@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2002 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -26,9 +26,9 @@
 /* this tests to see if SF_SYNC is raised at the right time */
 static int	Count = 0;
 #if __STD_C
-static except(Sfio_t* f, int type, Void_t* arg, Sfdisc_t* disc)
+static int except(Sfio_t* f, int type, Void_t* arg, Sfdisc_t* disc)
 #else
-static except(f, type, arg, disc)
+static int except(f, type, arg, disc)
 Sfio_t*		f;
 int		type;
 Void_t*		arg;

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1990-2003 AT&T Corp.                #
+#                Copyright (c) 1990-2004 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -15,7 +15,7 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
@@ -35,16 +35,18 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2002-07-31 $
+@(#)$Id: sear (AT&T Labs Research) 2004-09-24 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
 [+DESCRIPTION?\bsear\b generates a win32 self extracting archive
 	that can be used to install win32 files and applications.
-	Each \afile\a operand is a \btgz\b (\btar\b(1) \bgzip\b(1))
-	archive that is appended to the self extracting archive.
-	If no \afile\a operands are specified then the standard
-	input is read.]
+	\bpax\b(1) is used to generate a \btgz\b (\btar\b(1)
+	\bgzip\b(1)) archive from the \afile\a operands that is
+	appended to the self extracting archive. If no \afile\a
+	operands are specified then the standard input is read.
+	\bpax\b(1) options (like \b--verbose\b) may be specified
+	after a \b--\b operand but before the first \afile\a operand.]
 [+?When the self extracting archive is executed it creates a temporary
 	directory and unpacks each \afile\a. If \b--command\b=\acommand\a
 	was specified when the archive was generated then \acommand\a
@@ -63,7 +65,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 [v:verbose?Set the \bratz\b(1) \b--verbose\b option when the archive is
 	extracted.]
 
-[ file ] ...
+[ -- pax-options ] [ file ] ...
 
 [+EXIT STATUS?]{
 	[+0?Success.]
@@ -162,11 +164,13 @@ if	! rc -x -r -fo"$host_res" "$host_rc"
 then	exit 1
 fi
 export nativepp=-1
-if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src" "$res"
+if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
+	! $cc -o "$out" "$obj" "$res"
 then	exit 1
 fi
 size=$(wc -c < "$out")
-if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src" "$res"
+if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -c "$src" ||
+	! $cc -o "$out" "$obj" "$res"
 then	exit 1
 fi
-pax -x tgz -wv "$@" >> "$out"
+pax -x tgz -w "$@" >> "$out"

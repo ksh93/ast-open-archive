@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -508,7 +508,11 @@ ppop(int op, ...)
 				sfclose(pp.filedeps.sp);
 		}
 		if (pp.state & STANDALONE)
+		{
+			if ((pp.state & (NOTEXT|HIDDEN)) == HIDDEN && pplastout() != '\n')
+				ppputchar('\n');
 			ppflushout();
+		}
 		error_info.file = 0;
 		break;
 	case PP_DUMP:
@@ -778,6 +782,8 @@ ppop(int op, ...)
 				inithash(pp.strtab, predicates);
 				inithash(pp.strtab, variables);
 			}
+			pp.optflags[X_PROTOTYPED] = OPT_GLOBAL;
+			pp.optflags[X_SYSTEM_HEADER] = OPT_GLOBAL|OPT_PASS;
 
 			/*
 			 * mark macros that are builtin predicates
@@ -1310,6 +1316,18 @@ ppop(int op, ...)
 		break;
 	case PP_PRAGMA:
 		pp.pragma = va_arg(ap, PPPRAGMA);
+		break;
+	case PP_PRAGMAFLAGS:
+		if (p = va_arg(ap, char*))
+		{
+			n = OPT_GLOBAL;
+			if (*p == '-')
+				p++;
+			else
+				n |= OPT_PASS;
+			if ((c = (int)hashref(pp.strtab, p)) > 0 && c <= X_last_option)
+				pp.optflags[c] = n;
+		}
 		break;
 	case PP_PROBE:
 		pp.probe = va_arg(ap, char*);

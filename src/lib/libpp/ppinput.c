@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -195,8 +195,13 @@ pppush(register int t, register char* s, register char* p, int n)
 			error_info.file = s;
 			error_info.line = n;
 		}
-		pp.hidden = 0;
-		pp.state &= ~HIDDEN;
+		if (pp.state & HIDDEN)
+		{
+			pp.state &= ~HIDDEN;
+			pp.hidden = 0;
+			if (!(pp.state & NOTEXT) && pplastout() != '\n')
+				ppputchar('\n');
+		}
 		pp.state |= NEWLINE;
 		if (pp.mode & HOSTED) cur->flags |= IN_hosted;
 		if (pp.mode & (INIT|MARKHOSTED))
@@ -216,7 +221,8 @@ pppush(register int t, register char* s, register char* p, int n)
 			if (pp.state & JOINING) pp.state |= HIDDEN|SYNCLINE;
 			else
 #endif
-			if (pp.linesync) (*pp.linesync)(error_info.line, error_info.file);
+			if (pp.linesync)
+				(*pp.linesync)(error_info.line, error_info.file);
 #if ARCHIVE && CHECKPOINT
 			if (pp.member)
 				ppload(NiL);

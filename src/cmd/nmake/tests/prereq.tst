@@ -55,14 +55,17 @@ make Makefile.mo
 bind Makefile.mo 4
 exec  : compile into make object
 done Makefile.mo
+make .OPTION.COMPATIBILITY
+bind .OPTION.COMPATIBILITY 0
+done .OPTION.COMPATIBILITY virtual
 make .PROBE.INIT
 bind .PROBE.INIT 0
+make .OPTION.COMPATIBILITY
+bind .OPTION.COMPATIBILITY 4
+done .OPTION.COMPATIBILITY virtual
 make cc.probe
 bind cc.probe 3
 done cc.probe dontcare
-make .MAKE.OPTIONS.
-bind .MAKE.OPTIONS. 4
-done .MAKE.OPTIONS. virtual
 done .PROBE.INIT virtual
 setv INSTALLROOT $HOME
 bind (IFFEFLAGS) -v -c \'cc -O \'
@@ -171,14 +174,17 @@ make makerules.mo
 bind makerules.mo 3
 done makerules.mo
 done Makefile
+make .OPTION.COMPATIBILITY
+bind .OPTION.COMPATIBILITY 0
+done .OPTION.COMPATIBILITY virtual
 make .PROBE.INIT
 bind .PROBE.INIT 0
+make .OPTION.COMPATIBILITY
+bind .OPTION.COMPATIBILITY 4
+done .OPTION.COMPATIBILITY virtual
 make cc.probe
 bind cc.probe 3
 done cc.probe dontcare
-make .MAKE.OPTIONS.
-bind .MAKE.OPTIONS. 4
-done .MAKE.OPTIONS. virtual
 done .PROBE.INIT virtual
 setv INSTALLROOT $HOME
 bind (IFFEFLAGS) -v -c \'cc -O \'
@@ -281,11 +287,19 @@ info finish regression'
 TEST 04 ': scope'
 
 	EXEC	-n
+		INPUT Makefile $'z.o : -- --nooption'
+		ERROR - $'make: don\'t know how to make z.o : --nooption'
+		EXIT 1
+
+	EXEC	-n
+		INPUT Makefile $'z.o : -- variable=1'
+		ERROR - $'make: don\'t know how to make z.o'
+
+	EXEC	-n
 		INPUT Makefile $'USE == 1
 CCFLAGS = -x
 x.o : CCFLAGS+=-g .IMPLICIT'
 		ERROR - $'make: can\'t find source for x.o'
-		EXIT 1
 
 	EXEC	-n
 		INPUT Makefile $'USE == 1
@@ -295,7 +309,7 @@ x.o : CCFLAGS+=-g'
 
 	EXEC	-n
 		INPUT x.c 'int use = USE;'
-		OUTPUT - $'+ cc -x -g   -DUSE -c x.c'
+		OUTPUT - $'+ cc -x -g  -DUSE -c x.c'
 		ERROR -
 		EXIT 0
 
@@ -310,11 +324,19 @@ d.o : CCFLAGS=-a CCFLAGS+=-b'
 		INPUT b.c
 		INPUT c.c
 		INPUT d.c
-		OUTPUT - $'+ cc -O -a    -c a.c
-+ cc -O -b    -c b.c
-+ cc -O -a -b    -c c.c
-+ cc -a -b    -c d.c
+		OUTPUT - $'+ cc -O -a   -c a.c
++ cc -O -b   -c b.c
++ cc -O -a -b   -c c.c
++ cc -a -b   -c d.c
 + cc  -O   -o a a.o b.o c.o d.o'
+
+	EXEC	-n --compare tst=123
+		INPUT Makefile $'all : scoped notscoped
+scoped notscoped :
+	: $(<) --compare=$(-compare) tst=$(tst)
+scoped : --nocompare tst=789'
+		OUTPUT - $'+ : scoped --compare= tst=789
++ : notscoped --compare=1 tst=123'
 
 TEST 05 'serial vs concurrent'
 
@@ -373,7 +395,7 @@ TEST 06 ':: scope'
 	EXEC	-n
 		INPUT Makefile $'t :: t.c CCFLAGS=-g'
 		INPUT t.c
-		OUTPUT - $'+ cc -g    -c t.c
+		OUTPUT - $'+ cc -g   -c t.c
 + cc  -g   -o t t.o'
 
 TEST 07 'missing prereqs'
@@ -464,7 +486,7 @@ bar :: bar.c
 :INSTALL:
 	: $(~bar:Q) :'
 		INPUT bar.c
-		OUTPUT - $'+ cc -O    -c bar.c
+		OUTPUT - $'+ cc -O   -c bar.c
 + cc  -O   -o bar bar.o
 + if	silent test ! -d bin
 + then	mkdir -p bin 		    		   
@@ -479,7 +501,7 @@ CCFLAGS = $(CC.DLL)
 foo $(VERSION) :LIBRARY: foo.c'
 		INPUT foo.c
 		OUTPUT - $'+ echo "" -lfoo > foo.req
-+ cc -D_BLD_DLL -D_BLD_PIC    -c foo.c
++ cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + ar cr libfoo.a foo.o
 + rm -f foo.o
 + cc  -shared  -o libfoo.so -all libfoo.a -notall 
@@ -530,7 +552,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 
 	EXEC	-n install VERSION=
 		OUTPUT - $'+ echo "" -lfoo > foo.req
-+ cc -D_BLD_DLL -D_BLD_PIC    -c foo.c
++ cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + ar cr libfoo.a foo.o
 + rm -f foo.o
 + cc  -shared  -o libfoo.so.1.0 -all libfoo.a -notall 
@@ -581,7 +603,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 
 	EXEC	-n install VERSION=3.4.5
 		OUTPUT - $'+ echo "" -lfoo > foo.req
-+ cc -D_BLD_DLL -D_BLD_PIC    -c foo.c
++ cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + ar cr libfoo.a foo.o
 + rm -f foo.o
 + cc  -shared  -o libfoo.so.3.4.5 -all libfoo.a -notall 
@@ -639,23 +661,23 @@ TEST 12 '-l prereq libs'
 		INPUT libfoo.a
 		INPUT bar.req $' -lbar'
 		INPUT libbar.a
-		OUTPUT - $'+ cc -O    -c baz.c
+		OUTPUT - $'+ cc -O   -c baz.c
 + cc  -O   -o baz baz.o libfoo.a libbar.a'
 
 	EXEC	-n
 		INPUT foo.req $' -lbar'
-		OUTPUT - $'+ cc -O    -c baz.c
+		OUTPUT - $'+ cc -O   -c baz.c
 + cc  -O   -o baz baz.o libbar.a'
 
 	EXEC	-n
 		INPUT foo.req
-		OUTPUT - $'+ cc -O    -c baz.c
+		OUTPUT - $'+ cc -O   -c baz.c
 + cc  -O   -o baz baz.o'
 
 	EXEC	-n
 		INPUT foo.req $' -lfoo -lbar'
 		INPUT bar.req $' -lbar -lfoo'
-		OUTPUT - $'+ cc -O    -c baz.c
+		OUTPUT - $'+ cc -O   -c baz.c
 + cc  -O   -o baz baz.o libbar.a libfoo.a'
 
 TEST 13 'nested : scope'

@@ -38,17 +38,17 @@ b :: b.c x.c'
 		INPUT a.c $'int debug_a = DEBUG;'
 		INPUT b.c $'int debug_b = DEBUG;'
 		INPUT x.c
-		OUTPUT - $'+ cc -O   -DDEBUG -c a.c
-+ cc -O    -c x.c
+		OUTPUT - $'+ cc -O  -DDEBUG -c a.c
++ cc -O   -c x.c
 + cc  -O   -o a a.o x.o
-+ cc -O    -c b.c
++ cc -O   -c b.c
 + cc  -O   -o b b.o x.o'
 
 	EXEC	-n all DEBUG=2
-		OUTPUT - $'+ cc -O   -DDEBUG -c a.c
-+ cc -O    -c x.c
+		OUTPUT - $'+ cc -O  -DDEBUG -c a.c
++ cc -O   -c x.c
 + cc  -O   -o a a.o x.o
-+ cc -O   -DDEBUG=2 -c b.c
++ cc -O  -DDEBUG=2 -c b.c
 + cc  -O   -o b b.o x.o'
 
 TEST 03 ':: vs metarules'
@@ -57,7 +57,7 @@ TEST 03 ':: vs metarules'
 		INPUT Makefile 'x :: y.c'
 		INPUT x.c
 		INPUT y.c
-		OUTPUT - $'+ cc -O    -c y.c
+		OUTPUT - $'+ cc -O   -c y.c
 + cc  -O   -o x y.o'
 
 TEST 04 ':LIBRARY:'
@@ -256,9 +256,9 @@ int foo() { return 123; }'
 		INPUT foo.req $' -lfoo
  -lbar'
 		INPUT libbar.a
-		OUTPUT - $'+ cc -D_BLD_DLL -D_BLD_PIC    -c foo.c
+		OUTPUT - $'+ cc -D_BLD_DLL -D_BLD_PIC   -c foo.c
 + echo "" -lfoo > foo.req
-+ cc -D_BLD_DLL -D_BLD_PIC    -c lib.c
++ cc -D_BLD_DLL -D_BLD_PIC   -c lib.c
 + ar cr libfoo.a lib.o
 + rm -f lib.o
 + cc     -o foo foo.o libfoo.a libbar.a
@@ -297,12 +297,12 @@ init.c : mkinit builtins.c
 		INPUT mkbuiltins
 		INPUT mkinit
 		OUTPUT - $'+ sh ./mkbuiltins ./builtins
-+ cc -O     -O   -o builtins builtins.c
++ cc -O    -O   -o builtins builtins.c
 + sh ./mkbuiltins ./builtins
-+ cc -O  -I.  -c main.c
++ cc -O -I.  -c main.c
 + sh ./mkinit ./builtins.c
-+ cc -O    -c init.c
-+ cc -O    -c builtins.c'
++ cc -O   -c init.c
++ cc -O   -c builtins.c'
 
 	EXEC	-n
 		INPUT Makefile $'all : main.o init.o builtins.o
@@ -311,12 +311,12 @@ builtins.h builtins.c : mkbuiltins builtins
 init.c : mkinit builtins.c
 	sh $(*:P=E)'
 		OUTPUT - $'+ sh ./mkbuiltins ./builtins
-+ cc -O     -O   -o builtins builtins.c
++ cc -O    -O   -o builtins builtins.c
 + sh ./mkbuiltins ./builtins
-+ cc -O  -I.  -c main.c
++ cc -O -I.  -c main.c
 + sh ./mkinit ./builtins.c
-+ cc -O    -c init.c
-+ cc -O    -c builtins.c'
++ cc -O   -c init.c
++ cc -O   -c builtins.c'
 
 	EXEC	-n
 		INPUT Makefile $'all : main.o init.o builtins.o
@@ -325,11 +325,11 @@ builtins.h builtins.c :JOINT: mkbuiltins builtins
 init.c : mkinit builtins.c
 	sh $(*:P=E)'
 		OUTPUT - $'+ sh ./mkbuiltins ./builtins
-+ cc -O     -O   -o builtins builtins.c
-+ cc -O  -I.  -c main.c
++ cc -O    -O   -o builtins builtins.c
++ cc -O -I.  -c main.c
 + sh ./mkinit ./builtins.c
-+ cc -O    -c init.c
-+ cc -O    -c builtins.c'
++ cc -O   -c init.c
++ cc -O   -c builtins.c'
 
 TEST 14 ':JOINT:'
 
@@ -427,7 +427,7 @@ test :LIBRARY: lib.c
 libtestlib.a :LINK: $(.LIB.NAME. test)'
 		INPUT lib.c $'lib(){}'
 		OUTPUT - $'+ echo "" -ltest > test.req
-+ cc -O    -c lib.c
++ cc -O   -c lib.c
 + ar cr libtest.a lib.o
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
@@ -440,7 +440,7 @@ libtestlib.a :LINK: $(.LIB.NAME. test)'
 		INPUT Makefile $':ALL:
 libtest.a :: lib.c
 libtestlib.a :LINK: libtest.a'
-		OUTPUT - $'+ cc -O    -c lib.c
+		OUTPUT - $'+ cc -O   -c lib.c
 + ar cr libtest.a lib.o
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
@@ -453,7 +453,7 @@ libtestlib.a :LINK: libtest.a'
 		INPUT Makefile $':ALL:
 testlib.a :: lib.c
 libtestlib.a :LINK: testlib.a'
-		OUTPUT - $'+ cc -O    -c lib.c
+		OUTPUT - $'+ cc -O   -c lib.c
 + ar cr testlib.a lib.o
 + rm -f lib.o
 + if	silent test -f "libtestlib.a"
@@ -797,20 +797,29 @@ b:'
 
 TEST 24 ':MAKE: with lhs and rhs'
 
-	EXEC
+	EXEC	--novirtual
 		INPUT Makefile $'all : d1 d2
 d1 :MAKE: a
 d2 :MAKE: b'
-		ERROR - $'a: cannot recurse on virtual directory
-b: cannot recurse on virtual directory'
+		ERROR - $'a: warning: cannot recurse on virtual directory
+b: warning: cannot recurse on virtual directory'
 
-	EXEC
+	EXEC	--
+		ERROR - $'a:
+make [a]: a makefile must be specified when Nmakefile,nmakefile,Makefile,makefile omitted
+make: *** exit code 1 making a'
+		EXIT 1
+
+	EXEC	--novirtual
+
+	EXEC	--
 		INPUT a/Makefile $'all :\n\t: $(PWD:B)'
 		INPUT b/Makefile $'all :\n\t: $(PWD:B)'
 		ERROR - $'a:
 + : a
 b:
 + : b'
+		EXIT 0
 
 	EXEC	d1
 		ERROR - $'a:
@@ -826,7 +835,7 @@ TEST 25 ':: with command/library name clash'
 		INPUT Makefile $'t :: t.c -lt'
 		INPUT t.c $'int main(){return 0;}'
 		INPUT libt.a
-		OUTPUT - $'+ cc -O    -c t.c
+		OUTPUT - $'+ cc -O   -c t.c
 + cc  -O   -o t t.o libt.a'
 
 TEST 26 ':LIBRARY: + version + options'
@@ -981,7 +990,7 @@ TBINDIR = $(INSTALLROOT)/tbin
 .INSTALL.%.TBIN : $$(TBINDIR)
 t :: t.c .TBIN'
 		INPUT t.c $'int main(){return 0;}'
-		OUTPUT - $'+ cc -O    -c t.c
+		OUTPUT - $'+ cc -O   -c t.c
 + cc  -O   -o t t.o
 + if	silent test ! -d tbin
 + then	mkdir -p tbin 		    		   
@@ -1005,7 +1014,7 @@ TBINDIR = $(INSTALLROOT)/tbin
 .TBIN : .ATTRIBUTE
 $(TBINDIR) :INSTALLMAP: A=.TBIN
 t :: t.c .TBIN'
-		OUTPUT - $'+ cc -O    -c t.c
+		OUTPUT - $'+ cc -O   -c t.c
 + cc  -O   -o t t.o
 + if	silent test ! -d tbin
 + then	mkdir -p tbin 		    		   
@@ -1138,23 +1147,23 @@ libraryC$(VARIANTID) :LIBRARY: a.c b.c c.c -lws2_32
 			INPUT b.c
 			INPUT c.c
 			OUTPUT - $'+ echo "" -llibraryC > libraryC.req
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c a.c
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c b.c
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c c.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c a.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
 + ar cr liblibraryC.a a.o b.o c.o
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC.so.1.0 -all liblibraryC.a -notall 
 + echo "" -llibraryC++ > libraryC++.req
-+ CC -O -D_BLD_DLL -D_BLD_PIC    -c ../a.c
-+ CC -O -D_BLD_DLL -D_BLD_PIC    -c ../b.c
-+ CC -O -D_BLD_DLL -D_BLD_PIC    -c ../c.c
++ CC -O -D_BLD_DLL -D_BLD_PIC   -c ../a.c
++ CC -O -D_BLD_DLL -D_BLD_PIC   -c ../b.c
++ CC -O -D_BLD_DLL -D_BLD_PIC   -c ../c.c
 + ar cr liblibraryC++.a a.o b.o c.o
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC++.so.1.0 -all liblibraryC++.a -notall 
 + echo "" -llibraryC2 > libraryC2.req
-+ cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar    -c ../a.c
-+ cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar    -c ../b.c
-+ cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar    -c ../c.c
++ cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../a.c
++ cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../b.c
++ cc -O -D_BLD_DLL -D_BLD_PIC -DFOO=bar   -c ../c.c
 + ar cr liblibraryC2.a a.o b.o c.o
 + rm -f a.o b.o c.o
 + cc  -shared  -o liblibraryC2.so.1.0 -all liblibraryC2.a -notall '

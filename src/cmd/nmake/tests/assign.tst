@@ -148,3 +148,35 @@ all :
 		OUTPUT - $'hello world'
 
 	EXEC	--silent
+
+TEST 08 'variable and option scope'
+
+	EXEC	-bcf base.mk
+		INPUT base.mk $'
+CLOBBER := 1
+set option=";clobber;b;-;The install action removes targets instead of renaming to \atarget\a\b.old\b."
+set clobber:=1
+set jobs:=9'
+
+	EXEC	MAKERULES=base -n
+		INPUT Makefile $'all :
+	echo CLOBBER=$(CLOBBER) --clobber=$(-clobber) --jobs=$(-jobs)'
+		OUTPUT - $'+ echo CLOBBER=1 --clobber=1 --jobs=9'
+
+	EXEC	MAKERULES=base -n CLOBBER=0 --clobber=0 --jobs=0
+		INPUT Makefile $'all :
+	echo CLOBBER=$(CLOBBER) --clobber=$(-clobber) --jobs=$(-jobs)'
+		OUTPUT - $'+ echo CLOBBER=0 --clobber= --jobs='
+
+	EXEC	MAKERULES=base -n CLOBBER= --noclobber --nojobs
+		INPUT Makefile $'all :
+	echo CLOBBER=$(CLOBBER) --clobber=$(-clobber) --jobs=$(-jobs)'
+		OUTPUT - $'+ echo CLOBBER= --clobber= --jobs='
+
+	EXEC	MAKERULES=base -n --'?clobber'
+		OUTPUT -
+		ERROR - $'make: [ options ] [ script ... ] [ target ... ]
+OPTIONS
+  --clobber       (base) The install action removes targets instead of renaming
+                  to target.old.'
+		EXIT 2

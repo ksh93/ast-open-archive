@@ -1067,7 +1067,7 @@ order_descend(Sfio_t* xp, Hash_table_t* tab, struct rule* r, int all, unsigned l
 	return mark;
 }
 
-static void	order_find(Sfio_t*, Sfio_t*, Sfio_t*, Hash_table_t*, char*, char*, char*, char*, int, int);
+static void	order_find(Sfio_t*, Sfio_t*, Sfio_t*, Hash_table_t*, char*, char*, char*, char*, int, int, int);
 
 /*
  * scan makefile r for ORDER_RECURSE assertion operators and add to vec
@@ -1077,9 +1077,11 @@ static void
 order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, struct rule* d, struct rule* r, char* makefiles, char* skip, int prereqs)
 {
 	register char*	s;
+	register char*	t;
+	register char**	v;
 	Sfio_t*		sp;
-	DIR*		dir;
-	struct dirent*	ent;
+	int		n;
+	glob_t		gl;
 
 	if (d == internal.dot)
 		d->mark |= M_MUST;
@@ -1115,17 +1117,19 @@ order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, struct rule*
 					{
 						while (*++s && (*s == ' ' || *s == '\t'));
 						if (*s)
-							order_find(xp, tmp, vec, tab, NiL, s, makefiles, skip, 1, prereqs);
+							order_find(xp, tmp, vec, tab, NiL, s, makefiles, skip, 0, 1, prereqs);
 						else
 						{
 							d->mark |= M_RHS;
-							if (dir = opendir(d->name))
+							n = strlen(d->name) + 1;
+							sfprintf(internal.tmp, "%s/*/", d->name);
+							v = globv(&gl, sfstruse(internal.tmp));
+							while (t = *v++)
 							{
-								while (ent = readdir(dir))
-									if (*ent->d_name != '.')
-										order_find(xp, tmp, vec, tab, d->name, ent->d_name, makefiles, skip, 0, prereqs);
-								closedir(dir);
+								t[strlen(t) - 1] = 0;
+								order_find(xp, tmp, vec, tab, d->name, t + n, makefiles, skip, 1, 1, prereqs);
 							}
+							globfree(&gl);
 						}
 					}
 					break;
@@ -1140,7 +1144,7 @@ order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, struct rule*
  */
 
 static void
-order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, char* files, char* makefiles, char* skip, int force, int prereqs)
+order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, char* files, char* makefiles, char* skip, int directory, int force, int prereqs)
 {
 	struct rule*	r;
 	struct rule*	d;
@@ -1169,7 +1173,7 @@ order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, c
 		}
 		else
 			t = s;
-		if (force >= 0 && !stat(t, &st) && S_ISDIR(st.st_mode))
+		if (directory || force >= 0 && (d = bindfile(NiL, t, 0)) && !stat(d->name, &st) && S_ISDIR(st.st_mode))
 		{
 			d = makerule(t);
 			t = makefiles;
@@ -1257,7 +1261,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	tab = hashalloc(table.rule, 0);
 	tmp = sfstropen();
 	vec = sfstropen();
-	order_find(xp, tmp, vec, tab, NiL, directories, makefiles, skip, force, prereqs);
+	order_find(xp, tmp, vec, tab, NiL, directories, makefiles, skip, 0, force, prereqs);
 	mark = sfstrtell(vec);
 	putptr(vec, 0);
 	v = (struct rule**)sfstrbase(vec);
@@ -1521,6 +1525,11 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			pos = sfstrtell(xp);
 			if (*s == '/')
 				sfputr(xp, s, 0);
+			else if (r && (r->dynamic & D_bound) && r->time)
+			{
+				op = "!";
+				goto view;
+			}
 			else
 				sfprintf(xp, "%s/%s%c", state.mam.statix ? internal.dot->name : internal.pwd, s, 0);
 			s = sfstrset(xp, pos);
@@ -1646,7 +1655,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				sfprintf(tmp, "**");
 			else
 				sfprintf(tmp, "%s/**", s);
-			for (p = globv(sfstruse(tmp)); *p; p++)
+			for (p = globv(NiL, sfstruse(tmp)); *p; p++)
 			{
 				sfputc(xp, ' ');
 				sfputr(xp, *p, -1);
@@ -1656,7 +1665,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 		return;
 	case 'G':
 		sep = 0;
-		for (p = globv(s); *p; p++)
+		for (p = globv(NiL, s); *p; p++)
 		{
 			if (sep)
 				sfputc(xp, ' ');
@@ -1709,6 +1718,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			/* ignore */;
 		else if (*++op == '*' || *op == '!' || *op == '=' && (*(op + 1) == '*' || *(op + 1) == '!'))
 		{
+	view:
 			/*
 			 * if bound then return top and covered view names
 			 */
@@ -1717,7 +1727,10 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				op++;
 			sep = 0;
 			if (!state.maxview)
+			{
+				r = 0;
 				goto absolute;
+			}
 			else if (state.fsview)
 			{
 				sfstrrsrv(internal.nam, MAXNAME + 5);
@@ -1772,7 +1785,10 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 					}
 				}
 				if (*s == '/')
+				{
+					r = 0;
 					goto absolute;
+				}
 				for (; n <= state.maxview; n++)
 				{
 					if (root)
@@ -2146,17 +2162,32 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	case 'Q':
 		switch (*ops)
 		{
+		case 0:
+			tst = !!getrule(s);
+			break;
+		case 'O':
+			tst = isoption(s);
+			break;
+		case 'R':
+			tst = (!dobind || getrule(s)) && !(nametype(s, NiL) & (NAME_altstate|NAME_staterule|NAME_statevar));
+			break;
 		case 'S':
 			switch (*(ops + 1))
 			{
+			case 0:
+				tst = NAME_altstate|NAME_staterule|NAME_statevar;
+				break;
 			case 'A':
 				tst = NAME_altstate;
+				break;
+			case 'R':
+				tst = NAME_staterule;
 				break;
 			case 'V':
 				tst = NAME_statevar;
 				break;
 			default:
-				tst = NAME_staterule;
+				tst = 0;
 				break;
 			}
 			tst = (!dobind || getrule(s)) && (nametype(s, NiL) & tst);
@@ -2164,23 +2195,27 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		case 'V':
 			switch (*(ops + 1))
 			{
+			case 0:
+				tst = !!getvar(s);
+				break;
 			case 'I':
 				tst = (!dobind || getvar(s)) && isintvar(s);
 				break;
+			case 'V':
+				tst = (!dobind || getvar(s)) && !isintvar(s);
+				break;
 			default:
-				tst = !!getvar(s);
+				tst = 0;
 				break;
 			}
 			break;
 		default:
-			tst = !!getrule(s);
+			tst = 0;
 			break;
 		}
 		if (tst == !(sep & NOT))
-		{
 			sfputr(xp, s, -1);
-			return;
-		}
+		return;
 	}
 	r = makerule(s);
 	if (dounbind)
@@ -3075,6 +3110,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 	char*			oldp;
 	char*			newp;
 	char*			eb;
+	int			zer;
 	int			old;
 	int			qual;
 	int			cnt;
@@ -3416,13 +3452,19 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			if (*ed)
 				ed++;
 			*s = 0;
-			old = 0;
+			old = zer = 0;
 			while (*ed && *ed != del && !isspace(*ed))
 				switch (*ed++)
 				{
 				case 'O':
 				case 'o':
 					old = 1;
+					break;
+				case 'Z':
+				case 'z':
+				case '+':
+				case '-':
+					zer = 1;
 					break;
 				default:
 					error(1, "invalid character after conditional: %s", editcontext(eb, ed));
@@ -3442,47 +3484,58 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			 * value: [~!<>][=][<val>]
 			 */
 
-			for (;; ed++)
+			if (isupper(op))
 			{
-				switch (*ed)
+				for (;; ed++)
 				{
-				case '~':
-					if (sep & MAT)
+					switch (*ed)
+					{
+					case '-':
+					case '+':
+						if (!sep)
+						{
+							sep |= EQ;
+							ed++;
+						}
 						break;
-					sep |= MAT;
-					continue;
-				case '^':
-					if (sep & HAT)
-						break;
-					sep |= HAT;
-					continue;
-				case '!':
-					if (sep & NOT)
-						break;
-					sep |= NOT;
-					continue;
-				case '<':
-					if (sep & LT)
-						break;
-					sep |= LT;
-					continue;
-				case '=':
-					if (sep & EQ)
-						break;
-					sep |= EQ;
-					continue;
-				case '>':
-					if (sep & GT)
-						break;
-					sep |= GT;
-					continue;
+					case '~':
+						if (sep & MAT)
+							break;
+						sep |= MAT;
+						continue;
+					case '^':
+						if (sep & HAT)
+							break;
+						sep |= HAT;
+						continue;
+					case '!':
+						if (sep & NOT)
+							break;
+						sep |= NOT;
+						continue;
+					case '<':
+						if (sep & LT)
+							break;
+						sep |= LT;
+						continue;
+					case '=':
+						if (sep & EQ)
+							break;
+						sep |= EQ;
+						continue;
+					case '>':
+						if (sep & GT)
+							break;
+						sep |= GT;
+						continue;
+					}
+					break;
 				}
-				break;
-			}
-			if (!sep)
-			{
-				error(3, "edit operator delimiter omitted: %s", editcontext(eb, ed + 1));
-				break;
+				if (!sep)
+				{
+					error(3, "edit operator delimiter omitted: %s", editcontext(eb, ed + 1));
+					break;
+				}
 			}
 			val = ed;
 			for (cnt = n = 0; *ed; ed++)
@@ -3570,6 +3623,9 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		case 'U':
 		case 'W':
 		case 'X':
+		case '-':
+		case '+':
+		case '~':
 			tokenize = 0;
 			break;
 		}
@@ -3775,10 +3831,18 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			sort(xp, x, n);
 			continue;
 		case 'R':
-			parse(NiL, x, "expand", 0);
+			parse(NiL, x, "expand", NiL);
 			continue;
 		case 'V':
 			error(1, "edit operator `%c' must appear first", op);
+			continue;
+		case '-':
+		case '+':
+		case '~':
+			if (val != KEEP && val != DELETE && (*x && (*x != '0' || *(x + 1))) == (op == '+'))
+				expand(xp, val);
+			else if (op != '~')
+				expand(xp, x);
 			continue;
 		default:
 			error(1, "unknown edit operator `%c'", op);
@@ -3958,7 +4022,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				token(xp, s, val, sep);
 				break;
 			case 'Y':
-				expand(xp, *s ? (old ? s : oldp) : newp);
+				expand(xp, (*s && (zer ? (*s != '0' || *(s + 1)) : 1)) ? (old ? s : oldp) : newp);
 				break;
 #if DEBUG
 			default:

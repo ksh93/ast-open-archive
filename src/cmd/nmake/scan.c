@@ -1061,7 +1061,7 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 		if (a->script)
 		{
 			label[0] = a->type;
-			parse(NiL, a->script, label, 0);
+			parse(NiL, a->script, label, NiL);
 		}
 		if (a->map)
 		{
@@ -1084,7 +1084,7 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 			{
 				do
 				{
-					*o++ = (state.test & 4) ? '?' : FILE_SPACE;
+					*o++ = (state.test & 0x00080000) ? '?' : FILE_SPACE;
 				} while (o = strchr(o, ' '));
 				o = s;
 			}
@@ -1247,7 +1247,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 
 		if (!(sp = fapply(r, null, r->name, ss->external, CO_ALWAYS|CO_LOCAL|CO_URGENT)))
 			error(3, "%s: external scan error", r->name);
-		parse(sp, NiL, "external-scan", 0);
+		parse(sp, NiL, "external-scan", NiL);
 		sfclose(sp);
 		p = internal.implicit->prereqs;
 		internal.implicit->prereqs = 0;

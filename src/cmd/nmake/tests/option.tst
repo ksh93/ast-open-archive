@@ -1,113 +1,311 @@
 # ast nmake option tests
 
-INCLUDE test.def
+INCLUDE cc.def
 
 TEST 01 'option basics'
 
-	EXEC	-n -f - . 'print -- $(--:H:/ /$("\n")/G)'
-		OUTPUT - $'--alias
---file=-
---intermediate
---jobs=1
---noaccept
+	EXEC	-n -f - . 'print -- $(-?:/ /$("\n")/G)'
+		OUTPUT - $'--all-static:=1
+--cctype:=cc
+--compare:=1
+--nativepp:=-1
+--official-out:=OFFICIAL
+--output:=\'option\'
+--prefix-include:=1
+--preserve:=\'lib*.so.*|\'
+--recurse:=1
+--separate-include:=1
+--virtual:=1'
+
+	EXEC	-n -f - . 'print -- $(-+:/ /$("\n")/G)'
+		OUTPUT - $'--noexec'
+
+	EXEC	-n -f - . 'print -- $(-:/ /$("\n")/G)'
+
+	EXEC	-n -f - . 'print -- $(--:/ /$("\n")/G)'
+		OUTPUT - $'--noaccept
+--alias
 --nobase
 --nobelieve
---nobyname
 --nocompatibility
 --nocompile
 --nocorrupt
 --nocross
 --nodebug
---nodefine
 --noerrorid
 --noexec
 --noexpandview
 --noexplain
+--file=-
 --noforce
 --noglobal
 --noignore
 --noignorelock
---noimport
 --noinclude
+--intermediate
+--jobs=1
 --nokeepgoing
 --nolist
 --nomam
 --nonever
 --nooption
 --nooverride
---nopreprocess
 --noquestionable
 --noreadonly
+--readstate=32
 --noregress
 --noreread
 --noruledump
+--scan
+--noserialize
 --nosilent
 --nostrictview
 --notargetcontext
+--notargetprefix
 --notest
 --notolerance
 --notouch
---noundef
 --novardump
 --nowarn
---readstate=32
---scan
 --writeobject=-
---writestate=-'
+--writestate=-
+--nobyname
+--nodefine
+--nopreprocess
+--noundef
+--all-static:=1
+--noancestor
+--noancestor-source
+--noarclean
+--cctype:=cc
+--noclean-ignore
+--noclobber
+--compare:=1
+--nodebug-symbols
+--noforce-shared
+--noinstrument
+--nold-script
+--nolink
+--nativepp:=-1
+--official-out:=OFFICIAL
+--output:=\'option\'
+--prefix-include:=1
+--preserve:=\'lib*.so.*|\'
+--noprofile
+--recurse:=1
+--norecurse-enter
+--norecurse-leave
+--noselect
+--separate-include:=1
+--nostatic-link
+--nostrip-symbols
+--nothreads
+--novariants
+--noview-verify
+--virtual:=1'
 
-	EXEC	-n -f - -A --writeobject=test.mo --nowritestate . 'print -- $(--:H:/ /$("\n")/G)'
+	EXEC	--clobber -n -f - . 'print -- $(-?:/ /$("\n")/G)'
+		OUTPUT - $'--all-static:=1
+--cctype:=cc
+--compare:=1
+--nativepp:=-1
+--official-out:=OFFICIAL
+--output:=\'option\'
+--prefix-include:=1
+--preserve:=\'lib*.so.*|\'
+--recurse:=1
+--separate-include:=1
+--virtual:=1'
+
+	EXEC	--clobber -n -f - . 'print -- $(-+:/ /$("\n")/G)'
+		OUTPUT - $'--noexec'
+
+	EXEC	--clobber -n -f - . 'print -- $(-:/ /$("\n")/G)'
+		OUTPUT - $'--noexec
+--clobber=\'*\''
+
+	EXEC	--clobber -n -f - . 'print -- $(--:/ /$("\n")/G)'
+		OUTPUT - $'--noaccept
+--alias
+--nobase
+--nobelieve
+--nocompatibility
+--nocompile
+--nocorrupt
+--nocross
+--nodebug
+--noerrorid
+--noexec
+--noexpandview
+--noexplain
+--file=-
+--noforce
+--noglobal
+--noignore
+--noignorelock
+--noinclude
+--intermediate
+--jobs=1
+--nokeepgoing
+--nolist
+--nomam
+--nonever
+--nooption
+--nooverride
+--noquestionable
+--noreadonly
+--readstate=32
+--noregress
+--noreread
+--noruledump
+--scan
+--noserialize
+--nosilent
+--nostrictview
+--notargetcontext
+--notargetprefix
+--notest
+--notolerance
+--notouch
+--novardump
+--nowarn
+--writeobject=-
+--writestate=-
+--nobyname
+--nodefine
+--nopreprocess
+--noundef
+--all-static:=1
+--noancestor
+--noancestor-source
+--noarclean
+--cctype:=cc
+--noclean-ignore
+--clobber=\'*\'
+--compare:=1
+--nodebug-symbols
+--noforce-shared
+--noinstrument
+--nold-script
+--nolink
+--nativepp:=-1
+--official-out:=OFFICIAL
+--output:=\'option\'
+--prefix-include:=1
+--preserve:=\'lib*.so.*|\'
+--noprofile
+--recurse:=1
+--norecurse-enter
+--norecurse-leave
+--noselect
+--separate-include:=1
+--nostatic-link
+--nostrip-symbols
+--nothreads
+--novariants
+--noview-verify
+--virtual:=1'
+
+	EXEC	-n -f - -A --writeobject=test.mo --nowritestate . 'print -- $(--:/ /$("\n")/G)'
 		OUTPUT - $'--accept
 --alias
---file=-
---intermediate
---jobs=1
 --nobase
 --nobelieve
---nobyname
 --nocompatibility
 --nocompile
 --nocorrupt
 --nocross
 --nodebug
---nodefine
 --noerrorid
 --noexec
 --noexpandview
 --noexplain
+--file=-
 --noforce
 --noglobal
 --noignore
 --noignorelock
---noimport
 --noinclude
+--intermediate
+--jobs=1
 --nokeepgoing
 --nolist
 --nomam
 --nonever
 --nooption
 --nooverride
---nopreprocess
 --noquestionable
 --noreadonly
+--readstate=32
 --noregress
 --noreread
 --noruledump
+--scan
+--noserialize
 --nosilent
 --nostrictview
 --notargetcontext
+--notargetprefix
 --notest
 --notolerance
 --notouch
---noundef
 --novardump
 --nowarn
+--writeobject=test.mo
 --nowritestate
---readstate=32
---scan
---writeobject=test.mo'
+--nobyname
+--nodefine
+--nopreprocess
+--noundef
+--all-static:=1
+--noancestor
+--noancestor-source
+--noarclean
+--cctype:=cc
+--noclean-ignore
+--noclobber
+--compare:=1
+--nodebug-symbols
+--noforce-shared
+--noinstrument
+--nold-script
+--nolink
+--nativepp:=-1
+--official-out:=OFFICIAL
+--output:=\'option\'
+--prefix-include:=1
+--preserve:=\'lib*.so.*|\'
+--noprofile
+--recurse:=1
+--norecurse-enter
+--norecurse-leave
+--noselect
+--separate-include:=1
+--nostatic-link
+--nostrip-symbols
+--nothreads
+--novariants
+--noview-verify
+--virtual:=1'
+
+	EXEC	-n -f - . 'print -- $(-force)'
+		OUTPUT - $''
+
+	EXEC	-n -f - +F . 'print -- $(-force)'
+
+	EXEC	-n -f - --noforce . 'print -- $(-force)'
+
+	EXEC	-n -f - --force=0 . 'print -- $(-force)'
+
+	EXEC	-n -f - --force . 'print -- $(-force)'
+		OUTPUT - $'1'
+
+	EXEC	-n -f - --force=1 . 'print -- $(-force)'
+
+	EXEC	-n -f - -F . 'print -- $(-force)'
 
 	EXEC	-n -f - . 'print -- $(--force)'
-		OUTPUT - $''
+		OUTPUT - $'--noforce'
 
 	EXEC	-n -f - +F . 'print -- $(--force)'
 
@@ -115,46 +313,30 @@ TEST 01 'option basics'
 
 	EXEC	-n -f - --force=0 . 'print -- $(--force)'
 
+	EXEC	-n -f - -o noforce . 'print -- $(--force)'
+
+	EXEC	-n -f - -o force=0 . 'print -- $(--force)'
+
+	EXEC	-n -f - -o +F . 'print -- $(--force)'
+
 	EXEC	-n -f - --force . 'print -- $(--force)'
-		OUTPUT - $'1'
+		OUTPUT - $'--force'
 
 	EXEC	-n -f - --force=1 . 'print -- $(--force)'
 
 	EXEC	-n -f - -F . 'print -- $(--force)'
 
-	EXEC	-n -f - . 'print -- $(++force)'
-		OUTPUT - $'--noforce'
+	EXEC	-n -f - -o force . 'print -- $(--force)'
 
-	EXEC	-n -f - +F . 'print -- $(++force)'
+	EXEC	-n -f - -o force=1 . 'print -- $(--force)'
 
-	EXEC	-n -f - --noforce . 'print -- $(++force)'
-
-	EXEC	-n -f - --force=0 . 'print -- $(++force)'
-
-	EXEC	-n -f - -o noforce . 'print -- $(++force)'
-
-	EXEC	-n -f - -o force=0 . 'print -- $(++force)'
-
-	EXEC	-n -f - -o +F . 'print -- $(++force)'
-
-	EXEC	-n -f - --force . 'print -- $(++force)'
-		OUTPUT - $'--force'
-
-	EXEC	-n -f - --force=1 . 'print -- $(++force)'
-
-	EXEC	-n -f - -F . 'print -- $(++force)'
-
-	EXEC	-n -f - -o force . 'print -- $(++force)'
-
-	EXEC	-n -f - -o force=1 . 'print -- $(++force)'
-
-	EXEC	-n -f - -o -F . 'print -- $(++force)'
+	EXEC	-n -f - -o -F . 'print -- $(--force)'
 
 TEST 02 'undefined options'
 
 	EXEC	--silent -f - --foobar
 		ERROR - $'make: foobar: unknown option'
-		EXIT 1
+		EXIT 2
 
 	EXEC	--silent -f - -o --foobar
 
@@ -178,110 +360,123 @@ TEST 03 'user defined options'
 	EXEC	--silent
 		INPUT Makefile $'.set.unconditional : .FUNCTION
 	set $(%:N=1:??no?)force
-set option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\'
+set option=u;unconditional;b;.set.unconditional;\'Equivalent to \\b--force\\b.\'
 set unconditional
 all : .MAKE
-	print force=$(-force) unconditional=$(-unconditional) -F=$(-F) -u=$(-u) $(-)'
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+	print force=$(-force) unconditional=$(-unconditional) -F=$(-F) -u=$(-u)
+	print : $(-) :
+	print : $(--) :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1
+: --force --silent --unconditional :
+: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --noregress --noreread --noruledump --scan --noserialize --silent --nostrictview --notargetcontext --notargetprefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarclean --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --nolink --nativepp:=-1 --official-out:=OFFICIAL --output:=\'option\' --prefix-include:=1 --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
 
 	EXEC --silent
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1
+: --force --silent --unconditional :
+: --noaccept --alias --nobase --nobelieve --nocompatibility --nocompile --nocorrupt --nocross --debug=-2 --noerrorid --exec --noexpandview --noexplain --nofile --force --noglobal --noignore --noignorelock --noinclude --intermediate --jobs=1 --nokeepgoing --nolist --nomam --nonever --nooption --nooverride --noquestionable --noreadonly --readstate=32 --noregress --noreread --noruledump --scan --noserialize --silent --nostrictview --notargetcontext --notargetprefix --notest --notolerance --notouch --novardump --nowarn --writeobject=- --writestate=- --nobyname --nodefine --nopreprocess --noundef --all-static:=1 --noancestor --noancestor-source --noarclean --cctype:=cc --noclean-ignore --noclobber --compare:=1 --nodebug-symbols --noforce-shared --noinstrument --nold-script --nolink --nativepp:=-1 --official-out:=OFFICIAL --output:=\'option\' --prefix-include:=1 --preserve:=\'lib*.so.*|\' --noprofile --recurse:=1 --norecurse-enter --norecurse-leave --noselect --separate-include:=1 --nostatic-link --nostrip-symbols --nothreads --novariants --noview-verify --virtual:=1 --unconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
 
 	EXEC --silent -u
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+		INPUT Makefile $'.set.unconditional : .FUNCTION
+	set $(%:N=1:??no?)force
+set option=u;unconditional;b;.set.unconditional;\'Equivalent to \\b--force\\b.;\'
+set unconditional
+all : .MAKE
+	print force=$(-force) unconditional=$(-unconditional) -F=$(-F) -u=$(-u) : $(-) :'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
 
 	EXEC --silent -u
 
 	EXEC --silent
 
 	EXEC --silent +u
-		OUTPUT - $'force= unconditional= -F= -u= option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --nounconditional --silent --noforce'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
 
 	EXEC --silent +u
-		OUTPUT - $'force= unconditional= -F= -u= option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --nounconditional --silent --noforce'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
 
 	EXEC --silent +u
 
 	EXEC --silent
 
 	EXEC --silent -u
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force= unconditional= -F= -u= option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --nounconditional --silent --noforce'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
 
 	EXEC --silent -o unconditional
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
 
 	EXEC --silent
 
 	EXEC --silent -o nounconditional
-		OUTPUT - $'force= unconditional= -F= -u= option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --nounconditional --silent --noforce'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
 
 	EXEC --silent clobber
 		OUTPUT -
 
 	EXEC --silent --unconditional
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
 
 	EXEC --silent
 
 	EXEC --silent --nounconditional
-		OUTPUT - $'force= unconditional= -F= -u= option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --nounconditional --silent --noforce'
+		OUTPUT - $'force= unconditional= -F= -u= : --noforce --silent --nounconditional :'
 
 	EXEC --silent
-		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 option=u+unconditional+b+.set.unconditional+\'Equivalent to \b--force\b.\' --unconditional --silent --force'
+		OUTPUT - $'force=1 unconditional=1 -F=1 -u=1 : --force --silent --unconditional :'
 
 TEST 04 'command line definition'
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." --Ztest
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' --Ztest
 		INPUT Makefile $'tst :
 	: $(-) : $(-Z) : $(-Ztest) :'
-		OUTPUT - $'+ : --noexec option=Z+Ztest+b++\'Z test.\' --Ztest : 1 : 1 :'
+		OUTPUT - $'+ : --noexec --Ztest : 1 : 1 :'
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o Ztest
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o Ztest
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o --Ztest
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o --Ztest
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o -Ztest
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o -Ztest
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -Z
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -Z
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o -Z
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o -Z
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o Z
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o Z
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." --noZtest
-		OUTPUT - $'+ : --noexec option=Z+Ztest+b++\'Z test.\' --noZtest :  :  :'
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' --noZtest
+		OUTPUT - $'+ : --noexec --noZtest :  :  :'
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o noZtest
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o noZtest
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o --noZtest
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o --noZtest
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o -noZtest
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o -noZtest
 		OUTPUT - $'+ : --noexec :  :  :'
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." +Z
-		OUTPUT - $'+ : --noexec option=Z+Ztest+b++\'Z test.\' --noZtest :  :  :'
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' +Z
+		OUTPUT - $'+ : --noexec --noZtest :  :  :'
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o +Z
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o +Z
 
-	EXEC	-n --option=Z+Ztest+b++"Z test." -o Z
-		OUTPUT - $'+ : --noexec option=Z+Ztest+b++\'Z test.\' --Ztest : 1 : 1 :'
+	EXEC	-n --option='Z;Ztest;b;-;Z test.' -o Z
+		OUTPUT - $'+ : --noexec --Ztest : 1 : 1 :'
 
 TEST 05 '.mo interaction'
 
@@ -424,3 +619,212 @@ TEST 09 '--writeobject and --writestate with readonly pwd'
 
 	EXEC	--silent --writeobject=../wr/Testfile.mo --writestate=../wr/Testfile.ms
 		OUTPUT - $'Makefile.mo\nMakefile.ms\nTestfile.ml\nTestfile.mo\nTestfile.ms'
+
+TEST 10 'self documenting external options'
+
+	EXEC	-bcf base.mk
+		INPUT base.mk $'set option=";aha-base;b;-;Test base rules option;; superfluous.;"'
+
+	EXEC	'--?aha' -g global.mk MAKERULES=base
+		INPUT global.mk $'set option=";aha-global;n;-;Test global rules option.;estimate:=true"'
+		INPUT Makefile $'set option=";aha-user;sv;-;Test makefile option.;pattern:!*:=*.exe"
+set option=";aha-two"
+set option=";aha-three;s"
+set option=";aha-four;s;-;Blah;; blah."
+set option=";aha-five;s;-;Blah;; blah.;path"
+set option=";aha-six;s;-;Blah;; blah.;path;"
+set option=";aha-seven;n"
+set option=";aha-eight;n;-;Blah;; blah."
+set option=";aha-nine;n;-;Blah;; blah.;level"
+set option=";aha-ten;n;-;Blah;; blah.;level;"
+set option=";aha-var-three;sv"
+set option=";aha-var-four;sv;-;Blah;; blah."
+set option=";aha-var-five;sv;-;Blah;; blah.;path"
+set option=";aha-var-six;sv;-;Blah;; blah.;path;"
+set option=";aha-var-seven;nv"
+set option=";aha-var-eight;nv;-;Blah;; blah."
+set option=";aha-var-nine;nv;-;Blah;; blah.;level"
+set option=";aha-var-ten;nv;-;Blah;; blah.;level"'
+		EXIT 2
+		ERROR - $'make: [ options ] [ script ... ] [ target ... ]
+OPTIONS
+  --aha-base      (base) Test base rules option; superfluous.
+  --aha-global=estimate
+                  (global) Test global rules option. The default value is true.
+  --aha-user[=pattern]
+                  (Makefile) Test makefile option. If the option value is
+                  omitted then * is assumed. The default value is *.exe.
+  --aha-two       (Makefile) option.
+  --aha-three=string
+                  (Makefile) option.
+  --aha-four=string
+                  (Makefile) Blah; blah.
+  --aha-five=path (Makefile) Blah; blah.
+  --aha-six=path  (Makefile) Blah; blah.
+  --aha-seven=number
+                  (Makefile) option.
+  --aha-eight=number
+                  (Makefile) Blah; blah.
+  --aha-nine=level
+                  (Makefile) Blah; blah.
+  --aha-ten=level (Makefile) Blah; blah.
+  --aha-var-three[=string]
+                  (Makefile) option. The option value may be omitted.
+  --aha-var-four[=string]
+                  (Makefile) Blah; blah. The option value may be omitted.
+  --aha-var-five[=path]
+                  (Makefile) Blah; blah. The option value may be omitted.
+  --aha-var-six[=path]
+                  (Makefile) Blah; blah. The option value may be omitted.
+  --aha-var-seven[=number]
+                  (Makefile) option. The option value may be omitted.
+  --aha-var-eight[=number]
+                  (Makefile) Blah; blah. The option value may be omitted.
+  --aha-var-nine[=level]
+                  (Makefile) Blah; blah. The option value may be omitted.
+  --aha-var-ten[=level]
+                  (Makefile) Blah; blah. The option value may be omitted.'
+
+	EXEC	'--?aha' -g global.mk MAKERULES=base
+		INPUT Makefile $'set option=";aha-user;sv;-;Test makefile option.;pattern:!*:=*.exe"
+set option="+aha-two"
+set option="+aha-three+s"
+set option="+aha-four+s+-+Blah; blah."
+set option="+aha-five+s+-+Blah; blah.+path"
+set option="+aha-six+s+-+Blah; blah.+path+"
+set option="+aha-seven+n"
+set option="+aha-eight+n+-+Blah; blah."
+set option="+aha-nine+n+-+Blah; blah.+level"
+set option="+aha-ten+n+-+Blah; blah.+level+"
+set option="+aha-var-three+sv"
+set option="+aha-var-four+sv+-+Blah; blah."
+set option="+aha-var-five+sv+-+Blah; blah.+path"
+set option="+aha-var-six+sv+-+Blah; blah.+path+"
+set option="+aha-var-seven+nv"
+set option="+aha-var-eight+nv+-+Blah; blah."
+set option="+aha-var-nine+nv+-+Blah; blah.+level"
+set option="+aha-var-ten+nv+-+Blah; blah.+level"'
+
+TEST 11 'rules obsolete "name=value" compatibility'
+
+	EXEC	-n
+		INPUT Makefile $'all :\n\t: $(-clobber) : $(clobber) :'
+		OUTPUT - $'+ :  :  :'
+
+	EXEC	-n --noclobber
+
+	EXEC	-n --clobber=0
+
+	EXEC	-n --noclobber clobber=1
+		OUTPUT - $'+ :  : 1 :'
+
+	EXEC	-n clobber=1 --noclobber
+
+	EXEC	-n clobber=0
+		OUTPUT - $'+ :  : 0 :'
+
+	EXEC	-n --clobber
+		OUTPUT - $'+ : * :  :'
+
+	EXEC	-n --clobber=1
+
+	EXEC	-n --clobber clobber=0
+		OUTPUT - $'+ : * : 0 :'
+
+	EXEC	-n clobber=0 --clobber
+
+	EXPORT	MAKE_OPTIONS="clobber"
+
+	EXEC	-n
+		OUTPUT - $'+ : * :  :'
+
+	EXEC	-n --clobber=2
+		OUTPUT - $'+ : 2 :  :'
+
+	EXEC	-n --noclobber
+		OUTPUT - $'+ :  :  :'
+
+	EXEC	-n --noclobber clobber=1
+		OUTPUT - $'+ :  : 1 :'
+
+	EXEC	-n clobber=1 --noclobber
+
+	EXEC	-n clobber=0
+		OUTPUT - $'+ :  : 0 :'
+
+	EXEC	-n --clobber
+		OUTPUT - $'+ : * :  :'
+
+	EXEC	-n --clobber=1
+
+	EXEC	-n --clobber clobber=0
+		OUTPUT - $'+ : * : 0 :'
+
+	EXEC	-n clobber=0 --clobber
+
+	EXEC	-n
+		INPUT Makefile $'clobber = 0
+all :\n\t: $(-clobber) : $(clobber) :'
+		OUTPUT - $'+ :  : 0 :'
+
+	EXEC	-n
+		INPUT Makefile $'set noclobber
+all :\n\t: $(-clobber) : $(clobber) :'
+		OUTPUT - $'+ :  :  :'
+
+	EXEC	-n
+		INPUT Makefile $'clobber = 1
+all :\n\t: $(-clobber) : $(clobber) :'
+		OUTPUT - $'+ : * : 1 :'
+
+	EXEC	-n
+		INPUT Makefile $'set clobber
+all :\n\t: $(-clobber) : $(clobber) :'
+		OUTPUT - $'+ : * :  :'
+
+TEST 12 '--serialize'
+
+	EXEC	--jobs=2 --serialize
+		INPUT Makefile $'all : one two
+one :
+	echo begin $(<)
+	sleep 1
+	echo end $(<)
+two :
+	echo begin $(<)
+	sleep 3
+	echo end $(<)'
+		OUTPUT - $'begin one
+end one
+begin two
+end two'
+		ERROR - $'+ echo begin one
++ sleep 1
++ echo end one
++ echo begin two
++ sleep 3
++ echo end two'
+
+TEST 13 '--name[-+&|^]=value'
+
+	EXEC	-n
+		INPUT Makefile $'all : tst
+tst : .MAKE
+	print $(-test:F=0x%08x)
+	set test=0x1
+	print $(-test:F=0x%08x)
+	set test=0
+	print $(-test:F=0x%08x)
+	set test|=0x100
+	print $(-test:F=0x%08x)
+	set test|=0x011
+	print $(-test:F=0x%08x)
+	set test&=0x101
+	print $(-test:F=0x%08x)
+	set test^=0x111
+	print $(-test:F=0x%08x)
+	set test+=0x030
+	print $(-test:F=0x%08x)
+	set test-=0x010
+	print $(-test:F=0x%08x)'
+		OUTPUT - $'0x00000000\n0x00000001\n0x00000000\n0x00000100\n0x00000111\n0x00000101\n0x00000010\n0x00000040\n0x00000030'

@@ -40,7 +40,7 @@ cpp&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#msgcc">msgcc</A>&nbsp;&
 cql&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;ncsl&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#sort">sort</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libbz&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libodelta&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libz</TD></TR>
 </TBODY></TABLE></TD></TR></TBODY></TABLE>
 <P>
-This package is a superset of the following packages: ast-base ast-ksh ksh ast-ast; you won't need these if you download ast-open.
+This package is a superset of the following packages: ast-base ast-make ast-ksh ksh ast-ast; you won't need these if you download ast-open.
 The software is covered by this license:
 <UL type=square>
 <LI>
@@ -1032,7 +1032,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-04-08-08  --- Release ksh93p+  ---
+04-09-03  --- Release ksh93p+  ---
+04-09-03  &lt;&lt;&lt; here documents now handle quotes in the word token correctly. 
 04-08-08  The maximum size for read -n and and read -N was increased from
 	  4095 to 32M.
 04-08-04  printf %q was modified so that if an no operand was supplied, no
@@ -2192,6 +2193,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-25 bio.c: fix ap-&gt;io-&gt;count for skipped data -- wow
+	 pax-rpm.c: fix header padding logic
+04-09-01 bio.c: fix bread() seek logic
 04-08-11 pax.c,options.h,options.c: add -C,--chmod=mode to control header modes
 04-08-05 bio.c: fix bread() pointer arith 64 bit assumption (pax#15)
 04-08-01 delta.c: fix checksum 32-bit logic (pax#11) (testpax#01)
@@ -2559,6 +2563,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-24 sear.sh: add cc -c to avoid nativepp "ratz.c" message
 04-05-20 proto.tst: add `int fun __P((int));' test
 04-03-19 proto.c: add { .cpp .hpp }, fix standalone -c parse
 04-02-29 proto.tst: add -f -p option tests
@@ -2595,6 +2600,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-14 date.dat: add %| and %&amp; tests
+04-09-08 opt.tst: add :!value: omitted optional arg value TEST 47
 04-04-15 date.dat: add specific and ordinal day tests
 04-04-01 vmalloc: snarf vmalloc tests from kpv
 04-02-29 sfio/tscanf.c: add %! test
@@ -2968,10 +2975,33 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-24 option.c: optcheck() after each option table change
+04-09-21 add --option prereq scope with getopt() style "--" terminator
+	 expand.c: :P=A: now acts like :P=L!:
+	 Makerules.mk: fix $(-static) =&gt; $(-static-link)
+	 Makerules.mk: /bin/cat.exe =&gt; "%.exe : % .MAKE &gt;NULL"
+04-09-09 expand.c: add :T=QO: (isoption()) and :T=QR: (!!getrule())
+	 object.c: finally stomp the complist() panic via compcheck()
+	 object.c: fix loadstring() to detect early EOF
+	 option.c: add isoption(), --name&#0091;&#0091;-+&amp;|^&#0093;=value&#0093;
+	 option.c: fix set option table format to handle future extensions
+	 Makerules.mk: drop PACKAGE_LOCAL definition -- not used anywhere
+	 Makerules.mk: add rules options, syn with options.c
+	 Makerules.mk: this version incompatible with make &lt; 2004-09-09
+04-09-01 Makerules.mk: add .LIST.PACKAGE.RUNTIME
+	 Makerules.mk: fix recursive .LIST.PACKAGE.EDIT.
+	 make.h,options.h,option.c,command.c: add --serialize, state.serialize
+	 expand.c: sync :W: 2d and 3d logic
+	 option.c: add --option values subarg for optget(3) value list
+	 read.c: fix MAKERULES vs. explicit rules statement logic
+	 variable.c: change $(+) to $(--&#0091;name&#0093;), add $(-?&#0091;name&#0093;)
+04-08-31 debug.mk: fix -D-d vs -dD logic
 04-08-11 expand.c: :W=O: scans INIT files too -- duh
 	 expand.c: fix :P=H: sufix checks
 	 expand.c: handle :P!=S:
 	 command.c: fix .JOBDONE rule arg (internal#05)
+	 command.c: fix --targetcontext directory commit logic
+	 metarule.c: add --targetprefix=prefix to handle source base clashes
 	 parse.c: fix local ( a ... ) $(%) (statement#10)
 	 Makerules.mk: fix :PACKAGE_INSTALL: to use .ACCEPT (e.g. for proto)
 	 Makerules.mk: fix .MAMEDIT. initialization for 2d vs. 3d
@@ -2981,6 +3011,8 @@ All recorded changes follow.
 	 Makerules.mk: fix synthesized rule names to avoid .. canonicalization
 	 Makerules.mk: fix :PACKAGE: to handle `foo=bar' rhs
 	 Makerules.mk: add .LIST.PACKAGE.LICENSE
+	 Makerules.mk: add separateinclude=1 to override CC.DIALECT=-I-
+	 Makerules.mk: handle --targetprefix
 04-08-10 rules-win32.mk: add :PACKAGE: { atl crt mfc } support -- puke
 04-07-27 msgcat.mk: move :: related files to msg specific action
 04-07-22 tests/*.tst: more test additions
@@ -6435,6 +6467,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-14 ls.c: add -w&#0091;linesX&#0093;cols, last col must be visible in window
 04-07-17 ls.c: rename -f =&gt; -Z, add x/open -f
 04-03-28 ls.c: add variable column widths for minimal { -C -x } footprint
 04-02-29 pss-getprocs.c: fix readf/partf semantic mixup
@@ -6784,9 +6817,16 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-25 string/swapop.c: return op &lt; size -- duh
+04-09-23 comp/spawnveg.c: :NOOPTIMIZE: -- volatile sometimes ignored
+04-09-21 comp/spawnveg.c: exec_errno_ptr is volatile -- duh
+04-09-14 tm/tmscan.c: add %| alternation and %&amp; =&gt; tmdate()
+04-09-08 misc/optget.c: add :!value: omitted optional arg value
+	 misc/optget.c: fix --noNAME ambiguous option logic
 04-08-26 string/strperm.c: add who^mode to propagate least restrictive up
 	 astmath.c: add { frexpl ldexpl } checks for ast.req
 	 port/astlicense.c: ignore first option if non-assignment
+	 include/ast_dir.h: move d_fileno map before struct defs -- duh
 04-08-24 vmalloc/vmbest.c: add {VM_region} VMCHECK=+r for region segment checks
 	 misc/recfmt.c,include/recfmt.h: add
 04-08-23 vmalloc/vmbest.c: add {VM_primary VM_secondary} VMCHECK=-s for primary
@@ -7986,6 +8026,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-24 pathchk.c: fix docs
+04-09-14 date.c: add %| and %&amp; --parse docs
 04-08-27 cp.c: add FTW_DC check -- duh
 04-08-01 fmt.c: handle last char != '
 04-07-22 date.c,uname.c: access() =&gt; eaccess()
@@ -8347,6 +8389,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcoshell changes">libcoshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-22 cowait.c: remove CO_SERIALIZE temporaries after listing -- duh
+04-09-01 co*: add CO_SERIALIZE
 04-07-22 system.c: access() =&gt; eaccess()
 04-02-11 coinit.c: fix CO_CROSS PATH initialization
 02-10-30 coclose.c: fix reference-after-free bug in coclose()
@@ -8454,6 +8498,9 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-08-31 pplex.c: fix directive hidden newline logic
+	 ppcall.c: fix '(' peek bug that missed the MARK
+04-08-30 add pragma pp:pragmaflags PP_PRAGMAFLAGS, pp:system_header
 04-08-11 ppproto.c: intercept "#(define|undef) extern" for __(EX|IM)PORT__
 04-07-23 probe.win32: generalize #include dir order search
 04-07-22 ppsearch.c: access() =&gt; eaccess()
@@ -9108,7 +9155,7 @@ End:
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>August 28, 2004</TD>
+<TD align=right>September 28, 2004</TD>
 </TR>
 </TABLE>
 <P>

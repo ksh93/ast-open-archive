@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make nmake
 make archive.o
@@ -161,14 +161,15 @@ prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/hashpart.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/hash.h
+make ${INSTALLROOT}/include/ast/glob.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/glob.h
 make ${INSTALLROOT}/include/ast/fs3d.h implicit
 prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/fs3d.h
 make ${INSTALLROOT}/include/ast/dirent.h implicit
 make ${INSTALLROOT}/include/ast/ast_dirent.h implicit
-make ndir.h implicit
-done ndir.h dontcare virtual
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done ${INSTALLROOT}/include/ast/ast_dirent.h
 done ${INSTALLROOT}/include/ast/dirent.h
@@ -178,18 +179,15 @@ done make.h
 done archive.c
 meta archive.o %.c>%.o archive.c archive
 prev archive.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c archive.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c archive.c
 done archive.o generated
 make bind.o
 make bind.c
-make ${INSTALLROOT}/include/ast/glob.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/glob.h
 prev make.h implicit
 done bind.c
 meta bind.o %.c>%.o bind.c bind
 prev bind.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c bind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c bind.c
 done bind.o generated
 make command.o
 make command.c
@@ -199,7 +197,7 @@ prev make.h implicit
 done command.c
 meta command.o %.c>%.o command.c command
 prev command.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c command.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c command.c
 done command.o generated
 make dump.o
 make dump.c
@@ -207,7 +205,7 @@ prev make.h implicit
 done dump.c
 meta dump.o %.c>%.o dump.c dump
 prev dump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c dump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c dump.c
 done dump.o generated
 make expand.o
 make expand.c
@@ -226,7 +224,7 @@ prev make.h implicit
 done expand.c
 meta expand.o %.c>%.o expand.c expand
 prev expand.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c expand.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c expand.c
 done expand.o generated
 make main.o
 make main.c
@@ -248,7 +246,7 @@ prev make.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
 done main.o generated
 make make.o
 make make.c
@@ -256,7 +254,7 @@ prev make.h implicit
 done make.c
 meta make.o %.c>%.o make.c make
 prev make.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c make.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c make.c
 done make.o generated
 make mam.o
 make mam.c
@@ -264,7 +262,7 @@ prev make.h implicit
 done mam.c
 meta mam.o %.c>%.o mam.c mam
 prev mam.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c mam.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c mam.c
 done mam.o generated
 make metarule.o
 make metarule.c
@@ -272,7 +270,7 @@ prev make.h implicit
 done metarule.c
 meta metarule.o %.c>%.o metarule.c metarule
 prev metarule.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c metarule.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c metarule.c
 done metarule.o generated
 make misc.o
 make misc.c
@@ -286,7 +284,7 @@ prev make.h implicit
 done misc.c
 meta misc.o %.c>%.o misc.c misc
 prev misc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c misc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c misc.c
 done misc.o generated
 make object.o
 make object.c
@@ -296,11 +294,12 @@ done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ccode.h
+prev options.h implicit
 prev make.h implicit
 done object.c
 meta object.o %.c>%.o object.c object
 prev object.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c object.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c object.c
 done object.o generated
 make option.o
 make option.c
@@ -309,7 +308,7 @@ prev make.h implicit
 done option.c
 meta option.o %.c>%.o option.c option
 prev option.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
 make parse.o
 make parse.c
@@ -319,7 +318,7 @@ prev make.h implicit
 done parse.c
 meta parse.o %.c>%.o parse.c parse
 prev parse.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c parse.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c parse.c
 done parse.o generated
 make read.o
 make read.c
@@ -327,7 +326,7 @@ prev make.h implicit
 done read.c
 meta read.o %.c>%.o read.c read
 prev read.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c read.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c read.c
 done read.o generated
 make rule.o
 make rule.c
@@ -336,7 +335,7 @@ prev make.h implicit
 done rule.c
 meta rule.o %.c>%.o rule.c rule
 prev rule.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c rule.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c rule.c
 done rule.o generated
 make scan.o
 make scan.c
@@ -345,7 +344,7 @@ prev make.h implicit
 done scan.c
 meta scan.o %.c>%.o scan.c scan
 prev scan.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c scan.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c scan.c
 done scan.o generated
 make state.o
 make state.c
@@ -354,7 +353,7 @@ prev make.h implicit
 done state.c
 meta state.o %.c>%.o state.c state
 prev state.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c state.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c state.c
 done state.o generated
 make trap.o
 make trap.c
@@ -363,7 +362,7 @@ prev make.h implicit
 done trap.c
 meta trap.o %.c>%.o trap.c trap
 prev trap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c trap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c trap.c
 done trap.o generated
 make variable.o
 make variable.c
@@ -372,14 +371,14 @@ prev make.h implicit
 done variable.c
 meta variable.o %.c>%.o variable.c variable
 prev variable.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c variable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c variable.c
 done variable.o generated
 make version.o
 make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.4 2004-08-11 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.4 2004-09-24 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -700,7 +699,7 @@ exec - regress  tests/metarule.tst
 done test.metarule virtual
 make test.option
 make tests/option.tst
-prev tests/test.def implicit
+prev tests/cc.def implicit
 done tests/option.tst
 exec - regress  tests/option.tst
 done test.option virtual

@@ -34,6 +34,7 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <fs3d.h>
+#include <glob.h>
 #include <hash.h>
 #include <swap.h>
 #include <namval.h>
@@ -192,12 +193,13 @@
 #define A_insert	(1<<4)	/* assertion() .INSERT			*/
 #define A_metarule	(1<<5)	/* assertion() pattern metarule 	*/
 #define A_negate	(1<<6)	/* assertion() -attribute		*/
-#define A_norhs		(1<<7)	/* assertion() empty rhs		*/
-#define A_null		(1<<8)	/* assertion() .NULL			*/
-#define A_scan		(1<<9)	/* assertion() .SCAN			*/
-#define A_scope		(1<<10)	/* assertion() metarule scope prereqs	*/
-#define A_special	(1<<11)	/* assertion() .SPECIAL			*/
-#define A_target	(1<<12)	/* assertion() set P_target		*/
+#define A_nooptions	(1<<7)	/* assertion() no more option prereqs	*/
+#define A_norhs		(1<<8)	/* assertion() empty rhs		*/
+#define A_null		(1<<9)	/* assertion() .NULL			*/
+#define A_scan		(1<<10)	/* assertion() .SCAN			*/
+#define A_scope		(1<<11)	/* assertion() metarule scope prereqs	*/
+#define A_special	(1<<12)	/* assertion() .SPECIAL			*/
+#define A_target	(1<<13)	/* assertion() set P_target		*/
 
 #define C_ID1		(1<<0)	/* istype() first identifier char	*/
 #define C_ID2		(1<<1)	/* istype() remaining id chars		*/
@@ -251,6 +253,7 @@
 #define COMP_GLOBAL	(1<<3)	/* -g prereq				*/
 #define COMP_INCLUDE	(1<<4)	/* include prereq			*/
 #define COMP_OPTIONS	(1<<5)	/* -[DIU]* prereq			*/
+#define COMP_RULES	(1<<6)	/* from explicit rules statement	*/
 
 #define PREREQ_APPEND	1	/* addprereq append			*/
 #define PREREQ_DELETE	2	/* addprereq delete			*/
@@ -582,7 +585,6 @@ struct internal				/* internal rule and list info	*/
 	struct rule*	makefiles;	/* .MAKEFILES rule pointer	*/
 	struct rule*	metarule;	/* .METARULE rule pointer	*/
 	struct rule*	null;		/* .NULL rule pointer		*/
-	struct rule*	options;	/* .OPTIONS rule pointer	*/
 	struct rule*	preprocess;	/* .PREPROCESS rule pointer	*/
 	struct rule*	query;		/* .QUERY rule pointer		*/
 	struct rule*	rebind;		/* .REBIND rule pointer		*/
@@ -750,6 +752,7 @@ struct state				/* program state		*/
 	unsigned char	exec;		/* execute shell actions	*/
 	unsigned char	expandview;	/* expand paths if fsview!=0	*/
 	unsigned char	explain;	/* explain reason for actions	*/
+	unsigned char	explicitrules;	/* explicit rules statement	*/
 	unsigned char	finish;		/* in finish()			*/
 	unsigned char	force;		/* force target updates		*/
 	unsigned char	forceread;	/* force makefiles to be read	*/
@@ -779,6 +782,7 @@ struct state				/* program state		*/
 	unsigned char	ruledump;	/* dump rule information	*/
 	unsigned char	savestate;	/* must save state variables	*/
 	unsigned char	scan;		/* scan|check implicit prereqs	*/
+	unsigned char	serialize;	/* serialize concurrent output	*/
 	unsigned char	silent;		/* run silently			*/
 	unsigned char	strictview;	/* strict views			*/
 	unsigned char	targetcontext;	/* expand in target dir context	*/
@@ -811,10 +815,12 @@ struct state				/* program state		*/
 	char*		corrupt;	/* corrupt state file action	*/
 	char*		errorid;	/* error message id		*/
 	char*		hold;		/* hold error trap		*/
+	char*		loading;	/* loading this object file	*/
 	char*		makefile;	/* first makefile name		*/
 	char*		objectfile;	/* make object file name	*/
 	char*		rules;		/* base rules base name		*/
 	char*		statefile;	/* state variable file name	*/
+	char*		targetprefix;	/* target prefix dir separator	*/
 	char*		tmppchar;	/* macro char* temporary	*/
 	char*		tmpfile;	/* temporary file name		*/
 	char*		writeobject;	/* 0:nowrite or object file def	*/
@@ -836,6 +842,9 @@ struct state				/* program state		*/
 #endif
 	struct binding	view[MAXVIEW+1];/* view bind table		*/
 	unsigned int	maxview;	/* max view bind index		*/
+
+	int (*compnew)(const char*, char*, void*); /* new compile rule	*/
+	void*		comparg;	/* compnew handle		*/
 
 	struct label	resume;		/* if interpreter!=0		*/
 
@@ -927,7 +936,7 @@ extern int		forcescan(const char*, char* v, void*);
 extern char*		getarg(char**, int*);
 extern void		getop(Sfio_t*, char*, int);
 extern char*		getval(char*, int);
-extern char**		globv(char*);
+extern char**		globv(glob_t*, char*);
 extern int		handle(void);
 extern int		hasattribute(struct rule*, struct rule*, struct rule*);
 extern void		immediate(struct rule*);
@@ -939,6 +948,7 @@ extern void		inittrap(void);
 extern void		initview(void);
 extern void		initwakeup(int);
 extern void		interpreter(char*);
+extern int		isoption(const char*);
 extern int		nametype(const char*, char**);
 extern struct list*	joint(struct rule*);
 extern struct list*	listcopy(struct list*);
@@ -959,6 +969,7 @@ extern char*		mamname(struct rule*);
 extern void		mampop(Sfio_t*, struct rule*, long);
 extern int		mampush(Sfio_t*, struct rule*, long);
 extern Sfio_t*		mamout(struct rule*);
+extern char*		maprule(char*, struct rule*);
 extern void		merge(struct rule*, struct rule*, int);
 extern void		mergestate(struct rule*, struct rule*);
 extern void		metaclose(struct rule*, struct rule*, int);
@@ -972,11 +983,9 @@ extern void*		newchunk(char**, size_t);
 extern void		newfile(struct rule*, char*, unsigned long);
 extern unsigned long	numtime(unsigned long);
 extern char*		objectfile(void);
-extern struct option*	opentry(int, int);
-extern void		optcheck(void);
-extern void		optinit(void);
 extern void		parentage(Sfio_t*, struct rule*, char*);
-extern int		parse(Sfio_t*, char*, char*, int);
+extern int		parse(Sfio_t*, char*, char*, Sfio_t*);
+extern char*		parsefile(void);
 extern char*		pathname(char*, struct rule*);
 extern void		poplocal(void*);
 extern int		prereqchange(struct rule*, struct list*, struct rule*, struct list*);
@@ -997,7 +1006,7 @@ extern struct rule*	rulestate(struct rule*, int);
 extern void		savestate(void);
 extern struct list*	scan(struct rule*, unsigned long*);
 extern int		scanargs(int, char**, int*);
-extern void		set(char*);
+extern int		set(char*, int, Sfio_t*);
 extern struct var*	setvar(char*, char*, int);
 extern void		shquote(Sfio_t*, char*);
 extern struct rule*	source(struct rule*);

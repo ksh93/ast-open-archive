@@ -353,3 +353,118 @@ tst : .VIRTUAL .FORCE
 		ERROR - $'+ touch exists\n+ rm -f notfound exists'
 
 	EXEC
+
+TEST 15 ':-val: :+val: :!val: :???Z:'
+
+	EXEC	-n
+		INPUT Makefile $'A =
+B = 0
+C = 00
+D = 0 0
+E = 1
+F = 1 1
+all :
+	echo :$(A:~.):$(B:~.):$(C:~.):$(D:~.):$(E:~.):$(F:~.):
+	echo :$(A:-.):$(B:-.):$(C:-.):$(D:-.):$(E:-.):$(F:-.):
+	echo :$(A:+.):$(B:+.):$(C:+.):$(D:+.):$(E:+.):$(F:+.):
+	echo :$(A:@?Y?N?):$(B:@?Y?N?):$(C:@?Y?N?):$(D:@?Y?N?):$(E:@?Y?N?):$(F:@?Y?N?):
+	echo :$(A:@?Y?N?Z):$(B:@?Y?N?Z):$(C:@?Y?N?Z):$(D:@?Y?N?Z):$(E:@?Y?N?Z):$(F:@?Y?N?Z):
+	echo :$(A:@?Y?N?O):$(B:@?Y?N?O):$(C:@?Y?N?O):$(D:@?Y?N?O):$(E:@?Y?N?O):$(F:@?Y?N?O):
+	echo :$(A:@?Y?N?OZ):$(B:@?Y?N?OZ):$(C:@?Y?N?OZ):$(D:@?Y?N?OZ):$(E:@?Y?N?OZ):$(F:@?Y?N?OZ):
+	echo :$(A:?Y?N?):$(B:?Y?N?):$(C:?Y?N?):$(D:?Y?N?):$(E:?Y?N?):$(F:?Y?N?):
+	echo :$(A:?Y?N?Z):$(B:?Y?N?Z):$(C:?Y?N?Z):$(D:?Y?N?Z):$(E:?Y?N?Z):$(F:?Y?N?Z):
+	echo :$(A:?Y?N?O):$(B:?Y?N?O):$(C:?Y?N?O):$(D:?Y?N?O):$(E:?Y?N?O):$(F:?Y?N?O):
+	echo :$(A:?Y?N?OZ):$(B:?Y?N?OZ):$(C:?Y?N?OZ):$(D:?Y?N?OZ):$(E:?Y?N?OZ):$(F:?Y?N?OZ):'
+		OUTPUT - $'+ echo :.:.:::::
++ echo :.:.:00:0 0:1:1 1:
++ echo ::0:.:.:.:.:
++ echo :N:Y:Y:Y:Y:Y:
++ echo :N:N:Y:Y:Y:Y:
++ echo :N:0:00:0 0:1:1 1:
++ echo :N:N:00:0 0:1:1 1:
++ echo :N:Y:Y:Y Y:Y:Y Y:
++ echo :N:N:Y:N N:Y:Y Y:
++ echo :N:0:00:0 0:1:1 1:
++ echo :N:N:00:N N:1:1 1:'
+
+TEST 16 ':T=Q*:'
+
+	EXEC	-n
+		INPUT Makefile $'X = foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule
+.foo.yes.internal = 1
+foo_yes_variable = 2
+(foo_yes_variable) = 3
+foo_yes_rule : .SPECIAL
+all :
+	: T=XQ : $(X:T=XQ) :
+	: T=XQO : $(X:T=XQO) :
+	: T=XQR : $(X:T=XQR) :
+	: T=XQS : $(X:T=XQS) :
+	: T=XQSA : $(X:T=XQSA) :
+	: T=XQSR : $(X:T=XQSR) :
+	: T=XQSV : $(X:T=XQSV) :
+	: T=XQVI : $(X:T=XQVI) :
+	: T=XQV : $(X:T=XQV) :
+	: T!=XQ : $(X:T!=XQ) :
+	: T!=XQO : $(X:T!=XQO) :
+	: T!=XQR : $(X:T!=XQR) :
+	: T!=XQS : $(X:T!=XQS) :
+	: T!=XQSA : $(X:T!=XQSA) :
+	: T!=XQSR : $(X:T!=XQSR) :
+	: T!=XQSV : $(X:T!=XQSV) :
+	: T!=XQVI : $(X:T!=XQVI) :
+	: T!=XQV : $(X:T!=XQV) :
+	: T=Q : $(X:T=Q) :
+	: T=QO : $(X:T=QO) :
+	: T=QR : $(X:T=QR) :
+	: T=QS : $(X:T=QS) :
+	: T=QSA : $(X:T=QSA) :
+	: T=QSR : $(X:T=QSR) :
+	: T=QSV : $(X:T=QSV) :
+	: T=QVI : $(X:T=QVI) :
+	: T=QV : $(X:T=QV) :
+	: T!=Q : $(X:T!=Q) :
+	: T!=QO : $(X:T!=QO) :
+	: T!=QR : $(X:T!=QR) :
+	: T!=QS : $(X:T!=QS) :
+	: T!=QSA : $(X:T!=QSA) :
+	: T!=QSR : $(X:T!=QSR) :
+	: T!=QSV : $(X:T!=QSV) :
+	: T!=QVI : $(X:T!=QVI) :
+	: T!=QV : $(X:T!=QV) :'
+		OUTPUT - $'+ : T=XQ : (foo_yes_variable) foo_yes_rule :
++ : T=XQO :  :
++ : T=XQR : foo_yes_nothing .foo.yes.internal foo_yes_variable foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable foo_no_rule :
++ : T=XQS : (foo_yes_variable) ()foo_yes_rule (foo_no_variable) ()foo_no_rule :
++ : T=XQSA :  :
++ : T=XQSR : ()foo_yes_rule ()foo_no_rule :
++ : T=XQSV : (foo_yes_variable) (foo_no_variable) :
++ : T=XQVI :  :
++ : T=XQV : .foo.yes.internal foo_yes_variable :
++ : T!=XQ : foo_yes_nothing .foo.yes.internal foo_yes_variable ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=XQO : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=XQR : (foo_yes_variable) ()foo_yes_rule (foo_no_variable) ()foo_no_rule :
++ : T!=XQS : foo_yes_nothing .foo.yes.internal foo_yes_variable foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable foo_no_rule :
++ : T!=XQSA : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=XQSR : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule :
++ : T!=XQSV : foo_yes_nothing .foo.yes.internal foo_yes_variable foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable foo_no_rule ()foo_no_rule :
++ : T!=XQVI : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=XQV : foo_yes_nothing (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T=Q : (foo_yes_variable) foo_yes_rule :
++ : T=QO :  :
++ : T=QR : foo_yes_rule :
++ : T=QS : (foo_yes_variable) :
++ : T=QSA :  :
++ : T=QSR :  :
++ : T=QSV : (foo_yes_variable) :
++ : T=QVI :  :
++ : T=QV : .foo.yes.internal foo_yes_variable :
++ : T!=Q : foo_yes_nothing .foo.yes.internal foo_yes_variable ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QO : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QR : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QS : foo_yes_nothing .foo.yes.internal foo_yes_variable foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QSA : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QSR : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QSV : foo_yes_nothing .foo.yes.internal foo_yes_variable foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QVI : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
++ : T!=QV : foo_yes_nothing (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :'

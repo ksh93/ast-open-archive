@@ -109,6 +109,7 @@
  */
 
 #include "make.h"
+#include "options.h"
 
 #include <ccode.h>
 
@@ -406,7 +407,12 @@ compinit(const char* s, char* v, void* h)
 	r->complink = 0;
 	r->mark &= ~M_compile;
 	if (r->dynamic & D_alias)
+	{
+		state.compnew = compinit;
+		state.comparg = h;
 		mergestate(makerule(r->name), r);
+		state.compnew = 0;
+	}
 	if (h || (r->property & P_internal))
 		r->dynamic |= D_compiled;
 	return 0;
@@ -593,6 +599,42 @@ comprule(const char* s, char* v, void* h)
 }
 
 /*
+ * a final pass before complist() to catch any prereqs
+ * that eluded comprule()
+ */
+
+static int
+compcheck(const char* s, char* v, void* h)
+{
+	register struct rule*		r = (struct rule*)v;
+	register struct list*		p;
+	register struct rule*		a;
+
+	/*
+	 * ignore aliases and rules not set up by comprule()
+	 */
+
+	if (!r->complink || !(r->mark & M_compile) || s != r->name && !(r->dynamic & D_alias) || state.stateview == 0 && !(r->property & P_state))
+		return 0;
+	if (p = r->prereqs)
+	{
+		do
+		{
+			for (r = p->rule; !r->complink || !(r->dynamic & D_compiled); r = a)
+				if ((!(a = getrule(r->name)) || a == r) && ((r->property & P_state) || !r->uname || !(a = getrule(r->uname)) || a == r))
+				{
+					if (state.warn)
+						error(1, "forcing %s %s prerequisite %s", s, a ? "duplicate" : "dangling", r->name);
+					r->dynamic &= ~D_compiled;
+					comprule(r->name, (char*)r, h);
+					break;
+				}
+		} while (p = p->next);
+	}
+	return 0;
+}
+
+/*
  * compile the prerequisite list for r
  */
 
@@ -602,7 +644,6 @@ complist(const char* s, char* v, void* h)
 	register struct rule*		r = (struct rule*)v;
 	register struct list*		p;
 	register struct compstate*	cs = (struct compstate*)h;
-	register struct rule*		a;
 
 	/*
 	 * ignore aliases and rules not set up by comprule()
@@ -613,18 +654,7 @@ complist(const char* s, char* v, void* h)
 	r->mark &= ~M_compile;
 	if (p = r->prereqs)
 	{
-		do
-		{
-			for (r = p->rule; !r->complink || !(r->dynamic & D_compiled); r = a)
-				if (!(a = getrule(r->name)) || a == r)
-					error(PANIC, "prerequisite %s of %s not compiled", r->name, s);
-			sfputu(cs->fp, r->complink);
-
-			/*
-			 * list.next is always sequential on load
-			 */
-
-		} while (p = p->next);
+		do sfputu(cs->fp, p->rule->complink); while (p = p->next);
 		sfputu(cs->fp, 0);
 	}
 	return 0;
@@ -873,6 +903,16 @@ compile(char* objfile, char* select)
 		error(ERROR_SYSTEM|3, "%s: object file rule write error", state.tmpfile);
 
 	/*
+	 * despite the effort a few elusive prereqs manage to avoid comprule()
+	 * the compcheck() pass sets up complink for these prereqs
+	 */
+
+	for (p = internal.special->prereqs; p; p = p->next)
+		for (q = p->rule->prereqs; q; q = q->next)
+			compcheck(q->rule->name, (char*)q->rule, &cs);
+	hashwalk(table.rule, 0, compcheck, &cs);
+
+	/*
 	 * compile and write the prerequisite lists
 	 */
 
@@ -888,7 +928,14 @@ compile(char* objfile, char* select)
 	 */
 
 	if (state.stateview < 0)
-		listops(sp, 1);
+	{
+		/*
+		 * pre 2004-09-09 will just do "--"
+		 */
+
+		sfputr(sp, "--", 0);
+		listops(sp, 'O');
+	}
 	sfputc(sp, 0);
 
 	/*
@@ -1076,7 +1123,7 @@ loadstring(struct loadstate* ls, Sfio_t* sp)
 	register int	n;
 	register char*	s;
 
-	if (!(n = sfgetu(sp)))
+	if (!(n = sfgetu(sp)) || sfeof(sp))
 		return 0;
 	s = ls->sp;
 	ls->sp += n--;
@@ -1190,7 +1237,11 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 				}
 			}
 			else if ((n & COMP_BASE) && !state.rules)
+			{
+				if (n & COMP_RULES)
+					state.explicitrules = 1;
 				state.rules = makerule(s)->name;
+			}
 		}
 		else if (n & COMP_OPTIONS)
 		{
@@ -1784,7 +1835,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				r->dynamic |= D_compiled|D_lower;
 				viewname(r->name, state.stateview);
 				r->view = state.stateview;
-				putrule(r->name, r);
+				maprule(r->name, r);
 				if (o && (r->property & P_statevar) && !o->time)
 					o->time = r->time;
 			}
@@ -1839,7 +1890,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 						r->dynamic |= o->dynamic & (D_bound|D_entries|D_global|D_regular|D_scanned);
 						if (!(o->property & P_state) && o->uname)
 						{
-							r->uname = putrule(o->uname, r);
+							r->uname = maprule(o->uname, r);
 							getrule(o->name);
 						}
 					}
@@ -2041,13 +2092,14 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 
 	if (!state.list)
 	{
+		state.loading = (char*)objfile;
 		if (old)
 		{
 			if (old_trailer.options)
-				set(s + (unsigned long)old_trailer.options - 1);
+				set(s + (unsigned long)old_trailer.options - 1, 1, NiL);
 		}
-		else if ((s = getstring(sp)) && *s)
-			set(s);
+		else if ((s = getstring(sp)) && *s && (!streq(s, "--") || (s = getstring(sp)) && *s))
+			set(s, 1, NiL);
 		if (state.stateview < 0)
 		{
 			/*
@@ -2064,6 +2116,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			if (state.global)
 				state.global--;
 		}
+		state.loading = 0;
 	}
 	return 1;
  badversion:

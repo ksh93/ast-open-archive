@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make codex
 make codex.o
@@ -129,7 +129,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done codex.c
 meta codex.o %.c>%.o codex.c codex
 prev codex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?codex]"\" -c codex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?codex]"\" -c codex.c
 done codex.o generated
 bind -lcodex
 bind -last

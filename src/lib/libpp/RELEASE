@@ -1,3 +1,6 @@
+04-08-31 pplex.c: fix directive hidden newline logic
+	 ppcall.c: fix '(' peek bug that missed the MARK
+04-08-30 add pragma pp:pragmaflags PP_PRAGMAFLAGS, pp:system_header
 04-08-11 ppproto.c: intercept "#(define|undef) extern" for __(EX|IM)PORT__
 04-07-23 probe.win32: generalize #include dir order search
 04-07-22 ppsearch.c: access() => eaccess()

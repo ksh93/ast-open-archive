@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make msgadmin
 make msgadmin.sh
@@ -183,7 +183,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msgcpp.c
 meta msgcpp.o %.c>%.o msgcpp.c msgcpp
 prev msgcpp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcpp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcpp.c
 done msgcpp.o generated
 bind -lpp
 bind -last
@@ -234,7 +234,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msgcvt.c
 meta msgcvt.o %.c>%.o msgcvt.c msgcvt
 prev msgcvt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcvt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcvt.c
 done msgcvt.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o msgcvt msgcvt.o ${mam_libast}
 done msgcvt generated
@@ -252,7 +252,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msggen.c
 meta msggen.o %.c>%.o msggen.c msggen
 prev msggen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msggen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msggen.c
 done msggen.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o msggen msggen.o ${mam_libast}
 done msggen generated
@@ -265,7 +265,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msgget.c
 meta msgget.o %.c>%.o msgget.c msgget
 prev msgget.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgget.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgget.c
 done msgget.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o msgget msgget.o ${mam_libast}
 done msgget generated

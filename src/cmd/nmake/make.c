@@ -233,7 +233,7 @@ update(register struct rule* r, register struct rule* a, char* arg)
 							u->view = 0;
 							if (u->active && !state.mam.statix)
 								u->active->original = u->name;
-							u->name = putrule(s, u);
+							u->name = maprule(s, u);
 							break;
 						}
 					}

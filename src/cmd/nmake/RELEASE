@@ -1,7 +1,30 @@
+04-09-24 option.c: optcheck() after each option table change
+04-09-21 add --option prereq scope with getopt() style "--" terminator
+	 expand.c: :P=A: now acts like :P=L!:
+	 Makerules.mk: fix $(-static) => $(-static-link)
+	 Makerules.mk: /bin/cat.exe => "%.exe : % .MAKE >NULL"
+04-09-09 expand.c: add :T=QO: (isoption()) and :T=QR: (!!getrule())
+	 object.c: finally stomp the complist() panic via compcheck()
+	 object.c: fix loadstring() to detect early EOF
+	 option.c: add isoption(), --name[[-+&|^]=value]
+	 option.c: fix set option table format to handle future extensions
+	 Makerules.mk: drop PACKAGE_LOCAL definition -- not used anywhere
+	 Makerules.mk: add rules options, syn with options.c
+	 Makerules.mk: this version incompatible with make < 2004-09-09
+04-09-01 Makerules.mk: add .LIST.PACKAGE.RUNTIME
+	 Makerules.mk: fix recursive .LIST.PACKAGE.EDIT.
+	 make.h,options.h,option.c,command.c: add --serialize, state.serialize
+	 expand.c: sync :W: 2d and 3d logic
+	 option.c: add --option values subarg for optget(3) value list
+	 read.c: fix MAKERULES vs. explicit rules statement logic
+	 variable.c: change $(+) to $(--[name]), add $(-?[name])
+04-08-31 debug.mk: fix -D-d vs -dD logic
 04-08-11 expand.c: :W=O: scans INIT files too -- duh
 	 expand.c: fix :P=H: sufix checks
 	 expand.c: handle :P!=S:
 	 command.c: fix .JOBDONE rule arg (internal#05)
+	 command.c: fix --targetcontext directory commit logic
+	 metarule.c: add --targetprefix=prefix to handle source base clashes
 	 parse.c: fix local ( a ... ) $(%) (statement#10)
 	 Makerules.mk: fix :PACKAGE_INSTALL: to use .ACCEPT (e.g. for proto)
 	 Makerules.mk: fix .MAMEDIT. initialization for 2d vs. 3d
@@ -11,6 +34,8 @@
 	 Makerules.mk: fix synthesized rule names to avoid .. canonicalization
 	 Makerules.mk: fix :PACKAGE: to handle `foo=bar' rhs
 	 Makerules.mk: add .LIST.PACKAGE.LICENSE
+	 Makerules.mk: add separateinclude=1 to override CC.DIALECT=-I-
+	 Makerules.mk: handle --targetprefix
 04-08-10 rules-win32.mk: add :PACKAGE: { atl crt mfc } support -- puke
 04-07-27 msgcat.mk: move :: related files to msg specific action
 04-07-22 tests/*.tst: more test additions

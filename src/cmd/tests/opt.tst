@@ -3538,6 +3538,102 @@ TEST 46 'html escapism'
 </BODY>
 </HTML>'
 
+TEST 47 'omitted optional arg default'
+	usage1=$'[-][101:clobber?Clobber pattern.]:?[pattern:=*.exe:!*][102:select?Select pattern.]:[pattern=*.[ch]]]'
+	usage2=$'[-][101:clobber?Clobber pattern.]:?[pattern:!*:=*.exe][102:select?Select pattern.]:[pattern=*.[ch]]]'
+	EXEC make "$usage1" --clobber foo
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=* num=1\nargument=1 value="foo"'
+	EXEC make "$usage2" --clobber foo
+	EXEC make "$usage1" --clobber=1 bar
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=* num=1\nargument=1 value="bar"'
+	EXEC make "$usage2" --clobber=1 bar
+	EXEC make "$usage1" --noclobber foo
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=(null) num=0\nargument=1 value="foo"'
+	EXEC make "$usage2" --noclobber foo
+	EXEC make "$usage1" --clobber=0 bar
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=(null) num=0\nargument=1 value="bar"'
+	EXEC make "$usage2" --clobber=0 bar
+	EXEC make "$usage1" --clobber=foo bar
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=foo num=1\nargument=1 value="bar"'
+	EXEC make "$usage2" --clobber=foo bar
+	EXEC make "$usage1" --select foo bar
+		OUTPUT - $'return=-102 option=-102 name=--select arg=foo num=1\nargument=1 value="bar"'
+	EXEC make "$usage2" --select foo bar
+	EXEC make "$usage1" --select=foo bar
+	EXEC make "$usage2" --select=foo bar
+	EXEC make "$usage1" --?clobber
+		OUTPUT - $'return=? option=-? name=--?clobber num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  --clobber[=pattern]
+                  Clobber pattern. If the option value is omitted then * is
+                  assumed. The default value is *.exe.'
+		  EXIT 2
+	EXEC make "$usage2" --?clobber
+	EXEC make "$usage1" --?select
+		OUTPUT - $'return=? option=-? name=--?select num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  --select=pattern=*.[ch]
+                  Select pattern.'
+	EXEC make "$usage2" --?select
+	EXEC make "$usage1" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  make [ options ]
+
+OPTIONS
+  --clobber[=pattern]
+                  Clobber pattern. If the option value is omitted then * is
+                  assumed. The default value is *.exe.
+  --select=pattern=*.[ch]
+                  Select pattern.'
+	EXEC make "$usage2" --man
+	EXEC make "$usage1" --html
+		OUTPUT - $'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<TITLE>make man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;make&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>make&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>make</B> &#0091; <I>options</I> &#0093;
+<P>
+</DL>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>--<B>clobber</B>&#0091;=<I>pattern</I>&#0093;<DD>Clobber pattern. If the option value
+is omitted then <B>*</B> is assumed. The default value is <B>*.exe</B>.
+<DT>--<B>select</B>=<I>pattern=*.&#0091;ch&#0093;</I><DD>Select pattern.
+</DL></DL>
+</BODY>
+</HTML>'
+	EXEC make "$usage2" --html
+
+TEST 48 'ambiguous trio'
+	usage=$'[-][x:aha?AHA.][y:aha1?AHA1][z:aha2?AHA2]'
+	EXEC huh "$usage" --aha
+		OUTPUT - $'return=x option=-x name=--aha arg=(null) num=1'
+	EXEC huh "$usage" --noaha
+		OUTPUT - $'return=x option=-x name=--aha arg=(null) num=0'
+	EXEC huh "$usage" --aha1
+		OUTPUT - $'return=y option=-y name=--aha1 arg=(null) num=1'
+	EXEC huh "$usage" --noaha1
+		OUTPUT - $'return=y option=-y name=--aha1 arg=(null) num=0'
+	EXEC huh "$usage" --ah
+		OUTPUT - $'return=: option=-x name=--ah num=0'
+		ERROR - $'huh: --ah: ambiguous option'
+		EXIT 1
+	EXEC huh "$usage" --noah
+		OUTPUT - $'return=: option=-x name=--noah num=0'
+		ERROR - $'huh: --noah: ambiguous option'
+
 TEST 99 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man

@@ -1,4 +1,4 @@
-:PACKAGE: ast cpp:force
+:PACKAGE: ast cpp:force --clobber=!(nmake)
 
 if CC.HOSTTYPE == "linux.alpha"
 	/* workaround for "BUG IN DYNAMIC LINKER ld.so" */
@@ -25,8 +25,6 @@ RULESDIR = $(LIBDIR)/$(ID)
 IDNAME == "$(ID)"
 PATHCHECK == "$(ID)"
 STAMP == "\n@(#)\$Id: $(ID) ($(OWNER)) $(VERSION:?$$(VERSION) ??)$(RELEASE:?$$(RELEASE) ??)$(DATE) \$\0\n"
-
-clobber = !(nmake)
 
 nmake :: make-intro.0 nmake.1 nmake.8 Version.mk \
 	$(RULES) $(RULES:B:S=.1:N=*rules.1:F=%(lower)s) $(RULESFILES) \
@@ -56,11 +54,11 @@ convert :: convert.c
 	edit immediate implicit internal interrupt metarule option panic \
 	prereq quoting scan shell state statement syntax view
 
-Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
+Makeinstall.mk : $$(-mam:N=static*:??$$(-cctype|cctype:@P=P=C,pp)?)
 	{
-		echo '/* : : generated from $(cctype) assertions : : */'
+		echo '/* : : generated from $(-cctype|cctype) assertions : : */'
 		set -
-		f=$(*|"`$(LIBDIR)/probe/probe -kg C pp $(cctype:Q)`")
+		f=$(*|"`$(LIBDIR)/probe/probe -kg C pp $(-cctype|cctype:Q)`")
 		a="`$(SED) -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_ STDCAT STDCHMOD STDCMP STDCP STDED STDEDFLAGS STDLN STDMV STDRM"
 		for n in $a
 		do	eval $n=
@@ -125,6 +123,8 @@ end
 /*
  * this works around a master source race condition
  */
+
+MAKE = $(INSTALLROOT)/bin/nmake
 
 .MAKEINIT : .TARGETS
 

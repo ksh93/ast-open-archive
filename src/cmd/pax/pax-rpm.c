@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -86,6 +86,7 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 	int		i;
 	int		swap;
 	long		num;
+	unsigned char	zip[2];
 
 	if (size < sizeof(magic))
 		return 0;
@@ -93,6 +94,7 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 	verify.magic = RPM_MAGIC;
 	if ((swap = swapop(&verify.magic, &magic.magic, sizeof(magic.magic))) < 0)
 		return 0;
+	message((-2, "%s: magic swap=%d magic=%08x major=%d minor=%d", ap->name, swap, magic.magic, magic.major, magic.minor));
 	if (magic.major == 1)
 	{
 		if (size < (sizeof(magic) + sizeof(lead_old)))
@@ -116,14 +118,15 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 		if (paxread(pax, ap, &lead, (off_t)sizeof(lead), (off_t)sizeof(lead), 0) <= 0)
 			return 0;
 		memcpy(state.volume, lead.name, sizeof(state.volume) - 1);
+		if (swap & 1)
+			swapmem(swap & 1, &lead, &lead, sizeof(lead));
+		message((-2, "%s: lead name=%s archnum=%d osnum=%d sigtype=%d", ap->name, state.volume, lead.archnum, lead.osnum, lead.sigtype));
 		if (s = strrchr(ap->name, '/'))
 			s++;
 		else
 			s = ap->name;
 		if (!memcmp(s, state.volume, strlen(state.volume)))
 			state.volume[0] = 0;
-		if (swap & 1)
-			swapmem(swap & 1, &lead, &lead, sizeof(lead));
 		switch (lead.sigtype)
 		{
 		case 0:
@@ -131,65 +134,86 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 			break;
 		case 1:
 			num = 256;
+			if (paxread(pax, ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
+			{
+				error(2, "%s: %s format header %ld byte data block expected", ap->name, fp->name, num);
+				return -1;
+			}
 			break;
 		case 5:
-			if (paxread(pax, ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
+			for (;;)
 			{
-				error(2, "%s: %s format header magic expected at offset %ld", ap->name, fp->name, ap->io->offset + ap->io->count);
-				return -1;
+				if (paxread(pax, ap, zip, (off_t)sizeof(zip), (off_t)sizeof(zip), 0) <= 0)
+				{
+					error(2, "%s: %s format header magic expected at offset %ld", ap->name, fp->name, ap->io->offset + ap->io->count);
+					return -1;
+				}
+				if (zip[0] == 0x1f && zip[1] == 0x8b)
+				{
+					paxunread(pax, ap, zip, (off_t)sizeof(zip));
+					break;
+				}
+				num = (ap->io->count - 2) & 7;
+				message((-2, "%s: align pad=%ld", ap->name, num ? (8 - num) : num));
+				switch (num)
+				{
+				case 0:
+					paxunread(pax, ap, zip, (off_t)2);
+					break;
+				case 7:
+					paxunread(pax, ap, zip + 1, (off_t)1);
+					break;
+				case 6:
+					break;
+				default:
+					num = 6 - num;
+					if (paxread(pax, ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
+					{
+						error(2, "%s: %s format header %ld byte pad expected", ap->name, fp->name, num);
+						return -1;
+					}
+					break;
+				}
+				if (paxread(pax, ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
+				{
+					error(2, "%s: %s format header magic expected at offset %ld", ap->name, fp->name, ap->io->offset + ap->io->count);
+					return -1;
+				}
+				if (((unsigned char*)&verify)[0] == 0x1f && ((unsigned char*)&verify)[1] == 0x8b)
+				{
+					paxunread(pax, ap, &verify, (off_t)sizeof(verify));
+					break;
+				}
+				if (swap)
+				{
+					swapmem(swap, &verify.magic, &verify.magic, sizeof(verify.magic));
+					if (swap & 1)
+						swapmem(swap & 1, &verify.type, &verify.type, sizeof(verify.type));
+				}
+				message((-2, "%s: verify magic=%08x major=%d minor=%d type=%d", ap->name, verify.magic, verify.major, verify.minor, verify.type));
+				if (verify.magic != RPM_HEAD_MAGIC)
+				{
+					error(2, "%s: invalid %s format signature header magic", ap->name, fp->name);
+					return -1;
+				}
+				if (paxread(pax, ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
+				{
+					error(2, "%s: %s format signature header expected", ap->name, fp->name);
+					return -1;
+				}
+				if (swap)
+					swapmem(swap, &head, &head, sizeof(head));
+				num = head.entries * sizeof(Rpm_entry_t) + head.datalen;
+				message((-2, "%s: head entries=%lu datalen=%lu num=%lu", ap->name, head.entries, head.datalen, num));
+				if (paxread(pax, ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
+				{
+					error(2, "%s: %s format header %ld byte data block expected", ap->name, fp->name, num);
+					return -1;
+				}
 			}
-			if (swap)
-				swapmem(swap, &verify, &verify, sizeof(verify));
-			if (verify.magic != RPM_HEAD_MAGIC)
-			{
-				error(2, "%s: invalid %s format signature header magic", ap->name, fp->name);
-				return -1;
-			}
-			if (paxread(pax, ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
-			{
-				error(2, "%s: %s format signature header expected", ap->name, fp->name);
-				return -1;
-			}
-			if (swap)
-				swapmem(swap, &head, &head, sizeof(head));
-			num = head.entries * sizeof(Rpm_entry_t) + head.datalen;
-			num += (8 - (num % 8)) % 8;
 			break;
 		default:
 			error(2, "%s: %s format version %d.%d signature type %d not supported", ap->name, fp->name, magic.major, magic.minor, lead.sigtype);
-			return -1;
-		}
-		if (num && paxread(pax, ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
-		{
-			error(2, "%s: %s format header %ld byte data block expected", ap->name, fp->name, num);
-			return -1;
-		}
-		if (magic.major >= 3)
-		{
-			if (paxread(pax, ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
-			{
-				error(2, "%s: %s format header magic expected", ap->name, fp->name);
-				return -1;
-			}
-			if (swap)
-				swapmem(swap, &verify, &verify, sizeof(verify));
-			if (verify.magic != RPM_HEAD_MAGIC)
-			{
-				error(2, "%s: invalid %s format header magic", ap->name, fp->name);
-				return -1;
-			}
-		}
-		if (paxread(pax, ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
-		{
-			error(2, "%s: %s format header expected", ap->name, fp->name);
-			return -1;
-		}
-		if (swap)
-			swapmem(swap, &head, &head, sizeof(head));
-		num = head.entries * sizeof(Rpm_entry_t) + head.datalen;
-		if (num && paxread(pax, ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
-		{
-			error(2, "%s: %s format header %ld byte entry+data block expected", ap->name, fp->name, num);
 			return -1;
 		}
 	}

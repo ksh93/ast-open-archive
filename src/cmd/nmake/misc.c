@@ -483,6 +483,16 @@ getarg(char** buf, register int* flags)
 	if (flags)
 		*flags &= ~(A_group|A_metarule|A_scope);
 	for (s = *buf; isspace(*s); s++);
+	if (flags && !(*flags & A_nooptions) && s[0] == '-' && s[1] == '-')
+	{
+		if (!s[2] || isspace(s[2]))
+		{
+			for (s += 2; isspace(*s); s++);
+			*flags |= A_nooptions;
+		}
+		else
+			*flags |= A_scope;
+	}
 	if (!*(a = t = s))
 		return 0;
 	paren = 0;
@@ -536,6 +546,8 @@ getarg(char** buf, register int* flags)
 			if (!c)
 				s--;
 			*buf = s;
+			if (flags && !(*flags & (A_nooptions|A_scope)))
+				*flags |= A_nooptions;
 			return a;
 		}
 		*t++ = c;

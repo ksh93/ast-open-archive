@@ -138,6 +138,7 @@ struct parseinfo			/* recursive parse state stack	*/
 	char*		here;		/* <<? termination string	*/
 	Sfio_t*		fp;		/* input file pointer		*/
 	Sfio_t*		ip;		/* readline write string	*/
+	Sfio_t*		scoped;		/* scoped options/assignments	*/
 	char*		bp;		/* input buffer pointer		*/
 	char*		stashget;	/* loop body stash get		*/
 	char*		pushback;	/* line pushback pointer	*/
@@ -150,7 +151,6 @@ struct parseinfo			/* recursive parse state stack	*/
 	unsigned char	status;		/* action return status		*/
 	unsigned int	newline:1;	/* \n at *bp replaced by 0	*/
 	unsigned int	prompt:1;	/* interactive input with prompt*/
-	unsigned int	scoped:1;	/* assignments are scoped	*/
 	unsigned int	stashput:1;	/* put lines in stash		*/
 };
 
@@ -1482,7 +1482,7 @@ getline(Sfio_t* sp, int lead, int term)
 				n = sfstrtell(sp);
 				expand(sp, t);
 				sfputc(sp, 0);
-				set(sfstrset(sp, n));
+				set(sfstrset(sp, n), 1, pp->scoped);
 			}
 			continue;
 		}
@@ -2716,6 +2716,7 @@ rules(char* s)
 		state.rules = makerule(t)->name;
 	if (t != null && (t = getarg(&s, NiL)))
 		error(3, "%s: invalid base rule argument", t);
+	state.explicitrules = 1;
 }
 
 /*
@@ -3088,7 +3089,7 @@ interpreter(char* msg)
 	}
 	else
 		state.interpreter++;
-	parse(sfstdin, NiL, "query", 0);
+	parse(sfstdin, NiL, "query", NiL);
 	state.interpreter--;
 	state.resume = resume;
 	state.keepgoing &= 1;
@@ -3106,7 +3107,7 @@ interpreter(char* msg)
  */
 
 int
-parse(Sfio_t* fp, char* bp, char* name, int scoped)
+parse(Sfio_t* fp, char* bp, char* name, Sfio_t* scoped)
 {
 	register int		op;
 	register struct local*	lcl;
@@ -3324,4 +3325,17 @@ parse(Sfio_t* fp, char* bp, char* name, int scoped)
 		message((-2, "popping %s", name));
 #endif
 	return (pp + 1)->status;
+}
+
+char*
+parsefile(void)
+{
+	register struct parseinfo* pi;
+
+	if (state.loading)
+		return state.loading;
+	for (pi = pp; pi >= &parsestack[0]; pi--)
+		if (pi->fp)
+			return pi->name;
+	return error_info.file;
 }

@@ -13,13 +13,13 @@ TEST 01 'multiple targets'
 tst :: main.c g.sch'
 		INPUT g.sch
 		INPUT main.c
-		OUTPUT - $'+ cc -O    -c main.c
+		OUTPUT - $'+ cc -O   -c main.c
 + cp g.sch g.c
 + cp g.sch c_g.c
 + cp g.sch g.h
 + cp g.sch c_g.h
-+ cc -O    -c g.c
-+ cc -O    -c c_g.c
++ cc -O   -c g.c
++ cc -O   -c c_g.c
 + cc  -O   -o tst main.o g.o c_g.o'
 
 TEST 02 'chain'
@@ -109,11 +109,11 @@ cmd :: a.c g.g'
 		INPUT a.c $'extern int g();
 main(){return g();}'
 		INPUT g.g $'int g(){return 0;}'
-		OUTPUT - $'+ cc -O    -c a.c
+		OUTPUT - $'+ cc -O   -c a.c
 + : order : g.c g.h :
 + cat g.g > g.c
 + test -f g.h || echo "extern int g();" > g.h
-+ cc -O    -c g.c
++ cc -O   -c g.c
 + cc  -O   -o cmd a.o g.o'
 
 	EXEC	-n
@@ -123,8 +123,8 @@ main(){return g();}'
 		OUTPUT - $'+ : order : g.c g.h :
 + cat g.g > g.c
 + test -f g.h || echo "extern int g();" > g.h
-+ cc -O  -I.  -c a.c
-+ cc -O    -c g.c
++ cc -O -I.  -c a.c
++ cc -O   -c g.c
 + cc  -O   -o cmd a.o g.o'
 
 	EXEC	--
@@ -208,11 +208,11 @@ bar.c : GENTYPE=raw'
 		INPUT a.c
 		INPUT libsomelib.a
 		OUTPUT - $'+ generatesource   foo.spec
-+ cc -O    -c foo.c
-+ cc -O    -c a.c
++ cc -O   -c foo.c
++ cc -O   -c a.c
 + cc  -O   -o foogen foo.o a.o libsomelib.a
 + generatesource  -type raw bar.spec
-+ cc -O    -c bar.c
++ cc -O   -c bar.c
 + cc  -O   -o bargen bar.o a.o libsomelib.a'
 
 TEST 08 'idl'
@@ -322,8 +322,8 @@ SID_INC_DIR = $(VROOT)/inc
 		INPUT src.idl $'#include "tst/foo.idl"'
 		INPUT tst/foo.idl
 		OUTPUT - $'+ /software/Orbix/bin/idl -minterOp -B -S -cC.cpp -sS.cpp -I.   src.idl
-+ cc -O -I-H/software/Orbix/corba2/include +eh    -c src.C.cpp -o src.C.o
-+ cc -O -I-H/software/Orbix/corba2/include +eh    -c src.S.cpp -o src.S.o
++ cc -O -I-H/software/Orbix/corba2/include +eh   -c src.C.cpp -o src.C.o
++ cc -O -I-H/software/Orbix/corba2/include +eh   -c src.S.cpp -o src.S.o
 + cc  -O +eh   -o cmd src.C.o src.S.o'
 
 TEST 09 'stem vs ..'
@@ -370,7 +370,7 @@ GETFLAGS =
 	$(.SCCS.get $(>) $(<))'
 		INPUT s.hello.c
 		OUTPUT - $'+ get  s.hello.c > hello.c
-+ cc -O    -c hello.c
++ cc -O   -c hello.c
 + cc  -O   -o hello hello.o
 + rm -f hello.c'
 
@@ -385,10 +385,10 @@ int main(){return 0;}'
 		INPUT features/a $'cat{
 	#include "b.h"
 }end'
-		ERROR - $'+ iffe -v -c \'cc -O    \' -S \'\' run features/a
+		ERROR - $'+ iffe -v -c \'cc -O   \' -S \'\' run features/a
 iffe: test: is sys/types.h a header ... yes
 iffe: test: cat{ ... }end ... yes
-+ iffe -v -c \'cc -O    \' -S \'\' def b
++ iffe -v -c \'cc -O   \' -S \'\' def b
 iffe: test: is sys/types.h a header ... yes
 iffe: test: is b a library data symbol ... no
 iffe: test: is b.h a header ... no
@@ -409,7 +409,7 @@ iffe: test: is b a type or typedef ... no
 	DO	touch features/a
 
 	EXEC
-		ERROR - $'+ iffe -v -c \'cc -O    \' -S \'\' run features/a
+		ERROR - $'+ iffe -v -c \'cc -O   \' -S \'\' run features/a
 iffe: test: is sys/types.h a header ... yes
 iffe: test: cat{ ... }end ... yes
 iffe: FEATURE/a: unchanged'
@@ -424,7 +424,7 @@ t : main.o
 	: $(!)'
 		INPUT main.C $'int main(){return 0;}'
 		OUTPUT - $'+ cp main.C main.c
-+ cc -O    -c main.c
++ cc -O   -c main.c
 + : main.o'
 
 TEST 14 'yacc/lex generated implicit prereqs'
@@ -468,15 +468,15 @@ cmd :: a.cbl i.cbl t.cob x.cbl y.cbl t.cob'
         COPY z.cbl.'
 		INPUT z.cbl
 		OUTPUT - $'+ cobc -static -std=mvs -C   a.cbl
-+ cc -O    -c a.c
++ cc -O   -c a.c
 + cobc -static -std=mvs -C   i.cbl
-+ cc -O    -c i.c
++ cc -O   -c i.c
 + cobc -static -std=mvs -C   t.cob
-+ cc -O    -c t.c
++ cc -O   -c t.c
 + cobc -static -std=mvs -C -I. -Icobinc  x.cbl
-+ cc -O    -c x.c
++ cc -O   -c x.c
 + cobc -static -std=mvs -C -I.  y.cbl
-+ cc -O    -c y.c
++ cc -O   -c y.c
 + cc  -O    -o cmd a.o i.o t.o x.o y.o'
 
 TEST 16 'patterns vs. directories'
@@ -588,7 +588,7 @@ main() { return x(); }'
 + cc -c x_a.c
 + rm x_a.c
 + echo "extern int x();" > x.h
-+ cc -O  -I.  -c main.c
++ cc -O -I.  -c main.c
 + cc  -O   -o x x_a.o main.o'
 
 TEST 20 'base metarule augmentation'
@@ -603,6 +603,6 @@ TEST 20 'base metarule augmentation'
 cmd :: a.c b.c'
 		INPUT a.c
 		INPUT bot/b.c
-		OUTPUT - $'+ cc -g -O    -c a.c
-+ cc -O    -c bot/b.c
+		OUTPUT - $'+ cc -g -O   -c a.c
++ cc -O   -c bot/b.c
 + cc  -O   -o cmd a.o b.o'

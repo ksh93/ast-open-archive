@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.tab (AT&T Labs Research) 2003-06-10
+# @(#)pp.tab (AT&T Labs Research) 2004-08-30
 #
 # C preprocessor tables and states
 #
@@ -29,7 +29,7 @@
 	undef
 	+warning
 
-%keywords "static struct ppkeyword options" prefix=X_ index=optindex
+%keywords "static struct ppkeyword options" prefix=X_ index=optindex last=last_option
 
 	allmultiple
 	allpossible
@@ -71,6 +71,7 @@
 	pluscomment
 	plusplus
 	plussplice
+	pragmaflags
 	pragmaexpand
 	predefined
 	prefix
@@ -89,6 +90,7 @@
 	strict
 	stringspan
 	stringsplit
+	system_header
 	test
 	text
 	transition

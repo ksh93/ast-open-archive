@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -31,9 +31,9 @@ typedef struct _coord_
 Coord_t	Coord;
 
 #if __STD_C
-coordprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
+int coordprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
 #else
-coordprint(f, v, fe)
+int coordprint(f, v, fe)
 Sfio_t*		f;
 Void_t*		v;
 Sffmt_t*	fe;
@@ -71,9 +71,9 @@ typedef union Value_u
 } Value_t;
 
 #if __STD_C
-nulprint(Sfio_t* f, Void_t* val, Sffmt_t* fe)
+int nulprint(Sfio_t* f, Void_t* val, Sffmt_t* fe)
 #else
-nulprint(f, val, fe)
+int nulprint(f, val, fe)
 Sfio_t*		f;
 Void_t*		val;
 Sffmt_t*	fe;
@@ -102,9 +102,9 @@ Sffmt_t*	fe;
 static int	OXcount;
 static char*	OXstr = "abc";
 #if __STD_C
-DOXSprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
+int DOXSprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
 #else
-DOXSprint(f, v, fe)
+int DOXSprint(f, v, fe)
 Sfio_t*		f;
 Void_t*		v;
 Sffmt_t*	fe;
@@ -141,9 +141,9 @@ Sffmt_t*	fe;
 }
 
 #if __STD_C
-abprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
+int abprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
 #else
-abprint(f, v, fe)
+int abprint(f, v, fe)
 Sfio_t*		f;
 Void_t*		v;
 Sffmt_t*	fe;
@@ -168,9 +168,9 @@ Sffmt_t*	fe;
 }
 
 #if __STD_C
-intarg(Sfio_t* f, Void_t* val, Sffmt_t* fe)
+int intarg(Sfio_t* f, Void_t* val, Sffmt_t* fe)
 #else
-intarg(f, val, fe)
+int intarg(f, val, fe)
 Sfio_t*		f;
 Void_t*		val;
 Sffmt_t*	fe;
@@ -182,9 +182,9 @@ Sffmt_t*	fe;
 }
 
 #if __STD_C
-shortarg(Sfio_t* f, Void_t* val, Sffmt_t* fe)
+int shortarg(Sfio_t* f, Void_t* val, Sffmt_t* fe)
 #else
-shortarg(f, val, fe)
+int shortarg(f, val, fe)
 Sfio_t*		f;
 Void_t*		val;
 Sffmt_t*	fe;
@@ -199,9 +199,9 @@ Sffmt_t*	fe;
 }
 
 #if __STD_C
-transarg(Sfio_t* f, Void_t* val, Sffmt_t* fe)
+int transarg(Sfio_t* f, Void_t* val, Sffmt_t* fe)
 #else
-transarg(f, val, fe)
+int transarg(f, val, fe)
 Sfio_t*		f;
 Void_t*		val;
 Sffmt_t*	fe;

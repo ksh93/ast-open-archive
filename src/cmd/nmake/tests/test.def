@@ -5,13 +5,15 @@ UNIT nmake
 (vpath .) </dev/null >/dev/null 2>&1 && vpath - /#option/2d
 
 unset A
+unset MAKERULES
+unset MAKERULESPATH
+unset MAKESKIP
 unset NPROC
 unset P
-unset MAKESKIP
 unset VPATH
 
 export CC=cc
 export ERROR_OPTIONS='nosystem'
 export LANG=C LC_ALL=C
-export MAKE_OPTIONS='nativepp=-1 prefixinclude=0'
+export MAKE_OPTIONS='nativepp=-1 noprefixinclude'
 export PS4='+ '

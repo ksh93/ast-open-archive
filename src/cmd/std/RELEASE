@@ -1,3 +1,4 @@
+04-09-14 ls.c: add -w[linesX]cols, last col must be visible in window
 04-07-17 ls.c: rename -f => -Z, add x/open -f
 04-03-28 ls.c: add variable column widths for minimal { -C -x } footprint
 04-02-29 pss-getprocs.c: fix readf/partf semantic mixup

@@ -174,18 +174,33 @@ getval(register char* s, int op)
 		{
 
 		case '-':	/* option settings suitable for command line */
-		case '+':	/* option settings suitable for set */
-			if (c = (*++s == var))
-				s++;
+			/*
+			 * -name	option value if set
+			 * --name	option name and value for subsequent set
+			 * -?name	1 if option value was set/unset
+			 * -		non-default settings
+			 * -+		non-default internal settings
+			 * --		all settings
+			 * -?		:= default settings
+			 * -[^:alnum:]	defined by genop()/listops()
+			 */
+
+			if (c = *++s)
+			{
+				if (isalnum(c))
+					c = 0;
+				else
+					s++;
+			}
 			if (*s)
 			{
-				getop(internal.val, s, var != '-');
+				getop(internal.val, s, c);
 				return sfstruse(internal.val);
 			}
 			if (state.mam.statix && (state.never || state.frame->target && !(state.frame->target->property & P_always)))
 				return "${NMAKEFLAGS}";
-			listops(internal.val, -c);
-			if (var == '-')
+			listops(internal.val, c);
+			if (c == '-')
 				for (p = internal.preprocess->prereqs; p; p = p->next)
 					sfprintf(internal.val, " %s", p->rule->name);
 			return sfstruse(internal.val);
@@ -602,7 +617,7 @@ setvar(char* s, char* v, int flags)
 		p = auxiliary(s, 1);
 	}
 	p->property |= flags & (V_builtin|V_functional);
-	if (state.user || state.readonly || !(p->property & V_readonly) && (!(p->property & V_import) || state.global != 1 || state.import || (flags & V_import) || state.base && !state.init))
+	if (state.user || state.readonly || !(p->property & V_readonly) && (!(p->property & V_import) || state.global != 1 || (flags & V_import) || state.base && !state.init))
 	{
 		if (flags & V_import)
 		{

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -123,6 +123,9 @@
 #define IN_static		(1<<13)	/* static buffer - don't free	*/
 #define IN_sync			(1<<14)	/* line sync required on pop	*/
 #define IN_tokens		(1L<<15)/* non-space tokens encountered	*/
+
+#define OPT_GLOBAL		(1<<0)	/* pp: pass optional		*/
+#define OPT_PASS		(1<<1)	/* pass on			*/
 
 struct ppsymbol;
 struct ppindex;
@@ -278,6 +281,8 @@ struct pptuple				/* tuple macro			*/
 	char*		path;		/* full path of last #include	*/ \
 	char*		tmpbuf;		/* very temporary buffer	*/ \
 	char*		valbuf;		/* builtin macro value buffer	*/ \
+	char*		optflags;	/* OPT_* flags indexed by X_*	*/ \
+	int		lastout;	/* last output char		*/ \
 		/* the rest are implicitly initialized */ \
 	char*		include;	/* saved path of last #include	*/ \
 	char*		prefix;		/* current directory prefix	*/ \
@@ -459,7 +464,7 @@ struct pptuple				/* tuple macro			*/
 #define MAXID		255		/* maximum identifier size	*/
 #define MAXTOKEN	PPTOKSIZ	/* maximum token size		*/
 #define MAXFORMALS	64		/* maximum number macro formals	*/
-#define MAXHIDDEN	10		/* ppline if hidden>=MAXHIDDEN	*/
+#define MAXHIDDEN	8		/* ppline if hidden>=MAXHIDDEN	*/
 #define DEFMACSTACK	(MAXFORMALS*32*32)/* default macstack size	*/
 
 #define FSM_COMPATIBILITY	1	/* compatibility mode		*/
@@ -512,9 +517,6 @@ struct pptuple				/* tuple macro			*/
 #define TYPE_HOSTED	(1<<4)
 #define TYPE_INCLUDE	(1<<5)
 #define TYPE_VENDOR	(1<<6)
-
-#define PRAGMA_COMMAND	01		/* option had command prefix	*/
-#define PRAGMA_PP	02		/* pp command prefix		*/
 
 #define TOK_BUILTIN	(1<<0)		/* last token was #(		*/
 #define TOK_FORMAL	(1<<1)		/* last token was arg formal id	*/

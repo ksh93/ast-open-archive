@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make cql
 make cql.o
@@ -185,7 +185,7 @@ done cql.h
 done cql.c
 meta cql.o %.c>%.o cql.c cql
 prev cql.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cql.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cql.c
 done cql.o generated
 make decl.o
 make decl.c
@@ -193,7 +193,7 @@ prev cql.h implicit
 done decl.c
 meta decl.o %.c>%.o decl.c decl
 prev decl.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c decl.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c decl.c
 done decl.o generated
 make expr.o
 make expr.c
@@ -205,7 +205,7 @@ prev cql.h implicit
 done expr.c
 meta expr.o %.c>%.o expr.c expr
 prev expr.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c expr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c expr.c
 done expr.o generated
 make file.o
 make file.c
@@ -213,7 +213,7 @@ prev cql.h implicit
 done file.c
 meta file.o %.c>%.o file.c file
 prev file.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c file.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c file.c
 done file.o generated
 make hix.o
 make hix.c
@@ -236,7 +236,7 @@ done ${INSTALLROOT}/include/ast/sfio_t.h
 done hix.c
 meta hix.o %.c>%.o hix.c hix
 prev hix.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c hix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c hix.c
 done hix.o generated
 bind -lcdb
 bind -ldll
@@ -253,7 +253,7 @@ prev ${INSTALLROOT}/include/ast/cdb.h implicit
 done cdb.c
 meta cdb.o %.c>%.o cdb.c cdb
 prev cdb.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cdb.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cdb.c
 done cdb.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o cdb cdb.o ${mam_libcdb} ${mam_libdll} ${mam_libast}
 done cdb generated

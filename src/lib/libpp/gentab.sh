@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1986-2002 AT&T Corp.                #
+#                Copyright (c) 1986-2004 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -15,7 +15,7 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
@@ -31,7 +31,7 @@
 #
 #	%flags [ prefix=<prefix> ] [ index=<index> ] [ init=<init> ]
 #
-#	%keyword <name> [ prefix=<prefix> ] [ index=<index> ] [ init=<init> ]
+#	%keyword <name> [ prefix=<prefix> ] [ index=<index> ] [ init=<init> ] [ first=<id> ] [ last=<id> ]
 #
 #	%sequence [ prefix=<prefix> ] [ index=<index> ] [ init=<init> ]
 #
@@ -50,6 +50,8 @@ define=1
 err_line=0
 type=""
 index=""
+first=""
+last=""
 table=1
 while	:
 do	case $1 in
@@ -96,6 +98,14 @@ do	case $shell in
 	case $1 in
 	"")	;;
 	%flags|%keywords|%sequence)
+		case $define:$last in
+		1:?*)	case $shell in
+			ksh)	((n=counter-1)) ;;
+			*)	n=`expr $counter - 1` ;;
+			esac
+			echo "#define $prefix$last	$n"
+			;;
+		esac
 		case $type in
 		%flags|%sequence)
 			if	test $define = 1
@@ -121,6 +131,8 @@ do	case $shell in
 		prefix=""
 		index=""
 		init=""
+		first=""
+		last=""
 		case $type in
 		%keywords)
 			case $1 in
@@ -156,6 +168,9 @@ do	case $shell in
 			[0123456789]*)	counter=$value ;;
 			esac
 			;;
+		esac
+		case $define:$first in
+		1:?*)	echo "#define $prefix$first	$counter" ;;
 		esac
 		;;
 	%*)	echo "$command: ${err_file}line $err_line: $1: unknown keyword" >&2
@@ -204,6 +219,14 @@ do	case $shell in
 		;;
 	esac
 done
+case $define:$last in
+1:?*)	case $shell in
+	ksh)	((n=counter-1)) ;;
+	*)	n=`expr $counter - 1` ;;
+	esac
+	echo "#define $prefix$last	$n"
+	;;
+esac
 case $type in
 %keywords)
 	if	test $table = 1

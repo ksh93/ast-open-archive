@@ -54,7 +54,7 @@ readrules(void)
 	{
 		tmp = sfstropen();
 		edit(tmp, s, KEEP, KEEP, external.object);
-		readfile(sfstruse(tmp), COMP_BASE, NiL);
+		readfile(sfstruse(tmp), COMP_BASE|(state.explicitrules ? COMP_RULES : 0), NiL);
 		edit(tmp, s, DELETE, KEEP, DELETE);
 		state.rules = strdup(sfstruse(tmp));
 		sfstrclose(tmp);
@@ -162,19 +162,22 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 			{
 				if (needrules)
 				{
-					needrules = 0;
-					readrules();
-				}
-				else if (state.rules)
-				{
-					edit(internal.tmp, state.rules, DELETE, KEEP, DELETE);
-					edit(internal.wrk, b = getval(external.rules, VAL_PRIMARY), DELETE, KEEP, DELETE);
-					if (strcmp(sfstruse(internal.tmp), sfstruse(internal.wrk)))
+					if (state.rules && !state.explicitrules)
 					{
-						message((-2, "%s: base rules changed to %s", state.rules, b));
-						state.rules = b;
-						state.forceread = 1;
-						needrules = 1;
+						edit(internal.tmp, state.rules, DELETE, KEEP, DELETE);
+						edit(internal.wrk, b = getval(external.rules, VAL_PRIMARY), DELETE, KEEP, DELETE);
+						if (strcmp(sfstruse(internal.tmp), sfstruse(internal.wrk)))
+						{
+							error(state.exec || state.mam.out ? -1 : 1, "%s: base rules changed to %s", sfstrbase(internal.tmp), sfstrbase(internal.wrk));
+							state.rules = b;
+							state.forceread = 1;
+							needrules = 1;
+						}
+					}
+					if (!state.forceread)
+					{
+						needrules = 0;
+						readrules();
 					}
 				}
 				if (!state.forceread)
@@ -405,7 +408,7 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 	}
 	n = state.reading;
 	state.reading = 1;
-	parse(sp, NiL, r->name, 0);
+	parse(sp, NiL, r->name, NiL);
 	sfclose(sp);
 	state.reading = n;
 	if (!state.compile && !state.global)
@@ -422,6 +425,7 @@ int
 readfile(register char* file, int type, char* filter)
 {
 	register struct rule*	r;
+	char*			s;
 	Sfio_t*			rfp;
 
 	if (streq(file, "-") && (file = "/dev/null") || isdynamic(file))
@@ -438,7 +442,9 @@ readfile(register char* file, int type, char* filter)
 	state.init--;
 	if (r)
 	{
-		compref(type, unbound(r), r->time);
+		if (*(s = unbound(r)) == '/')
+			s = strrchr(s, '/') + 1;
+		compref(type, s, r->time);
 		r->dynamic |= D_scanned;
 		file = r->name;
 		if (rfp = filter ? fapply(internal.internal, null, file, filter, CO_ALWAYS|CO_LOCAL|CO_URGENT) : rsfopen(file))
@@ -449,7 +455,7 @@ readfile(register char* file, int type, char* filter)
 			if (state.user)
 			{
 				r->status = EXISTS;
-				parse(rfp, NiL, file, 0);
+				parse(rfp, NiL, file, NiL);
 				sfclose(rfp);
 			}
 			else

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make pax
 make bio.o
@@ -140,7 +140,7 @@ meta FEATURE/local features/%>FEATURE/% features/local local
 make features/local
 done features/local
 bind -last
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run features/local
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run features/local
 done FEATURE/local dontcare generated
 make ${INSTALLROOT}/include/ast/tar.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -216,7 +216,7 @@ done pax.h
 done bio.c
 meta bio.o %.c>%.o bio.c bio
 prev bio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c bio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c bio.c
 done bio.o generated
 make convert.o
 make convert.c
@@ -224,7 +224,7 @@ prev pax.h implicit
 done convert.c
 meta convert.o %.c>%.o convert.c convert
 prev convert.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c convert.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c convert.c
 done convert.o generated
 make copy.o
 make copy.c
@@ -232,7 +232,7 @@ prev pax.h implicit
 done copy.c
 meta copy.o %.c>%.o copy.c copy
 prev copy.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c copy.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c copy.c
 done copy.o generated
 make pax.o
 make pax.c
@@ -255,7 +255,7 @@ prev pax.h implicit
 done pax.c
 meta pax.o %.c>%.o pax.c pax
 prev pax.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c pax.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c pax.c
 done pax.o generated
 make options.o
 make options.c
@@ -263,7 +263,7 @@ prev pax.h implicit
 done options.c
 meta options.o %.c>%.o options.c options
 prev options.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c options.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c options.c
 done options.o generated
 make delta.o
 make delta.c
@@ -277,7 +277,7 @@ prev pax.h implicit
 done delta.c
 meta delta.o %.c>%.o delta.c delta
 prev delta.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c delta.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c delta.c
 done delta.o generated
 make file.o
 make file.c
@@ -288,7 +288,7 @@ prev pax.h implicit
 done file.c
 meta file.o %.c>%.o file.c file
 prev file.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c file.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c file.c
 done file.o generated
 make format.o
 make format.c
@@ -299,7 +299,7 @@ done format.h
 done format.c
 meta format.o %.c>%.o format.c format
 prev format.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c format.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c format.c
 done format.o generated
 make misc.o
 make misc.c
@@ -313,7 +313,7 @@ prev pax.h implicit
 done misc.c
 meta misc.o %.c>%.o misc.c misc
 prev misc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c misc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c misc.c
 done misc.o generated
 make paxlib.o
 make paxlib.c
@@ -321,7 +321,7 @@ prev pax.h implicit
 done paxlib.c
 meta paxlib.o %.c>%.o paxlib.c paxlib
 prev paxlib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c paxlib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c paxlib.c
 done paxlib.o generated
 make tv.o
 make tv.c
@@ -329,14 +329,14 @@ make FEATURE/tv implicit
 meta FEATURE/tv features/%>FEATURE/% features/tv tv
 make features/tv
 done features/tv
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run features/tv
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run features/tv
 done FEATURE/tv generated
 prev ${INSTALLROOT}/include/ast/tm.h implicit
 prev tv.h implicit
 done tv.c
 meta tv.o %.c>%.o tv.c tv
 prev tv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c tv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c tv.c
 done tv.o generated
 make pax-ar.o
 make pax-ar.c
@@ -345,7 +345,7 @@ prev format.h implicit
 done pax-ar.c
 meta pax-ar.o %.c>%.o pax-ar.c pax-ar
 prev pax-ar.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-ar.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-ar.c
 done pax-ar.o generated
 make pax-bzip.o
 make pax-bzip.c
@@ -353,7 +353,7 @@ prev format.h implicit
 done pax-bzip.c
 meta pax-bzip.o %.c>%.o pax-bzip.c pax-bzip
 prev pax-bzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-bzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-bzip.c
 done pax-bzip.o generated
 make pax-compress.o
 make pax-compress.c
@@ -361,7 +361,7 @@ prev format.h implicit
 done pax-compress.c
 meta pax-compress.o %.c>%.o pax-compress.c pax-compress
 prev pax-compress.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-compress.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-compress.c
 done pax-compress.o generated
 make pax-cpio.o
 make pax-cpio.c
@@ -369,7 +369,7 @@ prev format.h implicit
 done pax-cpio.c
 meta pax-cpio.o %.c>%.o pax-cpio.c pax-cpio
 prev pax-cpio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-cpio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-cpio.c
 done pax-cpio.o generated
 make pax-delta.o
 make pax-delta.c
@@ -377,7 +377,7 @@ prev format.h implicit
 done pax-delta.c
 meta pax-delta.o %.c>%.o pax-delta.c pax-delta
 prev pax-delta.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-delta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-delta.c
 done pax-delta.o generated
 make pax-delta_88.o
 make pax-delta_88.c
@@ -385,7 +385,7 @@ prev format.h implicit
 done pax-delta_88.c
 meta pax-delta_88.o %.c>%.o pax-delta_88.c pax-delta_88
 prev pax-delta_88.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-delta_88.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-delta_88.c
 done pax-delta_88.o generated
 make pax-gzip.o
 make pax-gzip.c
@@ -393,7 +393,7 @@ prev format.h implicit
 done pax-gzip.c
 meta pax-gzip.o %.c>%.o pax-gzip.c pax-gzip
 prev pax-gzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-gzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-gzip.c
 done pax-gzip.o generated
 make pax-ignore.o
 make pax-ignore.c
@@ -401,7 +401,7 @@ prev format.h implicit
 done pax-ignore.c
 meta pax-ignore.o %.c>%.o pax-ignore.c pax-ignore
 prev pax-ignore.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-ignore.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-ignore.c
 done pax-ignore.o generated
 make pax-mime.o
 make pax-mime.c
@@ -409,7 +409,7 @@ prev format.h implicit
 done pax-mime.c
 meta pax-mime.o %.c>%.o pax-mime.c pax-mime
 prev pax-mime.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-mime.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-mime.c
 done pax-mime.o generated
 make pax-patch.o
 make pax-patch.c
@@ -417,7 +417,7 @@ prev format.h implicit
 done pax-patch.c
 meta pax-patch.o %.c>%.o pax-patch.c pax-patch
 prev pax-patch.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-patch.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-patch.c
 done pax-patch.o generated
 make pax-pds.o
 make pax-pds.c
@@ -426,7 +426,7 @@ prev format.h implicit
 done pax-pds.c
 meta pax-pds.o %.c>%.o pax-pds.c pax-pds
 prev pax-pds.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-pds.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-pds.c
 done pax-pds.o generated
 make pax-rpm.o
 make pax-rpm.c
@@ -434,7 +434,7 @@ prev format.h implicit
 done pax-rpm.c
 meta pax-rpm.o %.c>%.o pax-rpm.c pax-rpm
 prev pax-rpm.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-rpm.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-rpm.c
 done pax-rpm.o generated
 make pax-slt.o
 make pax-slt.c
@@ -443,7 +443,7 @@ prev format.h implicit
 done pax-slt.c
 meta pax-slt.o %.c>%.o pax-slt.c pax-slt
 prev pax-slt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-slt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-slt.c
 done pax-slt.o generated
 make pax-tar.o
 make pax-tar.c
@@ -451,7 +451,7 @@ prev format.h implicit
 done pax-tar.c
 meta pax-tar.o %.c>%.o pax-tar.c pax-tar
 prev pax-tar.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-tar.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-tar.c
 done pax-tar.o generated
 make pax-tnef.o
 make pax-tnef.c
@@ -460,7 +460,7 @@ prev format.h implicit
 done pax-tnef.c
 meta pax-tnef.o %.c>%.o pax-tnef.c pax-tnef
 prev pax-tnef.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-tnef.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-tnef.c
 done pax-tnef.o generated
 make pax-vdb.o
 make pax-vdb.c
@@ -471,7 +471,7 @@ prev format.h implicit
 done pax-vdb.c
 meta pax-vdb.o %.c>%.o pax-vdb.c pax-vdb
 prev pax-vdb.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-vdb.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-vdb.c
 done pax-vdb.o generated
 make pax-saveset.o
 make pax-saveset.c
@@ -479,7 +479,7 @@ prev format.h implicit
 done pax-saveset.c
 meta pax-saveset.o %.c>%.o pax-saveset.c pax-saveset
 prev pax-saveset.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-saveset.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c pax-saveset.c
 done pax-saveset.o generated
 bind -lardir
 bind -lodelta
@@ -498,7 +498,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done nocom.c
 meta nocom.o %.c>%.o nocom.c nocom
 prev nocom.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c nocom.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c nocom.c
 done nocom.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o nocom nocom.o ${mam_libast}
 done nocom generated
@@ -568,7 +568,7 @@ done ${INSTALLROOT}/include/ast generated
 make ${INSTALLROOT}/include/ast/paxlib.h
 prev ${INSTALLROOT}/include/ast
 prev paxlib.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1987,author=gsf'  paxlib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1987,author=gsf'  paxlib.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/paxlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/paxlib.h

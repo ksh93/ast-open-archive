@@ -2,7 +2,7 @@
 
 INCLUDE cc.def
 
-TEST 01 'install with compare and clobber options'
+TEST 01 'install with --compare and --clobber'
 
 	EXPORT INSTALLROOT=.
 	EXPORT SHELL=/bin/sh
@@ -23,7 +23,7 @@ TEST 01 'install with compare and clobber options'
 
 	DO	touch t.sh
 
-	EXEC	--regress install compare=0
+	EXEC	--regress --nocompare install
 		ERROR - $'+ cp t.sh t
 + chmod u+w,+x t
 + mv bin/t bin/t.old
@@ -31,11 +31,19 @@ TEST 01 'install with compare and clobber options'
 
 	DO	touch t.sh
 
-	EXEC	--regress install compare=0 clobber=1
+	EXEC	--regress install compare=0 # obsolete compatibility
+
+	DO	touch t.sh
+
+	EXEC	--regress --nocompare --clobber install
 		ERROR - $'+ cp t.sh t
 + chmod u+w,+x t
 + rm -f bin/t
 + ignore cp t bin/t'
+
+	DO	touch t.sh
+
+	EXEC	--regress install compare=0 clobber=1 # obsolete compatibility
 
 TEST 02 'install+clean+clobber' && {
 
@@ -47,15 +55,13 @@ TEST 02 'install+clean+clobber' && {
 		INPUT Makefile $'Hdrs = a.h b.h c.h
 a :: a.c
 a.h :
-	sleep 1
 	touch $(<)
 $(INCLUDEDIR) :INSTALLDIR: $(Hdrs)'
 		INPUT a.c $'#include "a.h"
 main(){return 0;}'
 		INPUT b.h
 		INPUT c.h
-		ERROR - $'+ sleep 1
-+ touch a.h
+		ERROR - $'+ touch a.h
 + cc -O -I. -c a.c
 + cc -O -o a a.o
 + mkdir -p ../../bin
@@ -65,7 +71,7 @@ main(){return 0;}'
 + ignore cp b.h ../../include/b.h
 + ignore cp c.h ../../include/c.h'
 
-	EXEC	install
+	EXEC	--regress install
 		ERROR -
 
 	EXEC	clean
@@ -77,13 +83,18 @@ main(){return 0;}'
 	EXEC	clobber
 		ERROR - $'+ ignore rm -f -r Makefile.mo'
 
-	EXEC	install '$(BINDIR)/a : compare=0'
-		ERROR - $'+ sleep 1
-+ touch a.h
+	EXEC	--nocompare --regress install '$(BINDIR)/a'
+		ERROR - $'+ touch a.h
 + cc -O -I. -c a.c
 + cc -O -o a a.o
 + mv ../../bin/a ../../bin/a.old
-+ ignore cp a ../../bin/a'
++ ignore cp a ../../bin/a
++ mv ../../include/a.h ../../include/a.h.old
++ ignore cp a.h ../../include/a.h
++ mv ../../include/b.h ../../include/b.h.old
++ ignore cp b.h ../../include/b.h
++ mv ../../include/c.h ../../include/c.h.old
++ ignore cp c.h ../../include/c.h'
 
 	EXEC	clobber
 		ERROR - $'+ ignore rm -f -r a.h a.o a Makefile.mo Makefile.ms'
@@ -97,7 +108,7 @@ TEST 03 '*FLAGS'
 CCLDFLAGS += --CC.EXPORT.DYNAMIC
 tst :: tst.c'
 		INPUT tst.c
-		OUTPUT - $'+ cc -O --CC.WARN    -c tst.c
+		OUTPUT - $'+ cc -O --CC.WARN   -c tst.c
 + cc --CC.EXPORT.DYNAMIC  -O --CC.WARN   -o tst tst.o'
 
 TEST 04 'cc-'
@@ -107,8 +118,8 @@ TEST 04 'cc-'
 all :
 	echo CCFLAGS=$(CCFLAGS)'
 		INPUT cc-pg/
-		OUTPUT - $'+ echo CCFLAGS=-O -Ddummy   
-+ echo CCFLAGS=-pg   '
+		OUTPUT - $'+ echo CCFLAGS=-O -Ddummy  
++ echo CCFLAGS=-pg  '
 		ERROR - $'cc-pg:'
 
 TEST 05 'command arg target vs common action => .ACTION'
@@ -121,7 +132,7 @@ TEST 05 'command arg target vs common action => .ACTION'
 	EXEC	-n query
 		INPUT Makefile $'query :: query.c'
 		INPUT query.c $'int main(){return 0;}'
-		OUTPUT - $'+ cc -O    -c query.c
+		OUTPUT - $'+ cc -O   -c query.c
 + cc  -O   -o query query.o'
 
 	EXEC	-n query .
@@ -144,13 +155,13 @@ end
 o.o :: a.c z.c'
 		INPUT a.c
 		INPUT z.c
-		OUTPUT - $'+ cc -O    -c a.c
-+ cc -O    -c z.c
+		OUTPUT - $'+ cc -O   -c a.c
++ cc -O   -c z.c
 + ld -r  -o o.o a.o z.o'
 
 	EXEC	-n AHA=1
-		OUTPUT - $'+ cc -O    -c a.c
-+ cc -O    -c z.c
+		OUTPUT - $'+ cc -O   -c a.c
++ cc -O   -c z.c
 + : AHA -o o.o a.o z.o'
 
 TEST 07 'install with link on'
@@ -164,11 +175,11 @@ aha :LIBRARY: aha.c'
 		INPUT aha.c
 		INPUT aha.req ' -laha'
 		OUTPUT - $'+ echo "" -ltst -laha > tst.req
-+ cc -O    -c tst.c
++ cc -O   -c tst.c
 + ar cr libtst.a tst.o
 + rm -f tst.o
 + echo "" -laha > aha.req
-+ cc -O    -c aha.c
++ cc -O   -c aha.c
 + ar cr libaha.a aha.o
 + rm -f aha.o
 + if	silent test ! -d root/lib
@@ -226,13 +237,13 @@ aha :LIBRARY: aha.c'
 + 	fi
 + fi'
 
-	EXEC	-n install link=*
+	EXEC	-n --link="*" install
 		OUTPUT - $'+ echo "" -ltst -laha > tst.req
-+ cc -O    -c tst.c
++ cc -O   -c tst.c
 + ar cr libtst.a tst.o
 + rm -f tst.o
 + echo "" -laha > aha.req
-+ cc -O    -c aha.c
++ cc -O   -c aha.c
 + ar cr libaha.a aha.o
 + rm -f aha.o
 + if	silent test ! -d root/lib
@@ -290,6 +301,8 @@ aha :LIBRARY: aha.c'
 + 	fi
 + fi'
 
+	EXEC	-n install link="*" # obsolete compatibility
+
 TEST 08 'instrumented compilation'
 
 	DO	mkdir bin
@@ -305,9 +318,9 @@ lib :LIBRARY: lib.c'
 		INPUT lib.c $'extern int lib() { return 0; }'
 		INPUT lib.req $' -llib'
 		INPUT transmorgrify
-		OUTPUT - $'+ TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc -O    -c cmd.c
+		OUTPUT - $'+ TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc -O   -c cmd.c
 + echo "" -llib > lib.req
-+ TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc -O    -c lib.c
++ TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc -O   -c lib.c
 + ar cr liblib-tra.a lib.o
 + rm -f lib.o
 + TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc  -O   -o cmd cmd.o liblib-tra.a'
@@ -352,22 +365,22 @@ stdio.h : .SCAN.IGNORE'
 ;;;'$TWD$'/lib/Makefile;lib/Makefile
 ;;;'$TWD$'/lib/libl/Makefile;lib/libl/Makefile'
 
-TEST 10 'arclean'
+TEST 10 '--arclean=edit-op'
 
 	EXEC	-n all
 		INPUT Makefile $'tst :LIBRARY: explicit.o implicit.c'
 		INPUT explicit.c
 		INPUT implicit.c
 		OUTPUT - $'+ echo "" -ltst > tst.req
-+ cc -O    -c explicit.c
-+ cc -O    -c implicit.c
++ cc -O   -c explicit.c
++ cc -O   -c implicit.c
 + ar cr libtst.a explicit.o implicit.o
 + rm -f explicit.o implicit.o'
 
-	EXEC	-n all arclean=A=.IMPLICIT
+	EXEC	-n --arclean=A=.IMPLICIT all
 		OUTPUT - $'+ echo "" -ltst > tst.req
-+ cc -O    -c explicit.c
-+ cc -O    -c implicit.c
++ cc -O   -c explicit.c
++ cc -O   -c implicit.c
 + ar cr libtst.a explicit.o implicit.o
 + rm -f implicit.o'
 
@@ -407,33 +420,33 @@ t4 :LIBRARY: c.c'
 		INPUT $TWD/work/a.c $'int a(){return 0;}'
 		INPUT $TWD/work/b.c $'int b(){return 0;}'
 		INPUT $TWD/work/c.c $'int c(){return 0;}'
-		OUTPUT - $'+ cc -O -D_BLD_DLL -D_BLD_PIC    -c main.c
+		OUTPUT - $'+ cc -O -D_BLD_DLL -D_BLD_PIC   -c main.c
 + cc  -O   -o t1 main.o'
 
 	EXEC	-n all
-		OUTPUT - $'+ cc -O -D_BLD_DLL -D_BLD_PIC    -c main.c
+		OUTPUT - $'+ cc -O -D_BLD_DLL -D_BLD_PIC   -c main.c
 + cc  -O   -o t1 main.o
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c a.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c a.c
 + cc  -O   -o t2 main.o a.o
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c b.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
 + ar cr t3.a a.o b.o
 + rm -f a.o b.o
 + echo "" -lt4 > t4.req
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c c.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
 + ar cr libt4.a c.o
 + rm -f c.o
 + cc  -shared  -o libt4.so.1.0 -all libt4.a -notall '
 
 	EXEC	-n install
-		OUTPUT - $'+ cc -O -D_BLD_DLL -D_BLD_PIC    -c main.c
+		OUTPUT - $'+ cc -O -D_BLD_DLL -D_BLD_PIC   -c main.c
 + cc  -O   -o t1 main.o
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c a.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c a.c
 + cc  -O   -o t2 main.o a.o
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c b.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c b.c
 + ar cr t3.a a.o b.o
 + rm -f a.o b.o
 + echo "" -lt4 > t4.req
-+ cc -O -D_BLD_DLL -D_BLD_PIC    -c c.c
++ cc -O -D_BLD_DLL -D_BLD_PIC   -c c.c
 + ar cr libt4.a c.o
 + rm -f c.o
 + cc  -shared  -o libt4.so.1.0 -all libt4.a -notall 
@@ -626,11 +639,11 @@ TEST 14 'cc-'
 		INPUT t.c
 		INPUT cc-g/
 		OUTPUT - $'+ echo "" -lt > t.req
-+ cc -O    -c t.c
++ cc -O   -c t.c
 + ar cr libt.a t.o
 + rm -f t.o
 + echo "" -lt > t.req
-+ cc -g    -c ../t.c
++ cc -g   -c ../t.c
 + ar cr libt-g.a t.o
 + rm -f t.o'
 		ERROR - $'cc-g:'
@@ -649,11 +662,11 @@ t :LIBRARY: a.c'
 		INPUT t.h $'#define T 1'
 		INPUT main.c $'int main(){return 0;}'
 		INPUT a.c $'int a(){return 0;}'
-		OUTPUT - $'+ cc -O    -c main.c
+		OUTPUT - $'+ cc -O   -c main.c
 + cc  -O   -o t main.o
 + cc  -O   -o t2 main.o
 + echo "" -lt > t.req
-+ cc -O    -c a.c
++ cc -O   -c a.c
 + ar cr libt.a a.o
 + ignore ranlib libt.a
 + rm -f a.o
@@ -732,11 +745,11 @@ t :LIBRARY: a.c'
 + fi'
 
 	EXEC	-n --regress install link=t
-		OUTPUT - $'+ cc -O    -c main.c
+		OUTPUT - $'+ cc -O   -c main.c
 + cc  -O   -o t main.o
 + cc  -O   -o t2 main.o
 + echo "" -lt > t.req
-+ cc -O    -c a.c
++ cc -O   -c a.c
 + ar cr libt.a a.o
 + ignore ranlib libt.a
 + rm -f a.o

@@ -1,7 +1,118 @@
-info mam static
-note subcomponent level :MAKE: equivalent
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
+setv INSTALLROOT ${INSTALLROOT}
+setv PACKAGEROOT ${PACKAGEROOT}
+setv AR ar
+setv ARFLAGS cr
+setv AS as
+setv ASFLAGS
+setv CC cc
+setv mam_cc_FLAGS
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv COTEMP $$
+setv CPIO cpio
+setv CPIOFLAGS
+setv CPP "${CC} -E"
+setv F77 f77
+setv HOSTCC ${CC}
+setv IGNORE
+setv LD ld
+setv LDFLAGS
+setv LEX lex
+setv LEXFLAGS
+setv LPR lpr
+setv LPRFLAGS
+setv M4FLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
+setv PR pr
+setv PRFLAGS
+setv SHELL /bin/sh
+setv SILENT
+setv TAR tar
+setv YACC yacc
+setv YACCFLAGS -d
+make arj
+exec - set -
+exec - if	2d test -d arj || mkdir arj
+exec - then	echo  arj: >&2
+exec - 	cd arj
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=arj CC=cc version=2004-10-01 'dontcare test' .RWD.=arj .RECURSE .INSTALL test
+exec -
+exec - else	echo arj: warning: cannot recurse on virtual directory >&2
+exec - fi
+done arj generated
+make cab
+exec - set -
+exec - if	2d test -d cab || mkdir cab
+exec - then	echo  cab: >&2
+exec - 	cd cab
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=cab CC=cc version=2004-10-01 'dontcare test' .RWD.=cab .RECURSE .INSTALL test
+exec -
+exec - else	echo cab: warning: cannot recurse on virtual directory >&2
+exec - fi
+done cab generated
+make calib
+exec - set -
+exec - if	2d test -d calib || mkdir calib
+exec - then	echo  calib: >&2
+exec - 	cd calib
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=calib CC=cc version=2004-10-01 'dontcare test' .RWD.=calib .RECURSE .INSTALL test
+exec -
+exec - else	echo calib: warning: cannot recurse on virtual directory >&2
+exec - fi
+done calib generated
+make lha
+exec - set -
+exec - if	2d test -d lha || mkdir lha
+exec - then	echo  lha: >&2
+exec - 	cd lha
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lha CC=cc version=2004-10-01 'dontcare test' .RWD.=lha .RECURSE .INSTALL test
+exec -
+exec - else	echo lha: warning: cannot recurse on virtual directory >&2
+exec - fi
+done lha generated
+make rar
+exec - set -
+exec - if	2d test -d rar || mkdir rar
+exec - then	echo  rar: >&2
+exec - 	cd rar
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=rar CC=cc version=2004-10-01 'dontcare test' .RWD.=rar .RECURSE .INSTALL test
+exec -
+exec - else	echo rar: warning: cannot recurse on virtual directory >&2
+exec - fi
+done rar generated
+make tp
+exec - set -
+exec - if	2d test -d tp || mkdir tp
+exec - then	echo  tp: >&2
+exec - 	cd tp
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=tp CC=cc version=2004-10-01 'dontcare test' .RWD.=tp .RECURSE .INSTALL test
+exec -
+exec - else	echo tp: warning: cannot recurse on virtual directory >&2
+exec - fi
+done tp generated
+make zip
+exec - set -
+exec - if	2d test -d zip || mkdir zip
+exec - then	echo  zip: >&2
+exec - 	cd zip
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=zip CC=cc version=2004-10-01 'dontcare test' .RWD.=zip .RECURSE .INSTALL test
+exec -
+exec - else	echo zip: warning: cannot recurse on virtual directory >&2
+exec - fi
+done zip generated
+make zoo
+exec - set -
+exec - if	2d test -d zoo || mkdir zoo
+exec - then	echo  zoo: >&2
+exec - 	cd zoo
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=zoo CC=cc version=2004-10-01 'dontcare test' .RWD.=zoo .RECURSE .INSTALL test
+exec -
+exec - else	echo zoo: warning: cannot recurse on virtual directory >&2
+exec - fi
+done zoo generated
 make install
-make all
-exec - ${MAMAKE} -r '*' ${MAMAKEARGS}
-done all virtual
 done install virtual
+make test
+done test dontcare virtual

@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-07-17 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-09-14 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -159,7 +159,8 @@ USAGE_LICENSE
 "		[a:always?Always use color.]"
 "		[t:tty|auto?Use color when output is a tty.]"
 "}"
-"[w:width?\ascreen-width\a is the current screen width.]#[screen-width]"
+"[w:width?Set the screen width to \ascreen-width\a and the screen height"
+"	to \ascreen-height\a if specified.]:[[screen-heightX]]screen-width]"
 "[W:time?Display \akey\a time instead of the modification time:]:[key]{"
 "	[a:atime|access|use?access time]"
 "	[c:ctime|status?status change time]"
@@ -326,6 +327,7 @@ typedef struct				/* program state		*/
 	Count_t		total;		/* total counts			*/
 	int		adjust;		/* key() print with adjustment	*/
 	int		comma;		/* LS_COMMAS ftw.level crossing	*/
+	int		height;		/* output height in lines	*/
 	int		reverse;	/* reverse the sort		*/
 	int		scale;		/* metric scale power		*/
 	int		width;		/* output width in chars	*/
@@ -929,7 +931,7 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 									z = x[j]->namelen;
 							w += z + BETWEEN;
 						}
-						if (w <= state.width)
+						if (w <= state.width && (!state.height || (n - l) < state.height))
 							o = n;
 						if (n == 1)
 							break;
@@ -1301,7 +1303,14 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_ATIME;
 			break;
 		case 'w':
-			state.width = opt_info.num;
+			state.width = strtol(opt_info.arg, &e, 0); 
+			if (*e == 'x' || *e == 'X' || *e == '.' || *e == '+')
+			{
+				state.height = state.width;
+				state.width = strtol(e + 1, &e, 0); 
+			}
+			if (*e)
+				error(2, "%s: invalid screen width specification at `%s'", opt_info.arg, e);
 			break;
 		case 'x':
 			state.lsflags |= LS_ACROSS|LS_COLUMNS;
@@ -1572,11 +1581,16 @@ main(int argc, register char** argv)
 	{
 		if (state.lsflags & LS_LONG)
 			state.lsflags &= ~(LS_COLUMNS|LS_COMMAS);
-		else if (!state.width)
+		else
 		{
-			astwinsize(1, NiL, &state.width);
-			if (state.width <= 20)
-				state.width = 80;
+			if (!state.width)
+			{
+				astwinsize(1, &state.height, &state.width);
+				if (state.width <= 20)
+					state.width = 80;
+			}
+			if (state.height <= 4)
+				state.height = 24;
 		}
 	}
 	if (state.lsflags & LS_STAT)

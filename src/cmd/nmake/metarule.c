@@ -134,20 +134,40 @@ metamatch(char* stem, register char* s, char* pattern)
 {
 	register char*	p;
 	register char*	t;
-	register char*	b;
+	register char*	x;
+	register char*	y;
+	char*		b;
+	register int	targetprefix;
 	
 	b = s;
 	p = pattern;
+	targetprefix = state.targetprefix ? *state.targetprefix : -1;
 	while (*p != '%')
 	{
 		if (!metaccmp(pattern, *p, *s++))
 		{
 			s--;
-			while (*s != '/')
-				if (!*s++)
-					return 0;
-			while (*s == '/') s++;
-			b = s;
+			do
+			{
+				if (*s == '/')
+				{
+					while (*++s == '/');
+					break;
+				}
+				else if (*s == targetprefix)
+				{
+					x = state.targetprefix;
+					y = s;
+					while (*++x == *++y && *x);
+					if (!*x)
+					{
+						s = y;
+						break;
+					}
+				}
+			} while (*++s);
+			if (!*(b = s))
+				return 0;
 			p = pattern;
 		}
 		else if (!*p++)
@@ -161,8 +181,10 @@ metamatch(char* stem, register char* s, char* pattern)
 		}
 	}
 	t = s;
-	while (*s) s++;
-	while (*p) p++;
+	while (*s)
+		s++;
+	while (*p)
+		p++;
 	while (*--p != '%')
 		if (s <= t || !metaccmp(pattern, *p, *--s))
 			return 0;
@@ -170,6 +192,20 @@ metamatch(char* stem, register char* s, char* pattern)
 	{
 		if ((p = strrchr(t, '/')) && p < s)
 			t = p + 1;
+		if (state.targetprefix)
+		{
+			b = t;
+			while ((p = strchr(b, targetprefix)) && p < s)
+			{
+				x = state.targetprefix;
+				y = p;
+				while (*++x == *++y && *x);
+				if (!*x)
+					b = t = y;
+				else
+					b++;
+			}
+		}
 		p = stem;
 		while (t < s)
 			*p++ = *t++;
@@ -572,18 +608,18 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 				return 0;
 		}
  found:
-	if (meta && state.targetcontext && (t = strrchr(u = unbound(r), '/')))
+	if (meta && (state.targetcontext || state.targetprefix) && (t = strrchr(u = unbound(r), '/')))
 	{
 		*t = 0;
 		if (!strchr(s->name, '/'))
 		{
-			sfprintf(internal.met, "%s/%s", u, s->name);
+			sfprintf(internal.met, "%s%s%s", u, state.targetprefix ? state.targetprefix : "/", s->name);
 			s = makerule(sfstruse(internal.met));
 		}
 		if (!strchr(stem, '/'))
 		{
 			sfputr(internal.met, stem, 0);
-			sfsprintf(stem, MAXNAME - 1, "%s/%s", u, sfstruse(internal.met));
+			sfsprintf(stem, MAXNAME - 1, "%s%s%s", u, state.targetprefix ? state.targetprefix : "/", sfstruse(internal.met));
 		}
 		*t = '/';
 	}

@@ -38,7 +38,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-08-11 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-09-25 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1458,7 +1458,7 @@ main(int argc, char** argv)
 	argv += opt_info.index;
 	argc -= opt_info.index;
 	if (error_info.errors)
-		error(ERROR_USAGE|4, optusage(NiL));
+		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	if (!state.operation)
 	{
 		state.operation = IN;
@@ -1731,7 +1731,7 @@ main(int argc, char** argv)
 			if (--argc < 0)
 			{
 				error(2, "destination directory required for pass mode");
-				error(ERROR_USAGE|4, optusage(NiL));
+				error(ERROR_USAGE|4, "%s", optusage(NiL));
 			}
 			state.destination = argv[argc];
 			argv[argc] = 0;

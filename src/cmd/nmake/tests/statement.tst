@@ -372,7 +372,7 @@ b : << EOF
 and the other action
 EOF'
 		INPUT a.c
-		OUTPUT - $'+ cc -O    -c a.c
+		OUTPUT - $'+ cc -O   -c a.c
 + this is the action
 + and the other action'
 

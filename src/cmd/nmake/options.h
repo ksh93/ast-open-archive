@@ -27,29 +27,34 @@
  * AT&T Research
  *
  * make option attributes and flag mappings
+ *
+ * omitted letters are avilable for option flags:
+ *
+ *	abcdefghijklmnopqrstuvwxyz
+ *      --------------------------
+ *	ABCDEFGHIJK MNOPQRSTUV X  
+ *	abcdefg ijkl no  rst vwx z
  */
 
 #define OPT(o)		(o&((1<<9)-1))	/* get opt char from code	*/
 #define Of		(1<<8)		/* cannot be set by flag	*/
 
-#define Oa		(1<<9)		/* multiple values added	*/
+#define Oa		(1<<9)		/* multiple string values added	*/
 #define Ob		(1<<10)		/* boolean value		*/
 #define Oi		(1<<11)		/* state.* sense inverted	*/
-#define On		(1<<12)		/* numeric value		*/
-#define Oo		(1<<13)		/* flag sense opposite		*/
-#define Os		(1<<14)		/* string value			*/
-#define Ov		(1L<<15)	/* value is optional		*/
-#define Ox		(1L<<16)	/* not expanded in $(-)		*/
+#define Om		(1<<13)		/* internal option		*/
+#define On		(1<<14)		/* numeric value		*/
+#define Oo		(1<<15)		/* flag sense opposite		*/
+#define Os		(1L<<16)	/* string value			*/
+#define Ov		(1L<<17)	/* value is optional		*/
+#define Ox		(1L<<18)	/* not expanded in $(-)		*/
 
-#define OPT_COMPILE	(1<<0)		/* compile into object file	*/
-#define OPT_DECLARED	(1<<1)		/* OPT_EXTERNAL option declared	*/
-#define OPT_DEFINED	(1<<2)		/* option explicitly defined	*/
-#define OPT_EXPLICIT	(1<<3)		/* for OPT_rules checks		*/
-#define OPT_EXTERNAL	(1<<4)		/* external by name		*/
-#define OPT_FLAG	(1<<5)		/* external by flag		*/
-#define OPT_GLOBAL	(1<<6)		/* defined in global file	*/
-#define OPT_HIDDEN	(1<<7)		/* saved for listops(*,0)	*/
-#define OPT_READONLY	(1<<8)		/* cannot reset til state.user	*/
+#define OPT_COMPILE	(1L<<26)	/* compile into object		*/
+#define OPT_DECLARE	(1L<<27)	/* compile declaration		*/
+#define OPT_DEFAULT	(1L<<28)	/* := default value		*/
+#define OPT_EXTERNAL	(1L<<29)	/* external by name		*/
+#define OPT_READONLY	(1L<<30)	/* cannot reset til state.user	*/
+#define OPT_SET		(1L<<31)	/* explicitly set		*/
 
 #define OPT_accept	('A'|Ob)	/* accept existing targets	*/
 #define OPT_alias	('a'|Ob)	/* directory aliasing enabled	*/
@@ -71,7 +76,6 @@
 #define OPT_global	('g'|Oa|Os)	/* next arg is global makefile	*/
 #define OPT_ignore	('i'|Ob)	/* ignore shell action errors	*/
 #define OPT_ignorelock	('K'|Ob)	/* ignore state file locking	*/
-#define OPT_import	('H'|Ob|Ox)	/* import var def precedence	*/
 #define OPT_include	('I'|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_intermediate ('G'|Ob)	/* force intermediate targets	*/
 #define OPT_jobs	('j'|On)	/* job concurrency level	*/
@@ -79,35 +83,41 @@
 #define OPT_list	('l'|Ob|Ox)	/* list info and don't make	*/
 #define OPT_mam		('M'|Os)	/* generate mam			*/
 #define OPT_never	('N'|Ob)	/* really - don't exec anything	*/
-#define OPT_option	('O'|Oa|Of|Os|Ox)/* define new option by name	*/
-#define OPT_override	('X'|Ob|Of|Ox)	/* override selected algorithms	*/
+#define OPT_option	(101|Oa|Of|Os|Ox)/* define new option by name	*/
+#define OPT_override	(102|Ob|Of|Ox)	/* override selected algorithms	*/
 #define OPT_preprocess	('P'|Ob)	/* preprocess all makefiles	*/
-#define OPT_questionable ('Q'|Oa|On)	/* enable questionable code	*/
+#define OPT_questionable ('Q'|On)	/* enable questionable code	*/
 #define OPT_readonly	('R'|Ob)	/* current vars|opts readonly	*/
 #define OPT_readstate	('S'|On|Ov)	/* read state file on startup	*/
 #define OPT_regress	('q'|Ob)	/* output for regression test	*/
-#define OPT_reread	('Z'|Of|On|Ox)	/* force re-read all makefiles	*/
+#define OPT_reread	(103|Of|On|Ox)	/* force re-read all makefiles	*/
 #define OPT_ruledump	('r'|Ob|Ox)	/* dump rule definitions	*/
-#define OPT_scan	('s'|Ob|Of)	/* scan|check implicit prereqs	*/
+#define OPT_scan	(104|Ob|Of)	/* scan|check implicit prereqs	*/
+#define OPT_serialize	('O'|Ob)	/* serialize concurrent output	*/
 #define OPT_silent	('s'|Ob)	/* run silently			*/
 #define OPT_strictview	('V'|Ob)	/* strict views			*/
-#define OPT_targetcontext ('L'|Ob|Of)	/* expand in target dir context	*/
-#define OPT_test	('T'|Oa|On)	/* enable test code		*/
+#define OPT_targetcontext (105|Ob|Of)	/* expand in target dir context	*/
+#define OPT_targetprefix (106|Os|Of)	/* source dir target prefix sep	*/
+#define OPT_test	('T'|On)	/* enable test code		*/
 #define OPT_tolerance	('z'|On)	/* time comparison tolerance	*/
 #define OPT_touch	('t'|Ob)	/* touch out of date targets	*/
 #define OPT_undef	('U'|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_vardump	('v'|Ob|Ox)	/* dump variable definitions	*/
 #define OPT_warn	('w'|Ob)	/* enable source file warnings	*/
-#define OPT_writeobject	('y'|Of|Os|Ov|Ox)/* write recompiled object	*/
-#define OPT_writestate	('Y'|Of|Os|Ov|Ox)/* write state file on exit	*/
+#define OPT_writeobject	(107|Of|Os|Ov|Ox)/* write recompiled object	*/
+#define OPT_writestate	(108|Of|Os|Ov|Ox)/* write state file on exit	*/
 
 struct option				/* option table entry		*/
 {
 	char*		name;		/* option name			*/
-	unsigned long	flag;		/* OPT_[a-z]+ flags		*/
+	unsigned long	flags;		/* O[a-z] and OPT_[A-Z]+ flags	*/
 	char*		value;		/* overloaded value		*/
-	int		status;		/* OPT_[A-Z]+ status		*/
 	char*		set;		/* call this on set		*/
 	char*		description;	/* description			*/
 	char*		arg;		/* arg name			*/
+	struct option*	next;		/* external option list link	*/
 };
+
+extern struct option*	optflag(int);
+extern void		optcheck(int);
+extern void		optinit(void);

@@ -9,7 +9,7 @@ TEST 01 'static source'
 t :: t.c'
 		INPUT t.c $'#include "t.h"'
 		INPUT include/t.h 
-		OUTPUT - $'+ cc -O  -Iinclude  -c t.c
+		OUTPUT - $'+ cc -O -Iinclude  -c t.c
 + cc  -O   -o t t.o'
 
 TEST 02 'generated source'
@@ -27,7 +27,7 @@ make: don\'t know how to make t : t.o : t.c : t.h'
 
 	EXEC	-n
 		INPUT include/t.h 
-		OUTPUT - $'+ cc -O  -Iinclude  -c t.c
+		OUTPUT - $'+ cc -O -Iinclude  -c t.c
 + cc  -O   -o t t.o'
 		ERROR - $'+ echo \'#include "t.h"\'
 + 1> t.c'
@@ -176,7 +176,7 @@ This is a test.
 \'
 )'
 		INPUT t.c $'static char usage[] = "YADA" USAGE "YADA";'
-		OUTPUT - $'+ cc -O   -DUSAGE=\\""[-author?Bob Ushka <bu@regress.com>][-copyright?Copyright (c) 1999-2004 PRI Corp.][-license?http://www.regress.com/sw/license/regress-open.html]"\\" -c t.c
+		OUTPUT - $'+ cc -O  -DUSAGE=\\""[-author?Bob Ushka <bu@regress.com>][-copyright?Copyright (c) 1999-2004 PRI Corp.][-license?http://www.regress.com/sw/license/regress-open.html]"\\" -c t.c
 + cc  -O   -o t t.o'
 
 TEST 08 '.PARAMETER'
@@ -385,7 +385,7 @@ TEST 14 'include "messages"'
 #endif
 main(){}'
 		INPUT error.c
-		OUTPUT - $'+ cc -O    -c cmd.c
+		OUTPUT - $'+ cc -O   -c cmd.c
 + cc  -O   -o cmd cmd.o'
 
 TEST 15 '.SCAN.nroff'
@@ -628,7 +628,7 @@ cmd :: cmd.c'
 main() { return STATUS; }'
 		INPUT src/include/direct.h $'#define STATUS 1'
 		INPUT src/include/indirect.h $'#include "direct.h"'
-		OUTPUT - $'+ cc -O  -Iinclude -Isrc/include  -c src/cmd.c
+		OUTPUT - $'+ cc -O -Iinclude -Isrc/include  -c src/cmd.c
 + cc  -O   -o cmd cmd.o'
 
 	EXEC	-n

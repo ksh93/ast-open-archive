@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -72,8 +72,9 @@
 #define PPBUFSIZ	(32*PPBLKSIZ)		/* io buffer size	*/
 #define PPTOKSIZ	((PPBUFSIZ/2)-1)	/* max token size	*/
 
-#define PPWRITE(n)	do{if(write(1,pp.outbuf,n)!=(n))pperror(ERROR_SYSTEM|3,"%s: write error",pp.outfile);pp.offset+=(n);}while(0)
+#define PPWRITE(n)	do{if(write(1,pp.outbuf,n)!=(n))pperror(ERROR_SYSTEM|3,"%s: write error",pp.outfile);pp.offset+=(n);pp.lastout=pp.outbuf[n-1];}while(0)
 
+#define pplastout()	((pp.outp>pp.outbuf)?*(pp.outp-1):pp.lastout)
 #define ppoffset()	(pp.offset+pppendout())
 #define pppendout()	(pp.outp-pp.outbuf)
 #define ppputchar(c)	(*pp.outp++=(c))
@@ -174,23 +175,24 @@
 #define PP_PLUSPLUS		41	/* tokenize for C++		*/
 #define PP_POOL			42	/* pool for multiple io passes	*/
 #define PP_PRAGMA		43	/* passed pragma handler	*/
-#define PP_PROBE		44	/* ppdefault probe key		*/
-#define PP_QUOTE		45	/* add to quote set		*/
-#define PP_READ			46	/* include file without output	*/
-#define PP_REGUARD		47	/* file pop emits guard define	*/
-#define PP_RESERVED		48	/* COMPILE reserved keyword	*/
-#define PP_RESET		49	/* reset to initiali predefs	*/
-#define PP_SPACEOUT		50	/* pplex returns space,newline	*/
-#define PP_STANDALONE		51	/* standalone preprocessor	*/
-#define PP_STANDARD		52	/* standard include dir		*/
-#define PP_STRICT		53	/* strict implementation	*/
-#define PP_TEST			54	/* enable (undocumented) tests	*/
-#define PP_TEXT			55	/* include file with output	*/
-#define PP_TRANSITION		56	/* on COMPATIBILITY boundary	*/
-#define PP_TRUNCATE		57	/* truncate macro names		*/
-#define PP_UNDEF		58	/* undef symbol after ppdefault	*/
-#define PP_VENDOR		59	/* vendor file dirs follow	*/
-#define PP_WARN			60	/* enable annoying warnings	*/
+#define PP_PRAGMAFLAGS		44	/* global pragma flags		*/
+#define PP_PROBE		45	/* ppdefault probe key		*/
+#define PP_QUOTE		46	/* add to quote set		*/
+#define PP_READ			47	/* include file without output	*/
+#define PP_REGUARD		48	/* file pop emits guard define	*/
+#define PP_RESERVED		49	/* COMPILE reserved keyword	*/
+#define PP_RESET		50	/* reset to initiali predefs	*/
+#define PP_SPACEOUT		51	/* pplex returns space,newline	*/
+#define PP_STANDALONE		52	/* standalone preprocessor	*/
+#define PP_STANDARD		53	/* standard include dir		*/
+#define PP_STRICT		54	/* strict implementation	*/
+#define PP_TEST			55	/* enable (undocumented) tests	*/
+#define PP_TEXT			56	/* include file with output	*/
+#define PP_TRANSITION		57	/* on COMPATIBILITY boundary	*/
+#define PP_TRUNCATE		58	/* truncate macro names		*/
+#define PP_UNDEF		59	/* undef symbol after ppdefault	*/
+#define PP_VENDOR		60	/* vendor file dirs follow	*/
+#define PP_WARN			61	/* enable annoying warnings	*/
 
 #define PP_comment		(1<<0)	/* PP_COMMENT is set		*/
 #define PP_compatibility	(1<<1)	/* PP_COMPATIBILITY is set	*/
@@ -449,5 +451,6 @@ extern void		ppmacref(struct ppsymbol*, char*, int, int, unsigned long);
 extern void		ppop(int, ...);
 extern void		pppragma(char*, char*, char*, char*, int);
 extern int		ppprintf(char*, ...);
+extern int		ppsync(void);
 
 #endif

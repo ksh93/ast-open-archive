@@ -1557,10 +1557,10 @@ may get intermingled to the point of being useless.
 .VL 6
 .LI
 .B AT&T
-Not implemented yet.
-It will be done via the
 .B "nmake --serialize"
-option and implemented in a general way by the
+which sets the
+.L CO_SERIALIZE
+flag in the
 .I coshell
 library.
 .LI

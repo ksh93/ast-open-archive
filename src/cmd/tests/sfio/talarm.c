@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2002 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -52,9 +52,9 @@ int	sig;
 }
 
 #if __STD_C
-exceptf(Sfio_t* f, int type, Void_t* data, Sfdisc_t* disc)
+int exceptf(Sfio_t* f, int type, Void_t* data, Sfdisc_t* disc)
 #else
-exceptf(f, type, data, disc)
+int exceptf(f, type, data, disc)
 Sfio_t* 	f;
 int		type;
 Void_t*		data;

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -136,7 +136,6 @@ make ndir.h implicit
 done ndir.h dontcare virtual
 make ${INSTALLROOT}/include/ast/dirent.h implicit
 make ${INSTALLROOT}/include/ast/ast_dirent.h implicit
-prev ndir.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done ${INSTALLROOT}/include/ast/ast_dirent.h dontcare
 done ${INSTALLROOT}/include/ast/dirent.h dontcare
@@ -145,7 +144,7 @@ meta config.h %.iffe>%.h config.iffe config
 make config.iffe
 done config.iffe
 bind -last
-exec - iffe -o config.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run config.iffe
+exec - iffe -o config.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run config.iffe
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done config.h generated
 done system.h
@@ -154,7 +153,7 @@ done diff.c
 meta diff.o %.c>%.o diff.c diff
 prev diff.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Paul Eggert][-author?Richard Stallman][-author?Mike Haertel][-author?David Hayes][-author?Len Tower][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Paul Eggert][-author?Richard Stallman][-author?Mike Haertel][-author?David Hayes][-author?Len Tower][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
 done diff.o generated
 make analyze.o
 make analyze.c
@@ -165,7 +164,7 @@ done analyze.c
 meta analyze.o %.c>%.o analyze.c analyze
 prev analyze.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c analyze.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c analyze.c
 done analyze.o generated
 make dir.o
 make dir.c
@@ -174,7 +173,7 @@ done dir.c
 meta dir.o %.c>%.o dir.c dir
 prev dir.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c dir.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c dir.c
 done dir.o generated
 make io.o
 make io.c
@@ -183,7 +182,7 @@ done io.c
 meta io.o %.c>%.o io.c io
 prev io.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c io.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c io.c
 done io.o generated
 make util.o
 make util.c
@@ -192,7 +191,7 @@ done util.c
 meta util.o %.c>%.o util.c util
 prev util.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
 done util.o generated
 make context.o
 make context.c
@@ -201,7 +200,7 @@ done context.c
 meta context.o %.c>%.o context.c context
 prev context.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c context.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c context.c
 done context.o generated
 make ed.o
 make ed.c
@@ -210,7 +209,7 @@ done ed.c
 meta ed.o %.c>%.o ed.c ed
 prev ed.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ed.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ed.c
 done ed.o generated
 make ifdef.o
 make ifdef.c
@@ -219,7 +218,7 @@ done ifdef.c
 meta ifdef.o %.c>%.o ifdef.c ifdef
 prev ifdef.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ifdef.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ifdef.c
 done ifdef.o generated
 make cmpbuf.o
 make cmpbuf.c
@@ -229,7 +228,7 @@ done cmpbuf.c
 meta cmpbuf.o %.c>%.o cmpbuf.c cmpbuf
 prev cmpbuf.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmpbuf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmpbuf.c
 done cmpbuf.o generated
 make normal.o
 make normal.c
@@ -238,7 +237,7 @@ done normal.c
 meta normal.o %.c>%.o normal.c normal
 prev normal.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c normal.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c normal.c
 done normal.o generated
 make side.o
 make side.c
@@ -247,7 +246,7 @@ done side.c
 meta side.o %.c>%.o side.c side
 prev side.c
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c side.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c side.c
 done side.o generated
 setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
@@ -262,7 +261,7 @@ done diff3.c
 meta diff3.o %.c>%.o diff3.c diff3
 prev diff3.c
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Randy Smith][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Randy Smith][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
 done diff3.o generated
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o diff3 diff3.o ${mam_libast}
@@ -277,7 +276,7 @@ done sdiff.c
 meta sdiff.o %.c>%.o sdiff.c sdiff
 prev sdiff.c
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Thomas Lord][-copyright?Copyright (c) 1992-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Thomas Lord][-copyright?Copyright (c) 1992-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
 done sdiff.o generated
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o sdiff sdiff.o ${mam_libast}

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make coshell.svc
 make main.o
@@ -175,7 +175,7 @@ done service.h
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DPATHCHECK=CO_ID -DDEBUG -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DPATHCHECK=CO_ID -DDEBUG -D_PACKAGE_ast -c main.c
 done main.o generated
 make job.o
 make job.c
@@ -183,7 +183,7 @@ prev service.h implicit
 done job.c
 meta job.o %.c>%.o job.c job
 prev job.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c job.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c job.c
 done job.o generated
 make schedule.o
 make schedule.c
@@ -191,7 +191,7 @@ prev service.h implicit
 done schedule.c
 meta schedule.o %.c>%.o schedule.c schedule
 prev schedule.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c schedule.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c schedule.c
 done schedule.o generated
 make shell.o
 make shell.c
@@ -203,7 +203,7 @@ prev service.h implicit
 done shell.c
 meta shell.o %.c>%.o shell.c shell
 prev shell.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c shell.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c shell.c
 done shell.o generated
 make command.o
 make command.c
@@ -211,7 +211,7 @@ prev service.h implicit
 done command.c
 meta command.o %.c>%.o command.c command
 prev command.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c command.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c command.c
 done command.o generated
 make misc.o
 make misc.c
@@ -222,14 +222,14 @@ prev service.h implicit
 done misc.c
 meta misc.o %.c>%.o misc.c misc
 prev misc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c misc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c misc.c
 done misc.o generated
 make init.o
 make init.c
 done init.c
 meta init.o %.c>%.o init.c init
 prev init.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c init.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -c init.c
 done init.o generated
 bind -lcoshell
 bind -lcs

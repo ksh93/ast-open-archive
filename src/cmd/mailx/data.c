@@ -159,7 +159,7 @@ static const struct cmd	cmdtab[] =
 "map",		CMD(map),		M|Z|STRLIST,	0,	0,
 	X("address ...\nList the result of alias expansion on the address arguments. map! gives the step-by-step details."),
 "mar[k]",	CMD(mark),		STRLIST,	0,	0,
-	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), read (U), save (*), spam (X), touch. Multiple marks may be separated by , or |. If no mark is omitted then spam is assumed."),
+	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), save (*), spam (X), touch, unread (U). Multiple marks may be separated by , or |. If no mark is omitted then spam is assumed."),
 "mb[ox]",	CMD(mboxit),		W|STRLIST,	0,	0,
 	X("[ message ... ]\nAppend the selected messages to ${MBOX} on normal exit."),
 "mi[me]",	CMD(capability),	M|Z|RAWLIST,	0,	ARG_MAX,

@@ -1,8 +1,6 @@
-:PACKAGE: ast
+:PACKAGE: ast --clobber=!(mailx)
 
 LICENSE = type=free,since=1978,author='Kurt Shoens (UCB)+gsf',corporation='The Regents of the University of California and AT&T'
-
-clobber = !(mailx)
 
 mailx :: README RELEASE mailx.1 \
 	mailx.h local.h \

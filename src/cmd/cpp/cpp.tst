@@ -50,10 +50,9 @@ TEST 01 'bug'
 0);
 __LINE__ :: 7'
 		OUTPUT - $'# 1 ""
-\n
-\n
+\n\n\n\n
 "b";;
-\n7 :: 7'
+7 :: 7'
 	EXEC -I-D
 		INPUT - $'/*
 xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx xxxxxxx
@@ -198,10 +197,7 @@ int x;'
 		INPUT - $'#pragma pp:headerexpand
 #pragma pp:include "."
 #include "bug" ".03" ".h"'
-		OUTPUT - '# 1 ""
-
-
-'
+		OUTPUT - $'# 1 ""'
 		ERROR - $'cpp: line 3: bug.03.h: cannot find include file'
 		EXIT 1
 	EXEC -I-D
@@ -209,11 +205,7 @@ int x;'
 #pragma pp:include "."
 #define x\t<bug.03.h>
 #include\tx'
-		OUTPUT - '# 1 ""
-
-
-
-'
+		OUTPUT - $'# 1 ""'
 		ERROR - $'cpp: line 4: bug.03.h: cannot find include file'
 	EXEC -I-D
 		INPUT - $'#pragma pp:headerexpand
@@ -221,12 +213,7 @@ int x;'
 #define x\t<y.03.h>
 #define y\tbug
 #include\tx'
-		OUTPUT - '# 1 ""
-
-
-
-
-'
+		OUTPUT - $'# 1 ""'
 		ERROR - $'cpp: line 5: bug.03.h: cannot find include file'
 	EXEC -I-D
 		INPUT - $'#pragma pp:headerexpand
@@ -235,13 +222,7 @@ int x;'
 #define FOO bug
 #define HDR Concat3(<,FOO,.03.h>)
 #include HDR'
-		OUTPUT - '# 1 ""
-
-
-
-
-
-'
+		OUTPUT - $'# 1 ""'
 		ERROR - $'cpp: line 6: FOO.03.h: cannot find include file'
 
 TEST 02 'ess'
@@ -251,17 +232,20 @@ int a=0;
 int b=0;
 int SMSUBRRACT;
 int SMSUBRRMACT;
-\n#define SMREGCONV(x,reg,mask)   ( (~(CON(x)ACT ^ reg)) & (CON(x)MACT ^ mask) )
+
+#define SMREGCONV(x,reg,mask)   ( (~(CON(x)ACT ^ reg)) & (CON(x)MACT ^ mask) )
 main()
 {
   int subrr = SMREGCONV(SMSUBRR, a, b);
 }'
 		OUTPUT - $'# 1 ""
-\nint a=0;
+
+int a=0;
 int b=0;
 int SMSUBRRACT;
 int SMSUBRRMACT;
-\n
+
+
 main()
 {
   int subrr = ( (~(SMSUBRR ACT ^ a)) & (SMSUBRR MACT ^ b) );
@@ -281,13 +265,12 @@ TEST 03 'gnu'
 add(1,\\\n2);'
 		OUTPUT - $'# 1 ""
 
-1+ 2;
-'
+
+1+ 2;'
 		ERROR -
 	EXEC -I-D
 		INPUT - ''
-		OUTPUT - '# 1 ""
-'
+		OUTPUT - $'# 1 ""'
 	EXEC -I-D
 		INPUT - $'/* should yield `rep-list;\' */
 #define f()\trep-list
@@ -317,12 +300,12 @@ a = p(+);'
 	EXEC -I-D
 		INPUT - $'/* non-{tab,space} white space in directives */
 #define\fa\tb c'
-		OUTPUT - $'# 1 ""\n \n'
+		OUTPUT - $'# 1 ""\n '
 		ERROR - $'cpp: line 2: warning: `formfeed\' invalid in directives'
 	EXEC -I-D
 		INPUT - $'#include ""\t/* should be syntax error: invalid q-char-sequence */
 #include <>\t/* should be syntax error: invalid h-char-sequence */'
-		OUTPUT - $'# 1 ""\n\n'
+		OUTPUT - $'# 1 ""'
 		ERROR - $'cpp: line 1: #include: null file name
 cpp: line 2: #include: null file name'
 		EXIT 2
@@ -339,7 +322,7 @@ puts(f(hello/* space */world));'
 		INPUT - $'#define p(a,b)\ta ## b\t/* example of correct code */
 #define q(a,b)\ta ## ##\t/* constraint violation diagnosed */
 #define r(a,b)\t## b\t/* constraint violation diagnosed */'
-		OUTPUT - $'# 1 ""\n\n\n'
+		OUTPUT - $'# 1 ""'
 		ERROR - $'cpp: line 2: ## rhs operand omitted
 cpp: line 3: # lhs operand omitted'
 		EXIT 2
@@ -350,7 +333,7 @@ cpp: line 3: # lhs operand omitted'
 #define M 0
 #if (M != 0) && (100 / M)
 #endif'
-		OUTPUT - $'# 1 ""\n \n\n\n\n\n'
+		OUTPUT - $'# 1 ""\n '
 		ERROR -
 		EXIT 0
 	EXEC -I-D
@@ -361,13 +344,13 @@ okee
 \n#if \'\\xA\' == 10
 dokee
 #endif'
-		OUTPUT - $'# 1 ""\n \n\nokee\n\n\n\ndokee\n'
+		OUTPUT - $'# 1 ""\n \n\nokee\n\n\n\ndokee'
 	EXEC -I-D
 		INPUT - $'/* promote operand to Ulong */
 #if 0xFFFFFFFF < 1
 nope
 #endif'
-		OUTPUT - $'# 1 ""\n \n\n\n'
+		OUTPUT - $'# 1 ""\n '
 
 TEST 04 'gsf'
 	EXEC -I-D
@@ -394,7 +377,7 @@ _define_(x, v)
 \n#macdef _define_(x, v)
 #define x v
 #endmac /* _define_ */'
-		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n\n\n\n# 20\n\n\n\n\n\n\n'
+		OUTPUT - $'# 1 ""'
 	EXEC -I-D
 		INPUT - $'#define f(x)\tx
 #define q(x)\t# x
@@ -440,13 +423,7 @@ f(\'@LX@\');
 "@LX@"
 \'@LX@\'
 __LINE__'
-		OUTPUT - $'# 1 ""
-
-
-
-
-
-
+		OUTPUT - $'# 1 ""\n\n\n\n\n\n
 "\\"abc\\"";
 "\\"def\\\\0x\\"";
 "\'\\\\4\'";
@@ -457,7 +434,8 @@ __LINE__'
 @LX@;
 "@LX@";
 \'@LX@\';
-\n@LX@
+
+@LX@
 "@LX@"
 \'@LX@\'
 21'
@@ -577,7 +555,7 @@ bbb
 #else
 ddd
 #endif'
-		OUTPUT - $'# 1 ""\n\n\n\nbbb\n\n\n\n\n'
+		OUTPUT - $'# 1 ""\n\n\nbbb\n\n'
 		ERROR - $'cpp: line 3: warning: ifdef: invalid characters after directive
 cpp: line 5: more than one #else for #if
 cpp: line 5: warning: ifndef: invalid characters after directive
@@ -593,7 +571,7 @@ bbb
 #else
 ddd
 #endif'
-		OUTPUT - $'# 1 ""\n\n\n\nbbb\n\n\n\n\n'
+		OUTPUT - $'# 1 ""\n\n\nbbb\n\n'
 		ERROR - $'cpp: line 3: warning: if: invalid characters after directive
 cpp: line 5: more than one #else for #if
 cpp: line 5: warning: if: invalid characters after directive
@@ -643,8 +621,8 @@ long
  int
 \nbar
 ,
-__int64
-\naha
+\n__int64
+aha
 )
 {
 \t__int64 i;
@@ -2717,7 +2695,7 @@ abcdefg,abcdefg,abcdefg,abcdefg,abcdefg,abcdefg,abcdefg,abcdef,
 #define _STD_INCLUDE_DIR\t/e/program files/micrsoft platform sdk/include
 #define _STD_HEADER(name)\t<_STD_INCLUDE_DIR/name>
 \n#include _STD_HEADER(stdio.h)'
-		OUTPUT - $'# 1 ""\n\n\n\n\n'
+		OUTPUT - $'# 1 ""'
 		ERROR - $'cpp: line 5: warning: #include: reference to /e/program files/micrsoft platform sdk/include/stdio.h is not portable
 cpp: line 5: /e/program files/micrsoft platform sdk/include/stdio.h: cannot find include file'
 		EXIT 1
@@ -2767,12 +2745,9 @@ TEST 05 'stack skew'
 (k(ab,1,2,3))
 (k(ac,1,2,3))'
 		OUTPUT - $'# 1 ""
-\n
-\n
-\n
-\n
-\n
-\n(132)
+
+# 12
+(132)
 (213)
 (ac1'
 	EXEC -I-D
@@ -2795,10 +2770,7 @@ fishy( fishy( 4))'
 #endif
 \nmain(){}'
 		OUTPUT - $'# 1 ""
-\n
-\n
-\n
-main(){}'
+\n\n\nmain(){}'
 		ERROR -
 		EXIT 0
 	EXEC -I-D
@@ -2896,11 +2868,11 @@ printf("expands to either of the following (intentionally undefined): \\\n\t2*f(
 		INPUT - $'#define x\t2 * x
 #define f(a)\tg(a)
 #define g(b)\t(b)
-\n"f(x)" : f(x) ;
+
+"f(x)" : f(x) ;
 "g(x)" : g(x) ;'
 		OUTPUT - $'# 1 ""
-\n
-\n
+\n\n\n
 "f(x)": ( 2 * x) ;
 "g(x)": ( 2 * x) ;'
 	EXEC -I-D
@@ -2979,7 +2951,7 @@ f(2 * ( f(2 * ( z[0]))))'
 \nf(y+1) + f(f(z)) % t(t(g)(0) + t)(1);
 g(2+(3,4)-w) | h 5) & m
 \t(f)^m(m);'
-		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n\n\n\n\n\nf(2 * ( y+1)) + f(2 * ( f(2 * ( z[0])))) % f(2 * ( 0)) + t(1);\nf(2 * ( 2+(3,4)-0,1)) | f(2 * ( ~ 5)) & f(2 * ( 0,1))^m(0,1);\n'
+		OUTPUT - $'# 1 ""\n\n# 12\nf(2 * ( y+1)) + f(2 * ( f(2 * ( z[0])))) % f(2 * ( 0)) + t(1);\nf(2 * ( 2+(3,4)-0,1)) | f(2 * ( ~ 5)) & \nf(2 * ( 0,1))^m(0,1);'
 	EXEC -I-D
 		INPUT - $'#define str(s)\t\t# s
 #define xstr(s)\t\tstr(s)
@@ -2996,17 +2968,20 @@ fputs(str(strncmp("abc\\0d", "abc", \'\\4\') /* this goes away */
 glue(HIGH, LOW)
 xglue(HIGH, LOW)'
 		OUTPUT - $'# 1 ""
-\n
-\n
-\n
-\n
-\n
+
+# 11
 printf("x1= %d, x2= %s", x1, x2);
-fputs("strncmp(\\"abc\\\\0d\\", \\"abc\\", \'\\\\4\') == 0: @\\n", s);
-\n
+fputs(\n"strncmp(\\"abc\\\\0d\\", \\"abc\\", \'\\\\4\') == 0: @\\n", s);\n
 "hellohello, world"'
 		ERROR - $'cpp: line 14: vers2.h: cannot find include file'
 		EXIT 1
+	EXEC -I-D
+		INPUT vers2.h $'_VERS2_H'
+		OUTPUT - $'# 1 ""\n\n# 11\nprintf("x1= %d, x2= %s", x1, x2);
+fputs(\n"strncmp(\\"abc\\\\0d\\", \\"abc\\", \'\\\\4\') == 0: @\\n", s);
+# 1 "vers2.h"\n_VERS2_H\n# 15 ""\n"hellohello, world"'
+		ERROR -
+		EXIT 0
 	EXEC -I-D
 		INPUT - $'#define S(a)\t# a
 #define s(a)\tS(a)
@@ -3017,9 +2992,7 @@ fputs("strncmp(\\"abc\\\\0d\\", \\"abc\\", \'\\\\4\') == 0: @\\n", s);
 #define w\tworld
 \n#define hw\t"h ## w"
 #define helloworld\t"hello ## world"'
-		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n\n\n\n\n\n\n'
-		ERROR -
-		EXIT 0
+		OUTPUT - $'# 1 ""'
 	EXEC -I-D
 		INPUT - $'#define s(a)\t# a
 #define xs(a)\ts(a)
@@ -3031,13 +3004,11 @@ fputs("strncmp(\\"abc\\\\0d\\", \\"abc\\", \'\\\\4\') == 0: @\\n", s);
 \nf(v)
 \nh(v)'
 		OUTPUT - $'# 1 ""
-\n
-\n
-\n
-\n
-\n
-\nfile1
-\n"file1"'
+
+# 12
+file1
+
+"file1"'
 	EXEC -I-D
 		INPUT - $'#define a(x)\tx
 #define bc\tz
@@ -3093,15 +3064,8 @@ xglue(HIGH, LOW);'
 \tprintf("bad\\n");
 #endif
 }'
-		OUTPUT - $'# 1 ""
-void a() {
-\n
-\n\tprintf("good\\n");
-\n}
-\nvoid b() { 
-\n\tprintf("good\\n");
-\n
-\n}'
+		OUTPUT - $'# 1 ""\nvoid a() {\n\n\n\tprintf("good\\n");\n\n}
+\nvoid b() { \n\n\tprintf("good\\n");\n\n\n}'
 	EXEC -I-D
 		INPUT - $'#define echo(a)\t{ a }
 #define x\t2 * x
@@ -3213,7 +3177,7 @@ int line = 6;'
 		OUTPUT - $'# 1 ""\n\nint a\\      \nb = 1;'
 	EXEC -I-D
 		INPUT - $'#pragma pp:splicespace\nint a\\      \nb = 1;'
-		OUTPUT - $'# 1 ""\n\nint ab = 1;\n'
+		OUTPUT - $'# 1 ""\n\nint ab = 1;'
 	EXEC -I-D
 		INPUT - $'#pragma pp:splicespace\nchar s[] = "\\ ";'
 		OUTPUT - $'# 1 ""\n\nchar s[] = "\\ ";'
@@ -3279,15 +3243,7 @@ f3(1);
 f3(1,2);'
 		OUTPUT - $'# 1 ""
 
-
-
-
-
-
-
-
-
-
+# 11
 g1(x, );
 g1(x, 1);
 g1(x, 1,2);
@@ -3309,7 +3265,7 @@ cpp: line 5: e5: a: macro formal argument cannot follow ...'
 TEST 13 'headerexpand vs. headerexpandall -- standardize this'
 	DO	DATA hdra.c hdrm.c hdrx.c hdrx.h
 	EXEC -I-D -I. hdra.c
-		OUTPUT - $'# 1 "hdra.c"\n\n\n\n'
+		OUTPUT - $'# 1 "hdra.c"'
 		ERROR - $'cpp: "hdra.c", line 4: warning: _CAT: 3 actual arguments expected
 cpp: "hdra.c", line 4: #include: "..." or <...> argument expected'
 		EXIT 1
@@ -3318,24 +3274,19 @@ cpp: "hdra.c", line 4: #include: "..." or <...> argument expected'
 	EXEC -I-D -I. -D:headerexpandall hdra.c
 		OUTPUT - $'# 1 "hdra.c"
 
-
-
 # 1 "hdrx.h"
 int f(){return 0;}
 # 5 "hdra.c"'
 		ERROR -
 		EXIT 0
 	EXEC -I-D -I. hdrx.c
-		OUTPUT - $'# 1 "hdrx.c"\n\n\n\n\n'
+		OUTPUT - $'# 1 "hdrx.c"'
 		ERROR - $'cpp: "hdrx.c", line 5: warning: _CAT: 3 actual arguments expected
 cpp: "hdrx.c", line 5: warning: _XAT: 3 actual arguments expected
 cpp: "hdrx.c", line 5: #include: "..." or <...> argument expected'
 		EXIT 1
 	EXEC -I-D -I. -D:headerexpand hdrx.c
 		OUTPUT - $'# 1 "hdrx.c"
-
-
-
 
 # 1 "hdrx.h"
 int f(){return 0;}
@@ -3371,44 +3322,6 @@ k(void* buf,size_t size,size_t n,Xfio_t* sp){}
 l(void* buf,size_t size,size_t n,Xfio_t* sp){}
 m(Xfio_t* sp){}'
 		OUTPUT - $'# 1 ""
-
-
-
-# 25
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # 2
 a (sp) Xfio_t* sp;
@@ -3473,9 +3386,7 @@ TEST 16 'no newline in directive in last include line'
 
 # 1 "nl1.h"
 
-
-# 3 "nl1.c"
-'
+# 3 "nl1.c"'
 		ERROR - $'cpp: "nl1.c", line 1: warning: before
 cpp: "nl1.h", line 1: warning: during
 cpp: "nl1.h", line 2: warning: file does not end with `newline\'
@@ -3485,11 +3396,7 @@ cpp: "nl1.c", line 3: warning: after'
 
 # 1 "nl2.h"
 
-
-
-
-# 3 "nl2.c"
-'
+# 3 "nl2.c"'
 		ERROR - $'cpp: "nl2.c", line 1: warning: before
 cpp: "nl2.h", line 2: warning: during
 cpp: "nl2.h", line 4: warning: file does not end with `newline\'
@@ -3500,10 +3407,7 @@ cpp: "nl2.c", line 3: warning: after'
 # 1 "nl3.h"
 
 warning during
-
-
-# 3 "nl3.c"
-'
+# 3 "nl3.c"'
 		ERROR - $'cpp: "nl3.c", line 1: warning: before
 cpp: "nl3.h", line 4: warning: file does not end with `newline\'
 cpp: "nl3.c", line 3: warning: after'
@@ -3512,8 +3416,7 @@ cpp: "nl3.c", line 3: warning: after'
 
 # 1 "nl4.h"
 warning during
-# 3 "nl4.c"
-'
+# 3 "nl4.c"'
 		ERROR - $'cpp: "nl4.c", line 1: warning: before
 cpp: "nl4.h", line 1: warning: file does not end with `newline\'
 cpp: "nl4.c", line 3: warning: after'
@@ -3522,8 +3425,7 @@ cpp: "nl4.c", line 3: warning: after'
 
 # 1 "nl5.h"
  
-# 3 "nl5.c"
-'
+# 3 "nl5.c"'
 		ERROR - $'cpp: "nl5.c", line 1: warning: before
 cpp: "nl5.h", line 1: warning: file does not end with `newline\'
 cpp: "nl5.c", line 3: warning: after'
@@ -3577,8 +3479,7 @@ int std_tst_usr;
 
 # 3 "map1.c"
 
-# 1
-'
+# 1'
 	EXEC -I-D -Ilcl -I-H -Istd pmap2.c
 		OUTPUT - $'# 1 "pmap2.c"
 
@@ -3627,8 +3528,7 @@ int std_tst_usr;
 int lcl_tst_usr;
 # 3 "map2.c"
 
-# 1
-'
+# 1'
 
 TEST 18 'inappropriate pushback'
 	EXEC -I-D
@@ -3663,8 +3563,7 @@ TEST 20 'transition splice'
 		INPUT - $'#pragma prototyped
 int a = val>0?vau:0;
 int b = val>0?val:0;'
-		OUTPUT - $'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
-int a = val>0?vau:0;
+		OUTPUT - $'int a = val>0?vau:0;
 int b = val>0?val:0;'
 
 TEST 21 '#if expressions'
@@ -3701,7 +3600,8 @@ bad
 #else
 ok
 #endif'
-		OUTPUT - $'# 1 ""\n\n\n\nok\n\n\n\n\nok\n\n\n\n\nok\n\n\n\n\nok\n\n\n\n\nok\n\n\n\n\n\n\nok\n'
+		OUTPUT - $'# 1 ""\n\n\n\nok\n\n\n\nok\n\n\n\nok\n\n\n\nok\n\n\n\nok\n\n\n\nok'
+
 	EXEC -I-D
 		INPUT - $'#if 0x10 == 020
 __LINE__
@@ -3709,7 +3609,7 @@ __LINE__
 #if 0x10 == 16
 __LINE__
 #endif'
-		OUTPUT - $'# 1 ""\n\n2\n\n\n5\n'
+		OUTPUT - $'# 1 ""\n\n2\n\n\n5'
 
 TEST 22 '-D-d'
 	EXEC -I-D -D-d
@@ -3721,9 +3621,9 @@ A
 C'
 		OUTPUT - $'# 1 ""
 #define A B
+
+
 #define C D E F
-
-
 B
 D E F'
 
@@ -3806,16 +3706,13 @@ TEST 24 '#(define|undef) extern proto intercepts'
 extern void fun(int);
 #undef extern
 extern void fun(int arg) { return arg; }'
-		OUTPUT - $'# 1 ""\n\n\n
-# 25\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
-# 2
+		OUTPUT - $'# 1 ""
 
+# 2
 
 # 2
 
 extern  __declspec(dllexport) int fun ();
-
-
 # 4
 
 extern  int fun (arg) int arg;
@@ -3823,22 +3720,9 @@ extern  int fun (arg) int arg;
 { return arg; }'
 
 	EXEC -I-D -D__cplusplus -D__EXPORT__='__declspec(dllexport)'
-		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
-# 35
-\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
-# 2
-
-
-# 2
-
+		OUTPUT - $'# 1 ""\n\n# 2\n\n# 2\n
 extern "C" __declspec(dllexport) void fun (int) ;
-
-
-# 4
-
-extern "C" void fun (int arg)  
-# 5
-{ return arg; }'
+# 4\n\nextern "C" void fun (int arg)  \n# 5\n{ return arg; }'
 
 	EXEC -I-D -D-C -D__IMPORT__='__declspec(dllimport)'
 		INPUT - $'#pragma prototyped
@@ -3846,16 +3730,13 @@ extern "C" void fun (int arg)
 extern void fun(int);
 #undef extern
 extern void fun(int arg) { return arg; }'
-		OUTPUT - $'# 1 ""\n\n\n
-# 25\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
-# 2
+		OUTPUT - $'# 1 ""
 
+# 2
 
 # 2
 
 extern  __declspec(dllimport) int fun ();
-
-
 # 4
 
 extern  int fun (arg) int arg;
@@ -3863,19 +3744,710 @@ extern  int fun (arg) int arg;
 { return arg; }'
 
 	EXEC -I-D -D__cplusplus -D__IMPORT__='__declspec(dllimport)'
-		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
-# 35
-\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
-# 2
-
-
-# 2
-
+		OUTPUT - $'# 1 ""\n\n# 2\n\n# 2\n
 extern "C" __declspec(dllimport) void fun (int) ;
+# 4\n\nextern "C" void fun (int arg)  \n# 5\n{ return arg; }'
+
+TEST 25 '#include next'
+
+	EXEC -I-D -Itop -Imid -Ibot all.c
+		INPUT all.c $'extern int beg_src;
+#include <flt.h>
+#include <mth.h>
+extern int end_src;'
+		INPUT top/flt.h $'extern int beg_top_flt;
+extern int end_top_flt;'
+		INPUT mid/flt.h $'#ifndef _MID_FLT_H
+extern int beg_mid_flt;
+#include <.../flt.h>
+extern int end_mid_flt;
+#ifndef _MID_FLT_H
+#define _MID_FLT_H
+#endif
+#endif'
+		INPUT mid/mth.h $'#ifndef _MID_MTH_H
+extern int beg_mid_mth;
+#include <.../mth.h>
+#include <.../flt.h>
+extern int end_mid_mth;
+#ifndef _MID_MTH_H
+#define _MID_MTH_H
+#endif
+#endif'
+		INPUT bot/flt.h $'#ifndef _BOT_FLT_H
+#define _BOT_FLT_H
+extern int beg_bot_flt;
+extern int end_bot_flt;
+#endif'
+		INPUT bot/mth.h $'#ifndef _BOT_MTH_H
+#define _BOT_MTH_H
+extern int beg_bot_mth;
+extern int end_bot_mth;
+#endif'
+		OUTPUT - $'# 1 "all.c"
+extern int beg_src;
+# 1 "top/flt.h"
+extern int beg_top_flt;
+extern int end_top_flt;
+# 3 "all.c"
+
+# 1 "mid/mth.h"
+
+extern int beg_mid_mth;
+# 1 "bot/mth.h"
 
 
-# 4
+extern int beg_bot_mth;
+extern int end_bot_mth;
+# 4 "mid/mth.h"
 
-extern "C" void fun (int arg)  
-# 5
-{ return arg; }'
+# 1 "mid/flt.h"
+
+extern int beg_mid_flt;
+# 1 "bot/flt.h"
+
+
+extern int beg_bot_flt;
+extern int end_bot_flt;
+# 4 "mid/flt.h"
+extern int end_mid_flt;
+# 5 "mid/mth.h"
+extern int end_mid_mth;
+# 4 "all.c"
+extern int end_src;'
+
+	EXEC -I-D -Itop -Imid -Ibot
+		INPUT - $'#include <flt.h>'
+		OUTPUT - $'# 1 ""
+
+# 1 "top/flt.h"
+extern int beg_top_flt;
+extern int end_top_flt;
+# 2 ""'
+
+	EXEC -I-D -Itop -Imid -Ibot
+		INPUT - $'#include <.../flt.h>'
+		OUTPUT - $'# 1 ""
+
+# 1 "mid/flt.h"
+
+extern int beg_mid_flt;
+# 1 "bot/flt.h"
+
+
+extern int beg_bot_flt;
+extern int end_bot_flt;
+# 4 "mid/flt.h"
+extern int end_mid_flt;
+# 2 ""'
+
+	EXEC -I-D -Itop -Imid -Ibot
+		INPUT - $'#include <.../.../flt.h>'
+		OUTPUT - $'# 1 ""
+
+# 1 "bot/flt.h"
+
+
+extern int beg_bot_flt;
+extern int end_bot_flt;
+# 2 ""'
+
+	EXEC -I-D -Itop -Imid -Ibot
+		INPUT - $'#include <aha.h>'
+		INPUT top/aha.h $'beg_top_aha
+#include <...>
+end_top_aha'
+		INPUT mid/aha.h $'beg_mid_aha
+#include <...>
+end_mid_aha'
+		INPUT bot/aha.h $'beg_bot_aha
+end_bot_aha'
+		OUTPUT - $'# 1 ""
+
+# 1 "top/aha.h"
+beg_top_aha
+# 1 "mid/aha.h"
+beg_mid_aha
+# 1 "bot/aha.h"
+beg_bot_aha
+end_bot_aha
+# 3 "mid/aha.h"
+end_mid_aha
+# 3 "top/aha.h"
+end_top_aha
+# 2 ""'
+
+	EXEC -I-D -Itop -Imid -Ibot
+		INPUT - $'#include <aha.h>'
+		INPUT top/aha.h $'beg_top_aha
+#include <.../...>
+end_top_aha'
+		OUTPUT - $'# 1 ""
+
+# 1 "top/aha.h"
+beg_top_aha
+# 1 "bot/aha.h"
+beg_bot_aha
+end_bot_aha
+# 3 "top/aha.h"
+end_top_aha
+# 2 ""'
+
+TEST 26 '#pragma pp:pragmaflags'
+
+	EXEC -I-D
+		INPUT - $'#pragma system_header'
+		OUTPUT - $'# 1 ""
+#pragma system_header'
+
+	EXEC -I-D
+		INPUT - $'#pragma pp:pragmaflags system_header
+#pragma system_header'
+		OUTPUT - $'# 1 ""
+
+#pragma system_header'
+
+	EXEC -I-D
+		INPUT - $'#pragma pp:pragmaflags -system_header
+#pragma system_header'
+		OUTPUT - $'# 1 ""'
+
+TEST 27 'misc pragmas'
+
+	EXEC -I-D
+		INPUT - $'#pragma pp:note abc'
+		OUTPUT - $'# 1 ""'
+
+TEST 28 'line syncs'
+
+	EXEC -I-D
+		INPUT - $'__LINE__
+#pragma pass it on
+__LINE__
+#define a b
+__LINE__
+#define b c
+__LINE__'
+		OUTPUT - $'# 1 ""
+1
+#pragma pass it on
+3
+
+5
+
+7'
+
+	EXEC -I-D
+		INPUT - $'#pragma foo bar
+2 : __LINE__ : "a" : a ;
+#pragma bar foo
+4 : __LINE__ : a ;'
+		OUTPUT - $'# 1 ""
+#pragma foo bar
+2 : 2 : "a": a ;
+#pragma bar foo
+4 : 4 : a ;'
+
+	EXEC -I-D
+		INPUT - $'1 : __LINE__
+#pragma foo bar
+3 : __LINE__ : "a" : a ;
+#pragma bar foo
+5 : __LINE__ : a ;'
+		OUTPUT - $'# 1 ""
+1 : 1
+#pragma foo bar
+3 : 3 : "a": a ;
+#pragma bar foo
+5 : 5 : a ;'
+
+	EXEC -I-D
+		INPUT - $'#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+32 : __LINE__'
+		OUTPUT - $'# 1 ""\n\n# 32\n32 : 32'
+
+	EXEC -I-D
+		INPUT - $'#if 0
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#endif
+32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'#if 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#endif
+32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'/*efine a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a*/
+32 : __LINE__'
+		OUTPUT - $'# 1 ""\n \n# 32\n32 : 32'
+
+	EXEC -I-D
+		INPUT - $'#pragma pass it on
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+32 : __LINE__'
+		OUTPUT - $'# 1 ""\n#pragma pass it on\n# 32\n32 : 32'
+
+	EXEC -I-D
+		INPUT - $'#pragma pass it on
+#if 0
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#endif
+32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'#pragma pass it on
+#if 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#endif
+32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'#pragma pass it on\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'#pragma pass it on
+/*efine a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a*/
+32 : __LINE__'
+		OUTPUT - $'# 1 ""\n#pragma pass it on\n \n# 32\n32 : 32'
+
+	EXEC -I-D
+		INPUT - $'1 : __LINE__
+#pragma pass it on
+3 : __LINE__
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+32 : __LINE__'
+		OUTPUT - $'# 1 ""\n1 : 1\n#pragma pass it on\n3 : 3\n# 32\n32 : 32'
+
+	EXEC -I-D
+		INPUT - $'1 : __LINE__
+#pragma pass it on
+3 : __LINE__
+#if 0
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#endif
+32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'1 : __LINE__
+#pragma pass it on
+3 : __LINE__
+#if 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#endif
+32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'1 : __LINE__
+#pragma pass it on\n3 : __LINE__\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n32 : __LINE__'
+
+	EXEC -I-D
+		INPUT - $'1 : __LINE__
+#pragma pass it on
+3 : __LINE__
+/*efine a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a 1
+#define a*/
+32 : __LINE__'
+		OUTPUT - $'# 1 ""\n1 : 1\n#pragma pass it on\n3 : 3\n \n# 32\n32 : 32'
+
+TEST 29 'more hidden lines'
+
+	EXEC -I-D
+		INPUT - $'a\nb\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ny\nz'
+		OUTPUT - $'# 1 ""
+a
+b
+# 31
+y
+z'
+
+	EXEC -I-D
+		INPUT - $'aa\nbb\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nyy\nzz'
+		OUTPUT - $'# 1 ""
+aa
+bb
+# 31
+yy
+zz'
+
+	EXEC -I-D
+		INPUT - $'int fun(void)\na\nb\n\treturn 0\nc\nd'
+		OUTPUT - $'# 1 ""\nint fun(void)\na\nb\n\treturn 0\nc\nd'
+
+	EXEC -I-D
+		INPUT - $'a\n\na\n\n\na\n\n\n\na\n\n\n\n\na\n\n\n\n\n\na\n\n\n\n\n\n\na\n\n\n\n\n\n\n\na\n\n\n\n\n\n\n\n\na\n\n\n\n\n\n\n\n\n\na\n\n\n\n\n\n\n\n\n\n\na\n\n\n\n\n\n\n\n\n\n\n\na\n\n\n\n\n\n\n\n\n\n\n\n\na'
+		OUTPUT - $'# 1 ""\na\n\na\n\n\na\n\n\n\na\n\n\n\n\na\n\n\n\n\n\na\n\n\n\n\n\n\na\n\n\n\n\n\n\n\na\n# 45\na\n# 55\na\n# 66\na\n# 78\na\n# 91\na'
+
+	EXEC -I-D
+		INPUT - $'aa\n\naa\n\n\naa\n\n\n\naa\n\n\n\n\naa\n\n\n\n\n\naa\n\n\n\n\n\n\naa\n\n\n\n\n\n\n\naa\n\n\n\n\n\n\n\n\naa\n\n\n\n\n\n\n\n\n\naa\n\n\n\n\n\n\n\n\n\n\naa\n\n\n\n\n\n\n\n\n\n\n\naa\n\n\n\n\n\n\n\n\n\n\n\n\naa'
+		OUTPUT - $'# 1 ""\naa\n\naa\n\n\naa\n\n\n\naa\n\n\n\n\naa\n\n\n\n\n\naa\n\n\n\n\n\n\naa\n\n\n\n\n\n\n\naa\n# 45\naa\n# 55\naa\n# 66\naa\n# 78\naa\n# 91\naa'
+
+	EXEC -I-D
+		INPUT - $'1\n\n3\n\n\n6\n\n\n\n10\n\n\n\n\n15\n\n\n\n\n\n21\n\n\n\n\n\n\n28\n\n\n\n\n\n\n\n36\n\n\n\n\n\n\n\n\n45\n\n\n\n\n\n\n\n\n\n55\n\n\n\n\n\n\n\n\n\n\n66\n\n\n\n\n\n\n\n\n\n\n\n78\n\n\n\n\n\n\n\n\n\n\n\n\n91'
+		OUTPUT - $'# 1 ""\n1\n\n3\n\n\n6\n\n\n\n10\n\n\n\n\n15\n\n\n\n\n\n21\n\n\n\n\n\n\n28\n\n\n\n\n\n\n\n36\n# 45\n45\n# 55\n55\n# 66\n66\n# 78\n78\n# 91\n91'
+
+	EXEC -I-D
+		INPUT - $'1 __LINE__\n\n3 __LINE__\n\n\n6 __LINE__\n\n\n\n10 __LINE__\n\n\n\n\n15 __LINE__\n\n\n\n\n\n21 __LINE__\n\n\n\n\n\n\n28 __LINE__\n\n\n\n\n\n\n\n36 __LINE__\n\n\n\n\n\n\n\n\n45 __LINE__\n\n\n\n\n\n\n\n\n\n55 __LINE__\n\n\n\n\n\n\n\n\n\n\n66 __LINE__\n\n\n\n\n\n\n\n\n\n\n\n78 __LINE__\n\n\n\n\n\n\n\n\n\n\n\n\n91 __LINE__'
+		OUTPUT - $'# 1 ""\n1 1\n\n3 3\n\n\n6 6\n\n\n\n10 10\n\n\n\n\n15 15\n\n\n\n\n\n21 21\n\n\n\n\n\n\n28 28\n\n\n\n\n\n\n\n36 36\n# 45\n45 45\n# 55\n55 55\n# 66\n66 66\n# 78\n78 78\n# 91\n91 91'
+
+TEST 30 'weird splices'
+
+	EXEC -I-D
+		INPUT - $'1 __LINE__ \\\n\n3 __LINE__'
+		OUTPUT - $'# 1 ""\n1 1 \n\n3 3'
+
+	EXEC -I-D
+		INPUT - $'1 __LINE__\\\n\n3 __LINE__'
+		OUTPUT - $'# 1 ""\n1 1\n\n3 3'
+
+	EXEC -I-D
+		INPUT - $'a\n\n@'
+		OUTPUT - $'# 1 ""\na\n\n@'
+
+	EXEC -I-D
+		INPUT - $'a\n\n\\a'
+		OUTPUT - $'# 1 ""\na\n\n\\a'
+
+TEST 31 'convoluted function-like macros'
+
+	EXEC -I-D
+		INPUT - $'#define A(n,t)	B(n,t)
+#define B(s,t)	C##s t
+#define C2(x,y)	(x,(y,NIL))
+A(2,(a,b))'
+		OUTPUT - $'# 1 ""\n\n\n\n( a,( b,NIL))'

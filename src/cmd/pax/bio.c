@@ -369,7 +369,6 @@ bfill(register Archive_t* ap, int must)
 static void
 chunk(register Archive_t* ap, char* t, char* f, register size_t n, char* o)
 {
-	ap->io->count += n;
 	if (ap->sum > 0)
 	{
 		if (ap->flags & SUM)
@@ -451,7 +450,7 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 					r -= c;
 				}
 				ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
-				if (!ob && ap->sum <= 0 && ap->io->seekable && (z = n / BUFFERSIZE) && lseek(ap->io->fd, z *= BUFFERSIZE, SEEK_CUR) >= 0)
+				if (!ob && ap->sum <= 0 && ap->io->seekable && (z = r / BUFFERSIZE) && lseek(ap->io->fd, z *= BUFFERSIZE, SEEK_CUR) >= 0)
 				{
 					s += z;
 					r -= z;
@@ -468,7 +467,7 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 				break;
 			}
 		}
-	r = m - r;
+	ap->io->count += (r = m - r);
 	if (r < n)
 	{
 		if (ob && r)
@@ -597,6 +596,7 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 			return 0;
 	}
 	chunk(ap, b, b, n, b);
+	ap->io->count += n;
 	message((-7, "bget(%s,%I*d@%I*d,%d): %s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, must, show(b, n)));
 	return b;
 }
@@ -940,7 +940,8 @@ interactive(void)
 			error(ERROR_SYSTEM|3, "cannot prompt for interactive input");
 		sfsetbuf(state.rtty, NiL, 0);
 		sfsetbuf(state.wtty, NiL, 0);
-		if (fd >= 0) close(fd);
+		if (fd >= 0)
+			close(fd);
 	}
 }
 
@@ -959,6 +960,7 @@ newio(register Archive_t* ap, int c, int n)
 	char*		io;
 	char*		t;
 	off_t		z;
+	int		i;
 	struct stat	st;
 
 	Sfio_t*		cp = 0;
@@ -1013,15 +1015,16 @@ newio(register Archive_t* ap, int c, int n)
 			file = "file";
 		break;
 	}
+	i = (eomprompt && *eomprompt == '!' && !*(eomprompt + 1)) ? 3 : 1;
 	switch (c < 0 ? errno : 0)
 	{
 	case 0:
 	case ENOSPC:
 	case ENXIO:
-		error(1, "%s: end of %s medium", ap->name, io);
+		error(i, "%s: end of %s medium", ap->name, io);
 		break;
 	default:
-		error(ERROR_SYSTEM|1, "%s: %s %s error", ap->name, io, rw);
+		error(ERROR_SYSTEM|i, "%s: %s %s error", ap->name, io, rw);
 		break;
 	}
 	if (ap->total == z)

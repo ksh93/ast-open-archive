@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -79,7 +79,7 @@ ppline(int line, char* file)
 	 * some front ends can't handle two line syncs in a row
 	 */
 
-	if (pp.pending == pppendout())
+	if (pp.pending == pppendout() || pplastout() != '\n')
 		ppputchar('\n');
 	if (file)
 		ppprintf("#%s %d \"%s\"%s\n", pp.lineid, line, (pp.flags & PP_linebase) && (s = strrchr(file, '/')) ? s + 1 : file, type);

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,16 +35,16 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make cdb
 make libcdb.a archive
 make cdb.req
 exec - set -
 exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -54,8 +54,8 @@ exec - do	case $i in
 exec - 	"cdb"|cdb)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -177,7 +177,7 @@ done cdblib.h
 done cdbopen.c
 meta cdbopen.o %.c>%.o cdbopen.c cdbopen
 prev cdbopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbopen.c
 done cdbopen.o generated
 make cdbread.o
 make cdbread.c
@@ -185,7 +185,7 @@ prev cdblib.h implicit
 done cdbread.c
 meta cdbread.o %.c>%.o cdbread.c cdbread
 prev cdbread.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbread.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbread.c
 done cdbread.o generated
 make cdbwrite.o
 make cdbwrite.c
@@ -193,7 +193,7 @@ prev cdblib.h implicit
 done cdbwrite.c
 meta cdbwrite.o %.c>%.o cdbwrite.c cdbwrite
 prev cdbwrite.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbwrite.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbwrite.c
 done cdbwrite.o generated
 make cdbseek.o
 make cdbseek.c
@@ -201,7 +201,7 @@ prev cdblib.h implicit
 done cdbseek.c
 meta cdbseek.o %.c>%.o cdbseek.c cdbseek
 prev cdbseek.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbseek.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbseek.c
 done cdbseek.o generated
 make cdbmove.o
 make cdbmove.c
@@ -209,7 +209,7 @@ prev cdblib.h implicit
 done cdbmove.c
 meta cdbmove.o %.c>%.o cdbmove.c cdbmove
 prev cdbmove.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmove.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmove.c
 done cdbmove.o generated
 make cdbmap.o
 make cdbmap.c
@@ -217,7 +217,7 @@ prev cdblib.h implicit
 done cdbmap.c
 meta cdbmap.o %.c>%.o cdbmap.c cdbmap
 prev cdbmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmap.c
 done cdbmap.o generated
 make cdbcache.o
 make cdbcache.c
@@ -225,7 +225,7 @@ prev cdblib.h implicit
 done cdbcache.c
 meta cdbcache.o %.c>%.o cdbcache.c cdbcache
 prev cdbcache.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbcache.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbcache.c
 done cdbcache.o generated
 make cdbdrop.o
 make cdbdrop.c
@@ -233,7 +233,7 @@ prev cdblib.h implicit
 done cdbdrop.c
 meta cdbdrop.o %.c>%.o cdbdrop.c cdbdrop
 prev cdbdrop.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbdrop.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbdrop.c
 done cdbdrop.o generated
 make cdbempty.o
 make cdbempty.c
@@ -241,7 +241,7 @@ prev cdblib.h implicit
 done cdbempty.c
 meta cdbempty.o %.c>%.o cdbempty.c cdbempty
 prev cdbempty.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbempty.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbempty.c
 done cdbempty.o generated
 make cdblib.o
 make cdblib.c
@@ -251,7 +251,7 @@ prev cdblib.h implicit
 done cdblib.c
 meta cdblib.o %.c>%.o cdblib.c cdblib
 prev cdblib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdblib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdblib.c
 done cdblib.o generated
 make cdbtypes.o
 make cdbtypes.c
@@ -280,13 +280,13 @@ bind -ldll
 bind -lvdelta
 bind -lm dontcare
 bind -last
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libexpr} ${mam_libpz} ${mam_libz} ${mam_libdll} ${mam_libvdelta} ${mam_libm} ${mam_libast} ${mam_libast} : run features/lib
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libexpr} ${mam_libpz} ${mam_libz} ${mam_libdll} ${mam_libvdelta} ${mam_libm} ${mam_libast} ${mam_libast} : run features/lib
 done FEATURE/lib generated
 prev cdblib.h implicit
 done cdbtypes.c
 meta cdbtypes.o %.c>%.o cdbtypes.c cdbtypes
 prev cdbtypes.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbtypes.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbtypes.c
 done cdbtypes.o generated
 make cdbmeth.o
 make cdbmeth.c
@@ -294,7 +294,7 @@ prev cdblib.h implicit
 done cdbmeth.c
 meta cdbmeth.o %.c>%.o cdbmeth.c cdbmeth
 prev cdbmeth.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmeth.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmeth.c
 done cdbmeth.o generated
 make cdbdump.o
 make cdbdump.c
@@ -302,7 +302,7 @@ prev cdblib.h implicit
 done cdbdump.c
 meta cdbdump.o %.c>%.o cdbdump.c cdbdump
 prev cdbdump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbdump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbdump.c
 done cdbdump.o generated
 make cdberror.o
 make cdberror.c
@@ -310,7 +310,7 @@ prev cdblib.h implicit
 done cdberror.c
 meta cdberror.o %.c>%.o cdberror.c cdberror
 prev cdberror.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdberror.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdberror.c
 done cdberror.o generated
 make cdbimage.o
 make cdbimage.c
@@ -321,7 +321,7 @@ done ${INSTALLROOT}/include/ast/sfio_t.h
 done cdbimage.c
 meta cdbimage.o %.c>%.o cdbimage.c cdbimage
 prev cdbimage.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbimage.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbimage.c
 done cdbimage.o generated
 make cdbcdb.o
 make cdbcdb.c
@@ -329,7 +329,7 @@ prev cdblib.h implicit
 done cdbcdb.c
 meta cdbcdb.o %.c>%.o cdbcdb.c cdbcdb
 prev cdbcdb.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbcdb.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbcdb.c
 done cdbcdb.o generated
 make cdbflat.o
 make cdbflat.c
@@ -350,7 +350,7 @@ prev ${INSTALLROOT}/include/ast/sfio_t.h implicit
 done cdbflat.c
 meta cdbflat.o %.c>%.o cdbflat.c cdbflat
 prev cdbflat.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbflat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbflat.c
 done cdbflat.o generated
 make cdbgzip.o
 make cdbgzip.c
@@ -365,7 +365,7 @@ prev cdblib.h implicit
 done cdbgzip.c
 meta cdbgzip.o %.c>%.o cdbgzip.c cdbgzip
 prev cdbgzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbgzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbgzip.c
 done cdbgzip.o generated
 make cdbpzip.o
 make cdbpzip.c
@@ -381,7 +381,7 @@ prev cdblib.h implicit
 done cdbpzip.c
 meta cdbpzip.o %.c>%.o cdbpzip.c cdbpzip
 prev cdbpzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbpzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbpzip.c
 done cdbpzip.o generated
 make cdbvdelta.o
 make cdbvdelta.c
@@ -391,7 +391,7 @@ prev cdblib.h implicit
 done cdbvdelta.c
 meta cdbvdelta.o %.c>%.o cdbvdelta.c cdbvdelta
 prev cdbvdelta.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbvdelta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbvdelta.c
 done cdbvdelta.o generated
 exec - ${AR} cr libcdb.a cdbopen.o cdbread.o cdbwrite.o cdbseek.o cdbmove.o cdbmap.o cdbcache.o cdbdrop.o cdbempty.o cdblib.o cdbtypes.o cdbmeth.o cdbdump.o cdberror.o cdbimage.o cdbcdb.o cdbflat.o cdbgzip.o cdbpzip.o cdbvdelta.o
 exec - (ranlib libcdb.a) >/dev/null 2>&1 || true
@@ -438,7 +438,7 @@ done ${INSTALLROOT}/include/ast generated
 make ${INSTALLROOT}/include/ast/cdb.h
 prev ${INSTALLROOT}/include/ast
 prev cdb.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1997,author=gsf'  cdb.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1997,author=gsf'  cdb.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/cdb.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/cdb.h
@@ -446,7 +446,7 @@ exec - fi
 done ${INSTALLROOT}/include/ast/cdb.h generated
 make ${INSTALLROOT}/include/ast/cdbmethod.h
 prev cdbmethod.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1997,author=gsf'  cdbmethod.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1997,author=gsf'  cdbmethod.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/cdbmethod.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/cdbmethod.h

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -211,6 +211,8 @@ struct Pax_s				/* global state			*/
 	int		(*checksumf)(Pax_t*, Paxarchive_t*, Paxfile_t*, unsigned long, unsigned long);
 	int		(*nospacef)(Pax_t*);
 
+	int		(*nextf)(Pax_t*, Paxarchive_t*, size_t, size_t);
+
 #ifdef _PAX_PRIVATE_
 	_PAX_PRIVATE_
 #endif
@@ -221,6 +223,7 @@ struct Pax_s				/* global state			*/
 #define paxcorrupt(p,a,f,m)	(*(p)->corruptf)(p,a,f,m)
 #define paxdata(p,a,f,d,b,n)	(*(p)->dataf)(p,a,f,d,b,n)
 #define paxget(p,a,o,r)		(*(p)->getf)(p,a,o,r)
+#define paxnext(p,a,c,n)	(*(p)->nextf)(p,a,c,n)
 #define paxnospace(p)		(*(p)->nospacef)(p)
 #define paxpart(p,a,n)		(*(p)->partf)(p,a,n)
 #define paxput(p,a,b,n)		(*(p)->putf)(p,a,b,n)

@@ -23,6 +23,17 @@ Feb 10:30		%b %H:%S		Sun Feb  1 10:00:30 EST 1987
 00 96061		%H %y%j			Fri Mar  1 00:00:00 EST 1996
 
 #
+# alternation
+#
+
+020301			%m%d%y			Sat Feb  3 12:19:47 EST 2001
+020301			%m%d%y%|		Sat Feb  3 12:19:47 EST 2001
+020301			%m%d%y%|%&		Sat Feb  3 12:19:47 EST 2001
+020301			%m%d%y%|%m%d%Y%|%&	Sat Feb  3 12:19:47 EST 2001
+02032001		%m%d%y%|%m%d%Y%|%&	Sat Feb  3 12:19:47 EST 2001
+0102031219.47		%m%d%y%|%m%d%Y%|%&	Sat Feb  3 12:19:47 EST 2001
+
+#
 # export DATEMSK=date.msk for the following
 #
 

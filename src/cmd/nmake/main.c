@@ -181,6 +181,7 @@
  *	0x00010000 alarm status trace
  *	0x00020000 close internal.openfd before job exec
  *	0x00040000 set failed state|metarule event to staterule event
+ *	0x00080000 replace ' ' with '?' instead of FILE_SPACE
  */
 
 #include "make.h"
@@ -441,7 +442,7 @@ main(int argc, char** argv)
 	 */
 
 	sfputr(tmp, initstatic, -1);
-	parse(NiL, sfstruse(tmp), "initstatic", 0);
+	parse(NiL, sfstruse(tmp), "initstatic", NiL);
 
 	/*
 	 * check and read the args file
@@ -574,7 +575,7 @@ main(int argc, char** argv)
 	if ((i = error_info.trace) > -20)
 		error_info.trace = 0;
 	sfputr(tmp, initdynamic, -1);
-	parse(NiL, sfstruse(tmp), "initdynamic", 0);
+	parse(NiL, sfstruse(tmp), "initdynamic", NiL);
 	error_info.trace = i;
 	state.user = 0;
 	state.init = 0;
@@ -660,6 +661,14 @@ main(int argc, char** argv)
 		}
 		if (!s)
 		{
+			/*
+			 * this readfile() pulls in the default base rules
+			 * that might resolve any delayed self-documenting
+			 * options in optcheck()
+			 */
+
+			if (readfile("-", COMP_FILE, NiL))
+				optcheck(1);
 			if (*(s = sfstruse(imp)))
 				error(3, "a makefile must be specified when %s omitted", s);
 			else
@@ -674,7 +683,7 @@ main(int argc, char** argv)
 	 * validate external command line options
 	 */
 
-	optcheck();
+	optcheck(1);
 
 	/*
 	 * check for listing of variable and rule definitions
@@ -734,7 +743,7 @@ main(int argc, char** argv)
 		if (!state.maxview)
 			state.believe = 0;
 		else if (state.fsview)
-			error(3, "%s: option currently works in 2d only", opentry(OPT_believe, 0)->name);
+			error(3, "%s: option currently works in 2d only", optflag(OPT_believe)->name);
 	}
 
 	/*
@@ -783,7 +792,7 @@ main(int argc, char** argv)
 		if (state.argf[i] & ARG_SCRIPT)
 		{
 			state.reading = 1;
-			parse(NiL, state.argv[i], "command line script", 0);
+			parse(NiL, state.argv[i], "command line script", NiL);
 			state.reading = 0;
 		}
 

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -52,7 +52,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2004-01-28 $\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2004-08-31 $\0\n";
 
 #include "pplib.h"
 
@@ -69,6 +69,8 @@ static char	pathbuf[MAXTOKEN+1];	/* full path of last #include	*/
 static char	tmpbuf[MAXTOKEN+1];	/* very temporary buffer	*/
 static char	tokbuf[2*MAXTOKEN+1];	/* token buffer			*/
 static char	valbuf[MAXTOKEN+1];	/* builtin macro value buffer	*/
+
+static char	optflags[X_last_option+1];/* OPT_* flags indexed by X_*	*/
 
 static char	null[1];
 
@@ -172,6 +174,8 @@ struct ppglobals pp =
 	&pathbuf[0],			/* path				*/
 	&tmpbuf[0],			/* tmpbuf			*/
 	&valbuf[0],			/* valbuf			*/
+	&optflags[0],			/* optflags			*/
+	'\n',				/* lastout			*/
 
 	/* the rest are implicitly initialized */
 };

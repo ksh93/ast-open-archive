@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -34,6 +34,7 @@
 #undef	paxcorrupt
 #undef	paxdata
 #undef	paxget
+#undef	paxnext
 #undef	paxnospace
 #undef	paxpart
 #undef	paxput
@@ -107,6 +108,13 @@ static int
 paxwrite(Pax_t* pax, Paxarchive_t* ap, const void* b, off_t n)
 {
 	bwrite(ap, (void*)b, n);
+	return 0;
+}
+
+static int
+paxnext(Pax_t* pax, Paxarchive_t* ap, size_t c, size_t n)
+{
+	newio(ap, c, n);
 	return 0;
 }
 
@@ -230,4 +238,6 @@ paxinit(register Pax_t* pax, const char* id)
 	pax->corruptf = paxcorrupt;
 	pax->checksumf = paxchecksum;
 	pax->nospacef = paxnospace;
+
+	pax->nextf = paxnext;
 }

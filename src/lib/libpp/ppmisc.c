@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -197,4 +197,50 @@ pppredargs(void)
 	}
 	pp.token = pptoken;
 	return(type);
+}
+
+/*
+ * sync output line number
+ */
+
+int
+ppsync(void)
+{
+	long	m;
+
+	if ((pp.state & (ADD|HIDDEN)))
+	{
+		if (pp.state & ADD)
+		{
+			pp.state &= ~ADD;
+			m = pp.addp - pp.addbuf;
+			pp.addp = pp.addbuf;
+			ppprintf("%-.*s", m, pp.addbuf);
+		}
+		if (pp.linesync)
+		{
+			if ((pp.state & SYNCLINE) || pp.hidden >= MAXHIDDEN)
+			{
+				pp.hidden = 0;
+				pp.state &= ~(HIDDEN|SYNCLINE);
+				if (error_info.line)
+					(*pp.linesync)(error_info.line, error_info.file);
+			}
+			else
+			{
+				m = pp.hidden;
+				pp.hidden = 0;
+				pp.state &= ~HIDDEN;
+				while (m-- > 0)
+					ppputchar('\n');
+			}
+		}
+		else
+		{
+			pp.hidden = 0;
+			pp.state &= ~HIDDEN;
+			ppputchar('\n');
+		}
+	}
+	return 0;
 }

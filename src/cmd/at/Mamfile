@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,10 +35,10 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
-make ast_at
+make at
 make at.o
 make at.c
 make ${INSTALLROOT}/include/ast/fs3d.h implicit
@@ -162,20 +162,20 @@ done at.h
 done at.c
 meta at.o %.c>%.o at.c at
 prev at.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" -c at.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" -c at.c
 done at.o generated
 bind -lcoshell
 bind -lcs
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o ast_at at.o ${mam_libcoshell} ${mam_libcs} ${mam_libast}
-done ast_at generated
-make ast_batch
-prev ast_at
-exec - if	silent test -f "ast_batch"
-exec - then	rm -f ast_batch
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o at at.o ${mam_libcoshell} ${mam_libcs} ${mam_libast}
+done at generated
+make batch
+prev at
+exec - if	silent test -f "batch"
+exec - then	rm -f batch
 exec - fi
-exec - ln ast_at ast_batch
-done ast_batch generated
+exec - ln at batch
+done batch generated
 make atx
 make atx.o
 make atx.c
@@ -183,7 +183,7 @@ prev at.h implicit
 done atx.c
 meta atx.o %.c>%.o atx.c atx
 prev atx.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c atx.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c atx.c
 done atx.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o atx atx.o ${mam_libast} ${mam_libast}
 done atx generated
@@ -205,8 +205,6 @@ prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/proc.h
 make ${INSTALLROOT}/include/ast/dirent.h implicit
 make ${INSTALLROOT}/include/ast/ast_dirent.h implicit
-make ndir.h implicit
-done ndir.h dontcare virtual
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done ${INSTALLROOT}/include/ast/ast_dirent.h
 done ${INSTALLROOT}/include/ast/dirent.h
@@ -223,62 +221,64 @@ prev at.h implicit
 done atd.c
 meta atd.o %.c>%.o atd.c atd
 prev atd.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c atd.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c atd.c
 done atd.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o at.svc atd.o ${mam_libcs} ${mam_libast} ${mam_libcs} ${mam_libast}
 done at.svc generated
-make ast_crontab
+make crontab
 make crontab.sh
 done crontab.sh
+meta crontab %.sh>% crontab.sh crontab
+prev crontab.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
-exec - ;;
-exec - *) if ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - then ENV= $SHELL -n crontab.sh
-exec - fi
-exec - ;;
+exec - 	;;
+exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
+exec - 	then	ENV= $SHELL -n crontab.sh
+exec - 	fi
+exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "") case 185 in
-exec - 0) cp crontab.sh ast_crontab
-exec - ;;
-exec - *) {
-exec - i=`(read x; echo $x) < crontab.sh`
-exec - case $i in
-exec - '#!'*|*'||'*|':'*|'":"'*|"':'"*) echo "$i" ;;
-exec - esac
-exec - cat - crontab.sh <<'!'
+exec - "")	case 185 in
+exec - 	0)	cp crontab.sh crontab
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < crontab.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
+exec - 		esac
+exec - 		cat - crontab.sh <<'!'
 exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"
 exec - !
-exec - } > ast_crontab
-exec - ;;
-exec - esac
-exec - ;;
-exec - *) cat - crontab.sh > ast_crontab <<'!'
+exec - 		} > crontab
+exec - 		;;
+exec - 	esac
+exec - 	;;
+exec - *)	cat - crontab.sh > crontab <<'!'
 exec - ${mam_cc_SHELLMAGIC}
 exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"
 exec - !
-exec - ;;
+exec - 	;;
 exec - esac
-exec - chmod u+w,+x ast_crontab
-done ast_crontab generated
+exec - chmod u+w,+x crontab
+done crontab generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
 exec - then	mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ${INSTALLROOT}/bin generated
-make ${INSTALLROOT}/bin/ast_at
+make ${INSTALLROOT}/bin/at
 prev ${INSTALLROOT}/bin
-prev ast_at
-exec - test '' = 'ast_at' || ${STDCMP} 2>/dev/null -s ast_at ${INSTALLROOT}/bin/ast_at || { ${STDMV} ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_at.old 2>/dev/null || true; ${STDCP} ast_at ${INSTALLROOT}/bin/ast_at  		    		    ;}
-done ${INSTALLROOT}/bin/ast_at generated
-make ${INSTALLROOT}/bin/ast_batch
-prev ${INSTALLROOT}/bin/ast_at
-exec - if	silent test -f "${INSTALLROOT}/bin/ast_batch"
-exec - then	rm -f ${INSTALLROOT}/bin/ast_batch
+prev at
+exec - test '' = 'at' || ${STDCMP} 2>/dev/null -s at ${INSTALLROOT}/bin/at || { ${STDMV} ${INSTALLROOT}/bin/at ${INSTALLROOT}/bin/at.old 2>/dev/null || true; ${STDCP} at ${INSTALLROOT}/bin/at  		    		    ;}
+done ${INSTALLROOT}/bin/at generated
+make ${INSTALLROOT}/bin/batch
+prev ${INSTALLROOT}/bin/at
+exec - if	silent test -f "${INSTALLROOT}/bin/batch"
+exec - then	rm -f ${INSTALLROOT}/bin/batch
 exec - fi
-exec - ln ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_batch
-done ${INSTALLROOT}/bin/ast_batch generated
+exec - ln ${INSTALLROOT}/bin/at ${INSTALLROOT}/bin/batch
+done ${INSTALLROOT}/bin/batch generated
 make ${INSTALLROOT}/lib/at/jobs
 setv mode -Dmode="u=rwx,go=x"
 exec - if	silent test ! -d ${INSTALLROOT}/lib/at/jobs
@@ -307,10 +307,10 @@ prev at.svc
 setv preserve -Dpreserve
 exec - test '' = 'at.svc' || ${STDCMP} 2>/dev/null -s at.svc ${INSTALLROOT}/lib/cs/tcp/at/at.svc || { ${STDMV} ${INSTALLROOT}/lib/cs/tcp/at/at.svc ${INSTALLROOT}/lib/cs/tcp/at/at.svc.old 2>/dev/null || true; ${STDCP} at.svc ${INSTALLROOT}/lib/cs/tcp/at/at.svc  		    		    ;}
 done ${INSTALLROOT}/lib/cs/tcp/at/at.svc generated
-make ${INSTALLROOT}/bin/ast_crontab
-prev ast_crontab
-exec - test '' = 'ast_crontab' || ${STDCMP} 2>/dev/null -s ast_crontab ${INSTALLROOT}/bin/ast_crontab || { ${STDMV} ${INSTALLROOT}/bin/ast_crontab ${INSTALLROOT}/bin/ast_crontab.old 2>/dev/null || true; ${STDCP} ast_crontab ${INSTALLROOT}/bin/ast_crontab  		    		    ;}
-done ${INSTALLROOT}/bin/ast_crontab generated
+make ${INSTALLROOT}/bin/crontab
+prev crontab
+exec - test '' = 'crontab' || ${STDCMP} 2>/dev/null -s crontab ${INSTALLROOT}/bin/crontab || { ${STDMV} ${INSTALLROOT}/bin/crontab ${INSTALLROOT}/bin/crontab.old 2>/dev/null || true; ${STDCP} crontab ${INSTALLROOT}/bin/crontab  		    		    ;}
+done ${INSTALLROOT}/bin/crontab generated
 done install virtual
 make test
 done test dontcare virtual

@@ -31,14 +31,12 @@
 
 #include "make.h"
 
-#include <glob.h>
-
 /*
  * embedded spaces in file name wreak havoc
  * we wreak hack to get through
  */
 
-#define HACKSPACE(f,s)	for (s = f; s = strchr(s, ' '); *s++ = (state.test & 4) ? '?' : FILE_SPACE)
+#define HACKSPACE(f,s)	for (s = f; s = strchr(s, ' '); *s++ = (state.test & 0x00080000) ? '?' : FILE_SPACE)
 #define FIGNORE(s)	((s)[0]=='.'&&((s)[1]==0||(s)[1]=='.'&&(s)[2]==0))
 
 #if DEBUG
@@ -370,7 +368,7 @@ dirscan(struct rule* r)
 	if (s > r->name && *s == '/')
 		*s-- = 0;
 	if ((s - r->name + 1) != n)
-		r->name = putrule(r->name, r);
+		r->name = maprule(r->name, r);
 	r->dynamic |= D_scanned;
 	r->dynamic &= ~D_entries;
 	if (!(r->property & P_state))
@@ -583,28 +581,35 @@ glob_type(glob_t* gp, const char* path)
  */
 
 char**
-globv(char* s)
+globv(register glob_t* gp, char* s)
 {
 	register char**		q;
 	register char**		p;
 	register char**		x;
 	int			i;
+	int			f;
 	glob_t			gl;
 	struct globstate	gs;
 
 	static char*		nope[1];
 
-	memset(&gl, 0, sizeof(gl));
-	gl.gl_intr = &state.caught;
+	f = GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STARSTAR;
+	if (!gp)
+	{
+		gp = &gl;
+		f |= GLOB_STACK;
+	}
+	memset(gp, 0, sizeof(gl));
+	gp->gl_intr = &state.caught;
 	if (state.maxview && !state.fsview)
 	{
-		gl.gl_handle = (void*)&gs;
-		gl.gl_diropen = glob_diropen;
-		gl.gl_dirnext = glob_dirnext;
-		gl.gl_dirclose = glob_dirclose;
-		gl.gl_type = glob_type;
+		gp->gl_handle = (void*)&gs;
+		gp->gl_diropen = glob_diropen;
+		gp->gl_dirnext = glob_dirnext;
+		gp->gl_dirclose = glob_dirclose;
+		gp->gl_type = glob_type;
 	}
-	if (i = glob(s, GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STACK|GLOB_STARSTAR, 0, &gl))
+	if (i = glob(s, GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STACK|GLOB_STARSTAR, 0, gp))
 	{
 		if (!trap())
 			error(2, "glob() internal error %d", i);
@@ -612,7 +617,7 @@ globv(char* s)
 	}
 	if (state.maxview && !state.fsview)
 	{
-		for (i = 0, p = 0, x = q = gl.gl_pathv; *q; q++)
+		for (i = 0, p = 0, x = q = gp->gl_pathv; *q; q++)
 			if (!p || !streq(*q, *p))
 			{
 				*x++ = *q;
@@ -620,7 +625,7 @@ globv(char* s)
 			}
 		*x = 0;
 	}
-	return gl.gl_pathv;
+	return gp->gl_pathv;
 }
 
 /*
@@ -1430,7 +1435,7 @@ bindfile(register struct rule* r, char* name, int flags)
 				 */
 
 				s = r->name;
-				r->name = putrule(b, r);
+				r->name = maprule(b, r);
 				if (st.st_mode)
 					internal.openfile = r->name;
 				if (r->name != s)

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,16 +35,16 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make z
 make libz.a archive
 make z.req
 exec - set -
 exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -54,8 +54,8 @@ exec - do	case $i in
 exec - 	"z"|z)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -93,7 +93,7 @@ done zlib.h
 done adler32.c
 meta adler32.o %.c>%.o adler32.c adler32
 prev adler32.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c adler32.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c adler32.c
 done adler32.o generated
 make compress.o
 make compress.c
@@ -101,7 +101,7 @@ prev zlib.h implicit
 done compress.c
 meta compress.o %.c>%.o compress.c compress
 prev compress.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c compress.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c compress.c
 done compress.o generated
 make crc32.o
 make crc32.c
@@ -109,7 +109,7 @@ prev zlib.h implicit
 done crc32.c
 meta crc32.o %.c>%.o crc32.c crc32
 prev crc32.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c crc32.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c crc32.c
 done crc32.o generated
 make gzio.o
 make gzio.c
@@ -188,7 +188,7 @@ done ${INSTALLROOT}/include/ast/ast.h dontcare
 done gzio.c
 meta gzio.o %.c>%.o gzio.c gzio
 prev gzio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_z -c gzio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_z -c gzio.c
 done gzio.o generated
 make uncompr.o
 make uncompr.c
@@ -196,7 +196,7 @@ prev zlib.h implicit
 done uncompr.c
 meta uncompr.o %.c>%.o uncompr.c uncompr
 prev uncompr.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c uncompr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c uncompr.c
 done uncompr.o generated
 make deflate.o
 make deflate.c
@@ -206,7 +206,7 @@ done deflate.h
 done deflate.c
 meta deflate.o %.c>%.o deflate.c deflate
 prev deflate.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_z -c deflate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_z -c deflate.c
 done deflate.o generated
 make trees.o
 make trees.c
@@ -217,7 +217,7 @@ prev deflate.h implicit
 done trees.c
 meta trees.o %.c>%.o trees.c trees
 prev trees.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c trees.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c trees.c
 done trees.o generated
 make zutil.o
 make zutil.c
@@ -225,7 +225,7 @@ prev zutil.h implicit
 done zutil.c
 meta zutil.o %.c>%.o zutil.c zutil
 prev zutil.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c zutil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c zutil.c
 done zutil.o generated
 make inflate.o
 make inflate.c
@@ -235,7 +235,7 @@ prev zutil.h implicit
 done inflate.c
 meta inflate.o %.c>%.o inflate.c inflate
 prev inflate.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inflate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inflate.c
 done inflate.o generated
 make infblock.o
 make infblock.c
@@ -250,7 +250,7 @@ prev zutil.h implicit
 done infblock.c
 meta infblock.o %.c>%.o infblock.c infblock
 prev infblock.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infblock.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infblock.c
 done infblock.o generated
 make inftrees.o
 make inftrees.c
@@ -261,7 +261,7 @@ prev zutil.h implicit
 done inftrees.c
 meta inftrees.o %.c>%.o inftrees.c inftrees
 prev inftrees.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inftrees.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inftrees.c
 done inftrees.o generated
 make infcodes.o
 make infcodes.c
@@ -275,7 +275,7 @@ prev zutil.h implicit
 done infcodes.c
 meta infcodes.o %.c>%.o infcodes.c infcodes
 prev infcodes.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infcodes.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infcodes.c
 done infcodes.o generated
 make infutil.o
 make infutil.c
@@ -287,7 +287,7 @@ prev zutil.h implicit
 done infutil.c
 meta infutil.o %.c>%.o infutil.c infutil
 prev infutil.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infutil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infutil.c
 done infutil.o generated
 make inffast.o
 make inffast.c
@@ -300,7 +300,7 @@ prev zutil.h implicit
 done inffast.c
 meta inffast.o %.c>%.o inffast.c inffast
 prev inffast.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inffast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inffast.c
 done inffast.o generated
 make sfdcgzip.o
 make sfdcgzip.c
@@ -318,7 +318,7 @@ done ${INSTALLROOT}/include/ast/sfio_t.h
 done sfdcgzip.c
 meta sfdcgzip.o %.c>%.o sfdcgzip.c sfdcgzip
 prev sfdcgzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c sfdcgzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c sfdcgzip.c
 done sfdcgzip.o generated
 make sfdclzw.o
 make sfdclzw.c
@@ -328,7 +328,7 @@ prev ${INSTALLROOT}/include/ast/sfio_t.h implicit
 done sfdclzw.c
 meta sfdclzw.o %.c>%.o sfdclzw.c sfdclzw
 prev sfdclzw.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c sfdclzw.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c sfdclzw.c
 done sfdclzw.o generated
 exec - ${AR} cr libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o inffast.o sfdcgzip.o sfdclzw.o
 exec - (ranlib libz.a) >/dev/null 2>&1 || true
@@ -372,7 +372,7 @@ exec - test '' = 'zconf.h' || ${STDCMP} 2>/dev/null -s zconf.h ${INSTALLROOT}/in
 done ${INSTALLROOT}/include/ast/zconf.h generated
 make ${INSTALLROOT}/include/ast/sfdcgzip.h
 prev sfdcgzip.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o type=special'  sfdcgzip.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o type=special'  sfdcgzip.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/sfdcgzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/sfdcgzip.h
@@ -389,7 +389,7 @@ done example.c
 meta example.o %.c>%.o example.c example
 prev example.c
 setv _BLD_z -U_BLD_z
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c example.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c example.c
 done example.o generated
 prev libz.a archive
 bind -lz
@@ -410,7 +410,7 @@ done minigzip.c
 meta minigzip.o %.c>%.o minigzip.c minigzip
 prev minigzip.c
 setv _BLD_z -U_BLD_z
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c minigzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c minigzip.c
 done minigzip.o generated
 prev libz.a archive
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o minigzip minigzip.o ${mam_libz} ${mam_libast}

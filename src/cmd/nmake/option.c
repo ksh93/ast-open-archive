@@ -30,20 +30,16 @@
  *
  * option name mappings are here
  * option flag mappings are in options.h
- *
- * omitted letters are avilable for option flags:
- *
- *	ABCDEFGHIJKLMNOPQRSTUV XYZ
- *	abcdefg ijkl no  rst vwxyz
  */
 
 #include "make.h"
 #include "options.h"
 
-#define getoption(n)	((struct option*)hashget(opttab,(n)))
-#define putoption(n,o)	hashput(opttab,(n),(char*)(o))
+#define getoption(n)	((struct option*)hashget(opt.table,(n)))
 
 #define OPT_OFFSET	10
+#define OPT_NON		'-'
+#define OPT_SEP		';'
 
 static const char usage1[] =
 "+"
@@ -54,106 +50,101 @@ USAGE_LICENSE
 "	actions to build target files that are out of date with prerequisite"
 "	files. Most information used to build targets is contained in"
 "	the global \abase rules\a that are augmented by user \amakefiles\a."
-"	Each argument may be an option, script, or target. An option argument"
-"	is preceded by \b-\b or \b+\b. A script argument contains at least"
+"	Each operand may be an option, script, or target. An option operand"
+"	is preceded by \b-\b or \b+\b. A script operand contains at least"
 "	one of \bspace\b, \btab\b, \bnewline\b, \b:\b, \b=\b, \b\"\b, or"
 "	\b\\\b and is parsed as a separate, complete makefile. Otherwise"
-"	the argument is a \atarget\a that is generated according to the"
-"	\amakefile\a and \aglobal\a rules. \atarget\a arguments are made"
-"	in order from left to right and overrride the default targets.]"
+"	the operand is a \atarget\a that is generated according to the"
+"	\amakefile\a and \aglobal\a rules. \atarget\a operands are made"
+"	in order from left to right and override the default targets.]"
 "[+?Command line options, scripts and targets may appear in any order,"
-"	with the exception that no option argument may appear after a"
-"	\b--\b argument.]"
+"	with the exception that no option operand may appear after a"
+"	\b--\b operand.]"
+"[+?Options are qualified by the base name of the makefile that defined"
+"	them. Unqualified options are defined by \bnmake\b itself.]"
 ;
 
 static struct option	options[] =	/* option table			*/
 {
 
-"accept",	OPT_accept,	(char*)&state.accept,		0,0,
-	"Accept filesystem timestamps of existing targets.", 0,
-"alias",	OPT_alias,	(char*)&state.alias,		0,0,
-	"Enable directory aliasing.", 0,
-"base",		OPT_base,	(char*)&state.base,		0,0,
-	"Compile base or global rules.", 0,
-"believe",	OPT_believe,	(char*)&state.believe,		0,0,
+{ "accept",	OPT_accept,	(char*)&state.accept,		0,
+	"Accept filesystem timestamps of existing targets." },
+{ "alias",	OPT_alias,	(char*)&state.alias,		0,
+	"Enable directory aliasing." },
+{ "base",		OPT_base,	(char*)&state.base,	0,
+	"Compile base or global rules." },
+{ "believe",	OPT_believe,	(char*)&state.believe,		0,
 	"Believe the state file time of files lower than view level"
 	" \alevel-1\a. The file system time will be checked for files with"
 	" no state or files in views equal to or higher than \alevel\a."
 	" \alevel=0\a causes the file system time to be checked for"
-	" files on all view levels. The top view is level 0.", "level:=0",
-"byname",	OPT_byname,	0,				0,0,
-	"(obsolete) Set options by name.", "name[=value]]",
-"compile",	OPT_compile,	(char*)&state.compileonly,	0,0,
-	"Force makefile compilation.", 0,
-"compatibility",OPT_compatibility,(char*)&state.compatibility,	0,0,
-	"(obsolete) Enable compatibility messages.", 0,
-"corrupt",OPT_corrupt,	(char*)&state.corrupt,		0,0,
+	" files on all view levels. The top view is level 0.", "level:=0" },
+{ "compatibility",OPT_compatibility,(char*)&state.compatibility,0,
+	"Disable compatibility messages." },
+{ "compile",	OPT_compile,	(char*)&state.compileonly,	0,
+	"Compile the input makefile and exit." },
+{ "corrupt",OPT_corrupt,	(char*)&state.corrupt,		0,
 	"\aaction\a determines the action to take for corrupt or invalid"
-	" top view state files. \baccept\b is assumed if \aaction\a is"
-	" omitted. The top view default is \berror\b and the lower view"
-	" default is \baccept\b. \aaction\a may be one of:]:?[action]",
+	" top view state files. The top view default is \berror\b and the"
+	" lower view default is \baccept\b. \aaction\a may be one of:",
+	"[action:!accept]"
 	"{"
 	"	[+accept?print a warning and set \b--accept\b]"
 	"	[+error?print a diagnostic and exit]"
 	"	[+ignore?print a warning and set \b--noreadstate\b]"
-	"}",
-"cross",	OPT_cross,	(char*)&state.cross,		0,0,
-	"Don't run generated executables.", 0,
-"debug",	OPT_debug,	0,				0,0,
+	"}" },
+{ "cross",	OPT_cross,	(char*)&state.cross,		0,
+	"Don't run generated executables." },
+{ "debug",	OPT_debug,	0,				0,
 	"Set the debug trace level to \alevel\a. Higher levels produce"
-	" more output.", "level",
-"define",	OPT_define,	0,				0,0,
-	"(obsolete) Pass macro definition to the makefile preprocessor.",
-	"name[=value]]",
-"errorid",	OPT_errorid,	(char*)&state.errorid,		0,0,
-	"Add \aid\a to the error message command identifier.", "id:=make",
-"exec",		OPT_exec,	(char*)&state.exec,		0,0,
+	" more output.", "level" },
+{ "errorid",	OPT_errorid,	(char*)&state.errorid,		0,
+	"Add \aid\a to the error message command identifier.", "id:=make" },
+{ "exec",		OPT_exec,	(char*)&state.exec,	0,
 	"Enable shell action execution. \b--noexec\b"
 	" disables all but \b.ALWAYS\b shell actions and also disables"
-	" make object and state file generation/updates.", 0,
-"expandview",	OPT_expandview,	(char*)&state.expandview,	0,0,
-	"Expand \a3d\a filesystem paths.", 0,
-"explain",	OPT_explain,	(char*)&state.explain,		0,0,
-	"Explain each action.", 0,
-"file",		OPT_file,	(char*)&internal.makefiles,	0,0,
+	" make object and state file generation/updates." },
+{ "expandview",	OPT_expandview,	(char*)&state.expandview,	0,
+	"Expand \a3d\a filesystem paths." },
+{ "explain",	OPT_explain,	(char*)&state.explain,		0,
+	"Explain each action." },
+{ "file",		OPT_file,	(char*)&internal.makefiles,	0,
 	"Read the makefile \afile\a. If \b--file\b is not specified then"
 	" the makefile names specified by \b$(MAKEFILES)\b are attempted in"
 	" order from left to right. The file \b-\b is equivalent"
-	" to \b/dev/null\b.", "file",
-"force",	OPT_force,	(char*)&state.force,		0,0,
-	"Force all targets to be out of date.", 0,
-"global",	OPT_global,	(char*)&internal.globalfiles,	0,0,
+	" to \b/dev/null\b.", "file" },
+{ "force",	OPT_force,	(char*)&state.force,		0,
+	"Force all targets to be out of date." },
+{ "global",	OPT_global,	(char*)&internal.globalfiles,	0,
 	"Read the global makefile \afile\a. The \b--file\b search is not"
-	" affected.", "file",
-"ignore",	OPT_ignore,	(char*)&state.ignore,		0,0,
-	"Ignore shell action errors.", 0,
-"ignorelock",	OPT_ignorelock,	(char*)&state.ignorelock,	0,0,
-	"Ignore state file locks.", 0,
-"import",	OPT_import,	(char*)&state.import,		0,0,
-	"Current assignments will be marked \bimport\b.", 0,
-"include",	OPT_include,	0,				0,0,
-	"Add \adirectory\a to the makefile search list.", "directory",
-"intermediate",	OPT_intermediate,(char*)&state.intermediate,	0,0,
-	"Force intermediate target generation.", 0,
-"jobs",		OPT_jobs,	(char*)&state.jobs,		0,0,
+	" affected.", "file" },
+{ "ignore",	OPT_ignore,	(char*)&state.ignore,		0,
+	"Ignore shell action errors." },
+{ "ignorelock",	OPT_ignorelock,	(char*)&state.ignorelock,	0,
+	"Ignore state file locks." },
+{ "include",	OPT_include,	0,				0,
+	"Add \adirectory\a to the makefile search list.", "directory" },
+{ "intermediate",	OPT_intermediate,(char*)&state.intermediate,	0,
+	"Force intermediate target generation." },
+{ "jobs",		OPT_jobs,	(char*)&state.jobs,		0,
 	"Set the shell action concurrency level to \alevel\a."
 	" Level \b1\b allows dependency checking while an action is"
 	" executing; level \b0\b stops all activity while an action"
-	" is executing.", "level:=1",
-"keepgoing",	OPT_keepgoing,	(char*)&state.keepgoing,	0,0,
-	"Continue after error with sibling prerequisites.", 0,
-"list",		OPT_list,	(char*)&state.list,		0,0,
-	"List current rules and variables on the standard output in"
-	" makefile form.", 0,
-"mam",		OPT_mam,	(char*)&state.mam.options,	0,0,
+	" is executing.", "level:=${" CO_ENV_PROC "::-1}" },
+{ "keepgoing",	OPT_keepgoing,	(char*)&state.keepgoing,	0,
+	"Continue after error with sibling prerequisites." },
+{ "list",		OPT_list,	(char*)&state.list,		0,
+	"List the current rules and variables on the standard output in"
+	" makefile form." },
+{ "mam",		OPT_mam,	(char*)&state.mam.options,	0,
 	"Write \amake abstract machine\a output to \afile\a if specified or"
 	" to the standard output otherwise. See \bmam\b(5) for details on"
 	" the \amake abstract machine\a language. If \aparent\a !=0 then it is"
 	" the process id of a parent \amam\a process. \adirectory\a is"
 	" the working directory of the current \amam\a process relative"
 	" to the root \amam\a process, \b.\b if not specified. \atype\a"
-	" must be one of:]:"
-	"[type[-subtype]][::file[::parent[::directory]]]]]]]",
+	" must be one of:",
+	"[type[,subtype]][::file[::parent[::directory]]]]]]]"
 	"{"
 		"[+dynamic?\amam\a trace of an actual build]"
 		"[+regress?\amam\a for regression testing; labels, path"
@@ -163,15 +154,21 @@ static struct option	options[] =	/* option table			*/
 		"[+----?0 or more comma separated subtypes ----]"
 		"[+port?used by the base rules to generate portable"
 		" makefiles; some paths are parameterized; on by default]"
-	"}",
-"never",	OPT_never,	(char*)&state.never,		0,0,
+	"}" },
+{ "never",	OPT_never,	(char*)&state.never,		0,
 	"Don't execute any shell actions. \b--noexec\b executes \b.ALWAYS\b"
-	" shell actions.", 0,
-"option",	OPT_option,	(char*)&internal.options,	0,0,
-	"Define a new option. \achar\a is the single character option name,"
-	" \aname\a is the long option name, \aset\a is an optional"
-	" \b.FUNCTION\b that is called when the option is \bset\b,"
-	" and \aflags\a are a combination of:]:[char+name+flags+set+\"description\"]",
+	" shell actions." },
+{ "option",	OPT_option,	0,				0,
+	"Define a new option. The definition is a delimiter separated field"
+	" list. Any non-alpha-numberic delimiter other than \b-\b may be used."
+	" \b;\b is used in this description. Makefile \bset option\b"
+	" definitions must be '...' quoted. Two adjacent delimiters specifies"
+	" the literal delimiter character and a \b-\b field value specifies an"
+	" empty field. \achar\a is the single character option name, \aname\a"
+	" is the long option name, \aset\a is an optional \b.FUNCTION\b that"
+	" is called when the option value is changed by \bset\b, \avalues\a is"
+	" an \boptget\b(3) value list, and \aflags\a are a combination of:",
+	"['char;name;flags;set;description;values']"
 	"{"
 	"	[+a?multiple values appended]"
 	"	[+b?boolean value]"
@@ -179,75 +176,80 @@ static struct option	options[] =	/* option table			*/
 	"	[+n?numeric value]"
 	"	[+o?\a-char\a means \b--no\b\aname\a]"
 	"	[+s?string value]"
+	"	[+v?optional option argument]"
 	"	[+x?not expanded in \b$(-)\b]"
-	"}",
-"override",	OPT_override,	(char*)&state.override,		0,0,
-	"Implicit rules or metarules override explicit rules.", 0,
-"preprocess",	OPT_preprocess,	0,				0,0,
-	"(obsolete) Preprocess all makefiles.", 0,
-"questionable",	OPT_questionable,(char*)&state.questionable,	0,0,
+	"}" },
+{ "override",	OPT_override,	(char*)&state.override,		0,
+	"Implicit rules or metarules override explicit rules." },
+{ "questionable",	OPT_questionable,(char*)&state.questionable,	0,
 	"Enable questionable features defined by \amask\a. Questionable"
 	" features are artifacts of previous implementations (\bnmake\b has"
 	" been around since 1984-11-01) that will eventually be dropped."
 	" The questionable \amask\a registry is in the \bmain.c\b \bnmake\b"
-	" source file.", "mask",
-"readonly",	OPT_readonly,	(char*)&state.readonly,		0,0,
-	"Current assignments and assertions will be marked \breadonly\b.", 0,
-"readstate",	OPT_readstate,	(char*)&state.readstate,	0,0,
+	" source file.", "mask" },
+{ "readonly",	OPT_readonly,	(char*)&state.readonly,		0,
+	"Current assignments and assertions will be marked \breadonly\b." },
+{ "readstate",	OPT_readstate,	(char*)&state.readstate,	0,
 	"Ignore state files lower than view level \alevel\a. \alevel=0\a"
 	" ignores state files on all view levels. The top view is level 0.",
-	"level:=0",
-"regress",	OPT_regress,	(char*)&state.regress,		0,0,
-	"Massage output for regression testing.", 0,
-"reread",	OPT_reread,	(char*)&state.reread,		0,0,
+	"level:=0" },
+{ "regress",	OPT_regress,	(char*)&state.regress,		0,
+	"Massage output for regression testing." },
+{ "reread",	OPT_reread,	(char*)&state.reread,		0,
 	"Ignore any previously generated \b.mo\b files and re-read all"
-	" input makefiles.", 0,
-"ruledump",	OPT_ruledump,	(char*)&state.ruledump,		0,0,
+	" input makefiles." },
+{ "ruledump",	OPT_ruledump,	(char*)&state.ruledump,		0,
 	"Dump rule information in tabular form on the standard"
-	" error when \bnmake\b exits.", 0,
-"scan",		OPT_scan,	(char*)&state.scan,		0,0,
-	"Scan for and/or check implicit file prerequisites. On by default.", 0,
-"silent",	OPT_silent,	(char*)&state.silent,		0,0,
-	"Do not trace shell actions as they are executed.", 0,
-"strictview",	OPT_strictview,	(char*)&state.strictview,	0,0,
+	" error when \bnmake\b exits." },
+{ "scan",		OPT_scan,	(char*)&state.scan,	0,
+	"Scan for and/or check implicit file prerequisites. On by default." },
+{ "serialize",	OPT_serialize,	(char*)&state.serialize,	0,
+	"Serialize concurrent output by caching job stdout and stderr"
+	" output until job completion." },
+{ "silent",	OPT_silent,	(char*)&state.silent,		0,
+	"Do not trace shell actions as they are executed." },
+{ "strictview",	OPT_strictview,	(char*)&state.strictview,	0,
 	"Set \bVPATH\b \b.SOURCE\b rule interpretation to follow strict"
 	" \a3d\a filesystem semantics, where directories in the top views"
 	" take precedence. On by default when running in \a2d\a with"
-	" \bVPATH\b defined, off by default otherwise.", 0,
-"targetcontext",OPT_targetcontext,(char*)&state.targetcontext,	0,0,
+	" \bVPATH\b defined, off by default otherwise." },
+{ "targetcontext",OPT_targetcontext,(char*)&state.targetcontext,	0,
 	"Expand and execute shell actions in the target directory context."
 	" This allows a single makefile to control a directory tree while"
 	" generating target files at the source file directory level. By"
-	" default target files are generated in the current directory.", 0,
-"test",		OPT_test,	(char*)&state.test,		0,0,
+	" default target files are generated in the current directory." },
+{ "targetprefix",	OPT_targetprefix,(char*)&state.targetprefix,	0,
+	"Allow metarules to match \aseparator\a in the target to \b/\b"
+	" in the source. Used to disambiguate source file base name clashes"
+	" when target files are generated in the current directory."
+	" \aseparator\a must not contain metarule or shell pattern characters.",
+	"separator" },
+{ "test",		OPT_test,	(char*)&state.test,	0,
 	"Enable test code defined by \amask\a. Test code is implementation"
 	" specific. The test \amask\a registry is in the \bmain.c\b \bnmake\b"
-	" source file.", "mask",
-"tolerance",	OPT_tolerance,	(char*)&state.tolerance,	0,0,
+	" source file.", "mask" },
+{ "tolerance",	OPT_tolerance,	(char*)&state.tolerance,	0,
 	"Set the time comparison tolerance to \aseconds\a. Times within"
 	" the tolerance range compare equal. Useful on systems that can't"
 	" quite get the file system and local clocks in sync. A tolerance"
-	" of more that 5 seconds soon becomes intolerable.", "seconds",
-"touch",	OPT_touch,	(char*)&state.touch,		0,0,
+	" of more that 5 seconds soon becomes intolerable.", "seconds" },
+{ "touch",	OPT_touch,	(char*)&state.touch,		0,
 	"Touch the time stamps of out of date targets rather than execute"
-	" the shell action.", 0,
-"undef",	OPT_undef,	0,				0,0,
-	"(obsolete) Pass macro deletion to the makefile preprocessor.",
-	"name",
-"vardump",	OPT_vardump,	(char*)&state.vardump,		0,0,
+	" the shell action." },
+{ "vardump",	OPT_vardump,	(char*)&state.vardump,		0,
 	"Dump variable information in tabular form on the standard"
-	" error when \bnmake\b exits.", 0,
-"warn",		OPT_warn,	(char*)&state.warn,		0,0,
-	"Enable verbose warning messages. Currently ignored.", 0,
-"writeobject",	OPT_writeobject,(char*)&state.writeobject,	0,0,
+	" error when \bnmake\b exits." },
+{ "warn",		OPT_warn,	(char*)&state.warn,	0,
+	"Enable verbose warning messages." },
+{ "writeobject",	OPT_writeobject,(char*)&state.writeobject,	0,
 	"Generate a \b.mo\b make object file in \afile\a that can be read"
 	" instead of the input makefiles on the next \bnmake\b invocation."
 	" On by default. \b--nowriteobject\b prevents the generation."
 	" The default name is used if \afile\a is omitted or \b-\b."
 	" If \afile\a is a directory then the default is placed in that"
 	" directory.",
-	"file:=$(MAKEFILE::B::S=.mo)",
-"writestate",	OPT_writestate,	(char*)&state.writestate,	0,0,
+	"file:=$(MAKEFILE::B::S=.mo)" },
+{ "writestate",	OPT_writestate,	(char*)&state.writestate,	0,
 	"Generate a \b.ms\b make state file in \afile\a when \bnmake\b exits."
 	"The state contains the time stamps of all prerequisites and targets"
 	" that have been accessed since the state file was first generated."
@@ -255,7 +257,18 @@ static struct option	options[] =	/* option table			*/
 	" The default name is used if \afile\a is omitted or \b-\b."
 	" If \afile\a is a directory then the default is placed in that"
 	" directory.",
-	"file:=$(MAKEFILE::B::S=.ms)",
+	"file:=$(MAKEFILE::B::S=.ms)" },
+
+{ "byname",	OPT_byname,	0,				0,
+	"(obsolete) Set options by name.", "name[=value]]" },
+{ "define",	OPT_define,	0,				0,
+	"(obsolete) Pass macro definition to the makefile preprocessor.",
+	"name[=value]]" },
+{ "preprocess",	OPT_preprocess,	0,				0,
+	"(obsolete) Preprocess all makefiles." },
+{ "undef",	OPT_undef,	0,				0,
+	"(obsolete) Pass macro deletion to the makefile preprocessor.",
+	"name" },
 
 };
 
@@ -263,6 +276,23 @@ static const char usage2[] =
 "\n"
 "[ script ... ] [ target ... ]\n"
 "\n"
+"[+DIAGNOSTICS?Diagnostic messages are printed on the standard error and are"
+"	classified by levels. The level determines if the diagnostic"
+"	is printed, if it causes \bnmake\b to exit, and if it affects"
+"	the \bnmake\b exit status. The levels are:]{"
+"		[+<0?Debug message, enabled when the absolute value of"
+"			\alevel\a is less than or equal to the \b--debug\b"
+"			level. Debug diagnostics are prefixed by"
+"			\bdebug\b\alevel\a\b:\b.]"
+"		[+1?Warning message, disabled by \b--silent\b. Warning"
+"			diagnostics are prefixed by \bwarning\a\b:\b]"
+"		[+2?Non-fatal error message. Processing continues after"
+"			the diagnostic, but the eventual \bnmake\b exit"
+"			status will be non-zero.]"
+"		[+>2?Fatal error message. \bnmake\b exits after the"
+"			diagnostic (and internal cleanup) with exit"
+"			status \alevel\a-2.]"
+"}"
 "[+SEE ALSO?\b3d\b(1), \bar\b(1), \bcc\b(1), \bcoshell\b(1), \bcpp\b(1),"
 "	\bprobe\b(1), \bsh\b(1)]"
 ;
@@ -273,16 +303,47 @@ struct oplist				/* linked option list		*/
 	struct oplist*	next;		/* next in list			*/
 };
 
-static struct oplist*	hidden;		/* options hidden by cmd line	*/
-static struct oplist*	lasthidden;	/* tail of hidden		*/
-static struct oplist*	delayed;	/* delayed unknown options	*/
-static struct oplist*	lastdelayed;	/* tail of delayed		*/
+struct optstate				/* option state			*/
+{
+	struct oplist*	hidden;		/* options hidden by cmd line	*/
+	struct oplist*	lasthidden;	/* tail of hidden		*/
+	struct oplist*	delayed;	/* delayed unknown options	*/
+	struct oplist*	lastdelayed;	/* tail of delayed		*/
 
-static Hash_table_t*	opttab;
+	struct option*	head;		/* head of external option list	*/
+	struct option*	tail;		/* tail of external option list	*/
 
-static Sfio_t*		usage;		/* generated optget() usage	*/
-static int		lastusage;	/* next usage option offset	*/
-static int		nextusage;	/* next usage index		*/
+	Hash_table_t*	table;
+
+	Sfio_t*		usage;		/* generated optget() usage	*/
+	int		usageindex;	/* next user index		*/
+};
+
+static struct optstate	opt;
+
+static void
+putoption(register struct option* op, int index)
+{
+	register char*	s;
+	register int	c;
+	char		buf[16];
+
+	hashput(opt.table, op->name, (char*)op);
+	if (strchr(op->name, '-'))
+	{
+		s = op->name;
+		while (c = *s++)
+			if (c != '-')
+				sfputc(internal.tmp, c);
+		hashput(opt.table, strdup(sfstruse(internal.tmp)), (char*)op);
+	}
+	buf[0] = '-';
+	buf[1] = OPT(op->flags);
+	buf[2] = 0;
+	hashput(opt.table, strdup(buf), (char*)op);
+	sfsprintf(buf, sizeof(buf), "-%d", index);
+	hashput(opt.table, strdup(buf), (char*)op);
+}
 
 /*
  * initialize the option hash table
@@ -293,18 +354,23 @@ optinit(void)
 {
 	register int	i;
 
-	opttab = hashalloc(NiL, HASH_name, "options", 0);
+	opt.table = hashalloc(NiL, HASH_name, "options", 0);
 	for (i = 0; i < elementsof(options); i++)
 	{
-		switch (options[i].flag)
+		options[i].flags |= Om;
+		switch (OPT(options[i].flags))
 		{
-		case OPT_debug:
+		case OPT(OPT_debug):
 			options[i].value = (char*)&error_info.trace;
 			break;
 		}
-		putoption(options[i].name, &options[i]);
+		putoption(&options[i], i);
+		if (opt.tail)
+			opt.tail->next = &options[i];
+		else
+			opt.head = &options[i];
+		opt.tail = &options[i];
 	}
-	hashset(opttab, HASH_ALLOCATE);
 }
 
 /*
@@ -313,36 +379,17 @@ optinit(void)
  */
 
 struct option*
-opentry(register int flag, int type)
+optflag(register int flag)
 {
 	register struct option*	op;
-	Hash_position_t*	pos;
 	char			buf[3];
 
-	if ((flag = OPT(flag)) != '?' && (pos = hashscan(opttab, 0)))
-	{
-		while (hashnext(pos))
-		{
-			op = (struct option*)pos->bucket->value;
-			if (OPT(op->flag) == flag)
-			{
-				hashdone(pos);
-				return op;
-			}
-		}
-		hashdone(pos);
-	}
-	for (op = &options[0]; op < &options[elementsof(options)]; op++)
-		if (OPT(op->flag) == flag)
-			return op;
-	if (type == '=')
-		return 0;
 	buf[0] = '-';
-	buf[1] = flag;
+	buf[1] = OPT(flag);
 	buf[2] = 0;
-	if (!type || !state.readonly)
-		error(type ? 1 : ERROR_PANIC, "%s: unknown option flag", buf);
-	return getoption(buf);
+	if (!(op = getoption(buf)) && (flag & ~((1<<8)-1)))
+		error(ERROR_PANIC, "%s: unknown option flag", buf);
+	return op;
 }
 
 /*
@@ -363,7 +410,7 @@ setcall(register struct option* op, int readonly)
 		op->set = 0;
 		oreadonly = state.readonly;
 		state.readonly = readonly;
-		switch (op->flag & (Ob|On|Os))
+		switch (op->flags & (Ob|On|Os))
 		{
 		case Ob:
 			call(r, *((unsigned char*)op->value) ? "1" : null);
@@ -382,42 +429,56 @@ setcall(register struct option* op, int readonly)
 }
 
 /*
+ * copy a declare() string entry s to sp
+ */
+
+static void
+declarestr(register Sfio_t* sp, register const char* s)
+{
+	register int	c;
+
+	if (s && *s)
+		while (c = *s++)
+		{
+			if (c == OPT_SEP)
+				sfputc(sp, c);
+			sfputc(sp, c);
+		}
+	else
+		sfputc(sp, OPT_NON);
+	sfputc(sp, OPT_SEP);
+}
+
+/*
  * generate external option declaration
  */
 
 static void
-declare(register Sfio_t* sp, register struct option* op)
+declare(Sfio_t* sp, register struct option* op)
 {
-	sfputr(sp, opentry(OPT_option, 0)->name, '=');
-	if (OPT(op->flag) != '?')
-		sfputc(sp, OPT(op->flag));
-	sfputc(sp, '+');
-	sfputr(sp, op->name, -1);
-	sfputc(sp, '+');
-	if (op->flag & Oa)
-		sfputc(sp, 'a');
-	if (op->flag & Ob)
-		sfputc(sp, 'b');
-	if (op->flag & On)
-		sfputc(sp, 'n');
-	if (op->flag & Oo)
-		sfputc(sp, 'o');
-	if (op->flag & Os)
-		sfputc(sp, 's');
-	if (op->flag & Ov)
-		sfputc(sp, 'v');
-	if (op->flag & Ox)
-		sfputc(sp, 'x');
-	if (op->set)
-	{
-		sfputc(sp, '+');
-		sfputr(sp, op->set, -1);
-	}
-	if (op->description)
-	{
-		sfputc(sp, '+');
-		shquote(sp, op->description);
-	}
+	if (!(op->flags & Of))
+		sfputc(internal.tmp, OPT(op->flags));
+	sfputc(internal.tmp, OPT_SEP);
+	declarestr(internal.tmp, op->name);
+	if (op->flags & Oa)
+		sfputc(internal.tmp, 'a');
+	if (op->flags & Ob)
+		sfputc(internal.tmp, 'b');
+	if (op->flags & On)
+		sfputc(internal.tmp, 'n');
+	if (op->flags & Oo)
+		sfputc(internal.tmp, 'o');
+	if (op->flags & Os)
+		sfputc(internal.tmp, 's');
+	if (op->flags & Ov)
+		sfputc(internal.tmp, 'v');
+	if (op->flags & Ox)
+		sfputc(internal.tmp, 'x');
+	sfputc(internal.tmp, OPT_SEP);
+	declarestr(internal.tmp, op->set);
+	declarestr(internal.tmp, op->description);
+	declarestr(internal.tmp, op->arg);
+	shquote(sp, fmtesc(sfstruse(internal.tmp)));
 }
 
 /*
@@ -427,37 +488,41 @@ declare(register Sfio_t* sp, register struct option* op)
 static void
 genusage(register struct option* op, int index, int last)
 {
+	long	pos;
+
 	if (op)
 	{
-		if (last)
-			sfstrset(usage, lastusage);
-		sfputc(usage, '[');
-		if (!(op->flag & Of))
+		sfputc(opt.usage, '[');
+		if (!(op->flags & Of))
 		{
-			sfputc(usage, OPT(op->flag));
-			if (op->flag & Oo)
-				sfputc(usage, '!');
-			sfputc(usage, '=');
+			sfputc(opt.usage, OPT(op->flags));
+			if (op->flags & Oo)
+				sfputc(opt.usage, '!');
+			sfputc(opt.usage, '=');
 		}
-		sfprintf(usage, "%d:%s?%s", index + OPT_OFFSET, op->name, op->description);
+		sfprintf(opt.usage, "%d:%s?%s]", index + OPT_OFFSET, op->name, op->description);
 		if (op->arg)
 		{
-			if (*op->arg == '{')
-				sfputr(usage, op->arg, '\n');
+			if (op->flags & On)
+				sfputc(opt.usage, '#');
 			else
-				sfprintf(usage, "]%s%s[%s]\n", (op->flag & On) ? "#" : ":", (op->flag & Ov) ? "?" : "", op->arg);
+				sfputc(opt.usage, ':');
+			if (op->flags & Ov)
+				sfputc(opt.usage, '?');
+			if (*op->arg != '[')
+				sfputc(opt.usage, '[');
+			sfputr(opt.usage, op->arg, -1);
+			if (*op->arg != '[')
+				sfputc(opt.usage, ']');
 		}
-		else
-			sfputr(usage, "]", '\n');
+		sfputc(opt.usage, '\n');
 	}
+	pos = sfstrtell(opt.usage);
 	if (last)
-	{
-		nextusage = index + (op != 0);
-		lastusage = sfstrtell(usage);
-		sfprintf(usage, usage2, version);
-		sfputc(usage, 0);
-		sfstrrel(usage, -1);
-	}
+		sfprintf(opt.usage, usage2, version);
+	else
+		sfputc(opt.usage, 0);
+	sfstrset(opt.usage, pos);
 }
 
 /*
@@ -518,76 +583,182 @@ regressinit(void)
 }
 
 /*
+ * return option name and details
+ */
+
+static char*
+showop(register struct option* op)
+{
+	sfprintf(internal.tmp, "%s,", op->name);
+	sfprintf(internal.tmp, (op->flags & Of) ? "%03o," : "'%c',", op->flags & ((1<<8) - 1));
+	if (op->flags & Oa)
+		sfprintf(internal.tmp, "|a");
+	if (op->flags & Ob)
+		sfprintf(internal.tmp, "|b");
+	if (op->flags & Of)
+		sfprintf(internal.tmp, "|f");
+	if (op->flags & Oi)
+		sfprintf(internal.tmp, "|i");
+	if (op->flags & On)
+		sfprintf(internal.tmp, "|n");
+	if (op->flags & Oo)
+		sfprintf(internal.tmp, "|o");
+	if (op->flags & Os)
+		sfprintf(internal.tmp, "|s");
+	if (op->flags & Ov)
+		sfprintf(internal.tmp, "|v");
+	if (op->flags & Ox)
+		sfprintf(internal.tmp, "|x");
+	if (op->flags & OPT_COMPILE)
+		sfprintf(internal.tmp, "|COMPILE");
+	if (op->flags & OPT_DECLARE)
+		sfprintf(internal.tmp, "|DECLARE");
+	if (op->flags & OPT_DEFAULT)
+		sfprintf(internal.tmp, "|DEFAULT");
+	if (op->flags & OPT_EXTERNAL)
+		sfprintf(internal.tmp, "|EXTERNAL");
+	if (op->flags & OPT_READONLY)
+		sfprintf(internal.tmp, "|READONLY");
+	if (op->flags & OPT_SET)
+		sfprintf(internal.tmp, "|SET");
+	sfputc(internal.tmp, '|');
+	return sfstruse(internal.tmp);
+}
+
+/*
+ * return next option definition field
+ */
+
+static char*
+field(char** p, int sep, int app, int lenient)
+{
+	register char*	s;
+	register char*	t;
+	char*		v;
+	register int	c;
+
+	if (!(c = *(s = *p)) || c == app)
+		return 0;
+	if (c == sep)
+	{
+		*p = s + 1;
+		return 0;
+	}
+	v = t = s;
+	for (;;)
+	{
+		if (!(c = *t++ = *s++))
+		{
+			s--;
+			t--;
+			break;
+		}
+		else if (c == sep)
+		{
+			if (lenient || !*s)
+			{
+				t--;
+				s--;
+				break;
+			}
+			if (*s == OPT_NON && (!*(s + 1) || *(s + 1) == sep))
+			{
+				t--;
+				s++;
+				break;
+			}
+			if (*s != c)
+			{
+				t--;
+				s--;
+				break;
+			}
+			s++;
+		}
+	}
+	if (*s)
+		s++;
+	*p = s;
+	if (*t)
+		*t = 0;
+	if (!*v || lenient && *v == OPT_NON && !*(v + 1))
+		return 0;
+	return v;
+}
+
+/*
  * set an option given its pointer
  */
 
 static void
-setop(register struct option* op, register int n, char* s)
+setop(register struct option* op, register int n, char* s, int type)
 {
 	char*		t;
 	struct rule*	r;
 	int		readonly;
 
 	readonly = state.readonly;
-	if (OPT(op->flag) != OPT(OPT_option))
+	if (OPT(op->flags) != OPT(OPT_option))
 	{
+		if (type == ':' && (op->flags & OPT_SET))
+			return;
 		if (readonly)
-			op->status |= OPT_READONLY;
-		else if (!state.user && (op->status & OPT_READONLY))
+			op->flags |= OPT_READONLY;
+		else if (!state.user && (op->flags & OPT_READONLY))
 		{
 			struct oplist*	x;
 
 			/*
-			 * save for listops(*,0)
-			 *
-			 * NOTE: some of these may cancel during load()
+			 * save for listops(*,'O')
 			 */
 
-			if ((op->status & (OPT_EXTERNAL|OPT_HIDDEN)) == OPT_EXTERNAL)
-			{
-				op->status |= OPT_HIDDEN;
-				declare(internal.tmp, op);
-				sfputc(internal.tmp, ' ');
-			}
-			sfprintf(internal.tmp, "%s%s", n ? null : "no", op->name);
+			sfprintf(internal.tmp, "%s", op->name);
+			if (type == ':' && !(op->flags & OPT_SET))
+				sfputc(internal.tmp, ':');
 			if (s)
 				sfprintf(internal.tmp, "=%s", s);
-			else if (n != 0 && n != 1)
-				sfprintf(internal.tmp, "=%d", n);
-			x = newof(0, struct oplist, 1, 0);
-			x->option = strdup(sfstruse(internal.tmp));
-			if (lasthidden)
-				lasthidden = lasthidden->next = x;
 			else
-				hidden = lasthidden = x;
+				sfprintf(internal.tmp, "=%d", n);
+			n = sfstrtell(internal.tmp);
+			s = sfstruse(internal.tmp);
+			x = newof(0, struct oplist, 1, n);
+			x->option = strcpy((char*)(x + 1), s);
+			if (opt.lasthidden)
+				opt.lasthidden = opt.lasthidden->next = x;
+			else
+				opt.hidden = opt.lasthidden = x;
 			return;
 		}
 	}
-	if (!(op->status & OPT_READONLY))
+	if (type != ':')
 	{
-		if (!state.init)
-			op->status |= OPT_COMPILE;
-		if (state.global)
-			op->status |= OPT_GLOBAL;
-		else
-			op->status &= ~OPT_GLOBAL;
+		op->flags |= OPT_SET;
+		op->flags &= ~OPT_DEFAULT;
 	}
-	op->status |= OPT_DEFINED;
-	message((-3, "option(%s,'%c',%d,\"%s\")", op->name, op->flag & ((1<<8) - 1), n,  s ? s : null));
-	if (op->flag & Oi)
+	else if (!(op->flags & OPT_SET))
 	{
-		if (op->flag & On)
+		op->flags |= OPT_DEFAULT;
+		if (!state.loading)
+			op->flags |= OPT_COMPILE;
+	}
+	if (state.reading)
+		op->flags |= OPT_COMPILE;
+	if (error_info.trace <= -3)
+		error(-3, "option(%s,%d,\"%s\")", showop(op), n,  s ? s : null);
+	if (op->flags & Oi)
+	{
+		if (op->flags & On)
 			n = -n;
 		else
 			n = !n;
 	}
-	else if (op->flag & Ob)
+	else if (op->flags & Ob)
 		n = n != 0;
-	else if ((op->flag & (Os|Ov)) == Os && n && !s)
-		error(3, "-%c: option argument expected", OPT(op->flag));
+	else if ((op->flags & (Os|Ov)) == Os && n && !s)
+		error(3, "-%c: option argument expected", OPT(op->flags));
 	if (!n)
 		s = 0;
-	switch (OPT(op->flag))
+	switch (OPT(op->flags))
 	{
 	case OPT(OPT_believe):
 		if (state.compile < COMPILED)
@@ -597,7 +768,7 @@ setop(register struct option* op, register int n, char* s)
 		return;
 	case OPT(OPT_byname):
 		if (s)
-			set(s);
+			set(s, 1, NiL);
 		return;
 	case OPT(OPT_corrupt):
 		if (!s)
@@ -616,14 +787,14 @@ setop(register struct option* op, register int n, char* s)
 		return;
 	case OPT(OPT_include):
 		addprereq(catrule(internal.source->name, external.source, NiL, 1), makerule(s), PREREQ_APPEND);
-		if (!(op->status & OPT_READONLY))
+		if (!(op->flags & OPT_READONLY))
 			break;
 		/*FALLTHROUGH*/
 	case OPT(OPT_define):
 	case OPT(OPT_undef):
 		if (s)
 		{
-			sfprintf(internal.tmp, "-%c%s", OPT(op->flag), s);
+			sfprintf(internal.tmp, "-%c%s", OPT(op->flags), s);
 			if (!(r = getrule(sfstruse(internal.tmp))))
 				r = makerule(NiL);
 			addprereq(internal.preprocess, r, PREREQ_APPEND);
@@ -649,15 +820,9 @@ setop(register struct option* op, register int n, char* s)
 		}
 		else
 		{
-			op->status &= ~OPT_DEFINED;
+			op->flags &= ~OPT_SET;
 			error_info.id = idname;
 		}
-		return;
-	case OPT(OPT_import):
-		if (n > 0)
-			state.import++;
-		else
-			state.import--;
 		return;
 	case OPT(OPT_jobs):
 		if (n >= MAXJOBS)
@@ -702,7 +867,7 @@ setop(register struct option* op, register int n, char* s)
 			s = sfstruse(tmp);
 			if (t = strchr(s, ':'))
 				*t++ = 0;
-			if ((o = strchr(s, '+')) || (o = strchr(s, ',')))
+			if (o = strchr(s, ','))
 				*o++ = 0;
 			if (*s == *(state.mam.type = "dynamic") && (!*(s + 1) || !strcmp(s, state.mam.type)))
 				state.mam.dynamic = 1;
@@ -720,7 +885,7 @@ setop(register struct option* op, register int n, char* s)
 				error(3, "%s: invalid mam type: {dynamic,regress,static} expected", s);
 			while (s = o)
 			{
-				if ((o = strchr(s, '+')) || (o = strchr(s, ',')))
+				if (o = strchr(s, ','))
 					*o++ = 0;
 				if (*s == 'n' && *(s + 1) == 'o')
 				{
@@ -798,6 +963,184 @@ setop(register struct option* op, register int n, char* s)
 			sfstrclose(tmp);
 		}
 		return;
+	case OPT(OPT_option):
+		s = strdup(s);
+		while (*s)
+		{
+			char*		name;
+			char*		func;
+			char*		desc;
+			char*		args;
+			struct option*	nop;
+			int		app;
+			int		sep;
+			char		buf[16];
+
+			sep = *s;
+			if (isalpha(sep))
+			{
+				n = sep|Ob;
+				sep = *++s;
+			}
+			else
+			{
+				n = '?'|Of|Ob;
+				if (sep == OPT_NON)
+					sep = *++s;
+			}
+			app = (sep == ':') ? ';' : ':';
+			s++;
+			if (!(name = field(&s, sep, app, 1)))
+			{
+				if (n & Of)
+					error(2, "option flag and name omitted");
+				else
+					error(2, "-%c: option name omitted", OPT(n));
+				break;
+			}
+			if (t = field(&s, sep, app, 1))
+			{
+				for (;;)
+				{
+					switch (*t++)
+					{
+					case 0:
+						break;
+					case 'a':
+						n |= Oa;
+						continue;
+					case 'b':
+						n &= ~(On|Os);
+						n |= Ob;
+						continue;
+					case 'n':
+						n &= ~(Ob|Os);
+						n |= On;
+						continue;
+					case 'o':
+						n |= Oo;
+						continue;
+					case 's':
+						n &= ~(Ob|On);
+						n |= Os;
+						continue;
+					case 'v':
+						n |= Ov;
+						continue;
+					case 'x':
+						n |= Ox;
+						continue;
+					/* no complaints here for future extensions */
+					}
+					break;
+				}
+				if (n & Os)
+					n &= ~Oa;
+			}
+			func = field(&s, sep, app, 1);
+			desc = field(&s, sep, app, 0);
+			args = field(&s, sep, app, 0);
+			if (!(n & Of))
+			{
+				for (nop = &options[0]; nop < &options[elementsof(options)]; nop++)
+					if (OPT(nop->flags) == OPT(n))
+						break;
+				if (nop < &options[elementsof(options)])
+				{
+					error(2, "--%s: -%c conflicts with --%s", s, OPT(n), nop->name);
+					return;
+				}
+				buf[0] = '-';
+				buf[1] = OPT(n);
+				buf[2] = 0;
+				nop = getoption(buf);
+			}
+			else
+				nop = 0;
+			if (nop)
+			{
+				if (n & On)
+					*((int*)nop->value) = *((unsigned char*)nop->value);
+				else if (n & Os)
+					*((char**)nop->value) = 0;
+				nop->flags = n;
+			set_insert:
+				nop->name = name;
+				nop->set = func;
+				if (!desc)
+					desc = "option.";
+				if (*desc != '(')
+				{
+					sfputc(internal.tmp, '(');
+					if ((t = parsefile()) && *t)
+						edit(internal.tmp, t, DELETE, KEEP, DELETE);
+					else
+						sfputr(internal.tmp, state.base ? "rules" : state.global ?  "global" : "user", -1);
+					sfprintf(internal.tmp, ") %s", desc);
+					desc = strdup(sfstruse(internal.tmp));
+				}
+				nop->description = desc;
+				if (!args && (nop->flags & (On|Os)))
+					args = (nop->flags & On) ? "number" : "string";
+				if (args && (nop->flags & Ob))
+				{
+					nop->flags &= ~Ob;
+					nop->flags |= Os;
+				}
+				nop->arg = args;
+				putoption(nop, opt.usageindex);
+				genusage(nop, opt.usageindex++, 1);
+				if (nop->set && (nop->flags & OPT_SET))
+					readonly = 1;
+			}
+			else if (!(nop = getoption(name)))
+			{
+				nop = newof(0, struct option, 1, sizeof(char*));
+				nop->value = (char*)(nop + 1);
+				nop->flags = n|OPT_EXTERNAL;
+				if (!state.loading)
+					nop->flags |= OPT_DECLARE;
+				if (opt.tail)
+					opt.tail->next = nop;
+				else
+					opt.head = nop;
+				opt.tail = nop;
+				goto set_insert;
+			}
+			else if (!(nop->flags & OPT_EXTERNAL))
+				error(1, "--%s is an internal option", nop->name);
+			else
+			{
+				if (nop->flags & Of)
+				{
+					if ((n & (Ob|On|Os)) != (nop->flags & (Ob|On|Os)))
+					{
+						if (n & Os)
+							*((char**)nop->value) = 0;
+						else if ((n & On) && (nop->flags & Ob))
+							*((int*)nop->value) = *((unsigned char*)nop->value);
+						else if ((n & Ob) && (nop->flags & On))
+							*((unsigned char*)nop->value) = *((int*)nop->value) != 0;
+					}
+					nop->flags = n;
+				}
+				else if (OPT(nop->flags) != OPT(n))
+					error(1, "--%s: option flag -%c conflicts with -%c", nop->name, OPT(n), OPT(nop->flags));
+				if ((nop->flags & (Ob|On|Os)) != (n & (Ob|On|Os)))
+					error(1, "--%s: option is %s", nop->name, (nop->flags & Ob) ? "boolean" : (nop->flags & On) ? "numeric" : "string valued");
+			}
+
+			/*
+			 * skip the remaining fields for future extensions
+			 * and consume the append char if specified
+			 */
+
+			while (field(&s, sep, app, 0));
+			if (*s == app)
+				s++;
+		}
+		optcheck(0);
+		return;
 	case OPT(OPT_never):
 		if (state.never = n)
 			state.exec = 0;
@@ -819,6 +1162,33 @@ setop(register struct option* op, register int n, char* s)
 		else
 			if (error_info.trace > 0)
 				error_info.trace = 0;
+		return;
+	case OPT(OPT_targetprefix):
+		if (!n)
+			s = 0;
+		else if (s)
+			s = strdup(s);
+		if (state.targetprefix = s)
+			for (;;)
+			{
+				switch (*s++)
+				{
+				case 0:
+					break;
+				case '%':
+				case '*':
+				case '?':
+				case '&':
+				case '"':
+				case '\'':
+				case '\\':
+					error(3, "--%s: %s: value must not contain metarule or shell pattern characters", op->name, state.targetprefix);
+					break;
+				default:
+					continue;
+				}
+				break;
+			}
 		return;
 	case OPT(OPT_tolerance):
 		if ((state.tolerance = n) > 60)
@@ -855,18 +1225,45 @@ setop(register struct option* op, register int n, char* s)
 	}
 	if (op->value)
 	{
-		if (op->flag & Ob)
-			*((unsigned char*)op->value) = n;
-		else if (op->flag & On)
+		if (op->flags & Ob)
 		{
-			if (n && (op->flag & Oa))
-				*((int*)op->value) |= n;
-			else
-				*((int*)op->value) = n;
+			switch (type)
+			{
+			case '^':
+				*((unsigned char*)op->value) ^= n;
+				break;
+			default:
+				*((unsigned char*)op->value) = n != 0;
+				break;
+			}
 		}
-		else if (op->flag & Os)
+		else if (op->flags & On)
 		{
-			if (op->flag & Oa)
+			switch (type)
+			{
+			case '+':
+				*((int*)op->value) += n;
+				break;
+			case '-':
+				*((int*)op->value) -= n;
+				break;
+			case '|':
+				*((int*)op->value) |= n;
+				break;
+			case '&':
+				*((int*)op->value) &= n;
+				break;
+			case '^':
+				*((int*)op->value) ^= n;
+				break;
+			default:
+				*((int*)op->value) = n;
+				break;
+			}
+		}
+		else if (op->flags & Os)
+		{
+			if (op->flags & Oa)
 			{
 				if (s)
 				{
@@ -879,141 +1276,6 @@ setop(register struct option* op, register int n, char* s)
 						if (t = strchr(s, ':'))
 							*t = 0;
 						addprereq((*(struct rule**)op->value), makerule(s), PREREQ_APPEND);
-						if (OPT(op->flag) == OPT(OPT_option))
-						{
-							/*UNDENT*/
-	n = ((*s == '+' || *s == ',') ? ('?'|Of) : *s++) | Ob;
-	if (*s != '+' && *s != ',')
-		error(2, "%c: option name omitted", OPT(n));
-	else
-	{
-		char*		u;
-		char*		v;
-		char*		d;
-		struct option*	nop;
-		char		buf[16];
-
-		d = 0;
-		if ((u = strchr(++s, '+')) || (u = strchr(s, ',')))
-		{
-			*(v = u) = 0;
-			for (;;)
-			{
-				switch (*++v)
-				{
-				case '+':
-				case ',':
-					if (!*++v)
-						v = 0;
-					/*FALLTHROUGH*/
-				case 0:
-					break;
-				case 'a':
-					n |= Oa;
-					continue;
-				case 'b':
-					n &= ~(On|Os);
-					n |= Ob;
-					continue;
-				case 'n':
-					n &= ~(Ob|Os);
-					n |= On;
-					continue;
-				case 'o':
-					n |= Oo;
-					continue;
-				case 's':
-					n &= ~(Ob|On);
-					n |= Os;
-					continue;
-				case 'v':
-					n |= Ov;
-					continue;
-				case 'x':
-					n |= Ox;
-					continue;
-				default:
-					error(1, "`%c': unknown option type flag", *v);
-					continue;
-				}
-				break;
-			}
-			if (n & Os)
-				n &= ~Oa;
-			if (d = strchr(v, '+'))
-				*d++ = 0;
-		}
-		else
-			v = 0;
-		for (nop = &options[0]; nop < &options[elementsof(options)]; nop++)
-			if (OPT(nop->flag) == OPT(n))
-				break;
-		if (nop < &options[elementsof(options)])
-			error(2, "%s: -%c conflicts with -%c %s", s, OPT(n), OPT(OPT_byname), nop->name);
-		else
-		{
-			buf[0] = '-';
-			buf[1] = OPT(n);
-			buf[2] = 0;
-			if (nop = getoption(buf))
-			{
-				if (n & On)
-					*((int*)nop->value) = *((unsigned char*)nop->value);
-				else if (n & Os)
-					*((char**)nop->value) = 0;
-				nop->flag = n;
-				nop->status |= OPT_DECLARED;
-			set_insert:
-				if (v)
-					nop->set = strdup(v);
-				nop->name = strdup(s);
-				putoption(nop->name, nop);
-				if (d && !nop->description)
-					nop->description = strdup(d);
-				sfsprintf(buf, sizeof(buf), "-%d", nextusage);
-				putoption(strdup(buf), nop);
-				genusage(nop, nextusage, 1);
-				if (nop->set && (nop->status & OPT_DEFINED))
-					readonly = 1;
-			}
-			else if (!(nop = getoption(s)))
-			{
-				nop = newof(0, struct option, 1, sizeof(char*));
-				nop->value = (char*)(nop + 1);
-				nop->flag = n;
-				nop->status = OPT_EXTERNAL|OPT_DECLARED;
-				goto set_insert;
-			}
-			else if (!(nop->status & OPT_EXTERNAL))
-				error(1, "%s is an internal option", nop->name);
-			else
-			{
-				if (OPT(nop->flag) == '?')
-				{
-					if ((n & (Ob|On|Os)) != (nop->flag & (Ob|On|Os)))
-					{
-						if (n & Os)
-							*((char**)nop->value) = 0;
-						else if ((n & On) && (nop->flag & Ob))
-							*((int*)nop->value) = *((unsigned char*)nop->value);
-						else if ((n & Ob) && (nop->flag & On))
-							*((unsigned char*)nop->value) = *((int*)nop->value) != 0;
-					}
-					nop->flag = n;
-				}
-				else if (OPT(nop->flag) != OPT(n))
-					error(1, "%s: option flag -%c conflicts with -%c", nop->name, OPT(n), OPT(nop->flag));
-				if (!(nop->status & OPT_DECLARED))
-					nop->status |= OPT_DECLARED;
-				else if ((nop->flag & (Ob|On|Os)) != (n & (Ob|On|Os)))
-					error(1, "%s: option is %s", nop->name, (nop->flag & Ob) ? "boolean" : (nop->flag & On) ? "numeric" : "string valued");
-			}
-		}
-		if (u)
-			*u = '-';
-	}
-							/*INDENT*/
-						}
 						if (!t)
 							break;
 						*t++ = ':';
@@ -1036,58 +1298,167 @@ setop(register struct option* op, register int n, char* s)
 
 /*
  * generate a single option setting in sp given the option pointer
- * setting!=0 generates the option name and value suitable for set()
- * setting==0 only the value is generated (s unchanged if option not set)
+ * setting:
+ *	 0  only the value is generated, "" if option not set
+ *	'-' option name and value suitable for set()
+ *	'?' 1 if OPT_SET, "" otherwise
+ *	'#' table attributes with the current value
  * flag!=0 if relative to option flag rather than option name
  */
 
 static void
 genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 {
-	register int		n;
+	register long		n;
 	char*			v;
 	struct list*		p;
 
-	switch (op->flag & (Ob|On|Os))
+	switch (setting)
+	{
+	case '?':
+		if (op->flags & OPT_SET)
+			sfprintf(sp, "1");
+		return;
+	case '#':
+		sfprintf(sp, "%s=", showop(op));
+		break;
+	}
+	switch (op->flags & (Ob|On|Os))
 	{
 	case Ob:
-		if (op->value) n = *((unsigned char*)op->value);
-		else n = 0;
-		if (op->flag & Oi) n = !n;
-		if (flag && (op->flag & Oo)) n = !n;
-		if (setting) sfprintf(sp, "--%s%s", n ? null : "no", op->name);
-		else if (n) sfputc(sp, '1');
+		if (op->value)
+			n = *((unsigned char*)op->value);
+		else
+			n = 0;
+		if (op->flags & Oi)
+			n = !n;
+		if (flag && (op->flags & Oo))
+			n = !n;
+		switch (setting)
+		{
+		case 0:
+			if (!n)
+				return;
+			/*FALLTHROUGH*/
+		case '#':
+			break;
+		default:
+			if (op->flags & OPT_DEFAULT)
+				sfprintf(sp, "--%s:=", op->name);
+			else if (n)
+			{
+				sfprintf(sp, "--%s", op->name);
+				return;
+			}
+			else
+			{
+				sfprintf(sp, "--no%s", op->name);
+				return;
+			}
+			break;
+		}
+		sfputc(sp, n ? '1' : '0');
 		break;
 	case On:
-		if (op->value) n = *((int*)op->value);
-		else n = 0;
-		if (op->flag & Oi) n = -n;
-		if (setting) sfprintf(sp, "--%s%s", n ? null : "no", op->name);
-		if (n) sfprintf(sp, (op->flag & Oa) ? "%s0x%08x" : "%s%d", setting ? "=" : null, n);
+		if (op->value)
+			n = *((int*)op->value);
+		else
+			n = 0;
+		if (op->flags & Oi)
+			n = -n;
+		switch (setting)
+		{
+		case 0:
+			if (!n)
+				return;
+			/*FALLTHROUGH*/
+		case '#':
+			break;
+		default:
+			if (op->flags & OPT_DEFAULT)
+				sfprintf(sp, "--%s:=", op->name);
+			else if (n)
+				sfprintf(sp, "--%s=", op->name);
+			else
+			{
+				sfprintf(sp, "--no%s", op->name);
+				return;
+			}
+			break;
+		}
+		sfprintf(sp, (op->flags & Oa) ? "0x%08lx" : "%ld", n);
 		break;
 	case Os:
-		if ((op->flag & Oa) && op->value)
+		if ((op->flags & Oa) && op->value)
 		{
 			p = (*(struct rule**)op->value)->prereqs;
-			if (setting) sfprintf(sp, "--%s%s%s", p ? null : "no", op->name, p ? "=" : null);
-			if (p) for (;;)
+			switch (setting)
 			{
-				sfputr(sp, p->rule->name, -1);
-				if (!(p = p->next)) break;
-				sfputc(sp, ':');
+			case 0:
+				if (!p)
+					return;
+				/*FALLTHROUGH*/
+			case '#':
+				break;
+			default:
+				if (op->flags & OPT_DEFAULT)
+					sfprintf(sp, "--%s:=", op->name);
+				else if (p)
+					sfprintf(sp, "--%s=", op->name);
+				else
+				{
+					sfprintf(sp, "--no%s", op->name);
+					return;
+				}
+				break;
 			}
+			if (p)
+				for (;;)
+				{
+					shquote(sp, fmtesc(p->rule->name));
+					if (!(p = p->next))
+						break;
+					sfputc(sp, ':');
+				}
 		}
 		else
 		{
-			if (op->value) v = *((char**)op->value);
-			else v = 0;
-			if (setting) sfprintf(sp, "--%s%s", v ? null : "no", op->name);
-			if (v) sfprintf(sp, "%s%s", setting ? "=" : null, v);
+			if (op->value)
+				v = *((char**)op->value);
+			else
+				v = 0;
+			switch (setting)
+			{
+			case 0:
+			case '#':
+				if (!v)
+					return;
+				setting = 0;
+				break;
+			default:
+				if (op->flags & OPT_DEFAULT)
+					sfprintf(sp, "--%s:=", op->name);
+				else if (v)
+					sfprintf(sp, "--%s=", op->name);
+				else
+				{
+					sfprintf(sp, "--no%s", op->name);
+					return;
+				}
+				break;
+			}
+			if (v)
+			{
+				if (setting)
+					shquote(sp, fmtesc(v));
+				else
+					sfputr(sp, v, -1);
+			}
 		}
 		break;
 #if DEBUG
 	default:
-		error(PANIC, "%s: option has%s%s%s", op->name, (op->flag & Ob) ? " Ob" : null, (op->flag & On) ? " On" : null, (op->flag & Os) ? " Os" : null);
+		error(PANIC, "%s: option has%s%s%s", op->name, (op->flags & Ob) ? " Ob" : null, (op->flags & On) ? " On" : null, (op->flags & Os) ? " Os" : null);
 		break;
 #endif
 	}
@@ -1095,107 +1466,132 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 
 /*
  * check and set delayed options
- * this gives global and local makefiles a chance
+ * this gives base, global and local makefiles a chance to
+ * define the options via --option=definition
  */
 
 void
-optcheck(void)
+optcheck(int must)
 {
 	struct oplist*	x;
-	int		errors = error_info.errors;
+	int		errors;
 
-	while (x = delayed)
+	if (must)
 	{
-		delayed = x->next;
-		set(x->option);
-		free(x);
+		errors = error_info.errors;
+		while (x = opt.delayed)
+		{
+			opt.delayed = x->next;
+			if (*x->option)
+				set(x->option, 1, NiL);
+			free(x);
+		}
+		if (error_info.errors != errors)
+			finish(2);
 	}
-	if (error_info.errors != errors)
-		finish(1);
+	else
+		for (x = opt.delayed; x; x = x->next)
+			if (!set(x->option, 0, NiL))
+				*x->option = 0;
 }
 
 /*
  * generate option setting list in sp suitable for set()
- * object<0 generates all options, suitable for debugging
- * object=0 generates all non-Ox OPT_DEFINED options
- * object>0 generates only non-Ox OPT_COMPILE[OPT_GLOBAL] options
- *	    suitable for saving in make object files
+ * setting:
+ *       0  non-Ox OPT_SET options
+ *      '+' non-Om non-Ox OPT_SET options
+ *	'-' all
+ *      '?' non-Ox OPT_DEFAULT
+ *	'#' table attributes with the current value
+ *	'O' internal object file dump
  */
 
 void
-listops(register Sfio_t* sp, int object)
+listops(register Sfio_t* sp, int setting)
 {
 	register struct option*	op;
 	register struct oplist*	x;
+	int			sc;
 	int			sep;
-	int			mask;
-	int			test;
-	int			clear;
-	Hash_position_t*	pos;
+	long			mask;
+	long			test;
+	long			clear;
 
 	sep = 0;
-	if (object > 0)
+	sc = ' ';
+	clear = 0;
+	switch (setting)
 	{
-		mask = OPT_COMPILE|OPT_GLOBAL;
-		test = OPT_COMPILE|(!state.base && state.rules ? 0 : OPT_GLOBAL);
+	case '-':
+		mask = 0;
+		test = 0;
+		break;
+	case '+':
+		setting = '-';
+		mask = Om|Ox|OPT_SET;
+		test = Om|OPT_SET;
+		break;
+	case '?':
+		setting = '-';
+		mask = Ox|OPT_DEFAULT;
+		test = OPT_DEFAULT;
+		break;
+	case '#':
+		sc = '\n';
+		mask = 0;
+		test = 0;
+		break;
+	case 'O':
+		setting = '-';
+		mask = Ox|OPT_COMPILE;
+		test = OPT_COMPILE;
 		clear = ~OPT_COMPILE;
-		for (x = hidden; x; x = x->next)
+		for (op = opt.head; op; op = op->next)
+			if (op->flags & OPT_DECLARE)
+			{
+				op->flags &= ~OPT_DECLARE;
+				if (sep)
+					sfputc(sp, ':');
+				else
+				{
+					sep = 1;
+					sfprintf(sp, "--%s=", optflag(OPT_option)->name);
+				}
+				declare(sp, op);
+			}
+		while (x = opt.hidden)
 		{
+			opt.hidden = x->next;
 			if (sep)
-				sfputc(sp, ' ');
+				sfputc(sp, sc);
 			else
 				sep = 1;
 			sfputr(sp, x->option, -1);
+			free(x);
 		}
+		break;
+	default:
+		setting = '-';
+		mask = Ox|OPT_SET;
+		test = OPT_SET;
+		break;
 	}
-	else if (object < 0)
-	{
-		mask = 0;
-		test = 0;
-		clear = ~0;
-	}
-	else
-	{
-		mask = OPT_DEFINED|OPT_GLOBAL;
-		test = OPT_DEFINED;
-		clear = ~0;
-	}
-	if (pos = hashscan(opttab, 0))
-	{
-		while (hashnext(pos))
+	for (op = opt.head; op; op = op->next)
+		if ((op->flags & mask) == test)
 		{
-			if (*pos->bucket->name != '-')
-			{
-				op = (struct option*)pos->bucket->value;
-				if (object < 0 || !(op->flag & Ox) && (op->status & mask) == test || object > 0 && (op->status & (OPT_EXTERNAL|OPT_HIDDEN)) == OPT_EXTERNAL)
-				{
-					if (op->status & OPT_EXTERNAL)
-					{
-						if (sep)
-							sfputc(sp, ' ');
-						else
-							sep = 1;
-						declare(sp, op);
-						if (object >= 0 && (!(op->status & OPT_DEFINED) || object && (op->status & OPT_READONLY)))
-							continue;
-					}
-					if (sep)
-						sfputc(sp, ' ');
-					else
-						sep = 1;
-					genop(sp, op, 1, 0);
-					op->status &= clear;
-				}
-			}
+			if (sep)
+				sfputc(sp, sc);
+			else
+				sep = 1;
+			genop(sp, op, setting, 0);
+			if (clear)
+				op->flags &= clear;
 		}
-		hashdone(pos);
-	}
 }
 
 /*
  * generate a single option setting in sp given the option name
- * setting!=0 generates the option name and value suitable for set()
- * setting==0 only the value is generated ("" if option not set)
+ * setting passed to genop()
  * end of s is returned
  */
 
@@ -1205,7 +1601,7 @@ getop(register Sfio_t* sp, char* name, int setting)
 	register struct option*	op;
 	int			flag = 0;
 
-	if ((op = getoption(name)) || name[0] && !name[1] && (op = opentry(name[0], '=')) && (flag = 1))
+	if ((op = getoption(name)) || name[0] && !name[1] && (op = optflag(name[0])) && (flag = 1))
 		genop(sp, op, setting, flag);
 }
 
@@ -1214,7 +1610,7 @@ getop(register Sfio_t* sp, char* name, int setting)
  */
 
 static void
-optset(int i, char* v)
+optset(int i, char* v, Sfio_t* scope)
 {
 	register char*	s;
 	int		n;
@@ -1224,22 +1620,17 @@ optset(int i, char* v)
 
 	if (i > 0)
 	{
-		if (i == '?')
-			error(ERROR_USAGE|(state.readonly ? 4 : 2), "%s", opt_info.arg);
-		else if (i == ':')
+		if (state.readonly && !state.interpreter)
 		{
-			if (state.readonly && !*opt_info.option && !state.interpreter)
-			{
-				x = newof(0, struct oplist, 1, strlen(v) + 1);
-				strcpy(x->option = (char*)(x + 1), v);
-				if (lastdelayed)
-					lastdelayed = lastdelayed->next = x;
-				else
-					delayed = lastdelayed = x;
-			}
+			x = newof(0, struct oplist, 1, strlen(v) + 1);
+			x->option = strcpy((char*)(x + 1), v);
+			if (opt.lastdelayed)
+				opt.lastdelayed = opt.lastdelayed->next = x;
 			else
-				error(2, "%s", opt_info.arg);
+				opt.delayed = opt.lastdelayed = x;
 		}
+		else
+			error((i == '?' && opt_info.option[0] == '-' && opt_info.option[1] != '?') ? (ERROR_USAGE|(state.interpreter ? 2 : 4)) : 2, "%s", opt_info.arg);
 	}
 	else
 	{
@@ -1250,12 +1641,14 @@ optset(int i, char* v)
 			sfsprintf(buf, sizeof(buf), "-%d", i);
 			op = getoption(buf);
 		}
-		n = (op->flag & On) ? (opt_info.arg ? opt_info.num : 0) : (op->flag & Ob) ? (opt_info.num != 0) : (opt_info.num != 0) == !(op->flag & Oi);
+		n = (op->flags & On) ? (opt_info.arg ? opt_info.num : 0) : (op->flags & Ob) ? (opt_info.num != 0) : (opt_info.num != 0) == !(op->flags & Oi);
 		if (*opt_info.option == '+')
 			n = !n;
-		if ((s = opt_info.arg) && (!*s || !(op->flag & Os)))
+		if ((s = opt_info.arg) && (!*s || !(op->flags & Os)))
 			s = 0;
-		setop(op, n, s);
+		if (scope)
+			genop(scope, op, '-', 0);
+		setop(op, n, s, opt_info.assignment);
 	}
 }
 
@@ -1263,19 +1656,35 @@ optset(int i, char* v)
  * set options by name
  */
 
-void
-set(char* s)
+int
+set(char* s, int must, Sfio_t* scope)
 {
 	register int	i;
+	int		r;
+	int		oreadonly;
 	Opt_t		info;
 
+	r = 0;
 	info = opt_info;
-	while (i = optstr(s, sfstrbase(usage)))
+	while (i = optstr(s, sfstrbase(opt.usage)))
 	{
+		if (i > 0 && !must)
+		{
+			r = -1;
+			break;
+		}
 		s += opt_info.offset;
-		optset(i, opt_info.argv[1]);
+		if (!must)
+		{
+			oreadonly = state.readonly;
+			state.readonly = 1;
+		}
+		optset(i, opt_info.argv[1], scope);
+		if (!must)
+			state.readonly = oreadonly;
 	}
 	opt_info = info;
+	return r;
 }
 
 /*
@@ -1300,17 +1709,18 @@ scanargs(int argc, char** argv, int* argf)
 	 * generate the optget() usage string from options[]
 	 */
 
-	if (!(usage = sfstropen()))
+	if (!(opt.usage = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space [usage]");
-	sfprintf(usage, usage1, version);
+	sfprintf(opt.usage, usage1, version);
 	for (i = 0; i < elementsof(options); i++)
 		genusage(options + i, i, 0);
-	genusage(NiL, i, 1);
+	genusage(NiL, 0, 1);
+	opt.usageindex = i;
 	args = 0;
 	done = 0;
  again:
-	while (i = optget(argv, sfstrbase(usage)))
-		optset(i, argv[opt_info.index - (opt_info.offset == 0)]);
+	while (i = optget(argv, sfstrbase(opt.usage)))
+		optset(i, argv[opt_info.index - (opt_info.offset == 0)], NiL);
 	if (!done && streq(argv[opt_info.index - 1], "--"))
 		done = 1;
 	for (i = opt_info.index; i < argc; i++)
@@ -1335,7 +1745,7 @@ scanargs(int argc, char** argv, int* argf)
 					{
 						argf[i] |= ARG_ASSIGN;
 						state.reading = 1;
-						parse(NiL, e, "command line assignment", 0);
+						parse(NiL, e, "command line assignment", NiL);
 						state.reading = 0;
 					}
 					else
@@ -1358,7 +1768,7 @@ scanargs(int argc, char** argv, int* argf)
 }
 
 /*
- * called when things get messed up enough to re-exec
+ * please reboot your program to finish setup ...
  *
  * old!=0 execs external.old for backwards compatibility
  * otherwise re-exec forcing input files to be read
@@ -1371,7 +1781,7 @@ punt(int old)
 	register char**		av;
 	int			i;
 	struct list*		p;
-	Hash_position_t*	pos;
+	struct oplist*		x;
 	Sfio_t*			vec;
 
 	if (state.reread > 1) error(PANIC, "makefile prerequisites cause unbounded make exec recursion");
@@ -1410,20 +1820,8 @@ punt(int old)
 		if (state.base) sfputc(internal.tmp, 'b');
 		if (state.explain) sfputc(internal.tmp, 'e');
 		if (state.ruledump) sfputc(internal.tmp, 'r');
-
-		/*
-		 * unknown flags
-		 */
-
-		if (pos = hashscan(opttab, 0))
-		{
-			while (hashnext(pos))
-				if (((struct option*)pos->bucket->value)->status & OPT_FLAG)
-					sfputc(internal.tmp, *(((struct option*)pos->bucket->value)->name + 1));
-			hashdone(pos);
-		}
-		s = sfstruse(internal.tmp);
 		putptr(vec, getval(external.old, VAL_PRIMARY));
+		s = sfstruse(internal.tmp);
 		if (s[1]) putptr(vec, strdup(s));
 
 		/*
@@ -1440,6 +1838,13 @@ punt(int old)
 			sfputr(internal.tmp, state.mam.options, -1);
 			putptr(vec, strdup(sfstruse(internal.tmp)));
 		}
+
+		/*
+		 * delayed (unknown) options
+		 */
+
+		for (x = opt.delayed; x; x = x->next)
+			putptr(vec, x->option);
 
 		/*
 		 * makefile arguments
@@ -1486,7 +1891,9 @@ punt(int old)
 		 */
 
 		for (av = state.argv; *av; putptr(vec, *av++));
-		sfprintf(internal.tmp, "-%c%s=%d%s%s", OPT(OPT_byname), opentry(OPT_reread, 0)->name, state.reread + 1, state.preprocess ? " " : null, state.preprocess ? opentry(OPT_preprocess, 0)->name : null);
+		sfprintf(internal.tmp, "--%s=%d", optflag(OPT_reread)->name, state.reread + 1);
+		if (state.preprocess)
+			sfprintf(internal.tmp, "--%s", optflag(OPT_preprocess)->name);
 		putptr(vec, sfstruse(internal.tmp));
 	}
 	putptr(vec, 0);
@@ -1506,4 +1913,14 @@ punt(int old)
 	av = (char**)sfstrbase(vec);
 	execvp(av[0], av);
 	error(3, "cannot exec %s", av[0]);
+}
+
+/*
+ * return 1 if name is an option
+ */
+
+int
+isoption(const char* name)
+{
+	return getoption(name) != 0 || name[0] == 'n' && name[1] == 'o' && getoption(&name[2]) != 0;
 }

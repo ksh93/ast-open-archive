@@ -52,13 +52,14 @@ static int		hit[LAST-TERMINAL+2];
 
 #define BACKIN()	(ip--)
 #define BACKOUT()	(op=tp)
-#define CACHE()		do{CACHEINX();CACHEOUTX();st=pp.state;}while(0)
-#define CACHEIN()	do{CACHEINX();st=pp.state;}while(0)
+#define CACHE()		do{CACHEINX();CACHEOUTX();st=pp.state;if(!pp.hidden)spliced=0;}while(0)
+#define CACHEIN()	do{CACHEINX();st=pp.state;if(!pp.hidden)spliced=0;}while(0)
 #define CACHEINX()	do{ip=pp.in->nextchr;}while(0)
-#define CACHEOUT()	do{CACHEOUTX();st=pp.state;}while(0)
+#define CACHEOUT()	do{CACHEOUTX();st=pp.state;if(!pp.hidden)spliced=0;}while(0)
 #define CACHEOUTX()	do{tp=op=pp.outp;xp=pp.oute;if(sp)sp=op;}while(0)
 #define GETCHR()	(*(unsigned char*)ip++)
 #define LASTCHR()	(*(ip-1))
+#define LASTOUT()	((op>pp.outbuf)?*(op-1):pp.lastout)
 #define SKIPIN()	(ip++)
 #define PUTCHR(c)	(*op++=(c))
 #define SETCHR(c)	(*op=(c))
@@ -72,6 +73,59 @@ static int		hit[LAST-TERMINAL+2];
 #define PPCHECKOUT()	do{if(op>xp){{PPWRITE(PPBUFSIZ);if(pp.outbuf==pp.outb){pp.outbuf+=PPBUFSIZ;xp=pp.oute+=PPBUFSIZ;}else{pp.outbuf-=PPBUFSIZ;memcpy(pp.outbuf,xp,op-xp);xp=pp.oute-=PPBUFSIZ;op-=2*PPBUFSIZ;}}}}while(0)
 #define PPCHECKOUTSP()	do{if(op>xp){if(sp)op=sp;else{PPWRITE(PPBUFSIZ);if(pp.outbuf==pp.outb){pp.outbuf+=PPBUFSIZ;xp=pp.oute+=PPBUFSIZ;}else{pp.outbuf-=PPBUFSIZ;memcpy(pp.outbuf,xp,op-xp);xp=pp.oute-=PPBUFSIZ;op-=2*PPBUFSIZ;}}}}while(0)
 #define PPCHECKOUTTP()	do{if(op>xp){{PPWRITE(PPBUFSIZ);if(pp.outbuf==pp.outb){pp.outbuf+=PPBUFSIZ;xp=pp.oute+=PPBUFSIZ;}else{pp.outbuf-=PPBUFSIZ;memcpy(pp.outbuf,xp,op-xp);xp=pp.oute-=PPBUFSIZ;op-=2*PPBUFSIZ;}}tp=op;}}while(0)
+
+#define PPSYNCLINE()	do { \
+		if ((st & (ADD|HIDDEN))) \
+		{ \
+		    if (spliced) \
+		    { \
+			error_info.line += spliced; \
+			spliced = 0; \
+		    } \
+		    else \
+		    { \
+			if (st & ADD) \
+			{ \
+				st &= ~ADD; \
+				m = pp.addp - pp.addbuf; \
+				pp.addp = pp.addbuf; \
+				memcpy(op, pp.addbuf, m); \
+				op += m; \
+				PPCHECKOUT(); \
+			} \
+			if (pp.linesync) \
+			{ \
+				if ((st & SYNCLINE) || pp.hidden >= MAXHIDDEN) \
+				{ \
+					pp.hidden = 0; \
+					st &= ~(HIDDEN|SYNCLINE); \
+					if (error_info.line) \
+					{ \
+						if (LASTOUT() != '\n') \
+							PUTCHR('\n'); \
+						SYNCOUT(); \
+						(*pp.linesync)(error_info.line, error_info.file); \
+						CACHEOUT(); \
+					} \
+				} \
+				else \
+				{ \
+					m = pp.hidden; \
+					pp.hidden = 0; \
+					st &= ~HIDDEN; \
+					while (m-- > 0) \
+						PUTCHR('\n'); \
+				} \
+			} \
+			else \
+			{ \
+				pp.hidden = 0; \
+				st &= ~HIDDEN; \
+				PUTCHR('\n'); \
+			} \
+		    } \
+		} \
+	} while (0)
 
 #if POOL
 
@@ -145,6 +199,7 @@ ppcpp(void)
 	char*			xp;
 	char*			sp = 0;
 	int			qual = 0;
+	int			spliced = 0;
 #else
 	int			qual;
 #endif
@@ -182,6 +237,22 @@ ppcpp(void)
 	if (((state = ~state) != S_COMMENT || pp.comment || c == '/' && !INCOMMENT(rp)) && (n = ip - bp - 1) > 0)
 	{
 		ip = bp;
+#if CPP
+		if (op == tp && (st & (ADD|HIDDEN)))
+			switch (TERM(state))
+			{
+			case S_SHARP:
+				break;
+			case S_NL:
+				if (*ip == '\n')
+					break;
+				/*FALLTHROUGH*/
+			default:
+				PPSYNCLINE();
+				tp = op;
+				break;
+			}
+#endif
 		MEMCPY(op, ip, n);
 		ip++;
 	}
@@ -412,6 +483,9 @@ ppcpp(void)
 					error_info.file = cur->file;
 					error_info.line = cur->line;
 					pp.hidden = 0;
+#if CPP
+					spliced = 0;
+#endif
 					if (cur->flags & IN_hosted)
 					{
 						pp.mode |= HOSTED;
@@ -535,6 +609,8 @@ ppcpp(void)
 				if (c == EOB)
 				{
 #if CPP
+					if ((st & (NOTEXT|HIDDEN)) == HIDDEN && LASTOUT() != '\n')
+						PUTCHR('\n');
 					if (prv)
 #else
 					if (st & EOF2NL)
@@ -779,6 +855,11 @@ ppcpp(void)
 #if CPP
 		quot = c;
 		rp = fsm[LIT1];
+		if (op == tp)
+		{
+			PPSYNCLINE();
+			tp = op;
+		}
 #else
 		if ((quot = c) == '<')
 		{
@@ -969,7 +1050,7 @@ ppcpp(void)
 					STRCOPY(op, pp.token + 1, s);
 					continue;
 				case 0:
-					m = error_info.line - 1;
+					m = error_info.line ? (error_info.line - 1) : 0;
 					*pp.token = 0;
 					/*FALLTHROUGH*/
 				default:
@@ -1664,9 +1745,8 @@ ppcpp(void)
 			goto fsm_top;
 #endif
 		}
-		st &= ~NEWLINE;
 		SYNC();
-		c = ppcontrol();
+		ppcontrol();
 		CACHE();
 #if CPP
 		if (st & (NOTEXT|SKIPCONTROL))
@@ -1682,16 +1762,25 @@ ppcpp(void)
 			tp = op = sp;
 			sp = 0;
 		}
-		if (!c) goto fsm_start;
+		goto fsm_start;
 #else
-		if (!c) goto fsm_top;
+		goto fsm_top;
 #endif
-		/*FALLTHROUGH*/
 
 	case S_NL:
+#if CPP
+		if (op == tp && !(st & JOINING) && pp.in->type == IN_FILE)
+		{
+			st |= NEWLINE|HIDDEN;
+			pp.hidden++;
+			error_info.line++;
+			goto fsm_start;
+		}
+#endif
  fsm_newline:
 #if CPP
-		if (sp) op = sp;
+		if (sp)
+			op = sp;
 		else if (!(pp.in->flags & IN_noguard))
 		{
 			while (tp < op)
@@ -1703,63 +1792,25 @@ ppcpp(void)
 			c = '\n';
 		}
 		st |= NEWLINE;
-		for (;;)
+		error_info.line++;
+		if (*ip == '\n' && *(ip + 1) != '\n' && !pp.macref && !(st & (ADD|HIDDEN)))
 		{
-			error_info.line++;
-			if (*ip != '\n' || pp.macref) break;
 			ip++;
 			PUTCHR('\n');
+			error_info.line++;
 		}
 		if ((st & NOTEXT) && ((pp.mode & FILEDEPS) || (pp.option & (DEFINITIONS|PREDEFINITIONS))))
-		{
 			BACKOUT();
-			goto fsm_start;
-		}
-		debug((-5, "token[%d] %03o = %s [line=%d]", pp.level, c, pptokchr(c), error_info.line));
-		PUTCHR('\n');
-		if (st & (ADD|HIDDEN))
+		else
 		{
-			if (st & ADD)
+			debug((-5, "token[%d] %03o = %s [line=%d]", pp.level, c, pptokchr(c), error_info.line));
+			PUTCHR('\n');
+			PPSYNCLINE();
+			if (sp)
 			{
-				st &= ~ADD;
-				n = pp.addp - pp.addbuf;
-				pp.addp = pp.addbuf;
-				memcpy(op, pp.addbuf, n);
-				op += n;
 				PPCHECKOUT();
+				sp = op;
 			}
-			if (pp.linesync)
-			{
-				if ((st & SYNCLINE) || pp.hidden >= MAXHIDDEN)
-				{
-					pp.hidden = 0;
-					st &= ~(HIDDEN|SYNCLINE);
-					if (error_info.line)
-					{
-						SYNCOUT();
-						(*pp.linesync)(error_info.line, error_info.file);
-						CACHEOUT();
-					}
-				}
-				else
-				{
-					c = pp.hidden;
-					pp.hidden = 0;
-					st &= ~HIDDEN;
-					while (c-- > 0) PUTCHR('\n');
-				}
-			}
-			else
-			{
-				pp.hidden = 0;
-				st &= ~HIDDEN;
-				PUTCHR('\n');
-			}
-		}
-		if (sp)
-		{
-			PPCHECKOUT();
-			sp = op;
 		}
 		goto fsm_start;
 #else
@@ -2166,7 +2217,11 @@ ppcpp(void)
 							st |= HIDDEN;
 							pp.hidden++;
 						}
+#if CPP
+						spliced++;
+#else
 						error_info.line++;
+#endif
 						bp = ip;
 						goto fsm_get;
 					}
@@ -2275,12 +2330,15 @@ ppcpp(void)
 		goto fsm_start;
 	}
  fsm_return:
+#if CPP
+	error_info.line += spliced;
+#endif
 	SETCHR(0);
 	debug((-5, "token[%d] %03o = %s", pp.level, c, pptokstr(tp, 0)));
 	SYNC();
 	pp.level--;
 	error_info.indent--;
-	return(c);
+	return c;
 #endif
 }
 

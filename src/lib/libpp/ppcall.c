@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -183,7 +183,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 			 */
 
 			for (p = pp.in->nextchr; isspace(*p); p++);
-			if ((c = *p) != '(' && c != '/' && c != 0)
+			if ((c = *p) != '(' && c != '/' && c != 0 && c != MARK)
 				goto disable;
 			old_token = pp.token;
 			mp = pp.macp->next;
@@ -218,7 +218,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 				{
 					ungetchr('\n');
 					error_info.line--;
-					if (!--pp.hidden)
+					if (pp.hidden && !--pp.hidden)
 						pp.state &= ~HIDDEN;
 				}
 				pp.token = old_token;

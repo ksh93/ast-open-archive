@@ -15,7 +15,7 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
@@ -1952,7 +1952,9 @@ do	getline || {
 			'')	;;
 			*)	(( fd = so + soff ))
 				file=/tmp/m2h$$
+				path=$PATH
 				eval PATH=$HTMLPATH "$*" > $file
+				PATH=$path
 				eval exec $fd'< $file'
 				rm $file
 				so_file[so]=$file

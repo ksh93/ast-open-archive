@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,16 +35,16 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make edit
 make libedit.a archive
 make edit.req
 exec - set -
 exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -54,8 +54,8 @@ exec - do	case $i in
 exec - 	"edit"|edit)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -103,7 +103,7 @@ done features/ielib
 prev edit.req
 bind -ldll
 bind -last
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/ielib
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/ielib
 done FEATURE/ielib dontcare generated
 make FEATURE/options implicit
 meta FEATURE/options features/%.sh>FEATURE/% features/options.sh options
@@ -112,7 +112,7 @@ make OPTIONS implicit
 done OPTIONS
 done features/options.sh dontcare
 prev edit.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/options.sh OPTIONS
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/options.sh OPTIONS
 done FEATURE/options dontcare generated
 done sh_config.h
 make ${INSTALLROOT}/include/ast/error.h implicit
@@ -183,7 +183,7 @@ done io.h
 done editlib.c
 meta editlib.o %.c>%.o editlib.c editlib
 prev editlib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DLDYNAMIC -DESH -DVSH -D_PACKAGE_ast -c editlib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DLDYNAMIC -DESH -DVSH -D_PACKAGE_ast -c editlib.c
 done editlib.o generated
 make vi.o
 make vi.c
@@ -196,7 +196,7 @@ done defs.h dontcare virtual
 done vi.c
 meta vi.o %.c>%.o vi.c vi
 prev vi.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DESH -DVSH -D_PACKAGE_ast -c vi.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DESH -DVSH -D_PACKAGE_ast -c vi.c
 done vi.o generated
 make emacs.o
 make emacs.c
@@ -207,7 +207,7 @@ prev defs.h implicit
 done emacs.c
 meta emacs.o %.c>%.o emacs.c emacs
 prev emacs.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DESH -DVSH -D_PACKAGE_ast -c emacs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DESH -DVSH -D_PACKAGE_ast -c emacs.c
 done emacs.o generated
 make history.o
 make history.c
@@ -220,7 +220,7 @@ prev defs.h implicit
 done history.c
 meta history.o %.c>%.o history.c history
 prev history.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DVSH -DESH -D_PACKAGE_ast -c history.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DVSH -DESH -D_PACKAGE_ast -c history.c
 done history.o generated
 make edit.o
 make edit.c
@@ -236,7 +236,7 @@ prev defs.h implicit
 done edit.c
 meta edit.o %.c>%.o edit.c edit
 prev edit.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DESH -DVSH -D_PACKAGE_ast -c edit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DESH -DVSH -D_PACKAGE_ast -c edit.c
 done edit.o generated
 exec - ${AR} cr libedit.a editlib.o vi.o emacs.o history.o edit.o
 exec - (ranlib libedit.a) >/dev/null 2>&1 || true

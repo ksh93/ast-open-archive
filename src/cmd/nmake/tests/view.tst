@@ -25,7 +25,7 @@ TEST 02 'basic MAKEPATH'
 		INPUT ../bot/main.c $'#include "hdr.h"
 int main(){return 0;}'
 		INPUT ../bot/hdr.h $'extern int n;'
-		OUTPUT - $'+ cc -O  -I../bot  -c ../bot/main.c
+		OUTPUT - $'+ cc -O -I../bot  -c ../bot/main.c
 + cc  -O   -o main main.o'
 
 TEST 03 'basic VPATH'
@@ -39,7 +39,7 @@ TEST 03 'basic VPATH'
 		INPUT $TWD/bot/src/main.c $'#include "hdr.h"
 int main(){return 0;}'
 		INPUT $TWD/bot/src/hdr.h $'extern int n;'
-		OUTPUT - $'+ cc -O  -I'$TWD$'/bot/src  -c '$TWD$'/bot/src/main.c
+		OUTPUT - $'+ cc -O -I'$TWD$'/bot/src  -c '$TWD$'/bot/src/main.c
 + cc  -O   -o main main.o'
 
 TEST 04 'VPATH vs -I-'
@@ -208,7 +208,7 @@ TEST 09 '3 node contained VPATH with .SOURCE dups'
 int main() { return 0; }'
 		INPUT inca/a.h $'#define a 1'
 		INPUT incb/b.h $'#define b 1'
-		OUTPUT - $'+ cc -O  -I'$TWD$'/inca -I'$TWD$'/incb  -c t.c
+		OUTPUT - $'+ cc -O -I'$TWD$'/inca -I'$TWD$'/incb  -c t.c
 + cc  -O   -o t t.o'
 
 	EXEC	-n
@@ -395,18 +395,16 @@ s1.0:
 
 	CD	../top
 
-	EXEC	-n
+	EXEC	-n --novirtual
 		INPUT s2/
 		OUTPUT - $'+ echo make s2
 s2 done'
-		ERROR - $'s1: cannot recurse on virtual directory
-s1.0: cannot recurse on virtual directory
+		ERROR - $'s1: warning: cannot recurse on virtual directory
+s1.0: warning: cannot recurse on virtual directory
 + cd s2
-+ nmake --noexec'
++ nmake --noexec --novirtual'
 
 	EXEC	-n
-		INPUT s1/
-		INPUT s1.0/
 		OUTPUT - $'+ echo make s1
 + echo make s1.0
 + echo make s2
@@ -415,6 +413,12 @@ s2 done'
 s1.0:
 + cd s2
 + nmake --noexec'
+
+	EXEC	-n --novirtual
+		ERROR - $'s1:
+s1.0:
++ cd s2
++ nmake --noexec --novirtual'
 
 TEST 15 '3 levels'
 

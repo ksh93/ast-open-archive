@@ -133,7 +133,7 @@ accept(register struct rule* r)
 		{
 			if (!r->uname)
 				r->uname = r->name;
-			r->name = putrule(t + 1, r);
+			r->name = maprule(t + 1, r);
 		}
 		if (state.exec)
 			artouch(r->active->parent->target->name, r->name);
@@ -216,7 +216,7 @@ apply(register struct rule* r, char* lhs, char* rhs, char* act, unsigned long fl
 		}
 		oop = state.op;
 		state.op = 1;
-		errors = parse(NiL, act, r->name, 0) == FAILED;
+		errors = parse(NiL, act, r->name, NiL) == FAILED;
 		state.op = oop;
 	}
 	else
@@ -278,14 +278,34 @@ static void
 commit(struct joblist* job, register char* s)
 {
 	register char*		t;
+	register char*		v;
 	register struct rule*	r;
 	struct stat		st;
 
 	if (t = strrchr(s, '/'))
 	{
 		*t = 0;
-		if ((r = bindfile(NiL, s, 0)) && r->view && !stat(r->name, &st) || state.targetcontext && (!r || !r->time) && (st.st_mode = (S_IRWXU|S_IRWXG|S_IRWXO)) && (st.st_mtime = state.start))
+		if (r = bindfile(NiL, s, 0))
 		{
+			if (!r->view)
+			{
+				*t = '/';
+				return;
+			}
+			if (*(v = r->name) != '/')
+			{
+				sfprintf(internal.nam, "%s/%s", state.view[r->view].root, v);
+				v = sfstruse(internal.nam);
+			}
+			if (stat(v, &st))
+				r = 0;
+		}
+		if (r || state.targetcontext && (!r || !r->time) && (st.st_mode = (S_IRWXU|S_IRWXG|S_IRWXO)) && (st.st_mtime = state.start))
+		{
+			/*
+			 * why not mkdir -p here?
+			 */
+
 			commit(job, s);
 			if (((job->flags & CO_ALWAYS) || state.exec && state.touch) && (mkdir(s, st.st_mode & (S_IRWXU|S_IRWXG|S_IRWXO)) || stat(s, &st)))
 				error(1, "%s: cannot create target directory %s", job->target->name, s);
@@ -302,9 +322,9 @@ commit(struct joblist* job, register char* s)
 				oldname(r);
 			r->view = 0;
 			r->time = st.st_mtime;
+			if (r->dynamic & D_scanned)
+				unbind(NiL, (char*)r, NiL);
 		}
-		if (r && (r->dynamic & D_scanned))
-			unbind(NiL, (char*)r, NiL);
 		*t = '/';
 	}
 }
@@ -484,6 +504,7 @@ restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
 	int		localview;
 	void*		pos;
 	struct var*	v;
+	Sfio_t*		opt;
 	Sfio_t*		tmp;
 	Sfio_t*		context;
 
@@ -497,15 +518,19 @@ restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
 
 		job->flags |= CO_LOCALSTACK;
 		pos = pushlocal();
+		opt = sfstropen();
 		if (job->target->dynamic & D_hasscope)
 			for (p = job->prereqs; p; p = p->next)
 				if ((r = p->rule)->dynamic & D_scope)
-					parse(NiL, r->name, r->name, 1);
+				{
+					if (*r->name == '-')
+						set(r->name, 1, opt);
+					else
+						parse(NiL, r->name, r->name, opt);
+				}
 				else if ((r->property & (P_make|P_local|P_use)) == (P_make|P_local) && r->action)
-					parse(NiL, r->action, r->name, 1);
+					parse(NiL, r->action, r->name, opt);
 	}
-	else
-		pos = 0;
 	context = state.context;
 	if (state.targetcontext && *(u = unbound(job->target)) != '/' && (s = strrchr(u, '/')))
 	{
@@ -577,7 +602,12 @@ restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
 	if ((v = getvar(CO_ENV_ATTRIBUTES)) && !(v->property & V_import))
 		sfprintf(att, ",%s", v->value);
 	if (job->flags & CO_LOCALSTACK)
+	{
 		poplocal(pos);
+		if (*(s = sfstruse(opt)))
+			set(s, 1, NiL);
+		sfclose(opt);
+	}
 	state.localview = localview;
 	pop(job);
 }
@@ -593,6 +623,7 @@ execute(register struct joblist* job)
 {
 	register struct list*	p;
 	char*			t;
+	int			flags;
 	struct rule*		r;
 	Sfio_t*			tmp;
 	Sfio_t*			att;
@@ -642,7 +673,12 @@ execute(register struct joblist* job)
 				fcntl(internal.openfd, F_SETFD, 0);
 			sp = sfstropen();
 			sfprintf(sp, "label=%s", idname);
-			if (!(state.coshell = coopen(NiL, state.cross ? (CO_ANY|CO_CROSS) : CO_ANY, sfstruse(sp))))
+			flags = CO_ANY;
+			if (state.cross)
+				flags |= CO_CROSS;
+			if (state.serialize && state.jobs > 1)
+				flags |= CO_SERIALIZE;
+			if (!(state.coshell = coopen(NiL, flags, sfstruse(sp))))
 				error(ERROR_SYSTEM|3, "coshell open error");
 			sfstrclose(sp);
 		}
@@ -709,7 +745,7 @@ execute(register struct joblist* job)
 				{
 					remove(state.tmpfile);
 					if (job->target->property & P_read)
-						parse(sp, NiL, job->target->name, 0);
+						parse(sp, NiL, job->target->name, NiL);
 					else
 					{
 						char*	e;
@@ -1292,7 +1328,7 @@ trigger(register struct rule* r, struct rule* a, char* action, unsigned long fla
 				if (r->property & P_functional)
 					setvar(r->name, null, 0);
 				if (action)
-					switch (parse(NiL, action, r->name, 0))
+					switch (parse(NiL, action, r->name, NiL))
 					{
 					case EXISTS:
 						if (!(r->property & (P_state|P_virtual)))

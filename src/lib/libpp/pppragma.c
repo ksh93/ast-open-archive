@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -36,6 +36,7 @@ pppragma(char* directive, char* pass, char* name, char* value, int newline)
 {
 	register int	sep = 0;
 
+	ppsync();
 	if (directive)
 	{
 		ppprintf("#%s", directive);
@@ -52,14 +53,18 @@ pppragma(char* directive, char* pass, char* name, char* value, int newline)
 	}
 	if (name)
 	{
-		if (sep) ppprintf(" ");
+		if (sep)
+			ppprintf(" ");
+		else
+			sep = 1;
 		ppprintf("%s", name);
-		sep = 1;
 	}
 	if (value)
 	{
-		if (sep || pass) ppprintf(" ");
+		if (sep || pass)
+			ppprintf(" ");
 		ppprintf("%s", value);
 	}
-	if (newline) ppprintf("\n");
+	if (newline)
+		ppprintf("\n");
 }

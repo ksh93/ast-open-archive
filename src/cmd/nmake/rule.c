@@ -175,6 +175,42 @@ nametype(const char* name, char** e)
 }
 
 /*
+ * map name s to rule r
+ * previous mappings must be recociled with the prereq lists
+ */
+
+char*
+maprule(char* s, struct rule* r)
+{
+	register struct list*	p;
+	struct rule*		q;
+	struct rule*		o;
+	Hash_position_t*	pos;
+
+	static unsigned char	warn;
+
+	if ((o = getrule(s)) == r)
+		return r->name;
+	s = putrule(0, r);
+	if (o && (pos = hashscan(table.rule, 0)))
+	{
+		if (state.warn && !++warn)
+			error(1, "%d maprule() calls -- should not happen", UCHAR_MAX+1);
+		while (hashnext(pos))
+		{
+			q = (struct rule*)pos->bucket->value;
+			if (q == o)
+				pos->bucket->value = (char*)r;
+			for (p = q->prereqs; p; p = p->next)
+				if (p->rule == o)
+					p->rule = r;
+		}
+		hashdone(pos);
+	}
+	return s;
+}
+
+/*
  * return a pointer to a rule given its name,
  * creating the rule if necessary
  */
@@ -198,6 +234,8 @@ makerule(register char* name)
 	}
 	newrule(r);
 	r->name = putrule(0, r);
+	if (state.compnew)
+		(*state.compnew)(r->name, (char*)r, state.comparg);
 	if (!name)
 		n = nametype(r->name, NiL);
 	if (n & (NAME_staterule|NAME_altstate))
@@ -742,7 +780,7 @@ dynamic(register struct rule* r)
 			{
 				added = 1;
 				if (isglob(s))
-					v = globv(s);
+					v = globv(NiL, s);
 				else
 					*(v = vec) = s;
 				while (s = *v++)
@@ -1006,9 +1044,12 @@ mergestate(struct rule* from, struct rule* to)
 	 * if RULE merges then RULE+1..STATERULES also merge
 	 */
 
-	if (fromstate = staterule(RULE, from, NiL, 0)) tostate = staterule(RULE, to, NiL, 1);
-	else if ((from->dynamic & D_alias) && (tostate = staterule(RULE, to, NiL, 0))) fromstate = staterule(RULE, from, NiL, 1);
-	else return;
+	if (fromstate = staterule(RULE, from, NiL, 0))
+		tostate = staterule(RULE, to, NiL, 1);
+	else if ((from->dynamic & D_alias) && (tostate = staterule(RULE, to, NiL, 0)))
+		fromstate = staterule(RULE, from, NiL, 1);
+	else
+		return;
 #if DEBUG
 	if (state.test & 0x00000800)
 	{
@@ -1343,7 +1384,6 @@ initrule(void)
 	INIT(making,		".MAKING",	0);
 	INIT(metarule,		".METARULE",	0);
 	INIT(null,		".NULL",	P_attribute);
-	INIT(options,		".OPTIONS",	P_internal|P_readonly);
 	INIT(preprocess,	".PREPROCESS",	P_internal|P_readonly);
 	INIT(query,		".QUERY",	P_immediate|P_multiple|P_virtual);
 	INIT(rebind,		".REBIND",	P_immediate);
@@ -1626,7 +1666,7 @@ initview(void)
 						p = view(s, sfstruse(internal.tmp), p);
 					}
 				}
-				if (!(opentry(OPT_strictview, 0)->status & OPT_READONLY))
+				if (!(optflag(OPT_strictview)->flags & OPT_READONLY))
 					state.strictview = 1;
 				break;
 			}

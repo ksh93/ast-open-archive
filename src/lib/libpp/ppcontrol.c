@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -168,18 +168,18 @@ macsym(int tok)
 	if (tok != T_ID)
 	{
 		error(2, "%s: invalid macro name", pptokstr(pp.token, 0));
-		return(0);
+		return 0;
 	}
 	sym = pprefmac(pp.token, REF_CREATE);
-	if ((sym->flags & SYM_FINAL) && (pp.mode & HOSTED)) return(0);
+	if ((sym->flags & SYM_FINAL) && (pp.mode & HOSTED)) return 0;
 	if (sym->flags & (SYM_ACTIVE|SYM_READONLY))
 	{
 		if (!(pp.option & ALLPOSSIBLE))
 			error(2, "%s: macro is %s", sym->name, (sym->flags & SYM_READONLY) ? "readonly" : "active");
-		return(0);
+		return 0;
 	}
 	if (!sym->macro) sym->macro = newof(0, struct ppmacro, 1, 0);
-	return(sym);
+	return sym;
 }
 
 /*
@@ -233,7 +233,7 @@ getline(register char* p, char* x, int disable)
  done:
 	pp.state &= ~(NOSPACE|STRIP);
 	pp.state |= restore;
-	return(p);
+	return p;
 }
 
 /*
@@ -272,6 +272,7 @@ ppcontrol(void)
 	struct pptuple*			rp;
 	struct pptuple*			tp;
 	char*				v;
+	int				emitted;
 
 	union
 	{
@@ -309,11 +310,12 @@ ppcontrol(void)
 	static char*			formvals[MAXFORMALS];
 #endif
 
+	emitted = 0;
 	if (pp.state & SKIPCONTROL) pp.level--;
-	restore = pp.state & RESTORE;
+	restore = (pp.state & RESTORE)|NEWLINE;
 	if (pp.state & PASSTHROUGH) restore |= DISABLE;
 	else restore &= ~DISABLE;
-	pp.state &= ~(RESTORE|SKIPCONTROL);
+	pp.state &= ~(NEWLINE|RESTORE|SKIPCONTROL);
 	pp.state |= DIRECTIVE|DISABLE|EOF2NL|NOSPACE|NOVERTICAL;
 #if COMPATIBLE
 	if ((pp.state & (COMPATIBILITY|STRICT)) == COMPATIBILITY || (pp.mode & HOSTED)) pp.state &= ~NOVERTICAL;
@@ -616,6 +618,7 @@ ppcontrol(void)
 			*s = 0;
 		}
 		(*pp.pragma)(pp.valbuf + 1, p1, p3, p5, (pp.state & COMPILE) || (pp.mode & INIT) != 0);
+		emitted = 1;
 	}
 	goto donedirective;
 
@@ -1222,6 +1225,7 @@ ppcontrol(void)
 			mac->value = newof(mac->value, char, (mac->size = p - mac->value) + 1, 0);
 			if ((pp.option & (DEFINITIONS|PREDEFINITIONS|REGUARD)) && !sym->hidden && !(sym->flags & SYM_MULTILINE) && ((pp.option & PREDEFINITIONS) || !(pp.mode & INIT)) && ((pp.option & (DEFINITIONS|PREDEFINITIONS)) || !(pp.state & NOTEXT)))
 			{
+				ppsync();
 				ppprintf("#%s %s", dirname(DEFINE), sym->name);
 				if (sym->flags & SYM_FUNCTION)
 				{
@@ -1263,9 +1267,7 @@ ppcontrol(void)
 						ppcheckout();
 					}
 				}
-				if (pp.state & NOTEXT)
-					ppputchar('\n');
-				ppcheckout();
+				emitted = 1;
 			}
 		benign:
 			if (pp.mode & BUILTIN) sym->flags |= SYM_BUILTIN;
@@ -1633,19 +1635,18 @@ ppcontrol(void)
 				*p2 = 0;
 				n = streq(p1, pp.pass);
 				*p2 = ':';
-				if (!n) goto checkmap;
+				if (!n)
+					goto checkmap;
 			}
-			else n = 0;
+			else
+				n = 0;
 			i2 = *p4;
 			*p4 = 0;
-			if (!(i1 = (int)hashref(pp.strtab, p3 + (i0 ? 0 : 2))) && !i0)
-			{
-				i0 = 0;
-				i1 = (int)hashref(pp.strtab, p3);
-			}
+			if (((i1 = (int)hashref(pp.strtab, p3 + (i0 ? 0 : 2))) < 1 || i1 > X_last_option) && (i0 || (i1 = (int)hashref(pp.strtab, p3)) > X_last_option))
+				i1 = 0;
 			if ((pp.state & (COMPATIBILITY|STRICT)) == STRICT && !(pp.mode & (HOSTED|RELAX)))
 			{
-				if (i1 == X_PROTOTYPED)
+				if (pp.optflags[i1] & OPT_GLOBAL)
 					goto donedirective;
 				if (n || (pp.mode & WARN))
 				{
@@ -1656,11 +1657,13 @@ ppcontrol(void)
 			}
 			if (!n)
 			{
-				if (i1 != X_PROTOTYPED)
+				if (!(pp.optflags[i1] & OPT_GLOBAL))
 				{
 					*p4 = i2;
 					goto checkmap;
 				}
+				if (!(pp.optflags[i1] & OPT_PASS))
+					n = 1;
 			}
 			else if (!i1)
 				error(2, "%s: unknown option", p1);
@@ -1960,6 +1963,9 @@ ppcontrol(void)
 			case X_PRAGMAEXPAND:
 				setoption(PRAGMAEXPAND, i0);
 				break;
+			case X_PRAGMAFLAGS:
+				tokop(PP_PRAGMAFLAGS, p3, p, i0, 0);
+				break;
 			case X_PREDEFINED:
 				setoption(PREDEFINED, i0);
 				break;
@@ -2032,6 +2038,20 @@ ppcontrol(void)
 				if (pp.option & STRINGSPLIT)
 					setmode(CATLITERAL, 0);
 				break;
+			case X_SYSTEM_HEADER:
+				if (i0)
+				{
+					pp.mode |= HOSTED;
+					pp.flags |= PP_hosted;
+					pp.in->flags |= IN_hosted;
+				}
+				else
+				{
+					pp.mode &= ~HOSTED;
+					pp.flags &= ~PP_hosted;
+					pp.in->flags &= ~PP_hosted;
+				}
+				break;
 			case X_TEST:
 				ppop(PP_TEST, p);
 				break;
@@ -2050,11 +2070,13 @@ ppcontrol(void)
 				tokop(PP_VENDOR, p3, p, i0, TOKOP_UNSET|TOKOP_STRING|TOKOP_DUP);
 				break;
 			case X_VERSION:
-				if (pp.pragma && !(pp.state & NOTEXT))
+				if (!(*pp.control & SKIP) && pp.pragma && !(pp.state & NOTEXT))
 				{
 					sfsprintf(pp.tmpbuf, MAXTOKEN, "\"%s\"", pp.version);
 					(*pp.pragma)(dirname(PRAGMA), pp.pass, p3, pp.tmpbuf, !n);
-					if (pp.linesync && !n) (*pp.linesync)(error_info.line, error_info.file);
+					if (pp.linesync && !n)
+						(*pp.linesync)(error_info.line, error_info.file);
+					emitted = 1;
 				}
 				break;
 			case X_WARN:
@@ -2076,7 +2098,8 @@ ppcontrol(void)
 #endif
 			}
 			*p4 = i2;
-			if (!n) goto checkmap;
+			if (!n)
+				goto checkmap;
 			goto donedirective;
 		case RENAME:
 			if ((pp.state & STRICT) && !(pp.mode & (HOSTED|RELAX)))
@@ -2143,10 +2166,9 @@ ppcontrol(void)
 				}
 				if ((pp.option & (DEFINITIONS|PREDEFINITIONS|REGUARD)) && !sym->hidden && !(sym->flags & SYM_MULTILINE) && ((pp.option & PREDEFINITIONS) || !(pp.mode & INIT)) && ((pp.option & (DEFINITIONS|PREDEFINITIONS)) || !(pp.state & NOTEXT)))
 				{
+					ppsync();
 					ppprintf("#%s %s", dirname(UNDEF), sym->name);
-					if (pp.state & NOTEXT)
-						ppputchar('\n');
-					ppcheckout();
+					emitted = 1;
 				}
 				sym->flags &= ~(SYM_BUILTIN|SYM_FUNCTION|SYM_INIT|SYM_MULTILINE|SYM_PREDEFINED|SYM_REDEFINE|SYM_VARIADIC);
 				n2 = error_info.line;
@@ -2197,7 +2219,7 @@ ppcontrol(void)
 		switch (directive)
 		{
 		case LINE:
-			return(0);
+			return 0;
 		case INCLUDE:
 			if (pp.include)
 			{
@@ -2206,7 +2228,7 @@ ppcontrol(void)
 				if (!pp.vendor && (pp.found->type & TYPE_VENDOR))
 					pp.vendor = 1;
 				pp.include = 0;
-				return(0);
+				return 0;
 			}
 			if (pp.incref)
 				(*pp.incref)(error_info.file, ppgetfile(pp.path)->name, error_info.line, PP_SYNC_IGNORE);
@@ -2220,14 +2242,25 @@ ppcontrol(void)
 			pp.in->flags |= IN_tokens;
 			/*FALLTHROUGH*/
 		case ENDIF:
-			return('\n');
+			error_info.line++;
+			if (emitted)
+			{
+				ppputchar('\n');
+				ppcheckout();
+			}
+			else
+			{
+				pp.state |= HIDDEN;
+				pp.hidden++;
+			}
+			return 0;
 		}
 	}
 	pp.state |= restore|HIDDEN|SKIPCONTROL;
 	pp.hidden++;
 	pp.level++;
 	error_info.line++;
-	return(0);
+	return 0;
 }
 
 /*

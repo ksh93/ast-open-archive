@@ -679,3 +679,81 @@ tree_temp.mk_992 tree_temp.mk_993 tree_temp.mk_994 tree_temp.mk_995
 tree_temp.mk_996 tree_temp.mk_997 tree_temp.mk_998 tree_temp.mk_999'
 
 }
+
+TEST 13 'self-documentation'
+
+	EXEC	--???man
+		ERROR - $'version=1'
+		EXIT 2
+
+	EXEC	-f - --???man
+
+	EXEC	--short
+		ERROR - $'Usage: make [-AabCcJnxeFiKGklNRqrOsVtvwP] [-B level] [-X[action]] [-d level]
+            [-E id] [-f file] [-g file] [-I directory] [-j level]
+            [-M type[,subtype][:file[:parent[:directory]]]] [-Q mask]
+            [-S[level]] [-T mask] [-z seconds] [-o name[=value]]
+            [-D name[=value]] [-U name] [ script ... ] [ target ... ]'
+
+	EXEC	-f - --short
+
+	EXEC	--long
+		ERROR - $'Usage: make [--accept] [--alias] [--base] [--believe=level] [--compatibility]
+            [--compile] [--corrupt[=action]] [--cross] [--debug=level]
+            [--errorid=id] [--exec] [--expandview] [--explain] [--file=file]
+            [--force] [--global=file] [--ignore] [--ignorelock]
+            [--include=directory] [--intermediate] [--jobs=level] [--keepgoing]
+            [--list] [--mam=type[,subtype][:file[:parent[:directory]]]]
+            [--never] [--option=\'char;name;flags;set;description;values\']
+            [--override] [--questionable=mask] [--readonly]
+            [--readstate[=level]] [--regress] [--reread] [--ruledump] [--scan]
+            [--serialize] [--silent] [--strictview] [--targetcontext]
+            [--targetprefix=separator] [--test=mask] [--tolerance=seconds]
+            [--touch] [--vardump] [--warn] [--writeobject[=file]]
+            [--writestate[=file]] [--byname=name[=value]]
+            [--define=name[=value]] [--preprocess] [--undef=name]
+            [--all-static] [--ancestor=depth]
+            [--ancestor-source=.SOURCE.suffix directory...]
+            [--arclean=edit-ops] [--cctype=type] [--clean-ignore=pattern]
+            [--clobber[=pattern]] [--compare] [--debug-symbols]
+            [--force-shared] [--instrument=command] [--ld-script=suffix]
+            [--link=pattern] [--nativepp=level] [--official-out=file]
+            [--output=file] [--prefix-include] [--preserve[=pattern]]
+            [--profile] [--recurse=action] [--recurse-enter=text]
+            [--recurse-leave=text] [--select=edit-ops] [--separate-include]
+            [--static-link] [--strip-symbols] [--threads]
+            [--variants[=pattern]] [--view-verify=level] [--virtual]
+            [ script ... ] [ target ... ]'
+
+	EXEC	-f - --long
+
+	EXEC	--?file
+		ERROR - $'make: [ options ] [ script ... ] [ target ... ]
+OPTIONS
+  -f, --file=file Read the makefile file. If --file is not specified then the
+                  makefile names specified by $(MAKEFILES) are attempted in
+                  order from left to right. The file - is equivalent to
+                  /dev/null.'
+
+	EXEC	-f - --?file
+
+	EXEC	--?clobber
+		ERROR - $'make: [ options ] [ script ... ] [ target ... ]
+OPTIONS
+  --clobber[=pattern]
+                  (Makerules) Replace existing install action targets matching
+                  pattern instead of renaming to target.old. If the option
+                  value is omitted then * is assumed.'
+
+	EXEC	-f - --?clobber
+
+	EXEC	--unknown-option
+		ERROR - $'make: unknown-option: unknown option'
+
+	EXEC	-f - --unknown-option
+
+	EXEC	-f
+		ERROR - $'make: -f: file argument expected'
+
+	EXEC	--file
+		ERROR - $'make: file: file value expected'

@@ -333,7 +333,7 @@ Option_t		options[] =
 	The first character is the expression delimiter.\
 	There may be more than one edit expression;\
 	each is applied in order from left to right.",
-	",old,new,[glsu]]",
+	",old,new,[glpsu]]",
 	"[+g?All \aold\a patterns.]\
 	[+l?Convert \anew\a to lower case.]\
 	[+p?Print the edit result on the standard error.]\
@@ -353,8 +353,10 @@ Option_t		options[] =
 	"eom",
 	0,
 	OPT_eom,
-	"End of media prompt or !\acommand\a. Processing terminates if !\acommand\a returns non-zero exit status.",
-	"[!]]prompt",
+	"End of media prompt or !\acommand\a. Processing terminates if\
+	\b!\b\acommand\a returns non-zero exit status or if \b!\b is\
+	specified.",
+	"[!]][prompt]]",
 },
 {
 	"exact",
