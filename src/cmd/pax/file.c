@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -719,6 +719,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 {
 	register char*		name;
 	register int		n;
+	char*			e;
 
 	name = ftw->path;
 	message((-4, "getfile(%s)", name));
@@ -822,6 +823,12 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	f->longname = 0;
 	f->longlink = 0;
 	f->skip = 0;
+	if (state.mode)
+	{
+		f->st->st_mode = strperm(state.mode, &e, f->st->st_mode);
+		if (*e)
+			error(2, "%s: invalid mode expression", state.mode);
+	}
 	message((-2, "getfile(): path=%s name=%s mode=%s size=%I*d", name, f->name, fmtmode(f->st->st_mode, 1), sizeof(f->st->st_size), f->st->st_size));
 	return 1;
 }
@@ -944,7 +951,7 @@ addlink(register Archive_t* ap, register File_t* f)
 		if (!state.list)
 		{
 			s = f->linkpath;
-			if (access(s, 0))
+			if (access(s, F_OK))
 			{
 				f->skip = 1;
 				error(2, "%s must exist for hard link %s", s, f->name);

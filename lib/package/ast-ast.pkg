@@ -5,5 +5,5 @@ ast-ast :PACKAGE: libast
 :INDEX: the ast library, period
 
 :DESCRIPTION:
-	The AT&T Software Technology ast-ast package from AT&T Labs
-	Research contains the ast library.
+	The AT&T Software Technology ast-ast package from AT&T Research
+	contains the ast library.

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -112,7 +112,7 @@ expandops(register char* xp, register char* ed, int del)
 	ed = buf;
 	dir = bas = suf = DELETE;
 	eb = ed;
-	message((-5, "expandops(`%s')", ed));
+	debug((-5, "expandops(`%s')", ed));
 	op = 0;
 	for (;;)
 	{
@@ -273,7 +273,6 @@ expandops(register char* xp, register char* ed, int del)
 			 * value: [!<>=][=][<val>]
 			 */
 
-message((-6, "OP `%c' VALUE `%s'", op, ed));
 			if (op != '$') switch (*ed++)
 			{
 			case '!':
@@ -819,7 +818,7 @@ expand(register char* xp, register char* a)
 
 	char		varbuf[EXBUF];
 
-	message((-4, "expand(`%s')", a));
+	debug((-4, "expand(`%s')", a));
 	if (!(s = strchr(a, '$')))
 		return(strcopy(xp, a));
 	strncpy(xp, a, s - a);

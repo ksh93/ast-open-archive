@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -71,6 +71,7 @@
 #define OPT_global	('g'|Oa|Os)	/* next arg is global makefile	*/
 #define OPT_ignore	('i'|Ob)	/* ignore shell action errors	*/
 #define OPT_ignorelock	('K'|Ob)	/* ignore state file locking	*/
+#define OPT_import	('H'|Ob|Ox)	/* import var def precedence	*/
 #define OPT_include	('I'|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_intermediate ('G'|Ob)	/* force intermediate targets	*/
 #define OPT_jobs	('j'|On)	/* job concurrency level	*/
@@ -84,11 +85,12 @@
 #define OPT_questionable ('Q'|Oa|On)	/* enable questionable code	*/
 #define OPT_readonly	('R'|Ob)	/* current vars|opts readonly	*/
 #define OPT_readstate	('S'|On|Ov)	/* read state file on startup	*/
+#define OPT_regress	('q'|Ob)	/* output for regression test	*/
 #define OPT_reread	('Z'|Of|On|Ox)	/* force re-read all makefiles	*/
 #define OPT_ruledump	('r'|Ob|Ox)	/* dump rule definitions	*/
 #define OPT_scan	('s'|Ob|Of)	/* scan|check implicit prereqs	*/
 #define OPT_silent	('s'|Ob)	/* run silently			*/
-#define OPT_strictview	('V'|Ob|Oo)	/* strict views			*/
+#define OPT_strictview	('V'|Ob)	/* strict views			*/
 #define OPT_targetcontext ('L'|Ob|Of)	/* expand in target dir context	*/
 #define OPT_test	('T'|Oa|On)	/* enable test code		*/
 #define OPT_tolerance	('z'|On)	/* time comparison tolerance	*/
@@ -96,8 +98,8 @@
 #define OPT_undef	('U'|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_vardump	('v'|Ob|Ox)	/* dump variable definitions	*/
 #define OPT_warn	('w'|Ob)	/* enable source file warnings	*/
-#define OPT_writeobject	('Y'|Of|Os|Ox|Ov) /* write recompiled object	*/
-#define OPT_writestate	('W'|Of|Os|Ox|Ov) /* write state file on exit	*/
+#define OPT_writeobject	('y'|Of|Os|Ov|Ox)/* write recompiled object	*/
+#define OPT_writestate	('Y'|Of|Os|Ov|Ox)/* write state file on exit	*/
 
 struct option				/* option table entry		*/
 {

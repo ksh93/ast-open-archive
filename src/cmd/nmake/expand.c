@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -48,9 +48,10 @@
 #define SORT_MASK	0x0007
 
 #define SORT_first	((SORT_MASK+1)<<0)
-#define SORT_qualified	((SORT_MASK+1)<<1)
-#define SORT_sort	((SORT_MASK+1)<<2)
-#define SORT_uniq	((SORT_MASK+1)<<3)
+#define SORT_force	((SORT_MASK+1)<<1)
+#define SORT_qualified	((SORT_MASK+1)<<2)
+#define SORT_sort	((SORT_MASK+1)<<3)
+#define SORT_uniq	((SORT_MASK+1)<<4)
 
 typedef int (*Cmp_f)(const char*, const char*);
 
@@ -719,6 +720,8 @@ list(Sfio_t* xp, register char* s, char* pat, int flags)
 		if (!(r->mark & M_mark))
 		{
 			r->mark |= M_mark;
+			if (flags & SORT_force)
+				r->dynamic &= ~D_scanned;
 			if (!(r->dynamic & D_scanned))
 				dirscan(r);
 			putptr(vec, r);
@@ -1095,6 +1098,7 @@ order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, struct rule*
 			if (sfstrtell(xp))
 				sfputr(xp, "-", ' ');
 			sfputr(xp, d->name, ' ');
+			d->mark |= M_MUST|M_RHS;
 		}
 		hashput(tab, s, d);
 	}
@@ -1306,8 +1310,9 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 						{
 							if (i == ':' && strneq(s, "order", 5))
 							{
-								if (order)
-									order->prereqs = append(order->prereqs, cons(makerule(t), NiL));
+								if (!order)
+									order = makerule(external.order);
+								order->prereqs = append(order->prereqs, cons(makerule(t), NiL));
 							}
 							else if (i != ':' || !strneq(s, "command", 7))
 							{
@@ -1464,6 +1469,9 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 
 /*
  * path name operations from (rule) s into xp using op
+ *
+ * A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+ * A B C D E F G H I     L   N   P   R S   U V W X   Z
  */
 
 static void
@@ -1595,7 +1603,8 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				s = t;
 			}
 #if DEBUG
-			else message((-2, "pathop('%c',%s==%s): bound shorter than unbound", *op, r->name, r->uname));
+			else
+				message((-2, "pathop('%c',%s==%s): bound shorter than unbound", *op, r->name, r->uname));
 #endif
 		}
 		if (*r->name != '/')
@@ -1666,9 +1675,13 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			op++;
 		 if ((n = strlen(op)) > 5)
 			n = 5;
-		 while (n++ < 5 && (c = *s++))
-			if (istype(n, C_VARIABLE1|C_VARIABLE2))
+		 while (c = *s++)
+			if (istype(c, C_VARIABLE1|C_VARIABLE2))
+			{
+				if (n++ >= 5)
+					break;
 				sfputc(xp, c);
+			}
 		 n = 0;
 		 while (n++ < 5 && (c = *op++))
 			sfputc(xp, c);
@@ -1826,22 +1839,10 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 
 		if (r && (r->dynamic & D_bound))
 		{
+			c = 0;
 			if (*++op == '=')
 				op++;
-			if (!r->view || state.fsview && !state.expandview)
-			{
-				if (r->dynamic & D_global)
-					return;
-				if (*op)
-				{
-					sfprintf(internal.nam, "%s/%s", op, s);
-					s = sfstruse(internal.nam);
-					pathcanon(s, 0);
-				}
-				if (*s++ == '.' && *s++ == '.' && (*s == '/' || !*s))
-					return;
-			}
-			else
+			if (r->view && (!state.fsview || state.expandview))
 			{
 				n = state.view[r->view].pathlen;
 				if (*op)
@@ -1850,10 +1851,22 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 					for (t = state.view[r->view].path + n; t > state.view[r->view].path && (*t != '/' || --n > 0); t--);
 					n = t - state.view[r->view].path;
 				}
-				if (strncmp(s, state.view[r->view].path, n) || *(s + n) != '/')
-					return;
+				if (!strncmp(s, state.view[r->view].path, n) && *(s + n) == '/')
+					c = 1;
 			}
-			sfputr(xp, r->name, -1);
+			else if (!(r->dynamic & D_global))
+			{
+				if (*op)
+				{
+					sfprintf(internal.nam, "%s/%s", op, s);
+					s = sfstruse(internal.nam);
+					pathcanon(s, 0);
+				}
+				if (*s++ != '.' || *s++ != '.' || *s && *s != '/')
+					c = 1;
+			}
+			if (c == !(sep & NOT))
+				sfputr(xp, r->name, -1);
 		}
 		return;
 	case 'U':
@@ -2069,6 +2082,9 @@ mimetype(Sfio_t* xp, char* file)
  * apply token op p on (possibly bound) s with result in xp
  *
  * NOTE: this and :D:B:S: were the first edit operators
+ *
+ * A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+ * A B   D E F G   I       M N O P Q R S T U V W X Y Z
  */
 
 static void
@@ -2080,6 +2096,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	register int		op;
 	char*			ops;
 	int			dobind;
+	int			dounbind;
 	int			dowait;
 	int			force;
 	int			matched;
@@ -2092,18 +2109,26 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	Sfio_t*			tmp = 0;
 
 	dobind = 1;
+	dounbind = 0;
 	dowait = 1;
 	while (op = *p)
 	{
 		p++;
 		if (islower(op))
 			op = toupper(op);
-		if (op == 'W')
+		switch (op)
+		{
+		case 'B':
+			dounbind = 1;
+			continue;
+		case 'W':
 			dowait = 0;
-		else if (op == 'X')
+			continue;
+		case 'X':
 			dobind = 0;
-		else
-			break;
+			continue;
+		}
+		break;
 	}
 	ops = p;
 	while (*p && *p++ != '?');
@@ -2125,15 +2150,16 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			switch (*(ops + 1))
 			{
 			case 'A':
-				tst = (!dobind || getrule(s)) && isstate(s) && isaltstate(s);
+				tst = NAME_altstate;
 				break;
 			case 'V':
-				tst = (!dobind || getrule(s)) && isstatevar(s);
+				tst = NAME_statevar;
 				break;
 			default:
-				tst = (!dobind || getrule(s)) && isstate(s);
+				tst = NAME_staterule;
 				break;
 			}
+			tst = (!dobind || getrule(s)) && (nametype(s, NiL) & tst);
 			break;
 		case 'V':
 			switch (*(ops + 1))
@@ -2151,13 +2177,17 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			break;
 		}
 		if (tst == !(sep & NOT))
+		{
 			sfputr(xp, s, -1);
-		return;
+			return;
+		}
 	}
 	r = makerule(s);
+	if (dounbind)
+		unbind(NiL, (char*)r, NiL);
 	if (dobind)
 	{
-		tst = state.mam.regress && !(r->dynamic & D_bound);
+		tst = state.mam.regress && state.user > 1 && !(r->dynamic & D_bound);
 		r = bind(r);
 		if (tst && !(r->dynamic & D_built))
 			sfprintf(state.mam.out, "%sbind %s\n", state.mam.label, mamname(r));
@@ -2303,7 +2333,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		}
 		break;
 	case 'G':
-		if (tst != 'F' || (r->property & (P_target|P_terminal)) == P_terminal)
+		if (tst != 'F' && dobind || (r->property & (P_target|P_terminal)) == P_terminal)
 		{
 			matched = 0;
 			break;
@@ -2438,7 +2468,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		if (*ops)
 			sfputr(xp, fmttime(ops, r->time), -1);
 		else
-			sfprintf(xp, "%lu", r->time);
+			sfprintf(xp, "%lu", numtime(r->time));
 		return;
 	case 'S':
 		op = *ops++;
@@ -3028,6 +3058,9 @@ expandall(register Sfio_t* xp, register unsigned long all)
  * :D:, :B: and :S:, when contiguous, are collected and applied as a group
  * a single `:' must separate each op, the trailing `:' is optional
  * =, !, !=, <>, <, <=, > and >= may separate an op from its value
+ *
+ * A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+ * A B C D E F G H I J K L M N O P Q R S T U V W X Y
  */
 
 static void
@@ -3418,6 +3451,11 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 						break;
 					sep |= MAT;
 					continue;
+				case '^':
+					if (sep & HAT)
+						break;
+					sep |= HAT;
+					continue;
 				case '!':
 					if (sep & NOT)
 						break;
@@ -3635,6 +3673,8 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					n |= SORT_qualified;
 				if (sep & MAT)
 					n |= SORT_sort|SORT_version;
+				if (sep & HAT)
+					n |= SORT_force;
 				list(xp, x, val, n);
 				continue;
 			case 'M':
@@ -3792,10 +3832,10 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					arg = sfstrtell(xp);
 				}
 			}
-			if (ctx && iscontextp(s, ctx_end))
+			if (ctx && iscontextp(s, &ctx_end))
 			{
 				s++;
-				*ctx_end = 0;
+				*(ctx_end - 1) = 0;
 				sfputc(xp, MARK_CONTEXT);
 				ctx_beg = sfstrtell(xp);
 			}

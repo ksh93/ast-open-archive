@@ -31,7 +31,7 @@
 *        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.        *
 *                                                                  *
 *            Information and Software Systems Research             *
-*The Regents of the University of California and AT&T Labs Research*
+*  The Regents of the University of California and AT&T Research   *
 *                         Florham Park NJ                          *
 *                                                                  *
 *                        Kurt Shoens (UCB)                         *
@@ -329,7 +329,7 @@ isfileaddr(char* name)
 	if (!sp)
 		return 0;
 	*sp = 0;
-	r = access(name, 0) >= 0;
+	r = access(name, F_OK) >= 0;
 	*sp = '/';
 	return r;
 }

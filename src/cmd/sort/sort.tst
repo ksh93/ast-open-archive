@@ -247,6 +247,15 @@ PDQRS'
 	EXEC	-R6 fixed%6 fixed_6
 	EXEC	-R% fixed_6 fixed%6
 	EXEC	-R6 fixed_6 fixed%6
+	EXEC	-R% fixed_6
+		OUTPUT - $'BCDEF
+CD
+AB
+PDQRS'
+	EXEC	-R% var
+		INPUT -f var $'%c\x08%c%c-ZZZZZZZ%c\x04%c%c-AAA%c\x05%c%c-QQQQ'
+		OUTPUT -f - $'%c\x08%c%c-ZZZZZZZ%c\x04%c%c-AAA%c\x05%c%c-QQQQ'
+	EXEC	-R- var
 	EXEC	-R6 fixed%6 fixed%7
 		OUTPUT -n - $'BCDEF
 CD
@@ -263,6 +272,10 @@ Usage: sort [-bdfingpMrcmusSLvZ] [-k pos1[,pos2]|.reclen|.position.length]]]
             [-T tempdir] [-x method] [-z type[size]] [-y size] [-X test]
             [-D level] [ file ... ]'
 		EXIT 2
+	EXEC	-R% flat
+		INPUT flat $'-ZZZZZZZ\n-AAA\n-QQQQQ\n-CCCCCCCCCCCCCCCC'
+		ERROR - $'sort: record format cannot be determined from data sample'
+		EXIT 1
 
 TEST 25 'fixed records and fields'
 	EXEC	-s -k .5 -k .2.2

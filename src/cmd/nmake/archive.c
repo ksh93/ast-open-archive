@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -45,10 +45,17 @@ arupdate(char* name)
 	Ardir_t*	ar;
 	char*		update;
 
-	if (!(ar = ardiropen(name, NiL, ARDIR_LOCAL)))
-		return 0;
-	update = streq(ar->meth->name, "local") ? "($(RANLIB|\":\") $(<)) >/dev/null 2>&1 || true" : (ar->flags & ARDIR_RANLIB) ? "$(RANLIB) $(<)" : (char*)0;
-	ardirclose(ar);
+	update = "$(RANLIB) $(<)";
+	if (!state.regress)
+	{
+		if (!(ar = ardiropen(name, NiL, ARDIR_LOCAL)))
+			return 0;
+		if (streq(ar->meth->name, "local"))
+			update = "($(RANLIB|\":\") $(<)) >/dev/null 2>&1 || true";
+		else if (!(ar->flags & ARDIR_RANLIB))
+			update = 0;
+		ardirclose(ar);
+	}
 	return update;
 }
 
@@ -164,9 +171,7 @@ arscan(struct rule* r)
 		r->dynamic |= D_entries;
 	else if (r->scan >= SCAN_USER)
 	{
-#if DEBUG
-		message((-5, "scan aggregate %s", r->name));
-#endif
+		debug((-5, "scan aggregate %s", r->name));
 		d->archive = 1;
 		state.archive = d;
 		scan(r, NiL);
@@ -175,9 +180,7 @@ arscan(struct rule* r)
 	}
 	else if (ar = ardiropen(r->name, NiL, ARDIR_LOCAL))
 	{
-#if DEBUG
-		message((-5, "scan archive %s", r->name));
-#endif
+		debug((-5, "scan archive %s", r->name));
 		d->archive = 1;
 		if (walkar(ar, d, r->name))
 			r->dynamic |= D_entries;
@@ -186,8 +189,6 @@ arscan(struct rule* r)
 		if (ardirclose(ar))
 			error(1, "%s: archive scan error", r->name);
 	}
-#if DEBUG
 	else
-		message((-5, "arscan(%s) failed", r->name));
-#endif
+		debug((-5, "arscan(%s) failed", r->name));
 }

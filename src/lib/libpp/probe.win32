@@ -1,60 +1,72 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2003-08-06
+# @(#)probe.win32 (AT&T Research) 2004-07-23
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
 #
 # 2> easy.err to avoid mysterious hang with bcc
-#
+
+# begin preamble shared with the make probe.ini
+
+IFS=$'\n'
+
+typeset -A headers
+
+# we are probing on behalf of libpp and nmake
+# so the native preprocessor must be forced in
+# order to bootstrap libpp and nmake
 
 nativepp=-1
 export nativepp
 
-echo 	"#include <winerror.h>" > easy.c
-if	$cc -E easy.c > /dev/null 2> easy.err 
-then	probe_easy=winerror
-else	probe_easy=stddef
-fi
+probe_header="
+stddef.h
+"
+for inc in syslimits.h winerror.h ostream bits/ctype_base.h stream.h
+do	echo 	"#include <$inc>" > easy.c
+	if	$cc -E easy.c > /dev/null 2> easy.err 
+	then	probe_header="$probe_header
+$inc
+"
+	fi
+done
 
 {
-for i in $probe_easy
-do	echo "#include <$i.h>"
+for i in $probe_header
+do	echo "#include <$i>"
 done
 echo '#ifdef __cplusplus'
-echo "int cplus=__cplusplus"
+echo "int cplus=__cplusplus;"
 echo '#endif'
 echo '#ifdef _UWIN'
-echo "int uwin=_UWIN"
+echo "int uwin=_UWIN;"
 echo '#endif'
 echo '#ifdef __BORLANDC__'
-echo "int versionb=__BORLANDC__"
+echo "int versionb=__BORLANDC__;"
 echo '#endif'
 echo '#ifdef __DMC__'
-echo "int versiond=__DMC__"
+echo "int versiond=__DMC__;"
 echo '#endif'
 echo '#ifdef _MSC_VER'
-echo "int versionm=_MSC_VER"
+echo "int versionm=_MSC_VER;"
 echo '#endif'
 echo '#ifdef __ICL'
-echo "int versioni=__ICL"
+echo "int versioni=__ICL;"
 echo '#endif'
 echo '#ifdef __LCC__'
-echo "int versionl=0+__LCC__"
+echo "int versionl=0+__LCC__;"
 echo '#endif'
 echo '#ifdef __MINGW32__'
-echo "int versiong=__MINGW32__"
+echo "int versiong=__MINGW32__;"
 echo '#endif'
 echo '#ifdef __INTERIX'
-echo "int versiono=__INTERIX"
+echo "int versiono=__INTERIX;"
 echo '#endif'
 echo '#ifdef __WATCOMC__'
-echo "int versionw=__WATCOMC__"
+echo "int versionw=__WATCOMC__;"
 echo '#endif'
 } > easy.c
 
-for i in $probe_easy
-do	eval ${i}_include=
-done
 include=
 uwin=
 cplus=
@@ -67,32 +79,50 @@ versioni=
 versiono=
 versionw=
 
-$cc -E easy.c 2> easy.err |
-egrep -i '^(#line 1 .*\.[hH]| *int +(cplus|uwin|version[bdiglmw]) *= *[0-9])' |
+$cc -E easy.c 2>&1 |
+egrep -i '^(#(line)? 1 .*\.[hH]| *int +(cplus|uwin|version[bdiglmw]) *= *[0-9])' |
 sed	-e 's/.*"\(.*\)".*/\1/' \
 	-e 's,^  *,,' \
 	-e 's,  *$,,' \
 	-e 's, *= *,=,' \
 	-e 's,^\(.\):[\\/]*,/\1/,' \
 	-e 's,[\\/][\\/]*,/,g' \
-	-e 's,^\(/.*\)/\(.*\)\.[hH]$,\2_include="\1",' \
-	-e 's, *int *,,' \
+	-e 's,^\(/.*\)/\(.*\)$,headers[\2]="\1",' \
+	-e 's, *int *\(.*\);.*,\1,' \
 	> easy.sh
 . ./easy.sh
 
-for i in $probe_easy
-do	eval d=\"\$${i}_include\"
-	case $d in
-	?*)	include=$d
-		break
-		;;
-	esac
+include=
+for i in $probe_header
+do	d=${headers[$i]}
+	if [[ $d ]]
+	then	include="$include
+$d"
+	elif [[ $i == */* ]]
+	then	d=${headers[${i##*/}]}
+		if [[ $d == */${i%/*} ]]
+		then	include="$include
+${d%/${i%/*}}"
+		fi
+	fi
 done
 
 i=$($cc -V 2> easy.err)
 if	test "" != "$i" -a -d "$i/include"
-then	include=$i/include
+then	include="$i/include
+$include"
 fi
+
+stdinclude=
+for inc in $include
+do	for dup in $stdinclude
+	do	[[ $inc -ef $dup ]] && continue 2
+	done
+	stdinclude="$stdinclude
+$inc"
+done
+
+# end preamble shared with the make probe.ini
 
 pragexpand='#pragma pp:pragmaexpand'
 
@@ -163,8 +193,8 @@ if	[ X"$cplus" != X ]
 then	dialect=C++
 fi
 
-case $version:$include in
-[0-9]*:/*)
+case $version:$stdinclude in
+[0-9]*:*/*)
 	hosttype=$(package)
 	machine=${hosttype#*.}
 	case $uwin in
@@ -181,57 +211,10 @@ case $version:$include in
 		assert=""
 		;;
 	esac
-	standard="$standard
-#pragma pp:standard \"$include\""
-	[ X"$versiond" != X ] && [ X"$cplus" != X ] && standard="$standard
-#pragma pp:include \"${include%/include}/stl\""
-	[ X"$versiond" != X ] && standard="$standard
-#pragma pp:standard \"$include/win32\""
-	if	[ X"$versioni" != X ]
-	then	if	[ -d /msdev/vc98 ]
-		then 	inc=/msdev/vc98
-		elif	[ -d /msdev/vc7 ]
-		then 	inc=/msdev/vc7
-		else	inc=/msdev/vc
-		fi
-		standard="$standard
-#pragma pp:standard \"$inc/include\""
-		if	[ -d $inc/PlatformSDK ]
-		then	standard="$standard
-#pragma pp:standard \"$inc/PlatformSDK/include\""
-		fi
-	elif	[ X"$versiong" != X ]
-	then	if	[ X"$cplus" != X ]
-		then	if	[ -d "$include/g++-3" ]
-			then	standard="$standard
-#pragma pp:include \"$include/g++-3\""
-			elif	[ -d "$include"/c++/3.* ]
-			then	set X "$include"/c++/3.*
-				standard="$standard
-#pragma pp:include \"$2\""
-				if	[ -d "$2"/mingw32 ]
-				then	standard="$standard
-#pragma pp:include \"$2/mingw32\""
-				fi
-				if	[ -d "$2"/backward ]
-				then	standard="$standard
-#pragma pp:include \"$2/backward\""
-				fi
-			fi
-			if	[ -d "${include%/*}"/mingw32/include ]
-			then	standard="$standard
-#pragma pp:include \"${include%/*}/mingw32/include\""
-			fi
-		fi
-		if	[ -d "${include%/*}"/lib/gcc-lib/mingw32/*/include ]
-		then	set X "${include%/*}"/lib/gcc-lib/mingw32/*/include
-			standard="$standard
-#pragma pp:include \"$2\""
-		fi
-	elif	[ X"$versionm" != X ] && [ -d /msdev/vc7/PlatformSDK/include ]
-	then	standard="$standard
-#pragma pp:standard \"/msdev/vc7/PlatformSDK/include\""
-	fi
+	for inc in $stdinclude
+	do	standard="$standard
+#pragma pp:standard \"$inc\""
+	done
 	: the payoff
 	set -- $cc
 	cmd=$1
@@ -356,7 +339,7 @@ __pentium__
 __pentiumpro
 __pentiumpro__
 __stdcall
-	"
+"
 	echo "#define	s(x)	#x"
 	echo "#define	q(x)	s(x)"
 	for i in $premac
@@ -365,7 +348,7 @@ __stdcall
 		echo "#endif"
 	done
 	} > easy.c
-	$cc -E easy.c > easy.out 2> easy.err
+	$cc -E easy.c > easy.out 2>&1
 	sed     -e '/=/!d' -e 's,[^"]*,echo ,' -e 's/":/"/' -e 's/:"/"/' easy.out > easy.sh
 	. ./easy.sh >&3
 	cat >&3 <<!

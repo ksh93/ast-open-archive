@@ -1,3 +1,6 @@
+04-06-08 ed.c: fix move() bug that botched pointers across append()
+04-05-24 testregex.dat: add more backreference tests
+04-05-11 testregex.c: matchprint() now lists (?,?) up to nsub
 04-02-13 testmatch.dat: add strmatch() cache boundary tests
 03-10-17 testregex.c: add regexec() REG_LEFT tests, fix \x.... tests
 03-08-11 ed.c: fix . value after s

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -211,11 +211,11 @@ open3d(const char* path, int oflag, ...)
 #if VCS && defined(VCS_OPEN)
 	VCS_OPEN(path, oflag, mode, &state.path.st);
 #endif
-	if ((oflag & O_CREAT) && (!sp || level || (oflag & O_EXCL)) || (sp || level) && (oflag & (O_TRUNC|O_RDWR|O_WRONLY)))
+	if ((oflag & O_CREAT) && (!sp || level || (oflag & O_EXCL)) || (sp || level) && ((oflag & O_TRUNC) || (oflag & O_ACCMODE) != O_RDONLY))
 	{
 		if (sp)
 		{
-			if (oflag & (O_WRONLY|O_RDWR))
+			if ((oflag & O_ACCMODE) != O_RDONLY)
 			{
 				if (!level) 
 				{
@@ -241,8 +241,8 @@ open3d(const char* path, int oflag, ...)
 		r = -1;
 		goto done;
 	}
-	r = vcreate(sp, (oflag & O_RDWR) ? (oflag|O_CREAT) : oflag, mode);
-	if (r < 0 && errno == ENOENT && (oflag & (O_CREAT|O_RDWR|O_TRUNC|O_WRONLY)))
+	r = vcreate(sp, ((oflag & O_ACCMODE) == O_RDWR) ? (oflag|O_CREAT) : oflag, mode);
+	if (r < 0 && errno == ENOENT && ((oflag & (O_CREAT|O_TRUNC)) || (oflag & O_ACCMODE) != O_RDONLY))
 	{
 		if (!(sp = pathreal(path, P_PATHONLY|P_NOOPAQUE, NiL)))
 			r = -1;

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -37,6 +37,7 @@
 #define SCAN_macro		(1<<1)	/* macro (default line) style	*/
 #define SCAN_nopropagate	(1<<2)	/* don't propagate scan index	*/
 #define SCAN_state		(1<<3)	/* scan for state vars		*/
+#define SCAN_override		(1<<4)	/* no scan override warning	*/
 
 #define QUOTE_blank		(1<<0)	/* blank out quote		*/
 #define QUOTE_comment		(1<<1)	/* comment quote type		*/
@@ -182,7 +183,7 @@ scanbranch(scanstate* u, struct action* action, struct action* first, struct act
 				m = a;
 				for (b = a + 1; b <= last; b++)
 				{
-					if (b->pattern && b->pattern[i] != m->pattern[i])
+					if (b->pattern && b->pattern[i] && b->pattern[i] != m->pattern[i])
 					{
 						*u++ = m->pattern[i];
 						*u++ = 0;
@@ -426,6 +427,9 @@ scancompile(struct rule* r, int flags)
 					break;
 				case 'M':
 					ss->flags |= SCAN_macro;
+					continue;
+				case 'O':
+					ss->flags |= SCAN_override;
 					continue;
 				case 'S':
 					ss->flags |= SCAN_state;
@@ -1152,7 +1156,8 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 									os = q->rule->name;
 								else if (q->rule->scan == n)
 									ns = q->rule->name;
-							error(1, "%s: scan strategy %s overrides %s", u->name, ns, os);
+							if (!(strategy[n]->flags & SCAN_override))
+								error(1, "%s: scan strategy %s overrides %s", u->name, ns, os);
 						}
 						u->scan = n;
 						staterule(RULE, u, NiL, 1)->scan = n;
@@ -1759,9 +1764,7 @@ scan(register struct rule* r, unsigned long* tm)
 				if (p->rule->mark & M_scan)
 				{
 					p->rule->mark &= ~M_scan;
-#if DEBUG
-					message((-5, "%s: implicit prerequisite %s", r->name, p->rule->name));
-#endif
+					debug((-5, "%s: implicit prerequisite %s", r->name, p->rule->name));
 				}
 			s->prereqs = scanmatch(s->prereqs, ss->after, r, null, null, 0, 1);
 		}
@@ -1769,9 +1772,7 @@ scan(register struct rule* r, unsigned long* tm)
 			if (p->rule->mark & M_scan)
 			{
 				p->rule->mark &= ~M_scan;
-#if DEBUG
-				message((-5, "%s: implicit prerequisite %s", r->name, p->rule->name));
-#endif
+				debug((-5, "%s: implicit prerequisite %s", r->name, p->rule->name));
 			}
 	}
 	if (tm && prereqchange(r, s->prereqs, r, oprereqs))

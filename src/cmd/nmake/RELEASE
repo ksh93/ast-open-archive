@@ -1,3 +1,85 @@
+04-08-11 expand.c: :W=O: scans INIT files too -- duh
+	 expand.c: fix :P=H: sufix checks
+	 expand.c: handle :P!=S:
+	 command.c: fix .JOBDONE rule arg (internal#05)
+	 parse.c: fix local ( a ... ) $(%) (statement#10)
+	 Makerules.mk: fix :PACKAGE_INSTALL: to use .ACCEPT (e.g. for proto)
+	 Makerules.mk: fix .MAMEDIT. initialization for 2d vs. 3d
+	 Makerules.mk: YACCFIX now applies proto to y.tab.h
+	 Makerules.mk: ignore VERSION==- for default output file names
+	 Makerules.mk: fix :DLL: to work -- wow
+	 Makerules.mk: fix synthesized rule names to avoid .. canonicalization
+	 Makerules.mk: fix :PACKAGE: to handle `foo=bar' rhs
+	 Makerules.mk: add .LIST.PACKAGE.LICENSE
+04-08-10 rules-win32.mk: add :PACKAGE: { atl crt mfc } support -- puke
+04-07-27 msgcat.mk: move :: related files to msg specific action
+04-07-22 tests/*.tst: more test additions
+04-07-17 archive.c: --regress enables ranlib for all archive types
+	 bind.c: fix binding guess for unbuilt targets
+	 bind.c: fix overzealous dir HASH prune for 2d views
+	 bind.c: allow D_source&P_target to inherit lower view (assert#29)
+	 expand.c: add :T=B..: unbind pre-op
+	 main.c: move the .INIT trap after candidate state variable freeze
+	 main.c,read.c: update MAKECONVERT to handle 'file1:file2 action ...'
+	 make.c: let joint prereq share sibling frame for binding (assert#34)
+	 make.c: fix require_p loop detection
+	 object.c: add objectfile() to unify with statefile()
+	 object.c: fix lower view state var time propagation
+	 object.c: -nbf file inhibits frozen var check
+	 object.c: use complink() skip logic in comprule() -- wow
+	 option.c: --writestate and --writestate can specifiy dir only
+	 rule.c: add .GLOBAL and internal.global
+	 state.c: drop leads/lags warning for --regress
+	 Makerules.mk: handle multiple :LINK: lhs
+	 Makerules.mk: fix .DO.INSTALL.DIR view logic with .DO.TOP.LEVEL
+	 Scanrules.mk: add ".ATTRIBUTE.%.h : .SCAN.c" for .PARAMETER files
+	 Scanrules.mk: .SCAN.sh: add $'...' quotes
+04-06-30 parse.c: pass blank lines at all input levels to preserve numbering
+	 parse.c: no space indent warning for blank lines
+	 parse.c,syntax-08: handle quote after expansion in expression
+04-06-28 make.c: preserve joint metarule prereq list order
+	 diagnostics.tst: add
+04-06-21 Makerules.mk: make options env ignored if MAKE_OPTIONS set
+	 make.h: add state.import with increment/decrement semantics
+	 options.h,options.c,variable.c,object.c: add import state option
+	 parse.c: fix here action parse to honor quotes and nesting
+	 parse.c: retain blank/hidden action lines for line number consistency
+	 trap.c: fix functional vs. obsolete virtual interrupt logic
+	 assert.tst,automatics.tst,interrupts.tst,syntax.tst: add
+04-06-20 dump.c: drop dumprule() trailing ' ' by adding "state" status
+	 expand.c: skip tst=='F' for :T=XG:
+	 make.c: maketop() rule rename disabled (what did that do?)
+	 misc.c: handle %o in printext() -- oops
+	 misc.c: %t %T calls tmdate() if not a number
+	 parse.c: D_scope prereqs do not set P_target
+	 Makerules.mk: if ! "$(CC.DIALECT:N=-I-)" then no -I- -- duh
+04-06-19 implicit.tst: add
+04-06-18 rule.c: add nametype() to unify is*() name type macros
+04-06-17 options.h: add -q, --regress to massage output for testing
+	 misc.c: add numtime() for mam/regress/trace numeric times
+	 prereqs.tst: add
+04-06-12 assignment.tst: add
+04-06-11 Makerules.mk: fix per-target +l vs. -l
+	 nmake.tst: split into attributes.tst edit.tst options.tst
+	 options.c: recode to pass options.tst
+04-06-10 nmake.tst: initialize in 2d with no VPATH
+04-06-08 Makerules.mk: drop :PACKAGE: nolibrary => -l%:.VIRTUAL
+04-06-06 rule.c: fix associate() .SCAN match
+04-06-04 Makerules.mk: add :PACKAGE: foo:notype bar:type=-p --type=-g
+	 Makerules.mk: fix .REQUIRE.* to handle libfoo.a etc.
+	 scan.c: add 'O' option to inhibit scan override warning
+	 parse.c: debug=7 for active statements, debug=8 for skipped
+04-05-31 Makerules.mk: fix :PACKAGE: version logic
+	 Makerules.mk: add .FLAGSINIT, called in .MAKEINIT
+	 Makerules.mk,Scanrules.mk: strip to generic cobol
+	 expand.h,expand.c: add ^ edit op sep
+04-05-20 Makerules.mk: fix .OFFICIAL to not diff dirs
+04-05-19 parse.c: make the read builtin interruptable
+04-05-18 rule.c: move b_*() builtins here, add b_syscall()
+04-05-11 mam.c: add "bind ..." to match the mam doc
+	 make.c: add "meta ..." to match the mam doc
+	 Scanrules.mk: tweak cobol sql scan
+	 scan.c: fix ancient dup pattern prefix bug
 04-05-06 Makerules.mk: fix CCLD CCLDFLAGS semantics
 04-04-15 expand.c: fix :V: operand check
 	 expand.c: check var alternation only before first delimiter

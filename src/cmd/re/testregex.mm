@@ -5,7 +5,7 @@ AT&T Labs Research regex(3) regression tests
 .AF "AT&T Labs Research - Florham Park NJ"
 .AU "Glenn Fowler <gsf@research.att.com>"
 .H 1
-.xx link="testregex.c	testregex.c 2003-01-03"
+.xx link="testregex.c	testregex.c 2004-05-31"
 is the latest source for the AT&T Labs Research regression test
 harness for the
 .xx link="http://www.opengroup.org/onlinepubs/007904975/functions/regcomp.html	X/Open regex"
@@ -44,14 +44,17 @@ r c l.
 NAME	LABEL	AUTHORS
 AT&T ast	\h'0*\w"http://www.research.att.com/sw/download/"'A\h'0'	Glenn Fowler and Doug McIlroy
 bsd	\h'0*\w"ftp://ftp.netbsd.org/pub/NetBSD/NetBSD-1.5.2/source/sets/src.tgz"'B\h'0'	\|
+Bell Labs	\h'0*\w"http://www.bell-labs.com/"'D\h'0'	Doug McIlroy
 old gnu	\h'0*\w"http://www.gnu.org"'G\h'0'	\|
 gnu	\h'0*\w"http://www.gnu.org"'H\h'0'	Isamu Hasegawa
 irix	\h'0*\w"http://www.sgi.com"'I\h'0'	\|
+boost	\h'0*\w"http://www.boost.org/libs/regex/"'J\h'0'	John Maddock
 regex++	\h'0*\w"http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm"'M\h'0'	John Maddock
 pcre perl compatible	\h'0*\w"http://www.pcre.org/"'P\h'0'	Philip Hazel
 rx	\h'0*\w"ftp://regexps.com/pub/src/hackerlab/"'R\h'0'	Tom Lord
 spencer	\h'0*\w"http://arglist.com/regex/rxspencer-alpha3.8.g2.tar.gz"'S\h'0'	Henry Spencer
 libtre	\h'0*\w"http://kouli.iki.fi/~vlaurika/libtre/"'T\h'0'	Ville Laurikari
+unix caldera	\h'0*\w"http://unixtools.sourceforge.net/"'U\h'0'	\|
 .TE
 .H 1 "Test Data Repository"
 .TS

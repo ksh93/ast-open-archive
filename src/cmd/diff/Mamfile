@@ -1,15 +1,15 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv mam_cc_FLAGS 
+setv mam_cc_FLAGS
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,122 +35,126 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make LICENSE
-done LICENSE
+make ${INSTALLROOT}/lib/package/gnu.lic
+done ${INSTALLROOT}/lib/package/gnu.lic
 make install
 make diff
 make diff.o
 make diff.c
-make ../../../include/ast/fnmatch.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/fnmatch.h
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h
+make ${INSTALLROOT}/include/ast/fnmatch.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/fnmatch.h
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h
 make diff.h implicit
-make ../../../include/ast/regex.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/regex.h
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h
-done ../../../include/ast/stdio.h
+make ${INSTALLROOT}/include/ast/regex.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/regex.h
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h
+done ${INSTALLROOT}/include/ast/stdio.h
 make system.h implicit
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/re_comp.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-prev ../../../include/ast/stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h dontcare
-prev ../../../include/ast/limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/limits.h implicit
 make vfork.h implicit
 done vfork.h dontcare virtual
 make ndir.h implicit
 done ndir.h dontcare virtual
-make ../../../include/ast/dirent.h implicit
-make ../../../include/ast/ast_dirent.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/ast_dirent.h dontcare
-done ../../../include/ast/dirent.h dontcare
+make ${INSTALLROOT}/include/ast/dirent.h implicit
+make ${INSTALLROOT}/include/ast/ast_dirent.h implicit
+prev ndir.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/ast_dirent.h dontcare
+done ${INSTALLROOT}/include/ast/dirent.h dontcare
 make config.h implicit
+meta config.h %.iffe>%.h config.iffe config
 make config.iffe
 done config.iffe
 bind -last
-exec - iffe -o config.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run config.iffe
-prev ../../../include/ast/ast_std.h implicit
+exec - iffe -o config.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run config.iffe
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done config.h generated
 done system.h
 done diff.h
 done diff.c
+meta diff.o %.c>%.o diff.c diff
 prev diff.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Paul Eggert <eggert@twinsun.com>][-author?Richard Stallman <rms@gnu.ai.mit.edu>][-author?Mike Haertel][-author?David Hayes][-author?Len Tower][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Paul Eggert][-author?Richard Stallman][-author?Mike Haertel][-author?David Hayes][-author?Len Tower][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
 done diff.o generated
 make analyze.o
 make analyze.c
@@ -158,122 +162,144 @@ make cmpbuf.h implicit
 done cmpbuf.h
 prev diff.h implicit
 done analyze.c
+meta analyze.o %.c>%.o analyze.c analyze
 prev analyze.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c analyze.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c analyze.c
 done analyze.o generated
 make dir.o
 make dir.c
 prev diff.h implicit
 done dir.c
+meta dir.o %.c>%.o dir.c dir
 prev dir.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c dir.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c dir.c
 done dir.o generated
 make io.o
 make io.c
 prev diff.h implicit
 done io.c
+meta io.o %.c>%.o io.c io
 prev io.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c io.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c io.c
 done io.o generated
 make util.o
 make util.c
 prev diff.h implicit
 done util.c
+meta util.o %.c>%.o util.c util
 prev util.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
 done util.o generated
 make context.o
 make context.c
 prev diff.h implicit
 done context.c
+meta context.o %.c>%.o context.c context
 prev context.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c context.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c context.c
 done context.o generated
 make ed.o
 make ed.c
 prev diff.h implicit
 done ed.c
+meta ed.o %.c>%.o ed.c ed
 prev ed.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ed.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ed.c
 done ed.o generated
 make ifdef.o
 make ifdef.c
 prev diff.h implicit
 done ifdef.c
+meta ifdef.o %.c>%.o ifdef.c ifdef
 prev ifdef.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ifdef.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ifdef.c
 done ifdef.o generated
 make cmpbuf.o
 make cmpbuf.c
 prev cmpbuf.h implicit
 prev system.h implicit
 done cmpbuf.c
+meta cmpbuf.o %.c>%.o cmpbuf.c cmpbuf
 prev cmpbuf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmpbuf.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmpbuf.c
 done cmpbuf.o generated
 make normal.o
 make normal.c
 prev diff.h implicit
 done normal.c
+meta normal.o %.c>%.o normal.c normal
 prev normal.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c normal.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c normal.c
 done normal.o generated
 make side.o
 make side.c
 prev diff.h implicit
 done side.c
+meta side.o %.c>%.o side.c side
 prev side.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c side.c
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c side.c
 done side.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
+setv LICENSE -DLICENSE="author=\"Paul Eggert,Richard Stallman,Mike Haertel,David Hayes,Len Tower\""
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
 done diff generated
 make diff3
 make diff3.o
 make diff3.c
-prev ../../../include/ast/getopt.h implicit
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev system.h implicit
 done diff3.c
+meta diff3.o %.c>%.o diff3.c diff3
 prev diff3.c
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Randy Smith][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Randy Smith][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
 done diff3.o generated
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o diff3 diff3.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o diff3 diff3.o ${mam_libast}
 done diff3 generated
 make sdiff
 make sdiff.o
 make sdiff.c
-prev ../../../include/ast/getopt.h implicit
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev system.h implicit
 done sdiff.c
+meta sdiff.o %.c>%.o sdiff.c sdiff
 prev sdiff.c
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Thomas Lord][-copyright?Copyright (c) 1992-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-author?Thomas Lord][-copyright?Copyright (c) 1992-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
 done sdiff.o generated
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o sdiff sdiff.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o sdiff sdiff.o ${mam_libast}
 done sdiff generated
-make ../../../bin
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
+make ${INSTALLROOT}/bin
+exec - if	silent test ! -d ${INSTALLROOT}/bin
+exec - then	mkdir -p ${INSTALLROOT}/bin
 exec - fi
-done ../../../bin generated
-make ../../../bin/diff
-prev ../../../bin
+done ${INSTALLROOT}/bin generated
+make ${INSTALLROOT}/bin/diff
+prev ${INSTALLROOT}/bin
 prev diff
 exec - test '' = 'diff' || ${STDCMP} 2>/dev/null -s diff ${INSTALLROOT}/bin/diff || { ${STDMV} ${INSTALLROOT}/bin/diff ${INSTALLROOT}/bin/diff.old 2>/dev/null || true; ${STDCP} diff ${INSTALLROOT}/bin/diff  		    		    ;}
-done ../../../bin/diff generated
-make ../../../bin/diff3
+done ${INSTALLROOT}/bin/diff generated
+make ${INSTALLROOT}/bin/diff3
 prev diff3
 exec - test '' = 'diff3' || ${STDCMP} 2>/dev/null -s diff3 ${INSTALLROOT}/bin/diff3 || { ${STDMV} ${INSTALLROOT}/bin/diff3 ${INSTALLROOT}/bin/diff3.old 2>/dev/null || true; ${STDCP} diff3 ${INSTALLROOT}/bin/diff3  		    		    ;}
-done ../../../bin/diff3 generated
-make ../../../bin/sdiff
+done ${INSTALLROOT}/bin/diff3 generated
+make ${INSTALLROOT}/bin/sdiff
 prev sdiff
 exec - test '' = 'sdiff' || ${STDCMP} 2>/dev/null -s sdiff ${INSTALLROOT}/bin/sdiff || { ${STDMV} ${INSTALLROOT}/bin/sdiff ${INSTALLROOT}/bin/sdiff.old 2>/dev/null || true; ${STDCP} sdiff ${INSTALLROOT}/bin/sdiff  		    		    ;}
-done ../../../bin/sdiff generated
+done ${INSTALLROOT}/bin/sdiff generated
 done install virtual
 make test
 done test dontcare virtual

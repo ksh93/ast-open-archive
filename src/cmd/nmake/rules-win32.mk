@@ -30,3 +30,31 @@ SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 	echo EXPORTS
 	cat $(>)
 	} > $(<)
+
+/*
+ * SDK package support -- how about a stable registry?
+ */
+
+.PACKAGE.SDK. : .FUNCTION
+	local ( DIR PKG ) $(%)
+	local D V
+	D := $(DIR:F=%(lower)s)
+	if "$(PACKAGE_$(PKG))"
+		R := $(PACKAGE_$(PKG))/$(D)
+	else
+		if ! .PACKAGE.SDK.DIRS.
+			.PACKAGE.SDK.DIRS. := $(sh $(CC) -V 2>/dev/null) /platformsdk
+		end
+		R := $(.PACKAGE.SDK.DIRS.:X=$(PKG)/$(D) $(D)/win64/$(PKG) $(D):T=F)
+	end
+	PACKAGE_$(PKG)_$(DIR) := $(R)
+	return $(R)
+
+PACKAGE_atl_INCLUDE = $(.PACKAGE.SDK. INCLUDE atl)
+PACKAGE_atl_LIB = $(.PACKAGE.SDK. LIB atl)
+
+PACKAGE_crt_INCLUDE = $(.PACKAGE.SDK. INCLUDE crt)
+PACKAGE_crt_LIB = $(.PACKAGE.SDK. LIB crt)
+
+PACKAGE_mfc_INCLUDE = $(.PACKAGE.SDK. INCLUDE mfc)
+PACKAGE_mfc_LIB = $(.PACKAGE.SDK. LIB mfc)

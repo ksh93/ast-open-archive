@@ -13,5 +13,5 @@ function DATA
 
 TEST 01 'down to the second'
 	DO DATA
-	EXEC -f "$listformat" *.dat
+	EXEC --format="$listformat" *.dat
 		SAME OUTPUT list.dat

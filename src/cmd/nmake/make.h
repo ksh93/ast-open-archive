@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -46,8 +46,10 @@
 #include <sfstr.h>
 
 #if DEBUG
+#define debug(x)	do if (error_info.trace < 0) { error x; } while (0)
 #define	PANIC		(ERROR_PANIC|ERROR_SOURCE|ERROR_SYSTEM),__FILE__,__LINE__
 #else
+#define debug(x)
 #define	PANIC		ERROR_PANIC
 #endif
 
@@ -78,7 +80,7 @@
 #undef	setbit		/* netbsd has one in <sys/param.h> */
 
 #define bind		bindrule /* avoids possible socket clash */
-#define canon(x)	((state.context&&iscontextp(x,state.tmppchar))?(state.tmppchar+1):(state.mam.statix?mamcanon(x):pathcanon(x,0)))
+#define canon(x)	((state.context&&iscontextp(x,&state.tmppchar))?state.tmppchar:(state.mam.statix?mamcanon(x):pathcanon(x,0)))
 #define clrbit(v,b)	((v)&=~(1L<<(b)))
 #define getar(name)	((struct dir*)hashget(table.ar,(name)))
 #define getbound(name)	((char*)hashget(table.bound,(name)))
@@ -88,11 +90,6 @@
 #define getreg(name)	((int*)hashget(table.regress,(name)))
 #define getrule(name)	((struct rule*)hashget(table.rule,(name)))
 #define getvar(name)	((struct var*)hashget(table.var,(name)))
-#define isaltstate(x)	(*((x)+1)=='+')
-#define iscontext(x)	(*(x)==MARK_CONTEXT&&*((x)+strlen(x)-1)==MARK_CONTEXT)
-#define iscontextp(x,p)	(*(x)==MARK_CONTEXT&&*(p=(x)+strlen(x)-1)==MARK_CONTEXT)
-#define isintvar(x)	(*(x)=='.'&&*((x)+strlen(x))=='.')
-#define isstate(x)	(*(x)=='('&&strchr(x,')'))
 #define message(x)	do if (error_info.trace < 0) { error x; } while (0)
 #define notfile(r)	(((r)->property&(P_attribute|P_functional|P_make|P_operator|P_state|P_use|P_virtual))||((r)->dynamic&D_scope)||(r)->semaphore||((r)->property&P_dontcare)&&((r)->dynamic&D_bound)&&!(r)->time)
 #define oldname(r)	do{if(getbound(r->uname))putbound(0,0);if(r->dynamic&D_alias)r->dynamic&=~D_alias;else putrule(r->name,0);r->name=r->uname;r->uname=0;}while(0)
@@ -119,6 +116,15 @@
 #define viewable(r)	((r->property&P_state)&&*r->name=='(')
 #define viewname(s,v)	(*(s)=VIEWOFFSET+(v))
 #define zero(x)		memzero(&(x),sizeof(x))
+
+#define isaltstate(s)	(nametype(s,NiL)&(NAME_altstate))
+#define iscontext(s)	(nametype(s,NiL)&(NAME_context))
+#define iscontextp(s,p)	(nametype(s,p)&(NAME_context))
+#define isdynamic(s)	(nametype(s,NiL)&(NAME_dynamic|NAME_glob))
+#define isglob(s)	(nametype(s,NiL)&(NAME_glob))
+#define isintvar(s)	(nametype(s,NiL)&(NAME_intvar))
+#define isstate(s)	(nametype(s,NiL)&(NAME_staterule|NAME_altstate|NAME_statevar))
+#define isstatevar(s)	(nametype(s,NiL)&(NAME_statevar))
 
 #define freelist(x)	do{if(x){(x)->rule=(struct rule*)internal.freelists;internal.freelists=(char*)(x);}}while(0)
 #define freerule(r)	do{zero(*r);*((char**)r)=internal.freerules;internal.freerules=(char*)(r);}while(0)
@@ -190,7 +196,8 @@
 #define A_null		(1<<8)	/* assertion() .NULL			*/
 #define A_scan		(1<<9)	/* assertion() .SCAN			*/
 #define A_scope		(1<<10)	/* assertion() metarule scope prereqs	*/
-#define A_special	(1<<11)	/* assertion() .SPECIAL		*/
+#define A_special	(1<<11)	/* assertion() .SPECIAL			*/
+#define A_target	(1<<12)	/* assertion() set P_target		*/
 
 #define C_ID1		(1<<0)	/* istype() first identifier char	*/
 #define C_ID2		(1<<1)	/* istype() remaining id chars		*/
@@ -209,6 +216,19 @@
 #define C_VARPOS6	(1<<13)	/* istype() var superimposed code 6	*/
 #define C_VARPOS7	(1<<14)	/* istype() var superimposed code 7	*/
 #define C_VARPOS8	(1L<<15)/* istype() var superimposed code 8	*/
+
+#define NAME_altstate	0x001	/* altername state rule name		*/
+#define NAME_assignment	0x002	/* assignment				*/
+#define NAME_context	0x004	/* context string			*/
+#define NAME_dynamic	0x008	/* requires dynamic expand()		*/
+#define NAME_glob	0x010	/* requires dynamic glob()		*/
+#define NAME_identifier	0x020	/* identifier name			*/
+#define NAME_intvar	0x040	/* internal variable name		*/
+#define NAME_option	0x080	/* option				*/
+#define NAME_path	0x100	/* path name				*/
+#define NAME_staterule	0x200	/* state rule name			*/
+#define NAME_statevar	0x400	/* state variable name			*/
+#define NAME_variable	0x800	/* variable name			*/
 
 #define ARG_ASSIGN	(1<<0)	/* command line assignment arg flag	*/
 #define ARG_SCRIPT	(1<<1)	/* command line script arg flag		*/
@@ -531,6 +551,7 @@ struct internal				/* internal rule and list info	*/
 	struct rule*	exists;		/* .EXISTS rule pointer		*/
 	struct rule*	failed;		/* .FAILED rule pointer		*/
 	struct rule*	file;		/* .FILE rule pointer		*/
+	struct rule*	global;		/* .GLOBAL rule pointer		*/
 	struct rule*	member;		/* .MEMBER rule pointer		*/
 	struct rule*	notyet;		/* .NOTYET rule pointer		*/
 	struct rule*	scanned;	/* .SCANNED rule pointer	*/
@@ -586,13 +607,6 @@ struct internal				/* internal rule and list info	*/
 	struct rule*	source_p;	/* .SOURCE. rule pointer	*/
 
 	/*
-	 * builtin functions
-	 */
-
-	struct var*	getconf;	/* .GETCONF var pointer		*/
-	struct var*	outstanding;	/* .OUTSTANDING var pointer	*/
-
-	/*
 	 * miscellaneous internal info
 	 */
 
@@ -600,6 +614,7 @@ struct internal				/* internal rule and list info	*/
 	Sfio_t*		nam;		/* name generation buffer	*/
 	Sfio_t*		tmp;		/* very temporary work buffer	*/
 	Sfio_t*		val;		/* initial getval return buffer	*/
+	Sfio_t*		wrk;		/* very temporary work buffer	*/
 
 	char*		freelists;	/* free lists list		*/
 	char*		freerules;	/* free rules list		*/
@@ -662,6 +677,7 @@ struct external				/* external engine name info	*/
 	char*		object;		/* make object file suffix	*/
 	char*		source;		/* make source file suffix	*/
 	char*		state;		/* make state file suffix	*/
+	char*		tmp;		/* make temporary file suffix	*/
 };
 
 struct tables				/* hash table pointers		*/
@@ -700,6 +716,8 @@ struct label				/* resume label			*/
 
 struct mam				/* mam state			*/
 {
+	Sfdisc_t	disc;		/* output discipline -- first!	*/
+
 	int		level;		/* next error() message level	*/
 	int		parent;		/* mam parent label		*/
 	int		rootlen;	/* strlen(state.mam.root)	*/
@@ -741,6 +759,7 @@ struct state				/* program state		*/
 	unsigned char	global;		/* reading global rules		*/
 	unsigned char	ignore;		/* ignore sh action errors	*/
 	unsigned char	ignorelock;	/* ignore state lock		*/
+	unsigned char	import;		/* import var def precedence	*/
 	unsigned char	init;		/* engine initialization	*/
 	unsigned char	intermediate;	/* force intermediate targets	*/
 	unsigned char	interpreter;	/* in interpreter main loop	*/
@@ -756,6 +775,7 @@ struct state				/* program state		*/
 	unsigned char	preprocess;	/* preprocess all makefiles	*/
 	unsigned char	reading;	/* currently reading makefile	*/
 	unsigned char	readonly;	/* current vars|opts readonly	*/
+	unsigned char	regress;	/* output for regression test	*/
 	unsigned char	ruledump;	/* dump rule information	*/
 	unsigned char	savestate;	/* must save state variables	*/
 	unsigned char	scan;		/* scan|check implicit prereqs	*/
@@ -874,8 +894,6 @@ extern void		artouch(char*, char*);
 extern char*		arupdate(char*);
 extern struct rule*	associate(struct rule*, struct rule*, char*, struct list**);
 extern struct var*	auxiliary(char*, int);
-extern char*		b_getconf(char**);
-extern char*		b_outstanding(char**);
 extern struct rule*	bind(struct rule*);
 extern void		bindattribute(struct rule*);
 extern struct rule*	bindfile(struct rule*, char*, int);
@@ -885,7 +903,7 @@ extern void		candidates(void);
 extern char*		call(struct rule*, char*);
 extern struct rule*	catrule(char*, char*, char*, int);
 extern int		cmptime(unsigned long, unsigned long);
-extern char*		colonlist(Sfio_t*, char*, int);
+extern char*		colonlist(Sfio_t*, char*, int, int);
 extern void		compile(char*, char*);
 extern int		complete(struct rule*, struct list*, unsigned long*, long);
 extern void		compref(int, const char*, unsigned long);
@@ -921,9 +939,7 @@ extern void		inittrap(void);
 extern void		initview(void);
 extern void		initwakeup(int);
 extern void		interpreter(char*);
-extern int		isdynamic(const char*);
-extern int		isglob(const char*);
-extern int		isstatevar(const char*);
+extern int		nametype(const char*, char**);
 extern struct list*	joint(struct rule*);
 extern struct list*	listcopy(struct list*);
 extern void		listops(Sfio_t*, int);
@@ -954,6 +970,8 @@ extern struct rule*	metarule(char*, char*, int);
 extern void		negate(struct rule*, struct rule*);
 extern void*		newchunk(char**, size_t);
 extern void		newfile(struct rule*, char*, unsigned long);
+extern unsigned long	numtime(unsigned long);
+extern char*		objectfile(void);
 extern struct option*	opentry(int, int);
 extern void		optcheck(void);
 extern void		optinit(void);

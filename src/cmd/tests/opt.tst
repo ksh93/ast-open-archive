@@ -1309,13 +1309,22 @@ OPTIONS
 return=z option=-z name=base arg=aaa zzz num=1
 return=-103 option=-103 name=charset arg=us num=1'
 		ERROR -
+	EXEC	- pax "$usage" '--append --base="aaa zzz" --charset=us'
+	EXEC	- pax "$usage" '-a -zaaa'
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=z option=-z name=-z arg=aaa num=1'
 	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us\ ascii,block+=077777777777'
 		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
 return=z option=-z name=base arg=aaa,zzz num=1
 return=-103 option=-103 name=charset arg:=us ascii num=1
-return=b option=-b name=blocksize arg+=077777777777 num=8589934591LL'
+return=b option=-b name=blocksize arg+=077777777777 num=8589934591'
 	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n23 block+=077777777777\n'
 	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n23 block+=077777777777'
+	EXEC	- pax "$usage" '--app,--base=aaa\,zzz,--ch:=us\ ascii,--block+=077777777777'
+	EXEC	- pax "$usage" '-a,-zaaa,-b077777777777'
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=z option=-z name=-z arg=aaa num=1
+return=b option=-b name=-b arg=077777777777 num=8589934591'
 	EXEC	- pax "$usage" '14 foo'
 		EXIT 1
 		OUTPUT - $'return=: option= name=14 num=0 str=14 foo\nreturn=: option= name=foo num=0 str=14 foo'

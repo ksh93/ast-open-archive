@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2003 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,13 +15,13 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
 *                                                                  *
 *******************************************************************/
-#pragma prototype
+#pragma prototyped
 /*
  * base64encode()/base64decode() tester
  */
@@ -40,8 +40,9 @@ main()
 	unsigned char	tst[sizeof(dat)];
 	char		buf[1024];
 	unsigned char	pat[16];
-	char		en[] = "YWJjZGVmZ2hpams=";
-	char		de[] = "abcdefghijk";
+
+	static char	en[] = "YWJjZGVmZ2hpams=";
+	static char	de[] = "abcdefghijk";
 
 	testno = errors = 0;
 	sfprintf(sfstdout, "TEST	base64\n");

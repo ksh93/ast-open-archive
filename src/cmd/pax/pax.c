@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -38,7 +38,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-03-17 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -554,6 +554,17 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			}
 			else
 				state.checksum.name = 0;
+			break;
+		case OPT_chmod:
+			if (y && *v)
+			{
+				strperm(v, &e, 0);
+				if (*e)
+					error(3, "%s: invalid file mode expression", v);
+				state.mode = strdup(v);
+			}
+			else
+				state.mode = 0;
 			break;
 		case OPT_clobber:
 			state.clobber = y;

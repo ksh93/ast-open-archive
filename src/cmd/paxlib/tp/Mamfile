@@ -1,9 +1,9 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,119 +35,122 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make tp
 make libpaxtp.a archive
 make tp.o
 make tp.c
-make ../../../../include/ast/tm.h implicit
-make ../../../../include/ast/times.h implicit
-make ../../../../include/ast/ast_time.h implicit
-done ../../../../include/ast/ast_time.h dontcare
-make ../../../../include/ast/ast.h implicit
-make ../../../../include/ast/vmalloc.h implicit
-make ../../../../include/ast/ast_common.h implicit
-done ../../../../include/ast/ast_common.h dontcare
-make ../../../../include/ast/ast_std.h implicit
-make ../../../../include/ast/ast_botch.h implicit
-done ../../../../include/ast/ast_botch.h dontcare
-make ../../../../include/ast/ast_unistd.h implicit
-done ../../../../include/ast/ast_unistd.h dontcare
-make ../../../../include/ast/re_comp.h implicit
-make ../../../../include/ast/prototyped.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/prototyped.h dontcare
-done ../../../../include/ast/re_comp.h dontcare
-make ../../../../include/ast/getopt.h implicit
-make ../../../../include/ast/ast_getopt.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/ast_getopt.h dontcare
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/getopt.h dontcare
-make ../../../../include/ast/ast_fcntl.h implicit
-make ../../../../include/ast/ls.h implicit
-make ../../../../include/ast/ast_mode.h implicit
-done ../../../../include/ast/ast_mode.h dontcare
-make ../../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../../include/ast/ast_fs.h dontcare
-prev ../../../../include/ast/ast_std.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/ls.h dontcare
-prev ../../../../include/ast/ast_fs.h implicit
-done ../../../../include/ast/ast_fcntl.h dontcare
-make ../../../../include/ast/ast_types.h implicit
-done ../../../../include/ast/ast_types.h dontcare
-make ../../../../include/ast/ast_map.h implicit
-done ../../../../include/ast/ast_map.h dontcare
-make ../../../../include/ast/stdio.h implicit
-make ../../../../include/ast/ast_stdio.h implicit
-make ../../../../include/ast/sfio_s.h implicit
-done ../../../../include/ast/sfio_s.h dontcare
-prev ../../../../include/ast/ast_common.h implicit
-done ../../../../include/ast/ast_stdio.h dontcare
-done ../../../../include/ast/stdio.h dontcare
-prev ../../../../include/ast/getopt.h implicit
-make ../../../../include/ast/limits.h implicit
-make ../../../../include/ast/ast_limits.h implicit
-done ../../../../include/ast/ast_limits.h dontcare
-done ../../../../include/ast/limits.h dontcare
-make ../../../../include/ast/ast_hdr.h implicit
-done ../../../../include/ast/ast_hdr.h dontcare
-prev ../../../../include/ast/ast_getopt.h implicit
-make ../../../../include/ast/ast_lib.h implicit
-done ../../../../include/ast/ast_lib.h dontcare
-prev ../../../../include/ast/ast_common.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/ast_std.h dontcare
-done ../../../../include/ast/vmalloc.h dontcare
-make ../../../../include/ast/sfio.h implicit
-prev ../../../../include/ast/sfio_s.h implicit
-prev ../../../../include/ast/ast_common.h implicit
-prev ../../../../include/ast/ast_std.h implicit
-done ../../../../include/ast/sfio.h dontcare
-prev ../../../../include/ast/ast_std.h implicit
-make ../../../../include/ast/ast_version.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/ast_version.h dontcare
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/ast.h dontcare
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/times.h dontcare
-prev ../../../../include/ast/ast.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/tm.h
-make ../../../../include/ast/ccode.h implicit
-make ../../../../include/ast/ast_ccode.h implicit
-done ../../../../include/ast/ast_ccode.h dontcare
-prev ../../../../include/ast/ast.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/ccode.h
-make ../../../../include/ast/paxlib.h implicit
-prev ../../../../include/ast/vmalloc.h implicit
-make ../../../../include/ast/modex.h implicit
-make ../../../../include/ast/modecanon.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/modecanon.h dontcare
-prev ../../../../include/ast/ast_fs.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/modex.h dontcare
-prev ../../../../include/ast/ls.h implicit
-make ../../../../include/ast/error.h implicit
-make ../../../../include/ast/option.h implicit
-prev ../../../../include/ast/ast.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/option.h dontcare
-prev ../../../../include/ast/ast.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/error.h dontcare
-prev ../../../../include/ast/ast.h implicit
-prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/paxlib.h
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h
+make ${INSTALLROOT}/include/ast/ccode.h implicit
+make ${INSTALLROOT}/include/ast/ast_ccode.h implicit
+done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ccode.h
+make ${INSTALLROOT}/include/ast/paxlib.h implicit
+prev ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/modex.h implicit
+make ${INSTALLROOT}/include/ast/modecanon.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/modecanon.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/modex.h dontcare
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/paxlib.h
 done tp.c
+meta tp.o %.c>%.o tp.c tp
 prev tp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c tp.c
 done tp.o generated
 exec - ${AR} cr libpaxtp.a tp.o
 exec - (ranlib libpaxtp.a) >/dev/null 2>&1 || true

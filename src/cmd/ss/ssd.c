@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -402,7 +402,7 @@ main(int argc, char** argv)
 			error(ERROR_SYSTEM|3, "/: chdir error");
 		s = 0;
 		for (i = 0; i < elementsof(sysfiles); i++)
-			if (!access(sysfiles[i], 0))
+			if (!access(sysfiles[i], F_OK))
 			{
 				s = sysfiles[i];
 				break;
@@ -448,7 +448,7 @@ main(int argc, char** argv)
 		}
 	}
 	strcpy(cmd + strlen(cmd), ".idle");
-	if (access(cmd, X_OK)) idlecmd = 0;
+	if (eaccess(cmd, X_OK)) idlecmd = 0;
 	else
 	{
 		idlecmd = 1;

@@ -1,15 +1,15 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv mam_cc_FLAGS 
+setv mam_cc_FLAGS
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,207 +35,208 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ss
 make ss.o
 make ss.c
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h
-make ../../../include/ast/dirent.h implicit
-make ../../../include/ast/ast_dirent.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/ast_dirent.h
-done ../../../include/ast/dirent.h
-make ../../../include/ast/cs.h implicit
-make ../../../include/ast/times.h implicit
-make ../../../include/ast/ast_time.h implicit
-done ../../../include/ast/ast_time.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/times.h dontcare
-prev ../../../include/ast/ls.h implicit
-make ../../../include/ast/hashpart.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/hashpart.h dontcare
-make ../../../include/ast/ast_cs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h
+make ${INSTALLROOT}/include/ast/dirent.h implicit
+make ${INSTALLROOT}/include/ast/ast_dirent.h implicit
+make ndir.h implicit
+done ndir.h dontcare virtual
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/ast_dirent.h
+done ${INSTALLROOT}/include/ast/dirent.h
+make ${INSTALLROOT}/include/ast/cs.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/hashpart.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashpart.h dontcare
+make ${INSTALLROOT}/include/ast/ast_cs.h implicit
 make cell_sys_headers.h implicit
 done cell_sys_headers.h dontcare virtual
-done ../../../include/ast/ast_cs.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/cs.h
-prev ../../../include/ast/ast.h implicit
+done ${INSTALLROOT}/include/ast/ast_cs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/cs.h
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ss.c
+meta ss.o %.c>%.o ss.c ss
 prev ss.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ss]"\" -c ss.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ss]"\" -c ss.c
 done ss.o generated
 bind -lcs
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o ss ss.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o ss ss.o ${mam_libcs} ${mam_libast}
 done ss generated
 make ssd
 make ssd.o
 make ssd.c
 make FEATURE/cmd implicit
+meta FEATURE/cmd features/%>FEATURE/% features/cmd cmd
 make features/cmd
 done features/cmd
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/cmd
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run features/cmd
 done FEATURE/cmd generated
-make ../../../include/ast/ast_param.h implicit
-done ../../../include/ast/ast_param.h
-prev ../../../include/ast/dirent.h implicit
-prev ../../../include/ast/times.h implicit
-make ../../../include/ast/sig.h implicit
-done ../../../include/ast/sig.h
-make ../../../include/ast/proc.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/proc.h
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/cs.h implicit
-prev ../../../include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/ast_param.h implicit
+done ${INSTALLROOT}/include/ast/ast_param.h
+prev ${INSTALLROOT}/include/ast/dirent.h implicit
+prev ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/sig.h implicit
+done ${INSTALLROOT}/include/ast/sig.h
+make ${INSTALLROOT}/include/ast/proc.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/proc.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/cs.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ssd.c
+meta ssd.o %.c>%.o ssd.c ssd
 prev ssd.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ssd.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ssd.c
 done ssd.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o ssd ssd.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o ssd ssd.o ${mam_libcs} ${mam_libast}
 done ssd generated
-make ../../../bin
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
+make ${INSTALLROOT}/bin
+exec - if	silent test ! -d ${INSTALLROOT}/bin
+exec - then	mkdir -p ${INSTALLROOT}/bin
 exec - fi
-done ../../../bin generated
-make ../../../bin/ss
-prev ../../../bin
+done ${INSTALLROOT}/bin generated
+make ${INSTALLROOT}/bin/ss
+prev ${INSTALLROOT}/bin
 prev ss
 exec - test '' = 'ss' || ${STDCMP} 2>/dev/null -s ss ${INSTALLROOT}/bin/ss || { ${STDMV} ${INSTALLROOT}/bin/ss ${INSTALLROOT}/bin/ss.old 2>/dev/null || true; ${STDCP} ss ${INSTALLROOT}/bin/ss  		    		    ;}
-done ../../../bin/ss generated
-make ../../../man/man1
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
+done ${INSTALLROOT}/bin/ss generated
+make ${INSTALLROOT}/man/man1
+exec - if	silent test ! -d ${INSTALLROOT}/man/man1
+exec - then	mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
-done ../../../man/man1 generated
-make ../../../man/man1/ss.1
-prev ../../../man/man1
+done ${INSTALLROOT}/man/man1 generated
+make ${INSTALLROOT}/man/man1/ss.1
+prev ${INSTALLROOT}/man/man1
 make ss.1
 done ss.1
 exec - test '' = 'ss.1' || ${STDCMP} 2>/dev/null -s ss.1 ${INSTALLROOT}/man/man1/ss.1 || { ${STDMV} ${INSTALLROOT}/man/man1/ss.1 ${INSTALLROOT}/man/man1/ss.1.old 2>/dev/null || true; ${STDCP} ss.1 ${INSTALLROOT}/man/man1/ss.1  		    		    ;}
-done ../../../man/man1/ss.1 generated
-make ../../../lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
+done ${INSTALLROOT}/man/man1/ss.1 generated
+make ${INSTALLROOT}/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib
 exec - fi
-done ../../../lib generated
-make ../../../lib/ssd
-prev ../../../lib
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/ssd
+prev ${INSTALLROOT}/lib
 prev ssd
 setv group -Dgroup="kmem"
 setv mode -Dmode="ug+s,+x"
 setv preserve -Dpreserve
-exec - test '' = 'ssd' || ${STDCMP} 2>/dev/null -s ssd ${PACKAGE_ast_LIB}/ssd || { ${STDMV} ${PACKAGE_ast_LIB}/ssd ${PACKAGE_ast_LIB}/ssd.old 2>/dev/null || true; ${STDCP} ssd ${PACKAGE_ast_LIB}/ssd  		   && { chgrp kmem ${PACKAGE_ast_LIB}/ssd || true ;} 		   && chmod ug+s,+x ${PACKAGE_ast_LIB}/ssd ;}
-done ../../../lib/ssd generated
-make ../../../man/man8
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/man/man8
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man8 		    		   
+exec - test '' = 'ssd' || ${STDCMP} 2>/dev/null -s ssd ${INSTALLROOT}/lib/ssd || { ${STDMV} ${INSTALLROOT}/lib/ssd ${INSTALLROOT}/lib/ssd.old 2>/dev/null || true; ${STDCP} ssd ${INSTALLROOT}/lib/ssd  		   && { chgrp kmem ${INSTALLROOT}/lib/ssd || true ;} 		   && chmod ug+s,+x ${INSTALLROOT}/lib/ssd ;}
+done ${INSTALLROOT}/lib/ssd generated
+make ${INSTALLROOT}/man/man8
+exec - if	silent test ! -d ${INSTALLROOT}/man/man8
+exec - then	mkdir -p ${INSTALLROOT}/man/man8
 exec - fi
-done ../../../man/man8 generated
-make ../../../man/man8/ssd.8
-prev ../../../man/man8
+done ${INSTALLROOT}/man/man8 generated
+make ${INSTALLROOT}/man/man8/ssd.8
+prev ${INSTALLROOT}/man/man8
 make ssd.8
 done ssd.8
 exec - test '' = 'ssd.8' || ${STDCMP} 2>/dev/null -s ssd.8 ${INSTALLROOT}/man/man8/ssd.8 || { ${STDMV} ${INSTALLROOT}/man/man8/ssd.8 ${INSTALLROOT}/man/man8/ssd.8.old 2>/dev/null || true; ${STDCP} ssd.8 ${INSTALLROOT}/man/man8/ssd.8  		    		    ;}
-done ../../../man/man8/ssd.8 generated
-make ../../../share
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/share
-exec - then	set -x && mkdir -p ${INSTALLROOT}/share 		    		   
+done ${INSTALLROOT}/man/man8/ssd.8 generated
+make ${INSTALLROOT}/share
+exec - if	silent test ! -d ${INSTALLROOT}/share
+exec - then	mkdir -p ${INSTALLROOT}/share
 exec - fi
-done ../../../share generated
-make ../../../share/lib/ss
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/share/lib/ss
-exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/ss 		    		   
+done ${INSTALLROOT}/share generated
+make ${INSTALLROOT}/share/lib/ss
+exec - if	silent test ! -d ${INSTALLROOT}/share/lib/ss
+exec - then	mkdir -p ${INSTALLROOT}/share/lib/ss
 exec - fi
-done ../../../share/lib/ss generated
+done ${INSTALLROOT}/share/lib/ss generated
 done install virtual
 make test
 done test dontcare virtual

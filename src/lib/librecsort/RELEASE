@@ -1,3 +1,5 @@
+04-08-11 rskeydump.c: list key.nproc if >1
+04-06-15 rsprocess.c: fix V format record read
 04-02-11 rskey.c: fix old ast reclen:fieldlen:offset parse
 03-10-11 recsort.h: add RS_IGNORE Rs_t.type hint
 03-09-18 rswrite.c: fix RS_WRITE exceptions

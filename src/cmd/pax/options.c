@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -118,6 +118,14 @@ Option_t		options[] =
 	0,
 	0,
 	OPT_READONLY,
+},
+{
+	"chmod",
+	'C',
+	OPT_chmod,
+	"Apply the \bchmod\b(1) \amode\a expression to file modes\
+	written to archive headers.",
+	"mode"
 },
 {
 	"clobber",

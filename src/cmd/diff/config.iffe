@@ -5,7 +5,6 @@ hdr	float,stdarg,stdlib,string
 key	const =
 lib	dup2,memchr,sigaction,strchr,tmpnam
 lib	vfork = fork
-mem	stat.st_blksize sys/stat.h
 sys	dir,file,ndir,wait
 typ	pid_t = int
 
@@ -28,8 +27,8 @@ tst	CLOSEDIR_VOID note{ closedir() is a void function }end nocompile{
 		}
 	}end
 
-exp	STDC_HEADERS	HAVE_FLOAT_H&HAVE_STDARG_H&HAVE_STDLIB_H&HAVE_STRING_H
-exp	HAVE_ST_BLKSIZE	HAVE_ST_BLKSIZE_IN_STAT
+STDC_HEADERS	= ( HAVE_FLOAT_H & HAVE_STDARG_H & HAVE_STDLIB_H & HAVE_STRING_H )
+HAVE_ST_BLKSIZE = mem stat.st_blksize sys/stat.h
 
 run{
 	echo "#if _PACKAGE_ast"

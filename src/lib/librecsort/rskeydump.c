@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
@@ -79,6 +79,8 @@ register Sfio_t*	sp;
 	sfprintf(sp, "\ttab='%c' keys=%s maxfield=%d", kp->tab ? kp->tab : ' ', kp->coded ? "coded" : "", kp->field.maxfield);
 	if (kp->fixed)
 		sfprintf(sp, " fixed=%d", kp->fixed);
+	if (kp->nproc > 1)
+		sfprintf(sp, " nproc=%d", kp->nproc);
 	sfprintf(sp, "\n");
 	sfprintf(sp, "\trecsort data%s %d key%s %d\n", (kp->disc->type & RS_DSAMELEN) ? " DSAMELEN" : "", kp->disc->data, (kp->disc->type & RS_KSAMELEN) ? " KSAMELEN" : "", kp->disc->keylen);
 	for (fp = &kp->field.global; fp; fp = fp->next)

@@ -1,15 +1,15 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv mam_cc_FLAGS 
+setv mam_cc_FLAGS
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,6 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 exec - : only tests in this directory : nothing to install :
 done install virtual
@@ -50,95 +52,96 @@ done opt.tst
 make opt
 make opt.o
 make opt.c
-make ../../../include/ast/debug.h implicit
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/debug.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
 make ../../lib/libast/ast_common.h implicit
 done ../../lib/libast/ast_common.h dontcare
-make ../../../include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
 make ../../lib/libast/ast_botch.h implicit
 done ../../lib/libast/ast_botch.h dontcare
 make ../../lib/libast/ast_unistd.h implicit
 done ../../lib/libast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
 make ../../lib/libast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
 make ../../lib/libast/ast_mode.h implicit
 done ../../lib/libast/ast_mode.h dontcare
 make ../../lib/libast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ../../lib/libast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
 prev ../../lib/libast/ast_fs.h implicit
 done ../../lib/libast/ast_fcntl.h dontcare
 make ../../lib/libast/ast_types.h implicit
 done ../../lib/libast/ast_types.h dontcare
 make ../../lib/libast/ast_map.h implicit
 done ../../lib/libast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/stdio.h implicit
 make ../../lib/libast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
 prev ../../lib/libast/ast_common.h implicit
 done ../../lib/libast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
 make ../../lib/libast/ast_limits.h implicit
 done ../../lib/libast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
 make ../../lib/libast/ast_hdr.h implicit
 done ../../lib/libast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
 make ../../lib/libast/ast_lib.h implicit
 done ../../lib/libast/ast_lib.h dontcare
 prev ../../lib/libast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
 prev ../../lib/libast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/debug.h
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/debug.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done opt.c
+meta opt.o %.c>%.o opt.c opt
 prev opt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c opt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c opt.c
 done opt.o generated
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o opt opt.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o opt opt.o ${mam_libast}
 done opt generated
 exec - regress  opt.tst opt
 done test.opt virtual
@@ -148,12 +151,13 @@ done strelapsed.tst
 make strelapsed
 make strelapsed.o
 make strelapsed.c
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done strelapsed.c
+meta strelapsed.o %.c>%.o strelapsed.c strelapsed
 prev strelapsed.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strelapsed.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c strelapsed.c
 done strelapsed.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o strelapsed strelapsed.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o strelapsed strelapsed.o ${mam_libast}
 done strelapsed generated
 exec - regress  strelapsed.tst strelapsed
 done test.strelapsed virtual
@@ -163,13 +167,14 @@ done strtoi.tst
 make strtoi
 make strtoi.o
 make strtoi.c
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done strtoi.c
+meta strtoi.o %.c>%.o strtoi.c strtoi
 prev strtoi.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtoi.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c strtoi.c
 done strtoi.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o strtoi strtoi.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o strtoi strtoi.o ${mam_libast}
 done strtoi generated
 exec - regress  strtoi.tst strtoi
 done test.strtoi virtual
@@ -179,13 +184,14 @@ done strntoi.tst
 make strntoi
 make strntoi.o
 make strntoi.c
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done strntoi.c
+meta strntoi.o %.c>%.o strntoi.c strntoi
 prev strntoi.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntoi.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c strntoi.c
 done strntoi.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o strntoi strntoi.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o strntoi strntoi.o ${mam_libast}
 done strntoi generated
 exec - regress  strntoi.tst strntoi
 done test.strntoi virtual
@@ -195,13 +201,14 @@ done strtof.tst
 make strtof
 make strtof.o
 make strtof.c
-prev ../../../include/ast/stdio.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done strtof.c
+meta strtof.o %.c>%.o strtof.c strtof
 prev strtof.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtof.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c strtof.c
 done strtof.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o strtof strtof.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o strtof strtof.o ${mam_libast}
 done strtof generated
 exec - regress  strtof.tst strtof
 done test.strtof virtual
@@ -211,13 +218,14 @@ done strntof.tst
 make strntof
 make strntof.o
 make strntof.c
-prev ../../../include/ast/stdio.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done strntof.c
+meta strntof.o %.c>%.o strntof.c strntof
 prev strntof.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntof.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c strntof.c
 done strntof.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o strntof strntof.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o strntof strntof.o ${mam_libast}
 done strntof generated
 exec - regress  strntof.tst strntof
 done test.strntof virtual
@@ -225,12 +233,13 @@ make test.base64
 make base64
 make base64.o
 make base64.c
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done base64.c
+meta base64.o %.c>%.o base64.c base64
 prev base64.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c base64.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c base64.c
 done base64.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o base64 base64.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o base64 base64.o ${mam_libast}
 done base64 generated
 exec - base64
 done test.base64 virtual
@@ -238,22 +247,23 @@ make test.date
 make date
 make date.o
 make date.c
-make ../../../include/ast/tm.h implicit
-make ../../../include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
 make ../../lib/libast/ast_time.h implicit
 done ../../lib/libast/ast_time.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/times.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/tm.h
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done date.c
+meta date.o %.c>%.o date.c date
 prev date.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c date.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c date.c
 done date.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o date date.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o date date.o ${mam_libast}
 done date generated
 make date.msk
 done date.msk
@@ -271,20 +281,21 @@ make test.sfio
 make sfio/testsfio
 done sfio/testsfio
 make sfio/sftest.h
-done sfio/sftest.h
-make sfio/talarm.c
-prev sfio/sftest.h implicit
 make sfio/terror.h implicit
 prev ../../lib/libast/ast_common.h implicit
 done sfio/terror.h
-prev ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio_t.h implicit
-prev ../../../include/ast/sfio.h implicit
-done ../../../include/ast/sfio_t.h dontcare
-prev ../../../include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfio_t.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+done ${INSTALLROOT}/include/ast/sfio_t.h dontcare
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
 make FEATURE/sfio implicit
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def sfio
+meta FEATURE/sfio >FEATURE/%  sfio
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : def sfio
 done FEATURE/sfio generated
+done sfio/sftest.h
+make sfio/talarm.c
+prev sfio/sftest.h implicit
 done sfio/talarm.c
 make sfio/talign.c
 prev sfio/sftest.h implicit
@@ -441,7 +452,7 @@ make sfio/tstatus.c
 prev sfio/sftest.h implicit
 done sfio/tstatus.c
 make sfio/tstdio.c
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev sfio/sftest.h implicit
 done sfio/tstdio.c
 make sfio/tstkpk.c
@@ -469,14 +480,14 @@ make sfio/tungetc.c
 prev sfio/sftest.h implicit
 done sfio/tungetc.c
 make sfio/twchar.c
-make ../../../include/ast/wchar.h implicit
+make ${INSTALLROOT}/include/ast/wchar.h implicit
 make ../../lib/libast/ast_wchar.h implicit
-prev ../../../include/ast/stdio.h implicit
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev ../../lib/libast/ast_common.h implicit
 done ../../lib/libast/ast_wchar.h dontcare
-done ../../../include/ast/wchar.h dontcare
-prev ../../../include/ast/stdio.h implicit
+done ${INSTALLROOT}/include/ast/wchar.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev sfio/sftest.h implicit
 done sfio/twchar.c
 make sfio/twhole.c
@@ -485,24 +496,29 @@ done sfio/twhole.c
 make sfio/twrrd.c
 prev sfio/sftest.h implicit
 done sfio/twrrd.c
-exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tshare.c sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}
+exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tshare.c sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
 done test.sfio virtual
 make test.vmalloc
 make vmalloc/testvmalloc
 done vmalloc/testvmalloc
 make vmalloc/vmtest.h
+prev sfio/terror.h implicit
+make ../../lib/libast/vmalloc/vmhdr.h implicit
+prev ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_windows.h implicit
+prev windows.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_windows.h dontcare
+make FEATURE/vmalloc implicit
+meta FEATURE/vmalloc >FEATURE/%  vmalloc
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : def vmalloc
+done FEATURE/vmalloc dontcare generated
+prev ../../lib/libast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+done ../../lib/libast/vmalloc/vmhdr.h
 done vmalloc/vmtest.h
 make vmalloc/talign.c
 prev vmalloc/vmtest.h implicit
-prev sfio/terror.h implicit
-make ../../lib/libast/vmalloc/vmhdr.h implicit
-prev ../../../include/ast/vmalloc.h implicit
-make FEATURE/vmalloc implicit
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def vmalloc
-done FEATURE/vmalloc dontcare generated
-prev ../../lib/libast/ast_common.h implicit
-prev ../../../include/ast/ast.h implicit
-done ../../lib/libast/vmalloc/vmhdr.h
 done vmalloc/talign.c
 make vmalloc/tcompact.c
 prev vmalloc/vmtest.h implicit
@@ -534,6 +550,6 @@ done vmalloc/tstat.c
 make vmalloc/twalk.c
 prev vmalloc/vmtest.h implicit
 done vmalloc/twalk.c
-exec - 	set +x; vmalloc/testvmalloc  vmalloc/vmtest.h ${mam_libast} vmalloc/talign.c vmalloc/tcompact.c vmalloc/tlast.c vmalloc/tmalloc.c vmalloc/tmrandom.c vmalloc/tpool.c vmalloc/trandom.c vmalloc/tresize.c vmalloc/tsmall.c vmalloc/tstat.c vmalloc/twalk.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -Isfio -Ivmalloc -I../../lib/libast -I../../lib/libast/vmalloc -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}
+exec - 	set +x; vmalloc/testvmalloc  vmalloc/vmtest.h ${mam_libast} vmalloc/talign.c vmalloc/tcompact.c vmalloc/tlast.c vmalloc/tmalloc.c vmalloc/tmrandom.c vmalloc/tpool.c vmalloc/trandom.c vmalloc/tresize.c vmalloc/tsmall.c vmalloc/tstat.c vmalloc/twalk.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -Isfio -Ivmalloc -I../../lib/libast -I../../lib/libast/vmalloc -I${INSTALLROOT}/include/ast -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
 done test.vmalloc virtual
 done test dontcare virtual

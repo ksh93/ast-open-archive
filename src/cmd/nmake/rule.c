@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -36,100 +36,142 @@
 
 #define ASOC(field,name,flags)	internal.field=rassociate(name,flags)
 #define ATTR(field,name,flags)	internal.field=rinternal(name,P_attribute|(flags))
-#define FUNC(field,name,func)	((internal.field=setvar(name,NiL,V_builtin|V_functional))->builtin=(func))
+#define FUNC(name,func)		((setvar(name,NiL,V_builtin|V_functional))->builtin=(func))
 #define INIT(field,name,flags)	internal.field=rinternal(name,flags)
 
 /*
- * return non-0 if rule name s requires dynamic expand()
+ * return the NAME_* type for name
  */
 
 int
-isdynamic(register const char* s)
+nametype(const char* name, char** e)
 {
-	register int	g;
+	register const char*	s;
+	register int		t;
+	register int		q;
 
-	g = 0;
+	t = 0;
+	s = name;
+	switch (*s)
+	{
+	case 0:
+		return 0;
+	case MARK_CONTEXT:
+		q = NAME_context;
+		break;
+	case '.':
+		q = NAME_variable|NAME_intvar;
+		break;
+	case '-':
+	case '+':
+		return NAME_option;
+	case '(':
+		t = NAME_staterule;
+		q = 0;
+		break;
+	default:
+		q = istype(*s, C_ID1) ? (NAME_identifier|NAME_variable) : istype(*s, C_VARIABLE1) ? NAME_variable : 0;
+		break;
+	}
 	for (;;)
+	{
 		switch (*s++)
 		{
 		case 0:
-			return 0;
+			s -= 2;
+			break;
+		case '/':
+			q |= NAME_path;
+			q &= ~(NAME_identifier|NAME_variable);
+			continue;
+		case '=':
+			if (q & (NAME_identifier|NAME_variable))
+				q |= NAME_assignment;
+			continue;
+		case '+':
+			if (*s != '=')
+				q &= ~(NAME_identifier|NAME_variable);
+			continue;
+		case '&':
+			if (*s == '=')
+				continue;
+			/*FALLTHROUGH*/
 		case '*':
 		case '?':
 		case '[':
 		case ']':
 		case '|':
-		case '&':
-			return 1;
+			q |= NAME_glob;
+			q &= ~(NAME_identifier|NAME_variable);
+			continue;
 		case '@':
 		case '!':
 		case '}':
+			if (*s == '(')
+				t |= NAME_glob;
+			q &= ~(NAME_identifier|NAME_variable);
+			continue;
 		case '$':
 			if (*s == '(')
-				g = 1;
-			break;
-		case ')':
-			if (g)
-				return 1;
-			break;
-		}
-	/*NOTREACHED*/
-}
-
-/*
- * return non-0 if rule name s requires dynamic glob()
- */
-
-int
-isglob(register const char* s)
-{
-	register int	g;
-
-	g = 0;
-	for (;;)
-		switch (*s++)
-		{
-		case 0:
-			return 0;
-		case '*':
-		case '?':
-		case '[':
-		case ']':
-		case '|':
-		case '&':
-			return 1;
-		case '@':
-		case '!':
-		case '}':
-			if (*s == '(')
-				g = 1;
-			break;
-		case ')':
-			if (g)
-				return 1;
-			break;
-		}
-	/*NOTREACHED*/
-}
-
-/*
- * return non-0 if s is a state variable name
- */
-
-int
-isstatevar(register const char* s)
-{
-	if (*s++ == '(')
-		for (;;)
-			switch (*s++)
+				t |= NAME_dynamic;
+			q &= ~(NAME_identifier|NAME_variable);
+			continue;
+		case '(':
+			if (s > name + 1)
 			{
-			case 0:
-			case '(':
-				return 0;
-			case ')':
-				return !*s;
+				t &= ~NAME_staterule;
+				q &= ~NAME_staterule;
 			}
-	return 0;
+			continue;
+		case ')':
+			if (t & NAME_staterule)
+			{
+				t &= ~NAME_staterule;
+				q |= NAME_staterule;
+			}
+			else
+			{
+				q &= ~NAME_staterule;
+				q |= t & (NAME_glob|NAME_dynamic);
+			}
+			q &= ~(NAME_identifier|NAME_variable);
+			continue;
+		default:
+			if ((q & NAME_variable) && !istype(*(s - 1), C_VARIABLE1|C_VARIABLE2))
+				q &= ~(NAME_identifier|NAME_variable);
+			else if ((q & NAME_identifier) && !istype(*(s - 1), C_ID1|C_ID2))
+				q &= ~NAME_identifier;
+			continue;
+		}
+		break;
+	}
+	if ((q & NAME_context) && *s == MARK_CONTEXT)
+	{
+		if (e)
+			*e = (char*)(s + 1);
+		if (e)
+			*e = (char*)(s + 1);
+		return NAME_context;
+	}
+	if (q & NAME_staterule)
+	{
+		if (*s == ')')
+			return NAME_statevar;
+		if (*(name + 1) == '+')
+			return NAME_altstate;
+		return NAME_staterule;
+	}
+	if (q & NAME_dynamic)
+		return NAME_dynamic;
+	if (q & NAME_assignment)
+		return NAME_assignment;
+	if (q & NAME_glob)
+		return NAME_glob;
+	if (q & NAME_identifier)
+		return NAME_identifier;
+	if (q & NAME_variable)
+		return (q & NAME_intvar) && *s == '.' ? NAME_intvar : NAME_variable;
+	return q & NAME_path;
 }
 
 /*
@@ -147,7 +189,7 @@ makerule(register char* name)
 	{
 		if (r = getrule(name))
 			return r;
-		if (!(n = isstate(name)) && !isdynamic(name) && !iscontext(name) && (table.rule->flags & HASH_ALLOCATE))
+		if (((n = nametype(name, NiL)) & NAME_path) && (table.rule->flags & HASH_ALLOCATE))
 		{
 			pathcanon(name, 0);
 			if (r = getrule(name))
@@ -157,15 +199,21 @@ makerule(register char* name)
 	newrule(r);
 	r->name = putrule(0, r);
 	if (!name)
-		n = isstate(r->name);
-	if (n)
+		n = nametype(r->name, NiL);
+	if (n & (NAME_staterule|NAME_altstate))
 	{
 		r->dynamic |= D_compiled;
-		if (isstatevar(r->name)) r->property |= P_state|P_statevar;
-		else r->property |= P_state|P_staterule;
+		r->property |= P_state|P_staterule;
 	}
-	else if (state.init || state.readonly) r->dynamic |= D_compiled;
-	else r->dynamic &= ~D_compiled;
+	else if (n & NAME_statevar)
+	{
+		r->dynamic |= D_compiled;
+		r->property |= P_state|P_statevar;
+	}
+	else if (state.init || state.readonly)
+		r->dynamic |= D_compiled;
+	else
+		r->dynamic &= ~D_compiled;
 	r->status = NOTYET;
 	r->preview = state.maxview + 1;
 #if DEBUG
@@ -298,6 +346,7 @@ associate(register struct rule* a, register struct rule* r, register char* s, st
 {
 	register struct list*	p;
 	register struct rule*	x;
+	register struct rule*	z;
 	struct list*		u;
 
 	if (r)
@@ -314,7 +363,7 @@ associate(register struct rule* a, register struct rule* r, register char* s, st
 			{
 				if (x->property & P_attribute)
 				{
-					if (r && hasattribute(r, x, NiL))
+					if (r && (hasattribute(r, x, NiL) || !r->scan && x->scan && (z = staterule(RULE, r, NiL, -1)) && z->scan == x->scan))
 						break;
 				}
 				else if (x->name[0] == '%' && !x->name[1])
@@ -825,6 +874,7 @@ hasattribute(register struct rule* r, register struct rule* a, register struct r
 			if (a == internal.bound) return n & D_bound;
 			if (a == internal.built) return n & D_built;
 			if (a == internal.entries) return n & D_entries;
+			if (a == internal.global) return n & D_global;
 			if (a == internal.member) return n & (D_member|D_membertoo);
 			if (a == internal.regular) return n & D_regular;
 			if (a == internal.scanned) return n & D_scanned;
@@ -881,24 +931,31 @@ merge(register struct rule* from, register struct rule* to, int op)
 
 	if (from->name)
 	{
-		if (from == to || to->status != NOTYET && (to->status != UPDATE || !(from->property & P_use))) return;
+		if (from == to || to->status != NOTYET && (to->status != UPDATE || !(from->property & P_use)))
+			return;
 #if DEBUG
-		if (to->name) message((-4, "merging %s%s into %s", (op & MERGE_ATTR) ? "attributes of " : null, from->name, to->name));
+		if (to->name)
+			debug((-4, "merging %s%s into %s", (op & MERGE_ATTR) ? "attributes of " : null, from->name, to->name));
 #endif
 	}
 	to->property |= from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_foreground|P_functional|P_ignore|P_implicit|P_joint|P_local|P_make|P_multiple|P_parameter|P_read|P_repeat|P_terminal|P_virtual);
-	if (from->property & P_implicit) to->property &= ~P_terminal;
-	if ((from->property & (P_metarule|P_terminal)) == P_terminal) to->property &= ~P_implicit;
+	if (from->property & P_implicit)
+		to->property &= ~P_terminal;
+	if ((from->property & (P_metarule|P_terminal)) == P_terminal)
+		to->property &= ~P_implicit;
 	if (op & MERGE_ALL)
 	{
-		if (!to->action) to->action = from->action;
+		if (!to->action)
+			to->action = from->action;
 		to->attribute |= from->attribute;
 		to->property |= from->property & (P_accept|P_immediate|P_target|P_use);
 		to->dynamic |= from->dynamic & (D_dynamic|D_global|D_regular);
 		if (!(op & MERGE_SCANNED))
 			to->dynamic |= from->dynamic & (D_entries|D_scanned);
-		if (from->scan && from->scan != SCAN_NULL) to->scan = from->scan;
-		if (to->status == NOTYET) to->status = from->status;
+		if (from->scan && from->scan != SCAN_NULL)
+			to->scan = from->scan;
+		if (to->status == NOTYET)
+			to->status = from->status;
 		for (p = from->prereqs; p; p = p->next)
 			addprereq(to, p->rule, PREREQ_APPEND);
 		if (!(to->property & P_state))
@@ -920,13 +977,15 @@ merge(register struct rule* from, register struct rule* to, int op)
 	{
 		if (from->attribute && from != internal.accept && from != internal.ignore && from != internal.retain && ((to->property & (P_attribute|P_use)) != P_attribute || to == internal.accept || to == internal.ignore || to == internal.retain))
 			to->attribute |= from->attribute;
-		if (from->scan) to->scan = from->scan;
+		if (from->scan)
+			to->scan = from->scan;
 	}
 	else
 	{
 		if (from->attribute && from != internal.accept && from != internal.ignore && from != internal.retain && ((to->property & (P_attribute|P_use)) != P_attribute || to == internal.accept || to == internal.ignore || to == internal.retain))
 			to->attribute |= from->attribute & ~internal.ignore->attribute;
-		if (!to->scan) to->scan = from->scan;
+		if (!to->scan)
+			to->scan = from->scan;
 	}
 }
 
@@ -1066,6 +1125,75 @@ diratom(const char* s, char* v, void* h)
 }
 
 /*
+ * # outstanding jobs builtin
+ */
+
+static char*
+b_outstanding(char** args)
+{
+	sfprintf(internal.val, "%d", state.coshell ? state.coshell->outstanding : 0);
+	return sfstruse(internal.val);
+}
+
+/*
+ * getconf() builtin
+ */
+
+static char*
+b_getconf(char** args)
+{
+	char*	name;
+	char*	path;
+	char*	value;
+
+	if (name = *args)
+		args++;
+	if (path = *args)
+	{
+		if (path[0] == '-' && !path[1])
+			path = 0;
+		args++;
+	}
+	if ((value = *args) && value[0] == '-' && !value[1])
+		value = 0;
+	return astconf(name, path, value);
+}
+
+typedef int (*Systab_f)(void);
+
+typedef struct Systab_s
+{
+	const char*	name;
+	Systab_f	call;
+} Systab_t;
+
+static const Systab_t	systab[] =
+{
+	"getegid",	(Systab_f)getegid,
+	"geteuid",	(Systab_f)geteuid,
+	"getgid",	(Systab_f)getgid,
+	"getpid",	(Systab_f)getpid,
+	"getppid",	(Systab_f)getppid,
+	"getuid",	(Systab_f)getuid,
+	{0}
+};
+
+/*
+ * void arg system call catchall builtin
+ */
+
+static char*
+b_syscall(char** args)
+{
+	Systab_t*	call;
+
+	if (!*args)
+		return null;
+	sfprintf(internal.val, "%d", (call = (Systab_t*)strlook(systab, sizeof(systab[0]), *args)) ? (*call->call)() : -1);
+	return sfstruse(internal.val);
+}
+
+/*
  * external engine name initialization -- the rest are in initrule()
  *
  * NOTE: version.c may reference some of these names, not to mention
@@ -1120,6 +1248,7 @@ struct external external =
 	".mo",
 	".mk",
 	".ms",
+	".mt",
 };
 
 /*
@@ -1179,6 +1308,7 @@ initrule(void)
 	INIT(exists,		".EXISTS",	0);
 	INIT(failed,		".FAILED",	0);
 	INIT(file,		".FILE",	0);
+	INIT(global,		".GLOBAL",	0);
 	INIT(member,		".MEMBER",	0);
 	INIT(notyet,		".NOTYET",	0);
 	INIT(regular,		".REGULAR",	0);
@@ -1246,8 +1376,9 @@ initrule(void)
 	 * builtin functions
 	 */
 
-	FUNC(getconf,		".GETCONF",	b_getconf);
-	FUNC(outstanding,	".OUTSTANDING",	b_outstanding);
+	FUNC(			".GETCONF",	b_getconf);
+	FUNC(			".OUTSTANDING",	b_outstanding);
+	FUNC(			".SYSCALL",	b_syscall);
 
 #if DEBUG
 	putrule(".DEBUG", internal.query);
@@ -1381,7 +1512,7 @@ initview(void)
 	tmp = sfstropen();
 	if (fs3d(FS3D_TEST))
 	{
-		if ((n = (s = colonlist(tmp, external.viewnode, ' ')) != 0) || (s = colonlist(tmp, external.viewdot, ' ')))
+		if ((n = (s = colonlist(tmp, external.viewnode, 1, ' ')) != 0) || (s = colonlist(tmp, external.viewdot, 1, ' ')))
 		{
 			tok = tokopen(s, 0);
 			if (s = n ? tokread(tok) : ".")
@@ -1421,7 +1552,7 @@ initview(void)
 	else
 	{
 		unique(internal.dot);
-		if (s = colonlist(tmp, external.viewnode, ' '))
+		if (s = colonlist(tmp, external.viewnode, 1, ' '))
 		{
 			tok = tokopen(s, 1);
 			while (s = tokread(tok))
@@ -1501,7 +1632,7 @@ initview(void)
 			}
 			tokclose(tok);
 		}
-		if (s = colonlist(tmp, external.viewdot, ' '))
+		if (s = colonlist(tmp, external.viewdot, 1, ' '))
 		{
 			n = state.maxview;
 			tok = tokopen(s, 1);

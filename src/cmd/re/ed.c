@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2003 AT&T Corp.                *
+*                Copyright (c) 1995-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -27,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ed (AT&T Labs Research) 2003-08-11 $\n]"
+"[-?\n@(#)$Id: ed (AT&T Labs Research) 2004-06-08 $\n]"
 USAGE_LICENSE
 "[+NAME?ed - edit text]"
 "[+DESCRIPTION?\bed\b is a line-oriented text editor that has two modes:"
@@ -1439,15 +1439,20 @@ move(int cflag)
 	register Line_t*	ad1;
 	register Line_t*	ad2;
 	Line_t*			adt;
+	unsigned long		ad1_off;
+	unsigned long		adt_off;
 
 	nonzero();
 	if (!(adt = address()))
 		error(2, "invalid move destination");
 	newline();
 	if (cflag) {
-		ad1 = ed.dol + 1;
+		ad1_off = ed.dol - ed.zero + 1;
+		adt_off = adt - ed.zero;
 		append(getcopy, ed.dol, NiL);
+		ad1 = ed.zero + ad1_off;
 		ad2 = ed.dol;
+		adt = ed.zero + adt_off;
 	}
 	else {
 		ad2 = ed.addr2;

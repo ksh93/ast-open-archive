@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -130,7 +130,7 @@ tar_checksum(Archive_t* ap, int check, unsigned long sum)
 		}
 	else
 	{
-		map = (ap->mio.mode & O_WRONLY) ? ap->convert[SECTION_CONTROL].f2t : ap->convert[SECTION_CONTROL].t2f;
+		map = ((ap->mio.mode & O_ACCMODE) == O_WRONLY) ? ap->convert[SECTION_CONTROL].f2t : ap->convert[SECTION_CONTROL].t2f;
 		while (p < e)
 		{
 			c = map[*p++];
@@ -949,7 +949,7 @@ pax_putprologue(Pax_t* pax, register Archive_t* ap)
 		if (ap->delta->base)
 		{
 			putkey(ap, ap->tmp.global, &options[OPT_delta_base_size], NiL, ap->delta->base->size);
-			putkey(ap, ap->tmp.global, &options[OPT_delta_base_checksum], NiL, ap->delta->base->checksum);
+			putkey(ap, ap->tmp.global, &options[OPT_delta_base_checksum], NiL, ap->delta->base->checksum & 0xffffffff);
 		}
 	}
 	extend(ap, NiL, GLBTYPE);

@@ -31,7 +31,7 @@
 *        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.        *
 *                                                                  *
 *            Information and Software Systems Research             *
-*The Regents of the University of California and AT&T Labs Research*
+*  The Regents of the University of California and AT&T Research   *
 *                         Florham Park NJ                          *
 *                                                                  *
 *                        Kurt Shoens (UCB)                         *
@@ -42,4 +42,4 @@
  * mailx version stamp
  */
 
-#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2004-04-15 $\n"
+#define STAMP	"\n@(#)$Id: mailx (AT&T/BSD) 9.9 2004-08-17 $\n"

@@ -2806,7 +2806,7 @@ main(){}'
 #define R(x) x"
 L(abc)R(xyz);'
 		OUTPUT - $'# 1 ""
-\n"x\\n#define R(x) x"R(xyz);'
+\n"x\\n#define R(x) x" R(xyz);'
 		ERROR - $'cpp: line 1: warning: `newline\' in string'
 	EXEC -I-D
 		INPUT - $'#define a(x) x
@@ -3406,6 +3406,10 @@ m(Xfio_t* sp){}'
 
 
 
+
+
+
+
 # 2
 a (sp) Xfio_t* sp;
 # 2
@@ -3659,7 +3663,7 @@ TEST 20 'transition splice'
 		INPUT - $'#pragma prototyped
 int a = val>0?vau:0;
 int b = val>0?val:0;'
-		OUTPUT - $'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+		OUTPUT - $'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
 int a = val>0?vau:0;
 int b = val>0?val:0;'
 
@@ -3793,3 +3797,85 @@ cpp: line 12: warning: f: 2 actual arguments expected
 cpp: line 13: warning: f: 2 actual arguments expected
 cpp: line 14: warning: f: 2 actual arguments expected
 cpp: line 15: warning: f: 2 actual arguments expected'
+
+TEST 24 '#(define|undef) extern proto intercepts'
+
+	EXEC -I-D -D-C -D__EXPORT__='__declspec(dllexport)'
+		INPUT - $'#pragma prototyped
+#define extern __EXPORT__
+extern void fun(int);
+#undef extern
+extern void fun(int arg) { return arg; }'
+		OUTPUT - $'# 1 ""\n\n\n
+# 25\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+# 2
+
+
+# 2
+
+extern  __declspec(dllexport) int fun ();
+
+
+# 4
+
+extern  int fun (arg) int arg;
+# 5
+{ return arg; }'
+
+	EXEC -I-D -D__cplusplus -D__EXPORT__='__declspec(dllexport)'
+		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+# 35
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+# 2
+
+
+# 2
+
+extern "C" __declspec(dllexport) void fun (int) ;
+
+
+# 4
+
+extern "C" void fun (int arg)  
+# 5
+{ return arg; }'
+
+	EXEC -I-D -D-C -D__IMPORT__='__declspec(dllimport)'
+		INPUT - $'#pragma prototyped
+#define extern extern __IMPORT__
+extern void fun(int);
+#undef extern
+extern void fun(int arg) { return arg; }'
+		OUTPUT - $'# 1 ""\n\n\n
+# 25\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+# 2
+
+
+# 2
+
+extern  __declspec(dllimport) int fun ();
+
+
+# 4
+
+extern  int fun (arg) int arg;
+# 5
+{ return arg; }'
+
+	EXEC -I-D -D__cplusplus -D__IMPORT__='__declspec(dllimport)'
+		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+# 35
+\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+# 2
+
+
+# 2
+
+extern "C" __declspec(dllimport) void fun (int) ;
+
+
+# 4
+
+extern "C" void fun (int arg)  
+# 5
+{ return arg; }'

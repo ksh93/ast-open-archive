@@ -243,7 +243,7 @@ TclOpenFile(fname, mode)
 {
     int fd;
 
-    fd = open(fname, mode, 0666);
+    fd = open(fname, mode, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
     if (fd != -1) {
         fcntl(fd, F_SETFD, FD_CLOEXEC);
         return Tcl_GetFile((ClientData)fd, TCL_UNIX_FD);

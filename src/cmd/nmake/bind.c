@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -361,7 +361,6 @@ dirscan(struct rule* r)
 	int			n;
 	struct stat		st;
 
-	error(-3, "dirscan %s", r->name);
 	if (r->dynamic & D_scanned)
 		return;
 	if ((n = strlen(r->name)) > 1)
@@ -381,9 +380,7 @@ dirscan(struct rule* r)
 			s = r->name;
 			if (d->directory && (dirp = opendir(s)))
 			{
-#if DEBUG
-				message((-5, "scan directory %s", s));
-#endif
+				debug((-5, "scan directory %s", s));
 				while (entry = readdir(dirp))
 					if (!FIGNORE(entry->d_name))
 						addfile(d, entry->d_name, NOTIME);
@@ -398,9 +395,7 @@ dirscan(struct rule* r)
 				closedir(dirp);
 				return;
 			}
-#if DEBUG
-			message((-5, "dirscan(%s) failed", s));
-#endif
+			debug((-5, "dirscan(%s) failed", s));
 		}
 		else if (r->time)
 			r->dynamic |= D_entries;
@@ -696,7 +691,7 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 		x->dynamic |= D_bound;
 		x->dynamic &= ~D_member;
 		x->time = r->time;
-		if (!(x->dynamic & D_source))
+		if (!(x->dynamic & D_source) || (x->property & P_target))
 			x->view = r->view;
 	}
 	s = r->uname = r->name;
@@ -705,7 +700,7 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 	{
 		if (state.fsview && strchr(s, '/') && strchr(r->name, '/') && !streq(s, r->name))
 		{
-			message((-5, "%s and %s are bound in %s", s, r->name, d->name));
+			debug((-5, "%s and %s are bound in %s", s, r->name, d->name));
 			putbound(s, d->name);
 			putbound(r->name, d->name);
 		}
@@ -716,17 +711,17 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 	{
 		if ((!x->uname || x->uname[0] != '.' && x->uname[1] != '.' && x->uname[2] != '/') && ((s = getbound(x->name)) || x->uname && (s = getbound(x->uname))))
 		{
-			message((-5, "%s rebind %s => %s", r->name, getbound(r->name), s));
+			debug((-5, "%s rebind %s => %s", r->name, getbound(r->name), s));
 			putbound(r->name, s);
 		}
 		else if ((!r->uname || r->uname[0] != '.' && r->uname[1] != '.' && r->uname[2] != '/') && ((s = getbound(r->name)) || r->uname && (s = getbound(r->uname))))
 		{
-			message((-5, "%s rebind %s => %s", x->name, getbound(x->name), s));
+			debug((-5, "%s rebind %s => %s", x->name, getbound(x->name), s));
 			putbound(x->name, s);
 		}
 		else
 		{
-			message((-5, "no rebind for %s or %s", unbound(r), unbound(x)));
+			debug((-5, "no rebind for %s or %s", unbound(r), unbound(x)));
 			s = 0;
 		}
 		for (i = 0; i < na; i++)
@@ -1119,7 +1114,7 @@ bindfile(register struct rule* r, char* name, int flags)
 				for (f = getfile(dir), b = d->name; f; f = f->next)
 					if (f->dir->name == b)
 						break;
-				if (!f)
+				if (!f && !(z->uname))
 				{
 					z->dynamic |= D_scanned;
 					z->dynamic &= ~D_entries;
@@ -1254,7 +1249,7 @@ bindfile(register struct rule* r, char* name, int flags)
 			 *
 			 *	-	name = name, time = time(value)
 			 *	+	name = value, time = OLDTIME
-			 *		name = value, time = time(value)
+			 *		name = value, time = time(time)
 			 */
 
 			if (streq(s, "-") || streq(s, "+"))
@@ -1289,15 +1284,20 @@ bindfile(register struct rule* r, char* name, int flags)
 							name = strdup(s);
 							continue;
 						}
-						if (a->dynamic & D_bound)
-						{
-							st.st_mode = !(a->dynamic & D_regular);
-							st.st_mtime = a->time;
-						}
-						else
+						if (!(a->dynamic & D_bound))
 						{
 							st.st_mode = 0;
 							st.st_mtime = 0;
+						}
+						else if (!a->time)
+						{
+							st.st_mode = 0;
+							st.st_mtime = CURTIME;
+						}
+						else
+						{
+							st.st_mode = !(a->dynamic & D_regular);
+							st.st_mtime = a->time;
 						}
 					}
 					if (n == '-' || *b)
@@ -1390,7 +1390,7 @@ bindfile(register struct rule* r, char* name, int flags)
 			{
 				if (S_ISREG(st.st_mode) || !st.st_mode)
 					r->dynamic |= D_regular;
-				if (!(r->dynamic & D_source))
+				if (!(r->dynamic & D_source) || (r->property & P_target))
 					r->view = view;
 			}
 			if (!r->view && *b == '/')
@@ -1646,7 +1646,7 @@ unbind(const char* s, char* v, void* h)
 			r->scan = 0;
 			r->status = NOTYET;
 			r->time = 0;
-			if (u || !(r->dynamic & D_source))
+			if (u || !(r->dynamic & D_source) || (r->property & P_target))
 			{
 				r->preview = 0;
 				r->view = 0;
@@ -1716,9 +1716,7 @@ source(register struct rule* r)
 		 *	(2) the first A rhs operand is placed in the product
 		 */
 
-#if DEBUG
-		message((-5, "%s: recompute view cross product", r->name));
-#endif
+		debug((-5, "%s: recompute view cross product", r->name));
 		tmp = sfstropen();
 		z = &lst;
 		z->next = 0;

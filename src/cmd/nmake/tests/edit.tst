@@ -1,20 +1,8 @@
-# nmake regression tests
+# ast nmake edit operator tests
 
-function DATA
-{
-	typeset f i
-	for f
-	do	case $f in
-		L.dir)	mkdir L.dir
-			for i in 001 002 003 004
-			do	print $i > L.dir/$i
-			done
-			;;
-		esac
-	done
-}
+INCLUDE test.def
 
-TEST 001 ':H: sort edit op'
+TEST 01 ':H: sort'
 
 	EXEC	-n -f - . 'A = c b a a' 'print -- $(A:H)'
 		OUTPUT - $'a a b c'
@@ -125,17 +113,20 @@ TEST 001 ':H: sort edit op'
 	EXEC	-n -f - . 'V = a-1.2.3 a-02.3.4 a-01.2.3' 'print -- $(V:H=VU)'
 		OUTPUT - $'a-02.3.4 a-1.2.3'
 
-TEST 002 ':I: intersection edit op'
+TEST 02 ':I: intersection'
 
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:I)'
 		OUTPUT - $''
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:I<)'
 		OUTPUT - $''
 
-TEST 003 ':L: glob list edit op'
+TEST 03 ':L: glob list'
 
-	DO	DATA L.dir
 	EXEC	-n -f - . 'print -- $("L.dir":L)'
+		INPUT L.dir/001
+		INPUT L.dir/002
+		INPUT L.dir/003
+		INPUT L.dir/004
 		OUTPUT - $'001 002 003 004'
 	EXEC	-n -f - . 'print -- $("L.dir":L>)'
 		OUTPUT - $'004'
@@ -146,19 +137,19 @@ TEST 003 ':L: glob list edit op'
 	EXEC	-n -f - . 'print -- $("L.dir":L!)'
 		OUTPUT - $'L.dir/001 L.dir/002 L.dir/003 L.dir/004'
 
-TEST 004 ':N: file match edit op'
+TEST 04 ':N: file match'
 
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:N)'
 		OUTPUT - $''
 
-TEST 005 ':O: ordinal edit op'
+TEST 05 ':O: ordinal'
 
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:O)'
 		OUTPUT - $'8'
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:O=)'
 		OUTPUT - $'8'
 
-TEST 006 ':Q: quoting'
+TEST 06 ':Q: quoting'
 
 	EXEC	-n -f - . 'A = "a z"' 'print -- $(A:Q)'
 		OUTPUT - $'\\""a z"\\"'
@@ -181,7 +172,7 @@ TEST 006 ':Q: quoting'
 	EXEC	-n -f - . 'A = a$z' 'print -- $(A:@Q)'
 		OUTPUT - $'\'a\$z\''
 
-TEST 007 ':T=D: quoting'
+TEST 07 ':T=D: quoting'
 
 	EXEC	-n -f - . 'A == "a z"' 'print -- $("(A)":T=D)'
 		OUTPUT - -DA=$'\\""a z"\\"'
@@ -194,7 +185,7 @@ TEST 007 ':T=D: quoting'
 	EXEC	-n -f - . 'A == a$z' 'print -- $("(A)":T=D)'
 		OUTPUT - -DA=$'\'a\$z\''
 
-TEST 008 ':T=E: quoting'
+TEST 08 ':T=E: quoting'
 
 	EXEC	-n -f - . 'A == "a z"' 'print -- $("(A)":T=E)'
 		OUTPUT - A=$'"a z"'
@@ -205,3 +196,160 @@ TEST 008 ':T=E: quoting'
 		OUTPUT - A=$'\'a\\z\''
 	EXEC	-n -f - . 'A == a$z' 'print -- $("(A)":T=E)'
 		OUTPUT - A=$'\'a\$z\''
+
+TEST 09 ':C:'
+
+	EXEC	-n
+		INPUT Makefile $'A = ../../hdr
+t :
+	: $(X)
+	: $(Y)
+	: $(Z)
+X : .FUNCTION
+	return $(A:/^/-I)
+Y : .FUNCTION
+	.Y : $(A:/^/-I)
+	return $(~.Y)
+Z : .FUNCTION
+	.Z : $(A:/^/-I)
+	return $(*.Z)'
+		OUTPUT - $'+ : -I../../hdr
++ : -I../../hdr
++ : -I../../hdr'
+
+TEST 10 ':F:'
+
+	EXEC -n
+		INPUT Makefile $'LOWERCASE = GO LOWER CASE
+UPPERCASE = go upper case
+FILENAME = $$*/usr/people/login
+COUNT = 23
+STRING = "this is a string"
+all :
+	: obsolete lower :$(LOWERCASE:F=L):
+	: lower :$(LOWERCASE:F=%(lower)s):
+	: obsolete upper :$(UPPERCASE:F=U):
+	: upper :$(UPPERCASE:F=%(upper)s):
+	: string :$(STRING:F=%s):
+	: hex :$(COUNT:F=%x):
+	: dec :$(COUNT:F=%10.5d):
+	: oct :$(COUNT:F=%o):
+	: right justify :$("var1 var2":F=%20.10s):
+	: left justify :$("var1 var2":F=%-20.10s):
+	: obsolete variable :$(FILENAME:F=V):
+	: variable :$(FILENAME:F=%(variable)s):'
+		OUTPUT - $'+ : obsolete lower :go lower case:
++ : lower :go lower case:
++ : obsolete upper :GO UPPER CASE:
++ : upper :GO UPPER CASE:
++ : string :"this is a string":
++ : hex :17:
++ : dec :     00023:
++ : oct :27:
++ : right justify :                var1                 var2:
++ : left justify :var1                var2                :
++ : obsolete variable :....usr.people.login:
++ : variable :....usr.people.login:'
+
+TEST 11 'empty op values'
+
+	EXEC	-n
+		INPUT Makefile $'all : .MAKE
+	A = a b c
+	print $(A:A)
+	print $(A:I)'
+		OUTPUT - $'
+'
+
+TEST 12 ':P=G:'
+
+	EXPORT VPATH=$TWD/dev:$TWD/ofc
+
+	CD ofc
+
+	EXEC	-n
+		INPUT Makefile $'all : .MAKE
+	X = *.c
+	print :P=G: $(X:P=G)
+	print :P=G:T=F: $(X:P=G:T=F)'
+		INPUT ofc.c
+		INPUT dup.c
+		OUTPUT - $':P=G: dup.c ofc.c
+:P=G:T=F: dup.c ofc.c'
+
+	CD ../dev
+
+	EXEC	-n
+		INPUT dev.c
+		INPUT dup.c
+		OUTPUT - $':P=G: dev.c dup.c ofc.c
+:P=G:T=F: dev.c dup.c '$TWD$'/ofc/ofc.c'
+
+TEST 13 ':P=S:'
+
+	EXPORT VPATH=$TWD/dev:$TWD/ofc
+
+	CD ofc
+
+	EXEC	-ns
+		INPUT Makefile $'FILES = a.h ../a.h
+all : $(FILES)
+../a.h : a.h
+	cp $(*) $(<)
+.DONE : .done
+.done : .MAKE
+	print :P=S: $(FILES:T=F:P=S)
+	print :P!=S: $(FILES:T=F:P!=S)'
+		INPUT a.h
+		INPUT $TWD/a.h
+		OUTPUT - $':P=S: a.h
+:P!=S: ../a.h'
+
+	CD ../dev
+
+	EXEC	-ns
+		OUTPUT - $':P=S: '$TWD$'/ofc/a.h
+:P!=S: ../a.h'
+
+TEST 14 'rebind variants'
+
+	EXEC
+		INPUT Makefile $'set nowriteobject nowritestate
+all : tst
+	rm -f notfound $(*.SOURCE:L=e*)
+tst : .VIRTUAL .FORCE
+	touch exists'
+		ERROR - $'+ touch exists\n+ rm -f notfound'
+
+	EXEC
+		ERROR - $'+ touch exists\n+ rm -f notfound exists'
+
+	EXEC
+		INPUT Makefile $'set nowriteobject nowritestate
+all : tst
+	rm -f notfound $("rebind $(*.SOURCE)":R)$(*.SOURCE:L=e*)
+tst : .VIRTUAL .FORCE
+	touch exists'
+		ERROR - $'+ touch exists\n+ rm -f notfound exists'
+
+	EXEC
+
+	EXEC
+		INPUT Makefile $'set nowriteobject nowritestate
+all : tst
+	rm -f notfound $(*.SOURCE:T=B:L=e*)
+tst : .VIRTUAL .FORCE
+	touch exists'
+		ERROR - $'+ touch exists\n+ rm -f notfound exists'
+
+	EXEC
+
+	EXEC
+		INPUT Makefile $'set nowriteobject nowritestate
+all : tst
+	rm -f notfound $(*.SOURCE:L^=e*)
+tst : .VIRTUAL .FORCE
+	touch exists'
+		ERROR - $'+ touch exists\n+ rm -f notfound exists'
+
+	EXEC

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -140,7 +140,7 @@ csauth(register Cs_t* state, int fd, const char* path, const char* arg)
 		if (s = strrchr(tmp, '/'))
 		{
 			*s = 0;
-			if (access(tmp, X_OK) && (mkdir(tmp, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(tmp, S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)))
+			if (eaccess(tmp, X_OK) && (mkdir(tmp, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(tmp, S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)))
 			{
 				messagef((state->id, NiL, -1, "auth: %s: challenge directory error", tmp));
 				goto sorry;

@@ -31,7 +31,7 @@
 *        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.        *
 *                                                                  *
 *            Information and Software Systems Research             *
-*The Regents of the University of California and AT&T Labs Research*
+*  The Regents of the University of California and AT&T Research   *
 *                         Florham Park NJ                          *
 *                                                                  *
 *                        Kurt Shoens (UCB)                         *
@@ -60,7 +60,7 @@ settmp(const char* name, int dir)
 			quit();
 		state.readonly = 0;
 		if (dir) {
-			if (access(name, W_OK))
+			if (eaccess(name, W_OK))
 				state.readonly = 1;
 		}
 		else if ((fd = open(name, O_WRONLY|O_BINARY)) < 0)

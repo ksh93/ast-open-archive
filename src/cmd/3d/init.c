@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -44,7 +44,7 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2004-05-04 $\0\n"
+"] (AT&T Research) 2004-07-17 $\0\n"
 #else
 "\n@(#)$Id: 3d (AT&T Research) 2004-05-04 $\0\n"
 #endif

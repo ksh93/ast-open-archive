@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -403,6 +403,7 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 	register char*	v;
 	register int	c;
 	unsigned long	flags;
+	char*		mode;
 
 	if (ap)
 	{
@@ -415,6 +416,7 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 	{
 		sfopen(sfstdin, NiL, "rt");
 		sfset(sfstdin, SF_SHARE, 0);
+		mode = state.mode;
 		for (;;)
 		{
 			if (s = state.peekfile)
@@ -458,8 +460,8 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 						*t = 0;
 					if (v = strchr(s, '='))
 					{
-						*v = 0;
-						c = strtol(v + 1, NiL, 0);
+						*v++ = 0;
+						c = strtol(v, NiL, 0);
 					}
 					else
 						c = 1;
@@ -480,21 +482,22 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 							flags |= FTW_PHYSICAL;
 						}
 					}
-					if (v)
-						*v = '=';
+					else if (streq(s, "mode"))
+						state.mode = v;
 					if (!t)
 						break;
-					*t++ = ',';
-					s = t;
+					s = t + 1;
 				}
 				s = state.filter.path;
 				state.filter.line = *state.filter.name ? 2 : 1;
 			}
 			if (*s && ftwalk(s, copyfile, flags, NiL))
 			{
+				state.mode = mode;
 				error(2, "%s: not completely copied", s);
 				break;
 			}
+			state.mode = mode;
 		}
 	}
 	if (ap)

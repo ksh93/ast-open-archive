@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -51,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2004-04-01 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2004-08-01 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -396,8 +396,10 @@ const struct Args commands[] =
 	"Reverse the \b-sort\b sense.",
 "silent",	SILENT,		Unary,		0,	0,	0,
 	"Do not warn about inaccessible directories or symbolic link loops.",
-"size",		SIZE,		Num|Stat,	0,	"number[bckw]]", 0,
-	"File size is \anumber\a units.",
+"size",		SIZE,		Num|Stat,	0,	"number[bcgkm]]", 0,
+	"File size is \anumber\a units (b: 512 byte blocks, c: characters"
+	" g: 1024*1024*1024 blocks, k: 1024 blocks, m: 1024*1024 blocks.)"
+	" Sizes are rounded to the next unit.",
 "sort",		SORT,		Str,		0,	"option",	0,
 	"Search each directory in \a-option\a sort order, e.g., \b-name\b"
 	" sorts by name, \b-size\b sorts by size.",
@@ -453,6 +455,7 @@ struct Node
 	enum Command	action;
 	union Item	first;
 	union Item	second;
+	union Item	third;
 };
 
 struct Format
@@ -860,6 +863,7 @@ compile(char** argv, register struct Node* np)
 		np->name = argp->name;
 		np->action = argp->action;
 		np->second.i = 0; 
+		np->third.u = 0; 
 		if (argp->type & Stat)
 			walkflags &= ~FTW_DELAY;
 		if (argp->type & Op)
@@ -888,7 +892,32 @@ compile(char** argv, register struct Node* np)
 						np->second.i = *b; 
 						b++;
 					}
-					np->first.l = strton(b, &e, NiL, argp->action == SIZE ? 512 : 1);
+					np->first.u = strtoul(b, &e, 0);
+					switch (*e++)
+					{
+					default:
+						e--;
+						/*FALLTHROUGH*/
+					case 'b':
+						np->third.u = 512;
+						break;
+					case 'c':
+						break;
+					case 'g':
+						np->third.u = 1024 * 1024 * 1024;
+						break;
+					case 'k':
+						np->third.u = 1024;
+						break;
+					case 'm':
+						np->third.u = 1024 * 1024;
+						break;
+					case 'w':
+						np->third.u = 2;
+						break;
+					}
+					if (*e)
+						error(1, "%s: invalid character%s after number", e, *(e + 1) ? "s" : "");
 					break;
 				default:
 					np->first.cp = b;
@@ -1208,6 +1237,7 @@ execute(Ftw_t* ftw)
 	register struct Node*	np = topnode;
 	register int		val;
 	register unsigned long	u;
+	unsigned long		m;
 	int			not = 1;
 	Sfio_t*			fp;
 	struct Node*		tp;
@@ -1389,6 +1419,8 @@ execute(Ftw_t* ftw)
 		case LINKS:
 			u = ftw->statb.st_nlink;
 		num:
+			if (m = np->third.u)
+				u = (u + m - 1) / m;
 			switch (np->second.i)
 			{
 			case '+':

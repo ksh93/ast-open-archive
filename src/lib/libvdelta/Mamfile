@@ -1,15 +1,15 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv mam_cc_FLAGS 
+setv mam_cc_FLAGS
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,12 +35,14 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make vdelta
 make libvdelta.a archive
 make vdelta.req
 exec - set -
-exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
+exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
@@ -69,172 +71,176 @@ done vdelta.req generated
 make vddelta.o
 make vddelta.c
 make vdelhdr.h implicit
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
 make vdelta.h implicit
 done vdelta.h dontcare
 done vdelhdr.h
 done vddelta.c
+meta vddelta.o %.c>%.o vddelta.c vddelta
 prev vddelta.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vddelta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vddelta.c
 done vddelta.o generated
 make vdio.o
 make vdio.c
 prev vdelhdr.h implicit
 done vdio.c
+meta vdio.o %.c>%.o vdio.c vdio
 prev vdio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vdio.c
 done vdio.o generated
 make vdupdate.o
 make vdupdate.c
 prev vdelhdr.h implicit
 done vdupdate.c
+meta vdupdate.o %.c>%.o vdupdate.c vdupdate
 prev vdupdate.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdupdate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vdupdate.c
 done vdupdate.o generated
 make vdsqueeze.o
 make vdsqueeze.c
 prev vdelhdr.h implicit
 done vdsqueeze.c
+meta vdsqueeze.o %.c>%.o vdsqueeze.c vdsqueeze
 prev vdsqueeze.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdsqueeze.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vdsqueeze.c
 done vdsqueeze.o generated
 make vdexpand.o
 make vdexpand.c
 prev vdelhdr.h implicit
 done vdexpand.c
+meta vdexpand.o %.c>%.o vdexpand.c vdexpand
 prev vdexpand.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdexpand.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vdexpand.c
 done vdexpand.o generated
 make vddelta01.o
 make vd01/vddelta01.c
 make vd01/vdelhdr01.h implicit
-prev ../../../include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 make vd01/vdelta01.h implicit
 done vd01/vdelta01.h dontcare
 done vd01/vdelhdr01.h
 done vd01/vddelta01.c
+meta vddelta01.o %.c>%.o vd01/vddelta01.c vddelta01
 prev vd01/vddelta01.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vddelta01.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vd01/vddelta01.c
 done vddelta01.o generated
 make vdio01.o
 make vd01/vdio01.c
 prev vd01/vdelhdr01.h implicit
 done vd01/vdio01.c
+meta vdio01.o %.c>%.o vd01/vdio01.c vdio01
 prev vd01/vdio01.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdio01.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vd01/vdio01.c
 done vdio01.o generated
 make vdupdate01.o
 make vd01/vdupdate01.c
 prev vd01/vdelhdr01.h implicit
 done vd01/vdupdate01.c
+meta vdupdate01.o %.c>%.o vd01/vdupdate01.c vdupdate01
 prev vd01/vdupdate01.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdupdate01.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vd01/vdupdate01.c
 done vdupdate01.o generated
 exec - ${AR} cr libvdelta.a vddelta.o vdio.o vdupdate.o vdsqueeze.o vdexpand.o vddelta01.o vdio01.o vdupdate01.o
 exec - (ranlib libvdelta.a) >/dev/null 2>&1 || true
 done libvdelta.a generated
 done vdelta virtual
 prev libvdelta.a archive
-make ../../../lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
+make ${INSTALLROOT}/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib
 exec - fi
-done ../../../lib generated
-make ../../../lib/libvdelta.a archive
-prev ../../../lib
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libvdelta.a archive
+prev ${INSTALLROOT}/lib
 prev libvdelta.a archive
-exec - test '' = 'libvdelta.a' || ${STDCMP} 2>/dev/null -s libvdelta.a ${PACKAGE_ast_LIB}/libvdelta.a || { ${STDMV} ${PACKAGE_ast_LIB}/libvdelta.a ${PACKAGE_ast_LIB}/libvdelta.a.old 2>/dev/null || true; ${STDCP} libvdelta.a ${PACKAGE_ast_LIB}/libvdelta.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libvdelta.a) >/dev/null 2>&1 || true
-done ../../../lib/libvdelta.a generated
-make ../../../man/man3
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/man/man3
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 		    		   
+exec - test '' = 'libvdelta.a' || ${STDCMP} 2>/dev/null -s libvdelta.a ${INSTALLROOT}/lib/libvdelta.a || { ${STDMV} ${INSTALLROOT}/lib/libvdelta.a ${INSTALLROOT}/lib/libvdelta.a.old 2>/dev/null || true; ${STDCP} libvdelta.a ${INSTALLROOT}/lib/libvdelta.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libvdelta.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libvdelta.a generated
+make ${INSTALLROOT}/man/man3
+exec - if	silent test ! -d ${INSTALLROOT}/man/man3
+exec - then	mkdir -p ${INSTALLROOT}/man/man3
 exec - fi
-done ../../../man/man3 generated
-make ../../../man/man3/vdelta.3
-prev ../../../man/man3
+done ${INSTALLROOT}/man/man3 generated
+make ${INSTALLROOT}/man/man3/vdelta.3
+prev ${INSTALLROOT}/man/man3
 make vdelta.3
 done vdelta.3
 exec - test '' = 'vdelta.3' || ${STDCMP} 2>/dev/null -s vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3 || { ${STDMV} ${INSTALLROOT}/man/man3/vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3.old 2>/dev/null || true; ${STDCP} vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3  		    		    ;}
-done ../../../man/man3/vdelta.3 generated
-make ../../../lib/lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
+done ${INSTALLROOT}/man/man3/vdelta.3 generated
+make ${INSTALLROOT}/lib/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
-done ../../../lib/lib generated
-make ../../../lib/lib/vdelta
-prev ../../../lib/lib
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/vdelta
+prev ${INSTALLROOT}/lib/lib
 prev vdelta.req
-exec - test '' = 'vdelta.req' || ${STDCMP} 2>/dev/null -s vdelta.req ${PACKAGE_ast_LIB}/lib/vdelta || { ${STDMV} ${PACKAGE_ast_LIB}/lib/vdelta ${PACKAGE_ast_LIB}/lib/vdelta.old 2>/dev/null || true; ${STDCP} vdelta.req ${PACKAGE_ast_LIB}/lib/vdelta  		    		    ;}
-done ../../../lib/lib/vdelta generated
-make ../../../include/ast
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
+exec - test '' = 'vdelta.req' || ${STDCMP} 2>/dev/null -s vdelta.req ${INSTALLROOT}/lib/lib/vdelta || { ${STDMV} ${INSTALLROOT}/lib/lib/vdelta ${INSTALLROOT}/lib/lib/vdelta.old 2>/dev/null || true; ${STDCP} vdelta.req ${INSTALLROOT}/lib/lib/vdelta  		    		    ;}
+done ${INSTALLROOT}/lib/lib/vdelta generated
+make ${INSTALLROOT}/include/ast
+exec - if	silent test ! -d ${INSTALLROOT}/include/ast
+exec - then	mkdir -p ${INSTALLROOT}/include/ast
 exec - fi
-done ../../../include/ast generated
-make ../../../include/ast/vdelta.h
-prev ../../../include/ast
+done ${INSTALLROOT}/include/ast generated
+make ${INSTALLROOT}/include/ast/vdelta.h
+prev ${INSTALLROOT}/include/ast
 prev vdelta.h
-exec - test '' = 'vdelta.h' || ${STDCMP} 2>/dev/null -s vdelta.h ${PACKAGE_ast_INCLUDE}/vdelta.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/vdelta.h ${PACKAGE_ast_INCLUDE}/vdelta.h.old 2>/dev/null || true; ${STDCP} vdelta.h ${PACKAGE_ast_INCLUDE}/vdelta.h  		    		    ;}
-done ../../../include/ast/vdelta.h generated
+exec - test '' = 'vdelta.h' || ${STDCMP} 2>/dev/null -s vdelta.h ${INSTALLROOT}/include/ast/vdelta.h || { ${STDMV} ${INSTALLROOT}/include/ast/vdelta.h ${INSTALLROOT}/include/ast/vdelta.h.old 2>/dev/null || true; ${STDCP} vdelta.h ${INSTALLROOT}/include/ast/vdelta.h  		    		    ;}
+done ${INSTALLROOT}/include/ast/vdelta.h generated
 done install virtual
 make test
 done test dontcare virtual

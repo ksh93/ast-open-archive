@@ -1,15 +1,15 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv mam_cc_FLAGS 
+setv mam_cc_FLAGS
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,12 +35,14 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ardir
 make libardir.a archive
 make ardir.req
 exec - set -
-exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
+exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
@@ -69,213 +71,218 @@ done ardir.req generated
 make ardir.o
 make ardir.c
 make ardirlib.h implicit
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h dontcare
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
 make ardir.h implicit
-prev ../../../include/ast/ls.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ardir.h dontcare
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ardirlib.h
 done ardir.c
+meta ardir.o %.c>%.o ardir.c ardir
 prev ardir.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ardir.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ardir.c
 done ardir.o generated
 make ar-aix.o
 make ar-aix.c
-make ../../../include/ast/tm.h implicit
-make ../../../include/ast/times.h implicit
-make ../../../include/ast/ast_time.h implicit
-done ../../../include/ast/ast_time.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/times.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/tm.h
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h
 prev ardirlib.h implicit
 done ar-aix.c
+meta ar-aix.o %.c>%.o ar-aix.c ar-aix
 prev ar-aix.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ar-aix.c
 done ar-aix.o generated
 make ar-aixbig.o
 make ar-aixbig.c
-prev ../../../include/ast/tm.h implicit
+prev ${INSTALLROOT}/include/ast/tm.h implicit
 prev ardirlib.h implicit
 done ar-aixbig.c
+meta ar-aixbig.o %.c>%.o ar-aixbig.c ar-aixbig
 prev ar-aixbig.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aixbig.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ar-aixbig.c
 done ar-aixbig.o generated
 make ar-local.o
 make ar-local.c
-prev ../../../include/ast/tm.h implicit
+prev ${INSTALLROOT}/include/ast/tm.h implicit
 prev ardirlib.h implicit
 done ar-local.c
+meta ar-local.o %.c>%.o ar-local.c ar-local
 prev ar-local.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-local.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ar-local.c
 done ar-local.o generated
 make ar-omf.o
 make ar-omf.c
 make omf.h implicit
 done omf.h
-make ../../../include/ast/cdt.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/cdt.h
+make ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/cdt.h
 prev ardirlib.h implicit
 done ar-omf.c
+meta ar-omf.o %.c>%.o ar-omf.c ar-omf
 prev ar-omf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-omf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ar-omf.c
 done ar-omf.o generated
 make ar-pdp11.o
 make ar-pdp11.c
-prev ../../../include/ast/tm.h implicit
-make ../../../include/ast/swap.h implicit
-make ../../../include/ast/int.h implicit
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/int.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/swap.h
+prev ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/swap.h implicit
+make ${INSTALLROOT}/include/ast/int.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/int.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/swap.h
 prev ardirlib.h implicit
 done ar-pdp11.c
+meta ar-pdp11.o %.c>%.o ar-pdp11.c ar-pdp11
 prev ar-pdp11.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-pdp11.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ar-pdp11.c
 done ar-pdp11.o generated
 make ar-port.o
 make ar-port.c
-prev ../../../include/ast/tm.h implicit
+prev ${INSTALLROOT}/include/ast/tm.h implicit
 prev ardirlib.h implicit
 done ar-port.c
+meta ar-port.o %.c>%.o ar-port.c ar-port
 prev ar-port.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-port.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ar-port.c
 done ar-port.o generated
 make ar-s5r0.o
 make ar-s5r0.c
-prev ../../../include/ast/tm.h implicit
-prev ../../../include/ast/swap.h implicit
+prev ${INSTALLROOT}/include/ast/tm.h implicit
+prev ${INSTALLROOT}/include/ast/swap.h implicit
 prev ardirlib.h implicit
 done ar-s5r0.c
+meta ar-s5r0.o %.c>%.o ar-s5r0.c ar-s5r0
 prev ar-s5r0.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-s5r0.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ar-s5r0.c
 done ar-s5r0.o generated
 exec - ${AR} cr libardir.a ardir.o ar-aix.o ar-aixbig.o ar-local.o ar-omf.o ar-pdp11.o ar-port.o ar-s5r0.o
 exec - (ranlib libardir.a) >/dev/null 2>&1 || true
 done libardir.a generated
 done ardir virtual
 prev libardir.a archive
-make ../../../lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
+make ${INSTALLROOT}/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib
 exec - fi
-done ../../../lib generated
-make ../../../lib/libardir.a archive
-prev ../../../lib
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libardir.a archive
+prev ${INSTALLROOT}/lib
 prev libardir.a archive
-exec - test '' = 'libardir.a' || ${STDCMP} 2>/dev/null -s libardir.a ${PACKAGE_ast_LIB}/libardir.a || { ${STDMV} ${PACKAGE_ast_LIB}/libardir.a ${PACKAGE_ast_LIB}/libardir.a.old 2>/dev/null || true; ${STDCP} libardir.a ${PACKAGE_ast_LIB}/libardir.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libardir.a) >/dev/null 2>&1 || true
-done ../../../lib/libardir.a generated
-make ../../../lib/lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
+exec - test '' = 'libardir.a' || ${STDCMP} 2>/dev/null -s libardir.a ${INSTALLROOT}/lib/libardir.a || { ${STDMV} ${INSTALLROOT}/lib/libardir.a ${INSTALLROOT}/lib/libardir.a.old 2>/dev/null || true; ${STDCP} libardir.a ${INSTALLROOT}/lib/libardir.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libardir.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libardir.a generated
+make ${INSTALLROOT}/lib/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
-done ../../../lib/lib generated
-make ../../../lib/lib/ardir
-prev ../../../lib/lib
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/ardir
+prev ${INSTALLROOT}/lib/lib
 prev ardir.req
-exec - test '' = 'ardir.req' || ${STDCMP} 2>/dev/null -s ardir.req ${PACKAGE_ast_LIB}/lib/ardir || { ${STDMV} ${PACKAGE_ast_LIB}/lib/ardir ${PACKAGE_ast_LIB}/lib/ardir.old 2>/dev/null || true; ${STDCP} ardir.req ${PACKAGE_ast_LIB}/lib/ardir  		    		    ;}
-done ../../../lib/lib/ardir generated
-make ../../../include/ast
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
+exec - test '' = 'ardir.req' || ${STDCMP} 2>/dev/null -s ardir.req ${INSTALLROOT}/lib/lib/ardir || { ${STDMV} ${INSTALLROOT}/lib/lib/ardir ${INSTALLROOT}/lib/lib/ardir.old 2>/dev/null || true; ${STDCP} ardir.req ${INSTALLROOT}/lib/lib/ardir  		    		    ;}
+done ${INSTALLROOT}/lib/lib/ardir generated
+make ${INSTALLROOT}/include/ast
+exec - if	silent test ! -d ${INSTALLROOT}/include/ast
+exec - then	mkdir -p ${INSTALLROOT}/include/ast
 exec - fi
-done ../../../include/ast generated
-make ../../../include/ast/ardir.h
-prev ../../../include/ast
+done ${INSTALLROOT}/include/ast generated
+make ${INSTALLROOT}/include/ast/ardir.h
+prev ${INSTALLROOT}/include/ast
 prev ardir.h
-exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=2002,author=gsf+dgk'  ardir.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ardir.h 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf+dgk'  ardir.h > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/ardir.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ardir.h
+exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/ardir.h
 exec - fi
-done ../../../include/ast/ardir.h generated
+done ${INSTALLROOT}/include/ast/ardir.h generated
 done install virtual
 make test
 done test dontcare virtual

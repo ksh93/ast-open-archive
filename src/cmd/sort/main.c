@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -41,7 +41,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2004-02-11 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2004-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -85,8 +85,13 @@ USAGE_LICENSE
 "		[+%?If the fixed record size is not otherwise specified,"
 "			and the first input file name ends with \b%\b\asize\a"
 "			or \b%\b\asize\a\b.\b*, where \asize\a is a qualified"
-"			integer, then the fixed record size is set"
-"			to \asize\a.]"
+"			integer, then the fixed record size is set to"
+"			\asize\a. Otherwise \b-R-\b is attempted.]"
+"		[+-?The first block of the first input file is sampled to check"
+"			for \bv\b variable length and \bf\b fixed length format"
+"			records. \bsort\b exits with an error diagnostic if"
+"			the record format cannot be determined from the"
+"			sample.]"
 "}"
 "[b:ignorespace?Ignore leading white space (spaces and tabs) in field"
 "	comparisons.]"
@@ -127,8 +132,9 @@ USAGE_LICENSE
 "	This is the default.]"
 "[o:output?Place output in the designated \afile\a instead of on the"
 "	standard output. This file may be the same as one of"
-"	the inputs. The option may appear among the file arguments,"
-"	except after \b--\b.]:[output]"
+"	the inputs. The \afile\a \b-\b names the standard output."
+"	The option may appear among the file arguments, except"
+"	after \b--\b.]:[output]"
 "[l:library?Load the external sort discipline \alibrary\a with optional comma"
 "	separated \aname=value\a arguments. Libraries are loaded, in left"
 "	to right order, after the sort method has been"
@@ -213,16 +219,17 @@ USAGE_LICENSE
 #include <ls.h>
 #include <option.h>
 #include <recsort.h>
+#include <recfmt.h>
 #include <sfdcgzip.h>
 #include <sfstr.h>
 #include <vmalloc.h>
 #include <wait.h>
 #include <iconv.h>
 
-#define INBRK		(128*1024)	/* default heap increment	*/
 #define INMIN		(1024)		/* min input buffer size	*/
-#define INMAX		(128*1024*1024)	/* max input buffer size	*/
-#define INREC		(16*1024)	/* record begin chunk size	*/
+#define INBRK		(64*INMIN)	/* default heap increment	*/
+#define INMAX		(1024*INBRK)	/* max input buffer size	*/
+#define INREC		(16*INMIN)	/* record begin chunk size	*/
 
 #define TEST_dump	0x80000000	/* dump the state before sort	*/
 #define TEST_keys	0x40000000	/* dump keys			*/
@@ -273,7 +280,7 @@ typedef struct
 	int		single;		/* one input file		*/
 	int		verbose;	/* trace main actions		*/
 	int		zip;		/* sfdcgzip SF_* flags		*/
-	Sfio_t*		files[(OPEN_MAX>32) ? (OPEN_MAX-16) : (OPEN_MAX/2)];
+	Sfio_t*		files[OPEN_MAX > 68 ? 64 : (OPEN_MAX-4)];
 } Sort_t;
 
 /*
@@ -312,6 +319,29 @@ verify(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 }
 
 /*
+ * return read stream for path
+ */
+
+static Sfio_t*
+fileopen(register Sort_t* sp, const char* path)
+{
+	Sfio_t*		fp;
+
+	if (fp = sp->opened)
+		sp->opened = 0;
+	else if (streq(path, "-") || streq(path, "/dev/stdin"))
+	{
+		if (sp->hadstdin)
+			error(3, "%s: can only read once", path);
+		sp->hadstdin = 1;
+		fp = sfstdin;
+	}
+	else if (!(fp = sfopen(NiL, path, "r")))
+		error(ERROR_SYSTEM|3, "%s: cannot open", path);
+	return fp;
+}
+
+/*
  * process argv as in sort(1)
  */
 
@@ -325,8 +355,8 @@ parse(register Sort_t* sp, char** argv)
 	char**			a;
 	char**			v;
 	size_t			z;
-	int			fixedfile = 0;
 	int			obsolescent = 1;
+	int			sample = 0;
 	char			opt[16];
 	Optdisc_t		optdisc;
 
@@ -378,6 +408,7 @@ parse(register Sort_t* sp, char** argv)
 		break;
 	case 'v':
 		key->verbose = n;
+		sp->verbose = key->verbose || (key->test & TEST_show);
 		break;
 	case 'x':
 		if (!(key->meth = rskeymeth(key, opt_info.arg)))
@@ -484,7 +515,9 @@ parse(register Sort_t* sp, char** argv)
 			e = s;
 			break;
 		case '%':
-			fixedfile = 1;
+		case '-':
+		case '?':
+			sample = *s;
 			e = s + 1;
 			break;
 		default:
@@ -528,6 +561,8 @@ parse(register Sort_t* sp, char** argv)
 			key->test &= ~opt_info.num;
 		else
 			key->test |= opt_info.num;
+		sp->test = key->test;
+		sp->verbose = key->verbose || (key->test & TEST_show);
 		break;
 	case '?':
 		error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -543,15 +578,59 @@ parse(register Sort_t* sp, char** argv)
 		break;
 	}
 	key->input = argv += opt_info.index;
-	if (fixedfile)
+	if (sample == '%')
 		for (n = 0; s = key->input[n]; n++)
 			if ((s = strrchr(s, '%')) && (z = strton(s + 1, &e, NiL, 0)) && (!*e || *e == '.' && !strchr(e, '/')))
 			{
 				if (!key->fixed)
+				{
 					key->fixed = z;
+					sample = 0;
+				}
 				else if (key->fixed != z)
 					error(2, "%s: file fixed record length mismatch -- %d expected", key->input[n], key->fixed);
 			}
+	if (sample)
+	{
+		if ((sp->opened = fileopen(sp, key->input[0])) && (s = sfreserve(sp->opened, SF_UNBOUND, 1)))
+		{
+			struct stat	st;
+
+			z = sfvalue(sp->opened);
+			if (fstat(sffileno(sp->opened), &st) || st.st_size < z)
+				st.st_size = 0;
+			if (n = recfmt(s, z, st.st_size))
+				switch (RECTYPE(n))
+				{
+				case REC_delimited:
+					key->disc->data = RECSIZE(n);
+					break;
+				case REC_fixed:
+					key->fixed = RECSIZE(n);
+					if (sp->verbose)
+						error(0, "%s fixed record size %I*u", error_info.id, sizeof(key->fixed), key->fixed);
+					break;
+				case REC_variable:
+					if (RECSIZE(n) == 4)
+					{
+						key->disc->data = -('V');
+						if (sp->verbose)
+							error(0, "%s V format variable length records", error_info.id);
+					}
+					else
+						n = 0;
+					break;
+				default:
+					n = 0;
+					break;
+				}
+			sfread(sp->opened, s, 0);
+		}
+		else
+			n = -1;
+		if (n <= 0)
+			error(3, "record format cannot be determined from data sample");
+	}
 	if (obsolescent && (opt_info.index <= 1 || !streq(*(argv - 1), "--")))
 	{
 		/*
@@ -604,29 +683,6 @@ dumpkey(Rs_t* rs, unsigned char* dat, int datlen, unsigned char* key, int keylen
 }
 
 /*
- * return read stream for path
- */
-
-static Sfio_t*
-fileopen(register Sort_t* sp, const char* path)
-{
-	Sfio_t*		fp;
-
-	if (fp = sp->opened)
-		sp->opened = 0;
-	else if (streq(path, "-") || streq(path, "/dev/stdin"))
-	{
-		if (sp->hadstdin)
-			error(3, "%s: can only read once", path);
-		sp->hadstdin = 1;
-		fp = sfstdin;
-	}
-	else if (!(fp = sfopen(NiL, path, "r")))
-		error(ERROR_SYSTEM|3, "%s: cannot open", path);
-	return fp;
-}
-
-/*
  * initialize sp from argv
  */
 
@@ -667,8 +723,6 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 		return -1;
 	}
-	sp->test = key->test;
-	sp->verbose = key->verbose || (sp->test & TEST_show);
 
 	/*
 	 * finalize the buffer dimensions
@@ -895,7 +949,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		{
 			if (!n && os.st_dev == is.st_dev && os.st_ino == is.st_ino)
 				key->type |= RS_IGNORE;
-			else if (access(key->output, W_OK))
+			else if (eaccess(key->output, W_OK))
 				error(ERROR_SYSTEM|3, "%s: cannot write", key->output);
 			else if (!fs3d(FS3D_TEST) || !iview(&os))
 			{
@@ -1408,7 +1462,10 @@ main(int argc, char** argv)
 	if (init(&sort, &sort.disc, argv))
 		exit(1);
 	if (sort.test & TEST_dump)
+	{
+		sfprintf(sfstderr, "main\n\tintermediates=%d\n", sort.xfiles);
 		rskeydump(sort.key, sfstderr);
+	}
 	if (sort.key->type & RS_CAT)
 	{
 		while (s = *sort.key->input++)

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -48,6 +48,7 @@ static int	signals[] =		/* signals to catch		*/
 	SIGINT,
 	SIGALRM,
 	SIGTERM,
+	SIGPIPE,
 #ifdef SIGILL
 	SIGILL,
 #endif
@@ -79,7 +80,6 @@ static struct
 	int*		caught;		/* caught signals		*/
 	struct alarms*	alarms;		/* sorted alarm list		*/
 	struct alarms*	freealarms;	/* free alarm list		*/
-	int		newalarms;	/* setwakeup() check		*/
 } trap;
 
 /*
@@ -89,7 +89,7 @@ static struct
 static void
 interrupt(register int sig)
 {
-	signal(sig, interrupt);
+	signal(sig, sig == SIGPIPE ? SIG_IGN : interrupt);
 	trap.caught[sig] = 1;
 	state.caught = 1;
 }
@@ -119,9 +119,6 @@ setwakeup(void)
 	register unsigned long	now;
 	int			level;
 
-	if (!trap.newalarms)
-		return;
-	trap.newalarms = 0;
 	now = CURTIME;
 	if (!trap.alarms)
 		t = 0;
@@ -160,8 +157,10 @@ wakeup(unsigned long t, register struct list* p)
 	register struct alarms*	a;
 	register struct alarms*	z;
 	register struct alarms*	x;
+	struct alarms*		alarms;
 	unsigned long		now;
 
+	alarms = trap.alarms;
 	now = CURTIME;
 	if (t)
 	{
@@ -182,7 +181,6 @@ wakeup(unsigned long t, register struct list* p)
 						z->next = a->next;
 					else
 						trap.alarms = a->next;
-					trap.newalarms = 1;
 					break;
 				}
 			if (t)
@@ -207,7 +205,6 @@ wakeup(unsigned long t, register struct list* p)
 					z->next = x;
 				else
 					trap.alarms = x;
-				trap.newalarms = 1;
 			}
 		} while (p = p->next);
 	}
@@ -218,9 +215,9 @@ wakeup(unsigned long t, register struct list* p)
 			a = x;
 		a->next = trap.freealarms;
 		trap.freealarms = a;
-		trap.newalarms = 1;
 	}
-	setwakeup();
+	if (trap.alarms != alarms)
+		setwakeup();
 }
 
 /*
@@ -230,13 +227,13 @@ wakeup(unsigned long t, register struct list* p)
 void
 inittrap(void)
 {
-	register int	sig;
+	register int	i;
 
 	memfatal();
 	trap.caught = newof(0, int, sig_info.sigmax + 1, 0);
-	for (sig = 0; sig < elementsof(signals); sig++)
-		if (signal(signals[sig], interrupt) == SIG_IGN)
-			signal(signals[sig], SIG_IGN);
+	for (i = 0; i < elementsof(signals); i++)
+		if (signal(signals[i], interrupt) == SIG_IGN)
+			signal(signals[i], SIG_IGN);
 }
 
 /*
@@ -291,53 +288,57 @@ handle(void)
 				 */
 
 				w = 0;
-				if (!state.compileonly) switch (sig)
-				{
-				case SIGALRM:
-					t = CURTIME;
-					while ((a = trap.alarms) && a->time <= t)
+				if (!state.compileonly)
+					switch (sig)
 					{
-						trap.alarms = a->next;
-						r = a->rule;
-						a->next = trap.freealarms;
-						trap.freealarms = a;
-						trap.newalarms = 1;
-						maketop(r, (P_dontcare|P_force|P_ignore|P_repeat)|(r->property & P_make)?0:P_foreground, NiL);
-					}
-					setwakeup();
-					continue;
-				default:
-					s = fmtsignal(-sig);
-					if ((r = catrule(external.interrupt, ".", s, 0)) || (r = getrule(external.interrupt)))
-					{
-						v = setvar(external.interrupt, s, 0);
-						maketop(r, P_dontcare|P_force|P_ignore|P_repeat|(r->property & P_make)?0:P_foreground, s);
-						w = (r->property & P_functional) ? getval(r->name, VAL_PRIMARY) : v->value;
-						if (r->status == EXISTS && (!(r->property & P_functional) || streq(w, s) || streq(w, "continue")))
+					case SIGALRM:
+						s = fmtsignal(-sig);
+						t = CURTIME;
+						while ((a = trap.alarms) && a->time <= t)
 						{
-							message((-1, "trap %s handler %s status CONTINUE return %s", s, r->name, w));
-							continue;
+							trap.alarms = a->next;
+							r = a->rule;
+							a->next = trap.freealarms;
+							trap.freealarms = a;
+							maketop(r, (P_dontcare|P_force|P_ignore|P_repeat)|((r->property & P_make)?0:P_foreground), s);
 						}
-						message((-1, "trap %s handler %s status TERMINATE return %s", s, r->name, w));
-					}
-					/*FALLTHROUGH*/
+						setwakeup();
+						continue;
+					default:
+						s = fmtsignal(-sig);
+						if ((r = catrule(external.interrupt, ".", s, 0)) || (r = getrule(external.interrupt)))
+						{
+							if (!(r->property & P_functional))
+								v = setvar(external.interrupt, s, 0);
+							maketop(r, (P_dontcare|P_force|P_ignore|P_repeat)|((r->property & P_make)?0:P_foreground), s);
+							if (r->property & P_functional)
+								v = getvar(r->name);
+							w = v->value;
+							if (r->status == EXISTS && (streq(w, s) || streq(w, "continue")))
+							{
+								message((-1, "trap %s handler %s status CONTINUE return %s", s, r->name, w));
+								continue;
+							}
+							message((-1, "trap %s handler %s status TERMINATE return %s", s, r->name, w));
+						}
+						/*FALLTHROUGH*/
 #ifdef SIGILL
-				case SIGILL:
+					case SIGILL:
 #endif
 #ifdef SIGIOT
-				case SIGIOT:
+					case SIGIOT:
 #endif
 #ifdef SIGEMT
-				case SIGEMT:
+					case SIGEMT:
 #endif
 #ifdef SIGBUS
-				case SIGBUS:
+					case SIGBUS:
 #endif
 #ifdef SIGSEGV
-				case SIGSEGV:
+					case SIGSEGV:
 #endif
-					break;
-				}
+						break;
+					}
 
 				/*
 				 * terminate outstanding jobs

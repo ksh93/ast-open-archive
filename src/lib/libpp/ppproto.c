@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -33,7 +33,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2004-02-29 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2004-08-11 $\0\n";
 
 #if PROTOMAIN
 
@@ -366,9 +366,9 @@ init(struct proto* proto, char* op, int flags)
 #if !defined(__PROTO__)\n\
 #  if defined(__STDC__) || defined(__cplusplus) || defined(_proto) || defined(c_plusplus)\n\
 #    if defined(__cplusplus)\n\
-#      define __MANGLE__	\"C\"\n\
+#      define __LINKAGE__	\"C\"\n\
 #    else\n\
-#      define __MANGLE__\n\
+#      define __LINKAGE__\n\
 #    endif\n\
 #    define __STDARG__\n\
 #    define __PROTO__(x)	x\n\
@@ -389,13 +389,14 @@ init(struct proto* proto, char* op, int flags)
 #    define __PROTO__(x)	()\n\
 #    define __OTORP__(x)	x\n\
 #    define __PARAM__(n,o)	o\n\
-#    define __MANGLE__\n\
+#    define __LINKAGE__\n\
 #    define __V_		char\n\
 #    define const\n\
 #    define signed\n\
 #    define void		int\n\
 #    define volatile\n\
 #  endif\n\
+#  define __MANGLE__	__LINKAGE__\n\
 #  if defined(__cplusplus) || defined(c_plusplus)\n\
 #    define __VARARG__	...\n\
 #  else\n\
@@ -416,6 +417,9 @@ init(struct proto* proto, char* op, int flags)
 #    endif\n\
 #  endif\n\
 #endif\n\
+#if !defined(__LINKAGE__)\n\
+#define __LINKAGE__		/* 2004-08-11 transition */\n\
+#endif\n\
 ");
 	}
 	else
@@ -423,6 +427,9 @@ init(struct proto* proto, char* op, int flags)
 \n\
 #if !defined(__PROTO__)\n\
 #include <prototyped.h>\n\
+#endif\n\
+#if !defined(__LINKAGE__)\n\
+#define __LINKAGE__		/* 2004-08-11 transition */\n\
 #endif\n\
 ");
 	if (proto->package)
@@ -1053,7 +1060,12 @@ lex(register struct proto* proto, register long flags)
 				}
 				else if (paren == 2 && !aim)
 				{
-					if (flags & INDIRECT)
+					if (last == '(')
+					{
+						flags &= ~MATCH;
+						om = 0;
+					}
+					else if (flags & INDIRECT)
 					{
 						aim = ip - 1;
 						aom = op - 1;
@@ -1189,6 +1201,37 @@ if !defined(va_start)\n\
 						}
 						else if (*ip == 'd' && *++ip == 'e' && *++ ip == 'f' && *++ip == 'i' && *++ip == 'n' && *++ip == 'e' && (*++ip == ' ' || *ip == '\t'))
 						{
+							while (*++ip == ' ' || *ip == '\t');
+							if (*ip == 'e' && *++ip == 'x' && *++ ip == 't' && *++ip == 'e' && *++ip == 'r' && *++ip == 'n' && (*++ip == ' ' || *ip == '\t'))
+							{
+								t = ip;
+								while (*++t == ' ' || *t == '\t');
+								if (*t == 'e' && *++t == 'x' && *++ t == 't' && *++t == 'e' && *++t == 'r' && *++t == 'n' && (*++t == ' ' || *t == '\t' || *t == '\n' || *t == '\r'))
+									ip = t;
+								t = ip;
+								while (*++t == ' ' || *t == '\t');
+								if (*t == '_' && *(t + 1) == '_')
+								{
+									op = strcopy(op, "undef __MANGLE__\n");
+									op = linesync(proto, op, proto->line);
+									op = strcopy(op, "#define __MANGLE__ __LINKAGE__");
+									break;
+								}
+							}
+							flags |= DEFINE|MATCH;
+							im = bp - 1;
+							om = op - 1;
+						}
+						else if (*ip == 'u' && *++ip == 'n' && *++ ip == 'd' && *++ip == 'e' && *++ip == 'f' && (*++ip == ' ' || *ip == '\t'))
+						{
+							while (*++ip == ' ' || *ip == '\t');
+							if (*ip == 'e' && *++ip == 'x' && *++ ip == 't' && *++ip == 'e' && *++ip == 'r' && *++ip == 'n' && (*++ip == ' ' || *ip == '\t' || *ip == '\n' || *ip == '\r'))
+							{
+								op = strcopy(op, "undef __MANGLE__\n");
+								op = linesync(proto, op, proto->line);
+								op = strcopy(op, "#define __MANGLE__ __LINKAGE__");
+								break;
+							}
 							flags |= DEFINE|MATCH;
 							im = bp - 1;
 							om = op - 1;
@@ -2036,10 +2079,10 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 		 * file read in one chunk
 		 */
 
-		if (!(proto = newof(0, struct proto, 1, 3 * n + 2)))
+		if (!(proto = newof(0, struct proto, 1, 4 * n + 2)))
 			return 0;
 		proto->iz = n;
-		proto->oz = 2 * n;
+		proto->oz = 3 * n;
 		n = 0;
 	}
 	else

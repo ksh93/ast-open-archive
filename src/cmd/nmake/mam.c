@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -63,7 +63,10 @@ mamerror(int fd, const void* b, size_t n)
 	if (state.mam.level > 0)
 	{
 		if (e = strchr(s, ':'))
+		{
 			for (s = e; *++s && *s == ' ';);
+			n -= s - (char*)b;
+		}
 		switch (state.mam.level)
 		{
 		case ERROR_WARNING:
@@ -78,9 +81,7 @@ mamerror(int fd, const void* b, size_t n)
 		}
 		if (!t)
 			t = "error";
-		else if (e = strchr(s, ':'))
-			for (s = e; *++s && *s == ' ';);
-		sfprintf(state.mam.out, "%sinfo %s %s", state.mam.label, t, s);
+		sfprintf(state.mam.out, "%sinfo %s %-.*s", state.mam.label, t, n, s);
 		if (state.mam.regress)
 			return 0;
 	}
@@ -102,7 +103,7 @@ mamname(register struct rule* r)
 		return r->name;
 	if (state.mam.dynamic && (r->dynamic & D_alias))
 		r = makerule(r->name);
-	a = (r->property & P_target) ? unbound(r) : (state.mam.regress || state.expandview) ? r->name : localview(r);
+	a = ((r->property & P_target) || !state.user) ? unbound(r) : (state.mam.regress || state.expandview) ? r->name : localview(r);
 	if (state.mam.statix && (s = call(makerule(external.mamname), a)) && !streq(a, s))
 		a = s;
 	if (state.mam.root && (*a == '/' || (r->dynamic & (D_entries|D_member|D_membertoo|D_regular)) || stat(r->name, &st)))
@@ -144,6 +145,13 @@ mampush(Sfio_t* sp, register struct rule* r, long flags)
 		, (flags & P_joint) ? " joint" : null
 		, (r->property & P_state) ? " state" : null
 		);
+	if (pop && (state.mam.dynamic || state.mam.regress))
+	{
+		if (r->uname && strcmp(r->uname, mamname(r)))
+			sfprintf(sp, "%sbind %s %lu %s\n", state.mam.label, r->uname, numtime(r->time), mamname(r));
+		else
+			sfprintf(sp, "%sbind %s %lu\n", state.mam.label, mamname(r), numtime(r->time));
+	}
 	return pop;
 }
 

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -101,7 +101,7 @@ cssend(register Cs_t* state, int fd, int* fds, int n)
 	 */
 
 	s = csvar(state, CS_VAR_LOCAL, 0);
-	if (access(s, X_OK) && (mkdir(s, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(s, S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)))
+	if (eaccess(s, X_OK) && (mkdir(s, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(s, S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)))
 	{
 		messagef((state->id, NiL, -1, "send: %d: %s: invalid authentication directory ", fd, s));
 		return -1;

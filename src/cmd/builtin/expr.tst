@@ -1,6 +1,14 @@
 # regression tests for the expr utility
 
 TEST 01 'string op output'
+	EXEC	''
+		EXIT 1
+	EXEC	aa : 'a\(b\)*a'
+	EXEC	aa : 'a\(b*\)a'
+	EXEC	aba : 'a\(b\)*a'
+		OUTPUT - b
+		EXIT 0
+	EXEC	aba : 'a\(b*\)a'
 	EXEC	fred : '.*'
 		OUTPUT - 4
 	EXEC	fred/fred : '.*/\(.*\)'

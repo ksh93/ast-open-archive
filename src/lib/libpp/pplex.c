@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -994,6 +994,8 @@ ppcpp(void)
 					}
 					else if (*(pp.token - 1))
 						pp.token--;
+					if (ppisidig(*pp.token))
+						*op++ = ' ';
 					if (pp.in->type == IN_MACRO && (s = strchr(pp.token, MARK)) && !*(s + 1))
 					{
 						*(s + 1) = MARK;

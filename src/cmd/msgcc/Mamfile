@@ -1,15 +1,15 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv mam_cc_FLAGS 
+setv mam_cc_FLAGS
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,10 +35,13 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make msgadmin
 make msgadmin.sh
 done msgadmin.sh
+meta msgadmin %.sh>% msgadmin.sh msgadmin
 prev msgadmin.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -75,119 +78,121 @@ done msgadmin generated
 make msgcpp
 make msgcpp.o
 make msgcpp.c
-make ../../../include/ast/ppkey.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/ppkey.h
-make ../../../include/ast/pp.h implicit
-make ../../../include/ast/ccode.h implicit
-make ../../../include/ast/ast_ccode.h implicit
-done ../../../include/ast/ast_ccode.h dontcare
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/ppkey.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/ppkey.h
+make ${INSTALLROOT}/include/ast/pp.h implicit
+make ${INSTALLROOT}/include/ast/ccode.h implicit
+make ${INSTALLROOT}/include/ast/ast_ccode.h implicit
+done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ccode.h dontcare
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h dontcare
-make ../../../include/ast/hash.h implicit
-make ../../../include/ast/hashpart.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/hashpart.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/hash.h dontcare
-prev ../../../include/ast/limits.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/pp.h
-make ../../../include/ast/sfstr.h implicit
-prev ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfstr.h
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ccode.h dontcare
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+make ${INSTALLROOT}/include/ast/hash.h implicit
+make ${INSTALLROOT}/include/ast/hashpart.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashpart.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hash.h dontcare
+prev ${INSTALLROOT}/include/ast/limits.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/pp.h
+make ${INSTALLROOT}/include/ast/sfstr.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfstr.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msgcpp.c
+meta msgcpp.o %.c>%.o msgcpp.c msgcpp
 prev msgcpp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcpp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcpp.c
 done msgcpp.o generated
 bind -lpp
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msgcpp msgcpp.o ${mam_libpp} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o msgcpp msgcpp.o ${mam_libpp} ${mam_libast}
 done msgcpp generated
 make msgcc
 make msgcc.sh
 done msgcc.sh
+meta msgcc %.sh>% msgcc.sh msgcc
 prev msgcc.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -224,74 +229,76 @@ done msgcc generated
 make msgcvt
 make msgcvt.o
 make msgcvt.c
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msgcvt.c
+meta msgcvt.o %.c>%.o msgcvt.c msgcvt
 prev msgcvt.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcvt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcvt.c
 done msgcvt.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msgcvt msgcvt.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o msgcvt msgcvt.o ${mam_libast}
 done msgcvt generated
 make msggen
 make msggen.o
 make msggen.c
-prev ../../../include/ast/sfstr.h implicit
-make ../../../include/ast/mc.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/mc.h
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ccode.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/sfstr.h implicit
+make ${INSTALLROOT}/include/ast/mc.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/mc.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ccode.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msggen.c
+meta msggen.o %.c>%.o msggen.c msggen
 prev msggen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msggen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msggen.c
 done msggen.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msggen msggen.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o msggen msggen.o ${mam_libast}
 done msggen generated
 make msgget
 make msgget.o
 make msgget.c
-prev ../../../include/ast/mc.h implicit
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/mc.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done msgget.c
+meta msgget.o %.c>%.o msgget.c msgget
 prev msgget.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgget.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgget.c
 done msgget.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msgget msgget.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o msgget msgget.o ${mam_libast}
 done msgget generated
-make ../../../bin
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
+make ${INSTALLROOT}/bin
+exec - if	silent test ! -d ${INSTALLROOT}/bin
+exec - then	mkdir -p ${INSTALLROOT}/bin
 exec - fi
-done ../../../bin generated
-make ../../../bin/msgadmin
-prev ../../../bin
+done ${INSTALLROOT}/bin generated
+make ${INSTALLROOT}/bin/msgadmin
+prev ${INSTALLROOT}/bin
 prev msgadmin
 exec - test '' = 'msgadmin' || ${STDCMP} 2>/dev/null -s msgadmin ${INSTALLROOT}/bin/msgadmin || { ${STDMV} ${INSTALLROOT}/bin/msgadmin ${INSTALLROOT}/bin/msgadmin.old 2>/dev/null || true; ${STDCP} msgadmin ${INSTALLROOT}/bin/msgadmin  		    		    ;}
-done ../../../bin/msgadmin generated
-make ../../../bin/msgcpp
+done ${INSTALLROOT}/bin/msgadmin generated
+make ${INSTALLROOT}/bin/msgcpp
 prev msgcpp
 exec - test '' = 'msgcpp' || ${STDCMP} 2>/dev/null -s msgcpp ${INSTALLROOT}/bin/msgcpp || { ${STDMV} ${INSTALLROOT}/bin/msgcpp ${INSTALLROOT}/bin/msgcpp.old 2>/dev/null || true; ${STDCP} msgcpp ${INSTALLROOT}/bin/msgcpp  		    		    ;}
-done ../../../bin/msgcpp generated
-make ../../../bin/msgcc
+done ${INSTALLROOT}/bin/msgcpp generated
+make ${INSTALLROOT}/bin/msgcc
 prev msgcc
 exec - test '' = 'msgcc' || ${STDCMP} 2>/dev/null -s msgcc ${INSTALLROOT}/bin/msgcc || { ${STDMV} ${INSTALLROOT}/bin/msgcc ${INSTALLROOT}/bin/msgcc.old 2>/dev/null || true; ${STDCP} msgcc ${INSTALLROOT}/bin/msgcc  		    		    ;}
-done ../../../bin/msgcc generated
-make ../../../bin/msgcvt
+done ${INSTALLROOT}/bin/msgcc generated
+make ${INSTALLROOT}/bin/msgcvt
 prev msgcvt
 exec - test '' = 'msgcvt' || ${STDCMP} 2>/dev/null -s msgcvt ${INSTALLROOT}/bin/msgcvt || { ${STDMV} ${INSTALLROOT}/bin/msgcvt ${INSTALLROOT}/bin/msgcvt.old 2>/dev/null || true; ${STDCP} msgcvt ${INSTALLROOT}/bin/msgcvt  		    		    ;}
-done ../../../bin/msgcvt generated
-make ../../../bin/msggen
+done ${INSTALLROOT}/bin/msgcvt generated
+make ${INSTALLROOT}/bin/msggen
 prev msggen
 exec - test '' = 'msggen' || ${STDCMP} 2>/dev/null -s msggen ${INSTALLROOT}/bin/msggen || { ${STDMV} ${INSTALLROOT}/bin/msggen ${INSTALLROOT}/bin/msggen.old 2>/dev/null || true; ${STDCP} msggen ${INSTALLROOT}/bin/msggen  		    		    ;}
-done ../../../bin/msggen generated
-make ../../../bin/msgget
+done ${INSTALLROOT}/bin/msggen generated
+make ${INSTALLROOT}/bin/msgget
 prev msgget
 exec - test '' = 'msgget' || ${STDCMP} 2>/dev/null -s msgget ${INSTALLROOT}/bin/msgget || { ${STDMV} ${INSTALLROOT}/bin/msgget ${INSTALLROOT}/bin/msgget.old 2>/dev/null || true; ${STDCP} msgget ${INSTALLROOT}/bin/msgget  		    		    ;}
-done ../../../bin/msgget generated
+done ${INSTALLROOT}/bin/msgget generated
 done install virtual
 make test
 make test.msgcc

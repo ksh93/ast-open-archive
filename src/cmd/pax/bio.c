@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -399,22 +399,22 @@ off_t
 bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 {
 	register char*		s = (char*)ob;
-	register char*		e;
 	register ssize_t	c;
 	char*			b;
+	register off_t		r;
 	register off_t		z;
 
 	if (ap->io->eof)
 		return -1;
 	if (m <= 0)
 		m = n;
-	if (!s && ap->io->blocked)
-		s = state.tmp.buffer;
 	b = s;
-	e = s + m;
+	r = m;
 	if (ap->io->blocked)
 	{
-		while ((c = read(ap->io->fd, s, e - s)) <= 0)
+		if (!s)
+			b = s = state.tmp.buffer;
+		while ((c = read(ap->io->fd, s, r > ap->io->buffersize ? ap->io->buffersize : r)) <= 0)
 		{
 			if (must)
 				newio(ap, c, 0);
@@ -435,11 +435,12 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 		ap->io->empty = 0;
 		chunk(ap, s, s, c, ob);
 		s += c;
+		r -= c;
 	}
 	else
 		for (;;)
 		{
-			if ((c = ap->io->last - ap->io->next) < (e - s))
+			if ((c = ap->io->last - ap->io->next) < r)
 			{
 				if (c > 0)
 				{
@@ -447,39 +448,43 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 						memcpy(s, ap->io->next, c);
 					chunk(ap, s, ap->io->next, c, ob);
 					s += c;
+					r -= c;
 				}
 				ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
 				if (!ob && ap->sum <= 0 && ap->io->seekable && (z = n / BUFFERSIZE) && lseek(ap->io->fd, z *= BUFFERSIZE, SEEK_CUR) >= 0)
+				{
 					s += z;
+					r -= z;
+				}
 				if (bfill(ap, must) < 0)
 					break;
 			}
 			else
 			{
-				c = e - s;
-				chunk(ap, s, ap->io->next, c, ob);
-				ap->io->next += c;
-				s += c;
+				chunk(ap, s, ap->io->next, r, ob);
+				ap->io->next += r;
+				s += r;
+				r = 0;
 				break;
 			}
 		}
-	z = s - b;
-	if (z < n)
+	r = m - r;
+	if (r < n)
 	{
-		if (ob && z)
+		if (ob && r)
 		{
-			bunread(ap, b, z);
+			bunread(ap, b, r);
 			return 0;
 		}
 		return -1;
 	}
 #if DEBUG
 	if (ob)
-		message((-7, "bread(%s,%I*d@%I*d): %s", ap->name, sizeof(z), z, sizeof(ap->io->count), ap->io->count, show(b, z)));
+		message((-7, "bread(%s,%I*d@%I*d): %s", ap->name, sizeof(r), r, sizeof(ap->io->count), ap->io->count, show(b, r)));
 	else
-		message((-7, "bread(%s) skip(%I*d@%I*d)", ap->name, sizeof(z), z, sizeof(ap->io->count), ap->io->count));
+		message((-7, "bread(%s) skip(%I*d@%I*d)", ap->name, sizeof(r), r, sizeof(ap->io->count), ap->io->count));
 #endif
-	return z;
+	return r;
 }
 
 /*

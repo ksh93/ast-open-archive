@@ -1,15 +1,15 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv mam_cc_FLAGS 
+setv mam_cc_FLAGS
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,144 +35,150 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make html2rtf
 make html2rtf.o
 make html2rtf.c
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h
 make html2rtf.h implicit
-make ../../../include/ast/sfstr.h implicit
-prev ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfstr.h dontcare
-make ../../../include/ast/hash.h implicit
-make ../../../include/ast/hashpart.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/hashpart.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/hash.h dontcare
-prev ../../../include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfstr.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfstr.h dontcare
+make ${INSTALLROOT}/include/ast/hash.h implicit
+make ${INSTALLROOT}/include/ast/hashpart.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashpart.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hash.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done html2rtf.h
 done html2rtf.c
+meta html2rtf.o %.c>%.o html2rtf.c html2rtf
 prev html2rtf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2rtf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2rtf.c
 done html2rtf.o generated
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o html2rtf html2rtf.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o html2rtf html2rtf.o ${mam_libast}
 done html2rtf generated
 make html2db
 make html2db.o
 make html2db.c
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done html2db.c
+meta html2db.o %.c>%.o html2db.c html2db
 prev html2db.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2db.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2db.c
 done html2db.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o html2db html2db.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o html2db html2db.o ${mam_libast}
 done html2db generated
 make htmlrefs
 make htmlrefs.o
 make htmlrefs.c
-prev ../../../include/ast/stdio.h implicit
-make ../../../include/ast/glob.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/glob.h
-make ../../../include/ast/fts.h implicit
-prev ../../../include/ast/ls.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/fts.h
-prev ../../../include/ast/error.h implicit
-make ../../../include/ast/cdt.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/cdt.h
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/glob.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/glob.h
+make ${INSTALLROOT}/include/ast/fts.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/fts.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/cdt.h
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done htmlrefs.c
+meta htmlrefs.o %.c>%.o htmlrefs.c htmlrefs
 prev htmlrefs.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c htmlrefs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c htmlrefs.c
 done htmlrefs.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o htmlrefs htmlrefs.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o htmlrefs htmlrefs.o ${mam_libast}
 done htmlrefs generated
 make mm2html
 make mm2html.sh
 done mm2html.sh
+meta mm2html %.sh>% mm2html.sh mm2html
 prev mm2html.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -209,46 +215,48 @@ done mm2html generated
 make troff2html
 make troff2html.o
 make troff2html.c
-make ../../../include/ast/tm.h implicit
-make ../../../include/ast/times.h implicit
-make ../../../include/ast/ast_time.h implicit
-done ../../../include/ast/ast_time.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/times.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/tm.h
-prev ../../../include/ast/ls.h implicit
-make ../../../include/ast/hashkey.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/hashkey.h
-prev ../../../include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/hashkey.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashkey.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
 make troff2html.h implicit
-prev ../../../include/ast/sfstr.h implicit
-prev ../../../include/ast/hash.h implicit
-make ../../../include/ast/debug.h implicit
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/debug.h dontcare
-make ../../../include/ast/ccode.h implicit
-make ../../../include/ast/ast_ccode.h implicit
-done ../../../include/ast/ast_ccode.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ccode.h dontcare
-prev ../../../include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/sfstr.h implicit
+prev ${INSTALLROOT}/include/ast/hash.h implicit
+make ${INSTALLROOT}/include/ast/debug.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/debug.h dontcare
+make ${INSTALLROOT}/include/ast/ccode.h implicit
+make ${INSTALLROOT}/include/ast/ast_ccode.h implicit
+done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ccode.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done troff2html.h
 done troff2html.c
+meta troff2html.o %.c>%.o troff2html.c troff2html
 prev troff2html.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c troff2html.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c troff2html.c
 done troff2html.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o troff2html troff2html.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o troff2html troff2html.o ${mam_libast}
 done troff2html generated
 make download
 make download.sh
 done download.sh
+meta download %.sh>% download.sh download
 prev download.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -282,116 +290,113 @@ exec - 	;;
 exec - esac
 exec - chmod u+w,+x download
 done download generated
-make ../../../bin
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
+make ${INSTALLROOT}/bin
+exec - if	silent test ! -d ${INSTALLROOT}/bin
+exec - then	mkdir -p ${INSTALLROOT}/bin
 exec - fi
-done ../../../bin generated
-make ../../../bin/html2rtf
-prev ../../../bin
+done ${INSTALLROOT}/bin generated
+make ${INSTALLROOT}/bin/html2rtf
+prev ${INSTALLROOT}/bin
 prev html2rtf
 exec - test '' = 'html2rtf' || ${STDCMP} 2>/dev/null -s html2rtf ${INSTALLROOT}/bin/html2rtf || { ${STDMV} ${INSTALLROOT}/bin/html2rtf ${INSTALLROOT}/bin/html2rtf.old 2>/dev/null || true; ${STDCP} html2rtf ${INSTALLROOT}/bin/html2rtf  		    		    ;}
-done ../../../bin/html2rtf generated
-make ../../../man/man1
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
+done ${INSTALLROOT}/bin/html2rtf generated
+make ${INSTALLROOT}/man/man1
+exec - if	silent test ! -d ${INSTALLROOT}/man/man1
+exec - then	mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
-done ../../../man/man1 generated
-make ../../../man/man1/html2rtf.1
-prev ../../../man/man1
+done ${INSTALLROOT}/man/man1 generated
+make ${INSTALLROOT}/man/man1/html2rtf.1
+prev ${INSTALLROOT}/man/man1
 make html2rtf.1
 done html2rtf.1
 exec - test '' = 'html2rtf.1' || ${STDCMP} 2>/dev/null -s html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1 || { ${STDMV} ${INSTALLROOT}/man/man1/html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1.old 2>/dev/null || true; ${STDCP} html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1  		    		    ;}
-done ../../../man/man1/html2rtf.1 generated
-make ../../../bin/html2db
+done ${INSTALLROOT}/man/man1/html2rtf.1 generated
+make ${INSTALLROOT}/bin/html2db
 prev html2db
 exec - test '' = 'html2db' || ${STDCMP} 2>/dev/null -s html2db ${INSTALLROOT}/bin/html2db || { ${STDMV} ${INSTALLROOT}/bin/html2db ${INSTALLROOT}/bin/html2db.old 2>/dev/null || true; ${STDCP} html2db ${INSTALLROOT}/bin/html2db  		    		    ;}
-done ../../../bin/html2db generated
-make ../../../bin/htmlrefs
+done ${INSTALLROOT}/bin/html2db generated
+make ${INSTALLROOT}/bin/htmlrefs
 prev htmlrefs
 exec - test '' = 'htmlrefs' || ${STDCMP} 2>/dev/null -s htmlrefs ${INSTALLROOT}/bin/htmlrefs || { ${STDMV} ${INSTALLROOT}/bin/htmlrefs ${INSTALLROOT}/bin/htmlrefs.old 2>/dev/null || true; ${STDCP} htmlrefs ${INSTALLROOT}/bin/htmlrefs  		    		    ;}
-done ../../../bin/htmlrefs generated
-make ../../../bin/mm2html
+done ${INSTALLROOT}/bin/htmlrefs generated
+make ${INSTALLROOT}/bin/mm2html
 prev mm2html
 exec - test '' = 'mm2html' || ${STDCMP} 2>/dev/null -s mm2html ${INSTALLROOT}/bin/mm2html || { ${STDMV} ${INSTALLROOT}/bin/mm2html ${INSTALLROOT}/bin/mm2html.old 2>/dev/null || true; ${STDCP} mm2html ${INSTALLROOT}/bin/mm2html  		    		    ;}
-done ../../../bin/mm2html generated
-make ../../../man/man1/mm2html.1
+done ${INSTALLROOT}/bin/mm2html generated
+make ${INSTALLROOT}/man/man1/mm2html.1
 make mm2html.1
 done mm2html.1
 exec - test '' = 'mm2html.1' || ${STDCMP} 2>/dev/null -s mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1.old 2>/dev/null || true; ${STDCP} mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1  		    		    ;}
-done ../../../man/man1/mm2html.1 generated
-make ../../../bin/troff2html
+done ${INSTALLROOT}/man/man1/mm2html.1 generated
+make ${INSTALLROOT}/bin/troff2html
 prev troff2html
 exec - test '' = 'troff2html' || ${STDCMP} 2>/dev/null -s troff2html ${INSTALLROOT}/bin/troff2html || { ${STDMV} ${INSTALLROOT}/bin/troff2html ${INSTALLROOT}/bin/troff2html.old 2>/dev/null || true; ${STDCP} troff2html ${INSTALLROOT}/bin/troff2html  		    		    ;}
-done ../../../bin/troff2html generated
-make ../../../man/man1/troff2html.1
+done ${INSTALLROOT}/bin/troff2html generated
+make ${INSTALLROOT}/man/man1/troff2html.1
 make troff2html.1
 done troff2html.1
 exec - test '' = 'troff2html.1' || ${STDCMP} 2>/dev/null -s troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1.old 2>/dev/null || true; ${STDCP} troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1  		    		    ;}
-done ../../../man/man1/troff2html.1 generated
-make ../../../lib/html
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/html
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/html 		    		   
+done ${INSTALLROOT}/man/man1/troff2html.1 generated
+make ${INSTALLROOT}/lib/html
+exec - if	silent test ! -d ${INSTALLROOT}/lib/html
+exec - then	mkdir -p ${INSTALLROOT}/lib/html
 exec - fi
-done ../../../lib/html generated
-make ../../../lib/html/ast.mm
-prev ../../../lib/html
+done ${INSTALLROOT}/lib/html generated
+make ${INSTALLROOT}/lib/html/ast.mm
+prev ${INSTALLROOT}/lib/html
 make ast.mm
 done ast.mm
-exec - test '' = 'ast.mm' || ${STDCMP} 2>/dev/null -s ast.mm ${PACKAGE_ast_LIB}/html/ast.mm || { ${STDMV} ${PACKAGE_ast_LIB}/html/ast.mm ${PACKAGE_ast_LIB}/html/ast.mm.old 2>/dev/null || true; ${STDCP} ast.mm ${PACKAGE_ast_LIB}/html/ast.mm  		    		    ;}
-done ../../../lib/html/ast.mm generated
-make ../../../lib/html/strings.mm
+exec - test '' = 'ast.mm' || ${STDCMP} 2>/dev/null -s ast.mm ${INSTALLROOT}/lib/html/ast.mm || { ${STDMV} ${INSTALLROOT}/lib/html/ast.mm ${INSTALLROOT}/lib/html/ast.mm.old 2>/dev/null || true; ${STDCP} ast.mm ${INSTALLROOT}/lib/html/ast.mm  		    		    ;}
+done ${INSTALLROOT}/lib/html/ast.mm generated
+make ${INSTALLROOT}/lib/html/strings.mm
 make strings.mm
 done strings.mm
-exec - test '' = 'strings.mm' || ${STDCMP} 2>/dev/null -s strings.mm ${PACKAGE_ast_LIB}/html/strings.mm || { ${STDMV} ${PACKAGE_ast_LIB}/html/strings.mm ${PACKAGE_ast_LIB}/html/strings.mm.old 2>/dev/null || true; ${STDCP} strings.mm ${PACKAGE_ast_LIB}/html/strings.mm  		    		    ;}
-done ../../../lib/html/strings.mm generated
-make ../../../lib/html/man.tr
+exec - test '' = 'strings.mm' || ${STDCMP} 2>/dev/null -s strings.mm ${INSTALLROOT}/lib/html/strings.mm || { ${STDMV} ${INSTALLROOT}/lib/html/strings.mm ${INSTALLROOT}/lib/html/strings.mm.old 2>/dev/null || true; ${STDCP} strings.mm ${INSTALLROOT}/lib/html/strings.mm  		    		    ;}
+done ${INSTALLROOT}/lib/html/strings.mm generated
+make ${INSTALLROOT}/lib/html/man.tr
 make man.tr
 done man.tr
-exec - test '' = 'man.tr' || ${STDCMP} 2>/dev/null -s man.tr ${PACKAGE_ast_LIB}/html/man.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/man.tr ${PACKAGE_ast_LIB}/html/man.tr.old 2>/dev/null || true; ${STDCP} man.tr ${PACKAGE_ast_LIB}/html/man.tr  		    		    ;}
-done ../../../lib/html/man.tr generated
-make ../../../lib/html/mm.tr
+exec - test '' = 'man.tr' || ${STDCMP} 2>/dev/null -s man.tr ${INSTALLROOT}/lib/html/man.tr || { ${STDMV} ${INSTALLROOT}/lib/html/man.tr ${INSTALLROOT}/lib/html/man.tr.old 2>/dev/null || true; ${STDCP} man.tr ${INSTALLROOT}/lib/html/man.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/man.tr generated
+make ${INSTALLROOT}/lib/html/mm.tr
 make mm.tr
 done mm.tr
-exec - test '' = 'mm.tr' || ${STDCMP} 2>/dev/null -s mm.tr ${PACKAGE_ast_LIB}/html/mm.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mm.tr ${PACKAGE_ast_LIB}/html/mm.tr.old 2>/dev/null || true; ${STDCP} mm.tr ${PACKAGE_ast_LIB}/html/mm.tr  		    		    ;}
-done ../../../lib/html/mm.tr generated
-make ../../../lib/html/mandoc.tr
+exec - test '' = 'mm.tr' || ${STDCMP} 2>/dev/null -s mm.tr ${INSTALLROOT}/lib/html/mm.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mm.tr ${INSTALLROOT}/lib/html/mm.tr.old 2>/dev/null || true; ${STDCP} mm.tr ${INSTALLROOT}/lib/html/mm.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/mm.tr generated
+make ${INSTALLROOT}/lib/html/mandoc.tr
 make mandoc.tr
 done mandoc.tr
-exec - test '' = 'mandoc.tr' || ${STDCMP} 2>/dev/null -s mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr.old 2>/dev/null || true; ${STDCP} mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr  		    		    ;}
-done ../../../lib/html/mandoc.tr generated
-make ../../../lib/html/mdoc.tr
+exec - test '' = 'mandoc.tr' || ${STDCMP} 2>/dev/null -s mandoc.tr ${INSTALLROOT}/lib/html/mandoc.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mandoc.tr ${INSTALLROOT}/lib/html/mandoc.tr.old 2>/dev/null || true; ${STDCP} mandoc.tr ${INSTALLROOT}/lib/html/mandoc.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/mandoc.tr generated
+make ${INSTALLROOT}/lib/html/mdoc.tr
 make mdoc.tr
 done mdoc.tr
-exec - test '' = 'mdoc.tr' || ${STDCMP} 2>/dev/null -s mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr.old 2>/dev/null || true; ${STDCP} mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr  		    		    ;}
-done ../../../lib/html/mdoc.tr generated
-make ../../../lib/html/mdoc-common.tr
+exec - test '' = 'mdoc.tr' || ${STDCMP} 2>/dev/null -s mdoc.tr ${INSTALLROOT}/lib/html/mdoc.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc.tr ${INSTALLROOT}/lib/html/mdoc.tr.old 2>/dev/null || true; ${STDCP} mdoc.tr ${INSTALLROOT}/lib/html/mdoc.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/mdoc.tr generated
+make ${INSTALLROOT}/lib/html/mdoc-common.tr
 make mdoc-common.tr
 done mdoc-common.tr
-exec - test '' = 'mdoc-common.tr' || ${STDCMP} 2>/dev/null -s mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr.old 2>/dev/null || true; ${STDCP} mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr  		    		    ;}
-done ../../../lib/html/mdoc-common.tr generated
-make ../../../lib/html/mdoc-nroff.tr
+exec - test '' = 'mdoc-common.tr' || ${STDCMP} 2>/dev/null -s mdoc-common.tr ${INSTALLROOT}/lib/html/mdoc-common.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-common.tr ${INSTALLROOT}/lib/html/mdoc-common.tr.old 2>/dev/null || true; ${STDCP} mdoc-common.tr ${INSTALLROOT}/lib/html/mdoc-common.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/mdoc-common.tr generated
+make ${INSTALLROOT}/lib/html/mdoc-nroff.tr
 make mdoc-nroff.tr
 done mdoc-nroff.tr
-exec - test '' = 'mdoc-nroff.tr' || ${STDCMP} 2>/dev/null -s mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr.old 2>/dev/null || true; ${STDCP} mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr  		    		    ;}
-done ../../../lib/html/mdoc-nroff.tr generated
-make ../../../lib/html/mdoc-syms.tr
+exec - test '' = 'mdoc-nroff.tr' || ${STDCMP} 2>/dev/null -s mdoc-nroff.tr ${INSTALLROOT}/lib/html/mdoc-nroff.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-nroff.tr ${INSTALLROOT}/lib/html/mdoc-nroff.tr.old 2>/dev/null || true; ${STDCP} mdoc-nroff.tr ${INSTALLROOT}/lib/html/mdoc-nroff.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/mdoc-nroff.tr generated
+make ${INSTALLROOT}/lib/html/mdoc-syms.tr
 make mdoc-syms.tr
 done mdoc-syms.tr
-exec - test '' = 'mdoc-syms.tr' || ${STDCMP} 2>/dev/null -s mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr.old 2>/dev/null || true; ${STDCP} mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr  		    		    ;}
-done ../../../lib/html/mdoc-syms.tr generated
-make ../../../lib/html/mdoc-troff.tr
+exec - test '' = 'mdoc-syms.tr' || ${STDCMP} 2>/dev/null -s mdoc-syms.tr ${INSTALLROOT}/lib/html/mdoc-syms.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-syms.tr ${INSTALLROOT}/lib/html/mdoc-syms.tr.old 2>/dev/null || true; ${STDCP} mdoc-syms.tr ${INSTALLROOT}/lib/html/mdoc-syms.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/mdoc-syms.tr generated
+make ${INSTALLROOT}/lib/html/mdoc-troff.tr
 make mdoc-troff.tr
 done mdoc-troff.tr
-exec - test '' = 'mdoc-troff.tr' || ${STDCMP} 2>/dev/null -s mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr.old 2>/dev/null || true; ${STDCP} mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr  		    		    ;}
-done ../../../lib/html/mdoc-troff.tr generated
-make ../../../lib/html/download
+exec - test '' = 'mdoc-troff.tr' || ${STDCMP} 2>/dev/null -s mdoc-troff.tr ${INSTALLROOT}/lib/html/mdoc-troff.tr || { ${STDMV} ${INSTALLROOT}/lib/html/mdoc-troff.tr ${INSTALLROOT}/lib/html/mdoc-troff.tr.old 2>/dev/null || true; ${STDCP} mdoc-troff.tr ${INSTALLROOT}/lib/html/mdoc-troff.tr  		    		    ;}
+done ${INSTALLROOT}/lib/html/mdoc-troff.tr generated
+make ${INSTALLROOT}/lib/html/download
 prev download
-exec - test '' = 'download' || ${STDCMP} 2>/dev/null -s download ${PACKAGE_ast_LIB}/html/download || { ${STDMV} ${PACKAGE_ast_LIB}/html/download ${PACKAGE_ast_LIB}/html/download.old 2>/dev/null || true; ${STDCP} download ${PACKAGE_ast_LIB}/html/download  		    		    ;}
-done ../../../lib/html/download generated
+exec - test '' = 'download' || ${STDCMP} 2>/dev/null -s download ${INSTALLROOT}/lib/html/download || { ${STDMV} ${INSTALLROOT}/lib/html/download ${INSTALLROOT}/lib/html/download.old 2>/dev/null || true; ${STDCP} download ${INSTALLROOT}/lib/html/download  		    		    ;}
+done ${INSTALLROOT}/lib/html/download generated
 done install virtual
 make test
 done test dontcare virtual

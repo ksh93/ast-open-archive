@@ -1,3 +1,4 @@
+04-05-20 proto.tst: add `int fun __P((int));' test
 04-03-19 proto.c: add { .cpp .hpp }, fix standalone -c parse
 04-02-29 proto.tst: add -f -p option tests
 04-01-14 proto.c: add suffix-comment table

@@ -1,9 +1,9 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,12 +35,14 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make z
 make libz.a archive
 make z.req
 exec - set -
-exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
+exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
@@ -70,126 +72,131 @@ make adler32.o
 make adler32.c
 make zlib.h implicit
 make zconf.h implicit
-make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
 make windows.h implicit
 done windows.h dontcare virtual
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
 done zconf.h dontcare
 done zlib.h
 done adler32.c
+meta adler32.o %.c>%.o adler32.c adler32
 prev adler32.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c adler32.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c adler32.c
 done adler32.o generated
 make compress.o
 make compress.c
 prev zlib.h implicit
 done compress.c
+meta compress.o %.c>%.o compress.c compress
 prev compress.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c compress.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c compress.c
 done compress.o generated
 make crc32.o
 make crc32.c
 prev zlib.h implicit
 done crc32.c
+meta crc32.o %.c>%.o crc32.c crc32
 prev crc32.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c crc32.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c crc32.c
 done crc32.o generated
 make gzio.o
 make gzio.c
-make ../../../include/ast/sfstr.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/sfstr.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfstr.h dontcare
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfstr.h dontcare
 make zutil.h implicit
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 make unix.h implicit
 done unix.h dontcare virtual
-prev ../../../include/ast/limits.h implicit
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/limits.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 make alloc.h implicit
 done alloc.h dontcare virtual
 prev zlib.h implicit
 done zutil.h
-prev ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h dontcare
-prev ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
 done gzio.c
+meta gzio.o %.c>%.o gzio.c gzio
 prev gzio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c gzio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_z -c gzio.c
 done gzio.o generated
 make uncompr.o
 make uncompr.c
 prev zlib.h implicit
 done uncompr.c
+meta uncompr.o %.c>%.o uncompr.c uncompr
 prev uncompr.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c uncompr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c uncompr.c
 done uncompr.o generated
 make deflate.o
 make deflate.c
@@ -197,25 +204,28 @@ make deflate.h implicit
 prev zutil.h implicit
 done deflate.h
 done deflate.c
+meta deflate.o %.c>%.o deflate.c deflate
 prev deflate.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c deflate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_z -c deflate.c
 done deflate.o generated
 make trees.o
 make trees.c
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 make trees.h implicit
 done trees.h dontcare
 prev deflate.h implicit
 done trees.c
+meta trees.o %.c>%.o trees.c trees
 prev trees.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c trees.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c trees.c
 done trees.o generated
 make zutil.o
 make zutil.c
 prev zutil.h implicit
 done zutil.c
+meta zutil.o %.c>%.o zutil.c zutil
 prev zutil.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c zutil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c zutil.c
 done zutil.o generated
 make inflate.o
 make inflate.c
@@ -223,8 +233,9 @@ make infblock.h implicit
 done infblock.h
 prev zutil.h implicit
 done inflate.c
+meta inflate.o %.c>%.o inflate.c inflate
 prev inflate.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c inflate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inflate.c
 done inflate.o generated
 make infblock.o
 make infblock.c
@@ -237,8 +248,9 @@ done inftrees.h
 prev infblock.h implicit
 prev zutil.h implicit
 done infblock.c
+meta infblock.o %.c>%.o infblock.c infblock
 prev infblock.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c infblock.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infblock.c
 done infblock.o generated
 make inftrees.o
 make inftrees.c
@@ -247,8 +259,9 @@ done inffixed.h dontcare
 prev inftrees.h implicit
 prev zutil.h implicit
 done inftrees.c
+meta inftrees.o %.c>%.o inftrees.c inftrees
 prev inftrees.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c inftrees.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inftrees.c
 done inftrees.o generated
 make infcodes.o
 make infcodes.c
@@ -260,8 +273,9 @@ prev infblock.h implicit
 prev inftrees.h implicit
 prev zutil.h implicit
 done infcodes.c
+meta infcodes.o %.c>%.o infcodes.c infcodes
 prev infcodes.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c infcodes.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infcodes.c
 done infcodes.o generated
 make infutil.o
 make infutil.c
@@ -271,8 +285,9 @@ prev inftrees.h implicit
 prev infblock.h implicit
 prev zutil.h implicit
 done infutil.c
+meta infutil.o %.c>%.o infutil.c infutil
 prev infutil.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c infutil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c infutil.c
 done infutil.o generated
 make inffast.o
 make inffast.c
@@ -283,102 +298,103 @@ prev infblock.h implicit
 prev inftrees.h implicit
 prev zutil.h implicit
 done inffast.c
+meta inffast.o %.c>%.o inffast.c inffast
 prev inffast.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c inffast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c inffast.c
 done inffast.o generated
 make sfdcgzip.o
 make sfdcgzip.c
 make sfdcgzip.h implicit
-make ../../../include/ast/sfdisc.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfdisc.h dontcare
+make ${INSTALLROOT}/include/ast/sfdisc.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfdisc.h dontcare
 done sfdcgzip.h
 prev zlib.h implicit
-prev ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio_t.h implicit
-prev ../../../include/ast/sfio.h implicit
-done ../../../include/ast/sfio_t.h
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfio_t.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+done ${INSTALLROOT}/include/ast/sfio_t.h
 done sfdcgzip.c
+meta sfdcgzip.o %.c>%.o sfdcgzip.c sfdcgzip
 prev sfdcgzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c sfdcgzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c sfdcgzip.c
 done sfdcgzip.o generated
 make sfdclzw.o
 make sfdclzw.c
 prev sfdcgzip.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/sfio_t.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_t.h implicit
 done sfdclzw.c
+meta sfdclzw.o %.c>%.o sfdclzw.c sfdclzw
 prev sfdclzw.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c sfdclzw.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c sfdclzw.c
 done sfdclzw.o generated
 exec - ${AR} cr libz.a adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o zutil.o inflate.o infblock.o inftrees.o infcodes.o infutil.o inffast.o sfdcgzip.o sfdclzw.o
 exec - (ranlib libz.a) >/dev/null 2>&1 || true
 done libz.a generated
 done z virtual
 prev libz.a archive
-make ../../../lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
+make ${INSTALLROOT}/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib
 exec - fi
-done ../../../lib generated
-make ../../../lib/libz.a archive
-prev ../../../lib
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libz.a archive
+prev ${INSTALLROOT}/lib
 prev libz.a archive
-exec - test '' = 'libz.a' || ${STDCMP} 2>/dev/null -s libz.a ${PACKAGE_ast_LIB}/libz.a || { ${STDMV} ${PACKAGE_ast_LIB}/libz.a ${PACKAGE_ast_LIB}/libz.a.old 2>/dev/null || true; ${STDCP} libz.a ${PACKAGE_ast_LIB}/libz.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libz.a) >/dev/null 2>&1 || true
-done ../../../lib/libz.a generated
-make ../../../lib/lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
+exec - test '' = 'libz.a' || ${STDCMP} 2>/dev/null -s libz.a ${INSTALLROOT}/lib/libz.a || { ${STDMV} ${INSTALLROOT}/lib/libz.a ${INSTALLROOT}/lib/libz.a.old 2>/dev/null || true; ${STDCP} libz.a ${INSTALLROOT}/lib/libz.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libz.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libz.a generated
+make ${INSTALLROOT}/lib/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
-done ../../../lib/lib generated
-make ../../../lib/lib/z
-prev ../../../lib/lib
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/z
+prev ${INSTALLROOT}/lib/lib
 prev z.req
-exec - test '' = 'z.req' || ${STDCMP} 2>/dev/null -s z.req ${PACKAGE_ast_LIB}/lib/z || { ${STDMV} ${PACKAGE_ast_LIB}/lib/z ${PACKAGE_ast_LIB}/lib/z.old 2>/dev/null || true; ${STDCP} z.req ${PACKAGE_ast_LIB}/lib/z  		    		    ;}
-done ../../../lib/lib/z generated
-make ../../../include/ast
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
+exec - test '' = 'z.req' || ${STDCMP} 2>/dev/null -s z.req ${INSTALLROOT}/lib/lib/z || { ${STDMV} ${INSTALLROOT}/lib/lib/z ${INSTALLROOT}/lib/lib/z.old 2>/dev/null || true; ${STDCP} z.req ${INSTALLROOT}/lib/lib/z  		    		    ;}
+done ${INSTALLROOT}/lib/lib/z generated
+make ${INSTALLROOT}/include/ast
+exec - if	silent test ! -d ${INSTALLROOT}/include/ast
+exec - then	mkdir -p ${INSTALLROOT}/include/ast
 exec - fi
-done ../../../include/ast generated
-make ../../../include/ast/zlib.h
-prev ../../../include/ast
+done ${INSTALLROOT}/include/ast generated
+make ${INSTALLROOT}/include/ast/zlib.h
+prev ${INSTALLROOT}/include/ast
 prev zlib.h
-exec - test '' = 'zlib.h' || ${STDCMP} 2>/dev/null -s zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h.old 2>/dev/null || true; ${STDCP} zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h  		    		    ;}
-done ../../../include/ast/zlib.h generated
-make ../../../include/ast/zconf.h
+exec - test '' = 'zlib.h' || ${STDCMP} 2>/dev/null -s zlib.h ${INSTALLROOT}/include/ast/zlib.h || { ${STDMV} ${INSTALLROOT}/include/ast/zlib.h ${INSTALLROOT}/include/ast/zlib.h.old 2>/dev/null || true; ${STDCP} zlib.h ${INSTALLROOT}/include/ast/zlib.h  		    		    ;}
+done ${INSTALLROOT}/include/ast/zlib.h generated
+make ${INSTALLROOT}/include/ast/zconf.h
 prev zconf.h
-exec - test '' = 'zconf.h' || ${STDCMP} 2>/dev/null -s zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/dev/null || true; ${STDCP} zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h  		    		    ;}
-done ../../../include/ast/zconf.h generated
-make ../../../include/ast/sfdcgzip.h
+exec - test '' = 'zconf.h' || ${STDCMP} 2>/dev/null -s zconf.h ${INSTALLROOT}/include/ast/zconf.h || { ${STDMV} ${INSTALLROOT}/include/ast/zconf.h ${INSTALLROOT}/include/ast/zconf.h.old 2>/dev/null || true; ${STDCP} zconf.h ${INSTALLROOT}/include/ast/zconf.h  		    		    ;}
+done ${INSTALLROOT}/include/ast/zconf.h generated
+make ${INSTALLROOT}/include/ast/sfdcgzip.h
 prev sfdcgzip.h
-exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o type=special'  sfdcgzip.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcgzip.h 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o type=special'  sfdcgzip.h > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/sfdcgzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
+exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/sfdcgzip.h
 exec - fi
-done ../../../include/ast/sfdcgzip.h generated
+done ${INSTALLROOT}/include/ast/sfdcgzip.h generated
 done install virtual
 make test
 make example
 make example.o
 make example.c
 prev zlib.h implicit
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 done example.c
+meta example.o %.c>%.o example.c example
 prev example.c
 setv _BLD_z -U_BLD_z
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c example.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c example.c
 done example.o generated
 prev libz.a archive
 bind -lz
 bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o example example.o ${mam_libz} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o example example.o ${mam_libz} ${mam_libast}
 done example generated
 make example.out
 done example.out
@@ -389,14 +405,15 @@ prev unix.h implicit
 make io.h implicit
 done io.h dontcare virtual
 prev zlib.h implicit
-prev ../../../include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 done minigzip.c
+meta minigzip.o %.c>%.o minigzip.c minigzip
 prev minigzip.c
 setv _BLD_z -U_BLD_z
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c minigzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c minigzip.c
 done minigzip.o generated
 prev libz.a archive
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o minigzip minigzip.o ${mam_libz} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -o minigzip minigzip.o ${mam_libz} ${mam_libast}
 done minigzip generated
 make minigzip.out
 done minigzip.out

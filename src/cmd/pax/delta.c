@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -181,8 +181,8 @@ getdeltatrailer(register Archive_t* ap, register File_t* f)
 		else
 		{
 			x = (ap->format->flags & SUM) ? f->delta.base->info->checksum : ap->memsum;
-			if (f->delta.checksum != x)
-				error(2, "%s: %s: corrupt archive: checksum mismatch -- expected %08x, got %08x", ap->name, f->name, f->delta.checksum, x);
+			if ((f->delta.checksum ^ x) & 0xffffffff)
+				error(2, "%s: %s: corrupt archive: checksum mismatch -- expected %08lx, got %08lx", ap->name, f->name, f->delta.checksum & 0xffffffff, x & 0xffffffff);
 		}
 		if (n = f->delta.index - ap->delta->index)
 		{
@@ -232,7 +232,7 @@ setdeltaheader(register Archive_t* ap, register File_t* f)
 			putkey(ap, ap->tmp.extended, &options[OPT_uncompressed], NiL, f->uncompressed);
 			putkey(ap, ap->tmp.extended, &options[OPT_delta_index], NiL, ap->delta->index);
 			if (ap->delta->tab && (f->delta.base = (Member_t*)hashget(ap->delta->tab, f->name)))
-				putkey(ap, ap->tmp.extended, &options[OPT_delta_checksum], NiL, f->delta.base->info->checksum);
+				putkey(ap, ap->tmp.extended, &options[OPT_delta_checksum], NiL, f->delta.base->info->checksum & 0xffffffff);
 		}
 		else
 		{
@@ -319,7 +319,7 @@ deltabase(register Archive_t* ap)
 		bp = ap->delta->base = initarchive("/dev/null", O_RDONLY);
 	binit(bp);
 	bp->parent = ap;
-	if (!(bp->io->mode & O_WRONLY))
+	if ((bp->io->mode & O_ACCMODE) != O_WRONLY)
 		bp->sum++;
 	if ((bp->io->fd = open(bp->name, bp->io->mode|O_BINARY)) < 0 || fstat(bp->io->fd, &st))
 		error(ERROR_SYSTEM|3, "%s: %s: cannot open base archive", ap->name, bp->name);
@@ -348,6 +348,7 @@ deltabase(register Archive_t* ap)
 		}
 		if (!ap->delta->format)
 			ap->delta->format = getformat(FMT_DELTA, 1);
+		bp->checksum &= 0xffffffff;
 	}
 	else if (!ap->delta->format)
 	{
@@ -917,8 +918,8 @@ deltacheck(register Archive_t* ap, register File_t* f)
 							if (bp->size != size)
 								error(3, "%s: %s: base archive size mismatch -- expected %I*u, got %I*u", ap->name, bp->name, sizeof(size), size, sizeof(bp->size), bp->size);
 						}
-						if (bp->checksum != checksum)
-							error(1, "%s: %s: base archive checksum mismatch -- expected %08x, got %08x", ap->name, bp->name, checksum, bp->checksum);
+						if ((bp->checksum ^ checksum) & 0xffffffff)
+							error(1, "%s: %s: base archive checksum mismatch -- expected %08lx, got %08lx", ap->name, bp->name, checksum & 0xffffffff, bp->checksum & 0xffffffff);
 					}
 				}
 				else if (!ap->delta->compress)

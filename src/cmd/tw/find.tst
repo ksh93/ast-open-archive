@@ -3,6 +3,7 @@
 function DATA
 {
 	typeset f i j k
+	typeset -Z4 Z
 	for f
 	do	test -d $f && continue
 		KEEP $f
@@ -32,6 +33,20 @@ function DATA
 			for i in 0 1 2 3 4 5 6 7
 			do	: > mode/$i$i$i
 				chmod $i$i$i mode/$i$i$i
+			done
+			;;
+		size)	mkdir size
+			for ((i = 0; i < 600; i += 11))
+			do	Z=$i
+				for ((j = 0; j < i; j++))
+				do	print
+				done > size/$Z
+			done
+			for ((i = 0; i < 6000; i += 321))
+			do	Z=$i
+				for ((j = 0; j < i; j++))
+				do	print
+				done > size/$Z
 			done
 			;;
 		esac
@@ -509,3 +524,539 @@ match/jkl/vwx'
 match/.ghi
 match/.ghi/.mno
 match/jkl/.stu'
+
+TEST 06 '-size number[bckw]'
+	DO	DATA size
+	EXEC	size -sort -name -type f
+		OUTPUT - $'size/0000
+size/0011
+size/0022
+size/0033
+size/0044
+size/0055
+size/0066
+size/0077
+size/0088
+size/0099
+size/0110
+size/0121
+size/0132
+size/0143
+size/0154
+size/0165
+size/0176
+size/0187
+size/0198
+size/0209
+size/0220
+size/0231
+size/0242
+size/0253
+size/0264
+size/0275
+size/0286
+size/0297
+size/0308
+size/0319
+size/0321
+size/0330
+size/0341
+size/0352
+size/0363
+size/0374
+size/0385
+size/0396
+size/0407
+size/0418
+size/0429
+size/0440
+size/0451
+size/0462
+size/0473
+size/0484
+size/0495
+size/0506
+size/0517
+size/0528
+size/0539
+size/0550
+size/0561
+size/0572
+size/0583
+size/0594
+size/0642
+size/0963
+size/1284
+size/1605
+size/1926
+size/2247
+size/2568
+size/2889
+size/3210
+size/3531
+size/3852
+size/4173
+size/4494
+size/4815
+size/5136
+size/5457
+size/5778'
+	EXEC	size -sort -name -type f -a -size -0
+		OUTPUT -
+	EXEC	size -sort -name -type f -a -size 0
+		OUTPUT - $'size/0000'
+	EXEC	size -sort -name -type f -a -size +0
+		OUTPUT - $'size/0011
+size/0022
+size/0033
+size/0044
+size/0055
+size/0066
+size/0077
+size/0088
+size/0099
+size/0110
+size/0121
+size/0132
+size/0143
+size/0154
+size/0165
+size/0176
+size/0187
+size/0198
+size/0209
+size/0220
+size/0231
+size/0242
+size/0253
+size/0264
+size/0275
+size/0286
+size/0297
+size/0308
+size/0319
+size/0321
+size/0330
+size/0341
+size/0352
+size/0363
+size/0374
+size/0385
+size/0396
+size/0407
+size/0418
+size/0429
+size/0440
+size/0451
+size/0462
+size/0473
+size/0484
+size/0495
+size/0506
+size/0517
+size/0528
+size/0539
+size/0550
+size/0561
+size/0572
+size/0583
+size/0594
+size/0642
+size/0963
+size/1284
+size/1605
+size/1926
+size/2247
+size/2568
+size/2889
+size/3210
+size/3531
+size/3852
+size/4173
+size/4494
+size/4815
+size/5136
+size/5457
+size/5778'
+	EXEC	size -sort -name -type f -a -size -1c
+		OUTPUT - $'size/0000'
+	EXEC	size -sort -name -type f -a -size 1c
+		OUTPUT -
+	EXEC	size -sort -name -type f -a -size +1c
+		OUTPUT - $'size/0011
+size/0022
+size/0033
+size/0044
+size/0055
+size/0066
+size/0077
+size/0088
+size/0099
+size/0110
+size/0121
+size/0132
+size/0143
+size/0154
+size/0165
+size/0176
+size/0187
+size/0198
+size/0209
+size/0220
+size/0231
+size/0242
+size/0253
+size/0264
+size/0275
+size/0286
+size/0297
+size/0308
+size/0319
+size/0321
+size/0330
+size/0341
+size/0352
+size/0363
+size/0374
+size/0385
+size/0396
+size/0407
+size/0418
+size/0429
+size/0440
+size/0451
+size/0462
+size/0473
+size/0484
+size/0495
+size/0506
+size/0517
+size/0528
+size/0539
+size/0550
+size/0561
+size/0572
+size/0583
+size/0594
+size/0642
+size/0963
+size/1284
+size/1605
+size/1926
+size/2247
+size/2568
+size/2889
+size/3210
+size/3531
+size/3852
+size/4173
+size/4494
+size/4815
+size/5136
+size/5457
+size/5778'
+	EXEC	size -sort -name -type f -a -size -176c
+		OUTPUT - $'size/0000
+size/0011
+size/0022
+size/0033
+size/0044
+size/0055
+size/0066
+size/0077
+size/0088
+size/0099
+size/0110
+size/0121
+size/0132
+size/0143
+size/0154
+size/0165'
+	EXEC	size -sort -name -type f -a -size 176c
+		OUTPUT - $'size/0176'
+	EXEC	size -sort -name -type f -a -size +176c
+		OUTPUT - $'size/0187
+size/0198
+size/0209
+size/0220
+size/0231
+size/0242
+size/0253
+size/0264
+size/0275
+size/0286
+size/0297
+size/0308
+size/0319
+size/0321
+size/0330
+size/0341
+size/0352
+size/0363
+size/0374
+size/0385
+size/0396
+size/0407
+size/0418
+size/0429
+size/0440
+size/0451
+size/0462
+size/0473
+size/0484
+size/0495
+size/0506
+size/0517
+size/0528
+size/0539
+size/0550
+size/0561
+size/0572
+size/0583
+size/0594
+size/0642
+size/0963
+size/1284
+size/1605
+size/1926
+size/2247
+size/2568
+size/2889
+size/3210
+size/3531
+size/3852
+size/4173
+size/4494
+size/4815
+size/5136
+size/5457
+size/5778'
+	EXEC	size -sort -name -type f -a -size -1w
+		OUTPUT - $'size/0000'
+	EXEC	size -sort -name -type f -a -size 1w
+		OUTPUT -
+	EXEC	size -sort -name -type f -a -size +1w
+		OUTPUT - $'size/0011
+size/0022
+size/0033
+size/0044
+size/0055
+size/0066
+size/0077
+size/0088
+size/0099
+size/0110
+size/0121
+size/0132
+size/0143
+size/0154
+size/0165
+size/0176
+size/0187
+size/0198
+size/0209
+size/0220
+size/0231
+size/0242
+size/0253
+size/0264
+size/0275
+size/0286
+size/0297
+size/0308
+size/0319
+size/0321
+size/0330
+size/0341
+size/0352
+size/0363
+size/0374
+size/0385
+size/0396
+size/0407
+size/0418
+size/0429
+size/0440
+size/0451
+size/0462
+size/0473
+size/0484
+size/0495
+size/0506
+size/0517
+size/0528
+size/0539
+size/0550
+size/0561
+size/0572
+size/0583
+size/0594
+size/0642
+size/0963
+size/1284
+size/1605
+size/1926
+size/2247
+size/2568
+size/2889
+size/3210
+size/3531
+size/3852
+size/4173
+size/4494
+size/4815
+size/5136
+size/5457
+size/5778'
+	EXEC	size -sort -name -type f -a -size -1b
+		OUTPUT - $'size/0000'
+	EXEC	size -sort -name -type f -a -size 1b
+		OUTPUT - $'size/0011
+size/0022
+size/0033
+size/0044
+size/0055
+size/0066
+size/0077
+size/0088
+size/0099
+size/0110
+size/0121
+size/0132
+size/0143
+size/0154
+size/0165
+size/0176
+size/0187
+size/0198
+size/0209
+size/0220
+size/0231
+size/0242
+size/0253
+size/0264
+size/0275
+size/0286
+size/0297
+size/0308
+size/0319
+size/0321
+size/0330
+size/0341
+size/0352
+size/0363
+size/0374
+size/0385
+size/0396
+size/0407
+size/0418
+size/0429
+size/0440
+size/0451
+size/0462
+size/0473
+size/0484
+size/0495
+size/0506'
+	EXEC	size -sort -name -type f -a -size +1b
+		OUTPUT - $'size/0517
+size/0528
+size/0539
+size/0550
+size/0561
+size/0572
+size/0583
+size/0594
+size/0642
+size/0963
+size/1284
+size/1605
+size/1926
+size/2247
+size/2568
+size/2889
+size/3210
+size/3531
+size/3852
+size/4173
+size/4494
+size/4815
+size/5136
+size/5457
+size/5778'
+	EXEC	size -sort -name -type f -a -size -1k
+		OUTPUT - $'size/0000'
+	EXEC	size -sort -name -type f -a -size 1k
+		OUTPUT - $'size/0011
+size/0022
+size/0033
+size/0044
+size/0055
+size/0066
+size/0077
+size/0088
+size/0099
+size/0110
+size/0121
+size/0132
+size/0143
+size/0154
+size/0165
+size/0176
+size/0187
+size/0198
+size/0209
+size/0220
+size/0231
+size/0242
+size/0253
+size/0264
+size/0275
+size/0286
+size/0297
+size/0308
+size/0319
+size/0321
+size/0330
+size/0341
+size/0352
+size/0363
+size/0374
+size/0385
+size/0396
+size/0407
+size/0418
+size/0429
+size/0440
+size/0451
+size/0462
+size/0473
+size/0484
+size/0495
+size/0506
+size/0517
+size/0528
+size/0539
+size/0550
+size/0561
+size/0572
+size/0583
+size/0594
+size/0642
+size/0963'
+	EXEC	size -sort -name -type f -a -size +1k
+		OUTPUT - $'size/1284
+size/1605
+size/1926
+size/2247
+size/2568
+size/2889
+size/3210
+size/3531
+size/3852
+size/4173
+size/4494
+size/4815
+size/5136
+size/5457
+size/5778'

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2002 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2001-10-20 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2004-08-01 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -75,10 +75,10 @@ USAGE_LICENSE
 "	generator that inserts these lines.]"
 "[F:force?By default files are not copied if the source and target size and"
 "	modification times match. \b--force\b forces all files to be copied.]"
-"[i:index?\aname\a specifies the page named by directory"
-"	references.]:[name:=index.html]"
 "[h:hosts?Check only references matching the \bksh\b(1) pattern"
 "	\bhttp://\b\apattern\a\b/\b.]:[pattern]"
+"[i:index?\aname\a specifies the page named by directory"
+"	references.]:[name:=index.html]"
 "[k:keep?\apattern\a is used to match file base names that are always"
 "	considered referenced.]:[pattern:=.htaccess]"
 "[l:limit?Limit \b--copy\b and \b--remove\b operations to path names matching"
@@ -98,6 +98,8 @@ USAGE_LICENSE
 "[s:strict?By default unreferenced \b--index\b files and the containing"
 "	directory are considered referenced; \b--strict\b considers"
 "	unreferenced \b--index\b files unreferenced.]"
+"[S:symlink?Instruct \b--copy\b to \bsymlink\b(2) files that do not contain"
+"	\b<!--INTERNAL-->\b ... \b<!--/INTERNAL-->\b.]"
 "[u:user?\b~\b\aname\a translates to the \b--root\b"
 "	directory.]:[name:=caller-uid]"
 "[v:verbose?List files as they are copied (see \b--copy\b.)]"
@@ -188,6 +190,7 @@ typedef struct State_s
 	int		perlwarn;
 	int		remove;
 	int		strict;
+	int		symlink;
 	int		unreferenced;
 	int		verbose;
 	int		warn;
@@ -228,7 +231,7 @@ check(register State_t* state, const char* dir, const char* name, unsigned int f
 	sfsprintf(state->dir, sizeof(state->dir) - 1, "%s/(%s)", dir, name);
 	if (!glob(state->dir, GLOB_AUGMENTED|GLOB_DISC|GLOB_STACK, 0, &gl))
 		for (p = gl.gl_pathv; s = *p++;)
-			if (!dtmatch(state->files, s) && !access(s, 0))
+			if (!dtmatch(state->files, s) && !access(s, F_OK))
 			{
 				if (!(dp = newof(0, File_t, 1, strlen(s))))
 					error(ERROR_SYSTEM|3, "out of space [file]");
@@ -944,6 +947,8 @@ main(int argc, char** argv)
 		case 'x':
 			state->unreferenced = opt_info.num;
 			continue;
+		case 'S':
+			state->symlink = opt_info.num;
 		case 'X':
 			state->remove = opt_info.num;
 			continue;
@@ -1051,6 +1056,8 @@ main(int argc, char** argv)
 					{
 						if (fp->flags & FILTER)
 							sfprintf(sfstdout, "filter %s\n", p);
+						else if (state->symlink)
+							sfprintf(sfstdout, "  link %s\n", p);
 						else
 							sfprintf(sfstdout, "  copy %s\n", p);
 					}
@@ -1063,6 +1070,18 @@ main(int argc, char** argv)
 							sfprintf(sfstdout, " mkdir %s\n", p);
 						if (mkdir(p, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH))
 							error(ERROR_SYSTEM|2, "%s: cannot create directory", p);
+					}
+				}
+				else if (state->symlink && !(fp->flags & FILTER))
+				{
+					if (st.st_mtime != ts.st_mtime)
+					{
+						if (state->verbose)
+							sfprintf(sfstdout, " ln -s %s %s\n", fp->name, p);
+						if (ts.st_mtime)
+							remove(p);
+						if (symlink(fp->name, p))
+							error(ERROR_SYSTEM|2, "%s: cannot symlink to %s", fp->name, p);
 					}
 				}
 				else if (state->force || st.st_mtime != ts.st_mtime)

@@ -19648,7 +19648,7 @@ parse __PARAM__((Env_t* env, Rex_t* rex, Rex_t* cont, unsigned char* s), (env, r
 	}
 }'
 
-TEST 10 'how did this hide til 2002?'
+TEST 10 'how did this hide til 2002? (and how do we fix it?)'
 	EXEC -h
 		INPUT - $'#pragma prototyped
 void fun(int arg)
@@ -19689,6 +19689,9 @@ extern int f(int);'
 
 #if !defined(__PROTO__)
 #include <prototyped.h>
+#endif
+#if !defined(__LINKAGE__)
+#define __LINKAGE__		/* 2004-08-11 transition */
 #endif
 extern __MANGLE__ int f __PROTO__((int));'
 
@@ -19759,6 +19762,9 @@ extern int f(int);'
 #if !defined(__PROTO__)
 #include <prototyped.h>
 #endif
+#if !defined(__LINKAGE__)
+#define __LINKAGE__		/* 2004-08-11 transition */
+#endif
 extern __MANGLE__ int f __PROTO__((int));'
 
 TEST 13 'already noticed'
@@ -19773,6 +19779,9 @@ extern int f(int);'
 
 #if !defined(__PROTO__)
 #include <prototyped.h>
+#endif
+#if !defined(__LINKAGE__)
+#define __LINKAGE__		/* 2004-08-11 transition */
 #endif
 extern __MANGLE__ int f __PROTO__((int));'
 
@@ -19789,6 +19798,9 @@ extern int f(int);'
 #if !defined(__PROTO__)
 #include <prototyped.h>
 #endif
+#if !defined(__LINKAGE__)
+#define __LINKAGE__		/* 2004-08-11 transition */
+#endif
 extern __MANGLE__ int f __PROTO__((int));'
 
 	EXEC -s -o type=test,type=gpl
@@ -19801,6 +19813,9 @@ extern int f(int);'
 #if !defined(__PROTO__)
 #include <prototyped.h>
 #endif
+#if !defined(__LINKAGE__)
+#define __LINKAGE__		/* 2004-08-11 transition */
+#endif
 extern __MANGLE__ int f __PROTO__((int));'
 
 	EXEC -s -p -o type=test,type=gpl
@@ -19809,6 +19824,9 @@ extern __MANGLE__ int f __PROTO__((int));'
 
 #if !defined(__PROTO__)
 #include <prototyped.h>
+#endif
+#if !defined(__LINKAGE__)
+#define __LINKAGE__		/* 2004-08-11 transition */
 #endif
 extern __MANGLE__ int f __PROTO__((int));'
 
@@ -19823,4 +19841,58 @@ extern int f(int);'
 #if !defined(__PROTO__)
 #include <prototyped.h>
 #endif
+#if !defined(__LINKAGE__)
+#define __LINKAGE__		/* 2004-08-11 transition */
+#endif
 extern __MANGLE__ int f __PROTO__((int));'
+
+TEST 14 'already prototyped by __P() macros'
+
+	EXEC -f -h
+		INPUT - $'typedef int (*fun_f) __P((void const *));
+void fun __P((int));'
+		SAME OUTPUT INPUT
+
+TEST 15 '#(define|undef) extern intercepts'
+
+	EXEC -f -h
+		INPUT - $'#define extern __EXPORT__
+extern fun(int);
+#undef extern'
+		OUTPUT - $'#undef __MANGLE__
+#define __MANGLE__ __LINKAGE__ __EXPORT__
+extern __MANGLE__ fun(int);
+#undef __MANGLE__
+#define __MANGLE__ __LINKAGE__'
+
+	EXEC -f -h -n
+		OUTPUT - $'#undef __MANGLE__
+
+#line 1
+#define __MANGLE__ __LINKAGE__ __EXPORT__
+extern __MANGLE__ fun(int);
+#undef __MANGLE__
+
+#line 3
+#define __MANGLE__ __LINKAGE__'
+
+	EXEC -f -h
+		INPUT - $'#define extern extern __IMPORT__
+extern fun(int);
+#undef extern'
+		OUTPUT - $'#undef __MANGLE__
+#define __MANGLE__ __LINKAGE__ __IMPORT__
+extern __MANGLE__ fun(int);
+#undef __MANGLE__
+#define __MANGLE__ __LINKAGE__'
+
+	EXEC -f -h -n
+		OUTPUT - $'#undef __MANGLE__
+
+#line 1
+#define __MANGLE__ __LINKAGE__ __IMPORT__
+extern __MANGLE__ fun(int);
+#undef __MANGLE__
+
+#line 3
+#define __MANGLE__ __LINKAGE__'

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -219,6 +219,7 @@ intercept(Sfio_t* sp, int level, int flags)
 	char*			m;
 	char*			s;
 	char*			t;
+	char*			e;
 	int			n;
 	int			i;
 	Sfio_t*			tmp;
@@ -241,17 +242,21 @@ intercept(Sfio_t* sp, int level, int flags)
 		s = sfstruse(tmp);
 
 		/*
-		 * return [ level | - [ message ] ]
+		 * return [ level | - ] [ message ]
 		 * level is new level or - to retain old
 		 * omitted message means it has been printed
 		 */
 
 		if (t = call(r, s))
 		{
-			if (*t == '-' && isspace(*(t + 1)))
-				t += 2;
-			else if (i = strtol(t, &t, 0))
+			i = strtol(t, &e, 0);
+			if (e > t)
+			{
+				t = e;
 				level = i;
+			}
+			else if (*t == '-')
+				t++;
 			while (isspace(*t))
 				t++;
 		}
@@ -278,7 +283,7 @@ main(int argc, char** argv)
 	register struct list*	p;
 	int			i;
 	int			args;
-	int			debug;
+	int			trace;
 	char*			t;
 	char*			buf;
 	char*			tok;
@@ -341,6 +346,7 @@ main(int argc, char** argv)
 	internal.nam = sfstropen();
 	internal.tmp = sfstropen();
 	internal.val = sfstropen();
+	internal.wrk = sfstropen();
 	tmp = sfstropen();
 	sfstrrsrv(tmp, 2 * MAXNAME);
 
@@ -441,7 +447,7 @@ main(int argc, char** argv)
 	 * check and read the args file
 	 */
 
-	if (s = colonlist(tmp, external.args, ' '))
+	if (s = colonlist(tmp, external.args, 1, ' '))
 	{
 		i = fs3d(0);
 		tok = tokopen(s, 1);
@@ -476,22 +482,19 @@ main(int argc, char** argv)
 		state.forceread = 1;
 		state.virtualdot = 0;
 	}
-#if _WINIX
-	state.test ^= 0x00020000;
-#endif
 
 	/*
 	 * tone down the bootstrap noise
 	 */
 
-	if ((debug = error_info.trace) == -1)
+	if ((trace = error_info.trace) == -1)
 		error_info.trace = 0;
 
 	/*
 	 * check explicit environment overrides
 	 */
 
-	if (s = colonlist(tmp, external.import, ' '))
+	if (s = colonlist(tmp, external.import, 1, ' '))
 	{
 		tok = tokopen(s, 1);
 		while (s = tokread(tok))
@@ -522,7 +525,7 @@ main(int argc, char** argv)
 	if (error_info.trace < 0)
 	{
 		errno = 0;
-		error(error_info.trace, "%s [%d %s]", version, getpid(), strtime(state.start));
+		error(error_info.trace, "%s [%d %s]", version, state.pid, strtime(state.start));
 	}
 
 	/*
@@ -541,19 +544,26 @@ main(int argc, char** argv)
 	{
 		if (!state.mam.statix || *state.mam.label)
 			error_info.write = mamerror;
-		sfprintf(state.mam.out, "%sinfo mam %s %05d 1994-07-17 %s\n", state.mam.label, state.mam.type, state.mam.parent, version);
-		if (state.mam.regress)
-			sfprintf(state.mam.out, "%sinfo start regression\n", state.mam.label);
-		else if (!state.mam.statix || *state.mam.label)
+		if (state.mam.regress || state.regress)
 		{
-			sfprintf(state.mam.out, "%sinfo start %lu\n", state.mam.label, CURTIME);
-			if (!state.mam.root || streq(state.mam.root, internal.pwd))
-				sfprintf(state.mam.out, "%sinfo pwd %s\n", state.mam.label, internal.pwd);
-			else
-				sfprintf(state.mam.out, "%sinfo pwd %s %s\n", state.mam.label, state.mam.root, mamname(makerule(internal.pwd)));
-			buf = sfstrbase(tmp);
-			if (state.fsview && !mount(NiL, buf, FS3D_GET|FS3D_ALL|FS3D_SIZE(sfstrsize(tmp)), NiL))
-				sfprintf(state.mam.out, "%sinfo view %s\n", state.mam.label, buf);
+			sfprintf(state.mam.out, "%sinfo mam %s %05d\n", state.mam.label, state.mam.type, state.mam.parent);
+			if (state.mam.regress)
+				sfprintf(state.mam.out, "%sinfo start regression\n", state.mam.label);
+		}
+		else
+		{
+			sfprintf(state.mam.out, "%sinfo mam %s %05d 1994-07-17 %s\n", state.mam.label, state.mam.type, state.mam.parent, version);
+			if (!state.mam.statix || *state.mam.label)
+			{
+				sfprintf(state.mam.out, "%sinfo start %lu\n", state.mam.label, CURTIME);
+				if (!state.mam.root || streq(state.mam.root, internal.pwd))
+					sfprintf(state.mam.out, "%sinfo pwd %s\n", state.mam.label, internal.pwd);
+				else
+					sfprintf(state.mam.out, "%sinfo pwd %s %s\n", state.mam.label, state.mam.root, mamname(makerule(internal.pwd)));
+				buf = sfstrbase(tmp);
+				if (state.fsview && !mount(NiL, buf, FS3D_GET|FS3D_ALL|FS3D_SIZE(sfstrsize(tmp)), NiL))
+					sfprintf(state.mam.out, "%sinfo view %s\n", state.mam.label, buf);
+			}
 		}
 	}
 
@@ -594,8 +604,10 @@ main(int argc, char** argv)
 	if (!state.makefile)
 	{
 		int	sep;
+		Sfio_t*	exp;
 		Sfio_t*	imp;
 
+		exp = 0;
 		imp = sfstropen();
 		sep = 0;
 		s = 0;
@@ -603,30 +615,35 @@ main(int argc, char** argv)
 		{
 			sfputr(tmp, t, 0);
 			sfstrrsrv(tmp, MAXNAME);
-			i = sfstrtell(tmp);
 			tok = tokopen(sfstrbase(tmp), 0);
 			while (s = tokread(tok))
 			{
-				if (*s == '*' && *(s + 1) == '.')
+				if (!exp)
+					exp = sfstropen();
+				if (t = colonlist(exp, s, 0, ' '))
 				{
-					edit(tmp, internal.pwd, DELETE, KEEP, s + 1);
-					sfputc(tmp, 0);
-					s = sfstrset(tmp, i);
+					t = tokopen(t, 0);
+					while (s = tokread(t))
+					{
+						if (readfile(s, COMP_INCLUDE|COMP_DONTCARE, NiL))
+							break;
+						if (sep)
+							sfputc(imp, ',');
+						else
+							sep = 1;
+						sfputr(imp, s, -1);
+					}
+					tokclose(t);
+					if (s)
+						break;
 				}
-				if (readfile(s, COMP_INCLUDE|COMP_DONTCARE, NiL))
-					break;
-				if (sep)
-					sfputc(imp, ',');
-				else
-					sep = 1;
-				sfputr(imp, s, -1);
 				if (!(s = tokread(tok)))
 					break;
 			}
 			tokclose(tok);
 			sfstrset(tmp, 0);
 		}
-		if (!s && (s = colonlist(tmp, external.files, ' ')))
+		if (!s && (s = colonlist(tmp, external.files, 1, ' ')))
 		{
 			tok = tokopen(s, 1);
 			while (s = tokread(tok))
@@ -649,6 +666,8 @@ main(int argc, char** argv)
 				error(3, "a makefile must be specified");
 		}
 		sfstrclose(imp);
+		if (exp)
+			sfstrclose(exp);
 	}
 
 	/*
@@ -671,7 +690,7 @@ main(int argc, char** argv)
 	 * check if makefiles to be compiled
 	 */
 
-	if (state.compile && !state.virtualdot && state.writeobject && state.writestate)
+	if (state.compile && !state.virtualdot && state.writeobject)
 	{
 		/*
 		 * make the compinit trap
@@ -769,18 +788,18 @@ main(int argc, char** argv)
 		}
 
 	/*
-	 * make the init trap
-	 */
-
-	if (r = getrule(external.init))
-		maketop(r, P_dontcare|P_foreground, NiL);
-
-	/*
 	 * freeze the parameter files and candidate state variables
 	 */
 
 	state.user = 2;
 	candidates();
+
+	/*
+	 * make the init trap
+	 */
+
+	if (r = getrule(external.init))
+		maketop(r, P_dontcare|P_foreground, NiL);
 
 	/*
 	 * internal.args default to internal.main
@@ -794,7 +813,7 @@ main(int argc, char** argv)
 	 */
 
 	if (!error_info.trace)
-		error_info.trace = debug;
+		error_info.trace = trace;
 
 	/*
 	 * make the prerequisites of internal.args

@@ -3907,12 +3907,12 @@ TEST 06 '-f, -F, big pattern'
 	DO	DATA big.dat
 	EXEC	-n '\(.\)\(.\)\2\1' big.dat
 		IGNORE	OUTPUT
+	DO	cp OUTPUT out
 	EXEC	-c . out
-		DO { cp OUTPUT out ;}
 		OUTPUT - 91
+	DO	cp out INPUT
 	EXEC	-l . out
 		OUTPUT - out
-		DO { cp out INPUT ;}
 	EXEC	-l .
 		OUTPUT - '/dev/stdin'
 	EXEC	-l . big.dat big.dat

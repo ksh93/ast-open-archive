@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -75,16 +75,20 @@ catrule(register char* s1, register char* s2, register char* s3, int force)
 char*
 statefile(void)
 {
+	char*		dir;
 	Sfio_t*		sp;
+	struct stat	st;
 
-	if (!state.statefile && state.makefile)
+	if (!state.statefile && state.makefile && state.writestate)
 	{
 		sp = sfstropen();
-		if (!state.writestate || streq(state.writestate, "-"))
-			edit(sp, state.makefile, DELETE, KEEP, external.state);
+		dir = DELETE;
+		if (streq(state.writestate, "-") || !stat(state.writestate, &st) && S_ISDIR(st.st_mode) && (dir = state.writestate))
+			edit(sp, state.makefile, dir, KEEP, external.state);
 		else
 			expand(sp, state.writestate);
 		state.statefile = strdup(sfstruse(sp));
+		sfstrclose(sp);
 	}
 	return state.statefile;
 }
@@ -488,7 +492,7 @@ badlock(char* file, int view, unsigned long date)
 	if ((d = (CURTIME - date)) > 24 * 60 * 60)
 		error(1, "%s is probably an invalid lock file", file);
 	else if (d > 0)
-		error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(d, 1));
+		error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(state.regress ? 1 : d, 1));
 	else
 		error(1, "another make is running on %s in %s", state.makefile, state.view[view].path);
 	error(3, "use -%c to override", OPT(OPT_ignorelock));
@@ -530,7 +534,7 @@ lockstate(int set)
 	{
 		if (!state.exec || state.virtualdot || !state.writestate)
 			return;
-		edit(internal.nam, statefile(), DELETE, KEEP, external.lock);
+		edit(internal.nam, statefile(), KEEP, KEEP, external.lock);
 		file = strdup(sfstruse(internal.nam));
 		if (!state.ignorelock)
 		{
@@ -627,7 +631,7 @@ readstate(void)
 static void
 code(register const char* s)
 {
-	message((-6, "enter candidate state variable %s", s));
+	debug((-6, "enter candidate state variable %s", s));
 	settype(*s++, C_VARPOS1);
 	if (*s)
 	{
@@ -674,6 +678,7 @@ checkparam(const char* s, char* v, void* h)
 	NoP(h);
 	if ((r->property & (P_attribute|P_parameter|P_state)) == P_parameter)
 	{
+		r->property |= P_ignore;
 		maketop(r, 0L, NiL);
 		for (p = scan(r, &tm); p; p = p->next)
 			if (((r = p->rule)->property & (P_parameter|P_statevar)) == (P_parameter|P_statevar))
@@ -707,9 +712,7 @@ checkvar1(register const char* s, char* u, void* h)
 		r = staterule(VAR, NiL, (char*)s, 1);
 		if (!r->scan)
 		{
-#if DEBUG
-			message((-5, "%s and %s force re-scan", v->name, r->name));
-#endif
+			debug((-5, "%s and %s force re-scan", v->name, r->name));
 			r->scan = SCAN_STATE;
 			state.forcescan = 1;
 		}
@@ -732,9 +735,7 @@ checkvar2(const char* s, char* u, void* h)
 	NoP(h);
 	if ((r->property & P_statevar) && r->scan && !r->view && (!(v = varstate(r, 0)) || !(v->property & V_scan)) && (!(r->property & P_parameter) || !(r->dynamic & D_scanned)))
 	{
-#if DEBUG
-		message((-5, "%s forces re-scan", r->name));
-#endif
+		debug((-5, "%s forces re-scan", r->name));
 		r->scan = 0;
 		state.forcescan = 1;
 	}
@@ -1025,7 +1026,7 @@ statetime(register struct rule* r, int sync)
 
 					a = (n > 0) ? n : -n;
 					if (a > 1)
-						error(1, "%s file system time %s local time by at least %s", r->name, n > 0 ? "lags" : "leads", fmtelapsed(a, 1));
+						error(state.regress ? -1 : 1, "%s file system time %s local time by at least %s", r->name, n > 0 ? "lags" : "leads", fmtelapsed(a, 1));
 					localsync = a > state.tolerance ? 1 : -1;
 				}
 			}
@@ -1070,7 +1071,7 @@ statetime(register struct rule* r, int sync)
 					if (st.st_mtime == t)
 						break;
 					localskew = t - st.st_mtime;
-					error(1, "the utime(2) or utimes(2) system call is botched for the filesystem containing %s (the current time is adjusted by %d seconds) -- the state may be out of sync", r->name, localskew);
+					error(state.regress ? -1 : 1, "the utime(2) or utimes(2) system call is botched for the filesystem containing %s (the current time is adjusted by %d seconds) -- the state may be out of sync", r->name, localskew);
 
 					/*
 					 * the botch may only be for times near

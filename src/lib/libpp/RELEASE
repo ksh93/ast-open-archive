@@ -1,3 +1,7 @@
+04-08-11 ppproto.c: intercept "#(define|undef) extern" for __(EX|IM)PORT__
+04-07-23 probe.win32: generalize #include dir order search
+04-07-22 ppsearch.c: access() => eaccess()
+04-05-20 ppproto.c: don't __PROTO__ `int fun __P((int));'
 04-04-15 probe.win32: sync up with uwin 2003-08-06 master -- oops
 04-04-01 pp.probe: add stdinclude usrinclude path cleanup
 04-02-29 ppproto.c: fix bug that skipped prototyped check during notices check

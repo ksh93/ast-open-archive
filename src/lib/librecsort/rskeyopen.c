@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
@@ -30,7 +30,7 @@
 
 #include "rskeyhdr.h"
 
-static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2004-02-11 $\0\n";
+static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2004-08-11 $\0\n";
 
 static const char lib[] = "librecsort:rskey";
 

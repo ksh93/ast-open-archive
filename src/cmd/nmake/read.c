@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -48,7 +48,8 @@ readrules(void)
 	 * read the base rules
 	 */
 
-	if (!(s = state.rules)) state.rules = null;
+	if (!(s = state.rules))
+		state.rules = null;
 	else if (*s)
 	{
 		tmp = sfstropen();
@@ -93,11 +94,11 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 	char*		name;
 	char*		b;
 	char*		e;
-	char*		objectfile;
+	char*		objfile;
 	struct rule*	x;
 	Sfio_t*		fp;
 
-	objectfile = 0;
+	objfile = 0;
 	name = r->name;
 	if (!state.makefile)
 	{
@@ -109,12 +110,8 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 		setvar(external.file, r->name, 0)->property |= V_compiled;
 		edit(fp, r->name, DELETE, KEEP, KEEP);
 		state.makefile = strdup(sfstruse(fp));
-		if (!state.writeobject || streq(state.writeobject, "-"))
-			edit(fp, r->name, DELETE, KEEP, external.object);
-		else
-			expand(fp, state.writeobject);
-		objectfile = state.objectfile = strdup(sfstruse(fp));
 		sfstrclose(fp);
+		objfile = objectfile();
 	}
 	needrules = !state.base && !state.rules;
 
@@ -144,13 +141,13 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 	if (state.global || !state.forceread && (!(type & COMP_FILE) || needrules))
 	{
 		fp = sfstropen();
-		if (!objectfile)
+		if (!objfile)
 		{
 			edit(fp, r->name, DELETE, KEEP, external.object);
-			objectfile = sfstruse(fp);
+			objfile = sfstruse(fp);
 		}
 		state.init++;
-		x = bindfile(NiL, objectfile, 0);
+		x = bindfile(NiL, objfile, 0);
 		state.init--;
 		sfstrclose(fp);
 		if (!x || !x->time)
@@ -166,27 +163,19 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 				if (needrules)
 				{
 					needrules = 0;
-					if (state.rules)
+					readrules();
+				}
+				else if (state.rules)
+				{
+					edit(internal.tmp, state.rules, DELETE, KEEP, DELETE);
+					edit(internal.wrk, b = getval(external.rules, VAL_PRIMARY), DELETE, KEEP, DELETE);
+					if (strcmp(sfstruse(internal.tmp), sfstruse(internal.wrk)))
 					{
-						Sfio_t*	op;
-						Sfio_t*	np;
-
-						op = sfstropen();
-						np = sfstropen();
-						edit(op, state.rules, DELETE, KEEP, DELETE);
-						edit(np, b = getval(external.rules, VAL_PRIMARY), DELETE, KEEP, DELETE);
-						if (strcmp(sfstruse(op), sfstruse(np)))
-						{
-							message((-2, "%s: base rules changed to %s", state.rules, b));
-							state.rules = b;
-							state.forceread = 1;
-							needrules = 1;
-						}
-						sfstrclose(np);
-						sfstrclose(op);
+						message((-2, "%s: base rules changed to %s", state.rules, b));
+						state.rules = b;
+						state.forceread = 1;
+						needrules = 1;
 					}
-					if (!needrules)
-						readrules();
 				}
 				if (!state.forceread)
 				{
@@ -226,20 +215,27 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 		s = 0;
 		if (*(t = getval(external.convert, VAL_PRIMARY)))
 		{
+			char*	u;
+			char*	v;
+			Sfio_t*	exp;
+
+			exp = sfstropen();
 			if (e = strchr(r->name, '/'))
 				e++;
 			else
 				e = r->name;
 			b = tokopen(t, 1);
-			while (t = tokread(b))
+			while ((t = tokread(b)) && (t = colonlist(exp, t, 0, ' ')))
 			{
-				n = strmatch(e, t);
+				u = tokopen(t, 0);
+				while ((v = tokread(u)) && !streq(e, v));
+				tokclose(u);
 				if (!(s = tokread(b)))
 				{
-					error(2, "%s: %s: no action for pattern", external.convert, t);
+					error(2, "%s: %s: no action for file", external.convert, t);
 					break;
 				}
-				if (n)
+				if (v)
 				{
 					s = getarg((e = t = strdup(s), &e), NiL);
 					break;
@@ -247,6 +243,7 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 				s = 0;
 			}
 			tokclose(b);
+			sfstrclose(exp);
 		}
 		if (s)
 		{
@@ -455,7 +452,8 @@ readfile(register char* file, int type, char* filter)
 				parse(rfp, NiL, file, 0);
 				sfclose(rfp);
 			}
-			else readfp(rfp, r, type);
+			else
+				readfp(rfp, r, type);
 			if (state.mam.dynamic || state.mam.regress)
 				mampop(state.mam.out, r, 0);
 			if ((type & COMP_BASE) && r->uname)

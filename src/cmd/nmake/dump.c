@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -204,7 +204,7 @@ listrule(const char* s, char* v, void* h)
 		if (r->dynamic & D_select1) sfputr(sp, "select1", ' ');
 		if (r->dynamic & D_source) sfputr(sp, "source", ' ');
 		if (r->dynamic & D_triggered) sfputr(sp, "triggered", ' ');
-		if ((r->property & (P_state|P_statevar)) == P_state) /* ignore */;
+		if ((r->property & (P_state|P_statevar)) == P_state) sfputr(sp, "state", -1);
 		else if (!(r->dynamic & D_bound)) sfputr(sp, "unbound", -1);
 		else switch (r->status)
 		{
@@ -519,17 +519,18 @@ dumpaction(Sfio_t* sp, const char* name, register char* action, register const c
 		}
 		if (state.mam.out)
 		{
-			if (s = call(makerule(external.mamaction), action))
-				action = s;
 			mamlabel = state.mam.label;
 			prefix = "exec";
-			if (!name) name = "-";
+			if (!name)
+				name = "-";
 			sep = " ";
 		}
 		else
 		{
-			while (isspace(*action)) action++;
-			if (!*action) return;
+			while (isspace(*action))
+				action++;
+			if (!*action)
+				return;
 			mamlabel = null;
 			prefix = "+";
 			name = null;
@@ -538,9 +539,11 @@ dumpaction(Sfio_t* sp, const char* name, register char* action, register const c
 	}
 	for (;;)
 	{
-		if (s = strchr(action, '\n')) *s = 0;
+		if (s = strchr(action, '\n'))
+			*s = 0;
 		sfprintf(sp, "%s%s %s%s%s\n", mamlabel, prefix, name, sep, action);
-		if (!s) break;
+		if (!s)
+			break;
 		*s++ = '\n';
 		action = s;
 	}

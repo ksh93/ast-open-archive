@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-04-15 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-07-17 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -66,7 +66,7 @@
 	I| \# include "%"|A.LCL.INCLUDE|$(prefixinclude:/0//:?M$$$(.PREFIX.INCLUDE.)|??)
 	I| \# pragma library "%"|A.VIRTUAL|A.ACCEPT|M.LIBRARY.$$(%)|
 
-$("$(.SUFFIX.c) $(.SUFFIX.C) .S":/^/.ATTRIBUTE.%/) : .SCAN.c
+$("$(.SUFFIX.c) $(.SUFFIX.C) .h .S":/^/.ATTRIBUTE.%/) : .SCAN.c
 
 .SCAN.f : .SCAN
 	I| include '%'|
@@ -124,6 +124,7 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 	O|S|
 	Q|#||\\|LCW|
 	Q|'|'||Q|
+	Q|$'|'|\\|Q|
 	Q|\\|||QS|
 
 .ATTRIBUTE.%.sh : .SCAN.sh
@@ -150,26 +151,6 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 	I| $ include '%' |
 	I| $ include % |M$$(%:/;.*//)|
 
-/*
- * .fql used to be .F
- * if nobody complains about this change by 2004 then .fql is outta here
- */
-
-.BIND.%.SCAN.fql : .FUNCTION
-	if "$(%:N!=*.h)"
-		return $(%).h
-	end
-
-.SCAN.fql : .SCAN
-	$(@.SCAN.sql)
-	D| \# define %|
-	B| \# if|
-	E| \# endif|
-	I| \# include <%>|A.STD.INCLUDE|
-	I| \# include "%"|A.LCL.INCLUDE|M$$(.PREFIX.INCLUDE.)|
-	I| include '%'|
-	I| INCLUDE '%'|
-
 .SCAN.exec.sh : .SCAN
 	$(@.SCAN.sh)
 	I| : include@ % |OX|
@@ -178,45 +159,24 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 
 .ATTRIBUTE.features/%.sh : .SCAN.exec.sh
 
-.INCLUDE.cob : .FUNCTION
-	local F S T
-	F := $(%%:/ .*//:/\.$//)
+.INCLUDE.SUFFIX. : .FUNCTION
+	local F L S T
+	L := $(%:O=1)
+	F := $(%%:/ .*//:/\.$//:/'\(.*\)'/\1/)
 	if ! "$(F:S)"
-		for S $(.SUFFIX.HEADER.cob) $(<<:S)
+		for S $(.SUFFIX.HEADER.$(L)) $(<<:S)
 			T := $(F)$(S)
-			$(T) : .SCAN.cob
+			$(T) : .SCAN.$(L)
 			if "$(T:T=F)"
 				F := $(T)
 				break
 			end
 		end
 	end
-	$(F) : .SCAN.cob
-	if COBOLIPF && COBOLIPFCOPY && "$(F:B)" == "$(COBOLIPFCOPY)"
-		F += .COBOL.IPF
-	end
 	return $(F)
 
-.COBOL.MAIN : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
-	if COBOLMAIN && "$(<<<<:B:N=$(<<:B))"
-		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLMAIN)
-	end
-
-.COBOL.IPF : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
-	if COBOLIPF
-		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLIPF)
-	end
-
-.COBOL.SQL : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
-	if COBOLSQL
-		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLSQL)
-	end
-
 .SCAN.cob : .SCAN
-	I| \D COPY % |M$$(.INCLUDE.cob)|
-	T| \D EXEC SQL |M.COBOL.SQL|
-	T| \D INVOKE |M.COBOL.IPF|
-	S|M.COBOL.MAIN|
+	I| \D COPY % |M$$(.INCLUDE.SUFFIX. cob)|
 
 $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -67,7 +67,7 @@ initiate(Cs_t* state, const char* svc, char* cmd)
 	av[0] = cmd;
 	av[1] = (char*)svc;
 	av[2] = 0;
-	if ((pid = spawnve(av[0], av, environ)) == -1)
+	if ((pid = spawnveg(av[0], av, environ, 0)) == -1)
 	{
 		messagef((state->id, NiL, -1, "local: %s: cannot initiate %s", svc, cmd));
 		return -1;
@@ -141,7 +141,7 @@ cslocal(register Cs_t* state, const char* path)
 	for (;;)
 	{
 		p = pathcat(exe, p, ':', "../lib/cs/fdp", cmd);
-		if (!access(exe, X_OK) && !stat(exe, &st)) break;
+		if (!eaccess(exe, X_OK) && !stat(exe, &st)) break;
 		if (!p)
 		{
 			messagef((state->id, NiL, -1, "local: %s: %s: cannot locate service on ../lib/cs/fdp", path, cmd));

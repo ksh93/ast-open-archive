@@ -1,3 +1,12 @@
+04-07-26 3d.sh: update runtime docs
+	 3d.1: drop in deference to the 3d.sh runtime docs
+04-07-20 3d.h: undef _BLD_DEBUG to avoid raw libast symbols
+04-07-19 fs.c,lib.c,open3d.c,vcs_3d.h: { O_RDONLY O_WRONLY O_RDWR } are values
+04-07-19 dir3d.c: rewinddir643d() must call seekdir643d() (not seekdir64())
+04-07-01 3d.tst: TMP => TWD to match regress(1)
+04-06-16 3d.tst: coordinate $TMP with regress(1)
+04-06-14 lib.c: fix fs3d() 2d return value
+04-06-11 3d.tst: fix test and error counts
 04-05-04 open3d.c: create missing lower level dirs for O_CREAT ... file paths
 03-08-15 mount3d.c: change 3d intercept test to handle NiL || ""
 03-06-11 ast.c: add _map_malloc checks for _ast_malloc => malloc

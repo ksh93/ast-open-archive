@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -89,7 +89,7 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 							scanprereqs(sp, x, dostate, all, 0, sep, op);
 					}
 				}
-				else if (sp && (all || ((x->property & P_state) || x->scan || (y = staterule(PREREQS, x, NiL, 0)) && y->scan || !r->scan) && !(x->property & (P_ignore|P_use|P_virtual)) && (!(x->property & P_dontcare) || x->time)))
+				else if (sp && (all || ((x->property & P_state) || x->scan || (y = staterule(PREREQS, x, NiL, 0)) && y->scan || !r->scan) && !(x->property & (P_use|P_virtual)) && (!(x->property & P_ignore) || (x->property & P_parameter)) && (!(x->property & P_dontcare) || x->time)))
 				{
 					x->mark |= M_generate;
 					if (all || ((x->property & P_state) != 0) == dostate)
@@ -175,21 +175,19 @@ getval(register char* s, int op)
 
 		case '-':	/* option settings suitable for command line */
 		case '+':	/* option settings suitable for set */
-			if (*++s)
+			if (c = (*++s == var))
+				s++;
+			if (*s)
 			{
 				getop(internal.val, s, var != '-');
 				return sfstruse(internal.val);
 			}
 			if (state.mam.statix && (state.never || state.frame->target && !(state.frame->target->property & P_always)))
 				return "${NMAKEFLAGS}";
+			listops(internal.val, -c);
 			if (var == '-')
-			{
-				listops(internal.val, 0);
 				for (p = internal.preprocess->prereqs; p; p = p->next)
 					sfprintf(internal.val, " %s", p->rule->name);
-				return sfstruse(internal.val);
-			}
-			listops(internal.val, 0);
 			return sfstruse(internal.val);
 
 		case '=':	/* command line script args and export vars */
@@ -562,17 +560,14 @@ setvar(char* s, char* v, int flags)
 	 * the name determines the variable type
 	 */
 
-	t = s;
-	if (istype(*s, C_ID1))
-		while (istype(*++t, C_ID1|C_ID2));
-	else if (isstatevar(s))
+	n = nametype(s, NiL);
+	if (n & NAME_statevar)
 	{
 		bindstate(makerule(s), v);
 		return 0;
 	}
-	else if (!istype(*s, C_VARIABLE1|C_ID1|C_ID2) && *s != '(')
+	if (!(isid = !!(n & NAME_identifier)) && !(n & (NAME_variable|NAME_intvar)) && !istype(*s, C_VARIABLE1|C_ID1|C_ID2) && *s != '(')
 		error(2, "%s: invalid variable name", s);
-	isid = (t > s && *t == 0);
 
 	/*
 	 * check for a previous definition
@@ -607,7 +602,7 @@ setvar(char* s, char* v, int flags)
 		p = auxiliary(s, 1);
 	}
 	p->property |= flags & (V_builtin|V_functional);
-	if (state.user || state.readonly || !(p->property & V_readonly) && (!(p->property & V_import) || state.global != 1 || (flags & V_import) || state.base && !state.init))
+	if (state.user || state.readonly || !(p->property & V_readonly) && (!(p->property & V_import) || state.global != 1 || state.import || (flags & V_import) || state.base && !state.init))
 	{
 		if (flags & V_import)
 		{
@@ -698,8 +693,8 @@ setvar(char* s, char* v, int flags)
 	}
 	if (!p->value)
 	{
-		p->value = null;
-		p->property |= V_import;
+		p->value = strdup(null);
+		p->property |= V_free;
 	}
 	return p;
 }
@@ -710,14 +705,17 @@ setvar(char* s, char* v, int flags)
  */
 
 char*
-colonlist(register Sfio_t* sp, register char* s, register int del)
+colonlist(register Sfio_t* sp, register char* s, int exp, register int del)
 {
 	register char*	p;
 	struct var*	v;
 
-	if (!(v = getvar(s)))
-		return 0;
-	s = v->value;
+	if (exp)
+	{
+		if (!(v = getvar(s)))
+			return 0;
+		s = v->value;
+	}
 	expand(sp, s);
 	for (p = sfstruse(sp); isspace(*p); p++);
 	if (!*(s = p))
@@ -748,7 +746,7 @@ localvar(Sfio_t* sp, register struct var* v, char* value, int property)
 	struct var*	x;
 
 	prefix = (property & V_local_D) ? null : "_";
-	if (!(v->property & property) || !sp)
+	if (state.mam.out && (!(v->property & property) || !sp))
 	{
 		v->property |= property;
 		sfprintf(state.mam.out, "%ssetv %s%s ", state.mam.label, prefix, v->name);

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2003 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -210,21 +210,21 @@ main(int argc, char** argv)
 				sfprintf(sfstdout, "[%d] ", loop);
 			if (n == '?')
 			{
-				sfprintf(sfstdout, "return=%c option=%s name=%s num=%I*d%s\n", n, opt_info.option, opt_info.name, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
+				sfprintf(sfstdout, "return=%c option=%s name=%s num=%I*d\n", n, opt_info.option, opt_info.name, sizeof(opt_info.number), opt_info.number);
 				error(ERROR_USAGE|4, "%s", opt_info.arg);
 			}
 			else if (n == ':')
 			{
-				sfprintf(sfstdout, "return=%c option=%s name=%s num=%I*d%s", n, opt_info.option, opt_info.name, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
+				sfprintf(sfstdout, "return=%c option=%s name=%s num=%I*d", n, opt_info.option, opt_info.name, sizeof(opt_info.number), opt_info.number);
 				if (!opt_info.option[0])
 					sfprintf(sfstdout, " str=%s", argv[opt_info.index - 1]);
 				sfputc(sfstdout, '\n');
 				error(2, "%s", opt_info.arg);
 			}
 			else if (n > 0)
-				sfprintf(sfstdout, "return=%c option=%s name=%s arg%-.1s=%s num=%I*d%s\n", n, opt_info.option, opt_info.name, &opt_info.assignment, opt_info.arg, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
+				sfprintf(sfstdout, "return=%c option=%s name=%s arg%-.1s=%s num=%I*d\n", n, opt_info.option, opt_info.name, &opt_info.assignment, opt_info.arg, sizeof(opt_info.number), opt_info.number);
 			else
-				sfprintf(sfstdout, "return=%d option=%s name=%s arg%-.1s=%s num=%I*d%s\n", n, opt_info.option, opt_info.name, &opt_info.assignment, opt_info.arg, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
+				sfprintf(sfstdout, "return=%d option=%s name=%s arg%-.1s=%s num=%I*d\n", n, opt_info.option, opt_info.name, &opt_info.assignment, opt_info.arg, sizeof(opt_info.number), opt_info.number);
 			if (extra)
 			{
 				for (n = 0; n < ext; n += 2)

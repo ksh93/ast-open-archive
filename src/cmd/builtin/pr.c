@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pr (AT&T Labs Research) 2000-01-06 $\n]"
+"[-?\n@(#)$Id: pr (AT&T Labs Research) 2004-07-01 $\n]"
 USAGE_LICENSE
 "[+NAME?pr - print files]"
 "[+DESCRIPTION?\bpr\b formats and prints files to the standard output."
@@ -78,17 +78,18 @@ USAGE_LICENSE
 
 #include	<cmd.h>
 #include	<ctype.h>
+#include	<ccode.h>
 #include	<ls.h>
 #include	<tm.h>
 
-#define	A_FLAG	1
-#define	D_FLAG	2
-#define	F_FLAG	4
-#define	M_FLAG	8
-#define	R_FLAG	16
-#define	T_FLAG	32
-#define	P_FLAG	64
-#define	X_FLAG	128
+#define	A_FLAG	0x0001
+#define	D_FLAG	0x0002
+#define	F_FLAG	0x0004
+#define	M_FLAG	0x0008
+#define	R_FLAG	0x0010
+#define	T_FLAG	0x0020
+#define	P_FLAG	0x0040
+#define	X_FLAG	0x0080
 
 #define S_NL	1
 #define S_TAB	2
@@ -104,6 +105,7 @@ USAGE_LICENSE
 
 typedef struct _pr_
 {
+	Sfdisc_t disc; /* first! */
 	char	state[1<<CHAR_BIT];
 	Sfio_t	*outfile;
 	Sfio_t	*infile;
@@ -133,6 +135,15 @@ typedef struct _pr_
 	char	*margin;
 	char	*filename;
 	char	*date;
+	struct
+	{
+	Sfdisc_t*disc;
+	char	*buf;
+	char	*cur;
+	char	*end;
+	size_t	siz;
+	unsigned char *map;
+	}	control;
 } Pr_t;
 
 /*
@@ -533,6 +544,110 @@ static int prcol(register Pr_t *pp)
 	return r;
 }
 
+static ssize_t
+c_read(Sfio_t* fp, void* buf, size_t n, Sfdisc_t* dp)
+{
+	register Pr_t*	pp = (Pr_t*)dp;
+	register char*	s = (char*)buf;
+	register char*	e = s + n;
+	register int	c;
+	ssize_t		z;
+
+	static char	hat[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
+
+	if (pp->control.cur >= pp->control.end)
+	{
+		if (n > pp->control.siz)
+		{
+			pp->control.siz = roundof(n, 1024);
+			if (!(pp->control.buf = newof(pp->control.buf, char, pp->control.siz, 0)))
+				error(ERROR_exit(1), "out of space");
+		}
+		if ((z = sfrd(fp, pp->control.buf, n, dp)) <= 0)
+			return z;
+		pp->control.cur = pp->control.buf;
+		pp->control.end = pp->control.buf + z;
+	}
+	while (pp->control.cur < pp->control.end && s < e)
+	{
+		if ((c = mbsize(pp->control.cur)) > 1)
+		{
+			if (c > (e - s))
+				break;
+			while (c--)
+				*s++ = *pp->control.cur++;
+		}
+		else
+		{
+			c = ccmapchr(pp->control.map, *pp->control.cur);
+			if (c > 040 || c == 011 || c == 012)
+				*s++ = *pp->control.cur++;
+			else if ((e - s) < 2)
+				break;
+			else
+			{
+				pp->control.cur++;
+				*s++ = '^';
+				*s++ = hat[c];
+			}
+		}
+	}
+	return s - (char*)buf;
+}
+
+static ssize_t
+v_read(Sfio_t* fp, void* buf, size_t n, Sfdisc_t* dp)
+{
+	register Pr_t*	pp = (Pr_t*)dp;
+	register char*	s = (char*)buf;
+	register char*	e = s + n;
+	register char*	t;
+	register int	c;
+	ssize_t		z;
+
+	if (pp->control.cur >= pp->control.end)
+	{
+		if (n > pp->control.siz)
+		{
+			pp->control.siz = roundof(n, 1024);
+			if (!(pp->control.buf = newof(pp->control.buf, char, pp->control.siz, 0)))
+				error(ERROR_exit(1), "out of space");
+		}
+		if ((z = sfrd(fp, pp->control.buf, n, dp)) <= 0)
+			return z;
+		pp->control.cur = pp->control.buf;
+		pp->control.end = pp->control.buf + z;
+	}
+	while (pp->control.cur < pp->control.end && s < e)
+	{
+		if ((c = mbsize(pp->control.cur)) > 1)
+		{
+			if (c > (e - s))
+				break;
+			while (c--)
+				*s++ = *pp->control.cur++;
+		}
+		else
+		{
+			c = *pp->control.cur++;
+			if ((iscntrl(c) || !isprint(c)) && c != '\t' && c != '\n' || c == '\\')
+			{
+				t = fmtquote(pp->control.cur - 1, NiL, NiL, 1, 0);
+				if (strlen(t) > (e - s))
+				{
+					pp->control.cur--;
+					break;
+				}
+				while (*s = *t++)
+					s++;
+			}
+			else
+				*s++ = c;
+		}
+	}
+	return s - (char*)buf;
+}
+
 int
 b_pr(int argc, char **argv, void* context)
 {
@@ -552,6 +667,11 @@ b_pr(int argc, char **argv, void* context)
 			break;
 		case 'a':
 			pp->flags |= A_FLAG;
+			continue;
+		case 'c':
+			pp->control.disc = &pp->disc;
+			pp->control.disc->readf = c_read;
+			pp->control.map = ccmap(CC_NATIVE, CC_ASCII);
 			continue;
 		case 'd':
 			pp->flags |= D_FLAG;
@@ -650,17 +770,22 @@ b_pr(int argc, char **argv, void* context)
 			else
 				pp->schar = '\t';
 			continue;
+		case 'v':
+			pp->control.disc = &pp->disc;
+			pp->control.disc->readf = v_read;
+			continue;
 		case 'X':
 			pp->flags |= X_FLAG;
 			continue;
 		case ':':
 			error(2, "%s", opt_info.arg);
 			break;
-		default:
-			/*FALLTHROUGH*/
 		case '?':
 			error(ERROR_usage(2), "%s", opt_info.arg);
 			break;
+		default:
+			error(2, "-%c: not implemented", n);
+			continue;
 		}
 		break;
 	}
@@ -752,6 +877,8 @@ b_pr(int argc, char **argv, void* context)
 			error_info.errors = 1;
 			continue;
 		}
+		if (pp->control.disc && !sfdisc(fp, pp->control.disc))
+			error(2, "cannot push control character discipline");
 		if(pp->streams)
 			pp->streams[n++] = fp;
 		else

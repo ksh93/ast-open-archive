@@ -1,9 +1,9 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,12 +35,14 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make codex
 make libcodex.a archive
 make codex.req
 exec - set -
-exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
+exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
@@ -68,258 +70,270 @@ exec - rm -f 1.${COTEMP}.*
 done codex.req generated
 make codex.o
 make codex.c
-make ../../../include/ast/namval.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/namval.h
+make ${INSTALLROOT}/include/ast/namval.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/namval.h
 make codex.h implicit
 make codexlib.h implicit
 done codexlib.h dontcare
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h dontcare
-prev ../../../include/ast/ast.h implicit
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done codex.h
-make ../../../include/ast/sfio_t.h implicit
-prev ../../../include/ast/sfio.h implicit
-done ../../../include/ast/sfio_t.h
+make ${INSTALLROOT}/include/ast/sfio_t.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+done ${INSTALLROOT}/include/ast/sfio_t.h
 done codex.c
+meta codex.o %.c>%.o codex.c codex
 prev codex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codex.c
 done codex.o generated
 make codexdata.o
 make codexdata.c
 prev codex.h implicit
 done codexdata.c
+meta codexdata.o %.c>%.o codexdata.c codexdata
 prev codexdata.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexdata.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexdata.c
 done codexdata.o generated
 make codexid.o
 make codexid.c
 prev codex.h implicit
 done codexid.c
+meta codexid.o %.c>%.o codexid.c codexid
 prev codexid.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexid.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexid.c
 done codexid.o generated
 make codexlist.o
 make codexlist.c
-prev ../../../include/ast/error.h implicit
-make ../../../include/ast/debug.h implicit
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/debug.h
-make ../../../include/ast/dlldefs.h implicit
-done ../../../include/ast/dlldefs.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/debug.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/debug.h
+make ${INSTALLROOT}/include/ast/dlldefs.h implicit
+done ${INSTALLROOT}/include/ast/dlldefs.h
 prev codex.h implicit
 done codexlist.c
+meta codexlist.o %.c>%.o codexlist.c codexlist
 prev codexlist.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexlist.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_codex -c codexlist.c
 done codexlist.o generated
 make codexcmp.o
 make codexcmp.c
 prev codex.h implicit
 done codexcmp.c
+meta codexcmp.o %.c>%.o codexcmp.c codexcmp
 prev codexcmp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexcmp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexcmp.c
 done codexcmp.o generated
 make codexmeth.o
 make codexmeth.c
-prev ../../../include/ast/dlldefs.h implicit
+prev ${INSTALLROOT}/include/ast/dlldefs.h implicit
 prev codex.h implicit
 done codexmeth.c
+meta codexmeth.o %.c>%.o codexmeth.c codexmeth
 prev codexmeth.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexmeth.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexmeth.c
 done codexmeth.o generated
 make codexadd.o
 make codexadd.c
 prev codex.h implicit
 done codexadd.c
+meta codexadd.o %.c>%.o codexadd.c codexadd
 prev codexadd.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexadd.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexadd.c
 done codexadd.o generated
 make codexnull.o
 make codexnull.c
 prev codex.h implicit
-prev ../../../include/ast/sfio_t.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_t.h implicit
 done codexnull.c
+meta codexnull.o %.c>%.o codexnull.c codexnull
 prev codexnull.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexnull.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexnull.c
 done codexnull.o generated
 make codexgetpass.o
 make codexgetpass.c
-make ../../../include/ast/ast_tty.h implicit
-done ../../../include/ast/ast_tty.h
-make ../../../include/ast/sig.h implicit
-done ../../../include/ast/sig.h
+make ${INSTALLROOT}/include/ast/ast_tty.h implicit
+done ${INSTALLROOT}/include/ast/ast_tty.h
+make ${INSTALLROOT}/include/ast/sig.h implicit
+done ${INSTALLROOT}/include/ast/sig.h
 prev codex.h implicit
 done codexgetpass.c
+meta codexgetpass.o %.c>%.o codexgetpass.c codexgetpass
 prev codexgetpass.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexgetpass.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexgetpass.c
 done codexgetpass.o generated
 make codexpass.o
 make codexpass.c
 prev codex.h implicit
 done codexpass.c
+meta codexpass.o %.c>%.o codexpass.c codexpass
 prev codexpass.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexpass.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexpass.c
 done codexpass.o generated
 make codexsize.o
 make codexsize.c
 prev codex.h implicit
 done codexsize.c
+meta codexsize.o %.c>%.o codexsize.c codexsize
 prev codexsize.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c codexsize.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c codexsize.c
 done codexsize.o generated
 make code-rot13.o
 make code-rot13.c
 prev codex.h implicit
 done code-rot13.c
+meta code-rot13.o %.c>%.o code-rot13.c code-rot13
 prev code-rot13.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c code-rot13.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c code-rot13.c
 done code-rot13.o generated
 make code-qp.o
 make code-qp.c
 prev codex.h implicit
 done code-qp.c
+meta code-qp.o %.c>%.o code-qp.c code-qp
 prev code-qp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c code-qp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c code-qp.c
 done code-qp.o generated
 make code-uu.o
 make code-uu.c
 prev codex.h implicit
 done code-uu.c
+meta code-uu.o %.c>%.o code-uu.c code-uu
 prev code-uu.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c code-uu.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c code-uu.c
 done code-uu.o generated
 make code-iconv.o
 make code-iconv.c
-make ../../../include/ast/iconv.h implicit
-make ../../../include/ast/ast_iconv.h implicit
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_iconv.h
-done ../../../include/ast/iconv.h
+make ${INSTALLROOT}/include/ast/iconv.h implicit
+make ${INSTALLROOT}/include/ast/ast_iconv.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_iconv.h
+done ${INSTALLROOT}/include/ast/iconv.h
 prev codex.h implicit
 done code-iconv.c
+meta code-iconv.o %.c>%.o code-iconv.c code-iconv
 prev code-iconv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_codex -D_PACKAGE_ast -c code-iconv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c code-iconv.c
 done code-iconv.o generated
 exec - ${AR} cr libcodex.a codex.o codexdata.o codexid.o codexlist.o codexcmp.o codexmeth.o codexadd.o codexnull.o codexgetpass.o codexpass.o codexsize.o code-rot13.o code-qp.o code-uu.o code-iconv.o
 exec - (ranlib libcodex.a) >/dev/null 2>&1 || true
 done libcodex.a generated
 done codex virtual
 prev libcodex.a archive
-make ../../../lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
+make ${INSTALLROOT}/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib
 exec - fi
-done ../../../lib generated
-make ../../../lib/libcodex.a archive
-prev ../../../lib
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libcodex.a archive
+prev ${INSTALLROOT}/lib
 prev libcodex.a archive
-exec - test '' = 'libcodex.a' || ${STDCMP} 2>/dev/null -s libcodex.a ${PACKAGE_ast_LIB}/libcodex.a || { ${STDMV} ${PACKAGE_ast_LIB}/libcodex.a ${PACKAGE_ast_LIB}/libcodex.a.old 2>/dev/null || true; ${STDCP} libcodex.a ${PACKAGE_ast_LIB}/libcodex.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libcodex.a) >/dev/null 2>&1 || true
-done ../../../lib/libcodex.a generated
-make ../../../lib/lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
+exec - test '' = 'libcodex.a' || ${STDCMP} 2>/dev/null -s libcodex.a ${INSTALLROOT}/lib/libcodex.a || { ${STDMV} ${INSTALLROOT}/lib/libcodex.a ${INSTALLROOT}/lib/libcodex.a.old 2>/dev/null || true; ${STDCP} libcodex.a ${INSTALLROOT}/lib/libcodex.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libcodex.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libcodex.a generated
+make ${INSTALLROOT}/lib/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
-done ../../../lib/lib generated
-make ../../../lib/lib/codex
-prev ../../../lib/lib
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/codex
+prev ${INSTALLROOT}/lib/lib
 prev codex.req
-exec - test '' = 'codex.req' || ${STDCMP} 2>/dev/null -s codex.req ${PACKAGE_ast_LIB}/lib/codex || { ${STDMV} ${PACKAGE_ast_LIB}/lib/codex ${PACKAGE_ast_LIB}/lib/codex.old 2>/dev/null || true; ${STDCP} codex.req ${PACKAGE_ast_LIB}/lib/codex  		    		    ;}
-done ../../../lib/lib/codex generated
-make ../../../include/ast
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
+exec - test '' = 'codex.req' || ${STDCMP} 2>/dev/null -s codex.req ${INSTALLROOT}/lib/lib/codex || { ${STDMV} ${INSTALLROOT}/lib/lib/codex ${INSTALLROOT}/lib/lib/codex.old 2>/dev/null || true; ${STDCP} codex.req ${INSTALLROOT}/lib/lib/codex  		    		    ;}
+done ${INSTALLROOT}/lib/lib/codex generated
+make ${INSTALLROOT}/include/ast
+exec - if	silent test ! -d ${INSTALLROOT}/include/ast
+exec - then	mkdir -p ${INSTALLROOT}/include/ast
 exec - fi
-done ../../../include/ast generated
-make ../../../include/ast/codex.h
-prev ../../../include/ast
+done ${INSTALLROOT}/include/ast generated
+make ${INSTALLROOT}/include/ast/codex.h
+prev ${INSTALLROOT}/include/ast
 prev codex.h
-exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=2003,author=gsf+dgk+kpv'  codex.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/codex.h 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=gsf+dgk+kpv'  codex.h > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/codex.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/codex.h
+exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/codex.h
 exec - fi
-done ../../../include/ast/codex.h generated
+done ${INSTALLROOT}/include/ast/codex.h generated
 done install virtual
 make test
 done test dontcare virtual

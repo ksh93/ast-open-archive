@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -270,7 +270,7 @@ fscall(register Mount_t* mp, long call, int ret, ...)
 				va_arg(ap, const char*);
 				n = va_arg(ap, int);
 				va_end(ap);
-				if (!(n & (O_RDWR|O_WRONLY)))
+				if ((n & O_ACCMODE) == O_RDONLY)
 					goto nope;
 			}
 		}
@@ -312,7 +312,9 @@ fscall(register Mount_t* mp, long call, int ret, ...)
 				oerrno = errno;
 				goto unlock;
 			}
-			if (((n & (O_WRONLY|O_RDWR)) == 0) != ((oflag & (O_WRONLY|O_RDWR)) == 0))
+			n &= O_ACCMODE;
+			oflag &= O_ACCMODE;
+			if (n == O_RDONLY && oflag == O_WRONLY || n == O_WRONLY && oflag == O_RDONLY)
 			{
 				oerrno = EPERM;
 				goto unlock;
@@ -370,7 +372,8 @@ fscall(register Mount_t* mp, long call, int ret, ...)
 		}
 		goto unlock;
 	}
-	else rp = 0;
+	else
+		rp = 0;
 	if (fs->flags & FS_NAME)
 	{
 		if (up && fs != &state.fs[FS_fd])

@@ -1,5 +1,11 @@
 :PACKAGE: ast cpp:force
 
+if CC.HOSTTYPE == "linux.alpha"
+	/* workaround for "BUG IN DYNAMIC LINKER ld.so" */
+	:PACKAGE: :static
+	CCLDFLAGS += $(CC.STATIC)
+end
+
 LICENSE = since=1984,author=gsf
 
 include "Version.mk"
@@ -22,8 +28,7 @@ STAMP == "\n@(#)\$Id: $(ID) ($(OWNER)) $(VERSION:?$$(VERSION) ??)$(RELEASE:?$$(R
 
 clobber = !(nmake)
 
-nmake :: FEATURES HISTORY README RELEASE REFERENCES \
-	PROMO.mm make-intro.0 nmake.1 nmake.8 Version.mk \
+nmake :: make-intro.0 nmake.1 nmake.8 Version.mk \
 	$(RULES) $(RULES:B:S=.1:N=*rules.1:F=%(lower)s) $(RULESFILES) \
 	make.h expand.h options.h \
 	archive.c bind.c command.c dump.c expand.c main.c make.c \
@@ -31,19 +36,25 @@ nmake :: FEATURES HISTORY README RELEASE REFERENCES \
 	rule.c scan.c state.c trap.c variable.c version.c \
 	-lcoshell -lardir
 
-"win32*" :NOOPTIMIZE: expand.c object.c
+"win32*" :NOOPTIMIZE: expand.c object.c parse.c
 
 $(RULESDIR) :INSTALLDIR: Makeinstall.mk $(RULES) $(RULESFILES) ppcc
 
+:: nmake.mm PROMO.mm FEATURES HISTORY README RELEASE REFERENCES
+
 ppcc :: ppcc.sh
 
-:INSTALLDIR: convert maketest
+:: SCCS.mk
+
+:INSTALLDIR: convert
 
 convert :: convert.c
 
-maketest :: maketest.sh
+.SOURCE : tests
 
-:TEST: nmake
+:TEST: -- assert assign attribute automatic baserules common diagnostics \
+	edit immediate implicit internal interrupt metarule option panic \
+	prereq quoting scan shell state statement syntax view
 
 Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 	{

@@ -14,6 +14,14 @@ function DATA
 			do	print $i:$x$x$x$x$x$x$x$x$x$x
 			done
 			;;
+		dem.dat)for ((i = 512; i >= 0; i--))
+			do	print $i
+			done
+			;;
+		med.dat)for ((i = 0; i <= 512; i++))
+			do	print $i
+			done
+			;;
 		esac > $f
 	done
 }
@@ -117,12 +125,18 @@ TEST 04 'global commands'
 		OUTPUT - $'35\n35'
 
 TEST 05 '{ t } commands'
+	DO	DATA med.dat dem.dat
 	EXEC file
 		NOTE 'copy'
 		INPUT file $'1\n2\n3\n4'
 		INPUT - $'-2\n.t.\nw\nq'
 		OUTPUT file $'1\n2\n2\n3\n4'
 		OUTPUT - $'8\n2\n10'
+	EXEC med.dat
+		NOTE 'copy reverse'
+		INPUT - $'g/./.t0\n514,$d\nw file\nq'
+		SAME file dem.dat
+		OUTPUT - $'1942\n1942'
 
 TEST 06 '! command'
 	EXEC -h file

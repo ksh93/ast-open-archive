@@ -15,14 +15,13 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
 #                                                                  #
 ####################################################################
 : convert MAM dependency info to dot input
-
 COMMAND=mamdot
 case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
@@ -54,36 +53,53 @@ usage()
 	exit 2
 }
 
-ignore=
+integer level=0
+typeset -A pwd top
+typeset ignore= tree="@(make|done|prev)"
+
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
-	i)	ignore=$OPT
+	i)	[[ $ignore ]] && ignore="$ignore|"
+		ignore=$ignore$OPTARG
 		;;
 	*)	usage
 		;;
 	esac
 done
+[[ $ignore ]] && ignore="@($ignore)"
 
-integer level=0
 list[0]=all
+top[0]=1
 print "digraph mam {"
 print "rankdir = LR"
 print "node [ shape = box ]"
-while read -r label op arg junk
-do	[[ $arg == */* || $op != @(make|prev|done) ]] || {
-		[[ $op == make ]] && print "\"$label::$arg\" [ label = \"$arg\" ]"
+while read -r label op arg arg2 arg3 args
+do	[[ $label == [[:digit:]]* ]] || {
+		arg3=$args
+		arg2=$arg
+		arg=$op
+		op=$label
+		label=0
+	}
+	rule=$arg
+	[[ ${top[$label]} || $arg == */* || $op != $tree ]] || {
 		arg=$label::$arg
+		[[ $op == make ]] && print "\"$arg\" [ label = \"$rule\" ]"
 	}
 	case $op in
-	make)	[[ $arg == $ignore ]] || list[level]=${list[level]}$'\n'\"$arg\"
+	make)	[[ $rule == $ignore ]] || list[level]=${list[level]}$'\n'\"$arg\"
 		level=level+1
 		list[level]=
 		;;
-	prev)	[[ $arg == $ignore ]] || list[level]=${list[level]}$'\n'\"$arg\"
+	prev)	[[ $rule == $ignore ]] || list[level]=${list[level]}$'\n'\"$arg\"
 		;;
-	done)	[[ ${list[level]} ]] && [[ $arg != $ignore ]] &&
+	done)	[[ $rule == $ignore || ! ${list[level]} ]] ||
 			print "\"$arg\" -> {${list[level]} }"
 		level=level-1
+		;;
+	info)	case $arg in
+		pwd)	[[ $arg3 == "." ]] && top[$label]=1 ;;
+		esac
 		;;
 	esac
 done

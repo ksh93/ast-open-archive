@@ -32,10 +32,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2003-10-17 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2004-05-31 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
+#else
+#include <sys/types.h>
 #endif
 
 #include <stdio.h>
@@ -818,11 +820,11 @@ matchoffprint(int off)
 }
 
 static void
-matchprint(regmatch_t* match, int nmatch, char* ans, unsigned long test)
+matchprint(regmatch_t* match, int nmatch, int nsub, char* ans, unsigned long test)
 {
 	int	i;
 
-	for (; nmatch > 0; nmatch--)
+	for (; nmatch > nsub + 1; nmatch--)
 		if ((match[nmatch-1].rm_so != -1 || match[nmatch-1].rm_eo != -1) && (!(test & TEST_IGNORE_POSITION) || match[nmatch-1].rm_so >= 0 && match[nmatch-1].rm_eo >= 0))
 			break;
 	for (i = 0; i < nmatch; i++)
@@ -842,7 +844,7 @@ matchprint(regmatch_t* match, int nmatch, char* ans, unsigned long test)
 }
 
 static int
-matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len, int flags, unsigned long test)
+matchcheck(regmatch_t* match, int nmatch, int nsub, char* ans, char* re, char* s, int len, int flags, unsigned long test)
 {
 	char*	p;
 	int	i;
@@ -897,7 +899,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 			if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY)))
 			{
 				report("failed: match was", NiL, re, s, len, NiL, flags, test);
-				matchprint(match, nmatch, ans, test);
+				matchprint(match, nmatch, nsub, ans, test);
 			}
 			return 0;
 		}
@@ -916,7 +918,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 				if (!(test & TEST_SUMMARY))
 				{
 					report("failed: match was", NiL, re, s, len, NiL, flags, test);
-					matchprint(match, nmatch, ans, test);
+					matchprint(match, nmatch, nsub, ans, test);
 				}
 			}
 			return 0;
@@ -927,7 +929,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 		if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY)))
 		{
 			report("failed: overran match array", NiL, re, s, len, NiL, flags, test);
-			matchprint(match, nmatch + 1, NiL, test);
+			matchprint(match, nmatch + 1, nsub, NiL, test);
 		}
 		return 0;
 	}
@@ -1023,7 +1025,7 @@ note(unsigned long level, char* msg, unsigned long skip, unsigned long test)
 static char		ts[] = "\t\t\t\t\t\t\t";
 
 static unsigned long
-extract(int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* accept, regmatch_t* match, int nmatch, unsigned long skip, unsigned long level, unsigned long test)
+extract(int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* accept, regmatch_t* match, int nmatch, int nsub, unsigned long skip, unsigned long level, unsigned long test)
 {
 	if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_OK|TEST_PASS|TEST_SUMMARY))
 	{
@@ -1070,7 +1072,7 @@ extract(int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* ac
 		else if (accept)
 			printf("%s", accept);
 		else
-			matchprint(match, nmatch, NiL, test);
+			matchprint(match, nmatch, nsub, NiL, test);
 		if (msg)
 			printf("%s%s", TABS(*tabs++), msg);
 		putchar('\n');
@@ -1083,7 +1085,7 @@ extract(int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* ac
 }
 
 static int
-catchfree(regex_t* preg, int flags, int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* accept, regmatch_t* match, int nmatch, unsigned long skip, unsigned long level, unsigned long test)
+catchfree(regex_t* preg, int flags, int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* accept, regmatch_t* match, int nmatch, int nsub, unsigned long skip, unsigned long level, unsigned long test)
 {
 	int	eret;
 
@@ -1099,7 +1101,7 @@ catchfree(regex_t* preg, int flags, int* tabs, char* spec, char* re, char* s, ch
 		alarm(0);
 	}
 	else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-		extract(tabs, spec, re, s, ans, msg, NiL, NiL, 0, skip, level, test);
+		extract(tabs, spec, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
 	else
 	{
 		report("failed", "regfree", re, NiL, -1, msg, flags, test);
@@ -1723,7 +1725,7 @@ main(int argc, char** argv)
 #endif
 		{
 			if (test & (TEST_BASELINE|TEST_PASS|TEST_VERIFY))
-				extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, skip, level, test|TEST_OK);
+				extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test|TEST_OK);
 			continue;
 		}
 		if ((test & (TEST_QUERY|TEST_VERBOSE|TEST_VERIFY)) == TEST_VERBOSE)
@@ -1778,7 +1780,7 @@ main(int argc, char** argv)
 			}
 			if (!cret && *(p += preg.re_npat) && !(preg.re_sub->re_flags & REG_SUB_LAST))
 			{
-				if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, skip, level, test))
+				if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
 					continue;
 				cret = REG_EFLAGS;
 			}
@@ -1805,7 +1807,7 @@ main(int argc, char** argv)
 						if (nsub > preg.re_nsub)
 						{
 							if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-								skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, skip, level, test|TEST_DELIMIT);
+								skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
 							else
 							{
 								report("re_nsub incorrect", fun, re, NiL, -1, msg, flags, test);
@@ -1821,13 +1823,13 @@ main(int argc, char** argv)
 			if (!(test & TEST_SUB) && *ans && *ans != '(' && !streq(ans, "OK") && !streq(ans, "NOMATCH"))
 			{
 				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, skip, level, test|TEST_DELIMIT);
+					skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
 				else if (!(test & TEST_LENIENT))
 				{
 					report("failed", fun, re, NiL, -1, msg, flags, test);
 					printf("%s expected, OK returned\n", ans);
 				}
-				catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, skip, level, test);
+				catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
 				continue;
 			}
 		}
@@ -1842,7 +1844,7 @@ main(int argc, char** argv)
 					if (cret==codes[i].code)
 						got = i;
 				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, skip, level, test|TEST_DELIMIT);
+					skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
 				else
 				{
 					report("failed", fun, re, NiL, -1, msg, flags, test);
@@ -1863,7 +1865,7 @@ main(int argc, char** argv)
 				if (!expected)
 				{
 					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-						skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, skip, level, test|TEST_DELIMIT);
+						skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
 					else
 					{
 						report("failed: invalid error code", NiL, re, NiL, -1, msg, flags, test);
@@ -1873,7 +1875,7 @@ main(int argc, char** argv)
 				else if (cret != codes[expected].code && cret != REG_BADPAT)
 				{
 					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-						skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, skip, level, test|TEST_DELIMIT);
+						skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
 					else if (test & TEST_IGNORE_ERROR)
 						state.ignored++;
 					else
@@ -1939,7 +1941,7 @@ main(int argc, char** argv)
 				if (eret != REG_NOMATCH || !streq(ans, "NOMATCH"))
 				{
 					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-						skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, skip, level, test|TEST_DELIMIT);
+						skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
 					else
 					{
 						report("REG_NOSUB failed", fun, re, s, nstr, msg, flags, test);
@@ -1950,7 +1952,7 @@ main(int argc, char** argv)
 			else if (streq(ans, "NOMATCH"))
 			{
 				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, skip, level, test|TEST_DELIMIT);
+					skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_DELIMIT);
 				else
 				{
 					report("should fail and didn't", fun, re, s, nstr, msg, flags, test);
@@ -1963,7 +1965,7 @@ main(int argc, char** argv)
 			if (eret != REG_NOMATCH || !streq(ans, "NOMATCH"))
 			{
 				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, skip, level, test|TEST_DELIMIT);
+					skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, nsub, skip, level, test|TEST_DELIMIT);
 				else
 				{
 					report("failed", fun, re, s, nstr, msg, flags, test);
@@ -1979,11 +1981,11 @@ main(int argc, char** argv)
 		else if (streq(ans, "NOMATCH"))
 		{
 			if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-				skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, skip, level, test|TEST_DELIMIT);
+				skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_DELIMIT);
 			else
 			{
 				report("should fail and didn't", fun, re, s, nstr, msg, flags, test);
-				matchprint(match, nmatch, NiL, test);
+				matchprint(match, nmatch, nsub, NiL, test);
 			}
 		}
 #if _REG_subcomp
@@ -2005,15 +2007,15 @@ main(int argc, char** argv)
 			if (match[0].rm_so != state.NOMATCH.rm_so)
 			{
 				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, skip, level, test);
+					skip = extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
 				else
 				{
 					report("failed: no match but match array assigned", NiL, re, s, nstr, msg, flags, test);
-					matchprint(match, nmatch, NiL, test);
+					matchprint(match, nmatch, nsub, NiL, test);
 				}
 			}
 		}
-		else if (matchcheck(nmatch, match, ans, re, s, nstr, flags, test))
+		else if (matchcheck(match, nmatch, nsub, ans, re, s, nstr, flags, test))
 		{
 #if _REG_nexec
 			if (nexec < 0 && !nonexec)
@@ -2026,17 +2028,17 @@ main(int argc, char** argv)
 #endif
 			if (!(test & (TEST_SUB|TEST_VERIFY)) && !nonosub)
 			{
-				if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, skip, level, test))
+				if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
 					continue;
 				flags |= REG_NOSUB;
 				goto nosub;
 			}
 			if (test & (TEST_BASELINE|TEST_PASS|TEST_VERIFY))
-				skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, skip, level, test|TEST_OK);
+				skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_OK);
 		}
 		else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-			skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, skip, level, test|TEST_DELIMIT);
-		if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, skip, level, test))
+			skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_DELIMIT);
+		if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
 			continue;
 		goto compile;
 	}

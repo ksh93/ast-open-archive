@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -284,6 +284,7 @@ maketop(register struct rule* r, int p, char* arg)
 	unsigned long	t;
 	unsigned long	o;
 
+#if _HUH_2004_06_20
 	if ((p & (P_force|P_repeat)) == (P_force|P_repeat) && (r->property & (P_functional|P_make)) == P_make)
 	{
 		register struct rule*	a;
@@ -295,6 +296,7 @@ maketop(register struct rule* r, int p, char* arg)
 		a->prereqs = cons(r, NiL);
 		r = a;
 	}
+#endif
 	o = r->property & p;
 	r->property |= p;
 	if (p & P_ignore)
@@ -521,6 +523,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 		}
 		if ((r->property & P_dontcare) && !state.unwind)
 			state.unwind = error_info.indent;
+		otime = r->time;
 		if ((r1 = bind(r)) == r)
 			break;
 		if ((r->property & P_target) && !(r1->property & P_target))
@@ -546,7 +549,10 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 		for (p = r->prereqs->rule->prereqs; p; p = p->next)
 			if ((r1 = p->rule) != r)
 			{
+				fp = r1->active;
+				r1->active = r->active;
 				bind(r1);
+				r1->active = fp;
 				if (r1->status == NOTYET)
 				{
 					r0 = staterule(RULE, r1, NiL, 1);
@@ -568,7 +574,6 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 	state.frame = &frame;
 	if (r->dynamic & D_dynamic)
 		dynamic(r);
-	otime = r->time;
 	if (r->property & P_state)
 		while (r->active->prereqs && r->active->prereqs->next)
 			r->active->prereqs = r->active->prereqs->next;
@@ -605,9 +610,19 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 	must = 0;
 	tevent = 0;
 	if (r->property & P_state)
+	{
 		r0 = 0;
+		if (r->time != otime)
+		{
+			otime = r->time;
+			must = r->must = 1;
+			tevent = CURTIME;
+		}
+	}
 	else
 	{
+		otime = r->time;
+		must = 0;
 		r0 = staterule(RULE, r, NiL, 1);
 		if (!(r->property & P_virtual))
 		{
@@ -741,29 +756,46 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 				}
 				if (q && !(state.questionable & 0x00020000))
 				{
-					int	u = 0;
-					int	n = 0;
+					unsigned long	u = 0;
+					unsigned long	n = 0;
 
 					/*
 					 * mutually dependent requirements can
 					 * get us into a loop -- this limits
 					 * the total number to half the square
-					 * of the number of unique elements
+					 * of the number of unique non-virtual
+					 * prereqs
 					 */
 
 					for (q = r->prereqs; q; q = q->next)
-					{
-						n++;
-						if (!(q->rule->mark & M_mark))
+						if (!(q->rule->property & P_virtual))
 						{
-							q->rule->mark |= M_mark;
-							u++;
+							n++;
+							if (!(q->rule->mark & M_mark))
+							{
+								q->rule->mark |= M_mark;
+								u++;
+							}
 						}
+					if (u < 4)
+						u = 4;
+					if (n > (u * u) / 2)
+					{
+						for (q = r->prereqs; q; q = q->next)
+							if (!(q->rule->property & P_virtual) && (q->rule->mark & M_mark))
+								q->rule->mark &= ~(M_mark|M_generate);
+							else
+								q->rule->mark |= M_generate;
+						for (q = p; q; q = q->next)
+							if (!q->next || !(q->next->rule->mark & M_generate))
+							{
+								p = q;
+								message((-2, "require loop avoidance skips to %s [total=%lu uniqe=%lu]", q->next ? q->next->rule->name : "END", n, u));
+								break;
+							}
 					}
 					for (q = r->prereqs; q; q = q->next)
-						q->rule->mark &= ~M_mark;
-					if (n < (u * u) / 2)
-						continue;
+						q->rule->mark &= ~(M_mark|M_generate);
 				}
 			}
 		}
@@ -794,9 +826,9 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 				mam = state.mam.out;
 				pop = mampush(mam, r, flags);
 			}
-#if DEBUG
-			message((-9, "metarule=%s source=%s stem=%s", r4->name, r2->name, stem));
-#endif
+			if (mam)
+				sfprintf(mam, "%smeta %s %s %s %s\n", state.mam.label, mamname(r), r4->name, r2->name, stem);
+			debug((-9, "metarule=%s source=%s stem=%s", r4->name, r2->name, stem));
 			frame.stem = stem;
 
 			/*
@@ -854,7 +886,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 							x->property |= P_joint|P_target;
 							x->prereqs = cons(joint, x->prereqs);
 						}
-						joint->prereqs = cons(x, joint->prereqs);
+						joint->prereqs = append(joint->prereqs, cons(x, NiL));
 						if (x != r)
 						{
 							message((-1, "make(%s)", s));

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -490,11 +490,11 @@ main(int argc, char** argv)
 			if (suid < 0)
 			{
 				strcpy(base, ".");
-				if (access(path, 0))
+				if (access(path, F_OK))
 					for (s = path + (*path == '/'); s = strchr(s, '/'); *s++ = '/')
 					{
 						*s = 0;
-						if (access(path, 0) && mkdir(path, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH))
+						if (access(path, F_OK) && mkdir(path, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH))
 							error(ERROR_SYSTEM|3, "%s: cannot create directory", path);
 					}
 			}
@@ -587,14 +587,14 @@ main(int argc, char** argv)
 				sfsprintf(cmd, sizeof(cmd), "%-.*s%s", v - override, override, base);
 				if (!(options & KEY))
 				{
-					if (!access(cmd, 0))
+					if (!access(cmd, F_OK))
 						error(3, "%s: override already generated", cmd);
 					if (!(pf = sfopen(NiL, cmd, "w")))
 					{
 						for (s = cmd + (*cmd == '/'); s = strchr(s, '/'); *s++ = '/')
 						{
 							*s = 0;
-							if (access(cmd, 0) && mkdir(cmd, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH))
+							if (access(cmd, F_OK) && mkdir(cmd, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH))
 								error(ERROR_SYSTEM|3, "%s: cannot create override directory", cmd);
 						}
 						if (!(pf = sfopen(NiL, cmd, "w")))

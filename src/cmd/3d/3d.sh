@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1989-2003 AT&T Corp.                #
+#                Copyright (c) 1989-2004 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -15,7 +15,7 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
@@ -52,7 +52,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	(directory tree) obscure files in the lower level. Lower level files
 	have copy-on-write semantics to the top level. i.e., files in the lower
 	level are readonly; if a lower level file is modified it is first
-	copied to the top level before modification. Viewpath mounts
+	copied to the top level before modification. Viewpath mounted
 	directories can be chained. All levels but the top in a chain are
 	readonly. The traditional \bVPATH=\b\ad1:d2:d3\a viewpathing is
 	specified by the two \b3d\b mounts "\ad1 d2\a" and "\ad2 d3\a".]
@@ -141,7 +141,14 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	mangling.]
 [+?\b3d\b ignores calls not present in a particular host system. In addition,
 	\b3d\b only works on dynamically linked executables that have neither
-	set-uid nor set-gid permissions.]
+	set-uid nor set-gid permissions. It may not have the intended effect
+	on programs written in a language or linked with a language runtime
+	that hides or mangles system call library symbols, or that
+	directly emit system call instruction sequences rather than using
+	the corresponding library functions, or that dynamically link
+	libraries outside of the scope of the \b3d\b intercepts.]
+[+?Multi-process client-server applications may misbehave if the \b3d\b
+	environment between the related processes is not kept in sync.]
 
 [ command [ arg ... ] ]
 
@@ -154,12 +161,11 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	\bsgi.mips3\b that support multiple a.out formats may have multiple
 	versions of the \b3d\b dll. In all cases the \b3d\b script handles
 	the dll search.]
-[+EXAMPLES? ]{
-	[+\b$ 3d? ]
-	[+\b$ 3d $INSTALLROOT $PACKAGEROOT? ]
-	[+\b$ VPATH=$INSTALLROOT::$PACKAGEROOT 3d? ]
-	[+\b$ 3d ls -l? ]
-	[+\b$ 2d ls -l? ]
+[+EXAMPLES?]{
+	[+\b$ 3d]
+	[+\b$ VPATH=$INSTALLROOT::$PACKAGEROOT 3d]
+	[+\b$ 3d ls -l]
+	[+\b$ 2d ls -l]
 }
 [+SEE ALSO?\benv\b(1), \bie\b(1), \bsh\b(1), \btrace\b(1), \bwarp\b(1),
 	\bstat\b(2)]

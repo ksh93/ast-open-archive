@@ -1,4 +1,4 @@
-:PACKAGE: ast
+:PACKAGE: ast:static
 
 LICENSE = since=1998,author=gsf
 

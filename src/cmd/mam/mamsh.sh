@@ -15,7 +15,7 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
@@ -60,4 +60,4 @@ done
 
 echo ": : generated from makefile abstraction : :"
 echo 'eval ${1+"$@"}'
-sed -n -e 's/^setv \([^ ]*\) \(.*\)/\1=${\1-\2}/p' -e 's/^exec [^ ]* //p' ${1+"$@"}
+sed -n -e 's/^[0-9][0-9 	]*//' -e 's/^setv \([^ ]*\) \(.*\)/\1=${\1-\2}/p' -e 's/^exec [^ ]* //p' ${1+"$@"}

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -525,7 +525,7 @@ comprule(const char* s, char* v, void* h)
 	 * compile each rule only once
 	 */
 
-	if (r->dynamic & D_compiled)
+	if ((r->dynamic & D_compiled) || s != r->name && !(r->dynamic & D_alias))
 		return 0;
 	r->dynamic |= D_compiled;
 	r->mark |= M_compile;
@@ -728,8 +728,6 @@ compile(char* objfile, char* select)
 	struct rule*		r;
 	struct compstate	cs;
 
-	static char*		tmpfile;
-
 	/*
 	 * initialize the object globals
 	 */
@@ -742,9 +740,10 @@ compile(char* objfile, char* select)
 	 * create the object temporary file
 	 */
 
-	if (!tmpfile)
-		tmpfile = pathtemp(NiL, 0, null, idname, NiL);
-	state.tmpfile = tmpfile;
+	sp = sfstropen();
+	edit(sp, objfile, KEEP, KEEP, external.tmp);
+	state.tmpfile = strdup(sfstruse(sp));
+	sfstrclose(sp);
 	if (!(cs.fp = sfopen(NiL, state.tmpfile, "brw")))
 	{
 		error(ERROR_SYSTEM|1, "%s: cannot create temporary object file", state.tmpfile);
@@ -1022,6 +1021,32 @@ atomize(const char* s, char* v, void* h)
 }
 
 /*
+ * return the object file name
+ * assumes the main makefile has already been read
+ */
+
+char*
+objectfile(void)
+{
+	char*		dir;
+	Sfio_t*		sp;
+	struct stat	st;
+
+	if (!state.objectfile && state.makefile && state.writeobject)
+	{
+		sp = sfstropen();
+		dir = DELETE;
+		if (streq(state.writeobject, "-") || !stat(state.writeobject, &st) && S_ISDIR(st.st_mode) && (dir = state.writeobject))
+			edit(sp, state.makefile, dir, KEEP, external.object);
+		else
+			expand(sp, state.writeobject);
+		state.objectfile = strdup(sfstruse(sp));
+		sfstrclose(sp);
+	}
+	return state.objectfile;
+}
+
+/*
  * remove temporary compilation files
  */
 
@@ -1034,6 +1059,7 @@ remtmp(int fatal)
 	{
 		if (remove(state.tmpfile) && errno != ENOENT)
 			error(ERROR_SYSTEM|1, "%s: temporary file not removed", state.tmpfile);
+		free(state.tmpfile);
 		state.tmpfile = 0;
 	}
 	if (fatal)
@@ -1132,7 +1158,7 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 			 * check prerequisite file time with previous
 			 */
 
-			message((-4, "%s%s%s%s%s%sprerequisite %s [%s] state [%s]", (x->dynamic & D_regular) ? null : "non-regular ", (n & COMP_DONTCARE) ? "optional " : null, (n & COMP_BASE) ? "base " : null, (n & COMP_FILE) ? "-f " : null, (n & COMP_GLOBAL) ? "-g " : null, (n & COMP_INCLUDE) ? "include " : null, s, strtime(x->time), strtime(m)));
+			debug((-4, "%s%s%s%s%s%sprerequisite %s [%s] state [%s]", (x->dynamic & D_regular) ? null : "non-regular ", (n & COMP_DONTCARE) ? "optional " : null, (n & COMP_BASE) ? "base " : null, (n & COMP_FILE) ? "-f " : null, (n & COMP_GLOBAL) ? "-g " : null, (n & COMP_INCLUDE) ? "include " : null, s, strtime(x->time), strtime(m)));
 			if (((x->dynamic & D_regular) || (n & COMP_BASE)) && timecmp(m, x->time))
 			{
 				error(state.exec || state.mam.out ? -1 : 1, "%s: out of date with %s", r->name, x->name);
@@ -1370,6 +1396,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		off = sfgetu(sp);
 		sequence = sfgetu(sp);
 		flags = sfgetu(sp);
+		NoP(flags);
 		strings = sfgetu(sp);
 		lists = sfgetu(sp);
 		rules = sfgetu(sp);
@@ -1477,7 +1504,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			for (n = varstr; n > 0; n--)
 				loadstring(&ls, sp);
 		}
-		if ((v->property & V_frozen) && (!(x = getvar(v->name)) && ((v->property & V_oldvalue) || (v->property & V_import) && *v->value) || x && ((x->property & (V_append|V_readonly)) == (V_append|V_readonly) || ((v->property|x->property) & (V_import|V_readonly)) && !streq(v->value, x->value)) || (v->property & V_functional)))
+		if ((state.exec || !state.base || state.compileonly) && (v->property & V_frozen) && (!(x = getvar(v->name)) && ((v->property & V_oldvalue) || (v->property & V_import) && *v->value) || x && ((x->property & (V_append|V_readonly)) == (V_append|V_readonly) || ((v->property|x->property) & (V_import|V_readonly)) && !streq(v->value, x->value)) || (v->property & V_functional)))
 		{
 			error((state.exec || state.mam.out) && !state.explain ? -1 : 1, "%s: frozen %svariable %s changed", objfile, ((v->property|(x ? x->property : 0)) & V_import) ? "environment " : ((x ? x->property : 0) & V_readonly) ? "command argument " : null, v->name);
 			recompile = 1;
@@ -1758,6 +1785,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				viewname(r->name, state.stateview);
 				r->view = state.stateview;
 				putrule(r->name, r);
+				if (o && (r->property & P_statevar) && !o->time)
+					o->time = r->time;
 			}
 			else
 			{
@@ -2024,8 +2053,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			/*
 			 * check for load time actions
 			 *
-			 * NOTE: state.global++ allows var definitions
-			 *       to override readonly vars here
+			 * state.global++ enables setvar() V_import override
 			 */
 
 			if (state.global)

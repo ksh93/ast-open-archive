@@ -1,3 +1,5 @@
+04-07-26 warp.sh: update runtime docs
+04-07-23 Makefile: link with static ast libs
 01-10-20 warp: drop :WWW: standalone distribution
 99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
 99-05-21 add: _xstat64

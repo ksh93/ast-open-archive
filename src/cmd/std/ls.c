@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-03-28 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -38,6 +38,8 @@ USAGE_LICENSE
 "	The current directory is listed if no file arguments appear."
 "	The listing is sorted by file name by default, except that file"
 "	arguments are listed before directories.]"
+"[+?Multi-column terminal output display width is determined by \bioctl\b(2)"
+"	and/or the \bCOLUMNS\b environment variable.]"
 "[+?\bgetconf PATH_RESOLVE\b determines how symbolic links are handled. This"
 "	can be explicitly overridden by the \b--logical\b, \b--metaphysical\b,"
 "	and \b--physical\b options below. \bPATH_RESOLVE\b can be one of:]{"
@@ -59,7 +61,11 @@ USAGE_LICENSE
 "	override internal \b--format\b identifiers.]:[key[=value]]]"
 "[e:decimal-scale|thousands?Scale sizes to powers of 1000 { b K M G T }.]"
 "[E:block-size?Use \ablocksize\a blocks.]#[blocksize]"
-"[f:format?Append to the listing format string. \aformat\a follows"
+"[f:force?Force each argument to be interpreted as a directory and list"
+"	the name found in each slot in the physical directory order. Turns"
+"	on \b-aU\b and turns off \b-lrst\b. The results are undefined for"
+"	non-directory arguments.]"
+"[Z:format?Append to the listing format string. \aformat\a follows"
 "	\bprintf\b(3) conventions, except that \bsfio\b(3) inline ids"
 "	are used instead of arguments:"
 "	%[-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
@@ -114,7 +120,7 @@ USAGE_LICENSE
 "			lists the mtime in seconds since the epoch and the"
 "			ctime as hours:minutes:seconds.]"
 "	}"
-"[F:classify?Append a character for typing each entry.]"
+"[F:classify?Append a character for typing each entry. Turns on \b--physical\b.]"
 "[g?\b--long\b with no owner info.]"
 "[G:group?\b--long\b with no group info.]"
 "[h:scale|binary-scale|human-readable?Scale sizes to powers of 1024 { b K M G T }.]"
@@ -1238,9 +1244,10 @@ main(int argc, register char** argv)
 			state.scale = 1000;
 			break;
 		case 'f':
-			if (!sfstrtell(fmt))
-				state.lsflags &= ~LS_COLUMNS;
-			sfputr(fmt, opt_info.arg, ' ');
+			state.lsflags |= LS_ALL;
+			state.lsflags &= ~(LS_BLOCKS|LS_LONG|LS_TIME);
+			state.reverse = 0;
+			state.sortflags = LS_NOSORT;
 			break;
 		case 'g':
 		case 'O':
@@ -1517,6 +1524,11 @@ main(int argc, register char** argv)
 				state.lsflags &= ~(LS_ACROSS|LS_COLUMNS);
 				break;
 			}
+			break;
+		case 'Z':
+			if (!sfstrtell(fmt))
+				state.lsflags &= ~LS_COLUMNS;
+			sfputr(fmt, opt_info.arg, ' ');
 			break;
 		case '1':
 			state.lsflags &= ~(LS_COLUMNS|LS_PRINTABLE);

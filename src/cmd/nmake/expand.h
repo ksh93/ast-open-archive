@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -66,12 +66,13 @@ typedef struct
 #define EQ		(1<<1)
 #define GT		(1<<2)
 #define NOT		(1<<3)
-#define MAT		(1<<4)
+#define HAT		(1<<4)
+#define MAT		(1<<5)
 
 #define NE		(NOT|EQ)
 #define LE		(LT|EQ)
 #define GE		(GT|EQ)
-#define CMP		(1<<5)
+#define CMP		(1<<6)
 
 #define ED_COPY		1
 #define ED_EDIT		2

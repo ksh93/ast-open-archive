@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -672,7 +672,11 @@ execute(register struct joblist* job)
 			dumpaction(state.mam.out, MAMNAME(job->target), t, NiL);
 		if (r = getrule(external.makerun))
 			maketop(r, P_dontcare|P_foreground, NiL);
+#if _WINIX
+		if (internal.openfile)
+#else
 		if ((state.test & 0x00020000) && internal.openfile)
+#endif
 		{
 			internal.openfile = 0;
 			close(internal.openfd);
@@ -1024,14 +1028,14 @@ block(int check)
 				return 0;
 			break;
 		}
+		job = (struct joblist*)cojob->local;
 		if (r = getrule(external.jobdone))
 		{
 			if (!jobs.tmp)
 				jobs.tmp = sfstropen();
-			sfprintf(jobs.tmp, "%s %d %s %s", r->name, cojob->status, fmtelapsed(cojob->user, CO_QUANT), fmtelapsed(cojob->sys, CO_QUANT));
+			sfprintf(jobs.tmp, "%s %d %s %s", job->target->name, cojob->status, fmtelapsed(cojob->user, CO_QUANT), fmtelapsed(cojob->sys, CO_QUANT));
 			call(r, sfstruse(jobs.tmp));
 		}
-		job = (struct joblist*)cojob->local;
 		if (cojob->status)
 		{
 			if (n = !EXITED_TERM(cojob->status) || EXIT_CODE(cojob->status))

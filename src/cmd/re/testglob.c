@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2002 AT&T Corp.                *
+*                Copyright (c) 1995-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -61,6 +61,8 @@ quniq(char** argv, int n)
 
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <glob.h>
 #include <ctype.h>
@@ -635,7 +637,7 @@ main(int argc, char** argv)
 				if (i > (cwd + 1) || i >= elementsof(work))
 					bad("invalid workspace depth\n", NiL);
 				if (i > cwd) {
-					if (path[0] && access(path, 0)) {
+					if (path[0] && access(path, F_OK)) {
 						if (verbose) {
 							printf("test %-3d mkdir ", state.lineno);
 							quote(path);
@@ -646,13 +648,13 @@ main(int argc, char** argv)
 					}
 				}
 				else {
-					if (!streq(work[cwd - 1], ".") && access(path, 0)) {
+					if (!streq(work[cwd - 1], ".") && access(path, F_OK)) {
 						if (verbose) {
 							printf("test %-3d touch ", state.lineno);
 							quote(path);
 							printf("\n");
 						}
-						if (close(creat(path, 0644)))
+						if (close(creat(path, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)))
 							bad("cannot create work file\n", path);
 					}
 					cwd = i - 1;
@@ -667,7 +669,7 @@ main(int argc, char** argv)
 			continue;
 		}
 		if (work[1]) {
-			if (!streq(work[cwd-1], ".") && access(path, 0) && close(creat(path, 0644)))
+			if (!streq(work[cwd-1], ".") && access(path, F_OK) && close(creat(path, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)))
 				bad("cannot create work file\n", path);
 			*(work[1] - 1) = 0;
 			if (!working)

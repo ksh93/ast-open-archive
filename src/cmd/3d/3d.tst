@@ -1,6 +1,6 @@
 : 3d regression tests
 #
-# 3d.tst (AT&T Research) 2004-05-03
+# 3d.tst (AT&T Research) 2004-07-01
 #
 # the first section defines the test harness
 # the next section defines individual test functions
@@ -30,12 +30,7 @@ PREFIX=
 STAMP="2005-07-17+04:05:06"
 VIRTUAL=
 
-trap "(( ERRORS++ ))" ERR
-trap "CLEANUP 0" 0
-tmp=/tmp/$$.3d
-mkdir $tmp || exit
-cd $tmp
-mkdir bottom
+TWD
 
 function ACTIVE
 {
@@ -46,16 +41,18 @@ function TEST
 {
 	case $INIT in
 	"")	INIT=1
-		print "TEST	$COMMAND"
+		mkdir -p $TWD/bottom || exit 1
+		cd $TWD
+		INTRO
 		;;
 	esac
-	cd $tmp
+	cd $TWD
 	case $NUKE in
 	?*)	rm -rf $NUKE; NUKE= ;;
 	esac
 	PREFIX=
 	GROUP=$1
-	ACTIVE || return
+	ACTIVE || return 1
 	vpath - -
 	shift
 	print "$GROUP	$*"
@@ -66,11 +63,17 @@ function FAIL # file message
 	print -u2 "	FAIL $@"
 	rm -rf $1
 	(( ERRORS++ ))
+	return 0
+}
+
+function VERIFY # command ...
+{
+	(( TESTS++ ))
+	"$@" || FAIL "$@"
 }
 
 function PREFIX
 {
-	ACTIVE || return
 	PREFIX=$1
 	case $1 in
 	/*)	NUKE="$NUKE $1" ;;
@@ -80,11 +83,10 @@ function PREFIX
 
 function VIRTUAL
 {
-	ACTIVE || return
 	case $VIRTUAL in
 	?*)	pwd=$PWD
-		cd $tmp
-		rm -rf $tmp/$VIRTUAL
+		cd $TWD
+		rm -rf $TWD/$VIRTUAL
 		cd $pwd
 		;;
 	esac
@@ -93,44 +95,38 @@ function VIRTUAL
 
 function CD
 {
-	ACTIVE || return
-	cd $tmp/$1
+	VERIFY cd $TWD/$1
 }
 
 function VPATH
 {
-	ACTIVE || return
-	vpath "$@"
+	VERIFY vpath "$@"
 }
 
 function CP
 {
-	ACTIVE || return
-	cp "$@"
+	VERIFY cp "$@"
 	shift $#-1
 	NUKE="$NUKE $1"
 }
 
 function LN
 {
-	ACTIVE || return
-	ln "$@"
+	VERIFY ln "$@"
 	shift $#-1
 	NUKE="$NUKE $1"
 }
 
 function MV
 {
-	ACTIVE || return
-	mv "$@"
+	VERIFY mv "$@"
 	shift $#-1
 	NUKE="$NUKE $1"
 }
 
 function MKDIR
 {
-	ACTIVE || return
-	mkdir -p $*
+	VERIFY mkdir -p $*
 	for i
 	do	case $i in
 		/*)	NUKE="$NUKE $i" ;;
@@ -141,7 +137,6 @@ function MKDIR
 
 function DATA
 {
-	ACTIVE || return 1
 	VIRTUAL $VIRTUAL
 	case $1 in
 	-)	remove=1; shift ;;
@@ -152,28 +147,28 @@ function DATA
 	1)	;;
 	*)	return 1 ;;
 	esac
-	(( TESTS++ ))
 	path=$1
 	case $PREFIX in
 	"")	FILE=$path ;;
 	*)	FILE=$PREFIX/$path ;;
 	esac
 	file=bottom/$path
-	if	[[ ! -f $tmp/$file ]]
+	if	[[ ! -f $TWD/$file ]]
 	then	case $remove in
-		0)	if	[[ $path == */* && ! -d $tmp/${file%/*} ]]
-			then	mkdir -p $tmp/${file%/*} || FAIL $tmp/${file%/*} DATA mkdir
+		0)	if	[[ $path == */* && ! -d $TWD/${file%/*} ]]
+			then	mkdir -p $TWD/${file%/*} || FAIL $TWD/${file%/*} DATA mkdir
 			fi
-			print $OLD > $tmp/$file
+			print $OLD > $TWD/$file
 			mode=${file%???}
 			mode=${file#$mode}
-			chmod $mode $tmp/$file || FAIL $tmp/$file DATA chmod
+			chmod $mode $TWD/$file || FAIL $TWD/$file DATA chmod
 			;;
 		esac
 	else	case $remove in
-		1)	rm -f $tmp/$file ;;
+		1)	rm -f $TWD/$file ;;
 		esac
 	fi
+	(( TESTS++ ))
 	return 0
 }
 
@@ -183,7 +178,7 @@ function DATA
 
 function APPEND
 {
-	ACTIVE && DATA $* || return
+	DATA $*
 	print "$NEW" >> $FILE || FAIL $FILE write error
 	if	[[ $(<$FILE) != "$OLD"$'\n'"$NEW" ]]
 	then	FAIL $FILE unchanged by $0
@@ -194,7 +189,7 @@ function APPEND
 
 function MODE
 {
-	ACTIVE && DATA $* || return
+	DATA $*
 	chmod 000 $FILE || FAIL $FILE chmod error
 	if	[[ -f $FILE/... && ! -r $FILE/... ]]
 	then	FAIL $FILE/... changed by $0
@@ -205,7 +200,7 @@ function MODE
 
 function REMOVE
 {
-	ACTIVE && DATA $* || return
+	DATA $*
 	rm $FILE || FAIL $FILE rm error
 	if	[[ ! -f $FILE/... ]]
 	then	FAIL $FILE/... changed by $0
@@ -221,13 +216,13 @@ function REMOVE
 
 function TOUCH
 {
-	ACTIVE && DATA $* || return
-	touch -r $FILE -t "$seconds seconds" $tmp/reference || FAIL $tmp/reference touch error
+	DATA $*
+	touch -r $FILE -t "$seconds seconds" $TWD/reference || FAIL $TWD/reference touch error
 	(( seconds++ ))
 	touch -t "$seconds seconds" $FILE || FAIL $FILE touch error
-	if	[[ $FILE/... -nt $tmp/reference ]]
+	if	[[ $FILE/... -nt $TWD/reference ]]
 	then	FAIL $FILE/... changed by $0
-	elif	[[ ! $FILE -nt $tmp/reference ]]
+	elif	[[ ! $FILE -nt $TWD/reference ]]
 	then	FAIL $FILE unchanged by $0
 	fi
 	touch -t $STAMP $FILE
@@ -238,7 +233,7 @@ function TOUCH
 
 function UPDATE
 {
-	ACTIVE && DATA $* || return
+	DATA $*
 	print "$NEW" 1<> $FILE || FAIL $FILE write error
 	if	[[ $(<$FILE) != "$NEW" ]]
 	then	FAIL $FILE unchanged by $0
@@ -249,7 +244,7 @@ function UPDATE
 
 function WRITE
 {
-	ACTIVE && DATA $* || return
+	DATA $*
 	print "$NEW" > $FILE || FAIL $FILE write error
 	if	[[ $(<$FILE) != "$NEW" ]]
 	then	FAIL $FILE unchanged by $0
@@ -260,7 +255,8 @@ function WRITE
 
 function RUN
 {
-	ACTIVE && DATA $* || return
+	[[ $1 == 3d ]] || return
+	DATA
 	WRITE	w666
 	WRITE	w600
 	TOUCH	t777
@@ -287,58 +283,73 @@ function RUN
 # finally the tests
 #
 
-TEST 01 PWD==top top exists
+TEST 01 PWD==top top exists &&
+{
 	VPATH top bottom
 	MKDIR top
 	CD top
-	RUN
+	RUN 3d
+}
 
-TEST 02 PWD!=top top exists
+TEST 02 PWD!=top top exists &&
+{
 	VPATH top bottom
 	MKDIR top
 	MKDIR junk
 	CD junk
 	PREFIX ../top
-	RUN
+	RUN 3d
+}
 
-TEST 03 PWD==top top virtual
+TEST 03 PWD==top top virtual &&
+{
 	VIRTUAL top
 	VPATH top bottom
 	CD top
-	RUN
+	RUN 3d
+}
 
-TEST 04 PWD!=top top virtual
+TEST 04 PWD!=top top virtual &&
+{
 	VIRTUAL top
 	VPATH top bottom
 	MKDIR junk
 	CD junk
 	PREFIX ../top
-	RUN
+	RUN 3d
+}
 
-TEST 05 top symlink
+TEST 05 top symlink &&
+{
 	if	LN -s text link
 	then	[[ -L link ]] || FAIL lstat does stat
 	fi
+}
 
-TEST 06 symlink spaghetti
+TEST 06 symlink spaghetti &&
+{
 	MKDIR usr/bin sbin
-	ACTIVE && echo : > sbin/cmd && chmod +x sbin/cmd
+	echo : > sbin/cmd && chmod +x sbin/cmd
 	LN -s usr/bin bin
 	LN -s ../../sbin/cmd usr/bin/cmd
 	CD bin
-	ACTIVE && cmd
+	cmd
+}
 
-TEST 07 PWD==top top exists, bot virtual
+TEST 07 PWD==top top exists, bot virtual &&
+{
 	VPATH top bot
 	MKDIR top
 	CD top
-	ACTIVE && echo foo > foo && echo bar > bar
+	echo foo > foo && echo bar > bar
 	CP foo ...
 	MV bar ...
 	CP foo ...
-	ACTIVE && [[ $(ls ...) != $'bar\nfoo' ]] && FAIL bottom incomplete -- $(ls ...)
-	ACTIVE && [[ $(2d ls) != $'foo' ]] && FAIL top incomplete -- $(2d ls)
+	[[ ! -d ... ]] && FAIL ... not a directory && return
+	[[ $(ls ... 2>/dev/null) != $'bar\nfoo' ]] && FAIL bottom incomplete -- $(ls ... 2>&1)
+	[[ $(2d ls 2>/dev/null) != $'foo' ]] && FAIL top incomplete -- $(2d ls 2>&1)
 	CP * ...
-	ACTIVE && [[ $(cat bar) != bar ]] && FAIL bottom to bottom garbled -- $(cat bar)
-	ACTIVE && [[ $(cat foo) != foo ]] && FAIL top garbled -- $(cat foo)
-	ACTIVE && [[ $(cat .../foo) != foo ]] && FAIL top to bottom garbled -- $(cat .../foo)
+	[[ $(cat bar 2>/dev/null) != bar ]] && FAIL bottom to bottom garbled -- $(cat bar 2>&1)
+	[[ $(cat foo 2>/dev/null) != foo ]] && FAIL top garbled -- $(cat foo 2>&1)
+	[[ $(cat .../foo 2>/dev/null) != foo ]] && FAIL top to bottom garbled -- $(cat .../foo 2>&1)
+}

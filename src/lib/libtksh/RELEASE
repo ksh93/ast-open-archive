@@ -1,3 +1,4 @@
+04-07-19  tcl/tclIOUtil.c: treat { O_RDONLY O_WRONLY O_RDWR } as values
 03-06-13  include/tclInt.h: disable #undef sprintf that masked its prototype
 03-04-05  src/var.c: fix off by 1 malloc() call -- for once not gsf's fault!!
 	  src/var.c: hack around nv_move() double-free bug -- needs better fix

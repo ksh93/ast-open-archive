@@ -1,3 +1,5 @@
+04-08-17 head.c: handle Content-Type: message
+04-07-22 lex.c: access() => eaccess()
 04-04-15 spam.c: add spamtest mask names, fix spam() ordering
 04-03-25 mailx.h: shquote=>shellquote to avoid netbsd clash in <stdlib.h>!!
 04-03-17 spam.c: fix usermatch() loop

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1998-2002 AT&T Corp.                #
+#                Copyright (c) 1998-2004 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -15,7 +15,7 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
@@ -91,20 +91,14 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	System V \bx\b versions of the \bstat\b(2) family. \bwarp\b ignores
 	calls not present in a particular host system. In addition, \bwarp\b
 	only works on dynamically linked executables that have neither set-uid
-	nor set-gid permissions. It is currently available on these system
-	architectures:]{
-	[+linux.i386?]
-	[+linux.sparc?]
-	[+osf.alpha?]
-	[+sgi.mips2?]
-	[+sgi.mips3?]
-	[+sgi.mips4?]
-	[+sol.i386?]
-	[+sol.sun4?]
-	[+sun4?]
-	[+win32.alpha?]
-	[+win32.i386?]
-}
+	set-uid nor set-gid permissions. It may not have the intended effect
+	on programs written in a language or linked with a language runtime
+	that hides or mangles system call library symbols, or that
+	directly emit system call instruction sequences rather than using
+	the corresponding library functions, or that dynamically link
+	libraries outside of the scope of the \bwarp\b intercepts.]
+[+?Multi-process client-server applications may misbehave if the \bwarp\b
+	environment between the related processes is not kept in sync.]
 
 date [ command [ arg ... ] ]
 

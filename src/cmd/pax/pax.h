@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -564,6 +564,7 @@ struct Filter_s
 	size_t		length;		/* separator magic length	*/ \
 	size_t		fill;		/* last member filler size	*/ \
 	}		mime; \
+	char*		mode;		/* output chmod(1) mode		*/ \
 	int		modtime;	/* retain mtime			*/ \
 	int		newer;		/* append only if newer		*/ \
 	int		operation;	/* IN|OUT operation mode	*/ \

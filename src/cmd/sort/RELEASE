@@ -1,3 +1,6 @@
+04-08-11 main.c: add #intermediates to -Xdump, limit intermediates to 64
+04-07-22 main.c: acces() => eaccess()
+04-06-16 main.c: -R% -R- use recfmt() to sample for record format
 04-02-11 main.c: document the obsolescent -k reclen:fieldlen:offset
 	 sort.tst: add -k reclen:fieldlen:offset vs. -k .r -k .o.f tests
 03-11-11 main.c: fix sfread vs. sfreserve logic fooled by SFOPEN_INTERCEPT

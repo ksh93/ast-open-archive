@@ -1,3 +1,7 @@
+04-08-11 pax.c,options.h,options.c: add -C,--chmod=mode to control header modes
+04-08-05 bio.c: fix bread() pointer arith 64 bit assumption (pax#15)
+04-08-01 delta.c: fix checksum 32-bit logic (pax#11) (testpax#01)
+04-07-19 delta.c,format.c,pax-tar.c: { O_RDONLY O_WRONLY O_RDWR } are values
 04-03-17 pax-tar.c: add tar_putepilogue to *all* tar variants
 	 format.h: let pax-tar.c determine tar variant order
 	 bio.c: fix a few printf format long long mismatches: %ld => %I*d

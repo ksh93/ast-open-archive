@@ -31,7 +31,7 @@
 *        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.        *
 *                                                                  *
 *            Information and Software Systems Research             *
-*The Regents of the University of California and AT&T Labs Research*
+*  The Regents of the University of California and AT&T Research   *
 *                         Florham Park NJ                          *
 *                                                                  *
 *                        Kurt Shoens (UCB)                         *
@@ -151,7 +151,7 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 			if (!mimecmp("text/plain", data, NiL) || !mimecmp("text/enriched", data, NiL))
 				ap->flags |= PART_text;
 			else if (!mimecmp("message", data, NiL))
-				ap->flags |= PART_text;
+				ap->flags |= PART_message;
 			else
 				ap->flags |= PART_application;
 		}
@@ -431,7 +431,12 @@ multipart(register struct parse* pp)
 		else if (header) {
 			state.part.head = ap;
 			if (!mimehead(state.part.mime, (void*)contents, elementsof(contents), sizeof(*contents), s)) {
-				header = strchr(s, ':') != 0;
+				if (ap->flags & PART_message) {
+					ap->flags &= ~PART_message;
+					header = 1;
+				}
+				else
+					header = strchr(s, ':') != 0;
 				ap->offset = ftell(pp->fp);
 			}
 			state.part.head = 0;

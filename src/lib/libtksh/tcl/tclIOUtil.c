@@ -96,7 +96,7 @@ FileForRedirect(interp, spec, atOK, arg, nextArg, flags, skipPtr, closePtr,
 				 * was opened.  Unmodified if spec refers 
 				 * to a channel.  */
 {
-    int writing = (flags & O_WRONLY);
+    int writing = (flags & O_ACCMODE) == O_WRONLY;
     Tcl_Channel chan;
     Tcl_File file;
 
@@ -235,7 +235,7 @@ TclGetOpenMode(interp, string, seekFlagPtr)
 		return -1;
 	}
 	if (string[1] == '+') {
-	    mode &= ~(O_RDONLY|O_WRONLY);
+	    mode &= ~O_ACCMODE;
 	    mode |= O_RDWR;
 	    if (string[2] != 0) {
 		goto error;
@@ -269,13 +269,13 @@ TclGetOpenMode(interp, string, seekFlagPtr)
 	flag = modeArgv[i];
 	c = flag[0];
 	if ((c == 'R') && (strcmp(flag, "RDONLY") == 0)) {
-	    mode = (mode & ~RW_MODES) | O_RDONLY;
+	    mode = (mode & ~O_ACCMODE) | O_RDONLY;
 	    gotRW = 1;
 	} else if ((c == 'W') && (strcmp(flag, "WRONLY") == 0)) {
-	    mode = (mode & ~RW_MODES) | O_WRONLY;
+	    mode = (mode & ~O_ACCMODE) | O_WRONLY;
 	    gotRW = 1;
 	} else if ((c == 'R') && (strcmp(flag, "RDWR") == 0)) {
-	    mode = (mode & ~RW_MODES) | O_RDWR;
+	    mode = (mode & ~O_ACCMODE) | O_RDWR;
 	    gotRW = 1;
 	} else if ((c == 'A') && (strcmp(flag, "APPEND") == 0)) {
 	    mode |= O_APPEND;

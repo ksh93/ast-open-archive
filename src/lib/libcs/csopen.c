@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -55,24 +55,24 @@ static int
 mkmount(register Cs_t* state, int mode, int uid, int gid, char* endserv, char* endhost, char* endtype)
 {
 	*(state->control - 1) = 0;
-	if (access(state->mount, R_OK|W_OK|X_OK))
+	if (eaccess(state->mount, R_OK|W_OK|X_OK))
 	{
 		if (errno != ENOENT)
 			return -1;
 		if (!endserv && !(endserv = strrchr(state->mount, '/')))
 			return -1;
 		*endserv = 0;
-		if (access(state->mount, X_OK))
+		if (eaccess(state->mount, X_OK))
 		{
 			if (!endhost && !(endhost = strrchr(state->mount, '/')))
 				return -1;
 			*endhost = 0;
-			if (access(state->mount, X_OK))
+			if (eaccess(state->mount, X_OK))
 			{
 				if (!endtype && !(endtype = strrchr(state->mount, '/')))
 					return -1;
 				*endtype = 0;
-				if (access(state->mount, X_OK) && (mkdir(state->mount, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(state->mount, S_IRWXU|S_IRWXG|S_IRWXO)))
+				if (eaccess(state->mount, X_OK) && (mkdir(state->mount, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(state->mount, S_IRWXU|S_IRWXG|S_IRWXO)))
 					return -1;
 				*endtype = '/';
 				if (mkdir(state->mount, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(state->mount, S_IRWXU|S_IRWXG|S_IRWXO))
@@ -748,7 +748,7 @@ csopen(register Cs_t* state, const char* apath, int op)
 			goto bad;
 		}
 		b += sfsprintf(b, sizeof(state->mount) - (b - path), "%s", csvar(state, CS_VAR_LOCAL, 0));
-		if ((op & CS_OPEN_CREATE) && access(path, X_OK) && (mkdir(path, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(path, S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)))
+		if ((op & CS_OPEN_CREATE) && eaccess(path, X_OK) && (mkdir(path, S_IRWXU|S_IRWXG|S_IRWXO) || chmod(path, S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO)))
 			goto bad;
 	}
 	else

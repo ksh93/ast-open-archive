@@ -44,6 +44,7 @@ _PACKAGE_ID = $(LICENSEFILES:/:/ /G:T=F:O=1:B:/^$(LICENSEFILE)$/LIC/)
 
 .MSGCAT.LIST. : .FUNCTION
 	local D I O X
+	:: msgcat.h msgcat.key
 	O := $(CATALOG).msg
 	for X $(...:A=.COMMAND.o|.ARCHIVE.o:T!=S:T=F)
 		I += $(X) $(*$(X):N=*@($(CC.SUFFIX.OBJECT)):D=$(MSGCATDIR):B:S=.mso) $(*$(X):N=[-+]l*:/[-+]l\(.*\)/lib\1.msg/)
@@ -83,5 +84,3 @@ $(MSGCATDIR)/%.mso : %.key
 	if	test -x $(>)
 	then	$(>) | sed 's,^,str ,' > $(<)
 	fi
-
-:: msgcat.h msgcat.key

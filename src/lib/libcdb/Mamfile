@@ -1,9 +1,9 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
-setv INSTALLROOT ../../..
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-08-11
+setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ../../../../..
+setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -20,12 +20,12 @@ setv F77 f77
 setv HOSTCC ${CC}
 setv IGNORE
 setv LD ld
-setv LDFLAGS 
+setv LDFLAGS
 setv LEX lex
 setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
-setv M4FLAGS 
+setv M4FLAGS
 setv NMAKE nmake
 setv NMAKEFLAGS
 setv PR pr
@@ -35,12 +35,14 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make cdb
 make libcdb.a archive
 make cdb.req
 exec - set -
-exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
+exec - echo 'int main(){return 0;}' > 1.${COTEMP}.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
@@ -71,192 +73,203 @@ make cdbopen.c
 make cdblib.h implicit
 make cdbmethod.h implicit
 make cdb.h implicit
-make ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-make ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_botch.h implicit
-done ../../../include/ast/ast_botch.h dontcare
-make ../../../include/ast/ast_unistd.h implicit
-done ../../../include/ast/ast_unistd.h dontcare
-make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_getopt.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
-done ../../../include/ast/ast_fcntl.h dontcare
-make ../../../include/ast/ast_types.h implicit
-done ../../../include/ast/ast_types.h dontcare
-make ../../../include/ast/ast_map.h implicit
-done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-make ../../../include/ast/ast_hdr.h implicit
-done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/ast_lib.h implicit
-done ../../../include/ast/ast_lib.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_std.h dontcare
-done ../../../include/ast/vmalloc.h dontcare
-make ../../../include/ast/ccode.h implicit
-make ../../../include/ast/ast_ccode.h implicit
-done ../../../include/ast/ast_ccode.h dontcare
-make ../../../include/ast/ast.h implicit
-prev ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/sfio.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-make ../../../include/ast/ast_version.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_version.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ccode.h dontcare
-prev ../../../include/ast/ast.h implicit
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/ast_map.h implicit
+done ${INSTALLROOT}/include/ast/ast_map.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/ccode.h implicit
+make ${INSTALLROOT}/include/ast/ast_ccode.h implicit
+done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
+make ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ccode.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done cdb.h dontcare
 done cdbmethod.h dontcare
-make ../../../include/ast/sfstr.h implicit
-prev ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfstr.h dontcare
-make ../../../include/ast/namval.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/namval.h dontcare
-make ../../../include/ast/debug.h implicit
-make ../../../include/ast/error.h implicit
-make ../../../include/ast/option.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/option.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/error.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/debug.h dontcare
-prev ../../../include/ast/error.h implicit
-prev ../../../include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfstr.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfstr.h dontcare
+make ${INSTALLROOT}/include/ast/namval.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/namval.h dontcare
+make ${INSTALLROOT}/include/ast/debug.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/debug.h dontcare
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done cdblib.h
 done cdbopen.c
+meta cdbopen.o %.c>%.o cdbopen.c cdbopen
 prev cdbopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbopen.c
 done cdbopen.o generated
 make cdbread.o
 make cdbread.c
 prev cdblib.h implicit
 done cdbread.c
+meta cdbread.o %.c>%.o cdbread.c cdbread
 prev cdbread.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbread.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbread.c
 done cdbread.o generated
 make cdbwrite.o
 make cdbwrite.c
 prev cdblib.h implicit
 done cdbwrite.c
+meta cdbwrite.o %.c>%.o cdbwrite.c cdbwrite
 prev cdbwrite.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbwrite.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbwrite.c
 done cdbwrite.o generated
 make cdbseek.o
 make cdbseek.c
 prev cdblib.h implicit
 done cdbseek.c
+meta cdbseek.o %.c>%.o cdbseek.c cdbseek
 prev cdbseek.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbseek.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbseek.c
 done cdbseek.o generated
 make cdbmove.o
 make cdbmove.c
 prev cdblib.h implicit
 done cdbmove.c
+meta cdbmove.o %.c>%.o cdbmove.c cdbmove
 prev cdbmove.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbmove.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmove.c
 done cdbmove.o generated
 make cdbmap.o
 make cdbmap.c
 prev cdblib.h implicit
 done cdbmap.c
+meta cdbmap.o %.c>%.o cdbmap.c cdbmap
 prev cdbmap.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmap.c
 done cdbmap.o generated
 make cdbcache.o
 make cdbcache.c
 prev cdblib.h implicit
 done cdbcache.c
+meta cdbcache.o %.c>%.o cdbcache.c cdbcache
 prev cdbcache.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbcache.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbcache.c
 done cdbcache.o generated
 make cdbdrop.o
 make cdbdrop.c
 prev cdblib.h implicit
 done cdbdrop.c
+meta cdbdrop.o %.c>%.o cdbdrop.c cdbdrop
 prev cdbdrop.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbdrop.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbdrop.c
 done cdbdrop.o generated
 make cdbempty.o
 make cdbempty.c
 prev cdblib.h implicit
 done cdbempty.c
+meta cdbempty.o %.c>%.o cdbempty.c cdbempty
 prev cdbempty.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbempty.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbempty.c
 done cdbempty.o generated
 make cdblib.o
 make cdblib.c
-make ../../../include/ast/dlldefs.h implicit
-done ../../../include/ast/dlldefs.h
+make ${INSTALLROOT}/include/ast/dlldefs.h implicit
+done ${INSTALLROOT}/include/ast/dlldefs.h
 prev cdblib.h implicit
 done cdblib.c
+meta cdblib.o %.c>%.o cdblib.c cdblib
 prev cdblib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdblib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdblib.c
 done cdblib.o generated
 make cdbtypes.o
 make cdbtypes.c
-make ../../../include/ast/tm.h implicit
-make ../../../include/ast/times.h implicit
-make ../../../include/ast/ast_time.h implicit
-done ../../../include/ast/ast_time.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/times.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/tm.h
-make ../../../include/ast/hashpart.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/hashpart.h
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h
+make ${INSTALLROOT}/include/ast/hashpart.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashpart.h
 make FEATURE/lib implicit
+meta FEATURE/lib features/%>FEATURE/% features/lib lib
 make features/lib
 done features/lib
 prev cdb.req
@@ -267,171 +280,178 @@ bind -ldll
 bind -lvdelta
 bind -lm dontcare
 bind -last
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libexpr} ${mam_libpz} ${mam_libz} ${mam_libdll} ${mam_libvdelta} ${mam_libm} ${mam_libast} ${mam_libast} : run features/lib
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libexpr} ${mam_libpz} ${mam_libz} ${mam_libdll} ${mam_libvdelta} ${mam_libm} ${mam_libast} ${mam_libast} : run features/lib
 done FEATURE/lib generated
 prev cdblib.h implicit
 done cdbtypes.c
+meta cdbtypes.o %.c>%.o cdbtypes.c cdbtypes
 prev cdbtypes.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbtypes.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbtypes.c
 done cdbtypes.o generated
 make cdbmeth.o
 make cdbmeth.c
 prev cdblib.h implicit
 done cdbmeth.c
+meta cdbmeth.o %.c>%.o cdbmeth.c cdbmeth
 prev cdbmeth.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbmeth.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbmeth.c
 done cdbmeth.o generated
 make cdbdump.o
 make cdbdump.c
 prev cdblib.h implicit
 done cdbdump.c
+meta cdbdump.o %.c>%.o cdbdump.c cdbdump
 prev cdbdump.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbdump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbdump.c
 done cdbdump.o generated
 make cdberror.o
 make cdberror.c
 prev cdblib.h implicit
 done cdberror.c
+meta cdberror.o %.c>%.o cdberror.c cdberror
 prev cdberror.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdberror.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdberror.c
 done cdberror.o generated
 make cdbimage.o
 make cdbimage.c
 prev cdblib.h implicit
-make ../../../include/ast/sfio_t.h implicit
-prev ../../../include/ast/sfio.h implicit
-done ../../../include/ast/sfio_t.h
+make ${INSTALLROOT}/include/ast/sfio_t.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+done ${INSTALLROOT}/include/ast/sfio_t.h
 done cdbimage.c
+meta cdbimage.o %.c>%.o cdbimage.c cdbimage
 prev cdbimage.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbimage.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbimage.c
 done cdbimage.o generated
 make cdbcdb.o
 make cdbcdb.c
 prev cdblib.h implicit
 done cdbcdb.c
+meta cdbcdb.o %.c>%.o cdbcdb.c cdbcdb
 prev cdbcdb.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbcdb.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbcdb.c
 done cdbcdb.o generated
 make cdbflat.o
 make cdbflat.c
-make ../../../include/ast/expr.h implicit
-prev ../../../include/ast/vmalloc.h implicit
-make ../../../include/ast/cdt.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/cdt.h dontcare
-make ../../../include/ast/exparse.h implicit
-done ../../../include/ast/exparse.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/expr.h
+make ${INSTALLROOT}/include/ast/expr.h implicit
+prev ${INSTALLROOT}/include/ast/vmalloc.h implicit
+make ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/cdt.h dontcare
+make ${INSTALLROOT}/include/ast/exparse.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/exparse.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/expr.h
 prev cdblib.h implicit
-prev ../../../include/ast/sfio_t.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_t.h implicit
 done cdbflat.c
+meta cdbflat.o %.c>%.o cdbflat.c cdbflat
 prev cdbflat.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbflat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbflat.c
 done cdbflat.o generated
 make cdbgzip.o
 make cdbgzip.c
-make ../../../include/ast/sfdcgzip.h implicit
-make ../../../include/ast/sfdisc.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfdisc.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfdcgzip.h
+make ${INSTALLROOT}/include/ast/sfdcgzip.h implicit
+make ${INSTALLROOT}/include/ast/sfdisc.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfdisc.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfdcgzip.h
 prev cdblib.h implicit
 done cdbgzip.c
+meta cdbgzip.o %.c>%.o cdbgzip.c cdbgzip
 prev cdbgzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbgzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbgzip.c
 done cdbgzip.o generated
 make cdbpzip.o
 make cdbpzip.c
-make ../../../include/ast/pzip.h implicit
-prev ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/sfdcgzip.h implicit
-prev ../../../include/ast/option.h implicit
-prev ../../../include/ast/cdt.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/pzip.h
+make ${INSTALLROOT}/include/ast/pzip.h implicit
+prev ${INSTALLROOT}/include/ast/vmalloc.h implicit
+prev ${INSTALLROOT}/include/ast/sfdcgzip.h implicit
+prev ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/pzip.h
 prev cdblib.h implicit
 done cdbpzip.c
+meta cdbpzip.o %.c>%.o cdbpzip.c cdbpzip
 prev cdbpzip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbpzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_cdb -c cdbpzip.c
 done cdbpzip.o generated
 make cdbvdelta.o
 make cdbvdelta.c
-make ../../../include/ast/vdelta.h implicit
-done ../../../include/ast/vdelta.h
+make ${INSTALLROOT}/include/ast/vdelta.h implicit
+done ${INSTALLROOT}/include/ast/vdelta.h
 prev cdblib.h implicit
 done cdbvdelta.c
+meta cdbvdelta.o %.c>%.o cdbvdelta.c cdbvdelta
 prev cdbvdelta.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbvdelta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_BLD_cdb -D_PACKAGE_ast -c cdbvdelta.c
 done cdbvdelta.o generated
 exec - ${AR} cr libcdb.a cdbopen.o cdbread.o cdbwrite.o cdbseek.o cdbmove.o cdbmap.o cdbcache.o cdbdrop.o cdbempty.o cdblib.o cdbtypes.o cdbmeth.o cdbdump.o cdberror.o cdbimage.o cdbcdb.o cdbflat.o cdbgzip.o cdbpzip.o cdbvdelta.o
 exec - (ranlib libcdb.a) >/dev/null 2>&1 || true
 done libcdb.a generated
 done cdb virtual
 prev libcdb.a archive
-make ../../../lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
+make ${INSTALLROOT}/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib
 exec - fi
-done ../../../lib generated
-make ../../../lib/libcdb.a archive
-prev ../../../lib
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libcdb.a archive
+prev ${INSTALLROOT}/lib
 prev libcdb.a archive
-exec - test '' = 'libcdb.a' || ${STDCMP} 2>/dev/null -s libcdb.a ${PACKAGE_ast_LIB}/libcdb.a || { ${STDMV} ${PACKAGE_ast_LIB}/libcdb.a ${PACKAGE_ast_LIB}/libcdb.a.old 2>/dev/null || true; ${STDCP} libcdb.a ${PACKAGE_ast_LIB}/libcdb.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libcdb.a) >/dev/null 2>&1 || true
-done ../../../lib/libcdb.a generated
-make ../../../man/man3
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/man/man3
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 		    		   
+exec - test '' = 'libcdb.a' || ${STDCMP} 2>/dev/null -s libcdb.a ${INSTALLROOT}/lib/libcdb.a || { ${STDMV} ${INSTALLROOT}/lib/libcdb.a ${INSTALLROOT}/lib/libcdb.a.old 2>/dev/null || true; ${STDCP} libcdb.a ${INSTALLROOT}/lib/libcdb.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libcdb.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libcdb.a generated
+make ${INSTALLROOT}/man/man3
+exec - if	silent test ! -d ${INSTALLROOT}/man/man3
+exec - then	mkdir -p ${INSTALLROOT}/man/man3
 exec - fi
-done ../../../man/man3 generated
-make ../../../man/man3/cdb.3
-prev ../../../man/man3
+done ${INSTALLROOT}/man/man3 generated
+make ${INSTALLROOT}/man/man3/cdb.3
+prev ${INSTALLROOT}/man/man3
 make cdb.3
 done cdb.3
 exec - test '' = 'cdb.3' || ${STDCMP} 2>/dev/null -s cdb.3 ${INSTALLROOT}/man/man3/cdb.3 || { ${STDMV} ${INSTALLROOT}/man/man3/cdb.3 ${INSTALLROOT}/man/man3/cdb.3.old 2>/dev/null || true; ${STDCP} cdb.3 ${INSTALLROOT}/man/man3/cdb.3  		    		    ;}
-done ../../../man/man3/cdb.3 generated
-make ../../../lib/lib
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
+done ${INSTALLROOT}/man/man3/cdb.3 generated
+make ${INSTALLROOT}/lib/lib
+exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
+exec - then	mkdir -p ${INSTALLROOT}/lib/lib
 exec - fi
-done ../../../lib/lib generated
-make ../../../lib/lib/cdb
-prev ../../../lib/lib
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/cdb
+prev ${INSTALLROOT}/lib/lib
 prev cdb.req
-exec - test '' = 'cdb.req' || ${STDCMP} 2>/dev/null -s cdb.req ${PACKAGE_ast_LIB}/lib/cdb || { ${STDMV} ${PACKAGE_ast_LIB}/lib/cdb ${PACKAGE_ast_LIB}/lib/cdb.old 2>/dev/null || true; ${STDCP} cdb.req ${PACKAGE_ast_LIB}/lib/cdb  		    		    ;}
-done ../../../lib/lib/cdb generated
-make ../../../include/ast
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
+exec - test '' = 'cdb.req' || ${STDCMP} 2>/dev/null -s cdb.req ${INSTALLROOT}/lib/lib/cdb || { ${STDMV} ${INSTALLROOT}/lib/lib/cdb ${INSTALLROOT}/lib/lib/cdb.old 2>/dev/null || true; ${STDCP} cdb.req ${INSTALLROOT}/lib/lib/cdb  		    		    ;}
+done ${INSTALLROOT}/lib/lib/cdb generated
+make ${INSTALLROOT}/include/ast
+exec - if	silent test ! -d ${INSTALLROOT}/include/ast
+exec - then	mkdir -p ${INSTALLROOT}/include/ast
 exec - fi
-done ../../../include/ast generated
-make ../../../include/ast/cdb.h
-prev ../../../include/ast
+done ${INSTALLROOT}/include/ast generated
+make ${INSTALLROOT}/include/ast/cdb.h
+prev ${INSTALLROOT}/include/ast
 prev cdb.h
-exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=1997,author=gsf'  cdb.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cdb.h 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1997,author=gsf'  cdb.h > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/cdb.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cdb.h
+exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/cdb.h
 exec - fi
-done ../../../include/ast/cdb.h generated
-make ../../../include/ast/cdbmethod.h
+done ${INSTALLROOT}/include/ast/cdb.h generated
+make ${INSTALLROOT}/include/ast/cdbmethod.h
 prev cdbmethod.h
-exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=1997,author=gsf'  cdbmethod.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cdbmethod.h 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1997,author=gsf'  cdbmethod.h > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/cdbmethod.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cdbmethod.h
+exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/cdbmethod.h
 exec - fi
-done ../../../include/ast/cdbmethod.h generated
+done ${INSTALLROOT}/include/ast/cdbmethod.h generated
 done install virtual
 make test
 done test dontcare virtual

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -50,7 +50,7 @@ getprologue(register Archive_t* ap)
 	unsigned char		buf[MAXUNREAD];
 	unsigned char		cvt[MAXUNREAD];
 
-	if (ap->io->eof || state.volume && ap->io->mode != O_RDONLY)
+	if (ap->io->eof || state.volume && (ap->io->mode & O_ACCMODE) != O_RDONLY)
 		return 0;
 	state.volume[0] = 0;
 	ap->entry = 0;

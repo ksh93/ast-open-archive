@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -347,7 +347,7 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 					t = prefix;
 				else
 					sfsprintf(t = pp.path, PATH_MAX - 1, "%s/%s", dp->name, prefix);
-				if (access(t, X_OK))
+				if (eaccess(t, X_OK))
 				{
 					message((-3, "search: omit %s", t));
 					continue;
@@ -478,7 +478,7 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 #endif
 		{
 			pp.member = 0;
-			fd = (flags & SEARCH_INCLUDE) ? open(pp.path, O_RDONLY) : access(pp.path, R_OK);
+			fd = (flags & SEARCH_INCLUDE) ? open(pp.path, O_RDONLY) : eaccess(pp.path, R_OK);
 		}
 		if (fd >= 0)
 		{

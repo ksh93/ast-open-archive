@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
@@ -167,7 +167,7 @@ ssize_t	s_data;		/* data size		*/
 			else if (d < 0) /* 4 byte ibm BE length descriptor */
 			{	if(s_loop < 4)
 					break;
-				datalen = ((data[2]<<16)|(data[3])) + 4;
+				datalen = ((data[0]<<16)|(data[1]));
 			}
 			else /* records separated by some separator	*/
 			{	if(!(endd = (uchar*)memchr(data,(int)d,s_loop)) )

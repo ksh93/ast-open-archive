@@ -11,11 +11,10 @@ ast-base :PACKAGE: \
 :INDEX: ksh, pax, nmake, tw, sfio, and ast libraries
 
 :DESCRIPTION:
-	The AT&T Software Technology ast-base package from AT&T Labs
-	Research contains commands and libraries required by all other
-	ast based packages. Included are ksh93, a pax that generates
-	compact delta archives, nmake, the 3d user level versioning
-	filesystem, coshell for network execution, a multi-dialect C
-	preprocessor and companion library, gnu-make that uses coshell
-	for network execution, and libraries shared by the other ast
-	packages.
+	The AT&T Software Technology ast-base package from AT&T Research
+	contains commands and libraries required by all other ast based
+	packages. Included are ksh93, a pax that generates compact delta
+	archives, nmake, the 3d user level versioning filesystem, coshell
+	for network execution, a multi-dialect C preprocessor and companion
+	library, gnu-make that uses coshell for network execution, and
+	libraries shared by the other ast packages.

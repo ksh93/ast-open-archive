@@ -15,7 +15,7 @@
 #               AT&T's intellectual property rights.               #
 #                                                                  #
 #            Information and Software Systems Research             #
-#                        AT&T Labs Research                        #
+#                          AT&T Research                           #
 #                         Florham Park NJ                          #
 #                                                                  #
 #                David Korn <dgk@research.att.com>                 #
@@ -55,7 +55,14 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	\bread\b call, as well as any 32-bit and 64-bit versions. \bie\b
 	ignores calls not present in a particular host system. In addition,
 	\bie\b only works on dynamically linked executables that have neither
-	set-uid nor set-gid permissions.]
+	set-uid nor set-gid permissions. It may not have the intended effect
+	on programs written in a language or linked with a language runtime
+	that hides or mangles system call library symbols, or that
+	directly emit system call instruction sequences rather than using
+	the corresponding library functions, or that dynamically link
+	libraries outside of the scope of the \bie\b intercepts.]
+[+?Multi-process client-server applications may misbehave if the \bie\b
+	environment between the related processes is not kept in sync.]
 
 command [ arg ... ]
 

@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -142,9 +142,9 @@ struct parseinfo			/* recursive parse state stack	*/
 	char*		stashget;	/* loop body stash get		*/
 	char*		pushback;	/* line pushback pointer	*/
 	struct local*	local;		/* local variables		*/
-	int		checkhere;	/* possible <<?			*/
-	int		join;		/* join line			*/
+	int		checkhere;	/* <<? offset			*/
 	int		line;		/* prev level input line number	*/
+	int		splice;		/* splice line			*/
 	short		indent;		/* active indentation level	*/
 	unsigned char	eval;		/* eval block level		*/
 	unsigned char	status;		/* action return status		*/
@@ -386,13 +386,10 @@ local(Sfio_t* xp, char* v)
 				if ((a = getarg(&argv, NiL)) && !optional && streq(a, "..."))
 				{
 					optional = 1;
+					if (*v)
+						*(v - 1) = ' ';
 					if (!(a = getarg(&argv, NiL)))
-					{
-#if _HUH_2001_02_14
-						*(t + strlen(t)) = ' ';
-#endif
 						v = null;
-					}
 				}
 				argc++;
 				sfprintf(ap, "%s=%s", formal, t);
@@ -411,12 +408,15 @@ local(Sfio_t* xp, char* v)
 	{
 		if (formal)
 		{
-			if (!optional)
+			a = getarg(&argv, NiL);
+			if (!optional && (!a || !streq(a, "...")))
 				error(3, "%s: actual argument expected", formal, argc - 1);
-			do
+			formal = a;
+			while (formal)
 			{
 				declare(formal, error_info.line, 0);
-			} while (formal = getarg(&argv, NiL));
+				formal = getarg(&argv, NiL);
+			}
 		}
 		pp->argc = argc - 1;
 		while (argc <= argn)
@@ -478,9 +478,7 @@ iterate(void)
 		v->value = p;
 		v->property |= V_import;
 	}
-#if DEBUG
-	message((-7, "assignment: lhs=`%s' rhs=`%s'", v->name, v->value));
-#endif
+	debug((-6, "assignment: lhs=`%s' rhs=`%s'", v->name, v->value));
 	return 1;
 }
 
@@ -556,7 +554,7 @@ directive(register char* s)
 /*
  * read line from file or buffer
  *
- * `\<newline>' joins the current and next lead line
+ * `\<newline>' splices the current and next lead line
  * `#...<newline>' comments (preceded by space) are stripped from files
  *
  * return value for file input placed in pp->ip
@@ -567,13 +565,18 @@ readline(int lead)
 {
 	register char*	s;
 	register char*	t;
+	register char*	f;
 	register int	c;
 	register int	n;
+	register int	q;
 	struct rule*	r;
 	int		start;
+	int		here;
+	int		m;
 	long		line;
 	Sfio_t*		sps[2];
 
+	trap();
 	if (s = pp->pushback)
 	{
 		pp->pushback = 0;
@@ -639,18 +642,18 @@ readline(int lead)
 			if (sps[0] == state.coshell->msgfp || n > 1 && sps[1] == state.coshell->msgfp)
 				while (block(1));
 		} while (sps[0] != pp->fp && (n <= 1 || sps[1] != pp->fp));
-		pp->checkhere = 0;
-		n = 0;
+		here = pp->checkhere = 0;
+		n = q = 0;
 		for (;;)
 		{
 			switch (c = sfgetc(pp->fp))
 			{
 			case EOF:
 			eof:
-				if (n == COMMENT)
-					error(lead > 0 ? 2 : 1, "EOF in %c comment", n);
-				else if (n)
-					error(lead > 0 ? 2 : 1, "EOF in %c...%c quote starting at line %d", n, n, start);
+				if (q == COMMENT)
+					error(lead > 0 ? 2 : 1, "EOF in %c comment", q);
+				else if (q)
+					error(lead > 0 ? 2 : 1, "EOF in %c...%c quote starting at line %d", q, q, start);
 				else if (sfstrtell(pp->ip) > line)
 					error(lead > 0 ? 2 : 1, "file does not end with newline");
 				if (sfstrtell(pp->ip) > line)
@@ -671,7 +674,7 @@ readline(int lead)
 			case '\n':
 			newline:
 				error_info.line++;
-				if (!n || n == COMMENT)
+				if (!q || q == COMMENT)
 				{
 					t = sfstrrel(pp->ip, 0);
 					s = sfstrbase(pp->ip) + line;
@@ -715,7 +718,7 @@ readline(int lead)
 							error(ERROR_PROMPT, PS2);
 						continue;
 					}
-					pp->join = error_info.line + 2;
+					pp->splice = error_info.line + 2;
 					sfungetc(pp->fp, '\n');
 					c = '\\';
 					break;
@@ -726,16 +729,16 @@ readline(int lead)
 				break;
 			case '"':
 			case '\'':
-				if (c == n)
-					n = 0;
-				else if (!n)
+				if (c == q)
+					q = 0;
+				else if (!q)
 				{
-					n = c;
+					q = c;
 					start = error_info.line;
 				}
 				break;
 			case '/':
-				if (!n && (sfstrtell(pp->ip) == line || isspace(*(sfstrrel(pp->ip, 0) - 1))))
+				if (!q && (sfstrtell(pp->ip) == line || isspace(*(sfstrrel(pp->ip, 0) - 1))))
 					switch (c = sfgetc(pp->fp))
 					{
 					case EOF:
@@ -752,6 +755,7 @@ readline(int lead)
 							goto end;
 						case '\n':
 							error_info.line++;
+							sfputc(pp->ip, '\n');
 							if (pp->prompt)
 								error(ERROR_PROMPT, PS2);
 							break;
@@ -795,8 +799,8 @@ readline(int lead)
 					}
 				break;
 			case COMMENT:
-				if (!n && sfstrtell(pp->ip) > line && isspace(*(sfstrrel(pp->ip, 0) - 1)))
-					for (n = c;;)
+				if (!q && sfstrtell(pp->ip) > line && isspace(*(sfstrrel(pp->ip, 0) - 1)))
+					for (q = c;;)
 						switch (sfgetc(pp->fp))
 						{
 						case EOF:
@@ -813,6 +817,7 @@ readline(int lead)
 								if (!lead)
 									goto newline;
 								error_info.line++;
+								sfputc(pp->ip, '\n');
 								if (pp->prompt)
 									error(ERROR_PROMPT, PS2);
 								break;
@@ -822,8 +827,26 @@ readline(int lead)
 							goto newline;
 						}
 				break;
+			case '(':
+			case '[':
+			case '{':
+				if (!q)
+					n++;
+				break;
+			case ')':
+			case ']':
+			case '}':
+				if (!q && n)
+					n--;
+				break;
 			case '<':
-				pp->checkhere = 1;
+				if (!q && !n && !pp->checkhere && (m = sfstrtell(pp->ip) - line))
+				{
+					if (m == here)
+						pp->checkhere = 1;
+					else
+						here = m + 1;
+				}
 				break;
 			}
 			sfputc(pp->ip, c);
@@ -837,26 +860,50 @@ readline(int lead)
 			pp->newline = 0;
 			*s++ = '\n';
 		}
-		t = s;
-		while (pp->bp = strchr(t, '\n'))
+		if (f = strchr(s, '\n'))
 		{
-			/*
-			 * NOTE: the `\\n' is permanently removed the first
-			 *	 time through causing the '\\n' to be ignored
-			 *	 in this and subsequent line number counts
-			 */
+			if (lead > 0 && f > s && *(f - 1) == '\\')
+			{
+				/*
+				 * NOTE: `\\n' are permanently eliminated *each pass*
+				 *	 line counts are preserved by adding newlines
+				 *	 after sliding the spliced segment(s)
+				 */
 
-			if (lead > 0 && pp->bp > t && *(pp->bp - 1) == '\\')
-			{
-				t = pp->bp;
-				*(t - 1) = *t = ' ';
+				n = 1;
+				t = f - 1;
+				for (;;)
+				{
+					if (!(c = *++f))
+					{
+						f = 0;
+						*t = 0;
+						break;
+					}
+					else if (c != '\n')
+						*t++ = c;
+					else if (*(f - 1) != '\\')
+					{
+						f = t + 1;
+						while (n--)
+						{
+							*t++ = ' ';
+							*t++ = '\n';
+						}
+						break;
+					}
+					else
+					{
+						n++;
+						t--;
+					}
+				}
 			}
-			else
-			{
-				pp->newline = 1;
-				*pp->bp = 0;
-				break;
-			}
+		}
+		if (pp->bp = f)
+		{
+			*f = 0;
+			pp->newline = 1;
 		}
 		return s;
 	}
@@ -897,6 +944,7 @@ getline(Sfio_t* sp, int lead, int term)
 		free(t);
 		return sfstrtell(sp) != 0;
 	}
+ again:
 	while (s = lin = readline(lead))
 	{
 		indent = 0;
@@ -913,6 +961,9 @@ getline(Sfio_t* sp, int lead, int term)
 			{
 				static int	warned;
 
+				for (t = s; isspace(*t); t++);
+				if (!*t)
+					goto again;
 				if (!warned)
 				{
 					error(1, "<space> indentation may be non-portable");
@@ -944,9 +995,7 @@ getline(Sfio_t* sp, int lead, int term)
 					/*UNDENT*/
 	if (i)
 	{
-#if DEBUG
-		message((-8, "%s:%d:test: `%s'", error_info.file, error_info.line, s));
-#endif
+		debug((-7, "%s:%d:test: `%s'", error_info.file, error_info.line, s));
 		switch (i)
 		{
 
@@ -1191,39 +1240,29 @@ getline(Sfio_t* sp, int lead, int term)
 					sfstrset(sp, t - sfstrbase(sp));
 					sfputc(sp, 0);
 					setvar(state.frame->target->name, sfstrset(sp, n), 0);
-#if DEBUG
-					message((-5, "%s returns `%s'", state.frame->target->name, sfstrrel(sp, 0)));
-#endif
+					debug((-5, "%s returns `%s'", state.frame->target->name, sfstrrel(sp, 0)));
 				}
 				else if (*t)
 				{
 					if ((n = expr(sp, t)) == -1)
 					{
 						pp->status = FAILED;
-#if DEBUG
-						message((-5, "return fail"));
-#endif
+						debug((-5, "return fail"));
 					}
 					else if (n)
 					{
 						pp->status = TOUCH;
 						internal.internal->time = n;
-#if DEBUG
-						message((-5, "return [%s]", strtime(internal.internal->time)));
-#endif
+						debug((-5, "return [%s]", strtime(internal.internal->time)));
 					}
 					else
 					{
 						pp->status = EXISTS;
-#if DEBUG
-						message((-5, "return no update"));
-#endif
+						debug((-5, "return no update"));
 					}
 				}
-#if DEBUG
 				else
-					message((-5, "return normal"));
-#endif
+					debug((-5, "return normal"));
 				for (cp = pp->cp; cp >= pp->block; cp--)
 					cp->flags |= CON_skip | CON_kept;
 			}
@@ -1425,6 +1464,7 @@ getline(Sfio_t* sp, int lead, int term)
 						{
 							if (f)
 								error(1, "read format ignored");
+							sfset(state.io[d], SF_IOINTR, 1);
 							if (!(f = sfgetr(state.io[d], '\n', 1)))
 								f = null;
 							setvar(t, f, 0);
@@ -1452,7 +1492,10 @@ getline(Sfio_t* sp, int lead, int term)
 			}
 		}
 #if DEBUG
-		message((-8, "%s:%d:%s: `%s'", error_info.file, error_info.line, (pp->cp->flags & CON_skip) ? "skip" : "data", s));
+		if (pp->cp->flags & CON_skip)
+			debug((-8, "%s:%d:skip: `%s'", error_info.file, error_info.line, s));
+		else
+			debug((-7, "%s:%d:data: `%s'", error_info.file, error_info.line, s));
 #endif
 		if (!(pp->cp->flags & CON_skip))
 		{
@@ -1473,8 +1516,13 @@ getline(Sfio_t* sp, int lead, int term)
 			}
 			else if (!lead && pp->fp == sfstdin)
 				return 0;
-			else if (pp->join == error_info.line)
+			else if (pp->splice == error_info.line)
 				break;
+			else if (!lead)
+			{
+				sfputr(sp, s, term);
+				return 1;
+			}
 		}
 	}
 	if (!s)
@@ -1806,34 +1854,102 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 	{
 		if (pp->checkhere)
 		{
-			b = sfstrbase(sp) + rhs_pos;
-			for (t = p - 1; t > b; t--)
-				if (*t == '<')
+			t = b = sfstrbase(sp) + rhs_pos;
+			nest = quote = 0;
+			for (;;)
+			{
+				switch (*t++)
 				{
-					if (*(t - 1) == '<' && *(t + 1))
-					{
-						pp->here = strdup(t + 1);
-						for (t -= 2; t >= b && isspace(*t); t--);
-						*(t + 1) = 0;
-						if (!*b)
-							rhs_pos = -1;
-					}
+				case 0:
 					break;
+				case '"':
+				case '\'':
+					if (*(t - 1) == quote)
+						quote = 0;
+					else if (!quote)
+						quote = *(t - 1);
+					continue;
+				case '(':
+				case '[':
+				case '{':
+					if (!quote)
+						nest++;
+					continue;
+				case ')':
+				case ']':
+				case '}':
+					if (!quote)
+						nest--;
+					continue;
+				case '<':
+					if (!nest && !quote && *t == '<')
+					{
+						s = t - 1;
+						while (isspace(*++t));
+						if (*t)
+						{
+							p = t;
+							while (*++t)
+								if (isspace(*t))
+								{
+									*t = 0;
+									break;
+								}
+							pp->here = strdup(p);
+							while (--s >= b && isspace(*s));
+							*(s + 1) = 0;
+						}
+						break;
+					}
+					continue;
+				default:
+					continue;
 				}
+				break;
+			}
+			if (!*b)
+				rhs_pos = -1;
 		}
 		act_pos = ++p - sfstrbase(sp);
 		sfstrset(sp, act_pos);
 		while (getline(sp, 0, '\n'));
-		if (sfstrtell(sp) == act_pos)
-			act_pos = -1;
-		else
-			*(sfstrrel(sp, 0) - 1) = 0;
+		t = sfstrbase(sp) + act_pos;
+		s = sfstrrel(sp, 0);
+		for (;;)
+		{
+			if (s <= t)
+			{
+				act_pos = -1;
+				break;
+			}
+			if (*--s != '\n')
+			{
+				*(s + 1) = 0;
+				break;
+			}
+		}
 	}
 	*lhs = sfstrset(sp, 0);
 	*rhs = (rhs_pos >= 0) ? sfstrbase(sp) + rhs_pos : null;
 	*act = (act_pos >= 0) ? sfstrbase(sp) + act_pos : null;
 	return op;
 }
+
+static const Namval_t	nametypes[] =
+{
+	"altstate",	NAME_altstate,
+	"assignment",	NAME_assignment,
+	"context",	NAME_context,
+	"dynamic",	NAME_dynamic,
+	"glob",		NAME_glob,
+	"identifier",	NAME_identifier,
+	"intvar",	NAME_intvar,
+	"option",	NAME_option,
+	"path",		NAME_path,
+	"staterule",	NAME_staterule,
+	"statevar",	NAME_statevar,
+	"variable",	NAME_variable,
+};
 
 /*
  * parse a basic assertion statement
@@ -1847,6 +1963,8 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 	register struct list*	p;
 	register struct list*	q;
 	int			c;
+	int			i;
+	int			n;
 	int			isactive;
 	struct rule*		x;
 	struct rule*		joint;
@@ -1875,15 +1993,11 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 			}
 	if (opr)
 	{
-#if DEBUG
-		message((-7, "operator: lhs=`%s' %s rhs=`%s' act=`%-.1024s'", lhs, opr->name, rhs, act));
-#endif
+		debug((-6, "operator: lhs=`%s' %s rhs=`%s' act=`%-.1024s'", lhs, opr->name, rhs, act));
 		apply(opr, lhs, rhs, act, CO_ALWAYS|CO_LOCAL|CO_URGENT);
 		return;
 	}
-#if DEBUG
-	message((-7, "assertion: lhs=`%s' rhs=`%-.1024s' act=`%-.1024s'", lhs, rhs, act));
-#endif
+	debug((-6, "assertion: lhs=`%s' rhs=`%-.1024s' act=`%-.1024s'", lhs, rhs, act));
 
 	/*
 	 * special check for internal.query
@@ -1916,6 +2030,19 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 #else
 				error(2, "%s: implemented in DEBUG==1 version", s);
 #endif
+			}
+			else if (streq(s, "nametype"))
+			{
+				while (s = getarg(&rhs, NiL))
+				{
+					n = nametype(s, NiL);
+					sfprintf(sfstdout, "%16s", s);
+					for (i = 0; i < elementsof(nametypes); i++)
+						if (n & nametypes[i].value)
+							sfprintf(sfstdout, " %s", nametypes[i].name);
+					sfputc(sfstdout, '\n');
+				}
+				break;
 			}
 			else if (streq(s, "rules"))
 			{
@@ -1989,7 +2116,7 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 	zero(set);
 	set.op = op;
 	if (!*rhs)
-		set.op |= A_norhs;
+		set.op |= A_target;
 	p = q = 0;
 	while (s = getarg(&rhs, &set.op))
 	{
@@ -2142,10 +2269,12 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 				p = q = cons(r, NiL);
 			else
 				q = q->next = cons(r, NiL);
+			if (!(r->dynamic & D_scope))
+				set.op |= A_target;
 		}
 	}
 	prereqs = p;
-	if (prereqs || *act || (set.op & (A_norhs|A_null)) || (set.rule.property & (P_make|P_local)) == (P_make|P_local))
+	if (*act || (set.op & (A_null|A_target)) || (set.rule.property & (P_make|P_local)) == (P_make|P_local))
 		set.rule.property |= P_target;
 	joint = (set.rule.property & P_joint) ? internal.joint : 0;
 
@@ -2523,9 +2652,7 @@ assignment(char* lhs, int op, char* rhs)
 			r->uname = 0;
 			return;
 		}
-#if DEBUG
-	message((-7, "assignment: lhs=`%s' %s%srhs=`%-.1024s'", lhs, (op & OP_APPEND) ? "[append] " : null, (op & OP_STATE) ? "[state] " : null, rhs));
-#endif
+	debug((-6, "assignment: lhs=`%s' %s%srhs=`%-.1024s'", lhs, (op & OP_APPEND) ? "[append] " : null, (op & OP_STATE) ? "[state] " : null, rhs));
 	if (!(s = getarg(&lhs, NiL)))
 		error(1, "variable name missing in assignment");
 	else
@@ -2579,9 +2706,9 @@ rules(char* s)
 	if (state.rules)
 	{
 		edit(internal.nam, t, DELETE, KEEP, DELETE);
-		e = sfstruse(internal.nam);
-		if (!streq(e, state.rules))
-			error(3, "%s: incompatible with current base rules %s", e, state.rules);
+		edit(internal.wrk, state.rules, DELETE, KEEP, DELETE);
+		if (strcmp(sfstruse(internal.nam), sfstruse(internal.wrk)))
+			error(3, "%s: incompatible with current base rules %s", t, state.rules);
 	}
 	else if (t == null)
 		state.rules = null;
@@ -2644,10 +2771,10 @@ nextarg(char* s, char** p, char** end, long* val)
 	char		buf[10];
 	long		n;
 
-	if ((c = *s) && c != MARK_QUOTE)
+	if ((c = *s) && c != MARK_QUOTE && c != '"')
 	{
 		if (!istype(*s, C_VARIABLE1))
-			error(3, "argument expected in expression");
+			error(3, "argument expected in expression [%s]", s);
 		for (var = s++; istype(*s, C_VARIABLE2); s++);
 		varend = s;
 		while (isspace(*s))
@@ -2695,6 +2822,15 @@ nextarg(char* s, char** p, char** end, long* val)
 		if (*s)
 			while (isspace(*++s));
 	}
+	else if (c == '"')
+	{
+		for (arg = ++s; *s && *s != c; s++)
+			if (*s == '\\' && *(s + 1))
+				s++;
+		*end = s;
+		if (*s)
+			while (isspace(*++s));
+	}
 	else if (var)
 	{
 		sfsprintf(arg = buf, sizeof(buf), "%ld", *val = strexpr(s, &s, makeexpr, NiL));
@@ -2718,9 +2854,7 @@ nextarg(char* s, char** p, char** end, long* val)
 			if (*arg == '"' && !*(arg + 1))
 				arg++;
 		}
-#if DEBUG
-		message((-7, "assignment: lhs=`%s' rhs=`%s'", var, arg));
-#endif
+		debug((-6, "assignment: lhs=`%s' rhs=`%s'", var, arg));
 		setvar(var, arg, 0);
 		*varend = c;
 		if (end)
@@ -3029,8 +3163,8 @@ parse(Sfio_t* fp, char* bp, char* name, int scoped)
 	pp->pushback = 0;
 	pp->eval = 0;
 	pp->indent = 0;
-	pp->join = 0;
 	pp->newline = 0;
+	pp->splice = 0;
 	pp->status = UPDATE;
 	pp->cp = pp->block;
 	pp->cp->flags = 0;

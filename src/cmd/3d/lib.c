@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -153,22 +153,28 @@ fs3d(register int op)
 	register int	po;
 	register int	n;
 
-	if ((n = FS3D_op(op)) == FS3D_OP_INIT || !state.pid) init(1, 0, 0);
-	if (!state.in_2d) po = FS3D_ON;
-	else if (state.limit) po = FS3D_LIMIT(state.limit);
-	else po = FS3D_OFF;
+	if ((n = FS3D_op(op)) == FS3D_OP_INIT || !state.pid)
+		init(1, 0, 0);
+	if (!state.in_2d)
+		po = FS3D_ON;
+	else if (state.limit != TABSIZE)
+		po = FS3D_LIMIT(state.limit);
+	else
+		po = FS3D_OFF;
 	switch (n)
 	{
 	case FS3D_OP_INIT:
 	case FS3D_OP_TEST:
 		break;
 	case FS3D_OP_LIMIT:
-		if ((n = FS3D_arg(op)) <= 0 || n > TABSIZE) n = TABSIZE;
+		if ((n = FS3D_arg(op)) <= 0 || n > TABSIZE)
+			n = TABSIZE;
 		state.limit = n;
 		state.in_2d = 0;
 		break;
 	case FS3D_OP_OFF:
-		if (state.level > 0) po = -1;
+		if (state.level > 0)
+			po = -1;
 		else
 		{
 			state.limit = TABSIZE;
@@ -184,7 +190,7 @@ fs3d(register int op)
 		break;
 	}
 	message((-1, "fs3d(%d)=%d", op, po));
-	return(po);
+	return po;
 }
 
 /*
@@ -480,21 +486,24 @@ fileinit(int fd, struct stat* st, Mount_t* mp, int force)
 	if (!force && (f->flags & FILE_ERROR) || !st && FSTAT(fd, st = &sb) || (ffd = FCNTL(fd, F_GETFD, NiL)) == -1 || (ffl = FCNTL(fd, F_GETFL, NiL)) == -1)
 	{
 		f->flags = FILE_ERROR;
-		return(-1);
+		return -1;
 	}
 	f->oflag = ffl;
 	f->open = 0;
 	f->flags = FILE_OPEN;
-	if (S_ISREG(st->st_mode)) f->flags |= FILE_REGULAR;
-	if (ffd & FD_CLOEXEC) f->flags |= FILE_CLOEXEC;
-	if (ffl & (O_RDWR|O_WRONLY)) f->flags |= FILE_WRITE;
+	if (S_ISREG(st->st_mode))
+		f->flags |= FILE_REGULAR;
+	if (ffd & FD_CLOEXEC)
+		f->flags |= FILE_CLOEXEC;
+	if ((ffl & O_ACCMODE) != O_RDONLY)
+		f->flags |= FILE_WRITE;
 	f->id.fid[0] = st->st_ino;
 	f->id.fid[1] = st->st_dev;
 	if ((f->mount = mp) && fd > state.cache)
 		state.cache = fd;
 	if (fd > state.open)
 		state.open = fd;
-	return(0);
+	return 0;
 }
 
 #endif

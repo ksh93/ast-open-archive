@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -309,9 +309,7 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 		 * check explicit constrained prereqs -- easy
 		 */
 
-#if DEBUG
-		message((-9, "check explicit constrained metarule prerequisites"));
-#endif
+		debug((-9, "check explicit constrained metarule prerequisites"));
 		t = sfstrbase(internal.met);
 		matched = 0;
 		for (p = internal.metarule->prereqs; p; p = p->next)
@@ -338,9 +336,7 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 		 * check implicit constrained prereqs -- a little harder
 		 */
 
-#if DEBUG
-		message((-9, "check implicit constrained metarule prerequisites"));
-#endif
+		debug((-9, "check implicit constrained metarule prerequisites"));
 		matched = 0;
 		for (p = internal.metarule->prereqs; p; p = p->next)
 			if (metamatch(stem, u, p->rule->name) && (x = metainfo('I', p->rule->name, NiL, 0)))
@@ -382,9 +378,7 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 						 * check terminal unconstrained metarules
 						 */
 
-#if DEBUG
-						message((-9, "check terminal unconstrained metarules"));
-#endif
+						debug((-9, "check terminal unconstrained metarules"));
 						for (v = terminal; v; v = v->next)
 							if (metarule(v->rule->name, NiL, 0))
 							{
@@ -466,18 +460,14 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 				}
 		if (!matched)
 		{
-#if DEBUG
-			message((-9, "check nonterminal unconstrained metarules"));
-#endif
+			debug((-9, "check nonterminal unconstrained metarules"));
 			if (prereqs)
 			{
 				/*
 				 * check explicit prereqs -- easy
 				 */
 
-#if DEBUG
-				message((-9, "check explicit nonterminal unconstrained metarule prerequisites"));
-#endif
+				debug((-9, "check explicit nonterminal unconstrained metarule prerequisites"));
 				t = sfstrbase(internal.met);
 				for (p = x->prereqs; p; p = p->next)
 					if (m = metarule(p->rule->name, NiL, 0))
@@ -493,9 +483,7 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 			 * check implicit prereqs -- hardest
 			 */
 
-#if DEBUG
-			message((-9, "check implicit nonterminal unconstrained metarule prerequisites"));
-#endif
+			debug((-9, "check implicit nonterminal unconstrained metarule prerequisites"));
 			for (q = x->prereqs; q; q = q->next)
 				if (m = metarule(q->rule->name, NiL, 0))
 				{

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -92,6 +92,8 @@ rstat(char* name, struct stat* st, int res)
 			error(1, "%s modify time must be after the epoch", name);
 		st->st_mtime = OLDTIME;
 	}
+	if (state.regress && (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)))
+		st->st_mtime = CURTIME;
 	return 0;
 }
 
@@ -203,8 +205,33 @@ strtime(unsigned long t)
 		return "not checked";
 	else if (t == OLDTIME)
 		return "really old";
-	else
+	else if (!state.regress)
 		return fmttime("%?%K", (time_t)t);
+	else if (t < state.start)
+		return "recent";
+	else
+		return "current";
+}
+
+/*
+ * convert time t to a number for mam/regress/tracing
+ */
+
+unsigned long
+numtime(unsigned long t)
+{
+	if (!t)
+		return 0;
+	else if (t == NOTIME)
+		return 1;
+	else if (t == OLDTIME)
+		return 2;
+	else if (!state.regress)
+		return t;
+	else if (t < state.start)
+		return 3;
+	else
+		return 4;
 }
 
 /*
@@ -251,6 +278,7 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	Value_t*	value = (Value_t*)vp;
 	register char*	s;
 	char*		txt;
+	char*		e;
 	time_t		tm;
 
 	if (fp->all)
@@ -294,6 +322,13 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	case 'G':
 		dp->size = sizeof(value->d);
 		value->d = strtod(s, NiL);
+		break;
+	case 'o':
+	case 'u':
+	case 'x':
+	case 'X':
+		dp->size = sizeof(value->q);
+		value->q = strtoull(s, NiL, 0);
 		break;
 	case 'p':
 		value->p = (char**)strtol(s, NiL, 0);
@@ -344,17 +379,12 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		break;
 	case 't':
 	case 'T':
-		if ((tm = strtol(s, NiL, 0)) == -1)
+		tm = isdigit(*s) ? strtol(s, &e, 0) : tmdate(s, &e, NiL);
+		if (*e || tm == -1)
 			tm = CURTIME;
 		value->s = txt ? fmttime(txt, tm) : strtime(tm);
 		dp->fmt = 's';
 		dp->size = -1;
-		break;
-	case 'u':
-	case 'x':
-	case 'X':
-		dp->size = sizeof(value->q);
-		value->q = strtoull(s, NiL, 0);
 		break;
 	case 'Z':
 		dp->fmt = 'c';
@@ -524,39 +554,4 @@ explain(int level, ...)
 	va_start(ap, level);
 	errorv(NiL, state.explain ? 0 : EXPTRACE, ap);
 	va_end(ap);
-}
-
-/*
- * return # outstanding jobs
- */
-
-char*
-b_outstanding(char** args)
-{
-	sfprintf(internal.val, "%d", state.coshell ? state.coshell->outstanding : 0);
-	return sfstruse(internal.val);
-}
-
-/*
- * getconf() builtin
- */
-
-char*
-b_getconf(char** args)
-{
-	char*	name;
-	char*	path;
-	char*	value;
-
-	if (name = *args)
-		args++;
-	if (path = *args)
-	{
-		if (path[0] == '-' && !path[1])
-			path = 0;
-		args++;
-	}
-	if ((value = *args) && value[0] == '-' && !value[1])
-		value = 0;
-	return astconf(name, path, value);
 }

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -147,7 +147,7 @@ csport(register Cs_t* state, const char* type, const char* serv)
 			case HASHKEY5('p','r','o','x','y'):
 				return 402;
 			case HASHKEY3('a','t','x'):
-				if (access("/etc/in.atxd", 0))
+				if (access("/etc/in.atxd", F_OK))
 					break;
 				return 512;
 			case HASHKEY4('b','i','f','f'):

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2002 AT&T Corp.                *
+*                Copyright (c) 1992-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -15,7 +15,7 @@
 *               AT&T's intellectual property rights.               *
 *                                                                  *
 *            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
+*                          AT&T Research                           *
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
@@ -52,9 +52,10 @@ USAGE_LICENSE
 "	[+quoted-printable|qp]"
 "	[+binhex|mac-binhex]"
 "}"
+"[b?Equivalent to \b--method=binhex\b.]"
 "[m?Equivalent to \b--method=mime\b.]"
 "[q?Equivalent to \b--method=quoted-printable\b.]"
-"[u?Equivalent to \b--method=uuencode\b.]"
+"[u?Equivalent to \b--method=ucb\b.]"
 
 "\n"
 "\n[ [ file ] decode-file ]\n"
@@ -95,6 +96,7 @@ main(int argc, register char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'b':
 		case 'm':
 		case 'q':
 		case 'u':

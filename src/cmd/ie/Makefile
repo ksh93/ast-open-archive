@@ -1,4 +1,4 @@
-:PACKAGE: ast
+:PACKAGE: ast:static
 
 LICENSE		= since=1984,author='dgk+Pat Sullivan'
 CCFLAGS		= $(CC.OPTIMIZE) $(CC.DLL)
