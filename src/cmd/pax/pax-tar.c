@@ -956,6 +956,37 @@ pax_putprologue(Pax_t* pax, register Archive_t* ap)
 	return 1;
 }
 
+Format_t	pax_tar_format =
+{
+	"oldtar",
+	0,
+	"pre-POSIX tar with symlinks",
+	OLD,
+	ARCHIVE|LINKTYPE|SLASHDIR|IN|OUT,
+	DEFBUFFER,
+	DEFBLOCKS,
+	BLOCKSIZE,
+	PAXNEXT(pax_ustar_next),
+	0,
+	tar_done,
+	tar_getprologue,
+	tar_getheader,
+	0,
+	0,
+	0,
+	tar_putprologue,
+	tar_putheader,
+	0,
+	0,
+	tar_putepilogue,
+	0,
+	0,
+	0,
+	0,
+	tar_event,
+	EVENT_SKIP_JUNK
+};
+
 Format_t	pax_pax_format =
 {
 	"pax",
@@ -966,7 +997,7 @@ Format_t	pax_pax_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
-	pax_pax_next,
+	PAXNEXT(&pax_tar_format),
 	0,
 	tar_done,
 	tar_getprologue,
@@ -987,37 +1018,6 @@ Format_t	pax_pax_format =
 	EVENT_DELTA_EXTEND
 };
 
-Format_t	pax_tar_format =
-{
-	"oldtar",
-	0,
-	"pre-POSIX tar with symlinks",
-	OLD,
-	ARCHIVE|LINKTYPE|SLASHDIR|IN|OUT,
-	DEFBUFFER,
-	DEFBLOCKS,
-	BLOCKSIZE,
-	pax_tar_next,
-	0,
-	tar_done,
-	tar_getprologue,
-	tar_getheader,
-	0,
-	0,
-	0,
-	tar_putprologue,
-	tar_putheader,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	0,
-	tar_event,
-	EVENT_SKIP_JUNK
-};
-
 Format_t	pax_ustar_format =
 {
 	"ustar",
@@ -1028,7 +1028,7 @@ Format_t	pax_ustar_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
-	PAXNEXT(pax_ustar_next),
+	&pax_pax_format,
 	0,
 	tar_done,
 	tar_getprologue,
@@ -1040,7 +1040,7 @@ Format_t	pax_ustar_format =
 	tar_putheader,
 	0,
 	0,
-	0,
+	tar_putepilogue,
 	tar_lookup,
 	0,
 	0,

@@ -1359,7 +1359,7 @@ scanargs(int argc, char** argv, int* argf)
 		s = argv[i];
 		while (isspace(*s))
 			s++;
-		if (!done && (*s == '-' || *s == '+'))
+		if (!done && (*s == '-' || *s == '+') && *(s + 1))
 		{
 			opt_info.index = i;
 			opt_info.offset = 0;

@@ -1,3 +1,4 @@
+04-03-28 ls.c: add variable column widths for minimal { -C -x } footprint
 04-02-29 pss-getprocs.c: fix readf/partf semantic mixup
 04-02-26 ls.c: handle solaris S_ISDOOR for -F
 04-02-11 df.c: rescan mount table to avoid more expensive stat()/statvfs()

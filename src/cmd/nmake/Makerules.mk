@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-02-29 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-03-25 $"
 
 /*
  * handy attributes
@@ -574,7 +574,7 @@ include "Scanrules.mk"
 			end
 			return $(T)
 		else
-			local H I J L P S
+			local H I J L P Q S
 			L := $(%)
 			V :=
 			if P = "$(PACKAGE_$(B)_VERSION)"
@@ -597,7 +597,11 @@ include "Scanrules.mk"
 								end
 							end
 							T := $(T:T=F)
-							$(%) $(T) : .ARCHIVE $(force_shared:@??.IGNORE?)
+							Q = .ARCHIVE
+							if ! force_shared && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
+								Q += .IGNORE
+							end
+							$(%) $(T) : $(Q)
 							return $(T)
 						end
 					elif "$(J)" || ! "$(CC.PREFIX.SHARED)"
@@ -624,7 +628,11 @@ include "Scanrules.mk"
 										H = -
 									end
 								end
-								$(%) $(T) : .ARCHIVE $(force_shared:@??.IGNORE?)
+								Q = .ARCHIVE
+								if ! force_shared && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
+									Q += .IGNORE
+								end
+								$(%) $(T) : $(Q)
 								return $(H) $(T:T=F)
 							end
 							if ! "$(L:N=*+(.+([0-9])))"
@@ -1268,10 +1276,12 @@ end
 .RECURSE.SEMAPHORE : .VIRTUAL .FORCE .IGNORE .NULL
 
 .RECURSE.ARGS. : .FUNCTION
-	local A V
+	local A L V
 	for A $(.ORIGINAL.ARGS.)
-		if ! "$(A:A=.TARGET)" && ( T = "$(A:/.*/.&/U:A=.TARGET)" )
+		if ! L && ! "$(A:A=.TARGET)" && ( T = "$(A:/.*/.&/U:A=.TARGET)" )
 			A := $(T)
+		else
+			L = 1
 		end
 		if "$(A:A!=.ACTIVE:N!=.RECURSE)" || "$(A:A=.ONOBJECT)"
 			V += $(A)
@@ -1940,18 +1950,19 @@ end
 	return $(~~:A!=.USE)
 
 .SHARED.LIST. : .FUNCTION
-	local N=0 L D X W G A R
+	local N=0 L D X W G A R M
+	M := [-+]l*|*$(CC.SUFFIX.ARCHIVE)|*$(CC.SUFFIX.SHARED)
 	for L $(%)
 		if L == "{"
 			let N = N + 1
 		elif L == "}"
 			let N = N - 1
-		elif L == "[-+]l*|*$(CC.SUFFIX.ARCHIVE)"
+		elif L == "$(M)"
 			if N <= 0
 				G := $(L) $(G)
 			elif N > 1
 				W := $(L) $(W)
-			else
+			elif ! "$(X:N=$(L))"
 				X := $(X) $(L)
 			end
 		else
@@ -2016,8 +2027,8 @@ end
 	return $(S)
 
 .SHARED.BIND. : .FUNCTION
-	local L P S
-	if ! "$(%)" || ! CC.SUFFIX.STATIC
+	local A L P S
+	if "$(%)"
 		.NO.ARPROFILE = 1
 		for L $(%)
 			if "$(CC.SHARED)"
@@ -2027,6 +2038,11 @@ end
 					L := $(L:T=F)
 					if L == "-l*"
 						S += $(L)
+						if CC.SUFFIX.STATIC
+							if A = "$(L:P=B:/\(.*\)\$(CC.SUFFIX.SHARED)\([0-9.]*\)$/\1$(CC.SUFFIX.STATIC)\2/)"
+								S += $(A)
+							end
+						end
 					end
 				end
 			else
@@ -2037,21 +2053,10 @@ end
 			end
 		end
 		.NO.ARPROFILE =
-	else
-		for L $(%:T=WF:P=B:/\(.*\)\$(CC.SUFFIX.SHARED)\(\.[0-9.]*\)$/\1$(CC.SUFFIX.STATIC)\2)
-			while 1
-				if "$(L:T=F)"
-					S += $(L)
-					break
-				end
-				if "$(L)" != "*.+([0-9])"
-					break
-				end
-				L := $(L:/\.[0-9]*$//)
-			end
+		if S
+			return $(.SHARED.LIST. $(S))
 		end
 	end
-	return $(.SHARED.LIST. $(S))
 
 .SHARED.o : .USE (LDSHARED) (LDFLAGS) $$(LDLIBRARIES)
 	$(LDSHARED) $(LDFLAGS) $(CC.SHARED) -o $(<) $(.CC.LIB.DLL.$(CC.LIB.DLL) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.:$(CC.SHARED:@??:T=F:N=*$(CC.SUFFIX.ARCHIVE)?)))) $(CC.DLL.LIBRARIES)
@@ -2068,6 +2073,7 @@ end
 		X := $(Y) $(Z:/+l//)
 		Z += $(%:O>3:/.l//:N!=$(X:/ /|/):/^/-l/)
 		$(Z) : .DONTCARE
+		A := $(%:O=1)
 		if CC.DLL.DIR == "$\(BINDIR)"
 			W := $(Y:B:S=.so)
 			D := $(W)/$(D)
@@ -2076,11 +2082,10 @@ end
 				Z += .LIBRARY.STATIC.$(Y)
 				.LIBRARY.STATIC.$(Y) : .VIRTUAL
 			end
-			if CC.HOSTTYPE == "win32.*" && ! "$(.NO.INSTALL.)" && "$(.INSTALL.$(S))" != "." && "$(ARFLAGS)" != "*I*"
+			if CC.HOSTTYPE == "win32.*" && ! "$(.NO.INSTALL.)" && "$(.INSTALL.$(S))" != "." && "$(ARFLAGS)" != "*I*" && ! "$(*$(A):G=%.def)"
 				ARFLAGS := $(ARFLAGS)I
 			end
 		end
-		A := $(%:O=1)
 		$(D) $(S) : .JOINT $(<:/DEF.//) $(*$(A):N=*@($(.LD.KEEP.:/ /|/G:/|$//))) $(A) $(Z)
 		.ALL : $(D) $(S)
 		if ! "$(.NO.INSTALL.)"
@@ -2102,7 +2107,7 @@ end
 	local K L
 	K := *@($(.LD.KEEP.:/ /|/G:/|$//))
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
-	return $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(%:N=$(K)) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//):T=*) $(.SHARED.LIST. $(%:N!=*$(L)|$(K)))
+	return $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(%:N=$(K):T=F) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//):T=*) $(.SHARED.LIST. $(%:N!=*$(L)|$(K)))
 
 .SHARED.dll.a .SHARED.lib : .USE (LDSHARED) (LDFLAGS) $$(LDLIBRARIES)
 	$(SILENT) test -d $(<:O=1:D) || mkdir $(<:O=1:D)
@@ -2197,6 +2202,7 @@ end
 
 ":NOTHING:" : .MAKE .OPERATOR
 	.ALL .INSTALL .MAIN all cc- install : .CLEAR .DO.NOTHING
+	exit 0
 
 /*
  * var :OPTIONAL: src ...
@@ -3459,11 +3465,14 @@ PACKAGES : .SPECIAL .FUNCTION
 		.ORIGINAL$(T3). = $(T2:V)
 		end
 		$(T3) : .CLEAR .VIRTUAL
+		T4 = 0
 		for T1 $(T2)
-			if "$(T1:A!=.IMMEDIATE|.TARGET)"
+			if ! T4 && "$(T1:A!=.IMMEDIATE|.TARGET)"
 				T2 := $(".$(T1:F=%(upper)s)":A=.IMMEDIATE|.TARGET:A!=.ATTRIBUTE)
 				if T2
 					T1 := $(T2)
+				else
+					T4 = 1
 				end
 			end
 			$(T3) : $(T1:V)
@@ -3875,10 +3884,10 @@ end
 
 .LIST.PACKAGE.BINARY : .ONOBJECT .MAKE
 	local I E
-	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F:P=A)
+	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F)
 	E := $(.LIST.PACKAGE.EDIT.)
 	if package.strip
-		for I $(*.UNION:$(PACKAGE_OPTIMIZE:N=space:Y%:N=$(INSTALLROOT)/(bin|fun|lib)/*:N!=*$(CC.SUFFIX.ARCHIVE)|$(INSTALLROOT)/lib/lib?(/*)%%))
+		for I $(*.UNION:P=A:$(PACKAGE_OPTIMIZE:N=space:Y%:N=$(INSTALLROOT)/(bin|fun|lib)/*:N!=*$(CC.SUFFIX.ARCHIVE)|$(INSTALLROOT)/lib/lib?(/*)%%))
 			if "$(I:T=Y)" == "*/?(x-)(dll|exe)"
 				print ;;filter $(STRIP) $(STRIPFLAGS) $(I);$(I);$(I:$(E))
 			else
@@ -3886,7 +3895,7 @@ end
 			end
 		end
 	else
-		for I $(*.UNION)
+		for I $(*.UNION:P=A)
 			print ;;;$(I);$(I:$(E))
 		end
 	end

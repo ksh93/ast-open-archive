@@ -1,3 +1,7 @@
+04-03-17 pax-tar.c: add tar_putepilogue to *all* tar variants
+	 format.h: let pax-tar.c determine tar variant order
+	 bio.c: fix a few printf format long long mismatches: %ld => %I*d
+	 format.c: map ident buffer CC_ASCII => CC_NATIVE
 04-02-29 format.c: drop ap->format=0 for possible deltaverify()
 	 format.c: handle CC_ASCII=>CC_NATIVE getprologue() header translation
 	 options.h,options.c: add --forceconvert to force --from

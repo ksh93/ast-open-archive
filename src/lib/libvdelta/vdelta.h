@@ -78,10 +78,10 @@
 ** allows pointers across client ** and library code.
 */
 #ifndef _PTR_
-#if  _DLL_INDIRECT_DATA && !_DLL	/* building client code			*/
+#if  _DLL_INDIRECT_DATA && !defined(_DLL)	/* building client code		*/
 #define _ADR_ 		/* cannot export whole structs - data access via ptrs	*/
 #define _PTR_	*
-#else					/* library code or a normal system	*/
+#else			/* library code or a normal system			*/
 #define _ADR_	&	/* exporting whole struct is ok				*/
 #define _PTR_ 
 #endif

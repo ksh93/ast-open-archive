@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-03-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -34,8 +34,6 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ../../../lib/package/ast.lic
-done ../../../lib/package/ast.lic
 make install
 make cs
 make libcs.a archive
@@ -691,7 +689,7 @@ done ../../../include/ast generated
 make ../../../include/ast/cs.h
 prev ../../../include/ast
 prev cs.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  cs.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=1990,author=gsf'  cs.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cs.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cs.h
@@ -699,7 +697,7 @@ exec - fi
 done ../../../include/ast/cs.h generated
 make ../../../include/ast/css.h
 prev css.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  css.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=1990,author=gsf'  css.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/css.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/css.h
@@ -707,7 +705,7 @@ exec - fi
 done ../../../include/ast/css.h generated
 make ../../../include/ast/msg.h
 prev msg.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  msg.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=1990,author=gsf'  msg.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/msg.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/msg.h
@@ -715,7 +713,7 @@ exec - fi
 done ../../../include/ast/msg.h generated
 make ../../../include/ast/ast_cs.h
 prev ast_cs.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  ast_cs.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=1990,author=gsf'  ast_cs.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ast_cs.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ast_cs.h
@@ -723,7 +721,7 @@ exec - fi
 done ../../../include/ast/ast_cs.h generated
 make ../../../include/ast/cs_lib.h
 prev cs_lib.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  cs_lib.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/lib/package/ast.lic '-o since=1990,author=gsf'  cs_lib.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cs_lib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cs_lib.h

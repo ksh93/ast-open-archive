@@ -222,6 +222,7 @@ static void banner(const char *string,const char *delim,int width)
 	}
 }
 
+int
 main(int argc, char *argv[], void *extra)
 {
 	register int n;

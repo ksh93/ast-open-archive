@@ -38,7 +38,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-02-29 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-03-17 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"

@@ -36,7 +36,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Labs Research) 2004-02-14 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Labs Research) 2004-03-19 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -352,16 +352,20 @@ typedef struct Sufcom_s
 static const Sufcom_t	sufcom[] =
 {
 	"c",		"/*",
+	"cpp",		"/*",
 	"cxx",		"/*",
 	"c++",		"/*",
 	"C",		"/*",
+	"CPP",		"/*",
 	"CXX",		"/*",
 	"C++",		"/*",
 	"f",		"C",
 	"F",		"C",
 	"h",		"/*",
+	"hpp",		"/*",
 	"hxx",		"/*",
 	"H",		"/*",
+	"HPP",		"/*",
 	"HXX",		"/*",
 	"ksh",		"#",
 	"KSH",		"#",
@@ -439,11 +443,8 @@ main(int argc, char** argv)
 			case 0:
 				break;
 			case 'c':
-				if (!*(comment = ++file) && !(comment = *++argv))
-				{
-					file = "??";
-					continue;
-				}
+				if (!*(comment = ++file))
+					comment = *++argv;
 				break;
 			case 'd':
 				flags |= PROTO_DISABLE;

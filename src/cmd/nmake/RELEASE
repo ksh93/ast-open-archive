@@ -1,3 +1,14 @@
+04-03-25 pkg-X11.mk: drop openbsd.i386 -lc_r workaround
+	 Makerules.mk: fix .SHARED.BIND. CC.SUFFIX.STATIC -l* expansion bug
+04-03-17 expand.c: check { :: :LIBRARY: } lhs
+	 option.c: fixed bug that looped on `-' or `+' arg -- wow
+	 Makerules.mk: atom arg disables foo => .FOO checks for subsequent args
+	 Makerules.mk: fix .LIST.PACKAGE.BINARY :P=A: misplacement
+	 Makerules.mk: fix inappropriate .BIND.-l% CC.SUFFIX.ARCHIVE .IGNORE
+	 Makerules.mk: fix .SHARED.REF.* to bind before return
+	 Makerules.mk: :NOTHING: now does `exit 0' -- almost nothing
+	 Makerules.mk: I not appended to ARFLAGS if .def :LIBRARY: rhs
+	 pkg-X11.mk: handle /usr/include/X11R* /usr/lib/X11R*, deprecate contrib
 04-02-29 state.c: fix `another make running' message to handle <=0 elapsed time
 	 Makerules.mk: CC.LD.RUNPATH used only if LDRUNPATH set (. to kick in)
 	 Makerules.mk: mam ${MAKE} => ${NMAKE}, ${MAKEFLAGS} => ${NMAKEFLAGS}

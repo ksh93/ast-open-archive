@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: who (AT&T Labs Research) 2003-06-10 $\n]"
+"[-?\n@(#)$Id: who (AT&T Labs Research) 2004-03-25 $\n]"
 USAGE_LICENSE
 "[+NAME?who - display who is on the system]"
 "[+DESCRIPTION?\bwho\b displays various pieces of information about "
@@ -151,7 +151,7 @@ USAGE_LICENSE
 #	endif
 #endif
 
-#define skip(ut)	(!*ut.ut_user||!*ut.ut_line||dead(ut))
+#define skip(ut)	(!*ut.ut_user||!*ut.ut_line||dead(ut)|!strcasecmp(ut.ut_user,"login"))
 
 typedef struct
 {
@@ -264,7 +264,7 @@ static int who(Sfio_t *in, Sfio_t *out, int flags)
 	return(0);
 }
 
-b_who(int argc, char *argv[], void *context)
+int b_who(int argc, char *argv[], void *context)
 {
 	register int n, flags=0;
 	Sfio_t *sp;

@@ -5,6 +5,7 @@
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
+<META name="author" content="gsf+dgk+kpv">
 </HEAD>
 <BODY bgcolor=white link=slateblue vlink=teal >
 <TABLE border=0 align=center width=96%>
@@ -1008,8 +1009,9 @@ For the latest information vist the
 <TD align=left><A href="#librecsort changes">librecsort</A></TD>
 <TD align=left><A href="#libsum changes">libsum</A></TD>
 <TD align=left><A href="#libuu changes">libuu</A></TD>
-<TD align=left><A href="#libbz changes">libbz</A></TD>
+<TD align=left><A href="#libvdelta changes">libvdelta</A></TD>
 </TR><TR>
+<TD align=left><A href="#libbz changes">libbz</A></TD>
 <TD align=left><A href="#libz changes">libz</A></TD>
 <TD align=left><A href="#libcoshell changes">libcoshell</A></TD>
 <TD align=left><A href="#libcs changes">libcs</A></TD>
@@ -1017,6 +1019,7 @@ For the latest information vist the
 <TD align=left><A href="#libcodex changes">libcodex</A></TD>
 <TD align=left><A href="#libcdb changes">libcdb</A></TD>
 <TD align=left><A href="#libpz changes">libpz</A></TD>
+</TR><TR>
 <TD align=left><A href="#libtksh changes">libtksh</A></TD>
 </TR></TABLE>
 </FONT></B>
@@ -2143,6 +2146,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-17 pax-tar.c: add tar_putepilogue to *all* tar variants
+	 format.h: let pax-tar.c determine tar variant order
+	 bio.c: fix a few printf format long long mismatches: %ld =&gt; %I*d
+	 format.c: map ident buffer CC_ASCII =&gt; CC_NATIVE
 04-02-29 format.c: drop ap-&gt;format=0 for possible deltaverify()
 	 format.c: handle CC_ASCII=&gt;CC_NATIVE getprologue() header translation
 	 options.h,options.c: add --forceconvert to force --from
@@ -2498,6 +2505,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-19 proto.c: add { .cpp .hpp }, fix standalone -c parse
 04-02-29 proto.tst: add -f -p option tests
 04-01-14 proto.c: add suffix-comment table
 04-02-11 proto.c: default comment style set to match file suffix
@@ -2892,6 +2900,17 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-25 pkg-X11.mk: drop openbsd.i386 -lc_r workaround
+	 Makerules.mk: fix .SHARED.BIND. CC.SUFFIX.STATIC -l* expansion bug
+04-03-17 expand.c: check { :: :LIBRARY: } lhs
+	 option.c: fixed bug that looped on `-' or `+' arg -- wow
+	 Makerules.mk: atom arg disables foo =&gt; .FOO checks for subsequent args
+	 Makerules.mk: fix .LIST.PACKAGE.BINARY :P=A: misplacement
+	 Makerules.mk: fix inappropriate .BIND.-l% CC.SUFFIX.ARCHIVE .IGNORE
+	 Makerules.mk: fix .SHARED.REF.* to bind before return
+	 Makerules.mk: :NOTHING: now does `exit 0' -- almost nothing
+	 Makerules.mk: I not appended to ARFLAGS if .def :LIBRARY: rhs
+	 pkg-X11.mk: handle /usr/include/X11R* /usr/lib/X11R*, deprecate contrib
 04-02-29 state.c: fix `another make running' message to handle &lt;=0 elapsed time
 	 Makerules.mk: CC.LD.RUNPATH used only if LDRUNPATH set (. to kick in)
 	 Makerules.mk: mam ${MAKE} =&gt; ${NMAKE}, ${MAKEFLAGS} =&gt; ${NMAKEFLAGS}
@@ -5838,6 +5857,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mailx changes">mailx changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-25 mailx.h: shquote=&gt;shellquote to avoid netbsd clash in &lt;stdlib.h&gt;!!
+04-03-17 spam.c: fix usermatch() loop
 04-01-28 data.c: k,K are now autoprint (like d)
 04-01-22 data.c: K is alias for mark; omitted mark defaults to nospam
 	 list.c: addr- shorthand for addr-$
@@ -6221,6 +6242,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-28 ls.c: add variable column widths for minimal { -C -x } footprint
 04-02-29 pss-getprocs.c: fix readf/partf semantic mixup
 04-02-26 ls.c: handle solaris S_ISDOOR for -F
 04-02-11 df.c: rescan mount table to avoid more expensive stat()/statvfs()
@@ -6561,6 +6583,11 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-25 vmalloc/malloc.c: _AST_std_malloc=1 for __alpha
+	 path/pathprobe.c: per-user probe dir =&gt; $HOME/.probe/$HOSTTYPE
+04-03-23 regex/reglib.h: fix isw*() redefines
+04-03-17 features/stdio: no __FILE override for __CYGWIN_ (sys/reent.h clash)
+	 sfio/sfhdr.h,sfio/sfsetbuf.c: lower sfmove() default buf size 4x
 04-02-29 comp/omitted.c: move env trace after PATH fixup
 	 comp/omitted.c: cygwin spawn _P_DETACH =&gt; _P_NOWAIT+setpgid(pid,0)
 	 misc/optget.c: fix html mailto: match
@@ -7730,6 +7757,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-19 tail.c: handle -f sfreserve() large chunk failure
 04-02-29 cp.c: decouple -f and -i for standard CONFORMANCE
 	 cp.c: mv attempts rename() before remove()+rename()
 	 date.c: -f format or +format disables system clock set
@@ -8019,6 +8047,15 @@ End:
 
 </PRE>
 <P>
+<P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libvdelta changes">libvdelta changes</A></H3></FONT></FONT></CENTER>
+<PRE>
+
+04-03-14 vdelta.h: #if !_DLL =&gt; #if !defined(_DLL) to handle empty value
+08/11/95 version 2.0 -- new delta layout but old update recognized
+04/24/95 back out of latest version -- incompatible deltas generated
+
+</PRE>
+<P>
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libbz changes">libbz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
@@ -8090,6 +8127,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcs changes">libcs changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-03-25 csrecv.c,cssend.c: OPEN_MAX_CEIL =&gt; OPEN_MAX
 03-08-01 csdata.c: add NoF pure data workaround, drop const + prototyped
 03-03-28 msglib.h: add D_FILENO ifdef
 02-10-02 features/lib,genlocal.sh: add ssh, pid to hang warning
@@ -8817,7 +8855,7 @@ End:
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>March 12, 2004</TD>
+<TD align=right>March 28, 2004</TD>
 </TR>
 </TABLE>
 <P>

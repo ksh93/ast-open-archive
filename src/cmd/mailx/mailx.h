@@ -119,6 +119,8 @@ extern int	opterr;
 #define moretop()
 #endif
 
+#define shquote		shellquote	/* netbsd has one in <stdlib.h>! */
+
 #define ESCAPE		'~'		/* Default escape for sending */
 #define NMLSIZE		1024		/* max names in a message list */
 #define PATHSIZE	MAXPATHLEN	/* Size of pathnames throughout */

@@ -978,7 +978,9 @@ native(Sfio_t* xp, const char* s)
 	}
 }
 
+#define ORDER_COMMAND	""		/* command assertion operator	*/
 #define ORDER_INIT	"INIT"		/* no prereq dir prefix		*/
+#define ORDER_LIBRARY	"LIBRARY"	/* library assertion operator	*/
 #define ORDER_PACKAGE	"PACKAGE"	/* package assertion operator	*/
 #define ORDER_RECURSE	"MAKE"		/* recursion assertion operator	*/
 
@@ -992,9 +994,10 @@ native(Sfio_t* xp, const char* s)
  */
 
 static unsigned long
-order_descend(Sfio_t* xp, struct rule* r, int all, unsigned long mark, int prereqs)
+order_descend(Sfio_t* xp, Hash_table_t* tab, struct rule* r, int all, unsigned long mark, int prereqs)
 {
 	register struct list*	p;
+	register struct rule*	a;
 	unsigned long		here;
 	unsigned long		need;
 
@@ -1008,14 +1011,18 @@ order_descend(Sfio_t* xp, struct rule* r, int all, unsigned long mark, int prere
 		{
 			for (p = r->prereqs; p; p = p->next)
 			{
+				if (!(a = (struct rule*)hashget(tab, p->rule->name)))
+					a = p->rule;
+				else if (a == r)
+					continue;
 				if (!need)
 				{
 					need = 1;
 					r->mark |= M_LHS;
 					sfprintf(xp, "%s :", r->name);
 				}
-				sfprintf(xp, " %s", p->rule->name);
-				p->rule->mark |= M_RHS;
+				sfprintf(xp, " %s", a->name);
+				a->mark |= M_RHS;
 			}
 			if (need)
 			{
@@ -1024,10 +1031,14 @@ order_descend(Sfio_t* xp, struct rule* r, int all, unsigned long mark, int prere
 			}
 		}
 		for (p = r->prereqs; p; p = p->next)
-			if (p->rule->mark & M_MUST)
-				mark = order_descend(xp, p->rule, all, mark, prereqs);
-			else if (need < p->rule->complink)
-				need = p->rule->complink;
+		{
+			if (!(a = (struct rule*)hashget(tab, p->rule->name)))
+				a = p->rule;
+			if (a->mark & M_MUST)
+				mark = order_descend(xp, tab, a, all, mark, prereqs);
+			else if (need < a->complink)
+				need = a->complink;
+		}
 		freelist(r->prereqs);
 		r->prereqs = 0;
 	}
@@ -1219,7 +1230,9 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	char*		s;
 	char*		t;
 	char*		u;
+	char*		b;
 	char*		tok;
+	char*		lib;
 	struct rule*	r;
 	struct rule*	d;
 	struct rule*	order;
@@ -1234,6 +1247,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	int		j;
 	int		k;
 	int		p;
+	int		var;
 
 	order = targets ? (struct rule*)0 : getrule(external.order);
 	tab = hashalloc(table.rule, 0);
@@ -1249,25 +1263,40 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 		d = *v++;
 		if ((d->mark & M_MUST) && (sp = rsfopen(bind(r)->name)))
 		{
+			if (s = strrchr(d->name, '/'))
+				s++;
+			else
+				s = d->name;
 			while (s = sfgetr(sp, '\n', 1))
 			{
 				j = p = 0;
+				b = s;
 				while (*s)
 				{
-					for (k = 1; (i = *s) == ' ' || i == '\t' || i == '"' || i == '\''; s++);
-					for (t = s; (i = *s) && i != ' ' && i != '\t' && i != '"' && i != '\'' && i != '\\' && i != ':'; s++)
+					var = 0;
+					lib = 0;
+					for (k = 1; (i = *s) == ' ' || i == '\t' || i == '\r' || i == '"' || i == '\''; s++);
+					for (t = s; (i = *s) && i != ' ' && i != '\t' && i != '\r' && i != '"' && i != '\'' && i != '\\' && i != ':'; s++)
 						if (i == '/')
 							t = s + 1;
 						else if (i == '.' && *(s + 1) != 'c' && *(s + 1) != 'C' && t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
 							*s = 0;
+						else if (i == '$')
+							var = 1;
 					if (*s)
 						*s++ = 0;
+					if (var)
+						continue;
 					if (!t[0])
 						k = 0;
-					else if ((t[0] == '-' || t[0] == '+') && t[1] == 'l' && t[2])
+					else if ((t[0] == '-' || t[0] == '+') && t[1] == 'l')
 					{
-						sfprintf(internal.nam, "lib%s", t + 2);
-						t = sfstruse(internal.nam);
+						for (u = t += 2; istype(*u, C_ID1|C_ID2); u++);
+						*u = 0;
+						if (!*t)
+							continue;
+						sfprintf(internal.nam, "lib%s", t);
+						lib = t = sfstruse(internal.nam);
 					}
 					else if (p)
 					{
@@ -1294,6 +1323,22 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 					{
 						if (j != ':' || !isupper(*t))
 							k = 0;
+						else if ((i = streq(t, ORDER_COMMAND)) || streq(t, ORDER_LIBRARY))
+						{
+							for (; *b == ' ' || *b == '\t' || *b == '\r'; b++);
+							for (u = b; istype(*b, C_ID1|C_ID2); b++);
+							if (!*b || *b == ':' || *b == ' ' || *b == '\t' || *b == '\r')
+							{
+								*b = 0;
+								if (!i)
+								{
+									sfprintf(internal.nam, "lib%s", u);
+									u = sfstruse(internal.nam);
+								}
+								if (!hashget(tab, u))
+									hashput(tab, u, d);
+							}
+						}
 						else if (streq(t, ORDER_PACKAGE))
 						{
 							p = 1;
@@ -1338,6 +1383,8 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 						if (!streq(t, u) && (u[0] != 'l' || u[1] != 'i' || u[2] != 'b' || u[3]))
 							addprereq(d, r, PREREQ_APPEND);
 					}
+					else if (lib && (r = makerule(lib)) != d)
+						addprereq(d, r, PREREQ_APPEND);
 					j = i;
 				}
 			}
@@ -1347,7 +1394,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 			 * foolib : foo : libfoo
 			 */
 
-			if ((s = strrchr(d->name, '/')) && (s - d->name) > 3 && *(s - 1) == 'b' && *(s - 2) == 'i' && *(s - 3) == 'l')
+			if ((s = strrchr(d->name, '/')) && (s - d->name) > 3 && *(s - 1) == 'b' && *(s - 2) == 'i' && *(s - 3) == 'l' && *(s - 4) != '/')
 			{
 				*(s - 3) = 0;
 				r = makerule(d->name);
@@ -1363,7 +1410,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 		tok = tokopen(targets, 1);
 		while (s = tokread(tok))
 			if ((r = (struct rule*)hashget(tab, s)) && (r->mark & M_MUST))
-				mark = order_descend(xp, r, 1, mark, prereqs);
+				mark = order_descend(xp, tab, r, 1, mark, prereqs);
 		tokclose(tok);
 		k = 0;
 	}
@@ -1377,8 +1424,9 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 			for (q = order->prereqs; q; q = q->next)
 				if ((r = (struct rule*)hashget(tab, unbound(q->rule))) && (r->mark & M_MUST))
 				{
-					mark = order_descend(xp, r, 1, mark, prereqs);
-					sfputr(xp, "-", ' ');
+					mark = order_descend(xp, tab, r, 1, mark, prereqs);
+					if (!prereqs)
+						sfputr(xp, "-", ' ');
 				}
 		k = 1;
 	}
@@ -1387,7 +1435,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	{
 		r = *v++;
 		if (r->mark & M_MUST)
-			mark = order_descend(xp, r, k, mark, prereqs);
+			mark = order_descend(xp, tab, r, k, mark, prereqs);
 	}
 	if (prereqs)
 	{

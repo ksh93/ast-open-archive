@@ -37,7 +37,7 @@ tst	tst_rsh run{
 	do	for d in $path
 		do	if	test -x $d/$b
 			then	case $b in
-				rsh)	case `$d/$b $hostname echo ok 2>/dev/null` in
+				rsh)	case `$d/$b $hostname echo ok 2>/dev/null & sleep 5` in
 					ok)	;;
 					*)	continue ;;
 					esac

@@ -616,7 +616,7 @@ backup(register Archive_t* ap)
 		m = ap->io->next - (ap->io->buffer + MAXUNREAD);
 		if ((n = ap->io->count - m) > state.backup.count)
 		{
-			message((-1, "backup(%s): reread %ld", ap->name, n + m));
+			message((-1, "backup(%s): reread %I*d", ap->name, sizeof(n), n + m));
 			m = state.backup.last - (state.backup.buffer + MAXUNREAD);
 			if (lseek(ap->io->fd, (off_t)(-(n + m)), SEEK_CUR) == -1)
 			{
@@ -634,7 +634,7 @@ backup(register Archive_t* ap)
 		}
 		else
 			m = ap->io->last - (ap->io->buffer + MAXUNREAD);
-		message((-1, "backup(%s): %ld", ap->name, m));
+		message((-1, "backup(%s): %I*d", ap->name, sizeof(m), m));
 		if ((m = lseek(ap->io->fd, -m, SEEK_CUR)) == -1)
 		{
 #ifdef MTIOCTOP
@@ -712,11 +712,11 @@ bseek(register Archive_t* ap, off_t pos, int op, int hard)
 	}
 	ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
 	message((-8, "lseek(%s,%I*d,%d)", ap->name, sizeof(pos), pos + ap->io->offset, op));
-	if ((pos = lseek(ap->io->fd, ap->io->offset + pos, op)) < 0)
+	if ((u = lseek(ap->io->fd, ap->io->offset + pos, op)) < 0 && (op != SEEK_SET || (u = pos - ap->io->count) < 0 || u > 0 && bread(ap, NiL, u, u, 1) != u || !(u += ap->io->count + ap->io->offset)))
 		return -1;
 	ap->io->empty = 0;
 	ap->io->eof = 0;
-	return ap->io->count = pos - ap->io->offset;
+	return ap->io->count = u - ap->io->offset;
 }
 
 /*
@@ -858,7 +858,7 @@ void
 bput(register Archive_t* ap, register off_t n)
 {
 	ap->io->count += n;
-	message((-7, "bput(%s,%I*d@%ld): %s", ap->name, sizeof(n), n, ap->io->count, show(ap->io->next, n)));
+	message((-7, "bput(%s,%I*d@%I*d): %s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, show(ap->io->next, n)));
 	CONVERT(ap, ap->io->next, n);
 	if (ap->sum > 0)
 		ap->memsum = memsum(ap->io->next, n, ap->memsum);

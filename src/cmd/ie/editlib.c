@@ -121,6 +121,7 @@ typedef ssize_t (*Read_f)();
 #endif
 
 ssize_t rEAd(fd,buf,n)
+int fd;
 void *buf;
 size_t n;
 {
@@ -168,6 +169,7 @@ size_t n;
 #endif /* LDYNAMIC */
 
 extern ssize_t read(fd,buf,n)
+int fd;
 void *buf;
 size_t n;
 {
@@ -215,6 +217,7 @@ size_t n;
 #ifndef __EXPORT__
 
 extern ssize_t _read(fd,buf,n)
+int fd;
 void *buf;
 size_t n;
 {
@@ -222,6 +225,7 @@ size_t n;
 }
 
 extern ssize_t __read(fd,buf,n)
+int fd;
 void *buf;
 size_t n;
 {
@@ -229,6 +233,7 @@ size_t n;
 }
 
 extern ssize_t _libc_read(fd,buf,n)
+int fd;
 void *buf;
 size_t n;
 {
@@ -236,6 +241,7 @@ size_t n;
 }
 
 extern ssize_t __libc_read(fd,buf,n)
+int fd;
 void *buf;
 size_t n;
 {
@@ -251,6 +257,8 @@ size_t n;
  */
 
 int	set_edit(fd,mode)
+int fd;
+int mode;
 {
 	int retval = opt_flag;
 	opt_flag = mode;

@@ -48,7 +48,7 @@ sockrecv(int fd, Csid_t* id, int* fds, int n)
 	struct
 	{
 	struct cmsghdr		hdr;
-	int			fds[OPEN_MAX_CEIL + 1];
+	int			fds[OPEN_MAX + 1];
 	}			ctl;
 #else
 #define msg_control	msg_accrights
@@ -104,7 +104,7 @@ csrecv(register Cs_t* state, int fd, Csid_t* id, int* fds, int n)
 #if CS_LIB_SOCKET_UN && !CS_LIB_STREAM
 
 #if CS_LIB_SOCKET_RIGHTS
-	int			rfd[OPEN_MAX_CEIL + 1];
+	int			rfd[OPEN_MAX + 1];
 #endif
 	struct stat		st;
 

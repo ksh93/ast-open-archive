@@ -85,7 +85,7 @@ static int mesg(int  mode)
 	return((statb.st_mode&S_IWGRP)==0);
 }
 
-
+int
 main(int argc, char *argv[])
 {
 	register int n;

@@ -467,7 +467,7 @@ static int outpage(register Pr_t *pp,int n)
  * This routine processes multi-column and merged files
  * The data is put into in array and printed when the page fills.
  */
-static prcol(register Pr_t *pp)
+static int prcol(register Pr_t *pp)
 {
 	register char *cp, **next, **nextmax;
 	register int n=0, size;

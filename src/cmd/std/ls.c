@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-02-26 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-03-28 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -241,8 +241,11 @@ USAGE_LICENSE
 
 #define VISIBLE(f)	((f)->level<=0||(!state.ignore||!strmatch((f)->name,state.ignore))&&(!(state.lsflags&LS_NOBACKUP)||(f)->name[(f)->namelen-1]!='~')&&((state.lsflags&LS_ALL)||(f)->name[0]!='.'||(state.lsflags&LS_MOST)&&((f)->name[1]&&(f)->name[1]!='.'||(f)->name[2])))
 
-#define INVISIBLE	1
-#define LISTED		2
+#define BETWEEN		2		/* space between columns	*/
+#define AFTER		1		/* space after last column	*/
+
+#define INVISIBLE	(-1)
+#define LISTED		(-2)
 
 #define KEY_environ		(-1)
 
@@ -787,9 +790,10 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 			state.adjust = 2;
 			w = sfkeyprintf(state.tmp, lp, state.format, key, NiL) + state.adjust;
 			length += w;
-			n = state.width / length;
 			sfstrset(state.tmp, 0);
 			ftw->name[1] = i;
+			n = ((state.width - (length + BETWEEN + 2)) < 0) ? 1 : 2;
+				
 		}
 		if (state.lsflags & LS_COMMAS)
 		{
@@ -830,64 +834,115 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 				if (p->local.number != INVISIBLE)
 					pr(lp, p, 0);
 		}
-		else if (state.lsflags & LS_ACROSS)
-		{
-			i = 0;
-			for (p = ftw->link; p; p = p->link)
-				if (p->local.number != INVISIBLE)
-					pr(lp, p, ++i >= n ? (i = 0) : length);
-			if (i)
-				sfputc(sfstdout, '\n');
-		}
 		else
 		{
 			register Ftw_t**	x;
+			int			c;
 			int			j;
+			int			k;
+			int			l;
+			int			o;
+			int			r;
+			int			w;
+			int			z;
+
+			static unsigned short*	siz;
+			static int		sizsiz;
 
 			static Ftw_t**		vec;
 			static int		vecsiz;
 
-			if (n > (vecsiz - 1))
+			if (files > sizsiz)
 			{
-				vecsiz = roundof(n + 1, 64);
+				sizsiz = roundof(files, 64);
+				if (!(siz = newof(siz, unsigned short, sizsiz, 0)))
+					error(3, "out of space");
+			}
+			if (files > (vecsiz - 1))
+			{
+				vecsiz = roundof(files + 1, 64);
 				if (!(vec = newof(vec, Ftw_t*, vecsiz, 0)))
 					error(3, "out of space");
 			}
 			x = vec;
-			files = (files - 1) / n + 1;
-			p = ftw->link;
-			for (j = 0; j < n; j++)
-				if (x[j] = p)
-					for (i = 0; i < files; i++)
-					{
-						while (p && p->local.number == INVISIBLE) p = p->link;
-						if (i == 0)
-							x[j] = p;
-						if (!p)
-							break;
-						p = p->link;
-					}
-			x[n] = 0;
 			i = 0;
-			for (;;)
+			for (p = ftw->link; p; p = p->link)
+				if (p->local.number != INVISIBLE)
+					x[i++] = p;
+			n = i / (state.width / (length + BETWEEN)) + 1;
+			o = 0;
+			if ((state.lsflags & LS_ACROSS) && n > 1)
 			{
-				if (p = x[i])
+				for (;;)
 				{
-					if (p->local.number == LISTED)
-						x[i] = 0;
-					else
+					c = (i - 1) / n + 1;
+					w = -AFTER;
+					for (j = 0; j < c; j++)
 					{
-						p->local.number = LISTED;
-						ftw = p;
-						while ((p = p->link) && p->local.number == INVISIBLE);
-						x[i++] = (p && p->local.number != LISTED) ? p : 0;
-						pr(lp, ftw, x[i] ? length : 0);
+						z = 0;
+						for (l = 0, r = j; l < n && r < i; r += c, l++)
+							if (z < x[r]->namelen)
+								z = x[r]->namelen;
+						w += z + BETWEEN;
 					}
+					if (w <= state.width)
+						o = n;
+					if (n == 1)
+						break;
+					n--;
 				}
-				else if (i == 0)
-					break;
-				else
-					i = 0;
+				n = o ? o : 1;
+				c = (i - 1) / n + 1;
+				k = 0;
+				for (j = 0; j < c; j++)
+				{
+					siz[k] = 0;
+					for (l = 0, r = j; l < n && r < i; r += c, l++)
+						if (siz[k] < x[r]->namelen)
+							siz[k] = x[r]->namelen;
+					siz[k] += BETWEEN;
+					k++;
+				}
+				for (j = 0; j <= i; j += c)
+					for (l = 0, w = j; l < k && w < i; l++, w++)
+						pr(lp, x[w], l < (k - 1) && w < (i - 1) ? siz[l] : 0);
+			}
+			else
+			{
+				o = 0;
+				if (n > 1)
+					for (;;)
+					{
+						w = -AFTER;
+						j = 0;
+						while (j < i)
+						{
+							z = 0;
+							for (l = 0; l < n && j < i; j++, l++)
+								if (z < x[j]->namelen)
+									z = x[j]->namelen;
+							w += z + BETWEEN;
+						}
+						if (w <= state.width)
+							o = n;
+						if (n == 1)
+							break;
+						n--;
+					}
+				n = o ? o : 1;
+				j = k = 0;
+				while (j < i)
+				{
+					siz[k] = 0;
+					for (l = 0; l < n && j < i; j++, l++)
+						if (siz[k] < x[j]->namelen)
+							siz[k] = x[j]->namelen;
+					siz[k] += BETWEEN;
+					k++;
+				}
+				for (j = 0; j < n; j++)
+					for (l = 0, w = j; l < k && w < i; l++, w += n)
+						pr(lp, x[w], l < (k - 1) && w < (i - n) ? siz[l] : 0);
 			}
 		}
 	}

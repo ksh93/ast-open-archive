@@ -265,7 +265,7 @@ usermatch(const char* a, const char* b, int to)
 	register char*	td;
 
 	ap = (char*)a;
-	for (;;)
+	while (*ap)
 	{
 		while (isspace(*ap))
 			ap++;
@@ -327,6 +327,7 @@ usermatch(const char* a, const char* b, int to)
 		if (!ae)
 			return 0;
 		*ae++ = ',';
+		ap = ae;
 	}
  hit:
 	if (ae)

@@ -277,6 +277,7 @@ update(char* data, unsigned long now, int delay, CSSTAT* ss)
 	}
 }
 
+int
 main(int argc, char** argv)
 {
 	register int	n;

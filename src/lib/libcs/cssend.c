@@ -85,7 +85,7 @@ cssend(register Cs_t* state, int fd, int* fds, int n)
 #define msg_control	msg_accrights
 #define msg_controllen	msg_accrightslen
 #endif
-	int		fds[OPEN_MAX_CEIL + 1];
+	int		fds[OPEN_MAX + 1];
 	}		ctl;
 	char		tmp[PATH_MAX + 1];
 

@@ -48,6 +48,7 @@ getprologue(register Archive_t* ap)
 	off_t			skipped;
 	int			n;
 	unsigned char		buf[MAXUNREAD];
+	unsigned char		cvt[MAXUNREAD];
 
 	if (ap->io->eof || state.volume && ap->io->mode != O_RDONLY)
 		return 0;
@@ -78,6 +79,8 @@ getprologue(register Archive_t* ap)
 	if ((n = bread(ap, (char*)buf, (off_t)0, (off_t)sizeof(buf), 0)) <= MINID && !bcount(ap))
 		return 0;
 	bunread(ap, buf, n);
+	if (CC_NATIVE != CC_ASCII)
+		ccmapm(cvt, buf, sizeof(cvt), CC_ASCII, CC_NATIVE);
 	message((-2, "identify format"));
 	if (ap->volume <= 0 && !ap->compress)
 	{
@@ -160,7 +163,7 @@ getprologue(register Archive_t* ap)
 				{
 					message((-2, "check %s", fp->name));
 					convert(ap, SECTION_CONTROL, (fp->flags & CONV) ? CC_NATIVE : CC_ASCII, CC_NATIVE);
-					if ((n = (*fp->getprologue)(&state, fp, ap, f, buf, sizeof(buf))) < 0)
+					if ((n = (*fp->getprologue)(&state, fp, ap, f, ((fp->flags & CONV) || CC_NATIVE == CC_ASCII) ? buf : cvt, sizeof(buf))) < 0)
 						return 0;
 					if (n > 0)
 						break;

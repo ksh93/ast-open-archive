@@ -150,7 +150,7 @@ TEST 02 'archive format conversion'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
-		ERROR - y2k.pax $'in oldtar format\n372 files, 397 blocks'
+		ERROR - y2k.pax $'in oldtar format\n372 files, 399 blocks'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x ustar
 		OUTPUT -
@@ -158,7 +158,7 @@ TEST 02 'archive format conversion'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
-		ERROR - y2k.pax $'in ustar format\n372 files, 397 blocks'
+		ERROR - y2k.pax $'in ustar format\n372 files, 399 blocks'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x vdb
 		OUTPUT -

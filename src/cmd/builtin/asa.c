@@ -108,7 +108,7 @@ static int asa(register Sfio_t *in, Sfio_t *out, int reclen)
 	return(0);
 }
 
-b_asa(int argc, char *argv[], void *context)
+int b_asa(int argc, char *argv[], void *context)
 {
 	register char	*cp;
 	register Sfio_t	*fp;

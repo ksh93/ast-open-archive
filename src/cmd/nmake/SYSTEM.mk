@@ -61,7 +61,7 @@ SS.INTERCEPT = : :: :LIBRARY:
 				end
 			else if I == "?(no)(caller|exclude|intercept)?([-+]=*)"
 				O := $(I:/no//)
-				N := SS.$(O:/[-+]*=.*//:F=%(upper)s)
+				N := SS.$(O:/[-+]*=.*//:F=%(upper)S)
 				P := $(O:/[^-+=]*[-+]*=//)
 				O := $(O:/$(P)//)
 				T := $(O:/[-+]*=//)
