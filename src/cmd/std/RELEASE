@@ -1,3 +1,4 @@
+01-09-04 locale: add new catagories
 01-08-11 ls: fix nonprintable test for mb locales
 01-08-01 features/procfs: note that synthesized psinfo doesn't have pr_psargs
 01-06-27 dd: fix conv=[lu]case|x2y logic botch

@@ -8,6 +8,10 @@
 #ifndef _ZCONF_H
 #define _ZCONF_H
 
+#if _PACKAGE_ast
+#include <ast_common.h>	/* for __IMPORT__ and __EXPORT__ */
+#endif
+
 #if _BLD_z && defined(__EXPORT__)
 #define ZEXTERN		__EXPORT__
 #define ZEXPORT
@@ -53,7 +57,7 @@
 #  define voidp		z_voidp
 #endif
 
-#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && !defined(_UWIN)
+#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && !defined(_UWIN) && !defined(__CYGWIN__)
 #  define WIN32
 #endif
 #if defined(__GNUC__) || defined(WIN32) || defined(__386__) || defined(i386)

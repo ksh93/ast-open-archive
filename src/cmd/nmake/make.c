@@ -1021,61 +1021,66 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 
 	timefix(tevent);
 	message((-2, "[%s] : [%s]%s%s%s", strtime(r->time), strtime(tevent), errors ? " ERRORS" : null, errors && state.unwind >= error_info.indent ? " ignored" : null, must ? " must" : null));
-	if (!errors && !(r->dynamic & D_triggered) && r->status == UPDATE && (r1 && must || r->time < tevent && (!(r4 = staterule(PREREQS, r, NiL, 0)) || r4->time < tevent) || !r->time || !r2 && ((r->property & P_force) || r0 && (r->prereqs || r->action) && prereqchange(r, r->prereqs, r0, r0->prereqs))))
+	if (errors && !(state.questionable & 0x00800000))
+		r->status = FAILED;
+	else
 	{
-		if (r1)
+		if (!errors && !(r->dynamic & D_triggered) && r->status == UPDATE && (r1 && must || r->time < tevent && (!(r4 = staterule(PREREQS, r, NiL, 0)) || r4->time < tevent) || !r->time || !r2 && ((r->property & P_force) || r0 && (r->prereqs || r->action) && prereqchange(r, r->prereqs, r0, r0->prereqs))))
 		{
-			if (r3)
+			if (r1)
 			{
-				r = unalias(r, r3, r3name);
-				if (r0)
-					r0 = staterule(RULE, r, NiL, 1);
-			}
-			errors += update(r, r1, arg);
-		}
-		else if (r->property & P_dontcare)
-		{
-			statetime(r, 0);
-			tevent = 0;
-		}
-		else if (!(r->property & (P_state|P_virtual)))
-		{
-			if (!(r->property & (P_target|P_terminal)) || r2 || (r->property & P_terminal) && !r->time)
-			{
-				if (r->status == UPDATE)
+				if (r3)
 				{
-					/*
-					 * the attribute test handles rules in
-					 * make object files that have since
-					 * become attributes, e.g., .READONLY
-					 */
-
-					if ((r->property & P_attribute) || (r1 = associate(internal.dontcare_p, r, NiL, NiL)) && call(r1, r->name))
-					{
-						r->status = IGNORE;
-						statetime(r, 0);
-						tevent = 0;
-					}
-					else
-					{
-						errors++;
-						r->status = FAILED;
-						parentage(internal.tmp, r, " : ");
-						error(state.keepgoing || state.unwind ? 1 : 3, "don't know how to make %s", sfstruse(internal.tmp));
-						state.errors++;
-					}
+					r = unalias(r, r3, r3name);
+					if (r0)
+						r0 = staterule(RULE, r, NiL, 1);
 				}
+				errors += update(r, r1, arg);
 			}
-			else if (state.exec || state.mam.statix)
+			else if (r->property & P_dontcare)
 			{
 				statetime(r, 0);
-				if (!(r->property & P_terminal))
-					tevent = 0;
+				tevent = 0;
+			}
+			else if (!(r->property & (P_state|P_virtual)))
+			{
+				if (!(r->property & (P_target|P_terminal)) || r2 || (r->property & P_terminal) && !r->time)
+				{
+					if (r->status == UPDATE)
+					{
+						/*
+						 * the attribute test handles rules in
+						 * make object files that have since
+						 * become attributes, e.g., .READONLY
+						 */
+
+						if ((r->property & P_attribute) || (r1 = associate(internal.dontcare_p, r, NiL, NiL)) && call(r1, r->name))
+						{
+							r->status = IGNORE;
+							statetime(r, 0);
+							tevent = 0;
+						}
+						else
+						{
+							errors++;
+							r->status = FAILED;
+							parentage(internal.tmp, r, " : ");
+							error(state.keepgoing || state.unwind ? 1 : 3, "don't know how to make %s", sfstruse(internal.tmp));
+							state.errors++;
+						}
+					}
+				}
+				else if (state.exec || state.mam.statix)
+				{
+					statetime(r, 0);
+					if (!(r->property & P_terminal))
+						tevent = 0;
+				}
 			}
 		}
+		if (!(r->dynamic & D_triggered))
+			trigger(r, NiL, NiL, 0);
 	}
-	if (!(r->dynamic & D_triggered))
-		trigger(r, NiL, NiL, 0);
 	if (r->property & P_statevar)
 	{
 		if (state.targetview >= 0)

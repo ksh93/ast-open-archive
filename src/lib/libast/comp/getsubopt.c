@@ -28,23 +28,27 @@
  * Xopen 4.2 compatibility
  */
 
-#if defined(__EXPORT__)
-#define extern	__EXPORT__
-#endif
-
-extern int	getsubopt(char**, char* const*, char**);
-
-#undef	extern
-
-#include <ast.h>
+#include <ast_lib.h>
 
 #if _lib_getsubopt
+
+#include <ast.h>
 
 NoN(getsubopt)
 
 #else
 
+#define getsubopt	______getsubopt
+
+#include <ast.h>
+
+#undef	getsubopt
+
 #include <error.h>
+
+#if defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
 
 extern int
 getsubopt(register char** op, char* const* tp, char** vp)

@@ -1,6 +1,6 @@
 : converted from the pcre testdata/testinput4 2001-06-19
 
-{C	es
+{C	es_ES
 E$	^[\\w]+	École	(0,5)
 E$	^[\\w]+	École	(0,5)
 E$	^[\\w]+	École	(0,5)

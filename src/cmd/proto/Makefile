@@ -14,6 +14,11 @@ mamake :: mamake.c LICENSE=since=1999,author=gsf
 
 ratz :: ratz.c
 
+
 release :: release.c LICENSE=since=1999,author=gsf
+
+sear :: sear.sh LICENSE=since=2001,author=dgk+gsf
+
+$(LIBDIR)/sear :INSTALLDIR: ratz.c
 
 :TEST: proto

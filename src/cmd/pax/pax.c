@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-08-11 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-10-18 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -143,32 +143,33 @@ State_t			state;
 Format_t		format[] =
 {
 
-{ALAR_NAME,	ALAR_REGULAR,	ALAR_SPECIAL,	ALAR_ALIGN,	ALAR_FLAGS},
-{BINARY_NAME,	BINARY_REGULAR,	BINARY_SPECIAL,	BINARY_ALIGN,	BINARY_FLAGS},
-{CPIO_NAME,	CPIO_REGULAR,	CPIO_SPECIAL,	CPIO_ALIGN,	CPIO_FLAGS},
-{IBMAR_NAME,	IBMAR_REGULAR,	IBMAR_SPECIAL,	IBMAR_ALIGN,	IBMAR_FLAGS},
-{TAR_NAME,	TAR_REGULAR,	TAR_SPECIAL,	TAR_ALIGN,	TAR_FLAGS},
-{USTAR_NAME,	USTAR_REGULAR,	USTAR_SPECIAL,	USTAR_ALIGN,	USTAR_FLAGS},
-{ASC_NAME,	ASC_REGULAR,	ASC_SPECIAL,	ASC_ALIGN,	ASC_FLAGS},
-{ASCHK_NAME,	ASCHK_REGULAR,	ASCHK_SPECIAL,	ASCHK_ALIGN,	ASCHK_FLAGS},
-{SAVESET_NAME,	SAVESET_REGULAR,SAVESET_SPECIAL,SAVESET_ALIGN,	SAVESET_FLAGS},
-{PAX_NAME,	PAX_REGULAR,	PAX_SPECIAL,	PAX_ALIGN,	PAX_FLAGS},
-{PORTAR_NAME,	PORTAR_REGULAR,	PORTAR_SPECIAL,	PORTAR_ALIGN,	PORTAR_FLAGS},
-{RANDAR_NAME,	RANDAR_REGULAR,	RANDAR_SPECIAL,	RANDAR_ALIGN,	RANDAR_FLAGS},
-{VDB_NAME,	VDB_REGULAR,	VDB_SPECIAL,	VDB_ALIGN,	VDB_FLAGS},
-{ZIP_NAME,	ZIP_REGULAR,	ZIP_SPECIAL,	ZIP_ALIGN,	ZIP_FLAGS},
-{CAB_NAME,	CAB_REGULAR,	CAB_SPECIAL,	CAB_ALIGN,	CAB_FLAGS},
-{RPM_NAME,	RPM_REGULAR,	RPM_SPECIAL,	RPM_ALIGN,	RPM_FLAGS},
-{MIME_NAME,	MIME_REGULAR,	MIME_SPECIAL,	MIME_ALIGN,	MIME_FLAGS},
+{ALAR_NAME,	ALAR_DESC,	ALAR_REGULAR,	ALAR_SPECIAL,	ALAR_ALIGN,	ALAR_FLAGS},
+{BINARY_NAME,	BINARY_DESC,	BINARY_REGULAR,	BINARY_SPECIAL,	BINARY_ALIGN,	BINARY_FLAGS},
+{CPIO_NAME,	CPIO_DESC,	CPIO_REGULAR,	CPIO_SPECIAL,	CPIO_ALIGN,	CPIO_FLAGS},
+{IBMAR_NAME,	IBMAR_DESC,	IBMAR_REGULAR,	IBMAR_SPECIAL,	IBMAR_ALIGN,	IBMAR_FLAGS},
+{TAR_NAME,	TAR_DESC,	TAR_REGULAR,	TAR_SPECIAL,	TAR_ALIGN,	TAR_FLAGS},
+{USTAR_NAME,	USTAR_DESC,	USTAR_REGULAR,	USTAR_SPECIAL,	USTAR_ALIGN,	USTAR_FLAGS},
+{ASC_NAME,	ASC_DESC,	ASC_REGULAR,	ASC_SPECIAL,	ASC_ALIGN,	ASC_FLAGS},
+{ASCHK_NAME,	ASCHK_DESC,	ASCHK_REGULAR,	ASCHK_SPECIAL,	ASCHK_ALIGN,	ASCHK_FLAGS},
+{SAVESET_NAME,	SAVESET_DESC,	SAVESET_REGULAR,SAVESET_SPECIAL,SAVESET_ALIGN,	SAVESET_FLAGS},
+{PAX_NAME,	PAX_DESC,	PAX_REGULAR,	PAX_SPECIAL,	PAX_ALIGN,	PAX_FLAGS},
+{PORTAR_NAME,	PORTAR_DESC,	PORTAR_REGULAR,	PORTAR_SPECIAL,	PORTAR_ALIGN,	PORTAR_FLAGS},
+{RANDAR_NAME,	RANDAR_DESC,	RANDAR_REGULAR,	RANDAR_SPECIAL,	RANDAR_ALIGN,	RANDAR_FLAGS},
+{VDB_NAME,	VDB_DESC,	VDB_REGULAR,	VDB_SPECIAL,	VDB_ALIGN,	VDB_FLAGS},
+{ZIP_NAME,	ZIP_DESC,	ZIP_REGULAR,	ZIP_SPECIAL,	ZIP_ALIGN,	ZIP_FLAGS},
+{CAB_NAME,	CAB_DESC,	CAB_REGULAR,	CAB_SPECIAL,	CAB_ALIGN,	CAB_FLAGS},
+{RPM_NAME,	RPM_DESC,	RPM_REGULAR,	RPM_SPECIAL,	RPM_ALIGN,	RPM_FLAGS},
+{MIME_NAME,	MIME_DESC,	MIME_REGULAR,	MIME_SPECIAL,	MIME_ALIGN,	MIME_FLAGS},
+{TNEF_NAME,	TNEF_DESC,	TNEF_REGULAR,	TNEF_SPECIAL,	TNEF_ALIGN,	TNEF_FLAGS},
 
-{COMPRESS_NAME, COMPRESS_MAGIC_MASK, COMPRESS_MAGIC, 0,0, COMPRESS_ALGORITHM, COMPRESS_UNDO},
-{GZIP_NAME,     GZIP_MAGIC_MASK, GZIP_MAGIC,         0,0, GZIP_ALGORITHM,     GZIP_UNDO},
-{BZIP_NAME,     BZIP_MAGIC_MASK, BZIP_MAGIC,         0,0, BZIP_ALGORITHM,     BZIP_UNDO},
+{COMPRESS_NAME,	COMPRESS_DESC, COMPRESS_MAGIC_MASK, COMPRESS_MAGIC, 0, IN|OUT, COMPRESS_ALGORITHM, COMPRESS_UNDO},
+{GZIP_NAME,	GZIP_DESC,     GZIP_MAGIC_MASK, GZIP_MAGIC,         0, IN|OUT, GZIP_ALGORITHM,     GZIP_UNDO},
+{BZIP_NAME,	BZIP_DESC,     BZIP_MAGIC_MASK, BZIP_MAGIC,         0, IN|OUT, BZIP_ALGORITHM,     BZIP_UNDO},
 
-{DELTA_NAME,          0,0,0, OUT, DELTA_ALGORITHM},
-{DELTA_88_NAME,       0,0,0, 0,   DELTA_88_ALGORITHM},
-{DELTA_IGNORE_NAME},
-{DELTA_PATCH_NAME},
+{DELTA_NAME,		DELTA_DESC,          0,0,0, IN|OUT, DELTA_ALGORITHM},
+{DELTA_88_NAME,		DELTA_88_DESC,       0,0,0, IN,     DELTA_88_ALGORITHM},
+{DELTA_IGNORE_NAME,	DELTA_IGNORE_DESC,   0,0,0, IN|OUT},
+{DELTA_PATCH_NAME,	DELTA_PATCH_DESC,    0,0,0, IN|OUT},
 
 {0}
 
@@ -441,32 +442,6 @@ Option_t		options[] =
 	detected on read. A basic and compress format may be combined,\
 	separated by \b:\b. The supported formats are:",
 	"format",
-	"[+ansi?ANSI standard label tape. For tape devices only.]\
-	[+asc?s5r4 extended cpio character.]\
-	[+aschk?s5r4 extended cpio character with checksum.]\
-	[+binary?cpio binary with symlinks.]\
-	[+cab?MS cabinet file. For list only.]\
-	[+cpio?cpio character with symlinks.]\
-	[+ibmar?EBCDIC standard label tape. For tape devices only.]\
-	[+mime?encapsulated mime. For read only.]\
-	[+pax?POSIX 1003.2b-1995 extended ustar.]\
-	[+portarch?s5r2 portable object library. For read only.]\
-	[+randarch?BSD ranlib object library. For read only.]\
-	[+rpm?Redhat rpm package. For read only.]\
-	[+tar?tar with symlinks.]\
-	[+tgz?equivalent to \btar:gzip\b.]\
-	[+ustar?POSIX 1003.1-1988 tar.]\
-	[+vdb?virtual database.]\
-	[+vmsbackup?VMS backup savset. For input tape devices only.]\
-	[+zip?zip 2.1 / PKZIP 2.04g archive. For read only.]\
-	[+----?compression methods ----]\
-	[+compress?Lempel-Ziv compression.]\
-	[+gzip?gzip compression.]\
-	[+----?delta methods ----]\
-	[+delta?delta 94.]\
-	[+delta88?delta 88.]\
-	[+ignore?Ignore delta headers.]\
-	[+patch?delta using standard archive formats.]",
 },
 {
 	"from",
@@ -1789,6 +1764,20 @@ main(int argc, char** argv)
 			}
 			if (options[i].details)
 				sfprintf(state.tmp.str, "\n{%s}", options[i].details);
+			else if (i == OPT_format)
+			{
+				sfputc(state.tmp.str, '\n');
+				sfputc(state.tmp.str, '{');
+				for (n = 0; format[n].name; n++)
+				{
+					if (n == COMPRESS)
+						sfprintf(state.tmp.str, "[+----?compression methods ----]");
+					else if (n == DELTA)
+						sfprintf(state.tmp.str, "[+----?delta methods ----]");
+					sfprintf(state.tmp.str, "[+%s?%s%s]", format[n].name, format[n].desc, (format[n].flags & OUT) ? "" : "; for input only");
+				}
+				sfputc(state.tmp.str, '}');
+			}
 			sfputc(state.tmp.str, '\n');
 		}
 	sfputr(state.tmp.str, usage2, -1);

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -48,15 +48,26 @@ exec - 	then	ENV= $SHELL -n mamdag.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp mamdag.sh mamdag
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp mamdag.sh mamdag
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < mamdag.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat mamdag.sh
+exec - 		} > mamdag
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < mamdag.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat mamdag.sh
 exec - 	} > mamdag
 exec - 	;;
@@ -75,15 +86,26 @@ exec - 	then	ENV= $SHELL -n mamdot.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp mamdot.sh mamdot
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp mamdot.sh mamdot
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < mamdot.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat mamdot.sh
+exec - 		} > mamdot
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < mamdot.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat mamdot.sh
 exec - 	} > mamdot
 exec - 	;;
@@ -102,15 +124,26 @@ exec - 	then	ENV= $SHELL -n mamexec.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp mamexec.sh mamexec
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp mamexec.sh mamexec
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < mamexec.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat mamexec.sh
+exec - 		} > mamexec
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < mamexec.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat mamexec.sh
 exec - 	} > mamexec
 exec - 	;;
@@ -231,15 +264,26 @@ exec - 	then	ENV= $SHELL -n mamsh.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp mamsh.sh mamsh
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp mamsh.sh mamsh
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < mamsh.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat mamsh.sh
+exec - 		} > mamsh
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < mamsh.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat mamsh.sh
 exec - 	} > mamsh
 exec - 	;;

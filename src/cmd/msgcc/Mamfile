@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -48,15 +48,26 @@ exec - 	then	ENV= $SHELL -n msgadmin.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
-exec - "")	cp msgadmin.sh msgadmin
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
+exec - 	"")	cp msgadmin.sh msgadmin
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < msgadmin.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
+exec - 		cat msgadmin.sh
+exec - 		} > msgadmin
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < msgadmin.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
 exec - 	cat msgadmin.sh
 exec - 	} > msgadmin
 exec - 	;;
@@ -178,15 +189,26 @@ exec - 	then	ENV= $SHELL -n msgcc.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
-exec - "")	cp msgcc.sh msgcc
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
+exec - 	"")	cp msgcc.sh msgcc
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < msgcc.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
+exec - 		cat msgcc.sh
+exec - 		} > msgcc
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < msgcc.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
 exec - 	cat msgcc.sh
 exec - 	} > msgcc
 exec - 	;;

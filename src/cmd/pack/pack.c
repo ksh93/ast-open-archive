@@ -154,7 +154,7 @@ main(int argc, register char *argv[])
 			error(2, "%s: cannot pack a zero length file", infile);
 		else if(access(outfile,F_OK) ==0)
 			error(ERROR_system(0), "%s: already exists", outfile);
-		else if(((out=open(outfile,O_WRONLY|O_CREAT|O_TRUNC,PERM(statb.st_mode))) < 0) ||
+		else if(((out=open(outfile,O_WRONLY|O_CREAT|O_TRUNC|O_BINARY,PERM(statb.st_mode))) < 0) ||
 			!(fpout = sfnew((Sfio_t*)0,(char*)0,SF_UNBOUND,out,SF_WRITE)))
 			error(ERROR_system(0), "%s: cannot create", outfile);
 		else if((deleted++,chmod(outfile,statb.st_mode)) < 0)

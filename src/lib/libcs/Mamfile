@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -572,15 +572,26 @@ exec - 	then	ENV= $SHELL -n genlocal.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp genlocal.sh genlocal
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp genlocal.sh genlocal
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < genlocal.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat genlocal.sh
+exec - 		} > genlocal
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < genlocal.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat genlocal.sh
 exec - 	} > genlocal
 exec - 	;;
@@ -599,15 +610,26 @@ exec - 	then	ENV= $SHELL -n genshare.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp genshare.sh genshare
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp genshare.sh genshare
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < genshare.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat genshare.sh
+exec - 		} > genshare
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < genshare.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat genshare.sh
 exec - 	} > genshare
 exec - 	;;

@@ -64,7 +64,7 @@ void
 demail(void)
 {
 	if (state.var.keep || rm(state.path.mail) < 0)
-		close(open(state.path.mail, O_WRONLY|O_CREAT|O_TRUNC, MAILMODE));
+		close(open(state.path.mail, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, MAILMODE));
 }
 
 /*
@@ -752,7 +752,7 @@ touch(const char* file, time_t atime, time_t mtime, int force)
 	now = time(NiL);
 	if (stat(file, &st))
 	{
-		if (!force || close(open(file, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)))
+		if (!force || close(open(file, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)))
 			return -1;
 		st.st_mtime = st.st_atime = now;
 	}

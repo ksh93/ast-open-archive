@@ -1,3 +1,4 @@
+01-09-20 3d.sh: drop extra } in USAGE that emitted -} for --?
 01-07-17 Makefile: don't link 3d dll against ast dll
 01-02-19 close3d: dup reserved fd's higher
 01-02-14 add :VARIANT: to build dll's for CC.DLL.VARIANTS

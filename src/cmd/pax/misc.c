@@ -589,6 +589,29 @@ listentry(register File_t* f)
 	{
 		if (state.meter.on)
 		{
+			s = f->name;
+			for (;;)
+			{
+				switch (*s++)
+				{
+				case 0:
+					break;
+				case '\f':
+				case '\n':
+				case '\r':
+				case '\v':
+					if (state.meter.last)
+					{
+						sfprintf(sfstderr, "%*s", state.meter.last, "\r");
+						state.meter.last = 0;
+					}
+					listprintf(sfstderr, state.in, f, state.listformat);
+					return;
+				default:
+					continue;
+				}
+				break;
+			}
 			p = (state.in->io->count * 100) / state.meter.size;
 			n = listprintf(state.tmp.str, state.in, f, state.listformat);
 			s = sfstruse(state.tmp.str);

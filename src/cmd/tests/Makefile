@@ -16,7 +16,8 @@ date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat
 	do	DATEMSK=$(*:N=*.msk:/ /:/G) TZ=EST5EDT $(*:O=1) $(TESTDATEFLAGS) < $i
 	done
 
-.SOURCE : sfio ../../lib/libast/sfio ../../lib/libast
+.SOURCE : sfio
+.SOURCE.h : ../../lib/libast/sfio ../../lib/libast
 
 sfio :TEST: testsfio sftest.h +last \
 	talarm.c talign.c tappend.c tatexit.c tclose.c tdisc.c terrno.c \
@@ -28,7 +29,7 @@ sfio :TEST: testsfio sftest.h +last \
 	tputgetu.c trcrv.c treserve.c tscanf.c tseek.c \
 	tsetbuf.c tsetfd.c tshare.c tsize.c tstack.c tstatus.c \
 	tstdio.c tstkpk.c tstring.c tswap.c tsync.c ttell.c ttmp.c \
-	ttmpfile.c tungetc.c twhole.c twrrd.c
+	ttmpfile.c tungetc.c twchar.c twhole.c twrrd.c
 		set +x; $(*:O=1) $(TESTSFIOFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
 test.sf : testsfio sftest.h +last $$(*.ARGS:D:B:S=.c) .CLEARARGS

@@ -32,7 +32,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $__command__"
 	USAGE=$'
 [-?
-@(#)$Id: msgcc (AT&T Labs Research) 2001-05-29 $
+@(#)$Id: msgcc (AT&T Labs Research) 2001-10-10 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?msgcc - C language message catalog compiler]
@@ -292,7 +292,7 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 				print -r -- "$__line__"
 				continue
 				;;
-			'$'*|*"@(#)"*|*"<"*([[:word:] .-])"@"*([[:word:] .-])">"*|"http://"*)
+			'$'*|*"@(#)"*|*"<"*([[:word:] .-])"@"*([[:word:] .-])">"*([ 	])'"'|"http://"*)
 				continue
 				;;
 			*[[:alpha:]][[:alpha:]]*)

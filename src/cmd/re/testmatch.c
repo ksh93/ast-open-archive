@@ -25,16 +25,10 @@
 
 /*
  * match(3) test harness
- *
- * testmatch [ options ] < testmatch.dat
- *
- *	-c	catch signals and non-terminating regcomp,regexec
- *	-v	list each test line
- *
- * see testre --help for a description of the input format
+ * see testmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2001-05-16 $\0\n";
+static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2001-10-18 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -60,6 +54,85 @@ static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2001-05-16 $\0\n"
 #define NiL		(char*)0
 #endif
 #endif
+
+#define H(x)		fprintf(stderr,x)
+
+static void
+help(void)
+{
+H("NAME\n");
+H("  testmatch - strgrpmatch(3) test harness\n");
+H("\n");
+H("SYNOPSIS\n");
+H("  testmatch [ options ] < testmatch.dat\n");
+H("\n");
+H("DESCRIPTION\n");
+H("  testmatch reads strgrpmatch(3) test specifications, one per line, from\n");
+H("  the standard input and writes one output line for each failed test. A\n");
+H("  summary line is written after all tests are done. Each successful\n");
+H("  test is run again with no subexpression pointer array. Unsupported\n");
+H("  features are noted before the first test, and tests requiring these\n");
+H("  features are silently ignored.\n");
+H("\n");
+H("OPTIONS\n");
+H("  -c	catch signals and non-terminating calls\n");
+H("  -h	list help\n");
+H("  -v	list each test line\n");
+H("\n");
+H("INPUT FORMAT\n");
+H("  Input lines may be blank, a comment beginning with #, or a test\n");
+H("  specification. A specification is five fields separated by one\n");
+H("  or more tabs. NULL denotes the empty string and NIL denotes the\n");
+H("  0 pointer.\n");
+H("\n");
+H("  Field 1: the strgrpmatch(3) flags to apply, one character per\n");
+H("  STR_feature flag. The test is skipped if STR_feature is not supported\n");
+H("  by the implementation. If the first character is not [SK] then the\n");
+H("  specification is a global control line. Note that no distinction\n");
+H("  is made between SRE and KRE tests. STR_MAXIMAL is set by default.\n");
+H("  Specifications containing testre(1T) flags are silently ignored.\n");
+H("\n");
+H("    S	0			SRE	(sh glob)\n");
+H("    K	0			KRE	(ksh glob)\n");
+H("\n");
+H("    a	STR_LEFT|STR_RIGHT	implicit ^...$\n");
+H("    i	STR_ICASE		ignore case\n");
+H("    l	STR_LEFT		implicit ^...\n");
+H("    m	~STR_MAXIMAL		minimal match (default is STR_MAXIMAL)\n");
+H("    r	STR_RIGHT		implicit ...$\n");
+H("    u	standard unspecified behavior -- errors not counted\n");
+H("    $	                        expand C \\c escapes in fields 2 and 3\n");
+H("\n");
+H("  Field 1 control lines:\n");
+H("\n");
+H("    C	set LC_COLLATE and LC_CTYPE to locale in field 2\n");
+H("\n");
+H("    {				silent skip if failed until }\n");
+H("    }				end of skip\n");
+H("\n");
+H("    : comment			comment copied to output\n");
+H("\n");
+H("    number			use number for nmatch (20 by default)\n");
+H("\n");
+H("  Field 2: the strgrpmatch expression pattern; SAME uses the pattern\n");
+H("    from the previous specification.\n");
+H("\n");
+H("  Field 3: the string to match.\n");
+H("\n");
+H("  Field 4: the test outcome. This is either OK, NOMATCH, BADPAT, or\n");
+H("    the match array, a list of (m,n) entries with m and n being first\n");
+H("    and last+1 positions in the field 3 string, or NULL if subexpression\n");
+H("    array is specified and success is expected. The match[]\n");
+H("    subexpression pointer array is initialized to (-2,-2).\n");
+H("    All array elements not equal to (-2,-2) must be specified\n");
+H("    in the outcome. Unspecified endpoints are denoted by -1.\n");
+H("\n");
+H("  Field 5: optional comment appended to the report.\n");
+H("\n");
+H("CONTRIBUTORS\n");
+H("  Glenn Fowler <gsf@research.att.com> (ksh strgrpmatch)\n");
+H("  David Korn <dgk@research.att.com> (ksh glob matcher)\n");
+}
 
 #ifndef elementsof
 #define elementsof(x)	(sizeof(x)/sizeof(x[0]))
@@ -381,7 +454,7 @@ matchcheck(int nmatch, int* match, char* ans, char* re, char* s, int flags, int 
 			bad("improper answer\n", re, s, expand);
 		if (m!=match[i] || n!=match[i+1]) {
 			if (!query) {
-				report("match was: ", NiL, re, s, NiL, flags, unspecified, expand);
+				report("failed: match was: ", NiL, re, s, NiL, flags, unspecified, expand);
 				matchprint(match, nmatch);
 			}
 			return 0;
@@ -394,14 +467,14 @@ matchcheck(int nmatch, int* match, char* ans, char* re, char* s, int flags, int 
 					state.ignore.count++;
 					return 0;
 				}
-				report("match was: ", NiL, re, s, NiL, flags, unspecified, expand);
+				report("failed: match was: ", NiL, re, s, NiL, flags, unspecified, expand);
 				matchprint(match, nmatch);
 			}
 			return 0;
 		}
 	}
 	if (match[nmatch] != -2) {
-		report("overran match array: ", NiL, re, s, NiL, flags, unspecified, expand);
+		report("failed: overran match array: ", NiL, re, s, NiL, flags, unspecified, expand);
 		matchprint(match, nmatch + 1);
 	}
 	return 1;
@@ -489,6 +562,12 @@ main(int argc, char** argv)
 				catch = 1;
 				printf(", catch");
 				continue;
+			case 'h':
+			case '?':
+			case '-':
+				printf(", help\n\n");
+				help();
+				return 2;
 			case 'v':
 				verbose = 1;
 				printf(", verbose");
@@ -625,6 +704,9 @@ main(int argc, char** argv)
 			case 'b':
 				cflags = NOTEST;
 				continue;
+			case 'c':
+				cflags = NOTEST;
+				continue;
 			case 'd':
 				cflags = NOTEST;
 				continue;
@@ -633,8 +715,20 @@ main(int argc, char** argv)
 				continue;
 			case 'f':
 				continue;
+			case 'g':
+				cflags = NOTEST;
+				continue;
+			case 'h':
+				cflags = NOTEST;
+				continue;
 			case 'i':
 				eflags |= STR_ICASE;
+				continue;
+			case 'j':
+				cflags = NOTEST;
+				continue;
+			case 'k':
+				cflags = NOTEST;
 				continue;
 			case 'l':
 				eflags |= STR_LEFT;
@@ -670,6 +764,9 @@ main(int argc, char** argv)
 
 			case '$':
 				expand = 1;
+				continue;
+			case '/':
+				cflags = NOTEST;
 				continue;
 
 			case '{':
@@ -833,7 +930,7 @@ main(int argc, char** argv)
 				if (query)
 					skip = note(level, skip, msg);
 				else {
-					report("no match but match array assigned: ", NiL, re, s, msg, nmatch, unspecified, expand);
+					report("failed: no match but match array assigned: ", NiL, re, s, msg, nmatch, unspecified, expand);
 					matchprint(match, nmatch);
 				}
 			}

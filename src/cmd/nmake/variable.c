@@ -429,15 +429,21 @@ getval(register char* s, int op)
 			 */
 
 			*t = 0;
-			if (!(r = getrule(s)) || !(r->property & P_functional))
-				r = catrule(".", s, ".", 0);
+			if (!(v = getvar(s)) || !v->builtin)
+			{
+				if (!(r = getrule(s)) || !(r->property & P_functional))
+					r = catrule(".", s, ".", 0);
+				if (!r || !(r->property & P_functional))
+				{
+					*t++ = ' ';
+					return null;
+				}
+				if (v = getvar(r->name))
+					v->property |= V_functional;
+				else
+					v = setvar(r->name, NiL, V_functional);
+			}
 			*t++ = ' ';
-			if (!r || !(r->property & P_functional))
-				return null;
-			if (v = getvar(r->name))
-				v->property |= V_functional;
-			else
-				v = setvar(r->name, NiL, V_functional);
 		}
 		if (v->builtin)
 		{

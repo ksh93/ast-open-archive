@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_tcl ${INSTALLROOT}
 setv PACKAGE_tcl_INCLUDE ${PACKAGE_tcl}/include
@@ -176,7 +176,7 @@ done tkMain.o generated
 bind -ltk
 bind -ltcl
 bind -last
-make ${mam_libX11}
+make ${mam_libX11} archive
 done ${mam_libX11} dontcare virtual
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o tksh uinit.o tkMain.o ${mam_libtk} ${mam_libtcl} ${mam_libast}
 done tksh generated

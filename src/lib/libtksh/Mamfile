@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -165,9 +165,9 @@ done src/config.iffe
 prev tcl.req
 bind -lshell
 bind -last
-make ${mam_libX11}
+make ${mam_libX11} archive
 done ${mam_libX11} dontcare virtual
-prev ${mam_libX11}
+prev ${mam_libX11} archive
 exec - iffe -o config.h -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_X11_INCLUDE} -I${INSTALLROOT}/include -I/usr/include ${mam_libshell} ${mam_libast} ${mam_libast} : run src/config.iffe
 done config.h dontcare generated
 make include/tksh.h implicit

@@ -245,7 +245,7 @@ id=aha catalog=libast text="SEE ALSO"
 id=aha catalog=libast text="Bla."
 id=aha catalog=libast text="SYNOPSIS"
 id=(null) catalog=libast text="options"
-id=aha catalog=libast text="[ dialect "
+id=aha catalog=libast text="[ dialect ]"
 return=? option=- name=--man num=0
 id=(null) catalog=libast text="Usage"'
 		ERROR - $'ANZR
@@ -500,9 +500,9 @@ optional attributes separated by :, and an
 optional description string following ?.  The characters from the ?
 to the end of the next ]] are ignored for option parsing and short
 usage messages.  They are used for generating verbose help or man pages.
-The : character may not appear in the label
-The ?? character must be specified as ???? in label and the ]] character
-must be spcified as ]]]] in the description string.
+The : character may not appear in the label.
+The ? character must be specified as ?? in label and the ]] character
+must be specified as ]]]] in the description string.
 Text between two \\b (backspace) characters indicates
 that the text should be emboldened when displayed.
 Text between two \\a (bell) characters indicates that the text should
@@ -613,8 +613,8 @@ DESCRIPTION
   by :, and an optional description string following ?. The characters from the
   ? to the end of the next ] are ignored for option parsing and short usage
   messages. They are used for generating verbose help or man pages. The :
-  character may not appear in the label The ?? character must be specified as
-  ???? in label and the ] character must be spcified as ]] in the description
+  character may not appear in the label. The ? character must be specified as
+  ?? in label and the ] character must be specified as ]] in the description
   string. Text between two \\b (backspace) characters indicates that the text
   should be emboldened when displayed. Text between two \\a (bell) characters
   indicates that the text should be emphasised or italicised when displayed.
@@ -711,11 +711,11 @@ Each [...] group consists of an optional label, optional attributes separated
 by :, and an optional description string following ?. The characters from the ?
 to the end of the next ] are ignored for option parsing and short usage
 messages. They are used for generating verbose help or man pages. The :
-character may not appear in the label The ?? character must be specified as
-???? in label and the ] character must be spcified as ]] in the description
-string. Text between two \\b (backspace) characters indicates that the text
-should be emboldened when displayed. Text between two \\a (bell) characters
-indicates that the text should be emphasised or italicised when displayed.
+character may not appear in the label. The ? character must be specified as ??
+in label and the ] character must be specified as ]] in the description string.
+Text between two \\b (backspace) characters indicates that the text should be
+emboldened when displayed. Text between two \\a (bell) characters indicates that
+the text should be emphasised or italicised when displayed.
 .PP
 There are four types of groups:
 .H1 1.
@@ -837,11 +837,11 @@ lines separates the options from the command argument synopsis.
 separated by :, and an optional description string following ?. The characters
 from the ? to the end of the next &#0093; are ignored for option parsing and short
 usage messages. They are used for generating verbose help or man pages. The :
-character may not appear in the label The ?? character must be specified as
-???? in label and the &#0093; character must be spcified as &#0093;&#0093; in the description
-string. Text between two \\b (backspace) characters indicates that the text
-should be emboldened when displayed. Text between two \\a (bell) characters
-indicates that the text should be emphasised or italicised when displayed.
+character may not appear in the label. The ? character must be specified as ??
+in label and the &#0093; character must be specified as &#0093;&#0093; in the description string.
+Text between two \\b (backspace) characters indicates that the text should be
+emboldened when displayed. Text between two \\a (bell) characters indicates that
+the text should be emphasised or italicised when displayed.
 <P>
 <DT>There are four types of groups:
 <DL compact>
@@ -949,37 +949,92 @@ id=(null) catalog=libast text="keys"
 id=(null) catalog=libast text="long"
 id=(null) catalog=libast text="man"
 id=getopts catalog=libast text="version"
-id=getopts catalog=libast text="getopts (AT&T Research) 1999-02-02\n"
+id=getopts catalog=libast text="getopts (AT&T Research) 1999-02-02
+"
 id=getopts catalog=libast text="NAME"
-id=getopts catalog=libast text="\f?\f - parse utility options"
+id=getopts catalog=libast text="? - parse utility options"
 id=getopts catalog=libast text="OPTIONS"
 id=getopts catalog=libast text="command"
 id=getopts catalog=libast text="name"
-id=getopts catalog=libast text="Use \aname\a instead of the command name in usage messages."
+id=getopts catalog=libast text="Use name instead of the command name in usage messages."
 id=getopts catalog=libast text="DESCRIPTION"
-id=getopts catalog=libast text="The \bgetopts\b utility can be used to retrieve options and\narguments from a list of arguments give by \aargs\a or the positional\nparameters if \aargs\a is omitted.  It can also generate usage messages\nand a man page for the command based on the information in \aoptstring\a."
-id=getopts catalog=libast text="The \aoptstring\a string consists of alpha-numeric characters,\nthe special characters +, -, ?, :, and <space>, or character groups\nenclosed in [...]].  Character groups may be nested in {...}.\nOutside of a [...]] group, a single new-line followed by zero or\nmore blanks is ignored.  One or more blank lines separates the\noptions from the command argument synopsis."
-id=getopts catalog=libast text="Each [...]] group consists of an optional label,\noptional attributes separated by :, and an\noptional description string following ?.  The characters from the ?\nto the end of the next ]] are ignored for option parsing and short\nusage messages.  They are used for generating verbose help or man pages.\nThe : character may not appear in the label\nThe ?? character must be specified as ???? in label and the ]] character\nmust be spcified as ]]]] in the description string.\nText between two \\b (backspace) characters indicates\nthat the text should be emboldened when displayed.\nText between two \\a (bell) characters indicates that the text should\nbe emphasised or italicised when displayed."
+id=getopts catalog=libast text="The getopts utility can be used to retrieve options and
+arguments from a list of arguments give by args or the positional
+parameters if args is omitted.  It can also generate usage messages
+and a man page for the command based on the information in optstring."
+id=getopts catalog=libast text="The optstring string consists of alpha-numeric characters,
+the special characters +, -, ?, :, and <space>, or character groups
+enclosed in [...].  Character groups may be nested in {...}.
+Outside of a [...] group, a single new-line followed by zero or
+more blanks is ignored.  One or more blank lines separates the
+options from the command argument synopsis."
+id=getopts catalog=libast text="Each [...] group consists of an optional label,
+optional attributes separated by :, and an
+optional description string following ?.  The characters from the ?
+to the end of the next ] are ignored for option parsing and short
+usage messages.  They are used for generating verbose help or man pages.
+The : character may not appear in the label.
+The ? character must be specified as ?? in label and the ] character
+must be specified as ]] in the description string.
+Text between two \\b (backspace) characters indicates
+that the text should be emboldened when displayed.
+Text between two \\a (bell) characters indicates that the text should
+be emphasised or italicised when displayed."
 id=getopts catalog=libast text="There are four types of groups:"
-id=getopts catalog=libast text="An option specifiation of the form \aoption\a:\alongname\a.\n\tIn this case the first field is the option character.  If there\n\tis no option character, then a two digit number should be specified\n\tthat corresponds to the long options.  This negative of this number\n\twill be returned as the value of \aname\a by \bgetopts\b if the long\n\toption is matched. A longname is matched with \b--\b\alongname\a.  A\n\t* in the \alongname\a field indicates that only characters up that\n\tpoint need to match provided any additional characters match the option.\n\tThe [ and ]] can be omitted for options that don\'t have longnames\n\tor descriptive text."
-id=getopts catalog=libast text="A string option argument specification.\n\tOptions that take arguments can be followed by : or # and an option\n\tgroup specification.  An option group specification consists\n\tof a name for the option argument as field 1.   The remaining\n\tfields are a typename and zero or more of the special attribute words\n\t\blistof\b, \boneof\b, and \bignorecase\b.\n\tThe option specification can be followed\n\tby a list of option value descriptions enclosed in parenthesis."
+id=getopts catalog=libast text="An option specifiation of the form option:longname.
+	In this case the first field is the option character.  If there
+	is no option character, then a two digit number should be specified
+	that corresponds to the long options.  This negative of this number
+	will be returned as the value of name by getopts if the long
+	option is matched. A longname is matched with --longname.  A
+	* in the longname field indicates that only characters up that
+	point need to match provided any additional characters match the option.
+	The [ and ] can be omitted for options that don\'t have longnames
+	or descriptive text."
+id=getopts catalog=libast text="A string option argument specification.
+	Options that take arguments can be followed by : or # and an option
+	group specification.  An option group specification consists
+	of a name for the option argument as field 1.   The remaining
+	fields are a typename and zero or more of the special attribute words
+	listof, oneof, and ignorecase.
+	The option specification can be followed
+	by a list of option value descriptions enclosed in parenthesis."
 id=getopts catalog=libast text="A option value description."
-id=getopts catalog=libast text="A argument specification. A list of valid option argument values\n\t\tcan be specified by enclosing them inside a {...} following\n\t\tthe option argument specification.  Each of the permitted\n\t\tvalues can be specified with a [...]] containing the\n\t\tvalue followed by a description."
-id=getopts catalog=libast text="If the leading character of \aoptstring\a is +, then arguments\nbeginning with + will also be considered options."
-id=getopts catalog=libast text="A leading : character or a : following a leading + in \aoptstring\a\naffects the way errors are handled.  If an option character or longname\nargument not specified in \aoptstring\a is encountered when processing\noptions, the shell variable whose name is \aname\a will be set to the ?\ncharacter.  The shell variable \bOPTARG\b will be set to\nthe character found.  If an option argument is missing or has an invalid\nvalue, then \aname\a will be set to the : character and the shell variable\n\bOPTARG\b will be set to the option character found.\nWithout the leading :, \aname\a will be set to the ? character, \bOPTARG\b\nwill be unset, and an error message will be written to standard error\nwhen errors are encountered."
+id=getopts catalog=libast text="A argument specification. A list of valid option argument values
+		can be specified by enclosing them inside a {...} following
+		the option argument specification.  Each of the permitted
+		values can be specified with a [...] containing the
+		value followed by a description."
+id=getopts catalog=libast text="If the leading character of optstring is +, then arguments
+beginning with + will also be considered options."
+id=getopts catalog=libast text="A leading : character or a : following a leading + in optstring
+affects the way errors are handled.  If an option character or longname
+argument not specified in optstring is encountered when processing
+options, the shell variable whose name is name will be set to the ?
+character.  The shell variable OPTARG will be set to
+the character found.  If an option argument is missing or has an invalid
+value, then name will be set to the : character and the shell variable
+OPTARG will be set to the option character found.
+Without the leading :, name will be set to the ? character, OPTARG
+will be unset, and an error message will be written to standard error
+when errors are encountered."
 id=getopts catalog=libast text="The end of options occurs when:"
-id=getopts catalog=libast text="The special argument \b--\b."
-id=getopts catalog=libast text="An argument that does not beging with a \b-\b."
+id=getopts catalog=libast text="The special argument --."
+id=getopts catalog=libast text="An argument that does not beging with a -."
 id=getopts catalog=libast text="A help argument is specified."
 id=getopts catalog=libast text="An error is encountered."
-id=getopts catalog=libast text="If \bOPTARG\b is set to the value \b1\b, a new set of arguments\ncan be used."
-id=getopts catalog=libast text="\bgetopts\b can also be used to generate help messages containing command\nusage and detailed descriptions.  Specify \aargs\a as:"
+id=getopts catalog=libast text="If OPTARG is set to the value 1, a new set of arguments
+can be used."
+id=getopts catalog=libast text="getopts can also be used to generate help messages containing command
+usage and detailed descriptions.  Specify args as:"
 id=getopts catalog=libast text="To generate a usage synopsis."
 id=getopts catalog=libast text="To generate a verbose usage message."
 id=getopts catalog=libast text="To generate a formatted man page."
 id=getopts catalog=libast text="To generate an easy to parse usage message."
-id=getopts catalog=libast text="To generate a man page in \bhtml\b format."
-id=getopts catalog=libast text="When the end of options is encountered, \bgetopts\b exits with a\nnon-zero return value and the variable \bOPTIND\b is set to the\nindex of the first non-option argument."
+id=getopts catalog=libast text="To generate a man page in html format."
+id=getopts catalog=libast text="When the end of options is encountered, getopts exits with a
+non-zero return value and the variable OPTIND is set to the
+index of the first non-option argument."
 id=getopts catalog=libast text="EXIT STATUS"
 id=getopts catalog=libast text="An option specified was found."
 id=getopts catalog=libast text="An end of options was encountered."
@@ -987,7 +1042,7 @@ id=getopts catalog=libast text="A usage or information message was generated."
 id=getopts catalog=libast text="IMPLEMENTATION"
 id=getopts catalog=libast text="SYNOPSIS"
 id=(null) catalog=libast text="options"
-id=getopts catalog=libast text="opstring name [args..."
+id=getopts catalog=libast text="opstring name [args...]"
 return=? option=- name=--man num=0
 id=(null) catalog=libast text="Usage"'
 		ERROR - $'ANZR
@@ -1016,8 +1071,8 @@ QRFPEVCGVBA
   ol :, naq na bcgvbany qrfpevcgvba fgevat sbyybjvat ?. Gur punenpgref sebz gur
   ? gb gur raq bs gur arkg ] ner vtaberq sbe bcgvba cnefvat naq fubeg hfntr
   zrffntrf. Gurl ner hfrq sbe trarengvat ireobfr uryc be zna cntrf. Gur :
-  punenpgre znl abg nccrne va gur ynory Gur ?? punenpgre zhfg or fcrpvsvrq nf
-  ???? va ynory naq gur ] punenpgre zhfg or fcpvsvrq nf ]] va gur qrfpevcgvba
+  punenpgre znl abg nccrne va gur ynory. Gur ? punenpgre zhfg or fcrpvsvrq nf
+  ?? va ynory naq gur ] punenpgre zhfg or fcrpvsvrq nf ]] va gur qrfpevcgvba
   fgevat. Grkg orgjrra gjb \\b (onpxfcnpr) punenpgref vaqvpngrf gung gur grkg
   fubhyq or rzobyqrarq jura qvfcynlrq. Grkg orgjrra gjb \\a (oryy) punenpgref
   vaqvpngrf gung gur grkg fubhyq or rzcunfvfrq be vgnyvpvfrq jura qvfcynlrq.
@@ -1278,6 +1333,79 @@ TEST 11 'find style!'
 	EXEC	find "$find" --man
 		OUTPUT - $'return=? option=- name=-man num=0'
 		ERROR - $'NAME\n  find - find files\n\nSYNOPSIS\n  find [ options ] [ path ... ] [ option ]\n\nOPTIONS\n  -amin minutes   File was last accessed minutes minutes ago.\n  -chop           Chop leading ./ from printed pathnames.\n\nSEE ALSO\n  cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)'
+	EXEC	find "$find" --nroff
+		OUTPUT - $'return=? option=- name=-nroff num=0'
+		ERROR - $'.\\" format with nroff|troff|groff -man
+.nr mI 0
+.de mI
+.if \\\\n(mI>\\\\$1 \\{
+.nr mI \\\\n(mI-1
+.RE
+.mI \\\\$1
+.\\}
+.if \\\\n(mI<\\\\$1 \\{
+.nr mI \\\\n(mI+1
+.RS
+.mI \\\\$1
+.\\}
+..
+.de H1
+.mI 1
+.TP
+\\fB\\\\$1\\fP
+..
+.de H2
+.mI 2
+.TP
+\\fB\\\\$1\\fP
+..
+.de H3
+.mI 3
+.TP
+\\fB\\\\$1\\fP
+..
+.de H4
+.mI 4
+.TP
+\\fB\\\\$1\\fP
+..
+.de OP
+.mI 0
+.ie !\'\\\\$1\'-\' \\{
+.ds mO \\\\fB\\\\-\\\\$1\\\\fP
+.ds mS ,\\\\0
+.\\}
+.el \\{
+.ds mO \\\\&
+.ds mS \\\\&
+.\\}
+.ie \'\\\\$2\'-\' \\{
+.if !\'\\\\$4\'-\' .as mO \\\\0\\\\fI\\\\$4\\\\fP
+.\\}
+.el \\{
+.as mO \\\\*(mS\\\\fB\\\\-\\\\$2\\\\fP
+.if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
+.\\}
+.TP
+\\\\*(mO
+..
+.de FN
+.mI 0
+.TP
+\\\\$1 \\\\$2
+..
+.TH find 1
+.SH NAME
+\\fBfind\\fP \\- find files
+.SH SYNOPSIS
+\\fBfind\\fP\\ [\\ \\fIoptions\\fP\\ ]\\ [\\ path\\ \\&.\\&.\\&.\\ ]\\ [\\ option\\ ]
+.SH OPTIONS
+.OP - amin number minutes
+File was last accessed \\fIminutes\\fP minutes ago\\&.
+.OP - chop flag -
+Chop leading \\fB\\&./\\fP from printed pathnames\\&.
+.SH SEE\\ ALSO
+cpio(1), file(1), ls(1), sh(1), test(1), tw(1), stat(2)'
 
 TEST 12 'dd style!'
 	dd=$'[-1p0][+NAME?\bdd\b - copy and convert file][10:if?Input file name.]:[file][11:conv?Conversion option.]:[conversion][+SEE ALSO?cp(1), pax(1), tr(1), seek(2)]'
@@ -1441,29 +1569,42 @@ duh
 .PP'
 	EXEC	zwei "$usage" --nroff
 		OUTPUT - $'return=? option=- name=--nroff num=0'
-		ERROR - $'.\\" format with nroff|troff|groff -man
+		ERROR - $'.\\\" format with nroff|troff|groff -man
 .nr mI 0
-.de H1
-.if \\\\n(mI!=0 \\{
-.nr mI 0
+.de mI
+.if \\\\n(mI>\\\\$1 \\{
+.nr mI \\\\n(mI-1
 .RE
+.mI \\\\$1
 .\\}
+.if \\\\n(mI<\\\\$1 \\{
+.nr mI \\\\n(mI+1
+.RS
+.mI \\\\$1
+.\\}
+..
+.de H1
+.mI 1
+.TP
+\\fB\\\\$1\\fP
+..
+.de H2
+.mI 2
 .TP
 \\fB\\\\$1\\fP
 ..
 .de H3
-.if \\\\n(mI=0 \\{
-.nr mI 1
-.RS
-.\\}
+.mI 3
 .TP
-\\fB     \\\\$1\\fP
+\\fB\\\\$1\\fP
+..
+.de H4
+.mI 4
+.TP
+\\fB\\\\$1\\fP
 ..
 .de OP
-.if \\\\n(mI!=0 \\{
-.nr mI 0
-.RE
-.\\}
+.mI 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -1483,10 +1624,7 @@ duh
 \\\\*(mO
 ..
 .de FN
-.if \\\\n(mI!=0 \\{
-.nr mI 0
-.RE
-.\\}
+.mI 0
 .TP
 \\\\$1 \\\\$2
 ..
@@ -1495,7 +1633,7 @@ duh
 \\fBzwei\\fP\\ [\\ \\fIoptions\\fP\\ ]
 .SH OPTIONS
 .OP a aha string yyzzy
-magic\\\\sesame
+magic\\esesame
 .OP x - string bar
 foo
 .H3 a[b:c[d[,e]]?f[:g]]
@@ -1935,27 +2073,40 @@ href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 		OUTPUT - $'return=? option=- name=nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
 .nr mI 0
-.de H1
-.if \\\\n(mI!=0 \\{
-.nr mI 0
+.de mI
+.if \\\\n(mI>\\\\$1 \\{
+.nr mI \\\\n(mI-1
 .RE
+.mI \\\\$1
 .\\}
+.if \\\\n(mI<\\\\$1 \\{
+.nr mI \\\\n(mI+1
+.RS
+.mI \\\\$1
+.\\}
+..
+.de H1
+.mI 1
+.TP
+\\fB\\\\$1\\fP
+..
+.de H2
+.mI 2
 .TP
 \\fB\\\\$1\\fP
 ..
 .de H3
-.if \\\\n(mI=0 \\{
-.nr mI 1
-.RS
-.\\}
+.mI 3
 .TP
-\\fB     \\\\$1\\fP
+\\fB\\\\$1\\fP
+..
+.de H4
+.mI 4
+.TP
+\\fB\\\\$1\\fP
 ..
 .de OP
-.if \\\\n(mI!=0 \\{
-.nr mI 0
-.RE
-.\\}
+.mI 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -1968,43 +2119,40 @@ href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 .if !\'\\\\$4\'-\' .as mO \\\\0\\\\fI\\\\$4\\\\fP
 .\\}
 .el \\{
-.as mO \\\\*(mS\\\\fB\\\\-\\\\-\\\\$2\\\\fP
+.as mO \\\\*(mS\\\\fB\\\\$2\\\\fP
 .if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
 .\\}
 .TP
 \\\\*(mO
 ..
 .de FN
-.if \\\\n(mI!=0 \\{
-.nr mI 0
-.RE
-.\\}
+.mI 0
 .TP
 \\\\$1 \\\\$2
 ..
 .TH sum 3
 .SH NAME
-sum - checksum library
+sum \\- checksum library
 .SH SYNOPSIS
-#include\\ <sum.h>
+#include\\ <sum\\&.h>
 .SH DESCRIPTION
-\\fBsum\\fP is a checksum library.
+\\fBsum\\fP is a checksum library\\&.
 .SH FUNCTIONS
 .FN Sum_t*\\ \\fBsumopen\\fP(const\\ char*\\ \\fImethod\\fP)
-Open a sum handle for \\fImethod\\fP.
+Open a sum handle for \\fImethod\\fP\\&.
 .FN int\\ \\fBsumclose\\fP(Sum_t*\\ \\fIsum\\fP)
-Close a sum handle \\fIsum\\fP previously returned by \\fBsumopen\\fP.
+Close a sum handle \\fIsum\\fP previously returned by \\fBsumopen\\fP\\&.
 .SH SEE\\ ALSO
 \\fBcksum\\fP(1)
 .SH IMPLEMENTATION
 .H1 version
-sum (AT&T Labs Research) 1999-12-11
+sum (AT&T Labs Research) 1999\\-12\\-11
 .H1 author
-Glenn Fowler <gsf@research.att.com>
+Glenn Fowler <gsf@research\\&.att\\&.com>
 .H1 copyright
-Copyright (c) 1995-1999 AT&T Corp.
+Copyright (c) 1995\\-1999 AT&T Corp\\&.
 .H1 license
-http://www.research.att.com/sw/license/ast-open.html'
+http://www\\&.research\\&.att\\&.com/sw/license/ast\\-open\\&.html'
 	EXEC	sum "$usage" --api
 		OUTPUT - $'return=? option=- name=api num=0'
 		ERROR - $'.SH NAME
@@ -2050,27 +2198,40 @@ TEST 32 'miscellaneous'
 		OUTPUT - $'return=? option=- name=--nroff num=0'
 		ERROR - $'.\\" format with nroff|troff|groff -man
 .nr mI 0
-.de H1
-.if \\\\n(mI!=0 \\{
-.nr mI 0
+.de mI
+.if \\\\n(mI>\\\\$1 \\{
+.nr mI \\\\n(mI-1
 .RE
+.mI \\\\$1
 .\\}
+.if \\\\n(mI<\\\\$1 \\{
+.nr mI \\\\n(mI+1
+.RS
+.mI \\\\$1
+.\\}
+..
+.de H1
+.mI 1
+.TP
+\\fB\\\\$1\\fP
+..
+.de H2
+.mI 2
 .TP
 \\fB\\\\$1\\fP
 ..
 .de H3
-.if \\\\n(mI=0 \\{
-.nr mI 1
-.RS
-.\\}
+.mI 3
 .TP
-\\fB     \\\\$1\\fP
+\\fB\\\\$1\\fP
+..
+.de H4
+.mI 4
+.TP
+\\fB\\\\$1\\fP
 ..
 .de OP
-.if \\\\n(mI!=0 \\{
-.nr mI 0
-.RE
-.\\}
+.mI 0
 .ie !\'\\\\$1\'-\' \\{
 .ds mO \\\\fB\\\\-\\\\$1\\\\fP
 .ds mS ,\\\\0
@@ -2090,23 +2251,20 @@ TEST 32 'miscellaneous'
 \\\\*(mO
 ..
 .de FN
-.if \\\\n(mI!=0 \\{
-.nr mI 0
-.RE
-.\\}
+.mI 0
 .TP
 \\\\$1 \\\\$2
 ..
 .TH wow 1
 .SH NAME
-wow - zowee
+wow \\- zowee
 .SH SYNOPSIS
-\\fBwow\\fP\\ [\\ \\fIoptions\\fP\\ ]\\ [\\ file\\ ...\\ ]
+\\fBwow\\fP\\ [\\ \\fIoptions\\fP\\ ]\\ [\\ file\\ \\&.\\&.\\&.\\ ]
 .SH OPTIONS
 .OP a|b aORb flag -
-A or B.
+A or B\\&.
 .OP y|z yORz flag -
-Y or Z.
+Y or Z\\&.
 .SH IMPLEMENTATION
 .PP'
 	usage=$'[-][+NAME?wow - zowee][n:new-test?New test.][o:old-test?Old test.]\n\n[ file ... ]'
@@ -2299,9 +2457,9 @@ id=(null) catalog=libast text="options"
 id=(null) catalog=libast text="short"
 id=(null) catalog=libast text="usage"
 id=xlate catalog=libast text="NAME"
-id=xlate catalog=libast text="options available to all \bast\b commands"
+id=xlate catalog=libast text="options available to all ast commands"
 id=xlate catalog=libast text="DESCRIPTION"
-id=xlate catalog=libast text="\b-?\b and \b--?\b* options are the same for all \bast\b commands. For any \aitem\a below, if \b--\b\aitem\a is not supported by a given command then it is equivalent to \b--??\b\aitem\a. The \b--??\b form should be used for portability. All output is written to the standard error."
+id=xlate catalog=libast text="-? and --?* options are the same for all ast commands. For any item below, if --item is not supported by a given command then it is equivalent to --??item. The --?? form should be used for portability. All output is written to the standard error."
 id=xlate catalog=libast text="OPTIONS"
 id=xlate catalog=libast text="about"
 id=xlate catalog=libast text="List all implementation info."
@@ -2325,21 +2483,21 @@ id=xlate catalog=libast text="short"
 id=xlate catalog=libast text="List short option usage."
 id=xlate catalog=libast text="usage"
 id=xlate catalog=libast text="List the usage string with C style escapes."
-id=xlate catalog=libast text="??-\alabel\a"
-id=xlate catalog=libast text="List implementation info matching \alabel\a*."
-id=xlate catalog=libast text="??\aname\a"
-id=xlate catalog=libast text="Equivalent to \b--help=\b\aname\a."
+id=xlate catalog=libast text="?-label"
+id=xlate catalog=libast text="List implementation info matching label*."
+id=xlate catalog=libast text="?name"
+id=xlate catalog=libast text="Equivalent to --help=name."
+id=xlate catalog=libast text="?"
+id=xlate catalog=libast text="Equivalent to --??options."
 id=xlate catalog=libast text="??"
-id=xlate catalog=libast text="Equivalent to \b--??options\b."
-id=xlate catalog=libast text="????"
-id=xlate catalog=libast text="Equivalent to \b--??man\b."
-id=xlate catalog=libast text="??????"
-id=xlate catalog=libast text="Equivalent to \b--??help\b."
-id=xlate catalog=libast text="??????\aitem\a"
-id=xlate catalog=libast text="If the next argument is \b--\b\aoption\a then list the \aoption\a output in the \aitem\a style. Otherwise print \bversion=\b\an\a where \an\a>0 if \b--??\b\aitem\a is supported, \b0\b if not."
-id=xlate catalog=libast text="??????ESC"
+id=xlate catalog=libast text="Equivalent to --??man."
+id=xlate catalog=libast text="???"
+id=xlate catalog=libast text="Equivalent to --??help."
+id=xlate catalog=libast text="???item"
+id=xlate catalog=libast text="If the next argument is --option then list the option output in the item style. Otherwise print version=n where n>0 if --??item is supported, 0 if not."
+id=xlate catalog=libast text="???ESC"
 id=xlate catalog=libast text="Emit escape codes even if output is not a terminal."
-id=xlate catalog=libast text="??????TEST"
+id=xlate catalog=libast text="???TEST"
 id=xlate catalog=libast text="Massage the output for regression testing."
 id=xlate catalog=libast text="SYNOPSIS"
 id=(null) catalog=libast text="options"
@@ -2783,7 +2941,188 @@ SEE ALSO
 IMPLEMENTATION
   version         aha'
 
-TEST 40 'detailed key strings'
+TEST 40 'examples of example examples'
+	usage=$'[-?\naha\n][-catalog?SpamCo][+NAME?eg - test example examples][Q:quote?Quote names according to \astyle\a:]:[style:=question][+EXAMPLES]{[+\none\ntwo][+\n\vthree\nfour][+\n\afive\nsix]}[+SEE ALSO?\begman\b(1)]'
+	EXEC eg "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  eg - test example examples
+
+SYNOPSIS
+  eg [ options ]
+
+OPTIONS
+  -Q, --quote=style
+                  Quote names according to style: The default value is
+                  question.
+
+EXAMPLES
+    one
+    two
+
+    three
+    four
+
+    five
+    six
+
+SEE ALSO
+  egman(1)
+
+IMPLEMENTATION
+  version         aha
+  catalog         SpamCo'
+	EXEC eg "$usage" --nroff
+		OUTPUT - 'return=? option=- name=--nroff num=0'
+		ERROR - $'.\\" format with nroff|troff|groff -man
+.nr mI 0
+.de mI
+.if \\\\n(mI>\\\\$1 \\{
+.nr mI \\\\n(mI-1
+.RE
+.mI \\\\$1
+.\\}
+.if \\\\n(mI<\\\\$1 \\{
+.nr mI \\\\n(mI+1
+.RS
+.mI \\\\$1
+.\\}
+..
+.de H1
+.mI 1
+.TP
+\\fB\\\\$1\\fP
+..
+.de H2
+.mI 2
+.TP
+\\fB\\\\$1\\fP
+..
+.de H3
+.mI 3
+.TP
+\\fB\\\\$1\\fP
+..
+.de H4
+.mI 4
+.TP
+\\fB\\\\$1\\fP
+..
+.de OP
+.mI 0
+.ie !\'\\\\$1\'-\' \\{
+.ds mO \\\\fB\\\\-\\\\$1\\\\fP
+.ds mS ,\\\\0
+.\\}
+.el \\{
+.ds mO \\\\&
+.ds mS \\\\&
+.\\}
+.ie \'\\\\$2\'-\' \\{
+.if !\'\\\\$4\'-\' .as mO \\\\0\\\\fI\\\\$4\\\\fP
+.\\}
+.el \\{
+.as mO \\\\*(mS\\\\fB\\\\-\\\\-\\\\$2\\\\fP
+.if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
+.\\}
+.TP
+\\\\*(mO
+..
+.de FN
+.mI 0
+.TP
+\\\\$1 \\\\$2
+..
+.TH eg 1
+.SH NAME
+eg \\- test example examples
+.SH SYNOPSIS
+\\fBeg\\fP\\ [\\ \\fIoptions\\fP\\ ]
+.SH OPTIONS
+.OP Q quote string style question
+Quote names according to \\fIstyle\\fP:
+ The default value is \\fBquestion\\fP\\&.
+.SH EXAMPLES
+.DS
+\\f5one
+two\\fP
+.DE
+.DS
+three
+four
+.DE
+.DS
+\\fIfive
+six\\fP
+.DE
+.SH SEE\\ ALSO
+\\fBegman\\fP(1)
+.SH IMPLEMENTATION
+.H1 version
+aha
+.H1 catalog
+SpamCo'
+	EXEC eg "$usage" --html
+		OUTPUT - 'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<TITLE>eg man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;eg&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>eg&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
+<DT>eg - test example examples
+<P>
+</DL>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>eg</B> &#0091; <I>options</I> &#0093;
+<P>
+</DL>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD>Quote names according to <I>style
+</I>: The default value is <B>question</B>.
+</DL>
+<DT><H4><A name="EXAMPLES">EXAMPLES</A></H4>
+<P>
+<DT><PRE>
+<DL compact>
+<DT><TT>one
+<DT>two</TT>
+</DL>
+<DT></PRE>
+<DT><PRE>
+<DL compact>
+<DT>three
+<DT>four
+</DL>
+<DT></PRE>
+<DT><PRE>
+<DL compact>
+<DT><I>five
+<DT>six</I>
+</DL>
+<DT></PRE>
+<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DL compact>
+<DT><NOBR><A href="../man1/egman.html"><B>egman</B></A>(1)</NOBR>
+</DL>
+<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DL compact>
+<DT><A name="version"><B>version</B></A><DD>aha
+<DT><A name="catalog"><B>catalog</B></A><DD>SpamCo
+</DL></DL>
+</BODY>
+</HTML>'
+
+TEST 41 'detailed key strings'
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man
 		EXIT 2
@@ -2834,7 +3173,7 @@ IMPLEMENTATION
   ls [ (libast,3,709) ]
 
 (libast,3,333)
-  -Q, --(debug,ls,SpamCo,"quote")|quote=(debug,ls,SpamCo,"style
+  -Q, --(debug,ls,SpamCo,"quote")|quote=(debug,ls,SpamCo,"style:=question")
                   (debug,ls,SpamCo,"Quote names according to style:")
                     (debug,ls,SpamCo,"C")
                           (debug,ls,SpamCo,"C "..." style.")
@@ -2847,7 +3186,8 @@ IMPLEMENTATION
                     (debug,ls,SpamCo,"question|huh")
                           (debug,ls,SpamCo,"Replace unknown chars with ?.")
                   (debug,ls,SpamCo,"(libast,3,400) question.")
-  -x, --(debug,ls,SpamCo,"exec|run")|exec|run[=(debug,ls,SpamCo,"action]
+  -x,
+  --(debug,ls,SpamCo,"exec|run")|exec|run[=(debug,ls,SpamCo,"action:=default")]
                   (debug,ls,SpamCo,"Just do it.") (libast,3,401) (libast,3,400)
                   default.
 

@@ -106,7 +106,7 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 			edit(tmp, state.statefile, state.view[view].path, KEEP, KEEP);
 			sfputc(tmp, 0);
 			file = sfstrset(tmp, n);
-			if (fp = sfopen(NiL, file, "r"))
+			if (fp = sfopen(NiL, file, "br"))
 			{
 				/*
 				 * NOTE: this load should not be a problem for
@@ -507,7 +507,7 @@ lockstate(register char* file)
 		for (;;)
 		{
 			lockfile = file;
-			if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC|O_EXCL, 0)) >= 0)
+			if ((fd = open(file, O_WRONLY|O_CREAT|O_TRUNC|O_EXCL|O_BINARY, 0)) >= 0)
 				break;
 			lockfile = 0;
 			if (stat(file, &st) < 0)
@@ -553,7 +553,7 @@ readstate(char* file)
 	if (file)
 	{
 		lockstate(file);
-		if (state.readstate && (fp = sfopen(NiL, file, "r")))
+		if (state.readstate && (fp = sfopen(NiL, file, "br")))
 		{
 			state.stateview = 0;
 			message((-2, "loading state file %s", file));

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -193,6 +193,9 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c 
 done dump.o generated
 make expand.o
 make expand.c
+make ../../lib/libast/path/pathnative.c implicit
+prev ../../../include/ast/ast.h implicit
+done ../../lib/libast/path/pathnative.c
 make ../../../include/ast/regex.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -346,7 +349,7 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2001-07-17 \$\0\n"\" -c version.c
+exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2001-10-18 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -last
@@ -364,15 +367,26 @@ exec - 	then	ENV= $SHELL -n ppcc.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp ppcc.sh ppcc
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp ppcc.sh ppcc
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < ppcc.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat ppcc.sh
+exec - 		} > ppcc
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < ppcc.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat ppcc.sh
 exec - 	} > ppcc
 exec - 	;;
@@ -632,15 +646,26 @@ exec - 	then	ENV= $SHELL -n probe.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp probe.sh probe
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp probe.sh probe
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < probe.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat probe.sh
+exec - 		} > probe
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < probe.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat probe.sh
 exec - 	} > probe
 exec - 	;;

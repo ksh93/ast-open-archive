@@ -42,7 +42,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pin (AT&T Labs Research) 2000-10-04 $\n]"
+"[-?\n@(#)$Id: pin (AT&T Labs Research) 2001-10-08 $\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -66,7 +66,9 @@ USAGE_LICENSE
 "	both ordering and partitioning is NP-complete.]"
 "	[+(3)?The optimal partition for the ordering from step (2) is"
 "	determined by a dynamic program that computes the compressed size"
-"	for all partitions that preserve order.]"
+"	for all partitions that preserve order."
+"	Alternative greedy methods are also available that work more"
+"	quickly but do not guarantee optimality.]"
 "}"
 "[+?See \bpzip\b(1) for a detailed description of file partitions and"
 "	column frequencies. \bpin\b can run for a long time on some data"
@@ -115,10 +117,13 @@ USAGE_LICENSE
 "[w:window?Limit the number of training data rows used to induce the"
 "	partition. The window size may be decreased to accomodate an"
 "	integral number of complete rows.]#[window-size:=4M]"
-"[O!:optimal?Enable the optimal dynamic program step (step (3) from above).]"
+"[O:optimize?Choose the optimization (partitioning) method for step (3)"
+"	above. The methods"
+"	are:]:[method:=\foptimize_default\f]{\foptimize_methods\f}"
 "[Q:regress?Generate output for regression testing, such that identical"
 "	invocations with identical input files will generate the same output.]"
-"[R!:reorder?Enable the heuristic reorder step (step (2) from above).]"
+"[R:reorder?Choose the reordering method for step (2) above. The methods"
+"	are:]:[method:=\freorder_default\f]{\freorder_methods\f}"
 "[S:size?Ignore \b--row\b, determine the fixed record size, print it on the"
 "	standard output, and exit. If more than one \afile\a is specified"
 "	then the record size and name are printed for each file. A \b0\b"
@@ -147,7 +152,7 @@ USAGE_LICENSE
 #include <zlib.h>
 #include <bzlib.h>
 
-#define OP_optimal	0x01
+#define OP_optimize	0x01
 #define OP_reorder	0x02
 #define OP_size		0x04
 
@@ -167,6 +172,28 @@ typedef struct
 	int		prev;
 	int		column;
 } Stats_t;
+
+struct Optimize_method_s;
+
+typedef void (*Optimize_f)(struct Optimize_method_s*, unsigned char*, unsigned char*, size_t**, size_t*, size_t*, size_t, size_t, size_t);
+
+typedef struct Optimize_method_s
+{
+	const char*	name;
+	const char*	description;
+	Optimize_f	fun;
+} Optimize_method_t;
+
+struct Reorder_method_s;
+
+typedef void (*Reorder_f)(struct Reorder_method_s*, unsigned char*, unsigned char*, int*, size_t, size_t);
+
+typedef struct Reorder_method_s
+{
+	const char*	name;
+	const char*	description;
+	Reorder_f	fun;
+} Reorder_method_t;
 
 static struct
 {
@@ -378,7 +405,7 @@ field(unsigned char* t, register unsigned char* s, int i, int j, register int ro
 		b += n;
 	}
 	return zip(t, b - t);
-}	
+}
 
 /*
  * copy col i and col j from s into t
@@ -400,7 +427,7 @@ pair(unsigned char* t, register unsigned char* s, int i, register int j, size_t 
 			*b++ = *(s + j);
 	}
 	return zip(t, b - t);
-}	
+}
 
 /*
  * return the compressed size for partition pp
@@ -419,7 +446,7 @@ part(unsigned char* t, register unsigned char* s, register Part_t* pp, size_t ro
 		for (i = 0; i < pp->elements; i++)
 			*b++ = s[pp->member[i]];
 	return zip(t, b - t);
-}	
+}
 
 /*
  * merge col i with part pp and keep the best compression in np
@@ -470,14 +497,245 @@ merge(unsigned char* t, unsigned char* s, int i, Part_t* pp, register Part_t* np
 		return 1;
 	}
 	return 0;
-}	
+}
+
+/*
+ * filter out the high frequency columns from dat
+ */
+
+static size_t
+filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t high, int percent, size_t row, size_t tot)
+{
+	register int	i;
+	register int	j;
+	char*		q;
+	unsigned char*	s;
+	unsigned char*	t;
+	unsigned char*	dat;
+	unsigned char*	buf;
+	int		c;
+	size_t		rows;
+	size_t		n;
+	ssize_t		r;
+	unsigned long	freq;
+	Pzpart_t*	pp;
+	Sfio_t*		sp;
+
+	if (pz || high)
+	{
+		buf = *bufp;
+		dat = *datp;
+		rows = tot / row;
+		if (pz)
+		{
+			pp = pz->part;
+			high = pp->nmap;
+			if (!(state.map = newof(state.map, size_t, high, 0)))
+				error(ERROR_SYSTEM|3, "out of space [map]");
+			memcpy(state.map, pp->map, high * sizeof(state.map[0]));
+			pzclose(pz);
+		}
+		else
+		{
+			if (!(state.map = oldof(state.map, size_t, row, 0)))
+				error(ERROR_SYSTEM|3, "out of space [map]");
+			if (!(state.stats = oldof(state.stats, Stats_t, row, 0)))
+				error(ERROR_SYSTEM|3, "out of space [stats]");
+			memset(state.stats, 0, row * sizeof(state.stats[0]));
+			if (state.cache && (sp = sfopen(NiL, state.cachefile, "r")))
+			{
+				int		column;
+				unsigned long	frequency;
+
+				if (state.verbose)
+					sfprintf(sfstderr, "filter using %s for frequencies\n", state.cachefile);
+				error_info.file = state.cachefile;
+				error_info.line = 0;
+				while (q = sfgetr(sp, '\n', 1))
+				{
+					error_info.line++;
+					if (*q == 'f')
+					{
+						if (sfsscanf(q + 1, "%d %d %lu", &c, &column, &frequency) != 3 || c < 0 || c >= row || column < 0 || column >= row)
+							error(3, "%s: `%s' is invalid", buf, q);
+						state.stats[c].prev = 1;
+						state.stats[c].column = column;
+						state.stats[c].frequency = frequency;
+					}
+				}
+				for (j = 0; j < row; j++)
+					if (!state.stats[j].prev)
+						error(3, "invalid cache -- column %d frequency omitted", j);
+				sfclose(sp);
+				error_info.file = 0;
+				error_info.line = 0;
+			}
+			else
+			{
+				if (state.verbose)
+					sfprintf(sfstderr, "filter top %d%s high frequency columns\n", high, percent ? "%" : "");
+				s = dat;
+				for (i = 0; i < rows; i++)
+					for (j = 0; j < row; j++)
+						if (state.stats[j].prev != (c = *s++))
+						{
+							state.stats[j].prev = c;
+							state.stats[j].frequency++;
+						}
+				n = rows;
+				while ((r = sfread(ip, s = buf, row)) == row)
+				{
+					n++;
+					for (j = 0; j < row; j++)
+						if (state.stats[j].prev != (c = *s++))
+						{
+							state.stats[j].prev = c;
+							state.stats[j].frequency++;
+						}
+					if (n > 10000000L)
+					{
+						/*
+						 * that'll do pig
+						 */
+
+						r = 0;
+						break;
+					}
+				}
+				if (r < 0)
+					error(ERROR_SYSTEM|3, "data read error");
+				else if (r)
+					error(1, "last record incomplete");
+				for (j = 0; j < row; j++)
+					state.stats[j].column = j;
+				qsort(state.stats, row, sizeof(Stats_t), byfrequency);
+				if (state.cache)
+				{
+					error_info.file = state.cachefile;
+					error_info.line = 0;
+					if (!(sp = sfopen(NiL, state.cachefile, "w")))
+						error(ERROR_SYSTEM|1, "cannot write cache");
+					else
+					{
+						sfprintf(sp, "# %s cache for %s\n", error_info.id, state.input);
+						for (j = 0; j < row; j++)
+						{
+							sfprintf(sp, "f %d %d %lu\n", j, state.stats[j].column, state.stats[j].frequency);
+							error_info.line++;
+						}
+						if (sfclose(sp))
+							error(ERROR_SYSTEM|3, "cache write error");
+					}
+					error_info.file = 0;
+					error_info.line = 0;
+				}
+				if (state.verbose)
+					sfprintf(sfstderr, "filter done -- %u rows\n", n);
+			}
+			if (percent)
+			{
+				freq = state.stats[0].frequency * high / 100;
+				for (j = 0; j < row; j++)
+					if (state.stats[j].frequency <= freq)
+						break;
+				high = j;
+				if (state.verbose)
+					sfprintf(sfstderr, "%d high frequency column%s out of %d\n", high, high == 1 ? "" : "s", row);
+			}
+
+			/*
+			 * cut the original data layout some slack
+			 * by using the original column order
+			 */
+
+			qsort(state.stats, high, sizeof(Stats_t), bycolumn);
+			for (j = 0; j < high; j++)
+				state.map[j] = state.stats[j].column;
+			state.pairs = row;
+			if (!(state.pam = newof(state.pam, size_t, row, 0)))
+				error(ERROR_SYSTEM|3, "out of space [pam]");
+			for (j = 0; j < row; j++)
+				state.pam[j] = row;
+			for (j = 0; j < high; j++)
+				state.pam[state.map[j]] = j;
+		}
+		s = dat;
+		t = buf;
+		for (i = 0; i < rows; i++)
+		{
+			for (j = 0; j < high; j++)
+				*t++ = s[state.map[j]];
+			s += row;
+		}
+		row = high;
+		*bufp = dat;
+		*datp = buf;
+	}
+	else
+	{
+		if (!(state.map = newof(0, size_t, row, 0)))
+			error(ERROR_SYSTEM|3, "out of space [map]");
+		for (i = 0; i < row; i++)
+			state.map[i] = i;
+	}
+	return row;
+}
+
+/*
+ * stuff the partion group labels in lab
+ */
+
+static int
+solution(int* lab, int label, size_t* sol, int beg, int end)
+{
+	int	i;
+
+	i = sol[end];
+	if (i >= beg)
+		label = solution(lab, label, sol, beg, i);
+	for (label++, beg = i + 1; beg <= end; beg++)
+		lab[beg] = label;
+	return label;
+}
+
+/*
+ * list the final partition on sp
+ */
+
+static void
+list(Sfio_t* sp, int* lab, size_t row)
+{
+	register int	i;
+	register int	j;
+	register int	g;
+
+	g = -1;
+	for (i = 0; i < row; i++)
+	{
+		if (g != lab[i])
+		{
+			g = lab[i];
+			sfprintf(sp, "\n");
+		}
+		else
+			sfprintf(sp, " ");
+		for (j = i + 1; j < row && lab[j] == g && state.map[j] == (state.map[j - 1] + 1); j++);
+		sfprintf(sp, "%d", state.map[i]);
+		if ((j - i) > 1)
+		{
+			i = j - 1;
+			sfprintf(sp, "-%d", state.map[i]);
+		}
+	}
+	sfprintf(sp, "\n");
+}
 
 /*
  * search for a good initial ordering
  */
 
 static void
-reorder(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot)
+reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot)
 {
 	register int		i;
 	register int		j;
@@ -870,185 +1128,13 @@ reorder(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot
 }
 
 /*
- * filter out the high frequency columns from dat
+ * tsp ordering
  */
 
-static size_t
-filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t high, int percent, size_t row, size_t tot)
+static void
+reorder_tsp(Reorder_method_t* method, unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot)
 {
-	register int	i;
-	register int	j;
-	char*		q;
-	unsigned char*	s;
-	unsigned char*	t;
-	unsigned char*	dat;
-	unsigned char*	buf;
-	int		c;
-	size_t		rows;
-	size_t		n;
-	ssize_t		r;
-	unsigned long	freq;
-	Pzpart_t*	pp;
-	Sfio_t*		sp;
-
-	if (pz || high)
-	{
-		buf = *bufp;
-		dat = *datp;
-		rows = tot / row;
-		if (pz)
-		{
-			pp = pz->part;
-			high = pp->nmap;
-			if (!(state.map = newof(state.map, size_t, high, 0)))
-				error(ERROR_SYSTEM|3, "out of space [map]");
-			memcpy(state.map, pp->map, high * sizeof(state.map[0]));
-			pzclose(pz);
-		}
-		else
-		{
-			if (!(state.map = oldof(state.map, size_t, row, 0)))
-				error(ERROR_SYSTEM|3, "out of space [map]");
-			if (!(state.stats = oldof(state.stats, Stats_t, row, 0)))
-				error(ERROR_SYSTEM|3, "out of space [stats]");
-			memset(state.stats, 0, row * sizeof(state.stats[0]));
-			if (state.cache && (sp = sfopen(NiL, state.cachefile, "r")))
-			{
-				int		column;
-				unsigned long	frequency;
-
-				if (state.verbose)
-					sfprintf(sfstderr, "filter using %s for frequencies\n", state.cachefile);
-				error_info.file = state.cachefile;
-				error_info.line = 0;
-				while (q = sfgetr(sp, '\n', 1))
-				{
-					error_info.line++;
-					if (*q == 'f')
-					{
-						if (sfsscanf(q + 1, "%d %d %lu", &c, &column, &frequency) != 3 || c < 0 || c >= row || column < 0 || column >= row)
-							error(3, "%s: `%s' is invalid", buf, q);
-						state.stats[c].prev = 1;
-						state.stats[c].column = column;
-						state.stats[c].frequency = frequency;
-					}
-				}
-				for (j = 0; j < row; j++)
-					if (!state.stats[j].prev)
-						error(3, "invalid cache -- column %d frequency omitted", j);
-				sfclose(sp);
-				error_info.file = 0;
-				error_info.line = 0;
-			}
-			else
-			{
-				if (state.verbose)
-					sfprintf(sfstderr, "filter top %d%s high frequency columns\n", high, percent ? "%" : "");
-				s = dat;
-				for (i = 0; i < rows; i++)
-					for (j = 0; j < row; j++)
-						if (state.stats[j].prev != (c = *s++))
-						{
-							state.stats[j].prev = c;
-							state.stats[j].frequency++;
-						}
-				n = rows;
-				while ((r = sfread(ip, s = buf, row)) == row)
-				{
-					n++;
-					for (j = 0; j < row; j++)
-						if (state.stats[j].prev != (c = *s++))
-						{
-							state.stats[j].prev = c;
-							state.stats[j].frequency++;
-						}
-					if (n > 10000000L)
-					{
-						/*
-						 * that'll do pig
-						 */
-
-						r = 0;
-						break;
-					}
-				}
-				if (r < 0)
-					error(ERROR_SYSTEM|3, "data read error");
-				else if (r)
-					error(1, "last record incomplete");
-				for (j = 0; j < row; j++)
-					state.stats[j].column = j;
-				qsort(state.stats, row, sizeof(Stats_t), byfrequency);
-				if (state.cache)
-				{
-					error_info.file = state.cachefile;
-					error_info.line = 0;
-					if (!(sp = sfopen(NiL, state.cachefile, "w")))
-						error(ERROR_SYSTEM|1, "cannot write cache");
-					else
-					{
-						sfprintf(sp, "# %s cache for %s\n", error_info.id, state.input);
-						for (j = 0; j < row; j++)
-						{
-							sfprintf(sp, "f %d %d %lu\n", j, state.stats[j].column, state.stats[j].frequency);
-							error_info.line++;
-						}
-						if (sfclose(sp))
-							error(ERROR_SYSTEM|3, "cache write error");
-					}
-					error_info.file = 0;
-					error_info.line = 0;
-				}
-				if (state.verbose)
-					sfprintf(sfstderr, "filter done -- %u rows\n", n);
-			}
-			if (percent)
-			{
-				freq = state.stats[0].frequency * high / 100;
-				for (j = 0; j < row; j++)
-					if (state.stats[j].frequency <= freq)
-						break;
-				high = j;
-				if (state.verbose)
-					sfprintf(sfstderr, "%d high frequency column%s out of %d\n", high, high == 1 ? "" : "s", row);
-			}
-
-			/*
-			 * cut the original data layout some slack
-			 * by using the original column order
-			 */
-
-			qsort(state.stats, high, sizeof(Stats_t), bycolumn);
-			for (j = 0; j < high; j++)
-				state.map[j] = state.stats[j].column;
-			state.pairs = row;
-			if (!(state.pam = newof(state.pam, size_t, row, 0)))
-				error(ERROR_SYSTEM|3, "out of space [pam]");
-			for (j = 0; j < row; j++)
-				state.pam[j] = row;
-			for (j = 0; j < high; j++)
-				state.pam[state.map[j]] = j;
-		}
-		s = dat;
-		t = buf;
-		for (i = 0; i < rows; i++)
-		{
-			for (j = 0; j < high; j++)
-				*t++ = s[state.map[j]];
-			s += row;
-		}
-		row = high;
-		*bufp = dat;
-		*datp = buf;
-	}
-	else
-	{
-		if (!(state.map = newof(0, size_t, row, 0)))
-			error(ERROR_SYSTEM|3, "out of space [map]");
-		for (i = 0; i < row; i++)
-			state.map[i] = i;
-	}
-	return row;
+	error(3, "%s ordering not implemented yet", method->name);
 }
 
 /*
@@ -1056,11 +1142,34 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
  */
 
 static void
-optimize(size_t** val, size_t* cst, size_t* sol, int row)
+optimize_dynamic(Optimize_method_t* method, unsigned char* buf, unsigned char* dat, size_t** val, size_t* cst, size_t* sol, size_t row, size_t tot, size_t grp)
 {
 	int	i;
 	int	j;
+	int	k;
 	size_t	new;
+
+	/*
+	 * fill in the field compress value matrix
+	 */
+
+	for (i = 0; i < row; i++)
+	{
+		if (grp <= 0)
+			k = row;
+		else if ((k = i + grp) > row)
+			k = row;
+		if (state.verbose)
+			sfprintf(sfstderr, "%s %d..%d\n", method->name, i, k - 1);
+		for (j = i; j < k; j++)
+			val[i][j] = field(buf, dat, i, j, row, tot);
+		for (; j < row; j++)
+			val[i][j] = ~0;
+	}
+
+	/*
+	 * now run the dynamic program
+	 */
 
 	for (i = 0; i < row; i++)
 	{
@@ -1079,111 +1188,140 @@ optimize(size_t** val, size_t* cst, size_t* sol, int row)
 }
 
 /*
- * stuff the partion group labels in lab
+ * greedy algorithm to approximate optimal partition based on zip sizes in val
+ */
+
+static void
+optimize_greedy(Optimize_method_t* method, unsigned char* buf, unsigned char* dat, size_t** val, size_t* cst, size_t* sol, size_t row, size_t tot, size_t grp)
+{
+	int	i;
+	size_t	expand;
+	size_t	new;
+
+	cst[0] = val[0][0] = field(buf, dat, 0, 0, row, tot);
+	sol[0] = -1;
+	for (i = 1; i < row; i++)
+	{
+		val[sol[i-1] + 1][i] = field(buf, dat, sol[i-1]+1, i, row, tot);
+		val[i][i] = field(buf, dat, i, i, row, tot);
+		expand = val[sol[i-1] + 1][i];
+		new = cst[i-1] + val[i][i];
+		if (new < expand) {
+			cst[i] = val[i][i];
+			sol[i] = i-1;
+		}
+		else {
+			cst[i] = expand;
+			sol[i] = sol[i-1];
+		}
+	}
+}
+
+/*
+ * transitive greedy algorithm to approximate optimal partition
+ * based on zip sizes in val
+ */
+
+static void
+optimize_transitive(Optimize_method_t* method, unsigned char* buf, unsigned char* dat, size_t** val, size_t* cst, size_t* sol, size_t row, size_t tot, size_t grp)
+{
+	int	i;
+	size_t	expand;
+
+	cst[0] = val[0][0] = field(buf, dat, 0, 0, row, tot);
+	sol[0] = -1;
+	for (i = 1; i < row; i++)
+	{
+		val[i][i] = field(buf, dat, i, i, row, tot);
+		expand = field(buf, dat, i-1, i, row, tot);
+		if (expand <= val[i-1][i-1] + val[i][i])
+		{
+			cst[i] = expand;
+			sol[i] = sol[i-1];
+		}
+		else
+		{
+			cst[i] = val[i][i];
+			sol[i] = i-1;
+		}
+	}
+}
+
+/*
+ * optimization (partitioning) method table
+ * the first entry is the default
+ */
+
+static Optimize_method_t	optimize_methods[] =
+{
+	{
+		"dynamic",
+		"dynamic program optimal partition",
+		optimize_dynamic
+	},
+	{
+		"greedy",
+		"greedy approximation partition",
+		optimize_greedy
+	},
+	{
+		"none",
+		"no partition",
+		0
+	},
+	{
+		"transitive",
+		"transitive greedy approximation partition",
+		optimize_transitive
+	},
+};
+
+/*
+ * reorder method table
+ * the first entry is the default
+ */
+
+static Reorder_method_t		reorder_methods[] =
+{
+	{
+		"heuristic",
+		"heuristic reorder",
+		reorder_heuristic
+	},
+	{
+		"none",
+		"no reordering",
+		0
+	},
+	{
+		"tsp",
+		"tsp reordering",
+		reorder_tsp
+	},
+};
+
+/*
+ * optget() info discipline function
  */
 
 static int
-solution(int* lab, int label, size_t* sol, int beg, int end)
-{
-	int	i;
-
-	i = sol[end];
-	if (i >= beg)
-		label = solution(lab, label, sol, beg, i);
-	for (label++, beg = i + 1; beg <= end; beg++)
-		lab[beg] = label;
-	return label;
-}
-
-/*
- * determine the optimal partition on dat
- */
-
-static void
-optimal(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot, int maxgrp)
+optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 {
 	register int	i;
-	register int	j;
-	register int	k;
-	size_t*		cst;
-	size_t*		sol;
-	size_t**	val;
+	register int	n;
 
-	val = matrix(row);
-	cst = vector(row);
-	sol = vector(row);
-
-	/*
-	 * fill in the field compress value matrix
-	 */
-
-	for (i = 0; i < row; i++)
-	{
-		if (maxgrp <= 0)
-			k = row;
-		else if ((k = i + maxgrp) > row)
-			k = row;
-		if (state.verbose)
-			sfprintf(sfstderr, "optimal %d..%d\n", i, k - 1);
-		for (j = i; j < k; j++)
-			val[i][j] = field(buf, dat, i, j, row, tot);
-		for (; j < row; j++)
-			val[i][j] = ~0;
-	}
-
-	/*
-	 * determine the optimal partition
-	 */
-
-	optimize(val, cst, sol, row);
-
-	/*
-	 * gather the optimal partition group labels in lab
-	 */
-
-	solution(lab, 0, sol, 0, row - 1);
-	if (state.verbose)
-		sfprintf(sfstderr, "optimal done\n");
-
-	/*
-	 * clean up
-	 */
-
-	free(val);
-	free(cst);
-	free(sol);
-}
-
-/*
- * list the final partition on sp
- */
-
-static void
-list(Sfio_t* sp, int* lab, size_t row)
-{
-	register int	i;
-	register int	j;
-	register int	g;
-
-	g = -1;
-	for (i = 0; i < row; i++)
-	{
-		if (g != lab[i])
-		{
-			g = lab[i];
-			sfprintf(sp, "\n");
-		}
-		else
-			sfprintf(sp, " ");
-		for (j = i + 1; j < row && lab[j] == g && state.map[j] == (state.map[j - 1] + 1); j++);
-		sfprintf(sp, "%d", state.map[i]);
-		if ((j - i) > 1)
-		{
-			i = j - 1;
-			sfprintf(sp, "-%d", state.map[i]);
-		}
-	}
-	sfprintf(sp, "\n");
+	n = 0;
+	if (streq(s, "optimize_default"))
+		n += sfprintf(sp, "%s", optimize_methods[0].name);
+	else if (streq(s, "optimize_methods"))
+		for (i = 0; i < elementsof(optimize_methods); i++)
+			n += sfprintf(sp, "[+%s?%s]", optimize_methods[i].name, optimize_methods[i].description);
+	else if (streq(s, "reorder_default"))
+		n += sfprintf(sp, "%s", reorder_methods[0].name);
+	else if (streq(s, "reorder_methods"))
+		for (i = 0; i < elementsof(reorder_methods); i++)
+			n += sfprintf(sp, "[+%s?%s]", reorder_methods[i].name, reorder_methods[i].description);
+	return n;
 }
 
 int
@@ -1192,6 +1330,7 @@ main(int argc, char** argv)
 	unsigned char*	dat;
 	unsigned char*	buf;
 	char*		s;
+	int		i;
 	ssize_t		n;
 	ssize_t		m;
 	size_t		rows;
@@ -1204,8 +1343,9 @@ main(int argc, char** argv)
 	Pzdisc_t	disc;
 	struct stat	is;
 	struct stat	cs;
+	Optdisc_t	optdisc;
 
-	int		op = OP_optimal|OP_reorder;
+	int		op = 0;
 	size_t		high = 10;
 	int		maxgrp = 0;
 	size_t		row = 0;
@@ -1213,6 +1353,13 @@ main(int argc, char** argv)
 	char*		partition = 0;
 	int		percent = 1;
 
+	Optimize_method_t*	optimize_method = &optimize_methods[0];
+	Reorder_method_t*	reorder_method = &reorder_methods[0];
+
+	memset(&optdisc, 0, sizeof(optdisc));
+	optdisc.version = OPT_VERSION;
+	optdisc.infof = optinfo;
+	opt_info.disc = &optdisc;
 	error_info.id = "pin";
 	state.level = 6;
 	state.window = PZ_WINDOW;
@@ -1254,13 +1401,39 @@ main(int argc, char** argv)
 			state.window = opt_info.num;
 			continue;
 		case 'O':
-			op &= ~OP_optimal;
+			n = strlen(opt_info.arg);
+			for (i = 0;; i++)
+			{
+				if (i >= elementsof(optimize_methods))
+				{
+					error(2, "%s: unknown partition method", opt_info.arg);
+					break;
+				}
+				if (strneq(opt_info.arg, optimize_methods[i].name, n))
+				{
+					optimize_method = &optimize_methods[i];
+					break;
+				}
+			}
 			continue;
 		case 'Q':
 			sfprintf(dp, "regress\n");
 			continue;
 		case 'R':
-			op &= ~OP_reorder;
+			n = strlen(opt_info.arg);
+			for (i = 0;; i++)
+			{
+				if (i >= elementsof(reorder_methods))
+				{
+					error(2, "%s: unknown reorder method", opt_info.arg);
+					break;
+				}
+				if (strneq(opt_info.arg, reorder_methods[i].name, n))
+				{
+					reorder_method = &reorder_methods[i];
+					break;
+				}
+			}
 			continue;
 		case 'S':
 			op |= OP_size;
@@ -1291,6 +1464,10 @@ main(int argc, char** argv)
 	 * set up the workspace
 	 */
 
+	if (optimize_method->fun)
+		op |= OP_optimize;
+	if (reorder_method->fun)
+		op |= OP_reorder;
 	memset(&disc, 0, sizeof(disc));
 	disc.version = PZ_VERSION;
 	disc.errorf = (Pzerror_f)errorf;
@@ -1411,26 +1588,60 @@ main(int argc, char** argv)
 		tot = row * rows;
 		if (!(lab = newof(0, int, row, 0)))
 			error(ERROR_SYSTEM|3, "out of space [lab]");
-		if (pz && !(op & (OP_reorder|OP_optimal)))
+		if (pz && !(op & (OP_reorder|OP_optimize)))
 			for (n = 0; n < pz->part->nmap; n++)
 				lab[n] = pz->part->lab[n];
 	}
 	else
-		op &= ~(OP_optimal|OP_reorder);
+		op &= ~(OP_optimize|OP_reorder);
 
 	/*
 	 * determine a better ordering
 	 */
 
 	if (op & OP_reorder)
-		reorder(buf, dat, lab, row, tot);
+		(*reorder_method->fun)(reorder_method, buf, dat, lab, row, tot);
 
 	/*
 	 * generate a partition based on the ordering
 	 */
 
-	if (op & OP_optimal)
-		optimal(buf, dat, lab, row, tot, maxgrp);
+	if (op & OP_optimize)
+	{
+		size_t*		cst;
+		size_t*		sol;
+		size_t**	val;
+
+		/*
+		 * allocate the tmp workspace
+		 */
+
+		val = matrix(row);
+		cst = vector(row);
+		sol = vector(row);
+
+		/*
+		 * partition
+		 */
+
+		(*optimize_method->fun)(optimize_method, buf, dat, val, cst, sol, row, tot, maxgrp);
+
+		/*
+		 * gather the optimal partition group labels in lab
+		 */
+
+		solution(lab, 0, sol, 0, row - 1);
+		if (state.verbose)
+			sfprintf(sfstderr, "%s done\n", optimize_method->name);
+
+		/*
+		 * clean up
+		 */
+
+		free(val);
+		free(cst);
+		free(sol);
+	}
 
 	/*
 	 * finished -- list the partition

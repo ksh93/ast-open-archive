@@ -139,7 +139,6 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	implementation system call names may differ from those listed in
 	section 2 of the manual; \bstat\b(2) is especially vulnerbale to
 	mangling.]
-}
 [+?\b3d\b ignores calls not present in a particular host system. In addition,
 	\b3d\b only works on dynamically linked executables that have neither
 	set-uid nor set-gid permissions.]

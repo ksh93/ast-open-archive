@@ -124,7 +124,7 @@
 --*/
 #define BZ_LCCWIN32  0
 
-#if defined(_WIN32) && !defined(_UWIN)
+#if defined(_WIN32) && !defined(_UWIN) && !defined(__CYGWIN__)
 #define BZ_LCCWIN32 1
 #define BZ_UNIX 0
 #endif

@@ -413,7 +413,7 @@ arscan(struct rule* r)
 		state.archive = 0;
 		r->dynamic |= D_entries;
 	}
-	else if ((arfd = openar(r->name, "r")) >= 0)
+	else if ((arfd = openar(r->name, "br")) >= 0)
 	{
 #if DEBUG
 		message((-5, "scan archive %s", r->name));

@@ -139,7 +139,7 @@ int  hist_open()
 	}
 retry:
 	histname = path_relative(histname);
-	if((fd=open(histname,O_APPEND|O_RDWR|O_CREAT,S_IRUSR|S_IWUSR))>=0)
+	if((fd=open(histname,O_APPEND|O_RDWR|O_CREAT|O_BINARY,S_IRUSR|S_IWUSR))>=0)
 	{
 		hsize=io_seek(fd,(off_t)0,SEEK_END);
 	}

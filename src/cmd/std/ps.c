@@ -770,7 +770,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 #endif
 #ifdef _PS_args
 			sfprintf(state.tmp, _PS_path_num, pp->ps.pr_pid, _PS_args);
-			if ((i = open(sfstruse(state.tmp), O_RDONLY)) >= 0)
+			if ((i = open(sfstruse(state.tmp), O_RDONLY|O_BINARY)) >= 0)
 			{
 				n = read(i, sfstrbase(state.tmp), sfstrsize(state.tmp) - 1);
 				close(i);
@@ -986,7 +986,7 @@ ps(Ps_t* pp)
 #endif
 #ifdef _PS_args
 			sfprintf(state.tmp, _PS_path_num, pr->pr_pid, _PS_args);
-			if ((i = open(sfstruse(state.tmp), O_RDONLY)) >= 0)
+			if ((i = open(sfstruse(state.tmp), O_RDONLY|O_BINARY)) >= 0)
 			{
 				n = read(i, sfstrbase(state.tmp), sfstrsize(state.tmp) - 1);
 				close(i);
@@ -1342,7 +1342,7 @@ addpid(register char* s, int must, int verbose)
 		if (!*t)
 			break;
 		sfprintf(state.tmp, _PS_path_str, t, _PS_status);
-		if ((fd = open(sfstruse(state.tmp), O_RDONLY)) >= 0)
+		if ((fd = open(sfstruse(state.tmp), O_RDONLY|O_BINARY)) >= 0)
 		{
 			if (!(pp = state.pp) && !(state.pp = pp = newof(0, Ps_t, 1, 0)))
 				error(ERROR_SYSTEM|3, "out of space [proc]");

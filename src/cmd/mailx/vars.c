@@ -421,7 +421,7 @@ set_mailcap(struct var* vp, const char* value)
 void
 set_news(struct var* vp, const char* value)
 {
-	if (value && *value && close(open(state.var.news, O_WRONLY|O_CREAT|O_TRUNC, MAILMODE)))
+	if (value && *value && close(open(state.var.news, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, MAILMODE)))
 		note(FATAL|SYSTEM, "\"%s\"", state.var.news);
 }
 

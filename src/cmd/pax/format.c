@@ -914,6 +914,30 @@ seekable(Archive_t* ap)
 }
 
 /*
+ * no dos in our pathnames
+ */
+
+static void
+undos(File_t* f)
+{
+	register char*	s;
+
+	if (strchr(f->name, '\\'))
+	{
+		s = f->name;
+		if (s[1] == ':' && isalpha(s[0]))
+		{
+			if (*(s += 2) == '\\' || *s == '/')
+				s++;
+			f->name = s;
+		}
+		for (; *s; s++)
+			if (*s == '\\')
+				*s = '/';
+	}
+}
+
+/*
  * read next archive entry header
  */
 
@@ -1546,7 +1570,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				if (ap->swap)
 					swapmem(ap->swap, &lead_old, &lead_old, sizeof(lead_old));
 				if (bseek(ap, (off_t)lead_old.archoff, SEEK_SET, 0) != (off_t)lead_old.archoff)
-					error(3, "%s: %s imbedded archive seek error", ap->name, format[ap->compress].name);
+					error(3, "%s: %s embedded archive seek error", ap->name, format[ap->compress].name);
 			}
 			else if (magic.major)
 			{
@@ -2086,19 +2110,7 @@ getheader(register Archive_t* ap, register File_t* f)
 						if (m > sizeof(ap->path.header))
 							error(3, "%s: %s format member %d name too long", ap->name, format[MIME].name, ap->entries + 1);
 						strcpy(f->name, v);
-						if (strchr(f->name, '\\'))
-						{
-							t = f->name;
-							if (t[1] == ':' && isalpha(t[0]))
-							{
-								if (*(t += 2) == '\\' || *t == '/')
-									t++;
-								f->name = t;
-							}
-							for (; *t; t++)
-								if (*t == '\\')
-									*t = '/';
-						}
+						undos(f);
 					}
 				}
 			}
@@ -2156,6 +2168,160 @@ getheader(register Archive_t* ap, register File_t* f)
 				f->st->st_size += m;
 			}
 			break;
+		case TNEF:
+		{
+			Tnef_t*			tnef;
+			char*			s;
+			char*			e;
+			unsigned char*		x;
+			size_t			n;
+			size_t			m;
+			size_t			q;
+			size_t			z;
+			unsigned _ast_int4_t	magic;
+			unsigned int		level;
+			unsigned int		type;
+			unsigned int		name;
+			unsigned int		checksum;
+			size_t			size;
+			Tm_t			tm;
+
+			if (ap->entry == 1)
+			{
+				if (bread(ap, tar_block, (off_t)0, (off_t)6, 0) <= 0)
+					break;
+				magic = TNEF_MAGIC;
+				if ((ap->swap = swapop(&magic, tar_block, 4)) < 0)
+				{
+					bunread(ap, tar_block, 6);
+					break;
+				}
+			}
+			if (!(tnef = (Tnef_t*)ap->data))
+			{
+				if (!(tnef = newof(0, Tnef_t, 1, 0)))
+					error(ERROR_SYSTEM|3, "out of space [tnef header]");
+				ap->data = (void*)tnef;
+			}
+			*(f->name = ap->path.header) = 0;
+			f->st->st_dev = 0;
+			f->st->st_ino = 0;
+			f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
+			f->st->st_uid = state.uid;
+			f->st->st_gid = state.gid;
+			f->st->st_nlink = 1;
+			IDEVICE(f->st, 0);
+			f->st->st_mtime = f->st->st_ctime = f->st->st_atime = NOW;
+			f->st->st_size = 0;
+			while (bread(ap, s = tar_block, (off_t)0, (off_t)9, 0) > 0)
+			{
+				level = swapget(ap->swap, s + 0, 1);
+				n = swapget(ap->swap, s + 1, 4);
+				type = n >> 16;
+				name = n & ((1<<16)-1);
+				size = swapget(ap->swap, s + 5, 4);
+				if (!(s = bget(ap, size + 2, NiL)))
+					error(3, "%s: %s format attribute data truncated -- %d expected\n", ap->name, format[ap->format].name, size);
+				checksum = swapget(ap->swap, s + size, 2);
+				n = 0;
+				x = (unsigned char*)s;
+				e = s + size;
+				while (x < (unsigned char*)e)
+					n += *x++;
+				n &= ((1<<16)-1);
+				if (checksum != n)
+					error(3, "%s: %s format attribute data checksum error\n", ap->name, format[ap->format].name);
+				if (level == 2) switch (name)
+				{
+				case 0x800f: /* data */
+					f->st->st_size = size;
+					tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0) - size - 2;
+					break;
+				case 0x8010: /* title */
+					if (!*f->name)
+					{
+						if (size >= sizeof(ap->path.header))
+							size = sizeof(ap->path.header) - 1;
+						memcpy(f->name, s, size);
+					}
+					break;
+				case 0x8013: /* date */
+					if (type == 0x0003 && size >= 12)
+					{
+						tm.tm_year = swapget(ap->swap, s +  0, 2) - 1900;
+						tm.tm_mon  = swapget(ap->swap, s +  2, 2) - 1;
+						tm.tm_mday = swapget(ap->swap, s +  4, 2);
+						tm.tm_hour = swapget(ap->swap, s +  6, 2);
+						tm.tm_min  = swapget(ap->swap, s +  8, 2);
+						tm.tm_sec  = swapget(ap->swap, s + 10, 2);
+						f->st->st_mtime = tmtime(&tm, TM_LOCALZONE);
+					}
+					break;
+				case 0x9005: /* attachment */
+					if (size >= 4)
+					{
+						e = s + size - 4;
+						n = swapget(ap->swap, s, 4); s += 4;
+						while (n-- && s < e)
+						{
+							type = swapget(ap->swap, s, 2); s += 2;
+							name = swapget(ap->swap, s, 2); s += 2;
+							switch (type)
+							{
+							case 0x0002:
+							case 0x000b:
+								s += 2;
+								break;
+							case 0x0003:
+							case 0x0004:
+							case 0x0007:
+							case 0x000a:
+							case 0x000d:
+							case 0x0048:
+								s += 4;
+								break;
+							case 0x0005:
+							case 0x0006:
+							case 0x0014:
+							case 0x0040:
+								s += 8;
+								break;
+							case 0x001e:
+							case 0x001f:
+							case 0x0102:
+								m = swapget(ap->swap, s, 4); s += 4;
+								while (m--)
+								{
+									z = swapget(ap->swap, s, 4); s += 4;
+									z = roundof(z, 4);
+									if (name == 0x3707)
+									{
+										q = z;
+										if (q >= sizeof(ap->path.header))
+											q = sizeof(ap->path.header) - 1;
+										memcpy(f->name, s, q);
+									}
+									s += z;
+								}
+								break;
+							}
+						}
+					}
+					undos(f);
+					n = tnef->offset;
+					tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0);
+					if (bseek(ap, n, SEEK_SET, 1) != n)
+						error(3, "%s: %s input must be seekable", ap->name, format[ap->format].name);
+					goto found;
+				}
+			}
+			if (ap->io->eof && ap->entry == 1)
+			{
+				error(1, "%s: no members in %s file", ap->name, format[ap->format].name);
+				return 0;
+			}
+			break;
+		}
 		vdb_eof:
 			bflushin(ap, 0);
 			ap->io->eof = 1;
@@ -2217,9 +2383,13 @@ getheader(register Archive_t* ap, register File_t* f)
 				ap->format = MIME;
 				goto again;
 			case MIME:
+				ap->format = TNEF;
+				goto again;
+			case TNEF:
 				if (ap->entries > 0 && ap->volume > 1)
 				{
-					if (--ap->volume > 1) error(1, "junk data after volume %d", ap->volume);
+					if (--ap->volume > 1)
+						error(1, "junk data after volume %d", ap->volume);
 					finish(0);
 				}
 				if (!state.keepgoing)
@@ -3013,6 +3183,13 @@ gettrailer(register Archive_t* ap, File_t* f)
 	{
 		ap->checksum ^= ap->memsum;
 		ap->old.checksum ^= ap->old.memsum;
+	}
+	switch (ap->format)
+	{
+	case TNEF:
+		if (bseek(ap, ((Tnef_t*)ap->data)->offset, SEEK_SET, 1) != ((Tnef_t*)ap->data)->offset)
+			error(3, "%s: %s format seek error", ap->name, format[ap->format].name);
+		break;
 	}
 	getdeltatrailer(ap, f);
 	if ((n = format[ap->format].align) && (n = roundof(ap->io->count, n) - ap->io->count))

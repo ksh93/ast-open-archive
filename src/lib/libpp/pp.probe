@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2001-05-24
+# @(#)pp.probe (AT&T Research) 2001-08-31
 #
 # C probe for libpp
 #
@@ -452,9 +452,15 @@ case $# in
 	do	case $# in
 		0)	break ;;
 		esac
+		m=$1
+		shift
+		case $m in
+		*'('*)	i=`echo "$m" | sed 's,(.*,,'` ;;
+		*)	i=$m ;;
+		esac
 		predef="$predef
-$1"
-		eval predef_$1=0
+$i"
+		eval predef_$i=0
 		while	:
 		do	case $1 in
 			'=')	break ;;
@@ -479,8 +485,12 @@ $1"
 	do	case $# in
 		0)	break ;;
 		esac
-		i=$1
+		m=$1
 		shift
+		case $m in
+		*'('*)	i=`echo "$m" | sed 's,(.*,,'` ;;
+		*)	i=$m ;;
+		esac
 		case $i in
 		'=')	continue ;;
 		esac
@@ -504,7 +514,7 @@ $1"
 		*)	eval j=\$predef_$i
 			case $j in
 			0)	eval predef_$i=1
-				echo "#define $i$v"
+				echo "#define $m$v"
 				case $strict in
 				1)	strict= ;;
 				esac
@@ -520,8 +530,12 @@ $1"
 		do	case $# in
 			0)	break ;;
 			esac
-			i=$1
+			m=$1
 			shift
+			case $m in
+			*'('*)	i=`echo "$m" | sed 's,(.*,,'` ;;
+			*)	i=$m ;;
+			esac
 			v=
 			while	:
 			do	case $1 in
@@ -563,19 +577,22 @@ $1"
 					;;
 				esac
 				eval predef_$i=2
-				echo "#define $i$v"
+				echo "#define $m$v"
 				;;
-			1)	eval predef_$i=2
-				eval j=\$predef___${i}__
-				case $j in
-				[12])	;;
-				*)	case $ppbuiltin in
-					2)	echo "#pragma pp:builtin"
-						ppbuiltin=1
+			1)	case $m in
+				$i)	eval predef_$i=2
+					eval j=\$predef___${i}__
+					case $j in
+					[12])	;;
+					*)	case $ppbuiltin in
+						2)	echo "#pragma pp:builtin"
+							ppbuiltin=1
+							;;
+						esac
+						eval predef___${i}__=2
+						echo "#define __${i}__$v"
 						;;
 					esac
-					eval predef___${i}__=2
-					echo "#define __${i}__$v"
 					;;
 				esac
 				;;

@@ -6,7 +6,7 @@
 
 #include "mailx.h"
 
-static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.8 2001-04-01 $\0\n";
+static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.8 2001-10-15 $\0\n";
 
 static const char	terms[] = "\n\
 @(#)Copyright (c) 1980, 1993, 1996\n\
@@ -124,7 +124,7 @@ static const struct cmd	cmdtab[] =
 "f[rom]",	CMD(from),		MSGLIST,	0,	MMNORM,
 	X("[ message ]\nList the header summary for the selected messages."),
 "g[et]",	CMD(get),		M|RAWLIST,	0,	ARG_MAX,
-	X("[ attachment [ file ... ] ]\nCopy the attachments in the attachment number list from the current message into file. If file is omitted then the file name from the message attachment line is used. If the content type matches an entry in ${MAILCAP} then the corresponding command is executed. If all arguments are omitted then list the attachment summary for the current message. Valid only after a print or type command has been issued on the current message."),
+	X("[ attachment [ file ... ] ]\nCopy the attachments in the attachment number list from the current message into file. If file is omitted then the file name from the message attachment line is used. If the content type matches an entry in ${MAILCAP} then the corresponding command is executed. If all arguments are omitted then list the attachment summary for the current message. Valid only after a print or type command has been issued on the current message. A file name of - lists the contents on the standard output. A directory file argument copies the attachment to that directory."),
 "gr[oup]",	CMD(alias),		M|RAWLIST,	0,	ARG_MAX,
 	X("[ name [ value ] ]\nEquivalent to alias [ name [ value ] ]."),
 "h[eaders]",	CMD(headers),		Z|MSGLIST,	0,	MMNDEL,

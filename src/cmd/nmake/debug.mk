@@ -6,29 +6,31 @@
  * *.i from *.c
  */
 
+CCIFLAGS = $(CCFLAGS:N=-[DIU]*) $(&$(<:B:S=.o):T=D)
+
 %.i : %.c .ALWAYS
-	$(CC) $(CCFLAGS) -E $(>) > $(<)
+	$(CC) $(CCIFLAGS) -E $(>) > $(<)
 
 %.i : %.C .ALWAYS
-	$(CC) $(CCFLAGS) -E $(>) > $(<)
+	$(CC) $(CCIFLAGS) -E $(>) > $(<)
 
 %.i : %.cc .ALWAYS
-	$(CC) $(CCFLAGS) -E $(>) > $(<)
+	$(CC) $(CCIFLAGS) -E $(>) > $(<)
 
 %.inc : %.c .ALWAYS
-	$(CPP) $(CCFLAGS) -H $(>) > /dev/null 2> $(<)
+	$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
 
 %.inc : %.C .ALWAYS
-	$(CPP) $(CCFLAGS) -H $(>) > /dev/null 2> $(<)
+	$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
 
 %.inc : %.cc .ALWAYS
-	$(CPP) $(CCFLAGS) -H $(>) > /dev/null 2> $(<)
+	$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
 
 %.s : %.c .ALWAYS
-	$(CC) $(CCFLAGS) -S $(>) > $(<)
+	$(CC) $(CCIFLAGS) -S $(>) > $(<)
 
 %.s : %.C .ALWAYS
-	$(CC) $(CCFLAGS) -S $(>) > $(<)
+	$(CC) $(CCIFLAGS) -S $(>) > $(<)
 
 %.s : %.cc .ALWAYS
-	$(CC) $(CCFLAGS) -S $(>) > $(<)
+	$(CC) $(CCIFLAGS) -S $(>) > $(<)

@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2001-02-14
+# @(#)probe.win32 (AT&T Labs Research) 2001-09-19
 #
 # win32 specific make C probe initialization
 # ms vc is easy on uwin
@@ -61,8 +61,10 @@ case $versionb$versionm:$include in
 	cmd=$1
 	shift
 	set -- $(whence $cmd) "$@"
+	typ=$(package)
 	cat >&3 <<!
 CC.CC = $*
+CC.NATIVE = $*
 CC.ALTPP.FLAGS = -Yp,\$(CPP:D)
 CC.ALTPP.ENV =
 CC.ARFLAGS =
@@ -73,7 +75,8 @@ CC.DLLBIG = -D_BLD_DLL
 CC.DLL.VARIANTS =
 CC.DLL.LIBRARIES =
 CC.DYNAMIC =
-CC.HOSTTYPE = $(package)
+CC.EXECTYPE = $typ
+CC.HOSTTYPE = $typ
 CC.LD = /usr/bin/ld
 CC.LD.DYNAMIC = -Bdynamic
 CC.LD.RUNPATH =
@@ -107,6 +110,12 @@ CC.STDLIB = ${include%/*}/lib
 	esac
 	cat >&3 <<!
 CC.STRICT =
+CC.STRIP =
+CC.STRIPFLAGS =
+CC.PREFIX.ARCHIVE = lib
+CC.PREFIX.DYNAMIC =
+CC.PREFIX.SHARED =
+CC.PREFIX.SYMBOL = _
 CC.SUFFIX.ARCHIVE = .a
 CC.SUFFIX.COMMAND =
 CC.SUFFIX.DYNAMIC = .dll
@@ -115,7 +124,6 @@ CC.SUFFIX.OBJECT = .o
 CC.SUFFIX.SHARED = .lib
 CC.SUFFIX.SOURCE = .c
 CC.SUFFIX.STATIC =
-CC.SYMPREFIX =
 CC.WARN =
 CC.PREROOT =
 CC.UNIVERSE = att

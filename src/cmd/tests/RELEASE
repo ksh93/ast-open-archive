@@ -1,3 +1,7 @@
+01-10-18 strtof.tst: adjust for sfprintf()/printf() rounding
+01-10-18 sfio/twchar.c: add wchar_t tests
+01-10-11 opt.tst: add example and literal tests, \&. nroff tests
+01-10-10 opt.tst: sync with optget() i18n fixes
 01-08-11 test.sf*: need $(LDFLAGS) for -L* library link paths!
 01-03-26 test.strtoi,test.strtof: add
 01-02-14 sfio: add tmpread

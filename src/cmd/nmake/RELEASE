@@ -1,6 +1,30 @@
+01-10-20 Makerules.mk: fix --mam bug that didn't parameterize HOSTCC
+01-10-18 misc.c: clear SFFMT_LONG for %[cCsS] to avoid wide char conversions
+01-10-17 misc.c: add %a %A format, fix unknown format core dump
+01-10-15 Makerules.mk: fix .SELECT. bug that improperly dropped .ARCHIVE
+01-10-11 make.probe: fix CC.WARN probe for C++
+01-10-10 Makerules.mk,make.probe: add { SHELLMAGIC CC.SHELLMAGIC }
+01-10-05 make.c: add -Q0x00800000 to disable r->status=FAILED when errors!=0 !!
+01-10-02 Makerules.mk: :YYPREFIX: invert case for macro prefix
+01-09-28 Makerules.mk: fix .RWD. and .OWD. usage
+01-09-24 fix $(.GETCONF x) builtin
+01-09-19 make.probe: add cygwin dll build probes
+	 probe.win32: sync with make.probe
+	 Makerules.mk: include debug.mk by default
+	 Makerules.mk: .dll+.lib rule now passes .dll suffix to $(CC.LD)
+	 make.probe,Makerules.mk: add CC.PREFIX.(ARCHIVE|DYNAMIC|SHARED)
+	 make.probe,Makerules.mk: change CC.SYMPREFIX to CC.PREFIX.SYMBOL
+	 Makerules.mk: fix .RECURSE and .ONOBJECT to hit sub :MAKE: levels
+01-09-17 Makerules.mk: fix PACKAGE_OPTIMIZE logic
+01-09-11 expand.c: use pathnative() for native fs representation
+	 openar(): must open with "b" mode
+	 state.c: open state with "b" mode
+01-09-08 Makerules.mk: add *.a prereqs to dll link
+01-09-04 Makerules.mk: +l* bind conditioned on .LIBRARY.LIST. for dll builds
 01-08-11 Makerules.mk: reference $(CC.DLL.LIBRARIES) last and in link args only
 	 Makerules.mk: +l* in req list now checks .PACKAGE.*.library for -l*
 	 parse.c: fix `\\\r\n' to act like `\\\n'
+	 make.h: add FSWINDOWS to include { _WIN32 _UWIN __CYGWIN__ }
 01-07-17 Makerules.mk: fix :LIBRARY: to honor LDLIBRARIES
 01-06-21 misc.c: fix strtoll and strtoull macro rename
 01-06-10 Makerules.mk: add CC.NATIVE for native objects

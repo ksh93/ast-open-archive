@@ -35,7 +35,7 @@ TEST 01 'file args'
 		OUTPUT - '?'
 		EXIT '[12]'
 
-TEST 02 'commands'
+TEST 02 '{ = # a c } commands'
 	EXEC file
 		NOTE '='
 		INPUT - g/./.=
@@ -71,7 +71,7 @@ TEST 02 'commands'
 		INPUT - $'$c\nz\n.\nw\nq'
 		OUTPUT file $'a\nb\nz'
 
-TEST 03 'commands'
+TEST 03 '{ s } commands'
 	EXEC file
 		NOTE 'substitute'
 		INPUT file $'a\nb\nc'
@@ -89,3 +89,11 @@ TEST 03 'commands'
 		INPUT - $'1s/a//2\n2s/b//2\n3s/c//2\n4s/a/X/2\n5s/b/X/2\n6s/c/X/2\n7s/a/XX/2\n8s/b/XX/2\n9s/c/XX/2\nw\nq'
 		OUTPUT file $'abcbcabc\nabcacabc\nabcababc\nabcXbcabc\nabcaXcabc\nabcabXabc\nabcXXbcabc\nabcaXXcabc\nabcabXXabc'
 		OUTPUT - $'90\n90'
+
+TEST 04 '{ t } commands'
+	EXEC file
+		NOTE 'copy'
+		INPUT file $'1\n2\n3\n4'
+		INPUT - $'-2\n.t.\nw\nq'
+		OUTPUT file $'1\n2\n2\n3\n4'
+		OUTPUT - $'8\n2\n10'

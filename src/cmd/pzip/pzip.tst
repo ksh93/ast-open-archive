@@ -29,7 +29,7 @@ TEST 01 'pin'
 	DO	DATA tst.dat
 	PROG pin -v tst.dat
 		OUTPUT - $'# pzip partition
-# pin (AT&T Labs Research) 2000-10-04
+# pin (AT&T Labs Research) 2001-10-08
 # row 6 window 60000 compression level 6
 
 6	# high frequency 1
@@ -42,8 +42,8 @@ filter done -- 10000 rows
 reorder pairs for 0 [4]
 reorder part 3
 reorder done
-optimal 0..0
-optimal done'
+dynamic 0..0
+dynamic done'
 
 TEST 02 'pzip'
 	DO	DATA tst.dat col.prt row.prt tst.prt

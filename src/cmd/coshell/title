@@ -1,8 +1,8 @@
-# add to (+), delete from (-), print (.), or set ([=]) window title
+# add to (+), delete from (-), set [=], or print (.) window title
 # arguments are eval'd before printing
 # title text string exported in TITLE_TEXT
 
-function title # [+ | - | =] title ...
+function title # [ + | - | = | . ] title ...
 {
 	typeset	x t="$TITLE_TEXT"
 
@@ -40,14 +40,17 @@ function title # [+ | - | =] title ...
 	.)	print -r -- "$TITLE_TEXT"
 		return 0
 		;;
+	=)	shift
+		t="$*"
+		;;
 	*)	t="$*"
 		;;
 	esac
 	export TITLE_TEXT="$t"
 	eval x=\"$t\"
 	case $TERM in
-	630*)			print -nr -- "[?${#x};0v$x" ;;
-	uwin*|*vt100|xterm*)	print -nr -- "]0;$x" ;;
+	630*)			print -nr -- $'\E[?'"${#x}"$';0v'"${x}" ;;
+	uwin*|*vt100|xterm*)	print -nr -- $'\E]0;'"${x}"$'\a' ;;
 	*)			return 1 ;;
 	esac
 	return 0

@@ -115,7 +115,7 @@ USAGE_LICENSE
 "	[+G?Generate missing dependencies too.]"
 "	[+M?Only generate local header dependencies; \ahosted\a headers are"
 "		omitted. Note that \ahosted\a headers are determined by"
-"		\b-I-H\b and the \bpp::hosted\b and \bpp::hostdir\b pragmas;"
+"		\b-I-H\b and the \bpp:hosted\b and \bpp:hostdir\b pragmas;"
 "		no special distiction is made between \"\" and <> \binclude\b"
 "		styles.]"
 "}"

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2001-05-31
+# @(#)make.probe (AT&T Research) 2001-10-11
 #
 # C probe for make
 #
@@ -81,9 +81,12 @@ echo '#if defined(__STDC__) || defined(__cplusplus)
 extern type call(int);
 #endif
 int main() {call(0);return(0);}' > tstlib.$src
-echo 'f(){return 0;}' > warn.$src
-echo 'f(){return g();}' > warnko.$src
-echo 'int f(){return 0;}' > warnok.$src
+echo 'int f(){return 0;}' > warn.$src
+echo 'int f(){}' > warn1.$src
+echo 'int f(){int i; return 0;}' > warn2.$src
+echo 'int f(){int i; return i;}' > warn3.$src
+echo 'int f(){return g();}' > warn4.$src
+warn_enum="1 2 3 4"
 chmod -w *.$src
 
 arflags=
@@ -108,6 +111,9 @@ makeoptions=
 optimize=
 pic=
 plusplus=
+prefix_archive=lib
+prefix_dynamic=
+prefix_shared=lib
 ptrcopy=
 ptrimplicit=
 ptrmkdir=
@@ -116,6 +122,7 @@ repository=
 require=
 shared=
 shared_registry=
+shellmagic=
 soversion=
 stdc=
 strict=
@@ -461,7 +468,34 @@ then	eval set x $probe_stripflags
 fi
 
 case $pic:$so:$dynamic:$static in
-:::)	;;
+:::)	: lets get specifical
+	while	:
+	do
+		echo '__declspec(dllexport) int fun() { return 0; }' > exp.$src
+		if	$cc -c -D_BLD_DLL exp.$src
+		then	rm -f xxx.dll xxx.lib
+			if	$cc -shared -Wl,--enable-auto-image-base -Wl,--out-implib=xxx.lib -o xxx.dll exp.$obj &&
+				test -f xxx.lib -a -f xxx.dll
+			then
+				: cygwin
+				ld=$cc
+				pic=-D_BLD_DLL
+				PIC=$pic
+				sd=.dll
+				so=.lib
+				ldscript=".def .exp .res"
+				lib_dll=option
+				lib_all=-Wl,-whole-archive
+				lib_undef=-Wl,-no-whole-archive
+				shared='-shared -Wl,--enable-auto-image-base -Wl,--out-implib=$(<:N=*.lib)'
+				prefix_dynamic=cyg
+				prefix_shared=
+				break
+			fi
+		fi
+		break
+	done
+	;;
 *)	if	$cc -c $pic shared.$src notall.$src
 	then	
 		for dld in "$cc" "$ld"
@@ -768,6 +802,9 @@ case $shared in
 	esac
 	;;
 esac
+case $PIC in
+'')	PIC=$pic ;;
+esac
 
 case $lib_dll in
 option)	case $hosttype in
@@ -797,7 +834,7 @@ main()
 				chmod 555 libxxx$so
 			then	rm -f dlmain.$exe
 				if	$cc -o dlmain.$exe dlmain.$obj $pwd/libxxx$so &&
-					./dlmain.$exe >/dev/null 2>&1
+					(./dlmain.$exe) >/dev/null 2>&1
 				then	break
 				fi
 			fi
@@ -805,7 +842,7 @@ main()
 			if	$ld $shared -o libxxx$so dllib.$obj -lm -lc &&
 				chmod 555 libxxx$so &&
 				$cc -o dlmain.$exe dlmain.$obj $pwd/libxxx$so &&
-				./dlmain.$exe >/dev/null 2>&1
+				(./dlmain.$exe) >/dev/null 2>&1
 			then	dll_libraries='-lm -lc'
 			fi
 		fi
@@ -1072,9 +1109,7 @@ then	e=`wc -c < e`
 		fi
 	done
 
-	$cc -c warnko.$src 2>e
-	e=`wc -c < e`
-	$cc -c warnok.$src 2>e
+	$cc -c warn.$src 2>e
 	o=`wc -c < e`
 	eval set x $probe_warn
 	while	:
@@ -1082,22 +1117,25 @@ then	e=`wc -c < e`
 		case $# in
 		0)	break ;;
 		esac
-		rm -f warnok.$obj
-		$cc $1 -c warnok.$src 2>e && test -f warnok.$obj || continue
+		rm -f warn.$obj
+		$cc $1 -c warn.$src 2>e && test -f warn.$obj || continue
 		n=`wc -c < e`
 		if	test $n -gt $o
 		then	continue
 		fi
-		rm -f warnko.$obj
-		$cc $1 -c warnko.$src 2>e && test -f warnko.$obj || continue
-		n=`wc -c < e`
-		if	test $n -gt $e
-		then	warn=$1
-			break
-		fi
+		for n in $warn_enum
+		do	rm -f warn$n.$obj
+			$cc $1 -c warn$n.$src 2>e && test -f warn$n.$obj || continue
+			n=`wc -c < e`
+			if	test $n -gt $e
+			then	warn=$1
+				break 2
+			fi
+		done
 	done
 
 fi
+
 while	:
 do	case $hosted in
 	?*)	rm -f readonly.$exe
@@ -1294,6 +1332,24 @@ case $hosted in
 	;;
 esac
 
+# shellmagic defined if installed shell scripts need magic
+# currently only cygwin has the honor
+
+echo 'exec 4<&0
+echo ok' > ok
+chmod +x ok
+case `(eval ./ok | /bin/sh) 2>/dev/null` in
+ok)	;;
+*)	echo '#!/bin/env sh
+exec 4<&0
+echo ok' > ok
+	chmod +x ok
+	case `(eval ./ok | /bin/sh) 2>/dev/null` in
+	ok)	shellmagic='$("#")!/bin/env sh' ;;
+	esac
+	;;
+esac
+
 #
 # set up for local override
 #
@@ -1330,12 +1386,17 @@ CC_REQUIRE=$require
 CC_SHARED=$shared
 CC_SHARED_REGISTRY=$shared_registry
 CC_SHARED_REGISTRY_PATH=$probe_shared_registry_path
+CC_SHELLMAGIC=$shellmagic
 CC_STATIC=$static
 CC_STDINCLUDE=$stdinclude
 CC_STDLIB=$stdlib
 CC_STRICT=$strict
 CC_STRIP=$strip
 CC_STRIP_FLAGS=$stripflags
+CC_PREFIX_ARCHIVE=$prefix_archive
+CC_PREFIX_DYNAMIC=$prefix_dynamic
+CC_PREFIX_SHARED=$prefix_shared
+CC_PREFIX_SYMBOL=$symprefix
 CC_SUFFIX_ARCHIVE=.$lib
 CC_SUFFIX_COMMAND=$suffix_command
 CC_SUFFIX_DYNAMIC=$sd
@@ -1344,7 +1405,6 @@ CC_SUFFIX_OBJECT=.$obj
 CC_SUFFIX_SHARED=$so
 CC_SUFFIX_SOURCE=.$src
 CC_SUFFIX_STATIC=$sa
-CC_SYMPREFIX=$symprefix
 CC_WARN=$warn
 CC_ATTRIBUTES=$ATTRIBUTES
 
@@ -1402,12 +1462,17 @@ done
 echo CC.SHARED = $CC_SHARED
 echo CC.SHARED.REGISTRY = $CC_SHARED_REGISTRY
 echo CC.SHARED.REGISTRY.PATH = $CC_SHARED_REGISTRY_PATH
+echo CC.SHELLMAGIC = $CC_SHELLMAGIC
 echo CC.STATIC = $CC_STATIC
 echo CC.STDINCLUDE = $CC_STDINCLUDE
 echo CC.STDLIB = $CC_STDLIB
 echo CC.STRICT = $CC_STRICT
 echo CC.STRIP = $CC_STRIP
 echo CC.STRIP.FLAGS = $CC_STRIP_FLAGS
+echo CC.PREFIX.ARCHIVE = $CC_PREFIX_ARCHIVE
+echo CC.PREFIX.DYNAMIC = $CC_PREFIX_DYNAMIC
+echo CC.PREFIX.SHARED = $CC_PREFIX_SHARED
+echo CC.PREFIX.SYMBOL = $CC_PREFIX_SYMBOL
 echo CC.SUFFIX.ARCHIVE = $CC_SUFFIX_ARCHIVE
 echo CC.SUFFIX.COMMAND = $CC_SUFFIX_COMMAND
 echo CC.SUFFIX.DYNAMIC = $CC_SUFFIX_DYNAMIC
@@ -1416,7 +1481,6 @@ echo CC.SUFFIX.OBJECT = $CC_SUFFIX_OBJECT
 echo CC.SUFFIX.SHARED = $CC_SUFFIX_SHARED
 echo CC.SUFFIX.SOURCE = $CC_SUFFIX_SOURCE
 echo CC.SUFFIX.STATIC = $CC_SUFFIX_STATIC
-echo CC.SYMPREFIX = $CC_SYMPREFIX
 echo CC.WARN = $CC_WARN
 
 for i in $CC_ATTRIBUTES

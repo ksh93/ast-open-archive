@@ -1,52 +1,4 @@
-: strmatch and strgrpmatch tests 2001-03-17
-#
-# contributors:
-#
-#	Glenn Fowler	gsf@research.att.com
-#	David Korn	dgk@research.att.com
-#
-# input lines may be blank, or comment beginning with #,
-# or a test spec, four fields separated by 1 or more tabs,
-# NULL is the empty string, NIL is the 0 pointer
-#
-#    field 1, what tests to apply, one or more chars
-#	test skipped if REG_feature not defined
-#
-#	C	set LC_COLLATE and LC_CTYPE to locale in field 2
-#
-#	S	REG_SHELL		SRE
-#	K	REG_SHELL|REG_AUGMENTED	KRE
-#
-#	a	REG_LEFT|REG_RIGHT	implicit ^...$
-#	i	REG_ICASE
-#	l	REG_LEFT		implicit ^...
-#	m	REG_MINIMAL		minimal match
-#	r	REG_RIGHT		implicit ...$
-#	u	standard unspecified behavior -- errors not counted
-#
-#	{				don't report skip if failed until }
-#	}				end of { skip
-#
-#	: comment			comment copied to output
-#
-#	numb	use numb for nmatch (20 by default)
-#
-#    field 2, a regular expression.
-#
-#    field 3, a string to match.
-#
-#    field 4, outcome.  one of the posix error codes (with REG_
-#       deleted) or the match array, a list of (m,n) entries
-#	with m and n being first and last+1 positions in string,
-#	or NULL if REG_NOSUB is in effect and success is expected.
-#	BADPAT is acceptable in place of any regcomp error code
-#	and vice versa.
-#
-#    field 5, optional comment appended to report.
-#
-#    fields 2 and 3 may contain certain C escape sequences:
-#	\n \xhh
-#    all successful matches are retried with REG_NOSUB
+: strmatch and strgrpmatch tests 2001-10-03
 
 # shell patterns
 
@@ -350,3 +302,10 @@ K	*((a:|z:)+([string]))*([ ])	ghkahkgvdhkg saghka sghkvavsghkasdg z:string gjlb 
 
 K	+((a:|z:)+([string]))*([ ])	ujsdfiabhf ajkbfjkad boahjdbg hjadvbgj advb gjadbgjad vgjadvbg jadv gdjagv adjgvadsj adjgv ajgvajgvs javdj ssjvfjwassj gbjadgvsjkndbg asdjkgb asdhjkgb jkqeagvbtahjkevtg adhjkgv dhkasvgadhk gdsvh gvdghk adghkad ghkahkgvdhkg saghka sghkvavsghkasdg z:string gjlb jbgajkvbahjkgvbadhjkvb vbasdjgv jkadgvbadjgv a:string aksjbadvbajkgb advshjkgvakjg vashkgvashkgvashjkgvhkgadhvadvadhgvadhkgv adhkgvadhkvadhgva	(246,255)(246,254)(246,248)(248,254)(254,255)
 K	*((a:|z:)+([string]))*([ ])	ujsdfiabhf ajkbfjkad boahjdbg hjadvbgj advb gjadbgjad vgjadvbg jadv gdjagv adjgvadsj adjgv ajgvajgvs javdj ssjvfjwassj gbjadgvsjkndbg asdjkgb asdhjkgb jkqeagvbtahjkevtg adhjkgv dhkasvgadhk gdsvh gvdghk adghkad ghkahkgvdhkg saghka sghkvavsghkasdg z:string gjlb jbgajkvbahjkgvbadhjkvb vbasdjgv jkadgvbadjgv a:string aksjbadvbajkgb advshjkgvakjg vashkgvashkgvashjkgvhkgadhvadvadhgvadhkgv adhkgvadhkvadhgva	(0,0)(0,0)(?,?)(?,?)(0,0)
+
+# ansi cc trigraph gotchas
+
+K	ast*([0-9])?(.dll)	ast54.dll		(0,9)(3,5)(5,9)
+K	ast???(.dll)		ast54.dll		(0,9)(5,9)
+K	*/ast???(.dll)		ast.so/ast54.dll	(0,16)(12,16)
+K	?(ast.so/)ast???(.dll)	ast.so/ast54.dll	(0,16)(0,7)(12,16)

@@ -234,6 +234,7 @@ binit(register Archive_t* ap)
 
 	if (ap->delta)
 		ap->delta->hdr = ap->delta->hdrbuf;
+	ap->io->buffersize = state.buffersize;
 	n = 2 * state.buffersize;
 	if (!(ap->io->mode & O_WRONLY))
 		n += MAXUNREAD;
@@ -328,7 +329,7 @@ bfill(register Archive_t* ap, int must)
 		return -1;
 	if (ap->io->skip)
 		ap->io->skip = bskip(ap);
-	while ((c = read(ap->io->fd, ap->io->last, state.buffersize)) <= 0)
+	while ((c = read(ap->io->fd, ap->io->last, ap->io->buffersize)) <= 0)
 	{
 		if (must)
 			newio(ap, c, 0);
@@ -509,8 +510,8 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 			n = ap->io->last - ap->io->next;
 		else if ((n = ap->io->size - (ap->io->offset + ap->io->count)) < 0)
 			return 0;
-		else if (n > state.buffersize)
-			n = state.buffersize;
+		else if (n > ap->io->buffersize)
+			n = ap->io->buffersize;
 	}
 	if (p)
 		*p = n;
@@ -519,32 +520,50 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 	ap->io->next += n;
 	while (ap->io->next > ap->io->last)
 	{
-		if (ap->io->last > ap->io->buffer + MAXUNREAD + state.buffersize)
+		if (ap->io->last > ap->io->buffer + MAXUNREAD + ap->io->buffersize)
 		{
                         register char*  b;
                         register int    k;
                         register int    m;
+			int		r;
 
                         k = ap->io->last - s;
-			m = roundof(k, IOALIGN) - k;
+			r = roundof(k, IOALIGN) - k;
 #if DEBUG
-			if (m)
-				message((-8, "bget(%s) buffer alignment offset=%d", ap->name, m));
+			if (r)
+				message((-8, "bget(%s) buffer alignment offset=%d", ap->name, r));
 #endif
-                        b = ap->io->next = ap->io->buffer + MAXUNREAD + m;
+                        b = ap->io->next = ap->io->buffer + MAXUNREAD + r;
                         ap->io->last = b + k;
-                        m = s - b;
-                        while (k > m)
-                        {
-                                message((-8, "bget(%s) overlapping memcpy n=%I*d k=%d m=%d", ap->name, sizeof(n), n, k, m));
-                                memcpy(b, s, m);
-                                b += m;
-                                s += m;
-                                k -= m;
-                        }
-                        memcpy(b, s, k);
+                        if (m = s - b)
+			{
+                        	while (k > m)
+                        	{
+                                	message((-8, "bget(%s) overlapping memcpy n=%I*d k=%d m=%d next=%p last=%p", ap->name, sizeof(n), n, k, m, ap->io->next + n, ap->io->last));
+                                	memcpy(b, s, m);
+                                	b += m;
+                                	s += m;
+                                	k -= m;
+                        	}
+                        	memcpy(b, s, k);
+			}
 			s = ap->io->next;
 			ap->io->next += n;
+			if (ap->io->next > (ap->io->buffer + 2 * ap->io->buffersize))
+			{
+				k = ap->io->next - ap->io->buffer;
+				k = ap->io->buffersize = roundof(k, BLOCKSIZE);
+				k = 2 * k + MAXUNREAD;
+				if (!(b = newof(0, char, k, 0)))
+					error(3, "%s: cannot reallocate buffer", ap->name);
+				m = ap->io->last - s;
+				ap->io->buffer = b;
+				b += MAXUNREAD + r;
+				ap->io->next = b + n;
+				ap->io->last = b + m;
+				memcpy(b, s, m);
+				s = b;
+			}
 		}
 		if (bfill(ap, 1) < 0)
 			return 0;
@@ -642,7 +661,7 @@ bflushin(register Archive_t* ap, int hard)
 	ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
 	if (hard && !ap->io->eof)
 	{
-		while (read(ap->io->fd, state.tmp.buffer, state.buffersize) > 0);
+		while (read(ap->io->fd, state.tmp.buffer, ap->io->buffersize) > 0);
 		ap->io->eof = 1;
 	}
 }

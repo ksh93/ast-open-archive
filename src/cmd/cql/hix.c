@@ -54,7 +54,7 @@ static const char ID[] = "\n@(#)$Id: hix (AT&T Research) 2001-02-14 $\0\n";
 #define HIX_ERROR_TMP		7
 #define HIX_ERROR_VERSION	8
 
-#define ERROR(p,n)		((n)==HIX_ERROR_INDEX_WRITE?(error(1,"AHA#%d HIX_ERROR_INDEX_WRITE",__LINE__),0):0,(p)->flags|=HIX_ERROR,state.error=(p)->error=(n))
+#define ERROR(p,n)		((n)==HIX_ERROR_INDEX_WRITE?(error(-1,"line %d HIX_ERROR_INDEX_WRITE",__LINE__),0):0,(p)->flags|=HIX_ERROR,state.error=(p)->error=(n))
 
 #define IDBASE		64
 #define HASHCHUNK	256

@@ -2198,8 +2198,10 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 				{
 					s = proto->ip;
 					while (*s && *s++ != '\n');
-					proto->op = memcopy(proto->op, proto->ip, s - proto->ip);
+					m = s - proto->ip;
+					proto->op = memcopy(proto->op, proto->ip, m);
 					proto->ip = s;
+					proto->iz = n -= m;
 				}
 #if PROTOMAIN
 				if ((comlen = astlicense(proto->op, proto->oz, notice, options, proto->cc[0], proto->cc[1], proto->cc[2])) < 0)

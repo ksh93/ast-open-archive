@@ -6,18 +6,18 @@
 <META name="keywords" content="software, package">
 <TITLE> INIT package </TITLE>
 </HEAD>
-<BODY  bgcolor=white vlink=teal link=slateblue >
+<BODY  link=slateblue vlink=teal bgcolor=white >
 <TABLE border=0 align=center width=96%>
 <TBODY><TR><TD valign=top align=left>
 <!--INDEX--><!--/INDEX-->
 <P>
-<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="INIT package">INIT package</A></H3></CENTER></FONT></FONT>
+<P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="INIT package">INIT package</A></H3></FONT></FONT></CENTER>
 The INIT package is required by all other packages. It contains
 the package command, support scripts, and utilities.
 Components in this package:
 <P>
 <P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>
-<TABLE  bordercolor=white rules=none cellpadding=0 cellspacing=0 width=99% border=0 align=center frame=void >
+<TABLE  width=99% align=center border=0 cellspacing=0 frame=void rules=none bordercolor=white cellpadding=0 >
 <TBODY>
 <TR><TD align=left>
 INIT</TD></TR>
@@ -35,16 +35,35 @@ A recent
 <A href="#release change log">release change log</A>
 is also included.
 <P>
-<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="release change log">release change log</A></H3></CENTER></FONT></FONT>
+<P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="release change log">release change log</A></H3></FONT></FONT></CENTER>
 <PRE>
 
 All recorded changes follow.
 
 </PRE>
 <P>
-<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="INIT changes">INIT changes</A></H3></CENTER></FONT></FONT>
+<P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="INIT changes">INIT changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-20 package.sh: don't recurse into leaf dirs matching $MAKESKIP
+01-10-18 package.sh: convert to YYYY-MM-DD delta releases instead of NNNN
+	 package.mk: convert to YYYY-MM-DD delta releases instead of NNNN
+	 ratz.c: fix -m for paths containing <\>n</\>\r\v
+01-10-16 ratz.c: _SEA_* =&gt; SEAR_*
+	 ratz.c: preserve stdin for sear_exec()
+	 ratz.c: add recursive sear_rm_r() to sear_exec() tmp dir cleanup
+01-10-10 mamprobe.sh: add mam_cc_SHELLMAGIC
+	 package.sh: add nfs wakeup call to admin to avoid stale file handles
+01-10-04 cc.darin.ppc: -flat_namespace is not longer the default (huh)
+01-10-01 package make: prepend $INSTALLROOT/bin/ok to PATH
+	 package read: save cpy of bin/package when reading the INIT package
+	 mamprobe.sh: allow cc path with optional arguments
+01-09-24 Makefile,package.sh: add $INSTALLROOT/bin/.paths initialization
+01-09-19 package.mk: add recurse to list.package.*
+	 package.sh: bootstrap build nmake with _BLD_STATIC for _WIN32
+01-09-11 ratz.c: add _SEA_SKIP &amp; _SEA_COMMAND for self extracting archives
+01-09-07 package.mk: fix output capture to not generate files names with spaces
+01-09-07 package.mk: fix delta release number search
 01-08-11 package.mk: handle single gz executable packages (e.g., for ksh)
 	 package.sh: fix package install to require nmake only if no *.sum
 	 iffe.sh: drop ancient menu and prompt actions; check ./hdr.h clash
@@ -322,7 +341,7 @@ All recorded changes follow.
 <HR>
 <DIV align=right>
 <P>
-August 23, 2001
+October 19, 2001
 </DIV>
 
 </TD></TR></TBODY></TABLE>

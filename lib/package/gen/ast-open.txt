@@ -16,13 +16,13 @@ Source Package Installation Instructions:
       delta archives require the most recent base, so manually removing files
       in this directory may invalidate future deltas.
   (4) If the bin/package command does not exist then manually read the INIT source package:
-		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.0000.tgz | tar xvf -
+		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.tgz | tar xvf -
       If your system does not have tar(1) or gunzip(1) then download the ratz
       source package, compile it, and manually read the INIT source package:
 		mkdir bin
-		cp lib/package/tgz/ratz.YYYY-MM-DD.0000.c lib/package/tgz/ratz.c
+		cp lib/package/tgz/ratz.YYYY-MM-DD.c lib/package/tgz/ratz.c
 		cc -o bin/ratz lib/package/tgz/ratz.c
-		bin/ratz -lm < lib/package/tgz/INIT.YYYY-MM-DD.0000.tgz
+		bin/ratz -lm < lib/package/tgz/INIT.YYYY-MM-DD.tgz
   (5) Read all unread package archive(s):
 		bin/package read
       Both source and binary packages will be read by this step.
@@ -66,7 +66,74 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-01-08-09  --- Release ksh93l+  ---
+01-10-16  --- Release ksh93m-  ---
+01-10-16  typeset without arguments no longer outputs variable names
+	  that do not have any attributes that are set.
+01-10-16  A bug introduced in ksh93l in which assignments specified with
+	  the exec built-in were not being expanded properly has been
+	  fixed.
+01-10-11  An optimization bug in which ${!x) was treated as invariant in
+	  a for loop has been fixed.
+01-10-11  Unsigned integer variables in bases other than 10 are printed now
+	  exxpand in that base with the base prefix.
+01-10-10  A number of typos in the self generating man pages for shell
+	  built-ins have been fixed.
+01-10-04  The self generated man pages for hist and fc were not working
+	  correctly and have been fixed.
+01-10-03  Yet another optimizer bug in which shell patterns were
+	  treated as invariants has been fixed.
+01-09-27  Two bugs relating to multibyte history searches and to find
+	  have been fixed.
+01-09-27  A bug introduced in ksh93k in which the PATH searching was
+	  not restored after running a command with an assignment list 
+	  has been fixed.
+01-09-26  A bug in which a zero filled field was treated as octal when
+	  converted to integer has been fixed.
+01-09-26  Yet another bug in the optimization of for loops related to
+	  recursive functions with break or continue statements has been fixed.
+01-09-25  The exponentiation operator ** was added to the shell arithmetic
+	  evaluation.  It has higher precedence than * and is left
+	  associative.
+01-09-25  The code was modified to use the ast multibyte macros
+	  and functions for handing multibyte locales.
+01-09-25  The expansion ${parameter:offset:length} now hanles negative
+	  offsets which cause offsets to be measured from the end.
+01-09-25  Some spelling errors in the documentation were corrected.
+01-09-24  The /dev/tcp/host/port and /dev/udp/host/port now allow
+	  the ports to be specified by service name. 
+01-09-24  The change staring with ksh93g in which the the appropriate
+	  library path variable is prepended with a corresponding library
+	  directory has been modified.  With the new method, only the
+	  library path defined in the file named .paths in the directory
+	  where the executable is found will be modified.  See the
+	  man page for more details.
+01-09-23  The .fpath file (see ksh93h) is no longer looked for in each
+	  directory on the path to locate function directories.  The
+	  file named .paths is used instead.
+01-09-23  A bug in which IFS was not being restored after being changed in
+	  a subshell has been fixed.
+01-09-16  With the vi and emacs edit modes, after a list of command
+	  or functions is generated with = or M-= respectively,
+	  any element from the list can be pasted on the command line
+	  by preceding the = or M-= with a numeric parameter specifying
+	  the position on the list.
+01-09-16  A bug in ksh93l caused command completion not to find aliases
+	  and functions.  Command listing from the edit mode was presented
+	  in reverse order.  This has been fixed.
+01-09-13  Another bug in the optimization of for loops related to subshells
+	  when traps were set has been fixed.
+01-09-07  A change in ksh93l caused brace expansion to stop working
+	  and this has been fixed.
+01-09-04  A bug introduced in ksh93k in which an arithmetic statement
+	  within a function that used name references did not follow the
+	  reference has been fixed.
+01-09-04  A bug introduced in ksh93l in which export -p did not prefix
+	  each export with the word export has been fixed.
+01-08-29  A bug in multibyte input which occurered when a partial multibyte
+	  character was received has been fixed.
+01-08-29  A bug introduced in ksh93l which could cause a core dump
+	  when an assignment list containing PATH is specified inside
+	  command substitution has been fixed.
 01-08-09  Another bug in the optimization of for loops in ksh93l caused
 	  errors in recursive functions using local variables that
 	  contained for loops has been fixed.
@@ -267,7 +334,7 @@ All recorded changes follow.
 	  been fixed.
 00-10-18  The output format for indexed arrays in compound variables
 	  has been modified so that it can be used as input.
-00-10-18  Assignments with name references (typeset -n) will no
+00-10-18  Assignments with name references (typeset -n) will now
 	  implicitly unreference an existing name reference.
 00-10-17  A bug the += append operator when a single array element
 	  is appended to a variable that is not an array has been fixed.
@@ -765,6 +832,8 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+01-10-18 pax: fix --meter for paths containing \f\n\r\v
+01-09-06 pax: add ms tnef (transport neutral encapsulation format) archive read
 01-08-11 pax: fix tar_checksum() w.r.t. CC_NATIVE!=CC_ASCII
 01-06-28 pax: fix --from --to bio logic that sometimes double converted
 01-04-24 pax: --from & --to now associated with archive instead of global state
@@ -1031,6 +1100,9 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+01-10-16 sear.sh: _SEA_* => _SEAR_*
+01-10-05 sear.sh: rename from sea.sh
+01-09-11 sea.sh: add
 01-06-26 proto.tst: add another buffer boundary test (large of course)
 01-04-01 proto: preserve file mode for -r
 01-02-06 proto.tst: add (finally)
@@ -1044,6 +1116,10 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+01-10-18 strtof.tst: adjust for sfprintf()/printf() rounding
+01-10-18 sfio/twchar.c: add wchar_t tests
+01-10-11 opt.tst: add example and literal tests, \&. nroff tests
+01-10-10 opt.tst: sync with optget() i18n fixes
 01-08-11 test.sf*: need $(LDFLAGS) for -L* library link paths!
 01-03-26 test.strtoi,test.strtof: add
 01-02-14 sfio: add tmpread
@@ -1069,6 +1145,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+01-09-20 3d.sh: drop extra } in USAGE that emitted -} for --?
 01-07-17 Makefile: don't link 3d dll against ast dll
 01-02-19 close3d: dup reserved fd's higher
 01-02-14 add :VARIANT: to build dll's for CC.DLL.VARIANTS
@@ -1288,6 +1365,7 @@ All recorded changes follow.
 
 :::::::: msgcc ::::::::
 
+01-10-10 msgcc: allow some email forms to pass
 01-06-10 msgcpp: add proper escapes to OMIT pattern
 01-05-29 msgcc: add similar unused message replacement, -M-similar
 01-04-22 msgcc,msggen,msgget: use mcindex()
@@ -1296,9 +1374,33 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+01-10-20 Makerules.mk: fix --mam bug that didn't parameterize HOSTCC
+01-10-18 misc.c: clear SFFMT_LONG for %[cCsS] to avoid wide char conversions
+01-10-17 misc.c: add %a %A format, fix unknown format core dump
+01-10-15 Makerules.mk: fix .SELECT. bug that improperly dropped .ARCHIVE
+01-10-11 make.probe: fix CC.WARN probe for C++
+01-10-10 Makerules.mk,make.probe: add { SHELLMAGIC CC.SHELLMAGIC }
+01-10-05 make.c: add -Q0x00800000 to disable r->status=FAILED when errors!=0 !!
+01-10-02 Makerules.mk: :YYPREFIX: invert case for macro prefix
+01-09-28 Makerules.mk: fix .RWD. and .OWD. usage
+01-09-24 fix $(.GETCONF x) builtin
+01-09-19 make.probe: add cygwin dll build probes
+	 probe.win32: sync with make.probe
+	 Makerules.mk: include debug.mk by default
+	 Makerules.mk: .dll+.lib rule now passes .dll suffix to $(CC.LD)
+	 make.probe,Makerules.mk: add CC.PREFIX.(ARCHIVE|DYNAMIC|SHARED)
+	 make.probe,Makerules.mk: change CC.SYMPREFIX to CC.PREFIX.SYMBOL
+	 Makerules.mk: fix .RECURSE and .ONOBJECT to hit sub :MAKE: levels
+01-09-17 Makerules.mk: fix PACKAGE_OPTIMIZE logic
+01-09-11 expand.c: use pathnative() for native fs representation
+	 openar(): must open with "b" mode
+	 state.c: open state with "b" mode
+01-09-08 Makerules.mk: add *.a prereqs to dll link
+01-09-04 Makerules.mk: +l* bind conditioned on .LIBRARY.LIST. for dll builds
 01-08-11 Makerules.mk: reference $(CC.DLL.LIBRARIES) last and in link args only
 	 Makerules.mk: +l* in req list now checks .PACKAGE.*.library for -l*
 	 parse.c: fix `\\\r\n' to act like `\\\n'
+	 make.h: add FSWINDOWS to include { _WIN32 _UWIN __CYGWIN__ }
 01-07-17 Makerules.mk: fix :LIBRARY: to honor LDLIBRARIES
 01-06-21 misc.c: fix strtoll and strtoull macro rename
 01-06-10 Makerules.mk: add CC.NATIVE for native objects
@@ -3916,6 +4018,7 @@ End:
 
 :::::::: mailx ::::::::
 
+01-10-15 `get attachment dir' copies attachment to dir
 01-04-01 add state.var.hostname for smtp HELO
 	 add fmtident() to initialize state.version 
 01-01-01 fix map bug that retained alias after expansion
@@ -4023,6 +4126,8 @@ End:
 
 :::::::: pzip ::::::::
 
+01-10-08 pin: add --optimize={dynamic|greedy|non|transitive}
+	 pin: add --optimize method table for easy expansion
 01-08-11 pzip: set error_info.id from argv for statically linked disciplines
 01-06-28 pzip: --split turns implies PZ_READ even with -p
 01-02-02 pzip.tst: add -w window size test
@@ -4054,6 +4159,15 @@ End:
 
 :::::::: re ::::::::
 
+01-10-18 testmatch.c,testre.c: all test failure messages contain the text `fail'
+01-10-17 testre.dat: add []{}() imbalance tests
+01-10-05 testglob.c: update --help, add GLOB_LIST and GLOB_STACK tests
+	 testglob.dat: add a few more tests
+01-10-03 testmatch.dat: add ancc cc trigraph prone patterns
+01-09-11 ed: fix t command bug, add regression test
+	 ed: fix RE error intercept via REG_DISCIPLINE errorf
+01-09-06 testfnmatch,testmatch: add --help
+01-09-04 testre: update test data
 01-06-11 testre: handle embedded \0 in subject string, add \0 tests
 01-05-24 testre: add (?{...}) test support
 01-05-22 testre: add regsub() tests, testsub.dat
@@ -4164,6 +4278,7 @@ End:
 
 :::::::: std ::::::::
 
+01-09-04 locale: add new catagories
 01-08-11 ls: fix nonprintable test for mb locales
 01-08-01 features/procfs: note that synthesized psinfo doesn't have pr_psargs
 01-06-27 dd: fix conv=[lu]case|x2y logic botch
@@ -4411,12 +4526,49 @@ End:
 
 :::::::: libast ::::::::
 
+01-10-18 features/lib: check for strtod static link collision
+	 features/float: add another signed cast for old bsd cc
+	 features/wchar: add <stdlib.h> <stdio.h> before <wchar.h> for old bsd
+01-10-17 sfio/sfcvt.c: limit max precision to { FLT_DIG DBL_DIG LDBL_DIG }
+	 sfio/sfcvt.c: fix %[aA] format to always have leading 0[xX]1.
+	 sfio/sfvprintf.c: handle %C %lc %S %ls for wchar_t args
+	 sfio/sfvscanf.c: handle %C %lc %S %ls for wchar_t args
+	 string/fmtmode.c: fix bug that omitted trailing '\0'
+01-10-12 misc/optget.c: . => \&. for --??nroff
+	 comp/wc.c: fix mbstate_t initialization typo
+	 features/float: fix max integer / float loop termiation
+	 features/float: fix LDBL_UINTMAX_MAX typo that did DBL_UINTMAX_MAX
+01-10-11 include/sfio.h: fix _Sfstd* import/export
+	 features/common: fix _UWIN __DYNAMIC__() definition
+01-10-06 features/fcntl.c: { O_BINARY O_TEXT } default to 0
+	 features/omitted: add for comp/omitted.c
+	 sfio/sfopen.c: O_BINARY default for _WIN32&&!_UWIN
+01-10-05 misc/glob.c: fix `\(x/*' GLOB_NOMATCH bug that returned `(x'
+	 misc/optget.c: fix localization lookup that didn't drop doubled : ? ]
+01-10-04 comp/setlocale.c: handle sizeof(wchar_t)!=4 in debug locale
+	 comp/conf.sh: handle sytems where _SC_* is both an enum and a macro
+01-09-25 astconf: add LIBPREFIX
+01-09-20 features/common: add __DYNAMIC__() for dll externs
+01-09-19 cdt: kpv update
+	 mb*() macros: update for ksh conversion, extend debug locale
+01-09-16 tm/tmlocale.c: add compiled in defaults for C locale
+	 misc/glob.c: add gl_nextdir callback for GLOB_COMPLETE
+01-08-14 clarify _WIN32 vs. _UWIN vs. __CYGWIN__
+	 tminit: fix standard & daylight initialization
+01-09-11 pathnative.c: add for native fs representation
+	 regex.h: fix regerror_t prototype
+01-09-04 regex/regnexec.c: fix REG_ICASE for multi-char collating elements
+	 tm/tmlocale.c: fix old ascii LC_TIME load
+	 locale*: add new LC_* categories
+	 comp/omitted.c: add CYGWIN workarounds
+	 features/lib: add CYGWIN workarounds
 01-08-11 features/common: some compilers have long long but no LL constants!
 	 features/lib: add mmap64 implementation test (for linux.s390)
 	 regex/regcomp.c: fix \ in [...] parse
 	 setlocale: retain user locale spelling in setlocale() return value
 	 features/limits.c: don't include ./limits.h -- duh
 	 fmtesc: don't escape multibyte chars
+	 tm/tmlocale.c: fix native C locale default
 01-08-08 features/float: some compilers (msdev) forget long long vs. double
 01-07-31 misc/optget.c: handle suboptions
 01-07-27 cdt.h: add DTDISC()
@@ -5103,6 +5255,10 @@ End:
 
 :::::::: libcmd ::::::::
 
+01-10-11 getconf.c: fix usage typos
+01-09-11 cp.c,cmd.h: handle . in argv[0]
+	 cp.c: add O_BINARY to all open() calls
+01-09-06 tail: input streams must be SF_SHARE -- duh
 01-07-16 stty: fix cntl() macro for CC_NATIVE!=CC_ASCII
 01-05-31 date: fix /bin/date fallback logic
 	 stty: fix a few mismatched flags, -a and -g option logic
@@ -5198,6 +5354,7 @@ End:
 
 :::::::: libdll ::::::::
 
+01-09-25 dllfind: add LIBSUFFIX
 01-07-17 dllfind: do at least one dlopen() to prime dlerror()
 01-05-29 dlopen: fix dlopen(0,0) for HP
 01-04-20 dllfind: use getconf HOSTTYPE LIBPATH LIBSUFFIX
@@ -5298,6 +5455,7 @@ End:
 
 :::::::: libz ::::::::
 
+01-09-18 zconf.h: include <ast_std.h> for __IMPORT__ and __EXPORT__
 00-09-11 gzio: don't set verified=1 in check_header() for concatenation
 99-11-19 gzio: add missing _PACKAGE_ast
 99-09-11 sfdcgzip,sfdclzw: return 1 if discipline pushed
@@ -5313,6 +5471,8 @@ End:
 
 :::::::: libcoshell ::::::::
 
+01-09-11 coinit.c: fix coident[] for ancient bsh that die on `test == 1'
+	 coinit.c: and fix coident[] to weed out buggy ksh88i trap on exit
 01-05-31 co*: add CO_CROSS, expose CO_DEVFD
 01-04-23 coquote: add state.type to avoid getenv() overwrite on some systems
 01-01-01 cokill: killjob => cokilljob, killshell => cokillshell
@@ -5395,6 +5555,8 @@ End:
 
 :::::::: libpp ::::::::
 
+01-09-11 ppinput.c: use pathnative() for native fs representation
+01-08-31 pp.probe: handle -Dmacro(args)=value
 01-08-11 ppcontrol: fix ... and __VAR_ARGS__ for C99
 	 ppsearch: fix SEARCH_NEXT bug that skipped the include stack
 01-08-06 ppproto: preserve #! first line for # comments

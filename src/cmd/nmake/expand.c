@@ -809,15 +809,13 @@ sepcmp(int sep, unsigned long a, unsigned long b)
  * convert path to native representation with '..' quotes if needed
  */
 
-#if _UWIN
+#include "../../lib/libast/path/pathnative.c" /* drop in 2002 */
 
-extern int	uwin_path(const char*, char*, int);
-
-static const void
+static void
 native(Sfio_t* xp, const char* s)
 {
-	int	m;
-	int	n;
+	size_t	m;
+	size_t	n;
 
 	if (*s)
 	{
@@ -826,18 +824,12 @@ native(Sfio_t* xp, const char* s)
 		do
 		{
 			m = n;
-			n = uwin_path(s, sfstrrsrv(xp, m), m);
+			n = pathnative(s, sfstrrsrv(xp, m), m);
 		} while (n > m);
 		sfstrrel(xp, n);
 		sfputc(xp, '\'');
 	}
 }
-
-#else
-
-#define native(xp,s)	sfputr(xp,s,-1)
-
-#endif
 
 /*
  * low level for order()
@@ -1740,7 +1732,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	case 'A':
 		if (r->scan != SCAN_IGNORE || *ops == 'F' || *ops == 'f')
 		{
-			closear(openar(r->name, "r"));
+			closear(openar(r->name, "br"));
 			if (internal.arupdate)
 			{
 				struct frame*	oframe;

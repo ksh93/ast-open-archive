@@ -165,9 +165,9 @@ Sffmt_t*	fe;
 	  case 'F' :
 		fe->fmt = 'f'; return 0;
 	  case 'S' :
-		fe->fmt = 's'; return 0;
+		fe->fmt = 's'; fe->flags &= ~SFFMT_LONG; return 0;
 	  case 'C' :
-		fe->fmt = 'c'; return 0;
+		fe->fmt = 'c'; fe->flags &= ~SFFMT_LONG; return 0;
 	  default : return -1;
 	}
 }
@@ -278,7 +278,7 @@ MAIN()
 	sfsprintf(buf1,sizeof(buf1),"%d %o %f %s %c", -1, -1, -1., "s", 'c');
 	sfsprintf(buf2,sizeof(buf2),"%!%D %O %F %S %C",&fe, -1, -1, -1., "s", 'c');
 	if(strcmp(buf1,buf2) != 0)
-		terror("%%!: Extension function failed5\n");
+		terror("%%!: Extension function failed5: \"%s\" expected, \"%s\" returned\n", buf1, buf2);
 
 	k = 1234567890;
 	sfsprintf(buf1,sizeof(buf1),"%I*d",sizeof(k),k);

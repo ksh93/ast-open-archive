@@ -452,7 +452,7 @@ quit(void)
 			fileclose(xbuf);
 			return;
 		}
-		close(open(mbox, O_WRONLY|O_CREAT|O_TRUNC, MAILMODE));
+		close(open(mbox, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, MAILMODE));
 		if (!(obuf = fileopen(mbox, "Er+"))) {
 			fileclose(ibuf);
 			fileclose(fbuf);

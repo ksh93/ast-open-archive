@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -281,15 +281,26 @@ exec - 	then	ENV= $SHELL -n locate.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
-exec - "")	cp locate.sh locate
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
+exec - 	"")	cp locate.sh locate
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < locate.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
+exec - 		cat locate.sh
+exec - 		} > locate
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < locate.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
 exec - 	cat locate.sh
 exec - 	} > locate
 exec - 	;;
@@ -308,15 +319,26 @@ exec - 	then	ENV= $SHELL -n updatedb.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
-exec - "")	cp updatedb.sh updatedb
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
+exec - 	"")	cp updatedb.sh updatedb
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < updatedb.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
+exec - 		cat updatedb.sh
+exec - 		} > updatedb
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < updatedb.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
 exec - 	cat updatedb.sh
 exec - 	} > updatedb
 exec - 	;;

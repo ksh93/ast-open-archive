@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -300,15 +300,26 @@ exec - 	then	ENV= $SHELL -n rpm2cpio.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"' in
-exec - "")	cp rpm2cpio.sh rpm2cpio
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"' in
+exec - 	"")	cp rpm2cpio.sh rpm2cpio
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < rpm2cpio.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"
+exec - 		cat rpm2cpio.sh
+exec - 		} > rpm2cpio
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < rpm2cpio.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"
 exec - 	cat rpm2cpio.sh
 exec - 	} > rpm2cpio
 exec - 	;;
@@ -440,15 +451,26 @@ exec - 	then	ENV= $SHELL -n testpax.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case '' in
-exec - "")	cp testpax.sh testpax
+exec - case '${mam_cc_SHELLMAGIC}' in
+exec - "")	case '' in
+exec - 	"")	cp testpax.sh testpax
+exec - 		;;
+exec - 	*)	{
+exec - 		i=`(read x; echo $x) < testpax.sh`
+exec - 		case $i in
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		esac
+exec - 		echo 
+exec - 		cat testpax.sh
+exec - 		} > testpax
+exec - 		;;
+exec - 	esac
 exec - 	;;
 exec - *)	{
-exec - 	i=`(read x; echo $x) < testpax.sh`
-exec - 	case $i in
-exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	echo '${mam_cc_SHELLMAGIC}'
+exec - 	case '' in
+exec - 	?*)	echo  ;;
 exec - 	esac
-exec - 	echo 
 exec - 	cat testpax.sh
 exec - 	} > testpax
 exec - 	;;

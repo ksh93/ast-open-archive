@@ -28,7 +28,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-08-11 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-10-05 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -72,7 +72,8 @@ H("  testglob reads glob(3) test specifications, one per line, from the\n");
 H("  standard input and writes one output line for each failed test. A\n");
 H("  summary line is written after all tests are done. Unsupported\n");
 H("  features are noted before the first test, and tests requiring these\n");
-H("  features are silently ignored.\n");
+H("  features are silently ignored. Each test is repeated with GLOB_LIST,\n");
+H("  GLOB_STACK, and GLOB_LIST|GLOB_STACK set.\n");
 H("\n");
 H("OPTIONS\n");
 H("  -c	catch signals and non-terminating calls\n");
@@ -93,15 +94,15 @@ H("\n");
 H("    K	GLOB_AUGMENTED		augmented (ksh) patterns\n");
 H("    S	0			basic shell patterns\n");
 H("\n");
-H("    a	GLOB_APPEND\n");
-H("    b	GLOB_BRACE\n");
-H("    c	GLOB_CMPLETE\\n\n");
-H("    e	GLOB_NOESCAPE\n");
-H("    E	GLOB_ERR\n");
-H("    i	GLOB_ICASE\n");
-H("    m	GLOB_MARK\n");
-H("    n	GLOB_NOCHECK\n");
-H("    s	GLOB_NOSORT\n");
+H("    a	GLOB_APPEND		append to previous result\n");
+H("    b	GLOB_BRACE		enable {...} expansion\n");
+H("    c	GLOB_COMPLETE		shell file completion\n");
+H("    e	GLOB_NOESCAPE		\\ not special\n");
+H("    E	GLOB_ERR		abort on error\n");
+H("    i	GLOB_ICASE		ignore case\n");
+H("    m	GLOB_MARK		append / to directories\n");
+H("    n	GLOB_NOCHECK		no match returns original pattern\n");
+H("    s	GLOB_NOSORT		don't sort\n");
 H("    u	standard unspecified behavior -- errors not counted\n");
 H("\n");
 H("  Field 1 control lines:\n");
@@ -172,16 +173,16 @@ static const char* unsupported[] = {
 #define GLOB_COMPLETE	NOTEST
 #endif
 #ifndef GLOB_DISC
-#define GLOB_DISC	NOTEST
+#define GLOB_DISC	0
 #endif
 #ifndef GLOB_ICASE
 #define GLOB_ICASE	NOTEST
 #endif
 #ifndef GLOB_LIST
-#define GLOB_LIST	NOTEST
+#define GLOB_LIST	0
 #endif
 #ifndef GLOB_STACK
-#define GLOB_STACK	NOTEST
+#define GLOB_STACK	0
 #endif
 
 #define GLOB_UNKNOWN	(-1)
@@ -293,11 +294,11 @@ static void
 report(char* comment, char* pat, char* msg, int flags, int unspecified)
 {
 	printf("%d: ", state.lineno);
-#if GLOB_LIST != NOTEST
+#if GLOB_LIST
 	if (flags & GLOB_LIST)
 		printf("LIST: ");
 #endif
-#if GLOB_STACK != NOTEST
+#if GLOB_STACK
 	if (flags & GLOB_STACK)
 		printf("STACK: ");
 #endif
@@ -418,6 +419,12 @@ gotcha(int sig)
 	longjmp(state.gotcha, 1);
 }
 
+static int
+qstrcmp(const void* a, const void* b)
+{
+	return strcmp(*(char**)a, *(char**)b);
+}
+
 int
 main(int argc, char** argv)
 {
@@ -431,6 +438,7 @@ main(int argc, char** argv)
 	int		ret;
 	int		i;
 	int		m;
+	int		n;
 	int		expected;
 	int		got;
 	int		ok;
@@ -443,6 +451,7 @@ main(int argc, char** argv)
 	char*		ans;
 	char*		err;
 	char*		msg;
+	char**		v;
 	char*		field[5];
 	char		unit[64];
 	char		buf[16 * 1024];
@@ -450,11 +459,12 @@ main(int argc, char** argv)
 	char*		path;
 	char*		pathmax;
 	char*		work[16];
+	char*		av[256];
 	glob_t		gl;
-#if GLOB_DISC != NOTEST
+#if GLOB_DISC
 	char		fignore[128];
 #endif
-#if GLOB_LIST != NOTEST
+#if GLOB_LIST
 	globlist_t*	gi;
 #endif
 
@@ -469,11 +479,14 @@ main(int argc, char** argv)
 
 	static int	modes[] = {
 				0,
-#if 0 && GLOB_LIST != NOTEST
+#if GLOB_LIST
 				GLOB_LIST,
 #endif
-#if 0 && GLOB_STACK != NOTEST
+#if GLOB_STACK
 				GLOB_STACK,
+#endif
+#if GLOB_LIST && GLOB_STACK
+				GLOB_LIST|GLOB_STACK,
 #endif
 	};
 
@@ -597,7 +610,7 @@ main(int argc, char** argv)
 				bad("cannot chdir\n", path);
 			work[1] = 0;
 		}
-#if GLOB_DISC != NOTEST
+#if GLOB_DISC
 		fignore[0] = 0;
 #endif
 		i = 0;
@@ -666,7 +679,7 @@ main(int argc, char** argv)
 				flags |= GLOB_ERR;
 				continue;
 			case 'I':
-#if GLOB_DISC != NOTEST
+#if GLOB_DISC
 				if (field[1])
 					strncpy(fignore, field[1], sizeof(fignore) - 1);
 				else
@@ -762,9 +775,12 @@ main(int argc, char** argv)
 		okre = kre;
 		osre = sre;
 		for (m = 0; m < elementsof(modes); m++) {
-			if (m && (flags & modes[m]) == modes[m])
-				continue;
-			flags |= modes[m];
+			if (modes[m])
+			{
+				if ((flags & modes[m]) == modes[m])
+					continue;
+				flags |= modes[m];
+			}
 			err = field[2];
 			ans = field[3];
 			msg = field[4];
@@ -802,7 +818,7 @@ main(int argc, char** argv)
 				}
 				memset(&gl, 0, sizeof(gl));
 			}
-#if GLOB_DISC != NOTEST
+#if GLOB_DISC
 			if (fignore[0]) {
 				gl.gl_fignore = (const char*)fignore;
 				flags |= GLOB_DISC;
@@ -823,9 +839,6 @@ main(int argc, char** argv)
 			}
 			else
 				ret = glob(pat, flags, 0, &gl);
-#if 0
-printf("AHA%d ret=%d gl_pathc=%d\n", __LINE__, ret, gl.gl_pathc);
-#endif
 			if (ret == 0) {
 				ok = 1;
 				if (!gl.gl_pathc)
@@ -852,78 +865,58 @@ printf("AHA%d ret=%d gl_pathc=%d\n", __LINE__, ret, gl.gl_pathc);
 				}
 			}
 			else if (ret != GLOB_NOMATCH) {
-				bs = s = ans;
-#if GLOB_LIST != NOTEST
 				if (flags & GLOB_LIST) {
-					if (gi = gl.gl_list) {
-						p = gi->gl_path;
-						gi = gi->gl_next;
+					n = 0;
+					for (gi = gl.gl_list; gi; gi = gi->gl_next) {
+						if (n >= (elementsof(av) - 1))
+							break;
+						av[n++] = gi->gl_path;
 					}
-					else
-						p = "";
+					av[n] = 0;
+					v = av;
 				}
-				else
-#endif
-				if ((i = 0) < gl.gl_pathc)
-					p = gl.gl_pathv[i];
-				else
-					p = "";
-				bp = p;
-				for (;;) {
-					if (!*p) {
-						if (*s) {
-							if (*s != ' ')
-								break;
-							bs = ++s;
-						}
-#if GLOB_LIST != NOTEST
-						if (flags & GLOB_LIST) {
-							if (gi) {
-								p = gi->gl_path;
-								gi = gi->gl_next;
-							}
-							else
-								break;
-						}
-						else
-#endif
-						{
-							if (++i < gl.gl_pathc)
-								p = gl.gl_pathv[i];
-							else
-								break;
-						}
-						bp = p;
+				else {
+					n = gl.gl_pathc;
+					v = gl.gl_pathv;
+				}
+				if (flags & (GLOB_LIST|GLOB_NOSORT))
+					qsort(v, n, sizeof(*v), qstrcmp);
+				bs = s = ans;
+				bp = p = "";
+				for (i = 0; i < n; i++)
+				{
+					bp = p = v[i];
+					bs = s;
+					while (*p == *s && *s && *s != ' ')
+					{
+						p++;
+						s++;
 					}
-					if (!*s)
+					if (*p || *s && *s != ' ')
 						break;
-					if (*s != *p)
-						break;
-					s++;
-					p++;
+					while (*s == ' ')
+						s++;
 				}
 				if (*p || *s) {
-					if (!*p) {
-#if GLOB_LIST != NOTEST
-						if ((flags & GLOB_LIST) && !gi)
-							bp = 0;
-						else
-#endif
-						if (i >= gl.gl_pathc)
-							bp = 0;
-					}
+					if (!*p && i >= n)
+						bp = 0;
 					if (!*s)
-						bs = 0;
+						bs = s = 0;
 					else {
 						while (*s && *s != ' ')
 							s++;
-						*s = 0;
+						if (*s == ' ')
+							*s = 0;
+						else
+							s = 0;
 					}
 					report("match failed: ", pat, msg, flags, unspecified);
 					quote(bs);
 					printf(" expected, ");
 					quote(bp);
 					printf(" returned\n");
+					if (s)
+						*s = 0;
 				}
 			}
 			if (flags & GLOB_APPEND)

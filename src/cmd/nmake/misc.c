@@ -47,7 +47,7 @@ rstat(char* name, struct stat* st, int res)
 		close(internal.openfd);
 		internal.openfile = 0;
 	}
-	while ((internal.openfd = open(name, O_RDONLY)) < 0)
+	while ((internal.openfd = open(name, O_RDONLY|O_BINARY)) < 0)
 	{
 		if (errno != EINTR)
 		{
@@ -282,7 +282,9 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	switch (dp->fmt)
 	{
 	case 'c':
+	case 'C':
 		value->c = *s;
+		dp->flags &= ~SFFMT_LONG;
 		break;
 	case 'd':
 		dp->size = sizeof(value->q);
@@ -291,10 +293,12 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	case 'F':
 		dp->fmt = 'f';
 		/*FALLTHROUGH*/
+	case 'a':
+	case 'A':
 	case 'e':
+	case 'E':
 	case 'f':
 	case 'g':
-	case 'E':
 	case 'G':
 		dp->size = sizeof(value->d);
 		value->d = strtod(s, NiL);
@@ -303,15 +307,8 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		value->p = (char**)strtol(s, NiL, 0);
 		break;
 	case 's':
-		value->s = s;
-		break;
-	case 'u':
-	case 'x':
-	case 'X':
-		dp->size = sizeof(value->q);
-		value->q = strtoull(s, NiL, 0);
-		break;
 	case 'S':
+		dp->flags &= ~SFFMT_LONG;
 		value->s = s;
 		if (txt)
 		{
@@ -350,9 +347,9 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 						*s = '.';
 			}
 		}
-		dp->fmt = 's';
 		dp->size = -1;
 		break;
+	case 't':
 	case 'T':
 		tm = strtol(s, NiL, 0);
 		if (txt)
@@ -362,6 +359,12 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		dp->fmt = 's';
 		dp->size = -1;
 		break;
+	case 'u':
+	case 'x':
+	case 'X':
+		dp->size = sizeof(value->q);
+		value->q = strtoull(s, NiL, 0);
+		break;
 	case 'Z':
 		dp->fmt = 'c';
 		value->c = 0;
@@ -370,8 +373,12 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		value->i = (int)strtol(s, NiL, 0);
 		break;
 	default:
-		dp->flags &= ~SFFMT_VALUE;
+		tmpname[0] = dp->fmt;
+		tmpname[1] = 0;
+		value->s = tmpname;
 		error(2, "%%%c: unknown format", dp->fmt);
+		dp->fmt = 's';
+		dp->size = -1;
 		break;
 	}
 	return 0;
@@ -553,7 +560,12 @@ b_getconf(char** args)
 	if (name = *args)
 		args++;
 	if (path = *args)
+	{
+		if (path[0] == '-' && !path[1])
+			path = 0;
 		args++;
-	value = *args;
+	}
+	if ((value = *args) && value[0] == '-' && !value[1])
+		value = 0;
 	return astconf(name, path, value);
 }

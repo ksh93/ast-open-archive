@@ -108,7 +108,7 @@ svc_connect(void* handle, int fd, Cs_id_t* id, int clone, char** argv)
 			flags |= CAT_MSG;
 			break;
 		}
-	if (!s || (ad = csopen(s, 0)) < 0 && (ad = open(s, O_CREAT|O_APPEND|O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)) < 0)
+	if (!s || (ad = csopen(s, 0)) < 0 && (ad = open(s, O_CREAT|O_APPEND|O_WRONLY|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)) < 0)
 		return(-1);
 	if (fstat(ad, &st))
 	{

@@ -31,18 +31,16 @@
 
 #include "pplib.h"
 
+#include <sfstr.h>
+
 /*
  * convert path to native representation
  */
 
-#if _UWIN
-
-#include <sfstr.h>
-
-extern int	uwin_path(const char*, char*, int);
+#include "../../lib/libast/path/pathnative.c" /* drop in 2002 */
 
 static char*
-pathnative(register const char* s)
+native(register const char* s)
 {
 	register int		c;
 	register struct ppfile* xp;
@@ -60,7 +58,7 @@ pathnative(register const char* s)
 	do
 	{
 		m = n;
-		n = uwin_path(s, sfstrrsrv(np, m), m);
+		n = pathnative(s, sfstrrsrv(np, m), m);
 	} while (n > m);
 	sfstrrel(np, n);
 	s = (const char*)sfstruse(np);
@@ -85,12 +83,6 @@ pathnative(register const char* s)
 	return xp->name;
 }
 
-#else
-
-#define pathnative(s)	((char*)(s))
-
-#endif
-
 /*
  * push stream onto input stack
  * used by the PUSH_type macros
@@ -108,7 +100,7 @@ pppush(register int t, register char* s, register char* p, int n)
 	{
 	case IN_FILE:
 		if (pp.option & NATIVE)
-			s = pathnative(s);
+			s = native(s);
 		cur->flags |= IN_newline;
 		cur->fd = n;
 		cur->hide = ++pp.hide;

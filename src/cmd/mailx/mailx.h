@@ -36,6 +36,10 @@
 #include <string.h>
 #include <time.h>
 
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
 extern char*	optarg;
 extern int	optind;
 extern int	opterr;

@@ -112,7 +112,7 @@ typedef
 
 #else
 
-#if defined(_WIN32) && !defined(_UWIN)
+#if defined(_WIN32) && !defined(_UWIN) && !defined(__CYGWIN__)
 #   include <windows.h>
 #   ifdef small
       /* windows.h define small to char */

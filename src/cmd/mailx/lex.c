@@ -23,7 +23,7 @@ settmp(const char* name, int dir)
 			if (access(name, W_OK))
 				state.readonly = 1;
 		}
-		else if ((fd = open(name, O_WRONLY)) < 0)
+		else if ((fd = open(name, O_WRONLY|O_BINARY)) < 0)
 			state.readonly = 1;
 		else
 			close(fd);

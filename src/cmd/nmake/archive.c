@@ -308,13 +308,13 @@ openar(register char* name, char* mode)
 		ar->sym_offset = 0;
 		return arfd;
 	}
-	if (sfseek(ar->fp, (Sfoff_t)0, 0) < 0 || sfread(ar->fp, magic.data.V0, sizeof(magic.data.V0)) != sizeof(magic.data.V0))
+	if (sfseek(ar->fp, (Sfoff_t)0, SEEK_SET) < 0 || sfread(ar->fp, magic.data.V0, sizeof(magic.data.V0)) != sizeof(magic.data.V0))
 		goto local;
 	magic.term[sizeof(magic.data.V0)] = 0;
 	if (streq(magic.data.V0, MAGIC_V0))
 	{
 		ar->type = TYPE_V0;
-		if (sfseek(ar->fp, (Sfoff_t)0, 0) < 0 ||
+		if (sfseek(ar->fp, (Sfoff_t)0, SEEK_SET) < 0 ||
 		    sfread(ar->fp, (char*)&header.data.V0, sizeof(header.data.V0)) != sizeof(header.data.V0))
 			goto local;
 #if __pdp11__ || pdp11
@@ -322,13 +322,13 @@ openar(register char* name, char* mode)
 		goto local;
 #else
 		ar->sym_offset = sftell(ar->fp);
-		if (sfseek(ar->fp, (Sfoff_t)(swapget(0, header.data.V0.ar_syms, sizeof(header.data.V0.ar_syms)) * sizeof(struct symbol_V0)), 1) < 0)
+		if (sfseek(ar->fp, (Sfoff_t)(swapget(0, header.data.V0.ar_syms, sizeof(header.data.V0.ar_syms)) * sizeof(struct symbol_V0)), SEEK_CUR) < 0)
 			goto local;
 		ar->first = sftell(ar->fp);
 		return arfd;
 #endif
 	}
-	if (sfseek(ar->fp, (Sfoff_t)0, 0) < 0 || sfread(ar->fp, magic.data.port, sizeof(magic.data.port)) != sizeof(magic.data.port))
+	if (sfseek(ar->fp, (Sfoff_t)0, SEEK_SET) < 0 || sfread(ar->fp, magic.data.port, sizeof(magic.data.port)) != sizeof(magic.data.port))
 		goto local;
 	magic.term[sizeof(magic.data.port)] = 0;
 	if (streq(magic.data.port, MAGIC_port))
@@ -366,7 +366,7 @@ openar(register char* name, char* mode)
 			ar->sym_offset = 0;
 			size = -sizeof(header.data.port);
 		}
-		if (sfseek(ar->fp, (Sfoff_t)size, 1) < 0)
+		if (sfseek(ar->fp, (Sfoff_t)size, SEEK_CUR) < 0)
 			goto local;
 		ar->first = sftell(ar->fp);
 		while (sfread(ar->fp, (char*)&header.data.port, sizeof(header.data.port)) == sizeof(header.data.port) && header.data.port.ar_name[0] == TERM_port)
@@ -389,20 +389,20 @@ openar(register char* name, char* mode)
 				goto local;
 			ar->first = sftell(ar->fp);
 		}
-		if (sfseek(ar->fp, (Sfoff_t)ar->first, 0) != ar->first)
+		if (sfseek(ar->fp, (Sfoff_t)ar->first, SEEK_SET) != ar->first)
 			goto local;
 		if (ar->type == TYPE_rand && !uptodate)
 			internal.arupdate = UPDATE_rand;
 		return arfd;
 #endif
 	}
-	if (sfseek(ar->fp, (Sfoff_t)0, 0) < 0 || sfread(ar->fp, magic.data.aix, sizeof(magic.data.aix)) != sizeof(magic.data.aix))
+	if (sfseek(ar->fp, (Sfoff_t)0, SEEK_SET) < 0 || sfread(ar->fp, magic.data.aix, sizeof(magic.data.aix)) != sizeof(magic.data.aix))
 		goto local;
 	magic.term[sizeof(magic.data.aix)] = 0;
 	if (streq(magic.data.aix, MAGIC_aix))
 	{
 		ar->type = TYPE_aix;
-		if (sfseek(ar->fp, (Sfoff_t)0, 0) < 0 || sfread(ar->fp, (char*)&header.data.aix, sizeof(header.data.aix)) != sizeof(header.data.aix))
+		if (sfseek(ar->fp, (Sfoff_t)0, SEEK_SET) < 0 || sfread(ar->fp, (char*)&header.data.aix, sizeof(header.data.aix)) != sizeof(header.data.aix))
 			goto local;
 		header.term[sizeof(header.data.aix)] = 0;
 		if (sfsscanf(header.data.aix.fl_gstoff, "%ld", &ar->sym_offset) != 1)
@@ -416,7 +416,7 @@ openar(register char* name, char* mode)
 	if (streq(magic.data.aixbig, MAGIC_aixbig))
 	{
 		ar->type = TYPE_aixbig;
-		if (sfseek(ar->fp, (Sfoff_t)0, 0) < 0 || sfread(ar->fp, (char*)&header.data.aixbig, sizeof(header.data.aixbig)) != sizeof(header.data.aixbig))
+		if (sfseek(ar->fp, (Sfoff_t)0, SEEK_SET) < 0 || sfread(ar->fp, (char*)&header.data.aixbig, sizeof(header.data.aixbig)) != sizeof(header.data.aixbig))
 			goto local;
 		header.term[sizeof(header.data.aixbig)] = 0;
 		if (sfsscanf(header.data.aixbig.fl_gstoff, "%ld", &ar->sym_offset) != 1)
@@ -491,7 +491,7 @@ walkar(struct dir* d, int arfd, char* name)
 		putar(d->name, d);
 	op = "seek";
 	mem = null;
-	sfseek(ar->fp, (Sfoff_t)ar->first, 0);
+	sfseek(ar->fp, (Sfoff_t)ar->first, SEEK_SET);
 	offset = 0;
 	patch = -1;
 	switch (ar->type)
@@ -501,7 +501,7 @@ walkar(struct dir* d, int arfd, char* name)
 			d->truncate = 14;
 		mem = buf;
 		header.term[sizeof(header.data.pdp)] = 0;
-		while (sfseek(ar->fp, (Sfoff_t)offset, 1) >= 0)
+		while (sfseek(ar->fp, (Sfoff_t)offset, SEEK_CUR) >= 0)
 		{
 			if (sfread(ar->fp, header.data.pdp.ar_name, sizeof(header.data.pdp) - sizeof(header.data.pdp.ar_pad)) != (sizeof(header.data.pdp) - sizeof(header.data.pdp.ar_pad)))
 			{
@@ -531,7 +531,7 @@ walkar(struct dir* d, int arfd, char* name)
 				if (ar->swap)
 					header.data.pdp.ar_date = swapget(ar->swap, (char*)&header.data.pdp.ar_date, 4);
 				state.savestate = 1;
-				if (sfseek(ar->fp, -(Sfoff_t)(sizeof(header.data.pdp) - sizeof(header.data.pdp.ar_pad)), 1) < 0)
+				if (sfseek(ar->fp, -(Sfoff_t)(sizeof(header.data.pdp) - sizeof(header.data.pdp.ar_pad)), SEEK_CUR) < 0)
 					break;
 				if (sfwrite(ar->fp, header.data.pdp.ar_name, sizeof(header.data.pdp) - sizeof(header.data.pdp.ar_pad)) != (sizeof(header.data.pdp) - sizeof(header.data.pdp.ar_pad)))
 				{
@@ -553,7 +553,7 @@ walkar(struct dir* d, int arfd, char* name)
 		mem = member.data.V0.arf_name;
 		header.term[sizeof(header.data.V0)] = 0;
 		member.term[sizeof(member.data.V0)] = 0;
-		while (sfseek(ar->fp, (Sfoff_t)offset, 1) >= 0)
+		while (sfseek(ar->fp, (Sfoff_t)offset, SEEK_CUR) >= 0)
 		{
 			if (sfread(ar->fp, (char*)&member.data.V0, sizeof(member.data.V0)) != sizeof(member.data.V0))
 			{
@@ -580,7 +580,7 @@ walkar(struct dir* d, int arfd, char* name)
 				staterule(RULE, r, NiL, 1)->time = r->time = CURTIME;
 				state.savestate = 1;
 				swapput(0, member.data.V0.arf_date, sizeof(member.data.V0.arf_date), r->time);
-				if (sfseek(ar->fp, -(Sfoff_t)sizeof(member.data.V0), 1) < 0)
+				if (sfseek(ar->fp, -(Sfoff_t)sizeof(member.data.V0), SEEK_CUR) < 0)
 					break;
 				if (sfwrite(ar->fp, (char*)&member.data.V0, sizeof(member.data.V0)) != sizeof(member.data.V0))
 				{
@@ -601,8 +601,9 @@ walkar(struct dir* d, int arfd, char* name)
 			d->truncate = 14;
 		mem = header.data.port.ar_name;
 		header.term[sizeof(header.data.port)] = 0;
-		while (sfseek(ar->fp, (Sfoff_t)offset, 1) >= 0)
+		while (sfseek(ar->fp, (Sfoff_t)offset, SEEK_CUR) >= 0)
 		{
+if (state.test & 1) sfprintf(sfstdout, "%ld\n", (long)sftell(ar->fp));
 			if (sfread(ar->fp, (char*)&header.data.port, sizeof(header.data.port)) != sizeof(header.data.port) ||
 			    strncmp(header.data.port.ar_fmag, ENDHDR_port, SENDHDR_port))
 			{
@@ -664,7 +665,7 @@ walkar(struct dir* d, int arfd, char* name)
 					staterule(RULE, r, NiL, 1)->time = r->time = date;
 					state.savestate = 1;
 				}
-				if (sfseek(ar->fp, -(Sfoff_t)sizeof(header.data.port), 1) < 0)
+				if (sfseek(ar->fp, -(Sfoff_t)sizeof(header.data.port), SEEK_CUR) < 0)
 					break;
 				sfsprintf(buf, sizeof(buf), "%-12lu", date + patch);
 				strncpy(header.data.port.ar_date, buf, 12);
@@ -726,7 +727,7 @@ walkar(struct dir* d, int arfd, char* name)
 					op = "name read";
 					break;
 				}
-				if (sfseek(ar->fp, -(Sfoff_t)(len - 2), 1) < 0)
+				if (sfseek(ar->fp, -(Sfoff_t)(len - 2), SEEK_CUR) < 0)
 				{
 					op = "name seek";
 					break;
@@ -756,7 +757,7 @@ walkar(struct dir* d, int arfd, char* name)
 				state.savestate = 1;
 				sfsprintf(tm, sizeof(tm), "%-12lu", r->time);
 				strncpy(member.data.aix.ar_date, tm, 12);
-				if (sfseek(ar->fp, -(Sfoff_t)sizeof(member.data.aix), 1) < 0)
+				if (sfseek(ar->fp, -(Sfoff_t)sizeof(member.data.aix), SEEK_CUR) < 0)
 					break;
 				if (sfwrite(ar->fp, (char*)&member.data.aix, sizeof(member.data.aix)) != sizeof(member.data.aix))
 				{
@@ -782,7 +783,7 @@ walkar(struct dir* d, int arfd, char* name)
 		{
 			if (offset >= ar->last)
 				return 0;
-			if (sfseek(ar->fp, (Sfoff_t)offset, 0) < 0)
+			if (sfseek(ar->fp, (Sfoff_t)offset, SEEK_SET) < 0)
 				break;
 			if (sfread(ar->fp, (char*)&member.data.aixbig, sizeof(member.data.aixbig)) != sizeof(member.data.aixbig))
 			{
@@ -808,7 +809,7 @@ walkar(struct dir* d, int arfd, char* name)
 					op = "name read";
 					break;
 				}
-				if (sfseek(ar->fp, -(Sfoff_t)(len - 2), 1) < 0)
+				if (sfseek(ar->fp, -(Sfoff_t)(len - 2), SEEK_CUR) < 0)
 				{
 					op = "name seek";
 					break;
@@ -838,7 +839,7 @@ walkar(struct dir* d, int arfd, char* name)
 				state.savestate = 1;
 				sfsprintf(tm, sizeof(tm), "%-12lu", r->time);
 				strncpy(member.data.aixbig.ar_date, tm, 12);
-				if (sfseek(ar->fp, -(Sfoff_t)sizeof(member.data.aixbig), 1) < 0)
+				if (sfseek(ar->fp, -(Sfoff_t)sizeof(member.data.aixbig), SEEK_CUR) < 0)
 					break;
 				if (sfwrite(ar->fp, (char*)&member.data.aixbig, sizeof(member.data.aixbig)) != sizeof(member.data.aixbig))
 				{
@@ -959,7 +960,7 @@ touchar(char* name, register char* member)
 			ntouched++;
 		}
 	}
-	else if ((arfd = openar(name, "r+")) >= 0)
+	else if ((arfd = openar(name, "br+")) >= 0)
 	{
 		walkar(NiL, arfd, name);
 		closear(arfd);

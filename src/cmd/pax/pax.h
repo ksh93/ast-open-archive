@@ -51,10 +51,6 @@
 
 #include "FEATURE/local"
 
-#ifndef O_BINARY
-#define O_BINARY	0
-#endif
-
 #define PANIC		ERROR_PANIC|ERROR_SOURCE,__FILE__,__LINE__
 
 #define bcount(ap)	((ap)->io->last-(ap)->io->next)
@@ -103,6 +99,7 @@
 
 #define ALAR		0
 #define ALAR_NAME	"ansi"
+#define ALAR_DESC	"ANSI standard label tape; for tape devices only"
 #define ALAR_REGULAR	4
 #define ALAR_SPECIAL	ALAR_REGULAR
 #define ALAR_LABEL	2048
@@ -117,6 +114,7 @@
 
 #define BINARY		1
 #define BINARY_NAME	"binary"
+#define BINARY_DESC	"cpio binary with symlinks"
 #define BINARY_REGULAR	DEFBUFFER
 #define BINARY_SPECIAL	DEFBLOCKS
 #define BINARY_HEADER	26
@@ -141,6 +139,7 @@ typedef struct Hdr_binary_s		/* binary header		*/
 
 #define CPIO		2
 #define CPIO_NAME	"cpio"
+#define CPIO_DESC	"cpio character with symlinks"
 #define CPIO_REGULAR	DEFBUFFER
 #define CPIO_SPECIAL	DEFBLOCKS
 #define CPIO_HEADER	76
@@ -154,6 +153,7 @@ typedef struct Hdr_binary_s		/* binary header		*/
 
 #define IBMAR		3
 #define IBMAR_NAME	"ibm"
+#define IBMAR_DESC	"EBCDIC standard label tape; for tape devices only"
 #define IBMAR_REGULAR	ALAR_REGULAR
 #define IBMAR_SPECIAL	ALAR_SPECIAL
 #define IBMAR_ALIGN	ALAR_ALIGN
@@ -165,6 +165,7 @@ typedef struct Hdr_binary_s		/* binary header		*/
 
 #define TAR		4
 #define TAR_NAME	"tar"
+#define TAR_DESC	"tar with symlinks"
 #define TAR_REGULAR	DEFBUFFER
 #define TAR_SPECIAL	DEFBLOCKS
 #define TAR_HEADER	TBLOCK
@@ -183,6 +184,7 @@ typedef union tar_header_block Hdr_tar_t;
 
 #define USTAR		5
 #define USTAR_NAME	TMAGIC
+#define USTAR_DESC	"POSIX 1003.1-1988 tar"
 #define USTAR_REGULAR	TAR_REGULAR
 #define USTAR_SPECIAL	TAR_SPECIAL
 #define USTAR_HEADER	TAR_HEADER
@@ -199,6 +201,7 @@ typedef union tar_header_block Hdr_tar_t;
 
 #define ASC		6
 #define ASC_NAME	"asc"
+#define ASC_DESC	"s5r4 extended cpio character"
 #define ASC_REGULAR	CPIO_REGULAR
 #define ASC_SPECIAL	CPIO_SPECIAL
 #define ASC_HEADER	110
@@ -215,6 +218,7 @@ typedef union tar_header_block Hdr_tar_t;
 
 #define ASCHK		7
 #define ASCHK_NAME	"aschk"
+#define ASCHK_DESC	"s5r4 extended cpio character with checksum"
 #define ASCHK_REGULAR	ASC_REGULAR
 #define ASCHK_SPECIAL	ASC_SPECIAL
 #define ASCHK_MAGIC	070702
@@ -227,6 +231,7 @@ typedef union tar_header_block Hdr_tar_t;
 
 #define SAVESET		8
 #define SAVESET_NAME	"vmsbackup"
+#define SAVESET_DESC	"VMS backup savset; for tape devices only"
 #define SAVESET_REGULAR	0
 #define SAVESET_SPECIAL	0
 #define SAVESET_ALIGN	0
@@ -265,6 +270,7 @@ typedef union tar_header_block Hdr_tar_t;
 
 #define PAX		9
 #define PAX_NAME	"pax"
+#define PAX_DESC	"POSIX 1003.2b-1995 extended ustar"
 #define PAX_REGULAR	TAR_REGULAR
 #define PAX_SPECIAL	TAR_SPECIAL
 #define PAX_HEADER	TAR_HEADER
@@ -277,6 +283,7 @@ typedef union tar_header_block Hdr_tar_t;
 
 #define PORTAR		10
 #define PORTAR_NAME	"portarch"
+#define PORTAR_DESC	"s5r2 portable object library"
 #define PORTAR_REGULAR	0
 #define PORTAR_SPECIAL	0
 #define PORTAR_HEADER	sizeof(portar_header)
@@ -306,6 +313,7 @@ typedef struct Hdr_portar_s	/* portar header			*/
 
 #define RANDAR		11
 #define RANDAR_NAME	"randarch"
+#define RANDAR_DESC	"BSD ranlib object library"
 #define RANDAR_REGULAR	0
 #define RANDAR_SPECIAL	0
 #define RANDAR_SYM	"(__.SYMDEF|__________E???X)*"
@@ -321,6 +329,7 @@ typedef struct Hdr_portar_s	/* portar header			*/
 
 #define VDB		12
 #define VDB_NAME	VDB_MAGIC
+#define VDB_DESC	"virtual database"
 #define VDB_REGULAR	DEFBUFFER
 #define VDB_SPECIAL	DEFBLOCKS
 #define VDB_ALIGN	0
@@ -332,6 +341,7 @@ typedef struct Hdr_portar_s	/* portar header			*/
 
 #define ZIP		13
 #define ZIP_NAME	"zip"
+#define ZIP_DESC	"zip 2.1 / PKZIP 2.04g archive"
 #define ZIP_REGULAR	DEFBUFFER
 #define ZIP_SPECIAL	DEFBLOCKS
 #define ZIP_ALIGN	0
@@ -345,6 +355,7 @@ typedef struct Hdr_portar_s	/* portar header			*/
 
 #define CAB		14
 #define CAB_NAME	"cab"
+#define CAB_DESC	"MS cabinet file"
 #define CAB_REGULAR	DEFBUFFER
 #define CAB_SPECIAL	DEFBLOCKS
 #define CAB_ALIGN	0
@@ -374,6 +385,7 @@ typedef struct Cab_s
 
 #define RPM		15
 #define RPM_NAME	"rpm"
+#define RPM_DESC	"Redhat rpm package encapsulated cpio"
 #define RPM_REGULAR	DEFBUFFER
 #define RPM_SPECIAL	DEFBLOCKS
 #define RPM_ALIGN	0
@@ -387,6 +399,7 @@ typedef struct Cab_s
 
 #define MIME		16
 #define MIME_NAME	"mime"
+#define MIME_DESC	"encapsulated mime"
 #define MIME_MAGIC	"--"
 #define MIME_REGULAR	DEFBUFFER
 #define MIME_SPECIAL	DEFBLOCKS
@@ -394,25 +407,47 @@ typedef struct Cab_s
 #define MIME_FLAGS	IN
 
 /*
+ * ms outlook tnef -- how about zip + text name=value attributes?
+ */
+
+#define TNEF		17
+#define TNEF_NAME	"tnef"
+#define TNEF_DESC	"MS outlook transport neutral encapsulation format"
+#define TNEF_MAGIC	0x223e9f78
+#define TNEF_REGULAR	DEFBUFFER
+#define TNEF_SPECIAL	DEFBLOCKS
+#define TNEF_ALIGN	0
+#define TNEF_FLAGS	IN
+
+typedef struct Tnef_s
+{
+	char*		format;
+	off_t		offset;
+} Tnef_t;
+
+/*
  * compression pseudo formats -- COMPRESS is first
  */
 
-#define COMPRESS		17
+#define COMPRESS		18
 #define COMPRESS_NAME		"compress"
+#define COMPRESS_DESC		"Lempel-Ziv compression"
 #define COMPRESS_ALGORITHM	0
 #define COMPRESS_UNDO		{"zcat"}
 #define COMPRESS_MAGIC		0x1f9d0000
 #define COMPRESS_MAGIC_MASK	0xffff0000
 
-#define GZIP			18
+#define GZIP			19
 #define GZIP_NAME		"gzip"
+#define GZIP_DESC		"gzip compression"
 #define GZIP_ALGORITHM		"-9"
 #define GZIP_UNDO		{"gunzip"},{"ratz","-c"}
 #define GZIP_MAGIC		0x1f8b0000
 #define GZIP_MAGIC_MASK		0xffff0000
 
-#define BZIP			19
+#define BZIP			20
 #define BZIP_NAME		"bzip2"
+#define BZIP_DESC		"bzip compression"
 #define BZIP_ALGORITHM		0
 #define BZIP_UNDO		{"bunzip2"}
 #define BZIP_MAGIC		0x425a6800
@@ -422,19 +457,23 @@ typedef struct Cab_s
  * delta pseudo formats -- DELTA is first
  */
 
-#define DELTA			20
+#define DELTA			21
 #define DELTA_NAME		"delta"
+#define DELTA_DESC		"vdelta difference/compression"
 #define DELTA_ALGORITHM		"94"
 
-#define DELTA_88		21
+#define DELTA_88		22
 #define DELTA_88_NAME		"delta88"
+#define DELTA_88_DESC		"delta88 difference/compression"
 #define DELTA_88_ALGORITHM	"88"
 
-#define DELTA_IGNORE		22
+#define DELTA_IGNORE		23
 #define DELTA_IGNORE_NAME	"ignore"
+#define DELTA_IGNORE_DESC	"ignore delta headers"
 
-#define DELTA_PATCH		23
+#define DELTA_PATCH		24
 #define DELTA_PATCH_NAME	"patch"
+#define DELTA_PATCH_DESC	"delta using standard archive formats"
 
 /*
  * format generic definitions
@@ -517,6 +556,7 @@ typedef struct Bio_s			/* buffered io info		*/
 	char*		next;		/* next char pointer		*/
 	char*		last;		/* last char+1 pointer		*/
 	char*		buffer;		/* io buffer			*/
+	off_t		buffersize;	/* buffer size			*/
 	off_t		count;		/* char transfer count		*/
 	off_t		offset;		/* volume offset		*/
 	off_t		size;		/* total size if seekable	*/
@@ -610,6 +650,7 @@ typedef struct Member_s			/* cached member info		*/
 typedef struct Format_s			/* format info			*/
 {
 	char*		name;		/* name				*/
+	char*		desc;		/* description			*/
 	unsigned long	regular;	/* default regular blocking	*/
 	unsigned long	special;	/* default special blocking	*/
 	int		align;		/* trailer alignment		*/

@@ -1080,7 +1080,7 @@ compile(char** argv, register struct Node* np)
 				 * set up cpio
 				 */
 
-				if ((fd = open(b, O_WRONLY|O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)) < 0)
+				if ((fd = open(b, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)) < 0)
 					error(3, "%s: cannot create", b);
 				ops[0] = PROC_FD_DUP(fd, 1, PROC_FD_PARENT|PROC_FD_CHILD);
 				ops[1] = 0;

@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: locale (AT&T Labs Research) 2001-08-11 $\n]"
+"[-?\n@(#)$Id: locale (AT&T Labs Research) 2001-09-07 $\n]"
 USAGE_LICENSE
 "[+NAME?locale - get locale-specific information]"
 "[+DESCRIPTION?\blocale\b writes information about the current locale to"
@@ -62,9 +62,8 @@ USAGE_LICENSE
 "	\aattributes\a. This is the default.]"
 "[c:category?List the category names for each operand on the standard output.]"
 "[e:element?The operands are interpreted as collation elements. Each element"
-"	name is listed on the standard output followed by a \btab\b character,"
-"	the character width, the \bstrxfrm\b(3) width, and the \bstrxfrm\b(3)"
-"	collation weights.]"
+"	name is listed on the standard output followed by a \btab\b character"
+"	and the space separated list of \bstrxfrm\b(3) collation weights.]"
 "[i:indent?Indent keyword output lines for readability.]"
 "[k:keyword?List the keyword name for each operand on the standard output.]"
 "[l:local?List the locale names returned by the local system \bsetlocale\b(3)."
@@ -73,10 +72,14 @@ USAGE_LICENSE
 "[q:qualified?List qualified locale names: \alanguage\a and \aterritory\a"
 "	as the two character ISO codes; default and non-default \acharset\a and"
 "	\aattributes\a.]"
+"[t:composite?List the composite value of LC_ALL on the standard output.]"
 "[u:undefined?List all undefined locale names on the standard output.]"
 "[v:verbose?List verbose locale names: \alanguage\a and \aterritory\a"
 "	as the long English strings; non-default \acharset\a and"
 "	\aattributes\a.]"
+"[x:transform?The operands are interpreted as strings. Each string is listed"
+"	on the standard output followed by a \btab\b character and the"
+"	space separated list of \bstrxfrm\b(3) collation weights.]"
 
 "\n"
 "\n[ name | name=value ... ]\n"
@@ -115,7 +118,7 @@ typedef struct Keyword_s
 	int		index;
 	int		type;
 	int		elements;
-	int		offset;
+	long		offset;
 	Dtlink_t	link;
 } Keyword_t;
 
@@ -129,7 +132,9 @@ typedef struct Keyword_s
 
 #define C			1
 #define I			4
+#define N			3
 #define S			0
+#define X			5
 
 #define CV_collate		1
 
@@ -270,60 +275,288 @@ typedef struct Keyword_s
 #define CV_thousands_sep	(-1)
 #endif
 
+#if _num__NL_ADDRESS_POSTAL_FMT
+#define CV_postal_fmt		_NL_ADDRESS_POSTAL_FMT
+#else
+#define CV_postal_fmt		(-1)
+#endif
+#if _num__NL_ADDRESS_COUNTRY_NAME
+#define CV_country_name		_NL_ADDRESS_COUNTRY_NAME
+#else
+#define CV_country_name		(-1)
+#endif
+#if _num__NL_ADDRESS_COUNTRY_POST
+#define CV_country_post		_NL_ADDRESS_COUNTRY_POST
+#else
+#define CV_country_post		(-1)
+#endif
+#if _num__NL_ADDRESS_COUNTRY_AB2
+#define CV_country_ab2		_NL_ADDRESS_COUNTRY_AB2
+#else
+#define CV_country_ab2		(-1)
+#endif
+#if _num__NL_ADDRESS_COUNTRY_AB3
+#define CV_country_ab3		_NL_ADDRESS_COUNTRY_AB3
+#else
+#define CV_country_ab3		(-1)
+#endif
+#if _num__NL_ADDRESS_COUNTRY_NUM
+#define CV_country_num		_NL_ADDRESS_COUNTRY_NUM
+#else
+#define CV_country_num		(-1)
+#endif
+#if _num__NL_ADDRESS_COUNTRY_CAR
+#define CV_country_car		_NL_ADDRESS_COUNTRY_CAR
+#else
+#define CV_country_car		(-1)
+#endif
+#if _num__NL_ADDRESS_COUNTRY_ISBN
+#define CV_country_isbn		_NL_ADDRESS_COUNTRY_ISBN
+#else
+#define CV_country_isbn		(-1)
+#endif
+#if _num__NL_ADDRESS_LANG_NAME
+#define CV_lang_name		_NL_ADDRESS_LANG_NAME
+#else
+#define CV_lang_name		(-1)
+#endif
+#if _num__NL_ADDRESS_LANG_AB
+#define CV_lang_ab		_NL_ADDRESS_LANG_AB
+#else
+#define CV_lang_ab		(-1)
+#endif
+#if _num__NL_ADDRESS_LANG_TERM
+#define CV_lang_term		_NL_ADDRESS_LANG_TERM
+#else
+#define CV_lang_term		(-1)
+#endif
+#if _num__NL_ADDRESS_LANG_LIB
+#define CV_lang_lib		_NL_ADDRESS_LANG_LIB
+#else
+#define CV_lang_lib		(-1)
+#endif
+
+#if _num__NL_IDENTIFICATION_TITLE
+#define CV_title		_NL_IDENTIFICATION_TITLE
+#else
+#define CV_title		(-1)
+#endif
+#if _num__NL_IDENTIFICATION_SOURCE
+#define CV_source		_NL_IDENTIFICATION_SOURCE
+#else
+#define CV_source		(-1)
+#endif
+#if _num__NL_IDENTIFICATION_ADDRESS
+#define CV_address		_NL_IDENTIFICATION_ADDRESS
+#else
+#define CV_address		(-1)
+#endif
+#if _num__NL_IDENTIFICATION_CONTACT
+#define CV_contact		_NL_IDENTIFICATION_CONTACT
+#else
+#define CV_contact		(-1)
+#endif
+#if _num__NL_IDENTIFICATION_EMAIL
+#define CV_email		_NL_IDENTIFICATION_EMAIL
+#else
+#define CV_email		(-1)
+#endif
+#if _num__NL_IDENTIFICATION_TEL
+#define CV_tel			_NL_IDENTIFICATION_TEL
+#else
+#define CV_tel			(-1)
+#endif
+#if _num__NL_IDENTIFICATION_FAX
+#define CV_fax			_NL_IDENTIFICATION_FAX
+#else
+#define CV_fax			(-1)
+#endif
+#if _num__NL_IDENTIFICATION_LANGUAGE
+#define CV_language		_NL_IDENTIFICATION_LANGUAGE
+#define T_language		N
+#else
+#define CV_language		(-2)
+#define T_language		X
+#endif
+#if _num__NL_IDENTIFICATION_TERRITORY
+#define CV_territory		_NL_IDENTIFICATION_TERRITORY
+#define T_territory		N
+#else
+#define CV_territory		(-3)
+#define T_territory		X
+#endif
+#if _num__NL_IDENTIFICATION_ATTRIBUTES
+#define CV_attributes		_NL_IDENTIFICATION_ATTRIBUTES
+#define T_attributes		N
+#else
+#define CV_attributes		(-4)
+#define T_attributes		X
+#endif
+#if _num__NL_IDENTIFICATION_REVISION
+#define CV_revision		_NL_IDENTIFICATION_REVISION
+#else
+#define CV_revision		(-1)
+#endif
+#if _num__NL_IDENTIFICATION_DATE
+#define CV_date			_NL_IDENTIFICATION_DATE
+#else
+#define CV_date			(-1)
+#endif
+
+#if _num__NL_MEASUREMENT_MEASUREMENT
+#define CV_measurement		_NL_MEASUREMENT_MEASUREMENT
+#else
+#define CV_measurement		(-1)
+#endif
+
+#if _num__NL_NAME_NAME_FMT
+#define CV_name_fmt		_NL_NAME_NAME_FMT
+#else
+#define CV_name_fmt		(-1)
+#endif
+#if _num__NL_NAME_NAME_MISS
+#define CV_name_miss		_NL_NAME_NAME_MISS
+#else
+#define CV_name_miss		(-1)
+#endif
+#if _num__NL_NAME_NAME_MR
+#define CV_name_mr		_NL_NAME_NAME_MR
+#else
+#define CV_name_mr		(-1)
+#endif
+#if _num__NL_NAME_NAME_MRS
+#define CV_name_mrs		_NL_NAME_NAME_MRS
+#else
+#define CV_name_mrs		(-1)
+#endif
+#if _num__NL_NAME_NAME_MS
+#define CV_name_ms		_NL_NAME_NAME_MS
+#else
+#define CV_name_ms		(-1)
+#endif
+
+#if _num__NL_PAPER_HEIGHT
+#define CV_height		_NL_PAPER_HEIGHT
+#else
+#define CV_height		(-1)
+#endif
+#if _num__NL_PAPER_WIDTH
+#define CV_width		_NL_PAPER_WIDTH
+#else
+#define CV_width		(-1)
+#endif
+
+#if _num__NL_TELEPHONE_TEL_INT_FMT
+#define CV_tel_int_fmt		_NL_TELEPHONE_TEL_INT_FMT
+#else
+#define CV_tel_int_fmt		(-1)
+#endif
+#if _num__NL_TELEPHONE_TEL_DOM_FMT
+#define CV_tel_dom_fmt		_NL_TELEPHONE_TEL_DOM_FMT
+#else
+#define CV_tel_dom_fmt		(-1)
+#endif
+#if _num__NL_TELEPHONE_INT_SELECT
+#define CV_int_select		_NL_TELEPHONE_INT_SELECT
+#else
+#define CV_int_select		(-1)
+#endif
+#if _num__NL_TELEPHONE_INT_PREFIX
+#define CV_int_prefix		_NL_TELEPHONE_INT_PREFIX
+#else
+#define CV_int_prefix		(-1)
+#endif
+
 #ifndef MB_CUR_MIN
 #define MB_CUR_MIN		1
 #endif
 
 static Keyword_t	keywords[] =
 {
-{"TEST",		TEST,    	S,1,0},
-{"collate",		AST_LC_COLLATE, S,1,CV_collate},
-{"charset",		AST_LC_CTYPE,   S,1,CV_charset},
-{"mb_cur_max",		AST_LC_CTYPE,   I,1,CV_mb_cur_max},
-{"mb_cur_min",		AST_LC_CTYPE,   I,1,CV_mb_cur_min},
-{"yesexpr",		AST_LC_MESSAGES,S,1,CV_yesexpr},
-{"noexpr",		AST_LC_MESSAGES,S,1,CV_noexpr},
-{"yesstr",		AST_LC_MESSAGES,S,1,CV_yesstr},
-{"nostr",		AST_LC_MESSAGES,S,1,CV_nostr},
-{"credit_sign",		AST_LC_MONETARY,S,1,CV_credit_sign},
-{"currency_symbol",	AST_LC_MONETARY,S,1,CV_currency_symbol},
-{"debit_sign",		AST_LC_MONETARY,S,1,CV_debit_sign},
-{"frac_digits",		AST_LC_MONETARY,C,1,CV_frac_digits},
-{"int_curr_symbol",	AST_LC_MONETARY,S,1,CV_int_curr_symbol},
-{"int_frac_digits",	AST_LC_MONETARY,C,1,CV_int_frac_digits},
-{"left_parenthesis",	AST_LC_MONETARY,S,1,CV_left_parenthesis},
-{"mon_decimal_point",	AST_LC_MONETARY,S,1,CV_mon_decimal_point},
-{"mon_grouping",	AST_LC_MONETARY,S,1,CV_mon_grouping},
-{"mon_thousands_sep",	AST_LC_MONETARY,S,1,CV_mon_thousands_sep},
-{"n_cs_precedes",	AST_LC_MONETARY,C,1,CV_n_cs_precedes},
-{"n_sep_by_space",	AST_LC_MONETARY,C,1,CV_n_sep_by_space},
-{"n_sign_posn",		AST_LC_MONETARY,C,1,CV_n_sign_posn},
-{"negative_sign",	AST_LC_MONETARY,S,1,CV_negative_sign},
-{"p_cs_precedes",	AST_LC_MONETARY,C,1,CV_p_cs_precedes},
-{"p_sep_by_space",	AST_LC_MONETARY,C,1,CV_p_sep_by_space},
-{"p_sign_posn",		AST_LC_MONETARY,C,1,CV_p_sign_posn},
-{"positive_sign",	AST_LC_MONETARY,S,1,CV_positive_sign},
-{"right_parenthesis",	AST_LC_MONETARY,S,1,CV_right_parenthesis},
-{"decimal_point",	AST_LC_NUMERIC, S,1,CV_decimal_point},
-{"grouping",		AST_LC_NUMERIC, S,1,CV_grouping},
-{"thousands_sep",	AST_LC_NUMERIC, S,1,CV_thousands_sep},
-{"abday",		AST_LC_TIME,    S,7,TM_DAY_ABBREV*sizeof(char*)},
-{"abmon",		AST_LC_TIME,    S,12,TM_MONTH_ABBREV*sizeof(char*)},
-{"alt_digits",		AST_LC_TIME,    S,10,TM_DIGITS*sizeof(char*)},
-{"am_pm",		AST_LC_TIME,    S,2,TM_MERIDIAN*sizeof(char*)},
-{"d_fmt",		AST_LC_TIME,    S,1,TM_DATE*sizeof(char*)},
-{"d_t_fmt",		AST_LC_TIME,    S,1,TM_DEFAULT*sizeof(char*)},
-{"day",			AST_LC_TIME,    S,7,TM_DAY*sizeof(char*)},
-{"era",			AST_LC_TIME,    S,1,TM_ERA*sizeof(char*)},
-{"era_d_fmt",		AST_LC_TIME,    S,1,TM_ERA_DATE*sizeof(char*)},
-{"era_d_t_fmt",		AST_LC_TIME,    S,1,TM_ERA_DEFAULT*sizeof(char*)},
-{"era_t_fmt",		AST_LC_TIME,    S,1,TM_ERA_TIME*sizeof(char*)},
-{"era_year",		AST_LC_TIME,    S,1,TM_ERA_YEAR*sizeof(char*)},
-{"m_d_old",		AST_LC_TIME,    S,1,TM_DISTANT*sizeof(char*)},
-{"m_d_recent",		AST_LC_TIME,    S,1,TM_RECENT*sizeof(char*)},
-{"mon",			AST_LC_TIME,    S,12,TM_MONTH*sizeof(char*)},
-{"t_fmt",		AST_LC_TIME,    S,1,TM_TIME*sizeof(char*)},
-{"t_fmt_ampm",		AST_LC_TIME,    S,1,TM_MERIDIAN_TIME*sizeof(char*)},
+{"TEST",		TEST,    	   S,1,0},
+{"postal_fmt",		AST_LC_ADDRESS,    N,1,CV_postal_fmt},
+{"country_name",	AST_LC_ADDRESS,    N,1,CV_country_name},
+{"country_post",	AST_LC_ADDRESS,    N,1,CV_country_post},
+{"country_ab2",		AST_LC_ADDRESS,    N,1,CV_country_ab2},
+{"country_ab3",		AST_LC_ADDRESS,    N,1,CV_country_ab3},
+{"country_num",		AST_LC_ADDRESS,    N,1,CV_country_num},
+{"country_car",		AST_LC_ADDRESS,    N,1,CV_country_car},
+{"country_isbn",	AST_LC_ADDRESS,    N,1,CV_country_isbn},
+{"lang_name",		AST_LC_ADDRESS,    N,1,CV_lang_name},
+{"lang_ab",		AST_LC_ADDRESS,    N,1,CV_lang_ab},
+{"lang_term",		AST_LC_ADDRESS,    N,1,CV_lang_term},
+{"lang_lib",		AST_LC_ADDRESS,    N,1,CV_lang_lib},
+{"collate",		AST_LC_COLLATE,    S,1,CV_collate},
+{"charset",		AST_LC_CTYPE,      S,1,CV_charset},
+{"mb_cur_max",		AST_LC_CTYPE,      I,1,CV_mb_cur_max},
+{"mb_cur_min",		AST_LC_CTYPE,      I,1,CV_mb_cur_min},
+{"title",		AST_LC_IDENTIFICATION,N,1,CV_title},
+{"source",		AST_LC_IDENTIFICATION,N,1,CV_source},
+{"address",		AST_LC_IDENTIFICATION,N,1,CV_address},
+{"contact",		AST_LC_IDENTIFICATION,N,1,CV_contact},
+{"email",		AST_LC_IDENTIFICATION,N,1,CV_email},
+{"tel",			AST_LC_IDENTIFICATION,N,1,CV_tel},
+{"fax",			AST_LC_IDENTIFICATION,N,1,CV_fax},
+{"language",		AST_LC_IDENTIFICATION,T_language,1,CV_language},
+{"territory",		AST_LC_IDENTIFICATION,T_territory,1,CV_territory},
+{"attributes",		AST_LC_IDENTIFICATION,T_attributes,1,CV_attributes},
+{"revision",		AST_LC_IDENTIFICATION,N,1,CV_revision},
+{"date",		AST_LC_IDENTIFICATION,N,1,CV_date},
+{"measurement",		AST_LC_MEASUREMENT,N,1,CV_measurement},
+{"yesexpr",		AST_LC_MESSAGES,   N,1,CV_yesexpr},
+{"noexpr",		AST_LC_MESSAGES,   N,1,CV_noexpr},
+{"yesstr",		AST_LC_MESSAGES,   N,1,CV_yesstr},
+{"nostr",		AST_LC_MESSAGES,   N,1,CV_nostr},
+{"credit_sign",		AST_LC_MONETARY,   S,1,CV_credit_sign},
+{"currency_symbol",	AST_LC_MONETARY,   S,1,CV_currency_symbol},
+{"debit_sign",		AST_LC_MONETARY,   S,1,CV_debit_sign},
+{"frac_digits",		AST_LC_MONETARY,   C,1,CV_frac_digits},
+{"int_curr_symbol",	AST_LC_MONETARY,   S,1,CV_int_curr_symbol},
+{"int_frac_digits",	AST_LC_MONETARY,   C,1,CV_int_frac_digits},
+{"left_parenthesis",	AST_LC_MONETARY,   S,1,CV_left_parenthesis},
+{"mon_decimal_point",	AST_LC_MONETARY,   S,1,CV_mon_decimal_point},
+{"mon_grouping",	AST_LC_MONETARY,   S,1,CV_mon_grouping},
+{"mon_thousands_sep",	AST_LC_MONETARY,   S,1,CV_mon_thousands_sep},
+{"n_cs_precedes",	AST_LC_MONETARY,   C,1,CV_n_cs_precedes},
+{"n_sep_by_space",	AST_LC_MONETARY,   C,1,CV_n_sep_by_space},
+{"n_sign_posn",		AST_LC_MONETARY,   C,1,CV_n_sign_posn},
+{"negative_sign",	AST_LC_MONETARY,   S,1,CV_negative_sign},
+{"p_cs_precedes",	AST_LC_MONETARY,   C,1,CV_p_cs_precedes},
+{"p_sep_by_space",	AST_LC_MONETARY,   C,1,CV_p_sep_by_space},
+{"p_sign_posn",		AST_LC_MONETARY,   C,1,CV_p_sign_posn},
+{"positive_sign",	AST_LC_MONETARY,   S,1,CV_positive_sign},
+{"right_parenthesis",	AST_LC_MONETARY,   S,1,CV_right_parenthesis},
+{"name_fmt",		AST_LC_NAME,       N,1,CV_name_fmt},
+{"name_miss",		AST_LC_NAME,       N,1,CV_name_miss},
+{"name_mr",		AST_LC_NAME,       N,1,CV_name_mr},
+{"name_mrs",		AST_LC_NAME,       N,1,CV_name_mrs},
+{"name_ms",		AST_LC_NAME,       N,1,CV_name_ms},
+{"decimal_point",	AST_LC_NUMERIC,    S,1,CV_decimal_point},
+{"grouping",		AST_LC_NUMERIC,    S,1,CV_grouping},
+{"thousands_sep",	AST_LC_NUMERIC,    S,1,CV_thousands_sep},
+{"height",		AST_LC_PAPER,      N,1,CV_height},
+{"width",		AST_LC_PAPER,      N,1,CV_width},
+{"tel_int_fmt",		AST_LC_TELEPHONE,  N,1,CV_tel_int_fmt},
+{"tel_dom_fmt",		AST_LC_TELEPHONE,  N,1,CV_tel_dom_fmt},
+{"int_select",		AST_LC_TELEPHONE,  N,1,CV_int_select},
+{"int_prefix",		AST_LC_TELEPHONE,  N,1,CV_int_prefix},
+{"abday",		AST_LC_TIME,       S,7,TM_DAY_ABBREV*sizeof(char*)},
+{"abmon",		AST_LC_TIME,       S,12,TM_MONTH_ABBREV*sizeof(char*)},
+{"alt_digits",		AST_LC_TIME,       S,10,TM_DIGITS*sizeof(char*)},
+{"am_pm",		AST_LC_TIME,       S,2,TM_MERIDIAN*sizeof(char*)},
+{"d_fmt",		AST_LC_TIME,       S,1,TM_DATE*sizeof(char*)},
+{"d_t_fmt",		AST_LC_TIME,       S,1,TM_DEFAULT*sizeof(char*)},
+{"day",			AST_LC_TIME,       S,7,TM_DAY*sizeof(char*)},
+{"era",			AST_LC_TIME,       S,1,TM_ERA*sizeof(char*)},
+{"era_d_fmt",		AST_LC_TIME,       S,1,TM_ERA_DATE*sizeof(char*)},
+{"era_d_t_fmt",		AST_LC_TIME,       S,1,TM_ERA_DEFAULT*sizeof(char*)},
+{"era_t_fmt",		AST_LC_TIME,       S,1,TM_ERA_TIME*sizeof(char*)},
+{"era_year",		AST_LC_TIME,       S,1,TM_ERA_YEAR*sizeof(char*)},
+{"m_d_old",		AST_LC_TIME,       S,1,TM_DISTANT*sizeof(char*)},
+{"m_d_recent",		AST_LC_TIME,       S,1,TM_RECENT*sizeof(char*)},
+{"mon",			AST_LC_TIME,       S,12,TM_MONTH*sizeof(char*)},
+{"t_fmt",		AST_LC_TIME,       S,1,TM_TIME*sizeof(char*)},
+{"t_fmt_ampm",		AST_LC_TIME,       S,1,TM_MERIDIAN_TIME*sizeof(char*)},
 };
 
 static struct State_s
@@ -332,10 +565,13 @@ static struct State_s
 	struct lconv*	conv;
 	Dt_t*		dict;
 	Dtdisc_t	disc;
+	int		all;
+	int		output;
+	int		sep;
 } state;
 
 /*
- * list the locale name(s) for lc accoding to flags
+ * list the locale name(s) for lc according to flags
  */
 
 static void
@@ -393,6 +629,7 @@ list_locale(Sfio_t* sp, Keyword_t* key, Lc_t* lc, unsigned int flags)
 static void
 number(Sfio_t* sp, register Keyword_t* key, int i, unsigned int flags)
 {
+	state.output = 1;
 	if (flags & LC_indent)
 		sfputc(sp, '\t');
 	if (flags & LC_keyword)
@@ -411,6 +648,7 @@ value(Sfio_t* sp, register const char* s, register unsigned int flags)
 	register int	c;
 	register int	u;
 
+	state.output = 1;
 	if (flags & LC_quote)
 		sfputc(sp, '"');
 	if (flags & LC_upper)
@@ -449,20 +687,34 @@ value(Sfio_t* sp, register const char* s, register unsigned int flags)
 static void
 string(Sfio_t* sp, register Keyword_t* key, char** v, int n, unsigned int flags)
 {
-	char**	e = v + n - 1;
+	char**					e;
+	register const Lc_attribute_list_t*	a;
 
 	if (flags & LC_indent)
 		sfputc(sp, '\t');
 	if (flags & LC_keyword)
 		sfprintf(sp, "%s=", key->name);
-	if ((flags & LC_keyword) || v < e)
+	if ((flags & LC_keyword) || n != 1)
 		flags |= LC_quote;
-	value(sp, *v, flags);
-	flags |= LC_quote;
-	while (v++ < e)
+	if (n)
 	{
-		sfputc(sp, ';');
 		value(sp, *v, flags);
+		flags |= LC_quote;
+		e = v + n - 1;
+		while (v++ < e)
+		{
+			sfputc(sp, ';');
+			value(sp, *v, flags);
+		}
+	}
+	else if (v && (a = *((Lc_attribute_list_t**)v)))
+	{
+		value(sp, a->attribute->name, flags);
+		while (a = a->next)
+		{
+			sfputc(sp, ';');
+			value(sp, a->attribute->name, flags);
+		}
 	}
 	sfputc(sp, '\n');
 }
@@ -477,6 +729,7 @@ extract(Sfio_t* sp, register Keyword_t* key, void* data, unsigned int flags)
 	register int	i;
 	char*		s;
 	char**		v;
+	Lc_t*		lc;
 
 	switch (key->type)
 	{
@@ -496,6 +749,35 @@ extract(Sfio_t* sp, register Keyword_t* key, void* data, unsigned int flags)
 			i = -1;
 		number(sp, key, i, flags);
 		break;
+	case N:
+#if _lib_nl_langinfo
+		if (key->offset >= 0)
+		{
+			s = nl_langinfo(key->offset);
+
+#if _num__NL_PAPER_HEIGHT
+
+			/*
+			 * redhat decided to change the nl_langinfo()
+			 * return value after umpteen years of stability
+			 * to optionally return an int for some numeric
+			 * values -- botch botch botch
+			 */
+
+			if (((unsigned int)s) < 8196)
+			{
+				static char	xxx[32];
+
+				sfsprintf(xxx, sizeof(xxx), "%d", (unsigned int)s);
+				s = xxx;
+			}
+#endif
+		}
+		else
+#endif
+			s = "";
+		string(sp, key, &s, 1, flags);
+		break;
 	case S:
 		if (key->offset >= 0)
 		{
@@ -510,6 +792,28 @@ extract(Sfio_t* sp, register Keyword_t* key, void* data, unsigned int flags)
 		}
 		string(sp, key, v, i, flags);
 		break;
+	case X:
+		lc = (Lc_t*)lcinfo(state.categories[key->index].external)->lc;
+		i = 1;
+		if (key->offset == CV_language && lc->language)
+		{
+			s = (char*)lc->language->name;
+			flags |= LC_proper;
+		}
+		else if (key->offset == CV_territory && lc->territory)
+		{
+			s = (char*)lc->territory->name;
+			flags |= LC_proper;
+		}
+		else if (key->offset == CV_attributes && lc->attributes)
+		{
+			s = (char*)lc->attributes;
+			i = 0;
+		}
+		else
+			s = "";
+		string(sp, key, &s, i, flags);
+		break;
 	}
 }
 
@@ -520,14 +824,10 @@ extract(Sfio_t* sp, register Keyword_t* key, void* data, unsigned int flags)
 static void
 list_all(Sfio_t* sp, register Lc_t* lc, unsigned long flags)
 {
-	register const Lc_attribute_list_t*	ap;
-
-	static int				sep;
-	
 	if (!lc)
 		lc = (Lc_t*)lcinfo(LC_CTYPE)->lc;
-	if (!sep)
-		sep = 1;
+	if (!state.sep)
+		state.sep = 1;
 	else
 		sfputc(sp, '\n');
 	if (flags & LC_category)
@@ -541,37 +841,6 @@ list_all(Sfio_t* sp, register Lc_t* lc, unsigned long flags)
 	}
 	value(sp, lc->name, flags);
 	sfputc(sp, '\n');
-	if (lc->language)
-	{
-		if (flags & LC_indent)
-			sfputc(sp, '\t');
-		if (flags & LC_keyword)
-			sfprintf(sp, "language=");
-		value(sp, lc->language->name, flags|LC_proper);
-		sfputc(sp, '\n');
-	}
-	if (flags & LC_indent)
-		sfputc(sp, '\t');
-	if (flags & LC_keyword)
-		sfprintf(sp, "territory=");
-	value(sp, lc->territory->name, flags|LC_proper);
-	sfputc(sp, '\n');
-	if (ap = lc->attributes)
-	{
-		if (flags & LC_indent)
-			sfputc(sp, '\t');
-		if (flags & LC_keyword)
-			sfprintf(sp, "attributes=");
-		else if (ap->next)
-			flags |= LC_quote;
-		value(sp, ap->attribute->name, flags);
-		while (ap = ap->next)
-		{
-			sfputc(sp, ';');
-			value(sp, ap->attribute->name, flags);
-		}
-		sfputc(sp, '\n');
-	}
 }
 
 static int	scan(Sfio_t*, Keyword_t*, unsigned long);
@@ -584,6 +853,7 @@ static void
 list_keyword(Sfio_t* sp, register Keyword_t* key, char* value, unsigned int flags)
 {
 	register int		i;
+	register int		j;
 	register int		n;
 	register unsigned int	f;
 	char*			s;
@@ -611,21 +881,19 @@ list_keyword(Sfio_t* sp, register Keyword_t* key, char* value, unsigned int flag
 			break;
 		}
 		break;
-	case AST_LC_MESSAGES:
-#if _lib_nl_langinfo
-		if (key->offset >= 0)
-			s = nl_langinfo(key->offset);
-		else
-#endif
-			s = "";
-		string(sp, key, &s, 1, flags);
-		break;
 	case AST_LC_MONETARY:
 	case AST_LC_NUMERIC:
 		if (!state.conv)
 			state.conv = localeconv();
 		extract(sp, key, state.conv, flags);
 		break;
+	case AST_LC_ADDRESS:
+	case AST_LC_IDENTIFICATION:
+	case AST_LC_MEASUREMENT:
+	case AST_LC_MESSAGES:
+	case AST_LC_NAME:
+	case AST_LC_PAPER:
+	case AST_LC_TELEPHONE:
 	case AST_LC_TIME:
 		extract(sp, key, tmlocale(), flags);
 		break;
@@ -642,6 +910,7 @@ list_keyword(Sfio_t* sp, register Keyword_t* key, char* value, unsigned int flag
 		{
 			if (key->type == AST_LC_ALL)
 			{
+				state.all = 1;
 				if ((flags & (LC_defined|LC_recursive)) == LC_defined)
 				{
 					scan(sp, key, flags|LC_recursive);
@@ -652,21 +921,22 @@ list_keyword(Sfio_t* sp, register Keyword_t* key, char* value, unsigned int flag
 			}
 			else
 				i = n = key->type;
-			if (flags & (LC_category|LC_defined|LC_keyword))
+			if (state.all)
 				list_all(sp, NiL, flags);
 			for (; i <= n; i++)
 			{
 				f = flags;
-				for (key = (Keyword_t*)dtfirst(state.dict); key; key = (Keyword_t*)dtnext(state.dict, key))
-					if (key->index == i)
+				for (j = 0; j < elementsof(keywords); j++)
+					if (keywords[j].index == i)
 					{
-						list_keyword(sp, key, NiL, f);
+						list_keyword(sp, &keywords[j], NiL, f);
 						f &= ~LC_category;
 					}
 			}
 		}
 		break;
 	case TEST:
+		state.output = 1;
 		if (!value)
 			error(2, "%s: value expected", key->name);
 		else
@@ -716,15 +986,20 @@ main(int argc, char** argv)
 	register int		i;
 	register unsigned int	flags;
 	int			collate;
+	int			composite;
+	int			transform;
+	int			j;
 	char*			value;
 	Keyword_t*		key;
 	char			buf[64];
-	char			col[64];
+	char			col[1024];
 	char			dip[64];
 
 	error_info.id = "locale";
 	flags = 0;
 	collate = 0;
+	composite = 0;
+	transform = 0;
 	for (;;)
 	{
 		switch (optget(argv, usage))
@@ -755,11 +1030,17 @@ main(int argc, char** argv)
 		case 'q':
 			flags |= LC_qualified;
 			continue;
+		case 't':
+			composite = 1;
+			continue;
 		case 'u':
 			flags |= LC_undefined;
 			continue;
 		case 'v':
 			flags |= LC_verbose;
+			continue;
+		case 'x':
+			transform = 1;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -777,18 +1058,18 @@ main(int argc, char** argv)
 	{
 		while (name = *argv++)
 		{
-			sfprintf(sfstdout, "%s\t", name);
+			sfprintf(sfstdout, "%s", name);
 			sfsprintf(col, sizeof(col), ".%s.]", name);
 			if ((i = regcollate(col, NiL, buf, sizeof(buf))) < 0)
 			{
-				sfprintf(sfstdout, "ERROR\n");
+				sfprintf(sfstdout, "\tERROR\n");
 				continue;
 			}
 			if (!(collate = mbxfrm(col, buf, sizeof(col))))
 			{
 				if (i > 1)
 				{
-					sfprintf(sfstdout, "INVALID\n");
+					sfprintf(sfstdout, "\tINVALID\n");
 					continue;
 				}
 				collate = i;
@@ -797,15 +1078,31 @@ main(int argc, char** argv)
 			else if (i > 1)
 			{
 				buf[1] = 0;
-				if (mbxfrm(dip, buf, sizeof(dip)) != collate)
+				if (mbxfrm(dip, buf, sizeof(dip)) < collate)
 				{
-					sfprintf(sfstdout, "UNDEFINED\n");
+					sfprintf(sfstdout, "\tUNDEFINED\n");
 					continue;
 				}
 			}
-			sfprintf(sfstdout, "%d %d", i, collate);
-			for (i = 0; i < collate; i++)
-				sfprintf(sfstdout, " %02x", ((unsigned char*)col)[i]);
+			for (i = 0, j = '\t'; i < collate; i++, j = ' ')
+				sfprintf(sfstdout, "%c%02x", j, ((unsigned char*)col)[i]);
+			sfputc(sfstdout, '\n');
+		}
+		return error_info.errors != 0;
+	}
+	if (composite)
+	{
+		sfprintf(sfstdout, "%s\n", setlocale(LC_ALL, NiL));
+		return error_info.errors != 0;
+	}
+	if (transform)
+	{
+		while (name = *argv++)
+		{
+			sfprintf(sfstdout, "%s", name);
+			collate = mbxfrm(col, name, sizeof(col));
+			for (i = 0, j = '\t'; i < collate; i++, j = ' ')
+				sfprintf(sfstdout, "%c%02x", j, ((unsigned char*)col)[i]);
 			sfputc(sfstdout, '\n');
 		}
 		return error_info.errors != 0;
@@ -873,5 +1170,7 @@ main(int argc, char** argv)
 		else
 			list_keyword(sfstdout, key, value, flags);
 	}
+	if (!state.output)
+		list_keyword(sfstdout, (Keyword_t*)dtmatch(state.dict, state.categories[0].name), NiL, flags);
 	return error_info.errors != 0;
 }

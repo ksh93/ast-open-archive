@@ -1,3 +1,12 @@
+01-10-18 testmatch.c,testre.c: all test failure messages contain the text `fail'
+01-10-17 testre.dat: add []{}() imbalance tests
+01-10-05 testglob.c: update --help, add GLOB_LIST and GLOB_STACK tests
+	 testglob.dat: add a few more tests
+01-10-03 testmatch.dat: add ancc cc trigraph prone patterns
+01-09-11 ed: fix t command bug, add regression test
+	 ed: fix RE error intercept via REG_DISCIPLINE errorf
+01-09-06 testfnmatch,testmatch: add --help
+01-09-04 testre: update test data
 01-06-11 testre: handle embedded \0 in subject string, add \0 tests
 01-05-24 testre: add (?{...}) test support
 01-05-22 testre: add regsub() tests, testsub.dat

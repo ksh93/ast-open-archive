@@ -27,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ed (AT&T Labs Research) 1999-08-11 $\n]"
+"[-?\n@(#)$Id: ed (AT&T Labs Research) 2001-09-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ed - edit text]"
 "[+DESCRIPTION?\bed\b is a line-oriented text editor that has two modes:"
@@ -105,6 +105,7 @@ USAGE_LICENSE
 #define SWP(a,b)	(ed.swp=(a),(a)=(b),(b)=ed.swp)
 
 #define error		fatal
+#define errorf		fatalf
 #define trap()		do{if(ed.caught)handle();}while(0);
 
 
@@ -178,6 +179,7 @@ static struct		/* program state -- no other dynamic globals */
 	off_t		marks[MARK_MAX - MARK_MIN + 1];
 	off_t		tmpoff;
 	regex_t		re;
+	regdisc_t	redisc;
 	regmatch_t	match[MATCH_MAX - MATCH_MIN + 1];
 	unsigned long	all;
 	unsigned long	bytes;
@@ -234,15 +236,10 @@ helpwrite(int fd, const void* buf, size_t len)
 }
 
 static void
-error(int level, ...)
+reset(int level)
 {
-	va_list		ap;
 	register int	c;
 
-	trap();
-	va_start(ap, level);
-	errorv(NiL, level, ap);
-	va_end(ap);
 	if (level >= 2) {
 		if (ed.iop) {
 			sfclose(ed.iop);
@@ -267,6 +264,31 @@ error(int level, ...)
 }
 
 static void
+error(int level, ...)
+{
+	va_list		ap;
+
+	trap();
+	va_start(ap, level);
+	errorv(NiL, level, ap);
+	va_end(ap);
+	reset(level);
+}
+
+static int
+errorf(const regex_t* re, regdisc_t* disc, int level, ...)
+{
+	va_list		ap;
+
+	trap();
+	va_start(ap, level);
+	errorv(NiL, level, ap);
+	va_end(ap);
+	reset(level);
+	return 0;
+}
+
+static void
 init(void)
 {
 	register Sfio_t**	ss;
@@ -276,8 +298,12 @@ init(void)
 	ed.msg = sfstdout;
 	ed.all = BLOCK_LINE;
 	ed.page.size = BREAK_PAGE;
+	ed.redisc.re_version = REG_VERSION;
+	ed.redisc.re_errorf = errorf;
+	ed.re.re_disc = &ed.redisc;
+	ed.reflags = REG_DISCIPLINE;
 	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
-		ed.reflags = REG_LENIENT;
+		ed.reflags |= REG_LENIENT;
 	ed.verbose = 1;
 	for (c = 0; c < elementsof(signals); c++)
 		if (signal(signals[c], interrupt) == SIG_IGN)
@@ -1424,7 +1450,8 @@ move(int cflag)
 		error(2, "invalid move destination");
 	newline();
 	if (cflag) {
-		ad1 = append(getcopy, ed.dol + 1, &adt) + 1;
+		ad1 = ed.dol + 1;
+		append(getcopy, ed.dol, NiL);
 		ad2 = ed.dol;
 	}
 	else {

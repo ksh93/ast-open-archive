@@ -25,16 +25,10 @@
 
 /*
  * fnmatch(3) test harness
- *
- * testfnmatch [ options ] < testmatch.dat
- *
- *	-c	catch signals and non-terminating calls
- *	-v	list each test line
- *
- * see testre --help for a description of the input format
+ * see testfnmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2001-06-11 $\0\n";
+static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2001-09-06 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -65,6 +59,79 @@ static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2001-06-11 $\0\
 #define NiL		(char*)0
 #endif
 #endif
+
+#define H(x)		fprintf(stderr,x)
+
+static void
+help(void)
+{
+H("NAME\n");
+H("  testfnmatch - fnmatch(3) test harness\n");
+H("\n");
+H("SYNOPSIS\n");
+H("  testfnmatch [ options ] < testfnmatch.dat\n");
+H("\n");
+H("DESCRIPTION\n");
+H("  testfnmatch reads fnmatch(3) test specifications, one per line, from\n");
+H("  the standard input and writes one output line for each failed test. A\n");
+H("  summary line is written after all tests are done. Unsupported features\n");
+H("  are noted before the first test, and tests requiring these features\n");
+H("  are silently ignored.\n");
+H("\n");
+H("OPTIONS\n");
+H("  -c	catch signals and non-terminating calls\n");
+H("  -h	list help\n");
+H("  -v	list each test line\n");
+H("\n");
+H("INPUT FORMAT\n");
+H("  Input lines may be blank, a comment beginning with #, or a test\n");
+H("  specification. A specification is five fields separated by one\n");
+H("  or more tabs. NULL denotes the empty string and NIL denotes the\n");
+H("  0 pointer.\n");
+H("\n");
+H("  Field 1: the regex(3) flags to apply, one character per FNM_feature\n");
+H("  flag. The test is skipped if FNM_feature is not supported by the\n");
+H("  implementation. If the first character is not [SK] then the\n");
+H("  specification is a global control line. Specifications containing\n");
+H("  testre(1T) flags are silently ignored.\n");
+H("\n");
+H("    S	0			SRE	(basic sh glob)\n");
+H("    K	FNM_AUGMENTED		KRE	(ksh glob)\n");
+H("\n");
+H("    d	FNM_PERIOD		explicit leading . match\n");
+H("    g	FNM_LEADING_DIR		testfnmatch only -- match until /\n");
+H("    i	FNM_ICASE		ignore case\n");
+H("    p	FNM_PATHNAME		explicit / match\n");
+H("    s	FNM_NOESCAPE		\\ not special\n");
+H("    u	standard unspecified behavior -- errors not counted\n");
+H("    $	                        expand C \\c escapes in fields 2 and 3\n");
+H("\n");
+H("  Field 1 control lines:\n");
+H("\n");
+H("    C	set LC_COLLATE and LC_CTYPE to locale in field 2\n");
+H("\n");
+H("    {				silent skip if failed until }\n");
+H("    }				end of skip\n");
+H("\n");
+H("    : comment			comment copied to output\n");
+H("\n");
+H("    number			use number for nmatch (20 by default)\n");
+H("\n");
+H("  Field 2: the fnmatch pattern; SAME uses the pattern from the\n");
+H("    previous specification.\n");
+H("\n");
+H("  Field 3: the string to match.\n");
+H("\n");
+H("  Field 4: the test outcome. This is either OK, NOMATCH, or a testre(1T)\n");
+H("    style match list of (m,n) entries that is interpreted as OK.\n");
+H("\n");
+H("  Field 5: optional comment appended to the report.\n");
+H("\n");
+H("CONTRIBUTORS\n");
+H("  Glenn Fowler <gsf@research.att.com> (ksh strmatch, regex extensions)\n");
+H("  David Korn <dgk@research.att.com> (ksh glob matcher)\n");
+H("  glibc contributors (fnmatch tests)\n");
+}
 
 #ifndef elementsof
 #define elementsof(x)	(sizeof(x)/sizeof(x[0]))
@@ -411,6 +478,12 @@ main(int argc, char** argv)
 				catch = 1;
 				printf(", catch");
 				continue;
+			case 'h':
+			case '?':
+			case '-':
+				printf(", help\n\n");
+				help();
+				return 2;
 			case 'v':
 				verbose = 1;
 				printf(", verbose");
@@ -559,8 +632,17 @@ main(int argc, char** argv)
 			case 'g':
 				eflags |= FNM_LEADING_DIR;
 				continue;
+			case 'h':
+				cflags = NOTEST;
+				continue;
 			case 'i':
 				eflags |= FNM_ICASE;
+				continue;
+			case 'j':
+				cflags = NOTEST;
+				continue;
+			case 'k':
+				cflags = NOTEST;
 				continue;
 			case 'l':
 				eflags = NOTEST;
@@ -592,6 +674,9 @@ main(int argc, char** argv)
 
 			case '$':
 				expand = 1;
+				continue;
+			case '/':
+				cflags = NOTEST;
 				continue;
 
 			case '{':

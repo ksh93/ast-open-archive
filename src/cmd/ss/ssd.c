@@ -339,7 +339,7 @@ main(int argc, char** argv)
 		for (;;) update(data, 0, CS_STAT_FREQ + (CS_STAT_DOWN - CS_STAT_FREQ) / 2, &ss);
 	}
 	remove(data);
-	if ((n = open(data, O_WRONLY|O_CREAT|O_TRUNC, 0)) < 0)
+	if ((n = open(data, O_WRONLY|O_CREAT|O_TRUNC|O_BINARY, 0)) < 0)
 		error(ERROR_SYSTEM|3, "%s: cannot update", data);
 	for (i = 0; i < elementsof(usrfiles); i++)
 		if ((uf = open(usrfile = usrfiles[i], O_RDONLY)) >= 0) break;

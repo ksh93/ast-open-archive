@@ -1060,7 +1060,7 @@ load(Expr_t* prog, register File_t* f, Exid_t* sym)
 			m = st.st_size;
 			if (!(s = oldof(0, char, m + 2, 0)))
 				error(3, "out of space [data]");
-			if ((n = open(f->name, O_RDONLY)) < 0)
+			if ((n = open(f->name, O_RDONLY|O_BINARY)) < 0)
 				error(ERROR_SYSTEM|3, "%s: cannot read", f->name);
 			if ((k = read(n, s, m)) < 0)
 				error(ERROR_SYSTEM|3, "%s: read error", f->name);

@@ -541,6 +541,7 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 	off_t		cc;
 	FILE*		ip;
 	FILE*		op;
+	struct stat	st;
 
 	if (name == ap->name) {
 		cmd = 0;
@@ -553,6 +554,17 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 	}
 	else if (!(cmd = iscmd(name)) && !(name = expand(name, 1)))
 		return 1;
+	if (!stat(name, &st) && S_ISDIR(st.st_mode)) {
+		if (s = strrchr(ap->name, '/'))
+			s++;
+		else
+			s = ap->name;
+		if (!streq(name, ".")) {
+			sprintf(state.path.temp, "%s/%s", name, s);
+			s = state.path.temp;
+		}
+		name = savestr(s);
+	}
 	if (!ap->code[0] && mimeview(state.part.mime, "encoding", name, ap->type, ap->opts))
 		strncpy(ap->code, ap->type, sizeof(ap->code) - 1);
 	if (ap->code[0] && !isdigit(ap->code[0])) {

@@ -28,7 +28,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testre (AT&T Research) 2001-06-19 $\0\n";
+static const char id[] = "\n@(#)$Id: testre (AT&T Research) 2001-10-18 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -187,7 +187,7 @@ H("\n");
 H("    number			use number for nmatch (20 by default)\n");
 H("\n");
 H("  Field 2: the regular expression pattern; SAME uses the pattern from\n");
-H("    the previous specifications.\n");
+H("    the previous specification.\n");
 H("\n");
 H("  Field 3: the string to match.\n");
 H("\n");
@@ -757,7 +757,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 			x = sfstruse(state.disc.sp);
 			if (strcmp(p, x))
 			{
-				report("callout error: ", NiL, re, s, len, NiL, flags, unspecified, expand);
+				report("callout failed: ", NiL, re, s, len, NiL, flags, unspecified, expand);
 				quote(p, -1, expand);
 				printf(" expected, ");
 				quote(x, -1, expand);
@@ -790,7 +790,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 		{
 			if (!query)
 			{
-				report("match was: ", NiL, re, s, len, NiL, flags, unspecified, expand);
+				report("failed: match was: ", NiL, re, s, len, NiL, flags, unspecified, expand);
 				matchprint(match, nmatch);
 			}
 			return 0;
@@ -807,7 +807,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 					state.ignore.count++;
 					return 0;
 				}
-				report("match was: ", NiL, re, s, len, NiL, flags, unspecified, expand);
+				report("failed: match was: ", NiL, re, s, len, NiL, flags, unspecified, expand);
 				matchprint(match, nmatch);
 			}
 			return 0;
@@ -815,7 +815,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 	}
 	if (match[nmatch].rm_so != state.NOMATCH.rm_so)
 	{
-		report("overran match array: ", NiL, re, s, len, NiL, flags, unspecified, expand);
+		report("failed: overran match array: ", NiL, re, s, len, NiL, flags, unspecified, expand);
 		matchprint(match, nmatch + 1);
 	}
 	return 1;
@@ -1507,7 +1507,7 @@ main(int argc, char** argv)
 						skip = note(level, skip, msg);
 					else
 					{
-						report("invalid error code: ", NiL, re, NiL, -1, msg, flags, unspecified, expand);
+						report("failed: invalid error code: ", NiL, re, NiL, -1, msg, flags, unspecified, expand);
 						printf("%s expected, %s returned\n", ans, codes[got].name);
 					}
 				}
@@ -1642,7 +1642,7 @@ main(int argc, char** argv)
 					skip = note(level, skip, msg);
 				else
 				{
-					report("no match but match array assigned: ", NiL, re, s, nstr, msg, flags, unspecified, expand);
+					report("failed: no match but match array assigned: ", NiL, re, s, nstr, msg, flags, unspecified, expand);
 					matchprint(match, nmatch);
 				}
 			}

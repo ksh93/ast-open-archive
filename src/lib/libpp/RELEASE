@@ -1,3 +1,5 @@
+01-09-11 ppinput.c: use pathnative() for native fs representation
+01-08-31 pp.probe: handle -Dmacro(args)=value
 01-08-11 ppcontrol: fix ... and __VAR_ARGS__ for C99
 	 ppsearch: fix SEARCH_NEXT bug that skipped the include stack
 01-08-06 ppproto: preserve #! first line for # comments

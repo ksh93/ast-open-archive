@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-08-11 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-10-20 $"
 
 /*
  * handy attributes
@@ -129,7 +129,7 @@ output = $(PWD:M=.*[0-9]\.[0-9]:?$$(PWD:B:S:/-*\([0-9]\.[0-9]\)/-\1/)?$$(VERSION
 package_local = win32.*
 physical =
 prefixinclude = 1
-preserve = $(CC.SUFFIX.SHARED:?lib*$(CC.SUFFIX.SHARED).*??)
+preserve = $(CC.SUFFIX.SHARED:?$(CC.PREFIX.SHARED)*$(CC.SUFFIX.SHARED).*??)|$(CC.SUFFIX.DYNAMIC:?$(CC.PREFIX.DYNAMIC)*$(CC.SUFFIX.DYNAMIC)??)
 profile =
 recurse = 1
 recurse_enter =
@@ -210,7 +210,7 @@ else
 AWK = awk
 end
 BISON = bison
-BISONFLAGS = -y
+BISONFLAGS = -d
 cc = cc
 CC = cc
 CCFLAGS = -O
@@ -233,7 +233,11 @@ end
 
 DIFF = diff
 DIFFFLAGS = -u
+if ! "$(PATH:/:/ /G:X=ed:P=X)" && "$(PATH:/:/ /G:X=ex:P=X)"
+ED = ex
+else
 ED = ed
+end
 EDFLAGS = -
 EGREP = egrep
 F77 = f77
@@ -293,7 +297,7 @@ else
 NAWK = awk
 end
 NM = $(CC.NM)
-NMEDIT = $(CC.NMEDIT) -e '/^$(CC.SYMPREFIX)_STUB_/d' -e '/$(CC.SYMPREFIX)_already_defined$/d'
+NMEDIT = $(CC.NMEDIT) -e '/^$(CC.PREFIX.SYMBOL)_STUB_/d' -e '/$(CC.PREFIX.SYMBOL)_already_defined$/d'
 NMFLAGS = $(CC.NMFLAGS)
 PACKAGE =
 PACKAGE_PATH = $(PACKAGE)
@@ -312,6 +316,7 @@ RM = rm
 RMFLAGS = -f
 SED = sed
 SHAR = shar
+SHELLMAGIC = $(CC.SHELLMAGIC)
 SILENT = silent
 SORT = sort
 STRIP = $(CC.STRIP)
@@ -325,8 +330,13 @@ if "$(PATH:/:/ /G:X=vgrind:P=X)"
 VGRIND = vgrind
 end
 
+if ! "$(PATH:/:/ /G:X=yacc:P=X)" && "$(PATH:/:/ /G:X=bison:P=X)"
+YACC = $(BISON)
+YACCFLAGS = -y $(BISONFLAGS)
+else
 YACC = yacc
 YACCFLAGS = -d
+end
 
 /*
  * special symbols
@@ -335,7 +345,7 @@ YACCFLAGS = -d
 .BUILT. = $(...:T=XU:T=F:P=L:N!=/*$(.INSTALL.LIST.:@/ /|/G:/^./|&/)$(VROOT:?|$(VROOT)/*??)$(-global:@/:/|/G:/^./|&/):T=G)
 .CLOBBER. = $(".":L=*.([it]i|l[hn])) core
 .MANIFEST.FILES. = $(*.COMMON.SAVE:T=F) $(.SELECT.:A!=.ARCHIVE|.COMMAND|.OBJECT)
-.MANIFEST. = $(.MANIFEST.FILES.:$(.RWD.:?C,^,$(.RWD.)/,??):P=C:H!)
+.MANIFEST. = $(.MANIFEST.FILES.:$(.RECURSE.OFFSET.:?C,^\([^/]\),$(.RECURSE.OFFSET.)/\1,??):P=C:H!)
 .SOURCES. = $(.SELECT.:A=.REGULAR:A!=.ARCHIVE|.COMMAND|.OBJECT)
 
 /*
@@ -345,7 +355,7 @@ YACCFLAGS = -d
 (AR) (ARFLAGS) (AS) (ASFLAGS) (CPP) (CC) (CCFLAGS) (CCLD) \
 	(CCLDFLAGS) (COATTRIBUTES) (F77) (F77FLAGS) (IFFE) \
 	(IFFEFLAGS) (LD) (LDFLAGS) (LDLIBRARIES) (LEX) (LEXFLAGS) \
-	(M4) (M4FLAGS) (YACC) (YACCFLAGS) : .PARAMETER
+	(M4) (M4FLAGS) (SHELLMAGIC) (YACC) (YACCFLAGS) : .PARAMETER
 
 /*
  * mark actions that operate on built objects
@@ -379,7 +389,7 @@ include "Scanrules.mk"
 		if "$(.SHARED.DEF.:A=.TARGET)"
 			L := $($(.SHARED.DEF.) - $(%))
 		else
-			L := lib$(%:O=1)$(CC.SUFFIX.SHARED)
+			L := $(CC.PREFIX.SHARED)$(%:O=1)$(CC.SUFFIX.SHARED)
 			if "$(%:O=2)" == "[0-9]*"
 				L := $(L).$(%:O=2)
 			end
@@ -388,7 +398,7 @@ include "Scanrules.mk"
 	return $(L)
 
 .LIB.NAME. : .FUNCTION .PROBE.INIT
-	return lib$(%:O=1)$(CC.LIB.TYPE:O=1)$(CC.SUFFIX.ARCHIVE)
+	return $(CC.PREFIX.ARCHIVE)$(%:O=1)$(CC.LIB.TYPE:O=1)$(CC.SUFFIX.ARCHIVE)
 
 /*
  * bind overrides
@@ -403,11 +413,11 @@ include "Scanrules.mk"
 	if ! .NO.ARPROFILE
 		for P $(CC.LIB.TYPE)
 			/* libX-P.a or libX_P.a or libP/libX.a */
-			T := lib$(%)$(P)$(CC.SUFFIX.ARCHIVE)
+			T := $(CC.PREFIX.ARCHIVE)$(%)$(P)$(CC.SUFFIX.ARCHIVE)
 			if ! "$(T:A=.TARGET)" && ! "$(T:T=F)"
-				T := lib$(%)(P:/-/_/)$(CC.SUFFIX.ARCHIVE)
+				T := $(CC.PREFIX.ARCHIVE)$(%)(P:/-/_/)$(CC.SUFFIX.ARCHIVE)
 				if ! "$(T:A=.TARGET)" && ! "$(T:T=F)"
-					T := lib$(P:/-//)/lib$(%)$(CC.SUFFIX.ARCHIVE)
+					T := lib$(P:/-//)/$(CC.PREFIX.ARCHIVE)$(%)$(CC.SUFFIX.ARCHIVE)
 				end
 			end
 			if "$(T:A=.TARGET)" || "$(T:T=F)"
@@ -419,7 +429,7 @@ include "Scanrules.mk"
 .BIND.+l% : .FUNCTION
 	local A B L
 	B := $(%:/+l//)
-	A := lib$(B)$(CC.SUFFIX.ARCHIVE)
+	A := $(CC.PREFIX.ARCHIVE)$(B)$(CC.SUFFIX.ARCHIVE)
 	if "$(-mam:N=static*,port*)"
 		if L = "$(A:A=.TARGET)"
 			return $(L)
@@ -436,7 +446,7 @@ include "Scanrules.mk"
 	if ( L = "$(A:A=.TARGET)" )
 		return $(L)
 	end
-	if ! "$(MAKERULES_DEBUG)" && "$(.PACKAGE.$(B).library)" != "-l"
+	if ! "$(.LIBRARY.LIST.)" || "$(.PACKAGE.$(B).library)" != "-l"
 		if ( L = "$(A:T=F)" )
 			return $(L)
 		end
@@ -464,7 +474,7 @@ include "Scanrules.mk"
 		if "$(%:A=.DONTCARE)" && "$(A:N=/*)"
 			print -um bind -l$(B) dontcare
 			return + $(V)
-		elif T = "$(%:/-l\(.*\)/lib\1$(CC.SUFFIX.ARCHIVE)/:A=.TARGET)"
+		elif T = "$(%:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1$(CC.SUFFIX.ARCHIVE)/:A=.TARGET)"
 			return $(T)
 		else
 			$(V) : .DONTCARE
@@ -475,7 +485,7 @@ include "Scanrules.mk"
 		return $(T)
 	end
 	if ( static || "$(.PACKAGE.$(B).library)" == "+l" ) && "$(<<)" != ".BIND.+l%"
-		V := lib$(B)$(CC.SUFFIX.ARCHIVE)
+		V := $(CC.PREFIX.ARCHIVE)$(B)$(CC.SUFFIX.ARCHIVE)
 		if ( T = "$(V:A=.TARGET)" )
 			return $(T)
 		end
@@ -495,7 +505,7 @@ include "Scanrules.mk"
 				end
 			end
 		end
-		if ( T = "$(%:/-l\(.*\)/lib\1$(CC.SUFFIX.ARCHIVE)/:A=.TARGET)" )
+		if ( T = "$(%:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1$(CC.SUFFIX.ARCHIVE)/:A=.TARGET)" )
 			if "$(PACKAGE_OPTIMIZE:N=space)" && "$(CC.SUFFIX.SHARED)"
 				if ( V = "$(*$(B):N=*$(CC.SUFFIX.SHARED)*:A=.TARGET)" )
 					A := $(V:/\(.*$(CC.SUFFIX.SHARED)\).*/\1/)
@@ -511,59 +521,61 @@ include "Scanrules.mk"
 			end
 			return $(T)
 		else
-			local H I L P S
+			local H I J L P S
 			L := $(%)
 			V :=
 			if P = "$(PACKAGE_$(B)_VERSION)"
 				P := ?([-.])$(P)
 			end
-			for I $(P) ''
-				if "$(CC.SUFFIX.DYNAMIC)"
-					if T = "$(*.SOURCE.%.ARCHIVE:L>lib$(B)$(I)$(CC.SUFFIX.ARCHIVE)|$(B)$(I)$(CC.SUFFIX.SHARED))"
-						if "$(T)" == "*$(CC.SUFFIX.ARCHIVE)"
-							if S = "$(T:D:B=$(T:B:/lib//):S=$(CC.SUFFIX.SHARED):T=F)"
-								return $(S:T=F)
+			for J $(CC.PREFIX.SHARED) ''
+				for I $(P) ''
+					if "$(CC.SUFFIX.DYNAMIC)"
+						if T = "$(*.SOURCE.%.ARCHIVE:L>$(CC.PREFIX.ARCHIVE)$(B)$(I)$(CC.SUFFIX.ARCHIVE)|$(J)$(B)$(I)$(CC.SUFFIX.SHARED))"
+							if "$(T)" == "*$(CC.SUFFIX.ARCHIVE)"
+								if S = "$(T:D:B=$(J)$(T:B:/$(CC.PREFIX.ARCHIVE)//):S=$(CC.SUFFIX.SHARED):T=F)"
+									return $(S:T=F)
+								end
 							end
+							return $(T:T=F)
 						end
-						return $(T:T=F)
-					end
-				else
-					if "$(CC.SUFFIX.SHARED)"
-						S = |$(CC.SUFFIX.SHARED)
-						if "$(CC.SUFFIX.SHARED)" != "$(CC.SUFFIX.OBJECT)"
-							H = -
-							if "$(CC.DIALECT:N=VERSION)"
-								S := $(S)$$(V)*
-							end
-						end
-					end
-					if "$(CC.SUFFIX.STATIC)"
-						S := $(S:V)|$(CC.SUFFIX.STATIC)
-					end
-					while 1
-						T := $(*.SOURCE.%.ARCHIVE:L>$(L:/-l\(.*\)/lib\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)))
-						if T
-							if T == "*$(CC.SUFFIX.ARCHIVE)"
-								return $(T)
-							end
-							if "$(CC.SUFFIX.STATIC)" && T == "*$(CC.SUFFIX.STATIC)"
+					elif "$(J)" || ! "$(CC.PREFIX.SHARED)"
+						if "$(CC.SUFFIX.SHARED)"
+							S = |$(CC.SUFFIX.SHARED)
+							if "$(CC.SUFFIX.SHARED)" != "$(CC.SUFFIX.OBJECT)"
 								H = -
+								if "$(CC.DIALECT:N=VERSION)"
+									S := $(S)$$(V)*
+								end
 							end
-							$(%) $(T) : .ARCHIVE $(force_shared:@??.IGNORE?)
-							return $(H) $(T:T=F)
 						end
-						if ! "$(L:N=*+(.+([0-9])))"
-							break
+						if "$(CC.SUFFIX.STATIC)"
+							S := $(S:V)|$(CC.SUFFIX.STATIC)
 						end
-						T := $(L:/\.[0-9]*$//)
-						V := $(L:/$(T)//)$(V)
-						L := $(T)
+						while 1
+							T := $(*.SOURCE.%.ARCHIVE:L>$(L:/-l\(.*\)/$(CC.PREFIX.ARCHIVE)\1/)$(I)@($(V)$(CC.SUFFIX.ARCHIVE)$(S)))
+							if T
+								if T == "*$(CC.SUFFIX.ARCHIVE)"
+									return $(T)
+								end
+								if "$(CC.SUFFIX.STATIC)" && T == "*$(CC.SUFFIX.STATIC)"
+									H = -
+								end
+								$(%) $(T) : .ARCHIVE $(force_shared:@??.IGNORE?)
+								return $(H) $(T:T=F)
+							end
+							if ! "$(L:N=*+(.+([0-9])))"
+								break
+							end
+							T := $(L:/\.[0-9]*$//)
+							V := $(L:/$(T)//)$(V)
+							L := $(T)
+						end
 					end
 				end
 			end
 		end
 	else
-		T := lib$(B)$(CC.SUFFIX.ARCHIVE)
+		T := $(CC.PREFIX.ARCHIVE)$(B)$(CC.SUFFIX.ARCHIVE)
 		if "$(%:A=.DONTCARE)"
 			$(T) : .DONTCARE
 		end
@@ -592,7 +604,7 @@ include "Scanrules.mk"
 	if "$(-mam:N=static*,port*)"
 		local L T
 		L := $(%:/\${mam_lib\(.*\)}/\1/)
-		T := lib$(L)$(CC.SUFFIX.ARCHIVE)
+		T := $(CC.PREFIX.ARCHIVE)$(L)$(CC.SUFFIX.ARCHIVE)
 		if ( T = "$(T:T=F)" )
 			print -um bind -l$(L)
 			return - $(T)
@@ -738,7 +750,7 @@ include "Scanrules.mk"
 % : %.s (ASFLAGS) (LDFLAGS) $$(LDLIBRARIES)
 	$(CC) $(ASFLAGS) $(LDFLAGS) -o $(<) $(*)
 
-% : %.sh
+% : %.sh (SHELLMAGIC)
 	case $(-mam:N=static*:/:.*//):$OPTIND:$RANDOM in
 	?*:*:*|*::*|*:*:$RANDOM)
 		;;
@@ -747,15 +759,26 @@ include "Scanrules.mk"
 		fi
 		;;
 	esac
-	case '$(&:T=E)' in
-	"")	$(CP) $(>) $(<)
+	case '$(SHELLMAGIC)' in
+	"")	case '$(&:T=E)' in
+		"")	$(CP) $(>) $(<)
+			;;
+		*)	{
+			i=`(read x; echo $x) < $(>)`
+			case $i in
+			'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+			esac
+			echo $(&:T=E)
+			cat $(>)
+			} > $(<)
+			;;
+		esac
 		;;
 	*)	{
-		i=`(read x; echo $x) < $(>)`
-		case $i in
-		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+		echo '$(SHELLMAGIC)'
+		case '$(&:T=E)' in
+		?*)	echo $(&:T=E) ;;
 		esac
-		echo $(&:T=E)
 		cat $(>)
 		} > $(<)
 		;;
@@ -785,7 +808,7 @@ include "Scanrules.mk"
 	$(CC) $(CCFLAGS) -c $(>)
 
 %.c %.h : %.y .YACC.SEMAPHORE (YACC) (YACCFLAGS)
-	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(ED) $(EDFLAGS) y.tab.c <<!$("\n")g/yy/s//$(YACCFIX.$(%):F=%(lower)S)/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(upper)S)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(ED) $(EDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(ED) $(EDFLAGS) y.tab.c <<!$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)S)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(ED) $(EDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
 	$(MV) y.tab.c $(%).c
 	if	$(SILENT) test -s y.tab.h
 	then	$(ED) $(EDFLAGS) y.tab.h <<'!'
@@ -799,7 +822,7 @@ include "Scanrules.mk"
 	w
 	q
 	!
-		$(YACCFIX.$(%):?$(ED) $(EDFLAGS) y.tab.h <<!$("\n")g/yy/s//$(YACCFIX.$(%):F=%(lower)S)/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(upper)S)/g$("\n")w$("\n")q$("\n")!$("\n")??)if	$(SILENT) $(CMP) -s y.tab.h $(%).h
+		$(YACCFIX.$(%):?$(ED) $(EDFLAGS) y.tab.h <<!$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)S)/g$("\n")w$("\n")q$("\n")!$("\n")??)if	$(SILENT) $(CMP) -s y.tab.h $(%).h
 		then	$(RM) $(RMFLAGS) y.tab.h
 		else	$(MV) y.tab.h $(%).h
 		fi
@@ -809,7 +832,7 @@ include "Scanrules.mk"
 	fi
 
 %.c : %.l .LEX.SEMAPHORE (LEX) (LEXFLAGS) (CC)
-	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(ED) $(EDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%):F=%(lower)S)/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(upper)S)/g$("\n")w$("\n")q$("\n")!??)$(LEXHDR.$(%):?$("\n")$(ED) $(EDFLAGS) lex.yy.c <<!$("\n")1i$("\n")#include "$(LEXHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(ED) $(EDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%))/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(invert)S)/g$("\n")w$("\n")q$("\n")!??)$(LEXHDR.$(%):?$("\n")$(ED) $(EDFLAGS) lex.yy.c <<!$("\n")1i$("\n")#include "$(LEXHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
 	$(MV) lex.yy.c $(<)
 
 %.o : %.C (CC) (CCFLAGS)
@@ -845,9 +868,9 @@ include "Scanrules.mk"
 cc-% : "" .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
 	set -
 	if	test -d $(<:V:Q)
-	then	$(-silent:Y%%echo $(.RWD.:?$(.RWD.)/??)$(<:V:Q): >&2%)
+	then	$(-silent:Y%%echo $(-errorid:C%$%/%)$(<:V:Q): >&2%)
 		cd $(<:V:Q)
-		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:N!=MAKEPATH=*) $(.RECURSE.ARGS.:N!=cc-*:/^install$/cc-install/) $(%:Y!$$(INSTRUMENT_$$(%:/,.*//):@?instrument=$$(%:/,.*//)?CCFLAGS=-$$(%:V:/$$(%:V:N=*~*:?~?,?)/ /G:@/-W\(.\) /-W\1,/G:@Q)?)!!) $(.VARIANT.$(<))
+		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:N!=MAKEPATH=*) $(.RECURSE.ARGS.:N!=.CC-*:/^\.INSTALL$/.CC-INSTALL/) $(%:Y!$$(INSTRUMENT_$$(%:/,.*//):@?instrument=$$(%:/,.*//)?CCFLAGS=-$$(%:V:/$$(%:V:N=*~*:?~?,?)/ /G:@/-W\(.\) /-W\1,/G:@Q)?)!!) $(.VARIANT.$(<))
 	fi
 
 /*
@@ -1115,18 +1138,25 @@ if "$(_release_:N=V)"
 	/^#[ 	]*endif/p
 end
 
+.RECURSE.OFFSET. = $(.RWD.)
+
 .RECURSE : .MAKE .VIRTUAL .FORCE
-	.RWD. :=
+	.RECURSE.OFFSET. :=
 
 .RECURSE.SEMAPHORE : .VIRTUAL .FORCE .IGNORE .NULL
 
 .RECURSE.ARGS. : .FUNCTION
 	local A V
-	.RECURSE.PREFIX. := $(.RWD.)/
 	for A $(.ORIGINAL.ARGS.)
-		if "$(A:A!=.ACTIVE:N!=recurse|.RECURSE)" || "$(A:A=.ONOBJECT)" || "$(A:/.*/.&/U:A=.ONOBJECT)"
+		if ! "$(A:A=.TARGET)" && ( T = "$(A:/.*/.&/U:A=.TARGET)" )
+			A := $(T)
+		end
+		if "$(A:A!=.ACTIVE:N!=.RECURSE)" || "$(A:A=.ONOBJECT)"
 			V += $(A)
 		end
+	end
+	if "$(~.ARGS:A=.ONOBJECT)"
+		V := .RECURSE $(V)
 	end
 	return $(V)
 
@@ -1144,16 +1174,18 @@ end
 		end
 	end
 	M := ($(MAKEFILES:/:/|/G))
-	for I $(.RECURSE.ARGS.:A!=.ONOBJECT)
-		if ! "$(I:A=.ONOBJECT)" && ! "$(I:C/.*/.&/U:A=.ONOBJECT)"
-			T += $(I)
-		end
+	T := $(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE)
+	X := $(P:N!=-:C,$,/$(M),:P=G)
+	$(X) : .OBJECT
+	X := $(X:W=O=$(T))
+	M := $(X:B:S:/ /|/G)
+	if M
+		M := $(M)|
 	end
-	X := $(P:N!=-:C,$,/$(M),:P=G:W=O=$(T))
-	M := $(X:B:S:/ /|/G)|recurse|.RECURSE
+	M := $(M)recurse|.RECURSE
 	.ORIGINAL.ARGS. := $(.ORIGINAL.ARGS.:N!=$(M))
-	.ARGS : .CLEAR $(~.ARGS.:N!=$(M))
-	$(X:N!=-) : .RECURSE.DIR
+	.ARGS : .CLEAR $(~.ARGS:N!=$(M))
+	$(X:N!=-|.CC-*|cc-*) : .RECURSE.DIR
 	if recurse == "list"
 		print $(X:/ /$("\n")/G)
 		exit 0
@@ -1165,7 +1197,7 @@ end
 	if	$(physical:?$$(*.VIEW:O=2:N=...:Y%2d%%)??) test -d $(<) $(skeleton:?|| mkdir $(<)??)
 	then	$(-silent:Y%%echo $(recurse_enter) $(.RWD.:?$(<:N!=/*:?$(.RWD.)/??)??)$(<): >&2%)
 		cd $(<)
-		$(MAKE) $(-) --errorid=$(<:Q) $(=:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:?$(.RWD.)/??)$(<) $(.RECURSE.ARGS.)
+		$(MAKE) $(-) --errorid=$(<:Q) $(=:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:C%$%/%)$(<) $(.RECURSE.ARGS.)
 		$(recurse_exit:Y,$$(-silent:Y%%echo $$(recurse_exit) $$(.RWD.:?$$(<:N!=/*:?$$(.RWD.)/??)??)$$(<): >&2%),,)
 	elif	test '' = '$(physical)'
 	then	echo $(<): cannot recurse on virtual directory >&2
@@ -1213,7 +1245,7 @@ end
 		STATIC = 0
 		for T1 $(>:V:T=X)
 			if "$(T1:V:A=.ARCHIVE)" || T1 == "[-+]l*"
-				$(T1:V) : .MULTIPLE
+				$(T1:V) : .ARCHIVE .MULTIPLE
 				if T1 == "$(CC.LD.STATIC)"
 					STATIC = 1
 					if CC.SUFFIX.SHARED == ".lib"
@@ -1274,7 +1306,7 @@ end
 			end
 		end
 		if TS
-			.LIBRARY.STATIC.$(<:B:/^lib//) : $(CC.LD.STATIC) $(TS) $(CC.LD.DYNAMIC)
+			.LIBRARY.STATIC.$(<:B:/^$(CC.PREFIX.ARCHIVE)//) : $(CC.LD.STATIC) $(TS) $(CC.LD.DYNAMIC)
 		end
 		T0 := $(<)
 		if "$(<:A=.ARCHIVE)" || "$(TP:V:A=.ATTRIBUTE:A=.ARCHIVE)"
@@ -1665,10 +1697,10 @@ end
 				esac
 				for i in $$(.REQUIRE.$(B))
 				do	case $i in
-					"$(B)"$(...:A=.ARCHIVE:A=.TARGET:N=lib*$(CC.SUFFIX.ARCHIVE):/^lib\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
+					"$(B)"$(...:A=.ARCHIVE:A=.TARGET:N=$(CC.PREFIX.ARCHIVE)*$(CC.SUFFIX.ARCHIVE):/^$(CC.PREFIX.ARCHIVE)\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
 						;;
-					*)	if	test ! -f $$(LIBDIR)/lib$i$(CC.SUFFIX.ARCHIVE)
-						then	case `{ $$(CC) $$(CCFLAGS) $$(*.SOURCE.%.ARCHIVE:$$(.CC.NOSTDLIB.):N=*/lib*:P=L:/^/-L/) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) $(D) -l$i 2>&1 || echo '' $x ;} | $(SED) -e 's/[][()+@?]/#/g' || :` in
+					*)	if	test ! -f $$(LIBDIR)/$(CC.PREFIX.ARCHIVE)$i$(CC.SUFFIX.ARCHIVE)
+						then	case `{ $$(CC) $$(CCFLAGS) $$(*.SOURCE.%.ARCHIVE:$$(.CC.NOSTDLIB.):N=*/$(CC.PREFIX.ARCHIVE)*:P=L:/^/-L/) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) $(D) -l$i 2>&1 || echo '' $x ;} | $(SED) -e 's/[][()+@?]/#/g' || :` in
 							*$x*)	case `{ $$(CC) $$(CCFLAGS) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) $(D) -l$i 2>&1 || echo '' $x ;} | $(SED) -e 's/[][()+@?]/#/g' || :` in
 								*$x*) continue ;;
 								esac
@@ -1737,13 +1769,13 @@ end
 		B := $(%:O=2)
 		L := $(%:O>3:N=[-+]l*)
 		$(L) : .DONTCARE
-		B := lib$(%:O=2)$(CC.SUFFIX.SHARED)
+		B := $(CC.PREFIX.SHARED)$(%:O=2)$(CC.SUFFIX.SHARED)
 		if "$(%:O=3)" != "[0-9]*"
 			S := $(B)
 		else
 			S := $(B).$(%:O=3)
 		end
-		$(S) : .SHARED.o $(%:N=[!-+]*=*) lib$(%:O=2)$(CC.LIB.TYPE:O=1)$(CC.SUFFIX.ARCHIVE) $$(.SHARED.BIND. $(L))
+		$(S) : .SHARED.o $(%:N=[!-+]*=*) $(CC.PREFIX.ARCHIVE)$(%:O=2)$(CC.LIB.TYPE:O=1)$(CC.SUFFIX.ARCHIVE) $$(.SHARED.BIND. $(L))
 		if ! "$(.INSTALL.$(S))" && ! "$(.NO.INSTALL.)"
 			$$(LIBDIR) :INSTALLDIR: $(S)
 				$(LD_PRELOAD:N=$(<:D:B:D:B:D:B:S=$(CC.SUFFIX.SHARED)):?LD_PRELOAD=""; _RLD_LIST=DEFAULT;?)if	silent test -f $(<:C%\$(CC.SUFFIX.SHARED)\.%.oo.%)
@@ -1807,7 +1839,7 @@ end
 	local B D L S X Y Z W
 	Y := $(%:O=2)
 	B := $(Y)$(%:O=3:/[^0-9]//G)$(dll.custom:?_$(dll.custom)??)
-	D := $(B:B:S=$(CC.SUFFIX.DYNAMIC))
+	D := $(CC.PREFIX.DYNAMIC)$(B:B:S=$(CC.SUFFIX.DYNAMIC))
 	if "$(%:O=1)" != "-"
 		L := $(Y:B:S=$(CC.SUFFIX.SHARED))
 		S := $(B:B:S=$(CC.SUFFIX.SHARED))
@@ -1832,6 +1864,15 @@ end
 			end
 			if ! "$(.INSTALL.$(S))"
 				$(LIBDIR)/$(L) :INSTALL: $(S)
+				if CC.SUFFIX.SHARED == ".lib"
+					eval
+					.NO.STATIC.$(Y) : .AFTER
+						if	$(SILENT) test -f $(LIBDIR)/$(CC.PREFIX.ARCHIVE)$(Y)$(CC.SUFFIX.ARCHIVE)
+						then	$(MV) $(LIBDIR)/$(CC.PREFIX.ARCHIVE)$(Y)$(CC.SUFFIX.ARCHIVE) $(LIBDIR)/$(CC.PREFIX.ARCHIVE)$(Y)-static$(CC.SUFFIX.ARCHIVE)
+						fi
+					end
+					$(LIBDIR)/$(L) : .NO.STATIC.$(Y)
+				end
 			end
 		end
 	end
@@ -1840,19 +1881,16 @@ end
 .SHARED.REF.lib : .FUNCTION
 	local L
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
-	return $(*$(L):N=*@($(CC.SUFFIX.LD:/ /|/G))) $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(*.LIBRARY.STATIC.$(L:B:/^lib//)) $(%:N!=*$(CC.SUFFIX.ARCHIVE))
+	return $(*$(L):N=*@($(CC.SUFFIX.LD:/ /|/G))) $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//)) $(%:N!=*$(L))
 
 .SHARED.lib : .USE $$(LDLIBRARIES)
-	for i in $(<:B:S) # retain until 2001 #
-	do	$(SILENT) test -f $i && $(RM) -f $i
-	done
 	$(SILENT) test -d $(<:O=1:D) || mkdir $(<:O=1:D)
-	$(LD) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:D:B) $(.SHARED.REF.lib $(*)) $(CC.DLL.LIBRARIES)
+	$(LD) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1) $(.SHARED.REF.lib $(*)) $(CC.DLL.LIBRARIES)
 
 .SHARED.REF.x : .FUNCTION
 	local L
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
-	return $(.CC.LIB.DLL.symbol $(L)) $(*.LIBRARY.STATIC.$(L:B:/^lib//)) $(%:N!=*$(CC.SUFFIX.OBJECT))
+	return $(.CC.LIB.DLL.symbol $(L)) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//)) $(%:N!=*$(CC.SUFFIX.OBJECT))
 
 .SHARED.x : .USE $$(LDLIBRARIES)
 	$(CC) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:B:S) $(.SHARED.REF.x $(*)) $(CC.DLL.LIBRARIES)
@@ -1970,12 +2008,12 @@ end
 	local L P R
 	for L $(%)
 		if P = "$(.PACKAGE.$(L).library)"
-			R += $(**:B:S:N=[-+]l$(L)|lib$(L)$(CC.LIB.TYPE:?*($(CC.LIB.TYPE:/ /|/G))??)$(CC.SUFFIX.ARCHIVE):@??$(P)$(L)?)
+			R += $(**:B:S:N=[-+]l$(L)|$(CC.PREFIX.ARCHIVE)$(L)$(CC.LIB.TYPE:?*($(CC.LIB.TYPE:/ /|/G))??)$(CC.SUFFIX.ARCHIVE):@??$(P)$(L)?)
 		end
 	end
 	.UNBIND : $(R)
 	R += $(.PACKAGE.libraries)
-	$(R) : .MULTIPLE
+	$(R) : .ARCHIVE .MULTIPLE
 	return $(R)
 
 /*
@@ -2216,16 +2254,16 @@ PACKAGES : .SPECIAL .FUNCTION
 						N =
 					end
 				elif N == "space"
-					if "$(PACKAGE_OPTIMIZE:N=space)"
+					if ! "$(PACKAGE_OPTIMIZE:N=time)"
 						N = dynamic
 					else
-						N = static
+						N =
 					end
 				elif N == "time"
-					if "$(PACKAGE_OPTIMIZE:N=time)"
+					if ! "$(PACKAGE_OPTIMIZE:N=space)"
 						N = static
 					else
-						N = dynamic
+						N =
 					end
 				end
 				if N == "dynamic"
@@ -2292,16 +2330,16 @@ PACKAGES : .SPECIAL .FUNCTION
 						N =
 					end
 				elif N == "space"
-					if "$(PACKAGE_OPTIMIZE:N=space)"
+					if ! "$(PACKAGE_OPTIMIZE:N=time)"
 						N = dynamic
 					else
-						N = static
+						N =
 					end
 				elif N == "time"
-					if "$(PACKAGE_OPTIMIZE:N=time)"
+					if ! "$(PACKAGE_OPTIMIZE:N=space)"
 						N = static
 					else
-						N = dynamic
+						N =
 					end
 				end
 				if N == "dynamic"
@@ -2370,7 +2408,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		if ! "$(.NO.INSTALL.)"
 			$(BINDIR) :INSTALLDIR: $(B)
 				if	test ! -f $(<)
-				then	cp $(*) $(<)
+				then	$(CP) $(*) $(<)
 				fi
 		end
 		$(B) :: $(I)
@@ -2433,9 +2471,9 @@ PACKAGES : .SPECIAL .FUNCTION
 			then	if	test ! -d $$(<)
 				then	mkdir $$(<)
 				fi
-				$$(-silent:Y%%echo $$(.RWD.:?$$(.RWD.)/??)$$(<): >&2%)
+				$$(-silent:Y%%echo $$(.RWD.:C%$%/%)$$(<): >&2%)
 				cd $$(<)
-				$$(MAKE) --file=$$(MAKEFILE) --keepgoing $$(-) --errorid=$$(<) VARIANT=$$(<:/cc-//) VARIANTID=$$(<:/cc-//:N=[a-zA-Z]*:?-??)$$(<:/cc-//) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$$(MAKEPATH) $$(=:N!=MAKEPATH=*) $$(.RECURSE.ARGS.:N!=cc-*) $(@:V:@Q)
+				$$(MAKE) --file=$$(MAKEFILE) --keepgoing $$(-) --errorid=$$(<) VARIANT=$$(<:/cc-//) VARIANTID=$$(<:/cc-//:N=[a-zA-Z]*:?-??)$$(<:/cc-//) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$$(MAKEPATH) $$(=:N!=MAKEPATH=*) $$(.RECURSE.ARGS.:N!=.CC-*) $(@:V:@Q)
 			fi
 		end
 	else
@@ -2530,14 +2568,14 @@ PACKAGES : .SPECIAL .FUNCTION
 		.MAIN.TARGET. := $(T:O=1:B:S)
 		for X $(T)
 			T := $(.FILES.$(X:B:S):T=F:T!=G)
-			$(T) : -ARCHIVE -COMMAND -OBJECT
-			.UNION. : $(T) $(?$(X:B:S):T=F:P=S=$(.RWD.):T!=G)
+			$(T:N!=[-+]l*) : -ARCHIVE -COMMAND -OBJECT
+			.UNION. : $(T) $(?$(X:B:S):T=F:P=S=$(.RECURSE.OFFSET.):T!=G)
 		end
 	else
 		.UNION. : $(.FILES.:T=F:T!=G)
-		$(*.UNION.) : -ARCHIVE -COMMAND -OBJECT
-		.UNION. : $(...:T!=XS:T=F:A=.REGULAR:P=S=$(.RWD.):T!=G)
-		.UNION. : $(...:T=XSFA:T=F:A=.REGULAR:P=S=$(.RWD.):T!=G)
+		$(*.UNION.:N!=[-+]l*) : -ARCHIVE -COMMAND -OBJECT
+		.UNION. : $(...:T!=XS:T=F:A=.REGULAR:P=S=$(.RECURSE.OFFSET.):T!=G)
+		.UNION. : $(...:T=XSFA:T=F:A=.REGULAR:P=S=$(.RECURSE.OFFSET.):T!=G)
 	end
 	return $(*.UNION.:$(select))
 
@@ -3217,7 +3255,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	local F J
 	J := $(+jobs) /* XXX: multiple :LIBRARY: may get botched with jobs>0 */
 	set nojobs
-	F := _$(%:O=1:B:/^lib//:/$(CC.LIB.TYPE:O=1)$//:/[^a-zA-Z0-9_]/_/G)_
+	F := _$(%:O=1:B:/^$(CC.PREFIX.ARCHIVE)//:/$(CC.LIB.TYPE:O=1)$//:/[^a-zA-Z0-9_]/_/G)_
 	F := $(F:/___*/_/G)
 	$(F).exp : .FORCE $(%:O=1)
 		: generate $(*) export symbols in $(<)
@@ -3232,7 +3270,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	local F J
 	J := $(+jobs) /* XXX: multiple :LIBRARY: may get botched with jobs>0 */
 	set nojobs
-	F := _$(%:O=1:B:/^lib//:/$(CC.LIB.TYPE:O=1)$//:/[^a-zA-Z0-9_]/_/G)_
+	F := _$(%:O=1:B:/^$(CC.PREFIX.ARCHIVE)//:/$(CC.LIB.TYPE:O=1)$//:/[^a-zA-Z0-9_]/_/G)_
 	F := $(F:/___*/_/G)
 	$(F) : .FORCE $(%:O=1)
 		: extract $(*) objects in $(<)
@@ -3255,13 +3293,13 @@ PACKAGES : .SPECIAL .FUNCTION
 	local F J
 	J := $(+jobs) /* XXX: multiple :LIBRARY: may get botched with jobs>0 */
 	set nojobs
-	F := _$(%:O=1:B:/^lib//:/$(CC.LIB.TYPE:O=1)$//:/[^a-zA-Z0-9_]/_/G)_
+	F := _$(%:O=1:B:/^$(CC.PREFIX.ARCHIVE)//:/$(CC.LIB.TYPE:O=1)$//:/[^a-zA-Z0-9_]/_/G)_
 	F := $(F:/___*/_/G)
 	$(F).c : .FORCE $(%:O=1)
 		: generate $(*) export symbols in $(<)
 		set -
 		$(NM) $(NMFLAGS) $(*) |
-		$(SED) $(NMEDIT) -e '/^[ 	]*$/d' $(CC.SYMPREFIX:?-e 's/^$(CC.SYMPREFIX)//'??) |
+		$(SED) $(NMEDIT) -e '/^[ 	]*$/d' $(CC.PREFIX.SYMBOL:?-e 's/^$(CC.PREFIX.SYMBOL)//'??) |
 		$(SORT) -u > $(<:B:S=.i)
 		{
 			echo '/* $(*) export symbols */'
@@ -3365,21 +3403,21 @@ end
 	if "$(_release_:N=V)"
 	.COMMAND.o :
 		set -
-		cat $(<:B:S=.ln) $(.LINTLIBRARIES.:B:S=.ln:/lib\(.*\)/& llib-l\1/:T=F) > $(TMPDIR)/l$$.ln
+		cat $(<:B:S=.ln) $(.LINTLIBRARIES.:B:S=.ln:/$(CC.PREFIX.ARCHIVE)\(.*\)/& llib-l\1/:T=F) > $(TMPDIR)/l$$.ln
 		$(LINT2) -T$(TMPDIR)/l$$.ln $(<:B:S=.lh:T=F:/^/-H/) $(LINTFLAGS)
 		$(RM) $(RMFLAGS) $(TMPDIR)/l$$.ln $(<:B:S=.l[hn])
 	elif "$(_release_:N=research)"
 	.COMMAND.o :
 		set -
 		echo $(<)::
-		cat $(<:B:S=.ln) $(.LINTLIBRARIES.:B:S=.ln:/lib\(.*\)/& llib-l\1/:T=F) > $(TMPDIR)/l$$.ln
+		cat $(<:B:S=.ln) $(.LINTLIBRARIES.:B:S=.ln:/$(CC.PREFIX.ARCHIVE)\(.*\)/& llib-l\1/:T=F) > $(TMPDIR)/l$$.ln
 		$(LINT2) $(TMPDIR)/l$$.ln -S$(<:B:S=.lh) $(LINTFLAGS)
 		$(RM) $(RMFLAGS) $(TMPDIR)/l$$.ln $(<:B:S=.l[hn])
 	else
 	.COMMAND.o :
 		set -
 		echo $(<)::
-		cat $(<:B:S=.ln) $(.LINTLIBRARIES.:B:S=.ln:/lib\(.*\)/& llib-l\1/:T=F) > $(TMPDIR)/l$$.ln
+		cat $(<:B:S=.ln) $(.LINTLIBRARIES.:B:S=.ln:/$(CC.PREFIX.ARCHIVE)\(.*\)/& llib-l\1/:T=F) > $(TMPDIR)/l$$.ln
 		$(LINT2) $(TMPDIR)/l$$.ln $(LINTFLAGS)
 		$(RM) $(RMFLAGS) $(TMPDIR)/l$$.ln $(<:B:S=.l[hn])
 	end
@@ -3390,13 +3428,13 @@ end
 .LIST.INSTALL : .ONOBJECT .MAKE
 	print $(.INSTALL.LIST.:$(INSTALLROOT:N=.:?T=F?N=$(INSTALLROOT)/*:C%$(INSTALLROOT)/%%):C% %$("\n")%G)
 
-.LIST.MANIFEST : .COMMON.SAVE .MAKE
+.LIST.MANIFEST : .ONOBJECT .COMMON.SAVE .MAKE
 	print $(.MANIFEST.:/ /$("\n")/G)
 
-.LIST.PACKAGE.LOCAL : .COMMON.SAVE .MAKE
+.LIST.PACKAGE.LOCAL : .ONOBJECT .COMMON.SAVE .MAKE
 	print $(.MANIFEST.:P=A:/^/;;;/:/ /$("\n")/G)
 
-.LIST.PACKAGE.BINARY : .MAKE
+.LIST.PACKAGE.BINARY : .ONOBJECT .MAKE
 	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F:P=A)
 	if package.strip
 		local I
@@ -3411,7 +3449,7 @@ end
 		print $(*.UNION:/^/;;;/:/ /$("\n")/G)
 	end
 
-.LIST.PACKAGE.SOURCE : .COMMON.SAVE .MAKE
+.LIST.PACKAGE.SOURCE : .ONOBJECT .COMMON.SAVE .MAKE
 	local I
 	PROTOEDIT = P=A
 	for I $(.MANIFEST.:P=A)
@@ -3426,7 +3464,7 @@ end
 		end
 	end
 
-.LIST.SOURCE.TGZ : .COMMON.SAVE .MAKE
+.LIST.SOURCE.TGZ : .ONOBJECT .COMMON.SAVE .MAKE
 	local F P
 	PROTOEDIT = P=A
 	for F $(.MANIFEST.)
@@ -3453,7 +3491,7 @@ end
 .LIST.SYMBOLS : .ALWAYS
 	lib="$(...:A=.ARCHIVE:A=.TARGET:T=F:N!=*[-/]*)"
 	for lib in $lib
-	do	$(NM) $(NMFLAGS) $lib | $(SED) $(NMEDIT) $(CC.SYMPREFIX:?-e 's/^$(CC.SYMPREFIX)//'??) | $(SORT) -u
+	do	$(NM) $(NMFLAGS) $lib | $(SED) $(NMEDIT) $(CC.PREFIX.SYMBOL:?-e 's/^$(CC.PREFIX.SYMBOL)//'??) | $(SORT) -u
 	done
 
 if LPROF
@@ -3476,7 +3514,7 @@ if LPROF
 end
 
 .OFFICIAL : .ONOBJECT
-	$(".RWD.:=":R)$(*.VIEW:O=2:@?$$(.MANIFEST.:P=L:N!=[-/]*:C@.*@{ $$(DIFF) $$(DIFFFLAGS) $$(*.VIEW:O=2)/& & || true; } >> $(official_out:D=$$(*.VIEW:O=2):B:S); $$(MV) & $$(*.VIEW:O=2)/&;@)?: no lower view?)
+	$(".RECURSE.OFFSET.:=":R)$(*.VIEW:O=2:@?$$(.MANIFEST.:P=L:N!=[-/]*:C@.*@{ $$(DIFF) $$(DIFFFLAGS) $$(*.VIEW:O=2)/& & || true; } >> $(official_out:D=$$(*.VIEW:O=2):B:S); $$(MV) & $$(*.VIEW:O=2)/&;@)?: no lower view?)
 
 .PAX : .COMMON.SAVE $$(*.RECURSE:@?.PAX.RECURSE?.PAX.LOCAL)
 
@@ -3537,6 +3575,7 @@ end
 		CC.DYNAMIC =
 		CC.HOSTTYPE = $(_hosttype_)
 		CC.SHARED =
+		CC.SHELLMAGIC = ${mam_cc_SHELLMAGIC}
 		CC.STATIC =
 		_hosttype_ = ${_hosttype_=`package`}
 	end
@@ -3567,6 +3606,7 @@ end
 	print -um setv F77 f77
 	F77 = ${F77}
 	print -um setv HOSTCC ${CC}
+	HOSTCC = ${HOSTCC}
 	print -um setv IGNORE
 	INSTALLROOT = ${INSTALLROOT}
 	print -um setv LD ld

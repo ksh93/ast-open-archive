@@ -1,3 +1,6 @@
+01-10-16 sear.sh: _SEA_* => _SEAR_*
+01-10-05 sear.sh: rename from sea.sh
+01-09-11 sea.sh: add
 01-06-26 proto.tst: add another buffer boundary test (large of course)
 01-04-01 proto: preserve file mode for -r
 01-02-06 proto.tst: add (finally)

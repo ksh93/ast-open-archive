@@ -1,4 +1,4 @@
-: X/Open glob tests 2001-05-31
+: X/Open glob tests 2001-10-05
 
 # test workspace
 
@@ -43,6 +43,12 @@ Sn	c[d			OK		c[d
 S	c[d?			NOMATCH
 Sn	c[d?			OK		c[d?
 S	c[dx			OK		c[dx
+S	(x			NOMATCH
+S	(x/*			NOMATCH
+Sn	(x			OK		(x
+Sn	(x/*			OK		(x/*
+Sns	(x			OK		(x
+Sns	(x/*			OK		(x/*
 
 # embedded /
 
@@ -67,3 +73,26 @@ K	*(x)			OK		xxx
 K	+(x)			OK		xxx
 K	?(x)xx			OK		xxx
 K	?(x)xxx			OK		xxx
+K	(x			NOMATCH
+K	(x/*			NOMATCH
+Kn	(x			OK		(x
+Kn	(x/*			OK		(x/*
+Kns	(x			OK		(x
+Kns	(x/*			OK		(x/*
+K	\(x			NOMATCH
+K	\(x/*			NOMATCH
+Kn	\(x			OK		(x
+Kn	\(x/*			OK		(x/*
+Kns	\(x			OK		(x
+Kns	\(x/*			OK		(x/*
+K	%x/*			NOMATCH
+Kn	%x			OK		%x
+Kn	%x/*			OK		%x/*
+Kns	%x			OK		%x
+Kns	%x/*			OK		%x/*
+K	\%x			NOMATCH
+K	\%x/*			NOMATCH
+Kn	\%x			OK		%x
+Kn	\%x/*			OK		%x/*
+Kns	\%x			OK		%x
+Kns	\%x/*			OK		%x/*

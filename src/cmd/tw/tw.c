@@ -261,7 +261,7 @@ USAGE_LICENSE
 "		listed in the file \bcommands\b.]"
 "	[+tw -e \"int count;?\baction: count++;"
 "		printf('name=%s inode=%08ld\\\\n', name, ino);"
-"		end: printf('%d file%s\\\\n', count, count==1 ? '' :: 's');\"\b"
+"		end: printf('%d file%s\\\\n', count, count==1 ? '' : 's');\"\b"
 "		Lists the name and inode number of each file and also the"
 "		total number of files.]"
 "	[+tw -pP -e \"?\baction: if (visit++ == 0) {"
