@@ -1,3 +1,5 @@
+01-10-31 pin: add --reorder=tsp via -ltsp
+01-10-30 pzip: fix --window doc typo
 01-10-08 pin: add --optimize={dynamic|greedy|non|transitive}
 	 pin: add --optimize method table for easy expansion
 01-08-11 pzip: set error_info.id from argv for statically linked disciplines

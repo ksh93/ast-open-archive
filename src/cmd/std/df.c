@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: df (AT&T Labs Research) 2001-04-20 $\n]"
+"[-?\n@(#)$Id: df (AT&T Labs Research) 2001-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -567,7 +567,7 @@ status(const char* path, struct statvfs* vfs)
 
 	state.timeout = 0;
 	signal(SIGALRM, timeout);
-	alarm(2);
+	alarm(4);
 	r = statvfs(path, vfs);
 	alarm(0);
 	signal(SIGALRM, SIG_DFL);

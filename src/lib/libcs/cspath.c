@@ -74,7 +74,7 @@ devpath(char* path, int size, int blk, register struct stat* st)
 			strcpy(base, entry->d_name);
 			if (stat(path, &tst))
 				continue;
-			if (!subp && S_ISDIR(tst.st_mode))
+			if (!subp && S_ISDIR(tst.st_mode) && !streq(path, "/dev/fd"))
 			{
 				subp = dirp;
 				if (dirp = opendir(path))
@@ -188,8 +188,14 @@ cspath(register Cs_t* state, register int fd, int flags)
 		}
 	}
 #endif
-	else if (((typ = S_ISBLK(st.st_mode)) || S_ISCHR(st.st_mode)) && (s = devpath(state->path, sizeof(state->path), typ, &st))) return s;
-	else sfsprintf(state->path, sizeof(state->path), "/dev/ino/%u/%u", st.st_dev, st.st_ino);
+	else if ((typ = S_ISBLK(st.st_mode)) || S_ISCHR(st.st_mode))
+	{
+		if (s = devpath(state->path, sizeof(state->path), typ, &st))
+			return s;
+		sfsprintf(state->path, sizeof(state->path), "/dev/%s-%u,%u", typ ? "blk" : "chr", major(idevice(&st)), minor(idevice(&st)));
+	}
+	else
+		sfsprintf(state->path, sizeof(state->path), "/dev/ino/%u/%u", st.st_dev, st.st_ino);
 	return state->path;
 }
 

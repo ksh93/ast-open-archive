@@ -28,7 +28,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-10-05 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-10-20 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -353,6 +353,9 @@ escape(char* s)
 
 		case 0:
 			*++t = 0;
+			break;
+		case '\\':
+			*t = '\\';
 			break;
 		case 'n':
 			*t = '\n';
@@ -782,7 +785,8 @@ main(int argc, char** argv)
 				flags |= modes[m];
 			}
 			err = field[2];
-			ans = field[3];
+			if (ans = field[3])
+				escape(ans);
 			msg = field[4];
 			kre = okre;
 			sre = osre;

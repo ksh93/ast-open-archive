@@ -346,9 +346,13 @@ BODY {
 	COMMAND '=;=' </dev/null 2>/dev/null && a=yes || a=no
 	INFO "$a" 'semicolon usable as newline'
 	case $a in
-	*y*) a=$(print no | COMMAND ':x;s/no/yes/' 2>/dev/null)
-	INFO "$a" 'semicolon terminates a label'
-	;;
+	*y*)	a=$(print no | COMMAND ':x;s/no/yes/' 2>/dev/null)
+		INFO "$a" 'semicolon terminates a label'
+		COMMAND '=;  =' </dev/null 2>/dev/null && a=yes || a=no
+		INFO "$a" 'space after semicolon'
+		COMMAND '=  ;=' </dev/null 2>/dev/null && a=yes || a=no
+		INFO "$a" 'space before semicolon'
+		;;
 	esac
 	COMMAND '/a/s///' </dev/null 2>/dev/null && a=yes || a=no
 	INFO "$a" 'previous regular expression can be abbreviated as //'

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -342,6 +342,11 @@ make ../../../lib/sear/ratz.c
 prev ../INIT/ratz.c
 exec - mv ${PACKAGE_ast_LIB}/sear/ratz.c ${PACKAGE_ast_LIB}/sear/ratz.c.old 2>/dev/null || true; test '' = '../INIT/ratz.c' || { cp ../INIT/ratz.c ${PACKAGE_ast_LIB}/sear/ratz.c  		    		    ;}
 done ../../../lib/sear/ratz.c generated
+make ../../../lib/sear/sear.ico
+make sear.ico
+done sear.ico
+exec - mv ${PACKAGE_ast_LIB}/sear/sear.ico ${PACKAGE_ast_LIB}/sear/sear.ico.old 2>/dev/null || true; test '' = 'sear.ico' || { cp sear.ico ${PACKAGE_ast_LIB}/sear/sear.ico  		    		    ;}
+done ../../../lib/sear/sear.ico generated
 done install virtual
 make test
 make test.proto

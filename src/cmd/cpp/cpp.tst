@@ -3185,6 +3185,12 @@ int line = 6;'
 	EXEC -I-D
 		INPUT - $'#pragma pp:splicespace\nint a\\      \nb = 1;'
 		OUTPUT - $'# 1 ""\n\nint ab = 1;\n'
+	EXEC -I-D
+		INPUT - $'#pragma pp:splicespace\nchar s[] = "\\ ";'
+		OUTPUT - $'# 1 ""\n\nchar s[] = "\\ ";'
+	EXEC -I-D
+		INPUT - $'#pragma pp:splicespace\nchar s[] = "\\\\ ";'
+		OUTPUT - $'# 1 ""\n\nchar s[] = "\\\\ ";'
 
 TEST 11 'make dependencies'
 	DO	DATA a.h b.h c.h

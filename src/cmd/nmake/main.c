@@ -136,7 +136,7 @@
  *	0x00000008 1996-10-11 meta rhs prefix dir check even if rhs has prefix
  *	0x00000010 1994-01-01 old out of date if prereq in higher view
  *	0x00000020 1994-01-01 old scan advance logic
- *	0x00000040 1994-08-11 foiled alias means not found
+ *	0x00000040 2001-10-20 foiled alias still allows bind (!1994-08-11)
  *	0x00000080 1994-08-11 don't catrule() ../.. dir prefixes in bindfile()
  *	0x00000100 1994-10-01 metaclose() recursion even if rule.action!=0
  *	0x00000200 1994-11-11 disable generate() % transformation check

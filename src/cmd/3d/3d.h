@@ -68,6 +68,11 @@ __STDPP__directive pragma pp:note off64_t
 #include <hashkey.h>
 #include <dlldefs.h>
 
+#if _lib_strerror && defined(strerror)
+#undef	strerror
+extern char*		strerror();
+#endif
+
 #undef	mount
 #define mount		______mount
 #include <fs3d.h>
@@ -121,6 +126,10 @@ typedef int (*Fs_set_t)(struct Fs*, const char*, int, const char*, int);
 
 #define ATTR_MAX	121
 
+#include "FEATURE/peek"
+#include "FEATURE/syscall"
+#include "FEATURE/syslib"
+
 typedef struct Fs
 {
 	long		flags;
@@ -157,12 +166,20 @@ typedef struct Mount
 	short		flags;
 } Mount_t;
 
+typedef struct
+{
+	dev_t		dev;
+	ino_t		ino;
+	char		path[1];
+} Dir_t;
+
 #endif
 
 typedef struct
 {
 #if FS
 	Mount_t*	mount;
+	Dir_t*		dir;
 #endif
 	short*		reserved;
 	Msg_file_t	id;
@@ -174,10 +191,6 @@ typedef struct
 #if VCS
 #include "vcs_3d.h"
 #endif
-
-#include "FEATURE/peek"
-#include "FEATURE/syscall"
-#include "FEATURE/syslib"
 
 #define NOSYS		nosys
 

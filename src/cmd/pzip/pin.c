@@ -29,20 +29,10 @@
  * AT&T Research
  *
  * induce a column partition on fixed row data
- *
- * test registry
- *	0x0010	enable reorder keep trace
- *	0x0020	enable reorder skip/cost trace
- *	0x0040	enable reorder permutation trace
- *	0x0080	enable reorder level 2 merge prune
- *	0x0100	disable reorder merge prune
- *	0x0200	dump TSP v1 ordering matrix and exit
- *	0x0400	dump TSP v2 ordering matrix and exit
- *	0x0800	dump TSP v3 ordering matrix and exit
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pin (AT&T Labs Research) 2001-10-08 $\n]"
+"[-?\n@(#)$Id: pin (AT&T Labs Research) 2001-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -128,7 +118,14 @@ USAGE_LICENSE
 "	standard output, and exit. If more than one \afile\a is specified"
 "	then the record size and name are printed for each file. A \b0\b"
 "	size means the record size could not be determined from the sample.]"
-"[T:test?Enable implementation-specific tests and tracing.]#[test-mask]"
+"[T:test?Enable implementation-specific tests and tracing.]#[test-mask]{"
+"	[+0x0010?Enable reorder keep trace.]"
+"	[+0x0020?Enable reorder skip/cost trace.]"
+"	[+0x0040?Enable reorder permutation trace.]"
+"	[+0x0080?Enable reorder level 2 merge prune.]"
+"	[+0x0100?Disable reorder merge prune.]"
+"	[+0x0200?Partition using initial tsp cycles.]"
+"}"
 "[X:prefix?Uncompressed data contains a prefix that is defined by \acount\a"
 "	and an optional \aterminator\a. This data is not \bpzip\b compressed."
 "	\aterminator\a may be one of:]:[count[*terminator]]]{"
@@ -152,9 +149,17 @@ USAGE_LICENSE
 #include <zlib.h>
 #include <bzlib.h>
 
+#include "FEATURE/local"
+
+#if _hdr_tsp && _lib_tspopen
+#include <tsp.h>
+#endif
+
 #define OP_optimize	0x01
 #define OP_reorder	0x02
 #define OP_size		0x04
+
+#define	minof(x,y)	((x)<(y)?(x):(y))
 
 typedef struct
 {
@@ -682,6 +687,31 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 }
 
 /*
+ * permute state.map and dat according to a new order
+ */
+
+static void
+permute(unsigned char* buf, unsigned char* dat, size_t* ord, size_t row, size_t tot)
+{
+	register int	i;
+	size_t*		tmap;
+	unsigned char*	end;
+
+	tmap = vector(row);
+	for (i = 0; i < row; i++)
+		tmap[i] = state.map[i];
+	for (i = 0; i < row; i++)
+		state.map[i] = tmap[ord[i]];
+	for (end = dat + tot; dat < end; dat += row)
+	{
+		memcpy(buf, dat, row);
+		for (i = 0; i < row; i++)
+			dat[i] = buf[ord[i]];
+	}
+	free(tmap);
+}
+
+/*
  * stuff the partion group labels in lab
  */
 
@@ -746,6 +776,7 @@ reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* d
 	register Part_t*	bp;
 	Part_t*			fp;
 	size_t*			hit;
+	size_t*			ord;
 	ssize_t*		cst;
 	char*			s;
 	int			ii;
@@ -757,85 +788,15 @@ reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* d
 	Part_t*			nxt;
 	Part_t*			fin;
 	size_t**		siz;
-	unsigned char*		end;
 	Sfio_t*			sp;
 
-	if (state.test & 0x0800)
-	{
-		/*
-		 * dump TSP v3 ordering matrix and exit
-		 */
-
-		if (!(cst = newof(0, ssize_t, row, 0)))
-			error(ERROR_SYSTEM|3, "out of space [%d byte vector]", row);
-		for (i = 0; i < row; i++)
-			cst[i] = field(buf, dat, i, i, row, tot);
-		sfprintf(sfstdout, "%I*d A\n", sizeof(row), row);
-		for (i = 0; i < row; i++)
-			for (j = 0; j < row; j++)
-				if (i == j)
-					sfprintf(sfstdout, "0\n");
-				else
-				{
-					z = pair(buf, dat, i, j, row, tot);
-					y = cst[i] + cst[j];
-					if (z > y)
-						z = y;
-					sfprintf(sfstdout, "%I*d\n", sizeof(z), z);
-				}
-		exit(0);
-	}
-	if (state.test & 0x0400)
-	{
-		/*
-		 * dump TSP v2 ordering matrix and exit
-		 */
-
-		sfprintf(sfstdout, "%I*d A\n", sizeof(row), row);
-		for (i = 0; i < row; i++)
-			for (j = 0; j < row; j++)
-				if (i == j)
-					sfprintf(sfstdout, "0\n");
-				else
-					sfprintf(sfstdout, "%I*d\n", sizeof(size_t), pair(buf, dat, i, j, row, tot));
-		exit(0);
-	}
 	siz = matrix(row);
-	if (state.test & 0x0200)
-	{
-		/*
-		 * dump TSP v1 ordering matrix and exit
-		 */
-
-		z = 0;
-		for (i = 0; i < row; i++)
-			if (z < (y = siz[i][i] = field(buf, dat, i, i, row, tot)))
-				z = y;
-		for (i = 0; i < row; i++)
-			for (j = 0; j < row; j++)
-				if (i != j && z < (y = siz[i][j] = pair(buf, dat, i, j, row, tot)))
-					z = y;
-		z = (row + 1) * z + 1;
-		sfprintf(sfstdout, "%I*u A\n", sizeof(row), row + 1);
-		sfprintf(sfstdout, "%I*u\n", sizeof(z), z);  /* d(s,s) */
-		for (i = 0; i < row; i++)
-			sfprintf(sfstdout, "%I*u\n", sizeof(size_t), siz[i][i]);
-		for (i = 0; i < row; i++)
-		{
-			sfprintf(sfstdout, "%I*u\n", sizeof(z), z); /* d(i,s) */
-			for (j = 0; j < row; j++)
-				if (j == i)
-					sfprintf(sfstdout, "%I*u\n", sizeof(z), z); /* d(i,i) */
-				else
-					sfprintf(sfstdout, "%I*u\n", sizeof(size_t), siz[i][j]); /* d(i,j) */
-		}
-		exit(0);
-	}
 	cur = partition(row);
 	nxt = partition(row);
 	fin = partition(row);
-	if (!(hit = newof(0, size_t, row, 0)) || !(cst = newof(0, ssize_t, row, 0)))
-		error(ERROR_SYSTEM|3, "out of space [%d byte vector]", row);
+	hit = vector(row);
+	ord = vector(row);
+	cst = (ssize_t*)vector(row);
 
 	/*
 	 * fill in the pair compression size matrix
@@ -1072,7 +1033,7 @@ reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* d
 	}
 
 	/*
-	 * collect the order in cst and the partition labels in lab
+	 * collect the order in ord and the partition labels in lab
 	 */
 
 	if (state.verbose)
@@ -1090,13 +1051,13 @@ reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* d
 					j++;
 				}
 				hit[fp->member[i]] = 0;
-				cst[k++] = fp->member[i];
+				ord[k++] = fp->member[i];
 				lab[fp->member[i]] = j;
 			}
 	for (i = 0; i < row; i++)
 		if (hit[i])
 		{
-			cst[k++] = i;
+			ord[k++] = i;
 			lab[i] = ++j;
 		}
 
@@ -1104,16 +1065,7 @@ reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* d
 	 * permute state.map and dat according to the new order
 	 */
 
-	for (i = 0; i < row; i++)
-		hit[i] = state.map[i];
-	for (i = 0; i < row; i++)
-		state.map[i] = hit[cst[i]];
-	for (end = dat + tot; dat < end; dat += row)
-	{
-		memcpy(buf, dat, row);
-		for (i = 0; i < row; i++)
-			dat[i] = buf[cst[i]];
-	}
+	permute(buf, dat, ord, row, tot);
 
 	/*
 	 * clean up
@@ -1125,6 +1077,7 @@ reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* d
 	free(fin);
 	free(hit);
 	free(cst);
+	free(ord);
 }
 
 /*
@@ -1134,7 +1087,132 @@ reorder_heuristic(Reorder_method_t* method, unsigned char* buf, unsigned char* d
 static void
 reorder_tsp(Reorder_method_t* method, unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot)
 {
-	error(3, "%s ordering not implemented yet", method->name);
+#if TSP_VERSION
+	size_t		i;
+	size_t		j;
+	size_t		end;
+	size_t		breakat;
+	size_t*		self;
+	size_t**	apart;
+	size_t**	together;
+	Tsp_t*		tsp;
+	Tsp_index_t*	tour;
+	Tsp_index_t*	cycle;
+	Tsp_cost_t	breakval;
+	Tsp_cost_t**	cost;
+	Tsp_cost_t*	v;
+	Tsp_disc_t	disc;
+
+	i = row * row;
+	if (!(cost = newof(0, Tsp_cost_t*, row, i * sizeof(Tsp_cost_t))))
+		error(ERROR_SYSTEM|3, "out of space [%d X %d cost matrix]", row, row);
+	v = (Tsp_cost_t*)(cost + row);
+	for (j = 0; j < row; j++)
+	{
+		cost[j] = v;
+		v += row;
+	}
+	self = vector(row);
+	apart = matrix(row);
+	together = matrix(row);
+
+	/*
+	 * compute the Tsp_cost_t matrix
+	 */
+
+	if (state.verbose)
+		sfprintf(sfstderr, "compute the tsp cost matrix\n");
+	for (i = 0; i < row; i++)
+		self[i] = field(buf, dat, i, i, row, tot);
+	for (i = 0; i < row; i++)
+		for (j = 0; j < row; j++)
+			if (i != j)
+			{
+				together[i][j] = pair(buf, dat, i, j, row, tot);
+				apart[i][j] = self[i] + self[j];
+				cost[i][j] = minof(together[i][j], apart[i][j]);
+			}
+
+	/*
+	 * generate a tour
+	 */
+
+	if (state.verbose)
+		sfprintf(sfstderr, "generate a tour\n");
+	memset(&disc, 0, sizeof(disc));
+	disc.version = TSP_VERSION;
+	disc.errorf = (Tsp_error_f)errorf;
+	if (!(tsp = tspopen(&disc, cost, row, TSP_DFS|(state.verbose ? TSP_VERBOSE : 0))))
+		error(3, "tspopen error");
+	if (!(tour = tsptour(tsp)))
+		error(3, "tsptour error");
+
+	/*
+	 * break tour at most expensive link; put order into self
+	 */
+
+	breakat = end = row-1;
+	breakval = cost[tour[end]][tour[0]];
+	for (i = 0; i < end; i++)
+		if (cost[tour[i]][tour[i+1]] > breakval)
+		{
+			breakat = i;
+			breakval = cost[tour[i]][tour[i+1]];
+		}
+	j = 0;
+	for (i = breakat + 1; i < row; i++)
+		self[j++] = tour[i];
+	for (i = 0; i <= breakat; i++)
+		self[j++] = tour[i];
+
+	/*
+	 * permute state.map and dat according to the new order
+	 */
+
+	permute(buf, dat, self, row, tot);
+
+	/*
+	 * partition
+	 */
+
+	if (state.test & 0x0200)
+	{
+		/*
+		 * partition according to the initial tsp cycles
+		 */
+
+		if (!(cycle = tspcycle(tsp)))
+			error(3, "tspcycle error");
+		for (i = 0; i < row; i++)
+			lab[i] = cycle[self[i]];
+	}
+	else
+	{
+		/*
+		 * partition according to dependence along tour
+		 */
+
+		for (i = j = 0; i < end; i++)
+		{
+			lab[i] = j;
+			if (together[self[i]][self[i+1]] > apart[self[i]][self[i+1]])
+				j++;
+		}
+		lab[i] = j;
+	}
+
+	/*
+	 * clean up
+	 */
+
+	free(self);
+	free(apart);
+	free(together);
+	free(cost);
+	tspclose(tsp);
+#else
+	error(3, "%s ordering requires -l%s", method->name, method->name);
+#endif
 }
 
 /*

@@ -1,3 +1,4 @@
+01-10-31 tw,find: add slocate(1) refs
 01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
 	 cmdarg(): fix CMD_INSERT copy that omitted leading chars
 01-05-02 tw: fix -a to use CMD_POST instead of CMD_INSERT

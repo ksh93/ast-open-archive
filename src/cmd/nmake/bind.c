@@ -41,6 +41,22 @@
 #define HACKSPACE(f,s)	for (s = f; s = strchr(s, ' '); *s++ = (state.test & 4) ? '?' : FILE_SPACE)
 #define FIGNORE(s)	((s)[0]=='.'&&((s)[1]==0||(s)[1]=='.'&&(s)[2]==0))
 
+#if DEBUG
+#define DEBUGSOURCE(n,d,p) \
+	do \
+	{ \
+		if (error_info.trace <= -14) \
+		{ \
+			struct list*	q; \
+			message((-14, "  [%d] %s", n, (d)->name)); \
+			for (q = p; q; q = q->next) \
+				message((-14, "      %s", q->rule->name)); \
+		} \
+	} while (0)
+#else
+#define DEBUGSOURCE(n,d,p)
+#endif
+
 #if _WIN32
 
 /*
@@ -940,39 +956,64 @@ bindfile(register struct rule* r, char* name, int flags)
 		message((-11, "bindfile(%s): dir=%s base=%s", name, dir ? dir : internal.dot->name, base));
 #endif
 		ndirs = 0;
-		a = 0;
 		if (!(flags & BIND_DOT))
 		{
-			if (!r) a = associate(internal.source_p, NiL, name, NiL);
-			else if (name == r->name) a = associate(internal.source_p, r, NiL, NiL);
+			if (!r)
+				a = associate(internal.source_p, NiL, name, NiL);
+			else if (name == r->name)
+				a = associate(internal.source_p, r, NiL, NiL);
+			else
+				a = 0;
 			if (!a || !(a->property & P_force))
 			{
-				x = internal.source;
-				if (!(x->dynamic & D_cached)) x = source(x);
-				dirs[ndirs++] = x->prereqs;
-				if ((flags & BIND_MAKEFILE) && (z = catrule(internal.source->name, external.source, NiL, 0)))
+				if ((x = internal.source) != a)
 				{
-					if (!(z->dynamic & D_cached)) z = source(z);
-					dirs[ndirs++] = z->prereqs;
+					if (!(x->dynamic & D_cached))
+						x = source(x);
+					if ((p = x->prereqs) && (p->rule != internal.dot || (p = p->next)))
+					{
+						DEBUGSOURCE(ndirs, x, p);
+						dirs[ndirs++] = p;
+					}
+				}
+				if ((flags & BIND_MAKEFILE) && (x = catrule(internal.source->name, external.source, NiL, 0)) && x != a)
+				{
+					if (!(x->dynamic & D_cached))
+						x = source(x);
+					if ((p = x->prereqs) && (p->rule != internal.dot || (p = p->next)))
+					{
+						DEBUGSOURCE(ndirs, x, p);
+						dirs[ndirs++] = p;
+					}
 				}
 				edit(buf, name, DELETE, internal.source->name, KEEP);
-				if ((z = getrule(sfstruse(buf))) && z != x && z != internal.source_p)
+				if ((z = getrule(sfstruse(buf))) && z != x && z != internal.source && z != internal.source_p)
 				{
-					if (!(z->dynamic & D_cached)) z = source(z);
-					dirs[ndirs++] = z->prereqs;
+					if (!(z->dynamic & D_cached))
+						z = source(z);
+					if ((p = z->prereqs) && (p->rule != internal.dot || (p = p->next)))
+					{
+						DEBUGSOURCE(ndirs, z, p);
+						dirs[ndirs++] = p;
+					}
 				}
 			}
 			if (a)
 			{
-#if DEBUG
-				message((-5, "%s directory order from %s", (a->property & P_force) ? "override" : "insert", a->name));
-#endif
-				if (!(a->dynamic & D_cached)) a = source(a);
-				dirs[ndirs++] = a->prereqs;
+				if (!(a->dynamic & D_cached))
+					a = source(a);
+				if ((p = a->prereqs) && (p->rule != internal.dot || (p = p->next)))
+				{
+					DEBUGSOURCE(ndirs, a, p);
+					dirs[ndirs++] = p;
+				}
 			}
 		}
 		dot.rule = internal.dot;
 		dot.next = 0;
+#if DEBUG
+		message((-14, "  [%d] %s", ndirs, internal.dot->name));
+#endif
 		dirs[ndirs++] = &dot;
 
 		/*
@@ -1345,7 +1386,8 @@ bindfile(register struct rule* r, char* name, int flags)
 				if (r->property & x->property & P_target)
 				{
 					message((-2, "%s not aliased to %s", unbound(r), unbound(x)));
-					if (state.questionable & 0x00000040) found = 0;
+					if (!(state.questionable & 0x00000040))
+						found = 0;
 				}
 				else r = bindalias(r, x, b, od);
 			}
@@ -1590,13 +1632,16 @@ source(register struct rule* r)
 	{
 		x = r;
 		r = catrule(x->name, internal.internal->name, NiL, 1);
+#if _HUH_2001_10_31
 		freelist(r->prereqs);
+#endif
 		r->prereqs = listcopy(x->prereqs);
 		r->dynamic |= D_compiled | (x->dynamic & D_dynamic);
 		r->property |= P_readonly;
 	}
 	r->dynamic |= D_cached;
-	if (r->dynamic & D_dynamic) dynamic(r);
+	if (r->dynamic & D_dynamic)
+		dynamic(r);
 	if (state.maxview && !state.fsview)
 	{
 		register char*		s;
@@ -1651,7 +1696,8 @@ source(register struct rule* r)
 					sfputr(tmp, t, -1);
 					t = sfstruse(tmp);
 					pathcanon(t, 0);
-					if (!(x = getrule(t))) x = makerule(t);
+					if (!(x = getrule(t)))
+						x = makerule(t);
 					if (!(x->mark & M_directory))
 					{
 						x->mark |= M_directory;
@@ -1670,17 +1716,21 @@ source(register struct rule* r)
 #endif
 						if (dot || *s != '.' || *(s + 1))
 						{
-							if (dot) sfputr(tmp, s, -1);
-							else sfprintf(tmp, "%s/%s", s, t);
+							if (dot)
+								sfputr(tmp, s, -1);
+							else
+								sfprintf(tmp, "%s/%s", s, t);
 						}
-						else sfputr(tmp, t, -1);
+						else
+							sfputr(tmp, t, -1);
 						s = sfstruse(tmp);
 						pathcanon(s, 0);
 						x = makerule(s);
 						if (!(x->dynamic & D_source))
 						{
 							x->dynamic |= D_source;
-							if (x->view < view) x->view = view;
+							if (x->view < view)
+								x->view = view;
 						}
 						if (!(x->mark & M_directory))
 						{
@@ -1717,7 +1767,8 @@ source(register struct rule* r)
 					}
 					for (p = q; p; p = p->next)
 					{
-						if (*(t = unbound(p->rule)) == '/') break;
+						if (*(t = unbound(p->rule)) == '/')
+							break;
 						if (!p->rule->view)
 						{
 							if (*t == '.' && !*(t + 1))
@@ -1730,13 +1781,16 @@ source(register struct rule* r)
 									pathcanon(t, 0);
 									z = z->next = cons(makerule(t), NiL);
 								}
-								if (dot) continue;
+								if (dot)
+									continue;
 								sfputr(tmp, s, -1);
 							}
 							else
 							{
-								if (dot) sfputr(tmp, t, -1);
-								else sfprintf(tmp, "%s/%s", s, t);
+								if (dot)
+									sfputr(tmp, t, -1);
+								else
+									sfprintf(tmp, "%s/%s", s, t);
 							}
 							t = sfstruse(tmp);
 							pathcanon(t, 0);
@@ -1744,7 +1798,8 @@ source(register struct rule* r)
 							if (!(x->dynamic & D_source))
 							{
 								x->dynamic |= D_source;
-								if (x->view < view) x->view = view;
+								if (x->view < view)
+									x->view = view;
 							}
 							if (!(x->mark & M_directory))
 							{
@@ -1759,7 +1814,8 @@ source(register struct rule* r)
 					sfputr(tmp, t, -1);
 					t = sfstruse(tmp);
 					pathcanon(t, 0);
-					if (!(x = getrule(t))) x = makerule(t);
+					if (!(x = getrule(t)))
+						x = makerule(t);
 					if (!(x->mark & M_directory))
 					{
 						x->mark |= M_directory;

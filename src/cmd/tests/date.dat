@@ -116,7 +116,7 @@ next 2 days				NULL	Wed Sep 24 12:19:47 EDT 1986
 # cron command examples
 #
 
-0 0 1,15 * 1				NULL	Mon Sep 29 00:00:00 EDT 1986
+0 0 1,15 * 1				NULL	Mon Dec  1 00:00:00 EST 1986
 0 0 * * 1				NULL	Mon Sep 29 00:00:00 EDT 1986
 0 0 * * *				NULL	Tue Sep 23 00:00:00 EDT 1986
 15 0 * * *				NULL	Tue Sep 23 00:15:00 EDT 1986
@@ -128,6 +128,8 @@ next 2 days				NULL	Wed Sep 24 12:19:47 EDT 1986
 0 0 * 8 6				NULL	Sat Aug  1 00:00:00 EDT 1987
 0 0 * 8 0				NULL	Sun Aug  2 00:00:00 EDT 1987
 0 0 * 8 0,6				NULL	Sat Aug  1 00:00:00 EDT 1987
+0 7 1-7 * 2				NULL	Tue Oct  7 07:00:00 EDT 1986
+0 0 17 7 6				NULL	Sat Jul 17 00:00:00 EDT 1993
 
 #
 # date command examples

@@ -1,3 +1,7 @@
+01-10-31 sed: all space before ; command separator for REG_LENIENT
+01-10-20 testglob.c: handle \ in pattern and result field parse
+	 testglob.dat: add tests for \ in pattern and GLON_NOCHECK
+	 sed1.c: fix instruction cast pun
 01-10-18 testmatch.c,testre.c: all test failure messages contain the text `fail'
 01-10-17 testre.dat: add []{}() imbalance tests
 01-10-05 testglob.c: update --help, add GLOB_LIST and GLOB_STACK tests

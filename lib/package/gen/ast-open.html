@@ -19,6 +19,24 @@ Components in this package:
 <P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>
 <TABLE  width=99% align=center border=0 cellspacing=0 frame=void rules=none bordercolor=white cellpadding=0 >
 <TBODY>
+<TR><TD align=left>
+<A href="#3d">3d</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;html&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#pax">pax</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#tksh">tksh</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libdll&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#libtksh">libtksh</A></TD></TR>
+<TR><TD align=left>
+<A href="#at">at</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#ie">ie</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;probe&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#tw">tw</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libexpr&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libuu</TD></TR>
+<TR><TD align=left>
+<A href="#builtin">builtin</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#ksh93">ksh93</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#proto">proto</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#warp">warp</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libmam&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libvdelta</TD></TR>
+<TR><TD align=left>
+bzip&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;mailx&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#pzip">pzip</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libast&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libodelta&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libz</TD></TR>
+<TR><TD align=left>
+<A href="#coshell">coshell</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;mam&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;re&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libbz&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libpp</TD></TR>
+<TR><TD align=left>
+cpp&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#msgcc">msgcc</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#sort">sort</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libcdb&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libpz</TD></TR>
+<TR><TD align=left>
+cql&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;ncsl&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;ss&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libcmd&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;librecsort</TD></TR>
+<TR><TD align=left>
+cs&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#nmake">nmake</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#std">std</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libcoshell&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libsum</TD></TR>
+<TR><TD align=left>
+diff&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;pack&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;tests&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libcs&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libtk</TD></TR>
 </TBODY></TABLE></TD></TR></TBODY></TABLE>
 <P>
 This package is a superset of the following packages: ast-base ast-ksh; you won't need these if you download ast-open.
@@ -1776,6 +1794,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-20 pax: describe the 4 operation modes in separate paragraphs
 01-10-18 pax: fix --meter for paths containing <\>n</\>\r\v
 01-09-06 pax: add ms tnef (transport neutral encapsulation format) archive read
 01-08-11 pax: fix tar_checksum() w.r.t. CC_NATIVE!=CC_ASCII
@@ -1993,6 +2012,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-20 htmlrefs: fix &lt;!--INTERNAL--&gt; filter delete detection, GLOB_AUGMENTED
 01-05-09 mm2html: ignore a few more requests
 01-05-04 mm2html: more tbl adjustments from Bruce Lilly
 01-05-02 mm2html: tweak tbl column spacing, handle .TH &#0091;N&#0093;
@@ -2050,6 +2070,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 sear.sh: add sear.ico
 01-10-16 sear.sh: _SEA_* =&gt; _SEAR_*
 01-10-05 sear.sh: rename from sea.sh
 01-09-11 sea.sh: add
@@ -2072,6 +2093,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 opt.tst: add --?+SECTION tests
+01-10-30 date*.dat: fix cron tests where both mday and wday are specified
 01-10-18 strtof.tst: adjust for sfprintf()/printf() rounding
 01-10-18 sfio/twchar.c: add wchar_t tests
 01-10-11 opt.tst: add example and literal tests, <!--NULL-->. nroff tests
@@ -2104,6 +2127,13 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 fchdir3d: add along with state.file&#0091;&#0093;.dir to cache open dir paths
+	 dir3d.c: add recursive call intercepts
+	 error.c: add recursive call intercepts
+	 pathreal.c: add buffer size check
+	 features/syscall.sh: add bsd syscall __RENAME() checks
+	 syscall3d.c: check _lib_syscall before using it!
+01-10-30 features/syscall.sh,syscall3d.c: handle -ldl calls back into 3d
 01-09-20 3d.sh: drop extra } in USAGE that emitted -} for --?
 01-07-17 Makefile: don't link 3d dll against ast dll
 01-02-19 close3d: dup reserved fd's higher
@@ -2288,6 +2318,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="cpp changes">cpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-20 cpp.tst: add pp:splicespace "..." tests
 01-06-01 cpp.tst: add -M* dependency generation tests
 01-02-14 cpp.tst: pp:pragmaexpand pp:catliteral # operator interactions
 01-02-05 cpp.tst: add (finally)
@@ -2348,7 +2379,17 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 Makerules.mk: adjust .SOURCE.mk to ensure user specified dir order
+	 Makerules.mk: search MAKERULESPATH for ppcc rather than just MAKELIB
+	 Makerules.mk: delay CC.SHARED.REGISTRY expansion
+	 bind.c: add debug=14 directory search order trace
+	 make.probe: fix CC.SHARED.REGISTRY probe typo
+01-10-30 Makerules.mk: _BLD_foo==1 only for foo :LIBRARY: source
 01-10-20 Makerules.mk: fix --mam bug that didn't parameterize HOSTCC
+	 Makerules.mk: fix .PACKAGE.INIT. and .BIND.-l% to use the same search!
+	 bind.c: foiled alias still allows bind questionable=0x40
+	 expand.c: allow all edit op delimiter combinations (e.g., !&gt;, &lt;&gt;)
+	 make.probe: fix CC.DLL probe for gcc __ia64
 01-10-18 misc.c: clear SFFMT_LONG for %&#0091;cCsS&#0093; to avoid wide char conversions
 01-10-17 misc.c: add %a %A format, fix unknown format core dump
 01-10-15 Makerules.mk: fix .SELECT. bug that improperly dropped .ARCHIVE
@@ -3067,6 +3108,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 what.c: fix omitted file arg doc
 01-06-06 who.c: fix entry skip logic that listed too many entries
 01-05-31 Makefile: add PACKAGE_OPTIMIZE=space checks
 01-05-29 Makefile: if -lcmd is dll then BUILTINS linked to one a.out
@@ -5130,6 +5172,8 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="pzip changes">pzip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 pin: add --reorder=tsp via -ltsp
+01-10-30 pzip: fix --window doc typo
 01-10-08 pin: add --optimize={dynamic|greedy|non|transitive}
 	 pin: add --optimize method table for easy expansion
 01-08-11 pzip: set error_info.id from argv for statically linked disciplines
@@ -5166,6 +5210,10 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 sed: all space before ; command separator for REG_LENIENT
+01-10-20 testglob.c: handle &nbsp;in pattern and result field parse
+	 testglob.dat: add tests for &nbsp;in pattern and GLON_NOCHECK
+	 sed1.c: fix instruction cast pun
 01-10-18 testmatch.c,testre.c: all test failure messages contain the text `fail'
 01-10-17 testre.dat: add &#0091;&#0093;{}() imbalance tests
 01-10-05 testglob.c: update --help, add GLOB_LIST and GLOB_STACK tests
@@ -5291,6 +5339,7 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 df: increase the fs stat timeout from 2 to 4 sec
 01-09-04 locale: add new catagories
 01-08-11 ls: fix nonprintable test for mb locales
 01-08-01 features/procfs: note that synthesized psinfo doesn't have pr_psargs
@@ -5473,6 +5522,7 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 tw,find: add slocate(1) refs
 01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
 	 cmdarg(): fix CMD_INSERT copy that omitted leading chars
 01-05-02 tw: fix -a to use CMD_POST instead of CMD_INSERT
@@ -5539,6 +5589,7 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="warp changes">warp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-20 warp: drop :WWW: standalone distribution
 99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
 99-05-21 add: _xstat64
 99-04-01 add :WWW:, change from function to script
@@ -5551,6 +5602,19 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 regex/ucs_names.h: add string catenation to keep line length low
+	 misc/fastfind.c: handle gnu slocate db read
+	 misc/optget.c: add --?+SECTION queries
+	 comp/fnmatch.h: add FNM_NOSYS
+01-10-30 tm/tmdate.c: fix cron specs when both wday and mday are specified
+01-10-20 misc/glob.c: fix bug that called &nbsp;trim() twice on same path
+	 misc/glob.c: fix &nbsp;trim() bug that restored / to wrong position
+	 string/fmtre.c: fix { ^ . $ } translations
+	 misc/optget.c: use original string if translation fails -- duh
+	 sfio/sfhdr.h: assume &lt;errno.h&gt; assigns proper atttibutes to errno
+	 comp/regcmp.c: __ia64 workaround fixed by proper CC.DLL probe
+	 comp/getdate.c: __ia64 workaround fixed by proper CC.DLL probe
+	 features/lib: add lib getdate
 01-10-18 features/lib: check for strtod static link collision
 	 features/float: add another signed cast for old bsd cc
 	 features/wchar: add &lt;stdlib.h&gt; &lt;stdio.h&gt; before &lt;wchar.h&gt; for old bsd
@@ -6283,6 +6347,9 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 mkdir.c: mkdir() on existing dir could fail with errno!=EEXIST
+	 uname.c: add execve() loop check for unknown options
+01-10-29 tail.c: SF_SHARE on only if not reading through EOF
 01-10-11 getconf.c: fix usage typos
 01-09-11 cp.c,cmd.h: handle . in argv&#0091;0&#0093;
 	 cp.c: add O_BINARY to all open() calls
@@ -6385,6 +6452,7 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="libdll changes">libdll changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 dlfcn.c: change hp.pa dlopen() prototype (&lt;dlfcn.h&gt; but no -ldl!)
 01-09-25 dllfind: add LIBSUFFIX
 01-07-17 dllfind: do at least one dlopen() to prime dlerror()
 01-05-29 dlopen: fix dlopen(0,0) for HP
@@ -6520,6 +6588,7 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="libcoshell changes">libcoshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-26 coopen.c: hung sfclose(fp) -&gt; close(sffileno(fp)) -- wow
 01-09-11 coinit.c: fix coident&#0091;&#0093; for ancient bsh that die on `test == 1'
 	 coinit.c: and fix coident&#0091;&#0093; to weed out buggy ksh88i trap on exit
 01-05-31 co*: add CO_CROSS, expose CO_DEVFD
@@ -6537,6 +6606,8 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="libcs changes">libcs changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-31 cssend,csrecv: use msg_accrights over msg_control
+	 cspath: don't check /dev/fd/* -- duh
 01-05-11 csserve: sync cs.* with css-&gt;*
 	 csspoll: handl cspoll() EINTR that doesn't set cs.interrupt
 01-01-01 cspoll: fix getmsg() flag arg
@@ -6610,6 +6681,7 @@ End:
 <P><HR><CENTER><FONT face=courier><FONT color=red><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+01-10-20 pplex.c: fix pp:splicespace inside "..."
 01-09-11 ppinput.c: use pathnative() for native fs representation
 01-08-31 pp.probe: handle -Dmacro(args)=value
 01-08-11 ppcontrol: fix ... and __VAR_ARGS__ for C99
@@ -7138,7 +7210,7 @@ End:
 <HR>
 <DIV align=right>
 <P>
-October 19, 2001
+November 14, 2001
 </DIV>
 
 </TD></TR></TBODY></TABLE>

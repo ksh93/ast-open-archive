@@ -36,7 +36,7 @@ dup23d(int fd, register int r)
 	if (r >= 0 && r < elementsof(state.file) && state.file[r].reserved) close(r);
 	r = DUP2(fd, r);
 #if FS
-	if (state.cache && r >= 0 && r < elementsof(state.file))
+	if (r >= 0 && r < elementsof(state.file))
 		fs3d_dup(fd, r);
 #endif
 	return(r);

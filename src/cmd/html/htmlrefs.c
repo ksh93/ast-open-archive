@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2001-01-31 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2001-10-20 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -226,7 +226,7 @@ check(register State_t* state, const char* dir, const char* name, unsigned int f
 
 	memset(&gl, 0, sizeof(gl));
 	sfsprintf(state->dir, sizeof(state->dir) - 1, "%s/(%s)", dir, name);
-	if (!glob(state->dir, GLOB_DISC|GLOB_NOCHECK|GLOB_STACK, 0, &gl))
+	if (!glob(state->dir, GLOB_AUGMENTED|GLOB_DISC|GLOB_STACK, 0, &gl))
 		for (p = gl.gl_pathv; s = *p++;)
 			if (!dtmatch(state->files, s) && !access(s, 0))
 			{
@@ -845,11 +845,13 @@ filter(register State_t* state, register Sfio_t* ip, Sfio_t* op)
 		}
 		else
 		{
-			if (head)
-				return 0;
 			while ((s = sfgetr(ip, '\n', 0)) && (sfvalue(ip) != sizeof(external) || !strneq(s, external, sizeof(external) - 1)));
 			if (!s)
+			{
+				if (head)
+					return 0;
 				break;
+			}
 		}
 	}
 	if (sfvalue(ip) && (s = sfgetr(ip, -1, 0)) && (n = sfvalue(ip)))

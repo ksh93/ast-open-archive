@@ -2089,7 +2089,7 @@ ppcpp(void)
 				{
 					m = 0;
 					GET(c, n, tp, xp);
-					if (pp.option & SPLICESPACE)
+					if ((pp.option & SPLICESPACE) && !INQUOTE(rp))
 						while (n == ' ')
 						{
 							GET(c, n, tp, xp);

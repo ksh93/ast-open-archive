@@ -39,6 +39,13 @@ close3d(int fd)
 		register Mount_t*	mp;
 #endif
 
+#if defined(fchdir3d)
+		if (state.file[fd].dir)
+		{
+			free(state.file[fd].dir);
+			state.file[fd].dir = 0;
+		}
+#endif
 		if (rp = state.file[fd].reserved)
 		{
 			if ((nfd = FCNTL(fd, F_DUPFD, fd + 1)) < 0)

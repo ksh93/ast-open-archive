@@ -22,6 +22,7 @@ dup		dup	int		int				41
 dup2		dup	int		int, int			90
 execve		exec	int		const char*, char* const*, char* const*	59	59
 facl		control	int		int, int, int, aclent_t*	200		sys/acl.h
+fchdir		nop	int		int				147
 fchmod		chmod	int		int, mode_t			124
 fchown		chown	int		int, uid_t, gid_t		123
 fcntl		dup	int		int, int, ...			92

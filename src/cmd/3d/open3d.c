@@ -251,9 +251,29 @@ open3d(const char* path, int oflag, ...)
 	if (fd >= 0)
 		CLOSE(fd);
  done:
-#if FS
+#if FS || defined(fchdir3d)
 	if (r >= 0)
 	{
+#if defined(fchdir3d)
+		if (S_ISDIR(st.st_mode) && r < elementsof(state.file))
+		{
+			Dir_t*	dp;
+
+			if (state.file[r].dir)
+			{
+				free(state.file[r].dir);
+				state.file[r].dir = 0;
+			}
+			if (dp = newof(0, Dir_t, 1, strlen(sp)))
+			{
+				strcpy(dp->path, sp);
+				dp->dev = st.st_dev;
+				dp->ino = st.st_ino;
+				state.file[r].dir = dp;
+			}
+		}
+#endif
+#if FS
 		level = state.path.level;
 		if (state.cache)
 		{
@@ -266,6 +286,7 @@ open3d(const char* path, int oflag, ...)
 		for (mp = state.global; mp; mp = mp->global)
 			if (fssys(mp, MSG_open))
 				fscall(mp, MSG_open, r, state.path.name, oflag, st.st_mode, level);
+#endif
 	}
 #endif
 	return(r);

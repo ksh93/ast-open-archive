@@ -1,3 +1,10 @@
+01-10-31 fchdir3d: add along with state.file[].dir to cache open dir paths
+	 dir3d.c: add recursive call intercepts
+	 error.c: add recursive call intercepts
+	 pathreal.c: add buffer size check
+	 features/syscall.sh: add bsd syscall __RENAME() checks
+	 syscall3d.c: check _lib_syscall before using it!
+01-10-30 features/syscall.sh,syscall3d.c: handle -ldl calls back into 3d
 01-09-20 3d.sh: drop extra } in USAGE that emitted -} for --?
 01-07-17 Makefile: don't link 3d dll against ast dll
 01-02-19 close3d: dup reserved fd's higher

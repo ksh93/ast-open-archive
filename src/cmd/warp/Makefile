@@ -15,11 +15,3 @@ warp :: warp.sh
 :: README RELEASE PROMO.mm
 
 :TEST: warp
-
-:INSTALLDIR: date-www
-
-../std/date.o : .DO.NOTHING
-
-date-www :: ../std/date.o +last
-
-:WWW: warp.mm warp date-www testwarp-www

@@ -41,7 +41,7 @@ $(ID)$(VARIANTID) $(VERSION) :LIBRARY: README RELEASE PROMO.mm \
 	vcs_3d.h vcs.c \
 	access3d.c brk3d.c chdir3d.c chmod3d.c chown3d.c close3d.c \
 	creat3d.c dir3d.c dup23d.c dup3d.c execve3d.c exit3d.c \
-	fchmod3d.c fchown3d.c fcntl3d.c fork3d.c fpathconf3d.c \
+	fchdir3d.c fchmod3d.c fchown3d.c fcntl3d.c fork3d.c fpathconf3d.c \
 	fstat3d.c fstatfs3d.c fstatvfs3d.c fsync3d.c \
 	ftruncate3d.c getdents3d.c kill3d.c link3d.c lseek3d.c \
 	lstat3d.c mkdir3d.c mknod3d.c mount3d.c open3d.c pathconf3d.c \

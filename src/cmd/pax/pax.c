@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-10-18 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-10-20 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -60,8 +60,7 @@ USAGE_LICENSE
 "	directory tree, subject to the options described below.  By default the"
 "	owner and group of selected files will be that of the current user, and"
 "	the permissions and modify times will be the same as those in the"
-"	archive.  If the \b-r\b option is omitted then a table of contents of"
-"	the selected files is listed on the standard output.]"
+"	archive.]"
 "[+?\bpax -rw\b reads the files and directories named in the \apathname\a"
 "	arguments and copies them to the destination \adirectory\a."
 "	A directory \apathname\a argument refers to the files and (recursively)"
@@ -70,6 +69,8 @@ USAGE_LICENSE
 "	copy, one pathname per line.  In this case only those pathnames"
 "	appearing on the standard input are copied.  \adirectory\a must exist"
 "	before the copy.]"
+"[+?\bpax\b (\b-r\b and \b-w\b omitted) accepts \b-r\b operands and lists a"
+"	table of contents of the selected files on the standard output.]"
 "[+?The standard archive formats are automatically detected on input."
 "	The default output archive format is implementation defined, but may be"
 "	overridden by the \b-x\b option described below. \bpax\b archives may"

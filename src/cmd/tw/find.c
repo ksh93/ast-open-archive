@@ -51,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2001-02-06 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2001-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -84,8 +84,11 @@ static const char usage2[] =
 "[+FILES]{"
 "	[+lib/find/codes?Default \blocate\b(1) database.]"
 "}"
+"[+NOTES?In order to access the \bslocate\b(1) database the \bfind\b executable"
+"	must be setgid to the \bslocate\b group.]"
 "[+SEE ALSO?\bcpio\b(1), \bfile\b(1), \blocate\b(1), \bls\b(1), \bsh\b(1),"
-"	\btest\b(1), \btw\b(1), \bupdatedb\b(1), \bxargs\b(1), \bstat\b(2)]"
+"	\bslocate\b(1), \btest\b(1), \btw\b(1), \bupdatedb\b(1),"
+"	\bxargs\b(1), \bstat\b(2)]"
 ;
 
 #include <ast.h>

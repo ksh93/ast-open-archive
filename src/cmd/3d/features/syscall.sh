@@ -28,7 +28,7 @@
 #
 # this is the worst iffe script, we promise
 #
-# @(#)syscall.sh (AT&T Research) 1999-02-14
+# @(#)syscall.sh (AT&T Research) 2001-10-31
 #
 eval $1
 shell=
@@ -51,7 +51,6 @@ done
 tmpall="$tmp.[$tmpall]"
 rm -f $tmpall
 sys=
-hdr=
 fun=
 stdc=
 sym=
@@ -84,6 +83,40 @@ extern
 int syscall();
 static int ((*i)())=syscall;
 main() { return(i==0); }" > $tmp.c
+
+SYS_PREFIX=
+SYS_HEADER=
+SYS_CALL=
+for f in syscall.h sys/syscall.h
+do	echo "
+#include <$f>
+int x;" > ${tmp}s.c
+	if	$cc -c ${tmp}s.c </dev/null >/dev/null
+	then	SYS_HEADER=$f
+		echo "
+#include <$f>
+" >> $tmp.f
+		echo "#include <sys/syscall.h>
+#ifdef SYS_exit
+int i;
+#else
+(
+#endif" > ${tmp}s.c
+		if	$cc -c ${tmp}s.c
+		then	l=fun
+			echo "int ${l}() { return 0; }" > ${tmp}s.c
+			if	$cc -c ${tmp}s.c </dev/null >/dev/null
+			then	SYS_CALL=syscall
+				s=`nm ${tmp}s.o | sed -e /${l}/!d -e 's/.*[^_]\(_*'$l'[0-9]*\).*/\1/'`
+				case $s in
+				_*)	SYS_PREFIX=_ ;;
+				esac
+			fi
+		fi
+		break
+	fi
+done
+
 while	:
 do	echo '#include <sys/types.h>
 #include <dlfcn.h>
@@ -160,31 +193,25 @@ main()
 	if	rm -f $tmp.x &&
 		$cc $static -o $tmp.x $tmp.c </dev/null >/dev/null &&
 		$executable $tmp.x
-	then	for f in syscall.h sys/syscall.h
-		do	echo "
-#include <$f>
-int x;" > ${tmp}s.c
-			if	$cc -c ${tmp}s.c </dev/null >/dev/null
-			then	hdr=$f
-				echo "
+	then	case $SYS_HEADER in
+		?*)	echo "
 #include <$f>
 SYS" > ${tmp}s.c
-				break
-			fi
-		done
+			;;
+		esac
 		inc="#if defined(__STDPP__directive) && defined(__STDPP__hide)
 __STDPP__directive pragma pp:hide syscall
 #else
 #define syscall        ______syscall
 #endif
-#include <$hdr>
+#include <$SYS_HEADER>
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
 __STDPP__directive pragma pp:nohide syscall
 #else
 #undef  syscall
 #endif"
 		{
-		case $hdr in
+		case $SYS_HEADER in
 		?*)	echo "$inc" ;;
 		*)	echo "#define SYS_exit 1" ;;
 		esac
@@ -193,7 +220,7 @@ __STDPP__directive pragma pp:nohide syscall
 		if	rm -f ${tmp}m.x &&
 			$cc $static -o ${tmp}m.x ${tmp}m.c </dev/null >/dev/null &&
 			./${tmp}m.x
-		then	case $hdr in
+		then	case $SYS_HEADER in
 			?*)	echo "$inc" ;;
 			esac
 			rm -f $tmp.x
@@ -215,6 +242,7 @@ static int _lib_mangle_lib_;" >> $tmp.m
 	fi
 	break
 done
+echo iffe: test: type=$sys header=$SYS_HEADER ${SYS_CALL:+call=$SYS_CALL} ${SYS_PREFIX:+prefix=$SYS_PREFIX} >&$stderr
 echo "#if SYSTRACE3D
 
 /* output */
@@ -236,9 +264,10 @@ echo "#if SYSTRACE3D
 typedef struct
 {
 	Sysfunc_t	func;
-	unsigned short	index;
-	unsigned char	call;
-	unsigned char	args;
+	short		index;
+	short		nov;
+	unsigned short	call;
+	unsigned short	args;
 	const char*	name;
 	unsigned char	type[8];
 	unsigned long	count;
@@ -288,7 +317,7 @@ do	IFS="	"
 		continue
 		;;
 	"elif")	case $ifi in
-		0)	echo "$0: no if for elif" >&2
+		0)	echo "$0: no if for elif" >&$stderr
 			break
 			;;
 		esac
@@ -309,7 +338,7 @@ do	IFS="	"
 		ifi="$i $ifi"
 		;;
 	"else")	case $ifi in
-		0)	echo "$0: no if for else" >&2
+		0)	echo "$0: no if for else" >&$stderr
 			break
 			;;
 		esac
@@ -322,7 +351,7 @@ do	IFS="	"
 		ifi="$i $ifi"
 		;;
 	"fi")	case $ifi in
-		0)	echo "$0: no if for fi" >&2
+		0)	echo "$0: no if for fi" >&$stderr
 			break
 			;;
 		esac
@@ -341,6 +370,7 @@ do	IFS="	"
 	r=$3
 	p=$4
 	shift 4
+	echo iffe: test: system call $l >&$stderr
 	case $r in
 	"bool")	cast="(" tsac="<0?-1:0)" r=int ;;
 	"int")	cast= tsac= ;;
@@ -430,12 +460,15 @@ main()
 	A=$a
 	B=$b
 	alt=
+	def=
 	inc=
 	ind=
+	map=
 	num=
 	opt=
 	ref=
 	ver=
+	VER=
 	while	:
 	do	case $1 in
 		alt*)	alt=$2
@@ -473,7 +506,7 @@ extern $r $l($var);
 			echo "#define ARG3D$m		$B" >> $tmp.f
 			break
 			;;
-		ver*)	ver=1
+		ver*)	VER=1
 			case $2 in
 			-)	ref= ;;
 			*)	ref=$2 ;;
@@ -550,8 +583,8 @@ extern $r $l($var);
 		opt="$opt -Dheader"
 		;;
 	esac
-	case $ver in
-	?*)	if	rm -f $tmp.x &&
+	case $VER:$ver in
+	*:?*)	if	rm -f $tmp.x &&
 			$cc -Dsyscall=$xxx $static -o $tmp.x $tmp.c </dev/null >/dev/null &&
 			$executable $tmp.x
 		then	# hack test for last arg indirect in xxx version
@@ -607,8 +640,13 @@ extern $r $l($var);
 			esac
 			{
 			echo "#define SYS3D$m		$inx"
-			echo "#define SYS$m		SYS3D$m"
-			echo "#define SYS$xxx		SYS$m"
+			echo "#ifndef SYS$m"
+			echo "#define SYS$m		(-1)"
+			echo "#endif"
+			echo "#ifndef SYS$xxx"
+			echo "#define SYS$xxx		(-1)"
+			echo "#endif"
+			echo "#define SYSNOV$xxx	SYS$m"
 			} >> $tmp.f
 			case $shell in
 			*n*)	((inx=inx+1)) ;;
@@ -711,7 +749,8 @@ extern long $u();" >> $tmp.g
 			*)	x=
 				;;
 			esac
-			echo "{ ${x}SYS$xxx, MSG_CALL(MSG_$q), $c, \"$xxx\", { $d } }," >> $tmp.t
+			echo iffe: test: $l "=>" $xxx >&$stderr
+			echo "{ ${x}SYS$xxx, SYSNOV$xxx, MSG_CALL(MSG_$q), $c, \"$xxx\", { $d } }," >> $tmp.t
 			# NOTE: no varargs here
 			IFS=$comma
 			set $p
@@ -773,13 +812,45 @@ extern long $u();" >> $tmp.g
 			continue
 		fi
 		;;
+	1:*)	case $SYS_CALL in
+		?*)	echo "#include <${SYS_HEADER}>
+#ifdef SYS_${l}
+(
+#endif
+#include <sys/types.h>
+#include <sys/stat.h>
+extern int ${l}();
+int fun() { struct stat st; return ${l}(0,&st); }" > ${tmp}s.c
+			if	$cc -c ${tmp}s.c >/dev/null 2>&1
+			then	s=`nm ${tmp}s.o | sed -e /$l/!d -e 's/.*[^_]\('${SYS_PREFIX}'_*'${l}'[0-9]*\).*/\1/'`
+				case $s in
+				$l)	;;
+				*)	echo "#include <sys/syscall.h>
+#ifndef SYS_${s}
+(
+#else
+int i;
+#endif" > ${tmp}s.c
+					if	$cc -c ${tmp}s.c >/dev/null 2>&1
+					then	def=1
+						map=$s
+						echo "#define SYS_${l}	SYS_${s}" >> $tmp.f
+						echo iffe: test: $l "=>" $s >&$stderr
+					fi
+					;;
+				esac
+			else	def=1
+			fi
+			;;
+		esac
+		;;
 	esac
 	if	rm -f $tmp.x &&
 		$cc -Dsyscall=$l $opt $static -o $tmp.x $tmp.c </dev/null >/dev/null &&
 		$executable $tmp.x
 	then	case $sys in
 		att|bsd|dynamic|mangle)
-			case $hdr in
+			case $SYS_HEADER in
 			"")	case $num in
 				"")	;;
 				0)	echo "#define $u		$l" >> $tmp.r
@@ -817,7 +888,20 @@ extern long $u();" >> $tmp.g
 		echo "#ifndef SYS$m"
 		echo "#define SYS$m	(-1)"
 		echo "#endif"
-		} >> $tmp.u
+		} >> $tmp.f
+		;;
+	*)	case $def:$SYS_HEADER in
+		:?*)	echo "#include <${SYS_HEADER}>
+#ifdef SYS${m}
+(
+#else
+int i;
+#endif" > ${tmp}s.c
+			if	$cc -c ${tmp}s.c >/dev/null 2>&1
+			then	echo "#define SYS$m		(-1)" >> $tmp.f
+			fi
+			;;
+		esac
 		;;
 	esac
 	case $call in
@@ -841,10 +925,16 @@ extern long $u();" >> $tmp.g
 			;;
 		esac
 		;;
-	sys)	echo "#define SYS3D$m		$inx" >> $tmp.f
+	sys)	{
+		echo "#define SYS3D$m		$inx"
 		case $sys in
-		dynamic|mangle)	echo "#define SYS$m		SYS3D$m" >> $tmp.f ;;
+		dynamic|mangle)
+			echo "#ifndef SYS$m"
+			echo "#define SYS$m		(-1)"
+			echo "#endif"
+			;;
 		esac
+		} >> $tmp.f
 		case $shell in
 		*n*)	((inx=inx+1)) ;;
 		*)	inx=`expr $inx + 1` ;;
@@ -930,12 +1020,13 @@ extern long $u();" >> $tmp.g
 			} > ${tmp}h.c
 			$cc -o ${tmp}h.x ${tmp}h.c && ./${tmp}h.x && i=_$i
 			;;
-		*)	case $weak in
-			?*)	i=$w ;;
+		*)	case $map:$weak in
+			?*:*)	i=$map ;;
+			:?*)	i=$w ;;
 			esac
 			;;
 		esac
-		echo "{ ${x}SYS$m, MSG_CALL(MSG_$q), $c, \"$i\", { $d } }," >> $tmp.t
+		echo "{ ${x}SYS$m, (-1), MSG_CALL(MSG_$q), $c, \"$i\", { $d } }," >> $tmp.t
 		;;
 	*)	case $num in
 		?*)	echo "extern $r			$u($p);" >> $tmp.e ;;
@@ -1038,21 +1129,19 @@ IFS=$ifs
 if	test -f $tmp.t
 then	{
 	echo "};
-
-extern long	syscall(int, ...);
 "
 	case $sys in
 	dynamic|mangle)
-		echo "#define syscall(z,a,b,c,d,e,f)	(*sys_trace[z].func)(a,b,c,d,e,f)"
+		echo "#define SYSCALL3D(z,a,b,c,d,e,f)	(*sys_trace[z].func)(a,b,c,d,e,f)"
 		case $sys in
 		dynamic|mangle)
 			echo "#undef	fstat"
 			case $_SYS_fstat_VER in
-			"")	echo "#define fstat(a,b)	syscall(SYS3D_fstat,a,b,0,0,0,0)" ;;
-			*)	echo "#define fstat(a,b)	syscall(SYS3D_fstat,$_SYS_fstat_VER,a,b,0,0,0)" ;;
+			"")	echo "#define fstat(a,b)	SYSCALL3D(SYS3D_fstat,a,b,0,0,0,0)" ;;
+			*)	echo "#define fstat(a,b)	SYSCALL3D(SYS3D_fstat,$_SYS_fstat_VER,a,b,0,0,0)" ;;
 			esac
 			echo "#undef	write"
-			echo "#define write(a,b,c)	syscall(SYS3D_write,a,b,c,0,0,0)"
+			echo "#define write(a,b,c)	SYSCALL3D(SYS3D_write,a,b,c,0,0,0)"
 			;;
 		esac
 		;;

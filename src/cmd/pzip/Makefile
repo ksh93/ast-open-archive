@@ -12,7 +12,9 @@ pcmp :: pcmp.c
 
 pop :: pop.c
 
-pin :: pin.c -lbz LICENSE=since=1998,author=gsf+alb
+pin :: pin.c -lbz -ltsp LICENSE=since=1998,author=gsf+alb
+
+-ltsp : .DONTCARE
 
 r2c :: r2c.c
 

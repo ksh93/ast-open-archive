@@ -67,7 +67,7 @@ lseek64(int fd, off64_t off, int op)
 	mp = monitored();
 #endif
 	if (!seekf)
-		seekf = (Seek64_f)sysfunc(SYS_lseek64);
+		seekf = (Seek64_f)sysfunc(SYS3D_lseek64);
 	if ((r = (*seekf)(fd, off, op)) == -1)
 		return -1;
 #if FS
@@ -101,7 +101,7 @@ lseek3d(int fd, off_t off, int op)
 	if (sizeof(off_t) > sizeof(long))
 	{
 		if (!seekf)
-			seekf = (Seek_f)sysfunc(SYS_lseek);
+			seekf = (Seek_f)sysfunc(SYS3D_lseek);
 		r = (*seekf)(fd, off, op);
 	}
 	else if ((r = LSEEK(fd, off, op)) == -1)

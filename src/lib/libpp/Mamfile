@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-18
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -101,6 +101,7 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast.h
 done ppsym.c
 prev ppsym.c
+setv _BLD_pp -U_BLD_pp
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsym.c
 done ppsym.o generated
 bind -last
@@ -684,7 +685,7 @@ exec - .
 exec - w
 exec - q
 exec - !
-exec - ${HOSTCC} -o ${COTEMP}.exe 1.${COTEMP}.c
+exec - cc -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > pp.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done pp.yacc generated
@@ -723,7 +724,7 @@ exec - .
 exec - w
 exec - q
 exec - !
-exec - ${HOSTCC} -o ${COTEMP}.exe 1.${COTEMP}.c
+exec - cc -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > ppkey.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done ppkey.yacc generated

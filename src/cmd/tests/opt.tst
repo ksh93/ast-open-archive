@@ -2765,6 +2765,39 @@ id=xlate catalog=libast text="again|back"
 id=(null) catalog=libast text="options"
 return=? option=-? name=--?onpx num=0
 id=(null) catalog=libast text="Usage"'
+	EXEC -+ xlate "$usage" --?+EXAMPLES
+		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="EXAMPLES"
+id=xlate catalog=libast text="Examples."
+id=xlate catalog=libast text="Foo bar."
+id=xlate catalog=libast text="bar"
+id=xlate catalog=libast text="Bar foo."
+return=? option=-? name=--?+EXAMPLES num=0
+id=(null) catalog=libast text="Usage"'
+		ERROR - $'  EXAMPLES        Rknzcyrf.
+                    foo   Sbb one.
+                    one   One sbb.'
+	EXEC -+ xlate "$usage" --?+EX
+		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="EXAMPLES"
+id=xlate catalog=libast text="Examples."
+id=xlate catalog=libast text="Foo bar."
+id=xlate catalog=libast text="bar"
+id=xlate catalog=libast text="Bar foo."
+return=? option=-? name=--?+EX num=0
+id=(null) catalog=libast text="Usage"'
+	EXEC -+ xlate "$usage" --?+RKNZCYRF
+		OUTPUT - $'id=xlate catalog=libast text="algorithm"
+id=xlate catalog=libast text="again|back"
+id=xlate catalog=libast text="EXAMPLES"
+id=xlate catalog=libast text="Examples."
+id=xlate catalog=libast text="Foo bar."
+id=xlate catalog=libast text="bar"
+id=xlate catalog=libast text="Bar foo."
+return=? option=-? name=--?+RKNZCYRF num=0
+id=(null) catalog=libast text="Usage"'
 	usage=$'[-?\n@(#)xlate 1.0\n][-author?Col. Hyde][a:algorithm?\fone\f]:[method]{[+?\fthree\f]}[b:again|back?\ftwo\f]'
 	EXEC -+ xlate "$usage" --keys
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"

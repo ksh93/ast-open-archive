@@ -47,6 +47,7 @@ extern void regdump(regex_t*);	/* secret entry into regex pkg */
 #endif
 
 int semicolon;
+int spaces;
 Text rebuf;
 
 unsigned char adrs[UCHAR_MAX+1] = {	/* max no. of addrs, 3 is illegal */
@@ -315,7 +316,7 @@ wc(Text *script, Text *t)
 	if(*p != -1)
 		return;
 	*(Sfio_t**)p = sfopen(NiL, (char*)(p+1), "w");
-	if(*p == 0)
+	if(*(Sfio_t**)p == 0)
 		syntax("can't open file for writing");
 }
 
@@ -701,19 +702,26 @@ compile(Text *script, Text *t)
 			}
 		}
 		(*docom[ccmapc(cmd,CC_NATIVE,CC_ASCII)&0x7f])(script, t);
+		while(*t->w == ' ' || *t->w == '\t')
+		{
+			t->w++;
+			if(!(reflags & REG_LENIENT) && !spaces++)
+				synwarn("space separators");
+		}
 		switch(*t->w) {
 		case 0:
 			script->w = script->s + loc;
+			break;
+		case ';':
+			if(!(reflags & REG_LENIENT) && !semicolon++)
+				synwarn("semicolon separators");
+		case '\n':
+			t->w++;
 			break;
 		default:
 			if(cmd == '{')
 				break;
 			syntax("junk after command");
-		case ';':
-			if(!(reflags & REG_LENIENT) && !semicolon++)
-				synwarn("semicolon separators");
-		case '\n':
-				t->w++;
 		}
 		*q = pack(neg,cmd,script->w-script->s-loc);
 	}

@@ -308,7 +308,7 @@ get_tag(int f, register Tag_t* tp)
 		return(0);
 	if (tp->type & LOG)
 	{
-		tp->del = tell(f);
+		tp->del = lseek(f, 0, SEEK_CUR);
 		lseek(f, tp->dsize, SEEK_CUR);
 	}
 	return(tp);
@@ -333,7 +333,7 @@ rs_dir(register int fd, register Attr_t* ap)
 		head = add_entry(head, tp);
 
 	lseek(fd, ap->tag_reg, SEEK_SET);
-	while((tell(fd)<ap->del_reg) && get_tag(fd, tp))
+	while((lseek(fd, 0, SEEK_CUR)<ap->del_reg) && get_tag(fd, tp))
 		head = add_entry(head, tp);
 
 	/*

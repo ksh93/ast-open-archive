@@ -485,6 +485,10 @@ update(register Coshell_t* sp)
 		else
 		{
 			n = 0;
+			if (!sp->scale)
+				sp->scale = 1;
+			if (!sp->rating)
+				sp->rating = 1;
 			n += W_LOAD * (((sp->stat.load / sp->scale) + CPU(sp->cpu, W_JOB * LOAD)) / T_LOAD) * sp->bias / sp->rating;
 			if (sp->idle)
 			{

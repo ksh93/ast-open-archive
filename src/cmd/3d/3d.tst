@@ -12,6 +12,8 @@
 	exit 1
 }
 
+export LC_ALL=C
+
 integer seconds=0
 
 COMMAND=3d
@@ -214,9 +216,9 @@ function REMOVE
 function TOUCH
 {
 	ACTIVE && DATA $* || return
-	touch -r $FILE -t "$seconds seconds hence" $tmp/reference || FAIL $tmp/reference touch error
+	touch -r $FILE -t "$seconds seconds" $tmp/reference || FAIL $tmp/reference touch error
 	(( seconds++ ))
-	touch -t "$seconds seconds hence" $FILE || FAIL $FILE touch error
+	touch -t "$seconds seconds" $FILE || FAIL $FILE touch error
 	if	[[ $FILE/... -nt $tmp/reference ]]
 	then	FAIL $FILE/... changed by $0
 	elif	[[ ! $FILE -nt $tmp/reference ]]

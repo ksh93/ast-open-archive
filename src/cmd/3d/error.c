@@ -101,6 +101,13 @@ errorv(const char* lib, int level, va_list ap)
 	int		line;
 	char*		file;
 
+	static int	intercepted;
+
+	if (intercepted++)
+	{
+		intercepted--;
+		return;
+	}
 	if (level > 0)
 	{
 		flags = level & ~ERROR_LEVEL;
@@ -110,6 +117,7 @@ errorv(const char* lib, int level, va_list ap)
 	if ((fd = fsfd(&state.fs[FS_option])) <= 0 || level < error_info.trace || lib && (error_info.clear & ERROR_LIBRARY) || level < 0 && error_info.mask && !(error_info.mask & (1<<(-level - 1))))
 	{
 		if (level >= ERROR_FATAL) (*error_info.exit)(level - 1);
+		intercepted--;
 		return;
 	}
 	if (error_info.trace < 0) flags |= ERROR_LIBRARY|ERROR_SYSTEM;
@@ -197,6 +205,7 @@ errorv(const char* lib, int level, va_list ap)
 		pause();
 	}
 	if (level >= ERROR_FATAL) (*error_info.exit)(level - ERROR_FATAL + 1);
+	intercepted--;
 }
 
 void

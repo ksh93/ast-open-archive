@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2001-10-11
+# @(#)make.probe (AT&T Research) 2001-10-31
 #
 # C probe for make
 #
@@ -49,13 +49,16 @@ int main(){f(1);return 0;}' > implc.$src
 echo 'template <class T> void f(T){}' > implc_x.$src
 echo 'template <class T> void f(T);' > implc_x.h
 echo 'extern int NotalL(){return(0);}' > notall.$src
-echo "#include <stdio.h>
-extern int f(){return(0);} int main(){FILE* fp=stdin;return(f());}" > pic.$src
-echo "class x {int n;} m;" > plusplus.$src
+echo '#include <stdio.h>
+extern int i;
+int i = 1;
+extern int f(){return(i);}
+int main(){FILE* fp=stdin;return(f());}' > pic.$src
+echo 'class x {int n;} m;' > plusplus.$src
 echo 'int prefix(){return 0;}' > prefix.$src
-echo "template<class T> int gt(T a, T b);
+echo 'template<class T> int gt(T a, T b);
 template<class T> int gt(T a, T b) { return a > b; }
-int main () { return gt(2,1); }" > ptr.$src
+int main () { return gt(2,1); }' > ptr.$src
 echo 'main(){return 0;}' > require.$src
 echo '#if test_const
 #define CONST const
@@ -698,7 +701,7 @@ case $pic:$so:$dynamic:$static in
 			0)	break ;;
 			esac
 			rm -f xxx$dll
-			if	eval \$ld \$shared -o xxx.\$dll $1 shared.\$obj &&
+			if	eval \$ld \$shared -o xxx\$dll $1 shared.\$obj &&
 				test -r xxx$dll -a -r $probe_shared_registry_file
 			then	probe_shared_registry_file='$(CC.SHARED.REGISTRY.PATH)'
 				eval set x $probe_shared_registry
@@ -1333,7 +1336,6 @@ case $hosted in
 esac
 
 # shellmagic defined if installed shell scripts need magic
-# currently only cygwin has the honor
 
 echo 'exec 4<&0
 echo ok' > ok
@@ -1345,7 +1347,15 @@ exec 4<&0
 echo ok' > ok
 	chmod +x ok
 	case `(eval ./ok | /bin/sh) 2>/dev/null` in
-	ok)	shellmagic='$("#")!/bin/env sh' ;;
+	ok)	shellmagic='$("#")!/bin/env sh'
+		;;
+	*)	for i in /emx/bin/bash.exe /emx/bin/sh.exe
+		do	if	test -x $i
+			then	shellmagic='$("#")!'$i
+				break
+			fi
+		done
+		;;
 	esac
 	;;
 esac

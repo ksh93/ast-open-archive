@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1985-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,91 +21,29 @@
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
-*                 Phong Vo <kpv@research.att.com>                  *
+*                 Eduardo Krell <ekrell@adexus.cl>                 *
 *******************************************************************/
 #pragma prototyped
-/*
- * Glenn Fowler
- * AT&T Research
- *
- * convert path to native fs representation in <buf,siz>
- * length of converted path returned
- * if return length >= siz then buf is indeterminate, but another call
- * with siz=length+1 would work
- * if buf==0 then required size is returned
- */
 
-#include <ast.h>
+#include "3d.h"
 
-#if _UWIN
+#if defined(fchdir3d)
 
-extern int	uwin_path(const char*, char*, int);
-
-size_t
-pathnative(const char* path, char* buf, size_t siz)
+int
+fchdir3d(int fd)
 {
-	return uwin_path(path, buf, siz);
+	Dir_t*		dp;
+	struct stat	st;
+
+	if (FCHDIR(fd))
+		return -1;
+	if (fd >= 0 && fd < elementsof(state.file) && (dp = state.file[fd].dir) && !FSTAT(fd, &st) && dp->dev == st.st_dev && dp->ino == st.st_ino)
+		chdir(dp->path);
+	return 0;
 }
 
 #else
 
-#if __CYGWIN__
-
-extern void	cygwin_conv_to_win32_path(const char*, char*);
-
-size_t
-pathnative(const char* path, char* buf, size_t siz)
-{
-	size_t		n;
-
-	if (!buf || siz < PATH_MAX)
-	{
-		char	tmp[PATH_MAX];
-
-		cygwin_conv_to_win32_path(path, tmp);
-		if ((n = strlen(tmp)) < siz && buf)
-			memcpy(buf, tmp, n + 1);
-		return n;
-	}
-	cygwin_conv_to_win32_path(path, buf);
-	return strlen(buf);
-}
-
-#else
-
-#if __EMX__
-
-size_t
-pathnative(const char* path, char* buf, size_t siz)
-{
-	char*		s;
-	size_t		n;
-
-	if (!_fullpath(buf, path, siz))
-	{
-		for (s = buf; *s; s++)
-			if (*s == '/')
-				*s = '\\';
-	}
-	else if ((n = strlen(path)) < siz && buf)
-		memcpy(buf, path, n + 1);
-	return n;
-}
-
-#else
-
-size_t
-pathnative(const char* path, char* buf, size_t siz)
-{
-	size_t		n;
-
-	if ((n = strlen(path)) < siz && buf)
-		memcpy(buf, path, n + 1);
-	return n;
-}
-
-#endif
-
-#endif
+NoP(fchdir)
 
 #endif

@@ -5,6 +5,7 @@ lib	ntohs,ntohl,htons,htonl sys/types.h sys/socket.h netinet/in.h
 mem	statvfs.f_fstr sys/types.h sys/statvfs.h
 mem	msghdr.msg_accrights sys/types.h sys/uio.h sys/socket.h
 mem	msghdr.msg_control sys/types.h sys/uio.h sys/socket.h
+mem	msghdr.msg_flags sys/types.h sys/uio.h sys/socket.h
 mem	utsname.nodeext sys/utsname.h
 sym	revents sys/types.h poll.h
 sys	file,inet/tcp_user,resource,select,socket,sockio,uio,un,utsname
@@ -73,6 +74,9 @@ tst	cat{
 	#define CS_LIB_SOCKET	1
 	#if _sys_un
 	#define CS_LIB_SOCKET_UN	1
+	#if _mem_msg_accrights_msghdr && ! _mem_msg_flags_msghdr
+	#undef _mem_msg_control_msghdr
+	#endif
 	#if _lib_recvmsg && _lib_sendmsg && ( _mem_msg_accrights_msghdr || _mem_msg_control_msghdr )
 	#define CS_LIB_SOCKET_RIGHTS	1
 	#endif

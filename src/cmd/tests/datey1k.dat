@@ -109,7 +109,7 @@ next 2 days				NULL	Sun Jan  2 23:00:00 EST 2000
 # cron command examples
 #
 
-0 0 1,15 * 1				NULL	Sat Jan  1 00:00:00 EST 2000
+0 0 1,15 * 1				NULL	Mon May  1 00:00:00 EDT 2000
 0 0 * * 1				NULL	Mon Jan  3 00:00:00 EST 2000
 0 0 * * *				NULL	Sat Jan  1 00:00:00 EST 2000
 15 0 * * *				NULL	Sat Jan  1 00:15:00 EST 2000

@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2001-05-02 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2001-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -285,8 +285,10 @@ USAGE_LICENSE
 "[+FILES]{"
 "	[+lib/find/find.codes?Default \blocate\b(1) database.]"
 "}"
-"[+SEE ALSO?\bfind\b(1), \bgetconf\b(1), \blocate\b(1), \bupdatedb\b(1),"
-"	\bxargs\b(1)]"
+"[+NOTES?In order to access the \bslocate\b(1) database the \btw\b executable"
+"	must be setgid to the \bslocate\b group.]"
+"[+SEE ALSO?\bfind\b(1), \bgetconf\b(1), \blocate\b(1), \bslocate\b(1),"
+"	\bupdatedb\b(1), \bxargs\b(1)]"
 ;
 
 #include "tw.h"

@@ -15,10 +15,12 @@ Source Package Installation Instructions:
       directory and deletes old archives as new ones are read in. Package
       delta archives require the most recent base, so manually removing files
       in this directory may invalidate future deltas.
-  (4) If the bin/package command does not exist then manually read the INIT source package:
+  (4) If the bin/package command does not exist then manually read the INIT
+      source package:
 		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.tgz | tar xvf -
       If your system does not have tar(1) or gunzip(1) then download the ratz
-      source package, compile it, and manually read the INIT source package:
+      source package, compile it, and manually read the INIT
+      source package:
 		mkdir bin
 		cp lib/package/tgz/ratz.YYYY-MM-DD.c lib/package/tgz/ratz.c
 		cc -o bin/ratz lib/package/tgz/ratz.c
@@ -38,7 +40,13 @@ Source Package Installation Instructions:
 		bin/package test
       List test results and errors:
 		bin/package results test
-  (8) When (6) or (7) complete run:
+  (8) Run the binaries by
+		export PATH=$INSTALLROOT/bin:$PATH
+		ksh
+      or by adding $INSTALLROOT/lib to the runtime linker search list
+      (the variable that is assigned the value ../lib in the
+      $INSTALLROOT/bin/.paths file.) If you want to build individual
+      components run:
 		bin/package use
       to get an interactive $SHELL that sets up the environment for using
       package binaries:
@@ -56,10 +64,11 @@ Source Package Installation Instructions:
   (9) Once you are satisfied with a package its binaries can be installed in
       a public area by:
 		bin/package install DIRECTORY PACKAGE
-      and users can access the binaries by
-		bin/package use DIRECTORY
-      or by exporting the environment variable definitions listed by
-		bin/package environment use DIRECTORY
+      or you can just copy the entire $INSTALLROOT directory tree. Users can
+      run the binaries by
+		export PATH=DIRECTORY/bin:$PATH
+		ksh
+      or by adding DIRECTORY/lib to the runtime linker search list.
 
 
 All recorded changes follow.
@@ -832,6 +841,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+01-10-20 pax: describe the 4 operation modes in separate paragraphs
 01-10-18 pax: fix --meter for paths containing \f\n\r\v
 01-09-06 pax: add ms tnef (transport neutral encapsulation format) archive read
 01-08-11 pax: fix tar_checksum() w.r.t. CC_NATIVE!=CC_ASCII
@@ -1046,6 +1056,7 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+01-10-20 htmlrefs: fix <!--INTERNAL--> filter delete detection, GLOB_AUGMENTED
 01-05-09 mm2html: ignore a few more requests
 01-05-04 mm2html: more tbl adjustments from Bruce Lilly
 01-05-02 mm2html: tweak tbl column spacing, handle .TH [N]
@@ -1100,6 +1111,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+01-10-31 sear.sh: add sear.ico
 01-10-16 sear.sh: _SEA_* => _SEAR_*
 01-10-05 sear.sh: rename from sea.sh
 01-09-11 sea.sh: add
@@ -1116,6 +1128,8 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+01-10-31 opt.tst: add --?+SECTION tests
+01-10-30 date*.dat: fix cron tests where both mday and wday are specified
 01-10-18 strtof.tst: adjust for sfprintf()/printf() rounding
 01-10-18 sfio/twchar.c: add wchar_t tests
 01-10-11 opt.tst: add example and literal tests, \&. nroff tests
@@ -1145,6 +1159,13 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+01-10-31 fchdir3d: add along with state.file[].dir to cache open dir paths
+	 dir3d.c: add recursive call intercepts
+	 error.c: add recursive call intercepts
+	 pathreal.c: add buffer size check
+	 features/syscall.sh: add bsd syscall __RENAME() checks
+	 syscall3d.c: check _lib_syscall before using it!
+01-10-30 features/syscall.sh,syscall3d.c: handle -ldl calls back into 3d
 01-09-20 3d.sh: drop extra } in USAGE that emitted -} for --?
 01-07-17 Makefile: don't link 3d dll against ast dll
 01-02-19 close3d: dup reserved fd's higher
@@ -1323,6 +1344,7 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+01-10-20 cpp.tst: add pp:splicespace "..." tests
 01-06-01 cpp.tst: add -M* dependency generation tests
 01-02-14 cpp.tst: pp:pragmaexpand pp:catliteral # operator interactions
 01-02-05 cpp.tst: add (finally)
@@ -1374,7 +1396,17 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+01-10-31 Makerules.mk: adjust .SOURCE.mk to ensure user specified dir order
+	 Makerules.mk: search MAKERULESPATH for ppcc rather than just MAKELIB
+	 Makerules.mk: delay CC.SHARED.REGISTRY expansion
+	 bind.c: add debug=14 directory search order trace
+	 make.probe: fix CC.SHARED.REGISTRY probe typo
+01-10-30 Makerules.mk: _BLD_foo==1 only for foo :LIBRARY: source
 01-10-20 Makerules.mk: fix --mam bug that didn't parameterize HOSTCC
+	 Makerules.mk: fix .PACKAGE.INIT. and .BIND.-l% to use the same search!
+	 bind.c: foiled alias still allows bind questionable=0x40
+	 expand.c: allow all edit op delimiter combinations (e.g., !>, <>)
+	 make.probe: fix CC.DLL probe for gcc __ia64
 01-10-18 misc.c: clear SFFMT_LONG for %[cCsS] to avoid wide char conversions
 01-10-17 misc.c: add %a %A format, fix unknown format core dump
 01-10-15 Makerules.mk: fix .SELECT. bug that improperly dropped .ARCHIVE
@@ -2081,6 +2113,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+01-10-31 what.c: fix omitted file arg doc
 01-06-06 who.c: fix entry skip logic that listed too many entries
 01-05-31 Makefile: add PACKAGE_OPTIMIZE=space checks
 01-05-29 Makefile: if -lcmd is dll then BUILTINS linked to one a.out
@@ -4126,6 +4159,8 @@ End:
 
 :::::::: pzip ::::::::
 
+01-10-31 pin: add --reorder=tsp via -ltsp
+01-10-30 pzip: fix --window doc typo
 01-10-08 pin: add --optimize={dynamic|greedy|non|transitive}
 	 pin: add --optimize method table for easy expansion
 01-08-11 pzip: set error_info.id from argv for statically linked disciplines
@@ -4159,6 +4194,10 @@ End:
 
 :::::::: re ::::::::
 
+01-10-31 sed: all space before ; command separator for REG_LENIENT
+01-10-20 testglob.c: handle \ in pattern and result field parse
+	 testglob.dat: add tests for \ in pattern and GLON_NOCHECK
+	 sed1.c: fix instruction cast pun
 01-10-18 testmatch.c,testre.c: all test failure messages contain the text `fail'
 01-10-17 testre.dat: add []{}() imbalance tests
 01-10-05 testglob.c: update --help, add GLOB_LIST and GLOB_STACK tests
@@ -4278,6 +4317,7 @@ End:
 
 :::::::: std ::::::::
 
+01-10-31 df: increase the fs stat timeout from 2 to 4 sec
 01-09-04 locale: add new catagories
 01-08-11 ls: fix nonprintable test for mb locales
 01-08-01 features/procfs: note that synthesized psinfo doesn't have pr_psargs
@@ -4454,6 +4494,7 @@ End:
 
 :::::::: tw ::::::::
 
+01-10-31 tw,find: add slocate(1) refs
 01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
 	 cmdarg(): fix CMD_INSERT copy that omitted leading chars
 01-05-02 tw: fix -a to use CMD_POST instead of CMD_INSERT
@@ -4517,6 +4558,7 @@ End:
 
 :::::::: warp ::::::::
 
+01-10-20 warp: drop :WWW: standalone distribution
 99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
 99-05-21 add: _xstat64
 99-04-01 add :WWW:, change from function to script
@@ -4526,6 +4568,19 @@ End:
 
 :::::::: libast ::::::::
 
+01-10-31 regex/ucs_names.h: add string catenation to keep line length low
+	 misc/fastfind.c: handle gnu slocate db read
+	 misc/optget.c: add --?+SECTION queries
+	 comp/fnmatch.h: add FNM_NOSYS
+01-10-30 tm/tmdate.c: fix cron specs when both wday and mday are specified
+01-10-20 misc/glob.c: fix bug that called \ trim() twice on same path
+	 misc/glob.c: fix \ trim() bug that restored / to wrong position
+	 string/fmtre.c: fix { ^ . $ } translations
+	 misc/optget.c: use original string if translation fails -- duh
+	 sfio/sfhdr.h: assume <errno.h> assigns proper atttibutes to errno
+	 comp/regcmp.c: __ia64 workaround fixed by proper CC.DLL probe
+	 comp/getdate.c: __ia64 workaround fixed by proper CC.DLL probe
+	 features/lib: add lib getdate
 01-10-18 features/lib: check for strtod static link collision
 	 features/float: add another signed cast for old bsd cc
 	 features/wchar: add <stdlib.h> <stdio.h> before <wchar.h> for old bsd
@@ -5255,6 +5310,9 @@ End:
 
 :::::::: libcmd ::::::::
 
+01-10-31 mkdir.c: mkdir() on existing dir could fail with errno!=EEXIST
+	 uname.c: add execve() loop check for unknown options
+01-10-29 tail.c: SF_SHARE on only if not reading through EOF
 01-10-11 getconf.c: fix usage typos
 01-09-11 cp.c,cmd.h: handle . in argv[0]
 	 cp.c: add O_BINARY to all open() calls
@@ -5354,6 +5412,7 @@ End:
 
 :::::::: libdll ::::::::
 
+01-10-31 dlfcn.c: change hp.pa dlopen() prototype (<dlfcn.h> but no -ldl!)
 01-09-25 dllfind: add LIBSUFFIX
 01-07-17 dllfind: do at least one dlopen() to prime dlerror()
 01-05-29 dlopen: fix dlopen(0,0) for HP
@@ -5471,6 +5530,7 @@ End:
 
 :::::::: libcoshell ::::::::
 
+01-10-26 coopen.c: hung sfclose(fp) -> close(sffileno(fp)) -- wow
 01-09-11 coinit.c: fix coident[] for ancient bsh that die on `test == 1'
 	 coinit.c: and fix coident[] to weed out buggy ksh88i trap on exit
 01-05-31 co*: add CO_CROSS, expose CO_DEVFD
@@ -5485,6 +5545,8 @@ End:
 
 :::::::: libcs ::::::::
 
+01-10-31 cssend,csrecv: use msg_accrights over msg_control
+	 cspath: don't check /dev/fd/* -- duh
 01-05-11 csserve: sync cs.* with css->*
 	 csspoll: handl cspoll() EINTR that doesn't set cs.interrupt
 01-01-01 cspoll: fix getmsg() flag arg
@@ -5555,6 +5617,7 @@ End:
 
 :::::::: libpp ::::::::
 
+01-10-20 pplex.c: fix pp:splicespace inside "..."
 01-09-11 ppinput.c: use pathnative() for native fs representation
 01-08-31 pp.probe: handle -Dmacro(args)=value
 01-08-11 ppcontrol: fix ... and __VAR_ARGS__ for C99

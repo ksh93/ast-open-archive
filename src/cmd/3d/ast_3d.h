@@ -32,6 +32,7 @@
 #define _NAME3D_AST_H
 
 #define _ast_state	_3d_ast_state
+#define _ast_info	_3d_ast_info
 #define _hash_info_	_3d_hash_info
 #define fmterror	_3d_fmterror
 #define fmttime		_3d_fmttime

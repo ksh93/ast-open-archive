@@ -1,4 +1,4 @@
-: X/Open glob tests 2001-10-05
+: X/Open glob tests 2001-10-20
 
 # test workspace
 
@@ -26,6 +26,10 @@ W		TTfoo
 S	ab			OK		ab
 S	a*			OK		a[b ab ab?(cd| abcd
 S	TT*			OK		TT* TTfoo
+S	s\\*			NOMATCH
+Sn	s\\*			OK		s*
+S	s\\\\*			NOMATCH
+Sn	s\\\\*			OK		s\\*
 
 # subdir level basics
 
@@ -35,6 +39,19 @@ S	*/cd			OK		ab/cd
 Sn	*/cd			OK		ab/cd
 S	*/xx			NOMATCH
 Sn	*/xx			OK		*/xx
+S	s/\\/0*			NOMATCH
+Sn	s/\\/0*			OK		s//0*
+S	s/\\\\/0*		NOMATCH
+Sn	s/\\\\/0*		OK		s/\\/0*
+S	\\\\*?/\\\\*?		NOMATCH
+Sn	\\\\*?/\\\\*?		OK		\\*?/\\*?
+S	\\\\*/\\\\*?		NOMATCH
+Sn	\\\\*/\\\\*?		OK		\\*/\\*?
+S	\\\\*?/\\\\*		NOMATCH
+Sn	\\\\*?/\\\\*		OK		\\*?/\\*
+
+S	s/\\(\\<3d\\>\\)/\\\\h'0*1'\\1\\\\h'0'/	NOMATCH
+Sn	s/\\(\\<3d\\>\\)/\\\\h'0*1'\\1\\\\h'0'/	OK	s/(<3d>)/\\h'0*1'1\\h'0'/
 
 # malformed patterns
 

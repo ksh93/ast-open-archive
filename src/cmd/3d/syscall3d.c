@@ -216,7 +216,7 @@ calldump(char** b, char* e)
 #endif
 		);
 	for (cp = sys_trace; cp < &sys_trace[elementsof(sys_trace)]; cp++)
-		bprintf(b, e, "  %03d%s %03d %11s %p\n", cp - sys_trace, (cp - sys_trace) == cp->index ? " " : "*", cp->call, cp->name, cp->func);
+		bprintf(b, e, "  %03d%s %03d %12s %p\n", cp - sys_trace, (cp - sys_trace) == cp->index ? " " : "*", cp->call, cp->name, cp->func);
 }
 
 #if _no_exit_exit
@@ -230,7 +230,7 @@ void
 exit(int code)
 {
 	if (state.libexit)
-		sys_trace[SYS_exit].func = (Sysfunc_t)oksys;
+		sys_trace[SYS3D_exit].func = (Sysfunc_t)oksys;
 	_exit(code);
 	if (state.libexit)
 	{
@@ -410,9 +410,9 @@ syscall3d(int call, ...)
 	{
 #if _dynamic_syscall || _static_syscall
 #if _dynamic_syscall
-		if (dll)
+		if (dll && cp->func)
 #else
-		if (dll && cp->index < 0)
+		if (dll && cp->func && cp->index < 0)
 #endif
 		{
 			switch (cp->active++)
@@ -458,7 +458,20 @@ syscall3d(int call, ...)
 		}
 		else
 #endif
+#if _lib_syscall
+		if (cp->index >= 0)
 			r = syscall(cp->index, arg[1].pointer, arg[2].pointer, arg[3].pointer, arg[4].pointer, arg[5].pointer, arg[6].pointer);
+		else if (cp->nov >= 0)
+			r = syscall(cp->nov, arg[2].pointer, arg[3].pointer, arg[4].pointer, arg[5].pointer, arg[6].pointer, 0);
+		else
+#endif
+		{
+#ifndef ENOSYS
+#define ENOSYS	EINVAL
+#endif
+			errno = ENOSYS;
+			r = -1;
+		}
 	}
 #if !_mangle_syscall
 	if (r > 0 && (MSG_MASK(cp->call) & C_ZERO)) r = 0;

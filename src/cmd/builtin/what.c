@@ -40,12 +40,14 @@ USAGE_LICENSE
 "[+DESCRIPTION?\bwhat\b searches the given files for all occurrences of"
 "	the pattern \b@(#)\b or \b$Id:\b and writes a line to the standard"
 "	output containing the text that follows until the first occurrence"
-"	of one of the following: \b\" > \\ $ newline NUL\b.]"
+"	of one of the following: \b\" > \\ $ newline NUL\b. If no \bfile\b"
+"	is given or if a \bfile\b is \b-\b then the standard input is read.]"
+"	are specified]"
 
 "[s:first|single?Find only the first occurrence of the pattern in each file.]"
 
 "\n"
-"\nfile ...\n"
+"\n[ file ... ]\n"
 "\n"
 
 "[+EXIT STATUS]{"

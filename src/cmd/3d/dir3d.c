@@ -57,6 +57,7 @@ opendir3d(const char* apath)
 
 	if (dirp = (DIR*)state.freedirp) state.freedirp = 0;
 	else if (!(dirp = newof(0, DIR, 1, 0))) return 0;
+	intercepted++;
 	dirp->viewp = dirp->view;
 	n = state.in_2d;
 	if (path = pathreal(apath, P_SLASH, NiL)) state.in_2d = 2;
@@ -66,6 +67,7 @@ opendir3d(const char* apath)
 	if (!dirp->viewp->dirp)
 	{
 		state.freedirp = (void*)dirp;
+		intercepted = 0;
 		return 0;
 	}
 	dirp->boundary = state.boundary;
@@ -107,6 +109,7 @@ opendir3d(const char* apath)
 		else if (!(dirp->overlay = hashalloc(NiL, HASH_set, HASH_ALLOCATE, 0)))
 		{
 			closedir(dirp);
+			intercepted = 0;
 			return 0;
 		}
 	}
@@ -119,6 +122,7 @@ opendir3d(const char* apath)
 int
 closedir3d(register DIR* dirp)
 {
+	intercepted++;
 	if (dirp)
 	{
 		for (dirp->viewp = dirp->view; dirp->viewp->dirp; dirp->viewp++) CLOSEDIR(dirp->viewp->dirp);
@@ -126,6 +130,7 @@ closedir3d(register DIR* dirp)
 		if (!state.freedirp) state.freedirp = (void*)dirp;
 		else free((char*)dirp);
 	}
+	intercepted++;
 	return 0;
 }
 

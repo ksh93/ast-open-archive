@@ -1,3 +1,5 @@
+01-10-31 cssend,csrecv: use msg_accrights over msg_control
+	 cspath: don't check /dev/fd/* -- duh
 01-05-11 csserve: sync cs.* with css->*
 	 csspoll: handl cspoll() EINTR that doesn't set cs.interrupt
 01-01-01 cspoll: fix getmsg() flag arg

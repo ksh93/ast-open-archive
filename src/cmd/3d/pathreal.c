@@ -245,7 +245,8 @@ pathreal(const char* apath, register int type, struct stat* st)
 	}
 	else
 		sp = state.path.name;
-	while (*sp = *cp++)
+	ip = state.path.name + elementsof(state.path.name);
+	while (sp < ip && (*sp = *cp++))
 		sp++;
 	if (type & P_DOTDOT) strcpy(sp, "/..");
 	sp = state.path.name;

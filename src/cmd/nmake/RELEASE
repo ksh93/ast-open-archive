@@ -1,4 +1,14 @@
+01-10-31 Makerules.mk: adjust .SOURCE.mk to ensure user specified dir order
+	 Makerules.mk: search MAKERULESPATH for ppcc rather than just MAKELIB
+	 Makerules.mk: delay CC.SHARED.REGISTRY expansion
+	 bind.c: add debug=14 directory search order trace
+	 make.probe: fix CC.SHARED.REGISTRY probe typo
+01-10-30 Makerules.mk: _BLD_foo==1 only for foo :LIBRARY: source
 01-10-20 Makerules.mk: fix --mam bug that didn't parameterize HOSTCC
+	 Makerules.mk: fix .PACKAGE.INIT. and .BIND.-l% to use the same search!
+	 bind.c: foiled alias still allows bind questionable=0x40
+	 expand.c: allow all edit op delimiter combinations (e.g., !>, <>)
+	 make.probe: fix CC.DLL probe for gcc __ia64
 01-10-18 misc.c: clear SFFMT_LONG for %[cCsS] to avoid wide char conversions
 01-10-17 misc.c: add %a %A format, fix unknown format core dump
 01-10-15 Makerules.mk: fix .SELECT. bug that improperly dropped .ARCHIVE

@@ -1,3 +1,4 @@
+01-10-20 htmlrefs: fix <!--INTERNAL--> filter delete detection, GLOB_AUGMENTED
 01-05-09 mm2html: ignore a few more requests
 01-05-04 mm2html: more tbl adjustments from Bruce Lilly
 01-05-02 mm2html: tweak tbl column spacing, handle .TH [N]

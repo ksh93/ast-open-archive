@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-10-20 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-10-31 $"
 
 /*
  * handy attributes
@@ -64,7 +64,7 @@ rules
  * binding directory lists
  */
 
-PKGDIRS = $(LIBDIR) $(*.VIEW:X=$(VROOT)/$(LIBDIR:B:S)) $(MAKELIB:D)
+PKGDIRS = $(LIBDIR) $(*.VIEW:X=$(VROOT)/$(LIBDIR:B:S)) $(MAKERULESPATH:/:/ /G::D)
 LCLDIRS = /usr/local/arch/$(_hosttype_):/usr/common:/usr/local
 OPTDIRS = $(INSTALLROOT)/opt:/usr/add-on:/usr/addon:/usr/contrib:$(LCLDIRS):/opt:/home
 STDDIRS = /:/usr
@@ -303,7 +303,7 @@ PACKAGE =
 PACKAGE_PATH = $(PACKAGE)
 PACKAGE_LOCAL = $(CC.HOSTTYPE:N=$(package_local:/^0$/*/):??$(.PACKAGE.:O=1)_?)
 PAX = pax
-PPCC = $(MAKELIB)/ppcc
+PPCC = $(MAKERULESPATH:/:/ /G:X=ppcc:P=X:O=1)
 PPCCFLAGS =
 PR = pr
 PROTO = proto
@@ -526,6 +526,11 @@ include "Scanrules.mk"
 			V :=
 			if P = "$(PACKAGE_$(B)_VERSION)"
 				P := ?([-.])$(P)
+			end
+			if T = "$(PACKAGE_$(B)_LIB)"
+				if ! "$(.PACKAGE.stdlib:N=$(T))"
+					.SOURCE.a : $(T)
+				end
 			end
 			for J $(CC.PREFIX.SHARED) ''
 				for I $(P) ''
@@ -1299,6 +1304,30 @@ end
 				TP += $(T1)
 			end
 		end
+		T0 := $(<)
+		if "$(<:A=.ARCHIVE)" || "$(TP:V:A=.ATTRIBUTE:A=.ARCHIVE)"
+			TP += -COMMAND
+			if ! "$(@:V)" && ! "$(~:A=.USE)"
+				TP += .ARCHIVE$(CC.SUFFIX.OBJECT)
+			end
+		else
+			TA += $(.LIBRARY.ONLY.)
+			if ! "$(T3:N=$(<)?($(CC.SUFFIX.COMMAND)))"
+				if OBJ || "$(>:V:A=.ARCHIVE)"
+					if "$(T0:N=*$(CC.SUFFIX.OBJECT))"
+						TP += .OBJECT$(CC.SUFFIX.OBJECT)
+					else
+						if ! "$(<:S)" && CC.SUFFIX.COMMAND
+							$(T0) : .VIRTUAL $(T0)$(CC.SUFFIX.COMMAND)
+							T0 := $(T0)$(CC.SUFFIX.COMMAND)
+						end
+						TP += .COMMAND$(CC.SUFFIX.OBJECT)
+					end
+				else
+					TP += .OBJECT
+				end
+			end
+		end
 		if T3
 			$(T3) : .SPECIAL $(TA:V:Q)
 			if "$(.OPTIONS.$(<))"
@@ -1307,27 +1336,6 @@ end
 		end
 		if TS
 			.LIBRARY.STATIC.$(<:B:/^$(CC.PREFIX.ARCHIVE)//) : $(CC.LD.STATIC) $(TS) $(CC.LD.DYNAMIC)
-		end
-		T0 := $(<)
-		if "$(<:A=.ARCHIVE)" || "$(TP:V:A=.ATTRIBUTE:A=.ARCHIVE)"
-			TP += -COMMAND
-			if ! "$(@:V)" && ! "$(~:A=.USE)"
-				TP += .ARCHIVE$(CC.SUFFIX.OBJECT)
-			end
-		elif ! "$(T3:N=$(<)?($(CC.SUFFIX.COMMAND)))"
-			if OBJ || "$(>:V:A=.ARCHIVE)"
-				if "$(T0:N=*$(CC.SUFFIX.OBJECT))"
-					TP += .OBJECT$(CC.SUFFIX.OBJECT)
-				else
-					if ! "$(<:S)" && CC.SUFFIX.COMMAND
-						$(T0) : .VIRTUAL $(T0)$(CC.SUFFIX.COMMAND)
-						T0 := $(T0)$(CC.SUFFIX.COMMAND)
-					end
-					TP += .COMMAND$(CC.SUFFIX.OBJECT)
-				end
-			else
-				TP += .OBJECT
-			end
 		end
 		$(T0) : $(TP:V:Q)
 		if "$(@:V:?1??)"
@@ -1724,6 +1732,7 @@ end
 	eval
 	_BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G) == 1
 	end
+	.LIBRARY.ONLY. += _BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G)=
 	$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
 	for T $(<:O>2)
 		if T == "DLL*"
@@ -2003,6 +2012,7 @@ end
 .PACKAGE.build =
 .PACKAGE.install =
 .PACKAGE.libraries =
+.PACKAGE.stdlib = $(*.SOURCE.a) $(CC.STDLIB) /usr/lib /lib
 
 .PACKAGE.LIBRARIES. : .FUNCTION
 	local L P R
@@ -2181,6 +2191,9 @@ end
 					L := $(T1)/$(LP)
 					eval
 					PACKAGE_$(T3)_LIB = $(L)
+					end
+					if ! "$(.PACKAGE.stdlib:N=$(L))"
+						.SOURCE.a : $(L)
 					end
 				end
 				if ! .INITIALIZED.
@@ -2661,7 +2674,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		CC.SUFFIX.OBJECT = .o
 	end
 	.ATTRIBUTE.%$(CC.SUFFIX.OBJECT) : .OBJECT
-	CC.SHARED += $(CC.SHARED.REGISTRY)
+	CC.SHARED += $$(CC.SHARED.REGISTRY)
 
 	/*
 	 * this is a workaround hack to help packages with broken compilers
@@ -2682,6 +2695,14 @@ PACKAGES : .SPECIAL .FUNCTION
 
 .MAKEINIT : .MAKE .VIRTUAL .FORCE
 	local T1 T2 T3 T4 T5 T6 TI
+
+	/*
+	 * .SOURCE.mk gets bound long before the first user makefile is read
+	 * this assertion ensures that any user specified dirs appear
+	 * before the internal defaults set in the initdynamic[] script
+	 */
+
+	.SOURCE.mk : .CLEAR . $(*.SOURCE.mk:N!=$(*.SOURCE.mk.INTERNAL:/ /|/G)) $(*.SOURCE.mk.INTERNAL)
 	.MAKE : .PROBE.INIT
 	if "$(instrument)"
 		if ! ( instrument.root = "$(instrument:O=1:D:N!=.:T=F)" )
@@ -3606,7 +3627,6 @@ end
 	print -um setv F77 f77
 	F77 = ${F77}
 	print -um setv HOSTCC ${CC}
-	HOSTCC = ${HOSTCC}
 	print -um setv IGNORE
 	INSTALLROOT = ${INSTALLROOT}
 	print -um setv LD ld

@@ -44,9 +44,9 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2001-01-01 $\0\n"
+"] (AT&T Research) 2001-10-31 $\0\n"
 #else
-"\n@(#)$Id: 3d (AT&T Research) 2001-01-01 $\0\n"
+"\n@(#)$Id: 3d (AT&T Research) 2001-10-31 $\0\n"
 #endif
 ;
 

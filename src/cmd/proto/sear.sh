@@ -26,6 +26,7 @@
 COMMAND=sear
 cc="ncc -D_DLL -O -Y-Os"
 cmd="dir"
+ico=
 opt=
 out=install.exe
 src=
@@ -34,7 +35,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2001-10-16 $
+@(#)$Id: sear (AT&T Labs Research) 2001-10-31 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -50,6 +51,8 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 	is executed by \bCMD.EXE\b. The temporary directory is then
 	removed.]
 [c:cc?The C compiler command and flags are set to \acc\a.]:[cc:='$cc$']
+[i:icon?The resource icon is set to
+	\aicon\a.]:[icon:=$INSTALLROOT/lib/sear/sear.ico]
 [m:meter?Set the \bratz\b(1) \b--meter\b option when the archive is
 	extracted.]
 [o:output?The self extracting file name is \afile\a.]:[file:='$out$']
@@ -70,7 +73,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 '
 	;;
 *)	ARGV0=""
-	USAGE="c:[command]o:[output]r:[ratz-src] [ file ] ..."
+	USAGE="c:[command]i:[icon]o:[output]r:[ratz-src] [ file ] ..."
 	;;
 esac
 
@@ -84,6 +87,8 @@ usage()
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
 	c)	cc=$OPTARG
+		;;
+	i)	ico=$OPTARG
 		;;
 	m)	opt=${opt}m
 		;;
@@ -102,14 +107,15 @@ done
 shift $((OPTIND-1))
 
 case $src in
-'')	for i in ${PATH//:/ }
-	do	if	test -f ${i%/*}/lib/$COMMAND/ratz.c
-		then	src=${i%/*}/lib/$COMMAND/ratz.c
+'')	f=ratz.c
+	for i in ${PATH//:/ }
+	do	if	test -f ${i%/*}/lib/$COMMAND/$f
+		then	src=${i%/*}/lib/$COMMAND/$f
 			break
 		fi
 	done
 	case $src in
-	'')	echo "$COMMAND: ratz.c: cannot locate ratz source" >&2
+	'')	echo "$COMMAND: $f: cannot locate ratz source" >&2
 		exit 1
 		;;
 	esac
@@ -120,16 +126,46 @@ case $src in
 	fi
 	;;
 esac
+case $ico in
+'')	f=sear.ico
+	for i in ${PATH//:/ }
+	do	if	test -f ${i%/*}/lib/$COMMAND/$f
+		then	ico=${i%/*}/lib/$COMMAND/$f
+			break
+		fi
+	done
+	case $ico in
+	'')	echo "$COMMAND: $f: cannot locate icon source" >&2
+		exit 1
+		;;
+	esac
+	;;
+*)	if	test ! -f $ico 
+	then	echo "$COMMAND: $ico: cannot read icon" >&2
+		exit 1
+	fi
+	;;
+esac
 case $opt in
 ?*)	cc="$cc -D_SEAR_OPTS=\"-$opt\"" ;;
 esac
 
+tmp=/tmp/sear$$
+obj=${src##*/}
+obj=${obj%.*}.o
+trap 'rm -f $obj $tmp.*' 0 1 2 3
+res=$tmp.res
+typeset -H host_ico=$ico host_rc=$tmp.rc host_res=$tmp.res
+print -r "sear ICON \"$host_ico\"" > $tmp.rc
+if	! rc -x -r -fo"$host_res" "$host_rc"
+then	exit 1
+fi
 export nativepp=-1
-if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src"
+if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src" "$res"
 then	exit 1
 fi
 size=$(wc -c < $out)
-if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src"
+if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src" "$res"
 then	exit 1
 fi
 pax -x tgz -wv "$@" >> "$out"

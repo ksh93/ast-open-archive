@@ -680,8 +680,13 @@ list(Sfio_t* xp, register char* s, char* pat, int sep)
 					for (f = getfile(*v); f; f = f->next)
 						if (f->dir->name == s)
 						{
-							sfputr(xp, *v, -1);
-							goto first;
+							if (sep & NOT)
+								sfprintf(xp, " %s/%s", s, *v);
+							else
+							{
+								sfputr(xp, *v, -1);
+								goto first;
+							}
 						}
 		first:	;
 		}
@@ -2924,47 +2929,28 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			 * value: [!<>=][=][<val>]
 			 */
 
-			switch (*ed++)
+			for (sep = 0;; ed++)
 			{
-			case '!':
-				if (*ed == '=')
+				switch (*ed)
 				{
-					ed++;
-					sep = NE;
+				case '!':
+					sep |= NOT;
+					continue;
+				case '<':
+					sep |= LT;
+					continue;
+				case '=':
+					sep |= EQ;
+					continue;
+				case '>':
+					sep |= GT;
+					continue;
 				}
-				else
-					sep = NOT;
 				break;
-			case '=':
-				if (*ed == '=')
-					ed++;
-				sep = EQ;
-				break;
-			case '<':
-				if (*ed == '=')
-				{
-					ed++;
-					sep = LE;
-				}
-				else if (*ed == '>')
-				{
-					ed++;
-					sep = LT|GT;
-				}
-				else
-					sep = LT;
-				break;
-			case '>':
-				if (*ed == '=')
-				{
-					ed++;
-					sep = GE;
-				}
-				else
-					sep = GT;
-				break;
-			default:
-				error(3, "edit operator delimiter omitted: %s", editcontext(eb, ed));
+			}
+			if (!sep)
+			{
+				error(3, "edit operator delimiter omitted: %s", editcontext(eb, ed + 1));
 				break;
 			}
 			val = ed;
