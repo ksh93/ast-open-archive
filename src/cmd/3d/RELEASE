@@ -1,3 +1,5 @@
+00-10-19 init.c: initialize _3d_2d
+00-07-17 fix fchown to call MSG_fchown (not MSG_fchown); fixes vim dump!
 00-02-14 3d command long options (finally)
 99-01-01 --- release 4.0 ---
 99-04-01 dll: sfsprintf => _3d_sfsprintf

@@ -2,7 +2,9 @@
  * :PACKAGE: tcl support
  */
 
+if ! "$(TCLROOT)"
 TCLROOT = $(PACKAGE_tcl)
+end
 
 ":TCL_LIBRARY:" : .MAKE .OPERATOR
 	local A B L T
@@ -10,6 +12,7 @@ TCLROOT = $(PACKAGE_tcl)
 	if ! ( V = "$(<:O=2)" )
 		V := 1.0
 	end
+	CCFLAGS += $$(CC.DLL)
 	$(A) $(V) :LIBRARY: $(>)
 	if L = "$(.DLL.NAME. $(A) $(V))"
 		.INSTALL.$(.LIB.NAME. $(A) $(V)) := .

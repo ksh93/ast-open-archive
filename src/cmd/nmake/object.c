@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1984-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1984-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -727,17 +727,20 @@ compile(char* objfile, char* select)
 	if (sp = object.pp)
 	{
 		object.pp = 0;
-		sfputu(sp, COMP_OPTIONS);
-		sfputu(sp, 0);
-		for (p = internal.preprocess->prereqs; p; p = p->next)
-			putstring(sp, p->rule->name, p->next ? ' ' : -1);
-		sfputc(sp, 0);
-		sfputu(sp, 0);
-		sfputu(internal.tmp, HEADER_PREREQS);
-		sfputu(cs.fp, sfstrtell(internal.tmp) + sfstrtell(sp));
-		sfstrset(internal.tmp, 0);
-		sfputu(cs.fp, HEADER_PREREQS);
-		sfwrite(cs.fp, sfstrbase(sp), sfstrtell(sp));
+		if (!state.base)
+		{
+			sfputu(sp, COMP_OPTIONS);
+			sfputu(sp, 0);
+			for (p = internal.preprocess->prereqs; p; p = p->next)
+				putstring(sp, p->rule->name, p->next ? ' ' : -1);
+			sfputc(sp, 0);
+			sfputu(sp, 0);
+			sfputu(internal.tmp, HEADER_PREREQS);
+			sfputu(cs.fp, sfstrtell(internal.tmp) + sfstrtell(sp));
+			sfstrset(internal.tmp, 0);
+			sfputu(cs.fp, HEADER_PREREQS);
+			sfwrite(cs.fp, sfstrbase(sp), sfstrtell(sp));
+		}
 		sfstrclose(sp);
 	}
 	sp = cs.fp;
@@ -1934,9 +1937,6 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	goto bad;
  badmagic:
 	error(1, "%s: not a %s object file", objfile, version);
-#if DEBUG
-	if (!old) state.mismatch = 1;
-#endif
  bad:
 	if (p) free(p);
 	return(recompile);

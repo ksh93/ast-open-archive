@@ -1,3 +1,4 @@
+00-09-11 gzio: don't set verified=1 in check_header() for concatenation
 99-11-19 gzio: add missing _PACKAGE_ast
 99-09-11 sfdcgzip,sfdclzw: return 1 if discipline pushed
 99-08-11 gzio: fix gzread() z_err to keep Z_STREAM_END after check_header()

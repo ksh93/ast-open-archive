@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -39,8 +39,6 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make tksh
 make uinit.o
@@ -51,127 +49,128 @@ done include/debug.h dontcare
 make include/shcompat.h implicit
 done include/shcompat.h dontcare
 make ${PACKAGE_tk_INCLUDE}/tcl.h implicit
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
 done ${PACKAGE_tk_INCLUDE}/tcl.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/shell.h implicit
-make ${PACKAGE_ast_INCLUDE}/nval.h implicit
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/nval.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/shell.h implicit
+make ${INSTALLROOT}/include/ast/nval.h implicit
+make ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/cdt.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/nval.h dontcare
 make name.h implicit
 done name.h dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/history.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/history.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
-make ${PACKAGE_ast_INCLUDE}/stak.h implicit
-make ${PACKAGE_ast_INCLUDE}/stk.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/stk.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/stak.h dontcare
-make ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/option.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/option.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/error.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/shell.h dontcare
+make ${INSTALLROOT}/include/ast/history.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/history.h dontcare
+prev ${INSTALLROOT}/include/ast/cdt.h implicit
+make ${INSTALLROOT}/include/ast/cmd.h implicit
+make ${INSTALLROOT}/include/ast/stak.h implicit
+make ${INSTALLROOT}/include/ast/stk.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/stk.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/stak.h dontcare
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/cmd.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/shell.h dontcare
 done include/tksh.h
 done src/uinit.c
 prev src/uinit.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/uinit.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/uinit.c
 done uinit.o generated
 make tkMain.o
 make src/tkMain.c
-make ${PACKAGE_ast_INCLUDE}/wait.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/wait.h
+make ${INSTALLROOT}/include/ast/wait.h implicit
+make ${INSTALLROOT}/include/ast/ast_wait.h implicit
+done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/wait.h
 make ${PACKAGE_tk_INCLUDE}/tk.h implicit
 prev ${PACKAGE_tk_INCLUDE}/tcl.h implicit
 done ${PACKAGE_tk_INCLUDE}/tk.h
 prev ${PACKAGE_tk_INCLUDE}/tcl.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev include/tksh.h implicit
 done src/tkMain.c
 prev src/tkMain.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -c src/tkMain.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -c src/tkMain.c
 done tkMain.o generated
 make libtksh.a archive
 make tksh.req
+exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
 exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
@@ -184,7 +183,7 @@ exec - do	case $i in
 exec - 	"tksh"|tksh)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}    -L. -Lsrc -Ltcl ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
@@ -201,26 +200,26 @@ done tksh.req generated
 make panic.o
 make tcl/panic.c
 prev ${PACKAGE_tk_INCLUDE}/tcl.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done tcl/panic.c
 prev tcl/panic.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_BLD_tcl -D_PACKAGE_ast -c tcl/panic.c
+exec - ${CC} ${CCFLAGS}  -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_BLD_tcl -D_PACKAGE_ast -c tcl/panic.c
 done panic.o generated
 make regexp.o
 make tcl/regexp.c
 make include/tclPort.h implicit
-make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/times.h
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/dirent.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/dirent.h
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/dirent.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/dirent.h
 prev include/tksh.h implicit
 done include/tclPort.h
 make include/tclInt.h implicit
@@ -228,14 +227,14 @@ prev include/tksh.h implicit
 done include/tclInt.h
 done tcl/regexp.c
 prev tcl/regexp.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/regexp.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/regexp.c
 done regexp.o generated
 make tclHash.o
 make tcl/tclHash.c
 prev include/tclInt.h implicit
 done tcl/tclHash.c
 prev tcl/tclHash.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclHash.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclHash.c
 done tclHash.o generated
 make tclGet.o
 make tcl/tclGet.c
@@ -243,21 +242,21 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclGet.c
 prev tcl/tclGet.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclGet.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclGet.c
 done tclGet.o generated
 make tclAsync.o
 make tcl/tclAsync.c
 prev include/tclInt.h implicit
 done tcl/tclAsync.c
 prev tcl/tclAsync.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclAsync.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclAsync.c
 done tclAsync.o generated
 make tclLink.o
 make tcl/tclLink.c
 prev include/tclInt.h implicit
 done tcl/tclLink.c
 prev tcl/tclLink.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclLink.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclLink.c
 done tclLink.o generated
 make tclExpr.o
 make tcl/tclExpr.c
@@ -267,7 +266,7 @@ done include/float.h dontcare
 prev include/tclInt.h implicit
 done tcl/tclExpr.c
 prev tcl/tclExpr.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclExpr.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclExpr.c
 done tclExpr.o generated
 make tclCmdAH.o
 make tcl/tclCmdAH.c
@@ -275,7 +274,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclCmdAH.c
 prev tcl/tclCmdAH.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclCmdAH.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclCmdAH.c
 done tclCmdAH.o generated
 make tclCmdMZ.o
 make tcl/tclCmdMZ.c
@@ -283,7 +282,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclCmdMZ.c
 prev tcl/tclCmdMZ.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclCmdMZ.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclCmdMZ.c
 done tclCmdMZ.o generated
 make tclCmdIL.o
 make tcl/tclCmdIL.c
@@ -291,7 +290,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclCmdIL.c
 prev tcl/tclCmdIL.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclCmdIL.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclCmdIL.c
 done tclCmdIL.o generated
 make tclParse.o
 make tcl/tclParse.c
@@ -299,7 +298,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclParse.c
 prev tcl/tclParse.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclParse.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclParse.c
 done tclParse.o generated
 make tclGlob.o
 make tcl/tclGlob.c
@@ -307,7 +306,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclGlob.c
 prev tcl/tclGlob.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclGlob.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclGlob.c
 done tclGlob.o generated
 make tclUtil.o
 make tcl/tclUtil.c
@@ -315,7 +314,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclUtil.c
 prev tcl/tclUtil.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUtil.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUtil.c
 done tclUtil.o generated
 make tclEvent.o
 make tcl/tclEvent.c
@@ -323,14 +322,14 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclEvent.c
 prev tcl/tclEvent.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclEvent.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclEvent.c
 done tclEvent.o generated
 make tclPreserve.o
 make tcl/tclPreserve.c
 prev include/tclInt.h implicit
 done tcl/tclPreserve.c
 prev tcl/tclPreserve.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclPreserve.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclPreserve.c
 done tclPreserve.o generated
 make tclNotify.o
 make tcl/tclNotify.c
@@ -338,7 +337,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclNotify.c
 prev tcl/tclNotify.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclNotify.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclNotify.c
 done tclNotify.o generated
 make tclClock.o
 make tcl/tclClock.c
@@ -347,7 +346,7 @@ prev include/tclInt.h implicit
 prev ${PACKAGE_tk_INCLUDE}/tcl.h implicit
 done tcl/tclClock.c
 prev tcl/tclClock.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclClock.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclClock.c
 done tclClock.o generated
 make tclDate.o
 make tcl/tclDate.c
@@ -355,17 +354,17 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclDate.c
 prev tcl/tclDate.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclDate.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclDate.c
 done tclDate.o generated
 make tclInterp.o
 make tcl/tclInterp.c
 prev include/tclPort.h implicit
 prev include/tclInt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done tcl/tclInterp.c
 prev tcl/tclInterp.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclInterp.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclInterp.c
 done tclInterp.o generated
 make tclUnixFile.o
 make tcl/tclUnixFile.c
@@ -373,29 +372,29 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclUnixFile.c
 prev tcl/tclUnixFile.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixFile.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixFile.c
 done tclUnixFile.o generated
 make tclUnixTime.o
 make tcl/tclUnixTime.c
 prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 prev ${PACKAGE_tk_INCLUDE}/tcl.h implicit
-make ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/times.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tm.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${INSTALLROOT}/include/ast/tm.h implicit
+prev ${INSTALLROOT}/include/ast/times.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done tcl/tclUnixTime.c
 prev tcl/tclUnixTime.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixTime.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixTime.c
 done tclUnixTime.o generated
 make tclLoad.o
 make tcl/tclLoad.c
 prev include/tclInt.h implicit
 done tcl/tclLoad.c
 prev tcl/tclLoad.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclLoad.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclLoad.c
 done tclLoad.o generated
 make tclLoadDl.o
 make tcl/tclLoadDl.c
@@ -404,14 +403,14 @@ done include/dlfcn.h dontcare
 prev include/tclInt.h implicit
 done tcl/tclLoadDl.c
 prev tcl/tclLoadDl.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclLoadDl.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclLoadDl.c
 done tclLoadDl.o generated
 make tclPkg.o
 make tcl/tclPkg.c
 prev include/tclInt.h implicit
 done tcl/tclPkg.c
 prev tcl/tclPkg.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclPkg.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c tcl/tclPkg.c
 done tclPkg.o generated
 make tclPosixStr.o
 make tcl/tclPosixStr.c
@@ -419,7 +418,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclPosixStr.c
 prev tcl/tclPosixStr.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclPosixStr.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclPosixStr.c
 done tclPosixStr.o generated
 make tclFHandle.o
 make tcl/tclFHandle.c
@@ -428,7 +427,7 @@ prev include/tclInt.h implicit
 prev ${PACKAGE_tk_INCLUDE}/tcl.h implicit
 done tcl/tclFHandle.c
 prev tcl/tclFHandle.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclFHandle.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclFHandle.c
 done tclFHandle.o generated
 make tclIOCmd.o
 make tcl/tclIOCmd.c
@@ -436,7 +435,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclIOCmd.c
 prev tcl/tclIOCmd.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclIOCmd.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclIOCmd.c
 done tclIOCmd.o generated
 make tclUnixNotfy.o
 make tcl/tclUnixNotfy.c
@@ -446,7 +445,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclUnixNotfy.c
 prev tcl/tclUnixNotfy.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixNotfy.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixNotfy.c
 done tclUnixNotfy.o generated
 make init.o
 make src/init.c
@@ -455,61 +454,61 @@ done include/tclcmd.h
 prev include/tksh.h implicit
 done src/init.c
 prev src/init.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -DTKSH_LIBRARY=\""${INSTALLROOT}/lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/init.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -DTKSH_LIBRARY=\""${INSTALLROOT}/lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/init.c
 done init.o generated
 make debug.o
 make src/debug.c
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev include/tksh.h implicit
 done src/debug.c
 prev src/debug.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/debug.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/debug.c
 done debug.o generated
 make var.o
 make src/var.c
 make include/nvextra.h implicit
-prev ${PACKAGE_ast_INCLUDE}/nval.h implicit
+prev ${INSTALLROOT}/include/ast/nval.h implicit
 done include/nvextra.h
 prev include/tksh.h implicit
 done src/var.c
 prev src/var.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/var.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/var.c
 done var.o generated
 make eval.o
 make src/eval.c
-prev ${PACKAGE_ast_INCLUDE}/nval.h implicit
+prev ${INSTALLROOT}/include/ast/nval.h implicit
 prev include/tksh.h implicit
 done src/eval.c
 prev src/eval.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/eval.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/eval.c
 done eval.o generated
 make list.o
 make src/list.c
 prev include/tksh.h implicit
 done src/list.c
 prev src/list.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/list.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/list.c
 done list.o generated
 make shcompat.o
 make src/shcompat.c
 prev include/tksh.h implicit
 done src/shcompat.c
 prev src/shcompat.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -Dnvenv='nvprivate[0]' -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/shcompat.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -Dnvenv='nvprivate[0]' -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/shcompat.c
 done shcompat.o generated
 make tcleval.o
 make src/tcleval.c
 prev include/tksh.h implicit
 done src/tcleval.c
 prev src/tcleval.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/tcleval.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/tcleval.c
 done tcleval.o generated
 make tclproc.o
 make src/tclproc.c
 prev include/tksh.h implicit
 done src/tclproc.c
 prev src/tclproc.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/tclproc.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/tclproc.c
 done tclproc.o generated
 make commands.o
 make src/commands.c
@@ -517,7 +516,7 @@ prev include/tclcmd.h implicit
 prev include/tksh.h implicit
 done src/commands.c
 prev src/commands.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/commands.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/commands.c
 done commands.o generated
 make varcmd.o
 make src/varcmd.c
@@ -526,14 +525,14 @@ prev include/tclcmd.h implicit
 prev include/tksh.h implicit
 done src/varcmd.c
 prev src/varcmd.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/varcmd.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/varcmd.c
 done varcmd.o generated
 make tclMain.o
 make src/tclMain.c
 prev include/tksh.h implicit
 done src/tclMain.c
 prev src/tclMain.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/tclMain.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/tclMain.c
 done tclMain.o generated
 make basic.o
 make src/basic.c
@@ -541,7 +540,7 @@ prev include/tclcmd.h implicit
 prev include/tksh.h implicit
 done src/basic.c
 prev src/basic.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/basic.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -D_PACKAGE_ast -c src/basic.c
 done basic.o generated
 make filecmd.o
 make src/filecmd.c
@@ -549,17 +548,17 @@ prev include/tclPort.h implicit
 prev include/tksh.h implicit
 done src/filecmd.c
 prev src/filecmd.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/filecmd.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/filecmd.c
 done filecmd.o generated
 make tclIO.o
 make src/tclIO.c
 prev include/tclPort.h implicit
 prev include/tclInt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done src/tclIO.c
 prev src/tclIO.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/tclIO.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c src/tclIO.c
 done tclIO.o generated
 make tclUnixChan.o
 make tcl/tclUnixChan.c
@@ -567,7 +566,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclUnixChan.c
 prev tcl/tclUnixChan.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixChan.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclUnixChan.c
 done tclUnixChan.o generated
 make tclIOUtil.o
 make tcl/tclIOUtil.c
@@ -575,7 +574,7 @@ prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 done tcl/tclIOUtil.c
 prev tcl/tclIOUtil.c
-exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclIOUtil.c
+exec - ${CC} ${CCFLAGS}  -Iinclude -I${INSTALLROOT}/include/ast -I${PACKAGE_tk_INCLUDE} -D_PACKAGE_ast -DLIB_DIR=\""lib/tksh7.6"\" -D_BLD_tcl -c tcl/tclIOUtil.c
 done tclIOUtil.o generated
 exec - ${AR} cr libtksh.a panic.o regexp.o tclHash.o tclGet.o tclAsync.o tclLink.o tclExpr.o tclCmdAH.o tclCmdMZ.o tclCmdIL.o tclParse.o tclGlob.o tclUtil.o tclEvent.o tclPreserve.o tclNotify.o tclClock.o tclDate.o tclInterp.o tclUnixFile.o tclUnixTime.o tclLoad.o tclLoadDl.o tclPkg.o tclPosixStr.o tclFHandle.o tclIOCmd.o tclUnixNotfy.o init.o debug.o
 exec - ${AR} cr libtksh.a var.o eval.o list.o shcompat.o tcleval.o tclproc.o commands.o varcmd.o tclMain.o basic.o filecmd.o tclIO.o tclUnixChan.o tclIOUtil.o
@@ -588,12 +587,12 @@ make ${mam_libdl}
 done ${mam_libdl} dontcare virtual
 make ${mam_libdld}
 done ${mam_libdld} dontcare virtual
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-lm,${INSTALLROOT}/lib/libm.a,} ${mam_cc_L--es,-l+ljobs,${INSTALLROOT}/lib/lib+ljobs.a,} ${mam_cc_L--es,-l+li,${INSTALLROOT}/lib/lib+li.a,} ${mam_cc_L--es,-ldl,${INSTALLROOT}/lib/libdl.a,} ${mam_cc_L--es,-ldld,${INSTALLROOT}/lib/libdld.a,} ${mam_cc_L--es,-l+lintl,${INSTALLROOT}/lib/lib+lintl.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-ltk,${INSTALLROOT}/lib/libtk.a,} ${mam_cc_L--es,-lX11,${INSTALLROOT}/lib/libX11.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
-setv mam_libtk `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-ltk,${INSTALLROOT}/lib/libtk.a,} ${mam_cc_L--es,-lm,${INSTALLROOT}/lib/libm.a,} ${mam_cc_L--es,-l+ljobs,${INSTALLROOT}/lib/lib+ljobs.a,} ${mam_cc_L--es,-l+li,${INSTALLROOT}/lib/lib+li.a,} ${mam_cc_L--es,-ldl,${INSTALLROOT}/lib/libdl.a,} ${mam_cc_L--es,-ldld,${INSTALLROOT}/lib/libdld.a,} ${mam_cc_L--es,-l+lintl,${INSTALLROOT}/lib/lib+lintl.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-ltk,${INSTALLROOT}/lib/libtk.a,} ${mam_cc_L--es,-lX11,${INSTALLROOT}/lib/libX11.a,} ${INSTALLROOT}/lib/lib/tk 2>/dev/null || echo '' ${mam_cc_L+-ltk}${mam_cc_L-${PACKAGE_ast_LIB}/libtk.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-lm,${INSTALLROOT}/lib/libm.a,} ${mam_cc_L--es,-l+ljobs,${INSTALLROOT}/lib/lib+ljobs.a,} ${mam_cc_L--es,-l+li,${INSTALLROOT}/lib/lib+li.a,} ${mam_cc_L--es,-ldl,${INSTALLROOT}/lib/libdl.a,} ${mam_cc_L--es,-ldld,${INSTALLROOT}/lib/libdld.a,} ${mam_cc_L--es,-l+lintl,${INSTALLROOT}/lib/lib+lintl.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-ltk,${INSTALLROOT}/lib/libtk.a,} ${mam_cc_L--es,-lX11,${INSTALLROOT}/lib/libX11.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_tk_LIB}/libast.a}`
+setv mam_libtk `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-ltk,${INSTALLROOT}/lib/libtk.a,} ${mam_cc_L--es,-lm,${INSTALLROOT}/lib/libm.a,} ${mam_cc_L--es,-l+ljobs,${INSTALLROOT}/lib/lib+ljobs.a,} ${mam_cc_L--es,-l+li,${INSTALLROOT}/lib/lib+li.a,} ${mam_cc_L--es,-ldl,${INSTALLROOT}/lib/libdl.a,} ${mam_cc_L--es,-ldld,${INSTALLROOT}/lib/libdld.a,} ${mam_cc_L--es,-l+lintl,${INSTALLROOT}/lib/lib+lintl.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-ltk,${INSTALLROOT}/lib/libtk.a,} ${mam_cc_L--es,-lX11,${INSTALLROOT}/lib/libX11.a,} ${INSTALLROOT}/lib/lib/tk 2>/dev/null || echo '' ${mam_cc_L+-ltk}${mam_cc_L-${PACKAGE_tk_LIB}/libtk.a}`
 make ${mam_libX11}
 done ${mam_libX11} dontcare virtual
 prev ${mam_libX11}
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o tksh uinit.o tkMain.o ${mam_libtksh} ${mam_libm} ${mam_cc_static}  ${mam_cc_dynamic} ${mam_cc_static}  ${mam_cc_dynamic} ${mam_cc_static}  ${mam_cc_dynamic} ${mam_libast} ${mam_libtk} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_tk_LIB}}  -o tksh uinit.o tkMain.o ${mam_libtksh} ${mam_libm} ${mam_cc_static}  ${mam_cc_dynamic} ${mam_cc_static}  ${mam_cc_dynamic} ${mam_cc_static}  ${mam_cc_dynamic} ${mam_libast} ${mam_libtk} ${mam_libast}
 done tksh generated
 prev libtksh.a archive
 make ${INSTALLROOT}/bin
@@ -624,14 +623,14 @@ make ${INSTALLROOT}/bin/tksh
 prev tksh
 exec - mv ${INSTALLROOT}/bin/tksh ${INSTALLROOT}/bin/tksh.old 2>/dev/null || true; test '' = 'tksh' || { cp tksh ${INSTALLROOT}/bin/tksh  		    		    ;}
 done ${INSTALLROOT}/bin/tksh generated
-make ${PACKAGE_ast_LIB}
+make ${PACKAGE_tk_LIB}
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
+exec - if	test ! -d ${PACKAGE_tk_LIB}
+exec - then	set -x && mkdir -p ${PACKAGE_tk_LIB} 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${PACKAGE_tk_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -647,20 +646,20 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB} generated
-make ${PACKAGE_ast_LIB}/libtksh.a archive
+done ${PACKAGE_tk_LIB} generated
+make ${PACKAGE_tk_LIB}/libtksh.a archive
 prev libtksh.a archive
-exec - mv ${PACKAGE_ast_LIB}/libtksh.a ${PACKAGE_ast_LIB}/libtksh.a.old 2>/dev/null || true; test '' = 'libtksh.a' || { cp libtksh.a ${PACKAGE_ast_LIB}/libtksh.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libtksh.a) >/dev/null 2>&1 || true
-done ${PACKAGE_ast_LIB}/libtksh.a generated
-make ${PACKAGE_ast_LIB}/lib
+exec - mv ${PACKAGE_tk_LIB}/libtksh.a ${PACKAGE_tk_LIB}/libtksh.a.old 2>/dev/null || true; test '' = 'libtksh.a' || { cp libtksh.a ${PACKAGE_tk_LIB}/libtksh.a  		    		    ;}
+exec - (ranlib ${PACKAGE_tk_LIB}/libtksh.a) >/dev/null 2>&1 || true
+done ${PACKAGE_tk_LIB}/libtksh.a generated
+make ${PACKAGE_tk_LIB}/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
+exec - if	test ! -d ${PACKAGE_tk_LIB}/lib
+exec - then	set -x && mkdir -p ${PACKAGE_tk_LIB}/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${PACKAGE_tk_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -676,19 +675,19 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/lib generated
-make ${PACKAGE_ast_LIB}/lib/tksh
+done ${PACKAGE_tk_LIB}/lib generated
+make ${PACKAGE_tk_LIB}/lib/tksh
 prev tksh.req
-exec - mv ${PACKAGE_ast_LIB}/lib/tksh ${PACKAGE_ast_LIB}/lib/tksh.old 2>/dev/null || true; test '' = 'tksh.req' || { cp tksh.req ${PACKAGE_ast_LIB}/lib/tksh  		    		    ;}
-done ${PACKAGE_ast_LIB}/lib/tksh generated
-make ${PACKAGE_ast_LIB}/tksh7.6
+exec - mv ${PACKAGE_tk_LIB}/lib/tksh ${PACKAGE_tk_LIB}/lib/tksh.old 2>/dev/null || true; test '' = 'tksh.req' || { cp tksh.req ${PACKAGE_tk_LIB}/lib/tksh  		    		    ;}
+done ${PACKAGE_tk_LIB}/lib/tksh generated
+make ${PACKAGE_tk_LIB}/tksh7.6
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/tksh7.6
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tksh7.6 2>/dev/null && set - ||
+exec - if	test ! -d ${PACKAGE_tk_LIB}/tksh7.6
+exec - then	set -x && mkdir -p ${PACKAGE_tk_LIB}/tksh7.6 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tksh7.6 | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${PACKAGE_tk_LIB}/tksh7.6 | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -704,37 +703,37 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/tksh7.6 generated
-make ${PACKAGE_ast_LIB}/tksh7.6/init.ksh
+done ${PACKAGE_tk_LIB}/tksh7.6 generated
+make ${PACKAGE_tk_LIB}/tksh7.6/init.ksh
 make lib/tksh7.6/init.ksh
 done lib/tksh7.6/init.ksh
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.ksh' || { cp lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/init.ksh generated
-make ${PACKAGE_ast_LIB}/tksh7.6/init.tcl
+exec - mv ${PACKAGE_tk_LIB}/tksh7.6/init.ksh ${PACKAGE_tk_LIB}/tksh7.6/init.ksh.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.ksh' || { cp lib/tksh7.6/init.ksh ${PACKAGE_tk_LIB}/tksh7.6/init.ksh  		    		    ;}
+done ${PACKAGE_tk_LIB}/tksh7.6/init.ksh generated
+make ${PACKAGE_tk_LIB}/tksh7.6/init.tcl
 make lib/tksh7.6/init.tcl
 done lib/tksh7.6/init.tcl
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.tcl' || { cp lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/init.tcl generated
-make ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl
+exec - mv ${PACKAGE_tk_LIB}/tksh7.6/init.tcl ${PACKAGE_tk_LIB}/tksh7.6/init.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.tcl' || { cp lib/tksh7.6/init.tcl ${PACKAGE_tk_LIB}/tksh7.6/init.tcl  		    		    ;}
+done ${PACKAGE_tk_LIB}/tksh7.6/init.tcl generated
+make ${PACKAGE_tk_LIB}/tksh7.6/ldAout.tcl
 make lib/tksh7.6/ldAout.tcl
 done lib/tksh7.6/ldAout.tcl
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/ldAout.tcl' || { cp lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl generated
-make ${PACKAGE_ast_LIB}/tksh7.6/license.terms
+exec - mv ${PACKAGE_tk_LIB}/tksh7.6/ldAout.tcl ${PACKAGE_tk_LIB}/tksh7.6/ldAout.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/ldAout.tcl' || { cp lib/tksh7.6/ldAout.tcl ${PACKAGE_tk_LIB}/tksh7.6/ldAout.tcl  		    		    ;}
+done ${PACKAGE_tk_LIB}/tksh7.6/ldAout.tcl generated
+make ${PACKAGE_tk_LIB}/tksh7.6/license.terms
 make lib/tksh7.6/license.terms
 done lib/tksh7.6/license.terms
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms.old 2>/dev/null || true; test '' = 'lib/tksh7.6/license.terms' || { cp lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/license.terms generated
-make ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl
+exec - mv ${PACKAGE_tk_LIB}/tksh7.6/license.terms ${PACKAGE_tk_LIB}/tksh7.6/license.terms.old 2>/dev/null || true; test '' = 'lib/tksh7.6/license.terms' || { cp lib/tksh7.6/license.terms ${PACKAGE_tk_LIB}/tksh7.6/license.terms  		    		    ;}
+done ${PACKAGE_tk_LIB}/tksh7.6/license.terms generated
+make ${PACKAGE_tk_LIB}/tksh7.6/parray.tcl
 make lib/tksh7.6/parray.tcl
 done lib/tksh7.6/parray.tcl
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/parray.tcl' || { cp lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl generated
-make ${PACKAGE_ast_LIB}/tksh7.6/tclIndex
+exec - mv ${PACKAGE_tk_LIB}/tksh7.6/parray.tcl ${PACKAGE_tk_LIB}/tksh7.6/parray.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/parray.tcl' || { cp lib/tksh7.6/parray.tcl ${PACKAGE_tk_LIB}/tksh7.6/parray.tcl  		    		    ;}
+done ${PACKAGE_tk_LIB}/tksh7.6/parray.tcl generated
+make ${PACKAGE_tk_LIB}/tksh7.6/tclIndex
 make lib/tksh7.6/tclIndex
 done lib/tksh7.6/tclIndex
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex.old 2>/dev/null || true; test '' = 'lib/tksh7.6/tclIndex' || { cp lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/tclIndex generated
+exec - mv ${PACKAGE_tk_LIB}/tksh7.6/tclIndex ${PACKAGE_tk_LIB}/tksh7.6/tclIndex.old 2>/dev/null || true; test '' = 'lib/tksh7.6/tclIndex' || { cp lib/tksh7.6/tclIndex ${PACKAGE_tk_LIB}/tksh7.6/tclIndex  		    		    ;}
+done ${PACKAGE_tk_LIB}/tksh7.6/tclIndex generated
 done install virtual
 make test
 done test dontcare virtual

@@ -1,6 +1,6 @@
 UNIT $SHELL
 
-TEST 01 syntesized getconf
+TEST 01 synthesized getconf
 	EXEC -c '
 		_AST_FEATURES="" $SHELL -c "
 			print :\$_AST_FEATURES:

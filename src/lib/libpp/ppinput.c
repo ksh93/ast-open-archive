@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -173,7 +173,7 @@ pppush(register int t, register char* s, register char* p, int n)
 				cur->flags |= IN_regular;
 			errno = 0;
 #if PROTOTYPE
-			if (!(pp.test & TEST_noproto) && ((pp.state & COMPATIBILITY) || (pp.option & PLUSPLUS)) && (cur->buffer = pppopen(NiL, cur->fd, NiL, NiL, NiL, NiL, (PROTO_HEADER|PROTO_RETAIN)|((pp.option & PROTOTYPED) ? PROTO_FORCE : PROTO_PASS)|((pp.mode & MARKC) ? PROTO_PLUSPLUS : 0))))
+			if (!(pp.option & NOPROTO) && !(pp.test & TEST_noproto) && ((pp.state & COMPATIBILITY) || (pp.option & PLUSPLUS)) && (cur->buffer = pppopen(NiL, cur->fd, NiL, NiL, NiL, NiL, (PROTO_HEADER|PROTO_RETAIN)|((pp.option & PROTOTYPED) ? PROTO_FORCE : PROTO_PASS)|((pp.mode & MARKC) ? PROTO_PLUSPLUS : 0))))
 			{
 				*(p = cur->buffer - 1) = 0;
 				cur->buffer -= PPBAKSIZ;

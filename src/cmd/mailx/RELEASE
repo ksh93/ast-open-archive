@@ -1,3 +1,4 @@
+00-09-21 drop leading */ from user name
 00-05-09 add cd,pwd,${PWD},${OLDPWD} with ${CDPATH} check
 00-05-04 lex: flush stdout before prompt!
 00-03-17 add -Qn to get status of n most recent messages

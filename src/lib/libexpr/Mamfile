@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -33,12 +33,11 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make expr
 make libexpr.a archive
 make expr.req
+exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
 exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
@@ -51,7 +50,7 @@ exec - do	case $i in
 exec - 	"expr"|expr)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}    -L. ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
@@ -116,134 +115,134 @@ exec - #define gettxt(h,t)	(t)\
 exec - #endif' $i > O$i
 exec - 	done
 exec - fi
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/limits.h implicit
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
 make exgram.h implicit
 make exlib.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/sfstr.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/limits.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfstr.h dontcare
-make ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/option.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/option.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/error.h dontcare
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfstr.h dontcare
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
 make expr.h implicit
-make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/cdt.h dontcare
 make joint.exparse.y implicit joint
 make exparse.h implicit
 done exparse.h dontcare
 prev exparse.c
 done joint.exparse.y virtual
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done expr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/align.h implicit
-done ${PACKAGE_ast_INCLUDE}/align.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/align.h implicit
+done ${INSTALLROOT}/include/ast/align.h dontcare
 done exlib.h dontcare
 done exgram.h
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done exparse.c generated
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exparse.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exparse.c
 done exparse.o generated
 make excc.o
 make excc.c
 prev exlib.h implicit
 done excc.c
 prev excc.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excc.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c excc.c
 done excc.o generated
 make excontext.o
 make excontext.c
 prev exlib.h implicit
 done excontext.c
 prev excontext.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excontext.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c excontext.c
 done excontext.o generated
 make exdata.o
 make exdata.c
 prev exlib.h implicit
 done exdata.c
 prev exdata.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exdata.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exdata.c
 done exdata.o generated
 make exeval.o
 make exeval.c
-make ${PACKAGE_ast_INCLUDE}/tm.h implicit
-make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/times.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tm.h
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h
 make exop.h implicit
 prev exparse.h
 exec - {
@@ -255,70 +254,70 @@ done exop.h generated
 prev exlib.h implicit
 done exeval.c
 prev exeval.c
-exec - ${CC}   -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exeval.c
+exec - ${CC}   -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exeval.c
 done exeval.o generated
 make exexpr.o
 make exexpr.c
 prev exlib.h implicit
 done exexpr.c
 prev exexpr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exexpr.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exexpr.c
 done exexpr.o generated
 make exerror.o
 make exerror.c
 prev exlib.h implicit
 done exerror.c
 prev exerror.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exerror.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exerror.c
 done exerror.o generated
 make exopen.o
 make exopen.c
 prev exlib.h implicit
 done exopen.c
 prev exopen.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exopen.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exopen.c
 done exopen.o generated
 make exrewind.o
 make exrewind.c
 prev exlib.h implicit
 done exrewind.c
 prev exrewind.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exrewind.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exrewind.c
 done exrewind.o generated
 make extoken.o
 make extoken.c
 prev exlib.h implicit
 done extoken.c
 prev extoken.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extoken.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c extoken.c
 done extoken.o generated
 make extype.o
 make extype.c
 prev exlib.h implicit
 done extype.c
 prev extype.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extype.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c extype.c
 done extype.o generated
 make exzero.o
 make exzero.c
 prev exlib.h implicit
 done exzero.c
 prev exzero.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exzero.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_expr -c exzero.c
 done exzero.o generated
 exec - ${AR} cr libexpr.a exparse.o excc.o excontext.o exdata.o exeval.o exexpr.o exerror.o exopen.o exrewind.o extoken.o extype.o exzero.o
 exec - (ranlib libexpr.a) >/dev/null 2>&1 || true
 done libexpr.a generated
 done expr virtual
 prev libexpr.a archive
-make ${PACKAGE_ast_LIB}
+make ${INSTALLROOT}/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -334,20 +333,20 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB} generated
-make ${PACKAGE_ast_LIB}/libexpr.a archive
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libexpr.a archive
 prev libexpr.a archive
-exec - mv ${PACKAGE_ast_LIB}/libexpr.a ${PACKAGE_ast_LIB}/libexpr.a.old 2>/dev/null || true; test '' = 'libexpr.a' || { cp libexpr.a ${PACKAGE_ast_LIB}/libexpr.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libexpr.a) >/dev/null 2>&1 || true
-done ${PACKAGE_ast_LIB}/libexpr.a generated
-make ${PACKAGE_ast_LIB}/lib
+exec - mv ${INSTALLROOT}/lib/libexpr.a ${INSTALLROOT}/lib/libexpr.a.old 2>/dev/null || true; test '' = 'libexpr.a' || { cp libexpr.a ${INSTALLROOT}/lib/libexpr.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libexpr.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libexpr.a generated
+make ${INSTALLROOT}/lib/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib/lib
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -363,19 +362,19 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/lib generated
-make ${PACKAGE_ast_LIB}/lib/expr
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/expr
 prev expr.req
-exec - mv ${PACKAGE_ast_LIB}/lib/expr ${PACKAGE_ast_LIB}/lib/expr.old 2>/dev/null || true; test '' = 'expr.req' || { cp expr.req ${PACKAGE_ast_LIB}/lib/expr  		    		    ;}
-done ${PACKAGE_ast_LIB}/lib/expr generated
-make ${PACKAGE_ast_INCLUDE}
+exec - mv ${INSTALLROOT}/lib/lib/expr ${INSTALLROOT}/lib/lib/expr.old 2>/dev/null || true; test '' = 'expr.req' || { cp expr.req ${INSTALLROOT}/lib/lib/expr  		    		    ;}
+done ${INSTALLROOT}/lib/lib/expr generated
+make ${INSTALLROOT}/include/ast
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/include/ast
+exec - then	set -x && mkdir -p ${INSTALLROOT}/include/ast 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_INCLUDE} | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/include/ast | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -391,19 +390,19 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_INCLUDE} generated
-make ${PACKAGE_ast_INCLUDE}/expr.h
+done ${INSTALLROOT}/include/ast generated
+make ${INSTALLROOT}/include/ast/expr.h
 prev expr.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic -o since='1989,author=kpv' expr.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/expr.h 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/arch/sgi.mips3/lib/package/ast.lic '-o since=1989,author=kpv' expr.h > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/expr.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/expr.h
+exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/expr.h
 exec - fi
-done ${PACKAGE_ast_INCLUDE}/expr.h generated
-make ${PACKAGE_ast_INCLUDE}/exparse.h
+done ${INSTALLROOT}/include/ast/expr.h generated
+make ${INSTALLROOT}/include/ast/exparse.h
 prev exparse.h
-exec - mv ${PACKAGE_ast_INCLUDE}/exparse.h ${PACKAGE_ast_INCLUDE}/exparse.h.old 2>/dev/null || true; test '' = 'exparse.h' || { cp exparse.h ${PACKAGE_ast_INCLUDE}/exparse.h  		    		    ;}
-done ${PACKAGE_ast_INCLUDE}/exparse.h generated
+exec - mv ${INSTALLROOT}/include/ast/exparse.h ${INSTALLROOT}/include/ast/exparse.h.old 2>/dev/null || true; test '' = 'exparse.h' || { cp exparse.h ${INSTALLROOT}/include/ast/exparse.h  		    		    ;}
+done ${INSTALLROOT}/include/ast/exparse.h generated
 done install virtual
 make test
 done test dontcare virtual

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.tab (AT&T Labs Research) 2000-04-01
+# @(#)pp.tab (AT&T Labs Research) 2000-09-11
 #
 # C preprocessor tables and states
 #
@@ -66,9 +66,11 @@
 	pluscomment
 	plusplus
 	plussplice
+	pragmaexpand
 	predefined
 	prefix
 	preserve
+	proto
 	prototyped
 	quote
 	readonly
@@ -171,9 +173,11 @@
 	NOHASH			# don't hash PP_COMPILE T_ID's
 	NOISE			# convert T_X_* to T_NOISES
 	NOISEFILTER		# filter (ignore) NOISE
+	NOPROTO			# disable ppproto()
 	PLUSCOMMENT		# enable C++ comments
 	PLUSPLUS		# preprocess for C++
 	PLUSSPLICE		# C++ // \<newline> does not splice
+	PRAGMAEXPAND		# expand #pragma args
 	PREDEFINED		# mark macro definitions predefined
 	PREFIX			# prefix include for compatibility
 	PRESERVE		# preserve input layout
@@ -191,6 +195,7 @@
 	+BASE
 	DATE
 	FILE
+	+FUNCTION
 	LINE
 	+PATH
 	-STDC

@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1984-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1984-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -754,7 +754,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 			error(PANIC, "%s: active=0", r->name);
 		}
 #endif
-		if ((r2 = metaget(r, r->active->prereqs, stem, &r4)) && !(state.test & 0x00100000) && strchr(unbound(r), '/') && !strchr(r4->name, '/'))
+		if ((r2 = metaget(r, r->active->prereqs, stem, &r4)) && !(state.test & 0x00100000) && ((state.test & 0x00200000) || !(r->property & P_implicit)) && strchr(unbound(r), '/') && !strchr(r4->name, '/'))
 			r2 = 0;
 		if (r2)
 		{
@@ -1162,6 +1162,11 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 			r1->active = fp->previous;
 			if (fp != &frame)
 				free(fp);
+		}
+		if (r1 != r)
+		{
+			r1->time = r->time;
+			r1->status = r->status;
 		}
 	}
 	state.targetview = otargetview;

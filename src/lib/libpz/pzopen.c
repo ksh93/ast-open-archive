@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1998-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1998-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 
 /*
@@ -29,6 +29,8 @@
  */
 
 #include "pzlib.h"
+
+#include <ls.h>
 
 Pzstate_t	state = { "libpz:pz" };
 
@@ -96,6 +98,7 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 {
 	register Pz_t*	pz;
 	Vmalloc_t*	vm;
+	struct stat	st;
 
 	if (flags & PZ_AGAIN)
 	{
@@ -152,12 +155,25 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 		}
 		else if (!(pz->path = vmstrdup(vm, path)))
 			goto bad;
-		/* without this large .pz and .gz terminate short of EOF */
+
+		/*
+		 * without this large .pz and .gz terminate short of EOF
+		 */
+
 		if (!(pz->test & 0x00001000))
 			sfsetbuf(pz->io, (void*)pz->io, SF_UNBOUND);
 		if (pz->flags & PZ_DIO)
 			sfdcdio(pz->io, 0);
-		if (!(pz->flags & PZ_POP) && (!(pz->flags & PZ_WRITE) && sfdcgzip(pz->io, (pz->flags & PZ_CRC) ? 0 : SFGZ_NOCRC) > 0 || (pz->flags & PZ_WRITE) && sfdcpzip((Sfio_t*)pz, disc, pz->path, pz->flags|PZ_FORCE|PZ_PUSHED|PZ_HANDLE) > 0))
+
+		/*
+		 * there is an sfio discipline bug (probably usage,
+		 * not implementation) for piped input; the S_ISFIFO
+		 * test avoids the bug until the root problem is fixed
+		 */
+
+		if (!fstat(sffileno(pz->io), &st) && S_ISFIFO(st.st_mode))
+			pz->flags &= ~PZ_CRC;
+		else if (!(pz->flags & PZ_POP) && (!(pz->flags & PZ_WRITE) && sfdcgzip(pz->io, (pz->flags & PZ_CRC) ? 0 : SFGZ_NOCRC) > 0 || (pz->flags & PZ_WRITE) && sfdcpzip((Sfio_t*)pz, disc, pz->path, pz->flags|PZ_FORCE|PZ_PUSHED|PZ_HANDLE) > 0))
 			pz->flags |= PZ_POP;
 		else
 			pz->flags &= ~PZ_CRC;

@@ -1,28 +1,29 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1996-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*               Phong Vo <kpv@research.att.com>                *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1996-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                 Phong Vo <kpv@research.att.com>                  *
+*            Doug McIlroy <doug@research.bell-labs.com>            *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 
 /*
@@ -41,7 +42,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)sort (AT&T Labs Research) 2000-03-17\n]"
+"[-?\n@(#)sort (AT&T Labs Research) 2000-08-31\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -114,8 +115,9 @@ USAGE_LICENSE
 "	to tune performance. Type is a single character and may be one of:]:"
 "		[type[size]]]{"
 "		[+a?Buffer alignment.]"
+"		[+c?Input chunk size; sort chunks of this size and disable merge.]"
 "		[+i?Input buffer size.]"
-"		[+p?Input sort size; sorting is done in chunks of this size.]"
+"		[+p?Input sort size; sort chunks of this size before merge.]"
 "		[+o?Output buffer size.]"
 "		[+r?Maximum record size.]"
 "		[+I?Decompress the input if it is compressed.]"
@@ -193,9 +195,9 @@ USAGE_LICENSE
 #define INREC		(16*1024)	/* record begin chunk size	*/
 
 #define TEST_dump	0x80000000	/* dump the state before sort	*/
-#define TEST_read	0x40000000	/* force sfread()		*/
-#define TEST_show	0x20000000	/* show but don't do		*/
-#define TEST_keys	0x10000000	/* dump keys			*/
+#define TEST_keys	0x40000000	/* dump keys			*/
+#define TEST_read	0x20000000	/* force sfread()		*/
+#define TEST_show	0x10000000	/* show but don't do		*/
 
 typedef struct
 {
@@ -230,6 +232,7 @@ typedef struct
 	off_t		total;		/* total size of single file	*/
 	unsigned long	test;		/* test bit mask		*/
 	int		child;		/* in child process		*/
+	int		chunk;		/* chunk the input (no merge)	*/
 	int		hadstdin;	/* already has - on input	*/
 	int		map;		/* sfreserve() input		*/
 	int		mfiles;		/* multi-stage files[] count	*/
@@ -338,6 +341,10 @@ parse(register Sort_t* sp, char** argv)
 		{
 		case 'a':
 			kp->alignsize = z;
+			break;
+		case 'c':
+			sp->chunk = 1;
+			kp->alignsize = kp->insize = z;
 			break;
 		case 'i':
 			kp->insize = z;
@@ -530,7 +537,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		z = 0;
 	if (x > INMAX)
 		x = INMAX;
-	else if (x < INMIN)
+	else if (x < INMIN && !sp->chunk)
 		x = INMIN;
 	if (sp->single = !sp->key->input[1])
 	{
@@ -836,7 +843,16 @@ flush(register Sort_t* sp, register size_t r)
 	register size_t		m;
 	register size_t		b;
 
-	if (sp->rec->meth != Rsverify)
+	if (sp->chunk)
+	{
+		/*
+		 * skip merge and output sorted chunk
+		 */
+
+		if (rswrite(sp->rec, sp->op, RS_OTEXT))
+			error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
+	}
+	else if (sp->rec->meth != Rsverify)
 	{
 		/*
 		 * write to an intermediate file and rewind for rsmerge

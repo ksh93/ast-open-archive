@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1998-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1998-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 
 /*
@@ -37,10 +37,13 @@
  *	0x0040	enable reorder permutation trace
  *	0x0080	enable reorder level 2 merge prune
  *	0x0100	disable reorder merge prune
+ *	0x0200	dump TSP v1 ordering matrix and exit
+ *	0x0400	dump TSP v2 ordering matrix and exit
+ *	0x0800	dump TSP v3 ordering matrix and exit
  */
 
 static const char usage[] =
-"[-?\n@(#)pin (AT&T Labs Research) 2000-06-01\n]"
+"[-?\n@(#)pin (AT&T Labs Research) 2000-10-04\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -500,7 +503,77 @@ reorder(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot
 	unsigned char*		end;
 	Sfio_t*			sp;
 
+	if (state.test & 0x0800)
+	{
+		/*
+		 * dump TSP v3 ordering matrix and exit
+		 */
+
+		if (!(cst = newof(0, ssize_t, row, 0)))
+			error(ERROR_SYSTEM|3, "out of space [%d byte vector]", row);
+		for (i = 0; i < row; i++)
+			cst[i] = field(buf, dat, i, i, row, tot);
+		sfprintf(sfstdout, "%I*d A\n", sizeof(row), row);
+		for (i = 0; i < row; i++)
+			for (j = 0; j < row; j++)
+				if (i == j)
+					sfprintf(sfstdout, "0\n");
+				else
+				{
+					z = pair(buf, dat, i, j, row, tot);
+					y = cst[i] + cst[j];
+					if (z > y)
+						z = y;
+					sfprintf(sfstdout, "%I*d\n", sizeof(z), z);
+				}
+		exit(0);
+	}
+	if (state.test & 0x0400)
+	{
+		/*
+		 * dump TSP v2 ordering matrix and exit
+		 */
+
+		sfprintf(sfstdout, "%I*d A\n", sizeof(row), row);
+		for (i = 0; i < row; i++)
+			for (j = 0; j < row; j++)
+				if (i == j)
+					sfprintf(sfstdout, "0\n");
+				else
+					sfprintf(sfstdout, "%I*d\n", sizeof(size_t), pair(buf, dat, i, j, row, tot));
+		exit(0);
+	}
 	siz = matrix(row);
+	if (state.test & 0x0200)
+	{
+		/*
+		 * dump TSP v1 ordering matrix and exit
+		 */
+
+		z = 0;
+		for (i = 0; i < row; i++)
+			if (z < (y = siz[i][i] = field(buf, dat, i, i, row, tot)))
+				z = y;
+		for (i = 0; i < row; i++)
+			for (j = 0; j < row; j++)
+				if (i != j && z < (y = siz[i][j] = pair(buf, dat, i, j, row, tot)))
+					z = y;
+		z = (row + 1) * z + 1;
+		sfprintf(sfstdout, "%I*u A\n", sizeof(row), row + 1);
+		sfprintf(sfstdout, "%I*u\n", sizeof(z), z);  /* d(s,s) */
+		for (i = 0; i < row; i++)
+			sfprintf(sfstdout, "%I*u\n", sizeof(size_t), siz[i][i]);
+		for (i = 0; i < row; i++)
+		{
+			sfprintf(sfstdout, "%I*u\n", sizeof(z), z); /* d(i,s) */
+			for (j = 0; j < row; j++)
+				if (j == i)
+					sfprintf(sfstdout, "%I*u\n", sizeof(z), z); /* d(i,i) */
+				else
+					sfprintf(sfstdout, "%I*u\n", sizeof(size_t), siz[i][j]); /* d(i,j) */
+		}
+		exit(0);
+	}
 	cur = partition(row);
 	nxt = partition(row);
 	fin = partition(row);
@@ -1239,6 +1312,7 @@ main(int argc, char** argv)
 		if (pz = pzopen(&disc, state.input, 0))
 		{
 			state.test = pz->test;
+			ip = pz->io;
 			if (partition)
 			{
 				row = pz->part->row;
@@ -1261,7 +1335,6 @@ main(int argc, char** argv)
 				}
 				else if (m > 0 && (row < m || row > m && (row % m)))
 					error(1, "row size %I*d may be invalid -- try %I*u next time", sizeof(row), row, sizeof(m), m);
-				ip = pz->io;
 				pz->io = 0;
 				pzclose(pz);
 				pz = 0;

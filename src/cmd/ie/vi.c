@@ -1,28 +1,28 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1984-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*              David Korn <dgk@research.att.com>               *
-*                         Pat Sullivan                         *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1984-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*                David Korn <dgk@research.att.com>                 *
+*                           Pat Sullivan                           *
+*                                                                  *
+*******************************************************************/
 /* Adapted for ksh by David Korn */
 /*+	VI.C			P.D. Sullivan
  *
@@ -181,9 +181,6 @@
 
 #define	DEL	'\177'			/* interrupt char */
 
-#define	TRUE	1
-#define	FALSE	0
-
 #define	INVALID	(-1)			/* invalid column */
 #define	QUIT_C	'\34'			/* quit char */
 #define	SYSERR	(-1)			/* system error */
@@ -238,7 +235,7 @@ unsigned nchar;				/* number of chars to read */
 	genchar Ubuf[MAXLINE];	/* used for U command */
 	genchar ubuf[MAXLINE];	/* used for u command */
 	genchar Window[WINDOW+10];	/* window image */
-	char cntl_char;			/* TRUE if control character present */
+	char cntl_char;			/* 1 if control character present */
 	int Globals[9];			/* local global variables */
 	int	esc_or_hang = 0;	/* <ESC> or hangup */
 #ifndef FIORDCHK
@@ -423,7 +420,7 @@ unsigned nchar;				/* number of chars to read */
 	{
 		int kill_erase = 0;
 #   ifndef ECHOCTL
-		cntl_char = FALSE;
+		cntl_char = 0;
 #   endif /* !ECHOCTL */
 		for(i=(echoctl?last_virt:0); i<=last_virt; ++i )
 		{
@@ -439,13 +436,13 @@ unsigned nchar;				/* number of chars to read */
 			if( c==usrerase || c==usrkill )
 			{
 				/*** user typed escaped erase or kill char ***/
-				cntl_char = TRUE;
+				cntl_char = 1;
 				if(is_print(c))
 					kill_erase++;
 			}
 			else if( !is_print(c) )
 			{
-				cntl_char = TRUE;
+				cntl_char = 1;
 
 				if( c == cntl('V') )
 				{
@@ -493,7 +490,7 @@ unsigned nchar;				/* number of chars to read */
 # ifdef ECHOCTL
 				&& typeahead)
 # else
-				&& (typeahead || cntl_char==TRUE) )
+				&& (typeahead || cntl_char) )
 # endif /*ECHOCTL */
 			{
 				refresh(TRANSLATE);
@@ -597,7 +594,7 @@ unsigned nchar;				/* number of chars to read */
 
 	/*** Get a line from the terminal ***/
 
-	U_saved = FALSE;
+	U_saved = 0;
 
 #ifdef RAWONLY
 	getline(APPEND);
@@ -732,12 +729,12 @@ cntlmode()
 	int tmp_u_column = INVALID;	/* temporary u_column */
 	int was_inmacro;
 
-	if( U_saved == FALSE )
+	if( !U_saved )
 	{
 		/*** save virtual image if never done before ***/
 		virtual[last_virt+1] = '\0';
 		gencpy(U_space, virtual);
-		U_saved = TRUE;
+		U_saved = 1;
 	}
 
 	save_last();
@@ -1363,7 +1360,7 @@ register int mode;
 	register int c;
 	register int tmp;
 
-	addnl = TRUE;
+	addnl = 1;
 
 	if( mode == ESC )
 	{
@@ -1482,7 +1479,7 @@ register int mode;
 		case UEOF:		/** eof char **/
 			if( cur_virt != INVALID )
 				continue;
-			addnl = FALSE;
+			addnl = 0;
 
 		case '\n':		/** newline or return **/
 			if( mode != SEARCH )
@@ -1494,7 +1491,7 @@ register int mode;
 			{
 				if( cur_virt < last_virt )
 				{
-					replace(c, TRUE);
+					replace(c, 1);
 					continue;
 				}
 				delete(1, BAD);
@@ -1784,13 +1781,13 @@ int mode;
 		|| ( v==ocur_virt
 			&& (!is_print(virtual[v]) || !is_print(o_v_char))) )
 	{
-		opflag = FALSE;
+		opflag = 0;
 		p = 0;
 		v = 0;
 	}
 	else
 	{
-		opflag = TRUE;
+		opflag = 1;
 		p = ocur_phys;
 		v = ocur_virt;
 		if( !is_print(virtual[v]) )
@@ -1827,7 +1824,7 @@ int mode;
 	/*** attempt to optimize search somewhat to find ***/
 	/*** out where physical and window images differ ***/
 
-	if( first_w==ofirst_wind && ncur_phys>=ocur_phys && opflag==TRUE )
+	if( first_w==ofirst_wind && ncur_phys>=ocur_phys && opflag )
 	{
 		p = ocur_phys;
 		w = p - first_w;
@@ -1924,8 +1921,8 @@ int mode;
  *	Replace the cur_virt character with char.  This routine attempts
  * to avoid using refresh().
  *
- *	increment	= TRUE, increment cur_virt after replacement.
- *			= FALSE, leave cur_virt where it is.
+ *	increment	= 1, increment cur_virt after replacement.
+ *			= 0, leave cur_virt where it is.
  *
 }*/
 
@@ -1949,14 +1946,14 @@ register int increment;
 #ifdef MULTIBYTE
 		|| icharset(c) || out_csize(icharset(o_v_char))>1
 #endif /* MULTIBYTE */
-		|| (increment==TRUE && (cur_window==w_size-1)
+		|| (increment && (cur_window==w_size-1)
 			|| !is_print(virtual[cur_virt+1])) )
 	{
 		/*** must use standard refresh routine ***/
 
 		delete(1, BAD);
 		append(c, APPEND);
-		if( increment==TRUE && cur_virt<last_virt )
+		if( increment && cur_virt<last_virt )
 			++cur_virt;
 		refresh(CONTROL);
 	}
@@ -1966,7 +1963,7 @@ register int increment;
 		physical[cur_phys] = c;
 		window[cur_window] = c;
 		putchar(c);
-		if( increment == TRUE )
+		if( increment )
 		{
 			c = virtual[++cur_virt];
 			++cur_phys;
@@ -2531,7 +2528,7 @@ yankeol:
 					c = tolower(c);
 				else if( islower(c) )
 					c = toupper(c);
-				replace(c, TRUE);
+				replace(c, 1);
 			}
 			return(GOOD);
 		}

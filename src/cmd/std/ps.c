@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1989-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1989-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)ps (AT&T Labs Research) 2000-05-11\n]"
+"[-?\n@(#)ps (AT&T Labs Research) 2000-10-23\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -59,7 +59,7 @@ USAGE_LICENSE
 "	\bprintf\b(3) conventions, except that \bsfio\b(3) inline ids are used"
 "	instead of arguments:"
 "	%[#-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
-"	If \b#\b is specified then the internal width and percision are used."
+"	If \b#\b is specified then the internal width and precision are used."
 "	If \achar\a is \bs\b then the string form of the item is listed,"
 "	otherwise the corresponding numeric form is listed. If \achar\a is"
 "	\bq\b then the string form of the item is $'...' quoted if it contains"
@@ -194,6 +194,7 @@ typedef struct Ps_s			/* process state		*/
 	struct Ps_s*	root;		/* (partial) root list		*/
 	char*		user;		/* user name			*/
 	int		level;		/* process tree level		*/
+	int		must;		/* 1:must show -1:don't show	*/
 	int		shown;		/* list state			*/
 } Ps_t;
 
@@ -1143,6 +1144,26 @@ kids(register Ps_t* pp, int level)
 }
 
 /*
+ * return 1 if pp ancetor must be listed
+ */
+
+static int
+ancestor(register Ps_t* pp)
+{
+	register Ps_t*	ap;
+
+	if (pp->ps.pr_ppid != pp->ps.pr_pid && (ap = (Ps_t*)dtmatch(state.bypid, &pp->ps.pr_ppid)))
+	{
+		if (!ap->must)
+			ancestor(ap);
+		pp->must = ap->must;
+	}
+	else
+		pp->must = -1;
+	return pp->must > 0;
+}
+
+/*
  * ps() the selected procs
  */
 
@@ -1202,17 +1223,22 @@ list(void)
 
 		rp = zp = 0;
 		for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
-			if (pp->ps.pr_ppid != pp->ps.pr_pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps.pr_ppid)))
+		{
+			if (pp->must > 0 || ancestor(pp))
 			{
-				if (xp->lastchild)
-					xp->lastchild = xp->lastchild->sibling = pp;
+				if (pp->ps.pr_ppid != pp->ps.pr_pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps.pr_ppid)))
+				{
+					if (xp->lastchild)
+						xp->lastchild = xp->lastchild->sibling = pp;
+					else
+						xp->children = xp->lastchild = pp;
+				}
+				else if (zp)
+					zp = zp->root = pp;
 				else
-					xp->children = xp->lastchild = pp;
+					rp = zp = pp;
 			}
-			else if (zp)
-				zp = zp->root = pp;
-			else
-				rp = zp = pp;
+		}
 		for (pp = rp; pp; pp = pp->root)
 			kids(pp, 0);
 	}
@@ -1268,7 +1294,7 @@ order(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
  */
 
 static void
-addpid(register char* s, int verbose)
+addpid(register char* s, int must, int verbose)
 {
 	register char*			t;
 	register int			fd;
@@ -1388,10 +1414,12 @@ addpid(register char* s, int verbose)
 				}
 			}
 			pp->user = fmtuid(pr->pr_uid);
-			dtinsert(state.byorder, pp);
-			if (state.tree)
-				dtinsert(state.bypid, pp);
-			state.pp = 0;
+			pp->must = must;
+			if (!dtsearch(state.byorder, pp))
+			{
+				dtinsert(state.byorder, pp);
+				state.pp = 0;
+			}
 		}
 		else if (verbose || errno != ENOENT && errno != EACCES)
 			error(ERROR_SYSTEM|2, "%s: cannot open process", t);
@@ -1563,10 +1591,12 @@ main(int argc, register char** argv)
 {
 	register int	n;
 	register char*	s;
+	int		must;
 	DIR*		dir;
 	struct dirent*	ent;
 	Sfio_t*		fmt;
 	Key_t*		kp;
+	Ps_t*		pp;
 	Dtdisc_t	kd;
 	Dtdisc_t	pd;
 	Dtdisc_t	sd;
@@ -1651,7 +1681,7 @@ main(int argc, register char** argv)
 			addkey(opt_info.arg);
 			continue;
 		case 'p':
-			addpid(opt_info.arg, 1);
+			addpid(opt_info.arg, 1, 1);
 			continue;
 		case 's':
 			addid(opt_info.arg, KEY_sid, NiL);
@@ -1735,10 +1765,12 @@ main(int argc, register char** argv)
 	{
 		state.all = state.detached = state.leader = 1;
 		while (s = *argv++)
-			addpid(s, 1);
+			addpid(s, 1, 1);
 	}
-	else
+	if (state.tree || !dtsize(state.byorder))
 	{
+		if (!(must = !dtsize(state.byorder)))
+			state.all = 1;
 		if (state.controlled = !state.all && !state.detached && !state.ids)
 			for (n = 0; n <= 2; n++)
 				if (isatty(n) && !fstat(n, &st))
@@ -1750,8 +1782,11 @@ main(int argc, register char** argv)
 			error(ERROR_SYSTEM|3, "%s: cannot read process directory", _PS_dir);
 		while (ent = readdir(dir))
 			if (isdigit(*ent->d_name))
-				addpid(ent->d_name, state.verbose);
+				addpid(ent->d_name, must, state.verbose);
 		closedir(dir);
+		if (state.tree)
+			for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
+				dtinsert(state.bypid, pp);
 	}
 
 	/*

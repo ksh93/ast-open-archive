@@ -53,7 +53,7 @@
 #  define voidp		z_voidp
 #endif
 
-#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32)
+#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && !defined(_UWIN)
 #  define WIN32
 #endif
 #if defined(__GNUC__) || defined(WIN32) || defined(__386__) || defined(i386)

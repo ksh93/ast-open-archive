@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -33,221 +33,219 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make tw
 make tw.o
 make tw.c
-make ${PACKAGE_ast_INCLUDE}/wait.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/ast/wait.h implicit
+make ${INSTALLROOT}/include/ast/ast_wait.h implicit
+done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/wait.h
-make ${PACKAGE_ast_INCLUDE}/proc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/proc.h
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/wait.h
+make ${INSTALLROOT}/include/ast/proc.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/proc.h
 make tw.h implicit
 make cmdarg.h implicit
 done cmdarg.h
-make ${PACKAGE_ast_INCLUDE}/debug.h implicit
-make ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/option.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/option.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/error.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/debug.h
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/magic.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/magic.h
-make ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
-make ${PACKAGE_ast_INCLUDE}/fts.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/fts.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ftwalk.h
-make ${PACKAGE_ast_INCLUDE}/fs3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/fs3d.h
-make ${PACKAGE_ast_INCLUDE}/find.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/find.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/expr.h implicit
-make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/exparse.h implicit
-done ${PACKAGE_ast_INCLUDE}/exparse.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/expr.h
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${INSTALLROOT}/include/ast/debug.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/debug.h
+prev ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/magic.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/magic.h
+make ${INSTALLROOT}/include/ast/ftwalk.h implicit
+make ${INSTALLROOT}/include/ast/fts.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/fts.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ftwalk.h
+make ${INSTALLROOT}/include/ast/fs3d.h implicit
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/fs3d.h
+make ${INSTALLROOT}/include/ast/find.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/find.h
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/expr.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/cdt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+done ${INSTALLROOT}/include/ast/cdt.h dontcare
+make ${INSTALLROOT}/include/ast/exparse.h implicit
+done ${INSTALLROOT}/include/ast/exparse.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/expr.h
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done tw.h
 done tw.c
 prev tw.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c tw.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c tw.c
 done tw.o generated
 make expr.o
 make expr.c
-make ${PACKAGE_ast_INCLUDE}/tm.h implicit
-make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/times.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tm.h
-make ${PACKAGE_ast_INCLUDE}/int.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/int.h
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h
+make ${INSTALLROOT}/include/ast/int.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/int.h
 prev tw.h implicit
 done expr.c
 prev expr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c expr.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c expr.c
 done expr.o generated
 make cmdarg.o
 make cmdarg.c
 prev cmdarg.h implicit
-prev ${PACKAGE_ast_INCLUDE}/proc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/proc.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done cmdarg.c
 prev cmdarg.c
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmdarg.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmdarg.c
 done cmdarg.o generated
-setv mam_libexpr `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lexpr,${INSTALLROOT}/lib/libexpr.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/expr 2>/dev/null || echo '' ${mam_cc_L+-lexpr}${mam_cc_L-${PACKAGE_ast_LIB}/libexpr.a}`
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o tw tw.o expr.o cmdarg.o ${mam_libexpr} ${mam_libast}
+setv mam_libexpr `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lexpr,${INSTALLROOT}/lib/libexpr.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/expr 2>/dev/null || echo '' ${mam_cc_L+-lexpr}${mam_cc_L-${INSTALLROOT}/lib/libexpr.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${INSTALLROOT}/lib/libast.a}`
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o tw tw.o expr.o cmdarg.o ${mam_libexpr} ${mam_libast}
 done tw generated
 make find
 make find.o
 make find.c
 prev cmdarg.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfstr.h
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/regex.h
-make ${PACKAGE_ast_INCLUDE}/mime.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/mime.h
-prev ${PACKAGE_ast_INCLUDE}/magic.h implicit
-prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/proc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
-prev ${PACKAGE_ast_INCLUDE}/find.h implicit
-make ${PACKAGE_ast_INCLUDE}/modex.h implicit
-make ${PACKAGE_ast_INCLUDE}/modecanon.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/modecanon.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/modex.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfstr.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/sfstr.h
+make ${INSTALLROOT}/include/ast/regex.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/regex.h
+make ${INSTALLROOT}/include/ast/mime.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/mime.h
+prev ${INSTALLROOT}/include/ast/magic.h implicit
+prev ${INSTALLROOT}/include/ast/tm.h implicit
+prev ${INSTALLROOT}/include/ast/proc.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ftwalk.h implicit
+prev ${INSTALLROOT}/include/ast/find.h implicit
+make ${INSTALLROOT}/include/ast/modex.h implicit
+make ${INSTALLROOT}/include/ast/modecanon.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/modecanon.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/modex.h
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done find.c
 prev find.c
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c find.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c find.c
 done find.o generated
 prev cmdarg.o
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o find find.o cmdarg.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o find find.o cmdarg.o ${mam_libast}
 done find generated
 make xargs
 make xargs.o
 make xargs.c
 prev cmdarg.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/sfstr.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done xargs.c
 prev xargs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c xargs.c
+exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c xargs.c
 done xargs.o generated
 prev cmdarg.o
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o xargs xargs.o cmdarg.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o xargs xargs.o cmdarg.o ${mam_libast}
 done xargs generated
 make locate
 make locate.sh

@@ -1,3 +1,4 @@
+00-09-13 cql: fix state.active repeat lookups (still should avoid generate())
 99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
 99-10-01 cql: fix up array[n] format
 99-09-22 cql: for (member[index]) support

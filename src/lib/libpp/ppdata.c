@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -53,7 +53,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)libpp (AT&T Research) 2000-06-01\0\n";
+static const char id[] = "\n@(#)libpp (AT&T Research) 2000-09-18\0\n";
 
 #include "pplib.h"
 
@@ -64,7 +64,8 @@ static const char id[] = "\n@(#)libpp (AT&T Research) 2000-06-01\0\n";
 static char	addbuf[MAXTOKEN+1];	/* ADD buffer			*/
 static char	argsbuf[MAXTOKEN+1];	/* predicate args		*/
 static char	catbuf[MAXTOKEN+1];	/* catenation buffer		*/
-static char	outbuf[PPBUFSIZ+2*MAXTOKEN];/* output buffer		*/
+static char	hidebuf[MAXTOKEN+1];	/* pp:hide buffer		*/
+static char	outbuf[2*(PPBUFSIZ+MAXTOKEN)];/* output buffer		*/
 static char	pathbuf[MAXTOKEN+1];	/* full path of last #include	*/
 static char	tmpbuf[MAXTOKEN+1];	/* very temporary buffer	*/
 static char	tokbuf[2*MAXTOKEN+1];	/* token buffer			*/
@@ -98,8 +99,10 @@ struct ppglobals pp =
 
 	/* exposed for the output macros */
 
+	&outbuf[0],			/* outb				*/
 	&outbuf[0],			/* outbuf			*/
 	&outbuf[0],			/* outp				*/
+	&outbuf[PPBUFSIZ],		/* oute				*/
 	0,				/* offset			*/
 
 	/* public context */
@@ -163,6 +166,7 @@ struct ppglobals pp =
 	&addbuf[0],			/* addbuf			*/
 	&catbuf[0],			/* catbuf			*/
 	0,				/* hdrbuf			*/
+	&hidebuf[0],			/* hidebuf			*/
 	&pathbuf[0],			/* path				*/
 	&tmpbuf[0],			/* tmpbuf			*/
 	&valbuf[0],			/* valbuf			*/

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2000-01-11
+# @(#)pp.probe (AT&T Research) 2000-10-17
 #
 # C probe for libpp
 #
@@ -62,6 +62,11 @@ echo "#import \"import.h\"" > import.$src
 echo "int aaa;" > import.h
 echo "#include_next <stdio.h>" > include_next.$src
 echo "#include <stdio.h>" > linetype.$src
+echo '#include <sys/types.h>
+main()
+{
+	return sizeof(LONGLONG) != 8;
+}' > longlong.$src
 echo '#include "once.h"
 #include "once.h"' > once.$src
 echo '#ifdef once
@@ -554,6 +559,31 @@ case $ppbuiltin in
 1)	echo "#pragma pp:nobuiltin" ;;
 esac
 
+eval set x $probe_longlong
+shift
+x=
+for o in "$@"
+do	rm -f longlong.$exe
+	if	$cc -DLONGLONG="$o" -o longlong.$exe longlong.$src &&
+		./longlong.$exe
+	then	x=1
+		break
+	fi
+done
+case $x in
+'')	eval set x $probe_longlong_t
+	shift
+	for o in "$@"
+	do	rm -f longlong.$exe
+		if	$cc -DLONGLONG="$o" -o longlong.$exe longlong.$src &&
+			./longlong.$exe
+		then	echo "#define <long long> $o"
+			break
+		fi
+	done
+	;;
+esac
+
 echo
 for i in `echo "$predef" | sed -e 's/^__*\(.*\)_*\$/\1/' -e '/^[a-z][a-z]*[0-9][a-z0-9]*\$/!d'` `echo "$predef" | sed -e 's/^__*\(.*\)_*\$/\1/' -e '/^[a-z][a-z]*\$/!d'`
 do	case $i in
@@ -883,8 +913,8 @@ case $ident in
 *)	echo '#pragma pp:map "/#(pragma )?ident>/"' ;;
 esac
 case $import in
-1)	echo '#pragma pp:map "/#(pragma )?import>/" "/#(pragma )?import(.*)/__IMPORT__(\2)/"
-#macdef __IMPORT__(x)
+1)	echo '#pragma pp:map "/#(pragma )?import>/" "/#(pragma )?import(.*)/__STDPP__IMPORT__(\2)/"
+#macdef __STDPP__IMPORT__(x)
 #pragma pp:noallmultiple
 #include x
 #pragma pp:allmultiple

@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1989-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1989-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)tw (AT&T Labs Research) 1999-10-01\n]"
+"[-?\n@(#)tw (AT&T Labs Research) 2000-11-08\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -84,6 +84,7 @@ USAGE_LICENSE
 "[q:query?Emit an interactive query for each visited path. An affirmative"
 "	response accepts the path, a negative response rejects the path,"
 "	and a quit response exits \atw\a.]"
+"[r:recursive?Visit directories listed on the standard input.]"
 "[S:separator?The input file list separator is set to the first character"
 "	of \astring\a.]:[string]"
 "[s:size|max-chars?Use at most \achars\a characters per command. The default"
@@ -162,6 +163,7 @@ USAGE_LICENSE
 "		[+atime?access time; time/date strings are interpreted as"
 "			\bdate\b(1) expressions]"
 "		[+blocks?number of 1k blocks]"
+"		[+checksum?the file contents 32X4 checksum]"
 "		[+ctime?status change time]"
 "		[+dev?file system device]"
 "		[+fstype?file system type name; \bufs\b if it can't"
@@ -182,6 +184,7 @@ USAGE_LICENSE
 "			be used to mask mask the file type and permission"
 "			bits; \bmode\b strings are interpreted as \bchmod\b(1)"
 "			expressions]"
+"		[+mime?the file contents \afile\a(1) \b--mime\b type]"
 "		[+mtime?modify time]"
 "		[+name?file name with directory prefix stripped]"
 "		[+nlink?hard link count]"
@@ -296,6 +299,7 @@ USAGE_LICENSE
 #define LIST		((Exnode_t*)1)
 
 #define FTW_LIST	(FTW_USER<<0)	/* files listed on stdin	*/
+#define FTW_RECURSIVE	(FTW_USER<<1)	/* walk files listed on stdin	*/
 
 typedef struct Dir			/* directory list		*/
 {
@@ -432,7 +436,7 @@ tw(register Ftw_t* ftw)
 		lp->next = state.local;
 		state.local = lp;
 	}
-	if (state.ftwflags & FTW_LIST)
+	if ((state.ftwflags & (FTW_LIST|FTW_RECURSIVE)) == FTW_LIST)
 		ftw->status = FTW_SKIP;
 	return 0;
 }
@@ -536,6 +540,9 @@ main(int argc, register char** argv)
 			continue;
 		case 'q':
 			state.cmdflags |= CMD_QUERY;
+			continue;
+		case 'r':
+			state.ftwflags |= FTW_RECURSIVE;
 			continue;
 		case 's':
 			if ((size = opt_info.num) < 0)

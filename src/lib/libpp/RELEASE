@@ -1,3 +1,15 @@
+00-10-31 __STDC__==0 if HOSTED && _UWIN
+00-10-26 pplib.h: change SEEK_SET to O_RDONLY for aix
+00-10-17 pp.probe: __IMPORT__ => __STDPP__IMPORT__
+00-09-18 add __FUNCTION__=#(FUNCTION), #define <a b> c
+	 pp.probe: add probe_longlong
+	 probe.win32: add #define <long long>
+00-09-11 add pp:noproto (NOPROTO pp.option) to disable ppproto()
+00-09-01 ppproto: fix buffer slide bug
+00-08-11 pplb.h: check for <unistd.h> already included for PROTOMAIN
+	 pragma: add pp:pragmaexpand to expand pragma args
+	 ppcontrol: always disable pp:* pragma expansion
+	 ppcall: fix pp:hide buffer clash
 00-06-01 pplex: fix "\\U" and "\\u"
 00-05-22 ppsearch: fix uwin #include <C:/foo/bar.h>
 00-05-16 probe.win32: update reserved word list

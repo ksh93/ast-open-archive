@@ -997,8 +997,6 @@ compare_line_list (list1, lengths1, list2, lengths2, nl)
  * Routines to input and parse two way diffs.
  */
 
-extern char **environ;
-
 static struct diff_block *
 process_diff (filea, fileb, last_block)
      char const *filea, *fileb;
@@ -1236,7 +1234,7 @@ read_diff (filea, fileb, output_placement)
 	  dup2 (fds[1], STDOUT_FILENO);
 	  close (fds[1]);
 	}
-      execve (diff_program, (char **) argv, environ);
+      execvp (diff_program, (char **) argv);
       /* Avoid stdio, because the parent process's buffers are inherited.  */
       write (STDERR_FILENO, diff_program, strlen (diff_program));
       write (STDERR_FILENO, ": not found\n", 12);

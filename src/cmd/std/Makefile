@@ -52,6 +52,6 @@ unexpand :: unexpand.c LICENSE=since=1995,author=dgk
 
 expand :LINK: unexpand
 
-:TEST: ls sum tsort
+:TEST: date ls sum touch tsort
 
 :: y2k.dat

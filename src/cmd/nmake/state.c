@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1984-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1984-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -119,7 +119,7 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 				state.stateview = view;
 				message((-2, "loading state view %d file %s", view, file));
 				if (load(fp, file, 0) > 0) state.view[view].flags |= BIND_EXISTS;
-				else if (state.mismatch && !(state.view[0].flags & BIND_EXISTS)) state.accept = 1;
+				else if (state.corrupt && *state.corrupt == 'a' && !(state.view[0].flags & BIND_EXISTS)) state.accept = 1;
 				state.stateview = -1;
 				sfclose(fp);
 			}
@@ -560,11 +560,8 @@ readstate(char* file)
 			message((-2, "loading state file %s", file));
 			makerule(file)->dynamic |= D_built;
 			if (load(fp, file, 10) > 0) state.view[0].flags |= BIND_EXISTS;
-			else
-			{
-				if (!state.mismatch) error(3, "use -%c%c to accept current state or -%c to remake", OPT(OPT_accept), OPT(OPT_readstate), OPT(OPT_readstate));
-				state.accept = 1;
-			}
+			else if (!state.corrupt) error(3, "use -%c%c to accept current state or -%c to remake", OPT(OPT_accept), OPT(OPT_readstate), OPT(OPT_readstate));
+			else if (*state.corrupt == 'a') state.accept = 1;
 			state.stateview = -1;
 			sfclose(fp);
 		}

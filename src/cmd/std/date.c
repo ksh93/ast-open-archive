@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1989-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1989-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -31,15 +31,31 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)date (AT&T Labs Research) 2000-03-17\n]"
+"[-?\n@(#)date (AT&T Labs Research) 2000-10-31\n]"
 USAGE_LICENSE
 "[+NAME?date - set/list/convert dates]"
 "[+DESCRIPTION?\bdate\b sets the current date and time (with appropriate"
 "	privilege), lists the current date or file dates, or converts"
 "	dates.]"
+"[+?If the \adate\a operand consists of 4, 6, 8, 10 or 12 digits followed"
+"	by an optional \b.\b and two digits then it is interpreted as:"
+"	\aHHMM.SS\a, \addHHMM.SS\a, \ammddHHMM.SS\a, \ammddHHMMyy.SS\a or"
+"	\ayymmddHHMM.SS\a, or \ammddHHMMccyy.SS\a or \accyymmddHHMM.SS\a."
+"	Conflicting standards and practice allow a leading or trailing"
+"	2 or 4 digit year for the 10 and 12 digit forms; the X/Open trailing"
+"	form is used to disambiguate. Avoid the 10 digit form to avoid"
+"	confusion. The digit fields are:]{"
+"		[+cc?Century - 1, 19-20.]"
+"		[+yy?Year in century, 00-99.]"
+"		[+mm?Month, 01-12.]"
+"		[+dd?Day of month, 01-31.]"
+"		[+HH?Hour, 00-23.]"
+"		[+MM?Minute, 00-59.]"
+"		[+SS?Seconds, 00-60.]"
+"}"
 
-"[a:access-time?List file argument access times.]"
-"[c:change-time?List file argument change times.]"
+"[a:access-time|atime?List file argument access times.]"
+"[c:change-time|ctime?List file argument change times.]"
 "[d:date?Use \adate\a as the current date and do not set the system"
 "	clock.]:[date]"
 "[e:epoch?Output the date in seconds since the epoch."
@@ -118,7 +134,7 @@ USAGE_LICENSE
 "	monotonic increasing time. Not available on all systems.]"
 "[l:leap-seconds?Include leap seconds in time calculations. Leap seconds"
 "	after the ast library release date are not accounted for.]"
-"[m:modify-time?List file argument modify times.]"
+"[m:modify-time|mtime?List file argument modify times.]"
 "[n!:network?Set network time.]"
 "[p:parse?Add \aformat\a to the list of \bstrptime\b(3) parse conversion"
 "	formats. \aformat\a follows the same conventions as the"
@@ -129,6 +145,7 @@ USAGE_LICENSE
 "\n"
 "\n[ +format | date | file ... ]\n"
 "\n"
+
 "[+SEE ALSO?\bls\b(1), \bfmtelapsed\b(3), \bstrftime\b(3), \bstrptime\b(3)]"
 ;
 
@@ -241,7 +258,7 @@ main(int argc, register char** argv)
 	unsigned long	e;
 	char		buf[128];
 	Fmt_t*		fmts;
-	Fmt_t		fmt[5];
+	Fmt_t		fmt;
 	struct stat	st;
 
 	time_t*		clock = 0;	/* use this time		*/
@@ -256,17 +273,10 @@ main(int argc, register char** argv)
 	NoP(argc);
 	setlocale(LC_ALL, "");
 	error_info.id = "date";
-	fmts = &fmt[0];
-	fmt[0].format = "%m%d%H%M%Y.%S";
-	fmt[0].next = &fmt[1];
-	fmt[1].format = "%m%d%H%M%Y";
-	fmt[1].next = &fmt[2];
-	fmt[2].format = "%m%d%H%M%y.%S";
-	fmt[2].next = &fmt[3];
-	fmt[3].format = "%m%d%H%M%y";
-	fmt[3].next = &fmt[4];
-	fmt[4].format = "";
-	fmt[4].next = 0;
+	tm_info.flags |= TM_DATESTYLE;
+	fmts = &fmt;
+	fmt.format = "";
+	fmt.next = 0;
 	for (;;)
 	{
 		switch (optget(argv, usage))

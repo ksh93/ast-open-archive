@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2000-03-17
+# @(#)make.probe (AT&T Research) 2000-10-18
 #
 # C probe for make
 #
@@ -17,14 +17,14 @@ probe_ldmap="'-Wl,-M' '-Qoption ld -M' '-Wl,-m' '-m'"
 probe_ldrunpath="-Wl,-R, -R -Wl,-rpath, -L"
 probe_lib="a lib"
 probe_lib_append="/usr/lib/pa1.1"
-probe_lib_all="-all -Bwhole-archive -whole-archive -Wl,-zallextract"
+probe_lib_all="-all -Bwhole-archive -whole-archive -all_load -Wl,-zallextract"
 probe_lib_multiple="-Wl,-zmuldefs"
 probe_lib_undef="-notall -none -Bno-whole-archive -no-whole-archive -Wl,-zdefaultextract"
 probe_libdir="shlib lib"
 probe_nm="nm"
 probe_nmflags="'' -p -B"
 probe_optimize="-O"
-probe_pic="-Kpic -KPIC -fpic -pic +z '-G 0' -D_DLL_BLD -Wc,exportall"
+probe_pic="-Kpic -KPIC -fpic -pic +z '-G 0' -D_DLL_BLD -Wc,exportall -dynamic"
 probe_PIC="-Kpic -KPIC -fpic -fPIC -pic -PIC +z +Z"
 probe_readonly="-R -Krodata -xMerge -Wa,-r"
 probe_shared="'' -G -b -c -shared -Wl,dll"
@@ -426,27 +426,27 @@ case $pic:$so:$dynamic:$static in
 			0)	break ;;
 			esac
 			for dld in $cc $ld
-			do	rm -f xxx.$dll
+			do	rm -f xxx$dll
 				# UNDENT ...
 
-	if	$dld $1 -o xxx.$dll shared.$obj 2>e && test -r xxx.$dll
-	then	case `PATH=/bin:/usr/bin:$PATH file xxx.$dll` in
+	if	$dld $1 -o xxx$dll shared.$obj 2>e && test -r xxx$dll
+	then	case `PATH=/bin:/usr/bin:$PATH file xxx$dll` in
 		*lib*|*obj*|*shared*)	;;
-		"")		$executable xxx.$dll || continue ;;
+		"")		$executable xxx$dll || continue ;;
 		*)		continue ;;
 		esac
 		ld=$dld
 		shared=$1
-		z=`wc -c < xxx.$dll`
+		z=`wc -c < xxx$dll`
 		eval set x $probe_shared_nostart
 		while	:
 		do	shift
 			case $# in
 			0)	break ;;
 			esac
-			rm -f xxx.$dll
-			if	$ld $shared $1 -o xxx.$dll shared.$obj 2>e && test -r xxx.$dll
-			then	case `wc -c < xxx.$dll` in
+			rm -f xxx$dll
+			if	$ld $shared $1 -o xxx$dll shared.$obj 2>e && test -r xxx$dll
+			then	case `wc -c < xxx$dll` in
 				$z)	;;
 				*)	if	test -s e
 					then	case `cat e` in
@@ -502,9 +502,9 @@ case $pic:$so:$dynamic:$static in
 			case $# in
 			0)	break ;;
 			esac
-			rm -f xxx.$dll
-			if	$ld $shared -o xxx.$dll $1 libxxx.$lib && test -r xxx.$dll
-			then	if	$nm $nmflags xxx.$dll | grep ShareD
+			rm -f xxx$dll
+			if	$ld $shared -o xxx$dll $1 libxxx.$lib && test -r xxx$dll
+			then	if	$nm $nmflags xxx$dll | grep ShareD
 				then	lib_dll=option
 					lib_all=$1
 					break
@@ -522,10 +522,10 @@ case $pic:$so:$dynamic:$static in
 				case $# in
 				0)	break ;;
 				esac
-				rm -f xxx.$dll
-				if	$ld $shared -o xxx.$dll prefix.$obj $lib_all libxxx.$lib $1 libyyy.$lib && test -r xxx.$dll
+				rm -f xxx$dll
+				if	$ld $shared -o xxx$dll prefix.$obj $lib_all libxxx.$lib $1 libyyy.$lib && test -r xxx$dll
 				then	rm -f t
-					$nm $nmflags xxx.$dll > t
+					$nm $nmflags xxx$dll > t
 					case `grep -c ShareD t`:`grep -c NotalL t` in
 					0:*)	;;
 					*:0)	lib_undef=$1
@@ -538,18 +538,18 @@ case $pic:$so:$dynamic:$static in
 			"")	eval set x $probe_lib_multiple
 				rm -f libyyy.$lib
 				cp libxxx.$lib libyyy.$lib
-				rm -f xxx.$dll
-				if	$ld $shared -o xxx.$dll prefix.$obj $lib_all libxxx.$lib libyyy.$lib && test -r xxx.$dll
+				rm -f xxx$dll
+				if	$ld $shared -o xxx$dll prefix.$obj $lib_all libxxx.$lib libyyy.$lib && test -r xxx$dll
 				then	:
 				else	while	:
 					do	shift
 						case $# in
 						0)	break ;;
 						esac
-						rm -f xxx.$dll
-						if	$ld $shared -o xxx.$dll prefix.$obj $lib_all $1 libxxx.$lib libyyy.$lib && test -r xxx.$dll
+						rm -f xxx$dll
+						if	$ld $shared -o xxx$dll prefix.$obj $lib_all $1 libxxx.$lib libyyy.$lib && test -r xxx$dll
 						then	rm -f t
-							$nm $nmflags xxx.$dll > t
+							$nm $nmflags xxx$dll > t
 							case `grep -c ShareD t` in
 							0)	;;
 							*)	lib_all="$lib_all $1"
@@ -573,8 +573,8 @@ case $pic:$so:$dynamic:$static in
 				case $# in
 				0)	break ;;
 				esac
-				rm -f xxx.$dll
-				if	eval '$ld $shared' $1 '-o xxx.$dll shared.$obj 2>e && test -r xxx.$dll'
+				rm -f xxx$dll
+				if	eval '$ld $shared' $1 '-o xxx$dll shared.$obj 2>e && test -r xxx$dll'
 				then	case `cat e` in
 					"")	shared="$shared $1"; break ;;
 					esac
@@ -590,9 +590,9 @@ case $pic:$so:$dynamic:$static in
 			case $# in
 			0)	break ;;
 			esac
-			rm -f xxx.$dll
+			rm -f xxx$dll
 			if	eval \$ld \$shared -o xxx.\$dll $1 shared.\$obj &&
-				test -r xxx.$dll -a -r $probe_shared_registry_file
+				test -r xxx$dll -a -r $probe_shared_registry_file
 			then	probe_shared_registry_file='$(CC.SHARED.REGISTRY.PATH)'
 				eval set x $probe_shared_registry
 				i=

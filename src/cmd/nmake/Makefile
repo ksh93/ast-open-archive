@@ -1,4 +1,4 @@
-:PACKAGE: ast # + cpp 
+:PACKAGE: ast # + cpp
 
 LICENSE = since=1984,author=gsf
 

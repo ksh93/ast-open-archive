@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1989-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1989-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)df (AT&T Labs Research) 2000-05-11\n]"
+"[-?\n@(#)df (AT&T Labs Research) 2000-10-23\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -48,7 +48,7 @@ USAGE_LICENSE
 "	\aformat\a follows \bprintf\b(3) conventions, except that \bsfio\b(3)"
 "	inline ids are used instead of arguments:"
 "	%[#-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
-"	If \b#\b is specified then the internal width and percision are used."
+"	If \b#\b is specified then the internal width and precision are used."
 "	If \abase\a is non-zero and \b--posix\b is not on then the field values"
 "	are wrapped when they exceed the field width. If \achar\a is \bs\b then""	the string form of the item is listed, otherwise the corresponding"
 "	numeric form is listed. If \achar\a is \bq\b then the string form of"
@@ -466,7 +466,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				return 0;
 			break;
 		case KEY_filesystem:
-			s = df->mnt->fs;
+			if (!(s = df->mnt->fs))
+				s = "";
 			break;
 		case KEY_iavailable:
 			if (df->total || df->ttotal)
@@ -490,7 +491,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				s = "-";
 			break;
 		case KEY_mounted:
-			s = df->mnt->dir;
+			if (!(s = df->mnt->dir))
+				s = "";
 			break;
 		case KEY_native:
 			if (df->vfs.f_bsize >= 1024)
@@ -504,7 +506,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				s = "";
 			break;
 		case KEY_type:
-			s = df->mnt->type;
+			if (!(s = df->mnt->type))
+				s = "";
 			break;
 		case KEY_used:
 			s = (df->total || df->ttotal) ? scale(df->fraction, df->used, df->tused) : "-";

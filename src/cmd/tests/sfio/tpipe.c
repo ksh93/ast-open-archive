@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1999-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1999-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #include	"sftest.h"
 #include	<signal.h>
 
@@ -32,7 +32,7 @@ void alrmf(sig)
 int	sig;
 #endif
 {
-	terror("Alarm went off\n");
+	terror("Blocking somewhere until alarm went off\n");
 }
 
 MAIN()
@@ -115,6 +115,24 @@ MAIN()
 		terror("Bad peek size %d, expect 11\n",sfvalue(fr));
 	if(strncmp(s,"0123456789",10) != 0)
 		terror("Bad peek str %s\n",s);
+
+	/* test for handling pipe error */
+	if(pipe(fd) < 0)
+		terror("Can't create pipe");
+	close(fd[0]);
+	if(!(fw = sfnew(NIL(Sfio_t*),NIL(Void_t*),sizeof(buf),fd[1],SF_WRITE)) )
+		terror("Can't open stream");
+	signal(SIGPIPE,SIG_IGN); /* avoid dying by sigpipe */
+
+	for(i = 0; i < sizeof(buf); ++i)
+		buf[i] = 'a';
+	buf[sizeof(buf)-1] = 0;
+	for(i = 0; i < 3; ++i)
+	{	signal(SIGALRM,alrmf); /* do this to avoid infinite loop */
+		alarm(4);
+		sfprintf(fw, "%s\n", buf); /* this should not block */
+		alarm(0);
+	}
 
 	TSTRETURN(0);
 }

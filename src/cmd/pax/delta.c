@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1987-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1987-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -47,6 +47,8 @@ getdeltaops(Archive_t* ap, File_t* f)
 	unsigned long	x;
 	char		c;
 
+	if (state.delta2delta)
+		return;
 	s = ap->delta->hdrbuf;
 	e = s + sizeof(ap->delta->hdrbuf) - 1;
 	n = 0;
@@ -114,7 +116,7 @@ getdeltaheader(register Archive_t* ap, register File_t* f)
 	if (ap->format != ZIP)
 	{
 		f->delta.size = -1;
-		if (ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA))
+		if (ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA || ap->delta->format == DELTA_IGNORE && state.delta2delta))
 		{
 			ap->delta->index++;
 			if (ap->delta->tab && f->name && (f->delta.base = (Member_t*)hashget(ap->delta->tab, f->name)))
@@ -543,7 +545,9 @@ deltapass(Archive_t* ip, Archive_t* op)
 	char*			p;
 	Hash_position_t*	pos;
 
-	message((-1, "delta PASS"));
+	if (state.delta2delta != 2)
+		state.delta2delta = 0;
+	message((-1, "delta PASS%s", state.delta2delta ? " delta2delta" : ""));
 	deltabase(ip);
 	deltabase(op);
 	putprologue(op);
@@ -556,6 +560,13 @@ deltapass(Archive_t* ip, Archive_t* op)
 			f->ap = ip;
 			if (f->ro)
 				fileskip(ip, f);
+			else if (state.delta2delta)
+			{
+				if (validout(op, f) && selectfile(op, f))
+					fileout(op, f);
+				else
+					fileskip(ip, f);
+			}
 			else switch (f->delta.op)
 			{
 			case DELTA_create:

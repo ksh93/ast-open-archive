@@ -1,3 +1,7 @@
+Wed Jul 19 16:01:22 2000  Glenn Fowler <gsf@research.att.com>
+
+	* diff3 : call execvp() instead of execve()
+
 Sat Oct  1 05:24:19 1994  Paul Eggert  <eggert@twinsun.com>
 
 	* Version 2.7 released.

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -36,12 +36,11 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make tk
 make libtk.a archive
 make tk.req
+exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
 exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
@@ -54,7 +53,7 @@ exec - do	case $i in
 exec - 	"tk"|tk)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}    -L. -Lgeneric -Lunix ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
@@ -77,73 +76,73 @@ make generic/tkPort.h implicit
 make unix/tkUnixPort.h implicit
 make compat/unistd.h implicit
 make tcl/tcl.h implicit
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
 done tcl/tcl.h dontcare
 done compat/unistd.h dontcare
 prev tcl/tcl.h implicit
 make compat/stdlib.h implicit
 prev tcl/tcl.h implicit
 done compat/stdlib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 make compat/limits.h implicit
 done compat/limits.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/limits.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/limits.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 done unix/tkUnixPort.h dontcare
 make tkMacPort.h implicit
 done tkMacPort.h dontcare virtual
@@ -159,7 +158,7 @@ prev generic/tk.h implicit
 done generic/tkInt.h
 done unix/tkUnixSelect.c
 prev unix/tkUnixSelect.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixSelect.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixSelect.c
 done tkUnixSelect.o generated
 make tkUnixInit.o
 make unix/tkUnixInit.c
@@ -168,14 +167,14 @@ done unix/tkUnixInt.h
 prev generic/tkInt.h implicit
 done unix/tkUnixInit.c
 prev unix/tkUnixInit.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -DLIB_DIR=\""lib/tk4.2"\" -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixInit.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -DLIB_DIR=\""lib/tk4.2"\" -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixInit.c
 done tkUnixInit.o generated
 make tkAppInit.o
 make unix/tkAppInit.c
 prev generic/tk.h implicit
 done unix/tkAppInit.c
 prev unix/tkAppInit.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c unix/tkAppInit.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c unix/tkAppInit.c
 done tkAppInit.o generated
 make tkUnixEvent.o
 make unix/tkUnixEvent.c
@@ -183,21 +182,21 @@ prev unix/tkUnixInt.h implicit
 prev generic/tkInt.h implicit
 done unix/tkUnixEvent.c
 prev unix/tkUnixEvent.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixEvent.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixEvent.c
 done tkUnixEvent.o generated
 make tkUnixXId.o
 make unix/tkUnixXId.c
 prev generic/tkInt.h implicit
 done unix/tkUnixXId.c
 prev unix/tkUnixXId.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixXId.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixXId.c
 done tkUnixXId.o generated
 make tkUnixCursor.o
 make unix/tkUnixCursor.c
 prev generic/tkInt.h implicit
 done unix/tkUnixCursor.c
 prev unix/tkUnixCursor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixCursor.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixCursor.c
 done tkUnixCursor.o generated
 make tkUnixDialog.o
 make unix/tkUnixDialog.c
@@ -205,49 +204,49 @@ prev unix/tkUnixInt.h implicit
 prev generic/tkInt.h implicit
 done unix/tkUnixDialog.c
 prev unix/tkUnixDialog.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixDialog.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixDialog.c
 done tkUnixDialog.o generated
 make tkUnixDraw.o
 make unix/tkUnixDraw.c
 prev generic/tkInt.h implicit
 done unix/tkUnixDraw.c
 prev unix/tkUnixDraw.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixDraw.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixDraw.c
 done tkUnixDraw.o generated
 make tkUnixWm.o
 make unix/tkUnixWm.c
 prev generic/tkInt.h implicit
 done unix/tkUnixWm.c
 prev unix/tkUnixWm.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixWm.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnixWm.c
 done tkUnixWm.o generated
 make tkUnix.o
 make unix/tkUnix.c
 prev generic/tkInt.h implicit
 done unix/tkUnix.c
 prev unix/tkUnix.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnix.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c unix/tkUnix.c
 done tkUnix.o generated
 make tk3d.o
 make generic/tk3d.c
 prev generic/tkInt.h implicit
 done generic/tk3d.c
 prev generic/tk3d.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tk3d.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tk3d.c
 done tk3d.o generated
 make tkArgv.o
 make generic/tkArgv.c
 prev generic/tkInt.h implicit
 done generic/tkArgv.c
 prev generic/tkArgv.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkArgv.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkArgv.c
 done tkArgv.o generated
 make tkAtom.o
 make generic/tkAtom.c
 prev generic/tkInt.h implicit
 done generic/tkAtom.c
 prev generic/tkAtom.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkAtom.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkAtom.c
 done tkAtom.o generated
 make tkBind.o
 make generic/tkBind.c
@@ -256,7 +255,7 @@ done generic/tkNames.h dontcare
 prev generic/tkInt.h implicit
 done generic/tkBind.c
 prev generic/tkBind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkBind.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkBind.c
 done tkBind.o generated
 make tkBitmap.o
 make generic/tkBitmap.c
@@ -281,7 +280,7 @@ done bitmaps/error.bmp
 prev generic/tkInt.h implicit
 done generic/tkBitmap.c
 prev generic/tkBitmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Ibitmaps -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkBitmap.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Ibitmaps -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkBitmap.c
 done tkBitmap.o generated
 make tkButton.o
 make generic/tkButton.c
@@ -296,14 +295,14 @@ done generic/tkDefault.h
 prev generic/tkInt.h implicit
 done generic/tkButton.c
 prev generic/tkButton.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkButton.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkButton.c
 done tkButton.o generated
 make tkCanvArc.o
 make generic/tkCanvArc.c
 prev generic/tkInt.h implicit
 done generic/tkCanvArc.c
 prev generic/tkCanvArc.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvArc.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvArc.c
 done tkCanvArc.o generated
 make tkCanvBmap.o
 make generic/tkCanvBmap.c
@@ -313,7 +312,7 @@ done generic/tkCanvas.h
 prev generic/tkInt.h implicit
 done generic/tkCanvBmap.c
 prev generic/tkCanvBmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
 done tkCanvBmap.o generated
 make tkCanvImg.o
 make generic/tkCanvImg.c
@@ -321,21 +320,21 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvImg.c
 prev generic/tkCanvImg.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
 done tkCanvImg.o generated
 make tkCanvLine.o
 make generic/tkCanvLine.c
 prev generic/tkInt.h implicit
 done generic/tkCanvLine.c
 prev generic/tkCanvLine.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvLine.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvLine.c
 done tkCanvLine.o generated
 make tkCanvPoly.o
 make generic/tkCanvPoly.c
 prev generic/tkInt.h implicit
 done generic/tkCanvPoly.c
 prev generic/tkCanvPoly.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPoly.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPoly.c
 done tkCanvPoly.o generated
 make tkCanvPs.o
 make generic/tkCanvPs.c
@@ -343,7 +342,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvPs.c
 prev generic/tkCanvPs.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
 done tkCanvPs.o generated
 make tkCanvText.o
 make generic/tkCanvText.c
@@ -351,7 +350,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvText.c
 prev generic/tkCanvText.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
 done tkCanvText.o generated
 make tkCanvUtil.o
 make generic/tkCanvUtil.c
@@ -359,7 +358,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvUtil.c
 prev generic/tkCanvUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
 done tkCanvUtil.o generated
 make tkCanvWind.o
 make generic/tkCanvWind.c
@@ -367,7 +366,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvWind.c
 prev generic/tkCanvWind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
 done tkCanvWind.o generated
 make tkCanvas.o
 make generic/tkCanvas.c
@@ -376,7 +375,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvas.c
 prev generic/tkCanvas.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvas.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvas.c
 done tkCanvas.o generated
 make tkClipboard.o
 make generic/tkClipboard.c
@@ -384,42 +383,42 @@ prev generic/tkSelect.h implicit
 prev generic/tkInt.h implicit
 done generic/tkClipboard.c
 prev generic/tkClipboard.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkClipboard.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkClipboard.c
 done tkClipboard.o generated
 make tkCmds.o
 make generic/tkCmds.c
 prev generic/tkInt.h implicit
 done generic/tkCmds.c
 prev generic/tkCmds.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCmds.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCmds.c
 done tkCmds.o generated
 make tkColor.o
 make generic/tkColor.c
 prev generic/tkInt.h implicit
 done generic/tkColor.c
 prev generic/tkColor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkColor.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkColor.c
 done tkColor.o generated
 make tkConfig.o
 make generic/tkConfig.c
 prev generic/tkInt.h implicit
 done generic/tkConfig.c
 prev generic/tkConfig.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkConfig.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkConfig.c
 done tkConfig.o generated
 make tkConsole.o
 make generic/tkConsole.c
 prev generic/tkInt.h implicit
 done generic/tkConsole.c
 prev generic/tkConsole.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkConsole.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkConsole.c
 done tkConsole.o generated
 make tkCursor.o
 make generic/tkCursor.c
 prev generic/tkInt.h implicit
 done generic/tkCursor.c
 prev generic/tkCursor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCursor.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCursor.c
 done tkCursor.o generated
 make tkEntry.o
 make generic/tkEntry.c
@@ -427,14 +426,14 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkEntry.c
 prev generic/tkEntry.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkEntry.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkEntry.c
 done tkEntry.o generated
 make tkError.o
 make generic/tkError.c
 prev generic/tkInt.h implicit
 done generic/tkError.c
 prev generic/tkError.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkError.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkError.c
 done tkError.o generated
 make tkEvent.o
 make generic/tkEvent.c
@@ -442,7 +441,7 @@ prev generic/tkPort.h implicit
 prev generic/tkInt.h implicit
 done generic/tkEvent.c
 prev generic/tkEvent.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkEvent.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkEvent.c
 done tkEvent.o generated
 make tkFileFilter.o
 make generic/tkFileFilter.c
@@ -453,21 +452,21 @@ done generic/tkFileFilter.h
 prev generic/tkInt.h implicit
 done generic/tkFileFilter.c
 prev generic/tkFileFilter.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFileFilter.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFileFilter.c
 done tkFileFilter.o generated
 make tkFocus.o
 make generic/tkFocus.c
 prev generic/tkInt.h implicit
 done generic/tkFocus.c
 prev generic/tkFocus.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFocus.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFocus.c
 done tkFocus.o generated
 make tkFont.o
 make generic/tkFont.c
 prev generic/tkInt.h implicit
 done generic/tkFont.c
 prev generic/tkFont.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFont.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFont.c
 done tkFont.o generated
 make tkFrame.o
 make generic/tkFrame.c
@@ -475,77 +474,77 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkFrame.c
 prev generic/tkFrame.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFrame.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkFrame.c
 done tkFrame.o generated
 make tkGC.o
 make generic/tkGC.c
 prev generic/tkInt.h implicit
 done generic/tkGC.c
 prev generic/tkGC.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGC.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGC.c
 done tkGC.o generated
 make tkGeometry.o
 make generic/tkGeometry.c
 prev generic/tkInt.h implicit
 done generic/tkGeometry.c
 prev generic/tkGeometry.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGeometry.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGeometry.c
 done tkGeometry.o generated
 make tkGet.o
 make generic/tkGet.c
 prev generic/tkInt.h implicit
 done generic/tkGet.c
 prev generic/tkGet.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGet.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGet.c
 done tkGet.o generated
 make tkGrab.o
 make generic/tkGrab.c
 prev generic/tkInt.h implicit
 done generic/tkGrab.c
 prev generic/tkGrab.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGrab.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGrab.c
 done tkGrab.o generated
 make tkGrid.o
 make generic/tkGrid.c
 prev generic/tkInt.h implicit
 done generic/tkGrid.c
 prev generic/tkGrid.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGrid.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkGrid.c
 done tkGrid.o generated
 make tkImage.o
 make generic/tkImage.c
 prev generic/tkInt.h implicit
 done generic/tkImage.c
 prev generic/tkImage.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImage.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImage.c
 done tkImage.o generated
 make tkImgBmap.o
 make generic/tkImgBmap.c
 prev generic/tkInt.h implicit
 done generic/tkImgBmap.c
 prev generic/tkImgBmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgBmap.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgBmap.c
 done tkImgBmap.o generated
 make tkImgGIF.o
 make generic/tkImgGIF.c
 prev generic/tkInt.h implicit
 done generic/tkImgGIF.c
 prev generic/tkImgGIF.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgGIF.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgGIF.c
 done tkImgGIF.o generated
 make tkImgPPM.o
 make generic/tkImgPPM.c
 prev generic/tkInt.h implicit
 done generic/tkImgPPM.c
 prev generic/tkImgPPM.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgPPM.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgPPM.c
 done tkImgPPM.o generated
 make tkImgPhoto.o
 make generic/tkImgPhoto.c
 prev generic/tkInt.h implicit
 done generic/tkImgPhoto.c
 prev generic/tkImgPhoto.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgPhoto.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgPhoto.c
 done tkImgPhoto.o generated
 make tkImgUtil.o
 make generic/tkImgUtil.c
@@ -554,7 +553,7 @@ done xlib/xbytes.h
 prev generic/tkInt.h implicit
 done generic/tkImgUtil.c
 prev generic/tkImgUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Ixlib -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgUtil.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Ixlib -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkImgUtil.c
 done tkImgUtil.o generated
 make tkListbox.o
 make generic/tkListbox.c
@@ -562,7 +561,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkListbox.c
 prev generic/tkListbox.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkListbox.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkListbox.c
 done tkListbox.o generated
 make tkMenu.o
 make generic/tkMenu.c
@@ -572,7 +571,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMenu.c
 prev generic/tkMenu.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkMenu.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkMenu.c
 done tkMenu.o generated
 make tkMenubutton.o
 make generic/tkMenubutton.c
@@ -580,7 +579,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMenubutton.c
 prev generic/tkMenubutton.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkMenubutton.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkMenubutton.c
 done tkMenubutton.o generated
 make tkMessage.o
 make generic/tkMessage.c
@@ -588,35 +587,35 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMessage.c
 prev generic/tkMessage.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkMessage.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkMessage.c
 done tkMessage.o generated
 make tkOption.o
 make generic/tkOption.c
 prev generic/tkInt.h implicit
 done generic/tkOption.c
 prev generic/tkOption.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkOption.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkOption.c
 done tkOption.o generated
 make tkPack.o
 make generic/tkPack.c
 prev generic/tkInt.h implicit
 done generic/tkPack.c
 prev generic/tkPack.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkPack.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkPack.c
 done tkPack.o generated
 make tkPlace.o
 make generic/tkPlace.c
 prev generic/tkInt.h implicit
 done generic/tkPlace.c
 prev generic/tkPlace.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkPlace.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkPlace.c
 done tkPlace.o generated
 make tkRectOval.o
 make generic/tkRectOval.c
 prev generic/tkInt.h implicit
 done generic/tkRectOval.c
 prev generic/tkRectOval.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkRectOval.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkRectOval.c
 done tkRectOval.o generated
 make tkScale.o
 make generic/tkScale.c
@@ -624,7 +623,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkScale.c
 prev generic/tkScale.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkScale.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkScale.c
 done tkScale.o generated
 make tkScrollbar.o
 make generic/tkScrollbar.c
@@ -632,7 +631,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkScrollbar.c
 prev generic/tkScrollbar.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkScrollbar.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkScrollbar.c
 done tkScrollbar.o generated
 make tkSelect.o
 make generic/tkSelect.c
@@ -640,21 +639,21 @@ prev generic/tkSelect.h implicit
 prev generic/tkInt.h implicit
 done generic/tkSelect.c
 prev generic/tkSelect.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkSelect.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkSelect.c
 done tkSelect.o generated
 make tkSend.o
 make generic/tkSend.c
 prev generic/tkInt.h implicit
 done generic/tkSend.c
 prev generic/tkSend.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkSend.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkSend.c
 done tkSend.o generated
 make tkSquare.o
 make generic/tkSquare.c
 prev generic/tkInt.h implicit
 done generic/tkSquare.c
 prev generic/tkSquare.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkSquare.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkSquare.c
 done tkSquare.o generated
 make tkTest.o
 make generic/tkTest.c
@@ -663,7 +662,7 @@ done tkWinInt.h dontcare virtual
 prev generic/tkInt.h implicit
 done generic/tkTest.c
 prev generic/tkTest.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTest.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTest.c
 done tkTest.o generated
 make tkText.o
 make generic/tkText.c
@@ -674,7 +673,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkText.c
 prev generic/tkText.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkText.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkText.c
 done tkText.o generated
 make tkTextBTree.o
 make generic/tkTextBTree.c
@@ -682,7 +681,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextBTree.c
 prev generic/tkTextBTree.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
 done tkTextBTree.o generated
 make tkTextDisp.o
 make generic/tkTextDisp.c
@@ -690,7 +689,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextDisp.c
 prev generic/tkTextDisp.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
 done tkTextDisp.o generated
 make tkTextIndex.o
 make generic/tkTextIndex.c
@@ -699,7 +698,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextIndex.c
 prev generic/tkTextIndex.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextIndex.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextIndex.c
 done tkTextIndex.o generated
 make tkTextMark.o
 make generic/tkTextMark.c
@@ -707,7 +706,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextMark.c
 prev generic/tkTextMark.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
 done tkTextMark.o generated
 make tkTextTag.o
 make generic/tkTextTag.c
@@ -716,7 +715,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextTag.c
 prev generic/tkTextTag.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextTag.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextTag.c
 done tkTextTag.o generated
 make tkTextWind.o
 make generic/tkTextWind.c
@@ -724,7 +723,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextWind.c
 prev generic/tkTextWind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
 done tkTextWind.o generated
 make tkTrig.o
 make generic/tkTrig.c
@@ -732,28 +731,28 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTrig.c
 prev generic/tkTrig.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
 done tkTrig.o generated
 make tkUtil.o
 make generic/tkUtil.c
 prev generic/tkInt.h implicit
 done generic/tkUtil.c
 prev generic/tkUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkUtil.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkUtil.c
 done tkUtil.o generated
 make tkVisual.o
 make generic/tkVisual.c
 prev generic/tkInt.h implicit
 done generic/tkVisual.c
 prev generic/tkVisual.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkVisual.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkVisual.c
 done tkVisual.o generated
 make tkWindow.o
 make generic/tkWindow.c
 prev generic/tkInt.h implicit
 done generic/tkWindow.c
 prev generic/tkWindow.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkWindow.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Itcl -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkWindow.c
 done tkWindow.o generated
 exec - ${AR} cr libtk.a tkUnixSelect.o tkUnixInit.o tkAppInit.o tkUnixEvent.o tkUnixXId.o tkUnixCursor.o tkUnixDialog.o tkUnixDraw.o tkUnixWm.o tkUnix.o tk3d.o tkArgv.o tkAtom.o tkBind.o tkBitmap.o tkButton.o tkCanvArc.o tkCanvBmap.o tkCanvImg.o tkCanvLine.o tkCanvPoly.o tkCanvPs.o tkCanvText.o tkCanvUtil.o tkCanvWind.o tkCanvas.o tkClipboard.o tkCmds.o tkColor.o tkConfig.o
 exec - ${AR} cr libtk.a tkConsole.o tkCursor.o tkEntry.o tkError.o tkEvent.o tkFileFilter.o tkFocus.o tkFont.o tkFrame.o tkGC.o tkGeometry.o tkGet.o tkGrab.o tkGrid.o tkImage.o tkImgBmap.o tkImgGIF.o tkImgPPM.o tkImgPhoto.o tkImgUtil.o tkListbox.o tkMenu.o tkMenubutton.o tkMessage.o tkOption.o tkPack.o tkPlace.o tkRectOval.o tkScale.o tkScrollbar.o tkSelect.o tkSend.o tkSquare.o tkTest.o tkText.o tkTextBTree.o tkTextDisp.o tkTextIndex.o tkTextMark.o tkTextTag.o tkTextWind.o tkTrig.o tkUtil.o tkVisual.o tkWindow.o
@@ -761,14 +760,14 @@ exec - (ranlib libtk.a) >/dev/null 2>&1 || true
 done libtk.a generated
 done tk virtual
 prev libtk.a archive
-make ${PACKAGE_ast_LIB}
+make ${INSTALLROOT}/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -784,20 +783,20 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB} generated
-make ${PACKAGE_ast_LIB}/libtk.a archive
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/libtk.a archive
 prev libtk.a archive
-exec - mv ${PACKAGE_ast_LIB}/libtk.a ${PACKAGE_ast_LIB}/libtk.a.old 2>/dev/null || true; test '' = 'libtk.a' || { cp libtk.a ${PACKAGE_ast_LIB}/libtk.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libtk.a) >/dev/null 2>&1 || true
-done ${PACKAGE_ast_LIB}/libtk.a generated
-make ${PACKAGE_ast_LIB}/lib
+exec - mv ${INSTALLROOT}/lib/libtk.a ${INSTALLROOT}/lib/libtk.a.old 2>/dev/null || true; test '' = 'libtk.a' || { cp libtk.a ${INSTALLROOT}/lib/libtk.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/libtk.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/libtk.a generated
+make ${INSTALLROOT}/lib/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib/lib
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -813,11 +812,11 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/lib generated
-make ${PACKAGE_ast_LIB}/lib/tk
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/tk
 prev tk.req
-exec - mv ${PACKAGE_ast_LIB}/lib/tk ${PACKAGE_ast_LIB}/lib/tk.old 2>/dev/null || true; test '' = 'tk.req' || { cp tk.req ${PACKAGE_ast_LIB}/lib/tk  		    		    ;}
-done ${PACKAGE_ast_LIB}/lib/tk generated
+exec - mv ${INSTALLROOT}/lib/lib/tk ${INSTALLROOT}/lib/lib/tk.old 2>/dev/null || true; test '' = 'tk.req' || { cp tk.req ${INSTALLROOT}/lib/lib/tk  		    		    ;}
+done ${INSTALLROOT}/lib/lib/tk generated
 make ${INSTALLROOT}/include/tk
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/include/tk
@@ -850,14 +849,14 @@ make ${INSTALLROOT}/include/tk/tk.h
 prev generic/tk.h
 exec - mv ${INSTALLROOT}/include/tk/tk.h ${INSTALLROOT}/include/tk/tk.h.old 2>/dev/null || true; test '' = 'generic/tk.h' || { cp generic/tk.h ${INSTALLROOT}/include/tk/tk.h  		    		    ;}
 done ${INSTALLROOT}/include/tk/tk.h generated
-make ${PACKAGE_ast_LIB}/tk4.2
+make ${INSTALLROOT}/lib/tk4.2
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib/tk4.2
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/tk4.2 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tk4.2 | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib/tk4.2 | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -873,150 +872,150 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/tk4.2 generated
-make ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl
+done ${INSTALLROOT}/lib/tk4.2 generated
+make ${INSTALLROOT}/lib/tk4.2/bgerror.tcl
 make library/bgerror.tcl
 done library/bgerror.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl.old 2>/dev/null || true; test '' = 'library/bgerror.tcl' || { cp library/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/button.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/bgerror.tcl ${INSTALLROOT}/lib/tk4.2/bgerror.tcl.old 2>/dev/null || true; test '' = 'library/bgerror.tcl' || { cp library/bgerror.tcl ${INSTALLROOT}/lib/tk4.2/bgerror.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/bgerror.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/button.tcl
 make library/button.tcl
 done library/button.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl.old 2>/dev/null || true; test '' = 'library/button.tcl' || { cp library/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/button.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/button.tcl ${INSTALLROOT}/lib/tk4.2/button.tcl.old 2>/dev/null || true; test '' = 'library/button.tcl' || { cp library/button.tcl ${INSTALLROOT}/lib/tk4.2/button.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/button.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/clrpick.tcl
 make library/clrpick.tcl
 done library/clrpick.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/clrpick.tcl' || { cp library/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/clrpick.tcl' || { cp library/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/clrpick.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/clrpick.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/comdlg.tcl
 make library/comdlg.tcl
 done library/comdlg.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl.old 2>/dev/null || true; test '' = 'library/comdlg.tcl' || { cp library/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/console.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/comdlg.tcl ${INSTALLROOT}/lib/tk4.2/comdlg.tcl.old 2>/dev/null || true; test '' = 'library/comdlg.tcl' || { cp library/comdlg.tcl ${INSTALLROOT}/lib/tk4.2/comdlg.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/comdlg.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/console.tcl
 make library/console.tcl
 done library/console.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl.old 2>/dev/null || true; test '' = 'library/console.tcl' || { cp library/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/console.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/console.tcl ${INSTALLROOT}/lib/tk4.2/console.tcl.old 2>/dev/null || true; test '' = 'library/console.tcl' || { cp library/console.tcl ${INSTALLROOT}/lib/tk4.2/console.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/console.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/dialog.tcl
 make library/dialog.tcl
 done library/dialog.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl.old 2>/dev/null || true; test '' = 'library/dialog.tcl' || { cp library/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/entry.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/dialog.tcl ${INSTALLROOT}/lib/tk4.2/dialog.tcl.old 2>/dev/null || true; test '' = 'library/dialog.tcl' || { cp library/dialog.tcl ${INSTALLROOT}/lib/tk4.2/dialog.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/dialog.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/entry.tcl
 make library/entry.tcl
 done library/entry.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl.old 2>/dev/null || true; test '' = 'library/entry.tcl' || { cp library/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/entry.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/focus.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/entry.tcl ${INSTALLROOT}/lib/tk4.2/entry.tcl.old 2>/dev/null || true; test '' = 'library/entry.tcl' || { cp library/entry.tcl ${INSTALLROOT}/lib/tk4.2/entry.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/entry.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/focus.tcl
 make library/focus.tcl
 done library/focus.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl.old 2>/dev/null || true; test '' = 'library/focus.tcl' || { cp library/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/focus.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/folder.gif
+exec - mv ${INSTALLROOT}/lib/tk4.2/focus.tcl ${INSTALLROOT}/lib/tk4.2/focus.tcl.old 2>/dev/null || true; test '' = 'library/focus.tcl' || { cp library/focus.tcl ${INSTALLROOT}/lib/tk4.2/focus.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/focus.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/folder.gif
 make library/folder.gif
 done library/folder.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif.old 2>/dev/null || true; test '' = 'library/folder.gif' || { cp library/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/folder.gif generated
-make ${PACKAGE_ast_LIB}/tk4.2/license.terms
+exec - mv ${INSTALLROOT}/lib/tk4.2/folder.gif ${INSTALLROOT}/lib/tk4.2/folder.gif.old 2>/dev/null || true; test '' = 'library/folder.gif' || { cp library/folder.gif ${INSTALLROOT}/lib/tk4.2/folder.gif  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/folder.gif generated
+make ${INSTALLROOT}/lib/tk4.2/license.terms
 make library/license.terms
 done library/license.terms
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms.old 2>/dev/null || true; test '' = 'library/license.terms' || { cp library/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/license.terms generated
-make ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/license.terms ${INSTALLROOT}/lib/tk4.2/license.terms.old 2>/dev/null || true; test '' = 'library/license.terms' || { cp library/license.terms ${INSTALLROOT}/lib/tk4.2/license.terms  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/license.terms generated
+make ${INSTALLROOT}/lib/tk4.2/listbox.tcl
 make library/listbox.tcl
 done library/listbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl.old 2>/dev/null || true; test '' = 'library/listbox.tcl' || { cp library/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/menu.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/listbox.tcl ${INSTALLROOT}/lib/tk4.2/listbox.tcl.old 2>/dev/null || true; test '' = 'library/listbox.tcl' || { cp library/listbox.tcl ${INSTALLROOT}/lib/tk4.2/listbox.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/listbox.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/menu.tcl
 make library/menu.tcl
 done library/menu.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl.old 2>/dev/null || true; test '' = 'library/menu.tcl' || { cp library/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/menu.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/menu.tcl ${INSTALLROOT}/lib/tk4.2/menu.tcl.old 2>/dev/null || true; test '' = 'library/menu.tcl' || { cp library/menu.tcl ${INSTALLROOT}/lib/tk4.2/menu.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/menu.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/msgbox.tcl
 make library/msgbox.tcl
 done library/msgbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/msgbox.tcl' || { cp library/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/msgbox.tcl' || { cp library/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/msgbox.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/msgbox.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/obsolete.tcl
 make library/obsolete.tcl
 done library/obsolete.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl.old 2>/dev/null || true; test '' = 'library/obsolete.tcl' || { cp library/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/obsolete.tcl ${INSTALLROOT}/lib/tk4.2/obsolete.tcl.old 2>/dev/null || true; test '' = 'library/obsolete.tcl' || { cp library/obsolete.tcl ${INSTALLROOT}/lib/tk4.2/obsolete.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/obsolete.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/optMenu.tcl
 make library/optMenu.tcl
 done library/optMenu.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl.old 2>/dev/null || true; test '' = 'library/optMenu.tcl' || { cp library/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/palette.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/optMenu.tcl ${INSTALLROOT}/lib/tk4.2/optMenu.tcl.old 2>/dev/null || true; test '' = 'library/optMenu.tcl' || { cp library/optMenu.tcl ${INSTALLROOT}/lib/tk4.2/optMenu.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/optMenu.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/palette.tcl
 make library/palette.tcl
 done library/palette.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl.old 2>/dev/null || true; test '' = 'library/palette.tcl' || { cp library/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/palette.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/prolog.ps
+exec - mv ${INSTALLROOT}/lib/tk4.2/palette.tcl ${INSTALLROOT}/lib/tk4.2/palette.tcl.old 2>/dev/null || true; test '' = 'library/palette.tcl' || { cp library/palette.tcl ${INSTALLROOT}/lib/tk4.2/palette.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/palette.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/prolog.ps
 make library/prolog.ps
 done library/prolog.ps
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps.old 2>/dev/null || true; test '' = 'library/prolog.ps' || { cp library/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/prolog.ps generated
-make ${PACKAGE_ast_LIB}/tk4.2/scale.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/prolog.ps ${INSTALLROOT}/lib/tk4.2/prolog.ps.old 2>/dev/null || true; test '' = 'library/prolog.ps' || { cp library/prolog.ps ${INSTALLROOT}/lib/tk4.2/prolog.ps  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/prolog.ps generated
+make ${INSTALLROOT}/lib/tk4.2/scale.tcl
 make library/scale.tcl
 done library/scale.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl.old 2>/dev/null || true; test '' = 'library/scale.tcl' || { cp library/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/scale.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/scale.tcl ${INSTALLROOT}/lib/tk4.2/scale.tcl.old 2>/dev/null || true; test '' = 'library/scale.tcl' || { cp library/scale.tcl ${INSTALLROOT}/lib/tk4.2/scale.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/scale.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl
 make library/scrlbar.tcl
 done library/scrlbar.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl.old 2>/dev/null || true; test '' = 'library/scrlbar.tcl' || { cp library/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/tclIndex
+exec - mv ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl.old 2>/dev/null || true; test '' = 'library/scrlbar.tcl' || { cp library/scrlbar.tcl ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/scrlbar.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/tclIndex
 make library/tclIndex
 done library/tclIndex
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex.old 2>/dev/null || true; test '' = 'library/tclIndex' || { cp library/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/tclIndex generated
-make ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/tclIndex ${INSTALLROOT}/lib/tk4.2/tclIndex.old 2>/dev/null || true; test '' = 'library/tclIndex' || { cp library/tclIndex ${INSTALLROOT}/lib/tk4.2/tclIndex  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/tclIndex generated
+make ${INSTALLROOT}/lib/tk4.2/tearoff.tcl
 make library/tearoff.tcl
 done library/tearoff.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl.old 2>/dev/null || true; test '' = 'library/tearoff.tcl' || { cp library/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/text.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/tearoff.tcl ${INSTALLROOT}/lib/tk4.2/tearoff.tcl.old 2>/dev/null || true; test '' = 'library/tearoff.tcl' || { cp library/tearoff.tcl ${INSTALLROOT}/lib/tk4.2/tearoff.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/tearoff.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/text.tcl
 make library/text.tcl
 done library/text.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl.old 2>/dev/null || true; test '' = 'library/text.tcl' || { cp library/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/text.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/textfile.gif
+exec - mv ${INSTALLROOT}/lib/tk4.2/text.tcl ${INSTALLROOT}/lib/tk4.2/text.tcl.old 2>/dev/null || true; test '' = 'library/text.tcl' || { cp library/text.tcl ${INSTALLROOT}/lib/tk4.2/text.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/text.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/textfile.gif
 make library/textfile.gif
 done library/textfile.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif.old 2>/dev/null || true; test '' = 'library/textfile.gif' || { cp library/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/textfile.gif generated
-make ${PACKAGE_ast_LIB}/tk4.2/tk.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/textfile.gif ${INSTALLROOT}/lib/tk4.2/textfile.gif.old 2>/dev/null || true; test '' = 'library/textfile.gif' || { cp library/textfile.gif ${INSTALLROOT}/lib/tk4.2/textfile.gif  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/textfile.gif generated
+make ${INSTALLROOT}/lib/tk4.2/tk.tcl
 make library/tk.tcl
 done library/tk.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl.old 2>/dev/null || true; test '' = 'library/tk.tcl' || { cp library/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/tk.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/tk.tcl ${INSTALLROOT}/lib/tk4.2/tk.tcl.old 2>/dev/null || true; test '' = 'library/tk.tcl' || { cp library/tk.tcl ${INSTALLROOT}/lib/tk4.2/tk.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/tk.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl
 make library/tkfbox.tcl
 done library/tkfbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl.old 2>/dev/null || true; test '' = 'library/tkfbox.tcl' || { cp library/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/updir.xbm
+exec - mv ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl.old 2>/dev/null || true; test '' = 'library/tkfbox.tcl' || { cp library/tkfbox.tcl ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/tkfbox.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/updir.xbm
 make library/updir.xbm
 done library/updir.xbm
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm.old 2>/dev/null || true; test '' = 'library/updir.xbm' || { cp library/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/updir.xbm generated
-make ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/updir.xbm ${INSTALLROOT}/lib/tk4.2/updir.xbm.old 2>/dev/null || true; test '' = 'library/updir.xbm' || { cp library/updir.xbm ${INSTALLROOT}/lib/tk4.2/updir.xbm  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/updir.xbm generated
+make ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl
 make library/xmfbox.tcl
 done library/xmfbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl.old 2>/dev/null || true; test '' = 'library/xmfbox.tcl' || { cp library/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos
+exec - mv ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl.old 2>/dev/null || true; test '' = 'library/xmfbox.tcl' || { cp library/xmfbox.tcl ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/xmfbox.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2/demos
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib/tk4.2/demos
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/tk4.2/demos 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tk4.2/demos | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib/tk4.2/demos | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -1032,250 +1031,250 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/tk4.2/demos generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/README
+done ${INSTALLROOT}/lib/tk4.2/demos generated
+make ${INSTALLROOT}/lib/tk4.2/demos/README
 make library/demos/README
 done library/demos/README
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README.old 2>/dev/null || true; test '' = 'library/demos/README' || { cp library/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/README generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/README ${INSTALLROOT}/lib/tk4.2/demos/README.old 2>/dev/null || true; test '' = 'library/demos/README' || { cp library/demos/README ${INSTALLROOT}/lib/tk4.2/demos/README  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/README generated
+make ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl
 make library/demos/arrow.tcl
 done library/demos/arrow.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl.old 2>/dev/null || true; test '' = 'library/demos/arrow.tcl' || { cp library/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl.old 2>/dev/null || true; test '' = 'library/demos/arrow.tcl' || { cp library/demos/arrow.tcl ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/arrow.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl
 make library/demos/bind.tcl
 done library/demos/bind.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl.old 2>/dev/null || true; test '' = 'library/demos/bind.tcl' || { cp library/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl.old 2>/dev/null || true; test '' = 'library/demos/bind.tcl' || { cp library/demos/bind.tcl ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/bind.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl
 make library/demos/bitmap.tcl
 done library/demos/bitmap.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl.old 2>/dev/null || true; test '' = 'library/demos/bitmap.tcl' || { cp library/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/browse
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl.old 2>/dev/null || true; test '' = 'library/demos/bitmap.tcl' || { cp library/demos/bitmap.tcl ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/bitmap.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/browse
 make library/demos/browse
 done library/demos/browse
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse.old 2>/dev/null || true; test '' = 'library/demos/browse' || { cp library/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/browse generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/browse ${INSTALLROOT}/lib/tk4.2/demos/browse.old 2>/dev/null || true; test '' = 'library/demos/browse' || { cp library/demos/browse ${INSTALLROOT}/lib/tk4.2/demos/browse  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/browse generated
+make ${INSTALLROOT}/lib/tk4.2/demos/button.tcl
 make library/demos/button.tcl
 done library/demos/button.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl.old 2>/dev/null || true; test '' = 'library/demos/button.tcl' || { cp library/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/button.tcl ${INSTALLROOT}/lib/tk4.2/demos/button.tcl.old 2>/dev/null || true; test '' = 'library/demos/button.tcl' || { cp library/demos/button.tcl ${INSTALLROOT}/lib/tk4.2/demos/button.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/button.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/check.tcl
 make library/demos/check.tcl
 done library/demos/check.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl.old 2>/dev/null || true; test '' = 'library/demos/check.tcl' || { cp library/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/check.tcl ${INSTALLROOT}/lib/tk4.2/demos/check.tcl.old 2>/dev/null || true; test '' = 'library/demos/check.tcl' || { cp library/demos/check.tcl ${INSTALLROOT}/lib/tk4.2/demos/check.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/check.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl
 make library/demos/clrpick.tcl
 done library/demos/clrpick.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/demos/clrpick.tcl' || { cp library/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/demos/clrpick.tcl' || { cp library/demos/clrpick.tcl ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/clrpick.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl
 make library/demos/colors.tcl
 done library/demos/colors.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl.old 2>/dev/null || true; test '' = 'library/demos/colors.tcl' || { cp library/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl.old 2>/dev/null || true; test '' = 'library/demos/colors.tcl' || { cp library/demos/colors.tcl ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/colors.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl
 make library/demos/cscroll.tcl
 done library/demos/cscroll.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl.old 2>/dev/null || true; test '' = 'library/demos/cscroll.tcl' || { cp library/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl.old 2>/dev/null || true; test '' = 'library/demos/cscroll.tcl' || { cp library/demos/cscroll.tcl ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/cscroll.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl
 make library/demos/ctext.tcl
 done library/demos/ctext.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl.old 2>/dev/null || true; test '' = 'library/demos/ctext.tcl' || { cp library/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl.old 2>/dev/null || true; test '' = 'library/demos/ctext.tcl' || { cp library/demos/ctext.tcl ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/ctext.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl
 make library/demos/dialog1.tcl
 done library/demos/dialog1.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog1.tcl' || { cp library/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog1.tcl' || { cp library/demos/dialog1.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/dialog1.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl
 make library/demos/dialog2.tcl
 done library/demos/dialog2.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog2.tcl' || { cp library/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog2.tcl' || { cp library/demos/dialog2.tcl ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/dialog2.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl
 make library/demos/entry1.tcl
 done library/demos/entry1.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry1.tcl' || { cp library/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry1.tcl' || { cp library/demos/entry1.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/entry1.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl
 make library/demos/entry2.tcl
 done library/demos/entry2.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry2.tcl' || { cp library/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry2.tcl' || { cp library/demos/entry2.tcl ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/entry2.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl
 make library/demos/filebox.tcl
 done library/demos/filebox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl.old 2>/dev/null || true; test '' = 'library/demos/filebox.tcl' || { cp library/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl.old 2>/dev/null || true; test '' = 'library/demos/filebox.tcl' || { cp library/demos/filebox.tcl ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/filebox.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl
 make library/demos/floor.tcl
 done library/demos/floor.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl.old 2>/dev/null || true; test '' = 'library/demos/floor.tcl' || { cp library/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl.old 2>/dev/null || true; test '' = 'library/demos/floor.tcl' || { cp library/demos/floor.tcl ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/floor.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/form.tcl
 make library/demos/form.tcl
 done library/demos/form.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl.old 2>/dev/null || true; test '' = 'library/demos/form.tcl' || { cp library/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/hello
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/form.tcl ${INSTALLROOT}/lib/tk4.2/demos/form.tcl.old 2>/dev/null || true; test '' = 'library/demos/form.tcl' || { cp library/demos/form.tcl ${INSTALLROOT}/lib/tk4.2/demos/form.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/form.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/hello
 make library/demos/hello
 done library/demos/hello
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello.old 2>/dev/null || true; test '' = 'library/demos/hello' || { cp library/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/hello generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/hello ${INSTALLROOT}/lib/tk4.2/demos/hello.old 2>/dev/null || true; test '' = 'library/demos/hello' || { cp library/demos/hello ${INSTALLROOT}/lib/tk4.2/demos/hello  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/hello generated
+make ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl
 make library/demos/hscale.tcl
 done library/demos/hscale.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/hscale.tcl' || { cp library/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/hscale.tcl' || { cp library/demos/hscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/hscale.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl
 make library/demos/icon.tcl
 done library/demos/icon.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl.old 2>/dev/null || true; test '' = 'library/demos/icon.tcl' || { cp library/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl.old 2>/dev/null || true; test '' = 'library/demos/icon.tcl' || { cp library/demos/icon.tcl ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/icon.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl
 make library/demos/image1.tcl
 done library/demos/image1.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl.old 2>/dev/null || true; test '' = 'library/demos/image1.tcl' || { cp library/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl.old 2>/dev/null || true; test '' = 'library/demos/image1.tcl' || { cp library/demos/image1.tcl ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/image1.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl
 make library/demos/image2.tcl
 done library/demos/image2.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl.old 2>/dev/null || true; test '' = 'library/demos/image2.tcl' || { cp library/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl.old 2>/dev/null || true; test '' = 'library/demos/image2.tcl' || { cp library/demos/image2.tcl ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/image2.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/items.tcl
 make library/demos/items.tcl
 done library/demos/items.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl.old 2>/dev/null || true; test '' = 'library/demos/items.tcl' || { cp library/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/ixset
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/items.tcl ${INSTALLROOT}/lib/tk4.2/demos/items.tcl.old 2>/dev/null || true; test '' = 'library/demos/items.tcl' || { cp library/demos/items.tcl ${INSTALLROOT}/lib/tk4.2/demos/items.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/items.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/ixset
 make library/demos/ixset
 done library/demos/ixset
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset.old 2>/dev/null || true; test '' = 'library/demos/ixset' || { cp library/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/ixset generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/ixset ${INSTALLROOT}/lib/tk4.2/demos/ixset.old 2>/dev/null || true; test '' = 'library/demos/ixset' || { cp library/demos/ixset ${INSTALLROOT}/lib/tk4.2/demos/ixset  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/ixset generated
+make ${INSTALLROOT}/lib/tk4.2/demos/label.tcl
 make library/demos/label.tcl
 done library/demos/label.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl.old 2>/dev/null || true; test '' = 'library/demos/label.tcl' || { cp library/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/label.tcl ${INSTALLROOT}/lib/tk4.2/demos/label.tcl.old 2>/dev/null || true; test '' = 'library/demos/label.tcl' || { cp library/demos/label.tcl ${INSTALLROOT}/lib/tk4.2/demos/label.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/label.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/license.terms
 make library/demos/license.terms
 done library/demos/license.terms
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms.old 2>/dev/null || true; test '' = 'library/demos/license.terms' || { cp library/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/license.terms ${INSTALLROOT}/lib/tk4.2/demos/license.terms.old 2>/dev/null || true; test '' = 'library/demos/license.terms' || { cp library/demos/license.terms ${INSTALLROOT}/lib/tk4.2/demos/license.terms  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/license.terms generated
+make ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl
 make library/demos/menu.tcl
 done library/demos/menu.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl.old 2>/dev/null || true; test '' = 'library/demos/menu.tcl' || { cp library/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl.old 2>/dev/null || true; test '' = 'library/demos/menu.tcl' || { cp library/demos/menu.tcl ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/menu.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl
 make library/demos/msgbox.tcl
 done library/demos/msgbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/demos/msgbox.tcl' || { cp library/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/demos/msgbox.tcl' || { cp library/demos/msgbox.tcl ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/msgbox.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl
 make library/demos/plot.tcl
 done library/demos/plot.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl.old 2>/dev/null || true; test '' = 'library/demos/plot.tcl' || { cp library/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl.old 2>/dev/null || true; test '' = 'library/demos/plot.tcl' || { cp library/demos/plot.tcl ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/plot.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl
 make library/demos/puzzle.tcl
 done library/demos/puzzle.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl.old 2>/dev/null || true; test '' = 'library/demos/puzzle.tcl' || { cp library/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl.old 2>/dev/null || true; test '' = 'library/demos/puzzle.tcl' || { cp library/demos/puzzle.tcl ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/puzzle.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl
 make library/demos/radio.tcl
 done library/demos/radio.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl.old 2>/dev/null || true; test '' = 'library/demos/radio.tcl' || { cp library/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/rmt
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl.old 2>/dev/null || true; test '' = 'library/demos/radio.tcl' || { cp library/demos/radio.tcl ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/radio.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/rmt
 make library/demos/rmt
 done library/demos/rmt
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt.old 2>/dev/null || true; test '' = 'library/demos/rmt' || { cp library/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/rmt generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/rmt ${INSTALLROOT}/lib/tk4.2/demos/rmt.old 2>/dev/null || true; test '' = 'library/demos/rmt' || { cp library/demos/rmt ${INSTALLROOT}/lib/tk4.2/demos/rmt  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/rmt generated
+make ${INSTALLROOT}/lib/tk4.2/demos/rolodex
 make library/demos/rolodex
 done library/demos/rolodex
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex.old 2>/dev/null || true; test '' = 'library/demos/rolodex' || { cp library/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/rolodex ${INSTALLROOT}/lib/tk4.2/demos/rolodex.old 2>/dev/null || true; test '' = 'library/demos/rolodex' || { cp library/demos/rolodex ${INSTALLROOT}/lib/tk4.2/demos/rolodex  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/rolodex generated
+make ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl
 make library/demos/ruler.tcl
 done library/demos/ruler.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl.old 2>/dev/null || true; test '' = 'library/demos/ruler.tcl' || { cp library/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl.old 2>/dev/null || true; test '' = 'library/demos/ruler.tcl' || { cp library/demos/ruler.tcl ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/ruler.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl
 make library/demos/sayings.tcl
 done library/demos/sayings.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl.old 2>/dev/null || true; test '' = 'library/demos/sayings.tcl' || { cp library/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl.old 2>/dev/null || true; test '' = 'library/demos/sayings.tcl' || { cp library/demos/sayings.tcl ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/sayings.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/search.tcl
 make library/demos/search.tcl
 done library/demos/search.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl.old 2>/dev/null || true; test '' = 'library/demos/search.tcl' || { cp library/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/square
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/search.tcl ${INSTALLROOT}/lib/tk4.2/demos/search.tcl.old 2>/dev/null || true; test '' = 'library/demos/search.tcl' || { cp library/demos/search.tcl ${INSTALLROOT}/lib/tk4.2/demos/search.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/search.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/square
 make library/demos/square
 done library/demos/square
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square.old 2>/dev/null || true; test '' = 'library/demos/square' || { cp library/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/square generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/square ${INSTALLROOT}/lib/tk4.2/demos/square.old 2>/dev/null || true; test '' = 'library/demos/square' || { cp library/demos/square ${INSTALLROOT}/lib/tk4.2/demos/square  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/square generated
+make ${INSTALLROOT}/lib/tk4.2/demos/states.tcl
 make library/demos/states.tcl
 done library/demos/states.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl.old 2>/dev/null || true; test '' = 'library/demos/states.tcl' || { cp library/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/states.tcl ${INSTALLROOT}/lib/tk4.2/demos/states.tcl.old 2>/dev/null || true; test '' = 'library/demos/states.tcl' || { cp library/demos/states.tcl ${INSTALLROOT}/lib/tk4.2/demos/states.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/states.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/style.tcl
 make library/demos/style.tcl
 done library/demos/style.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl.old 2>/dev/null || true; test '' = 'library/demos/style.tcl' || { cp library/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/style.tcl ${INSTALLROOT}/lib/tk4.2/demos/style.tcl.old 2>/dev/null || true; test '' = 'library/demos/style.tcl' || { cp library/demos/style.tcl ${INSTALLROOT}/lib/tk4.2/demos/style.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/style.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/tclIndex
 make library/demos/tclIndex
 done library/demos/tclIndex
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex.old 2>/dev/null || true; test '' = 'library/demos/tclIndex' || { cp library/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/tclIndex ${INSTALLROOT}/lib/tk4.2/demos/tclIndex.old 2>/dev/null || true; test '' = 'library/demos/tclIndex' || { cp library/demos/tclIndex ${INSTALLROOT}/lib/tk4.2/demos/tclIndex  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/tclIndex generated
+make ${INSTALLROOT}/lib/tk4.2/demos/tcolor
 make library/demos/tcolor
 done library/demos/tcolor
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor.old 2>/dev/null || true; test '' = 'library/demos/tcolor' || { cp library/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/tcolor ${INSTALLROOT}/lib/tk4.2/demos/tcolor.old 2>/dev/null || true; test '' = 'library/demos/tcolor' || { cp library/demos/tcolor ${INSTALLROOT}/lib/tk4.2/demos/tcolor  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/tcolor generated
+make ${INSTALLROOT}/lib/tk4.2/demos/text.tcl
 make library/demos/text.tcl
 done library/demos/text.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl.old 2>/dev/null || true; test '' = 'library/demos/text.tcl' || { cp library/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/timer
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/text.tcl ${INSTALLROOT}/lib/tk4.2/demos/text.tcl.old 2>/dev/null || true; test '' = 'library/demos/text.tcl' || { cp library/demos/text.tcl ${INSTALLROOT}/lib/tk4.2/demos/text.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/text.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/timer
 make library/demos/timer
 done library/demos/timer
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer.old 2>/dev/null || true; test '' = 'library/demos/timer' || { cp library/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/timer generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/timer ${INSTALLROOT}/lib/tk4.2/demos/timer.old 2>/dev/null || true; test '' = 'library/demos/timer' || { cp library/demos/timer ${INSTALLROOT}/lib/tk4.2/demos/timer  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/timer generated
+make ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl
 make library/demos/twind.tcl
 done library/demos/twind.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl.old 2>/dev/null || true; test '' = 'library/demos/twind.tcl' || { cp library/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl.old 2>/dev/null || true; test '' = 'library/demos/twind.tcl' || { cp library/demos/twind.tcl ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/twind.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl
 make library/demos/vscale.tcl
 done library/demos/vscale.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/vscale.tcl' || { cp library/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/widget
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/vscale.tcl' || { cp library/demos/vscale.tcl ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/vscale.tcl generated
+make ${INSTALLROOT}/lib/tk4.2/demos/widget
 make library/demos/widget
 done library/demos/widget
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget.old 2>/dev/null || true; test '' = 'library/demos/widget' || { cp library/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/widget generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/widget ${INSTALLROOT}/lib/tk4.2/demos/widget.old 2>/dev/null || true; test '' = 'library/demos/widget' || { cp library/demos/widget ${INSTALLROOT}/lib/tk4.2/demos/widget  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/widget generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2/demos/images
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos/images 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib/tk4.2/demos/images
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/tk4.2/demos/images 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tk4.2/demos/images | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib/tk4.2/demos/images | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -1291,62 +1290,62 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif
+done ${INSTALLROOT}/lib/tk4.2/demos/images generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif
 make library/demos/images/earth.gif
 done library/demos/images/earth.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earth.gif' || { cp library/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earth.gif' || { cp library/demos/images/earth.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/earth.gif generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif
 make library/demos/images/earthris.gif
 done library/demos/images/earthris.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earthris.gif' || { cp library/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earthris.gif' || { cp library/demos/images/earthris.gif ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/earthris.gif generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp
 make library/demos/images/face.bmp
 done library/demos/images/face.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/face.bmp' || { cp library/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/face.bmp' || { cp library/demos/images/face.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/face.bmp generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp
 make library/demos/images/flagdown.bmp
 done library/demos/images/flagdown.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagdown.bmp' || { cp library/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagdown.bmp' || { cp library/demos/images/flagdown.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/flagdown.bmp generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp
 make library/demos/images/flagup.bmp
 done library/demos/images/flagup.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagup.bmp' || { cp library/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagup.bmp' || { cp library/demos/images/flagup.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/flagup.bmp generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp
 make library/demos/images/gray25.bmp
 done library/demos/images/gray25.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/gray25.bmp' || { cp library/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/gray25.bmp' || { cp library/demos/images/gray25.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/gray25.bmp generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp
 make library/demos/images/letters.bmp
 done library/demos/images/letters.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/letters.bmp' || { cp library/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/letters.bmp' || { cp library/demos/images/letters.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/letters.bmp generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp
 make library/demos/images/noletter.bmp
 done library/demos/images/noletter.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/noletter.bmp' || { cp library/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/noletter.bmp' || { cp library/demos/images/noletter.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/noletter.bmp generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp
 make library/demos/images/pattern.bmp
 done library/demos/images/pattern.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/pattern.bmp' || { cp library/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/pattern.bmp' || { cp library/demos/images/pattern.bmp ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/pattern.bmp generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif
 make library/demos/images/tcllogo.gif
 done library/demos/images/tcllogo.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif.old 2>/dev/null || true; test '' = 'library/demos/images/tcllogo.gif' || { cp library/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif generated
-make ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif.old 2>/dev/null || true; test '' = 'library/demos/images/tcllogo.gif' || { cp library/demos/images/tcllogo.gif ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/tcllogo.gif generated
+make ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm
 make library/demos/images/teapot.ppm
 done library/demos/images/teapot.ppm
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm.old 2>/dev/null || true; test '' = 'library/demos/images/teapot.ppm' || { cp library/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm  		    		    ;}
-done ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm generated
+exec - mv ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm.old 2>/dev/null || true; test '' = 'library/demos/images/teapot.ppm' || { cp library/demos/images/teapot.ppm ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm  		    		    ;}
+done ${INSTALLROOT}/lib/tk4.2/demos/images/teapot.ppm generated
 done install virtual
 make test
 done test dontcare virtual

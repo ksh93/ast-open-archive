@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)Makerules (AT&T Research) 2000-06-20"
+.ID. = "@(#)Makerules (AT&T Research) 2000-10-31"
 
 /*
  * handy attributes
@@ -146,7 +146,7 @@ viewverify =
  */
 
 .sh. : .SPECIAL .VIRTUAL .FUNCTIONAL .FORCE .REPEAT .ALWAYS .LOCAL
-	set +x
+	set -
 	$(%)
 
 /*
@@ -198,7 +198,15 @@ STDLN := $$(_feature_:N=ln:?$(.X.)?$$(STDCP)?)
 AR = ar
 ARFLAGS = r
 AS = as
+if "$(PATH:/:/ /G:X=awk:P=X)"
 AWK = awk
+elif "$(PATH:/:/ /G:X=nawk:P=X)"
+AWK = nawk
+elif "$(PATH:/:/ /G:X=gawk:P=X)"
+AWK = gawk
+else
+AWK = awk
+end
 BISON = bison
 BISONFLAGS = -y
 cc = cc
@@ -280,7 +288,7 @@ NAWK = nawk
 elif "$(PATH:/:/ /G:X=gawk:P=X)"
 NAWK = gawk
 else
-NAWK = nawk
+NAWK = awk
 end
 NM = $(CC.NM)
 NMEDIT = $(CC.NMEDIT) -e '/^$(CC.SYMPREFIX)_STUB_/d' -e '/$(CC.SYMPREFIX)_already_defined$/d'
@@ -306,6 +314,8 @@ SORT = sort
 STRIP = strip
 TAR = tar
 TARFLAGS = v
+VARIANT =
+VARIANTID =
 
 if "$(PATH:/:/ /G:X=vgrind:P=X)"
 VGRIND = vgrind
@@ -576,7 +586,7 @@ include "Scanrules.mk"
 	end
 
 .REQUIRE.-l% : .FUNCTION
-	local B R T
+	local B R T D DL DR
 	B := $(%:/-l//)
 	if "$(-mam:N=static*)" && "$(%)" != "-l+([a-zA-Z0-9_])"
 		return
@@ -610,6 +620,19 @@ include "Scanrules.mk"
 	elif "$(-mam:N=static*,port*)"
 		print -um setv mam_lib$(B) $(.MAMACTION. $("`")sed -e 's,$(%),$(%:/-l\(.*\)/lib\1$(CC.SUFFIX.ARCHIVE)),' $(T)$("`"))
 		return ${mam_lib$(B)}
+	end
+	/* req must be seen at or before the lib */
+	DL := $(%:T=WF:P=D)
+	DR := $(T:P=D)
+	if DL != "$(DR)"
+		for D $(*.SOURCE.%.ARCHIVE)
+			if D == "$(DR)"
+				break
+			end
+			if D == "$(DL)"
+				return
+			end
+		end
 	end
 	return $(T:T=I)
 
@@ -766,7 +789,7 @@ include "Scanrules.mk"
 	fi
 
 %.c : %.l .LEX.SEMAPHORE (LEX) (LEXFLAGS) (CC)
-	$(LEX) $(LEXFLAGS) $(>)
+	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(ED) $(EDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%):F=%(lower)S)/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(upper)S)/g$("\n")w$("\n")q$("\n")!??)
 	$(MV) lex.yy.c $(<)
 
 %.o : %.C (CC) (CCFLAGS)
@@ -782,7 +805,7 @@ include "Scanrules.mk"
 	$(CC) $(CCFLAGS) -c $(>)
 
 %.mo : %.mk
-	$(MAKE) $(-) --base --compile --file=$(>) $(CCFLAGS:N=-[I][!-]*) $(&:T=E)
+	$(MAKE) $(-) --base --compile --file=$(>) cctype= $(CCFLAGS:N=-[I][!-]*) $(&:T=E)
 
 /*
  * library req support
@@ -804,7 +827,7 @@ cc-% : "" .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
 	if	test -d $(<:V:Q)
 	then	$(-silent:Y%%echo $(.RWD.:?$(.RWD.)/??)$(<:V:Q): >&2%)
 		cd $(<:V:Q)
-		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:N!=MAKEPATH=*:Q) $(.RECURSE.ARGS.:N!=cc-*:/^install$/cc-install/) $(%:Y!$$(INSTRUMENT_$$(%:/,.*//):@?instrument=$$(%:/,.*//)?CCFLAGS=-$$(%:V:/$$(%:V:N=*~*:?~?,?)/ /G:@/-W\(.\) /-W\1,/G:@Q)?)!!)
+		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:N!=MAKEPATH=*) $(.RECURSE.ARGS.:N!=cc-*:/^install$/cc-install/) $(%:Y!$$(INSTRUMENT_$$(%:/,.*//):@?instrument=$$(%:/,.*//)?CCFLAGS=-$$(%:V:/$$(%:V:N=*~*:?~?,?)/ /G:@/-W\(.\) /-W\1,/G:@Q)?)!!)
 	fi
 
 /*
@@ -1115,12 +1138,13 @@ end
 
 .RECURSE.DIR : .USE .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
 	set -
-	if	$(physical:?2d??) test -d $(<) $(skeleton:?|| mkdir $(<)??)
+	if	$(physical:?$$(*.VIEW:O=2:N=...:Y%2d%%)??) test -d $(<) $(skeleton:?|| mkdir $(<)??)
 	then	$(-silent:Y%%echo $(recurse_enter) $(.RWD.:?$(<:N!=/*:?$(.RWD.)/??)??)$(<): >&2%)
 		cd $(<)
 		$(MAKE) $(-) --errorid=$(<:Q) $(=:N!=MAKEPATH=*|VPATH=*) .RWD.=$(.RWD.:?$(.RWD.)/??)$(<) $(.RECURSE.ARGS.)
 		$(recurse_exit:Y,$$(-silent:Y%%echo $$(recurse_exit) $$(.RWD.:?$$(<:N!=/*:?$$(.RWD.)/??)??)$$(<): >&2%),,)
-	else	echo $(<): cannot recurse on virtual directory >&2
+	elif	test '' = '$(physical)'
+	then	echo $(<): cannot recurse on virtual directory >&2
 	fi
 
 .RECURSE.FILE : .USE .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
@@ -1590,6 +1614,7 @@ end
 		(.REQUIRE.$(B)) : .PARAMETER
 		if "$(-mam:N=static*,port*)"
 			$(B).req : (CC) (CCFLAGS) (LDFLAGS) (.REQUIRE.$(B))
+				set -
 				echo 'main(){return(0);}' > 1.$(tmp).c
 				$$(CC) $$(CCFLAGS) -c 1.$(tmp).c &&
 				x=`$$(CC) $$(CCFLAGS) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) -l'*' 2>&1 | $(SED) -e 's/[][()+@?]/#/g' || :` &&
@@ -1602,7 +1627,7 @@ end
 					"$(B)"$(...:A=.ARCHIVE:A=.TARGET:N=lib*$(CC.SUFFIX.ARCHIVE):/^lib\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
 						;;
 					*)	if	test ! -f $$(LIBDIR)/lib$i$(CC.SUFFIX.ARCHIVE)
-						then	case `{ $$(CC) $$(CCFLAGS) $$(*.SOURCE.%.ARCHIVE:$$(.CC.NOSTDLIB.):P=L:/^/-L/) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) $(D) -l$i 2>&1 || echo '' $x ;} | $(SED) -e 's/[][()+@?]/#/g' || :` in
+						then	case `{ $$(CC) $$(CCFLAGS) $$(*.SOURCE.%.ARCHIVE:$$(.CC.NOSTDLIB.):N=*/lib*:P=L:/^/-L/) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) $(D) -l$i 2>&1 || echo '' $x ;} | $(SED) -e 's/[][()+@?]/#/g' || :` in
 							*$x*)	case `{ $$(CC) $$(CCFLAGS) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) $(D) -l$i 2>&1 || echo '' $x ;} | $(SED) -e 's/[][()+@?]/#/g' || :` in
 								*$x*) continue ;;
 								esac
@@ -1626,7 +1651,7 @@ end
 	eval
 	_BLD_$(B:B:S:/[^a-zA-Z0-9_]/_/G) == 1
 	end
-	$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[-+]l*))
+	$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
 	for T $(<:O>2)
 		if T == "DLL*"
 			.DLL.LIST. += $(B)
@@ -1678,7 +1703,7 @@ end
 		else
 			S := $(B).$(%:O=3)
 		end
-		$(S) : .SHARED.o lib$(%:O=2)$(CC.LIB.TYPE:O=1)$(CC.SUFFIX.ARCHIVE) $$(.SHARED.BIND. $(L))
+		$(S) : .SHARED.o $(%:N=[!-+]*=*) lib$(%:O=2)$(CC.LIB.TYPE:O=1)$(CC.SUFFIX.ARCHIVE) $$(.SHARED.BIND. $(L))
 		if ! "$(.INSTALL.$(S))" && ! "$(.NO.INSTALL.)"
 			$$(LIBDIR) :INSTALLDIR: $(S)
 				$(LD_PRELOAD:N=$(<:D:B:D:B:D:B:S=$(CC.SUFFIX.SHARED)):?LD_PRELOAD=""; _RLD_LIST=DEFAULT;?)if	silent test -f $(<:C%\$(CC.SUFFIX.SHARED)\.%.oo.%)
@@ -1851,12 +1876,22 @@ end
 	end
 
 /*
+ * var :OPTIONAL: src ...
+ *
+ *	lhs var set to rhs src and rhs asserted on ::
+ */
+
+":OPTIONAL:" : .MAKE .OPERATOR
+	$(<) := $(>)
+	:: $(>)
+
+/*
  * rhs are package names used in compilation
  * a package consists of a library and include directory
  * the most recent :PACKAGE: assertion takes highest precedence
  * .PACKAGE. is the ordered package list used to alter
- * .PACKAGE.build is the package list to build against
  * .SOURCE.h, INCLUDEDIR, LDLIBRARIES and ancestor
+ * .PACKAGE.build is the package list to build against
  * $(PACKAGE_<package>_INCLUDE) explicit include for <package>
  * $(PACKAGE_<package>_LIB) explicit lib dir for <package>
  * $(PACKAGE_<package>) root dir for include|lib for <package>
@@ -1890,12 +1925,162 @@ end
 	$(R) : .MULTIPLE
 	return $(R)
 
+/*
+ * initialize the package args
+ * on return the following are set if found for package $(P)
+ *	PACKAGE_$(P)_INCLUDE	package include dir
+ *	PACKAGE_$(P)_LIB	package lib dir
+ * the canonicalized last package name is returned
+ */
+
+.PACKAGE.INIT. : .FUNCTION .PROBE.INIT
+	local T1 T3 T4 T5 T6
+	local B D G H I L N P Q S T V W X Z IP LP
+	G := $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
+	G := $(G:U)
+	for T3 $(%)
+		I := $(PACKAGE_$(T3)_INCLUDE)
+		IP := $(.PACKAGE.$(T3).include)
+		if IP == "/*"
+			if ! I
+				I := $(IP)
+			end
+			IP =
+		end
+		if ! IP
+			IP = include
+		end
+		L := $(PACKAGE_$(T3)_LIB)
+		LP := $(.PACKAGE.$(T3).lib)
+		if LP == "/*"
+			if ! L
+				L := $(LP)
+			end
+			LP =
+		end
+		if ! LP
+			LP = lib
+		end
+		if ( !I || !L )
+			if ! ( T1 = "$(PACKAGE_$(T3))" )
+				T4 := $(PACKAGE:/:/ /G) $(.PACKAGE.DIRS.) $(G) $(G:/:/ /G:C%$%/$(T3)%)
+				if T3 == "*[!0-9]+([0-9])"
+					T4 += $(G:/:/ /G:C%$%/$(T3:C,[0-9]*$,,)%)
+				end
+				V =
+				if T5 = "$(PACKAGE_$(T3)_VERSION)"
+					N := $(T3)-$(T5) $(T3)$(T5) $(T3)R$(T5) $(T3)r$(T5)
+					B =
+					for T5 $(T5:/\./ /G)
+						if V
+							V := $(V)*(?(.)$(T5)
+							B := $(B))
+						else
+							V := $(T5)
+						end
+					end
+					V := $(V)$(B)
+				elif T3 == "*[0-9][rR]+([0-9])"
+					N := $(T3)
+					T3 := $(N:/[rR][0-9]*$//)
+				else
+					N :=
+				end
+				if B = "$(T3:N=[!0-9]*+([0-9.]):/[0-9]*$//)"
+					B := @($(T3)|$(B))
+				else
+					B := $(T3)
+				end
+				T1 =
+				N += $(T3)
+				if T3 == "*[!0-9]+([0-9])"
+					N += $(T3:C,[0-9]*$,,)
+				end
+				for S $(CC.SUFFIX.SHARED) $(CC.SUFFIX.ARCHIVE)
+					for D $(N) /
+						T5 := $(T4:N=*/$(D):D) $(T4)
+						for P lib ""
+							if ! V
+								X := $(LIBDIR)/$(P)$(T3)$(S)
+								if ( T1 = "$(X:P=X:O=1:D:D)" )
+									break 3
+								end
+							end
+							X := $(T5:C%$%/$(D)/$(LP)/$(P)$(T3)$(S)%)
+							if ( T1 = "$(X:P=X:O=1:D:D)" )
+								break 3
+							end
+							if T6 = "$(X:D:P=X:O=1)"
+								if Z = "$(T6:L>=?(lib)$(B)*$(S)*([0-9.]))"
+									if V
+										if W = "$(Z:N=*$(V)*:O=1)"
+											T1 := $(T6:D)
+											break 3
+										end
+									end
+									T1 := $(T6:D)
+									break 3
+								end
+							end
+						end
+					end
+				end
+				if ! "$(T1)"
+					if ! ( T1 = "$(T4:C%$%/$(IP)/$(T3)%:P=X:O=1:D:D)" )
+						T1 := $(T4:N=*/$(T3):C%$%/$(IP)%:P=X:O=1:D)
+					end
+					if K > 0 && ! "$(T1)"
+						continue
+					end
+				end
+				if K > 0
+					K$(K) := 1
+				end
+				eval
+				PACKAGE_$(T3) = $(T1:P=C)
+				end
+			end
+			if T1
+				.PACKAGE.DIRS. += $(T1)
+				if !I
+					I := $(T1)/$(IP)
+					H := $(I)/$(T3)/.
+					if "$(H:P=X)"
+						I := $(I)/$(T3)
+					end
+					eval
+					PACKAGE_$(T3)_INCLUDE = $(I)
+					end
+				end
+				if !L
+					L := $(T1)/$(LP)
+					eval
+					PACKAGE_$(T3)_LIB = $(L)
+					end
+				end
+			end
+		end
+	end
+	return $(T3)
+
+/*
+ * evaluate a logical expression of package ids
+ * used by :VARIANT:
+ */
+
+PACKAGES : .SPECIAL .FUNCTION
+	if ! "$(%)"
+		return 1
+	end
+	: $(.PACKAGE.INIT. $(%:/[^a-zA-Z0-9_.]/ /G))
+	return $(%:/\([A-Za-z0-9_.][A-Za-z0-9_.]*\)/"$$(PACKAGE_\1_LIB)"!=""/G:@/"  *"/" \&\& "/G:E)
+
 ":PACKAGE:" : .MAKE .OPERATOR
 	local I T N P V version insert=0 install=1 library=-l
 	if "$(<)"
 		/* a separate include handles package definitions for now */
 		eval
-		$$(<) :package: $$(>)
+		$$(<:V) :package: $$(>:V)
 			$(@:V)
 		end
 		return
@@ -1934,7 +2119,6 @@ end
 					library := -l
 				elif N == "static"
 					library := +l
-				elif N == "library"
 					if V
 						library := -l
 					else
@@ -1944,7 +2128,7 @@ end
 					$(N) := $(V)
 				end
 			end
-		else
+		elif T != "*:command"
 			if T == "*:*"
 				P := $(T:/:.*//)
 				T := $(T:/[^:]*//)
@@ -1996,6 +2180,8 @@ end
 					else
 						.PACKAGE.$(P).library :=
 					end
+				elif N == "include|lib"
+					.PACKAGE.$(P).$(N) := $(V)
 				elif N == "version"
 					PACKAGE_$(P)_VERSION := $(V)
 				elif N == "install"
@@ -2090,6 +2276,31 @@ end
 	.METARULE.X. : $(>)
 
 /*
+ * cc-* variants
+ *
+ *	id :VARIANT: [ package-expr ]
+ *		n1 = v1
+ *		n2 = v2
+ *		...
+ */
+
+":VARIANT:" : .MAKE .OPERATOR
+	.VARIANTS. += cc-$(<)
+	.CLOBBER. += cc-$(<)
+	eval
+	cc-$$(<) : .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
+		set -
+		if	test "0" != "$$(PACKAGES $(>))"
+		then	if	test ! -d $$(<)
+			then	mkdir $$(<)
+			fi
+			$$(-silent:Y%%echo $$(.RWD.:?$$(.RWD.)/??)$$(<): >&2%)
+			cd $$(<)
+			$$(MAKE) --file=$$(MAKEFILE) --keepgoing $$(-) --errorid=$$(<) VARIANT=$$(<:/cc-//) VARIANTID=$$(<:/cc-//:N=[a-zA-Z]*:?-??)$$(<:/cc-//) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$$(MAKEPATH) $$(=:N!=MAKEPATH=*) $$(.RECURSE.ARGS.:N!=cc-*) $(@:V:@Q)
+		fi
+	end
+
+/*
  * external distribution workarounds
  *
  *	target :WORKAROUND:		target is empty
@@ -2119,6 +2330,21 @@ end
 		end
 	end
 
+/*
+ * :YYPREFIX: foo a.y b.l
+ */
+
+":YYPREFIX:" : .MAKE .OPERATOR
+	local P F
+	P := $(>:O=1)
+	for F $(>:O>1)
+		if "$(F)" == "*.l"
+			LEXFIX.$(F:B) := $(P)
+		elif "$(F)" == "*.y"
+			YACCFIX.$(F:B) := $(P)
+		end
+	end
+	
 /*
  * rhs are compiled using $(cc) rather than $(CC)
  * use like ::
@@ -2159,8 +2385,7 @@ end
 		.UNION. : $(...:T!=XS:T=F:A=.REGULAR:P=S=$(.RWD.):T!=G)
 		.UNION. : $(...:T=XSFA:T=F:A=.REGULAR:P=S=$(.RWD.):T!=G)
 	end
-	X := */($(MAKEFILES:/:/|/G))
-	return $(*.UNION.:$(select):N!=$(X))
+	return $(*.UNION.:$(select))
 
 .GENSYM.COUNT. = 0
 
@@ -2192,7 +2417,7 @@ end
 	end
 	cctype := $(cctype:O=1:P=C) $(cctype:O>1)
 	if ! ( .CC.PROBE. = "$(CC.PROBE)" )
-		.CC.PROBE. := $(cctype:@P=P=C)
+		.CC.PROBE. := $(cctype|"cc":@P=P=C)
 	end
 	.CC.PROBE. : .VIRTUAL $(.CC.PROBE.)
 	$(.CC.PROBE.) : .SPECIAL .ACCEPT .DONTCARE
@@ -2422,10 +2647,9 @@ end
 		CC.STDLIB := $(T1:X=$$(CC.STDLIB:C@^/@@))
 	end
 	if T1 = "$(.PACKAGE.build:A!=.TARGET)"
-		local B D G H I L N Q S T V W X Y Z K=0 K0=0
+		local B D H I L N Q S T V W X Z K=0 K0=0 IP LP
 		LDLIBRARIES += $$(.PACKAGE.LIBRARIES. $(T1))
 		T2 =
-		G := $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
 		for T3 $(T1)
 			if T3 == "{"
 				if ! "$(-mam:N=static*)"
@@ -2441,107 +2665,9 @@ end
 			elif $(K$(K)) > 0
 				continue
 			end
+			T3 := $(.PACKAGE.INIT. $(T3))
 			I := $(PACKAGE_$(T3)_INCLUDE)
 			L := $(PACKAGE_$(T3)_LIB)
-			if ( !I || !L )
-				if ! ( T1 = "$(PACKAGE_$(T3))" )
-					T4 := $(PACKAGE:/:/ /G) $(Y) $(G) $(G:/:/ /G:C%$%/$(T3)%)
-					if T3 == "*[!0-9]+([0-9])"
-						T4 += $(G:/:/ /G:C%$%/$(T3:C,[0-9]*$,,)%)
-					end
-					V =
-					if T5 = "$(PACKAGE_$(T3)_VERSION)"
-						N := $(T3)-$(T5) $(T3)$(T5) $(T3)R$(T5) $(T3)r$(T5)
-						B =
-						for T5 $(T5:/\./ /G)
-							if V
-								V := $(V)*(?(.)$(T5)
-								B := $(B))
-							else
-								V := $(T5)
-							end
-						end
-						V := $(V)$(B)
-					elif T3 == "*[0-9][rR]+([0-9])"
-						N := $(T3)
-						T3 := $(N:/[rR][0-9]*$//)
-					else
-						N :=
-					end
-					if B = "$(T3:N=[!0-9]*+([0-9.]):/[0-9]*$//)"
-						B := @($(T3)|$(B))
-					else
-						B := $(T3)
-					end
-					T1 =
-					N += $(T3)
-					if T3 == "*[!0-9]+([0-9])"
-						N += $(T3:C,[0-9]*$,,)
-					end
-					for S $(CC.SUFFIX.SHARED) $(CC.SUFFIX.ARCHIVE)
-						for D $(N) /
-							T5 := $(T4:N=*/$(D):D) $(T4)
-							for P lib ""
-								if ! V
-									X := $(LIBDIR)/$(P)$(T3)$(S)
-									if ( T1 = "$(X:P=X:O=1:D:D)" )
-										break 3
-									end
-								end
-								X := $(T5:C%$%/$(D)/lib/$(P)$(T3)$(S)%)
-								if ( T1 = "$(X:P=X:O=1:D:D)" )
-									break 3
-								end
-								if T6 = "$(X:D:P=X:O=1)"
-									if Z = "$(T6:L>=?(lib)$(B)*$(S)*([0-9.]))"
-										if V
-											if W = "$(Z:N=*$(V)*:O=1)"
-												T1 := $(T6:D)
-												break 3
-											end
-										end
-										T1 := $(T6:D)
-										break 3
-									end
-								end
-							end
-						end
-					end
-					if ! "$(T1)"
-						if ! ( T1 = "$(T4:C%$%/include/$(T3)%:P=X:O=1:D:D)" )
-							T1 := $(T4:N=*/$(T3):C%$%/include%:P=X:O=1:D)
-						end
-						if K > 0 && ! "$(T1)"
-							continue
-						end
-					end
-					if K > 0
-						K$(K) := 1
-					end
-					eval
-					PACKAGE_$(T3) = $(T1:P=C)
-					end
-				end
-				if T1
-					Y += $(T1)
-					if !I
-						I := $(T1)/include
-						H := $(I)/$(T3)/.
-						if "$(H:P=X)"
-							I := $(I)/$(T3)
-						end
-						eval
-						PACKAGE_$(T3)_INCLUDE = $(I)
-						end
-					end
-					if !L
-						L := $(T1)/lib
-						eval
-						PACKAGE_$(T3)_LIB = $(L)
-						end
-					end
-				end
-			end
 			T2 += $(T3)
 			T4 =
 			if "$(-mam:N=static*)"
@@ -2693,7 +2819,7 @@ end
 	end
 	T3 =
 	if "$(CC.REPOSITORY)"
-		T3 += $(T5:V) $$(CCFLAGS:N=-[D]*) $$(.PTR.PREREQS:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(.PTR.PREREQS:A=.LCL.INCLUDE:P=D):/^/-I/) -I- $$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(.PTR.PREREQS:A=.LCL.INCLUDE|.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&.PTR.CHECK:T=D)
+		T3 += $(T5:V) $$(CCFLAGS:N=-[D]*) $$(.PTR.PREREQS:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(.PTR.PREREQS:A=.LCL.INCLUDE:P=D):/^/-I/) $(CC.DIALECT:N=-I-) $$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(.PTR.PREREQS:A=.LCL.INCLUDE|.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&.PTR.CHECK:T=D)
 		.APPEND.%.COMMAND : .PTR.CHECK .PTR.UPDATE
 		T3 := $$(@:V:N=*$\(CC*(LD)\)*:@?$(T3:V)??)
 	end
@@ -2907,7 +3033,7 @@ end
 .DELTA : .BASE.VERIFY .COMMON.SAVE
 	$(PAX) -w -f $("":T=R:F=%($(.BASE.DATE.FORMAT.))T).$(.BASE.) -z $(.BASE.) $(PAXFLAGS) $(.MANIFEST.)
 
-.CC- : .ONOBJECT $$(*.SOURCE:L<=cc-*)
+.CC- : .ONOBJECT $$(*.SOURCE:L<=cc-*) $$(.VARIANTS.)
 
 .CC-INSTALL : .ONOBJECT .ALL $$(*.INSTALL:N=*-*$$(CC.SUFFIX.ARCHIVE))
 
@@ -2927,7 +3053,7 @@ end
 	F := $(F:/___*/_/G)
 	$(F).exp : .FORCE $(%:O=1)
 		: generate $(*) export symbols in $(<)
-		set +x
+		set -
 		$(NM) $(NMFLAGS) $(*) |
 		$(SED) $(NMEDIT) > $(<)
 	.MAKE : $(F).exp
@@ -2942,7 +3068,7 @@ end
 	F := $(F:/___*/_/G)
 	$(F) : .FORCE $(%:O=1)
 		: extract $(*) objects in $(<)
-		set +x
+		set -
 		$(RM) -rf $(<)
 		$(MKDIR) $(<)
 		cd $(<)
@@ -2965,7 +3091,7 @@ end
 	F := $(F:/___*/_/G)
 	$(F).c : .FORCE $(%:O=1)
 		: generate $(*) export symbols in $(<)
-		set +x
+		set -
 		$(NM) $(NMFLAGS) $(*) |
 		$(SED) $(NMEDIT) -e '/^[ 	]*$/d' $(CC.SYMPREFIX:?-e 's/^$(CC.SYMPREFIX)//'??) |
 		$(SORT) -u > $(<:B:S=.i)
@@ -3012,7 +3138,7 @@ end
 	$(IGNORE) $(RM) $(RMFLAGS) $(.BUILT.:A=.REGULAR:A!=.ARCHIVE|.COMMAND:N!=*.(m[klos]|db$(CC.SUFFIX.SHARED:?|$(CC.SUFFIX.SHARED:/\.//).*??))$(cleanignore:?|($(cleanignore))??))
 
 .CLOBBER : .CLEARARGS .ONOBJECT .NOSTATEFILE
-	$(IGNORE) $(RM) $(RMFLAGS) $(.CLOBBER.:T=F:P=L) $(.BUILT.:A=.REGULAR)
+	$(IGNORE) $(RM) $(RMFLAGS) -r $(.CLOBBER.:T=F:P=L) $(.BUILT.:A=.REGULAR)
 
 .CLOBBER.INSTALL : .ONOBJECT
 	$(IGNORE) $(RM) $(RMFLAGS) -r $(.INSTALL.LIST.:T=F:P=L:A=.REGULAR)
@@ -3118,6 +3244,22 @@ end
 			print ^^$(PROTO) $(PROTOFLAGS) -dp -c'(*)' $(I)^$(I)
 		else
 			print ^^^$(I)
+		end
+	end
+
+.LIST.SOURCE.TGZ : .COMMON.SAVE .MAKE
+	local F P
+	PROTOEDIT = P=A
+	for F $(.MANIFEST.)
+		P := $(F:T=F)
+		if F == "*.[chly]"
+			print ^^$(PROTO) $(PROTOFLAGS) -dp $(P)^$(F)
+		elif F == "*.sh"
+			print ^^$(PROTO) $(PROTOFLAGS) -dp -c'#' $(P)^$(F)
+		elif F == "*.sml"
+			print ^^$(PROTO) $(PROTOFLAGS) -dp -c'(*)' $(P)^$(F)
+		else
+			print ^^^$(P)^$(F)
 		end
 	end
 
@@ -3303,7 +3445,7 @@ end
  * miscellaneous support
  */
 
-include "msgcat.mk"
+include - "msgcat.mk"
 
 /*
  * local installation info

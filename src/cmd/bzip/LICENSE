@@ -1,4 +1,10 @@
+license=(
+	type=special
+	package=bzip
+	author="Julian R Seward <jseward@acm.org>"
+	since=1996
 
+	notice='
 This program, "bzip2" and associated library "libbzip2", are
 copyright (C) 1996-1998 Julian R Seward.  All rights reserved.
 
@@ -21,7 +27,7 @@ are met:
    products derived from this software without specific prior written 
    permission.
 
-THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS
 OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
@@ -35,5 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Julian Seward, Guildford, Surrey, UK.
 jseward@acm.org
-bzip2/libbzip2 version 0.9.0 of 28 June 1998
+bzip2/libbzip2 version 0.9.0 of 28 June 1998'
 
+)

@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1987-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1987-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -38,7 +38,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pax (AT&T Labs Research) 2000-06-01\n]"
+"[-?\n@(#)pax (AT&T Labs Research) 2000-09-20\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1182,6 +1182,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				initdelta(ap);
 				if (!*v || streq(v, "-"))
 				{
+					state.delta2delta++;
 					if (!(state.operation & OUT))
 					{
 						ap->delta->format = DELTA_IGNORE;
@@ -1761,8 +1762,8 @@ main(int argc, char** argv)
 	state.summary = 1;
 	if (!(state.tmp.file = pathtmp(NiL, NiL, error_info.id, NiL)))
 		error(3, "out of space [tmp]");
-	if (!(state.tmp.str = sfstropen()))
-		error(3, "out of space [str]");
+	if (!(state.tmp.lst = sfstropen()) || !(state.tmp.str = sfstropen()))
+		error(3, "out of space [lst|str]");
 	sfputr(state.tmp.str, usage, -1);
 	for (i = 1; i < elementsof(options); i++)
 		if (options[i].description)

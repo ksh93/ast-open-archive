@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1991-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1991-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -847,7 +847,8 @@ record(register File_t* f, char* k, long h, int i, int c, int p)
 			return q->record->data;
 		}
 	}
-	f->field->index = -1;
+	if (!state.active)
+		f->field->index = -1;
 	return 0;
 }
 
@@ -917,13 +918,6 @@ generate(Expr_t* prog, register File_t* f, const char* file, Exid_t* sym)
 		f->hixdisc = state.hix;
 		if (!(f->hix = hixopen(file, secondary, r->symbol->name, g, &f->hixdisc)))
 			break;
-#if 0
-		if (state.test & 1)
-		{
-			if (strmatch(f->hix->name, sfprints("*%s*", r->symbol->name)))
-				f->name = strdup(f->hix->name);
-		}
-#endif
 		if ((state.test & 2) && !f->name)
 			f->name = f->hix->name;
 		if (f->hix->partitions > 1 && !f->hix->restrict)
@@ -947,7 +941,7 @@ generate(Expr_t* prog, register File_t* f, const char* file, Exid_t* sym)
 		}
 		if (!i++)
 		{
-			if (!(state.test & 4) && (sym != state.schema && (file && streq(name, ((Local_t*)state.schema->local.pointer)->file->name) || !file && sym == ((Local_t*)state.schema->local.pointer)->file->record->symbol)))
+			if (sym != state.schema && (file && streq(name, ((Local_t*)state.schema->local.pointer)->file->name) || !file && sym == ((Local_t*)state.schema->local.pointer)->file->record->symbol))
 				error(ERROR_PANIC, "%s: %s index generation clashes with %s", name, sym->name, state.schema->name);
 			message((-6, "gen: file=%s sym=%s", name, sym->name));
 			while (field = record(f, NiL, 0, 0, 0, -1))

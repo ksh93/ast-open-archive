@@ -1,3 +1,9 @@
+00-10-31 date: mmddHHMMccyy doc and code fixes, test
+	 touch: ccyymmddHHMM doc and code fixes, --time=mtime common sense, test
+00-10-23 ps: -Tp pid gets pid and all children
+00-10-06 du: fix roundup error by delaying until the totals
+00-09-21 touch: fix to handle obsolete MMDDhhmm[YY]
+00-08-11 ps: fix man typo
 00-06-10 dd: add swap=op
 00-05-24 ls: fix --kilobytes, add --block-size
 00-05-11 df,ls,ps: unknown format id is fatal error

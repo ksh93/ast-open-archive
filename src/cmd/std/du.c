@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1989-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1989-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)du (AT&T Labs Research) 1999-04-28\n]"
+"[-?\n@(#)du (AT&T Labs Research) 2000-10-06\n]"
 USAGE_LICENSE
 "[+NAME?du - summarize disk usage]"
 "[+DESCRIPTION?\bdu\b reports the number of blocks contained in all files"
@@ -73,6 +73,10 @@ USAGE_LICENSE
 #include <ftwalk.h>
 #include <error.h>
 
+#define BLOCKS(n)	(Count_t)((state.blocksize==LS_BLOCKSIZE)?(n):(((n)*LS_BLOCKSIZE+state.blocksize-1)/state.blocksize))
+
+typedef Sfulong_t Count_t;
+
 static struct				/* program state		*/
 {
 	int		all;		/* list non-directories too	*/
@@ -81,7 +85,7 @@ static struct				/* program state		*/
 	int		summary;	/* list summary only		*/
 	int		total;		/* list complete total only	*/
 	unsigned long	blocksize;	/* blocksize			*/
-	Sfulong_t	count;		/* total block count		*/
+	Count_t		count;		/* total block count		*/
 } state;
 
 struct fileid				/* unique file id		*/
@@ -97,8 +101,8 @@ struct fileid				/* unique file id		*/
 static int
 du(register Ftw_t* ftw)
 {
-	register Sfulong_t	n = 0;
-	register Sfulong_t	b;
+	register Count_t	n = 0;
+	register Count_t	b;
 	register int		list = !state.summary;
 
 	if (ftw->info == FTW_NS)
@@ -154,13 +158,11 @@ du(register Ftw_t* ftw)
 		break;
 	}
 	b = iblocks(&ftw->statb);
-	if (state.blocksize != LS_BLOCKSIZE)
-		b = (b * LS_BLOCKSIZE + state.blocksize - 1) / state.blocksize;
+	state.count += b;
 	n += b;
 	ftw->parent->local.number += n;
-	state.count += n;
 	if (!state.total && (list || ftw->level <= 0))
-		sfprintf(sfstdout, "%I*u\t%s\n", sizeof(n), n, ftw->path);
+		sfprintf(sfstdout, "%I*u\t%s\n", sizeof(Count_t), BLOCKS(n), ftw->path);
 	return 0;
 }
 
@@ -225,6 +227,6 @@ main(int argc, register char** argv)
 
 	ftwalk(argv[0] ? (char*)argv : NiL, du, flags, NiL);
 	if (state.total)
-		sfprintf(sfstdout, "%I*u\n", sizeof(state.count), state.count);
+		sfprintf(sfstdout, "%I*u\n", sizeof(Count_t), BLOCKS(state.count));
 	return error_info.errors != 0;
 }

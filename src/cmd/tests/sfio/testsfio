@@ -75,7 +75,6 @@ do	(( tests = tests + 1 ))
 		then	print -u2 passed
 			continue
 		fi
-		print -u2 FAILED
 		;;
 	*)	print -u2 compile FAILED
 		;;

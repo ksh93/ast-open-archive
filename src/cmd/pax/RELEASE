@@ -1,3 +1,7 @@
+00-09-20 copy.c: always allocate state.tmp.lst!
+00-08-31 change paths in delta archive: -rf i -z - -s e -wf o -z - [almost]
+00-08-11 copy.c: drop memalign() call for _std_malloc==1 in libast
+	 copy.c: save filter path from sfgetr() reset
 00-06-01 pax: fix mime format size by dropping last \r\n
 00-05-26 pax: astconf("CONFORMANCE",0,0)=="standard" inhibits some extensions
 	 pax: check USTAR file and link name lengths

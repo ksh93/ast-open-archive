@@ -1,27 +1,27 @@
-################################################################
-#                                                              #
-#           This software is part of the ast package           #
-#              Copyright (c) 1996-2000 AT&T Corp.              #
-#      and it may only be used by you under license from       #
-#                     AT&T Corp. ("AT&T")                      #
-#       A copy of the Source Code Agreement is available       #
-#              at the AT&T Internet web site URL               #
-#                                                              #
-#     http://www.research.att.com/sw/license/ast-open.html     #
-#                                                              #
-#      If you have copied this software without agreeing       #
-#      to the terms of the license you are infringing on       #
-#         the license and copyright and are violating          #
-#             AT&T's intellectual property rights.             #
-#                                                              #
-#               This software was created by the               #
-#               Network Services Research Center               #
-#                      AT&T Labs Research                      #
-#                       Florham Park NJ                        #
-#                                                              #
-#             Glenn Fowler <gsf@research.att.com>              #
-#                                                              #
-################################################################
+####################################################################
+#                                                                  #
+#             This software is part of the ast package             #
+#                Copyright (c) 1996-2000 AT&T Corp.                #
+#        and it may only be used by you under license from         #
+#                       AT&T Corp. ("AT&T")                        #
+#         A copy of the Source Code Agreement is available         #
+#                at the AT&T Internet web site URL                 #
+#                                                                  #
+#       http://www.research.att.com/sw/license/ast-open.html       #
+#                                                                  #
+#        If you have copied this software without agreeing         #
+#        to the terms of the license you are infringing on         #
+#           the license and copyright and are violating            #
+#               AT&T's intellectual property rights.               #
+#                                                                  #
+#                 This software was created by the                 #
+#                 Network Services Research Center                 #
+#                        AT&T Labs Research                        #
+#                         Florham Park NJ                          #
+#                                                                  #
+#               Glenn Fowler <gsf@research.att.com>                #
+#                                                                  #
+####################################################################
 : mm2html - convert mm/man subset to html
 
 # it keeps going and going ...
@@ -42,7 +42,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2000-05-25'
+version='mm2html (AT&T Labs Research) 2000-07-17'
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
@@ -846,6 +846,31 @@ do	getline || {
 			esac
 			;;
 		.AS|.H|.HU|.SH|.SS|.ce)
+			case $hp in
+			?*)	indent=${indent#$hp}
+				hp=
+				;;
+			esac
+			if	(( lists > pp ))
+			then	case ${type[@]:0:lists} in
+				*.[Aa][Ll]*|*.[IiTt][Pp]*)
+					while	:
+					do	case ${type[lists]} in
+						.[Aa][Ll]|.[IiTt][Pp])
+							print -rn -- "</${list[lists--]}>"
+							case ${type[lists]} in
+							.AL|.IP|.TP)break ;;
+							esac
+							;;
+						*)	break
+							;;
+						esac
+					done
+					;;
+				esac
+			fi
+			(( pp = lists ))
+			print -r -- "<P>"
 			case ${mm.title} in
 			?*)	print -r -- "<HR>"
 				case ${mm.author}${mm.keywords} in

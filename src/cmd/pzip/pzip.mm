@@ -6,10 +6,10 @@
 .TL
 AT&T Labs Research pzip command
 .H 1 Abstract
-Fixed length record data is often viewed as a waste of space,
-too sparse for production use.
-Much effort is then put into optimizing
-the data schema, and in the process complicating the data interface.
+Fixed length record data, although easy to access, is often viewed
+as a waste of space.
+Many projects go to great lengths optimizing data schemas to save space,
+but complicate the data interface in the process.
 .B pzip
 shows that in many cases this view of fixed length data is wrong.
 In fact, variable length data may become more compressible when

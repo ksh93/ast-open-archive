@@ -1,27 +1,27 @@
-################################################################
-#                                                              #
-#           This software is part of the ast package           #
-#              Copyright (c) 1996-2000 AT&T Corp.              #
-#      and it may only be used by you under license from       #
-#                     AT&T Corp. ("AT&T")                      #
-#       A copy of the Source Code Agreement is available       #
-#              at the AT&T Internet web site URL               #
-#                                                              #
-#     http://www.research.att.com/sw/license/ast-open.html     #
-#                                                              #
-#      If you have copied this software without agreeing       #
-#      to the terms of the license you are infringing on       #
-#         the license and copyright and are violating          #
-#             AT&T's intellectual property rights.             #
-#                                                              #
-#               This software was created by the               #
-#               Network Services Research Center               #
-#                      AT&T Labs Research                      #
-#                       Florham Park NJ                        #
-#                                                              #
-#             Glenn Fowler <gsf@research.att.com>              #
-#                                                              #
-################################################################
+####################################################################
+#                                                                  #
+#             This software is part of the ast package             #
+#                Copyright (c) 1996-2000 AT&T Corp.                #
+#        and it may only be used by you under license from         #
+#                       AT&T Corp. ("AT&T")                        #
+#         A copy of the Source Code Agreement is available         #
+#                at the AT&T Internet web site URL                 #
+#                                                                  #
+#       http://www.research.att.com/sw/license/ast-open.html       #
+#                                                                  #
+#        If you have copied this software without agreeing         #
+#        to the terms of the license you are infringing on         #
+#           the license and copyright and are violating            #
+#               AT&T's intellectual property rights.               #
+#                                                                  #
+#                 This software was created by the                 #
+#                 Network Services Research Center                 #
+#                        AT&T Labs Research                        #
+#                         Florham Park NJ                          #
+#                                                                  #
+#               Glenn Fowler <gsf@research.att.com>                #
+#                                                                  #
+####################################################################
 :
 # Glenn Fowler
 # AT&T Research
@@ -40,7 +40,7 @@ op=
 
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	usage=$'[-?
-@(#)crontab (AT&T Labs Research) 2000-05-22
+@(#)crontab (AT&T Labs Research) 2000-09-28
 ]
 '$USAGE_LICENSE$'
 [+NAME?crontab - schedule periodic background work]
@@ -48,7 +48,8 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	entry; a crontab entry is a list of commands and the times at which
 	they are to be executed. The new crontab entry can be input by
 	specifying \afile\a, or input from standard input if \afile\a is
-	omitted, or by using an editor, if \b--edit\b is specified.]
+	omitted, or by using an editor, if \b--edit\b is specified. The
+	actual crontab entry is maintained in the file \b$HOME/.crontab\b.]
 [+?Upon execution of a command from a crontab entry, the implementation will
 	supply a default environment, defining at least the following
 	environment variables:]{
@@ -121,6 +122,9 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	\alabel\a verbatim. Job labels are limited to 12 characters.]
 [+?Blank lines and those whose first non-blank character is "#" will
 	be ignored.]
+[+FILES]{
+	[+$HOME/.crontab?Edited per-user crontab entry file.]
+}
 [+SEE ALSO?\bat\b(1), \bbatch\b(1), \bsh\b(1)]
 '
 	;;

@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -34,6 +34,7 @@
 
 #include "pplib.h"
 #include "ppfsm.h"
+
 
 #if CPP
 
@@ -57,7 +58,7 @@ static int		hit[LAST-TERMINAL+2];
 #define CACHEIN()	do{CACHEINX();st=pp.state;}while(0)
 #define CACHEINX()	do{ip=pp.in->nextchr;}while(0)
 #define CACHEOUT()	do{CACHEOUTX();st=pp.state;}while(0)
-#define CACHEOUTX()	do{tp=op=pp.outp;if(sp)sp=op;}while(0)
+#define CACHEOUTX()	do{tp=op=pp.outp;xp=pp.oute;if(sp)sp=op;}while(0)
 #define GETCHR()	(*(unsigned char*)ip++)
 #define LASTCHR()	(*(ip-1))
 #define SKIPIN()	(ip++)
@@ -69,6 +70,10 @@ static int		hit[LAST-TERMINAL+2];
 #define SYNCOUT()	do{SYNCOUTX();pp.state=st;}while(0)
 #define SYNCOUTX()	do{if(sp)op=tp=sp;pp.outp=op;}while(0)
 #define UNGETCHR(c)	(*--ip=(c))
+
+#define PPCHECKOUT()	do{if(op>xp){{PPWRITE(PPBUFSIZ);if(pp.outbuf==pp.outb){pp.outbuf+=PPBUFSIZ;xp=pp.oute+=PPBUFSIZ;}else{pp.outbuf-=PPBUFSIZ;memcpy(pp.outbuf,xp,op-xp);xp=pp.oute-=PPBUFSIZ;op-=2*PPBUFSIZ;}}}}while(0)
+#define PPCHECKOUTSP()	do{if(op>xp){if(sp)op=sp;else{PPWRITE(PPBUFSIZ);if(pp.outbuf==pp.outb){pp.outbuf+=PPBUFSIZ;xp=pp.oute+=PPBUFSIZ;}else{pp.outbuf-=PPBUFSIZ;memcpy(pp.outbuf,xp,op-xp);xp=pp.oute-=PPBUFSIZ;op-=2*PPBUFSIZ;}}}}while(0)
+#define PPCHECKOUTTP()	do{if(op>xp){{PPWRITE(PPBUFSIZ);if(pp.outbuf==pp.outb){pp.outbuf+=PPBUFSIZ;xp=pp.oute+=PPBUFSIZ;}else{pp.outbuf-=PPBUFSIZ;memcpy(pp.outbuf,xp,op-xp);xp=pp.oute-=PPBUFSIZ;op-=2*PPBUFSIZ;}}tp=op;}}while(0)
 
 #if POOL
 
@@ -150,7 +155,6 @@ ppcpp(void)
 #if POOL
  fsm_pool:
 #endif
-	xp = pp.outbuf + PPBUFSIZ;
 #else
 	count(pplex);
 #endif
@@ -163,16 +167,7 @@ ppcpp(void)
 #endif
  fsm_start:
 #if CPP
-	if (op > xp)
-	{
-		if (sp) op = sp;
-		else
-		{
-			PPWRITE(PPBUFSIZ);
-			memcpy(pp.outbuf, xp, op - xp);
-			op -= PPBUFSIZ;
-		}
-	}
+	PPCHECKOUTSP();
 	tp = op;
 #endif
 	state = START;
@@ -1256,12 +1251,7 @@ ppcpp(void)
 							else n = xp + PPBUFSIZ - op;
 							MEMCPY(op, ip, n);
 							c -= n;
-							if (op > xp)
-							{
-								PPWRITE(PPBUFSIZ);
-								memcpy(pp.outbuf, xp, op - xp);
-								op -= PPBUFSIZ;
-							}
+							PPCHECKOUT();
 						}
 						ip = s;
 					}
@@ -1677,13 +1667,7 @@ ppcpp(void)
 		{
 			if (!sp)
 			{
-				if (op > xp)
-				{
-					PPWRITE(PPBUFSIZ);
-					memcpy(pp.outbuf, xp, op - xp);
-					op -= PPBUFSIZ;
-					tp = op;
-				}
+				PPCHECKOUTTP();
 				sp = tp;
 			}
 		}
@@ -1736,12 +1720,7 @@ ppcpp(void)
 				pp.addp = pp.addbuf;
 				memcpy(op, pp.addbuf, n);
 				op += n;
-				if (op > xp)
-				{
-					PPWRITE(PPBUFSIZ);
-					memcpy(pp.outbuf, xp, op - xp);
-					op -= PPBUFSIZ;
-				}
+				PPCHECKOUT();
 			}
 			if (pp.linesync)
 			{
@@ -1773,12 +1752,7 @@ ppcpp(void)
 		}
 		if (sp)
 		{
-			if (op > xp)
-			{
-				PPWRITE(PPBUFSIZ);
-				memcpy(pp.outbuf, xp, op - xp);
-				op -= PPBUFSIZ;
-			}
+			PPCHECKOUT();
 			sp = op;
 		}
 		goto fsm_start;
@@ -2218,7 +2192,6 @@ ppcpp(void)
 					if (n != EOB) BACKIN();
 				}
 				break;
-				error(1, "AHA splice %c", c);
 			}
 			if ((state &= ~SPLICE) >= TERMINAL)
 				goto fsm_terminal;

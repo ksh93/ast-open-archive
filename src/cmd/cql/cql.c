@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1991-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1991-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -47,7 +47,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)cql (AT&T Labs Research) 1999-11-19\n]"
+"[-?\n@(#)cql (AT&T Labs Research) 2000-09-12\n]"
 USAGE_LICENSE
 "[+NAME?cql - C query language]"
 "[+DESCRIPTION?\bcql\b applies C style expressions to flat database files."
@@ -95,8 +95,8 @@ USAGE_LICENSE
 "[w!:warn?Disable malformed data warning messages. With \b--nowarn\b malformed"
 "	records are silently repaired or discarded.]"
 "[I:include?Add \adir\a to the list of directories searched for include"
-"	and library files. To this list is added the default"
-"	\b../lib/cql\b directories on \b$PATH\b.]:[dir]"
+"	and library files. The default \b../lib/cql\b directories on \b$PATH\b"
+"	are added to this list.]:[dir]"
 "[D:debug?Set the debug trace level to \alevel\a. Higher levels produce"
 "	more output.]#[level]"
 "[T:test?Inclusive-or \amask\a into the implementation defined test mask."
@@ -722,7 +722,8 @@ main(int argc, char** argv)
 			 */
 
 			while (isspace(n = sfgetc(sfstdin)));
-			if (n == EOF) break;
+			if (n == EOF)
+				break;
 			sfungetc(sfstdin, n);
 			message((-2, ":::: parse the expressions"));
 			exexpr(prog, NiL, NiL, DELETE);
@@ -755,9 +756,7 @@ main(int argc, char** argv)
 				exit(0);
 			}
 			else if (strmatch(compiled, "*.cdb"))
-			{
 				error(3, "%s: use the cdb command to convert db files", compiled);
-			}
 			else
 			{
 				char*		name;
@@ -889,7 +888,8 @@ main(int argc, char** argv)
 								g = f->index;
 							}
 						}
-						if (state.loop[CLOSURE].body) pivot(f->hix, state.loop[CLOSURE].body);
+						if (state.loop[CLOSURE].body)
+							pivot(f->hix, state.loop[CLOSURE].body);
 						/*UNDENT...*/
 
 	do
@@ -913,13 +913,16 @@ main(int argc, char** argv)
 				h = f->hash;
 				while ((n = *g++) != hixend)
 				{
-					if (r->member[n].index > 1 || r->member[n].format.type == STRING) val.integer = strsum((field + n)->f_string, 0L);
-					else val = value(prog, NiL, r->member[n].symbol, NiL, field, -1, &state.expr);
+					if (r->member[n].index > 1 || r->member[n].format.type == STRING)
+						val.integer = strsum((field + n)->f_string, 0L);
+					else
+						val = value(prog, NiL, r->member[n].symbol, NiL, field, -1, &state.expr);
 					message((-8, "put: #2 offset=%05lld field=%d hash=0x%08llx value=%s index=%d type=%d", (Sflong_t)f->hix->offset, n, val.integer, (field + n)->f_string, r->member[n].index, r->member[n].format.type));
 					*h++ = val.integer;
 				}
 				g = f->index;
-				if (hixput(f->hix, f->hash)) break;
+				if (hixput(f->hix, f->hash))
+					break;
 			}
 			if (((kp = (Mark_t*)dtmatch(closure.member, (field + closure.parent)->f_string)) ? kp->value : 0) != (state.iteration - 1))
 				continue;
@@ -953,25 +956,29 @@ main(int argc, char** argv)
 			commit(f);
 			generate(prog, f, f->name, state.schema);
 		}
-		else hixseek(f->hix, 0L);
+		else
+			hixseek(f->hix, 0L);
 	} while (closure.selected != state.selected);
 
 						/*...INDENT*/
 					}
-					else message((-1, ":::: %s expression optimizes to constant 0", state.loop[CLOSURE].name));
+					else
+						message((-1, ":::: %s expression optimizes to constant 0", state.loop[CLOSURE].name));
 					state.schema = main_schema;
 					f = main_f;
 					r = main_r;
 				}
 			}
-			else message((-1, ":::: %s expression optimizes to constant 0", state.loop[SELECT].name));
+			else
+				message((-1, ":::: %s expression optimizes to constant 0", state.loop[SELECT].name));
 			if (!state.loop[END].body && (state.loop[END].body = exexpr(prog, state.loop[END].name, NiL, 0)))
 			{
 				state.end++;
 				exeval(prog, state.loop[END].body, state.empty);
 				state.end--;
 			}
-			if (!state.again) break;
+			if (!state.again)
+				break;
 			state.again = 0;
 			message((-2, ":::: restart the main loop"));
 			for (n = BEGIN + 1; n <= END; n++)
@@ -1000,7 +1007,8 @@ main(int argc, char** argv)
 			expr = expr->next;
 			exfreenode(prog, a->value.node);
 		}
-		if (!state.active) break;
+		if (!state.active)
+			break;
 		for (n = 0; n < elementsof(state.loop); n++)
 			if (state.loop[n].body)
 			{

@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1991-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1991-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * David Korn (algorithm)
@@ -298,7 +298,7 @@ virdir(Sfio_t* rp, const char* dir)
 			return dp;
 	if (!(sp = rp) && !(sp = sfopen(NiL, dir, "r")))
 		return 0;
-	if (sfseek(sp, (Sfoff_t)(-(VDB_LENGTH + 1)), 2) <= 0)
+	if (sfseek(sp, (Sfoff_t)(-(VDB_LENGTH + 1)), SEEK_END) <= 0)
 		goto bad;
 	if (!(s = sfgetr(sp, '\n', 0)))
 		goto bad;
@@ -313,7 +313,7 @@ virdir(Sfio_t* rp, const char* dir)
 	delimiter = s[VDB_OFFSET - 1];
 	off = strtol(s + VDB_OFFSET, NiL, 10) - sizeof(VDB_DIRECTORY);
 	eof = strtol(s + VDB_SIZE, NiL, 10);
-	if (sfseek(sp, off, 0) != off)
+	if (sfseek(sp, off, SEEK_SET) != off)
 		goto bad;
 	if (!(s = sfgetr(sp, '\n', 0)))
 		goto bad;
@@ -371,7 +371,7 @@ virdir(Sfio_t* rp, const char* dir)
 	if (!rp)
 		sfclose(sp);
 	else
-		sfseek(sp, (Sfoff_t)0, 0);
+		sfseek(sp, (Sfoff_t)0, SEEK_SET);
 	return 0;
 }
 
@@ -435,7 +435,7 @@ viropen(register Hix_t* hix, char* data, const char* primary, const char* second
 	}
 	strcpy(hix->part->name, data);
 	hix->part->stamp = st.st_mtime;
-	if (hix->part->vio.sp == sfstdin || !fstat(0, &sst) && st.st_ino == sst.st_ino && st.st_dev == sst.st_dev || sfseek(hix->part->vio.sp, (Sfoff_t)1, 0) != 1L || sfseek(hix->part->vio.sp, (Sfoff_t)0, 0) != 0L)
+	if (hix->part->vio.sp == sfstdin || !fstat(0, &sst) && st.st_ino == sst.st_ino && st.st_dev == sst.st_dev || sfseek(hix->part->vio.sp, (Sfoff_t)1, SEEK_SET) != 1L || sfseek(hix->part->vio.sp, (Sfoff_t)0, SEEK_SET) != 0L)
 	{
 		if (!S_ISREG(st.st_mode))
 		{
@@ -449,7 +449,7 @@ viropen(register Hix_t* hix, char* data, const char* primary, const char* second
 			for (fp = dp->file; fp; fp = fp->next)
 				if (virmatch(info, fp->name, i))
 				{
-					if (sfseek(hix->part->vio.sp, fp->vio.offset, 0) != fp->vio.offset)
+					if (sfseek(hix->part->vio.sp, fp->vio.offset, SEEK_SET) != fp->vio.offset)
 						return -1;
 					hix->delimiter = fp->delimiter;
 					hix->part->vio.offset = fp->vio.offset;
@@ -521,7 +521,7 @@ vioopen(Virdir_t* dp, const char* name)
 		else
 			sfsetbuf(io->vio->sp, NiL, 0);
 	}
-	if (sfseek(io->vio->sp, io->vio->offset, 0) != io->vio->offset)
+	if (sfseek(io->vio->sp, io->vio->offset, SEEK_SET) != io->vio->offset)
 		return 0;
 	message((-5, "vio: %s: offset=%lld size=%lld fd=%d", buf, (Sflong_t)io->vio->offset, (Sflong_t)io->vio->size, sffileno(io->vio->sp)));
 	return io->vio;
@@ -545,7 +545,7 @@ iogetnum(register Instruction_t* p)
 	{
 		v = p->part->index[p->id].vio;
 		n = p->position + v->offset;
-		if (sfseek(v->sp, n, 0) == n && (m = sfread(v->sp, (char*)p->base, sizeof(p->base))) >= sizeof(Number_t))
+		if (sfseek(v->sp, n, SEEK_SET) == n && (m = sfread(v->sp, (char*)p->base, sizeof(p->base))) >= sizeof(Number_t))
 		{
 			p->position += m;
 			p->data = p->base;
@@ -699,7 +699,7 @@ build(Hix_t* hix, register Index_t* x, Sfio_t* sp)
 	else
 	{
 		sfclrlock(x->vio->sp);
-		if ((offset = sftell(x->vio->sp)) < 0 || sfseek(x->vio->sp, (Sfoff_t)0, 0))
+		if ((offset = sftell(x->vio->sp)) < 0 || sfseek(x->vio->sp, (Sfoff_t)0, SEEK_SET))
 			goto bad;
 	}
 	if (!(b = newof(0, char, offset, sizeof(Number_t))))
@@ -708,7 +708,7 @@ build(Hix_t* hix, register Index_t* x, Sfio_t* sp)
 	sfset(x->vio->sp, SF_WRITE, 0);
 	if (x->flushed <= 1)
 		memcpy(b, x->buf, offset);
-	else if (sfseek(x->vio->sp, (Sfoff_t)0, 0) || sfread(x->vio->sp, b, offset) != offset || sfseek(x->vio->sp, (Sfoff_t)0, 0))
+	else if (sfseek(x->vio->sp, (Sfoff_t)0, SEEK_SET) || sfread(x->vio->sp, b, offset) != offset || sfseek(x->vio->sp, (Sfoff_t)0, SEEK_SET))
 		goto bad;
 	p = (Number_t*)b;
 	*(p + offset / sizeof(Number_t)) = 0;
@@ -1147,20 +1147,22 @@ int
 hixseek(Hix_t* hix, off_t offset)
 {
 	hix->part = hix->parts;
-	hix->offset = offset;
 	hix->size = 0;
-	while (hix->part && offset > hix->part->vio.size)
+	if (hix->offset = offset)
 	{
-		offset -= hix->part->vio.size;
-		hix->part = hix->part->next;
-	}
-	if (!hix->part)
-	{
-		hix->part = hix->parts;
-		hix->offset = offset = 0;
+		while (hix->part && offset > hix->part->vio.size)
+		{
+			offset -= hix->part->vio.size;
+			hix->part = hix->part->next;
+		}
+		if (!hix->part)
+		{
+			hix->part = hix->parts;
+			hix->offset = offset = 0;
+		}
 	}
 	offset += hix->part->vio.offset - hix->part->base;
-	return sfseek(hix->part->vio.sp, offset, 0) == offset ? 0 : -1;
+	return sfseek(hix->part->vio.sp, offset, SEEK_SET) == offset ? 0 : -1;
 }
 
 /*
@@ -1220,7 +1222,7 @@ hixclose(register Hix_t* hix)
 							else
 							{
 								message((-5, "hix: copy %s/%s", dp->name, fp->name));
-								if (sfseek(dp->sp, fp->vio.offset, 0) != fp->vio.offset || sfmove(dp->sp, sp, fp->vio.size, -1) != fp->vio.size)
+								if (sfseek(dp->sp, fp->vio.offset, SEEK_SET) != fp->vio.offset || sfmove(dp->sp, sp, fp->vio.size, -1) != fp->vio.size)
 									ERROR(hix, HIX_ERROR_INDEX_WRITE);
 							}
 							fp->vio.sp = sp;
@@ -1316,6 +1318,8 @@ hixset(register Hix_t* hix, int pos)
 			p->next = hix->free;
 			hix->free = p;
 		}
+	if (!pos)
+		hix->flags &= ~HIX_ERROR;
 	return pos;
 }
 
@@ -1408,6 +1412,7 @@ hixget(register Hix_t* hix, int partition)
 	int			v;
 	void*			r;
 
+error(-1, "AHA hixget%s%s%s", (hix->flags & HIX_ERROR) ? " ERROR" : "", (hix->flags & HIX_SCAN) ? " SCAN" : "", (hix->pc <= hix->pb) ? " hix->pc <= hix->pb" : "");
 	if ((hix->flags & (HIX_ERROR|HIX_SCAN)) || hix->pc <= hix->pb)
 	{
 		if (!hix->part)
@@ -1416,7 +1421,7 @@ hixget(register Hix_t* hix, int partition)
 		hix->offset += hix->size;
 		for (;;)
 		{
-			if (hix->offset >= (hix->part->base + hix->part->vio.size) && !hix->part->vio.sequential || !(hix->flags & HIX_SCAN) && ((hix->part->restrict && partition > hix->part->level || sfseek(hix->part->vio.sp, hix->offset + hix->part->vio.offset - hix->part->base, 0) != (hix->offset + hix->part->vio.offset - hix->part->base))))
+			if (hix->offset >= (hix->part->base + hix->part->vio.size) && !hix->part->vio.sequential || !(hix->flags & HIX_SCAN) && ((hix->part->restrict && partition > hix->part->level || sfseek(hix->part->vio.sp, hix->offset + hix->part->vio.offset - hix->part->base, SEEK_SET) != (hix->offset + hix->part->vio.offset - hix->part->base))))
 			{
 				hix->size = 0;
 				if (!(hix->part = hix->part->next))
@@ -1491,7 +1496,7 @@ hixget(register Hix_t* hix, int partition)
 			if ((hix->offset = offset) >= hix->part->base + hix->part->vio.size)
 				goto notfound;
 			offset += hix->part->vio.offset - hix->part->base;
-			if (sfseek(hix->part->vio.sp, offset, 0) != offset)
+			if (sfseek(hix->part->vio.sp, offset, SEEK_SET) != offset)
 			{
 				ERROR(hix, HIX_ERROR_DATA_SEEK);
 				goto notfound;

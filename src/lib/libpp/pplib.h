@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -209,6 +209,13 @@ struct counter				/* monitoring counters		*/
 	int		token;		/* emitted tokens		*/
 };
 
+struct pptuple				/* tuple macro			*/
+{
+	struct pptuple*	nomatch;	/* nomatch tuple		*/
+	struct pptuple*	match;		/* match tuple			*/
+	char		token[1];	/* matching token		*/
+};
+
 #define _PP_CONTEXT_PRIVATE_		/* ppglobals private context	*/ \
 	struct ppcontext* context;	/* current context		*/ \
 	long		state;		/* pp state flags		*/ \
@@ -261,6 +268,7 @@ struct counter				/* monitoring counters		*/
 	char*		addbuf;		/* ADD buffer			*/ \
 	char*		catbuf;		/* catenation buffer		*/ \
 	char*		hdrbuf;		/* HEADEREXPAND buffer		*/ \
+	char*		hidebuf;	/* pp:hide buffer		*/ \
 	char*		path;		/* full path of last #include	*/ \
 	char*		tmpbuf;		/* very temporary buffer	*/ \
 	char*		valbuf;		/* builtin macro value buffer	*/ \
@@ -303,18 +311,20 @@ struct counter				/* monitoring counters		*/
 
 #if MACKEYARGS
 #define _PP_MACRO_PRIVATE_		/* ppmacro private additions	*/ \
-	int		size;		/* body size			*/ \
+	struct pptuple*	tuple;		/* tuple macro			*/ \
 	union								   \
 	{								   \
 	char*		formal;		/* normal formals list		*/ \
 	struct ppkeyarg* key;		/* keyword formals table	*/ \
-	}		args;		/* macro args info		*/
+	}		args;		/* macro args info		*/ \
+	int		size;		/* body size			*/
 #define formals		args.formal	/* formal argument list		*/
 #define formkeys	args.key	/* formal keyword argument list	*/
 #else
 #define _PP_MACRO_PRIVATE_		/* ppmacro private additions	*/ \
-	int		size;		/* body size			*/ \
-	char*		formals;	/* formal argument list		*/
+	struct pptuple*	tuple;		/* tuple macro			*/ \
+	char*		formals;	/* formal argument list		*/ \
+	int		size;		/* body size			*/
 #endif
 
 #define _PP_DIRS_PRIVATE_		/* ppdirs private additions	*/ \
@@ -555,6 +565,18 @@ struct counter				/* monitoring counters		*/
 		debug((-7, "PUSH in=%s next=%s", ppinstr(pp.in), pptokchr(*pp.in->nextchr))); \
 	} while (0)
 
+#define PUSH_TUPLE(p,v)		\
+	do \
+	{ \
+		register struct ppinstk*	cur; \
+		PUSH(IN_MACRO, cur); \
+		cur->symbol = p; \
+		cur->nextchr = v; \
+		p->flags |= SYM_DISABLED; \
+		pp.state &= ~NEWLINE; \
+		debug((-7, "PUSH in=%s next=%s", ppinstr(pp.in), pptokchr(*pp.in->nextchr))); \
+	} while (0)
+
 #define PUSH_MULTILINE(p)		\
 	do \
 	{ \
@@ -678,19 +700,26 @@ struct ppsymkey				/* pun for SYM_KEYWORD lex val	*/
 
 #define size_t		int
 
-extern int		access(const char*, int);
 extern void*		calloc(size_t, size_t);
+extern char*		ctime(time_t*);
+extern void		free(void*);
+
+#define _PP_DELAY_	#
+
+_PP_DELAY_ ifndef O_RDONLY
+
+extern int		access(const char*, int);
 extern int		close(int);
 extern int		creat(const char*, int);
-extern char*		ctime(time_t*);
 extern void		exit(int);
-extern void		free(void*);
 extern int		link(const char*, const char*);
 extern int		open(const char*, int, ...);
 extern int		read(int, void*, int);
 extern time_t		time(time_t*);
 extern int		unlink(const char*);
 extern int		write(int, const void*, int);
+
+_PP_DELAY_ endif
 
 #else
 

@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1987-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1987-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -741,6 +741,7 @@ typedef struct				/* program state		*/
 	int		complete;	/* files completely in volume	*/
 	Convert_t	convert[SECTION_MAX];/* data/header conversion	*/
 	int		current;	/* current file[] index		*/
+	int		delta2delta;	/* -rz- -wz- : retain delta info*/
 	int		descend;	/* dir names self+descendents	*/
 	char*		destination;	/* pass mode destination dir	*/
 	dev_t		dev;		/* . device number		*/
@@ -873,6 +874,7 @@ typedef struct				/* program state		*/
 	char*		buffer;		/* temporary buffer		*/
 	long		buffersize;	/* temporary buffer size	*/
 	char*		file;		/* tmp file name		*/
+	Sfio_t*		lst;		/* temporary list stream	*/
 	Sfio_t*		str;		/* temporary string stream	*/
 	}		tmp;		/* temporary stuff		*/
 	int		uid;		/* current user id		*/

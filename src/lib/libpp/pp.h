@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -66,7 +66,7 @@
 
 #define PPBLKSIZ	1024			/* unit block size	*/
 #define PPBAKSIZ	(1*PPBLKSIZ)		/* input pushback size	*/
-#define PPBUFSIZ	(16*PPBLKSIZ)		/* io buffer size	*/
+#define PPBUFSIZ	(32*PPBLKSIZ)		/* io buffer size	*/
 #define PPTOKSIZ	((PPBUFSIZ/2)-1)	/* max token size	*/
 
 #define PPWRITE(n)	do{if(write(1,pp.outbuf,n)!=(n))pperror(ERROR_SYSTEM|3,"%s: write error",pp.outfile);pp.offset+=(n);}while(0)
@@ -75,7 +75,7 @@
 #define pppendout()	(pp.outp-pp.outbuf)
 #define ppputchar(c)	(*pp.outp++=(c))
 #define ppflushout()	do{if(pp.outp>pp.outbuf){PPWRITE(pp.outp-pp.outbuf);pp.outp=pp.outbuf;}}while(0)
-#define ppcheckout()	do{if(pp.outp>(pp.outbuf+PPBUFSIZ)){PPWRITE(PPBUFSIZ);memcpy(pp.outbuf,pp.outbuf+PPBUFSIZ,pp.outp-(pp.outbuf+PPBUFSIZ));pp.outp-=PPBUFSIZ;}}while(0)
+#define ppcheckout()	do{if(pp.outp>pp.oute){PPWRITE(PPBUFSIZ);if(pp.outbuf==pp.outb){pp.outbuf+=PPBUFSIZ;pp.oute+=PPBUFSIZ;}else{pp.outbuf-=PPBUFSIZ;memcpy(pp.outbuf,pp.oute,pp.outp-pp.oute);pp.oute-=PPBUFSIZ;pp.outp-=2*PPBUFSIZ;}}}while(0)
 
 #define ppsymget(t,n)	(struct ppsymbol*)hashlook(t,n,HASH_LOOKUP,NiL)
 #define ppsymref(t,n)	(struct ppsymbol*)hashlook(t,n,pp.truncate?HASH_LOOKUP:HASH_LOOKUP|HASH_INTERNAL,NiL)
@@ -402,8 +402,10 @@ struct ppglobals			/* globals accessed by pp.*	*/
 
 	/* exposed for the output macros */
 
+	char*		outb;		/* output buffer base		*/
 	char*		outbuf;		/* output buffer		*/
 	char*		outp;	    	/* outbuf pointer		*/
+	char*		oute;	    	/* outbuf end			*/
 	unsigned long	offset;		/* output offset		*/
 
 #ifdef _PP_CONTEXT_PUBLIC_

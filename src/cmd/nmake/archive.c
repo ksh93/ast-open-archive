@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1984-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1984-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -137,6 +137,7 @@ struct symbol_V0
 #define TERM_port	'/'
 #define ENDHDR_port	"`\n"
 #define SENDHDR_port	2
+#define HIDDEN_port	"#+([0-9])"
 #define SYMDIR_port	"(/ |/*/|_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*"
 #define SYMDIR_other	"(._|_.|__.|___)*"
 #define SYMDIR_age	5
@@ -157,6 +158,7 @@ struct header_port
 #define TERM_rand	' '
 #define SYMDIR_rand	"(__.SYMDEF|__________E???X)*"
 #define SYMDIR_strict	"__.SYMDEF SORTED*"
+#define HIDDEN_rand	"#+([0-9])"
 #define UPDATE_rand	"$(RANLIB) $(<)"
 
 #define NAME_aix	"aix"
@@ -191,9 +193,43 @@ struct member_aix
 	}	_ar_name;
 };
 
+#define NAME_aixbig	"aixbig"
+#define TYPE_aixbig	6
+#define MAGIC_aixbig	"<bigaf>\n"
+#define MSIZE_aixbig	8
+
+struct header_aixbig
+{
+	char	fl_magic[MSIZE_aixbig];
+	char	fl_memoff[20];	
+	char	fl_gstoff[20];
+	char	fl_gst64off[20];
+	char	fl_fstmoff[20];
+	char	fl_lstmoff[20];
+	char	fl_freeoff[20];
+};
+
+struct member_aixbig
+{
+	char	ar_size[20];
+	char	ar_nxtmem[20];
+	char	ar_prvmem[20];
+	char	ar_date[12];
+	char	ar_uid[12];
+	char	ar_gid[12];
+	char	ar_mode[12];
+	char	ar_namlen[4];
+	union
+	{
+		char	ar_name[2];
+		char	ar_fmag[2];
+	}	_ar_name;
+};
+
 union header_data
 {
 	struct header_aix	aix;
+	struct header_aixbig	aixbig;
 	struct header_pdp	pdp;
 	struct header_port	port;
 	struct header_V0	V0;
@@ -208,6 +244,7 @@ union header
 union magic_data
 {
 	char			aix[MSIZE_aix];
+	char			aixbig[MSIZE_aix];
 	unsigned int_2		pdp;
 	char			port[MSIZE_port];
 	char			V0[MSIZE_V0];
@@ -222,6 +259,7 @@ union magic
 union member_data
 {
 	struct member_aix	aix;
+	struct member_aixbig	aixbig;
 	struct member_V0	V0;
 };
 
@@ -373,6 +411,20 @@ openar(register char* name, char* mode)
 		if (sfsscanf(header.data.aix.fl_fstmoff, "%ld", &ar->first) != 1)
 			goto local;
 		if (sfsscanf(header.data.aix.fl_memoff, "%ld", &ar->last) != 1)
+			goto local;
+		return arfd;
+	}
+	if (streq(magic.data.aixbig, MAGIC_aixbig))
+	{
+		ar->type = TYPE_aixbig;
+		if (sfseek(ar->fp, (Sfoff_t)0, 0) < 0 || sfread(ar->fp, (char*)&header.data.aixbig, sizeof(header.data.aixbig)) != sizeof(header.data.aixbig))
+			goto local;
+		header.term[sizeof(header.data.aixbig)] = 0;
+		if (sfsscanf(header.data.aixbig.fl_gstoff, "%ld", &ar->sym_offset) != 1)
+			goto local;
+		if (sfsscanf(header.data.aixbig.fl_fstmoff, "%ld", &ar->first) != 1)
+			goto local;
+		if (sfsscanf(header.data.aixbig.fl_memoff, "%ld", &ar->last) != 1)
 			goto local;
 		return arfd;
 	}
@@ -596,7 +648,7 @@ walkar(struct dir* d, int arfd, char* name)
 					op = "date field";
 					break;
 				}
-				if (date > ar->time)
+				if (date > ar->time && !strmatch(mem, HIDDEN_port))
 				{
 					error(1, "member %s is newer than archive %s", mem, name);
 					date = ar->time;
@@ -717,6 +769,88 @@ walkar(struct dir* d, int arfd, char* name)
 				ntouched--;
 			}
 			if (sfsscanf(member.data.aix.ar_nxtmem, "%ld", &offset) != 1)
+			{
+				op = "next member offset";
+				break;
+			}
+		}
+		break;
+	case TYPE_aixbig:
+		*(mem = buf) = 0;
+		offset = ar->first;
+		header.term[sizeof(header.data.aixbig)] = 0;
+		for (;;)
+		{
+			if (offset >= ar->last)
+				return 0;
+			if (sfseek(ar->fp, (Sfoff_t)offset, 0) < 0)
+				break;
+			if (sfread(ar->fp, (char*)&member.data.aixbig, sizeof(member.data.aixbig)) != sizeof(member.data.aixbig))
+			{
+				if (!sferror(ar->fp))
+					return 1;
+				else
+				{
+					op = "read";
+					break;
+				}
+			}
+			member.term[sizeof(member.data.aixbig)] = 0;
+			if (sfsscanf(member.data.aixbig.ar_namlen, "%d", &len) != 1)
+			{
+				op = "name length";
+				break;
+			}
+			strncpy(mem, member.data.aixbig._ar_name.ar_name, 2);
+			if (len > 2)
+			{
+				if (sfread(ar->fp, mem + 2, len - 2) != len - 2)
+				{
+					op = "name read";
+					break;
+				}
+				if (sfseek(ar->fp, -(Sfoff_t)(len - 2), 1) < 0)
+				{
+					op = "name seek";
+					break;
+				}
+			}
+			mem[len] = 0;
+			if (d)
+			{
+				if (sfsscanf(member.data.aixbig.ar_date, "%lu", &date) != 1)
+				{
+					op = "date field";
+					break;
+				}
+				if (date > ar->time)
+				{
+					error(1, "member %s is newer than archive %s", mem, name);
+					date = ar->time;
+				}
+				addfile(d, mem, date);
+			}
+			else if ((r = getrule(mem)) && r->status == TOUCH)
+			{
+				char	tm[13];
+
+				r->status = EXISTS;
+				staterule(RULE, r, NiL, 1)->time = r->time = CURTIME;
+				state.savestate = 1;
+				sfsprintf(tm, sizeof(tm), "%-12lu", r->time);
+				strncpy(member.data.aixbig.ar_date, tm, 12);
+				if (sfseek(ar->fp, -(Sfoff_t)sizeof(member.data.aixbig), 1) < 0)
+					break;
+				if (sfwrite(ar->fp, (char*)&member.data.aixbig, sizeof(member.data.aixbig)) != sizeof(member.data.aixbig))
+				{
+					op = "write";
+					break;
+				}
+				if (!state.silent)
+					error(0, "touch %s/%s", name, mem);
+				ntouched--;
+			}
+			if (sfsscanf(member.data.aixbig.ar_nxtmem, "%ld", &offset) != 1)
 			{
 				op = "next member offset";
 				break;

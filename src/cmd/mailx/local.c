@@ -74,13 +74,21 @@ char*
 username(void)
 {
 	register char*	s;
+	register char*	t;
 	struct passwd*	pw;
 
-	if ((s = getenv("USER")) && *s || (s = getenv("LOGIN")) && *s)
-		return s;
-	if (pw = getpwuid(getuid()))
-		return pw->pw_name;
-	return 0;
+	if ((!(s = getenv("USER")) || !*s) &&
+	    (!(s = getenv("LOGIN")) || !*s) &&
+	    (pw = getpwuid(getuid())))
+		s = pw->pw_name;
+	if (s)
+	{
+		if (t = strrchr(s, '/'))
+			s = t + 1;
+		if (!*s)
+			s = 0;
+	}
+	return s;
 }
 
 /*

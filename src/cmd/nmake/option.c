@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1984-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1984-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -83,6 +83,16 @@ static struct option	options[] =	/* option table			*/
 	"Force makefile compilation.", 0,
 "compatibility",OPT_compatibility,(char*)&state.compatibility,	0,0,
 	"(obsolete) Enable compatibility messages.", 0,
+"corrupt|mismatch",OPT_corrupt,	(char*)&state.corrupt,		0,0,
+	"\aaction\a determines the action to take for corrupt or invalid"
+	" top view state files. \baccept\b is assumed if \aaction\a is"
+	" omitted. The top view default is \berror\b and the lower view"
+	" default is \baccept\b. \aaction\a may be one of:]:?[action]",
+	"{"
+	"	[+accept?print a warning and set \b--accept\b]"
+	"	[+error?print a diagnostic and exit]"
+	"	[+ignore?print a warning and set \b--noreadstate\b]"
+	"}",
 "debug",	OPT_debug,	0,				0,0,
 	"Set the debug trace level to \alevel\a. Higher levels produce"
 	" more output.", "level",
@@ -146,9 +156,6 @@ static struct option	options[] =	/* option table			*/
 		"[+port?used by the base rules to generate portable"
 		" makefiles; some paths are parameterized]"
 	"}",
-"mismatch",	OPT_mismatch,	(char*)&state.mismatch,		0,0,
-	"Accept filesystem state if state file version mismatches. Only"
-	" needed for state files generated before 1992-08-11.", 0,
 "never",	OPT_never,	(char*)&state.never,		0,0,
 	"Don't execute any shell actions. \b--noexec\b executes \b.ALWAYS\b"
 	" shell actions.", 0,
@@ -475,7 +482,7 @@ setop(register struct option* op, register int n, char* s)
 		else n = !n;
 	}
 	else if (op->flag & Ob) n = n != 0;
-	else if ((op->flag & Os) && n && !s)
+	else if ((op->flag & (Os|Ov)) == Os && n && !s)
 		error(3, "-%c: option argument expected", OPT(op->flag));
 	if (!n) s = 0;
 	switch (OPT(op->flag))
@@ -486,6 +493,21 @@ setop(register struct option* op, register int n, char* s)
 		return;
 	case OPT(OPT_byname):
 		if (s) set(s);
+		return;
+	case OPT(OPT_corrupt):
+		if (!s)
+			s = "-";
+		if ((*s == *(state.corrupt = "accept") || *s == '-') && (!*(s + 1) || !strcmp(s, state.corrupt)))
+			;
+		else if (*s == *(state.corrupt = "error") && (!*(s + 1) || !strcmp(s, state.corrupt)))
+			state.corrupt = 0;
+		else if (*s == *(state.corrupt = "ignore") && (!*(s + 1) || !strcmp(s, state.corrupt)))
+			;
+		else
+		{
+			state.corrupt = 0;
+			error(2, "%s: invalid corrupt action", s);
+		}
 		return;
 	case OPT(OPT_include):
 		addprereq(catrule(internal.source->name, external.source, NiL, 1), makerule(s), PREREQ_APPEND);

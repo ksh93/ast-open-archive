@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -196,7 +196,7 @@ macsym(int tok)
  */
 
 static char*
-getline(register char* p, char* x, int sep)
+getline(register char* p, char* x, int sep, int disable)
 {
 	register int	c;
 	register char*	s;
@@ -211,6 +211,19 @@ getline(register char* p, char* x, int sep)
 	last = 0;
 	while ((c = pplex()) != '\n')
 	{
+		if (disable)
+		{
+			if (c == ' ')
+				/*ignore*/;
+			else if (disable == 1)
+				disable = (c == T_ID && streq(pp.token, pp.pass)) ? 2 : 0;
+			else
+			{
+				disable = 0;
+				if (c == ':')
+					pp.state |= DISABLE;
+			}
+		}
 		if (c != ' ' || last == T_ID || ppisnumber(last))
 		{
 			if (last == ' ')
@@ -296,6 +309,9 @@ ppcontrol(void)
 	int				o;
 	int				directive;
 	long				restore;
+	struct pptuple*			rp;
+	struct pptuple*			tp;
+	char*				v;
 
 	union
 	{
@@ -525,7 +541,7 @@ ppcontrol(void)
 	*p++ = '#';
 	STRCOPY(p, pp.token, s);
 	p0 = p;
-	if (!(p6 = getline(p, &pp.valbuf[MAXTOKEN], -1)))
+	if (!(p6 = getline(p, &pp.valbuf[MAXTOKEN], -1, 0)))
 	{
 		*p0 = 0;
 		error(2, "%s: directive too long", pp.valbuf);
@@ -564,7 +580,7 @@ ppcontrol(void)
 		{
 			*p6++ = '\n';
 			s = p6;
-			if (!(p6 = getline(p6, &pp.valbuf[MAXTOKEN], 0)))
+			if (!(p6 = getline(p6, &pp.valbuf[MAXTOKEN], 0, 0)))
 			{
 				*p0 = 0;
 				error(2, "%s: nesting directive too long", pp.valbuf);
@@ -681,16 +697,30 @@ ppcontrol(void)
 #endif
 		case DEFINE:
 			n2 = error_info.line;
-			if ((c = pplex()) == '#' && directive == DEFINE) goto assertion;
-			if (!(sym = macsym(c))) goto eatdirective;
-			if (pp.truncate) ppfsm(FSM_MACRO, pp.token);
+			if ((c = pplex()) == '#' && directive == DEFINE)
+				goto assertion;
+			if (c == '<')
+			{
+				n = 1;
+				c = pplex();
+			}
+			else
+				n = 0;
+			if (!(sym = macsym(c)))
+				goto eatdirective;
+			if (pp.truncate)
+				ppfsm(FSM_MACRO, pp.token);
 			mac = sym->macro;
-			if ((pp.option & ALLPOSSIBLE) && !pp.in->prev->prev && mac->value) goto eatdirective;
+			if ((pp.option & ALLPOSSIBLE) && !pp.in->prev->prev && mac->value)
+				goto eatdirective;
+			if (n)
+				goto tuple;
 			old = *mac;
 			i0 = sym->flags;
 			sym->flags &= ~(SYM_BUILTIN|SYM_EMPTY|SYM_FINAL|SYM_FUNCTION|SYM_INIT|SYM_INITIAL|SYM_MULTILINE|SYM_NOEXPAND|SYM_PREDEFINED|SYM_REDEFINE|SYM_VARIADIC);
 #if MACDEF
-			if (directive == MACDEF) sym->flags |= SYM_MULTILINE;
+			if (directive == MACDEF)
+				sym->flags |= SYM_MULTILINE;
 #endif
 			mac->arity = 0;
 			mac->formals = 0;
@@ -1336,6 +1366,63 @@ ppcontrol(void)
 				goto eatdirective;
 			}
 			break;
+		tuple:
+			pp.state |= DEFINITION|NOEXPAND|NOSPACE;
+			rp = 0;
+			tp = mac->tuple;
+			if (!tp && !mac->value)
+				ppfsm(FSM_MACRO, sym->name);
+			while ((c = pplex()) && c != '>' && c != '\n')
+			{
+				for (; tp; tp = tp->nomatch)
+					if (streq(tp->token, pp.token))
+						break;
+				if (!tp)
+				{
+					if (!(tp = newof(0, struct pptuple, 1, strlen(pp.token))))
+						error(3, "out of space");
+					strcpy(tp->token, pp.token);
+					if (rp)
+					{
+						tp->nomatch = rp;
+						rp->nomatch = tp;
+					}
+					else
+					{
+						tp->nomatch = mac->tuple;
+						mac->tuple = tp;
+					}
+				}
+				rp = tp;
+				tp = tp->match;
+			}
+			pp.state &= ~NOSPACE;
+			if (!rp || c != '>')
+				error(2, "%s: > omitted in tuple macro definition", sym->name);
+			else
+			{
+				n = 2 * MAXTOKEN;
+				p = v = oldof(0, char, 0, n);
+				while ((c = pplex()) && c != '\n')
+					if (p > v || c != ' ')
+					{
+						STRCOPY(p, pp.token, s);
+						if (p > &v[n - MAXTOKEN] && (s = newof(v, char, n += MAXTOKEN, 0)) != v)
+						{
+							c = p - v;
+							v = s;
+							p = v + c;
+						}
+					}
+				while (p > v && *(p - 1) == ' ')
+					p--;
+				n = p - v;
+				tp = newof(0, struct pptuple, 1, n);
+				strcpy(tp->token, v);
+				tp->match = rp->match;
+				rp->match = tp;
+			}
+			goto benign;
 		case WARNING:
 			if ((pp.state & STRICT) && !(pp.mode & (HOSTED|RELAX)))
 				error(1, "#%s: non-standard directive", pp.token);
@@ -1516,7 +1603,7 @@ ppcontrol(void)
 			/*
 			 * #pragma [STDC] [pass:] [no]option [arg ...]
 			 *
-			 * pragma args are expanded
+			 * pragma args are not expanded by default
 			 *
 			 * if STDC is present then it is silently passed on
 			 *
@@ -1543,7 +1630,9 @@ ppcontrol(void)
 			*p++ = '#';
 			STRCOPY(p, pp.token, s);
 			p0 = p;
-			if (!(p6 = getline(p, &pp.valbuf[MAXTOKEN], -1)))
+			if (pp.option & PRAGMAEXPAND)
+				pp.state &= ~DISABLE;
+			if (!(p6 = getline(p, &pp.valbuf[MAXTOKEN], -1, !!(pp.option & PRAGMAEXPAND))))
 			{
 				*p0 = 0;
 				error(2, "%s: directive too long", pp.valbuf);
@@ -1973,6 +2062,9 @@ ppcontrol(void)
 			case X_PLUSSPLICE:
 				setoption(PLUSSPLICE, i0);
 				break;
+			case X_PRAGMAEXPAND:
+				setoption(PRAGMAEXPAND, i0);
+				break;
 			case X_PREDEFINED:
 				setoption(PREDEFINED, i0);
 				break;
@@ -2005,6 +2097,9 @@ ppcontrol(void)
 #else
 				error(1, "preprocessor not compiled with prototype conversion enabled");
 #endif
+				break;
+			case X_PROTO:
+				setoption(NOPROTO, !i0);
 				break;
 			case X_QUOTE:
 				tokop(PP_QUOTE, p3, p, i0, TOKOP_UNSET|TOKOP_STRING);

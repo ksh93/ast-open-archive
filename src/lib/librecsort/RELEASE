@@ -1,3 +1,4 @@
+00-08-31 rskey.c: fix code() buffer off by one (too far)
 00-03-17 rskey.c: consult RLIMIT_DATA for size limits
 00-01-25 rskey.c: win32.i386 optimizer generates bad code for key_n_code
 99-11-19 rskeylist.c: add usage

@@ -1,3 +1,28 @@
+00-10-31 option: --corrupt={accept|error|ignore}, --mismatch => --corrupt
+	 makerules: req file must be seen at of before the lib
+	 makerules: fix AWK and NAWK default definitions
+	 makerules: physical=1 => 2d iff in 3d
+	 pkg-tcl.mk: add CC.DLL, don't clobber TCLROOT
+00-10-28 makerules: drop MAKEFILES filter on .SELECT. (why was it there?)
+00-10-26 make.c: fix .JOINT sync bug
+	 makerules: add $(PACKAGES expr) and :VARIANT: rhs expr
+	 expand.c: add :T=F[BCFLPR]: to test file type
+	 makerules: cut down the number of --mam -L options for .req
+00-10-25 makerules: set +x => set -
+	 makerules: add set - to .req MAM action for zsh
+00-10-24 makerules: add :PACKAGE: name:lib=lib:include=include name:command
+	 makerules: add :VARIANT: to cc-%
+00-10-18 C+probe: mac os10 additions
+	 add cc.darwin.ppc for max os10
+00-10-16 object.c: don't compile makefile prereqs if state.base
+00-10-12 misc.c: add %x and %X formats to printf extension
+00-10-04 makerules: fix bug that passed -I- to non--I- CC
+00-10-03 makerules: add :YYPREFIX:
+00-09-21 expand.c: add libxxx and xxx to makefile ordered prereqs
+00-09-07 makerules: handle rhs a=b in :LIBRARY:
+00-08-11 archive.c: add aix <bigaf> archive format
+	 bind.c: add glob() gl_intr check
+00-07-17 makerules: fix $(cctype) freeze in makerules.mo
 00-06-20 makerules: mam_lib_* always checks lib/lib/* file
 00-06-19 makerules: generate dll in lib.so/libNN.dll
 00-06-01 main,state: a few _UWIN tweaks for W98 FAT

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
@@ -36,8 +36,6 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_pz_LIB}/package/ast.lic
-done ${PACKAGE_pz_LIB}/package/ast.lic
 make install
 make pzip
 make pzip.o

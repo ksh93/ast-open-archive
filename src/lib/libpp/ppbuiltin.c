@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -50,6 +50,7 @@ ppbuiltin(void)
 	int			n;
 	int			op;
 	char*			token;
+	char*			t;
 	long			number;
 	struct ppinstk*		in;
 	struct pplist*		list;
@@ -215,7 +216,7 @@ ppbuiltin(void)
 			break;
 		case V_STDC:
 			p = pp.valbuf;
-#if __sun__ || __sun || sun
+#if __sun__ || __sun || sun || _UWIN
 			p[0] = ((pp.state & (COMPATIBILITY|TRANSITION)) || (pp.mode & HOSTED)) ? '0' : '1';
 #else
 			p[0] = (pp.state & (COMPATIBILITY|TRANSITION)) ? '0' : '1';
@@ -277,6 +278,78 @@ ppbuiltin(void)
 			if (c != ')')
 				error(2, "%s: (\"...\") expected", p);
 			return;
+		case V_FUNCTION:
+
+#define BACK(a,p)	((a>p)?*--a:(number++?0:((p=pp.outbuf+PPBUFSIZ),(a=pp.outbuf+2*PPBUFSIZ),*--a)))
+#define PEEK(a,p)	((a>p)?*(a-1):(number?0:*(pp.outbuf+2*PPBUFSIZ-1)))
+
+			number = pp.outbuf == pp.outb;
+			a = pp.outp;
+			p = pp.outb;
+			op = 0;
+			while (c = BACK(a, p))
+			{
+				if (c == '"' || c == '\'')
+				{
+					op = 0;
+					while ((n = BACK(a, p)) && n != c || PEEK(a, p) == '\\');
+				}
+				else if (c == '\n')
+				{
+					token = a;
+					while (c = BACK(a, p))
+						if (c == '\n')
+						{
+							a = token;
+							break;
+						}
+						else if (c == '#' && PEEK(a, p) == '\n')
+							break;
+				}
+				else if (c == ' ')
+					/*ignore*/;
+				else if (c == '{') /* '}' */
+					op = 1;
+				else if (op == 1)
+				{
+					if (c == ')')
+					{
+						op = 2;
+						n = 1;
+					}
+					else
+						op = 0;
+				}
+				else if (op == 2)
+				{
+					if (c == ')')
+						n++;
+					else if (c == '(' && !--n)
+						op = 3;
+				}
+				else if (op == 3)
+				{
+					if (ppisidig(c))
+					{
+						for (t = p, token = a; ppisidig(PEEK(a, p)); a--);
+						for (p = pp.valbuf + 1; a <= token; *p++ = *a++);
+						*p = 0;
+						p = pp.valbuf + 1;
+						if (streq(p, "for") || streq(p, "if") || streq(p, "switch") || streq(p, "while"))
+						{
+							op = 0;
+							p = t;
+							continue;
+						}
+					}
+					else
+						op = 0;
+					break;
+				}
+			}
+			if (op != 3)
+				p = "__FUNCTION__";
+			break;
 		default:
 			if (pp.builtin && (a = (*pp.builtin)(pp.valbuf, p, a)))
 				p = a;

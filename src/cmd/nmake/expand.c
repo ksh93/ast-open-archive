@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1984-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*      If you have copied this software without agreeing       *
-*      to the terms of the license you are infringing on       *
-*         the license and copyright and are violating          *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1984-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -987,8 +987,11 @@ order(Sfio_t* xp, register char* s, char* val)
 								k = 0;
 								break;
 							}
-					if (k && (q = (struct rule*)hashget(tab, t)) && (q->mark & M_mark) && q != r)
-						addprereq(r, q, PREREQ_APPEND);
+					if (k)
+					{
+						if ((q = (struct rule*)hashget(tab, t)) && (q->mark & M_mark) && q != r || t[0] == 'l' && t[1] == 'i' && t[2] == 'b' && t[3] && (q = (struct rule*)hashget(tab, t + 3)) && (q->mark & M_mark) && q != r)
+							addprereq(r, q, PREREQ_APPEND);
+					}
 					j = i;
 				}
 			}
@@ -1700,6 +1703,47 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 				sfstrclose(tmp);
 		}
 		return;
+	case 'F':
+		if (!*ops)
+		{
+			matched = (op == tst);
+			break;
+		}
+		if (tst != 'F' || lstat(r->name, &st))
+		{
+			matched = 0;
+			break;
+		}
+		op = *ops;
+		if (islower(op))
+			op = toupper(op);
+		switch (op)
+		{
+		case 'B':
+			matched = S_ISBLK(st.st_mode);
+			break;
+		case 'C':
+			matched = S_ISCHR(st.st_mode);
+			break;
+		case 'D':
+			matched = S_ISDIR(st.st_mode);
+			break;
+		case 'F':
+		case 'R':
+		case '-':
+			matched = S_ISREG(st.st_mode);
+			break;
+		case 'L':
+			matched = S_ISLNK(st.st_mode);
+			break;
+		case 'P':
+			matched = S_ISFIFO(st.st_mode);
+			break;
+		default:
+			error(2, "%c: unknown file type op", op);
+			break;
+		}
+		break;
 	case 'G':
 		if (tst != 'F' || (r->property & (P_target|P_terminal)) == P_terminal)
 		{
@@ -2304,7 +2348,7 @@ shquote(register Sfio_t* xp, char* s)
 				break;
 			continue;
 		case '=':
-			if (!b && *(b = t) == '=')
+			if (!q && !b && *(b = t) == '=')
 				b++;
 			continue;
 		default:

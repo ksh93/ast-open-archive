@@ -163,11 +163,10 @@ grabedit(struct header* hp, unsigned long type)
 				continue;
 			}
 			strcpy(buf, s);
-			if ((r = ttyedit(0, 1, lp->name, buf, sizeof(buf))) >= 0)
-				s = buf;
-			extract(hp, lp->type, s);
-			if (r < 0)
+			if ((r = ttyedit(0, 1, lp->name, buf, sizeof(buf))) < 0)
 				break;
+			headclear(hp, lp->type);
+			extract(hp, lp->type, buf);
 		}
 	if (saveint != SIG_DFL)
 		signal(SIGINT, saveint);

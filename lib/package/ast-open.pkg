@@ -1,7 +1,7 @@
 ast-open ast-base ast-ksh :PACKAGE: \
 		ksh93 pax html proto bzip libast libcmd libdll libexpr \
-		libodelta librecsort libuu libvdelta libbz libz tests \
-		3d coshell cpp cs gmake mam msgcc nmake probe ss \
+		libodelta librecsort libsum libuu libvdelta libbz libz tests \
+		3d coshell cpp cs mam msgcc nmake probe ss \
 		libcoshell libcs libmam libpp \
 		at builtin cql diff ie mailx mam ncsl pack pzip \
 		re sort std tksh tw warp libcdb libpz libtk

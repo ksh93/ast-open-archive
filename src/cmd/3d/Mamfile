@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -33,12 +33,11 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make 3d
 make lib3d.a archive
 make 3d.req
+exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
 exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
 exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
@@ -51,7 +50,7 @@ exec - do	case $i in
 exec - 	"3d"|3d)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}    -L. ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
@@ -74,8 +73,8 @@ make FEATURE/syslib implicit
 make features/syslib
 done features/syslib
 prev 3d.req
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/syslib
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${INSTALLROOT}/lib/libast.a}`
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -I/usr/common/ast/include ${mam_libast} ${mam_libast} : run features/syslib
 done FEATURE/syslib dontcare generated
 make FEATURE/syscall implicit
 make features/syscall.sh
@@ -83,135 +82,135 @@ make sys.tab implicit
 done sys.tab
 done features/syscall.sh
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/syscall.sh sys.tab
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -I/usr/common/ast/include ${mam_libast} ${mam_libast} : run features/syscall.sh sys.tab
 done FEATURE/syscall dontcare generated
 make FEATURE/peek implicit
 make features/peek.c
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/ast/re_comp.h implicit
+make ${INSTALLROOT}/include/ast/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_tty.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h
+done ${INSTALLROOT}/include/ast/prototyped.h dontcare
+done ${INSTALLROOT}/include/ast/re_comp.h dontcare
+make ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/getopt.h dontcare
+make ${INSTALLROOT}/include/ast/ast_tty.h implicit
+done ${INSTALLROOT}/include/ast/ast_tty.h dontcare
+make ${INSTALLROOT}/include/ast/ast_lib.h implicit
+done ${INSTALLROOT}/include/ast/ast_lib.h
 done features/peek.c
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/peek.c
+exec - iffe -v -c '${CC} ${CCFLAGS}  -I${INSTALLROOT}/include/ast  ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -I/usr/common/ast/include ${mam_libast} ${mam_libast} : run features/peek.c
 done FEATURE/peek dontcare generated
 make vcs_3d.h implicit
 done vcs_3d.h dontcare
 make ../../lib/libcs/msg.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
+make ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_botch.h implicit
+done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
+make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
+done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
+make ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_mode.h implicit
+done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
+make ${INSTALLROOT}/include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ls.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
+make ${INSTALLROOT}/include/ast/ast_types.h implicit
+done ${INSTALLROOT}/include/ast/ast_types.h dontcare
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+make ${INSTALLROOT}/include/ast/limits.h implicit
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
+done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+prev ${INSTALLROOT}/include/ast/ast_lib.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_std.h dontcare
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+make ${INSTALLROOT}/include/ast/ast_version.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_version.h dontcare
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast.h dontcare
 done ../../lib/libcs/msg.h dontcare
-make ${PACKAGE_ast_INCLUDE}/fs3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/fs3d.h dontcare
-make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
-done ${PACKAGE_ast_INCLUDE}/dlldefs.h dontcare
-make ${PACKAGE_ast_INCLUDE}/hashkey.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/hashkey.h dontcare
-make ${PACKAGE_ast_INCLUDE}/debug.h implicit
-make ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/option.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/option.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/error.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/debug.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/times.h dontcare
-make ${PACKAGE_ast_INCLUDE}/sig.h implicit
-done ${PACKAGE_ast_INCLUDE}/sig.h dontcare
-make ${PACKAGE_ast_INCLUDE}/int.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/int.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${INSTALLROOT}/include/ast/fs3d.h implicit
+prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/fs3d.h dontcare
+make ${INSTALLROOT}/include/ast/dlldefs.h implicit
+done ${INSTALLROOT}/include/ast/dlldefs.h dontcare
+make ${INSTALLROOT}/include/ast/hashkey.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashkey.h dontcare
+make ${INSTALLROOT}/include/ast/debug.h implicit
+make ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/option.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/option.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/error.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/debug.h dontcare
+prev ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/times.h dontcare
+make ${INSTALLROOT}/include/ast/sig.h implicit
+done ${INSTALLROOT}/include/ast/sig.h dontcare
+make ${INSTALLROOT}/include/ast/int.h implicit
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/int.h dontcare
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 make lib_3d.h implicit
 prev std_3d.h implicit
 make dll_3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
+prev ${INSTALLROOT}/include/ast/dlldefs.h implicit
 prev lib_3d.h implicit
 done dll_3d.h dontcare
 make cs_3d.h implicit
 done cs_3d.h dontcare
 make ast_3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+prev ${INSTALLROOT}/include/ast/ast_lib.h implicit
 done ast_3d.h dontcare
 done lib_3d.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done 3d.h
 done init.c
 prev init.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DIDNAME=\""3d"\" -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c init.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DIDNAME=\""3d"\" -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c init.c
 done init.o generated
 make bio.o
 make bio.c
 prev 3d.h implicit
 done bio.c
 prev bio.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c bio.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c bio.c
 done bio.o generated
 make copy.o
 make copy.c
@@ -220,83 +219,83 @@ done mman.h dontcare virtual
 prev 3d.h implicit
 done copy.c
 prev copy.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c copy.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c copy.c
 done copy.o generated
 make error.o
 make error.c
 prev 3d.h implicit
 done error.c
 prev error.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -DVCS -DFS -D_PACKAGE_ast -c error.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -DVCS -DFS -D_PACKAGE_ast -c error.c
 done error.o generated
 make execv.o
 make execv.c
 prev 3d.h implicit
 done execv.c
 prev execv.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c execv.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c execv.c
 done execv.o generated
 make fs.o
 make fs.c
-make ${PACKAGE_ast_INCLUDE}/cs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/times.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_cs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_cs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/cs.h dontcare
+make ${INSTALLROOT}/include/ast/cs.h implicit
+prev ${INSTALLROOT}/include/ast/times.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/hashpart.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashpart.h dontcare
+make ${INSTALLROOT}/include/ast/ast_cs.h implicit
+done ${INSTALLROOT}/include/ast/ast_cs.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/cs.h dontcare
 prev 3d.h implicit
 done fs.c
 prev fs.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c fs.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c fs.c
 done fs.o generated
 make lib.o
 make lib.c
-prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${INSTALLROOT}/include/ast/cs.h implicit
 prev 3d.h implicit
 done lib.c
 prev lib.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -D_PACKAGE_ast -DVCS -c lib.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DDEBUG -D_PACKAGE_ast -DVCS -c lib.c
 done lib.o generated
 make map.o
 make map.c
 prev 3d.h implicit
 done map.c
 prev map.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG_TABLE=0 -DPATHCHECK=\""3d"\" -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c map.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG_TABLE=0 -DPATHCHECK=\""3d"\" -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c map.c
 done map.o generated
 make pathcanon.o
 make pathcanon.c
 prev 3d.h implicit
 done pathcanon.c
 prev pathcanon.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c pathcanon.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c pathcanon.c
 done pathcanon.o generated
 make pathnext.o
 make pathnext.c
 prev 3d.h implicit
 done pathnext.c
 prev pathnext.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c pathnext.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c pathnext.c
 done pathnext.o generated
 make pathreal.o
 make pathreal.c
 prev 3d.h implicit
 done pathreal.c
 prev pathreal.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c pathreal.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c pathreal.c
 done pathreal.o generated
 make peek.o
 make peek.c
-prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${INSTALLROOT}/include/ast/cs.h implicit
 prev 3d.h implicit
 done peek.c
 prev peek.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c peek.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c peek.c
 done peek.o generated
 make ast.o
 make ast.c
@@ -307,71 +306,71 @@ make FEATURE/hack implicit
 make ../../lib/libast/features/hack
 done ../../lib/libast/features/hack
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run ../../lib/libast/features/hack
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -I/usr/common/ast/include ${mam_libast} ${mam_libast} : run ../../lib/libast/features/hack
 done FEATURE/hack generated
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/comp/gross.c
 make ../../lib/libast/comp/spawnveg.c implicit
 make vfork.h implicit
 done vfork.h dontcare virtual
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/comp/spawnveg.c
 make ../../lib/libast/comp/spawnve.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/comp/spawnve.c
 make ../../lib/libast/path/pathshell.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/path/pathshell.c
 make ../../lib/libast/comp/waitpid.c implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
-make ${PACKAGE_ast_INCLUDE}/wait.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/wait.h
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/sig.h implicit
+make ${INSTALLROOT}/include/ast/wait.h implicit
+make ${INSTALLROOT}/include/ast/ast_wait.h implicit
+done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/wait.h
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/comp/waitpid.c
 make ../../lib/libast/misc/sigcrit.c implicit
-prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/sig.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/misc/sigcrit.c
 make ../../lib/libast/string/strmatch.c implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/hashkey.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/hashkey.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/string/strmatch.c
 make ../../lib/libast/path/pathtmp.c implicit
-make ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/times.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tm.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${INSTALLROOT}/include/ast/tm.h implicit
+prev ${INSTALLROOT}/include/ast/times.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h dontcare
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/path/pathtmp.c dontcare
 make ../../lib/libast/path/pathcat.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/path/pathcat.c dontcare
 make ../../lib/libast/string/fmterror.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/string/fmterror.c dontcare
 make ../../lib/libast/comp/memset.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/comp/memset.c
 make ../../lib/libast/hash/hashwalk.c implicit
 make ../../lib/libast/hash/hashlib.h implicit
-make ${PACKAGE_ast_INCLUDE}/hash.h implicit
-prev ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/hash.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${INSTALLROOT}/include/ast/hash.h implicit
+prev ${INSTALLROOT}/include/ast/hashpart.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hash.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/hash/hashlib.h
 done ../../lib/libast/hash/hashwalk.c
 make ../../lib/libast/hash/hashsize.c implicit
@@ -390,52 +389,52 @@ make ../../lib/libast/hash/hashalloc.c implicit
 prev ../../lib/libast/hash/hashlib.h implicit
 done ../../lib/libast/hash/hashalloc.c
 make ../../lib/libast/comp/getwd.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/comp/getwd.c
 make ../../lib/libast/misc/getcwd.c implicit
-prev ${PACKAGE_ast_INCLUDE}/fs3d.h implicit
+prev ${INSTALLROOT}/include/ast/fs3d.h implicit
 make ../../lib/libast/dir/dirlib.h implicit
 make ../../lib/libast/dir/dirstd.h implicit
 done ../../lib/libast/dir/dirstd.h dontcare
 make direntry.h implicit
 done direntry.h dontcare virtual
-prev ${PACKAGE_ast_INCLUDE}/limits.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_param.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_param.h dontcare
+prev ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_param.h implicit
+done ${INSTALLROOT}/include/ast/ast_param.h dontcare
 make ndir.h implicit
 done ndir.h dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/dirent.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/dirent.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${INSTALLROOT}/include/ast/dirent.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/dirent.h dontcare
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/dir/dirlib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/misc/getcwd.c
 make ../../lib/libast/misc/state.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/misc/state.c
 prev 3d.h implicit
 done ast.c
 prev ast.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c ast.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c ast.c
 done ast.o generated
 make cs.o
 make cs.c
 make ../../lib/libcs/msgsetmask.c implicit
 make ../../lib/libcs/msglib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_dir.h implicit
-prev ${PACKAGE_ast_INCLUDE}/dirent.h implicit
+prev ${INSTALLROOT}/include/ast/ls.h implicit
+make ${INSTALLROOT}/include/ast/ast_dir.h implicit
+prev ${INSTALLROOT}/include/ast/dirent.h implicit
 prev ../../lib/libast/dir/dirlib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_dir.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_lib.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ast_dir.h dontcare
 prev ../../lib/libcs/msg.h implicit
 make ../../lib/libcs/cs_lib.h implicit
 done ../../lib/libcs/cs_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libcs/msglib.h
 done ../../lib/libcs/msgsetmask.c
 make ../../lib/libcs/msgname.c implicit
@@ -452,17 +451,17 @@ prev ../../lib/libcs/msglib.h implicit
 done ../../lib/libcs/msggetmask.c
 make ../../lib/libcs/cspoll.c implicit
 make ../../lib/libcs/cslib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev ../../lib/libcs/cs_lib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
-make ${PACKAGE_ast_INCLUDE}/tok.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tok.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
-prev ${PACKAGE_ast_INCLUDE}/int.h implicit
-prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${INSTALLROOT}/include/ast/ast_tty.h implicit
+make ${INSTALLROOT}/include/ast/tok.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tok.h dontcare
+prev ${INSTALLROOT}/include/ast/sig.h implicit
+prev ${INSTALLROOT}/include/ast/int.h implicit
+prev ${INSTALLROOT}/include/ast/debug.h implicit
+prev ${INSTALLROOT}/include/ast/cs.h implicit
 done ../../lib/libcs/cslib.h dontcare
 done ../../lib/libcs/cspoll.c dontcare
 make ../../lib/libcs/cspipe.c implicit
@@ -472,11 +471,11 @@ make ../../lib/libcs/cspeek.c implicit
 prev ../../lib/libcs/cslib.h implicit
 done ../../lib/libcs/cspeek.c
 make ../../lib/libcs/msguser.c implicit
-prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${INSTALLROOT}/include/ast/cs.h implicit
 prev ../../lib/libcs/msglib.h implicit
 done ../../lib/libcs/msguser.c dontcare
 make ../../lib/libcs/msgread.c implicit
-prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${INSTALLROOT}/include/ast/cs.h implicit
 prev ../../lib/libcs/msglib.h implicit
 done ../../lib/libcs/msgread.c dontcare
 make ../../lib/libcs/msgbuf.c implicit
@@ -504,14 +503,14 @@ make ../../lib/libcs/csname.c implicit
 prev ../../lib/libcs/cslib.h implicit
 done ../../lib/libcs/csname.c dontcare
 make ../../lib/libcs/cslocal.c implicit
-prev ${PACKAGE_ast_INCLUDE}/wait.h implicit
+prev ${INSTALLROOT}/include/ast/wait.h implicit
 prev ../../lib/libcs/cslib.h implicit
 done ../../lib/libcs/cslocal.c dontcare
 make ../../lib/libcs/csbind.c implicit
 prev ../../lib/libcs/cslib.h implicit
 done ../../lib/libcs/csbind.c dontcare
 make ../../lib/libcs/csauth.c implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ../../lib/libcs/cslib.h implicit
 done ../../lib/libcs/csauth.c dontcare
 make ../../lib/libcs/csdata.c implicit
@@ -520,46 +519,46 @@ done ../../lib/libcs/csdata.c dontcare
 prev 3d.h implicit
 done cs.c
 prev cs.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c cs.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c cs.c
 done cs.o generated
 make license.o
 make license.c
 make ../../lib/libast/string/tokscan.c implicit
-prev ${PACKAGE_ast_INCLUDE}/tok.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/tok.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/string/tokscan.c dontcare
 prev 3d.h implicit
 done license.c
 prev license.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c license.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/string -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c license.c
 done license.o generated
 make vcs.o
 make vcs.c
 prev 3d.h implicit
 done vcs.c
 prev vcs.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c vcs.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c vcs.c
 done vcs.o generated
 make access3d.o
 make access3d.c
 prev 3d.h implicit
 done access3d.c
 prev access3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c access3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c access3d.c
 done access3d.o generated
 make brk3d.o
 make brk3d.c
 prev 3d.h implicit
 done brk3d.c
 prev brk3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c brk3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c brk3d.c
 done brk3d.o generated
 make chdir3d.o
 make chdir3d.c
 prev 3d.h implicit
 done chdir3d.c
 prev chdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c chdir3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c chdir3d.c
 done chdir3d.o generated
 make chmod3d.o
 make chmod3d.c
@@ -567,28 +566,28 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done chmod3d.c
 prev chmod3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c chmod3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c chmod3d.c
 done chmod3d.o generated
 make chown3d.o
 make chown3d.c
 prev 3d.h implicit
 done chown3d.c
 prev chown3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c chown3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c chown3d.c
 done chown3d.o generated
 make close3d.o
 make close3d.c
 prev 3d.h implicit
 done close3d.c
 prev close3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c close3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c close3d.c
 done close3d.o generated
 make creat3d.o
 make creat3d.c
 prev 3d.h implicit
 done creat3d.c
 prev creat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c creat3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c creat3d.c
 done creat3d.o generated
 make dir3d.o
 make dir3d.c
@@ -609,78 +608,78 @@ prev ../../lib/libast/dir/dirlib.h implicit
 done ../../lib/libast/dir/getdents.c dontcare
 prev ../../lib/libast/dir/dirlib.h implicit
 make dir_3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/hash.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_dir.h implicit
+prev ${INSTALLROOT}/include/ast/hash.h implicit
+prev ${INSTALLROOT}/include/ast/ast_dir.h implicit
 prev 3d.h implicit
 done dir_3d.h
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done dir3d.c
 prev dir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c dir3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c dir3d.c
 done dir3d.o generated
 make dup23d.o
 make dup23d.c
 prev 3d.h implicit
 done dup23d.c
 prev dup23d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c dup23d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c dup23d.c
 done dup23d.o generated
 make dup3d.o
 make dup3d.c
 prev 3d.h implicit
 done dup3d.c
 prev dup3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c dup3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c dup3d.c
 done dup3d.o generated
 make execve3d.o
 make execve3d.c
 prev 3d.h implicit
 done execve3d.c
 prev execve3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c execve3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c execve3d.c
 done execve3d.o generated
 make exit3d.o
 make exit3d.c
 prev 3d.h implicit
 done exit3d.c
 prev exit3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c exit3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c exit3d.c
 done exit3d.o generated
 make fchmod3d.o
 make fchmod3d.c
 prev 3d.h implicit
 done fchmod3d.c
 prev fchmod3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fchmod3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fchmod3d.c
 done fchmod3d.o generated
 make fchown3d.o
 make fchown3d.c
 prev 3d.h implicit
 done fchown3d.c
 prev fchown3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fchown3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fchown3d.c
 done fchown3d.o generated
 make fcntl3d.o
 make fcntl3d.c
 prev 3d.h implicit
 done fcntl3d.c
 prev fcntl3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fcntl3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fcntl3d.c
 done fcntl3d.o generated
 make fork3d.o
 make fork3d.c
-prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${INSTALLROOT}/include/ast/cs.h implicit
 prev 3d.h implicit
 done fork3d.c
 prev fork3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c fork3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c fork3d.c
 done fork3d.o generated
 make fpathconf3d.o
 make fpathconf3d.c
 prev 3d.h implicit
 done fpathconf3d.c
 prev fpathconf3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fpathconf3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fpathconf3d.c
 done fpathconf3d.o generated
 make fstat3d.o
 make fstat3d.c
@@ -688,7 +687,7 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done fstat3d.c
 prev fstat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fstat3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fstat3d.c
 done fstat3d.o generated
 make fstatfs3d.o
 make fstatfs3d.c
@@ -697,49 +696,49 @@ prev ../../lib/libcs/cs_lib.h implicit
 prev 3d.h implicit
 done fstatfs3d.c
 prev fstatfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -DVCS -D_PACKAGE_ast -c fstatfs3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DDEBUG -DVCS -D_PACKAGE_ast -c fstatfs3d.c
 done fstatfs3d.o generated
 make fstatvfs3d.o
 make fstatvfs3d.c
 prev 3d.h implicit
 done fstatvfs3d.c
 prev fstatvfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fstatvfs3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fstatvfs3d.c
 done fstatvfs3d.o generated
 make fsync3d.o
 make fsync3d.c
 prev 3d.h implicit
 done fsync3d.c
 prev fsync3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fsync3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c fsync3d.c
 done fsync3d.o generated
 make ftruncate3d.o
 make ftruncate3d.c
 prev 3d.h implicit
 done ftruncate3d.c
 prev ftruncate3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c ftruncate3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c ftruncate3d.c
 done ftruncate3d.o generated
 make getdents3d.o
 make getdents3d.c
 prev 3d.h implicit
 done getdents3d.c
 prev getdents3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c getdents3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c getdents3d.c
 done getdents3d.o generated
 make kill3d.o
 make kill3d.c
 prev 3d.h implicit
 done kill3d.c
 prev kill3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c kill3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c kill3d.c
 done kill3d.o generated
 make link3d.o
 make link3d.c
 prev 3d.h implicit
 done link3d.c
 prev link3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c link3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c link3d.c
 done link3d.o generated
 make lseek3d.o
 make lseek3d.c
@@ -747,14 +746,14 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done lseek3d.c
 prev lseek3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c lseek3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c lseek3d.c
 done lseek3d.o generated
 make lstat3d.o
 make lstat3d.c
 prev 3d.h implicit
 done lstat3d.c
 prev lstat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c lstat3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c lstat3d.c
 done lstat3d.o generated
 make mkdir3d.o
 make mkdir3d.c
@@ -762,7 +761,7 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done mkdir3d.c
 prev mkdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c mkdir3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c mkdir3d.c
 done mkdir3d.o generated
 make mknod3d.o
 make mknod3d.c
@@ -770,56 +769,56 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done mknod3d.c
 prev mknod3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c mknod3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c mknod3d.c
 done mknod3d.o generated
 make mount3d.o
 make mount3d.c
 prev 3d.h implicit
 done mount3d.c
 prev mount3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c mount3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c mount3d.c
 done mount3d.o generated
 make open3d.o
 make open3d.c
 prev 3d.h implicit
 done open3d.c
 prev open3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c open3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DVCS -DFS -DDEBUG -D_PACKAGE_ast -c open3d.c
 done open3d.o generated
 make pathconf3d.o
 make pathconf3d.c
 prev 3d.h implicit
 done pathconf3d.c
 prev pathconf3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c pathconf3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c pathconf3d.c
 done pathconf3d.o generated
 make pipe3d.o
 make pipe3d.c
 prev 3d.h implicit
 done pipe3d.c
 prev pipe3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c pipe3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c pipe3d.c
 done pipe3d.o generated
 make read3d.o
 make read3d.c
 prev 3d.h implicit
 done read3d.c
 prev read3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c read3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c read3d.c
 done read3d.o generated
 make readlink3d.o
 make readlink3d.c
 prev 3d.h implicit
 done readlink3d.c
 prev readlink3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c readlink3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c readlink3d.c
 done readlink3d.o generated
 make rename3d.o
 make rename3d.c
 prev 3d.h implicit
 done rename3d.c
 prev rename3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c rename3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c rename3d.c
 done rename3d.o generated
 make rmdir3d.o
 make rmdir3d.c
@@ -827,21 +826,21 @@ prev dir_3d.h implicit
 prev 3d.h implicit
 done rmdir3d.c
 prev rmdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -D_PACKAGE_ast -DVCS -c rmdir3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DDEBUG -D_PACKAGE_ast -DVCS -c rmdir3d.c
 done rmdir3d.o generated
 make sbrk3d.o
 make sbrk3d.c
 prev 3d.h implicit
 done sbrk3d.c
 prev sbrk3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c sbrk3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c sbrk3d.c
 done sbrk3d.o generated
 make stat3d.o
 make stat3d.c
 prev 3d.h implicit
 done stat3d.c
 prev stat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c stat3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c stat3d.c
 done stat3d.o generated
 make statfs3d.o
 make statfs3d.c
@@ -850,21 +849,21 @@ prev ../../lib/libcs/cs_lib.h implicit
 prev 3d.h implicit
 done statfs3d.c
 prev statfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -DVCS -D_PACKAGE_ast -c statfs3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DDEBUG -DVCS -D_PACKAGE_ast -c statfs3d.c
 done statfs3d.o generated
 make statvfs3d.o
 make statvfs3d.c
 prev 3d.h implicit
 done statvfs3d.c
 prev statvfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c statvfs3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c statvfs3d.c
 done statvfs3d.o generated
 make symlink3d.o
 make symlink3d.c
 prev 3d.h implicit
 done symlink3d.c
 prev symlink3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c symlink3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c symlink3d.c
 done symlink3d.o generated
 make syscall3d.o
 make syscall3d.c
@@ -872,7 +871,7 @@ prev dir_3d.h implicit
 prev 3d.h implicit
 done syscall3d.c
 prev syscall3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c syscall3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c syscall3d.c
 done syscall3d.o generated
 make sysent3d.o
 make sysent3d.c
@@ -886,14 +885,14 @@ make truncate3d.c
 prev 3d.h implicit
 done truncate3d.c
 prev truncate3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c truncate3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c truncate3d.c
 done truncate3d.o generated
 make unlink3d.o
 make unlink3d.c
 prev 3d.h implicit
 done unlink3d.c
 prev unlink3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c unlink3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c unlink3d.c
 done unlink3d.o generated
 make utime3d.o
 make utime3d.c
@@ -901,42 +900,42 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done utime3d.c
 prev utime3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c utime3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c utime3d.c
 done utime3d.o generated
 make utimes3d.o
 make utimes3d.c
 prev 3d.h implicit
 done utimes3d.c
 prev utimes3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c utimes3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c utimes3d.c
 done utimes3d.o generated
 make vfork3d.o
 make vfork3d.c
-prev ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+prev ${INSTALLROOT}/include/ast/ast_lib.h implicit
 done vfork3d.c
 prev vfork3d.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  -c vfork3d.c
+exec - ${CC} ${CCFLAGS}  -I${INSTALLROOT}/include/ast  -c vfork3d.c
 done vfork3d.o generated
 make write3d.o
 make write3d.c
 prev 3d.h implicit
 done write3d.c
 prev write3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c write3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c write3d.c
 done write3d.o generated
 make acl3d.o
 make acl3d.c
 prev 3d.h implicit
 done acl3d.c
 prev acl3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c acl3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c acl3d.c
 done acl3d.o generated
 make facl3d.o
 make facl3d.c
 prev 3d.h implicit
 done facl3d.c
 prev facl3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c facl3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -DDEBUG -D_PACKAGE_ast -c facl3d.c
 done facl3d.o generated
 make dll3d.o
 make dll3d.c
@@ -947,21 +946,21 @@ make xcoff.h implicit
 done xcoff.h dontcare virtual
 make dl.h implicit
 done dl.h dontcare virtual
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${INSTALLROOT}/include/ast/dlldefs.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libdll/dlfcn.c
 make ../../lib/libdll/dllnext.c implicit
 make link.h implicit
 done link.h dontcare virtual
-prev ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${INSTALLROOT}/include/ast/dlldefs.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libdll/dllnext.c
 prev dll_3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 done dll3d.c
 prev dll3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libdll -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dll3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libdll -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c dll3d.c
 done dll3d.o generated
 exec - ${AR} cr lib3d.a init.o bio.o copy.o error.o execv.o fs.o lib.o map.o pathcanon.o pathnext.o pathreal.o peek.o ast.o cs.o license.o vcs.o access3d.o brk3d.o chdir3d.o chmod3d.o chown3d.o close3d.o creat3d.o dir3d.o dup23d.o dup3d.o execve3d.o exit3d.o fchmod3d.o fchown3d.o
 exec - ${AR} cr lib3d.a fcntl3d.o fork3d.o fpathconf3d.o fstat3d.o fstatfs3d.o fstatvfs3d.o fsync3d.o ftruncate3d.o getdents3d.o kill3d.o link3d.o lseek3d.o lstat3d.o mkdir3d.o mknod3d.o mount3d.o open3d.o pathconf3d.o pipe3d.o read3d.o readlink3d.o rename3d.o rmdir3d.o sbrk3d.o stat3d.o statfs3d.o statvfs3d.o symlink3d.o syscall3d.o sysent3d.o truncate3d.o unlink3d.o utime3d.o utimes3d.o vfork3d.o write3d.o acl3d.o facl3d.o dll3d.o
@@ -1048,14 +1047,14 @@ exec - 	;;
 exec - esac
 exec - chmod u+w,+x vex
 done vex generated
-make ${PACKAGE_ast_LIB}
+make ${INSTALLROOT}/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -1071,20 +1070,20 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB} generated
-make ${PACKAGE_ast_LIB}/lib3d.a archive
+done ${INSTALLROOT}/lib generated
+make ${INSTALLROOT}/lib/lib3d.a archive
 prev lib3d.a archive
-exec - mv ${PACKAGE_ast_LIB}/lib3d.a ${PACKAGE_ast_LIB}/lib3d.a.old 2>/dev/null || true; test '' = 'lib3d.a' || { cp lib3d.a ${PACKAGE_ast_LIB}/lib3d.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/lib3d.a) >/dev/null 2>&1 || true
-done ${PACKAGE_ast_LIB}/lib3d.a generated
-make ${PACKAGE_ast_LIB}/lib
+exec - mv ${INSTALLROOT}/lib/lib3d.a ${INSTALLROOT}/lib/lib3d.a.old 2>/dev/null || true; test '' = 'lib3d.a' || { cp lib3d.a ${INSTALLROOT}/lib/lib3d.a  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/lib3d.a) >/dev/null 2>&1 || true
+done ${INSTALLROOT}/lib/lib3d.a generated
+make ${INSTALLROOT}/lib/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
+exec - if	test ! -d ${INSTALLROOT}/lib/lib
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${INSTALLROOT}/lib/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -1100,11 +1099,11 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/lib generated
-make ${PACKAGE_ast_LIB}/lib/3d
+done ${INSTALLROOT}/lib/lib generated
+make ${INSTALLROOT}/lib/lib/3d
 prev 3d.req
-exec - mv ${PACKAGE_ast_LIB}/lib/3d ${PACKAGE_ast_LIB}/lib/3d.old 2>/dev/null || true; test '' = '3d.req' || { cp 3d.req ${PACKAGE_ast_LIB}/lib/3d  		    		    ;}
-done ${PACKAGE_ast_LIB}/lib/3d generated
+exec - mv ${INSTALLROOT}/lib/lib/3d ${INSTALLROOT}/lib/lib/3d.old 2>/dev/null || true; test '' = '3d.req' || { cp 3d.req ${INSTALLROOT}/lib/lib/3d  		    		    ;}
+done ${INSTALLROOT}/lib/lib/3d generated
 make ${INSTALLROOT}/bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin

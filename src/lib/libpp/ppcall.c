@@ -1,27 +1,27 @@
-/***************************************************************
-*                                                              *
-*           This software is part of the ast package           *
-*              Copyright (c) 1986-2000 AT&T Corp.              *
-*      and it may only be used by you under license from       *
-*                     AT&T Corp. ("AT&T")                      *
-*       A copy of the Source Code Agreement is available       *
-*              at the AT&T Internet web site URL               *
-*                                                              *
-*     http://www.research.att.com/sw/license/ast-open.html     *
-*                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
-*             AT&T's intellectual property rights.             *
-*                                                              *
-*               This software was created by the               *
-*               Network Services Research Center               *
-*                      AT&T Labs Research                      *
-*                       Florham Park NJ                        *
-*                                                              *
-*             Glenn Fowler <gsf@research.att.com>              *
-*                                                              *
-***************************************************************/
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1986-2000 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -45,6 +45,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 {
 	register int			c;
 	register char*			p;
+	register char*			q;
 	register struct ppmacro*	mac;
 	int				n;
 	int				m;
@@ -56,6 +57,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 	char*				old_token;
 	struct ppmacstk*		mp;
 	struct ppinstk*			old_in;
+	struct pptuple*			tp;
 
 	ret = -1;
 	sym->flags |= SYM_NOTICED;
@@ -97,6 +99,79 @@ ppcall(register struct ppsymbol* sym, int tok)
 		debug((-5, "macro %s = %s", sym->name, mac->value));
 		if (pp.macref)
 			(*pp.macref)(sym, error_info.file, error_info.line, (pp.state & CONDITIONAL) ? REF_IF : REF_NORMAL, 0L);
+		if (tp = mac->tuple)
+		{
+			old_state = pp.state;
+			pp.state |= DEFINITION|NOSPACE;
+			old_token = pp.token;
+			n = 2 * MAXTOKEN;
+			pp.token = p = oldof(0, char, 0, n);
+			q = p + MAXTOKEN;
+			*pp.token++ = ' ';
+			while (c = pplex())
+			{
+				if (c == '\n')
+				{
+					pp.hidden++;
+					pp.state |= HIDDEN|NEWLINE;
+					old_state |= HIDDEN|NEWLINE;
+					error_info.line++;
+				}
+				else if (c == '#')
+				{
+					ungetchr(c);
+					break;
+				}
+				else
+				{
+					for (;;)
+					{
+						if (streq(pp.token, tp->token))
+						{
+							if (!(tp = tp->match))
+								break;
+							if (!tp->nomatch)
+							{
+								free(p);
+								pp.state = old_state;
+								pp.token = old_token;
+								PUSH_TUPLE(sym, tp->token);
+								ret = 1;
+								goto disable;
+							}
+						}
+						else if (!(tp = tp->nomatch))
+							break;
+					}
+					if (!tp)
+					{
+						pp.token = pp.toknxt;
+						break;
+					}
+				}
+				if ((pp.token = pp.toknxt) > q)
+				{
+					c = pp.token - p;
+					p = newof(p, char, n += MAXTOKEN, 0);
+					q = p + n - MAXTOKEN;
+					pp.token = p + c;
+				}
+				*pp.token++ = ' ';
+			}
+			if (pp.token > p && *(pp.token - 1) == ' ')
+				pp.token--;
+			if (pp.hidden)
+				*pp.token++ = '\n';
+			*pp.token = 0;
+			pp.state = old_state;
+			pp.token = old_token;
+			if (*p)
+				PUSH_RESCAN(p);
+			else
+				free(p);
+			if (!mac->value)
+				goto disable;
+		}
 		if (sym->flags & SYM_FUNCTION)
 		{
 			old_token = pp.token;
@@ -130,7 +205,8 @@ ppcall(register struct ppsymbol* sym, int tok)
 				{
 					ungetchr('\n');
 					error_info.line--;
-					if (!--pp.hidden) pp.state &= ~HIDDEN;
+					if (!--pp.hidden)
+						pp.state &= ~HIDDEN;
 				}
 				pp.token = old_token;
 				goto disable;
@@ -179,7 +255,8 @@ ppcall(register struct ppsymbol* sym, int tok)
 				case T_ID:
 					break;
 				case ')':	/* no actual key args */
-					if (!(pp.state & NOEXPAND)) pp.state |= NOEXPAND;
+					if (!(pp.state & NOEXPAND))
+						pp.state |= NOEXPAND;
 					for (c = 0; c < mac->arity; c++)
 						mp->arg[c][-1] = 0;
 					c = 0;
@@ -190,10 +267,13 @@ ppcall(register struct ppsymbol* sym, int tok)
 				}
 				for (c = 0; c < mac->arity; c++)
 					if (streq(pp.token, mac->args.key[c].name)) break;
-				if (c >= mac->arity) error(2, "%s: invalid macro argument keyword", pp.token);
-				if (pplex() != '=') error(2, "= expected in keyword macro argument");
+				if (c >= mac->arity)
+					error(2, "%s: invalid macro argument keyword", pp.token);
+				if (pplex() != '=')
+					error(2, "= expected in keyword macro argument");
 				pp.state &= ~NOSPACE;
-				if (!c) p++;
+				if (!c)
+					p++;
 				pp.token = mp->arg[c] = ++p;
 			}
 #endif
@@ -209,7 +289,8 @@ ppcall(register struct ppsymbol* sym, int tok)
 				case ')':
 					if (!n--)
 					{
-						if (p > mp->arg[c] && *(p - 1) == ' ') p--;
+						if (p > mp->arg[c] && *(p - 1) == ' ')
+							p--;
 #if MACKEYARGS
 						*p = 0;
 						m++;
@@ -220,10 +301,13 @@ ppcall(register struct ppsymbol* sym, int tok)
 				case ',':
 					if (!n && (m++, (c < mac->arity - 1 || !(sym->flags & SYM_VARIADIC))))
 					{
-						if (p > mp->arg[c] && *(p - 1) == ' ') p--;
+						if (p > mp->arg[c] && *(p - 1) == ' ')
+							p--;
 						*p++ = 0;
-						if (!(pp.state & NOEXPAND)) pp.state |= NOEXPAND;
-						else mp->arg[c][-1] = 0;
+						if (!(pp.state & NOEXPAND))
+							pp.state |= NOEXPAND;
+						else
+							mp->arg[c][-1] = 0;
 #if MACKEYARGS
 						if (pp.option & KEYARGS)
 						{
@@ -234,7 +318,8 @@ ppcall(register struct ppsymbol* sym, int tok)
 						{
 							if ((pp.state & STRICT) && p == mp->arg[c])
 								error(1, "%s: macro call argument %d is null", sym->name, c + 1);
-							if (c < mac->arity) c++;
+							if (c < mac->arity)
+								c++;
 							*p++ = ' ';
 						}
 						pp.toknxt = mp->arg[c] = p;
@@ -284,22 +369,26 @@ ppcall(register struct ppsymbol* sym, int tok)
 			if (!(pp.option & KEYARGS))
 #endif
 			{
-				if (p > mp->arg[0] && ++m || (sym->flags & SYM_VARIADIC)) c++;
+				if (p > mp->arg[0] && ++m || (sym->flags & SYM_VARIADIC))
+					c++;
 				if (c != mac->arity && !(sym->flags & SYM_EMPTY))
 				{
 					n = mac->arity;
 					if (!(sym->flags & SYM_VARIADIC))
 					{
 						error(1, "%s: %d actual argument%s expected", sym->name, n, n == 1 ? "" : "s");
-						if (!c) goto disable;
+						if (!c)
+							goto disable;
 					}
 					else if (c < --n)
 					{
 						error(1, "%s: at least %d actual argument%s expected", sym->name, n, n == 1 ? "" : "s");
-						if (!c) goto disable;
+						if (!c)
+							goto disable;
 					}
 				}
-				while (c < mac->arity) mp->arg[c++] = "\0" + 1;
+				while (c < mac->arity)
+					mp->arg[c++] = "\0" + 1;
 			}
 			mp->arg[0][-2] = m;
 			*p++ = 0;
@@ -308,13 +397,16 @@ ppcall(register struct ppsymbol* sym, int tok)
 		}
 		if (!tok && (sym->flags & SYM_NOEXPAND))
 		{
-			if (sym->flags & SYM_FUNCTION) popframe(mp);
+			if (sym->flags & SYM_FUNCTION)
+				popframe(mp);
 			ret = !mac->size;
 		}
 		else
 		{
-			if (sym->flags & SYM_MULTILINE) PUSH_MULTILINE(sym);
-			else PUSH_MACRO(sym);
+			if (sym->flags & SYM_MULTILINE)
+				PUSH_MULTILINE(sym);
+			else
+				PUSH_MACRO(sym);
 			ret = 1;
 		}
 	}
@@ -324,12 +416,12 @@ ppcall(register struct ppsymbol* sym, int tok)
 		struct ppinstk*	inp;
 
 		for (inp = pp.in; inp->type != IN_FILE && inp->prev; inp = inp->prev);
-		sfsprintf(pp.valbuf, MAXTOKEN, "_%d_%s_hIDe", inp->index, sym->name);
-		PUSH_STRING(pp.valbuf);
+		sfsprintf(pp.hidebuf, MAXTOKEN, "_%d_%s_hIDe", inp->index, sym->name);
+		PUSH_STRING(pp.hidebuf);
 		ret = 1;
 	}
 	pp.state &= ~NEWLINE;
 	pp.in->flags |= IN_tokens;
 	count(token);
-	return(ret);
+	return ret;
 }

@@ -1,3 +1,8 @@
+00-10-04 pin: add -T0x800 TSP v3 dump
+00-10-03 pin: add -T0x400 TSP v2 dump
+00-10-02 pin: fix -p bug that botched the input read
+	 pin: TSP dump now computes exact big value
+00-09-29 pin: add -T0x200 TSP v1 reorder matrix dump
 00-05-31 pin: --size does filter() to verify guess, 0 if wrong
 00-02-11 pin: always have state.map, even with no freq filter
 99-11-03 pin: alb optimize()+solution() update (quadratic loop)

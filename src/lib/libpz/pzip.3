@@ -19,7 +19,7 @@ pzip \- fixed record partition compress/decompress library
 .de IL
 .}S 2 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
 ..
-.de Ex		\" start example
+.de EX		\" start example
 .ta 1i 2i 3i 4i 5i 6i
 .PP
 .RS 
@@ -27,7 +27,7 @@ pzip \- fixed record partition compress/decompress library
 .ft 5
 .nf
 ..
-.de Ee		\" end example
+.de EE		\" end example
 .fi
 .ft
 .PD
@@ -465,9 +465,9 @@ An optional function that is called to emit error and warning messages.
 It is most often set to the
 .I libast
 .IR errorf ():
-.Ex
+.EX
 disc.errorf = (Pzerror_f)errorf;
-.Ee
+.EE
 .Tp
 .L "int (*eventf)(Pz_t* pz, int event, void* value, Pzdisc_t* disc)"
 An optional function that is called when events occur during stream processing.
@@ -843,7 +843,7 @@ to
 .LR options .
 Because of the extra information involved,
 .I pzip
-decompression is not supported.
+compression is not supported by the discipline.
 This is better handled by the
 .IR pzip (1)
 command interface.
@@ -861,6 +861,7 @@ decompress discipline
 on
 .L sp
 if necessary.
+0 is returned on success.
 
 .SH AUTHOR
 Glenn Fowler, gsf@research.att.com.

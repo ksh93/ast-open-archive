@@ -317,7 +317,6 @@ local void check_header(s)
     /* Check the gzip magic header */
 #if _PACKAGE_ast
     if (!s->verified) {
-	s->verified = 1;
 #endif
         for (len = 0; len < 2; len++) {
 	    c = get_byte(s);
