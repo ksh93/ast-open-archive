@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -466,7 +465,7 @@ vcs_real(const char* path, struct stat* st)
 
 	if (state.vcs.fd && state.vcs.dev == st->st_dev && state.vcs.ino == st->st_ino)
 		fd = state.vcs.fd;
-	else if ((fd = OPEN(path, 0, 0)) < 0)
+	else if ((fd = OPEN(path, O_RDONLY, 0)) < 0)
 		return(-1);
 	if (n = vcs_stat(fd, state.path.vcs.version, st, st->st_size))
 	{

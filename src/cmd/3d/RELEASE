@@ -1,3 +1,5 @@
+01-11-26 pathreal.c: empty path is an error
+01-11-16 ftruncate3d.c,truncate3d.c: use lseek3d indirection via sysfunc()
 01-10-31 fchdir3d: add along with state.file[].dir to cache open dir paths
 	 dir3d.c: add recursive call intercepts
 	 error.c: add recursive call intercepts

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2001 AT&T Corp.                *
+*                Copyright (c) 1987-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -589,30 +588,23 @@ listentry(register File_t* f)
 	{
 		if (state.meter.on)
 		{
-			s = f->name;
-			for (;;)
-			{
-				switch (*s++)
-				{
-				case 0:
+			for (s = f->name; *s; s++)
+				if (s[0] == ' ' && s[1] == '-' && s[2] == '-' && s[3] == ' ')
 					break;
-				case '\f':
-				case '\n':
-				case '\r':
-				case '\v':
-					if (state.meter.last)
-					{
-						sfprintf(sfstderr, "%*s", state.meter.last, "\r");
-						state.meter.last = 0;
-					}
-					listprintf(sfstderr, state.in, f, state.listformat);
-					return;
-				default:
-					continue;
+			if (*s)
+			{
+				if (state.meter.last)
+				{
+					sfprintf(sfstderr, "%*s", state.meter.last, "\r");
+					state.meter.last = 0;
 				}
-				break;
+				sfprintf(sfstderr, "\n");
+				listprintf(sfstderr, state.in, f, state.listformat);
+				sfprintf(sfstderr, "\n\n");
+				return;
 			}
-			p = (state.in->io->count * 100) / state.meter.size;
+			if ((p = (state.in->io->count * 100) / state.meter.size) > 100)
+				p = 100;
 			n = listprintf(state.tmp.str, state.in, f, state.listformat);
 			s = sfstruse(state.tmp.str);
 			if (state.meter.fancy)

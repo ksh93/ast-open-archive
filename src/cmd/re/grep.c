@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2001 AT&T Corp.                *
+*                Copyright (c) 1995-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -24,19 +23,20 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Labs Research) 1999-08-11 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Labs Research) 2002-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
-"[+DESCRIPTION?The grep commands search the named input files"
+"[+DESCRIPTION?The \bgrep\b commands search the named input files"
 "	for lines containing a match for the given \apatterns\a."
 "	Matching lines are printed by default. The standard input is searched"
 "	if no files are given or when the file \b-\b is specified.]"
-"[+?There are five variants of grep, each one using a different form of"
+"[+?There are five variants of \bgrep\b, each one using a different form of"
 "	\apattern\a, controlled either by option or the command path"
 "	base name. Details of each variant may be found in \bregex\b(3).]"
 "	{"
 "	[+grep?The default basic regular expressions (no alternations.)]"
 "	[+egrep?Extended regular expressions (alternations, one or more.)]"
+"	[+pgrep?\bperl\b(1) regular expressions (lenient extended.)]"
 "	[+xgrep?Augmented regular expressions (conjunction, negation.)]"
 "	[+fgrep?Fixed string expressions.]"
 "	[+agrep?Approximate regular expressions (not implemented.)]"
@@ -44,6 +44,7 @@ USAGE_LICENSE
 "[G:basic-regexp?\bgrep\b mode (default): basic regular expression \apatterns\a.]"
 "[E:extended-regexp?\begrep\b mode: extended regular expression \apatterns\a.]"
 "[X:augmented-regexp?\bxgrep\b mode: augmented regular expression \apatterns\a.]"
+"[P:perl-regexp?\bpgrep\b mode: \bperl\b(1) regular expression \apatterns\a.]"
 "[F:fixed-string?\bfgrep\b mode: fixed string \apatterns\a.]"
 "[A:approximate-regexp?\bagrep\b mode: approximate regular expression \apatterns\a (not implemented.)]"
 
@@ -63,6 +64,7 @@ USAGE_LICENSE
 "[i:ignore-case?Ignore case when matching.]"
 "[l:files-with-matches?Only print file names with at least one match.]"
 "[L:files-without-matches?Only print file names with no matches.]"
+"[b:highlight?Highlight matches using the ansi terminal bold sequence.]"
 "[v:invert-match|revert-match?Invert the \apattern\a match sense.]"
 "[O:lenient?Enable lenient \apattern\a interpretation. This is the default.]"
 "[x:line-match|line-regexp?Force \apatterns\a to match complete lines.]"
@@ -79,7 +81,7 @@ USAGE_LICENSE
 "[+DIAGNOSTICS?Exit status 0 if matches were found, 1 if no matches were found,"
 "	where \b-v\b invertes the exit status. Exit status 2 for other"
 "	errors that are accompanied by a message on the standard error.]"
-"[+SEE ALSO?\bed\b(1), \bsed\b(1), \bregex\b(3)]"
+"[+SEE ALSO?\bed\b(1), \bsed\b(1), \bperl\b(1), \bregex\b(3)]"
 "[+CAVEATS?Some expressions of necessity require exponential space"
 "	and/or time.]"
 "[+BUGS?Some expressions may use sub-optimal algorithms. For example,"
@@ -88,6 +90,7 @@ USAGE_LICENSE
 
 #include <ast.h>
 #include <ctype.h>
+#include <ccode.h>
 #include <error.h>
 #include <regex.h>
 #include <sfstr.h>
@@ -143,6 +146,10 @@ static struct				/* program state		*/
 	List_t		pattern;	/* pattern list			*/
 	List_t		re;		/* re list			*/
 
+	regmatch_t	posvec[1];	/* match position vector	*/
+	regmatch_t*	pos;		/* match position pointer	*/
+	int		posnum;		/* number of match positions	*/
+
 	int		hits;		/* if any patterns hit		*/
 	int		list;		/* list files with hits		*/
 	int		notfound;	/* some input file not found	*/
@@ -164,7 +171,6 @@ addre(List_t* p, char* s)
 	Item_t*	x;
 	Sfio_t*	t;
 
-error(-1, "AHA addre(\"%s\")", s);
 	if (!(x = newof(0, Item_t, 1, 0)))
 		error(ERROR_SYSTEM|3, "out of space (pattern `%s')", s);
 	if (state.words)
@@ -180,7 +186,8 @@ error(-1, "AHA addre(\"%s\")", s);
 		sfputc(t, '>');
 		s = sfstruse(t);
 	}
-	else t = 0;
+	else
+		t = 0;
 	if (result = regcomp(&x->value.re, s, state.options|REG_MULTIPLE))
 		regfatal(&x->value.re, 3, result);
 	if (t)
@@ -189,7 +196,8 @@ error(-1, "AHA addre(\"%s\")", s);
 		p->head = p->tail = x;
 	else if (regcomb(&p->tail->value.re, &x->value.re))
 		p->tail = p->tail->next = x;
-	else free(x);
+	else
+		free(x);
 }
 
 static void
@@ -200,8 +208,10 @@ addstring(List_t* p, char* s)
 	if (!(x = newof(0, Item_t, 1, 0)))
 		error(ERROR_SYSTEM|3, "out of space (string `%s')", s);
 	x->value.string = s;
-	if (p->head) p->tail->next = x;
-	else p->head = x;
+	if (p->head)
+		p->tail->next = x;
+	else
+		p->head = x;
 	p->tail = x;
 }
 
@@ -262,6 +272,19 @@ compile(void)
 		error(3, "no pattern");
 }
 
+static void
+highlight(Sfio_t* sp, const char* s, int n, int so, int eo)
+{
+	static const char	bold[] =	{CC_esc,'[','1','m'};
+	static const char	normal[] =	{CC_esc,'[','0','m'};
+
+	sfwrite(sp, s, so);
+	sfwrite(sp, bold, sizeof(bold));
+	sfwrite(sp, s + so, eo - so);
+	sfwrite(sp, normal, sizeof(normal));
+	sfwrite(sp, s + eo, n - eo);
+}
+
 static int
 record(void* handle, const char* s, size_t len)
 {
@@ -274,7 +297,10 @@ record(void* handle, const char* s, size_t len)
 	{
 		if (state.prefix)
 			sfprintf(sfstdout, "%s:", error_info.file);
-		sfwrite(sfstdout, s, len + 1);
+		if (state.pos)
+			highlight(sfstdout, s, len + 1, state.pos[0].rm_so, state.pos[0].rm_eo);
+		else
+			sfwrite(sfstdout, s, len + 1);
 	}
 	return 0;
 }
@@ -324,7 +350,7 @@ execute(Sfio_t* input, char* name)
 			x = state.re.head;
 			do
 			{
-				if (!(result = regnexec(&x->value.re, s, len, 0, 0, 0)))
+				if (!(result = regnexec(&x->value.re, s, len, state.posnum, state.pos, 0)))
 					break;
 				if (result != REG_NOMATCH)
 					regfatal(&x->value.re, 3, result);
@@ -340,7 +366,10 @@ execute(Sfio_t* input, char* name)
 						sfprintf(sfstdout, "%s:", name);
 					if (state.number)
 						sfprintf(sfstdout, "%d:", error_info.line);
-					sfwrite(sfstdout, s, len + 1);
+					if (state.pos)
+						highlight(sfstdout, s, len + 1, state.pos[0].rm_so, state.pos[0].rm_eo);
+					else
+						sfwrite(sfstdout, s, len + 1);
 				}
 			}
 		}
@@ -406,7 +435,7 @@ execute(Sfio_t* input, char* name)
 					}
 				}
 				*t = '\n';
-				if ((result = regrexec(re, span, t - span, 0, 0, state.options, '\n', (void*)&hits, record)) < 0)
+				if ((result = regrexec(re, span, t - span, state.posnum, state.pos, state.options, '\n', (void*)&hits, record)) < 0)
 					break;
 				if (result && result != REG_NOMATCH)
 					regfatal(re, 3, result);
@@ -429,7 +458,7 @@ execute(Sfio_t* input, char* name)
 			while (t > s)
 				if (*--t == '\n')
 				{
-					if ((result = regrexec(re, s, t - s, 0, 0, state.options, '\n', (void*)&hits, record)) < 0)
+					if ((result = regrexec(re, s, t - s, state.posnum, state.pos, state.options, '\n', (void*)&hits, record)) < 0)
 						goto done;
 					if (result && result != REG_NOMATCH)
 						regfatal(re, 3, result);
@@ -474,8 +503,10 @@ main(int argc, char** argv)
 	state.options = REG_NOSUB|REG_NULL;
 	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
 		state.options |= REG_LENIENT;
-	if (s = strrchr(argv[0], '/')) s++;
-	else s = argv[0];
+	if (s = strrchr(argv[0], '/'))
+		s++;
+	else
+		s = argv[0];
 	switch (*s)
 	{
 	case 'e':
@@ -487,6 +518,11 @@ main(int argc, char** argv)
 	case 'F':
 		s = "fgrep";
 		state.options |= REG_LITERAL;
+		break;
+	case 'p':
+	case 'P':
+		s = "pgrep";
+		state.options |= REG_EXTENDED|REG_LENIENT;
 		break;
 	case 'x':
 	case 'X':
@@ -519,6 +555,9 @@ main(int argc, char** argv)
 		case 'O':
 			state.options |= REG_LENIENT;
 			break;
+		case 'P':
+			state.options |= REG_EXTENDED|REG_LENIENT;
+			break;
 		case 'S':
 			state.options &= ~REG_LENIENT;
 			break;
@@ -545,6 +584,9 @@ main(int argc, char** argv)
 			break;
 		case 'X':
 			state.options |= REG_AUGMENTED;
+			break;
+		case 'b':
+			state.options &= ~REG_NOSUB;
 			break;
 		case 'c':
 			state.count = 1;
@@ -596,17 +638,25 @@ main(int argc, char** argv)
 			break;
 		}
 	argv += opt_info.index;
-	if ((state.options & (REG_AUGMENTED|REG_LITERAL)) == (REG_AUGMENTED|REG_LITERAL))
-		error(3, "-F and -X are incompatible");
-	if ((state.options & (REG_EXTENDED|REG_LITERAL)) == (REG_EXTENDED|REG_LITERAL))
-		error(3, "-E and -F are incompatible");
+	if ((state.options & REG_LITERAL) && (state.options & (REG_AUGMENTED|REG_EXTENDED)))
+		error(3, "-F and -A or -P or -X are incompatible");
 	if ((state.options & REG_LITERAL) && state.words)
-		error(ERROR_SYSTEM|3, "-w and -F are incompatible");
+		error(ERROR_SYSTEM|3, "-F and -w are incompatible");
 	if (!state.file.head && !state.pattern.head)
 	{
 		if (!argv[0])
 			error(3, "no pattern");
 		addstring(&state.pattern, *argv++);
+	}
+	if (!(state.options & REG_NOSUB))
+	{
+		if (state.count || state.list || state.query || (state.options & REG_INVERT))
+			state.options |= REG_NOSUB;
+		else
+		{
+			state.pos = state.posvec;
+			state.posnum = elementsof(state.posvec);
+		}
 	}
 	compile();
 	if (!argv[0])
@@ -637,5 +687,5 @@ main(int argc, char** argv)
 			}
 		}
 	}
-	exit((state.notfound && !state.query) ? 2 : !state.hits);
+	return (state.notfound && !state.query) ? 2 : !state.hits;
 }

@@ -51,7 +51,8 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	case SF_FINAL:
 		if (gz->gz)
 		{
-			r = gzclose(gz->gz) ? -1 : 0;
+			if (r = gzclose(gz->gz) ? -1 : 0)
+				sp->_flags |= SF_ERROR;
 			gz->gz = 0;
 		}
 		else
@@ -59,17 +60,16 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 		if (op != SF_CLOSING)
 			free(dp);
 		return r;
-	case SF_READ:
-	case SF_WRITE:
-		return *((ssize_t*)val) < 0 ? -1 : 0;
 	case SF_SYNC:
-		return val ? 0 : gzsync(gz->gz, (z_off_t)(-1)) == -1 ? -1 : 0;
+		if (!val && gzsync(gz->gz, (z_off_t)(-1)) < 0)
+			sp->_flags |= SF_ERROR;
+		return 0;
 	case SFGZ_HANDLE:
 		return (*((Gz_t**)val) = gz->gz) ? 1 : -1;
 	case SFGZ_GETPOS:
-		return (*((Sfoff_t*)val) = gzsync(gz->gz, (z_off_t)(-1))) == -1 ? -1 : 0;
+		return (*((Sfoff_t*)val) = gzsync(gz->gz, (z_off_t)(-1))) < 0 ? -1 : 0;
 	case SFGZ_SETPOS:
-		return gzsync(gz->gz, (z_off_t)(*((Sfoff_t*)val))) == -1 ? -1 : 0;
+		return gzsync(gz->gz, (z_off_t)(*((Sfoff_t*)val))) < 0 ? -1 : 0;
 	}
 	return 0;
 }
@@ -95,7 +95,7 @@ sfgzwrite(Sfio_t* fp, const Void_t* buf, size_t size, Sfdisc_t* dp)
 {
 	register Sfgzip_t*	gz = (Sfgzip_t*)dp;
 
-	return (gzwrite(gz->gz, (void*)buf, size) < 0) ? -1 : size;
+	return (gzwrite(gz->gz, (void*)buf, size) == size) ? size : -1;
 }
 
 /*

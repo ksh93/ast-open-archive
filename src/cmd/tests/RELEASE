@@ -1,3 +1,10 @@
+02-03-14 opt.tst: update \f...\f --keys tests
+02-02-02 sfio/(tclose|ttpopenrw|ttell).c: add alarm to handle hung coproc
+02-01-27 sfio/terror.h: handle non-idempotent <varargs.h>
+02-01-12 date.dat,date2k.dat: fix EST/EDT %z tests
+01-12-18 date.dat,datey2k.dat: update for %z change from SHH to SHHMM
+	 date.dat: add YYYY/MM/DD tests
+01-11-24 opt.tst: update --?+SECTION tests
 01-10-31 opt.tst: add --?+SECTION tests
 01-10-30 date*.dat: fix cron tests where both mday and wday are specified
 01-10-18 strtof.tst: adjust for sfprintf()/printf() rounding

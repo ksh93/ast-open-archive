@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -73,6 +73,7 @@ make panic.o
 make tcl/panic.c
 make include/tcl.h implicit
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 make ../../../include/ast/getopt.h implicit
 make ../../../include/ast/prototyped.h implicit
 make ../../../include/prototyped.h implicit
@@ -83,6 +84,7 @@ make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 make ../../../include/ast/ast.h implicit
 make ../../../include/ast/sfio.h implicit
@@ -117,6 +119,8 @@ done ../../../include/ast/ast_map.h dontcare
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -151,7 +155,9 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/times.h
 prev ../../../include/ast/stdio.h implicit
 make ../../../include/ast/dirent.h implicit
+make ../../../include/ast/ast_dirent.h implicit
 prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/ast_dirent.h
 done ../../../include/ast/dirent.h
 make include/tkshlib.h implicit
 make include/debug.h implicit
@@ -659,7 +665,7 @@ exec - fi
 done ../../../include/tcl generated
 make ../../../include/tcl/tksh.h
 prev include/tksh.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' include/tksh.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special'  include/tksh.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tksh.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tksh.h
@@ -667,7 +673,7 @@ exec - fi
 done ../../../include/tcl/tksh.h generated
 make ../../../include/tcl/tcl.h
 prev include/tcl.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' include/tcl.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special'  include/tcl.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tcl.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tcl.h

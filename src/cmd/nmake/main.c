@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2001 AT&T Corp.                *
+*                Copyright (c) 1984-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -935,11 +934,8 @@ finish(int n)
 		 */
 
 		state.finish++;
-		if (state.errors && state.keepgoing)
-		{
-			error(2, "*** %d action%s failed", state.errors, state.errors == 1 ? null : "s");
-			if (!n) n = 1;
-		}
+		if (state.errors && state.keepgoing && !n)
+			n = 1;
 		if (state.mam.out)
 		{
 			if (state.mam.regress)
@@ -950,6 +946,8 @@ finish(int n)
 		for (i = 0; i < elementsof(state.io); i++)
 			if (state.io[i] != sfstdin && state.io[i] != sfstdout && state.io[i] != sfstderr)
 				sfclose(state.io[i]);
+		if (state.errors && state.keepgoing)
+			error(2, "*** %d action%s failed", state.errors, state.errors == 1 ? null : "s");
 		message((-1, "%s exit", state.interrupt ? "interrupt" : n ? "error" : "normal"));
 		break;
 

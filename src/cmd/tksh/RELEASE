@@ -1,1 +1,2 @@
-01-01-01  separate -ltksh from tksh main
+02-02-14 Makefile: shell:static because dll is -g => fix this situation
+01-01-01 separate -ltksh from tksh main

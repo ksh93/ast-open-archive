@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -77,12 +77,16 @@ done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -140,6 +144,10 @@ done pp.req generated
 make ppargs.o
 make ppargs.c
 make pplib.h implicit
+make ../../../include/ast/vmalloc.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/vmalloc.h dontcare
 make ppkey.h implicit
 done ppkey.h dontcare
 make ppdef.h implicit
@@ -213,7 +221,7 @@ prev ../../../include/ast/ast.h implicit
 done pplib.h
 done ppargs.c
 prev ppargs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpp]"\" -c ppargs.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpp]"\" -c ppargs.c
 done ppargs.o generated
 make ppbuiltin.o
 make ppbuiltin.c
@@ -428,7 +436,7 @@ prev ppfsm.h
 prev ppdef.h
 prev pplib.h
 exec - : > 1.${COTEMP}.c
-exec - ed - 1.${COTEMP}.c <<'!'
+exec - ${STDED} ${STDEDFLAGS} 1.${COTEMP}.c <<'!'
 exec - r ppfsm.h
 exec - 1,/^#define PROTO/-d
 exec - /^#define LAST/,$d
@@ -639,7 +647,7 @@ exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/pp.h
 prev pp.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1986,author=gsf' pp.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1986,author=gsf'  pp.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/pp.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/pp.h
@@ -647,7 +655,7 @@ exec - fi
 done ../../../include/ast/pp.h generated
 make ../../../include/ast/ppkey.h
 prev ppkey.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1986,author=gsf' ppkey.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1986,author=gsf'  ppkey.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ppkey.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ppkey.h
@@ -661,7 +669,7 @@ exec - rm -f pp.yacc
 exec - {
 exec - cat pp.h
 exec - } > 1.${COTEMP}.c
-exec - ed - 1.${COTEMP}.c <<'!'
+exec - ${STDED} ${STDEDFLAGS} 1.${COTEMP}.c <<'!'
 exec - g/^#define N_/m0
 exec - v/^#define [NT]_/d
 exec - 1,$s/^#define \(T_[A-Z0-9_]*\).*/&\
@@ -685,7 +693,7 @@ exec - .
 exec - w
 exec - q
 exec - !
-exec - cc -o ${COTEMP}.exe 1.${COTEMP}.c
+exec - ${CC} -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > pp.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done pp.yacc generated
@@ -700,7 +708,7 @@ exec - {
 exec - sed -n -e '/^#define T_TOKEN/p' -e '/^#define N_/p' pp.h
 exec - cat ppkey.h
 exec - } > 1.${COTEMP}.c
-exec - ed - 1.${COTEMP}.c <<'!'
+exec - ${STDED} ${STDEDFLAGS} 1.${COTEMP}.c <<'!'
 exec - g/^#define N_/m0
 exec - v/^#define [NT]_/d
 exec - 1,$s/^#define \(T_[A-Z0-9_]*\).*/&\
@@ -724,7 +732,7 @@ exec - .
 exec - w
 exec - q
 exec - !
-exec - cc -o ${COTEMP}.exe 1.${COTEMP}.c
+exec - ${CC} -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > ppkey.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done ppkey.yacc generated

@@ -1,3 +1,5 @@
+01-12-12 cssfd: CS_POLL_CLOSE now close()'s if not dropped -- double duh
+	 csstat: change down test to avoid unsigned long overflow
 01-10-31 cssend,csrecv: use msg_accrights over msg_control
 	 cspath: don't check /dev/fd/* -- duh
 01-05-11 csserve: sync cs.* with css->*

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -47,7 +47,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in cdb expr pz vdelta m ast
+exec - for i in cdb expr pz z dll vdelta m ast
 exec - do	case $i in
 exec - 	"cdb"|cdb)
 exec - 		;;
@@ -72,22 +72,31 @@ make cdblib.h implicit
 make cdbmethod.h implicit
 make cdb.h implicit
 make ../../../include/ast/vmalloc.h implicit
+make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
+make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
+done ../../../include/ast/getopt.h dontcare
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/ast_stdio.h dontcare
+done ../../../include/ast/stdio.h dontcare
+prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_common.h implicit
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
 done ../../../include/ast/ast_botch.h dontcare
 make ../../../include/ast/ast_unistd.h implicit
 done ../../../include/ast/ast_unistd.h dontcare
 make ../../../include/ast/re_comp.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/re_comp.h dontcare
-make ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/getopt.h dontcare
+done ../../../include/ast/re_comp.h dontcare
+prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/ast_fcntl.h implicit
 make ../../../include/ast/ls.h implicit
 make ../../../include/ast/ast_mode.h implicit
@@ -105,14 +114,9 @@ make ../../../include/ast/ast_types.h implicit
 done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
-make ../../../include/ast/stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -255,10 +259,12 @@ done features/lib
 prev cdb.req
 bind -lexpr
 bind -lpz
+bind -lz
+bind -ldll
 bind -lvdelta
 bind -lm dontcare
 bind -last
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libexpr} ${mam_libpz} ${mam_libvdelta} ${mam_libm} ${mam_libast} ${mam_libast} : run features/lib
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libexpr} ${mam_libpz} ${mam_libz} ${mam_libdll} ${mam_libvdelta} ${mam_libm} ${mam_libast} ${mam_libast} : run features/lib
 done FEATURE/lib generated
 prev cdblib.h implicit
 done cdbtypes.c
@@ -477,7 +483,7 @@ exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/cdb.h
 prev cdb.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1997,author=gsf' cdb.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1997,author=gsf'  cdb.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cdb.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cdb.h
@@ -485,7 +491,7 @@ exec - fi
 done ../../../include/ast/cdb.h generated
 make ../../../include/ast/cdbmethod.h
 prev cdbmethod.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1997,author=gsf' cdbmethod.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1997,author=gsf'  cdbmethod.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cdbmethod.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cdbmethod.h

@@ -71,6 +71,8 @@
 #  define local
 #endif
 
+#define error		mgzerror
+
 char *prog;
 
 void error            OF((const char *msg));
@@ -273,11 +275,19 @@ int main(argc, argv)
 {
     int uncompr = 0;
     gzFile file;
+    char* s;
+    char* b;
     char outmode[20];
 
     strcpy(outmode, "wb6 ");
 
     prog = argv[0];
+    for (b = s = prog; *s; s++)
+	if (*s == '/')
+		b = s + 1;
+    for (; *b; b++)
+	if (*b == 'u' || *b == 'U')
+	    uncompr = 1;
     argc--, argv++;
 
     while (argc > 0) {

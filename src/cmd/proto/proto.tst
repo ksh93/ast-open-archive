@@ -19647,3 +19647,15 @@ parse __PARAM__((Env_t* env, Rex_t* rex, Rex_t* cont, unsigned char* s), (env, r
 		}
 	}
 }'
+
+TEST 10 'how did this hide til 2002?'
+	EXEC -h
+		INPUT - $'#pragma prototyped
+void fun(int arg)
+{
+	SPAN(next) = ratio * STSIZE(arg);
+}'
+		OUTPUT - $'                  
+void fun __PARAM__((int arg), (arg)) __OTORP__(int arg;){
+	SPAN(next) = ratio * STSIZE(arg);
+}'

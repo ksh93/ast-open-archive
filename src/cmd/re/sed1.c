@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2001 AT&T Corp.                *
+*                Copyright (c) 1995-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -93,7 +92,7 @@ unsigned char *synl;	/* current line pointer for syntax errors */
 int
 blank(Text *t)
 {
-	if(*t->w==' ' || *t->w=='\t') {
+	if(*t->w==' ' || *t->w=='\t' || *t->w=='\r') {
 		t->w++;
 		return 1;
 	} else
@@ -153,7 +152,7 @@ addr(Text *script, Text *t)
 {
 	int n;
 	if(reflags & REG_LENIENT)
-		while(*t->w == ' ' || *t->w == '\t')
+		while(*t->w == ' ' || *t->w == '\t' || *t->w == '\r')
 			t->w++;
 	switch(*t->w) {
 	default:
@@ -177,7 +176,7 @@ addr(Text *script, Text *t)
 	}
 	putint(script, n);
 	if(reflags & REG_LENIENT)
-		while(*t->w == ' ' || *t->w == '\t')
+		while(*t->w == ' ' || *t->w == '\t' || *t->w == '\r')
 			t->w++;
 	return 1;
 }
@@ -237,7 +236,7 @@ getlab(Text *t, int i)
 	unsigned char *u;
 	while(blank(t));	/* not exactly posix */
 	for(u=t->w; *t->w!='\n'; t->w++)
-		if(!isprint(*t->w) || *t->w==' ')
+		if(!isprint(*t->w) || *t->w==' ' || *t->w=='\t' || *t->w=='\r')
 			synwarn("invisible character in name");
 	if(u == t->w)
 		return -1;
@@ -702,7 +701,7 @@ compile(Text *script, Text *t)
 			}
 		}
 		(*docom[ccmapc(cmd,CC_NATIVE,CC_ASCII)&0x7f])(script, t);
-		while(*t->w == ' ' || *t->w == '\t')
+		while(*t->w == ' ' || *t->w == '\t' || *t->w == '\r')
 		{
 			t->w++;
 			if(!(reflags & REG_LENIENT) && !spaces++)

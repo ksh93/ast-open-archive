@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -31,17 +30,17 @@
 
 #if !_nosys_truncate64
 
-#if _UWIN
-#define _truncate64	truncate64
-#endif
+#undef	off_t
+#undef	ftruncate
 
-extern int	_truncate64(const char*, off64_t);
+typedef int (*Real_f)(const char*, off64_t);
 
 int
 truncate643d(const char* path, off64_t size)
 {
 	register char*	sp;
 	register int	r;
+	static Real_f	realf;
 #if FS
 	Mount_t*	mp;
 
@@ -51,7 +50,10 @@ truncate643d(const char* path, off64_t size)
 #endif
 	if (!(sp = pathreal(path, P_TOP, NiL)))
 		return -1;
-	r = _truncate64(sp, size);
+	if (!realf)
+		realf = (Real_f)sysfunc(SYS3D_truncate64);
+	r = (*realf)(sp, size);
+		return -1;
 #if FS
 	if (!r)
 	{

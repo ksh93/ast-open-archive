@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -86,12 +86,16 @@ done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -147,7 +151,7 @@ prev ../../../include/ast/ast.h implicit
 done at.h
 done at.c
 prev at.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" -c at.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" -c at.c
 done at.o generated
 bind -lcoshell
 bind -lcs
@@ -188,7 +192,9 @@ prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/proc.h
 make ../../../include/ast/dirent.h implicit
+make ../../../include/ast/ast_dirent.h implicit
 prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/ast_dirent.h
 done ../../../include/ast/dirent.h
 make ../../../include/ast/debug.h implicit
 prev ../../../include/ast/error.h implicit
@@ -218,7 +224,7 @@ exec - fi
 exec - ;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "") case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"' in
+exec - "") case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"' in
 exec - "") cp crontab.sh ast_crontab
 exec - ;;
 exec - *) {
@@ -226,7 +232,7 @@ exec - i=`(read x; echo $x) < crontab.sh`
 exec - case $i in
 exec - '#!'*|*'||'*|':'*|'":"'*|"':'"*) echo $i ;;
 exec - esac
-exec - echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"
+exec - echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"
 exec - cat crontab.sh
 exec - } > ast_crontab
 exec - ;;
@@ -234,8 +240,8 @@ exec - esac
 exec - ;;
 exec - *) {
 exec - echo '${mam_cc_SHELLMAGIC}'
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"' in
-exec - ?*) echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" ;;
+exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"' in
+exec - ?*) echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" ;;
 exec - esac
 exec - cat crontab.sh
 exec - } > ast_crontab

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2001 AT&T Corp.                *
+*                Copyright (c) 1998-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -32,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pin (AT&T Labs Research) 2001-10-31 $\n]"
+"[-?\n@(#)$Id: pin (AT&T Labs Research) 2001-12-05 $\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -114,10 +113,13 @@ USAGE_LICENSE
 "	invocations with identical input files will generate the same output.]"
 "[R:reorder?Choose the reordering method for step (2) above. The methods"
 "	are:]:[method:=\freorder_default\f]{\freorder_methods\f}"
-"[S:size?Ignore \b--row\b, determine the fixed record size, print it on the"
-"	standard output, and exit. If more than one \afile\a is specified"
-"	then the record size and name are printed for each file. A \b0\b"
-"	size means the record size could not be determined from the sample.]"
+"[S:size?Ignore \b--row\b, determine the fixed record size based on a window"
+"	of sampled data, print it on the standard output, and exit. If more"
+"	than one \afile\a is specified then the record size and name are"
+"	printed for each file. If the sample is insufficient, or if"
+"	\b--verify\b is specified, then all of the data read to determine"
+"	the row size. A \b0\b size means the record size could not be"
+"	determined.]"
 "[T:test?Enable implementation-specific tests and tracing.]#[test-mask]{"
 "	[+0x0010?Enable reorder keep trace.]"
 "	[+0x0020?Enable reorder skip/cost trace.]"
@@ -126,6 +128,7 @@ USAGE_LICENSE
 "	[+0x0100?Disable reorder merge prune.]"
 "	[+0x0200?Partition using initial tsp cycles.]"
 "}"
+"[V:verify?Verify \b--size\b by reading all data instead of the window sample.]"
 "[X:prefix?Uncompressed data contains a prefix that is defined by \acount\a"
 "	and an optional \aterminator\a. This data is not \bpzip\b compressed."
 "	\aterminator\a may be one of:]:[count[*terminator]]]{"
@@ -158,6 +161,7 @@ USAGE_LICENSE
 #define OP_optimize	0x01
 #define OP_reorder	0x02
 #define OP_size		0x04
+#define OP_verify	0x10
 
 #define	minof(x,y)	((x)<(y)?(x):(y))
 
@@ -1104,9 +1108,9 @@ reorder_tsp(Reorder_method_t* method, unsigned char* buf, unsigned char* dat, in
 	Tsp_disc_t	disc;
 
 	i = row * row;
-	if (!(cost = newof(0, Tsp_cost_t*, row, i * sizeof(Tsp_cost_t))))
+	if (!(v = newof(0, Tsp_cost_t, i, row * sizeof(Tsp_cost_t*))))
 		error(ERROR_SYSTEM|3, "out of space [%d X %d cost matrix]", row, row);
-	v = (Tsp_cost_t*)(cost + row);
+	cost = (Tsp_cost_t**)(v + i);
 	for (j = 0; j < row; j++)
 	{
 		cost[j] = v;
@@ -1519,6 +1523,9 @@ main(int argc, char** argv)
 		case 'T':
 			sfprintf(dp, "test=%s\n", opt_info.arg);
 			continue;
+		case 'V':
+			op |= OP_verify;
+			continue;
 		case 'X':
 			sfprintf(dp, "prefix=%s\n", opt_info.arg);
 			continue;
@@ -1598,7 +1605,7 @@ main(int argc, char** argv)
 			return 1;
 		if (!(op & OP_size))
 			break;
-		if (rec = row)
+		if (row && (op & OP_verify))
 		{
 			win = (state.window / row) * row;
 			if (!(dat = newof(dat, unsigned char, win, 0)))

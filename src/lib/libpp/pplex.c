@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2001 AT&T Corp.                *
+*                Copyright (c) 1986-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -780,7 +779,7 @@ ppcpp(void)
 #else
 		if ((quot = c) == '<')
 		{
-			if (!(st & HEADER) || (pp.option & HEADEREXPAND) && pp.in->type == IN_MACRO)
+			if (!(st & HEADER) || (pp.option & (HEADEREXPAND|HEADEREXPANDALL)) && pp.in->type != IN_FILE && pp.in->type != IN_BUFFER && pp.in->type != IN_INIT && pp.in->type != IN_RESCAN)
 			{
 				PUTCHR(c);
 				bp = ip;
@@ -1119,12 +1118,22 @@ ppcpp(void)
 			if (n & ~0777) error(1, "octal character constant too large");
 			goto octal;
 		case 'a':
+			if (pp.option & MODERN)
+			{
+				PUTCHR(c);
+				break;
+			}
 #if COMPATIBLE
 			if (st & COMPATIBILITY) goto unknown;
 #endif
 			n = CC_bel;
 			goto octal;
 		case 'v':
+			if (pp.option & MODERN)
+			{
+				PUTCHR(c);
+				break;
+			}
 			n = CC_vt;
 			goto octal;
 		case 'E':
@@ -1910,7 +1919,8 @@ ppcpp(void)
 							SYNCIN();
 							if (pp.macp->arg[c - ARGOFFSET][-1])
 								PUSH_EXPAND(pp.macp->arg[c - ARGOFFSET], pp.macp->line);
-							else PUSH_COPY(pp.macp->arg[c - ARGOFFSET], pp.macp->line);
+							else
+								PUSH_COPY(pp.macp->arg[c - ARGOFFSET], pp.macp->line);
 							CACHEIN();
 							bp = ip;
 							goto fsm_get;

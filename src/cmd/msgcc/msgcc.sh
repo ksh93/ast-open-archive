@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 2000-2001 AT&T Corp.                #
+#                Copyright (c) 2000-2002 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -14,8 +14,7 @@
 #           the license and copyright and are violating            #
 #               AT&T's intellectual property rights.               #
 #                                                                  #
-#                 This software was created by the                 #
-#                 Network Services Research Center                 #
+#            Information and Software Systems Research             #
 #                        AT&T Labs Research                        #
 #                         Florham Park NJ                          #
 #                                                                  #
@@ -26,13 +25,13 @@
 # NOTE: all variable names match __*__ to avoid clash with msgcpp def vars
 
 __command__=msgcc
-integer __similar__=35
+integer __similar__=30
 
 case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $__command__"
 	USAGE=$'
 [-?
-@(#)$Id: msgcc (AT&T Labs Research) 2001-10-10 $
+@(#)$Id: msgcc (AT&T Labs Research) 2002-03-11 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?msgcc - C language message catalog compiler]
@@ -90,10 +89,9 @@ keys()
 	$1 --??keys -- 2>&1 | grep '^".*"$'
 }
 
-integer __similar__=68
 typeset -A __index__
-typeset __keep__ __text__ __drop__ __oz__ __nz__ __z__ __hit__
-typeset __compile__ __mkmsgs__ __preprocess__
+typeset __keep__ __text__ __drop__ __oz__ __nz__ __z__ __hit__ __hit_i__
+typeset __compile__ __debug__ __mkmsgs__ __preprocess__
 typeset __merge__=1 __preserve__ __verbose__
 integer __i__=0 __args__=0 __code__=0 __files__=0 __max__=0 __num__=0 __skip__=0
 integer __set__=1 __sources__=0 __cmds__=0 __ndrop__=0 __new__=0 __old__=0
@@ -121,6 +119,9 @@ do	case $# in
 		(( __args__++ ))
 		;;
 	-E)	__preprocess__=1
+		;;
+	-M-debug)
+		__debug__=1
 		;;
 	-M-mkmsgs)
 		__mkmsgs__=1
@@ -220,12 +221,15 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 				else	print -u2 $"$__command__: unrecognized line=$__line__"
 					__code__=1
 				fi
-			else	if	[[ $__line__ == '$'* ]]
-				then	continue
-				else	__num__=${__line__%%' '*}
+			else	case $__line__ in
+				+([0-9])' '*)
+					__num__=${__line__%%' '*}
 					__line__=${__line__#*'"'}
 					__line__=${__line__%'"'}
-				fi
+					;;
+				*)	continue
+					;;
+				esac
 			fi
 			__index__["$__line__"]=$__num__
 			__text__[$__num__]=$__line__
@@ -233,7 +237,9 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 			then	(( __max__=__num__ ))
 			fi
 		done < $__out__
+		(( __new__=__max__+1 ))
 	else	__tmp__=$__out__
+		(( __new__=1 ))
 	fi
 	if	(( __code__ ))
 	then	exit $__code__
@@ -315,9 +321,6 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 						fi
 						__text__[$__num__]=$__line__
 						__index__["$__line__"]=$__num__
-						if	(( ! __new__ ))
-						then	(( __new__=__num__ ))
-						fi
 						(( __num__++ ))
 					fi
 				fi
@@ -327,40 +330,59 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 		if	(( __max__ < __num__ ))
 		then	(( __max__=__num__ ))
 		fi
+		if [[ $__debug__ ]]
+		then	for (( __num__=1; __num__<=__max__; __num__++ ))
+			do	if	[[ ${__text__[$__num__]} ]]
+				then	if	(( __num__ > __new__ ))
+					then	if	[[ ! ${__keep__[$__num__]} ]]
+						then	print -r -u2 -- $__num__ HUH '"'"${__text__[$__num__]}"'"'
+						else	print -r -u2 -- $__num__ NEW '"'"${__text__[$__num__]}"'"'
+						fi
+					elif	[[ ${__keep__[$__num__]} ]]
+					then	print -r -u2 -- $__num__ OLD '"'"${__text__[$__num__]}"'"'
+					else	print -r -u2 -- $__num__ XXX '"'"${__text__[$__num__]}"'"'
+					fi
+				fi
+			done
+			exit 0
+		fi
 		# check for replacements
 		if	[[ ! $__preserve__ ]]
-		then	for (( __num__=1; __num__<=__max__; __num__++ ))
+		then	for (( __num__=1; __num__<__new__; __num__++ ))
 			do	if	[[ ${__text__[$__num__]} && ! ${__keep__[$__num__]} ]]
 				then	(( __ndrop__++ ))
 					__drop__[__ndrop__]=$__num__
 				fi
 			done
-			[[ $__verbose__ ]] && print -u2 $command: ndrop $__ndrop__ nnew $((__max__-__new__+1))
+			[[ $__verbose__ ]] && print -u2 $__command__: old:1-$((__new__-1)) new:$__new__-$__max__ drop $__ndrop__ add $((__max__-__new__+1))
 			if	(( __ndrop__ ))
-			then	for (( __num__=__new__; __num__<=__max__; __num__++ ))
-				do	__nz__[$__num__]=$(print -r -- "\"${__text__[$__num__]}\"" | gzip | wc -c)
-				done
-				for (( __i__=1; __i__<=__ndrop__; __i__++ ))
+			then	for (( __i__=1; __i__<=__ndrop__; __i__++ ))
 				do	(( __old__=${__drop__[$__i__]} ))
-					__oz__=$(print -r -- "\"${__text__[$__old__]}\"" | gzip | wc -c)
+					__oz__[__i__]=$(print -r -- "\"${__text__[$__old__]}\"" | gzip | wc -c)
+				done
+				for (( __num__=__new__; __num__<=__max__; __num__++ ))
+				do	[[ ${__text__[$__num__]} ]] || continue
+					__nz__=$(print -r -- "\"${__text__[$__num__]}\"" | gzip | wc -c)
 					__hit__=0
 					(( __bz__=__similar__ ))
-					for (( __num__=__new__; __num__<=__max__; __num__++ ))
-					do	if	[[ ${__text__[$__num__]} ]]
+					for (( __i__=1; __i__<=__ndrop__; __i__++ ))
+					do	if	(( __old__=${__drop__[$__i__]} ))
 						then	__z__=$(print -r -- "\"${__text__[$__old__]}\"""\"${__text__[$__num__]}\"" | gzip | wc -c)
-							(( __z__ = (__z__ * 200 / (__oz__ + ${__nz__[$__num__]})) - 100 ))
+							(( __z__ = (__z__ * 200 / (${__oz__[__i__]} + $__nz__)) - 100 ))
 							if	(( __z__ < __bz__ ))
 							then	(( __bz__=__z__ ))
-								(( __hit__=__num__ ))
+								(( __hit__=__old__ ))
+								(( __hit_i__=__i__ ))
 							fi
 						fi
 					done
 					if	(( __hit__ ))
-					then	[[ $__verbose__ ]] && print -u2 $command: $__old__ $__hit__ $__bz__
-						__text__[$__old__]=${__text__[$__hit__]}
-						__keep__[$__old__]=1
-						__text__[$__hit__]=
-						__keep__[$__hit__]=
+					then	[[ $__verbose__ ]] && print -u2 $__command__: $__hit__ $__num__ $__bz__
+						__text__[$__hit__]=${__text__[$__num__]}
+						__keep__[$__hit__]=1
+						__drop__[$__hit_i__]=0
+						__text__[$__num__]=
+						__keep__[$__num__]=
 					fi
 				done
 			fi
@@ -374,7 +396,7 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 	}
 	if [[ $__tmp__ != $__out__ ]]
 	then	grep -v '^\$' $__tmp__ > ${__tmp__}n
-		grep -v '^\$' $__out__ > ${__tmp__}o
+		[[ -f $__out__ ]] && grep -v '^\$' $__out__ > ${__tmp__}o
 		cmp -s ${__tmp__}n ${__tmp__}o || {
 			[[ -f $__out__ ]] && mv $__out__ $__out__.old
 			mv $__tmp__ $__out__

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -72,13 +72,13 @@ done exparse.y
 make exparse.c
 prev exparse.y
 exec - ${YACC} ${YACCFLAGS} exparse.y
-exec - ed - y.tab.c <<!
+exec - ${STDED} ${STDEDFLAGS} y.tab.c <<!
 exec - g/yy/s//ex/g
 exec - g/YY/s//EX/g
 exec - w
 exec - q
 exec - !
-exec - ed - y.tab.c <<!
+exec - ${STDED} ${STDEDFLAGS} y.tab.c <<!
 exec - 1i
 exec - #include "ast.h"
 exec - .
@@ -87,7 +87,7 @@ exec - q
 exec - !
 exec - mv y.tab.c exparse.c
 exec - if	silent test -s y.tab.h
-exec - then	ed - y.tab.h <<'!'
+exec - then	${STDED} ${STDEDFLAGS} y.tab.h <<'!'
 exec - 1i
 exec - #ifndef _EXPARSE_H
 exec - #define _EXPARSE_H
@@ -98,7 +98,7 @@ exec - .
 exec - w
 exec - q
 exec - !
-exec - 	ed - y.tab.h <<!
+exec - 	${STDED} ${STDEDFLAGS} y.tab.h <<!
 exec - g/yy/s//ex/g
 exec - g/YY/s//EX/g
 exec - w
@@ -134,13 +134,17 @@ make ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 make exgram.h implicit
 make exlib.h implicit
@@ -407,7 +411,7 @@ exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/expr.h
 prev expr.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1989,author=kpv' expr.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1989,author=kpv'  expr.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/expr.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/expr.h

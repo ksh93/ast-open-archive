@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 2000-2001 AT&T Corp.                *
+*                Copyright (c) 2000-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -28,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: msggen (AT&T Labs Research) 2001-04-22 $\n]"
+"[-?\n@(#)$Id: msggen (AT&T Labs Research) 2002-03-11 $\n]"
 USAGE_LICENSE
 "[+NAME?msggen - generate a machine independent formatted message catalog]"
 "[+DESCRIPTION?\bmsggen\b merges the message text source files \amsgfile\a"
@@ -39,6 +38,23 @@ USAGE_LICENSE
 "	text defined in \amsgfile\a will replace the old message text"
 "	currently contained in \acatfile\a. Non-ASCII characters must be"
 "	UTF-8 encoded. \biconv\b(1) can be used to convert to/from UTF-8.]"
+"[f:format?List the \bprintf\b(3) format signature for each message in"
+"	\acatfile\a. A format signature is one line containing one character"
+"	per format specification:]{"
+"		[c?char]"
+"		[d?double]"
+"		[D?long double]"
+"		[f?float]"
+"		[h?short]"
+"		[i?int]"
+"		[j?long long]"
+"		[l?long]"
+"		[p?void*]"
+"		[s?string]"
+"		[t?ptrdiff_t]"
+"		[z?size_t]"
+"		[???unknown]"
+"}"
 "[l:list?List \acatfile\a in UTF-8 \amsgfile\a form.]"
 "[s:set?Convert the \acatfile\a operand to a message set number and"
 "	print the number on the standard output.]"
@@ -95,7 +111,8 @@ USAGE_LICENSE
 "\ncatfile [ msgfile ]\n"
 "\n"
 
-"[+SEE ALSO?\bgencat\b(1), \biconv\b(1), \bmsgcc\b(1), \btranslate\b(1)]"
+"[+SEE ALSO?\bgencat\b(1), \biconv\b(1), \bmsgcc\b(1), \btranslate\b(1),"
+"	\bfmtfmt\b(3)]"
 ;
 
 #include <ast.h>
@@ -212,6 +229,7 @@ main(int argc, char** argv)
 	Xl_t*		bp;
 
 	Xl_t*		xp = 0;
+	int		format = 0;
 	int		list = 0;
 	int		set = 0;
 
@@ -221,6 +239,9 @@ main(int argc, char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'f':
+			format = list = 1;
+			continue;
 		case 'l':
 			list = 1;
 			continue;
@@ -237,7 +258,7 @@ main(int argc, char** argv)
 		break;
 	}
 	argv += opt_info.index;
-	if (error_info.errors || !(catfile = *argv++) || !set && !list && !(msgfile = *argv++) || *argv)
+	if (error_info.errors || !(catfile = *argv++))
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 
 	/*
@@ -256,33 +277,82 @@ main(int argc, char** argv)
 		if (!(mc = mcopen(sp)))
 			error(ERROR_SYSTEM|3, "%s: catalog content error", catfile);
 		sfclose(sp);
-		if (*mc->translation)
+		if (format)
 		{
-			ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$translation ");
-			sfprintf(sfstdout, "%s", mc->translation);
-			ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "\n");
+			for (set = 1; set <= mc->num; set++)
+				if (mc->set[set].num)
+				{
+					sfprintf(sfstdout, "$set %d\n", set);
+					for (num = 1; num <= mc->set[set].num; num++)
+						if (s = mc->set[set].msg[num])
+							sfprintf(sfstdout, "%d \"%s\"\n", num, fmtfmt(s));
+				}
 		}
-		ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$quote \"\n");
-		for (set = 1; set <= mc->num; set++)
-			if (mc->set[set].num)
+		else
+		{
+			if (*mc->translation)
 			{
-				ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$set %d\n", set);
-				for (num = 1; num <= mc->set[set].num; num++)
-					if (s = mc->set[set].msg[num])
-					{
-						ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "%d \"", num);
-						while (c = *s++)
-						{
-							if (c == 0x22 || c == 0x5C)
-								sfputc(sfstdout, 0x5C);
-							sfputc(sfstdout, c);
-						}
-						ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "\"\n");
-					}
+				ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$translation ");
+				sfprintf(sfstdout, "%s", mc->translation);
+				ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "\n");
 			}
+			ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$quote \"\n");
+			for (set = 1; set <= mc->num; set++)
+				if (mc->set[set].num)
+				{
+					ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$set %d\n", set);
+					for (num = 1; num <= mc->set[set].num; num++)
+						if (s = mc->set[set].msg[num])
+						{
+							ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "%d \"", num);
+							while (c = *s++)
+							{
+								/*INDENT...*/
+
+			switch (c)
+			{
+			case 0x22: /* " */
+			case 0x5C: /* \ */
+				sfputc(sfstdout, 0x5C);
+				break;
+			case 0x07: /* \a */
+				c = 0x61;
+				sfputc(sfstdout, 0x5C);
+				break;
+			case 0x08: /* \b */
+				c = 0x62;
+				sfputc(sfstdout, 0x5C);
+				break;
+			case 0x0A: /* \n */
+				c = 0x6E;
+				sfputc(sfstdout, 0x5C);
+				break;
+			case 0x0B: /* \v */
+				c = 0x76;
+				sfputc(sfstdout, 0x5C);
+				break;
+			case 0x0C: /* \f */
+				c = 0x66;
+				sfputc(sfstdout, 0x5C);
+				break;
+			case 0x0D: /* \r */
+				c = 0x72;
+				sfputc(sfstdout, 0x5C);
+				break;
+			}
+
+								/*...UNDENT*/
+								sfputc(sfstdout, c);
+							}
+							ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "\"\n");
+						}
+				}
+		}
 		mcclose(mc);
 		return error_info.errors != 0;
 	}
+	else if (!(msgfile = *argv++) || *argv)
+		error(3, "exactly one message file must be specified");
 
 	/*
 	 * open the files and handles

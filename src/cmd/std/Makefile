@@ -4,8 +4,6 @@ LICENSE = since=1989,author=gsf
 
 :ALL:
 
-RM = $(STDRM)
-
 :: PROMO.mm README RELEASE ls-color.sh ls-dir.sh
 
 banner :: banner.c LICENSE=since=1989,author=dgk
@@ -26,9 +24,9 @@ ls :: ls.c
 
 mesg :: mesg.c LICENSE=since=1995,author=dgk
 
-$(PACKAGE_LOCAL)mount :: mount.1 mount.c LICENSE=since=1998,author=gsf $(CC.HOSTTYPE:N=sun4:?+last??)
+$(PACKAGE_LOCAL)mount :: mount.c LICENSE=since=1998,author=gsf $(CC.HOSTTYPE:N=sun4:?+last??)
 
-$(PACKAGE_LOCAL)ps :: ps.1 ps.c LICENSE=since=1998,author=gsf
+$(PACKAGE_LOCAL)ps :: ps.c pss.c LICENSE=since=1998,author=gsf
 
 shar :: shar.sh LICENSE=since=1999,author=dgk
 

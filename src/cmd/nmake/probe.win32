@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2001-09-19
+# @(#)probe.win32 (AT&T Labs Research) 2002-02-02
 #
 # win32 specific make C probe initialization
 # ms vc is easy on uwin
@@ -69,7 +69,7 @@ CC.ALTPP.FLAGS = -Yp,\$(CPP:D)
 CC.ALTPP.ENV =
 CC.ARFLAGS =
 CC.DEBUG = -g
-CC.DIALECT = ANSI DYNAMIC
+CC.DIALECT = ANSI CLOSURE DYNAMIC
 CC.DLL = -D_BLD_DLL
 CC.DLLBIG = -D_BLD_DLL
 CC.DLL.VARIANTS =
@@ -119,7 +119,7 @@ CC.PREFIX.SYMBOL = _
 CC.SUFFIX.ARCHIVE = .a
 CC.SUFFIX.COMMAND =
 CC.SUFFIX.DYNAMIC = .dll
-CC.SUFFIX.LD = .def .exp .res
+CC.SUFFIX.LD = .def .exp .ign .res
 CC.SUFFIX.OBJECT = .o
 CC.SUFFIX.SHARED = .lib
 CC.SUFFIX.SOURCE = .c

@@ -467,6 +467,14 @@ filesize(FILE* fp)
 	return st.st_size;
 }
 
+#if !_lib_ftruncate
+int
+ftruncate(int fd, off_t off)
+{
+	return 0;
+}
+#endif
+
 /*
  * Truncate a file to the last character written. This is
  * useful just before closing an old file that was opened

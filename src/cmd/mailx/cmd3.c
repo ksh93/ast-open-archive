@@ -396,9 +396,13 @@ reedit(register char* subj)
 
 	if (!subj)
 		return 0;
+#if _PACKAGE_ast
+	if (isalpha(subj[0]) && isalpha(subj[1]) && subj[2] == ':' && subj[3] == ' ' && subj[4])
+#else
 	if ((subj[0] == 'r' || subj[0] == 'R') &&
 	    (subj[1] == 'e' || subj[1] == 'E') &&
 	    subj[2] == ':')
+#endif
 		return subj;
 	newsubj = salloc(strlen(subj) + 5);
 	strcpy(newsubj, "Re: ");
@@ -418,42 +422,43 @@ reply1(struct msg* msgvec, unsigned long flags, int all)
 	struct msg*	ip;
 	struct header	head;
 
+	memset(&head, 0, sizeof(head));
 	if (all) {
 		if (msgvec->m_index && (msgvec + 1)->m_index) {
 			note(0, "Sorry, can't reply to multiple messages at once");
 			return 1;
 		}
-		memset(&head, 0, sizeof(head));
 		mp = state.msg.list + msgvec->m_index - 1;
 		touchmsg(mp);
 		state.msg.dot = mp;
 		rp = grab(mp, GREPLY, NiL);
 		if (cp = grab(mp, GTO, NiL))
 			extract(&head, GTO, cp);
-		if (head.h_subject = grab(mp, GSUB, NiL))
-			head.h_flags |= GSUB;
-		head.h_subject = reedit(head.h_subject);
 		if (cp = grab(mp, GCC, NiL))
 			extract(&head, GCC, cp);
 		extract(&head, GTO|GFIRST|GMETOO, rp);
-		sendmail(&head, flags|HEADERS);
 	}
 	else {
-		memset(&head, 0, sizeof(head));
 		for (ip = msgvec; ip->m_index; ip++) {
 			mp = state.msg.list + ip->m_index - 1;
 			touchmsg(mp);
 			state.msg.dot = mp;
 			extract(&head, GTO, grab(mp, GREPLY, NiL));
 		}
-		if (head.h_names) {
-			mp = state.msg.list + msgvec->m_index - 1;
-			if (head.h_subject = grab(mp, GSUB, NiL))
-				head.h_flags |= GSUB;
-			head.h_subject = reedit(head.h_subject);
-			sendmail(&head, flags|HEADERS);
-		}
+		if (!head.h_names)
+			return 0;
+		mp = state.msg.list + msgvec->m_index - 1;
 	}
+	if (head.h_subject = grab(mp, GSUB, NiL))
+		head.h_flags |= GSUB;
+	head.h_subject = reedit(head.h_subject);
+	if (flags & (FOLLOWUP|INTERPOLATE)) {
+		if (head.h_messageid = grab(mp, GMESSAGEID, NiL))
+			head.h_flags |= GMESSAGEID;
+		if (head.h_references = grab(mp, GREFERENCES, NiL))
+			head.h_flags |= GREFERENCES;
+	}
+	sendmail(&head, flags|HEADERS);
 	return 0;
 }
 

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2001 AT&T Corp.                *
+*                Copyright (c) 1984-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -215,15 +214,31 @@ staterule(int op, register struct rule* r, char* var, int force)
 	switch (op)
 	{
 	case PREREQS:
+		rul = var;
 		var = "+";
-		break;
-	case RULE:
 		if (!r)
 		{
+			if (nobind)
+			{
+				sfprintf(internal.nam, "(%s)%s", var, rul);
+				r = getrule(sfstruse(internal.nam));
+			}
+			return r;
+		}
+		break;
+	case RULE:
+		rul = var;
+		var = null;
+		if (!r)
+		{
+			if (nobind)
+			{
+				sfprintf(internal.nam, "(%s)%s", var, rul);
+				return getrule(sfstruse(internal.nam));
+			}
 			r = makerule(var);
 			nobind = 1;
 		}
-		var = null;
 		break;
 	case VAR:
 		if (!r)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2001 AT&T Corp.                *
+*                Copyright (c) 1990-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -36,7 +35,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Labs Research) 2001-04-01 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Labs Research) 2002-03-12 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -85,6 +84,7 @@ USAGE_LICENSE
 "			[+open?Open source.]"
 "			[+proprietary?Only by individual agreement.]"
 "			[+copyleft|gpl?The GNU Public License.]"
+"			[+free?BSD style open source.]"
 "			[+usage?License specific \boptget\b(3) usage strings.]"
 "			[+special|none?Special license text already in source.]"
 "			[+verbose?Include the disclaimer notice if any.]"

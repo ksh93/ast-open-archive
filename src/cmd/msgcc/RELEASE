@@ -1,3 +1,7 @@
+02-03-11 msgcc: fix merge replacement threshhold logic
+	 msggen: convert { \a \b \f \n \r \v } back to C escapes
+	 msgcpp: set pp:modern
+02-02-14 msggen: add -f to list printf format signatures
 01-10-10 msgcc: allow some email forms to pass
 01-06-10 msgcpp: add proper escapes to OMIT pattern
 01-05-29 msgcc: add similar unused message replacement, -M-similar

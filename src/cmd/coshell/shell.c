@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2001 AT&T Corp.                *
+*                Copyright (c) 1990-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -200,6 +199,7 @@ shellexec(Cojob_t* jp, char* msg, int fd)
 	char*			end;
 	Coattr_t		attr;
 
+	attr.set = attr.global.set = 0;
 	con = state.con;
 	cmd = strdup(msg);
 	if (tokscan(msg, &end, "%s %d %d %s %s %s %s %s %s", NiL, &id, &flags, &pwd, &out, &err, &att, &env, &act) != 9)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1993-2001 AT&T Corp.                *
+*                Copyright (c) 1993-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -33,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pack (AT&T Labs Research) 1999-05-03 $\n]"
+"[-?\n@(#)$Id: pack (AT&T Labs Research) 2002-03-09 $\n]"
 USAGE_LICENSE
 "[+NAME?pack - pack files using Huffman coding]"
 "[+DESCRIPTION?\bpack\b attempts to store the specified files in a compressed "
@@ -118,7 +117,7 @@ main(int argc, register char *argv[])
 		break;
 	}
 	argv += opt_info.index;
-	if(error_info.errors)
+	if(error_info.errors || !*argv)
 		error(ERROR_usage(2), "%s", optusage((char*)0));
 
 	while (infile = *argv++)

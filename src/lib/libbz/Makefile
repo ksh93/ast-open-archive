@@ -8,6 +8,10 @@ bz 2.0 :LIBRARY: bzlib.h bzlib_private.h sfdcbzip.h \
 	blocksort.c huffman.c crctable.c randtable.c compress.c \
 	decompress.c bzlib.c sfdcbzip.c
 
+if CC.HOSTTYPE == "win32.*" || "$(-mam)" == "static*"
+blocksort.o : .CC.NOOPTIMIZE
+end
+
 $(INCLUDEDIR) :INSTALLPROTO: sfdcbzip.h bzlib.h
 
 :: README RELEASE

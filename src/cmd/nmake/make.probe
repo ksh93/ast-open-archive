@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2001-10-31
+# @(#)make.probe (AT&T Research) 2002-01-11
 #
 # C probe for make
 #
@@ -486,7 +486,7 @@ case $pic:$so:$dynamic:$static in
 				PIC=$pic
 				sd=.dll
 				so=.lib
-				ldscript=".def .exp .res"
+				ldscript=".def .exp .ign .res"
 				lib_dll=option
 				lib_all=-Wl,-whole-archive
 				lib_undef=-Wl,-no-whole-archive

@@ -22,11 +22,12 @@ static const struct lab fields[] = {
 	"subject",		GSUB,
 	"subj",			GSUB,
 	"status",		GSTATUS,
+	"references",		GREFERENCES,
+	"message-id",		GMESSAGEID,
 	"received",		0,
 	"return-path",		0,
 	"importance",		0,
 	"in-reply-to",		0,
-	"message-id",		0,
 	"priority",		0,
 	"x-",			0,
 };

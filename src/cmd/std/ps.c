@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -28,11 +27,11 @@
  *
  * ps -- list process status
  *
- * if no /proc then we punt to /bin/ps -- and you better match their args!
+ * fall back to /bin/ps if no support -- and you better match their args!
  */
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2001-06-06 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2002-02-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -45,8 +44,6 @@ USAGE_LICENSE
 
 "[a:interactive?List all processes associated with terminals.]"
 "[c:class?Equivalent to \b--fields=\"pid class pri tty time command\"\b.]"
-"[C:command?List for commands that match the \begrep\b(1) RE"
-"	\apattern\a.]:[pattern]"
 "[d:no-session?List all processes except session leaders.]"
 "[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
@@ -59,14 +56,14 @@ USAGE_LICENSE
 "	\b--format\b options in this same style. \aformat\a follows"
 "	\bprintf\b(3) conventions, except that \bsfio\b(3) inline ids are used"
 "	instead of arguments:"
-"	%[#-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
+"	%[#-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\aheading\a]])\achar\a."
 "	If \b#\b is specified then the internal width and precision are used."
 "	If \achar\a is \bs\b then the string form of the item is listed,"
 "	otherwise the corresponding numeric form is listed. If \achar\a is"
 "	\bq\b then the string form of the item is $'...' quoted if it contains"
 "	space or non-printing characters. If \awidth\a is omitted then the"
-"	default width is assumed. \asubformat\a overrides the default"
-"	formatting for \aid\a. Supported \aid\as and \asubformat\as"
+"	default width is assumed. \aheading\a overrides the default"
+"	heading for \aid\a. Supported \aid\as"
 "	are:]:[format]{\fformats\f}"
 "[g:pgrps|process-groups?List processes with group leaders in the \apgrp\a"
 "	list.]:[pgrp...]"
@@ -116,14 +113,10 @@ USAGE_LICENSE
 #include <error.h>
 #include <int.h>
 #include <ls.h>
+#include <pss.h>
 #include <sfdisc.h>
 #include <sfstr.h>
 #include <tm.h>
-#include <regex.h>
-
-#include "FEATURE/procfs"
-
-#ifdef _PS_dir
 
 #if !_mem_st_rdev_stat
 #define st_rdev			st_dev
@@ -142,7 +135,7 @@ USAGE_LICENSE
 #define KEY_gid			8
 #define KEY_group		9
 #define KEY_nice		10
-#define KEY_ntpid		11
+#define KEY_npid		11
 #define KEY_pgrp		12
 #define KEY_pid			13
 #define KEY_ppid		14
@@ -165,11 +158,11 @@ typedef struct Key_s			/* format key			*/
 	char*		name;		/* key name			*/
 	char*		head;		/* heading name			*/
 	char*		desc;		/* description			*/
+	unsigned long	field;		/* pss field			*/
 	short		index;		/* index			*/
 	short		width;		/* field width			*/
 	unsigned long	maxval;		/* max value if !=0		*/
 	unsigned char	hex;		/* optional hex output		*/
-	unsigned char	missing;	/* missing in system		*/
 	unsigned char	already;	/* already specified		*/
 	short		cancel;		/* cancel this if specified	*/
 	short		prec;		/* field precision		*/
@@ -180,13 +173,6 @@ typedef struct Key_s			/* format key			*/
 	Dtlink_t	hashed;		/* hash link			*/
 	struct Key_s*	next;		/* format link			*/
 } Key_t;
-
-typedef struct				/* generic id table entry	*/
-{
-	Dtlink_t	hashed;		/* hash link			*/
-	long		id;		/* id number			*/
-	char		name[1];	/* id name			*/
-} Id_t;
 
 typedef struct List_s			/* pid list			*/
 {
@@ -199,37 +185,26 @@ typedef struct Ps_s			/* process state		*/
 {
 	Dtlink_t	hashed;		/* pid hash link		*/
 	Dtlink_t	sorted;		/* sorted link			*/
-	struct prpsinfo	ps;		/* ps info			*/
+	Pssent_t*	ps;		/* ps info			*/
 	struct Ps_s*	children;	/* child list			*/
 	struct Ps_s*	lastchild;	/* end of children		*/
 	struct Ps_s*	sibling;	/* sibling list			*/
 	struct Ps_s*	root;		/* (partial) root list		*/
 	char*		user;		/* user name			*/
+	pid_t		pid;		/* pid				*/
 	int		level;		/* process tree level		*/
 	int		must;		/* 1:must show -1:don't show	*/
 	int		shown;		/* list state			*/
 } Ps_t;
 
-typedef struct				/* program state		*/
+typedef struct State_s			/* program state		*/
 {
-	int		all;		/* popular categories		*/
-	int		controlled;	/* matching state.ttydev only	*/
-	int		detached;	/* detached too			*/
 	int		heading;	/* output heading		*/
-	int		leader;		/* pg leaders too		*/
-	int		idindex;	/* id select index		*/
-	int		match;		/* command name match		*/
 	int		recursive;	/* recursively list all children*/
 	int		tree;		/* list proc tree		*/
-	int		verbose;	/* verbose error messages	*/
 	int		hex;		/* output optional hex key form	*/
 	int		width;		/* output width			*/
 	unsigned long	now;		/* current time			*/
-#ifdef _PS_scan_boot
-	unsigned long	boot;		/* boot time			*/
-#endif
-	dev_t		ttydev;		/* controlling tty		*/
-	uid_t		caller;		/* caller effective uid		*/
 	Key_t*		fields;		/* format field list		*/
 	List_t*		pids;		/* pid vectors			*/
 	char*		format;		/* sfkeyprintf() format		*/
@@ -237,47 +212,15 @@ typedef struct				/* program state		*/
 	Dt_t*		keys;		/* format keys			*/
 	Dt_t*		bypid;		/* procs by pid			*/
 	Dt_t*		byorder;	/* procs by pid			*/
-	Dt_t*		ids;		/* select by id			*/
-	Dt_t*		ttys;		/* tty base name bu dev		*/
 	Ps_t*		pp;		/* next proc info slot		*/
+	Pss_t*		pss;		/* ps stream			*/
+	Pssdisc_t	pssdisc;	/* ps stream discipline		*/
 	Sfio_t*		mac;		/* temporary string stream	*/
-	Sfio_t*		nul;		/* temporary string stream	*/
 	Sfio_t*		tmp;		/* temporary string stream	*/
 	Sfio_t*		wrk;		/* temporary string stream	*/
-	regex_t		re;		/* command match RE		*/
 	char		branch[1024];	/* process tree branch		*/
 	char		buf[1024];	/* work buffer			*/
 } State_t;
-
-#if defined(_PS_dir) && !defined(_mem_pr_clname_prpsinfo)
-#undef	_mem_pr_clname_prpsinfo
-#define _mem_pr_clname_prpsinfo		0
-#endif
-
-#if defined(_PS_dir) && !defined(_mem_pr_lttydev_prpsinfo)
-#undef	_mem_pr_lttydev_prpsinfo
-#define _mem_pr_lttydev_prpsinfo	0
-#endif
-
-#if defined(_PS_dir) && !defined(_mem_pr_ntpid_prpsinfo)
-#undef	_mem_pr_ntpid_prpsinfo
-#define _mem_pr_ntpid_prpsinfo		0
-#endif
-
-#if defined(_PS_dir) && !defined(_mem_pr_psargs_prpsinfo)
-#undef	_mem_pr_psargs_prpsinfo
-#define _mem_pr_psargs_prpsinfo		0
-#endif
-
-#if defined(_PS_dir) && !defined(_mem_pr_refcount_prpsinfo)
-#undef	_mem_pr_refcount_prpsinfo
-#define _mem_pr_refcount_prpsinfo	0
-#endif
-
-#if defined(_PS_dir) && !defined(_mem_pr_tgrp_prpsinfo)
-#undef	_mem_pr_tgrp_prpsinfo
-#define _mem_pr_tgrp_prpsinfo		0
-#endif
 
 static Key_t	keys[] =
 {
@@ -288,6 +231,7 @@ static Key_t	keys[] =
 		"addr",
 		"ADDR",
 		"Physical address.",
+		PSS_addr,
 		KEY_addr,
 		8
 	},
@@ -295,6 +239,7 @@ static Key_t	keys[] =
 		"args",
 		"COMMAND",
 		"Command path with arguments.",
+		PSS_args,
 		KEY_args,
 		-32, 0,
 		0,0,0,
@@ -304,14 +249,15 @@ static Key_t	keys[] =
 		"class",
 		"CLS",
 		"Scheduling class.",
+		PSS_sched,
 		KEY_class,
-		3, 0,
-		0,!_mem_pr_clname_prpsinfo
+		3,
 	},
 	{
 		"command",
 		"COMMAND",
 		"Command file base name.",
+		PSS_command,
 		KEY_command,
 		-16, 0,
 		0,0,0,
@@ -321,6 +267,7 @@ static Key_t	keys[] =
 		"cpu",
 		"%CPU",
 		"Cpu percent usage.",
+		PSS_cpu,
 		KEY_cpu,
 		4
 	},
@@ -328,6 +275,7 @@ static Key_t	keys[] =
 		"etime",
 		"ELAPSED",
 		"Elapsed time since start.",
+		0,
 		KEY_etime,
 		7
 	},
@@ -335,6 +283,7 @@ static Key_t	keys[] =
 		"flags",
 		"F",
 		"State flags.",
+		PSS_flags,
 		KEY_flags,
 		2
 	},
@@ -342,6 +291,7 @@ static Key_t	keys[] =
 		"gid",
 		"GROUP",
 		"Numeric group id.",
+		PSS_gid,
 		KEY_gid,
 		8, 0,
 		0,0,0,
@@ -351,6 +301,7 @@ static Key_t	keys[] =
 		"group",
 		"GROUP",
 		"Group id name.",
+		PSS_gid,
 		KEY_group,
 		8, 0,
 		0,0,0,
@@ -360,21 +311,24 @@ static Key_t	keys[] =
 		"nice",
 		"NI",
 		"Adjusted scheduling priority.",
+		PSS_nice,
 		KEY_nice,
 		4
 	},
 	{
-		"ntpid",
-		"NTPID",
-		"NT process id.",
-		KEY_ntpid,
+		"npid",
+		"NPID",
+		"native process id.",
+		PSS_npid,
+		KEY_npid,
 		5, 0,
-		1,!_mem_pr_ntpid_prpsinfo
+		1,
 	},
 	{
 		"pgrp",
 		"PGRP",
 		"Process group id.",
+		PSS_pgrp,
 		KEY_pgrp,
 		5, PID_MAX,
 		1,0,0
@@ -383,6 +337,7 @@ static Key_t	keys[] =
 		"pid",
 		"PID",
 		"Process id.",
+		PSS_pid,
 		KEY_pid,
 		5, PID_MAX,
 		1,0,0
@@ -391,6 +346,7 @@ static Key_t	keys[] =
 		"ppid",
 		"PPID",
 		"Parent process id.",
+		PSS_ppid,
 		KEY_ppid,
 		5, PID_MAX,
 		1
@@ -399,21 +355,24 @@ static Key_t	keys[] =
 		"pri",
 		"PRI",
 		"Scheduling priority.",
+		PSS_pri,
 		KEY_pri,
 		3
 	},
 	{
 		"refcount",
 		"REFS",
-		"NT reference count.",
+		"reference count.",
+		PSS_refcount,
 		KEY_refcount,
 		4, 0,
-		1,!_mem_pr_refcount_prpsinfo
+		1,
 	},
 	{
 		"rss",
 		"RSS",
 		"Resident page set size in kilobytes.",
+		PSS_rss,
 		KEY_rss,
 		5
 	},
@@ -421,6 +380,7 @@ static Key_t	keys[] =
 		"sid",
 		"SID",
 		"Session id.",
+		PSS_sid,
 		KEY_sid,
 		5, PID_MAX,
 		1
@@ -429,6 +389,7 @@ static Key_t	keys[] =
 		"size",
 		"SIZE",
 		"Virtual memory size in kilobytes.",
+		PSS_size,
 		KEY_size,
 		6
 	},
@@ -436,6 +397,7 @@ static Key_t	keys[] =
 		"start",
 		"START",
 		"Start time.",
+		PSS_start,
 		KEY_start,
 		8
 	},
@@ -443,6 +405,7 @@ static Key_t	keys[] =
 		"state",
 		"S",
 		"Basic state.",
+		PSS_state,
 		KEY_state,
 		1
 	},
@@ -450,14 +413,16 @@ static Key_t	keys[] =
 		"tgrp",
 		"TGRP",
 		"Terminal group id.",
+		PSS_tgrp,
 		KEY_tgrp,
 		5, PID_MAX,
-		1,!_mem_pr_tgrp_prpsinfo
+		1,
 	},
 	{
 		"time",
 		"TIME",
 		"usr+sys time.",
+		PSS_time,
 		KEY_time,
 		6
 	},
@@ -465,6 +430,7 @@ static Key_t	keys[] =
 		"tty",
 		"TT",
 		"Controlling terminal base name.",
+		PSS_tty,
 		KEY_tty,
 		-7,
 	},
@@ -472,6 +438,7 @@ static Key_t	keys[] =
 		"uid",
 		"USER",
 		"Numeric user id.",
+		PSS_uid,
 		KEY_uid,
 		8, 0,
 		0,0,0,
@@ -481,6 +448,7 @@ static Key_t	keys[] =
 		"user",
 		"USER",
 		"User id name.",
+		PSS_uid,
 		KEY_user,
 		8, 0,
 		0,0,0,
@@ -490,18 +458,20 @@ static Key_t	keys[] =
 		"wchan",
 		"WCHAN",
 		"Wait address.",
+		PSS_wchan,
 		KEY_wchan,
 		8
 	},
 
 	/* aliases after this point */
 
-	{ "comm",	0,	0,	KEY_command		},
-	{ "pcpu",	0,	0,	KEY_cpu			},
-	{ "rgroup",	0,	0,	KEY_group		},
-	{ "ruser",	0,	0,	KEY_user		},
-	{ "tid",	0,	0,	KEY_tgrp		},
-	{ "vsz",	0,	0,	KEY_size		},
+	{ "comm",	0,	0,	0,	KEY_command		},
+	{ "ntpid",	0,	0,	0,	KEY_npid		},
+	{ "pcpu",	0,	0,	0,	KEY_cpu			},
+	{ "rgroup",	0,	0,	0,	KEY_group		},
+	{ "ruser",	0,	0,	0,	KEY_user		},
+	{ "tid",	0,	0,	0,	KEY_tgrp		},
+	{ "vsz",	0,	0,	0,	KEY_size		},
 
 };
 
@@ -525,87 +495,11 @@ optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		{
 			sfprintf(sp, "[+%s?", keys[i].name);
 			if (keys[i].head)
-				sfprintf(sp, "%s The title string is \b%s\b and the default width is %d.]", keys[i].desc, keys[i].head, keys[i].width);
+				sfprintf(sp, "%s The title string is \b%s\b and the default width is %d.%s]", keys[i].desc, keys[i].head, keys[i].width, (!keys[i].field || (state.pss->fields & keys[i].field)) ? "" : " Not available on this system.");
 			else
 				sfprintf(sp, "Equivalent to \b%s\b.]", keys[keys[i].index].name);
 		}
 	return 0;
-}
-
-/*
- * initialize the ttyid hash
- */
-
-static void
-ttyinit(void)
-{
-	register DIR*		dir;
-	register struct dirent*	ent;
-	register Id_t*		ip;
-	DIR*			sub = 0;
-	Dtdisc_t*		dp;
-	char*			base;
-	char*			name;
-	struct stat		st;
-	char			path[PATH_MAX];
-
-	if (!(dp = newof(0, Dtdisc_t, 1, 0)))
-		error(ERROR_SYSTEM|3, "out of space [tty-disc]");
-	dp->key = offsetof(Id_t, id);
-	dp->size = sizeof(long);
-	dp->link = offsetof(Id_t, hashed);
-	if (!(state.ttys = dtopen(dp, Dthash)))
-		error(ERROR_SYSTEM|3, "out of space [tty-dict]");
-	strcpy(path, "/dev");
-	if (!(dir = opendir(path)))
-	{
-		error(ERROR_SYSTEM|2, "%s: cannot read", path);
-		return;
-	}
-	path[4] = '/';
-	name = base = path + 5;
-	for (;;)
-	{
-		while (ent = readdir(dir))
-		{
-			if (D_NAMLEN(ent) + (base - path) + 1 > sizeof(path))
-				continue;
-			if (!sub && (ent->d_name[0] != 'c' && ent->d_name[0] != 't' && ent->d_name[0] != 'p' && ent->d_name[0] != 'v' || ent->d_name[1] != 'o' && ent->d_name[1] != 't'))
-				continue;
-			strcpy(base, ent->d_name);
-			if (stat(path, &st))
-				continue;
-			if (!S_ISCHR(st.st_mode))
-			{
-				if (sub || !S_ISDIR(st.st_mode))
-					continue;
-				sub = dir;
-				if (dir = opendir(path))
-				{
-					base = path + strlen(path);
-					*base++ = '/';
-				}
-				else
-				{
-					dir = sub;
-					sub = 0;
-				}
-				continue;
-			}
-			if (!(ip = newof(0, Id_t, 1, strlen(name))))
-				error(ERROR_SYSTEM|3, "out of space [tty-entry]");
-			strcpy(ip->name, name);
-			ip->id = st.st_rdev;
-			dtinsert(state.ttys, ip);
-		}
-		if (!sub)
-			break;
-		closedir(dir);
-		dir = sub;
-		sub = 0;
-		base = name;
-	}
-	closedir(dir);
 }
 
 /*
@@ -615,62 +509,7 @@ ttyinit(void)
 static int
 ttyid(const char* name)
 {
-	register const char*	s;
-	register Id_t*		ip;
-	long			v;
-	struct stat		st;
-
-	s = name;
-	if (stat(s, &st))
-	{
-		sfprintf(state.tmp, "/dev/%s", name);
-		s = (const char*)sfstruse(state.tmp);
-		if (stat(s, &st))
-		{
-			sfprintf(state.tmp, "/dev/tty%s", name);
-			s = (const char*)sfstruse(state.tmp);
-			if (stat(s, &st))
-			{
-				error(ERROR_SYSTEM|2, "%s: unknown tty", name);
-				return -1;
-			}
-		}
-	}
-	if (!state.ttys)
-		ttyinit();
-	v = st.st_rdev;
-	if (!(ip = (Id_t*)dtmatch(state.ttys, &v)))
-	{
-		if (!(ip = newof(0, Id_t, 1, strlen(s))))
-			error(ERROR_SYSTEM|3, "out of space [tty]");
-		strcpy(ip->name, s);
-		ip->id = v;
-		dtinsert(state.ttys, ip);
-	}
-	return st.st_rdev;
-}
-
-/*
- * return tty base name given tty device id
- */
-
-static char*
-ttybase(dev_t dev)
-{
-	register Id_t*	ip;
-	long		v;
-
-	static char	name[32];
-
-	if (dev == (dev_t)PRNODEV)
-		return "?";
-	if (!state.ttys)
-		ttyinit();
-	v = dev;
-	if (ip = (Id_t*)dtmatch(state.ttys, &v))
-		return ip->name;
-	sfsprintf(name, sizeof(name), "%03d,%03d", major(dev), minor(dev));
-	return name;
+	return pssttydev(state.pss, name);
 }
 
 /*
@@ -715,6 +554,12 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	}
 	else if (!pp)
 	{
+		if (!(state.pss->fields & kp->field))
+		{
+			error(1, "%s: not available on this system", kp->name);
+			return -1;
+		}
+		state.pssdisc.fields |= kp->field;
 		if (fp->flags & SFFMT_ALTER)
 		{
 			if (kp->maxval)
@@ -740,7 +585,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		if (fp->flags & SFFMT_LEFT)
 			kp->width = -kp->width;
 		fp->fmt = 's';
-		*ps = kp->head;
+		*ps = arg && (arg = (const char*)strdup(arg)) ? (char*)arg : kp->head;
 	}
 	else
 	{
@@ -752,49 +597,21 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		switch (kp->index)
 		{
 		case KEY_addr:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			n = (long)pp->ps.pr_addr;
+			n = (long)pp->ps->addr;
 			goto number;
-#if _mem_pr_clname_prpsinfo
 		case KEY_class:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			s = pp->ps.pr_clname;
+			s = pp->ps->sched;
 			break;
-#endif
 		case KEY_args:
-#if _mem_pr_psargs_prpsinfo
-			s = PR_ZOMBIE(&pp->ps) ? "<defunct>" : pp->ps.pr_psargs;
+			s = pp->ps->args;
 			goto branch;
-#endif
-#ifdef _PS_args
-			sfprintf(state.tmp, _PS_path_num, pp->ps.pr_pid, _PS_args);
-			if ((i = open(sfstruse(state.tmp), O_RDONLY|O_BINARY)) >= 0)
-			{
-				n = read(i, sfstrbase(state.tmp), sfstrsize(state.tmp) - 1);
-				close(i);
-				if (n > 0)
-				{
-					s = sfstrbase(state.tmp);
-					for (i = 0; i < n; i++)
-						if (!s[i])
-							s[i] = ' ';
-					s[i] = 0;
-					goto branch;
-				}
-			}
-#endif
 		case KEY_command:
-			s = PR_ZOMBIE(&pp->ps) ? "<defunct>" : pp->ps.pr_fname;
-#if _mem_pr_psargs_prpsinfo || defined(_PS_args)
+			s = pp->ps->command;
 		branch:
-#endif
-			if (s[0] == '(' && s[i = strlen(s) - 1] == ')')
-			{
-				s[i] = 0;
-				s++;
-			}
 			if ((j = pp->level) > 0)
 			{
 				for (i = 0, j--; i < j; i++)
@@ -805,90 +622,84 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			}
 			break;
 		case KEY_cpu:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pp->ps.pr_cpu;
+			n = pp->ps->cpu;
 			goto percent;
 		case KEY_etime:
-			s = fmtelapsed(state.now - (unsigned long)PR_START(&pp->ps), 1);
+			s = fmtelapsed(state.now - (unsigned long)pp->ps->start, 1);
 			break;
 		case KEY_flags:
-			n = pp->ps.pr_flag & 0xff;
+			n = pp->ps->flags & PSS_FLAGS;
 			goto number;
 		case KEY_gid:
-			n = pp->ps.pr_gid;
+			n = pp->ps->gid;
 			goto number;
 		case KEY_group:
-			s = fmtgid(pp->ps.pr_gid);
+			s = fmtgid(pp->ps->gid);
 			break;
 		case KEY_nice:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pp->ps.pr_nice;
+			n = pp->ps->nice;
 			goto number;
-#if _mem_pr_ntpid_prpsinfo
-		case KEY_ntpid:
-			n = pp->ps.pr_ntpid;
+		case KEY_npid:
+			n = pp->ps->npid;
 			goto number;
-#endif
 		case KEY_pgrp:
-			n = pp->ps.pr_pgrp;
+			n = pp->ps->pgrp;
 			goto number;
 		case KEY_pid:
-			n = pp->ps.pr_pid;
+			n = pp->ps->pid;
 			goto number;
 		case KEY_ppid:
-			n = pp->ps.pr_ppid;
+			n = pp->ps->ppid;
 			break;
 		case KEY_pri:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pp->ps.pr_pri;
+			n = pp->ps->pri;
 			goto number;
-#if _mem_pr_refcount_prpsinfo
 		case KEY_refcount:
-			n = pp->ps.pr_refcount;
+			n = pp->ps->refcount;
 			goto number;
-#endif
 		case KEY_rss:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pp->ps.pr_rssize;
+			n = pp->ps->rss;
 			goto number;
 		case KEY_sid:
-			n = pp->ps.pr_sid;
+			n = pp->ps->sid;
 			goto number;
 		case KEY_size:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pp->ps.pr_size;
+			n = pp->ps->size;
 			goto number;
 		case KEY_start:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			u = PR_START(&pp->ps);
+			u = pp->ps->start;
 			s = fmttime((state.now - u) >= (24 * 60 * 60) ? "%y-%m-%d" : "%H:%M:%S", u);
 			break;
 		case KEY_state:
-			*(s = sbuf) = pp->ps.pr_sname;
+			*(s = sbuf) = pp->ps->state;
 			*(s + 1) = 0;
 			break;
-#if _mem_pr_tgrp_prpsinfo
 		case KEY_tgrp:
-			n = pp->ps.pr_tgrp;
+			n = pp->ps->tgrp;
 			goto number;
-#endif
 		case KEY_time:
 			if (fp->fmt == 's')
-				s = fmtelapsed(PR_TIME(&pp->ps), PR_HZ);
+				s = fmtelapsed(pp->ps->time, state.pss->hz);
 			else
-				n = PR_TIME(&pp->ps);
+				n = pp->ps->time;
 			break;
 		case KEY_tty:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			s = ttybase(pp->ps.pr_ttydev);
-			if ((i = strlen(s) - kp->prec) > 0)
+			s = pssttyname(state.pss, pp->ps->tty);
+			if (kp->prec && (i = strlen(s) - kp->prec) > 0)
 			{
 				if (s[0] == 'p' && s[1] == 't')
 				{
@@ -904,15 +715,15 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			}
 			break;
 		case KEY_uid:
-			n = pp->ps.pr_uid;
+			n = pp->ps->uid;
 			goto number;
 		case KEY_user:
 			s = pp->user;
 			break;
 		case KEY_wchan:
-			if (PR_ZOMBIE(&pp->ps))
+			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			n = (long)pp->ps.pr_wchan;
+			n = (long)pp->ps->wchan;
 			goto number;
 		default:
 			return 0;
@@ -947,14 +758,14 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 static void
 ps(Ps_t* pp)
 {
-	register Key_t*			kp;
-	register struct prpsinfo*	pr;
-	register char*			s;
-	register int			i;
-	register long			n;
-	unsigned long			u;
-	int				j;
-	char				sbuf[2];
+	register Key_t*		kp;
+	register Pssent_t*	pr;
+	register char*		s;
+	register int		i;
+	register long		n;
+	unsigned long		u;
+	int			j;
+	char			sbuf[2];
 
 	pp->shown = 1;
 	if (state.format)
@@ -962,55 +773,27 @@ ps(Ps_t* pp)
 		sfkeyprintf(sfstdout, pp, state.format, key, NiL);
 		return;
 	}
-	pr = &pp->ps;
+	pr = pp->ps;
 	for (kp = state.fields; kp; kp = kp->next)
 	{
 		switch (kp->index)
 		{
 		case KEY_addr:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			n = (long)pr->pr_addr;
+			n = (long)pr->addr;
 			goto hex;
-#if _mem_pr_clname_prpsinfo
 		case KEY_class:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			s = pr->pr_clname;
+			s = pr->sched;
 			goto string;
-#endif
 		case KEY_args:
-#if _mem_pr_psargs_prpsinfo
-			s = PR_ZOMBIE(pr) ? "<defunct>" : pr->pr_psargs;
+			s = pr->args;
 			goto branch;
-#endif
-#ifdef _PS_args
-			sfprintf(state.tmp, _PS_path_num, pr->pr_pid, _PS_args);
-			if ((i = open(sfstruse(state.tmp), O_RDONLY|O_BINARY)) >= 0)
-			{
-				n = read(i, sfstrbase(state.tmp), sfstrsize(state.tmp) - 1);
-				close(i);
-				if (n > 0)
-				{
-					s = sfstrbase(state.tmp);
-					for (i = 0; i < n; i++)
-						if (!s[i])
-							s[i] = ' ';
-					s[i] = 0;
-					goto branch;
-				}
-			}
-#endif
 		case KEY_command:
-			s = PR_ZOMBIE(pr) ? "<defunct>" : pr->pr_fname;
-#if _mem_pr_psargs_prpsinfo || defined(_PS_args)
+			s = pr->command;
 		branch:
-#endif
-			if (s[0] == '(' && s[i = strlen(s) - 1] == ')')
-			{
-				s[i] = 0;
-				s++;
-			}
 			if ((j = pp->level) > 0)
 			{
 				for (i = 0, j--; i < j; i++)
@@ -1019,87 +802,81 @@ ps(Ps_t* pp)
 			}
 			goto string;
 		case KEY_cpu:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pr->pr_cpu;
+			n = pr->cpu;
 			goto percent;
 		case KEY_etime:
-			s = fmtelapsed(state.now - (unsigned long)PR_START(pr), 1);
+			s = fmtelapsed(state.now - (unsigned long)pr->start, 1);
 			goto string;
 		case KEY_flags:
-			n = pr->pr_flag & 0xff;
+			n = pr->flags & PSS_FLAGS;
 			goto hex;
 		case KEY_gid:
-			n = pr->pr_gid;
+			n = pr->gid;
 			goto number;
 		case KEY_group:
-			s = fmtgid(pr->pr_gid);
+			s = fmtgid(pr->gid);
 			goto string;
 		case KEY_nice:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pr->pr_nice;
+			n = pr->nice;
 			goto number;
-#if _mem_pr_ntpid_prpsinfo
-		case KEY_ntpid:
-			n = pr->pr_ntpid;
+		case KEY_npid:
+			n = pr->npid;
 			goto hex;
-#endif
 		case KEY_pgrp:
-			n = pr->pr_pgrp;
+			n = pr->pgrp;
 			goto number;
 		case KEY_pid:
-			n = pr->pr_pid;
+			n = pr->pid;
 			goto number;
 		case KEY_ppid:
-			n = pr->pr_ppid;
+			n = pr->ppid;
 			goto number;
 		case KEY_pri:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pr->pr_pri;
+			n = pr->pri;
 			goto number;
-#if _mem_pr_refcount_prpsinfo
 		case KEY_refcount:
-			n = pr->pr_refcount;
+			n = pr->refcount;
 			goto number;
-#endif
 		case KEY_rss:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pr->pr_rssize;
+			n = pr->rss;
 			goto number;
 		case KEY_sid:
-			n = pr->pr_sid;
+			n = pr->sid;
 			goto number;
 		case KEY_size:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			n = pr->pr_size;
+			n = pr->size;
 			goto number;
 		case KEY_start:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			u = PR_START(pr);
+			u = pr->start;
 			s = fmttime((state.now - u) >= (24 * 60 * 60) ? "%y-%m-%d" : "%H:%M:%S", u);
 			goto string;
 		case KEY_state:
-			*(s = sbuf) = pr->pr_sname;
+			*(s = sbuf) = pr->state;
 			*(s + 1) = 0;
 			goto string;
-#if _mem_pr_tgrp_prpsinfo
 		case KEY_tgrp:
-			n = pr->pr_tgrp;
+			n = pr->tgrp;
 			goto number;
-#endif
 		case KEY_time:
-			s = fmtelapsed(PR_TIME(pr), PR_HZ);
+			s = fmtelapsed(pr->time, state.pss->hz);
 			goto string;
 		case KEY_tty:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			s = ttybase(pr->pr_ttydev);
-			if ((i = strlen(s) - kp->prec) > 0)
+			s = pssttyname(state.pss, pr->tty);
+			if (kp->prec && (i = strlen(s) - kp->prec) > 0)
 			{
 				if (s[0] == 'p' && s[1] == 't')
 				{
@@ -1115,15 +892,15 @@ ps(Ps_t* pp)
 			}
 			goto string;
 		case KEY_uid:
-			n = pr->pr_uid;
+			n = pr->uid;
 			goto number;
 		case KEY_user:
 			s = pp->user;
 			goto string;
 		case KEY_wchan:
-			if (PR_ZOMBIE(pr))
+			if (pr->state == PSS_ZOMBIE)
 				goto zombie;
-			n = (long)pr->pr_wchan;
+			n = (long)pr->wchan;
 			goto hex;
 		}
 		s = "????";
@@ -1183,7 +960,7 @@ ancestor(register Ps_t* pp)
 {
 	register Ps_t*	ap;
 
-	if (pp->ps.pr_ppid != pp->ps.pr_pid && (ap = (Ps_t*)dtmatch(state.bypid, &pp->ps.pr_ppid)))
+	if (pp->ps->ppid != pp->ps->pid && (ap = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)))
 	{
 		if (!ap->must)
 			ancestor(ap);
@@ -1201,47 +978,11 @@ ancestor(register Ps_t* pp)
 static void
 list(void)
 {
-	register int	n;
 	register Ps_t*	pp;
 	register Ps_t*	xp;
 	register Ps_t*	zp;
-	register Key_t*	kp;
 	Ps_t*		rp;
 
-	if (state.fields)
-	{
-		while (state.fields->skip)
-			state.fields = state.fields->next;
-		kp = state.fields;
-		while (kp->next)
-		{
-			if (!kp->next->skip)
-				kp = kp->next;
-			else if (!(kp->next = kp->next->next))
-			{
-				state.lastfield = kp;
-				break;
-			}
-		}
-		n = 0;
-		for (kp = state.fields; kp; kp = kp->next)
-		{
-			if ((kp->prec = kp->width) < 0)
-				kp->prec = -kp->prec;
-			if (*kp->head)
-				n = 1;
-		}
-		kp = state.lastfield;
-		if (kp->width < 0)
-			kp->width = 0;
-		if (kp->index == KEY_args)
-			kp->prec = 80;
-		if (n && state.heading)
-			for (kp = state.fields; kp; kp = kp->next)
-				sfprintf(sfstdout, "%*s%s", kp->width, kp->head, kp->sep);
-	}
-	else if (state.heading)
-		sfkeyprintf(sfstdout, NiL, state.format, key, NiL);
 	if (state.recursive)
 	{
 		/*
@@ -1252,7 +993,7 @@ list(void)
 		for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
 			if (pp->must > 0 || !pp->must && ancestor(pp))
 			{
-				if (pp->ps.pr_ppid != pp->ps.pr_pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps.pr_ppid)) && xp->must > 0)
+				if (pp->ps->ppid != pp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)) && xp->must > 0)
 				{
 					if (xp->lastchild)
 						xp->lastchild = xp->lastchild->sibling = pp;
@@ -1284,33 +1025,85 @@ list(void)
 }
 
 /*
+ * finalize the field formats and optionally list the heading
+ */
+
+static void
+head(void)
+{
+	register int	n;
+	register Key_t*	kp;
+
+	if (state.fields)
+	{
+		while (state.fields->skip)
+			state.fields = state.fields->next;
+		kp = state.fields;
+		while (kp->next)
+		{
+			if (!kp->next->skip)
+				kp = kp->next;
+			else if (!(kp->next = kp->next->next))
+			{
+				state.lastfield = kp;
+				break;
+			}
+		}
+		n = 0;
+		for (kp = state.fields; kp; kp = kp->next)
+		{
+			if ((kp->prec = kp->width) < 0)
+				kp->prec = -kp->prec;
+			if (*kp->head)
+				n = 1;
+		}
+		kp = state.lastfield;
+		if (kp->width < 0)
+			kp->width = 0;
+		if (kp->index == KEY_args)
+			kp->prec = 80;
+		if (n && state.heading)
+		{
+			for (kp = state.fields; kp; kp = kp->next)
+				sfprintf(sfstdout, "%*s%s", kp->width, kp->head, kp->sep);
+			sfputc(sfstdout, '\n');
+		}
+	}
+	else
+	{
+		sfkeyprintf(state.heading ? sfstdout : state.wrk, NiL, state.format, key, NiL);
+		sfstrset(state.wrk, 0);
+	}
+}
+
+/*
  * order procs by <uid,start,pid>
  */
 
 static int
-order(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
+byorder(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 {
-	register Ps_t*	pa = (Ps_t*)((char*)a - offsetof(Ps_t, ps.pr_pid));
-	register Ps_t*	pb = (Ps_t*)((char*)b - offsetof(Ps_t, ps.pr_pid));
+	register Ps_t*	pa = (Ps_t*)a;
+	register Ps_t*	pb = (Ps_t*)b;
 	register int	i;
 
 	NoP(dt);
 	NoP(disc);
 	if (i = strcmp(pa->user, pb->user))
 		return i;
-	if (pa->ps.pr_pgrp < pb->ps.pr_pgrp)
+	if (pa->ps->pgrp < pb->ps->pgrp)
 		return -1;
-	if (pa->ps.pr_pgrp > pb->ps.pr_pgrp)
+	if (pa->ps->pgrp > pb->ps->pgrp)
 		return 1;
-	if (i = (pa->ps.pr_pgrp == pa->ps.pr_pid) - (pb->ps.pr_pgrp == pb->ps.pr_pid))
+	if (i = (pa->ps->pgrp == pa->ps->pid) - (pb->ps->pgrp == pb->ps->pid))
 		return i;
-	if (PR_START(&pa->ps) < PR_START(&pb->ps))
+	if (pa->ps->start < pb->ps->start)
 		return -1;
-	if (PR_START(&pa->ps) > PR_START(&pb->ps))
+	if (pa->ps->start > pb->ps->start)
 		return 1;
-	if (pa->ps.pr_pid < pb->ps.pr_pid)
+	if (pa->ps->pid < pb->ps->pid)
 		return -1;
-	if (pa->ps.pr_pid > pb->ps.pr_pid)
+	if (pa->ps->pid > pb->ps->pid)
 		return 1;
 	return 0;
 }
@@ -1320,136 +1113,37 @@ order(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
  */
 
 static void
-addpid(register char* s, int must, int verbose)
+addpid(Pssent_t* pe, register char* s, int must)
 {
-	register char*			t;
-	register int			fd;
-	register Ps_t*			pp;
-	register struct prpsinfo*	pr;
-	register int			c;
-	int				n;
-	unsigned long			x;
-#if defined(_PS_scan_binary) || defined(_PS_scan_format)
-	struct stat			st;
-#endif
+	register char*		t;
+	register Ps_t*		pp;
+	register int		c;
+	char*			e;
+	pid_t			pid;
 
 	do
 	{
-		for (; isspace(*s) || *s == ','; s++);
-		for (t = s; *s && !isspace(*s) && *s != ','; s++);
-		c = *s;
-		*s = 0;
-		if (!*t)
-			break;
-		sfprintf(state.tmp, _PS_path_str, t, _PS_status);
-		if ((fd = open(sfstruse(state.tmp), O_RDONLY|O_BINARY)) >= 0)
+		if (s)
+		{
+			for (; isspace(*s) || *s == ','; s++);
+			for (t = s; *s && !isspace(*s) && *s != ','; s++);
+			c = *s;
+			*s = 0;
+			if (!*t)
+				break;
+			pid = (pid_t)strtol(t, &e, 0);
+			if (*e)
+				error(3, "%s: invalid pid", t);
+			pe = pssread(state.pss, pid);
+		}
+		if (pe)
 		{
 			if (!(pp = state.pp) && !(state.pp = pp = newof(0, Ps_t, 1, 0)))
 				error(ERROR_SYSTEM|3, "out of space [proc]");
-			pr = &pp->ps;
-#ifdef _PS_scan_format
-			if ((n = read(fd, state.buf, sizeof(state.buf))) <= 0 || fstat(fd, &st))
-			{
-				n = -1;
-				errno = EINVAL;
-			}
-			else
-			{
-				memset(pr, sizeof(*pr), 0);
-				n = sfsscanf(state.buf, _PS_scan_format, _PS_scan_args(pr));
-				if (n != _PS_scan_count)
-					error(1, "%s: scan count %d, expected %d", t, n, _PS_scan_count);
-#ifdef _PS_scan_fix
-				_PS_scan_fix(pr);
-#endif
-				pr->pr_uid = st.st_uid;
-				pr->pr_gid = st.st_gid;
-				pr->pr_nice = pr->pr_priority - 15;
-				pr->pr_size /= 1024;
-				pr->pr_rssize /= 1024;
-#ifdef _PS_scan_boot
-				if (!state.boot)
-				{
-					register char*	s;
-					Sfio_t*		fp;
-
-					state.boot = 1;
-					if (fp = sfopen(NiL, "/proc/stat", "r"))
-					{
-						while (s = sfgetr(fp, '\n', 0))
-							if (strneq(s, "btime ", 6))
-							{
-								state.boot = strtol(s + 6, NiL, 10);
-								break;
-							}
-						sfclose(fp);
-					}
-				}
-				pr->pr_start = state.boot + pr->pr_start / PR_HZ;
-#endif
-			}
-#else
-#ifdef _PS_scan_binary
-			n = read(fd, pr, sizeof(*pr)) == sizeof(*pr) ? 1 : -1;
-#else
-			n = ioctl(fd, PIOCPSINFO, pr);
-#endif
-#endif
-			close(fd);
-			if (n < 0)
-			{
-				error(ERROR_SYSTEM|2, "%s: cannot get process info", t);
-				return;
-			}
-			if (must <= 0 && (!state.tree || !state.all))
-			{
-				if (state.controlled)
-				{
-					if (pr->pr_ttydev != state.ttydev || pr->pr_uid != state.caller)
-						return;
-				}
-				else if (!state.detached && pr->pr_ttydev == (dev_t)(-1))
-					return;
-				else if (state.detached < 0 && (pr->pr_ttydev != (dev_t)(-1) || PR_ZOMBIE(pr)))
-					return;
-				else if (!state.leader && pr->pr_pid == pr->pr_sid)
-					return;
-				if (state.match && (n = regexec(&state.re, pr->pr_fname, 0, NiL, 0)))
-					{
-						if (n != REG_NOMATCH)
-							regfatal(&state.re, 3, n);
-						if (!state.recursive)
-							return;
-						must = 0;
-					}
-				if (!state.all && state.idindex)
-				{
-					switch (state.idindex)
-					{
-					case KEY_group:
-						x = pr->pr_gid;
-						break;
-					case KEY_pgrp:
-						x = pr->pr_pgrp;
-						break;
-					case KEY_sid:
-						x = pr->pr_sid;
-						break;
-					case KEY_tty:
-						x = pr->pr_ttydev;
-						break;
-					case KEY_user:
-						x = pr->pr_uid;
-						break;
-					default:
-						error(2, "internal error: %s selection not implemented", keys[state.idindex].name);
-						return;
-					}
-					if (!dtmatch(state.ids, &x))
-						return;
-				}
-			}
-			pp->user = fmtuid(pr->pr_uid);
+			if (!(pp->ps = psssave(state.pss, pe)))
+				break;
+			pp->user = fmtuid(pe->uid);
+			pp->pid = pp->ps->pid;
 			pp->must = must != 0;
 			if (!dtsearch(state.byorder, pp))
 			{
@@ -1457,13 +1151,11 @@ addpid(register char* s, int must, int verbose)
 				state.pp = 0;
 			}
 		}
-		else if (verbose || errno != ENOENT && errno != EACCES)
-			error(ERROR_SYSTEM|2, "%s: cannot open process", t);
-	} while (*s++ = c);
+	} while (s && (*s++ = c));
 }
 
 /*
- * add the ids in s into state.ids
+ * add the ids in s into state.pssdisc.match
  * getid!=0 translates alnum to id number
  */
 
@@ -1474,25 +1166,21 @@ addid(register char* s, int index, int (*getid)(const char*))
 	register int	c;
 	char*		e;
 	long		n;
-	Dtdisc_t*	dp;
-	Id_t*		ip;
+	unsigned long	field;
+	Pssmatch_t*	mp;
+	Pssdata_t*	dp;
 
-	if (index != state.idindex)
+	if (!((field = keys[index].field) & PSS_match))
+		error(3, "%s: cannot match on this field", keys[index].name);
+	for (mp = state.pssdisc.match; mp && mp->field != field; mp = mp->next);
+	if (!mp)
 	{
-		if (state.idindex)
-		{
-			error(2, "only one of %s and %s may be selected", keys[state.idindex].name, keys[index].name);
-			return;
-		}
-		state.idindex = index;
-		if (!(dp = newof(0, Dtdisc_t, 1, 0)))
-			error(ERROR_SYSTEM|3, "out of space [id-disc]");
-		dp->key = offsetof(Id_t, id);
-		dp->size = sizeof(long);
-		dp->link = offsetof(Id_t, hashed);
-		if (!(state.ids = dtopen(dp, Dthash)))
-			error(ERROR_SYSTEM|3, "out of space [id-dict]");
-		state.detached = state.leader = 1;
+		if (!(mp = newof(0, Pssmatch_t, 1, 0)))
+			error(ERROR_SYSTEM|3, "out of space [match]");
+		mp->next = state.pssdisc.match;
+		mp->field = field;
+		state.pssdisc.match = mp;
+		state.pssdisc.flags |= PSS_LEADER;
 	}
 	do
 	{
@@ -1518,10 +1206,11 @@ addid(register char* s, int index, int (*getid)(const char*))
 			error(1, "%s: invalid %s", t, keys[index].name);
 			continue;
 		}
-		if (!(ip = newof(0, Id_t, 1, 0)))
-			error(ERROR_SYSTEM|3, "out of space [id]");
-		ip->id = n;
-		dtinsert(state.ids, ip);
+		if (!(dp = newof(0, Pssdata_t, 1, 0)))
+			error(ERROR_SYSTEM|3, "out of space [match data]");
+		dp->next = mp->data;
+		mp->data = dp;
+		dp->data = n;
 	} while (*s++);
 }
 
@@ -1546,7 +1235,7 @@ addkey(const char* k)
 		for (kp = keys + 1; kp < keys + elementsof(keys); kp++)
 		{
 			ap = kp->head ? kp : (keys + kp->index);
-			sfprintf(sfstdout, "%-8s %-8s %s%s%s\n", kp->name, ap->head, ap->desc, ap == kp ? "" : " [alias]", ap->missing ? " [not available]" : "");
+			sfprintf(sfstdout, "%-8s %-8s %s%s%s\n", kp->name, ap->head, ap->desc, ap == kp ? "" : " [alias]", (!ap->field || (state.pss->fields & ap->field)) ? "" : " [not available]");
 		}
 		exit(0);
 	}
@@ -1579,11 +1268,6 @@ addkey(const char* k)
 
 		if (!kp->head)
 			kp = keys + kp->index;
-		if (kp->missing)
-		{
-			error(1, "%s: format key not implemented for this system", t);
-			continue;
-		}
 
 		/*
 		 * adjust the width field
@@ -1591,12 +1275,23 @@ addkey(const char* k)
 
 		if (*s == '=')
 		{
-			kp->head = s + 1;
-			if ((w = strlen(kp->head)) > kp->width)
+			for (t = ++s; *s && !isspace(*s) && *s != ','; s++);
+			w = s - t;
+			if (!(kp->head = newof(0, char, w, 1)))
+				error(3, "out of space [head]");
+			memcpy(kp->head, t, w);
+			if (w < c)
+				w = c;
+			if (w > kp->width)
 				kp->width = w;
 		}
-		if (c >= strlen(kp->head))
+		else if (c >= strlen(kp->head))
 			kp->width = c;
+		if (!(state.pss->fields & kp->field))
+		{
+			error(1, "%s: not available on this system", kp->name);
+			continue;
+		}
 
 		/*
 		 * except for width and head adjustments
@@ -1618,6 +1313,7 @@ addkey(const char* k)
 				if (c >= kp->width)
 					kp->width = c;
 			}
+			state.pssdisc.fields |= kp->field;
 		}
 	} while (*s != '=' && *s++);
 }
@@ -1648,17 +1344,21 @@ poppids(void)
 {
 	register List_t*	p;
 	register int		i;
+	unsigned long		flags;
 
+	flags = state.pssdisc.flags;
+	state.pssdisc.flags |= PSS_VERBOSE;
 	while (p = state.pids)
 	{
 		state.pids = p->next;
 		if (i = p->argc)
 			while (--i >= 0)
-				addpid(p->argv[i], 1, 1);
+				addpid(NiL, p->argv[i], 1);
 		else
-			addpid((char*)p->argv, 1, 1);
+			addpid(NiL, (char*)p->argv, 1);
 		free(p);
 	}
+	state.pssdisc.flags = flags;
 }
 
 int
@@ -1667,13 +1367,12 @@ main(int argc, register char** argv)
 	register int	n;
 	register char*	s;
 	int		must;
-	DIR*		dir;
-	struct dirent*	ent;
 	Sfio_t*		fmt;
 	Key_t*		kp;
 	Ps_t*		pp;
+	Pssent_t*	pe;
 	Dtdisc_t	kd;
-	Dtdisc_t	pd;
+	Dtdisc_t	nd;
 	Dtdisc_t	sd;
 	Optdisc_t	od;
 	struct stat	st;
@@ -1682,7 +1381,6 @@ main(int argc, register char** argv)
 	error_info.id = "ps";
 	setlocale(LC_ALL, "");
 	state.now = time((time_t*)0);
-	state.caller = geteuid();
 	state.heading = 1;
 	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()) || !(state.wrk = sfstropen()))
 		error(3, "out of space [tmp]");
@@ -1691,6 +1389,8 @@ main(int argc, register char** argv)
 	 * set up the disciplines
 	 */
 
+	state.pssdisc.version = PSS_VERSION;
+	state.pssdisc.errorf = (Psserror_f)errorf;
 	memset(&od, 0, sizeof(od));
 	od.version = OPT_VERSION;
 	od.infof = optinfo;
@@ -1699,21 +1399,29 @@ main(int argc, register char** argv)
 	kd.key = offsetof(Key_t, name);
 	kd.size = -1;
 	kd.link = offsetof(Key_t, hashed);
-	memset(&pd, 0, sizeof(pd));
-	pd.key = offsetof(Ps_t, ps.pr_pid);
-	pd.size = sizeof(state.pp->ps.pr_pid);
-	pd.link = offsetof(Ps_t, hashed);
+	memset(&nd, 0, sizeof(nd));
+	nd.key = offsetof(Ps_t, pid);
+	nd.size = sizeof(pid_t);
+	nd.link = offsetof(Ps_t, hashed);
 	memset(&sd, 0, sizeof(sd));
-	sd.key = offsetof(Ps_t, ps.pr_pid);
-	sd.size = sizeof(state.pp->ps.pr_pid);
 	sd.link = offsetof(Ps_t, sorted);
-	sd.comparf = order;
+	sd.comparf = byorder;
+
+	/*
+	 * open the ps stream
+	 */
+
+	if (!(state.pss = pssopen(&state.pssdisc)) || !state.pss->fields)
+	{
+		execv("/bin/ps", argv);
+		exit(EXIT_NOTFOUND);
+	}
 
 	/*
 	 * initialize the format key table
 	 */
 
-	if (!(state.keys = dtopen(&kd, Dthash)) || !(state.bypid = dtopen(&pd, Dthash)) || !(state.byorder = dtopen(&sd, Dttree)))
+	if (!(state.keys = dtopen(&kd, Dthash)) || !(state.bypid = dtopen(&nd, Dthash)) || !(state.byorder = dtopen(&sd, Dttree)))
 		error(3, "out of space [dict]");
 	for (n = 1; n < elementsof(keys); n++)
 		dtinsert(state.keys, keys + n);
@@ -1727,17 +1435,17 @@ main(int argc, register char** argv)
 		switch (optget(argv, usage))
 		{
 		case 'a':
-			state.all = 1;
+			state.pssdisc.flags |= PSS_ALL|PSS_DETACHED;
 			continue;
 		case 'c':
 			addkey("pid class pri tty time command");
 			continue;
 		case 'd':
-			state.all = state.detached = 1;
+			state.pssdisc.flags |= PSS_ALL;
 			continue;
 		case 'e':
 		case 'A':
-			state.all = state.detached = state.leader = 1;
+			state.pssdisc.flags |= PSS_ALL|PSS_LEADER;
 			continue;
 		case 'f':
 			addkey("user pid ppid start tty time args");
@@ -1773,18 +1481,13 @@ main(int argc, register char** argv)
 			addid(opt_info.arg, KEY_tty, ttyid);
 			continue;
 		case 'u':
-			addid(opt_info.arg, KEY_user, struid);
+			addid(opt_info.arg, KEY_uid, struid);
 			continue;
 		case 'v':
-			state.verbose = 1;
+			state.pssdisc.flags |= PSS_VERBOSE;
 			continue;
 		case 'x':
-			state.detached = state.leader = -1;
-			continue;
-		case 'C':
-			if (n = regcomp(&state.re, opt_info.arg, REG_AUGMENTED))
-				regfatal(&state.re, 3, n);
-			state.match = 1;
+			state.pssdisc.flags |= PSS_DETACHED|PSS_LEADER;
 			continue;
 		case 'D':
 			if (s = strchr(opt_info.arg, '='))
@@ -1848,6 +1551,7 @@ main(int argc, register char** argv)
 		if (!state.fields)
 			addkey(default_format);
 	}
+	head();
 
 	/*
 	 * add each proc by name
@@ -1855,7 +1559,7 @@ main(int argc, register char** argv)
 
 	if (*argv)
 	{
-		state.all = state.detached = 1;
+		state.pssdisc.flags |= PSS_ALL|PSS_ATTACHED;
 		pushpids(argv, argc);
 	}
 	if (state.recursive || !state.pids)
@@ -1863,25 +1567,25 @@ main(int argc, register char** argv)
 		if (state.pids)
 		{
 			must = 0;
-			state.all = 1;
+			state.pssdisc.flags |= PSS_ALL;
 		}
 		else
 			must = -1;
-		if (state.controlled = !state.all && !state.detached && !state.ids)
+		if (!(state.pssdisc.flags & (PSS_ALL|PSS_ATTACHED|PSS_DETACHED|PSS_LEADER)))
+		{
+			state.pssdisc.flags |= PSS_UID;
+			state.pssdisc.uid = geteuid();
 			for (n = 0; n <= 2; n++)
 				if (isatty(n) && !fstat(n, &st))
 				{
-					state.ttydev = st.st_rdev;
+					state.pssdisc.flags |= PSS_TTY;
+					state.pssdisc.tty = st.st_rdev;
 					break;
 				}
-		error(-1, "state all=%d controlled=%d detached=%d leader=%d must=%d", state.all, state.controlled, state.detached, state.leader, must);
+		}
 		poppids();
-		if (!(dir = opendir(_PS_dir)))
-			error(ERROR_SYSTEM|3, "%s: cannot read process directory", _PS_dir);
-		while (ent = readdir(dir))
-			if (isdigit(*ent->d_name))
-				addpid(ent->d_name, must, state.verbose);
-		closedir(dir);
+		while (pe = pssread(state.pss, PSS_SCAN))
+			addpid(pe, NiL, must);
 		if (state.recursive)
 			for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
 				dtinsert(state.bypid, pp);
@@ -1896,16 +1600,6 @@ main(int argc, register char** argv)
 	if (state.fields)
 		state.lastfield->sep = newline;
 	list();
+	pssclose(state.pss);
 	return error_info.errors != 0;
 }
-
-#else
-
-int
-main(int argc, register char** argv)
-{
-	execv("/bin/ps", argv);
-	exit(EXIT_NOTFOUND);
-}
-
-#endif

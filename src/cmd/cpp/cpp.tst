@@ -9,6 +9,17 @@ function DATA
 		a.h)	print -r -- $'#include "c.h"' > $f ;;
 		b.h)	print -r -- $'#include "c.h"' > $f ;;
 		c.h)	print -r -- $'#include "d.h"' > $f ;;
+		hdra.c)	print -r -- $'#define _CAT(a,b,c) a##b##c
+#define hdra    hdrx
+#define hdr     _CAT(<,hdra,.h>)
+#include hdr' > $f ;;
+		hdrm.c)	print -r -- $'#include <hdrx.h>' > $f ;;
+		hdrx.c)	print -r -- $'#define _XAT(a,b,c) a##b##c
+#define _CAT(a,b,c) _XAT(a,b,c)
+#define hdra    hdrx
+#define hdr     _CAT(<,hdra,.h>)
+#include hdr' > $f ;;
+		hdrx.h)	print -r -- $'int f(){return 0;}' > $f ;;
 		esac
 	done
 }
@@ -3276,3 +3287,141 @@ cpp: line 3: e3: __VA_ARGS__: duplicate macro formal argument
 cpp: line 4: e4: __VA_ARGS__: macro formal argument cannot follow ...
 cpp: line 4: e4: __VA_ARGS__: duplicate macro formal argument
 cpp: line 5: e5: a: macro formal argument cannot follow ...'
+
+TEST 13 'headerexpand vs. headerexpandall -- standardize this'
+	DO	DATA hdra.c hdrm.c hdrx.c hdrx.h
+	EXEC -I-D -I. hdra.c
+		OUTPUT - $'# 1 "hdra.c"\n\n\n\n'
+		ERROR - $'cpp: "hdra.c", line 4: warning: _CAT: 3 actual arguments expected
+cpp: "hdra.c", line 4: #include: "..." or <...> argument expected'
+		EXIT 1
+	EXEC -I-D -I. -D:headerexpand hdra.c
+		ERROR - $'cpp: "hdra.c", line 4: hdra.h: cannot find include file'
+	EXEC -I-D -I. -D:headerexpandall hdra.c
+		OUTPUT - $'# 1 "hdra.c"
+
+
+
+# 1 "hdrx.h"
+int f(){return 0;}
+# 5 "hdra.c"'
+		ERROR -
+		EXIT 0
+	EXEC -I-D -I. hdrx.c
+		OUTPUT - $'# 1 "hdrx.c"\n\n\n\n\n'
+		ERROR - $'cpp: "hdrx.c", line 5: warning: _CAT: 3 actual arguments expected
+cpp: "hdrx.c", line 5: warning: _XAT: 3 actual arguments expected
+cpp: "hdrx.c", line 5: #include: "..." or <...> argument expected'
+		EXIT 1
+	EXEC -I-D -I. -D:headerexpand hdrx.c
+		OUTPUT - $'# 1 "hdrx.c"
+
+
+
+
+# 1 "hdrx.h"
+int f(){return 0;}
+# 6 "hdrx.c"'
+		ERROR -
+		EXIT 0
+	EXEC -I-D -I. -D:headerexpandall hdrx.c
+	EXEC -I-D -I. hdrm.c
+		OUTPUT - $'# 1 "hdrm.c"
+
+# 1 "hdrx.h"
+int f(){return 0;}
+# 2 "hdrm.c"'
+	EXEC -I-D -I. -D:headerexpand hdrm.c
+	EXEC -I-D -I. -D:headerexpandall hdrm.c
+	EXEC -I-D -I. -Dhdrx=hdra hdrm.c
+	EXEC -I-D -I. -Dhdrx=hdra -D:headerexpand hdrm.c
+	EXEC -I-D -I. -Dhdrx=hdra -D:headerexpandall hdrm.c
+
+TEST 14 'ancient proto stealth memory fault'
+	EXEC -I-D -D:compatibility
+		INPUT - $'#pragma prototyped
+a(Xfio_t* sp){}
+b(Xfio_t* sp){}
+d(Xfio_t* sp){}
+e(Xfio_t* sp){}
+f(Xfio_t* sp){}
+g(char* buf,int size,Xfio_t* sp){}
+h(Xfio_t* sp){}
+i(int c,Xfio_t* sp){}
+j(char* buf,Xfio_t* sp){}
+k(void* buf,size_t size,size_t n,Xfio_t* sp){}
+l(void* buf,size_t size,size_t n,Xfio_t* sp){}
+m(Xfio_t* sp){}'
+		OUTPUT - $'# 1 ""
+
+
+
+# 25
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 2
+a (sp) Xfio_t* sp;
+# 2
+{}
+b (sp) Xfio_t* sp;
+# 3
+{}
+d (sp) Xfio_t* sp;
+# 4
+{}
+e (sp) Xfio_t* sp;
+# 5
+{}
+f (sp) Xfio_t* sp;
+# 6
+{}
+g (buf, size, sp) char* buf;int size;Xfio_t* sp;
+# 7
+{}
+h (sp) Xfio_t* sp;
+# 8
+{}
+i (c, sp) int c;Xfio_t* sp;
+# 9
+{}
+j (buf, sp) char* buf;Xfio_t* sp;
+# 10
+{}
+k (buf, size, n, sp) char* buf;size_t size;size_t n;Xfio_t* sp;
+# 11
+{}
+l (buf, size, n, sp) char* buf;size_t size;size_t n;Xfio_t* sp;
+# 12
+{}
+m (sp) Xfio_t* sp;
+# 13
+{}'

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1990-2001 AT&T Corp.                #
+#                Copyright (c) 1990-2002 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -14,8 +14,7 @@
 #           the license and copyright and are violating            #
 #               AT&T's intellectual property rights.               #
 #                                                                  #
-#                 This software was created by the                 #
-#                 Network Services Research Center                 #
+#            Information and Software Systems Research             #
 #                        AT&T Labs Research                        #
 #                         Florham Park NJ                          #
 #                                                                  #
@@ -35,7 +34,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2001-10-31 $
+@(#)$Id: sear (AT&T Labs Research) 2001-12-12 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -156,7 +155,7 @@ obj=${obj%.*}.o
 trap 'rm -f $obj $tmp.*' 0 1 2 3
 res=$tmp.res
 typeset -H host_ico=$ico host_rc=$tmp.rc host_res=$tmp.res
-print -r "sear ICON \"$host_ico\"" > $tmp.rc
+print -r "sear ICON \"${host_ico//\\/\\\\}\"" > $tmp.rc
 if	! rc -x -r -fo"$host_res" "$host_rc"
 then	exit 1
 fi

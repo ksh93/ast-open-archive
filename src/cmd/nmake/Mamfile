@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -84,12 +84,16 @@ done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -156,7 +160,9 @@ prev ../../../include/ast/ast_fs.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/fs3d.h
 make ../../../include/ast/dirent.h implicit
+make ../../../include/ast/ast_dirent.h implicit
 prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/ast_dirent.h
 done ../../../include/ast/dirent.h
 prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
@@ -286,7 +292,7 @@ prev options.h implicit
 prev make.h implicit
 done option.c
 prev option.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
 make parse.o
 make parse.c
@@ -349,7 +355,7 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2001-10-31 \$\0\n"\" -c version.c
+exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2002-02-14 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -last
@@ -514,7 +520,7 @@ exec - {
 exec - 	echo '/* : : generated from cc assertions : : */'
 exec - 	set -
 exec - 	f=`${INSTALLROOT}/lib/probe/probe -kg C pp cc`
-exec - 	a="`sed -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_"
+exec - 	a="`sed -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_ STDCAT STDCMP STDCP STDED STDEDFLAGS STDLN STDMV STDRM"
 exec - 	for n in $a
 exec - 	do	eval $n=
 exec - 	done
@@ -529,7 +535,40 @@ exec - 	case `cat /tmp/mkl$$/hl` in
 exec - 	"$text")	_feature_="$_feature_ ln" ;;
 exec - 	esac
 exec - 	ln -s /tmp/mkl$$/hl /tmp/mkl$$/sl 2>/dev/null && rm /tmp/mkl$$/sl && _feature_="$_feature_ ln-s"
-exec - 	rm -rf /tmp/mkl$$
+exec - 	( /bin/mkdir -p /tmp/mkl$$/mk/dir ) 2>/dev/null &&
+exec - 	test ! -d ./-p &&
+exec - 	_feature_="$_feature_ mkdir-p"
+exec - 	rm -rf ./-p /tmp/mkl$$
+exec - 	if	( ed ) < /dev/null > /dev/null 2>&1
+exec - 	then	STDED=ed
+exec - 	else	STDED=ex
+exec - 	fi
+exec - 	STDEDFLAGS=-
+exec - 	set STDCAT cat STDCMP cmp STDCP cp STDLN ln STDMV mv STDRM rm
+exec - 	while	:
+exec - 	do	case $# in
+exec - 		0|1)	break ;;
+exec - 		esac
+exec - 		p=$2
+exec - 		for d in /bin /usr/bin /usr/sbin
+exec - 		do	if	test -x $d/$p
+exec - 			then	p=$d/$p
+exec - 				break
+exec - 			fi
+exec - 		done
+exec - 		eval $1=\$p
+exec - 		shift
+exec - 		shift
+exec - 	done
+exec - 	if	test -x /bin/cat.exe
+exec - 	then	if	/bin/cat /bin/cat >/dev/null 2>&1
+exec - 		then	: ok
+exec - 		else	: .exe challenged
+exec - 			for n in STDCAT STDCMP STDCP STDLN STDMV STDRM
+exec - 			do	eval $n=\"execrate \$$n\"
+exec - 			done
+exec - 		fi
+exec - 	fi
 exec - 	set -x
 exec - 	for n in $a
 exec - 	do	eval echo \$n = \$$n

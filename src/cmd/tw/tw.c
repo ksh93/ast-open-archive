@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -202,6 +201,8 @@ USAGE_LICENSE
 "			[+SKIP?do not consider this file or any subdirectories"
 "				if it is a directory]"
 "		}"
+"		[+symlink?the symbolic link text if the file is a symbolic"
+"			link]"
 "		[+type?the type bits of \bmode\b:]{"
 "			[+BLK?block special]"
 "			[+CHR?block special]"
@@ -731,13 +732,16 @@ main(int argc, register char** argv)
 			disc.dirs = ap = av;
 			if (firstdir != lastdir)
 				firstdir = firstdir->next;
-			do *ap++ = firstdir->name; while (firstdir = firstdir->next);
+			do {error(-1, "AHA dir %s", firstdir->name);*ap++ = firstdir->name;} while (firstdir = firstdir->next);
 			*ap = 0;
 			if (!(state.find = findopen(codes, state.pattern, NiL, &disc)))
 				exit(1);
 			state.ftwflags |= FTW_TOP;
 			n = state.select == ALL ? state.act : ACT_EVAL;
+error(-1, "AHA pattern=%s codes=%s state.select=%p state.act=%d n=%d", state.pattern, codes, state.select, state.act, n);
 			while (s = findread(state.find))
+			{
+error(-1, "AHA n=%d s=%s", n, s);
 				switch (n)
 				{
 				case ACT_CMDARG:
@@ -750,6 +754,7 @@ main(int argc, register char** argv)
 					ftwalk(s, tw, state.ftwflags, NiL);
 					break;
 				}
+			}
 		}
 		else if (state.ftwflags & FTW_LIST)
 		{

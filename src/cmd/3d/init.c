@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -44,7 +43,7 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2001-10-31 $\0\n"
+"] (AT&T Research) 2001-11-26 $\0\n"
 #else
 "\n@(#)$Id: 3d (AT&T Research) 2001-10-31 $\0\n"
 #endif
@@ -1422,7 +1421,7 @@ control(void)
 		}
 		if (!n) n = strlen(s);
 		sfsprintf(buf, sizeof(buf), "%-*s#%d", n, s, state.pid);
-		if ((fd = OPEN(buf, 0, 0)) >= 0)
+		if ((fd = OPEN(buf, O_RDONLY, 0)) >= 0)
 		{
 			if ((n = READ(fd, buf, sizeof(buf) - 1)) > 0)
 			{

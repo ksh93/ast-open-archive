@@ -1,3 +1,4 @@
+02-02-14 Makefiles: add explicit -lz -ldll references
 01-07-17 cdblib: call dllerror() on failed dllfind()
 01-02-14 cdbtypes: add seed detail for {hash} and {rand} types
 01-01-01 cdbimage: drop span discipline that invalidated seeks

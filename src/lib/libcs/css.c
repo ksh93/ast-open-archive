@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2001 AT&T Corp.                *
+*                Copyright (c) 1990-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -584,6 +583,8 @@ cssfd(register Css_t* css, register int fd, unsigned long op)
 				drop(state.fdinfo[fd].css, &state.fdpoll[n]);
 				break;
 			}
+		if (n >= state.fdpolling)
+			close(fd);
 #if DEBUG
 		ip = 0;
 		goto show;

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2001 AT&T Corp.                *
+*                Copyright (c) 1986-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -33,7 +32,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2001-08-06 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2002-03-15 $\0\n";
 
 #if PROTOMAIN
 
@@ -54,6 +53,7 @@ static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2001-08-06 $\0\n";
 
 #define MAGICDIR	"pragma"	/* proto magic directive	*/
 #define MAGICARG	"prototyped"	/* proto magic directive arg	*/
+#define MAGICOFF	"noticed"	/* no notice if found in pragma	*/
 #define MAGICTOP	64		/* must be in these top lines	*/
 #define NOTICED		"Copyright"	/* no notice if found in magic	*/
 
@@ -337,10 +337,10 @@ linesync(register struct proto* proto, register char* p, register long n)
 	if (proto->flags & LINESYNC)
 #endif
 	{
+#if PROTOMAIN
 		p = strcopy(p, "\n#line ");
-#if !PROTOMAIN
-		*p++ = '#';
-		*p++ = ' ';
+#else
+		p = strcopy(p, "\n# ");
 #endif
 		p = number(p, n);
 		*p++ = '\n';
@@ -2116,8 +2116,10 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 					pragma = -2;
 				}
 				if (!strncmp(s, MAGICARG, sizeof(MAGICARG) - 1) && (*(s += sizeof(MAGICARG) - 1) == ' ' || *s == '\t' || *s == '\n' || *s == '\r'))
-				{
 					while (*s)
+					{
+						if ((*(s - 1) == ' ' || *(s - 1) == '\t') && *s == *MAGICOFF && !strncmp(s, MAGICOFF, sizeof(MAGICOFF) - 1))
+							notice = options = 0;
 						if (*s++ == '\n')
 						{
 							pragma += 2;
@@ -2127,7 +2129,7 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 							for (s--; b < s; *b++ = ' ');
 							goto magic;
 						}
-				}
+					}
 				pragma = -1;
 			}
 		}
@@ -2186,7 +2188,7 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 			pppclose(iob);
 			return 0;
 		}
-		else if ((flags & PROTO_PASS) || !pragma)
+		else if ((flags & (PROTO_FORCE|PROTO_PASS)) == PROTO_PASS || !pragma)
 		{
 			proto->flags |= PASS;
 			if (proto->flags & MORE)

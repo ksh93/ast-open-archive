@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2001 AT&T Corp.                *
+*                Copyright (c) 1986-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -420,7 +419,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 				popframe(mp);
 			ret = !mac->size;
 		}
-		else
+		else if (!(pp.state & HEADER) || (pp.option & HEADEREXPANDALL)  || pp.in->type != IN_COPY)
 		{
 			if (sym->flags & SYM_MULTILINE)
 				PUSH_MULTILINE(sym);
@@ -430,7 +429,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 		}
 	}
  disable:
-	if (ret < 0 && sym->hidden && !(pp.mode & EXPOSE) && (pp.in->type == IN_FILE || pp.in->type == IN_MACRO || pp.in->type == IN_EXPAND))
+	if (ret < 0 && sym->hidden && !(pp.mode & EXPOSE) && !(pp.state & HEADER) && (pp.in->type == IN_FILE || pp.in->type == IN_MACRO || pp.in->type == IN_EXPAND))
 	{
 		struct ppinstk*	inp;
 

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2001-08-31
+# @(#)pp.probe (AT&T Research) 2001-11-22
 #
 # C probe for libpp
 #
@@ -52,11 +52,16 @@ int x;
 #else
 (
 #endif" > elseif.$src
-echo "#define hdrx hdry
-#define _DIR .
-#define _HDR(x) <_DIR/x>
-#include _HDR(hdrx.h)" > hdrx.$src
-echo "int f(){return 0;}" > hdry.h
+echo "#define _CAT(a,b,c) a##b##c
+#define hdra	hdrx
+#define hdr	_CAT(<,hdra,.h>)
+#include hdr" > hdra.$src
+echo "#define _XAT(a,b,c) a##b##c
+#define _CAT(a,b,c) _XAT(a,b,c)
+#define hdra	hdrx
+#define hdr	_CAT(<,hdra,.h>)
+#include hdr" > hdrx.$src
+echo "int f(){return 0;}" > hdrx.h
 echo "#ident \"$id\"" > ident.$src
 echo "#import \"import.h\"" > import.$src
 echo "int aaa;" > import.h
@@ -182,6 +187,7 @@ dollar=
 eject=
 elseif=
 headerexpand=
+headerexpandall=
 hostedtransition=
 ident=
 import=
@@ -218,7 +224,11 @@ $cc -c dollar.$src && dollar=1
 
 $cc -c elseif.$src && elseif=1
 
-$cc -I. -c hdrx.$src && headerexpand=1
+if	$cc -I. -c hdra.$src
+then	headerexpandall=1
+elif	$cc -I. -c hdrx.$src
+then	headerexpand=1
+fi
 
 if	$cc -E eject.$src
 then	case "`$cc -E eject.$src | grep -c 'eject'`" in
@@ -987,6 +997,9 @@ case $elseif in
 esac
 case $headerexpand in
 1)	echo "#pragma pp:headerexpand" ;;
+esac
+case $headerexpandall in
+1)	echo "#pragma pp:headerexpandall" ;;
 esac
 case $ident in
 1)	echo '#pragma pp:map "/#(pragma )?ident>/" "/#(pragma )?/###/"' ;;

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2001 AT&T Corp.                *
+*                Copyright (c) 1998-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -43,7 +42,7 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 	register unsigned char*	low;
 	unsigned char*		vp;
 	unsigned char*		ve;
-	ssize_t			r;
+	Sfoff_t			r;
 	int			peek;
 	Pzread_f		readf;
 	Pzindex_f		indexf;
@@ -94,7 +93,7 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 			if (pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: last record incomplete", pz->path);
 		}
-		if (sfsync(op))
+		if (sfsync(op) || sferror(op))
 		{
 			if (pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: output write error", pz->path);

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2001 AT&T Corp.                *
+*                Copyright (c) 1991-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -30,7 +29,7 @@
  * hash index file implementation
  */
 
-static const char ID[] = "\n@(#)$Id: hix (AT&T Research) 2001-02-14 $\0\n";
+static const char ID[] = "\n@(#)$Id: hix (AT&T Research) 2001-12-21 $\0\n";
 
 #include <sfio_t.h>
 #include <ast.h>
@@ -149,7 +148,7 @@ typedef struct Part_s
 	char*		tag;		/* data union name		*/
 	Number_t	stamp;		/* data file stamp		*/
 	int		level;		/* index file level		*/
-	int		restrict;	/* restrict to this part	*/
+	int		restricted;	/* restricted to this part	*/
 	int		suffix;		/* index file suffix		*/
 	Sfoff_t		base;		/* file partition offset	*/
 	Index_t		index[1];	/* index file state		*/
@@ -929,7 +928,7 @@ hixopen(const char* primary, const char* secondary, const char* info, int* id, H
 			{
 				*s++ = 0;
 				if (*s == ':')
-					hix->restrict = hix->part->restrict = 1;
+					hix->restricted = hix->part->restricted = 1;
 			}
 			if (viropen(hix, b, primary, secondary, info, i))
 			{
@@ -941,7 +940,7 @@ hixopen(const char* primary, const char* secondary, const char* info, int* id, H
 				break;
 			}
 			hix->part->level = ++k;
-			message((-3, "hix: part=%d name=%s info=%s tag=%s delimiter=%c base=%llu offset=%llu size=%llu fd=%d stamp=%s%s%s%s", k, hix->part->name, info, hix->part->tag, hix->delimiter ? hix->delimiter : ';', (Sflong_t)hix->part->base, (Sflong_t)hix->part->vio.offset, (Sflong_t)hix->part->vio.size, sffileno(hix->part->vio.sp), fmttime("%K", hix->part->stamp), hix->part->vio.empty ? " EMPTY" : "", hix->part->vio.sequential ? " SEQUENTIAL" : "", hix->part->restrict ? " RESTRICT" : ""));
+			message((-3, "hix: part=%d name=%s info=%s tag=%s delimiter=%c base=%llu offset=%llu size=%llu fd=%d stamp=%s%s%s%s", k, hix->part->name, info, hix->part->tag, hix->delimiter ? hix->delimiter : ';', (Sflong_t)hix->part->base, (Sflong_t)hix->part->vio.offset, (Sflong_t)hix->part->vio.size, sffileno(hix->part->vio.sp), fmttime("%K", hix->part->stamp), hix->part->vio.empty ? " EMPTY" : "", hix->part->vio.sequential ? " SEQUENTIAL" : "", hix->part->restricted ? " RESTRICTED" : ""));
 			if (!(b = s))
 				break;
 			if (!(p = newof(0, Part_t, 1, (n - 1) * sizeof(Index_t))))
@@ -954,7 +953,7 @@ hixopen(const char* primary, const char* secondary, const char* info, int* id, H
 			if (*b == ':')
 			{
 				b++;
-				hix->restrict = p->restrict = 1;
+				hix->restricted = p->restricted = 1;
 			}
 		}
 		if (k > 0)
@@ -1425,7 +1424,7 @@ hixget(register Hix_t* hix, int partition)
 		hix->offset += hix->size;
 		for (;;)
 		{
-			if (hix->offset >= (hix->part->base + hix->part->vio.size) && !hix->part->vio.sequential || !(hix->flags & HIX_SCAN) && ((hix->part->restrict && partition > hix->part->level || sfseek(hix->part->vio.sp, hix->offset + hix->part->vio.offset - hix->part->base, SEEK_SET) != (hix->offset + hix->part->vio.offset - hix->part->base))))
+			if (hix->offset >= (hix->part->base + hix->part->vio.size) && !hix->part->vio.sequential || !(hix->flags & HIX_SCAN) && ((hix->part->restricted && partition > hix->part->level || sfseek(hix->part->vio.sp, hix->offset + hix->part->vio.offset - hix->part->base, SEEK_SET) != (hix->offset + hix->part->vio.offset - hix->part->base))))
 			{
 				hix->size = 0;
 				if (!(hix->part = hix->part->next))
@@ -1488,7 +1487,7 @@ hixget(register Hix_t* hix, int partition)
 				}
 			hit:	;
 			}
-		if (partition > 0 && hix->part->restrict)
+		if (partition > 0 && hix->part->restricted)
 		{
 			if (partition < hix->part->level)
 				goto notfound;
@@ -1517,7 +1516,7 @@ hixget(register Hix_t* hix, int partition)
 	if (hix->size > hix->maxsize)
 		hix->maxsize = hix->size;
 	hix->partition = hix->part->level;
-	hix->restrict = hix->part->restrict ? hix->partition : 0;
+	hix->restricted = hix->part->restricted ? hix->partition : 0;
 	return r;
  notfound:
 	hix->size = 0;

@@ -48,14 +48,12 @@ Automatically generated
 .B probe
 information provides convenient compiler abstractions:
 .EX
-CCFLAGS = $(CC.PIC)
+CCFLAGS = $(CC.DLL)
 
 ast 4.0 :LIBRARY: ast.c strmatch.c
 .EE
 In this case if the compiler supports
-.I pic
-(position independent code)
-and shared libraries then
+shared libraries (aka \fBdll\fP\fIs\fP) then
 .L "nmake install"
 will generate
 .I libast.a

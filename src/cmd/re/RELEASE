@@ -1,3 +1,8 @@
+02-02-14 grep: add -P,--perl-regexp == REG_EXTENDED|REG_LENIENT
+02-02-12 ed.c: add \r hacks
+02-02-02 sed0.c: add \r to blank() set
+01-12-06 grep.c: add -b,--highlight to highlight matched text on ansi terms
+01-11-20 minimal.dat: add tests for regnexec() REG_MINIMAL char class bug
 01-10-31 sed: all space before ; command separator for REG_LENIENT
 01-10-20 testglob.c: handle \ in pattern and result field parse
 	 testglob.dat: add tests for \ in pattern and GLON_NOCHECK

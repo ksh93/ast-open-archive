@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2001 AT&T Corp.                *
+*                Copyright (c) 1998-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -48,7 +47,8 @@ USAGE_LICENSE
 "[+?If a \apartition\a file is specified then \apzip\a compresses the input"
 "	\afile\a to the standard output, otherwise \apzip\a decompresses"
 "	the input \afile\a to the standard ouput. If \afile\a is omitted"
-"	then the standard input is used.]"
+"	then the standard input is used. If the standard input is a tty"
+"	then \b/dev/null\b is silently used.]"
 "[+?\afile\a may be \apzip\a compressed, \agzip\a compressed, or raw."
 "	\apzip\a files self-identify; the row size and partition can be"
 "	determined from the \apzip\a header. For \agzip\a and raw data,"

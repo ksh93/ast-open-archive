@@ -11,6 +11,10 @@ PACKAGE_X11 := $(PACKAGE_X11_DIRS:T=F:O=1)
 PACKAGE_X11_VERSION = 6
 
 CC.REQUIRE.X11 = -lXext -lX11 -lnsl -lsocket -lw -ldl -lintl -ldnet_stub
-CC.REQUIRE.Xaw = -lXaw -lXt -lXmu -lX11 -lSM -lICE -lm
+CC.REQUIRE.Xt = -lXt -lXmu -lX11 -lSM -lICE -lm
+CC.REQUIRE.Xaw = -lXaw -lXt
+CC.REQUIRE.Xaw3d = -lXaw3d -lXt
 
-$(CC.REQUIRE.X11) $(CC.REQUIRE.Xaw) : .DONTCARE
+$(CC.REQUIRE.X11) $(CC.REQUIRE.Xt) \
+$(CC.REQUIRE.Xaw) $(CC.REQUIRE.Xaw3d) \
+: .DONTCARE

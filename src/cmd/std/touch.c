@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -30,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: touch (AT&T Labs Research) 2000-10-31 $\n]"
+"[-?\n@(#)$Id: touch (AT&T Labs Research) 2002-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?touch - change file access and modification times]"
 "[+DESCRIPTION?\btouch\b changes the modification time, access time or both"
@@ -67,13 +66,13 @@ USAGE_LICENSE
 "	access time unless \b--access\b is also specified.]"
 "[r:reference?Use the corresponding time of \afile\a instead of the current"
 "	time.]:[file]"
-"[t|d:time|date?Use the specified \atime\a instead of the current time. Most"
-"	common date formats are accepted. If \atime\a consists of 4, 6, 8, 10"
-"	or 12 digits followed by an optional \b.\b and 2 digits then it is"
-"	interpreted as the \adate\a operand above, except that the leading"
-"	2 or 4 digit year form is used to disambiguate. Avoid the 10 digit"
-"	form to avoid confusion. If \b--reference\b is specified or if \afile\a"
-"	already exists then \atime\a may also be one of:]:[time]{"
+"[t|d:time|date?Use the specified \adate-time\a instead of the current"
+"	date-time. Most common formats are accepted. If \adate-time\a consists"
+"	of 4, 6, 8, 10 or 12 digits followed by an optional \b.\b and 2 digits"
+"	then it is interpreted as the \adate\a operand above, except that the"
+"	leading 2 or 4 digit year form is used to disambiguate. Avoid the 10"
+"	digit form to avoid confusion. If \b--reference\b is specified or if"
+"	\afile\a already exists then \atime\a may also be one of:]:[date-time]{"
 "		[+access|atime|use?The access time of the reference file.]"
 "		[+change|ctime?The change time of the reference file.]"
 "		[+modify|mtime|modification?The modify time of the reference"
@@ -97,11 +96,11 @@ USAGE_LICENSE
 #include <tm.h>
 #include <error.h>
 
-#define ATIME	01
-#define CTIME	02
-#define MTIME	04
+#define ATIME		01
+#define CTIME		02
+#define MTIME		04
 
-#define SAME	((time_t)(-1))
+#define SAME		((time_t)(-1))
 
 int
 main(int argc, register char** argv)
@@ -109,6 +108,7 @@ main(int argc, register char** argv)
 	register char*	reference = 0;
 	int		create = 1;
 	int		set = 0;
+	int		verbatim = 0;
 	int		verbose = 0;
 	time_t		date = 0;
 	time_t		atime = SAME;
@@ -135,6 +135,7 @@ main(int argc, register char** argv)
 			continue;
 		case 'd':
 		case 't':
+			verbatim = 1;
 			if (streq(opt_info.arg, "access") || streq(opt_info.arg, "atime") || streq(opt_info.arg, "use"))
 				use = &st.st_atime;
 			else if (streq(opt_info.arg, "change") || streq(opt_info.arg, "ctime"))
@@ -158,6 +159,7 @@ main(int argc, register char** argv)
 			set |= CTIME;
 			continue;
 		case 'r':
+			verbatim = 1;
 			reference = opt_info.arg;
 			date = 0;
 			continue;
@@ -178,7 +180,7 @@ main(int argc, register char** argv)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	if (!reference)
 	{
-		if (!date)
+		if (!verbatim)
 		{
 			for (file = *argv; *file >= '0' && *file <= '9'; file++);
 			if (((n = (file - *argv)) == 4 || n == 6 || n == 8 || n == 10 || n == 12) && (!*file || *file == '.' && *(file + 1) >= '0' && *(file + 1) <= '9' && *(file + 2) >= '0' && *(file + 2) <= '9' && !*(file + 3)))
@@ -187,6 +189,7 @@ main(int argc, register char** argv)
 				date = tmdate(file = *argv++, &e, NiL);
 				if (*e)
 					error(3, "%s: invalid date specification", file);
+				verbatim = 1;
 			}
 		}
 		st.st_atime = st.st_mtime = date;
@@ -217,7 +220,7 @@ main(int argc, register char** argv)
 			if (set & MTIME)
 				mtime = *use;
 		}
-		if (touch(file, atime, mtime, create))
+		if (touch(file, atime, mtime, verbatim && ((set & ATIME) && (atime == (time_t)0 || atime == (time_t)-1) || (set & MTIME) && (mtime == (time_t)0 || mtime == (time_t)-1)) ? -create : create))
 			if (errno != ENOENT)
 				error(ERROR_SYSTEM|2, "%s: cannot touch", file);
 			else if (verbose)

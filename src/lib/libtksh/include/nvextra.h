@@ -77,6 +77,7 @@ typedef struct Assoc
 	void *		dummy2;
 	void *		dummy3;
 	void *		dummy4;
+	void *		dummy5;
 	Namval_t	*namval;
 } Assoc;
 

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -107,14 +107,18 @@ make gzio.o
 make gzio.c
 make zutil.h implicit
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 make unix.h implicit
 done unix.h dontcare virtual
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 prev ../../../include/ast/stdio.h implicit
 make alloc.h implicit
@@ -393,7 +397,7 @@ exec - mv ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/d
 done ../../../include/ast/zconf.h generated
 make ../../../include/ast/sfdcgzip.h
 prev sfdcgzip.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' sfdcgzip.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special'  sfdcgzip.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcgzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcgzip.h

@@ -2,7 +2,7 @@
 #include <dirent.h>
 #include <pwd.h>
 #include <times.h>
-#if HAVE_TIME_H
+#if HAVE_TIME_H && !_PACKAGE_ast
 #include <time.h>
 #endif
 #if HAVE_SYS_PARAM_H

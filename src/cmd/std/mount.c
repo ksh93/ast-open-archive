@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -30,7 +29,7 @@
  */
 
 static const char mount_usage[] =
-"[-?\n@(#)$Id: mount (AT&T Labs Research) 2001-02-14 $\n]"
+"[-?\n@(#)$Id: mount (AT&T Labs Research) 2002-02-02 $\n]"
 USAGE_LICENSE
 "[+NAME?mount - mount and display filesystems]"
 "[+DESCRIPTION?\bmount\b attaches a named filesystem \afs\a to the"
@@ -408,9 +407,9 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if ((s = *argv) && !*++argv && !state.mtab || state.mtab && (!*state.mtab || streq(state.mtab, "-")) || !state.mtab && (state.all || state.match))
 		state.mtab = FSTAB;
-	if (!(mp = mntopen(state.mtab, "r")))
+	if (!(mp = mntopen(state.mtab, "r")) && (!trydefault || !(mp = mntopen(state.mtab, "r"))))
 	{
-		if (state.mtab)
+		if (state.mtab && !trydefault)
 			error(ERROR_SYSTEM|3, "%s: cannot open fs table", state.mtab);
 		else
 			error(ERROR_SYSTEM|3, "cannot open default mount table");

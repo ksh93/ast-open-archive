@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -54,19 +54,12 @@ done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
-make ../../../include/ast/stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
-done ../../../include/ast/stdio.h dontcare
-prev ../../../include/ast/getopt.h implicit
-prev ../../../include/ast/stdio.h implicit
-make ../../../include/ast/bzlib.h implicit
-make windows.h implicit
-done windows.h dontcare virtual
-prev ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
 done ../../../include/ast/ast_botch.h dontcare
@@ -87,7 +80,17 @@ make ../../../include/ast/ast_types.h implicit
 done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
+make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
+prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
+done ../../../include/ast/stdio.h dontcare
+prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -97,6 +100,19 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/sfio.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_version.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_version.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast.h dontcare
+prev ../../../include/ast/stdio.h implicit
+make ../../../include/ast/bzlib.h implicit
+make windows.h implicit
+done windows.h dontcare virtual
+prev ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/ast_std.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/bzlib.h
 done bzip2.c
@@ -121,6 +137,13 @@ exec - then	rm -f bunzip
 exec - fi
 exec - ln bzip2 bunzip
 done bunzip generated
+make bunzip2
+prev bzip2
+exec - if	silent test -f "bunzip2"
+exec - then	rm -f bunzip2
+exec - fi
+exec - ln bzip2 bunzip2
+done bunzip2 generated
 make bzcat
 prev bzip2
 exec - if	silent test -f "bzcat"
@@ -199,6 +222,13 @@ exec - then	rm -f ${INSTALLROOT}/bin/bunzip
 exec - fi
 exec - ln ${INSTALLROOT}/bin/bzip2 ${INSTALLROOT}/bin/bunzip
 done ../../../bin/bunzip generated
+make ../../../bin/bunzip2
+prev ../../../bin/bzip2
+exec - if	silent test -f "${INSTALLROOT}/bin/bunzip2"
+exec - then	rm -f ${INSTALLROOT}/bin/bunzip2
+exec - fi
+exec - ln ${INSTALLROOT}/bin/bzip2 ${INSTALLROOT}/bin/bunzip2
+done ../../../bin/bunzip2 generated
 make ../../../bin/bzcat
 prev ../../../bin/bzip2
 exec - if	silent test -f "${INSTALLROOT}/bin/bzcat"

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -37,7 +36,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: probe (AT&T Labs Research) 2001-08-11 $\n]"
+"[-?\n@(#)$Id: probe (AT&T Labs Research) 2002-01-30 $\n]"
 USAGE_LICENSE
 "[+NAME?probe - generate/install/display language processor probe information]"
 "[+DESCRIPTION?\bprobe\b generates, installs and displays on the standard"
@@ -59,7 +58,7 @@ USAGE_LICENSE
 "	each \alanguage-processor\a pair. Any options that change the"
 "	semantics of the language handled by \aprocessor\a should be included"
 "	in the \aprocessor\a operand. e.g., if \bcc -++\b processes C++ files,"
-"	the \aprocessor\a should be \bcc -++\b, not \bcc\b.]"
+"	then \aprocessor\a should be \bcc -++\b, not \bcc\b.]"
 "[+?\bprobe\b generation may take a few minutes on some systems or for"
 "	some \aprocessors\a. Information is shared between users as much"
 "	as possible. If the \b--key\b option produces a path under your"
@@ -91,7 +90,7 @@ USAGE_LICENSE
 "[t:test?Start probe generation but do not save the results. Used for"
 "	debugging probe scripts.]"
 "[v:verify?Each probe information file contains a comment (in the"
-"	\alanguage\a syntax) that can be used to verify the contents. This"
+"	\atool\a syntax) that can be used to verify the contents. This"
 "	option does that verification.]"
 "[D:debug?Start probe generation, do not save the results, and write the"
 "	probe script trace (see \bsh\b(1) \b-x\b) to the standard error.]"
@@ -103,11 +102,13 @@ USAGE_LICENSE
 "	[+lib/probe/\alanguage\a/\atool\a?\atool\a specific information"
 "		directory for \alanguage\a processors.]"
 "	[+$HOME/.probe?Per-user directory when \bprobe\b is installed"
-"		non-set-uid.]"
+"		non-set-uid or the probe directory is on a readonly"
+"		filesystem.]"
 "}"
 "[+CAVEATS?To allow probe information to be generated and shared among all"
 "	users the executable \alib/probe/probe\a must be set-uid to the owner"
-"	of the \alib/probe\a directory hierarchy.]"
+"	of the \alib/probe\a directory hierarchy and the probe directory"
+"	filesystem must be mounted read-write.]"
 "[+?Automatic language processor probing is mostly black magic, but then"
 "	so are most language processor implementations.]"
 
@@ -154,6 +155,37 @@ static int	signals[] =	/* signals caught by interrupt()	*/
 	SIGQUIT,
 #endif
 };
+
+#if defined(ST_RDONLY) || defined(ST_NOSUID)
+
+/*
+ * return non-0 if path is in a readonly or non-setuid fs
+ */
+
+static int
+rofs(const char* path)
+{
+	struct statvfs	vfs;
+
+	if (!statvfs(path, &vfs))
+	{
+#if defined(ST_RDONLY)
+		if (vfs.f_flag & ST_RDONLY)
+			return 1;
+#endif
+#if defined(ST_NOSUID)
+		if (vfs.f_flag & ST_NOSUID)
+			return 1;
+#endif
+	}
+	return 0;
+}
+
+#else
+
+#define rofs(p)		0
+
+#endif
 
 /*
  * check path for old processor name clash
@@ -344,7 +376,7 @@ main(int argc, char** argv)
 		strcpy(base + 6, probe);
 		if (stat(path, &vs))
 			error(ERROR_SYSTEM|3, "%s: not found", path);
-		if (vs.st_mode & S_ISUID)
+		if ((vs.st_mode & S_ISUID) && !rofs(path))
 		{
 			suid = (n = geteuid()) != getuid();
 			if (suid && vs.st_uid != n)
@@ -361,8 +393,14 @@ main(int argc, char** argv)
 		if (stat(path, &vs))
 			error(ERROR_SYSTEM|3, "%s: not found", path);
 		ptime = vs.st_mtime;
-		if (!(script = strdup(path)))
+		n = strlen(path);
+		if (!(script = newof(0, char, n, 5)))
 			error(ERROR_SYSTEM|3, "out of space");
+		strcpy(script, path);
+		strcpy(script + n, ".ini");
+		if (!stat(script, &vs) && vs.st_size && ptime < (unsigned long)vs.st_mtime)
+			ptime = vs.st_mtime;
+		*(script + n) = 0;
 		if (suid >= 0)
 			strcpy(base, key);
 		else if (!(path = pathprobe(NiL, attributes, language, tool, processor, -1)))

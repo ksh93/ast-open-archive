@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2001 AT&T Corp.                *
+*                Copyright (c) 1990-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -496,6 +495,10 @@ server(int fd, int op, int sub, int arg, char* dat)
 		else drop(arg);
 		break;
 	case 'g':
+		/*
+		 * string values
+		 */
+
 		sfprintf(state.string, "\n");
 		sfprintf(state.string, "   version  %-.*s\n", strlen(version) - 1, version);
 		sfprintf(state.string, "      mesg  %s\n", state.mesg);
@@ -508,42 +511,61 @@ server(int fd, int op, int sub, int arg, char* dat)
 		sfprintf(state.string, "      pump  %s\n", state.pump);
 		sfprintf(state.string, "   service  %s\n", state.service);
 		sfprintf(state.string, "     shell  %s\n", state.sh);
+
+		/*
+		 * readonly values
+		 */
+
 		sfprintf(state.string, "\n");
 
 		sfprintf(state.string, "    access  %-7s", state.access < cs.time ? "EXPIRED" : fmtelapsed(state.access - cs.time, 1));
+		sfprintf(state.string, "  joblimit  %-6d ", state.joblimit);
+		sfprintf(state.string, "       pid  %-6d ", getpid());
+		sfprintf(state.string, "       sys  %-6s\n", fmtelapsed(state.sys, CO_QUANT));
+
+
+		sfprintf(state.string, "     clock  %-6s ", fmtelapsed(cs.time - state.clock, 1));
+		sfprintf(state.string, "      jobs  %-6d ", state.jobs);
+		sfprintf(state.string, "      real  %-6s ", fmtelapsed(state.real, 1));
+		sfprintf(state.string, "      user  %-6s\n", fmtelapsed(state.user, CO_QUANT));
+
+		sfprintf(state.string, "      cmds  %-6d ", state.cmds);
+		sfprintf(state.string, "   jobwait  %-6d ", state.jobwait);
+		sfprintf(state.string, "   running  %-6d ", state.running);
+		sfprintf(state.string, "     users  %-6d\n", state.users);
+
+		sfprintf(state.string, "   connect  %-6d ", state.connect);
+		sfprintf(state.string, "      open  %-6d ", state.open);
+		sfprintf(state.string, "    shells  %-6d ", state.shells);
+		sfprintf(state.string, "    wakeup  %-6s\n", fmtelapsed(state.wakeup, 1000));
+
 		sfprintf(state.string, "   fdtotal  %-6d ", state.fdtotal);
 		sfprintf(state.string, "  override  %-6d ", state.override);
-		sfprintf(state.string, "   running  %-6d\n", state.running);
+		sfprintf(state.string, " shellwait  %-6d\n", state.shellwait);
+
+		/*
+		 * global values
+		 */
+
+		sfprintf(state.string, "\n");
 
 		sfprintf(state.string, "      busy  %-6s ", fmtelapsed(state.busy, 1));
 		sfprintf(state.string, "     grace  %-6s ", fmtelapsed(state.grace, 1));
 		sfprintf(state.string, "    percpu  %-6d ", state.percpu);
-		sfprintf(state.string, "    shells  %-6d\n", state.shells);
-
-		sfprintf(state.string, "     clock  %-6s ", fmtelapsed(cs.time - state.clock, 1));
-		sfprintf(state.string, "  joblimit  %-6d ", state.joblimit);
-		sfprintf(state.string, "   perhost  %-6d ", state.perhost);
-		sfprintf(state.string, " shellwait  %-6d\n", state.shellwait);
-
-		sfprintf(state.string, "      cmds  %-6d ", state.cmds);
-		sfprintf(state.string, "      jobs  %-6d ", state.jobs);
-		sfprintf(state.string, " perserver  %-6d ", state.perserver);
-		sfprintf(state.string, "       sys  %-6s\n", fmtelapsed(state.sys, CO_QUANT));
-
-		sfprintf(state.string, "   connect  %-6d ", state.connect);
-		sfprintf(state.string, "   jobwait  %-6d ", state.jobwait);
-		sfprintf(state.string, "   peruser  %-6d ", state.peruser);
-		sfprintf(state.string, "      user  %-6s\n", fmtelapsed(state.user, CO_QUANT));
+		sfprintf(state.string, "   peruser  %-6d\n", state.peruser);
 
 		sfprintf(state.string, "     debug  %-6d ", -error_info.trace);
-		sfprintf(state.string, "   maxload  %-6s ", fmtfloat(state.maxload));
-		sfprintf(state.string, "      pool  %-6d ", state.pool);
-		sfprintf(state.string, "     users  %-6d\n", state.users);
+		sfprintf(state.string, "   maxidle  %-6s ", fmtelapsed(state.maxidle, 1));
+		sfprintf(state.string, "   perhost  %-6d ", state.perhost);
+		sfprintf(state.string, "      pool  %-6d\n", state.pool);
 
 		sfprintf(state.string, "   disable  %-6s ", fmtelapsed(state.disable, 1));
-		sfprintf(state.string, "      open  %-6d ", state.open);
-		sfprintf(state.string, "      real  %-6s ", fmtelapsed(state.real, 1));
-		sfprintf(state.string, "    wakeup  %-6s\n", fmtelapsed(state.wakeup, 1000));
+		sfprintf(state.string, "   maxload  %-6s ", fmtfloat(state.maxload));
+		sfprintf(state.string, " perserver  %-6d\n", state.perserver);
+
+		/*
+		 * done
+		 */
 
 		sfprintf(state.string, "\n");
 		break;

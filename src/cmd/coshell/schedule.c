@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2001 AT&T Corp.                *
+*                Copyright (c) 1990-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -47,7 +46,9 @@
 
 #define CPU(n,v)	((v)*100/(10+((n)-1)*W_CPU/10)/10)
 #define PCT(n,p)	(((n)/100)*(p))
-#define RNK(p,a)	(((p)->mode&SHELL_DISABLE)?INT_MAX:((((p)->stat.load/(p)->scale)+((p)->running*BIAS+CPU((p)->cpu,(a)->bias)))*(p)->bias*(((p)==state.home&&(p)->cpu==1)?400:100)/(p)->rating))
+#define RNK(p,a)	(((p)->mode&SHELL_DISABLE)?INT_MAX:((p)->flags&IGN)?(INT_MAX/2):((((p)->stat.load/(p)->scale)+((p)->running*BIAS+CPU((p)->cpu,(a)->bias)))*(p)->bias*(((p)==state.home&&(p)->cpu==1)?400:100)/(p)->rating))
+
+#define IDLE(m,i)	((m)>=((i)<=(state.maxidle)?(i):(state.maxidle)))
 
 /*
  * allocate and copy string v into s
@@ -123,6 +124,8 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 				state.grace = a->global.grace;
 			if (a->global.set & SETIDENTIFY)
 				state.identify = dupstring(state.identify, a->global.identify);
+			if (a->global.set & SETMAXIDLE)
+				state.maxidle = a->global.maxidle;
 			if (a->global.set & SETMAXLOAD)
 				state.maxload = a->global.maxload;
 			if (a->global.set & SETMIGRATE)
@@ -160,7 +163,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 			}
 			if (a->global.set & SETFILE)
 				return(info(op, a->global.file));
-			if (a->global.set & (SETBUSY|SETPERCPU|SETPERHOST|SETPERSERVER|SETPERUSER))
+			if (a->global.set & (SETBUSY|SETMAXIDLE|SETPERCPU|SETPERHOST|SETPERSERVER|SETPERUSER))
 				jobcheck(NiL);
 		}
 		if ((op & (DEF|NEW)) && a->set && !(a->set & SETNAME))
@@ -245,7 +248,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 					continue;
 				}
 				if (ap->update <= cs.time && ap->errors < ERRORS) update(ap);
-				if (ap != state.shell && (ap->override || ap->stat.idle < ap->idle && (!ap->bypass || !(bypass = miscmatch(ap, ap->bypass)))))
+				if (ap != state.shell && (ap->override || !IDLE(ap->stat.idle, ap->idle) && (!ap->bypass || !(bypass = miscmatch(ap, ap->bypass)))))
 				{
 					if (matched) noverride++;
 					if (cs.time > ap->override)
@@ -272,13 +275,13 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 				if (ap->fd > 0)
 				{
 					v = RNK(ap, a);
-					if (v < sv && ap->running < (state.perhost ? state.perhost : ap->cpu * state.percpu) && (!state.maxload || (ap->stat.load / ap->scale) < state.maxload) && (!sp || bypass || ap->stat.idle >= ap->idle || sp->stat.idle < sp->idle))
+					if (v < sv && ap->running < (state.perhost ? state.perhost : ap->cpu * state.percpu) && (!state.maxload || (ap->stat.load / ap->scale) < state.maxload) && (!sp || bypass || IDLE(ap->stat.idle, ap->idle) || !IDLE(sp->stat.idle, sp->idle)))
 					{
 						sv = v;
 						sp = ap;
 					}
 				}
-				else if (!ap->fd && (!mp || ap->rank < mp->rank) && (ap->stat.idle >= ap->idle || ap->home || ap->bypass && miscmatch(ap, ap->bypass) || ((a->set | op) & (SETMISC|DEF|NEW|SET)) == SETMISC)) mp = ap;
+				else if (!ap->fd && (!mp || ap->rank < mp->rank) && (IDLE(ap->stat.idle, ap->idle) || ap->home || ap->bypass && miscmatch(ap, ap->bypass) || ((a->set | op) & (SETMISC|DEF|NEW|SET)) == SETMISC)) mp = ap;
 			}
 		} while ((ap = ap->next) != state.shellnext);
 		if (mp && (!sp || nopen < state.pool + noverride && RNK(mp, a) <  PCT(sv, H_RANK))) sp = mp;
@@ -306,7 +309,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 		if (sp)
 		{
 			if (dp == sp) dp = 0;
-			if (sp->override || sp->stat.idle < sp->idle) sp->mode |= SHELL_OVERRIDE;
+			if (sp->override || !IDLE(sp->stat.idle, sp->idle)) sp->mode |= SHELL_OVERRIDE;
 			else sp->mode &= ~SHELL_OVERRIDE;
 			state.shellnext = sp->next;
 			goto found;
@@ -379,7 +382,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 		break;
 	case DEF|JOB:
 	case JOB:
-		if (sp != state.shell && (sp->override || sp->stat.idle < sp->idle))
+		if (sp != state.shell && (sp->override || !IDLE(sp->stat.idle, sp->idle)))
 		{
 			if (!sp->override) state.override++;
 			sp->override = cs.time + (sp->home ? HOME : OVERRIDE);
@@ -490,13 +493,16 @@ update(register Coshell_t* sp)
 			if (!sp->rating)
 				sp->rating = 1;
 			n += W_LOAD * (((sp->stat.load / sp->scale) + CPU(sp->cpu, W_JOB * LOAD)) / T_LOAD) * sp->bias / sp->rating;
-			if (sp->idle)
+			if (state.maxidle)
 			{
-				if (sp->stat.idle < sp->idle) n += W_IDLE;
-				else if (sp->stat.idle < R_IDLE * sp->idle) n += W_IDLE * (R_IDLE * sp->idle - sp->stat.idle) / ((R_IDLE - 1) * sp->idle);
+				if (sp->idle)
+				{
+					if (sp->stat.idle < sp->idle) n += W_IDLE;
+					else if (sp->stat.idle < R_IDLE * sp->idle) n += W_IDLE * (R_IDLE * sp->idle - sp->stat.idle) / ((R_IDLE - 1) * sp->idle);
+				}
+				else if (sp->stat.users && sp->stat.idle < R_USER)
+					n += W_USER * (R_USER - sp->stat.idle) / R_USER;
 			}
-			else if (sp->stat.users && sp->stat.idle < R_USER)
-				n += W_USER * (R_USER - sp->stat.idle) / R_USER;
 			if (n > PCT(X_RANK, C_RANK))
 			{
 				if (n >= 2 * X_RANK) n = X_RANK - 1;
@@ -510,7 +516,7 @@ update(register Coshell_t* sp)
 		{
 			sp->update = cs.time + UPDATE;
 			if (sp->fd > 0 && (2 * sp->stat.up) < (cs.time - sp->start)) shellclose(sp, -1);
-			if (!sp->fd && sp->stat.idle < sp->idle) sp->update += sp->idle - sp->stat.idle;
+			if (!sp->fd && !IDLE(sp->stat.idle, sp->idle)) sp->update += sp->idle - sp->stat.idle;
 		}
 		message((-4, "%s: %s=%s idle=%s load=%s users=%d rank=%s", sp->name, sp->stat.up < 0 ? "down" : "up", fmtelapsed(sp->stat.up < 0 ? -sp->stat.up : sp->stat.up, 1), fmtelapsed(sp->stat.idle, 1), fmtfloat(sp->stat.load), sp->stat.users, fmtfloat(sp->rank)));
 	}

@@ -1,3 +1,7 @@
+01-12-12 resolve SETSHELL local vs. global conflict -- its both
+	 ignore attr now really ignores host -- duh
+01-12-11 add global maxidle=0 to ignore idle
+	 split readonly and user settable values in `g' command output
 00-12-14 shell is per host attribute
 00-02-01 --- release 2.2 ---
 99-06-24 cosh: change exit to return

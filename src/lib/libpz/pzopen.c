@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2001 AT&T Corp.                *
+*                Copyright (c) 1998-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -205,7 +204,7 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 		}
 		if (pz->options && pzoptions(pz, pz->part, pz->options, 1) < 0)
 			goto bad;
-		if ((pz->flags & PZ_UNKNOWN) && !pz->disc->readf && !pz->disc->splitf)
+		if ((pz->flags & (PZ_NOPZIP|PZ_UNKNOWN)) == PZ_UNKNOWN && !pz->disc->readf && !pz->disc->splitf)
 		{
 			if (pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: unknown input format", pz->path);
@@ -336,22 +335,35 @@ pzclose(register Pz_t* pz)
 					);
 		(*pz->disc->errorf)(pz, pz->disc, 0, "%s", sfstruse(pz->tmp));
 	}
-	if (pz->oip && pz->io)
+	if (pz->io)
 	{
-		if (pz->disc->eventf)
-			r = (*pz->disc->eventf)(pz, PZ_CLOSE, NiL, 0, pz->disc);
-		if (!(pz->flags & PZ_STREAM))
+		if (pz->oip)
 		{
-			if (sfclose(pz->oip) < 0)
+			if (pz->disc->eventf)
+				r = (*pz->disc->eventf)(pz, PZ_CLOSE, NiL, 0, pz->disc);
+			if (!(pz->flags & PZ_STREAM))
 			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: input stream close error", pz->path);
-				r = -1;
+				if (sfclose(pz->oip) < 0)
+				{
+					if (pz->disc->errorf)
+						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: input stream close error", pz->path);
+					r = -1;
+				}
 			}
+			else if (pz->flags & PZ_POP)
+				sfdisc(pz->oip, SF_POPDISC);
+			pz->oip = 0;
 		}
 		else if (pz->flags & PZ_POP)
-			sfdisc(pz->oip, SF_POPDISC);
-		pz->oip = 0;
+		{
+			sfdisc(pz->io, SF_POPDISC);
+			if (sferror(pz->io))
+			{
+				pz->flags |= PZ_ERROR;
+				if (pz->disc->errorf)
+					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, (pz->flags & PZ_WRITE) ? "write error" : "read error");
+			}
+		}
 	}
 	if (pz->flags & PZ_ERROR)
 		r = -1;

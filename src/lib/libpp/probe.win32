@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2001-02-22
+# @(#)probe.win32 (AT&T Labs Research) 2002-01-23
 #
 # win32 specific pp C probe initialization
 # ms vc is easy on uwin
@@ -105,10 +105,31 @@ echo "#define __unix__" __unix__
 #endif
 #endif
 !
-	for i in _ALPHA_ _INTEGRAL_MAX_BITS _MSC_EXTENSIONS _MSC_VER \
-		_M_ALPHA_ _M_IX86 _POSIX_ _UWIN _WIN32 _X86_ \
-		__BORLANDC__ __TURBOC__ \
-		__cplusplus
+	premac="
+_ALPHA_
+_AXP64_
+_GENIA64_
+_INTEGRAL_MAX_BITS
+_MSC_EXTENSIONS
+_MSC_VER
+_M_ALPHA
+_M_ALPHA_
+_M_IA64
+_M_IX86
+_M_MRX000
+_M_PPC
+_NTSYSTEM_
+_POSIX_
+_STDCALL_SUPPORTED
+_UWIN
+_WIN32
+_WIN64
+_X86_
+__BORLANDC__
+__TURBOC__
+__cplusplus
+	"
+	for i in $premac
 	do	echo "#ifdef $i"
 		echo "echo \"#define $i\" $i"
 		echo "#endif"

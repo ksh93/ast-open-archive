@@ -2559,7 +2559,7 @@ id=(null) catalog=libast text="Usage"'
 		ERROR - $'"algorithm"
 "method"
 "again|back"'
-	usage=$usage$'[+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}'
+	usage=$usage$'[+EXAMPLES?Examples.]{[+foo?Foo bar.][+\abar\a?Bar foo.]}[+?More e.g.]{[+aha?AHA]}'
 	EXEC -+ xlate "$usage" --keys
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
@@ -2581,7 +2581,9 @@ id=(null) catalog=libast text="Usage"'
 "Examples."
 "Foo bar."
 "\\abar\\a"
-"Bar foo."'
+"Bar foo."
+"More e.g."
+"AHA"'
 	EXEC -+ xlate "$usage" --man
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
@@ -2611,8 +2613,10 @@ id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
 id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="\abar\a"
+id=xlate catalog=libast text="bar"
 id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
 id=(null) catalog=libast text="options"
@@ -2629,6 +2633,9 @@ RKNZCYRF
 
 FLABCFVF
   xlate [ bcgvbaf ]
+
+  Zber r.t.
+    aha   NUN
 
 VZCYRZRAGNGVBA
   irefvba         kyngr 1.0 
@@ -2681,8 +2688,10 @@ id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
 id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="\abar\a"
+id=xlate catalog=libast text="bar"
 id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
 id=(null) catalog=libast text="options"
@@ -2699,6 +2708,9 @@ RKNZCYRF
 
 FLABCFVF
   xlate [ bcgvbaf ]
+
+  Zber r.t.
+    aha   NUN
 
 VZCYRZRAGNGVBA
   irefvba         kyngr 1.0 
@@ -2723,8 +2735,10 @@ id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
 id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="\abar\a"
+id=xlate catalog=libast text="bar"
 id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
 id=xlate catalog=libast text="IMPLEMENTATION"
 id=xlate catalog=libast text="SYNOPSIS"
 id=(null) catalog=libast text="options"
@@ -2773,11 +2787,15 @@ id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
 id=xlate catalog=libast text="bar"
 id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
 return=? option=-? name=--?+EXAMPLES num=0
 id=(null) catalog=libast text="Usage"'
 		ERROR - $'  EXAMPLES        Rknzcyrf.
                     foo   Sbb one.
-                    one   One sbb.'
+                    one   One sbb.
+                  Zber r.t.
+                    aha   NUN'
 	EXEC -+ xlate "$usage" --?+EX
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
@@ -2786,6 +2804,8 @@ id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
 id=xlate catalog=libast text="bar"
 id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
 return=? option=-? name=--?+EX num=0
 id=(null) catalog=libast text="Usage"'
 	EXEC -+ xlate "$usage" --?+RKNZCYRF
@@ -2796,6 +2816,8 @@ id=xlate catalog=libast text="Examples."
 id=xlate catalog=libast text="Foo bar."
 id=xlate catalog=libast text="bar"
 id=xlate catalog=libast text="Bar foo."
+id=xlate catalog=libast text="More e.g."
+id=xlate catalog=libast text="AHA"
 return=? option=-? name=--?+RKNZCYRF num=0
 id=(null) catalog=libast text="Usage"'
 	usage=$'[-?\n@(#)xlate 1.0\n][-author?Col. Hyde][a:algorithm?\fone\f]:[method]{[+?\fthree\f]}[b:again|back?\ftwo\f]'
@@ -2815,11 +2837,11 @@ id=(null) catalog=libast text="keys"
 return=? option=- name=--keys num=0
 id=(null) catalog=libast text="Usage"'
 		ERROR - $'"algorithm"
-"<* one info ok *>"
+"\\fone\\f"
 "method"
-"<* three info ok *>"
+"\\fthree\\f"
 "again|back"
-"<* two info ok *>"'
+"\\ftwo\\f"'
 
 TEST 35 'alternate version ids'
 	EXEC id $'[-?\n@(#)id (spamco) 2000-12-01\n]' --?-version
@@ -3155,7 +3177,78 @@ SpamCo'
 </BODY>
 </HTML>'
 
-TEST 41 'detailed key strings'
+TEST 41 'cache exercizes'
+	usage=$'[-1c][a:aaa?AAA][b:bbb?BBB]:[bv][c:ccc?CCC]:?[cv]'
+	EXEC typeset "$usage" -a -b1
+		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
+[3] return=b option=-b name=-b arg=1 num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[2] return=b option=-b name=-b arg=1 num=1
+[1] return=a option=-a name=-a arg=(null) num=1
+[1] return=b option=-b name=-b arg=1 num=1'
+	EXEC typeset "$usage" -c2 -a
+		OUTPUT - $'[3] return=c option=-c name=-c arg=2 num=1
+[3] return=a option=-a name=-a arg=(null) num=1
+[2] return=c option=-c name=-c arg=2 num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[1] return=c option=-c name=-c arg=2 num=1
+[1] return=a option=-a name=-a arg=(null) num=1'
+	EXEC typeset "$usage" -c -a
+		OUTPUT - $'[3] return=c option=-c name=-c arg=(null) num=1
+[3] return=a option=-a name=-a arg=(null) num=1
+[2] return=c option=-c name=-c arg=(null) num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[1] return=c option=-c name=-c arg=(null) num=1
+[1] return=a option=-a name=-a arg=(null) num=1'
+	EXEC typeset "$usage" -a -b1 -c -c2
+		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
+[3] return=b option=-b name=-b arg=1 num=1
+[3] return=c option=-c name=-c arg=(null) num=1
+[3] return=c option=-c name=-c arg=2 num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[2] return=b option=-b name=-b arg=1 num=1
+[2] return=c option=-c name=-c arg=(null) num=1
+[2] return=c option=-c name=-c arg=2 num=1
+[1] return=a option=-a name=-a arg=(null) num=1
+[1] return=b option=-b name=-b arg=1 num=1
+[1] return=c option=-c name=-c arg=(null) num=1
+[1] return=c option=-c name=-c arg=2 num=1'
+	usage=$'[-1c]a:[command][n:number]#?[number][s:string]:?[string]'
+	EXEC typeset "$usage" -n
+		OUTPUT - $'[3] return=n option=-n name=-n arg=(null) num=1
+[2] return=n option=-n name=-n arg=(null) num=1
+[1] return=n option=-n name=-n arg=(null) num=1'
+	EXEC typeset "$usage" -n12
+		OUTPUT - $'[3] return=n option=-n name=-n arg=12 num=12
+[2] return=n option=-n name=-n arg=12 num=12
+[1] return=n option=-n name=-n arg=12 num=12'
+	EXEC typeset "$usage" -s
+		OUTPUT - $'[3] return=s option=-s name=-s arg=(null) num=1
+[2] return=s option=-s name=-s arg=(null) num=1
+[1] return=s option=-s name=-s arg=(null) num=1'
+	EXEC typeset "$usage" -s12
+		OUTPUT - $'[3] return=s option=-s name=-s arg=12 num=1
+[2] return=s option=-s name=-s arg=12 num=1
+[1] return=s option=-s name=-s arg=12 num=1'
+	EXEC typeset "$usage" OPT --foo
+		OUTPUT - $'[3] argument=1 value="OPT"
+[3] argument=2 value="--foo"
+[2] argument=1 value="OPT"
+[2] argument=2 value="--foo"
+[1] argument=1 value="OPT"
+[1] argument=2 value="--foo"'
+	EXEC typeset "$usage" -a locate OPT --foo
+		OUTPUT - $'[3] return=a option=-a name=-a arg=locate num=1
+[3] argument=1 value="OPT"
+[3] argument=2 value="--foo"
+[2] return=a option=-a name=-a arg=locate num=1
+[2] argument=1 value="OPT"
+[2] argument=2 value="--foo"
+[1] return=a option=-a name=-a arg=locate num=1
+[1] argument=1 value="OPT"
+[1] argument=2 value="--foo"'
+
+TEST 42 'detailed key strings'
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man
 		EXIT 2

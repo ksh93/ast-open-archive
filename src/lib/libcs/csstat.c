@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2001 AT&T Corp.                *
+*                Copyright (c) 1990-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -56,6 +55,8 @@ csstat(register Cs_t* state, const char* name, register Csstat_t* sp)
 	register int		n;
 	register int		i;
 	char*			s;
+	unsigned long		a;
+	unsigned long		m;
 	struct stat		st;
 	char			buf[PATH_MAX];
 
@@ -64,7 +65,8 @@ csstat(register Cs_t* state, const char* name, register Csstat_t* sp)
 
 	messagef((state->id, NiL, -8, "stat(%s) call", name));
 	CSTIME();
-	if (!name || streq(name, CS_HOST_LOCAL)) name = (const char*)csname(state, 0);
+	if (!name || streq(name, CS_HOST_LOCAL))
+		name = (const char*)csname(state, 0);
 	if (!strchr(name, '/'))
 	{
 		if (!init)
@@ -73,16 +75,18 @@ csstat(register Cs_t* state, const char* name, register Csstat_t* sp)
 			if (pathpath(buf, CS_STAT_DIR, "", PATH_EXECUTE))
 				dir = strdup(buf);
 		}
-		if (!dir) return -1;
+		if (!dir)
+			return -1;
 		sfsprintf(buf, sizeof(buf), "%s/%s", dir, name);
-		if (((n = stat(buf, &st)) || (long)(state->time - (unsigned long)st.st_ctime) >= CS_STAT_DOWN))
+		if ((n = stat(buf, &st)) || (state->time - CS_STAT_DOWN) > (unsigned long)st.st_ctime)
 		{
 			if (initiate(state, name, buf))
 				return -1;
 			for (i = 1; i < CS_STAT_DOWN / 20; i <<= 1)
 			{
 				sleep(i);
-				if (!(n = stat(buf, &st))) break;
+				if (!(n = stat(buf, &st)))
+					break;
 			}
 			if (n)
 			{
@@ -91,26 +95,33 @@ csstat(register Cs_t* state, const char* name, register Csstat_t* sp)
 			}
 		}
 	}
-	else n = stat(name, &st);
+	else
+		n = stat(name, &st);
 	if (n)
 	{
 		memzero(sp, sizeof(*sp));
 		sp->up = -CS_STAT_DOWN;
 	}
-	else if (!(sp->up = (((st.st_atime >> 16) & 03777) << ((st.st_atime >> 27) & 037))))
-	{
-		memzero(sp, sizeof(*sp));
-		sp->up = -(((st.st_atime & 03777) << ((st.st_atime >> 11) & 037)) + (long)(state->time - (unsigned long)st.st_ctime));
-		s = csname(state, 0);
-		if (streq(name, s)) initiate(state, name, buf);
-	}
 	else
 	{
-		sp->load = ((st.st_mtime >> 24) & 0377) << 3;
-		sp->pctsys = (st.st_mtime >> 16) & 0377;
-		sp->pctusr = (st.st_mtime >> 8) & 0377;
-		sp->users = st.st_mtime & 0377;
-		sp->idle = sp->users ? ((st.st_atime & 03777) << ((st.st_atime >> 11) & 037)) : ~0;
+		a = st.st_atime;
+		m = st.st_mtime;
+		if (!(sp->up = (((a >> 16) & 0x7ff) << ((a >> 27) & 0x1f))))
+		{
+			memzero(sp, sizeof(*sp));
+			sp->up = -(((a & 0x7ff) << ((a >> 11) & 0x1f)) + (long)(state->time - (unsigned long)st.st_ctime));
+			s = csname(state, 0);
+			if (streq(name, s))
+				initiate(state, name, buf);
+		}
+		else
+		{
+			sp->load = ((m >> 24) & 0xff) << 3;
+			sp->pctsys = (m >> 16) & 0xff;
+			sp->pctusr = (m >> 8) & 0xff;
+			sp->users = m & 0xff;
+			sp->idle = sp->users ? ((a & 0x7ff) << ((a >> 11) & 0x1f)) : ~0;
+		}
 	}
 	return 0;
 }

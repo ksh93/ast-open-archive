@@ -154,11 +154,14 @@
 --*/
 
 #if BZ_UNIX
-#   include <sys/types.h>
-#   include <utime.h>
-#   include <unistd.h>
-#   include <sys/stat.h>
-#   include <sys/times.h>
+#   if _PACKAGE_ast
+#	include <ast.h>
+#   else
+#	include <sys/types.h>
+#	include <unistd.h>
+#	include <sys/stat.h>
+#	include <sys/times.h>
+#   endif
 
 #   define PATH_SEP    '/'
 #   define MY_LSTAT    lstat
@@ -779,12 +782,16 @@ void copyDatePermissionsAndOwner ( Char *srcName, Char *dstName )
 #if BZ_UNIX
    IntNative      retVal;
    struct MY_STAT statBuf;
+#if !_PACKAGE_ast
    struct utimbuf uTimBuf;
+#endif
 
    retVal = MY_LSTAT ( srcName, &statBuf );
    ERROR_IF_NOT_ZERO ( retVal );
+#if !_PACKAGE_ast
    uTimBuf.actime = statBuf.st_atime;
    uTimBuf.modtime = statBuf.st_mtime;
+#endif
 
    retVal = chmod ( dstName, statBuf.st_mode );
    ERROR_IF_NOT_ZERO ( retVal );
@@ -797,7 +804,11 @@ void copyDatePermissionsAndOwner ( Char *srcName, Char *dstName )
    retVal = chown ( dstName, statBuf.st_uid, statBuf.st_gid );
    ERROR_IF_NOT_ZERO ( retVal );
    */
+#if _PACKAGE_ast
+   retVal = touch ( dstName, statBuf.st_atime, statBuf.st_mtime );
+#else
    retVal = utime ( dstName, &uTimBuf );
+#endif
    ERROR_IF_NOT_ZERO ( retVal );
 #endif
 }
@@ -1383,19 +1394,35 @@ IntNative main ( IntNative argc, Char *argv[] )
    /*-- Determine what to do (compress/uncompress/test/cat). --*/
    /*-- Note that subsequent flag handling may change this. --*/
    opMode = OM_Z;
-
-   if ( (strstr ( progName, "unzip" ) != 0) ||
-        (strstr ( progName, "UNZIP" ) != 0) )
-      opMode = OM_UNZ;
-
-   if ( (strstr ( progName, "z2cat" ) != 0) ||
-        (strstr ( progName, "Z2CAT" ) != 0) ||
-        (strstr ( progName, "zcat" ) != 0)  ||
-        (strstr ( progName, "ZCAT" ) != 0) )  {
-      opMode = OM_UNZ;
-      srcMode = (numFileNames == 0) ? SM_I2O : SM_F2O;
+   tmp = progName;
+   for (;;)
+   {
+	switch (*tmp++)
+	{
+	case 0:
+	    break;
+	case 'u':
+	case 'U':
+	    if (!strncasecmp(tmp, "nzip", 4))
+	    {
+      		opMode = OM_UNZ;
+		break;
+	    }
+	    continue;
+	case 'z':
+	case 'Z':
+	    if (!strncasecmp(tmp, "zcat", 4) || !strncasecmp(tmp, "z2cat", 5))
+	    {
+      		opMode = OM_UNZ;
+		srcMode = (numFileNames == 0) ? SM_I2O : SM_F2O;
+		break;
+	    }
+	    continue;
+	default:
+	    continue;
+	}
+	break;
    }
-
 
    /*-- Look at the flags. --*/
    for (aa = argList; aa != NULL; aa = aa->link)

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_tcl ${INSTALLROOT}
 setv PACKAGE_tcl_INCLUDE ${PACKAGE_tcl}/include
@@ -82,6 +82,7 @@ make unix/tkUnixPort.h implicit
 make compat/unistd.h implicit
 make ../../../include/tcl/tcl.h implicit
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 make ../../../include/ast/getopt.h implicit
 make ../../../include/ast/prototyped.h implicit
 make ../../../include/prototyped.h implicit
@@ -92,6 +93,7 @@ make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 make ../../../include/ast/ast.h implicit
 make ../../../include/ast/sfio.h implicit
@@ -126,6 +128,8 @@ done ../../../include/ast/ast_map.h dontcare
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -175,6 +179,7 @@ make unix/tkUnixInit.c
 make unix/tkUnixInt.h implicit
 done unix/tkUnixInt.h
 prev generic/tkInt.h implicit
+prev ../../../include/ast/ast.h implicit
 done unix/tkUnixInit.c
 prev unix/tkUnixInit.c
 exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -DLIB_DIR=\""lib/tk4.2"\" -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixInit.c
@@ -288,8 +293,8 @@ done tkBitmap.o generated
 make tkButton.o
 make generic/tkButton.c
 make generic/tkDefault.h implicit
-make unix/tkUnixDefault.h implicit
-done unix/tkUnixDefault.h dontcare
+make unix/tkUnixDef.h implicit
+done unix/tkUnixDef.h dontcare
 make tkMacDefault.h implicit
 done tkMacDefault.h dontcare virtual
 make tkWinDefault.h implicit
@@ -757,8 +762,18 @@ done generic/tkWindow.c
 prev generic/tkWindow.c
 exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkWindow.c
 done tkWindow.o generated
+make tkMain.o
+make generic/tkMain.c
+prev compat/stdlib.h implicit
+prev ../../../include/ast/stdio.h implicit
+prev generic/tk.h implicit
+prev ../../../include/tcl/tcl.h implicit
+done generic/tkMain.c
+prev generic/tkMain.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tk -c generic/tkMain.c
+done tkMain.o generated
 exec - ${AR} cr libtk.a tkUnixSelect.o tkUnixInit.o tkUnixEvent.o tkUnixXId.o tkUnixCursor.o tkUnixDialog.o tkUnixDraw.o tkUnixWm.o tkUnix.o tk3d.o tkArgv.o tkAtom.o tkBind.o tkBitmap.o tkButton.o tkCanvArc.o tkCanvBmap.o tkCanvImg.o tkCanvLine.o tkCanvPoly.o tkCanvPs.o tkCanvText.o tkCanvUtil.o tkCanvWind.o tkCanvas.o tkClipboard.o tkCmds.o tkColor.o tkConfig.o tkConsole.o
-exec - ${AR} cr libtk.a tkCursor.o tkEntry.o tkError.o tkEvent.o tkFileFilter.o tkFocus.o tkFont.o tkFrame.o tkGC.o tkGeometry.o tkGet.o tkGrab.o tkGrid.o tkImage.o tkImgBmap.o tkImgGIF.o tkImgPPM.o tkImgPhoto.o tkImgUtil.o tkListbox.o tkMenu.o tkMenubutton.o tkMessage.o tkOption.o tkPack.o tkPlace.o tkRectOval.o tkScale.o tkScrollbar.o tkSelect.o tkSend.o tkSquare.o tkTest.o tkText.o tkTextBTree.o tkTextDisp.o tkTextIndex.o tkTextMark.o tkTextTag.o tkTextWind.o tkTrig.o tkUtil.o tkVisual.o tkWindow.o
+exec - ${AR} cr libtk.a tkCursor.o tkEntry.o tkError.o tkEvent.o tkFileFilter.o tkFocus.o tkFont.o tkFrame.o tkGC.o tkGeometry.o tkGet.o tkGrab.o tkGrid.o tkImage.o tkImgBmap.o tkImgGIF.o tkImgPPM.o tkImgPhoto.o tkImgUtil.o tkListbox.o tkMenu.o tkMenubutton.o tkMessage.o tkOption.o tkPack.o tkPlace.o tkRectOval.o tkScale.o tkScrollbar.o tkSelect.o tkSend.o tkSquare.o tkTest.o tkText.o tkTextBTree.o tkTextDisp.o tkTextIndex.o tkTextMark.o tkTextTag.o tkTextWind.o tkTrig.o tkUtil.o tkVisual.o tkWindow.o tkMain.o
 exec - (ranlib libtk.a) >/dev/null 2>&1 || true
 done libtk.a generated
 done tk virtual
@@ -846,7 +861,7 @@ exec - fi
 done ../../../include/tcl generated
 make ../../../include/tcl/tk.h
 prev generic/tk.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic  generic/tk.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic   generic/tk.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tk.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tk.h

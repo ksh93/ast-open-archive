@@ -1,3 +1,5 @@
+02-01-24 look.c: drop <strings.h> ref
+01-11-26 what.c: fix doc type, add --matched
 01-10-31 what.c: fix omitted file arg doc
 01-06-06 who.c: fix entry skip logic that listed too many entries
 01-05-31 Makefile: add PACKAGE_OPTIMIZE=space checks

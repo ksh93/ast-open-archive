@@ -1,3 +1,14 @@
+02-02-14 touch.c: explicit epoch dates (0) are different from now (also 0)
+	 locale.c: don't output on unknown keyword
+02-02-11 ps.c: validate input pid strings
+02-02-04 ps.c: --format subformat => heading
+02-02-02 pss.c: handle __CYGWIN__ bug where sizeof(TTY_CONSOLE)>sizeof(dev_t)
+02-01-31 pss.c: add aix getprocs()
+	 ps.c: ntpid=>npid, ntpid now a deprecated alias
+02-01-28 ls: fix devmajor/devminor to use st_rdev where appropriate
+02-01-22 ps: fix `not available' warning to attempt subsequent fields
+02-01-21 ps: recode to use pss.[ch] process status stream interface
+02-01-06 touch: clarify --time doc
 01-10-31 df: increase the fs stat timeout from 2 to 4 sec
 01-09-04 locale: add new catagories
 01-08-11 ls: fix nonprintable test for mb locales

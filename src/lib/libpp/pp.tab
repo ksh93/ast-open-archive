@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.tab (AT&T Labs Research) 2001-03-08
+# @(#)pp.tab (AT&T Labs Research) 2002-03-11
 #
 # C preprocessor tables and states
 #
@@ -44,6 +44,7 @@
 	final
 	hide
 	headerexpand
+	headerexpandall
 	hosted
 	hostedtransition
 	hostdir
@@ -59,6 +60,7 @@
 	linetype
 	macref
 	map
+	modern
 	multiple
 	native
 	note
@@ -169,11 +171,13 @@
 	ALLPOSSIBLE		# ignore top level conditionals
 	ELSEIF			# #else if|ifdef|ifndef ok
 	FINAL			# final hosted macro value
-	HEADEREXPAND		# expanded < does not quote #include macros
+	HEADEREXPAND		# HEADEREXPANDALL but macro args not expanded
+	HEADEREXPANDALL		# expanded < does not quote #include macros
 	IGNORELINE		# ignore #line until first file arg
 	INITIAL			# initial hosted macro value
 	KEEPNOTEXT		# keep NOTEXT setting
 	KEYARGS			# name=value macro arguments
+	MODERN			# generate modern output (\a instead of \007)
 	NATIVE			# report native paths
 	NOHASH			# don't hash PP_COMPILE T_ID's
 	NOISE			# convert T_X_* to T_NOISES

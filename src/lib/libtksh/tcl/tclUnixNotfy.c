@@ -24,7 +24,7 @@
 #define _DLL 1
 #endif
 
-#if HAVE_SYS_SELECT_H
+#if HAVE_SYS_SELECT_H && !defined(NFDBITS)
 #include <sys/select.h>
 #endif
 

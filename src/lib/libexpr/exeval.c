@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -229,7 +228,15 @@ format(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		txt = 0;
 	switch (dp->fmt)
 	{
+	case 'q':
+	case 'Q':
+		s = *((char**)vp);
+		*((char**)vp) = fmtquote(s, "$'", "'", strlen(s), 0);
+		dp->fmt = 's';
+		dp->size = -1;
+		break;
 	case 'S':
+		dp->flags &= ~SFFMT_LONG;
 		s = *((char**)vp);
 		if (txt)
 		{
@@ -271,6 +278,7 @@ format(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		dp->fmt = 's';
 		dp->size = -1;
 		break;
+	case 't':
 	case 'T':
 		tm = *((Sflong_t*)vp);
 		tmform(*((char**)vp) = tmbuf, txt ? txt : "%?%l", tm == -1 ? (time_t*)0 : &tm);

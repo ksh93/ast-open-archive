@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -41,15 +41,15 @@ make data.o
 make data.c
 make mailx.h implicit
 make local.h implicit
-make FEATURE/gethostname implicit
+make FEATURE/local implicit
+make local.iffe
+done local.iffe
 bind -last
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def gethostname
-done FEATURE/gethostname dontcare generated
-make FEATURE/paths implicit
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def paths
-done FEATURE/paths dontcare generated
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run local.iffe
+done FEATURE/local dontcare generated
 done local.h
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 make ../../../include/ast/getopt.h implicit
 make ../../../include/ast/prototyped.h implicit
 make ../../../include/prototyped.h implicit
@@ -60,6 +60,7 @@ make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/ast_stdio.h
 done ../../../include/ast/stdio.h
 make ../../../include/ast/mime.h implicit
 make ../../../include/ast/ls.h implicit
@@ -89,6 +90,8 @@ done ../../../include/ast/ast_map.h dontcare
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare

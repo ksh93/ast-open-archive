@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -82,12 +82,16 @@ done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -108,6 +112,10 @@ done ../../lib/libast/port/astlicense.c dontcare
 make ../../lib/libpp/ppfsm.h implicit
 done ../../lib/libpp/ppfsm.h dontcare
 make ../../lib/libpp/pplib.h implicit
+make ../../../include/ast/vmalloc.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/vmalloc.h dontcare
 make ../../lib/libpp/ppkey.h implicit
 done ../../lib/libpp/ppkey.h dontcare
 make ../../lib/libpp/ppdef.h implicit
@@ -147,7 +155,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done proto.c
 prev proto.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libpp -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -c proto.c
+exec - ${CC} ${CCFLAGS}  -I../../lib/libpp -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -c proto.c
 done proto.o generated
 bind -last
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o proto proto.o ${mam_libast}
@@ -161,7 +169,7 @@ prev ../../../include/ast/ast.h implicit
 done ../INIT/mamake.c
 prev ../INIT/mamake.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/mamake.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/mamake.c
 done mamake.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o mamake mamake.o ${mam_libast}
@@ -197,7 +205,7 @@ prev ../../../include/ast/ast.h implicit
 done ../INIT/release.c
 prev ../INIT/release.c
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/release.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/release.c
 done release.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o release release.o ${mam_libast}
@@ -216,7 +224,7 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"' in
 exec - 	"")	cp sear.sh sear
 exec - 		;;
 exec - 	*)	{
@@ -224,7 +232,7 @@ exec - 		i=`(read x; echo $x) < sear.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"
 exec - 		cat sear.sh
 exec - 		} > sear
 exec - 		;;
@@ -232,8 +240,8 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" ;;
+exec - 	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" ;;
 exec - 	esac
 exec - 	cat sear.sh
 exec - 	} > sear
@@ -269,35 +277,6 @@ make ../../../bin/proto
 prev proto
 exec - mv ${INSTALLROOT}/bin/proto ${INSTALLROOT}/bin/proto.old 2>/dev/null || true; test '' = 'proto' || { cp proto ${INSTALLROOT}/bin/proto  		    		    ;}
 done ../../../bin/proto generated
-make ../../../man/man1
-exec - set -
-exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
-exec - fi
-done ../../../man/man1 generated
-make ../../../man/man1/proto.1
-make proto.1
-done proto.1
-exec - mv ${INSTALLROOT}/man/man1/proto.1 ${INSTALLROOT}/man/man1/proto.1.old 2>/dev/null || true; test '' = 'proto.1' || { cp proto.1 ${INSTALLROOT}/man/man1/proto.1  		    		    ;}
-done ../../../man/man1/proto.1 generated
 make ../../../bin/mamake
 prev mamake
 exec - mv ${INSTALLROOT}/bin/mamake ${INSTALLROOT}/bin/mamake.old 2>/dev/null || true; test '' = 'mamake' || { cp mamake ${INSTALLROOT}/bin/mamake  		    		    ;}

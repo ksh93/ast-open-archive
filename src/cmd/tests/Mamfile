@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -90,14 +90,18 @@ make ../../lib/libast/ast_types.h implicit
 done ../../lib/libast/ast_types.h dontcare
 make ../../lib/libast/ast_map.h implicit
 done ../../lib/libast/ast_map.h dontcare
-make ../../lib/libast/stdio.h implicit
+make ../../../include/ast/stdio.h implicit
+make ../../lib/libast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../lib/libast/ast_common.h implicit
-done ../../lib/libast/stdio.h dontcare
+done ../../lib/libast/ast_stdio.h dontcare
+done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
-make ../../lib/libast/limits.h implicit
-done ../../lib/libast/limits.h dontcare
+make ../../../include/ast/limits.h implicit
+make ../../lib/libast/ast_limits.h implicit
+done ../../lib/libast/ast_limits.h dontcare
+done ../../../include/ast/limits.h dontcare
 make ../../lib/libast/ast_hdr.h implicit
 done ../../lib/libast/ast_hdr.h dontcare
 prev ../../../include/ast/getopt.h implicit
@@ -154,7 +158,7 @@ done strtof.tst
 make strtof
 make strtof.o
 make strtof.c
-prev ../../lib/libast/stdio.h implicit
+prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/ast.h implicit
 done strtof.c
 prev strtof.c
@@ -204,7 +208,7 @@ make sfio/sftest.h
 done sfio/sftest.h
 make sfio/talarm.c
 prev sfio/sftest.h implicit
-prev ../../lib/libast/limits.h implicit
+prev ../../../include/ast/limits.h implicit
 make sfio/terror.h implicit
 prev ../../lib/libast/ast_common.h implicit
 done sfio/terror.h
@@ -371,7 +375,7 @@ make sfio/tstatus.c
 prev sfio/sftest.h implicit
 done sfio/tstatus.c
 make sfio/tstdio.c
-prev ../../lib/libast/stdio.h implicit
+prev ../../../include/ast/stdio.h implicit
 prev sfio/sftest.h implicit
 done sfio/tstdio.c
 make sfio/tstkpk.c
@@ -399,13 +403,15 @@ make sfio/tungetc.c
 prev sfio/sftest.h implicit
 done sfio/tungetc.c
 make sfio/twchar.c
-make ../../lib/libast/wchar.h implicit
-prev ../../lib/libast/wchar.h implicit
-prev ../../lib/libast/stdio.h implicit
-prev ../../lib/libast/stdio.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../lib/libast/wchar.h dontcare
-prev ../../lib/libast/stdio.h implicit
+make ../../../include/ast/wchar.h implicit
+make ../../lib/libast/ast_wchar.h implicit
+prev ../../../include/ast/wchar.h implicit
+prev ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/stdio.h implicit
+prev ../../lib/libast/ast_common.h implicit
+done ../../lib/libast/ast_wchar.h dontcare
+done ../../../include/ast/wchar.h dontcare
+prev ../../../include/ast/stdio.h implicit
 prev sfio/sftest.h implicit
 done sfio/twchar.c
 make sfio/twhole.c

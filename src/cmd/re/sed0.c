@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2001 AT&T Corp.                *
+*                Copyright (c) 1995-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -26,7 +25,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Labs Research) 2001-10-31 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Labs Research) 2002-02-02 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"
@@ -152,7 +151,7 @@ grow(Text *t, int n)
 {
 	int w = t->w - t->s;
 	int e = t->e - t->s + (n/SF_BUFSIZE+1)*SF_BUFSIZE;
-	t->s = (unsigned char*)realloc(t->s, e);
+	t->s = oldof(t->s, unsigned char, e, 0);
 	if(t->s == 0)
 		error(3, "out of space");
 	t->w = t->s + w;

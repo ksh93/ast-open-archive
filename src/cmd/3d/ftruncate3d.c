@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -34,15 +33,12 @@
 #undef	off_t
 #undef	ftruncate
 
-#if _UWIN
-#define _ftruncate64	ftruncate64
-#endif
-
-extern int	_ftruncate64(int, off64_t);
+typedef int (*Real_f)(int, off64_t);
 
 int
 ftruncate64(int fd, off64_t size)
 {
+	static Real_f	realf;
 #if FS
 	Mount_t*	mp;
 
@@ -50,7 +46,9 @@ ftruncate64(int fd, off64_t size)
 		return state.ret;
 	mp = monitored();
 #endif
-	if (_ftruncate64(fd, size))
+	if (!realf)
+		realf = (Real_f)sysfunc(SYS3D_ftruncate64);
+	if ((*realf)(fd, size))
 		return -1;
 #if FS
 	if (mp)

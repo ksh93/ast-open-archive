@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -30,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2001-08-11 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2002-01-28 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -490,11 +489,11 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		break;
 	case KEY_devmajor:
 		if (st)
-			n = major(st->st_dev);
+			n = (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)) ? major(idevice(st)) : major(st->st_dev);
 		break;
 	case KEY_devminor:
 		if (st)
-			n = minor(st->st_dev);
+			n = (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)) ? minor(idevice(st)) : minor(st->st_dev);
 		break;
 	case KEY_dir_blocks:
 		if (lp)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2001 AT&T Corp.                *
+*                Copyright (c) 1984-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -631,6 +630,7 @@ struct external				/* external engine name info	*/
 	char*		done;		/* made just before exit	*/
 	char*		init;		/* made before first user target*/
 	char*		interrupt;	/* made on first interrupt	*/
+	char*		jobdone;	/* made when each job done	*/
 	char*		makedone;	/* made after done		*/
 	char*		makeinit;	/* made after before init	*/
 	char*		makeprompt;	/* made just before each prompt	*/

@@ -1,3 +1,6 @@
+02-03-09 pzopen,pzdeflate,pzsync: add fatal error checks
+02-02-14 pzopen: disable PZ_UNKNOWN check if PZ_NOPZIP -- duh
+02-01-11 pzdeflate: use Sfoff_t for sfmove() return instead of ssize_t
 01-08-11 pzinit: add for static discipline library linking
 01-07-17 pzlib: call dllerror() on failed dllfind()
 01-06-28 pzpartnext: add to iterate over all partitions

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -137,12 +137,16 @@ done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -235,7 +239,7 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' in
 exec - 	"")	cp ie.sh ie
 exec - 		;;
 exec - 	*)	{
@@ -243,7 +247,7 @@ exec - 		i=`(read x; echo $x) < ie.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"
 exec - 		cat ie.sh
 exec - 		} > ie
 exec - 		;;
@@ -251,8 +255,8 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\" ;;
+exec - 	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\" ;;
 exec - 	esac
 exec - 	cat ie.sh
 exec - 	} > ie

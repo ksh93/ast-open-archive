@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2001 AT&T Corp.                *
+*                Copyright (c) 1998-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -28,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.1 (AT&T Labs Research) 2001-08-11 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.1 (AT&T Labs Research) 2002-01-14 $\n]"
 "[a:append]"
 "[x:crc]"
 "[d:debug]#[level]"

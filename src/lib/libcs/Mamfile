@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -79,11 +79,13 @@ make ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 make cs_lib.h implicit
 make FEATURE/lib
@@ -127,6 +129,8 @@ done ../../../include/ast/ast_map.h dontcare
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -327,7 +331,9 @@ make cspath.o
 make cspath.c
 make ../../../include/ast/ast_dir.h implicit
 make ../../../include/ast/dirent.h implicit
+make ../../../include/ast/ast_dirent.h implicit
 prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/ast_dirent.h dontcare
 done ../../../include/ast/dirent.h dontcare
 make dirlib.h implicit
 done dirlib.h dontcare virtual
@@ -748,7 +754,7 @@ exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/cs.h
 prev cs.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf' cs.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  cs.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cs.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cs.h
@@ -756,7 +762,7 @@ exec - fi
 done ../../../include/ast/cs.h generated
 make ../../../include/ast/css.h
 prev css.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf' css.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  css.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/css.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/css.h
@@ -764,7 +770,7 @@ exec - fi
 done ../../../include/ast/css.h generated
 make ../../../include/ast/msg.h
 prev msg.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf' msg.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  msg.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/msg.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/msg.h
@@ -772,7 +778,7 @@ exec - fi
 done ../../../include/ast/msg.h generated
 make ../../../include/ast/ast_cs.h
 prev ast_cs.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf' ast_cs.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  ast_cs.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ast_cs.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ast_cs.h
@@ -780,7 +786,7 @@ exec - fi
 done ../../../include/ast/ast_cs.h generated
 make ../../../include/ast/cs_lib.h
 prev cs_lib.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf' cs_lib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  cs_lib.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cs_lib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cs_lib.h

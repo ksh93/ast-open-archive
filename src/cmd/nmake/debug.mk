@@ -1,12 +1,12 @@
 /*
  * interactive debug support
  *
- * @(#)debug (AT&T Research) 1990-12-11
+ * @(#)debug (AT&T Research) 2002-01-11
  *
  * *.i from *.c
  */
 
-CCIFLAGS = $(CCFLAGS:N=-[DIU]*) $(&$(<:B:S=.o):T=D)
+CCIFLAGS = $(CC.ALTPP.FLAGS) $(CCFLAGS:N=-[DIU]*) $(&$(<:B:S=.o):T=D)
 
 %.i : %.c .ALWAYS
 	$(CC) $(CCIFLAGS) -E $(>) > $(<)

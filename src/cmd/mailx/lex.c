@@ -230,9 +230,15 @@ commands(void)
 			signal(SIGINT, intr);
 		if (signal(SIGHUP, SIG_IGN) != SIG_IGN)
 			signal(SIGHUP, hangup);
+#if SIGTSTP
 		signal(SIGTSTP, stop);
+#endif
+#if SIGTTOU
 		signal(SIGTTOU, stop);
+#endif
+#if SIGTTIN
 		signal(SIGTTIN, stop);
+#endif
 	}
 	setexit();
 	for (;;) {

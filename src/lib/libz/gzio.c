@@ -53,6 +53,7 @@ typedef struct gz_stream {
     char     *path;   /* path name for debugging only */
     int      transparent; /* 1 if input file is not a .gz file */
 #if _PACKAGE_ast
+    int      fatal;   /* fatal stream error => all other ops fail */
     int      nocrc;   /* 1 to skip 'r' crc checks */
     int      noclose; /* 1 to skip destroy fclose */
     int      verified;/* 2-byte magic read and verified ('v') */
@@ -109,6 +110,7 @@ local gzFile gz_open (path, mode, fp)
     s->z_eof = 0;
     s->crc = crc32(0L, Z_NULL, 0);
 #if _PACKAGE_ast
+    s->fatal = 0;
     s->nocrc = 0;
     s->previous_out = 0;
     s->verified = 0;
@@ -260,13 +262,15 @@ int ZEXPORT gzsetparams (file, level, strategy)
     gz_stream *s = (gz_stream*)file;
 
     if (s == NULL || s->mode != 'w') return Z_STREAM_ERROR;
+    if (s->fatal) return Z_ERRNO;
 
     /* Make room to allow flushing */
     if (s->stream.avail_out == 0) {
 
 	s->stream.next_out = s->outbuf;
 	if (fwrite(s->outbuf, 1, Z_BUFSIZE, s->file) != Z_BUFSIZE) {
-	    s->z_err = Z_ERRNO;
+	    s->fatal = 1;
+	    return s->z_err = Z_ERRNO;
 	}
 	s->stream.avail_out = Z_BUFSIZE;
     }
@@ -395,7 +399,8 @@ local int destroy (s)
 #endif
 	    err = Z_ERRNO;
     }
-    if (s->z_err < 0) err = s->z_err;
+    if (s->fatal) err = -1;
+    else if (s->z_err < 0) err = s->z_err;
 
     TRYFREE(s->inbuf);
     TRYFREE(s->outbuf);
@@ -573,6 +578,7 @@ int ZEXPORT gzwrite (file, buf, len)
     gz_stream *s = (gz_stream*)file;
 
     if (s == NULL || s->mode != 'w') return Z_STREAM_ERROR;
+    if (s->fatal) return Z_ERRNO;
 
     s->stream.next_in = (Bytef*)buf;
     s->stream.avail_in = len;
@@ -583,9 +589,9 @@ int ZEXPORT gzwrite (file, buf, len)
 
             s->stream.next_out = s->outbuf;
             if (fwrite(s->outbuf, 1, Z_BUFSIZE, s->file) != Z_BUFSIZE) {
-                s->z_err = Z_ERRNO;
-                break;
-            }
+		s->fatal = 1;
+                return s->z_err = Z_ERRNO;
+	    }
             s->stream.avail_out = Z_BUFSIZE;
         }
         s->z_err = deflate(&(s->stream), Z_NO_FLUSH);
@@ -689,6 +695,7 @@ local int do_flush (file, flush)
     gz_stream *s = (gz_stream*)file;
 
     if (s == NULL || s->mode != 'w') return Z_STREAM_ERROR;
+    if (s->fatal) return Z_ERRNO;
 
     s->stream.avail_in = 0; /* should be zero already anyway */
 
@@ -697,9 +704,9 @@ local int do_flush (file, flush)
 
         if (len != 0) {
             if ((uInt)fwrite(s->outbuf, 1, len, s->file) != len) {
-                s->z_err = Z_ERRNO;
-                return Z_ERRNO;
-            }
+		s->fatal = 1;
+                return s->z_err = Z_ERRNO;
+	    }
             s->stream.next_out = s->outbuf;
             s->stream.avail_out = Z_BUFSIZE;
         }
@@ -724,10 +731,17 @@ int ZEXPORT gzflush (file, flush)
      int flush;
 {
     gz_stream *s = (gz_stream*)file;
-    int err = do_flush (file, flush);
+    int err;
 
+    if (s == NULL || s->mode != 'w') return Z_STREAM_ERROR;
+    if (s->fatal) return Z_ERRNO;
+
+    err = do_flush (file, flush);
     if (err) return err;
-    fflush(s->file);
+    if (fflush(s->file)) {
+	s->fatal = 1;
+	return s->z_err = Z_ERRNO;
+    }
     return  s->z_err == Z_STREAM_END ? Z_OK : s->z_err;
 }
 
@@ -754,12 +768,15 @@ z_off_t ZEXPORT gzsync (file, offset)
 {
     gz_stream *s = (gz_stream*)file;
 
-    if (s == NULL || s->z_err == Z_ERRNO || s->z_err == Z_DATA_ERROR)
+    if (s == NULL || s->z_err == Z_ERRNO || s->z_err == Z_DATA_ERROR || s->fatal)
 	return -1;
     if (s->mode == 'w') {
     	if (do_flush (file, Z_FULL_FLUSH))
 	    return -1;
-    	fflush(s->file);
+    	if (fflush(s->file)) {
+	    s->fatal = 1;
+	    return s->z_err = Z_ERRNO;
+	}
     }
     else if (gzrewind(file) < 0)
         return -1;

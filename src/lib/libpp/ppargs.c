@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2001 AT&T Corp.                *
+*                Copyright (c) 1986-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2001-06-06 $\n]"
+"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2002-03-11 $\n]"
 USAGE_LICENSE
 "[+NAME?cpp - C language preprocessor]"
 "[+DESCRIPTION?\bcpp\b is the preprocessor for all C language dialects. It is"
@@ -418,7 +417,9 @@ ppargs(char** argv, int last)
 			 * cross your fingers
 			 */
 
-			s = &argv[opt_info.index][opt_info.offset-1];
+			if (!(s = argv[opt_info.index]))
+				error(3, "%s", opt_info.arg);
+			s += opt_info.offset - 1;
 			if (strmatch(s, "i*.h"))
 				ppop((pp.arg_style & STYLE_gnu) || s[1] == '/' ? PP_READ : PP_TEXT, s + 1);
 			else if (strmatch(s, "*@(nostandard|nostdinc)*"))

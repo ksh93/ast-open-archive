@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2001 AT&T Corp.                *
+*                Copyright (c) 1995-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -27,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ed (AT&T Labs Research) 2001-09-11 $\n]"
+"[-?\n@(#)$Id: ed (AT&T Labs Research) 2002-02-12 $\n]"
 USAGE_LICENSE
 "[+NAME?ed - edit text]"
 "[+DESCRIPTION?\bed\b is a line-oriented text editor that has two modes:"
@@ -106,7 +105,7 @@ USAGE_LICENSE
 
 #define error		fatal
 #define errorf		fatalf
-#define trap()		do{if(ed.caught)handle();}while(0);
+#define trap()		do{if(ed.caught)handle();}while(0)
 
 
 typedef struct
@@ -207,6 +206,8 @@ interrupt(int sig)
 static int
 getchr(void)
 {
+	int	c;
+
 	if (ed.lastc = ed.peekc) {
 		ed.peekc = 0;
 		return ed.lastc;
@@ -219,6 +220,12 @@ getchr(void)
 	}
 	if ((ed.lastc = sfgetc(sfstdin)) == EOF)
 		trap();
+        else if (ed.lastc == '\r') {
+                if ((c = sfgetc(sfstdin)) == '\n')
+                        ed.lastc = c;
+                else if (c != EOF)
+                        sfungetc(sfstdin, c);
+        }
 	return ed.lastc;
 }
 
@@ -505,7 +512,8 @@ getfile(void)
 			return 0;
 		ed.warn_newline = 1;
 	}
-	n = sfvalue(ed.iop);
+	if ((n = sfvalue(ed.iop)) > 0 && s[n - 1] == '\r')
+		s[--n] = 0;
 	if ((m = strlen(s)) < n) {
 		register char*	t;
 		register char*	u;

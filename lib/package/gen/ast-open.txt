@@ -75,7 +75,43 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-01-10-16  --- Release ksh93m-  ---
+02-02-18  --- Release ksh93m+  ---
+02-02-18  A bug in which lines beginning with a # were deleted from here
+	  documents when the here-document delimiter was followed by
+	  a comment has been fixed.
+02-12-06  An optimization bug in which ${!x[@]) was treated as invariant in
+	  a for loop has been fixed.
+02-02-06  A bug in which the ERR trap is not cleared for a script invoked
+	  by name from within a function has been fixed.
+02-01-08  A bug in which a shell script executed from within a subshell
+	  could cause this script to have an invalid pointer leading
+	  to a memory fault has been fixed. 
+02-01-07  Added here documents of the form <<< word (as per zsh) which
+	  is equivalent to << delim\nword\ndelim.
+02-01-07  A bug in which the first word of a compound assignment,
+	  x=(word ...), was treated as a reserved word has been fixed.
+02-01-07  A bug in the handling of \ when noglob was enabled and a
+	  substitution of the form ${word op pattern} occured in the
+	  same word has been fixed.
+02-01-07  A compilation option, CMDLIB_BLTIN in the file OPTION, has
+	  been added.  When this options is set, all commands implemented
+	  in libcmd become shell builtin commands by default.
+02-01-07  A bug in which builtin foo, where foo is already a builtin
+	  would result in the builtin foo getting removed has been fixed. 
+02-01-07  A bug which the shell executed a command found in the current
+	  directory when PATH have no valid directories has been fixed.
+01-11-28  The value of $? was not being set when called with exit.
+01-11-28  If the last command was of the form (...) and a trap on EXIT or
+	  ERR was set, and the command inside () modifed the trap, then
+	  the original trap wasn't executed.
+01-11-26  The value for 0 is now precdeded by the base number when
+	  the base was not 10.
+01-11-26  The default has compilation mode has been changes so that
+	  viraw mode will always be on.
+
+01-10-31  --- Release ksh93m  ---
+01-10-31  A for loop optimizer bug for subshells contained withing for
+	  loops has been fixed.
 01-10-16  typeset without arguments no longer outputs variable names
 	  that do not have any attributes that are set.
 01-10-16  A bug introduced in ksh93l in which assignments specified with
@@ -841,6 +877,8 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+01-12-07 pax: fix --meter to retain paths containing " -- "
+01-12-06 pax: fix --meter to stop at 100% (don't tell coach)
 01-10-20 pax: describe the 4 operation modes in separate paragraphs
 01-10-18 pax: fix --meter for paths containing \f\n\r\v
 01-09-06 pax: add ms tnef (transport neutral encapsulation format) archive read
@@ -1056,6 +1094,13 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+02-03-17 mm2html: add .SG no-op
+	 mm2html: check .EX figure# label args
+	 mm2html: add .so/.sn dir search to .BP
+02-03-15 mm2html: add LC_NUMERIC=C for floating point constants
+02-02-14 mm2html: shorten indentation
+02-01-16 mm2html: handle .so and .xx in getline
+	 mm2html: .sn and .so look in dir of including file
 01-10-20 htmlrefs: fix <!--INTERNAL--> filter delete detection, GLOB_AUGMENTED
 01-05-09 mm2html: ignore a few more requests
 01-05-04 mm2html: more tbl adjustments from Bruce Lilly
@@ -1111,6 +1156,9 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+02-03-12 proto.c: add type=free
+02-01-07 proto.tst: add TEST 05 -- no fix yet
+01-12-12 sear.sh: fix rc ICON path \ escapes
 01-10-31 sear.sh: add sear.ico
 01-10-16 sear.sh: _SEA_* => _SEAR_*
 01-10-05 sear.sh: rename from sea.sh
@@ -1123,11 +1171,21 @@ All recorded changes follow.
 
 :::::::: bzip ::::::::
 
+02-02-14 bzip2.c: fix uwin core dump
+02-01-24 bzip2.c: use _PACKAGE_ast touch(3) instead of <utime.h>
+	 bzip2.c: fix strstr() loop
 01-01-01 bzip2.c: include bzlib.h first
 99-01-01 package for ast
 
 :::::::: tests ::::::::
 
+02-03-14 opt.tst: update \f...\f --keys tests
+02-02-02 sfio/(tclose|ttpopenrw|ttell).c: add alarm to handle hung coproc
+02-01-27 sfio/terror.h: handle non-idempotent <varargs.h>
+02-01-12 date.dat,date2k.dat: fix EST/EDT %z tests
+01-12-18 date.dat,datey2k.dat: update for %z change from SHH to SHHMM
+	 date.dat: add YYYY/MM/DD tests
+01-11-24 opt.tst: update --?+SECTION tests
 01-10-31 opt.tst: add --?+SECTION tests
 01-10-30 date*.dat: fix cron tests where both mday and wday are specified
 01-10-18 strtof.tst: adjust for sfprintf()/printf() rounding
@@ -1159,6 +1217,8 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+01-11-26 pathreal.c: empty path is an error
+01-11-16 ftruncate3d.c,truncate3d.c: use lseek3d indirection via sysfunc()
 01-10-31 fchdir3d: add along with state.file[].dir to cache open dir paths
 	 dir3d.c: add recursive call intercepts
 	 error.c: add recursive call intercepts
@@ -1265,6 +1325,10 @@ All recorded changes follow.
 
 :::::::: coshell ::::::::
 
+01-12-12 resolve SETSHELL local vs. global conflict -- its both
+	 ignore attr now really ignores host -- duh
+01-12-11 add global maxidle=0 to ignore idle
+	 split readonly and user settable values in `g' command output
 00-12-14 shell is per host attribute
 00-02-01 --- release 2.2 ---
 99-06-24 cosh: change exit to return
@@ -1344,6 +1408,7 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+02-03-15 cpp.tst: add TEST 14 for libpp/ppproto.c memory fault fix
 01-10-20 cpp.tst: add pp:splicespace "..." tests
 01-06-01 cpp.tst: add -M* dependency generation tests
 01-02-14 cpp.tst: pp:pragmaexpand pp:catliteral # operator interactions
@@ -1387,6 +1452,10 @@ All recorded changes follow.
 
 :::::::: msgcc ::::::::
 
+02-03-11 msgcc: fix merge replacement threshhold logic
+	 msggen: convert { \a \b \f \n \r \v } back to C escapes
+	 msgcpp: set pp:modern
+02-02-14 msggen: add -f to list printf format signatures
 01-10-10 msgcc: allow some email forms to pass
 01-06-10 msgcpp: add proper escapes to OMIT pattern
 01-05-29 msgcc: add similar unused message replacement, -M-similar
@@ -1396,69 +1465,104 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
-01-10-31 Makerules.mk: adjust .SOURCE.mk to ensure user specified dir order
-	 Makerules.mk: search MAKERULESPATH for ppcc rather than just MAKELIB
-	 Makerules.mk: delay CC.SHARED.REGISTRY expansion
+02-03-14 variable.c: add label to --mam "setv" 
+02-02-14 makerules: add and use CMPFLAGS
+	 makerules: add win32 ar I flag only when installing .a
+	 makerules: iffe { CC CCFLAGS LDFLAGS } => { IFFECC ... }
+	 scan.c,variable.c: .SCAN.IGNORE must ignore state prereqs too
+	 main.c: fix final message sequence for .ERROR intercept
+	 state.c,variable.c: fix $(?x) when state(x) exists but rule(x) doesn't
+	 makerules: add .SHARED.UNIQ. to .COMMAND.o (required by sgi.mips3)
+02-02-02 makerules: mark :VARIANT: target .SPECIAL
+	 makerules: use STDED & STDEDFLAGS to differentiate from ED=vi
+	 makerules: drop ED & EDFLAGS
+	 Makeinstall.mk: add STD* probe with possible execrate(1)
+	 makerules: inhibit lib/lib closure for CC.DIALECT==CLOSURE
+	 probe.win32: add CC.DIALECT CLOSURE to inhibit .lib closure
+	 option.c: -S => -S0
+	 makerules: fixed .SHARED.UNIQ. to ignore .MULTIPLE -- duh
+02-02-01 makerules: fix .IFFE.REF. for \r\n systems -- barf
+02-01-22 makerules: ARFLAGS += I for CC.DLL on win32.*
+02-01-15 makerules: fix $(CC.PREFIX.DYNAMIC) logic in .BIND.-l%
+	 makerules: mark $(CC.SUFFIX.DYNAMIC) .SCAN.IGNORE
+02-01-11 makerules: fix $(CC.SUFFIX.LD) prereqs for :LIBRARY: dlls
+	 make.probe: add .ign to cygwin CC.SUFFIX.LD
+02-01-10 makerules: add proto -e arg to lhs of :INSTALLPROTO:
+	 probe.win32: add .ign to CC.SUFFIX.LD
+02-01-08 makerules: initialize HOSTCC to $(CC)
+02-01-07 makerules: fix .LIBRARY.STATIC.* binding
+02-01-04 makerules: .REQUIRE.-l% includes pkg-%.mk of lib+prereqs before bind
+01-12-26 makerules: .REQUIRE.-l% includes pkg-%.mk if it exists
+01-12-24 pkg-X11.mk: add CC.REQUIRE.Xaw3d
+01-12-20 makerules: fix .RECURSE.INIT to use only first match of $(MAKEFILES)
+01-12-19 makerules: foo :VARIANT: ... implies _BLD_foo==implies _BLD_foo==1
+01-12-18 makerules: sync .SOURCE.a between .BIND* and .PACKAGE* (again!)
+01-12-15 command.c: fix bug that discarded a running job twice
+01-11-30 command.c: exit 128 silently marks job error but continues
+01-11-25 command.c: add .JOBDONE(target status user sys) .FUNCTION
+01-10-31 makerules: adjust .SOURCE.mk to ensure user specified dir order
+	 makerules: search MAKERULESPATH for ppcc rather than just MAKELIB
+	 makerules: delay CC.SHARED.REGISTRY expansion
 	 bind.c: add debug=14 directory search order trace
 	 make.probe: fix CC.SHARED.REGISTRY probe typo
-01-10-30 Makerules.mk: _BLD_foo==1 only for foo :LIBRARY: source
-01-10-20 Makerules.mk: fix --mam bug that didn't parameterize HOSTCC
-	 Makerules.mk: fix .PACKAGE.INIT. and .BIND.-l% to use the same search!
+01-10-30 makerules: _BLD_foo==1 only for foo :LIBRARY: source
+01-10-20 makerules: fix --mam bug that didn't parameterize HOSTCC
+	 makerules: fix .PACKAGE.INIT. and .BIND.-l% to use the same search!
 	 bind.c: foiled alias still allows bind questionable=0x40
 	 expand.c: allow all edit op delimiter combinations (e.g., !>, <>)
 	 make.probe: fix CC.DLL probe for gcc __ia64
 01-10-18 misc.c: clear SFFMT_LONG for %[cCsS] to avoid wide char conversions
 01-10-17 misc.c: add %a %A format, fix unknown format core dump
-01-10-15 Makerules.mk: fix .SELECT. bug that improperly dropped .ARCHIVE
+01-10-15 makerules: fix .SELECT. bug that improperly dropped .ARCHIVE
 01-10-11 make.probe: fix CC.WARN probe for C++
 01-10-10 Makerules.mk,make.probe: add { SHELLMAGIC CC.SHELLMAGIC }
 01-10-05 make.c: add -Q0x00800000 to disable r->status=FAILED when errors!=0 !!
-01-10-02 Makerules.mk: :YYPREFIX: invert case for macro prefix
-01-09-28 Makerules.mk: fix .RWD. and .OWD. usage
+01-10-02 makerules: :YYPREFIX: invert case for macro prefix
+01-09-28 makerules: fix .RWD. and .OWD. usage
 01-09-24 fix $(.GETCONF x) builtin
 01-09-19 make.probe: add cygwin dll build probes
 	 probe.win32: sync with make.probe
-	 Makerules.mk: include debug.mk by default
-	 Makerules.mk: .dll+.lib rule now passes .dll suffix to $(CC.LD)
-	 make.probe,Makerules.mk: add CC.PREFIX.(ARCHIVE|DYNAMIC|SHARED)
-	 make.probe,Makerules.mk: change CC.SYMPREFIX to CC.PREFIX.SYMBOL
-	 Makerules.mk: fix .RECURSE and .ONOBJECT to hit sub :MAKE: levels
-01-09-17 Makerules.mk: fix PACKAGE_OPTIMIZE logic
+	 makerules: include debug.mk by default
+	 makerules: .dll+.lib rule now passes .dll suffix to $(CC.LD)
+	 make.probe,makerules: add CC.PREFIX.(ARCHIVE|DYNAMIC|SHARED)
+	 make.probe,makerules: change CC.SYMPREFIX to CC.PREFIX.SYMBOL
+	 makerules: fix .RECURSE and .ONOBJECT to hit sub :MAKE: levels
+01-09-17 makerules: fix PACKAGE_OPTIMIZE logic
 01-09-11 expand.c: use pathnative() for native fs representation
 	 openar(): must open with "b" mode
 	 state.c: open state with "b" mode
-01-09-08 Makerules.mk: add *.a prereqs to dll link
-01-09-04 Makerules.mk: +l* bind conditioned on .LIBRARY.LIST. for dll builds
-01-08-11 Makerules.mk: reference $(CC.DLL.LIBRARIES) last and in link args only
-	 Makerules.mk: +l* in req list now checks .PACKAGE.*.library for -l*
+01-09-08 makerules: add *.a prereqs to dll link
+01-09-04 makerules: +l* bind conditioned on .LIBRARY.LIST. for dll builds
+01-08-11 makerules: reference $(CC.DLL.LIBRARIES) last and in link args only
+	 makerules: +l* in req list now checks .PACKAGE.*.library for -l*
 	 parse.c: fix `\\\r\n' to act like `\\\n'
 	 make.h: add FSWINDOWS to include { _WIN32 _UWIN __CYGWIN__ }
-01-07-17 Makerules.mk: fix :LIBRARY: to honor LDLIBRARIES
+01-07-17 makerules: fix :LIBRARY: to honor LDLIBRARIES
 01-06-21 misc.c: fix strtoll and strtoull macro rename
-01-06-10 Makerules.mk: add CC.NATIVE for native objects
+01-06-10 makerules: add CC.NATIVE for native objects
 01-06-07 command.c: fix job deadlock bug that improperly broke the loop
-01-05-31 Makerules.mk: add option rhs to :DLL:
-	 Makerules.mk: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
-	 Makerules.mk: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
+01-05-31 makerules: add option rhs to :DLL:
+	 makerules: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
+	 makerules: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
 	 make.probe: add CC.EXECTYPE
 	 make.probe: fix { ld nm size strip } search
 	 make.probe: adjust probe_shared order for linux.arm gcc
 	 option.c: add --cross to not run generated executables
 01-05-30 make.probe: add CC.NATIVE
 01-05-28 make.probe: add CC.STRIP and CC.STRIP.FLAGS
-	 Makerules.mk: add PACKAGESTRIP check for .LIST.PACKAGE.BINARY
+	 makerules: add PACKAGESTRIP check for .LIST.PACKAGE.BINARY
 01-05-26 expand.c: add :T=Y: for mime type
 01-05-09 --- release 4.2 ---
 	 make.h: isdynamic,isglob,isstatevar: functions to factor out strmatch()
 	 expand.c: add T=XQ[S[AV]|V[I]] to factor out strmatch() in base rules
 	 rule.c: speed up associate() by factoring out attributes
 01-05-01 expand.c: order() now handles :PACKAGE: foo:command
-01-04-26 Makerules.mk: null out cctype and .CC.PROBE. for --base
-	 Makerules.mk: fix .REQ. bug that missed :LIBRARY: targets
-01-04-25 Makerules.mk: add variants=pattern to select cc- variants
-	 Makerules.mk: add .VARIANTS alias for .CC-
+01-04-26 makerules: null out cctype and .CC.PROBE. for --base
+	 makerules: fix .REQ. bug that missed :LIBRARY: targets
+01-04-25 makerules: add variants=pattern to select cc- variants
+	 makerules: add .VARIANTS alias for .CC-
 	 option.c: fix bug that omitted readonly option values in .mo
-01-04-24 Makerules.mk: :DLL: sets VARIANT=DLL
+01-04-24 makerules: :DLL: sets VARIANT=DLL
 01-04-18 object.c: fix CC_NATIVE!=CC_ASCII buffer overflow
 	 make.probe,makerules: mvs.390 adjustments for CC.LIB.DLL=symbol
 01-04-01 scan.c: fix * scan match bug that gave up too soon
@@ -1757,14 +1861,14 @@ All recorded changes follow.
 	 Makerules: add :DLL: .DLL for dll generation
 	 Makerules: fix .MAKEINIT premature :T=F: that botched .SOURCExVPATH
 	 object.c: fix to handle 01/24/89 format objects (yes it still works)
-	 ppcc,Makerules.mk: generalize $(CC.DIALECT) option passing
+	 ppcc,makerules: generalize $(CC.DIALECT) option passing
 	 metarule: case sensitive match for patterns matching `[-+]*'
 	 archive.c,object.c: (Sfoff_t) for K&R compilers
 	 MAKEFILES=Nmakefile:nmakefile:Makefile:makefile -- thanks bill
 	 MAKEARGS=Nmakeargs:nmakeargs:Makeargs:makeargs -- thanks again bill
 	 probe: add CC.LD.RUNPATH
-	 Makerules.mk: add LDRUNPATH and CC.LD.RUNPATH support
-	 Makerules.mk: tone down PTR prereq scan
+	 makerules: add LDRUNPATH and CC.LD.RUNPATH support
+	 makerules: tone down PTR prereq scan
 	 .GETCONF: first builtin function
 96-11-28 ccmaps .mo for ascii/ebcdic compatibility
 96-10-31 outstanding bug reports addressed
@@ -2065,6 +2169,8 @@ All recorded changes follow.
 
 :::::::: probe ::::::::
 
+02-01-30 probe.c: add probe.ini check to match libast/pathprobe()
+01-12-03 probe.c: return HOME relative path if readonly/non-suid fs
 00-08-11 probe: fix non-suid generation check
 00-01-11 probe: fix -t with writable info
 99-09-01 probe: add --override
@@ -2082,6 +2188,7 @@ All recorded changes follow.
 
 :::::::: at ::::::::
 
+02-02-14 atd: add strdup(argv[1]) to workaround argv[1]=>0 mystery
 01-06-18 crontab: clarify the command<=>job relationship
 01-03-28 atd: fix log file rollover infinite loop
 01-02-14 atd: monitor daemon and restart if it dies
@@ -2113,6 +2220,8 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+02-01-24 look.c: drop <strings.h> ref
+01-11-26 what.c: fix doc type, add --matched
 01-10-31 what.c: fix omitted file arg doc
 01-06-06 who.c: fix entry skip logic that listed too many entries
 01-05-31 Makefile: add PACKAGE_OPTIMIZE=space checks
@@ -4051,6 +4160,11 @@ End:
 
 :::::::: mailx ::::::::
 
+02-03-17 spam.c: add spamtest=bitmask: 0x0001: content-type==text/html
+02-01-31 data.c: clarify imap var docs
+02-01-30 local.iffe: add to handle no <termios.h> and ftruncate()
+02-01-24 ifdef { SIGTSTP SIGTTOU SIGTTIN }
+02-01-16 properly update References: in replies
 01-10-15 `get attachment dir' copies attachment to dir
 01-04-01 add state.var.hostname for smtp HELO
 	 add fmtident() to initialize state.version 
@@ -4067,7 +4181,7 @@ End:
 99-07-17 fix imap reply via imap_setinput() omission
 	 @x.y.z in spam list matches x.y.z domain suffix
 	 tone down hostmatch(), check unknown in Received:
-	 fix $MAIL lock by check syscall return value -- how novel
+	 fix $MAIL lock by checking syscall return value -- how novel
 	 add -S, -o justfrom
 	 add -NS to print info and exit
 	 spam: Message-Id: <>
@@ -4157,8 +4271,14 @@ End:
 99-09-01 add usage[]
 96-10-11 first release
 
+:::::::: pack ::::::::
+
+2002-03-09 pack,unpack: diagnostic if no file operands
+1999-05-03 add optget() docs
+
 :::::::: pzip ::::::::
 
+02-02-14 Makefile: add explicit -lz references
 01-10-31 pin: add --reorder=tsp via -ltsp
 01-10-30 pzip: fix --window doc typo
 01-10-08 pin: add --optimize={dynamic|greedy|non|transitive}
@@ -4194,6 +4314,11 @@ End:
 
 :::::::: re ::::::::
 
+02-02-14 grep: add -P,--perl-regexp == REG_EXTENDED|REG_LENIENT
+02-02-12 ed.c: add \r hacks
+02-02-02 sed0.c: add \r to blank() set
+01-12-06 grep.c: add -b,--highlight to highlight matched text on ansi terms
+01-11-20 minimal.dat: add tests for regnexec() REG_MINIMAL char class bug
 01-10-31 sed: all space before ; command separator for REG_LENIENT
 01-10-20 testglob.c: handle \ in pattern and result field parse
 	 testglob.dat: add tests for \ in pattern and GLON_NOCHECK
@@ -4317,6 +4442,17 @@ End:
 
 :::::::: std ::::::::
 
+02-02-14 touch.c: explicit epoch dates (0) are different from now (also 0)
+	 locale.c: don't output on unknown keyword
+02-02-11 ps.c: validate input pid strings
+02-02-04 ps.c: --format subformat => heading
+02-02-02 pss.c: handle __CYGWIN__ bug where sizeof(TTY_CONSOLE)>sizeof(dev_t)
+02-01-31 pss.c: add aix getprocs()
+	 ps.c: ntpid=>npid, ntpid now a deprecated alias
+02-01-28 ls: fix devmajor/devminor to use st_rdev where appropriate
+02-01-22 ps: fix `not available' warning to attempt subsequent fields
+02-01-21 ps: recode to use pss.[ch] process status stream interface
+02-01-06 touch: clarify --time doc
 01-10-31 df: increase the fs stat timeout from 2 to 4 sec
 01-09-04 locale: add new catagories
 01-08-11 ls: fix nonprintable test for mb locales
@@ -4490,10 +4626,12 @@ End:
 
 :::::::: tksh ::::::::
 
-01-01-01  separate -ltksh from tksh main
+02-02-14 Makefile: shell:static because dll is -g => fix this situation
+01-01-01 separate -ltksh from tksh main
 
 :::::::: tw ::::::::
 
+02-01-16 tw: add symlink to EXPRESSIONS doc
 01-10-31 tw,find: add slocate(1) refs
 01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
 	 cmdarg(): fix CMD_INSERT copy that omitted leading chars
@@ -4568,6 +4706,74 @@ End:
 
 :::::::: libast ::::::::
 
+02-03-17 features/stdio: hack around g++ 3.* clashes
+	 Makefile: add ast_nl_types.h to the .check.hdr list
+	 string/strtoip4.c: fix validity check bug that only checked last part
+02-03-14 misc/optget.c: fix --keys to not expand inline \f...\f
+02-03-12 port/astlicense.c: add type=free
+	 path/pathaccess.c: sibling ".." search ignores relative dirs
+	 sfio/sfvscanf.c: sfstrtof get() must return 0 on eof
+02-03-11 path/pathexists.c: check path by pairs checking {ENOTDIR,ENOENT}
+02-02-14 features/float: copy local min/max macros to avoid printf roundoff
+	 features/wchar: include <ast_common.h>, not <ast_std.h>
+	 misc/magic.c: match[]=>matches[] to fix K&R match() macro conflict
+	 include/vmalloc.h: include <stdlib.h> for !_PACKAGE_ast
+	 uwin/mini.sym: add sprintf (now required by features/common)
+	 regex/regnexec.c: truncate wide chars for <ctype.h> functions
+	 Makefile: fix MAM ast_common.h sequencing bug by making it first
+	 cdt/dthash.c: fix DT_DELETE memory leak (DT_DETACH typo)
+	 cdt/dthash.c: fix DT_DELETE double free (dt->data->here typo)
+	 regex/regcomp.c: fix recomb() to reject RE with backref
+	 features/iffeio: explicitly generate stdio.lcl
+	 stdio: add {fcloseall,f(get|put)s_unlocked,fmemopen,getdelim,getline}
+	 tmmake,tmtime: allow negative time_t if native localtime/gmtime do
+	 tmdate: allow years before 1969
+	 fmtfmt: add
+	 include/ast.h: add { PATH_TOUCH_CREATE PATH_TOUCH_VERBATIM }
+	 Makefile: add std/*.h for std header iffe overrides
+	 comp/iconv.c: fix non-C win32 sfreserve() loop
+02-02-11 features/common: separate long long / long double tests
+	 features/common: verify printf handles long long / long double
+02-02-02 include/ast_std.h,sfio/sfhdr.h: drop _hdr_locale tests -- always on now
+	 include/ast_std.h: trust _UWIN <unistd.h>
+02-01-31 port/mnt.c: add aix options field
+02-01-30 comp/strstr.c: add for ancient s5
+	 stdio/_flsbuf.c: only on systems that transfer to native (e.g., uwin)
+	 string/strtoi.h: cat min/max error return values
+02-01-28 features/tty: add cf[gs]et[io]speed macros for <termio.h>
+	 comp/rename.c: punt to (ancient) /usr/lib/mv_dir on EISDIR
+02-01-24 sigcrit.c: fix SIGCLD!=SIGCHLD interrupt loop
+	 sfvprintf.c: convert fast io macros to functions for uts.390 cc
+	 string/strtoi.h: drop #pragma prototyped for standalone sfio
+	 sfdcsubstr.c: rename from sfdcsubstream.c for 14 char fs
+02-01-22 execlp,execvp,execvpe,spawnlp,spawnvp,spawnvpe: fix __EXPORT__
+	 spawnlp,spawnve,spawnvp,spawnvpe: handle ms mode arg -- barf
+	 sftable.c: ifdef hacks for _WIN32&_ALPHA_ fp exception
+	 _stdfun.c: add _UWIN&_ALPHA_ iob map
+02-01-18 sfio/sfstrtof.h: drop #pragma prototyped for standalone sfio
+02-01-17 features/hdr: don't include <stddef.h> after it doesn't check out!
+02-01-16 misc/magic.c: add version type for YYYYMMDD or [a.][b.]c.d
+	 misc/magic.c: recode mime %s parse -- sensible and no buffer overflow
+02-01-15 misc/magic.tab,magicid.h: add generic binary magic number and header
+02-01-12 tm/tmlocale.c: override win32 default date for {C,POSIX,en} locales
+	 comp/omitted.c: fix cygwin workaround logic bugs
+02-01-09 stdio/fseeko.c,ftello.c: add from UNIX98
+02-01-08 comp/conf.sh: use $cc instead of cc
+02-01-07 string/strlcat.c,string/strlcpy.c: add bsd api
+01-12-18 comp/conf.tab: fix LFS_CFLAGS default for sun _CS_LFS_CFLAGS botch
+	 features/common: add hdr stdarg test
+	 tm/tmdate.c: handle YYYY/MM/DD
+01-12-10 misc/magic.tab: add generic 0x00010203 binary magic
+01-12-03 path/pathprobe.c: return HOME relative path if readonly/non-suid fs
+01-11-30 misc/optget.c: add simple cache for repeat offenders (like ksh read)
+	 sfio/sfhdr.h: preserve errno across SFMMSEQON-SFMMSEQOFF
+01-11-29 magic.tab: fix GIF version number listing
+01-11-28 string/fmtbase.c: p!=0 => base always included in output
+01-11-26 misc/fts.c: empty path is an error
+01-11-14 misc/optget.c: fix --?+SECTION queries to include paragraphs
+01-11-20 regex/regnexec.c: fix REG_MINIMAL character class match bug
+01-11-19 features/lib: retain _lib_confstr for all solaris releases
+01-11-16 comp/setlocale.c: fix !_lib_setlocale typo
 01-10-31 regex/ucs_names.h: add string catenation to keep line length low
 	 misc/fastfind.c: handle gnu slocate db read
 	 misc/optget.c: add --?+SECTION queries
@@ -5310,6 +5516,8 @@ End:
 
 :::::::: libcmd ::::::::
 
+02-01-24 stty.c: ifdef a few more macros for uts (yes, its still running)
+01-12-14 date.c: clarify %z doc
 01-10-31 mkdir.c: mkdir() on existing dir could fail with errno!=EEXIST
 	 uname.c: add execve() loop check for unknown options
 01-10-29 tail.c: SF_SHARE on only if not reading through EOF
@@ -5412,6 +5620,8 @@ End:
 
 :::::::: libdll ::::::::
 
+02-03-17 dllfind.c: fix dll prefix search (for cygwin)
+02-01-11 features/dll: include <dlfcn.h> only if _hdr_dlfcn&&_lib_dlopen
 01-10-31 dlfcn.c: change hp.pa dlopen() prototype (<dlfcn.h> but no -ldl!)
 01-09-25 dllfind: add LIBSUFFIX
 01-07-17 dllfind: do at least one dlopen() to prime dlerror()
@@ -5507,6 +5717,8 @@ End:
 
 :::::::: libbz ::::::::
 
+02-02-14 blocksort.c: drop -O for msvc
+02-01-24 bzhdr.h: rename from bzlib_private.h for 14 char fs
 01-01-01 bzlib.h: add _PACKAGE_ast checks
 99-09-11 sfdcbzip: return >0 if discipline pushed
 99-07-17 sfdcbzip: don't free disc on SF_CLOSE
@@ -5514,6 +5726,11 @@ End:
 
 :::::::: libz ::::::::
 
+02-03-11 infblock.c: apply double free patch
+02-03-09 gzio.c: add stream->fatal to mark fatal errors previously ignored
+	 sfdcgzip.c: fix exception return values and mark SF_ERROR on fatal
+02-01-30 minigzip.c: error() => mgzerror() to avoid ancient ld dup sym error
+	 minigzip.c: [uU] in executable base name => gunzip, otherwise gzip
 01-09-18 zconf.h: include <ast_std.h> for __IMPORT__ and __EXPORT__
 00-09-11 gzio: don't set verified=1 in check_header() for concatenation
 99-11-19 gzio: add missing _PACKAGE_ast
@@ -5530,6 +5747,7 @@ End:
 
 :::::::: libcoshell ::::::::
 
+02-01-24 coopen.c: fix small memory leak
 01-10-26 coopen.c: hung sfclose(fp) -> close(sffileno(fp)) -- wow
 01-09-11 coinit.c: fix coident[] for ancient bsh that die on `test == 1'
 	 coinit.c: and fix coident[] to weed out buggy ksh88i trap on exit
@@ -5545,6 +5763,8 @@ End:
 
 :::::::: libcs ::::::::
 
+01-12-12 cssfd: CS_POLL_CLOSE now close()'s if not dropped -- double duh
+	 csstat: change down test to avoid unsigned long overflow
 01-10-31 cssend,csrecv: use msg_accrights over msg_control
 	 cspath: don't check /dev/fd/* -- duh
 01-05-11 csserve: sync cs.* with css->*
@@ -5617,6 +5837,16 @@ End:
 
 :::::::: libpp ::::::::
 
+02-03-15 ppproto.c: fix cpp pp:compatibility double line sync memory fault
+02-03-11 pplex.c: add pp:modern to emit \a \v instead of octal forms
+02-02-14 ppargs.c: fix -D or -U as last arg core dump
+02-01-24 pplib.h: use vmalloc(Vmregion) if _std_malloc
+02-01-23 probe.win32: add more msvc predefined macro candidates
+02-01-14 ppproto.c: #pragma prototyped noticed -- has notice comment
+02-01-10 ppproto.c: fix PROTO_FORCE|PROTO_PASS bug that disabled PROTO_FORCE
+02-01-08 pplex.c: fix HEADEREXPAND|HEADEREXPANDALL logic
+01-11-22 pplex.c: add pp:headerexpandall for gcc vs. msvc <...> expand diff
+	 pp.probe: add pp:headerexpandall test
 01-10-20 pplex.c: fix pp:splicespace inside "..."
 01-09-11 ppinput.c: use pathnative() for native fs representation
 01-08-31 pp.probe: handle -Dmacro(args)=value
@@ -5968,6 +6198,7 @@ End:
 
 :::::::: libcdb ::::::::
 
+02-02-14 Makefiles: add explicit -lz -ldll references
 01-07-17 cdblib: call dllerror() on failed dllfind()
 01-02-14 cdbtypes: add seed detail for {hash} and {rand} types
 01-01-01 cdbimage: drop span discipline that invalidated seeks
@@ -5999,6 +6230,9 @@ End:
 
 :::::::: libpz ::::::::
 
+02-03-09 pzopen,pzdeflate,pzsync: add fatal error checks
+02-02-14 pzopen: disable PZ_UNKNOWN check if PZ_NOPZIP -- duh
+02-01-11 pzdeflate: use Sfoff_t for sfmove() return instead of ssize_t
 01-08-11 pzinit: add for static discipline library linking
 01-07-17 pzlib: call dllerror() on failed dllfind()
 01-06-28 pzpartnext: add to iterate over all partitions
@@ -6039,6 +6273,8 @@ End:
 
 :::::::: libtksh ::::::::
 
+02-03-17  update ksh private assoc array offsets -- should be a function call
+02-01-30  compensate for uts.390 lack of header guards for { select.h time.h }
 01-04-19  add HAVE_TIME_H HAVE_SYS_PARAM_H HAVE___FD_MASK tests to tclPort.h
 00-02-10  --- Release 7.6 ---
 00-02-10  Update README file

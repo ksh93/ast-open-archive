@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2001 AT&T Corp.                *
+*                Copyright (c) 1990-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -157,7 +156,8 @@
 #define SETNAME		(1<<14)		/* name was set			*/
 #define SETRATING	(1L<<15)	/* rating was set		*/
 #define SETSCALE	(1L<<16)	/* scale was set		*/
-#define SETTYPE		(1L<<17)	/* type was set			*/
+#define SETSHELL	(1L<<17)	/* shell was set		*/
+#define SETTYPE		(1L<<18)	/* type was set			*/
 
 #define SETBUSY		(1<<0)		/* global.busy was set		*/
 #define SETDEBUG	(1<<1)		/* global.debug was set		*/
@@ -166,18 +166,19 @@
 #define SETGRACE	(1<<4)		/* global.grace was set		*/
 #define SETIDENTIFY	(1<<5)		/* global.identify was set	*/
 #define SETLOAD		(1<<6)		/* stat.load was set		*/
-#define SETMAXLOAD	(1<<7)		/* global.maxload was set	*/
-#define SETMIGRATE	(1<<8)		/* global.migrate was set	*/
-#define SETPERCPU	(1<<9)		/* global.percpu was set	*/
-#define SETPERHOST	(1<<10)		/* global.perhost was set	*/
-#define SETPERSERVER	(1<<11)		/* global.perserver was set	*/
-#define SETPERUSER	(1<<12)		/* global.peruser was set	*/
-#define SETPOOL		(1<<13)		/* global.pool was set		*/
-#define SETPROFILE	(1<<14)		/* global.profile was set	*/
-#define SETSCHEDULE	(1L<<15)	/* global.schedule was set	*/
-#define SETSHELL	(1L<<16)	/* global.shell was set		*/
-#define SETUPDATE	(1L<<17)	/* stat.update was set		*/
-#define SETUSERS	(1L<<18)	/* stat.users was set		*/
+#define SETMAXIDLE	(1<<7)		/* global.maxidle was set	*/
+#define SETMAXLOAD	(1<<8)		/* global.maxload was set	*/
+#define SETMIGRATE	(1<<9)		/* global.migrate was set	*/
+#define SETPERCPU	(1<<10)		/* global.percpu was set	*/
+#define SETPERHOST	(1<<11)		/* global.perhost was set	*/
+#define SETPERSERVER	(1<<12)		/* global.perserver was set	*/
+#define SETPERUSER	(1<<13)		/* global.peruser was set	*/
+#define SETPOOL		(1<<14)		/* global.pool was set		*/
+#define SETPROFILE	(1L<<15)	/* global.profile was set	*/
+#define SETSCHEDULE	(1L<<16)	/* global.schedule was set	*/
+/*#define SETSHELL	(1L<<17)	/* global.shell was set		*/
+#define SETUPDATE	(1L<<18)	/* stat.update was set		*/
+#define SETUSERS	(1L<<19)	/* stat.users was set		*/
 
 #define QUEUE		(-1)		/* waiting for shell to open	*/
 #define START		(-2)		/* started but no pid		*/
@@ -212,6 +213,7 @@ typedef struct
 	int		debug;
 	unsigned long	disable;
 	int		grace;
+	int		maxidle;
 	int		maxload;
 	int		percpu;
 	int		perhost;
@@ -298,6 +300,7 @@ typedef struct
 	int		jobs;
 	int		joblimit;
 	int		jobwait;
+	int		maxidle;
 	int		maxload;
 	char*		mesg;
 	char*		migrate;

@@ -18,12 +18,14 @@ struct letter {
  * Ouput message part to op.
  */
 static int
-part(register struct parse* pp, FILE* op, const char* encoding, off_t size, char* prefix, int prefixlen, int emptylen)
+part(register struct parse* pp, FILE* op, const char* encoding, off_t size, char* prefix, int prefixlen, int emptylen, unsigned long flags)
 {
 	register int	n = 0;
 	register int	i;
 	register FILE*	ip;
 	int		r = -1;
+	int		skip;
+	int		line;
 
 	ip = pp->fp;
 	if (*encoding && !isdigit(*encoding)) {
@@ -43,12 +45,27 @@ part(register struct parse* pp, FILE* op, const char* encoding, off_t size, char
 			goto bad;
 	}
 	if (prefix) {
+		skip = 1;
+		line = 0;
 		while (size > 0) {
 			if (!fgets(pp->buf, sizeof(pp->buf), ip)) {
 				n = 0;
 				break;
 			}
 			size -= n = strlen(pp->buf);
+			if (pp->buf[0] == '\n') {
+				if (!skip)
+					line++;
+				continue;
+			}
+			else
+				skip = 0;
+			if ((flags & GREFERENCES) && pp->buf[0] == '-' && pp->buf[1] == '-' && isspace(pp->buf[2]))
+				break;
+			if (line) {
+				line = 0;
+				fputc('\n', op);
+			}
 			i = n > 1 ? prefixlen : emptylen;
 			if (fwrite(prefix, 1, i, op) != i || fwrite(pp->buf, 1, n, op) != n)
 				goto bad;
@@ -89,6 +106,9 @@ copy(register struct msg* mp, FILE* op, Dt_t** ignore, char* prefix, unsigned lo
 {
 	register char*	s;
 	register int	i;
+	char*		date;
+	char*		head;
+	char*		from;
 	int		emptylen;
 	int		prefixlen;
 	struct part*	ap;
@@ -108,22 +128,57 @@ copy(register struct msg* mp, FILE* op, Dt_t** ignore, char* prefix, unsigned lo
 		emptylen = (s + 1) - prefix;
 	}
 	flags |= GDISPLAY|GNL;
-	if (!ignore || !ignored(ignore, "status"))
-		flags |= GSTATUS;
-	if (headset(&pp, mp, NiL, NiL, ignore, flags)) {
-		i = pp.length > 1 ? prefixlen : emptylen;
-		do {
-			if (prefix && fwrite(prefix, 1, i, op) != i ||
-			    fwrite(pp.buf, 1, pp.length, op) != pp.length)
-				return -1;
-		} while (headget(&pp));
+	if (flags & GREFERENCES) {
+		if (headset(&pp, mp, NiL, NiL, NiL, 0)) {
+			date = 0;
+			from = 0;
+			head = savestr(pp.data);
+			while (headget(&pp)) {
+				if (!strcasecmp(pp.name, "date"))
+					date = savestr(pp.data);
+				else if (!strcasecmp(pp.name, "from"))
+					from = savestr(pp.data);
+			}
+			if (from) {
+				if (s = strchr(from, '<')) {
+					while (s > from && isspace(*(s - 1)))
+						s--;
+					*s = 0;
+				}
+				if (*from == '"' && *++from && *(s = from + strlen(from) - 1) == '"')
+					*s = 0;
+			}
+			else {
+				from = head;
+				if (s = strchr(head, ' ')) {
+					*s++ = 0;
+					if (!date)
+						date = s;
+				}
+			}
+			if (date || (date = strchr(head, ' ')) && ++date)
+				fprintf(op, "On %s ", date);
+			fprintf(op, "%s wrote:\n", from);
+		}
+	}
+	else {
+		if (!ignore || !ignored(ignore, "status"))
+			flags |= GSTATUS;
+		if (headset(&pp, mp, NiL, NiL, ignore, flags)) {
+			i = pp.length > 1 ? prefixlen : emptylen;
+			do {
+				if (prefix && fwrite(prefix, 1, i, op) != i ||
+			    	fwrite(pp.buf, 1, pp.length, op) != pp.length)
+					return -1;
+			} while (headget(&pp));
+		}
+		fputc('\n', op);
 	}
 
 	/*
 	 * Copy out the message body
 	 */
 
-	fputc('\n', op);
 	if (ap = state.part.in.head) {
 		do {
 			if (flags & GINTERPOLATE) {
@@ -131,20 +186,20 @@ copy(register struct msg* mp, FILE* op, Dt_t** ignore, char* prefix, unsigned lo
 				note(DEBUG, "interpolate boundary=%s offset=%ld size=%ld", state.part.out.boundary, (long)ap->raw.offset, (long)ap->raw.size);
 				fprintf(op, "\n--%s\n", state.part.out.boundary);
 				fseek(pp.fp, ap->raw.offset, SEEK_SET);
-				if (part(&pp, op, state.part.global.code, ap->raw.size, prefix, prefixlen, emptylen))
+				if (part(&pp, op, state.part.global.code, ap->raw.size, prefix, prefixlen, emptylen, flags))
 					return -1;
 			}
 			else if (ap->flags & PART_body) {
 				note(DEBUG, "copy part text offset=%ld size=%ld lines=%ld", (long)ap->offset, (long)ap->size, (long)ap->lines);
 				fseek(pp.fp, ap->offset, SEEK_SET);
-				if (part(&pp, op, ap->code, ap->size, prefix, prefixlen, emptylen))
+				if (part(&pp, op, ap->code, ap->size, prefix, prefixlen, emptylen, flags))
 					return -1;
 			}
 			else
 				fprintf(op, "(attachment %2d %s %20s \"%s\")\n\n", ap->count, counts(1, ap->lines, ap->size), ap->type, ap->name);
 		} while (ap = ap->next);
 	}
-	else if (part(&pp, op, state.part.global.code, pp.count, prefix, prefixlen, emptylen))
+	else if (part(&pp, op, state.part.global.code, pp.count, prefix, prefixlen, emptylen, flags))
 		return -1;
 	return 0;
 }
@@ -501,6 +556,24 @@ headout(FILE* fp, struct header* hp, register unsigned long flags)
 			fprintf(fp, "Content-Type: text/plain; charset=us-ascii\n");
 			fprintf(fp, "Content-Transfer-Encoding: 7bit\n");
 		}
+		if (hp->h_flags & GMESSAGEID) {
+			fprintf(fp, "References: ");
+			if (hp->h_flags & GREFERENCES) {
+				char*	s;
+				int	m;
+				int	n;
+
+				m = REFLEN - strlen(hp->h_messageid) - 12;
+				s = hp->h_references;
+				if ((n = strlen(s)) > m) {
+					for (s += n - m; *s && !isspace(*s); s++);
+					for (; isspace(*s); s++);
+				}
+				fprintf(fp, "%s ", s);
+			}
+			fprintf(fp, "%s\n", hp->h_messageid);
+			hp->h_flags &= ~(GMESSAGEID|GREFERENCES);
+		}
 	}
 	for (lp = state.hdrtab; lp->name; lp++)
 		if (flags & lp->type) {
@@ -516,7 +589,7 @@ headout(FILE* fp, struct header* hp, register unsigned long flags)
 		if ((flags & GRULE) && state.var.rule && *state.var.rule)
 			fprintf(fp, "%s\n\n", state.var.rule);
 		else
-			putc('\n', fp);
+			fputc('\n', fp);
 	}
 	return 0;
 }

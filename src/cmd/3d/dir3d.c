@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -122,15 +121,23 @@ opendir3d(const char* apath)
 int
 closedir3d(register DIR* dirp)
 {
-	intercepted++;
 	if (dirp)
 	{
-		for (dirp->viewp = dirp->view; dirp->viewp->dirp; dirp->viewp++) CLOSEDIR(dirp->viewp->dirp);
-		if (dirp->overlay) hashfree(dirp->overlay);
-		if (!state.freedirp) state.freedirp = (void*)dirp;
-		else free((char*)dirp);
+		if (intercepted++)
+		{
+			intercepted--;
+			return CLOSEDIR(dirp);
+		}
+		for (dirp->viewp = dirp->view; dirp->viewp->dirp; dirp->viewp++)
+			CLOSEDIR(dirp->viewp->dirp);
+		if (dirp->overlay)
+			hashfree(dirp->overlay);
+		if (!state.freedirp)
+			state.freedirp = (void*)dirp;
+		else
+			free((char*)dirp);
+		intercepted--;
 	}
-	intercepted++;
 	return 0;
 }
 

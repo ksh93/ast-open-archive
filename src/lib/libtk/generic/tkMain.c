@@ -28,7 +28,6 @@
 #   else
 #       include <stdlib.h>
 #   endif
-#endif
 
 /*
  * Declarations for various library procedures and variables (don't want
@@ -42,6 +41,8 @@
 extern int		isatty _ANSI_ARGS_((int fd));
 extern int		read _ANSI_ARGS_((int fd, char *buf, size_t size));
 extern char *		strrchr _ANSI_ARGS_((CONST char *string, int c));
+
+#endif
 
 /*
  * Global variables used by the main program:

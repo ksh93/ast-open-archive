@@ -364,6 +364,8 @@ skin(char* name, unsigned long type)
 
 	if (!name)
 		return 0;
+	if (type & (GMESSAGEID|GREFERENCES))
+		return savestr(name);
 	if (!strchr(name, '(') && !strchr(name, '<') && !strchr(name, ' '))
 		return normalize(name, NiL, type);
 	gotlt = 0;

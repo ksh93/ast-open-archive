@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -136,12 +136,16 @@ done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -321,10 +325,13 @@ done vfork.h dontcare virtual
 prev ../../../include/ast/error.h implicit
 make spawn.h implicit
 done spawn.h dontcare virtual
+make process.h implicit
+done process.h dontcare virtual
 prev ../../../include/ast/ast.h implicit
 done ../../lib/libast/comp/spawnveg.c
 make ../../lib/libast/comp/spawnve.c implicit
 prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/ast_lib.h implicit
 done ../../lib/libast/comp/spawnve.c
 make ../../lib/libast/path/pathshell.c implicit
 prev ../../../include/ast/ast.h implicit
@@ -413,7 +420,9 @@ done ../../../include/ast/ast_param.h dontcare
 make ndir.h implicit
 done ndir.h dontcare virtual
 make ../../../include/ast/dirent.h implicit
+make ../../../include/ast/ast_dirent.h implicit
 prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/ast_dirent.h dontcare
 done ../../../include/ast/dirent.h dontcare
 prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
@@ -993,7 +1002,7 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1' in
+exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1' in
 exec - 	"")	cp 3d.sh 3d
 exec - 		;;
 exec - 	*)	{
@@ -1001,7 +1010,7 @@ exec - 		i=`(read x; echo $x) < 3d.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1
 exec - 		cat 3d.sh
 exec - 		} > 3d
 exec - 		;;
@@ -1009,8 +1018,8 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1 ;;
+exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1' in
+exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1 ;;
 exec - 	esac
 exec - 	cat 3d.sh
 exec - 	} > 3d

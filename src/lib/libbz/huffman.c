@@ -60,7 +60,7 @@
 --*/
 
 
-#include "bzlib_private.h"
+#include "bzhdr.h"
 
 /*---------------------------------------------------*/
 #define WEIGHTOF(zz0)  ((zz0) & 0xffffff00)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2001 AT&T Corp.                *
+*                Copyright (c) 1996-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -1474,6 +1473,7 @@ init(const char* path)
 int
 main(int argc, char** argv)
 {
+	char*	path;
 	pid_t	pid;
 	int	status;
 
@@ -1481,6 +1481,8 @@ main(int argc, char** argv)
 	NoP(argv);
 	error_info.id = "at.svc";
 	error_info.write = stampwrite;
+	if ((path = argv[1]) && !(path = strdup(path)))
+		path = argv[1];
 
 	/*
 	 * monitor the daemon and restart if it dies
@@ -1491,7 +1493,7 @@ main(int argc, char** argv)
 	{
 		if ((pid = fork()) <= 0)
 		{
-			if (!init(argv[1]))
+			if (!init(path))
 				csspoll(CS_NEVER, 0);
 			return 1;
 		}

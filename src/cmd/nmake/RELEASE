@@ -1,66 +1,101 @@
-01-10-31 Makerules.mk: adjust .SOURCE.mk to ensure user specified dir order
-	 Makerules.mk: search MAKERULESPATH for ppcc rather than just MAKELIB
-	 Makerules.mk: delay CC.SHARED.REGISTRY expansion
+02-03-14 variable.c: add label to --mam "setv" 
+02-02-14 makerules: add and use CMPFLAGS
+	 makerules: add win32 ar I flag only when installing .a
+	 makerules: iffe { CC CCFLAGS LDFLAGS } => { IFFECC ... }
+	 scan.c,variable.c: .SCAN.IGNORE must ignore state prereqs too
+	 main.c: fix final message sequence for .ERROR intercept
+	 state.c,variable.c: fix $(?x) when state(x) exists but rule(x) doesn't
+	 makerules: add .SHARED.UNIQ. to .COMMAND.o (required by sgi.mips3)
+02-02-02 makerules: mark :VARIANT: target .SPECIAL
+	 makerules: use STDED & STDEDFLAGS to differentiate from ED=vi
+	 makerules: drop ED & EDFLAGS
+	 Makeinstall.mk: add STD* probe with possible execrate(1)
+	 makerules: inhibit lib/lib closure for CC.DIALECT==CLOSURE
+	 probe.win32: add CC.DIALECT CLOSURE to inhibit .lib closure
+	 option.c: -S => -S0
+	 makerules: fixed .SHARED.UNIQ. to ignore .MULTIPLE -- duh
+02-02-01 makerules: fix .IFFE.REF. for \r\n systems -- barf
+02-01-22 makerules: ARFLAGS += I for CC.DLL on win32.*
+02-01-15 makerules: fix $(CC.PREFIX.DYNAMIC) logic in .BIND.-l%
+	 makerules: mark $(CC.SUFFIX.DYNAMIC) .SCAN.IGNORE
+02-01-11 makerules: fix $(CC.SUFFIX.LD) prereqs for :LIBRARY: dlls
+	 make.probe: add .ign to cygwin CC.SUFFIX.LD
+02-01-10 makerules: add proto -e arg to lhs of :INSTALLPROTO:
+	 probe.win32: add .ign to CC.SUFFIX.LD
+02-01-08 makerules: initialize HOSTCC to $(CC)
+02-01-07 makerules: fix .LIBRARY.STATIC.* binding
+02-01-04 makerules: .REQUIRE.-l% includes pkg-%.mk of lib+prereqs before bind
+01-12-26 makerules: .REQUIRE.-l% includes pkg-%.mk if it exists
+01-12-24 pkg-X11.mk: add CC.REQUIRE.Xaw3d
+01-12-20 makerules: fix .RECURSE.INIT to use only first match of $(MAKEFILES)
+01-12-19 makerules: foo :VARIANT: ... implies _BLD_foo==implies _BLD_foo==1
+01-12-18 makerules: sync .SOURCE.a between .BIND* and .PACKAGE* (again!)
+01-12-15 command.c: fix bug that discarded a running job twice
+01-11-30 command.c: exit 128 silently marks job error but continues
+01-11-25 command.c: add .JOBDONE(target status user sys) .FUNCTION
+01-10-31 makerules: adjust .SOURCE.mk to ensure user specified dir order
+	 makerules: search MAKERULESPATH for ppcc rather than just MAKELIB
+	 makerules: delay CC.SHARED.REGISTRY expansion
 	 bind.c: add debug=14 directory search order trace
 	 make.probe: fix CC.SHARED.REGISTRY probe typo
-01-10-30 Makerules.mk: _BLD_foo==1 only for foo :LIBRARY: source
-01-10-20 Makerules.mk: fix --mam bug that didn't parameterize HOSTCC
-	 Makerules.mk: fix .PACKAGE.INIT. and .BIND.-l% to use the same search!
+01-10-30 makerules: _BLD_foo==1 only for foo :LIBRARY: source
+01-10-20 makerules: fix --mam bug that didn't parameterize HOSTCC
+	 makerules: fix .PACKAGE.INIT. and .BIND.-l% to use the same search!
 	 bind.c: foiled alias still allows bind questionable=0x40
 	 expand.c: allow all edit op delimiter combinations (e.g., !>, <>)
 	 make.probe: fix CC.DLL probe for gcc __ia64
 01-10-18 misc.c: clear SFFMT_LONG for %[cCsS] to avoid wide char conversions
 01-10-17 misc.c: add %a %A format, fix unknown format core dump
-01-10-15 Makerules.mk: fix .SELECT. bug that improperly dropped .ARCHIVE
+01-10-15 makerules: fix .SELECT. bug that improperly dropped .ARCHIVE
 01-10-11 make.probe: fix CC.WARN probe for C++
 01-10-10 Makerules.mk,make.probe: add { SHELLMAGIC CC.SHELLMAGIC }
 01-10-05 make.c: add -Q0x00800000 to disable r->status=FAILED when errors!=0 !!
-01-10-02 Makerules.mk: :YYPREFIX: invert case for macro prefix
-01-09-28 Makerules.mk: fix .RWD. and .OWD. usage
+01-10-02 makerules: :YYPREFIX: invert case for macro prefix
+01-09-28 makerules: fix .RWD. and .OWD. usage
 01-09-24 fix $(.GETCONF x) builtin
 01-09-19 make.probe: add cygwin dll build probes
 	 probe.win32: sync with make.probe
-	 Makerules.mk: include debug.mk by default
-	 Makerules.mk: .dll+.lib rule now passes .dll suffix to $(CC.LD)
-	 make.probe,Makerules.mk: add CC.PREFIX.(ARCHIVE|DYNAMIC|SHARED)
-	 make.probe,Makerules.mk: change CC.SYMPREFIX to CC.PREFIX.SYMBOL
-	 Makerules.mk: fix .RECURSE and .ONOBJECT to hit sub :MAKE: levels
-01-09-17 Makerules.mk: fix PACKAGE_OPTIMIZE logic
+	 makerules: include debug.mk by default
+	 makerules: .dll+.lib rule now passes .dll suffix to $(CC.LD)
+	 make.probe,makerules: add CC.PREFIX.(ARCHIVE|DYNAMIC|SHARED)
+	 make.probe,makerules: change CC.SYMPREFIX to CC.PREFIX.SYMBOL
+	 makerules: fix .RECURSE and .ONOBJECT to hit sub :MAKE: levels
+01-09-17 makerules: fix PACKAGE_OPTIMIZE logic
 01-09-11 expand.c: use pathnative() for native fs representation
 	 openar(): must open with "b" mode
 	 state.c: open state with "b" mode
-01-09-08 Makerules.mk: add *.a prereqs to dll link
-01-09-04 Makerules.mk: +l* bind conditioned on .LIBRARY.LIST. for dll builds
-01-08-11 Makerules.mk: reference $(CC.DLL.LIBRARIES) last and in link args only
-	 Makerules.mk: +l* in req list now checks .PACKAGE.*.library for -l*
+01-09-08 makerules: add *.a prereqs to dll link
+01-09-04 makerules: +l* bind conditioned on .LIBRARY.LIST. for dll builds
+01-08-11 makerules: reference $(CC.DLL.LIBRARIES) last and in link args only
+	 makerules: +l* in req list now checks .PACKAGE.*.library for -l*
 	 parse.c: fix `\\\r\n' to act like `\\\n'
 	 make.h: add FSWINDOWS to include { _WIN32 _UWIN __CYGWIN__ }
-01-07-17 Makerules.mk: fix :LIBRARY: to honor LDLIBRARIES
+01-07-17 makerules: fix :LIBRARY: to honor LDLIBRARIES
 01-06-21 misc.c: fix strtoll and strtoull macro rename
-01-06-10 Makerules.mk: add CC.NATIVE for native objects
+01-06-10 makerules: add CC.NATIVE for native objects
 01-06-07 command.c: fix job deadlock bug that improperly broke the loop
-01-05-31 Makerules.mk: add option rhs to :DLL:
-	 Makerules.mk: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
-	 Makerules.mk: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
+01-05-31 makerules: add option rhs to :DLL:
+	 makerules: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
+	 makerules: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
 	 make.probe: add CC.EXECTYPE
 	 make.probe: fix { ld nm size strip } search
 	 make.probe: adjust probe_shared order for linux.arm gcc
 	 option.c: add --cross to not run generated executables
 01-05-30 make.probe: add CC.NATIVE
 01-05-28 make.probe: add CC.STRIP and CC.STRIP.FLAGS
-	 Makerules.mk: add PACKAGESTRIP check for .LIST.PACKAGE.BINARY
+	 makerules: add PACKAGESTRIP check for .LIST.PACKAGE.BINARY
 01-05-26 expand.c: add :T=Y: for mime type
 01-05-09 --- release 4.2 ---
 	 make.h: isdynamic,isglob,isstatevar: functions to factor out strmatch()
 	 expand.c: add T=XQ[S[AV]|V[I]] to factor out strmatch() in base rules
 	 rule.c: speed up associate() by factoring out attributes
 01-05-01 expand.c: order() now handles :PACKAGE: foo:command
-01-04-26 Makerules.mk: null out cctype and .CC.PROBE. for --base
-	 Makerules.mk: fix .REQ. bug that missed :LIBRARY: targets
-01-04-25 Makerules.mk: add variants=pattern to select cc- variants
-	 Makerules.mk: add .VARIANTS alias for .CC-
+01-04-26 makerules: null out cctype and .CC.PROBE. for --base
+	 makerules: fix .REQ. bug that missed :LIBRARY: targets
+01-04-25 makerules: add variants=pattern to select cc- variants
+	 makerules: add .VARIANTS alias for .CC-
 	 option.c: fix bug that omitted readonly option values in .mo
-01-04-24 Makerules.mk: :DLL: sets VARIANT=DLL
+01-04-24 makerules: :DLL: sets VARIANT=DLL
 01-04-18 object.c: fix CC_NATIVE!=CC_ASCII buffer overflow
 	 make.probe,makerules: mvs.390 adjustments for CC.LIB.DLL=symbol
 01-04-01 scan.c: fix * scan match bug that gave up too soon
@@ -359,14 +394,14 @@
 	 Makerules: add :DLL: .DLL for dll generation
 	 Makerules: fix .MAKEINIT premature :T=F: that botched .SOURCExVPATH
 	 object.c: fix to handle 01/24/89 format objects (yes it still works)
-	 ppcc,Makerules.mk: generalize $(CC.DIALECT) option passing
+	 ppcc,makerules: generalize $(CC.DIALECT) option passing
 	 metarule: case sensitive match for patterns matching `[-+]*'
 	 archive.c,object.c: (Sfoff_t) for K&R compilers
 	 MAKEFILES=Nmakefile:nmakefile:Makefile:makefile -- thanks bill
 	 MAKEARGS=Nmakeargs:nmakeargs:Makeargs:makeargs -- thanks again bill
 	 probe: add CC.LD.RUNPATH
-	 Makerules.mk: add LDRUNPATH and CC.LD.RUNPATH support
-	 Makerules.mk: tone down PTR prereq scan
+	 makerules: add LDRUNPATH and CC.LD.RUNPATH support
+	 makerules: tone down PTR prereq scan
 	 .GETCONF: first builtin function
 96-11-28 ccmaps .mo for ascii/ebcdic compatibility
 96-10-31 outstanding bug reports addressed

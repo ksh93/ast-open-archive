@@ -1,3 +1,5 @@
+02-02-14 blocksort.c: drop -O for msvc
+02-01-24 bzhdr.h: rename from bzlib_private.h for 14 char fs
 01-01-01 bzlib.h: add _PACKAGE_ast checks
 99-09-11 sfdcbzip: return >0 if discipline pushed
 99-07-17 sfdcbzip: don't free disc on SF_CLOSE

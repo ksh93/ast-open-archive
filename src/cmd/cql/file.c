@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2001 AT&T Corp.                *
+*                Copyright (c) 1991-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -835,13 +834,13 @@ record(register File_t* f, char* k, long h, int i, int c, int p)
 				}
 			}
 			if (p >= 0)
-				partition = f->hix->restrict;
+				partition = f->hix->restricted;
 			if (c)
 			{
 				if (!(q->record = cdbcache(f->cdb, q->record)))
 					return 0;
 				q->cached = 1;
-				q->partition = f->hix->restrict;
+				q->partition = f->hix->restricted;
 			}
 			return q->record->data;
 		}
@@ -921,7 +920,7 @@ generate(Expr_t* prog, register File_t* f, const char* file, Exid_t* sym)
 			break;
 		if ((state.test & 2) && !f->name)
 			f->name = f->hix->name;
-		if (f->hix->partitions > 1 && !f->hix->restrict)
+		if (f->hix->partitions > 1 && !f->hix->restricted)
 		{
 			f->overdisc.key = offsetof(Mark_t, name);
 			f->overdisc.freef = cdtobjfree;

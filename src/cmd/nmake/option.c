@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2001 AT&T Corp.                *
+*                Copyright (c) 1984-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -188,7 +187,7 @@ static struct option	options[] =	/* option table			*/
 	"Current assignments and assertions will be marked readonly.", 0,
 "readstate",	OPT_readstate,	(char*)&state.readstate,	0,0,
 	"Ignore state files lower than view level \alevel\a. \alevel=0\a"
-	" accepts state files on all view levels. The top view is level 0.",
+	" ignores state files on all view levels. The top view is level 0.",
 	"level:=0",
 "reread",	OPT_reread,	(char*)&state.reread,		0,0,
 	"Ignore any previously generated \b.mo\b files and re-read all"
@@ -1313,7 +1312,7 @@ scanargs(int argc, char** argv, int* argf)
 		else
 		{
 			op = &options[-10 - i];
-			n = (op->flag & On) ? opt_info.num : 1;
+			n = (op->flag & On) ? (opt_info.arg ? opt_info.num : 0) : 1;
 			if (*opt_info.option == '+')
 				n = !n;
 			if (op->flag & Oo)

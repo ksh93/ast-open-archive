@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2001 AT&T Corp.                *
+*                Copyright (c) 1992-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -34,16 +33,19 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: what (AT&T Labs Research) 2000-12-01 $\n]"
+"[-?\n@(#)$Id: what (AT&T Labs Research) 2001-11-26 $\n]"
 USAGE_LICENSE
 "[+NAME?what - display binary identification strings]"
 "[+DESCRIPTION?\bwhat\b searches the given files for all occurrences of"
-"	the pattern \b@(#)\b or \b$Id:\b and writes a line to the standard"
-"	output containing the text that follows until the first occurrence"
-"	of one of the following: \b\" > \\ $ newline NUL\b. If no \bfile\b"
-"	is given or if a \bfile\b is \b-\b then the standard input is read.]"
-"	are specified]"
+"	the identification pattern \b@(#)\b or \b$Id:\b and writes a line to"
+"	the standard output containing the text that follows until the first"
+"	occurrence of one of the following: \b\" > \\ $ newline NUL\b. If no"
+"	\bfile\b is given or if a \bfile\b is \b-\b then the standard input is"
+"	read. The name of each input file, followed by a \b:\b, is also"
+"	written as a separate line to the standard output.]"
 
+"[m:matched?Only list the names of files that match the identification"
+"	pattern.]"
 "[s:first|single?Find only the first occurrence of the pattern in each file.]"
 
 "\n"
@@ -66,6 +68,7 @@ USAGE_LICENSE
 static struct
 {
 	int		hit;
+	int		match;
 	int		single;
 	size_t		skip[UCHAR_MAX+1];
 	unsigned char	prev[3];
@@ -80,10 +83,12 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 	register unsigned char*	e;
 	register size_t		index;
 	register size_t		mid;
+	int			intro;
 	unsigned char*		b;
 	char*			t;
 
-	sfprintf(op, "%s:\n", file);
+	if (intro = !state.match)
+		sfprintf(op, "%s:\n", file);
 	if (buf = (unsigned char*)sfreserve(ip, SF_UNBOUND, 0))
 	{
 		skip = state.skip;
@@ -166,6 +171,11 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 					}
 					b = s;
 					t = "\t";
+					if (!intro)
+					{
+						intro = 1;
+						sfprintf(op, "%s:\n", file);
+					}
 					for (;;)
 					{
 						if (s >= e)
@@ -237,6 +247,9 @@ b_what(int argc, char** argv, void* context)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'm':
+			state.match = 1;
+			continue;
 		case 's':
 			state.single = 1;
 			continue;

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2001 AT&T Corp.                *
+*                Copyright (c) 1999-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -51,6 +50,7 @@ MAIN()
 	void(*	handler)_ARG_((int));
 
 #define N_STR	10
+	alarm(10);
 	if(argc > 1) /* to act as a coprocess that read/write ten lines */
 	{	int	i, n, rv;
 

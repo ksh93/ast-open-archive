@@ -1,65 +1,38 @@
 The INIT package is required by all other packages. It contains the
 package command, support scripts, and utilities.
 
-Source Package Installation Instructions:
+Binary Package Installation Instructions:
 
   (1) Do not install packages as root/super-user. Although some components may
       have setuid executables, few must be owned by root. These are best
       changed manually when the security implications are understood.
   (2) Choose a package root directory and cd to it. This will be a local work
-      area for all packages. See (9) for installing packages for public use.
+      area for all packages. See (7) for installing packages for public use.
   (3) Create the subdirectory lib/package/tgz and download all package archives
       into that directory. The package(1) command maintains the contents of this
       directory and deletes old archives as new ones are read in. Package
       delta archives require the most recent base, so manually removing files
       in this directory may invalidate future deltas.
   (4) If the bin/package command does not exist then manually read the INIT
-      source package:
-		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.tgz | tar xvf -
-      If your system does not have tar(1) or gunzip(1) then download the ratz
-      source package, compile it, and manually read the INIT
-      source package:
+      binary package:
+		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.HOSTTYPE.tgz |
+			tar xvf -
+      where HOSTTYPE is compatible with your host architecture. If your system
+      does not have tar(1) or gunzip(1) then download the ratz binary package,
+      install it, and manually read the INIT binary package:
 		mkdir bin
-		cp lib/package/tgz/ratz.YYYY-MM-DD.c lib/package/tgz/ratz.c
-		cc -o bin/ratz lib/package/tgz/ratz.c
-		bin/ratz -lm < lib/package/tgz/INIT.YYYY-MM-DD.tgz
+		cp lib/package/tgz/ratz.YYYY-MM-DD.HOSTTYPE.exe bin/ratz
+		bin/ratz -lm < lib/package/tgz/INIT.YYYY-MM-DD.HOSTTYPE.tgz
   (5) Read all unread package archive(s):
 		bin/package read
-      Both source and binary packages will be read by this step.
-  (6) Build and install; all generated files are placed under arch/$HOSTTYPE
-      ($INSTALLROOT), where $HOSTTYPE is defined by the output of
-      bin/package (with no arguments.) name=value arguments are supported; CC
-      and CCFLAGS are likely candidates. The output is written to the terminal
-      and captured in $INSTALLROOT/lib/package/gen/make.out:
-		bin/package make
-  (7) List make results and interesting errors from (6):
-		bin/package results
-      Run the regression tests:
-		bin/package test
-      List test results and errors:
-		bin/package results test
-  (8) Run the binaries by
+      Both binary and source packages will be read by this step.
+  (6) Run the binaries by
 		export PATH=$INSTALLROOT/bin:$PATH
 		ksh
       or by adding $INSTALLROOT/lib to the runtime linker search list
       (the variable that is assigned the value ../lib in the
-      $INSTALLROOT/bin/.paths file.) If you want to build individual
-      components run:
-		bin/package use
-      to get an interactive $SHELL that sets up the environment for using
-      package binaries:
-	  $HOSTTYPE	 the current host type
-	  $PACKAGEROOT	 the root directory for all packages ($P)
-	  $INSTALLROOT	 the installation root for the current host type ($A)
-	  $PATH		 $INSTALLROOT/bin:$PACKAGEROOT/bin prepended
-	  $VPATH	 a multi-level view; all building done in $INSTALLROOT
-          DLL-MAGIC	 environment magic for locating package shared libraries
-      From this shell you can run nmake in any directory under
-      $INSTALLROOT/src and rebuild just that part. If $INSTALLROOT/bin/nmake
-      does not exist then use $INSTALLROOT/bin/mamake on Mamfile.
-      nmake is open source - download ast-open or ast-base to
-      simplify future builds or to make new or delta packages.
-  (9) Once you are satisfied with a package its binaries can be installed in
+      $INSTALLROOT/bin/.paths file.)
+  (7) Once you are satisfied with a package its binaries can be installed in
       a public area by:
 		bin/package install DIRECTORY PACKAGE
       or you can just copy the entire $INSTALLROOT directory tree. Users can
@@ -73,6 +46,52 @@ All recorded changes follow.
 
 :::::::: INIT ::::::::
 
+02-03-17 package.sh: fix PAX initialization that was sometimes omitted for read
+	 package.sh: fix update delta sync fetch
+02-02-14 iffe.sh: fix macro{ }end docs to include "
+	 iffe.sh: add dfn to extract #define from headers
+	 iffe.sh: handle nxt #include ok but no line sync
+	 iffe.sh: drop local header clash logic
+	 iffe.sh: add -X, --exclude=dir to exclude -I dirs
+	 iffe.sh: lcl,nxt now generate <...> headers instead of "..."
+	 package.sh: admin.db root dir matching -* disables host
+	 package.mk: fix package.src.pat typo -- too many )
+	 package.mk: add { :COVERS: :DESCRIPTION: :REQUIRES: }
+	 package.sh: handle { :COVERS: :DESCRIPTION: :REQUIRES: }
+	 Makefile: move proto.c generation to the proto component dir
+02-02-02 execrate.sh: add for .exe challenged win32 systems/commands
+	 mamprobe.sh: add STD* commands/flags
+	 mamake.c: update mamprobe info when older than mamprobe executable
+	 package.sh: move ed/ex workaround to mamprobe.sh
+	 package.sh: fix `host type' bug that incorrectly assumed sun4 for sol
+	 package.sh: add execrate(1) hooks for challenged systems
+	 package.sh: add check for { cc ar nm yacc/bison } before make
+	 ratz.c: fix "rb" vs. "r" macro tests
+	 iffe.sh: add nxt, similar to lcl but defines _nxt_foo for #include
+	 iffe.sh,package.sh: remove vaibale from sccs,cvs ident strings -- duh
+02-01-24 C+probe: check CC.DYNAMIC to handle cc that accept but ignore -B*
+	 iffe.sh: handle 'mem struct.a.b'
+02-01-22 iffe.sh: cache (internal) `foo vs. struct foo' test results
+	 package.sh: uts.370 => uts.390
+02-01-18 package.sh: fix uts hosttype
+02-01-17 package.sh: add 'results failed ...' to list failures only
+	 package.sh: change ARCH internal var to all_types to avoid env conflict
+	 iffe.sh: fix hdr/lib precheck that missed some -- ouch
+	 iffe.sh: fix noexecute test that forgot to check compile first!
+02-01-15 ratz.c: fix path[] type typo
+02-01-01 package.mk: tighten license search
+02-01-08 package.sh: `pwd` => ${PWD:-`pwd`}
+	 package.mk: expand license file pattern match
+02-01-04 iffe.sh: fix `exp name "value"' bug that duped "value"
+	 iffe.sh: fix initial <sys/types.h> check to honor --config
+01-12-25 iffe.sh: fix bug where -o file restored old file
+01-12-23 package.mk: uniq the closure lists
+01-12-07 ratz.c: fix --meter to retain paths containing " -- "
+01-11-30 ratz.c: use sear_system() to execute; should work on all windows
+01-11-28 ratz.c: fix sear_rm_r() to check SetCurrentDirectory() status
+01-11-26 ditto.sh: drop n+=v for ksh compatibility
+01-11-21 ditto.sh: add rsync script replacement [hey, it works!]
+	 package.sh: add [ditto]:directory notation to admin.db
 01-10-31 package.sh: handle *.sum paths with embedded space
 	 package.sh: change executable() to onpath()
 	 package.sh: executable([!] foo) replaces test [!] -x foo (.exe hack)
@@ -95,7 +114,7 @@ All recorded changes follow.
 	 ratz.c: add recursive sear_rm_r() to sear_exec() tmp dir cleanup
 01-10-10 mamprobe.sh: add mam_cc_SHELLMAGIC
 	 package.sh: add nfs wakeup call to admin to avoid stale file handles
-01-10-04 cc.darin.ppc: -flat_namespace is not longer the default (huh)
+01-10-04 cc.darwin.ppc: -flat_namespace is not longer the default (huh)
 01-10-01 package make: prepend $INSTALLROOT/bin/ok to PATH
 	 package read: save cpy of bin/package when reading the INIT package
 	 mamprobe.sh: allow cc path with optional arguments
@@ -143,7 +162,7 @@ All recorded changes follow.
 	 mamake: execute actions with $SHELL, ignored signals back to default
 	 package.sh: nmake check error output to /dev/null
 	 package.sh: fix INIT a.out updates for knr cc
-	 package.sh: package list now handle large tgz dirs
+	 package.sh: package list now handles large tgz dirs
 	 package.sh: *-ok executables moved to ok/* for *.dll systems
 	 iffe.sh: change "exec >&-" to "exec >/dev/null" else linux mkdir fails!
 	 mamake: handle `bind -lx [dontcare]'

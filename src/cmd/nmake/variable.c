@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2001 AT&T Corp.                *
+*                Copyright (c) 1984-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -49,7 +48,9 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 	struct list		t;
 
 	i = 0;
-	if ((x = staterule(PREREQS, r, NiL, 0)) && (x->property & P_implicit))
+	if (r->scan == SCAN_IGNORE && !(state.questionable & 0x02000000))
+		top = -1;
+	else if ((x = staterule(PREREQS, r, NiL, 0)) && (x->property & P_implicit))
 		prereqs[i++] = x->prereqs;
 	else
 		top = 1;
@@ -80,7 +81,8 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 					if (!sp)
 					{
 						x->mark &= ~M_generate;
-						scanprereqs(sp, x, dostate, all, 0, sep);
+						if (top >= 0)
+							scanprereqs(sp, x, dostate, all, 0, sep);
 					}
 				}
 				else if (sp && (all || ((x->property & P_state) || x->scan || !r->scan) && !(x->property & (P_ignore|P_use|P_virtual)) && (!(x->property & P_dontcare) || x->time)))
@@ -94,7 +96,8 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 							sep = 1;
 						sfputr(sp, state.localview ? localview(x) : ((x->dynamic & D_alias) ? x->uname : x->name), -1);
 					}
-					sep = scanprereqs(sp, x, dostate, all, 0, sep);
+					if (top >= 0)
+						sep = scanprereqs(sp, x, dostate, all, 0, sep);
 				}
 			} while (x = z);
 		}
@@ -248,7 +251,16 @@ getval(register char* s, int op)
 				}
 				else
 					t = 0;
-				r = getrule(s);
+				if (!(r = getrule(s)))
+					switch (var)
+					{
+					case '!':
+					case '&':
+					case '?':
+						if (staterule(RULE, NiL, s, -1) || staterule(PREREQS, NiL, s, -1))
+							r = makerule(s);
+						break;
+					}
 				if (t)
 					*t = MARK_CONTEXT;
 				if (!r)
@@ -743,7 +755,7 @@ localvar(Sfio_t* sp, register struct var* v, char* value, int property)
 	if (!(v->property & property) || !sp)
 	{
 		v->property |= property;
-		sfprintf(state.mam.out, "setv %s%s ", prefix, v->name);
+		sfprintf(state.mam.out, "%ssetv %s%s ", state.mam.label, prefix, v->name);
 		if (*(s = value))
 		{
 			sfprintf(state.mam.out, "%s%s", (property & V_local_D) ? "-D" : null, v->name);

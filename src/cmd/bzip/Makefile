@@ -10,6 +10,8 @@ bzip :LINK: bzip2
 
 bunzip :LINK: bzip2
 
+bunzip2 :LINK: bzip2
+
 bzcat :LINK: bzip2
 
 :INSTALLDIR: bzip2recover

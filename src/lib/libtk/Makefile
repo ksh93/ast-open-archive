@@ -33,14 +33,14 @@ $(LIB) $(TK_VERSION) :LIBRARY: \
 	tkPlace.c tkRectOval.c tkScale.c tkScrollbar.c tkSelect.c tkSend.c \
 	tkSquare.c tkTest.c tkText.c tkTextBTree.c tkTextDisp.c \
 	tkTextIndex.c tkTextMark.c tkTextTag.c tkTextWind.c tkTrig.c \
-	tkUtil.c tkVisual.c tkWindow.c \
+	tkUtil.c tkVisual.c tkWindow.c tkMain.c \
 	tkDefault.h tkFileFilter.h tkSelect.h tkNnames.h tkInt.h \
-	tkText.h tk.h tkPatch.h tkCanvas.h tkPort.h tkUnixDefault.h \
+	tkText.h tk.h tkPatch.h tkCanvas.h tkPort.h tkUnixDef.h \
 	tkUnixInt.h tkUnixPort.h
 
 $(INCLUDEDIR) :INSTALLPROTO: tk.h
 
-:: README ToDo changes license.terms tkMain.c tkAppInit.c
+:: README ToDo changes license.terms tkAppInit.c
 
 /* Generated with: ksh gen library '/$(ID)$(TK_VERSION)' */
 

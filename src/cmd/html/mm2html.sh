@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1996-2001 AT&T Corp.                #
+#                Copyright (c) 1996-2002 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -14,8 +14,7 @@
 #           the license and copyright and are violating            #
 #               AT&T's intellectual property rights.               #
 #                                                                  #
-#                 This software was created by the                 #
-#                 Network Services Research Center                 #
+#            Information and Software Systems Research             #
 #                        AT&T Labs Research                        #
 #                         Florham Park NJ                          #
 #                                                                  #
@@ -43,7 +42,8 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2001-05-09'
+version='mm2html (AT&T Labs Research) 2002-03-17'
+LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
@@ -113,13 +113,14 @@ esac
 
 set -o noglob
 
-integer count fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4 row n s
+integer count row n s
+integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4
 integer labels=0 reference=1 ident=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
 typeset -x -A ds map nr outline
-typeset cond frame label list prev text trailer type
+typeset cond fg frame label list prev text trailer type
 typeset license html meta nl mm index authors vg header references ss
 typeset mm_AF mm_AF_cur mm_AF_old mm_AU
 
@@ -394,7 +395,7 @@ function getfiles
 function getline
 {
 	integer i n
-	typeset data a c q v x
+	typeset data a c q v x d
 	if	(( peek ))
 	then	(( peek = 0 ))
 		trap 'set -- "${text[@]}"' 0
@@ -577,6 +578,139 @@ function getline
 				\\\{*)	text[0]=${text[0]#??} ;;
 				esac
 				;;
+			.so)	x=${text[1]}
+				for d in . $document
+				do	case $d in
+					.)	d= ;;
+					*/*)	d=${d%/*}/ ;;
+					*)	continue ;;
+					esac
+					if	[[ -f "$d$x" ]]
+					then	(( fd = so + soff ))
+						tmp=/tmp/m2h$$
+						getfiles "$d$x" > $tmp
+						eval exec $fd'< $tmp'
+						rm $tmp
+						so_file[so]=$file
+						file=$d$x
+						so_line[so]=$line
+						(( line = 0 ))
+						(( so++ ))
+						continue 2
+					fi
+				done
+				warning "$x: $op cannot read"
+				continue
+				;;
+			.xx)	data=
+				set -- "${text[@]}"
+				shift
+				while	:
+				do	case $# in
+					0)	break ;;
+					esac
+					nam=${1%%=*}
+					case $nam in
+					no?*)	nam=${nam#no} val=0 ;;
+					*)	val=${1#*=} ;;
+					esac
+					shift
+					case $nam in
+					begin|end)
+						set -- $val
+						case $nam in
+						begin)	upper=$1 ;;
+						end)	upper=/$1 ;;
+						esac
+						shift
+						case $# in
+						0)	val="<!--${upper}-->" ;;
+						*)	val="<!--${upper} $@-->" ;;
+						esac
+						if	(( ident ))
+						then	print -r -- "$val"
+						else	meta="$meta$nl$val"
+						fi
+						;;
+					index)	case $val in
+						0)	labels=-1 ;;
+						*)	labels=0 ;;
+						esac
+						;;
+					label|link|ref)
+						case $val in
+						*'	'*)
+							url=${val%%'	'*}
+							txt=${val#*'	'}
+							;;
+						*'\\t'*)
+							url=${val%%'\\t'*}
+							txt=${val#*'\\t'}
+							;;
+						*)	url=$val
+							txt=$val
+							;;
+						esac
+						case $url in
+						*[:/.]*)	pfx= ;;
+						*)		pfx='#' ;;
+						esac
+						case $url in
+						*'${html.'*'}'*)
+							eval url=\"$url\"
+							;;
+						esac
+						case $nam in
+						label)	if	(( labels >= 0 ))
+							then	nam=name
+								label[labels++]=$txt
+								print -r -- "<A $nam=\"$url\">$txt</A>"
+							fi
+							;;
+						link)	nam=href
+							tar=
+							case $frame in
+							?*)	case $url in
+								*([abcdefghijklmnopqrstuvwxyz]):*|/*)
+									tar=" target=_top"
+									;;
+								esac
+								;;
+							esac
+							if	[[ $frame != '' && $title == '' ]]
+							then	rm $framebody
+								framelink=$pfx$url
+							else	data="$data <A $nam=\"$pfx$url\"$tar>$txt</A>"
+							fi
+							;;
+						ref)	case $txt in
+							$url)	x="<LINK href=\"$url\">" ;;
+							*)	x="<LINK href=\"$url\" type=\"$txt\">" ;;
+							esac
+							case $framelink in
+							'')	meta="$meta$nl$x" ;;
+							*)	framerefs="$framerefs$nl$x" ;;
+							esac
+							;;
+						esac
+						;;
+					meta.*)	meta="$meta$nl<META name=\"${nam#*.}\" content=\"$val\">"
+						;;
+					logo)	eval html.$nam.src='$'val
+						;;
+					ident|logo*|title|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
+						eval html.$nam='$'val
+						;;
+					*)	eval license.$nam='$'val
+						;;
+					esac
+				done
+				case $data in
+				'')	continue ;;
+				esac
+				set -A text -- "$data"
+				break
+				;;
 			esac
 			case ${text[0]} in
 			@($primary))
@@ -705,6 +839,8 @@ function getline
 				0)	getline ;;
 				esac
 				set -A text -- "<FONT SIZE=-2><B>""$@""</B></FONT>"
+				;;
+			.SG)	continue
 				;;
 			.SM)	set -- "${text[@]}"
 				shift
@@ -1156,10 +1292,22 @@ do	getline || {
 			?*)	[[ -f $frame-$i ]] && i=$frame-$i ;;
 			esac
 			print -r -- "<CENTER><IMG src=\"$i\"></CENTER>"
-			if [[ ! -f $1 ]]
+			f=
+			for d in . $document
+			do	case $d in
+				.)	d= ;;
+				*/*)	d=${d%/*}/ ;;
+				*)	continue ;;
+				esac
+				if	[[ -f "$d$1" ]]
+				then	f=$d$1
+					break
+				fi
+			done
+			if [[ ! $f ]]
 			then	print -u2 "$command: $1: data file not found"
-			elif [[ $1 -nt $i ]]
-			then	ps2gif $1 $i
+			elif [[ $f -nt $i ]]
+			then	ps2gif $f $i
 			fi
 			;;
 		.CT)	: ignore $op
@@ -1185,6 +1333,9 @@ do	getline || {
 			then	nf=0
 				print -r -- "</PRE>"
 			fi
+			if [[ $fg ]]
+			then	print -r -- "<H4 align=center>$fg</H4>"
+			fi
 			indent=${indent#$inch}
 			;;
 		.EX|.eX)if ((!nf))
@@ -1192,6 +1343,10 @@ do	getline || {
 				print -r -- "<PRE>"
 			fi
 			indent=$inch$indent
+			case $# in
+			2)	fg="Figure $1: $2" ;;
+			*)	fg= ;;
+			esac
 			;;
 		.FE)	print -r -- '&nbsp;]&nbsp'
 			;;
@@ -1770,24 +1925,18 @@ do	getline || {
 				;;
 			esac
 			;;
-		.sn)	if	[[ ! -f $1 ]]
-			then	warning "$1: $op cannot read"
-			else	cat "$1"
-			fi
-			;;
-		.so)	if	[[ ! -f $1 ]]
-			then	warning "$1: $op cannot read"
-			else	(( fd = so + soff ))
-				tmp=/tmp/m2h$$
-				getfiles "$1" > $tmp
-				eval exec $fd'< $tmp'
-				rm $tmp
-				so_file[so]=$file
-				file=$1
-				so_line[so]=$line
-				(( line = 0 ))
-				(( so++ ))
-			fi
+		.sn)	for d in . $document
+			do	case $d in
+				.)	d= ;;
+				*/*)	d=${d%/*}/ ;;
+				*)	continue ;;
+				esac
+				if	[[ -f "$d$1" ]]
+				then	cat "$d$1"
+					continue 2
+				fi
+			done
+			warning "$1: $op cannot read"
 			;;
 		.sp|.SP)case $1 in
 			[0123456789]*)
@@ -1807,108 +1956,8 @@ do	getline || {
 			;;
 		.ul)	: ignore $op
 			;;
-		.xx)	while	:
-			do	case $# in
-				0)	break ;;
-				esac
-				nam=${1%%=*}
-				case $nam in
-				no?*)	nam=${nam#no} val=0 ;;
-				*)	val=${1#*=} ;;
-				esac
-				shift
-				case $nam in
-				begin|end)
-					set -- $val
-					case $nam in
-					begin)	upper=$1 ;;
-					end)	upper=/$1 ;;
-					esac
-					shift
-					case $# in
-					0)	val="<!--${upper}-->" ;;
-					*)	val="<!--${upper} $@-->" ;;
-					esac
-					if	(( ident ))
-					then	print -r -- "$val"
-					else	meta="$meta$nl$val"
-					fi
-					;;
-				index)	case $val in
-					0)	labels=-1 ;;
-					*)	labels=0 ;;
-					esac
-					;;
-				label|link|ref)
-					case $val in
-					*'	'*)
-						url=${val%%'	'*}
-						txt=${val#*'	'}
-						;;
-					*'\\t'*)
-						url=${val%%'\\t'*}
-						txt=${val#*'\\t'}
-						;;
-					*)	url=$val
-						txt=$val
-						;;
-					esac
-					case $url in
-					*[:/.]*)	pfx= ;;
-					*)		pfx='#' ;;
-					esac
-					case $url in
-					*'${html.'*'}'*)
-						eval url=\"$url\"
-						;;
-					esac
-					case $nam in
-					label)	if	(( labels >= 0 ))
-						then	nam=name
-							label[labels++]=$txt
-							print -r -- "<A $nam=\"$url\">$txt</A>"
-						fi
-						;;
-					link)	nam=href
-						tar=
-						case $frame in
-						?*)	case $url in
-							*([abcdefghijklmnopqrstuvwxyz]):*|/*)
-								tar=" target=_top"
-								;;
-							esac
-							;;
-						esac
-						if	[[ $frame != '' && $title == '' ]]
-						then	rm $framebody
-							framelink=$pfx$url
-						else	print -r -- "<A $nam=\"$pfx$url\"$tar>$txt</A>"
-						fi
-						;;
-					ref)	case $txt in
-						$url)	x="<LINK href=\"$url\">" ;;
-						*)	x="<LINK href=\"$url\" type=\"$txt\">" ;;
-						esac
-						case $framelink in
-						'')	meta="$meta$nl$x" ;;
-						*)	framerefs="$framerefs$nl$x" ;;
-						esac
-						;;
-					esac
-					;;
-				meta.*)	meta="$meta$nl<META name=\"${nam#*.}\" content=\"$val\">"
-					;;
-				logo)	eval html.$nam.src='$'val
-					;;
-				ident|logo*|title|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
-					eval html.$nam='$'val
-					;;
-				*)	eval license.$nam='$'val
-					;;
-				esac
-			done
-			;;
 		.vG)	vg=$1
+			inch=" "
 			set +o noglob
 			rm -f [0123456789][0123456789].html index.html outline.html
 			set -o noglob

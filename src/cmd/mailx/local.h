@@ -5,8 +5,7 @@
  */
 
 #if _PACKAGE_ast
-#include "FEATURE/paths"
-#include "FEATURE/gethostname"
+#include "FEATURE/local"
 #endif
 
 #if _hdr_paths

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -83,12 +83,16 @@ done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -124,7 +128,7 @@ done ../../../include/ast/error.h
 prev ../../../include/ast/ast.h implicit
 done ed.c
 prev ed.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c ed.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c ed.c
 done ed.o generated
 bind -last
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ed ed.o ${mam_libast}
@@ -142,11 +146,17 @@ make grep.c
 prev ../../../include/ast/sfstr.h implicit
 prev ../../../include/ast/regex.h implicit
 prev ../../../include/ast/error.h implicit
+make ../../../include/ast/ccode.h implicit
+make ../../../include/ast/ast_ccode.h implicit
+done ../../../include/ast/ast_ccode.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ccode.h
 prev ../../../include/ast/ast.h implicit
 done grep.c
 prev grep.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c grep.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c grep.c
 done grep.o generated
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o grep grep.o ${mam_libast}
@@ -176,16 +186,11 @@ done sed.h
 done sed0.c
 prev sed0.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -D_PACKAGE_ast -c sed0.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -D_PACKAGE_ast -c sed0.c
 done sed0.o generated
 make sed1.o
 make sed1.c
-make ../../../include/ast/ccode.h implicit
-make ../../../include/ast/ast_ccode.h implicit
-done ../../../include/ast/ast_ccode.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ccode.h
+prev ../../../include/ast/ccode.h implicit
 prev sed.h implicit
 done sed1.c
 prev sed1.c

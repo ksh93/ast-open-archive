@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -68,11 +68,12 @@ exec - rm -f 1.${COTEMP}.*
 done bz.req generated
 make blocksort.o
 make blocksort.c
-make bzlib_private.h implicit
+make bzhdr.h implicit
 make bzlib.h implicit
 make windows.h implicit
 done windows.h dontcare virtual
 make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
 make ../../../include/ast/getopt.h implicit
 make ../../../include/ast/prototyped.h implicit
 make ../../../include/prototyped.h implicit
@@ -83,6 +84,7 @@ make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
@@ -113,6 +115,8 @@ done ../../../include/ast/ast_map.h dontcare
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
 make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
@@ -125,42 +129,42 @@ done ../../../include/ast/ast_std.h dontcare
 done bzlib.h dontcare
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/ast_std.h implicit
-done bzlib_private.h
+done bzhdr.h
 done blocksort.c
 prev blocksort.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
+exec - ${CC} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
 done blocksort.o generated
 make huffman.o
 make huffman.c
-prev bzlib_private.h implicit
+prev bzhdr.h implicit
 done huffman.c
 prev huffman.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c huffman.c
 done huffman.o generated
 make crctable.o
 make crctable.c
-prev bzlib_private.h implicit
+prev bzhdr.h implicit
 done crctable.c
 prev crctable.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c crctable.c
 done crctable.o generated
 make randtable.o
 make randtable.c
-prev bzlib_private.h implicit
+prev bzhdr.h implicit
 done randtable.c
 prev randtable.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c randtable.c
 done randtable.o generated
 make compress.o
 make compress.c
-prev bzlib_private.h implicit
+prev bzhdr.h implicit
 done compress.c
 prev compress.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c compress.c
 done compress.o generated
 make decompress.o
 make decompress.c
-prev bzlib_private.h implicit
+prev bzhdr.h implicit
 done decompress.c
 prev decompress.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c decompress.c
@@ -169,7 +173,7 @@ make bzlib.o
 make bzlib.c
 make io.h implicit
 done io.h dontcare virtual
-prev bzlib_private.h implicit
+prev bzhdr.h implicit
 done bzlib.c
 prev bzlib.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c bzlib.c
@@ -290,7 +294,7 @@ exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/sfdcbzip.h
 prev sfdcbzip.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' sfdcbzip.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special'  sfdcbzip.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcbzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
@@ -298,7 +302,7 @@ exec - fi
 done ../../../include/ast/sfdcbzip.h generated
 make ../../../include/ast/bzlib.h
 prev bzlib.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' bzlib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special'  bzlib.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/bzlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/bzlib.h

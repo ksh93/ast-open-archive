@@ -12,6 +12,10 @@
  * SCCS: @(#) tkUnixInit.c 1.13 96/08/22 09:23:05
  */
 
+#if _PACKAGE_ast
+#include <ast.h>
+#endif
+
 #include "tkInt.h"
 #include "tkUnixInt.h"
 

@@ -83,7 +83,7 @@ probe.ini : (CC.HOSTTYPE) probe.win32
 	{
 	$(*:N!=$(>):?$(SED) -n -e '/^#define T_TOKEN/p' -e '/^#define N_/p' $(*:N!=$(>))$("\n")??)cat $(>)
 	} > 1.$(tmp).c
-	$(ED) $(EDFLAGS) 1.$(tmp).c <<'!'
+	$(STDED|ED) $(STDEDFLAGS|EDFLAGS) 1.$(tmp).c <<'!'
 	g/^#define N_/m0
 	v/^#define [NT]_/d
 	1,$s/^#define \(T_[A-Z0-9_]*\).*/&\
@@ -113,7 +113,7 @@ probe.ini : (CC.HOSTTYPE) probe.win32
 
 ppdebug.h : ppfsm.h ppdef.h pplib.h
 	: > 1.$(tmp).c
-	$(ED) $(EDFLAGS) 1.$(tmp).c <<'!'
+	$(STDED|ED) $(STDEDFLAGS|EDFLAGS) 1.$(tmp).c <<'!'
 	r $(*:N=*fsm.h)
 	1,/^#define PROTO/-d
 	/^#define LAST/,$d

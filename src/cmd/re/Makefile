@@ -52,7 +52,7 @@ test.regex : test.glob - test.fnmatch - test.match - test.re
 
 re.tgz : README.re \
 		testfnmatch.c testglob.c testmatch.c testre.c \
-		testglob.dat testmatch.dat testre.dat
+		testfnmatch.dat testglob.dat testmatch.dat testre.dat
 	for f in $(*)
 	do	case $f in
 		*READ*)	echo "^^^$f^README" ;;

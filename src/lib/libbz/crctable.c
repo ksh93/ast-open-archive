@@ -60,7 +60,7 @@
 --*/
 
 
-#include "bzlib_private.h"
+#include "bzhdr.h"
 
 /*--
   I think this is an implementation of the AUTODIN-II,

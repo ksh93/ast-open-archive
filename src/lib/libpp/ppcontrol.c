@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2001 AT&T Corp.                *
+*                Copyright (c) 1986-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -511,8 +510,7 @@ ppcontrol(void)
 				break;
 			case '<':
 				/*
-				 * HEADEREXPAND gets us here and if
-				 * you must know ms does it this way
+				 * HEADEREXPAND|HEADEREXPANDALL gets us here
 				 */
 
 				if (!(p = pp.hdrbuf) && !(p = pp.hdrbuf = newof(0, char, MAXTOKEN, 0)))
@@ -1777,6 +1775,9 @@ ppcontrol(void)
 			case X_HEADEREXPAND:
 				setoption(HEADEREXPAND, i0);
 				break;
+			case X_HEADEREXPANDALL:
+				setoption(HEADEREXPANDALL, i0);
+				break;
 			case X_HIDE:
 			case X_NOTE:
 				PUSH_LINE(p);
@@ -2053,6 +2054,9 @@ ppcontrol(void)
  eatmap:
 	POP_LINE();
 				/*INDENT*/
+				break;
+			case X_MODERN:
+				setoption(MODERN, i0);
 				break;
 			case X_MULTIPLE:
 				n = 1;

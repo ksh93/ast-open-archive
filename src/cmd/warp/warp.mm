@@ -196,39 +196,3 @@ Systems like
 that support multiple a.out formats may have multiple versions of
 .IR libwarp.so .
 .sh download warp $WWWTYPES
-.H 1 Installation
-To install the warp binaries:
-.BL
-.LI
-On your local system select a directory that contains a bin
-directory compatible with the selected
-.I architecture
-from above.
-This can be an empty directory.
-Call this directory $INSTALLROOT:
-.EX
-INSTALLROOT=selected-directory
-.EE
-.LI
-Untar the selected
-.BI warp- architecture .tar.gz
-in $INSTALLROOT:
-.EX
-cd $INSTALLROOT
-gunzip < warp-\fIarchitecture\fP.tar.gz | tar xvf -
-.EE
-.LE
-.H 1 Usage
-To use
-.BR warp :
-.BL
-.LI
-export PATH=$INSTALLROOT/bin:$PATH
-.LI
-Run the installation test script:
-.EX
-testwarp
-.EE
-.LI
-Try the man page examples.
-.LE

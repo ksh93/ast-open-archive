@@ -1,3 +1,13 @@
+02-03-15 ppproto.c: fix cpp pp:compatibility double line sync memory fault
+02-03-11 pplex.c: add pp:modern to emit \a \v instead of octal forms
+02-02-14 ppargs.c: fix -D or -U as last arg core dump
+02-01-24 pplib.h: use vmalloc(Vmregion) if _std_malloc
+02-01-23 probe.win32: add more msvc predefined macro candidates
+02-01-14 ppproto.c: #pragma prototyped noticed -- has notice comment
+02-01-10 ppproto.c: fix PROTO_FORCE|PROTO_PASS bug that disabled PROTO_FORCE
+02-01-08 pplex.c: fix HEADEREXPAND|HEADEREXPANDALL logic
+01-11-22 pplex.c: add pp:headerexpandall for gcc vs. msvc <...> expand diff
+	 pp.probe: add pp:headerexpandall test
 01-10-20 pplex.c: fix pp:splicespace inside "..."
 01-09-11 ppinput.c: use pathnative() for native fs representation
 01-08-31 pp.probe: handle -Dmacro(args)=value

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1989-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -177,6 +176,11 @@ pathreal(const char* apath, register int type, struct stat* st)
 	else
 		type &= ~P_SAFE;
  again:
+	if (!*path)
+	{
+		errno = ENOENT;
+		return 0;
+	}
 	cp = sp = path;
 	state.path.synthesize = state.path.linksize = 0;
 	if (!st)
@@ -200,13 +204,11 @@ pathreal(const char* apath, register int type, struct stat* st)
 			goto skip;
 		}
 	}
-	if (!state.pwd || *sp == 0 || (sp[1] == 0 && (*sp == '.' || *sp == '/' && !safe)))
+	if (!state.pwd || sp[1] == 0 && (*sp == '.' || *sp == '/' && !safe))
 	{
-		if (*sp == 0)
-			sp = state.dot;
 		if (st != &stbuf && LSTAT(sp, st))
 			return 0;
-		if (*sp == '/' || (!state.pwd || !*sp) && (type & P_PATHONLY))
+		if (*sp == '/' || !state.pwd && (type & P_PATHONLY))
 			strncpy(state.path.name, sp, PATH_MAX);
 		else if (!state.pwd)
 		{
@@ -444,7 +446,7 @@ pathreal(const char* apath, register int type, struct stat* st)
 		int	rfd;
 		int	wfd;
 
-		if ((rfd = OPEN(sp, 0, 0)) < 0)
+		if ((rfd = OPEN(sp, O_RDONLY, 0)) < 0)
 			sp = 0;
 		else
 		{

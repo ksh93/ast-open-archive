@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2001 AT&T Corp.                *
+*                Copyright (c) 1999-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -72,6 +71,7 @@ MAIN()
 	char*	s;
 	int	i;
 
+	alarm(10);
 	if(argc > 1)
         {       /* coprocess only */
                 while((s = sfgetr(sfstdin,'\n',0)) )
@@ -94,12 +94,12 @@ MAIN()
 
 	sfset(f,SF_SHARE,1);
 
-	if(sfwrite(f,"123\n",4) != 4)
+	if(sfwrite(f,"456\n",4) != 4)
 		terror("Write coprocess2\n");
 	if(sftell(f) != 12)
 		terror("sftell 3\n");
 
-	if(!(s = sfreserve(f,4,0)) || strncmp(s,"123\n",4) != 0 )
+	if(!(s = sfreserve(f,4,0)) || strncmp(s,"456\n",4) != 0 )
 		terror("Read coprocess2\n");
 	if(sftell(f) != 16)
 		terror("sftell 4\n");

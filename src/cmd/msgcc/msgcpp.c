@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 2000-2001 AT&T Corp.                *
+*                Copyright (c) 2000-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -30,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: msgcpp (AT&T Labs Research) 2000-06-10 $\n]"
+"[-?\n@(#)$Id: msgcpp (AT&T Labs Research) 2002-03-11 $\n]"
 USAGE_LICENSE
 "[+NAME?msgcpp - C language message catalog preprocessor]"
 "[+DESCRIPTION?\bmsgcpp\b is a C language message catalog preprocessor."
@@ -174,6 +173,7 @@ main(int argc, char** argv)
 	ppop(PP_COMPILE, keys);
 	ppop(PP_OPTION, "allpossible");
 	ppop(PP_OPTION, "catliteral");
+	ppop(PP_OPTION, "modern");
 	ppop(PP_OPTION, "readonly");
 	ppop(PP_DEFINE, "_BLD_msgcat=1");
 	ppop(PP_DEFINE, "const=");

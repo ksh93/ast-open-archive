@@ -1,3 +1,8 @@
+02-03-17 spam.c: add spamtest=bitmask: 0x0001: content-type==text/html
+02-01-31 data.c: clarify imap var docs
+02-01-30 local.iffe: add to handle no <termios.h> and ftruncate()
+02-01-24 ifdef { SIGTSTP SIGTTOU SIGTTIN }
+02-01-16 properly update References: in replies
 01-10-15 `get attachment dir' copies attachment to dir
 01-04-01 add state.var.hostname for smtp HELO
 	 add fmtident() to initialize state.version 
@@ -14,7 +19,7 @@
 99-07-17 fix imap reply via imap_setinput() omission
 	 @x.y.z in spam list matches x.y.z domain suffix
 	 tone down hostmatch(), check unknown in Received:
-	 fix $MAIL lock by check syscall return value -- how novel
+	 fix $MAIL lock by checking syscall return value -- how novel
 	 add -S, -o justfrom
 	 add -NS to print info and exit
 	 spam: Message-Id: <>

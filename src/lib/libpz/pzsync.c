@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2001 AT&T Corp.                *
+*                Copyright (c) 1998-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -126,6 +125,12 @@ pzsync(register Pz_t* pz)
 				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "lo frequency code write error");
 			return -1;
 		}
+	}
+	else if ((pz->flags & PZ_WRITE) && sfsync(pz->io))
+	{
+		if (pz->disc->errorf)
+			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "write error");
+		return -1;
 	}
 	return 0;
 }

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2001 AT&T Corp.                *
+*                Copyright (c) 1986-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -597,7 +596,8 @@ struct pptuple				/* tuple macro			*/
 		cur->control = pp.control; \
 		*pp.control = 0; \
 		cur->file = error_info.file; \
-		error_info.file = cur->buffer = malloc(n = strlen(error_info.file) + strlen(((struct ppsymbol*)p)->name) + 24); \
+		n = strlen(error_info.file) + strlen(((struct ppsymbol*)p)->name) + 24; \
+		error_info.file = cur->buffer = newof(0, char, n, 0); \
 		sfsprintf(error_info.file, n, "%s:%s,%d", cur->file, p->name, error_info.line); \
 		cur->line = error_info.line; \
 		error_info.line = 1; \
@@ -797,5 +797,20 @@ extern int		ppsearch(char*, int, int);
 extern char*		ppstatestr(long);
 extern char*		pptokstr(char*, int);
 extern void		pptrace(int);
+
+#if _std_malloc
+
+#include <vmalloc.h>
+
+#undef	free
+#define free(p)	 	vmfree(Vmregion,(void*)p)
+#undef	newof
+#define newof(p,t,n,x)	vmnewof(Vmregion,p,t,n,x)
+#undef	oldof
+#define oldof(p,t,n,x)	vmoldof(Vmregion,p,t,n,x)
+#undef	strdup
+#define strdup(s)	vmstrdup(Vmregion,s)
+
+#endif
 
 #endif

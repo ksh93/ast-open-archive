@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 2000-2001 AT&T Corp.                #
+#                Copyright (c) 2000-2002 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -14,8 +14,7 @@
 #           the license and copyright and are violating            #
 #               AT&T's intellectual property rights.               #
 #                                                                  #
-#                 This software was created by the                 #
-#                 Network Services Research Center                 #
+#            Information and Software Systems Research             #
 #                        AT&T Labs Research                        #
 #                         Florham Park NJ                          #
 #                                                                  #
@@ -46,6 +45,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 [f:force?Force binary catalog generation even when the current binary is newer
 	than the source.]
 [g:generate?Generate and install \bgencat\b(1) binary message catalogs.]
+[l:list?List each installed message catalog name paired with its input source.]
 [n:show?Show commands but do not execute.]
 [o:omit?Omit \btranslate\b(1) methods matching the \bksh\b(1)
 	\apattern\a.]:[pattern]
@@ -81,9 +81,7 @@ messages()
 	set -- $MSGROOT/arch/*/src/cmd/INIT/INIT.msg
 	[[ -f $1 ]] || { print -u2 $"$command: INIT.msg: not found"; exit 1; }
 	MSGROOT=${1%/src/cmd/INIT/INIT.msg}
-	for i in $MSGROOT/src/@(cmd|lib)/*/*.msg
-	do	grep -q '^1 ' $i && print -r $i
-	done
+	grep -l '^1' $MSGROOT/src/@(cmd|lib)/*/*.msg
 }
 
 integer n
@@ -98,6 +96,7 @@ do	case $OPT in
 	d)	dialect=$OPTARG ;;
 	f)	force=1 ;;
 	g)	op=generate ;;
+	l)	op=list ;;
 	n)	exec=print show=-n ;;
 	o)	omit="-o $OPTARG" ;;
 	r)	op=remove ;;
@@ -146,6 +145,9 @@ generate)
 			cd $owd
 		fi
 	done
+	;;
+
+list)	messages | sed 's,^.*/\(.*\)\.msg$,\1 &,'
 	;;
 
 remove)	(( !$# )) && set -- *.msg translate.tmp

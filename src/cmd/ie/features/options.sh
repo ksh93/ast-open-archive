@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1984-2001 AT&T Corp.                #
+#                Copyright (c) 1984-2002 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -14,8 +14,7 @@
 #           the license and copyright and are violating            #
 #               AT&T's intellectual property rights.               #
 #                                                                  #
-#                 This software was created by the                 #
-#                 Network Services Research Center                 #
+#            Information and Software Systems Research             #
 #                        AT&T Labs Research                        #
 #                         Florham Park NJ                          #
 #                                                                  #
@@ -44,9 +43,9 @@ do	: This could be done with eval, but eval broken in some shells
 	LDYNAMIC)	j=$LDYNAMIC;;
 	MULTIBYTE)	j=$MULTIBYTE;;
 	NEWTEST)	j=$NEWTEST;;
-	OLDTERMIO)	echo "#include <sys/termios.h>" > dummy.c
-			echo "#include <sys/termio.h>" >> dummy.c
-			if	$CC -E dummy.c > /dev/null 2>&1
+	OLDTERMIO)	echo "#include <sys/termios.h>" > $tmp.c
+			echo "#include <sys/termio.h>" >> $tmp.c
+			if	$CC -E $tmp.c > /dev/null 2>&1
 			then	j=$OLDTERMIO
 			fi ;;
 	OLDTEST)	j=$OLDTEST;;

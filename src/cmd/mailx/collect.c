@@ -183,7 +183,7 @@ deadletter(void)
  * should shift over and 'f' if not.
  */
 static int
-interpolate(char* ms, FILE* fp, int f)
+interpolate(char* ms, FILE* fp, int f, int followup)
 {
 	register struct msg*	mp;
 	register struct msg*	ip;
@@ -209,17 +209,22 @@ interpolate(char* ms, FILE* fp, int f)
 	else if (!(prefix = state.var.indentprefix))
 		prefix = "\t";
 	ignore = isupper(f) ? (Dt_t**)0 : &state.ignore;
-	printf("Interpolating:");
+	if (!followup)
+		printf("Interpolating:");
 	for (ip = state.msg.list; ip->m_index; ip++) {
 		mp = state.msg.list + ip->m_index - 1;
 		touchmsg(mp);
-		printf(" %d", ip->m_index);
+		if (followup)
+			flags |= GREFERENCES;
+		else
+			printf(" %d", ip->m_index);
 		if (copy(mp, fp, ignore, prefix, flags) < 0) {
 			note(SYSTEM, "%s", state.tmp.mail);
 			return -1;
 		}
 	}
-	printf("\n");
+	if (!followup)
+		printf("\n");
 	return 0;
 }
 
@@ -295,9 +300,15 @@ collect(struct header* hp, unsigned long flags)
 	 * Start catching signals from here, but we'll still die on interrupts
 	 * until we're in the main loop.
 	 */
+#ifdef SIGTSTP
 	state.collect.sigtstp = signal(SIGTSTP, collstop);
+#endif
+#ifdef SIGTTOU
 	state.collect.sigttou = signal(SIGTTOU, collstop);
+#endif
+#ifdef SIGTTIN
 	state.collect.sigttin = signal(SIGTTIN, collstop);
+#endif
 	if ((sig = setjmp(state.collect.abort)) || (sig = setjmp(state.collect.work))) {
 		resume(sig);
 		rm(state.tmp.mail);
@@ -313,7 +324,7 @@ collect(struct header* hp, unsigned long flags)
 	remove(state.tmp.mail);
 
 	pp.fp = stdin;
-	if ((flags & INTERPOLATE) && interpolate("", state.collect.fp, 'm') < 0)
+	if ((flags & INTERPOLATE) && interpolate("", state.collect.fp, 'm', 1) < 0)
 		goto err;
 	if ((flags & INTERPOLATE) && state.var.interactive) {
 		rewind(state.collect.fp);
@@ -332,6 +343,8 @@ collect(struct header* hp, unsigned long flags)
 			g &= ~GNL;
 		}
 		if (flags & HEADERS) {
+			if (flags & (FOLLOWUP|INTERPOLATE))
+				g |= GREFERENCES;
 			headout(stdout, hp, g);
 			fflush(stdout);
 		}
@@ -548,7 +561,7 @@ collect(struct header* hp, unsigned long flags)
 			 * standard list processing garbage.
 			 * If ~f is given, we don't shift over.
 			 */
-			if (interpolate(pp.buf + 2, state.collect.fp, c) < 0)
+			if (interpolate(pp.buf + 2, state.collect.fp, c, 0) < 0)
 				goto err;
 			goto cont;
 		case 'h':
@@ -710,9 +723,15 @@ collect(struct header* hp, unsigned long flags)
 		}
 	}
 	state.noreset--;
+#ifdef SIGTSTP
 	signal(SIGTSTP, state.collect.sigtstp);
+#endif
+#ifdef SIGTTOU
 	signal(SIGTTOU, state.collect.sigttou);
+#endif
+#ifdef SIGTTIN
 	signal(SIGTTIN, state.collect.sigttin);
+#endif
 	signal(SIGINT, state.collect.sigint);
 	signal(SIGHUP, state.collect.sighup);
 	return state.collect.fp;

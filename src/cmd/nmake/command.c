@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2001 AT&T Corp.                *
+*                Copyright (c) 1984-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -14,8 +14,7 @@
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
 *                                                                  *
-*                 This software was created by the                 *
-*                 Network Services Research Center                 *
+*            Information and Software Systems Research             *
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
@@ -92,6 +91,7 @@ struct jobstate				/* job state			*/
 	struct frame*	freeframe;	/* free target frames		*/
 	struct context* freecontext;	/* free job context headers	*/
 	int		intermediate;	/* # INTERMEDIATE jobs		*/
+	Sfio_t*		tmp;		/* tmp stream			*/
 };
 
 static struct jobstate	jobs;
@@ -927,7 +927,7 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 					if (error_info.trace || state.explain)
 						error(state.explain ? 0 : -1, "breaking possible job deadlock at %s", jammed->name);
 					for (job = jobs.firstjob; job; job = job->next)
-						if (job->target == jammed)
+						if (job->target == jammed && job->status != RUNNING)
 						{
 							jammed = 0;
 							job->status = READY;
@@ -953,6 +953,7 @@ block(int check)
 	register Cojob_t*		cojob;
 	register struct joblist*	job;
 	register struct list*		p;
+	struct rule*			r;
 	int				n;
 	int				clear = 0;
 	int				resume = 0;
@@ -1018,16 +1019,25 @@ block(int check)
 				return 0;
 			break;
 		}
+		if (r = getrule(external.jobdone))
+		{
+			if (!jobs.tmp)
+				jobs.tmp = sfstropen();
+			sfprintf(jobs.tmp, "%s %d %s %s", r->name, cojob->status, fmtelapsed(cojob->user, CO_QUANT), fmtelapsed(cojob->sys, CO_QUANT));
+			call(r, sfstruse(jobs.tmp));
+		}
 		job = (struct joblist*)cojob->local;
 		if (cojob->status)
 		{
-			error(2, "*** %s code %d making %s%s", ERROR_translate(NiL, NiL, NiL, EXITED_TERM(cojob->status) ? "termination" : "exit"), EXIT_CODE(cojob->status), job->target->name, (job->flags & CO_IGNORE) ? ERROR_translate(NiL, NiL, NiL, " ignored") : null);
+			if (n = !EXITED_TERM(cojob->status) || EXIT_CODE(cojob->status))
+				error(2, "*** %s code %d making %s%s", ERROR_translate(NiL, NiL, NiL, EXITED_TERM(cojob->status) ? "termination" : "exit"), EXIT_CODE(cojob->status), job->target->name, (job->flags & CO_IGNORE) ? ERROR_translate(NiL, NiL, NiL, " ignored") : null);
 			if (!(job->flags & CO_IGNORE))
 			{
 				job->flags |= CO_ERRORS;
-				if (state.keepgoing)
+				if (state.keepgoing || !n)
 				{
-					state.errors++;
+					if (n)
+						state.errors++;
 					job->flags |= CO_KEEPGOING;
 				}
 			}

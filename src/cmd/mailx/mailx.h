@@ -90,6 +90,7 @@ extern int	opterr;
 #define REGDEP		2		/* Maximum regret depth. */
 #define STRINGLEN	1024		/* Maximum length of string token */
 #define MARGIN		72		/* Right line margin */
+#define REFLEN		(12*MARGIN)	/* Maximum length or References: */
 
 typedef struct msg {
 	int	m_index;		/* command address vector index */
@@ -266,19 +267,21 @@ struct headline {
 #define GINTERPOLATE	(1<<10)		/* Check headers for interpolate() */
 #define GLAST		(1<<11)		/* Get last instance */
 #define GMAP		(1<<12)		/* Already mapped */
-#define GMETOO		(1<<13)		/* Send to state.var.user too */
-#define GMIME		(1<<14)		/* Check MIME content headers */
-#define GMISC		(1L<<15)	/* Grab miscellaneous headers */
-#define GNEWS		(1L<<16)	/* For newsgroup article id */
-#define GNL		(1L<<17)	/* Print blank line after headers */
-#define GREPLY		(1L<<18)	/* For reply to sender */
-#define GRULE		(1L<<19)	/* Ouput rule if GNL */
-#define GSEND		(1L<<20)	/* Get it ready to send */
-#define GSTACK		(1L<<21)	/* savestr() unmapped names */
-#define GSTATUS		(1L<<22)	/* Grab Status: line */
-#define GSUB		(1L<<23)	/* Grab Subject: line */
-#define GTO		(1L<<24)	/* Grab To: line */
-#define GUSER		(1L<<25)	/* Stop if ${user}@ */
+#define GMESSAGEID	(1<<13)		/* Grab Message-ID: line */
+#define GMETOO		(1<<14)		/* Send to state.var.user too */
+#define GMIME		(1L<<15)	/* Check MIME content headers */
+#define GMISC		(1L<<16)	/* Grab miscellaneous headers */
+#define GNEWS		(1L<<17)	/* For newsgroup article id */
+#define GNL		(1L<<18)	/* Print blank line after headers */
+#define GREFERENCES	(1L<<19)	/* Grab References: line */
+#define GREPLY		(1L<<20)	/* For reply to sender */
+#define GRULE		(1L<<21)	/* Ouput rule if GNL */
+#define GSEND		(1L<<22)	/* Get it ready to send */
+#define GSTACK		(1L<<23)	/* savestr() unmapped names */
+#define GSTATUS		(1L<<24)	/* Grab Status: line */
+#define GSUB		(1L<<25)	/* Grab Subject: line */
+#define GTO		(1L<<26)	/* Grab To: line */
+#define GUSER		(1L<<27)	/* Stop if ${user}@ */
 
 #define GCOMPOSE	(GEDIT|GSTATUS)	/* Composable headers */
 #define GEDIT		(GSTD|GMISC)	/* Editable headers */
@@ -386,6 +389,8 @@ struct header {
 	char**		h_options;	/* Mailer options */
 	char*		h_subject;	/* Subject string */
 	char*		h_first;	/* First recipient */
+	char*		h_messageid;	/* Parent message-id */
+	char*		h_references;	/* References */
 	struct {
 	struct list*	head;
 	struct list*	tail;
@@ -429,6 +434,7 @@ struct dict {
 #define HEADERS		(1<<1)
 #define INTERPOLATE	(1<<2)
 #define MARK		(1<<3)
+#define REPLY		(1<<4)
 
 /*
  * Token values returned by the scanner used for argument lists.
@@ -731,6 +737,7 @@ typedef struct {
 	char*	spamfromok;
 	char*	spamlog;
 	char*	spamsub;
+	long	spamtest;
 	char*	spamto;
 	char*	spamtook;
 	char*	spamvia;

@@ -6,10 +6,10 @@
 
 #include "mailx.h"
 
-static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.8 2001-10-15 $\0\n";
+static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2002-03-17 $\0\n";
 
 static const char	terms[] = "\n\
-@(#)Copyright (c) 1980, 1993, 1996\n\
+@(#)Copyright (c) 1980, 1993, 1996, 2002\n\
 \tThe Regents of the University of California.  All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
@@ -298,7 +298,7 @@ static const struct var	vartab[] =
 "HOME",		&state.var.home,		D|E|N,	".",0,
 	X("The user's home directory, also named \"~\"."),
 "IMAP",		&state.var.imap,		D|E|N,	"~/.imap",0,
-	X("IMAP host and authentication file.  One line with `host LOGIN name password' or `host AUTHENTICATE method'."),
+	X("IMAP host and authentication file.  Each line with `host name LOGIN name password' or `host name AUTHENTICATE method'."),
 "LISTER",	&state.var.lister,		D|E|N,	"ls",0,
 	X("The utility invoked for the folders command."),
 "MAIL",		&state.var.mail,		E,	"",set_mail,
@@ -382,7 +382,7 @@ static const struct var	vartab[] =
 "ignoreeof",	&state.var.ignoreeof,		0,	0,0,
 	X("Ignore the EOF char on message input. `.' or ~. must terminate the message."),
 "imap",		&state.var.imap,		0,	0,0,
-	X("IMAP host and authentication file.  One line with `host LOGIN name password' or `host AUTHENTICATE method'."),
+	X("IMAP host and authentication file.  Each line with `host name LOGIN name password' or `host name AUTHENTICATE method'."),
 "inbox",	&state.var.inbox,		0,	"+inbox",0,
 	X("mh incoming mailbox. If ${inbox} is a directory then SAVE messages are removed on exit."),
 "indentprefix",	&state.var.indentprefix,	N,	"\t",0,
@@ -467,6 +467,8 @@ static const struct var	vartab[] =
 	X("spamfromok"),
 "spamsub",	&state.var.spamsub,		N,	"ad,adv,advertisement,spam",set_list,
 	X("Case-insensitive candidate spam Subject: word prefix list."),
+"spamtest",	(char**)&state.var.spamtest,	I,	"0",0,
+	X("Spam test bitmask -- see the source, Luke."),
 "spamto",	&state.var.spamto,		N,	"-,*@(friend|money|suppressed|undisclosed)*,u,you",set_list,
 	X("Case-insensitive candidate spam recipient address list."),
 "spamtook",	&state.var.spamtook,		N,	0,set_list,

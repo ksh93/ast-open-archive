@@ -274,6 +274,7 @@ spammed(register struct msg* mp)
 	unsigned long	d;
 	int		proper;
 	int		ours;
+	long		test;
 	struct parse	pp;
 
 	if (!(to = grab(mp, GTO|GCOMPARE|GDISPLAY|GLAST|GUSER, NiL)) || !*to) {
@@ -290,6 +291,7 @@ spammed(register struct msg* mp)
 		q = 0;
 		proper = 0;
 		ours = state.var.domain ? strlen(state.var.domain) : 0;
+		test = 0;
 		while (headget(&pp)) {
 			t = pp.name;
 			if ((*t == 'X' || *t == 'x') && *(t + 1) == '-')
@@ -299,6 +301,15 @@ spammed(register struct msg* mp)
 					if (TRACING('x'))
 						note(0, "spam: advertisement header");
 					return 1;
+				}
+			}
+			else if (*t == 'C' || *t == 'c') {
+				if (!strcasecmp(t, "Content-Type")) {
+					t = skin(pp.data, GDISPLAY|GCOMPARE|GFROM);
+					if (TRACING('x'))
+						note(0, "spam: test 0x0001: content-type `%s'", t);
+					if (!strncasecmp(t, "text/html", 9))
+						test |= 0x0001;
 				}
 			}
 			else if (*t == 'F' || *t == 'f') {
@@ -390,9 +401,11 @@ spammed(register struct msg* mp)
 				}
 			}
 		}
+		if (proper)
+			return 0;
+		if (test & state.var.spamtest)
+			return 1;
 	}
-	if (proper)
-		return 0;
 	if (state.var.local) {
 		local = state.var.local;
 		state.var.local = 0;

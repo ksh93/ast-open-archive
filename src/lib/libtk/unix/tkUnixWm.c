@@ -18,6 +18,14 @@
 #include "tkInt.h"
 #include <errno.h>
 
+#ifndef WithdrawnState
+#define WithdrawnState	0
+#define Ancient		1
+#endif
+#ifndef PBaseSize
+#define PBaseSize	0
+#endif
+
 /*
  * A data structure of the following type holds information for
  * each window manager protocol (such as WM_DELETE_WINDOW) for
@@ -446,6 +454,7 @@ TkWmMapWindow(winPtr)
 				 * be mapped. */
 {
     register WmInfo *wmPtr = winPtr->wmInfoPtr;
+#if !Ancient
     XTextProperty textProp;
 
     if (wmPtr->flags & WM_NEVER_MAPPED) {
@@ -492,6 +501,7 @@ TkWmMapWindow(winPtr)
 	    }
 	}
     }
+#endif
     if (wmPtr->hints.initial_state == WithdrawnState) {
 	return;
     }
@@ -820,6 +830,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	wmPtr->clientMachine = (char *)
 		ckalloc((unsigned) (strlen(argv[3]) + 1));
 	strcpy(wmPtr->clientMachine, argv[3]);
+#if !Ancient
 	if (!(wmPtr->flags & WM_NEVER_MAPPED)) {
 	    XTextProperty textProp;
 	    if (XStringListToTextProperty(&wmPtr->clientMachine, 1, &textProp)
@@ -829,6 +840,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 		XFree((char *) textProp.value);
 	    }
 	}
+#endif
     } else if ((c == 'c') && (strncmp(argv[1], "colormapwindows", length) == 0)
 	    && (length >= 3)) {
 	Window *cmapList;
@@ -1631,6 +1643,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 	    return TCL_OK;
 	} else {
 	    wmPtr->titleUid = Tk_GetUid(argv[3]);
+#if !Ancient
 	    if (!(wmPtr->flags & WM_NEVER_MAPPED)) {
 		XTextProperty textProp;
 
@@ -1640,6 +1653,7 @@ Tk_WmCmd(clientData, interp, argc, argv)
 		    XFree((char *) textProp.value);
 		}
 	    }
+#endif
 	}
     } else if ((c == 't') && (strncmp(argv[1], "transient", length) == 0)
 	    && (length >= 3)) {
@@ -2561,6 +2575,7 @@ UpdateSizeHints(winPtr)
 
     GetMaxSize(wmPtr, &maxWidth, &maxHeight);
     if (wmPtr->gridWin != NULL) {
+#if PBaseSize
 	hintsPtr->base_width = winPtr->reqWidth
 		- (wmPtr->reqGridWidth * wmPtr->widthInc);
 	if (hintsPtr->base_width < 0) {
@@ -2571,21 +2586,36 @@ UpdateSizeHints(winPtr)
 	if (hintsPtr->base_height < 0) {
 	    hintsPtr->base_height = 0;
 	}
-	hintsPtr->min_width = hintsPtr->base_width
-		+ (wmPtr->minWidth * wmPtr->widthInc);
-	hintsPtr->min_height = hintsPtr->base_height
-		+ (wmPtr->minHeight * wmPtr->heightInc);
-	hintsPtr->max_width = hintsPtr->base_width
-		+ (maxWidth * wmPtr->widthInc);
-	hintsPtr->max_height = hintsPtr->base_height
-		+ (maxHeight * wmPtr->heightInc);
+#endif
+	hintsPtr->min_width =
+#if PBaseSize
+		hintsPtr->base_width +
+#endif
+		(wmPtr->minWidth * wmPtr->widthInc);
+	hintsPtr->min_height =
+#if PBaseSize
+		hintsPtr->base_height +
+#endif
+		(wmPtr->minHeight * wmPtr->heightInc);
+	hintsPtr->max_width =
+#if PBaseSize
+		hintsPtr->base_width +
+#endif
+		(maxWidth * wmPtr->widthInc);
+	hintsPtr->max_height =
+#if PBaseSize
+		hintsPtr->base_height +
+#endif
+		(maxHeight * wmPtr->heightInc);
     } else {
 	hintsPtr->min_width = wmPtr->minWidth;
 	hintsPtr->min_height = wmPtr->minHeight;
 	hintsPtr->max_width = maxWidth;
 	hintsPtr->max_height = maxHeight;
+#if PBaseSize
 	hintsPtr->base_width = 0;
 	hintsPtr->base_height = 0;
+#endif
     }
     hintsPtr->width_inc = wmPtr->widthInc;
     hintsPtr->height_inc = wmPtr->heightInc;
@@ -2593,7 +2623,9 @@ UpdateSizeHints(winPtr)
     hintsPtr->min_aspect.y = wmPtr->minAspect.y;
     hintsPtr->max_aspect.x = wmPtr->maxAspect.x;
     hintsPtr->max_aspect.y = wmPtr->maxAspect.y;
+#if PWinGravity
     hintsPtr->win_gravity = wmPtr->gravity;
+#endif
     hintsPtr->flags = wmPtr->sizeHintsFlags | PMinSize | PMaxSize;
 
     /*

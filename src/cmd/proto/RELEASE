@@ -1,3 +1,6 @@
+02-03-12 proto.c: add type=free
+02-01-07 proto.tst: add TEST 05 -- no fix yet
+01-12-12 sear.sh: fix rc ICON path \ escapes
 01-10-31 sear.sh: add sear.ico
 01-10-16 sear.sh: _SEA_* => _SEAR_*
 01-10-05 sear.sh: rename from sea.sh
