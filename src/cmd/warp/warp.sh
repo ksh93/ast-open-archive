@@ -1,16 +1,14 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1998-2004 AT&T Corp.                  #
+#                  Copyright (c) 1998-2005 AT&T Corp.                  #
 #                      and is licensed under the                       #
-#          Common Public License, Version 1.0 (the "License")          #
-#                        by AT&T Corp. ("AT&T")                        #
-#      Any use, downloading, reproduction or distribution of this      #
-#      software constitutes acceptance of the License.  A copy of      #
-#                     the License is available at                      #
+#                  Common Public License, Version 1.0                  #
+#                            by AT&T Corp.                             #
 #                                                                      #
-#         http://www.research.att.com/sw/license/cpl-1.0.html          #
-#         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         #
+#                A copy of the License is available at                 #
+#            http://www.opensource.org/licenses/cpl1.0.txt             #
+#         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         #
 #                                                                      #
 #              Information and Software Systems Research               #
 #                            AT&T Research                             #
@@ -111,7 +109,7 @@ date [ command [ arg ... ] ]
 	the dll search.]
 [+EXAMPLES?]{
 	[+$ date -f %K?1998-03-11+13:41]
-	[+$ warp 2000-02-29+12:30:30 date -f %K?2000-02-29+12:30]
+	[+$ warp 2000-02-29+12::30::30 date -f %K?2000-02-29+12:30]
 	[+$ warp "2 years" date -f %K?2000-01-01+00:00]
 	[+$ PS1="(warp) " warp -f $((60*60*24)) 2000-02-29+12::30::30?#
 		interactive \bsh\b(1) where 1 warped day passes for each
@@ -162,14 +160,14 @@ prefix=${prefix#$root/}
 
 : determine the warp offset
 
-(( now = $(LD_LIBRARY_PATH=$root/lib:$LD_LIBRARY_PATH $root/bin/date -f %#) ))
+(( now = $(LD_LIBRARY_PATH=$root/lib:$LD_LIBRARY_PATH $root/bin/date -f %s) ))
 case $1 in
 now)	(( warp = now ))
 	;;
 +([0-9]))
 	(( warp = $1 ))
 	;;
-*)	(( warp = $(LD_LIBRARY_PATH=$root/lib:$LD_LIBRARY_PATH $root/bin/date -f %# -s "$1") ))
+*)	(( warp = $(LD_LIBRARY_PATH=$root/lib:$LD_LIBRARY_PATH $root/bin/date -f %s -s "$1") ))
 	;;
 esac
 shift
@@ -183,7 +181,7 @@ then	case $base_str in
 	+([0-9]))
 		(( base = $base_str ))
 		;;
-	*)	(( base = $(LD_LIBRARY_PATH=$root/lib:$LD_LIBRARY_PATH $root/bin/date -f %# -s "$base_str") ))
+	*)	(( base = $(LD_LIBRARY_PATH=$root/lib:$LD_LIBRARY_PATH $root/bin/date -f %s -s "$base_str") ))
 		;;
 	esac
 	opt="$opt-b$base -f$factor "

@@ -1,6 +1,6 @@
 :PACKAGE: ast
 
-LICENSE = since=1993;author=dgk
+LICENSE = since=1993,author=dgk
 
 pack :: pack.c libhuff.a
 

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2004 AT&T Corp.                  *
+*                  Copyright (c) 1998-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -33,7 +31,6 @@ static const char id[] = "\n@(#)$Id: pcmp (AT&T Research) 1998-11-01 $\0\n";
 #include <error.h>
 #include <ls.h>
 #include <pzip.h>
-#include <sfstr.h>
 #include <zlib.h>
 
 static struct
@@ -102,9 +99,9 @@ dif(unsigned char* f, size_t fsize, unsigned char* t, size_t tsize, size_t cols)
 	sfputu(dp, 0);
 	fsize = sfstrtell(vp);
 	sfputu(dp, fsize);
-	sfwrite(dp, sfstrset(vp, 0), fsize);
+	sfwrite(dp, sfstrseek(vp, 0, SEEK_SET), fsize);
 	fsize = sfstrtell(dp);
-	return zip((unsigned char*)sfstrset(dp, 0), fsize, t, tsize);
+	return zip((unsigned char*)sfstrseek(dp, 0, SEEK_SET), fsize, t, tsize);
 }
 
 main(int argc, char** argv)

@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-10-01 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-12-08 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -28,7 +28,7 @@
 
 /*
  * .PFX.INCLUDE stuff needed for C #include "..." compatibility
- * prefixinclude=0 to turn off the hack
+ * --noprefix-include to turn off the hack
  */
 
 .BIND.%.PFX.INCLUDE : .FUNCTION
@@ -63,7 +63,7 @@
 	B| \# if|
 	E| \# endif|
 	I| \# include <%>|A.STD.INCLUDE|M$$(%:S:?$$(%)??)|
-	I| \# include "%"|A.LCL.INCLUDE|$(prefixinclude:/0//:?M$$$(.PREFIX.INCLUDE.)|??)
+	I| \# include "%"|A.LCL.INCLUDE|$(-prefix-include:+M$$$(.PREFIX.INCLUDE.))|
 	I| \# pragma library "%"|A.VIRTUAL|A.ACCEPT|M.LIBRARY.$$(%)|
 
 $("$(.SUFFIX.c) $(.SUFFIX.C) .h .S":/^/.ATTRIBUTE.%/) : .SCAN.c
@@ -181,3 +181,10 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 
 .SOURCE.%.SCAN.cob : . $$(*.SOURCE$$(.SUFFIX.HEADER.cob:O=1)) $$(*.SOURCE.cob) $$(*.SOURCE)
+
+.SCAN.iffe : .SCAN
+	I| include % |
+
+.ATTRIBUTE.features/% : .SCAN.iffe
+
+.ATTRIBUTE.%.iffe : .SCAN.iffe

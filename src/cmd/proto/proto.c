@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2004 AT&T Corp.                  *
+*                  Copyright (c) 1990-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -34,7 +32,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Labs Research) 2004-10-01 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Labs Research) 2004-10-22 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -81,28 +79,48 @@ USAGE_LICENSE
 "	either single or double quotes. \aname\a may"
 "	be:]:[file]{"
 "		[+type?The license type:]{"
+"			[+bsd?The BSD open source license.]"
 "			[+cpl?The Common Public License.]"
-"			[+gpl|copyleft?The GNU Public License.]"
-"			[+free?BSD style open source.]"
-"			[+nonexclusive?Single person non-commercial use.]"
+"			[+mit?The MIT open source license.]"
+"			[+gpl?The GNU Public License.]"
+"			[+inline?License text already in source.]"
+"			[+none?No license.]"
 "			[+noncommercial?Non-commercial use.]"
+"			[+nonexclusive?Single person non-commercial use.]"
 "			[+open?Open source.]"
 "			[+proprietary?Only by individual agreement.]"
+"			[+special?License text in \bnotice\b.]"
 "			[+usage?License specific \boptget\b(3) usage strings.]"
-"			[+special|none?Special license text already in source.]"
 "			[+verbose?Include the disclaimer notice if any.]"
+"			[+zlib?The ZLIB open source license.]"
 "		}"
 "		[+author?A \b,\b separated list of \aname\a <\aemail\a> pairs.]"
+"		[+class?The license class. The default values are:]{"
+"			[+gpl?The GNU Public License.]"
+"			[+open?\bwww.opensource.org\b sanctioned open source.]"
+"			[+proprietary?Internal or non-disclosure use only.]"
+"			[+special?Nonstandard license text and notices.]"
+"		}"
 "		[+corporation?They own it all, e.g., \bAT&T\b.]"
 "		[+company?Within the corporation, e.g., \bLabs Research\b.]"
+"		[+location?Company location.]"
 "		[+organization?Within the company, e.g., \bNetwork Services"
 "			Research Department\b.]"
-"		[+location?Company location.]"
-"		[+notice?Disclaimer notice text with embedded newlines.]"
+"		[+notice?\btype=special\b notice text with embedded newlines"
+"			or additional notice text listed by \btype=verbose\b.]"
 "		[+package?The generic software package name, e.g., \bast\b.]"
 "		[+since?The year the software was first released.]"
 "		[+url?The URL of the detailed license text, e.g.,"
 "		\bhttp://www.research.att.com/sw/license/open-ast.html\b.]"
+"		[+urlmd5?The \bmd5sum\b(1) of the downloaded URL data. Note that"
+"			the downloaded data may have embedded \b\\r\b not present"
+"			in the original source.]"
+"		[+query=\atext\a?If \atext\a is one of the \aname\as above"
+"			then its value is expanded, otherwise"
+"			\b${\b\aname\a\b}\b in \atext\a is expanded. The"
+"			results is printed as a line on the standard output"
+"			and \bproto\b exits. This should only be used via"
+"			\b--options\b.]"
 "}"
 "[n:sync?Output C style line syncs to retain the original line structure.]"
 "[o:options?Additional space or \b,\b separated \aname=value\a \b--license\b"

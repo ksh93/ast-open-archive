@@ -1,16 +1,14 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1996-2004 AT&T Corp.                  #
+#                  Copyright (c) 1996-2005 AT&T Corp.                  #
 #                      and is licensed under the                       #
-#          Common Public License, Version 1.0 (the "License")          #
-#                        by AT&T Corp. ("AT&T")                        #
-#      Any use, downloading, reproduction or distribution of this      #
-#      software constitutes acceptance of the License.  A copy of      #
-#                     the License is available at                      #
+#                  Common Public License, Version 1.0                  #
+#                            by AT&T Corp.                             #
 #                                                                      #
-#         http://www.research.att.com/sw/license/cpl-1.0.html          #
-#         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         #
+#                A copy of the License is available at                 #
+#            http://www.opensource.org/licenses/cpl1.0.txt             #
+#         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         #
 #                                                                      #
 #              Information and Software Systems Research               #
 #                            AT&T Research                             #
@@ -41,13 +39,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2004-05-01' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2005-01-11' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Labs Research) 2004-05-01 $
+@(#)$Id: mm2html (AT&T Labs Research) 2005-01-11 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -74,6 +72,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	\afile\a.]:[file[??name=value;...]]]
 [o:option?Sets a space or \b,\b separated list of \b--license\b options. Option
 	values with embedded spaces must be quoted.]:[[no]]name=value]
+[t:top?Open non-local urls in the top frame.]
 [x:index?Generate a standalone \aname\a\b-index.html\b for framed HTML where
 	\aname\a is specified by \b--frame\b.]
 
@@ -106,7 +105,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 '
 	;;
 *)	ARGV0=""
-	USAGE='i:[file] [ file ... ]'
+	USAGE='f:gh:l:o:tx [ file ... ]'
 	;;
 esac
 
@@ -184,6 +183,7 @@ pd='<P>'
 pm=
 primary=".BL|.LI|.IX"
 ss="verdana,arial,helvetica,geneva,sans-serif"
+top=
 vg_ps=20
 
 function options
@@ -249,6 +249,8 @@ do	case $OPT in
 		esac
 		;;
 	o)	options "$OPTARG"
+		;;
+	t)	top=1
 		;;
 	x)	index=local
 		;;
@@ -669,7 +671,7 @@ function getline
 							;;
 						link)	nam=href
 							tar=
-							case $frame$vg in
+							case $frame$top$vg in
 							?*)	case $url in
 								*([abcdefghijklmnopqrstuvwxyz]):*|/*)
 									tar=" target=_top"
@@ -678,7 +680,7 @@ function getline
 								;;
 							esac
 							if	[[ $frame != '' && $title == '' ]]
-							then	rm $framebody
+							then	[[ -f $framebody ]] && rm $framebody
 								framelink=$pfx$url
 							else	data="$data	<A $nam=\"$pfx$url\"$tar>$txt</A>"
 							fi

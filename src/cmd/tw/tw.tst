@@ -43,7 +43,7 @@ function DATA
 
 TEST 01 'basics'
 	DO	DATA data
-	EXEC	-d data
+	EXEC	-d data -e sort:name
 		OUTPUT - $'data
 data/aaa
 data/aaa/111
@@ -152,7 +152,7 @@ data/zzz/333/7/s.z'
 
 TEST 02 'patterns'
 	DO	DATA data
-	EXEC	-d data -e 'name=="*.c"'
+	EXEC	-d data -e sort:name -e 'name=="*.c"'
 		OUTPUT - $'data/aaa/111/4/q.c
 data/aaa/111/5/q.c
 data/aaa/111/6/q.c
@@ -177,7 +177,7 @@ data/zzz/333/4/q.c
 data/zzz/333/5/q.c
 data/zzz/333/6/q.c
 data/zzz/333/7/q.c'
-	EXEC	-d data -e 'name=="*.[cd]"'
+	EXEC	-d data -e sort:name -e 'name=="*.[cd]"'
 		OUTPUT - $'data/aaa/111/4/q.c
 data/aaa/111/4/r.d
 data/aaa/111/5/q.c
@@ -226,11 +226,11 @@ data/zzz/333/6/q.c
 data/zzz/333/6/r.d
 data/zzz/333/7/q.c
 data/zzz/333/7/r.d'
-	EXEC	-d data -e 'name=="*.c" || name=="*.d"'
+	EXEC	-d data -e sort:name -e 'name=="*.c" || name=="*.d"'
 
 TEST 03 'types'
 	DO	DATA data
-	EXEC	-d data -e type==DIR
+	EXEC	-d data -e sort:name -e type==DIR
 		OUTPUT - $'data
 data/aaa
 data/aaa/111
@@ -264,7 +264,7 @@ data/zzz/333/4
 data/zzz/333/5
 data/zzz/333/6
 data/zzz/333/7'
-	EXEC	-d data -e type==REG
+	EXEC	-d data -e sort:name -e type==REG
 		OUTPUT - $'data/aaa/111/4/q.c
 data/aaa/111/4/r.d
 data/aaa/111/4/s.z

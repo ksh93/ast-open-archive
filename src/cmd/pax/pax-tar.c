@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2004 AT&T Corp.                  *
+*                  Copyright (c) 1987-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -60,7 +58,7 @@ putkey(Archive_t* ap, Sfio_t* sp, Option_t* op, const char* value, Sfulong_t num
 	else
 	{
 		n = sfprintf(ap->tmp.key, "%I*u", sizeof(number), number);
-		sfstrset(ap->tmp.key, 0);
+		sfstrseek(ap->tmp.key, 0, SEEK_SET);
 	}
 	n += strlen(op->name) + 3 + ((op->flags & OPT_VENDOR) ? sizeof(VENDOR) : 0);
 	o = 0;
@@ -68,7 +66,7 @@ putkey(Archive_t* ap, Sfio_t* sp, Option_t* op, const char* value, Sfulong_t num
 	{
 		sfprintf(ap->tmp.key, "%I*u", sizeof(n), n);
 		m = sfstrtell(ap->tmp.key);
-		sfstrset(ap->tmp.key, 0);
+		sfstrseek(ap->tmp.key, 0, SEEK_SET);
 		if (m == o)
 			break;
 		n += m - o;
@@ -269,7 +267,7 @@ headname(Archive_t* ap, File_t* f, const char* fmt)
 	listprintf(ap->tmp.hdr, ap, f, fmt);
 	if (sfstrtell(ap->tmp.hdr) > TARSIZEOF(name))
 	{
-		sfstrset(ap->tmp.hdr, 0);
+		sfstrseek(ap->tmp.hdr, 0, SEEK_SET);
 		s = f->name;
 		if (t = strrchr(s, '/'))
 			f->name = t + 1;
@@ -377,19 +375,20 @@ extend(Archive_t* ap, File_t* f, int type)
 						switch (op->index)
 						{
 						case OPT_atime:
-							tvgetstat(f->st, &tv, NiL, NiL);
+							tvgetatime(&tv, f->st);
 							break;
 						case OPT_mtime:
-							tvgetstat(f->st, NiL, &tv, NiL);
+							tvgetmtime(&tv, f->st);
 							break;
 						case OPT_ctime:
-							tvgetstat(f->st, NiL, NiL, &tv);
-							if (!tv.tv_nsec)
-								continue;
+							tvgetctime(&tv, f->st);
 							break;
 						}
-						sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
-						for (s = num + strlen(num); *(s - 1) == '0'; s--);
+						if (!tv.tv_nsec)
+							continue;
+						s = num + sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
+						while (*(s - 1) == '0')
+							s--;
 						if (*(s - 1) == '.')
 							*s++ = '0';
 						*s = 0;

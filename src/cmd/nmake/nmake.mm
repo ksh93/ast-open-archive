@@ -443,7 +443,7 @@ portions of rules can be shared, .e.g, edit operators applied to
 .LE
 .P
 The special variables are:
-.VL 1i
+.VL 6
 .LI
 .L "$(<)"
 The target name.
@@ -570,7 +570,7 @@ See
 .xx link="../probe/probe.html	probe information"
 for details.
 Typical user makefile make probe variables are:
-.VL 1i
+.VL 6
 .LI
 .B CC.DEBUG
 The
@@ -1429,12 +1429,12 @@ in the current directory.
 If found, each line of the file is inserted into the command line
 option list.
 This allows local additions/overrides without the need to modify
-the underlying makefile, which may be on a difefrent viewpath level.
+the underlying makefile, which may be on a different viewpath level.
 For example a
 .L Makeargs
 file containing
 .EX
-debug==1
+--debug-symbols
 .EE
 will compile with compiler debugging flags enabled.
 .P
@@ -1524,7 +1524,7 @@ named
 .BR nmake :
 .VL 6
 .LI
-.B "AT&T nmake 4.4"
+.B "AT&T nmake 5.0"
 This is the version maintained by the original author.
 .LI
 .B "Lucent nmake 3.5"
@@ -1617,6 +1617,36 @@ depending on the value of the
 variable.
 .LE
 .LI
+.B "Makerules options"
+.I --option=value
+instead of
+.I option=value
+to control optional makerules behavior.
+The difference is subtle but significant.
+.I option
+in the second (makerules variable) form can conflict
+with environment and makefile variables.
+It also lacks the self documentation of
+.BI --?option
+or
+.B --man
+from the
+.B nmake
+command line.
+Makerules differences are the main point of divergence between
+Lucent and AT&T
+.BR nmake :
+.VL 6
+.LI
+.B AT&T
+The makerules variable form is supported for backwards compatibility.
+Warnings will eventually be enabled to encourage use of the
+makerules option form.
+.LI
+.B Lucent
+Many makerules variable additions.
+.LE
+.LI
 .B ":MAKE: ordering"
 .VL 6
 .LI
@@ -1634,17 +1664,17 @@ By default the entry is listed as
 .LI
 .B AT&T
 The directory name is prefixed with
-.B $(recurse_enter)
-on directory entry and
-.B $(recurse_exit)
-on directory exit.
+.BI --recurse-enter= text
+on entering a directory and
+.BI --recurse-leave= text
+on leaving a directory.
 .LI
 .B Lucent
-The directory name is prefixed with
+The directory name is prefixed with the makerules variable
 .B $(recurse_begin_message)
-on directory entry and
+on entering a directory and
 .B $(recurse_end_message)
-on directory exit.
+on leaving a directory.
 .LE
 .LI
 .B .ACTIONWRAP
@@ -1826,7 +1856,7 @@ if
 is not in the default libraries.
 
 .H 1 GLOSSARY
-.VL 1i
+.VL 6
 .LI
 .I action
 An \fIaction\fP is part of an \fIassertion\fP that is specified by
@@ -1956,7 +1986,7 @@ to search for files during the \fIbind\fP process.
 .LE
 
 .H 1 REFERENCES
-.VL 1i
+.VL 6
 .LI
 .xx link="../publications/open-2000-1.pdf	The AT&T AST OpenSource software collection",
 with David Korn and Stephen North and Phong Vo,

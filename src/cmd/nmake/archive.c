@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -64,10 +62,10 @@ arupdate(char* name)
  */
 
 static int
-walkar(register Ardir_t* ar, struct dir* d, char* name)
+walkar(register Ardir_t* ar, Dir_t* d, char* name)
 {
 	register Ardirent_t*	ent;
-	register struct rule*	r;
+	register Rule_t*	r;
 
 	if (d)
 	{
@@ -78,16 +76,16 @@ walkar(register Ardir_t* ar, struct dir* d, char* name)
 	{
 		if (d)
 		{
-			if (ent->mtime > ar->st.st_mtime)
+			if ((Seconds_t)ent->mtime > (Seconds_t)ar->st.st_mtime)
 				message((-1, "member %s is newer than archive %s", ent->name, name));
-			addfile(d, ent->name, ent->mtime);
+			addfile(d, ent->name, ((r = staterule(RULE, NiL, ent->name, -1)) && ent->mtime == tmxsec(r->time)) ? r->time : tmxsns(ent->mtime, 0));
 		}
 		else if ((r = getrule(ent->name)) && r->status == TOUCH)
 		{
-			ent->mtime = CURTIME;
+			ent->mtime = CURSECS;
 			ardirchange(ar, ent);
 			r->status = EXISTS;
-			staterule(RULE, r, NiL, 1)->time = r->time = ent->mtime;
+			staterule(RULE, r, NiL, 1)->time = r->time = tmxsns(ent->mtime, 0);
 			state.savestate = 1;
 			if (!state.silent)
 				error(0, "touch %s/%s", name, ent->name);
@@ -104,7 +102,7 @@ walkar(register Ardir_t* ar, struct dir* d, char* name)
 static int
 chktouch(const char* s, char* v, void* h)
 {
-	struct rule*	r = (struct rule*)v;
+	Rule_t*		r = (Rule_t*)v;
 
 	NoP(s);
 	NoP(h);
@@ -123,7 +121,7 @@ chktouch(const char* s, char* v, void* h)
 void
 artouch(char* name, register char* member)
 {
-	register struct rule*	r;
+	register Rule_t*	r;
 	Ardir_t*		ar;
 
 	if (member)
@@ -155,10 +153,10 @@ artouch(char* name, register char* member)
  */
 
 void
-arscan(struct rule* r)
+arscan(Rule_t* r)
 {
 	Ardir_t*	ar;
-	struct dir*	d;
+	Dir_t*		d;
 
 	if (r->dynamic & D_scanned)
 		return;

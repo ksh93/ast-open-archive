@@ -704,7 +704,6 @@ int ZEXPORT gzwrite (file, buf, len)
 */
 #if _PACKAGE_ast
 
-#include <sfstr.h>
 
 #ifdef __STDC__
 int ZEXPORTVA gzprintf (gzFile file, const char *format, /* args */ ...)

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1997-2004 AT&T Corp.                  *
+*                  Copyright (c) 1997-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -81,7 +79,7 @@ cdbrecognize(register Cdb_t* cdb)
 	register int		n;
 
 	n = sizeof(CDB_MAGIC) - 1;
-	if (!(s = (char*)sfreserve(cdb->io, n, 1)))
+	if (!(s = (char*)sfreserve(cdb->io, n, SF_LOCKR)))
 		return -1;
 	if (memcmp(CDB_MAGIC, s, n))
 		n = -1;
@@ -348,9 +346,11 @@ cdbrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 	register int		skip;
 	register int		keep;
 	Sfio_t*			io;
-	char*			s;
 	long			x;
 	int			first;
+#if CC_NATIVE != CC_ASCII
+	char*			s;
+#endif
 
 	rp->offset = sftell(cdb->io);
 	if (cdb->flags & CDB_DUMP)
@@ -487,7 +487,7 @@ cdbrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 					sfputu(io, skip);
 					skip = 1;
 					sfwrite(io, sfstrbase(cdb->tmp), sfstrtell(cdb->tmp));
-					sfstrset(cdb->tmp, 0);
+					sfstrseek(cdb->tmp, 0, SEEK_SET);
 				}
 				else
 					skip++;
@@ -497,7 +497,7 @@ cdbrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 				sfputu(io, keep);
 				sfputu(io, skip);
 				sfwrite(io, sfstrbase(cdb->tmp), sfstrtell(cdb->tmp));
-				sfstrset(cdb->tmp, 0);
+				sfstrseek(cdb->tmp, 0, SEEK_SET);
 			}
 			else
 				sfputu(io, 0);
@@ -507,7 +507,7 @@ cdbrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 			x = sfstrtell(io);
 			sfputu(cdb->io, x);
 			sfwrite(cdb->io, sfstrbase(io), x);
-			sfstrset(io, 0);
+			sfstrseek(io, 0, SEEK_SET);
 		}
 		if (sferror(cdb->io))
 			goto bad;
@@ -565,10 +565,10 @@ getstr(Cdb_t* cdb, int save)
 static int
 putstr(Cdb_t* cdb, register const char* s)
 {
+#if CC_NATIVE != CC_ASCII
 	register char*	t;
 	register int	n;
 
-#if CC_NATIVE != CC_ASCII
 	n = strlen(s) + 1;
 	if (!(t = (char*)sfreserve(cdb->io, n, 0)))
 		return -1;
@@ -590,6 +590,7 @@ cdbhdrread(register Cdb_t* cdb)
 	register int		c;
 	register int		n;
 	register unsigned long	u;
+	Fill_t*			fp;
 
 	/*
 	 * verify the magic number
@@ -603,6 +604,20 @@ cdbhdrread(register Cdb_t* cdb)
 		return -1;
 	}
 	sfseek(cdb->io, (Sfoff_t)n, SEEK_CUR);
+
+	/*
+	 * push the fill discipline
+	 * enabled in the CDB_OPEN event if strings are accessed
+	 * discipline push must be done here because header
+	 * read fills input buffer that is flushed on
+	 * discipline change
+	 */
+
+	if (!(fp = vmnewof(cdb->vm, 0, Fill_t, 1, 0)))
+		return cdbnospace(cdb);
+	fp->disc.exceptf = cdbfill;
+	fp->cdb = cdb;
+	sfdisc(cdb->io, &fp->disc);
 
 	/*
 	 * the rest depends on major.minor
@@ -712,20 +727,11 @@ cdbevent(register Cdb_t* cdb, int op)
 	{
 	case CDB_OPEN:
 		/*
-		 * if any strings are referenced then push the fill discipline
+		 * if any strings are referenced then enable the fill discipline
 		 */
 
 		if (cdb->strings)
-		{
-			register Fill_t*	fp;
-
-			if (!(fp = vmnewof(cdb->vm, 0, Fill_t, 1, 0)))
-				return cdbnospace(cdb);
-			fp->disc.exceptf = cdbfill;
-			fp->cdb = cdb;
-			sfdisc(cdb->io, &fp->disc);
 			sfset(cdb->io, SF_IOCHECK, 1);
-		}
 		break;
 	}
 	return 0;

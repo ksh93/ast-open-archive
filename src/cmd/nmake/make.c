@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -36,15 +34,15 @@
  */
 
 static int
-makescan(register struct rule* r, unsigned long* tm)
+makescan(register Rule_t* r, Time_t* tm)
 {
-	register struct rule*	s;
-	register struct rule*	u;
-	register struct list*	p;
-	struct list*		q;
+	register Rule_t*	s;
+	register Rule_t*	u;
+	register List_t*	p;
+	List_t*			q;
 	int			errors = 0;
-	unsigned long		tevent;
-	unsigned long		t;
+	Time_t			tevent;
+	Time_t			t;
 
 	message((-2, "check scan prerequisites"));
 	q = scan(r, &tevent);
@@ -67,14 +65,14 @@ makescan(register struct rule* r, unsigned long* tm)
  */
 
 static void
-globalprereqs(register struct rule* r, struct rule* g)
+globalprereqs(register Rule_t* r, Rule_t* g)
 {
-	register struct list*	p;
-	register struct list*	q;
-	register struct list*	t;
-	register struct list*	u;
-	struct rule*		x;
-	struct list*		pos = 0;
+	register List_t*	p;
+	register List_t*	q;
+	register List_t*	t;
+	register List_t*	u;
+	Rule_t*			x;
+	List_t*			pos = 0;
 
 	while (x = associate(g, r, NiL, &pos))
 		if (p = x->prereqs)
@@ -105,10 +103,10 @@ globalprereqs(register struct rule* r, struct rule* g)
  * return unaliased a
  */
 
-static struct rule*
-unalias(register struct rule* r, register struct rule* a, char* name)
+static Rule_t*
+unalias(register Rule_t* r, register Rule_t* a, char* name)
 {
-	struct frame*	oframe;
+	Frame_t*	oframe;
 
 	message((-3, "unalias(%s) -> %s", a->name, name));
 	if (a == r)
@@ -142,10 +140,10 @@ unalias(register struct rule* r, register struct rule* a, char* name)
  */
 
 static int
-update(register struct rule* r, register struct rule* a, char* arg)
+update(register Rule_t* r, register Rule_t* a, char* arg)
 {
-	register struct list*	p;
-	register struct rule*	u;
+	register List_t*	p;
+	register Rule_t*	u;
 	int			errors;
 	char*			s;
 
@@ -277,15 +275,15 @@ update(register struct rule* r, register struct rule* a, char* arg)
  */
 
 void
-maketop(register struct rule* r, int p, char* arg)
+maketop(register Rule_t* r, int p, char* arg)
 {
-	unsigned long	t;
-	unsigned long	o;
+	Time_t		t;
+	Flags_t		o;
 
 #if _HUH_2004_06_20
 	if ((p & (P_force|P_repeat)) == (P_force|P_repeat) && (r->property & (P_functional|P_make)) == P_make)
 	{
-		register struct rule*	a;
+		register Rule_t*	a;
 
 		a = catrule(internal.internal->name, ".%%", r->name, 1);
 		a->property |= P_internal|P_virtual;
@@ -311,13 +309,13 @@ maketop(register struct rule* r, int p, char* arg)
  */
 
 int
-make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
+make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 {
-	register struct list*	p;
-	register struct rule*	r1;
-	unsigned long		t;
-	unsigned long		tevent;
-	unsigned long		otime;
+	register List_t*	p;
+	register Rule_t*	r1;
+	Time_t			t;
+	Time_t			tevent;
+	Time_t			otime;
 	char*			s;
 	char*			v;
 	char*			r3name;
@@ -326,15 +324,15 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 	int			must;
 	int			otargetview;
 	int			pop;
-	struct rule*		r0;
-	struct rule*		r2;
-	struct rule*		r3;
-	struct rule*		r4;
-	struct rule*		parent;
-	struct list*		q;
-	struct frame*		fp;
-	struct frame*		oframe;
-	struct frame		frame;
+	Rule_t*			r0;
+	Rule_t*			r2;
+	Rule_t*			r3;
+	Rule_t*			r4;
+	Rule_t*			parent;
+	List_t*			q;
+	Frame_t*		fp;
+	Frame_t*		oframe;
+	Frame_t			frame;
 	Sfio_t*			mam;
 	char			stem[MAXNAME];
 
@@ -506,7 +504,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 					*ttarget = tevent;
 					PREVIEW(parent, r);
 				}
-				message((-1, "time(%s) = %s", r->name, strtime(tevent)));
+				message((-1, "time(%s) = %s", r->name, timestr(tevent)));
 				r->active = frame.previous;
 				if (state.unwind == error_info.indent)
 				{
@@ -522,6 +520,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 		if ((r->property & P_dontcare) && !state.unwind)
 			state.unwind = error_info.indent;
 		otime = r->time;
+if ((state.test & 2) && strmatch(r->name, "*.o")) dumprule(sfstderr, r);
 		if ((r1 = bind(r)) == r)
 			break;
 		if ((r->property & P_target) && !(r1->property & P_target))
@@ -536,6 +535,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 		r->active->target = r;
 		r->active->previous = fp;
 	}
+if ((state.test & 2) && strmatch(r->name, "*.o")) dumprule(sfstderr, r);
 	if ((r3 == r || (r->property & P_target) && !(r3->property & P_target)) && (!(r->dynamic & D_alias) || r3name == unbound(r)))
 		r3 = 0;
 	otargetview = state.targetview;
@@ -554,13 +554,13 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 				if (r1->status == NOTYET)
 				{
 					r0 = staterule(RULE, r1, NiL, 1);
-					if (!timeq(r1->time, r0->time) || !r0->event)
+					if (!statetimeq(r1, r0) || !r0->event)
 					{
 						reason((1, "%s joint sibling %s is out of date", r->name, r1->name));
 						staterule(RULE, r, NiL, 1)->time = 0;
 					}
 				}
-				fp = newof(0, struct frame, 1, 0);
+				fp = newof(0, Frame_t, 1, 0);
 				fp->target = r1;
 				fp->parent = state.frame;
 				fp->previous = r1->active;
@@ -577,7 +577,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 			r->active->prereqs = r->active->prereqs->next;
 	r->dynamic &= ~(D_hasafter|D_hasbefore|D_hasmake|D_hasscope|D_hassemaphore|D_triggered);
 	r->status = UPDATE;
-	message((-1, "time(%s) = %s", r->name, strtime(r->time)));
+	message((-1, "time(%s) = %s", r->name, timestr(r->time)));
 	if (mam = mamout(r))
 	{
 		pop = mampush(mam, r, flags);
@@ -632,21 +632,22 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 				r->dynamic |= D_intermediate;
 				r->must++;
 			}
-			else if (!timeq(r->time, r0->time) || !r0->event || (r->dynamic & D_aliaschanged))
+			else if (!statetimeq(r, r0) || !r0->event || (r->dynamic & D_aliaschanged))
 			{
 				if (!(r->property & P_accept) && !state.accept)
 				{
 					if (r->dynamic & D_aliaschanged)
-						reason((1, "%s [%s] binds to a different file", r->name, strtime(r->time)));
+						reason((1, "%s [%s] binds to a different file", r->name, timestr(r->time)));
 					else
 					{
-						if (r->time && r->time < r0->time && (r->dynamic & D_regular)) error(1, "%s has been replaced by an older version", unbound(r));
+						if (r->time && r->time < r0->time && (r->dynamic & D_regular))
+							error(1, "%s has been replaced by an older version", unbound(r));
 						if (r0->event && r0->time)
-							reason((1, "%s [%s] has changed [%s]", r->name, strtime(r->time), strtime(r0->time)));
+							reason((1, "%s [%s] has changed [%s]", r->name, timestr(r->time), timestr(r0->time)));
 						else if (r0->event && r->view)
-							reason((1, "%s [%s] has changed in view %s", r->name, strtime(r->time), state.view[r->view].path));
+							reason((1, "%s [%s] has changed in view %s", r->name, timestr(r->time), state.view[r->view].path));
 						else
-							reason((1, "%s [%s] has no previous state", r->name, strtime(r->time)));
+							reason((1, "%s [%s] has no previous state", r->name, timestr(r->time)));
 					}
 					must = 1;
 					r0->event = CURTIME;
@@ -863,8 +864,8 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 
 				if (r4 = metainfo('S', r1->name, NiL, 0))
 				{
-					struct rule*	joint;
-					struct rule*	x;
+					Rule_t*		joint;
+					Rule_t*		x;
 					Sfio_t*		tmp;
 
 					message((-2, "check joint metarule targets"));
@@ -900,7 +901,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 								reason((1, "joint metarule target %s changed", s));
 							}
 							x->status = r->status;
-							message((-1, "time(%s) = %s", s, strtime(t)));
+							message((-1, "time(%s) = %s", s, timestr(t)));
 							if (state.unwind == error_info.indent)
 							{
 								state.unwind = 0;
@@ -909,7 +910,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 							error_info.indent--;
 							if (!x->active || x->active->parent != oframe)
 							{
-								fp = newof(0, struct frame, 1, 0);
+								fp = newof(0, Frame_t, 1, 0);
 								fp->target = x;
 								fp->parent = oframe;
 								fp->previous = x->active;
@@ -1076,7 +1077,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 	 */
 
 	timefix(tevent);
-	message((-2, "[%s] : [%s]%s%s%s", strtime(r->time), strtime(tevent), errors ? " ERRORS" : null, errors && state.unwind >= error_info.indent ? " ignored" : null, must ? " must" : null));
+	message((-2, "[%s] : [%s]%s%s%s", timestr(r->time), timestr(tevent), errors ? " ERRORS" : null, errors && state.unwind >= error_info.indent ? " ignored" : null, must ? " must" : null));
 	if (errors && !(state.questionable & 0x00800000))
 		r->status = FAILED;
 	else
@@ -1260,7 +1261,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 		*ttarget = t;
 		PREVIEW(parent, r);
 	}
-	message((-1, "time(%s) = %s", r->name, strtime(*ttarget)));
+	message((-1, "time(%s) = %s", r->name, timestr(*ttarget)));
 	if (mam && pop)
 		mampop(mam, r, P_virtual);
 	return errors;
@@ -1271,11 +1272,11 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
  */
 
 int
-makebefore(register struct rule* r)
+makebefore(register Rule_t* r)
 {
-	register struct list*	p;
+	register List_t*	p;
 	register int		errors;
-	unsigned long		t;
+	Time_t			t;
 
 	errors = 0;
 	if ((r->dynamic & (D_hasbefore|D_triggered)) == (D_hasbefore|D_triggered))
@@ -1283,7 +1284,7 @@ makebefore(register struct rule* r)
 		r->dynamic &= ~D_hasbefore;
 		message((-2, "check explicit before `prerequisites'"));
 		for (p = r->prereqs; p; p = p->next)
-			if (p->rule->property & P_before)
+			if ((p->rule->property & (P_after|P_before)) == P_before)
 				errors += make(p->rule, &t, NiL, 0);
 	}
 	return errors;
@@ -1294,20 +1295,20 @@ makebefore(register struct rule* r)
  */
 
 int
-makeafter(register struct rule* r)
+makeafter(register Rule_t* r, Flags_t property)
 {
-	register struct list*	p;
+	register List_t*	p;
 	register int		errors;
-	unsigned long		t;
+	Time_t			t;
 
 	errors = 0;
 	if ((r->dynamic & (D_hasafter|D_triggered)) == (D_hasafter|D_triggered))
 	{
 		statetime(r, -1);
 		r->dynamic &= ~(D_hasafter|D_hasmake);
-		message((-2, "check explicit after `prerequisites'"));
+		message((-2, "check explicit %safter `prerequisites'", (property & P_dontcare) ? "dontcare " : null));
 		for (p = r->prereqs; p; p = p->next)
-			if (p->rule->property & P_after)
+			if ((p->rule->property & P_failure) == property)
 				errors += make(p->rule, &t, NiL, 0);
 	}
 	return errors;

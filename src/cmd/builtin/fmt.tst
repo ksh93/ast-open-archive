@@ -1480,3 +1480,62 @@ TEST 03 '--optget'
     only change their \\b$PATH\\b variable to reference the new installation
     root \\bbin\\b directory. \\bpackage install\\b installs binary packages in
     a new \\b$INSTALLROOT\\b.]'
+
+TEST 04 '--optget vs. "..."'
+
+	EXEC	--optget -w76
+		INPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one of"
+"	the directories on \\b$PATH\\b, searched in order. Each alias is"
+"	is a " FOO " and another    "    BAR   " at the end.]"'
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one of the "
+    "directories on \\b$PATH\\b, searched in order. Each alias is is a " FOO " and "
+    "another " BAR " at the end.]"'
+
+	EXEC	--optget --width=69
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one of the "
+    "directories on \\b$PATH\\b, searched in order. Each alias is is a " FOO " "
+    "and another " BAR " at the end.]"'
+
+	EXEC	--optget --width=68
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one of "
+    "the directories on \\b$PATH\\b, searched in order. Each alias is is a " FOO " "
+    "and another " BAR " at the end.]"'
+
+	EXEC	--optget --width=66
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one of "
+    "the directories on \\b$PATH\\b, searched in order. Each alias is is "
+    "a " FOO " and another " BAR " at the end.]"'
+
+	EXEC	--optget --width=65
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one of "
+    "the directories on \\b$PATH\\b, searched in order. Each alias is "
+    "is a " FOO " and another " BAR " at the end.]"'
+
+	EXEC	--optget --width=64
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one "
+    "of the directories on \\b$PATH\\b, searched in order. Each alias "
+    "is is a " FOO " and another " BAR " at the end.]"'
+
+	EXEC	--optget --width=62
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in one "
+    "of the directories on \\b$PATH\\b, searched in order. Each "
+    "alias is is a " FOO " and another " BAR " at the end.]"'
+
+	EXEC	--optget --width=61
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in "
+    "one of the directories on \\b$PATH\\b, searched in order. Each "
+    "alias is is a " FOO " and another " BAR " at the end.]"'
+
+	EXEC	--optget --width=60
+		OUTPUT - $'"[+?Method aliases may be defined in \\b../" ALIASES "\\b in "
+    "one of the directories on \\b$PATH\\b, searched in order. "
+    "Each alias is is a " FOO " and another " BAR " at the end.]"'
+
+TEST 05 '--optget vs. "...\n..."'
+
+	EXEC	--optget -w76
+		INPUT - $'"\\n\\n[ file ... ]\\n\\n"'
+		OUTPUT - $'    "\\n\\n"\n"[ file ... ]"\n    "\\n\\n"'
+
+	EXEC	--optget -w76
+		INPUT - $'"\\n"\n"\\n[ file ... ]\\n"\n"\\n"'

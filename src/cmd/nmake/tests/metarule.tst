@@ -52,21 +52,21 @@ all : t.tso
 		INPUT t.ts
 		OUTPUT - $': convert t.ts to t.tso : --init : FLAGS=--init :'
 
-	EXEC	--silent --regress
+	EXEC	--silent
 		OUTPUT -
 
 	DO	touch t.ts
 
-	EXEC	--silent --regress
+	EXEC	--silent
 		OUTPUT - $': convert t.ts to t.tso : --init : FLAGS=--init :'
 
-	EXEC	--silent --regress
+	EXEC	--silent
 		OUTPUT -
 
-	EXEC	--silent --regress FLAGS=--done
+	EXEC	--silent FLAGS=--done
 		OUTPUT - $': convert t.ts to t.tso : --done : FLAGS=--done :'
 
-	EXEC	--silent --regress FLAGS=--done
+	EXEC	--silent FLAGS=--done
 		OUTPUT -
 
 TEST 04 'stem exercizes'
@@ -142,7 +142,6 @@ main(){return g();}'
 	EXEC
 		ERROR -
 
-	DO	sleep 1
 	DO	touch g.g
 
 	EXEC
@@ -180,7 +179,6 @@ a :: a.ch z.ch'
 	EXEC
 		ERROR -
 
-	DO	sleep 1
 	DO	touch z.sz
 
 	EXEC
@@ -285,7 +283,7 @@ CCFLAGS += -I-H$$(ORBIXDIR)/corba2/include
 	Q|\\\'|\\\'|\\\\|LQ|
 	Q|\\\\|||CS|
 	I| \\# include <%>|A.STD.IDL.INCLUDE|
-	I| \\# include "%"|A.LCL.IDL.INCLUDE|$(prefixinclude:/0//:?M$$$(.PREFIX.IDL.INCLUDE.)|??)
+	I| \\# include "%"|A.LCL.IDL.INCLUDE|$(-prefix-include:/0//:?M$$$(.PREFIX.IDL.INCLUDE.)|??)
 
 .ATTRIBUTE.%.idl : .SCAN.idl
 
@@ -405,7 +403,6 @@ iffe: test: is b a type or typedef ... no
 	EXEC
 		ERROR -
 
-	DO	sleep 1
 	DO	touch features/a
 
 	EXEC
@@ -559,7 +556,7 @@ $(LIBDIR)/g2 :INSTALLDIR: $(G2SRC)'
 	EXEC	--regress install
 		ERROR -
 
-	DO	touch p_e.h
+	DO	{ sleep 1; touch p_e.h; } # ccs *.[ao] 1 sec granulatity
 
 	EXEC	--regress install
 		ERROR - $'+ cp '$TWD$'/bot/src/p_e.g p_e.c
@@ -568,7 +565,7 @@ $(LIBDIR)/g2 :INSTALLDIR: $(G2SRC)'
 + ar cr liba.a p_e.o
 + ignore ranlib liba.a
 + rm -f p_e.o
-+ mv ../../lib/liba.a ../../lib/liba.a.old
++ mv -f ../../lib/liba.a ../../lib/liba.a.old
 + ignore cp liba.a ../../lib/liba.a
 + ignore ranlib ../../lib/liba.a'
 
@@ -632,3 +629,112 @@ tst :
 		OUTPUT -
 		ERROR - $'make: don\'t know how to make aha.out'
 		EXIT 1
+
+TEST 22 'yacc/lex .AFTER [.FAILURE] fallbacks with semaphores'
+
+	EXEC	DISABLE_YY= DISABLE_LL=
+		INPUT Makefile $'.YY.SEMAPHORE .LL.SEMAPHORE : .SEMAPHORE
+%.c %.h : %.yy (DISABLE_YY) .YY.SEMAPHORE
+	$(DISABLE_YY)
+	cp $(>) $(%).c
+	cp $(>) $(%).h
+%.c : %.ll (DISABLE_LL) .LL.SEMAPHORE
+	$(DISABLE_LL)
+	cp $(>) $(<)
+cmd :: yy.yy ll.ll
+yy.c : .PASS.AFTER.yy.c .FAIL.AFTER.yy.c
+.PASS.AFTER.yy.c : .VIRTUAL .FORCE .AFTER
+	: generate $(<<:N=*.c) fallback :
+	cp $(<<:N=*.c) $(<<:N=*.c:B:S=.yy.c)
+	: generate $(<<:N=*.h) fallback :
+	cp $(<<:N=*.h) $(<<:N=*.h:B:S=.yy.h)
+.FAIL.AFTER.yy.c : .VIRTUAL .FORCE .AFTER .FAILURE
+	: falling back to previous $(<<:N=*.c) :
+	cp $(<<:N=*.c:B:S=.yy.c) $(<<:N=*.c)
+	: falling back to previous $(<<:N=*.h) :
+	cp $(<<:N=*.h:B:S=.yy.h) $(<<:N=*.h)
+ll.c : .PASS.AFTER.ll.c .FAIL.AFTER.ll.c
+.PASS.AFTER.ll.c : .VIRTUAL .FORCE .AFTER
+	: generate $(<<) fallback :
+	cp $(<<) $(<<:B:S=.ll.c)
+.FAIL.AFTER.ll.c : .VIRTUAL .FORCE .AFTER .FAILURE
+	: falling back to previous $(<<) :
+	cp $(<<:B:S=.ll.c) $(<<)'
+		INPUT yy.yy $'int main(){return 0;}'
+		INPUT ll.ll $'int ll;'
+		ERROR - $'+ cp yy.yy yy.c
++ cp yy.yy yy.h
++ : generate yy.c fallback :
++ cp yy.c yy.yy.c
++ : generate yy.h fallback :
++ cp yy.h yy.yy.h
++ cc -O -c yy.c
++ cp ll.ll ll.c
++ : generate ll.c fallback :
++ cp ll.c ll.ll.c
++ cc -O -c ll.c
++ cc -O -o cmd yy.o ll.o'
+
+	EXEC	DISABLE_YY= DISABLE_LL=
+		ERROR -
+
+	EXEC	DISABLE_YY=false DISABLE_LL=
+		ERROR - $'+ false
+make: *** exit code 1 making yy.c
++ : falling back to previous yy.c :
++ cp yy.yy.c yy.c
++ : falling back to previous yy.h :
++ cp yy.yy.h yy.h
++ cc -O -c yy.c
++ cc -O -o cmd yy.o ll.o'
+
+	EXEC	DISABLE_YY=false DISABLE_LL=
+		ERROR -
+
+	EXEC	DISABLE_YY= DISABLE_LL=false
+		ERROR - $'+ cp yy.yy yy.c
++ cp yy.yy yy.h
++ : generate yy.c fallback :
++ cp yy.c yy.yy.c
++ : generate yy.h fallback :
++ cp yy.h yy.yy.h
++ cc -O -c yy.c
++ false
+make: *** exit code 1 making ll.c
++ : falling back to previous ll.c :
++ cp ll.ll.c ll.c
++ cc -O -c ll.c
++ cc -O -o cmd yy.o ll.o'
+
+	EXEC	DISABLE_YY= DISABLE_LL=false
+		ERROR -
+
+	EXEC	DISABLE_YY=false DISABLE_LL=false
+		ERROR - $'+ false
+make: *** exit code 1 making yy.c
++ : falling back to previous yy.c :
++ cp yy.yy.c yy.c
++ : falling back to previous yy.h :
++ cp yy.yy.h yy.h
++ cc -O -c yy.c
++ cc -O -o cmd yy.o ll.o'
+
+	EXEC	DISABLE_YY=false DISABLE_LL=false
+		ERROR -
+
+	EXEC	DISABLE_YY= DISABLE_LL=
+		ERROR - $'+ cp yy.yy yy.c
++ cp yy.yy yy.h
++ : generate yy.c fallback :
++ cp yy.c yy.yy.c
++ : generate yy.h fallback :
++ cp yy.h yy.yy.h
++ cc -O -c yy.c
++ cp ll.ll ll.c
++ : generate ll.c fallback :
++ cp ll.c ll.ll.c
++ cc -O -c ll.c
++ cc -O -o cmd yy.o ll.o'
+
+	EXEC	DISABLE_YY= DISABLE_LL=
+		ERROR -

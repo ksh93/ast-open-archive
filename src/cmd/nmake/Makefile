@@ -1,11 +1,5 @@
 :PACKAGE: ast cpp:force --clobber=!(nmake)
 
-if CC.HOSTTYPE == "linux.alpha"
-	/* workaround for "BUG IN DYNAMIC LINKER ld.so" */
-	:PACKAGE: :static
-	CCLDFLAGS += $(CC.STATIC)
-end
-
 LICENSE = since=1984,author=gsf
 
 include "Version.mk"

@@ -4,7 +4,7 @@ INCLUDE cc.def
 
 TEST 01 'state views'
 
-	EXEC	--nojobs --regress one code=2
+	EXEC	--nojobs one code=2
 		INPUT Makefile $'all : one two
 one : .ALWAYS .VIRTUAL .FORCE
 	cd $(<)
@@ -22,7 +22,7 @@ app :: a.c b.c c.c'
 		INPUT b.c $'extern int c(); int b() { return c() + CODE; }'
 		INPUT c.c $'int c() { return CODE; }'
 		ERROR - $'+ cd one
-+ ../../nmake --nojobs --regress -f main.mk CODE==2
++ ../../nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..
 + : -DCODE=2
 + 1> a.o
@@ -33,15 +33,15 @@ app :: a.c b.c c.c'
 + :
 + 1> app'
 
-	EXEC	--nojobs --regress one code=2
+	EXEC	--nojobs one code=2
 		ERROR - $'+ cd one
-+ ../../nmake --nojobs --regress -f main.mk CODE==2
++ ../../nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..'
 
-	EXEC	--nojobs --regress one code=2
+	EXEC	--nojobs one code=2
 
-	EXEC	--nojobs --regress two code=0
-		ERROR - $'+ ../nmake --nojobs --regress -f main.mk CODE==0
+	EXEC	--nojobs two code=0
+		ERROR - $'+ ../nmake --nojobs -f main.mk CODE==0
 + : -DCODE=0
 + 1> a.o
 + : -DCODE=0
@@ -51,13 +51,13 @@ app :: a.c b.c c.c'
 + :
 + 1> app'
 
-	EXEC	--nojobs --regress two code=0
+	EXEC	--nojobs two code=0
 		INPUT two/
-		ERROR - $'+ ../nmake --nojobs --regress -f main.mk CODE==0'
+		ERROR - $'+ ../nmake --nojobs -f main.mk CODE==0'
 
-	EXEC	--nojobs --regress one code=2
+	EXEC	--nojobs one code=2
 		ERROR - $'+ cd one
-+ ../../nmake --nojobs --regress -f main.mk CODE==2
++ ../../nmake --nojobs -f main.mk CODE==2
 + MAKEPATH=..
 + : -DCODE=2
 + 1> a.o
@@ -81,19 +81,19 @@ YY = yy
 		ERROR - $'+ : XX is xx
 + : YY is yy'
 
-	EXEC	--regress
+	EXEC	--
 		ERROR -
 
-	EXEC	--regress XX=aa
+	EXEC	XX=aa
 		ERROR - $'+ : XX is aa'
 
-	EXEC	--regress
+	EXEC	--
 		ERROR - $'+ : XX is xx'
 
-	EXEC	--regress YY=zz
+	EXEC	YY=zz
 		ERROR - $'+ : YY is zz'
 
-	EXEC	--regress
+	EXEC	--
 		ERROR - $'+ : YY is yy'
 
 TEST 03 'error status'
@@ -116,8 +116,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -154,7 +154,7 @@ done z virtual
 exec - echo aha b y z
 done a virtual'
 
-	EXEC	--regress
+	EXEC	--
 		OUTPUT -
 		ERROR - $'+ true
 + 1> b
@@ -163,7 +163,78 @@ done a virtual'
 make: *** exit code 1 making y'
 		EXIT 1
 
-	EXEC	--regress
+	EXEC
 		ERROR - $'+ false
 + 1> y
 make: *** exit code 1 making y'
+
+TEST 04 'cancelled error status'
+
+	EXEC
+		INPUT Makefile $'%.z : %.x (DISABLE.%)
+	$(DISABLE.$(%):?false?touch $(<)?)
+z : a.z b.z c.z d.z
+	touch $(<)'
+		INPUT a.x
+		INPUT b.x
+		INPUT c.x
+		INPUT d.x
+		ERROR - $'+ touch a.z
++ touch b.z
++ touch c.z
++ touch d.z
++ touch z'
+	
+	EXEC	DISABLE.a=1 DISABLE.b=1 DISABLE.c=1 DISABLE.d=1 -k
+		EXIT 1
+		ERROR - $'+ false
+make: *** exit code 1 making a.z
++ false
+make: *** exit code 1 making b.z
++ false
+make: *** exit code 1 making c.z
++ false
+make: *** exit code 1 making d.z
+make: *** 4 actions failed'
+	
+	EXEC	DISABLE.a=1 DISABLE.b=1 DISABLE.c=1 DISABLE.d=1
+		ERROR - $'+ false
+make: *** exit code 1 making a.z'
+	
+	EXEC	DISABLE.a=1 DISABLE.b=1 DISABLE.c=1 DISABLE.d=1 -k
+		ERROR - $'+ false
+make: *** exit code 1 making a.z
++ false
+make: *** exit code 1 making b.z
++ false
+make: *** exit code 1 making c.z
++ false
+make: *** exit code 1 making d.z
+make: *** 4 actions failed'
+	
+	EXEC	DISABLE.a=  DISABLE.b=  DISABLE.c=1 DISABLE.d=1
+		ERROR - $'+ touch a.z
++ touch b.z
++ false
+make: *** exit code 1 making c.z'
+	
+	EXEC	DISABLE.a=  DISABLE.b=  DISABLE.c=1 DISABLE.d=1
+		ERROR - $'+ false
+make: *** exit code 1 making c.z'
+	
+	EXEC	DISABLE.a=  DISABLE.b=  DISABLE.c=  DISABLE.d=1
+		ERROR - $'+ touch c.z
++ false
+make: *** exit code 1 making d.z'
+
+	EXEC	DISABLE.a=  DISABLE.b=  DISABLE.c=  DISABLE.d=1
+		ERROR - $'+ false
+make: *** exit code 1 making d.z'
+	
+	EXEC	DISABLE.a=  DISABLE.b=  DISABLE.c=  DISABLE.d=
+		EXIT 0
+		ERROR - $'+ touch d.z
++ touch z'
+	
+	EXEC	DISABLE.a=  DISABLE.b=  DISABLE.c=  DISABLE.d=
+		ERROR -

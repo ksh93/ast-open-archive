@@ -265,13 +265,8 @@ UVWXYZ'
 		ERROR - $'sort: warning: incomplete record length=1'
 	EXEC	-R% fixed%6 fixed%7
 		OUTPUT -
-		ERROR - $'sort: fixed%7: file fixed record length mismatch -- 6 expected
-Usage: sort [-bdfingpMrcmusSLvZ] [-k pos1[,pos2]|.reclen|.position.length]]]
-            [-K pos] [-R format] [-C codeset|from:to] [-J seed] [-t tab-char]
-            [-j processes] [-o output] [-l library[,name=value...]]
-            [-T tempdir] [-x method] [-z type[size]] [-y size] [-X test]
-            [-D level] [ file ... ]'
-		EXIT 2
+		ERROR - $'sort: fixed%7: file fixed record length mismatch -- 6 expected'
+		EXIT 1
 	EXEC	-R% flat
 		INPUT flat $'-ZZZZZZZ\n-AAA\n-QQQQQ\n-CCCCCCCCCCCCCCCC'
 		ERROR - $'sort: record format cannot be determined from data sample'
@@ -285,3 +280,17 @@ TEST 25 'fixed records and fields'
 	EXEC	-s -k .5 -k .2.3
 		OUTPUT - $'abc1\nzbc2'
 	EXEC	-s -k 5:3:1
+
+TEST 26 'compressed input/output'
+	EXEC	-zO
+		INPUT - $'5\n3\n1'
+		IGNORE OUTPUT
+		COPY OUTPUT o.gz
+	EXEC	-zO
+		INPUT - $'6\n4\n2'
+		IGNORE OUTPUT
+		COPY OUTPUT e.gz
+	EXEC	-zI e.gz o.gz
+		OUTPUT - $'1\n2\n3\n4\n5\n6'
+	EXEC	-zI -m e.gz o.gz
+	EXEC	-zI -m o.gz e.gz

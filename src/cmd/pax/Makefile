@@ -7,7 +7,7 @@ DEBUG == 1
 pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	pax.h options.h \
 	bio.c convert.c copy.c pax.c options.c \
-	delta.c file.c format.c misc.c paxlib.c tv.c \
+	delta.c file.c format.c misc.c paxlib.c \
 	pax-ar.c pax-bzip.c pax-compress.c \
 	pax-cpio.c pax-delta.c pax-delta_88.c pax-gzip.c \
 	pax-ignore.c pax-mime.c pax-patch.c pax-pds.c \

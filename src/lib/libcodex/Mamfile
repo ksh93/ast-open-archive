@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make codex
 make libcodex.a archive
@@ -285,6 +285,12 @@ make code-iconv.o
 make code-iconv.c
 make ${INSTALLROOT}/include/ast/iconv.h implicit
 make ${INSTALLROOT}/include/ast/ast_iconv.h implicit
+make ${INSTALLROOT}/include/ast/ccode.h implicit
+make ${INSTALLROOT}/include/ast/ast_ccode.h implicit
+done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ccode.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 done ${INSTALLROOT}/include/ast/ast_iconv.h
 done ${INSTALLROOT}/include/ast/iconv.h
@@ -292,7 +298,7 @@ prev codex.h implicit
 done code-iconv.c
 meta code-iconv.o %.c>%.o code-iconv.c code-iconv
 prev code-iconv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_codex -D_PACKAGE_ast -c code-iconv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_codex -c code-iconv.c
 done code-iconv.o generated
 exec - ${AR} cr libcodex.a codex.o codexdata.o codexid.o codexlist.o codexcmp.o codexmeth.o codexadd.o codexnull.o codexgetpass.o codexpass.o codexsize.o code-rot13.o code-qp.o code-uu.o code-iconv.o
 exec - (ranlib libcodex.a) >/dev/null 2>&1 || true
@@ -328,7 +334,7 @@ done ${INSTALLROOT}/include/ast generated
 make ${INSTALLROOT}/include/ast/codex.h
 prev ${INSTALLROOT}/include/ast
 prev codex.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=2003,author=gsf+dgk+kpv'  codex.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=gsf+dgk+kpv'  codex.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/codex.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/codex.h

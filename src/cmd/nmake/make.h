@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -42,7 +40,7 @@
 #include <tok.h>
 #include <setjmp.h>
 #include <sfdisc.h>
-#include <sfstr.h>
+#include <tmx.h>
 
 #if DEBUG
 #define debug(x)	do if (error_info.trace < 0) { error x; } while (0)
@@ -81,14 +79,14 @@
 #define bind		bindrule /* avoids possible socket clash */
 #define canon(x)	((state.context&&iscontextp(x,&state.tmppchar))?state.tmppchar:(state.mam.statix?mamcanon(x):pathcanon(x,0)))
 #define clrbit(v,b)	((v)&=~(1L<<(b)))
-#define getar(name)	((struct dir*)hashget(table.ar,(name)))
+#define getar(name)	((Dir_t*)hashget(table.ar,(name)))
 #define getbound(name)	((char*)hashget(table.bound,(name)))
-#define getdir(id)	((struct dir*)hashget(table.dir,(char*)(id)))
-#define getfile(name)	((struct file*)hashget(table.file,(name)))
+#define getdir(id)	((Dir_t*)hashget(table.dir,(char*)(id)))
+#define getfile(name)	((File_t*)hashget(table.file,(name)))
 #define getold(name)	((char*)hashget(table.oldvalue,(name)))
 #define getreg(name)	((int*)hashget(table.regress,(name)))
-#define getrule(name)	((struct rule*)hashget(table.rule,(name)))
-#define getvar(name)	((struct var*)hashget(table.var,(name)))
+#define getrule(name)	((Rule_t*)hashget(table.rule,(name)))
+#define getvar(name)	((Var_t*)hashget(table.var,(name)))
 #define message(x)	do if (error_info.trace < 0) { error x; } while (0)
 #define notfile(r)	(((r)->property&(P_attribute|P_functional|P_make|P_operator|P_state|P_use|P_virtual))||((r)->dynamic&D_scope)||(r)->semaphore||((r)->property&P_dontcare)&&((r)->dynamic&D_bound)&&!(r)->time)
 #define oldname(r)	do{if(getbound(r->uname))putbound(0,0);if(r->dynamic&D_alias)r->dynamic&=~D_alias;else putrule(r->name,0);r->name=r->uname;r->uname=0;}while(0)
@@ -106,8 +104,7 @@
 #define rsfopen(f)	((f)==internal.openfile?(internal.openfile=0,sfnew(NiL,NiL,SF_UNBOUND,internal.openfd,SF_READ)):sfopen(NiL,f,"r"))
 #define setbit(v,b)	((v)|=(1L<<(b)))
 #define shquote		shellquote /* netbsd has one in <stdlib.h>! */
-#define timecmp(a,b)	((a)==(b)?0:cmptime(a,b))
-#define timeq(a,b)	!timecmp(a,b)
+#define statetimeq	timestateq /* avoids statetime symbol truncation clash */
 #define timefix(t)      t-=(t<state.tolerance)?t:state.tolerance
 #define trap()		(state.caught?handle():0)
 #define tstbit(v,b)	((v)&(1L<<(b)))
@@ -125,13 +122,13 @@
 #define isstate(s)	(nametype(s,NiL)&(NAME_staterule|NAME_altstate|NAME_statevar))
 #define isstatevar(s)	(nametype(s,NiL)&(NAME_statevar))
 
-#define freelist(x)	do{if(x){(x)->rule=(struct rule*)internal.freelists;internal.freelists=(char*)(x);}}while(0)
+#define freelist(x)	do{if(x){(x)->rule=(Rule_t*)internal.freelists;internal.freelists=(char*)(x);}}while(0)
 #define freerule(r)	do{zero(*r);*((char**)r)=internal.freerules;internal.freerules=(char*)(r);}while(0)
 #define freevar(v)	do{(v)->property&=(V_free|V_import);*((char**)v)=internal.freevars;internal.freevars=(char*)(v);}while(0)
 
-#define newlist(x)	do{if(x=(struct list*)internal.freelists){if(x->next){x=x->next;*((char**)internal.freelists)=(char*)x->next;}else internal.freelists=(char*)x->rule;}else x=(struct list*)newchunk(&internal.freelists,sizeof(struct list));}while(0)
-#define newrule(r)	do{if(r=(struct rule*)internal.freerules){internal.freerules=(*((char**)r));zero(*r);}else r=(struct rule*)newchunk(&internal.freerules,sizeof(struct rule));}while(0)
-#define newvar(v)	do{if(v=(struct var*)internal.freevars){internal.freevars=(*((char**)v));}else v=(struct var*)newchunk(&internal.freevars,sizeof(struct var));}while(0)
+#define newlist(x)	do{if(x=(List_t*)internal.freelists){if(x->next){x=x->next;*((char**)internal.freelists)=(char*)x->next;}else internal.freelists=(char*)x->rule;}else x=(List_t*)newchunk(&internal.freelists,sizeof(List_t));}while(0)
+#define newrule(r)	do{if(r=(Rule_t*)internal.freerules){internal.freerules=(*((char**)r));zero(*r);}else r=(Rule_t*)newchunk(&internal.freerules,sizeof(Rule_t));}while(0)
+#define newvar(v)	do{if(v=(Var_t*)internal.freevars){internal.freevars=(*((char**)v));}else v=(Var_t*)newchunk(&internal.freevars,sizeof(Var_t));}while(0)
 
 #if CHAR_MIN < 0
 #define ctable		(ctypes-(CHAR_MIN)+1)
@@ -159,9 +156,10 @@
 #define DELETE	NiL		/* delete path component in edit()	*/
 #define KEEP	((char*)1)	/* keep path component in edit()	*/
 
-#define NOTIME	(unsigned long)(-1)	/* not checked time		*/
-#define OLDTIME	(unsigned long)(1)	/* oldest valid time		*/
-#define CURTIME	(unsigned long)time(NiL)/* current time			*/
+#define NOTIME	TMX_NOTIME	/* not checked time			*/
+#define OLDTIME	((Time_t)(1))	/* oldest valid time			*/
+#define CURTIME	tmxgettime()	/* high resolution current time		*/
+#define CURSECS	((Seconds_t)time(NiL)) /* seconds resolution time	*/
 
 /*
  * VAR and RULE must not change -- the rest must be in sequence
@@ -178,7 +176,7 @@
 #define MAXNAME		1024	/* maximum file pathname length		*/
 #define PCTGARBAGE	10	/* maximum state garbage percentage	*/
 
-#define MAXVIEW		(sizeof(viewvector)*CHAR_BIT) /* max view index	*/
+#define MAXVIEW		(sizeof(Flags_t)*CHAR_BIT) /* max view index	*/
 
 #if BINDINDEX
 #define MAXBIND		UCHAR_MAX/* maximum bind index			*/
@@ -252,6 +250,7 @@
 #define COMP_INCLUDE	(1<<4)	/* include prereq			*/
 #define COMP_OPTIONS	(1<<5)	/* -[DIU]* prereq			*/
 #define COMP_RULES	(1<<6)	/* from explicit rules statement	*/
+#define COMP_NSEC	(1<<7)	/* next prereq nsec			*/
 
 #define PREREQ_APPEND	1	/* addprereq append			*/
 #define PREREQ_DELETE	2	/* addprereq delete			*/
@@ -271,7 +270,8 @@
 #define CO_KEEPGOING	(CO_USER<<4)	/* keep going on job error	*/
 #define CO_LOCALSTACK	(CO_USER<<5)	/* stack local vars for action	*/
 #define CO_PRIMARY	(CO_USER<<6)	/* primary prereq added		*/
-#define CO_URGENT	(CO_USER<<7)	/* enter job at top of queue	*/
+#define CO_SEMAPHORES	(CO_USER<<7)	/* release semaphores		*/
+#define CO_URGENT	(CO_USER<<8)	/* enter job at top of queue	*/
 
 /*
  * rule.property flags
@@ -312,6 +312,8 @@
 #define P_virtual	(1L<<30)	/* target is not a file		*/
 
 #define P_read		(1L<<31)	/* read action output		*/
+
+#define P_failure	(P_after|P_before)	/* conjoined		*/
 
 /*
  * rule.dynamic flags
@@ -360,7 +362,9 @@
 
 #define D_context	(1L<<29)	/* ref may be diff dir context	*/
 
-#define D_CLEAROBJECT	(~(D_bindindex|D_built|D_compiled|D_context|D_dynamic|D_index|D_lower|D_scope))
+#define D_lowres	(1L<<30)	/* low resolution time		*/
+
+#define D_CLEAROBJECT	(~(D_bindindex|D_built|D_compiled|D_context|D_dynamic|D_index|D_lower|D_lowres|D_scope))
 
 #define M_bind		(1<<0)		/* bind recursion mark		*/
 #define M_compile	(1<<1)		/* compilation mark		*/
@@ -408,30 +412,58 @@
 #define VAL_PRIMARY	(1<<3)		/* primary value		*/
 #define VAL_UNBOUND	(1<<4)		/* unbound name			*/
 
-struct fileid				/* unique file id		*/
+typedef struct dirent Dirent_t;
+typedef struct stat Stat_t;
+
+struct File_s; typedef struct File_s File_t;
+struct Frame_s; typedef struct Frame_s Frame_t;
+struct List_s; typedef struct List_s List_t;
+struct Rule_s; typedef struct Rule_s Rule_t;
+
+typedef unsigned _ast_int4_t Flags_t;	/* flag bit vector		*/
+typedef unsigned _ast_int4_t Seconds_t;	/* seconds resolution time	*/
+
+typedef struct Fileid_s			/* unique file id		*/
 {
 	long		dev;		/* device number		*/
 	long		ino;		/* inode number			*/
-};
+} Fileid_t;
 
-struct dir				/* scanned directory entry	*/
+typedef struct Dir_s			/* scanned directory entry	*/
 {
 	char*		name;		/* directory name		*/
-	unsigned long	time;		/* modify time			*/
+	Time_t		time;		/* modify time			*/
 	unsigned char	archive;	/* directory is an archive	*/
 	unsigned char	directory;	/* directory is a real directory*/
 	unsigned char	ignorecase;	/* pox on dirs that ignore case	*/
 	unsigned char	truncate;	/* names truncated to this	*/
-};
+} Dir_t;
 
-struct file				/* file table entry		*/
+struct File_s				/* file table entry		*/
 {
-	struct file*	next;		/* next in list			*/
-	struct dir*	dir;		/* directory containing file	*/
-	unsigned long	time;		/* modify time			*/
+	File_t*		next;		/* next in list			*/
+	Dir_t*		dir;		/* directory containing file	*/
+	Time_t		time;		/* modify time			*/
 };
 
-typedef int viewvector;			/* view consistency bit vector	*/
+struct Frame_s				/* active target frame		*/
+{
+	Frame_t*	parent;		/* parent frame			*/
+	Frame_t*	previous;	/* previous active frame	*/
+	Rule_t*		target;		/* target in frame		*/
+	List_t*		prereqs;	/* original prereqs		*/
+	char*		action;		/* original action		*/
+	char*		original;	/* original bound name		*/
+	char*		primary;	/* metarule primary prereq name	*/
+	char*		stem;		/* metarule stem		*/
+
+	struct
+	{
+	char*		name;		/* original target name		*/
+	Frame_t*	frame;		/* original target frame	*/
+	Time_t		time;		/* original target time		*/
+	}		context;	/* context push/pop		*/
+};
 
 /*
  * statevar data, staterule sync time and unbound rule name -- shared in rule.u1
@@ -442,25 +474,25 @@ typedef int viewvector;			/* view consistency bit vector	*/
 #define uname		u1.u_uname
 #define unbound(r)	((r)->uname?(r)->uname:(r)->name)
 
-struct rule				/* rule				*/
+struct Rule_s				/* rule				*/
 {
 	char*		name;		/* rule name			*/
-	struct frame*	active;		/* active target frame		*/
+	Frame_t*	active;		/* active target frame		*/
 
 	union
 	{
 	char*		u_uname;	/* unbound name			*/
 	char*		u_data;		/* state value			*/
-	unsigned long	u_event;	/* state rule event time	*/
+	Time_t		u_event;	/* state rule event time	*/
 	}		u1;
 
-	struct list*	prereqs;	/* prerequisites		*/
+	List_t*		prereqs;	/* prerequisites		*/
 	char*		action;		/* update action		*/
-	unsigned long	time;		/* modify time			*/
+	Time_t		time;		/* modify time			*/
 
-	long		attribute;	/* external named attributes	*/
-	long		dynamic;	/* dynamic properties		*/
-	long		property;	/* stable properties		*/
+	Flags_t		attribute;	/* external named attributes	*/
+	Flags_t		dynamic;	/* dynamic properties		*/
+	Flags_t		property;	/* stable properties		*/
 
 	unsigned char	scan;		/* file scan strategy index	*/
 	unsigned char	semaphore;	/* semaphore + count		*/
@@ -472,139 +504,120 @@ struct rule				/* rule				*/
 	unsigned short	must;		/* cancel if == 0		*/
 
 	unsigned long	complink;	/* compilation link		*/
-	viewvector	checked[STATERULES+1];	/* view state check	*/
+	Flags_t		checked[STATERULES+1];	/* view state check	*/
 
 #if BINDINDEX
 	unsigned char	source;		/* source bind index		*/
 #endif
 };
 
-struct frame				/* active target frame		*/
-{
-	struct frame*	parent;		/* parent frame			*/
-	struct frame*	previous;	/* previous active frame	*/
-	struct rule*	target;		/* target in frame		*/
-	struct list*	prereqs;	/* original prereqs		*/
-	char*		action;		/* original action		*/
-	char*		original;	/* original bound name		*/
-	char*		primary;	/* metarule primary prereq name	*/
-	char*		stem;		/* metarule stem		*/
-
-	struct
-	{
-	char*		name;		/* original target name		*/
-	struct frame*	frame;		/* original target frame	*/
-	unsigned long	time;		/* original target time		*/
-	}		context;	/* context push/pop		*/
-};
-
-struct internal				/* internal rule and list info	*/
+typedef struct Internal_s		/* internal rule and list info	*/
 {
 	/*
 	 * read/write rule attributes
 	 */
 
-	struct rule*	accept;		/* .ACCEPT rule pointer		*/
-	struct rule*	after;		/* .AFTER rule pointer		*/
-	struct rule*	alarm;		/* .ALARM rule pointer		*/
-	struct rule*	always;		/* .ALWAYS rule pointer		*/
-	struct rule*	archive;	/* .ARCHIVE rule pointer	*/
-	struct rule*	attribute;	/* .ATTRIBUTE rule pointer	*/
-	struct rule*	before;		/* .BEFORE rule pointer		*/
-	struct rule*	command;	/* .COMMAND rule pointer	*/
-	struct rule*	dontcare;	/* .DONTCARE rule pointer	*/
-	struct rule*	force;		/* .FORCE rule pointer		*/
-	struct rule*	foreground;	/* .FOREGROUND rule pointer	*/
-	struct rule*	functional;	/* .FUNCTIONAL rule pointer	*/
-	struct rule*	ignore;		/* .IGNORE rule pointer		*/
-	struct rule*	immediate;	/* .IMMEDIATE rule pointer	*/
-	struct rule*	implicit;	/* .IMPLICIT rule pointer	*/
-	struct rule*	insert;		/* .INSERT rule pointer		*/
-	struct rule*	joint;		/* .JOINT rule pointer		*/
-	struct rule*	local;		/* .LOCAL rule pointer		*/
-	struct rule*	make;		/* .MAKE rule pointer		*/
-	struct rule*	making;		/* .MAKING rule pointer		*/
-	struct rule*	multiple;	/* .MULTIPLE rule pointer	*/
-	struct rule*	op;		/* .OPERATOR rule pointer	*/
-	struct rule*	parameter;	/* .PARAMETER rule pointer	*/
-	struct rule*	read;		/* .READ rule pointer		*/
-	struct rule*	readonly;	/* .READONLY rule pointer	*/
-	struct rule*	regular;	/* .REGULAR rule pointer	*/
-	struct rule*	repeat;		/* .REPEAT rule pointer		*/
-	struct rule*	run;		/* .RUN rule pointer		*/
-	struct rule*	semaphore;	/* .SEMAPHORE rule pointer	*/
-	struct rule*	source;		/* .SOURCE rule pointer		*/
-	struct rule*	state;		/* .STATE rule pointer		*/
-	struct rule*	sync;		/* .SYNC rule pointer		*/
-	struct rule*	terminal;	/* .TERMINAL rule pointer	*/
-	struct rule*	use;		/* .USE rule pointer		*/
-	struct rule*	virt;		/* .VIRTUAL rule pointer	*/
-	struct rule*	wait;		/* .WAIT rule pointer		*/
+	Rule_t*		accept;		/* .ACCEPT rule pointer		*/
+	Rule_t*		after;		/* .AFTER rule pointer		*/
+	Rule_t*		alarm;		/* .ALARM rule pointer		*/
+	Rule_t*		always;		/* .ALWAYS rule pointer		*/
+	Rule_t*		archive;	/* .ARCHIVE rule pointer	*/
+	Rule_t*		attribute;	/* .ATTRIBUTE rule pointer	*/
+	Rule_t*		before;		/* .BEFORE rule pointer		*/
+	Rule_t*		command;	/* .COMMAND rule pointer	*/
+	Rule_t*		dontcare;	/* .DONTCARE rule pointer	*/
+	Rule_t*		force;		/* .FORCE rule pointer		*/
+	Rule_t*		foreground;	/* .FOREGROUND rule pointer	*/
+	Rule_t*		functional;	/* .FUNCTIONAL rule pointer	*/
+	Rule_t*		ignore;		/* .IGNORE rule pointer		*/
+	Rule_t*		immediate;	/* .IMMEDIATE rule pointer	*/
+	Rule_t*		implicit;	/* .IMPLICIT rule pointer	*/
+	Rule_t*		insert;		/* .INSERT rule pointer		*/
+	Rule_t*		joint;		/* .JOINT rule pointer		*/
+	Rule_t*		local;		/* .LOCAL rule pointer		*/
+	Rule_t*		make;		/* .MAKE rule pointer		*/
+	Rule_t*		making;		/* .MAKING rule pointer		*/
+	Rule_t*		multiple;	/* .MULTIPLE rule pointer	*/
+	Rule_t*		op;		/* .OPERATOR rule pointer	*/
+	Rule_t*		parameter;	/* .PARAMETER rule pointer	*/
+	Rule_t*		read;		/* .READ rule pointer		*/
+	Rule_t*		readonly;	/* .READONLY rule pointer	*/
+	Rule_t*		regular;	/* .REGULAR rule pointer	*/
+	Rule_t*		repeat;		/* .REPEAT rule pointer		*/
+	Rule_t*		run;		/* .RUN rule pointer		*/
+	Rule_t*		semaphore;	/* .SEMAPHORE rule pointer	*/
+	Rule_t*		source;		/* .SOURCE rule pointer		*/
+	Rule_t*		state;		/* .STATE rule pointer		*/
+	Rule_t*		sync;		/* .SYNC rule pointer		*/
+	Rule_t*		terminal;	/* .TERMINAL rule pointer	*/
+	Rule_t*		use;		/* .USE rule pointer		*/
+	Rule_t*		virt;		/* .VIRTUAL rule pointer	*/
+	Rule_t*		wait;		/* .WAIT rule pointer		*/
 
 	/*
 	 * readonly rule attributes
 	 */
 	 
-	struct rule*	active;		/* .ACTIVE rule pointer		*/
-	struct rule*	bound;		/* .BOUND rule pointer		*/
-	struct rule*	built;		/* .BUILT rule pointer		*/
-	struct rule*	entries;	/* .ENTRIES rule pointer	*/
-	struct rule*	exists;		/* .EXISTS rule pointer		*/
-	struct rule*	failed;		/* .FAILED rule pointer		*/
-	struct rule*	file;		/* .FILE rule pointer		*/
-	struct rule*	global;		/* .GLOBAL rule pointer		*/
-	struct rule*	member;		/* .MEMBER rule pointer		*/
-	struct rule*	notyet;		/* .NOTYET rule pointer		*/
-	struct rule*	scanned;	/* .SCANNED rule pointer	*/
-	struct rule*	staterule;	/* .STATERULE rule pointer	*/
-	struct rule*	statevar;	/* .STATEVAR rule pointer	*/
-	struct rule*	target;		/* .TARGET rule pointer		*/
-	struct rule*	triggered;	/* .TRIGGERED rule pointer	*/
+	Rule_t*		active;		/* .ACTIVE rule pointer		*/
+	Rule_t*		bound;		/* .BOUND rule pointer		*/
+	Rule_t*		built;		/* .BUILT rule pointer		*/
+	Rule_t*		entries;	/* .ENTRIES rule pointer	*/
+	Rule_t*		exists;		/* .EXISTS rule pointer		*/
+	Rule_t*		failed;		/* .FAILED rule pointer		*/
+	Rule_t*		file;		/* .FILE rule pointer		*/
+	Rule_t*		global;		/* .GLOBAL rule pointer		*/
+	Rule_t*		member;		/* .MEMBER rule pointer		*/
+	Rule_t*		notyet;		/* .NOTYET rule pointer		*/
+	Rule_t*		scanned;	/* .SCANNED rule pointer	*/
+	Rule_t*		staterule;	/* .STATERULE rule pointer	*/
+	Rule_t*		statevar;	/* .STATEVAR rule pointer	*/
+	Rule_t*		target;		/* .TARGET rule pointer		*/
+	Rule_t*		triggered;	/* .TRIGGERED rule pointer	*/
 
 	/*
 	 * special rules and names
 	 */
 
-	struct rule*	args;		/* .ARGS rule pointer		*/
- 	struct rule*	assert;		/* .ASSERT rule pointer		*/
- 	struct rule*	assign;		/* .ASSIGN rule pointer		*/
-	struct rule*	bind;		/* .BIND rule pointer		*/
-	struct rule*	clear;		/* .CLEAR rule pointer		*/
-	struct rule*	copy;		/* .COPY rule pointer		*/
-	struct rule*	delete;		/* .DELETE rule pointer		*/
-	struct rule*	dot;		/* . rule pointer		*/
-	struct rule*	empty;		/* "" rule pointer		*/
-	struct rule*	error;		/* error intercept rule pointer	*/
-	struct rule*	exported;	/* .EXPORT rule pointer		*/
-	struct rule*	globalfiles;	/* .GLOBALFILES rule pointer	*/
-	struct rule*	include;	/* .INCLUDE rule pointer	*/
-	struct rule*	internal;	/* .INTERNAL rule pointer	*/
-	struct rule*	main;		/* .MAIN rule pointer		*/
-	struct rule*	makefiles;	/* .MAKEFILES rule pointer	*/
-	struct rule*	metarule;	/* .METARULE rule pointer	*/
-	struct rule*	null;		/* .NULL rule pointer		*/
-	struct rule*	preprocess;	/* .PREPROCESS rule pointer	*/
-	struct rule*	query;		/* .QUERY rule pointer		*/
-	struct rule*	rebind;		/* .REBIND rule pointer		*/
-	struct rule*	reset;		/* .RESET rule pointer		*/
-	struct rule*	retain;		/* .RETAIN rule pointer		*/
-	struct rule*	scan;		/* .SCAN rule pointer		*/
-	struct rule*	special;	/* .SPECIAL rule pointer	*/
-	struct rule*	tmplist;	/* .TMPLIST rule pointer	*/
-	struct rule*	unbind;		/* .UNBIND rule pointer		*/
-	struct rule*	view;		/* .VIEW rule pointer		*/
+	Rule_t*		args;		/* .ARGS rule pointer		*/
+ 	Rule_t*		assert;		/* .ASSERT rule pointer		*/
+ 	Rule_t*		assign;		/* .ASSIGN rule pointer		*/
+	Rule_t*		bind;		/* .BIND rule pointer		*/
+	Rule_t*		clear;		/* .CLEAR rule pointer		*/
+	Rule_t*		copy;		/* .COPY rule pointer		*/
+	Rule_t*		delete;		/* .DELETE rule pointer		*/
+	Rule_t*		dot;		/* . rule pointer		*/
+	Rule_t*		empty;		/* "" rule pointer		*/
+	Rule_t*		error;		/* error intercept rule pointer	*/
+	Rule_t*		exported;	/* .EXPORT rule pointer		*/
+	Rule_t*		globalfiles;	/* .GLOBALFILES rule pointer	*/
+	Rule_t*		include;	/* .INCLUDE rule pointer	*/
+	Rule_t*		internal;	/* .INTERNAL rule pointer	*/
+	Rule_t*		main;		/* .MAIN rule pointer		*/
+	Rule_t*		makefiles;	/* .MAKEFILES rule pointer	*/
+	Rule_t*		metarule;	/* .METARULE rule pointer	*/
+	Rule_t*		null;		/* .NULL rule pointer		*/
+	Rule_t*		preprocess;	/* .PREPROCESS rule pointer	*/
+	Rule_t*		query;		/* .QUERY rule pointer		*/
+	Rule_t*		rebind;		/* .REBIND rule pointer		*/
+	Rule_t*		reset;		/* .RESET rule pointer		*/
+	Rule_t*		retain;		/* .RETAIN rule pointer		*/
+	Rule_t*		scan;		/* .SCAN rule pointer		*/
+	Rule_t*		special;	/* .SPECIAL rule pointer	*/
+	Rule_t*		tmplist;	/* .TMPLIST rule pointer	*/
+	Rule_t*		unbind;		/* .UNBIND rule pointer		*/
+	Rule_t*		view;		/* .VIEW rule pointer		*/
 
 	/*
 	 * pattern association rules
 	 */
 
-	struct rule*	append_p;	/* .APPEND. rule pointer	*/
-	struct rule*	attribute_p;	/* .ATTRIBUTE. rule pointer	*/
-	struct rule*	bind_p;		/* .BIND. rule pointer		*/
-	struct rule*	dontcare_p;	/* .DONTCARE. rule pointer	*/
-	struct rule*	insert_p;	/* .INSERT. rule pointer	*/
-	struct rule*	require_p;	/* .REQUIRE. rule pointer	*/
-	struct rule*	source_p;	/* .SOURCE. rule pointer	*/
+	Rule_t*		append_p;	/* .APPEND. rule pointer	*/
+	Rule_t*		attribute_p;	/* .ATTRIBUTE. rule pointer	*/
+	Rule_t*		bind_p;		/* .BIND. rule pointer		*/
+	Rule_t*		dontcare_p;	/* .DONTCARE. rule pointer	*/
+	Rule_t*		insert_p;	/* .INSERT. rule pointer	*/
+	Rule_t*		require_p;	/* .REQUIRE. rule pointer	*/
+	Rule_t*		source_p;	/* .SOURCE. rule pointer	*/
 
 	/*
 	 * miscellaneous internal info
@@ -627,9 +640,9 @@ struct internal				/* internal rule and list info	*/
 
 	int		openfd;		/* bind()-scan() optimization	*/
 	int		pwdlen;		/* strlen(internal.pwd)		*/
-};
+} Internal_t;
 
-struct external				/* external engine name info	*/
+typedef struct External_s		/* external engine name info	*/
 {
 	/*
 	 * names of variables defined by engine, init, or environment
@@ -678,9 +691,9 @@ struct external				/* external engine name info	*/
 	char*		source;		/* make source file suffix	*/
 	char*		state;		/* make state file suffix	*/
 	char*		tmp;		/* make temporary file suffix	*/
-};
+} External_t;
 
-struct tables				/* hash table pointers		*/
+typedef struct Tables_s			/* hash table pointers		*/
 {
 	Hash_table_t*	ar;		/* archives dir info by name	*/
 	Hash_table_t*	bound;		/* directory of bound file	*/
@@ -690,15 +703,15 @@ struct tables				/* hash table pointers		*/
 	Hash_table_t*	regress;	/* regression path maps		*/
 	Hash_table_t*	rule;		/* rule names			*/
 	Hash_table_t*	var;		/* variable names		*/
-};
+} Tables_t;
 
 #define BIND_EXISTS	(1<<0)		/* statefile loaded		*/
 #define BIND_LOADED	(1<<1)		/* statefile loaded		*/
 
-struct binding				/* binding info			*/
+typedef struct Binding_s		/* binding info			*/
 {
 #if BINDINDEX
-	struct rule*	path;		/* path name component		*/
+	Rule_t*		path;		/* path name component		*/
 #else
 	char*		path;		/* path name component		*/
 #endif
@@ -707,14 +720,14 @@ struct binding				/* binding info			*/
 	short		rootlen;	/* root length			*/
 	unsigned char	flags;		/* BIND_* flags			*/
 	unsigned char	map;		/* external index map		*/
-};
+} Binding_t;
 
-struct label				/* resume label			*/
+typedef struct Label_s			/* resume label			*/
 {
 	jmp_buf		label;
-};
+} Label_t;
 
-struct mam				/* mam state			*/
+typedef struct Mam_s			/* mam state			*/
 {
 	Sfdisc_t	disc;		/* output discipline -- first!	*/
 
@@ -735,9 +748,9 @@ struct mam				/* mam state			*/
 
 	unsigned char	dontcare;	/* emit dontcare rules too	*/
 	unsigned char	port;		/* emit porting hints		*/
-};
+} Mam_t;
 
-struct state				/* program state		*/
+typedef struct State_s			/* program state		*/
 {
 	unsigned char	accept;		/* accept all existing targets	*/
 	unsigned char	alias;		/* enable directory aliasing	*/
@@ -806,9 +819,10 @@ struct state				/* program state		*/
 	int		tolerance;	/* time comparison tolerance	*/
 	int		unwind;		/* make() dontcare unwind level	*/
 
-	unsigned long	questionable;	/* questionable code enable bits*/
-	unsigned long	test;		/* test code enable bits	*/
-	unsigned long	start;		/* start time of this make	*/
+	Flags_t		questionable;	/* questionable code enable bits*/
+	Flags_t		test;		/* test code enable bits	*/
+
+	Time_t		start;		/* start time of this make	*/
 
 	char*		corrupt;	/* corrupt state file action	*/
 	char*		errorid;	/* error message id		*/
@@ -828,54 +842,54 @@ struct state				/* program state		*/
 
 	char**		argv;		/* global argv			*/
 
-	struct dir*	archive;	/* .SCAN archive		*/
+	Dir_t*		archive;	/* .SCAN archive		*/
 
 	Sfio_t*		context;	/* localview() target context	*/
 
-	struct frame*	frame;		/* current target frame		*/
+	Frame_t*	frame;		/* current target frame		*/
 
 #if BINDINDEX
-	struct binding	source[MAXBIND+1];/* source bind table		*/
+	Binding_t	source[MAXBIND+1];/* source bind table		*/
 	int		maxsource;	/* max source bind index	*/
 #endif
-	struct binding	view[MAXVIEW+1];/* view bind table		*/
+	Binding_t	view[MAXVIEW+1];/* view bind table		*/
 	unsigned int	maxview;	/* max view bind index		*/
 
 	int (*compnew)(const char*, char*, void*); /* new compile rule	*/
 	void*		comparg;	/* compnew handle		*/
 
-	struct label	resume;		/* if interpreter!=0		*/
+	Label_t		resume;		/* if interpreter!=0		*/
 
-	struct mam	mam;		/* mam state			*/
+	Mam_t		mam;		/* mam state			*/
 
 	Coshell_t*	coshell;	/* coshell handle		*/
 
 	Sfio_t*		io[11];		/* print/read streams		*/
-};
+} State_t;
 
-struct var				/* variable			*/
+typedef struct Var_s			/* variable			*/
 {
 	char*		name;		/* name				*/
 	char*		value;		/* value			*/
-	long		property;	/* static and dynamic		*/
-	long		length;		/* maximum length of value	*/
+	Flags_t		property;	/* static and dynamic		*/
+	size_t		length;		/* maximum length of value	*/
 	char*		(*builtin)(char**);	/* builtin function	*/
-};
+} Var_t;
 
-struct list				/* rule cons cell		*/
+struct List_s				/* rule cons cell		*/
 {
-	struct list*	next;		/* next in list			*/
-	struct rule*	rule;		/* list item			*/
+	List_t*		next;		/* next in list			*/
+	Rule_t*		rule;		/* list item			*/
 };
 
 /*
  * make globals
  */
 
-extern struct external	external;	/* external engine names	*/
-extern struct internal	internal;	/* internal rule and list info	*/
-extern struct state	state;		/* engine state			*/
-extern struct tables	table;		/* hash table pointers		*/
+extern External_t	external;	/* external engine names	*/
+extern Internal_t	internal;	/* internal rule and list info	*/
+extern State_t		state;		/* engine state			*/
+extern Tables_t		table;		/* hash table pointers		*/
 
 extern char		null[];		/* null string			*/
 extern char		tmpname[];	/* temporary name buffer	*/
@@ -891,44 +905,43 @@ extern char*		version;	/* program version stamp	*/
  * make routines
  */
 
-extern struct file*	addfile(struct dir*, char*, unsigned long);
-extern void		addprereq(struct rule*, struct rule*, int);
-extern struct list*	append(struct list*, struct list*);
-extern int		apply(struct rule*, char*, char*, char*, unsigned long);
+extern File_t*		addfile(Dir_t*, char*, Time_t);
+extern void		addprereq(Rule_t*, Rule_t*, int);
+extern List_t*		append(List_t*, List_t*);
+extern int		apply(Rule_t*, char*, char*, char*, Flags_t);
 extern void		argcount(void);
-extern void		arscan(struct rule*);
+extern void		arscan(Rule_t*);
 extern void		artouch(char*, char*);
 extern char*		arupdate(char*);
-extern struct rule*	associate(struct rule*, struct rule*, char*, struct list**);
-extern struct var*	auxiliary(char*, int);
-extern struct rule*	bind(struct rule*);
-extern void		bindattribute(struct rule*);
-extern struct rule*	bindfile(struct rule*, char*, int);
-extern struct rule*	bindstate(struct rule*, char*);
+extern Rule_t*		associate(Rule_t*, Rule_t*, char*, List_t**);
+extern Var_t*		auxiliary(char*, int);
+extern Rule_t*		bind(Rule_t*);
+extern void		bindattribute(Rule_t*);
+extern Rule_t*		bindfile(Rule_t*, char*, int);
+extern Rule_t*		bindstate(Rule_t*, char*);
 extern int		block(int);
 extern void		candidates(void);
-extern char*		call(struct rule*, char*);
-extern struct rule*	catrule(char*, char*, char*, int);
-extern int		cmptime(unsigned long, unsigned long);
+extern char*		call(Rule_t*, char*);
+extern Rule_t*		catrule(char*, char*, char*, int);
 extern char*		colonlist(Sfio_t*, char*, int, int);
 extern void		compile(char*, char*);
-extern int		complete(struct rule*, struct list*, unsigned long*, long);
-extern void		compref(int, const char*, unsigned long);
-extern struct list*	cons(struct rule*, struct list*);
-extern void		dirscan(struct rule*);
+extern int		complete(Rule_t*, List_t*, Time_t*, Flags_t);
+extern void		compref(int, const char*, Time_t);
+extern List_t*		cons(Rule_t*, List_t*);
+extern void		dirscan(Rule_t*);
 extern void		drop(void);
 extern void		dump(Sfio_t*, int);
 extern void		dumpaction(Sfio_t*, const char*, char*, const char*);
 extern void		dumpjobs(int);
 extern void		dumpregress(Sfio_t*, const char*, const char*, char*);
-extern void		dumprule(Sfio_t*, struct rule*);
-extern void		dumpvar(Sfio_t*, struct var*);
-extern void		dynamic(struct rule*);
+extern void		dumprule(Sfio_t*, Rule_t*);
+extern void		dumpvar(Sfio_t*, Var_t*);
+extern void		dynamic(Rule_t*);
 extern void		edit(Sfio_t*, char*, char*, char*, char*);
 extern void		expand(Sfio_t*, char*);
 extern void		explain(int, ...);
 extern long		expr(Sfio_t*, char*);
-extern Sfio_t*		fapply(struct rule*, char*, char*, char*, unsigned long);
+extern Sfio_t*		fapply(Rule_t*, char*, char*, char*, Flags_t);
 extern void		finish(int);
 extern int		forcescan(const char*, char* v, void*);
 extern char*		getarg(char**, int*);
@@ -936,8 +949,9 @@ extern void		getop(Sfio_t*, char*, int);
 extern char*		getval(char*, int);
 extern char**		globv(glob_t*, char*);
 extern int		handle(void);
-extern int		hasattribute(struct rule*, struct rule*, struct rule*);
-extern void		immediate(struct rule*);
+extern int		hasattribute(Rule_t*, Rule_t*, Rule_t*);
+extern int		hasafter(Rule_t*, Flags_t);
+extern void		immediate(Rule_t*);
 extern void		initcode(void);
 extern void		inithash(void);
 extern void		initrule(void);
@@ -948,45 +962,44 @@ extern void		initwakeup(int);
 extern void		interpreter(char*);
 extern int		isoption(const char*);
 extern int		nametype(const char*, char**);
-extern struct list*	joint(struct rule*);
-extern struct list*	listcopy(struct list*);
+extern List_t*		joint(Rule_t*);
+extern List_t*		listcopy(List_t*);
 extern void		listops(Sfio_t*, int);
 extern int		load(Sfio_t*, const char*, int);
-extern int		loadable(Sfio_t*, struct rule*, int);
-extern void		localvar(Sfio_t*, struct var*, char*, int);
-extern char*		localview(struct rule*);
+extern int		loadable(Sfio_t*, Rule_t*, int);
+extern void		localvar(Sfio_t*, Var_t*, char*, int);
+extern char*		localview(Rule_t*);
 extern void		lockstate(int);
-extern int		make(struct rule*, unsigned long*, char*, long);
-extern int		makeafter(struct rule*);
-extern int		makebefore(struct rule*);
-extern struct rule*	makerule(char*);
-extern void		maketop(struct rule*, int, char*);
+extern int		make(Rule_t*, Time_t*, char*, Flags_t);
+extern int		makeafter(Rule_t*, Flags_t);
+extern int		makebefore(Rule_t*);
+extern Rule_t*		makerule(char*);
+extern void		maketop(Rule_t*, int, char*);
 extern char*		mamcanon(char*);
 extern ssize_t		mamerror(int, const void*, size_t);
-extern char*		mamname(struct rule*);
-extern void		mampop(Sfio_t*, struct rule*, long);
-extern int		mampush(Sfio_t*, struct rule*, long);
-extern Sfio_t*		mamout(struct rule*);
-extern char*		maprule(char*, struct rule*);
-extern void		merge(struct rule*, struct rule*, int);
-extern void		mergestate(struct rule*, struct rule*);
-extern void		metaclose(struct rule*, struct rule*, int);
+extern char*		mamname(Rule_t*);
+extern void		mampop(Sfio_t*, Rule_t*, Flags_t);
+extern int		mampush(Sfio_t*, Rule_t*, Flags_t);
+extern Sfio_t*		mamout(Rule_t*);
+extern char*		maprule(char*, Rule_t*);
+extern void		merge(Rule_t*, Rule_t*, int);
+extern void		mergestate(Rule_t*, Rule_t*);
+extern void		metaclose(Rule_t*, Rule_t*, int);
 extern void		metaexpand(Sfio_t*, char*, char*);
-extern struct rule*	metaget(struct rule*, struct list*, char*, struct rule**);
-extern struct rule*	metainfo(int, char*, char*, int);
+extern Rule_t*		metaget(Rule_t*, List_t*, char*, Rule_t**);
+extern Rule_t*		metainfo(int, char*, char*, int);
 extern int		metamatch(char*, char*, char*);
-extern struct rule*	metarule(char*, char*, int);
-extern void		negate(struct rule*, struct rule*);
+extern Rule_t*		metarule(char*, char*, int);
+extern void		negate(Rule_t*, Rule_t*);
 extern void*		newchunk(char**, size_t);
-extern void		newfile(struct rule*, char*, unsigned long);
-extern unsigned long	numtime(unsigned long);
+extern void		newfile(Rule_t*, char*, Time_t);
 extern char*		objectfile(void);
-extern void		parentage(Sfio_t*, struct rule*, char*);
+extern void		parentage(Sfio_t*, Rule_t*, char*);
 extern int		parse(Sfio_t*, char*, char*, Sfio_t*);
 extern char*		parsefile(void);
-extern char*		pathname(char*, struct rule*);
+extern char*		pathname(char*, Rule_t*);
 extern void		poplocal(void*);
-extern int		prereqchange(struct rule*, struct list*, struct rule*, struct list*);
+extern int		prereqchange(Rule_t*, List_t*, Rule_t*, List_t*);
 extern void		punt(int);
 extern void*		pushlocal(void);
 extern void		readcheck(void);
@@ -994,30 +1007,33 @@ extern void		readclear(void);
 extern void		readenv(void);
 extern int		readfile(char*, int, char*);
 extern void		readstate(void);
-extern void		rebind(struct rule*, int);
-extern void		remdup(struct list*);
+extern void		rebind(Rule_t*, int);
+extern void		remdup(List_t*);
 extern void		remtmp(int);
 extern int		resolve(char*, int, int);
-extern int		rstat(char*, struct stat*, int);
+extern int		rstat(char*, Stat_t*, int);
 extern void		rules(char*);
-extern struct rule*	rulestate(struct rule*, int);
+extern Rule_t*		rulestate(Rule_t*, int);
 extern void		savestate(void);
-extern struct list*	scan(struct rule*, unsigned long*);
+extern List_t*		scan(Rule_t*, Time_t*);
 extern int		scanargs(int, char**, int*);
 extern int		set(char*, int, Sfio_t*);
-extern struct var*	setvar(char*, char*, int);
+extern Var_t*		setvar(char*, char*, int);
 extern void		shquote(Sfio_t*, char*);
-extern struct rule*	source(struct rule*);
-extern int		special(struct rule*);
+extern Rule_t*		source(Rule_t*);
+extern int		special(Rule_t*);
 extern char*		statefile(void);
-extern struct rule*	staterule(int, struct rule*, char*, int);
-extern unsigned long	statetime(struct rule*, int);
+extern Rule_t*		staterule(int, Rule_t*, char*, int);
+extern Time_t		statetime(Rule_t*, int);
+extern int		statetimeq(Rule_t*, Rule_t*);
 extern int		strprintf(Sfio_t*, const char*, char*, int, int);
-extern char*		strtime(unsigned long);
 extern void		terminate(void);
-extern void		trigger(struct rule*, struct rule*, char*, unsigned long);
+extern char*		timefmt(const char*, Time_t);
+extern Time_t		timenum(const char*, char**);
+extern char*		timestr(Time_t);
+extern void		trigger(Rule_t*, Rule_t*, char*, Flags_t);
 extern int		unbind(const char*, char*, void*);
-extern struct dir*	unique(struct rule*);
+extern Dir_t*		unique(Rule_t*);
 extern void		unparse(int);
-extern struct var*	varstate(struct rule*, int);
-extern void		wakeup(unsigned long, struct list*);
+extern Var_t*		varstate(Rule_t*, int);
+extern void		wakeup(Seconds_t, List_t*);

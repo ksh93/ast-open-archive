@@ -1,3 +1,6 @@
+05-01-11 ppargs.c: fix -I-S docs
+	 ppinput.c: ppproto() only for COMPATIBILITY or PLUSPLUS
+04-10-22 ppproto.c: handle `type var[x][y]' arg prototype
 04-10-01 pplex.c: really fix directive hidden newline logic
 04-08-31 pplex.c: fix directive hidden newline logic
 	 ppcall.c: fix '(' peek bug that missed the MARK

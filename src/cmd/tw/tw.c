@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2004 AT&T Corp.                  *
+*                  Copyright (c) 1989-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -31,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2003-09-23 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2004-12-24 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -39,7 +37,10 @@ USAGE_LICENSE
 "	If \acmd arg ...\a is specified then the pathnames are collected"
 "	and appended to the end of the \aarg\alist and \acmd\a is executed"
 "	by the equivalent of \bexecvp\b(2). \acmd\a will be executed 0 or more"
-"	times, depending the number of generated pathname arguments.]"
+"	times, depending the number of generated pathname arguments. If"
+"	\b--ignore-errors\b is not specified then the first \acmd\a execution"
+"	that returns non-zero exit status causes \btw\b terminate and exit"
+"	with non-zero exit status.]"
 "[+?If the last option is \b-\b and \b--fast\b was not specified then the"
 "	pathnames are read, one per line, from the standard input, the"
 "	\b--directory\b options are ignored, and the directory tree is not"
@@ -326,7 +327,8 @@ act(register Ftw_t* ftw, int op)
 	switch (op)
 	{
 	case ACT_CMDARG:
-		cmdarg(state.cmd, ftw->path, ftw->pathlen);
+		if (cmdarg(state.cmd, ftw->path, ftw->pathlen) && !state.ignore)
+			exit(1);
 		break;
 	case ACT_CODE:
 		if (findwrite(state.find, ftw->path, ftw->pathlen, (ftw->info & FTW_D) ? "system/dir" : (char*)0))
@@ -745,7 +747,8 @@ main(int argc, register char** argv)
 				switch (n)
 				{
 				case ACT_CMDARG:
-					cmdarg(state.cmd, s, strlen(s));
+					if (cmdarg(state.cmd, s, strlen(s)) && !state.ignore)
+						exit(1);
 					break;
 				case ACT_LIST:
 					sfputr(sfstdout, s, '\n');
@@ -773,10 +776,10 @@ main(int argc, register char** argv)
 					len = sfvalue(sfstdin);
 				else
 					break;
-				if (n)
-					cmdarg(state.cmd, s, len);
-				else
+				if (!n)
 					ftwalk(s, tw, state.ftwflags, NiL);
+				else if (cmdarg(state.cmd, s, len) && !state.ignore)
+					exit(1);
 			}
 			if (sferror(sfstdin))
 				error(ERROR_SYSTEM|2, "input read error");
@@ -791,8 +794,8 @@ main(int argc, register char** argv)
 			*ap = 0;
 			ftwalk((char*)av, tw, state.ftwflags|FTW_MULTIPLE, state.sort);
 		}
-		if (state.cmd)
-			cmdflush(state.cmd);
+		if (state.cmd && cmdflush(state.cmd) && !state.ignore)
+			exit(1);
 		if (state.find && (findclose(state.find) || state.finderror))
 			exit(2);
 	}

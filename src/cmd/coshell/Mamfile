@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make coshell.svc
 make main.o
@@ -48,10 +48,11 @@ done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${INSTALLROOT}/include/ast/prototyped.h dontcare
 done ${INSTALLROOT}/include/ast/namval.h
 make service.h implicit
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-make ${INSTALLROOT}/include/ast/sfio.h implicit
-make ${INSTALLROOT}/include/ast/sfio_s.h implicit
-done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+make ${INSTALLROOT}/include/ast/wait.h implicit
+make ${INSTALLROOT}/include/ast/ast_wait.h implicit
+done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
 make ${INSTALLROOT}/include/ast/ast_common.h implicit
 done ${INSTALLROOT}/include/ast/ast_common.h dontcare
 make ${INSTALLROOT}/include/ast/ast_std.h implicit
@@ -87,7 +88,8 @@ make ${INSTALLROOT}/include/ast/ast_map.h implicit
 done ${INSTALLROOT}/include/ast/ast_map.h dontcare
 make ${INSTALLROOT}/include/ast/stdio.h implicit
 make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
-prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
+make ${INSTALLROOT}/include/ast/sfio_s.h implicit
+done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
 done ${INSTALLROOT}/include/ast/stdio.h dontcare
@@ -104,18 +106,12 @@ done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast_std.h dontcare
-done ${INSTALLROOT}/include/ast/sfio.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h
-make ${INSTALLROOT}/include/ast/wait.h implicit
-make ${INSTALLROOT}/include/ast/ast_wait.h implicit
-done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
-make ${INSTALLROOT}/include/ast/ast.h implicit
-make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 make ${INSTALLROOT}/include/ast/ast_version.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit

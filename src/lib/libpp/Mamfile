@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ppsym
 make ppsym.o
@@ -196,7 +196,7 @@ exec - chmod u+w,+x gentab
 done gentab generated
 make pp.tab
 done pp.tab
-exec - gentab -d pp.tab > ppdef.h
+exec - ${INSTALLROOT}/src/lib/libpp/gentab -d pp.tab > ppdef.h
 done ppdef.h dontcare generated
 make pp.h implicit
 make ${INSTALLROOT}/include/ast/ccode.h implicit
@@ -227,14 +227,10 @@ done pplib.h
 done ppargs.c
 meta ppargs.o %.c>%.o ppargs.c ppargs
 prev ppargs.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?libpp]"\" -c ppargs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpp]"\" -c ppargs.c
 done ppargs.o generated
 make ppbuiltin.o
 make ppbuiltin.c
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h
 make ${INSTALLROOT}/include/ast/times.h implicit
 make ${INSTALLROOT}/include/ast/ast_time.h implicit
 done ${INSTALLROOT}/include/ast/ast_time.h dontcare
@@ -253,7 +249,7 @@ prev pplib.h implicit
 done ppcall.c
 meta ppcall.o %.c>%.o ppcall.c ppcall
 prev ppcall.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ppcall.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ppcall.c
 done ppcall.o generated
 make ppcomment.o
 make ppcomment.c
@@ -300,7 +296,7 @@ done pplex.c
 done ppcpp.c
 meta ppcpp.o %.c>%.o ppcpp.c ppcpp
 prev ppcpp.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ppcpp.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ppcpp.c
 done ppcpp.o generated
 make ppdata.o
 make ppdata.c
@@ -334,7 +330,7 @@ prev pplib.h implicit
 done ppfsm.c
 meta ppfsm.o %.c>%.o ppfsm.c ppfsm
 prev ppfsm.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ppfsm.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ppfsm.c
 done ppfsm.o generated
 make ppincref.o
 make ppincref.c
@@ -349,7 +345,6 @@ make ppinput.c
 make ../../lib/libast/path/pathnative.c implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/path/pathnative.c
-prev ${INSTALLROOT}/include/ast/sfstr.h implicit
 prev pplib.h implicit
 done ppinput.c
 meta ppinput.o %.c>%.o ppinput.c ppinput
@@ -369,7 +364,7 @@ make pplex.o
 prev pplex.c
 meta pplex.o %.c>%.o pplex.c pplex
 prev pplex.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c pplex.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c pplex.c
 done pplex.o generated
 make ppline.o
 make ppline.c
@@ -399,12 +394,11 @@ make ppop.o
 make ppop.c
 make ${INSTALLROOT}/include/ast/preroot.h implicit
 done ${INSTALLROOT}/include/ast/preroot.h
-prev ${INSTALLROOT}/include/ast/sfstr.h implicit
 prev ${INSTALLROOT}/include/ast/ls.h implicit
 make pptab.h implicit
 prev gentab
 prev pp.tab
-exec - gentab -t pp.tab > pptab.h
+exec - ${INSTALLROOT}/src/lib/libpp/gentab -t pp.tab > pptab.h
 done pptab.h generated
 prev pplib.h implicit
 done ppop.c
@@ -431,13 +425,13 @@ done ppprintf.o generated
 make ppproto.o
 make ppproto.c
 make ../libast/port/astlicense.c implicit
-make ${INSTALLROOT}/include/ast/hashkey.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/hashkey.h dontcare
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../libast/port/astlicense.c dontcare
 prev ppfsm.h implicit
 prev pplib.h implicit
+make ${INSTALLROOT}/include/ast/hashkey.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/hashkey.h dontcare
 prev ppfsm.c implicit
 done ppproto.c
 meta ppproto.o %.c>%.o ppproto.c ppproto
@@ -605,7 +599,7 @@ done ${INSTALLROOT}/include/ast generated
 make ${INSTALLROOT}/include/ast/pp.h
 prev ${INSTALLROOT}/include/ast
 prev pp.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  pp.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  pp.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/pp.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/pp.h
@@ -613,7 +607,7 @@ exec - fi
 done ${INSTALLROOT}/include/ast/pp.h generated
 make ${INSTALLROOT}/include/ast/ppkey.h
 prev ppkey.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  ppkey.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  ppkey.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/ppkey.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/ppkey.h

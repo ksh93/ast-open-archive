@@ -9,4 +9,4 @@ vdelta 2.0 :LIBRARY: vdelta.3 vdelta.h vdelhdr.h \
 		vdelta01.h vdelhdr01.h \
 		vddelta01.c vdio01.c vdupdate01.c
 
-$(INCLUDEDIR) :INSTALLDIR: vdelta.h
+$(INCLUDEDIR) :INSTALLPROTO: vdelta.h

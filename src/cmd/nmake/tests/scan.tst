@@ -69,7 +69,7 @@ main(){}'
 	EXEC
 		ERROR -
 
-	DO touch x.eh
+	DO	touch x.eh
 
 	EXEC
 
@@ -153,7 +153,7 @@ TEST 07 'USAGE state variable scan'
 
 	EXEC	-n
 		INPUT Makefile $'LICENSEFILE = regress.lic
-USAGE == "$(LICENSEFILE:T=F:P=W=type=usage,$(LICENSE))"
+USAGE == "$(LICENSEFILE:T=F:P=W=type=usage,$(LICENSE):/1999-..../1999-2004/)"
 t :: t.c LICENSE=since=1999,author=bu'
 		INPUT regress.lic $'message_set=3
 contributor=(
@@ -314,8 +314,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -601,16 +601,16 @@ STATE=1
 echo $STATE
 : include c.sh'
 
-	EXEC	--silent --regress STATE=2
+	EXEC	--silent STATE=2
 		OUTPUT x $': include a.sh b.sh
 STATE=2
 : include a.sh b.sh
 echo $STATE
 : include c.sh'
 
-	EXEC	--silent --regress STATE=2
+	EXEC	--silent STATE=2
 
-	EXEC	--silent --regress
+	EXEC	--silent
 		OUTPUT x $': include a.sh b.sh
 STATE=1
 : include a.sh b.sh

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2004 AT&T Corp.                  *
+*                  Copyright (c) 1998-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -28,7 +26,6 @@
 #include "pzlib.h"
 
 #include <cdt.h>
-#include <sfstr.h>
 
 struct Deflate_s;
 struct Inflate_s;
@@ -220,10 +217,10 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 		{
 			error_info.file = ip->name;
 			error_info.line = n;
-			sfstrset(ip->sp, 0);
+			sfstrseek(ip->sp, 0, SEEK_SET);
 			if (!pzpartset(dp->pz, ip->part))
 				goto bad;
-			sfstrtmp(state.buf, SF_READ, sfstrbase(ip->sp), n);
+			sfstrbuf(state.buf, sfstrbase(ip->sp), n, 0);
 			dp->pz->io = state.buf;
 			if (pzdeflate(dp->pz, op))
 				goto bad;
@@ -237,7 +234,7 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 	for (ip = (Id_t*)dtfirst(dp->sqs); ip; ip = (Id_t*)dtnext(dp->sqs, ip))
 		if (n = sfstrtell(ip->sp))
 		{
-			sfstrset(ip->sp, 0);
+			sfstrseek(ip->sp, 0, SEEK_SET);
 			if (sfwrite(op, sfstrbase(ip->sp), n) != n || sfsync(op))
 			{
 				error_info.file = ip->name;
@@ -258,7 +255,7 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 
 	sfputu(dp->xp, 0);
 	n = sfstrtell(dp->xp);
-	sfstrset(dp->xp, 0);
+	sfstrseek(dp->xp, 0, SEEK_SET);
 	if (sfwrite(op, sfstrbase(dp->xp), n) != n)
 	{
 		if (dp->pz->disc->errorf)
@@ -596,7 +593,7 @@ inflate(Pz_t* pz, Sfio_t* op)
 		for (i = 0; i < parts; i++)
 			if (tab[i]->use)
 			{
-				sfstrtmp(state.buf, SF_WRITE, tab[i]->bp, tab[i]->size);
+				sfstrbuf(state.buf, tab[i]->bp, tab[i]->size, 0);
 				if (!pzpartset(pz, tab[i]->part))
 					goto bad;
 				if (pzinflate(pz, state.buf))

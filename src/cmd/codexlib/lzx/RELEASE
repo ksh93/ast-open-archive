@@ -1,3 +1,0 @@
-04-01-22 handle catenation sync (from cabinet < 32768 block)
-04-01-20 relocate() works -- what a hack
-04-01-19 first release

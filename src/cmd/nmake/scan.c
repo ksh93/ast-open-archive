@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -56,9 +54,11 @@
 #define SCANARGS		2	/* max number % arg matches	*/
 #define SCANBUFFER		4096	/* scan buffer size		*/
 
-typedef unsigned short scanstate;
+typedef unsigned short Scanstate_t;
 
-struct action				/* state action			*/
+struct Quote_s; typedef struct Quote_s Quote_t;
+
+typedef struct Action_s			/* state action			*/
 {
 	short		type;		/* action type id		*/
 	short		flags;		/* SCAN_* flags			*/
@@ -77,30 +77,30 @@ struct action				/* state action			*/
 	}		property;	/* properties			*/
 	int		attrprop;	/* attribute|property mods	*/
 	int		scan;		/* scan index			*/
-};
+} Action_t;
 
-struct quote				/* quote/comment match info	*/
+struct Quote_s				/* quote/comment match info	*/
 {
-	struct quote*	next;		/* next in list			*/
+	Quote_t*	next;		/* next in list			*/
 	char*		begin;		/* begin pattern		*/
 	char*		end;		/* end pattern			*/
 	int		escape;		/* end escape char		*/
 	int		flags;		/* QUOTE_* flags		*/
 };
 
-struct scan				/* scan info			*/
+typedef struct Scan_s			/* scan info			*/
 {
 	unsigned char	type[UCHAR_MAX];/* SCAN_* types indexed by char	*/
 	int		flags;		/* SCAN_* flags			*/
 	char*		external;	/* external scan		*/
-	struct action*	before;		/* do this before scanexec	*/
-	struct action*	after;		/* do this after scanexec	*/
-	struct quote*	quote;		/* quote patterns		*/
-	struct action*	action;		/* action table			*/
-	struct action*	classid;	/* classid action		*/
-	scanstate*	state;		/* state transition table	*/
+	Action_t*	before;		/* do this before scanexec	*/
+	Action_t*	after;		/* do this after scanexec	*/
+	Quote_t*	quote;		/* quote patterns		*/
+	Action_t*	action;		/* action table			*/
+	Action_t*	classid;	/* classid action		*/
+	Scanstate_t*	state;		/* state transition table	*/
 	void*		data;		/* private data			*/
-};
+} Scan_t;
 
 /*
  * default scan strategies
@@ -113,7 +113,7 @@ static Namval_t		scantab[] =
 	".STATE",	SCAN_STATE,
 };
 
-static struct scan*	strategy[SCAN_MAX+1];
+static Scan_t*		strategy[SCAN_MAX+1];
 
 /*
  * initialize the scan atoms
@@ -123,7 +123,7 @@ void
 initscan(int repeat)
 {
 	register int		i;
-	register struct rule*	r;
+	register Rule_t*	r;
 
 	if (!repeat)
 		for (i = 0; i < elementsof(scantab); i++)
@@ -164,13 +164,13 @@ scansort(register const char* a, register const char* b)
  * next state pointer returned
  */
 
-static scanstate*
-scanbranch(scanstate* u, struct action* action, struct action* first, struct action* last, register int i)
+static Scanstate_t*
+scanbranch(Scanstate_t* u, Action_t* action, Action_t* first, Action_t* last, register int i)
 {
-	register struct action*	a;
-	struct action*		b;
-	struct action*		m;
-	scanstate*		v;
+	register Action_t*	a;
+	Action_t*		b;
+	Action_t*		m;
+	Scanstate_t*		v;
 
 	for (a = first; a <= last; a++)
 	{
@@ -241,13 +241,13 @@ scanbranch(scanstate* u, struct action* action, struct action* first, struct act
  */
 
 static void
-scanaction(struct action* a, register char* s)
+scanaction(Action_t* a, register char* s)
 {
 	register int	c;
 	register int	t;
 	register char*	v;
 	register char*	n;
-	struct rule*	u;
+	Rule_t*		u;
 	unsigned long	m;
 
 	if (c = *s++)
@@ -351,12 +351,12 @@ scanaction(struct action* a, register char* s)
  * compile scan description in r and return scan pointer
  */
 
-static struct scan*
-scancompile(struct rule* r, int flags)
+static Scan_t*
+scancompile(Rule_t* r, int flags)
 {
 	register char*		s;
-	register struct scan*	ss;
-	register struct quote*	q;
+	register Scan_t*	ss;
+	register Quote_t*	q;
 	register int		c;
 	int			i;
 	int			t;
@@ -368,12 +368,12 @@ scancompile(struct rule* r, int flags)
 	char*			y;
 	char*			x[128];
 	char**			p;
-	struct action*		a;
+	Action_t*		a;
 	Sfio_t*			tmp;
 
 	z = 0;
 	p = x;
-	ss = newof(0, struct scan, 1, 0);
+	ss = newof(0, Scan_t, 1, 0);
 	ss->flags = flags;
 	tmp = sfstropen();
 	expand(tmp, r->action);
@@ -392,7 +392,7 @@ scancompile(struct rule* r, int flags)
 		case 0:
 			break;
 		case 'C':
-			ss->classid = newof(0, struct action, 1, 0);
+			ss->classid = newof(0, Action_t, 1, 0);
 			scanaction(ss->classid, s);
 			ss->data = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_name, r->name, 0);
 			break;
@@ -414,7 +414,7 @@ scancompile(struct rule* r, int flags)
 			}
 			break;
 		case 'F':
-			ss->after = newof(0, struct action, 1, 0);
+			ss->after = newof(0, Action_t, 1, 0);
 			scanaction(ss->after, s);
 			break;
 		case 'O':
@@ -446,7 +446,7 @@ scancompile(struct rule* r, int flags)
 		case 'Q':
 			if (c = *s++)
 			{
-				q = newof(0, struct quote, 1, 0);
+				q = newof(0, Quote_t, 1, 0);
 				q->next = ss->quote;
 				ss->quote = q;
 				q->end = null;
@@ -516,7 +516,7 @@ scancompile(struct rule* r, int flags)
 			}
 			break;
 		case 'S':
-			ss->before = newof(0, struct action, 1, 0);
+			ss->before = newof(0, Action_t, 1, 0);
 			scanaction(ss->before, s);
 			break;
 		case 'X':
@@ -536,8 +536,8 @@ scancompile(struct rule* r, int flags)
 	} while (s = n);
 	if (p > x)
 	{
-		ss->action = a = newof(0, struct action, p - x + 1, 0);
-		ss->state = newof(0, scanstate, z * 4, 0);
+		ss->action = a = newof(0, Action_t, p - x + 1, 0);
+		ss->state = newof(0, Scanstate_t, z * 4, 0);
 		z = p - x;
 		strsort(x, z, scansort);
 		*p = 0;
@@ -621,7 +621,7 @@ scancompile(struct rule* r, int flags)
  */
 
 static unsigned char*
-scanquote(int fd, unsigned char* buf, unsigned char** p, register unsigned char* g, struct quote* q, int flags)
+scanquote(int fd, unsigned char* buf, unsigned char** p, register unsigned char* g, Quote_t* q, int flags)
 {
 	register int		c;
 	register unsigned char*	t;
@@ -745,15 +745,15 @@ scanquote(int fd, unsigned char* buf, unsigned char** p, register unsigned char*
  * parameter definition
  */
 
-static struct list*
-scandefine(register char* s, struct list* p)
+static List_t*
+scandefine(register char* s, List_t* p)
 {
 	register char*	t;
 	char*		b;
 	char*		z;
 	int		c;
-	struct rule*	u;
-	struct var*	v;
+	Rule_t*		u;
+	Var_t*		v;
 	Sfio_t*		tmp;
 
 	while (isspace(*s))
@@ -818,8 +818,8 @@ scandefine(register char* s, struct list* p)
  */
 
 /*ARGSUSED*/
-static struct list*
-scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
+static List_t*
+scanmacro(int fd, Rule_t* r, Scan_t* ss, register List_t* p)
 {
 	register int		c;
 	register int		inquote;
@@ -832,8 +832,8 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
 	int			t;
 	Sfio_t*			fp;
 	Sfio_t*			tmp;
-	struct rule*		u;
-	struct var*		v;
+	Rule_t*			u;
+	Var_t*			v;
 
 	if (!(fp = sfnew(NiL, NiL, SF_UNBOUND, fd, SF_READ)))
 	{
@@ -848,7 +848,7 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
 		case ')':
 			if (!inquote)
 			{
-				sfstrset(tmp, 0);
+				sfstrseek(tmp, 0, SEEK_SET);
 				if (paren-- == ifparen)
 					ifparen = 0;
 			}
@@ -860,14 +860,14 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
 			if (inquote == c)
 			{
 				inquote = 0;
-				sfstrset(tmp, 0);
+				sfstrseek(tmp, 0, SEEK_SET);
 			}
 			else if (!inquote && c != '\n')
 				inquote = c == '#' ? '\n' : c;
 			break;
 
 		case '\\':
-			sfstrset(tmp, 0);
+			sfstrseek(tmp, 0, SEEK_SET);
 			sfgetc(fp);
 			break;
 
@@ -929,7 +929,7 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
 		{
 			if (!strcmp(w, "include"))
 			{
-				sfstrset(tmp, 0);
+				sfstrseek(tmp, 0, SEEK_SET);
 				while ((c = sfgetc(fp)) != EOF && c != ')')
 					if (!isspace(c))
 						sfputc(tmp, c);
@@ -961,7 +961,7 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
 		{
 			do
 			{
-				sfstrset(tmp, 0);
+				sfstrseek(tmp, 0, SEEK_SET);
 				while ((c = sfgetc(fp)) != EOF && c != ')' && c != ',')
 					if (!isspace(c))
 						sfputc(tmp, c);
@@ -989,7 +989,7 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
 		}
 		else if ((r->property & P_parameter) && *w == 'd' && !strcmp(w, "define"))
 		{
-			sfstrset(tmp, 0);
+			sfstrseek(tmp, 0, SEEK_SET);
 			while ((c = sfgetc(fp)) != EOF && c != ',')
 				if (!isspace(c))
 					sfputc(tmp, c);
@@ -1043,14 +1043,14 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
  * b is beginning of the original line
  */
 
-static struct list*
-scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, char* s, int iflev, int split)
+static List_t*
+scanmatch(List_t* p, register Action_t* a, Rule_t* r, char* b, char* s, int iflev, int split)
 {
 	int		n;
 	char*		t;
 	char*		o;
-	struct rule*	u;
-	struct rule*	x;
+	Rule_t*		u;
+	Rule_t*		x;
 	Sfio_t*		tmp = 0;
 
 	static char	label[] = "X-scan-action";
@@ -1124,7 +1124,7 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 					u->property |= P_dontcare;
 				else if (!(u->property & P_target))
 					u->property &= ~P_dontcare;
-				x = (u->dynamic & D_alias) ? getrule(u->name) : (struct rule*)0;
+				x = (u->dynamic & D_alias) ? getrule(u->name) : (Rule_t*)0;
 				if (a->attrprop)
 				{
 					u->attribute &= ~a->attribute.clear;
@@ -1151,7 +1151,7 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 						{
 							char*		os;
 							char*		ns;
-							struct list*	q;
+							List_t*		q;
 
 							os = ns = internal.scan->name;
 							for (q = internal.scan->prereqs; q; q = q->next)
@@ -1175,7 +1175,7 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 	}
 	else
 	{
-		x = (r->dynamic & D_alias) ? getrule(r->name) : (struct rule*)0;
+		x = (r->dynamic & D_alias) ? getrule(r->name) : (Rule_t*)0;
 		if (a->attrprop)
 		{
 			r->attribute &= ~a->attribute.clear;
@@ -1198,7 +1198,7 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 
 #if DEBUG
 static char*
-opname(scanstate* s)
+opname(Scanstate_t* s)
 {
 	int		i;
 
@@ -1238,18 +1238,18 @@ opname(scanstate* s)
  * cons prereqs on p
  */
 
-static struct list*
-scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
+static List_t*
+scanexec(int fd, Rule_t* r, Scan_t* ss, List_t* p)
 {
 	register int		c;
 	register unsigned char*	g;
-	register scanstate*	s;
-	scanstate*		m;
+	register Scanstate_t*	s;
+	Scanstate_t*		m;
 	unsigned char*		pb;
 	unsigned char*		x;
 	unsigned char*		b;
-	scanstate*		rep;
-	scanstate*		per;
+	Scanstate_t*		rep;
+	Scanstate_t*		per;
 	char*			a;
 	Hash_table_t*		tab;
 	Hash_position_t*	pos;
@@ -1262,13 +1262,13 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 	int			h;
 	int			t;
 	int			typ;
-	struct frame		frame;
-	struct rule*		u;
-	struct var*		v;
+	Frame_t			frame;
+	Rule_t*			u;
+	Var_t*			v;
 	struct
 	{
 	int			arg;
-	scanstate*		state;
+	Scanstate_t*		state;
 	unsigned char*		buffer;
 	}			any[8], *pop;
 	unsigned char		buf[2 * SCANBUFFER + 1];
@@ -1494,10 +1494,12 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 			case 'A':
 				if (state.archive)
 				{
-					unsigned long	date;
+					Time_t	date;
 
-					if (!(date = strtol((char*)b + arg[1].begin, NiL, 10)))
-						date = tmdate((char*)b + arg[1].begin, NiL, NiL);
+					if (date = strtol((char*)b + arg[1].begin, NiL, 10))
+						date = tmxsns(date, 0);
+					else
+						date = tmxdate((char*)b + arg[1].begin, NiL, TMX_NOW);
 					addfile(state.archive, (char*)b + arg[0].begin, date);
 				}
 				else
@@ -1716,14 +1718,14 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
  * r must be bound to a file which is then scanned
  */
 
-struct list*
-scan(register struct rule* r, unsigned long* tm)
+List_t*
+scan(register Rule_t* r, Time_t* tm)
 {
-	register struct rule*	s;
-	register struct list*	oprereqs;
-	struct rule*		alt;
-	struct list*		p;
-	struct scan*		ss;
+	register Rule_t*	s;
+	register List_t*	oprereqs;
+	Rule_t*			alt;
+	List_t*			p;
+	Scan_t*			ss;
 	int			fd;
 
 	if (tm)
@@ -1782,7 +1784,7 @@ scan(register struct rule* r, unsigned long* tm)
 		{
 			message((-2, "scanning %s for prerequisites", r->name));
 			state.savestate = 1;
-			s->prereqs = scanexec(fd, r, ss, ss->before ? scanmatch(NiL, ss->before, r, null, null, 0, 1) : (struct list*)0);
+			s->prereqs = scanexec(fd, r, ss, ss->before ? scanmatch(NiL, ss->before, r, null, null, 0, 1) : (List_t*)0);
 			close(fd);
 		}
 	}

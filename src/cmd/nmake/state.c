@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -43,14 +41,16 @@
  * force<0 canon's name first
  */
 
-struct rule*
+Rule_t*
 catrule(register char* s1, register char* s2, register char* s3, int force)
 {
-	struct rule*	r;
+	Rule_t*		r;
 
 	sfputr(internal.nam, s1, *s2++);
-	if (*s2) sfputr(internal.nam, s2, s3 ? *s3++ : -1);
-	if (s3 && *s3) sfputr(internal.nam, s3, -1);
+	if (*s2)
+		sfputr(internal.nam, s2, s3 ? *s3++ : -1);
+	if (s3 && *s3)
+		sfputr(internal.nam, s3, -1);
 	s1 = sfstruse(internal.nam);
 	if (!(r = getrule(s1)) && force)
 	{
@@ -75,7 +75,7 @@ statefile(void)
 {
 	char*		dir;
 	Sfio_t*		sp;
-	struct stat	st;
+	Stat_t		st;
 
 	if (!state.statefile && state.makefile && state.writestate)
 	{
@@ -97,18 +97,20 @@ statefile(void)
  * NOTE: requires state.maxview>0 && 0<=view<=state.maxview
  */
 
-static struct rule*
-stateview(int op, char* name, register struct rule* s, register struct rule* r, int view, int accept, struct rule** pv)
+static Rule_t*
+stateview(int op, char* name, register Rule_t* s, register Rule_t* r, int view, int accept, Rule_t** pv)
 {
-	register struct rule*	v;
-	register struct list*	p;
+	register Rule_t*	v;
+	register List_t*	p;
 	Sfio_t*			fp;
 
-	if (pv) *pv = 0;
+	if (pv)
+		*pv = 0;
 	if (state.compile < COMPILED)
 	{
 #if DEBUG
-		if (state.test & 0x00000200) error(2, "STATEVIEW %d %s state file load delayed until after makefile read", view, name);
+		if (state.test & 0x00000200)
+			error(2, "STATEVIEW %d %s state file load delayed until after makefile read", view, name);
 #endif
 		return 0;
 	}
@@ -126,10 +128,11 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 				sfputr(tmp, name, 0);
 				n = sfstrtell(tmp);
 			}
-			else n = 0;
+			else
+				n = 0;
 			edit(tmp, statefile(), state.view[view].path, KEEP, KEEP);
 			sfputc(tmp, 0);
-			file = sfstrset(tmp, n);
+			file = sfstrseek(tmp, n, SEEK_SET);
 			if (fp = sfopen(NiL, file, "br"))
 			{
 				/*
@@ -141,12 +144,15 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 
 				state.stateview = view;
 				message((-2, "loading state view %d file %s", view, file));
-				if (load(fp, file, 0) > 0) state.view[view].flags |= BIND_EXISTS;
-				else if (state.corrupt && *state.corrupt == 'a' && !(state.view[0].flags & BIND_EXISTS)) state.accept = 1;
+				if (load(fp, file, 0) > 0)
+					state.view[view].flags |= BIND_EXISTS;
+				else if (state.corrupt && *state.corrupt == 'a' && !(state.view[0].flags & BIND_EXISTS))
+					state.accept = 1;
 				state.stateview = -1;
 				sfclose(fp);
 			}
-			if (n) strcpy(name, sfstrbase(tmp));
+			if (n)
+				strcpy(name, sfstrbase(tmp));
 			sfstrclose(tmp);
 		}
 		state.view[view].flags |= BIND_LOADED;
@@ -157,41 +163,56 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 		v = getrule(name);
 		unviewname(name);
 #if DEBUG
-		if (state.test & 0x00000200) error(2, "STATEVIEW %s [%s] test %d [%s] -> %s [%s]", name, s ? strtime(s->time) : "no rule", view, strtime(r->time), v ? v->name : null, v ? strtime(v->time) : "no rule");
+		if (state.test & 0x00000200)
+			error(2, "STATEVIEW %s [%s] test %d [%s] -> %s [%s]", name, s ? timestr(s->time) : "no rule", view, timestr(r->time), v ? v->name : null, v ? timestr(v->time) : "no rule");
 #endif
 		if (v)
 		{
-			if (pv) *pv = v;
-			if (s && (op == RULE && (s->event >= v->event && s->event || !v->time && (v->property & P_force)) || op == PREREQS && s->time >= v->time)) return s;
+			if (pv)
+				*pv = v;
+			if (s && (op == RULE && (s->event >= v->event && s->event || !v->time && (v->property & P_force)) || op == PREREQS && s->time >= v->time))
+				return s;
 			if (v->time == r->time || accept || r->view == view || (r->property & (P_state|P_use|P_virtual)) || state.believe && view >= (state.believe - 1))
 			{
 				if (r->property & P_state)
 				{
 					if (r->property & P_statevar)
 					{
-						if (r->statedata && (!v->statedata && *r->statedata || v->statedata && !streq(r->statedata, v->statedata) || r->time > v->time)) return 0;
+						if (r->statedata && (!v->statedata && *r->statedata || v->statedata && !streq(r->statedata, v->statedata) || r->time > v->time))
+							return 0;
 						s = r;
 						s->statedata = v->statedata;
-						if (v->property & P_parameter) s->property |= P_parameter;
+						if (v->property & P_parameter)
+							s->property |= P_parameter;
 					}
 				}
 				else
 				{
 					if (r->property & P_use)
 					{
-						if (r->action && (!v->action || !streq(r->action, v->action)) || !r->action && v->action) return 0;
+						if (r->action && (!v->action || !streq(r->action, v->action)) || !r->action && v->action)
+							return 0;
 						r->time = v->time;
 					}
-					if (!s) s = makerule(name);
+					if (!s)
+						s = makerule(name);
 				}
 				s->time = v->time;
 				s->attribute = v->attribute;
 				s->event = v->event;
 				s->action = v->action;
-				if (v->property & P_force) s->property |= P_force;
-				else s->property &= ~P_force;
-				if (v->dynamic & D_built) s->dynamic |= D_built;
-				else s->dynamic &= ~D_built;
+				if (v->property & P_force)
+					s->property |= P_force;
+				else
+					s->property &= ~P_force;
+				if (v->dynamic & D_built)
+					s->dynamic |= D_built;
+				else
+					s->dynamic &= ~D_built;
+				if (v->dynamic & D_lowres)
+					s->dynamic |= D_lowres;
+				else
+					s->dynamic &= ~D_lowres;
 				s->prereqs = listcopy(v->prereqs);
 				s->scan = v->scan;
 				for (p = s->prereqs; p; p = p->next)
@@ -208,7 +229,8 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 				if (state.test & 0x00000200)
 				{
 					error(2, "STATEVIEW %s accept %d", s->name, view);
-					if (state.test & 0x00000400) dumprule(sfstderr, s);
+					if (state.test & 0x00000400)
+						dumprule(sfstderr, s);
 				}
 #endif
 			}
@@ -223,19 +245,19 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
  * force<0 prevents a state bind
  */
 
-struct rule*
-staterule(int op, register struct rule* r, char* var, int force)
+Rule_t*
+staterule(int op, register Rule_t* r, char* var, int force)
 {
-	register struct rule*	s;
+	register Rule_t*	s;
 	register int		i;
 	char*			rul;
 	char*			nam;
-	struct rule*		v;
+	Rule_t*			v;
 	int			j;
 	int			k;
 	int			m;
 	int			nobind = force < 0;
-	viewvector*		b;
+	Flags_t*		b;
 
 	switch (op)
 	{
@@ -312,7 +334,7 @@ staterule(int op, register struct rule* r, char* var, int force)
 	{
 		b = &r->checked[op];
 		k = 0;
-		if (!tstbit(*b, i = (r->property & (P_statevar|P_use|P_virtual)) && state.targetview > 0 ? state.targetview : r->view) && (!s || !s->time || (r->property & P_statevar) || !(k = timeq(r->time, s->time))))
+		if (!tstbit(*b, i = (r->property & (P_statevar|P_use|P_virtual)) && state.targetview > 0 ? state.targetview : r->view) && (!s || !s->time || (r->property & P_statevar) || !(k = statetimeq(r, s))))
 		{
 			if (!(r->property & (P_statevar|P_use|P_virtual)) && !(r->dynamic & D_bound) && !(r->mark & M_bind) && (s && s->time || !s && state.compile >= COMPILED))
 			{
@@ -400,8 +422,8 @@ staterule(int op, register struct rule* r, char* var, int force)
  * force causes the non-state rule to be created
  */
 
-struct rule*
-rulestate(register struct rule* r, int force)
+Rule_t*
+rulestate(register Rule_t* r, int force)
 {
 	register char*		s;
 
@@ -409,7 +431,8 @@ rulestate(register struct rule* r, int force)
 	{
 		s = r->name;
 		while (*s && *s++ != ')');
-		if (!(r = getrule(s)) && force) r = makerule(s);
+		if (!(r = getrule(s)) && force)
+			r = makerule(s);
 	}
 	return r;
 }
@@ -419,12 +442,12 @@ rulestate(register struct rule* r, int force)
  * force causes the variable to be created
  */
 
-struct var*
-varstate(register struct rule* r, int force)
+Var_t*
+varstate(register Rule_t* r, int force)
 {
 	register char*		s;
 	register char*		t;
-	register struct var*	v;
+	register Var_t*		v;
 
 	s = r->name;
 	if (r->property & P_state)
@@ -434,11 +457,15 @@ varstate(register struct rule* r, int force)
 			s++;
 			*(t = s + strlen(s) - 1) = 0;
 		}
-		else return 0;
+		else
+			return 0;
 	}
-	else t = 0;
-	if (!(v = getvar(s)) && force) v = setvar(s, null, 0);
-	if (t) *t = ')';
+	else
+		t = 0;
+	if (!(v = getvar(s)) && force)
+		v = setvar(s, null, 0);
+	if (t)
+		*t = ')';
 	return v;
 }
 
@@ -447,10 +474,10 @@ varstate(register struct rule* r, int force)
  * force causes the variable to be created
  */
 
-struct var*
+Var_t*
 auxiliary(char* s, int force)
 {
-	struct var*	v;
+	Var_t*		v;
 
 	sfprintf(internal.nam, "(&)%s", s);
 	if (!(v = getvar(sfstruse(internal.nam))) && force)
@@ -465,7 +492,7 @@ auxiliary(char* s, int force)
 int
 forcescan(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
+	register Rule_t*	r = (Rule_t*)v;
 	register int		n = h ? *((unsigned char*)h) : r->scan;
 
 	NoP(s);
@@ -479,7 +506,7 @@ forcescan(const char* s, char* v, void* h)
  */
 
 static void
-badlock(char* file, int view, unsigned long date)
+badlock(char* file, int view, Time_t date)
 {
 	long	d;
 
@@ -487,7 +514,7 @@ badlock(char* file, int view, unsigned long date)
 	 * probably a bad lock if too old
 	 */
 
-	if ((d = (CURTIME - date)) > 24 * 60 * 60)
+	if ((d = (CURSECS - tmxsec(date))) > 24 * 60 * 60)
 		error(1, "%s is probably an invalid lock file", file);
 	else if (d > 0)
 		error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(state.regress ? 1 : d, 1));
@@ -515,17 +542,17 @@ badlock(char* file, int view, unsigned long date)
  *	   systems
  */
 
-#define LOCKTIME(p,m)	((unsigned long)((m)?(p)->st_mtime:(p)->st_ctime))
+#define LOCKTIME(p,m)	((m)?tmxgetmtime(p):tmxgetctime(p))
 
 void
 lockstate(int set)
 {
 	register int		fd;
 	register char*		file;
-	struct stat		st;
+	Stat_t			st;
 
 	static char*		lockfile;
-	static unsigned long	locktime;
+	static Time_t		locktime;
 	static int		lockmtime;
 
 	if (set)
@@ -569,7 +596,7 @@ lockstate(int set)
 		close(fd);
 		if (stat(file, &st) < 0)
 			error(3, "cannot stat lock file %s", file);
-		lockmtime = st.st_atime < st.st_mtime || st.st_ctime < st.st_mtime;
+		lockmtime = tmxgetatime(&st) < tmxgetmtime(&st) || tmxgetctime(&st) < tmxgetmtime(&st);
 		locktime = LOCKTIME(&st, lockmtime);
 	}
 	else if (lockfile)
@@ -667,10 +694,10 @@ code(register const char* s)
 static int
 checkparam(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
-	register struct list*	p;
+	register Rule_t*	r = (Rule_t*)v;
+	register List_t*	p;
 	register char*		t;
-	unsigned long		tm;
+	Time_t			tm;
 
 	NoP(s);
 	NoP(h);
@@ -700,8 +727,8 @@ checkparam(const char* s, char* v, void* h)
 static int
 checkvar1(register const char* s, char* u, void* h)
 {
-	register struct var*	v = (struct var*)u;
-	register struct rule*	r;
+	register Var_t*		v = (Var_t*)u;
+	register Rule_t*	r;
 
 	NoP(h);
 	if (v->property & V_scan)
@@ -726,8 +753,8 @@ checkvar1(register const char* s, char* u, void* h)
 static int
 checkvar2(const char* s, char* u, void* h)
 {
-	register struct rule*	r = (struct rule*)u;
-	struct var*		v;
+	register Rule_t*	r = (Rule_t*)u;
+	Var_t*			v;
 
 	NoP(s);
 	NoP(h);
@@ -798,10 +825,11 @@ savestate(void)
  * bind statevar r to a variable
  */
 
-struct rule*
-bindstate(register struct rule* r, register char* val)
+Rule_t*
+bindstate(register Rule_t* r, register char* val)
 {
-	struct rule*	s;
+	Rule_t*		s;
+	Time_t		t;
 
 #if DEBUG
 	if (!(r->property & P_state))
@@ -813,7 +841,7 @@ bindstate(register struct rule* r, register char* val)
 		return r;
 	if (r->property & P_statevar)
 	{
-		register struct var*	v;
+		register Var_t*		v;
 		Sfio_t*			tmp = 0;
 
 		/*
@@ -869,7 +897,9 @@ bindstate(register struct rule* r, register char* val)
 			state.savestate = 1;
 			if (r->statedata != val)
 				r->statedata = strdup(val);
-			r->time = CURTIME - 1;	/* hack around 1 sec granularity */
+			if (r->time == (t = CURTIME))
+				t++;
+			r->time = t;
 		}
 		if ((r->property & P_accept) || state.accept)
 			r->time = OLDTIME;
@@ -888,36 +918,42 @@ bindstate(register struct rule* r, register char* val)
  */
 
 static int
-checkcurrent(register struct rule* r, struct stat* st)
+checkcurrent(register Rule_t* r, Stat_t* st)
 {
 	register int	n;
 	register char*	s;
 	long		pos;
 
-	if (r->uname && !(n = rstat(r->uname, st, 1))) oldname(r);
+	if (r->uname && !(n = rstat(r->uname, st, 1)))
+		oldname(r);
 	else if ((n = rstat(r->name, st, 1)) && (state.exec || state.mam.out && !state.mam.port))
 	{
 		rebind(r, -1);
 		n = rstat(r->name, st, 1);
 	}
-	if (!(r->dynamic & D_entries) && !n && S_ISREG(st->st_mode)) r->dynamic |= D_regular;
-	if (!(r->dynamic & D_triggered)) return n;
+	if (!n && !(r->dynamic & D_entries) && S_ISREG(st->st_mode))
+		r->dynamic |= D_regular;
+	if (!(r->dynamic & D_triggered))
+		return n;
 	edit(internal.nam, r->name, KEEP, DELETE, DELETE);
-	if (!(pos = sfstrtell(internal.nam))) return n;
+	if (!(pos = sfstrtell(internal.nam)))
+		return n;
 	sfputc(internal.nam, 0);
 	sfputr(internal.nam, r->name, 0);
-	s = sfstrset(internal.nam, pos + 1);
+	s = sfstrseek(internal.nam, pos + 1, SEEK_SET);
 	pathcanon(s, 0);
 	if (!streq(r->name, s))
 	{
-		if (!r->uname) r->uname = r->name;
+		if (!r->uname)
+			r->uname = r->name;
 		r->name = strdup(s);
 	}
-	s = sfstrset(internal.nam, 0);
+	s = sfstrseek(internal.nam, 0, SEEK_SET);
 #if DEBUG
-	if (state.test & 0x00000100) error(2, "statetime(%s): dir=%s n=%d time=[%s]", r->name, s, n, strtime(n ? NOTIME : st->st_mtime));
+	if (state.test & 0x00000100)
+		error(2, "statetime(%s): dir=%s n=%d time=[%s]", r->name, s, n, timestr(n ? NOTIME : tmxgetmtime(st)));
 #endif
-	newfile(r, s, n ? NOTIME : st->st_mtime);
+	newfile(r, s, n ? NOTIME : tmxgetmtime(st));
 	return n;
 }
 
@@ -927,18 +963,19 @@ checkcurrent(register struct rule* r, struct stat* st)
  * sync<0 resolves r but does not update state
  */
 
-unsigned long
-statetime(register struct rule* r, int sync)
+Time_t
+statetime(register Rule_t* r, int sync)
 {
-	register struct rule*	s;
+	register Rule_t*	s;
 	int			a;
 	int			n;
 	int			skip = 0;
 	int			zerostate = 0;
-	unsigned long		t;
-	struct rule*		x;
-	struct stat		st;
-	struct stat		ln;
+	Time_t			t;
+	Time_t			q;
+	Rule_t*			x;
+	Stat_t			st;
+	Stat_t			ln;
 
 	if (r->property & P_state)
 		return r->time;
@@ -947,7 +984,7 @@ statetime(register struct rule* r, int sync)
 		zerostate = 1;
 	else if (r->status == FAILED)
 	{
-		st.st_mtime = 0;
+		tmxsetmtime(&st, 0);
 		if ((state.test & 0x00040000) && (s = staterule(RULE, r, NiL, 0)))
 		{
 			r->time = s->time;
@@ -958,20 +995,24 @@ statetime(register struct rule* r, int sync)
 		}
 	}
 	else if (r->property & P_virtual)
-		r->time = st.st_mtime = CURTIME;
+	{
+		r->time = CURTIME;
+		tmxsetmtime(&st, r->time);
+	}
 	else if (checkcurrent(r, &st))
 	{
 		if (r->property & P_dontcare)
-			st.st_mtime = 0;
+			t = 0;
 		else
 		{
-			st.st_mtime = CURTIME;
+			t = CURTIME;
 			zerostate = 1;
 		}
+		tmxsetmtime(&st, t);
 	}
 	else if (sync < 0)
 		return r->time;
-	else if ((s = staterule(RULE, r, NiL, 1)) && s->time == st.st_mtime)
+	else if ((s = staterule(RULE, r, NiL, 1)) && s->time == tmxgetmtime(&st))
 	{
 		if (state.exec && !state.touch)
 		{
@@ -981,6 +1022,7 @@ statetime(register struct rule* r, int sync)
 			 */
 
 			x = staterule(PREREQS, r, NiL, 1);
+			x->dynamic &= ~D_lowres;
 			x->time = r->time;
 			r->time = s->event;
 			if (r->dynamic & D_triggered)
@@ -992,7 +1034,7 @@ statetime(register struct rule* r, int sync)
 	{
 		static int	localsync;
 		static int	localtest;
-		static long	localskew;
+		static Time_t	localskew;
 
 		/*
 		 * r is built since its time changed after its action triggered
@@ -1012,11 +1054,11 @@ statetime(register struct rule* r, int sync)
 
 #if DEBUG
 			if (state.test & 0x00000100)
-				error(2, "%s: r[%s] s[%s] f[%s]", r->name, strtime(r->time), strtime(s->time), strtime(st.st_mtime));
+				error(2, "%s: r[%s] s[%s] f[%s]", r->name, timestr(r->time), timestr(s->time), timestr(tmxgetmtime(&st)));
 #endif
-			if (!localsync && !state.override && r->time && r->time != OLDTIME && !(r->property & P_force) && st.st_mtime == st.st_ctime)
+			if (!localsync && !state.override && r->time && r->time != OLDTIME && !(r->property & P_force) && tmxgetmtime(&st) == tmxgetctime(&st))
 			{
-				if (((n = (r->time - (unsigned long)st.st_mtime - 1)) >= 0 || (n = (CURTIME - (unsigned long)st.st_mtime + 2)) <= 0) && (lstat(r->name, &ln) || !S_ISLNK(ln.st_mode)))
+				if (((n = (tmxsec(r->time) - (unsigned long)st.st_mtime - 1)) >= 0 || (n = (CURSECS - (unsigned long)st.st_mtime + 2)) <= 0) && (lstat(r->name, &ln) || !S_ISLNK(ln.st_mode)))
 				{
 					/*
 					 * warn if difference not tolerable
@@ -1034,20 +1076,21 @@ statetime(register struct rule* r, int sync)
 				 * NOTE: time stamp syncs work on the assumption that
 				 *	 all source files have an mtime that is older
 				 *	 than CURTIME -- this isn't too bad since
-				 *	 only built files are sync'd
+				 *	 only built files are sync'd; also note that
+				 *	 nsec is set to 0 to avoid resolution mismatches
 				 */
 
 				for (;;)
 				{
-					t = CURTIME + localskew;
-					if (touch(r->name, (time_t)0, t, 0))
+					t = tmxsns(CURSECS + tmxsec(localskew), 0);
+					if (tmxtouch(r->name, TMX_NOTIME, t, TMX_NOTIME, 0))
 					{
 						error(ERROR_SYSTEM|1, "%s not sync'd to local time", r->name);
 						break;
 					}
 					if (localtest)
 					{
-						st.st_mtime = t;
+						tmxsetmtime(&st, t);
 						break;
 					}
 
@@ -1066,21 +1109,23 @@ statetime(register struct rule* r, int sync)
 						break;
 					}
 					localtest = 1;
-					if (st.st_mtime == t)
+					q = tmxgetmtime(&st);
+					if (tmxsec(q) == tmxsec(t))
 						break;
-					localskew = t - st.st_mtime;
-					error(state.regress ? -1 : 1, "the utime(2) or utimes(2) system call is botched for the filesystem containing %s (the current time is adjusted by %d seconds) -- the state may be out of sync", r->name, localskew);
+					localskew = tmxsns(tmxsec(q)-tmxsec(t),0);
+					error(state.regress ? -1 : 1, "the utime(2) or utimes(2) system call is botched for the filesystem containing %s (the current time is adjusted by %lu seconds) -- the state may be out of sync", r->name, tmxsec(localskew));
 
 					/*
-					 * the botch may only be for times near
-					 * "now" -- localskew=1 handles this
+					 * the botch may only be for times near "now"
+					 * localskew=1s handles this
 					 */
 
-					if (localskew != 1)
+					if (localskew > tmxsns(1,0))
 					{
-						t = CURTIME + 1;
-						if (!touch(r->name, (time_t)0, t, 0) && !stat(r->name, &st) && st.st_mtime == t)
-							localskew = 1;
+						t = CURTIME + tmxsns(1,0);
+						t = tmxsns(tmxsec(t),0);
+						if (!tmxtouch(r->name, TMX_NOTIME, t, TMX_NOTIME, 0) && !stat(r->name, &st) && tmxgetmtime(&st) == t)
+							localskew = tmxsns(1,0);
 					}
 				}
 			}
@@ -1101,11 +1146,39 @@ statetime(register struct rule* r, int sync)
 		}
 		state.savestate = 1;
 	}
-	if (!skip && (s->time != st.st_mtime || zerostate && s->time))
+	if (!skip && (s->time != tmxgetmtime(&st) || zerostate && s->time))
 	{
-		s->time = zerostate ? 0 : st.st_mtime;
+		s->dynamic &= ~D_lowres;
+		s->time = zerostate ? 0 : tmxgetmtime(&st);
 		s->event = CURTIME;
 		state.savestate = 1;
 	}
 	return s->time;
+}
+
+/*
+ * return 1 if rule r time matches state s time modulo
+ * tolerance and low resolution time state
+ */
+
+int
+statetimeq(Rule_t* r, Rule_t* s)
+{
+	long	d;
+
+	if (r->time == s->time)
+		return 1;
+	if (state.tolerance || (s->dynamic & D_lowres))
+	{
+		if (!(d = tmxsec(r->time) - tmxsec(s->time)) && (s->dynamic & D_lowres))
+		{
+			s->dynamic &= ~D_lowres;
+			s->time = r->time;
+			state.savestate = 1;
+			return 1;
+		}
+		if (d >= -state.tolerance && d <= state.tolerance)
+			return 1;
+	}
+	return 0;
 }

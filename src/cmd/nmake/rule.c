@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -32,6 +30,7 @@
 #include "make.h"
 #include "options.h"
 
+#define ANON(name,flags)	(void)rinternal(name,P_attribute|(flags))
 #define ASOC(field,name,flags)	internal.field=rassociate(name,flags)
 #define ATTR(field,name,flags)	internal.field=rinternal(name,P_attribute|(flags))
 #define FUNC(name,func)		((setvar(name,NiL,V_builtin|V_functional))->builtin=(func))
@@ -178,11 +177,11 @@ nametype(const char* name, char** e)
  */
 
 char*
-maprule(char* s, struct rule* r)
+maprule(char* s, Rule_t* r)
 {
-	register struct list*	p;
-	struct rule*		q;
-	struct rule*		o;
+	register List_t*	p;
+	Rule_t*			q;
+	Rule_t*			o;
 	Hash_position_t*	pos;
 
 	static unsigned char	warn;
@@ -196,7 +195,7 @@ maprule(char* s, struct rule* r)
 			error(1, "%d maprule() calls -- should not happen", UCHAR_MAX+1);
 		while (hashnext(pos))
 		{
-			q = (struct rule*)pos->bucket->value;
+			q = (Rule_t*)pos->bucket->value;
 			if (q == o)
 				pos->bucket->value = (char*)r;
 			for (p = q->prereqs; p; p = p->next)
@@ -213,10 +212,10 @@ maprule(char* s, struct rule* r)
  * creating the rule if necessary
  */
 
-struct rule*
+Rule_t*
 makerule(register char* name)
 {
-	register struct rule*	r;
+	register Rule_t*	r;
 	int			n;
 
 	if (name)
@@ -264,7 +263,7 @@ makerule(register char* name)
  */
 
 int
-special(register struct rule* r)
+special(register Rule_t* r)
 {
 	register char*	s;
 
@@ -288,10 +287,10 @@ special(register struct rule* r)
  * static single element list returned for non-joint target
  */
 
-struct list*
-joint(register struct rule* r)
+List_t*
+joint(register Rule_t* r)
 {
-	static struct list	tmp;
+	static List_t		tmp;
 
 	if ((r->property & (P_joint|P_target)) == (P_joint|P_target))
 		return r->prereqs->rule->prereqs;
@@ -305,10 +304,10 @@ joint(register struct rule* r)
  */
 
 void
-addprereq(register struct rule* r, register struct rule* x, int op)
+addprereq(register Rule_t* r, register Rule_t* x, int op)
 {
-	register struct list*	p;
-	register struct list*	q;
+	register List_t*	p;
+	register List_t*	q;
 
 	if (x != r)
 	{
@@ -377,13 +376,13 @@ addprereq(register struct rule* r, register struct rule* x, int op)
  * *pos undefined when 0 returned
  */
 
-struct rule*
-associate(register struct rule* a, register struct rule* r, register char* s, struct list** pos)
+Rule_t*
+associate(register Rule_t* a, register Rule_t* r, register char* s, List_t** pos)
 {
-	register struct list*	p;
-	register struct rule*	x;
-	register struct rule*	z;
-	struct list*		u;
+	register List_t*	p;
+	register Rule_t*	x;
+	register Rule_t*	z;
+	List_t*			u;
 
 	if (r)
 	{
@@ -428,7 +427,7 @@ associate(register struct rule* a, register struct rule* r, register char* s, st
 #define IGNORECHANGE(r)	((r)->property & (P_joint|P_ignore))
 
 int
-prereqchange(register struct rule* r, register struct list* newprereqs, struct rule* o, register struct list* oldprereqs)
+prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, register List_t* oldprereqs)
 {
 	if ((r->property & P_accept) || state.accept)
 		return 0;
@@ -481,7 +480,7 @@ prereqchange(register struct rule* r, register struct list* newprereqs, struct r
  */
 
 static void
-getimmediate(register struct rule* r, struct list** prereqs, char** action)
+getimmediate(register Rule_t* r, List_t** prereqs, char** action)
 {
 	if (r->dynamic & D_dynamic)
 		dynamic(r);
@@ -498,8 +497,8 @@ getimmediate(register struct rule* r, struct list** prereqs, char** action)
 static int
 reset(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
-	struct stat		st;
+	register Rule_t*	r = (Rule_t*)v;
+	Stat_t			st;
 
 	if (!(r->property & P_state))
 	{
@@ -507,7 +506,7 @@ reset(const char* s, char* v, void* h)
 		{
 			r->status = NOTYET;
 			if (!stat(r->name, &st))
-				r->time = st.st_mtime;
+				r->time = tmxgetmtime(&st);
 			r->dynamic &= ~(D_entries|D_hasafter|D_hasbefore|D_hasmake|D_hasscope|D_hassemaphore|D_scanned|D_triggered);
 		}
 		else
@@ -522,18 +521,19 @@ reset(const char* s, char* v, void* h)
  */
 
 void
-immediate(register struct rule* r)
+immediate(register Rule_t* r)
 {
-	register struct list*	p;
-	register struct rule*	x;
-	struct list*		prereqs;
+	register List_t*	p;
+	register Rule_t*	x;
+	List_t*			prereqs;
 	char*			action;
 	char*			e;
-	struct var*		v;
+	Var_t*			v;
 	int			i;
 	int			g;
 	int			u;
-	unsigned long		a;
+	Flags_t			a;
+	Seconds_t		t;
 
 	if (r == internal.retain || r == internal.state)
 	{
@@ -542,8 +542,10 @@ immediate(register struct rule* r)
 		for (p = prereqs; p; p = p->next)
 			if (v = varstate(p->rule, 1))
 			{
-				if (a == V_scan) setvar(v->name, v->value, V_scan);
-				else v->property |= a;
+				if (a == V_scan)
+					setvar(v->name, v->value, V_scan);
+				else
+					v->property |= a;
 			}
 	}
 	else if (r == internal.rebind || r == internal.accept)
@@ -581,8 +583,8 @@ immediate(register struct rule* r)
 	else if (r == internal.always || r == internal.local || r == internal.make || r == internal.run)
 	{
 		int		errors;
-		unsigned long	now;
-		unsigned long	tm = 0;
+		Time_t		now;
+		Time_t		tm = 0;
 
 		getimmediate(r, &prereqs, &action);
 		i = !prereqs;
@@ -644,15 +646,15 @@ immediate(register struct rule* r)
 		getimmediate(r, &prereqs, &action);
 		if (p = prereqs)
 		{
-			a = strelapsed(p->rule->name, &e, 1);
+			t = strelapsed(p->rule->name, &e, 1);
 			if (*e)
-				a = 0;
+				t = 0;
 			else
 				p = p->next;
 		}
 		else
-			a = 0;
-		wakeup(a, p);
+			t = 0;
+		wakeup(t, p);
 	}
 	else if (r == internal.sync)
 	{
@@ -697,10 +699,10 @@ immediate(register struct rule* r)
  */
 
 void
-remdup(register struct list* p)
+remdup(register List_t* p)
 {
-	register struct list*	q;
-	register struct list*	x;
+	register List_t*	q;
+	register List_t*	x;
 
 	for (x = p, q = 0; p; p = p->next)
 	{
@@ -735,20 +737,20 @@ remdup(register struct list* p)
  */
 
 void
-dynamic(register struct rule* r)
+dynamic(register Rule_t* r)
 {
 	register char*		s;
-	register struct list*	p;
-	register struct list*	q;
-	register struct list*	t;
+	register List_t*	p;
+	register List_t*	q;
+	register List_t*	t;
 	char**			v;
 	char*			buf;
 	int			added;
 	int			flags;
-	struct rule*		x;
-	struct rule*		u;
-	struct frame*		oframe;
-	struct frame		frame;
+	Rule_t*			x;
+	Rule_t*			u;
+	Frame_t*		oframe;
+	Frame_t			frame;
 	Sfio_t*			tmp;
 	char*			vec[2];
 
@@ -822,11 +824,11 @@ dynamic(register struct rule* r)
  */
 
 int
-hasattribute(register struct rule* r, register struct rule* a, register struct rule* x)
+hasattribute(register Rule_t* r, register Rule_t* a, register Rule_t* x)
 {
-	register long	n;
-	register int	attrname;
-	struct list*	p;
+	register Flags_t	n;
+	register int		attrname;
+	List_t*			p;
 
 	attrname = *a->name == ATTRNAME;
 	if (a->property & P_attribute)
@@ -957,13 +959,29 @@ hasattribute(register struct rule* r, register struct rule* a, register struct r
 }
 
 /*
+ * return nonzero if r has an after prerequisite with exact property
+ */
+
+int
+hasafter(register Rule_t* r, register Flags_t property)
+{
+	register List_t*	p;
+
+	if (r->dynamic & D_hasafter)
+		for (p = r->prereqs; p; p = p->next)
+			if ((p->rule->property & P_failure) == property)
+				return 1;
+	return 0;
+}
+
+/*
  * merge <from> into <to> according to op
  */
 
 void
-merge(register struct rule* from, register struct rule* to, int op)
+merge(register Rule_t* from, register Rule_t* to, int op)
 {
-	register struct list*	p;
+	register List_t*	p;
 
 	if (from->name)
 	{
@@ -974,7 +992,10 @@ merge(register struct rule* from, register struct rule* to, int op)
 			debug((-4, "merging %s%s into %s", (op & MERGE_ATTR) ? "attributes of " : null, from->name, to->name));
 #endif
 	}
-	to->property |= from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_foreground|P_functional|P_ignore|P_implicit|P_joint|P_local|P_make|P_multiple|P_parameter|P_read|P_repeat|P_terminal|P_virtual);
+	if (to->dynamic & D_bound)
+		to->property |= from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_force|P_foreground|P_functional|P_implicit|P_joint|P_local|P_make|P_multiple|P_parameter|P_read|P_repeat|P_terminal|P_virtual);
+	else
+		to->property |= from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_foreground|P_functional|P_ignore|P_implicit|P_joint|P_local|P_make|P_multiple|P_parameter|P_read|P_repeat|P_terminal|P_virtual);
 	if (from->property & P_implicit)
 		to->property &= ~P_terminal;
 	if ((from->property & (P_metarule|P_terminal)) == P_terminal)
@@ -1030,12 +1051,12 @@ merge(register struct rule* from, register struct rule* to, int op)
  */
 
 void
-mergestate(struct rule* from, struct rule* to)
+mergestate(Rule_t* from, Rule_t* to)
 {
 	register int		i;
-	register struct rule*	fromstate;
-	register struct rule*	tostate;
-	struct rule*		t;
+	register Rule_t*	fromstate;
+	register Rule_t*	tostate;
+	Rule_t*			t;
 	char*			s;
 
 	/*
@@ -1051,11 +1072,11 @@ mergestate(struct rule* from, struct rule* to)
 #if DEBUG
 	if (state.test & 0x00000800)
 	{
-		error(2, "MERGESTATE from: %s: %s time=[%s] event=[%s]", from->name, fromstate->name, strtime(fromstate->time), strtime(fromstate->event));
-		error(2, "MERGESTATE   to: %s: %s time=[%s] event=[%s]", to->name, tostate->name, strtime(tostate->time), strtime(tostate->event));
+		error(2, "MERGESTATE from: %s: %s time=[%s] event=[%s]", from->name, fromstate->name, timestr(fromstate->time), timestr(fromstate->event));
+		error(2, "MERGESTATE   to: %s: %s time=[%s] event=[%s]", to->name, tostate->name, timestr(tostate->time), timestr(tostate->event));
 	}
 #endif
-	if ((from->dynamic & D_alias) && fromstate->time && fromstate->time != tostate->time)
+	if ((from->dynamic & D_alias) && fromstate->time && !statetimeq(fromstate, tostate))
 	{
 		/*
 		 * the solution is conservative but ok
@@ -1104,7 +1125,7 @@ mergestate(struct rule* from, struct rule* to)
  */
 
 void
-negate(register struct rule* from, register struct rule* to)
+negate(register Rule_t* from, register Rule_t* to)
 {
 	to->attribute &= ~from->attribute;
 	to->property &= ~(from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_functional|P_ignore|P_immediate|P_implicit|P_local|P_make|P_multiple|P_parameter|P_repeat|P_target|P_terminal|P_use|P_virtual));
@@ -1117,10 +1138,10 @@ negate(register struct rule* from, register struct rule* to)
  * make an internal rule pointer
  */
 
-static struct rule*
+static Rule_t*
 rinternal(char* s, register int flags)
 {
-	register struct rule*	r;
+	register Rule_t*	r;
 
 	r = makerule(s);
 	r->property |= flags;
@@ -1134,12 +1155,12 @@ rinternal(char* s, register int flags)
  * NOTE: this is required to sync pre 2001-05-09 make objects 
  */
 
-static struct rule*
+static Rule_t*
 rassociate(char* s, register int flags)
 {
-	register struct rule*	r;
-	register struct rule*	a;
-	register struct list*	p;
+	register Rule_t*	r;
+	register Rule_t*	a;
+	register List_t*	p;
 
 	r = rinternal(s, flags);
 	for (p = r->prereqs; p; p = p->next)
@@ -1155,7 +1176,7 @@ rassociate(char* s, register int flags)
 static int
 diratom(const char* s, char* v, void* h)
 {
-	struct dir*	d = (struct dir*)v;
+	Dir_t*		d = (Dir_t*)v;
 
 	NoP(s);
 	NoP(h);
@@ -1239,7 +1260,7 @@ b_syscall(char** args)
  *	 non-engine source makefiles
  */
 
-struct external external =
+External_t	external =
 {
 	/*
 	 * variable names
@@ -1297,7 +1318,7 @@ struct external external =
 void
 initrule(void)
 {
-	struct rule*	r;
+	Rule_t*		r;
 	int		i;
 
 	static int	repeat;
@@ -1335,6 +1356,12 @@ initrule(void)
 	ATTR(terminal,		".TERMINAL",	P_terminal);
 	ATTR(use,		".USE",		P_use);
 	ATTR(virt,		".VIRTUAL",	P_virtual);
+
+	/*
+	 * anonymous attributes (no internal handle)
+	 */
+
+	ANON(			".FAILURE",	P_failure);
 
 	/*
 	 * readonly rule attributes
@@ -1429,7 +1456,7 @@ initrule(void)
 
 	if (!repeat)
 	{
-		static struct frame	frame;
+		static Frame_t		frame;
 
 		frame.target = internal.internal;
 		state.frame = frame.parent = &frame;
@@ -1478,11 +1505,11 @@ initrule(void)
  * low level for initview()
  */
 
-static struct list*
-view(register char* s, register char* d, struct list* p)
+static List_t*
+view(register char* s, register char* d, List_t* p)
 {
 	register int		i;
-	register struct rule*	r;
+	register Rule_t*	r;
 
 	if (!d)
 		d = s;
@@ -1540,10 +1567,10 @@ initview(void)
 	char*		pwd;
 	char*		tok;
 	char*		u;
-	struct list*	p;
-	struct rule*	r;
-	struct stat	top;
-	struct stat	bot;
+	List_t*		p;
+	Rule_t*		r;
+	Stat_t		top;
+	Stat_t		bot;
 	Sfio_t*		tmp;
 
 	p = internal.view->prereqs = cons(internal.dot, NiL);
@@ -1565,7 +1592,7 @@ initview(void)
 		for (n = 1; n <= MAXVIEW; n++)
 			sfputr(tmp, "/...", -1);
 		sfputc(tmp, 0);
-		s = t = sfstrrel(tmp, 0);
+		s = t = sfstrseek(tmp, 0, SEEK_CUR);
 		while (!stat(t -= 4, &top))
 		{
 			if (state.maxview >= MAXVIEW - 1)

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2004 AT&T Corp.                  *
+*                  Copyright (c) 1989-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -30,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: file (AT&T Labs Research) 2002-11-22 $\n]"
+"[-?\n@(#)$Id: file (AT&T Labs Research) 2004-10-11 $\n]"
 USAGE_LICENSE
 "[+NAME?file - determine file type]"
 "[+DESCRIPTION?\bfile\b tests and attempts to classify each \afile\a argument."
@@ -64,7 +62,9 @@ USAGE_LICENSE
 "	still loaded last. If \b--magic\b is also specified then the default"
 "	system \amagic\a is only loaded if explicity specified.]:[file]"
 "[p:pattern|match?Only files with descriptions matching the \bsh\b(1)"
-"	match \apattern\a are listed.]:[pattern]"
+"	match \apattern\a are listed. \bfile\b exits with status 0 if any"
+"	files match, 0 otherwise.]:[pattern]"
+"[q:quiet|silent?Do not list matching \b--pattern\b files.]"
 "[L:logical|dereference?Follow symbolic links.]"
 "[P|h:physical?Don't follow symbolic links.]"
 "[w:warn?Enable magic file parse warning messages.]"
@@ -139,8 +139,9 @@ USAGE_LICENSE
 #define MAGIC_LIST	(MAGIC_USER<<0)
 #define MAGIC_LOAD	(MAGIC_USER<<1)
 #define MAGIC_PHYSICAL	(MAGIC_USER<<2)
+#define MAGIC_SILENT	(MAGIC_USER<<3)
 
-static void
+static int
 type(Magic_t* mp, char* file, const char* pattern, register Magicdisc_t* disc)
 {
 	char*		s;
@@ -156,9 +157,17 @@ type(Magic_t* mp, char* file, const char* pattern, register Magicdisc_t* disc)
 		sfclose(fp);
 	e = pathcanon(file, 0);
 	if (!pattern)
+	{
 		sfprintf(sfstdout, "%s:\t%s%s\n", file, e - file > 6 ? "" : "\t", s);
+		return 1;
+	}
 	else if (strmatch(s, pattern))
-		sfprintf(sfstdout, "%s\n", file);
+	{
+		if (!(disc->flags & MAGIC_SILENT))
+			sfprintf(sfstdout, "%s\n", file);
+		return 1;
+	}
+	return 0;
 }
 
 int
@@ -168,6 +177,7 @@ main(int argc, register char** argv)
 	register char*		p;
 	char*			pattern = 0;
 	Sfio_t*			list = 0;
+	int			hit;
 	Magicdisc_t		disc;
 
 	NoP(argc);
@@ -201,6 +211,9 @@ main(int argc, register char** argv)
 		case 'l':
 			disc.flags |= MAGIC_LIST|MAGIC_VERBOSE;
 			continue;
+		case 'L':
+			disc.flags &= ~MAGIC_PHYSICAL;
+			continue;
 		case 'm':
 			if (magicload(mp, opt_info.arg, 0))
 				error(3, "%s: cannot load magic file", opt_info.arg);
@@ -213,12 +226,12 @@ main(int argc, register char** argv)
 		case 'p':
 			pattern = opt_info.arg;
 			continue;
-		case 'L':
-			disc.flags &= ~MAGIC_PHYSICAL;
-			continue;
 		case 'P':
 		case 'h':
 			disc.flags |= MAGIC_PHYSICAL;
+			continue;
+		case 'q':
+			disc.flags |= MAGIC_SILENT;
 			continue;
 		case 'w':
 			disc.flags |= MAGIC_VERBOSE;
@@ -238,18 +251,22 @@ main(int argc, register char** argv)
 	if (!(disc.flags & MAGIC_LOAD) && magicload(mp, NiL, 0))
 		error(3, "$%s,%s: cannot load default magic file", MAGIC_FILE_ENV, MAGIC_FILE);
 	if (disc.flags & MAGIC_LIST)
+	{
 		magiclist(mp, sfstdout);
+		hit = 1;
+	}
 	else
 	{
+		hit = 0;
 		if (!list && !*argv)
 			list = sfstdin;
 		if (list)
 			while (p = sfgetr(list, '\n', 1))
 				if (*p)
-					type(mp, p, pattern, &disc);
+					hit |= type(mp, p, pattern, &disc);
 		while (p = *argv++)
 			if (*p)
-				type(mp, p, pattern, &disc);
+				hit |= type(mp, p, pattern, &disc);
 	}
-	return 0;
+	return !hit;
 }

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make z
 make libz.a archive
@@ -113,10 +113,30 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_
 done crc32.o generated
 make gzio.o
 make gzio.c
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-make ${INSTALLROOT}/include/ast/sfio.h implicit
+make zutil.h implicit
+make ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
 make ${INSTALLROOT}/include/ast/sfio_s.h implicit
 done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
+done ${INSTALLROOT}/include/ast/stdio.h dontcare
+make unix.h implicit
+done unix.h dontcare virtual
+make ${INSTALLROOT}/include/ast/limits.h implicit
+make ${INSTALLROOT}/include/ast/ast_limits.h implicit
+done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
+done ${INSTALLROOT}/include/ast/limits.h dontcare
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+make alloc.h implicit
+done alloc.h dontcare virtual
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${INSTALLROOT}/include/ast/getopt.h implicit
+prev zlib.h implicit
+done zutil.h
+prev ${INSTALLROOT}/include/ast/stdio.h implicit
+make ${INSTALLROOT}/include/ast/ast.h implicit
+make ${INSTALLROOT}/include/ast/vmalloc.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 make ${INSTALLROOT}/include/ast/ast_std.h implicit
 make ${INSTALLROOT}/include/ast/ast_botch.h implicit
@@ -140,17 +160,7 @@ make ${INSTALLROOT}/include/ast/ast_types.h implicit
 done ${INSTALLROOT}/include/ast/ast_types.h dontcare
 make ${INSTALLROOT}/include/ast/ast_map.h implicit
 done ${INSTALLROOT}/include/ast/ast_map.h dontcare
-make ${INSTALLROOT}/include/ast/stdio.h implicit
-make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
-prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
-done ${INSTALLROOT}/include/ast/stdio.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/limits.h implicit
-make ${INSTALLROOT}/include/ast/ast_limits.h implicit
-done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
-done ${INSTALLROOT}/include/ast/limits.h dontcare
+prev ${INSTALLROOT}/include/ast/limits.h implicit
 make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
 done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
@@ -159,26 +169,12 @@ done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast_std.h dontcare
-done ${INSTALLROOT}/include/ast/sfio.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h dontcare
-make zutil.h implicit
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
-make unix.h implicit
-done unix.h dontcare virtual
-prev ${INSTALLROOT}/include/ast/limits.h implicit
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
-make alloc.h implicit
-done alloc.h dontcare virtual
-prev zlib.h implicit
-done zutil.h
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
-make ${INSTALLROOT}/include/ast/ast.h implicit
-make ${INSTALLROOT}/include/ast/vmalloc.h implicit
+done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
+make ${INSTALLROOT}/include/ast/sfio.h implicit
+prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
+done ${INSTALLROOT}/include/ast/sfio.h dontcare
 prev ${INSTALLROOT}/include/ast/ast_std.h implicit
 make ${INSTALLROOT}/include/ast/ast_version.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -188,7 +184,7 @@ done ${INSTALLROOT}/include/ast/ast.h dontcare
 done gzio.c
 meta gzio.o %.c>%.o gzio.c gzio
 prev gzio.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -D_BLD_z -c gzio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_BLD_z -D_PACKAGE_ast -c gzio.c
 done gzio.o generated
 make uncompr.o
 make uncompr.c
@@ -372,7 +368,7 @@ exec - test '' = 'zconf.h' || ${STDCMP} 2>/dev/null -s zconf.h ${INSTALLROOT}/in
 done ${INSTALLROOT}/include/ast/zconf.h generated
 make ${INSTALLROOT}/include/ast/sfdcgzip.h
 prev sfdcgzip.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o type=special'  sfdcgzip.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o zlib,since=1995,author="Jean-loup Gailly,Mark Adler"'  sfdcgzip.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/sfdcgzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/sfdcgzip.h

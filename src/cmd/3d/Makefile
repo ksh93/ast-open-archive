@@ -47,7 +47,7 @@ $(ID)$(VARIANTID) $(VERSION) :LIBRARY: README RELEASE PROMO.mm \
 	lstat3d.c mkdir3d.c mknod3d.c mount3d.c open3d.c pathconf3d.c \
 	pipe3d.c read3d.c readlink3d.c rename3d.c rmdir3d.c sbrk3d.c \
 	stat3d.c statfs3d.c statvfs3d.c symlink3d.c syscall3d.c \
-	sysent3d.c truncate3d.c unlink3d.c utime3d.c utimes3d.c \
+	sysent3d.c truncate3d.c unlink3d.c utime3d.c utimes3d.c utimets3d.c \
 	vfork3d.c write3d.c \
 	acl3d.c facl3d.c \
 	dll3d.c \

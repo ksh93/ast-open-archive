@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2004 AT&T Corp.                  *
+*                  Copyright (c) 1995-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -60,7 +58,6 @@ USAGE_LICENSE
 #include <error.h>
 #include <ls.h>
 #include <sfdisc.h>
-#include <sfstr.h>
 #include <sig.h>
 
 #include <ctype.h>
@@ -354,7 +351,7 @@ helpwrite(int fd, const void* buf, size_t len)
 
 	NoP(fd);
 	n = ed.help ? sfwrite(sfstderr, buf, len) : ed.verbose ? sfputr(ed.msg, "?", '\n') : 0;
-	sfstrset(ed.buffer.help, 0);
+	sfstrseek(ed.buffer.help, 0, SEEK_SET);
 	sfwrite(ed.buffer.help, buf, len - 1);
 	sfputc(ed.buffer.help, 0);
 	return n;
@@ -384,7 +381,7 @@ init(void)
 		if (!(*ss = sfstropen()))
 			error(ERROR_SYSTEM|3, "cannot initialize internal buffer");
 		sfputc(*ss, 0);
-		sfstrset(*ss, 0);
+		sfstrseek(*ss, 0, SEEK_SET);
 	}
 	sfputr(ed.buffer.help, "?", 0);
 	if (!(ed.zero = newof(NiL, Line_t, ed.all, 0)))
@@ -397,7 +394,7 @@ getrec(register Sfio_t* sp, register int delimiter, register int flags)
 	register int	c;
 	register char*	glob;
 
-	sfstrset(sp, 0);
+	sfstrseek(sp, 0, SEEK_SET);
 	glob = ed.global;
 	while ((c = getchr()) != delimiter) {
 		if (c == '\n') {
@@ -879,7 +876,7 @@ exfile(void)
 	if (ed.warn_null || ed.warn_newline) {
 		char*	sep = "";
 
-		sfstrset(ed.buffer.line, 0);
+		sfstrseek(ed.buffer.line, 0, SEEK_SET);
 		if (ed.warn_null) {
 			sfprintf(ed.buffer.line, "%d null character%s ignored", ed.warn_null, plural(ed.warn_null));
 			ed.warn_null = 0;
@@ -953,7 +950,7 @@ handle(void)
 		mask = umask(S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);
 		b = "ed.hup";
 		if (!(ed.iop = sfopen(NiL, b, "w")) && !ed.restricted && (s = getenv("HOME"))) {
-			sfstrset(ed.buffer.line, 0);
+			sfstrseek(ed.buffer.line, 0, SEEK_SET);
 			sfprintf(ed.buffer.line, "%s/%s", s, b);
 			b = sfstruse(ed.buffer.line);;
 			ed.iop = sfopen(NiL, b, "w");
@@ -1152,7 +1149,7 @@ shell(void)
 	else
 		SWP(ed.buffer.shell, ed.buffer.line);
 	s = sfstrbase(ed.buffer.shell);
-	sfstrset(ed.buffer.line, 0);
+	sfstrseek(ed.buffer.line, 0, SEEK_SET);
 	sfputc(ed.buffer.line, '!');
 	while (c = *s++) {
 		if (c == '\\') {
@@ -1275,7 +1272,7 @@ filename(int c)
 				error(2, "%s: restricted file name", p);
 		}
 		if (!sh && (!*sfstrbase(ed.buffer.file) || c == 'e' || c == 'f')) {
-			sfstrset(ed.buffer.file, 0);
+			sfstrseek(ed.buffer.file, 0, SEEK_SET);
 			sfputr(ed.buffer.file, p, 0);
 		}
 		if (c == 'f')
@@ -1368,7 +1365,7 @@ join(void)
 	register Line_t*	a1;
 
 	nonzero();
-	sfstrset(ed.buffer.work, 0);
+	sfstrseek(ed.buffer.work, 0, SEEK_SET);
 	for (a1 = ed.addr1; a1 <= ed.addr2;)
 		sfputr(ed.buffer.work, lineget((a1++)->offset), -1);
 	a1 = ed.dot = ed.addr1;
@@ -1653,7 +1650,7 @@ commands(void)
 			setnoaddr();
 			s = getrec(ed.buffer.line, '\n', 0);
 			if (*s || !(ed.prompt = -ed.prompt) && (s = "*")) {
-				sfstrset(ed.buffer.prompt, 0);
+				sfstrseek(ed.buffer.prompt, 0, SEEK_SET);
 				sfputr(ed.buffer.prompt, s, 0);
 				ed.prompt = 1;
 			}
@@ -1778,12 +1775,12 @@ main(int argc, char** argv)
 
 			case 'o':
 				ed.msg = sfstderr;
-				sfstrset(ed.buffer.file, 0);
+				sfstrseek(ed.buffer.file, 0, SEEK_SET);
 				sfputr(ed.buffer.file, "/dev/stdout", 0);
 				continue;
 
 			case 'p':
-				sfstrset(ed.buffer.prompt, 0);
+				sfstrseek(ed.buffer.prompt, 0, SEEK_SET);
 				sfputr(ed.buffer.prompt, opt_info.arg, 0);
 				ed.prompt = 1;
 				continue;

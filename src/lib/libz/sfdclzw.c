@@ -1,3 +1,37 @@
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*                                                                      *
+* This software is provided 'as-is', without any express or implied    *
+* warranty. In no event will the authors be held liable for any        *
+* damages arising from the use of this software.                       *
+*                                                                      *
+* Permission is granted to anyone to use this software for any         *
+* purpose, including commercial applications, and to alter it and      *
+* redistribute it freely, subject to the following restrictions:       *
+*                                                                      *
+*  1. The origin of this software must not be misrepresented;          *
+*     you must not claim that you wrote the original software. If      *
+*     you use this software in a product, an acknowledgment in the     *
+*     product documentation would be appreciated but is not            *
+*     required.                                                        *
+*                                                                      *
+*  2. Altered source versions must be plainly marked as such,          *
+*     and must not be misrepresented as being the original             *
+*     software.                                                        *
+*                                                                      *
+*  3. This notice may not be removed or altered from any source        *
+*     distribution.                                                    *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                           Jean-loup Gailly                           *
+*                              Mark Adler                              *
+*                                                                      *
+***********************************************************************/
 #pragma prototyped
 
 /*
@@ -23,11 +57,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *

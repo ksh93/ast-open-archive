@@ -8,7 +8,7 @@ LICENSE = since=1989,author=gsf
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
 
-/* NOTE: -o mam bug in -I for exparse.c if exparse.y not first */
+/* NOTE: --mam bug in -I for exparse.c if exparse.y not first */
 
 expr 2.0 :LIBRARY: RELEASE expr.h exlib.h exgram.h exparse.y \
 		excc.c excontext.c exdata.c exeval.c exexpr.c \
@@ -19,9 +19,11 @@ expr 2.0 :LIBRARY: RELEASE expr.h exlib.h exgram.h exparse.y \
 
 exop.h : exparse.h
 	{
-	echo "static const char* exop[] = {"
-	$(SED) -e '/^[ 	]*#[ 	]*define[ 	][ 	]*[A-Z]/!d' -e 's/^[ 	]*#[ 	]*define[ 	]*\([A-Z0-9_]*\).*/	"\1",/'
-	echo "};"
+	echo 'static const char* exop[] = {'
+	echo '	"MINTOKEN",'
+	$(SED) -e '1,/MINTOKEN/d' -e '/MAXTOKEN/,$d' -e '/^[ 	]*#[ 	]*define[ 	][ 	]*[A-Z]/!d' -e 's/^[ 	]*#[ 	]*define[ 	]*\([A-Z0-9_]*\).*/	"\1",/'
+	echo '	"MAXTOKEN",'
+	echo '};'
 	} < $(*) > $(<)
 
 $(INCLUDEDIR) :INSTALLPROTO: expr.h

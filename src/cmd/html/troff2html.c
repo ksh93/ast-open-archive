@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2004 AT&T Corp.                  *
+*                  Copyright (c) 1996-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -289,7 +287,7 @@ pushin(char* name, int line, Sfio_t* ip, char* data, Arg_t* arg)
 		pp->mac = state.mac;
 		state.mac = arg;
 		if (pp->top.sp)
-			sfstrset(pp->top.sp, 0);
+			sfstrseek(pp->top.sp, 0, SEEK_SET);
 		else if (!(pp->top.sp = sfstropen()))
 			error(ERROR_SYSTEM|3, "out of space [macro call]");
 		pp->tag = state.tag;
@@ -3394,7 +3392,7 @@ text(void)
 	if (state.it.text)
 		return 1;
 	s = sfstrbase(state.out);
-	e = sfstrrel(state.out, 0);
+	e = sfstrseek(state.out, 0, SEEK_CUR);
 	while (s < e)
 	{
 		switch (*s++)
@@ -3576,7 +3574,7 @@ setopt(void* a, const void* x, register int n, const char* v)
 							break;
 						}
 					sfprintf(state.tmp, "FN%ld\t%-.*s", m, t - s, s);
-					sfstrset(state.out, s - b);
+					sfstrseek(state.out, s - b, SEEK_SET);
 					code_n(OP_link, sfstruse(state.tmp));
 					sfprintf(state.tmp, "FN%ld", m);
 					code_n(OP_fn, sfstruse(state.tmp));

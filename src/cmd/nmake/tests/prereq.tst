@@ -46,36 +46,36 @@ mymain : .FORCE .MAKE .ALWAYS
 		OUTPUT - $'info mam regress 00000
 info start regression
 make Makefile
-bind Makefile 3
+bind Makefile 0.3
 make makerules.mo
-bind makerules.mo 3
+bind makerules.mo 0.3
 done makerules.mo
 done Makefile
 make Makefile.mo
-bind Makefile.mo 4
+bind Makefile.mo 0.4
 exec  : compile into make object
 done Makefile.mo
 make .OPTION.COMPATIBILITY
-bind .OPTION.COMPATIBILITY 0
+bind .OPTION.COMPATIBILITY 0.0
 done .OPTION.COMPATIBILITY virtual
 make .PROBE.INIT
-bind .PROBE.INIT 0
+bind .PROBE.INIT 0.0
 make .OPTION.COMPATIBILITY
-bind .OPTION.COMPATIBILITY 4
+bind .OPTION.COMPATIBILITY 0.4
 done .OPTION.COMPATIBILITY virtual
 make cc.probe
-bind cc.probe 3
+bind cc.probe 0.3
 done cc.probe dontcare
 done .PROBE.INIT virtual
 setv INSTALLROOT $HOME
 bind (IFFEFLAGS) -v -c \'cc -O \'
 make .FLAGSINIT
-bind .FLAGSINIT 0
+bind .FLAGSINIT 0.0
 done .FLAGSINIT virtual
 make .MAM.INIT
-bind .MAM.INIT 0
+bind .MAM.INIT 0.0
 make .FIND.
-bind .FIND. 0
+bind .FIND. 0.0
 done .FIND. virtual
 setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
@@ -84,8 +84,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -110,57 +110,66 @@ setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
 make .FIND.
-bind .FIND. 4
+bind .FIND. 0.4
 done .FIND. virtual
 make .CATALOG.NAME.
-bind .CATALOG.NAME. 0
+bind .CATALOG.NAME. 0.0
 done .CATALOG.NAME. virtual
 make .CATALOG.NAME.
-bind .CATALOG.NAME. 4
+bind .CATALOG.NAME. 0.4
 done .CATALOG.NAME. virtual
 bind (USAGE_LICENSE) "[--catalog?prereq]"
 make (USAGE_LICENSE) state
-bind "[--catalog?prereq]" 4 (USAGE_LICENSE)
+bind "[--catalog?prereq]" 0.4 (USAGE_LICENSE)
 done (USAGE_LICENSE)
 done .MAM.INIT virtual
 make myinit
-bind myinit 0
+bind myinit 0.0
 done myinit generated
 make mymain
-bind mymain 0
+bind mymain 0.0
 make bar.h
-bind bar.h 0
+bind bar.h 0.0
 meta bar.h %.G>%.h uhdr/bar.G bar
 make uhdr/bar.G
-bind bar.G 3 uhdr/bar.G
+bind bar.G 0.3 uhdr/bar.G
 make .SCAN.c
-bind .SCAN.c 0
+bind .SCAN.c 0.0
 done .SCAN.c virtual
+make .PREFIX.INCLUDE.
+bind .PREFIX.INCLUDE. 0.0
+done .PREFIX.INCLUDE. virtual
 make foo.h implicit
-bind foo.h 0
+bind foo.h 0.0
 meta foo.h %.G>%.h uhdr/foo.G foo
 make uhdr/foo.G
-bind foo.G 3 uhdr/foo.G
+bind foo.G 0.3 uhdr/foo.G
 done uhdr/foo.G
-init foo.h 0
+init foo.h 0.4
 exec - cp uhdr/foo.G foo.h
-code - 0 0 0
+code - 0 0.4 0.4
+make .PREFIX.INCLUDE.
+bind .PREFIX.INCLUDE. 0.4
+done .PREFIX.INCLUDE. virtual
 info warning "mymain", line 2: warning: mymain : bar.h : uhdr/bar.G : foo.h : bar.h: implicit reference before action completed
 make bar.h implicit
-bind bar.h 4
+bind bar.h 0.4
 done bar.h virtual
 done foo.h generated
 done uhdr/bar.G
-init bar.h 0
+init bar.h 0.4
 exec - cp uhdr/bar.G bar.h
-code - 0 0 0
+code - 0 0.4 0.4
+make .PREFIX.INCLUDE.
+bind .PREFIX.INCLUDE. 0.4
+done .PREFIX.INCLUDE. virtual
 make foo.h implicit
-bind foo.h 4
+bind foo.h 0.4
 done foo.h generated
 done bar.h generated
 done mymain generated
 make Makefile.ms
-bind Makefile.ms 4
+bind Makefile.ms 0.4
 exec  : compile into make object
 done Makefile.ms
 info finish regression'
@@ -169,32 +178,32 @@ info finish regression'
 		OUTPUT - $'info mam regress 00000
 info start regression
 make Makefile
-bind Makefile 3
+bind Makefile 0.3
 make makerules.mo
-bind makerules.mo 3
+bind makerules.mo 0.3
 done makerules.mo
 done Makefile
 make .OPTION.COMPATIBILITY
-bind .OPTION.COMPATIBILITY 0
+bind .OPTION.COMPATIBILITY 0.0
 done .OPTION.COMPATIBILITY virtual
 make .PROBE.INIT
-bind .PROBE.INIT 0
+bind .PROBE.INIT 0.0
 make .OPTION.COMPATIBILITY
-bind .OPTION.COMPATIBILITY 4
+bind .OPTION.COMPATIBILITY 0.4
 done .OPTION.COMPATIBILITY virtual
 make cc.probe
-bind cc.probe 3
+bind cc.probe 0.3
 done cc.probe dontcare
 done .PROBE.INIT virtual
 setv INSTALLROOT $HOME
 bind (IFFEFLAGS) -v -c \'cc -O \'
 make .FLAGSINIT
-bind .FLAGSINIT 0
+bind .FLAGSINIT 0.0
 done .FLAGSINIT virtual
 make .MAM.INIT
-bind .MAM.INIT 0
+bind .MAM.INIT 0.0
 make .FIND.
-bind .FIND. 0
+bind .FIND. 0.0
 done .FIND. virtual
 setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
@@ -203,8 +212,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -229,57 +238,66 @@ setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
 make .FIND.
-bind .FIND. 4
+bind .FIND. 0.4
 done .FIND. virtual
 make .CATALOG.NAME.
-bind .CATALOG.NAME. 0
+bind .CATALOG.NAME. 0.0
 done .CATALOG.NAME. virtual
 make .CATALOG.NAME.
-bind .CATALOG.NAME. 4
+bind .CATALOG.NAME. 0.4
 done .CATALOG.NAME. virtual
 bind (USAGE_LICENSE) "[--catalog?prereq]"
 make (USAGE_LICENSE) state
-bind "[--catalog?prereq]" 4 (USAGE_LICENSE)
+bind "[--catalog?prereq]" 0.4 (USAGE_LICENSE)
 done (USAGE_LICENSE)
 done .MAM.INIT virtual
 make myinit
-bind myinit 0
+bind myinit 0.0
 done myinit generated
 make mymain
-bind mymain 0
+bind mymain 0.0
 make bar.h
-bind bar.h 3
+bind bar.h 0.3
 meta bar.h %.G>%.h uhdr/bar.G bar
 make uhdr/bar.G
-bind bar.G 3 uhdr/bar.G
+bind bar.G 0.3 uhdr/bar.G
 make .SCAN.c
-bind .SCAN.c 0
+bind .SCAN.c 0.0
 done .SCAN.c virtual
+make .PREFIX.INCLUDE.
+bind .PREFIX.INCLUDE. 0.0
+done .PREFIX.INCLUDE. virtual
 make foo.h implicit
-bind foo.h 3
+bind foo.h 0.3
 meta foo.h %.G>%.h uhdr/foo.G foo
 make uhdr/foo.G
-bind foo.G 3 uhdr/foo.G
+bind foo.G 0.3 uhdr/foo.G
 done uhdr/foo.G
-init foo.h 0
+init foo.h 0.4
 exec - cp uhdr/foo.G foo.h
-code - 0 0 0
+code - 0 0.4 0.4
+make .PREFIX.INCLUDE.
+bind .PREFIX.INCLUDE. 0.4
+done .PREFIX.INCLUDE. virtual
 info warning "mymain", line 2: warning: mymain : bar.h : uhdr/bar.G : foo.h : bar.h: implicit reference before action completed
 make bar.h implicit
-bind bar.h 4
+bind bar.h 0.4
 done bar.h
 done foo.h generated
 done uhdr/bar.G
-init bar.h 0
+init bar.h 0.4
 exec - cp uhdr/bar.G bar.h
-code - 0 0 0
+code - 0 0.4 0.4
+make .PREFIX.INCLUDE.
+bind .PREFIX.INCLUDE. 0.4
+done .PREFIX.INCLUDE. virtual
 make foo.h implicit
-bind foo.h 4
+bind foo.h 0.4
 done foo.h generated
 done bar.h generated
 done mymain generated
 make Makefile.ms
-bind Makefile.ms 4
+bind Makefile.ms 0.4
 exec  : compile into make object
 done Makefile.ms
 info finish regression'
@@ -439,11 +457,11 @@ TEST 08 'prereq expansion'
 		INPUT t.c
 		OUTPUT - $'+ : ">" : "t.c" :
 + : "~" : "t.c (MYVAR1) (MYVAR2)" :
-+ : aha : "" :'
++ : aha : "(MYVAR1) (MYVAR2)" :'
 
 TEST 09 'prereq error'
 
-	EXEC	--regress
+	EXEC
 		INPUT Makefile $'target : file1 file2 file3 file4
 	: COMPILE $(>)
 	grep -q error $(*) && exit 1
@@ -456,10 +474,10 @@ TEST 09 'prereq error'
 + grep -q error file1 file2 file3 file4
 + touch target'
 
-	EXEC	--regress
+	EXEC
 		ERROR -
 
-	EXEC	--regress
+	EXEC
 		INPUT file2 $'error'	# simulate compilation error
 		INPUT file3 $'good'	# simulate good patch
 		ERROR - $'+ : COMPILE file2 file3
@@ -468,14 +486,14 @@ TEST 09 'prereq error'
 make: *** exit code 1 making target'
 		EXIT 1
 
-	EXEC	--regress
+	EXEC
 		INPUT file2 $'better'	# simulate good repatch
 		ERROR - $'+ : COMPILE file2 file3
 + grep -q error file1 file2 file3 file4
 + touch target'
 		EXIT 0
 
-	EXEC	--regress
+	EXEC
 		ERROR -
 
 TEST 10 'all prereqs'
@@ -514,7 +532,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
 + 		if	silent test -f "lib/libfoo.a"
-+ 		then	mv lib/libfoo.a lib/libfoo.a.old
++ 		then	mv -f lib/libfoo.a lib/libfoo.a.old
 + 		fi
 + 		ignore cp libfoo.a lib/libfoo.a  		    		   
 + 		}
@@ -529,7 +547,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
 + 		if	silent test -f "lib/lib/foo"
-+ 		then	mv lib/lib/foo lib/lib/foo.old
++ 		then	mv -f lib/lib/foo lib/lib/foo.old
 + 		fi
 + 		ignore cp foo.req lib/lib/foo  		    		   
 + 		}
@@ -565,7 +583,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
 + 		if	silent test -f "lib/libfoo.a"
-+ 		then	mv lib/libfoo.a lib/libfoo.a.old
++ 		then	mv -f lib/libfoo.a lib/libfoo.a.old
 + 		fi
 + 		ignore cp libfoo.a lib/libfoo.a  		    		   
 + 		}
@@ -580,7 +598,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
 + 		if	silent test -f "lib/lib/foo"
-+ 		then	mv lib/lib/foo lib/lib/foo.old
++ 		then	mv -f lib/lib/foo lib/lib/foo.old
 + 		fi
 + 		ignore cp foo.req lib/lib/foo  		    		   
 + 		}
@@ -616,7 +634,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s libfoo.a lib/libfoo.a ||
 + 		{
 + 		if	silent test -f "lib/libfoo.a"
-+ 		then	mv lib/libfoo.a lib/libfoo.a.old
++ 		then	mv -f lib/libfoo.a lib/libfoo.a.old
 + 		fi
 + 		ignore cp libfoo.a lib/libfoo.a  		    		   
 + 		}
@@ -631,7 +649,7 @@ foo $(VERSION) :LIBRARY: foo.c'
 + 	else	silent cmp -s foo.req lib/lib/foo ||
 + 		{
 + 		if	silent test -f "lib/lib/foo"
-+ 		then	mv lib/lib/foo lib/lib/foo.old
++ 		then	mv -f lib/lib/foo lib/lib/foo.old
 + 		fi
 + 		ignore cp foo.req lib/lib/foo  		    		   
 + 		}

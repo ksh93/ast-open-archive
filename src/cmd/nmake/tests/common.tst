@@ -26,7 +26,7 @@ TEST 01 'install with --compare and --clobber'
 	EXEC	--regress --nocompare install
 		ERROR - $'+ cp t.sh t
 + chmod u+w,+x t
-+ mv bin/t bin/t.old
++ mv -f bin/t bin/t.old
 + ignore cp t bin/t'
 
 	DO	touch t.sh
@@ -71,7 +71,7 @@ main(){return 0;}'
 + ignore cp b.h ../../include/b.h
 + ignore cp c.h ../../include/c.h'
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR -
 
 	EXEC	clean
@@ -83,17 +83,17 @@ main(){return 0;}'
 	EXEC	clobber
 		ERROR - $'+ ignore rm -f -r Makefile.mo'
 
-	EXEC	--nocompare --regress install '$(BINDIR)/a'
+	EXEC	--nocompare install '$(BINDIR)/a'
 		ERROR - $'+ touch a.h
 + cc -O -I. -c a.c
 + cc -O -o a a.o
-+ mv ../../bin/a ../../bin/a.old
++ mv -f ../../bin/a ../../bin/a.old
 + ignore cp a ../../bin/a
-+ mv ../../include/a.h ../../include/a.h.old
++ mv -f ../../include/a.h ../../include/a.h.old
 + ignore cp a.h ../../include/a.h
-+ mv ../../include/b.h ../../include/b.h.old
++ mv -f ../../include/b.h ../../include/b.h.old
 + ignore cp b.h ../../include/b.h
-+ mv ../../include/c.h ../../include/c.h.old
++ mv -f ../../include/c.h ../../include/c.h.old
 + ignore cp c.h ../../include/c.h'
 
 	EXEC	clobber
@@ -191,7 +191,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libtst.a root/lib/libtst.a ||
 + 		{
 + 		if	silent test -f "root/lib/libtst.a"
-+ 		then	mv root/lib/libtst.a root/lib/libtst.a.old
++ 		then	mv -f root/lib/libtst.a root/lib/libtst.a.old
 + 		fi
 + 		ignore cp libtst.a root/lib/libtst.a  		    		   
 + 		}
@@ -206,7 +206,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s tst.req root/lib/lib/tst ||
 + 		{
 + 		if	silent test -f "root/lib/lib/tst"
-+ 		then	mv root/lib/lib/tst root/lib/lib/tst.old
++ 		then	mv -f root/lib/lib/tst root/lib/lib/tst.old
 + 		fi
 + 		ignore cp tst.req root/lib/lib/tst  		    		   
 + 		}
@@ -218,7 +218,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libaha.a root/lib/libaha.a ||
 + 		{
 + 		if	silent test -f "root/lib/libaha.a"
-+ 		then	mv root/lib/libaha.a root/lib/libaha.a.old
++ 		then	mv -f root/lib/libaha.a root/lib/libaha.a.old
 + 		fi
 + 		ignore cp libaha.a root/lib/libaha.a  		    		   
 + 		}
@@ -230,7 +230,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s aha.req root/lib/lib/aha ||
 + 		{
 + 		if	silent test -f "root/lib/lib/aha"
-+ 		then	mv root/lib/lib/aha root/lib/lib/aha.old
++ 		then	mv -f root/lib/lib/aha root/lib/lib/aha.old
 + 		fi
 + 		ignore cp aha.req root/lib/lib/aha  		    		   
 + 		}
@@ -255,7 +255,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libtst.a root/lib/libtst.a ||
 + 		{
 + 		if	silent test -f "root/lib/libtst.a"
-+ 		then	mv root/lib/libtst.a root/lib/libtst.a.old
++ 		then	mv -f root/lib/libtst.a root/lib/libtst.a.old
 + 		fi
 + 		ln -s ../../libtst.a root/lib/libtst.a || ignore cp libtst.a root/lib/libtst.a  		    		   
 + 		}
@@ -270,7 +270,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s tst.req root/lib/lib/tst ||
 + 		{
 + 		if	silent test -f "root/lib/lib/tst"
-+ 		then	mv root/lib/lib/tst root/lib/lib/tst.old
++ 		then	mv -f root/lib/lib/tst root/lib/lib/tst.old
 + 		fi
 + 		ln -s ../../../tst.req root/lib/lib/tst || ignore cp tst.req root/lib/lib/tst  		    		   
 + 		}
@@ -282,7 +282,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s libaha.a root/lib/libaha.a ||
 + 		{
 + 		if	silent test -f "root/lib/libaha.a"
-+ 		then	mv root/lib/libaha.a root/lib/libaha.a.old
++ 		then	mv -f root/lib/libaha.a root/lib/libaha.a.old
 + 		fi
 + 		ln -s ../../libaha.a root/lib/libaha.a || ignore cp libaha.a root/lib/libaha.a  		    		   
 + 		}
@@ -294,7 +294,7 @@ aha :LIBRARY: aha.c'
 + 	else	silent cmp -s aha.req root/lib/lib/aha ||
 + 		{
 + 		if	silent test -f "root/lib/lib/aha"
-+ 		then	mv root/lib/lib/aha root/lib/lib/aha.old
++ 		then	mv -f root/lib/lib/aha root/lib/lib/aha.old
 + 		fi
 + 		ln -s ../../../aha.req root/lib/lib/aha || ignore cp aha.req root/lib/lib/aha  		    		   
 + 		}
@@ -459,7 +459,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t1 ../bin/t1 ||
 + 		{
 + 		if	silent test -f "../bin/t1"
-+ 		then	mv ../bin/t1 ../bin/t1.old
++ 		then	mv -f ../bin/t1 ../bin/t1.old
 + 		fi
 + 		ignore cp t1 ../bin/t1  		    		   
 + 		}
@@ -471,7 +471,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t2 ../bin/t2 ||
 + 		{
 + 		if	silent test -f "../bin/t2"
-+ 		then	mv ../bin/t2 ../bin/t2.old
++ 		then	mv -f ../bin/t2 ../bin/t2.old
 + 		fi
 + 		ignore cp t2 ../bin/t2  		    		   
 + 		}
@@ -486,7 +486,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t3.a ../lib/t3.a ||
 + 		{
 + 		if	silent test -f "../lib/t3.a"
-+ 		then	mv ../lib/t3.a ../lib/t3.a.old
++ 		then	mv -f ../lib/t3.a ../lib/t3.a.old
 + 		fi
 + 		ignore cp t3.a ../lib/t3.a  		    		   
 + 		}
@@ -498,7 +498,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s libt4.a ../lib/libt4.a ||
 + 		{
 + 		if	silent test -f "../lib/libt4.a"
-+ 		then	mv ../lib/libt4.a ../lib/libt4.a.old
++ 		then	mv -f ../lib/libt4.a ../lib/libt4.a.old
 + 		fi
 + 		ignore cp libt4.a ../lib/libt4.a  		    		   
 + 		}
@@ -513,7 +513,7 @@ t4 :LIBRARY: c.c'
 + 	else	silent cmp -s t4.req ../lib/lib/t4 ||
 + 		{
 + 		if	silent test -f "../lib/lib/t4"
-+ 		then	mv ../lib/lib/t4 ../lib/lib/t4.old
++ 		then	mv -f ../lib/lib/t4 ../lib/lib/t4.old
 + 		fi
 + 		ignore cp t4.req ../lib/lib/t4  		    		   
 + 		}
@@ -679,7 +679,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.h include/t.h ||
 + 		{
 + 		if	silent test -f "include/t.h"
-+ 		then	mv include/t.h include/t.h.old
++ 		then	mv -f include/t.h include/t.h.old
 + 		fi
 + 		ignore cp t.h include/t.h  		    		   
 + 		}
@@ -694,7 +694,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t bin/t ||
 + 		{
 + 		if	silent test -f "bin/t"
-+ 		then	mv bin/t bin/t.old
++ 		then	mv -f bin/t bin/t.old
 + 		fi
 + 		ignore cp t bin/t  		    		   
 + 		}
@@ -706,7 +706,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t2 bin/t2 ||
 + 		{
 + 		if	silent test -f "bin/t2"
-+ 		then	mv bin/t2 bin/t2.old
++ 		then	mv -f bin/t2 bin/t2.old
 + 		fi
 + 		ignore cp t2 bin/t2  		    		   
 + 		}
@@ -721,7 +721,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s libt.a lib/libt.a ||
 + 		{
 + 		if	silent test -f "lib/libt.a"
-+ 		then	mv lib/libt.a lib/libt.a.old
++ 		then	mv -f lib/libt.a lib/libt.a.old
 + 		fi
 + 		ignore cp libt.a lib/libt.a  		    		   
 + 		}
@@ -737,7 +737,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.req lib/lib/t ||
 + 		{
 + 		if	silent test -f "lib/lib/t"
-+ 		then	mv lib/lib/t lib/lib/t.old
++ 		then	mv -f lib/lib/t lib/lib/t.old
 + 		fi
 + 		ignore cp t.req lib/lib/t  		    		   
 + 		}
@@ -762,7 +762,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.h include/t.h ||
 + 		{
 + 		if	silent test -f "include/t.h"
-+ 		then	mv include/t.h include/t.h.old
++ 		then	mv -f include/t.h include/t.h.old
 + 		fi
 + 		ignore cp t.h include/t.h  		    		   
 + 		}
@@ -777,7 +777,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t bin/t ||
 + 		{
 + 		if	silent test -f "bin/t"
-+ 		then	mv bin/t bin/t.old
++ 		then	mv -f bin/t bin/t.old
 + 		fi
 + 		ln -s ../t bin/t || ignore cp t bin/t  		    		   
 + 		}
@@ -789,7 +789,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t2 bin/t2 ||
 + 		{
 + 		if	silent test -f "bin/t2"
-+ 		then	mv bin/t2 bin/t2.old
++ 		then	mv -f bin/t2 bin/t2.old
 + 		fi
 + 		ignore cp t2 bin/t2  		    		   
 + 		}
@@ -804,7 +804,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s libt.a lib/libt.a ||
 + 		{
 + 		if	silent test -f "lib/libt.a"
-+ 		then	mv lib/libt.a lib/libt.a.old
++ 		then	mv -f lib/libt.a lib/libt.a.old
 + 		fi
 + 		ignore cp libt.a lib/libt.a  		    		   
 + 		}
@@ -820,7 +820,7 @@ t :LIBRARY: a.c'
 + 	else	silent cmp -s t.req lib/lib/t ||
 + 		{
 + 		if	silent test -f "lib/lib/t"
-+ 		then	mv lib/lib/t lib/lib/t.old
++ 		then	mv -f lib/lib/t lib/lib/t.old
 + 		fi
 + 		ln -s ../../t.req lib/lib/t || ignore cp t.req lib/lib/t  		    		   
 + 		}
@@ -907,7 +907,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/NSTMTC.fld ||
 + 		{
 + 		if	silent test -f "etc/NSTMTC.fld"
-+ 		then	mv etc/NSTMTC.fld etc/NSTMTC.fld.old
++ 		then	mv -f etc/NSTMTC.fld etc/NSTMTC.fld.old
 + 		fi
 + 		ignore cp NSTMTC.fld etc/NSTMTC.fld  		    		   
 + 		}
@@ -919,7 +919,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/EIT5E.fld ||
 + 		{
 + 		if	silent test -f "etc/EIT5E.fld"
-+ 		then	mv etc/EIT5E.fld etc/EIT5E.fld.old
++ 		then	mv -f etc/EIT5E.fld etc/EIT5E.fld.old
 + 		fi
 + 		ignore cp NSTMTC.fld etc/EIT5E.fld  		    		   
 + 		}
@@ -931,7 +931,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/EIT4EP.fld ||
 + 		{
 + 		if	silent test -f "etc/EIT4EP.fld"
-+ 		then	mv etc/EIT4EP.fld etc/EIT4EP.fld.old
++ 		then	mv -f etc/EIT4EP.fld etc/EIT4EP.fld.old
 + 		fi
 + 		ignore cp NSTMTC.fld etc/EIT4EP.fld  		    		   
 + 		}
@@ -943,7 +943,7 @@ $(ETCDIR)/NSTUI.fld :INSTALL: NSTMTC.fld'
 + 	else	silent cmp -s NSTMTC.fld etc/NSTUI.fld ||
 + 		{
 + 		if	silent test -f "etc/NSTUI.fld"
-+ 		then	mv etc/NSTUI.fld etc/NSTUI.fld.old
++ 		then	mv -f etc/NSTUI.fld etc/NSTUI.fld.old
 + 		fi
 + 		ignore cp NSTMTC.fld etc/NSTUI.fld  		    		   
 + 		}
@@ -966,9 +966,25 @@ TEST 19 'synthesized rule name clashes'
 + 	else	silent cmp -s file ../../install/file ||
 + 		{
 + 		if	silent test -f "../../install/file"
-+ 		then	mv ../../install/file ../../install/file.old
++ 		then	mv -f ../../install/file ../../install/file.old
 + 		fi
 + 		ignore cp file ../../install/file  		    		   
 + 		}
 + 	fi
 + fi'
+
+TEST 20 'cc- permutations and perturbations'
+
+	EXEC	-n all cc-
+		INPUT Makefile $'CCFLAGS += -Ddummy
+TEST = abc
+DATA = DATA
+all :
+	echo [ $(-errorid) ] CCFLAGS=$(CCFLAGS) TEST=$(TEST) DATA=$(DATA)'
+		INPUT cc-pg/
+		INPUT cc-,TEST=123,DATA=data/
+		INPUT cc-O,TEST=789
+		OUTPUT - $'+ echo [  ] CCFLAGS=-O -Ddummy   TEST=abc DATA=DATA
++ echo [ cc-,TEST=123,DATA=data ] CCFLAGS=-O -Ddummy   TEST=123 DATA=data
++ echo [ cc-pg ] CCFLAGS=-pg   TEST=abc DATA=DATA'
+		ERROR - $'cc-,TEST=123,DATA=data:\ncc-pg:'

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2004 AT&T Corp.                  *
+*                  Copyright (c) 1996-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -39,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2004-09-28 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2004-12-01 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -219,7 +217,6 @@ USAGE_LICENSE
 #include <recsort.h>
 #include <recfmt.h>
 #include <sfdcgzip.h>
-#include <sfstr.h>
 #include <vmalloc.h>
 #include <wait.h>
 #include <iconv.h>
@@ -746,6 +743,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	}
 	else
 		sp->test |= TEST_read;
+	if (sp->zip & SF_READ)
+		sp->test |= TEST_read;
 	fixed = key->fixed;
 	if (!(sp->test & TEST_read))
 	{
@@ -1135,15 +1134,15 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 
 	error_info.file = ip == sfstdin ? (char*)0 : (char*)name;
 	sfset(ip, SF_SHARE, 0);
-	if (sp->map)
+	if (sp->zip & SF_READ)
+		sfdcgzip(ip, 0);
+	else if (sp->map)
 	{
 		sfsetbuf(ip, NiL, z = sp->end);
 		m = -1;
 	}
 	else
 		sfsetbuf(ip, NiL, 0);
-	if (sp->zip & SF_READ)
-		sfdcgzip(ip, 0);
 	r = sp->cur = roundof(sp->cur, sp->key->alignsize);
 	p = 0;
 	for (;;)
@@ -1501,6 +1500,8 @@ main(int argc, char** argv)
 						fp = 0;
 						continue;
 					}
+					if (sort.zip & SF_READ)
+						sfdcgzip(fp, 0);
 					sort.files[sort.nfiles++] = fp;
 				}
 				else

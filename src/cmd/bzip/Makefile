@@ -1,6 +1,6 @@
 :PACKAGE: ast
 
-LICENSE = type=special
+LICENSE = zlib
 
 PROTOFLAGS = -s
 

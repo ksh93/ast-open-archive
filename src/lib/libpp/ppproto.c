@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2004 AT&T Corp.                  *
+*                  Copyright (c) 1986-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -31,11 +29,13 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2004-08-11 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2004-10-22 $\0\n";
 
 #if PROTOMAIN
 
 #include "ppfsm.c"
+
+#include <hashkey.h>
 
 #if PROTO_STANDALONE
 #undef	O_RDONLY
@@ -210,9 +210,9 @@ static int		errors;
  */
 
 static int
-sstrlen(register char* s)
+sstrlen(register const char* s)
 {
-	register char*	b;
+	register const char*	b;
 
 	for (b = s; *s; s++);
 	return s - b;
@@ -223,13 +223,14 @@ sstrlen(register char* s)
  */
 
 static int
-sstrncmp(register char* s, register char* t, register int n)
+sstrncmp(register const char* s, register char* t, register int n)
 {
-	register char*	e = s + n;
+	register const char*	e = s + n;
 
 	while (s < e)
 	{
-		if (*s != *t || !*s) return *s - *t;
+		if (*s != *t || !*s)
+			return *s - *t;
 		s++;
 		t++;
 	}
@@ -241,7 +242,7 @@ sstrncmp(register char* s, register char* t, register int n)
  */
 
 static char*
-strcopy(register char* s, register char* t)
+strcopy(register char* s, register const char* t)
 {
 	while (*s++ = *t++);
 	return s - 1;
@@ -509,6 +510,7 @@ lex(register struct proto* proto, register long flags)
 	int			n;
 	int			line;
 	int			quot;
+	int			brack;
 	int			x;
 	int			vc;
 
@@ -1460,10 +1462,17 @@ if !defined(va_start)\n\
 						proto->ip = im;
 						proto->op = op;
 						group = 0;
+						brack = 0;
 						for (;;)
 						{
 							switch (lex(proto, (flags & GLOBAL) | RECURSIVE))
 							{
+							case '[':
+								brack++;
+								continue;
+							case ']':
+								brack--;
+								continue;
 							case '(':
 								if (paren++) group++;
 								continue;
@@ -1494,7 +1503,7 @@ if !defined(va_start)\n\
 								}
 								continue;
 							case T_ID:
-								if (group <= 1)
+								if (group <= 1 && !brack)
 								{
 									flags |= MATCH;
 									m = proto->tp;

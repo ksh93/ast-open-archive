@@ -26,7 +26,7 @@ make: warning: liblib.a.c: prerequisite liblib.a is active
 + rm -f lib.o
 + cc -O -o cmd cmd.o liblib.a'
 
-	EXEC	--regress
+	EXEC
 		ERROR -
 
 TEST 02 ':: with scoped variables'
@@ -166,7 +166,7 @@ TEST 07 ':INSTALLDIR:'
 + 	else	silent cmp -s test fun/test ||
 + 		{
 + 		if	silent test -f "fun/test"
-+ 		then	mv fun/test fun/test.old
++ 		then	mv -f fun/test fun/test.old
 + 		fi
 + 		ignore cp test fun/test  		    		   
 + 		}
@@ -333,7 +333,7 @@ init.c : mkinit builtins.c
 
 TEST 14 ':JOINT:'
 
-	EXEC	--regress
+	EXEC
 		INPUT Makefile $'all : a b c
 a b c :JOINT: i
 	touch $(<)'
@@ -343,7 +343,7 @@ a b c :JOINT: i
 	EXEC
 		ERROR -
 
-	DO touch b
+	DO	touch b
 
 	EXEC
 		ERROR - $'+ touch a b c'
@@ -393,7 +393,7 @@ TEST 15 ':: .sh rhs mismatch with lhs'
 
 TEST 16 ':INSTALLDIR: with dir prerequisite'
 
-	EXEC	--regress install
+	EXEC	install
 		INPUT Makefile $'usr :INSTALLDIR: include x.h'
 		INPUT include/a.h $'a.tst'
 		INPUT include/z.h $'z.tst'
@@ -519,7 +519,7 @@ ug gu :LINK: gg'
 + 	else	silent cmp -s gg bin/gg ||
 + 		{
 + 		if	silent test -f "bin/gg"
-+ 		then	mv bin/gg bin/gg.old
++ 		then	mv -f bin/gg bin/gg.old
 + 		fi
 + 		ignore cp gg bin/gg  		    		   
 + 		}
@@ -536,7 +536,7 @@ ug gu :LINK: gg'
 + fi
 + ln bin/gg bin/gu'
 
-	EXEC	--regress install
+	EXEC	install
 		INPUT Makefile $'INSTALLROOT = .
 .COMMAND.o : .USE
 	touch $(<)
@@ -553,12 +553,12 @@ aaa zzz :LINK: cmd'
 + ln bin/cmd bin/aaa
 + ln bin/cmd bin/zzz'
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR -
 
 	DO	touch aaa
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR - $'+ touch cmd
 + cp aaa aaa.old
 + rm -f aaa
@@ -567,12 +567,12 @@ aaa zzz :LINK: cmd'
 + rm -f zzz
 + ln cmd zzz'
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR -
 
 	DO	touch bin/aaa
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR - $'+ cp bin/aaa bin/aaa.old
 + rm -f bin/aaa
 + ln bin/cmd bin/aaa
@@ -580,15 +580,15 @@ aaa zzz :LINK: cmd'
 + rm -f bin/zzz
 + ln bin/cmd bin/zzz'
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR -
 
 	DO	rm aaa
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR - $'+ ln cmd aaa'
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR -
 
 TEST 20 ':: with dir qualified target'
@@ -664,7 +664,7 @@ BBB :: BBB.sh'
 
 TEST 21 ':JOINT: + update'
 
-	EXEC	--regress
+	EXEC
 		INPUT Makefile $'SMGEN = smgen
 SMGEN_FLAGS = -k -s printf
 FILES = color.sm traffic.c
@@ -713,13 +713,13 @@ making ColorSM.h'
 + cc -O -I. -c traffic.c
 + cc -o traffic color.o traffic.o'
 
-	EXEC	--regress
+	EXEC
 		OUTPUT -
 		ERROR -
 
-	DO	{ sleep 1; touch color.sm; }
+	DO	touch color.sm
 
-	EXEC	--regress
+	EXEC
 		OUTPUT - $'color.c is up-to-date
 color.h is up-to-date
 making ColorSM.h'
@@ -752,7 +752,7 @@ cp $1 DB2.h'
 
 	CD	../../dev/src
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR - $'+ mkdir -p ../lib/db'
 
 	EXEC	-n clobber
@@ -866,7 +866,7 @@ t $(VERSION) :LIBRARY: a.c z.c'
 	EXEC	--regress all VERSION=5.0
 		ERROR -
 
-	EXEC	clobber
+	EXEC	--regress clobber
 		ERROR - $'+ ignore rm -f -r libt.so.2.4 libt.a Makefile.mo Makefile.ms t.req libt.so.5.0'
 
 	EXEC	--regress install VERSION='7.1 plugin=foo'
@@ -900,7 +900,7 @@ TEST 27 ':MAKE: + install + file name clash'
 + 	else	silent cmp -s t.exe bin/t.exe ||
 + 		{
 + 		if	silent test -f "bin/t.exe"
-+ 		then	mv bin/t.exe bin/t.exe.old
++ 		then	mv -f bin/t.exe bin/t.exe.old
 + 		fi
 + 		ignore cp t.exe bin/t.exe  		    		   
 + 		}
@@ -945,7 +945,7 @@ $$(BINDIR) :INSTALLDIR: mode=0644 $(FILES)'
 + 	else	silent cmp -s a bin/a ||
 + 		{
 + 		if	silent test -f "bin/a"
-+ 		then	mv bin/a bin/a.old
++ 		then	mv -f bin/a bin/a.old
 + 		fi
 + 		ignore cp a bin/a  		    		   && chmod 0644 bin/a
 + 		}
@@ -976,7 +976,7 @@ $(INCLUDEDIR) :INSTALLDIR: prog3'
 
 	CD	../dev
 
-	EXEC	--regress install
+	EXEC	install
 		ERROR - $'+ mkdir -p bin
 + mkdir -p lib
 + mkdir -p include'
@@ -1001,7 +1001,7 @@ t :: t.c .TBIN'
 + 	else	silent cmp -s t tbin/t ||
 + 		{
 + 		if	silent test -f "tbin/t"
-+ 		then	mv tbin/t tbin/t.old
++ 		then	mv -f tbin/t tbin/t.old
 + 		fi
 + 		ignore cp t tbin/t  		    		   
 + 		}
@@ -1025,7 +1025,7 @@ t :: t.c .TBIN'
 + 	else	silent cmp -s t.o tbin/t.o ||
 + 		{
 + 		if	silent test -f "tbin/t.o"
-+ 		then	mv tbin/t.o tbin/t.o.old
++ 		then	mv -f tbin/t.o tbin/t.o.old
 + 		fi
 + 		ignore cp t.o tbin/t.o  		    		   
 + 		}
@@ -1037,7 +1037,7 @@ t :: t.c .TBIN'
 + 	else	silent cmp -s t tbin/t ||
 + 		{
 + 		if	silent test -f "tbin/t"
-+ 		then	mv tbin/t tbin/t.old
++ 		then	mv -f tbin/t tbin/t.old
 + 		fi
 + 		ignore cp t tbin/t  		    		   
 + 		}
@@ -1097,7 +1097,7 @@ TEST 32 ':MAKE: + ..'
 
 TEST 33 ':JOINT: vs cc'
 
-	EXEC	--regress
+	EXEC
 		INPUT Makefile $'all : b.o a.o
 b.o a.o :JOINT: j.c
 	$(CC) -c $(*)
@@ -1108,7 +1108,7 @@ b.o a.o :JOINT: j.c
 + cp j.o b.o
 + mv j.o a.o'
 
-	EXEC	--regress
+	EXEC
 		ERROR -
 
 TEST 34 ':JOINT: vs :LIBRARY:'
@@ -1131,7 +1131,7 @@ b.o a.o :JOINT: fun.c
 + ignore ranlib libtst.a
 + rm -f b.o a.o'
 
-	EXEC	--regress
+	EXEC
 		ERROR
 
 TEST 35 ':LIBRARY: + :VARIANT: + cc-'

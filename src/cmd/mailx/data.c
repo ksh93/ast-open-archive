@@ -22,11 +22,7 @@ are met:\n\
 2. Redistributions in binary form must reproduce the above copyright\n\
    notice, this list of conditions and the following disclaimer in the\n\
    documentation and/or other materials provided with the distribution.\n\
-3. All advertising materials mentioning features or use of this software\n\
-   must display the following acknowledgement:\n\
-	This product includes software developed by the University of\n\
-	California, Berkeley and its contributors.\n\
-4. Neither the name of the University nor the names of its contributors\n\
+3. Neither the name of the University nor the names of its contributors\n\
    may be used to endorse or promote products derived from this software\n\
    without specific prior written permission.\n\
 \n\
@@ -159,7 +155,7 @@ static const struct cmd	cmdtab[] =
 "map",		CMD(map),		M|Z|STRLIST,	0,	0,
 	X("address ...\nList the result of alias expansion on the address arguments. map! gives the step-by-step details."),
 "mar[k]",	CMD(mark),		STRLIST,	0,	0,
-	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), save (*), spam (X), touch, unread (U). Multiple marks may be separated by , or |. If no mark is omitted then spam is assumed."),
+	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), save (*), spam (X), touch, unread (U). Multiple marks may be separated by , or |. If mark is omitted then spam is assumed."),
 "mb[ox]",	CMD(mboxit),		W|STRLIST,	0,	0,
 	X("[ message ... ]\nAppend the selected messages to ${MBOX} on normal exit."),
 "mi[me]",	CMD(capability),	M|Z|RAWLIST,	0,	ARG_MAX,

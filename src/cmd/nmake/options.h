@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -105,7 +103,9 @@
 #define OPT_writeobject	(107|Of|Os|Ov|Ox)/* write recompiled object	*/
 #define OPT_writestate	(108|Of|Os|Ov|Ox)/* write state file on exit	*/
 
-struct option				/* option table entry		*/
+struct Option_s; typedef struct Option_s Option_t;
+
+struct Option_s				/* option table entry		*/
 {
 	char*		name;		/* option name			*/
 	unsigned long	flags;		/* O[a-z] and OPT_[A-Z]+ flags	*/
@@ -113,9 +113,9 @@ struct option				/* option table entry		*/
 	char*		set;		/* call this on set		*/
 	char*		description;	/* description			*/
 	char*		arg;		/* arg name			*/
-	struct option*	next;		/* external option list link	*/
+	Option_t*	next;		/* external option list link	*/
 };
 
-extern struct option*	optflag(int);
+extern Option_t*	optflag(int);
 extern void		optcheck(int);
 extern void		optinit(void);

@@ -19,7 +19,7 @@ integer seconds=1
 COMMAND=3d
 
 FILE=
-FORMAT="%Y-%m-%d+%H:%M:%S"
+FORMAT="%K"
 GROUP=
 INIT=
 NEW="new-and-improved"
@@ -217,7 +217,7 @@ function REMOVE
 function TOUCH
 {
 	DATA $*
-	touch -r $FILE -t "$seconds seconds" $TWD/reference || FAIL $TWD/reference touch error
+	touch -t "$seconds seconds" $TWD/reference || FAIL $TWD/reference touch error
 	(( seconds++ ))
 	touch -t "$seconds seconds" $FILE || FAIL $FILE touch error
 	if	[[ $FILE/... -nt $TWD/reference ]]
@@ -345,11 +345,6 @@ TEST 07 PWD==top top exists, bot virtual &&
 	CP foo ...
 	MV bar ...
 	CP foo ...
-	[[ ! -d ... ]] && FAIL ... not a directory && return
-	[[ $(ls ... 2>/dev/null) != $'bar\nfoo' ]] && FAIL bottom incomplete -- $(ls ... 2>&1)
-	[[ $(2d ls 2>/dev/null) != $'foo' ]] && FAIL top incomplete -- $(2d ls 2>&1)
-	CP * ...
-	[[ $(cat bar 2>/dev/null) != bar ]] && FAIL bottom to bottom garbled -- $(cat bar 2>&1)
+	[[ -d ... ]] && FAIL ... is a directory && return
 	[[ $(cat foo 2>/dev/null) != foo ]] && FAIL top garbled -- $(cat foo 2>&1)
-	[[ $(cat .../foo 2>/dev/null) != foo ]] && FAIL top to bottom garbled -- $(cat .../foo 2>&1)
 }

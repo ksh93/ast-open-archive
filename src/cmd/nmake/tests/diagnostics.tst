@@ -4,8 +4,8 @@ INCLUDE test.def
 
 TEST 01 'mode 000 files'
 
-	DO touch all
-	DO chmod 000 all
+	DO	touch all
+	DO	chmod 000 all
 
 	EXEC	-n
 		INPUT Makefile $'
@@ -145,10 +145,10 @@ mid : .MAKE .VIRTUAL .FORCE
 
 TEST 06 'concurrency check'
 
-	EXEC	--regress
+	EXEC
 		INPUT Makefile $'all : .FORCE
 	silent $(MAKE) $(-) $(=)'
-		ERROR - $'make: warning: another make has been running on Makefile in . for the past 1.00s
+		ERROR - $'make: warning: another make is running on Makefile in .
 make: use -K to override
 make: *** exit code 1 making all'
 		EXIT 1
@@ -173,8 +173,9 @@ TEST 08 'included file change'
 		INPUT Makefile $'include "test.mk"'
 		INPUT test.mk $'all :'
 
-	DO sleep 1
-	DO touch test.mk
+	EXEC	# 1 sec granularity state sync for INPUT updates
+
+	DO	touch test.mk
 
 	EXEC	--noexec
 		ERROR - $'make: warning: Makefile.mo: out of date with test.mk
@@ -714,11 +715,11 @@ TEST 13 'self-documentation'
             [--define=name[=value]] [--preprocess] [--undef=name]
             [--all-static] [--ancestor=depth]
             [--ancestor-source=.SOURCE.suffix directory...]
-            [--arclean=edit-ops] [--cctype=type] [--clean-ignore=pattern]
-            [--clobber[=pattern]] [--compare] [--debug-symbols]
-            [--force-shared] [--instrument=command] [--ld-script=suffix]
-            [--link=pattern] [--nativepp=level] [--official-out=file]
-            [--output=file] [--prefix-include] [--preserve[=pattern]]
+            [--archive-clean=edit-ops] [--archive-output=file] [--cctype=type]
+            [--clean-ignore=pattern] [--clobber[=pattern]] [--compare]
+            [--debug-symbols] [--force-shared] [--instrument=command]
+            [--ld-script=suffix] [--link=pattern] [--native-pp=level]
+            [--official-output=file] [--prefix-include] [--preserve[=pattern]]
             [--profile] [--recurse=action] [--recurse-enter=text]
             [--recurse-leave=text] [--select=edit-ops] [--separate-include]
             [--static-link] [--strip-symbols] [--threads]

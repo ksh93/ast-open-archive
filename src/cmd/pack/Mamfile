@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make pack
 make pack.o
@@ -125,7 +125,7 @@ done huffman.h
 done pack.c
 meta pack.o %.c>%.o pack.c pack
 prev pack.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?pack]"\" -c pack.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pack]"\" -c pack.c
 done pack.o generated
 make libhuff.a archive
 make huff.req
@@ -207,10 +207,6 @@ done pack generated
 make unpack
 make unpack.o
 make unpack.c
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h
 make ${INSTALLROOT}/include/ast/times.h implicit
 make ${INSTALLROOT}/include/ast/ast_time.h implicit
 done ${INSTALLROOT}/include/ast/ast_time.h dontcare
@@ -223,7 +219,7 @@ prev huffman.h implicit
 done unpack.c
 meta unpack.o %.c>%.o unpack.c unpack
 prev unpack.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?pack]"\" -c unpack.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pack]"\" -c unpack.c
 done unpack.o generated
 prev libhuff.a archive
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o unpack unpack.o libhuff.a ${mam_libast}

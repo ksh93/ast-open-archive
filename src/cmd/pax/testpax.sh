@@ -1,16 +1,14 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1987-2004 AT&T Corp.                  #
+#                  Copyright (c) 1987-2005 AT&T Corp.                  #
 #                      and is licensed under the                       #
-#          Common Public License, Version 1.0 (the "License")          #
-#                        by AT&T Corp. ("AT&T")                        #
-#      Any use, downloading, reproduction or distribution of this      #
-#      software constitutes acceptance of the License.  A copy of      #
-#                     the License is available at                      #
+#                  Common Public License, Version 1.0                  #
+#                            by AT&T Corp.                             #
 #                                                                      #
-#         http://www.research.att.com/sw/license/cpl-1.0.html          #
-#         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         #
+#                A copy of the License is available at                 #
+#            http://www.opensource.org/licenses/cpl1.0.txt             #
+#         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         #
 #                                                                      #
 #              Information and Software Systems Research               #
 #                            AT&T Research                             #
@@ -24,6 +22,8 @@
 # testpax [ + ] [ - ] [ tar-path ] [ pax-path ] [ pax-options ... ]
 #
 #	+		execution trace
+#	-		don't clean up pax.tmp
+#	.		exit on first failure (and don't clean up)
 #	tar-path	tar the old and new archives
 #
 # @(#)testpax (AT&T Labs Research) 2003-10-01
@@ -31,6 +31,7 @@
 integer errors=0 tests=0
 typeset -Z TEST=00
 
+bail=
 clobber=1
 tmp=pax.tmp
 
@@ -38,6 +39,7 @@ while	:
 do	case $1 in
 	+)	PS4='+$LINENO+ '; shift; set -x ;;
 	-)	clobber=; shift ;;
+	.)	bail=1; shift ;;
 	*)	break ;;
 	esac
 done
@@ -150,6 +152,9 @@ do	suf=${format##*.}
 	esac
 	TEST=$tests
 	print -u2 "$TEST	base $fmt$result"
+	case $bail:$result in
+	1:?*)	exit 1 ;;
+	esac
 
 	((tests++))
 	status=0
@@ -202,6 +207,9 @@ do	suf=${format##*.}
 	esac
 	TEST=$tests
 	print -u2 "$TEST	delta $fmt$result"
+	case $bail:$result in
+	1:?*)	exit 1 ;;
+	esac
 
 	((tests++))
 	status=0
@@ -224,6 +232,9 @@ do	suf=${format##*.}
 	esac
 	TEST=$tests
 	print -u2 "$TEST	io $fmt$result"
+	case $bail:$result in
+	1:?*)	exit 1 ;;
+	esac
 
 	: back to parent of $tmp
 	cd ..
@@ -243,6 +254,9 @@ case $status$? in
 esac
 TEST=$tests
 print -u2 "$TEST	copy new cpy$result"
+case $bail:$result in
+1:?*)	exit 1 ;;
+esac
 
 : conversion test
 
@@ -262,6 +276,9 @@ else	result=" FAILED"
 fi
 TEST=$tests
 print -u2 "$TEST	codeset conversion$result"
+case $bail:$result in
+1:?*)	exit 1 ;;
+esac
 
 : clean up
 

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2004 AT&T Corp.                  *
+*                  Copyright (c) 1998-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -113,7 +111,7 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 		pz->vmdisc.exceptf = nomalloc;
 		if (!vmdisc(vm, &pz->vmdisc))
 			goto bad;
-		tmtimeofday(&pz->start);
+		tvgettime(&pz->start);
 		pz->major = PZ_MAJOR;
 		pz->minor = PZ_MINOR;
 		pz->id = state.id;
@@ -238,7 +236,7 @@ pzclose(register Pz_t* pz)
 	unsigned long	e;
 	Sfoff_t		p;
 	Sfio_t*		op;
-	struct timeval	now;
+	Tv_t		now;
 
 	if (!pz)
 		return -1;
@@ -290,8 +288,8 @@ pzclose(register Pz_t* pz)
 			e = 100;
 		else
 		{
-			tmtimeofday(&now);
-			if (!(e = ((unsigned long)now.tv_sec - (unsigned long)pz->start.tv_sec) * 100 + ((long)now.tv_usec - (long)pz->start.tv_usec) / 10000))
+			tvgettime(&now);
+			if (!(e = ((unsigned long)now.tv_sec - (unsigned long)pz->start.tv_sec) * 100 + ((long)now.tv_nsec - (long)pz->start.tv_nsec) / 10000000L))
 				e = 1;
 		}
 		sfprintf(pz->tmp, _("total %s rate %.2f time %s bpr %.2f bps %s size %I*u/%I*u windows %I*u")

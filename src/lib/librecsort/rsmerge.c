@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2004 AT&T Corp.                  *
+*                  Copyright (c) 1996-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -135,12 +133,12 @@ Merge_t*	mg;
 	ssize_t		datalen, rsc;
 	reg Rsobj_t	*obj, *endobj;
 	reg uchar	*t, *cur, *rsrv, *endrsrv;
-	reg int		n, type = rs->type;
+	reg int		n, type = rs->type, last;
 	reg ssize_t	key = rs->disc->key;
 	reg ssize_t	keylen = rs->disc->keylen;
 	reg Rsdefkey_f	defkeyf = rs->disc->defkeyf;
 	reg uchar	*m_key, *c_key;
-	reg ssize_t	s_key, s;
+	reg ssize_t	s_key, s, o, x;
 
 	if(MGISEOF(mg))
 		return -1;
@@ -165,22 +163,29 @@ Merge_t*	mg;
 	{	if(type&RS_DSAMELEN)
 		{	MGRESERVE(mg,rsrv,endrsrv,cur,datalen, return -1);
 		}
-		else for(s = RS_RESERVE;;) /* make sure we have at least 1 record */
+		else for(s = RS_RESERVE, o = 0, last = 0;;) /* make sure we have at least 1 record */
 		{	MGRESERVE(mg,rsrv,endrsrv,cur,s, goto last_chunk);
-			if((t = (uchar*)memchr(cur,rsc,endrsrv-cur)) )
+			x = endrsrv-cur;
+			if((t = (uchar*)memchr(cur,rsc,x)) )
 			{	datalen = (t-cur)+1;
 				break;
 			}
 			else if(MGISEOF(mg))
 				return -1;
+			else if(o == x)
+			{	datalen = x;
+				break;
+			}
 			else
-			{	s += RS_RESERVE;
+			{	o = x;
+				s += RS_RESERVE;
 				continue;
 			}
 		last_chunk:
-			if((s = sfvalue(mg->f)) > 0)
-				MGCLREOF(mg);
-			else	return -1;
+			if(last || (s = sfvalue(mg->f)) <= 0)
+				return -1;
+			last = 0;
+			MGCLREOF(mg);
 		}
 	}
 	else

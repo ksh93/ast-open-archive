@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -96,6 +94,7 @@
  *   2002             (4.2)             .	AT&T Research
  *   2003             (4.3)             .	AT&T Research
  *   2004             (4.4)             .	AT&T Research
+ *   2005             (5.0)             .	AT&T Research
  *
  * command line arguments are of three types
  *
@@ -201,9 +200,9 @@
  * global initialization -- external engine names are defined in initrule()
  */
 
-struct internal		internal;	/* internal rules and vars	*/
-struct state		state;		/* program state		*/
-struct tables		table;		/* hash table info		*/
+Internal_t		internal;	/* internal rules and vars	*/
+State_t			state;		/* program state		*/
+Tables_t		table;		/* hash table info		*/
 char			null[] = "";	/* null string			*/
 char			tmpname[MAXNAME];/* temporary name buffer	*/
 short			ctypes[UCHAR_MAX+1];/* istype() character types	*/
@@ -215,7 +214,7 @@ short			ctypes[UCHAR_MAX+1];/* istype() character types	*/
 static int
 intercept(Sfio_t* sp, int level, int flags)
 {
-	register struct rule*	r;
+	register Rule_t*	r;
 	char*			m;
 	char*			s;
 	char*			t;
@@ -279,17 +278,17 @@ int
 main(int argc, char** argv)
 {
 	register char*		s;
-	register struct rule*	r;
-	register struct list*	p;
+	register Rule_t*	r;
+	register List_t*	p;
 	int			i;
 	int			args;
 	int			trace;
 	char*			t;
 	char*			buf;
 	char*			tok;
-	struct var*		v;
-	struct stat		st;
-	struct stat		ds;
+	Var_t*			v;
+	Stat_t			st;
+	Stat_t			ds;
 	Sfio_t*			tmp;
 
 	/*
@@ -525,7 +524,7 @@ main(int argc, char** argv)
 	if (error_info.trace < 0)
 	{
 		errno = 0;
-		error(error_info.trace, "%s [%d %s]", version, state.pid, strtime(state.start));
+		error(error_info.trace, "%s [%d %s]", version, state.pid, timestr(state.start));
 	}
 
 	/*
@@ -641,7 +640,7 @@ main(int argc, char** argv)
 					break;
 			}
 			tokclose(tok);
-			sfstrset(tmp, 0);
+			sfstrseek(tmp, 0, SEEK_SET);
 		}
 		if (!s && (s = colonlist(tmp, external.files, 1, ' ')))
 		{
@@ -761,7 +760,7 @@ main(int argc, char** argv)
 	for (i = args; i < state.argc; i++)
 		if (state.argf[i] & ARG_TARGET)
 		{
-			struct list*	q;
+			List_t*		q;
 
 			q = cons(makerule(state.argv[i]), NiL);
 			if (p)
@@ -858,8 +857,8 @@ main(int argc, char** argv)
 void
 finish(int n)
 {
+	Rule_t*		r;
 	int		i;
-	struct rule*	r;
 
 	/*
 	 * old error intercept

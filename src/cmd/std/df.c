@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2004 AT&T Corp.                  *
+*                  Copyright (c) 1989-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -105,7 +103,6 @@ USAGE_LICENSE
 #include <mnt.h>
 #include <sig.h>
 #include <sfdisc.h>
-#include <sfstr.h>
 
 typedef struct				/* df entry			*/
 {
@@ -860,7 +857,7 @@ main(int argc, register char** argv)
 	{
 		error(ERROR_SYSTEM|(argc > 0 ? 1 : 3), "cannot access mount table");
 		sfkeyprintf(head ? sfstdout : state.tmp, NiL, format, key, NiL);
-		sfstrset(state.tmp, 0);
+		sfstrseek(state.tmp, 0, SEEK_SET);
 		df.mnt = &mnt;
 		mnt.dir = UNKNOWN;
 		mnt.type = 0;
@@ -872,7 +869,7 @@ main(int argc, register char** argv)
 	else
 	{
 		sfkeyprintf(head ? sfstdout : state.tmp, NiL, format, key, NiL);
-		sfstrset(state.tmp, 0);
+		sfstrseek(state.tmp, 0, SEEK_SET);
 		if (rem = argc)
 		{
 			if (!(dev = newof(0, dev_t, argc, 0)))

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2004 AT&T Corp.                  *
+*                  Copyright (c) 1989-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -27,8 +25,13 @@
  * ls -- list file status
  */
 
+#define TIME_ISO	"%Q/%m-%d+%H:%M/%Y-%m-%d /"
+#define TIME_LONG_ISO	"%K"
+#define TIME_FULL_ISO	"%K.%N%z"
+#define TIME_LOCALE	"%c"
+
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-09-14 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-12-25 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -57,8 +60,8 @@ USAGE_LICENSE
 "[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
 "	override internal \b--format\b identifiers.]:[key[=value]]]"
-"[e:decimal-scale|thousands?Scale sizes to powers of 1000 { b K M G T }.]"
-"[E:block-size?Use \ablocksize\a blocks.]#[blocksize]"
+"[e:long-iso|long-time?Equivalent to \b--long --time-style=long-iso\b.]"
+"[E:full-iso|full-time?Equivalent to \b--long --time-style=full-iso\b.]"
 "[f:force?Force each argument to be interpreted as a directory and list"
 "	the name found in each slot in the physical directory order. Turns"
 "	on \b-aU\b and turns off \b-lrst\b. The results are undefined for"
@@ -183,12 +186,13 @@ USAGE_LICENSE
 "	[1:single-column?One column down the page.]"
 "}"
 "[z:time-style?List the time according to \astyle\a:]:[style]{"
-"	[i:iso?Equivalent to \b+%K\b.]"
+"	[i:iso?Equivalent to \b+" TIME_ISO "\b.]"
 "	[10:posix-iso?No change for the C or posix locales, \biso\b otherwise.]"
-"	[f:full-iso?Equivalent to \b+%Y-%m-%d+%H:%M:%S.000000%z\b.]"
+"	[f:full-iso?Equivalent to \b+" TIME_FULL_ISO "\b.]"
+"	[l:long-iso?Equivalent to \b+" TIME_LONG_ISO "\b.]"
 "	[11:posix-full-iso?No change for the C or posix locales, \bfull-iso\b"
 "		otherwise.]"
-"	[l:locale?Equivalent to \b+%c\b.]"
+"	[L:locale?Equivalent to \b+" TIME_LOCALE "\b.]"
 "	[12:+\aformat\a?A \bdate\b(1) +\aformat\a.]"
 "}"
 "[1:one-column?List one file per line.]"
@@ -198,10 +202,11 @@ USAGE_LICENSE
 "	follow. The default is determined by \bgetconf PATH_RESOLVE\b.]"
 "[P:physical?Don't follow symbolic links. The default is determined by"
 "	\bgetconf PATH_RESOLVE\b.]"
-"[101:dump?Print the generated \b--format\b string on the standard output"
+"[101:block-size?Use \ablocksize\a blocks.]#[blocksize]"
+"[102:decimal-scale|thousands?Scale sizes to powers of 1000 { b K M G T }.]"
+"[103:dump?Print the generated \b--format\b string on the standard output"
 "	and exit.]"
-"[102:full-time?Equivalent to \b--time-style=full-iso\b.]"
-"[103:testdate?\b--format\b time values newer than \adate\a will be printed"
+"[104:testdate?\b--format\b time values newer than \adate\a will be printed"
 "	as \adate\a. Used for regression testing.]:[date]"
 
 "\n"
@@ -217,9 +222,8 @@ USAGE_LICENSE
 #include <error.h>
 #include <ftwalk.h>
 #include <sfdisc.h>
-#include <sfstr.h>
 #include <hash.h>
-#include <tm.h>
+#include <tmx.h>
 
 #define LS_ACROSS	(LS_USER<<0)	/* multi-column row order	*/
 #define LS_ALL		(LS_USER<<1)	/* list all			*/
@@ -453,6 +457,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	register Sflong_t	n = 0;
 	register Key_t*		kp;
 	List_t*			lp;
+	Time_t			t;
 
 	static Sfio_t*		mp;
 	static const char	fmt_mode[] = "mode";
@@ -471,6 +476,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		ftw = 0;
 		st = 0;
 	}
+	t = TMX_NOTIME;
 	if (!(kp = (Key_t*)hashget(state.keys, fp->t_str)))
 	{
 		if (*fp->t_str != '$')
@@ -498,7 +504,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	{
 	case KEY_atime:
 		if (st)
+		{
 			n = st->st_atime;
+			t = tmxgetatime(st);
+		}
 		if (!arg)
 			arg = state.timefmt;
 		break;
@@ -508,7 +517,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		break;
 	case KEY_ctime:
 		if (st)
+		{
 			n = st->st_ctime;
+			t = tmxgetctime(st);
+		}
 		if (!arg)
 			arg = state.timefmt;
 		break;
@@ -639,7 +651,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		break;
 	case KEY_mtime:
 		if (st)
+		{
 			n = st->st_mtime;
+			t = tmxgetmtime(st);
+		}
 		if (!arg)
 			arg = state.timefmt;
 		break;
@@ -723,9 +738,14 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				if (*arg == '=')
 					arg++;
 			}
+			if (!*arg)
+				arg = state.timefmt;
 			if ((unsigned long)n >= state.testdate)
+			{
 				n = state.testdate;
-			*ps = fmttime(*arg ? arg : state.timefmt, (time_t)n);
+				t = TMX_NOTIME;
+			}
+			*ps = t == TMX_NOTIME ? fmttime(arg, (time_t)n) : fmttmx(arg, t);
 		}
 	}
 	else
@@ -796,7 +816,7 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 			state.adjust = 2;
 			w = sfkeyprintf(state.tmp, lp, state.format, key, NiL) + state.adjust;
 			length += w;
-			sfstrset(state.tmp, 0);
+			sfstrseek(state.tmp, 0, SEEK_SET);
 			ftw->name[1] = i;
 			n = ((state.width - (length + BETWEEN + 2)) < 0) ? 1 : 2;
 				
@@ -966,6 +986,8 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 	register int	n;
 	char*		x1;
 	char*		x2;
+	Time_t		t1;
+	Time_t		t2;
 
 	if (state.sortflags & LS_NOSORT)
 		return 0;
@@ -992,17 +1014,22 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 	{
 		if (state.sortflags & LS_ATIME)
 		{
-			f1->statb.st_mtime = f1->statb.st_atime;
-			f2->statb.st_mtime = f2->statb.st_atime;
+			t1 = tmxgetatime(&f1->statb);
+			t2 = tmxgetatime(&f2->statb);
 		}
 		else if (state.sortflags & LS_CTIME)
 		{
-			f1->statb.st_mtime = f1->statb.st_ctime;
-			f2->statb.st_mtime = f2->statb.st_ctime;
+			t1 = tmxgetctime(&f1->statb);
+			t2 = tmxgetctime(&f2->statb);
 		}
-		if (f1->statb.st_mtime < f2->statb.st_mtime)
+		else
+		{
+			t1 = tmxgetmtime(&f1->statb);
+			t2 = tmxgetmtime(&f2->statb);
+		}
+		if (t1 < t2)
 			n = 1;
-		else if (f1->statb.st_mtime > f2->statb.st_mtime)
+		else if (t1 > t2)
 			n = -1;
 		else
 			n = 0;
@@ -1241,7 +1268,8 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_DIRECTORY;
 			break;
 		case 'e':
-			state.scale = 1000;
+			state.lsflags |= LS_LONG;
+			state.timefmt = TIME_LONG_ISO;
 			break;
 		case 'f':
 			state.lsflags |= LS_ALL;
@@ -1353,17 +1381,20 @@ main(int argc, register char** argv)
 					break;
 				/*FALLTHROUGH*/
 			case 'i':
-				state.timefmt = "%K";
+				state.timefmt = TIME_ISO;
 				break;
 			case -11:
 				if (!strcmp(setlocale(LC_TIME, NiL), "C"))
 					break;
 				/*FALLTHROUGH*/
 			case 'f':
-				state.timefmt = "%Y-%m-%d+%H:%M:%S.000000%z";
+				state.timefmt = TIME_FULL_ISO;
 				break;
 			case 'l':
-				state.timefmt = "%c";
+				state.timefmt = TIME_LONG_ISO;
+				break;
+			case 'L':
+				state.timefmt = TIME_LOCALE;
 				break;
 			case -12:
 				s = opt_info.arg + 1;
@@ -1415,9 +1446,8 @@ main(int argc, register char** argv)
 			}
 			break;
 		case 'E':
-			if (opt_info.num <= 0)
-				error(3, "%ld: invalid block size", opt_info.num);
-			state.blocksize = opt_info.num;
+			state.lsflags |= LS_LONG;
+			state.timefmt = TIME_FULL_ISO;
 			break;
 		case 'F':
 			state.lsflags |= LS_MARK;
@@ -1439,7 +1469,6 @@ main(int argc, register char** argv)
 				state.lsflags |= LS_ESCAPE|LS_PRINTABLE;
 				break;
 			case 'l':
-				state.lsflags |= LS_ESCAPE|LS_PRINTABLE|LS_QUOTE|LS_SHELL;
 				break;
 			case 'q':
 				state.lsflags |= LS_PRINTABLE;
@@ -1541,12 +1570,17 @@ main(int argc, register char** argv)
 			state.lsflags &= ~(LS_COLUMNS|LS_PRINTABLE);
 			break;
 		case -101:
-			dump = 1;
+			if (opt_info.num <= 0)
+				error(3, "%ld: invalid block size", opt_info.num);
+			state.blocksize = opt_info.num;
 			break;
 		case -102:
-			state.timefmt = "%c";
+			state.scale = 1000;
 			break;
 		case -103:
+			dump = 1;
+			break;
+		case -104:
 			state.testdate = tmdate(opt_info.arg, &e, NiL);
 			if (*e)
 				error(3, "%s: invalid date string", opt_info.arg, opt_info.option);
@@ -1615,7 +1649,7 @@ main(int argc, register char** argv)
 				sfprintf(fmt, " %%-8(uid)%c", (state.lsflags & LS_NUMBER) ? 'd' : 's');
 			if (!(state.lsflags & LS_NOGROUP))
 				sfprintf(fmt, " %%-8(gid)%c", (state.lsflags & LS_NUMBER) ? 'd' : 's');
-			sfputr(fmt, "%8(device:case::%(size)u:*:%(device)s)s", -1);
+			sfputr(fmt, " %8(device:case::%(size)u:*:%(device)s)s", -1);
 			sfprintf(fmt, " %%(%s)s ", (state.timeflags & LS_ATIME) ? "atime" : (state.timeflags & LS_CTIME) ? "ctime" : "mtime");
 		}
 		sfputr(fmt, "%(name)s", -1);
@@ -1627,7 +1661,7 @@ main(int argc, register char** argv)
 			sfputr(fmt, "%(linkop:case:?*: %(linkop)s %(linkpath)s)s", -1);
 	}
 	else
-		sfstrrel(fmt, -1);
+		sfstrseek(fmt, -1, SEEK_CUR);
 	state.format = sfstruse(fmt);
 	if (dump)
 	{

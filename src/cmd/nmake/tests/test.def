@@ -15,5 +15,5 @@ unset VPATH
 export CC=cc
 export ERROR_OPTIONS='nosystem'
 export LANG=C LC_ALL=C
-export MAKE_OPTIONS='nativepp=-1 noprefixinclude'
+export MAKE_OPTIONS='native-pp=-1 noprefix-include'
 export PS4='+ '

@@ -1,3 +1,4 @@
+04-10-31 cdbcdb.c: fix CDB_OPEN vs. cdbhdrread() sfdisc() buffer flush bug
 04-02-29 cdb.h: fix data symbol __EXPORT__ logic
 02-02-14 Makefiles: add explicit -lz -ldll references
 01-07-17 cdblib: call dllerror() on failed dllfind()

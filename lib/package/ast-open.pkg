@@ -3,10 +3,12 @@ ast-open :PACKAGE: \
 		libexpr libodelta librecsort libsum libuu libvdelta libbz \
 		libz tests 3d coshell cpp cs mam msgcc nmake probe ss \
 		libcoshell libcs libmam libpp libcodex paxlib codexlib \
-		at builtin codex cql diff ie mailx mam ncsl pack pzip \
+		at builtin codex cql ie mailx mam ncsl pack pzip \
 		re sort std tksh tw warp libcdb libpz libtksh libtk
 
 :COVERS: ast-base
+
+:LICENSE: *.open
 
 :CATEGORY: devel libs mail shells utils
 

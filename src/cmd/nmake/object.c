@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -87,6 +85,8 @@
  *	1 # encoded	status|semaphore|view|scan
  *	1 # prereqs	prereq list index
  *	1 # time	rule time
+ *	1 # nsec	rule nsec [2004-12-01]
+ *	1 # eventnsec	event nsec [2004-12-01]
  *	* # ...		[rule number field additions here]
  *	1 $ name	name string
  *	1 $ action	action string
@@ -103,7 +103,7 @@
  *	* @ ...		[trailer string fields additions here]
  *
  * NOTE: the old format compatibility code should probably be dropped in 95
- * NOTE: HA -- as of 08/11/97 2.1 was still in production use
+ * NOTE: HA -- as of 1997-08-11 2.1 was still in production use
  */
 
 #include "make.h"
@@ -118,9 +118,9 @@
  * by staterule() while marks are in use
  */
 
-#define getoldrule(r)	((struct rule*)r->action)
+#define getoldrule(r)	((Rule_t*)r->action)
 #define isoldrule(r)	(r->status==OLDRULE)
-#define setoldrule(r,o)	(r->status=OLDRULE,r->action=(char*)o,r->prereqs=(struct list*)oldrules,oldrules=r)
+#define setoldrule(r,o)	(r->status=OLDRULE,r->action=(char*)o,r->prereqs=(List_t*)oldrules,oldrules=r)
 
 #define MAGIC		"\015\001\013\005"
 #define MAGICSIZE	(sizeof(MAGIC)-1)
@@ -135,12 +135,12 @@
 #define MINVARNUM	1		/* min # variable number fields	*/
 #define MINVARSTR	2		/* min # variable string fields	*/
 
-#define RULENUM		(MINRULENUM+0)	/* # rule number fields		*/
+#define RULENUM		(MINRULENUM+2)	/* # rule number fields		*/
 #define RULESTR		(MINRULESTR+0)	/* # rule string fields		*/
 #define VARNUM		(MINVARNUM+0)	/* # variable number fields	*/
 #define VARSTR		(MINVARSTR+0)	/* # variable string fields	*/
 
-struct compstate			/* compile state		*/
+typedef struct Compstate_s		/* compile state		*/
 {
 	char*		sp;		/* string table pointer		*/
 	Sfio_t*		fp;		/* object file pointer		*/
@@ -148,14 +148,14 @@ struct compstate			/* compile state		*/
 	unsigned long	rules;		/* rule index			*/
 	unsigned long	strings;	/* string index			*/
 	unsigned long	variables;	/* variable index		*/
-};
+} Compstate_t;
 
-struct loadstate			/* load state			*/
+typedef struct Loadstate_s		/* load state			*/
 {
 	char*		sp;		/* string table pointer		*/
-};
+} Loadstate_t;
 
-static struct				/* object global state		*/
+static struct Object_s			/* object global state		*/
 {
 	Sfio_t*		pp;		/* prerequisite ref pointer	*/
 	unsigned char*	a2n;		/* CC_ASCII=>CC_NATIVE		*/
@@ -163,11 +163,12 @@ static struct				/* object global state		*/
 	unsigned long	garbage;	/* state garbage count		*/
 	unsigned long	rules;		/* state rule count		*/
 	int		initialized;	/* state initialized		*/
+	int		lowres;		/* low resolution time state	*/
 } object;
 
 /*
  * old object format compatibility
- * frozen 12/25/92
+ * frozen 1992-12-25
  */
 
 #define OLD_MAGIC	0x0d010b05
@@ -180,16 +181,18 @@ static struct				/* object global state		*/
 #define old_data	u2.u_data
 #define old_event	u2.u_event
 
-struct OLD_header			/* old make object file header	*/
+struct OLD_list_s; typedef struct OLD_list_s OLD_list_t;
+
+typedef struct OLD_header_s		/* old make object file header	*/
 {
 	long		magic;		/* magic number			*/
 	char		version[32];	/* compiler/loader version	*/
 	unsigned char	null;		/* 0 byte for long version's	*/
 	unsigned char	sequence;	/* different still compatible	*/
 	unsigned char	sizes[10];	/* misc size checks		*/
-};
+} OLD_header_t;
 
-struct OLD_trailer			/* old make object file trailer	*/
+typedef struct OLD_trailer_s		/* old make object file trailer	*/
 {
 	long		magic;		/* magic number			*/
 	char*		options;	/* options for set()		*/
@@ -197,17 +200,17 @@ struct OLD_trailer			/* old make object file trailer	*/
 	long		rules;		/* number of compiled rules	*/
 	long		size;		/* total sizeof object file	*/
 	long		variables;	/* number of compiled variables	*/
-};
+} OLD_trailer_t;
 
-struct OLD_rule				/* old rule			*/
+typedef struct OLD_rule_s		/* old rule			*/
 {
 	char*		name;		/* rule name			*/
 
 	union
 	{
-	struct frame*	u_active;	/* active target frame		*/
+	Frame_t*	u_active;	/* active target frame		*/
 	unsigned long	u_complink;	/* compilation link		*/
-	struct rule*	u_freelink;	/* free list link		*/
+	Rule_t*		u_freelink;	/* free list link		*/
 	}		u1;
 
 	union
@@ -217,7 +220,7 @@ struct OLD_rule				/* old rule			*/
 	unsigned long	u_event;	/* state rule event time	*/
 	}		u2;
 
-	struct OLD_list* prereqs;	/* prerequisites		*/
+	OLD_list_t*	prereqs;	/* prerequisites		*/
 	char*		action;		/* update action		*/
 	unsigned long	time;		/* modify time			*/
 
@@ -242,23 +245,23 @@ struct OLD_rule				/* old rule			*/
 	unsigned short	must;		/* cancel if == 0		*/
 
 	char*		runtime;	/* run time info		*/
-};
+} OLD_rule_t;
 
-struct OLD_var				/* old variable			*/
+typedef struct OLD_var_s		/* old variable			*/
 {
 	char*		name;		/* name				*/
 	char*		value;		/* value			*/
 	long		property;	/* static and dynamic		*/
 	long		length;		/* maximum length of value	*/
-};
+} OLD_var_t;
 
-struct OLD_list				/* old rule cons cell		*/
+struct OLD_list_s			/* old rule cons cell		*/
 {
-	struct OLD_list* next;		/* next in list			*/
-	struct OLD_rule* rule;		/* list item			*/
+	OLD_list_t*	next;		/* next in list			*/
+	OLD_rule_t*	rule;		/* list item			*/
 };
 
-static struct OLD_header old_stamp =	/* old object header is fixed	*/
+static OLD_header_t	old_stamp =	/* old object header is fixed	*/
 {
 	OLD_MAGIC,
 	OLD_VERSION,
@@ -270,9 +273,9 @@ static struct OLD_header old_stamp =	/* old object header is fixed	*/
 	sizeof(short),
 	sizeof(long),
 	sizeof(char*),
-	sizeof(struct OLD_list),
-	sizeof(struct OLD_rule),
-	sizeof(struct OLD_var),
+	sizeof(OLD_list_t),
+	sizeof(OLD_rule_t),
+	sizeof(OLD_var_t),
 	0,
 };
 
@@ -331,9 +334,9 @@ putstring(register Sfio_t* sp, register const char* s, int sep)
  */
 
 static void
-markcompile(register struct rule* r)
+markcompile(register Rule_t* r)
 {
-	register struct list*	p;
+	register List_t*	p;
 
 	r->dynamic &= ~D_compiled;
 	r->mark |= M_compile;
@@ -347,11 +350,11 @@ markcompile(register struct rule* r)
  */
 
 static void
-markgarbage(register struct rule* r, int garbage)
+markgarbage(register Rule_t* r, int garbage)
 {
-	register struct list*	p;
+	register List_t*	p;
 	register int		i;
-	struct rule*		x;
+	Rule_t*			x;
 
 	r->mark |= M_compile;
 	if (garbage)
@@ -371,7 +374,7 @@ markgarbage(register struct rule* r, int garbage)
  */
 
 static void
-compstring(register struct compstate* cs, register char* s)
+compstring(register Compstate_t* cs, register char* s)
 {
 	register int		c;
 	register unsigned char*	map;
@@ -399,7 +402,7 @@ compstring(register struct compstate* cs, register char* s)
 static int
 compinit(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
+	register Rule_t*	r = (Rule_t*)v;
 
 	NoP(s);
 	r->complink = 0;
@@ -425,7 +428,7 @@ compinit(const char* s, char* v, void* h)
 static int
 compselect(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
+	register Rule_t*	r = (Rule_t*)v;
 	register char*		select = (char*)h;
 
 	NoP(s);
@@ -435,7 +438,7 @@ compselect(const char* s, char* v, void* h)
 		expand(internal.met, select);
 		if (sfstrtell(internal.met))
 		{
-			sfstrset(internal.met, 0);
+			sfstrseek(internal.met, 0, SEEK_SET);
 			markcompile(r);
 		}
 	}
@@ -451,7 +454,7 @@ compselect(const char* s, char* v, void* h)
 static int
 compstate(const char* s, char* v, void* h)
 {
-	register struct rule*		r = (struct rule*)v;
+	register Rule_t*		r = (Rule_t*)v;
 
 	NoP(s);
 	NoP(h);
@@ -475,8 +478,8 @@ compstate(const char* s, char* v, void* h)
 static int
 compmark(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
-	register struct list*	p;
+	register Rule_t*	r = (Rule_t*)v;
+	register List_t*	p;
 
 	NoP(s);
 	NoP(h);
@@ -502,7 +505,7 @@ compmark(const char* s, char* v, void* h)
 static int
 compkeep(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
+	register Rule_t*	r = (Rule_t*)v;
 
 	NoP(s);
 	NoP(h);
@@ -518,10 +521,10 @@ compkeep(const char* s, char* v, void* h)
 static int
 comprule(const char* s, char* v, void* h)
 {
-	register struct rule*		r = (struct rule*)v;
-	register struct list*		p;
-	register struct compstate*	cs = (struct compstate*)h;
-	struct rule			x;
+	register Rule_t*	r = (Rule_t*)v;
+	register List_t*	p;
+	register Compstate_t*	cs = (Compstate_t*)h;
+	Rule_t			x;
 
 	NoP(s);
 
@@ -563,6 +566,7 @@ comprule(const char* s, char* v, void* h)
 			r->name = r->uname;
 			r->uname = 0;
 		}
+		r->time = 0;
 #if BINDINDEX
 		r->view = 0;
 #endif
@@ -586,11 +590,19 @@ comprule(const char* s, char* v, void* h)
 	}
 	else
 		sfputu(cs->fp, 0);
-	sfputu(cs->fp, r->time);
+	sfputu(cs->fp, tmxsec(r->time));
+
+	/*
+	 * 2004-12-01
+	 */
+
+	sfputu(cs->fp, tmxnsec(r->time));
+	sfputu(cs->fp, (r->property & P_staterule) ? tmxnsec(r->event) : 0);
+
 	compstring(cs, r->name);
 	compstring(cs, r->action);
 	if (r->property & P_staterule)
-		sfputu(cs->fp, r->event);
+		sfputu(cs->fp, tmxsec(r->event));
 	else
 		compstring(cs, r->statedata);
 	return 0;
@@ -604,9 +616,9 @@ comprule(const char* s, char* v, void* h)
 static int
 compcheck(const char* s, char* v, void* h)
 {
-	register struct rule*		r = (struct rule*)v;
-	register struct list*		p;
-	register struct rule*		a;
+	register Rule_t*		r = (Rule_t*)v;
+	register List_t*		p;
+	register Rule_t*		a;
 
 	/*
 	 * ignore aliases and rules not set up by comprule()
@@ -639,9 +651,9 @@ compcheck(const char* s, char* v, void* h)
 static int
 complist(const char* s, char* v, void* h)
 {
-	register struct rule*		r = (struct rule*)v;
-	register struct list*		p;
-	register struct compstate*	cs = (struct compstate*)h;
+	register Rule_t*	r = (Rule_t*)v;
+	register List_t*	p;
+	register Compstate_t*	cs = (Compstate_t*)h;
 
 	/*
 	 * ignore aliases and rules not set up by comprule()
@@ -665,11 +677,11 @@ complist(const char* s, char* v, void* h)
 static int
 compvar(const char* s, char* u, void* h)
 {
-	register struct var*		v = (struct var*)u;
-	register struct compstate*	cs = (struct compstate*)h;
-	char*				t;
-	unsigned long			property;
-	char*				value;
+	register Var_t*		v = (Var_t*)u;
+	register Compstate_t*	cs = (Compstate_t*)h;
+	char*			t;
+	unsigned long		property;
+	char*			value;
 
 	/*
 	 * compile each variable only once
@@ -734,7 +746,7 @@ compvar(const char* s, char* u, void* h)
 static int
 clearmarks(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
+	register Rule_t*	r = (Rule_t*)v;
 
 	NoP(s);
 	NoP(h);
@@ -751,10 +763,10 @@ void
 compile(char* objfile, char* select)
 {
 	register Sfio_t*	sp;
-	struct list*		p;
-	struct list*		q;
-	struct rule*		r;
-	struct compstate	cs;
+	List_t*			p;
+	List_t*			q;
+	Rule_t*			r;
+	Compstate_t		cs;
 
 	/*
 	 * initialize the object globals
@@ -802,7 +814,7 @@ compile(char* objfile, char* select)
 			sfputu(sp, 0);
 			sfputu(internal.tmp, HEADER_PREREQS);
 			sfputu(cs.fp, sfstrtell(internal.tmp) + sfstrtell(sp));
-			sfstrset(internal.tmp, 0);
+			sfstrseek(internal.tmp, 0, SEEK_SET);
 			sfputu(cs.fp, HEADER_PREREQS);
 			sfwrite(cs.fp, sfstrbase(sp), sfstrtell(sp));
 		}
@@ -973,6 +985,27 @@ compile(char* objfile, char* select)
 	if (rename(state.tmpfile, objfile))
 		error(1, "%s: object file not recompiled", objfile);
 	remtmp(0);
+	if (state.stateview == 0)
+	{
+		Stat_t		st;
+		Time_t		t;
+		Time_t		x;
+
+		/*
+		 * set the state file times to the latest
+		 * possible event time modulo the file
+		 * system time precision
+		 */
+
+		t = CURTIME;
+		x = tmxsns(tmxsec(t), 999999999);
+		if (!tmxtouch(objfile, x, x, TMX_NOTIME, 0) && !stat(objfile, &st))
+		{
+			t += tmxsns(1,0) - tmxnsec(tmxgetmtime(&st));
+			tmxtouch(objfile, t, t, TMX_NOTIME, 0);
+		}
+	
+	}
 	r = bindfile(NiL, objfile, BIND_DOT|BIND_FORCE|BIND_RULE);
 	r->dynamic |= D_built|D_regular;
 	r->view = 0;
@@ -991,14 +1024,22 @@ compile(char* objfile, char* select)
  */
 
 void
-compref(int type, const char* name, unsigned long date)
+compref(int type, const char* name, Time_t date)
 {
 	if (object.pp)
 	{
 		if (type)
 		{
+			/*
+			 * COMP_NSEC for backwards compatibility
+			 * ignored by old implementations
+			 */
+
+			sfputu(object.pp, COMP_NSEC);
+			sfputu(object.pp, tmxnsec(date));
+			putstring(object.pp, null, 0);
 			sfputu(object.pp, type);
-			sfputu(object.pp, date);
+			sfputu(object.pp, tmxsec(date));
 			putstring(object.pp, name, 0);
 		}
 		else
@@ -1018,8 +1059,8 @@ compref(int type, const char* name, unsigned long date)
 static int
 promote(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
-	register struct list*	p;
+	register Rule_t*	r = (Rule_t*)v;
+	register List_t*	p;
 
 	NoP(s);
 	NoP(h);
@@ -1047,8 +1088,8 @@ promote(const char* s, char* v, void* h)
 static int
 atomize(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
-	register struct list*	p;
+	register Rule_t*	r = (Rule_t*)v;
+	register List_t*	p;
 
 	NoP(s);
 	NoP(h);
@@ -1075,7 +1116,7 @@ objectfile(void)
 {
 	char*		dir;
 	Sfio_t*		sp;
-	struct stat	st;
+	Stat_t		st;
 
 	if (!state.objectfile && state.makefile && state.writeobject)
 	{
@@ -1116,7 +1157,7 @@ remtmp(int fatal)
  */
 
 static char*
-loadstring(struct loadstate* ls, Sfio_t* sp)
+loadstring(Loadstate_t* ls, Sfio_t* sp)
 {
 	register int	n;
 	register char*	s;
@@ -1146,15 +1187,17 @@ loadinit(void)
  */
 
 int
-loadable(register Sfio_t* sp, register struct rule* r, int source)
+loadable(register Sfio_t* sp, register Rule_t* r, int source)
 {
-	register struct rule*	x;
-	register struct list*	p;
+	register Rule_t*	x;
+	register List_t*	p;
 	char*			s;
 	char*			t;
 	long			n;
 	Sfoff_t			off;
-	time_t			m;
+	Time_t			tm;
+	Time_t			tn;
+	int			lowres;
 	int			ok = 1;
 	long			old = 0;
 
@@ -1181,14 +1224,18 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 							/*UNDENT...*/
 
 	state.init++;
+	lowres = 1;
+	tn = 0;
 	while (n = sfgetu(sp))
 	{
-		m = sfgetu(sp);
+		tm = sfgetu(sp);
 		if (!(s = getstring(sp)))
 			break;
 		if (n & (COMP_BASE|COMP_FILE|COMP_GLOBAL|COMP_INCLUDE))
 		{
 			x = bindfile(NiL, s, BIND_FORCE|BIND_MAKEFILE|BIND_RULE);
+			tm = (x && lowres && tm == tmxsec(x->time)) ? x->time : tmxsns(tm, tn);
+			tn = 0;
 			if (!(x->dynamic & D_regular))
 				x->dynamic &= ~D_bound;
 
@@ -1203,8 +1250,8 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 			 * check prerequisite file time with previous
 			 */
 
-			debug((-4, "%s%s%s%s%s%sprerequisite %s [%s] state [%s]", (x->dynamic & D_regular) ? null : "non-regular ", (n & COMP_DONTCARE) ? "optional " : null, (n & COMP_BASE) ? "base " : null, (n & COMP_FILE) ? "-f " : null, (n & COMP_GLOBAL) ? "-g " : null, (n & COMP_INCLUDE) ? "include " : null, s, strtime(x->time), strtime(m)));
-			if (((x->dynamic & D_regular) || (n & COMP_BASE)) && timecmp(m, x->time))
+			debug((-4, "%s%s%s%s%s%sprerequisite %s [%s] state [%s]", (x->dynamic & D_regular) ? null : "non-regular ", (n & COMP_DONTCARE) ? "optional " : null, (n & COMP_BASE) ? "base " : null, (n & COMP_FILE) ? "-f " : null, (n & COMP_GLOBAL) ? "-g " : null, (n & COMP_INCLUDE) ? "include " : null, s, timestr(x->time), timestr(tm)));
+			if (((x->dynamic & D_regular) || (n & COMP_BASE)) && x->time != tm)
 			{
 				error(state.exec || state.mam.out ? -1 : 1, "%s: out of date with %s", r->name, x->name);
 				break;
@@ -1240,6 +1287,11 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 					state.explicitrules = 1;
 				state.rules = makerule(s)->name;
 			}
+		}
+		else if (n & COMP_NSEC)
+		{
+			tn = tm;
+			lowres = 0;
 		}
 		else if (n & COMP_OPTIONS)
 		{
@@ -1310,21 +1362,21 @@ int
 load(register Sfio_t* sp, const char* objfile, int ucheck)
 {
 	register int		n;
-	register struct rule*	r;
-	register struct var*	v;
-	register struct list*	d;
+	register Rule_t*	r;
+	register Var_t*		v;
+	register List_t*	d;
 	register char*		s;
 	char*			p = 0;
 	int			promoted = 0;
 	int			recompile = 0;
-	struct rule*		oldrules = 0;
-	struct rule*		or;
-	struct rule*		xr;
-	struct var*		ov;
-	struct var*		xv;
-	struct var*		x;
-	struct list*		xd;
-	struct list*		a;
+	Rule_t*			oldrules = 0;
+	Rule_t*			or;
+	Rule_t*			xr;
+	Var_t*			ov;
+	Var_t*			xv;
+	Var_t*			x;
+	List_t*			xd;
+	List_t*			a;
 	char*			ident;
 	int			flags;
 	int			strings;
@@ -1340,24 +1392,27 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	int			oscan;
 	int			scanclash;
 	int			sequence;
+	int			lowres;
 	unsigned long		attr;
 	unsigned long		attrclear;
 	unsigned long		oattribute;
-	struct frame*		fp;
+	unsigned long		ts;
+	unsigned long		tn;
+	Frame_t*		fp;
 	Sfoff_t			off;
-	struct stat		st;
+	Stat_t			st;
 	unsigned long		attrmap[CHAR_BIT * sizeof(unsigned long)];
 	unsigned char		scanmap[UCHAR_MAX + 1];
-	struct loadstate	ls;
+	Loadstate_t		ls;
 
 	int			old;
 	int			old_swap;
 	long			old_magic;
-	struct OLD_rule		old_rule;
-	struct OLD_var		old_var;
-	struct OLD_list		old_list;
-	struct OLD_header	old_header;
-	struct OLD_trailer	old_trailer;
+	OLD_rule_t		old_rule;
+	OLD_var_t		old_var;
+	OLD_list_t		old_list;
+	OLD_header_t		old_header;
+	OLD_trailer_t		old_trailer;
 
 	loadinit();
 	zero(ls);
@@ -1385,7 +1440,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	 * check for other users within last ucheck minutes
 	 */
 
-	if (ucheck && st.st_uid != geteuid() && (n = (CURTIME - (unsigned long)st.st_mtime)) < ucheck * 60)
+	if (ucheck && st.st_uid != geteuid() && (n = CURSECS - st.st_mtime) < ucheck * 60)
 		error(1, "%s: another user was here %s ago", state.makefile, fmtelapsed(n, 1));
 
 	/*
@@ -1433,6 +1488,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		strings = st.st_size - sizeof(old_trailer) - off;
 		if (sfeof(sp) || sfseek(sp, off, SEEK_SET) != off)
 			goto badio;
+		lowres = state.stateview >= 0;
 	}
 	else
 	{
@@ -1449,7 +1505,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		strings = sfgetu(sp);
 		lists = sfgetu(sp);
 		rules = sfgetu(sp);
-		rulenum = sfgetu(sp);
+		lowres = (rulenum = sfgetu(sp)) < 2 && state.stateview >= 0;
 		rulestr = sfgetu(sp);
 		variables = sfgetu(sp);
 		varnum = sfgetu(sp);
@@ -1471,21 +1527,27 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		}
 	}
 	message((-3, "%s sequence=%d lists=%d rules=%d variables=%d strings=%d", ident, sequence, lists, rules, variables, strings));
+	if (lowres && !object.lowres)
+	{
+		object.lowres = 1;
+		if (!state.silent)
+			error(1, "%s: low time resolution state file -- subsecond differences ignored", objfile);
+	}
 
 	/*
 	 * allocate strings and structs in one chunk
 	 * and compute pointers to the compiled data
 	 */
 
-	if (!(p = newof(0, char, lists * sizeof(struct list) + rules * sizeof(struct rule) + variables * sizeof(struct var) + strings, 0)))
+	if (!(p = newof(0, char, lists * sizeof(List_t) + rules * sizeof(Rule_t) + variables * sizeof(Var_t) + strings, 0)))
 	{
 		error(3, "out of space");
 		goto bad;
 	}
-	r = or = (struct rule*)p;
-	d = (struct list*)((char*)r + rules * sizeof(struct rule));
-	v = ov = (struct var*)((char*)d + lists * sizeof(struct list));
-	s = ((char*)v + variables * sizeof(struct var));
+	r = or = (Rule_t*)p;
+	d = (List_t*)((char*)r + rules * sizeof(Rule_t));
+	v = ov = (Var_t*)((char*)d + lists * sizeof(List_t));
+	s = ((char*)v + variables * sizeof(Var_t));
 
 	/*
 	 * read the string table
@@ -1628,7 +1690,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	hashclear(table.rule, HASH_ALLOCATE);
 	for (xr = r + rules; r < xr; r++)
 	{
-		register struct rule*	o;
+		register Rule_t*	o;
 
 		if (old)
 		{
@@ -1655,7 +1717,10 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			if (old_rule.name)
 				r->name = s + (unsigned long)old_rule.name - 1;
 			if (r->property & P_staterule)
+			{
+				r->dynamic |= D_lowres;
 				r->event = old_rule.old_event;
+			}
 			else if (old_rule.old_data)
 				r->statedata = s + (unsigned long)old_rule.old_data - 1;
 			if (old_rule.prereqs)
@@ -1665,14 +1730,14 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			r->scan = old_rule.scan;
 			r->semaphore = old_rule.semaphore;
 			r->view = old_rule.view;
-			r->time = old_rule.time;
+			r->time = tmxsns(old_rule.time, 0);
 			switch (sequence)
 			{
-			case 0: /* 09/11/89 */
+			case 0: /* 1989-09-11 */
 				if ((r->property & P_attribute) && (r->attribute && !(r->property & P_use) && !streq(r->name, internal.attribute->name) || r->scan && !streq(r->name, internal.scan->name)))
 					r->dynamic |= D_index;
 				/*FALLTHROUGH*/
-			case 1: /* 07/17/91 */
+			case 1: /* 1991-07-17 */
 				if (r->property & P_staterule)
 				{
 					if (isaltstate(r->name))
@@ -1698,18 +1763,48 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			}
 			if (n = sfgetu(sp))
 				r->prereqs = d + n - 1;
-			r->time = sfgetu(sp);
+			ts = sfgetu(sp);
+
+			/*
+			 * 2004-12-01
+			 */
+
+			if (n = rulenum)
+			{
+				n--;
+				tn = sfgetu(sp);
+			}
+			else
+				tn = 0;
+			r->time = tmxsns(ts, tn);
+
+			/*
+			 * 2004-12-01
+			 */
+
+			if ((r->property & P_staterule) && n)
+			{
+				n--;
+				tn = sfgetu(sp);
+			}
+			else
+				tn = 0;
 
 			/*
 			 * rule number field additions here
 			 */
 
-			for (n = rulenum; n > 0; n--)
+			while (n--)
 				sfgetu(sp);
 			r->name = loadstring(&ls, sp);
 			r->action = loadstring(&ls, sp);
 			if (r->property & P_staterule)
-				r->event = sfgetu(sp);
+			{
+				ts = sfgetu(sp);
+				r->event = tmxsns(ts, tn);
+				if (lowres)
+					r->dynamic |= D_lowres;
+			}
 			else
 				r->statedata = loadstring(&ls, sp);
 
@@ -2032,8 +2127,33 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 
 	if (state.stateview >= 0)
 	{
+		Time_t	t;
+		Time_t	q;
+
 		object.garbage += garbage;
 		object.rules += rules;
+
+		/*
+		 * handle low time resolution by making
+		 * sure the current time is at least as
+		 * recent as the state file time, previously
+		 * set in compile() to take into account
+		 * the file system time precision
+		 */
+
+		t = tmxgetmtime(&st);
+		if (state.tolerance)
+			t += tmxsns(state.tolerance, 0);
+		q = CURTIME;
+		if (q >= t)
+			t = 0;
+		else if ((t -= q) > tmxsns(5,0))
+			t = tmxsns(5,0);
+		if (t)
+		{
+			error(state.tolerance ? 1 : -1, "%s: state time sync delay %lu.%09lu", objfile, tmxsec(t), tmxnsec(t));
+			tmxsleep(t);
+		}
 	}
 
 	/*
@@ -2070,7 +2190,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		}
 		do
 		{
-			xr = (struct rule*)oldrules->prereqs;
+			xr = (Rule_t*)oldrules->prereqs;
 			freerule(oldrules);
 		} while (oldrules = xr);
 	}

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -91,11 +89,11 @@ mamerror(int fd, const void* b, size_t n)
  */
 
 char*
-mamname(register struct rule* r)
+mamname(register Rule_t* r)
 {
 	char*		a;
 	char*		s;
-	struct stat	st;
+	Stat_t		st;
 
 	if (r->property & P_state)
 		return r->name;
@@ -125,7 +123,7 @@ mamname(register struct rule* r)
  */
 
 int
-mampush(Sfio_t* sp, register struct rule* r, long flags)
+mampush(Sfio_t* sp, register Rule_t* r, Flags_t flags)
 {
 	int	pop;
 
@@ -146,9 +144,9 @@ mampush(Sfio_t* sp, register struct rule* r, long flags)
 	if (pop && (state.mam.dynamic || state.mam.regress))
 	{
 		if (r->uname && strcmp(r->uname, mamname(r)))
-			sfprintf(sp, "%sbind %s %lu %s\n", state.mam.label, r->uname, numtime(r->time), mamname(r));
+			sfprintf(sp, "%sbind %s %s %s\n", state.mam.label, r->uname, timefmt(NiL, r->time), mamname(r));
 		else
-			sfprintf(sp, "%sbind %s %lu\n", state.mam.label, mamname(r), numtime(r->time));
+			sfprintf(sp, "%sbind %s %s\n", state.mam.label, mamname(r), timefmt(NiL, r->time));
 	}
 	return pop;
 }
@@ -158,10 +156,10 @@ mampush(Sfio_t* sp, register struct rule* r, long flags)
  */
 
 void
-mampop(Sfio_t* sp, register struct rule* r, long flags)
+mampop(Sfio_t* sp, register Rule_t* r, Flags_t flags)
 {
-	struct rule*	s;
-	struct list*	p;
+	Rule_t*		s;
+	List_t*		p;
 
 	s = staterule(RULE, r, NiL, 0);
 	sfprintf(sp, "%sdone %s%s%s%s%s\n"
@@ -186,9 +184,9 @@ mampop(Sfio_t* sp, register struct rule* r, long flags)
  */
 
 Sfio_t*
-mamout(register struct rule* r)
+mamout(register Rule_t* r)
 {
-	register struct rule*	r0;
+	register Rule_t*	r0;
 	register char*		s;
 
 	if (!state.mam.out || !state.user || r == internal.empty)

@@ -73,6 +73,37 @@ midnight 96060				NULL	Thu Feb 29 00:00:00 EST 1996
 79 minutes ago				NULL	Mon Sep 22 11:00:00 EDT 1986
 107 seconds ago				NULL	Mon Sep 22 12:18:00 EDT 1986
 107_seconds_ago				NULL	Mon Sep 22 12:18:00 EDT 1986
+1 hour ago				NULL	Mon Sep 22 11:19:47 EDT 1986
+10 hours ago				NULL	Mon Sep 22 02:19:47 EDT 1986
+11 hours ago				NULL	Mon Sep 22 01:19:47 EDT 1986
+12 hours ago				NULL	Mon Sep 22 00:19:47 EDT 1986
+13 hours ago				NULL	Sun Sep 21 23:19:47 EDT 1986
+1 day ago				NULL	Sun Sep 21 12:19:47 EDT 1986
+21 days ago				NULL	Mon Sep  1 12:19:47 EDT 1986
+22 days ago				NULL	Sun Aug 31 12:19:47 EDT 1986
+23 days ago				NULL	Sat Aug 30 12:19:47 EDT 1986
+1 week ago				NULL	Mon Sep 15 00:00:00 EDT 1986
+2 weeks ago				NULL	Mon Sep  8 00:00:00 EDT 1986
+3 weeks ago				NULL	Mon Sep  1 00:00:00 EDT 1986
+4 weeks ago				NULL	Mon Aug 25 00:00:00 EDT 1986
+5 weeks ago				NULL	Mon Aug 18 00:00:00 EDT 1986
+52 weeks ago				NULL	Mon Sep 23 00:00:00 EDT 1985
+104 weeks ago				NULL	Mon Sep 24 00:00:00 EDT 1984
+1 month ago				NULL	Fri Aug  1 00:00:00 EDT 1986
+2 months ago				NULL	Tue Jul  1 00:00:00 EDT 1986
+3 months ago				NULL	Sun Jun  1 00:00:00 EDT 1986
+4 months ago				NULL	Thu May  1 00:00:00 EDT 1986
+5 months ago				NULL	Tue Apr  1 00:00:00 EST 1986
+6 months ago				NULL	Sat Mar  1 00:00:00 EST 1986
+7 months ago				NULL	Sat Feb  1 00:00:00 EST 1986
+8 months ago				NULL	Wed Jan  1 00:00:00 EST 1986
+9 months ago				NULL	Sun Dec  1 00:00:00 EST 1985
+10 months ago				NULL	Fri Nov  1 00:00:00 EST 1985
+11 months ago				NULL	Tue Oct  1 00:00:00 EDT 1985
+12 months ago				NULL	Sun Sep  1 00:00:00 EDT 1985
+13 months ago				NULL	Thu Aug  1 00:00:00 EDT 1985
+24 months ago				NULL	Wed May  1 00:00:00 EDT 1985
+36 months ago				NULL	Tue May  1 00:00:00 EDT 1984
 
 #
 # we can't forget the amazing dr ek
@@ -116,6 +147,12 @@ final monday may 2004			NULL	Mon May 31 00:00:00 EDT 2004
 final monday in may 2004		NULL	Mon May 31 00:00:00 EDT 2004
 last monday in may 2004			NULL	Mon May 31 00:00:00 EDT 2004
 last monday may 2004			NULL	Mon Apr 26 00:00:00 EDT 2004
+final day in feb 2004			NULL	Sun Feb 29 00:00:00 EST 2004
+final day feb 2004			NULL	Sun Feb 29 00:00:00 EST 2004
+final day feb 2001			NULL	Wed Feb 28 00:00:00 EST 2001
+final day feb 2000			NULL	Tue Feb 29 00:00:00 EST 2000
+final day feb 1999			NULL	Sun Feb 28 00:00:00 EST 1999
+final day feb 1996			NULL	Thu Feb 29 00:00:00 EST 1996
 
 #
 # a few leap year tests
@@ -266,7 +303,9 @@ next 01:00 pm				NULL	Mon Sep 22 13:00:00 EDT 1986
 #
 
 ,#0					NULL	Wed Dec 31 19:00:00 EST 1969
+,#18000					NULL	Thu Jan  1 00:00:00 EST 1970
 ,#0 + 1022731200 seconds		NULL	Thu May 30 00:00:00 EDT 2002
+,#18000 + 1022731200 seconds		NULL	Thu May 30 05:00:00 EDT 2002
 
 #
 # tricks and well known bugs
@@ -295,7 +334,7 @@ NIL	%I_%j_%_I_%_H_%m		03_265_ 3_15_09
 NIL	%H%M%S%-H%-M%-S%_H%_M%_S	1509471594715 947
 NIL	%M_%n_%p_%r			09_\n_PM_03:09:47 PM
 NIL	%s_%S_%t_%T			527800187_47_\t_15:09:47
-NIL	%U_%V_%w_%W			38_38_1_38
+NIL	%j_%U_%V_%W_%u_%w		265_38_39_38_1_1
 NIL	%x_%X_%y_%Y			09/22/86_15:09:47_86_1986
 NIL	%z_%Z				-0500_EDT
 NIL	%Y-%m-%d			1986-09-22
@@ -312,8 +351,8 @@ NIL	%e		22
 NIL	%E		22
 NIL	%f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%F		Mon Sep 22 15:09:47 EDT 1986
-NIL	%g		Sep 22 15:09
-NIL	%G		Sep 22  1986
+NIL	%g		86
+NIL	%G		1986
 NIL	%h		Sep
 NIL	%H		15
 NIL	%i		Mon Sep 22 15:09:47 -0500 EDT 1986
@@ -326,12 +365,14 @@ NIL	%l		Sep 22  1986
 NIL	%L		%L
 NIL	%m		09
 NIL	%M		09
+NIL	%N		000000000
 NIL	%o		Mon Sep 22 15:09:47 EDT 1986
 NIL	%O		Mon Sep 22 15:09:47 EDT 1986
 NIL	%p		PM
 NIL	%P		%P
-NIL	%q		%q
-NIL	%Q/%g/%G/	Sep 22  1986
+NIL	%Q/%Qr/%Qd/	Sep 22  1986
+NIL	%Qd		Sep 22  1986
+NIL	%Qr		Sep 22 15:09
 NIL	%r		03:09:47 PM
 NIL	%R		15:09
 NIL	%s		527800187
@@ -341,7 +382,7 @@ NIL	%T		15:09:47
 NIL	%u		1
 NIL	%U		38
 NIL	%v		%v
-NIL	%V		38
+NIL	%V		39
 NIL	%w		1
 NIL	%W		38
 NIL	%x		09/22/86
@@ -362,8 +403,8 @@ NIL	%0e		22
 NIL	%0E		22
 NIL	%0f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%0F		Mon Sep 22 15:09:47 EDT 1986
-NIL	%0g		Sep 22 15:09
-NIL	%0G		Sep 22  1986
+NIL	%0g		86
+NIL	%0G		1986
 NIL	%0h		Sep
 NIL	%0H		15
 NIL	%0i		Mon Sep 22 15:09:47 -0500 EDT 1986
@@ -376,12 +417,14 @@ NIL	%0l		Sep 22  1986
 NIL	%0L		%L
 NIL	%0m		09
 NIL	%0M		09
+NIL	%0N		000000000
 NIL	%0o		Mon Sep 22 15:09:47 EDT 1986
 NIL	%0O		Mon Sep 22 15:09:47 EDT 1986
 NIL	%0p		PM
 NIL	%0P		%P
-NIL	%0q		%q
-NIL	%0Q/%g/%G/	Sep 22  1986
+NIL	%0Q/%Qr/%Qd/	Sep 22  1986
+NIL	%0Qd		Sep 22  1986
+NIL	%0Qr		Sep 22 15:09
 NIL	%0r		03:09:47 PM
 NIL	%0R		15:09
 NIL	%0s		527800187
@@ -391,7 +434,7 @@ NIL	%0T		15:09:47
 NIL	%0u		1
 NIL	%0U		38
 NIL	%0v		%v
-NIL	%0V		38
+NIL	%0V		39
 NIL	%0w		1
 NIL	%0W		38
 NIL	%0x		09/22/86
@@ -412,8 +455,8 @@ NIL	%-e		22
 NIL	%-E		22
 NIL	%-f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%-F		Mon Sep 22 15:09:47 EDT 1986
-NIL	%-g		Sep 22 15:09
-NIL	%-G		Sep 22  1986
+NIL	%-g		86
+NIL	%-G		1986
 NIL	%-h		Sep
 NIL	%-H		15
 NIL	%-i		Mon Sep 22 15:09:47 -0500 EDT 1986
@@ -426,12 +469,14 @@ NIL	%-l		Sep 22  1986
 NIL	%-L		%L
 NIL	%-m		9
 NIL	%-M		9
+NIL	%-N		0
 NIL	%-o		Mon Sep 22 15:09:47 EDT 1986
 NIL	%-O		Mon Sep 22 15:09:47 EDT 1986
 NIL	%-p		PM
 NIL	%-P		%P
-NIL	%-q		%q
-NIL	%-Q/%g/%G/	Sep 22  1986
+NIL	%-Q/%Qr/%Qd/	Sep 22  1986
+NIL	%-Qd		Sep 22  1986
+NIL	%-Qr		Sep 22 15:09
 NIL	%-r		03:09:47 PM
 NIL	%-R		15:09
 NIL	%-s		527800187
@@ -441,7 +486,7 @@ NIL	%-T		15:09:47
 NIL	%-u		1
 NIL	%-U		38
 NIL	%-v		%v
-NIL	%-V		38
+NIL	%-V		39
 NIL	%-w		1
 NIL	%-W		38
 NIL	%-x		09/22/86
@@ -462,8 +507,8 @@ NIL	%_e		22
 NIL	%_E		22
 NIL	%_f		Mon Sep 22 15:09:47 EDT 1986
 NIL	%_F		Mon Sep 22 15:09:47 EDT 1986
-NIL	%_g		Sep 22 15:09
-NIL	%_G		Sep 22  1986
+NIL	%_g		86
+NIL	%_G		1986
 NIL	%_h		Sep
 NIL	%_H		15
 NIL	%_i		Mon Sep 22 15:09:47 -0500 EDT 1986
@@ -476,12 +521,14 @@ NIL	%_l		Sep 22  1986
 NIL	%_L		%L
 NIL	%_m		 9
 NIL	%_M		 9
+NIL	%_N		        0
 NIL	%_o		Mon Sep 22 15:09:47 EDT 1986
 NIL	%_O		Mon Sep 22 15:09:47 EDT 1986
 NIL	%_p		PM
 NIL	%_P		%P
-NIL	%_q		%q
-NIL	%_Q/%g/%G/	Sep 22  1986
+NIL	%_Q/%Qr/%Qd/	Sep 22  1986
+NIL	%_Qd		Sep 22  1986
+NIL	%_Qr		Sep 22 15:09
 NIL	%_r		03:09:47 PM
 NIL	%_R		15:09
 NIL	%_s		527800187
@@ -491,7 +538,7 @@ NIL	%_T		15:09:47
 NIL	%_u		1
 NIL	%_U		38
 NIL	%_v		%v
-NIL	%_V		38
+NIL	%_V		39
 NIL	%_w		1
 NIL	%_W		38
 NIL	%_x		09/22/86

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2004 AT&T Corp.                  *
+*                  Copyright (c) 1999-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -146,6 +144,8 @@ MAIN()
 	int	flags;
 	char	buf[1024], low[64], up[64];
 
+	static char data[] = "data";
+
 	sfsetbuf(sfstdin,buf,sizeof(buf));
 	flags = sfset(sfstdin,0,0);
 	sfdisc(sfstdin,&Ldisc);
@@ -181,6 +181,7 @@ MAIN()
 	{	s[n-1] = 0;
 		terror("Input2=%s, Expect=%s\n",s,l);
 	}
+	sfclose(f);
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
 		terror("Opening file\n");
@@ -193,6 +194,7 @@ MAIN()
 		terror("sfgetr\n");
 	if(strcmp(s,up) != 0)
 		terror("Bad data\n");
+	sfclose(f);
 
 	/* read-once discipline */
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
@@ -217,6 +219,8 @@ MAIN()
 		terror("sfreserve failed 3\n");
 	if(sfvalue(f) != 3)
 		terror("Wrong reserved length3\n");
+	sfclose(f);
+	sfclose(fs);
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
 		terror("Opening file to write\n");
@@ -227,6 +231,33 @@ MAIN()
 		terror("Bad sfwr\n");
 	if(strcmp(External,"onetwo") != 0)
 		terror("Bad call of sfwr\n");
+	sfclose(f);
+
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
+		terror("Opening file to write\n");
+	if(sfwrite(f, data, sizeof(data)) != sizeof(data))
+		terror("data write\n");
+	if(sfclose(f))
+		terror("Write close\n");
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
+		terror("Opening file to read\n");
+	sfset(f, SF_SHARE, 0);
+	if(!(s = (char*)sfreserve(f, SF_UNBOUND, SF_LOCKR)))
+		terror("sfreserve SF_UNBOUND SF_LOCKR\n");
+	n = sfvalue(f);
+	if(n != sizeof(data))
+		terror("sfreserve SF_LOCKR %d -- %d expected\n", n, sizeof(data));
+	if(sfread(f, s, 0))
+		terror("sfread unlock\n");
+	sfdisc(f,&Edisc);
+	if(!(s = (char*)sfreserve(f, SF_UNBOUND, 0)))
+		terror("sfreserve SF_UNBOUND\n");
+	n = sfvalue(f);
+	if(n != sizeof(data))
+		terror("sfreserve %d -- %d expected\n", n, sizeof(data));
+	if(strcmp(s, data))
+		terror("sfreserve data \"%s\" corrupt -- \"%s\" expected\n", s, data);
+	sfclose(f);
 
 	TSTEXIT(0);
 }

@@ -1,3 +1,30 @@
+05-01-01 --- release 5.0 ---
+	 high resolution time stamps
+04-12-25 Makerules.mk: handle cc-,a=b
+	 Makerules.mk: check for -I. after -I-
+	 Makerules.mk: add MVFLAGS=-f for install actions
+	 msgcat.mk: fix _PACKAGE_ID
+04-12-08 Scanrules.mk: add .SCAN.iffe for `include previous-iffe-output'
+	 Scanrules.mk: fix $(prefixinclude:?...) => $(-prefix-include:+...)
+	 Makerules.mk: no -g CC.LIB.TYPE (in ar name) if CC.OPTIMIZE also set
+	 rule.c: don't propagate .DONTCARE .IGNORE to bound rule
+	 parse.c: association pattern ending in % is appended
+	 expand.c: fix :P=A: 3d logic to retain pwd prefix -- doh
+	 expand.c: fix makefile scan to ignore lib*.[hH]
+	 bind.c: fix bug that missed bind dir for x given explicit d/x (edit#18)
+	 misc.c,option.c: *,*=* is a target/prereq, not a (scoped) var assignment
+04-12-01 object.c,state.c: tmsleep() on statefile time for 1 sec granularity
+04-11-25 expand.c: handle :T=<op>=<ops>: for all <op>
+	 command.c: maintain error state for cancelled actions
+	 command.c: add .AFTER .FAILURE to capture action errors
+	 Makerules.mk: LEX = $(FLEX) if flex exists
+	 Makerules.mk: add :YYPREFIX: fallback to previously generated
+04-10-22 Makerules.mk: check for package-pwd in LICENSEFILES
+	 Makerules.mk: mam ${(debug|strip)...} => ${-(debug|strip)-symbols...}
+	 Makerules.mk: add $(LICENSECLASS)
+	 Makerules.mk: add $(package.license.class) pattern for .LIST.PACKAGE.*
+	 Makerules.mk: add $(.SELECT.EDIT.) for omitting .RECURSE subdirs
+	 expand.c: fix recursive order logic
 04-10-01 metarule.c: metaget assumes % target for ... : % .NULL (-Q0x08000000)
 	 scan.c: add \T token match for (\D|\V)
 	 Makerules.mk: :PACKAGE: --option checked first, "set" by default

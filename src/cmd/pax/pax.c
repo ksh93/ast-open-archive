@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2004 AT&T Corp.                  *
+*                  Copyright (c) 1987-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -36,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-09-25 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2004-12-25 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1464,7 +1462,7 @@ main(int argc, char** argv)
 	}
 	if (!sfstrtell(opt.listformat))
 		sfputr(opt.listformat, (state.list && state.verbose) ? "%(mode)s %2(nlink)d %-8(uname)s %-8(gname)s%8(device:case::%(size)llu:*:%(device)s)s %(mtime)s %(delta.op:case:?*:%(delta.op)s )s%(path)s%(linkop:case:?*: %(linkop)s %(linkpath)s)s" : "%(delta.op:case:?*:%(delta.op)s )s%(path)s%(linkop:case:?*: %(linkop)s %(linkpath)s)s", ' ');
-	sfstrrel(opt.listformat, -1);
+	sfstrseek(opt.listformat, -1, SEEK_CUR);
 	if (!state.meter.on)
 		sfputc(opt.listformat, '\n');
 	if (!(state.listformat = strdup(sfstruse(opt.listformat))))

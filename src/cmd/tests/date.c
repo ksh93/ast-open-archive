@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2004 AT&T Corp.                  *
+*                  Copyright (c) 1999-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -21,7 +19,7 @@
 ***********************************************************************/
 #pragma prototyped
 /*
- * tmscan(3) tester
+ * tmscan(3) tmfmt(3) tester
  *
  * testdate [-c] [-v] < testre.dat
  *
@@ -31,7 +29,7 @@
  * see comments in testdate.dat for description of format
  */
 
-static const char id[] = "\n@(#)$Id: testdate (AT&T Research) 2001-08-11 $\0\n";
+static const char id[] = "\n@(#)$Id: testdate (AT&T Research) 2005-01-04 $\0\n";
 
 #include <ast.h>
 #include <ctype.h>
@@ -340,20 +338,39 @@ main(int argc, char** argv)
 			escape(fmt);
 		if (!(ans = field[2]))
 			bad("NIL answer", NiL, NiL);
-		if (str && streq(str, "SET"))
+		if (str)
 		{
-			if (!fmt)
-				bad("NIL SET variable", NiL, NiL);
-			if (streq(fmt, "NOW"))
+			if (streq(str, "SET"))
 			{
-				t_now = tmdate(ans, &e, &t_now);
-				if (*e)
-					bad("invalid NOW", ans, NiL);
-				sfprintf(sfstdout, "NOTE	base date is %s\n", fmttime(NiL, t_now));
+				if (!fmt)
+					bad("NIL SET variable", NiL, NiL);
+				if (streq(fmt, "NOW"))
+				{
+					t_now = tmdate(ans, &e, &t_now);
+					if (*e)
+						bad("invalid NOW", ans, NiL);
+					sfprintf(sfstdout, "NOTE	base date is %s\n", fmttime(NiL, t_now));
+				}
+				else
+					bad("unknown SET variable", fmt, NiL);
+				continue;
 			}
-			else
-				bad("unknown SET variable", fmt, NiL);
-			continue;
+			if (streq(str, "FMT"))
+			{
+				str = 0;
+				if (!fmt)
+				{
+					bad("NIL format", NiL, NiL);
+					continue;
+				}
+				t_now = tmdate(fmt, &e, &t_now);
+				if (*e)
+					bad("invalid NOW", fmt, NiL);
+				if (fmt = ans)
+					escape(fmt);
+				if (!(ans = field[3]))
+					bad("NIL answer", NiL, NiL);
+			}
 		}
 		flags = 0;
 		sfsync(sfstdout);

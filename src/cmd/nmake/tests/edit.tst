@@ -499,3 +499,13 @@ all :
 + : 
 + : =f'
 		ERROR - $'make: regular expression: !.*: unary op not preceeded by re'
+
+TEST 18 ':P=D:'
+
+	EXEC	-n
+		INPUT Makefile $'.SOURCE : a z
+all : a.x z.x z/z.x
+	: $(*) : $(*:P=D) :'
+		INPUT a/a.x a
+		INPUT z/z.x z
+		OUTPUT - $'+ : a/a.x z/z.x z/z.x : a z z :'

@@ -1,1 +1,2 @@
-lib	getitimer,setitimer
+lib	clock_gettime,getitimer,setitimer
+typ	struct.timespec

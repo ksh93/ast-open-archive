@@ -27,7 +27,6 @@ TEST 02 'times'
 	EXEC -a -t 2000-05-04+03:02:01 a
 	EXEC -m -t 2000-01-02+03:04:05 a
 	EXEC -a -t mtime a
-		OUTPUT -
 	PROG ls --format="%(atime:time=%K)s %(mtime:time=%K)s %(path)s" a
 		OUTPUT - $'2000-01-02+03:04:05 2000-01-02+03:04:05 a'
 	EXEC 0102030405 b
@@ -78,3 +77,13 @@ TEST 02 'times'
 		OUTPUT -
 	PROG ls --format="%(mtime:time=%K)s %(path)s" b
 		OUTPUT - $'2000-01-02+03:04:00 b'
+
+TEST 03 'subsecond times'
+	EXEC -a -t 2000-05-04+03:02:01.098 a
+	EXEC -m -t 2000-01-02+03:04:05.678 a
+	PROG ls --format="%(atime:time=%K.%N)s %(mtime:time=%K.%N)s %(path)s" a
+		OUTPUT - $'2000-05-04+03:02:01.098000000 2000-01-02+03:04:05.678000000 a'
+	EXEC -a -t mtime a
+		OUTPUT -
+	PROG ls --format="%(atime:time=%K.%N)s %(mtime:time=%K.%N)s %(path)s" a
+		OUTPUT - $'2000-01-02+03:04:05.678000000 2000-01-02+03:04:05.678000000 a'

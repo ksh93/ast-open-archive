@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-10-01 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-01-01 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -36,7 +36,8 @@ tmp = ${COTEMP}
 set option=';all-static;b;-;Force the prerequisite libraries of static \b+l\b\aname\a library references to be static.'
 set option=';ancestor;n;-;Set the ancestor search directory depth to \adepth\a. \bMAKEPATH\b and variant recursive invocations may increase the depth.;depth:=3'
 set option=';ancestor-source;s;-;A list of \b.SOURCE\b\a.suffix\a \adirectory\a pairs added to the ancestor directory search.;.SOURCE.suffix directory...:=$(.ANCESTOR.LIST)'
-set option=';arclean;s;-;A catenation of edit operators that selects archive members to be deleted by the \barclean\b action.;edit-ops'
+set option=';archive-clean;s;-;A catenation of edit operators that selects archive member files to be removed after being added to the archive.;edit-ops'
+set option=';archive-output;s;-;The output file name for archiving actions (\bpax\b, \bsave\b, \btgz\b, etc.) The default is based on the current directory and the VERSION variable.;file'
 set option=';cctype;s;-;Set the \bprobe\b(1) C compiler type identifier. The default value is based on the \bCC\b variable.;[type]'
 set option=';clean-ignore;s;-;Ignore \bclean\b action generated target files matching \apattern\a.;pattern'
 set option=';clobber;sv;-;Replace existing \binstall\b action targets matching \apattern\a instead of renaming to \atarget\a\b.old\b.;pattern:!*'
@@ -46,13 +47,12 @@ set option=';force-shared;b;-;Force \b-l\b\aname\a library references to bind to
 set option=';instrument;s;-;Enable compile-time, link-time and/or run-time code instrumentation. Instrumentation interfaces that replace the compiler command, and the \bapp\b, \binsight\b, \bpurecov\b, \bpurify\b, \bquantify\b and \bsentinel\b special-need interfaces, are supported.;command'
 set option=';ld-script;s;-;A space-separated list of suffixes of script files to be passed to the linker.;suffix'
 set option=';link;s;-;Hard link \binstall\b action targets matching \apattern\a instead of copying.;pattern'
-set option=';nativepp;n;-;Force the use of the native C preprocessor and print a \alevel\a diagnostic message noting the override.;level'
-set option=';official-out;s;-;The \bdiff\b(1) log file name for the \bofficial\b action. If \afile\a is a relative path name then it is written in the next view level.;file:=OFFICIAL'
-set option=';output;s;-;The output file name for archiving actions (\bpax\b, \bsave\b, \btgz\b, etc.) The default is based on the current directory and the VERSION variable.;file'
+set option=';native-pp;n;-;Force the use of the native C preprocessor and print a \alevel\a diagnostic message noting the override.;level'
+set option=';official-output;s;-;The \bdiff\b(1) log file name for the \bofficial\b action. If \afile\a is a relative path name then it is written in the next view level.;file:=OFFICIAL'
 set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b-I-\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
 set option=';preserve;sv;-;Move existing \binstall\b action targets matching \apattern\a to the \bETXTBSY\b subdirectory of the install target.;pattern:!*'
 set option=';profile;b;-;Compile and link with \bprof\b(1) instrumentation options enabled.'
-set option=';recurse;s;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently.][+prereqs?List the recursion directory dependency as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
+set option=';recurse;s;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
 set option=';recurse-enter;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon entering a recursive \b:MAKE:\b directory.;text'
 set option=';recurse-leave;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon leaving a recursive \b:MAKE:\b directory. If \b--recurse-leave\b is not specified then no message is printed upon leaving \b:MAKE:\b directories.;text'
 set option=';select;s;-;A catenation of edit operators that selects terminal source files.;edit-ops'
@@ -69,9 +69,9 @@ set option=';virtual;b;-;Allow \b:MAKE:\b to \bmkdir\b(1) recursive directories 
  */
 
 set all-static:=1
+set archive-output:=$$(PWD:N=*[0-9].[0-9]*|*-$(VERSION:@N!=-):?$$(PWD:B:S:/---*\\([^-]*\\)/-\\1/)?$$(VERSION:@N!=-:Y%$$(PWD:B:S)-$$(VERSION)%$$(PWD:B)%)?)
 set compare:=1
-set official-out:=OFFICIAL
-set output:=$$(PWD:N=*[0-9].[0-9]*|*-$(VERSION:@N!=-):?$$(PWD:B:S:/---*\\([^-]*\\)/-\\1/)?$$(VERSION:@N!=-:Y%$$(PWD:B:S)-$$(VERSION)%$$(PWD:B)%)?)
+set official-output:=OFFICIAL
 set preserve:=$$(CC.SUFFIX.SHARED:+$$(CC.PREFIX.SHARED)*$$(CC.SUFFIX.SHARED).*)|$$(CC.SUFFIX.DYNAMIC:+$$(CC.PREFIX.DYNAMIC)*$$(CC.SUFFIX.DYNAMIC))
 set recurse:=1
 set separate-include:=1
@@ -130,6 +130,14 @@ set virtual:=1
 				N += --link=$(link)
 			end
 		end
+		if ! "$(-?prefix-include)" && "$("prefixinclude":T=QV)"
+			O += prefixinclude=$(prefixinclude)
+			if prefixinclude
+				N += --prefix-include
+			else
+				N += --noprefix-include
+			end
+		end
 		if ! "$(-?static-link)" && "$("static":T=QV)"
 			O += static=$(static)
 			if static
@@ -140,7 +148,7 @@ set virtual:=1
 		end
 		if N
 			set $(N)
-			if .MAKEVERSION. >= 20050101
+			if .MAKEVERSION. >= 20050701
 				error 1 $(O): obsolete: use $(N)
 			end
 		end
@@ -223,8 +231,9 @@ CATALOG = $(.CATALOG.NAME.)
 HTMLINITFILES = 2HTML:$(HOME)/.2html
 LICENSE =
 LICENSEFILE = LICENSE
-LICENSEFILES = $(.PACKAGE.license) $(LICENSE:/,.*//:N!=*=*) $(LICENSEFILE) $(.PACKAGE.)
+LICENSEFILES = $(.PACKAGE.license) $(LICENSE:/,.*//:N!=*=*) $(LICENSEFILE) $(.PACKAGE.)-$(PWD:C,^$(INSTALLROOT)/[^/]*/[^/]*/,,:C,/.*,,:/^lib//:/lib$//) $(.PACKAGE.)
 LICENSEINFO = $(.FIND. lib/package .lic $(LICENSEFILES))
+LICENSECLASS = $(LICENSEINFO:P=W=$(LICENSE),query=${type}.${class})
 
 /*
  * language processor suffix equivalences
@@ -263,11 +272,11 @@ LICENSEINFO = $(.FIND. lib/package .lic $(LICENSEFILES))
 	P = $(PATH) $(PKGDIRS)
 	P := $(P:/:/ /G:D:T=F)
 	for F $(FILES)
-		if X = "$(F:T=F)"
+		if X = "$(F:T=FR)"
 			return $(X)
 		end
 		if "$(X:S)" != "*.*" && SUFFIX != "-"
-			if X = "$(F:D:B:S=$(SUFFIX):T=F)"
+			if X = "$(F:D:B:S=$(SUFFIX):T=FR)"
 				return $(X)
 			end
 		end
@@ -276,11 +285,11 @@ LICENSEINFO = $(.FIND. lib/package .lic $(LICENSEFILES))
 		else
 			D = =$(SIBLING)
 		end
-		if X = "$(P:X=$(F:D$(D):B:S):T=F)"
+		if X = "$(P:X=$(F:D$(D):B:S):T=FR)"
 			return $(X:O=1)
 		end
 		if "$(F:S)" != "*.*" && SUFFIX != "-"
-			if X = "$(P:X=$(F:D$(D):B:S=$(SUFFIX)):T=F)"
+			if X = "$(P:X=$(F:D$(D):B:S=$(SUFFIX)):T=FR)"
 				return $(X:O=1)
 			end
 		end
@@ -383,7 +392,7 @@ LD = $(CC.LD)
 LDFLAGS =
 LDSHARED = $(CC.SHARED.LD|CC.LD)
 LDRUNPATH =
-if ! "$(PATH:/:/ /G:X=lex:P=X)" && "$(PATH:/:/ /G:X=flex:P=X)"
+if "$(sh if $(FLEX) $(FLEXFLAGS) --version >/dev/null 2>&1; then echo 0; else echo 1; fi)" == "0"
 LEX = $(FLEX)
 LEXFLAGS = $(FLEXFLAGS)
 else
@@ -425,6 +434,7 @@ MM2HTMLINFO = $(LICENSEINFO)
 MM2HTMLINIT = $(HTMLINITFILES:/:/ /G:T=F:O=1)
 MM2HTMLFLAGS = $(MM2HTMLINFO:@Q:/^/-l /) $(MM2HTMLINIT:@Q:/^/-h /) $(LICENSE:@/^/-o /:@Q)
 MV = mv
+MVFLAGS = -f
 if "$(PATH:/:/ /G:X=nawk:P=X)"
 NAWK = nawk
 elif "$(PATH:/:/ /G:X=gawk:P=X)"
@@ -658,6 +668,7 @@ include "Scanrules.mk"
 			return $(T)
 		end
 		if ( T = "$(V:T=F)" ) && "$(T:D)" != "$(CC.STDLIB:/ /|/G)" && "$(T:D)" != "/usr/($(.PACKAGE.:/ /|/G))"
+			$(T) : -IGNORE
 			return $(T)
 		end
 	end
@@ -723,7 +734,7 @@ include "Scanrules.mk"
 							end
 							T := $(T:T=F)
 							Q = .ARCHIVE
-							if ! "$(-force-shared)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
+							if ! "$(-force-shared)" && ! "$(-static-link)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
 								Q += .IGNORE
 							end
 							$(%) $(T) : $(Q)
@@ -754,7 +765,7 @@ include "Scanrules.mk"
 									end
 								end
 								Q = .ARCHIVE
-								if ! "$(-force-shared)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
+								if ! "$(-force-shared)" && ! "$(-static-link)" && "$(CC.SUFFIX.SHARED)" && T == "*$(CC.SUFFIX.SHARED)"
 									Q += .IGNORE
 								end
 								$(%) $(T) : $(Q)
@@ -839,8 +850,8 @@ include "Scanrules.mk"
 
 .REQUIRE.RULES. : .FUNCTION
 	local B R T D DL DR
-	B := $(%:/-l//)
-	if "$(-mam:N=static*)" && "$(%)" != "-l+([a-zA-Z0-9_])"
+	B := $(%:/[-+]l//)
+	if "$(-mam:N=static*)" && "$(%)" != "[-+]l+([a-zA-Z0-9_])"
 		return
 	end
 	for D 1 2
@@ -871,7 +882,7 @@ include "Scanrules.mk"
 			break
 		end
 	end
-	if ! ( T = "$(%:/-l\(.*\)/\1.req/:T=F)" )
+	if ! ( T = "$(%:/[-+]l\(.*\)/\1.req/:T=F)" )
 		R := lib/$(B)
 		$(R) : .ARCHIVE
 		if ! ( T = "$(R:T=F)" )
@@ -987,7 +998,7 @@ include "Scanrules.mk"
 .ARCLEAN.LIST. : .FUNCTION
 	local I V
 	if ! .AR.RETAIN
-		for I $(***:T=F:T=G:P=L:A!=.ARCHIVE|.TERMINAL:N!=$(.ARCHIVE.OMIT.):$(-arclean))
+		for I $(***:T=F:T=G:P=L:A!=.ARCHIVE|.TERMINAL:N!=$(.ARCHIVE.OMIT.):$(-archive-clean))
 			if ! "$(~$(I):A=.FORCE:A!=.IGNORE)"
 				V += $(I)
 			end
@@ -1148,7 +1159,7 @@ cc-% : "" .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
 	if	test -d $(<:V:Q)
 	then	$(-silent:Y%%echo $(-errorid:C%$%/%)$(<:V:Q): >&2%)
 		cd $(<:V:Q)
-		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:V:N!=MAKEPATH=*) $(.RECURSE.ARGS.:N!=.CC-*:/^\.INSTALL$/.CC-INSTALL/) $(%:Y!$$(INSTRUMENT_$$(%:/,.*//):@?--instrument=$$(%:/,.*//)?CCFLAGS=-$$(%:V:/$$(%:V:N=*~*:?~?,?)/ /G:@/-W\(.\) /-W\1,/G:@Q)?)!!) $(.VARIANT.$(<))
+		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:V:N!=MAKEPATH=*) $(.RECURSE.ARGS.:N!=.CC-*:/^\.INSTALL$/.CC-INSTALL/) $(%:Y;$$(INSTRUMENT_$$(%:/,.*//):@?--instrument=$$(%:/,.*//)?$$(%:V:/$$(%:V:N=*~*:Y!~!,!)/ /G:@/-W\(.\) /-W\1,/G:N!=[!-+]*=*:@/^./CCFLAGS=-&/:@Q) $$(%:V:/$$(%:V:N=*~*:Y!~!,!)/ /G:@/-W\(.\) /-W\1,/G:N=[!-+]*=*)?);;) $(.VARIANT.$(<))
 	fi
 
 /*
@@ -1264,11 +1275,11 @@ DAGGERFLAGS =
 
 .DO.INSTALL.OLD. : .FUNCTION
 	if "$(-preserve)" == "\*" || "$(-preserve:N=*/*:?$$(%:N=$$(-preserve))?$$(%:B:S:N=$$(-preserve))?)"
-		return $(SILENT) test -d $(%:D:B=ETXTBSY) || $(MKDIR) $(%:D:B=ETXTBSY); $(MV) $(%) $(%:D:B=ETXTBSY)/$(%:B)#$(%:P=I)
+		return $(SILENT) test -d $(%:D:B=ETXTBSY) || $(MKDIR) $(%:D:B=ETXTBSY); $(MV) $(MVFLAGS) $(%) $(%:D:B=ETXTBSY)/$(%:B)#$(%:P=I)
 	elif "$(-clobber)" == "\*" || "$(-clobber:N=*/*:?$$(%:N=$$(-clobber))?$$(%:B:S:N=$$(-clobber))?)"
 		return $(RM) $(RMFLAGS) $(%)
 	else
-		return $(MV) $(%) $(%).old
+		return $(MV) $(MVFLAGS) $(%) $(%).old
 	end
 
 .DO.INSTALL : .USE $$(<:N=*$$(CC.SUFFIX.ARCHIVE):?.ARCOPY??)
@@ -1302,7 +1313,7 @@ DAGGERFLAGS =
 		return $(CP) $(%) $(%).old$("\n")$(RM) $(RMFLAGS) $(%)
 	end
 
-.DO.LINK : .USE .ACCEPT /* .ACCEPT until dual-time implementation */
+.DO.LINK : .USE /* .ACCEPT .ACCEPT until dual-time implementation */
 	if	$(SILENT) test -f "$(<)"
 	then	$(.DO.LINK.OLD. $(<))
 	fi
@@ -1313,7 +1324,7 @@ DAGGERFLAGS =
 .NOOPTIMIZE.c .CC.NOOPTIMIZE /* drop .CC.* in 2004 */ : .MAKE .LOCAL
 	CCFLAGS := $(.MAM.CC.FLAGS|CCFLAGS:VP:N!=-O*|$(CC.OPTIMIZE)|$\(CC.OPTIMIZE\))
 	if "$(-mam)"
-		CCFLAGS := ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}
+		CCFLAGS := ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}
 	elif "$(-debug-symbols)"
 		CCFLAGS := $(CC.DEBUG) $(CCFLAGS:VP:N!=-g|$(CC.DEBUG)|$\(CC.DEBUG\))
 	end
@@ -1461,6 +1472,7 @@ end
 	P := $(D:N!=-|.CC-*|cc-*)
 	$(P:T!=FR) : .TERMINAL .RECURSE.DIR
 	$(P:T=FR) : .TERMINAL .RECURSE.FILE
+	.SELECT.EDIT. := $(.SELECT.EDIT.):N!=($(P:T=F:P=L=*:/ /|/G))?(/*)
 	return $(D)
 
 .RECURSE.DIR : .USE .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
@@ -3090,14 +3102,20 @@ PACKAGES : .SPECIAL .FUNCTION
 	end
 
 /*
- * :YYPREFIX: [prefix] [header.h] a.y b.l
+ * :YYPREFIX: [prefix] [header.h] a.y a.y.c a.y.h b.l b.l.c
  */
 
 ":YYPREFIX:" : .MAKE .OPERATOR
-	local H P F
+	local H P F PL PY PH B I O
 	for F $(>)
 		if "$(F)" != "*.*"
 			P := $(F)
+		elif "$(F)" == "*.l.c"
+			PL := $(F)
+		elif "$(F)" == "*.y.c"
+			PY := $(F)
+		elif "$(F)" == "*.y.h"
+			PH := $(F)
 		elif "$(F)" == "*.h"
 			H := $(F)
 		elif "$(F)" == "*.l"
@@ -3107,6 +3125,49 @@ PACKAGES : .SPECIAL .FUNCTION
 			YACCFIX.$(F:B) := $(P)
 			YACCHDR.$(F:B) := $(H)
 		end
+	end
+	if PL
+		:: $(PL)
+		.PASS.AFTER.$(PL) : .VIRTUAL .FORCE .AFTER
+			{
+			echo "/* : : fallback $(<<) generated by $(LEX) -- do not edit : : */"
+			cat $(<<)
+			} > $(<<:B:S=.l.c)
+		.FAIL.AFTER.$(PL) : .VIRTUAL .FORCE .AFTER .FAILURE $(PL)
+			: $(<<) : falling back to previously generated $(*) :
+			$(CP) $(*) $(<<)
+		$(PL:B:B)$(PL:S) : .PASS.AFTER.$(PL) .FAIL.AFTER.$(PL)
+	end
+	if PY
+		:: $(PY)
+		O := $(PY:S)
+		I := $(PY:B::S)
+		B := $(PY:B:B)
+		if PH
+			.PASS.AFTER.$(PY) : .VIRTUAL .FORCE .AFTER
+				{
+				echo "/* : : fallback $(<<:N=*.c:B:S=.c) generated by $(YACC) -- do not edit : : */"
+				cat $(<<:N=*.c)
+				} > $(<<:N=*.c:B:S=.y.c)
+				{
+				echo "/* : : fallback $(<<:N=*.h:B:S=.h) generated by $(YACC) -- do not edit : : */"
+				cat $(<<:N=*.h)
+				} > $(<<:N=*.h:B:S=.y.h)
+			.FAIL.AFTER.$(PY) : .VIRTUAL .FORCE .AFTER .FAILURE $(PY) $(PH)
+				: $(<<) : falling back to previously generated { $(*) } :
+				$(CP) $(*:O=1) $(<<:O=1)
+				$(CP) $(*:O=2) $(<<:O=2)
+		else
+			.PASS.AFTER.$(PY) : .VIRTUAL .FORCE .AFTER
+				{
+				echo "/* : : fallback $(<<) generated by $(YACC) -- do not edit : : */"
+				cat $(<<)
+				} > $(<<:B:S=.y.c)
+			.FAIL.AFTER.$(PY) : .VIRTUAL .FORCE .AFTER .FAILURE $(PY)
+				: $(<<) : falling back to previously generated $(*) :
+				$(CP) $(*) $(<<)
+		end
+		$(PY:B:B)$(PY:S) : .PASS.AFTER.$(PY) .FAIL.AFTER.$(PY)
 	end
 	
 /*
@@ -3158,7 +3219,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		.UNION. : $(...:T!=XS:T=F:A=.REGULAR:P=S:T!=G)
 		.UNION. : $(...:T=XSFA:T=F:A=.REGULAR:P=S:T!=G)
 	end
-	return $(*.UNION.:$(-select))
+	return $(*.UNION.:$(-select):$(.SELECT.EDIT.))
 
 .GENSYM.COUNT. = 0
 
@@ -3267,7 +3328,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		if "$(-threads)"
 			J := t$(J)
 		end
-		if "$(-debug-symbols)" || "$(CCFLAGS:N=$(CC.DEBUG))"
+		if "$(-debug-symbols)" || "$(CCFLAGS:N=$(CC.DEBUG))" && ! "$(CCFLAGS:N=-O*|$(CC.OPTIMIZE))"
 			J := $(J)g
 		end
 		if ! "$(J)"
@@ -3644,7 +3705,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		set prefix-include:=1
 	end
 	if "$(-prefix-include)" || ! "$(-separate-include)" || "$(-nativepp)" && ! "$(CC.SEPARATEINCLUDE)"
-		T3 += $$(*:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(!$$$$(*):A=.LCL.INCLUDE|.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&:T=D)
+		T3 += $$(*:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(!$$$$(*):A=.LCL.INCLUDE|.STD.INCLUDE:P=D:U):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&:T=D)
 		if "$(-nativepp)" == "[1-9]*"
 			error 1 local include files may be ignored by the native C preprocessor
 		end
@@ -3652,7 +3713,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		if ! "$(-?prefix-include)"
 			set prefix-include:=0
 		end
-		T3 += $$(*:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(!$$$$(*):A=.LCL.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/) -I- $$$(*.SOURCE.%.STD.INCLUDE:I=$$$$(!$$$$(*):A=.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&:T=D)
+		T3 += $$(*:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(!$$$$(*):A=.LCL.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/) -I- $$$(!$$$(*):A=.STD.INCLUDE:A=.LCL.INCLUDE:@+-I.) $$$(*.SOURCE.%.STD.INCLUDE:I=$$$$(!$$$$(*):A=.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&:T=D)
 	end
 	if "$(CC.DIALECT:N=TOUCHO)"
 		.TOUCHO : .MAKE .VIRTUAL .FORCE .REPEAT .AFTER .FOREGROUND
@@ -3909,7 +3970,7 @@ test : .SPECIAL .DONTCARE .ONOBJECT $$("check":A=.TARGET:A!=.ARCHIVE|.COMMAND|.O
 
 .BASE.VERIFY : .MAKE .VIRTUAL .FORCE .REPEAT
 	if ! "$(.BASE.)"
-		error 3 $(-output): no base archive for delta
+		error 3 $(-archive-output): no base archive for delta
 	end
 
 .BASE.UPDATE : .MAKE .VIRTUAL .FORCE
@@ -4068,7 +4129,7 @@ test : .SPECIAL .DONTCARE .ONOBJECT $$("check":A=.TARGET:A!=.ARCHIVE|.COMMAND|.O
 
 if CPIO
 .CPIO : .COMMON.SAVE
-	echo $(.MANIFEST.) | tr ' ' '\012' | $(CPIO) -o $(CPIOFLAGS) > $(-output)$(-?output:~.cpio)
+	echo $(.MANIFEST.) | tr ' ' '\012' | $(CPIO) -o $(CPIOFLAGS) > $(-archive-output)$(-?archive-output:~.cpio)
 end
 
 if CTAGS
@@ -4157,6 +4218,14 @@ end
 
 .LIST.PACKAGE.LICENSE : .ONOBJECT .MAKE
 	local I E
+	if "$(package.license.class)"
+		if "$(LICENSECLASS)" != "$(package.license.class)"
+			if "$(LICENSECLASS)" != "."
+				error 1 $(LICENSECLASS): not a $(package.license.class) license -- ignored
+			end
+			exit 0
+		end
+	end
 	E := $(.LIST.PACKAGE.EDIT.)
 	if I = "$(LICENSEINFO:P!=S)"
 		print ;;;$(I);$(I:$(E))
@@ -4276,42 +4345,42 @@ if LPROF
 end
 
 .OFFICIAL : .ONOBJECT
-	$(*.VIEW:O=2:@?$$(.MANIFEST.:P=L:N!=[-/]*:T=FR:C@.*@{ $$(DIFF) $$(DIFFFLAGS) $$(*.VIEW:O=2)/& & || true; } >> $(-official-out:D=$$(*.VIEW:O=2):B:S); $$(MV) & $$(*.VIEW:O=2)/&;@)?: no lower view?)
+	$(*.VIEW:O=2:@?$$(.MANIFEST.:P=L:N!=[-/]*:T=FR:C@.*@{ $$(DIFF) $$(DIFFFLAGS) $$(*.VIEW:O=2)/& & || true; } >> $(-official-output:D=$$(*.VIEW:O=2):B:S); $$(MV) $$(MVFLAGS) & $$(*.VIEW:O=2)/&;@)?: no lower view?)
 
 .PAX : .COMMON.SAVE $$(*.RECURSE:@?.PAX.RECURSE?.PAX.LOCAL)
 
 .PAX.LOCAL : .COMMON.SAVE
-	$(PAX) -d -w -f $(-output)$(-?output:~.pax) $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $(-archive-output)$(-?archive-output:~.pax) $(PAXFLAGS) $(.MANIFEST.)
 
 .PAX.RECURSE : .COMMON.SAVE
 	$(MAKE) --noexec --file=$(MAKEFILE) $(-) recurse list.manifest |
 	$(SORT) -u |
-	$(PAX) -w -f $(-output)$(-?output:~.pax) $(PAXFLAGS)
+	$(PAX) -w -f $(-archive-output)$(-?archive-output:~.pax) $(PAXFLAGS)
 
 .PRINT : .COMMON.SAVE
 	$(PR) $(PRFLAGS) $(.SOURCES.:N!=*.[0-9]*([!./])) $(LPR:@?| $(LPR) $(LPRFLAGS)??)
 
 .SAVE : .COMMON.SAVE
-	$(PAX) -d -w -f $(-output)$(-?output:~.$("":T=R:F=%($(.BASE.DATE.FORMAT.))T)) $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $(-archive-output)$(-?archive-output:~.$("":T=R:F=%($(.BASE.DATE.FORMAT.))T)) $(PAXFLAGS) $(.MANIFEST.)
 
 .SHAR : .COMMON.SAVE
-	$(SHAR) $(SHARFLAGS) $(.MANIFEST.) > $(-output)$(-?output:~.shar)
+	$(SHAR) $(SHARFLAGS) $(.MANIFEST.) > $(-archive-output)$(-?archive-output:~.shar)
 
 .TAR : .COMMON.SAVE
-	$(TAR) cf$(TARFLAGS) $(-output)$(-?output:~.tar) $(.MANIFEST.)
+	$(TAR) cf$(TARFLAGS) $(-archive-output)$(-?archive-output:~.tar) $(.MANIFEST.)
 
 .TARBALL : .COMMON.SAVE
-	$(PAX) -d -w -f $(-output)$(-?output:~.tgz) -x tar:gzip $(PAXFLAGS) -s ',^[^/],$(PWD:B:/-.*//)$(VERSION:@N!=-:?-$(VERSION)??)/,' $(.MANIFEST.)
+	$(PAX) -d -w -f $(-archive-output)$(-?archive-output:~.tgz) -x tar:gzip $(PAXFLAGS) -s ',^[^/],$(PWD:B:/-.*//)$(VERSION:@N!=-:?-$(VERSION)??)/,' $(.MANIFEST.)
 
 .TGZ : .COMMON.SAVE $$(*.RECURSE:@?.TGZ.RECURSE?.TGZ.LOCAL)
 
 .TGZ.LOCAL : .COMMON.SAVE
-	$(PAX) -d -w -f $(-output)$(-?output:~.tgz) -x tar:gzip $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $(-archive-output)$(-?archive-output:~.tgz) -x tar:gzip $(PAXFLAGS) $(.MANIFEST.)
 
 .TGZ.RECURSE : .COMMON.SAVE
 	$(MAKE) --noexec --file=$(MAKEFILE) $(-) recurse list.manifest |
 	$(SORT) -u |
-	$(PAX) -w -f $(-output)$(-?output:~.tgz) -x tar:gzip $(PAXFLAGS)
+	$(PAX) -w -f $(-archive-output)$(-?archive-output:~.tgz) -x tar:gzip $(PAXFLAGS)
 
 /*
  * make abstract machine support
@@ -4324,6 +4393,14 @@ end
 		INSTALLROOT = $(.MAMROOT.)
 		PACKAGEROOT = $(.MAMROOT.)/../..
 		set noreadonly
+		if "$(-mam:N=*,port*)"
+			if ! "$(-?prefix-include)"
+				set noprefix-include
+			end
+			if ! "$(-?separate-include)"
+				set noseparate-include
+			end
+		end
 	end
 	.MAKEINIT : .MAM.INIT
 
@@ -4366,14 +4443,14 @@ end
 	print -um setv mam_cc_FLAGS $(.MAM.CC.FLAGS)
 	T := $(CCFLAGS:VP)
 	if "$(T:N=-O*|$(CC.OPTIMIZE))"
-		print -um setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+		print -um setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 	elif "$(T:N=-g|$(CC.DEBUG))"
 		print -um setv CCFLAGS ${mam_cc_DEBUG}
 	else
-		print -um setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}
+		print -um setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}
 	end
 	CCFLAGS = ${mam_cc_FLAGS} ${CCFLAGS}
-	print -um setv CCLDFLAGS $(CCLDFLAGS:VP:N!=$\(*\)) ${strip?1?${mam_cc_LD_STRIP}??}
+	print -um setv CCLDFLAGS $(CCLDFLAGS:VP:N!=$\(*\)) ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 	CCLDFLAGS = ${CCLDFLAGS}
 	CC.NATIVE = ${CC}
 	CMP = cmp 2>/dev/null

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make pax
 make bio.o
@@ -149,9 +149,9 @@ make ${INSTALLROOT}/include/ast/fnv.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/fnv.h dontcare
-make tv.h implicit
+make ${INSTALLROOT}/include/ast/tv.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
-done tv.h dontcare
+done ${INSTALLROOT}/include/ast/tv.h dontcare
 make ${INSTALLROOT}/include/ast/sum.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -164,10 +164,6 @@ prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/debug.h dontcare
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h dontcare
 make ${INSTALLROOT}/include/ast/align.h implicit
 done ${INSTALLROOT}/include/ast/align.h dontcare
 make ${INSTALLROOT}/include/ast/swap.h implicit
@@ -243,6 +239,7 @@ prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/tm.h
 make ${INSTALLROOT}/include/ast/iconv.h implicit
 make ${INSTALLROOT}/include/ast/ast_iconv.h implicit
+prev ${INSTALLROOT}/include/ast/ccode.h implicit
 prev ${INSTALLROOT}/include/ast/ast_common.h implicit
 done ${INSTALLROOT}/include/ast/ast_iconv.h
 done ${INSTALLROOT}/include/ast/iconv.h
@@ -255,7 +252,7 @@ prev pax.h implicit
 done pax.c
 meta pax.o %.c>%.o pax.c pax
 prev pax.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?pax]"\" -c pax.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pax]"\" -c pax.c
 done pax.o generated
 make options.o
 make options.c
@@ -277,7 +274,7 @@ prev pax.h implicit
 done delta.c
 meta delta.o %.c>%.o delta.c delta
 prev delta.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c delta.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c delta.c
 done delta.o generated
 make file.o
 make file.c
@@ -292,7 +289,6 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG
 done file.o generated
 make format.o
 make format.c
-prev ${INSTALLROOT}/include/ast/tm.h implicit
 make format.h implicit
 prev pax.h implicit
 done format.h
@@ -303,6 +299,10 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG
 done format.o generated
 make misc.o
 make misc.c
+make ${INSTALLROOT}/include/ast/tmx.h implicit
+prev ${INSTALLROOT}/include/ast/tv.h implicit
+prev ${INSTALLROOT}/include/ast/tm.h implicit
+done ${INSTALLROOT}/include/ast/tmx.h
 make ${INSTALLROOT}/include/ast/sfdisc.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -323,21 +323,6 @@ meta paxlib.o %.c>%.o paxlib.c paxlib
 prev paxlib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c paxlib.c
 done paxlib.o generated
-make tv.o
-make tv.c
-make FEATURE/tv implicit
-meta FEATURE/tv features/%>FEATURE/% features/tv tv
-make features/tv
-done features/tv
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} : run features/tv
-done FEATURE/tv generated
-prev ${INSTALLROOT}/include/ast/tm.h implicit
-prev tv.h implicit
-done tv.c
-meta tv.o %.c>%.o tv.c tv
-prev tv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c tv.c
-done tv.o generated
 make pax-ar.o
 make pax-ar.c
 prev ${INSTALLROOT}/include/ast/ardir.h implicit
@@ -487,7 +472,7 @@ bind -lvdelta
 bind -lcodex
 bind -lsum
 bind -ldll
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pax bio.o convert.o copy.o pax.o options.o delta.o file.o format.o misc.o paxlib.o tv.o pax-ar.o pax-bzip.o pax-compress.o pax-cpio.o pax-delta.o pax-delta_88.o pax-gzip.o pax-ignore.o pax-mime.o pax-patch.o pax-pds.o pax-rpm.o pax-slt.o pax-tar.o pax-tnef.o pax-vdb.o pax-saveset.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libcodex} ${mam_libsum} ${mam_libdll} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pax bio.o convert.o copy.o pax.o options.o delta.o file.o format.o misc.o paxlib.o pax-ar.o pax-bzip.o pax-compress.o pax-cpio.o pax-delta.o pax-delta_88.o pax-gzip.o pax-ignore.o pax-mime.o pax-patch.o pax-pds.o pax-rpm.o pax-slt.o pax-tar.o pax-tnef.o pax-vdb.o pax-saveset.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libcodex} ${mam_libsum} ${mam_libdll} ${mam_libast}
 done pax generated
 make nocom
 make nocom.o
@@ -498,7 +483,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done nocom.c
 meta nocom.o %.c>%.o nocom.c nocom
 prev nocom.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?pax]"\" -c nocom.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pax]"\" -c nocom.c
 done nocom.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o nocom nocom.o ${mam_libast}
 done nocom generated
@@ -516,7 +501,7 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 185 in
+exec - "")	case 179 in
 exec - 	0)	cp rpm2cpio.sh rpm2cpio
 exec - 		;;
 exec - 	*)	{
@@ -525,7 +510,7 @@ exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
 exec - 		cat - rpm2cpio.sh <<'!'
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?pax]"
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pax]"
 exec - !
 exec - 		} > rpm2cpio
 exec - 		;;
@@ -533,7 +518,7 @@ exec - 	esac
 exec - 	;;
 exec - *)	cat - rpm2cpio.sh > rpm2cpio <<'!'
 exec - ${mam_cc_SHELLMAGIC}
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?pax]"
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?pax]"
 exec - !
 exec - 	;;
 exec - esac
@@ -568,7 +553,7 @@ done ${INSTALLROOT}/include/ast generated
 make ${INSTALLROOT}/include/ast/paxlib.h
 prev ${INSTALLROOT}/include/ast
 prev paxlib.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1987,author=gsf'  paxlib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1987,author=gsf'  paxlib.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/paxlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/paxlib.h

@@ -1,3 +1,5 @@
+05-01-11 Makefile: fix exop.h generation to handle spurious #define's
+04-12-14 exeval.c: handle printf "%% %x"
 04-04-15 exeval.c: handle scanf %s -- forgot that regression test!
 04-04-01 exparse.y: drop #pragma prototyped
 04-02-26 add scanf() and sscanf()

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2004 AT&T Corp.                  *
+*                  Copyright (c) 1998-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -59,7 +57,6 @@ USAGE_LICENSE
 #include "pzlib.h"
 
 #include <int.h>
-#include <sfstr.h>
 
 #define CHECKSUM_OP	SFDCEVENT('P','Z',1)
 
@@ -642,7 +639,7 @@ cvtevent(Pz_t* pz, int op, void* data, size_t size, Pzdisc_t* disc)
 	case PZ_TAILREAD:
 		if (cvt->flags & CHECKSUM)
 		{
-			sfstrtmp(state->tmp, SF_READ, data, size);
+			sfstrbuf(state->tmp, data, size, 0);
 			if (sfgetu(state->tmp) == CHECKSUM_OP)
 			{
 				cvt->flags |= CHECKSUM_TAIL;
@@ -667,7 +664,7 @@ cvtevent(Pz_t* pz, int op, void* data, size_t size, Pzdisc_t* disc)
 			sfputu(state->tmp, cvt->checksum);
 			n = sfstrtell(state->tmp);
 			sfputu(sp, n);
-			sfwrite(sp, sfstrset(state->tmp, 0), n);
+			sfwrite(sp, sfstrseek(state->tmp, 0, SEEK_SET), n);
 		}
 		break;
 	}

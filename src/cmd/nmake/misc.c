@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -30,7 +28,6 @@
 #include "make.h"
 
 #include <int.h>
-#include <tm.h>
 
 /*
  * stat() that checks for read access
@@ -38,8 +35,10 @@
  */
 
 int
-rstat(char* name, struct stat* st, int res)
+rstat(char* name, Stat_t* st, int res)
 {
+	Time_t	t;
+
 	if (internal.openfile)
 	{
 		close(internal.openfd);
@@ -54,7 +53,7 @@ rstat(char* name, struct stat* st, int res)
 				if (state.maxview && !state.fsview)
 				{
 					int		oerrno = errno;
-					struct stat	rm;
+					Stat_t		rm;
 
 					if (!stat(name, st) && st->st_nlink > 1 && !st->st_size && !(st->st_mode & S_IPERM))
 					{
@@ -84,14 +83,17 @@ rstat(char* name, struct stat* st, int res)
 	if (fstat(internal.openfd, st))
 		return -1;
  found:
-	if (!st->st_mtime)
+	if (!tmxgetmtime(st))
 	{
 		if (S_ISREG(st->st_mode) || S_ISDIR(st->st_mode))
 			error(1, "%s modify time must be after the epoch", name);
-		st->st_mtime = OLDTIME;
+		tmxsetmtime(st, OLDTIME);
 	}
 	if (state.regress && (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)))
-		st->st_mtime = CURTIME;
+	{
+		t = CURTIME;
+		tmxsetmtime(st, t);
+	}
 	return 0;
 }
 
@@ -127,10 +129,10 @@ newchunk(char** head, register size_t unit)
  * list p is surgically modified
  */
 
-struct list*
-append(struct list* p, struct list* q)
+List_t*
+append(List_t* p, List_t* q)
 {
-	register struct list*	t;
+	register List_t*	t;
 
 	if (t = p)
 	{
@@ -150,10 +152,10 @@ append(struct list* p, struct list* q)
  * list p is not modified
  */
 
-struct list*
-cons(struct rule* r, struct list* p)
+List_t*
+cons(Rule_t* r, List_t* p)
 {
-	register struct list*	q;
+	register List_t*	q;
 
 	newlist(q);
 	q->next = p;
@@ -166,12 +168,12 @@ cons(struct rule* r, struct list* p)
  * the items in the list are not copied
  */
 
-struct list*
-listcopy(register struct list* p)
+List_t*
+listcopy(register List_t* p)
 {
-	register struct list*	q;
-	register struct list*	r;
-	register struct list*	t;
+	register List_t*	q;
+	register List_t*	r;
+	register List_t*	t;
 
 	if (!p)
 		return 0;
@@ -191,11 +193,55 @@ listcopy(register struct list* p)
 }
 
 /*
+ * format time or convert to number
+ */
+
+char*
+timefmt(const char* fmt, Time_t t)
+{
+	if (!t)
+		return "0.0";
+	else if (t == NOTIME)
+		return "0.1";
+	else if (t == OLDTIME)
+		return "0.2";
+	else if (!state.regress)
+		return fmttmx((fmt && *fmt) ? fmt : "%s.%6N", t);
+	else if (t < state.start)
+		return "0.3";
+	else
+		return "0.4";
+}
+
+/*
+ * convert numeric string time to Time_t
+ */
+
+Time_t
+timenum(const char* s, char** p)
+{
+	Time_t		t;
+	unsigned long	n;
+	char*		e;
+
+	if ((t = strtoull(s, &e, 10)) == (Time_t)(-1))
+	{
+		if (p)
+			*p = (char*)s;
+		return TMX_NOTIME;
+	}
+	n = *e == '.' ? strtoul(e + 1, &e, 10) : 0;
+	if (p)
+		*p = e;
+	return tmxsns(t, n);
+}
+
+/*
  * convert time t to a string for tracing
  */
 
 char*
-strtime(unsigned long t)
+timestr(Time_t t)
 {
 	if (!t)
 		return "not found";
@@ -204,32 +250,11 @@ strtime(unsigned long t)
 	else if (t == OLDTIME)
 		return "really old";
 	else if (!state.regress)
-		return fmttime("%?%K", (time_t)t);
+		return fmttmx("%?%K.%6N", t);
 	else if (t < state.start)
 		return "recent";
 	else
 		return "current";
-}
-
-/*
- * convert time t to a number for mam/regress/tracing
- */
-
-unsigned long
-numtime(unsigned long t)
-{
-	if (!t)
-		return 0;
-	else if (t == NOTIME)
-		return 1;
-	else if (t == OLDTIME)
-		return 2;
-	else if (!state.regress)
-		return t;
-	else if (t < state.start)
-		return 3;
-	else
-		return 4;
 }
 
 /*
@@ -244,7 +269,7 @@ numtime(unsigned long t)
 #define strtoull	strtoul
 #endif
 
-typedef union
+typedef union Value_u
 {
 	char**		p;
 	char*		s;
@@ -257,7 +282,7 @@ typedef union
 	double		d;
 } Value_t;
 
-typedef struct
+typedef struct Fmt_s
 {
 	Sffmt_t		fmt;
 	char*		arg;
@@ -277,7 +302,7 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	register char*	s;
 	char*		txt;
 	char*		e;
-	time_t		tm;
+	Time_t		tm;
 
 	if (fp->all)
 	{
@@ -377,10 +402,11 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		break;
 	case 't':
 	case 'T':
-		tm = isdigit(*s) ? strtol(s, &e, 0) : tmdate(s, &e, NiL);
-		if (*e || tm == -1)
+		if (!isdigit(*s) || ((tm = strtol(s, &e, 0)), *e))
+			tm = tmxdate(s, &e, TMX_NOW);
+		if (*e || tm == TMX_NOTIME)
 			tm = CURTIME;
-		value->s = txt ? fmttime(txt, tm) : strtime(tm);
+		value->s = txt ? fmttmx(txt, tm) : timestr(tm);
 		dp->fmt = 's';
 		dp->size = -1;
 		break;
@@ -441,24 +467,6 @@ strprintf(Sfio_t* sp, const char* format, char* argp, int all, int term)
 	if (fmt.tmp)
 		sfstrclose(fmt.tmp);
 	return n;
-}
-
-/*
- * time comparison with tolerance
- * same return value as strcmp()
- */
-
-int
-cmptime(unsigned long a, unsigned long b)
-{
-	long	diff;
-
-	diff = a - b;
-	if (diff < -state.tolerance)
-		return -1;
-	if (diff > state.tolerance)
-		return 1;
-	return 0;
 }
 
 /*
@@ -534,6 +542,10 @@ getarg(char** buf, register int* flags)
 		case '=':
 			if (flags && !(*flags & (A_group|A_metarule)))
 				*flags |= A_scope;
+			break;
+		case ',':
+			if (flags)
+				*flags |= A_group;
 			break;
 		default:
 			if (paren || !isspace(c))

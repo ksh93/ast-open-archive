@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 exec - : only tests in this directory : nothing to install :
 done install virtual
@@ -273,7 +273,9 @@ make datey1k.dat
 done datey1k.dat
 make datey2k.dat
 done datey2k.dat
-exec - for i in date.dat datey1k.dat datey2k.dat
+make week.dat
+done week.dat
+exec - for i in date.dat datey1k.dat datey2k.dat week.dat
 exec - do	DATEMSK=date.msk TZ=EST5EDT date  < $i
 exec - done
 done test.date virtual
@@ -439,6 +441,9 @@ done sfio/tsetbuf.c
 make sfio/tsetfd.c
 prev sfio/sftest.h implicit
 done sfio/tsetfd.c
+make sfio/tsfstr.c
+prev sfio/sftest.h implicit
+done sfio/tsfstr.c
 make sfio/tshare.c
 prev sfio/sftest.h implicit
 done sfio/tshare.c
@@ -496,7 +501,7 @@ done sfio/twhole.c
 make sfio/twrrd.c
 prev sfio/sftest.h implicit
 done sfio/twrrd.c
-exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tshare.c sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
+exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tsfstr.c sfio/tshare.c sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${INSTALLROOT}/include/ast -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
 done test.sfio virtual
 make test.vmalloc
 make vmalloc/testvmalloc

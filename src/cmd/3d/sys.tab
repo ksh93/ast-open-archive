@@ -62,6 +62,7 @@ truncate	truncate	int		const char*, off_t		129	0
 unlink		remove	int		const char*			10
 utime		utime	int		const char*, const struct utimbuf*	30
 utimes		utime	int		const char*, const struct timeval*	138	0
+utimets		utime	int		const char*, const struct timespec*	235	0
 vfork		fork	pid_t		void				66
 write		write	ssize_t		int, const void*, size_t	4
 #

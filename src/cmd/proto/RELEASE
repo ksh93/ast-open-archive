@@ -1,3 +1,5 @@
+04-10-24 sear.sh: note in docs that ratz options apply to sear .exe's
+04-10-22 proto.tst: add array arg prototype tests
 04-10-01 proto.c: add CPL docs
 04-09-24 sear.sh: add cc -c to avoid nativepp "ratz.c" message
 04-05-20 proto.tst: add `int fun __P((int));' test

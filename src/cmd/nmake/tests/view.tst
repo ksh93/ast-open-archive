@@ -34,7 +34,7 @@ TEST 03 'basic VPATH'
 
 	CD	top/src
 
-	EXEC	-n --regress
+	EXEC	-n
 		INPUT $TWD/bot/src/Makefile $'main :: main.c'
 		INPUT $TWD/bot/src/main.c $'#include "hdr.h"
 int main(){return 0;}'
@@ -178,7 +178,7 @@ TEST 08 ':INSTALLDIR: with 2 node VPATH'
 
 	CD	ofc
 
-	EXEC	--regress install
+	EXEC	install
 		INPUT Makefile $'INSTALLROOT = .
 .SOURCE : src
 $(ETCDIR) :INSTALLDIR: a.c b.c c.c'
@@ -192,10 +192,12 @@ $(ETCDIR) :INSTALLDIR: a.c b.c c.c'
 
 	CD	../dev
 
-	EXEC	--regress install
+	EXEC	install # 1 sec granularity state sync for INPUT updates
+		ERROR - $'+ mkdir -p etc'
+
+	EXEC	install
 		INPUT src/a.c $'dev'
-		ERROR - $'+ mkdir -p etc
-+ ignore cp src/a.c etc/a.c'
+		ERROR - $'+ ignore cp src/a.c etc/a.c'
 
 TEST 09 '3 node contained VPATH with .SOURCE dups'
 
@@ -329,7 +331,7 @@ TEST 13 'joint metarule overlay'
 
 	CD	bot
 
-	EXEC	--regress target
+	EXEC	target
 		INPUT Makefile $'%.c %.h : %.j
 	echo "#define PWD \\"this file is from $(PWD)\\"" > $(<:N=*.h)
 	echo "int i;" >$(<:N=*.c)
@@ -349,7 +351,10 @@ int main() { return PWD != 0; }'
 
 	CD	../top
 
-	EXEC	--regress target
+	EXEC	target # 1 sec granularity state sync for INPUT updates
+		ERROR -
+
+	EXEC	target
 		INPUT file.j $'TOP'
 		ERROR - $'+ echo \'#define PWD "this file is from '$TWD$'/top"\'
 + 1> file.h
@@ -359,12 +364,12 @@ int main() { return PWD != 0; }'
 + cc -O -I. -c '$TWD$'/bot/main.c
 + cc -O -o target file.o main.o'
 
-	EXEC	--regress clobber
+	EXEC	clobber
 		ERROR - $'+ ignore rm -f -r target main.o file.c file.h file.o Makefile.ms'
 
 	CD	../bot
 
-	EXEC	--regress clobber
+	EXEC	clobber
 		ERROR - $'+ ignore rm -f -r target main.o file.c file.h file.o Makefile.mo Makefile.ms'
 
 TEST 14 'view over multiple subdirs'
@@ -426,7 +431,7 @@ TEST 15 '3 levels'
 
 	CD	bot/esql
 
-	EXEC	--regress
+	EXEC
 		INPUT $TWD/bot/esql/Makefile $'.SOURCE.eh : ../hdr
 
 ESQL      = print
@@ -470,7 +475,7 @@ all : DBcreateTables.cc DBdropTables.cc'
 
 	CD	../../mid/esql
 
-	EXEC	--regress
+	EXEC
 		INPUT $TWD/mid/esql/
 		INPUT $TWD/mid/hdr/
 		ERROR -
@@ -479,6 +484,6 @@ all : DBcreateTables.cc DBdropTables.cc'
 
 	CD	../../top/esql
 
-	EXEC	--regress
+	EXEC
 		INPUT $TWD/top/esql/
 		INPUT $TWD/top/hdr/

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make nmake
 make archive.o
@@ -116,10 +116,21 @@ done ${INSTALLROOT}/include/ast/ast.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ardir.h
 make make.h implicit
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
+make ${INSTALLROOT}/include/ast/tmx.h implicit
+make ${INSTALLROOT}/include/ast/tv.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+done ${INSTALLROOT}/include/ast/tv.h dontcare
+make ${INSTALLROOT}/include/ast/tm.h implicit
+make ${INSTALLROOT}/include/ast/times.h implicit
+make ${INSTALLROOT}/include/ast/ast_time.h implicit
+done ${INSTALLROOT}/include/ast/ast_time.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h
+done ${INSTALLROOT}/include/ast/times.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/tm.h dontcare
+done ${INSTALLROOT}/include/ast/tmx.h
 make ${INSTALLROOT}/include/ast/sfdisc.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -128,12 +139,7 @@ make ${INSTALLROOT}/include/ast/tok.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/tok.h
-make ${INSTALLROOT}/include/ast/times.h implicit
-make ${INSTALLROOT}/include/ast/ast_time.h implicit
-done ${INSTALLROOT}/include/ast/ast_time.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/times.h
+prev ${INSTALLROOT}/include/ast/times.h implicit
 make ${INSTALLROOT}/include/ast/coshell.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -224,7 +230,7 @@ prev make.h implicit
 done expand.c
 meta expand.o %.c>%.o expand.c expand
 prev expand.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c expand.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c expand.c
 done expand.o generated
 make main.o
 make main.c
@@ -274,11 +280,6 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG
 done metarule.o generated
 make misc.o
 make misc.c
-make ${INSTALLROOT}/include/ast/tm.h implicit
-prev ${INSTALLROOT}/include/ast/times.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/tm.h
 prev ${INSTALLROOT}/include/ast/int.h implicit
 prev make.h implicit
 done misc.c
@@ -299,7 +300,7 @@ prev make.h implicit
 done object.c
 meta object.o %.c>%.o object.c object
 prev object.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c object.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c object.c
 done object.o generated
 make option.o
 make option.c
@@ -308,7 +309,7 @@ prev make.h implicit
 done option.c
 meta option.o %.c>%.o option.c option
 prev option.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html]"\" -D_PACKAGE_ast -c option.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
 make parse.o
 make parse.c
@@ -318,7 +319,7 @@ prev make.h implicit
 done parse.c
 meta parse.o %.c>%.o parse.c parse
 prev parse.c
-exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c parse.c
+exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG??} -I. -I${INSTALLROOT}/include/ast -DDEBUG -D_PACKAGE_ast -c parse.c
 done parse.o generated
 make read.o
 make read.c
@@ -378,7 +379,7 @@ make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.4 2004-10-01 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.0 2005-01-01 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir

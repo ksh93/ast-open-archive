@@ -220,47 +220,6 @@ DESCRIPTION
 
 SEE ALSO
   Bla.'
-	EXEC -+ aha "$usage" --man
-		OUTPUT - $'id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=aha catalog=libast text="NAME"
-id=aha catalog=libast text="aha - just do it"
-id=aha catalog=libast text="DESCRIPTION"
-id=aha catalog=libast text="Bla bla."
-id=aha catalog=libast text="dabba"
-id=aha catalog=libast text="aroni"
-id=aha catalog=libast text="SEE ALSO"
-id=aha catalog=libast text="Bla."
-id=aha catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
-id=aha catalog=libast text="[ dialect ]"
-return=? option=- name=--man num=0
-id=(null) catalog=libast text="Usage"'
-		ERROR - $'ANZR
-  nun - whfg qb vg
-
-FLABCFVF
-  aha [ bcgvbaf ] [ qvnyrpg ]
-
-QRFPEVCGVBA
-  Oyn oyn.
-    yabba qnoon
-    doo   nebav
-
-FRR NYFB
-  Oyn.'
 	usage=$'[-][+NAME?aha - just do it][+DESCRIPTION?Bla bla.]{[+before?insert]\fzero\f[+after?append]}'
 	EXEC	aha "$usage" --man
 		OUTPUT - $'return=? option=- name=--man num=0'
@@ -299,7 +258,7 @@ OPTIONS
 
 TEST 04 'oh man'
 	usage=$'
-	[-?@(#)sum (AT&T Labs Research) 1999-01-23\n]
+	[-?@(#)sum (AT&T Research) 1999-01-23\n]
 	[-author?Glenn Fowler <gsf@research.att.com>]
 	[-author?David Korn <dgk@research.att.com>]
 	[-copyright?Copyright (c) 1989-1999 AT&T Corp.]
@@ -475,21 +434,21 @@ AND ALSO MORE JUNK TOO
   Next paragraph.
 
 IMPLEMENTATION
-  version         sum (AT&T Labs Research) 1999-01-23
+  version         sum (AT&T Research) 1999-01-23
   author          Glenn Fowler <gsf@research.att.com>
   author          David Korn <dgk@research.att.com>
   copyright       Copyright (c) 1989-1999 AT&T Corp.
   license         http://www.research.att.com/sw/license/ast-open.html'
 	EXEC	sum "$usage" '--?' -
 		OUTPUT - $'return=? option=-? name=--? num=0'
-		ERROR - $'  version         sum (AT&T Labs Research) 1999-01-23
+		ERROR - $'  version         sum (AT&T Research) 1999-01-23
   author          Glenn Fowler <gsf@research.att.com>
   author          David Korn <dgk@research.att.com>
   copyright       Copyright (c) 1989-1999 AT&T Corp.
   license         http://www.research.att.com/sw/license/ast-open.html'
 	EXEC	sum "$usage" '--?' -ver
 		OUTPUT - $'return=? option=-? name=--? num=0'
-		ERROR - $'  version         sum (AT&T Labs Research) 1999-01-23'
+		ERROR - $'  version         sum (AT&T Research) 1999-01-23'
 	EXEC	sum "$usage" '--?' -copyright
 		OUTPUT - $'return=? option=-? name=--? num=0'
 		ERROR - $'  copyright       Copyright (c) 1989-1999 AT&T Corp.'
@@ -610,6 +569,7 @@ index of the first non-option argument.]
 	[+2?A usage or information message was generated.]
 }
 '
+	getopts_usage=$usage
 	EXEC	getopts "$usage" '-?'
 		EXIT 2
 		OUTPUT - $'return=? option=-? name=-? num=0'
@@ -833,7 +793,7 @@ getopts (AT&T Research) 1999-02-02'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
 <TITLE>getopts man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -967,218 +927,6 @@ first non-option argument.
 	EXEC	getopts "$usage" '--version'
 		OUTPUT - $'return=? option=- name=--version num=0'
 		ERROR - $'  version         getopts (AT&T Research) 1999-02-02'
-	EXEC	-+ getopts "$usage" '--man'
-		OUTPUT - $'id=getopts catalog=libast text="command"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=(null) catalog=libast text="about"
-id=(null) catalog=libast text="api"
-id=(null) catalog=libast text="help"
-id=(null) catalog=libast text="html"
-id=(null) catalog=libast text="keys"
-id=(null) catalog=libast text="long"
-id=(null) catalog=libast text="man"
-id=getopts catalog=libast text="version"
-id=getopts catalog=libast text="getopts (AT&T Research) 1999-02-02
-"
-id=getopts catalog=libast text="NAME"
-id=getopts catalog=libast text="? - parse utility options"
-id=getopts catalog=libast text="OPTIONS"
-id=getopts catalog=libast text="command"
-id=getopts catalog=libast text="name"
-id=getopts catalog=libast text="Use name instead of the command name in usage messages."
-id=getopts catalog=libast text="DESCRIPTION"
-id=getopts catalog=libast text="The getopts utility can be used to retrieve options and
-arguments from a list of arguments give by args or the positional
-parameters if args is omitted.  It can also generate usage messages
-and a man page for the command based on the information in optstring."
-id=getopts catalog=libast text="The optstring string consists of alpha-numeric characters,
-the special characters +, -, ?, :, and <space>, or character groups
-enclosed in [...].  Character groups may be nested in {...}.
-Outside of a [...] group, a single new-line followed by zero or
-more blanks is ignored.  One or more blank lines separates the
-options from the command argument synopsis."
-id=getopts catalog=libast text="Each [...] group consists of an optional label,
-optional attributes separated by :, and an
-optional description string following ?.  The characters from the ?
-to the end of the next ] are ignored for option parsing and short
-usage messages.  They are used for generating verbose help or man pages.
-The : character may not appear in the label.
-The ? character must be specified as ?? in label and the ] character
-must be specified as ]] in the description string.
-Text between two \\b (backspace) characters indicates
-that the text should be emboldened when displayed.
-Text between two \\a (bell) characters indicates that the text should
-be emphasised or italicised when displayed."
-id=getopts catalog=libast text="There are four types of groups:"
-id=getopts catalog=libast text="An option specifiation of the form option:longname.
-	In this case the first field is the option character.  If there
-	is no option character, then a two digit number should be specified
-	that corresponds to the long options.  This negative of this number
-	will be returned as the value of name by getopts if the long
-	option is matched. A longname is matched with --longname.  A
-	* in the longname field indicates that only characters up that
-	point need to match provided any additional characters match the option.
-	The [ and ] can be omitted for options that don\'t have longnames
-	or descriptive text."
-id=getopts catalog=libast text="A string option argument specification.
-	Options that take arguments can be followed by : or # and an option
-	group specification.  An option group specification consists
-	of a name for the option argument as field 1.   The remaining
-	fields are a typename and zero or more of the special attribute words
-	listof, oneof, and ignorecase.
-	The option specification can be followed
-	by a list of option value descriptions enclosed in parenthesis."
-id=getopts catalog=libast text="A option value description."
-id=getopts catalog=libast text="A argument specification. A list of valid option argument values
-		can be specified by enclosing them inside a {...} following
-		the option argument specification.  Each of the permitted
-		values can be specified with a [...] containing the
-		value followed by a description."
-id=getopts catalog=libast text="If the leading character of optstring is +, then arguments
-beginning with + will also be considered options."
-id=getopts catalog=libast text="A leading : character or a : following a leading + in optstring
-affects the way errors are handled.  If an option character or longname
-argument not specified in optstring is encountered when processing
-options, the shell variable whose name is name will be set to the ?
-character.  The shell variable OPTARG will be set to
-the character found.  If an option argument is missing or has an invalid
-value, then name will be set to the : character and the shell variable
-OPTARG will be set to the option character found.
-Without the leading :, name will be set to the ? character, OPTARG
-will be unset, and an error message will be written to standard error
-when errors are encountered."
-id=getopts catalog=libast text="The end of options occurs when:"
-id=getopts catalog=libast text="The special argument --."
-id=getopts catalog=libast text="An argument that does not beging with a -."
-id=getopts catalog=libast text="A help argument is specified."
-id=getopts catalog=libast text="An error is encountered."
-id=getopts catalog=libast text="If OPTARG is set to the value 1, a new set of arguments
-can be used."
-id=getopts catalog=libast text="getopts can also be used to generate help messages containing command
-usage and detailed descriptions.  Specify args as:"
-id=getopts catalog=libast text="To generate a usage synopsis."
-id=getopts catalog=libast text="To generate a verbose usage message."
-id=getopts catalog=libast text="To generate a formatted man page."
-id=getopts catalog=libast text="To generate an easy to parse usage message."
-id=getopts catalog=libast text="To generate a man page in html format."
-id=getopts catalog=libast text="When the end of options is encountered, getopts exits with a
-non-zero return value and the variable OPTIND is set to the
-index of the first non-option argument."
-id=getopts catalog=libast text="EXIT STATUS"
-id=getopts catalog=libast text="An option specified was found."
-id=getopts catalog=libast text="An end of options was encountered."
-id=getopts catalog=libast text="A usage or information message was generated."
-id=getopts catalog=libast text="IMPLEMENTATION"
-id=getopts catalog=libast text="SYNOPSIS"
-id=(null) catalog=libast text="options"
-id=getopts catalog=libast text="opstring name [args...]"
-return=? option=- name=--man num=0
-id=(null) catalog=libast text="Usage"'
-		ERROR - $'ANZR
-  getopts - cnefr hgvyvgl bcgvbaf
-
-FLABCFVF
-  getopts [ bcgvbaf ] bcfgevat anzr [netf...]
-
-BCGVBAF
-  -a, --pbzznaq|command=anzr
-                  Hfr anzr vafgrnq bs gur pbzznaq anzr va hfntr zrffntrf.
-
-QRFPEVCGVBA
-  Gur getopts hgvyvgl pna or hfrq gb ergevrir bcgvbaf naq nethzragf sebz n yvfg
-  bs nethzragf tvir ol netf be gur cbfvgvbany cnenzrgref vs netf vf bzvggrq. Vg
-  pna nyfb trarengr hfntr zrffntrf naq n zna cntr sbe gur pbzznaq onfrq ba gur
-  vasbezngvba va bcgfgevat.
-
-  Gur bcgfgevat fgevat pbafvfgf bs nycun-ahzrevp punenpgref, gur fcrpvny
-  punenpgref +, -, ?, :, naq <fcnpr>, be punenpgre tebhcf rapybfrq va [...].
-  Punenpgre tebhcf znl or arfgrq va {...}. Bhgfvqr bs n [...] tebhc, n fvatyr
-  arj-yvar sbyybjrq ol mreb be zber oynaxf vf vtaberq. Bar be zber oynax yvarf
-  frcnengrf gur bcgvbaf sebz gur pbzznaq nethzrag flabcfvf.
-
-  Rnpu [...] tebhc pbafvfgf bs na bcgvbany ynory, bcgvbany nggevohgrf frcnengrq
-  ol :, naq na bcgvbany qrfpevcgvba fgevat sbyybjvat ?. Gur punenpgref sebz gur
-  ? gb gur raq bs gur arkg ] ner vtaberq sbe bcgvba cnefvat naq fubeg hfntr
-  zrffntrf. Gurl ner hfrq sbe trarengvat ireobfr uryc be zna cntrf. Gur :
-  punenpgre znl abg nccrne va gur ynory. Gur ? punenpgre zhfg or fcrpvsvrq nf
-  ?? va ynory naq gur ] punenpgre zhfg or fcrpvsvrq nf ]] va gur qrfpevcgvba
-  fgevat. Grkg orgjrra gjb \\b (onpxfcnpr) punenpgref vaqvpngrf gung gur grkg
-  fubhyq or rzobyqrarq jura qvfcynlrq. Grkg orgjrra gjb \\a (oryy) punenpgref
-  vaqvpngrf gung gur grkg fubhyq or rzcunfvfrq be vgnyvpvfrq jura qvfcynlrq.
-
-  Gurer ner sbhe glcrf bs tebhcf:
-    1.    Na bcgvba fcrpvsvngvba bs gur sbez bcgvba:ybatanzr. Va guvf pnfr gur
-          svefg svryq vf gur bcgvba punenpgre. Vs gurer vf ab bcgvba punenpgre,
-          gura n gjb qvtvg ahzore fubhyq or fcrpvsvrq gung pbeerfcbaqf gb gur
-          ybat bcgvbaf. Guvf artngvir bs guvf ahzore jvyy or erghearq nf gur
-          inyhr bs anzr ol getopts vs gur ybat bcgvba vf zngpurq. N ybatanzr vf
-          zngpurq jvgu --ybatanzr. N * va gur ybatanzr svryq vaqvpngrf gung
-          bayl punenpgref hc gung cbvag arrq gb zngpu cebivqrq nal nqqvgvbany
-          punenpgref zngpu gur bcgvba. Gur [ naq ] pna or bzvggrq sbe bcgvbaf
-          gung qba\'g unir ybatanzrf be qrfpevcgvir grkg.
-    2.    N fgevat bcgvba nethzrag fcrpvsvpngvba. Bcgvbaf gung gnxr nethzragf
-          pna or sbyybjrq ol : be # naq na bcgvba tebhc fcrpvsvpngvba. Na
-          bcgvba tebhc fcrpvsvpngvba pbafvfgf bs n anzr sbe gur bcgvba nethzrag
-          nf svryq 1. Gur erznvavat svryqf ner n glcranzr naq mreb be zber bs
-          gur fcrpvny nggevohgr jbeqf listof, oneof, naq ignorecase. Gur bcgvba
-          fcrpvsvpngvba pna or sbyybjrq ol n yvfg bs bcgvba inyhr qrfpevcgvbaf
-          rapybfrq va cneragurfvf.
-    3.    N bcgvba inyhr qrfpevcgvba.
-    4.    N nethzrag fcrpvsvpngvba. N yvfg bs inyvq bcgvba nethzrag inyhrf pna
-          or fcrpvsvrq ol rapybfvat gurz vafvqr n {...} sbyybjvat gur bcgvba
-          nethzrag fcrpvsvpngvba. Rnpu bs gur crezvggrq inyhrf pna or fcrpvsvrq
-          jvgu n [...] pbagnvavat gur inyhr sbyybjrq ol n qrfpevcgvba.
-
-  Vs gur yrnqvat punenpgre bs bcgfgevat vf +, gura nethzragf ortvaavat jvgu +
-  jvyy nyfb or pbafvqrerq bcgvbaf.
-
-  N yrnqvat : punenpgre be n : sbyybjvat n yrnqvat + va bcgfgevat nssrpgf gur
-  jnl reebef ner unaqyrq. Vs na bcgvba punenpgre be ybatanzr nethzrag abg
-  fcrpvsvrq va bcgfgevat vf rapbhagrerq jura cebprffvat bcgvbaf, gur furyy
-  inevnoyr jubfr anzr vf anzr jvyy or frg gb gur ? punenpgre. Gur furyy
-  inevnoyr OPTARG jvyy or frg gb gur punenpgre sbhaq. Vs na bcgvba nethzrag vf
-  zvffvat be unf na vainyvq inyhr, gura anzr jvyy or frg gb gur : punenpgre naq
-  gur furyy inevnoyr OPTARG jvyy or frg gb gur bcgvba punenpgre sbhaq. Jvgubhg
-  gur yrnqvat :, anzr jvyy or frg gb gur ? punenpgre, OPTARG jvyy or hafrg, naq
-  na reebe zrffntr jvyy or jevggra gb fgnaqneq reebe jura reebef ner
-  rapbhagrerq.
-
-  Gur raq bs bcgvbaf bpphef jura:
-    1.    Gur fcrpvny nethzrag --.
-    2.    Na nethzrag gung qbrf abg ortvat jvgu n -.
-    3.    N uryc nethzrag vf fcrpvsvrq.
-    4.    Na reebe vf rapbhagrerq.
-
-  Vs OPTARG vf frg gb gur inyhr 1, n arj frg bs nethzragf pna or hfrq.
-
-  getopts pna nyfb or hfrq gb trarengr uryc zrffntrf pbagnvavat pbzznaq hfntr
-  naq qrgnvyrq qrfpevcgvbaf. Fcrpvsl netf nf:
-    -?    Gb trarengr n hfntr flabcfvf.
-    --??  Gb trarengr n ireobfr hfntr zrffntr.
-    --??man
-          Gb trarengr n sbeznggrq zna cntr.
-    --??api
-          Gb trarengr na rnfl gb cnefr hfntr zrffntr.
-    --??html
-          Gb trarengr n zna cntr va html sbezng.
-
-  Jura gur raq bs bcgvbaf vf rapbhagrerq, getopts rkvgf jvgu n aba-mreb erghea
-  inyhr naq gur inevnoyr OPTIND vf frg gb gur vaqrk bs gur svefg aba-bcgvba
-  nethzrag.
-
-RKVG FGNGHF
-    0     Na bcgvba fcrpvsvrq jnf sbhaq.
-    1     Na raq bs bcgvbaf jnf rapbhagrerq.
-    2     N hfntr be vasbezngvba zrffntr jnf trarengrq.
-
-VZCYRZRAGNGVBA
-  irefvba         trgbcgf (NG&G Erfrnepu) 1999-02-02'
 	usage=$'[-][a:aaa?AAA]:[delimiter:=\\::][b:bbb?BBB]:[string:=??][c]:[ccc:==??::=]'
 	EXEC	tooalso "$usage" --man
 		OUTPUT - $'return=? option=- name=--man num=0'
@@ -1290,7 +1038,7 @@ return=a option=-a name=aaa arg=(null) num=1'
 OPTIONS
   -a, --aaa       AAA
   -v, --vvv=xxx   VVV'
-	usage=$'[-?@(#)pax (AT&T Labs Research) 1999-02-14\n]
+	usage=$'[-?@(#)pax (AT&T Research) 1999-02-14\n]
 [a:append?Append to end of archive.]
 [101:atime?Preserve or set access time.]:?[time]
 [z:base?Delta base archive name. - ignores base on input, compresses on output.]:[archive]
@@ -1586,7 +1334,7 @@ TEST 16 'detailed man'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
 <TITLE>cmd man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -1887,7 +1635,7 @@ TEST 24 'detailed html'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
 <!--INTERNAL-->
 <TITLE>test man document</TITLE>
 </HEAD>
@@ -2092,7 +1840,7 @@ IMPLEMENTATION
 TEST 30 'library interfaces'
 	USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-1999 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"
 	usage=$'
-[-1s3?@(#)sum (AT&T Labs Research) 1999-12-11]'$USAGE_LICENSE$'
+[-1s3?@(#)sum (AT&T Research) 1999-12-11]'$USAGE_LICENSE$'
 [+NAME?sum - checksum library]
 [+DESCRIPTION?\bsum\b is a checksum library.]
 [Sum_t*:sumopen(const char* \amethod\a)?Open a sum handle for \amethod\a.]
@@ -2109,7 +1857,7 @@ TEST 30 'library interfaces'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
 <TITLE>sum man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -2143,8 +1891,7 @@ previously returned by <B>sumopen</B>.
 </DL>
 <DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
 <DL compact>
-<DT><A name="version"><B>version</B></A><DD>sum (AT&amp;T Labs Research)
-1999-12-11
+<DT><A name="version"><B>version</B></A><DD>sum (AT&amp;T Research) 1999-12-11
 <DT><A name="author"><B>author</B></A><DD>Glenn Fowler &lt;<A
 href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 <DT><A name="copyright"><B>copyright</B></A><DD>Copyright &copy; 1995-1999 AT&amp;T Corp.
@@ -2230,7 +1977,7 @@ Close a sum handle \\fIsum\\fP previously returned by \\fBsumopen\\fP\\&.
 \\fBcksum\\fP(1)
 .SH IMPLEMENTATION
 .H1 version
-sum (AT&T Labs Research) 1999\\-12\\-11
+sum (AT&T Research) 1999\\-12\\-11
 .H1 author
 Glenn Fowler <gsf@research\\&.att\\&.com>
 .H1 copyright
@@ -2254,7 +2001,7 @@ Close a sum handle sum previously returned by sumopen.
 cksum(1)
 .SH IMPLEMENTATION
 .H1 version
-sum (AT&T Labs Research) 1999-12-11
+sum (AT&T Research) 1999-12-11
 .H1 author
 Glenn Fowler <gsf@research.att.com>
 .H1 copyright
@@ -2409,7 +2156,1227 @@ OPTIONS
 	usage=$'[-][+NAME?find][71:printf]:[format]{[+foo?][+a?alert]}'
 	EXEC find "$usage" --man
 
-TEST 34 'translation'
+TEST 35 'alternate version ids'
+	EXEC id $'[-?\n@(#)id (spamco) 2000-12-01\n]' --?-version
+		OUTPUT - $'return=? option=-? name=--?-version num=0'
+		ERROR - $'  version         id (spamco) 2000-12-01'
+		EXIT 2
+	EXEC id $'[-?\n@(#)  \t  id (spamco) 2000-12-01\n]' --?-version
+	EXEC id $'[-?\n$Id: id (spamco) 2000-12-01 $\n]' --?-version
+		ERROR - $'  version         id (spamco) 2000-12-01'
+	EXEC id $'[-?\n@(#)$Id: id (spamco) 2000-12-01 $\n]' --?-version
+	EXEC id $'[-?\n$Id: @(#)id (spamco) 2000-12-01 $\n]' --?-version
+
+TEST 36 'enumerated option argument values'
+	usage=$'[-?\naha\n][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n[c:C?C style.][A:always?Always shell style.][101:shell?Shell quote if necessary.][q:question?Replace unknown chars with ?.]\n}'
+	EXEC ls "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'SYNOPSIS
+  ls [ options ]
+
+OPTIONS
+  -Q, --quote=style
+                  Quote names according to style:
+                    c|C   C style.
+                    A|always
+                          Always shell style.
+                    shell Shell quote if necessary.
+                    question
+                          Replace unknown chars with ?.
+                  The default value is question.
+
+IMPLEMENTATION
+  version         aha'
+	EXEC ls "$usage" --quote
+		EXIT 1
+		OUTPUT - 'return=: option=-Q name=--quote num=0'
+		ERROR - 'ls: --quote: style value expected'
+	EXEC ls "$usage" --quote=alx
+		ERROR - 'ls: --quote: alx: unknown option argument value'
+	EXEC ls "$usage" --quote=c
+		EXIT 0
+		OUTPUT - 'return=Q option=-Q name=--quote arg=c num=99'
+		ERROR -
+	EXEC ls "$usage" --quote=C
+		OUTPUT - 'return=Q option=-Q name=--quote arg=C num=99'
+	EXEC ls "$usage" -Q shell
+		OUTPUT - 'return=Q option=-Q name=-Q arg=shell num=-101'
+	EXEC ls "$usage" -Qs
+		OUTPUT - 'return=Q option=-Q name=-Q arg=s num=-101'
+
+TEST 37 'stealth bugs'
+	usage=$'[-?\naha\n][-catalog?SpamCo][h:html?Read html from \afile\a.]:[file[??name=value;...]]]'
+	EXEC m2h "$usage" -h
+		EXIT 1
+		OUTPUT - 'return=: option=-h name=-h num=0'
+		ERROR - 'm2h: -h: file[?name=value;...] argument expected'
+	EXEC m2h "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'SYNOPSIS
+  m2h [ options ]
+
+OPTIONS
+  -h, --html=file[?name=value;...]
+                  Read html from file.
+
+IMPLEMENTATION
+  version         aha
+  catalog         SpamCo'
+	EXEC m2h "$usage" --keys
+		OUTPUT - 'return=? option=- name=--keys num=0'
+		ERROR - '"catalog"
+"html"
+"Read html from \afile\a."
+"file[?name=value;...]"'
+	EXEC ls $'[-][w:width]#[screen-width]' -wx
+		OUTPUT - $'return=: option=-w name=-w num=0'
+		ERROR - $'ls: -w: numeric screen-width argument expected'
+		EXIT 1
+
+TEST 38 'ancient compatibility for modern implementations -- ok, I still use vi'
+	usage=$'[-1o][a:all][f:full][l:long][u:user]:[uid]\n\n[ pid ... ]\n\n'
+	EXEC ps "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'SYNOPSIS
+  ps [ options ] [ pid ... ]
+
+OPTIONS
+  -a, --all
+  -f, --full
+  -l, --long
+  -u, --user=uid'
+	EXEC ps "$usage" a 123
+		EXIT 0
+		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
+argument=1 value="123"'
+		ERROR -
+	EXEC ps "$usage" -a 123
+	EXEC ps "$usage" al 123
+		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
+return=l option=-l name=-l arg=(null) num=1
+argument=1 value="123"'
+	EXEC ps "$usage" -al 123
+	EXEC ps "$usage" a l 123
+	EXEC ps "$usage" a -l 123
+	EXEC ps "$usage" u bozo l 123
+		OUTPUT - 'return=u option=-u name=-u arg=bozo num=1
+return=l option=-l name=-l arg=(null) num=1
+argument=1 value="123"'
+	EXEC ps "$usage" -u bozo -l 123
+	EXEC ps "$usage" a u bozo l 123
+		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
+return=u option=-u name=-u arg=bozo num=1
+return=l option=-l name=-l arg=(null) num=1
+argument=1 value="123"'
+
+TEST 39 'local suboptions'
+	usage=$'[-?\naha\n][+NAME?search][x:method?The algorithm:]:[method:=linear]{[linear?Fast.][quadratic?Slower. Sub-options:]{[-][e:edges?Limit edges.]#[n:=50]}[np?Slow.][heuristic?Almost works. Sub-options:]{[-][n:nodes?Limit nodes.]#?[n:=100][f:foo?Bar.]:[huh][d:dump?Dump tables.][l:label?Set label.]:[string]}}[D:debug?Debug level.]#[level][+SEE ALSO?\afoo\a(1)]'
+	EXEC search "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'NAME
+  search
+
+SYNOPSIS
+  search [ options ]
+
+OPTIONS
+  -x, --method=method
+                  The algorithm:
+                    linear
+                          Fast.
+                    quadratic
+                          Slower. Sub-options:
+                            edges=n
+                                  Limit edges. The default value is 50.
+                    np    Slow.
+                    heuristic
+                          Almost works. Sub-options:
+                            nodes[=n]
+                                  Limit nodes. The option value may be omitted.
+                                  The default value is 100.
+                            foo=huh
+                                  Bar.
+                            dump  Dump tables.
+                            label=string
+                                  Set label.
+                  The default value is linear.
+  -D, --debug=level
+                  Debug level.
+
+SEE ALSO
+  foo(1)
+
+IMPLEMENTATION
+  version         aha'
+
+TEST 40 'examples of example examples'
+	usage=$'[-?\naha\n][-catalog?SpamCo][+NAME?eg - test example examples][Q:quote?Quote names according to \astyle\a:]:[style:=question][+EXAMPLES]{[+\none\ntwo][+\n\vthree\nfour][+\n\afive\nsix]}[+SEE ALSO?\begman\b(1)]'
+	EXEC eg "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  eg - test example examples
+
+SYNOPSIS
+  eg [ options ]
+
+OPTIONS
+  -Q, --quote=style
+                  Quote names according to style: The default value is
+                  question.
+
+EXAMPLES
+    one
+    two
+
+    three
+    four
+
+    five
+    six
+
+SEE ALSO
+  egman(1)
+
+IMPLEMENTATION
+  version         aha
+  catalog         SpamCo'
+	EXEC eg "$usage" --nroff
+		OUTPUT - 'return=? option=- name=--nroff num=0'
+		ERROR - $'.\\" format with nroff|troff|groff -man
+.fp 5 CW
+.nr mI 0
+.de mI
+.if \\\\n(mI>\\\\$1 \\{
+.nr mI \\\\n(mI-1
+.RE
+.mI \\\\$1
+.\\}
+.if \\\\n(mI<\\\\$1 \\{
+.nr mI \\\\n(mI+1
+.RS
+.mI \\\\$1
+.\\}
+..
+.de H1
+.mI 1
+.TP
+\\fB\\\\$1\\fP
+..
+.de H2
+.mI 2
+.TP
+\\fB\\\\$1\\fP
+..
+.de H3
+.mI 3
+.TP
+\\fB\\\\$1\\fP
+..
+.de H4
+.mI 4
+.TP
+\\fB\\\\$1\\fP
+..
+.de OP
+.mI 0
+.ie !\'\\\\$1\'-\' \\{
+.ds mO \\\\fB\\\\-\\\\$1\\\\fP
+.ds mS ,\\\\0
+.\\}
+.el \\{
+.ds mO \\\\&
+.ds mS \\\\&
+.\\}
+.ie \'\\\\$2\'-\' \\{
+.if !\'\\\\$4\'-\' .as mO \\\\0\\\\fI\\\\$4\\\\fP
+.\\}
+.el \\{
+.as mO \\\\*(mS\\\\fB\\\\-\\\\-\\\\$2\\\\fP
+.if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
+.\\}
+.TP
+\\\\*(mO
+..
+.de FN
+.mI 0
+.TP
+\\\\$1 \\\\$2
+..
+.TH eg 1
+.SH NAME
+eg \\- test example examples
+.SH SYNOPSIS
+\\fBeg\\fP\\ [\\ \\fIoptions\\fP\\ ]
+.SH OPTIONS
+.OP Q quote string style question
+Quote names according to \\fIstyle\\fP:
+ The default value is \\fBquestion\\fP\\&.
+.SH EXAMPLES
+.DS
+\\f5one
+two\\fP
+.DE
+.DS
+three
+four
+.DE
+.DS
+\\fIfive
+six\\fP
+.DE
+.SH SEE\\ ALSO
+\\fBegman\\fP(1)
+.SH IMPLEMENTATION
+.H1 version
+aha
+.H1 catalog
+SpamCo'
+	EXEC eg "$usage" --html
+		OUTPUT - 'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<TITLE>eg man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;eg&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>eg&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
+<DT>eg - test example examples
+<P>
+</DL>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>eg</B> &#0091; <I>options</I> &#0093;
+<P>
+</DL>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD>Quote names according to <I>style
+</I>: The default value is <B>question</B>.
+</DL>
+<DT><H4><A name="EXAMPLES">EXAMPLES</A></H4>
+<P>
+<DT><PRE>
+<DL compact>
+<DT><TT>one
+<DT>two</TT>
+</DL>
+<DT></PRE>
+<DT><PRE>
+<DL compact>
+<DT>three
+<DT>four
+</DL>
+<DT></PRE>
+<DT><PRE>
+<DL compact>
+<DT><I>five
+<DT>six</I>
+</DL>
+<DT></PRE>
+<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DL compact>
+<DT><NOBR><A href="../man1/egman.html"><B>egman</B></A>(1)</NOBR>
+</DL>
+<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DL compact>
+<DT><A name="version"><B>version</B></A><DD>aha
+<DT><A name="catalog"><B>catalog</B></A><DD>SpamCo
+</DL></DL>
+</BODY>
+</HTML>'
+
+TEST 41 'cache exercizes'
+	usage=$'[-1c][a:aaa?AAA][b:bbb?BBB]:[bv][c:ccc?CCC]:?[cv]'
+	EXEC typeset "$usage" -a -b1
+		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
+[3] return=b option=-b name=-b arg=1 num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[2] return=b option=-b name=-b arg=1 num=1
+[1] return=a option=-a name=-a arg=(null) num=1
+[1] return=b option=-b name=-b arg=1 num=1'
+	EXEC typeset "$usage" -c2 -a
+		OUTPUT - $'[3] return=c option=-c name=-c arg=2 num=1
+[3] return=a option=-a name=-a arg=(null) num=1
+[2] return=c option=-c name=-c arg=2 num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[1] return=c option=-c name=-c arg=2 num=1
+[1] return=a option=-a name=-a arg=(null) num=1'
+	EXEC typeset "$usage" -c -a
+		OUTPUT - $'[3] return=c option=-c name=-c arg=(null) num=1
+[3] return=a option=-a name=-a arg=(null) num=1
+[2] return=c option=-c name=-c arg=(null) num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[1] return=c option=-c name=-c arg=(null) num=1
+[1] return=a option=-a name=-a arg=(null) num=1'
+	EXEC typeset "$usage" -a -b1 -c -c2
+		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
+[3] return=b option=-b name=-b arg=1 num=1
+[3] return=c option=-c name=-c arg=(null) num=1
+[3] return=c option=-c name=-c arg=2 num=1
+[2] return=a option=-a name=-a arg=(null) num=1
+[2] return=b option=-b name=-b arg=1 num=1
+[2] return=c option=-c name=-c arg=(null) num=1
+[2] return=c option=-c name=-c arg=2 num=1
+[1] return=a option=-a name=-a arg=(null) num=1
+[1] return=b option=-b name=-b arg=1 num=1
+[1] return=c option=-c name=-c arg=(null) num=1
+[1] return=c option=-c name=-c arg=2 num=1'
+	usage=$'[-1c]a:[command][n:number]#?[number][s:string]:?[string]'
+	EXEC typeset "$usage" -n
+		OUTPUT - $'[3] return=n option=-n name=-n arg=(null) num=1
+[2] return=n option=-n name=-n arg=(null) num=1
+[1] return=n option=-n name=-n arg=(null) num=1'
+	EXEC typeset "$usage" -n12
+		OUTPUT - $'[3] return=n option=-n name=-n arg=12 num=12
+[2] return=n option=-n name=-n arg=12 num=12
+[1] return=n option=-n name=-n arg=12 num=12'
+	EXEC typeset "$usage" -s
+		OUTPUT - $'[3] return=s option=-s name=-s arg=(null) num=1
+[2] return=s option=-s name=-s arg=(null) num=1
+[1] return=s option=-s name=-s arg=(null) num=1'
+	EXEC typeset "$usage" -s12
+		OUTPUT - $'[3] return=s option=-s name=-s arg=12 num=1
+[2] return=s option=-s name=-s arg=12 num=1
+[1] return=s option=-s name=-s arg=12 num=1'
+	EXEC typeset "$usage" OPT --foo
+		OUTPUT - $'[3] argument=1 value="OPT"
+[3] argument=2 value="--foo"
+[2] argument=1 value="OPT"
+[2] argument=2 value="--foo"
+[1] argument=1 value="OPT"
+[1] argument=2 value="--foo"'
+	EXEC typeset "$usage" -a locate OPT --foo
+		OUTPUT - $'[3] return=a option=-a name=-a arg=locate num=1
+[3] argument=1 value="OPT"
+[3] argument=2 value="--foo"
+[2] return=a option=-a name=-a arg=locate num=1
+[2] argument=1 value="OPT"
+[2] argument=2 value="--foo"
+[1] return=a option=-a name=-a arg=locate num=1
+[1] argument=1 value="OPT"
+[1] argument=2 value="--foo"'
+
+TEST 42 'optional long names'
+	usage=$'[-][a:aaa][b:bbb?BBB][c?CCC][d:?DDD][e\f:n:eee\f][f\f:y:fff\f?FFF][g:ggg?GGG]'
+	EXEC tst "$usage" -a --aaa -b --bbb -c -d -e --eee -f --fff -g -ggg
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=a option=-a name=--aaa arg=(null) num=1
+return=b option=-b name=-b arg=(null) num=1
+return=b option=-b name=--bbb arg=(null) num=1
+return=c option=-c name=-c arg=(null) num=1
+return=d option=-d name=-d arg=(null) num=1
+return=e option=-e name=-e arg=(null) num=1
+return=e option=-e name=--eee arg=(null) num=1
+return=f option=-f name=-f arg=(null) num=1
+return=f option=-f name=--fff arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1'
+	EXEC tst "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  tst [ options ]
+
+OPTIONS
+  -a, --aaa
+  -b, --bbb       BBB
+  -c              CCC
+  -d              DDD
+  -e
+  -f, --fff       FFF
+  -g, --ggg       GGG'
+	usage=$'[-][a:aaa]:[av][b:bbb?BBB]:[bv][c?CCC]:[cv][d:?DDD]:[dv][e\f:n:eee\f]:[ev][f\f:y:fff\f?FFF]:[fv][g:ggg?GGG]:[gv]'
+	EXEC tst "$usage" -a AV --aaa=LAV -bBV --bbb=LBV -c CV -dDV -e EV --eee LEV -f FV --fff=LFV -gGV -ggg LGV
+		EXIT 0
+		OUTPUT - $'return=a option=-a name=-a arg=AV num=1
+return=a option=-a name=--aaa arg=LAV num=1
+return=b option=-b name=-b arg=BV num=1
+return=b option=-b name=--bbb arg=LBV num=1
+return=c option=-c name=-c arg=CV num=1
+return=d option=-d name=-d arg=DV num=1
+return=e option=-e name=-e arg=EV num=1
+return=e option=-e name=--eee arg=LEV num=1
+return=f option=-f name=-f arg=FV num=1
+return=f option=-f name=--fff arg=LFV num=1
+return=g option=-g name=-g arg=GV num=1
+return=g option=-g name=-g arg=gg num=1
+argument=1 value="LGV"'
+		ERROR -
+	EXEC tst "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  tst [ options ]
+
+OPTIONS
+  -a, --aaa=av
+  -b, --bbb=bv    BBB
+  -c cv           CCC
+  -d dv           DDD
+  -e ev
+  -f, --fff=fv    FFF
+  -g, --ggg=gv    GGG'
+
+TEST 43 'trailing wild card'
+	usage=$'[-][z:zzz]:[style][A:a*][B:b*][C:c*]'
+	EXEC wild "$usage" -A -B -C --a --b --c --axx --bxx --cxx
+		OUTPUT - $'return=A option=-A name=-A arg=(null) num=1
+return=B option=-B name=-B arg=(null) num=1
+return=C option=-C name=-C arg=(null) num=1
+return=A option=-A name=--a arg=(null) num=1
+return=B option=-B name=--b arg=(null) num=1
+return=C option=-C name=--c arg=(null) num=1
+return=A option=-A name=--axx arg=(null) num=1
+return=B option=-B name=--bxx arg=(null) num=1
+return=C option=-C name=--cxx arg=(null) num=1'
+
+	(
+		export LC_ALL=en_US
+		EXEC wild "$usage" -A -B -C --a --b --c --axx --bxx --cxx
+	)
+
+	usage=$'[-][z:zzz]:[style]{[A:a*][B:b*][C:c*]}'
+	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
+		OUTPUT - $'return=z option=-z name=-z arg=A num=65
+return=z option=-z name=-z arg=B num=66
+return=z option=-z name=-z arg=C num=67
+return=z option=-z name=-z arg=a num=65
+return=z option=-z name=-z arg=b num=66
+return=z option=-z name=-z arg=c num=67
+return=z option=-z name=-z arg=axx num=65
+return=z option=-z name=-z arg=bxx num=66
+return=z option=-z name=-z arg=cxx num=67'
+	usage=$'[-][z:zzz]:[style]{[A:a*?aaa][B:b*?bbb][C:c*?ccc]}'
+	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
+	EXEC wild "$usage" -z
+		EXIT 1
+		OUTPUT - $'return=: option=-z name=-z num=0'
+		ERROR - $'wild: -z: style argument expected'
+	EXEC wild "$usage" --zzz
+		OUTPUT - $'return=: option=-z name=--zzz num=0'
+		ERROR - $'wild: --zzz: style value expected'
+	usage=$'[-][z:zzz]:[style]{[A:a\aget\a?aaa][B:b\aoutta\a?bbb][C:c\atown\a?ccc]}'
+	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
+		EXIT 0
+		OUTPUT - $'return=z option=-z name=-z arg=A num=65
+return=z option=-z name=-z arg=B num=66
+return=z option=-z name=-z arg=C num=67
+return=z option=-z name=-z arg=a num=65
+return=z option=-z name=-z arg=b num=66
+return=z option=-z name=-z arg=c num=67
+return=z option=-z name=-z arg=axx num=65
+return=z option=-z name=-z arg=bxx num=66
+return=z option=-z name=-z arg=cxx num=67'
+		ERROR -
+	EXEC wild "$usage" -z
+		EXIT 1
+		OUTPUT - $'return=: option=-z name=-z num=0'
+		ERROR - $'wild: -z: style argument expected'
+	EXEC wild "$usage" --zzz
+		OUTPUT - $'return=: option=-z name=--zzz num=0'
+		ERROR - $'wild: --zzz: style value expected'
+	EXEC wild "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  wild [ options ]
+
+OPTIONS
+  -z, --zzz=style
+                    A|aget
+                          aaa
+                    B|boutta
+                          bbb
+                    C|ctown
+                          ccc'
+
+TEST 44 'getopt_long() compatibility'
+	usage=$'[-1p1]\n[h:help]\n[V:version]\n[v:verbose]\n[X]\n[259:save-temps]\n[s:std]:[string]\n[d:debug]\n[262:static]\n[263:dynamic]\n[264:free]\n[265:fixed]\n[266:column]:[string]\n[267:MT]:[string]\n[268:MF]:[string]\n[269:fmain]\n[270:fno-main]\n[W:Wall]\n[272:Wobsolete]\n[273:Wno-obsolete]\n[274:Warchaic]\n[275:Wno-archaic]\n[276:Wcolumn-overflow]\n[277:Wno-column-overflow]\n[278:Wconstant]\n[279:Wno-constant]\n[280:Wparentheses]\n[281:Wno-parentheses]\n[282:Wimplicit-terminator]\n[283:Wno-implicit-terminator]\n[284:Wstrict-typing]\n[285:Wno-strict-typing]\n[?]\n[E]\n[P]\n[C]\n[S]\n[c]\n[m]\n[g]\n[o]:[]\n[I]:[]\n'
+	EXEC cobcc "$usage" -static -I foo -Ibar -debug -C -Wparen tst.cob
+		OUTPUT - $'return=-262 option=-262 name=-static arg=(null) num=1
+return=I option=-262 name=-I arg=foo num=1
+return=I option=-262 name=-I arg=bar num=1
+return=d option=-d name=-debug arg=(null) num=1
+return=C option=-d name=-C arg=(null) num=1
+return=-280 option=-280 name=-Wparentheses arg=(null) num=1
+argument=1 value="tst.cob"'
+
+TEST 45 'n=v vs. n:=v'
+	usage=$'[-][a:aaa?AAA]:[vvv]'
+	EXEC pax "$usage" -a 1 --a=xx --a:=yy
+		OUTPUT - $'return=a option=-a name=-a arg=1 num=1
+return=a option=-a name=--aaa arg=xx num=1
+return=a option=-a name=--aaa arg:=yy num=1'
+	EXEC pax "$usage" -a 1 --aaa=xx --aaa:=yy
+
+TEST 46 'html escapism'
+	usage=$'[-][+NAME?codex - encode/decode filter][+?Methods:]{[+and?things]{[+of?this <= 64.]:[nature][+govern?ator]}}\n\n[ [ <,> ] method [ <,>,| method ... ] ]\n\n[+SEE ALSO?\bcodex\b(3), \bvcodex\b(3)]'
+	EXEC codex "$usage" --html
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<TITLE>codex man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;codex&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>codex&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
+<DT>codex - encode/decode filter
+<P>
+</DL>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>codex</B> &#0091; <I>options</I> &#0093; &#0091; &#0091; &lt;,&gt; &#0093; method &#0091; &lt;,&gt;,| method
+... &#0093; &#0093;
+<P>
+<DT>Methods:
+<DL compact>
+<DL compact>
+<DT><A name="and"><B>and</B></A><DD>things
+<DL compact>
+<DL compact>
+<DT><A name="of=nature"><B>of=<I>nature</I></B></A><DD>this &lt;= 64.
+<DT><A name="govern"><B>govern</B></A><DD>ator
+</DL>
+</DL>
+</DL>
+</DL>
+</DL>
+<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DL compact>
+<DT><NOBR><A href="../man3/codex.html"><B>codex</B></A>(3),</NOBR> <NOBR><A href="../man3/vcodex.html"><B>vcodex</B></A>(3)</NOBR>
+</DL></DL>
+</BODY>
+</HTML>'
+
+TEST 47 'omitted optional arg default'
+	usage1=$'[-][101:clobber?Clobber pattern.]:?[pattern:=*.exe:!*][102:select?Select pattern.]:[pattern=*.[ch]]]'
+	usage2=$'[-][101:clobber?Clobber pattern.]:?[pattern:!*:=*.exe][102:select?Select pattern.]:[pattern=*.[ch]]]'
+	EXEC make "$usage1" --clobber foo
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=* num=1\nargument=1 value="foo"'
+	EXEC make "$usage2" --clobber foo
+	EXEC make "$usage1" --clobber=1 bar
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=* num=1\nargument=1 value="bar"'
+	EXEC make "$usage2" --clobber=1 bar
+	EXEC make "$usage1" --noclobber foo
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=(null) num=0\nargument=1 value="foo"'
+	EXEC make "$usage2" --noclobber foo
+	EXEC make "$usage1" --clobber=0 bar
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=(null) num=0\nargument=1 value="bar"'
+	EXEC make "$usage2" --clobber=0 bar
+	EXEC make "$usage1" --clobber=foo bar
+		OUTPUT - $'return=-101 option=-101 name=--clobber arg=foo num=1\nargument=1 value="bar"'
+	EXEC make "$usage2" --clobber=foo bar
+	EXEC make "$usage1" --select foo bar
+		OUTPUT - $'return=-102 option=-102 name=--select arg=foo num=1\nargument=1 value="bar"'
+	EXEC make "$usage2" --select foo bar
+	EXEC make "$usage1" --select=foo bar
+	EXEC make "$usage2" --select=foo bar
+	EXEC make "$usage1" --?clobber
+		OUTPUT - $'return=? option=-? name=--?clobber num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  --clobber[=pattern]
+                  Clobber pattern. If the option value is omitted then * is
+                  assumed. The default value is *.exe.'
+		  EXIT 2
+	EXEC make "$usage2" --?clobber
+	EXEC make "$usage1" --?select
+		OUTPUT - $'return=? option=-? name=--?select num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  --select=pattern=*.[ch]
+                  Select pattern.'
+	EXEC make "$usage2" --?select
+	EXEC make "$usage1" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  make [ options ]
+
+OPTIONS
+  --clobber[=pattern]
+                  Clobber pattern. If the option value is omitted then * is
+                  assumed. The default value is *.exe.
+  --select=pattern=*.[ch]
+                  Select pattern.'
+	EXEC make "$usage2" --man
+	EXEC make "$usage1" --html
+		OUTPUT - $'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Research) 2000-04-01">
+<TITLE>make man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;make&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>make&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>make</B> &#0091; <I>options</I> &#0093;
+<P>
+</DL>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>--<B>clobber</B>&#0091;=<I>pattern</I>&#0093;<DD>Clobber pattern. If the option value
+is omitted then <B>*</B> is assumed. The default value is <B>*.exe</B>.
+<DT>--<B>select</B>=<I>pattern=*.&#0091;ch&#0093;</I><DD>Select pattern.
+</DL></DL>
+</BODY>
+</HTML>'
+	EXEC make "$usage2" --html
+
+TEST 48 'ambiguous trio'
+	usage=$'[-][x:aha?AHA.][y:aha1?AHA1][z:aha2?AHA2]'
+	EXEC huh "$usage" --aha
+		OUTPUT - $'return=x option=-x name=--aha arg=(null) num=1'
+	EXEC huh "$usage" --noaha
+		OUTPUT - $'return=x option=-x name=--aha arg=(null) num=0'
+	EXEC huh "$usage" --aha1
+		OUTPUT - $'return=y option=-y name=--aha1 arg=(null) num=1'
+	EXEC huh "$usage" --noaha1
+		OUTPUT - $'return=y option=-y name=--aha1 arg=(null) num=0'
+	EXEC huh "$usage" --ah
+		OUTPUT - $'return=: option=-x name=--ah num=0'
+		ERROR - $'huh: --ah: ambiguous option'
+		EXIT 1
+	EXEC huh "$usage" --noah
+		OUTPUT - $'return=: option=-x name=--noah num=0'
+		ERROR - $'huh: --noah: ambiguous option'
+
+TEST 49 'the long and short of it'
+	usage=$'[-][a:archive-clean][b:archive-clobber]'
+	EXEC make "$usage" --archive-clean --acle --aclo --ar-clobber --arcle --arclo
+		OUTPUT - $'return=a option=-a name=--archive-clean arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1
+return=b option=-b name=--archive-clobber arg=(null) num=1
+return=b option=-b name=--archive-clobber arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1
+return=b option=-b name=--archive-clobber arg=(null) num=1'
+	EXEC make "$usage" --archive_clean --acle --aclo --ar_clobber --arcle --arclo
+	EXEC make "$usage" --ac --ac --a-c --ar-c --arc --arcl
+		OUTPUT - $'return=: option=-a name=--ac num=0
+return=: option=-a name=--ac num=0
+return=: option=-a name=--a-c num=0
+return=: option=-a name=--ar-c num=0
+return=: option=-a name=--arc num=0
+return=: option=-a name=--arcl num=0'
+		ERROR - $'make: --ac: ambiguous option
+make: --ac: ambiguous option
+make: --a-c: ambiguous option
+make: --ar-c: ambiguous option
+make: --arc: ambiguous option
+make: --arcl: ambiguous option'
+		EXIT 1
+	EXEC make "$usage" --ac --ac --a_c --ar_c --arc --arcl
+		OUTPUT - $'return=: option=-a name=--ac num=0
+return=: option=-a name=--ac num=0
+return=: option=-a name=--a_c num=0
+return=: option=-a name=--ar_c num=0
+return=: option=-a name=--arc num=0
+return=: option=-a name=--arcl num=0'
+		ERROR - $'make: --ac: ambiguous option
+make: --ac: ambiguous option
+make: --a_c: ambiguous option
+make: --ar_c: ambiguous option
+make: --arc: ambiguous option
+make: --arcl: ambiguous option'
+	usage=$'[-][a:archive-clean]'
+	EXEC make "$usage" --archive-clean --ac --a-c --ar-c --arc --ar-clean --arclean
+		OUTPUT - $'return=a option=-a name=--archive-clean arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1
+return=a option=-a name=--archive-clean arg=(null) num=1'
+		ERROR -
+		EXIT 0
+	EXEC make "$usage" --archive_clean --ac --a_c --ar_c --arc --ar_clean --arclean
+	EXEC make "$usage" --?archive-clean --?a-c --?ac --?ar-c --?arc --?ar-clean --?arclean
+		OUTPUT - $'return=? option=-? name=--?archive-clean num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  -a, --archive-clean'
+		EXIT 2
+	EXEC make "$usage" --?archive_clean --?a_c --?ac --?ar_c --?arc --?ar_clean --?arclean
+		OUTPUT - $'return=? option=-? name=--?archive_clean num=0'
+	EXEC make "$usage" --?a-c
+		OUTPUT - $'return=? option=-? name=--?a-c num=0'
+	EXEC make "$usage" --?a_c
+		OUTPUT - $'return=? option=-? name=--?a_c num=0'
+	EXEC make "$usage" --?ac
+		OUTPUT - $'return=? option=-? name=--?ac num=0'
+	EXEC make "$usage" --?ar-c
+		OUTPUT - $'return=? option=-? name=--?ar-c num=0'
+	EXEC make "$usage" --?ar_c
+		OUTPUT - $'return=? option=-? name=--?ar_c num=0'
+	EXEC make "$usage" --?arc
+		OUTPUT - $'return=? option=-? name=--?arc num=0'
+	EXEC make "$usage" --?ar-clean
+		OUTPUT - $'return=? option=-? name=--?ar-clean num=0'
+	EXEC make "$usage" --?ar_clean
+		OUTPUT - $'return=? option=-? name=--?ar_clean num=0'
+	EXEC make "$usage" --?arclean
+		OUTPUT - $'return=? option=-? name=--?arclean num=0'
+
+TEST 50 'the underscored long and short of it'
+	usage=$'[-][a:archive_clean][b:archive_clobber]'
+	EXEC make "$usage" --archive-clean --acle --aclo --ar-clobber --arcle --arclo
+		OUTPUT - $'return=a option=-a name=--archive_clean arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1
+return=b option=-b name=--archive_clobber arg=(null) num=1
+return=b option=-b name=--archive_clobber arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1
+return=b option=-b name=--archive_clobber arg=(null) num=1'
+	EXEC make "$usage" --archive_clean --acle --aclo --ar_clobber --arcle --arclo
+	EXEC make "$usage" --ac --ac --a-c --ar-c --arc --arcl
+		OUTPUT - $'return=: option=-a name=--ac num=0
+return=: option=-a name=--ac num=0
+return=: option=-a name=--a-c num=0
+return=: option=-a name=--ar-c num=0
+return=: option=-a name=--arc num=0
+return=: option=-a name=--arcl num=0'
+		ERROR - $'make: --ac: ambiguous option
+make: --ac: ambiguous option
+make: --a-c: ambiguous option
+make: --ar-c: ambiguous option
+make: --arc: ambiguous option
+make: --arcl: ambiguous option'
+		EXIT 1
+	EXEC make "$usage" --ac --ac --a_c --ar_c --arc --arcl
+		OUTPUT - $'return=: option=-a name=--ac num=0
+return=: option=-a name=--ac num=0
+return=: option=-a name=--a_c num=0
+return=: option=-a name=--ar_c num=0
+return=: option=-a name=--arc num=0
+return=: option=-a name=--arcl num=0'
+		ERROR - $'make: --ac: ambiguous option
+make: --ac: ambiguous option
+make: --a_c: ambiguous option
+make: --ar_c: ambiguous option
+make: --arc: ambiguous option
+make: --arcl: ambiguous option'
+	usage=$'[-][a:archive_clean]'
+	EXEC make "$usage" --archive-clean --ac --a-c --ar-c --arc --ar-clean --arclean
+		OUTPUT - $'return=a option=-a name=--archive_clean arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1
+return=a option=-a name=--archive_clean arg=(null) num=1'
+		ERROR -
+		EXIT 0
+	EXEC make "$usage" --archive_clean --ac --a_c --ar_c --arc --ar_clean --arclean
+	EXEC make "$usage" --?archive-clean --?a-c --?ac --?ar-c --?arc --?ar-clean --?arclean
+		OUTPUT - $'return=? option=-? name=--?archive-clean num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  -a, --archive_clean'
+		EXIT 2
+	EXEC make "$usage" --?archive_clean --?a_c --?ac --?ar_c --?arc --?ar_clean --?arclean
+		OUTPUT - $'return=? option=-? name=--?archive_clean num=0'
+	EXEC make "$usage" --?a-c
+		OUTPUT - $'return=? option=-? name=--?a-c num=0'
+	EXEC make "$usage" --?a_c
+		OUTPUT - $'return=? option=-? name=--?a_c num=0'
+	EXEC make "$usage" --?ac
+		OUTPUT - $'return=? option=-? name=--?ac num=0'
+	EXEC make "$usage" --?ar-c
+		OUTPUT - $'return=? option=-? name=--?ar-c num=0'
+	EXEC make "$usage" --?ar_c
+		OUTPUT - $'return=? option=-? name=--?ar_c num=0'
+	EXEC make "$usage" --?arc
+		OUTPUT - $'return=? option=-? name=--?arc num=0'
+	EXEC make "$usage" --?ar-clean
+		OUTPUT - $'return=? option=-? name=--?ar-clean num=0'
+	EXEC make "$usage" --?ar_clean
+		OUTPUT - $'return=? option=-? name=--?ar_clean num=0'
+	EXEC make "$usage" --?arclean
+		OUTPUT - $'return=? option=-? name=--?arclean num=0'
+
+TEST 51 'the suboption long and short of it'
+	usage=$'[-][z:time-style?Time style.]:[style]{[11:iso?Iso.][12:posix-iso?Posix iso.][13:full-iso?Full iso.][14:full-numeric?Full numeric.]}'
+	EXEC make "$usage" --time-style=iso --ts=i --time-style=full-iso --ts=fi --ts=fn --time-style=full-numeric -z fnumeric -z fulnumeric -z fuln -z fulln --timestyle=fullnumeric
+		OUTPUT - $'return=z option=-z name=--time-style arg=iso num=-11
+return=z option=-z name=--time-style arg=i num=-11
+return=z option=-z name=--time-style arg=full-iso num=-13
+return=z option=-z name=--time-style arg=fi num=-13
+return=z option=-z name=--time-style arg=fn num=-14
+return=z option=-z name=--time-style arg=full-numeric num=-14
+return=z option=-z name=-z arg=fnumeric num=-14
+return=z option=-z name=-z arg=fulnumeric num=-14
+return=z option=-z name=-z arg=fuln num=-14
+return=z option=-z name=-z arg=fulln num=-14
+return=z option=-z name=--time-style arg=fullnumeric num=-14'
+	EXEC make "$usage" --time_style=iso --ts=i --time_style=full_iso --ts=fi --ts=fn --time_style=full_numeric -z fnumeric -z fulnumeric -z fuln -z fulln --timestyle=fullnumeric
+		OUTPUT - $'return=z option=-z name=--time-style arg=iso num=-11
+return=z option=-z name=--time-style arg=i num=-11
+return=z option=-z name=--time-style arg=full_iso num=-13
+return=z option=-z name=--time-style arg=fi num=-13
+return=z option=-z name=--time-style arg=fn num=-14
+return=z option=-z name=--time-style arg=full_numeric num=-14
+return=z option=-z name=-z arg=fnumeric num=-14
+return=z option=-z name=-z arg=fulnumeric num=-14
+return=z option=-z name=-z arg=fuln num=-14
+return=z option=-z name=-z arg=fulln num=-14
+return=z option=-z name=--time-style arg=fullnumeric num=-14'
+
+TEST 52 'the underscored suboption long and short of it'
+	usage=$'[-][z:time_style?Time style.]:[style]{[11:iso?Iso.][12:posix_iso?Posix iso.][13:full_iso?Full iso.][14:full_numeric?Full numeric.]}'
+	EXEC make "$usage" --time-style=iso --ts=i --time-style=full-iso --ts=fi --ts=fn --time-style=full-numeric -z fnumeric -z fulnumeric -z fuln -z fulln --timestyle=fullnumeric
+		OUTPUT - $'return=z option=-z name=--time_style arg=iso num=-11
+return=z option=-z name=--time_style arg=i num=-11
+return=z option=-z name=--time_style arg=full-iso num=-13
+return=z option=-z name=--time_style arg=fi num=-13
+return=z option=-z name=--time_style arg=fn num=-14
+return=z option=-z name=--time_style arg=full-numeric num=-14
+return=z option=-z name=-z arg=fnumeric num=-14
+return=z option=-z name=-z arg=fulnumeric num=-14
+return=z option=-z name=-z arg=fuln num=-14
+return=z option=-z name=-z arg=fulln num=-14
+return=z option=-z name=--time_style arg=fullnumeric num=-14'
+	EXEC make "$usage" --time_style=iso --ts=i --time_style=full_iso --ts=fi --ts=fn --time_style=full_numeric -z fnumeric -z fulnumeric -z fuln -z fulln --timestyle=fullnumeric
+		OUTPUT - $'return=z option=-z name=--time_style arg=iso num=-11
+return=z option=-z name=--time_style arg=i num=-11
+return=z option=-z name=--time_style arg=full_iso num=-13
+return=z option=-z name=--time_style arg=fi num=-13
+return=z option=-z name=--time_style arg=fn num=-14
+return=z option=-z name=--time_style arg=full_numeric num=-14
+return=z option=-z name=-z arg=fnumeric num=-14
+return=z option=-z name=-z arg=fulnumeric num=-14
+return=z option=-z name=-z arg=fuln num=-14
+return=z option=-z name=-z arg=fulln num=-14
+return=z option=-z name=--time_style arg=fullnumeric num=-14'
+
+TEST 53 'dashing long name input separator ingeniousness'
+	usage=$'[-][p:prefixinclude?PREFIX-INCLUDE]'
+	EXEC make "$usage" --prefixinclude --prefix-include --pre-fix-inc-lude
+		OUTPUT - $'return=p option=-p name=--prefixinclude arg=(null) num=1
+return=p option=-p name=--prefixinclude arg=(null) num=1
+return=p option=-p name=--prefixinclude arg=(null) num=1'
+	EXEC make "$usage" --prefixinclude --prefix_include --pre_fix_inc_lude
+	EXEC make "$usage" --prefixinclude --prefix_include --pre_fix-inc_lude
+	EXEC make "$usage" --?prefixinclude
+		OUTPUT - $'return=? option=-? name=--?prefixinclude num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  -p, --prefixinclude
+                  PREFIX-INCLUDE'
+		EXIT 2
+	EXEC make "$usage" --?prefix-include
+		OUTPUT - $'return=? option=-? name=--?prefix-include num=0'
+	EXEC make "$usage" --?pre-fix-inc-lude
+		OUTPUT - $'return=? option=-? name=--?pre-fix-inc-lude num=0'
+	EXEC make "$usage" --?pre_fix_inc_lude
+		OUTPUT - $'return=? option=-? name=--?pre_fix_inc_lude num=0'
+	EXEC make "$usage" --?pre_fix-inc_lude
+		OUTPUT - $'return=? option=-? name=--?pre_fix-inc_lude num=0'
+	usage=$'[-][p:pre-fix_inc-lude?PREFIX-INCLUDE]'
+	EXEC make "$usage" --prefixinclude --prefix-include --pre-fix-inc-lude
+		OUTPUT - $'return=p option=-p name=--pre-fix_inc-lude arg=(null) num=1
+return=p option=-p name=--pre-fix_inc-lude arg=(null) num=1
+return=p option=-p name=--pre-fix_inc-lude arg=(null) num=1'
+		ERROR -
+		EXIT 0
+	EXEC make "$usage" --prefixinclude --prefix_include --pre_fix_inc_lude
+	EXEC make "$usage" --prefixinclude --prefix_include --pre_fix-inc_lude
+	EXEC make "$usage" --?prefixinclude
+		OUTPUT - $'return=? option=-? name=--?prefixinclude num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  -p, --pre-fix_inc-lude
+                  PREFIX-INCLUDE'
+		EXIT 2
+	EXEC make "$usage" --?prefix-include
+		OUTPUT - $'return=? option=-? name=--?prefix-include num=0'
+	EXEC make "$usage" --?pre-fix-inc-lude
+		OUTPUT - $'return=? option=-? name=--?pre-fix-inc-lude num=0'
+	EXEC make "$usage" --?pre_fix_inc_lude
+		OUTPUT - $'return=? option=-? name=--?pre_fix_inc_lude num=0'
+	EXEC make "$usage" --?pre_fix-inc_lude
+		OUTPUT - $'return=? option=-? name=--?pre_fix-inc_lude num=0'
+
+# skip non-astsa (standalone ast) tests
+
+[[ $(COMMAND -+ query '[-]' '--???about' 2>/dev/null) == *catalog=libast* ]] || exit
+
+TEST 98 'translation'
+	usage=$'[-][+NAME?aha - just do it][+DESCRIPTION?Bla bla.]{\fzero\f}\n\n[ dialect ]\n\n[+SEE ALSO?Bla.]'
+	EXEC -+ aha "$usage" --man
+		OUTPUT - $'id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=aha catalog=libast text="NAME"
+id=aha catalog=libast text="aha - just do it"
+id=aha catalog=libast text="DESCRIPTION"
+id=aha catalog=libast text="Bla bla."
+id=aha catalog=libast text="dabba"
+id=aha catalog=libast text="aroni"
+id=aha catalog=libast text="SEE ALSO"
+id=aha catalog=libast text="Bla."
+id=aha catalog=libast text="SYNOPSIS"
+id=(null) catalog=libast text="options"
+id=aha catalog=libast text="[ dialect ]"
+return=? option=- name=--man num=0
+id=(null) catalog=libast text="Usage"'
+		ERROR - $'ANZR
+  nun - whfg qb vg
+
+FLABCFVF
+  aha [ bcgvbaf ] [ qvnyrpg ]
+
+QRFPEVCGVBA
+  Oyn oyn.
+    yabba qnoon
+    doo   nebav
+
+FRR NYFB
+  Oyn.'
+		EXIT 2
+	usage=$getopts_usage
+	EXEC	-+ getopts "$usage" '--man'
+		OUTPUT - $'id=getopts catalog=libast text="command"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=getopts catalog=libast text="version"
+id=getopts catalog=libast text="getopts (AT&T Research) 1999-02-02
+"
+id=getopts catalog=libast text="NAME"
+id=getopts catalog=libast text="? - parse utility options"
+id=getopts catalog=libast text="OPTIONS"
+id=getopts catalog=libast text="command"
+id=getopts catalog=libast text="name"
+id=getopts catalog=libast text="Use name instead of the command name in usage messages."
+id=getopts catalog=libast text="DESCRIPTION"
+id=getopts catalog=libast text="The getopts utility can be used to retrieve options and
+arguments from a list of arguments give by args or the positional
+parameters if args is omitted.  It can also generate usage messages
+and a man page for the command based on the information in optstring."
+id=getopts catalog=libast text="The optstring string consists of alpha-numeric characters,
+the special characters +, -, ?, :, and <space>, or character groups
+enclosed in [...].  Character groups may be nested in {...}.
+Outside of a [...] group, a single new-line followed by zero or
+more blanks is ignored.  One or more blank lines separates the
+options from the command argument synopsis."
+id=getopts catalog=libast text="Each [...] group consists of an optional label,
+optional attributes separated by :, and an
+optional description string following ?.  The characters from the ?
+to the end of the next ] are ignored for option parsing and short
+usage messages.  They are used for generating verbose help or man pages.
+The : character may not appear in the label.
+The ? character must be specified as ?? in label and the ] character
+must be specified as ]] in the description string.
+Text between two \\b (backspace) characters indicates
+that the text should be emboldened when displayed.
+Text between two \\a (bell) characters indicates that the text should
+be emphasised or italicised when displayed."
+id=getopts catalog=libast text="There are four types of groups:"
+id=getopts catalog=libast text="An option specifiation of the form option:longname.
+	In this case the first field is the option character.  If there
+	is no option character, then a two digit number should be specified
+	that corresponds to the long options.  This negative of this number
+	will be returned as the value of name by getopts if the long
+	option is matched. A longname is matched with --longname.  A
+	* in the longname field indicates that only characters up that
+	point need to match provided any additional characters match the option.
+	The [ and ] can be omitted for options that don\'t have longnames
+	or descriptive text."
+id=getopts catalog=libast text="A string option argument specification.
+	Options that take arguments can be followed by : or # and an option
+	group specification.  An option group specification consists
+	of a name for the option argument as field 1.   The remaining
+	fields are a typename and zero or more of the special attribute words
+	listof, oneof, and ignorecase.
+	The option specification can be followed
+	by a list of option value descriptions enclosed in parenthesis."
+id=getopts catalog=libast text="A option value description."
+id=getopts catalog=libast text="A argument specification. A list of valid option argument values
+		can be specified by enclosing them inside a {...} following
+		the option argument specification.  Each of the permitted
+		values can be specified with a [...] containing the
+		value followed by a description."
+id=getopts catalog=libast text="If the leading character of optstring is +, then arguments
+beginning with + will also be considered options."
+id=getopts catalog=libast text="A leading : character or a : following a leading + in optstring
+affects the way errors are handled.  If an option character or longname
+argument not specified in optstring is encountered when processing
+options, the shell variable whose name is name will be set to the ?
+character.  The shell variable OPTARG will be set to
+the character found.  If an option argument is missing or has an invalid
+value, then name will be set to the : character and the shell variable
+OPTARG will be set to the option character found.
+Without the leading :, name will be set to the ? character, OPTARG
+will be unset, and an error message will be written to standard error
+when errors are encountered."
+id=getopts catalog=libast text="The end of options occurs when:"
+id=getopts catalog=libast text="The special argument --."
+id=getopts catalog=libast text="An argument that does not beging with a -."
+id=getopts catalog=libast text="A help argument is specified."
+id=getopts catalog=libast text="An error is encountered."
+id=getopts catalog=libast text="If OPTARG is set to the value 1, a new set of arguments
+can be used."
+id=getopts catalog=libast text="getopts can also be used to generate help messages containing command
+usage and detailed descriptions.  Specify args as:"
+id=getopts catalog=libast text="To generate a usage synopsis."
+id=getopts catalog=libast text="To generate a verbose usage message."
+id=getopts catalog=libast text="To generate a formatted man page."
+id=getopts catalog=libast text="To generate an easy to parse usage message."
+id=getopts catalog=libast text="To generate a man page in html format."
+id=getopts catalog=libast text="When the end of options is encountered, getopts exits with a
+non-zero return value and the variable OPTIND is set to the
+index of the first non-option argument."
+id=getopts catalog=libast text="EXIT STATUS"
+id=getopts catalog=libast text="An option specified was found."
+id=getopts catalog=libast text="An end of options was encountered."
+id=getopts catalog=libast text="A usage or information message was generated."
+id=getopts catalog=libast text="IMPLEMENTATION"
+id=getopts catalog=libast text="SYNOPSIS"
+id=(null) catalog=libast text="options"
+id=getopts catalog=libast text="opstring name [args...]"
+return=? option=- name=--man num=0
+id=(null) catalog=libast text="Usage"'
+		ERROR - $'ANZR
+  getopts - cnefr hgvyvgl bcgvbaf
+
+FLABCFVF
+  getopts [ bcgvbaf ] bcfgevat anzr [netf...]
+
+BCGVBAF
+  -a, --pbzznaq|command=anzr
+                  Hfr anzr vafgrnq bs gur pbzznaq anzr va hfntr zrffntrf.
+
+QRFPEVCGVBA
+  Gur getopts hgvyvgl pna or hfrq gb ergevrir bcgvbaf naq nethzragf sebz n yvfg
+  bs nethzragf tvir ol netf be gur cbfvgvbany cnenzrgref vs netf vf bzvggrq. Vg
+  pna nyfb trarengr hfntr zrffntrf naq n zna cntr sbe gur pbzznaq onfrq ba gur
+  vasbezngvba va bcgfgevat.
+
+  Gur bcgfgevat fgevat pbafvfgf bs nycun-ahzrevp punenpgref, gur fcrpvny
+  punenpgref +, -, ?, :, naq <fcnpr>, be punenpgre tebhcf rapybfrq va [...].
+  Punenpgre tebhcf znl or arfgrq va {...}. Bhgfvqr bs n [...] tebhc, n fvatyr
+  arj-yvar sbyybjrq ol mreb be zber oynaxf vf vtaberq. Bar be zber oynax yvarf
+  frcnengrf gur bcgvbaf sebz gur pbzznaq nethzrag flabcfvf.
+
+  Rnpu [...] tebhc pbafvfgf bs na bcgvbany ynory, bcgvbany nggevohgrf frcnengrq
+  ol :, naq na bcgvbany qrfpevcgvba fgevat sbyybjvat ?. Gur punenpgref sebz gur
+  ? gb gur raq bs gur arkg ] ner vtaberq sbe bcgvba cnefvat naq fubeg hfntr
+  zrffntrf. Gurl ner hfrq sbe trarengvat ireobfr uryc be zna cntrf. Gur :
+  punenpgre znl abg nccrne va gur ynory. Gur ? punenpgre zhfg or fcrpvsvrq nf
+  ?? va ynory naq gur ] punenpgre zhfg or fcrpvsvrq nf ]] va gur qrfpevcgvba
+  fgevat. Grkg orgjrra gjb \\b (onpxfcnpr) punenpgref vaqvpngrf gung gur grkg
+  fubhyq or rzobyqrarq jura qvfcynlrq. Grkg orgjrra gjb \\a (oryy) punenpgref
+  vaqvpngrf gung gur grkg fubhyq or rzcunfvfrq be vgnyvpvfrq jura qvfcynlrq.
+
+  Gurer ner sbhe glcrf bs tebhcf:
+    1.    Na bcgvba fcrpvsvngvba bs gur sbez bcgvba:ybatanzr. Va guvf pnfr gur
+          svefg svryq vf gur bcgvba punenpgre. Vs gurer vf ab bcgvba punenpgre,
+          gura n gjb qvtvg ahzore fubhyq or fcrpvsvrq gung pbeerfcbaqf gb gur
+          ybat bcgvbaf. Guvf artngvir bs guvf ahzore jvyy or erghearq nf gur
+          inyhr bs anzr ol getopts vs gur ybat bcgvba vf zngpurq. N ybatanzr vf
+          zngpurq jvgu --ybatanzr. N * va gur ybatanzr svryq vaqvpngrf gung
+          bayl punenpgref hc gung cbvag arrq gb zngpu cebivqrq nal nqqvgvbany
+          punenpgref zngpu gur bcgvba. Gur [ naq ] pna or bzvggrq sbe bcgvbaf
+          gung qba\'g unir ybatanzrf be qrfpevcgvir grkg.
+    2.    N fgevat bcgvba nethzrag fcrpvsvpngvba. Bcgvbaf gung gnxr nethzragf
+          pna or sbyybjrq ol : be # naq na bcgvba tebhc fcrpvsvpngvba. Na
+          bcgvba tebhc fcrpvsvpngvba pbafvfgf bs n anzr sbe gur bcgvba nethzrag
+          nf svryq 1. Gur erznvavat svryqf ner n glcranzr naq mreb be zber bs
+          gur fcrpvny nggevohgr jbeqf listof, oneof, naq ignorecase. Gur bcgvba
+          fcrpvsvpngvba pna or sbyybjrq ol n yvfg bs bcgvba inyhr qrfpevcgvbaf
+          rapybfrq va cneragurfvf.
+    3.    N bcgvba inyhr qrfpevcgvba.
+    4.    N nethzrag fcrpvsvpngvba. N yvfg bs inyvq bcgvba nethzrag inyhrf pna
+          or fcrpvsvrq ol rapybfvat gurz vafvqr n {...} sbyybjvat gur bcgvba
+          nethzrag fcrpvsvpngvba. Rnpu bs gur crezvggrq inyhrf pna or fcrpvsvrq
+          jvgu n [...] pbagnvavat gur inyhr sbyybjrq ol n qrfpevcgvba.
+
+  Vs gur yrnqvat punenpgre bs bcgfgevat vf +, gura nethzragf ortvaavat jvgu +
+  jvyy nyfb or pbafvqrerq bcgvbaf.
+
+  N yrnqvat : punenpgre be n : sbyybjvat n yrnqvat + va bcgfgevat nssrpgf gur
+  jnl reebef ner unaqyrq. Vs na bcgvba punenpgre be ybatanzr nethzrag abg
+  fcrpvsvrq va bcgfgevat vf rapbhagrerq jura cebprffvat bcgvbaf, gur furyy
+  inevnoyr jubfr anzr vf anzr jvyy or frg gb gur ? punenpgre. Gur furyy
+  inevnoyr OPTARG jvyy or frg gb gur punenpgre sbhaq. Vs na bcgvba nethzrag vf
+  zvffvat be unf na vainyvq inyhr, gura anzr jvyy or frg gb gur : punenpgre naq
+  gur furyy inevnoyr OPTARG jvyy or frg gb gur bcgvba punenpgre sbhaq. Jvgubhg
+  gur yrnqvat :, anzr jvyy or frg gb gur ? punenpgre, OPTARG jvyy or hafrg, naq
+  na reebe zrffntr jvyy or jevggra gb fgnaqneq reebe jura reebef ner
+  rapbhagrerq.
+
+  Gur raq bs bcgvbaf bpphef jura:
+    1.    Gur fcrpvny nethzrag --.
+    2.    Na nethzrag gung qbrf abg ortvat jvgu n -.
+    3.    N uryc nethzrag vf fcrpvsvrq.
+    4.    Na reebe vf rapbhagrerq.
+
+  Vs OPTARG vf frg gb gur inyhr 1, n arj frg bs nethzragf pna or hfrq.
+
+  getopts pna nyfb or hfrq gb trarengr uryc zrffntrf pbagnvavat pbzznaq hfntr
+  naq qrgnvyrq qrfpevcgvbaf. Fcrpvsl netf nf:
+    -?    Gb trarengr n hfntr flabcfvf.
+    --??  Gb trarengr n ireobfr hfntr zrffntr.
+    --??man
+          Gb trarengr n sbeznggrq zna cntr.
+    --??api
+          Gb trarengr na rnfl gb cnefr hfntr zrffntr.
+    --??html
+          Gb trarengr n zna cntr va html sbezng.
+
+  Jura gur raq bs bcgvbaf vf rapbhagrerq, getopts rkvgf jvgu n aba-mreb erghea
+  inyhr naq gur inevnoyr OPTIND vf frg gb gur vaqrk bs gur svefg aba-bcgvba
+  nethzrag.
+
+RKVG FGNGHF
+    0     Na bcgvba fcrpvsvrq jnf sbhaq.
+    1     Na raq bs bcgvbaf jnf rapbhagrerq.
+    2     N hfntr be vasbezngvba zrffntr jnf trarengrq.
+
+VZCYRZRAGNGVBA
+  irefvba         trgbcgf (NG&G Erfrnepu) 1999-02-02'
 	usage=$'[-?\n@(#)xlate 1.0\n][-author?Col. Hyde][a:algorithm]:[method][b:again|back]'
 	EXEC -+ xlate "$usage" --algorithm=xxx --again --back
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
@@ -2420,6 +3387,8 @@ return=b option=-b name=--again arg=(null) num=1
 id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
 return=b option=-b name=--back arg=(null) num=1'
+		ERROR -
+		EXIT 0
 	EXEC -+ xlate "$usage" --nytbevguz=xxx --ntnva --onpx
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 return=a option=-a name=--nytbevguz arg=xxx num=1
@@ -2927,712 +3896,6 @@ id=(null) catalog=libast text="Usage"'
 "\\fthree\\f"
 "again|back"
 "\\ftwo\\f"'
-
-TEST 35 'alternate version ids'
-	EXEC id $'[-?\n@(#)id (spamco) 2000-12-01\n]' --?-version
-		OUTPUT - $'return=? option=-? name=--?-version num=0'
-		ERROR - $'  version         id (spamco) 2000-12-01'
-		EXIT 2
-	EXEC id $'[-?\n@(#)  \t  id (spamco) 2000-12-01\n]' --?-version
-	EXEC id $'[-?\n$Id: id (spamco) 2000-12-01 $\n]' --?-version
-		ERROR - $'  version         id (spamco) 2000-12-01'
-	EXEC id $'[-?\n@(#)$Id: id (spamco) 2000-12-01 $\n]' --?-version
-	EXEC id $'[-?\n$Id: @(#)id (spamco) 2000-12-01 $\n]' --?-version
-
-TEST 36 'enumerated option argument values'
-	usage=$'[-?\naha\n][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n[c:C?C style.][A:always?Always shell style.][101:shell?Shell quote if necessary.][q:question?Replace unknown chars with ?.]\n}'
-	EXEC ls "$usage" --man
-		EXIT 2
-		OUTPUT - 'return=? option=- name=--man num=0'
-		ERROR - 'SYNOPSIS
-  ls [ options ]
-
-OPTIONS
-  -Q, --quote=style
-                  Quote names according to style:
-                    c|C   C style.
-                    A|always
-                          Always shell style.
-                    shell Shell quote if necessary.
-                    question
-                          Replace unknown chars with ?.
-                  The default value is question.
-
-IMPLEMENTATION
-  version         aha'
-	EXEC ls "$usage" --quote
-		EXIT 1
-		OUTPUT - 'return=: option=-Q name=--quote num=0'
-		ERROR - 'ls: --quote: style value expected'
-	EXEC ls "$usage" --quote=alx
-		ERROR - 'ls: --quote: alx: unknown option argument value'
-	EXEC ls "$usage" --quote=c
-		EXIT 0
-		OUTPUT - 'return=Q option=-Q name=--quote arg=c num=99'
-		ERROR -
-	EXEC ls "$usage" --quote=C
-		OUTPUT - 'return=Q option=-Q name=--quote arg=C num=99'
-	EXEC ls "$usage" -Q shell
-		OUTPUT - 'return=Q option=-Q name=-Q arg=shell num=-101'
-	EXEC ls "$usage" -Qs
-		OUTPUT - 'return=Q option=-Q name=-Q arg=s num=-101'
-
-TEST 37 'stealth bugs'
-	usage=$'[-?\naha\n][-catalog?SpamCo][h:html?Read html from \afile\a.]:[file[??name=value;...]]]'
-	EXEC m2h "$usage" -h
-		EXIT 1
-		OUTPUT - 'return=: option=-h name=-h num=0'
-		ERROR - 'm2h: -h: file[?name=value;...] argument expected'
-	EXEC m2h "$usage" --man
-		EXIT 2
-		OUTPUT - 'return=? option=- name=--man num=0'
-		ERROR - 'SYNOPSIS
-  m2h [ options ]
-
-OPTIONS
-  -h, --html=file[?name=value;...]
-                  Read html from file.
-
-IMPLEMENTATION
-  version         aha
-  catalog         SpamCo'
-	EXEC m2h "$usage" --keys
-		OUTPUT - 'return=? option=- name=--keys num=0'
-		ERROR - '"catalog"
-"html"
-"Read html from \afile\a."
-"file[?name=value;...]"'
-	EXEC ls $'[-][w:width]#[screen-width]' -wx
-		OUTPUT - $'return=: option=-w name=-w num=0'
-		ERROR - $'ls: -w: numeric screen-width argument expected'
-		EXIT 1
-
-TEST 38 'ancient compatibility for modern implementations -- ok, I still use vi'
-	usage=$'[-1o][a:all][f:full][l:long][u:user]:[uid]\n\n[ pid ... ]\n\n'
-	EXEC ps "$usage" --man
-		EXIT 2
-		OUTPUT - 'return=? option=- name=--man num=0'
-		ERROR - 'SYNOPSIS
-  ps [ options ] [ pid ... ]
-
-OPTIONS
-  -a, --all
-  -f, --full
-  -l, --long
-  -u, --user=uid'
-	EXEC ps "$usage" a 123
-		EXIT 0
-		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
-argument=1 value="123"'
-		ERROR -
-	EXEC ps "$usage" -a 123
-	EXEC ps "$usage" al 123
-		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
-return=l option=-l name=-l arg=(null) num=1
-argument=1 value="123"'
-	EXEC ps "$usage" -al 123
-	EXEC ps "$usage" a l 123
-	EXEC ps "$usage" a -l 123
-	EXEC ps "$usage" u bozo l 123
-		OUTPUT - 'return=u option=-u name=-u arg=bozo num=1
-return=l option=-l name=-l arg=(null) num=1
-argument=1 value="123"'
-	EXEC ps "$usage" -u bozo -l 123
-	EXEC ps "$usage" a u bozo l 123
-		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
-return=u option=-u name=-u arg=bozo num=1
-return=l option=-l name=-l arg=(null) num=1
-argument=1 value="123"'
-
-TEST 39 'local suboptions'
-	usage=$'[-?\naha\n][+NAME?search][x:method?The algorithm:]:[method:=linear]{[linear?Fast.][quadratic?Slower. Sub-options:]{[-][e:edges?Limit edges.]#[n:=50]}[np?Slow.][heuristic?Almost works. Sub-options:]{[-][n:nodes?Limit nodes.]#?[n:=100][f:foo?Bar.]:[huh][d:dump?Dump tables.][l:label?Set label.]:[string]}}[D:debug?Debug level.]#[level][+SEE ALSO?\afoo\a(1)]'
-	EXEC search "$usage" --man
-		EXIT 2
-		OUTPUT - 'return=? option=- name=--man num=0'
-		ERROR - 'NAME
-  search
-
-SYNOPSIS
-  search [ options ]
-
-OPTIONS
-  -x, --method=method
-                  The algorithm:
-                    linear
-                          Fast.
-                    quadratic
-                          Slower. Sub-options:
-                            edges=n
-                                  Limit edges. The default value is 50.
-                    np    Slow.
-                    heuristic
-                          Almost works. Sub-options:
-                            nodes[=n]
-                                  Limit nodes. The option value may be omitted.
-                                  The default value is 100.
-                            foo=huh
-                                  Bar.
-                            dump  Dump tables.
-                            label=string
-                                  Set label.
-                  The default value is linear.
-  -D, --debug=level
-                  Debug level.
-
-SEE ALSO
-  foo(1)
-
-IMPLEMENTATION
-  version         aha'
-
-TEST 40 'examples of example examples'
-	usage=$'[-?\naha\n][-catalog?SpamCo][+NAME?eg - test example examples][Q:quote?Quote names according to \astyle\a:]:[style:=question][+EXAMPLES]{[+\none\ntwo][+\n\vthree\nfour][+\n\afive\nsix]}[+SEE ALSO?\begman\b(1)]'
-	EXEC eg "$usage" --man
-		EXIT 2
-		OUTPUT - 'return=? option=- name=--man num=0'
-		ERROR - $'NAME
-  eg - test example examples
-
-SYNOPSIS
-  eg [ options ]
-
-OPTIONS
-  -Q, --quote=style
-                  Quote names according to style: The default value is
-                  question.
-
-EXAMPLES
-    one
-    two
-
-    three
-    four
-
-    five
-    six
-
-SEE ALSO
-  egman(1)
-
-IMPLEMENTATION
-  version         aha
-  catalog         SpamCo'
-	EXEC eg "$usage" --nroff
-		OUTPUT - 'return=? option=- name=--nroff num=0'
-		ERROR - $'.\\" format with nroff|troff|groff -man
-.fp 5 CW
-.nr mI 0
-.de mI
-.if \\\\n(mI>\\\\$1 \\{
-.nr mI \\\\n(mI-1
-.RE
-.mI \\\\$1
-.\\}
-.if \\\\n(mI<\\\\$1 \\{
-.nr mI \\\\n(mI+1
-.RS
-.mI \\\\$1
-.\\}
-..
-.de H1
-.mI 1
-.TP
-\\fB\\\\$1\\fP
-..
-.de H2
-.mI 2
-.TP
-\\fB\\\\$1\\fP
-..
-.de H3
-.mI 3
-.TP
-\\fB\\\\$1\\fP
-..
-.de H4
-.mI 4
-.TP
-\\fB\\\\$1\\fP
-..
-.de OP
-.mI 0
-.ie !\'\\\\$1\'-\' \\{
-.ds mO \\\\fB\\\\-\\\\$1\\\\fP
-.ds mS ,\\\\0
-.\\}
-.el \\{
-.ds mO \\\\&
-.ds mS \\\\&
-.\\}
-.ie \'\\\\$2\'-\' \\{
-.if !\'\\\\$4\'-\' .as mO \\\\0\\\\fI\\\\$4\\\\fP
-.\\}
-.el \\{
-.as mO \\\\*(mS\\\\fB\\\\-\\\\-\\\\$2\\\\fP
-.if !\'\\\\$4\'-\' .as mO =\\\\fI\\\\$4\\\\fP
-.\\}
-.TP
-\\\\*(mO
-..
-.de FN
-.mI 0
-.TP
-\\\\$1 \\\\$2
-..
-.TH eg 1
-.SH NAME
-eg \\- test example examples
-.SH SYNOPSIS
-\\fBeg\\fP\\ [\\ \\fIoptions\\fP\\ ]
-.SH OPTIONS
-.OP Q quote string style question
-Quote names according to \\fIstyle\\fP:
- The default value is \\fBquestion\\fP\\&.
-.SH EXAMPLES
-.DS
-\\f5one
-two\\fP
-.DE
-.DS
-three
-four
-.DE
-.DS
-\\fIfive
-six\\fP
-.DE
-.SH SEE\\ ALSO
-\\fBegman\\fP(1)
-.SH IMPLEMENTATION
-.H1 version
-aha
-.H1 catalog
-SpamCo'
-	EXEC eg "$usage" --html
-		OUTPUT - 'return=? option=- name=--html num=0'
-		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<HTML>
-<HEAD>
-<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
-<TITLE>eg man document</TITLE>
-</HEAD>
-<BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;eg&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>eg&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
-<HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>eg - test example examples
-<P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>eg</B> &#0091; <I>options</I> &#0093;
-<P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>-<B>Q</B>, --<B>quote</B>=<I>style</I><DD>Quote names according to <I>style
-</I>: The default value is <B>question</B>.
-</DL>
-<DT><H4><A name="EXAMPLES">EXAMPLES</A></H4>
-<P>
-<DT><PRE>
-<DL compact>
-<DT><TT>one
-<DT>two</TT>
-</DL>
-<DT></PRE>
-<DT><PRE>
-<DL compact>
-<DT>three
-<DT>four
-</DL>
-<DT></PRE>
-<DT><PRE>
-<DL compact>
-<DT><I>five
-<DT>six</I>
-</DL>
-<DT></PRE>
-<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
-<DL compact>
-<DT><NOBR><A href="../man1/egman.html"><B>egman</B></A>(1)</NOBR>
-</DL>
-<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
-<DL compact>
-<DT><A name="version"><B>version</B></A><DD>aha
-<DT><A name="catalog"><B>catalog</B></A><DD>SpamCo
-</DL></DL>
-</BODY>
-</HTML>'
-
-TEST 41 'cache exercizes'
-	usage=$'[-1c][a:aaa?AAA][b:bbb?BBB]:[bv][c:ccc?CCC]:?[cv]'
-	EXEC typeset "$usage" -a -b1
-		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
-[3] return=b option=-b name=-b arg=1 num=1
-[2] return=a option=-a name=-a arg=(null) num=1
-[2] return=b option=-b name=-b arg=1 num=1
-[1] return=a option=-a name=-a arg=(null) num=1
-[1] return=b option=-b name=-b arg=1 num=1'
-	EXEC typeset "$usage" -c2 -a
-		OUTPUT - $'[3] return=c option=-c name=-c arg=2 num=1
-[3] return=a option=-a name=-a arg=(null) num=1
-[2] return=c option=-c name=-c arg=2 num=1
-[2] return=a option=-a name=-a arg=(null) num=1
-[1] return=c option=-c name=-c arg=2 num=1
-[1] return=a option=-a name=-a arg=(null) num=1'
-	EXEC typeset "$usage" -c -a
-		OUTPUT - $'[3] return=c option=-c name=-c arg=(null) num=1
-[3] return=a option=-a name=-a arg=(null) num=1
-[2] return=c option=-c name=-c arg=(null) num=1
-[2] return=a option=-a name=-a arg=(null) num=1
-[1] return=c option=-c name=-c arg=(null) num=1
-[1] return=a option=-a name=-a arg=(null) num=1'
-	EXEC typeset "$usage" -a -b1 -c -c2
-		OUTPUT - $'[3] return=a option=-a name=-a arg=(null) num=1
-[3] return=b option=-b name=-b arg=1 num=1
-[3] return=c option=-c name=-c arg=(null) num=1
-[3] return=c option=-c name=-c arg=2 num=1
-[2] return=a option=-a name=-a arg=(null) num=1
-[2] return=b option=-b name=-b arg=1 num=1
-[2] return=c option=-c name=-c arg=(null) num=1
-[2] return=c option=-c name=-c arg=2 num=1
-[1] return=a option=-a name=-a arg=(null) num=1
-[1] return=b option=-b name=-b arg=1 num=1
-[1] return=c option=-c name=-c arg=(null) num=1
-[1] return=c option=-c name=-c arg=2 num=1'
-	usage=$'[-1c]a:[command][n:number]#?[number][s:string]:?[string]'
-	EXEC typeset "$usage" -n
-		OUTPUT - $'[3] return=n option=-n name=-n arg=(null) num=1
-[2] return=n option=-n name=-n arg=(null) num=1
-[1] return=n option=-n name=-n arg=(null) num=1'
-	EXEC typeset "$usage" -n12
-		OUTPUT - $'[3] return=n option=-n name=-n arg=12 num=12
-[2] return=n option=-n name=-n arg=12 num=12
-[1] return=n option=-n name=-n arg=12 num=12'
-	EXEC typeset "$usage" -s
-		OUTPUT - $'[3] return=s option=-s name=-s arg=(null) num=1
-[2] return=s option=-s name=-s arg=(null) num=1
-[1] return=s option=-s name=-s arg=(null) num=1'
-	EXEC typeset "$usage" -s12
-		OUTPUT - $'[3] return=s option=-s name=-s arg=12 num=1
-[2] return=s option=-s name=-s arg=12 num=1
-[1] return=s option=-s name=-s arg=12 num=1'
-	EXEC typeset "$usage" OPT --foo
-		OUTPUT - $'[3] argument=1 value="OPT"
-[3] argument=2 value="--foo"
-[2] argument=1 value="OPT"
-[2] argument=2 value="--foo"
-[1] argument=1 value="OPT"
-[1] argument=2 value="--foo"'
-	EXEC typeset "$usage" -a locate OPT --foo
-		OUTPUT - $'[3] return=a option=-a name=-a arg=locate num=1
-[3] argument=1 value="OPT"
-[3] argument=2 value="--foo"
-[2] return=a option=-a name=-a arg=locate num=1
-[2] argument=1 value="OPT"
-[2] argument=2 value="--foo"
-[1] return=a option=-a name=-a arg=locate num=1
-[1] argument=1 value="OPT"
-[1] argument=2 value="--foo"'
-
-TEST 42 'optional long names'
-	usage=$'[-][a:aaa][b:bbb?BBB][c?CCC][d:?DDD][e\f:n:eee\f][f\f:y:fff\f?FFF][g:ggg?GGG]'
-	EXEC tst "$usage" -a --aaa -b --bbb -c -d -e --eee -f --fff -g -ggg
-		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
-return=a option=-a name=--aaa arg=(null) num=1
-return=b option=-b name=-b arg=(null) num=1
-return=b option=-b name=--bbb arg=(null) num=1
-return=c option=-c name=-c arg=(null) num=1
-return=d option=-d name=-d arg=(null) num=1
-return=e option=-e name=-e arg=(null) num=1
-return=e option=-e name=--eee arg=(null) num=1
-return=f option=-f name=-f arg=(null) num=1
-return=f option=-f name=--fff arg=(null) num=1
-return=g option=-g name=-g arg=(null) num=1
-return=g option=-g name=-g arg=(null) num=1
-return=g option=-g name=-g arg=(null) num=1
-return=g option=-g name=-g arg=(null) num=1'
-	EXEC tst "$usage" --man
-		EXIT 2
-		OUTPUT - $'return=? option=- name=--man num=0'
-		ERROR - $'SYNOPSIS
-  tst [ options ]
-
-OPTIONS
-  -a, --aaa
-  -b, --bbb       BBB
-  -c              CCC
-  -d              DDD
-  -e
-  -f, --fff       FFF
-  -g, --ggg       GGG'
-	usage=$'[-][a:aaa]:[av][b:bbb?BBB]:[bv][c?CCC]:[cv][d:?DDD]:[dv][e\f:n:eee\f]:[ev][f\f:y:fff\f?FFF]:[fv][g:ggg?GGG]:[gv]'
-	EXEC tst "$usage" -a AV --aaa=LAV -bBV --bbb=LBV -c CV -dDV -e EV --eee LEV -f FV --fff=LFV -gGV -ggg LGV
-		EXIT 0
-		OUTPUT - $'return=a option=-a name=-a arg=AV num=1
-return=a option=-a name=--aaa arg=LAV num=1
-return=b option=-b name=-b arg=BV num=1
-return=b option=-b name=--bbb arg=LBV num=1
-return=c option=-c name=-c arg=CV num=1
-return=d option=-d name=-d arg=DV num=1
-return=e option=-e name=-e arg=EV num=1
-return=e option=-e name=--eee arg=LEV num=1
-return=f option=-f name=-f arg=FV num=1
-return=f option=-f name=--fff arg=LFV num=1
-return=g option=-g name=-g arg=GV num=1
-return=g option=-g name=-g arg=gg num=1
-argument=1 value="LGV"'
-		ERROR -
-	EXEC tst "$usage" --man
-		EXIT 2
-		OUTPUT - $'return=? option=- name=--man num=0'
-		ERROR - $'SYNOPSIS
-  tst [ options ]
-
-OPTIONS
-  -a, --aaa=av
-  -b, --bbb=bv    BBB
-  -c cv           CCC
-  -d dv           DDD
-  -e ev
-  -f, --fff=fv    FFF
-  -g, --ggg=gv    GGG'
-
-TEST 43 'trailing wild card'
-	usage=$'[-][z:zzz]:[style][A:a*][B:b*][C:c*]'
-	EXEC wild "$usage" -A -B -C --a --b --c --axx --bxx --cxx
-		OUTPUT - $'return=A option=-A name=-A arg=(null) num=1
-return=B option=-B name=-B arg=(null) num=1
-return=C option=-C name=-C arg=(null) num=1
-return=A option=-A name=--a arg=(null) num=1
-return=B option=-B name=--b arg=(null) num=1
-return=C option=-C name=--c arg=(null) num=1
-return=A option=-A name=--axx arg=(null) num=1
-return=B option=-B name=--bxx arg=(null) num=1
-return=C option=-C name=--cxx arg=(null) num=1'
-
-	(
-		export LC_ALL=en_US
-		EXEC wild "$usage" -A -B -C --a --b --c --axx --bxx --cxx
-	)
-
-	usage=$'[-][z:zzz]:[style]{[A:a*][B:b*][C:c*]}'
-	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
-		OUTPUT - $'return=z option=-z name=-z arg=A num=65
-return=z option=-z name=-z arg=B num=66
-return=z option=-z name=-z arg=C num=67
-return=z option=-z name=-z arg=a num=65
-return=z option=-z name=-z arg=b num=66
-return=z option=-z name=-z arg=c num=67
-return=z option=-z name=-z arg=axx num=65
-return=z option=-z name=-z arg=bxx num=66
-return=z option=-z name=-z arg=cxx num=67'
-	usage=$'[-][z:zzz]:[style]{[A:a*?aaa][B:b*?bbb][C:c*?ccc]}'
-	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
-	EXEC wild "$usage" -z
-		EXIT 1
-		OUTPUT - $'return=: option=-z name=-z num=0'
-		ERROR - $'wild: -z: style argument expected'
-	EXEC wild "$usage" --zzz
-		OUTPUT - $'return=: option=-z name=--zzz num=0'
-		ERROR - $'wild: --zzz: style value expected'
-	usage=$'[-][z:zzz]:[style]{[A:a\aget\a?aaa][B:b\aoutta\a?bbb][C:c\atown\a?ccc]}'
-	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
-		EXIT 0
-		OUTPUT - $'return=z option=-z name=-z arg=A num=65
-return=z option=-z name=-z arg=B num=66
-return=z option=-z name=-z arg=C num=67
-return=z option=-z name=-z arg=a num=65
-return=z option=-z name=-z arg=b num=66
-return=z option=-z name=-z arg=c num=67
-return=z option=-z name=-z arg=axx num=65
-return=z option=-z name=-z arg=bxx num=66
-return=z option=-z name=-z arg=cxx num=67'
-		ERROR -
-	EXEC wild "$usage" -z
-		EXIT 1
-		OUTPUT - $'return=: option=-z name=-z num=0'
-		ERROR - $'wild: -z: style argument expected'
-	EXEC wild "$usage" --zzz
-		OUTPUT - $'return=: option=-z name=--zzz num=0'
-		ERROR - $'wild: --zzz: style value expected'
-	EXEC wild "$usage" --man
-		EXIT 2
-		OUTPUT - $'return=? option=- name=--man num=0'
-		ERROR - $'SYNOPSIS
-  wild [ options ]
-
-OPTIONS
-  -z, --zzz=style
-                    A|aget
-                          aaa
-                    B|boutta
-                          bbb
-                    C|ctown
-                          ccc'
-
-TEST 44 'getopt_long() compatibility'
-	usage=$'[-1p1]\n[h:help]\n[V:version]\n[v:verbose]\n[X]\n[259:save-temps]\n[s:std]:[string]\n[d:debug]\n[262:static]\n[263:dynamic]\n[264:free]\n[265:fixed]\n[266:column]:[string]\n[267:MT]:[string]\n[268:MF]:[string]\n[269:fmain]\n[270:fno-main]\n[W:Wall]\n[272:Wobsolete]\n[273:Wno-obsolete]\n[274:Warchaic]\n[275:Wno-archaic]\n[276:Wcolumn-overflow]\n[277:Wno-column-overflow]\n[278:Wconstant]\n[279:Wno-constant]\n[280:Wparentheses]\n[281:Wno-parentheses]\n[282:Wimplicit-terminator]\n[283:Wno-implicit-terminator]\n[284:Wstrict-typing]\n[285:Wno-strict-typing]\n[?]\n[E]\n[P]\n[C]\n[S]\n[c]\n[m]\n[g]\n[o]:[]\n[I]:[]\n'
-	EXEC cobcc "$usage" -static -I foo -Ibar -debug -C -Wparen tst.cob
-		OUTPUT - $'return=-262 option=-262 name=-static arg=(null) num=1
-return=I option=-262 name=-I arg=foo num=1
-return=I option=-262 name=-I arg=bar num=1
-return=d option=-d name=-debug arg=(null) num=1
-return=C option=-d name=-C arg=(null) num=1
-return=-280 option=-280 name=-Wparentheses arg=(null) num=1
-argument=1 value="tst.cob"'
-
-TEST 45 'n=v vs. n:=v'
-	usage=$'[-][a:aaa?AAA]:[vvv]'
-	EXEC pax "$usage" -a 1 --a=xx --a:=yy
-		OUTPUT - $'return=a option=-a name=-a arg=1 num=1
-return=a option=-a name=--aaa arg=xx num=1
-return=a option=-a name=--aaa arg:=yy num=1'
-	EXEC pax "$usage" -a 1 --aaa=xx --aaa:=yy
-
-TEST 46 'html escapism'
-	usage=$'[-][+NAME?codex - encode/decode filter][+?Methods:]{[+and?things]{[+of?this <= 64.]:[nature][+govern?ator]}}\n\n[ [ <,> ] method [ <,>,| method ... ] ]\n\n[+SEE ALSO?\bcodex\b(3), \bvcodex\b(3)]'
-	EXEC codex "$usage" --html
-		EXIT 2
-		OUTPUT - $'return=? option=- name=--html num=0'
-		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<HTML>
-<HEAD>
-<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
-<TITLE>codex man document</TITLE>
-</HEAD>
-<BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;codex&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>codex&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
-<HR>
-<DL compact>
-<DT><H4><A name="NAME">NAME</A></H4>
-<DL compact>
-<DT>codex - encode/decode filter
-<P>
-</DL>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>codex</B> &#0091; <I>options</I> &#0093; &#0091; &#0091; &lt;,&gt; &#0093; method &#0091; &lt;,&gt;,| method
-... &#0093; &#0093;
-<P>
-<DT>Methods:
-<DL compact>
-<DL compact>
-<DT><A name="and"><B>and</B></A><DD>things
-<DL compact>
-<DL compact>
-<DT><A name="of=nature"><B>of=<I>nature</I></B></A><DD>this &lt;= 64.
-<DT><A name="govern"><B>govern</B></A><DD>ator
-</DL>
-</DL>
-</DL>
-</DL>
-</DL>
-<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
-<DL compact>
-<DT><NOBR><A href="../man3/codex.html"><B>codex</B></A>(3),</NOBR> <NOBR><A href="../man3/vcodex.html"><B>vcodex</B></A>(3)</NOBR>
-</DL></DL>
-</BODY>
-</HTML>'
-
-TEST 47 'omitted optional arg default'
-	usage1=$'[-][101:clobber?Clobber pattern.]:?[pattern:=*.exe:!*][102:select?Select pattern.]:[pattern=*.[ch]]]'
-	usage2=$'[-][101:clobber?Clobber pattern.]:?[pattern:!*:=*.exe][102:select?Select pattern.]:[pattern=*.[ch]]]'
-	EXEC make "$usage1" --clobber foo
-		OUTPUT - $'return=-101 option=-101 name=--clobber arg=* num=1\nargument=1 value="foo"'
-	EXEC make "$usage2" --clobber foo
-	EXEC make "$usage1" --clobber=1 bar
-		OUTPUT - $'return=-101 option=-101 name=--clobber arg=* num=1\nargument=1 value="bar"'
-	EXEC make "$usage2" --clobber=1 bar
-	EXEC make "$usage1" --noclobber foo
-		OUTPUT - $'return=-101 option=-101 name=--clobber arg=(null) num=0\nargument=1 value="foo"'
-	EXEC make "$usage2" --noclobber foo
-	EXEC make "$usage1" --clobber=0 bar
-		OUTPUT - $'return=-101 option=-101 name=--clobber arg=(null) num=0\nargument=1 value="bar"'
-	EXEC make "$usage2" --clobber=0 bar
-	EXEC make "$usage1" --clobber=foo bar
-		OUTPUT - $'return=-101 option=-101 name=--clobber arg=foo num=1\nargument=1 value="bar"'
-	EXEC make "$usage2" --clobber=foo bar
-	EXEC make "$usage1" --select foo bar
-		OUTPUT - $'return=-102 option=-102 name=--select arg=foo num=1\nargument=1 value="bar"'
-	EXEC make "$usage2" --select foo bar
-	EXEC make "$usage1" --select=foo bar
-	EXEC make "$usage2" --select=foo bar
-	EXEC make "$usage1" --?clobber
-		OUTPUT - $'return=? option=-? name=--?clobber num=0'
-		ERROR - $'Usage: make [ options ]
-OPTIONS
-  --clobber[=pattern]
-                  Clobber pattern. If the option value is omitted then * is
-                  assumed. The default value is *.exe.'
-		  EXIT 2
-	EXEC make "$usage2" --?clobber
-	EXEC make "$usage1" --?select
-		OUTPUT - $'return=? option=-? name=--?select num=0'
-		ERROR - $'Usage: make [ options ]
-OPTIONS
-  --select=pattern=*.[ch]
-                  Select pattern.'
-	EXEC make "$usage2" --?select
-	EXEC make "$usage1" --man
-		OUTPUT - $'return=? option=- name=--man num=0'
-		ERROR - $'SYNOPSIS
-  make [ options ]
-
-OPTIONS
-  --clobber[=pattern]
-                  Clobber pattern. If the option value is omitted then * is
-                  assumed. The default value is *.exe.
-  --select=pattern=*.[ch]
-                  Select pattern.'
-	EXEC make "$usage2" --man
-	EXEC make "$usage1" --html
-		OUTPUT - $'return=? option=- name=--html num=0'
-		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
-<HTML>
-<HEAD>
-<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
-<TITLE>make man document</TITLE>
-</HEAD>
-<BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;make&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>make&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
-<HR>
-<DL compact>
-<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
-<DL compact>
-<DT><B>make</B> &#0091; <I>options</I> &#0093;
-<P>
-</DL>
-<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
-<DL compact>
-<DT>--<B>clobber</B>&#0091;=<I>pattern</I>&#0093;<DD>Clobber pattern. If the option value
-is omitted then <B>*</B> is assumed. The default value is <B>*.exe</B>.
-<DT>--<B>select</B>=<I>pattern=*.&#0091;ch&#0093;</I><DD>Select pattern.
-</DL></DL>
-</BODY>
-</HTML>'
-	EXEC make "$usage2" --html
-
-TEST 48 'ambiguous trio'
-	usage=$'[-][x:aha?AHA.][y:aha1?AHA1][z:aha2?AHA2]'
-	EXEC huh "$usage" --aha
-		OUTPUT - $'return=x option=-x name=--aha arg=(null) num=1'
-	EXEC huh "$usage" --noaha
-		OUTPUT - $'return=x option=-x name=--aha arg=(null) num=0'
-	EXEC huh "$usage" --aha1
-		OUTPUT - $'return=y option=-y name=--aha1 arg=(null) num=1'
-	EXEC huh "$usage" --noaha1
-		OUTPUT - $'return=y option=-y name=--aha1 arg=(null) num=0'
-	EXEC huh "$usage" --ah
-		OUTPUT - $'return=: option=-x name=--ah num=0'
-		ERROR - $'huh: --ah: ambiguous option'
-		EXIT 1
-	EXEC huh "$usage" --noah
-		OUTPUT - $'return=: option=-x name=--noah num=0'
-		ERROR - $'huh: --noah: ambiguous option'
 
 TEST 99 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'

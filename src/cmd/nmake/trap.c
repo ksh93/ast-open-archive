@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -33,11 +31,13 @@
 
 #undef	trap
 
-struct alarms
+struct Alarms_s; typedef struct Alarms_s Alarms_t;
+
+struct Alarms_s
 {
-	struct alarms*	next;
-	struct rule*	rule;
-	unsigned long	time;
+	Alarms_t*	next;
+	Rule_t*		rule;
+	Seconds_t	time;
 };
 
 static int	signals[] =		/* signals to catch		*/
@@ -73,11 +73,11 @@ static int	signals[] =		/* signals to catch		*/
 #endif
 };
 
-static struct
+static struct Trap_s
 {
 	int*		caught;		/* caught signals		*/
-	struct alarms*	alarms;		/* sorted alarm list		*/
-	struct alarms*	freealarms;	/* free alarm list		*/
+	Alarms_t*	alarms;		/* sorted alarm list		*/
+	Alarms_t*	freealarms;	/* free alarm list		*/
 } trap;
 
 /*
@@ -99,7 +99,7 @@ interrupt(register int sig)
 void
 initwakeup(int repeat)
 {
-	register struct alarms*	a;
+	register Alarms_t*	a;
 
 	NoP(repeat);
 	for (a = trap.alarms; a; a = a->next)
@@ -113,11 +113,11 @@ initwakeup(int repeat)
 static void
 setwakeup(void)
 {
-	register unsigned long	t;
-	register unsigned long	now;
+	register Seconds_t	t;
+	register Seconds_t	now;
 	int			level;
 
-	now = CURTIME;
+	now = CURSECS;
 	if (!trap.alarms)
 		t = 0;
 	else if (trap.alarms->time <= now)
@@ -129,14 +129,14 @@ setwakeup(void)
 	setvar(internal.alarm->name, fmtelapsed(t, 1), 0);
 	if (error_info.trace <= (level = (state.test & 0x00010000) ? 2 : CMDTRACE))
 	{
-		register struct alarms*	a;
+		register Alarms_t*	a;
 
 		if (a = trap.alarms)
 		{
 			error(level, "ALARM  TIME                 RULE");
 			do
 			{
-				error(level, "%6s %s %s", fmtelapsed((a->time >= now) ? (a->time - now) : 0, 1), strtime(a->time), a->rule->name);
+				error(level, "%6s %s %s", fmtelapsed((a->time >= now) ? (a->time - now) : 0, 1), timestr(tmxsns(a->time, 0)), a->rule->name);
 			} while (a = a->next);
 		}
 		else
@@ -150,16 +150,16 @@ setwakeup(void)
  */
 
 void
-wakeup(unsigned long t, register struct list* p)
+wakeup(Seconds_t t, register List_t* p)
 {
-	register struct alarms*	a;
-	register struct alarms*	z;
-	register struct alarms*	x;
-	struct alarms*		alarms;
-	unsigned long		now;
+	register Alarms_t*	a;
+	register Alarms_t*	z;
+	register Alarms_t*	x;
+	Alarms_t*		alarms;
+	Seconds_t		now;
 
 	alarms = trap.alarms;
-	now = CURTIME;
+	now = CURSECS;
 	if (t)
 	{
 		t += now;
@@ -188,7 +188,7 @@ wakeup(unsigned long t, register struct list* p)
 					if (x = trap.freealarms)
 						trap.freealarms = trap.freealarms->next;
 					else
-						x = newof(0, struct alarms, 1, 0);
+						x = newof(0, Alarms_t, 1, 0);
 					x->rule = p->rule;
 				}
 				x->time = t;
@@ -244,12 +244,12 @@ int
 handle(void)
 {
 	register int		sig;
-	register struct rule*	r;
-	register struct alarms*	a;
+	register Rule_t*	r;
+	register Alarms_t*	a;
 	char*			s;
 	char*			w;
-	struct var*		v;
-	unsigned long		t;
+	Var_t*			v;
+	Seconds_t		t;
 
 	if (!state.caught)
 		return 0;
@@ -291,7 +291,7 @@ handle(void)
 					{
 					case SIGALRM:
 						s = fmtsignal(-sig);
-						t = CURTIME;
+						t = CURSECS;
 						while ((a = trap.alarms) && a->time <= t)
 						{
 							trap.alarms = a->next;

@@ -1,3 +1,4 @@
+04-12-01 main.c: fix -zI bug that only worked for 1 input file (sort#26)
 04-09-28 main.c: fix ERROR_USAGE logic
 04-08-11 main.c: add #intermediates to -Xdump, limit intermediates to 64
 04-07-22 main.c: acces() => eaccess()

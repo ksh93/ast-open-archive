@@ -32,16 +32,14 @@ making target3'
 	EXEC	--silent
 		OUTPUT -
 
-	DO sleep 1
-	DO touch prereq1 prereq2
+	DO	touch prereq1 prereq2
 
 	EXEC	--silent
 		OUTPUT - $'making target1
 making prereq2
 making target2'
 
-	DO sleep 1
-	DO touch prereq3
+	DO	touch prereq3
 
 	EXEC	--silent
 		OUTPUT - $'making prereq3
@@ -64,7 +62,6 @@ prog.o : .ACCEPT'
 	EXEC	--silent
 		OUTPUT -
 
-	DO	sleep 1
 	DO	touch prog.c
 
 	EXEC	--silent
@@ -272,11 +269,11 @@ int h()
 + cc -O -I. -c h.c
 + cc -O -o h m.o h.o'
 
-	EXEC	--regress
+	EXEC
 		INPUT h.h $'#define YODA 1'
 		ERROR -
 
-	EXEC	--regress
+	EXEC
 		INPUT h.h $'#define GERMAN 1'
 		ERROR - $'+ cc -O -I. -c h.c
 + cc -O -o h m.o h.o'
@@ -355,7 +352,7 @@ TEST 14 '.PARAMETER + state + views'
 
 	CD	v2
 
-	EXEC	--regress
+	EXEC
 		INPUT Makefile $'.ATTRIBUTE.%.G : .TERMINAL
 .MAKEINIT : .init
 .init : .MAKE .VIRTUAL .FORCE
@@ -378,7 +375,7 @@ all : .MAKE .VIRTUAL .FORCE
 
 	EXPORT	VPATH=$TWD/v0:$TWD/v1:$TWD/v2
 
-	EXEC	--regress
+	EXEC
 		INPUT param.G $'#define aaa NEW
 #define zzz 2'
 		OUTPUT - $'PARAMETER : param.G
@@ -386,3 +383,94 @@ all : .MAKE .VIRTUAL .FORCE
 (zzz) = 2'
 
 	EXEC
+
+TEST 15 '.AFTER .FAILURE'
+
+	EXEC	GEN=true
+		INPUT Makefile $'GEN = false
+t : t.i
+	touch $(<)
+t.i : t.x (GEN)
+	$(GEN)
+.PASS.AFTER.t.i : .VIRTUAL .FORCE .AFTER
+	: $(<) : $(**) : $(<<) :
+	cp $(**) $(<<)
+.FAIL.AFTER.t.i : .VIRTUAL .FORCE .AFTER .FAILURE
+	: $(<) : $(**) : $(<<) :
+	cp /dev/null $(<<)
+t.i : .PASS.AFTER.t.i .FAIL.AFTER.t.i'
+		INPUT t.x $'SOURCE'
+		OUTPUT -
+		OUTPUT t.i $'SOURCE'
+		ERROR - $'+ true
++ : .PASS.AFTER.t.i : t.x : t.i :
++ cp t.x t.i
++ touch t'
+
+	EXEC	GEN=true
+		ERROR -
+
+	EXEC	GEN=false
+		OUTPUT t.i
+		ERROR - '+ false
+make: *** exit code 1 making t.i
++ : .FAIL.AFTER.t.i : t.x : t.i :
++ cp /dev/null t.i
++ touch t'
+
+	EXEC	GEN=false
+		ERROR -
+
+TEST 16 '.SEMAPHORE'
+
+	EXEC
+		INPUT Makefile $'
+set jobs=4
+all : a1 b1 c1
+x : .SEMAPHORE
+a1 : x
+	silent sleep 1
+	: $(<) :
+b1 : x
+	: $(<) :
+c1 :
+	: $(<) :'
+		ERROR - $'+ : c1 :
++ : a1 :
++ : b1 :'
+
+	EXEC
+		INPUT Makefile $'
+set jobs=4
+all : a2 b2 c2
+x : .SEMAPHORE .SEMAPHORE
+a2 : x
+	silent sleep 1
+	: $(<) :
+b2 : x
+	: $(<) :
+c2 : x
+	: $(<) :'
+		ERROR - $'+ : b2 :
++ : c2 :
++ : a2 :'
+
+TEST 17 '.AFTER + .SEMAPHORE'
+
+	EXEC
+		INPUT Makefile $'
+set jobs=2
+all : a b c
+x : .SEMAPHORE
+fix : .AFTER .FORCE .REPEAT
+	silent sleep 1
+	: $(<) : $(<<) :
+a b : x fix
+	: $(<) : $(<<) :
+c :
+	: $(<) : $(<<) :'
+		ERROR - $'+ : a : all :
++ : c : all :
++ : b : all :
++ : fix : a :
++ : fix : b :'

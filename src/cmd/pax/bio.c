@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2004 AT&T Corp.                  *
+*                  Copyright (c) 1987-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -141,7 +139,8 @@ blokread(register Archive_t* ap, char* buf, int n)
 		ap->io->blokflag = 1;
 		if ((i = read(ap->io->fd, buf, ap->io->blok ? 4 : n)) < 4 || !strneq(buf, "\002\014\017\013", 4))
 		{
-			if (ap->io->blok) error(3, "%s: input archive is not a BLOK file", ap->name);
+			if (ap->io->blok)
+				error(3, "%s: input archive is not a BLOK file", ap->name);
 			return i;
 		}
 		if (i > 4 && lseek(ap->io->fd, (off_t)4, SEEK_SET) != 4)
@@ -174,9 +173,11 @@ blokread(register Archive_t* ap, char* buf, int n)
 			if ((i = read(ap->io->fd, buf, j)) != j)
 				error(2, "%s: blokread blocking error", ap->name);
 		}
-		else i = 0;
+		else
+			i = 0;
 	}
-	else i = read(ap->io->fd, buf, n);
+	else
+		i = read(ap->io->fd, buf, n);
 	return i;
 }
 
@@ -219,16 +220,40 @@ blokwrite(register Archive_t* ap, char* buf, int n)
 		j = s - blk;
 		if ((i = write(ap->io->fd, blk, j)) != j)
 			error(ERROR_SYSTEM|3, "%s: blokwrite count write error (%d!=%d)", ap->name, i, j);
-		if (n <= 0) i = n;
+		if (n <= 0)
+			i = n;
 		else if ((i = write(ap->io->fd, buf, n)) != n)
 			error(ERROR_SYSTEM|3, "%s: blokwrite data write error (%d!=%d", ap->name, i, n);
 	}
-	else i = write(ap->io->fd, buf, n);
+	else
+		i = write(ap->io->fd, buf, n);
 	return i;
 }
 
 #define read(f,b,n)	blokread(f,b,n)
 #define write(f,b,n)	blokwrite(f,b,n)
+
+#endif
+
+#if 0
+
+static ssize_t
+ewrite(int f, void* b, size_t n)
+{
+	static int	count = 1;
+
+	if (!count)
+	{
+		sfprintf(sfstderr, "AHA ENOSPC\n");
+		errno = ENOSPC;
+		return -1;
+	}
+	count--;
+	return write(f, b, n);
+}
+
+#undef	write
+#define write(f,b,n)	ewrite(f,b,n)
 
 #endif
 
@@ -737,7 +762,8 @@ bflushout(register Archive_t* ap)
 		ap->io->next = ap->io->buffer;
 		while ((c = write(ap->io->fd, ap->io->next, n)) != n)
 		{
-			if (c <= 0) newio(ap, c, n);
+			if (c <= 0)
+				newio(ap, c, n);
 			else
 			{
 				ap->io->next += c;
@@ -794,7 +820,8 @@ bwrite(register Archive_t* ap, void* ab, register off_t n)
 
 					mt.mt_op = MTWEOF;
 					mt.mt_count = 1;
-					if (ioctl(ap->io->fd, MTIOCTOP, &mt) >= 0) break;
+					if (ioctl(ap->io->fd, MTIOCTOP, &mt) >= 0)
+						break;
 				}
 #endif
 				error(3, "%s: cannot write tape EOF marks", ap->name);
@@ -974,7 +1001,7 @@ newio(register Archive_t* ap, int c, int n)
 		ap->io->offset += ap->io->count - n;
 		ap->io->count = n;
 		z = ap->io->offset + ap->io->count;
-		if (ap->format->putepilogue && (*ap->format->putepilogue)(&state, ap))
+		if (ap->format->putepilogue && (*ap->format->putepilogue)(&state, ap) < 0)
 			return;
 	}
 	else

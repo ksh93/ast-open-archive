@@ -165,6 +165,18 @@ data/zzz/333/7/s.z'
 	EXEC	data -sort -name --print
 	EXEC	-sort -name -print data
 	EXEC	--sort --name --print data
+	EXEC	-H data -sort -name --print
+	EXEC	--H data -sort -name --print
+	EXEC	-metaphysical data -sort -name --print
+	EXEC	--metaphysical data -sort -name --print
+	EXEC	-L data -sort -name --print
+	EXEC	--L data -sort -name --print
+	EXEC	-logical data -sort -name --print
+	EXEC	--logical data -sort -name --print
+	EXEC	-P data -sort -name --print
+	EXEC	--P data -sort -name --print
+	EXEC	-physical data -sort -name --print
+	EXEC	--physical data -sort -name --print
 
 TEST 02 'patterns'
 	DO	DATA data

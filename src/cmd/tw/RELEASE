@@ -1,3 +1,5 @@
+04-12-24 tw.c: cmd non-zero exit status causes tw to terminate
+04-12-08 find.c: fix `option ... path ... option' logic *again*
 04-08-01 find.c: really fix -size
 04-04-15 tw.tst: add %s scanf tests
 04-04-01 find.c: handle `-sort -KEY' and `-sort KEY'

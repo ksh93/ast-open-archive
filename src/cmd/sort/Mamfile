@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,24 +35,21 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make sort
 make main.o
 make main.c
 make ${INSTALLROOT}/include/ast/iconv.h implicit
 make ${INSTALLROOT}/include/ast/ast_iconv.h implicit
-make ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_common.h dontcare
-done ${INSTALLROOT}/include/ast/ast_iconv.h
-done ${INSTALLROOT}/include/ast/iconv.h
-make ${INSTALLROOT}/include/ast/wait.h implicit
-make ${INSTALLROOT}/include/ast/ast_wait.h implicit
-done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
+make ${INSTALLROOT}/include/ast/ccode.h implicit
+make ${INSTALLROOT}/include/ast/ast_ccode.h implicit
+done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
 make ${INSTALLROOT}/include/ast/ast.h implicit
 make ${INSTALLROOT}/include/ast/vmalloc.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+make ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_common.h dontcare
 make ${INSTALLROOT}/include/ast/ast_std.h implicit
 make ${INSTALLROOT}/include/ast/ast_botch.h implicit
 done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
@@ -120,12 +117,17 @@ done ${INSTALLROOT}/include/ast/ast_version.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/ast.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${INSTALLROOT}/include/ast/ccode.h dontcare
+prev ${INSTALLROOT}/include/ast/ast_common.h implicit
+done ${INSTALLROOT}/include/ast/ast_iconv.h
+done ${INSTALLROOT}/include/ast/iconv.h
+make ${INSTALLROOT}/include/ast/wait.h implicit
+make ${INSTALLROOT}/include/ast/ast_wait.h implicit
+done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/wait.h
 prev ${INSTALLROOT}/include/ast/vmalloc.h implicit
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h
 make ${INSTALLROOT}/include/ast/sfdcgzip.h implicit
 make ${INSTALLROOT}/include/ast/sfdisc.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
@@ -158,11 +160,10 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?sort]"\" -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sort]"\" -c main.c
 done main.o generated
 make sfopen.o
 make sfopen.c
-prev ${INSTALLROOT}/include/ast/sfstr.h implicit
 prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done sfopen.c

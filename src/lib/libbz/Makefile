@@ -1,6 +1,6 @@
 :PACKAGE: ast
 
-LICENSE = type=special
+LICENSE = zlib,since=1996,author="Julian R Seward"
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 

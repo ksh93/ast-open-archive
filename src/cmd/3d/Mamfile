@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS ${mam_cc_DLL}
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make 3d
 make lib3d.a archive
@@ -382,9 +382,10 @@ done ${INSTALLROOT}/include/ast/regex.h
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/string/strmatch.c
 make ../../lib/libast/port/touch.c implicit
-prev ${INSTALLROOT}/include/ast/error.h implicit
+make ${INSTALLROOT}/include/ast/tv.h implicit
+prev ${INSTALLROOT}/include/ast/ast.h implicit
+done ${INSTALLROOT}/include/ast/tv.h dontcare
 prev ${INSTALLROOT}/include/ast/times.h implicit
-prev ${INSTALLROOT}/include/ast/ls.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 done ../../lib/libast/port/touch.c dontcare
 make ../../lib/libast/string/tokscan.c implicit
@@ -1028,6 +1029,14 @@ meta utimes3d.o %.c>%.o utimes3d.c utimes3d
 prev utimes3d.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c utimes3d.c
 done utimes3d.o generated
+make utimets3d.o
+make utimets3d.c
+prev 3d.h implicit
+done utimets3d.c
+meta utimets3d.o %.c>%.o utimets3d.c utimets3d
+prev utimets3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libcs -I${INSTALLROOT}/include/ast -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c utimets3d.c
+done utimets3d.o generated
 make vfork3d.o
 make vfork3d.c
 prev ${INSTALLROOT}/include/ast/ast_lib.h implicit
@@ -1087,7 +1096,7 @@ prev dll3d.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I../../lib/libdll -I${INSTALLROOT}/include/ast -D_BLD_dll -D_BLD_ast -DDEBUG -D_PACKAGE_ast -c dll3d.c
 done dll3d.o generated
 exec - ${AR} cr lib3d.a init.o bio.o copy.o error.o execv.o fs.o lib.o map.o pathcanon.o pathnext.o pathreal.o peek.o ast.o cs.o license.o vcs.o access3d.o brk3d.o chdir3d.o chmod3d.o chown3d.o close3d.o creat3d.o dir3d.o dup23d.o dup3d.o execve3d.o exit3d.o fchdir3d.o fchmod3d.o
-exec - ${AR} cr lib3d.a fchown3d.o fcntl3d.o fork3d.o fpathconf3d.o fstat3d.o fstatfs3d.o fstatvfs3d.o fsync3d.o ftruncate3d.o getdents3d.o kill3d.o link3d.o lseek3d.o lstat3d.o mkdir3d.o mknod3d.o mount3d.o open3d.o pathconf3d.o pipe3d.o read3d.o readlink3d.o rename3d.o rmdir3d.o sbrk3d.o stat3d.o statfs3d.o statvfs3d.o symlink3d.o syscall3d.o sysent3d.o truncate3d.o unlink3d.o utime3d.o utimes3d.o vfork3d.o write3d.o acl3d.o facl3d.o dll3d.o
+exec - ${AR} cr lib3d.a fchown3d.o fcntl3d.o fork3d.o fpathconf3d.o fstat3d.o fstatfs3d.o fstatvfs3d.o fsync3d.o ftruncate3d.o getdents3d.o kill3d.o link3d.o lseek3d.o lstat3d.o mkdir3d.o mknod3d.o mount3d.o open3d.o pathconf3d.o pipe3d.o read3d.o readlink3d.o rename3d.o rmdir3d.o sbrk3d.o stat3d.o statfs3d.o statvfs3d.o symlink3d.o syscall3d.o sysent3d.o truncate3d.o unlink3d.o utime3d.o utimes3d.o utimets3d.o vfork3d.o write3d.o acl3d.o facl3d.o dll3d.o
 exec - (ranlib lib3d.a) >/dev/null 2>&1 || true
 done lib3d.a generated
 make 3d.sh
@@ -1103,7 +1112,7 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 372 in
+exec - "")	case 366 in
 exec - 	0)	cp 3d.sh 3d
 exec - 		;;
 exec - 	*)	{
@@ -1112,7 +1121,7 @@ exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
 exec - 		cat - 3d.sh <<'!'
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
 exec - !
 exec - 		} > 3d
 exec - 		;;
@@ -1120,7 +1129,7 @@ exec - 	esac
 exec - 	;;
 exec - *)	cat - 3d.sh > 3d <<'!'
 exec - ${mam_cc_SHELLMAGIC}
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
 exec - !
 exec - 	;;
 exec - esac

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -63,46 +61,50 @@ static char*	statusname[] =
 
 #endif
 
-struct joblist				/* job list cell		*/
-{
-	struct joblist*	next;		/* next in list			*/
-	struct joblist*	prev;		/* prev in list			*/
-	Cojob_t*	cojob;		/* coshell job info		*/
-	struct rule*	target;		/* target for job		*/
-	struct list*	prereqs;	/* these must be done		*/
-	struct context* context;	/* job target context		*/
-	char*		action;		/* unexpanded action		*/
-	int		status;		/* job status			*/
-	unsigned long	flags;		/* job flags			*/
-};
+struct Context_s; typedef struct Context_s Context_t;
+struct Joblist_s; typedef struct Joblist_s Joblist_t;
 
-struct context				/* job target context		*/
+struct Context_s			/* job target context		*/
 {
-	struct context*	next;		/* for free list link		*/
-	struct frame*	frame;		/* active target frames		*/
-	struct frame*	last;		/* last active target frame	*/
+	Context_t*	next;		/* for free list link		*/
+	Frame_t*	frame;		/* active target frames		*/
+	Frame_t*	last;		/* last active target frame	*/
 	int		targetview;	/* state.targetview		*/
 };
 
-struct jobstate				/* job state			*/
+struct Joblist_s			/* job list cell		*/
 {
-	struct joblist*	firstjob;	/* first job			*/
-	struct joblist*	lastjob;	/* last job			*/
-	struct joblist*	freejob;	/* free jobs			*/
-	struct frame*	freeframe;	/* free target frames		*/
-	struct context* freecontext;	/* free job context headers	*/
-	int		intermediate;	/* # INTERMEDIATE jobs		*/
-	Sfio_t*		tmp;		/* tmp stream			*/
+	Joblist_t*	next;		/* next in list			*/
+	Joblist_t*	prev;		/* prev in list			*/
+	Cojob_t*	cojob;		/* coshell job info		*/
+	Rule_t*		target;		/* target for job		*/
+	List_t*		prereqs;	/* these must be done		*/
+	Context_t* 	context;	/* job target context		*/
+	char*		action;		/* unexpanded action		*/
+	int		status;		/* job status			*/
+	Flags_t		flags;		/* job flags			*/
 };
 
-static struct jobstate	jobs;
+typedef struct Jobstate_s		/* job state			*/
+{
+	Joblist_t*	firstjob;	/* first job			*/
+	Joblist_t*	lastjob;	/* last job			*/
+	Joblist_t*	freejob;	/* free jobs			*/
+	Frame_t*	freeframe;	/* free target frames		*/
+	Context_t*	freecontext;	/* free job context headers	*/
+	int		intermediate;	/* # INTERMEDIATE jobs		*/
+	Sfio_t*		tmp;		/* tmp stream			*/
+	Rule_t*		triggered;	/* triggered but not yet a job	*/
+} Jobstate_t;
+
+static Jobstate_t	jobs;
 
 /*
  * accept r as up to date
  */
 
 static void
-accept(register struct rule* r)
+accept(register Rule_t* r)
 {
 	if (r->property & P_state)
 	{
@@ -146,9 +148,9 @@ accept(register struct rule* r)
 			error(0, "touch %s", r->name);
 		if (state.exec)
 		{
-			struct stat	st;
+			Stat_t		st;
 
-			if (stat(r->name, &st) || (unsigned long)st.st_mtime < state.start && touch(r->name, (time_t)0, (time_t)0, 0))
+			if (stat(r->name, &st) || tmxgetmtime(&st) < state.start && tmxtouch(r->name, (Time_t)0, (Time_t)0, (Time_t)0, 0))
 				error(ERROR_SYSTEM|1, "cannot touch %s", r->name);
 			statetime(r, 0);
 		}
@@ -164,16 +166,16 @@ accept(register struct rule* r)
  */
 
 int
-apply(register struct rule* r, char* lhs, char* rhs, char* act, unsigned long flags)
+apply(register Rule_t* r, char* lhs, char* rhs, char* act, Flags_t flags)
 {
-	register struct rule*	x;
+	register Rule_t*	x;
 	int			oop;
 	int			errors;
-	struct rule		lhs_rule;
-	struct rule		rhs_rule;
-	struct list		lhs_prereqs;
-	struct frame		lhs_frame;
-	struct frame*		oframe;
+	Rule_t			lhs_rule;
+	Rule_t			rhs_rule;
+	List_t			lhs_prereqs;
+	Frame_t			lhs_frame;
+	Frame_t*		oframe;
 
 	zero(lhs_rule);
 	zero(rhs_rule);
@@ -204,7 +206,7 @@ apply(register struct rule* r, char* lhs, char* rhs, char* act, unsigned long fl
 	{
 		if (r->prereqs)
 		{
-			unsigned long	t;
+			Time_t		t;
 			char*		oaction;
 
 			oaction = r->action;
@@ -232,7 +234,7 @@ apply(register struct rule* r, char* lhs, char* rhs, char* act, unsigned long fl
  */
 
 Sfio_t*
-fapply(struct rule* r, char* lhs, char* rhs, char* act, unsigned long flags)
+fapply(Rule_t* r, char* lhs, char* rhs, char* act, Flags_t flags)
 {
 	Sfio_t*	fp;
 
@@ -255,9 +257,9 @@ fapply(struct rule* r, char* lhs, char* rhs, char* act, unsigned long flags)
  */
 
 char*
-call(register struct rule* r, char* args)
+call(register Rule_t* r, char* args)
 {
-	register struct var*	v;
+	register Var_t*		v;
 
 	if (r->property & P_functional)
 	{
@@ -273,12 +275,12 @@ call(register struct rule* r, char* args)
  */
 
 static void
-commit(struct joblist* job, register char* s)
+commit(Joblist_t* job, register char* s)
 {
 	register char*		t;
 	register char*		v;
-	register struct rule*	r;
-	struct stat		st;
+	register Rule_t*	r;
+	Stat_t			st;
 
 	if (t = strrchr(s, '/'))
 	{
@@ -298,7 +300,7 @@ commit(struct joblist* job, register char* s)
 			if (stat(v, &st))
 				r = 0;
 		}
-		if (r || state.targetcontext && (!r || !r->time) && (st.st_mode = (S_IRWXU|S_IRWXG|S_IRWXO)) && (st.st_mtime = state.start))
+		if (r || state.targetcontext && (!r || !r->time) && (st.st_mode = (S_IRWXU|S_IRWXG|S_IRWXO)) && tmxsetmtime(&st, state.start))
 		{
 			/*
 			 * why not mkdir -p here?
@@ -319,7 +321,7 @@ commit(struct joblist* job, register char* s)
 			if (r->dynamic & D_alias)
 				oldname(r);
 			r->view = 0;
-			r->time = st.st_mtime;
+			r->time = tmxgetmtime(&st);
 			if (r->dynamic & D_scanned)
 				unbind(NiL, (char*)r, NiL);
 		}
@@ -332,13 +334,13 @@ commit(struct joblist* job, register char* s)
  */
 
 static void
-push(struct joblist* job)
+push(Joblist_t* job)
 {
-	register struct context*	z;
-	register struct frame*		p;
-	register struct rule*		r;
-	int				n;
-	unsigned long			tm;
+	register Context_t*	z;
+	register Frame_t*	p;
+	register Rule_t*	r;
+	int			n;
+	Time_t			tm;
 
 	job->status |= PUSHED;
 	if (z = job->context)
@@ -372,13 +374,13 @@ push(struct joblist* job)
  */
 
 static void
-pop(struct joblist* job)
+pop(Joblist_t* job)
 {
-	register struct context*	z;
-	register struct frame*		p;
-	register struct rule*		r;
-	int				n;
-	unsigned long			tm;
+	register Context_t*	z;
+	register Frame_t*	p;
+	register Rule_t*	r;
+	int			n;
+	Time_t			tm;
 
 	if (z = job->context)
 	{
@@ -409,10 +411,18 @@ pop(struct joblist* job)
  */
 
 static void
-discard(register struct joblist* job)
+discard(register Joblist_t* job)
 {
-	register struct context*	z;
+	register Context_t*	z;
+	register List_t*	p;
 
+	if (job->flags & CO_SEMAPHORES)
+		for (p = job->prereqs; p; p = p->next)
+			if (p->rule->semaphore)
+			{
+				p->rule->semaphore++;
+				p->rule->status = EXISTS;
+			}
 	if (job->flags & CO_PRIMARY)
 	{
 		job->prereqs->next = 0;
@@ -443,19 +453,19 @@ discard(register struct joblist* job)
  */
 
 static void
-save(struct joblist* job)
+save(Joblist_t* job)
 {
-	register struct frame*	o;
-	register struct frame*	p;
-	register struct frame*	x;
-	struct context*		z;
+	register Frame_t*	o;
+	register Frame_t*	p;
+	register Frame_t*	x;
+	Context_t*		z;
 
 	if (job->action && !job->context)
 	{
 		if (z = jobs.freecontext)
 			jobs.freecontext = jobs.freecontext->next;
 		else
-			z = newof(0, struct context, 1, 0);
+			z = newof(0, Context_t, 1, 0);
 		z->targetview = state.targetview;
 		o = state.frame;
 		p = 0;
@@ -464,7 +474,7 @@ save(struct joblist* job)
 			if (x = jobs.freeframe)
 				jobs.freeframe = jobs.freeframe->parent;
 			else
-				x = newof(0, struct frame, 1, 0);
+				x = newof(0, Frame_t, 1, 0);
 			if (p)
 				p->parent = x;
 			else
@@ -490,7 +500,7 @@ save(struct joblist* job)
  */
 
 static void
-restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
+restore(register Joblist_t* job, Sfio_t* buf, Sfio_t* att)
 {
 	register char*	s;
 	register char*	b;
@@ -501,7 +511,7 @@ restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
 	int		downlen;
 	int		localview;
 	void*		pos;
-	struct var*	v;
+	Var_t*		v;
 	Sfio_t*		opt;
 	Sfio_t*		tmp;
 	Sfio_t*		context;
@@ -511,8 +521,8 @@ restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
 	state.localview = state.mam.statix && !state.expandview && state.user && !(job->flags & CO_ALWAYS);
 	if ((job->flags & CO_LOCALSTACK) || (job->target->dynamic & D_hasscope))
 	{
-		register struct rule*	r;
-		register struct list*	p;
+		register Rule_t*	r;
+		register List_t*	p;
 
 		job->flags |= CO_LOCALSTACK;
 		pos = pushlocal();
@@ -532,8 +542,8 @@ restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
 	context = state.context;
 	if (state.targetcontext && *(u = unbound(job->target)) != '/' && (s = strrchr(u, '/')))
 	{
+		size_t	n;
 		int	c;
-		long	n;
 
 		tmp = sfstropen();
 		downlen = s - u;
@@ -610,19 +620,19 @@ restore(register struct joblist* job, Sfio_t* buf, Sfio_t* att)
 	pop(job);
 }
 
-static int	done(struct joblist* job, int, Cojob_t*);
+static int	done(Joblist_t* job, int, Cojob_t*);
 
 /*
  * send a job to the coshell for execution
  */
 
 static void
-execute(register struct joblist* job)
+execute(register Joblist_t* job)
 {
-	register struct list*	p;
+	register List_t*	p;
 	char*			t;
 	int			flags;
-	struct rule*		r;
+	Rule_t*			r;
 	Sfio_t*			tmp;
 	Sfio_t*			att;
 	Sfio_t*			sp;
@@ -635,7 +645,7 @@ execute(register struct joblist* job)
 	if (state.targetcontext || state.maxview && !state.fsview && *job->target->name != '/' && (!(job->target->dynamic & D_regular) || job->target->view))
 		commit(job, job->target->name);
 	if ((state.mam.dynamic || state.mam.regress) && state.user && !(job->target->property & (P_after|P_before|P_dontcare|P_make|P_state|P_virtual)))
-		sfprintf(state.mam.out, "%sinit %s %lu\n", state.mam.label, mamname(job->target), state.mam.regress ? 0L : CURTIME);
+		sfprintf(state.mam.out, "%sinit %s %s\n", state.mam.label, mamname(job->target), timefmt(NiL, CURTIME));
 	if (!(job->flags & CO_ALWAYS))
 	{
 		if (state.touch)
@@ -724,9 +734,12 @@ execute(register struct joblist* job)
 		 */
 
 		if (job->target->dynamic & D_hassemaphore)
+		{
+			job->flags |= CO_SEMAPHORES;
 			for (p = job->prereqs; p; p = p->next)
 				if (p->rule->semaphore && --p->rule->semaphore == 1)
 					p->rule->status = MAKING;
+		}
 
 		/*
 		 * check status and sync
@@ -750,10 +763,10 @@ execute(register struct joblist* job)
 
 						sfmove(sp, tmp, SF_UNBOUND, -1);
 						t = sfstrbase(tmp);
-						e = sfstrrel(tmp, 0);
+						e = sfstrseek(tmp, 0, SEEK_CUR);
 						while (e > t && *(e - 1) == '\n')
 							e--;
-						sfstrset(tmp, e - t);
+						sfstrseek(tmp, e - t, SEEK_SET);
 						setvar(job->target->name, sfstruse(tmp), 0);
 					}
 					sfclose(sp);
@@ -773,11 +786,11 @@ execute(register struct joblist* job)
  */
 
 static int
-cancel(register struct rule* r, register struct list* p)
+cancel(register Rule_t* r, register List_t* p)
 {
-	register struct rule*	a;
-	register struct rule*	s;
-	register struct rule*	t;
+	register Rule_t*	a;
+	register Rule_t*	s;
+	register Rule_t*	t;
 
 	if (r->must)
 	{
@@ -812,47 +825,56 @@ cancel(register struct rule* r, register struct list* p)
  */
 
 static int
-done(register struct joblist* job, int clear, Cojob_t* cojob)
+done(register Joblist_t* job, int clear, Cojob_t* cojob)
 {
-	register struct list*	p;
-	register struct rule*	a;
-	unsigned long		tm;
+	register List_t*	p;
+	register Rule_t*	a;
+	Time_t			tm;
 	int			n;
-	struct rule*		jammed;
-	struct rule*		waiting;
+	int			semaphore;
+	Rule_t*			jammed;
+	Rule_t*			waiting;
 
+	if (clear && jobs.triggered && (a = staterule(RULE, jobs.triggered, NiL, 0)) && (a->property & P_force))
+	{
+		a->time = 0;
+		state.savestate = 1;
+	}
  another:
 	job->cojob = 0;
 	jobstatus();
 	if (job->status == INTERMEDIATE)
 		state.intermediate--;
-	else if (!clear && job->status == RUNNING && !(job->flags & CO_ERRORS) && (job->target->dynamic & D_hasafter))
+	else if (!clear && job->status == RUNNING && (job->target->dynamic & D_hasafter) && hasafter(job->target, (job->flags & CO_ERRORS) ? P_failure : P_after))
 	{
 		job->status = BEFORE;
 		for (p = job->target->prereqs; p; p = p->next)
 		{
 			if ((a = p->rule)->dynamic & D_alias)
 				a = makerule(a->name);
-			if (a->status == MAKING || !(a->property & P_make) && a->status == UPDATE)
+			if (a->status == MAKING && !a->semaphore || !(a->property & P_make) && a->status == UPDATE)
 				return 0;
 		}
 	after:
 		push(job);
-		n = makeafter(job->target);
+		n = makeafter(job->target, (job->flags & CO_ERRORS) ? P_failure : P_after);
 		pop(job);
 		if (n)
 			job->flags |= CO_ERRORS;
 		else
+		{
+			job->flags &= ~CO_ERRORS;
 			for (p = job->prereqs; p; p = p->next)
 			{
 				if ((a = p->rule)->dynamic & D_alias)
 					a = makerule(a->name);
-				if (a->status == MAKING)
+				if (a->status == MAKING && !a->semaphore)
 				{
 					job->status = AFTER;
 					return !state.coshell || state.coshell->outstanding < state.jobs;
 				}
 			}
+		}
 	}
 
 	/*
@@ -863,7 +885,7 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 		job->target->status = (job->flags & CO_ERRORS) ? ((job->target->property & P_dontcare) ? IGNORE : FAILED) : EXISTS;
 	tm = statetime(job->target, 0);
 	if (n = cojob && (state.mam.dynamic || state.mam.regress) && state.user && !(job->target->property & (P_after|P_before|P_dontcare|P_make|P_state|P_virtual)))
-		sfprintf(state.mam.out, "%scode %s %d %lu %lu%s%s\n", state.mam.label, (job->target != state.frame->target || (job->target->property & P_after)) ? mamname(job->target) : "-", EXIT_CODE(cojob->status), state.mam.regress ? 0L : tm, state.mam.regress ? 0L : CURTIME, (job->target->dynamic & D_same) ? " same" : null, cojob->status && (job->flags & CO_IGNORE) ? " ignore" : null);
+		sfprintf(state.mam.out, "%scode %s %d %s %s%s%s\n", state.mam.label, (job->target != state.frame->target || (job->target->property & P_after)) ? mamname(job->target) : "-", EXIT_CODE(cojob->status), timefmt(NiL, tm), timefmt(NiL, CURTIME), (job->target->dynamic & D_same) ? " same" : null, cojob->status && (job->flags & CO_IGNORE) ? " ignore" : null);
 	if ((job->target->property & (P_joint|P_target)) == (P_joint|P_target))
 		for (p = job->target->prereqs->rule->prereqs; p; p = p->next)
 			if (p->rule != job->target)
@@ -872,7 +894,7 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 					p->rule->status = (job->flags & CO_ERRORS) ? ((p->rule->property & P_dontcare) ? IGNORE : FAILED) : EXISTS;
 				tm = statetime(p->rule, 0);
 				if (n)
-					sfprintf(state.mam.out, "%scode %s %d %lu%s%s\n", state.mam.label, mamname(p->rule), EXIT_CODE(cojob->status), state.mam.regress ? 0L : tm, (p->rule->dynamic & D_same) ? " same" : null, cojob->status && (job->flags & CO_IGNORE) ? " ignore" : null);
+					sfprintf(state.mam.out, "%scode %s %d %s%s%s\n", state.mam.label, mamname(p->rule), EXIT_CODE(cojob->status), timefmt(NiL, tm), (p->rule->dynamic & D_same) ? " same" : null, cojob->status && (job->flags & CO_IGNORE) ? " ignore" : null);
 			}
 
 	/*
@@ -891,6 +913,7 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 			case BLOCKED:
 			case READY:
 				n = READY;
+				semaphore = 1;
 				waiting = 0;
 				for (p = job->prereqs; p; p = p->next)
 				{
@@ -913,6 +936,8 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 						}
 						waiting = 0;
 						n = BLOCKED;
+						if (!a->semaphore)
+							semaphore = 0;
 						break;
 					default:
 						continue;
@@ -921,14 +946,14 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 				}
 				if (waiting)
 					jammed = waiting;
-				else if (job->status == AFTER)
+				else if (!clear && job->status == AFTER)
 				{
-					if (n == READY)
+					if (n == READY || semaphore)
 						goto another;
 				}
 				else if (!clear && job->status == BEFORE)
 				{
-					if (n == READY)
+					if (n == READY || semaphore)
 						goto after;
 				}
 				else if ((job->status = n) == READY)
@@ -993,13 +1018,12 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 int
 block(int check)
 {
-	register Cojob_t*		cojob;
-	register struct joblist*	job;
-	register struct list*		p;
-	struct rule*			r;
-	int				n;
-	int				clear = 0;
-	int				resume = 0;
+	register Cojob_t*	cojob;
+	register Joblist_t*	job;
+	Rule_t*			r;
+	int			n;
+	int			clear = 0;
+	int			resume = 0;
 
 	if (!state.coshell || state.coshell->outstanding <= 0)
 	{
@@ -1062,7 +1086,7 @@ block(int check)
 				return 0;
 			break;
 		}
-		job = (struct joblist*)cojob->local;
+		job = (Joblist_t*)cojob->local;
 		if (r = getrule(external.jobdone))
 		{
 			if (!jobs.tmp)
@@ -1073,7 +1097,11 @@ block(int check)
 		if (cojob->status)
 		{
 			if (n = !EXITED_TERM(cojob->status) || EXIT_CODE(cojob->status))
+			{
 				error(2, "*** %s code %d making %s%s", ERROR_translate(NiL, NiL, NiL, EXITED_TERM(cojob->status) ? "termination" : "exit"), EXIT_CODE(cojob->status), job->target->name, (job->flags & CO_IGNORE) ? ERROR_translate(NiL, NiL, NiL, " ignored") : null);
+				if ((job->target->dynamic & D_hasafter) && hasafter(job->target, P_failure))
+					n = 0;
+			}
 			if (!(job->flags & CO_IGNORE))
 			{
 				job->flags |= CO_ERRORS;
@@ -1088,18 +1116,6 @@ block(int check)
 				clear = 1;
 		}
 		message((-3, "job: %s: interrupt=%d clear=%d status=%d flags=%08x", job->target->name, state.interrupt, clear, cojob->status, job->flags));
-
-		/*
-		 * release semaphores
-		 */
-
-		if (job->target->dynamic & D_hassemaphore)
-			for (p = job->prereqs; p; p = p->next)
-				if (p->rule->semaphore)
-				{
-					p->rule->semaphore++;
-					p->rule->status = EXISTS;
-				}
 
 		/*
 		 * job is done
@@ -1130,14 +1146,14 @@ block(int check)
  */
 
 int
-complete(register struct rule* r, register struct list* p, unsigned long* tm, long flags)
+complete(register Rule_t* r, register List_t* p, Time_t* tm, Flags_t flags)
 {
-	register int		errors = 0;
-	int			check = 0;
-	int			recent;
-	struct list		tmp;
-	struct list*		q;
-	unsigned long		tprereqs;
+	register int	errors = 0;
+	int		check = 0;
+	int		recent;
+	List_t		tmp;
+	List_t*		q;
+	Time_t		tprereqs;
 
 	if (r)
 	{
@@ -1184,8 +1200,8 @@ complete(register struct rule* r, register struct list* p, unsigned long* tm, lo
 			r->status = EXISTS;
 		if (recent && (r->property & (P_joint|P_target)) == (P_joint|P_target))
 		{
-			register struct rule*	x;
-			register struct rule*	s;
+			register Rule_t*	x;
+			register Rule_t*	s;
 
 			s = staterule(RULE, r, NiL, 1);
 			for (q = r->prereqs->rule->prereqs; q; q = q->next)
@@ -1249,12 +1265,12 @@ drop(void)
  */
 
 void
-trigger(register struct rule* r, struct rule* a, char* action, unsigned long flags)
+trigger(register Rule_t* r, Rule_t* a, char* action, Flags_t flags)
 {
-	register struct joblist*	job;
-	register struct list*		p;
-	struct list*			prereqs;
-	int				n;
+	register Joblist_t*	job;
+	register List_t*	p;
+	List_t*			prereqs;
+	int			n;
 
 	/*
 	 * update flags
@@ -1279,6 +1295,8 @@ trigger(register struct rule* r, struct rule* a, char* action, unsigned long fla
 	if (action)
 	{
 		message((-1, "triggering %s action%s%s", r->name, r == a ? null : " using ", r == a ? null : a->name));
+		if (state.exec)
+			jobs.triggered = r;
 		r->dynamic |= D_triggered;
 		if ((r->property & (P_joint|P_target)) == (P_joint|P_target))
 			for (p = r->prereqs->rule->prereqs; p; p = p->next)
@@ -1354,8 +1372,16 @@ trigger(register struct rule* r, struct rule* a, char* action, unsigned long fla
 					p->rule->status = r->status;
 					p->rule->time = r->time;
 				}
-		if (r->status != FAILED && (r->dynamic & (D_hasafter|D_triggered)) == (D_hasafter|D_triggered) && (makeafter(r) || complete(NiL, prereqs, NiL, 0)))
-			r->status = (r->property & P_dontcare) ? IGNORE : FAILED;
+		if ((r->dynamic & (D_hasafter|D_triggered)) == (D_hasafter|D_triggered))
+		{
+			if (r->status == FAILED)
+			{
+				if (hasafter(r, P_failure) && !makeafter(r, P_failure) && !complete(NiL, prereqs, NiL, 0))
+					r->status = EXISTS;
+			}
+			else if (hasafter(r, P_after) && (makeafter(r, P_after) || complete(NiL, prereqs, NiL, 0)))
+				r->status = (r->property & P_dontcare) ? IGNORE : FAILED;
+		}
 	}
 	else
 	{
@@ -1439,7 +1465,7 @@ trigger(register struct rule* r, struct rule* a, char* action, unsigned long fla
 			if (job = jobs.freejob)
 				jobs.freejob = jobs.freejob->next;
 			else
-				job = newof(0, struct joblist, 1, 0);
+				job = newof(0, Joblist_t, 1, 0);
 			if (flags & CO_URGENT)
 			{
 				job->prev = 0;
@@ -1476,7 +1502,7 @@ trigger(register struct rule* r, struct rule* a, char* action, unsigned long fla
 			if (n == READY)
 			{
 				execute(job);
-				if (r->status != FAILED && (r->dynamic & D_hasafter))
+				if (r->dynamic & D_hasafter)
 					save(job);
 			}
 			else
@@ -1493,9 +1519,14 @@ trigger(register struct rule* r, struct rule* a, char* action, unsigned long fla
 						p->rule->status = EXISTS;
 			if ((r->dynamic & (D_hasafter|D_triggered)) == (D_hasafter|D_triggered))
 			{
-				if (makeafter(r) || complete(NiL, prereqs, NiL, 0))
+				if (r->status == FAILED)
+				{
+					if (hasafter(r, P_failure) && !makeafter(r, P_failure) && !complete(NiL, prereqs, NiL, 0))
+						r->status = EXISTS;
+				}
+				else if (hasafter(r, P_after) && (makeafter(r, P_after) || complete(NiL, prereqs, NiL, 0)))
 					r->status = (r->property & P_dontcare) ? IGNORE : FAILED;
-				else
+				if (r->status == EXISTS)
 				{
 					char*	t;
 					Sfio_t*	tmp;
@@ -1536,9 +1567,9 @@ resolve(char* file, int fd, int mode)
 void
 dumpjobs(int level)
 {
-	register struct joblist*	job;
-	int				indent;
-	int				line;
+	register Joblist_t*	job;
+	int			indent;
+	int			line;
 
 	if (state.coshell && error_info.trace <= level)
 	{

@@ -16,6 +16,7 @@
 
 #include <ast.h>
 #include <tm.h>
+#include <tv.h>
 
 #include "tcl.h"
 
@@ -32,10 +33,10 @@ TclpGetSeconds()
 unsigned long
 TclpGetClicks()
 {
-	struct timeval	tv;
+	Tv_t	tv;
 
-	tmtimeofday(&tv);
-	return 1000000 * tv.tv_sec + tv.tv_usec;
+	tvgettime(&tv);
+	return 1000000 * tv.tv_sec + tv.tv_nsec / 1000;
 }
 
 int
@@ -50,11 +51,11 @@ void
 TclpGetTime(tp)
 Tcl_Time*	tp;
 {
-	struct timeval	tv;
+	Tv_t	tv;
 
-	tmtimeofday(&tv);
+	tvgettime(&tv);
 	tp->sec = tv.tv_sec;
-	tp->usec = tv.tv_usec;
+	tp->usec = tv.tv_nsec / 1000;
 }
 
 #else /* _PACKAGE_ast */

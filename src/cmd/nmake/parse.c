@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -82,24 +80,26 @@
 #define POPLOCAL(p)	do{for(p=pp->local;p;p=p->next)if(!(p->newv.property&V_scope))p->bucket->value=(char*)&p->newv;}while(0)
 
 #define freelocal(x)	do{x->next=freelocals;freelocals=x;}while(0)
-#define newlocal(x)	do{if(x=freelocals)freelocals=x->next;else x=newof(0,struct local,1,0);}while(0)
+#define newlocal(x)	do{if(x=freelocals)freelocals=x->next;else x=newof(0,Local_t,1,0);}while(0)
 
-struct local				/* local variable state		*/
+struct Local_s; typedef struct Local_s Local_t;
+
+struct Local_s				/* local variable state		*/
 {
 	Hash_bucket_t*	bucket;		/* table.var hash bucket	*/
-	struct var*	oldv;		/* old variable value		*/
-	struct var	newv;		/* new variable info		*/
-	struct local*	next;		/* next in list			*/
+	Var_t*		oldv;		/* old variable value		*/
+	Var_t		newv;		/* new variable info		*/
+	Local_t*	next;		/* next in list			*/
 	int		line;		/* declaration line number	*/
 };
 
-struct control				/* flow control block stack	*/
+typedef struct Control_s		/* flow control block stack	*/
 {
 	int		flags;		/* block flags			*/
 	union
 	{
 	char*		buffer;		/* loop body buffer		*/
-	unsigned long	offset;		/* loop body ip offset		*/
+	size_t		offset;		/* loop body ip offset		*/
 	}		body;
 	int		line;		/* loop line number		*/
 	union
@@ -111,7 +111,7 @@ struct control				/* flow control block stack	*/
 	}		w;
 	struct
 	{
-	struct var*	var;		/* for loop variable		*/
+	Var_t*		var;		/* for loop variable		*/
 	char**		args;		/* for loop arg vector		*/
 	Sfio_t*		tmp;		/* for loop arg tmp		*/
 	Sfio_t*		vec;		/* for loop argv tmp		*/
@@ -122,12 +122,12 @@ struct control				/* flow control block stack	*/
 	}		pos;		/* for loop position		*/
 	}		f;
 	}		loop;
-};
+} Control_t;
 
-struct parseinfo			/* recursive parse state stack	*/
+typedef struct Parseinfo_s		/* recursive parse state stack	*/
 {
-	struct control*	cp;		/* control block pointer	*/
-	struct control*	block;		/* control block lo water	*/
+	Control_t*	cp;		/* control block pointer	*/
+	Control_t*	block;		/* control block lo water	*/
 
 	/* the rest are implicitly initialized */
 
@@ -140,7 +140,7 @@ struct parseinfo			/* recursive parse state stack	*/
 	char*		bp;		/* input buffer pointer		*/
 	char*		stashget;	/* loop body stash get		*/
 	char*		pushback;	/* line pushback pointer	*/
-	struct local*	local;		/* local variables		*/
+	Local_t*	local;		/* local variables		*/
 	int		checkhere;	/* <<? offset			*/
 	int		line;		/* prev level input line number	*/
 	int		splice;		/* splice line			*/
@@ -150,7 +150,7 @@ struct parseinfo			/* recursive parse state stack	*/
 	unsigned int	newline:1;	/* \n at *bp replaced by 0	*/
 	unsigned int	prompt:1;	/* interactive input with prompt*/
 	unsigned int	stashput:1;	/* put lines in stash		*/
-};
+} Parseinfo_t;
 
 /*
  * WARNING: getline() uses the first keyword char
@@ -178,12 +178,12 @@ static Namval_t		controls[] =	/* control keywords		*/
 	"while",	CON_while,
 };
 
-static struct control	constack[PARSEDEPTH * 3];
+static Control_t	constack[PARSEDEPTH * 3];
 
-static struct parseinfo	parsestack[PARSEDEPTH] = { &constack[0], &constack[0] };
-static struct parseinfo* pp = &parsestack[0];
+static Parseinfo_t	parsestack[PARSEDEPTH] = { &constack[0], &constack[0] };
+static Parseinfo_t*	pp = &parsestack[0];
 
-static struct local*	freelocals;
+static Local_t*		freelocals;
 
 /*
  * unwind the parse stack to level on errors
@@ -192,10 +192,10 @@ static struct local*	freelocals;
 void
 unparse(int level)
 {
-	register struct local*		lcl;
-	register struct local*		olcl;
-	register struct control*	cp;
-	register struct rule*		r;
+	register Local_t*	lcl;
+	register Local_t*	olcl;
+	register Control_t*	cp;
+	register Rule_t*	r;
 
 	if (pp >= &parsestack[elementsof(parsestack)])
 		pp = &parsestack[elementsof(parsestack) - 1];
@@ -254,8 +254,8 @@ unparse(int level)
 static void
 declare(char* t, int line, long flags)
 {
-	register struct var*	v;
-	register struct local*	p;
+	register Var_t*		v;
+	register Local_t*	p;
 	register char*		s;
 	register char*		d;
 
@@ -331,8 +331,8 @@ local(Sfio_t* xp, char* v)
 	register char*	a;
 	long		top;
 	int		argn;
-	struct control*	cp;
-	struct local*	p;
+	Control_t*	cp;
+	Local_t*	p;
 	int		argc = 0;
 	int		optional = 0;
 	char*		argv = 0;
@@ -351,7 +351,7 @@ local(Sfio_t* xp, char* v)
 	top = sfstrtell(xp);
 	expand(xp, v);
 	sfputc(xp, 0);
-	v = sfstrset(xp, top);
+	v = sfstrseek(xp, top, SEEK_SET);
 	if (t)
 		*t = '\n';
 	while (t = getarg(&v, NiL))
@@ -445,7 +445,7 @@ iterate(void)
 {
 	register char*		p;
 	register char**		ap;
-	register struct var*	v = pp->cp->loop.f.var;
+	register Var_t*		v = pp->cp->loop.f.var;
 
 	if (pp->cp->flags & CON_scan)
 	{
@@ -489,8 +489,8 @@ directive(register char* s)
 {
 	register char*	t;
 	register int	n;
-	struct rule*	r;
-	struct stat	st;
+	Rule_t*		r;
+	Stat_t		st;
 
 	static Sfio_t*	file;
 
@@ -526,7 +526,7 @@ directive(register char* s)
 							r->property |= P_dontcare;
 						else
 						{
-							r->time = st.st_mtime;
+							r->time = tmxgetmtime(&st);
 							compref(COMP_INCLUDE, r->name, r->time);
 						}
 					}
@@ -567,7 +567,7 @@ readline(int lead)
 	register int	c;
 	register int	n;
 	register int	q;
-	struct rule*	r;
+	Rule_t*		r;
 	int		start;
 	int		here;
 	int		m;
@@ -580,9 +580,9 @@ readline(int lead)
 		pp->pushback = 0;
 		if (pp->fp)
 		{
-			if (lead > 0 && (t = sfstrrel(pp->ip, 0) - 1) > s && *(t - 1) == '\\')
+			if (lead > 0 && (t = sfstrseek(pp->ip, 0, SEEK_CUR) - 1) > s && *(t - 1) == '\\')
 			{
-				sfstrrel(pp->ip, -2);
+				sfstrseek(pp->ip, -2, SEEK_CUR);
 				line = s - sfstrbase(pp->ip);
 				goto pushback;
 			}
@@ -617,11 +617,11 @@ readline(int lead)
 		}
 		if (pp->stashput)
 		{
-			sfstrrel(pp->ip, -1);
+			sfstrseek(pp->ip, -1, SEEK_CUR);
 			sfputc(pp->ip, '\n');
 		}
 		else
-			sfstrset(pp->ip, 0);
+			sfstrseek(pp->ip, 0, SEEK_SET);
 		line = sfstrtell(pp->ip);
 	pushback:
 		do
@@ -674,18 +674,18 @@ readline(int lead)
 				error_info.line++;
 				if (!q || q == COMMENT)
 				{
-					t = sfstrrel(pp->ip, 0);
+					t = sfstrseek(pp->ip, 0, SEEK_CUR);
 					s = sfstrbase(pp->ip) + line;
 					while (t > s && (*(t - 1) == ' ' || *(t - 1) == '\t'))
 						t--;
-					sfstrset(pp->ip, t - sfstrbase(pp->ip));
+					sfstrseek(pp->ip, t - sfstrbase(pp->ip), SEEK_SET);
 					sfputc(pp->ip, 0);
 					s = sfstrbase(pp->ip) + line;
 					if (*s == COMMENT)
 					{
 						directive(s);
 						*s = 0;
-						sfstrset(pp->ip, line + 1);
+						sfstrseek(pp->ip, line + 1, SEEK_SET);
 					}
 					return s;
 				}
@@ -736,7 +736,7 @@ readline(int lead)
 				}
 				break;
 			case '/':
-				if (!q && (sfstrtell(pp->ip) == line || isspace(*(sfstrrel(pp->ip, 0) - 1))))
+				if (!q && (sfstrtell(pp->ip) == line || isspace(*(sfstrseek(pp->ip, 0, SEEK_CUR) - 1))))
 					switch (c = sfgetc(pp->fp))
 					{
 					case EOF:
@@ -797,7 +797,7 @@ readline(int lead)
 					}
 				break;
 			case COMMENT:
-				if (!q && sfstrtell(pp->ip) > line && isspace(*(sfstrrel(pp->ip, 0) - 1)))
+				if (!q && sfstrtell(pp->ip) > line && isspace(*(sfstrseek(pp->ip, 0, SEEK_CUR) - 1)))
 					for (q = c;;)
 						switch (sfgetc(pp->fp))
 						{
@@ -924,11 +924,13 @@ getline(Sfio_t* sp, int lead, int term)
 	register char*	s;
 	register char*	t;
 	register int	indent;
-	int		i;
+	Time_t		tm;
 	long		n;
+	int		i;
+	char*		e;
 	char*		lin;
 	char*		tok;
-	struct control*	cp;
+	Control_t*	cp;
 	Namval_t*	nv;
 
 	if (pp->here && !lead)
@@ -1136,7 +1138,7 @@ getline(Sfio_t* sp, int lead, int term)
 					error(3, "for loop variable omitted");
 				pp->cp->loop.f.vec = tp = sfstropen();
 				do putptr(tp, t = getarg(&tok, NiL)); while (t);
-				if (*(pp->cp->loop.f.args = (char**)sfstrset(tp, 0)))
+				if (*(pp->cp->loop.f.args = (char**)sfstrseek(tp, 0, SEEK_SET)))
 				{
 					pp->cp->loop.f.var = setvar(s, null, 0);
 					if (pp->cp->flags & CON_scan)
@@ -1153,7 +1155,7 @@ getline(Sfio_t* sp, int lead, int term)
 							{
 								pp->stashput = 1;
 								pp->cp->flags |= CON_stash;
-								sfstrset(pp->ip, 0);
+								sfstrseek(pp->ip, 0, SEEK_SET);
 								sfputc(pp->ip, 0);
 							}
 							pp->cp->body.offset = pp->stashget ? (pp->stashget - sfstrbase(pp->ip)) : (sfstrtell(pp->ip) - 1);
@@ -1189,7 +1191,7 @@ getline(Sfio_t* sp, int lead, int term)
 					{
 						pp->stashput = 1;
 						pp->cp->flags |= CON_stash;
-						sfstrset(pp->ip, 0);
+						sfstrseek(pp->ip, 0, SEEK_SET);
 						sfputc(pp->ip, 0);
 						pp->cp->loop.w.test = strdup(t);
 						pp->cp->loop.w.free = 1;
@@ -1232,26 +1234,33 @@ getline(Sfio_t* sp, int lead, int term)
 					n = sfstrtell(sp);
 					expand(sp, t);
 					s = sfstrbase(sp) + n;
-					t = sfstrrel(sp, 0);
+					t = sfstrseek(sp, 0, SEEK_CUR);
 					while (t > s && isspace(*(t - 1)))
 						t--;
-					sfstrset(sp, t - sfstrbase(sp));
+					sfstrseek(sp, t - sfstrbase(sp), SEEK_SET);
 					sfputc(sp, 0);
-					setvar(state.frame->target->name, sfstrset(sp, n), 0);
-					debug((-5, "%s returns `%s'", state.frame->target->name, sfstrrel(sp, 0)));
+					setvar(state.frame->target->name, sfstrseek(sp, n, SEEK_SET), 0);
+					debug((-5, "%s returns `%s'", state.frame->target->name, sfstrseek(sp, 0, SEEK_CUR)));
 				}
 				else if (*t)
 				{
-					if ((n = expr(sp, t)) == -1)
+					if ((tm = timenum(t, &e)) != TMX_NOTIME && *e)
+					{
+						if ((n = expr(sp, t)) == -1)
+							tm = TMX_NOTIME;
+						else
+							tm = tmxsns(n, 0);
+					}
+					if (tm == TMX_NOTIME)
 					{
 						pp->status = FAILED;
 						debug((-5, "return fail"));
 					}
-					else if (n)
+					else if (tm)
 					{
 						pp->status = TOUCH;
-						internal.internal->time = n;
-						debug((-5, "return [%s]", strtime(internal.internal->time)));
+						internal.internal->time = tm;
+						debug((-5, "return [%s]", timestr(internal.internal->time)));
 					}
 					else
 					{
@@ -1294,7 +1303,7 @@ getline(Sfio_t* sp, int lead, int term)
 				n = sfstrtell(sp);
 				expand(sp, t);
 				sfputc(sp, 0);
-				i = strtol(sfstrset(sp, n), &tok, 0);
+				i = strtol(sfstrseek(sp, n, SEEK_SET), &tok, 0);
 				for (t = tok; isspace(*t); t++);
 				c = error_info.line;
 				if (i > 0 && !(i & 040))
@@ -1310,7 +1319,7 @@ getline(Sfio_t* sp, int lead, int term)
 				n = sfstrtell(sp);
 				expand(sp, t);
 				sfputc(sp, 0);
-				i = strtol(sfstrset(sp, n), &tok, 0);
+				i = strtol(sfstrseek(sp, n, SEEK_SET), &tok, 0);
 				finish(i);
 			}
 			continue;
@@ -1328,7 +1337,7 @@ getline(Sfio_t* sp, int lead, int term)
 				n = sfstrtell(sp);
 				expand(sp, t);
 				sfputc(sp, 0);
-				a = sfstrset(sp, n);
+				a = sfstrseek(sp, n, SEEK_SET);
 				d = i == CON_print;
 				f = 0;
 				n = '\n';
@@ -1480,7 +1489,7 @@ getline(Sfio_t* sp, int lead, int term)
 				n = sfstrtell(sp);
 				expand(sp, t);
 				sfputc(sp, 0);
-				set(sfstrset(sp, n), 1, pp->scoped);
+				set(sfstrseek(sp, n, SEEK_SET), 1, pp->scoped);
 			}
 			continue;
 		}
@@ -1583,7 +1592,7 @@ getline(Sfio_t* sp, int lead, int term)
  */
 
 static int
-statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
+statement(Sfio_t* sp, char** lhs, Rule_t** opr, char** rhs, char** act)
 {
 	register int	c;
 	register char*	s;
@@ -1746,16 +1755,16 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 			sfputr(tmp, sfstrbase(sp), 0);
 			rhs_pos = sfstrtell(tmp);
 			sfputr(tmp, t, 0);
-			sfstrset(sp, 0);
-			expand(sp, sfstrset(tmp, 0));
+			sfstrseek(sp, 0, SEEK_SET);
+			expand(sp, sfstrseek(tmp, 0, SEEK_SET));
 			sfputc(sp, 0);
-			sfstrset(tmp, rhs_pos);
+			sfstrseek(tmp, rhs_pos, SEEK_SET);
 			rhs_pos = sfstrtell(sp);
-			expand(sp, sfstrrel(tmp, 0));
+			expand(sp, sfstrseek(tmp, 0, SEEK_CUR));
 			sfputc(sp, 0);
 			sfstrclose(tmp);
 			s = t = sfstrbase(sp) + rhs_pos;
-			p = sfstrrel(sp, 0) - 1;
+			p = sfstrseek(sp, 0, SEEK_CUR) - 1;
 		}
 		else
 			p = t + strlen(t);
@@ -1802,7 +1811,7 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 			brace++;
 		}
 		act_pos = brace - sfstrbase(sp);
-		sfstrset(sp, p - sfstrbase(sp));
+		sfstrseek(sp, p - sfstrbase(sp), SEEK_SET);
 		quote = 0;
 		while (nest)
 		{
@@ -1813,7 +1822,7 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 				break;
 			}
 			s = sfstrbase(sp) + lin_pos;
-			t = sfstrrel(sp, 0);
+			t = sfstrseek(sp, 0, SEEK_CUR);
 			while (s < t)
 			{
 				if ((c = *s++) == '\\')
@@ -1909,10 +1918,10 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 				rhs_pos = -1;
 		}
 		act_pos = ++p - sfstrbase(sp);
-		sfstrset(sp, act_pos);
+		sfstrseek(sp, act_pos, SEEK_SET);
 		while (getline(sp, 0, '\n'));
 		t = sfstrbase(sp) + act_pos;
-		s = sfstrrel(sp, 0);
+		s = sfstrseek(sp, 0, SEEK_CUR);
 		for (;;)
 		{
 			if (s <= t)
@@ -1927,7 +1936,7 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 			}
 		}
 	}
-	*lhs = sfstrset(sp, 0);
+	*lhs = sfstrseek(sp, 0, SEEK_SET);
 	*rhs = (rhs_pos >= 0) ? sfstrbase(sp) + rhs_pos : null;
 	*act = (act_pos >= 0) ? sfstrbase(sp) + act_pos : null;
 	return op;
@@ -1954,25 +1963,25 @@ static const Namval_t	nametypes[] =
  */
 
 static void
-assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
+assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 {
 	register char*		s;
-	register struct rule*	r;
-	register struct list*	p;
-	register struct list*	q;
+	register Rule_t*	r;
+	register List_t*	p;
+	register List_t*	q;
 	int			c;
 	int			i;
 	int			n;
 	int			isactive;
-	struct rule*		x;
-	struct rule*		joint;
-	struct var*		v;
-	struct list*		jointail;
-	struct list*		prereqs;
+	Rule_t*			x;
+	Rule_t*			joint;
+	Var_t*			v;
+	List_t*			jointail;
+	List_t*			prereqs;
 	char*			name;
 	struct					/* prereq attributes	*/
 	{
-		struct rule	rule;		/* rule attributes	*/
+		Rule_t		rule;		/* rule attributes	*/
 		int		op;		/* assertion op		*/
 	}			*att, clr, set;
 
@@ -2051,8 +2060,8 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 			}
 			else if (streq(s, "stack"))
 			{
-				struct parseinfo*	sp = pp;
-				struct local*		lp;
+				Parseinfo_t*	sp = pp;
+				Local_t*	lp;
 
 				c = 1;
 				while (--sp > &parsestack[0])
@@ -2135,7 +2144,7 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 			{
 				if (r)
 				{
-					unsigned long	m = 0;
+					Flags_t		m = 0;
 
 					/*
 		 			 * user controlled dynamic
@@ -2297,8 +2306,8 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 		}
 		if ((set.op & (A_metarule|A_special)) == A_metarule)
 		{
-			struct rule*	in;
-			struct rule*	out;
+			Rule_t*		in;
+			Rule_t*		out;
 
 			in = 0;
 			if (*name == ATTRNAME)
@@ -2319,7 +2328,7 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 
 				if (*s != '%' || *(s + 1) != ATTRNAME || !(x = getrule(s + 1)) || !(x->property & P_attribute))
 					x = makerule(s);
-				addprereq(in, x, PREREQ_INSERT);
+				addprereq(in, x, *(s + strlen(s) - 1) == '%' ? PREREQ_APPEND : PREREQ_INSERT);
 				if (set.op & A_negate)
 				{
 					*name = ATTRCLEAR;
@@ -2632,11 +2641,11 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 static void
 assignment(char* lhs, int op, char* rhs)
 {
-	register struct rule*	r;
-	register struct list*	p;
+	register Rule_t*	r;
+	register List_t*	p;
 	register char*		s;
 	register int		n;
-	struct var*		v;
+	Var_t*			v;
 
 	for (p = internal.assign->prereqs; p; p = p->next)
 		if (((r = p->rule)->property & P_operator) && !(r->dynamic & D_bound))
@@ -2724,7 +2733,7 @@ rules(char* s)
 void*
 pushlocal(void)
 {
-	register struct local*	p;
+	register Local_t*	p;
 
 	PUSHLOCAL(p);
 	return (void*)pp->local;
@@ -2738,10 +2747,10 @@ pushlocal(void)
 void
 poplocal(void* pos)
 {
-	register struct local*	p;
-	register struct local*	t;
+	register Local_t*	p;
+	register Local_t*	t;
 
-	p = (struct local*)pos;
+	p = (Local_t*)pos;
 	while (pp->local != p)
 	{
 		pp->local->bucket->value = (char*)pp->local->oldv;
@@ -3036,7 +3045,7 @@ expr(Sfio_t* xp, register char* s)
 			while (v > restore)
 				**--v = '"';
 			*t = c;
-			return strexpr(sfstrset(xp, top), NiL, makeexpr, NiL);
+			return strexpr(sfstrseek(xp, top, SEEK_SET), NiL, makeexpr, NiL);
 		}
 }
 
@@ -3063,8 +3072,8 @@ interpreter(char* msg)
 {
 	int		level;
 	void		(*errexit)(int);
-	struct frame	frame;
-	struct label	resume;
+	Frame_t		frame;
+	Label_t		resume;
 
 	if (msg)
 		error(0, "\n%s\n", msg);
@@ -3108,13 +3117,13 @@ int
 parse(Sfio_t* fp, char* bp, char* name, Sfio_t* scoped)
 {
 	register int		op;
-	register struct local*	lcl;
+	register Local_t*	lcl;
 	char*			lhs;
 	char*			rhs;
 	char*			act;
 	char*			alt;
-	struct rule*		opr;
-	struct local*		olcl;
+	Rule_t*			opr;
+	Local_t*		olcl;
 	Sfio_t*			buf;
 	Sfio_t*			tmp;
 
@@ -3328,7 +3337,7 @@ parse(Sfio_t* fp, char* bp, char* name, Sfio_t* scoped)
 char*
 parsefile(void)
 {
-	register struct parseinfo* pi;
+	register Parseinfo_t*	pi;
 
 	if (state.loading)
 		return state.loading;

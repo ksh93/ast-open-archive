@@ -4,7 +4,7 @@
 
 :PACKAGE: ast
 
-LICENSE = type=special
+LICENSE = zlib,since=1995,author="Jean-loup Gailly,Mark Adler"
 
 ID = z
 VERSION = 1.0

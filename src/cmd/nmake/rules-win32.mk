@@ -10,7 +10,7 @@ RCFLAGS = -x
 
 SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 
-.SOURCE.%.SCAN.rc : $$(*.SOURCE.rc) $$(*.SOURCE) $$(*.SOURCE.h:D:X=mfc/include include)
+.SOURCE.%.SCAN.rc : $$(*.SOURCE.rc) $$(*.SOURCE) $$(*.SOURCE.h:D:X=include/mfc mfc/include include)
 
 .SCAN.rc : .SCAN
 	$(@.SCAN.c)
@@ -45,7 +45,7 @@ SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
 		if ! .PACKAGE.SDK.DIRS.
 			.PACKAGE.SDK.DIRS. := $(sh $(CC) -V 2>/dev/null) /platformsdk
 		end
-		R := $(.PACKAGE.SDK.DIRS.:X=$(PKG)/$(D) $(D)/win64/$(PKG) $(D):T=F)
+		R := $(.PACKAGE.SDK.DIRS.:X=$(D)/$(PKG) $(PKG)/$(D) $(D)/win64/$(PKG) $(D):T=F)
 	end
 	PACKAGE_$(PKG)_$(DIR) := $(R)
 	return $(R)

@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -368,8 +366,8 @@ uniq(Sfio_t* xp, char* v, char* w, int sep)
 	register char*	s;
 	char*		tok;
 	Hash_table_t*	tab;
-	struct fileid	id;
-	struct stat	st;
+	Fileid_t	id;
+	Stat_t		st;
 
 	tok = tokopen(w, 1);
 	if (sep & NOT)
@@ -476,9 +474,9 @@ cross(Sfio_t* xp, char* v, char* w)
 			else sep = 1;
 			pos = sfstrtell(xp);
 			sfputr(xp, t, 0);
-			x = sfstrset(xp, pos);
+			x = sfstrseek(xp, pos, SEEK_SET);
 			pos += canon(x) - x;
-			sfstrset(xp, pos);
+			sfstrseek(xp, pos, SEEK_SET);
 		}
 		else
 		{
@@ -497,9 +495,9 @@ cross(Sfio_t* xp, char* v, char* w)
 				else if (*s != '.' || *(s + 1))
 					sfprintf(xp, "%s/", s);
 				sfputr(xp, x, 0);
-				x = sfstrset(xp, pos);
+				x = sfstrseek(xp, pos, SEEK_SET);
 				pos += canon(x) - x;
-				sfstrset(xp, pos);
+				sfstrseek(xp, pos, SEEK_SET);
 			}
 			tokclose(tok1);
 		}
@@ -516,12 +514,12 @@ cross(Sfio_t* xp, char* v, char* w)
 static void
 intersect(Sfio_t* xp, char* v, char* w, int sep)
 {
-	register struct list*	p;
-	register struct rule*	r;
+	register List_t*	p;
+	register Rule_t*	r;
 	register char*		s;
 	register int		n;
-	struct list*		q;
-	struct list*		x;
+	List_t*			q;
+	List_t*			x;
 	char*			tok;
 	Sfio_t*			tmp;
 
@@ -610,12 +608,12 @@ intersect(Sfio_t* xp, char* v, char* w, int sep)
 static void
 hasprereq(Sfio_t* xp, char* v, char* w)
 {
-	register struct list*	p;
-	register struct list*	q;
-	register struct rule*	r;
+	register List_t*	p;
+	register List_t*	q;
+	register Rule_t*	r;
 	register char*		s;
 	int			sep;
-	struct list*		x;
+	List_t*			x;
 	char*			tok;
 
 	x = 0;
@@ -674,20 +672,20 @@ linebreak(Sfio_t* xp, register char* s, char* pfx)
 		pos += sfprintf(xp, " %s", s);
 	}
 	tokclose(tok);
-	if (pos == pre) sfstrset(xp, rew);
+	if (pos == pre) sfstrseek(xp, rew, SEEK_SET);
 }
 
 /*
- * generate list of file base names matchin pat from all dirs in s
+ * generate list of file base names matching pat from all dirs in s
  */
 
 static void
 list(Sfio_t* xp, register char* s, char* pat, int flags)
 {
-	register struct rule*	r;
+	register Rule_t*	r;
 	register char**		v;
 	char**			w;
-	struct file*		f;
+	File_t*			f;
 	Hash_position_t*	pos;
 	char*			tok;
 	int			n;
@@ -727,7 +725,7 @@ list(Sfio_t* xp, register char* s, char* pat, int flags)
 	}
 	putptr(vec, 0);
 	tokclose(tok);
-	for (v = (char**)sfstrbase(vec); r = (struct rule*)*v;)
+	for (v = (char**)sfstrbase(vec); r = (Rule_t*)*v;)
 	{
 		r->mark &= ~M_mark;
 		*v++ = r->name;
@@ -743,7 +741,7 @@ list(Sfio_t* xp, register char* s, char* pat, int flags)
 		{
 			if ((s = pos->bucket->name)[0] != '.' || s[1] && (s[1] != '.' || s[2]))
 			{
-				f = (struct file*)pos->bucket->value;
+				f = (File_t*)pos->bucket->value;
 				if (*pat)
 				{
 					if (f->dir->ignorecase)
@@ -903,10 +901,10 @@ relative(Sfio_t* xp, register char* s, register char* t)
 	sfprintf(tmp, "%s/", s);
 	s = sfstruse(tmp);
 	pos = pathcanon(s, 0) - s + 1;
-	sfstrset(tmp, pos);
+	sfstrseek(tmp, pos, SEEK_SET);
 	if (*t != '/') sfprintf(tmp, "%s/", internal.pwd);
 	sfprintf(tmp, "%s/%c", t, 0);
-	pathcanon(v = t = sfstrset(tmp, pos), 0);
+	pathcanon(v = t = sfstrseek(tmp, pos, SEEK_SET), 0);
 	u = s = sfstrbase(tmp);
 	while (*s && *s == *t)
 		if (*s++ == '/')
@@ -920,7 +918,7 @@ relative(Sfio_t* xp, register char* s, register char* t)
 		if (*u++ == '/')
 			sfputr(xp, "../", -1);
 	sfputr(xp, v, -1);
-	if (sfstrtell(xp) > pos + 1) sfstrrel(xp, -1);
+	if (sfstrtell(xp) > pos + 1) sfstrseek(xp, -1, SEEK_CUR);
 	else sfputc(xp, '.');
 	sfstrclose(tmp);
 }
@@ -931,6 +929,36 @@ relative(Sfio_t* xp, register char* s, register char* t)
 
 static int
 sepcmp(int sep, unsigned long a, unsigned long b)
+{
+	switch (sep)
+	{
+	case LT:
+		return a < b;
+	case LE:
+		return a <= b;
+	case EQ:
+		return a == b;
+	case NE:
+	case NOT:
+		return a != b;
+	case GE:
+		return a >= b;
+	case GT:
+		return a > b;
+	default:
+#if DEBUG
+		error(PANIC, "invalid separator operator %d", sep);
+#endif
+		return 0;
+	}
+}
+
+/*
+ * apply binary separator operator to times a and b
+ */
+
+static int
+septimecmp(int sep, Time_t a, Time_t b)
 {
 	switch (sep)
 	{
@@ -974,7 +1002,7 @@ native(Sfio_t* xp, const char* s)
 			m = n;
 			n = pathnative(s, sfstrrsrv(xp, m), m);
 		} while (n > m);
-		sfstrrel(xp, n);
+		sfstrseek(xp, n, SEEK_CUR);
 		sfputc(xp, '\'');
 	}
 }
@@ -995,10 +1023,10 @@ native(Sfio_t* xp, const char* s)
  */
 
 static unsigned long
-order_descend(Sfio_t* xp, Hash_table_t* tab, struct rule* r, int all, unsigned long mark, int prereqs)
+order_descend(Sfio_t* xp, Hash_table_t* tab, Rule_t* r, int all, unsigned long mark, int prereqs)
 {
-	register struct list*	p;
-	register struct rule*	a;
+	register List_t*	p;
+	register Rule_t*	a;
 	unsigned long		here;
 	unsigned long		need;
 
@@ -1012,7 +1040,7 @@ order_descend(Sfio_t* xp, Hash_table_t* tab, struct rule* r, int all, unsigned l
 		{
 			for (p = r->prereqs; p; p = p->next)
 			{
-				if (!(a = (struct rule*)hashget(tab, p->rule->name)))
+				if (!(a = (Rule_t*)hashget(tab, p->rule->name)))
 					a = p->rule;
 				else if (a == r)
 					continue;
@@ -1033,7 +1061,7 @@ order_descend(Sfio_t* xp, Hash_table_t* tab, struct rule* r, int all, unsigned l
 		}
 		for (p = r->prereqs; p; p = p->next)
 		{
-			if (!(a = (struct rule*)hashget(tab, p->rule->name)))
+			if (!(a = (Rule_t*)hashget(tab, p->rule->name)))
 				a = p->rule;
 			if (a->mark & M_MUST)
 				mark = order_descend(xp, tab, a, all, mark, prereqs);
@@ -1072,7 +1100,7 @@ static void	order_find(Sfio_t*, Sfio_t*, Sfio_t*, Hash_table_t*, char*, char*, c
  */
 
 static void
-order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, struct rule* d, struct rule* r, char* makefiles, char* skip, int prereqs)
+order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, Rule_t* d, Rule_t* r, char* makefiles, char* skip, int prereqs)
 {
 	register char*	s;
 	register char*	t;
@@ -1144,13 +1172,13 @@ order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, struct rule*
 static void
 order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, char* files, char* makefiles, char* skip, int directory, int force, int prereqs)
 {
-	struct rule*	r;
-	struct rule*	d;
+	Rule_t*		r;
+	Rule_t*		d;
 	char*		s;
 	char*		t;
 	char*		e;
 	char*		tok;
-	struct stat	st;
+	Stat_t		st;
 
 	tok = tokopen(files, 1);
 	while (s = tokread(tok))
@@ -1219,7 +1247,7 @@ order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, c
 static int
 order_cmp(const void* a, const void* b)
 {
-	return strcoll((*((struct rule**)a + 1))->name, (*((struct rule**)b + 1))->name);
+	return strcoll((*((Rule_t**)a + 1))->name, (*((Rule_t**)b + 1))->name);
 }
 
 /*
@@ -1239,11 +1267,11 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	char*		b;
 	char*		tok;
 	char*		lib;
-	struct rule*	r;
-	struct rule*	d;
-	struct rule*	order;
-	struct rule**	v;
-	struct list*	q;
+	Rule_t*		r;
+	Rule_t*		d;
+	Rule_t*		order;
+	Rule_t**	v;
+	List_t*		q;
 	Sfio_t*		vec;
 	Sfio_t*		tmp;
 	Sfio_t*		sp;
@@ -1255,14 +1283,14 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	int		p;
 	int		var;
 
-	order = targets ? (struct rule*)0 : getrule(external.order);
+	order = targets ? (Rule_t*)0 : getrule(external.order);
 	tab = hashalloc(table.rule, 0);
 	tmp = sfstropen();
 	vec = sfstropen();
 	order_find(xp, tmp, vec, tab, NiL, directories, makefiles, skip, 0, force, prereqs);
 	mark = sfstrtell(vec);
 	putptr(vec, 0);
-	v = (struct rule**)sfstrbase(vec);
+	v = (Rule_t**)sfstrbase(vec);
 	qsort(v, mark / sizeof(v) / 2, sizeof(v) * 2, order_cmp);
 	while (r = *v++)
 	{
@@ -1285,7 +1313,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 					for (t = s; (i = *s) && i != ' ' && i != '\t' && i != '\r' && i != '"' && i != '\'' && i != '\\' && i != ':'; s++)
 						if (i == '/')
 							t = s + 1;
-						else if (i == '.' && *(s + 1) != 'c' && *(s + 1) != 'C' && t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
+						else if (i == '.' && *(s + 1) != 'c' && *(s + 1) != 'C' && *(s + 1) != 'h' && *(s + 1) != 'H' && t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
 							*s = 0;
 						else if (i == '$')
 							var = 1;
@@ -1375,7 +1403,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 								k = 0;
 								break;
 							}
-					if (k && ((r = (struct rule*)hashget(tab, t)) && (r->mark & M_MUST) && r != d || *t++ == 'l' && *t++ == 'i' && *t++ == 'b' && *t && (r = (struct rule*)hashget(tab, t)) && (r->mark & M_MUST) && r != d))
+					if (k && ((r = (Rule_t*)hashget(tab, t)) && (r->mark & M_MUST) && r != d || *t++ == 'l' && *t++ == 'i' && *t++ == 'b' && *t && (r = (Rule_t*)hashget(tab, t)) && (r->mark & M_MUST) && r != d))
 					{
 						if (t = strrchr(d->name, '/'))
 							t++;
@@ -1405,9 +1433,17 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 			{
 				*(s - 3) = 0;
 				r = makerule(d->name);
-				*(s - 3) = 'l';
 				if (r != d)
 					addprereq(d, r, PREREQ_APPEND);
+				if (t = strrchr(d->name, '/'))
+					t++;
+				else
+					t = d->name;
+				sfprintf(internal.nam, "lib/lib%s", t);
+				r = makerule(sfstruse(internal.nam));
+				if (r != d)
+					addprereq(d, r, PREREQ_APPEND);
+				*(s - 3) = 'l';
 			}
 		}
 	}
@@ -1416,7 +1452,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	{
 		tok = tokopen(targets, 1);
 		while (s = tokread(tok))
-			if ((r = (struct rule*)hashget(tab, s)) && (r->mark & M_MUST))
+			if ((r = (Rule_t*)hashget(tab, s)) && (r->mark & M_MUST))
 				mark = order_descend(xp, tab, r, 1, mark, prereqs);
 		tokclose(tok);
 		k = 0;
@@ -1429,7 +1465,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 
 		if (order)
 			for (q = order->prereqs; q; q = q->next)
-				if ((r = (struct rule*)hashget(tab, unbound(q->rule))) && (r->mark & M_MUST))
+				if ((r = (Rule_t*)hashget(tab, unbound(q->rule))) && (r->mark & M_MUST))
 				{
 					mark = order_descend(xp, tab, r, 1, mark, prereqs);
 					if (!prereqs)
@@ -1437,7 +1473,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 				}
 		k = 1;
 	}
-	v = (struct rule**)sfstrbase(vec);
+	v = (Rule_t**)sfstrbase(vec);
 	while (*v++)
 	{
 		r = *v++;
@@ -1447,7 +1483,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	if (prereqs)
 	{
 		sfprintf(xp, "all :");
-		v = (struct rule**)sfstrbase(vec);
+		v = (Rule_t**)sfstrbase(vec);
 		while (*v++)
 		{
 			r = *v++;
@@ -1455,7 +1491,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 				sfprintf(xp, " %s", r->name);
 		}
 	}
-	v = (struct rule**)sfstrbase(vec);
+	v = (Rule_t**)sfstrbase(vec);
 	while (*v++)
 	{
 		r = *v++;
@@ -1481,15 +1517,15 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 {
 	register char*		t;
 	register int		n;
-	register struct rule*	r;
+	register Rule_t*	r;
 	register char**		p;
 	char*			e;
-	struct rule*		x;
+	Rule_t*			x;
 	int			c;
 	int			i;
 	int			chop;
 	int			root;
-	struct stat		st;
+	Stat_t			st;
 	long			pos;
 	Sfio_t*			tmp;
 
@@ -1525,14 +1561,14 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				sfputr(xp, s, 0);
 			else if (r && (r->dynamic & D_bound) && r->time)
 			{
-				op = "!";
+				op = "A";
 				goto view;
 			}
 			else
 				sfprintf(xp, "%s/%s%c", state.mam.statix ? internal.dot->name : internal.pwd, s, 0);
-			s = sfstrset(xp, pos);
+			s = sfstrseek(xp, pos, SEEK_SET);
 			pos += canon(s) - s;
-			sfstrset(xp, pos);
+			sfstrseek(xp, pos, SEEK_SET);
 		}
 		return;
 	case 'B':
@@ -1556,9 +1592,9 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 		{
 			pos = sfstrtell(xp);
 			sfputr(xp, s, 0);
-			s = sfstrset(xp, pos);
+			s = sfstrseek(xp, pos, SEEK_SET);
 			pos += canon(s) - s;
-			sfstrset(xp, pos);
+			sfstrseek(xp, pos, SEEK_SET);
 		}
 		return;
 	case 'D':
@@ -1567,7 +1603,8 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 		 */
 
 		sep = 0;
-		if (!r || !r->time || (r->property & P_state) || r->status == IGNORE) break;
+		if (!r || !r->time || (r->property & P_state) || r->status == IGNORE)
+			break;
 		if ((t = getbound(r->name)) || (s = r->uname) && (t = getbound(s)))
 		{
 			if ((x = getrule(t)) && (x->dynamic & (D_entries|D_scanned)) == (D_entries|D_scanned) || *t == '/' && !*(t + 1))
@@ -1701,7 +1738,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 
 		if (*s)
 		{
-			struct stat	st1;
+			Stat_t		st1;
 
 			if (*++op == '=')
 				op++;
@@ -1734,7 +1771,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				sfstrrsrv(internal.nam, MAXNAME + 5);
 				t = sfstruse(internal.nam);
 				strcpy(t, r->name);
-				for (n = 0;;)
+				for (n = *op == 'A';;)
 				{
 					if (mount(t, t, FS3D_GET|FS3D_VIEW|FS3D_SIZE(MAXNAME), NiL))
 						break;
@@ -1813,6 +1850,11 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 					}
 				}
 			}
+			if (*op == 'A' && !sep)
+			{
+				r = 0;
+				goto absolute;
+			}
 		}
 		else
 		{
@@ -1835,7 +1877,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			*t++ = 0;
 		if (s = pathprobe(sfstrrsrv(xp, MAXNAME), NiL, op, t ? t : idname, s, 0))
 		{
-			sfstrrel(xp, strlen(s));
+			sfstrseek(xp, strlen(s), SEEK_CUR);
 			makerule(s)->dynamic |= D_built|D_global;
 		}
 		if (t)
@@ -1888,6 +1930,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 		 * return unbound name
 		 */
 
+		if ((state.test & 1) && r && !(r->property & P_state)) error(1, "AHA :P=U: alias=%d name=%s unbound=%s s=%s", !!(r->dynamic & D_alias), r->name, unbound(r), s);
 		sfputr(xp, (r && !(r->property & P_state) && !(r->dynamic & D_alias)) ? unbound(r) : s, -1);
 		return;
 	case 'V':
@@ -1933,9 +1976,9 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			op++;
 		n = 8 * 1024;
 		if ((n = astlicense(sfstrrsrv(xp, n), n, s, op, '/', '*', '/')) < 0)
-			error(2, "license: %s", sfstrrel(xp, 0));
-		else if (n > 0 && *(sfstrrel(xp, n) - 1) == '\n')
-			sfstrrel(xp, -1);
+			error(2, "license: %s", sfstrseek(xp, 0, SEEK_CUR));
+		else if (n > 0 && *(sfstrseek(xp, n, SEEK_CUR) - 1) == '\n')
+			sfstrseek(xp, -1, SEEK_CUR);
 		return;
 	case 'X':
 		/*
@@ -1999,7 +2042,7 @@ edit(Sfio_t* xp, register char* s, char* dir, char* bas, char* suf)
 	if (q != DELETE && q != KEEP)
 	{
 		sfputr(xp, q, -1);
-		if (*q && *(sfstrrel(xp, 0) - 1) != '/')
+		if (*q && *(sfstrseek(xp, 0, SEEK_CUR) - 1) != '/')
 			sfputc(xp, '/');
 	}
 
@@ -2036,11 +2079,11 @@ edit(Sfio_t* xp, register char* s, char* dir, char* bas, char* suf)
 	 */
 
 	p = sfstrbase(xp) + pos + 1;
-	q = sfstrrel(xp, 0);
+	q = sfstrseek(xp, 0, SEEK_CUR);
 	while (q > p && *(q - 1) == '/')
 		q--;
 	pos = q - sfstrbase(xp);
-	sfstrset(xp, pos);
+	sfstrseek(xp, pos, SEEK_SET);
 }
 
 /*
@@ -2068,7 +2111,7 @@ mimetype(Sfio_t* xp, char* file)
 {
 	Sfio_t*			sp;
 	char*			mime;
-	struct stat		st;
+	Stat_t			st;
 
 	static Magic_t*		magic;
 	static Magicdisc_t	disc;
@@ -2104,9 +2147,9 @@ mimetype(Sfio_t* xp, char* file)
 static void
 token(Sfio_t* xp, char* s, register char* p, int sep)
 {
-	register struct rule*	r;
-	register struct rule*	x;
-	register struct var*	v;
+	register Rule_t*	r;
+	register Rule_t*	x;
+	register Var_t*		v;
 	register int		op;
 	char*			ops;
 	int			dobind;
@@ -2115,10 +2158,10 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	int			force;
 	int			matched;
 	int			tst;
-	unsigned long		tm;
-	struct list*		q;
-	struct list*		z;
-	struct stat		st;
+	Time_t			tm;
+	List_t*			q;
+	List_t*			z;
+	Stat_t			st;
 	Sfio_t*			sp;
 	Sfio_t*			tmp = 0;
 
@@ -2226,7 +2269,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			sfprintf(state.mam.out, "%sbind %s\n", state.mam.label, mamname(r));
 		if (op == 'F' && r->status == MAKING && dowait)
 		{
-			struct frame*	fp;
+			Frame_t*	fp;
 
 			/*
 			 * don't wait for targets in the active frames
@@ -2240,15 +2283,14 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 				}
 		}
 	}
+	if (*ops == '=')
+		ops++;
 	if (!*r->name)
 	{
 		switch (op)
 		{
 		case 'R':
-			if (*ops)
-				sfputr(xp, fmttime(ops, CURTIME), -1);
-			else
-				sfprintf(xp, "%lu", CURTIME);
+			sfputr(xp, timefmt(ops, CURTIME), -1);
 			break;
 		}
 		return;
@@ -2263,8 +2305,8 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	case 'A':
 		if ((r->scan != SCAN_IGNORE || *ops == 'F' || *ops == 'f') && (s = arupdate(r->name)))
 		{
-			struct frame*	oframe;
-			struct frame	frame;
+			Frame_t*	oframe;
+			Frame_t		frame;
 
 			oframe = state.frame;
 			if (!(state.frame = r->active))
@@ -2325,9 +2367,16 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		}
 		return;
 	case 'F':
-		if (!*ops)
+		if (!(op = *ops))
 		{
-			matched = (op == tst);
+			matched = (tst == 'F');
+			break;
+		}
+		if (islower(op))
+			op = toupper(op);
+		if (tst == 'F' && op == 'R' && (r->dynamic & (D_bound|D_regular)) == (D_bound|D_regular))
+		{
+			matched = 1;
 			break;
 		}
 		if (tst != 'F' || ((sep & GT) ? pathstat(r->name, &st) : lstat(r->name, &st)))
@@ -2335,9 +2384,6 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			matched = 0;
 			break;
 		}
-		op = *ops;
-		if (islower(op))
-			op = toupper(op);
 		switch (op)
 		{
 		case 'B':
@@ -2359,6 +2405,9 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			break;
 		case 'P':
 			matched = S_ISFIFO(st.st_mode);
+			break;
+		case 'X':
+			matched = 1;
 			break;
 		default:
 			error(2, "%c: unknown file type op", op);
@@ -2432,7 +2481,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			p = s + sfstrtell(tmp);
 			while (p > s && *(p - 1) == '\n')
 				p--;
-			sfstrset(tmp, p - s);
+			sfstrseek(tmp, p - s, SEEK_SET);
 			if (tmp != xp)
 			{
 				expand(xp, sfstruse(tmp));
@@ -2442,9 +2491,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		return;
 	case 'M':
 		if (!*ops)
-			ops = " ";
-		else if (*ops == '=' && !*++ops)
-			ops = " : ";
+			ops = *(ops - 1) == '=' ? " : " : " ";
 		parentage(xp, r, ops);
 		return;
 	case 'O':
@@ -2498,18 +2545,19 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		matched = (tst == 'F' && (lstat(r->name, &st) || !S_ISLNK(st.st_mode)));
 		break;
 	case 'R':
-		if (*ops)
-			sfputr(xp, fmttime(ops, r->time), -1);
-		else
-			sfprintf(xp, "%lu", numtime(r->time));
+		sfputr(xp, timefmt(ops, r->time), -1);
 		return;
 	case 'S':
 		op = *ops++;
+		if (*ops == '=')
+			ops++;
 		if (islower(op))
 			op = toupper(op);
 		if (force = op == 'F')
 		{
 			op = *ops++;
+			if (*ops == '=')
+				ops++;
 			if (islower(op))
 				op = toupper(op);
 		}
@@ -2550,7 +2598,9 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			tm = state.frame->target->time;
 		else
 		{
-			tm = strtoul(ops, &s, 10);
+			tm = strtoull(ops, &s, 10);
+			if (*s == '.')
+				tm = tmxsns(tm, strtoull(s, &s, 10));
 			if (*s)
 			{
 				if (x = getrule(ops))
@@ -2559,10 +2609,11 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 						x = bind(x);
 					tm = x->time;
 				}
-				else tm = 0;
+				else
+					tm = 0;
 			}
 		}
-		if (sepcmp(sep, (unsigned long)r->time, tm))
+		if (septimecmp(sep, r->time, tm))
 			sfputr(xp, r->name, -1);
 		return;
 	case 'U':
@@ -2598,10 +2649,9 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			ops = null;
 			break;
 		}
-		if (*ops)
-			sfputr(xp, fmttime(ops, tm), -1);
-		else
-			sfprintf(xp, "%lu", tm);
+		if (*ops == '=')
+			ops++;
+		sfputr(xp, timefmt(ops, tm), -1);
 		return;
 	default:
 		matched = (op == tst);
@@ -2622,7 +2672,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
  */
 
 void
-parentage(Sfio_t* xp, register struct rule* r, char* sep)
+parentage(Sfio_t* xp, register Rule_t* r, char* sep)
 {
 	if (r->active && r->active->parent && !(r->active->parent->target->mark & M_mark) && r->active->parent->parent != r->active->parent)
 	{
@@ -2644,15 +2694,15 @@ static void
 attribute(Sfio_t* xp, char* s, register char* att, int sep)
 {
 	register char*		t;
-	register struct rule*	r;
-	register struct rule*	a;
-	register struct list*	p;
+	register Rule_t*	r;
+	register Rule_t*	a;
+	register List_t*	p;
 	long			n;
 	int			c;
 	int			i;
-	struct rule*		x;
-	struct rule*		y;
-	struct rule*		z;
+	Rule_t*			x;
+	Rule_t*			y;
+	Rule_t*			z;
 
 	i = 0;
 	r = getrule(s);
@@ -2763,9 +2813,9 @@ attribute(Sfio_t* xp, char* s, register char* att, int sep)
 static void
 generate(Sfio_t* xp, char* name, char* pat, int sep)
 {
-	register struct rule*	x;
-	register struct list*	p;
-	register struct list*	q;
+	register Rule_t*	x;
+	register List_t*	p;
+	register List_t*	q;
 	char*			b;
 	char			stem[MAXNAME];
 
@@ -2813,9 +2863,9 @@ generate(Sfio_t* xp, char* name, char* pat, int sep)
 							{
 								/*UNDENT...*/
 
-	struct rule*		y;
-	struct rule*		z;
-	struct list*		u;
+	Rule_t*			y;
+	Rule_t*			z;
+	List_t*			u;
 	long			b;
 
 	if (z = metarule(q->rule->name, p->rule->name, 0))
@@ -2836,7 +2886,7 @@ generate(Sfio_t* xp, char* name, char* pat, int sep)
 						break;
 				}
 				if (sfstrtell(xp) != b)
-					sfstrrel(xp, -1);
+					sfstrseek(xp, -1, SEEK_CUR);
 				sfstrclose(tp);
 				return;
 			}
@@ -2856,7 +2906,7 @@ generate(Sfio_t* xp, char* name, char* pat, int sep)
 							sfputc(xp, ' ');
 					}
 					if (sfstrtell(xp) != b)
-						sfstrrel(xp, -1);
+						sfstrseek(xp, -1, SEEK_CUR);
 					sfstrclose(tp);
 					return;
 				}
@@ -3043,7 +3093,7 @@ editcontext(register char* beg, register char* cur)
 {
 	register int	n;
 
-	sfstrset(internal.tmp, 0);
+	sfstrseek(internal.tmp, 0, SEEK_SET);
 	if ((n = cur - beg) > (EDITCONTEXT / 2)) beg = cur - (n = (EDITCONTEXT / 2));
 	if (n > 0) sfprintf(internal.tmp, "%-*.*s", n, n, beg);
 	if (*cur) sfprintf(internal.tmp, ">>>%c", *cur);
@@ -3064,7 +3114,7 @@ static void
 expandall(register Sfio_t* xp, register unsigned long all)
 {
 	register int		sep;
-	register struct rule*	r;
+	register Rule_t*	r;
 	Hash_position_t*	pos;
 
 	sep = 0;
@@ -3072,7 +3122,7 @@ expandall(register Sfio_t* xp, register unsigned long all)
 	{
 		while (hashnext(pos))
 		{
-			r = (struct rule*)pos->bucket->value;
+			r = (Rule_t*)pos->bucket->value;
 			if (pos->bucket->name == r->name && !(r->dynamic & D_alias) && (!all || (r->dynamic & all)))
 			{
 				if (sep) sfputc(xp, ' ');
@@ -3127,7 +3177,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 	char*			ctx_end;
 	char*			tok;
 	char*			x;
-	struct rule*		r;
+	Rule_t*			r;
 	Edit_map_t*		map;
 	Hash_position_t*	pos;
 	int			out;
@@ -3642,7 +3692,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			if (xp)
 			{
 				sfputc(xp, 0);
-				x = sfstrset(xp, beg);
+				x = sfstrseek(xp, beg, SEEK_SET);
 			}
 			else
 				x = v;
@@ -3777,7 +3827,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			{
 				buf[1] = sfstropen();
 				sfputr(buf[1], x, 0);
-				x = sfstrset(buf[1], 0);
+				x = sfstrseek(buf[1], 0, SEEK_SET);
 			}
 			n = SORT_sort;
 			if (val == DELETE || val == KEEP)
@@ -3869,7 +3919,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				{
 					if (!hashnext(pos))
 						goto breakloop;
-					r = (struct rule*)pos->bucket->value;
+					r = (Rule_t*)pos->bucket->value;
 					if (pos->bucket->name == r->name && !(r->dynamic & D_alias) && (exp < 0 || (r->dynamic & all)))
 					{
 						r->dynamic &= ~all;
@@ -3963,7 +4013,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				break;
 			case 'O':
 				if (cntlim < 0)
-					sfstrset(xp, arg = beg);
+					sfstrseek(xp, arg = beg, SEEK_SET);
 				else
 					switch (sep)
 					{
@@ -4032,7 +4082,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				*ctx_end = MARK_CONTEXT;
 				n = sfstrtell(xp) - ctx_beg;
 				if (!n)
-					sfstrrel(xp, -1);
+					sfstrseek(xp, -1, SEEK_CUR);
 				else if (n > 1 && *(s = sfstrbase(xp) + ctx_beg) == MARK_CONTEXT)
 					*(s - 1) = ' ';
 				else
@@ -4066,7 +4116,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			if (all && sfstrtell(xp) > beg)
 			{
 				sfputc(xp, 0);
-				makerule(sfstrset(xp, beg))->dynamic |= lla;
+				makerule(sfstrseek(xp, beg, SEEK_SET))->dynamic |= lla;
 			}
 		}
 	breakloop:
@@ -4074,7 +4124,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		{
 			*ctx_end = MARK_CONTEXT;
 			if (sfstrtell(xp) == ctx_beg)
-				sfstrrel(xp, -1);
+				sfstrseek(xp, -1, SEEK_CUR);
 		}
 		if (all)
 		{
@@ -4092,7 +4142,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 
 					while (hashnext(pos))
 					{
-						r = (struct rule*)pos->bucket->value;
+						r = (Rule_t*)pos->bucket->value;
 						r->dynamic &= ~all;
 					}
 					hashdone(pos);
@@ -4111,7 +4161,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				if (op == 'O' && !cntlim)
 					sfprintf(xp, "%d", cnt - 1);
 				else if (arg > beg)
-					sfstrrel(xp, -1);
+					sfstrseek(xp, -1, SEEK_CUR);
 			}
 		}
 
@@ -4359,8 +4409,8 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 	{
 		pos = sfstrtell(xp);
 		sfputc(xp, 0);
-		error(-10, "expand(%s,lev=%d): `%s'", sfstrbase(msg), level, sfstrset(xp, beg));
-		sfstrset(xp, pos);
+		error(-10, "expand(%s,lev=%d): `%s'", sfstrbase(msg), level, sfstrseek(xp, beg, SEEK_SET));
+		sfstrseek(xp, pos, SEEK_SET);
 		sfstrclose(msg);
 	}
 #endif
@@ -4425,7 +4475,12 @@ expand(register Sfio_t* xp, register char* a)
 				p = 1;
 				while (c = *a++)
 				{
-					if (c == '"')
+					if (c == '\\' && *a)
+					{
+						sfputc(xp, c);
+						c = *a++;
+					}
+					else if (c == '"')
 						q = !q;
 					else if (q)
 						/* quoted */;
@@ -4468,7 +4523,7 @@ expand(register Sfio_t* xp, register char* a)
 					sfputc(xp, c);
 				}
 				sfputc(xp, 0);
-				s = sfstrset(xp, var);
+				s = sfstrseek(xp, var, SEEK_SET);
 				if (q || !c)
 				{
 					a--;

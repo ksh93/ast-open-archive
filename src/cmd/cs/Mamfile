@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -10,8 +10,8 @@ setv AS as
 setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS
-setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
-setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make cs
 make cs.o
@@ -129,10 +129,6 @@ done ${INSTALLROOT}/include/ast/error.h dontcare
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/ast/debug.h
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h
 make ${INSTALLROOT}/include/ast/tok.h implicit
 prev ${INSTALLROOT}/include/ast/ast.h implicit
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
@@ -186,7 +182,7 @@ prev ${INSTALLROOT}/include/ast/ast.h implicit
 done cs.c
 meta cs.o %.c>%.o cs.c cs
 prev cs.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?cs]"\" -c cs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c cs.c
 done cs.o generated
 bind -lcs
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o cs cs.o ${mam_libcs} ${mam_libast}
@@ -194,7 +190,6 @@ done cs generated
 make css
 make css.o
 make css.c
-prev ${INSTALLROOT}/include/ast/sfstr.h implicit
 prev ${INSTALLROOT}/include/ast/proc.h implicit
 prev ${INSTALLROOT}/include/ast/error.h implicit
 make ${INSTALLROOT}/include/ast/css.h implicit
@@ -204,7 +199,7 @@ done ${INSTALLROOT}/include/ast/css.h
 done css.c
 meta css.o %.c>%.o css.c css
 prev css.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?cs]"\" -c css.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c css.c
 done css.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o css css.o ${mam_libcs} ${mam_libast}
 done css generated
@@ -269,7 +264,6 @@ done fs_env.svc generated
 make mbb.svc
 make mbb.o
 make mbb.c
-prev ${INSTALLROOT}/include/ast/sfstr.h implicit
 prev ${INSTALLROOT}/include/ast/ls.h implicit
 prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/debug.h implicit
@@ -277,7 +271,7 @@ prev ${INSTALLROOT}/include/ast/css.h implicit
 done mbb.c
 meta mbb.o %.c>%.o mbb.c mbb
 prev mbb.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?cs]"\" -c mbb.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cs]"\" -c mbb.c
 done mbb.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mbb.svc mbb.o ${mam_libcs} ${mam_libast}
 done mbb.svc generated
@@ -331,7 +325,6 @@ make tst-old.svc
 make tst-old.o
 make tst-old.c
 prev ${INSTALLROOT}/include/ast/tm.h implicit
-prev ${INSTALLROOT}/include/ast/sfstr.h implicit
 prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/cs.h implicit
 done tst-old.c
@@ -345,7 +338,6 @@ make tst.svc
 make tst.o
 make tst.c
 prev ${INSTALLROOT}/include/ast/tm.h implicit
-prev ${INSTALLROOT}/include/ast/sfstr.h implicit
 prev ${INSTALLROOT}/include/ast/error.h implicit
 prev ${INSTALLROOT}/include/ast/css.h implicit
 done tst.c

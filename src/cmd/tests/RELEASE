@@ -1,3 +1,6 @@
+05-01-04 date.c: add ``FMT time format answer''
+04-10-31 date.dat: add { hours days weeks months } ago tests
+04-10-27 opt.tst: TESTs 9? for astsa (stanadalone ast)
 04-09-14 date.dat: add %| and %& tests
 04-09-08 opt.tst: add :!value: omitted optional arg value TEST 47
 04-04-15 date.dat: add specific and ordinal day tests

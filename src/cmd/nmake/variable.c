@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -39,15 +37,15 @@
  */
 
 static int
-scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, int sep, int op)
+scanprereqs(register Sfio_t* sp, Rule_t* r, int dostate, int all, int top, int sep, int op)
 {
 	register int		i;
-	register struct list*	p;
-	register struct rule*	x;
-	struct rule*		y;
-	struct rule*		z;
-	struct list*		prereqs[4];
-	struct list		t;
+	register List_t*	p;
+	register Rule_t*	x;
+	Rule_t*			y;
+	Rule_t*			z;
+	List_t*			prereqs[4];
+	List_t			t;
 
 	i = 0;
 	if (r->scan == SCAN_IGNORE && !(state.questionable & 0x02000000))
@@ -113,7 +111,7 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
  */
 
 static int
-genprereqs(Sfio_t* sp, struct rule* r, int dostate, int all, int sep, int op)
+genprereqs(Sfio_t* sp, Rule_t* r, int dostate, int all, int sep, int op)
 {
 	state.val++;
 	sep = scanprereqs(sp, r, dostate, all, 1, sep, op);
@@ -131,12 +129,12 @@ genprereqs(Sfio_t* sp, struct rule* r, int dostate, int all, int sep, int op)
 char*
 getval(register char* s, int op)
 {
-	register struct list*	p;
-	register struct rule*	r;
-	struct rule*		x;
-	struct rule*		z;
-	struct var*		v;
-	struct var*		a;
+	register List_t*	p;
+	register Rule_t*	r;
+	Rule_t*			x;
+	Rule_t*			z;
+	Var_t*			v;
+	Var_t*			a;
 	char*			t;
 	char*			val;
 	char*			next;
@@ -146,7 +144,7 @@ getval(register char* s, int op)
 	int			tokens;
 	int			pop;
 	int			sep;
-	unsigned long		e;
+	Time_t			e;
 	char**			ap;
 	char*			arg[16];
 
@@ -532,7 +530,7 @@ getval(register char* s, int op)
  */
 
 static void
-resetvar(register struct var* p, char* v, int append)
+resetvar(register Var_t* p, char* v, int append)
 {
 	register int	n;
 
@@ -558,11 +556,11 @@ resetvar(register struct var* p, char* v, int append)
  * set the value of a variable
  */
 
-struct var*
+Var_t*
 setvar(char* s, char* v, int flags)
 {
 	register char*		t;
-	register struct var*	p;
+	register Var_t*		p;
 	register int		n;
 	int			isid;
 
@@ -721,7 +719,7 @@ char*
 colonlist(register Sfio_t* sp, register char* s, int exp, register int del)
 {
 	register char*	p;
-	struct var*	v;
+	Var_t*		v;
 
 	if (exp)
 	{
@@ -750,13 +748,13 @@ colonlist(register Sfio_t* sp, register char* s, int exp, register int del)
  */
 
 void
-localvar(Sfio_t* sp, register struct var* v, char* value, int property)
+localvar(Sfio_t* sp, register Var_t* v, char* value, int property)
 {
 	register char*	s;
 	register int	c;
 	char*		prefix;
 	char*		t;
-	struct var*	x;
+	Var_t*		x;
 
 	prefix = (property & V_local_D) ? null : "_";
 	if (state.mam.out && (!(v->property & property) || !sp))
@@ -832,6 +830,6 @@ readenv(void)
 			if (*t++ == '=')
 				setvar(sfstruse(internal.nam), t, V_import);
 			else
-				sfstrset(internal.nam, 0);
+				sfstrseek(internal.nam, 0, SEEK_SET);
 		}
 }

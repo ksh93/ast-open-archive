@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -33,7 +31,7 @@
 #include "make.h"
 #include "options.h"
 
-#define getoption(n)	((struct option*)hashget(opt.table,(n)))
+#define getoption(n)	((Option_t*)hashget(opt.table,(n)))
 
 #define OPT_OFFSET	10
 #define OPT_NON		'-'
@@ -62,7 +60,7 @@ USAGE_LICENSE
 "	them. Unqualified options are defined by \bnmake\b itself.]"
 ;
 
-static struct option	options[] =	/* option table			*/
+static Option_t		options[] =	/* option table			*/
 {
 
 { "accept",	OPT_accept,	(char*)&state.accept,		0,
@@ -295,32 +293,34 @@ static const char usage2[] =
 "	\bprobe\b(1), \bsh\b(1)]"
 ;
 
-struct oplist				/* linked option list		*/
+struct Oplist_s; typedef struct Oplist_s Oplist_t;
+
+struct Oplist_s				/* linked option list		*/
 {
 	char*		option;		/* option value for set()	*/
-	struct oplist*	next;		/* next in list			*/
+	Oplist_t*	next;		/* next in list			*/
 };
 
-struct optstate				/* option state			*/
+typedef struct Optstate_s		/* option state			*/
 {
-	struct oplist*	hidden;		/* options hidden by cmd line	*/
-	struct oplist*	lasthidden;	/* tail of hidden		*/
-	struct oplist*	delayed;	/* delayed unknown options	*/
-	struct oplist*	lastdelayed;	/* tail of delayed		*/
+	Oplist_t*	hidden;		/* options hidden by cmd line	*/
+	Oplist_t*	lasthidden;	/* tail of hidden		*/
+	Oplist_t*	delayed;	/* delayed unknown options	*/
+	Oplist_t*	lastdelayed;	/* tail of delayed		*/
 
-	struct option*	head;		/* head of external option list	*/
-	struct option*	tail;		/* tail of external option list	*/
+	Option_t*	head;		/* head of external option list	*/
+	Option_t*	tail;		/* tail of external option list	*/
 
 	Hash_table_t*	table;
 
 	Sfio_t*		usage;		/* generated optget() usage	*/
 	int		usageindex;	/* next user index		*/
-};
+} Optstate_t;
 
-static struct optstate	opt;
+static Optstate_t	opt;
 
 static void
-putoption(register struct option* op, int index)
+putoption(register Option_t* op, int index)
 {
 	register char*	s;
 	register int	c;
@@ -384,10 +384,10 @@ optinit(void)
  * type==0 panics if not in table
  */
 
-struct option*
+Option_t*
 optflag(register int flag)
 {
-	register struct option*	op;
+	register Option_t*	op;
 	char			buf[8];
 
 	if (flag & Of)
@@ -408,9 +408,9 @@ optflag(register int flag)
  */
 
 static void
-setcall(register struct option* op, int readonly)
+setcall(register Option_t* op, int readonly)
 {
-	struct rule*	r;
+	Rule_t*		r;
 	char*		oset;
 	int		oreadonly;
 	char		buf[16];
@@ -465,7 +465,7 @@ declarestr(register Sfio_t* sp, register const char* s)
  */
 
 static void
-declare(Sfio_t* sp, register struct option* op)
+declare(Sfio_t* sp, register Option_t* op)
 {
 	if (!(op->flags & Of))
 		sfputc(internal.tmp, OPT(op->flags));
@@ -497,7 +497,7 @@ declare(Sfio_t* sp, register struct option* op)
  */
 
 static void
-genusage(register struct option* op, int index, int last)
+genusage(register Option_t* op, int index, int last)
 {
 	long	pos;
 
@@ -533,7 +533,7 @@ genusage(register struct option* op, int index, int last)
 		sfprintf(opt.usage, usage2, version);
 	else
 		sfputc(opt.usage, 0);
-	sfstrset(opt.usage, pos);
+	sfstrseek(opt.usage, pos, SEEK_SET);
 }
 
 /*
@@ -576,20 +576,18 @@ mamwrite(Sfio_t* fp, const void* buf, size_t n, Sfdisc_t* dp)
 }
 
 /*
- * make sure the start time is > the last program invocation
- * and then make sure the current time is > the start time
+ * make sure the current time is > the start time
+ * to differentiate strtime() "recent" vs. "current"
  */
 
 static void
 regressinit(void)
 {
-	unsigned long	t;
+	Time_t	t;
 
 	while (state.start == (t = CURTIME))
-		sleep(1);
+		tmsleep(0L, 100000000L);
 	state.start = t;
-	while (state.start == CURTIME)
-		sleep(1);
 	error_info.version = 0;
 }
 
@@ -598,7 +596,7 @@ regressinit(void)
  */
 
 static char*
-showop(register struct option* op)
+showop(register Option_t* op)
 {
 	sfprintf(internal.tmp, "%s,", op->name);
 	sfprintf(internal.tmp, (op->flags & Of) ? "%03o," : "'%c',", op->flags & ((1<<8) - 1));
@@ -702,10 +700,10 @@ field(char** p, int sep, int app, int lenient)
  */
 
 static void
-setop(register struct option* op, register int n, char* s, int type)
+setop(register Option_t* op, register int n, char* s, int type)
 {
 	char*		t;
-	struct rule*	r;
+	Rule_t*		r;
 	int		readonly;
 
 	readonly = state.readonly;
@@ -717,7 +715,7 @@ setop(register struct option* op, register int n, char* s, int type)
 			op->flags |= OPT_READONLY;
 		else if (!state.user && (op->flags & OPT_READONLY))
 		{
-			struct oplist*	x;
+			Oplist_t*	x;
 
 			/*
 			 * save for listops(*,'O')
@@ -732,7 +730,7 @@ setop(register struct option* op, register int n, char* s, int type)
 				sfprintf(internal.tmp, "=%d", n);
 			n = sfstrtell(internal.tmp);
 			s = sfstruse(internal.tmp);
-			x = newof(0, struct oplist, 1, n);
+			x = newof(0, Oplist_t, 1, n);
 			x->option = strcpy((char*)(x + 1), s);
 			if (opt.lasthidden)
 				opt.lasthidden = opt.lasthidden->next = x;
@@ -982,7 +980,7 @@ setop(register struct option* op, register int n, char* s, int type)
 			char*		func;
 			char*		desc;
 			char*		args;
-			struct option*	nop;
+			Option_t*	nop;
 			int		app;
 			int		sep;
 			char		buf[16];
@@ -1106,7 +1104,7 @@ setop(register struct option* op, register int n, char* s, int type)
 			}
 			else if (!(nop = getoption(name)))
 			{
-				nop = newof(0, struct option, 1, sizeof(char*));
+				nop = newof(0, Option_t, 1, sizeof(char*));
 				nop->value = (char*)(nop + 1);
 				nop->flags = n|OPT_EXTERNAL;
 				if (!state.loading)
@@ -1286,7 +1284,7 @@ setop(register struct option* op, register int n, char* s, int type)
 					{
 						if (t = strchr(s, ':'))
 							*t = 0;
-						addprereq((*(struct rule**)op->value), makerule(s), PREREQ_APPEND);
+						addprereq((*(Rule_t**)op->value), makerule(s), PREREQ_APPEND);
 						if (!t)
 							break;
 						*t++ = ':';
@@ -1295,8 +1293,8 @@ setop(register struct option* op, register int n, char* s, int type)
 				}
 				else
 				{
-					freelist((*(struct rule**)op->value)->prereqs);
-					(*(struct rule**)op->value)->prereqs = 0;
+					freelist((*(Rule_t**)op->value)->prereqs);
+					(*(Rule_t**)op->value)->prereqs = 0;
 				}
 			}
 			else
@@ -1318,11 +1316,11 @@ setop(register struct option* op, register int n, char* s, int type)
  */
 
 static void
-genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
+genop(register Sfio_t* sp, register Option_t* op, int setting, int flag)
 {
 	register long		n;
 	char*			v;
-	struct list*		p;
+	List_t*			p;
 
 	switch (setting)
 	{
@@ -1409,7 +1407,7 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 	case Os:
 		if ((op->flags & Oa) && op->value && !(flag & Oi))
 		{
-			p = (*(struct rule**)op->value)->prereqs;
+			p = (*(Rule_t**)op->value)->prereqs;
 			switch (setting)
 			{
 			case 0:
@@ -1491,7 +1489,7 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 void
 optcheck(int must)
 {
-	struct oplist*	x;
+	Oplist_t*	x;
 	int		errors;
 
 	if (must)
@@ -1527,8 +1525,8 @@ optcheck(int must)
 void
 listops(register Sfio_t* sp, int setting)
 {
-	register struct option*	op;
-	register struct oplist*	x;
+	register Option_t*	op;
+	register Oplist_t*	x;
 	int			sc;
 	int			sep;
 	long			mask;
@@ -1616,7 +1614,7 @@ listops(register Sfio_t* sp, int setting)
 void
 getop(register Sfio_t* sp, char* name, int setting)
 {
-	register struct option*	op;
+	register Option_t*	op;
 	int			flag;
 
 	if ((op = getoption(name)) && !(flag = 0) || name[0] == 'n' && name[1] == 'o' && (op = getoption(&name[2])) && (flag = Oi) || name[0] && !name[1] && (op = optflag(name[0])) && (flag = Of))
@@ -1632,15 +1630,15 @@ optset(int i, char* v, Sfio_t* scope)
 {
 	register char*	s;
 	int		n;
-	struct option*	op;
-	struct oplist*	x;
+	Option_t*	op;
+	Oplist_t*	x;
 	char		buf[16];
 
 	if (i > 0)
 	{
 		if (state.readonly && !state.interpreter)
 		{
-			x = newof(0, struct oplist, 1, strlen(v) + 1);
+			x = newof(0, Oplist_t, 1, strlen(v) + 1);
 			x->option = strcpy((char*)(x + 1), v);
 			if (opt.lastdelayed)
 				opt.lastdelayed = opt.lastdelayed->next = x;
@@ -1755,7 +1753,12 @@ scanargs(int argc, char** argv, int* argf)
 		if (*s)
 		{
 			for (e = s; c = *s; s++)
-				if (istype(c, C_TERMINAL) && c != '+' && c != '&')
+				if (c == ',')
+				{
+					s = null;
+					break;
+				}
+				else if (istype(c, C_TERMINAL) && c != '+' && c != '&')
 				{
 					while (isspace(*s))
 						s++;
@@ -1798,8 +1801,8 @@ punt(int old)
 	register char*		s;
 	register char**		av;
 	int			i;
-	struct list*		p;
-	struct oplist*		x;
+	List_t*			p;
+	Oplist_t*		x;
 	Sfio_t*			vec;
 
 	if (state.reread > 1) error(PANIC, "makefile prerequisites cause unbounded make exec recursion");

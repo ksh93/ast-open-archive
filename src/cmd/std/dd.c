@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2004 AT&T Corp.                  *
+*                  Copyright (c) 1989-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -61,7 +59,6 @@ static const char usage2[] =
 #include <iconv.h>
 #include <ls.h>
 #include <sig.h>
-#include <sfstr.h>
 #include <swap.h>
 
 #define CODE		0
@@ -203,8 +200,9 @@ static State_t		state =
 	{
 		"from",
 		CODE,
-		"Convert from \acharset\a to the \bto\b=\acharset\a"
-		" or the local default.",
+		"Convert from \acodeset\a to the \bto\b=\acodeset\a"
+		" or the local default. \acodeset\a names are matched"
+		" by left-anchored case-insensitive \bksh\b(1) patterns.",
 	},
 	{
 		"ibs",
@@ -261,8 +259,8 @@ static State_t		state =
 	{
 		"to",
 		CODE,
-		"Convert to \acharset\a from the \bfrom\b=\acharset\a"
-		" or the local default. See \bfrom\b for \acharset\a names.",
+		"Convert to \acodeset\a from the \bfrom\b=\acodeset\a"
+		" or the local default. See \bfrom\b for \acodeset\a names.",
 	},
 
 	{
@@ -381,7 +379,7 @@ static State_t		state =
 
 static Desc_t		desc[] =
 {
-	"charset",	"",
+	"codeset",	"",
 	"conversion",	"",
 	0,		0,
 	"number",	0,
@@ -499,25 +497,9 @@ main(int argc, char** argv)
 						sfputc(sp, '[');
 						sfputc(sp, '+');
 						sfputc(sp, '\b');
-						s = (char*)ic->match;
-						if (*s == '(')
-							s++;
-						while (i = *s++)
-						{
-							if (i == ')' && !*s)
-								break;
-							if (i == '?' || i == ']')
-								sfputc(sp, i);
-							sfputc(sp, i);
-						}
+						optesc(sp, ic->match, '?');
 						sfputc(sp, '?');
-						s = (char*)ic->desc;
-						while (i = *s++)
-						{
-							if (i == ']')
-								sfputc(sp, i);
-							sfputc(sp, i);
-						}
+						optesc(sp, ic->desc, 0);
 						sfputc(sp, ']');
 						sfputc(sp, '\n');
 					}

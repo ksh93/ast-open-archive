@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -43,7 +41,7 @@
 	{ \
 		if (error_info.trace <= -14) \
 		{ \
-			struct list*	q; \
+			List_t*		q; \
 			message((-14, "  [%d] %s", n, (r)->name)); \
 			for (q = p; q; q = q->next) \
 				message((-14, "      %s", q->rule->name)); \
@@ -65,7 +63,7 @@
 static int
 file_compare(register const char* s, register const char* t)
 {
-	return ((struct file*)hashgetbucket(s)->value)->dir->ignorecase ? strcasecmp(s, t) : strcmp(s, t);
+	return ((File_t*)hashgetbucket(s)->value)->dir->ignorecase ? strcasecmp(s, t) : strcmp(s, t);
 }
 
 static unsigned int
@@ -164,7 +162,7 @@ inithash(void)
 	table.rule	= hashalloc(table.oldvalue, HASH_name, "atoms", 0);
 #endif
 	table.var	= hashalloc(table.oldvalue, HASH_name, "variables", 0);
-	table.dir	= hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(struct fileid), HASH_name, "directories", 0);
+	table.dir	= hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(Fileid_t), HASH_name, "directories", 0);
 	optinit();
 }
 
@@ -172,13 +170,13 @@ inithash(void)
  * determine if a directory (archive) has already been scanned
  */
 
-struct dir*
-unique(register struct rule* r)
+Dir_t*
+unique(register Rule_t* r)
 {
-	register struct dir*	d;
-	struct rule*		x;
-	struct fileid		id;
-	struct stat		st;
+	register Dir_t*	d;
+	Rule_t*		x;
+	Fileid_t	id;
+	Stat_t		st;
 
 	if (rstat(r->name, &st, 0))
 	{
@@ -203,7 +201,7 @@ unique(register struct rule* r)
 
 		if (!x->uname && strlen(r->name) < strlen(x->name))
 		{
-			struct rule*	t;
+			Rule_t*		t;
 
 			t = r;
 			r = x;
@@ -219,9 +217,9 @@ unique(register struct rule* r)
 		d->name = r->name = x->name;
 		return 0;
 	}
-	d = newof(0, struct dir, 1, 0);
+	d = newof(0, Dir_t, 1, 0);
 	d->name = r->name;
-	d->time = r->time = st.st_mtime;
+	d->time = r->time = tmxgetmtime(&st);
 	d->directory = S_ISDIR(st.st_mode) != 0;
 	putdir(0, d);
 #if _WINIX
@@ -234,11 +232,11 @@ unique(register struct rule* r)
  * add a directory (archive) entry to the file hash
  */
 
-struct file*
-addfile(struct dir* d, char* name, unsigned long date)
+File_t*
+addfile(Dir_t* d, char* name, Time_t date)
 {
-	register struct file*	f;
-	register struct file*	n;
+	register File_t*	f;
+	register File_t*	n;
 	register char*		s;
 
 	HACKSPACE(name, s);
@@ -262,15 +260,15 @@ addfile(struct dir* d, char* name, unsigned long date)
 			if (n->time < date)
 				n->time = date;
 #if DEBUG
-			message((-12, "%s: %s %s [duplicate member]", d->name, name, strtime(n->time)));
+			message((-12, "%s: %s %s [duplicate member]", d->name, name, timestr(n->time)));
 #endif
 		}
 		return n;
 	}
 #if DEBUG
-	message((-12, "%s: %s %s%s", d->name, name, strtime(date), d->ignorecase ? " [ignorecase]" : null));
+	message((-12, "%s: %s %s%s", d->name, name, timestr(date), d->ignorecase ? " [ignorecase]" : null));
 #endif
-	f = newof(0, struct file, 1, 0);
+	f = newof(0, File_t, 1, 0);
 	f->next = n;
 	f->dir = d;
 	f->time = date;
@@ -295,13 +293,13 @@ addfile(struct dir* d, char* name, unsigned long date)
  */
 
 void
-newfile(register struct rule* r, char* dir, unsigned long date)
+newfile(register Rule_t* r, char* dir, Time_t date)
 {
 	register char*		s;
 	register char*		t;
 	char*			nam;
-	struct rule*		z;
-	struct dir*		d;
+	Rule_t*			z;
+	Dir_t*			d;
 	Hash_position_t*	pos;
 	Sfio_t*			tmp;
 
@@ -326,7 +324,7 @@ newfile(register struct rule* r, char* dir, unsigned long date)
 			{
 				while (hashnext(pos))
 				{
-					d = (struct dir*)pos->bucket->value;
+					d = (Dir_t*)pos->bucket->value;
 					if (d->name == z->name)
 					{
 						addfile(d, s + 1, date);
@@ -348,14 +346,14 @@ newfile(register struct rule* r, char* dir, unsigned long date)
  */
 
 void
-dirscan(struct rule* r)
+dirscan(Rule_t* r)
 {
 	register DIR*		dirp;
-	register struct dir*	d;
-	register struct dirent*	entry;
+	register Dir_t*		d;
+	register Dirent_t*	entry;
 	char*			s;
 	int			n;
-	struct stat		st;
+	Stat_t			st;
 
 	if (r->dynamic & D_scanned)
 		return;
@@ -384,7 +382,7 @@ dirscan(struct rule* r)
 				if (!(r->dynamic & D_bound) && !stat(s, &st))
 				{
 					r->dynamic |= D_bound;
-					r->time = st.st_mtime;
+					r->time = tmxgetmtime(&st);
 					if (!r->view && ((state.questionable & 0x00000800) || !(r->property & P_target)) && *s == '/' && (strncmp(s, internal.pwd, internal.pwdlen) || *(s + internal.pwdlen) != '/'))
 						r->dynamic |= D_global;
 				}
@@ -398,14 +396,14 @@ dirscan(struct rule* r)
 	}
 }
 
-struct globstate
+typedef struct Globstate_s
 {
 	char*		name;
 	DIR*		dirp;
 	int		view;
 	int		root;
 	Hash_table_t*	overlay;
-};
+} Globstate_t;
 
 /*
  * glob() diropen for 2d views
@@ -414,10 +412,10 @@ struct globstate
 static void*
 glob_diropen(glob_t* gp, const char* path)
 {
-	struct globstate*	gs = (struct globstate*)gp->gl_handle;
-	const char*		dir;
-	register int		i;
-	register int		n;
+	Globstate_t*	gs = (Globstate_t*)gp->gl_handle;
+	const char*	dir;
+	register int	i;
+	register int	n;
 
 	if (!(gs->overlay = hashalloc(NiL, HASH_set, HASH_ALLOCATE, 0)))
 		return 0;
@@ -464,9 +462,9 @@ glob_diropen(glob_t* gp, const char* path)
 static char*
 glob_dirnext(glob_t* gp, void* handle)
 {
-	struct globstate*	gs = (struct globstate*)handle;
-	struct dirent*		dp;
-	char*			s;
+	Globstate_t*	gs = (Globstate_t*)handle;
+	Dirent_t*	dp;
+	char*		s;
 
 	for (;;)
 	{
@@ -511,7 +509,7 @@ glob_dirnext(glob_t* gp, void* handle)
 static void
 glob_dirclose(glob_t* gp, void* handle)
 {
-	struct globstate*	gs = (struct globstate*)handle;
+	Globstate_t*	gs = (Globstate_t*)handle;
 
 	if (gs->dirp)
 		closedir(gs->dirp);
@@ -529,7 +527,7 @@ glob_type(glob_t* gp, const char* path)
 	register int		i;
 	register int		n;
 	int			root;
-	struct stat		st;
+	Stat_t			st;
 
 	i = 0;
 	if ((*gp->gl_stat)(path, &st))
@@ -587,7 +585,7 @@ globv(register glob_t* gp, char* s)
 	int			i;
 	int			f;
 	glob_t			gl;
-	struct globstate	gs;
+	Globstate_t		gs;
 
 	static char*		nope[1];
 
@@ -599,6 +597,7 @@ globv(register glob_t* gp, char* s)
 	}
 	memset(gp, 0, sizeof(gl));
 	gp->gl_intr = &state.caught;
+	gp->gl_stat = pathstat;
 	if (state.maxview && !state.fsview)
 	{
 		gp->gl_handle = (void*)&gs;
@@ -607,7 +606,7 @@ globv(register glob_t* gp, char* s)
 		gp->gl_dirclose = glob_dirclose;
 		gp->gl_type = glob_type;
 	}
-	if (i = glob(s, GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STACK|GLOB_STARSTAR, 0, gp))
+	if (i = glob(s, f, 0, gp))
 	{
 		if (!trap())
 			error(2, "glob() internal error %d", i);
@@ -633,15 +632,15 @@ globv(register glob_t* gp, char* s)
  * a pointer to r merged with x is returned
  */
 
-static struct rule*
-bindalias(register struct rule* r, register struct rule* x, char* path, struct rule* d)
+static Rule_t*
+bindalias(register Rule_t* r, register Rule_t* x, char* path, Rule_t* d)
 {
 	char*		s;
 	int		i;
 	int		n;
 	int		na = 0;
-	struct rule*	z;
-	struct rule*	a[3];
+	Rule_t*		z;
+	Rule_t*		a[3];
 
 	if (x->dynamic & D_alias)
 	{
@@ -722,6 +721,15 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 			debug((-5, "%s rebind %s => %s", x->name, getbound(x->name), s));
 			putbound(x->name, s);
 		}
+		else if (r->uname && (n = strlen(r->name)) > (i = strlen(r->uname)) && r->name[n-=i+1] == '/')
+		{
+			r->name[n] = 0;
+			s = (z = getrule(r->name)) ? z->name : strdup(r->name);
+			r->name[n] = '/';
+			debug((-5, "%s and %s are bound in %s", r->name, r->uname, s));
+			putbound(r->name, s);
+			putbound(r->uname, s);
+		}
 		else
 		{
 			debug((-5, "no rebind for %s or %s", unbound(r), unbound(x)));
@@ -746,11 +754,11 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
  * 0 always returned if !state && == r or if not in local view
  */
 
-static struct rule*
-localrule(register struct rule* r, int force)
+static Rule_t*
+localrule(register Rule_t* r, int force)
 {
 	register char*		s;
-	register struct rule*	x;
+	register Rule_t*	x;
 	char*			p;
 	char*			v;
 	Sfio_t*			tmp;
@@ -826,15 +834,15 @@ localrule(register struct rule* r, int force)
  * bind a rule to a file
  */
 
-struct rule*
-bindfile(register struct rule* r, char* name, int flags)
+Rule_t*
+bindfile(register Rule_t* r, char* name, int flags)
 {
-	register struct rule*	d;
-	register struct file*	f;
+	register Rule_t*	d;
+	register File_t*	f;
 	register char*		s;
-	struct list*		p;
-	struct file*		files;
-	struct file*		ofiles;
+	List_t*			p;
+	File_t*			files;
+	File_t*			ofiles;
 	char*			dir = 0;
 	char*			base;
 	char*			b;
@@ -846,19 +854,19 @@ bindfile(register struct rule* r, char* name, int flags)
 	int			allocated = 0;
 	int			aliased = 0;
 	unsigned int		view;
-	unsigned long		tm;
-	struct stat		st;
-	struct rule*		a;
-	struct rule*		od;
-	struct rule*		x;
-	struct rule*		z;
-	struct list*		dirs[5];
-	struct list		dot;
+	Time_t			tm;
+	Stat_t			st;
+	Rule_t*			a;
+	Rule_t*			od;
+	Rule_t*			x;
+	Rule_t*			z;
+	List_t*			dirs[5];
+	List_t			dot;
 	Sfio_t*			buf;
 	Sfio_t*			tmp;
 
-	static struct dir	tmp_dir;
-	static struct file	tmp_file = { 0, &tmp_dir, NOTIME };
+	static Dir_t		tmp_dir;
+	static File_t		tmp_file = { 0, &tmp_dir, NOTIME };
 
 	if (r || (r = getrule(name)))
 	{
@@ -898,11 +906,11 @@ bindfile(register struct rule* r, char* name, int flags)
 #endif
 		{
 			sfputr(buf, name, 0);
-			s = sfstrset(buf, 0);
+			s = sfstrseek(buf, 0, SEEK_SET);
 			canon(s);
 			if (!rstat(s, &st, 0))
 			{
-				tm = st.st_mtime;
+				tm = tmxgetmtime(&st);
 				f = 0;
 				found = 1;
 			}
@@ -919,7 +927,7 @@ bindfile(register struct rule* r, char* name, int flags)
 							if (!rstat(b = sfstruse(internal.nam), &st, 0))
 							{
 								sfputr(buf, b, 0);
-								tm = st.st_mtime;
+								tm = tmxgetmtime(&st);
 								f = 0;
 								found = 1;
 #if 0 /* not sure about this */
@@ -1035,7 +1043,7 @@ bindfile(register struct rule* r, char* name, int flags)
 
 		if (r && r->active && (r->active->parent->target->property & P_archive) && !(r->dynamic & D_membertoo))
 		{
-			struct dir*	ar;
+			Dir_t*		ar;
 
 			i = 0;
 			for (f = files; f; f = f->next)
@@ -1196,13 +1204,13 @@ bindfile(register struct rule* r, char* name, int flags)
 					{
 						view = d->view;
 						tm = x->time;
-						message((-3, "%s: believe time [%s] from view %d", r->name, strtime(tm), view));
+						message((-3, "%s: believe time [%s] from view %d", r->name, timestr(tm), view));
 					}
 					else if (rstat(s, &st, 0))
 						tm = 0;
 					else
 					{
-						tm = st.st_mtime;
+						tm = tmxgetmtime(&st);
 						view = state.fsview ? iview(&st) : d->view;
 					}
 				}
@@ -1269,7 +1277,7 @@ bindfile(register struct rule* r, char* name, int flags)
 				if (n == '+')
 				{
 					st.st_mode = 0;
-					st.st_mtime = OLDTIME;
+					tmxsetmtime(&st, OLDTIME);
 					sfputr(buf, s, 0);
 				}
 				else
@@ -1290,17 +1298,18 @@ bindfile(register struct rule* r, char* name, int flags)
 						if (!(a->dynamic & D_bound))
 						{
 							st.st_mode = 0;
-							st.st_mtime = 0;
+							tmxsetmtime(&st, 0);
 						}
 						else if (!a->time)
 						{
 							st.st_mode = 0;
-							st.st_mtime = CURTIME;
+							tm = CURTIME;
+							tmxsetmtime(&st, tm);
 						}
 						else
 						{
 							st.st_mode = !(a->dynamic & D_regular);
-							st.st_mtime = a->time;
+							tmxsetmtime(&st, a->time);
 						}
 					}
 					if (n == '-' || *b)
@@ -1313,13 +1322,13 @@ bindfile(register struct rule* r, char* name, int flags)
 					{
 						aliased = 1;
 						sfputr(buf, s, 0);
-						s = sfstrset(buf, 0);
+						s = sfstrseek(buf, 0, SEEK_SET);
 						canon(s);
-						if (state.fsview && state.expandview && st.st_mtime && iview(&st))
+						if (state.fsview && state.expandview && tmxgetmtime(&st) && iview(&st))
 							mount(s, s, FS3D_GET|FS3D_VIEW|FS3D_SIZE(sfstrsize(buf)), NiL);
 					}
 				}
-				tm = t ? strtol(t, NiL, 0) : st.st_mtime;
+				tm = t ? timenum(t, NiL) : tmxgetmtime(&st);
 				view = a ? a->view : state.maxview + 1;
 				od = 0;
 				found = 1;
@@ -1373,9 +1382,9 @@ bindfile(register struct rule* r, char* name, int flags)
 
 		if (view > state.maxview)
 			view = 0;
-		b = sfstrset(buf, 0);
+		b = sfstrseek(buf, 0, SEEK_SET);
 #if DEBUG
-		message((-11, "bindfile(%s): path=%s rule=%s alias=%s view=%d time=%s", name, b, r ? r->name : (char*)0, (x = getrule(b)) && x != r ? x->name : (char*)0, view, strtime(tm)));
+		message((-11, "bindfile(%s): path=%s rule=%s alias=%s view=%d time=%s", name, b, r ? r->name : (char*)0, (x = getrule(b)) && x != r ? x->name : (char*)0, view, timestr(tm)));
 #endif
 		if (!r)
 			r = makerule(name);
@@ -1504,10 +1513,10 @@ bindfile(register struct rule* r, char* name, int flags)
  */
 
 void
-bindattribute(register struct rule* r)
+bindattribute(register Rule_t* r)
 {
-	register struct rule*	x;
-	register struct rule*	z;
+	register Rule_t*	x;
+	register Rule_t*	z;
 
 	r->dynamic |= D_bound;
 	if (x = associate(internal.attribute_p, r, NiL, NiL))
@@ -1524,10 +1533,10 @@ bindattribute(register struct rule* r)
  * bind a rule, possibly changing the rule name
  */
 
-struct rule*
-bind(register struct rule* r)
+Rule_t*
+bind(register Rule_t* r)
 {
-	register struct rule*	b;
+	register Rule_t*	b;
 
 	if (!r)
 		return 0;
@@ -1564,10 +1573,10 @@ bind(register struct rule* r)
  */
 
 void
-rebind(register struct rule* r, register int op)
+rebind(register Rule_t* r, register int op)
 {
 	char*		t;
-	struct rule*	x;
+	Rule_t*		x;
 
 	if (!(r->property & P_state))
 	{
@@ -1606,7 +1615,7 @@ rebind(register struct rule* r, register int op)
 		if (op > 0)
 			r->time = OLDTIME;
 	}
-	message((-2, "%s(%s) = %s", op > 0 ? "accept" : "rebind", r->name, strtime(r->time)));
+	message((-2, "%s(%s) = %s", op > 0 ? "accept" : "rebind", r->name, timestr(r->time)));
 }
 
 /*
@@ -1618,7 +1627,7 @@ rebind(register struct rule* r, register int op)
 int
 unbind(const char* s, char* v, void* h)
 {
-	register struct rule*	r = (struct rule*)v;
+	register Rule_t*	r = (Rule_t*)v;
 
 	if (!s || !h && (r->mark & M_mark) || h && (r->dynamic & D_alias) && (makerule(r->name)->mark & M_mark))
 	{
@@ -1663,10 +1672,10 @@ unbind(const char* s, char* v, void* h)
  * fix up .SOURCE prereqs after user assertion
  */
 
-struct rule*
-source(register struct rule* r)
+Rule_t*
+source(register Rule_t* r)
 {
-	register struct rule*	x;
+	register Rule_t*	x;
 
 	if (state.compile > COMPILED)
 		return r;
@@ -1688,11 +1697,11 @@ source(register struct rule* r)
 	{
 		register char*		s;
 		register char*		t;
-		register struct list*	p;
+		register List_t*	p;
 		int			dot;
 		unsigned int		view;
-		struct list*		z;
-		struct list		lst;
+		List_t*			z;
+		List_t			lst;
 		Sfio_t*			tmp;
 
 		/*
@@ -1783,7 +1792,7 @@ source(register struct rule* r)
 		}
 		else
 		{
-			struct list*	q;
+			List_t*		q;
 			int		dotted = 0;
 
 			q = r->prereqs;
@@ -1879,7 +1888,7 @@ source(register struct rule* r)
  */
 
 char*
-pathname(register char* s, register struct rule* r)
+pathname(register char* s, register Rule_t* r)
 {
 	if ((r->dynamic & D_bound) && !(r->property & (P_state|P_virtual)) && *r->name != '/')
 	{
@@ -1903,9 +1912,9 @@ pathname(register char* s, register struct rule* r)
  */
 
 char*
-localview(register struct rule* r)
+localview(register Rule_t* r)
 {
-	register struct rule*	x;
+	register Rule_t*	x;
 
 	if (r->dynamic & D_alias)
 		r = makerule(r->name);

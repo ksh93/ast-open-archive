@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2004 AT&T Corp.                  *
+*                  Copyright (c) 1987-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -31,6 +29,7 @@
 
 #include <dlldefs.h>
 #include <sfdisc.h>
+#include <tmx.h>
 
 static Format_t*
 scan(void)
@@ -176,7 +175,8 @@ selectfile(register Archive_t* ap, register File_t* f)
 		d->dev = f->st->st_dev;
 		d->ino = f->st->st_ino;
 		d->mode = f->st->st_mode;
-		tvgetstat(f->st, &d->atime, &d->mtime, NiL);
+		tvgetatime(&d->atime, f->st);
+		tvgetmtime(&d->mtime, f->st);
 		d->offset = ap->io->offset + ap->io->count;
 		d->size = f->st->st_size;
 		d->uncompressed = f->uncompressed;
@@ -208,7 +208,8 @@ selectfile(register Archive_t* ap, register File_t* f)
 			d->dev = f->st->st_dev;
 			d->ino = f->st->st_ino;
 			d->mode = f->st->st_mode;
-			tvgetstat(f->st, &d->atime, &d->mtime, NiL);
+			tvgetatime(&d->atime, f->st);
+			tvgetmtime(&d->mtime, f->st);
 			d->offset = ap->io->offset + ap->io->count;
 			d->size = f->st->st_size;
 			d->uncompressed = f->uncompressed;
@@ -435,9 +436,10 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 	register struct stat*	st = f->st;
 	char*			s = 0;
 	Sflong_t		n = 0;
+	Time_t			t = TMX_NOTIME;
 	int			type = 0;
 	int			k;
-	char*			t;
+	char*			e;
 	Option_t*		op;
 
 	static const char	fmt_time[] = "time=%?%l";
@@ -470,6 +472,7 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 			{
 			case OPT_atime:
 				n = st->st_atime;
+				t = tmxgetatime(st);
 				type = TYPE_time;
 				break;
 			case OPT_charset:
@@ -477,6 +480,7 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 				break;
 			case OPT_ctime:
 				n = st->st_ctime;
+				t = tmxgetctime(st);
 				type = TYPE_time;
 				break;
 			case OPT_delta_op:
@@ -594,6 +598,7 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 				break;
 			case OPT_mtime:
 				n = st->st_mtime;
+				t = tmxgetmtime(st);
 				type = TYPE_time;
 				break;
 			case OPT_name:
@@ -674,9 +679,9 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 		case 'd':
 			if (!op)
 				s = f->name;
-			if (t = strrchr(s, '/'))
+			if (e = strrchr(s, '/'))
 			{
-				sfwrite(state.tmp.fmt, s, t - s);
+				sfwrite(state.tmp.fmt, s, e - s);
 				s = sfstruse(state.tmp.fmt);
 			}
 			else
@@ -724,8 +729,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 	case 'F':
 		if (!op)
 			s = f->name;
-		if (t = strrchr(s, '/'))
-			s = t + 1;
+		if (e = strrchr(s, '/'))
+			s = e + 1;
 		break;
 	case 'M':
 		if (!op)
@@ -733,11 +738,19 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 		s = fmtmode(n, 1);
 		break;
 	case 'T':
-		if (!op)
-			n = st->st_mtime;
 		if (!arg)
 			arg = "%b %e %H:%M %Y";
-		s = fmttime(arg, n);
+		if (!op)
+		{
+			n = st->st_mtime;
+			t = tmxgetmtime(st);
+		}
+		if ((unsigned long)n >= state.testdate)
+		{
+			n = state.testdate;
+			t = TMX_NOTIME;
+		}
+		s = t == TMX_NOTIME ? fmttime(arg, n) : fmttmx(arg, t);
 		break;
 	default:
 		if (s)
@@ -753,8 +766,11 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 				if (!arg || !*arg)
 					arg = fmt_time + 5;
 				if ((unsigned long)n >= state.testdate)
+				{
 					n = state.testdate;
-				*ps = fmttime(arg, n);
+					t = TMX_NOTIME;
+				}
+				*ps = t == TMX_NOTIME ? fmttime(arg, (time_t)n) : fmttmx(arg, t);
 			}
 		}
 		else

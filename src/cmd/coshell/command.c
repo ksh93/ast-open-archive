@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2004 AT&T Corp.                  *
+*                  Copyright (c) 1990-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -329,9 +327,9 @@ command(int fd, char** ap)
 			continue;
 		}
 		n = sfstrtell(state.string);
-		sfstrset(state.string, 0);
+		sfstrseek(state.string, 0, SEEK_SET);
 		sfprintf(state.string, "#%05d\n", n - 7);
-		if (!cmdsend(fd, c, sfstrset(state.string, 0), n, &code)) break;
+		if (!cmdsend(fd, c, sfstrseek(state.string, 0, SEEK_SET), n, &code)) break;
 	}
 	return(code);
 }
@@ -811,5 +809,5 @@ server(int fd, int op, int sub, int arg, char* dat)
 		break;
 	}
 	if ((n = sfstrtell(state.string)) > 0)
-		cswrite(con[fd].info.user.fds[1], sfstrset(state.string, 0), n);
+		cswrite(con[fd].info.user.fds[1], sfstrseek(state.string, 0, SEEK_SET), n);
 }

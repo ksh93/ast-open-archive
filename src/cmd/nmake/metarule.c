@@ -1,16 +1,14 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                  Copyright (c) 1984-2005 AT&T Corp.                  *
 *                      and is licensed under the                       *
-*          Common Public License, Version 1.0 (the "License")          *
-*                        by AT&T Corp. ("AT&T")                        *
-*      Any use, downloading, reproduction or distribution of this      *
-*      software constitutes acceptance of the License.  A copy of      *
-*                     the License is available at                      *
+*                  Common Public License, Version 1.0                  *
+*                            by AT&T Corp.                             *
 *                                                                      *
-*         http://www.research.att.com/sw/license/cpl-1.0.html          *
-*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                A copy of the License is available at                 *
+*            http://www.opensource.org/licenses/cpl1.0.txt             *
+*         (with md5 checksum 059e8cd6165cb4c31e351f2b69388fd9)         *
 *                                                                      *
 *              Information and Software Systems Research               *
 *                            AT&T Research                             *
@@ -36,10 +34,10 @@
  * force causes the rule to be created
  */
 
-struct rule*
+Rule_t*
 metarule(char* in, char* out, int force)
 {
-	register struct rule*	r;
+	register Rule_t*	r;
 	register char*		s;
 
 	sfprintf(internal.met, "%s>%s", in, out ? out : "%");
@@ -65,7 +63,8 @@ metarule(char* in, char* out, int force)
 				sfprintf(internal.met, "%s>%s", in, r->prereqs->rule->name);
 				r = getrule(sfstruse(internal.met));
 			}
-			else r = 0;
+			else
+				r = 0;
 		}
 		if (r && (!(r->property & P_metarule) || !r->action && !r->uname))
 			r = 0;
@@ -87,10 +86,10 @@ metarule(char* in, char* out, int force)
  *	'X'	unconstrained output exclusions
  */
 
-struct rule*
+Rule_t*
 metainfo(int type, char* s1, char* s2, int force)
 {
-	register struct rule*	r;
+	register Rule_t*	r;
 
 	sfprintf(internal.met, "%s.%c.%s%s%s", internal.metarule->name, type, s1 ? s1 : null, s2 ? ">" : null, s2 ? s2 : null);
 	s1 = sfstruse(internal.met);
@@ -240,14 +239,14 @@ metaexpand(Sfio_t* sp, char* stem, char* p)
  */
 
 void
-metaclose(struct rule* in, struct rule* out, int c)
+metaclose(Rule_t* in, Rule_t* out, int c)
 {
 	char*		s;
-	struct rule*	x;
-	struct rule*	y;
-	struct rule*	z;
-	struct list*	p;
-	struct list*	q;
+	Rule_t*		x;
+	Rule_t*		y;
+	Rule_t*		z;
+	List_t*		p;
+	List_t*		q;
 	char		stem[MAXNAME];
 
 #if DEBUG
@@ -322,17 +321,17 @@ metaclose(struct rule* in, struct rule* out, int c)
  * *meta is the matching metarule
  */
 
-struct rule*
-metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
+Rule_t*
+metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 {
-	register struct list*	p;
-	register struct list*	q;
-	register struct list*	v;
-	struct rule*		m;
-	struct rule*		s;
-	struct rule*		x;
-	struct rule*		y;
-	struct list*		terminal;
+	register List_t*	p;
+	register List_t*	q;
+	register List_t*	v;
+	Rule_t*			m;
+	Rule_t*			s;
+	Rule_t*			x;
+	Rule_t*			y;
+	List_t*			terminal;
 	char*			b;
 	char*			u;
 	char*			t;
@@ -362,7 +361,8 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 	else matched = 1;
 	if (b = strrchr(u, '/'))
 		b++;
-	else b = u;
+	else
+		b = u;
 	terminal = (x = metainfo('T', NiL, NiL, 0)) ? x->prereqs : 0;
 	if (matched)
 	{

@@ -1,3 +1,8 @@
+04-12-25 ls: -e == --time-style=long-iso, -E == --time-style=full-iso
+	 ls: fix --quote-style=literal to bet literal -- doh
+04-12-15 ls: --time-style=long-iso
+04-12-12 touch.c: add high resolution time support
+04-10-28 ls.c: add space between group/size so they won't run together
 04-10-01 dd.c: drop ancient unused map code
 04-09-14 ls.c: add -w[linesX]cols, last col must be visible in window
 04-07-17 ls.c: rename -f => -Z, add x/open -f

@@ -3562,7 +3562,8 @@ TEST 20 'transition splice'
 		INPUT - $'#pragma prototyped
 int a = val>0?vau:0;
 int b = val>0?val:0;'
-		OUTPUT - $'int a = val>0?vau:0;
+		OUTPUT - $'
+int a = val>0?vau:0;
 int b = val>0?val:0;'
 
 TEST 21 '#if expressions'

@@ -99,7 +99,6 @@ static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2004-05-31 $\0\n"
 
 #ifdef REG_DISCIPLINE
 
-#include <sfstr.h>
 
 #include <stk.h>
 
@@ -1755,7 +1754,7 @@ main(int argc, char** argv)
 			stkset(stkstd, state.stack, 0);
 		flags |= REG_DISCIPLINE;
 		state.disc.ordinal = 0;
-		sfstrset(state.disc.sp, 0);
+		sfstrseek(state.disc.sp, 0, SEEK_SET);
 #endif
 		if (!(test & TEST_CATCH))
 			cret = regcomp(&preg, re, flags);

@@ -1,41 +1,68 @@
 /***********************************************************************
 *                                                                      *
-*               This software is part of the ast package               *
-*Copyright (c) 1978-2004 The Regents of the University of California an*
+*               This software is part of the bsd package               *
+*Copyright (c) 1978-2005 The Regents of the University of California an*
 *                                                                      *
-*            Permission is hereby granted, free of charge,             *
-*         to any person obtaining a copy of THIS SOFTWARE FILE         *
-*              (the "Software"), to deal in the Software               *
-*                without restriction, including without                *
-*             limitation the rights to use, copy, modify,              *
-*                  merge, publish, distribute, and/or                  *
-*              sell copies of the Software, and to permit              *
-*              persons to whom the Software is furnished               *
-*            to do so, subject to the following disclaimer:            *
+* Redistribution and use in source and binary forms, with or           *
+* without modification, are permitted provided that the following      *
+* conditions are met:                                                  *
 *                                                                      *
-*THIS SOFTWARE IS PROVIDED BY The Regents of the University of Californ*
-*           ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,           *
-*              INCLUDING, BUT NOT LIMITED TO, THE IMPLIED              *
-*              WARRANTIES OF MERCHANTABILITY AND FITNESS               *
-*               FOR A PARTICULAR PURPOSE ARE DISCLAIMED.               *
-*IN NO EVENT SHALL The Regents of the University of California and AT&T*
-*           BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,            *
-*             SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES             *
-*             (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT              *
-*            OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,             *
-*             DATA, OR PROFITS; OR BUSINESS INTERRUPTION)              *
-*            HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,            *
-*            WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT            *
-*             (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING              *
-*             IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,              *
-*          EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.          *
+*    1. Redistributions of source code must retain the above           *
+*       copyright notice, this list of conditions and the              *
+*       following disclaimer.                                          *
 *                                                                      *
-*              Information and Software Systems Research               *
-*    The Regents of the University of California and AT&T Research     *
-*                           Florham Park NJ                            *
+*    2. Redistributions in binary form must reproduce the above        *
+*       copyright notice, this list of conditions and the              *
+*       following disclaimer in the documentation and/or other         *
+*       materials provided with the distribution.                      *
+*                                                                      *
+*    3. Neither the name of The Regents of the University of California*
+*       names of its contributors may be used to endorse or            *
+*       promote products derived from this software without            *
+*       specific prior written permission.                             *
+*                                                                      *
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND               *
+* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,          *
+* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF             *
+* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE             *
+* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS    *
+* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,             *
+* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED      *
+* TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,        *
+* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON    *
+* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,      *
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY       *
+* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE              *
+* POSSIBILITY OF SUCH DAMAGE.                                          *
+*                                                                      *
+* Redistribution and use in source and binary forms, with or without   *
+* modification, are permitted provided that the following conditions   *
+* are met:                                                             *
+* 1. Redistributions of source code must retain the above copyright    *
+*    notice, this list of conditions and the following disclaimer.     *
+* 2. Redistributions in binary form must reproduce the above copyright *
+*    notice, this list of conditions and the following disclaimer in   *
+*    the documentation and/or other materials provided with the        *
+*    distribution.                                                     *
+* 3. Neither the name of the University nor the names of its           *
+*    contributors may be used to endorse or promote products derived   *
+*    from this software without specific prior written permission.     *
+*                                                                      *
+* THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS"    *
+* AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED    *
+* TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A      *
+* PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS    *
+* OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,      *
+* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT     *
+* LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF     *
+* USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND  *
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,   *
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT   *
+* OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF   *
+* SUCH DAMAGE.                                                         *
 *                                                                      *
 *                          Kurt Shoens (UCB)                           *
-*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                 gsf                                  *
 *                                                                      *
 ***********************************************************************/
 #pragma prototyped
@@ -51,7 +78,6 @@
 #if _PACKAGE_ast
 
 #include <css.h>
-#include <sfstr.h>
 #include <tm.h>
 #include <vmalloc.h>
 
@@ -1646,7 +1672,7 @@ imapinit(void)
 		free(imap);
 		return 0;
 	}
-	if (!(imap->mp = sfstrnew(SF_READ|SF_WRITE)) || !(imap->tp = sfstropen()) || !(imap->np = sfstrnew(SF_READ|SF_WRITE)))
+	if (!(imap->mp = sfstropen()) || !(imap->tp = sfstropen()) || !(imap->np = sfstropen()))
 	{
 		note(ERROR|SYSTEM, "Out of space [imap tmp string stream]");
 		vmclose(imap->gm);
@@ -1804,7 +1830,7 @@ imap_setinput(register Msg_t* mp)
 	int			m = mp - state.msg.list + 1;
 
 	imap->copy.fp = imap->mp;
-	sfstrset(imap->mp, 0);
+	sfstrseek(imap->mp, 0, SEEK_SET);
 	if (imapexec(imap, "FETCH %d (BODY.PEEK[HEADER])", m))
 		note(FATAL, "imap: %d: cannot fetch message header", m);
 	imap->copy.fp = sfstdout;
@@ -2387,7 +2413,7 @@ imap_flags(register Imap_t* imap, Msg_t* mp, register int flags, char* op)
 			note(ERROR, "%d: message flags not updated", mp - state.msg.list + 1);
 	}
 	else
-		sfstrset(imap->tp, 0);
+		sfstrseek(imap->tp, 0, SEEK_SET);
 }
 
 /*

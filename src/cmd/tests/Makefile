@@ -13,7 +13,7 @@ LICENSE = since=1999,author=gsf
 
 base64 :TEST: base64.c
 
-date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat
+date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat week.dat
 	for i in $(*:N=*.dat)
 	do	DATEMSK=$(*:N=*.msk:/ /:/G) TZ=EST5EDT $(*:O=1) $(TESTDATEFLAGS) < $i
 	done
@@ -29,7 +29,7 @@ sfio :TEST: testsfio sftest.h +last \
 	tpkrd.c tpoll.c tpool.c tpopen.c tpopenrw.c tprintf.c \
 	tpublic.c tputgetc.c tputgetd.c tputgetl.c tputgetm.c tputgetr.c \
 	tputgetu.c trcrv.c treserve.c tscanf.c tseek.c \
-	tsetbuf.c tsetfd.c tshare.c tsize.c tstack.c tstatus.c \
+	tsetbuf.c tsetfd.c tsfstr.c tshare.c tsize.c tstack.c tstatus.c \
 	tstdio.c tstkpk.c tstring.c tswap.c tsync.c ttell.c ttmp.c \
 	ttmpfile.c tungetc.c twchar.c twhole.c twrrd.c
 		set +x; $(*:O=1) $(TESTSFIOFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
