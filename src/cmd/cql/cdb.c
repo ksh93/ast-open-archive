@@ -328,7 +328,7 @@ main(int argc, char** argv)
 	error_info.id = "cdb";
 	memset(&input, 0, sizeof(input));
 	input.disc.version = CDB_VERSION;
-	input.disc.errorf = (Cdberror_f)errorf;
+	input.disc.errorf = errorf;
 	output = input;
 	input.flags = CDB_READ;
 	output.flags = CDB_WRITE;

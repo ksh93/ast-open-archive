@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: probe (AT&T Labs Research) 2002-09-21 $\n]"
+"[-?\n@(#)$Id: probe (AT&T Labs Research) 2002-10-30 $\n]"
 USAGE_LICENSE
 "[+NAME?probe - generate/install/display language processor probe information]"
 "[+DESCRIPTION?\bprobe\b generates, installs and displays on the standard"
@@ -524,7 +524,7 @@ main(int argc, char** argv)
 			cmdenvv[n] = 0;
 			if (!(pp = procopen(script, cmdargv, cmdenvv, NiL, PROC_UID|PROC_GID|((options&TEST)?0:PROC_READ))))
 				n = -1;
-			else if (!(options & TEST) && (!(pf = sfnew(NiL, NiL, SF_UNBOUND, pp->rfd, SF_READ)) || sfmove(pf, fp, SF_UNBOUND, -1) < 0 || sfclose(pf) || sfclose(fp)))
+			else if (!(options & TEST) && (!(pf = sfnew(NiL, NiL, SF_UNBOUND, pp->rfd, SF_READ)) || !(pp->rfd = -1) || sfmove(pf, fp, SF_UNBOUND, -1) < 0 || sfclose(pf) || sfclose(fp)))
 				n = -2;
 			else
 				n = 0;

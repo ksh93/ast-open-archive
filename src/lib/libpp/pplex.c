@@ -540,33 +540,35 @@ ppcpp(void)
 					if (st & EOF2NL)
 					{
 						st &= ~EOF2NL;
-						c = '\n';
+						*(ip - 1) = c = '\n';
 					}
 					else if (!(st & (FILEPOP|PASSEOF)) && prv)
 #endif
 					{
-						if (!(cur->flags & (IN_noguard|IN_tokens)) && cur->symbol)
-							ppmultiple(ppsetfile(error_info.file), cur->symbol);
-						if (cur->fd >= 0)
-							close(cur->fd);
 						if (!(cur->flags & IN_newline))
 						{
-							st |= EOF2NL;
+							cur->flags |= IN_newline;
 							if ((pp.mode & (HOSTED|PEDANTIC)) == PEDANTIC && LASTCHR() != '\f' && LASTCHR() != CC_sub)
 								error(1, "file does not end with %s", pptokchr('\n'));
-#if CPP
-							PUTCHR('\n');
-#endif
+							*(ip - 1) = c = '\n';
 						}
-						if (pp.incref && !(pp.mode & INIT))
+						else
 						{
-							SYNCOUT();
-							(*pp.incref)(error_info.file, cur->file, error_info.line - 1, PP_SYNC_POP);
-							CACHEOUT();
+							if (!(cur->flags & (IN_noguard|IN_tokens)) && cur->symbol)
+								ppmultiple(ppsetfile(error_info.file), cur->symbol);
+							if (cur->fd >= 0)
+								close(cur->fd);
+							if (pp.incref && !(pp.mode & INIT))
+							{
+								SYNCOUT();
+								(*pp.incref)(error_info.file, cur->file, error_info.line - 1, PP_SYNC_POP);
+								CACHEOUT();
+							}
+							goto fsm_pop;
 						}
-						goto fsm_pop;
 					}
-					else c = EOF;
+					else
+						c = EOF;
 				}
 				break;
 			case IN_MACRO:

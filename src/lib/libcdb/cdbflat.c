@@ -1874,7 +1874,7 @@ flatevent(register Cdb_t* cdb, int op)
 			fid->exdisc.version = EX_VERSION;
 			fid->exdisc.flags = EX_CHARSTRING|EX_FATAL|EX_UNDECLARED;
 			fid->exdisc.symbols = fid->symbols;
-			fid->exdisc.errorf = (Exerror_f)cdb->disc->errorf;
+			fid->exdisc.errorf = cdb->disc->errorf;
 			fid->exdisc.getf = flatgetval;
 			if (!(fid->expr = exopen(&fid->exdisc)))
 				goto nospace;

@@ -559,6 +559,7 @@ lockstate(register char* file)
 		}
 		else
 			remove(lockfile);
+		free(lockfile);
 		lockfile = 0;
 	}
 }

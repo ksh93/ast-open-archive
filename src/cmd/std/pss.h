@@ -87,8 +87,6 @@
 struct Pss_s;
 struct Pssdisc_s;
 
-typedef int (*Psserror_f)(struct Pss_s*, struct Pssdisc_s*, int, const char*, ...);
-
 typedef struct Pssent_s
 {
 	void*		addr;
@@ -148,7 +146,7 @@ typedef struct Pssdisc_s
 	dev_t		tty;		/* PSS_TTY match value		*/
 	pid_t		uid;		/* PSS_UID match value		*/
 	Pssmatch_t*	match;		/* match these fields		*/
-	Psserror_f	errorf;		/* error function		*/
+	Error_f		errorf;		/* error function		*/
 } Pssdisc_t;
 
 typedef struct Pss_s

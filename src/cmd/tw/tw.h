@@ -109,23 +109,24 @@
 #define C_DIR		40
 #define C_DNR		41
 #define C_DNX		42
-#define C_DP		43
-#define C_FIFO		44
-#define C_FMT		45
-#define C_FOLLOW	46
-#define C_LNK		47
-#define C_NOPOST	48
-#define C_NR		49
-#define C_NS		50
-#define C_NX		51
-#define C_REG		52
-#define C_SOCK		53
-#define C_SKIP		54
+#define C_DOOR		43
+#define C_DP		44
+#define C_FIFO		45
+#define C_FMT		46
+#define C_FOLLOW	47
+#define C_LNK		48
+#define C_NOPOST	49
+#define C_NR		50
+#define C_NS		51
+#define C_NX		52
+#define C_REG		53
+#define C_SOCK		54
+#define C_SKIP		55
 
-#define X_cmdarg	55
-#define X_cmdflush	56
+#define X_cmdarg	56
+#define X_cmdflush	57
 
-#define M_MEMBER	57
+#define M_MEMBER	58
 
 typedef struct				/* unique file identifier	*/
 {

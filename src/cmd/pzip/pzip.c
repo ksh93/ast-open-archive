@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pzip (AT&T Labs Research) 2001-06-28 $\n]"
+"[-?\n@(#)$Id: pzip (AT&T Labs Research) 2002-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - fixed record partition compress/decompress]"
 "[+DESCRIPTION?\b\f?\f\b compresses and decompresses data files of fixed"
@@ -118,7 +118,9 @@ USAGE_LICENSE
 "	specifies the row size. The remaining lines operate on column offset"
 "	ranges of the form: \abegin\a[-\aend\a]] where \abegin\a is the"
 "	beginning column offset (starting at 0), and \aend\a is the ending"
-"	column offset for an inclusive range. The operators are:]:[file]{"
+"	column offset for an inclusive range. The file name \b//\b or"
+"	\b/gzip/\b disables \bpzip\b partitioning and applies only"
+"	\bgzip\b compression. The operators are:]:[file]{"
 "		[+range [...]]?places all columns in the specified \arange\a"
 "			list in the same high frequency partition group."
 "			Each high frequency partition group is processed as"
@@ -213,7 +215,7 @@ main(int argc, char** argv)
 	error_info.id = s;
 	memset(&disc, 0, sizeof(disc));
 	disc.version = PZ_VERSION;
-	disc.errorf = (Pzerror_f)errorf;
+	disc.errorf = errorf;
 	if (!(dp = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space");
 	for (;;)
@@ -326,7 +328,7 @@ main(int argc, char** argv)
 	{
 		if (*argv)
 			error(3, "%s: file argument not expected for sfdcpzip discipline test", *argv);
-		if (sfdcpzip(sfstdin, &disc, NiL, flags) < 0)
+		if (sfdcpzip(sfstdin, NiL, flags, &disc) < 0)
 			error(3, "sfdcpzip discipline push error");
 		if (sfmove(sfstdin, sfstdout, SF_UNBOUND, -1) < 0 || sfclose(sfstdout))
 			error(ERROR_SYSTEM|3, "sfdcpzip io error");

@@ -55,7 +55,6 @@
 struct Hix_s;
 struct Hixdisc_s;
 
-typedef int (*Hixerror_f)(struct Hix_s*, struct Hixdisc_s*, int, const char*, ...);
 typedef char* (*Hixfind_f)(struct Hix_s*, char*, size_t, const char*, struct Hixdisc_s*);
 
 typedef struct Hixdisc_s
@@ -64,7 +63,7 @@ typedef struct Hixdisc_s
 	unsigned long	flags;		/* HIX_* flags			*/
 	char*		stamp;		/* application stamp		*/
 	char*		lib;		/* pathfind() lib		*/
-	Hixerror_f	errorf;		/* error function		*/
+	Error_f		errorf;		/* error function		*/
 	int		(*eventf)(struct Hix_s*, int, void*, struct Hixdisc_s*);
 					/* event function		*/
 	void*		(*splitf)(struct Hix_s*, Sfio_t*, char*, char*, struct Hixdisc_s*);

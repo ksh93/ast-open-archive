@@ -77,6 +77,8 @@
 				ccmaps(b, c, f, t); \
 				break; \
 			} \
+		if ((a)->swapio) \
+			swapmem((a)->swapio, b, b, c); \
 	} while (0)
 
 #define TEXT(b,c,f)	text((unsigned char*)b,c,f)

@@ -135,6 +135,7 @@ getprologue(register Archive_t* ap)
 		return 0;
 	state.id.volume[0] = 0;
 	ap->format = -1;
+	ap->swapio = 0;
 	ap->io->offset += ap->io->count;
 	ap->io->count = 0;
 	ap->section = SECTION_CONTROL;
@@ -406,7 +407,8 @@ getepilogue(register Archive_t* ap)
 {
 	register char*	s;
 	register off_t	n;
-	register off_t	i;
+	register int	i;
+	long		sum;
 
 	ap->section = SECTION_CONTROL;
 	if (ap->delta && ap->delta->epilogue < 0)
@@ -455,31 +457,42 @@ getepilogue(register Archive_t* ap)
 				if (ap->io->eof) ap->io->keep = 0;
 				else if (ap->io->keep > 0) ap->io->keep--;
 				ap->format = IN_DEFAULT;
+				ap->swapio = 0;
 				message((-2, "go for next tape volume"));
 				return;
 			}
 			i = MAXBLOCKS;
-			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, state.tmp.buffer, (off_t)0, (off_t)n, 0) > 0) do
-			{
-				if (*(s = state.tmp.buffer) && n == BLOCKSIZE)
+			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, tar_block, (off_t)0, (off_t)n, 0) > 0)
+				do
 				{
-					bunread(ap, state.tmp.buffer, BLOCKSIZE);
-					ap->format = IN_DEFAULT;
-					message((-2, "go for next volume %-.32s...", state.tmp.buffer));
-					return;
-				}
-				while (s < state.tmp.buffer + n && !*s++);
-				if (s < state.tmp.buffer + n)
-				{
-					if (ap->volume > 1) error(1, "junk data after volume %d", ap->volume);
-					break;
-				}
-				n = BLOCKSIZE;
-			} while (i-- > 0 && bread(ap, state.tmp.buffer, (off_t)0, n, 0) > 0);
+					for (s = tar_block; s < tar_block + n && !*s; s++);
+					if (s < tar_block + n)
+					{
+						if (n == BLOCKSIZE)
+						{
+							if (ap->format == TAR || ap->format == USTAR)
+							{
+								if (!isdigit(tar_header.chksum[0]) || !isdigit(tar_header.chksum[1]) || !isdigit(tar_header.chksum[2]) || !isdigit(tar_header.chksum[3]) || !isdigit(tar_header.chksum[4]) || !isdigit(tar_header.chksum[5]) || !isdigit(tar_header.chksum[6]) || sfsscanf(tar_header.chksum, "%7lo", &sum) != 1 || (sum & TAR_SUMASK) != tar_checksum(ap))
+									continue;
+								if (i = MAXBLOCKS - i)
+									error(1, "%s: %d junk block%s after volume %d", ap->name, i, i == 1 ? "" : "s", ap->volume);
+							}
+							bunread(ap, tar_block, BLOCKSIZE);
+							ap->format = IN_DEFAULT;
+							ap->swapio = 0;
+							return;
+						}
+						if (ap->volume > 1)
+							error(1, "junk data after volume %d", ap->volume);
+						break;
+					}
+					n = BLOCKSIZE;
+				} while (i-- > 0 && bread(ap, tar_block, (off_t)0, n, 0) > 0);
 			bflushin(ap, 1);
 			break;
 		}
 		ap->format = IN_DEFAULT;
+		ap->swapio = 0;
 	}
 }
 
@@ -1234,7 +1247,28 @@ getheader(register Archive_t* ap, register File_t* f)
 			if (sfsscanf(tar_header.chksum, "%7lo", &num) != 1) goto notar;
 			if ((num &= TAR_SUMASK) != (sum = tar_checksum(ap)))
 			{
-				if (ap->entry == 1) goto notar;
+				if (ap->entry == 1)
+				{
+					if (!ap->swapio)
+					{
+						long	x;
+						char	tmp[sizeof(tar_header.chksum) + 1];
+
+						tmp[sizeof(tar_header.chksum)] = 0;
+						for (i = 1; i < 4; i++)
+						{
+							memcpy(tmp, tar_header.chksum, sizeof(tar_header.chksum));
+							swapmem(i, tmp, tmp, sizeof(tar_header.chksum));
+							if (sfsscanf(tmp, "%7lo", &x) == 1 && (x & TAR_SUMASK) == sum)
+							{
+								ap->swapio = i;
+								bunread(ap, tar_block, TAR_HEADER);
+								goto again;
+							}
+						}
+					}
+					goto notar;
+				}
 				error(state.keepgoing ? 1 : 3, "%s format checksum error (%ld != %ld)", format[ap->format].name, num, sum);
 			}
 			if (sfsscanf(tar_header.size, "%11lo", &num) == 1)
@@ -1595,6 +1629,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			ap->entry = 0;
 			ap->format = -1;
 			ap->swap = 0;
+			ap->swapio = 0;
 			ap->volume--;
 			i = state.id.volume[0];
 			if (!getprologue(ap))
@@ -2117,6 +2152,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			unsigned int		name;
 			unsigned int		checksum;
 			size_t			size;
+			size_t			part;
 			Tm_t			tm;
 
 			if (ap->entry == 1)
@@ -2152,11 +2188,36 @@ getheader(register Archive_t* ap, register File_t* f)
 				n = swapget(ap->swap, s + 1, 4);
 				type = n >> 16;
 				name = n & ((1<<16)-1);
-				size = swapget(ap->swap, s + 5, 4);
-				if (!(s = bget(ap, size + 2, NiL)))
-					error(3, "%s: %s format attribute data truncated -- %d expected", ap->name, format[ap->format].name, size);
-				checksum = swapget(ap->swap, s + size, 2);
 				n = 0;
+				size = swapget(ap->swap, s + 5, 4);
+				part = ap->io->buffersize;
+				if (size > part)
+				{
+					if (level == 2)
+					{
+						level = 0;
+						if (name == 0x800f)
+						{
+							f->st->st_size = size;
+							tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0);
+						}
+						else
+							error(1, "%s: %s format 0x%04x attribute ignored", ap->name, format[ap->format].name, name);
+					}
+					while (size > part)
+					{
+						size -= part;
+						if (!(s = bget(ap, part, NiL)))
+							error(3, "%s: %s format 0x%04x attribute data truncated -- %d expected", ap->name, format[ap->format].name, name, part);
+						x = (unsigned char*)s;
+						e = s + part;
+						while (x < (unsigned char*)e)
+							n += *x++;
+					}
+				}
+				if (!(s = bget(ap, size + 2, NiL)))
+					error(3, "%s: %s format 0x%04x attribute data truncated -- %d expected", ap->name, format[ap->format].name, name, size);
+				checksum = swapget(ap->swap, s + size, 2);
 				x = (unsigned char*)s;
 				e = s + size;
 				while (x < (unsigned char*)e)
@@ -2255,84 +2316,6 @@ getheader(register Archive_t* ap, register File_t* f)
 			}
 			break;
 		}
-		case OMF:
-		{
-			static time_t	stamp;
-
-			if (ap->entry == 1)
-			{
-				struct stat	st;
-
-				stamp = fstat(ap->io->fd, &st) >= 0 ? st.st_mtime : NOW;
-				if (bread(ap, tar_block, (off_t)0, (off_t)3, 0) <= 0)
-					break;
-				if (((unsigned char*)tar_block)[0] != OMF_MAGIC)
-				{
-					bunread(ap, tar_block, 3);
-					break;
-				}
-				sum = ((unsigned char*)tar_block)[1] | (((unsigned char*)tar_block)[2] << 8);
-				if (bread(ap, NiL, (off_t)0, (off_t)sum, 0) <= 0)
-					error(3, "%s: %s format header truncated -- %d expected", ap->name, format[ap->format].name, sum);
-			}
-			f->name = 0;
-			for (;;)
-			{
-				if (bread(ap, tar_block, (off_t)0, (off_t)1, 0) <= 0)
-					error(3, "%s: %s format record truncated -- %d expected for type", ap->name, format[ap->format].name, 1);
-				if (!(type = ((unsigned char*)tar_block)[0]))
-					continue;
-				if (bread(ap, tar_block, (off_t)0, (off_t)2, 0) <= 0)
-					error(3, "%s: %s format record truncated -- %d expected for size", ap->name, format[ap->format].name, 2);
-				num = sum = ((unsigned char*)tar_block)[0] | (((unsigned char*)tar_block)[1] << 8);
-				switch (type)
-				{
-				case 0x80:
-				case 0x82:
-					if (bread(ap, tar_block, (off_t)0, (off_t)1, 0) <= 0)
-						error(3, "%s: %s format record truncated -- %d expected for name length", ap->name, format[ap->format].name, 1);
-					lab = ((unsigned char*)tar_block)[0];
-					if (lab > (sizeof(ap->path.header) - 3))
-						lab = sizeof(ap->path.header) - 3;
-					num -= lab +1;
-					if (bread(ap, f->name = ap->path.header, (off_t)0, (off_t)lab, 0) <= 0)
-						error(3, "%s: %s format record truncated -- %d expected for name", ap->name, format[ap->format].name, lab);
-					f->name[lab] = 0;
-					if (s = strrchr(f->name, '.'))
-						lab = s - f->name;
-					strcpy(f->name + lab, ".o");
-					m = 0;
-					break;
-				case 0x8A:
-					if (!f->name)
-						error(3, "%s: %s format corrupted -- data record before name record", ap->name, format[ap->format].name);
-					f->st->st_dev = 0;
-					f->st->st_ino = 0;
-					f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
-					f->st->st_uid = state.uid;
-					f->st->st_gid = state.gid;
-					f->st->st_nlink = 1;
-					IDEVICE(f->st, 0);
-					f->st->st_mtime = f->st->st_ctime = f->st->st_atime = stamp;
-					m += 3;
-					f->st->st_size = m + sum;
-					if (bseek(ap, (off_t)(-m), SEEK_CUR, 0) < 0)
-						error(3, "%s: %s format seek error", ap->name, format[ap->format].name);
-					goto found;
-				case 0xf1:
-					goto vdb_eof;
-				}
-				m += sum + 3;
-				if (num > 0 && bread(ap, NiL, (off_t)0, (off_t)num, 0) <= 0)
-					error(3, "%s: %s format record truncated -- %d expected for data", ap->name, format[ap->format].name, num);
-			}
-			if (ap->io->eof && ap->entry == 1)
-			{
-				error(1, "%s: no members in %s file", ap->name, format[ap->format].name);
-				return 0;
-			}
-			break;
-		}
 		vdb_eof:
 			bflushin(ap, 0);
 			ap->io->eof = 1;
@@ -2403,12 +2386,10 @@ getheader(register Archive_t* ap, register File_t* f)
 						error(1, "junk data after volume %d", ap->volume);
 					finish(0);
 				}
-				ap->format = OMF;
-				goto again;
-			case OMF:
 				if (!state.keepgoing)
 					error(3, "%s: unknown input format", ap->name);
 				ap->format = IN_DEFAULT;
+				ap->swapio = 0;
 				goto skip;
 			}
 		}
@@ -2610,9 +2591,12 @@ getheader(register Archive_t* ap, register File_t* f)
 		}
 		if (state.summary && state.verbose)
 		{
-			if (ap->io->blok) sfprintf(sfstderr, "BLOK ");
-			if (ap->parent) sfprintf(sfstderr, "%s base %s", ap->parent->name, ap->name);
-			else sfprintf(sfstderr, "%s volume %d", ap->name, ap->volume);
+			if (ap->io->blok)
+				sfprintf(sfstderr, "BLOK ");
+			if (ap->parent)
+				sfprintf(sfstderr, "%s base %s", ap->parent->name, ap->name);
+			else
+				sfprintf(sfstderr, "%s volume %d", ap->name, ap->volume);
 			if (state.id.volume[0])
 				sfprintf(sfstderr, " label %s", state.id.volume);
 			sfprintf(sfstderr, " in");
@@ -2625,10 +2609,14 @@ getheader(register Archive_t* ap, register File_t* f)
 			if (ap->delta && ap->delta->version)
 				sfprintf(sfstderr, " %s", format[ap->delta->version].name);
 			sfprintf(sfstderr, " %s format", format[ap->format].name);
+			if (ap->swapio)
+				sfprintf(sfstderr, " %s swapped", "unix\0nuxi\0ixun\0xinu" + 5 * ap->swapio);
 			if (error_info.trace)
 			{
-				if (*state.id.format) sfprintf(sfstderr, " %s", state.id.format);
-				if (*state.id.implementation) sfprintf(sfstderr, " implementation %s", state.id.implementation);
+				if (*state.id.format)
+					sfprintf(sfstderr, " %s", state.id.format);
+				if (*state.id.implementation)
+					sfprintf(sfstderr, " implementation %s", state.id.implementation);
 			}
 			sfprintf(sfstderr, "\n");
 		}

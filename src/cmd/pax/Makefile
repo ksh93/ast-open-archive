@@ -10,9 +10,7 @@ pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	delta.c file.c format.c misc.c \
 	-lardir -lodelta -lvdelta -lsum
 
-if CC.HOSTTYPE == "win32*" || "$(-mam)" == "static*"
-delta.o : .CC.NOOPTIMIZE
-end
+"win32*" :NOOPTIMIZE: delta.c
 
 nocom :: nocom.c
 

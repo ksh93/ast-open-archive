@@ -239,7 +239,7 @@ listrule(const char* s, char* v, void* h)
 		}
 		if (r->mark)
 		{
-			sfputr(sp, "|mark", '|');
+			sfputr(sp, " |mark", '|');
 			if (r->mark & M_bind) sfputr(sp, "bind", '|');
 			if (r->mark & M_compile) sfputr(sp, "compile", '|');
 			if (r->mark & M_directory) sfputr(sp, "directory", '|');

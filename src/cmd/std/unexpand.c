@@ -57,7 +57,7 @@ USAGE_LICENSE
 	"[+0?All files expanded successfully.]"
 	"[+>0?One or more files failed to open or could not be read.]"
 "}"
-"[+SEE ALSO?unexpand(1),pr(1)]"
+"[+SEE ALSO?\bunexpand\b(1), \bpr\b(1)]"
 ;
 
 static const char unexpand_usage[] =
@@ -90,7 +90,7 @@ USAGE_LICENSE
 	"[+0?All files unexpanded successfully.]"
 	"[+>0?One or more files failed to open or could not be read.]"
 "}"
-"[+SEE ALSO?expand(1),pr(1)]"
+"[+SEE ALSO?\bexpand\b(1), \bpr\b(1)]"
 ;
 
 

@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: file (AT&T Labs Research) 2002-07-31 $\n]"
+"[-?\n@(#)$Id: file (AT&T Labs Research) 2002-11-22 $\n]"
 USAGE_LICENSE
 "[+NAME?file - determine file type]"
 "[+DESCRIPTION?\bfile\b tests and attempts to classify each \afile\a argument."
@@ -104,10 +104,13 @@ USAGE_LICENSE
 "		[+long?4 byte integer]"
 "		[+quad?8 byte integer]"
 "		[+date?4 byte time_t]"
+"		[+version?4 byte unsigned integer of the form \aYYYYMMDD\a"
+"			for \aYYYY-MM-DD\a, 0x\aYYZZ\a for \aYY.ZZ\a, or"
+"			0x\aWWXXYYZZ\a for \aWW.XX.YY.ZZ\a]"
 "		[+edit?substitute operator for string data:"
-"			%\aold\a%\anew\a%[glu]], where \b%\b is any delimiter.]"
+"			%\aold\a%\anew\a%[glu]], where \b%\b is any delimiter]"
 "		[+match?case insensitive \bsh\b(1) match pattern operator"
-"			for string data.]"
+"			for string data]"
 "	}"
 "	[+[mask]]operator?\amask\a is an optional \b&\b\anumber\a that is"
 "		masked (bit \band\b) with the content data before"
@@ -173,7 +176,7 @@ main(int argc, register char** argv)
 	error_info.id = "file";
 	disc.version = MAGIC_VERSION;
 	disc.flags = 0;
-	disc.errorf = (Magicerror_f)errorf;
+	disc.errorf = errorf;
 	if (!(mp = magicopen(&disc)))
 		error(3, "out of space");
 	for (;;)

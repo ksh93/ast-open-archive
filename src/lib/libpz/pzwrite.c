@@ -40,6 +40,7 @@ pzwrite(register Pz_t* pz, Sfio_t* op, const void* buf, size_t n)
 	register unsigned char*	low;
 	unsigned char*		be;
 	size_t			k;
+	size_t			x;
 	ssize_t			r;
 	Sfio_t*			tmp;
 
@@ -51,24 +52,11 @@ pzwrite(register Pz_t* pz, Sfio_t* op, const void* buf, size_t n)
 	}
 	if (!n)
 		return 0;
-	pp = pz->part;
-
-	/*
-	 * this could be relaxed with a side buffer that caches partial
-	 * rows between pzwrite() calls -- for now we take the easy way
-	 */
-
-	if (n % pp->row)
-	{
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, 2, "%s: write buffer size %I*u must be a multiple of the row size %I*u", pz->path, sizeof(n), n, sizeof(pp->row), pp->row);
-		return -1;
-	}
 	if (pzheadwrite(pz, op))
 		return -1;
 	if (pz->flags & PZ_NOPZIP)
 	{
-		if ((r = sfwrite(op, buf, n)) != n)
+		if ((r = sfwrite(op, buf, n)) < 0)
 		{
 			if (pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: write error", pz->path);
@@ -76,12 +64,41 @@ pzwrite(register Pz_t* pz, Sfio_t* op, const void* buf, size_t n)
 		}
 		return r;
 	}
-	bp = (unsigned char*)buf;
+	pp = pz->part;
+	if (pz->ws.pc || n < pp->row)
+	{
+		if (!pz->ws.pb && !(pz->ws.pb = vmnewof(pz->vm, 0, unsigned char, pp->row, 0)))
+			return -1;
+		x = pp->row - pz->ws.pc;
+		if (x > n)
+			x = n;
+		memcpy(pz->ws.pb + pz->ws.pc, buf, x);
+		if ((pz->ws.pc += x) < pp->row)
+			return x;
+		pz->ws.pc = 0;
+		if (pzwrite(pz, op, pz->ws.pb, pp->row) != pp->row)
+			return -1;
+		if (!(n -= x))
+			return x;
+	}
+	else
+		x = 0;
+	bp = (unsigned char*)buf + x;
 	be = bp + n;
+	if (k = n % pp->row)
+	{
+		if (!pz->ws.pb && !(pz->ws.pb = vmnewof(pz->vm, 0, unsigned char, pp->row, 0)))
+			return -1;
+		x += k;
+		n -= k;
+		be -= k;
+		memcpy(pz->ws.pb + pz->ws.pc, be, k);
+		pz->ws.pc += k;
+	}
 	pat = pz->pat;
 	tmp = pz->tmp;
 	low = pp->low;
-	for (;;)
+	while (bp < be)
 	{
 		if (!pz->ws.bp)
 		{
@@ -138,11 +155,11 @@ pzwrite(register Pz_t* pz, Sfio_t* op, const void* buf, size_t n)
 			pz->ws.row++;
 			bp += pp->row;
 		}
-		if (bp < be || k >= pp->col)
-			break;
+		if (k < pp->col)
+			continue;
 	dump:
 		if (pzsync(pz))
 			return -1;
 	}
-	return n;
+	return n + x;
 }

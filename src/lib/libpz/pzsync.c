@@ -41,6 +41,7 @@ pzsync(register Pz_t* pz)
 	Sfio_t*			tmp;
 	Sfio_t*			op;
 
+	op = pz->ws.io ? pz->ws.io : pz->io;
 	if (pz->ws.bp)
 	{
 		/*
@@ -49,7 +50,6 @@ pzsync(register Pz_t* pz)
 
 		pz->ws.bp = 0;
 		pp = pz->part;
-		op = pz->ws.io;
 		tmp = pz->tmp;
 		n = pz->ws.row;
 		if (pz->flags & PZ_SECTION)
@@ -127,7 +127,7 @@ pzsync(register Pz_t* pz)
 			return -1;
 		}
 	}
-	else if ((pz->flags & PZ_WRITE) && sfsync(pz->io))
+	else if ((pz->flags & PZ_WRITE) && sfsync(op))
 	{
 		if (pz->disc->errorf)
 			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "write error");

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -494,7 +494,7 @@ make src/shcompat.c
 prev include/tkshlib.h implicit
 done src/shcompat.c
 prev src/shcompat.c
-exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -Dnvenv='nvprivate[0]' -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -c src/shcompat.c
+exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -c src/shcompat.c
 done shcompat.o generated
 make tcleval.o
 make src/tcleval.c

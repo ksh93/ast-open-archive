@@ -388,7 +388,7 @@ main(int argc, char** argv)
 	state.disc.flags = CSS_DAEMON|CSS_ERROR|CSS_INTERRUPT|CSS_LOG;
 	state.disc.acceptf = acceptf;
 	state.disc.actionf = actionf;
-	state.disc.errorf = (Csserror_f)errorf;
+	state.disc.errorf = errorf;
 	state.disc.exceptf = exceptf;
 	for (;;)
 	{

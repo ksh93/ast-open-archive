@@ -101,7 +101,7 @@ main(int argc, char** argv)
 	disc.flags = CSS_DAEMON|CSS_ERROR|CSS_DORMANT|CSS_INTERRUPT;
 	disc.timeout = 20 * 60 * 1000L;
 	disc.actionf = actionf;
-	disc.errorf = (Csserror_f)errorf;
+	disc.errorf = errorf;
 	disc.exceptf = exceptf;
 	if (!(css = cssopen(argv[1], &disc)))
 		exit(1);

@@ -109,8 +109,6 @@ struct Exnode_s; typedef struct Exnode_s Exnode_t;
 struct Expr_s; typedef struct Expr_s Expr_t;
 struct Exref_s; typedef struct Exref_s Exref_t;
 
-typedef int (*Exerror_f)(Expr_t*, Exdisc_t*, int, const char*, ...);
-
 typedef struct				/* user defined member type	*/
 {
 	Sflong_t	number;
@@ -210,7 +208,7 @@ struct Exdisc_s				/* discipline			*/
 					/* unknown cast function	*/
 	int		(*convertf)(Expr_t*, Exnode_t*, int, Exid_t*, int, Exdisc_t*);
 					/* type conversion function	*/
-	Exerror_f	errorf;		/* error function		*/
+	Error_f		errorf;		/* error function		*/
 	Extype_t	(*getf)(Expr_t*, Exnode_t*, Exid_t*, Exref_t*, void*, int, Exdisc_t*);
 					/* get value function		*/
 	Extype_t	(*reff)(Expr_t*, Exnode_t*, Exid_t*, Exref_t*, char*, int, Exdisc_t*);

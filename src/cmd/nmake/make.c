@@ -740,7 +740,31 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 						(q = p)->rule = r2;
 				}
 				if (q && !(state.questionable & 0x00020000))
-					continue;
+				{
+					int	u = 0;
+					int	n = 0;
+
+					/*
+					 * mutually dependent requirements can
+					 * get us into a loop -- this limits
+					 * the total number to half the square
+					 * of the number of unique elements
+					 */
+
+					for (q = r->prereqs; q; q = q->next)
+					{
+						n++;
+						if (!(q->rule->mark & M_mark))
+						{
+							q->rule->mark |= M_mark;
+							u++;
+						}
+					}
+					for (q = r->prereqs; q; q = q->next)
+						q->rule->mark &= ~M_mark;
+					if (n < (u * u) / 2)
+						continue;
+				}
 			}
 		}
 		p = p->next;

@@ -1,3 +1,4 @@
+02-10-18 features/syscall.sh: handle pseudo files in cc -E line syncs
 02-07-17 syscall3d.c: clean up user level intercept code
 02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR
 02-06-14 ast_3d.h,cs.c: move fmttime() macro override to cs.c

@@ -1,3 +1,8 @@
+02-12-13 format.c: fix TNEF bug that did bget(n) for n>buffersize
+02-10-23 misc.c: fix meter buffer overflow
+02-10-20 pax: drop experimental OMF; use ardirlist() to list ar types
+	 pax: add -t for x/open
+02-10-18 pax: add tar/ustar swap and inter-volume junk block checks
 02-09-09 format.c: handle all 11 octal digits in cpio format size
 02-09-05 file.c: fix chmod() loop at exists=0011 on case ignorant filesystems
 02-08-19 pax: cmd line patterns applied before -i or -s path edits

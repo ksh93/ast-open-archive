@@ -58,7 +58,9 @@ typedef struct				/* write stream state		*/
 	unsigned char*	bp;		/* hi freq buf ptr		*/
 	unsigned char*	vp;		/* lo freq code val ptr		*/
 	unsigned char*	ve;		/* lo freq code val end		*/
+	unsigned char*	pb;		/* partial row buffer		*/
 
+	size_t		pc;		/* partial row count		*/
 	size_t		rep;		/* lo freq repeat count		*/
 	size_t		row;		/* lo freq row count		*/
 

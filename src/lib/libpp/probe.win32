@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2002-08-30
+# @(#)probe.win32 (AT&T Labs Research) 2002-11-29
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -81,6 +81,8 @@ if	test "" != "$i" -a -d "$i/include"
 then	include=$i/include
 fi
 
+pragexpand='#pragma pp:pragmaexpand'
+
 case $versionb in
 ?*)	version=$versionb VERSION=__BORLANDC__ 
 	reserved="#pragma pp:reserved __asm=GROUP __based=GROUP __cdecl __declspec=GROUP __except __export __far __fastcall __finally __huge __inline __int16 __int32 __int64 __int8 __leave __near __novtordisp __pascal __restrict __stdcall __syscall __try __unaligned __wchar_t
@@ -89,8 +91,10 @@ case $versionb in
 	specific="#define <long long> __int64
 #define <__int64 int> __int64
 #define <__int64 unsigned> unsigned __int64"
+	pragexpand='#pragma pp:nopragmaexpand'
 	pragmas="#pragma pp:nocatliteral
-#pragma pp:stringsplit"
+#pragma pp:stringsplit
+#pragma pp:lineid line"
 	;;
 esac
 case $versiond in
@@ -99,7 +103,6 @@ case $versiond in
 	specific="#define __TIMESTAMP__   __DATE__ \" \" __TIME__"
 	pragmas="#pragma pp:transition
 #pragma pp:elseif
-#pragma pp:noallmultiple
 #pragma pp:lineid line"
 	;;
 esac
@@ -111,6 +114,7 @@ case $versionm in
 	specific="#define <long long> __int64
 #define <__int64 int> __int64
 #define <__int64 unsigned> unsigned __int64"
+	pragmas="#pragma pp:lineid line"
 	;;
 esac
 case $versionl in
@@ -134,6 +138,10 @@ case $versiong in
 ?*)	version=$versiong VERSION=__MINGW32__
 	reserved="#pragma pp:reserved __declspec=GROUP __alignof=GROUP __alignof__=GROUP __attribute=GROUP __attribute__=GROUP __extension__=GROUP asm=GROUP __asm=GROUP __asm__=GROUP const __const __const__ enum inline __inline __inline__ __restrict __restrict__ signed __signed __signed__ typeof=GROUP __typeof=GROUP __typeof__=GROUP void volatile __volatile __volatile__ __cdecl _stdcall __stdcall"
 	specific="#define __declspec(x)   __attribute__((x))"
+	pragexpand='#pragma pp:nopragmaexpand'
+	pragmas='#pragma pp:map "/#include_next>/" ",[^\<]*\<,#include <.../,"
+#pragma pp:lineid
+#pragma pp:linetype 2'
 	;;
 esac
 
@@ -157,19 +165,44 @@ case $version:$include in
 	esac
 	standard="$standard
 #pragma pp:standard \"$include\""
+	[ X"$versiond" != X ] && [ X"$cplus" != X ] && standard="$standard
+#pragma pp:include \"${include%/include}/stl\""
 	[ X"$versiond" != X ] && standard="$standard
 #pragma pp:standard \"$include/win32\""
 	if	[ X"$versioni" != X ]
 	then	if	[ -d /msdev/vc98 ]
 		then standard="$standard
 #pragma pp:standard \"/msdev/vc98/include\""
+		elif	[ -d /msdev/vc7 ]
+		then standard="$standard
+#pragma pp:standard \"/msdev/vc7/include\""
 		else standard="$standard
 #pragma pp:standard \"/msdev/vc/include\""
 		fi
-	elif	[ X"$versiong" != X ] && [ X"$cplus" != X ]
-	then standard="$standard
-#pragma pp:include \"$include/g++-3\"
-#pragma pp:include \"$include/../mingw32/include\""
+	elif	[ X"$versiong" != X ]
+	then	if	[ X"$cplus" != X ]
+		then	if	[ -d "$include/g++-3" ]
+			then	standard="$standard
+#pragma pp:standard \"$include/g++-3\""
+			elif	[ -d "$include"/c++/3.* ]
+			then	set X "$include"/c++/3.*
+				standard="$standard
+#pragma pp:standard \"$2\""
+				if	[ -d "$2"/mingw32 ]
+				then	standard="$standard
+#pragma pp:standard \"$2/mingw32\""
+				fi
+			fi
+			if	[ -d "${include%/*}"/mingw32/include ]
+			then	standard="$standard
+#pragma pp:standard \"${include%/*}/mingw32/include\""
+			fi
+		fi
+		if	[ -d "${include%/*}"/lib/gcc-lib/mingw32/*/include ]
+		then	set X "${include%/*}"/lib/gcc-lib/mingw32/*/include
+			standard="$standard
+#pragma pp:standard \"$2\""
+		fi
 	fi
 	: the payoff
 	set -- $cc
@@ -233,6 +266,7 @@ __ICL
 __INITIAL_POINTER_SIZE
 __INLINE_8087
 __INTEL_COMPILER
+__INTSIZE
 __LCCDEBUGLEVEL
 __LCCOPTIMLEVEL
 __LCC__
@@ -242,6 +276,11 @@ __SC__
 __SMALL__
 __STATIC__
 __STDC__
+__STDC_HOSTED__
+__STDC_IEC_559__
+__STDC_IEC_559_COMPLEX__
+__STDC_ISO_10646__
+__STDC_VERSION__
 __STRLEN
 __TURBOC__
 __WIN32__
@@ -295,7 +334,7 @@ $reserved
 $pragmas
 
 #pragma pp:pluscomment
-#pragma pp:pragmaexpand
+$pragexpand
 #pragma pp:zeof
 #pragma pp:id "$"${standard}
 #pragma pp:nocatliteral

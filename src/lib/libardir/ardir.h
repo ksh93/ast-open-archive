@@ -103,6 +103,7 @@ struct Ardir_s
 };
 
 extern Ardirmeth_t*	ardirmeth(const char*);
+extern Ardirmeth_t*	ardirlist(Ardirmeth_t*);
 extern Ardir_t*		ardiropen(const char*, Ardirmeth_t*, int);
 extern Ardirent_t*	ardirnext(Ardir_t*);
 extern off_t		ardircopy(Ardir_t*, Ardirent_t*, int);

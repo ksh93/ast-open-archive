@@ -531,6 +531,10 @@ glob_dirnext(glob_t* gp, void* handle)
 			if (hashget(gs->overlay, dp->d_name))
 				continue;
 			hashput(gs->overlay, 0, (char*)gs);
+#if defined(DT_UNKNOWN) && defined(DT_DIR) && defined(DT_LNK)
+			if (dp->d_type != DT_UNKNOWN && dp->d_type != DT_DIR && dp->d_type != DT_LNK)
+				gp->gl_status |= GLOB_NOTDIR;
+#endif
 			return dp->d_name;
 		}
 		closedir(gs->dirp);
@@ -581,7 +585,7 @@ glob_type(glob_t* gp, const char* path)
 	struct stat		st;
 
 	i = 0;
-	if (stat(path, &st))
+	if ((*gp->gl_stat)(path, &st))
 	{
 		root = 0;
 		if (*path == '/')
@@ -854,7 +858,7 @@ bindfile(register struct rule* r, char* name, int flags)
 	struct list*		p;
 	struct file*		files;
 	struct file*		ofiles;
-	char*			dir;
+	char*			dir = 0;
 	char*			base;
 	char*			b;
 	int			found;
@@ -1367,6 +1371,7 @@ bindfile(register struct rule* r, char* name, int flags)
 		message((-11, "bindfile(%s): path=%s rule=%s alias=%s view=%d time=%s", name, b, r ? r->name : (char*)0, (x = getrule(b)) ? x->name : (char*)0, view, strtime(tm)));
 #endif
 		if (!r) r = makerule(name);
+		if (internal.openfile) internal.openfile = r->name;
 		if (!(r->dynamic & D_member) || tm > r->time)
 		{
 			if (r->dynamic & D_member)

@@ -175,7 +175,7 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 
 		if (!fstat(sffileno(pz->io), &st) && S_ISFIFO(st.st_mode))
 			pz->flags &= ~PZ_CRC;
-		else if (!(pz->flags & PZ_POP) && (!(pz->flags & PZ_WRITE) && sfdcgzip(pz->io, (pz->flags & PZ_CRC) ? 0 : SFGZ_NOCRC) > 0 || (pz->flags & PZ_WRITE) && sfdcpzip((Sfio_t*)pz, disc, pz->path, pz->flags|PZ_FORCE|PZ_PUSHED|PZ_HANDLE) > 0))
+		else if (!(pz->flags & PZ_POP) && (!(pz->flags & PZ_WRITE) && sfdcgzip(pz->io, (pz->flags & PZ_CRC) ? 0 : SFGZ_NOCRC) > 0 || (pz->flags & (PZ_PUSHED|PZ_WRITE)) == PZ_WRITE && sfdcpzip((Sfio_t*)pz, pz->path, pz->flags|PZ_FORCE|PZ_PUSHED|PZ_HANDLE, disc) > 0))
 			pz->flags |= PZ_POP;
 		else
 			pz->flags &= ~PZ_CRC;
@@ -249,6 +249,12 @@ pzclose(register Pz_t* pz)
 		 * finish up the pzwrite() stream
 		 */
 
+		if (pz->ws.pc)
+		{
+			if (pz->disc->errorf)
+				(*pz->disc->errorf)(pz, pz->disc, 2, "last record incomplete %u/%u", pz->ws.pc, pz->row);
+			return -1;
+		}
 		sfputu(op, 0);
 		if (!(pz->flags & PZ_SECTION))
 		{

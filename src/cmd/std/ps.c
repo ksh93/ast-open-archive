@@ -1407,7 +1407,7 @@ main(int argc, register char** argv)
 	 */
 
 	state.pssdisc.version = PSS_VERSION;
-	state.pssdisc.errorf = (Psserror_f)errorf;
+	state.pssdisc.errorf = errorf;
 	memset(&od, 0, sizeof(od));
 	od.version = OPT_VERSION;
 	od.infof = optinfo;

@@ -1341,7 +1341,7 @@ init(const char* path)
 		error(ERROR_SYSTEM|3, "%s: job directory uid %d != effective uid %d", s, ds.st_uid, state->admin[0]);
 	state->disc.version = CSS_VERSION;
 	state->disc.flags = CSS_DAEMON|CSS_ERROR|CSS_INTERRUPT|CSS_WAKEUP;
-	state->disc.errorf = (Csserror_f)errorf;
+	state->disc.errorf = errorf;
 	state->disc.acceptf = client;
 	state->disc.actionf = request;
 	state->disc.exceptf = exception;

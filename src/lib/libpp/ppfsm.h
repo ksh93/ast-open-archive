@@ -63,7 +63,7 @@
 
 #define INDEX(p)	(((p)-fsm[0])/(MAX+1))
 
-#define IDSTATE(x)	(INQMACRO(fsm[x])?QID:(x))
+#define IDSTATE(x)	(((x)>=0&&INQMACRO(fsm[x]))?QID:(x))
 
 #define INCOMMENT(p)	((p)>=fsm[COM2]&&(p)<=fsm[COM4]||INCOMMENTXX(p))
 #define INCOMMENTXX(p)	((p)>=fsm[COM5]&&(p)<=fsm[COM7])

@@ -162,7 +162,7 @@ csserve(Cs_t* state, void* handle, const char* path, void* (*init)(void*, int), 
 	if (server->rd || server->wr)
 		server->disc.actionf = actionf;
 	server->to = to;
-	server->disc.errorf = (Csserror_f)errorf;
+	server->disc.errorf = errorf;
 	server->disc.exceptf = exceptf;
 	server->done = done;
 	close(0);

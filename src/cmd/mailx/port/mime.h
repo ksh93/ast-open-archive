@@ -31,13 +31,11 @@ typedef struct Mime_s Mime_t;
 struct Mimedisc_s;
 typedef struct Mimedisc_s Mimedisc_t;
 
-typedef int (*Mimeerror_f)(Mime_t*, Mimedisc_t*, int, const char*, ...);
-
 struct Mimedisc_s
 {
 	unsigned long	version;	/* interface version		*/
 	unsigned long	flags;		/* MIME_* flags			*/
-	Mimeerror_f	errorf;		/* error function		*/
+	Error_f		errorf;		/* error function		*/
 	int		(*valuef)(Mime_t*, void*, char*, size_t, Mimedisc_t*);
 					/* value extraction function	*/
 };

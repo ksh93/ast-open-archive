@@ -98,7 +98,7 @@ main(int argc, register char** argv)
 	state.list = 1;
 	memset(&disc, 0, sizeof(disc));
 	disc.version = FIND_VERSION;
-	disc.errorf = (Finderror_f)errorf;
+	disc.errorf = errorf;
 	for (;;)
 	{
 		switch (optget(argv, "cf:[pattern]mnt:[type]F:[codes]I dir ..."))

@@ -184,7 +184,8 @@ static Namval_t *TkshOpenVar(Tcl_Interp *interp, char **name1, char **name2,
 			{
 				if (! nv_isnull(namval))
 					ov_return(needArray);
-				nv_makearray(namval);
+				/* nv_makearray(namval); */
+				nv_setarray(namval, nv_associative);
 			}
 			if (! nv_putsub(namval, part2, ARRAY_ADD))
 				ov_return(noSuchVar);
@@ -252,23 +253,21 @@ void TkshTracesOff(void)
 
 TkshArrayInfo *TkshArrayData(Namval_t *namval)
 {
-	Namfun_t *nf_arr, *nf_top = namval->nvfun;
+	Namfun_t *nf_arr, *fp;
 
-	if (nf_top)	/* Already a discipline; go to end of stack */
+	for (fp=namval->nvfun; fp; fp = fp->next)
 	{
-		while (nf_top->next)
-			nf_top = nf_top->next;
-		if (nf_top->disc->getval == tksh_arrgetval)
-			return array_data(nf_top);
+                if ((fp->disc == &tksh_trace_array))
+			return array_data(fp);
 	}
-	nf_arr = (Namfun_t *) malloc(tksh_trace_array.dsize);
+
+	nf_arr = (Namfun_t *) calloc(1, tksh_trace_array.dsize);
 	nf_arr->next = NULL;
 	nf_arr->disc = & tksh_trace_array;
 	array_data(nf_arr)->clientData = NULL;
-	if (nf_top)
-		nf_top->next = nf_arr;
-	else
-		namval->nvfun = nf_arr;
+
+	nv_disc(namval, nf_arr, NV_LAST);
+
 	return array_data(nf_arr);
 }
 
@@ -315,27 +314,24 @@ int TkshUpVar(Tcl_Interp *interp, char *newname, char *part1,
 
 static void TkshClearTraces(Namval_t *nv)
 {
-	Namfun_t *fp;
+	Namfun_t *fp, *fpnext;
 	Tcl_Trace_Info *traceinfo;
 
 	dprintf(("Clearing traces\n"));
-	if (! nv->nvfun)
-		return;
-	while ((fp = nv_stack(nv, NULL)))
+
+	for (fp=nv->nvfun; fp; fp = fpnext)
 	{
+		fpnext = fp->next;
                 if ((fp->disc->getval != tksh_getval) &&
                     (fp->disc->putval != tksh_putval))
                 {
-			free(fp);
 			continue;
 		}
 		traceinfo = (Tcl_Trace_Info *) (fp + 1);
 		if (! (traceinfo->nv))
 			traceinfo = (Tcl_Trace_Info *) (traceinfo->clientData);
 		traceinfo->flags |= TCL_TRACE_DESTROYED;
-#if 0
-		if (trace_element(traceinfo) || (nv == traceinfo->nv))
-#endif
+		if (nv_disc(nv, fp, NV_POP))
 			free(fp);
 	}
 }
@@ -505,6 +501,7 @@ tksh_arrputval(Namval_t *nv, const char *val, int flags, Namfun_t *nf)
 {
 	Namval_t *nvsub = nv_opensub(nv), nvcpy;
 
+	memset(&nvcpy, 0, sizeof(nvcpy));
 	if (! nvsub)			/* Don't handle whole array put */
 	{
 		nv_putv(nv, val, flags, nf);
@@ -535,10 +532,7 @@ tksh_arrputval(Namval_t *nv, const char *val, int flags, Namfun_t *nf)
 	do	/* call traces in each array element */
 	{
 		if ((nvsub = nv_opensub(nv)))
-		{
 			nv_unset(nvsub);
-			((Namarr_t *) nv->nvalue)->nelem--;
-		}
 	}
 	while (nv_nextsub(nv) != 0);
 	nv_putv(nv, val, flags, nf);		/* Free array */
@@ -741,7 +735,7 @@ int Tcl_TraceVar2(Tcl_Interp *interp, char *part1, char *part2, int flags,
 	if (part2 && ! (nvsub = nv_opensub(namval)))
 		goto scalar;
 
-	if (! (nf = (Namfun_t *) malloc(TRACE_SIZE)))
+	if (! (nf = (Namfun_t *) calloc(1, TRACE_SIZE)))
 		goto scalar;
 
 	traceinfo = (Tcl_Trace_Info *) (nf + 1);
@@ -792,10 +786,10 @@ static Namfun_t *first_namfun(Namval_t *nv)
 
 #define share_flag(x, y, f) ( ((x) & f) == ((y) & f) )
 static Namfun_t *find_namfun(Namval_t *nv, int flags, Tcl_VarTraceProc *proc,
-	ClientData clientData, Namfun_t **prev_fun)
+	ClientData clientData)
 {
 	Tcl_Trace_Info *traceinfo;
-	Namfun_t *first = first_namfun(nv), *node = first, *prev = NULL;
+	Namfun_t *first = first_namfun(nv), *node = first;
 
 	while (node)
 	{
@@ -804,11 +798,8 @@ static Namfun_t *find_namfun(Namval_t *nv, int flags, Tcl_VarTraceProc *proc,
 		     share_flag(traceinfo->flags, flags, TCL_GLOBAL_ONLY) &&
 		    (traceinfo->clientData == clientData))
 		{
-			if (prev_fun)
-				*prev_fun = prev;
 			return node;
 		}
-		prev = node;
 		node = node->next;
 	}
 	return NULL;
@@ -817,7 +808,7 @@ static Namfun_t *find_namfun(Namval_t *nv, int flags, Tcl_VarTraceProc *proc,
 void Tcl_UntraceVar2(Tcl_Interp *interp, char *name1, char *name2,
 	int flags, Tcl_VarTraceProc *proc, ClientData clientData)
 {
-	Namfun_t *prev, *nf;
+	Namfun_t *nf;
 	Namval_t *namval;
 
 	dprintf(("Tksh: Untracing var %s[%s]\n", name1,name2?name2:""));
@@ -829,13 +820,8 @@ void Tcl_UntraceVar2(Tcl_Interp *interp, char *name1, char *name2,
 	if (name2 && ! (namval = nv_opensub(namval)) )
 		goto scalar;
 
-	if ((nf = find_namfun(namval, flags, proc, clientData, &prev)))
-	{
-		if (prev)
-			prev->next = nf->next;
-		else
-			nv_stack(namval, (Namfun_t *) NULL);
-	}
+	if ((nf = find_namfun(namval, flags, proc, clientData)))
+		nv_disc(namval, nf, NV_POP);
 	return;
 
   scalar:

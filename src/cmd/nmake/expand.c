@@ -1596,7 +1596,7 @@ mimetype(Sfio_t* xp, char* file)
 	{
 		disc.version = MAGIC_VERSION;
 		disc.flags = MAGIC_MIME;
-		disc.errorf = (Magicerror_f)errorf;
+		disc.errorf = errorf;
 		if (!(magic = magicopen(&disc)))
 			error(3, "out of space [magic]");
 		magicload(magic, NiL, 0);

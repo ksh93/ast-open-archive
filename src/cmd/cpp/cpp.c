@@ -45,5 +45,5 @@ main(int argc, char** argv)
 	ppop(PP_INIT);
 	ppcpp();
 	ppop(PP_DONE);
-	exit(error_info.errors);
+	return error_info.errors;
 }

@@ -1092,6 +1092,8 @@ ppop(int op, ...)
 		if (pp.initialized) goto before;
 		pp.ignoresrc++;
 		pp.stddirs = pp.lastdir;
+		if (!(pp.ro_option & PREFIX))
+			pp.option &= ~PREFIX;
 		break;
 	case PP_MACREF:
 		pp.macref = va_arg(ap, PPMACREF);

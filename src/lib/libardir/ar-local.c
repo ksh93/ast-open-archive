@@ -78,14 +78,14 @@ localopen(Ardir_t* ar, char* buf, size_t n)
 		return -1;
 	if (!(state = newof(0, State_t, 1, 0)))
 		return -1;
+	ar->data = (void*)state;
 	cmd = sfprints("${ARDIR:-ar} ${ARDIRFLAGS:-tv} '%s' 2>/dev/null", ar->path);
 	if (!(state->sp = sfpopen(NiL, cmd, "r")) || (c = sfgetc(state->sp)) == EOF || sfungetc(state->sp, c) == EOF)
-		goto nope;
-	ar->data = (void*)state;
+	{
+		localclose(ar);
+		return -1;
+	}
 	return 0;
- nope:
-	localclose(ar);
-	return -1;
 }
 
 /*

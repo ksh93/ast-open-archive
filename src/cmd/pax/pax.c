@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2002-09-09 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2002-12-13 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -161,7 +161,6 @@ Format_t		format[] =
 {RPM_NAME,	RPM_DESC,	RPM_REGULAR,	RPM_SPECIAL,	RPM_ALIGN,	RPM_FLAGS},
 {MIME_NAME,	MIME_DESC,	MIME_REGULAR,	MIME_SPECIAL,	MIME_ALIGN,	MIME_FLAGS},
 {TNEF_NAME,	TNEF_DESC,	TNEF_REGULAR,	TNEF_SPECIAL,	TNEF_ALIGN,	TNEF_FLAGS},
-{OMF_NAME,	OMF_DESC,	OMF_REGULAR,	OMF_SPECIAL,	OMF_ALIGN,	OMF_FLAGS},
 
 {COMPRESS_NAME,	COMPRESS_DESC, COMPRESS_MAGIC_MASK, COMPRESS_MAGIC, 0, IN|OUT, COMPRESS_ALGORITHM, COMPRESS_UNDO},
 {GZIP_NAME,	GZIP_DESC,     GZIP_MAGIC_MASK, GZIP_MAGIC,         0, IN|OUT, GZIP_ALGORITHM,     GZIP_UNDO},
@@ -805,6 +804,12 @@ Option_t		options[] =
 	OPT_record_trailer,
 	"Member trailer, NULL if omitted. The default is format specific.",
 	"string",
+},
+{
+	"reset-atime",
+	't',
+	OPT_reset_atime,
+	"Reset the file access times of copied files.",
 },
 {
 	"sequence",
@@ -1532,6 +1537,9 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			else if (!(state.record.trailerlen = stresc(state.record.trailer = strdup(v))))
 				state.record.trailerlen = 1;
 			break;
+		case OPT_reset_atime:
+			state.acctime = n;
+			break;
 		case OPT_summary:
 			state.summary = n;
 			break;
@@ -1739,7 +1747,13 @@ main(int argc, char** argv)
 				for (n = 0; format[n].name; n++)
 				{
 					if (n == COMPRESS)
+					{
+						Ardirmeth_t*	ar = 0;
+
+						while (ar = ardirlist(ar))
+							sfprintf(state.tmp.str, "[+%s?%s; for input only]", ar->name, ar->description);
 						sfprintf(state.tmp.str, "[+----?compression methods ----]");
+					}
 					else if (n == DELTA)
 						sfprintf(state.tmp.str, "[+----?delta methods ----]");
 					sfprintf(state.tmp.str, "[+%s?%s%s]", format[n].name, format[n].desc, (format[n].flags & OUT) ? "" : "; for input only");

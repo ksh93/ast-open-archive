@@ -42,6 +42,7 @@ typedef struct
 	Sfdisc_t	sfdisc;		/* sfio discipline		*/
 	Pzdisc_t	disc;		/* pzip discipline		*/
 	Pz_t*		pz;		/* pz handle			*/
+	Sfio_t*		io;		/* real pzwrite stream		*/
 } Sfpzip_t;
 
 /*
@@ -66,6 +67,7 @@ sfpzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	case SF_FINAL:
 		if (pz->pz)
 		{
+			pz->pz->flags &= ~PZ_STREAM;
 			r = pzclose(pz->pz);
 			pz->pz = 0;
 		}
@@ -103,8 +105,7 @@ sfpzwrite(Sfio_t* fp, const Void_t* buf, size_t size, Sfdisc_t* dp)
 {
 	register Sfpzip_t*	pz = (Sfpzip_t*)dp;
 
-	/* NOTE: fp is wrong here! */
-	return (pzwrite(pz->pz, fp, (void*)buf, size) < 0) ? -1 : size;
+	return pzwrite(pz->pz, pz->io, buf, size);
 }
 
 /*
@@ -121,7 +122,7 @@ sfpzwrite(Sfio_t* fp, const Void_t* buf, size_t size, Sfdisc_t* dp)
  */
 
 int
-sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
+sfdcpzip(Sfio_t* sp, const char* path, unsigned long flags, Pzdisc_t* disc)
 {
 	Sfio_t*		io;
 	Sfpzip_t*	pz;
@@ -179,7 +180,7 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 	}
 	pz->disc.version = PZ_VERSION;
 	flags &= ~(PZ_READ|PZ_WRITE|PZ_STAT|PZ_STREAM|PZ_INTERNAL);
-	flags |= PZ_STREAM|((sfset(sp, 0, 0) & SF_READ) ? PZ_READ : PZ_WRITE);
+	flags |= PZ_PUSHED|PZ_STREAM|((sfset(sp, 0, 0) & SF_READ) ? PZ_READ : PZ_WRITE);
 	if (oz && (oz->flags & PZ_WRITE))
 		flags |= PZ_DELAY;
 	if (disc)
@@ -187,10 +188,11 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 		pz->disc.errorf = disc->errorf;
 		pz->disc.window = disc->window;
 		pz->disc.options = disc->options;
+		pz->disc.partition = disc->partition;
 		if (disc->splitf)
 			flags |= PZ_ACCEPT;
 	}
-	if (!(pz->pz = pzopen(&pz->disc, (char*)io, flags)))
+	if (!(pz->pz = pzopen(&pz->disc, (char*)io, flags)) || (sp->_file = open("/dev/null", 0)) < 0)
 	{
 		io->_file = -1;
 		sfclose(io);
@@ -200,11 +202,13 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 	if (path)
 		pz->pz->path = path;
 	pz->sfdisc.exceptf = sfpzexcept;
-	if (sfset(sp, 0, 0) & SF_READ)
-		pz->sfdisc.readf = sfpzread;
-	else
+	if (flags & PZ_WRITE)
+	{
 		pz->sfdisc.writef = sfpzwrite;
-	sp->_file = open("/dev/null", 0);
+		pz->io = io;
+	}
+	else
+		pz->sfdisc.readf = sfpzread;
 	sfset(sp, SF_SHARE|SF_PUBLIC, 0);
 	if (sfdisc(sp, &pz->sfdisc) != &pz->sfdisc)
 	{

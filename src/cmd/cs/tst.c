@@ -153,7 +153,7 @@ main(int argc, char** argv)
 	disc.wakeup = 4 * 1000L;
 	disc.acceptf = acceptf;
 	disc.actionf = actionf;
-	disc.errorf = (Csserror_f)errorf;
+	disc.errorf = errorf;
 	disc.exceptf = exceptf;
 	if (!(css = cssopen(argv[1], &disc)))
 		exit(1);

@@ -1102,7 +1102,11 @@ value(Expr_t* prog, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 							val.string = ((Extype_t*)env)[0].string;
 						}
 						else
-							val.string = re.re_sub->re_buf;
+						{
+							n = strlen(re.re_sub->re_buf) + 1;
+							if (val.string = fmtbuf(n))
+								memcpy(val.string, re.re_sub->re_buf, n);
+						}
 						regfree(&re);
 					}
 				}
@@ -1504,7 +1508,7 @@ init(register Exid_t* sym)
 	state.expr.symbols = sym;
 	state.expr.lib = state.expr.type = error_info.id;
 	state.expr.convertf = convert;
-	state.expr.errorf = (Exerror_f)errorf;
+	state.expr.errorf = errorf;
 	state.expr.getf = value;
 	state.expr.reff = reference;
 	state.expr.setf = assign;

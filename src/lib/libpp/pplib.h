@@ -120,7 +120,7 @@
 #define IN_regular		(1<<12)	/* regular input file		*/
 #define IN_static		(1<<13)	/* static buffer - don't free	*/
 #define IN_sync			(1<<14)	/* line sync required on pop	*/
-#define IN_tokens		(1<<15)	/* non-space tokens encountered	*/
+#define IN_tokens		(1L<<15)/* non-space tokens encountered	*/
 
 struct ppsymbol;
 struct ppindex;

@@ -825,7 +825,7 @@ first(int f, int m)
 	if (!state.msg.count)
 		return 0;
 	f &= MDELETE|MNONE;
-	m &= MDELETE|MNONE;
+	m &= MDELETE|MNONE|MSPAM;
 	for (mp = state.msg.dot; mp < state.msg.list + state.msg.count; mp++)
 		if ((mp->m_flag & m) == f)
 			return mp - state.msg.list + 1;

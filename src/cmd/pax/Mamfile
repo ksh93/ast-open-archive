@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -284,7 +284,7 @@ bind -lardir
 bind -lodelta
 bind -lvdelta
 bind -lsum
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o pax bio.o convert.o copy.o pax.o delta.o file.o format.o misc.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libsum} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pax bio.o convert.o copy.o pax.o delta.o file.o format.o misc.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libsum} ${mam_libast}
 done pax generated
 make nocom
 make nocom.o
@@ -296,7 +296,7 @@ done nocom.c
 prev nocom.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c nocom.c
 done nocom.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o nocom nocom.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o nocom nocom.o ${mam_libast}
 done nocom generated
 make rpm2cpio
 make rpm2cpio.sh

@@ -392,23 +392,10 @@ typedef struct Tnef_s
 } Tnef_t;
 
 /*
- * ms dos omf library
- */
-
-#define OMF		17
-#define OMF_NAME	"omf"
-#define OMF_DESC	"DOS OMF library"
-#define OMF_MAGIC	0xf0
-#define OMF_REGULAR	DEFBUFFER
-#define OMF_SPECIAL	DEFBLOCKS
-#define OMF_ALIGN	0
-#define OMF_FLAGS	IN
-
-/*
  * compression pseudo formats -- COMPRESS is first
  */
 
-#define COMPRESS		18
+#define COMPRESS		17
 #define COMPRESS_NAME		"compress"
 #define COMPRESS_DESC		"Lempel-Ziv compression"
 #define COMPRESS_ALGORITHM	0
@@ -416,7 +403,7 @@ typedef struct Tnef_s
 #define COMPRESS_MAGIC		0x1f9d0000
 #define COMPRESS_MAGIC_MASK	0xffff0000
 
-#define GZIP			19
+#define GZIP			18
 #define GZIP_NAME		"gzip"
 #define GZIP_DESC		"gzip compression"
 #define GZIP_ALGORITHM		"-9"
@@ -424,7 +411,7 @@ typedef struct Tnef_s
 #define GZIP_MAGIC		0x1f8b0000
 #define GZIP_MAGIC_MASK		0xffff0000
 
-#define BZIP			20
+#define BZIP			19
 #define BZIP_NAME		"bzip2"
 #define BZIP_DESC		"bzip compression"
 #define BZIP_ALGORITHM		0
@@ -436,21 +423,21 @@ typedef struct Tnef_s
  * delta pseudo formats -- DELTA is first
  */
 
-#define DELTA			21
+#define DELTA			20
 #define DELTA_NAME		"delta"
 #define DELTA_DESC		"vdelta difference/compression"
 #define DELTA_ALGORITHM		"94"
 
-#define DELTA_88		22
+#define DELTA_88		21
 #define DELTA_88_NAME		"delta88"
 #define DELTA_88_DESC		"delta88 difference/compression"
 #define DELTA_88_ALGORITHM	"88"
 
-#define DELTA_IGNORE		23
+#define DELTA_IGNORE		22
 #define DELTA_IGNORE_NAME	"ignore"
 #define DELTA_IGNORE_DESC	"ignore delta headers"
 
-#define DELTA_PATCH		24
+#define DELTA_PATCH		23
 #define DELTA_PATCH_NAME	"patch"
 #define DELTA_PATCH_DESC	"delta using standard archive formats"
 
@@ -734,6 +721,7 @@ typedef struct Archive_s		/* archive info			*/
 	struct stat	st;		/* memver stat			*/
 	int		sum;		/* collect running checksum	*/
 	int		swap;		/* swap operation		*/
+	int		swapio;		/* io swap operation		*/
 	Hash_table_t*	tab;		/* entries to verify		*/
 	Bio_t		tio;		/* temporary buffered io	*/
 	int		verified;	/* number of verified entries	*/

@@ -47,7 +47,7 @@ __STDPP__directive pragma pp:hide execlp _execlp __execlp execve _execve __execv
 #define __alarm		________alarm
 #define gettimeofday	______gettimeofday
 #define _gettimeofday	_______gettimeofday
-#define _gettimeofday	________gettimeofday
+#define __gettimeofday	________gettimeofday
 #define getitimer	______getitimer
 #define _getitimer	_______getitimer
 #define __getitimer	________getitimer

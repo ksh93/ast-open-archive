@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -214,7 +214,7 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmdarg.c
 done cmdarg.o generated
 bind -lexpr
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o tw tw.o expr.o ftwlocal.o cmdarg.o ${mam_libexpr} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tw tw.o expr.o ftwlocal.o cmdarg.o ${mam_libexpr} ${mam_libast}
 done tw generated
 make find
 make find.o
@@ -262,7 +262,7 @@ done find.o generated
 prev ftwlocal.o
 prev cmdarg.o
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o find find.o ftwlocal.o cmdarg.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o find find.o ftwlocal.o cmdarg.o ${mam_libast}
 done find generated
 make xargs
 make xargs.o
@@ -276,7 +276,7 @@ prev xargs.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c xargs.c
 done xargs.o generated
 prev cmdarg.o
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o xargs xargs.o cmdarg.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o xargs xargs.o cmdarg.o ${mam_libast}
 done xargs generated
 make locate
 make locate.sh

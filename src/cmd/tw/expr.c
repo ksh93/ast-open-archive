@@ -47,6 +47,7 @@ static Exid_t	symbols[] =
 	EXID("D",	CONSTANT,	C_D,		INTEGER,	0),
 	EXID("DC",	CONSTANT,	C_DC,		INTEGER,	0),
 	EXID("DIR",	CONSTANT,	C_DIR,		INTEGER,	0),
+	EXID("DOOR",	CONSTANT,	C_DOOR,		INTEGER,	0),
 	EXID("DNR",	CONSTANT,	C_DNR,		INTEGER,	0),
 	EXID("DNX",	CONSTANT,	C_DNX,		INTEGER,	0),
 	EXID("FIFO",	CONSTANT,	C_FIFO,		INTEGER,	0),
@@ -305,6 +306,9 @@ getval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 #ifdef S_ISSOCK
 		else if (S_ISSOCK(st->st_mode)) v.integer = C_SOCK;
 #endif
+#ifdef S_ISDOOR
+		else if (S_ISDOOR(st->st_mode)) v.integer = C_DOOR;
+#endif
 		else v.integer = 0;
 		break;
 	case F_uid:
@@ -436,6 +440,7 @@ refval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, int el
 	case C_BLK:
 	case C_CHR:
 	case C_DIR:
+	case C_DOOR:
 	case C_FIFO:
 	case C_LNK:
 	case C_REG:
@@ -487,7 +492,7 @@ refval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, int el
 		{
 			state.magicdisc.version = MAGIC_VERSION;
 			state.magicdisc.flags = 0;
-			state.magicdisc.errorf = (Magicerror_f)errorf;
+			state.magicdisc.errorf = errorf;
 			if (!(state.magic = magicopen(&state.magicdisc)) || magicload(state.magic, NiL, 0))
 				error(3, "%s: cannot load magic file", MAGIC_FILE);
 		}
@@ -719,7 +724,7 @@ compile(char* s)
 		state.expr.flags = EX_CHARSTRING|EX_FATAL;
 		state.expr.symbols = symbols;
 		state.expr.convertf = convert;
-		state.expr.errorf = (Exerror_f)errorf;
+		state.expr.errorf = errorf;
 		state.expr.getf = getval;
 		state.expr.reff = refval;
 		state.expr.setf = setval;

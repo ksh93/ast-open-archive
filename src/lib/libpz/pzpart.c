@@ -28,8 +28,9 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.1 (AT&T Labs Research) 2002-01-14 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.2 (AT&T Labs Research) 2002-12-18 $\n]"
 "[a:append]"
+"[c:comment]:[text]"
 "[x:crc]"
 "[d:debug]#[level]"
 "[D:dump]"
@@ -368,7 +369,7 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 		if (!(pz->buf = vmnewof(pz->vm, 0, unsigned char, n, 0)))
 		{
 			if (pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [buf,wrk]");
+				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
 			pz->wrk = 0;
 			return -1;
 		}
@@ -512,6 +513,14 @@ pzoptions(register Pz_t* pz, register Pzpart_t* pp, char* options, int must)
 						pz->flags |= PZ_APPEND;
 					else
 						pz->flags &= ~PZ_APPEND;
+					break;
+				case 'c':
+					if (!pz->disc->comment && !(pz->disc->comment = vmstrdup(pz->vm, opt_info.arg)))
+					{
+						if (pz->disc->errorf)
+							(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
+						return -1;
+					}
 					break;
 				case 'x':
 					if (opt_info.num)
@@ -697,15 +706,20 @@ pzpartition(register Pz_t* pz, const char* partition)
 	}
 	if (s[0] == '/' && s[i=strlen(s)-1] == '/')
 	{
-		n = (int)strtol(s + 1, &e, 10);
-		if (e[0] == '/' && !e[1])
-			n = sfsprintf(buf, sizeof(buf), "%d\n0-%d\n", n, n - 1);
+		if (streq(s, "/") || streq(s, "//") || streq(s, "/gzip/"))
+			n = sfsprintf(buf, sizeof(buf), "set nopzip\n1\n0-0\n");
 		else
 		{
-			n = sfsprintf(buf, sizeof(buf), "%.*s\n", i - 1, s + 1);
-			for (s = buf; *s; s++)
-				if (isspace(*s) || *s == ',')
-					*s = '\n';
+			n = (int)strtol(s + 1, &e, 10);
+			if (e[0] == '/' && !e[1])
+				n = sfsprintf(buf, sizeof(buf), "%d\n0-%d\n", n, n - 1);
+			else
+			{
+				n = sfsprintf(buf, sizeof(buf), "%.*s\n", i - 1, s + 1);
+				for (s = buf; *s; s++)
+					if (isspace(*s) || *s == ',')
+						*s = '\n';
+			}
 		}
 		if (!(sp = sfstropen()) || sfstrtmp(sp, SF_READ, buf, n))
 		{
@@ -727,7 +741,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 			memcpy(t, s, e - s);
 			t[e - s] = 0;
 			s = t;
-			if (*e == '#' && !(pz->partname = vmstrdup(pz->vm, e + 1)) || *e == '?' && pzoptions(pz, NiL, e + 1, 0))
+			if (*e == '#' && !(pz->partname = vmstrdup(pz->vm, e + 1)) || *e == '?' && pzoptions(pz, NiL, e + 1, 1))
 				goto bad;
 		}
 		if (!(sp = pzfind(pz, s, PZ_PART_SUF, "r")))
@@ -780,7 +794,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 				if (!(np = vmstrdup(pz->vm, e)))
 					goto bad;
 			}
-			else if (isalpha(*s) && pzoptions(pz, pp, s, 0))
+			else if (isalpha(*s) && pzoptions(pz, pp, s, 1))
 				goto bad;
 		} while (!(n = strtol(s, &t, 10)));
 		if (pz->flags & PZ_ROWONLY)
@@ -836,7 +850,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 				break;
 			else if (isalpha(*s))
 			{
-				if (pzoptions(pz, pp, s, 0))
+				if (pzoptions(pz, pp, s, 1))
 					goto bad;
 				continue;
 			}

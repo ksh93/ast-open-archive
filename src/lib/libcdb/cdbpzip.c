@@ -42,7 +42,7 @@
 static int
 pziprecognize(register Cdb_t* cdb)
 {
-	return sfdcpzip(cdb->io, NiL, NiL, PZ_STAT) > 0 ? 0 : -1;
+	return sfdcpzip(cdb->io, NiL, PZ_STAT, NiL) > 0 ? 0 : -1;
 }
 
 /*
@@ -67,11 +67,11 @@ pzipevent(register Cdb_t* cdb, int op)
 			}
 			disc->version = PZ_VERSION;
 			disc->options = cdb->disc->details;
-			disc->errorf = (Pzerror_f)cdb->disc->errorf;
+			disc->errorf = cdb->disc->errorf;
 		}
 		else
 			disc = 0;
-		return sfdcpzip(cdb->io, disc, NiL, 0);
+		return sfdcpzip(cdb->io, NiL, 0, disc);
 	case CDB_CLOSE:
 		break;
 	}

@@ -161,29 +161,29 @@ typedef struct Getprocs_s
 
 #ifdef _PS_dir
 
-#if !_mem_pr_clname_prpsinfo
+#if !defined(pr_clname) && !_mem_pr_clname_prpsinfo
 #undef	PSS_sched
 #define PSS_sched			0
 #endif
 
-#if !_mem_pr_gid_prpsinfo
+#if !defined(pr_gid) && !_mem_pr_gid_prpsinfo
 #undef	PSS_gid
 #define PSS_gid				0
 #endif
 
-#if !_mem_pr_lttydev_prpsinfo
+#if !defined(pr_lttydev) && !_mem_pr_lttydev_prpsinfo
 #undef	_mem_pr_lttydev_prpsinfo
 #define _mem_pr_lttydev_prpsinfo	0
 #endif
 
-#if !_mem_pr_ntpid_prpsinfo
+#if !defined(pr_ntpid) && !_mem_pr_ntpid_prpsinfo
 #undef	PSS_npid
 #define PSS_npid			0
 #else
 #define pr_npid				pr_ntpid
 #endif
 
-#if !_mem_pr_pgrp_prpsinfo
+#if !defined(pr_pgrp) && !_mem_pr_pgrp_prpsinfo
 #if _mem_pr_pgid_prpsinfo
 #undef	_mem_pr_pgrp_prpsinfo
 #define _mem_pr_pgrp_prpsinfo		1
@@ -194,33 +194,33 @@ typedef struct Getprocs_s
 #endif
 #endif
 
-#if !_mem_pr_psargs_prpsinfo
+#if !defined(pr_psargs) && !_mem_pr_psargs_prpsinfo
 #undef	_mem_pr_psargs_prpsinfo
 #define _mem_pr_psargs_prpsinfo		0
 #endif
 
-#if !_mem_pr_refcount_prpsinfo
+#if !defined(pr_refcount) && !_mem_pr_refcount_prpsinfo
 #undef	PSS_refcount
 #define PSS_refcount			0
 #endif
 
-#if !_mem_pr_rssize_prpsinfo
+#if !defined(pr_rssize) && !_mem_pr_rssize_prpsinfo
 #undef	PSS_rss
 #define PSS_rss				0
 #endif
 
-#if !_mem_pr_sonproc_prpsinfo
+#if !defined(pr_sonproc) && !_mem_pr_sonproc_prpsinfo
 #undef	PSS_proc
 #define PSS_proc			0
 #endif
 
-#if !_mem_pr_sid_prpsinfo
+#if !defined(pr_sid) && !_mem_pr_sid_prpsinfo
 #undef	PSS_sid
 #define PSS_sid				0
 #define pr_sid				pr_tgrp
 #endif
 
-#if !_mem_pr_tgrp_prpsinfo
+#if !defined(pr_tgrp) && !_mem_pr_tgrp_prpsinfo
 #undef	PSS_tgrp
 #define PSS_tgrp			0
 #define pr_tgrp				pr_pgrp

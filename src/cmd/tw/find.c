@@ -51,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2002-04-18 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2002-11-07 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -413,7 +413,9 @@ const struct Args commands[] =
 		"[+f?regular file]"
 		"[+l?symbolic link]"
 		"[+p?named pipe (FIFO)]"
-		"[+s?socket]",
+		"[+s?socket]"
+		"[+C?contiguous]"
+		"[+D?door]",
 	"File type matches \atype\a:",
 "used",		USED,		Num|Stat,	0,	"days",	0,
 	"File was accessed \adays\a days after its status changed.",
@@ -1048,7 +1050,7 @@ compile(char** argv, register struct Node* np)
 			{
 				magicdisc.version = MAGIC_VERSION;
 				magicdisc.flags = 0;
-				magicdisc.errorf = (Magicerror_f)errorf;
+				magicdisc.errorf = errorf;
 				if (!(magic = magicopen(&magicdisc)) || magicload(magic, NiL, 0))
 					error(3, "%s: cannot load magic file", MAGIC_FILE);
 			}
@@ -1322,6 +1324,11 @@ execute(Ftw_t* ftw)
 #ifdef S_ISCTG
 			case 'C':
 				val = S_ISCTG(val);
+				break;
+#endif
+#ifdef S_ISDOOR
+			case 'D':
+				val = S_ISDOOR(val);
 				break;
 #endif
 			default:
@@ -1629,7 +1636,7 @@ main(int argc, char** argv)
 		memset(&disc, 0, sizeof(disc));
 		disc.version = FIND_VERSION;
 		disc.flags = icase ? FIND_ICASE : 0;
-		disc.errorf = (Finderror_f)errorf;
+		disc.errorf = errorf;
 		disc.dirs = op;
 		walkflags |= FTW_TOP;
 		if (fp = findopen(codes, fast, NiL, &disc))

@@ -2339,7 +2339,7 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 		if (*act)
 		{
 			if (!(s = r->action) || !streq(act, s))
-				r->action = strdup(act);
+				r->action = strdup(act); /* XXX: possible leak */
 			if (s && r->action != s && !state.user && !(set.rule.property & P_operator) && !(set.op & A_special) && !special(r) && !special(&set.rule))
 				error(1, "multiple actions for %s", r->name);
 		}

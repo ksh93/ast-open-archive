@@ -34,13 +34,13 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: what (AT&T Labs Research) 2001-11-26 $\n]"
+"[-?\n@(#)$Id: what (AT&T Labs Research) 2002-11-14 $\n]"
 USAGE_LICENSE
 "[+NAME?what - display binary identification strings]"
 "[+DESCRIPTION?\bwhat\b searches the given files for all occurrences of"
 "	the identification pattern \b@(#)\b or \b$Id:\b and writes a line to"
 "	the standard output containing the text that follows until the first"
-"	occurrence of one of the following: \b\" > \\ $ newline NUL\b. If no"
+"	occurrence of one of the following: \b\" < > \\ $ newline NUL\b. If no"
 "	\bfile\b is given or if a \bfile\b is \b-\b then the standard input is"
 "	read. The name of each input file, followed by a \b:\b, is also"
 "	written as a separate line to the standard output.]"
@@ -192,6 +192,7 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 							switch (*s)
 							{
 							case 0:
+							case '<':
 							case '>':
 							case '"':
 							case '\\':
@@ -236,7 +237,7 @@ b_what(int argc, char** argv, void* context)
 	register Sfio_t*	sp;
 
 	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG);
+	cmdinit(argv, context, ERROR_CATALOG, 0);
 	state.hit = state.single = 0;
 	for (n = 0; n <= UCHAR_MAX; n++)
 		state.skip[n] = 4;

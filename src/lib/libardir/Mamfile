@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -162,12 +162,6 @@ done ../../../include/ast/times.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/tm.h
-make ../../../include/ast/swap.h implicit
-make ../../../include/ast/int.h implicit
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/int.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/swap.h
 prev ardirlib.h implicit
 done ar-aix.c
 prev ar-aix.c
@@ -176,7 +170,6 @@ done ar-aix.o generated
 make ar-aixbig.o
 make ar-aixbig.c
 prev ../../../include/ast/tm.h implicit
-prev ../../../include/ast/swap.h implicit
 prev ardirlib.h implicit
 done ar-aixbig.c
 prev ar-aixbig.c
@@ -206,7 +199,12 @@ done ar-omf.o generated
 make ar-pdp11.o
 make ar-pdp11.c
 prev ../../../include/ast/tm.h implicit
-prev ../../../include/ast/swap.h implicit
+make ../../../include/ast/swap.h implicit
+make ../../../include/ast/int.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/int.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/swap.h
 prev ardirlib.h implicit
 done ar-pdp11.c
 prev ar-pdp11.c

@@ -1,50 +1,16 @@
 #pragma prototyped
-/* First, determine which version of KSH we're using.  For now,
-   the best way to tell is by seeing if sh_bltin_tree is defined
- */
 
 #ifdef SH_VERSION
 #define NEWKSH
 # if SH_VERSION >= 19961101
 # define KSH93F
 # endif
-# if SH_VERSION >= 19990801
-# define _COMPAT_SH_PRIVATE
-# endif
 #endif
 
 #define NIL(t)		((t)0)
 
-#ifdef NEWKSH
-
-#if 0
-#define sh_trap(cmd, val)	sh_interp((cmd), NULL, NULL)
-#endif
-
 #ifndef SH_SUBSHARE
 #define SH_SUBSHARE	(1L<<27)	/* subshell shares state with parent */
-#endif
-
-#else
-/* Older versions of libshell */
-extern Sfio_t		*sh_sfeval(char*[]);
-
-typedef struct Shscope_t
-{
-	Hashtab_t *var_tree;
-	Hashtab_t *par_tree;
-	struct Shscope_t *par_scope;
-	int argc;
-	char **argv;
-} Shscope_t; 
-
-int		nv_getlevel(void);
-
-Hashtab_t *	sh_bltin_tree(void);
-Shscope_t *	sh_getscope(int index, int mode);
-void		sh_setscope(Shscope_t *new, Shscope_t *old);
-int		sh_funscope(int argc, char **argv, int (*func)(void *), void *data, int f);
-
 #endif
 
 #ifndef KSH93F

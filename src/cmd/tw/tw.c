@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2002-04-03 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2002-11-07 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -208,6 +208,7 @@ USAGE_LICENSE
 "			[+BLK?block special]"
 "			[+CHR?block special]"
 "			[+DIR?directory]"
+"			[+DOOR?door]"
 "			[+FIFO?fifo]"
 "			[+LNK?symbolic link]"
 "			[+REG?regular]"
@@ -684,7 +685,7 @@ main(int argc, register char** argv)
 				disc.flags |= FIND_TYPE;
 			if (state.cmdflags & CMD_QUERY)
 				disc.flags |= FIND_OLD;
-			disc.errorf = (Finderror_f)errorf;
+			disc.errorf = errorf;
 			if (!(state.find = findopen(codes, NiL, NiL, &disc)))
 				exit(2);
 			if (disc.flags & FIND_TYPE)
@@ -731,7 +732,7 @@ main(int argc, register char** argv)
 			disc.version = FIND_VERSION;
 			if (state.icase)
 				disc.flags |= FIND_ICASE;
-			disc.errorf = (Finderror_f)errorf;
+			disc.errorf = errorf;
 			disc.dirs = ap = av;
 			if (firstdir != lastdir)
 				firstdir = firstdir->next;

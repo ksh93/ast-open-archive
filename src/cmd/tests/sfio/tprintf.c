@@ -513,5 +513,10 @@ MAIN()
 	if(strcmp(buf1,"1345 1234 11145401322 322 3e+02 -0.01 0.01 1e-05 1 -1    |") )
 		terror("Precision not set to zero as required after a dot");
 
+	/* test %#c to print C-style characters */
+	sfsprintf(buf1, sizeof(buf1), "%#.2c%#.2c", '\n', 255);
+	if(strcmp(buf1, "\\n\\n\\377\\377") != 0)
+		terror("%%#c formatting failed");
+
 	TSTEXIT(0);
 }

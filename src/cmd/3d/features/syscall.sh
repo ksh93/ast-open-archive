@@ -28,7 +28,7 @@
 #
 # this is the worst iffe script, we promise
 #
-# @(#)syscall.sh (AT&T Research) 2001-10-31
+# @(#)syscall.sh (AT&T Research) 2002-10-18
 #
 eval $1
 shell=
@@ -528,7 +528,10 @@ extern $r $l($var);
 			for i in sys/types.h $ref
 			do	echo "#include <$i>"
 			done > ${tmp}h.c
-			i=`$cc -E ${tmp}h.c | sed -e '/^#[line 	]*1[ 	]/!d' -e 's/.*"\(.*\)".*/\1/'`
+			i=
+			for j in `$cc -E ${tmp}h.c | sed -e '/^#[line 	]*1[ 	]/!d' -e 's/.*"\(.*\)".*/\1/'`
+			do	test -f "$j" && i="$i $j"
+			done
 			ver=`sed -e "/define[ 	]*[A-Z_0-9]*64_VER/!d" -e 's/.*define[ 	]*\([A-Z_0-9][A-Z_0-9]*\).*/\1/' $i </dev/null | sort -u`
 			ver64="$ver64 $ver"
 			ver=`sed -e "/${xxx}.*_VER/!d" -e 's/.*([ 	]*\([A-Z_0-9][A-Z_0-9]*\).*/\1/' $i </dev/null | sort -u`

@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2002-10-01 $\n]"
+"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2002-12-06 $\n]"
 USAGE_LICENSE
 "[+NAME?cpp - C language preprocessor]"
 "[+DESCRIPTION?\bcpp\b is the preprocessor for all C language dialects. It is"
@@ -91,7 +91,11 @@ USAGE_LICENSE
 "	[+-D-+, pp::plusplus?Preprocess for the C++ dialect.]"
 "}"
 "[I:include?Append \adirectory\a to the list of directories searched for"
-"	\b#include\b files.]:?[directory]{"
+"	\b#include\b files. If \adirectory\a is \b-\b then: (1) \b-I\b"
+"	directories before \b-I-\b are searched only for \"...\" include"
+"	files; (2) \b-I\b directories after \b-I-\b are searched for"
+"	\"...\" and <...> include files; (3) the directory \b.\b is searched"
+"	only if it is explicitly specified by a \b-I\b option.]:?[directory]{"
 "	[+-I-C\adirectory\a, \bpp::cdir\b \adirectory\a?Mark \adirectory\a"
 "		as a C header directory. Used with \bpp:plusplus\b.]"
 "	[+-I-D[\afile\a]]?Read the default \bprobe\b(1) definitions from"

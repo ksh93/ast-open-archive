@@ -61,9 +61,9 @@ pzfixed(Pz_t* pz, register Sfio_t* io, void* buf, size_t z)
 	unsigned long			f;
 	unsigned long			g;
 	Sfoff_t				siz;
-	Pzerror_f			trace;
+	Error_f				trace;
 
-	trace = pz && error_info.trace <= -2 ? pz->disc->errorf : (Pzerror_f)0;
+	trace = pz && error_info.trace <= -2 ? pz->disc->errorf : 0;
 	siz = pz && (pz->flags & PZ_POP) ? (Sfoff_t)0 : sfsize(io);
 	if (buf)
 		s = (unsigned char*)buf;

@@ -497,7 +497,7 @@ execute(char* linebuf, int contxt)
 		return 0;
 	}
 	if (state.var.autoprint && (com->c_argtype & P))
-		if (!(state.msg.dot->m_flag & (MDELETE|MNONE))) {
+		if (!(state.msg.dot->m_flag & (MDELETE|MNONE|MSPAM))) {
 			state.msg.list->m_index = state.msg.dot - state.msg.list + 1;
 			(state.msg.list + 1)->m_index = 0;
 			type(state.msg.list);

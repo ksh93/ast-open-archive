@@ -87,7 +87,7 @@ main(int argc, register char** argv)
 	memset(&disc, 0, sizeof(disc));
 	disc.version = UU_VERSION;
 	disc.flags = UU_HEADER;
-	disc.errorf = (Uuerror_f)errorf;
+	disc.errorf = errorf;
 	encoding = 0;
 	ipath = opath = 0;
 	ip = sfstdin;

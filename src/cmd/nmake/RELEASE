@@ -1,3 +1,26 @@
+02-12-21 --- release 4.3 ---
+02-12-18 Makerules.mk: :NOOPTIMIZE: "..."'d operator arg shenanigans
+02-12-16 Makerules.mk: disable .ARCOPY for linked targets
+02-12-06 Makerules.mk: sync CC.MAKE.OPTIONS,nativepp,prefixinclude logic
+02-12-04 Makerules.mk: fix contorted .so editing that botched n.n.n versions
+	 Makerules.mk: parameterize CC/cc suffixes in { .SUFFIX.c .SUFFIX.C }
+	 Makerules.mk: use { .SUFFIX.c .SUFFIX.C } in :cc: list generation
+	 Makerules.mk: parameterize fortran suffixes in { .SUFFIX.f .SUFFIX.r }
+	 Makerules.mk: %.f is now equivalent to %.F
+	 Scanrules.mk: use { .SUFFIX.c .SUFFIX.C .SUFFIX.f .SUFFIX.r }
+	 Scanrules.mk: change .SCAN.F to .SCAN.fql -- who cares?
+02-12-03 rule.c: don't .UNBIND M_bind rules (questionable=0x02000000)
+02-12-02 Makerules.mk: prefixinclude=0 if CC.DIALECT has -I-
+	 make.c: add mutually dependent requirement loop check (for -l loops)
+02-11-28 main.c: don't close error_info.fd in startup
+02-11-21 Makerules.mk: dll version "-" bug that removed the installed dll!
+02-11-20 Makerules.mk: fix :cc: to handle all C source suffixes
+02-11-12 Makerules.mk: handle CC.LD.ORIGIN and CC.LD.STRIP
+02-10-31 main.c: change exit()=>return for pedantic lint
+02-10-28 bind.c: add GLOB_NOTDIR optimization to gl_dirnext
+02-10-25 eliminate a few uninitialized variable references
+02-10-20 Makerules.mk: add :NOTHING: (:ALL: or ...)
+02-10-16 Makerules.mk: fix :MAKE: for rhs files
 02-10-02 state.c: (-Q0x01000000) $(>) use min(r->time,state(r)->time)
 	 misc.c: tmform() => fmttime(); %K default time format
 02-09-22 Makerules.mk: drop ${mam_cc_STATIC} for +l binding

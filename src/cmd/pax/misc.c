@@ -609,12 +609,13 @@ listentry(register File_t* f)
 					s += n - (state.meter.width - METER_parts - 1);
 					n = state.meter.width - METER_parts - 1;
 				}
-				i = (p / (100 / METER_parts));
 				j = n + METER_parts + 2;
 				if (!state.meter.last)
 					state.meter.last = j + 5;
 				if ((k = state.meter.last - j - 5) < 0)
 					k = 0;
+				if ((i = (p / (100 / METER_parts))) >= sizeof(bar))
+					i = sizeof(bar) - 1;
 				n = 0;
 				while (n < i)
 					bar[n++] = '*';

@@ -76,7 +76,7 @@ ppmultiple(register struct ppfile* fp, register struct ppsymbol* test)
 	register struct ppsymbol*	status;
 
 	status = fp->guard;
-	debug((-4, "ppmultiple(%s) status=%s%s test=%s", fp->name, status == INC_CLEAR ? "[CLEAR]" : status == INC_TEST ? "[ONCE]" : status == INC_IGNORE ? "[IGNORE]" : status->name, (pp.mode & HOSTED) ? "[HOSTED]" : "", test == INC_CLEAR ? "[CLEAR]" : test == INC_TEST ? "[TEST]" : test->name));
+	message((-3, "search: %s: status=%s%s test=%s", fp->name, status == INC_CLEAR ? "[CLEAR]" : status == INC_TEST ? "[ONCE]" : status == INC_IGNORE ? "[IGNORE]" : status->name, (pp.mode & HOSTED) ? "[HOSTED]" : "", test == INC_CLEAR ? "[CLEAR]" : test == INC_TEST ? "[TEST]" : test->name));
 	if (status == INC_IGNORE)
 	{
 		message((-2, "%s: ignored [%s]", fp->name, pp.ignore));
@@ -700,6 +700,18 @@ ppsearch(char* file, int type, int flags)
 	}
 	if ((fd = search(fp, dp, type, flags)) < 0)
 	{
+		if ((pp.option & PLUSPLUS) && file != pp.tmpbuf)
+		{
+			s = file + strlen(file);
+			while (s > file && *--s != '/' && *s != '\\' && *s != '.');
+			if (*s != '.')
+			{
+				sfsprintf(pp.tmpbuf, MAXTOKEN, "%s.h", file);
+				file = pp.tmpbuf;
+				goto again;
+			}
+		}
+
 		/*
 		 * hackery for msdos files viewed through unix
 		 */

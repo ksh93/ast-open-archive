@@ -1,3 +1,10 @@
+02-12-18 pzwrite.c: add partial row buffer
+02-12-12 sfdcpzip.c: move disc arg to the end for discplined consistency
+02-12-11 sfdczip.c: add
+	 sfdcpzip.c: fix SF_WRITE, set disc.partition if passed in
+02-11-22 sfdcpzip.c: fix bug that did not close pz->pz->io (and its fd!)
+	 pzpart: check option errors (duh) and accept comment option
+02-10-31 pzpart: partition file "/" or "//" or "/gzip/" => gzip compress
 02-04-30 pzopen,pzhead: tighten pzip magic check via reasonable version number
 02-03-09 pzopen,pzdeflate,pzsync: add fatal error checks
 02-02-14 pzopen: disable PZ_UNKNOWN check if PZ_NOPZIP -- duh

@@ -43,7 +43,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2002-08-30'
+version='mm2html (AT&T Labs Research) 2002-10-24'
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
@@ -670,7 +670,7 @@ function getline
 							;;
 						link)	nam=href
 							tar=
-							case $frame in
+							case $frame$vg in
 							?*)	case $url in
 								*([abcdefghijklmnopqrstuvwxyz]):*|/*)
 									tar=" target=_top"
@@ -2076,12 +2076,15 @@ case $references in
 esac
 print -r -- "<P>"
 print -r -- "<HR>"
-print -r -- "<DIV align=right>"
+print -r -- "<TABLE border=0 align=center width=96%>"
+integer dls=0 drs=0
+typeset d dl dr
 case ${html.ident} in
 1)	case ${license.author} in
 	?*)	IFS=',+'
 		set -- ${license.author}
 		IFS=$ifs
+		d=""
 		sp=""
 		for a
 		do	v=${contributor[$a]}
@@ -2092,31 +2095,35 @@ case ${html.ident} in
 			set -- $a
 			IFS=$ifs
 			case $2 in
-			?*)	print -rn "$sp<A href=\"mailto:$2?subject=$title\">"
+			?*)	d="$d$sp<A href=\"mailto:$2?subject=$title\">"
 				sp=", "
 				set -- $1
-				print -rn -- $*
-				print -r "</A>"
+				d="$d$*</A>"
 				;;
 			esac
 		done
+		[[ $d ]] && dr[++drs]=$d
 		;;
 	*)	case ${html.MAILTO} in
-		?*)	print -r "<A href=\"mailto:${html.MAILTO}?subject=$title\">${html.MAILTO}</A>" ;;
+		?*)	dr[++drs]="<A href=\"mailto:${html.MAILTO}?subject=$title\">${html.MAILTO}</A>" ;;
 		esac
 		;;
 	esac
 	for i in "${license.organization}" "${license.corporation} ${license.company}" "${license.address}" "${license.location}" "${license.phone}"
 	do	case $i in
 		''|' ')	;;
-		*)	print -r -- "<BR>${i//\&/&amp\;}" ;;
+		*)	dr[++drs]="${i//\&/&amp\;}" ;;
 		esac
 	done
 	;;
 esac
+dr[++drs]="${ds[Dt]}"
+(( drs < dls )) && (( drs = dls ))
+for (( dls = 1; dls <= drs; dls++ ))
+do	print -r -- "<TR>$nl<TD align=left>${dl[dls]}</TD>$nl<TD align=right>${dr[dls]}</TD>$nl</TR>"
+done
+print -r -- "</TABLE>"
 print -r -- "<P>"
-print -r -- "${ds[Dt]}"
-print -r -- "</DIV>"
 case ${html.footing} in
 ?*)	html.toolbar=
 	hit=

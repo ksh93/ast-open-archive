@@ -1,3 +1,4 @@
+02-10-30 probe.c: reset proc->rfd after sfnew() to avoid close() error
 02-09-21 probe.c: handle strlen(base) != BASE_MAX
 02-09-11 probe.c: add more override docs
 02-01-30 probe.c: add probe.ini check to match libast/pathprobe()

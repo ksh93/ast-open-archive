@@ -153,7 +153,7 @@ typedef struct
 	const char*	comment;	/* format specific comment	*/
 	const char*	details;	/* format specific details	*/
 	const char*	lib;		/* pathfind() lib		*/
-	Cdberror_f	errorf;		/* error function		*/
+	Error_f		errorf;		/* error function		*/
 	Cdbevent_f	eventf;		/* event function		*/
 	Cdbindex_f	indexf;		/* key index function		*/
 } Disc_pre_19980811_t;

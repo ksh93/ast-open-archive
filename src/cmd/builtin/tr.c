@@ -502,7 +502,7 @@ b_tr(int argc, char** argv, void* context)
 	register int	flags = 0;
 	Tr_t*		tr;
 
-	cmdinit(argv, context, ERROR_CATALOG);
+	cmdinit(argv, context, ERROR_CATALOG, 0);
 	flags = 0;
 	for (;;)
 	{

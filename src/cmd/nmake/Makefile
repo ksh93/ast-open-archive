@@ -30,9 +30,7 @@ nmake :: FEATURES HISTORY README RELEASE REFERENCES \
 	rule.c scan.c state.c trap.c variable.c version.c \
 	-lcoshell -lardir
 
-if CC.HOSTTYPE == "win32*" || "$(-mam)" == "static*"
-expand.o object.o : .CC.NOOPTIMIZE
-end
+"win32*" :NOOPTIMIZE: expand.c object.c
 
 $(RULESDIR) :INSTALLDIR: Makeinstall.mk $(RULES) $(RULESFILES) ppcc
 

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -141,7 +141,7 @@ done dlls.o generated
 bind -ldll
 bind -last
 setv STANDALONE -DSTANDALONE="b_dlls"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o dlls dlls.o ${mam_libdll} ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o dlls dlls.o ${mam_libdll} ${mam_libast} ${mam_libcmd}
 done dlls generated
 make look
 make look.o
@@ -150,10 +150,10 @@ prev ../../../include/ast/cmd.h implicit
 done look.c
 prev look.c
 setv STANDALONE -DSTANDALONE="b_look"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_look -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c look.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_look -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c look.c
 done look.o generated
 setv STANDALONE -DSTANDALONE="b_look"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o look look.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o look look.o ${mam_libast} ${mam_libcmd}
 done look generated
 make mime
 make mime.o
@@ -174,7 +174,7 @@ setv STANDALONE -DSTANDALONE="b_mime"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_mime -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c mime.c
 done mime.o generated
 setv STANDALONE -DSTANDALONE="b_mime"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o mime mime.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mime mime.o ${mam_libast} ${mam_libcmd}
 done mime generated
 make od
 make od.o
@@ -195,7 +195,7 @@ setv STANDALONE -DSTANDALONE="b_od"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_od -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c od.c
 done od.o generated
 setv STANDALONE -DSTANDALONE="b_od"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o od od.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o od od.o ${mam_libast} ${mam_libcmd}
 done od generated
 make pr
 make pr.o
@@ -218,7 +218,7 @@ setv STANDALONE -DSTANDALONE="b_pr"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_pr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c pr.c
 done pr.o generated
 setv STANDALONE -DSTANDALONE="b_pr"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o pr pr.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pr pr.o ${mam_libast} ${mam_libcmd}
 done pr generated
 make strings
 make strings.o
@@ -230,7 +230,7 @@ setv STANDALONE -DSTANDALONE="b_strings"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_strings -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c strings.c
 done strings.o generated
 setv STANDALONE -DSTANDALONE="b_strings"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o strings strings.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strings strings.o ${mam_libast} ${mam_libcmd}
 done strings generated
 make tr
 make tr.o
@@ -247,7 +247,7 @@ setv STANDALONE -DSTANDALONE="b_tr"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_tr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c tr.c
 done tr.o generated
 setv STANDALONE -DSTANDALONE="b_tr"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o tr tr.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tr tr.o ${mam_libast} ${mam_libcmd}
 done tr generated
 make uudecode
 make uudecode.o
@@ -266,7 +266,7 @@ exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uudecode -D_PAC
 done uudecode.o generated
 bind -luu
 setv STANDALONE -DSTANDALONE="b_uudecode"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o uudecode uudecode.o ${mam_libuu} ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o uudecode uudecode.o ${mam_libuu} ${mam_libast} ${mam_libcmd}
 done uudecode generated
 make uuencode
 make uuencode.o
@@ -281,7 +281,7 @@ setv STANDALONE -DSTANDALONE="b_uuencode"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uuencode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c uuencode.c
 done uuencode.o generated
 setv STANDALONE -DSTANDALONE="b_uuencode"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o uuencode uuencode.o ${mam_libuu} ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o uuencode uuencode.o ${mam_libuu} ${mam_libast} ${mam_libcmd}
 done uuencode generated
 make what
 make what.o
@@ -293,7 +293,7 @@ setv STANDALONE -DSTANDALONE="b_what"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_what -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c what.c
 done what.o generated
 setv STANDALONE -DSTANDALONE="b_what"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o what what.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o what what.o ${mam_libast} ${mam_libcmd}
 done what generated
 make who
 make who.o
@@ -310,7 +310,7 @@ setv STANDALONE -DSTANDALONE="b_who"
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_who -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c who.c
 done who.o generated
 setv STANDALONE -DSTANDALONE="b_who"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o who who.o ${mam_libast} ${mam_libcmd}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o who who.o ${mam_libast} ${mam_libcmd}
 done who generated
 make basename
 make builtin.c

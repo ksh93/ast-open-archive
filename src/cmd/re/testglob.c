@@ -28,12 +28,37 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2002-04-12 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2002-10-28 $\0\n";
 
 #if _PACKAGE_ast
+
 #include <ast.h>
+
+#define quniq(v,n)	struniq(v,n)
+
 #else
+
 #define fmtident(s)	((char*)(s)+10)
+
+static int
+quniq(char** argv, int n)
+{
+	register char**	ao;
+	register char**	an;
+	register char**	ae;
+
+	ao = an = argv;
+	ae = ao + n;
+	while (++an < ae)
+	{
+		while (streq(*ao, *an))
+			if (++an >= ae)
+				return ao - argv + 1;
+		*++ao = *an;
+	}
+	return ao - argv + 1;
+}
+
 #endif
 
 #include <stdio.h>
@@ -78,6 +103,7 @@ H("\n");
 H("OPTIONS\n");
 H("  -c	catch signals and non-terminating calls\n");
 H("  -e	ignore error code mismatches\n");
+H("  -n	do not repeat tests with GLOB_LIST, GLOB_STACK, or GLOB_LIST|GLOB_STACK\n");
 H("  -v	list each test line\n");
 H("\n");
 H("INPUT FORMAT\n");
@@ -103,6 +129,7 @@ H("    E	GLOB_ERR		abort on error\n");
 H("    i	GLOB_ICASE		ignore case\n");
 H("    m	GLOB_MARK		append / to directories\n");
 H("    n	GLOB_NOCHECK		no match returns original pattern\n");
+H("    r	GLOB_STARSTAR		enable /**/ expansion\n");
 H("    s	GLOB_NOSORT		don't sort\n");
 H("    u	standard unspecified behavior -- errors not counted\n");
 H("\n");
@@ -164,6 +191,9 @@ static const char* unsupported[] = {
 #ifndef GLOB_STACK
 	"STACK",
 #endif
+#ifndef GLOB_STARSTAR
+	"STARSTAR",
+#endif
 	0
 };
 
@@ -184,6 +214,9 @@ static const char* unsupported[] = {
 #endif
 #ifndef GLOB_STACK
 #define GLOB_STACK	0
+#endif
+#ifndef GLOB_STARSTAR
+#define GLOB_STARSTAR	0
 #endif
 
 #define GLOB_UNKNOWN	(-1)
@@ -473,6 +506,7 @@ main(int argc, char** argv)
 	int		expected;
 	int		got;
 	int		ok;
+	int		nmodes;
 	char*		spec;
 	char*		pat;
 	char*		p;
@@ -521,6 +555,7 @@ main(int argc, char** argv)
 #endif
 	};
 
+	nmodes = elementsof(modes);
 	printf("TEST\t%s", s = fmtident(id));
 	p = unit;
 	while (p < &unit[sizeof(unit)-1] && (*p = *s++) && !isspace(*p))
@@ -546,6 +581,9 @@ main(int argc, char** argv)
 				printf(", help\n\n");
 				help();
 				return 2;
+			case 'n':
+				nmodes = 1;
+				continue;
 			case 'v':
 				verbose = 1;
 				printf(", verbose");
@@ -745,6 +783,9 @@ main(int argc, char** argv)
 			case 'n':
 				flags |= GLOB_NOCHECK;
 				continue;
+			case 'r':
+				flags |= GLOB_STARSTAR;
+				continue;
 			case 's':
 				flags |= GLOB_NOSORT;
 				continue;
@@ -806,7 +847,7 @@ main(int argc, char** argv)
 			escape(ans);
 		okre = kre;
 		osre = sre;
-		for (m = 0; m < elementsof(modes); m++) {
+		for (m = 0; m < nmodes; m++) {
 			if (modes[m])
 			{
 				if ((flags & modes[m]) == modes[m])
@@ -913,8 +954,21 @@ main(int argc, char** argv)
 					n = gl.gl_pathc;
 					v = gl.gl_pathv;
 				}
+				if (verbose)
+				{
+					printf("    ");
+					for (i = 0; i < n; i++)
+						printf(" %s", v[i]);
+					printf("\n");
+				}
 				if (flags & (GLOB_LIST|GLOB_NOSORT))
+				{
 					qsort(v, n, sizeof(*v), qstrcmp);
+					if ((flags & GLOB_STARSTAR) && !(gl.gl_flags & GLOB_STARSTAR))
+						v[n = quniq(v, n)] = 0;
+				}
+				if (!ans)
+					ans = "";
 				bs = s = ans;
 				bp = p = "";
 				for (i = 0; i < n; i++)

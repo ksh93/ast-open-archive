@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -136,7 +136,7 @@ exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE
 done banner.o generated
 bind -last
 setv LICENSE -DLICENSE="since=1989,author=dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o banner banner.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o banner banner.o ${mam_libast}
 done banner generated
 make dd
 make dd.o
@@ -166,7 +166,7 @@ done dd.c
 prev dd.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c dd.c
 done dd.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o dd dd.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o dd dd.o ${mam_libast}
 done dd generated
 make df
 make df.o
@@ -191,7 +191,7 @@ done df.c
 prev df.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c df.c
 done df.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o df df.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o df df.o ${mam_libast}
 done df generated
 make du
 make du.o
@@ -216,7 +216,7 @@ done du.c
 prev du.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c du.c
 done du.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o du du.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o du du.o ${mam_libast}
 done du generated
 make file
 make file.o
@@ -232,7 +232,7 @@ done file.c
 prev file.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c file.c
 done file.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o file file.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o file file.o ${mam_libast}
 done file generated
 make iconv
 make iconv.o
@@ -244,7 +244,7 @@ done iconv.c
 prev iconv.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c iconv.c
 done iconv.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o iconv iconv.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o iconv iconv.o ${mam_libast}
 done iconv generated
 make locale
 make locale.o
@@ -285,7 +285,7 @@ done locale.c
 prev locale.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c locale.c
 done locale.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o locale locale.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o locale locale.o ${mam_libast}
 done locale generated
 make ls
 make ls.o
@@ -301,7 +301,7 @@ done ls.c
 prev ls.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ls.c
 done ls.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ls ls.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ls ls.o ${mam_libast}
 done ls generated
 make mesg
 make mesg.o
@@ -314,7 +314,7 @@ setv LICENSE -DLICENSE="since=1995,author=dgk"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mesg.c
 done mesg.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o mesg mesg.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mesg mesg.o ${mam_libast}
 done mesg generated
 make ast_mount
 make mount.o
@@ -337,7 +337,7 @@ setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mount.c
 done mount.o generated
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ast_mount mount.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ast_mount mount.o ${mam_libast}
 done ast_mount generated
 make ast_ps
 make ps.o
@@ -401,7 +401,7 @@ setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss.c
 done pss.o generated
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ast_ps ps.o pss.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ast_ps ps.o pss.o ${mam_libast}
 done ast_ps generated
 make shar
 make shar.sh
@@ -453,7 +453,7 @@ setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c split.c
 done split.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o split split.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o split split.o ${mam_libast}
 done split generated
 make csplit
 prev split
@@ -485,7 +485,7 @@ prev sum.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c sum.c
 done sum.o generated
 bind -lsum
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o sum sum.o ${mam_libsum} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sum sum.o ${mam_libsum} ${mam_libast}
 done sum generated
 make cksum
 prev sum
@@ -512,7 +512,7 @@ done touch.c
 prev touch.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c touch.c
 done touch.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o touch touch.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o touch touch.o ${mam_libast}
 done touch generated
 make tsort
 make tsort.o
@@ -526,7 +526,7 @@ setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c tsort.c
 done tsort.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o tsort tsort.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tsort tsort.o ${mam_libast}
 done tsort generated
 make unexpand
 make unexpand.o
@@ -538,7 +538,7 @@ setv LICENSE -DLICENSE="since=1995,author=dgk"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c unexpand.c
 done unexpand.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o unexpand unexpand.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o unexpand unexpand.o ${mam_libast}
 done unexpand generated
 make expand
 prev unexpand

@@ -283,7 +283,7 @@ State_t			state =
 	{	"end",		0,	0	},
 	},
 	1,
-	{ HIX_VERSION, 0, VERSION, 0, (Hixerror_f)errorf, hix_event }
+	{ HIX_VERSION, 0, VERSION, 0, errorf, hix_event }
 };
 
 typedef Sflong_t (*Compiled_f)(char**);
@@ -770,14 +770,14 @@ main(int argc, char** argv)
 				message((-2, ":::: load expression C code from %s", compiled));
 				if (!(sp = sfstropen()))
 					error(ERROR_SYSTEM|3, "out of space [load]");
-				if (!(dll = dllfind(compiled, NiL, RTLD_LAZY)))
+				if (!(dll = dllfind(compiled, NiL, RTLD_LAZY, buf, sizeof(buf))))
 					error(ERROR_SYSTEM|3, "%s: %s", compiled, dlerror());
 				for (n = 0; n < elementsof(state.loop); n++)
 				{
 					sfprintf(sp, "%s_%s", error_info.id, state.loop[n].name);
 					name = sfstruse(sp);
 					if ((x = exexpr(prog, state.loop[n].name, NiL, 0)) && !(x->compiled.integer = (Compiled_f)dlllook(dll, name)))
-						error(3, "%s: %s function not found", compiled, name);
+						error(3, "%s: %s function not found", buf, name);
 				}
 				sfstrclose(sp);
 				state.expr.data = data;

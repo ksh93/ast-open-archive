@@ -10,8 +10,6 @@ TK_VERSION		=	4.2
 LIB_DIR			==	"lib/$(ID)$(TCL_VERSION)"
 TKSH_LIBRARY    	==      "$(LIBDIR)/$(ID)$(TCL_VERSION)"
 
-nvenv			==	nvprivate[0]
-
 if CC.HOSTTYPE == "win32.*"
 CCFLAGS			=	$(CC.OPTIMIZE) $(CC.DLLBIG)
 else

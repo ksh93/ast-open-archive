@@ -424,11 +424,13 @@ ppcontrol(void)
 				sym = pprefmac(pp.token, REF_IF);
 				if (directive == IFNDEF && pp.control == pp.in->control + 1)
 				{
-					if (pp.in->flags & (IN_defguard|IN_endguard)) pp.in->flags |= IN_noguard;
+					if (pp.in->flags & (IN_defguard|IN_endguard))
+						pp.in->flags |= IN_noguard;
 					else
 					{
 						pp.in->flags |= IN_defguard;
-						if (!(pp.in->flags & IN_tokens)) pp.in->symbol = sym ? sym : pprefmac(pp.token, REF_CREATE);
+						if (!(pp.in->flags & IN_tokens))
+							pp.in->symbol = sym ? sym : pprefmac(pp.token, REF_CREATE);
 					}
 				}
 			}

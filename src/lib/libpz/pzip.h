@@ -92,7 +92,6 @@ struct Pzsplit_s; typedef struct Pzsplit_s Pzsplit_t;
 
 typedef ssize_t (*Pzconvert_f)(Pz_t*, Pzconvert_t*, const unsigned char*, unsigned char*, Pzdisc_t*);
 typedef int (*Pzevent_f)(Pz_t*, int, void*, size_t, Pzdisc_t*);
-typedef int (*Pzerror_f)(Pz_t*, Pzdisc_t*, int, const char*, ...);
 typedef int (*Pzindex_f)(Pz_t*, Pzindex_t*, void*, Pzdisc_t*);
 typedef const char* (*Pzinit_f)(Pz_t*, Pzdisc_t*);
 typedef char* (*Pzname_f)(Pz_t*, unsigned long, Pzdisc_t*);
@@ -138,7 +137,7 @@ struct Pzdisc_s				/* user discipline		*/
 	const char*	partition;	/* data partition file		*/
 	const char*	lib;		/* pathfind() lib		*/
 	size_t		window;		/* max window size		*/
-	Pzerror_f	errorf;		/* error function		*/
+	Error_f		errorf;		/* error function		*/
 	Pzevent_f	eventf;		/* event function		*/
 	Pzinit_f	initf;		/* library init function	*/
 	Pzread_f	readf;		/* partition row read function	*/
@@ -270,7 +269,8 @@ extern int		pzdcconvert(Pz_t*, const Pzconvert_t*);
 
 extern ssize_t		pzfixed(Pz_t*, Sfio_t*, void*, size_t);
 
-extern int		sfdcpzip(Sfio_t*, Pzdisc_t*, const char*, unsigned long);
+extern int		sfdcpzip(Sfio_t*, const char*, unsigned long, Pzdisc_t*);
+extern int		sfdczip(Sfio_t*, const char*, const char*, Error_f);
 
 #undef	extern
 

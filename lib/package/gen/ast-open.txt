@@ -75,6 +75,37 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
+02-11-30  --- Release ksh93n+  ---
+02-11-30  A bug that can show up in evaluating arithmetic statements that
+	  are in an autoloaded function when the function is autoload from
+	  another function has been fixed.
+02-11-30  An optimization bug in which an expansion of the form ${!name.@},
+	  which occurred inside a for or a while loop, when name is a name
+	  reference, has been fixed.
+02-11-18  A bug in which modifying array variables in a subshell could leave
+	  side effects in the parent shell environment has been fixed.
+02-11-18  A memory leak when unsetting an associative array has been fixed.
+02-11-14  The code to display compound objects was rewritten to make
+	  it easier for runtime extensions to reuse this code.
+02-11-14  A change was made to allow runtime builtins to be notified when
+	  a signal is received so that cleanup can be performed.
+02-10-31  User applications can now trap the ALRM signal.  Previously,
+	  the ALRM signal was used internally and could not be used
+	  by applications. 
+02-10-31  A bug in which signals received while reading from a coprocess
+	  for which traps were set was not handled correctly has been fixed.
+02-10-31  A bug in which a file opened with exec inside a subshell could
+	  be closed before the subshell completed has been fixed.
+02-10-21  A bug in which setting PATH or FPATH inside a function might not
+	  take effect has been fixed.
+02-10-21  A bug which could cause a core dump when a local SECONDS variable
+	  is defined in a function has been fixed.
+02-10-15  A bug in which the associate array name operator ${!array[@]}
+	  could return the same name multiple times has been fixed.
+02-10-15  A bug in which the zero'th element of an associative array was
+	  not getting set when an assignment was made without a subscript
+	  specified has been fixed.
+
 02-09-30  --- Release ksh93n  ---
 02-09-30  The maximum indexed array size was increased to 16Megs.
 02-09-30  A bug which could cause a core dump when changing attributes
@@ -85,7 +116,7 @@ All recorded changes follow.
 	  'a' before the right hand side was evaluated has been fixed.
 02-09-27  A bug in which the error message for ${var?message} when var was
 	  null or unset did not contain the variable name var has been fixed.
-02-09-27  A bug in which closing file descripts 0 through 2 could
+02-09-27  A bug in which closing file descriptors 0 through 2 could
 	  cause a subsequent here document to fail has been fixed. 
 02-09-14  A bug in whence which occurs when the specified name contained
 	  a / has been fixed.
@@ -99,7 +130,7 @@ All recorded changes follow.
 02-09-09  A bug in which a background job was not removed from the job list
 	  when a subshell completed has been fixed, for example (prog&). 
 02-09-03  A bug in which an assignment of the form name=(integer x=3)
-	  could be intepreted as an array assignment rather than a
+	  could be interpretted as an array assignment rather than a
 	  compound variable assignment has been fixed.
 02-08-19  A command completion bug which occured on file systems that
 	  are case insensitive has been fixed.
@@ -181,9 +212,9 @@ All recorded changes follow.
 	  directory when PATH have no valid directories has been fixed.
 01-11-28  The value of $? was not being set when called with exit.
 01-11-28  If the last command was of the form (...) and a trap on EXIT or
-	  ERR was set, and the command inside () modifed the trap, then
+	  ERR was set, and the command inside () modified the trap, then
 	  the original trap wasn't executed.
-01-11-26  The value for 0 is now precdeded by the base number when
+01-11-26  The value for 0 is now preceded by the base number when
 	  the base was not 10.
 01-11-26  The default has compilation mode has been changes so that
 	  viraw mode will always be on.
@@ -199,7 +230,7 @@ All recorded changes follow.
 01-10-11  An optimization bug in which ${!x) was treated as invariant in
 	  a for loop has been fixed.
 01-10-11  Unsigned integer variables in bases other than 10 are printed now
-	  exxpand in that base with the base prefix.
+	  expand in that base with the base prefix.
 01-10-10  A number of typos in the self generating man pages for shell
 	  built-ins have been fixed.
 01-10-04  The self generated man pages for hist and fc were not working
@@ -220,7 +251,7 @@ All recorded changes follow.
 	  associative.
 01-09-25  The code was modified to use the ast multibyte macros
 	  and functions for handing multibyte locales.
-01-09-25  The expansion ${parameter:offset:length} now hanles negative
+01-09-25  The expansion ${parameter:offset:length} now handles negative
 	  offsets which cause offsets to be measured from the end.
 01-09-25  Some spelling errors in the documentation were corrected.
 01-09-24  The /dev/tcp/host/port and /dev/udp/host/port now allow
@@ -253,7 +284,7 @@ All recorded changes follow.
 	  reference has been fixed.
 01-09-04  A bug introduced in ksh93l in which export -p did not prefix
 	  each export with the word export has been fixed.
-01-08-29  A bug in multibyte input which occurered when a partial multibyte
+01-08-29  A bug in multibyte input which occurred when a partial multibyte
 	  character was received has been fixed.
 01-08-29  A bug introduced in ksh93l which could cause a core dump
 	  when an assignment list containing PATH is specified inside
@@ -261,7 +292,7 @@ All recorded changes follow.
 01-08-09  Another bug in the optimization of for loops in ksh93l caused
 	  errors in recursive functions using local variables that
 	  contained for loops has been fixed.
-01-07-27  A bug in which IFS would be unset after a command substituion
+01-07-27  A bug in which IFS would be unset after a command substitution
 	  inside a here document has been fixed.
 01-07-26  To conform to the POSIX standard, if you invoked ksh name,
 	  and name does not contain a /,  it will first try to run
@@ -272,7 +303,7 @@ All recorded changes follow.
 01-07-23  A bug in which unset -f invoked in a subshell could unset a
 	  function defined in the parent has been fixed.
 01-07-16  A bug in the optimization of for loops in ksh93l caused
-	  name references to be treated as invariantes has been fixed.
+	  name references to be treated as invariants has been fixed.
 01-07-09  A bug in which a discipline function applied to a local variable
 	  could cause a shell exception has been fixed.  Discipline
 	  functions can only be specified for global variables. 
@@ -672,7 +703,7 @@ All recorded changes follow.
 	  the value of a name reference contained a positional
 	  parameter and the name reference was not defined inside
 	  a function has been fixed.
-97-06-30  Arithmetic expressions now correctly handle hexidecimal
+97-06-30  Arithmetic expressions now correctly handle hexadecimal
 	  constants.
 97-06-30  A bug in which integer variables could be expanded
 	  with a leading 10# when declared with typeset -i
@@ -956,6 +987,11 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+02-12-13 format.c: fix TNEF bug that did bget(n) for n>buffersize
+02-10-23 misc.c: fix meter buffer overflow
+02-10-20 pax: drop experimental OMF; use ardirlist() to list ar types
+	 pax: add -t for x/open
+02-10-18 pax: add tar/ustar swap and inter-volume junk block checks
 02-09-09 format.c: handle all 11 octal digits in cpio format size
 02-09-05 file.c: fix chmod() loop at exists=0011 on case ignorant filesystems
 02-08-19 pax: cmd line patterns applied before -i or -s path edits
@@ -1183,6 +1219,8 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+02-10-24 mm2html: viewgraph link target is _top too
+02-10-15 mm2html: ident footer is now a TABLE instead of a DIV
 02-08-30 mm2html: .AL with no args is equivalent to .NL
 02-08-26 mm2html: fix .VL mark indent logic
 02-08-19 mm2html: ignore .fp
@@ -1321,6 +1359,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+02-10-18 features/syscall.sh: handle pseudo files in cc -E line syncs
 02-07-17 syscall3d.c: clean up user level intercept code
 02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR
 02-06-14 ast_3d.h,cs.c: move fmttime() macro override to cs.c
@@ -1517,6 +1556,8 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+02-11-07 cpp.c: exit() => return for lame linters
+02-10-10 cpp.tst: add does not end with `newline' tests
 02-05-24 cpp.tst: add TEST 15 pragma space canonicalization tests
 02-03-15 cpp.tst: add TEST 14 for libpp/ppproto.c memory fault fix
 01-10-20 cpp.tst: add pp:splicespace "..." tests
@@ -1576,6 +1617,29 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+02-12-21 --- release 4.3 ---
+02-12-18 Makerules.mk: :NOOPTIMIZE: "..."'d operator arg shenanigans
+02-12-16 Makerules.mk: disable .ARCOPY for linked targets
+02-12-06 Makerules.mk: sync CC.MAKE.OPTIONS,nativepp,prefixinclude logic
+02-12-04 Makerules.mk: fix contorted .so editing that botched n.n.n versions
+	 Makerules.mk: parameterize CC/cc suffixes in { .SUFFIX.c .SUFFIX.C }
+	 Makerules.mk: use { .SUFFIX.c .SUFFIX.C } in :cc: list generation
+	 Makerules.mk: parameterize fortran suffixes in { .SUFFIX.f .SUFFIX.r }
+	 Makerules.mk: %.f is now equivalent to %.F
+	 Scanrules.mk: use { .SUFFIX.c .SUFFIX.C .SUFFIX.f .SUFFIX.r }
+	 Scanrules.mk: change .SCAN.F to .SCAN.fql -- who cares?
+02-12-03 rule.c: don't .UNBIND M_bind rules (questionable=0x02000000)
+02-12-02 Makerules.mk: prefixinclude=0 if CC.DIALECT has -I-
+	 make.c: add mutually dependent requirement loop check (for -l loops)
+02-11-28 main.c: don't close error_info.fd in startup
+02-11-21 Makerules.mk: dll version "-" bug that removed the installed dll!
+02-11-20 Makerules.mk: fix :cc: to handle all C source suffixes
+02-11-12 Makerules.mk: handle CC.LD.ORIGIN and CC.LD.STRIP
+02-10-31 main.c: change exit()=>return for pedantic lint
+02-10-28 bind.c: add GLOB_NOTDIR optimization to gl_dirnext
+02-10-25 eliminate a few uninitialized variable references
+02-10-20 Makerules.mk: add :NOTHING: (:ALL: or ...)
+02-10-16 Makerules.mk: fix :MAKE: for rhs files
 02-10-02 state.c: (-Q0x01000000) $(>) use min(r->time,state(r)->time)
 	 misc.c: tmform() => fmttime(); %K default time format
 02-09-22 Makerules.mk: drop ${mam_cc_STATIC} for +l binding
@@ -2315,6 +2379,7 @@ All recorded changes follow.
 
 :::::::: probe ::::::::
 
+02-10-30 probe.c: reset proc->rfd after sfnew() to avoid close() error
 02-09-21 probe.c: handle strlen(base) != BASE_MAX
 02-09-11 probe.c: add more override docs
 02-01-30 probe.c: add probe.ini check to match libast/pathprobe()
@@ -2368,6 +2433,8 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+02-11-14 what.c: stop on < to catch html/xml
+	 update cmdinit() calls for 4th flag arg
 02-09-11 dlls.c: add --base & --path
 02-09-05 pr.data: eliminate case ignorant file name clashes (for mac os X)
 02-08-30 dlls.c: exit 1 if no matching dll found
@@ -2440,6 +2507,7 @@ All recorded changes follow.
 
 :::::::: cql ::::::::
 
+02-11-12 expr.c: save result before regfree() in cql.sub()
 02-09-06 cql: fix field update when old string value is NiL
 02-06-27 cql: fix file details 0 dereference when no file name
 02-05-20 cql: update to use regsubcomp(),regsubexec()
@@ -4320,6 +4388,14 @@ End:
 
 :::::::: mailx ::::::::
 
+02-12-12 imap.c: handle no-name attachments
+02-12-11 head.c: application of DeMorgan's law proves Murphy's
+02-12-04 local.h: include FEATURE/lcl from lcl.iffe to avoid local.h clash
+02-11-22 head.c: convert unfriendly attachment path name characters to '_'
+02-10-31 imap.c: drop obsolete RFC2060 FETCH args
+02-10-20 spam.c: test=0x0060 for Authentication-Warning: checks
+02-10-16 spam.c: test=0x0010 to verify From: in domain matches Received: hosts
+02-10-08 mailx: fix a few strncopy() size off-by-ones
 02-10-01 mailx: fix ancient buffer overflows by comitting to ast -- bye bsd
 02-09-22 local.c: honor MAIL if its a regular file
 02-09-08 add spambody to catch mail filter warnings embedded in message bodies
@@ -4485,6 +4561,7 @@ End:
 
 :::::::: re ::::::::
 
+02-10-10 grep.c: ignore -a for GNU compatibility: gnugrep=tw+astgrep
 02-08-12 testregex.dat,locale.dat: add REG_MINIMAL tests for mb bug
 02-08-07 *.dat: recognize anchors in BRE subexpressions
 02-07-17 testregex.c: fix basic re support test
@@ -4633,6 +4710,9 @@ End:
 
 :::::::: std ::::::::
 
+02-12-04 du.c: add -H -L -P(default) symlink options
+02-11-22 file.c: add version type description
+02-10-10 pss.c: redefine only if not defined -- duh
 02-10-02 pss.c: move <ast_windows.h> to first #if __CYGWIN__
 02-09-30 dd.c: honor both count*bs *and* count
 02-09-24 dd.c: fix partial record computations and printf format
@@ -4833,6 +4913,8 @@ End:
 
 :::::::: tw ::::::::
 
+02-11-07 tw: add type==DOOR (solaris S_ISDOOR)
+	 find: add -type D (solaris S_ISDOOR)
 02-07-17 updatedb.sh: add --local to skip non-local directories
 02-04-18 find: fix lookup() bug that dumped on unknown keys
 02-04-03 find: add FTW_DELAY logic, fix directory -empty
@@ -4912,6 +4994,31 @@ End:
 
 :::::::: libast ::::::::
 
+02-12-15 include/error.h: errorcontext => Error_context_s (compatible til 2004)
+02-12-06 misc/sigdata.c: add NoF(sigdadata) -- why nmake was uninterruptable!
+02-12-03 comp/omitted.c,features/omitted: handle cygwin alarm() return botch
+02-11-27 misc/swapop.c: op=3,size=4 => op=7
+	 string/strlcat.c,strlcpy.c: fix uwin decl clash
+02-11-26 sfio/sfvprintf.c: fix sfsprintf() '\0' termination bug
+02-11-22 misc/glob.c: move static struniq() to libast extern
+	 string/fmtversion.c,include/ast.h: add fmtversion
+02-11-18 string/strncopy.c: add
+	 misc/magic.tab: list size for magicid.h magic
+02-11-14 sfio/sfvprintf.c: add %#c for C escapes
+	 include/error.h: add ERROR_NOTIFY context flag for builtin commands
+02-11-11 string/strtoi.h: add S2I_size for strnto*() size_t 2nd arg
+	 sfio/sfstrtof.h: add S2I_size for strnto*() size_t 2nd arg
+	 comp/putenv.c: add setenv() and unsetenv() wrappers for setenviron()
+02-10-31 path/pathfind.c: add dir of including file to the pathinclude() list
+	 misc/optesc.c: add
+02-10-30 string/strtoip4.c: set next char pointer even on error
+02-10-29 comp/resolvepath.c: add (size_t version of realpath())
+	 misc/mime.c: fix mimehead() to ignore null content values
+02-10-28 misc/glob.c: add GLOB_STARSTAR for /**/ and GLOB_NOTDIR optimization
+02-10-27 string/struniq.c: add
+02-10-23 features/common: fix off-by-one loop check
+02-10-18 include/ast_std.h: avoid off_t,ftruncate,lseek,truncate redefinitions
+02-10-17 misc/mime.c: handle type/* match, fix bogus header parse
 02-10-04 sfio/sfstrtof.h: S2F_static <0:export =0:private >0:static
 02-10-02 features/common: don't define _WIN32; define _WINIX => unix on windows
 	 features/tty: finally stomp the bsd _POSIX_VDISABLE redefinition
@@ -5830,6 +5937,7 @@ End:
 
 :::::::: libardir ::::::::
 
+02-10-20 ardir.c: add ardirlist()
 02-08-09 ardir.c: ardiropen() fails if !S_ISREG unless ARDIR_FORCE
 02-06-11 ar-port.c: handle 4.4BSD `#1/size' long names
 02-06-06 #ifndef EILSEQ => EINVAL
@@ -5837,6 +5945,7 @@ End:
 
 :::::::: libcmd ::::::::
 
+02-11-14 update for cmdinit() 4th arg and ERROR_NOTIFY for interrupt cleanup
 02-10-02 date.c: tmform() => tmfmt()
 02-09-30 date.c,uname.c: change execv() calls to procrun(): exec|exit => bad
 02-09-06 wclib.c: fix 1 char-at-a-time miscount bug
@@ -5947,6 +6056,8 @@ End:
 
 :::::::: libdll ::::::::
 
+02-11-18 dllfind.c: add path,size args (with backwards compatibility checks)
+02-11-15 dllfind.c: check for ./path if '.' in path but no '/'
 02-08-30 dllfind.c: fix a bug that returned uninitialized value on not found
 02-08-28 dllscan.c: handle and display bin as a sibling dir
 02-07-31 dllscan.c: add dllsopen,dllsread,dllsclose
@@ -6087,6 +6198,8 @@ End:
 
 :::::::: libcoshell ::::::::
 
+02-10-30 coclose.c: fix reference-after-free bug in coclose()
+02-01-31 codata.c,coopen.c: fix CO_MSGFD parameterization
 02-01-24 coopen.c: fix small memory leak
 01-10-26 coopen.c: hung sfclose(fp) -> close(sffileno(fp)) -- wow
 01-09-11 coinit.c: fix coident[] for ancient bsh that die on `test == 1'
@@ -6179,6 +6292,15 @@ End:
 
 :::::::: libpp ::::::::
 
+02-12-17 ppargs.c: document -I-!
+02-12-06 -I- pp:noprefix otherwise pp:prefix default
+02-11-29 probe.win32: added __INTSIZE, drop dm pp:noallmultiple
+02-11-26 pp.def: add STDC_HOSTED
+	 probe.win32: add C95 and C99 STDC predefined macros
+02-10-30 ppfsm.h: add boundary check to IDSTATE()
+02-10-18 probe.win32: update for mingw
+02-10-15 ppsearch.c: if PLUSPLUS && not found && no suffix then try with .h
+02-10-10 pplex.c: fix does not end with `newline' bugs
 02-10-01 ppop.c,ppargs.c: -I-I => -I-M with proper docs; -I-I for PP_IGNORE
 02-09-21 pp.probe: add pp:nocatliteral test
 02-09-10 pp.tab: add pp:passthrough to match -D-P docs
@@ -6589,6 +6711,13 @@ End:
 
 :::::::: libpz ::::::::
 
+02-12-18 pzwrite.c: add partial row buffer
+02-12-12 sfdcpzip.c: move disc arg to the end for discplined consistency
+02-12-11 sfdczip.c: add
+	 sfdcpzip.c: fix SF_WRITE, set disc.partition if passed in
+02-11-22 sfdcpzip.c: fix bug that did not close pz->pz->io (and its fd!)
+	 pzpart: check option errors (duh) and accept comment option
+02-10-31 pzpart: partition file "/" or "//" or "/gzip/" => gzip compress
 02-04-30 pzopen,pzhead: tighten pzip magic check via reasonable version number
 02-03-09 pzopen,pzdeflate,pzsync: add fatal error checks
 02-02-14 pzopen: disable PZ_UNKNOWN check if PZ_NOPZIP -- duh

@@ -1680,16 +1680,12 @@ init(int force, const char* opt, int opsize)
 		if (!getcwd(state.path.name, sizeof(state.path.name)) || setpwd(state.path.name))
 		{
 			state.pwd = 0;
-			if (!state.in_2d)
-#if DEBUG
-				error(2, "invalid PWD -- falling back to 2d");
-#else
+			if (!n)
 			{
 				static char	msg[] = "3d: invalid PWD -- falling back to 2d\n";
 
 				write(2, msg, sizeof(msg) - 1);
 			}
-#endif
 		}
 		else state.in_2d = n;
 	}

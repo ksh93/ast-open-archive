@@ -475,7 +475,7 @@ main(int argc, char** argv)
 	error_info.id = "pop";
 	memset(&disc, 0, sizeof(disc));
 	disc.version = PZ_VERSION;
-	disc.errorf = (Pzerror_f)errorf;
+	disc.errorf = errorf;
 	if (!(dp = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space [options]");
 	for (;;)

@@ -435,7 +435,7 @@ getval(register char* s, int op)
 		if (v)
 		{
 			t = 0;
-			if (!(v->property & V_functional) || !(r = getrule(v->name)) || !(r->property & P_functional))
+			if (!(v->property & V_functional) || (r = getrule(v->name)) && !(r->property & P_functional))
 				r = 0;
 		}
 		else

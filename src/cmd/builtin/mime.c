@@ -67,7 +67,7 @@ b_mime(int argc, char** argv, void* context)
 	Mimedisc_t	disc;
 
 	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG);
+	cmdinit(argv, context, ERROR_CATALOG, 0);
 	silent = 0;
 	for (;;)
 	{
@@ -93,7 +93,7 @@ b_mime(int argc, char** argv, void* context)
 		error(ERROR_usage(2), "%s", optusage(NiL));
 	disc.version = MIME_VERSION;
 	disc.flags = 0;
-	disc.errorf = (Mimeerror_f)errorf;
+	disc.errorf = errorf;
 	if (!(mp = mimeopen(&disc)))
 		error(ERROR_exit(1), "mime library error");
 	if (mimeload(mp, NiL, 0))

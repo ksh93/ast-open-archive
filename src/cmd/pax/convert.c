@@ -131,13 +131,19 @@ tar_checksum(Archive_t* ap)
 {
 	register unsigned char*		p;
 	register unsigned char*		e;
+	register unsigned char*		t;
 	register unsigned long		n;
 	register const unsigned char*	map;
+	unsigned char			tmp[sizeof(tar_header.chksum)];
 
 	p = (unsigned char*)tar_header.chksum;
 	e = p + sizeof(tar_header.chksum);
+	t = tmp;
 	while (p < e)
+	{
+		*t++ = *p;
 		*p++ = ' ';
+	}
 	n = 0;
 	p = (unsigned char*)tar_block;
 	e = p + TAR_HEADER;
@@ -150,6 +156,11 @@ tar_checksum(Archive_t* ap)
 		while (p < e)
 			n += map[*p++];
 	}
+	p = (unsigned char*)tar_header.chksum;
+	e = p + sizeof(tar_header.chksum);
+	t = tmp;
+	while (p < e)
+		*p++ = *t++;
 	return n & TAR_SUMASK;
 }
 

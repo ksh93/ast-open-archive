@@ -1,3 +1,5 @@
+02-10-24 mm2html: viewgraph link target is _top too
+02-10-15 mm2html: ident footer is now a TABLE instead of a DIV
 02-08-30 mm2html: .AL with no args is equivalent to .NL
 02-08-26 mm2html: fix .VL mark indent logic
 02-08-19 mm2html: ignore .fp

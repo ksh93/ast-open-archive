@@ -112,22 +112,23 @@
 #define OPT_record_pad		71
 #define OPT_record_size		72
 #define OPT_record_trailer	73
-#define OPT_sequence		74
-#define OPT_size		75
-#define OPT_summary		76
-#define OPT_symlink		77
-#define OPT_tape		78
-#define OPT_test		79
-#define OPT_to			80
-#define OPT_typeflag		81
-#define OPT_uname		82
-#define OPT_unblocked		83
-#define OPT_update		84
-#define OPT_verbose		85
-#define OPT_verify		86
-#define OPT_version		87
-#define OPT_write		88
-#define OPT_yes			89
+#define OPT_reset_atime		74
+#define OPT_sequence		75
+#define OPT_size		76
+#define OPT_summary		77
+#define OPT_symlink		78
+#define OPT_tape		79
+#define OPT_test		80
+#define OPT_to			81
+#define OPT_typeflag		82
+#define OPT_uname		83
+#define OPT_unblocked		84
+#define OPT_update		85
+#define OPT_verbose		86
+#define OPT_verify		87
+#define OPT_version		88
+#define OPT_write		89
+#define OPT_yes			90
 
 typedef struct
 {

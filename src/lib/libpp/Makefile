@@ -20,17 +20,9 @@ $(ID) 2.0 :LIBRARY: BUGS NOTES RELEASE HISTORY pp.3 \
 		pplex.c ppline.c ppmacref.c ppmisc.c ppop.c pppragma.c \
 		ppprintf.c ppproto.c ppsearch.c pptrace.c
 
-if CC.HOSTTYPE == "hp.pa" || "$(-mam)" == "static*"
-ppfsm.o : .CC.NOOPTIMIZE
-end
-
-if CC.HOSTTYPE == "osf.alpha" || "$(-mam)" == "static*"
-ppcall.o : .CC.NOOPTIMIZE
-end
-
-if CC.HOSTTYPE == "sol*.i386" || "$(-mam)" == "static*"
-ppcpp.o pplex.o : .CC.NOOPTIMIZE
-end
+"hp.pa"		:NOOPTIMIZE: ppfsm.c
+"osf.alpha"	:NOOPTIMIZE: ppcall.c
+"sol*.i386"	:NOOPTIMIZE: ppcpp.c pplex.c
 
 ppdef.h : gentab pp.tab
 	PATH=.:$PATH $(*:N=*gentab) -d $(*:N=*.tab) > $(<)

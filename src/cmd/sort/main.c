@@ -509,7 +509,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	Vmdcsbrk->round = INBRK;
 	dp->version = RSKEY_VERSION;
 	dp->flags = 0;
-	dp->errorf = (Rskeyerror_f)errorf;
+	dp->errorf = errorf;
 	if (!(sp->key = rskeyopen(dp)))
 		return -1;
 	z = sp->key->insize = 2 * INMAX;

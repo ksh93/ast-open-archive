@@ -195,4 +195,10 @@ Systems like
 .B sgi.mips3
 that support multiple a.out formats may have multiple versions of
 .IR libwarp.so .
-.sh download warp $WWWTYPES
+.H 1 Download
+.B warp
+is part of the
+.I ast-open
+package posted at the
+.xx link="http://www.research.att.com/sw/download/	AT&T Software Technology"
+download site.

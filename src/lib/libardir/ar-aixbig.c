@@ -29,7 +29,6 @@
  */
 
 #include <ardirlib.h>
-#include <swap.h>
 #include <tm.h>
 
 #define MAGIC		"<bigaf>\n"
@@ -68,7 +67,6 @@ typedef struct State_s			/* method state			*/
 	off_t		current;	/* current dirent offset	*/
 	off_t		offset;		/* next dirent offset		*/
 	off_t		last;		/* last member offset		*/
-	int		swap;		/* swapget() op if necessary	*/
 	Member_t	member;		/* current member		*/
 	int		term;		/* trailing '\0' for member	*/
 	char*		name;		/* current member name		*/
@@ -166,8 +164,9 @@ aixbignext(Ardir_t* ar)
 			ar->error = errno;
 			return 0;
 		}
+		ar->dirent.name = state->name;
 	}
-	memcpy(ar->dirent.name = state->name, state->member._ar_name.ar_name, 2);
+	memcpy(state->name, state->member._ar_name.ar_name, 2);
 	if (n > 2)
 	{
 		if (read(ar->fd, state->name + 2, n - 2) != (n - 2))
@@ -231,6 +230,7 @@ aixbigchange(Ardir_t* ar, Ardirent_t* ent)
 {
 	State_t*	state = (State_t*)ar->data;
 	off_t		o;
+	char		buf[sizeof(state->member.ar_date) + 1];
 
 	o = state->current + offsetof(Member_t, ar_date);
 	if (lseek(ar->fd, o, SEEK_SET) != o)
@@ -238,8 +238,8 @@ aixbigchange(Ardir_t* ar, Ardirent_t* ent)
 		ar->error = errno;
 		return -1;
 	}
-	swapput(0, (char*)&state->member.ar_date, sizeof(state->member.ar_date), (int_max)ent->mtime);
-	if (write(ar->fd, &state->member.ar_date, sizeof(state->member.ar_date)) != sizeof(state->member.ar_date))
+	sfsprintf(buf, sizeof(buf), "%-*lu", sizeof(buf) - 1, (unsigned long)ent->mtime);
+	if (write(ar->fd, buf, sizeof(buf) - 1) != (sizeof(buf) - 1))
 	{
 		ar->error = errno;
 		return -1;

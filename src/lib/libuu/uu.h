@@ -44,7 +44,6 @@ struct Uudisc_s; typedef struct Uudisc_s Uudisc_t;
 struct Uumeth_s; typedef struct Uumeth_s Uumeth_t;
 
 typedef int (*Uu_f)(Uu_t*);
-typedef int (*Uuerror_f)(Uu_t*, Uudisc_t*, int, const char*, ...);
 
 struct Uumeth_s
 {
@@ -61,7 +60,7 @@ struct Uudisc_s
 {
 	unsigned long	version;
 	unsigned long	flags;
-	Uuerror_f	errorf;
+	Error_f		errorf;
 };
 
 struct Uu_s

@@ -20,6 +20,16 @@ function DATA
 #define hdr     _CAT(<,hdra,.h>)
 #include hdr' > $f ;;
 		hdrx.h)	print -r -- $'int f(){return 0;}' > $f ;;
+		nl1.c)	print -r -- $'#warning before\n#include "nl1.h"\n#warning after' > $f ;;
+		nl1.h)	print -r -n -- $'#warning during' > $f ;;
+		nl2.c)	print -r -- $'#warning before\n#include "nl2.h"\n#warning after' > $f ;;
+		nl2.h)	print -r -n -- $'#ifndef NL2\n#warning during\n#endif' > $f ;;
+		nl3.c)	print -r -- $'#warning before\n#include "nl3.h"\n#warning after' > $f ;;
+		nl3.h)	print -r -n -- $'#ifndef NL2\nwarning during\n#endif' > $f ;;
+		nl4.c)	print -r -- $'#warning before\n#include "nl4.h"\n#warning after' > $f ;;
+		nl4.h)	print -r -n -- $'warning during' > $f ;;
+		nl5.c)	print -r -- $'#warning before\n#include "nl5.h"\n#warning after' > $f ;;
+		nl5.h)	print -r -n -- $'// warning during' > $f ;;
 		esac
 	done
 }
@@ -3443,3 +3453,65 @@ TEST 15 'pragma passing'
 #pragma option push -b -a8 -pc -A- -B-
 #pragma option push @b @a8 @pc @A@ @B@
 #pragma option push %b %a8 %pc %A% %B%'
+
+TEST 16 'no newline in directive in last include line'
+	DO	DATA nl1.c nl1.h nl2.c nl2.h nl3.c nl3.h nl4.c nl4.h nl5.c nl5.h
+	EXEC -I-D nl1.c
+		OUTPUT - $'# 1 "nl1.c"
+
+# 1 "nl1.h"
+
+
+# 3 "nl1.c"
+'
+		ERROR - $'cpp: "nl1.c", line 1: warning: before
+cpp: "nl1.h", line 1: warning: during
+cpp: "nl1.h", line 2: warning: file does not end with `newline\'
+cpp: "nl1.c", line 3: warning: after'
+	EXEC -I-D nl2.c
+		OUTPUT - $'# 1 "nl2.c"
+
+# 1 "nl2.h"
+
+
+
+
+# 3 "nl2.c"
+'
+		ERROR - $'cpp: "nl2.c", line 1: warning: before
+cpp: "nl2.h", line 2: warning: during
+cpp: "nl2.h", line 4: warning: file does not end with `newline\'
+cpp: "nl2.c", line 3: warning: after'
+	EXEC -I-D nl3.c
+		OUTPUT - $'# 1 "nl3.c"
+
+# 1 "nl3.h"
+
+warning during
+
+
+# 3 "nl3.c"
+'
+		ERROR - $'cpp: "nl3.c", line 1: warning: before
+cpp: "nl3.h", line 4: warning: file does not end with `newline\'
+cpp: "nl3.c", line 3: warning: after'
+	EXEC -I-D nl4.c
+		OUTPUT - $'# 1 "nl4.c"
+
+# 1 "nl4.h"
+warning during
+# 3 "nl4.c"
+'
+		ERROR - $'cpp: "nl4.c", line 1: warning: before
+cpp: "nl4.h", line 1: warning: file does not end with `newline\'
+cpp: "nl4.c", line 3: warning: after'
+	EXEC -I-D -D-+ nl5.c
+		OUTPUT - $'# 1 "nl5.c"
+
+# 1 "nl5.h"
+ 
+# 3 "nl5.c"
+'
+		ERROR - $'cpp: "nl5.c", line 1: warning: before
+cpp: "nl5.h", line 1: warning: file does not end with `newline\'
+cpp: "nl5.c", line 3: warning: after'

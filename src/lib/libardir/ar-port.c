@@ -80,7 +80,7 @@ portclose(Ardir_t* ar)
 {
 	State_t*	state;
 	int		r;
-	char		buf[12];
+	char		buf[sizeof(state->header.ar_date) + 1];
 
 	if (!ar || !(state = (State_t*)ar->data))
 		r = -1;
@@ -93,8 +93,8 @@ portclose(Ardir_t* ar)
 				r = -1;
 			else
 			{
-				sfsprintf(buf, sizeof(buf), "%-12lu", (unsigned long)time((time_t*)0) + 5);
-				if (write(ar->fd, buf, sizeof(buf)) != sizeof(buf))
+				sfsprintf(buf, sizeof(buf), "%-*lu", sizeof(buf) - 1, (unsigned long)time((time_t*)0) + 5);
+				if (write(ar->fd, buf, sizeof(buf) - 1) != (sizeof(buf) - 1))
 					r = -1;
 			}
 		}
@@ -314,7 +314,7 @@ portchange(Ardir_t* ar, Ardirent_t* ent)
 {
 	State_t*	state = (State_t*)ar->data;
 	off_t		o;
-	char		buf[12];
+	char		buf[sizeof(state->header.ar_date) + 1];
 
 	o = state->current + offsetof(Header_t, ar_date);
 	if (lseek(ar->fd, o, SEEK_SET) != o)
@@ -322,8 +322,8 @@ portchange(Ardir_t* ar, Ardirent_t* ent)
 		ar->error = errno;
 		return -1;
 	}
-	sfsprintf(buf, sizeof(buf), "%-12lu", ent->mtime);
-	if (write(ar->fd, buf, sizeof(buf)) != sizeof(buf))
+	sfsprintf(buf, sizeof(buf), "%-*lu", sizeof(buf) - 1, (unsigned long)ent->mtime);
+	if (write(ar->fd, buf, sizeof(buf) - 1) != (sizeof(buf) - 1))
 	{
 		ar->error = errno;
 		return -1;

@@ -12,6 +12,4 @@ recsort $(VERSION) :LIBRARY: RELEASE recsort.3 recsort.h rshdr.h \
 
 $(INCLUDEDIR) :INSTALLPROTO: recsort.h
 
-if CC.HOSTTYPE == "win32.*" || "$(-mam)" == "static*"
-rskey.o : .CC.NOOPTIMIZE
-end
+"win32*" :NOOPTIMIZE: rskey.c

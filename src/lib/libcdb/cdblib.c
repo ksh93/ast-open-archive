@@ -41,6 +41,7 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 	register int		n;
 	Init_f			initf;
 	char			buf[64];
+	char			path[PATH_MAX];
 
 	/*
 	 * prepend local part of state.id to name if not already there
@@ -72,7 +73,7 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 	if (!(dll = newof(0, Cdbdll_t, 1, strlen(name) + 1)))
 		return -1;
 	dll->name = strcpy((char*)(dll + 1), name);
-	if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY)) && (!base || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY))))
+	if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY, path, sizeof(path))) && (!base || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY, path, sizeof(path)))))
 	{
 		if (disc && disc->errorf)
 			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: %s", dll->name + n, dlerror());
@@ -89,13 +90,13 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 	if (!(initf = (Init_f)dlllook(dll->dll, buf)))
 	{
 		if (disc && disc->errorf)
-			(*disc->errorf)(NiL, disc, 2, "%s: %s: initialization function not found in library", dll->name + n, buf);
+			(*disc->errorf)(NiL, disc, 2, "%s: %s: initialization function not found in library", path, buf);
 		return -1;
 	}
 	if ((*initf)() < 0)
 	{
 		if (disc && disc->errorf)
-			(*disc->errorf)(NiL, disc, 2, "%s: %s: initialization function error", dll->name + n, buf);
+			(*disc->errorf)(NiL, disc, 2, "%s: %s: initialization function error", path, buf);
 		return -1;
 	}
 	return 0;

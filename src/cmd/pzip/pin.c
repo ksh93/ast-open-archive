@@ -1146,7 +1146,7 @@ reorder_tsp(Reorder_method_t* method, unsigned char* buf, unsigned char* dat, in
 		sfprintf(sfstderr, "generate a tour\n");
 	memset(&disc, 0, sizeof(disc));
 	disc.version = TSP_VERSION;
-	disc.errorf = (Tsp_error_f)errorf;
+	disc.errorf = errorf;
 	if (!(tsp = tspopen(&disc, cost, row, TSP_DFS|(state.verbose ? TSP_VERBOSE : 0))))
 		error(3, "tspopen error");
 	if (!(tour = tsptour(tsp)))
@@ -1556,7 +1556,7 @@ main(int argc, char** argv)
 		op |= OP_reorder;
 	memset(&disc, 0, sizeof(disc));
 	disc.version = PZ_VERSION;
-	disc.errorf = (Pzerror_f)errorf;
+	disc.errorf = errorf;
 	disc.partition = partition;
 	disc.window = 1;
 	if (sftell(dp) && !(disc.options = strdup(sfstruse(dp))))

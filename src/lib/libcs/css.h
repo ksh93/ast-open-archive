@@ -72,15 +72,13 @@ typedef struct Css_s Css_t;
 typedef struct Cssdisc_s Cssdisc_t;
 typedef struct Cssfd_s Cssfd_t;
 
-typedef int (*Csserror_f)(Css_t*, Cssdisc_t*, int, const char*, ...);
-
 struct Cssdisc_s			/* user discipline		*/
 {
 	unsigned long	version;	/* CSS_VERSION			*/
 	unsigned long	flags;		/* CSS_* flags			*/
 	unsigned long	timeout;	/* timeout in ms, 0 if none	*/
 	unsigned long	wakeup;		/* wakeup in ms, 0 if none	*/
-	Csserror_f	errorf;		/* error message handler	*/
+	Error_f		errorf;		/* error message handler	*/
 	int		(*acceptf)(Css_t*, Cssfd_t*, Csid_t*, char**, Cssdisc_t*);
 					/* accept new connection/fd	*/
 	int		(*actionf)(Css_t*, Cssfd_t*, Cssdisc_t*);

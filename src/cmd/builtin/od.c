@@ -782,7 +782,7 @@ b_od(int argc, char** argv, void* context)
 	char			buf[4];
 
 	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG);
+	cmdinit(argv, context, ERROR_CATALOG, 0);
 	memset(&state, 0, sizeof(state));
 	per = 0;
 	state.swap = int_swap;

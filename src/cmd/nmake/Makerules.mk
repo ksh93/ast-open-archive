@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2002-09-22 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2002-12-18 $"
 
 /*
  * handy attributes
@@ -105,6 +105,15 @@ MAKEDIRS = cmd:contrib:etc:lib
 MAKESKIP = *-*
 
 /*
+ * language processor suffix equivalences
+ */
+
+.SUFFIX.c = .c
+.SUFFIX.C = .C .cc .cpp .cxx .c++
+.SUFFIX.f = .f .F
+.SUFFIX.r = .r .R
+
+/*
  * makerules control variables
  */
 
@@ -128,7 +137,6 @@ official_out = OFFICIAL
 output = $(PWD:N=*[0-9].[0-9]*|*-$(VERSION):?$$(PWD:B:S:/---*\([^-]*\)/-\1/)?$$(VERSION:Y%$$(PWD:B:S)-$$(VERSION)%$$(PWD:B)%)?)
 package_local = win32.*
 physical =
-prefixinclude = 1
 preserve = $(CC.SUFFIX.SHARED:?$(CC.PREFIX.SHARED)*$(CC.SUFFIX.SHARED).*??)|$(CC.SUFFIX.DYNAMIC:?$(CC.PREFIX.DYNAMIC)*$(CC.SUFFIX.DYNAMIC)??)
 profile =
 recurse = 1
@@ -781,7 +789,7 @@ include "Scanrules.mk"
 	$(<<:T=A)
 
 .ARCOPY : .AFTER .IGNORE .VIRTUAL .FORCE .REPEAT
-	$(<<:T=AF)
+	$(**:O=1:P=I=$(<<):?: $(<<) linked to $(**:O=1)?$(<<:T=AF)?)
 
 .ARCLEAN.LIST. : .FUNCTION
 	local I V
@@ -807,16 +815,17 @@ include "Scanrules.mk"
  * match-all metarules
  */
 
-% : %.c (CC) (CCFLAGS) (LDFLAGS) $$(LDLIBRARIES)
-	$(CC) $(CCFLAGS) $(LDFLAGS:N!=-[DIU]*) $(CCLDFLAGS) -o $(<) $(*)
+for .S. $(.SUFFIX.c) $(.SUFFIX.C)
+	% : %$(.S.) (CC) (CCFLAGS) (LDFLAGS) $$(LDLIBRARIES)
+		$(CC) $(CCFLAGS) $(LDFLAGS:N!=-[DIU]*) $(CCLDFLAGS) -o $(<) $(*)
+end
 
-% : %.f (F77) (F77FLAGS) (LDFLAGS) $$(LDLIBRARIES)
-	$(F77) $(F77FLAGS) $(LDFLAGS) -o $(<) $(*)
+for .S. $(.SUFFIX.f) $(.SUFFIX.r)
+	% : %$(.S.) (F77) (F77FLAGS) (LDFLAGS) $$(LDLIBRARIES)
+		$(F77) $(F77FLAGS) $(LDFLAGS) -o $(<) $(*)
+end
 
-% : %.r (F77) (F77FLAGS) (LDFLAGS) $$(LDLIBRARIES)
-	$(F77) $(F77FLAGS) $(LDFLAGS) -o $(<) $(*)
-
-% : %.F (F77) (CCFLAGS) (F77FLAGS) (LDFLAGS) $$(LDLIBRARIES)
+% : %.fql (F77) (CCFLAGS) (F77FLAGS) (LDFLAGS) $$(LDLIBRARIES)
 	$(F77) $(CCFLAGS) $(F77FLAGS) $(LDFLAGS) -o $(<) $(*)
 
 % : %.s (ASFLAGS) (LDFLAGS) $$(LDLIBRARIES)
@@ -861,17 +870,15 @@ include "Scanrules.mk"
  * double suffix metarules
  */
 
-%.o : %.c (CC) (CCFLAGS)
-	$(CC) $(CCFLAGS) -c $(>)
+for .S. $(.SUFFIX.c) $(.SUFFIX.C)
+	%.o : %$(.S.) (CC) (CCFLAGS)
+		$(CC) $(CCFLAGS) -c $(>)
+end
 
-%.o : %.r (F77) (F77FLAGS)
-	$(F77) $(F77FLAGS) -c $(>)
-
-%.o : %.f (F77) (F77FLAGS)
-	$(F77) $(F77FLAGS) -c $(>)
-
-%.o : %.F (F77) (F77FLAGS)
-	$(F77) $(F77FLAGS) -c $(>)
+for .S. $(.SUFFIX.f) $(.SUFFIX.r)
+	%.o : %$(.S.) (F77) (F77FLAGS)
+		$(F77) $(F77FLAGS) -c $(>)
+end
 
 %.o : %.s (AS) (ASFLAGS)
 	$(AS) $(ASFLAGS) -o $(<) $(>)
@@ -906,18 +913,6 @@ include "Scanrules.mk"
 %.c : %.l .LEX.SEMAPHORE (LEX) (LEXFLAGS) (CC)
 	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%))/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(LEXHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")1i$("\n")#include "$(LEXHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
 	$(MV) lex.yy.c $(<)
-
-%.o : %.C (CC) (CCFLAGS)
-	$(CC) $(CCFLAGS) -c $(>)
-
-%.o : %.cc (CC) (CCFLAGS)
-	$(CC) $(CCFLAGS) -c $(>)
-
-%.o : %.cpp (CC) (CCFLAGS)
-	$(CC) $(CCFLAGS) -c $(>)
-
-%.o : %.cxx (CC) (CCFLAGS)
-	$(CC) $(CCFLAGS) -c $(>)
 
 %.mo : %.mk
 	$(MAKE) $(-) --base --compile --file=$(>) $(CCFLAGS:N=-[I][!-]*) $(&:T=E)
@@ -1013,14 +1008,19 @@ DAGGERFLAGS =
 .CIADB.AGAIN =
 
 .CIADB : .MAKE .VIRTUAL .FORCE .ONOBJECT .REPEAT .PROBE.INIT
-	local A T U X
-	T := $(.SOURCES.:G=%.c:B:S=$(CC.SUFFIX.OBJECT)) $(.SOURCES.:G=%.C:B:S=$(CC.SUFFIX.OBJECT)) $(.SOURCES.:G=%.cxx:B:S=$(CC.SUFFIX.OBJECT))
+	local A S T U X
+	for S $(.SUFFIX.c) $(.SUFFIX.C)
+		T += $(.SOURCES.:G=%$(S):B:S=$(CC.SUFFIX.OBJECT))
+	end
 	if T
 		.SOURCE.c : $(IFFESRCDIR)
 		.CIA.REBIND : .MAKE .VIRTUAL .FORCE .AFTER .FOREGROUND
 			.REBIND : $(CIAFILES)
 		for U $(T)
-			X := $(*$(U):G=%.c) $(*$(U):G=%.C) $(*$(U):G=%.cxx)
+			X =
+			for S $(.SUFFIX.c) $(.SUFFIX.C)
+				X += $(*$(U):G=%$(S))
+			end
 			if ( X = "$(X:A!=.LCL.INCLUDE|.STD.INCLUDE)" )
 				$(U:B:S=.A) : .IMPLICIT $(X) $(~$(U):A=.STATEVAR)
 				A += $(U:B:S=.A)
@@ -1097,7 +1097,7 @@ DAGGERFLAGS =
 
 .DO.NOTHING : .USE .NULL
 
-.NOOPTIMIZE.c .CC.NOOPTIMIZE /* drop .CC.* in 2001 */ : .MAKE .LOCAL
+.NOOPTIMIZE.c .CC.NOOPTIMIZE /* drop .CC.* in 2004 */ : .MAKE .LOCAL
 	CCFLAGS := $(.MAM.CCFLAGS|CCFLAGS:VP:N!=-O*|$\(CC.OPTIMIZE\))
 
 .READONLY. : .FUNCTION
@@ -1269,7 +1269,9 @@ end
 	M := $(M)recurse|.RECURSE
 	.ORIGINAL.ARGS. := $(.ORIGINAL.ARGS.:N!=$(M))
 	.ARGS : .CLEAR $(~.ARGS:N!=$(M))
-	$(X:N!=-|.CC-*|cc-*) : .RECURSE.DIR
+	T := $(X:N!=-|.CC-*|cc-*)
+	$(T:T!=FR) : .TERMINAL .RECURSE.DIR
+	$(T:T=FR) : .TERMINAL .RECURSE.FILE
 	if recurse == "list"
 		print $(X:/ /$("\n")/G)
 		exit 0
@@ -1880,17 +1882,19 @@ end
 		$(S) : .SHARED.o $(%:N=[!-+]*=*) $(CC.PREFIX.ARCHIVE)$(%:O=2)$(CC.LIB.TYPE:O=1)$(CC.SUFFIX.ARCHIVE) $$(.SHARED.BIND. $(L))
 		if ! "$(.INSTALL.$(S))" && ! "$(.NO.INSTALL.)"
 			$$(LIBDIR) :INSTALLDIR: $(S)
-				$(LD_PRELOAD:N=$(<:D:B:D:B:D:B:S=$(CC.SUFFIX.SHARED)):?LD_PRELOAD=""; _RLD_LIST=DEFAULT;?)if	silent test -f $(<:C%\$(CC.SUFFIX.SHARED)\.%.oo.%)
+				$(LD_PRELOAD:N=$(<:C%\$(CC.SUFFIX.SHARED)\..*%$(CC.SUFFIX.SHARED)%):?LD_PRELOAD=""; _RLD_LIST=DEFAULT;?)if	silent test -f $(<:C%\$(CC.SUFFIX.SHARED)\.%.oo.%)
 				then	$(STDRM) $(RMFLAGS) $(<:C%\$(CC.SUFFIX.SHARED)\.%.oo.%)
 				fi
 				if	silent test -f $(<)
 				then	$(STDMV) $(<) $(<:C%\$(CC.SUFFIX.SHARED)\.%.oo.%)
 				fi
 				$(STDCP) $(<:B:S) $(<)
-				if	silent test -f $(<:D:B:D:B:D:B:S=$(CC.SUFFIX.SHARED))
-				then	$(STDRM) $(RMFLAGS) $(<:D:B:D:B:D:B:S=$(CC.SUFFIX.SHARED))
+				if	silent test "$(<)" != "$(<:C%\$(CC.SUFFIX.SHARED)\..*%$(CC.SUFFIX.SHARED)%)"
+				then	if	silent test -f $(<:C%\$(CC.SUFFIX.SHARED)\..*%$(CC.SUFFIX.SHARED)%)
+					then	$(STDRM) $(RMFLAGS) $(<:C%\$(CC.SUFFIX.SHARED)\..*%$(CC.SUFFIX.SHARED)%)
+					fi
+					$(STDLN) $(<) $(<:C%\$(CC.SUFFIX.SHARED)\..*%$(CC.SUFFIX.SHARED)%)
 				fi
-				$(STDLN) $(<) $(<:D:B:D:B:D:B:S=$(CC.SUFFIX.SHARED))
 				chmod -w $(<)
 		end
 	end
@@ -2048,13 +2052,15 @@ end
 
 /*
  * rhs compilation with no optimization
- * lhs is CC.HOSTTYPE match pattern to match
+ * lhs is CC.HOSTTYPE match pattern list to match
  * activated for all architectures if lhs omitted
  */
 
 ":NOOPTIMIZE:" : .MAKE .OPERATOR .PROBE.INIT
-	local T
-	if ! "$(<)" || "$(-mam)" == "static*" || CC.HOSTTYPE == "$(<)"
+	local T P
+	.P. : .CLEAR $(<)
+	P := $(*.P.:/ /|/G)
+	if ! "$(P)" || "$(-mam)" == "static*" || CC.HOSTTYPE == "$(P)"
 		for T $(>)
 			if "$(@.NOOPTIMIZE$(T:S):V)"
 				$(T:B:S=$(CC.SUFFIX.OBJECT)) : .SPECIAL .NOOPTIMIZE$(T:S)
@@ -2063,6 +2069,13 @@ end
 			end
 		end
 	end
+
+/*
+ * force default and the usual suspects to do nothing
+ */
+
+":NOTHING:" : .MAKE .OPERATOR
+	.ALL .INSTALL .MAIN all cc- install test : .CLEAR .DO.NOTHING
 
 /*
  * var :OPTIONAL: src ...
@@ -2102,6 +2115,7 @@ end
 .PACKAGE.install =
 .PACKAGE.libraries =
 .PACKAGE.stdlib = $(*.SOURCE.a) $(CC.STDLIB) /usr/lib /lib
+.PACKAGE.strip =
 
 .PACKAGE.LIBRARIES. : .FUNCTION
 	local L P R
@@ -2357,9 +2371,11 @@ PACKAGES : .SPECIAL .FUNCTION
 					V := $(N:/[^=]*=//)
 					N := $(N:/=.*//)
 				end
+				S =
 				if N == "optimize"
 					if "$(PACKAGE_OPTIMIZE:N=space)"
 						N = dynamic
+						.PACKAGE.strip = $(CC.PACKAGE.STRIP)
 					elif "$(PACKAGE_OPTIMIZE:N=time)"
 						N = static
 					else
@@ -2368,6 +2384,7 @@ PACKAGES : .SPECIAL .FUNCTION
 				elif N == "space"
 					if ! "$(PACKAGE_OPTIMIZE:N=time)"
 						N = dynamic
+						.PACKAGE.strip = $(CC.PACKAGE.STRIP)
 					else
 						N =
 					end
@@ -2662,18 +2679,27 @@ PACKAGES : .SPECIAL .FUNCTION
 /*
  * rhs are compiled using $(cc) rather than $(CC)
  * use like ::
+ * NOTE: case ignorant filesystems make this a little tricky
  */
 
 ":cc:" : .MAKE .OPERATOR .PROBE.INIT
 	if "$(CC)" != "$(cc)"
+		local O S T
+		for S $(.SUFFIX.$(CC.DIALECT:N=C++:?c?C?))
+			T := $(>:G=%$(S))
+			if T == "*$(S)" || S == ".c" && T != "*.C" || S == ".C" && T != "*.c"
+				O += $(T:B:S=$(CC.SUFFIX.OBJECT))
+			end
+		end
+		O := $(O:U)
 		.CLOBBER. += null.mo null.ms
 		:: $(>)
-		$(<) :: $(>:G=%.c:B:S=$(CC.SUFFIX.OBJECT))
-		$(>:G=%.c:B:S=$(CC.SUFFIX.OBJECT)) : .CLEAR .JOINT .DO.cc
+		$(<) :: $(O)
+		$(O) : .CLEAR .JOINT .DO.cc
 	end
 
 .DO.cc : .USE .ALWAYS .LOCAL .FORCE
-	$(-exec:?silent ??)$(MAKE) --file=/dev/null --file=$(MAKEFILE) $(-) --errorid=cc $(<) $(=) CC=$(cc:@Q) CCFLAGS=$(CCFLAGS:VP:@Q)
+	$(-exec:?silent ??)$(MAKE) --file=/dev/null --file=$(MAKEFILE) $(-) --errorid=$(cc:N!=*=*:B) '.null : $(<)' .null $(=) CC=$(cc:@Q) CCFLAGS=$(CCFLAGS:VP:@Q)
 
 /*
  * make scripts
@@ -3096,7 +3122,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	if nativepp == "" && "$(CC.DIALECT:N=-I-)" && !CC.ALTPP.FLAGS && !CC.ALTPP.ENV
 		nativepp = 1
 	end
-	if !nativepp
+	if ! nativepp
 		if CC.CC && ! ( T4 = "$(CC.PROBEPP)" )
 			T4 := $(cctype:@P=P=C,pp)
 		end
@@ -3127,10 +3153,9 @@ PACKAGES : .SPECIAL .FUNCTION
 		if nativepp == "[1-9]*"
 			error 1 local include files may be ignored by the native C preprocessor
 		end
+		prefixinclude = 1
 	else
-		if ! prefixinclude
-			T3 += -D:noprefix
-		end
+		prefixinclude = 0
 		T3 += $$(*:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(!$$$$(*):A=.LCL.INCLUDE:P=D):/^/-I/) -I- $$$(*.SOURCE.%.STD.INCLUDE:I=$$$$(!$$$$(*):A=.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&:T=D)
 	end
 	if "$(CC.DIALECT:N=TOUCHO)"
@@ -3178,6 +3203,15 @@ PACKAGES : .SPECIAL .FUNCTION
 			CCLDFLAGS &= $(.CC.LD.RUNPATH.)
 		end
 		LDFLAGS &= $$(*.SOURCE.%.ARCHIVE:I=$$$(*:N=-l*:P=D):$(.CC.NOSTDLIB.):P=A:/^/-L/) $(T3:V)
+	end
+	if "$(CC.LD.ORIGIN:V)"
+		CCLDFLAGS &= $$(CC.LD.ORIGIN)
+	end
+	if "$(CC.LD.STRIP:V)"
+		if "$(PACKAGE_OPTIMIZE:N=space)"
+			.PACKAGE.strip = $(CC.LD.STRIP)
+		end
+		CCLDFLAGS += $$(.PACKAGE.strip)
 	end
 	M4FLAGS &= $$(*.SOURCE.%.M4.INCLUDE:I=$$$(!$$$(*):P=D):/^/-I/) $$(&:T=D)
 

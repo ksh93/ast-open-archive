@@ -1,3 +1,4 @@
+02-11-12 expr.c: save result before regfree() in cql.sub()
 02-09-06 cql: fix field update when old string value is NiL
 02-06-27 cql: fix file details 0 dereference when no file name
 02-05-20 cql: update to use regsubcomp(),regsubexec()

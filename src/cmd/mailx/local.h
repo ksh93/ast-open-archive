@@ -5,7 +5,7 @@
  */
 
 #if _PACKAGE_ast
-#include "FEATURE/local"
+#include "FEATURE/lcl"
 #endif
 
 #if _hdr_paths

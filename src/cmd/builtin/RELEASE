@@ -1,3 +1,5 @@
+02-11-14 what.c: stop on < to catch html/xml
+	 update cmdinit() calls for 4th flag arg
 02-09-11 dlls.c: add --base & --path
 02-09-05 pr.data: eliminate case ignorant file name clashes (for mac os X)
 02-08-30 dlls.c: exit 1 if no matching dll found

@@ -138,7 +138,6 @@ struct Cdbrecord_s; typedef struct Cdbrecord_s Cdbrecord_t;
 struct Cdbschema_s; typedef struct Cdbschema_s Cdbschema_t;
 struct Cdbtype_s; typedef struct Cdbtype_s Cdbtype_t;
 
-typedef int (*Cdberror_f)(Cdb_t*, Cdbdisc_t*, int, const char*, ...);
 typedef int (*Cdbevent_f)(Cdb_t*, int, void*, Cdbdisc_t*);
 typedef int (*Cdbindex_f)(Cdb_t*, Cdbkey_t*, Cdbdisc_t*);
 
@@ -187,7 +186,7 @@ struct Cdbdisc_s			/* user discipline		*/
 	const char*	comment;	/* format specific comment	*/
 	const char*	details;	/* format specific details	*/
 	const char*	lib;		/* pathfind() lib		*/
-	Cdberror_f	errorf;		/* error function		*/
+	Error_f		errorf;		/* error function		*/
 	Cdbevent_f	eventf;		/* event function		*/
 	Cdbindex_f	indexf;		/* key index function		*/
 };

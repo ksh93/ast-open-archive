@@ -472,7 +472,7 @@ immediate(register struct rule* r)
 	{
 		getimmediate(r, &prereqs, &action);
 		for (p = prereqs; p; p = p->next)
-			if (p->rule->dynamic & (D_bound|D_scanned))
+			if ((p->rule->dynamic & (D_bound|D_scanned)) && (!(p->rule->mark & M_bind) || (state.questionable & 0x02000000)))
 				p->rule->mark |= M_mark;
 		hashwalk(table.rule, 0, unbind, r);
 		hashwalk(table.rule, 0, unbind, NiL);
@@ -688,6 +688,7 @@ dynamic(register struct rule* r)
 			u = p->rule;
 			expand(tmp, u->name);
 			buf = sfstruse(tmp);
+			flags = 0;
 			while (s = getarg(&buf, &flags))
 			{
 				added = 1;

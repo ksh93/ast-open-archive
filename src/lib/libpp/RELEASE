@@ -1,3 +1,12 @@
+02-12-17 ppargs.c: document -I-!
+02-12-06 -I- pp:noprefix otherwise pp:prefix default
+02-11-29 probe.win32: added __INTSIZE, drop dm pp:noallmultiple
+02-11-26 pp.def: add STDC_HOSTED
+	 probe.win32: add C95 and C99 STDC predefined macros
+02-10-30 ppfsm.h: add boundary check to IDSTATE()
+02-10-18 probe.win32: update for mingw
+02-10-15 ppsearch.c: if PLUSPLUS && not found && no suffix then try with .h
+02-10-10 pplex.c: fix does not end with `newline' bugs
 02-10-01 ppop.c,ppargs.c: -I-I => -I-M with proper docs; -I-I for PP_IGNORE
 02-09-21 pp.probe: add pp:nocatliteral test
 02-09-10 pp.tab: add pp:passthrough to match -D-P docs

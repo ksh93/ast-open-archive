@@ -177,13 +177,11 @@ typedef struct Cs_s Cs_t;
 struct Csdisc_s;
 typedef struct Csdisc_s Csdisc_t;
 
-typedef int (*Cserror_f)(Cs_t*, Csdisc_t*, int, const char*, ...);
-
 struct Csdisc_s				/* user discipline		*/
 {
 	unsigned long	version;	/* CS_VERSION			*/
 	unsigned long	flags;		/* CS_* flags			*/
-	Cserror_f	errorf;		/* error message handler	*/
+	Error_f		errorf;		/* error message handler	*/
 };
 
 struct Cs_s				/* thread state			*/

@@ -24,7 +24,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Labs Research) 2002-02-14 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Labs Research) 2002-10-10 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -76,6 +76,7 @@ USAGE_LICENSE
 "[T:test?Enable implementation specific tests.]:"
 "		[test]"
 "[w:word-match|word-regexp?Force \apatterns\a to match complete words.]"
+"[a?Ignored for GNU compatibility.]"
 "\n"
 "\n[ pattern ] [ file ... ]\n"
 "\n"
@@ -585,6 +586,8 @@ main(int argc, char** argv)
 			break;
 		case 'X':
 			state.options |= REG_AUGMENTED;
+			break;
+		case 'a':
 			break;
 		case 'b':
 			state.options &= ~REG_NOSUB;

@@ -213,7 +213,7 @@ b_strings(int argc, char** argv, void* context)
 	register char*		format = 0;
 
 	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG);
+	cmdinit(argv, context, ERROR_CATALOG, 0);
 	if (argv[1] && streq(argv[1], "-"))
 		argv++;
 	for (;;)

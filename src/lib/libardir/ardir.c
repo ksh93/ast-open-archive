@@ -184,3 +184,9 @@ ardirmeth(const char* name)
 			return meth;
 	return 0;
 }
+
+Ardirmeth_t*
+ardirlist(Ardirmeth_t* meth)
+{
+	return meth ? meth->next : ar_first_method;
+}

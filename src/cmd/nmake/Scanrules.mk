@@ -64,18 +64,13 @@
 	I| \# include "%"|A.LCL.INCLUDE|$(prefixinclude:/0//:?M$$$(.PREFIX.INCLUDE.)|??)
 	I| \# pragma library "%"|A.VIRTUAL|A.ACCEPT|M.LIBRARY.$$(%)|
 
-.ATTRIBUTE.%.c : .SCAN.c
-.ATTRIBUTE.%.C : .SCAN.c
-.ATTRIBUTE.%.cc : .SCAN.c
-.ATTRIBUTE.%.cpp : .SCAN.c
-.ATTRIBUTE.%.cxx : .SCAN.c
-.ATTRIBUTE.%.S : .SCAN.c
+$("$(.SUFFIX.c) $(.SUFFIX.C) .S":/^/.ATTRIBUTE.%/) : .SCAN.c
 
 .SCAN.f : .SCAN
 	I| include '%'|
 	I| INCLUDE '%'|
 
-.ATTRIBUTE.%.f : .SCAN.f
+$(.SUFFIX.f:/^/.ATTRIBUTE.%/) : .SCAN.f
 
 .SOURCE.%.SCAN.m4 : $$(*.SOURCE.m4) $$(*.SOURCE) $$(*.SOURCE.h)
 
@@ -121,7 +116,7 @@
 	I| INCLUDE "%"|
 	I| INCLUDE % |
 
-.ATTRIBUTE.%.r : .SCAN.r
+$(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 
 .SCAN.sh : .SCAN
 	O|S|
@@ -153,12 +148,17 @@
 	I| $ include '%' |
 	I| $ include % |M$$(%:/;.*//)|
 
-.BIND.%.SCAN.F : .FUNCTION
+/*
+ * .fql used to be .F
+ * if nobody complains about this change by 2004 then .fql is outta here
+ */
+
+.BIND.%.SCAN.fql : .FUNCTION
 	if "$(%:N!=*.h)"
 		return $(%).h
 	end
 
-.SCAN.F : .SCAN
+.SCAN.fql : .SCAN
 	$(@.SCAN.sql)
 	D| \# define %|
 	B| \# if|
@@ -175,4 +175,3 @@
 	I| *< % |A.DONTCARE|M$$(%:C%.*[`$&].*%%:C%['"]%%:C%["']$%%)|
 
 .ATTRIBUTE.features/%.sh : .SCAN.exec.sh
-.ATTRIBUTE.feature/%.sh : .SCAN.exec.sh

@@ -39,6 +39,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 	register int		n;
 	register char*		id;
 	char			buf[64];
+	char			path[PATH_MAX];
 
 	/*
 	 * prepend local part of state.id to name if not already there
@@ -80,7 +81,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 		state.dll = dll;
 		if (ignore)
 			return 0;
-		if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY)) && (!n || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY))))
+		if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY, path, sizeof(path))) && (!n || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY, path, sizeof(path)))))
 		{
 			if (pz->disc && pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %s", dll->name + n, dlerror());
@@ -95,7 +96,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 		if (!(dll->initf = (Pzinit_f)dlllook(dll->dll, buf)))
 		{
 			if (pz->disc && pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: %s: initialization function not found in library", dll->name + n, buf);
+				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: %s: initialization function not found in library", path, buf);
 			return -1;
 		}
 	}

@@ -15,9 +15,7 @@ expr 2.0 :LIBRARY: RELEASE expr.h exlib.h exgram.h exparse.y \
 		exerror.c exopen.c exrewind.c extoken.c extype.c \
 		exzero.c
 
-if CC.HOSTTYPE == "*.i386" || "$(-mam)" == "static*"
-exeval.o : .CC.NOOPTIMIZE
-end
+"*.i386" :NOOPTIMIZE: exeval.c
 
 exop.h : exparse.h
 	{

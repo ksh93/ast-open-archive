@@ -1,3 +1,6 @@
+02-12-04 du.c: add -H -L -P(default) symlink options
+02-11-22 file.c: add version type description
+02-10-10 pss.c: redefine only if not defined -- duh
 02-10-02 pss.c: move <ast_windows.h> to first #if __CYGWIN__
 02-09-30 dd.c: honor both count*bs *and* count
 02-09-24 dd.c: fix partial record computations and printf format

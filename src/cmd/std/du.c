@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: du (AT&T Labs Research) 2000-10-06 $\n]"
+"[-?\n@(#)$Id: du (AT&T Labs Research) 2002-12-04 $\n]"
 USAGE_LICENSE
 "[+NAME?du - summarize disk usage]"
 "[+DESCRIPTION?\bdu\b reports the number of blocks contained in all files"
@@ -58,6 +58,10 @@ USAGE_LICENSE
 "	default.]"
 "[x|X|l:xdev|local|mount|one-file-system?Do not descend into directories in"
 "	different filesystems than their parents.]"
+"[L:logical|follow?Follow symbolic links. The default is \b--physical\b.]"
+"[H:metaphysical?Follow command argument symbolic links, otherwise don't"
+"	follow. The default is \b--physical\b.]"
+"[P:physical?Don't follow symbolic links. The default is \b--physical\b.]"
 
 "\n"
 "\n[ path ... ]\n"
@@ -204,6 +208,16 @@ main(int argc, register char** argv)
 			continue;
 		case 'v':
 			state.silent = 0;
+			continue;
+		case 'H':
+			flags |= FTW_META|FTW_PHYSICAL;
+			continue;
+		case 'L':
+			flags &= ~(FTW_META|FTW_PHYSICAL);
+			continue;
+		case 'P':
+			flags &= ~FTW_META;
+			flags |= FTW_PHYSICAL;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);

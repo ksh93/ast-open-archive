@@ -325,11 +325,8 @@ static const Imaplex_t	imapstatus[] =
 #define IMAP_FETCH_ENVELOPE		3
 #define IMAP_FETCH_FLAGS		4
 #define IMAP_FETCH_INTERNALDATE		5
-#define IMAP_FETCH_RFC822		6
-#define IMAP_FETCH_RFC822_HEADER	7
-#define IMAP_FETCH_RFC822_SIZE		8
-#define IMAP_FETCH_RFC822_TEXT		9
-#define IMAP_FETCH_UID			10
+#define IMAP_FETCH_RFC822_SIZE		6
+#define IMAP_FETCH_UID			7
 
 static const Imaplex_t	imapfetch[] =
 {
@@ -338,10 +335,7 @@ static const Imaplex_t	imapfetch[] =
 	"ENVELOPE",			IMAP_FETCH_ENVELOPE,
 	"FLAGS",			IMAP_FETCH_FLAGS,
 	"INTERNALDATE",			IMAP_FETCH_INTERNALDATE,
-	"RFC822",			IMAP_FETCH_RFC822,
-	"RFC822.HEADER",		IMAP_FETCH_RFC822_HEADER,
 	"RFC822.SIZE",			IMAP_FETCH_RFC822_SIZE,
-	"RFC822.TEXT",			IMAP_FETCH_RFC822_TEXT,
 	"UID",				IMAP_FETCH_UID,
 };
 
@@ -563,11 +557,21 @@ imapgetarg(Imap_t* imap, register Imapop_t* op, register Imaplist_t* lp, int* ep
 				/*FALLTHROUGH*/
 			default:
 			name:
-				for (b = s; (c = *s) && !isspace(c); s++)
-					if (c == eol)
+				m = 0;
+				for (b = s; (c = *s); s++)
+					if (c == '[')
+						m = c;
+					else if (c == ']')
+						m = 0;
+					else if (m == 0)
 					{
-						*ep = 0;
-						break;
+						if (c == eol)
+						{
+							*ep = 0;
+							break;
+						}
+						else if (isspace(c))
+							break;
 					}
 				if (c)
 					*s++ = 0;
@@ -931,6 +935,13 @@ imap_BODYSTRUCTURE(register Imap_t* imap, register Imaparg_t* ap, register Msg_t
 					}
 			}
 			break;
+		case IMAP_CONTENT_data:
+			if (!pp->name)
+			{
+				sfprintf(imap->tp, "%d.att", ((Imapmsg_t*)mp->m_info)->attachments + 1);
+				pp->name = vmstrdup(imap->vm, sfstruse(imap->tp));
+			}
+			break;
 		}
 		if (pp->name)
 		{
@@ -987,8 +998,6 @@ imap_FETCH(Imap_t* imap, register Imapop_t* op)
 				if (xp) switch (xp->code)
 				{
 				case IMAP_FETCH_BODY:
-				case IMAP_FETCH_RFC822_HEADER:
-				case IMAP_FETCH_RFC822_TEXT:
 					imapputarg(imap, ap);
 					break;
 				case IMAP_FETCH_BODYSTRUCTURE:
@@ -1336,7 +1345,7 @@ imapvsend(register Imap_t* imap, int retain, const char* fmt, va_list ap)
 			if (!q)
 			{
 				for (; (c = *s) && (c == ' ' || c == '\n' || c == '\r' || c == '\t'); s++);
-				if (c)
+				if (c && c != ']')
 					sfputc(imap->tp, ' ');
 			}
 			continue;
@@ -1756,7 +1765,7 @@ imap_setinput(register Msg_t* mp)
 
 	imap->copy.fp = imap->mp;
 	sfstrset(imap->mp, 0);
-	if (imapexec(imap, "FETCH %d (RFC822.HEADER)", m))
+	if (imapexec(imap, "FETCH %d (BODY.PEEK[HEADER])", m))
 		note(FATAL, "imap: %d: cannot fetch message header", m);
 	imap->copy.fp = sfstdout;
 	imap->mp->_endb = imap->mp->_next;
@@ -1932,23 +1941,23 @@ imap_copy(register struct msg* mp, Sfio_t* op, Dt_t** ignore, char* prefix, unsi
 		sfputr(op, imap->copy.prefix, -1);
 	}
 	sfprintf(op, "From %s %s\n", ip->from, ip->date);
-	sfprintf(imap->tp, "FETCH %d (RFC822.HEADER", i);
+	sfprintf(imap->tp, "FETCH %d (BODY[HEADER", i);
 	if (ignore && *ignore)
 	{
 		if (ignore == &state.ignoreall)
-			sfprintf(imap->tp, ".LINES NIL");
+			sfprintf(imap->tp, ".FIELDS NIL");
 		else
 		{
 			if (dictflags(ignore) & RETAIN)
 			{
 				i = RETAIN;
-				sfprintf(imap->tp, ".LINES (");
+				sfprintf(imap->tp, ".FIELDS (");
 				s = "";
 			}
 			else
 			{
 				i = IGNORE;
-				sfprintf(imap->tp, ".LINES.NOT (From");
+				sfprintf(imap->tp, ".FIELDS.NOT (From");
 				s = " ";
 			}
 			for (np = (struct name*)dtfirst(*ignore); np; np = (struct name*)dtnext(*ignore, np))
@@ -1959,12 +1968,13 @@ imap_copy(register struct msg* mp, Sfio_t* op, Dt_t** ignore, char* prefix, unsi
 				}
 			sfprintf(imap->tp, ")");
 		}
+		sfprintf(imap->tp, "]");
 		for (pp = ip->parts; pp; pp = pp->next)
 			if (pp->content == IMAP_CONTENT_text)
 				sfprintf(imap->tp, " BODY[%s]", pp->id);
 	}
 	else
-		sfprintf(imap->tp, " RFC822.TEXT");
+		sfprintf(imap->tp, "] BODY[TEXT]");
 	sfprintf(imap->tp, ")");
 	if (imapexec(IMAP, sfstruse(imap->tp)))
 		note(FATAL, "imap: %d: cannot fetch message info", i);

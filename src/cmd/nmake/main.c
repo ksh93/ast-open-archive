@@ -96,6 +96,7 @@
  *                      .               .
  *   2001             (4.1)             .	AT&T Research
  *   2001             (4.2)             .	AT&T Research
+ *   2003             (4.3)             .	AT&T Research
  *
  * command line arguments are of three types
  *
@@ -155,6 +156,7 @@
  *	0x00400000 2001-02-14 allow P_archive to break job deadlock
  *	0x00800000 2001-10-05 disable early r->status=FAILED when errors!=0
  *	0x01000000 2002-10-02 $(>) doesn't check min(rule.time,state.time)
+ *	0x02000000 2002-12-04 don't inhibit .UNBIND of M_bind rules
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *
@@ -292,7 +294,9 @@ main(int argc, char** argv)
 	error_info.version = version;
 	error_info.exit = finish;
 	error_info.auxilliary = intercept;
-	if (pathcheck(PATHCHECK, error_info.id, NiL)) exit(1);
+	if (pathcheck(PATHCHECK, error_info.id, NiL))
+		return 1;
+	error(-99, "startup");
 	settypes("*?[]", C_MATCH);
 	settypes("+-|=", C_OPTVAL);
 	settypes(" \t\n", C_SEP);
@@ -315,7 +319,7 @@ main(int argc, char** argv)
 	if (isatty(i))
 		i++;
 	for (; i < 20; i++)
-		if (!fcntl(i, F_GETFD, 0))
+		if (i != error_info.fd && !fcntl(i, F_GETFD, 0))
 			close(i);
 
 	/*
@@ -374,7 +378,7 @@ main(int argc, char** argv)
 	 */
 
 	buf = sfstrbase(tmp);
-	internal.pwd = (s = getcwd(buf, MAXNAME)) ? strdup(s) : ".";
+	internal.pwd = (s = getcwd(buf, MAXNAME)) ? strdup(s) : strdup(".");
 	internal.pwdlen = strlen(internal.pwd);
 	if (stat(".", &st))
 		error(3, "cannot stat .");
@@ -404,6 +408,7 @@ main(int argc, char** argv)
 	{
 		if (!stat(v->value, &st) && !stat(internal.pwd, &ds) && st.st_ino == ds.st_ino && st.st_dev == ds.st_dev)
 		{
+			free(internal.pwd);
 			internal.pwd = strdup(v->value);
 			internal.pwdlen = strlen(v->value);
 		}
@@ -654,7 +659,7 @@ main(int argc, char** argv)
 	if (state.list)
 	{
 		dump(sfstdout, 0);
-		exit(0);
+		return 0;
 	}
 
 	/*
@@ -696,7 +701,7 @@ main(int argc, char** argv)
 	 */
 
 	if (state.compileonly)
-		exit(0);
+		return 0;
 	compref(0, NiL, 0);
 	sfstrclose(tmp);
 	state.compile = COMPILED;
@@ -811,7 +816,7 @@ main(int argc, char** argv)
 	 */
 
 	finish(0);
-	exit(0);
+	return 0;
 }
 
 /*

@@ -1,3 +1,11 @@
+02-12-12 imap.c: handle no-name attachments
+02-12-11 head.c: application of DeMorgan's law proves Murphy's
+02-12-04 local.h: include FEATURE/lcl from lcl.iffe to avoid local.h clash
+02-11-22 head.c: convert unfriendly attachment path name characters to '_'
+02-10-31 imap.c: drop obsolete RFC2060 FETCH args
+02-10-20 spam.c: test=0x0060 for Authentication-Warning: checks
+02-10-16 spam.c: test=0x0010 to verify From: in domain matches Received: hosts
+02-10-08 mailx: fix a few strncopy() size off-by-ones
 02-10-01 mailx: fix ancient buffer overflows by comitting to ast -- bye bsd
 02-09-22 local.c: honor MAIL if its a regular file
 02-09-08 add spambody to catch mail filter warnings embedded in message bodies

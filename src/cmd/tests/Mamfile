@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -132,7 +132,7 @@ prev opt.c
 exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c opt.c
 done opt.o generated
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o opt opt.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o opt opt.o ${mam_libast}
 done opt generated
 exec - regress  opt.tst opt
 done test.opt virtual
@@ -147,7 +147,7 @@ done strelapsed.c
 prev strelapsed.c
 exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strelapsed.c
 done strelapsed.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o strelapsed strelapsed.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strelapsed strelapsed.o ${mam_libast}
 done strelapsed generated
 exec - regress  strelapsed.tst strelapsed
 done test.strelapsed virtual
@@ -163,10 +163,26 @@ done strtoi.c
 prev strtoi.c
 exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtoi.c
 done strtoi.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o strtoi strtoi.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strtoi strtoi.o ${mam_libast}
 done strtoi generated
 exec - regress  strtoi.tst strtoi
 done test.strtoi virtual
+make test.strntoi
+make strntoi.tst
+done strntoi.tst
+make strntoi
+make strntoi.o
+make strntoi.c
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ast.h implicit
+done strntoi.c
+prev strntoi.c
+exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntoi.c
+done strntoi.o generated
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strntoi strntoi.o ${mam_libast}
+done strntoi generated
+exec - regress  strntoi.tst strntoi
+done test.strntoi virtual
 make test.strtof
 make strtof.tst
 done strtof.tst
@@ -179,10 +195,26 @@ done strtof.c
 prev strtof.c
 exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtof.c
 done strtof.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o strtof strtof.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strtof strtof.o ${mam_libast}
 done strtof generated
 exec - regress  strtof.tst strtof
 done test.strtof virtual
+make test.strntof
+make strntof.tst
+done strntof.tst
+make strntof
+make strntof.o
+make strntof.c
+prev ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/ast.h implicit
+done strntof.c
+prev strntof.c
+exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntof.c
+done strntof.o generated
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strntof strntof.o ${mam_libast}
+done strntof generated
+exec - regress  strntof.tst strntof
+done test.strntof virtual
 make test.date
 make date
 make date.o
@@ -202,7 +234,7 @@ done date.c
 prev date.c
 exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c date.c
 done date.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o date date.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o date date.o ${mam_libast}
 done date generated
 make date.msk
 done date.msk

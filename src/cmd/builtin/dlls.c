@@ -76,7 +76,7 @@ b_dlls(int argc, char** argv, void* context)
 	Dllinfo_t*	dli;
 
 	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG);
+	cmdinit(argv, context, ERROR_CATALOG, 0);
 	flags = 0;
 	for (;;)
 	{

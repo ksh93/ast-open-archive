@@ -42,7 +42,7 @@ typedef int			(*Rsevent_f)_ARG_((Rs_t*, int, Void_t*, Rsdisc_t*));
 typedef struct _rskey_s		Rskey_t;
 typedef struct _rskeydisc_s	Rskeydisc_t;
 typedef int			(*Rskeyerror_f)
-				  _ARG_((Rskey_t*, Rskeydisc_t*, int, const char*, ...));
+				  _ARG_((Void_t*, Void_t*, int, ...));
 
 struct _rsmethod_s
 {	int		(*insertf)_ARG_((Rs_t*, Rsobj_t*));

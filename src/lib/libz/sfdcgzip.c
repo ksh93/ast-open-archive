@@ -102,7 +102,7 @@ sfgzwrite(Sfio_t* fp, const Void_t* buf, size_t size, Sfdisc_t* dp)
 {
 	register Sfgzip_t*	gz = (Sfgzip_t*)dp;
 
-	return (gzwrite(gz->gz, (void*)buf, size) == size) ? size : -1;
+	return gzwrite(gz->gz, (void*)buf, size);
 }
 
 /*

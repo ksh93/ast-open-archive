@@ -1443,7 +1443,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				a = (char*)b + arg[0].begin;
 				break;
 			}
-			p = scanmatch(p, &ss->action[*s], r, (char*)b, a, iflev, a > (char*)b && (c = *(a - 1)) != '"' && c != '\'' && (c != '<' || arg[0].replace != '>'));
+			p = scanmatch(p, &ss->action[*s], r, (char*)b, a, iflev, a != null && a > (char*)b && (c = *(a - 1)) != '"' && c != '\'' && (c != '<' || arg[0].replace != '>'));
 			for (c = 0; c < n; c++)
 				*(b + arg[c].end) = arg[c].replace;
 		}

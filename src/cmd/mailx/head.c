@@ -98,17 +98,16 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 			state.part.in.multi = 1;
 		else if (!*ap->type || !strchr(ap->type, '/') || cp->index == CONTENT_type && (ap->flags & PART_disposition)) {
 			ap->flags &= ~PART_disposition;
-			if (size > sizeof(ap->type))
-				size = sizeof(ap->type);
-			strncopy(ap->type, data, size);
+			if (size >= sizeof(ap->type))
+				size = sizeof(ap->type) - 1;
+			strncopy(ap->type, data, size + 1);
 			strlower(ap->type);
 			s = data + size;
 			if (!(e = strchr(s, '\n')))
 				e = s + strlen(s);
-			if ((size = (e - s)) > sizeof(ap->opts))
-				size = sizeof(ap->opts);
-			strncopy(ap->opts, s, size);
-			ap->opts[size] = 0;
+			if ((size = (e - s)) >= sizeof(ap->opts))
+				size = sizeof(ap->opts) - 1;
+			strncopy(ap->opts, s, size + 1);
 			if (!mimecmp("text/plain", data, NiL) || !mimecmp("text/enriched", data, NiL))
 				ap->flags |= PART_text;
 			else if (!mimecmp("message", data, NiL))
@@ -118,9 +117,9 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 		}
 		break;
 	case CONTENT_encoding:
-		if (size > sizeof(ap->code))
-			size = sizeof(ap->code);
-		strncopy(ap->code, data, size);
+		if (size >= sizeof(ap->code))
+			size = sizeof(ap->code) - 1;
+		strncopy(ap->code, data, size + 1);
 		strlower(ap->code);
 		break;
 	case CONTENT_name:
@@ -128,9 +127,9 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 			break;
 		/*FALLTHROUGH*/
 	case CONTENT_filename:
-		if (size > sizeof(ap->name))
-			size = sizeof(ap->name);
-		strncopy(ap->name, data, size);
+		if (size >= sizeof(ap->name))
+			size = sizeof(ap->name) - 1;
+		strncopy(ap->name, data, size + 1);
 		break;
 	}
 	return 0;
@@ -277,7 +276,7 @@ attach(register struct part* ap)
 				t = ap->name;
 			}
 			else {
-				if (!isgraph(c))
+				if (isspace(c) || iscntrl(c) || !isprint(c) || c == '#' || c == '$' || c == '&' || c == '*' || c == '(' || c == ')' || c == '"' || c == '\'' || c == '`' || c == '<' || c == '>' || c == '?' || c == '[' || c == ']' || c == '{' || c == '}')
 					c = '_';
 				if (c != '_' && c != '-' || p != '_' && p != '-')
 					*t++ = c;
@@ -316,7 +315,7 @@ headline(register struct parse* pp)
 	s = pp->buf + n;
 	e = pp->buf + sizeof(pp->buf) - 1;
 	pp->count -= n;
-	if (*pp->buf != '\n' || *pp->buf != '\r' && *(pp->buf + 1) != '\n') {
+	if (*pp->buf != '\n' && (*pp->buf != '\r' || *(pp->buf + 1) != '\n')) {
 		while ((!pp->mp || pp->count > 0) && (c = fgetc(pp->fp)) != EOF) {
 			if (c == '\r' || c == '\n' || !isspace(c)) {
 				ungetc(c, pp->fp);
@@ -522,8 +521,11 @@ headget(register struct parse* pp)
 		if ((pp->flags & GMIME) && mimehead(state.part.mime, (void*)contents, elementsof(contents), sizeof(*contents), s))
 			multipart(pp);
 		else {
-			while (*s == '>')
+			i = 0;
+			while (*s == '>') {
 				s++;
+				i = 1;
+			}
 			pp->name = s;
 			for (n = 0; *s && !isspace(*s) && *s != ':'; n = *s++) {
 				if (isupper(*s)) {
@@ -535,7 +537,8 @@ headget(register struct parse* pp)
 						*s = toupper(*s);
 				}
 			}
-			separator = *(pp->separator = s);
+			if ((separator = *(pp->separator = s)) != ':' && i)
+				continue;
 			*s = 0;
 			if (!pp->ignore || !ignored(pp->ignore, pp->name) || (pp->flags & GMETOO) && streq(pp->name, "To") && ((pp->flags &= ~GMETOO), 1)) {
 				while (isspace(*++s));

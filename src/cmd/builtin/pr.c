@@ -542,7 +542,7 @@ b_pr(int argc, char **argv, void* context)
 	register Sfio_t *fp;
 	struct stat statb;
 
-	cmdinit(argv, context, ERROR_CATALOG);
+	cmdinit(argv, context, ERROR_CATALOG, 0);
 	pp = prinit();
 	for (;;)
 	{
