@@ -1,4 +1,9 @@
-01-01-01 cql: add space.cql test
+01-02-14 cql: fix bug that didn't propagate details to cdbopen()
+	 cql: add --regenerate to force index regeneration
+01-02-07 cql.tst: add -l to TEST 19,20
+01-01-01 cql: the field default CDB_SPACE now strips leading/trailing spaces
+	 cql: add SCHEMA.details="nospace" to inhibit field space stripping
+	 cql: add space.cql test
 00-12-12 cql: fix 0 pointer deref in commit()
 00-09-13 cql: fix state.active repeat lookups (still should avoid generate())
 99-11-19 cql: fix cdbimage() logic and "-" workaround in main()

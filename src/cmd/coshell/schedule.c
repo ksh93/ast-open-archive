@@ -558,7 +558,7 @@ info(int op, char* file)
 		error(ERROR_SYSTEM|2, "%s: not found", file ? file : "<local host info>");
 		return(0);
 	}
-	if ((op & NEW) && (fp->flags & SF_STRING))
+	if ((op & NEW) && (sfset(fp, 0, 0) & SF_STRING))
 		op &= ~DEF;
 	while (s = sfgetr(fp, '\n', 1))
 		search(op, s, NiL, NiL);

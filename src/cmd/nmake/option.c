@@ -37,8 +37,8 @@
 
 #include <option.h>
 
-#define getopt(name)	((struct option*)hashget(opttab,(name)))
-#define putopt(name,o)	hashput(opttab,(name),(char*)(o))
+#define getoption(n)	((struct option*)hashget(opttab,(n)))
+#define putoption(n,o)	hashput(opttab,(n),(char*)(o))
 
 static const char usage1[] =
 "+"
@@ -73,7 +73,7 @@ static struct option	options[] =	/* option table			*/
 "believe",	OPT_believe,	(char*)&state.believe,		0,0,
 	"Believe the state file time of files lower than view level"
 	" \alevel-1\a. The file system time will be checked for files with"
-	" no state or files in views equal to or higher than \alevel-1\a."
+	" no state or files in views equal to or higher than \alevel\a."
 	" \alevel=0\a causes the file system time to be checked for"
 	" files on all view levels. The top view is level 0.", "level:=0",
 "byname",	OPT_byname,	0,				0,0,
@@ -92,6 +92,8 @@ static struct option	options[] =	/* option table			*/
 	"	[+error?print a diagnostic and exit]"
 	"	[+ignore?print a warning and set \b--noreadstate\b]"
 	"}",
+"cross",	OPT_cross,	(char*)&state.cross,		0,0,
+	"Don't run generated executables.", 0,
 "debug",	OPT_debug,	0,				0,0,
 	"Set the debug trace level to \alevel\a. Higher levels produce"
 	" more output.", "level",
@@ -129,7 +131,7 @@ static struct option	options[] =	/* option table			*/
 "jobs",		OPT_jobs,	(char*)&state.jobs,		0,0,
 	"Set the shell action concurrency level to \alevel\a."
 	" Level \b1\b allows dependency checking while an action is"
-	" executing; level \b0\b stops all activitiy while an action"
+	" executing; level \b0\b stops all activity while an action"
 	" is executing.", "level:=1",
 "keepgoing",	OPT_keepgoing,	(char*)&state.keepgoing,	0,0,
 	"Continue after error with sibling prerequisites.", 0,
@@ -307,7 +309,7 @@ optinit(void)
 			options[i].value = (char*)&error_info.trace;
 			break;
 		}
-		putopt(options[i].name, &options[i]);
+		putoption(options[i].name, &options[i]);
 	}
 	hashset(opttab, HASH_ALLOCATE);
 }
@@ -346,7 +348,7 @@ opentry(register int flag, int type)
 	buf[2] = 0;
 	if (!type || !state.readonly)
 		error(type ? 1 : ERROR_PANIC, "%s: unknown option flag", buf);
-	else if (!(op = getopt(buf)))
+	else if (!(op = getoption(buf)))
 	{
 		/*
 		 * unknown command line option flags to be
@@ -360,7 +362,7 @@ opentry(register int flag, int type)
 		op->status = OPT_EXTERNAL|OPT_FLAG|OPT_READONLY;
 		if ((*((unsigned char*)op->value) = type == '-') || type == '+')
 			op->status |= OPT_DEFINED;
-		op->name = putopt(0, op);
+		op->name = putoption(0, op);
 	}
 	return 0;
 }
@@ -440,7 +442,8 @@ setop(register struct option* op, register int n, char* s)
 
 	if (OPT(op->flag) != OPT(OPT_option))
 	{
-		if (state.readonly) op->status |= OPT_READONLY;
+		if (state.readonly)
+			op->status |= OPT_READONLY;
 		else if (!state.user && (op->status & OPT_READONLY))
 		{
 			struct oplist*	x;
@@ -458,37 +461,50 @@ setop(register struct option* op, register int n, char* s)
 				sfputc(internal.tmp, ' ');
 			}
 			sfprintf(internal.tmp, "%s%s", n ? null : "no", op->name);
-			if (s) sfprintf(internal.tmp, "=%s", s);
-			else if (n != 0 && n != 1) sfprintf(internal.tmp, "=%d", n);
+			if (s)
+				sfprintf(internal.tmp, "=%s", s);
+			else if (n != 0 && n != 1)
+				sfprintf(internal.tmp, "=%d", n);
 			x = newof(0, struct oplist, 1, 0);
 			x->option = strdup(sfstruse(internal.tmp));
-			if (lasthidden) lasthidden = lasthidden->next = x;
-			else hidden = lasthidden = x;
+			if (lasthidden)
+				lasthidden = lasthidden->next = x;
+			else
+				hidden = lasthidden = x;
 			return;
 		}
 	}
 	if (!(op->status & OPT_READONLY))
 	{
-		if (!state.init) op->status |= OPT_COMPILE;
-		if (state.global) op->status |= OPT_GLOBAL;
-		else op->status &= ~OPT_GLOBAL;
+		if (!state.init)
+			op->status |= OPT_COMPILE;
+		if (state.global)
+			op->status |= OPT_GLOBAL;
+		else
+			op->status &= ~OPT_GLOBAL;
 	}
 	op->status |= OPT_DEFINED;
 	message((-3, "option(%s,'%c',%d,\"%s\")", op->name, op->flag & ((1<<8) - 1), n,  s ? s : null));
 	if (op->flag & Oi)
 	{
-		if (op->flag & On) n = -n;
-		else n = !n;
+		if (op->flag & On)
+			n = -n;
+		else
+			n = !n;
 	}
-	else if (op->flag & Ob) n = n != 0;
+	else if (op->flag & Ob)
+		n = n != 0;
 	else if ((op->flag & (Os|Ov)) == Os && n && !s)
 		error(3, "-%c: option argument expected", OPT(op->flag));
-	if (!n) s = 0;
+	if (!n)
+		s = 0;
 	switch (OPT(op->flag))
 	{
 	case OPT(OPT_believe):
-		if (state.compile < COMPILED) state.believe = n;
-		else error(2, "%s: option must be set before %s", op->name, external.makeinit);
+		if (state.compile < COMPILED)
+			state.believe = n;
+		else
+			error(2, "%s: option must be set before %s", op->name, external.makeinit);
 		return;
 	case OPT(OPT_byname):
 		if (s) set(s);
@@ -548,14 +564,17 @@ setop(register struct option* op, register int n, char* s)
 		}
 		return;
 	case OPT(OPT_jobs):
-		if (n >= MAXJOBS) n = MAXJOBS - 1;
-		if (n < 1) n = 0;
+		if (n >= MAXJOBS)
+			n = MAXJOBS - 1;
+		if (n < 1)
+			n = 0;
 		state.jobs = n;
 		return;
 	case OPT(OPT_mam):
 		if (state.mam.label != null)
 		{
-			if (state.mam.label) free(state.mam.label);
+			if (state.mam.label)
+				free(state.mam.label);
 			state.mam.label = null;
 		}
 		if (state.mam.options)
@@ -593,25 +612,30 @@ setop(register struct option* op, register int n, char* s)
 			{
 				state.mam.regress = 1;
 				state.silent = 1;
-				if (!table.regress) table.regress = hashalloc(table.rule, HASH_name, "regress-paths", 0);
+				if (!table.regress)
+					table.regress = hashalloc(table.rule, HASH_name, "regress-paths", 0);
 			}
 			else if (*s == *(state.mam.type = "static") && (!*(s + 1) || !strcmp(s, state.mam.type)))
 				state.mam.statix = 1;
-			else error(3, "%s: invalid mam type: {dynamic,regress,static} expected", s);
+			else
+				error(3, "%s: invalid mam type: {dynamic,regress,static} expected", s);
 			while (s = o)
 			{
-				if (o = strchr(s, ',')) *o++ = 0;
+				if (o = strchr(s, ','))
+					*o++ = 0;
 				if (*s == 'n' && *(s + 1) == 'o')
 				{
 					s += 2;
 					n = 0;
 				}
-				else n = 1;
+				else
+					n = 1;
 				if (*s == *(u = "dontcare") && (!*(s + 1) || !strcmp(s, u)))
 					state.mam.dontcare = n;
 				else if (*s == *(u = "port") && (!*(s + 1) || !strcmp(s, u)))
 					state.mam.port = n;
-				else error(3, "%s: invalid mam option: [no]{dontcare,port} expected", s);
+				else
+					error(3, "%s: invalid mam option: [no]{dontcare,port} expected", s);
 			}
 			if (t)
 			{
@@ -635,7 +659,8 @@ setop(register struct option* op, register int n, char* s)
 							error(3, "%s: mam label expected", t);
 						t++;
 					}
-					if (!*t) t = 0;
+					if (!*t)
+						t = 0;
 				}
 			}
 			else s = null;
@@ -648,7 +673,8 @@ setop(register struct option* op, register int n, char* s)
 				state.mam.out = sfstderr;
 			else if (!(state.mam.out = sfopen(NiL, s, state.mam.parent ? "a" : "w")))
 				error(ERROR_SYSTEM|3, "%s: cannot write mam output file", s);
-			else fcntl(sffileno(state.mam.out), F_SETFD, FD_CLOEXEC);
+			else
+				fcntl(sffileno(state.mam.out), F_SETFD, FD_CLOEXEC);
 			sfset(state.mam.out, SF_LINE, 1);
 			sfprintf(internal.tmp, "%s", state.mam.type);
 			if (state.mam.dontcare)
@@ -670,29 +696,38 @@ setop(register struct option* op, register int n, char* s)
 		}
 		return;
 	case OPT(OPT_never):
-		if (state.never = n) state.exec = 0;
+		if (state.never = n)
+			state.exec = 0;
 		return;
 	case OPT(OPT_reread):
-		if (state.reread = n) state.forceread = 1;
+		if (state.reread = n)
+			state.forceread = 1;
 		return;
 	case OPT(OPT_silent):
 		if (state.silent = n)
 		{
-			if (!error_info.trace) error_info.trace = 2;
+			if (!error_info.trace)
+				error_info.trace = 2;
 		}
-		else if (error_info.trace > 0) error_info.trace = 0;
+		else
+			if (error_info.trace > 0)
+				error_info.trace = 0;
 		return;
 	case OPT(OPT_tolerance):
-		if ((state.tolerance = n) > 60) error(1, "the time comparison tolerance should probably be less than a minute");
+		if ((state.tolerance = n) > 60)
+			error(1, "the time comparison tolerance should probably be less than a minute");
 		return;
 	}
 	if (op->value)
 	{
-		if (op->flag & Ob) *((unsigned char*)op->value) = n;
+		if (op->flag & Ob)
+			*((unsigned char*)op->value) = n;
 		else if (op->flag & On)
 		{
-			if (n && (op->flag & Oa)) *((int*)op->value) |= n;
-			else *((int*)op->value) = n;
+			if (n && (op->flag & Oa))
+				*((int*)op->value) |= n;
+			else
+				*((int*)op->value) = n;
 		}
 		else if (op->flag & Os)
 		{
@@ -712,7 +747,8 @@ setop(register struct option* op, register int n, char* s)
 						{
 							/*UNDENT*/
 	n = ((*s == ',') ? ('?'|Of) : *s++) | Ob;
-	if (*s != ',') error(2, "%c: option name omitted", OPT(n));
+	if (*s != ',')
+		error(2, "%c: option name omitted", OPT(n));
 	else
 	{
 		char*		u;
@@ -768,56 +804,72 @@ setop(register struct option* op, register int n, char* s)
 		for (nop = &options[0]; nop < &options[elementsof(options)]; nop++)
 			if (OPT(nop->flag) == OPT(n))
 				break;
-		if (nop < &options[elementsof(options)]) error(2, "%s: -%c conflicts with -%c %s", s, OPT(n), OPT(OPT_byname), nop->name);
+		if (nop < &options[elementsof(options)])
+			error(2, "%s: -%c conflicts with -%c %s", s, OPT(n), OPT(OPT_byname), nop->name);
 		else
 		{
 			buf[0] = '-';
 			buf[1] = OPT(n);
 			buf[2] = 0;
-			if (nop = getopt(buf))
+			if (nop = getoption(buf))
 			{
-				putopt(0, 0);
-				if (n & On) *((int*)nop->value) = *((unsigned char*)nop->value);
-				else if (n & Os) *((char**)nop->value) = 0;
+				putoption(0, 0);
+				if (n & On)
+					*((int*)nop->value) = *((unsigned char*)nop->value);
+				else if (n & Os)
+					*((char**)nop->value) = 0;
 				nop->flag = n;
 				nop->status |= OPT_DECLARED;
-				if (v) nop->set = strdup(v);
-				nop->name = putopt(s, nop);
-				if (nop->set && (nop->status & OPT_DEFINED)) setcall(nop, 1);
+				if (v)
+					nop->set = strdup(v);
+				nop->name = putoption(s, nop);
+				if (nop->set && (nop->status & OPT_DEFINED))
+					setcall(nop, 1);
 			}
-			else if (!(nop = getopt(s)))
+			else if (!(nop = getoption(s)))
 			{
 				nop = newof(0, struct option, 1, sizeof(char*));
 				nop->value = (char*)(nop + 1);
 				nop->flag = n;
 				nop->status = OPT_EXTERNAL|OPT_DECLARED;
-				if (v) nop->set = strdup(v);
-				nop->name = putopt(0, nop);
-				if (nop->set && (nop->status & OPT_DEFINED)) setcall(nop, 1);
+				if (v)
+					nop->set = strdup(v);
+				nop->name = putoption(0, nop);
+				if (nop->set && (nop->status & OPT_DEFINED))
+					setcall(nop, 1);
 			}
-			else if (!(nop->status & OPT_EXTERNAL)) error(1, "%s is an internal option", nop->name);
+			else if (!(nop->status & OPT_EXTERNAL))
+				error(1, "%s is an internal option", nop->name);
 			else
 			{
 				if (OPT(nop->flag) == '?')
 				{
 					if ((n & (Ob|On|Os)) != (nop->flag & (Ob|On|Os)))
 					{
-						if (n & Os) *((char**)nop->value) = 0;
-						else if ((n & On) && (nop->flag & Ob)) *((int*)nop->value) = *((unsigned char*)nop->value);
-						else if ((n & Ob) && (nop->flag & On)) *((unsigned char*)nop->value) = *((int*)nop->value) != 0;
+						if (n & Os)
+							*((char**)nop->value) = 0;
+						else if ((n & On) && (nop->flag & Ob))
+							*((int*)nop->value) = *((unsigned char*)nop->value);
+						else if ((n & Ob) && (nop->flag & On))
+							*((unsigned char*)nop->value) = *((int*)nop->value) != 0;
 					}
 					nop->flag = n;
 				}
-				else if (OPT(nop->flag) != OPT(n)) error(1, "%s: option flag -%c conflicts with -%c", nop->name, OPT(n), OPT(nop->flag));
-				if (!(nop->status & OPT_DECLARED)) nop->status |= OPT_DECLARED;
-				else if ((nop->flag & (Ob|On|Os)) != (n & (Ob|On|Os))) error(1, "%s: option is %s", nop->name, (nop->flag & Ob) ? "boolean" : (nop->flag & On) ? "numeric" : "string valued");
+				else if (OPT(nop->flag) != OPT(n))
+					error(1, "%s: option flag -%c conflicts with -%c", nop->name, OPT(n), OPT(nop->flag));
+				if (!(nop->status & OPT_DECLARED))
+					nop->status |= OPT_DECLARED;
+				else if ((nop->flag & (Ob|On|Os)) != (n & (Ob|On|Os)))
+					error(1, "%s: option is %s", nop->name, (nop->flag & Ob) ? "boolean" : (nop->flag & On) ? "numeric" : "string valued");
 			}
 		}
-		if (u) *u = ',';
+		if (u)
+			*u = ',';
 	}
 							/*INDENT*/
 						}
-						if (!t) break;
+						if (!t)
+							break;
 						*t++ = ':';
 						s = t;
 					}
@@ -1020,7 +1072,7 @@ getop(register Sfio_t* sp, char* name, int setting)
 	register struct option*	op;
 	int			flag = 0;
 
-	if ((op = getopt(name)) || name[0] && !name[1] && (op = opentry(name[0], '=')) && (flag = 1))
+	if ((op = getoption(name)) || name[0] && !name[1] && (op = opentry(name[0], '=')) && (flag = 1))
 		genop(sp, op, setting, flag);
 }
 
@@ -1068,7 +1120,7 @@ set(register char* s)
 				s++;
 			continue;
 		}
-		if (!(op = getopt(t)))
+		if (!(op = getoption(t)))
 		{
 			if (*t == '?')
 				help(b);
@@ -1083,7 +1135,7 @@ set(register char* s)
 				op->value = (char*)(op + 1);
 				op->flag = '?'|(istype(c, C_OPTVAL) ? isdigit(*(s + 1)) ? On : Os : Ob);
 				op->status = OPT_EXTERNAL|OPT_READONLY;
-				op->name = putopt(0, op);
+				op->name = putoption(0, op);
 			}
 			else
 			{
@@ -1180,6 +1232,8 @@ set(register char* s)
 			{
 				c = *s;
 				*s = 0;
+				if (!(op->flag & Os))
+					t = 0;
 				setop(op, n, t);
 				*s = c;
 			}

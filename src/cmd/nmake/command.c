@@ -637,7 +637,7 @@ execute(register struct joblist* job)
 				fcntl(internal.openfd, F_SETFD, 0);
 			sp = sfstropen();
 			sfprintf(sp, "label=%s", idname);
-			if (!(state.coshell = coopen(NiL, CO_ANY, sfstruse(sp))))
+			if (!(state.coshell = coopen(NiL, state.cross ? (CO_ANY|CO_CROSS) : CO_ANY, sfstruse(sp))))
 				error(ERROR_SYSTEM|3, "coshell open error");
 			sfstrclose(sp);
 		}
@@ -649,13 +649,13 @@ execute(register struct joblist* job)
 			if (job->target->property & P_read)
 			{
 				if (!dot)
-					dot = pathtmp(NiL, null, idname, NiL);
+					dot = pathtemp(NiL, 0, null, idname, NiL);
 				state.tmpfile = dot;
 			}
 			else
 			{
 				if (!tmp)
-					tmp = pathtmp(NiL, NiL, idname, NiL);
+					tmp = pathtemp(NiL, 0, NiL, idname, NiL);
 				state.tmpfile = tmp;
 			}
 		}
@@ -863,7 +863,7 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 						job->flags |= CO_ERRORS;
 						goto another;
 					case MAKING:
-						if (!jammed && (a->mark & M_waiting))
+						if (!jammed && (a->mark & M_waiting) && !(a->property & P_archive))
 						{
 							waiting = a;
 							continue;
@@ -931,6 +931,7 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 						{
 							jammed = 0;
 							job->status = READY;
+							state.jobs++;
 							goto unjam;
 						}
 				}

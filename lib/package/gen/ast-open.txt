@@ -22,7 +22,7 @@ Source Package Installation Instructions:
 		mkdir bin
 		cp lib/package/tgz/ratz.YYYY-MM-DD.0000.c lib/package/tgz/ratz.c
 		cc -o bin/ratz lib/package/tgz/ratz.c
-		bin/ratz -lv < lib/package/tgz/INIT.YYYY-MM-DD.0000.tgz
+		bin/ratz -lm < lib/package/tgz/INIT.YYYY-MM-DD.0000.tgz
   (5) Read all unread package archive(s):
 		bin/package read
       Both source and binary packages will be read by this step.
@@ -66,6 +66,147 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
+01-06-18  --- Release ksh93l  ---
+01-06-18  A bug in assigning integers larger than can be represented as
+	  long integers to floating point variables has been fixed.
+01-06-18  A bug in the handling of unsigned integers (typeset -ui) has
+	  been fixed.
+01-06-04  The evaluation of the PS1 prompt no longer effects the value
+	  of the $? variable.
+01-06-01  A small memory leak from subshells has been fixed.
+01-05-22  A bug in which attributes for variables that did not have
+	  values would be lost after a subshell has been fixed.
+01-05-22  The %R format has been added to convert a shell pattern into
+	  an extended regular expression.
+01-05-22  The escape sequences \e, \cX, \C[.collating-element.], and
+	  \x{hex} have been added to ASCII-C strings and to printf format
+	  strings.
+01-05-20  Patterns of the form {n}(pattern) and {m,n}(pattern) are now
+	  recognized.  The first form matches exactly n of pattern whereas,
+	  the second form matches from m to n instances of pattern.
+01-05-20  The shell allows *-(pattern), +-(pattern),  ?-(pattern),
+	  {m,n}-(pattern}, and @-(pattern) to cause the minimal
+	  match of pattern to be selected whenever possible rather
+	  than the maximal (greedy) match. 
+01-05-20  The character class [:word:] has been added to patterns.
+	  The word class is the union of [:alnum:] and the character _.
+01-05-20  Inside (...) pattern groups, the \ character is now treated
+	  specially even when in an enclosing character class.  The
+	  sequences, \w, \d, \s are equivalent to the character classes
+	  word, digit, and space respectively.  The sequences \W, \D,
+	  and \S are their complement sets. 
+01-05-20  The shell now recognizes pattern groups of the form
+	  ~(options:pattern) where options or :pattern can be omitted.
+	  Options use the letters + and - to enable and disable options
+	  respectively.  The option letters g (greedy), i (ignore case)
+	  are used to cause maximal matching and to cause case
+	  insensitive matching respectively.  If :pattern is also
+	  specified, these options are only in effect while this
+	  pattern is being processed.  Otherwise, these options remain
+	  in effect until the end of the pattern group that they are contained
+	  in or until another ~(...) is encountered.  These pattern groups
+	  are not counted with respect to group numbering.
+01-05-14  When edit completion, expansion, or listing occurs in the
+	  middle of a quoted string, the leading quote is ignored when
+	  performing the completion, expansion, or listing.
+01-05-14  A small memory leak from subshells has been fixed.
+01-05-10  A bug in which open files were not restored after a subshell
+	  that had used exec to replace a file has been fixed. 
+01-05-10  Redirection to a null file name now generates an error message. 
+01-05-09  The shell now rejects some invalid parameter substitutions that
+	  were previously processed in undefined ways.
+01-05-09  A bug in which the output of select was not flushed before the
+	  read when input did not come from the terminal has been fixed. 
+01-05-08  A bug in which job ids would not be freed for interactive shells
+	  when subshells ran built-ins in the background has been fixed.
+01-05-08  The FPATH variable now requires an explicit . to cause the
+	  current directory to be treated as a function directory. 
+01-05-08  A bug in read -n when echo mode was disabled has been fixed.
+01-05-07  A bug in which function definitions could be listed as part
+	  of the history has been fixed.
+01-04-30  This release uses a new and often much faster pattern matcher than
+	  earlier releases.
+01-04-30  An optimizer now eliminates invariant parameter expansions from
+	  for while and until loops.
+01-04-30  The variable .sh.match is set after each pattern match (# % or /)
+	  in a variable substitution.  The variable .sh.match is an
+	  indexed array with element 0 being the complete match. 
+	  The array is only valid until the next subsequent pattern
+	  match or until the value of the variable changes which ever
+	  comes first.
+01-04-30  A self generating man page has been added to shcomp.  Also,
+	  shcomp now stops compiling when it finds an exit or exec
+	  command and copies the remainder so that it can be used
+	  for standard input.
+01-04-30  The shcomp command was modified so that it can work in an
+	  EBCIDIC environment and that binary scripts are portable
+	  across environments.
+01-04-30  A bug in the handling of a trailing : in PATH has been fixed.
+01-04-30  A bug in which the builtin version of a command would get invoked
+	  even though the full pathname for the command was specified
+	  has been fixed.
+01-04-30  A bug in which read would loose the last character when
+	  reading the last line of a file that did not contain a new-line
+	  character has been fixed.
+01-04-23  A bug on some systems in which in vi mode the end of file
+	  character and end of line character could be swapped has
+	  been fixed.
+01-04-23  A bug on some systems in which invoking a shell script that
+	  did not have execute permission could set the exit value to
+	  127 rather than 126 has been fixed.
+01-04-20  A bug in which read -n from a pipe would block if fewer than
+	  n characters was received has been fixed.
+01-04-09  A bug in which invalid patterns, for example, ) by itself,
+	  was not treated as a string has been fixed so that if i=')',
+	  then [[ $i == $i ]] is true.
+01-04-09  The shell arithmetic now interprets C character constants.
+01-04-09  A bug in which a non-zero return from a function defined
+	  with the function reserved word did not trigger the ERR
+	  trap or exit with set -e has been fixed.
+01-04-02  A bug on some systems, in which characters above 127 were
+	  not displayed correctly in vi or emacs edit mode has been fixed.
+01-04-02  A bug on some systems, introduced in the 'k' point release, in
+	  which the erase character in viraw mode was moving the cursor
+	  to the left without erasing the character has been fixed.
+01-04-02  On some systems the wcwith() function was returning a wrong
+	  value for characters and caused characters to be displayed
+	  incorrectly from the shell edit modes.  A work around for
+	  this problem has been added. 
+01-03-26  A bug in which valid scripts could produce syntax errors
+	  when run with locales that considered characters such as "'"
+	  to be space characters has been fixed.
+01-03-20  A bug in which an syntax error in an arithmetic expression
+	  entered interactively could cause the shell to go into
+	  an infinite loop outputting the error message has been fixed.
+01-03-10  ksh93 accepts -l as a synonym for -L in test on systems for
+	  which /bin/test -l tests for symbolic links.
+01-03-10  A bug in parsing scripts in which { and } are used in place of
+	  in and esac in case statements embedded in compound commands
+	  has been fixed.  Use of { and } for in and esac is obsolete.
+01-03-06  A bug in which an argument of the form foo=bar was not
+	  being passed correctly to a traced function whose name
+	  was foo has been fixed.
+01-03-02  Using $(trap -p name) did not print the name of the current
+	  trap setting for trap name.
+01-02-26  Exported floating point variables gave incorrect results
+	  when passing them to ksh88.  This has been fixed.
+01-02-25  A race condition in which a coprocess which completed too quickly
+	  would not allow subsequent coprocesses to start has been fixed.
+01-02-25  The 'g' format specifier is now handled by printf.  It had
+	  inadvertently been omitted.
+01-02-20  The + was not being displayed during an execution trace
+	  with the += assignment operator.
+01-02-19  The error message which occurs when the interpreter name
+	  defined on the #! line does not exist is more informative.
+01-02-19  A bug in which $0 would not be set correctly when a
+	  script with #! was invoked by full pathname from the
+	  directory of the script has been fixed.
+01-02-19  A shell script did not always pick up tty mode changes
+	  made by external commands such as stty which could
+	  effect the behavior of read.
+01-02-19  The -u, -g, and -k unary tests did not give the correct
+	  results when used with negation and this has been fixed.
+
 01-02-05  --- Release ksh93k+  ---
 01-02-05  The sequence \<newline> inside $'...' was not incrementing
 	  the line count and this has been fixed.
@@ -75,7 +216,7 @@ All recorded changes follow.
 01-01-25  allow arithmetic expressions with float%int and treat them
 	  as ((int)float)%int rather than as an error. 
 01-01-19  read -n1 was not working and has been fixed.
-01-01-17  ksh now handes the case in which a here document in command
+01-01-17  ksh now handles the case in which a here document in command
 	  substitution $() is terminated by the trailing ).  Previously,
 	  a new-line was needed at the end of the delimiter word. 
 01-01-02  A bug in which a KEYBD trap would cause a multi-line token
@@ -604,6 +745,12 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+01-04-24 pax: --from & --to now associated with archive instead of global state
+01-04-17 pax: --from conversion only done if no control chars in first 256
+01-04-01 pax: fix --intermediate to create missing dirs first
+01-02-27 pax: add lchmod() and lchown() for symlink() restoration
+01-02-08 pax.tst: add -L and -P to symlink edit test
+01-02-07 format.c: fix malloc off-by-one for vdb format read
 01-02-02 file.c: fix duplicate -s map in addlink()
 00-12-20 bio.c: include <sys/ioctl.h> for systems that miss _IOW() etc.
 00-10-31 format.c: handle rpm 4.0 and newer
@@ -808,6 +955,14 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+01-05-09 mm2html: ignore a few more requests
+01-05-04 mm2html: more tbl adjustments from Bruce Lilly
+01-05-02 mm2html: tweak tbl column spacing, handle .TH [N]
+01-05-01 mm2html: tbl fixes
+01-04-27 mm2html: fix .SH,.SH indentation; ignore { .nh .hc .hy }
+01-03-22 mm2html,troff2html: ignore { .hw .lw }
+01-03-01 troff2html: fix bug that treated \*(]? as \*]?
+01-02-28 troff2html: add \n(YR and fix macros for y2k -- oops
 01-01-31 htmlrefs: fix nul char bug in <!--INTERNAL--> filter
 01-01-01 mm2html: fix incorrect \h'... #local refs
 	 mm2html: append <!--LABELS-->...<!--/LABELS--> for second pass
@@ -854,6 +1009,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+01-04-01 proto: preserve file mode for -r
 01-02-06 proto.tst: add (finally)
 99-11-19 add --license, --shell, --copy, --verbose
 99-08-11 long options
@@ -865,6 +1021,8 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+01-03-26 test.strtoi,test.strtof: add
+01-02-14 sfio: add tmpread
 01-01-31 sfio: uniform test exit codes
 01-01-01 opt.tst: add enumerated option argument values
 00-12-11 date.dat: add a few more crontab(1) forms
@@ -887,6 +1045,8 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+01-02-19 close3d: dup reserved fd's higher
+01-02-14 add :VARIANT: to build dll's for CC.DLL.VARIANTS
 01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
 00-12-14 3d.sh: fix -c
 00-10-31 ast.c add pathtemp.c
@@ -1061,6 +1221,8 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+01-06-01 cpp.tst: add -M* dependency generation tests
+01-02-14 cpp.tst: pp:pragmaexpand pp:catliteral # operator interactions
 01-02-05 cpp.tst: add (finally)
 96-01-31 --- release 2.0 ---
 92-04-01 update for new libpp
@@ -1101,14 +1263,56 @@ All recorded changes follow.
 
 :::::::: msgcc ::::::::
 
+01-06-10 msgcpp: add proper escapes to OMIT pattern
+01-05-29 msgcc: add similar unused message replacement, -M-similar
+01-04-22 msgcc,msggen,msgget: use mcindex()
 01-01-31 ignore ls generation errors
 00-04-20 first release
 
 :::::::: nmake ::::::::
 
+01-05-31 Makerules.mk: add option rhs to :DLL:
+	 Makerules.mk: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
+	 Makerules.mk: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
+	 make.probe: add CC.EXECTYPE
+	 make.probe: fix { ld nm size strip } search
+	 make.probe: adjust probe_shared order for linux.arm gcc
+	 option.c: add --cross to not run generated executables
+01-05-30 make.probe: add CC.NATIVE
+01-05-28 make.probe: add CC.STRIP and CC.STRIP.FLAGS
+	 Makerules.mk: add PACKAGESTRIP check for .LIST.PACKAGE.BINARY
+01-05-26 expand.c: add :T=Y: for mime type
+01-05-09 --- release 4.2 ---
+	 make.h: isdynamic,isglob,isstatevar: functions to factor out strmatch()
+	 expand.c: add T=XQ[S[AV]|V[I]] to factor out strmatch() in base rules
+	 rule.c: speed up associate() by factoring out attributes
+01-05-01 expand.c: order() now handles :PACKAGE: foo:command
+01-04-26 Makerules.mk: null out cctype and .CC.PROBE. for --base
+	 Makerules.mk: fix .REQ. bug that missed :LIBRARY: targets
+01-04-25 Makerules.mk: add variants=pattern to select cc- variants
+	 Makerules.mk: add .VARIANTS alias for .CC-
+	 option.c: fix bug that omitted readonly option values in .mo
+01-04-24 Makerules.mk: :DLL: sets VARIANT=DLL
+01-04-18 object.c: fix CC_NATIVE!=CC_ASCII buffer overflow
+	 make.probe,makerules: mvs.390 adjustments for CC.LIB.DLL=symbol
+01-04-01 scan.c: fix * scan match bug that gave up too soon
+01-03-08 printext: handle %*C
+01-02-26 makerules: CC.SUFFIX.STATIC get .ARCHIVE attribute
+	 makerules: add .NO.ARPROFILE to defer to dll prereqs for dll target
+	 pkg-X11.mk: check libXmu.sa for openwin
+01-02-14 make.probe,makerules: add CC.DLL.LIBRARIES, CC.DLL.ALTERNATES
+	 make.probe: linux needs CC.DLL.LIBRARIES=-lc for binary compatibility
+	 probe.win32: change to CC.STATIC=-Bstatic, dynamic is now the default
+	 makerules: drop .SCAN.IGNORE for .DO.INSTALL.DIR
+	 makerules: fix .SHARED.BIND. to pull in dynamic refs
+	 makerules: change .OFFICIAL diff style to -u
+	 mam: add `bind -lX [dontcare]' to simplify library binding
+	 command.c: fix job deadlock bug that used archive before it built
+01-02-07 Scanrules.mk: add .cxx for C++
 01-02-02 makerules: bias package search to viewpath and make installroot
 	 makerules: *.req can be down the view
-01-01-01 expand: fix :D: to preserve leading / -- how long has this been wrong?
+01-01-01 --- release 4.1 ---
+	 expand: fix :D: to preserve leading / -- how long has this been wrong?
 	 makerules: fix .PACKAGE.INIT. for dir == /
 	 makerules: $(PACKAGE_PATH) is list of default package root dirs
 	 makerules: add recurse=list to list recursion order and exit
@@ -1712,6 +1916,9 @@ All recorded changes follow.
 
 :::::::: at ::::::::
 
+01-06-18 crontab: clarify the command<=>job relationship
+01-03-28 atd: fix log file rollover infinite loop
+01-02-14 atd: monitor daemon and restart if it dies
 01-01-01 atd: add actual and expected info to atx log messages
 00-09-28 crontab: update USAGE
 00-06-16 atd,atx: use base 36 instead of 64 in job names (now just lower case)
@@ -1740,6 +1947,13 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+01-06-06 who.c: fix entry skip logic that listed too many entries
+01-05-31 Makefile: add PACKAGE_OPTIMIZE=space checks
+01-05-29 Makefile: if -lcmd is dll then BUILTINS linked to one a.out
+01-05-21 tr: regcollate() interface update
+01-04-17 date.tst: move from std
+01-04-01 uudecode: fix -o decode-file and add regression test
+01-03-39 uudecode: add --local for UU_LOCAL
 00-12-04 look: add
 00-12-01 what: add RCS ident(1) $Id:
 00-04-01 uuencode: umask 022 for consistent header comparisons
@@ -1793,7 +2007,12 @@ All recorded changes follow.
 
 :::::::: cql ::::::::
 
-01-01-01 cql: add space.cql test
+01-02-14 cql: fix bug that didn't propagate details to cdbopen()
+	 cql: add --regenerate to force index regeneration
+01-02-07 cql.tst: add -l to TEST 19,20
+01-01-01 cql: the field default CDB_SPACE now strips leading/trailing spaces
+	 cql: add SCHEMA.details="nospace" to inhibit field space stripping
+	 cql: add space.cql test
 00-12-12 cql: fix 0 pointer deref in commit()
 00-09-13 cql: fix state.active repeat lookups (still should avoid generate())
 99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
@@ -1877,6 +2096,10 @@ All recorded changes follow.
 92-09-01 add virtual db
 
 :::::::: diff ::::::::
+
+Thu Apr 19 14:27:41 2001  Glenn Fowler <gsf@research.att.com>
+
+	* diff,diff3,sdiff : use negative indices to avoid non-ascii case dups
 
 Wed Jul 19 16:01:22 2000  Glenn Fowler <gsf@research.att.com>
 
@@ -3651,6 +3874,7 @@ End:
 
 :::::::: ie ::::::::
 
+01-04-25 vi.c: handle implementations with VEOL but not VEOL2
 00-02-14 ie: ie.sh script replaces ie fun
 	 ie: convert configure/* => features(ielib|options.sh)
 99-11-19 Makefile: fix sh_config.h for 2d -- eventually should use iffe
@@ -3659,6 +3883,8 @@ End:
 
 :::::::: mailx ::::::::
 
+01-04-01 add state.var.hostname for smtp HELO
+	 add fmtident() to initialize state.version 
 01-01-01 fix map bug that retained alias after expansion
 	 smtp: add domain to RCPT TO: if omitted
 00-11-27 add Date: and From: to smtp
@@ -3793,6 +4019,14 @@ End:
 
 :::::::: re ::::::::
 
+01-06-11 testre: handle embedded \0 in subject string, add \0 tests
+01-05-24 testre: add (?{...}) test support
+01-05-22 testre: add regsub() tests, testsub.dat
+01-05-16 regex.h update
+	 test*.c,*.dat: update for sensible test \\c expansion
+01-04-18 testglob.dat: add no metachar tests
+01-03-19 testglob: add
+01-03-08 testre,testmatch: update for I18N and strgrpmatch() regex wrapper
 99-12-12 sed: delay peek for .==$
 99-08-11 grep: don't complain about EISDIR read error
 	 ed: usage to stderr
@@ -3867,6 +4101,8 @@ End:
 
 :::::::: sort ::::::::
 
+01-04-19 sort.tst: add -s tests
+00-03-09 main.c: fix infomation typo
 00-12-25 main.c: close input before final overwrite ops
 00-08-31 main.c: add -zcCHUNK to sort in chunks with merge disabled
 99-11-19 main.c: use rskeylist() for method usage
@@ -3893,6 +4129,27 @@ End:
 
 :::::::: std ::::::::
 
+01-06-08 ps: option `-' is optional for ancient compatibility
+01-06-06 ls: drop octets for bytes -- yay
+01-05-25 locale: -m runs local locale until the standard comes to its senses
+	 locale: add --element to list collation element weights
+01-04-20 df: --man now says --scale is the CONFORMANCE!=standard default
+01-04-17 date,rm: move to -lcmd
+01-04-01 locale: fix LC_ALL listing
+01-03-23 tsort: fix typo that goofed up $'b c\na c\na b'
+01-03-22 ps: %(ntpid)d takes precedence over hex attribute
+01-03-17 date: update --man for tmfmt() changes
+	 locale: add with regression test
+01-03-09 df: fix cannot stat filesystem typo
+01-03-05 ls: add --dump to dump generated --format string
+01-03-01 ps: fix iffe logic that disabled too much for /proc synthesis
+	 ps: fix -T -p that missed some children
+	 ps: fix -x to include session leaders
+01-02-14 ps: disable some iffe results for synthesized /proc structs
+	 ps: use sfstrbase() and sfstrsize() instead of member names
+	 mount: define NGROUPS for freebsd -- how does <sys/ucred.h> make it?
+	 df: add scaled sizes, no sync(2) unless -s,--sync
+	 df: add statvfs() timeout for good ol NFS
 01-01-31 ls: handle --sort=size
 01-01-01 ps: change (-x,--hex)=>(-X,--hex), add (-x,--detached)
 	 ls: really ignore --tabs, add --quote-style --scale, --thousands
@@ -4044,6 +4301,7 @@ End:
 
 :::::::: tw ::::::::
 
+01-05-02 tw: fix -a to use CMD_POST instead of CMD_INSERT
 01-02-06 tw,find: move --local test fslocal()
 01-01-01 find: fix -newer -anewer -cnewer -perm
 00-11-14 updatedb: add --dir-format (it was already the default)
@@ -4113,6 +4371,88 @@ End:
 
 :::::::: libast ::::::::
 
+01-06-15 string/chresc: only 2 hex digits max for \xxx
+	 regex/regsub: handle REG_SHELL ~(nnn) rhs backrefs
+01-06-11 regex: handle embedded \0 in pattern and subject string
+	 regex: add (?nnn) for backrefs > 9
+	 comp/fnmatch: add FNM_LEADING_DIR for gnu compatibility
+	 features/float: _ast_flt_unsigned_max_t for bsd.i386 omission
+01-06-06 misc/optget.c: add o option for old ps,ar,tar with optional leading -
+	 regex/regcomp.c: REG_LENIENT|REG_DELIMITED \<newline> => <newline>
+	 regex/regcomp.c: REG_LENIENT \000 => NUL
+01-06-04 features/dirent: replace Makefile hack with iffe semi-hack
+	 regex/regnexec.c: negation must also check REG_SHELL_DOT
+01-06-03 sprintf.c: change buf size from SF_BUFSIZE to INT_MAX
+01-05-31 glob: fix gl_fignore to ignore leading . by default
+	 features/lib: add botch_d_ino_dirent64 for linux botch
+01-05-25 port/lc.tab: add a few missing language_territory's
+01-05-23 string/chresc: \C[.collation-element.]
+	 fmtmatch,fmtre: update for <regex.h> syntax extensions
+01-05-21 regex: add perl extensions, unicode names for collation elements
+01-05-11 string/chresc: \e == \E == escape, \cX == control X, \x{..} == \x..
+01-05-09 path/pathtemp.c: pathtemp(0,0,0,"/private",0) for mode S_IRUSR|S_IWUSR
+	 port/touch.c: handle utime(2) EPERM to fix bug that truncated
+	 regex: change REG_MINIMAL to avoid negation -- much faster now
+01-05-08 *.h: add some off_t macro guards for suse linux
+01-05-03 regcomp.c: optimize ((x)!)* to ((x)!)
+	 wchar: add <wchar.h> and stdio wchar routines
+01-05-02 feaures/wchar: add <wchar.h> intercept, add stdio wchar functions
+01-05-01 string/strtoi.h: signed strtoi accepts qualified unsigned constants
+01-04-30 comp/setlocale.c: fix code that relied on 2 simultaneous getenv()'s
+	 tm/tmlocale.c: check for UTF-8 encoded LC_TIME files
+	 misc/magic.tab: add utf-8 and utf-16 U+FEFF magic
+01-04-26 features/common: some cc's have _ast_int8_t but not LL constants
+01-04-24 features/lib: add _std_strtod for mac os X
+01-04-23 ccode: add CC_sub for ms embedded EOF char on ebcdic -- no joke
+01-04-20 iconv: handle ebcdic<=>utf
+	 mc.h,mc.c: add mcindex()
+	 ast_std.h: add AST_MESSAGE_SET
+01-04-18 features/libpath.sh: fix mvs probe
+	 *: sundry mvs fixes
+	 glob: fix GLOB_NOCHECK to avoid stat() and properly trim patterns
+01-04-01 strtod,strtold: add
+	 strtol,strtoul,strtoll,strtoull,strton,strtonl: handle locale & ERANGE
+	 sfvprintf,sfvscanf: handle locale decimal_point,thousands_sep
+	 sfvprintf,sfvscanf: handle %a,%A
+	 setlocale: add LC_NUMERIC decimal_point,thousands_sep init
+	 ast_std.h: __OPTIMIZE_SIZE__==1 to disable non-std __GNUC__ inlines
+	 pathexists: path cache to cut down pathpath() access(2) calls
+	 features/stdio: __FILE_TAG == _sfio_s for solaris
+01-03-23 iconv: fix iconv_move buffer boundary bug that stopped at 1 block
+01-03-19 glob: add GLOB_AUGMENTED
+	 regex: REG_SHELL syntax error implies REG_LITERAL match
+	 strto[ln][ll]: add overflow checks
+01-03-17 locale: reimplemented to provide canonical locale namespace
+	 locale: add LC_ALL=local for local system user default
+	 tm.h: TM_*_3 => TM_*_ABBREV
+	 tmfmt: handle standard E and O format modifiers
+	 tmlocale: consult nl_langinfo() if defined
+	 fmtquote("\"",1) => shell quote
+01-03-08 regex: handle multibyte chars and collation classes
+	 strmatch,strgrpmatch: now a wrapper on regex
+	 ast_std.h: add mb*() multibyte and collation support
+	 sfvscanf: handle locale decimal and thousand
+	 proc*,system: handle ignored SIGCHLD
+	 sfkeyprintf: handle %*C
+01-03-06 locale: add locale data cache for efficient multiple locale switching
+	 optget: fix LC_MESSAGES!=C --man bug
+01-03-01 Makefile: HEADEROPT is not optional for win32.*
+	 comp/syslog.h: comply with the de factos
+	 optget(): fix \f...\f stack bug that referenced data after pop
+01-02-27 *locale*: a batch of fixes for native LC_MESSAGE&LC_TIME hooks
+01-02-22 pathprobe: reprobe test now checks probe.ini too
+	 sfio_s.h: advertize public Sfio_t members with _ prefix
+	 sfio.h,features/stdio: add <sfio_s.h> reference
+	 sfhdr.h: map <sfio_s.h> _foo to foo
+	 sfio.h: SF_APPEND=>SF_APPENDWR, SF_CLOSE=>SF_CLOSING
+01-02-14 comp/conf.sh: probe <unistd.h> for _(CS|PC|SC)_* getconf symbols
+	 stdio/*: update for uwin stdio.dll binary compatibility
+	 sfread: finally fixed premature pipe read EOF bug
+	 fmtscale: format tenths for number > 0 && number < 10
+01-02-09 _sfmode(),_sftype(),_Sfextern: UWIN binary stdio compatibility exports
+01-02-08 sfgetm,sfputm,_sfputm: fix max clash with k&r max() macro
+	 setlocale: undef valid for sun4 k&r valid() macro
+01-02-07 catopen.c: don't do native catopen for the debug locale
 01-02-06 sfraise.c: add SF_FINAL check to avoid (posibly) freed disciplines
 01-01-01 features/common: fix uwin __DEFINE__
 	 sftable: initialize decimal and thousand
@@ -4711,6 +5051,12 @@ End:
 
 :::::::: libcmd ::::::::
 
+01-05-31 date: fix /bin/date fallback logic
+	 stty: fix a few mismatched flags, -a and -g option logic
+	 stty: tone down sane to modify current settings rather than from zero
+01-05-01 uname: -i => -h, add sol.sun4 -i, add sgi -R, punt to /usr/bin/uname
+01-04-17 date,rm: add
+01-03-07 cp: fix readonly string mod on "."
 01-01-23 cp: `cp foo' => `cp foo .' only for CONFORMANCE!=standard
 00-12-01 cut: multibyte support
 00-10-31 mkdir: handle races by checking EEXIST
@@ -4799,6 +5145,9 @@ End:
 
 :::::::: libdll ::::::::
 
+01-05-29 dlopen: fix dlopen(0,0) for HP
+01-04-20 dllfind: use getconf HOSTTYPE LIBPATH LIBSUFFIX
+01-02-14 features/dll: fix unbalanced ' quote and ancient hostinfo reference
 00-01-26 dlllook: add -- dlsym() with `_' weak prefix fallback
 99-04-01 features/dll: drop <stdio.h> -- iffe protos printf
 99-03-19 static=1 for all but win32.*
@@ -4880,6 +5229,8 @@ End:
 
 :::::::: libuu ::::::::
 
+01-03-27 uulib: add UU_LOCAL for local path conversion
+00-03-06 uulib: !UU_HEADER decode checks for candidate encodings
 00-03-04 uulib: add posix decode size check
 98-12-25 uu_encode: fix dp->fill usage
 98-11-11 uulib: add binhex encode
@@ -4908,6 +5259,8 @@ End:
 
 :::::::: libcoshell ::::::::
 
+01-05-31 co*: add CO_CROSS, expose CO_DEVFD
+01-04-23 coquote: add state.type to avoid getenv() overwrite on some systems
 01-01-01 cokill: killjob => cokilljob, killshell => cokillshell
 00-12-18 coinit: CO_OSH ? "${!-$$}" : "${!:-$$}"
 00-10-25 codata: $ZSH_VERSION is not ksh
@@ -4918,6 +5271,8 @@ End:
 
 :::::::: libcs ::::::::
 
+01-05-11 csserve: sync cs.* with css->*
+	 csspoll: handl cspoll() EINTR that doesn't set cs.interrupt
 01-01-01 cspoll: fix getmsg() flag arg
 	 csaddr: fix local host addr initialization
 00-06-01 csopen: handle dynamic ip assignment underfoot
@@ -4986,10 +5341,27 @@ End:
 
 :::::::: libpp ::::::::
 
+01-06-06 ppsearch.c: list PP_FILEDEPS headers once
+01-06-01 pp.h,ppop.c,ppsearch.c: allow multiple PP_FILEDEPS (-M)
+01-05-24 pp.probe: fix pp:hostedtransition probe: only suncc can __STDC__==1?
+01-04-25 pp.probe: split macro probe files for compilers that have #line limits
+01-04-19 pp.h,pplex.c,ppproto.c: fix { \a \E \v } EBCDIC translations
+01-04-16 pp.tab: add pp:splicespace for mvs jcl decks -- the 60's live on
+01-04-13 ppbuiltin: add __FUNCTION__ cache for functions that span the buffer
+01-03-08 pp.tab,ppbuiltin,ppcontrol,probe: add pp:hostedtransition
+01-02-22 pp.tab,ppfsm,pplex,pp.probe,probe.win32: add pp:zeof for ^Z => EOF
+01-02-14 ppcall.c: fix macro(tuple*) bug that truncated macro arg expand buffer
+	 pplex.c: fix # inside pp:pragmaexpand
+	 gentab.sh: change ksh test for openbsd /bin/sh
+	 ppproto.c: fix buffer boundary bug that lost call nesting
+	 ppproto.c: add realloc prototype and memcpy=>memcopy strcpy=>strcopy
+01-02-09 ppsearch.c: fix another pp.include null dereference
+01-02-07 ppcall.c: fix stack inequality checks 
+	 ppcall.c: handle trailing \ in macro args
 01-02-06 fix readonly buffer write (cpp test 07:2873)
 01-02-04 fix -M* to properly handle .cxx .cpp .C input
 	 fix IN_BUFFER pop bug that did not reset the token pointer
-01-01-01 pp:headerexpand: space ok if no IN_MACRO
+01-01-01 pp:headerexpand: space ok if not IN_MACRO
 	 ppcall: hide if IN_FILE|IN_MACRO|IN_EXPAND
 	 pplex: don't complain about ^L or ^Z as last char in file
 	 ppsearch: fix #include <.../foo.h> loop
@@ -5312,8 +5684,10 @@ End:
 
 :::::::: libcdb ::::::::
 
+01-02-14 cdbtypes: add seed detail for {hash} and {rand} types
 01-01-01 cdbimage: drop span discipline that invalidated seeks
-	 cdbflat: check details in flatevent, fix CDB_SPACE
+	 cdbflat: check details in flatevent
+	 cdbflat: fix CDB_SPACE to strip both leading and trailing space
 00-02-14 cdbimage: fix record span bug that caused cql regression test failures
 99-10-01 add: cdbimage() CDB_IMAGE
 99-08-11 cdbopen: fix referenced checks
@@ -5376,6 +5750,7 @@ End:
 
 :::::::: libtksh ::::::::
 
+01-04-19  add HAVE_TIME_H HAVE_SYS_PARAM_H HAVE___FD_MASK tests to tclPort.h
 00-02-10  --- Release 7.6 ---
 00-02-10  Update README file
 00-02-09  Deleted unreferenced vars, dropped tcl 7.5 compatibility,

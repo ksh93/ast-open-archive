@@ -9,7 +9,7 @@
 
 LICENSE = since=1999,author=gsf
 
-:TEST: astconf opt
+:TEST: astconf opt strtoi strtof
 
 date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat
 	for i in $(*:N=*.dat)
@@ -20,9 +20,9 @@ date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat
 
 sfio :TEST: testsfio sftest.h +last \
 	talarm.c talign.c tappend.c tatexit.c tclose.c tdisc.c terrno.c \
-	texcept.c tflags.c tgetr.c thole.c tleak.c tlongdouble.c tmmap2read.c \
-	tmode.c tmove.c tmprocess.c tmtsafe.c tmultiple.c tmwrite.c \
-	tnoseek.c tnotify.c topen.c tpipe.c tpipemove.c \
+	texcept.c tflags.c tgetr.c thole.c tleak.c tlocale.c tlongdouble.c \
+	tmmap2read.c tmode.c tmove.c tmpread.c tmprocess.c tmtsafe.c \
+	tmultiple.c tmwrite.c tnoseek.c tnotify.c topen.c tpipe.c tpipemove.c \
 	tpkrd.c tpoll.c tpool.c tpopen.c tpopenrw.c tprintf.c \
 	tpublic.c tputgetc.c tputgetd.c tputgetl.c tputgetm.c tputgetr.c \
 	tputgetu.c trcrv.c treserve.c tscanf.c tseek.c \

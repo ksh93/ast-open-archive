@@ -1003,12 +1003,89 @@ TEST 18 'member arrays'
 	EXEC	-I$data -l -f array2.cql $data/array2.db
 
 TEST 19 'buffer boundaries and hix steady state'
-	EXEC	-e 't {int n; register char* a;}; a=="x";' $data/span.db
+	EXEC	-l -e 't {int n; register char* a;}; a=="x";' $data/span.db
 		OUTPUT - $'1;x\n3;x'
 	EXEC
 
 TEST 20 '-lcdb details'
-	EXEC	-I$data -f space.cql -e 'action:printf(":%s:\n", name.last)'
+	EXEC	-I$data -l -f space.cql -e 'action:printf(":%s:\n", name.last)'
 		OUTPUT - $':Fowler:\n:Sword:\n:Bennett:\n:Haralick:'
-	EXEC	-I$data -f space.cql -e 'dat.details="nospace";' -e 'action:printf(":%s:\n", name.last)'
+	EXEC	-I$data -l -f space.cql -e 'dat.details="nospace";' -e 'action:printf(":%s:\n", name.last)'
 		OUTPUT - $':Fowler:\n: Sword:\n:Bennett :\n: Haralick :'
+	EXEC	-I$data -l -f fax.cql -e $'
+Facility.details = "space";
+Reference.details = "space";
+schema = Facility;
+void select() { FaxType  == "FNYAK"; }
+'
+		OUTPUT - $'TAVSZFFKEL|IJA5050489|CPOFUBKA   |HYGQPQF1341|FNYAK |81699|CPOFUBKA   EVTRUTI6412BDOEE 43639|O|J2784544       ||3|GYVRX5|53741897|95939197|5KMR9|...||      |SA
+ZGPWVLDSWN|ORS5876243|CPOFUBKA   |HYGQPQF1341|FNYAK |61490|CPOFUBKA   EVTRUTI6412BDOEE 43630|Q|V8786507       ||6|JLAQO2|06470499|15915979|5ESL5|...||      |OK
+BMRWDTZWUB|ILS7214423|CPOFUBKA   |HYGQPQF1341|FNYAK |21611|CPOFUBKA   EVTRUTI6412BDOEE 43631|W|N2126568       ||3|MAVFF1|73923815|69637416|2DRM4|...||      |HR
+CLSHOGYZJM|DUX4347138|CPOFUBKA   |HYGQPQF1341|FNYAK |16380|CPOFUBKA   EVTRUTI6412BDOEE 43631|V|D6988043       ||9|KMPDH9|61495490|60682086|6TJQ6|...||      |WT
+GNWJKQODRC|PUP4741576|CPOFUBKA   |HYGQPQF1341|FNYAK |12523|CPOFUBKA   EVTRUTI6412BDOEE 43632|X|I7457432       ||1|OADHZ3|79567340|82666606|2RRW8|...||      |LZ
+SBEZUOSTXA|XAV2129512|CPOFUBKA   |HYGQPQF1341|FNYAK |78342|CPOFUBKA   EVTRUTI6412BDOEE 43633|R|T0349203       ||0|DRUMY2|00269327|17577111|3SQB3|...||      |OE
+XSPCHNZKQT|CDU1458681|CPOFUBKA   |HYGQPQF1341|FNYAK |47450|CPOFUBKA   EVTRUTI6412BDOEE 43634|W|I7412338       ||5|CGTBF9|97772212|22008640|8TPO8|...||      |BV
+CREPASGDRW|TUN6725398|CPOFUBKA   |HYGQPQF1341|FNYAK |72982|CPOFUBKA   EVTRUTI6412BDOEE 43635|J|V6561822       ||5|EQLTP9|77376890|64002480|2LTA2|...||      |PX
+ORCNACCNLC|FAP6983914|CPOFUBKA   |HYGQPQF1341|FNYAK |34961|CPOFUBKA   EVTRUTI6412BDOEE 43636|Z|L2725474       ||1|UABZL7|97374254|48608282|2LJO6|...||      |NR
+FUHQPPZWWT|QNS9834869|CPOFUBKA   |UMPXQX48   |FNYAK |67859|CPOFUBKA   RJCYVW57   ZVWKM 47815|W|X2764071       |TG|0|VHGOE4|02216564|06846822|6NJE0|...||      |TX
+STGXYYSJXG|JYV8181710|CPOFUBKA   |UMPXQX48   |FNYAK |38561|CPOFUBKA   RJCYVW57   ZVWKM 47816|X|A1299589       |BC|8|NXKES4|88632680|00028244|0HTG6|...||      |HJ
+SFYBSWIXPM|FEF4189176|CPOFUBKA   |UMPXQX48   |FNYAK |16348|CPOFUBKA   RJCYVW57   ZVWKM 47817|V|A3013942       |YL|3|GOVBD7|71321819|53991939|3CWH5|...||      |WO
+POHKXVXOUD|QZW9658087|CPOFUBKA   |UMPXQX48   |FNYAK |43412|CPOFUBKA   RJCYVW57   ZVWKM 47818|I|P4382856       |AZ|3|CODTL3|79103533|31135579|7EUR9|...||      |KO
+XWTEVJZGIX|ILQ9690649|CPOFUBKA   |UMPXQX48   |FNYAK |85635|CPOFUBKA   RJCYVW57   ZVWKM 47819|I|Y5299560       ||4|JDSOI8|38960994|82840028|4DBQ8|...||      |RR
+GTOLQSQPRO|XMB2963314|CPOFUBKA   |UMPXQX48   |FNYAK |52509|CPOFUBKA   RJCYVW57   ZVWKM 47810|D|L2342072       ||6|LXMQK0|78922318|62062642|0PXE2|...||      |BZ
+GJMZKEABVY|LCB8707598|CPOFUBKA   |UMPXQX48   |FNYAK |12702|CPOFUBKA   RJCYVW57   ZVWKM 47811|J|B2340402       ||4|NNGYE6|18744112|86400442|2BJU6|...||      |FZ
+CFMVIKCLFE|LUT6387752|CPOFUBKA   |UMPXQX48   |FNYAK |92705|CPOFUBKA   RJCYVW57   ZVWKM 47812|F|J2706420       ||0|TJGMG0|36108778|02600200|2PTK8|...||      |NL'
+	EXEC
+	EXEC	-R -I$data -l -f fax.cql -e $'
+Facility.details = "nospace";
+Reference.details = "nospace";
+schema = Facility;
+void select() { FaxType  == "FNYAK "; }
+'
+	EXEC	-I$data -l -f fax.cql -e $'
+Facility.details = "nospace";
+Reference.details = "nospace";
+schema = Facility;
+void select() { FaxType  == "FNYAK "; }
+'
+	EXEC	-R -I$data -l -f fax.cql -e $'
+Facility.details = "space";
+Reference.details = "space";
+schema = Reference;
+void select() { f.FaxType  == "FNYAK"; }
+'
+		OUTPUT - $'CPOFUBKA   EVTRUTI6412BDOEE 43639
+CPOFUBKA   EVTRUTI6412BDOEE 43630
+CPOFUBKA   EVTRUTI6412BDOEE 43631
+CPOFUBKA   EVTRUTI6412BDOEE 43631
+CPOFUBKA   EVTRUTI6412BDOEE 43632
+CPOFUBKA   EVTRUTI6412BDOEE 43633
+CPOFUBKA   EVTRUTI6412BDOEE 43634
+CPOFUBKA   EVTRUTI6412BDOEE 43635
+CPOFUBKA   EVTRUTI6412BDOEE 43636
+CPOFUBKA   RJCYVW57   ZVWKM 47815
+CPOFUBKA   RJCYVW57   ZVWKM 47816
+CPOFUBKA   RJCYVW57   ZVWKM 47817
+CPOFUBKA   RJCYVW57   ZVWKM 47818
+CPOFUBKA   RJCYVW57   ZVWKM 47819
+CPOFUBKA   RJCYVW57   ZVWKM 47810
+CPOFUBKA   RJCYVW57   ZVWKM 47811
+CPOFUBKA   RJCYVW57   ZVWKM 47812'
+	EXEC	-I$data -l -f fax.cql -e $'
+Facility.details = "space";
+Reference.details = "space";
+schema = Reference;
+void select() { f.FaxType  == "FNYAK"; }
+'
+	EXEC	-R -I$data -l -f fax.cql -e $'
+Facility.details = "nospace";
+Reference.details = "nospace";
+schema = Reference;
+void select() { f.FaxType  == "FNYAK "; }
+'
+	EXEC	-I$data -l -f fax.cql -e $'
+Facility.details = "nospace";
+Reference.details = "nospace";
+schema = Reference;
+void select() { f.FaxType  == "FNYAK "; }
+'

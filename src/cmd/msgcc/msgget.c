@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: msgget (AT&T Labs Research) 2000-05-17 $\n]"
+"[-?\n@(#)$Id: msgget (AT&T Labs Research) 2001-04-21 $\n]"
 USAGE_LICENSE
 "[+NAME?msgget - get a message from a message catalog]"
 "[+DESCRIPTION?\bmsgget\b gets the message corresponding to the parameters."
@@ -55,8 +55,6 @@ main(int argc, char** argv)
 {
 	register Mc_t*	mc;
 	register char*	s;
-	char*		t;
-	char*		e;
 	char*		loc;
 	char*		cmd;
 	char*		cat;
@@ -84,21 +82,10 @@ main(int argc, char** argv)
 	argv += opt_info.index;
 	if (error_info.errors || !(loc = *argv++) || !(cmd = *argv++) || !(s = *argv++))
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	set = num = 0;
-	if (!streq(s, "-"))
-	{
-		if (t = strchr(s, '.'))
-		{
-			*t++ = 0;
-			set = (int)strtol(s, &e, 0);
-			if (*e)
-				set = MC_MESSAGE_SET(s);
-			s = t;
-		}
-		else
-			set = 1;
-		num = (int)strtol(s, &t, 0);
-	}
+	if (streq(s, "-"))
+		set = num = 0;
+	else
+		mcindex(s, NiL, &set, &num);
 	if (!(msg = *argv++))
 		msg = "";
 	else if (*argv)

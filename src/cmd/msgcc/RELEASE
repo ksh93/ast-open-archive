@@ -1,2 +1,5 @@
+01-06-10 msgcpp: add proper escapes to OMIT pattern
+01-05-29 msgcc: add similar unused message replacement, -M-similar
+01-04-22 msgcc,msggen,msgget: use mcindex()
 01-01-31 ignore ls generation errors
 00-04-20 first release

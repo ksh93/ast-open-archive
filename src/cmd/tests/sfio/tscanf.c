@@ -47,13 +47,14 @@
 
 MAIN()
 {
-	char	str[8], c[4], cl[8];
-	int	i, j, k, n;
-	float	f;
-	double	d;
-	char*	s;
-	Void_t*	vp;
-	Sfio_t*	sf;
+	char		str[8], c[4], cl[8];
+	int		i, j, k, n;
+	unsigned long	a1, a2, a3;
+	float		f;
+	double		d;
+	char*		s;
+	Void_t*		vp;
+	Sfio_t*		sf;
 
 	str[0] = 'x'; str[1] = 0;
 	n = sfsscanf("123","%[a-z]%d",str,&i);
@@ -73,7 +74,7 @@ MAIN()
 	if(sfsscanf("123456789","%.*.*d",4,10,&i) != 1)
 		terror("Bad %%d scanning\n");
 	if(i != 1234)
-		terror("Got wrong value\n");
+		terror("Expected 1234, got %d\n", i);
 
 	i = -1;
 	if(sfsscanf("0","%i",&i) != 1 || i != 0)
@@ -199,6 +200,13 @@ MAIN()
 	n = -1;
 	if(sfsscanf("12345 ","%d %n",&k,&n) != 1 || k != 12345 || n != 6)
 		terror("Bad scanning results");
+
+	n = sfsscanf("zis.zis.gawpwo", "%..36lu.%..36lu.%..36lu", &a1, &a2, &a3);
+	s = sfprints("%d %lu %lu %lu", n, a1, a2, a3);
+	if (!s)
+		terror("sfprints failed");
+	if (strcmp(s, "3 46036 46036 985781544"))
+		terror("Base 36 scan failed");
 
 	TSTEXIT(0);
 }

@@ -36,7 +36,7 @@
 
 #include <ast.h>
 
-#define HIX_VERSION	19970811L	/* interface version		*/
+#define HIX_VERSION	20010214L	/* implementation version	*/
 
 #define HIX_OPEN	0		/* open event			*/
 #define HIX_CLOSE	1		/* close event			*/
@@ -44,8 +44,9 @@
 #define HIX_ERROR	(1<<0)		/* previous op caused error	*/
 #define HIX_LOCAL	(1<<1)		/* index data in . ok		*/
 #define HIX_READONLY	(1<<2)		/* use but don't generate index	*/
-#define HIX_TEST1	(1<<3)		/* internal test #1		*/
-#define HIX_TEST2	(1<<4)		/* internal test #2		*/
+#define HIX_REGENERATE	(1<<3)		/* regenerate used indexes	*/
+#define HIX_TEST1	(1<<4)		/* internal test #1		*/
+#define HIX_TEST2	(1<<5)		/* internal test #2		*/
 #define HIX_USER	(1<<9)		/* first user defined flag	*/
 
 #define HIX_and		(-1)

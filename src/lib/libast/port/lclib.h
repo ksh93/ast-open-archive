@@ -24,54 +24,42 @@
 *                 Phong Vo <kpv@research.att.com>                  *
 *******************************************************************/
 #pragma prototyped
+
 /*
- * AT&T Bell Laboratories
- *
- * <dirent.h> for systems with opendir() and <ndir.h>
+ * locale state private definitions
  */
 
-#ifndef _DIRENT_H
-#define _DIRENT_H
+#ifndef _LCLIB_H
+#define _LCLIB_H	1
 
-#if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide closedir opendir readdir seekdir telldir
-#else
-#define closedir	______closedir
-#define opendir		______opendir
-#define readdir		______readdir
-#define seekdir		______seekdir
-#define telldir		______telldir
-#endif
+#define categories	_ast_categories
+#define locales		_ast_locales
+#define translate	_ast_translate
 
-#include <ndir.h>
+struct Lc_info_s;
 
-#if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide closedir opendir readdir seekdir telldir
-#else
-#undef	closedir
-#undef	opendir
-#undef	readdir
-#undef	seekdir
-#undef	telldir
-#endif
+#define _LC_PRIVATE_ \
+	struct Lc_info_s	info[AST_LC_COUNT]; \
+	struct Lc_s*		next;
 
-#ifndef dirent
-#define dirent	direct
-#endif
+#define _LC_TERRITORY_PRIVATE_ \
+	unsigned char		indices[LC_territory_language_max];
 
-#if !defined(d_fileno) && !defined(d_ino)
-#define d_fileno	d_ino
-#endif
+#include <ast.h>
+#include <error.h>
+#include <lc.h>
 
-#ifdef	rewinddir
-#undef	rewinddir
-#define rewinddir(p)	seekdir(p,0L)
-#endif
+typedef struct Lc_numeric_s
+{
+	int		decimal;
+	int		thousand;
+} Lc_numeric_t;
 
-extern DIR*		opendir(const char*);
-extern void		closedir(DIR*);
-extern struct dirent*	readdir(DIR*);
-extern void		seekdir(DIR*, long);
-extern long		telldir(DIR*);
+#define LCINFO(c)	(&locales[c]->info[c])
+
+extern	Lc_category_t	categories[];
+extern	Lc_t*		locales[];
+
+extern char*		translate(const char*, const char*, const char*, const char*);
 
 #endif

@@ -41,7 +41,7 @@ trap 'err_exit qutting early' HUP INT QUIT TERM
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	usage=$'
 [-?
-@(#)shar (AT&T Labs Research) 1999-04-20\n
+@(#)$Id: shar (AT&T Labs Research) 1999-04-20 $
 ]
 '$USAGE_LICENSE$'
 	[+NAME? shar - create a shell archive]

@@ -90,6 +90,7 @@ typedef void (*Sig_handler_t)(int);
 
 extern int		chresc(const char*, char**);
 extern char*		fmtesc(const char*);
+extern char*		fmtident(const char*);
 extern char*		pathshell(void);
 extern int		sigcritical(int);
 extern int		sigunblock(int);

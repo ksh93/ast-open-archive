@@ -47,7 +47,7 @@ static int tksh_command(int argc, char *argv[], void *data)
 #else
 			if (commandData->interp->result &&
 			   (*commandData->interp->result) &&
-			   (sfstdout->flags & SF_STRING || (
+			   (sfset(sfstdout, 0, 0) & SF_STRING || (
 			   (!sh_getscope(1,1)) && !inEval &&
 				sh_isoption(SH_INTERACTIVE))))
 #endif

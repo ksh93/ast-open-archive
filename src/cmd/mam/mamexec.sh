@@ -61,7 +61,7 @@ do	case $# in
 		break
 		;;
 	-*)	case $1 in
-		-*[abceghjklmopqrtuvwxyz_A-Z0-9]*) # [!...] not portable
+		-*[abceghjklmopqrtuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]*) # [!...] not portable
 			echo "Usage: $_command_ [ -dfins ] [ target ... ] < mam-file" >&2; exit 2
 			;;
 		*)	case $1 in

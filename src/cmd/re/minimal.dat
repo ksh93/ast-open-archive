@@ -1,0 +1,50 @@
+: REG_MINIMAL tests 2001-05-21
+
+E	(abc)+(xyz)+		abcabcxyzxyz	(0,12)(3,6)(9,12)
+Em	(abc)+(xyz)+		abcabcxyzxyz	(0,9)(3,6)(6,9)
+E	(abc)+?(xyz)+?		abcabcxyzxyz	(0,9)(3,6)(6,9)
+E	(abc)+(xyz)+?		abcabcxyzxyz	(0,9)(3,6)(6,9)
+E	(abc)+?(xyz)+		abcabcxyzxyz	(0,12)(3,6)(9,12)
+
+E	(abc|abcxyz)+(xyz)+	abcabcxyzxyz	(0,12)(3,9)(9,12)
+Em	(abc|abcxyz)+(xyz)+	abcabcxyzxyz	(0,9)(3,6)(6,9)
+E	(abc|abcxyz)+?(xyz)+?	abcabcxyzxyz	(0,9)(3,6)(6,9)
+E	(abc|abcxyz)+(xyz)+?	abcabcxyzxyz	(0,12)(3,9)(9,12)
+E	(abc|abcxyz)+?(xyz)+	abcabcxyzxyz	(0,12)(3,6)(9,12)
+
+Em	.*/(foo|bar)		/home/dgk/foo//bar/abcabcabc	(0,13)(10,13)
+Em	.*/(bar|foo)		/home/dgk/foo//bar/abcabcabc	(0,13)(10,13)
+Em	(.*/foo|.*/bar)		/home/dgk/foo//bar/abcabcabc	(0,13)(0,13)
+Em	(.*/bar|.*/foo)		/home/dgk/foo//bar/abcabcabc	(0,13)(0,13)
+
+Km	@(*/bar|*/foo)		/home/dgk/foo//bar/abcabcabc	(0,13)(0,13)
+Kmp	@(*/bar|*/foo)		/home/dgk/foo//bar/abcabcabc	(6,13)(6,13)
+
+K	*(?)			abc			(0,3)(0,3)
+K	*-(?)			abc			(0,0)(0,0)
+
+K	@(*(?))			abc			(0,3)(0,3)(0,3)
+K	@-(*(?))		abc			(0,0)(0,0)(0,0)
+
+Em	.*(\d)+.*		abc123abc456abc789	(0,4)(3,4)
+E	.*?(\d)+?.*?		abc123abc456abc789	(0,4)(3,4)
+E	.*(\d)+.*		abc123abc456abc789	(0,18)(17,18)
+E	.*(\d)+?.*		abc123abc456abc789	(0,18)(17,18)
+
+Km	*+([0-9])*		abc123abc456abc789	(0,4)(3,4)
+K	*-(?)+-([0-9])*-(?)	abc123abc456abc789	(0,4)(0,3)(3,4)(4,4)
+K	~(-g)*+([0-9])*		abc123abc456abc789	(0,4)(3,4)
+K	{1}-(*+([0-9])*)	abc123abc456abc789	(0,4)(0,4)(3,4)
+
+K	*+([0-9])*		abc123abc456abc789	(0,18)(17,18)
+K	~(g)*+([0-9])*		abc123abc456abc789	(0,18)(17,18)
+K	{1}(*+([0-9])*)		abc123abc456abc789	(0,18)(0,18)(17,18)
+
+SK	*,*			a,b			(0,3)
+SK	*\,*			a,b			(0,3)
+SK	*@*			a@b			(0,3)
+SK	*\@*			a@b			(0,3)
+SK	*!*			a!b			(0,3)
+SK	*\!*			a!b			(0,3)
+SK	*~*			a~b			(0,3)
+SK	*\~*			a~b			(0,3)

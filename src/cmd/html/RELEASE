@@ -1,3 +1,11 @@
+01-05-09 mm2html: ignore a few more requests
+01-05-04 mm2html: more tbl adjustments from Bruce Lilly
+01-05-02 mm2html: tweak tbl column spacing, handle .TH [N]
+01-05-01 mm2html: tbl fixes
+01-04-27 mm2html: fix .SH,.SH indentation; ignore { .nh .hc .hy }
+01-03-22 mm2html,troff2html: ignore { .hw .lw }
+01-03-01 troff2html: fix bug that treated \*(]? as \*]?
+01-02-28 troff2html: add \n(YR and fix macros for y2k -- oops
 01-01-31 htmlrefs: fix nul char bug in <!--INTERNAL--> filter
 01-01-01 mm2html: fix incorrect \h'... #local refs
 	 mm2html: append <!--LABELS-->...<!--/LABELS--> for second pass

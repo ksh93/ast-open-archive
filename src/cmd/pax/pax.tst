@@ -10,53 +10,53 @@ VIEW link link.dat
 VIEW mode mode.dat
 
 TEST 01 'different date formats'
-	EXEC --nosummary -rf $date list.dat
-	EXEC --listformat="$dateformat" -vf $date
+	EXEC --nosummary --from=ascii -rf $date list.dat
+	EXEC --listformat="$dateformat" --from=ascii -vf $date
 		SAME OUTPUT list.dat
 		ERROR - $date $'volume 1 in cpio format\n372 files, 99 blocks'
-	EXEC -rf $date -wf y2k.pax -x asc
+	EXEC --from=ascii -rf $date -wf y2k.pax -x asc
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
 		ERROR - y2k.pax $'volume 1 in asc format\n372 files, 116 blocks'
-	EXEC -rf $date -wf y2k.pax -x aschk
+	EXEC --from=ascii -rf $date -wf y2k.pax -x aschk
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
 		ERROR - y2k.pax $'volume 1 in aschk format\n372 files, 116 blocks'
-	EXEC -rf $date -wf y2k.pax -x binary
+	EXEC --from=ascii -rf $date -wf y2k.pax -x binary
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
 		ERROR - y2k.pax $'volume 1 in binary format\n372 files, 54 blocks'
-	EXEC -rf $date -wf y2k.pax -x cpio
+	EXEC --from=ascii -rf $date -wf y2k.pax -x cpio
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
 		ERROR - y2k.pax $'volume 1 in cpio format\n372 files, 99 blocks'
-	EXEC -rf $date -wf y2k.pax -x pax
+	EXEC --from=ascii -rf $date -wf y2k.pax -x pax
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
 		ERROR - y2k.pax $'volume 1 in pax format\n372 files, 1143 blocks'
-	EXEC -rf $date -wf y2k.pax -x tar
+	EXEC --from=ascii -rf $date -wf y2k.pax -x tar
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
 		ERROR - y2k.pax $'volume 1 in tar format\n372 files, 399 blocks'
-	EXEC -rf $date -wf y2k.pax -x ustar
+	EXEC --from=ascii -rf $date -wf y2k.pax -x ustar
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
 		ERROR - y2k.pax $'volume 1 in ustar format\n372 files, 399 blocks'
-	EXEC -rf $date -wf y2k.pax -x vdb
+	EXEC --from=ascii -rf $date -wf y2k.pax -x vdb
 		OUTPUT -
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
@@ -66,13 +66,13 @@ TEST 01 'different date formats'
 TEST 02 'different file modes'
 	o=
 
-	EXEC --nosummary $o -rf $mode keep.lst mode.lst
+	EXEC --nosummary $o --from=ascii -rf $mode keep.lst mode.lst
 		OUTPUT -
 		ERROR -
-	EXEC --listformat="$modeformat" -vf $mode
+	EXEC --listformat="$modeformat" --from=ascii -vf $mode
 		SAME OUTPUT keep.lst
 		ERROR - $mode $'volume 1 in cpio format\n19 files, 8 blocks'
-	EXEC --nosummary $o -rf $mode
+	EXEC --nosummary $o --from=ascii -rf $mode
 		OUTPUT -
 		ERROR - $'pax: warning: mode.dir/m4000: mode --S------ not set
 pax: warning: mode.dir/m4100: mode --S------ not set
@@ -87,7 +87,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT mode.lst
 		ERROR - mode.pax $'volume 1 in cpio format\n19 files, 8 blocks'
-	EXEC --nosummary $o -rf $mode
+	EXEC --nosummary $o --from=ascii -rf $mode
 		OUTPUT -
 		ERROR - $'pax: warning: mode.dir/m4000: mode --S------ not set
 pax: warning: mode.dir/m4100: mode --S------ not set
@@ -103,7 +103,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 		SAME OUTPUT mode.lst
 		ERROR - mode.pax $'volume 1 in cpio format\n19 files, 8 blocks'
 	DO chmod u+rw,go+r mode.dir/*
-	EXEC --nosummary $o -rf $mode
+	EXEC --nosummary $o --from=ascii -rf $mode
 		OUTPUT -
 		ERROR - $'pax: warning: mode.dir/m4000: mode --S------ not set
 pax: warning: mode.dir/m4100: mode --S------ not set
@@ -121,20 +121,20 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 
 	o=--preserve=ps
 
-	EXEC --nosummary $o -rf $mode keep.lst mode.lst
+	EXEC --nosummary $o --from=ascii -rf $mode keep.lst mode.lst
 		OUTPUT -
 		ERROR -
-	EXEC --listformat="$modeformat" -vf $mode
+	EXEC --listformat="$modeformat" --from=ascii -vf $mode
 		SAME OUTPUT keep.lst
 		ERROR - $mode $'volume 1 in cpio format\n19 files, 8 blocks'
-	EXEC --nosummary $o -rf $mode
+	EXEC --nosummary $o --from=ascii -rf $mode
 		OUTPUT -
 		ERROR -
 	EXEC --nosummary -wf mode.pax keep.lst mode.lst mode.dir
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep.lst
 		ERROR - mode.pax $'volume 1 in cpio format\n19 files, 8 blocks'
-	EXEC --nosummary $o -rf $mode
+	EXEC --nosummary $o --from=ascii -rf $mode
 		OUTPUT -
 		ERROR -
 	EXEC --nosummary -wf mode.pax keep.lst mode.lst mode.dir
@@ -142,7 +142,7 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 		SAME OUTPUT keep.lst
 		ERROR - mode.pax $'volume 1 in cpio format\n19 files, 8 blocks'
 	DO chmod u+rw,go+r mode.dir/*
-	EXEC --nosummary $o -rf $mode
+	EXEC --nosummary $o --from=ascii -rf $mode
 		OUTPUT -
 		ERROR -
 	EXEC --nosummary -wf mode.pax keep.lst mode.lst mode.dir
@@ -151,13 +151,18 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 		ERROR - mode.pax $'volume 1 in cpio format\n19 files, 8 blocks'
 
 TEST 03 'file and link path substitution'
-	EXEC --nosummary -f $link
+	EXEC --nosummary --from=ascii -f $link
 		OUTPUT - $'bin/aaa
 bin/bbb -> bin/aaa
 bin/yyy
 bin/zzz == bin/yyy'
-	EXEC --nosummary -f $link -s ,^,usr/,
+	EXEC --nosummary -L --from=ascii -f $link -s ,^,usr/,
 		OUTPUT - $'usr/bin/aaa
 usr/bin/bbb -> usr/bin/aaa
+usr/bin/yyy
+usr/bin/zzz == usr/bin/yyy'
+	EXEC --nosummary -P --from=ascii -f $link -s ,^,usr/,
+		OUTPUT - $'usr/bin/aaa
+usr/bin/bbb -> bin/aaa
 usr/bin/yyy
 usr/bin/zzz == usr/bin/yyy'

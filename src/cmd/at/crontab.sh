@@ -38,8 +38,9 @@ temp=${TMPDIR:-/tmp}/cron$$
 op=
 
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
-0123)	usage=$'[-?
-@(#)crontab (AT&T Labs Research) 2000-09-28
+0123)	usage=$'
+[-?
+@(#)$Id: crontab (AT&T Labs Research) 2000-09-28 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?crontab - schedule periodic background work]
@@ -70,9 +71,9 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	\bcron.allow\b and \bcron.deny\b files consist of one user name per
 	line.]
 [+?In this implementation, each command in the \bcrontab\b file represents
-	a single \bat\b(1) \ajob\a. Only one job per \bcrontab\b entry will
-	be executed. A new job for a given entry will not be scheduled until
-	the previous job for that entry, if any, has exited.]
+	a single \bat\b(1) \ajob\a. Only one job per command will be executed.
+	A new job for a given command will not be scheduled until the previous
+	job for that command, if any, has exited.]
 [e:edit?Edit a copy of the calling user crontab entry, or create an empty
 	entry to edit if the crontab entry does not exist. When editing is
 	complete, the entry will be installed as the calling user crontab

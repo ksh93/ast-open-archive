@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.1 2001-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -33,140 +33,144 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ../../../lib/package/ast.lic
+done ../../../lib/package/ast.lic
 make install
 make cql
 make cql.o
 make cql.c
-make ../../lib/libast/string/fmtident.c implicit
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+make ../../../include/ast/wait.h implicit
+make ../../../include/ast/ast_wait.h implicit
+done ../../../include/ast/ast_wait.h dontcare
+make ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_common.h dontcare
+make ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_botch.h implicit
+done ../../../include/ast/ast_botch.h dontcare
+make ../../../include/ast/ast_unistd.h implicit
+done ../../../include/ast/ast_unistd.h dontcare
+make ../../../include/ast/re_comp.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
+done ../../../include/ast/re_comp.h dontcare
+make ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/getopt.h dontcare
+make ../../../include/ast/ast_fcntl.h implicit
+make ../../../include/ast/ls.h implicit
+make ../../../include/ast/ast_mode.h implicit
+done ../../../include/ast/ast_mode.h dontcare
+make ../../../include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-done ../../lib/libast/string/fmtident.c dontcare
-make ${PACKAGE_ast_INCLUDE}/wait.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/wait.h
-make ${PACKAGE_ast_INCLUDE}/vdb.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/vdb.h
-make ${PACKAGE_ast_INCLUDE}/proc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/proc.h
-make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
-done ${PACKAGE_ast_INCLUDE}/dlldefs.h
+done ../../../include/ast/ast_fs.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ls.h dontcare
+prev ../../../include/ast/ast_fs.h implicit
+done ../../../include/ast/ast_fcntl.h dontcare
+make ../../../include/ast/ast_types.h implicit
+done ../../../include/ast/ast_types.h dontcare
+make ../../../include/ast/ast_map.h implicit
+done ../../../include/ast/ast_map.h dontcare
+make ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/stdio.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/limits.h implicit
+done ../../../include/ast/limits.h dontcare
+make ../../../include/ast/ast_hdr.h implicit
+done ../../../include/ast/ast_hdr.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_lib.h implicit
+done ../../../include/ast/ast_lib.h dontcare
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/sfio.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_version.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_version.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/wait.h
+make ../../../include/ast/vdb.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/vdb.h
+make ../../../include/ast/proc.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/proc.h
+make ../../../include/ast/dlldefs.h implicit
+done ../../../include/ast/dlldefs.h
 make cql.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfstr.h
-make ${PACKAGE_ast_INCLUDE}/debug.h implicit
-make ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/option.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/option.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/error.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/debug.h
+make ../../../include/ast/sfstr.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/sfstr.h
+make ../../../include/ast/debug.h implicit
+make ../../../include/ast/error.h implicit
+make ../../../include/ast/option.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/option.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/error.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/debug.h
 make hix.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/ast.h implicit
 done hix.h
-make ${PACKAGE_ast_INCLUDE}/tm.h implicit
-make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/times.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tm.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/expr.h implicit
-make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/exparse.h implicit
-done ${PACKAGE_ast_INCLUDE}/exparse.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/expr.h
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/cdb.h implicit
-prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ccode.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdb.h
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ../../../include/ast/tm.h implicit
+make ../../../include/ast/times.h implicit
+make ../../../include/ast/ast_time.h implicit
+done ../../../include/ast/ast_time.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/times.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/tm.h
+prev ../../../include/ast/ls.h implicit
+make ../../../include/ast/expr.h implicit
+make ../../../include/ast/vmalloc.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/cdt.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/cdt.h dontcare
+make ../../../include/ast/exparse.h implicit
+done ../../../include/ast/exparse.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/expr.h
+prev ../../../include/ast/error.h implicit
+make ../../../include/ast/cdb.h implicit
+prev ../../../include/ast/vmalloc.h implicit
+make ../../../include/ast/ccode.h implicit
+make ../../../include/ast/ast_ccode.h implicit
+done ../../../include/ast/ast_ccode.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ccode.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/cdb.h
+prev ../../../include/ast/ast.h implicit
 done cql.h
 done cql.c
 prev cql.c
@@ -181,10 +185,10 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c 
 done decl.o generated
 make expr.o
 make expr.c
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/regex.h
+make ../../../include/ast/regex.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/regex.h
 prev cql.h implicit
 done expr.c
 prev expr.c
@@ -199,50 +203,50 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c 
 done file.o generated
 make hix.o
 make hix.c
-prev ${PACKAGE_ast_INCLUDE}/vdb.h implicit
+prev ../../../include/ast/vdb.h implicit
 prev hix.h implicit
-prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/swap.h implicit
-make ${PACKAGE_ast_INCLUDE}/int.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/int.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/swap.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio_t.h
+prev ../../../include/ast/debug.h implicit
+prev ../../../include/ast/error.h implicit
+make ../../../include/ast/swap.h implicit
+make ../../../include/ast/int.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/int.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/swap.h
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/cdt.h implicit
+prev ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio_t.h implicit
+prev ../../../include/ast/sfio.h implicit
+done ../../../include/ast/sfio_t.h
 done hix.c
 prev hix.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c hix.c
 done hix.o generated
-setv mam_libcdb `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcdb,${INSTALLROOT}/lib/libcdb.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/cdb 2>/dev/null || echo '' ${mam_cc_L+-lcdb}${mam_cc_L-${PACKAGE_ast_LIB}/libcdb.a}`
-setv mam_libdll `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-ldll,${INSTALLROOT}/lib/libdll.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/dll 2>/dev/null || echo '' ${mam_cc_L+-ldll}${mam_cc_L-${PACKAGE_ast_LIB}/libdll.a}`
-setv mam_libexpr `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lexpr,${INSTALLROOT}/lib/libexpr.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/expr 2>/dev/null || echo '' ${mam_cc_L+-lexpr}${mam_cc_L-${PACKAGE_ast_LIB}/libexpr.a}`
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
+bind -lcdb
+bind -ldll
+bind -lexpr
+bind -last
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o cql cql.o decl.o expr.o file.o hix.o ${mam_libcdb} ${mam_libdll} ${mam_libexpr} ${mam_libast}
 done cql generated
 make cdb
 make cdb.o
 make cdb.c
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cdb.h implicit
+prev ../../../include/ast/sfstr.h implicit
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/cdb.h implicit
 done cdb.c
 prev cdb.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cdb.c
 done cdb.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o cdb cdb.o ${mam_libcdb} ${mam_libdll} ${mam_libast}
 done cdb generated
-make ${INSTALLROOT}/bin
+make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
 exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -260,17 +264,17 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${INSTALLROOT}/bin generated
-make ${INSTALLROOT}/bin/cql
+done ../../../bin generated
+make ../../../bin/cql
 prev cql
 exec - mv ${INSTALLROOT}/bin/cql ${INSTALLROOT}/bin/cql.old 2>/dev/null || true; test '' = 'cql' || { cp cql ${INSTALLROOT}/bin/cql  		    		    ;}
-done ${INSTALLROOT}/bin/cql generated
-make ${INSTALLROOT}/man/man1
+done ../../../bin/cql generated
+make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
 exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -288,21 +292,21 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/cql.1
+done ../../../man/man1 generated
+make ../../../man/man1/cql.1
 make cql.1
 done cql.1
 exec - mv ${INSTALLROOT}/man/man1/cql.1 ${INSTALLROOT}/man/man1/cql.1.old 2>/dev/null || true; test '' = 'cql.1' || { cp cql.1 ${INSTALLROOT}/man/man1/cql.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/cql.1 generated
-make ${INSTALLROOT}/bin/cdb
+done ../../../man/man1/cql.1 generated
+make ../../../bin/cdb
 prev cdb
 exec - mv ${INSTALLROOT}/bin/cdb ${INSTALLROOT}/bin/cdb.old 2>/dev/null || true; test '' = 'cdb' || { cp cdb ${INSTALLROOT}/bin/cdb  		    		    ;}
-done ${INSTALLROOT}/bin/cdb generated
-make ${INSTALLROOT}/man/man1/cdb.1
+done ../../../bin/cdb generated
+make ../../../man/man1/cdb.1
 make cdb.1
 done cdb.1
 exec - mv ${INSTALLROOT}/man/man1/cdb.1 ${INSTALLROOT}/man/man1/cdb.1.old 2>/dev/null || true; test '' = 'cdb.1' || { cp cdb.1 ${INSTALLROOT}/man/man1/cdb.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/cdb.1 generated
+done ../../../man/man1/cdb.1 generated
 done install virtual
 make test
 make test.cdb

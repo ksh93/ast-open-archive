@@ -1,0 +1,731 @@
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*                Copyright (c) 1995-2001 AT&T Corp.                *
+*        and it may only be used by you under license from         *
+*                       AT&T Corp. ("AT&T")                        *
+*         A copy of the Source Code Agreement is available         *
+*                at the AT&T Internet web site URL                 *
+*                                                                  *
+*       http://www.research.att.com/sw/license/ast-open.html       *
+*                                                                  *
+*        If you have copied this software without agreeing         *
+*        to the terms of the license you are infringing on         *
+*           the license and copyright and are violating            *
+*               AT&T's intellectual property rights.               *
+*                                                                  *
+*                 This software was created by the                 *
+*                 Network Services Research Center                 *
+*                        AT&T Labs Research                        *
+*                         Florham Park NJ                          *
+*                                                                  *
+*               Glenn Fowler <gsf@research.att.com>                *
+*******************************************************************/
+#pragma prototyped
+
+/*
+ * fnmatch(3) test harness
+ *
+ * testfnmatch [ options ] < testmatch.dat
+ *
+ *	-c	catch signals and non-terminating calls
+ *	-v	list each test line
+ *
+ * see testre --help for a description of the input format
+ */
+
+static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2001-06-11 $\0\n";
+
+#if _PACKAGE_ast
+#include <ast.h>
+#include <fnmatch.h>
+#else
+#define fmtident(s)	((char*)(s)+10)
+#endif
+
+#include <stdio.h>
+#include <ctype.h>
+#include <setjmp.h>
+#include <signal.h>
+#include <locale.h>
+#include <unistd.h>
+
+#if !_PACKAGE_ast
+#include <fnmatch.h>
+#endif
+
+#ifdef	__STDC__
+#include <stdlib.h>
+#endif
+
+#ifndef NiL
+#ifdef	__STDC__
+#define NiL		0
+#else
+#define NiL		(char*)0
+#endif
+#endif
+
+#ifndef elementsof
+#define elementsof(x)	(sizeof(x)/sizeof(x[0]))
+#endif
+
+#ifndef streq
+#define streq(a,b)	(*(a)==*(b)&&!strcmp(a,b))
+#endif
+
+#define LOOPED		2
+#define NOTEST		(~0)
+
+static const char* unsupported[] = {
+#ifndef FNM_ICASE
+	"ICASE",
+#endif
+#ifndef FNM_NOESCAPE
+	"NOESCAPE",
+#endif
+#ifndef FNM_PATHNAME
+	"PATHNAME",
+#endif
+#ifndef FNM_PERIOD
+	"PERIOD",
+#endif
+	0
+};
+
+#ifndef FNM_ICASE
+#define FNM_ICASE	NOTEST
+#endif
+#ifndef FNM_LEADING_DIR
+#define FNM_LEADING_DIR	NOTEST
+#endif
+#ifndef FNM_NOESCAPE
+#define FNM_NOESCAPE	NOTEST
+#endif
+#ifndef FNM_PATHNAME
+#define FNM_PATHNAME	NOTEST
+#endif
+#ifndef FNM_PERIOD
+#define FNM_PERIOD	NOTEST
+#endif
+
+static struct
+{
+	int		errors;
+	struct
+	{
+	int		count;
+	int		error;
+	int		position;
+	}		ignore;
+	int		lineno;
+	int		ret;
+	int		signals;
+	int		unspecified;
+	int		warnings;
+	char*		which;
+	jmp_buf		gotcha;
+} state;
+
+static void
+quote(char* s, int expand)
+{
+	unsigned char*	u = (unsigned char*)s;
+	int		c;
+
+	if (!u)
+		printf("NIL");
+	else if (!*u)
+		printf("NULL");
+	else if (expand)
+	{
+		printf("\"");
+		for (;;)
+		{
+			switch (c = *u++)
+			{
+			case 0:
+				break;
+			case '\\':
+				printf("\\\\");
+				continue;
+			case '"':
+				printf("\\\"");
+				continue;
+			case '\a':
+				printf("\\a");
+				continue;
+			case '\b':
+				printf("\\b");
+				continue;
+			case '\f':
+				printf("\\f");
+				continue;
+			case '\n':
+				printf("\\n");
+				continue;
+			case '\r':
+				printf("\\r");
+				continue;
+			case '\t':
+				printf("\\t");
+				continue;
+			case '\v':
+				printf("\\v");
+				continue;
+			default:
+				if (!iscntrl(c) && isprint(c))
+					putchar(c);
+				else
+					printf("\\x%02x", c);
+				continue;
+			}
+			break;
+		}
+		printf("\"");
+	}
+	else
+		printf("%s", s);
+}
+
+static void
+report(char* comment, char* re, char* s, char* msg, int unspecified, int expand)
+{
+	printf("%d:", state.lineno);
+	if (re) {
+		printf(" ");
+		quote(re, expand);
+		if (s) {
+			printf(" versus ");
+			quote(s, expand);
+		}
+	}
+	if (unspecified) {
+		state.unspecified++;
+		printf(" unspecified behavior");
+	}
+	else
+		state.errors++;
+	printf(" %s %s", state.which, comment);
+	if (msg && comment[strlen(comment)-1] != '\n')
+		printf(": %s: ", msg);
+}
+
+static int
+note(int level, int skip, char* msg)
+{
+	if (!skip) {
+		printf("NOTE\t");
+		if (msg)
+			printf("%s: ", msg);
+		printf("skipping lines %d", state.lineno);
+	}
+	return skip | level;
+}
+
+static void
+bad(char* comment, char* re, char* s, int expand)
+{
+	printf("bad test case ");
+	report(comment, re, s, NiL, 0, expand);
+	exit(1);
+}
+
+static void
+escape(char* s)
+{
+	char*	t;
+	char*	q;
+	int	c;
+
+	for (t = s; *t = *s; s++, t++)
+		if (*s == '\\')
+			switch (*++s)
+			{
+			case '\\':
+				break;
+			case 'a':
+				*t = '\a';
+				break;
+			case 'b':
+				*t = '\b';
+				break;
+			case 'c':
+				if (*t = *s)
+					s++;
+				*t &= 037;
+				break;
+			case 'e':
+			case 'E':
+				*t = 033;
+				break;
+			case 'f':
+				*t = '\f';
+				break;
+			case 'n':
+				*t = '\n';
+				break;
+			case 'r':
+				*t = '\r';
+				break;
+			case 's':
+				*t = ' ';
+				break;
+			case 't':
+				*t = '\t';
+				break;
+			case 'v':
+				*t = '\v';
+				break;
+			case 'x':
+				c = 0;
+				q = ++s;
+				for (;;)
+				{
+					switch (*s)
+					{
+					case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+						c = (c << 4) + *s++ - 'a' + 10;
+						continue;
+					case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+						c = (c << 4) + *s++ - 'A' + 10;
+						continue;
+					case '0': case '1': case '2': case '3': case '4':
+					case '5': case '6': case '7': case '8': case '9':
+						c = (c << 4) + *s++ - '0';
+						continue;
+					case '{':
+						if (q != s)
+							break;
+						s++;
+						continue;
+					case '}':
+						if (*q == '{')
+							s++;
+						break;
+					default:
+						s--;
+						break;
+					}
+					break;
+				}
+				*t = c;
+				break;
+			case '0': case '1': case '2': case '3':
+			case '4': case '5': case '6': case '7':
+				c = *s - '0';
+				q = s + 2;
+				while (s < q)
+					switch (*++s)
+					{
+					case '0': case '1': case '2': case '3':
+					case '4': case '5': case '6': case '7':
+						c = (c << 3) + *s - '0';
+						break;
+					default:
+						q = --s;
+						break;
+					}
+				*t = c;
+				break;
+			default:
+				bad("invalid C \\ escape\n", NiL, NiL, 0);
+			}
+}
+
+static void
+sigunblock(int s)
+{
+#ifdef SIG_SETMASK
+	int		op;
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	if (s) {
+		sigaddset(&mask, s);
+		op = SIG_UNBLOCK;
+	}
+	else op = SIG_SETMASK;
+	sigprocmask(op, &mask, NiL);
+#else
+#ifdef sigmask
+	sigsetmask(s ? (sigsetmask(0L) & ~sigmask(s)) : 0L);
+#endif
+#endif
+}
+
+static void
+gotcha(int sig)
+{
+	signal(sig, gotcha);
+	alarm(0);
+	state.signals++;
+	state.ret = 0;
+	sigunblock(sig);
+	longjmp(state.gotcha, 1);
+}
+
+int
+main(int argc, char** argv)
+{
+	int		cflags;
+	int		eflags;
+	int		expand;
+	int		query;
+	int		unspecified;
+	int		kre;
+	int		sre;
+	int		eret;
+	int		i;
+	int		j;
+	int		got;
+	char*		p;
+	char*		spec;
+	char*		re;
+	char*		s;
+	char*		ans;
+	char*		msg;
+	char*		field[6];
+	char		buf[16 * 1024];
+	char		unit[64];
+
+	int		catch = 0;
+	int		level = 1;
+	int		locale = 0;
+	int		skip = 0;
+	int		testno = 0;
+	int		verbose = 0;
+
+	printf("TEST\t%s", s = fmtident(id));
+	p = unit;
+	while (p < &unit[sizeof(unit)-1] && (*p = *s++) && !isspace(*p))
+		p++;
+	*p = 0;
+	while ((p = *++argv) && *p == '-')
+		for (;;) {
+			switch (*++p) {
+
+			case 0:
+				break;
+			case 'c':
+				catch = 1;
+				printf(", catch");
+				continue;
+			case 'v':
+				verbose = 1;
+				printf(", verbose");
+				continue;
+			default:
+				printf(", invalid option %c", *p);
+				continue;
+			}
+			break;
+		}
+	if (p)
+		printf(", argument(s) ignored");
+	printf("\n");
+	if (elementsof(unsupported) > 1) {
+		printf("NOTE\tunsupported:");
+		got = ' ';
+		for (i = 0; i < elementsof(unsupported) - 1; i++) {
+			printf("%c%s", got, unsupported[i]);
+			got = ',';
+		}
+		printf("\n");
+	}
+	if (catch) {
+		signal(SIGALRM, gotcha);
+		signal(SIGBUS, gotcha);
+		signal(SIGSEGV, gotcha);
+	}
+	while (p = gets(buf)) {
+		state.lineno++;
+
+	/* parse: */
+
+		if (*p == 0 || *p == '#')
+			continue;
+		if (*p == ':') {
+			while (*++p == ' ');
+			printf("NOTE	%s\n", p);
+			continue;
+		}
+		i = 0;
+		field[i++] = p;
+		for (;;) {
+			switch (*p++) {
+
+			case 0:
+				p--;
+				goto checkfield;
+			case '\t':
+				*(p - 1) = 0;
+			checkfield:
+				s = field[i - 1];
+				if (streq(s, "NIL"))
+					field[i - 1] = 0;
+				else if (streq(s, "NULL"))
+					*s = 0;
+				while (*p == '\t')
+					p++;
+				if (!*p)
+					break;
+				if (i >= elementsof(field))
+					bad("too many fields\n", NiL, NiL, 0);
+				field[i++] = p;
+				/*FALLTHROUGH*/
+			default:
+				continue;
+			}
+			break;
+		}
+		if (!(spec = field[0]))
+			bad("NIL spec\n", NiL, NiL, 0);
+
+	/* interpret: */
+
+		cflags = 0;
+		eflags = 0;
+#if 0
+#if FNM_PATHNAME != NOTEST
+		eflags |= FNM_PATHNAME;
+#endif
+#if FNM_PERIOD != NOTEST
+		eflags |= FNM_PERIOD;
+#endif
+#endif
+		expand = query = unspecified = kre = sre = 0;
+		for (p = spec; *p; p++) {
+			if (isdigit(*p)) {
+				strtol(p, &p, 10);
+				p--;
+				continue;
+			}
+			switch (*p) {
+
+			case 'A':
+				continue;
+			case 'B':
+				continue;
+			case 'C':
+				if (!query && !(skip & level))
+					bad("locale must be nested\n", NiL, NiL, 0);
+				query = 0;
+				if (locale)
+					bad("locale nesting not supported\n", NiL, NiL, 0);
+				if (i != 2)
+					bad("locale field expected\n", NiL, NiL, 0);
+				if (!(skip & level)) {
+#if defined(LC_COLLATE) && defined(LC_CTYPE)
+					s = field[1];
+					if (!s || streq(s, "POSIX"))
+						s = "C";
+					if (!(ans = setlocale(LC_COLLATE, s)) || streq(ans, "C") || streq(ans, "POSIX") || !(ans = setlocale(LC_CTYPE, s)) || streq(ans, "C") || streq(ans, "POSIX"))
+						skip = note(level, skip, s);
+					else {
+						printf("NOTE	\"%s\" locale\n", s);
+						locale = level;
+					}
+#else
+					skip = note(level, skip, "locales not supported");
+#endif
+				}
+				cflags = NOTEST;
+				continue;
+			case 'E':
+				continue;
+			case 'K':
+				kre = 1;
+				continue;
+			case 'L':
+				continue;
+			case 'S':
+				sre = 1;
+				continue;
+
+			case 'a':
+				continue;
+			case 'b':
+				cflags = NOTEST;
+				continue;
+			case 'd':
+				eflags |= FNM_PERIOD;
+				continue;
+			case 'e':
+				cflags = NOTEST;
+				continue;
+			case 'f':
+				continue;
+			case 'g':
+				eflags |= FNM_LEADING_DIR;
+				continue;
+			case 'i':
+				eflags |= FNM_ICASE;
+				continue;
+			case 'l':
+				eflags = NOTEST;
+				continue;
+			case 'm':
+				eflags = NOTEST;
+				continue;
+			case 'n':
+				cflags = NOTEST;
+				continue;
+			case 'p':
+				eflags |= FNM_PATHNAME;
+				continue;
+			case 'r':
+				eflags = NOTEST;
+				continue;
+			case 's':
+				eflags |= FNM_NOESCAPE;
+				continue;
+			case 'u':
+				unspecified = 1;
+				continue;
+			case 'x':
+				cflags = NOTEST;
+				continue;
+			case 'z':
+				cflags = NOTEST;
+				continue;
+
+			case '$':
+				expand = 1;
+				continue;
+
+			case '{':
+				level <<= 1;
+				if (skip & (level >> 1)) {
+					skip |= level;
+					cflags = NOTEST;
+				}
+				else {
+					skip &= ~level;
+					query = 1;
+				}
+				continue;
+			case '}':
+				if (level == 1)
+					bad("invalid {...} nesting\n", NiL, NiL, 0);
+				else
+				{
+					if ((skip & level) && !(skip & (level>>1)))
+						printf("-%d\n", state.lineno);
+#if defined(LC_COLLATE) && defined(LC_CTYPE)
+					else if (locale & level) {
+						locale = 0;
+						if (!(skip & level)) {
+							s = "C";
+							setlocale(LC_COLLATE, s);
+							setlocale(LC_CTYPE, s);
+							printf("NOTE	\"%s\" locale\n", s);
+						}
+					}
+#endif
+					level >>= 1;
+				}
+				cflags = NOTEST;
+				continue;
+
+			default:
+				bad("bad spec\n", spec, NiL, 0);
+				break;
+
+			}
+			break;
+		}
+		if ((cflags|eflags) == NOTEST || !sre && !kre)
+			continue;
+		if (i < 4)
+			bad("too few fields\n", NiL, NiL, 0);
+		while (i < elementsof(field))
+			field[i++] = 0;
+		if ((re = field[1]) && expand)
+			escape(re);
+		if ((s = field[2]) && expand)
+			escape(s);
+		if (!(ans = field[3]))
+			bad("NIL answer\n", NiL, NiL, 0);
+		if (*ans == '(') {
+			i = strtol(ans + 1, &p, 10);
+			j = strtol(p + 1, &p, 10);
+			if (*p == ')') {
+				s[j] = 0;
+				s += i;
+			}
+		}
+		msg = field[4];
+		fflush(stdout);
+
+	compile:
+
+		if (skip)
+			continue;
+		if (sre) {
+			state.which = "SRE";
+			sre = 0;
+		}
+#ifdef FNM_AUGMENTED
+		else if (kre) {
+			state.which = "KRE";
+			eflags |= FNM_AUGMENTED;
+			kre = 0;
+		}
+#endif
+		else
+			continue;
+		if (!query && verbose)
+			printf("test %-3d %s \"%s\" \"%s\"\n", state.lineno, state.which, re, s);
+		if (skip)
+			continue;
+		if (!query)
+			testno++;
+		if (catch) {
+			if (setjmp(state.gotcha))
+				eret = state.ret;
+			else {
+				alarm(LOOPED);
+				eret = fnmatch(re, s, eflags);
+				alarm(0);
+			}
+		}
+		else
+			eret = fnmatch(re, s, eflags);
+		if (eret) {
+			if (!streq(ans, "NOMATCH") && *ans != 'E') {
+				if (query)
+					skip = note(level, skip, msg);
+				else {
+					report("failed: ", re, s, msg, unspecified, expand);
+					if (eret == FNM_NOMATCH)
+						printf("OK expected, NOMATCH returned");
+					else
+						printf("OK expected, error %d returned", eret);
+					printf("\n");
+				}
+			}
+		}
+		else if (streq(ans, "NOMATCH") || *ans == 'E') {
+			if (query)
+				skip = note(level, skip, msg);
+			else {
+				report("failed: ", re, s, msg, unspecified, expand);
+				printf("%s expected, OK returned", ans);
+				printf("\n");
+			}
+		}
+		goto compile;
+	}
+	printf("TEST\t%s, %d test%s", unit, testno, testno == 1 ? "" : "s");
+	if (state.ignore.count)
+		printf(", %d ignored mismatche%s", state.ignore.count, state.ignore.count == 1 ? "" : "s");
+	if (state.warnings)
+		printf(", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
+	if (state.unspecified)
+		printf(", %d unspecified difference%s", state.unspecified, state.unspecified == 1 ? "" : "s");
+	if (state.signals)
+		printf(", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
+	printf(", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
+	return 0;
+}

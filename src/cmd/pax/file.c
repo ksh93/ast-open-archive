@@ -151,7 +151,7 @@ openin(register Archive_t* ap, register File_t* f)
 
 	if (f->type != X_IFREG)
 		rfd = -1;
-	else if (state.filter.argv)
+	else if (state.filter.argv && f->st->st_size)
 		rfd = filter(ap, f);
 	else if ((rfd = open(f->st->st_size ? f->path : "/dev/null", O_RDONLY|O_BINARY)) < 0)
 		error(ERROR_SYSTEM|2, "%s: cannot read", f->path);
@@ -469,6 +469,7 @@ openout(register Archive_t* ap, register File_t* f)
 				return -1;
 			}
 		}
+		setfile(ap, f);
 		listentry(f);
 		return -2;
 	}
@@ -530,14 +531,20 @@ openout(register Archive_t* ap, register File_t* f)
 			 * thanks to the amazing dr. ek
 			 */
 
+			if (missdir(ap, f))
+			{
+				error(ERROR_SYSTEM|2, "%s: cannot create intermediate directories", f->name);
+				return -1;
+			}
 			d = (e = strrchr(f->name, '/')) ? f->name : ".";
 			for (n = 0;; n++)
 			{
 				if (e)
 					*e = 0;
-				f->intermediate = pathtmp(ap->path.temp, d, error_info.id, &ifd);
+				f->intermediate = pathtemp(ap->path.temp, sizeof(ap->path.temp), d, error_info.id, &ifd);
 				if (e)
 					*e = '/';
+				message((-4, "%s: intermediate %s", f->name, f->intermediate));
 				if (f->intermediate)
 				{
 					ap->errors = error_info.errors;
@@ -546,11 +553,6 @@ openout(register Archive_t* ap, register File_t* f)
 				if (n)
 				{
 					error(ERROR_SYSTEM|2, "%s: cannot create intermediate name", f->name);
-					return -1;
-				}
-				if (missdir(ap, f))
-				{
-					error(ERROR_SYSTEM|2, "%s: cannot create intermediate directories", f->name);
 					return -1;
 				}
 			}
@@ -1105,6 +1107,7 @@ initarchive(const char* name, int mode)
 	ap->sum = -1;
 	ap->mio.mode = ap->tio.mode = mode;
 	ap->io = &ap->mio;
+	ap->convert[0].internal = ap->convert[0].external = CC_NATIVE;
 	return ap;
 }
 
@@ -1158,7 +1161,41 @@ setfile(register Archive_t* ap, register File_t* f)
 	switch (f->type)
 	{
 	case X_IFLNK:
-		break;
+#if _lib_lchown
+		if (state.owner)
+		{
+			if (state.flags & SETIDS)
+			{
+				post.uid = state.setuid;
+				post.gid = state.setgid;
+			}
+			else
+			{
+				post.uid = f->st->st_uid;
+				post.gid = f->st->st_gid;
+			}
+			if (lchown(f->name, post.uid, post.gid) < 0)
+				error(1, "%s: cannot chown to (%d,%d)", f->name, post.uid, post.gid);
+		}
+#endif
+#if _lib_lchmod
+		if (f->chmod)
+		{
+			int		m;
+			struct stat	st;
+
+			if (lchmod(f->name, f->perm & state.modemask))
+				error(1, "%s: cannot chmod to %s", f->name, fmtmode(f->perm & state.modemask, 0) + 1);
+			else if (m = f->perm & (S_ISUID|S_ISGID|S_ISVTX))
+			{
+				if (lstat(f->name, &st))
+					error(1, "%s: not found", f->name);
+				else if (m ^= (st.st_mode & (S_ISUID|S_ISGID|S_ISVTX)))
+					error(1, "%s: mode %s not set", f->name, fmtmode(m, 0) + 1);
+			}
+		}
+#endif
+		return;
 	case X_IFDIR:
 		if (f->chmod || state.modtime || state.owner || (f->perm & S_IRWXU) != S_IRWXU)
 		{
@@ -1177,19 +1214,17 @@ setfile(register Archive_t* ap, register File_t* f)
 			else
 				p->chmod = f->chmod;
 			hashput(state.restore, f->name, p);
-			break;
+			return;
 		}
-		/*FALLTHROUGH*/
-	default:
-		p = &post;
-		p->mtime = f->st->st_mtime;
-		p->uid = f->st->st_uid;
-		p->gid = f->st->st_gid;
-		p->mode = f->perm;
-		p->chmod = f->chmod;
-		restore(f->name, (char*)p, NiL);
 		break;
 	}
+	p = &post;
+	p->mtime = f->st->st_mtime;
+	p->uid = f->st->st_uid;
+	p->gid = f->st->st_gid;
+	p->mode = f->perm;
+	p->chmod = f->chmod;
+	restore(f->name, (char*)p, NiL);
 }
 
 /*

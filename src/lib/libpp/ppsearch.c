@@ -33,6 +33,7 @@
 
 #define SEARCH_NEXT	(SEARCH_USER<<1)/* search for next (uncover)	*/
 #define SEARCH_SKIP	(SEARCH_USER<<2)/* current binding skipped	*/
+#define SEARCH_TEST	(SEARCH_USER<<3)/* current binding skipped	*/
 
 #define COLUMN_TAB	7
 #define COLUMN_MAX	72
@@ -356,8 +357,14 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 						fp->bound[index] = xp = ppsetfile(pp.path);
 						if ((flags & SEARCH_INCLUDE) || (xp->flags & INC_EXISTS))
 						{
-							if (!(flags & SEARCH_INCLUDE) || !ppmultiple(xp, INC_TEST))
+							if (!(flags & SEARCH_INCLUDE))
 								return 0;
+							if (!ppmultiple(xp, INC_TEST))
+							{
+								if (flags & SEARCH_TEST)
+									pp.include = xp->name;
+								return 0;
+							}
 							mp = xp;
 						}
 					}
@@ -372,8 +379,14 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 				else
 				{
 					strcpy(pp.path, xp->name);
-					if (!(flags & SEARCH_INCLUDE) || !ppmultiple(xp, INC_TEST))
+					if (!(flags & SEARCH_INCLUDE))
 						return 0;
+					if (!ppmultiple(xp, INC_TEST))
+					{
+						if (flags & SEARCH_TEST)
+							pp.include = xp->name;
+						return 0;
+					}
 					mp = xp;
 				}
 			}
@@ -396,8 +409,14 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 		{
 			if (xp->flags & INC_EXISTS)
 			{
-				if (!(flags & SEARCH_INCLUDE) || !(flags & SEARCH_NEXT) && mp != xp && (mp = xp) && !ppmultiple(xp, INC_TEST))
+				if (!(flags & SEARCH_INCLUDE))
 					return 0;
+				if (!(flags & SEARCH_NEXT) && mp != xp && (mp = xp) && !ppmultiple(xp, INC_TEST))
+				{
+					if (flags & SEARCH_TEST)
+						pp.include = xp->name;
+					return 0;
+				}
 			}
 			else if (*fp->name == '/')
 				break;
@@ -471,21 +490,24 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 #endif
 						if (fd > 0)
 							close(fd);
+						if (flags & SEARCH_TEST)
+							pp.include = xp->name;
 						return 0;
 					}
 				}
 				pp.include = xp->name;
-				if ((pp.mode & (FILEDEPS|INIT)) == FILEDEPS && ((pp.mode & HEADERDEPS) || !(pp.mode & MARKHOSTED)))
+				if ((pp.mode & (FILEDEPS|INIT)) == FILEDEPS && ((pp.mode & HEADERDEPS) || !(pp.mode & MARKHOSTED)) && !(xp->flags & INC_LISTED))
 				{
+					xp->flags |= INC_LISTED;
 					if ((pp.column + strlen(xp->name)) >= COLUMN_MAX)
 					{
-						sfprintf(pp.filedeps, " \\\n");
+						sfprintf(pp.filedeps.sp, " \\\n");
 						pp.column = COLUMN_TAB;
 						index = '\t';
 					}
 					else
 						index = ' ';
-					pp.column += sfprintf(pp.filedeps, "%c%s", index, xp->name);
+					pp.column += sfprintf(pp.filedeps.sp, "%c%s", index, xp->name);
 				}
 			}
 			return fd;
@@ -524,6 +546,7 @@ ppsearch(char* file, int type, int flags)
 	register char*		s;
 	register struct ppdirs*	dp;
 	struct oplist*		cp;
+	struct ppfile*		xp;
 	int			dospath;
 	int			fd;
 	int			index;
@@ -565,7 +588,7 @@ ppsearch(char* file, int type, int flags)
 			m = strlen(fp->name + 4);
 			if (n < m || !streq(fp->name + 4, error_info.file + n - m))
 			{
-				if ((fd = ppsearch(fp->name + 4, type, flags)) < 0)
+				if ((fd = ppsearch(fp->name + 4, type, flags|SEARCH_TEST)) < 0)
 					return -1;
 				if (fd > 0)
 					close(fd);
@@ -642,8 +665,6 @@ ppsearch(char* file, int type, int flags)
 			}
 			if (fd >= 0)
 			{
-				struct ppfile*	xp;
-
 				sfsprintf(name, sizeof(name) - 1, "%s/%s", pp.in->prefix, fp->name);
 				pathcanon(name, 0);
 				xp = ppsetfile(name);
@@ -692,15 +713,20 @@ ppsearch(char* file, int type, int flags)
 			}
 			else if (!(pp.mode & INIT))
 			{
-				if ((pp.column + strlen(file)) >= COLUMN_MAX)
+				xp = ppsetfile(file);
+				if (!(xp->flags & INC_LISTED))
 				{
-					sfprintf(pp.filedeps, " \\\n");
-					pp.column = COLUMN_TAB;
-					index = '\t';
+					xp->flags |= INC_LISTED;
+					if ((pp.column + strlen(file)) >= COLUMN_MAX)
+					{
+						sfprintf(pp.filedeps.sp, " \\\n");
+						pp.column = COLUMN_TAB;
+						index = '\t';
+					}
+					else
+						index = ' ';
+					pp.column += sfprintf(pp.filedeps.sp, "%c%s", index, file);
 				}
-				else
-					index = ' ';
-				pp.column += sfprintf(pp.filedeps, "%c%s", index, file);
 			}
 		}
 	}

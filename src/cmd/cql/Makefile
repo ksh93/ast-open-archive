@@ -27,4 +27,5 @@ cdb :: cdb.1 cdb.c -lcdb -ldll
 	data/fix.cql data/fixcheck.cql data/fixok.db data/fixko.db \
 	data/array1.cql data/array1.db data/array2.cql data/array2.db \
 	data/span.db \
-	data/space.cql data/space.db
+	data/space.cql data/space.db \
+	data/fax.cql data/faxdat.db data/faxref.db

@@ -100,12 +100,16 @@ ck_atoi (str, out)
      char const *str;
      int *out;
 {
+#if _PACKAGE_ast
+  *out = opt_info.num;
+#else
   char const *p;
   for (p = str; *p; p++)
     if (*p < '0' || *p > '9')
       return -1;
 
   *out = atoi (optarg);
+#endif
   return 0;
 }
 
@@ -167,7 +171,7 @@ add_exclude_file (name)
   return close (f.desc);
 }
 
-/* The numbers 129- that appear in the fourth element of some entries
+/* The numbers -129... that appear in the fourth element of some entries
    tell the big switch in `main' how to process those options.  */
 
 #if _PACKAGE_ast
@@ -332,20 +336,20 @@ static struct option const longopts[] =
   {"exclude-from", 1, 0, 'X'},
   {"side-by-side", 0, 0, 'y'},
   {"unified", 2, 0, 'U'},
-  {"left-column", 0, 0, 129},
-  {"suppress-common-lines", 0, 0, 130},
-  {"sdiff-merge-assist", 0, 0, 131},
-  {"old-line-format", 1, 0, 132},
-  {"new-line-format", 1, 0, 133},
-  {"unchanged-line-format", 1, 0, 134},
-  {"line-format", 1, 0, 135},
-  {"old-group-format", 1, 0, 136},
-  {"new-group-format", 1, 0, 137},
-  {"unchanged-group-format", 1, 0, 138},
-  {"changed-group-format", 1, 0, 139},
-  {"horizon-lines", 1, 0, 140},
-  {"help", 0, 0, 141},
-  {"binary", 0, 0, 142},
+  {"left-column", 0, 0, -129},
+  {"suppress-common-lines", 0, 0, -130},
+  {"sdiff-merge-assist", 0, 0, -131},
+  {"old-line-format", 1, 0, -132},
+  {"new-line-format", 1, 0, -133},
+  {"unchanged-line-format", 1, 0, -134},
+  {"line-format", 1, 0, -135},
+  {"old-group-format", 1, 0, -136},
+  {"new-group-format", 1, 0, -137},
+  {"unchanged-group-format", 1, 0, -138},
+  {"changed-group-format", 1, 0, -139},
+  {"horizon-lines", 1, 0, -140},
+  {"help", 0, 0, -141},
+  {"binary", 0, 0, -142},
   {0, 0, 0, 0}
 };
 
@@ -374,7 +378,7 @@ main (argc, argv)
 
 #if _PACKAGE_ast
   error_info.id = "diff";
-  while ((c = optget(argv, ast_usage)) && c < 0 ? (c = -c) : c)
+  while (c = optget(argv, ast_usage))
 #else
   while ((c = getopt_long (argc, argv,
 			   "0123456789abBcC:dD:efF:hHiI:lL:nNpPqrsS:tTuU:vwW:x:X:y",
@@ -635,29 +639,29 @@ main (argc, argv)
 	    fatal ("column width must be a positive integer");
 	  break;
 
-	case 129:
+	case -129:
 	  sdiff_left_only = 1;
 	  break;
 
-	case 130:
+	case -130:
 	  sdiff_skip_common_lines = 1;
 	  break;
 
-	case 131:
+	case -131:
 	  /* sdiff-style columns output. */
 	  specify_style (OUTPUT_SDIFF);
 	  sdiff_help_sdiff = 1;
 	  break;
 
-	case 132:
-	case 133:
-	case 134:
+	case -132:
+	case -133:
+	case -134:
 	  specify_style (OUTPUT_IFDEF);
 	  if (specify_format (&line_format[c - 132], optarg) != 0)
 	    error ("conflicting line format", 0, 0);
 	  break;
 
-	case 135:
+	case -135:
 	  specify_style (OUTPUT_IFDEF);
 	  {
 	    int i, err = 0;
@@ -668,26 +672,26 @@ main (argc, argv)
 	  }
 	  break;
 
-	case 136:
-	case 137:
-	case 138:
-	case 139:
+	case -136:
+	case -137:
+	case -138:
+	case -139:
 	  specify_style (OUTPUT_IFDEF);
 	  if (specify_format (&group_format[c - 136], optarg) != 0)
 	    error ("conflicting group format", 0, 0);
 	  break;
 
-	case 140:
+	case -140:
 	  if (ck_atoi (optarg, &horizon_lines) || horizon_lines < 0)
 	    fatal ("horizon must be a nonnegative integer");
 	  break;
 
-	case 141:
+	case -141:
 	  usage ();
 	  check_stdout ();
 	  exit (0);
 
-	case 142:
+	case -142:
 	  /* Use binary I/O when reading and writing data.
 	     On Posix hosts, this has no effect.  */
 #if HAVE_SETMODE

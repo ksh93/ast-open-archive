@@ -1,3 +1,7 @@
+Thu Apr 19 14:27:41 2001  Glenn Fowler <gsf@research.att.com>
+
+	* diff,diff3,sdiff : use negative indices to avoid non-ascii case dups
+
 Wed Jul 19 16:01:22 2000  Glenn Fowler <gsf@research.att.com>
 
 	* diff3 : call execvp() instead of execve()

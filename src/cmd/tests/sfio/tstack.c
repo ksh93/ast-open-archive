@@ -35,10 +35,10 @@ Void_t*		data;
 Sfdisc_t*	disc;
 #endif
 {
-	if(type == SF_CLOSE || type == SF_FINAL)
+	if(type == SF_CLOSING || type == SF_FINAL)
 	{	if(f != Fclose)
 			return -1;
-		if(type == SF_CLOSE && (f->mode&SF_RDWR) != f->mode)
+		if(type == SF_CLOSING && (f->mode&SF_RDWR) != f->mode)
 			terror("Stream should be open\n");
 		return 0;
 	}

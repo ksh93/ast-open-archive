@@ -1,5 +1,7 @@
+01-02-14 cdbtypes: add seed detail for {hash} and {rand} types
 01-01-01 cdbimage: drop span discipline that invalidated seeks
-	 cdbflat: check details in flatevent, fix CDB_SPACE
+	 cdbflat: check details in flatevent
+	 cdbflat: fix CDB_SPACE to strip both leading and trailing space
 00-02-14 cdbimage: fix record span bug that caused cql regression test failures
 99-10-01 add: cdbimage() CDB_IMAGE
 99-08-11 cdbopen: fix referenced checks

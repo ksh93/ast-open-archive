@@ -93,7 +93,7 @@ exceptf(Css_t* css, unsigned long op, unsigned long arg, Cssdisc_t* disc)
 	case CSS_WAKEUP:
 		return !server->to ? 0 : (*server->to)(server->handle) < 0 ? -1 : 1;
 	}
-	error(ERROR_SYSTEM|3, "poll error");
+	error(ERROR_SYSTEM|3, "poll error [op=%lu arg=%lu]", op, arg);
 	return -1;
 }
 
@@ -154,9 +154,12 @@ csserve(Cs_t* state, void* handle, const char* path, void* (*init)(void*, int), 
 	server->disc.version = CSS_VERSION;
 	server->disc.flags = CSS_DAEMON|CSS_LOG|CSS_CLOSE|CSS_ERROR|CSS_INTERRUPT|CSS_TIMEOUT|CSS_WAKEUP;
 	server->handle = handle;
-	if (server->con = con)
+	server->con = con;
+	if (server->con)
 		server->disc.acceptf = acceptf;
-	if ((server->rd = rd) || (server->wr = wr))
+	server->rd = rd;
+	server->wr = wr;
+	if (server->rd || server->wr)
 		server->disc.actionf = actionf;
 	server->to = to;
 	server->disc.errorf = (Csserror_f)errorf;
@@ -166,7 +169,10 @@ csserve(Cs_t* state, void* handle, const char* path, void* (*init)(void*, int), 
 	if (!(server->css = cssopen(path, (Cssdisc_t*)server)))
 		exit(1);
 	error_info.id = server->css->service;
+	state->id = server->css->id;
 	state->cs = server->css->path;
+	state->control = state->mount + (server->css->control - server->css->mount);
+	strcpy(state->mount, server->css->mount);
 #ifdef SIGCHLD
 	if (!done)
 		signal(SIGCHLD, SIG_DFL);

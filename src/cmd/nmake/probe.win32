@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2000-12-25
+# @(#)probe.win32 (AT&T Labs Research) 2001-02-14
 #
 # win32 specific make C probe initialization
 # ms vc is easy on uwin
@@ -70,10 +70,13 @@ CC.DEBUG = -g
 CC.DIALECT = ANSI DYNAMIC
 CC.DLL = -D_BLD_DLL
 CC.DLLBIG = -D_BLD_DLL
+CC.DLL.VARIANTS =
+CC.DLL.LIBRARIES =
 CC.DYNAMIC =
 CC.HOSTTYPE = $(package)
 CC.LD = /usr/bin/ld
 CC.LD.DYNAMIC = -Bdynamic
+CC.LD.RUNPATH =
 CC.LD.STATIC = -Bstatic
 CC.LIB.DLL = option
 CC.LIB.ALL = -Bwhole-archive
@@ -84,8 +87,11 @@ CC.NMEDIT =
 CC.NMFLAGS =
 CC.OPTIMIZE = -O
 CC.READONLY =
+CC.REPOSITORY =
 CC.SHARED = -G
-CC.STATIC =
+CC.SHARED.REGISTRY =
+CC.SHARED.REGISTRY.PATH =
+CC.STATIC = -Bstatic
 !
 	case $uwin in
 	[0-9]*)	cat >&3 <<!

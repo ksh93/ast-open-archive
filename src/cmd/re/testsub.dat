@@ -1,0 +1,77 @@
+: regsub tests 2001-06-18
+
+E/	/[az]/X/		abc.xyz			Xbc.xyz
+E/	/[az]/X/g		abc.xyz			Xbc.xyX
+
+E/	/\b/-/			abc.xyz			-abc.xyz
+E/	/\b/-/g			abc.xyz			-abc.xyz
+
+E/	/.\b/&-/		abc.xyz			abc-.xyz
+E/	/.\b/&-/g		abc.xyz			abc-.-xyz-
+E/	/.\b/\0-/		abc.xyz			abc-.xyz
+E/	/.\b/\0-/g		abc.xyz			abc-.-xyz-
+
+E/	/\b./-&/		abc.xyz			-abc.xyz
+E/	/\b./-&/g		abc.xyz			-a-b-c-.-x-y-z
+E/	/\b./-\0/		abc.xyz			-abc.xyz
+E/	/\b./-\0/g		abc.xyz			-a-b-c-.-x-y-z
+
+E/	/.\b/&\&/		abc.xyz			abc&.xyz
+E/	/.\b/&\&/g		abc.xyz			abc&.&xyz&
+E/	/.\b/\0\&/		abc.xyz			abc&.xyz
+E/	/.\b/\0\&/g		abc.xyz			abc&.&xyz&
+
+E/	/\b./\&&/		abc.xyz			&abc.xyz
+E/	/\b./\&&/g		abc.xyz			&a&b&c&.&x&y&z
+E/	/\b./\&\0/		abc.xyz			&abc.xyz
+E/	/\b./\&\0/g		abc.xyz			&a&b&c&.&x&y&z
+
+E/	/\b./\%%/		abc:xyz			%%bc:xyz
+E/	/\b./\%%/g		abc:xyz			%%%%%%%%%%%%%%
+
+E/	/(.*):(.*)/\2:\1/	ABC:xyz			xyz:ABC
+E/	/(.*):(.*)/\1:\2/l	ABC:xyz			abc:xyz
+E/	/(.*):(.*)/\1:\2/u	ABC:xyz			ABC:XYZ
+E/	/(.*):(.*)/\L\1:\U\2/	ABC:xyz			abc:XYZ
+
+K/	/[az]/X/		abc.xyz			Xbc.xyz
+K/	/[az]/X/g		abc.xyz			Xbc.xyX
+
+K/	/\b/-/			abc.xyz			-abc.xyz
+K/	/\b/-/g			abc.xyz			-abc.xyz
+
+K/	/?\b/&-/		abc.xyz			ab&-.xyz
+K/	/?\b/&-/g		abc.xyz			ab&-&-xy&-
+K/	/?\b/~(&)-/		abc.xyz			abc-.xyz
+K/	/?\b/~(&)-/g		abc.xyz			abc-.-xyz-
+K/	/?\b/~(0)-/		abc.xyz			abc-.xyz
+K/	/?\b/~(0)-/g		abc.xyz			abc-.-xyz-
+
+K/	/\b?/-&/		abc.xyz			-&bc.xyz
+K/	/\b?/-&/g		abc.xyz			-&-&-&-&-&-&-&
+K/	/\b?/-~(&)/		abc.xyz			-abc.xyz
+K/	/\b?/-~(&)/g		abc.xyz			-a-b-c-.-x-y-z
+K/	/\b?/-~(0)/		abc.xyz			-abc.xyz
+K/	/\b?/-~(0)/g		abc.xyz			-a-b-c-.-x-y-z
+
+K/	/?\b/&\&/		abc.xyz			ab&&.xyz
+K/	/?\b/&\&/g		abc.xyz			ab&&&&xy&&
+K/	/?\b/~(&)&/		abc.xyz			abc&.xyz
+K/	/?\b/~(&)&/g		abc.xyz			abc&.&xyz&
+K/	/?\b/~(0)&/		abc.xyz			abc&.xyz
+K/	/?\b/~(0)&/g		abc.xyz			abc&.&xyz&
+
+K/	/\b?/\&&/		abc.xyz			&&bc.xyz
+K/	/\b?/\&&/g		abc.xyz			&&&&&&&&&&&&&&
+K/	/\b?/&~(&)/		abc.xyz			&abc.xyz
+K/	/\b?/&~(&)/g		abc.xyz			&a&b&c&.&x&y&z
+K/	/\b?/&~(0)/		abc.xyz			&abc.xyz
+K/	/\b?/&~(0)/g		abc.xyz			&a&b&c&.&x&y&z
+
+K/	/\b?/\%%/		abc:xyz			%%bc:xyz
+K/	/\b?/\%%/g		abc:xyz			%%%%%%%%%%%%%%
+
+K/	/@(*):@(*)/~(2):~(1)/		ABC:xyz		xyz:ABC
+K/	/@(*):@(*)/~(1):~(2)/l		ABC:xyz		abc:xyz
+K/	/@(*):@(*)/~(1):~(2)/u		ABC:xyz		ABC:XYZ
+K/	/@(*):@(*)/~(L)~(1):~(U)~(2)/	ABC:xyz		abc:XYZ

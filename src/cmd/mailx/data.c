@@ -6,7 +6,7 @@
 
 #include "mailx.h"
 
-static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.8 2001-01-01 $\0\n";
+static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.8 2001-04-01 $\0\n";
 
 static const char	terms[] = "\n\
 @(#)Copyright (c) 1980, 1993, 1996\n\
@@ -375,6 +375,8 @@ static const struct var	vartab[] =
 	X("Ignore blank lines in message headers."),
 "hold",		&state.var.hold,		0,	0,0,
 	X("Preserve all READ messages in the system mailbox rather than in ${MBOX}."),
+"hostname",	&state.var.hostname,		0,	"localhost",0,
+	X("The local host name."),
 "ignore",	&state.var.ignore,		0,	0,0,
 	X("Ignore interrupts on message input."),
 "ignoreeof",	&state.var.ignoreeof,		0,	0,0,
@@ -503,7 +505,7 @@ static const struct lab	hdrtab[] =
 
 State_t		state =
 {
-	id + 10,
+	id,
 	terms + 5,
 	"",
 	cmdtab,

@@ -2,7 +2,15 @@
 #include <dirent.h>
 #include <pwd.h>
 #include <times.h>
+#if HAVE_TIME_H
+#include <time.h>
+#endif
+#if HAVE_SYS_PARAM_H
 #include <sys/param.h>
+#endif
+#if HAVE___FD_MASK
+#define fd_mask		__fd_mask
+#endif
 
 #ifndef S_ISLNK
 #define S_ISLNK(m)	0

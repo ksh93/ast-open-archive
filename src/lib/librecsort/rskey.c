@@ -22,6 +22,7 @@
 *                 Phong Vo <kpv@research.att.com>                  *
 *               Glenn Fowler <gsf@research.att.com>                *
 *******************************************************************/
+#pragma prototyped
 /*
  * Glenn Fowler
  * AT&T Research
@@ -36,6 +37,7 @@
 
 #if _sys_resource && _lib_getrlimit
 
+#include <times.h>
 #include <sys/resource.h>
 
 static size_t

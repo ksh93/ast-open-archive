@@ -24,7 +24,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: tsort (AT&T Labs Research) 2000-01-11 $\n]"
+"[-?\n@(#)$Id: tsort (AT&T Labs Research) 2000-03-23 $\n]"
 USAGE_LICENSE
 "[+NAME?tsort - topological sort]"
 "[+DESCRIPTION?\btsort\b writes to the standard output a totally ordered"
@@ -126,7 +126,7 @@ tsort(Sfio_t* ip)
 					if (!(p = newof(0, List_t, 1, 0)))
 						error(ERROR_exit(1), "out of space [hash list]");
 					p->node = head;
-					p->next = head->prereqs;
+					p->next = x->prereqs;
 					x->prereqs = p;
 				}
 				head = 0;

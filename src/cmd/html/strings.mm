@@ -23,7 +23,7 @@
 '''\"	Free Strings:  ]Q ]R ]H ]L ]V ]W ]X ]k ]l
 '''\"	
 '''\"	Register ;V = user-specified year for copyright date
-.nr ;V \n(yr
+.nr ;V \n(YR
 '''\"	AT&T PROPRIETARY MARKINGS
 '''\"	The following strings are used by the macro PM:
 '''\"	
@@ -55,7 +55,7 @@
 '''\"	Marking Type:  COPYRIGHT
 '''\"	Invocation:  .PM 5  or  .PM CR
 '''\"	Strings: ]i ]j
-.ds ]i \f1Copyright \(co 19\\n(;V AT&T\fP
+.ds ]i \f1Copyright \(co \\n(;V AT&T\fP
 .ds ]j \f1All Rights Reserved.\fP
 '''\"
 '''\"	Marking Type:  UNPUBLISHED WORK

@@ -41,7 +41,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2000-12-25 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2001-03-09 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -128,7 +128,7 @@ USAGE_LICENSE
 "		[+dump?List detailed information on the option settings.]"
 "		[+keys?List the canonical key for each record.]"
 "		[+read?Force input file read by disabling memory mapping.]"
-"		[+show?Show setup infomation and exit before sorting.]"
+"		[+show?Show setup information and exit before sorting.]"
 "		[+test?Immediatly exit with status 0; used to verify"
 "			this implementation]"
 "	}"
@@ -381,7 +381,7 @@ parse(register Sort_t* sp, char** argv)
 		kp->type |= RS_DATA;
 		break;
 	case 'T':
-		pathtmp(NiL, opt_info.arg, "/TMPPATH", NiL);
+		pathtemp(NiL, 0, opt_info.arg, "/TMPPATH", NiL);
 		break;
 	case 'X':
 		s = opt_info.arg;
@@ -782,7 +782,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 								*t = 0;
 							}
 							else s = ".";
-							if (sp->overwrite = pathtmp(NiL, s, error_info.id, &n))
+							if (sp->overwrite = pathtemp(NiL, 0, s, error_info.id, &n))
 								sp->op = sfnew(NiL, NiL, SF_UNBOUND, n, SF_WRITE);
 							if (t) *t = '/';
 							if (!sp->op || fstat(n, &is))

@@ -46,9 +46,9 @@ function title # [+ | - | =] title ...
 	export TITLE_TEXT="$t"
 	eval x=\"$t\"
 	case $TERM in
-	630*)	print -nr -- "[?${#x};0v$x" ;;
-	xterm*)	print -nr -- "]0;$x" ;;
-	*)	return 1 ;;
+	630*)			print -nr -- "[?${#x};0v$x" ;;
+	uwin*|*vt100|xterm*)	print -nr -- "]0;$x" ;;
+	*)			return 1 ;;
 	esac
 	return 0
 }

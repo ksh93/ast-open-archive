@@ -364,7 +364,7 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		dp->fmt = 'c';
 		value->c = 0;
 		break;
-	case '*':
+	case '.':
 		value->i = (int)strtol(s, NiL, 0);
 		break;
 	default:

@@ -56,6 +56,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 	char*				old_token;
 	struct ppmacstk*		mp;
 	struct ppinstk*			old_in;
+	struct ppinstk*			kp;
 	struct pptuple*			tp;
 
 	ret = -1;
@@ -162,6 +163,8 @@ ppcall(register struct ppsymbol* sym, int tok)
 				pp.token--;
 			if (pp.hidden != old_hidden)
 				*pp.token++ = '\n';
+			else
+				*pp.token++ = ' ';
 			*pp.token = 0;
 			pp.state = old_state;
 			pp.token = old_token;
@@ -291,6 +294,14 @@ ppcall(register struct ppsymbol* sym, int tok)
 					{
 						if (p > mp->arg[c] && *(p - 1) == ' ')
 							p--;
+						if (p > mp->arg[c] && *(p - 1) == '\\')
+						{
+							for (q = mp->arg[c]; q < p; q++)
+								if (*q == '\\')
+									q++;
+							if (q > p)
+								*p++ = '\\';
+						}
 #if MACKEYARGS
 						*p = 0;
 						m++;
@@ -326,7 +337,11 @@ ppcall(register struct ppsymbol* sym, int tok)
 					}
 					break;
 				case 0:
-					if (pp.in <= old_in)
+					if (pp.in == old_in)
+						kp = 0;
+					else
+						for (kp = pp.in; kp && kp != old_in; kp = kp->prev);
+					if (!kp)
 					{
 						error(
 #if COMPATIBLE
@@ -361,8 +376,12 @@ ppcall(register struct ppsymbol* sym, int tok)
 			if (pp.state & NOEXPAND)
 				mp->arg[c][-1] = 0;
 			pp.token = old_token;
-			if (pp.in > old_in)
-				error(2, "%s: macro call starts and ends in different files", sym->name);
+			if (pp.in != old_in)
+			{
+				for (kp = pp.in; kp && kp != old_in; kp = kp->prev);
+				if (kp)
+					error(2, "%s: macro call starts and ends in different files", sym->name);
+			}
 			pp.state &= ~(COLLECTING|FILEPOP|NOEXPAND);
 			sym->flags &= ~SYM_ACTIVE;
 #if MACKEYARGS

@@ -106,7 +106,7 @@ case $mode in
 	case $# in
 	0)	set - "." ;;
 	esac
-	options="$options -x tar"
+	options="$options -x ustar"
 	;;
 esac
 case $list in

@@ -36,11 +36,11 @@
  */
 
 void
-convert(int section, int internal, int external)
+convert(Archive_t* ap, int section, int internal, int external)
 {
-	state.convert[section].on =
-		(state.convert[section].internal = internal) !=
-		(state.convert[section].external = external);
+	ap->convert[section].on =
+		(ap->convert[section].internal = internal) !=
+		(ap->convert[section].external = external);
 }
 
 /*
@@ -127,7 +127,7 @@ cpio_short(register unsigned short* s, long n)
  */
 
 long
-tar_checksum(void)
+tar_checksum(Archive_t* ap)
 {
 	register unsigned char*		p;
 	register unsigned char*		e;
@@ -141,9 +141,9 @@ tar_checksum(void)
 	n = 0;
 	p = (unsigned char*)tar_block;
 	e = p + TAR_HEADER;
-	if (state.convert[SECTION_CONTROL].on)
+	if (ap->convert[SECTION_CONTROL].on)
 	{
-		map = CCMAP(state.convert[SECTION_CONTROL].internal, state.convert[SECTION_CONTROL].external);
+		map = CCMAP(ap->convert[SECTION_CONTROL].internal, ap->convert[SECTION_CONTROL].external);
 		while (p < e)
 			n += map[*p++];
 	}

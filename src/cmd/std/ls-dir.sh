@@ -24,6 +24,6 @@
 : we do that too
 ls 	-D header='%(dir.count:case:[01]::*:\n)s Directory of %(path)s\n' \
 	-D meridian='%(mtime:time=%p)s' \
-	-D trailer='%9(dir.files)lu file(s) %10(dir.octets)lu bytes\n' \
+	-D trailer='%9(dir.files)lu file(s) %10(dir.bytes)lu bytes\n' \
 	-f '%-8.8(name:edit:\\([^.]*\\).*:\\1:u)s %3.3(name:edit:[^.]*\\.*\\(.*\\):\\1:u)s %5(mode:case:d*:<DIR>:l*:<LNK>:*x*:<EXE>)s%7(size)lu %(mtime:time=%m-%d-%y  %I:%M)s%(meridian:edit:\\(.\\).*:\\1:l)s' \
 	"$@"

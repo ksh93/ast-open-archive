@@ -52,10 +52,10 @@ Sfdisc_t*	disc;
 #if __STD_C
 static Sfoff_t discseek(Sfio_t* f, Sfoff_t offset, int type, Sfdisc_t* disc)
 #else
-static ssize_t discseek(f, offset, type, disc)
+static Sfoff_t discseek(f, offset, type, disc)
 Sfio_t*		f;
 Sfoff_t		offset;
-int		type
+int		type;
 Sfdisc_t*	disc;
 #endif
 {

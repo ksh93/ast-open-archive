@@ -215,11 +215,7 @@ ppbuiltin(void)
 			break;
 		case V_STDC:
 			p = pp.valbuf;
-#if __sun__ || __sun || sun || _UWIN
-			p[0] = ((pp.state & (COMPATIBILITY|TRANSITION)) || (pp.mode & HOSTED)) ? '0' : '1';
-#else
-			p[0] = (pp.state & (COMPATIBILITY|TRANSITION)) ? '0' : '1';
-#endif
+			p[0] = ((pp.state & (COMPATIBILITY|TRANSITION)) || (pp.mode & (HOSTED|HOSTEDTRANSITION)) == (HOSTED|HOSTEDTRANSITION)) ? '0' : '1';
 			p[1] = 0;
 			break;
 		case V_TIME:
@@ -346,7 +342,11 @@ ppbuiltin(void)
 					break;
 				}
 			}
-			if (op != 3)
+			if (op == 3)
+				strncpy(pp.funbuf, p, sizeof(pp.funbuf) - 1);
+			else if (*pp.funbuf)
+				p = pp.funbuf;
+			else
 				p = "__FUNCTION__";
 			break;
 		default:

@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2001-01-01 $\n]"
+"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2001-06-06 $\n]"
 USAGE_LICENSE
 "[+NAME?cpp - C language preprocessor]"
 "[+DESCRIPTION?\bcpp\b is the preprocessor for all C language dialects. It is"
@@ -109,9 +109,15 @@ USAGE_LICENSE
 "[M:dependencies?Generate \bmake\b(1) dependencies. Not needed with"
 "	\bnmake\b(1). \b-M\b may be followed by optional \aflags\a to change"
 "	dependency output styles:]{"
-"	[+D?Generate dependencies in a separate \b.d\b file.]"
+"	[+D?Generate dependencies in a separate \b.d\b file. Preprocessed"
+"		output is still written to \aoutput\a, or the standard output"
+"		if \aoutput\a is omitted.]"
 "	[+G?Generate missing dependencies too.]"
-"	[+M?Only generate local header dependencies.]"
+"	[+M?Only generate local header dependencies; \ahosted\a headers are"
+"		omitted. Note that \ahosted\a headers are determined by"
+"		\b-I-H\b and the \bpp::hosted\b and \bpp::hostdir\b pragmas;"
+"		no special distiction is made between \"\" and <> \binclude\b"
+"		styles.]"
 "}"
 "[P!:sync?Emit line syncs.]"
 "[U:undefine?Remove the definition for the macro \aname\a.]:[name]"

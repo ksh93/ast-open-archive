@@ -28,7 +28,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)locate (AT&T Labs Research) 1999-01-23
+@(#)$Id: locate (AT&T Labs Research) 1999-01-23 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?locate - locate files in pathname database]

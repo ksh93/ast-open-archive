@@ -1053,7 +1053,7 @@ shell(void)
 			sfputc(ed.buffer.line, c);
 	}
 	if (ed.given) {
-		if (!ed.tmpfile && !(ed.tmpfile = pathtmp(NiL, NiL, error_info.id, NiL)))
+		if (!ed.tmpfile && !(ed.tmpfile = pathtemp(NiL, 0, NiL, error_info.id, NiL)))
 			error(ERROR_SYSTEM|2, "cannot generate temp file name");
 		if (!(ed.iop = sfopen(NiL, ed.tmpfile, "w")))
 			error(ERROR_SYSTEM|2, "%s: cannot create temp file", ed.tmpfile);

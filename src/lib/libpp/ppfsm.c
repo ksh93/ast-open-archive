@@ -553,7 +553,7 @@ char		trigraph[MAX+1];
 static char	spl[] = { '\\', '\r', 0 };
 static char	aln[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$@";
 #else
-static char	spl[] = { MARK, '?', '\\', '\r', 0 };
+static char	spl[] = { MARK, '?', '\\', '\r', CC_sub, 0 };
 static char	aln[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
 #endif
 static char*	let = &aln[10];

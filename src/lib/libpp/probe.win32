@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2001-01-01
+# @(#)probe.win32 (AT&T Labs Research) 2001-02-22
 #
 # win32 specific pp C probe initialization
 # ms vc is easy on uwin
@@ -136,6 +136,7 @@ echo "#define __unix__" __unix__
 
 #pragma pp:pluscomment
 #pragma pp:pragmaexpand
+#pragma pp:zeof
 #pragma pp:id "$"${standard}
 #pragma pp:nocatliteral
 #pragma pp:stringsplit

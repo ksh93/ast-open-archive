@@ -1,3 +1,5 @@
+01-06-01 cpp.tst: add -M* dependency generation tests
+01-02-14 cpp.tst: pp:pragmaexpand pp:catliteral # operator interactions
 01-02-05 cpp.tst: add (finally)
 96-01-31 --- release 2.0 ---
 92-04-01 update for new libpp

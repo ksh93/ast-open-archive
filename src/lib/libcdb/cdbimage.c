@@ -48,7 +48,7 @@ cdbimage(Cdb_t* cdb, Cdbrecord_t* rp, Sfio_t* op, int tc)
 	ssize_t			z;
 
 	r = 0;
-	z = cdb->io->next - cdb->io->data;
+	z = cdb->io->_next - cdb->io->_data;
 	n = sftell(cdb->io) - rp->offset;
 	if (n > z)
 	{
@@ -68,7 +68,7 @@ cdbimage(Cdb_t* cdb, Cdbrecord_t* rp, Sfio_t* op, int tc)
 		 */
 
 		r += n;
-		b = cdb->io->next - n;
+		b = cdb->io->_next - n;
 		if (rp->schema->terminator.chr >= 0)
 			n--;
 		if (n && sfwrite(op, b, n) != n)

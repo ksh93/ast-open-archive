@@ -1418,6 +1418,7 @@ typedef struct
 {
 	Cdbuint_t	hash;
 	int		rand;
+	int		seed;
 } Hash_t;
 
 static const char	lower_hash[] = "abcdefghijklmnopqrstuvwxyz";
@@ -1444,6 +1445,7 @@ init_hash(Cdb_t* cdb, Cdbtype_t* type)
 		HASHPART(h, n);
 	hp->hash = h;
 	hp->rand = type->name[0] == 'r';
+	hp->seed = 0;
 	type->data = (void*)hp;
 	return 0;
 }
@@ -1458,6 +1460,12 @@ internal_hash(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, const char* b, size_t 
 	register int		c;
 	register Cdbuint_t	h;
 
+	if (!hp->seed)
+	{
+		hp->seed = 1;
+		if (fp->details)
+			hp->hash = strtoul(fp->details, NiL, 0);
+	}
 	if (!(t = vmoldof(cdb->record->vm, 0, unsigned char, n + 1, 0)))
 		return -1;
 	dp->string.base = (char*)t;
@@ -1474,7 +1482,7 @@ internal_hash(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, const char* b, size_t 
 			c = lower_hash[h % (sizeof(lower_hash) - 1)];
 		else if (isupper(c))
 			c = upper_hash[h % (sizeof(upper_hash) - 1)];
-		else if (c != '+' && c != '-' && c != '_' && c != '.')
+		else if (c != '+' && c != '-' && c != '_' && c != '.' && c != ' ')
 			c = digit_hash[h % (sizeof(digit_hash) - 1)];
 		*t++ = c;
 	}
@@ -1494,6 +1502,12 @@ external_hash(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, char* b, size_t n, Cdb
 	register int		c;
 	register Cdbuint_t	h;
 
+	if (!hp->seed)
+	{
+		hp->seed = 1;
+		if (fp->details)
+			hp->hash = strtoul(fp->details, NiL, 0);
+	}
 	if (n < dp->string.length)
 		return -(dp->string.length + 1);
 	s = (unsigned char*)dp->string.base;
@@ -1508,7 +1522,7 @@ external_hash(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, char* b, size_t n, Cdb
 			c = lower_hash[h % (sizeof(lower_hash) - 1)];
 		else if (isupper(c))
 			c = upper_hash[h % (sizeof(upper_hash) - 1)];
-		else if (c != '+' && c != '-' && c != '_' && c != '.')
+		else if (c != '+' && c != '-' && c != '_' && c != '.' && c != ' ')
 			c = digit_hash[h % (sizeof(digit_hash) - 1)];
 		*t++ = c;
 	}

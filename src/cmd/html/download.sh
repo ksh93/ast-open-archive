@@ -28,7 +28,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)download (AT&T Labs Research) 2000-12-07
+@(#)$Id: download (AT&T Labs Research) 2000-12-07 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?download - generate web site download instructions for an mm document]

@@ -288,6 +288,7 @@ ppexpand(register char* p)
 	char*			pptoken;
 	char*			ppmactop;
 	struct ppmacstk*	nextmacp;
+	struct ppinstk*		cur;
 
 	debug((-7, "before expand: %s", p));
 	if (ppmactop = pp.mactop)
@@ -299,34 +300,41 @@ ppexpand(register char* p)
 	pp.state &= ~restore;
 	pp.mode &= ~MARKMACRO;
 	PUSH_STRING(p);
+	cur = pp.in;
 	pp.in->flags |= IN_expand;
 	pptoken = pp.token;
 	n = 2 * MAXTOKEN;
 	pp.token = p = oldof(0, char, 0, n);
 	m = p + MAXTOKEN;
-	while (pplex())
+	for (;;)
 	{
-		if ((pp.token = pp.toknxt) > m)
+		if (pplex())
 		{
-			c = pp.token - p;
-			p = newof(p, char, n += MAXTOKEN, 0);
-			m = p + n - MAXTOKEN;
-			pp.token = p + c;
+			if ((pp.token = pp.toknxt) > m)
+			{
+				c = pp.token - p;
+				p = newof(p, char, n += MAXTOKEN, 0);
+				m = p + n - MAXTOKEN;
+				pp.token = p + c;
+			}
+			if (pp.mode & MARKMACRO)
+			{
+				pp.mode &= ~MARKMACRO;
+				*pp.token++ = MARK;
+				*pp.token++ = 'X';
+			}
 		}
-		if (pp.mode & MARKMACRO)
-		{
-			pp.mode &= ~MARKMACRO;
-			*pp.token++ = MARK;
-			*pp.token++ = 'X';
-		}
+		else if (pp.in == cur)
+			break;
 	}
 	*pp.token = 0;
-	if (ppmactop) pp.macp->next = nextmacp;
+	if (ppmactop)
+		pp.macp->next = nextmacp;
 	debug((-7, "after expand: %s", p));
 	pp.token = pptoken;
 	pp.state |= restore;
 	pp.in = pp.in->prev;
-	return(p);
+	return p;
 }
 
 #if CHECKPOINT
@@ -528,7 +536,7 @@ ppload(register char* s)
 		error(3, "checkpoint index seek error");
 	if (!(s = sfreserve(sp, n - index_offset, 0)))
 		error(3, "checkpoint index read error");
-	if (sp->flags & SF_STRING)
+	if (sfset(sp, 0, 0) & SF_STRING)
 		b = s;
 	else if (!(b = ip = memdup(s, n - index_offset)))
 		error(3, "checkpoint index alloc error");

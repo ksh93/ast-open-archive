@@ -43,12 +43,12 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2001-01-01'
+version='mm2html (AT&T Labs Research) 2001-05-09'
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)'$version$'
+@(#)$Id: '$version$' $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -114,12 +114,12 @@ esac
 set -o noglob
 
 integer count fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4 row n s
-integer labels=0 reference=1 ident=0
+integer labels=0 reference=1 ident=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
 typeset -x -A ds map nr outline
-typeset cond frame label list prev text trailer type
+typeset cond frame label list prev text title_end trailer type
 typeset license html meta nl mm index authors vg header references ss
 typeset mm_AF mm_AF_cur mm_AF_old mm_AU
 
@@ -133,10 +133,11 @@ html=(
 		bgcolor=#ffffff
 	)
 	TABLE=(
-		align=left
 		bgcolor=#ffd0d0
-		bordercolor=#ffffff
 		border=0
+		bordercolor=#ffffff
+		frame="void"
+		rules="none"
 	)
 	H1=(
 		align=center
@@ -214,7 +215,7 @@ function options
 			"")	v=1 ;;
 			esac
 			case $o in
-			*.*|[A-Z]*)
+			*.*|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
 				eval $o="'$v'"
 				;;
 			*)	eval license.$o="'$v'"
@@ -305,6 +306,91 @@ function warning
 	print -u2 "$command: warning: ${file:+"$file: "}line $line:" "$@"
 }
 
+function getfiles
+{
+	sed	\
+	-e 's%\\".*%%' \
+	-e 's%\\(>=%>=%g' \
+	-e 's%\\(<=%<=%g' \
+	-e 's%&%\&amp;%g' \
+	-e 's%<%\&lt;%g' \
+	-e 's%>%\&gt;%g' \
+	-e 's%\[%\&#0091;%g' \
+	-e 's%\]%\&#0093;%g' \
+	-e 's%\\&amp;%<!--NULL-->%g' \
+	-e 's%\\'\''%'\''%g' \
+	-e 's%\\`%`%g' \
+	-e 's%\\-%\&#45;%g' \
+	-e 's%\\+%+%g' \
+	-e 's%\\0%\&nbsp;%g' \
+	-e 's%\\|%\&nbsp;%g' \
+	-e 's%\\\^%\&nbsp;%g' \
+	-e 's%\\ %\&nbsp;%g' \
+	-e 's%\\(+-%\&#177;%g' \
+	-e 's%\\(-%=%g' \
+	-e 's%\\(ap%~%g' \
+	-e 's%\\(bu%\&#183;%g' \
+	-e 's%\\(bv%|%g' \
+	-e 's%\\(co%\&#169;%g' \
+	-e 's%\\(dg%\&#167;%g' \
+	-e 's%\\(fm%'\''%g' \
+	-e 's%\\(rg%\&#174;%g' \
+	-e 's%\\(sq%\&#164;%g' \
+	-e 's%\\(\*\([*`'\'']\)%\1%g' \
+	-e 's%\\\*\([*`'\'']\)%\1%g' \
+	-e 's%\\d\([^\\]*\)\\u%<SUB>\1</SUB>%g' \
+	-e 's%\\u\([^\\]*\)\\d%<SUP>\1</SUP>%g' \
+	-e 's%\\v\(.\)-\([^\\]*\)\1\(.*\)\\v\1+*\2\1%<SUB>\3</SUB>%g' \
+	-e 's%\\v\(.\)+*\([^\\]*\)\1\(.*\)\\v\1-\2\1%<SUP>\3</SUP>%g' \
+	-e 's%\\h'\''0\*\\w"\([abcdefghijklmnopqrstuvwxyz]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
+	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
+	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1">\2</A>%g' \
+	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%<A href="#\1">\1</A>%g' \
+	-e 's%\\h'\''0\*1'\''\([abcdefghijklmnopqrstuvwxyz]*:[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
+	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
+	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_parent>\1</A>%g' \
+	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A name="\1">\2</A>%g' \
+	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%<A name="\1">\1</A>%g' \
+	-e 's%\\s+\(.\)\([^\\]*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
+	-e 's%\\s+\(.\)\([^\\]*\)\\s0%<FONT SIZE=+\1>\2</FONT>%g' \
+	-e 's%\\s-\(.\)\([^\\]*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
+	-e 's%\\s-\(.\)\([^\\]*\)\\s0%<FONT SIZE=-\1>\2</FONT>%g' \
+	-e 's%\\f(\(..\)\([^\\]*\)%<\1>\2</\1>%g' \
+	-e 's%\\f[PR]%\\fZ%g' \
+	-e 's%\\f\(.\)\([^\\]*\)%<\1>\2</\1>%g' \
+	-e 's%&lt;\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.]*@[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.]*\)&gt;%<SMALL>\&lt;<A href=mailto:\1>\1</A>\&gt;</SMALL>%g' \
+	-e 's%\[[ABCDEFGHIJKLMNOPQRSTUVWXYZ][ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]*[0123456789][0123456789][abcdefghijklmnopqrstuvwxyz]*]%<CITE>&</CITE>%g' \
+	-e 's%</*Z>%%g' \
+	-e 's%<[146789]>%%g' \
+	-e 's%</[146789]>%%g' \
+	-e 's%<2>%<EM>%g' \
+	-e 's%</2>%</EM>%g' \
+	-e 's%<3>%<STRONG>%g' \
+	-e 's%</3>%</STRONG>%g' \
+	-e 's%<5>%<TT>%g' \
+	-e 's%</5>%</TT>%g' \
+	-e 's%<B>%<STRONG>%g' \
+	-e 's%</B>%</STRONG>%g' \
+	-e 's%<I>%<EM>%g' \
+	-e 's%</I>%</EM>%g' \
+	-e 's%<L>%<TT>%g' \
+	-e 's%</L>%</TT>%g' \
+	-e 's%<X>%<TT>%g' \
+	-e 's%</X>%</TT>%g' \
+	-e 's%<CW>%<TT>%g' \
+	-e 's%</CW>%</TT>%g' \
+	-e 's%<EM>\([^<]*\)</EM>(\([0123456789]\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>\2</NOBR>%g' \
+	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0123456789]\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>\2</NOBR>%g' \
+	-e 's%<TT>\([^<]*\)</TT>(\([0123456789]\))%<NOBR><A href="../man\2/\1.html"><TT>\1</TT></A>\2</NOBR>%g' \
+	-e 's%\\s+\(.\)\(.*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
+	-e 's%\\s-\(.\)\(.*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
+	-e 's%\\c%<JOIN>%g' \
+	-e 's%\\e%<!--NULL-->\\<!--NULL-->%g' \
+	-e '/^'\''[abcdefghijklmnopqrstuvwxyz][abcdefghijklmnopqrstuvwxyz]\>/s%.%.%' \
+	-e '/^\..*".*\\/s%\\%\\\\%g' \
+	"$@"
+}
+
 function getline
 {
 	integer i n
@@ -390,7 +476,7 @@ function getline
 		esac
 		case $data in
 		.?*)	case $data in
-			*[\"]*)	
+			*[\"]*)
 				unset v
 				a= i=0 n=0 q=
 				while	:
@@ -406,7 +492,7 @@ function getline
 							;;
 						esac
 						;;
-					[\"\<]) case $q in
+					[\"\<])	case $q in
 						"")	case $c in
 							\<)	q=\>
 								;;
@@ -460,12 +546,12 @@ function getline
 						;;
 					esac
 					case $x in
-					t|\'@(*)\'\1\'|+([\-+0-9])=\1)
+					t|\'@(*)\'\1\'|+([\-+0123456789])=\1)
 						(( n = ! n ))
 						;;
-					+([\-+0-9])=+([\-+0-9]))
+					+([\-+0123456789])=+([\-+0123456789]))
 						;;
-					[0-9]*[0-9])
+					[0123456789]*[0123456789])
 						(( n = $x ))
 						;;
 					esac
@@ -506,7 +592,7 @@ function getline
 				shift
 				case $op in
 				.[BIL]R)case $#:$2 in
-					2':('[0-9]')'*([,.?!:;]))
+					2':('[0123456789]')'*([,.?!:;]))
 						x=${2#'('*')'}
 						y=${2%$x}
 						n=$y
@@ -694,6 +780,7 @@ TD { font-family:${ss}; font-size:$((vg_ps-1))pt; }
 		;;
 	esac
 	print -r -- "</HEAD>"
+	title_end=
 	case ${html.heading} in
 	?*)	case ${html.heading} in
 		?*)	html.toolbar=
@@ -726,13 +813,16 @@ $(cat $hit)
 		esac
 		;;
 	*)	print -r -- "<BODY" ${html.BODY/'('@(*)')'/\1} ">"
-		case ${html.width} in
+		case $macros:${html.width} in
+		man:*|*:)
+			;;
 		?*)	case ${html.width} in
 			*%)	x="align=center " ;;
 			*)	x="" ;;
 			esac
-			print -r -- "<TABLE border=0 ${x}width=${html.width}><TR><TD valign=top align=left>"
-			trailer="$trailer$nl</TD></TR></TABLE>"
+			print -r -- "<TABLE border=0 ${x}width=${html.width}>$nl<TBODY><TR><TD valign=top align=left>"
+			trailer="$trailer$nl"
+			title_end="</TD></TR></TBODY></TABLE>$nl"
 			;;
 		esac
 		case $frame in
@@ -759,6 +849,7 @@ $(cat $hit)
 		trailer="$pm$nl$trailer"
 		;;
 	esac
+	print -r -n -- "$title_end"
 	trailer="${trailer}${nl}</BODY>"
 }
 
@@ -813,92 +904,50 @@ function heading
 	esac
 }
 
+function tbl_attributes
+{
+	typeset u x
+	typeset -F0 w
+	case $1 in
+	[aAcC]*)a="$a align=center" ;;
+	[lL]*)	a="$a align=left" ;;
+	[nN]*)	a="$a align=right char=." ;;
+	[rR]*)	a="$a align=right" ;;
+	esac
+	case $i in
+	*[wW]\(+([0-9.])*\)*)
+		x=${i##*[wW]\(}
+		x=${x%%\)*}
+		u=${x##+([0-9.])}
+		x=${x%$u}
+		case $u in
+		c)	(( w=x*75/2.54 )) ;;
+		i)	(( w=x*75 )) ;;
+		m)	(( w=x*75*12/72 )) ;;
+		n)	(( w=x*75*12/72/2 )) ;;
+		p)	(( w=x*75/72 )) ;;
+		P)	(( w=x*75/6 )) ;;
+		*)	(( w=x*75*12/72/2 )) ;;
+		esac
+		a="$a width=$w"
+		;;
+	esac
+	case $i in
+	*[bB]*)		b="$b<B>" e="</B>$e" ;;
+	esac
+	case X$i in
+	*[!0-9.][iI]*)	b="$b<I>" e="</I>$e" ;;
+	esac
+}
+
 if	[[ $frame != '' ]]
 then	framebody=$frame.html
 	exec > $framebody || exit
 fi
 document="$@"
 
-sed	\
-	-e 's%\\".*%%' \
-	-e 's%\\(>=%>=%g' \
-	-e 's%\\(<=%<=%g' \
-	-e 's%&%\&amp;%g' \
-	-e 's%<%\&lt;%g' \
-	-e 's%>%\&gt;%g' \
-	-e 's%\[%\&#0091;%g' \
-	-e 's%\]%\&#0093;%g' \
-	-e 's%\\&amp;%<NULL>%g' \
-	-e 's%\\'\''%'\''%g' \
-	-e 's%\\`%`%g' \
-	-e 's%\\-%\&#45;%g' \
-	-e 's%\\+%+%g' \
-	-e 's%\\0%\&nbsp;%g' \
-	-e 's%\\|%\&nbsp;%g' \
-	-e 's%\\\^%\&nbsp;%g' \
-	-e 's%\\ %\&nbsp;%g' \
-	-e 's%\\(+-%\&#177;%g' \
-	-e 's%\\(-%=%g' \
-	-e 's%\\(ap%~%g' \
-	-e 's%\\(bu%\&#183;%g' \
-	-e 's%\\(bv%|%g' \
-	-e 's%\\(co%\&#169;%g' \
-	-e 's%\\(dg%\&#167;%g' \
-	-e 's%\\(fm%'\''%g' \
-	-e 's%\\(rg%\&#174;%g' \
-	-e 's%\\(sq%\&#164;%g' \
-	-e 's%\\(\*\([*`'\'']\)%\1%g' \
-	-e 's%\\\*\([*`'\'']\)%\1%g' \
-	-e 's%\\d\([^\\]*\)\\u%<SUB>\1</SUB>%g' \
-	-e 's%\\u\([^\\]*\)\\d%<SUP>\1</SUP>%g' \
-	-e 's%\\v\(.\)-\([^\\]*\)\1\(.*\)\\v\1+*\2\1%<SUB>\3</SUB>%g' \
-	-e 's%\\v\(.\)+*\([^\\]*\)\1\(.*\)\\v\1-\2\1%<SUP>\3</SUP>%g' \
-	-e 's%\\h'\''0\*\\w"\([a-z]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
-	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
-	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1">\2</A>%g' \
-	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%<A href="#\1">\1</A>%g' \
-	-e 's%\\h'\''0\*1'\''\([a-z]*:[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
-	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
-	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_parent>\1</A>%g' \
-	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A name="\1">\2</A>%g' \
-	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%<A name="\1">\1</A>%g' \
-	-e 's%\\s+\(.\)\([^\\]*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
-	-e 's%\\s+\(.\)\([^\\]*\)\\s0%<FONT SIZE=+\1>\2</FONT>%g' \
-	-e 's%\\s-\(.\)\([^\\]*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
-	-e 's%\\s-\(.\)\([^\\]*\)\\s0%<FONT SIZE=-\1>\2</FONT>%g' \
-	-e 's%\\f(\(..\)\([^\\]*\)%<\1>\2</\1>%g' \
-	-e 's%\\f[PR]%\\fZ%g' \
-	-e 's%\\f\(.\)\([^\\]*\)%<\1>\2</\1>%g' \
-	-e 's%&lt;\([a-zA-Z0-9_.]*@[a-zA-Z0-9_.]*\)&gt;%<SMALL>\&lt;<A href=mailto:\1>\1</A>\&gt;</SMALL>%g' \
-	-e 's%\[[A-Z][A-Za-z]*[0-9][0-9][a-z]*]%<CITE>&</CITE>%g' \
-	-e 's%</*Z>%%g' \
-	-e 's%<[146-9]>%%g' \
-	-e 's%</[146-9]>%%g' \
-	-e 's%<2>%<EM>%g' \
-	-e 's%</2>%</EM>%g' \
-	-e 's%<3>%<STRONG>%g' \
-	-e 's%</3>%</STRONG>%g' \
-	-e 's%<5>%<TT>%g' \
-	-e 's%</5>%</TT>%g' \
-	-e 's%<B>%<STRONG>%g' \
-	-e 's%</B>%</STRONG>%g' \
-	-e 's%<I>%<EM>%g' \
-	-e 's%</I>%</EM>%g' \
-	-e 's%<L>%<TT>%g' \
-	-e 's%</L>%</TT>%g' \
-	-e 's%<X>%<TT>%g' \
-	-e 's%</X>%</TT>%g' \
-	-e 's%<CW>%<TT>%g' \
-	-e 's%</CW>%</TT>%g' \
-	-e 's%<EM>\([^<]*\)</EM>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>\2</NOBR>%g' \
-	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>\2</NOBR>%g' \
-	-e 's%<TT>\([^<]*\)</TT>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><TT>\1</TT></A>\2</NOBR>%g' \
-	-e 's%\\s+\(.\)\(.*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
-	-e 's%\\s-\(.\)\(.*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
-	-e 's%\\c%<JOIN>%g' \
-	-e 's%\\e%<NULL>\\<NULL>%g' \
-	-e '/^\..*".*\\/s%\\%\\\\%g' \
-"$@" | while	:
+getfiles "$@" |
+while	:
 do	getline || {
 		[[ $title != '' ]] && break
 		set -- .TL
@@ -937,7 +986,7 @@ do	getline || {
 			print -r -- "<DL COMPACT>"
 			case $op in
 			.AL)	case $1 in
-				[0-9a-zA-Z])
+				[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ])
 					type[++lists]=.al
 					list[lists]=OL
 					print -r -- "<OL type=\"$1\">"
@@ -949,6 +998,10 @@ do	getline || {
 			esac
 			;;
 		.AS|.H|.HU|.SH|.SS|.ce)
+			if ((nf))
+			then	nf=0
+				print -r -- "</PRE>"
+			fi
 			case $hp in
 			?*)	indent=${indent#$hp}
 				hp=
@@ -1038,37 +1091,37 @@ do	getline || {
 				while	(( count-- > 0 )) && read -r data
 				do	print -r -- "$data<BR>"
 				done
-				print -r -- "</PRE></CENTER>"
+				print -r -- "</CENTER>"
+				if ((nf))
+				then	nf=0
+					print -r -- "</PRE>"
+				fi
 				;;
-			*)	case $op in
-				.SH|.SS)macros=man
-					while	(( lists > 0 ))
-					do	print -r -- "</${list[lists]}>"
-						case ${type[lists--]} in
-						.SH|$op)	break ;;
-						esac
-					done
-					type[++lists]=$op
-					list[lists]=DL
-					print -r -- "<DL COMPACT>"
-					beg="<DT>"
-					end="<DD>"
-					case $op in
-					.SH)	set 2 "$@"
-						;;
-					.SS)	set 3 "$@"
-						type[++lists]=.XX
-						list[lists]=DL
-						print -r -- "<DL>"
-						;;
+			.S[HS])	macros=man
+				while	(( lists > 0 ))
+				do	print -r -- "</${list[lists]}>"
+					case ${type[lists--]} in
+					.S[HS])	break ;;
 					esac
-					op=.H
-					;;
-				*)	beg=
-					end=
+				done
+				type[++lists]=$op
+				list[lists]=DL
+				print -r -- "<DL COMPACT><DT>"
+				case $op in
+				.SS)	type[++lists]=.XX
+					list[lists]=DL
+					print -r -- "<DL COMPACT><DT>"
 					;;
 				esac
-				heading $op "$@"
+				case $op in
+				.SH)	heading .H 2 "$@" ;;
+				*)	heading .H 3 "$@" ;;
+				esac
+				type[++lists]=.XX
+				list[lists]=DL
+				print -r -- "<DL COMPACT><DT>"
+				;;
+			*)	heading $op "$@"
 				;;
 			esac
 			;;
@@ -1112,21 +1165,35 @@ do	getline || {
 			then	ps2gif $1 $i
 			fi
 			;;
+		.CT)	: ignore $op
+			;;
 		.DE|.dE|.fi)
-			print -r -- "</PRE>"
+			if ((nf))
+			then	nf=0
+				print -r -- "</PRE>"
+			fi
 			;;
 		.DF|.DS|.dS|.nf)
-			print -r -- "<PRE>"
+			if ((!nf))
+			then	nf=1
+				print -r -- "<PRE>"
+			fi
 			;;
 		.DT)	case $macros in
 			man)	;;
 			*)	print -r -- "${ds[Dt]}" ;;
 			esac
 			;;
-		.EE|.eE)print -r -- "</PRE>"
+		.EE|.eE)if ((nf))
+			then	nf=0
+				print -r -- "</PRE>"
+			fi
 			indent=${indent#$inch}
 			;;
-		.EX|.eX)print -r -- "<PRE>"
+		.EX|.eX)if ((!nf))
+			then	nf=1
+				print -r -- "<PRE>"
+			fi
 			indent=$inch$indent
 			;;
 		.FE)	print -r -- '&nbsp;]&nbsp'
@@ -1166,6 +1233,9 @@ do	getline || {
 		.HY)	: ignore $op
 			;;
 		.IP|.LI|.TF|.TP|.bI|.sI)
+			case $macros:$op in
+			mm:.TP)	continue ;;
+			esac
 			case $op in
 			.IP|.LP|.TF|.TP)OP=$op
 				case ${type[lists]} in
@@ -1174,7 +1244,8 @@ do	getline || {
 					list[lists]=DL
 					print -r -- "$pd<DL COMPACT>"
 					case $1 in
-					[0-9]*)	type[++lists]=.tp
+					[0123456789]*)
+						type[++lists]=.tp
 						list[lists]=DL
 						print -r -- "<DL COMPACT>"
 						;;
@@ -1256,8 +1327,7 @@ do	getline || {
 			*)	pm="${pm}PROPRIETARY" ;;
 			esac
 			case $pm in
-			?*)	
-				case $op in
+			?*)	case $op in
 				.pM)	pm="<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR><TD><FONT font face=\"${ss}\"><B>${pm}</B></FONT></TD></TR></TABLE>" ;;
 				*)	pm="<HR><CENTER><$H>${pm}</$H></CENTER>" ;;
 				esac
@@ -1312,7 +1382,7 @@ do	getline || {
 				L*)	sec="LOCAL COMMANDS" ;;
 				*)	sec="SECTION $2" ;;
 				esac
-				print -r -- "<H3><TABLE width=100%><TR><TH align=left>$1($2)<TH align=center><A href=\"\" TITLE-\"Command Index\">$sec</A><TH align=right>$1($2)</TR></TABLE></H3>"
+				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$1($2)</TH><TH align=center><A href=\"\" TITLE=\"Command Index\">$sec</A></TH><TH align=right>$1($2)</TH></TR></TBODY></TABLE></H3>"
 				print -r -- "<HR>"
 				;;
 			.TL)	getline || break
@@ -1324,151 +1394,283 @@ do	getline || {
 			;;
 		.TM)	: ignore $op
 			;;
-		.TS)	ifs=$IFS
-			(( row=0 ))
-			unset opts
-			eval "opts=${html.TABLE}"
-			tab=$'\t'
-			while	getline
-			do	set -- ${@//[-\|_=]/ }
-				case $# in
-				0)	continue ;;
-				esac
-				(( row++ ))
-				tbl[row]=$*
-				case $1 in
-				.TE)	continue 2 ;;
-				esac
-				case $* in
-				*";")	(( row=0 ))
-					for i in ${@//[,\;]/ }
-					do	case $i in
-						center)	opts.align=center
-							;;
-						expand)	opts.align=center opts.width="90%"
-							;;
-						*box)	opts.border=1
-							;;
-						linesize'('*')')
-							opts.border=${i//*'('@(*)')'*/\1}
-							;;
-						tab'('*')'*)
-							tab=${i//*'('@(*)')'*/\1}
-							;;
-						tab'(')	case $* in
-							*'tab(,'*)	tab=',' ;;
-							*'tab(;'*)	tab=';' ;;
-							*'tab( '*)	tab=' ' ;;
-							*)		tab=$'\t' ;;
-							esac
-							;;
-						esac
-					done
-					;;
-				*".")	break
-					;;
-				esac
-			done
-			case ${opts.border} in
-			0)	opts.cellpadding=0
-				opts.cellspacing=0
-				unset opts.bgcolor
+		.TS)	# undent ...
+
+	ifs=$IFS
+	case $1 in
+	H)	tbl_tmp=/tmp/m2h$$tbl
+		(( tbl_fd=3 ))
+		trap "rm -f $tbl_tmp" 0 1 2 3
+		eval exec "$tbl_fd>$tbl_tmp"
+		;;
+	esac
+	unset opts
+	eval "opts=${html.TABLE}"
+	unset opts.width opts.align
+	tbl_ns=3
+	tbl_sp='&nbsp;&nbsp;'
+	tab=$'\t'
+	(( augment=0 ))
+	while	:
+	do	(( row=0 ))
+		while	getline
+		do	set -- ${@//[-\|_=]/ }
+			case $# in
+			0)	continue ;;
+			esac
+			case $1 in
+			'.T&'*)	continue
 				;;
-			*)	case ${opts.cellpadding} in
-				'')	opts.cellpadding=2 ;;
-				esac
-				case ${opts.cellspacing} in
-				'')	opts.cellspacing=2 ;;
-				esac
+			.TE)	if (( tbl_fd != 1 ))
+				then	warning ".TS H without .TH"
+					eval "exec $tbl_fd>&-"
+					(( tbl_fd=1 ))
+					rm -f $tbl_tmp
+					tbl_tmp=
+					trap - 0 1 2 3
+					if (( augment ))
+					then	print -r -u$tbl_fd -- "</THEAD><TBODY>"
+					fi
+				fi
+				continue 3
 				;;
 			esac
-			print -r -- "<TABLE" ${opts/'('@(*)')'/\1} ">"
-			for ((n = 1; n < row; n++))
-			do	getline || break
-				case $1 in
-				[_=]*)	((n--)); continue ;;
+			(( row++ ))
+			tbl[row]=${@//..*/.}
+			case $* in
+			*";"*)	(( row=0 ))
+				for i in ${@//[,\;]/ }
+				do	case $i in
+					center)	opts.align=center
+						;;
+					expand)	opts.align=center opts.width="99%"
+						;;
+					allbox)	opts.border=1
+						opts.frame="box"
+						opts.rules="all"
+						;;
+					box)	opts.border=1
+						opts.frame="box"
+						opts.rules="none"
+						;;
+					doublebox)
+						opts.border=2
+						opts.frame="box"
+						opts.rules="none"
+						;;
+					linesize'('*')')
+						opts.border=${i//*'('@(*)')'*/\1}
+						;;
+					tab'('*')'*)
+						tab=${i//*'('@(*)')'*/\1}
+						;;
+					tab'(')	case $* in
+						*'tab(,'*)	tab=',' ;;
+						*'tab(;'*)	tab=';' ;;
+						*'tab( '*)	tab=' ' ;;
+						*)		tab=$'\t' ;;
+						esac
+						;;
+					esac
+				done
+				;;
+			*".")	break
+				;;
+			esac
+		done
+		case ${opts.border} in
+		0)	opts.cellpadding=0
+			opts.cellspacing=0
+			unset opts.bgcolor
+			;;
+		*)	case ${opts.cellpadding} in
+			'')	opts.cellpadding=2 ;;
+			esac
+			case ${opts.cellspacing} in
+			'')	opts.cellspacing=2 ;;
+			esac
+			;;
+		esac
+		if ((!augment))
+		then	(( augment=1 ))
+			print -r -- "<P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>$nl<TABLE" ${opts/'('@(*)')'/\1} ">"
+			if (( tbl_fd == 3 ))
+			then	print -r -u$tbl_fd -- "<THEAD>"
+			else	print -r -u$tbl_fd -- "<TBODY>"
+			fi
+		fi
+		for ((n = 1; n < row; n++))
+		do	getline || break
+			case $1 in
+			[_=]*)	((n--)); continue ;;
+			esac
+			print -rn -u$tbl_fd -- "<TR>"
+			IFS=$tab
+			set -- $*
+			IFS=$ifs
+			set -A Q ${tbl[n]}
+			(( q=0 ))
+			(( s=1 ))
+			while	:
+			do	i=${Q[q++]}
+				case $i in
+				''|.)	break
+					;;
+				*[0-9]*)x=${i//[pvw]*([()0-9.inm])/}
+					x=${i//[[:alpha:]]/}
+					case $x in
+					+([0-9]))
+						if (( $x > tbl_ns ))
+						then	tbl_ns=$x
+							tbl_sp=''
+							for ((m=(tbl_ns+1)/2; m>0; m--))
+							do	tbl_sp=${tbl_sp}'&nbsp;'
+							done
+
+						fi
+					esac
+					;;
 				esac
-				print -rn -- "<TR>"
-				IFS=$tab
-				set -- $*
-				IFS=$ifs
-				set -A Q ${tbl[n]}
-				(( q=0 ))
-				(( s=1 ))
-				while	:
-				do	a= b= e=
-					i=${Q[q++]}
-					case $i in
-					'')	break ;;
-					*s*)	(( s++ )); continue ;;
-					*c*)	a="$a align=center" ;;
-					*l*)	a="$a align=left" ;;
-					*r*)	a="$a align=right" ;;
-					esac
-					case $i in
-					*b*)	b="<B>" e="</B>" ;;
-					*i*)	b="<I>" e="</I>" ;;
-					esac
-					while	[[ ${Q[q]} == *s* ]]
-					do	(( s++ ))
-						(( q++ ))
-					done
-					if	(( s > 1 ))
-					then	a="$a colspan=$s"
-						(( s=1 ))
+				a=
+				case $q in
+				1)		b='' ;;
+				*)		b=$tbl_sp ;;
+				esac
+				case ${Q[q]}:$# in
+				:*|*:[01])	e='' ;;
+				*)		e=$tbl_sp ;;
+				esac
+				case $i in
+				[sS]*)	(( s++ )); continue ;;
+				esac
+				tbl_attributes "$i"
+				while	[[ ${Q[q]} == *s* ]]
+				do	(( s++ ))
+					(( q++ ))
+				done
+				if	(( s > 1 ))
+				then	a="$a colspan=$s"
+					(( s=1 ))
+				fi
+				print -rn -u$tbl_fd -- "<TD$a>$b$1$e</TD>"
+				case $# in
+				0|1)	break ;;
+				esac
+				shift
+			done
+			print -r -u$tbl_fd -- "</TR>"
+		done
+		prev=
+		set -A Q ${tbl[n]}
+		while	getline
+		do	case $1 in
+			'.T&'*)	(( augment=1 ))
+				continue 2
+				;;
+			.TH*)	if (( tbl_fd != 1 ))
+				then	print -r -u$tbl_fd -- "</THEAD>"
+					if (( tbl_no == 1 || $# == 1 )) || [[ $2 != N ]]
+					then	cat $tbl_tmp
 					fi
-					print -rn -- "<TH$a>$b$1$e</TH>"
+					eval "exec $tbl_fd>&-"
+					(( tbl_fd=1 ))
+					rm -f $tbl_tmp
+					tbl_tmp=
+					trap - 0 1 2 3
+				fi
+				print -r -u$tbl_fd -- "<TBODY>"
+				continue
+				;;
+			.TE)	(( tbl_no++ ))
+				if (( tbl_fd != 1 ))
+				then	warning ".TS H without .TH"
+					eval "exec $tbl_fd>&-"
+					(( tbl_fd=1 ))
+					rm -f $tbl_tmp
+					tbl_tmp=
+					trap - 0 1 2 3
+					print -r -u$tbl_fd -- "</THEAD><TBODY>"
+				fi
+				break
+				;;
+			esac
+			IFS=$tab
+			set -- $*
+			IFS=$ifs
+			case $* in
+			*"\\")	prev=$prev$'\n'${*/"\\"/}
+				;;
+			*)	print -rn -u$tbl_fd -- "<TR>"
+				IFS=$'\t'
+				set -- $prev$'\n'$*
+				IFS=$ifs
+				case $* in
+				$'\n_')	rule=1
+					set -- '_'
+					;;
+				$'\n=')	rule=1
+					set -- '='
+					;;
+				*)	rule=0
+					;;
+				esac
+				(( q=0 ))
+				while	:
+				do	i=${Q[q++]}
+					case $i in
+					''|.)	break
+						;;
+					*[0-9]*)x=${i//[pvw]*([()0-9.inm])/}
+						x=${i//[[:alpha:]]/}
+						case $x in
+						+([0-9]))
+							if (( $x > tbl_ns ))
+							then	tbl_ns=$x
+								tbl_sp=''
+								for ((m=(tbl_ns+1)/2; m>0; m--))
+								do	tbl_sp=${tbl_sp}'&nbsp;'
+								done
+
+							fi
+						esac
+						;;
+					esac
+					a=
+					case $q in
+					1)		b='' ;;
+					*)		b=$tbl_sp ;;
+					esac
+					case ${Q[q]}:$# in
+					:*|*:[01])	e='' ;;
+					*)		e=$tbl_sp ;;
+					esac
+					case $1 in
+					$'\n_'|'_')
+						print -rn -u$tbl_fd -- "<TD><HR width=100% size=2 noshade></TD>"
+						;;
+					$'\n='|'=')
+						print -rn -u$tbl_fd -- "<TD><HR width=100% size=4 noshade></TD>"
+						;;
+					*)	tbl_attributes "$i"
+						print -rn -u$tbl_fd -- "<TD$a>$b$1$e</TD>"
+						;;
+					esac
+					((rule)) && continue
 					case $# in
 					0|1)	break ;;
 					esac
 					shift
 				done
-				print -r -- "</TR>"
-			done
-			prev=
-			attr=${tbl[row]}
-			while	getline
-			do	case $1 in
-				[_=]*)	continue ;;
-				.TE)	break ;;
-				esac
-				IFS=$tab
-				set -- $*
-				IFS=$ifs
-				case $* in
-				*"\\")	prev=$prev$'\n'${*/"\\"/}
-					;;
-				*)	print -rn -- "<TR>"
-					IFS=$'\t'
-					set -- $prev$'\n'$*
-					IFS=$ifs
-					for i in $attr
-					do	beg=
-						end=
-						pos=left
-						case $i in
-						*c*)	pos=center ;;
-						*l*)	pos=left ;;
-						*[nr]*)	pos=right ;;
-						esac
-						case $i in
-						*b*)	beg="$beg<STRONG>" end="</STRONG>$end" ;;
-						esac
-						case $i in
-						*i*)	beg="$beg<EM>" end="</EM>$end" ;;
-						esac
-						print -rn -- "<TD align=$pos>$beg$1$end</TD>"
-						case $# in
-						0|1)	break ;;
-						esac
-						shift
-					done
-					print -r -- "</TR>"
-					prev=
-					;;
-				esac
-			done
-			print -r -- "</TABLE>"
+				print -r -u$tbl_fd -- "</TR>"
+				prev=
+				;;
+			esac
+		done
+		break
+	done
+	print -r -- "</TBODY></TABLE></TD></TR></TBODY></TABLE>"
+
+			# ... indent
 			;;
 		.TX)	: ignore $op
 			;;
@@ -1480,11 +1682,15 @@ do	getline || {
 			;;
 		.al)	: ignore $op
 			;;
+		.bd)	: ignore $op
+			;;
 		.br)	print -r -- "<BR>"
 			;;
-		.de)	case $op in
-			.de)	end=..
-				;;
+		.de|.am.ig)
+			end=..
+			case $#:$op in
+			0:*)	;;
+			*:.ig)	end=$1 ;;
 			esac
 			: ignore $op to $end
 			while	getline
@@ -1518,6 +1724,12 @@ do	getline || {
 				;;
 			esac
 			;;
+		.hc)	: ignore $op
+			;;
+		.hw)	: ignore $op
+			;;
+		.hy)	: ignore $op
+			;;
 		.in)	indent_prev=$indent
 			case $1 in
 			"")	i=$indent_prev; indent_prev=$indent; indent=$i ;;
@@ -1526,16 +1738,22 @@ do	getline || {
 			*)	indent=$inch ;;
 			esac
 			;;
+		.lf)	: ignore $op
+			;;
 		.ll)	: ignore $op
 			;;
 		.ne)	: ignore $op
+			;;
+		.nh)	: ignore $op
 			;;
 		.nr)	op=$1
 			shift
 			nr[$op]=$*
 			;;
+		.ns)	: ignore $op
+			;;
 		.ps|.pS)case $1 in
-			[-+][0-9])
+			[-+][0123456789])
 				print -r -- "<FONT SIZE=$1>"
 				;;
 			esac
@@ -1563,7 +1781,10 @@ do	getline || {
 		.so)	if	[[ ! -f $1 ]]
 			then	warning "$1: $op cannot read"
 			else	(( fd = so + soff ))
-				eval exec $fd'< $1'
+				tmp=/tmp/m2h$$
+				getfiles "$1" > $tmp
+				eval exec $fd'< $tmp'
+				rm $tmp
 				so_file[so]=$file
 				file=$1
 				so_line[so]=$line
@@ -1572,7 +1793,8 @@ do	getline || {
 			fi
 			;;
 		.sp|.SP)case $1 in
-			[0-9]*)	count=$1
+			[0123456789]*)
+				count=$1
 				while	(( count >= 0 ))
 				do	(( count-- ))
 					print -r -- "<BR>"
@@ -1585,6 +1807,8 @@ do	getline || {
 		.ta)	: ignore $op
 			;;
 		.ti)	: ignore $op
+			;;
+		.ul)	: ignore $op
 			;;
 		.xx)	while	:
 			do	case $# in
@@ -1652,7 +1876,9 @@ do	getline || {
 						tar=
 						case $frame in
 						?*)	case $url in
-							*([a-z]):*|/*)	tar=" target=_top" ;;
+							*([abcdefghijklmnopqrstuvwxyz]):*|/*)
+								tar=" target=_top"
+								;;
 							esac
 							;;
 						esac
@@ -1677,7 +1903,7 @@ do	getline || {
 					;;
 				logo)	eval html.$nam.src='$'val
 					;;
-				ident|logo*|title|[A-Z]*)
+				ident|logo*|title|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
 					eval html.$nam='$'val
 					;;
 				*)	eval license.$nam='$'val
@@ -1687,7 +1913,7 @@ do	getline || {
 			;;
 		.vG)	vg=$1
 			set +o noglob
-			rm -f [0-9][0-9].html index.html outline.html
+			rm -f [0123456789][0123456789].html index.html outline.html
 			set -o noglob
 			exec > $page.html
 			outline[$page]=$2
@@ -1929,7 +2155,7 @@ q
 	then
 		print -r -- "<!--LABELS-->"
 		print -r -- "<B><FONT font face=\"${ss}\">"
-		print -r -- "<TABLE bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center><TR>"
+		print -r -- "<TABLE border=0 bordercolor=white cellpadding=0 cellspacing=0 width=90% align=center><TR>"
 		for ((n = 0; n < labels; n++))
 		do	print -r -- "<TD align=left><A href=\"#${label[n]}\">${label[n]}</A></TD>"
 			if (( (n + 1) < labels && (n & 7) == 7 ))
@@ -1956,7 +2182,7 @@ case $vg in
 </HTML>"
 	exec > outline.html
 	title "${title} outline"
-	print -r -- "<BODY  bgcolor='#ffffff'>
+	print -r -- "<BODY bgcolor='#ffffff'>
 ${pm}<CENTER>
 <BR><H1><FONT color=red>outline</FONT></H1>
 <P>

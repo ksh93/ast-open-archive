@@ -29,10 +29,10 @@
  * cs library data
  */
 
-static const char id_cs[] = "\n@(#)$Id: libcs (AT&T Research) 2001-01-01 $\0\n";
+static const char id_cs[] = "\n@(#)$Id: libcs (AT&T Research) 2001-05-11 $\0\n";
 
 #include "cslib.h"
 
 static Csdisc_t	disc = { CS_VERSION };
 
-Cs_t			cs = { "libcs:cs", &disc };
+Cs_t		cs = { "libcs:cs", &disc };

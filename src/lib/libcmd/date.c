@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1992-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,6 +20,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                David Korn <dgk@research.att.com>                 *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -30,12 +31,15 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: date (AT&T Labs Research) 2000-12-11 $\n]"
+"[-?\n@(#)$Id: date (AT&T Labs Research) 2001-05-31 $\n]"
 USAGE_LICENSE
 "[+NAME?date - set/list/convert dates]"
 "[+DESCRIPTION?\bdate\b sets the current date and time (with appropriate"
 "	privilege), lists the current date or file dates, or converts"
 "	dates.]"
+"[+?Most common \adate\a forms are recognized, including those for"
+"	\bcrontab\b(1), \bls\b(1), \btouch\b(1), and the default"
+"	output from \bdate\b itself.]"
 "[+?If the \adate\a operand consists of 4, 6, 8, 10 or 12 digits followed"
 "	by an optional \b.\b and two digits then it is interpreted as:"
 "	\aHHMM.SS\a, \addHHMM.SS\a, \ammddHHMM.SS\a, \ammddHHMMyy.SS\a or"
@@ -52,8 +56,12 @@ USAGE_LICENSE
 "		[+MM?Minute, 00-59.]"
 "		[+SS?Seconds, 00-60.]"
 "}"
-"[+?If more than one \adate\a operand is specified the each operand sets"
-"	the reference date for subsequent operands.]"
+"[+?If more than one \adate\a operand is specified then:]{"
+"		[+1.?Each operand sets the reference date for the next"
+"			operand.]"
+"		[+2.?The date is listed for each operand.]"
+"		[+3.?The system date is not set.]"
+"}"
 
 "[a:access-time|atime?List file argument access times.]"
 "[c:change-time|ctime?List file argument change times.]"
@@ -73,9 +81,12 @@ USAGE_LICENSE
 "	fixed size field, zero padded if necessary,"
 "	and \\\ac\a and \\\annn\a sequences are as in C. Invalid"
 "	%\afield\a specifications and all other characters are copied"
-"	without change. \b%-\b\achar\a turns off padding, \b%_\b\achar\a pads"
-"	with space, otherwise numeric fields are padded with \b0\b and string"
-"	fields are padded with space. The fields are:]:[format]{"
+"	without change. \afield\a may be preceded by \b%-\b to turn off"
+"	padding or \b%_\b to pad with space, otherwise numeric fields"
+"	are padded with \b0\b and string fields are padded with space."
+"	\afield\a may also be preceded by \bE\b for alternate era"
+"	representation or \bO\b for alternate digit representation (if"
+"	supported by the current locale.) The fields are:]:[format]{"
 "		[+%?% character]"
 "		[+a?abbreviated weekday name]"
 "		[+A?full weekday name]"
@@ -86,6 +97,10 @@ USAGE_LICENSE
 "		[+D?date as \amm/dd/yy\a]"
 "		[+e?blank padded day of month number]"
 "		[+E?unpadded day of month number]"
+"		[+f?locale default override date format]"
+"		[+F?locale default date format]"
+"		[+g?\bls\b(1) \b-l\b recent date with \ahh:mm\a]"
+"		[+G?\bls\b(1) \b-l\b distant date with \ayyyy\a]"
 "		[+h?abbreviated month name]"
 "		[+H?24-hour clock hour]"
 "		[+i?international \bdate\b(1) date with time zone type name]"
@@ -94,14 +109,12 @@ USAGE_LICENSE
 "		[+J?0-offset Julian date]"
 "		[+k?\bdate\b(1) style date]"
 "		[+K?date as \ayyyy-mm-dd+HH:MM:SS\a]"
-"		[+l?\bls\b(1) \b-l\b date that lists recent dates with"
-"			\ahh:mm\a and distant dates with \ayyyy\a]"
+"		[+l?\bls\b(1) \b-l\b date that formats recent dates with \b%g\b"
+"			and distant dates with \b%G\b]"
 "		[+m?month number]"
 "		[+M?minutes]"
 "		[+n?newline character]"
 "		[+N?time zone type name]"
-"		[+o?locale default override date format]"
-"		[+O?locale default date format]"
 "		[+p?meridian (e.g., \bAM\b or \bPM\b)]"
 "		[+r?12-hour time as \ahh:mm:ss meridian\a]"
 "		[+R?24-hour time as \ahh:mm\a]"
@@ -147,13 +160,13 @@ USAGE_LICENSE
 "\n[ +format | date ... | file ... ]\n"
 "\n"
 
-"[+SEE ALSO?\bls\b(1), \bfmtelapsed\b(3), \bstrftime\b(3), \bstrptime\b(3)]"
+"[+SEE ALSO?\bcrontab\b(1), \bls\b(1), \btouch\b(1), \bfmtelapsed\b(3),"
+"	\bstrftime\b(3), \bstrptime\b(3)]"
 ;
 
-#include <ast.h>
+#include <cmdlib.h>
 #include <ls.h>
 #include <tm.h>
-#include <error.h>
 #include <times.h>
 
 #include "FEATURE/time"
@@ -181,6 +194,7 @@ settime(time_t clock, int adjust, int network)
 	char*		args[5];
 	char		buf[128];
 
+#if _lib_stime || _lib_settimeofday
 	if (!adjust && !network)
 	{
 #if _lib_stime
@@ -195,14 +209,13 @@ settime(time_t clock, int adjust, int network)
 #else
 		return settimeofday(&tv);
 #endif
-#else
-		errno = ENOSYS;
-		return -1;
 #endif
 #endif
 	}
+#endif
 	argv = args;
-	if (streq(_UNIV_DEFAULT, "att"))
+	*argv++ = error_info.id;
+	if (streq(astconf("UNIVERSE", NiL, NiL), "att"))
 	{
 		tmfmt(buf, sizeof(buf), "%m%d%H%M%Y.%S", &clock);
 		if (adjust)
@@ -246,7 +259,7 @@ convert(register Fmt_t* f, char* s, time_t now)
 }
 
 int
-main(int argc, register char** argv)
+b_date(int argc, register char** argv, void* context)
 {
 	register int	n;
 	register char*	s;
@@ -271,8 +284,8 @@ main(int argc, register char** argv)
 	int		show = 0;	/* show date and don't set	*/
 
 	NoP(argc);
+	cmdinit(argv, context, ERROR_CATALOG);
 	setlocale(LC_ALL, "");
-	error_info.id = "date";
 	tm_info.flags |= TM_DATESTYLE;
 	fmts = &fmt;
 	fmt.format = "";
@@ -358,7 +371,7 @@ main(int argc, register char** argv)
 	}
 	else if (filetime)
 	{
-		if (!argv[0])
+		if (!*argv)
 			error(ERROR_USAGE|4, "%s", optusage(NiL));
 		n = argv[1] != 0;
 		while (s = *argv++)
@@ -377,21 +390,28 @@ main(int argc, register char** argv)
 	}
 	else
 	{
-		if ((s = argv[0]) && !format && *s == '+')
+		if ((s = *argv) && !format && *s == '+')
 		{
 			format = s + 1;
 			argv++;
-			s = argv[0];
+			s = *argv;
 		}
 		if (s || (s = string))
 		{
-			if (argv[0] && string)
+			if (*argv && string)
 				error(ERROR_USAGE|4, "%s", optusage(NiL));
 			now = convert(fmts, s, 0);
-			if (*argv)
-				while (s = *++argv)
-					now = convert(fmts, s, now);
 			clock = &now;
+			if (*argv && (s = *++argv))
+			{
+				show = 1;
+				do
+				{
+					tmfmt(buf, sizeof(buf), format, clock);
+					sfprintf(sfstdout, "%s\n", buf);
+					now = convert(fmts, s, now);
+				} while (s = *++argv);
+			}
 		}
 		else
 			show = 1;
@@ -402,6 +422,12 @@ main(int argc, register char** argv)
 		}
 		else if (settime(*clock, increment, network))
 			error(ERROR_SYSTEM|3, "cannot set system time");
+	}
+	while (fmts != &fmt)
+	{
+		f = fmts;
+		fmts = fmts->next;
+		free(f);
 	}
 	return error_info.errors != 0;
 }

@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: df (AT&T Labs Research) 2000-12-13 $\n]"
+"[-?\n@(#)$Id: df (AT&T Labs Research) 2001-04-20 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -42,6 +42,7 @@ USAGE_LICENSE
 "[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
 "	override internal \b--format\b identifiers.]:[key[=value]]]"
+"[e:decimal-scale|thousands?Scale disk usage to powers of 1000.]"
 "[f:format?Append to the listing format string. The \bls\b(1), \bpax\b(1) and"
 "	\bps\b(1) commands also have \b--format\b options in this same style."
 "	\aformat\a follows \bprintf\b(3) conventions, except that \bsfio\b(3)"
@@ -60,17 +61,18 @@ USAGE_LICENSE
 "[i:inodes?Display inode usage instead of block usage. There is at least one"
 "	inode for each active file and directory on a filesystem.]"
 "[k:kilobytes?Measure disk usage in 1024 byte blocks.]"
+"[K:scale|binary-scale|human-readable?Scale disk usage to powers of 1024."
+"	This is the default if \bgetconf CONFORMANCE\b is not \bstandard\b.]"
 "[l:local?List information on local filesystems only, i.e., network"
 "	mounts are omitted.]"
-"[m:megabytes?Measure disk usage in 1024K byte blocks. This is the default"
-"	if \bgetconf CONFORMANCE\b is not \bstandard\b.]"
+"[m:megabytes?Measure disk usage in 1024K byte blocks.]"
 "[n:native-block?Measure disk usage in the native filesystem block size."
 "	This size may vary between filesystems; it is displayed by the"
 "	\bsize\b format identifier.]"
 "[O:options?Display the \bmount\b(1) options.]"
 "[P:portable?Display each filesystem on one line. By default output is"
 "	folded for readability. Also implies \b--blockbytes\b.]"
-"[s!:sync?Call \bsync\b(2) before querying the filesystems.]"
+"[s:sync?Call \bsync\b(2) before querying the filesystems.]"
 "[F:type?Display all filesystems of type \atype\a. Unknown types are"
 "	listed as \blocal\b. Typical (but not supported on all systems) values"
 "	are:]:[type]{"
@@ -103,6 +105,7 @@ USAGE_LICENSE
 #include <cdt.h>
 #include <ls.h>
 #include <mnt.h>
+#include <sig.h>
 #include <sfdisc.h>
 #include <sfstr.h>
 
@@ -312,7 +315,9 @@ static struct
 	int		block;		/* block unit			*/
 	int		local;		/* local mounts only		*/
 	int		posix;		/* posix format			*/
+	int		scale;		/* metric scale power		*/
 	int		sync;		/* sync() first			*/
+	int		timeout;	/* status() timed out		*/
 	int		verbose;	/* verbose message level {-1,1}	*/
 	char*		type;		/* type pattern			*/
 	Sfio_t*		mac;		/* temporary macro stream	*/
@@ -364,6 +369,14 @@ append(Sfio_t* fmt, const char* format)
 static char*
 scale(int m, unsigned long w, unsigned long p)
 {
+	Sfulong_t	n;
+
+	if (state.scale)
+	{
+		n = w;
+		n *= state.block;
+		return fmtscale(n, state.scale);
+	}
 	if (state.block < 1024 * 1024)
 		sfsprintf(state.buf, sizeof(state.buf), "%lu", w);
 	else if (!m || !w && !p || w > 9)
@@ -534,6 +547,41 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 }
 
 /*
+ * catch statvfs() timeout
+ */
+
+static void
+timeout(int sig)
+{
+	state.timeout = 1;
+}
+
+/*
+ * statvfs() with timeout
+ */
+
+static int
+status(const char* path, struct statvfs* vfs)
+{
+	int		r;
+
+	state.timeout = 0;
+	signal(SIGALRM, timeout);
+	alarm(2);
+	r = statvfs(path, vfs);
+	alarm(0);
+	signal(SIGALRM, SIG_DFL);
+	if (r)
+	{
+		if (state.timeout)
+			error(ERROR_SYSTEM|2, "%s: filesystem stat timed out", path);
+		else
+			error(ERROR_SYSTEM|2, "%s: cannot stat filesystem", path);
+	}
+	return r;
+}
+
+/*
  * list one entry
  */
 
@@ -565,7 +613,9 @@ entry(Df_t* df, const char* format)
 		}
 		df->fraction = 0;
 		df->ttotal = df->tavail = df->tused = 0;
-		if (state.block)
+		if (state.scale)
+			state.block = F_FRSIZE(&df->vfs);
+		else if (state.block)
 		{
 			b = F_FRSIZE(&df->vfs);
 			if (b > state.block)
@@ -625,7 +675,6 @@ main(int argc, register char** argv)
 	error_info.id = "df";
 	state.block = -1;
 	state.posix = -1;
-	state.sync = 1;
 	state.verbose = -1;
 	dev = 0;
 	head = 1;
@@ -685,6 +734,9 @@ main(int argc, register char** argv)
 			if (kp->macro = s)
 				stresc(s);
 			continue;
+		case 'e':
+			state.scale = 1000;
+			continue;
 		case 'f':
 			append(fmt, opt_info.arg);
 			continue;
@@ -702,6 +754,9 @@ main(int argc, register char** argv)
 			continue;
 		case 'k':
 			state.block = 1024;
+			continue;
+		case 'K':
+			state.scale = 1024;
 			continue;
 		case 'l':
 			state.local = 1;
@@ -750,9 +805,23 @@ main(int argc, register char** argv)
 	if (state.posix < 0)
 		state.posix = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
 	if (state.block < 0)
-		state.block = state.posix ? 512 : 1024 * 1024;
+	{
+		if (state.posix)
+			state.block = 512;
+		else
+		{
+			state.block = 1024 * 1024;
+			if (!state.scale)
+				state.scale = 1024;
+		}
+	}
 	s = 0;
-	if (state.block <= 512)
+	if (state.scale)
+	{
+		n = 5;
+		s = "Size";
+	}
+	else if (state.block <= 512)
 	{
 		n = 10;
 		if (!state.block)
@@ -799,9 +868,7 @@ main(int argc, register char** argv)
 		mnt.type = 0;
 		mnt.flags = 0;
 		while (mnt.fs = *argv++)
-			if (statvfs(mnt.fs, &df.vfs))
-				error(ERROR_SYSTEM|2, "%s: cannot stat filesystem", mnt.fs);
-			else
+			if (!status(mnt.fs, &df.vfs))
 				entry(&df, format);
 	}
 	else
@@ -848,9 +915,7 @@ main(int argc, register char** argv)
 				if (n >= argc)
 					continue;
 			}
-			if (statvfs(df.mnt->dir, &df.vfs) && statvfs(df.mnt->fs, &df.vfs))
-				error(ERROR_SYSTEM|2, "%s: cannot stat filesystem", df.mnt->dir);
-			else
+			if (!status(df.mnt->dir, &df.vfs) || !status(df.mnt->fs, &df.vfs))
 				entry(&df, format);
 			if (argc > 0)
 			{
@@ -871,17 +936,9 @@ main(int argc, register char** argv)
 			mnt.fs = 0;
 			mnt.flags = 0;
 			for (n = 0; n < argc; n++)
-				if (mnt.dir = argv[n])
-				{
-					if (statvfs(mnt.dir, &vfs))
-						error(ERROR_SYSTEM|2, "%s: mount point not found", mnt.dir);
-					else
-						entry(&df, format);
-				}
+				if ((mnt.dir = argv[n]) && !status(mnt.dir, &vfs))
+					entry(&df, format);
 		}
 	}
 	return error_info.errors != 0;
 }
-#if __OBSOLETE__ < 20010101
-#include "../../lib/libast/disc/sfkeyprintf.c"
-#endif

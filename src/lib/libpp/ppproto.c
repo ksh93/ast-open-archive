@@ -33,7 +33,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2000-09-01 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2001-04-19 $\0\n";
 
 #if PROTOMAIN
 
@@ -60,6 +60,7 @@ static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2000-09-01 $\0\n";
 struct proto				/* proto buffer state		*/
 {
 	int		brace;		/* {..} level			*/
+	int		call;		/* call level			*/
 	int		fd;		/* input file descriptor	*/
 	char*		file;		/* input file name		*/
 	long		flags;		/* coupled flags		*/
@@ -196,6 +197,10 @@ static int		errors;
  * namespace pollution forces us to claim parts of libc
  */
 
+#undef	memcpy
+#define memcpy(t,f,n)	memcopy(t,f,n)
+#undef	strcpy
+#define strcpy(t,f)	strcopy(t,f)
 #undef	strlen
 #define strlen(s)	sstrlen(s)
 #undef	strncmp
@@ -460,14 +465,14 @@ init(struct proto* proto, char* op, int flags)
 }
 
 #define BACKOUT()	(op=ko)
-#define CACHE()		(CACHEIN(),CACHEOUT())
+#define CACHE()		do{CACHEIN();CACHEOUT();call=proto->call;}while(0)
 #define CACHEIN()	(ip=proto->ip)
 #define CACHEOUT()	(op=proto->op)
 #define GETCHR()	(*(unsigned char*)ip++)
 #define KEEPOUT()	(ko=op)
 #define LASTOUT()	(*(op-1))
 #define PUTCHR(c)	(*op++=(c))
-#define SYNC()		do{SYNCIN();SYNCOUT();proto->flags&=~(INIT|VARIADIC|VARIADIC2);proto->flags|=flags&(INIT|VARIADIC|VARIADIC2);}while(0)
+#define SYNC()		do{SYNCIN();SYNCOUT();proto->flags&=~(EXTERN|INIT|VARIADIC|VARIADIC2);proto->flags|=flags&(EXTERN|INIT|VARIADIC|VARIADIC2);proto->call=call;}while(0)
 #define SYNCIN()	(proto->ip=ip)
 #define SYNCOUT()	(proto->op=op)
 #define UNGETCHR()	(ip--)
@@ -612,7 +617,8 @@ lex(register struct proto* proto, register long flags)
 #endif
 			flags |= SLIDE;
 			c = ip - proto->ib;
-			if (!(flags & MATCH)) im = proto->tp;
+			if (!(flags & MATCH))
+				im = proto->tp;
 			if (ip > proto->ib)
 			{
 				n = ip - im;
@@ -627,8 +633,10 @@ lex(register struct proto* proto, register long flags)
 				im -= c;
 				ie -= c;
 			}
-			if (aim) aim -= c;
-			if (aie) aie -= c;
+			if (aim)
+				aim -= c;
+			if (aie)
+				aie -= c;
 			if ((n = read(proto->fd, ip, proto->iz)) > 0)
 			{
 				if ((proto->options & REGULAR) && n < proto->iz)
@@ -637,7 +645,8 @@ lex(register struct proto* proto, register long flags)
 					close(proto->fd);
 				}
 				*(ip + n) = 0;
-				if (state & SPLICE) goto fsm_splice;
+				if (state & SPLICE)
+					goto fsm_splice;
 				bp = ip;
 				goto fsm_get;
 			}
@@ -645,7 +654,8 @@ lex(register struct proto* proto, register long flags)
 			proto->flags &= ~MORE;
 			close(proto->fd);
 		}
-		if (state & SPLICE) goto fsm_splice;
+		if (state & SPLICE)
+			goto fsm_splice;
 		/* NOTE: RECURSIVE lex() should really SLIDE too */
 		if (!(flags & RECURSIVE) && (state = rp[c = EOF]))
 		{
@@ -720,15 +730,14 @@ lex(register struct proto* proto, register long flags)
 		switch (c)
 		{
 		case 'a':
-			PUTCHR('0');
-			PUTCHR('0');
-			PUTCHR('7');
-			break;
+			n = CC_bel;
+			goto fsm_oct;
+		case 'E':
+			n = CC_esc;
+			goto fsm_oct;
 		case 'v':
-			PUTCHR('0');
-			PUTCHR('1');
-			PUTCHR('3');
-			break;
+			n = CC_vt;
+			goto fsm_oct;
 		case 'x':
 			SYNC();
 			lex(proto, (flags & GLOBAL) | RECURSIVE);
@@ -752,6 +761,7 @@ lex(register struct proto* proto, register long flags)
 			}
  fsm_hex:
 			UNGETCHR();
+ fsm_oct:
 			PUTCHR(((n >> 6) & 07) + '0');
 			PUTCHR(((n >> 3) & 07) + '0');
 			PUTCHR((n & 07) + '0');
@@ -1637,12 +1647,12 @@ if !defined(va_start)\n\
 				if (c == ';')
 				{
 					flags &= ~(MANGLE|TOKENS|TYPEDEF);
+					call = 0;
 					if (flags & SLIDE)
 					{
 						SYNC();
 						return 0;
 					}
-					call = 0;
 				}
 				else call = call > 1 && c == ',';
 				group = 0;
@@ -1850,9 +1860,28 @@ if !defined(va_start)\n\
 				{
 					switch (*(op - 1))
 					{
+					case 'f':
+					case 'F':
+						t = op;
+						while ((c = *--t) >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z');
+						if (*t == '.')
+							op--;
+						n = 0;
+						break;
 					case 'l':
 					case 'L':
-						n |= 01;
+						if (!(n & 01))
+						{
+							n |= 01;
+							t = op;
+							while ((c = *--t) >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z');
+							if (*t == '.')
+							{
+								n = 0;
+								op--;
+								break;
+							}
+						}
 						continue;
 					case 'u':
 					case 'U':
@@ -1861,12 +1890,13 @@ if !defined(va_start)\n\
 					}
 					break;
 				}
-				if (n & 01) *op++ = 'l';
+				if (n & 01)
+					*op++ = 'L';
 				if (n & 02)
 				{
 					m = op;
 					t = op = m + 10;
-					while ((c = *--m) >= '0' && c <= '9'|| c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')
+					while ((c = *--m) >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z')
 						*--t = c;
 					c = *t;
 					strcopy(m + 1, "(unsigned)");

@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: troff2html (AT&T Labs Research) 1999-08-11 $\n]"
+"[-?\n@(#)$Id: troff2html (AT&T Labs Research) 2001-03-01 $\n]"
 USAGE_LICENSE
 "[+NAME?troff2html - convert troff/groff input to html]"
 "[+DESCRIPTION?\btroff2html\b converts \btroff\b(1) (or \bgroff\b(1),"
@@ -1665,9 +1665,10 @@ interpolate(int type)
 	register char*	x;
 	register char*	t;
 	int		i;
+	int		k;
 	char		buf[MAXNAME];
 
-	i = 0;
+	i = k = 0;
 	b = buf;
 	*b++ = (type == 'g' || type == 'j') ? 'f' : type;
 	x = buf + 2;
@@ -1693,11 +1694,12 @@ interpolate(int type)
 			if (state.groff && x == buf + 2)
 			{
 				x = buf + sizeof(buf) - 2;
+				k = 1;
 				continue;
 			}
 			break;
 		case ']':
-			if (state.groff && x > buf + 2)
+			if (k)
 				goto done;
 			break;
 		case '-':
@@ -1865,12 +1867,13 @@ it(void)
  */
 
 static void
-nr(char* s, int v, int internal)
+nr(char* s, int v, int format, int internal)
 {
 	register Num_t*	np;
 
 	np = num(s);
 	np->number = v;
+	np->format = format;
 	if (internal > 0)
 		np->internal = internal;
 }
@@ -1886,10 +1889,11 @@ tm(time_t t)
 
 	state.date = t;
 	xp = tmmake(&t);
-	nr("dw", xp->tm_wday + 1, 0);
-	nr("dy", xp->tm_mday, 0);
-	nr("mo", xp->tm_mon + 1, 0);
-	nr("yr", xp->tm_year, 0);
+	nr("dw", xp->tm_wday + 1, 0, 0);
+	nr("dy", xp->tm_mday, 0, 0);
+	nr("mo", xp->tm_mon + 1, 0, 0);
+	nr("yr", xp->tm_year % 100, 2, 0);
+	nr("YR", 1900 + xp->tm_year, 4, 0);
 }
 
 /*
@@ -2442,7 +2446,7 @@ groff_sy(Tag_t* tp, Arg_t* ap)
 {
 	char*	s;
 
-	nr("systat", (long)((s = join(ap, 1)) ? system(s) : 0), 0);
+	nr("systat", (long)((s = join(ap, 1)) ? system(s) : 0), 0, 0);
 }
 
 static void
@@ -4563,6 +4567,7 @@ static Tag_t tags[] =
 	".it",		troff_it,	0,			0,0,0,0,
 	".kern",	0,		0,			0,0,0,0,
 	".lc",		0,		0,			0,0,0,0,
+	".lf",		0,		0,			0,0,0,0,
 	".ll",		troff_ll,	0,			0,0,0,0,
 	".ls",		0,		0,			0,0,0,0,
 	".lt",		0,		0,			0,0,0,0,
@@ -4699,52 +4704,52 @@ init(void)
 			error(ERROR_SYSTEM|3, "out of space [tag hash put]");
 	}
 	hashset(state.symbols, HASH_ALLOCATE);
-	nr("%", 1, 1);
-	nr(".$", 0, 1);
-	nr(".A", 0, 1);
-	nr(".C", 0, 1);
-	nr(".F", 0, 1);
-	nr(".H", 0, 1);
-	nr(".L", 0, 1);
-	nr(".P", 0, 1);
-	nr(".T", 0, 1);
-	nr(".R", 0, 1);
-	nr(".V", 0, 1);
-	nr(".a", 0, 1);
-	nr(".b", 0, 1);
-	nr(".c", 0, 1);
-	nr(".ce", 0, 1);
-	nr(".d", 0, 1);
-	nr(".ev", 0, 1);
-	nr(".f", 0, 1);
-	nr(".g", 0, 1);
-	nr(".i", 0, 1);
-	nr(".in", 0, 1);
-	nr(".j", 0, 1);
-	nr(".k", 0, 1);
-	nr(".l", 0, 1);
-	nr(".ll", 0, 1);
-	nr(".n", 0, 1);
-	nr(".pn", 0, 1);
-	nr(".ps", 0, 1);
-	nr(".psr", 0, 1);
-	nr(".s", 0, 1);
-	nr(".sr", 0, 1);
-	nr(".t", 0, 1);
-	nr(".u", 0, 1);
-	nr(".v", 0, 1);
-	nr(".vpt", 0, 1);
-	nr(".w", 0, 1);
-	nr(".warn", 0, 1);
-	nr(".x", 0, 1);
-	nr(".y", 0, 1);
-	nr(".z", 0, 1);
-	nr("c.", 0, 1);
-	nr("dl", 0, 1);
-	nr("dn", 0, 1);
-	nr("ln", 0, 1);
-	nr("nl", 0, 1);
-	nr("systat", 0, 0);
+	nr("%", 1, 0, 1);
+	nr(".$", 0, 0, 1);
+	nr(".A", 0, 0, 1);
+	nr(".C", 0, 0, 1);
+	nr(".F", 0, 0, 1);
+	nr(".H", 0, 0, 1);
+	nr(".L", 0, 0, 1);
+	nr(".P", 0, 0, 1);
+	nr(".T", 0, 0, 1);
+	nr(".R", 0, 0, 1);
+	nr(".V", 0, 0, 1);
+	nr(".a", 0, 0, 1);
+	nr(".b", 0, 0, 1);
+	nr(".c", 0, 0, 1);
+	nr(".ce", 0, 0, 1);
+	nr(".d", 0, 0, 1);
+	nr(".ev", 0, 0, 1);
+	nr(".f", 0, 0, 1);
+	nr(".g", 0, 0, 1);
+	nr(".i", 0, 0, 1);
+	nr(".in", 0, 0, 1);
+	nr(".j", 0, 0, 1);
+	nr(".k", 0, 0, 1);
+	nr(".l", 0, 0, 1);
+	nr(".ll", 0, 0, 1);
+	nr(".n", 0, 0, 1);
+	nr(".pn", 0, 0, 1);
+	nr(".ps", 0, 0, 1);
+	nr(".psr", 0, 0, 1);
+	nr(".s", 0, 0, 1);
+	nr(".sr", 0, 0, 1);
+	nr(".t", 0, 0, 1);
+	nr(".u", 0, 0, 1);
+	nr(".v", 0, 0, 1);
+	nr(".vpt", 0, 0, 1);
+	nr(".w", 0, 0, 1);
+	nr(".warn", 0, 0, 1);
+	nr(".x", 0, 0, 1);
+	nr(".y", 0, 0, 1);
+	nr(".z", 0, 0, 1);
+	nr("c.", 0, 0, 1);
+	nr("dl", 0, 0, 1);
+	nr("dn", 0, 0, 1);
+	nr("ln", 0, 0, 1);
+	nr("nl", 0, 0, 1);
+	nr("systat", 0, 0, 0);
 	tm(NiL);
 	hot("see", 1);
 	hot("refer", 1);
@@ -5958,7 +5963,7 @@ main(int argc, char** argv)
 			{
 				opt_info.num = expression(s + 1, NiL, 0);
 				s[1] = 0;
-				nr(s, opt_info.num, 0);
+				nr(s, opt_info.num, 0, 0);
 			}
 			continue;
 		case 's':

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.tab (AT&T Labs Research) 2000-12-25
+# @(#)pp.tab (AT&T Labs Research) 2001-03-08
 #
 # C preprocessor tables and states
 #
@@ -45,6 +45,7 @@
 	hide
 	headerexpand
 	hosted
+	hostedtransition
 	hostdir
 	id
 	ignore
@@ -78,6 +79,7 @@
 	reserved
 	spaceout
 	splicecat
+	splicespace
 	standard
 	statement
 	strict
@@ -89,6 +91,7 @@
 	truncate
 	version
 	warn
+	zeof
 
 %keywords "static struct ppkeyword predicates" prefix=X_ index=optindex
 
@@ -150,6 +153,7 @@
 	GENDEPS			# missings FILEDEPS are generated
 	HEADERDEPS		# <...> too for FILEDEPS
 	HOSTED			# hosted include file
+	HOSTEDTRANSITION	# hosted include files get __STDC__=0
 	INACTIVE		# inactive conditional branch
 	INIT			# initialization phase
 	LOADING			# loading a checkpoint file
@@ -185,9 +189,11 @@
 	PROTOTYPED		# force all input to be prototyped
 	REGUARD			# emit header guard define at file pop
 	SPLICECAT		# \<newline> ok for COMPATIBILITY catenation
+	SPLICESPACE		# \<space>+<newline> == \<newline> for jcl
 	STRINGSPAN		# <newline> in string ok
 	STRINGSPLIT		# "...\\n..." => "..."\n"..."
 	TRUNCATE		# truncate identifiers
+	ZEOF			# ^Z anywhere in file => EOF
 
 %keywords "static struct ppkeyword variables" prefix=V_ index=optindex
 

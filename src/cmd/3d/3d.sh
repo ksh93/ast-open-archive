@@ -36,7 +36,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)3d (AT&T Labs Research) 2000-12-14
+@(#)$Id: 3d (AT&T Labs Research) 2000-12-14 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?3d - execute a command with nDFS filesystem services enabled]
@@ -189,7 +189,7 @@ esac
 abi=
 dir=${dir%/*}
 case $dir in
-*/arch/sgi.mips[0-9]*)
+*/arch/sgi.mips[0123456789]*)
 	if	test -d /lib32 -o -d /lib64
 	then	d=${dir%-*}
 		d=${d%?}
@@ -270,7 +270,7 @@ case $version in
 /*)	;;
 *)	for x in $dir/lib/lib3d.s[lo]$version
 	do	case $x in
-		*/lib3d.s[lo]*[a-zA-Z]*)
+		*/lib3d.s[lo]*[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
 			;;
 		*)	version=$x
 			break

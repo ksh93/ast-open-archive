@@ -37,7 +37,7 @@ int		fd;
 	switch(Type = type)
 	{
 	case SF_NEW:
-	case SF_CLOSE:
+	case SF_CLOSING:
 	case SF_SETFD:
 	case SF_READ:
 	case SF_WRITE:
@@ -60,8 +60,8 @@ MAIN()
 	close(fd+5);
 	if(sfsetfd(f,fd+5) != fd+5 || Type != SF_SETFD)
 		terror("Notify did not announce SF_SETFD event\n");
-	if(sfclose(f) < 0 || Type != SF_CLOSE)
-		terror("Notify did not announce SF_CLOSE event\n");
+	if(sfclose(f) < 0 || Type != SF_CLOSING)
+		terror("Notify did not announce SF_CLOSING event\n");
 	
 	if(sfputc(sfstdin,'a') >= 0 || Type != SF_WRITE)
 		terror("Notify did not announce SF_WRITE event\n");

@@ -1,7 +1,7 @@
 #
 # list of known old cpp predefined symbols
 #
-# @(#)pp.def (gsf@research.att.com) 2001-01-01
+# @(#)pp.def (gsf@research.att.com) 2001-04-24
 #
 # symbols will be tested for the common `_' permutations
 # qualifiers may be combinations of
@@ -19,12 +19,16 @@ AES_SOURCE	:source:
 AIX		:architecture:
 AIX32		:architecture:
 AIX64		:architecture:
+ALL_SOURCE	:source:
 AM29000		:architecture:
 AM29K		:architecture:
 ANSI_CPP	:dialect:
 AOSVS		:release:
+APPLE		:vendor:
+APPLE_CC	:dialect:
 ATT		:release:
 ATT4		:release:
+BIG_ENDIAN
 BSD		:release:
 BSD_COMPAT	:source:
 BSD_TYPES	:source:
@@ -32,15 +36,19 @@ CDECL
 CI
 CLASSIFY_TYPE
 COMPACT		:architecture:
+COMPILER_VER
 CRAY		:machine:
 CRAY1		:machine:
 CRAY2		:machine:
 DATAGENERAL	:machine:
 DGUX		:release:
+DLL
 DMERT		:release:
+DYNAMIC		:dialect:
 EXTENSIONS	:dialect:
 FreeBSD		:release:
 GNUC		:dialect:vendor:
+GNUC_MINOR
 GNUG		:dialect:vendor:
 HFS		:vendor:
 HIGHC
@@ -55,8 +63,8 @@ LANGUAGE_C_PLUS_PLUS	:dialect:
 LARGE		:architecture:
 LARGE_M
 LATTICE		:vendor:
-LONG_LONG	:dialect:
 LONGLONG	:dialect:
+LONG_LONG	:dialect:
 M68010		:machine:
 M68020		:machine:
 MACH		:release:
@@ -102,6 +110,7 @@ M_SYSIII
 M_SYSV
 M_WDSWAP
 M_XENIX
+NATURAL_ALIGNMENT
 NEXT		:release:
 NeXT		:release:
 ON_SEL
@@ -124,17 +133,18 @@ SGI_SOURCE	:source:
 SIZE_TYPE
 SMALL		:architecture:
 SMALL_M
-STD_INCLUDE_DIR
-STDC_VERSION
 STDC_IEC_559
 STDC_IEC_559_COMPLEX
 STDC_ISO_10646
+STDC_VERSION
+STD_INCLUDE_DIR
 SVR3
 SVR4
 SVR4_SOURCE	:source:
 SYSTYPE_BSD
 SYSTYPE_SVR4
 SYSTYPE_SYSV
+TARGET_LIB
 TINY		:architecture:
 TM_DPS6
 TM_L66
@@ -231,6 +241,7 @@ orion		:release:
 os		:release:
 pcdos		:system:
 pdp11		:architecture:
+ppc		:architecture:
 pyr		:architecture:
 rsx		:release:
 sel		:architecture:

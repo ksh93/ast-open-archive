@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2001 AT&T Corp.                *
+*                Copyright (c) 1992-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,6 +20,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                David Korn <dgk@research.att.com>                 *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -30,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: rm (AT&T Labs Research) 2001-01-01 $\n]"
+"[-?\n@(#)$Id: rm (AT&T Labs Research) 2001-04-17 $\n]"
 USAGE_LICENSE
 "[+NAME?rm - remove files]"
 "[+DESCRIPTION?\brm\b removes the named \afile\a arguments. By default it"
@@ -65,11 +66,10 @@ USAGE_LICENSE
 "[+SEE ALSO?\bmv\b(1), \brmdir\b(2), \bunlink\b(2), \bremove\b(3)]"
 ;
 
-#include <ast.h>
+#include <cmdlib.h>
 #include <ls.h>
 #include <ftwalk.h>
 #include <fs3d.h>
-#include <error.h>
 
 #define RM_AGAIN	(1<<0)
 #define RM_ENTRY	(1<<1)
@@ -307,10 +307,10 @@ rm(register Ftw_t* ftw)
 }
 
 int
-main(int argc, register char** argv)
+b_rm(int argc, register char** argv, void* context)
 {
 	NoP(argc);
-	error_info.id = "rm";
+	cmdinit(argv, context, ERROR_CATALOG);
 	state.fs3d = fs3d(FS3D_TEST);
 	state.terminal = isatty(0);
 	for (;;)
@@ -370,5 +370,5 @@ main(int argc, register char** argv)
 		state.verbose = 0;
 	state.uid = geteuid();
 	ftwalk((char*)argv, rm, FTW_MULTIPLE|FTW_PHYSICAL|FTW_TWICE, NiL);
-	exit(error_info.errors != 0);
+	return error_info.errors != 0;
 }

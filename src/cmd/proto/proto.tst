@@ -196,14 +196,23 @@ register packet *pkt;
 
     return(0);
 }'
-		OUTPUT - $'                  
-disp_form(pkt)
+		OUTPUT - $'                  \ndisp_form(pkt)
 register packet *pkt;
 {
     char *rjust(__VARARG__), *ptr;
 
     return(0);
 }'
+	EXEC -nh
+		INPUT - $'#pragma prototyped
+int i = 0xbeef;
+int I = 0XBEEF;
+float f = 12.34f;
+float F = 56.78F;'
+		OUTPUT - $'                  \nint i = 0xbeef;
+int I = 0XBEEF;
+float f = 12.34;
+float F = 56.78;'
 
 TEST 02 'subtleties'
 	EXEC -nh
@@ -4602,6 +4611,1779 @@ static int hello __PARAM__((const char* msg), (msg)) __OTORP__(const char* msg;)
 }'
 
 TEST 08 'buffer boundaries'
+	EXEC -nhf
+		INPUT - $'/*
+  xxxxxxxxxxx xxxxx xxxxxxx.
+*/
+#ifndef xxxxxxxx
+#define xxxxxxxx
+
+#if defined(xxxxxxxxxxx) || defined(xxxxxxxxxx)
+extern "x" {
+#endif
+
+#if defined(xxxxxxxxxxx)
+/*
+  xxxxx xxxxxxx xx [0..65535].
+*/
+#define xxxxxxxxx(xxxxxxx)  (((xxxxxxxx long) (xxxxxxx)) >> 8)
+#define xxxxxxxxxxxxxx "#%04x%04x%04x"
+#define xxxxxx  65535x
+#define xxxxxxxxxxxx  65535x
+#define xxxxxxxxxxxx  16
+#define xxxxxxx(xxxxxxx)  (((xxxxxxxx long) (xxxxxxx))*257)
+#define xxxxxxxxxx(xxxxx)  ((xxxxxxxx long) (xxxxx))
+#define xxxxxxxx(xxxxx)  ((xxxxxxxx long) (xxxxx))
+
+xxxxxxx xxxxxxxx short xxxxxxx;
+#else
+/*
+  xxxxx xxxxxxx xx [0..255].
+*/
+#define xxxxxxxxx(xxxxxxx)  ((xxxxxxxx long) (xxxxxxx))
+#define xxxxxxxxxxxxxx "#%02x%02x%02x"
+#define xxxxxx  255
+#define xxxxxxxxxxxx  255
+#define xxxxxxxxxxxx  8
+#define xxxxxxx(xxxxxxx)  ((xxxxxxxx long) (xxxxxxx))
+#define xxxxxxxxxx(xxxxx)  (((xxxxxxxx long) (xxxxx)) >> 8)
+#define xxxxxxxx(xxxxx)  (((xxxxxxxx long) (xxxxx))*257)
+
+xxxxxxx xxxxxxxx char xxxxxxx;
+#endif
+
+/*
+  3x xxxxxxx.
+*/
+#define xxxxxxxxxxxxxxxxxx  xxxxxxx(80)
+#define xxxxxxxxxxxxxxxxx  xxxxxxx(125)
+#define xxxxxxxxxxxxxx  xxxxxxx(135)
+#define xxxxxxxxxxxxx  xxxxxxx(185)
+#define xxxxxxxxxxxxxx  xxxxxxx(110)
+
+/*
+  xxxxxxx xxxxxxxxxxxx.
+*/
+xxxxxxx struct xxxxxxxxx
+{
+  char
+    *xxxx;
+
+  long
+    xxxxxx,
+    xxxxxx,
+    xxxxxx,
+    xxxxxxx;
+} xxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxx
+{
+  char
+    *xxxx;
+
+  xxxxxxxx char
+    xxx,
+    xxxxx,
+    xxxx;
+} xxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  xxxxxxxx short
+    xxx,
+    xxxxx,
+    xxxx,
+    xxxxx;
+
+  xxxxxxxx char
+    xxxxx;
+
+  char
+    xxx[3];
+
+  xxxxxxxx long
+    xxxxx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxxxxx
+{
+  int
+    xxxxx;
+
+  double
+    xxxxxx;
+} xxxxxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxx
+{
+  double
+    (*xxxxxxxx)(double),
+    xxxxxxx;
+} xxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxx
+{
+  int
+    x,
+    x;
+
+  xxxxxxxx int
+    xxxxx,
+    xxxxxx;
+
+  int
+    xxxxxxxxxxx,
+    xxxxxxxxxxx;
+} xxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxx
+{
+  /*
+    xxxx xxxxxx.
+  */
+  xxxxxxxx
+    xxxx;
+  /*
+    xxxx xxx xxxxx xxxxxxxxx xxxxxxx.
+  */
+  xxxx
+    *xxxx;
+
+  char
+    xxxxxxxx[xxxxxxxxxxxxx],
+    xxxxxx[xxxxxxxxxxxxx],
+    xxxxxx[xxxxxxxxxxxxx],
+    xxxx[xxxxxxxxxxxxx];
+
+  xxxxxxxx int
+    xxxxxx,
+    xxxxxxxxx,
+    xxxxxx,
+    xxxxxxxx,
+    xxxxxxxx,
+    xxxxx,
+    xxxx;
+
+  char
+    *xxxx,
+    *xxxx,
+    *xxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxx;
+
+  /*
+    xxxxxxxxxxx xxxxxxx.
+  */
+  xxxxxxxxxxxxxxx
+    xxxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxx;
+
+  /*
+    xxxxxxxxxx xxxxxxx.
+  */
+  char
+    *xxxxxxxxxxx,
+    *xxx,
+    *xxxx,
+    *xxx,
+    *xxxxxxx,
+    *xxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxx,
+    xxxxxxxxx,
+    xxxxxxxxx;
+
+  int
+    xxxx;
+
+  char
+    *xxxxxxxxxxxxxxxx,
+    *xxxxxxxxxxxx,
+    *xxxxxxxxxxx;
+
+  /*
+    xxxxx xxxxxxxxx xxxxxxx.
+  */
+  xxxxxxxx int
+    xxxxxx,
+    xxxxxxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxxxxxxx;
+
+  /*
+    xxxxxxxxx xxxxxxx.
+  */
+  char
+    *xxxxxxx,
+    *xxxxx,
+    *xxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxxxxxxxxxxxxx,
+    xxxxxxxxxxxxxxx,
+    xxxxxxxxxxxxxxxx;
+
+  /*
+    xxxxxxxxxxxxx xxxxxxx.
+  */
+  xxxxxxxx int
+    xxxxxxx;
+
+  xxxxxxxxxxx
+    xxxxxxxxxxxx;
+
+  char
+    *xxxx;
+
+  long
+    xxxxx;
+} xxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  char
+    xxxxxxxx[xxxxxxxxxxxxx];
+
+  char
+    *xxxxxxxx,
+    *xxxx,
+    *xxxxxxxxxxxxxxxx,
+    *xxxxxxxxxxxx,
+    *xxxxxxxxxxx,
+    *xxxxx,
+    *xxxxx,
+    *xxxxxxx,
+    *xxx,
+    *xxxx;
+
+  xxxxxxxx int
+    xxxxxxxxx,
+    xxxxxxxxxxxx,
+    xxxxxxx,
+    xxxxxx;
+
+  xxxxxxxxxxxxxxxxx
+    xxxxxxx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxx
+{
+  double
+    x,
+    x,
+    x;
+} xxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxx
+{
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxx;
+
+  double
+    x,
+    x;
+
+  xxxxxxxxxxx
+    xxxxxx;
+
+  char
+    *xxxx;
+} xxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxx
+{
+  xxxxxxxx int
+    xxxxx,
+    xxxxxx;
+
+  int
+    x,
+    x;
+} xxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxxxx
+{
+  xxxxxxx
+    xxx,
+    xxxxx,
+    xxxx,
+    xxxxxx;
+
+  xxxxxxxx short
+    xxxxx;
+} xxxxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  double
+    xx,
+    xx,
+    xx,
+    xx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  xxxxxxxx int
+    xxxxxx;
+
+  xxxxxxxx char
+    *xxxx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxxxxx
+{
+  xxxxxxxxx
+    xxxxxxxxxxx,
+    xxxxxxxxxxxxx,
+    xxxxxxxxxxxx,
+    xxxxxxxxxxx;
+} xxxxxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxx
+{
+  xxxxxxxx
+    xxxx;
+
+  xxxx
+    *xxxx;
+
+  int
+    xxxxxx,
+    xxxxxx,
+    xxxxxxxxx;
+
+  char
+    xxxxxxxx[xxxxxxxxxxxxx];
+
+  long int
+    xxxxxxxx;
+
+  int
+    xxxx;
+
+  char
+    xxxxxx[xxxxxxxxxxxxx],
+    *xxxxxxxx,
+    *xxxxx;
+
+  xxxxxxxxx
+#if defined(xxxxxxxxxxx) || defined(xxxxxxxxxx)
+    xxxxxxx;
+#else
+    xxxxx;
+#endif
+
+  xxxxxxxx int
+    xxxxx;
+
+  xxxxxxxxxxxxxxx
+    xxxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxx,
+    xxxx,
+    xxxxx;
+
+  int
+    xxxxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxx;
+
+  char
+    *xxxxxxx,
+    *xxxxxxxxx;
+
+  xxxxxxxxxxx
+    *xxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxxxxxxx;
+
+  xxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxx;
+
+  double
+    xxxxx;
+
+  xxxxxxxxxxxxxxxx
+    xxxxxxxxxxxx;
+
+  xxxxxxxxxxx
+    xxxxxxxxxxxxx,
+    xxxxxxxxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxx;
+
+  double
+    xxxxxxxxxxxx,
+    xxxxxxxxxxxx;
+
+  char
+    *xxxxxxxxx;
+
+  xxxxxxxxxxxxxxx
+    *xxxxxx;
+
+  xxxxxxxx long
+    xxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxx;
+
+  xxxxxxxx char
+    *xxxxxxxxxxxxx;
+
+  xxxxxxxxxxx
+    xxxxxxxxxxxxxxxx,
+    xxxxxxxxxxxx,
+    xxxxxxxxxxx;
+
+  char
+    *xxxxxxxx,
+    *xxxx;
+
+  xxxxxxxx int
+    xxxxxxx,
+    xxxxx,
+    xxxxxxxxxx;
+
+  int
+    xxxx;
+
+  xxxxxxxxxx
+    xxxxxx;
+
+  double
+    xxxx;
+
+  xxxxxxxx long
+    xxxxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxxxxxxxxxxx;
+
+  double
+    xxxxxxxxxxxxxxxxxxxxx,
+    xxxxxxxxxxxxxxxxxxxxxxxx;
+
+  long int
+    xxxxxxxxxxx;
+
+  char
+    xxxxxxxxxxxxxxx[xxxxxxxxxxxxx];
+
+  xxxxxxxx int
+    xxxxxxxxxxxxxx,
+    xxxxxxxxxxx;
+
+  int
+    xxxxxxxxxxxxxxxxxxxxxx,
+    xxxxxxx;
+
+  xxxxxxxx int
+    xxxxxx;
+
+  struct xxxxxx
+    *xxxxxxxx,
+    *xxxx,
+    *xxxx;
+} xxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxx
+{
+  xxxxxxxxx
+    *xxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxx;
+
+  char
+    *xxxxxxxx,
+    *xxxx,
+    *xxxxxxxxx,
+    *xxxxxxxxx;
+
+  double
+    xxxxxxx;
+
+  xxxxx
+    *xxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxx;
+} xxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxx
+{
+  const char
+    *xxx;
+
+  xxxxx
+    *(*xxxxxxx)(const xxxxxxxxx *);
+
+  xxxxxxxx int
+    (*xxxxxxx)(const xxxxxxxxx *,xxxxx *),
+    (*xxxxxx)(const xxxxxxxx char *,const xxxxxxxx int),
+    xxxxxx,
+    xxxxxxxxxxxx;
+
+  const char
+    *xxxxxxxxxxx;
+
+  xxxx
+    *xxxx;
+
+  struct xxxxxxxxxxx
+    *xxxxxxxx,
+    *xxxx;
+} xxxxxxxxxx;
+
+/*
+  xxxxx const xxxxxxxxxxxx.
+*/
+extern const char
+  *xxxxxxxx,
+  *xxxxxxxxxxxxxxx,
+  *xxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxx,
+  *xxxxxxxxxx,
+  *xxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxx;
+
+extern const xxxxxxxxxxxxx
+  xxxxxxxxxxxx[235],
+  xxxxxxxxxx[757];
+
+/*
+  xxxxx xxxxxxxxx xxxxxxx.
+*/
+extern xxxxxx xxxxxxxxxxxx
+  *xxxxxxxxxxxxxxxxx(const xxxxxxxxx *,const xxxxxxxxxxxx *);
+
+extern xxxxxx xxxxx
+  *xxxxxxxxxxxxx(const xxxxx *,const xxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *),
+  *xxxxxxxxxxxx(xxxxx *,const xxxxxxxx int),
+  *xxxxxxxxxxxxx(const xxxxx *),
+  *xxxxxxxxx(const xxxxx *,const double),
+  *xxxxxxxxxxx(const xxxxx *,const xxxxxxxxxxxxx *),
+  *xxxxxxxxx(const xxxxx *,const xxxxxxxxxxxxx *),
+  *xxxxxxxxxx(const xxxxx *,const xxxxxxxx int,const xxxxxxxx int,
+    const xxxxxxxx int),
+  *xxxxxxxxxxx(const xxxxxxxx int,const xxxxxxxx int,const xxxxx *,
+    const xxxxx *,const xxxxx *,const xxxxx *),
+  *xxxxxxxxx(const xxxxx *,const xxxxxxxxxxxxx *),
+  *xxxxxxxxxxxxxx(xxxxx *),
+  *xxxxxxxxx(const xxxxx *,const double),
+  *xxxxxxxxxxx(const xxxxx *),
+  *xxxxxxxxxxxx(const xxxxx *),
+  *xxxxxxxxx(const xxxxx *),
+  *xxxxxxxxx(const xxxxx *),
+  *xxxxxxxxxx(const xxxxx *,const xxxxxxxxx *),
+  *xxxxxxxxxxxx(xxxxx *,const double),
+  **xxxxxxxxxxxxxxxx(const xxxxx *,xxxxxxxx int *),
+  *xxxxxxxxxxxx(xxxxx *),
+  *xxxxxxxxxxx(xxxxx *),
+  *xxxxxxxxxxxxx(const xxxxx *,const xxxxxxxxxxx *),
+  *xxxxxxxxxxx(xxxxx *,const xxxxxxxx int),
+  *xxxxxxxxxxxxx(xxxxx *,const xxxxxxxx int),
+  *xxxxxxxxx(const xxxxxxxxx *),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxx(xxxxxxxxx *),
+  *xxxxxxxxxx(xxxxxxxxx *),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx),
+  *xxxxxxxxxxxxxxxx(const xxxxx *),
+  *xxxxxxxxx(const xxxxx *,const int,const int),
+  *xxxxxxxxxxx(const xxxxx *,const double,const xxxxxxxx int,
+    const xxxxxxxx int),
+  *xxxxxxxxxxx(const xxxxx *,const xxxxxxxx int,const xxxxxxxx int),
+  *xxxxxxxxxx(const xxxxx *,const xxxxxxxx int,const xxxxxxxx int),
+  *xxxxxxxxxx(xxxxx *,const xxxxxxxx int,double,double),
+  *xxxxxxxxxxxx(const xxxxx *,const double),
+  *xxxxxxxxxx(const xxxxx *,const double,const double,const xxxxxxxx int),
+  *xxxxxxxxxxx(xxxxx *,const xxxxxxxx int),
+  *xxxxxxxxxxxx(xxxxx *,xxxxx *),
+  *xxxxxxxxxxx(xxxxx *,const xxxxx *),
+  *xxxxxxxxxx(xxxxx *,double),
+  *xxxxxxxxx(xxxxx *,const double,const double),
+  *xxxxxxxxx(xxxxx *,const xxxxxxxx int,const xxxxxxxx int);
+
+extern xxxxxx xxxxxxxxx
+  *xxxxxxxxxxxxxx(const xxxxxxxxx *);
+
+extern xxxxxx xxxxxxxxx
+  xxxxxxxxxxxx(xxxxx *);
+
+extern xxxxxx int
+  xxxxxxxxxxxxx(const char *,int *,int *,xxxxxxxx int *,xxxxxxxx int *),
+  xxxxxxxxxxxxxxxxxx(const char *,int *,int *,xxxxxxxx int *,xxxxxxxx int *);
+
+extern xxxxxx xxxxxxxxxx
+  *xxxxxxxxxxxxx(const char *),
+  *xxxxxxxxxxxxxxxxxx(const char *,xxxxx *(*)(const xxxxxxxxx *),
+    xxxxxxxx int (*)(const xxxxxxxxx *,xxxxx *),
+    xxxxxxxx int (*)(const xxxxxxxx char *,const xxxxxxxx int),
+    const xxxxxxxx int,const xxxxxxxx int,const char *);
+
+extern xxxxxx xxxxxxxx int
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxxx(const xxxxx *),
+  xxxxxxxxxx(const char *),
+  xxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxx(const char *,const xxxxxxxx int),
+  xxxxxxxxx(const xxxxx *),
+  xxxxxxxxxxx(xxxxx *,const xxxxxxxxxxx *,int,int),
+  xxxxxxxxxxxxxxxxxx(const char *,xxxxxxxxxxx *),
+  xxxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx, xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxx(const xxxxxxxxx *,xxxxx *),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxx(const xxxxxxxxx *,xxxxx *),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx),
+  xxxxxxxxxxxxx(const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx);
+
+extern xxxxxx xxxx
+  xxxxxxxxxxxxxxxxx(const xxxxxxxxx *,xxxxx *),
+  xxxxxxxxxxxxx(xxxxx *,const xxxxxxxxxxxx *),
+  xxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxxxxxxxx(xxxxx *,const xxxxxxxxxxxxxxx *,xxxxx *,const int x,
+    const int x,const xxxxxxxxxxx),
+  xxxxxxxxxxxxx(xxxxx *,const char *,const char *),
+  xxxxxxxxxxxx(xxxxx *,const char *),
+  xxxxxxxxxxxxxx(xxxxx *,const xxxxxxxxxxxxxxxxx,xxxxx *,const int,const int),
+  xxxxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxx(xxxxx *,const xxxxxxxx int),
+  xxxxxxxxxxxxxxxxxx(xxxxx *,const int),
+  xxxxxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxx(xxxxx *,xxxx *,const xxxxxxxx int),
+  xxxxxxxxxxxxxxxxxxx(xxxxxxxxxxxx *),
+  xxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxxxxx(xxxxxxxxx *),
+  xxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxxxxxxx(xxxxxxxxxxx *),
+  xxxxxxxxx(xxxxx *,const xxxxxxxxxxxx *),
+  xxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxx(xxxxx *,const char *),
+  xxxxxxxxxxxxxxx(const xxxxxxxxx *,xxxxxxxxxxxx *),
+  xxxxxxxxxxxx(xxxxxxxxx *),
+  xxxxxxxxxxxxxx(xxxxxxxxxxx *),
+  xxxxxxxxx(const xxxxx *,xxxxx *,xxxxx *,xxxxx *,xxxxx *),
+  xxxxxxxxxx(xxxxx *,const char *),
+  xxxxxxxxxx(xxxxx *,const xxxxxxxxx),
+  xxxxxxxxxxxxxx(xxxx *),
+  xxxxxxxxxxxxxxxxxxx(xxxxx *,const xxxxxxxxxxxxxxx *,const xxxxxxxx int,
+    const int x,const int x,const xxxxxxxxxxx),
+  xxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxx(xxxxx *,const char *),
+  xxxxxxxxxxxx(const xxxxxxxxx *,const int,char **,xxxxx **),
+  xxxxxxxxxxxxx(const xxxxxxxxx *,const int,char **,xxxxx **),
+  xxxxxxxxxxx(xxxxx *,const xxxxxxxx int),
+  xxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxx(xxxxx *,const char *,const char *),
+  xxxxxxxxxx(xxxxx *,const xxxxxxxxxxxxx *,const int),
+  xxxxxxxxxxxxxxxxx(xxxxx *,const xxxxxxxxxxxxxx),
+  xxxxxxxx(xxxxx *),
+  xxxxxxxxxxxx(xxxxxxxxx *,const xxxxxxxx int),
+  xxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxxx(xxxxx *,const double),
+  xxxxxxxxxxxxxxxxxxxxxxx(xxxxx *),
+  xxxxxxxxx(xxxxx *),
+  xxxxxxxxxxxx(xxxxx *,xxxxx *),
+  xxxxxxxxxxxxxx(xxxxx *,const double),
+  xxxxxxxxxxxx(const xxxxxxx,const xxxxxxx,const xxxxxxx,double *,double *,
+    double *),
+  xxxxxxxxxxxxxx(xxxxx **,const char *,const char *),
+  xxxxxxxxxxxxxxxxx(xxxxx *,const xxxxxxxxxxxxxx),
+  xxxxxxxxxxxxxxxx(xxxxx *,const char *);
+
+#if defined(xxxxxxxxxxx) || defined(xxxxxxxxxx)
+}
+#endif
+
+#endif'
+		OUTPUT - $'/*
+  xxxxxxxxxxx xxxxx xxxxxxx.
+*/
+#ifndef xxxxxxxx
+#define xxxxxxxx
+
+#if defined(xxxxxxxxxxx) || defined(xxxxxxxxxx)
+extern __MANGLE__ "x" {
+#endif
+
+#if defined(xxxxxxxxxxx)
+/*
+  xxxxx xxxxxxx xx [0..65535].
+*/
+#define xxxxxxxxx(xxxxxxx)  (((xxxxxxxx long) (xxxxxxx)) >> 8)
+#define xxxxxxxxxxxxxx "#%04x%04x%04x"
+#define xxxxxx  65535x
+#define xxxxxxxxxxxx  65535x
+#define xxxxxxxxxxxx  16
+#define xxxxxxx(xxxxxxx)  (((xxxxxxxx long) (xxxxxxx))*257)
+#define xxxxxxxxxx(xxxxx)  ((xxxxxxxx long) (xxxxx))
+#define xxxxxxxx(xxxxx)  ((xxxxxxxx long) (xxxxx))
+
+xxxxxxx xxxxxxxx short xxxxxxx;
+#else
+/*
+  xxxxx xxxxxxx xx [0..255].
+*/
+#define xxxxxxxxx(xxxxxxx)  ((xxxxxxxx long) (xxxxxxx))
+#define xxxxxxxxxxxxxx "#%02x%02x%02x"
+#define xxxxxx  255
+#define xxxxxxxxxxxx  255
+#define xxxxxxxxxxxx  8
+#define xxxxxxx(xxxxxxx)  ((xxxxxxxx long) (xxxxxxx))
+#define xxxxxxxxxx(xxxxx)  (((xxxxxxxx long) (xxxxx)) >> 8)
+#define xxxxxxxx(xxxxx)  (((xxxxxxxx long) (xxxxx))*257)
+
+xxxxxxx xxxxxxxx char xxxxxxx;
+#endif
+
+/*
+  3x xxxxxxx.
+*/
+#define xxxxxxxxxxxxxxxxxx  xxxxxxx(80)
+#define xxxxxxxxxxxxxxxxx  xxxxxxx(125)
+#define xxxxxxxxxxxxxx  xxxxxxx(135)
+#define xxxxxxxxxxxxx  xxxxxxx(185)
+#define xxxxxxxxxxxxxx  xxxxxxx(110)
+
+/*
+  xxxxxxx xxxxxxxxxxxx.
+*/
+xxxxxxx struct xxxxxxxxx
+{
+  char
+    *xxxx;
+
+  long
+    xxxxxx,
+    xxxxxx,
+    xxxxxx,
+    xxxxxxx;
+} xxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxx
+{
+  char
+    *xxxx;
+
+  xxxxxxxx char
+    xxx,
+    xxxxx,
+    xxxx;
+} xxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  xxxxxxxx short
+    xxx,
+    xxxxx,
+    xxxx,
+    xxxxx;
+
+  xxxxxxxx char
+    xxxxx;
+
+  char
+    xxx[3];
+
+  xxxxxxxx long
+    xxxxx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxxxxx
+{
+  int
+    xxxxx;
+
+  double
+    xxxxxx;
+} xxxxxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxx
+{
+  double
+    (*xxxxxxxx) __PROTO__((double)),
+    xxxxxxx;
+} xxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxx
+{
+  int
+    x,
+    x;
+
+  xxxxxxxx int
+    xxxxx,
+    xxxxxx;
+
+  int
+    xxxxxxxxxxx,
+    xxxxxxxxxxx;
+} xxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxx
+{
+  /*
+    xxxx xxxxxx.
+  */
+  xxxxxxxx
+    xxxx;
+  /*
+    xxxx xxx xxxxx xxxxxxxxx xxxxxxx.
+  */
+  xxxx
+    *xxxx;
+
+  char
+    xxxxxxxx[xxxxxxxxxxxxx],
+    xxxxxx[xxxxxxxxxxxxx],
+    xxxxxx[xxxxxxxxxxxxx],
+    xxxx[xxxxxxxxxxxxx];
+
+  xxxxxxxx int
+    xxxxxx,
+    xxxxxxxxx,
+    xxxxxx,
+    xxxxxxxx,
+    xxxxxxxx,
+    xxxxx,
+    xxxx;
+
+  char
+    *xxxx,
+    *xxxx,
+    *xxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxx;
+
+  /*
+    xxxxxxxxxxx xxxxxxx.
+  */
+  xxxxxxxxxxxxxxx
+    xxxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxx;
+
+  /*
+    xxxxxxxxxx xxxxxxx.
+  */
+  char
+    *xxxxxxxxxxx,
+    *xxx,
+    *xxxx,
+    *xxx,
+    *xxxxxxx,
+    *xxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxx,
+    xxxxxxxxx,
+    xxxxxxxxx;
+
+  int
+    xxxx;
+
+  char
+    *xxxxxxxxxxxxxxxx,
+    *xxxxxxxxxxxx,
+    *xxxxxxxxxxx;
+
+  /*
+    xxxxx xxxxxxxxx xxxxxxx.
+  */
+  xxxxxxxx int
+    xxxxxx,
+    xxxxxxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxxxxxxx;
+
+  /*
+    xxxxxxxxx xxxxxxx.
+  */
+  char
+    *xxxxxxx,
+    *xxxxx,
+    *xxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxxxxxxxxxxxxx,
+    xxxxxxxxxxxxxxx,
+    xxxxxxxxxxxxxxxx;
+
+  /*
+    xxxxxxxxxxxxx xxxxxxx.
+  */
+  xxxxxxxx int
+    xxxxxxx;
+
+  xxxxxxxxxxx
+    xxxxxxxxxxxx;
+
+  char
+    *xxxx;
+
+  long
+    xxxxx;
+} xxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  char
+    xxxxxxxx[xxxxxxxxxxxxx];
+
+  char
+    *xxxxxxxx,
+    *xxxx,
+    *xxxxxxxxxxxxxxxx,
+    *xxxxxxxxxxxx,
+    *xxxxxxxxxxx,
+    *xxxxx,
+    *xxxxx,
+    *xxxxxxx,
+    *xxx,
+    *xxxx;
+
+  xxxxxxxx int
+    xxxxxxxxx,
+    xxxxxxxxxxxx,
+    xxxxxxx,
+    xxxxxx;
+
+  xxxxxxxxxxxxxxxxx
+    xxxxxxx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxx
+{
+  double
+    x,
+    x,
+    x;
+} xxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxx
+{
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxx;
+
+  double
+    x,
+    x;
+
+  xxxxxxxxxxx
+    xxxxxx;
+
+  char
+    *xxxx;
+} xxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxx
+{
+  xxxxxxxx int
+    xxxxx,
+    xxxxxx;
+
+  int
+    x,
+    x;
+} xxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxxxx
+{
+  xxxxxxx
+    xxx,
+    xxxxx,
+    xxxx,
+    xxxxxx;
+
+  xxxxxxxx short
+    xxxxx;
+} xxxxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  double
+    xx,
+    xx,
+    xx,
+    xx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxx
+{
+  xxxxxxxx int
+    xxxxxx;
+
+  xxxxxxxx char
+    *xxxx;
+} xxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxxxxxx
+{
+  xxxxxxxxx
+    xxxxxxxxxxx,
+    xxxxxxxxxxxxx,
+    xxxxxxxxxxxx,
+    xxxxxxxxxxx;
+} xxxxxxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxx
+{
+  xxxxxxxx
+    xxxx;
+
+  xxxx
+    *xxxx;
+
+  int
+    xxxxxx,
+    xxxxxx,
+    xxxxxxxxx;
+
+  char
+    xxxxxxxx[xxxxxxxxxxxxx];
+
+  long int
+    xxxxxxxx;
+
+  int
+    xxxx;
+
+  char
+    xxxxxx[xxxxxxxxxxxxx],
+    *xxxxxxxx,
+    *xxxxx;
+
+  xxxxxxxxx
+#if defined(xxxxxxxxxxx) || defined(xxxxxxxxxx)
+    xxxxxxx;
+#else
+    xxxxx;
+#endif
+
+  xxxxxxxx int
+    xxxxx;
+
+  xxxxxxxxxxxxxxx
+    xxxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxx,
+    xxxx,
+    xxxxx;
+
+  int
+    xxxxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxx;
+
+  char
+    *xxxxxxx,
+    *xxxxxxxxx;
+
+  xxxxxxxxxxx
+    *xxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxxxxxxx;
+
+  xxxxxxxxxxxxxxx
+    xxxxxxxxxxxxxxxx;
+
+  double
+    xxxxx;
+
+  xxxxxxxxxxxxxxxx
+    xxxxxxxxxxxx;
+
+  xxxxxxxxxxx
+    xxxxxxxxxxxxx,
+    xxxxxxxxxxxx;
+
+  xxxxxxxxxxxxxx
+    xxxxx;
+
+  double
+    xxxxxxxxxxxx,
+    xxxxxxxxxxxx;
+
+  char
+    *xxxxxxxxx;
+
+  xxxxxxxxxxxxxxx
+    *xxxxxx;
+
+  xxxxxxxx long
+    xxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxx;
+
+  xxxxxxxx char
+    *xxxxxxxxxxxxx;
+
+  xxxxxxxxxxx
+    xxxxxxxxxxxxxxxx,
+    xxxxxxxxxxxx,
+    xxxxxxxxxxx;
+
+  char
+    *xxxxxxxx,
+    *xxxx;
+
+  xxxxxxxx int
+    xxxxxxx,
+    xxxxx,
+    xxxxxxxxxx;
+
+  int
+    xxxx;
+
+  xxxxxxxxxx
+    xxxxxx;
+
+  double
+    xxxx;
+
+  xxxxxxxx long
+    xxxxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxxxxxxxxxxxxxxx;
+
+  double
+    xxxxxxxxxxxxxxxxxxxxx,
+    xxxxxxxxxxxxxxxxxxxxxxxx;
+
+  long int
+    xxxxxxxxxxx;
+
+  char
+    xxxxxxxxxxxxxxx[xxxxxxxxxxxxx];
+
+  xxxxxxxx int
+    xxxxxxxxxxxxxx,
+    xxxxxxxxxxx;
+
+  int
+    xxxxxxxxxxxxxxxxxxxxxx,
+    xxxxxxx;
+
+  xxxxxxxx int
+    xxxxxx;
+
+  struct xxxxxx
+    *xxxxxxxx,
+    *xxxx,
+    *xxxx;
+} xxxxx;
+
+xxxxxxx struct xxxxxxxxxxxxx
+{
+  xxxxxxxxx
+    *xxxxxxxxxx;
+
+  xxxxxxxx int
+    xxxxxxx;
+
+  char
+    *xxxxxxxx,
+    *xxxx,
+    *xxxxxxxxx,
+    *xxxxxxxxx;
+
+  double
+    xxxxxxx;
+
+  xxxxx
+    *xxxx;
+
+  xxxxxxxxxxxxx
+    xxxxxx;
+} xxxxxxxxxxxx;
+
+xxxxxxx struct xxxxxxxxxxx
+{
+  const char
+    *xxx;
+
+  xxxxx
+    *(*xxxxxxx) __PROTO__((const xxxxxxxxx *));
+
+  xxxxxxxx int
+    (*xxxxxxx) __PROTO__((const xxxxxxxxx *,xxxxx *)),
+    (*xxxxxx) __PROTO__((const xxxxxxxx char *,const xxxxxxxx int)),
+    xxxxxx,
+    xxxxxxxxxxxx;
+
+  const char
+    *xxxxxxxxxxx;
+
+  xxxx
+    *xxxx;
+
+  struct xxxxxxxxxxx
+    *xxxxxxxx,
+    *xxxx;
+} xxxxxxxxxx;
+
+/*
+  xxxxx const xxxxxxxxxxxx.
+*/
+extern __MANGLE__ const char
+  *xxxxxxxx,
+  *xxxxxxxxxxxxxxx,
+  *xxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxx,
+  *xxxxxxxxxx,
+  *xxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxx,
+  *xxxxxxxxxxxxxxx;
+
+extern __MANGLE__ const xxxxxxxxxxxxx
+  xxxxxxxxxxxx[235],
+  xxxxxxxxxx[757];
+
+/*
+  xxxxx xxxxxxxxx xxxxxxx.
+*/
+extern __MANGLE__ xxxxxx xxxxxxxxxxxx
+  *xxxxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *,const xxxxxxxxxxxx *));
+
+extern __MANGLE__ xxxxxx xxxxx
+  *xxxxxxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *)),
+  *xxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxx *)),
+  *xxxxxxxxx __PROTO__((const xxxxx *,const double)),
+  *xxxxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxxxxxxx *)),
+  *xxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxxxxxxx *)),
+  *xxxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxx int,const xxxxxxxx int,
+    const xxxxxxxx int)),
+  *xxxxxxxxxxx __PROTO__((const xxxxxxxx int,const xxxxxxxx int,const xxxxx *,
+    const xxxxx *,const xxxxx *,const xxxxx *)),
+  *xxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxxxxxxx *)),
+  *xxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  *xxxxxxxxx __PROTO__((const xxxxx *,const double)),
+  *xxxxxxxxxxx __PROTO__((const xxxxx *)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxx *)),
+  *xxxxxxxxx __PROTO__((const xxxxx *)),
+  *xxxxxxxxx __PROTO__((const xxxxx *)),
+  *xxxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxxx *)),
+  *xxxxxxxxxxxx __PROTO__((xxxxx *,const double)),
+  **xxxxxxxxxxxxxxxx __PROTO__((const xxxxx *,xxxxxxxx int *)),
+  *xxxxxxxxxxxx __PROTO__((xxxxx *)),
+  *xxxxxxxxxxx __PROTO__((xxxxx *)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxxxxx *)),
+  *xxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int)),
+  *xxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int)),
+  *xxxxxxxxx __PROTO__((const xxxxxxxxx *)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxx __PROTO__((xxxxxxxxx *)),
+  *xxxxxxxxxx __PROTO__((xxxxxxxxx *)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx)),
+  *xxxxxxxxxxxxxxxx __PROTO__((const xxxxx *)),
+  *xxxxxxxxx __PROTO__((const xxxxx *,const int,const int)),
+  *xxxxxxxxxxx __PROTO__((const xxxxx *,const double,const xxxxxxxx int,
+    const xxxxxxxx int)),
+  *xxxxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxx int,const xxxxxxxx int)),
+  *xxxxxxxxxx __PROTO__((const xxxxx *,const xxxxxxxx int,const xxxxxxxx int)),
+  *xxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int,double,double)),
+  *xxxxxxxxxxxx __PROTO__((const xxxxx *,const double)),
+  *xxxxxxxxxx __PROTO__((const xxxxx *,const double,const double,const xxxxxxxx int)),
+  *xxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int)),
+  *xxxxxxxxxxxx __PROTO__((xxxxx *,xxxxx *)),
+  *xxxxxxxxxxx __PROTO__((xxxxx *,const xxxxx *)),
+  *xxxxxxxxxx __PROTO__((xxxxx *,double)),
+  *xxxxxxxxx __PROTO__((xxxxx *,const double,const double)),
+  *xxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int,const xxxxxxxx int));
+
+extern __MANGLE__ xxxxxx xxxxxxxxx
+  *xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *));
+
+extern __MANGLE__ xxxxxx xxxxxxxxx
+  xxxxxxxxxxxx __PROTO__((xxxxx *));
+
+extern __MANGLE__ xxxxxx int
+  xxxxxxxxxxxxx __PROTO__((const char *,int *,int *,xxxxxxxx int *,xxxxxxxx int *)),
+  xxxxxxxxxxxxxxxxxx __PROTO__((const char *,int *,int *,xxxxxxxx int *,xxxxxxxx int *));
+
+extern __MANGLE__ xxxxxx xxxxxxxxxx
+  *xxxxxxxxxxxxx __PROTO__((const char *)),
+  *xxxxxxxxxxxxxxxxxx __PROTO__((const char *,xxxxx *(*)(const xxxxxxxxx *),
+    xxxxxxxx int (*)(const xxxxxxxxx *,xxxxx *),
+    xxxxxxxx int (*)(const xxxxxxxx char *,const xxxxxxxx int),
+    const xxxxxxxx int,const xxxxxxxx int,const char *));
+
+extern __MANGLE__ xxxxxx xxxxxxxx int
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxxx __PROTO__((const xxxxx *)),
+  xxxxxxxxxx __PROTO__((const char *)),
+  xxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxx __PROTO__((const char *,const xxxxxxxx int)),
+  xxxxxxxxx __PROTO__((const xxxxx *)),
+  xxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxx *,int,int)),
+  xxxxxxxxxxxxxxxxxx __PROTO__((const char *,xxxxxxxxxxx *)),
+  xxxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx, xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxx __PROTO__((const xxxxxxxxx *,xxxxx *)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *,xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *xxxxxxxxxx,xxxxx *xxxxx));
+
+extern __MANGLE__ xxxxxx xxxx
+  xxxxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *,xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxx *)),
+  xxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxxxxx *,xxxxx *,const int x,
+    const int x,const xxxxxxxxxxx)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *,const char *,const char *)),
+  xxxxxxxxxxxx __PROTO__((xxxxx *,const char *)),
+  xxxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxxxxxxx,xxxxx *,const int,const int)),
+  xxxxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int)),
+  xxxxxxxxxxxxxxxxxx __PROTO__((xxxxx *,const int)),
+  xxxxxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *,xxxx *,const xxxxxxxx int)),
+  xxxxxxxxxxxxxxxxxxx __PROTO__((xxxxxxxxxxxx *)),
+  xxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxxxxx __PROTO__((xxxxxxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxxxxxxx __PROTO__((xxxxxxxxxxx *)),
+  xxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxx __PROTO__((xxxxx *,const char *)),
+  xxxxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *,xxxxxxxxxxxx *)),
+  xxxxxxxxxxxx __PROTO__((xxxxxxxxx *)),
+  xxxxxxxxxxxxxx __PROTO__((xxxxxxxxxxx *)),
+  xxxxxxxxx __PROTO__((const xxxxx *,xxxxx *,xxxxx *,xxxxx *,xxxxx *)),
+  xxxxxxxxxx __PROTO__((xxxxx *,const char *)),
+  xxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxx)),
+  xxxxxxxxxxxxxx __PROTO__((xxxx *)),
+  xxxxxxxxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxxxxx *,const xxxxxxxx int,
+    const int x,const int x,const xxxxxxxxxxx)),
+  xxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *,const char *)),
+  xxxxxxxxxxxx __PROTO__((const xxxxxxxxx *,const int,char **,xxxxx **)),
+  xxxxxxxxxxxxx __PROTO__((const xxxxxxxxx *,const int,char **,xxxxx **)),
+  xxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxx int)),
+  xxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxx __PROTO__((xxxxx *,const char *,const char *)),
+  xxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxxx *,const int)),
+  xxxxxxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxxxx)),
+  xxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxx __PROTO__((xxxxxxxxx *,const xxxxxxxx int)),
+  xxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxxx __PROTO__((xxxxx *,const double)),
+  xxxxxxxxxxxxxxxxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxx __PROTO__((xxxxx *)),
+  xxxxxxxxxxxx __PROTO__((xxxxx *,xxxxx *)),
+  xxxxxxxxxxxxxx __PROTO__((xxxxx *,const double)),
+  xxxxxxxxxxxx __PROTO__((const xxxxxxx,const xxxxxxx,const xxxxxxx,double *,double *,
+    double *)),
+  xxxxxxxxxxxxxx __PROTO__((xxxxx **,const char *,const char *)),
+  xxxxxxxxxxxxxxxxx __PROTO__((xxxxx *,const xxxxxxxxxxxxxx)),
+  xxxxxxxxxxxxxxxx __PROTO__((xxxxx *,const char *));
+
+#if defined(xxxxxxxxxxx) || defined(xxxxxxxxxx)
+}
+#endif
+
+#endif'
+	EXEC -fhn
+		INPUT - $'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+f(x);'
+		SAME OUTPUT INPUT
+
+TEST 09 'more buffer boundaries'
 	EXEC -nh
 		INPUT - $'#pragma prototyped
 /*

@@ -33,8 +33,6 @@ if CC.HOSTTYPE == "win32*" || "$(-mam)" == "static*"
 expand.o object.o : .CC.NOOPTIMIZE
 end
 
-:READONLY: version.c
-
 $(RULESDIR) :INSTALLDIR: Makeinstall.mk $(RULES) $(RULESFILES) ppcc
 
 ppcc :: ppcc.sh
@@ -102,6 +100,10 @@ local T
 for T $(RULES:B)
 	$(T:F=%(lower)S:D=$$(RULESDIR):B:S=.mo) :INSTALL: $(T:B:S=.mo)
 end
+
+/*
+ * this works around a master source race condition
+ */
 
 .MAKEINIT : .TARGETS
 

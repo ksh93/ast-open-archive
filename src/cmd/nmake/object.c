@@ -293,19 +293,25 @@ getstring(Sfio_t* sp)
  */
 
 static void
-putstring(Sfio_t* sp, const char* s, int sep)
+putstring(register Sfio_t* sp, register const char* s, int sep)
 {
-	int	n;
+	register int	c;
 
-	if (CC_NATIVE != CC_ASCII)
+	if (CC_NATIVE == CC_ASCII)
+		sfputr(sp, s, sep);
+	else
 	{
-		n = strlen(s);
-		memcpy(tmpname, s, n + 1);
+		while (c = *s++)
+		{
+			c = ccmapc(c, CC_NATIVE, CC_ASCII);
+			sfputc(sp, c);
+		}
 		if (sep >= 0)
-			tmpname[n++] = sep;
-		sfwrite(sp, ccmaps(tmpname, n, CC_NATIVE, CC_ASCII), n);
+		{
+			c = ccmapc(sep, CC_NATIVE, CC_ASCII);
+			sfputc(sp, c);
+		}
 	}
-	else sfputr(sp, s, sep);
 }
 
 /*
@@ -336,8 +342,10 @@ markgarbage(register struct rule* r, int garbage)
 	struct rule*		x;
 
 	r->mark |= M_compile;
-	if (garbage) r->dynamic |= D_garbage;
-	else r->dynamic &= ~D_garbage;
+	if (garbage)
+		r->dynamic |= D_garbage;
+	else
+		r->dynamic &= ~D_garbage;
 	for (p = r->prereqs; p; p = p->next)
 		if (!(p->rule->mark & M_compile))
 			markgarbage(p->rule, garbage);
@@ -353,22 +361,24 @@ markgarbage(register struct rule* r, int garbage)
 static void
 compstring(register struct compstate* cs, register char* s)
 {
-	register int	n;
+	register int	c;
 
 	if (s)
 	{
-		n = strlen(s) + 1;
-		cs->strings += n;
-		sfputu(cs->fp, n);
-		n--;
-		if (CC_NATIVE != CC_ASCII)
-		{
-			memcpy(tmpname, s, n);
-			s = ccmaps(tmpname, n, CC_NATIVE, CC_ASCII);
-		}
-		sfwrite(cs->fp, s, n);
+		c = strlen(s) + 1;
+		cs->strings += c;
+		sfputu(cs->fp, c);
+		if (CC_NATIVE == CC_ASCII)
+			sfwrite(cs->fp, s, c - 1);
+		else
+			while (c = *s++)
+			{
+				c = ccmapc(c, CC_NATIVE, CC_ASCII);
+				sfputc(cs->fp, c);
+			}
 	}
-	else sfputu(cs->fp, 0);
+	else
+		sfputu(cs->fp, 0);
 }
 
 /*
@@ -384,9 +394,11 @@ compinit(const char* s, char* v, void* h)
 	NoP(s);
 	r->complink = 0;
 	r->mark &= ~M_compile;
-	if (r->dynamic & D_alias) mergestate(makerule(r->name), r);
-	if (h || (r->property & P_internal)) r->dynamic |= D_compiled;
-	return(0);
+	if (r->dynamic & D_alias)
+		mergestate(makerule(r->name), r);
+	if (h || (r->property & P_internal))
+		r->dynamic |= D_compiled;
+	return 0;
 }
 
 /*
@@ -412,7 +424,7 @@ compselect(const char* s, char* v, void* h)
 			markcompile(r);
 		}
 	}
-	return(0);
+	return 0;
 }
 
 /*
@@ -431,10 +443,12 @@ compstate(const char* s, char* v, void* h)
 	r->dynamic |= D_compiled;
 	if (r->dynamic & D_garbage)
 	{
-		if (!object.garbage) r->dynamic &= ~D_garbage;
-		else if (!(r->mark & M_compile)) markgarbage(r, 1);
+		if (!object.garbage)
+			r->dynamic &= ~D_garbage;
+		else if (!(r->mark & M_compile))
+			markgarbage(r, 1);
 	}
-	return(0);
+	return 0;
 }
 
 /*
@@ -461,8 +475,9 @@ compmark(const char* s, char* v, void* h)
 				p->rule->dynamic &= ~D_compiled;
 		}
 	}
-	else if (!(r->dynamic & D_compiled) && !(r->mark & M_compile)) markcompile(r);
-	return(0);
+	else if (!(r->dynamic & D_compiled) && !(r->mark & M_compile))
+		markcompile(r);
+	return 0;
 }
 
 /*
@@ -476,8 +491,9 @@ compkeep(const char* s, char* v, void* h)
 
 	NoP(s);
 	NoP(h);
-	if (!(r->mark & M_compile) && !(r->dynamic & D_garbage)) markgarbage(r, 0);
-	return(0);
+	if (!(r->mark & M_compile) && !(r->dynamic & D_garbage))
+		markgarbage(r, 0);
+	return 0;
 }
 
 /*
@@ -498,11 +514,13 @@ comprule(const char* s, char* v, void* h)
 	 * compile each rule only once
 	 */
 
-	if (r->dynamic & D_compiled) return(0);
+	if (r->dynamic & D_compiled)
+		return 0;
 	r->dynamic |= D_compiled;
 	r->mark |= M_compile;
 #if DEBUG
-	if (r->property & P_internal) error(1, "internal rule %s should not be compiled", r->name);
+	if (r->property & P_internal)
+		error(1, "internal rule %s should not be compiled", r->name);
 #endif
 
 	/*
@@ -551,13 +569,16 @@ comprule(const char* s, char* v, void* h)
 		sfputu(cs->fp, cs->lists);
 		do cs->lists++; while (p = p->next);
 	}
-	else sfputu(cs->fp, 0);
+	else
+		sfputu(cs->fp, 0);
 	sfputu(cs->fp, r->time);
 	compstring(cs, r->name);
 	compstring(cs, r->action);
-	if (r->property & P_staterule) sfputu(cs->fp, r->event);
-	else compstring(cs, r->statedata);
-	return(0);
+	if (r->property & P_staterule)
+		sfputu(cs->fp, r->event);
+	else
+		compstring(cs, r->statedata);
+	return 0;
 }
 
 /*
@@ -576,7 +597,8 @@ complist(const char* s, char* v, void* h)
 	 * ignore aliases and rules not set up by comprule()
 	 */
 
-	if (!r->complink || !(r->mark & M_compile) || s != r->name && !(r->dynamic & D_alias) || state.stateview == 0 && !(r->property & P_state)) return(0);
+	if (!r->complink || !(r->mark & M_compile) || s != r->name && !(r->dynamic & D_alias) || state.stateview == 0 && !(r->property & P_state))
+		return 0;
 	r->mark &= ~M_compile;
 	if (p = r->prereqs)
 	{
@@ -594,7 +616,7 @@ complist(const char* s, char* v, void* h)
 		} while (p = p->next);
 		sfputu(cs->fp, 0);
 	}
-	return(0);
+	return 0;
 }
 
 /*
@@ -615,7 +637,8 @@ compvar(const char* s, char* u, void* h)
 	 * don't compile command arg variable definitions
 	 */
 
-	if ((v->property & V_compiled) || state.stateview < 0 && !(v->property & V_frozen) && ((v->property & V_import) || (v->property & (V_oldvalue|V_readonly)) == V_readonly) || state.stateview == 0 && !(v->property & V_retain)) return(0);
+	if ((v->property & V_compiled) || state.stateview < 0 && !(v->property & V_frozen) && ((v->property & V_import) || (v->property & (V_oldvalue|V_readonly)) == V_readonly) || state.stateview == 0 && !(v->property & V_retain))
+		return 0;
 	v->property |= V_compiled;
 	property = v->property;
 	value = v->value;
@@ -628,7 +651,8 @@ compvar(const char* s, char* u, void* h)
 	 * is different than the makefile value
 	 */
 
-	if (state.stateview == 0) property &= ~V_CLEAROBJECT;
+	if (state.stateview == 0)
+		property &= ~V_CLEAROBJECT;
 	else
 	{
 		property &= ~V_CLEARSTATE;
@@ -641,13 +665,16 @@ compvar(const char* s, char* u, void* h)
 					value = t;
 					property &= ~V_oldvalue;
 				}
-				else if (streq(value, t)) property &= ~V_oldvalue;
+				else if (streq(value, t))
+					property &= ~V_oldvalue;
 			}
 #if DEBUG
-			else error(PANIC, "%s->oldvalue set but not in table.oldvalue", s);
+			else
+				error(PANIC, "%s->oldvalue set but not in table.oldvalue", s);
 #endif
 		}
-		else if ((property & (V_frozen|V_readonly)) == (V_frozen|V_readonly)) property |= V_oldvalue;
+		else if ((property & (V_frozen|V_readonly)) == (V_frozen|V_readonly))
+			property |= V_oldvalue;
 	}
 
 	/*
@@ -658,7 +685,7 @@ compvar(const char* s, char* u, void* h)
 	compstring(cs, v->name);
 	compstring(cs, value);
 	cs->variables++;
-	return(0);
+	return 0;
 }
 
 /*
@@ -674,7 +701,7 @@ clearmarks(const char* s, char* v, void* h)
 	NoP(h);
 	r->complink = 0;
 	r->mark &= ~M_compile;
-	return(0);
+	return 0;
 }
 
 /*
@@ -704,7 +731,8 @@ compile(char* objfile, char* select)
 	 * create the object temporary file
 	 */
 
-	if (!tmpfile) tmpfile = pathtmp(NiL, null, idname, NiL);
+	if (!tmpfile)
+		tmpfile = pathtemp(NiL, 0, null, idname, NiL);
 	state.tmpfile = tmpfile;
 	if (!(cs.fp = sfopen(NiL, state.tmpfile, "brw")))
 	{
@@ -924,7 +952,8 @@ compref(int type, const char* name, unsigned long date)
 			object.pp = 0;
 		}
 	}
-	else if (!type && !state.makefile) object.pp = sfstropen();
+	else if (!type && !state.makefile)
+		object.pp = sfstropen();
 }
 
 /*
@@ -953,7 +982,7 @@ promote(const char* s, char* v, void* h)
 			}
 		}
 	}
-	return(0);
+	return 0;
 }
 
 /*
@@ -973,12 +1002,12 @@ atomize(const char* s, char* v, void* h)
 #if DEBUG
 		error(PANIC, "old rule %s still in table.rule%s", r->name, r == getrule(r->name) ? null : " -- duplicate hash");
 #endif
-		return(0);
+		return 0;
 	}
 	for (p = r->prereqs; p; p = p->next)
 		if (isoldrule(p->rule))
 			p->rule = getoldrule(p->rule);
-	return(0);
+	return 0;
 }
 
 /*
@@ -996,7 +1025,8 @@ remtmp(int fatal)
 			error(ERROR_SYSTEM|1, "%s: temporary file not removed", state.tmpfile);
 		state.tmpfile = 0;
 	}
-	if (fatal) lockstate(NiL);
+	if (fatal)
+		lockstate(NiL);
 }
 
 /*
@@ -1009,12 +1039,13 @@ loadstring(struct loadstate* ls, Sfio_t* sp)
 	register int	n;
 	register char*	s;
 
-	if (!(n = sfgetu(sp))) return(0);
+	if (!(n = sfgetu(sp)))
+		return 0;
 	s = ls->sp;
 	ls->sp += n--;
 	sfread(sp, s, n);
 	ccmaps(s, n, CC_ASCII, CC_NATIVE);
-	return(s);
+	return s;
 }
 
 /*
@@ -1039,7 +1070,8 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 	{
 		if (n >= MAGICSIZE && !memcmp(s, MAGIC, MAGICSIZE) || n >= sizeof(old) && ((old = OLD_MAGIC, swapop(s, &old, sizeof(old)) >= 0) || (old = OLD_OLD_MAGIC, swapop(s, &old, sizeof(old)) >= 0)))
 		{
-			if (!source) return(state.base || !state.forceread || state.global || state.list);
+			if (!source)
+				return state.base || !state.forceread || state.global || state.list;
 
 			/*
 			 * check previous source prerequisites
@@ -1059,11 +1091,13 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 	while (n = sfgetu(sp))
 	{
 		m = sfgetu(sp);
-		if (!(s = getstring(sp))) break;
+		if (!(s = getstring(sp)))
+			break;
 		if (n & (COMP_BASE|COMP_FILE|COMP_GLOBAL|COMP_INCLUDE))
 		{
 			x = bindfile(NiL, s, BIND_FORCE|BIND_MAKEFILE|BIND_RULE);
-			if (!(x->dynamic & D_regular)) x->dynamic &= ~D_bound;
+			if (!(x->dynamic & D_regular))
+				x->dynamic &= ~D_bound;
 
 			/*
 			 * put makefile prereqs in state as query courtesy
@@ -1128,14 +1162,16 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 	}
  nope:
 	state.init--;
-	if (n) ok = 0;
+	if (n)
+		ok = 0;
 
 	/*
 	 * check for explicit file prereqs not specified last time
 	 */
 
 	for (p = internal.globalfiles->prereqs; p; p = p->next)
-		if (p->rule->mark & M_compile) p->rule->mark &= ~M_compile;
+		if (p->rule->mark & M_compile)
+			p->rule->mark &= ~M_compile;
 		else if (ok)
 		{
 			ok = 0;
@@ -1143,14 +1179,16 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 				error(state.exec || state.mam.out ? -1 : 1, "%s: global file %s not specified last time", r->name, p->rule->name);
 		}
 	for (p = internal.makefiles->prereqs; p; p = p->next)
-		if (p->rule->mark & M_compile) p->rule->mark &= ~M_compile;
+		if (p->rule->mark & M_compile)
+			p->rule->mark &= ~M_compile;
 		else if (ok)
 		{
 			ok = 0;
 			if (state.writeobject)
 				error(state.exec || state.mam.out ? -1 : 1, "%s: file %s not specified last time", r->name, p->rule->name);
 		}
-	if (ok && !sfseek(sp, (Sfoff_t)0, SEEK_SET)) return(1);
+	if (ok && !sfseek(sp, (Sfoff_t)0, SEEK_SET))
+		return 1;
 
 							/*...INDENT*/
 							break;
@@ -1160,7 +1198,7 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 			}
 		}
 	}
-	return(0);
+	return 0;
 }
 
 /*
@@ -1233,16 +1271,16 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	if (fstat(sffileno(sp), &st))
 	{
 		error(1, "%s: cannot stat object file", objfile);
-		return(0);
+		return 0;
 	}
 	if (!st.st_size)
 	{
 		if (state.stateview >= 0)
 		{
 			error(1, "%s: empty state file", objfile);
-			return(0);
+			return 0;
 		}
-		return(1);
+		return 1;
 	}
 
 	/*
@@ -1256,7 +1294,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	 * check the header
 	 */
 
-	if (!(s = sfreserve(sp, MAGICSIZE, 0))) goto badmagic;
+	if (!(s = sfreserve(sp, MAGICSIZE, 0)))
+		goto badmagic;
 	if (memcmp(s, MAGIC, MAGICSIZE) || !(s = getstring(sp)) || streq(s, OLD_VERSION))
 	{
 		old = 1;
@@ -1288,19 +1327,22 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		if (old_trailer.magic != old_header.magic || old_trailer.size != st.st_size)
 			goto badmagic;
 		if (state.exec && streq(objfile, state.objectfile))
-			return(0);
+			return 0;
 		lists = old_trailer.lists;
 		rules = old_trailer.rules;
 		variables = old_trailer.variables;
 		off = sizeof(old_header) + rules * sizeof(old_rule) + lists * sizeof(old_list) + variables * sizeof(old_var);
 		strings = st.st_size - sizeof(old_trailer) - off;
-		if (sfeof(sp) || sfseek(sp, off, SEEK_SET) != off) goto badio;
+		if (sfeof(sp) || sfseek(sp, off, SEEK_SET) != off)
+			goto badio;
 	}
 	else
 	{
 		old = 0;
-		if (s = strrchr(s, ' ')) s++;
-		else s = "old";
+		if (s = strrchr(s, ' '))
+			s++;
+		else
+			s = "old";
 		ident = strcpy((char*)scanmap, s);
 		off = sfgetu(sp);
 		sequence = sfgetu(sp);
@@ -1322,8 +1364,10 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 
 		for (;;)
 		{
-			if (sfeof(sp) || sfseek(sp, off, SEEK_SET) != off) goto badio;
-			if (!sequence || !(off = sfgetu(sp))) break;
+			if (sfeof(sp) || sfseek(sp, off, SEEK_SET) != off)
+				goto badio;
+			if (!sequence || !(off = sfgetu(sp)))
+				break;
 			off += sfseek(sp, (Sfoff_t)0, SEEK_CUR);
 		}
 	}
@@ -1348,8 +1392,10 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	 * read the string table
 	 */
 
-	if (!old) ls.sp = s;
-	else if (sfread(sp, s, strings) != strings) goto badio;
+	if (!old)
+		ls.sp = s;
+	else if (sfread(sp, s, strings) != strings)
+		goto badio;
 
 	/*
 	 * load the variables and check for any frozen
@@ -1359,7 +1405,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	if (old)
 	{
 		off = sizeof(old_header) + rules * sizeof(old_rule) + lists * sizeof(old_list);
-		if (sfseek(sp, off, SEEK_SET) != off) goto badio;
+		if (sfseek(sp, off, SEEK_SET) != off)
+			goto badio;
 	}
 	oattribute = internal.attribute->attribute;
 	oscan = internal.scan->scan;
@@ -1368,11 +1415,15 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	{
 		if (old)
 		{
-			if (sfread(sp, (char*)&old_var, sizeof(old_var)) != sizeof(old_var)) goto badio;
-			if (old_swap) swapmem(old_swap, &old_var, &old_var, sizeof(old_var));
+			if (sfread(sp, (char*)&old_var, sizeof(old_var)) != sizeof(old_var))
+				goto badio;
+			if (old_swap)
+				swapmem(old_swap, &old_var, &old_var, sizeof(old_var));
 			v->property = old_var.property;
-			if (old_var.name) v->name = s + (unsigned long)old_var.name - 1;
-			if (old_var.value) v->value = s + (unsigned long)old_var.value - 1;
+			if (old_var.name)
+				v->name = s + (unsigned long)old_var.name - 1;
+			if (old_var.value)
+				v->value = s + (unsigned long)old_var.value - 1;
 			switch (sequence)
 			{
 			case 2: /* 01/24/89 */
@@ -1391,7 +1442,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			 * variable number field additions here
 			 */
 
-			for (n = varnum; n > 0; n--) sfgetu(sp);
+			for (n = varnum; n > 0; n--)
+				sfgetu(sp);
 			v->name = loadstring(&ls, sp);
 			v->value = loadstring(&ls, sp);
 
@@ -1399,7 +1451,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			 * variable string field additions here
 			 */
 
-			for (n = varstr; n > 0; n--) loadstring(&ls, sp);
+			for (n = varstr; n > 0; n--)
+				loadstring(&ls, sp);
 		}
 		if ((v->property & V_frozen) && (!(x = getvar(v->name)) && ((v->property & V_oldvalue) || (v->property & V_import) && *v->value) || x && ((x->property & (V_append|V_readonly)) == (V_append|V_readonly) || ((v->property|x->property) & (V_import|V_readonly)) && !streq(v->value, x->value)) || (v->property & V_functional)))
 		{
@@ -1407,9 +1460,11 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			recompile = 1;
 			v->property &= ~V_readonly;
 		}
-		else v->property &= ~(V_oldvalue|V_readonly);
+		else
+			v->property &= ~(V_oldvalue|V_readonly);
 	}
-	if (sfeof(sp)) goto badio;
+	if (sfeof(sp))
+		goto badio;
 	if (recompile)
 	{
 		recompile = 0;
@@ -1429,7 +1484,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		if (!(x = getvar(v->name)) || !(x->property & (V_readonly|V_restored)) && (!(x->property & V_import) || !state.global))
 		{
 			putvar(v->name, v);
-			if (x) freevar(x);
+			if (x)
+				freevar(x);
 		}
 		else
 		{
@@ -1466,7 +1522,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	if (old)
 	{
 		off = sizeof(old_header);
-		if (sfseek(sp, off, SEEK_SET) != off) goto badio;
+		if (sfseek(sp, off, SEEK_SET) != off)
+			goto badio;
 	}
 	garbage = 0;
 	hashclear(table.rule, HASH_ALLOCATE);
@@ -1476,8 +1533,10 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 
 		if (old)
 		{
-			if (sfread(sp, (char*)&old_rule, sizeof(old_rule)) != sizeof(old_rule)) goto badio;
-			if (old_swap) swapmem(old_swap, &old_rule, &old_rule, (char*)&old_rule.noswap - (char*)&old_rule);
+			if (sfread(sp, (char*)&old_rule, sizeof(old_rule)) != sizeof(old_rule))
+				goto badio;
+			if (old_swap)
+				swapmem(old_swap, &old_rule, &old_rule, (char*)&old_rule.noswap - (char*)&old_rule);
 			r->property = old_rule.property;
 			r->dynamic = old_rule.dynamic;
 			r->attribute = old_rule.attribute;
@@ -1494,11 +1553,16 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 					((r->dynamic & 0x00040000L) << 4);
 				break;
 			}
-			if (old_rule.name) r->name = s + (unsigned long)old_rule.name - 1;
-			if (r->property & P_staterule) r->event = old_rule.old_event;
-			else if (old_rule.old_data) r->statedata = s + (unsigned long)old_rule.old_data - 1;
-			if (old_rule.prereqs) r->prereqs = d + (unsigned long)old_rule.prereqs / sizeof(old_list) - 1;
-			if (old_rule.action) r->action = s + (unsigned long)old_rule.action - 1;
+			if (old_rule.name)
+				r->name = s + (unsigned long)old_rule.name - 1;
+			if (r->property & P_staterule)
+				r->event = old_rule.old_event;
+			else if (old_rule.old_data)
+				r->statedata = s + (unsigned long)old_rule.old_data - 1;
+			if (old_rule.prereqs)
+				r->prereqs = d + (unsigned long)old_rule.prereqs / sizeof(old_list) - 1;
+			if (old_rule.action)
+				r->action = s + (unsigned long)old_rule.action - 1;
 			r->scan = old_rule.scan;
 			r->semaphore = old_rule.semaphore;
 			r->view = old_rule.view;
@@ -1533,24 +1597,29 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				r->view = (n>>8) & ((1<<8)-1);
 				r->scan = (n) & ((1<<8)-1);
 			}
-			if (n = sfgetu(sp)) r->prereqs = d + n - 1;
+			if (n = sfgetu(sp))
+				r->prereqs = d + n - 1;
 			r->time = sfgetu(sp);
 
 			/*
 			 * rule number field additions here
 			 */
 
-			for (n = rulenum; n > 0; n--) sfgetu(sp);
+			for (n = rulenum; n > 0; n--)
+				sfgetu(sp);
 			r->name = loadstring(&ls, sp);
 			r->action = loadstring(&ls, sp);
-			if (r->property & P_staterule) r->event = sfgetu(sp);
-			else r->statedata = loadstring(&ls, sp);
+			if (r->property & P_staterule)
+				r->event = sfgetu(sp);
+			else
+				r->statedata = loadstring(&ls, sp);
 
 			/*
 			 * rule string field additions here
 			 */
 
-			for (n = rulestr; n > 0; n--) loadstring(&ls, sp);
+			for (n = rulestr; n > 0; n--)
+				loadstring(&ls, sp);
 		}
 		r->preview = state.maxview + 1;
 		o = getrule(r->name);
@@ -1569,7 +1638,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 					if (r->scan != o->scan)
 					{
 						error((state.exec || state.mam.out) && !state.explain ? -1 : 1, "%s: %s %s definition changed", objfile, r->name, internal.scan->name);
-						if (state.stateview < 0) return(-1);
+						if (state.stateview < 0)
+							return -1;
 						attr = o->scan;
 					}
 				}
@@ -1579,11 +1649,13 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 						if (r->scan == a->rule->scan)
 						{
 							error((state.exec || state.mam.out) && !state.explain ? -1 : 1, "%s: %s %s definition clashes with %s", objfile, r->name, internal.scan->name, a->rule->name);
-							if (state.stateview < 0) return(-1);
+							if (state.stateview < 0)
+								return -1;
 							attr = 0;
 							break;
 						}
-					if (state.stateview >= 0) attr = 0;
+					if (state.stateview >= 0)
+						attr = 0;
 				}
 				if (attr != ~0)
 				{
@@ -1595,7 +1667,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 					}
 					if (!(r->scan = scanmap[r->scan] = attr))
 						r->property &= ~P_attribute;
-					if (o) continue;
+					if (o)
+						continue;
 				}
 			}
 			else if (r->attribute)
@@ -1606,17 +1679,20 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 					if (r->attribute != o->attribute)
 					{
 						error((state.exec || state.mam.out) && !state.explain ? -1 : 1, "%s: %s %s definition changed", objfile, r->name, internal.attribute->name);
-						if (state.stateview < 0) return(-1);
+						if (state.stateview < 0)
+							return -1;
 						attr = o->attribute;
 					}
 				}
-				else for (a = internal.attribute->prereqs; a; a = a->next)
-					if (r->attribute == a->rule->attribute)
-					{
-						error((state.exec || state.mam.out) && !state.explain ? -1 : 1, "%s: %s %s definition clashes with %s", objfile, r->name, internal.attribute->name, a->rule->name);
-						if (state.stateview < 0) return(-1);
-						attr = 0;
-					}
+				else
+					for (a = internal.attribute->prereqs; a; a = a->next)
+						if (r->attribute == a->rule->attribute)
+						{
+							error((state.exec || state.mam.out) && !state.explain ? -1 : 1, "%s: %s %s definition clashes with %s", objfile, r->name, internal.attribute->name, a->rule->name);
+							if (state.stateview < 0)
+								return -1;
+							attr = 0;
+						}
 				if (attr != ~0)
 				{
 					if (!attrclash)
@@ -1647,7 +1723,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 						attr |= attrmap[n];
 				r->attribute = attr;
 			}
-			if (scanclash) r->scan = scanmap[r->scan];
+			if (scanclash)
+				r->scan = scanmap[r->scan];
 		}
 		if (r->dynamic & D_compiled)
 		{
@@ -1735,7 +1812,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		else
 		{
 			r->name = putrule(0, r);
-			if (!(r->property & P_state)) r->time = 0;
+			if (!(r->property & P_state))
+				r->time = 0;
 			if (state.stateview >= 0)
 			{
 				if (state.stateview >= 0 && (r->property & P_target))
@@ -1763,19 +1841,23 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 					if (r->source)
 					{
 						state.source[r->source].map = o->source;
-						if (isoldrule(o)) state.source[o->source].path = r;
+						if (isoldrule(o))
+							state.source[o->source].path = r;
 					}
 					else if (r->view)
 					{
 						state.view[r->view].map = o->view;
-						if (isoldrule(o)) state.view[o->view].path = r;
+						if (isoldrule(o))
+							state.view[o->view].path = r;
 					}
 				}
 				else if (r->source)
 				{
-					if (++state.maxsource >= elementsof(state.source)) error(3, "%s: too many %s directories -- %d max", r->name, internal.source->name, elementsof(state.source));
+					if (++state.maxsource >= elementsof(state.source))
+						error(3, "%s: too many %s directories -- %d max", r->name, internal.source->name, elementsof(state.source));
 					state.source[r->source].map = state.maxsource;
-					if (isoldrule(o)) state.source[state.maxsource].path = r;
+					if (isoldrule(o))
+						state.source[state.maxsource].path = r;
 					else
 					{
 						o->dynamic |= D_bindindex;
@@ -1786,7 +1868,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			}
 			else if (r->source)
 			{
-				if (++state.maxsource >= elementsof(state.source)) error(3, "%s: too many %s directories -- %d max", r->name, internal.source->name, elementsof(state.source));
+				if (++state.maxsource >= elementsof(state.source))
+					error(3, "%s: too many %s directories -- %d max", r->name, internal.source->name, elementsof(state.source));
 				state.source[r->source].map = state.maxsource;
 				state.source[state.maxsource].path = r;
 			}
@@ -1805,7 +1888,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	if (old)
 	{
 		off = sizeof(old_header) + rules * sizeof(old_rule);
-		if (sfseek(sp, off, SEEK_SET) != off) goto badio;
+		if (sfseek(sp, off, SEEK_SET) != off)
+			goto badio;
 	}
 	if (lists)
 	{
@@ -1813,10 +1897,14 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		{
 			if (old)
 			{
-				if (sfread(sp, (char*)&old_list, sizeof(old_list)) != sizeof(old_list)) goto badio;
-				if (old_swap) swapmem(old_swap, &old_list, &old_list, sizeof(old_list));
-				if (old_list.rule) d->rule = r + (unsigned long)old_list.rule / sizeof(old_rule) - 1;
-				if (old_list.next) d->next = d + 1;
+				if (sfread(sp, (char*)&old_list, sizeof(old_list)) != sizeof(old_list))
+					goto badio;
+				if (old_swap)
+					swapmem(old_swap, &old_list, &old_list, sizeof(old_list));
+				if (old_list.rule)
+					d->rule = r + (unsigned long)old_list.rule / sizeof(old_rule) - 1;
+				if (old_list.next)
+					d->next = d + 1;
 				d++;
 			}
 			else if (n = sfgetu(sp))
@@ -1825,7 +1913,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				d->next = d + 1;
 				d++;
 			}
-			else (d - 1)->next = 0;
+			else
+				(d - 1)->next = 0;
 		}
 		if (!old)
 		{
@@ -1833,7 +1922,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			(d - 1)->next = 0;
 		}
 	}
-	if (sfeof(sp)) goto badio;
+	if (sfeof(sp))
+		goto badio;
 
 	/*
 	 * collect state file garbage collection stats
@@ -1855,7 +1945,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	 * make sure top view state has top view prereqs
 	 */
 
-	if (promoted) hashwalk(table.rule, 0, promote, NiL);
+	if (promoted)
+		hashwalk(table.rule, 0, promote, NiL);
 
 	/*
 	 * associate one rule with each name
@@ -1872,7 +1963,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				fp->target = getoldrule(fp->target);
 				fp->target->active = fp;
 			}
-			if (fp == fp->parent) break;
+			if (fp == fp->parent)
+				break;
 			fp = fp->parent;
 		}
 		do
@@ -1886,8 +1978,10 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	 * check special indices
 	 */
 
-	if (internal.attribute->attribute == 1) internal.attribute->attribute = oattribute;
-	if (internal.scan->scan == SCAN_USER) internal.scan->scan = oscan;
+	if (internal.attribute->attribute == 1)
+		internal.attribute->attribute = oattribute;
+	if (internal.scan->scan == SCAN_USER)
+		internal.scan->scan = oscan;
 
 	/*
 	 * reset compiled options
@@ -1900,7 +1994,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			if (old_trailer.options)
 				set(s + (unsigned long)old_trailer.options - 1);
 		}
-		else if ((s = getstring(sp)) && *s) set(s);
+		else if ((s = getstring(sp)) && *s)
+			set(s);
 		if (state.stateview < 0)
 		{
 			/*
@@ -1910,14 +2005,16 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			 *       to override readonly vars here
 			 */
 
-			if (state.global) state.global++;
+			if (state.global)
+				state.global++;
 			for (xr = r + rules; r < xr; r++)
 				if ((r->property & (P_immediate|P_target)) == (P_immediate|P_target))
 					immediate(r);
-			if (state.global) state.global--;
+			if (state.global)
+				state.global--;
 		}
 	}
-	return(1);
+	return 1;
  badversion:
 	if (strncmp(old_header.version, old_stamp.version, sizeof(old_header.version)))
 	{
@@ -1929,14 +2026,16 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			sfsprintf(old_header.version, sizeof(old_header.version), "%d", *((long*)old_header.version));
 		error(1, "%s: old format (%s) incompatible with make loader (%s)", objfile, old_header.version, old_stamp.version);
 	}
-	else error(1, "%s: old format (%s) generated on an incompatible architecture", objfile, old_header.version);
-	return(0);
+	else
+		error(1, "%s: old format (%s) generated on an incompatible architecture", objfile, old_header.version);
+	return 0;
  badio:
 	error(ERROR_SYSTEM|2, "%s: object file io error", objfile);
 	goto bad;
  badmagic:
 	error(1, "%s: not a %s object file", objfile, version);
  bad:
-	if (p) free(p);
-	return(recompile);
+	if (p)
+		free(p);
+	return recompile;
 }

@@ -1,7 +1,24 @@
+01-06-06 ppsearch.c: list PP_FILEDEPS headers once
+01-06-01 pp.h,ppop.c,ppsearch.c: allow multiple PP_FILEDEPS (-M)
+01-05-24 pp.probe: fix pp:hostedtransition probe: only suncc can __STDC__==1?
+01-04-25 pp.probe: split macro probe files for compilers that have #line limits
+01-04-19 pp.h,pplex.c,ppproto.c: fix { \a \E \v } EBCDIC translations
+01-04-16 pp.tab: add pp:splicespace for mvs jcl decks -- the 60's live on
+01-04-13 ppbuiltin: add __FUNCTION__ cache for functions that span the buffer
+01-03-08 pp.tab,ppbuiltin,ppcontrol,probe: add pp:hostedtransition
+01-02-22 pp.tab,ppfsm,pplex,pp.probe,probe.win32: add pp:zeof for ^Z => EOF
+01-02-14 ppcall.c: fix macro(tuple*) bug that truncated macro arg expand buffer
+	 pplex.c: fix # inside pp:pragmaexpand
+	 gentab.sh: change ksh test for openbsd /bin/sh
+	 ppproto.c: fix buffer boundary bug that lost call nesting
+	 ppproto.c: add realloc prototype and memcpy=>memcopy strcpy=>strcopy
+01-02-09 ppsearch.c: fix another pp.include null dereference
+01-02-07 ppcall.c: fix stack inequality checks 
+	 ppcall.c: handle trailing \ in macro args
 01-02-06 fix readonly buffer write (cpp test 07:2873)
 01-02-04 fix -M* to properly handle .cxx .cpp .C input
 	 fix IN_BUFFER pop bug that did not reset the token pointer
-01-01-01 pp:headerexpand: space ok if no IN_MACRO
+01-01-01 pp:headerexpand: space ok if not IN_MACRO
 	 ppcall: hide if IN_FILE|IN_MACRO|IN_EXPAND
 	 pplex: don't complain about ^L or ^Z as last char in file
 	 ppsearch: fix #include <.../foo.h> loop

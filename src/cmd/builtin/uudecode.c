@@ -28,15 +28,16 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: uudecode (AT&T Labs Research) 1999-04-28 $\n]"
+"[-?\n@(#)$Id: uudecode (AT&T Labs Research) 2001-04-01 $\n]"
 USAGE_LICENSE
 "[+NAME?uudecode - decode a uuencoded binary file]"
-"[+DESCRIPTION?\buudecode\b writes decodes the named input \afile\a"
+"[+DESCRIPTION?\buudecode\b decodes the named input \afile\a"
 "	or the standard input if no file is specified, to the file"
-"	name encoded in the \afile\a by \buuencode\b. If \adecode-file\a is"
+"	name encoded in \afile\a by \buuencode\b. If \adecode-file\a is"
 "	specified then the output is written there. \b-\b is equivalent"
 "	to the standard output.]"
 
+"[c:local?Convert pathnames to file names in the local directory.]"
 "[h!:header?The input file contains header and trailer sequences."
 "	The header for some encoding formats may contain file name and"
 "	access infomation.]"
@@ -102,6 +103,9 @@ main(int argc, register char** argv)
 			buf[1] = 0;
 			encoding = buf;
 			continue;
+		case 'c':
+			disc.flags |= UU_LOCAL;
+			continue;
 		case 'h':
 			disc.flags &= ~UU_HEADER;
 			continue;
@@ -132,11 +136,8 @@ main(int argc, register char** argv)
 		break;
 	}
 	argv += opt_info.index;
-	if (ipath = *argv)
-	{
-		if (opath = *++argv)
-			argv++;
-	}
+	if ((ipath = *argv) && *++argv)
+		opath = *argv++;
 	if (error_info.errors || *argv)
 		error(ERROR_usage(2), "%s", optusage(NiL));
 	if (!(meth = uumeth(encoding)))

@@ -26,9 +26,9 @@
  * Glenn Fowler
  * AT&T Research
  *
- * at.svc -- the other side of at -- must run as root
+ * at.svc -- the other side of at
  *
- * the at control dir hierarchy, all files owned by root
+ * the at control dir hierarchy, all files owned by one user
  *
  *	$INSTALLROOT/lib/at
  *		jobs			AT_DIR_MODE
@@ -39,7 +39,7 @@
  * <time> is the earliest absolute time the job can be run
  */
 
-static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2001-01-01 $\0\n";
+static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2001-03-28 $\0\n";
 
 #include "at.h"
 
@@ -187,10 +187,6 @@ static const char*	queuedefs[] =
 };
 
 static int	schedule(State_t*);
-
-#if __OBSOLETE__ < 20020101
-#include "../../lib/libast/string/fmtident.c"
-#endif
 
 /*
  * return user info given name or uid
@@ -1075,7 +1071,8 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 						drop(state, job);
 						m++;
 					}
-					else error(ERROR_OUTPUT|2, con->fd, "%s: only %s can remove this job", job->name);
+					else
+						error(ERROR_OUTPUT|2, con->fd, "%s: only %s can remove this job", job->name, fmtuid(job->id.uid));
 					break;
 				}
 		}
@@ -1172,6 +1169,13 @@ commit(void)
 	char		buf[PATH_MAX];
 	Tm_t*		tm;
 
+	static int	commiting = 0;
+
+	if (commiting++)
+	{
+		commiting--;
+		return;
+	}
 	now = NOW;
 	if (!rollover)
 	{
@@ -1203,6 +1207,7 @@ commit(void)
 		error(ERROR_SYSTEM|AT_STRICT, "%s: cannot append to log file", AT_LOG_FILE);
 	if (rolled)
 		error(0, "log file rollover");
+	commiting--;
 }
 
 /*
@@ -1469,11 +1474,31 @@ init(const char* path)
 int
 main(int argc, char** argv)
 {
+	pid_t	pid;
+	int	status;
+
 	NoP(argc);
 	NoP(argv);
 	error_info.id = "at.svc";
 	error_info.write = stampwrite;
-	if (!init(argv[1]))
-		csspoll(CS_NEVER, 0);
-	return 1;
+
+	/*
+	 * monitor the daemon and restart if it dies
+	 */
+
+	csdaemon(&cs, (1<<0)|(1<<1)|(1<<2));
+	for (;;)
+	{
+		if ((pid = fork()) <= 0)
+		{
+			if (!init(argv[1]))
+				csspoll(CS_NEVER, 0);
+			return 1;
+		}
+		while (waitpid(pid, &status, 0) != pid);
+		if (!status)
+			break;
+		sleep(60);
+	}
+	return 0;
 }

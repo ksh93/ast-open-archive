@@ -31,7 +31,6 @@
 
 #include "pax.h"
 
-#include "FEATURE/mtio"
 #if _sys_mtio
 #include <ast_tty.h>
 #include <sys/mtio.h>
@@ -59,6 +58,54 @@
 #undef	MTIOCTOP
 #endif
 #endif
+
+#define CONVERT(a,b,c,f,t) \
+	do \
+	{ \
+		if (c) \
+			switch ((a)->convert[SECTION(a)].on) \
+			{ \
+			case 1: \
+				if (SECTION(a) != SECTION_DATA || TEXT(b,c,f)) \
+					(a)->convert[SECTION(a)].on = 2; \
+				else \
+				{ \
+					(a)->convert[SECTION(a)].on = 0; \
+					break; \
+				} \
+			case 2: \
+				ccmaps(b, c, f, t); \
+				break; \
+			} \
+	} while (0)
+
+#define TEXT(b,c,f)	text((unsigned char*)b,c,f)
+
+#define EXTERNAL(a,b,c)	CONVERT(a,b,c,(a)->convert[SECTION(a)].internal,(a)->convert[SECTION(a)].external)
+#define INTERNAL(a,b,c)	CONVERT(a,b,c,(a)->convert[SECTION(a)].external,(a)->convert[SECTION(a)].internal)
+
+/*
+ * return 1 if b is text data in f charset
+ */
+
+static int
+text(register unsigned char* b, ssize_t n, int f)
+{
+	register unsigned char*	e;
+	register int		c;
+
+	if (n > 256)
+		n = 256;
+	e = b + n;
+	while (b < e)
+	{
+		c = *b++;
+		c = CCMAPC(c, f, CC_ASCII);
+		if (c >= 0177 || c < 010 || c > 012 && c < 040)
+			return 0;
+	}
+	return 1;
+}
 
 #if 0 && DEBUG
 
@@ -335,8 +382,7 @@ bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
 			ap->memsum = memsum(b, c, ap->memsum);
 			ap->old.memsum = omemsum(b, c, ap->old.memsum);
 		}
-		if (state.convert[SECTION(ap)].on)
-			ccmaps(b, c, state.convert[SECTION(ap)].external, state.convert[SECTION(ap)].internal);
+		INTERNAL(ap, b, c);
 #if DEBUG
 		if (ob) message((-7, "bread(%s,%d@%I*d): %-.*s%s", ap->name, c, sizeof(ap->io->count), ap->io->count, c > 32 ? 32 : c, ob, c > 32 ? "..." : ""));
 #endif
@@ -360,8 +406,7 @@ bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
 					if (ob)
 					{
 						memcpy(b, ap->io->next, c);
-						if (state.convert[SECTION(ap)].on)
-							ccmaps(b, c, state.convert[SECTION(ap)].external, state.convert[SECTION(ap)].internal);
+						INTERNAL(ap, b, c);
 					}
 					b += c;
 					n -= c;
@@ -395,8 +440,7 @@ bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
 				if (ob)
 				{
 					memcpy(b, ap->io->next, n);
-					if (state.convert[SECTION(ap)].on)
-						ccmaps(b, n, state.convert[SECTION(ap)].external, state.convert[SECTION(ap)].internal);
+					INTERNAL(ap, b, n);
 				}
 				ap->io->next += n;
 				ap->io->count += n;
@@ -431,8 +475,7 @@ bunread(register Archive_t* ap, void* ab, register int n)
 		if (ap->io->next < ap->io->buffer)
 			error(PANIC, "bunread(%s,%d): too much pushback", ap->name, n);
 		memcpy(ap->io->next, b, n);
-		if (state.convert[SECTION(ap)].on)
-			ccmaps(ap->io->next, n, state.convert[SECTION(ap)].internal, state.convert[SECTION(ap)].external);
+		EXTERNAL(ap, ap->io->next, n);
 	}
 	message((-7, "bunread(%s,%d@%I*d): %-.*s%s", ap->name, n, sizeof(ap->io->count), ap->io->count, n > 32 ? 32 : n, ap->io->next, n > 32 ? "..." : ""));
 }
@@ -499,8 +542,7 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 		ap->memsum = memsum(s, n, ap->memsum);
 		ap->old.memsum = omemsum(s, n, ap->old.memsum);
 	}
-	if (state.convert[SECTION(ap)].on)
-		ccmaps(s, n, state.convert[SECTION(ap)].external, state.convert[SECTION(ap)].internal);
+	INTERNAL(ap, s, n);
 	message((-7, "bget(%s,%I*d@%I*d): %-.*s%s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, n > 32 ? 32 : (int)n, s, n > 32 ? "..." : ""));
 	return s;
 }
@@ -672,12 +714,8 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 	register int	c;
 	int		an;
 
-	if (state.convert[SECTION(ap)].on)
-	{
-		ccmaps(b, n, state.convert[SECTION(ap)].internal, state.convert[SECTION(ap)].external);
-		an = n;
-	}
-	else an = 0;
+	EXTERNAL(ap, b, n);
+	an = ap->convert[SECTION(ap)].on ? n : 0;
 	if (ap->sum > 0)
 		ap->memsum = memsum(b, n, ap->memsum);
 	if (state.checksum.sum && SECTION(ap) == SECTION_DATA)
@@ -754,8 +792,7 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 			}
 		}
 	}
-	if (an)
-		ccmaps(ab, an, state.convert[SECTION(ap)].external, state.convert[SECTION(ap)].internal);
+	INTERNAL(ap, ab, an);
 }
 
 /*
@@ -767,8 +804,7 @@ bput(register Archive_t* ap, register int n)
 {
 	ap->io->count += n;
 	message((-7, "bput(%s,%d@%ld): %-.*s%s", ap->name, n, ap->io->count, n > 32 ? 32 : n, ap->io->next, n > 32 ? "..." : ""));
-	if (state.convert[SECTION(ap)].on)
-		ccmaps(ap->io->next, n, state.convert[SECTION(ap)].internal, state.convert[SECTION(ap)].external);
+	EXTERNAL(ap, ap->io->next, n);
 	if (ap->sum > 0)
 		ap->memsum = memsum(ap->io->next, n, ap->memsum);
 	if (state.checksum.sum && SECTION(ap) == SECTION_DATA)

@@ -1,3 +1,10 @@
+01-06-06 who.c: fix entry skip logic that listed too many entries
+01-05-31 Makefile: add PACKAGE_OPTIMIZE=space checks
+01-05-29 Makefile: if -lcmd is dll then BUILTINS linked to one a.out
+01-05-21 tr: regcollate() interface update
+01-04-17 date.tst: move from std
+01-04-01 uudecode: fix -o decode-file and add regression test
+01-03-39 uudecode: add --local for UU_LOCAL
 00-12-04 look: add
 00-12-01 what: add RCS ident(1) $Id:
 00-04-01 uuencode: umask 022 for consistent header comparisons

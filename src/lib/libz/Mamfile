@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.1 2001-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -33,6 +33,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ../../../lib/package/ast.lic
+done ../../../lib/package/ast.lic
 make install
 make z
 make libz.a archive
@@ -68,15 +70,15 @@ make adler32.o
 make adler32.c
 make zlib.h implicit
 make zconf.h implicit
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ../../../include/ast/re_comp.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
+done ../../../include/ast/re_comp.h dontcare
+make ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/getopt.h dontcare
 make windows.h implicit
 done windows.h dontcare virtual
 done zconf.h dontcare
@@ -102,62 +104,67 @@ done crc32.o generated
 make gzio.o
 make gzio.c
 make zutil.h implicit
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
+make ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/stdio.h dontcare
 make unix.h implicit
 done unix.h dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+make ../../../include/ast/limits.h implicit
+done ../../../include/ast/limits.h dontcare
+prev ../../../include/ast/stdio.h implicit
 make alloc.h implicit
 done alloc.h dontcare virtual
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/getopt.h implicit
 prev zlib.h implicit
 done zutil.h
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+make ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_botch.h implicit
+done ../../../include/ast/ast_botch.h dontcare
+make ../../../include/ast/ast_unistd.h implicit
+done ../../../include/ast/ast_unistd.h dontcare
+make ../../../include/ast/ast_fcntl.h implicit
+make ../../../include/ast/ls.h implicit
+make ../../../include/ast/ast_mode.h implicit
+done ../../../include/ast/ast_mode.h dontcare
+make ../../../include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/limits.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+done ../../../include/ast/ast_fs.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ls.h dontcare
+prev ../../../include/ast/ast_fs.h implicit
+done ../../../include/ast/ast_fcntl.h dontcare
+make ../../../include/ast/ast_types.h implicit
+done ../../../include/ast/ast_types.h dontcare
+make ../../../include/ast/ast_map.h implicit
+done ../../../include/ast/ast_map.h dontcare
+prev ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_hdr.h implicit
+done ../../../include/ast/ast_hdr.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_lib.h implicit
+done ../../../include/ast/ast_lib.h dontcare
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/sfio.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_version.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_version.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast.h dontcare
 done gzio.c
 prev gzio.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c gzio.c
@@ -180,7 +187,7 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c
 done deflate.o generated
 make trees.o
 make trees.c
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ../../../include/ast/stdio.h implicit
 make trees.h implicit
 done trees.h dontcare
 prev deflate.h implicit
@@ -267,16 +274,16 @@ done inffast.o generated
 make sfdcgzip.o
 make sfdcgzip.c
 make sfdcgzip.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfdisc.h dontcare
+make ../../../include/ast/sfdisc.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/sfdisc.h dontcare
 done sfdcgzip.h
 prev zlib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio_t.h
+prev ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio_t.h implicit
+prev ../../../include/ast/sfio.h implicit
+done ../../../include/ast/sfio_t.h
 done sfdcgzip.c
 prev sfdcgzip.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c sfdcgzip.c
@@ -284,7 +291,7 @@ done sfdcgzip.o generated
 make sfdclzw.o
 make sfdclzw.c
 prev sfdcgzip.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/ast.h implicit
 done sfdclzw.c
 prev sfdclzw.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c sfdclzw.c
@@ -294,12 +301,12 @@ exec - (ranlib libz.a) >/dev/null 2>&1 || true
 done libz.a generated
 done z virtual
 prev libz.a archive
-make ${PACKAGE_ast_LIB}
+make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
 exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -317,18 +324,18 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB} generated
-make ${PACKAGE_ast_LIB}/libz.a archive
+done ../../../lib generated
+make ../../../lib/libz.a archive
 prev libz.a archive
 exec - mv ${PACKAGE_ast_LIB}/libz.a ${PACKAGE_ast_LIB}/libz.a.old 2>/dev/null || true; test '' = 'libz.a' || { cp libz.a ${PACKAGE_ast_LIB}/libz.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libz.a) >/dev/null 2>&1 || true
-done ${PACKAGE_ast_LIB}/libz.a generated
-make ${PACKAGE_ast_LIB}/lib
+done ../../../lib/libz.a generated
+make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
 exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -346,17 +353,17 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/lib generated
-make ${PACKAGE_ast_LIB}/lib/z
+done ../../../lib/lib generated
+make ../../../lib/lib/z
 prev z.req
 exec - mv ${PACKAGE_ast_LIB}/lib/z ${PACKAGE_ast_LIB}/lib/z.old 2>/dev/null || true; test '' = 'z.req' || { cp z.req ${PACKAGE_ast_LIB}/lib/z  		    		    ;}
-done ${PACKAGE_ast_LIB}/lib/z generated
-make ${PACKAGE_ast_INCLUDE}
+done ../../../lib/lib/z generated
+make ../../../include/ast
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
 exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${PACKAGE_ast_INCLUDE} | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -374,40 +381,38 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_INCLUDE} generated
-make ${PACKAGE_ast_INCLUDE}/zlib.h
+done ../../../include/ast generated
+make ../../../include/ast/zlib.h
 prev zlib.h
 exec - mv ${PACKAGE_ast_INCLUDE}/zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h.old 2>/dev/null || true; test '' = 'zlib.h' || { cp zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h  		    		    ;}
-done ${PACKAGE_ast_INCLUDE}/zlib.h generated
-make ${PACKAGE_ast_INCLUDE}/zconf.h
+done ../../../include/ast/zlib.h generated
+make ../../../include/ast/zconf.h
 prev zconf.h
 exec - mv ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/dev/null || true; test '' = 'zconf.h' || { cp zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h  		    		    ;}
-done ${PACKAGE_ast_INCLUDE}/zconf.h generated
-make ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
+done ../../../include/ast/zconf.h generated
+make ../../../include/ast/sfdcgzip.h
 prev sfdcgzip.h
-exec - proto -p -s -l /home/gsf/arch/sgi.mips3/lib/package/ast.lic '-o type=special' sfdcgzip.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' sfdcgzip.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcgzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
 exec - fi
-done ${PACKAGE_ast_INCLUDE}/sfdcgzip.h generated
+done ../../../include/ast/sfdcgzip.h generated
 done install virtual
 make test
 make example
 make example.o
 make example.c
 prev zlib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ../../../include/ast/stdio.h implicit
 done example.c
 prev example.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -c example.c
 done example.o generated
 prev libz.a archive
-setv mam_libz `sed -e 's,-lz,libz.a,' z.req`
-setv mam_libz `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lz,${INSTALLROOT}/lib/libz.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/z 2>/dev/null || echo '' ${mam_cc_L+-lz}${mam_cc_L-libz.a}`
-make ${mam_libast}
-done ${mam_libast} dontcare virtual
-exec - ${CC} ${CCFLAGS} ${LDFLAGS}   -o example example.o ${mam_libz}
+bind -lz
+bind -last
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o example example.o ${mam_libz} ${mam_libast}
 done example generated
 make minigzip
 make minigzip.o
@@ -416,15 +421,13 @@ prev unix.h implicit
 make io.h implicit
 done io.h dontcare virtual
 prev zlib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ../../../include/ast/stdio.h implicit
 done minigzip.c
 prev minigzip.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -c minigzip.c
 done minigzip.o generated
 prev libz.a archive
-setv mam_libz `sed -e 's,-lz,libz.a,' z.req`
-prev ${mam_libast}
-exec - ${CC} ${CCFLAGS} ${LDFLAGS}   -o minigzip minigzip.o ${mam_libz}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o minigzip minigzip.o ${mam_libz} ${mam_libast}
 done minigzip generated
 exec - example
 exec - echo hello world | minigzip | minigzip -d

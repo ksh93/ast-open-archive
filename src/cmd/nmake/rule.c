@@ -34,9 +34,103 @@
 #include "make.h"
 #include "options.h"
 
+#define ASOC(field,name,flags)	internal.field=rassociate(name,flags)
 #define ATTR(field,name,flags)	internal.field=rinternal(name,P_attribute|(flags))
 #define FUNC(field,name,func)	((internal.field=setvar(name,NiL,V_builtin|V_functional))->builtin=(func))
 #define INIT(field,name,flags)	internal.field=rinternal(name,flags)
+
+/*
+ * return non-0 if rule name s requires dynamic expand()
+ */
+
+int
+isdynamic(register const char* s)
+{
+	register int	g;
+
+	g = 0;
+	for (;;)
+		switch (*s++)
+		{
+		case 0:
+			return 0;
+		case '*':
+		case '?':
+		case '[':
+		case ']':
+		case '|':
+		case '&':
+			return 1;
+		case '@':
+		case '!':
+		case '}':
+		case '$':
+			if (*s == '(')
+				g = 1;
+			break;
+		case ')':
+			if (g)
+				return 1;
+			break;
+		}
+	/*NOTREACHED*/
+}
+
+/*
+ * return non-0 if rule name s requires dynamic glob()
+ */
+
+int
+isglob(register const char* s)
+{
+	register int	g;
+
+	g = 0;
+	for (;;)
+		switch (*s++)
+		{
+		case 0:
+			return 0;
+		case '*':
+		case '?':
+		case '[':
+		case ']':
+		case '|':
+		case '&':
+			return 1;
+		case '@':
+		case '!':
+		case '}':
+			if (*s == '(')
+				g = 1;
+			break;
+		case ')':
+			if (g)
+				return 1;
+			break;
+		}
+	/*NOTREACHED*/
+}
+
+/*
+ * return non-0 if s is a state variable name
+ */
+
+int
+isstatevar(register const char* s)
+{
+	if (*s++ == '(')
+		for (;;)
+			switch (*s++)
+			{
+			case 0:
+			case '(':
+				return 0;
+			case ')':
+				return !*s;
+			}
+	return 0;
+}
 
 /*
  * return a pointer to a rule given its name,
@@ -203,7 +297,7 @@ struct rule*
 associate(register struct rule* a, register struct rule* r, register char* s, struct list** pos)
 {
 	register struct list*	p;
-	struct rule*		x;
+	register struct rule*	x;
 	struct list*		u;
 
 	if (r)
@@ -216,25 +310,25 @@ associate(register struct rule* a, register struct rule* r, register char* s, st
 	{
 		u = 0;
 		for (p = pos && *pos ? (*pos)->next : a->prereqs; p; p = p->next)
-		{
-			if (p->rule != r)
+			if ((x = p->rule) != r)
 			{
-				if (p->rule->name[0] == '%')
+				if (x->property & P_attribute)
 				{
-					if (!p->rule->name[1])
-					{
-						u = p;
-						continue;
-					}
-					if (r && (x = getrule(p->rule->name + 1)) && x != r && (x->property & P_attribute) && hasattribute(r, x, NiL)) break;
+					if (r && hasattribute(r, x, NiL))
+						break;
 				}
-				if (metamatch(NiL, s, p->rule->name) || r && r->uname && !(r->property & P_state) && metamatch(NiL, r->uname, p->rule->name)) break;
+				else if (x->name[0] == '%' && !x->name[1])
+					u = p;
+				else if (metamatch(NiL, s, x->name) || r && r->uname && !(r->property & P_state) && metamatch(NiL, r->uname, x->name))
+					break;
 			}
-		}
 		if (p || (p = u))
 		{
-			if (pos) *pos = p;
-			return catrule(a->name, p->rule->name, NiL, 0);
+			if (pos)
+				*pos = p;
+			return (p->rule->property & P_attribute) ?
+				catrule(a->name, "%", p->rule->name, 0) :
+				catrule(a->name, p->rule->name, NiL, 0);
 		}
 	} while (r && s == r->name && r->uname && !(r->property & P_state) && (s = r->uname) != r->name);
 	return 0;
@@ -930,7 +1024,27 @@ rinternal(char* s, register int flags)
 
 	r = makerule(s);
 	r->property |= flags;
-	if (!r->prereqs && !r->action) r->dynamic |= D_compiled;
+	if (!r->prereqs && !r->action)
+		r->dynamic |= D_compiled;
+	return r;
+}
+
+/*
+ * make an internal pattern association rule pointer
+ * NOTE: this is required to sync pre 2001-05-09 make objects 
+ */
+
+static struct rule*
+rassociate(char* s, register int flags)
+{
+	register struct rule*	r;
+	register struct rule*	a;
+	register struct list*	p;
+
+	r = rinternal(s, flags);
+	for (p = r->prereqs; p; p = p->next)
+		if (!(p->rule->property & P_attribute) && p->rule->name[0] == '%' && p->rule->name[1] == ATTRNAME && (a = getrule(p->rule->name + 1)) && (a->property & P_attribute))
+			p->rule = a;
 	return r;
 }
 
@@ -1115,13 +1229,13 @@ initrule(void)
 	 * pattern association rules
 	 */
 
-	INIT(append_p,		".APPEND.",	0);
-	INIT(attribute_p,	".ATTRIBUTE.",	0);
-	INIT(bind_p,		".BIND.",	0);
-	INIT(dontcare_p,	".DONTCARE.",	0);
-	INIT(insert_p,		".INSERT.",	0);
-	INIT(require_p,		".REQUIRE.",	0);
-	INIT(source_p,		".SOURCE.",	0);
+	ASOC(append_p,		".APPEND.",	0);
+	ASOC(attribute_p,	".ATTRIBUTE.",	0);
+	ASOC(bind_p,		".BIND.",	0);
+	ASOC(dontcare_p,	".DONTCARE.",	0);
+	ASOC(insert_p,		".INSERT.",	0);
+	ASOC(require_p,		".REQUIRE.",	0);
+	ASOC(source_p,		".SOURCE.",	0);
 
 	/*
 	 * builtin functions

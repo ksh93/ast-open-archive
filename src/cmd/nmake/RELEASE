@@ -1,6 +1,45 @@
+01-05-31 Makerules.mk: add option rhs to :DLL:
+	 Makerules.mk: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
+	 Makerules.mk: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
+	 make.probe: add CC.EXECTYPE
+	 make.probe: fix { ld nm size strip } search
+	 make.probe: adjust probe_shared order for linux.arm gcc
+	 option.c: add --cross to not run generated executables
+01-05-30 make.probe: add CC.NATIVE
+01-05-28 make.probe: add CC.STRIP and CC.STRIP.FLAGS
+	 Makerules.mk: add PACKAGESTRIP check for .LIST.PACKAGE.BINARY
+01-05-26 expand.c: add :T=Y: for mime type
+01-05-09 --- release 4.2 ---
+	 make.h: isdynamic,isglob,isstatevar: functions to factor out strmatch()
+	 expand.c: add T=XQ[S[AV]|V[I]] to factor out strmatch() in base rules
+	 rule.c: speed up associate() by factoring out attributes
+01-05-01 expand.c: order() now handles :PACKAGE: foo:command
+01-04-26 Makerules.mk: null out cctype and .CC.PROBE. for --base
+	 Makerules.mk: fix .REQ. bug that missed :LIBRARY: targets
+01-04-25 Makerules.mk: add variants=pattern to select cc- variants
+	 Makerules.mk: add .VARIANTS alias for .CC-
+	 option.c: fix bug that omitted readonly option values in .mo
+01-04-24 Makerules.mk: :DLL: sets VARIANT=DLL
+01-04-18 object.c: fix CC_NATIVE!=CC_ASCII buffer overflow
+	 make.probe,makerules: mvs.390 adjustments for CC.LIB.DLL=symbol
+01-04-01 scan.c: fix * scan match bug that gave up too soon
+01-03-08 printext: handle %*C
+01-02-26 makerules: CC.SUFFIX.STATIC get .ARCHIVE attribute
+	 makerules: add .NO.ARPROFILE to defer to dll prereqs for dll target
+	 pkg-X11.mk: check libXmu.sa for openwin
+01-02-14 make.probe,makerules: add CC.DLL.LIBRARIES, CC.DLL.ALTERNATES
+	 make.probe: linux needs CC.DLL.LIBRARIES=-lc for binary compatibility
+	 probe.win32: change to CC.STATIC=-Bstatic, dynamic is now the default
+	 makerules: drop .SCAN.IGNORE for .DO.INSTALL.DIR
+	 makerules: fix .SHARED.BIND. to pull in dynamic refs
+	 makerules: change .OFFICIAL diff style to -u
+	 mam: add `bind -lX [dontcare]' to simplify library binding
+	 command.c: fix job deadlock bug that used archive before it built
+01-02-07 Scanrules.mk: add .cxx for C++
 01-02-02 makerules: bias package search to viewpath and make installroot
 	 makerules: *.req can be down the view
-01-01-01 expand: fix :D: to preserve leading / -- how long has this been wrong?
+01-01-01 --- release 4.1 ---
+	 expand: fix :D: to preserve leading / -- how long has this been wrong?
 	 makerules: fix .PACKAGE.INIT. for dir == /
 	 makerules: $(PACKAGE_PATH) is list of default package root dirs
 	 makerules: add recurse=list to list recursion order and exit

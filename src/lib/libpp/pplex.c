@@ -34,7 +34,6 @@
 #include "pplib.h"
 #include "ppfsm.h"
 
-
 #if CPP
 
 /*
@@ -553,7 +552,7 @@ ppcpp(void)
 						if (!(cur->flags & IN_newline))
 						{
 							st |= EOF2NL;
-							if ((pp.mode & (HOSTED|PEDANTIC)) == PEDANTIC && LASTCHR() != '\f' && LASTCHR() != 032)
+							if ((pp.mode & (HOSTED|PEDANTIC)) == PEDANTIC && LASTCHR() != '\f' && LASTCHR() != CC_sub)
 								error(1, "file does not end with %s", pptokchr('\n'));
 #if CPP
 							PUTCHR('\n');
@@ -943,7 +942,7 @@ ppcpp(void)
 #endif
 					if (ppstate & ADD)
 						ppstate &= ~ADD;
-					else if (m == n)
+					else if (m == n || !(st & SPACEOUT))
 						op--;
 					else
 					{
@@ -956,7 +955,7 @@ ppcpp(void)
 				case T_STRING:
 					if (ppstate & ADD)
 						ppstate &= ~ADD;
-					else if (m == n)
+					else if (m == n || !(st & SPACEOUT))
 						op--;
 					else
 					{
@@ -1058,6 +1057,17 @@ ppcpp(void)
 		else if (pp.option & PRESERVE) PUTCHR(c);
 		else switch (c)
 		{
+		case 'b':
+		case 'f':
+		case 'n':
+		case 'r':
+		case 't':
+		case '\\':
+		case '\'':
+		case '"':
+		case '?':
+			PUTCHR(c);
+			break;
 #if COMPATIBLE
 		case '8':
 		case '9':
@@ -1107,23 +1117,20 @@ ppcpp(void)
 				break;
 			}
 			if (n & ~0777) error(1, "octal character constant too large");
-			PUTCHR(((n >> 6) & 07) + '0');
-			PUTCHR(((n >> 3) & 07) + '0');
-			PUTCHR((n & 07) + '0');
-			break;
+			goto octal;
 		case 'a':
 #if COMPATIBLE
 			if (st & COMPATIBILITY) goto unknown;
 #endif
-			PUTCHR('0');
-			PUTCHR('0');
-			PUTCHR('7');
-			break;
+			n = CC_bel;
+			goto octal;
 		case 'v':
-			PUTCHR('0');
-			PUTCHR('1');
-			PUTCHR('3');
-			break;
+			n = CC_vt;
+			goto octal;
+		case 'E':
+			if (st & (COMPATIBILITY|STRICT)) goto unknown;
+			n = CC_esc;
+			goto octal;
 		case 'x':
 #if COMPATIBLE
 			if (st & COMPATIBILITY) goto unknown;
@@ -1170,26 +1177,10 @@ ppcpp(void)
 				break;
 			}
 			if (n & ~0777) error(1, "hexadecimal character constant too large");
+		octal:
 			PUTCHR(((n >> 6) & 07) + '0');
 			PUTCHR(((n >> 3) & 07) + '0');
 			PUTCHR((n & 07) + '0');
-			break;
-		case 'E':
-			if (st & (COMPATIBILITY|STRICT)) goto unknown;
-			PUTCHR('0');
-			PUTCHR('3');
-			PUTCHR('3');
-			break;
-		case 'b':
-		case 'f':
-		case 'n':
-		case 'r':
-		case 't':
-		case '\\':
-		case '\'':
-		case '"':
-		case '?':
-			PUTCHR(c);
 			break;
 		default:
 		unknown:
@@ -1761,7 +1752,7 @@ ppcpp(void)
 		if (pp.level == 1)
 		{
 			error_info.line++;
-			if (!(st & SPACEOUT))
+			if (!(st & (JOINING|SPACEOUT)))
 			{
 				debug((-5, "token[%d] %03o = %s [line=%d]", pp.level, c, pptokchr(c), error_info.line));
 				BACKOUT();
@@ -1956,7 +1947,7 @@ ppcpp(void)
 						PUSH_QUOTE(pp.macp->arg[c - ARGOFFSET], pp.macp->line);
 						CACHEIN();
 						bp = ip - 1;
-						if (st & COLLECTING) rp = fsm[START];
+						if (st & (COLLECTING|EOF2NL)) rp = fsm[START];
 						if (state = rp[c = '"']) goto fsm_next;
 						goto fsm_get;
 					case 'S':
@@ -2096,7 +2087,14 @@ ppcpp(void)
 
 				if (pp.in->type == IN_FILE && (!(pp.option & PLUSSPLICE) || !INCOMMENTXX(rp)))
 				{
+					m = 0;
 					GET(c, n, tp, xp);
+					if (pp.option & SPLICESPACE)
+						while (n == ' ')
+						{
+							GET(c, n, tp, xp);
+							m = 1;
+						}
 					if (n == '\r')
 					{
 						GET(c, n, tp, xp);
@@ -2173,6 +2171,8 @@ ppcpp(void)
 #endif
 					else if (n != EOB)
 						BACKIN();
+					if (m && INSPACE(rp))
+						UNGETCHR(c);
 				}
 				break;
 			case '\r':
@@ -2190,6 +2190,19 @@ ppcpp(void)
 						goto fsm_get;
 					}
 					if (n != EOB) BACKIN();
+				}
+				break;
+			case CC_sub:
+				/*
+				 * barf & puke
+				 */
+
+				if ((pp.option & ZEOF) && pp.in->type == IN_FILE)
+				{
+					pp.in->flags |= IN_eof;
+					c = 0;
+					state = S_EOB;
+					goto fsm_terminal;
 				}
 				break;
 			}

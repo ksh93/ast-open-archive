@@ -21,3 +21,8 @@ TEST 01 'basics'
 		INPUT - $'a'
 		OUTPUT -
 		ERROR - $'tsort: odd data'
+
+TEST 02 'how did this slip through?'
+	EXEC
+		INPUT - $'b c\na c\na b'
+		OUTPUT - $'a\nb\nc'

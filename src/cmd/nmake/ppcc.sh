@@ -26,8 +26,8 @@
 # @(#)ppcc (AT&T Research) 1997-02-14
 
 case $-:$BASH_VERSION in
-*x*:[0-9]*)	: bash set -x is broken :; set +ex; old=1 ;;
-*)		old= ;;
+*x*:[0123456789]*)	: bash set -x is broken :; set +ex; old=1 ;;
+*)			old= ;;
 esac
 
 command=ppcc
@@ -172,8 +172,8 @@ trap '	status=$?
 	exit $status
 ' 0 1 2 3 15
 case $old in
-'')	case `(set -A a no ok; echo "${a[1]}") 2>/dev/null` in
-	ok)	;;
+'')	case `(set -A a no ok; ((b=1+1)); echo "${a[1]}$b") 2>/dev/null` in
+	ok2)	;;
 	*)	old=1 ;;
 	esac
 	;;
@@ -277,7 +277,7 @@ case $old:$RANDOM in
 			esac
 			continue
 			;;
-		-[DIU]*|-[a-zA-Z][a-zA-Z0-9_]*)
+		-[DIU]*|-[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*)
 			;;
 		[-+]*)	continue
 			;;
@@ -414,7 +414,7 @@ case $old:$RANDOM in
 				(( nav = nav + 1 ))
 			done
 			;;
-		-[DIU]*|-[a-zA-Z][a-zA-Z0-9_]*)
+		-[DIU]*|-[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*)
 			pp[npp]=$arg
 			(( npp = npp + 1 ))
 			case $ppld in

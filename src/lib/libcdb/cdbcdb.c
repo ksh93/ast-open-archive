@@ -128,7 +128,7 @@ cdbfill(Sfio_t* sp, int op, Void_t* value, Sfdisc_t* disc)
 		do
 		{
 			for (ep = (dp = rp->data) + cdb->strings; dp < ep; dp++)
-				if ((dp->flags & (CDB_STRING|CDB_CACHED)) == CDB_STRING && dp->string.base >= (char*)sp->data && dp->string.base < (char*)sp->endb)
+				if ((dp->flags & (CDB_STRING|CDB_CACHED)) == CDB_STRING && dp->string.base >= (char*)sp->_data && dp->string.base < (char*)sp->_endb)
 				{
 					if (!(dp->string.base = vmstrdup(vp, dp->string.base)))
 						return cdbnospace(cdb);

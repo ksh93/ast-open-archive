@@ -1,5 +1,5 @@
 # regression tests for the sort utility
-# generated from the gnu perl tests
+# 01..22 were generated from the gnu perl tests
 
 TEST 01 'simple checks'
 	EXEC	-c f1
@@ -205,3 +205,12 @@ TEST 22 'errors'
 	EXEC	-k1.1,-k0 f1
 	EXEC	-k 2.,3 f1
 	EXEC	-k 2, f1
+
+TEST 23 'stable sort'
+	EXEC	-s -k2,2
+		INPUT - $'1 A\n2 A'
+		SAME OUTPUT INPUT
+	EXEC	-s -k2,2r
+	EXEC	-s -r -k2,2
+		OUTPUT - $'2 A\n1 A'
+	EXEC	-s -r -k2,2r

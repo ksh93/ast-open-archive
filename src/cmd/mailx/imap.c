@@ -1759,7 +1759,7 @@ imap_setinput(register Msg_t* mp)
 	if (imapexec(imap, "FETCH %d (RFC822.HEADER)", m))
 		note(FATAL, "imap: %d: cannot fetch message header", m);
 	imap->copy.fp = sfstdout;
-	imap->mp->endb = imap->mp->next;
+	imap->mp->_endb = imap->mp->_next;
 	sfseek(imap->mp, (Sfoff_t)0, SEEK_SET);
 	return imap->mp;
 }

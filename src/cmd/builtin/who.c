@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: who (AT&T Labs Research) 1999-06-25 $\n]"
+"[-?\n@(#)$Id: who (AT&T Labs Research) 2001-06-06 $\n]"
 USAGE_LICENSE
 "[+NAME?who - display who is on the system]"
 "[+DESCRIPTION?\bwho\b displays various pieces of information about "
@@ -134,20 +134,24 @@ USAGE_LICENSE
 #	endif
 #endif
 
-#if _mem_ut_type_utmp || _mem_ut_type_utmpx
-#	ifndef	DEAD_PROCESS
-#		define DEAD_PROCESS	8
-#	endif
-#	define dead(ut)		((ut).ut_type == DEAD_PROCESS)
+#ifdef	nonuser
+#	define dead(ut)	(nonuser(ut))
 #else
-#	ifdef	nonuser
-#		define dead(ut)	(nonuser(ut))
+#	if _mem_ut_type_utmp || _mem_ut_type_utmpx
+#		ifdef USER_PROCESS
+#			define dead(ut)		((ut).ut_type != USER_PROCESS)
+#		else
+#			ifndef	DEAD_PROCESS
+#				define DEAD_PROCESS	8
+#			endif
+#			define dead(ut)		((ut).ut_type == DEAD_PROCESS)
+#		endif
 #	else
 #		define dead(ut)	0
 #	endif
 #endif
 
-#define skip(ut)	(!*ut.ut_user || !*ut.ut_line || dead(ut))
+#define skip(ut)	(!*ut.ut_user||!*ut.ut_line||dead(ut))
 
 typedef struct
 {

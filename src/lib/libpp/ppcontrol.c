@@ -1833,11 +1833,14 @@ ppcontrol(void)
 				/*...INDENT*/
 				POP_LINE();
 				break;
+			case X_HOSTDIR:
+				tokop(PP_HOSTDIR, p3, p, i0, TOKOP_UNSET|TOKOP_STRING|TOKOP_DUP);
+				break;
 			case X_HOSTED:
 				setmode(HOSTED, i0);
 				break;
-			case X_HOSTDIR:
-				tokop(PP_HOSTDIR, p3, p, i0, TOKOP_UNSET|TOKOP_STRING|TOKOP_DUP);
+			case X_HOSTEDTRANSITION:
+				setmode(HOSTEDTRANSITION, i0);
 				break;
 			case X_ID:
 				tokop(PP_ID, p3, p, i0, TOKOP_UNSET|TOKOP_STRING);
@@ -2129,6 +2132,9 @@ ppcontrol(void)
 			case X_SPLICECAT:
 				setoption(SPLICECAT, i0);
 				break;
+			case X_SPLICESPACE:
+				setoption(SPLICESPACE, i0);
+				break;
 			case X_STANDARD:
 				tokop(PP_STANDARD, p3, p, i0, TOKOP_UNSET|TOKOP_STRING|TOKOP_DUP);
 				break;
@@ -2167,6 +2173,9 @@ ppcontrol(void)
 				break;
 			case X_WARN:
 				ppop(PP_WARN, i0);
+				break;
+			case X_ZEOF:
+				setoption(ZEOF, i0);
 				break;
 #if DEBUG
 			case 0:

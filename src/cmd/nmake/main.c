@@ -95,6 +95,7 @@
  *   2000             (4.0)             .	AT&T Research
  *                      .               .
  *   2001             (4.1)             .	AT&T Research
+ *   2001             (4.2)             .	AT&T Research
  *
  * command line arguments are of three types
  *
@@ -151,6 +152,7 @@
  *	0x00080000 1999-11-19 disable touch steady state loop
  *	0x00100000 2000-02-14 apply metarule even if dir on unbound lhs
  *	0x00200000 2000-09-08 0x00100000 implied if !P_implicit
+ *	0x00400000 2001-02-14 allow P_archive to break job deadlock
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *
@@ -198,10 +200,6 @@ struct tables		table;		/* hash table info		*/
 char			null[] = "";	/* null string			*/
 char			tmpname[MAXNAME];/* temporary name buffer	*/
 short			ctypes[UCHAR_MAX+1];/* istype() character types	*/
-
-#if __OBSOLETE__ < 20020101
-#include "../../lib/libast/string/fmtident.c"
-#endif
 
 /*
  * user error message intercept

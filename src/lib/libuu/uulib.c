@@ -1485,7 +1485,7 @@ uudecode(register Uu_t* uu, Sfio_t* ip, Sfio_t* op, size_t n, const char* path)
 			uu->op = sfstdout;
 		else
 		{
-			if (headerpath)
+			if (headerpath && (uu->flags & UU_LOCAL))
 			{
 				for (s = uu->path; *s; s++)
 					if (isspace(*s) || iscntrl(*s) || !isprint(*s) || *s == '/' || *s == '\\')

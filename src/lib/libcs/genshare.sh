@@ -62,11 +62,11 @@ esac
 if	test ! -d $dir
 then	echo "$0: $dir: invalid directory" >&2; exit 1
 fi
-s="`df 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[a-zA-Z0-9_]*:/!d' -e 's/:.*//' | sort -u`"
+s="`df 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*:/!d' -e 's/:.*//' | sort -u`"
 case $s in
 "")	s=`hostname 2>/dev/null || uname -n 2>/dev/null || cat /etc/whoami 2>/dev/null || echo local 2>/dev/null`
 	;;
-*)	p=`df $dir/. 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[a-zA-Z0-9_]*:/!d' -e 's/:.*//'`
+*)	p=`df $dir/. 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*:/!d' -e 's/:.*//'`
 	case $p in
 	"")	p=`hostname 2>/dev/null || uname -n 2>/dev/null || cat /etc/whoami 2>/dev/null || echo local 2>/dev/null` ;;
 	esac
@@ -81,7 +81,7 @@ $h" ;;
 	done
 	t=$s
 	s=`(echo "$t"; for h in $t
-	do	$rsh $h df '2>/dev/null' | sed -e 's/^[^(]*(//' -e '/^[a-zA-Z0-9_]*:/!d' -e 's/:.*//'
+	do	$rsh $h df '2>/dev/null' | sed -e 's/^[^(]*(//' -e '/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*:/!d' -e 's/:.*//'
 	done) | sort | uniq -c | sort -bnr | sed -e 's/^[ 	]*[0-9]*[ 	]*//'`
 	;;
 esac

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.1 2001-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -36,6 +36,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ../../../lib/package/ast.lic
+done ../../../lib/package/ast.lic
 make install
 make tcl
 make libtcl.a archive
@@ -70,65 +72,70 @@ done tcl.req generated
 make panic.o
 make tcl/panic.c
 make include/tcl.h implicit
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
+done ../../../include/ast/getopt.h dontcare
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_common.h dontcare
+done ../../../include/ast/stdio.h dontcare
+make ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+make ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_botch.h implicit
+done ../../../include/ast/ast_botch.h dontcare
+make ../../../include/ast/ast_unistd.h implicit
+done ../../../include/ast/ast_unistd.h dontcare
+make ../../../include/ast/re_comp.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/re_comp.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_fcntl.h implicit
+make ../../../include/ast/ls.h implicit
+make ../../../include/ast/ast_mode.h implicit
+done ../../../include/ast/ast_mode.h dontcare
+make ../../../include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+done ../../../include/ast/ast_fs.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ls.h dontcare
+prev ../../../include/ast/ast_fs.h implicit
+done ../../../include/ast/ast_fcntl.h dontcare
+make ../../../include/ast/ast_types.h implicit
+done ../../../include/ast/ast_types.h dontcare
+make ../../../include/ast/ast_map.h implicit
+done ../../../include/ast/ast_map.h dontcare
+prev ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/limits.h implicit
+done ../../../include/ast/limits.h dontcare
+make ../../../include/ast/ast_hdr.h implicit
+done ../../../include/ast/ast_hdr.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_lib.h implicit
+done ../../../include/ast/ast_lib.h dontcare
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/sfio.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_version.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_version.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast.h dontcare
 done include/tcl.h
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/ast.h implicit
 done tcl/panic.c
 prev tcl/panic.c
 exec - ${CC} ${CCFLAGS}  -Iinclude -I${PACKAGE_ast_INCLUDE} -D_BLD_tcl -D_PACKAGE_ast -c tcl/panic.c
@@ -136,29 +143,28 @@ done panic.o generated
 make regexp.o
 make tcl/regexp.c
 make include/tclPort.h implicit
-make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/times.h
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/dirent.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/dirent.h
+make ../../../include/ast/times.h implicit
+make ../../../include/ast/ast_time.h implicit
+done ../../../include/ast/ast_time.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/times.h
+prev ../../../include/ast/stdio.h implicit
+make ../../../include/ast/dirent.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/dirent.h
 make include/tkshlib.h implicit
 make include/debug.h implicit
 done include/debug.h dontcare
 make include/shcompat.h implicit
 done include/shcompat.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ../../../include/ast/stdio.h implicit
 make config.h implicit
 make src/config.iffe
 done src/config.iffe
 prev tcl.req
-setv mam_libshell `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lshell,${INSTALLROOT}/lib/libshell.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-lX11,${INSTALLROOT}/lib/libX11.a,} ${INSTALLROOT}/lib/lib/shell 2>/dev/null || echo '' ${mam_cc_L+-lshell}${mam_cc_L-${PACKAGE_ast_LIB}/libshell.a}`
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-lX11,${INSTALLROOT}/lib/libX11.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
+bind -lshell
+bind -last
 make ${mam_libX11}
 done ${mam_libX11} dontcare virtual
 prev ${mam_libX11}
@@ -166,44 +172,48 @@ exec - iffe -o config.h -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+
 done config.h dontcare generated
 make include/tksh.h implicit
 prev include/tcl.h implicit
-make ${PACKAGE_ast_INCLUDE}/shell.h implicit
-make ${PACKAGE_ast_INCLUDE}/nval.h implicit
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/nval.h dontcare
+make ../../../include/ast/shell.h implicit
+make ../../../include/ast/nval.h implicit
+make ../../../include/ast/cdt.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/cdt.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/nval.h dontcare
 make name.h implicit
 done name.h dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/history.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/history.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
-make ${PACKAGE_ast_INCLUDE}/stak.h implicit
-make ${PACKAGE_ast_INCLUDE}/stk.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/stk.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/stak.h dontcare
-make ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/option.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/option.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/error.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/shell.h dontcare
+make ../../../include/ast/history.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/history.h dontcare
+prev ../../../include/ast/cdt.h implicit
+make ../../../include/ast/cmd.h implicit
+make ../../../include/ast/dlldefs.h implicit
+make include/dlfcn.h implicit
+done include/dlfcn.h dontcare
+done ../../../include/ast/dlldefs.h dontcare
+make ../../../include/ast/stak.h implicit
+make ../../../include/ast/stk.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/stk.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/stak.h dontcare
+make ../../../include/ast/error.h implicit
+make ../../../include/ast/option.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/option.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/error.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/cmd.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/shell.h dontcare
 done include/tksh.h dontcare
 done include/tkshlib.h
 done include/tclPort.h
@@ -345,8 +355,8 @@ make tclInterp.o
 make tcl/tclInterp.c
 prev include/tclPort.h implicit
 prev include/tclInt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/ast.h implicit
 done tcl/tclInterp.c
 prev tcl/tclInterp.c
 exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -c tcl/tclInterp.c
@@ -364,12 +374,12 @@ make tcl/tclUnixTime.c
 prev include/tclPort.h implicit
 prev include/tclInt.h implicit
 prev include/tcl.h implicit
-make ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/times.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tm.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ../../../include/ast/tm.h implicit
+prev ../../../include/ast/times.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/tm.h dontcare
+prev ../../../include/ast/ast.h implicit
 done tcl/tclUnixTime.c
 prev tcl/tclUnixTime.c
 exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -c tcl/tclUnixTime.c
@@ -383,8 +393,7 @@ exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -D_BLD_tcl -DLIB
 done tclLoad.o generated
 make tclLoadDl.o
 make tcl/tclLoadDl.c
-make include/dlfcn.h implicit
-done include/dlfcn.h dontcare
+prev include/dlfcn.h implicit
 prev include/tclInt.h implicit
 done tcl/tclLoadDl.c
 prev tcl/tclLoadDl.c
@@ -443,7 +452,7 @@ exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -DLIB_DIR=\""lib
 done init.o generated
 make debug.o
 make src/debug.c
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/ast.h implicit
 prev include/tkshlib.h implicit
 done src/debug.c
 prev src/debug.c
@@ -452,7 +461,7 @@ done debug.o generated
 make var.o
 make src/var.c
 make include/nvextra.h implicit
-prev ${PACKAGE_ast_INCLUDE}/nval.h implicit
+prev ../../../include/ast/nval.h implicit
 done include/nvextra.h
 prev include/tkshlib.h implicit
 done src/var.c
@@ -461,7 +470,7 @@ exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -
 done var.o generated
 make eval.o
 make src/eval.c
-prev ${PACKAGE_ast_INCLUDE}/nval.h implicit
+prev ../../../include/ast/nval.h implicit
 prev include/tkshlib.h implicit
 done src/eval.c
 prev src/eval.c
@@ -539,8 +548,8 @@ make tclIO.o
 make src/tclIO.c
 prev include/tclPort.h implicit
 prev include/tclInt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/ast.h implicit
 done src/tclIO.c
 prev src/tclIO.c
 exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -c src/tclIO.c
@@ -567,12 +576,12 @@ exec - (ranlib libtcl.a) >/dev/null 2>&1 || true
 done libtcl.a generated
 done tcl
 prev libtcl.a archive
-make ${PACKAGE_ast_LIB}
+make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
 exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -590,18 +599,18 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB} generated
-make ${PACKAGE_ast_LIB}/libtcl.a archive
+done ../../../lib generated
+make ../../../lib/libtcl.a archive
 prev libtcl.a archive
 exec - mv ${PACKAGE_ast_LIB}/libtcl.a ${PACKAGE_ast_LIB}/libtcl.a.old 2>/dev/null || true; test '' = 'libtcl.a' || { cp libtcl.a ${PACKAGE_ast_LIB}/libtcl.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libtcl.a) >/dev/null 2>&1 || true
-done ${PACKAGE_ast_LIB}/libtcl.a generated
-make ${PACKAGE_ast_LIB}/lib
+done ../../../lib/libtcl.a generated
+make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
 exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -619,17 +628,17 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/lib generated
-make ${PACKAGE_ast_LIB}/lib/tcl
+done ../../../lib/lib generated
+make ../../../lib/lib/tcl
 prev tcl.req
 exec - mv ${PACKAGE_ast_LIB}/lib/tcl ${PACKAGE_ast_LIB}/lib/tcl.old 2>/dev/null || true; test '' = 'tcl.req' || { cp tcl.req ${PACKAGE_ast_LIB}/lib/tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/lib/tcl generated
-make ${INSTALLROOT}/include/tcl
+done ../../../lib/lib/tcl generated
+make ../../../include/tcl
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/include/tcl
 exec - then	set -x && mkdir -p ${INSTALLROOT}/include/tcl 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${INSTALLROOT}/include/tcl | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -647,29 +656,29 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${INSTALLROOT}/include/tcl generated
-make ${INSTALLROOT}/include/tcl/tksh.h
+done ../../../include/tcl generated
+make ../../../include/tcl/tksh.h
 prev include/tksh.h
-exec - proto -p -s -l /home/gsf/arch/sgi.mips3/lib/package/ast.lic '-o type=special' include/tksh.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' include/tksh.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tksh.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tksh.h
 exec - fi
-done ${INSTALLROOT}/include/tcl/tksh.h generated
-make ${INSTALLROOT}/include/tcl/tcl.h
+done ../../../include/tcl/tksh.h generated
+make ../../../include/tcl/tcl.h
 prev include/tcl.h
-exec - proto -p -s -l /home/gsf/arch/sgi.mips3/lib/package/ast.lic '-o type=special' include/tcl.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' include/tcl.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tcl.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tcl.h
 exec - fi
-done ${INSTALLROOT}/include/tcl/tcl.h generated
-make ${PACKAGE_ast_LIB}/tksh7.6
+done ../../../include/tcl/tcl.h generated
+make ../../../lib/tksh7.6
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/tksh7.6
 exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tksh7.6 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && rm -rf ./-p
+exec - 		test -d ./-p && rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${PACKAGE_ast_LIB}/tksh7.6 | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -687,37 +696,37 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_LIB}/tksh7.6 generated
-make ${PACKAGE_ast_LIB}/tksh7.6/init.ksh
+done ../../../lib/tksh7.6 generated
+make ../../../lib/tksh7.6/init.ksh
 make lib/tksh7.6/init.ksh
 done lib/tksh7.6/init.ksh
 exec - mv ${PACKAGE_ast_LIB}/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.ksh' || { cp lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/init.ksh generated
-make ${PACKAGE_ast_LIB}/tksh7.6/init.tcl
+done ../../../lib/tksh7.6/init.ksh generated
+make ../../../lib/tksh7.6/init.tcl
 make lib/tksh7.6/init.tcl
 done lib/tksh7.6/init.tcl
 exec - mv ${PACKAGE_ast_LIB}/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.tcl' || { cp lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/init.tcl generated
-make ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl
+done ../../../lib/tksh7.6/init.tcl generated
+make ../../../lib/tksh7.6/ldAout.tcl
 make lib/tksh7.6/ldAout.tcl
 done lib/tksh7.6/ldAout.tcl
 exec - mv ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/ldAout.tcl' || { cp lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl generated
-make ${PACKAGE_ast_LIB}/tksh7.6/license.terms
+done ../../../lib/tksh7.6/ldAout.tcl generated
+make ../../../lib/tksh7.6/license.terms
 make lib/tksh7.6/license.terms
 done lib/tksh7.6/license.terms
 exec - mv ${PACKAGE_ast_LIB}/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms.old 2>/dev/null || true; test '' = 'lib/tksh7.6/license.terms' || { cp lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/license.terms generated
-make ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl
+done ../../../lib/tksh7.6/license.terms generated
+make ../../../lib/tksh7.6/parray.tcl
 make lib/tksh7.6/parray.tcl
 done lib/tksh7.6/parray.tcl
 exec - mv ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/parray.tcl' || { cp lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl generated
-make ${PACKAGE_ast_LIB}/tksh7.6/tclIndex
+done ../../../lib/tksh7.6/parray.tcl generated
+make ../../../lib/tksh7.6/tclIndex
 make lib/tksh7.6/tclIndex
 done lib/tksh7.6/tclIndex
 exec - mv ${PACKAGE_ast_LIB}/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex.old 2>/dev/null || true; test '' = 'lib/tksh7.6/tclIndex' || { cp lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex  		    		    ;}
-done ${PACKAGE_ast_LIB}/tksh7.6/tclIndex generated
+done ../../../lib/tksh7.6/tclIndex generated
 done install virtual
 make test
 done test dontcare virtual

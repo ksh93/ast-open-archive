@@ -36,7 +36,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Labs Research) 2000-08-11 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Labs Research) 2001-04-01 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -211,8 +211,16 @@ replace(const char* newfile, const char* oldfile, int preserve)
 	struct stat	st;
 	time_t		ut[2];
 
-	if (preserve && stat(oldfile, &st) || remove(oldfile) || rename(newfile, oldfile))
+	if (stat(oldfile, &st))
+	{
+		if (preserve)
+			return -1;
+		st.st_mode = 0;
+	}
+	if (remove(oldfile) || rename(newfile, oldfile))
 		return -1;
+	if (st.st_mode &= (S_IRUSR|S_IWUSR|S_IXUSR|S_IRGRP|S_IWGRP|S_IXGRP|S_IROTH|S_IWOTH|S_IXOTH))
+		chmod(oldfile, st.st_mode);
 	if (preserve)
 	{
 		ut[0] = st.st_atime;

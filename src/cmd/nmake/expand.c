@@ -32,6 +32,7 @@
 #include "make.h"
 #include "expand.h"
 
+#include <magic.h>
 #include <regex.h>
 
 #define BREAKARGS	100
@@ -959,8 +960,14 @@ order(Sfio_t* xp, register char* s, char* val)
 							p = 2;
 						else if (p == 1)
 						{
-							sfprintf(internal.nam, "lib%s", t);
-							t = sfstruse(internal.nam);
+							if (i != ':' || !strneq(s, "command", 7))
+							{
+								sfprintf(internal.nam, "lib%s", t);
+								t = sfstruse(internal.nam);
+							}
+							if (i == ':')
+								while (*s && !isspace(*s))
+									s++;
 						}
 					}
 					else if (i == ':')
@@ -1569,6 +1576,35 @@ substitute(Sfio_t* xp, regex_t* re, register char* s, char* newp, int glob)
 	}
 }
 
+static void
+mimetype(Sfio_t* xp, char* file)
+{
+	Sfio_t*			sp;
+	char*			mime;
+	struct stat		st;
+
+	static Magic_t*		magic;
+	static Magicdisc_t	disc;
+
+	if (!magic)
+	{
+		disc.version = MAGIC_VERSION;
+		disc.flags = MAGIC_MIME;
+		disc.errorf = (Magicerror_f)errorf;
+		if (!(magic = magicopen(&disc)))
+			error(3, "out of space [magic]");
+		magicload(magic, NiL, 0);
+	}
+	if (rstat(file, &st, 0) || !(sp = rsfopen(file)))
+		mime = "error";
+	else
+	{
+		mime = magictype(magic, sp, file, &st);
+		sfclose(sp);
+	}
+	sfputr(xp, mime, -1);
+}
+
 /*
  * apply token op p on (possibly bound) s with result in xp
  *
@@ -1623,7 +1659,38 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			sfputc(xp, '1');
 		return;
 	case 'Q':
-		if ((*ops == 'V' ? (getvar(s) != 0) : (getrule(s) != 0)) == (sep == EQ))
+		switch (*ops)
+		{
+		case 'S':
+			switch (*(ops + 1))
+			{
+			case 'A':
+				tst = (!dobind || getrule(s)) && isstate(s) && isaltstate(s);
+				break;
+			case 'V':
+				tst = (!dobind || getrule(s)) && isstatevar(s);
+				break;
+			default:
+				tst = (!dobind || getrule(s)) && isstate(s);
+				break;
+			}
+			break;
+		case 'V':
+			switch (*(ops + 1))
+			{
+			case 'I':
+				tst = (!dobind || getvar(s)) && isintvar(s);
+				break;
+			default:
+				tst = !!getvar(s);
+				break;
+			}
+			break;
+		default:
+			tst = !!getrule(s);
+			break;
+		}
+		if (tst == (sep == EQ))
 			sfputr(xp, s, -1);
 		return;
 	}
@@ -1976,6 +2043,9 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		return;
 	case 'U':
 		sfputr(xp, (r->property & P_staterule) ? rulestate(r, 1)->name : (r->property & P_statevar) ? varstate(r, 1)->name : r->name, -1);
+		return;
+	case 'Y':
+		mimetype(xp, r->name);
 		return;
 	case 'Z':
 		switch (*ops++)

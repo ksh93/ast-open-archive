@@ -37,6 +37,7 @@
 
 #define UU_HEADER	(1<<0)		/* header/trailer encoded too	*/
 #define UU_TEXT		(1<<1)		/* process text file		*/
+#define UU_LOCAL	(1<<2)		/* embedded paths in .		*/
 
 struct Uu_s; typedef struct Uu_s Uu_t;
 struct Uudisc_s; typedef struct Uudisc_s Uudisc_t;

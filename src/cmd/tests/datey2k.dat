@@ -149,10 +149,10 @@ NIL	%d	29
 NIL	%D	02/29/00
 NIL	%e	29
 NIL	%E	29
-NIL	%f	%f
-NIL	%F	%F
-NIL	%g	%g
-NIL	%G	%G
+NIL	%f	Tue Feb 29 01:02:03 EST 2000
+NIL	%F	Tue Feb 29 01:02:03 EST 2000
+NIL	%g	Feb 29 01:02
+NIL	%G	Feb 29  2000
 NIL	%h	Feb
 NIL	%H	01
 NIL	%i	Tue Feb 29 01:02:03 +05 EST 2000
@@ -199,10 +199,10 @@ NIL	%0d	29
 NIL	%0D	02/29/00
 NIL	%0e	29
 NIL	%0E	29
-NIL	%0f	%f
-NIL	%0F	%F
-NIL	%0g	%g
-NIL	%0G	%G
+NIL	%0f	Tue Feb 29 01:02:03 EST 2000
+NIL	%0F	Tue Feb 29 01:02:03 EST 2000
+NIL	%0g	Feb 29 01:02
+NIL	%0G	Feb 29  2000
 NIL	%0h	Feb
 NIL	%0H	01
 NIL	%0i	Tue Feb 29 01:02:03 +05 EST 2000
@@ -249,10 +249,10 @@ NIL	%-d	29
 NIL	%-D	02/29/00
 NIL	%-e	29
 NIL	%-E	29
-NIL	%-f	%f
-NIL	%-F	%F
-NIL	%-g	%g
-NIL	%-G	%G
+NIL	%-f	Tue Feb 29 01:02:03 EST 2000
+NIL	%-F	Tue Feb 29 01:02:03 EST 2000
+NIL	%-g	Feb 29 01:02
+NIL	%-G	Feb 29  2000
 NIL	%-h	Feb
 NIL	%-H	1
 NIL	%-i	Tue Feb 29 01:02:03 +05 EST 2000
@@ -299,10 +299,10 @@ NIL	%_d	29
 NIL	%_D	02/29/00
 NIL	%_e	29
 NIL	%_E	29
-NIL	%_f	%f
-NIL	%_F	%F
-NIL	%_g	%g
-NIL	%_G	%G
+NIL	%_f	Tue Feb 29 01:02:03 EST 2000
+NIL	%_F	Tue Feb 29 01:02:03 EST 2000
+NIL	%_g	Feb 29 01:02
+NIL	%_G	Feb 29  2000
 NIL	%_h	Feb
 NIL	%_H	 1
 NIL	%_i	Tue Feb 29 01:02:03 +05 EST 2000

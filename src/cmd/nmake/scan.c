@@ -121,13 +121,14 @@ initscan(int repeat)
 	register int		i;
 	register struct rule*	r;
 
-	if (!repeat) for (i = 0; i < elementsof(scantab); i++)
-	{
-		r = catrule(internal.scan->name, scantab[i].name, NiL, 1);
-		r->property |= P_attribute;
-		r->scan = scantab[i].value;
-		addprereq(internal.scan, r, PREREQ_APPEND);
-	}
+	if (!repeat)
+		for (i = 0; i < elementsof(scantab); i++)
+		{
+			r = catrule(internal.scan->name, scantab[i].name, NiL, 1);
+			r->property |= P_attribute;
+			r->scan = scantab[i].value;
+			addprereq(internal.scan, r, PREREQ_APPEND);
+		}
 }
 
 /*
@@ -140,12 +141,17 @@ scansort(register const char* a, register const char* b)
 	register const char*	s;
 
 	while (*++a == *++b)
-		if (!*a) return 0;
-	if (*a == '*') return -1;
-	else if (*b == '*') return 1;
+		if (!*a)
+			return 0;
+	if (*a == '*')
+		return 1;
+	else if (*b == '*')
+		return -1;
 	for (s = " *%@"; *s; s++)
-		if (*a == *s) return 1;
-		else if (*b == *s) return -1;
+		if (*a == *s)
+			return 1;
+		else if (*b == *s)
+			return -1;
 	return *a - *b;
 }
 
@@ -237,90 +243,101 @@ scanaction(struct action* a, register char* s)
 	struct rule*	u;
 	unsigned long	m;
 
-	if (c = *s++) do
-	{
-		v = n = s;
-		while (t = *s++)
+	if (c = *s++)
+		do
 		{
-			if (t == c) break;
-			if (t == '\\' && !(t = *s++)) break;
-			*n++ = t;
-		}
-		*n = 0;
-		if (!*v) break;
-		switch (*v++)
-		{
-		case 'A':
-			n = tokopen(v, 1);
-			while (v = tokread(n))
+			v = n = s;
+			while (t = *s++)
 			{
-				if (((t = *v) == ATTRSET || t == ATTRCLEAR) && *(v + 1))
-				{
-					*v = ATTRNAME;
-					u = getrule(v);
-					*v = t;
-					if (!u) u = getrule(v + 1);
-				}
-				else u = getrule(v);
-				if (!u || !(u->property & P_attribute))
-					error(3, "%s: must be an attribute", v);
-				if (u->scan)
-				{
-					if (!a->scan) a->scan = u->scan;
-				}
-				else if (u->attribute)
-				{
-					a->attrprop = 1;
-					if (t == '-') a->attribute.clear |= u->attribute;
-					else a->attribute.set |= u->attribute;
-				}
-				else if (m = u->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_foreground|P_functional|P_ignore|P_implicit|P_local|P_make|P_multiple|P_parameter|P_repeat|P_terminal|P_virtual))
-				{
-					a->attrprop = 1;
-					if (t == '-') a->property.clear |= m;
-					else a->property.set |= m;
-				}
-			}
-			tokclose(n);
-			break;
-		case 'M':
-			if (a->map)
-			{
-				error(1, "%c: multiply defined", *(v - 1));
-				free(a->map);
-			}
-			a->map = strdup(v);
-			break;
-		case 'O':
-			for (;;)
-			{
-				switch (*v++)
-				{
-				case 0:
+				if (t == c)
 					break;
-				case 'X':
-					a->flags |= SCAN_nopropagate;
-					continue;
-				default:
-					error(1, "%c: invalid match option", *(v - 1));
-					continue;
+				if (t == '\\' && !(t = *s++))
+					break;
+				*n++ = t;
+			}
+			*n = 0;
+			if (!*v)
+				break;
+			switch (*v++)
+			{
+			case 'A':
+				n = tokopen(v, 1);
+				while (v = tokread(n))
+				{
+					if (((t = *v) == ATTRSET || t == ATTRCLEAR) && *(v + 1))
+					{
+						*v = ATTRNAME;
+						u = getrule(v);
+						*v = t;
+						if (!u)
+							u = getrule(v + 1);
+					}
+					else
+						u = getrule(v);
+					if (!u || !(u->property & P_attribute))
+						error(3, "%s: must be an attribute", v);
+					if (u->scan)
+					{
+						if (!a->scan)
+							a->scan = u->scan;
+					}
+					else if (u->attribute)
+					{
+						a->attrprop = 1;
+						if (t == '-')
+							a->attribute.clear |= u->attribute;
+						else
+							a->attribute.set |= u->attribute;
+					}
+					else if (m = u->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_foreground|P_functional|P_ignore|P_implicit|P_local|P_make|P_multiple|P_parameter|P_repeat|P_terminal|P_virtual))
+					{
+						a->attrprop = 1;
+						if (t == '-')
+							a->property.clear |= m;
+						else
+							a->property.set |= m;
+					}
+				}
+				tokclose(n);
+				break;
+			case 'M':
+				if (a->map)
+				{
+					error(1, "%c: multiply defined", *(v - 1));
+					free(a->map);
+				}
+				a->map = strdup(v);
+				break;
+			case 'O':
+				for (;;)
+				{
+					switch (*v++)
+					{
+					case 0:
+						break;
+					case 'X':
+						a->flags |= SCAN_nopropagate;
+						continue;
+					default:
+						error(1, "%c: invalid match option", *(v - 1));
+						continue;
+					}
+					break;
 				}
 				break;
+			case 'R':
+				if (a->script)
+				{
+					error(1, "%c: multiply defined", *(v - 1));
+					free(a->script);
+				}
+				a->script = strdup(v);
+				break;
+			default:
+				error(1, "%c: invalid match operation", *(v - 1));
+				break;
 			}
-			break;
-		case 'R':
-			if (a->script)
-			{
-				error(1, "%c: multiply defined", *(v - 1));
-				free(a->script);
-			}
-			a->script = strdup(v);
-			break;
-		default:
-			error(1, "%c: invalid match operation", *(v - 1));
-			break;
-		}
-	} while (t);
+		} while (t);
 }
 
 /*
@@ -361,13 +378,15 @@ scancompile(struct rule* r, int flags)
 	do
 	{
 		error_info.line++;
-		if (n = strchr(s, '\n')) *n++ = 0;
+		if (n = strchr(s, '\n'))
+			*n++ = 0;
 		switch (*s++)
 		{
 		case 0:
 			break;
 		case 'D':
-			if (!(ss->flags & SCAN_define)) break;
+			if (!(ss->flags & SCAN_define))
+				break;
 			/*FALLTHROUGH*/
 		case 'A':
 		case 'B':
@@ -422,7 +441,8 @@ scancompile(struct rule* r, int flags)
 					v = y = s;
 					while (t = *s++)
 					{
-						if (t == c || t == '\\' && !(t = *s++)) break;
+						if (t == c || t == '\\' && !(t = *s++))
+							break;
 						*y++ = t;
 					}
 					*y = 0;
@@ -485,7 +505,8 @@ scancompile(struct rule* r, int flags)
 			scanaction(ss->before, s);
 			break;
 		case 'X':
-			if (*s) s++;
+			if (*s)
+				s++;
 			if (ss->external)
 			{
 				error(1, "%s: external scan multiply defined", s - 1);
@@ -515,14 +536,17 @@ scancompile(struct rule* r, int flags)
 			a->pattern = n = s;
 			while (t = *s++)
 			{
-				if (t == c) break;
+				if (t == c)
+					break;
 				if (t == '\\')
 				{
-					if (!(t = *s++)) break;
+					if (!(t = *s++))
+						break;
 				}
 				else if (isspace(t))
 				{
-					if (n > a->pattern && *(n - 1) == SPC) continue;
+					if (n > a->pattern && *(n - 1) == SPC)
+						continue;
 					t = SPC;
 				}
 				else if (t == '%')
@@ -530,8 +554,10 @@ scancompile(struct rule* r, int flags)
 					i++;
 					t = ARG;
 				}
-				else if (t == '*') t = ANY;
-				else if (t == '@') t = REP;
+				else if (t == '*')
+					t = ANY;
+				else if (t == '@')
+					t = REP;
 				*n++ = t;
 			}
 			scanaction(a, s - 1);
@@ -540,8 +566,10 @@ scancompile(struct rule* r, int flags)
 			{
 			case 'A':
 			case 'I':
-				if (!i) error(3, "%% arg match missing from pattern [%s]", a->pattern);
-				if (i > SCANARGS) error(3, "too many %% arg matches in pattern [%s]", a->pattern);
+				if (!i)
+					error(3, "%% arg match missing from pattern [%s]", a->pattern);
+				if (i > SCANARGS)
+					error(3, "too many %% arg matches in pattern [%s]", a->pattern);
 				break;
 			}
 		}
@@ -596,7 +624,8 @@ scanquote(int fd, unsigned char* buf, unsigned char** p, register unsigned char*
 				}
 				if (!*t)
 				{
-					if (q->flags & QUOTE_single) goto accept;
+					if (q->flags & QUOTE_single)
+						goto accept;
 					e = *q->end;
 					y = g;
 					for (;;)
@@ -615,7 +644,8 @@ scanquote(int fd, unsigned char* buf, unsigned char** p, register unsigned char*
 	{
 		if (!*t)
 		{
-			if (c == '\n') g--;
+			if (c == '\n')
+				g--;
 			goto accept;
 		}
 		while (!(c = *g++))
@@ -697,22 +727,28 @@ scandefine(register char* s, struct list* p)
 	struct var*	v;
 	Sfio_t*		tmp;
 
-	while (isspace(*s)) s++;
+	while (isspace(*s))
+		s++;
 	t = s;
-	while (*s && istype(*s, C_ID1|C_ID2)) s++;
+	while (*s && istype(*s, C_ID1|C_ID2))
+		s++;
 	if (s > t)
 	{
 		c = *s;
 		*s = 0;
 		u = staterule(VAR, NiL, t, 1);
-		if (!(v = getvar(t))) v = setvar(t, null, 0);
+		if (!(v = getvar(t)))
+			v = setvar(t, null, 0);
 		*s = c;
 		b = t = s;
 		for (;;)
 		{
-			while (isspace(*s)) s++;
-			while (*s && !isspace(*s)) *t++ = *s++;
-			if (!*s) break;
+			while (isspace(*s))
+				s++;
+			while (*s && !isspace(*s))
+				*t++ = *s++;
+			if (!*s)
+				break;
 			*t++ = ' ';
 		}
 		for (z = t; z < s; *z++ = ' ');
@@ -724,7 +760,8 @@ scandefine(register char* s, struct list* p)
 			setvar(v->name, sfstruse(tmp), 0);
 			sfstrclose(tmp);
 		}
-		else setvar(v->name, b, 0);
+		else
+			setvar(v->name, b, 0);
 		if (!(u->mark & M_scan))
 		{
 			u->mark |= M_scan;
@@ -732,7 +769,8 @@ scandefine(register char* s, struct list* p)
 			v->property |= V_scan;
 			p = cons(u, p);
 		}
-		if (t < s) *t = ' ';
+		if (t < s)
+			*t = ' ';
 	}
 	return p;
 }
@@ -775,179 +813,196 @@ scanmacro(int fd, struct rule* r, struct scan* ss, register struct list* p)
 	}
 	tmp = sfstropen();
 	ifparen = inquote = paren = 0;
-	while ((c = sfgetc(fp)) != EOF) switch (c)
-	{
-	case ')':
-		if (!inquote)
+	while ((c = sfgetc(fp)) != EOF)
+		switch (c)
 		{
-			sfstrset(tmp, 0);
-			if (paren-- == ifparen) ifparen = 0;
-		}
-		break;
-
-	case '"':
-	case '#':
-	case '\n':
-		if (inquote == c)
-		{
-			inquote = 0;
-			sfstrset(tmp, 0);
-		}
-		else if (!inquote && c != '\n') inquote = c == '#' ? '\n' : c;
-		break;
-
-	case '\\':
-		sfstrset(tmp, 0);
-		sfgetc(fp);
-		break;
-
-	default:
-		if (!inquote)
-		{
-			if (!sfstrtell(tmp))
-			{
-				if (c == '(') paren++;
-				else if (istype(c, C_VARPOS1) && state.fullscan)
-				{
-					h = 1;
-					t = C_VARPOS1;
-					sfputc(tmp, c);
-				}
-				else if (istype(c, C_ID1|C_ID2))
-				{
-					h = 0;
-					t = C_ID1|C_ID2;
-					sfputc(tmp, c);
-				}
-			}
-			else
-			{
-				if (t != (C_ID1|C_ID2))
-				{
-					if (t == C_VARPOS8) t = C_ID1|C_ID2;
-					else t <<= 1;
-				}
-				if (istype(c, t)) sfputc(tmp, c);
-				else if (t == (C_ID1|C_ID2) || !istype(c, C_ID1|C_ID2))
-				{
-					w = sfstruse(tmp);
-					if (h && (v = getvar(w)) && (v->property & V_scan))
-					{
-						u = staterule(VAR, NiL, w, 1);
-						if (!(u->mark & M_scan))
-						{
-							u->mark |= M_scan;
-							p = cons(u, p);
-						}
-					}
-					if (c == '(')
-					{
-						paren++;
-						/*UNDENT*/
-	if (*w == 's')
-	{
-		dontcare = 1;
-		w++;
-	}
-	else dontcare = ifparen != 0;
-	if (*w == 'i')
-	{
-		if (!strcmp(w, "include"))
-		{
-			sfstrset(tmp, 0);
-			while ((c = sfgetc(fp)) != EOF && c != ')')
-				if (!isspace(c))
-					sfputc(tmp, c);
-			sfungetc(fp, c);
-			u = makerule(sfstruse(tmp));
-			if (!(u->mark & M_scan))
-			{
-				u->mark |= M_scan;
-				if (dontcare) u->property |= P_dontcare;
-				else if (!(u->property & P_target)) u->property &= ~P_dontcare;
-				if (ss->action && ss->action[1].attrprop && ss->action[1].type == 'I')
-				{
-					u->attribute &= ~ss->action[1].attribute.clear;
-					u->attribute |= ss->action[1].attribute.set;
-					u->property &= ~ss->action[1].property.clear;
-					u->property |= ss->action[1].property.set;
-				}
-				u->scan = r->scan;
-				staterule(RULE, u, NiL, 1)->scan = r->scan;
-				p = cons(u, p);
-			}
-		}
-		else if (!ifparen && (!strcmp(w, "ifdef") || !strcmp(w, "ifelse"))) ifparen = paren;
-	}
-	else if (*w == 'I' && !strcmp(w, "INCLUDE"))
-	{
-		do
-		{
-			sfstrset(tmp, 0);
-			while ((c = sfgetc(fp)) != EOF && c != ')' && c != ',')
-				if (!isspace(c))
-					sfputc(tmp, c);
-			u = makerule(sfstruse(tmp));
-			if (!(u->mark & M_scan))
-			{
-				u->mark |= M_scan;
-				if (dontcare) u->property |= P_dontcare;
-				else if (!(u->property & P_target)) u->property &= ~P_dontcare;
-				if (ss->action && ss->action[1].attrprop && ss->action[1].type == 'I')
-				{
-					u->attribute &= ~ss->action[1].attribute.clear;
-					u->attribute |= ss->action[1].attribute.set;
-					u->property &= ~ss->action[1].property.clear;
-					u->property |= ss->action[1].property.set;
-				}
-				u->scan = r->scan;
-				staterule(RULE, u, NiL, 1)->scan = r->scan;
-				p = cons(u, p);
-			}
-		} while (c == ',');
-		sfungetc(fp, c);
-	}
-	else if ((r->property & P_parameter) && *w == 'd' && !strcmp(w, "define"))
-	{
-		sfstrset(tmp, 0);
-		while ((c = sfgetc(fp)) != EOF && c != ',')
-			if (!isspace(c))
-				sfputc(tmp, c);
-		sfputc(tmp, ' ');
-		while (isspace(c = sfgetc(fp)));
-		if (c == '`') inquote = '\'';
-		else sfungetc(fp, c);
-		n = 1;
-		while ((c = sfgetc(fp)) != EOF && c != inquote)
-		{
+		case ')':
 			if (!inquote)
 			{
-				if (c == '(') n++;
-				else if (c == ')' && !n--) break;
+				sfstrset(tmp, 0);
+				if (paren-- == ifparen)
+					ifparen = 0;
 			}
-			else if (c == '#')
+			break;
+
+		case '"':
+		case '#':
+		case '\n':
+			if (inquote == c)
 			{
-				while ((c = sfgetc(fp)) != EOF && c != '\n');
-				continue;
+				inquote = 0;
+				sfstrset(tmp, 0);
 			}
-			sfputc(tmp, c);
-		}
-		inquote = 0;
-		p = scandefine(sfstruse(tmp), p);
-	}
-						/*INDENT*/
+			else if (!inquote && c != '\n')
+				inquote = c == '#' ? '\n' : c;
+			break;
+
+		case '\\':
+			sfstrset(tmp, 0);
+			sfgetc(fp);
+			break;
+
+		default:
+			if (!inquote)
+			{
+				if (!sfstrtell(tmp))
+				{
+					if (c == '(')
+						paren++;
+					else if (istype(c, C_VARPOS1) && state.fullscan)
+					{
+						h = 1;
+						t = C_VARPOS1;
+						sfputc(tmp, c);
+					}
+					else if (istype(c, C_ID1|C_ID2))
+					{
+						h = 0;
+						t = C_ID1|C_ID2;
+						sfputc(tmp, c);
 					}
 				}
 				else
 				{
-					h = 0;
-					t = C_ID1|C_ID2;
-					sfputc(tmp, c);
+					if (t != (C_ID1|C_ID2))
+					{
+						if (t == C_VARPOS8)
+							t = C_ID1|C_ID2;
+						else
+							t <<= 1;
+					}
+					if (istype(c, t))
+						sfputc(tmp, c);
+					else if (t == (C_ID1|C_ID2) || !istype(c, C_ID1|C_ID2))
+					{
+						w = sfstruse(tmp);
+						if (h && (v = getvar(w)) && (v->property & V_scan))
+						{
+							u = staterule(VAR, NiL, w, 1);
+							if (!(u->mark & M_scan))
+							{
+								u->mark |= M_scan;
+								p = cons(u, p);
+							}
+						}
+						if (c == '(')
+						{
+							paren++;
+							/*UNDENT*/
+		if (*w == 's')
+		{
+			dontcare = 1;
+			w++;
+		}
+		else
+			dontcare = ifparen != 0;
+		if (*w == 'i')
+		{
+			if (!strcmp(w, "include"))
+			{
+				sfstrset(tmp, 0);
+				while ((c = sfgetc(fp)) != EOF && c != ')')
+					if (!isspace(c))
+						sfputc(tmp, c);
+				sfungetc(fp, c);
+				u = makerule(sfstruse(tmp));
+				if (!(u->mark & M_scan))
+				{
+					u->mark |= M_scan;
+					if (dontcare)
+						u->property |= P_dontcare;
+					else if (!(u->property & P_target))
+						u->property &= ~P_dontcare;
+					if (ss->action && ss->action[1].attrprop && ss->action[1].type == 'I')
+					{
+						u->attribute &= ~ss->action[1].attribute.clear;
+						u->attribute |= ss->action[1].attribute.set;
+						u->property &= ~ss->action[1].property.clear;
+						u->property |= ss->action[1].property.set;
+					}
+					u->scan = r->scan;
+					staterule(RULE, u, NiL, 1)->scan = r->scan;
+					p = cons(u, p);
 				}
 			}
+			else if (!ifparen && (!strcmp(w, "ifdef") || !strcmp(w, "ifelse")))
+				ifparen = paren;
 		}
-		break;
-	}
+		else if (*w == 'I' && !strcmp(w, "INCLUDE"))
+		{
+			do
+			{
+				sfstrset(tmp, 0);
+				while ((c = sfgetc(fp)) != EOF && c != ')' && c != ',')
+					if (!isspace(c))
+						sfputc(tmp, c);
+				u = makerule(sfstruse(tmp));
+				if (!(u->mark & M_scan))
+				{
+					u->mark |= M_scan;
+					if (dontcare)
+						u->property |= P_dontcare;
+					else if (!(u->property & P_target))
+						u->property &= ~P_dontcare;
+					if (ss->action && ss->action[1].attrprop && ss->action[1].type == 'I')
+					{
+						u->attribute &= ~ss->action[1].attribute.clear;
+						u->attribute |= ss->action[1].attribute.set;
+						u->property &= ~ss->action[1].property.clear;
+						u->property |= ss->action[1].property.set;
+					}
+					u->scan = r->scan;
+					staterule(RULE, u, NiL, 1)->scan = r->scan;
+					p = cons(u, p);
+				}
+			} while (c == ',');
+			sfungetc(fp, c);
+		}
+		else if ((r->property & P_parameter) && *w == 'd' && !strcmp(w, "define"))
+		{
+			sfstrset(tmp, 0);
+			while ((c = sfgetc(fp)) != EOF && c != ',')
+				if (!isspace(c))
+					sfputc(tmp, c);
+			sfputc(tmp, ' ');
+			while (isspace(c = sfgetc(fp)));
+			if (c == '`')
+				inquote = '\'';
+			else
+				sfungetc(fp, c);
+			n = 1;
+			while ((c = sfgetc(fp)) != EOF && c != inquote)
+			{
+				if (!inquote)
+				{
+					if (c == '(')
+						n++;
+					else if (c == ')' && !n--)
+						break;
+				}
+				else if (c == '#')
+				{
+					while ((c = sfgetc(fp)) != EOF && c != '\n');
+					continue;
+				}
+				sfputc(tmp, c);
+			}
+			inquote = 0;
+			p = scandefine(sfstruse(tmp), p);
+		}
+							/*INDENT*/
+						}
+					}
+					else
+					{
+						h = 0;
+						t = C_ID1|C_ID2;
+						sfputc(tmp, c);
+					}
+				}
+			}
+			break;
+		}
 	sfstrclose(tmp);
 	sfsetfd(fp, -1);
 	sfclose(fp);
@@ -1198,7 +1253,8 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 					memcpy(buf + SCANBUFFER - c, b, c);
 					b = buf + SCANBUFFER - c;
 				}
-				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0) goto done;
+				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
+					goto done;
 				g[c] = 0;
 			}
 			for (;;)
@@ -1221,9 +1277,11 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 					}
 				}
 #if DEBUG
-				if (!(state.questionable & 0x00000020)) h = 1;
+				if (!(state.questionable & 0x00000020))
+					h = 1;
 #endif
-				if (c == '\n') break;
+				if (c == '\n')
+					break;
 				h = 1;
 			}
 			else if (!c)
@@ -1234,23 +1292,28 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 					memcpy(buf + SCANBUFFER - c, b, c);
 					b = buf + SCANBUFFER - c;
 				}
-				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0) goto done;
+				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
+					goto done;
 				g[c] = 0;
 			}
 			else if (ss->type[c] & (t = (m ? (QUOTE_blank|QUOTE_comment|QUOTE_quote) : QUOTE_comment)))
 			{
-				if ((x = scanquote(fd, buf, &b, g, ss->quote, t)) == g) break;
+				if ((x = scanquote(fd, buf, &b, g, ss->quote, t)) == g)
+					break;
 				g = x;
-				if (ss->type[c] & QUOTE_comment) h = 1;
+				if (ss->type[c] & QUOTE_comment)
+					h = 1;
 			}
-			else if (!m) break;
+			else if (!m)
+				break;
 			c = *g++;
 		}
 		s = s + *(s + 1) + 1;
 		if (!h && !rep && (*s == ANY || *s == ARG || *s == 0))
 		{
 #if DEBUG
-			if ((state.test & 0x00000080) && *s == 0) error(2, "scanexec: HIT *s==0");
+			if ((state.test & 0x00000080) && *s == 0)
+				error(2, "scanexec: HIT *s==0");
 #endif
 			m = 0;
 			collect = 0;
@@ -1262,11 +1325,11 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 		if (pop < &any[elementsof(any)])
 		{
 			pop->arg = n;
-			pop->state = s + *(s + 1) + 1;
-			pop->buffer = g - 1;
+			pop->state = s;
+			pop->buffer = g;
 			pop++;
 		}
-		s += 2;
+		s += *(s + 1) + 1;
 	}
 	else if (*s == ARG)
 	{
@@ -1287,20 +1350,25 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				x = b + arg[0].begin;
 				while (x < g)
 				{
-					if (*per == SPC) while (x < g && isspace(*x)) x++;
+					if (*per == SPC)
+						while (x < g && isspace(*x))
+							x++;
 					else
 					{
-						if (*x != *per) break;
+						if (*x != *per)
+							break;
 						x++;
 					}
 					per += *(per + 1) + 1;
 				}
-				if (x >= g) break;
+				if (x >= g)
+					break;
 			}
 			for (s = per; *s; s = s + *(s + 1) + 1);
 			goto rephit;
 		}
-		else rep = s = s + *(s + 1) + 1;
+		else
+			rep = s = s + *(s + 1) + 1;
 	}
 	else if (*s == 0)
 	{
@@ -1321,12 +1389,15 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 		}
 		if (c == '\n')
 		{
-			if (per || rep && *rep != ARG && (*rep != SPC || *(rep + *(rep + 1) + 1) != ARG) && (!hit || n)) g++;
-			else rep = 0;
+			if (per || rep && *rep != ARG && (*rep != SPC || *(rep + *(rep + 1) + 1) != ARG) && (!hit || n))
+				g++;
+			else
+				rep = 0;
 		}
 		if (*++s && (!n || arg[0].begin < arg[0].end))
 		{
-			if (rep) hit += n;
+			if (rep)
+				hit += n;
 			if (n < elementsof(arg))
 			{
 				arg[n].begin = arg[n].end = g - b - 1;
@@ -1339,7 +1410,8 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 			while (c < elementsof(arg))
 				arg[c++].begin = arg[n - 1].begin;
 #if DEBUG
-			if (state.test & 0x00000080) error(2, "scanexec: %s: %c n=%d \"%s\" \"%s\"", r->name, ss->action[*s].type, n - 1, b + arg[0].begin, b + arg[1].begin);
+			if (state.test & 0x00000080)
+				error(2, "scanexec: %s: %c n=%d \"%s\" \"%s\"", r->name, ss->action[*s].type, n - 1, b + arg[0].begin, b + arg[1].begin);
 #endif
 			a = null;
 			switch (ss->action[*s].type)
@@ -1353,7 +1425,8 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 						date = tmdate((char*)b + arg[1].begin, NiL, NiL);
 					addfile(state.archive, (char*)b + arg[0].begin, date);
 				}
-				else error(2, "%s: `A' scan pattern for non-%s", r->name, internal.archive->name);
+				else
+					error(2, "%s: `A' scan pattern for non-%s", r->name, internal.archive->name);
 				a = (char*)b + arg[0].begin;
 				break;
 			case 'B':
@@ -1376,7 +1449,8 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 		}
 		else
 		{
-			if (hit) rep = 0;
+			if (hit)
+				rep = 0;
 			if (pop > any)
 			{
 				pop--;
@@ -1389,7 +1463,8 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 		if (rep)
 		{
 			s = rep;
-			if ((b = --g) == pb) goto done;
+			if ((b = --g) == pb)
+				goto done;
 			pb = b;
 			n = 0;
 			goto next;
@@ -1410,7 +1485,8 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 		s = s + *s;
 		goto next;
 	}
-	else s++;
+	else
+		s++;
 				/*INDENT*/
 			}
 			g = b;
@@ -1421,12 +1497,14 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 		{
 			if (!c)
 			{
-				if ((c = read(fd, b = g = buf + SCANBUFFER, SCANBUFFER)) <= 0) goto done;
+				if ((c = read(fd, b = g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
+					goto done;
 				g[c] = 0;
 			}
 			else if (x[c] & (QUOTE_comment|QUOTE_quote))
 			{
-				if (g - 2 >= b) b = g - 2;
+				if (g - 2 >= b)
+					b = g - 2;
 				g = scanquote(fd, buf, &b, g, ss->quote, QUOTE_comment|QUOTE_quote);
 			}
 			else if (n && istype(c, C_ID1))
@@ -1452,17 +1530,21 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 							memcpy(buf + SCANBUFFER - c, b, c);
 							b = buf + SCANBUFFER - c;
 						}
-						if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0) goto done;
+						if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
+							goto done;
 						g[c] = 0;
 					}
 					if (t != (C_ID1|C_ID2))
 					{
-						if (t == C_VARPOS8) t = C_ID1|C_ID2;
-						else t <<= 1;
+						if (t == C_VARPOS8)
+							t = C_ID1|C_ID2;
+						else
+							t <<= 1;
 					}
 					if (!istype(c, t))
 					{
-						if (t == (C_ID1|C_ID2) || !istype(c, C_ID1|C_ID2)) break;
+						if (t == (C_ID1|C_ID2) || !istype(c, C_ID1|C_ID2))
+							break;
 						t = C_ID1|C_ID2;
 						h = 0;
 					}
@@ -1506,7 +1588,8 @@ scan(register struct rule* r, unsigned long* tm)
 	struct scan*		ss;
 	int			fd;
 
-	if (tm) *tm = 0;
+	if (tm)
+		*tm = 0;
 	if ((r->property & (P_attribute|P_state|P_virtual)) || !(r->dynamic & D_regular))
 		return 0;
 	s = staterule(RULE, r, NiL, 1);
@@ -1522,7 +1605,8 @@ scan(register struct rule* r, unsigned long* tm)
 		alt->property &= ~P_implicit;
 		alt = 0;
 	}
-	if (r->scan < SCAN_USER) ss = 0;
+	if (r->scan < SCAN_USER)
+		ss = 0;
 	else
 	{
 		if (!strategy[r->scan])
@@ -1533,16 +1617,19 @@ scan(register struct rule* r, unsigned long* tm)
 					strategy[r->scan] = scancompile(p->rule, (r->property & P_parameter) ? SCAN_define : 0);
 					break;
 				}
-			if (!p) error(3, "%s: invalid scan index %d", r->name, r->scan);
+			if (!p)
+				error(3, "%s: invalid scan index %d", r->name, r->scan);
 		}
 		ss = strategy[r->scan];
 	}
 	r->dynamic |= D_scanned;
-	if (s->dynamic & D_scanned) return s->prereqs;
+	if (s->dynamic & D_scanned)
+		return s->prereqs;
 	oprereqs = s->prereqs;
 	if (ss)
 	{
-		if (!(r->property & P_accept) && !state.accept && !((s->property | (alt ? alt->property : 0L)) & P_force) && r->scan == s->scan) ss = 0;
+		if (!(r->property & P_accept) && !state.accept && !((s->property | (alt ? alt->property : 0L)) & P_force) && r->scan == s->scan)
+			ss = 0;
 		else if ((fd = ropen(r->name, O_RDONLY)) < 0)
 		{
 			if (state.exec && !(r->property & P_dontcare))
@@ -1568,11 +1655,13 @@ scan(register struct rule* r, unsigned long* tm)
 		alt->scan = s->scan;
 		if (alt->prereqs != r->prereqs)
 		{
-			if ((r->property & (P_joint|P_target)) != (P_joint|P_target)) freelist(alt->prereqs);
+			if ((r->property & (P_joint|P_target)) != (P_joint|P_target))
+				freelist(alt->prereqs);
 			alt->prereqs = r->prereqs;
 		}
 	}
-	else s->attribute = r->attribute;
+	else
+		s->attribute = r->attribute;
 	if (ss)
 	{
 		if (ss->after)

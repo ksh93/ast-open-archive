@@ -714,8 +714,3 @@ portable(const char* s)
 			return 0;
 	return 1;
 }
-#if __OBSOLETE__ < 20010101
-#define Value_t		Sfkey_value_t
-#undef	REG_SUB_STOP
-#include "../../lib/libast/disc/sfkeyprintf.c"
-#endif

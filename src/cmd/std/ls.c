@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2001-01-31 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2001-06-06 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -184,6 +184,8 @@ USAGE_LICENSE
 "	follow. The default is determined by \bgetconf PATH_RESOLVE\b.]"
 "[P:physical?Don't follow symbolic links. The default is determined by"
 "	\bgetconf PATH_RESOLVE\b.]"
+"[101:dump?Print the generated \b--format\b string on the standard output"
+"	and exit.]"
 
 "\n"
 "\n[ file ... ]\n"
@@ -237,9 +239,9 @@ USAGE_LICENSE
 #define KEY_devmajor		5
 #define KEY_devminor		6
 #define KEY_dir_blocks		7
-#define KEY_dir_count		8
-#define KEY_dir_files		9
-#define KEY_dir_octets		10
+#define KEY_dir_bytes		8
+#define KEY_dir_count		9
+#define KEY_dir_files		10
 #define KEY_flags		11
 #define KEY_gid			12
 #define KEY_header		13
@@ -256,8 +258,8 @@ USAGE_LICENSE
 #define KEY_size		24
 #define KEY_summary		25
 #define KEY_total_blocks	26
-#define KEY_total_files		27
-#define KEY_total_octets	28
+#define KEY_total_bytes		27
+#define KEY_total_files		28
 #define KEY_trailer		29
 #define KEY_uid			30
 
@@ -267,8 +269,8 @@ USAGE_LICENSE
 typedef struct				/* dir/total counts		*/
 {
 	unsigned long	blocks;		/* number of blocks		*/
+	unsigned long	bytes;		/* number of bytes		*/
 	unsigned long	files;		/* number of files		*/
-	unsigned long	octets;		/* number of octets		*/
 } Count_t;
 
 typedef struct				/* sfkeyprintf() keys		*/
@@ -325,9 +327,9 @@ static Key_t	keys[] =
 	{ "devmajor",		KEY_devmajor		},
 	{ "devminor",		KEY_devminor		},
 	{ "dir.blocks",		KEY_dir_blocks		},
+	{ "dir.bytes",		KEY_dir_bytes		},
 	{ "dir.count",		KEY_dir_count		},
 	{ "dir.files",		KEY_dir_files		},
-	{ "dir.octets",		KEY_dir_octets		},
 	{ "flags",		KEY_flags		},
 	{ "gid",		KEY_gid			},
 	{ "header",		KEY_header, 0, DEF_header },
@@ -344,16 +346,16 @@ static Key_t	keys[] =
 	{ "size",		KEY_size		},
 	{ "summary",		KEY_summary		},
 	{ "total.blocks",	KEY_total_blocks	},
+	{ "total.bytes",	KEY_total_bytes		},
 	{ "total.files",	KEY_total_files		},
-	{ "total.octets",	KEY_total_octets	},
 	{ "trailer",		KEY_trailer		},
 	{ "uid",		KEY_uid			},
 
 	/* aliases */
 
-	{ "dir.bytes",		KEY_dir_octets		},
+	{ "dir.octets",		KEY_dir_bytes		},
 	{ "linkname",		KEY_linkpath		},
-	{ "total.bytes",	KEY_total_octets	},
+	{ "total.octets",	KEY_total_bytes		},
 };
 
 static State_t		state;
@@ -396,10 +398,6 @@ printable(register char* s)
 	*t = 0;
 	return prdata;
 }
-
-#if __OBSOLETE__ < 20020101
-#include "../../lib/libast/string/fmtscale.c"
-#endif
 
 /*
  * sfkeyprintf() lookup
@@ -487,6 +485,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		if (lp)
 			n = lp->count.blocks;
 		break;
+	case KEY_dir_bytes:
+		if (lp)
+			n = lp->count.bytes;
+		break;
 	case KEY_dir_count:
 		if (ftw != state.top)
 		{
@@ -499,10 +501,6 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	case KEY_dir_files:
 		if (lp)
 			n = lp->count.files;
-		break;
-	case KEY_dir_octets:
-		if (lp)
-			n = lp->count.octets;
 		break;
 	case KEY_environ:
 		if (!(s = kp->macro))
@@ -622,11 +620,11 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	case KEY_total_blocks:
 		n = state.total.blocks;
 		break;
+	case KEY_total_bytes:
+		n = state.total.bytes;
+		break;
 	case KEY_total_files:
 		n = state.total.files;
-		break;
-	case KEY_total_octets:
-		n = state.total.octets;
 		break;
 	case KEY_uid:
 		if (st)
@@ -915,8 +913,8 @@ dir(register Ftw_t* ftw)
 		state.top = ftw;
 	length = 0;
 	list.count.blocks = 0;
+	list.count.bytes = 0;
 	list.count.files = 0;
-	list.count.octets = 0;
 	for (p = ftw->link; p; p = p->link)
 	{
 		if (p->level == 0 && p->info == FTW_D && !(state.lsflags & LS_DIRECTORY))
@@ -940,7 +938,7 @@ dir(register Ftw_t* ftw)
 			else
 			{
 				list.count.blocks += BLOCKS(&p->statb);
-				list.count.octets += p->statb.st_size;
+				list.count.bytes += p->statb.st_size;
 			}
 			list.count.files++;
 			if (p->namelen > length)
@@ -956,8 +954,8 @@ dir(register Ftw_t* ftw)
 		}
 	}
 	state.total.blocks += list.count.blocks;
+	state.total.bytes += list.count.bytes;
 	state.total.files += list.count.files;
-	state.total.octets += list.count.octets;
 	col(&list, ftw, length);
 	state.lsflags |= LS_SEPARATE;
 	if (top)
@@ -1040,6 +1038,7 @@ main(int argc, register char** argv)
 	register char*	s;
 	Key_t*		kp;
 	Sfio_t*		fmt;
+	int		dump = 0;
 
 	static char	fmt_color[] = "%(mode:case:d*:\\E[01;34m%(name)s\\E[0m:l*:\\E[01;36m%(name)s\\E[0m:*x*:\\E[01;32m%(name)s\\E[0m:*:%(name)s)s";
 
@@ -1368,6 +1367,9 @@ main(int argc, register char** argv)
 		case '1':
 			state.lsflags &= ~(LS_COLUMNS|LS_PRINTABLE);
 			break;
+		case -101:
+			dump = 1;
+			break;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
 			break;
@@ -1439,6 +1441,11 @@ main(int argc, register char** argv)
 	else
 		sfstrrel(fmt, -1);
 	state.format = sfstruse(fmt);
+	if (dump)
+	{
+		sfprintf(sfstdout, "%s\n", state.format);
+		exit(0);
+	}
 	stresc(state.format);
 
 	/*
@@ -1458,6 +1465,3 @@ main(int argc, register char** argv)
 		sfkeyprintf(sfstdout, NiL, keys[KEY_summary].macro, key, NiL);
 	exit(error_info.errors != 0);
 }
-#if __OBSOLETE__ < 20010101
-#include "../../lib/libast/disc/sfkeyprintf.c"
-#endif

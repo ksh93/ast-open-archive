@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ps (AT&T Labs Research) 2001-01-01 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2001-06-06 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -249,27 +249,33 @@ typedef struct				/* program state		*/
 	char		buf[1024];	/* work buffer			*/
 } State_t;
 
-#ifndef _mem_pr_clname_prpsinfo
+#if defined(_PS_dir) && !defined(_mem_pr_clname_prpsinfo)
+#undef	_mem_pr_clname_prpsinfo
 #define _mem_pr_clname_prpsinfo		0
 #endif
 
-#ifndef _mem_pr_lttydev_prpsinfo
+#if defined(_PS_dir) && !defined(_mem_pr_lttydev_prpsinfo)
+#undef	_mem_pr_lttydev_prpsinfo
 #define _mem_pr_lttydev_prpsinfo	0
 #endif
 
-#ifndef _mem_pr_ntpid_prpsinfo
+#if defined(_PS_dir) && !defined(_mem_pr_ntpid_prpsinfo)
+#undef	_mem_pr_ntpid_prpsinfo
 #define _mem_pr_ntpid_prpsinfo		0
 #endif
 
-#ifndef _mem_pr_psargs_prpsinfo
+#if defined(_PS_dir) && !defined(_mem_pr_psargs_prpsinfo)
+#undef	_mem_pr_psargs_prpsinfo
 #define _mem_pr_psargs_prpsinfo		0
 #endif
 
-#ifndef _mem_pr_refcount_prpsinfo
+#if defined(_PS_dir) && !defined(_mem_pr_refcount_prpsinfo)
+#undef	_mem_pr_refcount_prpsinfo
 #define _mem_pr_refcount_prpsinfo	0
 #endif
 
-#ifndef _mem_pr_tgrp_prpsinfo
+#if defined(_PS_dir) && !defined(_mem_pr_tgrp_prpsinfo)
+#undef	_mem_pr_tgrp_prpsinfo
 #define _mem_pr_tgrp_prpsinfo		0
 #endif
 
@@ -749,7 +755,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			if (PR_ZOMBIE(&pp->ps))
 				goto zombie;
 			n = (long)pp->ps.pr_addr;
-			goto hex;
+			goto number;
 #if _mem_pr_clname_prpsinfo
 		case KEY_class:
 			if (PR_ZOMBIE(&pp->ps))
@@ -766,11 +772,11 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			sfprintf(state.tmp, _PS_path_num, pp->ps.pr_pid, _PS_args);
 			if ((i = open(sfstruse(state.tmp), O_RDONLY)) >= 0)
 			{
-				n = read(i, state.tmp->data, state.tmp->size - 1);
+				n = read(i, sfstrbase(state.tmp), sfstrsize(state.tmp) - 1);
 				close(i);
 				if (n > 0)
 				{
-					s = state.tmp->data;
+					s = sfstrbase(state.tmp);
 					for (i = 0; i < n; i++)
 						if (!s[i])
 							s[i] = ' ';
@@ -808,7 +814,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			break;
 		case KEY_flags:
 			n = pp->ps.pr_flag & 0xff;
-			goto hex;
+			goto number;
 		case KEY_gid:
 			n = pp->ps.pr_gid;
 			goto number;
@@ -823,7 +829,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 #if _mem_pr_ntpid_prpsinfo
 		case KEY_ntpid:
 			n = pp->ps.pr_ntpid;
-			goto hex;
+			goto number;
 #endif
 		case KEY_pgrp:
 			n = pp->ps.pr_pgrp;
@@ -907,7 +913,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			if (PR_ZOMBIE(&pp->ps))
 				goto zombie;
 			n = (long)pp->ps.pr_wchan;
-			goto hex;
+			goto number;
 		default:
 			return 0;
 		zombie:
@@ -918,12 +924,12 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			s = sfstruse(state.tmp);
 			break;
 		number:
-			if (!state.hex || !kp->hex)
-				break;
-		hex:
-			fp->fmt = 'x';
-			if (!kp->hex)
-				fp->flags |= SFFMT_ZERO;
+			if (state.hex)
+			{
+				fp->fmt = 'x';
+				if (!kp->hex)
+					fp->flags |= SFFMT_ZERO;
+			}
 			break;
 		}
 		if (s)
@@ -982,11 +988,11 @@ ps(Ps_t* pp)
 			sfprintf(state.tmp, _PS_path_num, pr->pr_pid, _PS_args);
 			if ((i = open(sfstruse(state.tmp), O_RDONLY)) >= 0)
 			{
-				n = read(i, state.tmp->data, state.tmp->size - 1);
+				n = read(i, sfstrbase(state.tmp), sfstrsize(state.tmp) - 1);
 				close(i);
 				if (n > 0)
 				{
-					s = state.tmp->data;
+					s = sfstrbase(state.tmp);
 					for (i = 0; i < n; i++)
 						if (!s[i])
 							s[i] = ' ';
@@ -1395,7 +1401,7 @@ addpid(register char* s, int must, int verbose)
 				error(ERROR_SYSTEM|2, "%s: cannot get process info", t);
 				return;
 			}
-			if (must <= 0)
+			if (must <= 0 && (!state.tree || !state.all))
 			{
 				if (state.controlled)
 				{
@@ -1773,7 +1779,7 @@ main(int argc, register char** argv)
 			state.verbose = 1;
 			continue;
 		case 'x':
-			state.detached = -1;
+			state.detached = state.leader = -1;
 			continue;
 		case 'C':
 			if (n = regcomp(&state.re, opt_info.arg, REG_AUGMENTED))

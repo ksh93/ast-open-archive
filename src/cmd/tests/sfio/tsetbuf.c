@@ -22,9 +22,6 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *******************************************************************/
 #include	"sftest.h"
-#ifdef SF_APPEND
-#undef SF_APPEND
-#endif
 
 #if _hdr_stat
 #include	<stat.h>

@@ -52,7 +52,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2001-02-06 $\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2001-06-01 $\0\n";
 
 #include "pplib.h"
 
@@ -120,7 +120,8 @@ struct ppglobals pp =
 	ALLMULTIPLE|CATLITERAL,		/* mode				*/
 	PREFIX,				/* option			*/
 	0,				/* test				*/
-	0,				/* filedeps			*/
+	0,				/* filedeps.sp			*/
+	0,				/* filedeps.flags		*/
 	&firstdir,			/* firstdir			*/
 	&firstdir,			/* lastdir			*/
 	0,				/* hide				*/

@@ -133,7 +133,14 @@ struct edit
 #define	UKILL	-5			/* user kill char synonym */
 #define	UQUIT	-6			/* user quit char synonym */
 
-#define	cntl(x)		(x&037)
+#if ( 'a' == 97) /* ASCII? */
+#   define	cntl(x)		(x&037)
+#else
+#   define cntl(c) (c=='D'?55:(c=='E'?45:(c=='F'?46:(c=='G'?'\a':(c=='H'?'\b': \
+		(c=='I'?'\t':(c=='J'?'\n':(c=='T'?60:(c=='U'?61:(c=='V'?50: \
+		(c=='W'?38:(c=='Z'?63:(c=='['?39:(c==']'?29: \
+		(c<'J'?c+1-'A':(c+10-'J'))))))))))))))))
+#endif
 
 #ifndef KSHELL
 #   define STRIP	0377

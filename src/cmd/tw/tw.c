@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2001-02-06 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2001-05-02 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -515,7 +515,7 @@ main(int argc, register char** argv)
 		{
 		case 'a':
 			args = opt_info.arg;
-			state.cmdflags |= CMD_INSERT;
+			state.cmdflags |= CMD_POST;
 			continue;
 		case 'c':
 			if ((count = opt_info.num) < 0)

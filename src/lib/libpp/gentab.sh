@@ -36,13 +36,16 @@
 #	%sequence [ prefix=<prefix> ] [ index=<index> ] [ init=<init> ]
 #
 
-one=1
-if	test one -eq 1 2>/dev/null
-then	shell=ksh
+num=1
+((num=num+1))
+case $num in
+2)	shell=ksh
 	typeset -u ID
 	typeset -i counter err_line
-else	shell=bsh
-fi
+	;;
+*)	shell=bsh
+	;;
+esac
 command=$0
 counter=0
 define=1
@@ -151,8 +154,8 @@ do	case $shell in
 			;;
 		*)	eval value=\$$index
 			case $value in
-			"")	counter=$init ;;
-			[0-9]*) counter=$value ;;
+			"")		counter=$init ;;
+			[0123456789]*)	counter=$value ;;
 			esac
 			;;
 		esac
@@ -165,14 +168,14 @@ do	case $shell in
 			"")	break
 				;;
 			*)	case $shell in
-				ksh)	ID=${1#[!a-zA-Z_]} ;;
-				*)	ID=`echo $1 | tr '[a-z]' '[A-Z]' | sed 's/^[^A-Z_]//'` ;;
+				ksh)	ID=${1#[!abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_]} ;;
+				*)	ID=`echo $1 | tr abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ | sed 's/^[^ABCDEFGHIJKLMNOPQRSTUVWXYZ_]//'` ;;
 				esac
 				case $type in
 				%flags)	if	test $define = 1
 					then	case $counter in
 						32) echo "$command: ${err_file}line $err_line: warning: $1: too many flag bits" >&2 ;;
-						1[5-9]|[23][0-9]) long=L ;;
+						1[56789]|[23][0123456789]) long=L ;;
 						*) long= ;;
 						esac
 						echo "#define $prefix$ID	(1$long<<$counter)"

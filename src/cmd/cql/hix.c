@@ -30,7 +30,7 @@
  * hash index file implementation
  */
 
-static const char ID[] = "\n@(#)$Id: hix (AT&T Research) 2001-01-01 $\0\n";
+static const char ID[] = "\n@(#)$Id: hix (AT&T Research) 2001-02-14 $\0\n";
 
 #include <sfio_t.h>
 #include <ast.h>
@@ -901,7 +901,7 @@ hixopen(const char* primary, const char* secondary, const char* info, int* id, H
 	if (!(hix = newof(0, Hix_t, 1, (m - 1) * sizeof(int) + (n + 1) * sizeof(int*))) || !(hix->part = hix->parts = newof(0, Part_t, 1, (n - 1) * sizeof(Index_t))))
 		return 0;
 	hix->disc = disc;
-	hix->flags = disc->flags & (HIX_LOCAL|HIX_READONLY|HIX_TEST1|HIX_TEST2|(~(HIX_USER-1)));
+	hix->flags = disc->flags & (HIX_LOCAL|HIX_READONLY|HIX_REGENERATE|HIX_TEST1|HIX_TEST2|(~(HIX_USER-1)));
 	hix->indices = n;
 	hix->gen = (int*)&hix->map[m];
 	for (k = 0, i = VIR_primary; i <= VIR_last; i <<= 1)
@@ -1066,6 +1066,11 @@ hixopen(const char* primary, const char* secondary, const char* info, int* id, H
 					if (x->header.stamp && x->header.stamp != hix->part->stamp)
 					{
 						message((-5, "hix: %s: update: vio header stamp %s mismatch: expected %s", buf, fmttime("%K", x->header.stamp), fmttime("%K", hix->part->stamp)));
+						goto update;
+					}
+					if (disc->flags & HIX_REGENERATE)
+					{
+						message((-5, "hix: %s: update: forced index regeneration", buf));
 						goto update;
 					}
 				}

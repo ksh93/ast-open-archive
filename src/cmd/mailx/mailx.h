@@ -675,6 +675,7 @@ typedef struct {
 	char*	headerbotch;
 	char*	hold;
 	char*	home;
+	char*	hostname;
 	char*	ignore;
 	char*	ignoreeof;
 	char*	imap;

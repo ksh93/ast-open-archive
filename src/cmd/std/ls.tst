@@ -8,7 +8,7 @@ VIEW data y2k.dat
 
 function DATA
 {
-	pax -o 'nosummary' -rf $data
+	pax --nosummary --from=ascii -rf $data
 }
 
 TEST 01 'down to the second'

@@ -1,3 +1,24 @@
+01-06-08 ps: option `-' is optional for ancient compatibility
+01-06-06 ls: drop octets for bytes -- yay
+01-05-25 locale: -m runs local locale until the standard comes to its senses
+	 locale: add --element to list collation element weights
+01-04-20 df: --man now says --scale is the CONFORMANCE!=standard default
+01-04-17 date,rm: move to -lcmd
+01-04-01 locale: fix LC_ALL listing
+01-03-23 tsort: fix typo that goofed up $'b c\na c\na b'
+01-03-22 ps: %(ntpid)d takes precedence over hex attribute
+01-03-17 date: update --man for tmfmt() changes
+	 locale: add with regression test
+01-03-09 df: fix cannot stat filesystem typo
+01-03-05 ls: add --dump to dump generated --format string
+01-03-01 ps: fix iffe logic that disabled too much for /proc synthesis
+	 ps: fix -T -p that missed some children
+	 ps: fix -x to include session leaders
+01-02-14 ps: disable some iffe results for synthesized /proc structs
+	 ps: use sfstrbase() and sfstrsize() instead of member names
+	 mount: define NGROUPS for freebsd -- how does <sys/ucred.h> make it?
+	 df: add scaled sizes, no sync(2) unless -s,--sync
+	 df: add statvfs() timeout for good ol NFS
 01-01-31 ls: handle --sort=size
 01-01-01 ps: change (-x,--hex)=>(-X,--hex), add (-x,--detached)
 	 ls: really ignore --tabs, add --quote-style --scale, --thousands

@@ -10,8 +10,6 @@ RM = $(STDRM)
 
 banner :: banner.c LICENSE=since=1989,author=dgk
 
-date :: date.1 date.c
-
 dd :: dd.c
 
 df :: df.c
@@ -22,6 +20,8 @@ file :: file.c
 
 iconv :: iconv.c
 
+locale :: locale.c
+
 ls :: ls.c
 
 mesg :: mesg.c LICENSE=since=1995,author=dgk
@@ -29,8 +29,6 @@ mesg :: mesg.c LICENSE=since=1995,author=dgk
 $(PACKAGE_LOCAL)mount :: mount.1 mount.c LICENSE=since=1998,author=gsf
 
 $(PACKAGE_LOCAL)ps :: ps.1 ps.c LICENSE=since=1998,author=gsf
-
-rm :: rm.c
 
 shar :: shar.sh LICENSE=since=1999,author=dgk
 
@@ -52,6 +50,6 @@ unexpand :: unexpand.c LICENSE=since=1995,author=dgk
 
 expand :LINK: unexpand
 
-:TEST: date ls sum touch tsort
+:TEST: locale ls sum touch tsort
 
 :: y2k.dat

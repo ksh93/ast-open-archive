@@ -234,7 +234,6 @@ unsigned nchar;				/* number of chars to read */
 	genchar Ubuf[MAXLINE];	/* used for U command */
 	genchar ubuf[MAXLINE];	/* used for u command */
 	genchar Window[WINDOW+10];	/* window image */
-	char cntl_char;			/* 1 if control character present */
 	int Globals[9];			/* local global variables */
 	int	esc_or_hang = 0;	/* <ESC> or hangup */
 #ifndef FIORDCHK
@@ -319,6 +318,13 @@ unsigned nchar;				/* number of chars to read */
 			term_char = shbuf[--i];
 			if( term_char == '\r' )
 				term_char = '\n';
+#if !defined(VEOL2) && !defined(ECHOCTL)
+			if(term_char=='\n')
+			{
+				tty_cooked(ERRIO);
+				return(i+1);
+			}
+#endif
 			if( term_char=='\n' || term_char==usreof )
 			{
 				/*** remove terminator & null terminate ***/
@@ -419,7 +425,7 @@ unsigned nchar;				/* number of chars to read */
 	{
 		int kill_erase = 0;
 #   ifndef ECHOCTL
-		cntl_char = 0;
+		int cntl_char = 0;
 #   endif /* !ECHOCTL */
 		for(i=(echoctl?last_virt:0); i<=last_virt; ++i )
 		{
@@ -435,13 +441,17 @@ unsigned nchar;				/* number of chars to read */
 			if( c==usrerase || c==usrkill )
 			{
 				/*** user typed escaped erase or kill char ***/
+#   ifndef ECHOCTL
 				cntl_char = 1;
+#   endif /* !ECHOCTL */
 				if(is_print(c))
 					kill_erase++;
 			}
 			else if( !is_print(c) )
 			{
+#   ifndef ECHOCTL
 				cntl_char = 1;
+#   endif /* !ECHOCTL */
 
 				if( c == cntl('V') )
 				{

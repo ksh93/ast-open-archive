@@ -1,3 +1,9 @@
+01-04-24 pax: --from & --to now associated with archive instead of global state
+01-04-17 pax: --from conversion only done if no control chars in first 256
+01-04-01 pax: fix --intermediate to create missing dirs first
+01-02-27 pax: add lchmod() and lchown() for symlink() restoration
+01-02-08 pax.tst: add -L and -P to symlink edit test
+01-02-07 format.c: fix malloc off-by-one for vdb format read
 01-02-02 file.c: fix duplicate -s map in addlink()
 00-12-20 bio.c: include <sys/ioctl.h> for systems that miss _IOW() etc.
 00-10-31 format.c: handle rpm 4.0 and newer

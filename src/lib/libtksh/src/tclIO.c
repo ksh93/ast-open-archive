@@ -797,10 +797,10 @@ static int sfInBuffer(f, flag)     /* Flag set = write */
 {
 	if (flag) {
 		sfset(f, SF_WRITE, 1);
-		return sfBufferSize(f) - (f->endb - f->next);
+		return sfBufferSize(f) - (f->_endb - f->_next);
 	} else {
 		sfset(f, SF_READ, 1);
-		return f->endb - f->next;
+		return f->_endb - f->_next;
 	}
 }
 

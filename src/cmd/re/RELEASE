@@ -1,3 +1,11 @@
+01-06-11 testre: handle embedded \0 in subject string, add \0 tests
+01-05-24 testre: add (?{...}) test support
+01-05-22 testre: add regsub() tests, testsub.dat
+01-05-16 regex.h update
+	 test*.c,*.dat: update for sensible test \\c expansion
+01-04-18 testglob.dat: add no metachar tests
+01-03-19 testglob: add
+01-03-08 testre,testmatch: update for I18N and strgrpmatch() regex wrapper
 99-12-12 sed: delay peek for .==$
 99-08-11 grep: don't complain about EISDIR read error
 	 ed: usage to stderr

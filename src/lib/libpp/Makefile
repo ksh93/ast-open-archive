@@ -33,10 +33,10 @@ ppcpp.o pplex.o : .CC.NOOPTIMIZE
 end
 
 ppdef.h : gentab pp.tab
-	$(*:N=*gentab) -d $(*:N=*.tab) > $(<)
+	PATH=.:$PATH $(*:N=*gentab) -d $(*:N=*.tab) > $(<)
 
 pptab.h : gentab pp.tab
-	$(*:N=*gentab) -t $(*:N=*.tab) > $(<)
+	PATH=.:$PATH $(*:N=*gentab) -t $(*:N=*.tab) > $(<)
 
 :INSTALLDIR: gentab ppsym
 

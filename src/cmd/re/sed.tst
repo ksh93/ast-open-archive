@@ -373,3 +373,63 @@ BODY {
 	COMMAND '1 , 2p' </dev/null 2>/dev/null && a=yes || a=no
 	INFO "$a" 'spaces allowed between addresses'
 }
+
+TEST 30 'hold buffer line join'
+	EXEC -One '
+/^Package:/{
+s/^Package:[[:space:]]*\<\([[:alnum:].+-]*$1[[:alnum:].+-]*\).*/\1/
+h
+}
+/^Description:/{
+s/^Description:[[:space:]]*\(.*\)/\1/
+H
+g
+s/\
+/ - /
+p
+}
+'
+		INPUT - 'Package: grep
+Essential: yes
+Priority: required
+Section: base
+Installed-Size: 488
+Debian-Maintainer: Wichert Akkerman <wakkerma@debian.org>
+Maintainer: Carl Worth <cworth@handhelds.org>
+Architecture: arm
+Version: 2.4.2-1
+Provides: rgrep
+Pre-Depends: libc6 (>= 2.1.2)
+Conflicts: rgrep
+Filename: ./grep_2.4.2-1_arm.ipk
+Size: 119438
+MD5Sum: 67fa4cb756f951fda7b7a5d4da2ab523
+Description: GNU grep, egrep and fgrep.
+ The GNU family of grep utilities may be the "fastest grep in the west".
+ GNU grep is based on a fast lazy-state deterministic matcher (about
+ twice as fast as stock Unix egrep) hybridized with a Boyer-Moore-Gosper
+ search for a fixed string that eliminates impossible text from being
+ considered by the full regexp matcher without necessarily having to
+ look at every character. The result is typically many times faster
+ than Unix grep or egrep. (Regular expressions containing backreferencing
+ will run more slowly, however.)
+
+Package: sed
+Priority: required
+Section: base
+Installed-Size: 180
+Debian-Maintainer: Wichert Akkerman <wakkerma@debian.org>
+Maintainer: Carl Worth <cworth@handhelds.org>
+Architecture: arm
+Version: 3.02-6
+Pre-Depends: libc6 (>= 2.1.2)
+Filename: ./sed_3.02-6_arm.ipk
+Size: 12338
+MD5Sum: c893daf6fef70813b566db8ed8c06950
+Description: The GNU sed stream editor.
+ sed reads the specified files or the standard input if no
+ files are specified, makes editing changes according to a
+ list of commands, and writes the results to the standard
+ output.'
+		OUTPUT - 'Package: grep - GNU grep, egrep and fgrep.
+Package: sed - The GNU sed stream editor.'

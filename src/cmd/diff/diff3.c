@@ -262,7 +262,7 @@ static struct option const longopts[] =
   {"overlap-only", 0, 0, 'x'},
   {"easy-only", 0, 0, '3'},
   {"version", 0, 0, 'v'},
-  {"help", 0, 0, 129},
+  {"help", 0, 0, -129},
   {0, 0, 0, 0}
 };
 
@@ -295,7 +295,7 @@ main (argc, argv)
 
 #if _PACKAGE_ast
   error_info.id = "diff3";
-  while ((c = optget(argv, ast_usage)) && c < 0 ? (c = -c) : c)
+  while (c = optget(argv, ast_usage))
 #else
   while ((c = getopt_long (argc, argv, "aeimvx3AEL:TX", longopts, 0)) != EOF)
 #endif
@@ -339,7 +339,7 @@ main (argc, argv)
 	case 'v':
 	  printf ("diff3 - GNU diffutils version %s\n", VERSION);
 	  exit (0);
-	case 129:
+	case -129:
 	  usage ();
 	  check_stdout ();
 	  exit (0);

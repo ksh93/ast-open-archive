@@ -91,7 +91,7 @@ USAGE_LICENSE
 "[T:test?Enable internal implementation specific tests.]:[test]{"
 "	[+bn?Allocate a fixed input buffer of size \an\a.]"
 "	[+mn?Set the mapped input buffer size to \an\a.]"
-"	[+n?Turn of the \bSF_SHARE\b input buffer flag.]"
+"	[+n?Turn off the \bSF_SHARE\b input buffer flag.]"
 "}"
 "[v:all|output-duplicates?Output all data.]"
 "[w:per-line|width?The number of items to format per output line."

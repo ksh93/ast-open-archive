@@ -8,6 +8,10 @@ bzip2 :: bzip2.1 bzip2.c -lbz
 
 bzip :LINK: bzip2
 
+bunzip :LINK: bzip2
+
+bzcat :LINK: bzip2
+
 :INSTALLDIR: bzip2recover
 
 bzip2recover :: bzip2recover.c

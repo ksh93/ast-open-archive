@@ -106,7 +106,7 @@ cssend(register Cs_t* state, int fd, int* fds, int n)
 		messagef((state->id, NiL, -1, "send: %d: %s: invalid authentication directory ", fd, s));
 		return -1;
 	}
-	if (!(s = pathtmp(tmp, s, "cs", 0)))
+	if (!(s = pathtemp(tmp, sizeof(tmp), s, "cs", 0)))
 	{
 		messagef((state->id, NiL, -1, "send: %d: authentication tmp file error", fd));
 		return -1;

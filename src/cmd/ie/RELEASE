@@ -1,3 +1,4 @@
+01-04-25 vi.c: handle implementations with VEOL but not VEOL2
 00-02-14 ie: ie.sh script replaces ie fun
 	 ie: convert configure/* => features(ielib|options.sh)
 99-11-19 Makefile: fix sh_config.h for 2d -- eventually should use iffe

@@ -32,7 +32,7 @@ FS = 0
 VCS = 0
 end
 
-$(ID) $(VERSION) :LIBRARY: README RELEASE PROMO.mm \
+$(ID)$(VARIANTID) $(VERSION) :LIBRARY: README RELEASE PROMO.mm \
 	3d.h lib_3d.h dir_3d.h \
 	init.c \
 	bio.c copy.c error.c execv.c fs.c lib.c map.c \
@@ -53,6 +53,8 @@ $(ID) $(VERSION) :LIBRARY: README RELEASE PROMO.mm \
 	dll3d.c \
 	-ldl
 
+if ! VARIANTID
+
 3d :: 2d.1 3d.1 3d.sh
 
 opaque :: opaque.sh
@@ -61,7 +63,9 @@ vex :: vex.sh
 
 $(FUNDIR) :INSTALLDIR: mode=+x _2d
 
-NAME3D = lib_3d.h std_3d.h vcs_3d.h
+end
+
+:VARIANT:
 
 /*
  * -l<library> :lib: <subdir> ...
@@ -69,13 +73,16 @@ NAME3D = lib_3d.h std_3d.h vcs_3d.h
  * snarf src from <library> and its <subdir>s
  */
 
+NAME3D = lib_3d.h std_3d.h vcs_3d.h
+
 ":lib:" : .MAKE .OPERATOR
 	local L
 	L := $(<:/-l//)
 	:: $(L)_3d.h
 	NAME3D += $(L)_3d.h
-	.SOURCE.c : $("../../lib/lib$(L)":X=. $(>))
-	.SOURCE.features/% : ../../lib/lib$(L)
+	L := ../../$(VARIANTID:?../)lib/lib$(L)
+	.SOURCE.c : $(L:X=. $(>))
+	.SOURCE.features/% : $(L)
 
 -last :lib: comp dir hash misc path port string
 

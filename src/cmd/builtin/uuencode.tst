@@ -24,7 +24,7 @@ function DATA
 			;;
 		3.dat)	print -f $'\001\002\003'
 			;;
-		abc.dat)print -f $'abc'
+		abc.dat)print $'abc'
 			;;
 		esac > $f
 		chmod u=rw,go=r $f
@@ -211,7 +211,12 @@ TEST 05 'file name shell game'
 		OUTPUT -
 	PROG	uudecode o
 		SAME game.dat abc.dat
+	PROG	uudecode -o o.dat o
+		SAME o.dat abc.dat
 	PROG	uudecode o -
 		OUTPUT - $'abc'
 	PROG	uudecode -o -
-		INPUT - $'begin-base64 644 game.dat\nYWJjCg==\n===='
+		INPUT - $'begin-base64 644 foo.dat\nYWJjCg==\n===='
+	PROG	uudecode
+		OUTPUT -
+		SAME foo.dat abc.dat

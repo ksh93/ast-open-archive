@@ -53,10 +53,14 @@
 #define HASH_HEADER	int	hash_header
 #define Hash_table_t	char
 #define Sfio_t		char
+#define CC_bel		(('A'==0301)?0057:0007)
+#define CC_esc		(('A'==0301)?0047:0033)
+#define CC_vt		0013
 #else
 #include <limits.h>
 #include <hash.h>
 #include <error.h>
+#include <ccode.h>
 #endif
 
 #define PPDEFAULT	"pp_default.h"		/* runtime definitions	*/

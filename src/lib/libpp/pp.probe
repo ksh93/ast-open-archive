@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2001-01-01
+# @(#)pp.probe (AT&T Research) 2001-05-24
 #
 # C probe for libpp
 #
@@ -94,6 +94,10 @@ b
 int ab,xy;
 #define xy XY
 char* g(x,y);' > splice.$src
+{
+echo 'int a\                        '
+echo 'b = 1;'
+} > splicesp.$src
 echo '#define g(a,b) a/**/b
 int g(x,y)=1;' > trans.$src
 echo '#define m 65
@@ -165,6 +169,9 @@ echo '#define m 65
 #if xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx != m
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 #endif' > truncate.$src
+cat > zeof.c <<'!'
+char* foo = "az";
+!
 
 allmultiple=
 assert=
@@ -175,6 +182,7 @@ dollar=
 eject=
 elseif=
 headerexpand=
+hostedtransition=
 ident=
 import=
 include_next=
@@ -189,10 +197,12 @@ reguard=
 reserved=
 spaceout=
 splicecat=
+splicespace=
 strict=
 stringspan=
 transition=
 truncate=
+zeof=
 
 $cc -c assert.$src && assert=1
 
@@ -220,15 +230,15 @@ $cc -S ident.$src && grep "$id" ident.s && ident=1
 
 { $cc -E import.$src | grep aaa ;} && import=1
 
-{ $cc -E include_next.$src | grep '^[ 	]*#[ 	]*[0-9]*[ 	]*".*stdio.h"' ;} && include_next=1
+{ $cc -E include_next.$src | grep '^[ 	]*#[ 	]*[0123456789]*[ 	]*".*stdio.h"' ;} && include_next=1
 
 if	$cc -c lineid1.i
 then	$cc -c lineid2.i || lineid=line
 else	$cc -c lineid3.c || lineid=line
 fi
 
-if	$cc -E linetype.$src | grep '^[ 	]*#[ 	]*[0-9]*[ 	]*".*"[ 	]*[12]' > linetype
-then	if	grep '^[ 	]*#[ 	]*[0-9]*[ 	]*".*"[ 	]*[12][ 	][ 	]*3' linetype
+if	$cc -E linetype.$src | grep '^[ 	]*#[ 	]*[0123456789]*[ 	]*".*"[ 	]*[12]' > linetype
+then	if	grep '^[ 	]*#[ 	]*[0123456789]*[ 	]*".*"[ 	]*[12][ 	][ 	]*3' linetype
 	then	linetype=2
 	else	linetype=1
 	fi
@@ -241,6 +251,8 @@ $cc -c plusplus.$src && plusplus=1
 $cc -c span.$src && stringspan=1
 
 $cc -c splice.$src && splicecat=1
+
+$cc -c splicesp.$src && splicespace=1
 
 exec < $ppkey
 while	read keyword type alternate comment
@@ -314,12 +326,13 @@ esac
 
 stdc=`$cc -E stdc.$src | sed -e '/stdc_default_value/!d' -e 's/.*=[ 	]*//' -e 's/[ 	]*;.*//'`
 case $stdc in
-0)	$cc -c trans.$src && transition=1 ;;
-[0-9]*)	;;
-*)	stdc= ;;
+0)		$cc -c trans.$src && transition=1 ;;
+[0123456789]*)	;;
+*)		stdc= ;;
 esac
 
-truncate=`$cc -E truncate.$src | grep '^[ 	]*[0-9]'`
+truncate=`$cc -E truncate.$src | grep '^[ 	]*[0123456789]'`
+$cc -c zeof.c || zeof=1
 
 echo "$predef" >> all.pp
 {
@@ -359,26 +372,43 @@ echo "$predef" >> all.pp
 		esac
 	done
 } 3>&- 3>&1 >/dev/null |
-	sed -e '/^ppsymbol$/d' -e '/^.$/d' -e '/^..$/d' -e '/[A-Z].*[a-z]/d' -e '/[a-z].*[A-Z]/d' |
+	sed -e '/^ppsymbol$/d' -e '/^.$/d' -e '/^..$/d' -e '/[ABCDEFGHIJKLMNOPQRSTUVWXYZ].*[abcdefghijklmnopqrstuvwxyz]/d' -e '/[abcdefghijklmnopqrstuvwxyz].*[ABCDEFGHIJKLMNOPQRSTUVWXYZ]/d' |
 	cat - all.pp |
 	sort -u |
 	{
-	echo "struct { char* name; long value; } predef[] = {"
+	for i in 0 1 2 3 4 5
+	do	echo "struct { char* name; long value; } predef[] = {" > cpp$i.$src
+	done
 	while read sym junk
 	do	case $sym in
-		_*)		set ${sym} ;;
-		[a-zA-Z]*)	set ${sym} _${sym} _${sym}_ __${sym} __${sym}__ ;;
-		*)		continue ;;
+		_*)	set 0 ${sym}
+			;;
+		*_)	continue
+			;;
+		[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
+			set 1 ${sym} 2 _${sym} 3 _${sym}_ 4 __${sym} 5 __${sym}__
+			;;
+		*)	continue
+			;;
 		esac
-		for sym
-		do	echo "#ifdef $sym"
-			echo "\"$sym\" , (long) $sym -1,"
+		while	:
+		do	case $# in
+			0|1)	break ;;
+			esac
+			{
+			echo "#ifdef $2"
+			echo "\"$2\" , (long) $2 -1,"
 			echo "#endif"
+			} >> cpp$1.$src
+			shift
+			shift
 		done
 	done 
-	echo "\"\", 0 };"
-	} > cpp.$src
-preval="`$cc -E cpp.$src | sed -e '/\".*\".*,.*,/!d' -e 's/[^\"]*\"\\([^\"]*\\)\"[ 	]*,[ 	]*([ 	]*long[ 	]*)[ 	]*\\(.*\\)[ 	]*-[ 	]*1[ 	]*,[ 	]*\$/\\1 \\2 =/g'` `$cc -dM -E stdc.$src | sed -e '/[ 	]*#[ 	]*define/!d' -e '/\"/d' -e 's/[ 	]*#[ 	]*define[ 	]*\\([a-zA-Z0-9_]*\\)[ 	]*\\(.*\\)/\\1 \\2 =/'`"
+	for i in 0 1 2 3 4 5
+	do	echo "\"\", 0 };" >> cpp$i.$src
+	done
+	}
+preval="`for i in 0 1 2 3 4 5;do $cc -E cpp$i.$src;done | sed -e '/\".*\".*,.*,/!d' -e 's/[^\"]*\"\\([^\"]*\\)\"[ 	]*,[ 	]*([ 	]*long[ 	]*)[ 	]*\\(.*\\)[ 	]*-[ 	]*1[ 	]*,[ 	]*\$/\\1 \\2 =/g'` `$cc -dM -E stdc.$src | sed -e '/[ 	]*#[ 	]*define/!d' -e '/\"/d' -e 's/[ 	]*#[ 	]*define[ 	]*\\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*\\)[ 	]*\\(.*\\)/\\1 \\2 =/'`"
 
 for i in bufld namei quota reboot utsname vfs
 do	echo "#include <sys/$i.h>" > t.$src
@@ -388,6 +418,11 @@ do	echo "#include <sys/$i.h>" > t.$src
 	fi
 	eval sys_$i=$x
 done
+
+case "`grep -c '__STDC__[-0 	]*[=!]=[ 	]*0' $usrinclude/stdio.h 2>/dev/null`" in
+0)	;;
+*)	hostedtransition=1 ;;
+esac
 
 #
 # the payoff
@@ -508,7 +543,7 @@ $1"
 					nopredef=1
 					continue
 					;;
-				' '[0-9]*|' '"'"*"'"*)
+				' '[0123456789]*|' '"'"*"'"*)
 					;;
 				*)	case $1 in
 					_*)	;;
@@ -597,7 +632,7 @@ case $x in
 esac
 
 echo
-for i in `echo "$predef" | sed -e 's/^__*\(.*\)_*\$/\1/' -e '/^[a-z][a-z]*[0-9][a-z0-9]*\$/!d'` `echo "$predef" | sed -e 's/^__*\(.*\)_*\$/\1/' -e '/^[a-z][a-z]*\$/!d'`
+for i in `echo "$predef" | sed -e 's/^__*\(.*\)_*\$/\1/' -e '/^[abcdefghijklmnopqrstuvwxyz][abcdefghijklmnopqrstuvwxyz]*[0123456789][abcdefghijklmnopqrstuvwxyz0123456789]*\$/!d'` `echo "$predef" | sed -e 's/^__*\(.*\)_*\$/\1/' -e '/^[abcdefghijklmnopqrstuvwxyz][abcdefghijklmnopqrstuvwxyz]*\$/!d'`
 do	case $i in
 	*ix)	;;
 	*)	architecture=$i
@@ -698,9 +733,10 @@ ibm|uts|u370)	model=370
 m*68*)		architecture=m68000
 		for i in $predef
 		do	case $i in
-			m*68*[1-9][0-9])model=`echo $i | sed 's/.*\(..\)/\1/'`
-					break
-					;;
+			m*68*[123456789][0123456789])
+				model=`echo $i | sed 's/.*\(..\)/\1/'`
+				break
+				;;
 			esac
 		done
 		;;
@@ -712,13 +748,16 @@ u3b)		case $model in
 		esac
 		architecture=3b
 		;;
-vax[0-9]*)	model=`echo $architecture | sed 's/vax//'`
+vax[0123456789]*)
+		model=`echo $architecture | sed 's/vax//'`
 		architecture=vax
 		;;
-hp[0-9]*s[0-9])	case $release in
-		[a-z]*.[a-z]*.*)	version=$release
-					release=V
-					;;
+hp[0123456789]*s[0123456789])
+		case $release in
+		[abcdefghijklmnopqrstuvwxyz]*.[abcdefghijklmnopqrstuvwxyz]*.*)
+			version=$release
+			release=V
+			;;
 		esac
 		architecture="$architecture `echo $architecture | sed 's/s.*//'`"
 		;;
@@ -758,7 +797,7 @@ esac
 echo "#define #version($version)"
 case $architecture in
 "")	echo "#define #architecture()" ;;
-*)	for i in `echo $architecture | tr '[A-Z]' '[a-z]'`
+*)	for i in `echo $architecture | tr ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz`
 	do	echo "#define #architecture($i)"
 	done
 	;;
@@ -776,7 +815,7 @@ esac
 case $machine in
 "")	echo "#define #machine()" ;;
 *)	j=
-	for i in `echo $machine | tr '[A-Z]' '[a-z]'`
+	for i in `echo $machine | tr ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz`
 	do	case " $i " in
 		*" $j "*)
 			;;
@@ -793,7 +832,7 @@ done
 echo "#define #addressing()"
 for i in $ATTRIBUTES
 do	eval d=\$$i
-	n=`echo $i | tr '[A-Z]' '[a-z]'`
+	n=`echo $i | tr ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz`
 	echo "#define #$n($d)"
 done
 case $stdc in
@@ -831,6 +870,9 @@ esac
 case $splicecat in
 ?*)	echo "#pragma pp:splicecat" ;;
 esac
+case $splicespace in
+?*)	echo "#pragma pp:splicespace" ;;
+esac
 case $stringspan in
 ?*)	echo "#pragma pp:stringspan" ;;
 esac
@@ -844,6 +886,9 @@ case $stdc in
 	esac
 	;;
 esac
+case $hostedtransition in
+1)	echo "#pragma pp:hostedtransition" ;;
+esac
 case $stdc in
 ?*)	case $ppopt$ppenv in
 	"")	spaceout=1
@@ -854,6 +899,9 @@ case $stdc in
 esac
 case $truncate in
 ?*)	echo "#pragma pp:truncate $truncate" ;;
+esac
+case $zeof in
+?*)	echo "#pragma pp:zeof" ;;
 esac
 case $dollar in
 1)	echo '#pragma pp:id "$"' ;;
@@ -955,7 +1003,7 @@ case $stdc:$spaceout in
 esac
 
 if	$cc -E preinc.$src > preinc.out
-then	for f in `sed -e 's,\\\\,/,g' -e 's,"[A-Za-z]:/,"/,g' -e '/^#[line 	]*[0-9][0-9]*[ 	][ 	]*"[\\/]/!d' -e 's/^#[line 	]*[0-9][0-9]*[ 	][ 	]*".*[\\/]\(.*\)".*/\1/' preinc.out | sort -u`
+then	for f in `sed -e 's,\\\\,/,g' -e 's,"[ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]:/,"/,g' -e '/^#[line 	]*[0123456789][0123456789]*[ 	][ 	]*"[\\/]/!d' -e 's/^#[line 	]*[0123456789][0123456789]*[ 	][ 	]*".*[\\/]\(.*\)".*/\1/' preinc.out | sort -u`
 	do	case $f in
 		*preinc.$src*)
 			;;

@@ -1,3 +1,5 @@
+01-05-11 csserve: sync cs.* with css->*
+	 csspoll: handl cspoll() EINTR that doesn't set cs.interrupt
 01-01-01 cspoll: fix getmsg() flag arg
 	 csaddr: fix local host addr initialization
 00-06-01 csopen: handle dynamic ip assignment underfoot

@@ -626,7 +626,7 @@ globv(char* s)
 		gl.gl_dirclose = glob_dirclose;
 		gl.gl_type = glob_type;
 	}
-	if (i = glob(s, GLOB_DISC|GLOB_NOCHECK|GLOB_STACK, 0, &gl))
+	if (i = glob(s, GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STACK, 0, &gl))
 	{
 		if (!trap())
 			error(2, "glob() internal error %d", i);
@@ -720,7 +720,7 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 	{
 		if (state.fsview && strchr(s, '/') && strchr(r->name, '/') && !streq(s, r->name))
 		{
-			message((-5, "%s and %s are bound in %s\n", s, r->name, d->name));
+			message((-5, "%s and %s are bound in %s", s, r->name, d->name));
 			putbound(s, d->name);
 			putbound(r->name, d->name);
 		}

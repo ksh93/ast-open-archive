@@ -46,7 +46,7 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	case SF_ATEXIT:
 		sfdisc(sp, SF_POPDISC);
 		return 0;
-	case SF_CLOSE:
+	case SF_CLOSING:
 	case SF_DPOP:
 	case SF_FINAL:
 		if (gz->gz)
@@ -56,7 +56,7 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 		}
 		else
 			r = 0;
-		if (op != SF_CLOSE)
+		if (op != SF_CLOSING)
 			free(dp);
 		return r;
 	case SF_READ:
@@ -118,7 +118,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 	Sfgzip_t*	gz;
 	char		mode[10];
 
-	if (sp->flags & SF_READ)
+	if (sfset(sp, 0, 0) & SF_READ)
 	{
 		register unsigned char*	s;
 		register int		n;
@@ -153,12 +153,12 @@ sfdcgzip(Sfio_t* sp, int flags)
 	if (!(gz = newof(0, Sfgzip_t, 1, 0)))
 		return -1;
 	gz->disc.exceptf = sfgzexcept;
-	if (sp->flags & SF_READ)
+	if (sfset(sp, 0, 0) & SF_READ)
 		gz->disc.readf = sfgzread;
 	else
 		gz->disc.writef = sfgzwrite;
 	m = mode;
-	*m++ = (sp->flags & SF_READ) ? 'r' : 'w';
+	*m++ = (sfset(sp, 0, 0) & SF_READ) ? 'r' : 'w';
 	*m++ = 'b';
 	if (flags & SFGZ_NOCRC)
 		*m++ = 'n';
@@ -187,7 +187,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 #else
 	sfsetbuf(sp, NiL, SF_BUFSIZE);
 #endif
-	if (!(sp->flags & SF_READ))
+	if (!(sfset(sp, 0, 0) & SF_READ))
 		sfset(sp, SF_IOCHECK, 1);
 	return 1;
 }

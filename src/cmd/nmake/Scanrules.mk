@@ -68,6 +68,7 @@
 .ATTRIBUTE.%.C : .SCAN.c
 .ATTRIBUTE.%.cc : .SCAN.c
 .ATTRIBUTE.%.cpp : .SCAN.c
+.ATTRIBUTE.%.cxx : .SCAN.c
 .ATTRIBUTE.%.S : .SCAN.c
 
 .SCAN.f : .SCAN

@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: msggen (AT&T Labs Research) 2000-04-26 $\n]"
+"[-?\n@(#)$Id: msggen (AT&T Labs Research) 2001-04-22 $\n]"
 USAGE_LICENSE
 "[+NAME?msggen - generate a machine independent formatted message catalog]"
 "[+DESCRIPTION?\bmsggen\b merges the message text source files \amsgfile\a"
@@ -39,7 +39,9 @@ USAGE_LICENSE
 "	text defined in \amsgfile\a will replace the old message text"
 "	currently contained in \acatfile\a. Non-ASCII characters must be"
 "	UTF-8 encoded. \biconv\b(1) can be used to convert to/from UTF-8.]"
-"[l:list?List \acatfile\a in \amsgfile\a form.]"
+"[l:list?List \acatfile\a in UTF-8 \amsgfile\a form.]"
+"[s:set?Convert the \acatfile\a operand to a message set number and"
+"	print the number on the standard output.]"
 "[+EXTENDED DESCRIPTION?Message text source files are in \bgencat\b(1)"
 "	format, defined as follows. Note that the fields of a message text"
 "	source line are separated by a single blank character. Any other"
@@ -98,6 +100,7 @@ USAGE_LICENSE
 
 #include <ast.h>
 #include <ctype.h>
+#include <ccode.h>
 #include <error.h>
 #include <mc.h>
 #include <sfstr.h>
@@ -160,6 +163,34 @@ translation(Xl_t* xp, register char* s)
 	return xp;
 }
 
+/*
+ * sfprintf() with ccmaps(from,to)
+ */
+
+static int
+ccsfprintf(int from, int to, Sfio_t* sp, const char* format, ...)
+{
+	va_list		ap;
+	Sfio_t*		tp;
+	char*		s;
+	int		n;
+
+	va_start(ap, format);
+	if (from == to)
+		n = sfvprintf(sp, format, ap);
+	else if (tp = sfstropen())
+	{
+		n = sfvprintf(tp, format, ap);
+		s = sfstrbase(tp);
+		ccmaps(s, n, from, to);
+		n = sfwrite(sp, s, n);
+		sfstrclose(tp);
+	}
+	else
+		n = -1;
+	return n;
+}
+
 int
 main(int argc, char** argv)
 {
@@ -169,7 +200,6 @@ main(int argc, char** argv)
 	register int	c;
 	register int	q;
 	register int	i;
-	int		set;
 	int		num;
 	char*		b;
 	char*		e;
@@ -183,6 +213,7 @@ main(int argc, char** argv)
 
 	Xl_t*		xp = 0;
 	int		list = 0;
+	int		set = 0;
 
 	NoP(argc);
 	error_info.id = "msggen";
@@ -192,6 +223,9 @@ main(int argc, char** argv)
 		{
 		case 'l':
 			list = 1;
+			continue;
+		case 's':
+			set = 1;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -203,14 +237,19 @@ main(int argc, char** argv)
 		break;
 	}
 	argv += opt_info.index;
-	if (error_info.errors || !(catfile = *argv++) || !list && !(msgfile = *argv++) || *argv)
+	if (error_info.errors || !(catfile = *argv++) || !set && !list && !(msgfile = *argv++) || *argv)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 
 	/*
-	 * list only needs catfile
+	 * set and list only need catfile
 	 */
 
-	if (list)
+	if (set)
+	{
+		sfprintf(sfstdout, "%d\n", mcindex(catfile, NiL, NiL, NiL));
+		return error_info.errors != 0;
+	}
+	else if (list)
 	{
 		if (!(sp = sfopen(NiL, catfile, "r")))
 			error(ERROR_SYSTEM|3, "%s: cannot read catalog", catfile);
@@ -218,15 +257,28 @@ main(int argc, char** argv)
 			error(ERROR_SYSTEM|3, "%s: catalog content error", catfile);
 		sfclose(sp);
 		if (*mc->translation)
-			sfprintf(sfstdout, "$translation %s\n", mc->translation);
-		sfprintf(sfstdout, "$quote \"\n");
+		{
+			ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$translation ");
+			sfprintf(sfstdout, "%s", mc->translation);
+			ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "\n");
+		}
+		ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$quote \"\n");
 		for (set = 1; set <= mc->num; set++)
 			if (mc->set[set].num)
 			{
-				sfprintf(sfstdout, "$set %d\n", set);
+				ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "$set %d\n", set);
 				for (num = 1; num <= mc->set[set].num; num++)
 					if (s = mc->set[set].msg[num])
-						sfprintf(sfstdout, "%d %s\n", num, fmtquote(s, "\"", "\"", strlen(s), 3));
+					{
+						ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "%d \"", num);
+						while (c = *s++)
+						{
+							if (c == 0x22 || c == 0x5C)
+								sfputc(sfstdout, 0x5C);
+							sfputc(sfstdout, c);
+						}
+						ccsfprintf(CC_NATIVE, CC_ASCII, sfstdout, "\"\n");
+					}
 			}
 		mcclose(mc);
 		return error_info.errors != 0;
@@ -388,7 +440,7 @@ main(int argc, char** argv)
 	 * rename if no errors
 	 */
 
-	if (!(s = pathtmp(NiL, "", error_info.id, NiL)) || !(sp = sfopen(NiL, s, "w")))
+	if (!(s = pathtemp(NiL, 0, "", error_info.id, NiL)) || !(sp = sfopen(NiL, s, "w")))
 		error(ERROR_SYSTEM|3, "%s: cannot write catalog file", catfile);
 	if (mcdump(mc, sp) || mcclose(mc) || sfclose(sp))
 	{

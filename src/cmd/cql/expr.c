@@ -577,6 +577,14 @@ reference(Expr_t* prog, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, in
 							state.hix.flags |= HIX_READONLY;
 						continue;
 					}
+					if (streq(str, "regenerate"))
+					{
+						if (i)
+							state.hix.flags &= ~HIX_REGENERATE;
+						else
+							state.hix.flags |= HIX_REGENERATE;
+						continue;
+					}
 					if (streq(str, "replace"))
 					{
 						state.replace = i;

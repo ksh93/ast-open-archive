@@ -39,11 +39,11 @@ Sfdisc_t*	disc;
 	{
 	case SF_WRITE :
 		return 0;
-	case SF_CLOSE:
-		if(Type == SF_CLOSE)
+	case SF_CLOSING:
+		if(Type == SF_CLOSING)
 			return 0;
 	case SF_SYNC:
-		if(Type == SF_CLOSE)
+		if(Type == SF_CLOSING)
 			return 0;
 	}
 
@@ -130,7 +130,7 @@ MAIN()
 		terror("Did not get purge event\n");
 
 	sfclose(f);
-	if(Type != SF_CLOSE)
+	if(Type != SF_CLOSING)
 		terror("Did not get close event\n");
 
 	sfclose(f);

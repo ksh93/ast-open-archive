@@ -1,0 +1,24 @@
+hdr	langinfo,nl_types
+
+mem	lconv.credit_sign locale.h
+mem	lconv.currency_symbol locale.h
+mem	lconv.debit_sign locale.h
+mem	lconv.frac_digits locale.h
+mem	lconv.int_curr_symbol locale.h
+mem	lconv.int_frac_digits locale.h
+mem	lconv.left_parenthesis locale.h
+mem	lconv.mon_decimal_point locale.h
+mem	lconv.mon_grouping locale.h
+mem	lconv.mon_thousands_sep locale.h
+mem	lconv.n_cs_precedes locale.h
+mem	lconv.n_sep_by_space locale.h
+mem	lconv.n_sign_posn locale.h
+mem	lconv.negative_sign locale.h
+mem	lconv.p_cs_precedes locale.h
+mem	lconv.p_sep_by_space locale.h
+mem	lconv.p_sign_posn locale.h
+mem	lconv.positive_sign locale.h
+mem	lconv.right_parenthesis locale.h
+mem	lconv.decimal_point locale.h
+mem	lconv.grouping locale.h
+mem	lconv.thousands_sep locale.h

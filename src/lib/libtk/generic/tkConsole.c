@@ -513,7 +513,7 @@ InterpreterCmd(clientData, interp, argc, argv)
  *----------------------------------------------------------------------
  */
 
-void 
+static void 
 ConsoleDeleteProc(clientData) 
     ClientData clientData;
 {

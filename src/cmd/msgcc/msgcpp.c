@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: msgcpp (AT&T Labs Research) 2000-05-17 $\n]"
+"[-?\n@(#)$Id: msgcpp (AT&T Labs Research) 2000-06-10 $\n]"
 USAGE_LICENSE
 "[+NAME?msgcpp - C language message catalog preprocessor]"
 "[+DESCRIPTION?\bmsgcpp\b is a C language message catalog preprocessor."
@@ -97,7 +97,7 @@ USAGE_LICENSE
 #define T_STDIO		(T_KEYWORD+2)
 #define T_TRANSLATE	(T_KEYWORD+3)
 
-#define OMIT		"*@(\\[[-+]*\\?*\\]|\\@\\(#\\)|Copyright \\(c\\)|\\000|\\00[^0-9]|\\0[^0-9])*"
+#define OMIT		"*@(\\[[-+]*\\?*\\]|\\@\\(#\\)|Copyright \\(c\\)|\\\\000|\\\\00[!0-9]|\\\\0[!0-9])*"
 
 static struct ppkeyword	keys[] =
 {

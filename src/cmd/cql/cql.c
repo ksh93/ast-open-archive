@@ -46,7 +46,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cql (AT&T Labs Research) 2001-01-01 $\n]"
+"[-?\n@(#)cql (AT&T Labs Research) 2001-02-14\n]"
 USAGE_LICENSE
 "[+NAME?cql - C query language]"
 "[+DESCRIPTION?\bcql\b applies C style expressions to flat database files."
@@ -89,6 +89,8 @@ USAGE_LICENSE
 "	and \b--noindex\b is on then \bcql\b exits with a diagnostic.]"
 "[r:replace?Replace the top level database view with an updated view if there"
 "	were updates.]"
+"[R:regenerate?If index files are required then \b--regenerate\b forces them"
+"	to be regenerated even if the otherwise seem up-to-date.]"
 "[u:update?Only output updated records. By default all selected records are"
 "	output.]"
 "[w!:warn?Disable malformed data warning messages. With \b--nowarn\b malformed"
@@ -328,72 +330,6 @@ ccf(Excc_t* cc, Exnode_t* node, Exid_t* sym, Exref_t* ref, Exnode_t* elt, Exccdi
 	return 0;
 }
 
-/*
- * check candidate record
- */
-
-static int
-candidate(register File_t* f)
-{
-	register Record_t*	r = f->scan.record;
-	register Field_t*	field = f->scan.field;
-	int*			g = f->scan.generate;
-	char*			s;
-	int			n;
-	long*			h;
-	Mark_t*			kp;
-	Extype_t		val;
-
-	f->scan.data[1] = (char*)field;
-	state.record++;
-	if (g)
-	{
-		h = f->hash;
-		while ((n = *g++) != hixend)
-		{
-			if (r->member[n].record)
-				val.integer = strsum(field[n].f_string, 0L);
-			else if (r->member[n].index > 1 || r->member[n].format.type == STRING)
-				val.integer = (field[n].flags & CDB_STRING) ? strsum(field[n].f_string, 0L) : field[n].f_unsigned;
-			else
-				val = value(f->scan.prog, NiL, r->member[n].symbol, NiL, field, -1, &state.expr);
-			message((-8, "put: #1 offset=%05lld field=%d hash=0x%08llx value=%s index=%d type=%d", (Sflong_t)f->hix->offset, n, val.integer, (field + n)->f_string, r->member[n].index, r->member[n].format.type));
-			*h++ = val.integer;
-		}
-		if (hixput(f->hix, f->hash))
-			return -1;
-	}
-	if (state.loop[SELECT].body)
-	{
-		val = exeval(f->scan.prog, state.loop[SELECT].body, field);
-		if (!val.integer)
-			return 0;
-	}
-	state.selected++;
-	if (state.loop[ACTION].body)
-		exeval(f->scan.prog, state.loop[ACTION].body, field);
-	else
-		image(f, sfstdout, f->terminator);
-	if (state.closure.on)
-	{
-		s = (field + state.closure.key)->f_string;
-		if (!(kp = (Mark_t*)dtmatch(state.closure.member, s)))
-		{
-			n = strlen(s);
-			if (!(kp = newof(0, Mark_t, 1, n)))
-				error(3, "out of space [closure mark]");
-			memcpy(kp->name, s, n);
-			dtinsert(state.closure.member, kp);
-		}
-		kp->value = state.iteration;
-	}
-	return 0;
-}
-
-#if __OBSOLETE__ < 20020101
-#include "../../lib/libast/string/fmtident.c"
-#endif
-
 int
 main(int argc, char** argv)
 {
@@ -412,7 +348,22 @@ main(int argc, char** argv)
 	Sfio_t*			sp;
 	Extype_t		val;
 	char			buf[PATH_MAX];
+	char*			data[2];
 	Mark_t*			kp;
+	struct
+	{
+	Exid_t*			entity;
+	Exid_t*			relation;
+	Dt_t*			member;
+	File_t*			f;
+	Record_t*		r;
+	int			key;
+	int			parent;
+	int			child;
+	int			on;
+	int			selected;
+	Dtdisc_t		disc;
+	}			closure;
 
 	char*			compiled = 0;
 	List_t*			expr = 0;
@@ -422,6 +373,7 @@ main(int argc, char** argv)
 
 	NoP(argc);
 	error_info.id = state.hix.lib = "cql";
+	closure.relation = 0;
 	av = argv;
 	prog = init(symbols);
 	for (;;)
@@ -462,6 +414,9 @@ main(int argc, char** argv)
 			continue;
 		case 'r':
 			state.replace = 1;
+			continue;
+		case 'R':
+			state.hix.flags |= HIX_REGENERATE;
 			continue;
 		case 'u':
 			state.update = 1;
@@ -504,7 +459,8 @@ main(int argc, char** argv)
 	 * parse the declarations
 	 */
 
-	message((-1, ":::: %s", fmtident(usage)));
+	s = strchr(usage, '\n') + 5;
+	message((-1, ":::: %-.*s", strchr(s, '\n') - s, s));
 	message((-2, ":::: parse the declarations"));
 	for (a = expr; a; a = a->next)
 		if (declare(prog, a->value.string, NiL, 1))
@@ -573,7 +529,7 @@ main(int argc, char** argv)
 		if (e = strchr(parent->name, '.'))
 		{
 			*e = 0;
-			state.closure.relation = (Exid_t*)dtmatch(prog->symbols, parent->name);
+			state.closure.relation = closure.relation = (Exid_t*)dtmatch(prog->symbols, parent->name);
 			*e = '.';
 			if (e = strchr(child->name, '.'))
 			{
@@ -582,22 +538,23 @@ main(int argc, char** argv)
 				*e = '.';
 			}
 		}
-		if (!e || !state.closure.relation || !cel || state.closure.relation != cel)
+		if (!e || !closure.relation || !cel || closure.relation != cel)
 			error(3, "%s: must name the same schema as %s", child->name, parent->name);
-		state.closure.disc.key = offsetof(Mark_t, name);
-		if (!(state.closure.member = dtopen(&state.closure.disc, Dtset)))
+		memset(&closure.disc, 0, sizeof(closure.disc));
+		closure.disc.key = offsetof(Mark_t, name);
+		if (!(closure.member = dtopen(&closure.disc, Dtset)))
 			error(3, "out of space [closure hash]");
-		state.closure.entity = ent->symbol;
-		state.closure.key = ent->key;
-		state.closure.parent = GETFIELD(parent);
-		state.closure.child = GETFIELD(child);
-		state.closure.selected = 0;
-		message((-3, "clo: entity=%s relation=%s key=%d parent=%d child=%d", state.closure.entity->name, state.closure.relation->name, state.closure.key, state.closure.parent, state.closure.child));
-		state.closure.r = ((Local_t*)state.closure.relation->local.pointer)->record;
-		attach(state.closure.relation, state.closure.r, 0);
-		propagate(state.closure.r);
-		state.closure.f = ((Local_t*)state.closure.relation->local.pointer)->file;
-		load(prog, state.closure.f, NiL);
+		closure.entity = ent->symbol;
+		closure.key = ent->key;
+		closure.parent = GETFIELD(parent);
+		closure.child = GETFIELD(child);
+		closure.selected = 0;
+		message((-3, "clo: entity=%s relation=%s key=%d parent=%d child=%d", closure.entity->name, closure.relation->name, closure.key, closure.parent, closure.child));
+		closure.r = ((Local_t*)closure.relation->local.pointer)->record;
+		attach(closure.relation, closure.r, 0);
+		propagate(closure.r);
+		closure.f = ((Local_t*)closure.relation->local.pointer)->file;
+		load(prog, closure.f, NiL);
 		state.iteration = 1;
 	}
 	else
@@ -630,8 +587,8 @@ main(int argc, char** argv)
 			error(3, "out of space [file]");
 		sfstrclose(sp);
 	}
-	if (state.closure.relation && !state.closure.f->name)
-		state.closure.f->name = f->name;
+	if (closure.relation && !closure.f->name)
+		closure.f->name = f->name;
 
 	/*
 	 * parse the expressions
@@ -823,10 +780,10 @@ main(int argc, char** argv)
 						error(3, "%s: %s function not found", compiled, name);
 				}
 				sfstrclose(sp);
-				state.expr.data = f->scan.data;
+				state.expr.data = data;
 			}
 		}
-		state.closure.on = state.closure.relation && (state.loop[CLOSURE].body = exexpr(prog, state.loop[CLOSURE].name, NiL, 0));
+		closure.on = closure.relation && (state.loop[CLOSURE].body = exexpr(prog, state.loop[CLOSURE].name, NiL, 0));
 		if (state.loop[BEGIN].body = exexpr(prog, state.loop[BEGIN].name, NiL, 0))
 			exeval(prog, state.loop[BEGIN].body, state.empty);
 
@@ -861,10 +818,55 @@ main(int argc, char** argv)
 				}
 				if (state.loop[SELECT].body)
 					pivot(f, state.loop[SELECT].body);
-				f->scan.prog = prog;
-				while ((f->scan.field = record(f, NiL, 0, 0, 0, 0)) && !candidate(f));
+				while (field = record(f, NiL, 0, 0, 0, 0))
+				{
+					data[1] = (char*)field;
+					state.record++;
+					if (g)
+					{
+						h = f->hash;
+						while ((n = *g++) != hixend)
+						{
+							if (r->member[n].record)
+								val.integer = strsum(field[n].f_string, 0L);
+							else if (r->member[n].index > 1 || r->member[n].format.type == STRING)
+								val.integer = (field[n].flags & CDB_STRING) ? strsum(field[n].f_string, 0L) : field[n].f_unsigned;
+							else
+								val = value(prog, NiL, r->member[n].symbol, NiL, field, -1, &state.expr);
+							message((-8, "put: #1 offset=%05lld field=%d hash=0x%08llx value=%s index=%d type=%d", (Sflong_t)f->hix->offset, n, val.integer, (field + n)->f_string, r->member[n].index, r->member[n].format.type));
+							*h++ = val.integer;
+						}
+						g = f->index;
+						if (hixput(f->hix, f->hash))
+							break;
+					}
+					if (state.loop[SELECT].body)
+					{
+						val = exeval(prog, state.loop[SELECT].body, field);
+						if (!val.integer)
+							continue;
+					}
+					state.selected++;
+					if (state.loop[ACTION].body)
+						exeval(prog, state.loop[ACTION].body, field);
+					else
+						image(f, sfstdout, f->terminator);
+					if (closure.on)
+					{
+						s = (field + closure.key)->f_string;
+						if (!(kp = (Mark_t*)dtmatch(closure.member, s)))
+						{
+							n = strlen(s);
+							if (!(kp = newof(0, Mark_t, 1, n)))
+								error(3, "out of space [closure mark]");
+							memcpy(kp->name, s, n);
+							dtinsert(closure.member, kp);
+						}
+						kp->value = state.iteration;
+					}
+				}
 				commit(f);
-				if (state.closure.on && state.closure.selected != state.selected)
+				if (closure.on && closure.selected != state.selected)
 				{
 					Exid_t*			main_schema = state.schema;
 					Field_t*		main_field;
@@ -873,9 +875,9 @@ main(int argc, char** argv)
 
 					message((-2, ":::: closure"));
 					generate(prog, f, f->name, state.schema);
-					state.schema = state.closure.relation;
-					f = state.closure.f;
-					r = state.closure.r;
+					state.schema = closure.relation;
+					f = closure.f;
+					r = closure.r;
 					generate(prog, f, f->name, state.schema);
 					if (!state.loop[CLOSURE].body || !optimize(prog, state.loop[CLOSURE].body))
 					{
@@ -898,16 +900,16 @@ main(int argc, char** argv)
 	{
 		n = 0;
 		hixset(f->hix, 0);
-		for (kp = (Mark_t*)dtfirst(state.closure.member); kp; kp = (Mark_t*)dtnext(state.closure.member, kp))
+		for (kp = (Mark_t*)dtfirst(closure.member); kp; kp = (Mark_t*)dtnext(closure.member, kp))
 			if (kp->value == state.iteration)
 			{
-				hixeq(f->hix, state.closure.parent, strsum(kp->name, 0L));
+				hixeq(f->hix, closure.parent, strsum(kp->name, 0L));
 				if (n++)
 					hixor(f->hix);
 			}
 		state.iteration++;
-		message((-3, "clo: iteration=%d selected=%d total=%d", state.iteration, state.selected - state.closure.selected, state.selected));
-		state.closure.selected = state.selected;
+		message((-3, "clo: iteration=%d selected=%d total=%d", state.iteration, state.selected - closure.selected, state.selected));
+		closure.selected = state.selected;
 		while (field = record(f, NiL, 0, 0, 0, 0))
 		{
 			if (g)
@@ -926,30 +928,30 @@ main(int argc, char** argv)
 				if (hixput(f->hix, f->hash))
 					break;
 			}
-			if (((kp = (Mark_t*)dtmatch(state.closure.member, (field + state.closure.parent)->f_string)) ? kp->value : 0) != (state.iteration - 1))
+			if (((kp = (Mark_t*)dtmatch(closure.member, (field + closure.parent)->f_string)) ? kp->value : 0) != (state.iteration - 1))
 				continue;
 			val = exeval(prog, state.loop[CLOSURE].body, field);
 			if (!val.integer)
 				continue;
-			s = (field + state.closure.child)->f_string;
-			if (!(kp = (Mark_t*)dtmatch(state.closure.member, s)))
+			s = (field + closure.child)->f_string;
+			if (!(kp = (Mark_t*)dtmatch(closure.member, s)))
 			{
 				n = strlen(s);
 				if (!(kp = newof(0, Mark_t, 1, n)))
 					error(3, "out of space [closure mark]");
 				memcpy(kp->name, s, n);
 				kp->value = state.iteration;
-				dtinsert(state.closure.member, kp);
+				dtinsert(closure.member, kp);
 			}
 			state.selected++;
-			if (main_field = record(main_f, s, strsum((field + state.closure.child)->f_string, 0L), state.closure.key, 1, 1))
+			if (main_field = record(main_f, s, strsum((field + closure.child)->f_string, 0L), closure.key, 1, 1))
 			{
 				state.schema = main_schema;
 				if (state.loop[ACTION].body)
 					exeval(prog, state.loop[ACTION].body, main_field);
 				else
 					image(main_f, sfstdout, main_f->terminator);
-				state.schema = state.closure.relation;
+				state.schema = closure.relation;
 			}
 		}
 		if (g)
@@ -960,7 +962,7 @@ main(int argc, char** argv)
 		}
 		else
 			hixseek(f->hix, 0L);
-	} while (state.closure.selected != state.selected);
+	} while (closure.selected != state.selected);
 
 						/*...INDENT*/
 					}

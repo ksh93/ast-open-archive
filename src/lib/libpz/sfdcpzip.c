@@ -61,7 +61,7 @@ sfpzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	case SF_ATEXIT:
 		sfdisc(sp, SF_POPDISC);
 		return 0;
-	case SF_CLOSE:
+	case SF_CLOSING:
 	case SF_DPOP:
 	case SF_FINAL:
 		if (pz->pz)
@@ -71,7 +71,7 @@ sfpzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 		}
 		else
 			r = 0;
-		if (op != SF_CLOSE)
+		if (op != SF_CLOSING)
 			free(dp);
 		return r;
 	case SF_SYNC:
@@ -134,7 +134,7 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 	}
 	else
 		oz = 0;
-	if (sp->flags & SF_WRITE)
+	if (sfset(sp, 0, 0) & SF_WRITE)
 	{
 		if (flags & PZ_STAT)
 			return -1;
@@ -169,17 +169,17 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 		}
 		sfsync(sp);
 	}
-	if (!(io = sfnew(NiL, NiL, SF_UNBOUND, sffileno(sp), (sp->flags & (SF_READ|SF_WRITE)))))
+	if (!(io = sfnew(NiL, NiL, SF_UNBOUND, sffileno(sp), (sfset(sp, 0, 0) & (SF_READ|SF_WRITE)))))
 		return -1;
 	if (!(pz = newof(0, Sfpzip_t, 1, 0)))
 	{
-		io->file = -1;
+		io->_file = -1;
 		sfclose(io);
 		return -1;
 	}
 	pz->disc.version = PZ_VERSION;
 	flags &= ~(PZ_READ|PZ_WRITE|PZ_STAT|PZ_STREAM|PZ_INTERNAL);
-	flags |= PZ_STREAM|((sp->flags & SF_READ) ? PZ_READ : PZ_WRITE);
+	flags |= PZ_STREAM|((sfset(sp, 0, 0) & SF_READ) ? PZ_READ : PZ_WRITE);
 	if (oz && (oz->flags & PZ_WRITE))
 		flags |= PZ_DELAY;
 	if (disc)
@@ -192,7 +192,7 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 	}
 	if (!(pz->pz = pzopen(&pz->disc, (char*)io, flags)))
 	{
-		io->file = -1;
+		io->_file = -1;
 		sfclose(io);
 		free(pz);
 		return -1;
@@ -200,18 +200,18 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 	if (path)
 		pz->pz->path = path;
 	pz->sfdisc.exceptf = sfpzexcept;
-	if (sp->flags & SF_READ)
+	if (sfset(sp, 0, 0) & SF_READ)
 		pz->sfdisc.readf = sfpzread;
 	else
 		pz->sfdisc.writef = sfpzwrite;
-	sp->file = open("/dev/null", 0);
+	sp->_file = open("/dev/null", 0);
 	sfset(sp, SF_SHARE|SF_PUBLIC, 0);
 	if (sfdisc(sp, &pz->sfdisc) != &pz->sfdisc)
 	{
-		close(sp->file);
-		sp->file = io->file;
+		close(sp->_file);
+		sp->_file = io->_file;
 		sfseek(sp, sftell(io), SEEK_SET);
-		io->file = -1;
+		io->_file = -1;
 		pzclose(pz->pz);
 		free(pz);
 		return -1;

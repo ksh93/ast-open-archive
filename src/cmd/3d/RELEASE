@@ -1,3 +1,5 @@
+01-02-19 close3d: dup reserved fd's higher
+01-02-14 add :VARIANT: to build dll's for CC.DLL.VARIANTS
 01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
 00-12-14 3d.sh: fix -c
 00-10-31 ast.c add pathtemp.c

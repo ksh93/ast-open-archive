@@ -50,7 +50,7 @@
  * example:	"{;}d3p2*3I4i321*i"
  */
 
-static const char id[] = "\n@(#)$Id: cdb library 2.2 (AT&T Research) 2001-01-01 $\0\n";
+static const char id[] = "\n@(#)$Id: cdb library 2.2 (AT&T Research) 2001-02-14 $\0\n";
 
 #include "cdblib.h"
 

@@ -71,6 +71,7 @@
 #define INTMACRO(p)	((p)>=fsm[NID]&&(p)<=fsm[LIT])
 #define INQUOTE(p)	((p)>=fsm[LIT1]&&(p)<=fsm[LIT2])
 #define INOPSPACE(p)	((p)==fsm[BIN1])
+#define INSPACE(p)	((p)==fsm[WS1])
 
 /*
  * proto non-terminal states

@@ -928,7 +928,7 @@ extern long $u();" >> $tmp.g
 			echo "void _exit(code) int code; { if (hit++) abort(); __exit(code); }"
 			echo "main() { return 0; }"
 			} > ${tmp}h.c
-			$cc -o ${tmp}h.x ${tmp}h.c && ${tmp}h.x && i=_$i
+			$cc -o ${tmp}h.x ${tmp}h.c && ./${tmp}h.x && i=_$i
 			;;
 		*)	case $weak in
 			?*)	i=$w ;;

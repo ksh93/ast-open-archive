@@ -346,7 +346,7 @@ TkCanvPostscriptCmd(canvasPtr, interp, argc, argv)
 
     Tcl_AppendResult(canvasPtr->interp, "%!PS-Adobe-3.0 EPSF-3.0\n",
 	    "%%Creator: Tk Canvas Widget\n", (char *) NULL);
-#if !(defined(WIN_TCL) || defined(MAC_TCL))
+#if !(defined(WIN_TCL) || defined(MAC_TCL) || 1)
     pwPtr = getpwuid(getuid());
     Tcl_AppendResult(canvasPtr->interp, "%%For: ",
 	    (pwPtr != NULL) ? pwPtr->pw_gecos : "Unknown", "\n",

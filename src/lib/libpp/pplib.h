@@ -221,7 +221,11 @@ struct pptuple				/* tuple macro			*/
 	long		mode;		/* uncoupled pp state flags	*/ \
 	long		option;		/* option flags			*/ \
 	long		test;		/* implementation tests		*/ \
-	Sfio_t*		filedeps;	/* FILEDEPS output stream	*/ \
+	struct								   \
+	{								   \
+	Sfio_t*		sp;		/* FILEDEPS output stream	*/ \
+	long		flags;		/* PP_FILEDEPS flags		*/ \
+	}		filedeps;	/* FILEDEPS info		*/ \
 	struct ppdirs*	firstdir;	/* first include dir		*/ \
 	struct ppdirs*	lastdir;	/* last include dir		*/ \
 	int		hide;		/* current include hide index	*/ \
@@ -303,7 +307,8 @@ struct pptuple				/* tuple macro			*/
 	PPMACREF	macref;		/* called on macro def/ref	*/ \
 	PPOPTARG	optarg;		/* unknown option arg handler	*/ \
 	PPPRAGMA	pragma;		/* pass along unknown pragmas	*/ \
-	struct counter	counter;	/* monitoring counters		*/
+	struct counter	counter;	/* monitoring counters		*/ \
+	char		funbuf[256];	/* last __FUNCTION__		*/
 
 #define _PP_SYMBOL_PRIVATE_		/* ppsymbol private additions	*/ \
 	struct pphide*	hidden;		/* hidden symbol info		*/
@@ -403,6 +408,9 @@ struct pptuple				/* tuple macro			*/
 
 #define NEWDIRECTIVE	(-1)
 
+#undef	dirname
+#undef	error
+
 #define dirname(x)	ppkeyname(x,1)
 #define error		pperror
 #define keyname(x)	ppkeyname(x,0)
@@ -479,7 +487,8 @@ struct pptuple				/* tuple macro			*/
 #define INC_MAP		INC_PREFIX
 #define INC_SELF	(1<<(2*INC_MAX+0))
 #define INC_EXISTS	(1<<(2*INC_MAX+1))
-#define INC_MAPPED	(1<<(2*INC_MAX+2))
+#define INC_LISTED	(1<<(2*INC_MAX+2))
+#define INC_MAPPED	(1<<(2*INC_MAX+3))
 
 #define TYPE_ARCHIVE	(1<<0)
 #define TYPE_BUFFER	(1<<1)
@@ -699,6 +708,7 @@ struct ppsymkey				/* pun for SYM_KEYWORD lex val	*/
 
 #define size_t		int
 
+extern void*		realloc(void*, size_t);
 extern void*		calloc(size_t, size_t);
 extern char*		ctime(time_t*);
 extern void		free(void*);

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2001-01-01
+# @(#)make.probe (AT&T Research) 2001-05-31
 #
 # C probe for make
 #
@@ -11,15 +11,14 @@
 
 probe_arflags="-xar"
 probe_debug="-g"
-probe_ld="ld \$cc"
+probe_ld='ld "$cc"'
 probe_ldlib="LD_LIBRARY_PATH LIBPATH LPATH"
 probe_ldmap="'-Wl,-M' '-Qoption ld -M' '-Wl,-m' '-m'"
 probe_ldrunpath="-Wl,-R, -R -Wl,-rpath, -L"
 probe_lib="a lib"
 probe_lib_append="/usr/lib/pa1.1"
-probe_lib_all="-all -Bwhole-archive -whole-archive -all_load -Wl,-zallextract"
+probe_lib_all_undef="-all -notall -all -none -Bwhole-archive -Bno-whole-archive -whole-archive -no-whole-archive -Wl,-whole-archive -Wl,-no-whole-archive -all_load '' -Wl,-zallextract -Wl,-zdefaultextract"
 probe_lib_multiple="-Wl,-zmuldefs"
-probe_lib_undef="-notall -none -Bno-whole-archive -no-whole-archive -Wl,-zdefaultextract"
 probe_libdir="shlib lib"
 probe_nm="nm"
 probe_nmflags="'' -p -B"
@@ -33,13 +32,18 @@ probe_shared_registry='"-update_registry $probe_shared_registry_file"'
 probe_shared_registry_file='registry.ld'
 probe_shared_registry_path="\$(LIBDIR)/$probe_shared_registry_file"
 probe_strict="'-ansi -pedantic' '-ansi -strict' -strict -ansi"
+probe_strip="strip"
+probe_stripflags="-f"
 probe_unresolved="'-expect_unresolved \"*\"'"
 probe_warn="-Wall -fullwarn -w3 '-A -A' +w1"
 
 echo '#pragma pp:version' > libpp.$src
 echo 'main(){return 0;}' > doti.$src
-echo '#include "iminus.h"' > iminus.$src
-echo 'int x;' > iminus.h
+echo '#include <stdio.h>' > imstd.$src
+echo '#include "_i_.h"' > imusr.$src
+echo 'int x;' > _i_.h
+mkdir im
+echo '(' > im/stdio.h
 echo '#include "implc_x.h"
 int main(){f(1);return 0;}' > implc.$src
 echo 'template <class T> void f(T){}' > implc_x.$src
@@ -83,9 +87,12 @@ echo 'int f(){return 0;}' > warnok.$src
 chmod -w *.$src
 
 arflags=
-dialect=
 debug=
+dialect=
+dll_libraries=
+dll_variants=
 doti=
+exectype=
 iminus=
 implicitc=
 lddynamic=
@@ -136,11 +143,19 @@ path=$*
 set x $cc
 eval `echo $2 | sed -e 's,\(.*\)/\(.*\),d=\1 b=\2,'`
 case $b in
-[cC][cC])	p= s= ;;
-*[cC][cC]*)	eval `echo $b | sed -e 's,\(.*\)[cC][cC]\(.*\),p=\1 b=\2,'` ;;
-*)		p= s= ;;
+[cC][cC])
+	p= s=
+	;;
+*[cC][cC]*)
+	eval `echo $b | sed -e 's,\(.*\)[cC][cC]\(.*\),p=\1 b=\2,'`
+	case $p in
+	*g)	p="$p `echo $p | sed -e 's/.$//'`" ;;
+	esac
+	;;
+*)	p= s=
+	;;
 esac
-eval set _ $probe_ld _ $probe_nm _ $probe_size _
+eval set _ $probe_ld _ $probe_nm _ $probe_size _ $probe_strip _
 while	:
 do	shift
 	case $# in
@@ -155,7 +170,7 @@ do	shift
 		i=$1
 		shift
 		case $i in
-		/*)	if	test -x $i
+		/*)	if	$executable $i
 			then	v=$i
 				break
 			fi
@@ -163,14 +178,14 @@ do	shift
 		esac
 		for x in $p ''
 		do	for y in $s ''
-			do	if	test -x $d/$x$i$y
+			do	if	$executable $d/$x$i$y
 				then	v=$d/$x$i$y
 					break 3
 				fi
 			done
 		done
 		for x in $path
-		do	if	test -x $x/$i
+		do	if	$executable $x/$i
 			then	v=$i
 				break 2
 			fi
@@ -193,6 +208,7 @@ do	shift
 done
 nmedit=
 nmflags=
+stripflags=
 
 rm -f dynamic.$exe
 if	$cc -o dynamic.$exe dynamic.$obj && $executable dynamic.$exe
@@ -214,8 +230,21 @@ then	mkdir mylib
 fi
 test `$cc -E libpp.$src | grep -c '^#pragma pp:version "libpp '` -eq 1 && libpp=1
 $cc -E doti.$src > doti.i && $cc -c doti.i && test -s doti.$obj && doti=1
-if	$cc -c -I. -I- iminus.$src
-then	$cc -c -I- iminus.$src || iminus=1
+if	$cc -c imusr.$src
+then	if	$cc -c -I- imusr.$src
+	then	: '-I- should skip "_i_.h" in .'
+	elif	$cc -c imstd.$src
+	then	if	$cc -c -Iim imstd.$src
+		then	: '-Idir should find <stdio.h> in dir'
+		elif	$cc -c -I- -Iim imstd.$src
+		then	: '-I- -Idir should find <stdio.h> in dir'
+		elif	$cc -c -Iim -I- imstd.$src
+		then	iminus=1
+		else	: '-Idir -I- should skip <stdio.h> in dir'
+		fi
+	else	: should find stdio.h
+	fi
+else	: 'should find "_i_.h" in .'
 fi
 if	$cc -c pic.$src 2>e
 then	e=`wc -l e`
@@ -233,7 +262,7 @@ then	e=`wc -l e`
 			$cc -o pic.$exe pic.$obj && test -f pic.$exe && continue
 		}
 		case $1 in
-		*-D[a-z]*=*)
+		*-D[abcdefghijklmnopqrstuvwxyz]*=*)
 			pic=$1
 			break
 			;;
@@ -249,8 +278,9 @@ then	e=`wc -l e`
 			shared=-Wl,dll
 			probe_sd=
 			probe_shared=
-			lddynamic=-Bdynamic
-			ldstatic=-Bstatic
+			#unused# lddynamic=-Bdynamic
+			#unused# ldstatic=-Bstatic
+			lib_dll=SYMBOL
 			break
 			;;
 		esac
@@ -396,7 +426,7 @@ then	eval set x $probe_nmflags
 		case $# in
 		0)	break ;;
 		esac
-		case `$nm $1 pic.$obj | grep -c '[0-9][ 	][ 	]*T[ 	][ 	]*[_A-Za-z]'` in
+		case `$nm $1 pic.$obj | grep -c '[0123456789][ 	][ 	]*T[ 	][ 	]*[_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]'` in
 		0)	;;
 		*)	nmflags=$1
 			break
@@ -411,26 +441,44 @@ then	eval set x $probe_nmflags
 			;;
 		esac
 		;;
-	*)	nmedit="-e '/[ 	]T[ 	][ 	]*[_A-Za-z]/!d' -e 's/.*[ 	]T[ 	][ 	]*//'"
+	*)	nmedit="-e '/[ 	]T[ 	][ 	]*[_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]/!d' -e 's/.*[ 	]T[ 	][ 	]*//'"
 		;;
 	esac
+fi
+
+if	$cc -c doti.$src
+then	eval set x $probe_stripflags
+	while	:
+	do	shift
+		case $# in
+		0)	break ;;
+		esac
+		if	$strip $1 doti.$obj
+		then	stripflags=$1
+			break
+		fi
+	done
 fi
 
 case $pic:$so:$dynamic:$static in
 :::)	;;
 *)	if	$cc -c $pic shared.$src notall.$src
-	then	eval set x $probe_shared
-		while	:
-		do	shift
-			case $# in
-			0)	break ;;
-			esac
-			for dld in $cc $ld
-			do	rm -f xxx$dll
+	then	
+		for dld in "$cc" "$ld"
+		do	eval set x $probe_shared
+			while	:
+			do	shift
+				case $# in
+				0)	break ;;
+				esac
+				rm -f xxx$dll
 				# UNDENT ...
 
 	if	$dld $1 -o xxx$dll shared.$obj 2>e && test -r xxx$dll
-	then	case `PATH=/bin:/usr/bin:$PATH file xxx$dll` in
+	then	if	test -s e && egrep -i 'unknown|invalid|option' e > /dev/null
+		then	continue
+		fi
+		case `PATH=/bin:/usr/bin:$PATH file xxx$dll` in
 		*lib*|*obj*|*shared*)	;;
 		"")		$executable xxx$dll || continue ;;
 		*)		continue ;;
@@ -496,53 +544,69 @@ case $pic:$so:$dynamic:$static in
 		rm -f libxxx.$lib
 		ar cr libxxx.$lib shared.$obj
 		ranlib libxxx.$lib
-		eval set x $probe_lib_all
+		eval set x x $probe_lib_all_undef
 		rm -f xxx$dll
 		if	$ld $shared -o xxx$dll libxxx.$lib && test -r xxx$dll
 		then	if	$nm $nmflags xxx$dll | grep ShareD
 			then	lib_dll=OPTION
-				set x
+				set x x
 			fi
 		fi
 		while	:
 		do	shift
+			shift
 			case $# in
-			0)	break ;;
+			0|1)	break ;;
 			esac
 			rm -f xxx$dll
-			if	$ld $shared -o xxx$dll $1 libxxx.$lib && test -r xxx$dll
+			if	$ld $shared -o xxx$dll $1 libxxx.$lib $2 && test -r xxx$dll
 			then	if	$nm $nmflags xxx$dll | grep ShareD
 				then	lib_dll=option
 					lib_all=$1
+					lib_undef=$2
 					break
 				fi
 			fi
+			case $2 in
+			?*)	if	$ld $shared -o xxx$dll $1 libxxx.$lib && test -r xxx$dll
+				then	if	$nm $nmflags xxx$dll | grep ShareD
+					then	lib_dll=option
+						lib_all=$1
+						break
+					fi
+				fi
+				;;
+			esac
 		done
 		case $lib_dll in
 		OPTION)	lib_dll=option
 			;;
-		option)	rm -f libyyy.$lib
-			ar cr libyyy.$lib notall.$obj
-			ranlib libyyy.$lib
-			$cc -c prefix.$src
-			eval set x $probe_lib_undef
-			while	:
-			do	shift
-				case $# in
-				0)	break ;;
-				esac
-				rm -f xxx$dll
-				if	$ld $shared -o xxx$dll prefix.$obj $lib_all libxxx.$lib $1 libyyy.$lib && test -r xxx$dll
-				then	rm -f t
-					$nm $nmflags xxx$dll > t
-					case `grep -c ShareD t`:`grep -c NotalL t` in
-					0:*)	;;
-					*:0)	lib_undef=$1
-						break
-						;;
+		option)	case $lib_undef in
+			"")	rm -f libyyy.$lib
+				ar cr libyyy.$lib notall.$obj
+				ranlib libyyy.$lib
+				$cc -c prefix.$src
+				eval set x x $probe_lib_all_undef
+				while	:
+				do	shift
+					shift
+					case $# in
+					0|1)	break ;;
 					esac
-				fi
-			done
+					rm -f xxx$dll
+					if	$ld $shared -o xxx$dll prefix.$obj $lib_all libxxx.$lib $2 libyyy.$lib && test -r xxx$dll
+					then	rm -f t
+						$nm $nmflags xxx$dll > t
+						case `grep -c ShareD t`:`grep -c NotalL t` in
+						0:*)	;;
+						*:0)	lib_undef=$2
+							break
+							;;
+						esac
+					fi
+				done
+				;;
+			esac
 			case $lib_undef in
 			"")	eval set x $probe_lib_multiple
 				rm -f libyyy.$lib
@@ -690,6 +754,7 @@ case $shared in
 			if	$ld -o lib.$obj -L: -bexport:lib.exp -berok -bmodtype:SRE -T512 -H512 -lm -lc member.$obj && $cc -o main.exe main.$obj lib.$obj
 			then	shared='-T512 -H512 -L$(LIBDIR): -berok -bmodtype:SRE'
 				lib_dll=export
+				dll_libraries='-lm -lc'
 				ldscript=.exp
 				case $pic in
 				"")	pic=-D_PIC_ ;;
@@ -699,6 +764,59 @@ case $shared in
 				esac
 			fi
 		fi
+		;;
+	esac
+	;;
+esac
+
+case $lib_dll in
+option)	case $hosttype in
+	linux.*)	dll_libraries=-lc ;;
+	esac
+	;;
+SYMBOL)	lib_dll=symbol
+	;;
+symbol)	echo "#include <stdio.h>
+extern int fun()
+{
+	puts(\"fun\");
+	return 0;
+}" > dllib.$src
+	echo "extern int fun();
+main()
+{
+	return fun();
+}" > dlmain.$src
+	pwd=`pwd`
+	while	:
+	do
+		if	$cc $pic -c dlmain.$src &&
+			$cc $pic -c dllib.$src
+		then	rm -f libxxx$so
+			if	$ld $shared -o libxxx$so dllib.$obj &&
+				chmod 555 libxxx$so
+			then	rm -f dlmain.$exe
+				if	$cc -o dlmain.$exe dlmain.$obj $pwd/libxxx$so &&
+					./dlmain.$exe >/dev/null 2>&1
+				then	break
+				fi
+			fi
+			rm -f libxxx$so dlmain.$exe
+			if	$ld $shared -o libxxx$so dllib.$obj -lm -lc &&
+				chmod 555 libxxx$so &&
+				$cc -o dlmain.$exe dlmain.$obj $pwd/libxxx$so &&
+				./dlmain.$exe >/dev/null 2>&1
+			then	dll_libraries='-lm -lc'
+			fi
+		fi
+		break
+	done
+	# the dll_libraries probe is still lame
+	case $dll_libraries in
+	'')	case $hosttype in
+		sco.*|sol*.*|sun*)	;;
+		*)			dll_libraries='-lm -lc' ;;
+		esac
 		;;
 	esac
 	;;
@@ -773,7 +891,7 @@ then	case $plusplus in
 				case $# in
 				0)	break ;;
 				esac
-				d=`$cc -Dtype=int -Dcall=$sym $static $1 tstlib.$src -l$l 2>&1 | sed -e '/[\\\\\\/].*[\\\\\\/]lib[a-zA-Z+][a-zA-Z+]*\.[^\\\\\\/]*\$/!d' -e 's,^[^\\\\\/]*,,' -e 's,[\\\\\\/]lib[a-zA-Z+][a-zA-Z+]*\.[^\\\\\\/]*\$,,' -e '/^[\\\\\\/]/!d' | sort -u`
+				d=`$cc -Dtype=int -Dcall=$sym $static $1 tstlib.$src -l$l 2>&1 | sed -e '/[\\\\\\/].*[\\\\\\/]lib[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+]*\.[^\\\\\\/]*\$/!d' -e 's,^[^\\\\\/]*,,' -e 's,[\\\\\\/]lib[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+]*\.[^\\\\\\/]*\$,,' -e '/^[\\\\\\/]/!d' | sort -u`
 				case $d in
 				?*)	tstlib="$tstlib $d" ;;
 				esac
@@ -1002,12 +1120,12 @@ do	case $hosted in
 		done
 		rm -f readonly.$exe readonly.s
 		if	$cc -S readonly.$src && test -f readonly.s
-		then	if	sed	-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)data/\1text/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)zero[ 	][ 	]*/\1set	.,.+/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*1/\1byte 0/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*2/\1byte 0,0/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*3/\1byte 0,0,0/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*4/\1byte 0,0,0,0/' \
+		then	if	sed	-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)data/\1text/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)zero[ 	][ 	]*/\1set	.,.+/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*1/\1byte 0/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*2/\1byte 0,0/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*3/\1byte 0,0,0/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*4/\1byte 0,0,0,0/' \
 					readonly.s > ro.s && $cc -o readonly.$exe ro.s && $executable readonly.$exe
 			then	if	./readonly.$exe
 				then	:
@@ -1016,12 +1134,12 @@ do	case $hosted in
 				fi
 			fi
 			rm -f readonly.$exe
-			if	sed	-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)idat/\1code/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)zero[ 	][ 	]*/\1set	.,.+/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*1/\1byte 0/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*2/\1byte 0,0/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*3/\1byte 0,0,0/' \
-					-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)space[ 	][ 	]*4/\1byte 0,0,0,0/' \
+			if	sed	-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)idat/\1code/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)zero[ 	][ 	]*/\1set	.,.+/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*1/\1byte 0/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*2/\1byte 0,0/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*3/\1byte 0,0,0/' \
+					-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)space[ 	][ 	]*4/\1byte 0,0,0,0/' \
 					readonly.s > ro.s && $cc -o readonly.$exe ro.s && $executable readonly.$exe
 			then	if	./readonly.$exe
 				then	:
@@ -1029,7 +1147,7 @@ do	case $hosted in
 					break
 				fi
 			fi
-			if	sed	-e 's/^\([ 	]*[.a-zA-Z0-9_$:]*[ 	]*\.*\)data/\1rdata/' \
+			if	sed	-e 's/^\([ 	]*[.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_$:]*[ 	]*\.*\)data/\1rdata/' \
 					readonly.s > ro.s && $cc -o readonly.$exe ro.s && $executable readonly.$exe
 			then	if	./readonly.$exe
 				then	:
@@ -1115,9 +1233,9 @@ case $sa:$sd:$so in
 		do	eval j="'" $i/lib*$1 "'"
 			case $j in
 			" $i/lib*$1 ")
-				eval j="'" $i/lib*$1.[0-9]* "'"
+				eval j="'" $i/lib*$1.[0123456789]* "'"
 				case $j in
-				" $i/lib*$1.[0-9]* ")
+				" $i/lib*$1.[0123456789]* ")
 					continue
 					;;
 				esac
@@ -1138,12 +1256,50 @@ case $ldscript in
 	esac
 	;;
 esac
+case $hosttype in
+'')		hosttype=unknown ;;
+sgi.mips3)	dll_variants='sgi.mips2:o32:-mips2 sgi.mips4:64:-mips4' ;;
+sgi.mips4)	dll_variants='sgi.mips2:o32:-mips2 sgi.mips3:n32:-mips3' ;;
+esac
+
+case $hosted in
+'')	ccnative=`echo $cc | sed -e 's,.*/,,'`
+	ccs=$ccnative
+	for c in cc gcc
+	do	case " $ccs " in
+		*" $c "*)	;;
+		*)		ccs="$ccs $c" ;;
+		esac
+	done
+	for p in $path
+	do	for c in $ccs
+		do	if	$executable $p/$c
+			then	rm -f native.$exe
+				if	$p/$c -o native.$exe doti.$src && ./native.$exe
+				then	ccnative=$p/$c
+					exectype=`package CC="$ccnative" || $SHELL -c "package CC='$ccnative'"`
+					case $exectype in
+					*[Uu][Ss][Aa][Gg][Ee]:*)
+						exectype=`PATH=$_probe_PATH; export PATH; package CC="$ccnative" || $SHELL -c "package CC='$ccnative'"`
+						;;
+					esac
+					break 2
+				fi
+			fi
+		done
+	done
+	;;
+*)	ccnative=$cc
+	exectype=$hosttype
+	;;
+esac
 
 #
 # set up for local override
 #
 
 CC_CC=$cc
+CC_NATIVE=$ccnative
 CC_ALTPP_FLAGS=$ppopt
 CC_ALTPP_ENV=$ppenv
 CC_ARFLAGS=$arflags
@@ -1151,11 +1307,11 @@ CC_DEBUG=$debug
 CC_DIALECT=$dialect
 CC_DLL=$pic
 CC_DLLBIG=$PIC
+CC_DLL_LIBRARIES=$dll_libraries
+CC_DLL_VARIANTS=$dll_variants
 CC_DYNAMIC=$dynamic
-case $hosttype in
-?*)	CC_HOSTTYPE=$hosttype ;;
-*)	CC_HOSTTYPE=unknown ;;
-esac
+CC_EXECTYPE=$exectype
+CC_HOSTTYPE=$hosttype
 CC_LD=$ld
 CC_LD_DYNAMIC=$lddynamic
 CC_LD_RUNPATH=$ldrunpath
@@ -1178,6 +1334,8 @@ CC_STATIC=$static
 CC_STDINCLUDE=$stdinclude
 CC_STDLIB=$stdlib
 CC_STRICT=$strict
+CC_STRIP=$strip
+CC_STRIP_FLAGS=$stripflags
 CC_SUFFIX_ARCHIVE=.$lib
 CC_SUFFIX_COMMAND=$suffix_command
 CC_SUFFIX_DYNAMIC=$sd
@@ -1208,6 +1366,7 @@ fi
 # the payoff
 #
 
+echo CC.NATIVE = $CC_NATIVE
 echo CC.ALTPP.FLAGS = $CC_ALTPP_FLAGS
 echo CC.ALTPP.ENV = $CC_ALTPP_ENV
 echo CC.ARFLAGS = $CC_ARFLAGS
@@ -1215,7 +1374,10 @@ echo CC.DEBUG = $CC_DEBUG
 echo CC.DIALECT = $CC_DIALECT
 echo CC.DLL = $CC_DLL
 echo CC.DLLBIG = $CC_DLLBIG
+echo CC.DLL.VARIANTS = $CC_DLL_VARIANTS
+echo CC.DLL.LIBRARIES = $CC_DLL_LIBRARIES
 echo CC.DYNAMIC = $CC_DYNAMIC
+echo CC.EXECTYPE = $CC_EXECTYPE
 echo CC.HOSTTYPE = $CC_HOSTTYPE
 echo CC.LD = $CC_LD
 echo CC.LD.DYNAMIC = $CC_LD_DYNAMIC
@@ -1244,6 +1406,8 @@ echo CC.STATIC = $CC_STATIC
 echo CC.STDINCLUDE = $CC_STDINCLUDE
 echo CC.STDLIB = $CC_STDLIB
 echo CC.STRICT = $CC_STRICT
+echo CC.STRIP = $CC_STRIP
+echo CC.STRIP.FLAGS = $CC_STRIP_FLAGS
 echo CC.SUFFIX.ARCHIVE = $CC_SUFFIX_ARCHIVE
 echo CC.SUFFIX.COMMAND = $CC_SUFFIX_COMMAND
 echo CC.SUFFIX.DYNAMIC = $CC_SUFFIX_DYNAMIC

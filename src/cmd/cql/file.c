@@ -681,10 +681,10 @@ hix_event(Hix_t* hix, int op, void* arg, Hixdisc_t* disc)
 		}
 		f->cdbdisc.version = CDB_VERSION;
 		f->cdbdisc.schema = f->schema;
-		f->cdbdisc.details = f->details;
+		f->cdbdisc.details = f->details ? f->details : ((Local_t*)f->record->symbol->local.pointer)->file->details;
 		f->cdbdisc.errorf = (Cdberror_f)errorf;
 		f->cdbdisc.eventf = cdb_event;
-		message((-1, "cdb: open %s fp=%p schema=%s offset=%lld flags=%s", hix->name, ip, f->cdbdisc.schema, sftell(ip), cdbflags(NiL, CDB_READ|CDB_TERMINATED|state.cdb_flags|((error_info.trace<=-8)?((error_info.trace<=-11)?(CDB_DUMP|CDB_VERBOSE):CDB_DUMP):0))));
+		message((-1, "cdb: open %s f=%p fp=%p schema=%s offset=%lld flags=%s details=%s", hix->name, f, ip, f->cdbdisc.schema, sftell(ip), cdbflags(NiL, CDB_READ|CDB_TERMINATED|state.cdb_flags|((error_info.trace<=-8)?((error_info.trace<=-11)?(CDB_DUMP|CDB_VERBOSE):CDB_DUMP):0)), f->cdbdisc.details));
 		f->cdb = cdbopen(NiL, &f->cdbdisc, f->format, ip, hix->name, CDB_READ|CDB_TERMINATED|state.cdb_flags|((error_info.trace<=-8)?((error_info.trace<=-11)?(CDB_DUMP|CDB_VERBOSE):CDB_DUMP):0));
 		if (!f->cdb)
 			return -1;
@@ -915,6 +915,8 @@ generate(Expr_t* prog, register File_t* f, const char* file, Exid_t* sym)
 	{
 		message((-7, "fil: name=%s access=%c primary=%s secondary=%s info=%s%s%s", f->name, -f->access, file, secondary, r->symbol->name, f->hix ? " REPEAT" : "", g ? " GENERATE" : ""));
 		f->hixdisc = state.hix;
+		if (f->hix)
+			f->hixdisc.flags &= ~HIX_REGENERATE;
 		if (!(f->hix = hixopen(file, secondary, r->symbol->name, g, &f->hixdisc)))
 			break;
 		if ((state.test & 2) && !f->name)

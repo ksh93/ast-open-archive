@@ -24,128 +24,849 @@
 #pragma prototyped
 
 /*
- * glob test harness
+ * glob(3) test harness
+ *
+ * testglob [ options ] < testglob.dat
+ *
+ *	-c	catch signals and non-terminating calls
+ *	-v	list each test line
+ *
+ * see comments in testglob.dat for a description of the input format
  */
 
-static const char usage[] =
-"[-?\n@(#)$Id: testglob (AT&T Labs Research) 1999-11-04 $\n]"
-USAGE_LICENSE
-"[+NAME?testglob - test harness for \bglob\b(3)]"
-"[+DESCRIPTION?\btestglob\b is a test harness for the \bglob\b(3) library"
-"	function. It provides access to the \bast\b extension to \bglob\b(3)."
-"	More than one \apattern\a argument exercises \bGLOB_APPEND\b. Be sure"
-"	to quote the \apattern\a arguments, otherwise you will be testing"
-"	\bsh\b(1) and not \bglob\b(3).]"
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-03-17 $\0\n";
 
-"[c:completion?Perform shell command completion.]"
-"[d:drop?Drop directory entries matching pattern.]:[pattern]"
-"[e!:escape?\b\\\b quotes the next character.]"
-"[i:ignorecase?Ignore case when matching patterns.]"
-"[l:list?Return a linked list of matched paths rather than a 0 terminated"
-"	array. The list is not sorted.]"
-"[m:mark?Append \b/\b to matched directories.]"
-"[s!:sort?Sort the matched paths. Ignored for \b--list\b.]"
-
-"\n"
-"\npattern ...\n"
-"\n"
-"[+SEE ALSO?\btestmatch\b(1), \btestre\b(1), \bregex\b(3), \bstrmatch\b(3)]"
-;
-
+#if _PACKAGE_ast
 #include <ast.h>
-#include <ctype.h>
+#else
+#define fmtident(s)	((char*)(s)+10)
+#endif
+
+#include <stdio.h>
 #include <glob.h>
-#include <error.h>
+#include <ctype.h>
+#include <setjmp.h>
+#include <signal.h>
+#include <locale.h>
+#include <unistd.h>
 
-static char*
-globerror(int code)
+#ifdef	__STDC__
+#include <stdlib.h>
+#endif
+
+#ifndef NiL
+#ifdef	__STDC__
+#define NiL		0
+#else
+#define NiL		(char*)0
+#endif
+#endif
+
+#ifndef elementsof
+#define elementsof(x)	(sizeof(x)/sizeof(x[0]))
+#endif
+
+#ifndef streq
+#define streq(a,b)	(*(a)==*(b)&&!strcmp(a,b))
+#endif
+
+#define LOOPED		2
+#define NOTEST		(~0)
+
+static const char* unsupported[] = {
+#ifndef GLOB_AUGMENTED
+	"AUGMENTED",
+#endif
+#ifndef GLOB_BRACE
+	"BRACE",
+#endif
+#ifndef GLOB_COMPLETE
+	"COMPLETE",
+#endif
+#ifndef GLOB_DISC
+	"DISC",
+#endif
+#ifndef GLOB_ICASE
+	"ICASE",
+#endif
+#ifndef GLOB_LIST
+	"LIST",
+#endif
+#ifndef GLOB_STACK
+	"STACK",
+#endif
+	0
+};
+
+#ifndef GLOB_BRACE
+#define GLOB_BRACE	NOTEST
+#endif
+#ifndef GLOB_COMPLETE
+#define GLOB_COMPLETE	NOTEST
+#endif
+#ifndef GLOB_DISC
+#define GLOB_DISC	NOTEST
+#endif
+#ifndef GLOB_ICASE
+#define GLOB_ICASE	NOTEST
+#endif
+#ifndef GLOB_LIST
+#define GLOB_LIST	NOTEST
+#endif
+#ifndef GLOB_STACK
+#define GLOB_STACK	NOTEST
+#endif
+
+#define GLOB_UNKNOWN	(-1)
+
+#ifndef GLOB_ABORTED
+#define GLOB_ABORTED	(GLOB_UNKNOWN-1)
+#endif
+#ifndef GLOB_NOMATCH
+#define GLOB_NOMATCH	(GLOB_UNKNOWN-2)
+#endif
+#ifndef GLOB_NOSPACE
+#define GLOB_NOSPACE	(GLOB_UNKNOWN-3)
+#endif
+#ifndef GLOB_INTR
+#define GLOB_INTR	(GLOB_UNKNOWN-4)
+#endif
+#ifndef GLOB_APPERR
+#define GLOB_APPERR	(GLOB_UNKNOWN-5)
+#endif
+#ifndef GLOB_NOSYS
+#define GLOB_NOSYS	(GLOB_UNKNOWN-6)
+#endif
+#ifndef GLOB_ELOOP
+#define GLOB_ELOOP	(GLOB_UNKNOWN-7)
+#endif
+#ifndef GLOB_EBUS
+#define GLOB_EBUS	(GLOB_UNKNOWN-8)
+#endif
+#ifndef GLOB_EFAULT
+#define GLOB_EFAULT	(GLOB_UNKNOWN-9)
+#endif
+
+static const struct { int code; char* name; char* desc;} codes[] = {
+	GLOB_UNKNOWN,	"UNKNOWN",	"unknown",
+	0,		"OK",		"ok",
+	GLOB_ABORTED,	"ABORTED",	"glob aborted",
+	GLOB_NOMATCH,	"NOMATCH",	"no match",
+	GLOB_NOSPACE,	"NOSPACE",	"no space left",
+	GLOB_INTR,	"INTR",		"an interrupt occurred",
+	GLOB_APPERR,	"APPERR",	"aplication error",
+	GLOB_NOSYS,	"NOSYS",	"not a system call",
+	GLOB_ELOOP,	"ELOOP",	"recursin loop",
+	GLOB_EBUS,	"EBUS",		"bus error",
+	GLOB_EFAULT,	"EFAULT",	"memory fault",
+};
+
+static struct {
+	int		errors;
+	struct {
+	int		count;
+	int		error;
+	int		position;
+	}		ignore;
+	int		lineno;
+	int		ret;
+	int		signals;
+	int		unspecified;
+	int		warnings;
+	char*		stack;
+	char*		which;
+	jmp_buf		gotcha;
+} state;
+
+static void
+quote(char* s)
 {
-	static char	msg[32];
+	unsigned char*	u = (unsigned char*)s;
+	int		c;
 
-	switch (code)
-	{
-	case GLOB_ABORTED:	return "GLOB_ABORTED";
-	case GLOB_NOMATCH:	return "GLOB_NOMATCH";
-	case GLOB_NOSPACE:	return "GLOB_NOSPACE";
-	case GLOB_INTR:		return "GLOB_INTR";
-	case GLOB_APPERR:	return "GLOB_APPERR";
-	case GLOB_NOSYS:	return "GLOB_NOSYS";
+	if (!u)
+		printf("NIL");
+	else if (!*u)
+		printf("NULL");
+	else {
+		printf("\"");
+		for (;;) {
+			switch (c = *u++) {
+			case 0:
+				break;;
+			case '\\':
+				printf("\\\\");
+				continue;
+			case '"':
+				printf("\\\"");
+				continue;
+			case '\n':
+				printf("\\n");
+				continue;
+			case '\r':
+				printf("\\r");
+				continue;
+			case '\t':
+				printf("\\t");
+				continue;
+			default:
+				if (!iscntrl(c) && isprint(c))
+					putchar(c);
+				else
+					printf("\\x%02x", c);
+				continue;
+			}
+			break;
+		}
+		printf("\"");
 	}
-	sfsprintf(msg, sizeof(msg), "unknown error %d", code);
-	return msg;
+}
+
+static void
+report(char* comment, char* pat, char* msg, int flags, int unspecified)
+{
+	printf("%d: ", state.lineno);
+#if GLOB_LIST != NOTEST
+	if (flags & GLOB_LIST)
+		printf("LIST: ");
+#endif
+#if GLOB_STACK != NOTEST
+	if (flags & GLOB_STACK)
+		printf("STACK: ");
+#endif
+	if (unspecified) {
+		state.unspecified++;
+		printf(" unspecified behavior");
+	}
+	else
+		state.errors++;
+	if (pat)
+		quote(pat);
+	printf(" %s %s", state.which, comment);
+	if (msg && comment[strlen(comment)-1] != '\n')
+		printf(": %s: ", msg);
+}
+
+static int
+note(int level, int skip, char* msg)
+{
+	if (!skip) {
+		printf("NOTE\t");
+		if (msg)
+			printf("%s: ", msg);
+		printf("skipping lines %d", state.lineno);
+	}
+	return skip | level;
+}
+
+static void
+bad(char* comment, char* pat)
+{
+	printf("bad test case ");
+	report(comment, pat, NiL, 0, 0);
+	exit(1);
+}
+
+static int
+hex(int c)
+{
+	return isdigit(c) ? (c - '0') : (c - (isupper(c) ? 'A' : 'a') + 10);
+}
+
+static void
+escape(char* s)
+{
+	char*	t;
+
+	for (t = s; *t = *s; s++, t++) {
+		if (*s != '\\')
+			continue;
+		switch (*++s) {
+
+		case 0:
+			*++t = 0;
+			break;
+		case 'n':
+			*t = '\n';
+			break;
+		case 'r':
+			*t = '\r';
+			break;
+		case 't':
+			*t = '\t';
+			break;
+		case 'x':
+			if (!isxdigit(s[1]) || !isxdigit(s[2]))
+				bad("bad \\x\n", NiL);
+			*t = hex(*++s) << 4;
+			*t |= hex(*++s);
+			break;
+		default:
+			s--;
+			break;
+		}
+	}
+}
+
+static void
+sigunblock(int s)
+{
+#ifdef SIG_SETMASK
+	int		op;
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	if (s) {
+		sigaddset(&mask, s);
+		op = SIG_UNBLOCK;
+	}
+	else op = SIG_SETMASK;
+	sigprocmask(op, &mask, NiL);
+#else
+#ifdef sigmask
+	sigsetmask(s ? (sigsetmask(0L) & ~sigmask(s)) : 0L);
+#endif
+#endif
+}
+
+static void
+gotcha(int sig)
+{
+	signal(sig, gotcha);
+	alarm(0);
+	state.signals++;
+	switch (sig) {
+
+	case SIGALRM:
+		state.ret = GLOB_ELOOP;
+		break;
+	case SIGBUS:
+		state.ret = GLOB_EBUS;
+		break;
+	case SIGSEGV:
+		state.ret = GLOB_EFAULT;
+		break;
+	}
+	sigunblock(sig);
+	longjmp(state.gotcha, 1);
 }
 
 int
 main(int argc, char** argv)
 {
-	register char*		pattern;
-	register char**		vp;
-	register globlist_t*	gl;
-	register int		i;
-	glob_t			gs;
+	int		flags;
+	int		query;
+	int		unspecified;
+	int		kre;
+	int		sre;
+	int		okre;
+	int		osre;
+	int		ret;
+	int		i;
+	int		m;
+	int		expected;
+	int		got;
+	int		ok;
+	char*		spec;
+	char*		pat;
+	char*		p;
+	char*		bp;
+	char*		s;
+	char*		bs;
+	char*		ans;
+	char*		err;
+	char*		msg;
+	char*		field[5];
+	char		unit[64];
+	char		buf[16 * 1024];
+	char		pathbuf[1024];
+	char*		path;
+	char*		pathmax;
+	char*		work[16];
+	glob_t		gl;
+#if GLOB_DISC != NOTEST
+	char		fignore[128];
+#endif
+#if GLOB_LIST != NOTEST
+	globlist_t*	gi;
+#endif
 
-	int			flags = GLOB_NOCHECK|GLOB_STACK;
+	int		catch = 0;
+	int		cwd = 0;
+	int		level = 1;
+	int		locale = 0;
+	int		skip = 0;
+	int		testno = 0;
+	int		verbose = 0;
+	int		working = 0;
 
-	NoP(argc);
-	error_info.id = "testglob";
-	memset(&gs, 0, sizeof(gs));
-	for (;;)
-	{
-		switch (optget(argv, usage))
-		{
-		case 'c':
-			if (opt_info.num)
-				flags |= GLOB_COMPLETE;
+	static int	modes[] = {
+				0,
+#if 0 && GLOB_LIST != NOTEST
+				GLOB_LIST,
+#endif
+#if 0 && GLOB_STACK != NOTEST
+				GLOB_STACK,
+#endif
+	};
+
+	printf("TEST\t%s", s = fmtident(id));
+	p = unit;
+	while (p < &unit[sizeof(unit)-1] && (*p = *s++) && !isspace(*p))
+		p++;
+	*p = 0;
+	while ((p = *++argv) && *p == '-')
+		for (;;) {
+			switch (*++p) {
+
+			case 0:
+				break;
+			case 'c':
+				catch = 1;
+				printf(", catch");
+				continue;
+			case 'e':
+				state.ignore.error = 1;
+				printf(", ignore error code mismatches");
+				continue;
+			case 'v':
+				verbose = 1;
+				printf(", verbose");
+				continue;
+			default:
+				printf(", invalid option %c", *p);
+				continue;
+			}
+			break;
+		}
+	if (p)
+		printf(", argument(s) ignored");
+	printf("\n");
+	if (elementsof(unsupported) > 1) {
+		printf("NOTE\tunsupported:");
+		got = ' ';
+		for (i = 0; i < elementsof(unsupported) - 1; i++) {
+			printf("%c%s", got, unsupported[i]);
+			got = ',';
+		}
+		printf("\n");
+	}
+	if (catch) {
+		signal(SIGALRM, gotcha);
+		signal(SIGBUS, gotcha);
+		signal(SIGSEGV, gotcha);
+	}
+	path = pathbuf + 1;
+	pathmax = &path[elementsof(pathbuf)-1];
+	path[0] = 0;
+	work[cwd] = path;
+	work[cwd + 1] = 0;
+	ok = 0;
+	while (p = gets(buf)) {
+		state.lineno++;
+
+	/* parse: */
+
+		if (*p == 0 || *p == '#')
 			continue;
-		case 'd':
-			gs.gl_fignore = opt_info.arg;
-			continue;
-		case 'e':
-			if (!opt_info.num)
-				flags |= GLOB_NOESCAPE;
-			continue;
-		case 'i':
-			if (opt_info.num)
-				flags |= GLOB_ICASE;
-			continue;
-		case 'l':
-			if (opt_info.num)
-				flags |= GLOB_LIST;
-			continue;
-		case 'm':
-			if (opt_info.num)
-				flags |= GLOB_MARK;
-			continue;
-		case 's':
-			if (!opt_info.num)
-				flags |= GLOB_NOSORT;
-			continue;
-		case '?':
-			error(ERROR_USAGE|4, "%s", opt_info.arg);
-			continue;
-		case ':':
-			error(2, "%s", opt_info.arg);
+		if (*p == ':') {
+			while (*++p == ' ');
+			printf("NOTE	%s\n", p);
 			continue;
 		}
-		break;
+		if (*p == 'W') {
+			while (*++p == '\t');
+			if (*p) {
+				i = p - buf - 1;
+				if (i > (cwd + 1) || i >= elementsof(work))
+					bad("invalid workspace depth\n", NiL);
+				if (i > cwd) {
+					if (path[0] && access(path, 0)) {
+						if (verbose) {
+							printf("test %-3d mkdir ", state.lineno);
+							quote(path);
+							printf("\n");
+						}
+						if (mkdir(path, 0755))
+							bad("cannot create work directory\n", path);
+					}
+				}
+				else {
+					if (!streq(work[cwd - 1], ".") && access(path, 0)) {
+						if (verbose) {
+							printf("test %-3d touch ", state.lineno);
+							quote(path);
+							printf("\n");
+						}
+						if (close(creat(path, 0644)))
+							bad("cannot create work file\n", path);
+					}
+					cwd = i - 1;
+				}
+				s = work[cwd];
+				*(s - 1) = '/';
+				while (s < pathmax && (*s = *p++))
+					s++;
+				*s++ = 0;
+				work[cwd = i] = s;
+			}
+			continue;
+		}
+		if (work[1]) {
+			if (!streq(work[cwd-1], ".") && access(path, 0) && close(creat(path, 0644)))
+				bad("cannot create work file\n", path);
+			*(work[1] - 1) = 0;
+			if (!working)
+				working = 1;
+			else if (chdir(".."))
+				bad("cannot chdir\n", "..");
+			if (chdir(path))
+				bad("cannot chdir\n", path);
+			work[1] = 0;
+		}
+#if GLOB_DISC != NOTEST
+		fignore[0] = 0;
+#endif
+		i = 0;
+		field[i++] = p;
+		for (;;) {
+			switch (*p++) {
+			case 0:
+				p--;
+				goto checkfield;
+			case '\t':
+				*(p - 1) = 0;
+			checkfield:
+				s = field[i - 1];
+				if (streq(s, "NIL"))
+					field[i - 1] = 0;
+				else if (streq(s, "NULL"))
+					*s = 0;
+				while (*p == '\t')
+					p++;
+				if (!*p)
+					break;
+				if (i >= elementsof(field))
+					bad("too many fields\n", NiL);
+				field[i++] = p;
+				/*FALLTHROUGH*/
+			default:
+				continue;
+			}
+			break;
+		}
+		if (!(spec = field[0]))
+			bad("NIL spec\n", NiL);
+
+	/* interpret: */
+
+		flags = 0;
+		query = unspecified = kre = sre = 0;
+		for (p = spec; *p; p++) {
+			switch (*p) {
+			case 'C':
+				if (!query && !(skip & level))
+					bad("locale must be nested\n", NiL);
+				query = 0;
+				if (locale)
+					bad("locale nesting not supported\n", NiL);
+				if (i != 2)
+					bad("locale field expected\n", NiL);
+				if (!(skip & level)) {
+#if defined(LC_COLLATE) && defined(LC_CTYPE)
+					s = field[1];
+					if (!s || streq(s, "POSIX"))
+						s = "C";
+					if (!(ans = setlocale(LC_COLLATE, s)) || streq(ans, "C") || streq(ans, "POSIX") || !(ans = setlocale(LC_CTYPE, s)) || streq(ans, "C") || streq(ans, "POSIX"))
+						skip = note(level, skip, s);
+					else {
+						printf("NOTE	\"%s\" locale\n", s);
+						locale = level;
+					}
+#else
+					skip = note(level, skip, "locales not supported");
+#endif
+				}
+				flags |= NOTEST;
+				continue;
+			case 'E':
+				flags |= GLOB_ERR;
+				continue;
+			case 'I':
+#if GLOB_DISC != NOTEST
+				if (field[1])
+					strncpy(fignore, field[1], sizeof(fignore) - 1);
+				else
+					fignore[0] = 0;
+#endif
+				flags |= NOTEST;
+				continue;
+			case 'K':
+				kre = 1;
+				continue;
+			case 'S':
+				sre = 1;
+				continue;
+
+			case 'a':
+				flags |= GLOB_APPEND;
+				continue;
+			case 'b':
+				flags |= GLOB_BRACE;
+				continue;
+			case 'c':
+				flags |= GLOB_COMPLETE;
+				continue;
+			case 'e':
+				flags |= GLOB_NOESCAPE;
+				continue;
+			case 'i':
+				flags |= GLOB_ICASE;
+				continue;
+			case 'm':
+				flags |= GLOB_MARK;
+				continue;
+			case 'n':
+				flags |= GLOB_NOCHECK;
+				continue;
+			case 's':
+				flags |= GLOB_NOSORT;
+				continue;
+			case 'u':
+				unspecified = 1;
+				continue;
+
+			case '{':
+				level <<= 1;
+				if (skip & (level >> 1)) {
+					skip |= level;
+					flags |= NOTEST;
+				}
+				else {
+					skip &= ~level;
+					query = 1;
+				}
+				continue;
+			case '}':
+				if (level == 1)
+					bad("invalid {...} nesting\n", NiL);
+				else
+				{
+					if ((skip & level) && !(skip & (level>>1)))
+						printf("-%d\n", state.lineno);
+#if defined(LC_COLLATE) && defined(LC_CTYPE)
+					else if (locale & level) {
+						locale = 0;
+						if (!(skip & level)) {
+							s = "C";
+							setlocale(LC_COLLATE, s);
+							setlocale(LC_CTYPE, s);
+							printf("NOTE	\"%s\" locale\n", s);
+						}
+					}
+#endif
+					level >>= 1;
+				}
+				flags |= NOTEST;
+				continue;
+			default:
+				bad("bad spec\n", spec);
+				break;
+
+			}
+			break;
+		}
+		if (flags == NOTEST || !sre && !kre)
+			continue;
+		if (i < 3)
+			bad("too few fields\n", NiL);
+		while (i < elementsof(field))
+			field[i++] = 0;
+		if (pat = field[1])
+			escape(pat);
+		if (skip & level)
+			continue;
+		okre = kre;
+		osre = sre;
+		for (m = 0; m < elementsof(modes); m++) {
+			if (m && (flags & modes[m]) == modes[m])
+				continue;
+			flags |= modes[m];
+			err = field[2];
+			ans = field[3];
+			msg = field[4];
+			kre = okre;
+			sre = osre;
+			fflush(stdout);
+
+	/* execute: */
+
+			if (sre) {
+				state.which = "SRE";
+				sre = 0;
+#ifdef GLOB_AUGMENTED
+				flags &= ~GLOB_AUGMENTED;
+#endif
+			}
+#ifdef GLOB_AUGMENTED
+			else if (kre) {
+				state.which = "KRE";
+				kre = 0;
+				flags |= GLOB_AUGMENTED;
+			}
+#endif
+			else
+				continue;
+			if (!m && !query && verbose) {
+				printf("test %-3d ", state.lineno);
+				quote(pat);
+				printf("\n");
+			}
+			if (!ok || !(flags & GLOB_APPEND)) {
+				if (ok) {
+					ok = 0;
+					globfree(&gl);
+				}
+				memset(&gl, 0, sizeof(gl));
+			}
+#if GLOB_DISC != NOTEST
+			if (fignore[0]) {
+				gl.gl_fignore = (const char*)fignore;
+				flags |= GLOB_DISC;
+			}
+			else
+				gl.gl_fignore = 0;
+#endif
+			if (!query)
+				testno++;
+			if (catch) {
+				if (setjmp(state.gotcha))
+					ret = state.ret;
+				else {
+					alarm(LOOPED);
+					ret = glob(pat, flags, 0, &gl);
+					alarm(0);
+				}
+			}
+			else
+				ret = glob(pat, flags, 0, &gl);
+#if 0
+printf("AHA%d ret=%d gl_pathc=%d\n", __LINE__, ret, gl.gl_pathc);
+#endif
+			if (ret == 0) {
+				ok = 1;
+				if (!gl.gl_pathc)
+					ret = GLOB_NOMATCH;
+			}
+			expected = got = 0;
+			for (i = 1; i < elementsof(codes); i++) {
+				if (streq(err, codes[i].name))
+					expected = i;
+				if (ret == codes[i].code)
+					got = i;
+			}
+			if (expected != got) {
+				if (query)
+					skip = note(level, skip, msg);
+				else if (state.ignore.error)
+					state.ignore.count++;
+				else {
+					report("return failed: ", pat, msg, flags, unspecified);
+					printf("%s expected, %s returned", codes[expected].name, codes[got].name);
+					if (!ret)
+						printf(" with %d match%s", gl.gl_pathc, gl.gl_pathc == 1 ? "" : "es");
+					printf("\n");
+				}
+			}
+			else if (ret != GLOB_NOMATCH) {
+				bs = s = ans;
+#if GLOB_LIST != NOTEST
+				if (flags & GLOB_LIST) {
+					if (gi = gl.gl_list) {
+						p = gi->gl_path;
+						gi = gi->gl_next;
+					}
+					else
+						p = "";
+				}
+				else
+#endif
+				if ((i = 0) < gl.gl_pathc)
+					p = gl.gl_pathv[i];
+				else
+					p = "";
+				bp = p;
+				for (;;) {
+					if (!*p) {
+						if (*s) {
+							if (*s != ' ')
+								break;
+							bs = ++s;
+						}
+#if GLOB_LIST != NOTEST
+						if (flags & GLOB_LIST) {
+							if (gi) {
+								p = gi->gl_path;
+								gi = gi->gl_next;
+							}
+							else
+								break;
+						}
+						else
+#endif
+						{
+							if (++i < gl.gl_pathc)
+								p = gl.gl_pathv[i];
+							else
+								break;
+						}
+						bp = p;
+					}
+					if (!*s)
+						break;
+					if (*s != *p)
+						break;
+					s++;
+					p++;
+				}
+				if (*p || *s) {
+					if (!*p) {
+#if GLOB_LIST != NOTEST
+						if ((flags & GLOB_LIST) && !gi)
+							bp = 0;
+						else
+#endif
+						if (i >= gl.gl_pathc)
+							bp = 0;
+					}
+					if (!*s)
+						bs = 0;
+					else {
+						while (*s && *s != ' ')
+							s++;
+						*s = 0;
+					}
+					report("match failed: ", pat, msg, flags, unspecified);
+					quote(bs);
+					printf(" expected, ");
+					quote(bp);
+					printf(" returned\n");
+				}
+			}
+			if (flags & GLOB_APPEND)
+				break;
+			flags &= ~modes[m];
+		}
 	}
-	argv += opt_info.index;
-	if (error_info.errors || !*argv)
-		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	while (pattern = *argv++)
-	{
-		if (i = glob(pattern, flags, 0, &gs))
-			error(2, "%s: glob error %s", pattern, globerror(i));
-		else
-			flags |= GLOB_APPEND;
-	}
-	sfprintf(sfstdout, "%d match%s\n", gs.gl_pathc, gs.gl_pathc == 1 ? "" : "es");
-	if (flags & GLOB_LIST)
-		for (gl = gs.gl_list; gl; gl = gl->gl_next)
-			sfprintf(sfstdout, "%s\n", gl->gl_path);
-	else
-		for (vp = gs.gl_pathv; *vp; vp++)
-			sfprintf(sfstdout, "%s\n", *vp);
-	globfree(&gs);
-	return error_info.errors != 0;
+	printf("TEST\t%s, %d test%s", unit, testno, testno == 1 ? "" : "s");
+	if (state.ignore.count)
+		printf(", %d ignored mismatche%s", state.ignore.count, state.ignore.count == 1 ? "" : "s");
+	if (state.warnings)
+		printf(", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
+	if (state.unspecified)
+		printf(", %d unspecified difference%s", state.unspecified, state.unspecified == 1 ? "" : "s");
+	if (state.signals)
+		printf(", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
+	printf(", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
+	return 0;
 }

@@ -88,11 +88,8 @@
 #define isaltstate(x)	(*((x)+1)=='+')
 #define iscontext(x)	(*(x)==MARK_CONTEXT&&*((x)+strlen(x)-1)==MARK_CONTEXT)
 #define iscontextp(x,p)	(*(x)==MARK_CONTEXT&&*(p=(x)+strlen(x)-1)==MARK_CONTEXT)
-#define isdynamic(x)	strmatch(x,"*@([][*?|&]|[*?@!]\\(*\\)|$\\(*\\))*")
-#define isglob(s)	strmatch(s,"*@([][*?|&]|[*?@!]\\(*\\))*")
-#define isintvar(x)	(*(x)=='.'&&strmatch(x,".*."))
-#define isstatevar(x)	(*(x)=='('&&strmatch(x,"\\(*([!()])\\)"))
-#define isstate(x)	(*(x)=='('&&strmatch(x,"\\(*\\)*"))
+#define isintvar(x)	(*(x)=='.'&&*((x)+strlen(x))=='.')
+#define isstate(x)	(*(x)=='('&&strchr(x,')'))
 #define message(x)	do if (error_info.trace < 0) { error x; } while (0)
 #define notfile(r)	(((r)->property&(P_attribute|P_functional|P_make|P_operator|P_state|P_use|P_virtual))||((r)->dynamic&D_scope)||(r)->semaphore||((r)->property&P_dontcare)&&((r)->dynamic&D_bound)&&!(r)->time)
 #define oldname(r)	do{if(getbound(r->uname))putbound(0,0);if(r->dynamic&D_alias)r->dynamic&=~D_alias;else putrule(r->name,0);r->name=r->uname;r->uname=0;}while(0)
@@ -715,6 +712,7 @@ struct state				/* program state		*/
 	unsigned char	compile;	/* make object compile state	*/
 	unsigned char	compileonly;	/* only compile (force)		*/
 	unsigned char	compatibility;	/* disable compatibility msgs	*/
+	unsigned char	cross;		/* don't run gen'd executables	*/
 	unsigned char	exec;		/* execute shell actions	*/
 	unsigned char	expandview;	/* expand paths if fsview!=0	*/
 	unsigned char	explain;	/* explain reason for actions	*/
@@ -904,6 +902,9 @@ extern void		inittrap(void);
 extern void		initview(void);
 extern void		initwakeup(int);
 extern void		interpreter(char*);
+extern int		isdynamic(const char*);
+extern int		isglob(const char*);
+extern int		isstatevar(const char*);
 extern struct list*	joint(struct rule*);
 extern struct list*	listcopy(struct list*);
 extern void		listops(Sfio_t*, int);

@@ -1,3 +1,5 @@
+01-03-26 test.strtoi,test.strtof: add
+01-02-14 sfio: add tmpread
 01-01-31 sfio: uniform test exit codes
 01-01-01 opt.tst: add enumerated option argument values
 00-12-11 date.dat: add a few more crontab(1) forms

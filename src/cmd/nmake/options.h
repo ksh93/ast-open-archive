@@ -59,6 +59,7 @@
 #define OPT_compile	('c'|Ob|Ox)	/* force makefile compilation	*/
 #define OPT_compatibility ('C'|Ob|Ox)	/* disable compatibility msgs	*/
 #define OPT_corrupt	('X'|Os|Ov)	/* corrupt statefile action	*/
+#define OPT_cross	('J'|Ob)	/* don't run gen'd executables	*/
 #define OPT_debug	('d'|Oi|On)	/* debug trace level		*/
 #define OPT_define	('D'|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_errorid	('E'|Os)	/* append to error output id	*/

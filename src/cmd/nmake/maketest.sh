@@ -230,12 +230,12 @@ ini*)	case $2 in
 	?*)	dir=$2
 		if	test ! -d $dir
 		then	case $dir in
-			*.+([0-9]))
+			*.+([0123456789]))
 				;;
-			*)	set -- $dir.+([0-9])
+			*)	set -- $dir.+([0123456789])
 				shift $#-1
 				case $1 in
-				*.+([0-9]))
+				*.+([0123456789]))
 					dir=$dir.$((${1##*.}+1))
 					;;
 				*)	dir=$dir.1
@@ -439,7 +439,7 @@ new*)	if	test -d $TEST_data
 							*)	gen="$gen $pwd/$file"
 								case $first in
 								?*)	first=
-									gen="$gen $pwd/*.m[los] $pwd/make[0-9][0-9][0-9]*[a-z]"
+									gen="$gen $pwd/*.m[los] $pwd/make[0123456789][0123456789][0123456789]*[abcdefghijklmnopqrstuvwxyz]"
 									;;
 								esac
 								;;
@@ -462,7 +462,7 @@ new*)	if	test -d $TEST_data
 			*)	gen="$gen $file"
 				case $first in
 				?*)	first=
-					gen="$gen *.m[los] make[0-9][0-9][0-9]*[a-z]"
+					gen="$gen *.m[los] make[0123456789][0123456789][0123456789]*[abcdefghijklmnopqrstuvwxyz]"
 					;;
 				esac
 				;;
@@ -538,7 +538,7 @@ run)	if	test ! -f $TEST_data/tst
 		top=.
 		while	:
 		do	case $1 in
-			[a-z]*=*)
+			[abcdefghijklmnopqrstuvwxyz]*=*)
 				eval $1
 				shift
 				;;
@@ -691,7 +691,7 @@ ver*)	if	test ! -f $TEST_data/tst
 		vars=
 		while	:
 		do	case $1 in
-			[a-z]*=*)
+			[abcdefghijklmnopqrstuvwxyz]*=*)
 				eval $1
 				shift
 				;;

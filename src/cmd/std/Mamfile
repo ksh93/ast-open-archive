@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.1 2001-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -33,148 +33,129 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
+make ../../../lib/package/ast.lic
+done ../../../lib/package/ast.lic
 make install
 make banner
 make banner.o
 make banner.c
-make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+make ../../../include/ast/ccode.h implicit
+make ../../../include/ast/ast_ccode.h implicit
+done ../../../include/ast/ast_ccode.h dontcare
+make ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_common.h dontcare
+make ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_botch.h implicit
+done ../../../include/ast/ast_botch.h dontcare
+make ../../../include/ast/ast_unistd.h implicit
+done ../../../include/ast/ast_unistd.h dontcare
+make ../../../include/ast/re_comp.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
+done ../../../include/ast/re_comp.h dontcare
+make ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/getopt.h dontcare
+make ../../../include/ast/ast_fcntl.h implicit
+make ../../../include/ast/ls.h implicit
+make ../../../include/ast/ast_mode.h implicit
+done ../../../include/ast/ast_mode.h dontcare
+make ../../../include/ast/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ccode.h
-make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
-make ${PACKAGE_ast_INCLUDE}/stak.h implicit
-make ${PACKAGE_ast_INCLUDE}/stk.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/stk.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/stak.h dontcare
-make ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/option.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/option.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/error.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/cmd.h
+done ../../../include/ast/ast_fs.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ls.h dontcare
+prev ../../../include/ast/ast_fs.h implicit
+done ../../../include/ast/ast_fcntl.h dontcare
+make ../../../include/ast/ast_types.h implicit
+done ../../../include/ast/ast_types.h dontcare
+make ../../../include/ast/ast_map.h implicit
+done ../../../include/ast/ast_map.h dontcare
+make ../../../include/ast/stdio.h implicit
+prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/stdio.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/limits.h implicit
+done ../../../include/ast/limits.h dontcare
+make ../../../include/ast/ast_hdr.h implicit
+done ../../../include/ast/ast_hdr.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_lib.h implicit
+done ../../../include/ast/ast_lib.h dontcare
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/sfio.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+make ../../../include/ast/ast_version.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_version.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ccode.h
+make ../../../include/ast/cmd.h implicit
+make ../../../include/ast/dlldefs.h implicit
+done ../../../include/ast/dlldefs.h dontcare
+make ../../../include/ast/stak.h implicit
+make ../../../include/ast/stk.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/stk.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/stak.h dontcare
+make ../../../include/ast/error.h implicit
+make ../../../include/ast/option.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/option.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/error.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/cmd.h
 done banner.c
 prev banner.c
 setv LICENSE -DLICENSE="since=1989,author=dgk"
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c banner.c
 done banner.o generated
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
+bind -last
 setv LICENSE -DLICENSE="since=1989,author=dgk"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o banner banner.o ${mam_libast}
 done banner generated
-make date
-make date.o
-make date.c
-make FEATURE/time implicit
-make features/time
-done features/time
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/time
-done FEATURE/time generated
-make ${PACKAGE_ast_INCLUDE}/times.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/times.h
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/times.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/tm.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done date.c
-prev date.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c date.c
-done date.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o date date.o ${mam_libast}
-done date generated
 make dd
 make dd.o
 make dd.c
-make ${PACKAGE_ast_INCLUDE}/swap.h implicit
-make ${PACKAGE_ast_INCLUDE}/int.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/int.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/swap.h
-make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfstr.h
-make ${PACKAGE_ast_INCLUDE}/sig.h implicit
-done ${PACKAGE_ast_INCLUDE}/sig.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/iconv.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ${PACKAGE_ast_INCLUDE}/iconv.h
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ../../../include/ast/swap.h implicit
+make ../../../include/ast/int.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/int.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/swap.h
+make ../../../include/ast/sfstr.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/sfstr.h
+make ../../../include/ast/sig.h implicit
+done ../../../include/ast/sig.h
+prev ../../../include/ast/ls.h implicit
+make ../../../include/ast/iconv.h implicit
+prev ../../../include/ast/ast.h implicit
+done ../../../include/ast/iconv.h
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ccode.h implicit
+prev ../../../include/ast/ast.h implicit
 done dd.c
 prev dd.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c dd.c
@@ -184,56 +165,47 @@ done dd generated
 make df
 make df.o
 make df.c
-make ../../lib/libast/disc/sfkeyprintf.c implicit
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfdisc.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../../lib/libast/disc/sfkeyprintf.c dontcare
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
-make ${PACKAGE_ast_INCLUDE}/mnt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/mnt.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/sfstr.h implicit
+make ../../../include/ast/sfdisc.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/sfdisc.h
+prev ../../../include/ast/sig.h implicit
+make ../../../include/ast/mnt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/mnt.h
+prev ../../../include/ast/ls.h implicit
+make ../../../include/ast/cdt.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/cdt.h
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ast.h implicit
 done df.c
 prev df.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c df.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c df.c
 done df.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o df df.o ${mam_libast}
 done df generated
 make du
 make du.o
 make du.c
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
-make ${PACKAGE_ast_INCLUDE}/fts.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/fts.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ftwalk.h
-make ${PACKAGE_ast_INCLUDE}/hash.h implicit
-make ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/hash.h
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/error.h implicit
+make ../../../include/ast/ftwalk.h implicit
+make ../../../include/ast/fts.h implicit
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/fts.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ftwalk.h
+make ../../../include/ast/hash.h implicit
+make ../../../include/ast/hashpart.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/hashpart.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/hash.h
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/ast.h implicit
 done du.c
 prev du.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c du.c
@@ -243,13 +215,13 @@ done du generated
 make file
 make file.o
 make file.c
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/magic.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/magic.h
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/error.h implicit
+make ../../../include/ast/magic.h implicit
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/magic.h
+prev ../../../include/ast/ast.h implicit
 done file.c
 prev file.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c file.c
@@ -259,40 +231,75 @@ done file generated
 make iconv
 make iconv.o
 make iconv.c
-prev ${PACKAGE_ast_INCLUDE}/iconv.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/iconv.h implicit
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ast.h implicit
 done iconv.c
 prev iconv.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c iconv.c
 done iconv.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o iconv iconv.o ${mam_libast}
 done iconv generated
+make locale
+make locale.o
+make locale.c
+make ../../../include/ast/nl_types.h implicit
+prev ../../../include/ast/limits.h implicit
+done ../../../include/ast/nl_types.h dontcare
+prev ../../../include/ast/nl_types.h implicit
+make FEATURE/locales implicit
+make features/locales
+done features/locales
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/locales
+done FEATURE/locales generated
+make ../../../include/ast/regex.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/regex.h
+make ../../../include/ast/tm.h implicit
+make ../../../include/ast/times.h implicit
+make ../../../include/ast/ast_time.h implicit
+done ../../../include/ast/ast_time.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/times.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/tm.h
+make ../../../include/ast/lc.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/lc.h
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/cdt.h implicit
+prev ../../../include/ast/ast.h implicit
+done locale.c
+prev locale.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c locale.c
+done locale.o generated
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o locale locale.o ${mam_libast}
+done locale generated
 make ls
 make ls.o
 make ls.c
-prev ../../lib/libast/disc/sfkeyprintf.c implicit
-make ../../lib/libast/string/fmtscale.c implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../../lib/libast/string/fmtscale.c dontcare
-prev ${PACKAGE_ast_INCLUDE}/hash.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/hash.h implicit
+prev ../../../include/ast/sfstr.h implicit
+prev ../../../include/ast/sfdisc.h implicit
+prev ../../../include/ast/ftwalk.h implicit
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/ast.h implicit
 done ls.c
 prev ls.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ls.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ls.c
 done ls.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ls ls.o ${mam_libast}
 done ls generated
 make mesg
 make mesg.o
 make mesg.c
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/cmd.h implicit
 done mesg.c
 prev mesg.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
@@ -309,13 +316,13 @@ make features/unmount
 done features/unmount
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/unmount
 done FEATURE/unmount generated
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/mnt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/sfstr.h implicit
+prev ../../../include/ast/ast_fs.h implicit
+prev ../../../include/ast/mnt.h implicit
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/cdt.h implicit
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ast.h implicit
 done mount.c
 prev mount.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
@@ -332,26 +339,25 @@ make features/procfs
 done features/procfs
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/procfs
 done FEATURE/procfs generated
-prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/int.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/dirent.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/dirent.h
-prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_dir.h implicit
-prev ${PACKAGE_ast_INCLUDE}/dirent.h implicit
+prev ../../../include/ast/regex.h implicit
+prev ../../../include/ast/tm.h implicit
+prev ../../../include/ast/sfstr.h implicit
+prev ../../../include/ast/sfdisc.h implicit
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/int.h implicit
+prev ../../../include/ast/error.h implicit
+make ../../../include/ast/dirent.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/dirent.h
+prev ../../../include/ast/cdt.h implicit
+make ../../../include/ast/ast_dir.h implicit
+prev ../../../include/ast/dirent.h implicit
 make dirlib.h implicit
 done dirlib.h dontcare virtual
-prev ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_dir.h
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/ast_lib.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_dir.h
+prev ../../../include/ast/ast.h implicit
 done ps.c
 prev ps.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
@@ -360,23 +366,6 @@ done ps.o generated
 setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ast_ps ps.o ${mam_libast}
 done ast_ps generated
-make rm
-make rm.o
-make rm.c
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-make ${PACKAGE_ast_INCLUDE}/fs3d.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/fs3d.h
-prev ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done rm.c
-prev rm.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c rm.c
-done rm.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o rm rm.o ${mam_libast}
-done rm generated
 make shar
 make shar.sh
 done shar.sh
@@ -385,7 +374,7 @@ setv LICENSE -DLICENSE="since=1999,author=dgk"
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
 exec - 	;;
-exec - *)	if	ENV= x= $SHELL -n -c '${list[level]} ' 2>/dev/null
+exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
 exec - 	then	ENV= $SHELL -n shar.sh
 exec - 	fi
 exec - 	;;
@@ -408,8 +397,8 @@ done shar generated
 make split
 make split.o
 make split.c
-prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
+prev ../../../include/ast/regex.h implicit
+prev ../../../include/ast/cmd.h implicit
 done split.c
 prev split.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
@@ -428,26 +417,26 @@ done csplit generated
 make sum
 make sum.o
 make sum.c
-prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-make ${PACKAGE_ast_INCLUDE}/modex.h implicit
-make ${PACKAGE_ast_INCLUDE}/modecanon.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/modecanon.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/modex.h
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/sum.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sum.h
+prev ../../../include/ast/sfstr.h implicit
+make ../../../include/ast/modex.h implicit
+make ../../../include/ast/modecanon.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/modecanon.h dontcare
+prev ../../../include/ast/ast_fs.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/modex.h
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ftwalk.h implicit
+prev ../../../include/ast/ls.h implicit
+make ../../../include/ast/sum.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/sum.h
 done sum.c
 prev sum.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c sum.c
 done sum.o generated
-setv mam_libsum `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lsum,${INSTALLROOT}/lib/libsum.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/sum 2>/dev/null || echo '' ${mam_cc_L+-lsum}${mam_cc_L-${PACKAGE_ast_LIB}/libsum.a}`
+bind -lsum
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o sum sum.o ${mam_libsum} ${mam_libast}
 done sum generated
 make cksum
@@ -467,10 +456,10 @@ done md5sum generated
 make touch
 make touch.o
 make touch.c
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/tm.h implicit
+prev ../../../include/ast/ls.h implicit
+prev ../../../include/ast/ast.h implicit
 done touch.c
 prev touch.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c touch.c
@@ -480,9 +469,9 @@ done touch generated
 make tsort
 make tsort.o
 make tsort.c
-prev ${PACKAGE_ast_INCLUDE}/hash.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ../../../include/ast/hash.h implicit
+prev ../../../include/ast/error.h implicit
+prev ../../../include/ast/ast.h implicit
 done tsort.c
 prev tsort.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
@@ -494,7 +483,7 @@ done tsort generated
 make unexpand
 make unexpand.o
 make unexpand.c
-prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
+prev ../../../include/ast/cmd.h implicit
 done unexpand.c
 prev unexpand.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
@@ -510,12 +499,12 @@ exec - then	/bin/rm -f expand
 exec - fi
 exec - ln unexpand expand
 done expand generated
-make ${INSTALLROOT}/bin
+make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
 exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && /bin/rm -rf ./-p
+exec - 		test -d ./-p && /bin/rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -533,21 +522,53 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${INSTALLROOT}/bin generated
-make ${INSTALLROOT}/bin/banner
+done ../../../bin generated
+make ../../../bin/banner
 prev banner
 exec - mv ${INSTALLROOT}/bin/banner ${INSTALLROOT}/bin/banner.old 2>/dev/null || true; test '' = 'banner' || { cp banner ${INSTALLROOT}/bin/banner  		    		    ;}
-done ${INSTALLROOT}/bin/banner generated
-make ${INSTALLROOT}/bin/date
-prev date
-exec - mv ${INSTALLROOT}/bin/date ${INSTALLROOT}/bin/date.old 2>/dev/null || true; test '' = 'date' || { cp date ${INSTALLROOT}/bin/date  		    		    ;}
-done ${INSTALLROOT}/bin/date generated
-make ${INSTALLROOT}/man/man1
+done ../../../bin/banner generated
+make ../../../bin/dd
+prev dd
+exec - mv ${INSTALLROOT}/bin/dd ${INSTALLROOT}/bin/dd.old 2>/dev/null || true; test '' = 'dd' || { cp dd ${INSTALLROOT}/bin/dd  		    		    ;}
+done ../../../bin/dd generated
+make ../../../bin/df
+prev df
+exec - mv ${INSTALLROOT}/bin/df ${INSTALLROOT}/bin/df.old 2>/dev/null || true; test '' = 'df' || { cp df ${INSTALLROOT}/bin/df  		    		    ;}
+done ../../../bin/df generated
+make ../../../bin/du
+prev du
+exec - mv ${INSTALLROOT}/bin/du ${INSTALLROOT}/bin/du.old 2>/dev/null || true; test '' = 'du' || { cp du ${INSTALLROOT}/bin/du  		    		    ;}
+done ../../../bin/du generated
+make ../../../bin/file
+prev file
+exec - mv ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; test '' = 'file' || { cp file ${INSTALLROOT}/bin/file  		    		    ;}
+done ../../../bin/file generated
+make ../../../bin/iconv
+prev iconv
+exec - mv ${INSTALLROOT}/bin/iconv ${INSTALLROOT}/bin/iconv.old 2>/dev/null || true; test '' = 'iconv' || { cp iconv ${INSTALLROOT}/bin/iconv  		    		    ;}
+done ../../../bin/iconv generated
+make ../../../bin/locale
+prev locale
+exec - mv ${INSTALLROOT}/bin/locale ${INSTALLROOT}/bin/locale.old 2>/dev/null || true; test '' = 'locale' || { cp locale ${INSTALLROOT}/bin/locale  		    		    ;}
+done ../../../bin/locale generated
+make ../../../bin/ls
+prev ls
+exec - mv ${INSTALLROOT}/bin/ls ${INSTALLROOT}/bin/ls.old 2>/dev/null || true; test '' = 'ls' || { cp ls ${INSTALLROOT}/bin/ls  		    		    ;}
+done ../../../bin/ls generated
+make ../../../bin/mesg
+prev mesg
+exec - mv ${INSTALLROOT}/bin/mesg ${INSTALLROOT}/bin/mesg.old 2>/dev/null || true; test '' = 'mesg' || { cp mesg ${INSTALLROOT}/bin/mesg  		    		    ;}
+done ../../../bin/mesg generated
+make ../../../bin/ast_mount
+prev ast_mount
+exec - mv ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; test '' = 'ast_mount' || { cp ast_mount ${INSTALLROOT}/bin/ast_mount  		    		    ;}
+done ../../../bin/ast_mount generated
+make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
 exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
 exec - 	{
-exec - 		test -d ./-p && /bin/rm -rf ./-p
+exec - 		test -d ./-p && /bin/rm -Rf ./-p
 exec - 		p=
 exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
@@ -565,122 +586,81 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${INSTALLROOT}/man/man1 generated
-make ${INSTALLROOT}/man/man1/date.1
-make date.1
-done date.1
-exec - mv ${INSTALLROOT}/man/man1/date.1 ${INSTALLROOT}/man/man1/date.1.old 2>/dev/null || true; test '' = 'date.1' || { cp date.1 ${INSTALLROOT}/man/man1/date.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/date.1 generated
-make ${INSTALLROOT}/bin/dd
-prev dd
-exec - mv ${INSTALLROOT}/bin/dd ${INSTALLROOT}/bin/dd.old 2>/dev/null || true; test '' = 'dd' || { cp dd ${INSTALLROOT}/bin/dd  		    		    ;}
-done ${INSTALLROOT}/bin/dd generated
-make ${INSTALLROOT}/bin/df
-prev df
-exec - mv ${INSTALLROOT}/bin/df ${INSTALLROOT}/bin/df.old 2>/dev/null || true; test '' = 'df' || { cp df ${INSTALLROOT}/bin/df  		    		    ;}
-done ${INSTALLROOT}/bin/df generated
-make ${INSTALLROOT}/bin/du
-prev du
-exec - mv ${INSTALLROOT}/bin/du ${INSTALLROOT}/bin/du.old 2>/dev/null || true; test '' = 'du' || { cp du ${INSTALLROOT}/bin/du  		    		    ;}
-done ${INSTALLROOT}/bin/du generated
-make ${INSTALLROOT}/bin/file
-prev file
-exec - mv ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; test '' = 'file' || { cp file ${INSTALLROOT}/bin/file  		    		    ;}
-done ${INSTALLROOT}/bin/file generated
-make ${INSTALLROOT}/bin/iconv
-prev iconv
-exec - mv ${INSTALLROOT}/bin/iconv ${INSTALLROOT}/bin/iconv.old 2>/dev/null || true; test '' = 'iconv' || { cp iconv ${INSTALLROOT}/bin/iconv  		    		    ;}
-done ${INSTALLROOT}/bin/iconv generated
-make ${INSTALLROOT}/bin/ls
-prev ls
-exec - mv ${INSTALLROOT}/bin/ls ${INSTALLROOT}/bin/ls.old 2>/dev/null || true; test '' = 'ls' || { cp ls ${INSTALLROOT}/bin/ls  		    		    ;}
-done ${INSTALLROOT}/bin/ls generated
-make ${INSTALLROOT}/bin/mesg
-prev mesg
-exec - mv ${INSTALLROOT}/bin/mesg ${INSTALLROOT}/bin/mesg.old 2>/dev/null || true; test '' = 'mesg' || { cp mesg ${INSTALLROOT}/bin/mesg  		    		    ;}
-done ${INSTALLROOT}/bin/mesg generated
-make ${INSTALLROOT}/bin/ast_mount
-prev ast_mount
-exec - mv ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; test '' = 'ast_mount' || { cp ast_mount ${INSTALLROOT}/bin/ast_mount  		    		    ;}
-done ${INSTALLROOT}/bin/ast_mount generated
-make ${INSTALLROOT}/man/man1/mount.1
+done ../../../man/man1 generated
+make ../../../man/man1/mount.1
 make mount.1
 done mount.1
 exec - mv ${INSTALLROOT}/man/man1/mount.1 ${INSTALLROOT}/man/man1/mount.1.old 2>/dev/null || true; test '' = 'mount.1' || { cp mount.1 ${INSTALLROOT}/man/man1/mount.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/mount.1 generated
-make ${INSTALLROOT}/bin/ast_ps
+done ../../../man/man1/mount.1 generated
+make ../../../bin/ast_ps
 prev ast_ps
 exec - mv ${INSTALLROOT}/bin/ast_ps ${INSTALLROOT}/bin/ast_ps.old 2>/dev/null || true; test '' = 'ast_ps' || { cp ast_ps ${INSTALLROOT}/bin/ast_ps  		    		    ;}
-done ${INSTALLROOT}/bin/ast_ps generated
-make ${INSTALLROOT}/man/man1/ps.1
+done ../../../bin/ast_ps generated
+make ../../../man/man1/ps.1
 make ps.1
 done ps.1
 exec - mv ${INSTALLROOT}/man/man1/ps.1 ${INSTALLROOT}/man/man1/ps.1.old 2>/dev/null || true; test '' = 'ps.1' || { cp ps.1 ${INSTALLROOT}/man/man1/ps.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/ps.1 generated
-make ${INSTALLROOT}/bin/rm
-prev rm
-exec - mv ${INSTALLROOT}/bin/rm ${INSTALLROOT}/bin/rm.old 2>/dev/null || true; test '' = 'rm' || { cp rm ${INSTALLROOT}/bin/rm  		    		    ;}
-done ${INSTALLROOT}/bin/rm generated
-make ${INSTALLROOT}/bin/shar
+done ../../../man/man1/ps.1 generated
+make ../../../bin/shar
 prev shar
 exec - mv ${INSTALLROOT}/bin/shar ${INSTALLROOT}/bin/shar.old 2>/dev/null || true; test '' = 'shar' || { cp shar ${INSTALLROOT}/bin/shar  		    		    ;}
-done ${INSTALLROOT}/bin/shar generated
-make ${INSTALLROOT}/bin/split
+done ../../../bin/shar generated
+make ../../../bin/split
 prev split
 exec - mv ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/split.old 2>/dev/null || true; test '' = 'split' || { cp split ${INSTALLROOT}/bin/split  		    		    ;}
-done ${INSTALLROOT}/bin/split generated
-make ${INSTALLROOT}/bin/csplit
-prev ${INSTALLROOT}/bin/split
+done ../../../bin/split generated
+make ../../../bin/csplit
+prev ../../../bin/split
 exec - if	silent test -f "${INSTALLROOT}/bin/csplit"
 exec - then	/bin/rm -f ${INSTALLROOT}/bin/csplit
 exec - fi
 exec - ln ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/csplit
-done ${INSTALLROOT}/bin/csplit generated
-make ${INSTALLROOT}/bin/sum
+done ../../../bin/csplit generated
+make ../../../bin/sum
 prev sum
 exec - mv ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/sum.old 2>/dev/null || true; test '' = 'sum' || { cp sum ${INSTALLROOT}/bin/sum  		    		    ;}
-done ${INSTALLROOT}/bin/sum generated
-make ${INSTALLROOT}/bin/cksum
-prev ${INSTALLROOT}/bin/sum
+done ../../../bin/sum generated
+make ../../../bin/cksum
+prev ../../../bin/sum
 exec - if	silent test -f "${INSTALLROOT}/bin/cksum"
 exec - then	/bin/rm -f ${INSTALLROOT}/bin/cksum
 exec - fi
 exec - ln ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/cksum
-done ${INSTALLROOT}/bin/cksum generated
-make ${INSTALLROOT}/bin/md5sum
-prev ${INSTALLROOT}/bin/sum
+done ../../../bin/cksum generated
+make ../../../bin/md5sum
+prev ../../../bin/sum
 exec - if	silent test -f "${INSTALLROOT}/bin/md5sum"
 exec - then	/bin/rm -f ${INSTALLROOT}/bin/md5sum
 exec - fi
 exec - ln ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/md5sum
-done ${INSTALLROOT}/bin/md5sum generated
-make ${INSTALLROOT}/bin/touch
+done ../../../bin/md5sum generated
+make ../../../bin/touch
 prev touch
 exec - mv ${INSTALLROOT}/bin/touch ${INSTALLROOT}/bin/touch.old 2>/dev/null || true; test '' = 'touch' || { cp touch ${INSTALLROOT}/bin/touch  		    		    ;}
-done ${INSTALLROOT}/bin/touch generated
-make ${INSTALLROOT}/bin/tsort
+done ../../../bin/touch generated
+make ../../../bin/tsort
 prev tsort
 exec - mv ${INSTALLROOT}/bin/tsort ${INSTALLROOT}/bin/tsort.old 2>/dev/null || true; test '' = 'tsort' || { cp tsort ${INSTALLROOT}/bin/tsort  		    		    ;}
-done ${INSTALLROOT}/bin/tsort generated
-make ${INSTALLROOT}/bin/unexpand
+done ../../../bin/tsort generated
+make ../../../bin/unexpand
 prev unexpand
 exec - mv ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/unexpand.old 2>/dev/null || true; test '' = 'unexpand' || { cp unexpand ${INSTALLROOT}/bin/unexpand  		    		    ;}
-done ${INSTALLROOT}/bin/unexpand generated
-make ${INSTALLROOT}/bin/expand
-prev ${INSTALLROOT}/bin/unexpand
+done ../../../bin/unexpand generated
+make ../../../bin/expand
+prev ../../../bin/unexpand
 exec - if	silent test -f "${INSTALLROOT}/bin/expand"
 exec - then	/bin/rm -f ${INSTALLROOT}/bin/expand
 exec - fi
 exec - ln ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/expand
-done ${INSTALLROOT}/bin/expand generated
+done ../../../bin/expand generated
 done install virtual
 make test
-make test.date
-make date.tst
-done date.tst
-prev date
-exec - regress  date.tst date
-done test.date virtual
+make test.locale
+make locale.tst
+done locale.tst
+prev locale
+exec - regress  locale.tst locale
+done test.locale virtual
 make test.ls
 make ls.tst
 done ls.tst

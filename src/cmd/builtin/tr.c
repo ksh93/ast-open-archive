@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Labs Research) 1999-05-01 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Labs Research) 2001-05-21 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"
@@ -140,6 +140,7 @@ nextchar(register Tr_t* tr)
 	int		q;
 	char*		e;
 	regclass_t	f;
+	char		buf[32];
 
 	/*
 	 * tr.count>0 when tr.type==1 string contains x*count
@@ -212,10 +213,10 @@ nextchar(register Tr_t* tr)
 			return nextchar(tr);
 		case '.':
 		case '=':
-			if ((q = regcollate(tr->next, &e)) >= 0)
+			if ((q = regcollate(tr->next, &e, buf, sizeof(buf))) >= 0)
 			{
 				tr->next = e;
-				c = q;
+				c = q ? buf[0] : 0;
 				break;
 			}
 			/*FALLTHROUGH*/

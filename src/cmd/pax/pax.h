@@ -49,6 +49,8 @@
 #include <int.h>
 #include <sum.h>
 
+#include "FEATURE/local"
+
 #ifndef O_BINARY
 #define O_BINARY	0
 #endif
@@ -125,7 +127,7 @@
 #define BINARY_ALIGN	2
 #define BINARY_FLAGS	IN|OUT
 
-typedef struct				/* binary header		*/
+typedef struct Hdr_binary_s		/* binary header		*/
 {
 	short		magic;
 	unsigned short	dev;
@@ -290,7 +292,7 @@ typedef union tar_header_block Hdr_tar_t;
 #define PORTAR_ALIGN	2
 #define PORTAR_FLAGS	IN
 
-typedef struct			/* portar header			*/
+typedef struct Hdr_portar_s	/* portar header			*/
 {
 	char	ar_name[16];
 	char	ar_date[12];	/* left-adj; decimal char*; blank fill	*/
@@ -353,7 +355,7 @@ typedef struct			/* portar header			*/
 
 #include "cab.h"
 
-typedef struct
+typedef struct Cab_s
 {
 	char*		format;
 	Cabheader_t	header;
@@ -513,7 +515,7 @@ typedef struct
 #define MAXUNREAD	BLOCKSIZE	/* max bunread() count		*/
 #define RESETABLE	(-1)		/* default option can be reset	*/
 
-typedef struct				/* buffered io info		*/
+typedef struct Bio_s			/* buffered io info		*/
 {
 	char*		next;		/* next char pointer		*/
 	char*		last;		/* last char+1 pointer		*/
@@ -535,20 +537,20 @@ typedef struct				/* buffered io info		*/
 	unsigned int	unblocked:1;	/* set unblocked device io	*/
 } Bio_t;
 
-typedef struct				/* pseudo fd buffer		*/
+typedef struct Buffer_s			/* pseudo fd buffer		*/
 {
 	char*		base;		/* buffer base			*/
 	char*		next;		/* current position		*/
 	char*		past;		/* overflow position		*/
 } Buffer_t;
 
-typedef struct				/* unique file identifier	*/
+typedef struct Fileid_s			/* unique file identifier	*/
 {
 	int		dev;		/* device			*/
 	int		ino;		/* inode			*/
 } Fileid_t;
 
-typedef struct				/* link info			*/
+typedef struct Link_s			/* link info			*/
 {
 	char*		name;		/* name				*/
 	char*		checksum;	/* hard link checksum		*/
@@ -556,9 +558,9 @@ typedef struct				/* link info			*/
 	Fileid_t	id;		/* generated link file id	*/
 } Link_t;
 
-typedef struct				/* common internal file info	*/
+typedef struct File_s			/* common internal file info	*/
 {
-	struct Archive*	ap;		/* !=0 if from buffer		*/
+	struct Archive_s*ap;		/* !=0 if from buffer		*/
 	int		extended;	/* extended header file		*/
 	int		fd;		/* >=0 read fd			*/
 	char*		id;		/* archive file id		*/
@@ -571,7 +573,7 @@ typedef struct				/* common internal file info	*/
 	struct
 	{
 	int		op;		/* op				*/
-	struct Member*	base;		/* base file pointer		*/
+	struct Member_s*base;		/* base file pointer		*/
 	off_t		size;		/* target file size		*/
 	}		delta;		/* delta info			*/
 	struct stat*	st;		/* stat() info from ftwalk()	*/
@@ -595,7 +597,7 @@ typedef struct				/* common internal file info	*/
 	unsigned int	skip:1;		/* skip this entry		*/
 } File_t;
 
-typedef struct Member			/* cached member info		*/
+typedef struct Member_s			/* cached member info		*/
 {
 	File_t*		info;		/* deltapass() file info	*/
 	long		mtime;		/* modify time			*/
@@ -608,7 +610,7 @@ typedef struct Member			/* cached member info		*/
 	unsigned int	mark:1;		/* visit mark			*/
 } Member_t;
 
-typedef struct				/* format info			*/
+typedef struct Format_s			/* format info			*/
 {
 	char*		name;		/* name				*/
 	unsigned long	regular;	/* default regular blocking	*/
@@ -620,21 +622,21 @@ typedef struct				/* format info			*/
 	char*		undotoo[2];	/* alternate undo		*/
 } Format_t;
 
-typedef struct List			/* generic list			*/
+typedef struct List_s			/* generic list			*/
 {
-	struct List*	next;		/* next in list			*/
+	struct List_s*	next;		/* next in list			*/
 	void*		item;		/* list item pointer		*/
 } List_t;
 
-typedef struct Map			/* file name map list		*/
+typedef struct Map_s			/* file name map list		*/
 {
-	struct Map*	next;		/* next in list			*/
+	struct Map_s*	next;		/* next in list			*/
 	regex_t		re;		/* compiled match re		*/
 	char*		into;		/* map into this		*/
 	int		flags;		/* resub() flags		*/
 } Map_t;
 
-typedef struct				/* post processing restoration	*/
+typedef struct Post_s			/* post processing restoration	*/
 {
 	time_t		mtime;		/* modify time			*/
 	int		mode;		/* permissions			*/
@@ -643,16 +645,16 @@ typedef struct				/* post processing restoration	*/
 	unsigned int	chmod:1;	/* must restore mode		*/
 } Post_t;
 
-typedef union				/* byte|half swap probe		*/
+typedef union Integral_u		/* byte|half swap probe		*/
 {
 	unsigned int_4	l;
 	unsigned int_2	s[2];
 	unsigned int_1	c[4];
 } Integral_t;
 
-typedef struct				/* delta archive info		*/
+typedef struct Delta_s			/* delta archive info		*/
 {
-	struct Archive*	base;		/* base archive			*/
+	struct Archive_s*base;		/* base archive			*/
 	int		epilogue;	/* epilogue hit			*/
 	int		index;		/* member index			*/
 	int		format;		/* 0,DELTA,DELTA_IGNORE,DELTA_PATCH */
@@ -663,10 +665,18 @@ typedef struct				/* delta archive info		*/
 	int		version;	/* encoding type version	*/
 } Delta_t;
 
-typedef struct Archive			/* archive info			*/
+typedef struct Convert_s		/* char code conversion		*/
+{
+	int		on;		/* do the conversion		*/
+	int		internal;	/* internal char code		*/
+	int		external;	/* external char code		*/
+} Convert_t;
+
+typedef struct Archive_s		/* archive info			*/
 {
 	unsigned long	checksum;	/* running checksum		*/
 	int		compress;	/* compression index		*/
+	Convert_t	convert[SECTION_MAX];/* data/header conversion	*/
 	void*		data;		/* format specific data		*/
 	Delta_t*	delta;		/* delta info			*/
 	int		entries;	/* total number of entries	*/
@@ -695,7 +705,7 @@ typedef struct Archive			/* archive info			*/
 	char		prev[PATH_MAX];	/* previous entry order check	*/
 	char		temp[PATH_MAX];	/* temp intermediate name	*/
 	}		path;
-	struct Archive*	parent;		/* parent (delta) for base	*/
+	struct Archive_s*parent;	/* parent (delta) for base	*/
 	int		part;		/* media change count		*/
 	int		peek;		/* already peeked at file entry */
 	File_t*		record;		/* record output file		*/
@@ -713,14 +723,7 @@ typedef struct Archive			/* archive info			*/
 	int		volume;		/* volume number		*/
 } Archive_t;
 
-typedef struct				/* char code conversion		*/
-{
-	int		on;		/* do the conversion		*/
-	int		internal;	/* internal char code		*/
-	int		external;	/* external char code		*/
-} Convert_t;
-
-typedef struct				/* program state		*/
+typedef struct State_s			/* program state		*/
 {
 	int		acctime;	/* reset file access times	*/
 	int		append;		/* append -- must be 0 or 1 !!!	*/
@@ -738,7 +741,6 @@ typedef struct				/* program state		*/
 	int		chmod;		/* must preserve mode		*/
 	int		clobber;	/* overwrite output files	*/
 	int		complete;	/* files completely in volume	*/
-	Convert_t	convert[SECTION_MAX];/* data/header conversion	*/
 	int		current;	/* current file[] index		*/
 	int		delta2delta;	/* -rz- -wz- : retain delta info*/
 	int		descend;	/* dir names self+descendents	*/
@@ -928,7 +930,7 @@ extern void		bunread(Archive_t*, void*, int);
 extern void		bwrite(Archive_t*, void*, int);
 extern int		closeout(Archive_t*, File_t*, int);
 extern int		cmpftw(Ftw_t*, Ftw_t*);
-extern void		convert(int, int, int);
+extern void		convert(Archive_t*, int, int, int);
 extern void		copy(Archive_t*, int(*)(Ftw_t*));
 extern void		copyin(Archive_t*);
 extern int		copyinout(Ftw_t*);
@@ -993,6 +995,6 @@ extern void		setoptions(char*, char**, char*, Archive_t*);
 extern void		settime(const char*, time_t, time_t);
 extern char*		strlower(char*);
 extern char*		strupper(char*);
-extern long		tar_checksum(void);
+extern long		tar_checksum(Archive_t*);
 extern int		validout(Archive_t*, File_t*);
 extern int		verify(Archive_t*, File_t*, char*);

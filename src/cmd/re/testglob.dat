@@ -1,0 +1,115 @@
+: X/Open glob tests 2001-05-31
+#
+# contributors:
+#
+#	Glenn Fowler	gsf@research.att.com
+#	David Korn	dgk@research.att.com
+#
+# input lines may be blank, or comment beginning with #,
+# or a test spec, four fields separated by 1 or more tabs,
+# NULL is the empty string, NIL is the 0 pointer
+#
+#    field 1, what tests to apply, one or more chars
+#	test skipped if GLOB_feature not defined
+#
+#	C	set LC_COLLATE and LC_CTYPE to locale in field 2
+#
+#	E 	GLOB_ERR
+#	I 	pattern			field 2 is gl_fignore, on until cleared
+#	K 	GLOB_AUGMENTED		augmented (ksh) patterns
+#	S	0			basic shell patterns
+#
+#	a	GLOB_APPEND
+#	b	GLOB_BRACE
+#	c	GLOB_CMPLETE
+#	e	GLOB_NOESCAPE
+#	i	GLOB_ICASE		ignore case
+#	m	GLOB_MARK
+#	n	GLOB_NOCHECK
+#	s	GLOB_NOSORT
+#	u	standard unspecified behavior -- errors not counted
+#
+#	{				don't report skip if failed until }
+#	}				end of { skip
+#
+#	: comment			comment copied to output
+#
+#    field 2, a shell filename expansion pattern.
+#
+#    field 3, the expected glob() return value.
+#
+#    field 4, optional space-separated matched file list.
+#
+#    field 5, optional comment appended to report.
+#
+#    field 2 may contain certain C escape sequences:
+#	\n \xhh
+#    all successful matches are retried with GLOB_LIST and GLOB_STACK
+
+# test workspace
+
+W	glob.tmp
+W		ab
+W			?(.|a)z
+W				.
+W			.cd
+W			cd
+W		cd
+W		ab?(cd|
+W			cd)
+W		abcd
+W		a[b
+W			c]d
+W		c[d
+W		c[d(
+W		c[dx
+W		xxx
+W		TT*
+W		TTfoo
+
+# top level basics
+
+S	ab			OK		ab
+S	a*			OK		a[b ab ab?(cd| abcd
+S	TT*			OK		TT* TTfoo
+
+# subdir level basics
+
+S	*/			OK		a[b/ ab/ ab?(cd|/
+Sn	*/			OK		a[b/ ab/ ab?(cd|/
+S	*/cd			OK		ab/cd
+Sn	*/cd			OK		ab/cd
+S	*/xx			NOMATCH
+Sn	*/xx			OK		*/xx
+
+# malformed patterns
+
+S	c[d			OK		c[d
+Sn	c[d			OK		c[d
+S	c[d?			NOMATCH
+Sn	c[d?			OK		c[d?
+S	c[dx			OK		c[dx
+
+# embedded /
+
+S	ab/cd			OK		ab/cd
+S	ab/xx			NOMATCH
+S	ab[/]cd			NOMATCH
+
+# X/Open
+
+S	a[b/c]d			OK		a[b/c]d
+Sn	a[b/c]d			OK		a[b/c]d
+
+# augmented sh patterns
+
+K	a?(b)			OK		ab
+K	ab?(cd|/cd)		OK		ab?(cd|/cd)
+K	ab/?(.|a)*		OK		ab/. ab/.. ab/.cd ab/?(.|a)z ab/cd
+K	ab/[.a]*		NOMATCH
+K	ab/.*			OK		ab/. ab/.. ab/.cd
+K	c[d(			OK		c[d(
+K	*(x)			OK		xxx
+K	+(x)			OK		xxx
+K	?(x)xx			OK		xxx
+K	?(x)xxx			OK		xxx

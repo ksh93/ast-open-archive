@@ -604,7 +604,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 						static char*	tmp;
 
 						if (!tmp)
-							tmp = pathtmp(NiL, NiL, error_info.id, NiL);
+							tmp = pathtemp(NiL, 0, NiL, error_info.id, NiL);
 						if ((wfd = open(tmp, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
 						{
 							error(2, "%s: cannot create filter temporary %s", f->path, tmp);
@@ -1067,7 +1067,7 @@ if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I
 							error(3, "%s: delta bread error", f->name);
 						/*FALLTHROUGH*/
 					case DELTA_BUFFER:
-						if (!tmp) tmp = pathtmp(NiL, NiL, error_info.id, NiL);
+						if (!tmp) tmp = pathtemp(NiL, 0, NiL, error_info.id, NiL);
 						if ((data[op].fd = open(tmp, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
 							error(3, "%s: cannot create delta temporary file", tmp);
 						if (write(data[op].fd, data[op].vd.data, data[op].vd.size) != data[op].vd.size)

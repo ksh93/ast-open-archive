@@ -1607,7 +1607,7 @@ TEST 21 'justification and emphasis'
 		ERROR - $'"warn"
 "Warn about invalid \\b--check\\b lines."
 "format"
-"hours:minutes:seconds.\\t\\007id\\007 may be  followed  by [maybe]] \\b:case:\\b\\007p1\\007:\\007s1\\007:...:\\007pn\\007:\\007sn\\007 which expands to \\007si\\007 if"
+"hours:minutes:seconds.\\t\\aid\\a may be  followed  by [maybe] \\b:case:\\b\\ap1\\a:\\as1\\a:...:\\apn\\a:\\asn\\a which expands to \\asi\\a if"
 "[ file ... ]"'
 
 TEST 22 'no with values'
@@ -2419,7 +2419,7 @@ id=(null) catalog=libast text="Usage"'
 "again|back"
 "Examples."
 "Foo bar."
-"\\007bar\\007"
+"\\abar\\a"
 "Bar foo."'
 	EXEC -+ xlate "$usage" --man
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
@@ -2676,7 +2676,70 @@ IMPLEMENTATION
 	EXEC ls "$usage" -Qs
 		OUTPUT - 'return=Q option=-Q name=-Q arg=s num=-101'
 
-TEST 37 'detailed key strings'
+TEST 37 'stealth bugs'
+	usage=$'[-?\naha\n][-catalog?SpamCo][h:html?Read html from \afile\a.]:[file[??name=value;...]]]'
+	EXEC m2h "$usage" -h
+		EXIT 1
+		OUTPUT - 'return=: option=-h name=-h num=0'
+		ERROR - 'm2h: -h: file[?name=value;...] argument expected'
+	EXEC m2h "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'SYNOPSIS
+  m2h [ options ]
+
+OPTIONS
+  -h, --html=file[?name=value;...]
+                  Read html from file.
+
+IMPLEMENTATION
+  version         aha
+  catalog         SpamCo'
+	EXEC m2h "$usage" --keys
+		OUTPUT - 'return=? option=- name=--keys num=0'
+		ERROR - '"catalog"
+"html"
+"Read html from \afile\a."
+"file[?name=value;...]"'
+
+TEST 38 'ancient compatibility for modern implementations -- ok, I still use vi'
+	usage=$'[-1o][a:all][f:full][l:long][u:user]:[uid]\n\n[ pid ... ]\n\n'
+	EXEC ps "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'SYNOPSIS
+  ps [ options ] [ pid ... ]
+
+OPTIONS
+  -a, --all
+  -f, --full
+  -l, --long
+  -u, --user=uid'
+	EXEC ps "$usage" a 123
+		EXIT 0
+		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
+argument=1 value="123"'
+		ERROR -
+	EXEC ps "$usage" -a 123
+	EXEC ps "$usage" al 123
+		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
+return=l option=-l name=-l arg=(null) num=1
+argument=1 value="123"'
+	EXEC ps "$usage" -al 123
+	EXEC ps "$usage" a l 123
+	EXEC ps "$usage" a -l 123
+	EXEC ps "$usage" u bozo l 123
+		OUTPUT - 'return=u option=-u name=-u arg=bozo num=1
+return=l option=-l name=-l arg=(null) num=1
+argument=1 value="123"'
+	EXEC ps "$usage" -u bozo -l 123
+	EXEC ps "$usage" a u bozo l 123
+		OUTPUT - 'return=a option=-a name=-a arg=(null) num=1
+return=u option=-u name=-u arg=bozo num=1
+return=l option=-l name=-l arg=(null) num=1
+argument=1 value="123"'
+
+TEST 39 'detailed key strings'
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man
 		EXIT 2
@@ -2707,7 +2770,7 @@ IMPLEMENTATION
 		OUTPUT - 'return=? option=- name=--keys num=0'
 		ERROR - '"catalog"
 "quote"
-"Quote names according to \007style\007:"
+"Quote names according to \astyle\a:"
 "style:=question"
 "C \"...\" style."
 "escape"
@@ -2747,3 +2810,15 @@ IMPLEMENTATION
 (libast,3,238)
   (libast,3,812)  (debug,ls,SpamCo,"aha ")
   (libast,3,499)  (debug,ls,SpamCo,"SpamCo")'
+	usage=$'[-][+NAME?small]\n\nfile\n\n[+SEE?\btbig\b(1)]'
+	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC small "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'(libast,3,325)
+  (debug,small,libast,"small")
+
+(libast,3,372)
+  small [ (libast,3,709) ] (debug,small,libast,"file")
+
+(debug,small,libast,"SEE")
+  (debug,small,libast,"tbig(1)")'

@@ -30,7 +30,7 @@
  */
 
 static const char mount_usage[] =
-"[-?\n@(#)$Id: mount (AT&T Labs Research) 1999-11-19 $\n]"
+"[-?\n@(#)$Id: mount (AT&T Labs Research) 2001-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?mount - mount and display filesystems]"
 "[+DESCRIPTION?\bmount\b attaches a named filesystem \afs\a to the"
@@ -127,6 +127,9 @@ __STDPP__directive pragma pp:hide mount umount unmount
 #endif
 #if __bsdi__ || __bsdi || bsdi
 #include <sys/param.h>
+#endif
+#ifndef NGROUPS
+#define NGROUPS	NGROUPS_MAX
 #endif
 #include <sys/mount.h>
 #if defined(__STDPP__directive) && defined(__STDPP__hide)

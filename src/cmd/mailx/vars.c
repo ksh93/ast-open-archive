@@ -24,6 +24,7 @@ varinit(void)
 
 	static const char*		domains[] = { _PATH_RESCONF };
 
+	state.version = fmtident(state.version);
 	setscreensize();
 	for (vp = state.vartab; vp->name; vp++) {
 		if ((vp->flags & E) && (s = getenv(vp->name)) && *s)
@@ -33,47 +34,54 @@ varinit(void)
 	}
 
 	/*
-	 * Get the local domain name.
+	 * Get the local host name.
 	 */
 
 #if _lib_gethostname
-	if (!gethostname(buf, sizeof(buf)) && (s = strchr(buf, '.')))
+	if (!gethostname(buf, sizeof(buf)))
+		state.var.hostname = varkeep(buf);
+#endif
+
+	/*
+	 * Get the local domain name.
+	 */
+
+	if ((s = strchr(state.var.hostname, '.')))
 		state.var.domain = varkeep(s + 1);
 	else
-#endif
-	for (i = 0; i < sizeof(domains) / sizeof(domains[0]); i++) {
-		s = (char*)domains[i];
-		do {
-			if (fp = fileopen(s, "r")) {
-				while (s = fgets(buf, sizeof(buf), fp)) {
-					while (isspace(*s))
-						s++;
-					if (((c = *s++) == 'd' || c == 'D') &&
-					    ((c = *s++) == 'o' || c == 'O') &&
-					    ((c = *s++) == 'm' || c == 'M') &&
-					    ((c = *s++) == 'a' || c == 'A') &&
-					    ((c = *s++) == 'i' || c == 'M') &&
-					    ((c = *s++) == 'n' || c == 'N') &&
-					    (isspace(c = *s++) || c == ':' || c == '=')) {
+		for (i = 0; i < sizeof(domains) / sizeof(domains[0]); i++) {
+			s = (char*)domains[i];
+			do {
+				if (fp = fileopen(s, "r")) {
+					while (s = fgets(buf, sizeof(buf), fp)) {
 						while (isspace(*s))
 							s++;
-						t = s;
-						while (*t && !isspace(*t))
-							t++;
-						while (t > s && *(t - 1) == '.')
-							t--;
-						if (*t)
-							*t = 0;
-						state.var.domain = varkeep(s);
-						break;
+						if (((c = *s++) == 'd' || c == 'D') &&
+						    ((c = *s++) == 'o' || c == 'O') &&
+						    ((c = *s++) == 'm' || c == 'M') &&
+						    ((c = *s++) == 'a' || c == 'A') &&
+						    ((c = *s++) == 'i' || c == 'M') &&
+						    ((c = *s++) == 'n' || c == 'N') &&
+						    (isspace(c = *s++) || c == ':' || c == '=')) {
+							while (isspace(*s))
+								s++;
+							t = s;
+							while (*t && !isspace(*t))
+								t++;
+							while (t > s && *(t - 1) == '.')
+								t--;
+							if (*t)
+								*t = 0;
+							state.var.domain = varkeep(s);
+							break;
+						}
 					}
+					fileclose(fp);
+					i = sizeof(domains) / sizeof(domains[0]);
+					break;
 				}
-				fileclose(fp);
-				i = sizeof(domains) / sizeof(domains[0]);
-				break;
-			}
-		} while (!i && (s = strchr(s + 1, '/')));
-	}
+			} while (!i && (s = strchr(s + 1, '/')));
+		}
 
 	/*
 	 * Interactive.

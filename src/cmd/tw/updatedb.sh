@@ -33,7 +33,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)updatedb (AT&T Labs Research) 2001-01-01
+@(#)$Id: updatedb (AT&T Labs Research) 2001-01-01 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?updatedb - generate locate pathname database]

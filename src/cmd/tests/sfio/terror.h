@@ -91,6 +91,16 @@ static char		Tstfile[16][256];
 
 #define tmesg		(Tstline=-1),tstwarn
 
+#ifdef DEBUG
+#ifdef __LINE__
+#define TSTDEBUG(x)	(Tstline=__LINE__),tstwarn x
+#else
+#define TSTDEBUG(x)	(Tstline=-1),tstwarn x
+#endif
+#else
+#define TSTDEBUG(x)
+#endif
+
 #ifndef MAIN
 #if __STD_C
 #define MAIN()		main(int argc, char** argv)

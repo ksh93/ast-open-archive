@@ -386,7 +386,9 @@ local(Sfio_t* xp, char* v)
 					optional = 1;
 					if (!(a = getarg(&argv, NiL)))
 					{
+#if _HUH_2001_02_14
 						*(t + strlen(t)) = ' ';
+#endif
 						v = null;
 					}
 				}
@@ -1376,7 +1378,7 @@ getline(Sfio_t* sp, int lead, int term)
 				/*...INDENT*/
 				if (i == CON_print)
 				{
-					if (state.io[d] && (state.io[d]->flags & SF_WRITE))
+					if (state.io[d] && (sfset(state.io[d], 0, 0) & SF_WRITE))
 					{
 						if (f)
 							strprintf(state.io[d], f, t, 0, n);
@@ -1388,7 +1390,7 @@ getline(Sfio_t* sp, int lead, int term)
 				}
 				else if (n != -1 || *t)
 				{
-					if (state.io[d] && (state.io[d]->flags & SF_READ))
+					if (state.io[d] && (sfset(state.io[d], 0, 0) & SF_READ))
 					{
 						if (!*(a = t) || !(t = getarg(&a, NiL)) || getarg(&a, NiL))
 							error(2, "one variable argument expected");
@@ -2141,7 +2143,9 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 				 * pattern association rule
 				 */
 
-				addprereq(in, makerule(s), PREREQ_INSERT);
+				if (*s != '%' || *(s + 1) != ATTRNAME || !(x = getrule(s + 1)) || !(x->property & P_attribute))
+					x = makerule(s);
+				addprereq(in, x, PREREQ_INSERT);
 				if (set.op & A_negate)
 				{
 					*name = ATTRCLEAR;

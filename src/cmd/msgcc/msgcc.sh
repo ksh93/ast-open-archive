@@ -23,12 +23,16 @@
 ####################################################################
 : C language message catalog compiler
 
+# NOTE: all variable names match __*__ to avoid clash with msgcpp def vars
+
 __command__=msgcc
+integer __similar__=35
+
 case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $__command__"
 	USAGE=$'
 [-?
-@(#)msgcc (AT&T Labs Research) 2000-04-20
+@(#)$Id: msgcc (AT&T Labs Research) 2001-05-29 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?msgcc - C language message catalog compiler]
@@ -43,12 +47,24 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 [+?If \b-M-new\b is not specified then messages are merged with those in the
 	pre-existing \b-o\b file.]
 [M?Set a \bmsgcc\b specific \aoption\a. \aoption\a may be:]:[-option]{
-	[+delete?Messages in the \b-o\b file that are not in new
-		\b.msg\b file arguments are deleted.]
 	[+mkmsgs?The \b-o\b file is assumed to be in \bmkmsgs\b(1) format.]
 	[+new?Create a new \b-o\b file.]
+	[+preserve?Messages in the \b-o\b file that are not in new
+		\b.msg\b file arguments are preserved. The default is to
+		either reuse the message numbers with new message text that
+		is similar to the old or to delete the message text, leaving
+		an unused message number.]
 	[+set=\anumber\a?Set the message set number to \anumber\a. The default
 		is \b1\b.]
+	[+similar=\anumber\a?The message text similarity measure thresshold.
+		The similarity measure between \aold\a and \anew\a message
+		text is 100*(2*gzip(\aold\a+\anew\a)/(gzip(\aold\a)+gzip(\anew\a))-1),
+		where gzip(\ax\a) is the size of text \ax\a when compressed by
+		\bgzip\b(1). The default threshhold is '$__similar__$'. A
+		threshhold of \b0\b turns off message replacement, but unused
+		old messages are still deleted. Use \b-M-preserve\b to preserve
+		all old messages.]
+	[+verbose?Trace similar message replacements on the standard error.]
 }
 
 file ...
@@ -74,10 +90,13 @@ keys()
 	$1 --??keys -- 2>&1 | grep '^".*"$'
 }
 
+integer __similar__=68
 typeset -A __index__
-typeset __compile__ __delete__ __mkmsgs__ __new__ __preprocess__
+typeset __keep__ __text__ __drop__ __oz__ __nz__ __z__ __hit__
+typeset __compile__ __mkmsgs__ __preprocess__
+typeset __merge__=1 __preserve__ __verbose__
 integer __i__=0 __args__=0 __code__=0 __files__=0 __max__=0 __num__=0 __skip__=0
-integer __set__=1 __sources__=0 __cmds__=0
+integer __set__=1 __sources__=0 __cmds__=0 __ndrop__=0 __new__=0 __old__=0
 __out__=a.out.msg
 __OUT__=
 
@@ -103,16 +122,22 @@ do	case $# in
 		;;
 	-E)	__preprocess__=1
 		;;
-	-M-delete)
-		__delete__=1
-		;;
 	-M-mkmsgs)
 		__mkmsgs__=1
 		;;
-	-M-new)	__new__=1
+	-M-new)	__merge__=
+		;;
+	-M-perserve)
+		__preserve__=1
 		;;
 	-M-set=*)
-		__set__=${__arg__#*=}
+		__set__=$(msggen -s ${__arg__#*=}.1)
+		;;
+	-M-similar=*)
+		__similar__=${__arg__#*=}
+		;;
+	-M-verbose)
+		__verbose__=1
 		;;
 	-o)	case $# in
 		1)	print -u2 $"$__command__: output argument expected"
@@ -171,7 +196,7 @@ done
 # combine the .mso and .msg files
 
 if	[[ ! $__compile__ && ! $__preprocess__ ]]
-then	if	[[ ! $__new__ && -r $__out__ ]]
+then	if	[[ $__merge__ && -r $__out__ ]]
 	then	__tmp__=$__out__.tmp
 		trap '__code__=$?; rm -f ${__tmp__}*; exit $__code__' 0 1 2
 		while	read -r __line__
@@ -202,7 +227,7 @@ then	if	[[ ! $__new__ && -r $__out__ ]]
 					__line__=${__line__%'"'}
 				fi
 			fi
-			(( __index__["$__line__"]=__num__ ))
+			__index__["$__line__"]=$__num__
 			__text__[$__num__]=$__line__
 			if	(( __max__ < __num__ ))
 			then	(( __max__=__num__ ))
@@ -238,7 +263,8 @@ then	if	[[ ! $__new__ && -r $__out__ ]]
 			var)	__a1__=${__line__%% *}
 				__a2__=${__line__#* }
 				case $__a1__ in
-				[0-9]*)	eval __v__='$'$__a2__
+				[[:digit:]]*)
+					eval __v__='$'$__a2__
 					__v__='"'${__v__:__a1__+1}
 					;;
 				*)	eval __v__='$'$__a1__
@@ -248,7 +274,8 @@ then	if	[[ ! $__new__ && -r $__out__ ]]
 				then	print -r -- "$__v__"
 				fi
 				;;
-			[0-9]*)	print -r -- "$__line__"
+			[[:digit:]]*)
+				[[ $__preserve__ ]] && print -r -- "$__line__"
 				;;
 			'$')	print -r -u9 $__op__ include $__line__
 				;;
@@ -265,17 +292,17 @@ then	if	[[ ! $__new__ && -r $__out__ ]]
 				print -r -- "$__line__"
 				continue
 				;;
-			'$'*|*"@(#)"*|*"<"*([a-zA-Z0-9_ .-])"@"*([a-zA-Z0-9_ .-])">"*|"http://"*)
+			'$'*|*"@(#)"*|*"<"*([[:word:] .-])"@"*([[:word:] .-])">"*|"http://"*)
 				continue
 				;;
-			*[a-zA-Z][a-zA-Z]*)
+			*[[:alpha:]][[:alpha:]]*)
 				__line__=${__line__#*'"'}
 				__line__=${__line__%'"'}
 				if	[[ $__line__ ]]
 				then	if	[[ ${__index__["$__line__"]} ]]
-					then	if [[ $__delete__ ]]
+					then	if [[ ! $__preserve__ ]]
 						then	__num__=${__index__["$__line__"]}
-							__text__[-$__num__]=1
+							__keep__[$__num__]=1
 						fi
 					else	while	 [[ ${__text__[$__num__]} ]]
 						do	(( __num__++ ))
@@ -283,11 +310,15 @@ then	if	[[ ! $__new__ && -r $__out__ ]]
 						if	(( __max__ < __num__ ))
 						then	(( __max__=__num__ ))
 						fi
-						if	[[ $__delete__ ]]
-						then	 __text__[-$__num__]=1
+						if	[[ ! $__preserve__ ]]
+						then	 __keep__[$__num__]=1
 						fi
 						__text__[$__num__]=$__line__
-						(( __index__["$__line__"]=__num__++ ))
+						__index__["$__line__"]=$__num__
+						if	(( ! __new__ ))
+						then	(( __new__=__num__ ))
+						fi
+						(( __num__++ ))
 					fi
 				fi
 				;;
@@ -296,8 +327,47 @@ then	if	[[ ! $__new__ && -r $__out__ ]]
 		if	(( __max__ < __num__ ))
 		then	(( __max__=__num__ ))
 		fi
-		for (( __num__=1; __num__ <=__max__; __num__++ ))
-		do	if	[[ ${__text__[$__num__]} && ( ! $__delete__ || ${__text__[-$__num__]} ) ]]
+		# check for replacements
+		if	[[ ! $__preserve__ ]]
+		then	for (( __num__=1; __num__<=__max__; __num__++ ))
+			do	if	[[ ${__text__[$__num__]} && ! ${__keep__[$__num__]} ]]
+				then	(( __ndrop__++ ))
+					__drop__[__ndrop__]=$__num__
+				fi
+			done
+			[[ $__verbose__ ]] && print -u2 $command: ndrop $__ndrop__ nnew $((__max__-__new__+1))
+			if	(( __ndrop__ ))
+			then	for (( __num__=__new__; __num__<=__max__; __num__++ ))
+				do	__nz__[$__num__]=$(print -r -- "\"${__text__[$__num__]}\"" | gzip | wc -c)
+				done
+				for (( __i__=1; __i__<=__ndrop__; __i__++ ))
+				do	(( __old__=${__drop__[$__i__]} ))
+					__oz__=$(print -r -- "\"${__text__[$__old__]}\"" | gzip | wc -c)
+					__hit__=0
+					(( __bz__=__similar__ ))
+					for (( __num__=__new__; __num__<=__max__; __num__++ ))
+					do	if	[[ ${__text__[$__num__]} ]]
+						then	__z__=$(print -r -- "\"${__text__[$__old__]}\"""\"${__text__[$__num__]}\"" | gzip | wc -c)
+							(( __z__ = (__z__ * 200 / (__oz__ + ${__nz__[$__num__]})) - 100 ))
+							if	(( __z__ < __bz__ ))
+							then	(( __bz__=__z__ ))
+								(( __hit__=__num__ ))
+							fi
+						fi
+					done
+					if	(( __hit__ ))
+					then	[[ $__verbose__ ]] && print -u2 $command: $__old__ $__hit__ $__bz__
+						__text__[$__old__]=${__text__[$__hit__]}
+						__keep__[$__old__]=1
+						__text__[$__hit__]=
+						__keep__[$__hit__]=
+					fi
+				done
+			fi
+		fi
+		# final output
+		for (( __num__=1; __num__<=__max__; __num__++ ))
+		do	if	[[ ${__text__[$__num__]} && ( $__preserve__ || ${__keep__[$__num__]} ) ]]
 			then	print -r -- $__num__ "\"${__text__[$__num__]}\""
 			fi
 		done
@@ -305,8 +375,10 @@ then	if	[[ ! $__new__ && -r $__out__ ]]
 	if [[ $__tmp__ != $__out__ ]]
 	then	grep -v '^\$' $__tmp__ > ${__tmp__}n
 		grep -v '^\$' $__out__ > ${__tmp__}o
-		cmp -s ${__tmp__}n ${__tmp__}o ||
-		mv $__tmp__ $__out__
+		cmp -s ${__tmp__}n ${__tmp__}o || {
+			[[ -f $__out__ ]] && mv $__out__ $__out__.old
+			mv $__tmp__ $__out__
+		}
 	fi
 fi
 exit $__code__

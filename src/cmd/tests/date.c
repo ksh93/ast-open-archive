@@ -33,7 +33,7 @@
  * see comments in testdate.dat for description of format
  */
 
-static const char id[] = "\n@(#)$Id: testdate (AT&T Research) 1999-10-22 $\0\n";
+static const char id[] = "\n@(#)$Id: testdate (AT&T Research) 2001-04-18 $\0\n";
 
 #include <ast.h>
 #include <ctype.h>
@@ -96,7 +96,7 @@ normal(char* s)
 			sfprintf(sfstdout, "\\t");
 			break;
 		default:
-			if (c >= ' ' && c < 0177)
+			if (isprint(c))
 				sfputc(sfstdout, c);
 			else
 				sfprintf(sfstdout, "\\x%02x", c);

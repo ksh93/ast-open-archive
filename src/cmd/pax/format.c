@@ -78,9 +78,9 @@ isalar(Archive_t* ap, register char* hdr)
 	{
 		ap->format = ALAR;
 		ccmaps(hdr, ALAR_HEADER, CC_ASCII, CC_NATIVE);
-		convert(SECTION_CONTROL, CC_NATIVE, CC_ASCII);
-		if (!state.convert[0].on)
-			convert(SECTION_DATA, CC_NATIVE, CC_ASCII);
+		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_ASCII);
+		if (!ap->convert[0].on)
+			convert(ap, SECTION_DATA, CC_NATIVE, CC_ASCII);
 	}
 	else if (ap->expected < 0 || ap->expected == IBMAR)
 	{
@@ -90,9 +90,9 @@ isalar(Archive_t* ap, register char* hdr)
 			return 0;
 		ccmaps(hdr, ALAR_HEADER, CC_EBCDIC1, CC_NATIVE);
 		ap->format = IBMAR;
-		convert(SECTION_CONTROL, CC_NATIVE, CC_EBCDIC1);
-		if (!state.convert[0].on)
-			convert(SECTION_DATA, CC_NATIVE, CC_EBCDIC1);
+		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_EBCDIC1);
+		if (!ap->convert[0].on)
+			convert(ap, SECTION_DATA, CC_NATIVE, CC_EBCDIC1);
 	}
 	getlabstr(hdr, 5, 6, state.id.volume);
 	getlabstr(hdr, 25, 6, state.id.format);
@@ -137,7 +137,7 @@ getprologue(register Archive_t* ap)
 	ap->io->offset += ap->io->count;
 	ap->io->count = 0;
 	ap->section = SECTION_CONTROL;
-	convert(SECTION_CONTROL, CC_NATIVE, CC_NATIVE);
+	convert(ap, SECTION_CONTROL, CC_NATIVE, CC_NATIVE);
 	if (bread(ap, alar_header, (off_t)ALAR_HEADER, (off_t)ALAR_HEADER, 0) <= 0)
 	{
 		if (!bcount(ap))
@@ -314,7 +314,7 @@ getprologue(register Archive_t* ap)
 	if (ap->format < 0)
 	{
 		ap->format = ap->expected >= 0 ? ap->expected : IN_DEFAULT;
-		convert(SECTION_CONTROL, CC_NATIVE, CC_ASCII);
+		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_ASCII);
 	}
 	return 1;
 }
@@ -387,14 +387,14 @@ putprologue(register Archive_t* ap)
 	switch (ap->format)
 	{
 	case IBMAR:
-		convert(SECTION_CONTROL, CC_NATIVE, CC_EBCDIC1);
-		if (!state.convert[0].on)
-			convert(SECTION_DATA, CC_NATIVE, CC_EBCDIC1);
+		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_EBCDIC1);
+		if (!ap->convert[0].on)
+			convert(ap, SECTION_DATA, CC_NATIVE, CC_EBCDIC1);
 		break;
 	default:
-		convert(SECTION_CONTROL, CC_NATIVE, CC_ASCII);
-		if (!state.convert[0].on)
-			convert(SECTION_DATA, CC_NATIVE, CC_NATIVE);
+		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_ASCII);
+		if (!ap->convert[0].on)
+			convert(ap, SECTION_DATA, CC_NATIVE, CC_NATIVE);
 		break;
 	}
 	switch (ap->format)
@@ -551,9 +551,10 @@ putepilogue(register Archive_t* ap)
 	if (state.install.path)
 	{
 		if (sfclose(state.install.sp))
-			error(ERROR_SYSTEM|2, "%s: install temporary write error", state.checksum.path);
+			error(ERROR_SYSTEM|2, "%s: install temporary write error", state.install.path);
 		state.filter.line = 2;
 		state.filter.name = state.install.name;
+		state.filter.command = "";
 		ftwalk(state.install.path, copyout, state.ftwflags, NiL);
 		state.filter.line = 0;
 	}
@@ -565,6 +566,7 @@ putepilogue(register Archive_t* ap)
 		state.checksum.sum = 0;
 		state.filter.line = 2;
 		state.filter.name = state.checksum.name;
+		state.filter.command = "";
 		ftwalk(state.checksum.path, copyout, state.ftwflags, NiL);
 		state.filter.line = 0;
 	}
@@ -1261,7 +1263,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			if (sfsscanf(tar_header.mtime, "%11lo", &num) != 1) goto notar;
 			f->st->st_mtime = num;
 			if (sfsscanf(tar_header.chksum, "%7lo", &num) != 1) goto notar;
-			if ((num &= TAR_SUMASK) != (sum = tar_checksum()))
+			if ((num &= TAR_SUMASK) != (sum = tar_checksum(ap)))
 			{
 				if (ap->entry == 1) goto notar;
 				error(state.keepgoing ? 1 : 3, "%s format checksum error (%ld != %ld)", format[ap->format].name, num, sum);
@@ -1478,7 +1480,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				state.vdb.delimiter = s[VDB_OFFSET - 1];
 				n = strtol(s + VDB_OFFSET, NiL, 10) - sizeof(VDB_DIRECTORY);
 				i = lseek(ap->io->fd, (off_t)0, SEEK_CUR) - n - VDB_LENGTH - state.vdb.variant;
-				if (!(state.vdb.header.base = newof(0, char, i, 0))) break;
+				if (!(state.vdb.header.base = newof(0, char, i, 1))) break;
 				if (lseek(ap->io->fd, n, SEEK_SET) != n) break;
 				if (read(ap->io->fd, state.vdb.header.base, i) != i) break;
 				*(state.vdb.header.base + i) = 0;
@@ -2456,6 +2458,7 @@ getheader(register Archive_t* ap, register File_t* f)
 		ap->memsum = 0;
 	ap->old.memsum = 0;
 	ap->section = SECTION_DATA;
+	ap->convert[ap->section].on = ap->convert[ap->section].internal != ap->convert[ap->section].external;
 	return 1;
 }
 
@@ -2924,7 +2927,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			strcpy(tar_header.uname, f->uidname);
 			strcpy(tar_header.gname, f->gidname);
 		}
-		sfsprintf(tar_header.chksum, sizeof(tar_header.chksum), "%0*lo ", sizeof(tar_header.chksum) - 1, tar_checksum());
+		sfsprintf(tar_header.chksum, sizeof(tar_header.chksum), "%0*lo ", sizeof(tar_header.chksum) - 1, tar_checksum(ap));
 		bwrite(ap, tar_block, TAR_HEADER);
 		break;
 	case VDB:

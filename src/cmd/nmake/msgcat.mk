@@ -3,7 +3,7 @@
  */
 
 MSGCC = msgcc
-MSGCCFLAGS = -M-set=$(_PACKAGE_MESSAGE_SET)
+MSGCCFLAGS = -M-set=$(_PACKAGE_ID)
 MSGCATDIR = msgs
 
 /*
@@ -35,8 +35,7 @@ MSGCATDIR = msgs
 		end
 	end
 
-_PACKAGE_ID = $(LICENSEFILES:/:/ /G:T=F:O=1:B)
-_PACKAGE_MESSAGE_SET == $(_PACKAGE_ID|"9":O=n:/[^0-9A-Za-z]//G:/\(...\).*/\1/:/./^36#&/G:/.*/((((0&)-9)\&63)+1)/:E)
+_PACKAGE_ID = $(LICENSEFILES:/:/ /G:T=F:O=1:B:/^$(LICENSEFILE)$/LIC/)
 
 (MSGCC) (MSGCCFLAGS) : .PARAMETER
 

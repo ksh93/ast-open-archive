@@ -2,7 +2,7 @@
  * standalone versions of -lcmd builtins
  */
 
-:PACKAGE: ast
+:PACKAGE: ast cmd:space
 
 LICENSE = since=1992,author=gsf+dgk
 
@@ -11,28 +11,52 @@ LICENSE = since=1992,author=gsf+dgk
 :: cmdlib.h builtin.c
 
 BUILTIN ==
+DYNAMIC ==
 STANDALONE ==
 
-LINKS = ln mv
+LINKS = cp: ln mv
 
 CAT = $(STDCAT|"cat")
 CMP = $(STDCMP|"cmp") 2>/dev/null
 CP = $(STDCP|"cp")
 LN = $(STDLN|"ln")
+RM = $(STDRM|"rm")
 
 BUILTINS :COMMAND: cmd.h
-	$(SED) -e '/^extern[ 	].*[ 	]b_/!d' -e 's/.*[ 	]b_\([a-z]*\).*/\1/' $(LINKS:C,.*,-e '/^&$/d',) $(*)
+	$(SED) -e '/^extern[ 	].*[ 	]b_/!d' -e 's/.*[ 	]b_\([a-z]*\).*/\1/' $(LINKS:N!=*[:]:C,.*,-e '/^&$/d',) $(*)
 
 .INIT : .builtin
 
 .builtin : .MAKE .VIRTUAL .FORCE
-	local T
+	local T I
 	:ALL: $(BUILTINS)
-	$(BINDIR) :INSTALLDIR: $(BUILTINS)
-	$(BUILTINS) : $(&$("%.c":T=SM%)) BUILTIN=b_$$(<:B) builtin.c -lcmd $(*$("%.c":T=SM%))
-		$(CAT) $(*:N=*builtin.c) > $(<).c
-		$(@$("%.c":T=SM%):/.*builtin.c$/$(<).c/)
-		$(RM) $(RMFLAGS) $(<).c
+	T = -lcmd
+	if "$(PACKAGE_OPTIMIZE:N=space)" && "$(T:T=F)" == "-lcmd"
+		T := $(BUILTINS:O=1)
+		$(T) :: BUILTIN=1 DYNAMIC=1 builtin.c -lcmd -ldll
+		for I $(BUILTINS:O>1)
+			$(I) :LINK: $(T)
+		end
+		for I $(LINKS)
+			if I != "*:"
+				$(I) :LINK: $(T)
+			end
+		end
+	else
+		$(BINDIR) :INSTALLDIR: $(BUILTINS)
+		$(BUILTINS) : .COMMAND $(&$("%.c":T=SM%)) BUILTIN=b_$$(<:B) builtin.c -lcmd $(*$("%.c":T=SM%))
+			$(CAT) $(*:N=*builtin.c) > $(<).c
+			$(RM) $(RMFLAGS) $(<)
+			$(@$("%.c":T=SM%):/.*builtin.c$/$(<).c/)
+			$(RM) $(RMFLAGS) $(<).c
+		for I $(LINKS)
+			if I == "*:"
+				T := $(I:/.$//)
+			else
+				$(I) :LINK: $(T)
+			end
+		end
+	end
 
 ":BUILTIN:" : .MAKE .OPERATOR
 	local T P
@@ -49,12 +73,6 @@ BUILTINS :COMMAND: cmd.h
 
 :BUILTIN: look mime od pr strings tr uudecode -luu uuencode -luu what who
 
-:INSTALL: $(BINDIR)/ln $(BINDIR)/mv
-
-$(BINDIR)/ln :LINK: cp
-
-$(BINDIR)/mv :LINK: cp
-
 :: PROMO.mm RELEASE
 
-:TEST: cut expr join od paste tail tr uuencode
+:TEST: cut date expr join od paste tail tr uuencode

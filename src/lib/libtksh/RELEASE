@@ -1,3 +1,4 @@
+01-04-19  add HAVE_TIME_H HAVE_SYS_PARAM_H HAVE___FD_MASK tests to tclPort.h
 00-02-10  --- Release 7.6 ---
 00-02-10  Update README file
 00-02-09  Deleted unreferenced vars, dropped tcl 7.5 compatibility,

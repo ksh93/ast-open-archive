@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-02-02 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-04-24 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -411,10 +411,10 @@ Option_t		options[] =
 	split into space separated arguments, and is executed with the\
 	pathname of the file to be processed as the last argument.\
 	The standard output of the resulting command is read by \bpax\b.\
-	\b--nodescend\b implied by \b--filter\b. If \acommand\a is \b-\b and\
-	the archive is being written and there are no command line \afile\a\
-	arguments, then each line on the standard input is interpreted as a\
-	delimiter separated command:\
+	\b--nodescend\b is implied by \b--filter\b. If \acommand\a is \b-\b\
+	and the archive is being written and there are no command line\
+	\afile\a arguments, then each line on the standard input is\
+	interpreted as a delimiter separated command:\
 	\bX\b\aoptions\a\bX\b\acommand\a\bX\b\aphysical\a\bX\b\alogical\a,\
 	where:",
 	"command",
@@ -430,7 +430,7 @@ Option_t		options[] =
 		is empty then the file contents are copied unchanged.]\
 	[+physical?The actual file path, used for archive status.]\
 	[+logical?The file path as it will appear in the archive. If\
-		\alogical\a is empty the \aphysical\a path is used. The\
+		\alogical\a is empty then the \aphysical\a path is used. The\
 		resulting path is still subject to any \b--edit\b options.]"
 },
 {
@@ -472,7 +472,9 @@ Option_t		options[] =
 	"from",
 	0,
 	OPT_from,
-	"File data input character set name.",
+	"File data input character set name.\
+	Only files that have no control characters in the first 256 bytes\
+	are converted.",
 	"name",
 	"[+NATIVE?Local system default.]\
 	[+ASCII?Common US ASCII.]\
@@ -1360,19 +1362,20 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			break;
 		case OPT_from:
 		case OPT_to:
+			ap = getarchive(state.operation);
 			if ((n = ccmapid(v)) < 0)
 				error(3, "%s: unknown character code set", v);
 			switch (op->index)
 			{
 			case OPT_from:
-				state.convert[0].external = n;
+				ap->convert[0].external = n;
 				break;
 			case OPT_to:
-				state.convert[0].internal = n;
+				ap->convert[0].internal = n;
 				break;
 			}
-			state.convert[0].on = 1;
-			convert(SECTION_DATA, state.convert[0].internal, state.convert[0].external);
+			ap->convert[0].on = 1;
+			convert(ap, SECTION_DATA, ap->convert[0].internal, ap->convert[0].external);
 			break;
 		case OPT_ignore:
 			if (n && *v)
@@ -1729,7 +1732,6 @@ main(int argc, char** argv)
 	state.ftwflags = ftwflags()|FTW_DOT;
 	state.buffersize = DEFBUFFER * DEFBLOCKS;
 	state.clobber = 1;
-	state.convert[0].internal = state.convert[0].external = CC_NATIVE;
 	state.descend = RESETABLE;
 	state.format = OUT_DEFAULT;
 	state.header.name = "HEADER!!!";
@@ -1759,7 +1761,7 @@ main(int argc, char** argv)
 	state.record.line = 1;
 	state.strict = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
 	state.summary = 1;
-	if (!(state.tmp.file = pathtmp(NiL, NiL, error_info.id, NiL)))
+	if (!(state.tmp.file = pathtemp(NiL, 0, NiL, error_info.id, NiL)))
 		error(3, "out of space [tmp]");
 	if (!(state.tmp.lst = sfstropen()) || !(state.tmp.str = sfstropen()))
 		error(3, "out of space [lst|str]");
@@ -2021,7 +2023,7 @@ main(int argc, char** argv)
 		}
 		if (state.checksum.name)
 		{
-			if (!(state.checksum.path = pathtmp(NiL, NiL, error_info.id, NiL)))
+			if (!(state.checksum.path = pathtemp(NiL, 0, NiL, error_info.id, NiL)))
 				error(3, "out of space [checksum temporary]");
 			if (!(state.checksum.sp = sfopen(NiL, state.checksum.path, "w")))
 				error(3, "%s: cannot write checksum temporary", state.checksum.path);
@@ -2030,7 +2032,7 @@ main(int argc, char** argv)
 		}
 		if (state.install.name)
 		{
-			if (!(state.install.path = pathtmp(NiL, NiL, error_info.id, NiL)))
+			if (!(state.install.path = pathtemp(NiL, 0, NiL, error_info.id, NiL)))
 				error(3, "out of space [install script]");
 			if (!(state.install.sp = sfopen(NiL, state.install.path, "w")))
 				error(3, "%s: cannot write install temporary", state.install.path);

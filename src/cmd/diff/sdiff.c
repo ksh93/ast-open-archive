@@ -173,7 +173,7 @@ static struct option const longopts[] =
   {"expand-tabs", 0, 0, 't'},
   {"width", 1, 0, 'w'},
   {"version", 0, 0, 'v'},
-  {"help", 0, 0, 129},
+  {"help", 0, 0, -129},
   {0, 0, 0, 0}
 };
 
@@ -547,7 +547,7 @@ main (argc, argv)
 	  diffarg ("-w");
 	  break;
 
-	case 129:
+	case -129:
 	  usage ();
 	  if (ferror (stdout) || fclose (stdout) != 0)
 	    fatal ("write error");

@@ -184,10 +184,6 @@ static struct
 	int		verbose;
 } state;
 
-#if __OBSOLETE__ < 20020101
-#include "../../lib/libast/string/fmtident.c"
-#endif
-
 /*
  * allocate an i-length vector of size_t
  */

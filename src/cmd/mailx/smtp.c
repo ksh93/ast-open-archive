@@ -78,8 +78,8 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 	 * identify
 	 */
 
-	if (!(s = state.var.domain))
-		s = state.var.user;
+	if (!(s = state.var.domain) || !*s)
+		s = state.var.hostname;
 	if (sfprintf(sp, "HELO %s\r\n", s) < 0)
 		goto bad_send;
 	do
@@ -88,7 +88,7 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 			goto bad_recv;
 		if (strtol(s, &e, 10) != SMTP_OK)
 			goto bad_prot;
-	} while (*e == SMTP_OK);
+	} while (*(unsigned char*)e == SMTP_OK);
 
 	/*
 	 * from

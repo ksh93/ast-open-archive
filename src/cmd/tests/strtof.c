@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1985-2001 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,41 +20,72 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                David Korn <dgk@research.att.com>                 *
-*                 Phong Vo <kpv@research.att.com>                  *
 *******************************************************************/
 #pragma prototyped
+
 /*
- * AT&T Research
+ * AT&T Labs Research
  *
- * <dirent.h> for [fl]stat64 and off64_t
+ * test harness for
  *
- * NOTE: this file assumes the local <dirent.h>
- *	 can be reached by <../include/dirent.h>
+ *	strtod		strtold
  */
 
-#ifndef _DIR64_H
-#define _DIR64_H
-
-#include <ast_std.h>
-
-#if _typ_off64_t
-#undef	off_t
+#if _PACKAGE_ast
+#include <ast.h>
+#else
+#define _ast_fltmax_t	long double
 #endif
 
-#include <../include/dirent.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <locale.h>
 
-#if _typ_off64_t
-#define	off_t		off64_t
-#endif
-
-#if _lib_readdir64 && _typ_struct_dirent64
-#ifndef	dirent
-#define dirent		dirent64
-#endif
-#ifndef	readdir
-#define readdir		readdir64
-#endif
+#ifndef ERANGE
+#define ERANGE	EINVAL
 #endif
 
+#ifndef errno
+extern int	errno;
 #endif
+
+#if !_PACKAGE_ast
+#undef	printf
+#endif
+
+main(int argc, char** argv)
+{
+	char*			s;
+	char*			p;
+	double			d;
+	_ast_fltmax_t		ld;
+	int			sep = 0;
+
+	while (s = *++argv)
+	{
+		if (!strncmp(s, "LC_ALL=", 7))
+		{
+			if (!setlocale(LC_ALL, s + 7))
+			{
+				printf("%s failed\n", s);
+				return 0;
+			}
+			continue;
+		}
+		if (sep)
+			printf("\n");
+		else
+			sep = 1;
+
+		errno = 0;
+		d = strtod(s, &p);
+		printf("strtod   \"%s\" \"%s\" %.15e %s\n", s, p, d, errno == 0 ? "OK" : errno == ERANGE ? "ERANGE" : errno == EINVAL ? "EINVAL" : "ERROR");
+
+		errno = 0;
+		ld = strtold(s, &p);
+		printf("strtold  \"%s\" \"%s\" %.31Le %s\n", s, p, ld, errno == 0 ? "OK" : errno == ERANGE ? "ERANGE" : errno == EINVAL ? "EINVAL" : "ERROR");
+
+	}
+	return 0;
+}

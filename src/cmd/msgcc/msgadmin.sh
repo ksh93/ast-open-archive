@@ -29,7 +29,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)msgadmin (AT&T Labs Research) 2001-01-31
+@(#)$Id: msgadmin (AT&T Labs Research) 2001-06-08 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?'$command$' - message catalog file administration]
@@ -39,9 +39,12 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 	\b--generate\b, \b--remove\b, \b--translate\b, or \b--verify\b
 	must be specified.]
 [D:debug?Passed to \btranslate\b(1).]
+[a:all?Passed to \btranslate\b(1).]
 [c:cache?Passed to \btranslate\b(1).]
 [d:dialect?Operate on the dialects in the \b,\b separated \adialect\a list.
 	\b-\b means all dialects supported by \btranslate\b(1).]:[dialect:=-]
+[f:force?Force binary catalog generation even when the current binary is newer
+	than the source.]
 [g:generate?Generate and install \bgencat\b(1) binary message catalogs.]
 [n:show?Show commands but do not execute.]
 [o:omit?Omit \btranslate\b(1) methods matching the \bksh\b(1)
@@ -84,12 +87,13 @@ messages()
 }
 
 integer n
-typeset cache dialect=- exec force omit op show verbose
+typeset all cache dialect=- exec force omit op show verbose
 typeset dir=$INSTALLROOT gen=gencat
 
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
 	D)	debug=-D ;;
+	a)	all=-a ;;
 	c)	cache=-c ;;
 	d)	dialect=$OPTARG ;;
 	f)	force=1 ;;
@@ -150,7 +154,7 @@ remove)	(( !$# )) && set -- *.msg translate.tmp
 
 translate)
 	(( !$# )) && set -- $(messages)
-	translate -lmv $cache $debug $omit $show $dialect "$@"
+	translate -lmv $all $cache $debug $omit $show $dialect "$@"
 	;;
 
 verify)	(( ! $# )) && set -- *.msg

@@ -763,9 +763,11 @@ csspoll(unsigned long ms, unsigned long flags)
 					}
 					if (err)
 					{
-						if ((css->disc->flags & CSS_INTERRUPT) && sig)
+						if ((css->disc->flags & CSS_INTERRUPT) && (sig || err == EINTR))
 						{
-							if ((*css->disc->exceptf)(css, CSS_INTERRUPT, sig, css->disc) >= 0)
+							if (!sig)
+								clrerr = 1;
+							else if ((*css->disc->exceptf)(css, CSS_INTERRUPT, sig, css->disc) >= 0)
 								clrsig = 1;
 						}
 						else if (css->disc->flags & CSS_ERROR)
@@ -775,7 +777,7 @@ csspoll(unsigned long ms, unsigned long flags)
 						}
 					}
 				}
-			if (err && (ms != CS_NEVER || (flags & CSS_INTERRUPT) && sig && !clrsig || (flags & CSS_ERROR) && !sig && !clrerr))
+			if (err && (ms != CS_NEVER || (flags & CSS_INTERRUPT) && (sig || err == EINTR) && !clrsig || (flags & CSS_ERROR) && !sig && err != EINTR && !clrerr))
 			{
 				errno = err;
 				state.polling--;

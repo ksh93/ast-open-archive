@@ -1,5 +1,18 @@
 # regression tests for the ast libpp cpp
 
+KEEP "*.h"
+
+function DATA
+{
+	for f
+	do	case $f in
+		a.h)	print -r -- $'#include "c.h"' > $f ;;
+		b.h)	print -r -- $'#include "c.h"' > $f ;;
+		c.h)	print -r -- $'#include "d.h"' > $f ;;
+		esac
+	done
+}
+
 TEST 01 'bug'
 	EXEC -I-D
 		INPUT - $'#define A(a)\t        a
@@ -382,7 +395,8 @@ n(\'@LX@\');'
 #define xstr(s)\t\tstr(s)
 #define glue(a, b)\ta ## b
 #define xglue(a, b)\tglue(a, b)
-\nstr("abc");
+
+str("abc");
 str("def\\0x");
 str(\'\\4\');
 str(@ \\n);
@@ -392,13 +406,18 @@ str(\'@LX@\');
 f(@LX@);
 f("@LX@");
 f(\'@LX@\');
-\n@LX@
+
+@LX@
 "@LX@"
-\'@LX@\''
+\'@LX@\'
+__LINE__'
 		OUTPUT - $'# 1 ""
-\n
-\n
-\n
+
+
+
+
+
+
 "\\"abc\\"";
 "\\"def\\\\0x\\"";
 "\'\\\\4\'";
@@ -410,7 +429,9 @@ f(\'@LX@\');
 "@LX@";
 \'@LX@\';
 \n@LX@
-"@LX@"\'@LX@\''
+"@LX@"
+\'@LX@\'
+21'
 	EXEC -I-D
 		INPUT - $'#define i(x) x
 #define q(x) #x
@@ -2690,7 +2711,7 @@ extern int\tclosedir (DIR* __dirp);'
 		ERROR -
 		EXIT 0
 
-TEST 05 'huh'
+TEST 05 'stack skew'
 	EXEC -I-D
 		INPUT - $'#define CAT(a,b)  a##b
 #define XCAT(a,b) CAT(a,b)
@@ -2703,8 +2724,6 @@ TEST 05 'huh'
 \n
 \n
 \n(ac1'
-		ERROR - $'cpp: line 8: XCAT: macro call starts and ends in different files'
-		EXIT 1
 	EXEC -I-D
 		INPUT - $'#define CAT(a,b)  a##b
 #define XCAT(a,b) CAT(a,b)
@@ -2727,7 +2746,6 @@ TEST 05 'huh'
 \n(132)
 (213)
 (ac1'
-		ERROR - $'cpp: line 14: XCAT: macro call starts and ends in different files'
 	EXEC -I-D
 		INPUT - $'#define a(x) fishy(x
 #define b(y) a(y
@@ -2739,6 +2757,7 @@ delay(a(b)(4))))'
 \nfishy( fishy( 4)
 fishy( fishy( 4))'
 		ERROR - $'cpp: line 5: a: `EOF\' in macro argument list'
+		EXIT 1
 	EXEC -I-D
 		INPUT - $'#define A 0x00000080
 #define B 0x80000000
@@ -2878,11 +2897,16 @@ main() {
 \tputs( stringize( BACKSLASH ));
 \treturn 0;
 }'
-		OUTPUT -n - $'# 1 ""\n\n\n\n\nmain() {\n\tputs( "\\");\\n\treturn 0;\\n}\\n"'
-		ERROR - $'cpp: line 6: warning: `newline\' in string
-cpp: line 7: warning: `newline\' in string
-cpp: line 8: warning: `newline\' in string
-cpp: warning: `EOF\' in string'
+		OUTPUT - $'# 1 ""\n\n\n\n\nmain() {\n\tputs( "\\\\");\n\treturn 0;\n}'
+		ERROR -
+	EXEC -I-D
+		INPUT - $'#define s(x)\t\t#x
+#define stringize(x)\ts(x)
+
+\nmain() {
+\tputs( stringize( \\ ));
+\treturn 0;
+}'
 
 TEST 08 'stc'
 	EXEC -I-D
@@ -3056,3 +3080,142 @@ echo(x)'
 		OUTPUT - $'# 1 ""
 \n
 { 2 * x }'
+
+TEST 10 'extensions'
+	EXEC -I-D
+		INPUT - $'#define <long long>\t__int64
+#define _ARG_(x)\tx
+extern long long\tfun _ARG_((long*));'
+		OUTPUT - $'# 1 ""
+
+
+extern __int64	fun (long *   );'
+	EXEC -I-D
+		INPUT - $'#pragma pp:catliteral
+char* a = "aaa" "zzz";'
+		OUTPUT - $'# 1 ""
+
+char* a = "aaazzz";'
+	EXEC -I-D
+		INPUT - $'#pragma pp:catliteral
+char* a = "aaa"
+/* aha */
+"zzz";
+int line = __LINE__;'
+		OUTPUT - $'# 1 ""
+
+char* a = "aaazzz"
+# 4
+;
+int line = 5;'
+	EXEC -I-D
+		INPUT - $'#pragma pp:catliteral
+#pragma pp:spaceout
+char* a = "aaa"
+/* aha */
+"zzz";
+int line = __LINE__;'
+		OUTPUT - $'# 1 ""
+
+
+char* a = "aaa\\
+zzz"
+# 5
+;
+int line = 6;'
+	EXEC -I-D
+		INPUT - $'#pragma pp:pragmaexpand
+#pragma pp:catliteral
+#define _TEXTSEG(name)  ".text$" #name
+#define AFX_COLL_SEG    _TEXTSEG(AFX_COL1)
+"AFX_COLL_SEG" : AFX_COLL_SEG ;
+#pragma code_seg(AFX_COLL_SEG)'
+		OUTPUT - $'# 1 ""
+
+
+
+
+"AFX_COLL_SEG": ".text$AFX_COL1";
+#pragma code_seg (".text$"  "AFX_COL1")'
+	EXEC -I-D
+		INPUT - $'#pragma pp:nopragmaexpand
+#pragma pp:catliteral
+#define _TEXTSEG(name)  ".text$" #name
+#define AFX_COLL_SEG    _TEXTSEG(AFX_COL1)
+"AFX_COLL_SEG" : AFX_COLL_SEG ;
+#pragma code_seg(AFX_COLL_SEG)'
+		OUTPUT - $'# 1 ""
+
+
+
+
+"AFX_COLL_SEG": ".text$AFX_COL1";
+#pragma code_seg (AFX_COLL_SEG)'
+	EXEC -I-D
+		INPUT - $'#pragma pp:pragmaexpand
+#pragma pp:nocatliteral
+#define _TEXTSEG(name)  ".text$" #name
+#define AFX_COLL_SEG    _TEXTSEG(AFX_COL1)
+"AFX_COLL_SEG" : AFX_COLL_SEG ;
+#pragma code_seg(AFX_COLL_SEG)'
+		OUTPUT - $'# 1 ""
+
+
+
+
+"AFX_COLL_SEG" : ".text$" "AFX_COL1" ;
+#pragma code_seg (".text$"  "AFX_COL1")'
+	EXEC -I-D
+		INPUT - $'#pragma pp:nopragmaexpand
+#pragma pp:nocatliteral
+#define _TEXTSEG(name)  ".text$" #name
+#define AFX_COLL_SEG    _TEXTSEG(AFX_COL1)
+"AFX_COLL_SEG" : AFX_COLL_SEG ;
+#pragma code_seg(AFX_COLL_SEG)'
+		OUTPUT - $'# 1 ""
+
+
+
+
+"AFX_COLL_SEG" : ".text$" "AFX_COL1" ;
+#pragma code_seg (AFX_COLL_SEG)'
+	EXEC -I-D
+		INPUT - $'#pragma pp:nosplicespace\nint a\\      \nb = 1;'
+		OUTPUT - $'# 1 ""\n\nint a\\      \nb = 1;'
+	EXEC -I-D
+		INPUT - $'#pragma pp:splicespace\nint a\\      \nb = 1;'
+		OUTPUT - $'# 1 ""\n\nint ab = 1;\n'
+
+TEST 11 'make dependencies'
+	DO	DATA a.h b.h c.h
+	EXEC -I-D -D:transition -M t.c
+		EXIT 2
+		INPUT t.c $'#include "a.h"\n#include "b.h"'
+		OUTPUT - $'t.o : t.c a.h c.h b.h'
+		ERROR - $'cpp: "c.h", line 1: d.h: cannot find include file\ncpp: "c.h", line 1: d.h: cannot find include file'
+	EXEC -I-D -D:transition -MG t.c
+		EXIT 0
+		OUTPUT - $'t.o : t.c a.h c.h d.h b.h'
+		ERROR -
+	EXEC -D:transition -MMG t.c
+		INPUT t.c $'#include "a.h"\n#include "b.h"\n#include <stdio.h>'
+	EXEC -I-D -D:transition -MGD t.c
+		INPUT t.c $'#include "a.h"\n#include "b.h"'
+		OUTPUT t.d $'t.o : t.c a.h c.h d.h b.h'
+		OUTPUT - $'# 1 "t.c"
+
+# 1 "a.h"
+
+# 1 "c.h"
+
+# 2 "a.h"
+
+# 2 "t.c"
+
+# 1 "b.h"
+
+# 1 "c.h"
+
+# 2 "b.h"
+
+# 3 "t.c"'

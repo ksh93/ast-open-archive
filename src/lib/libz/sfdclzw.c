@@ -465,7 +465,7 @@ lzw_except(Sfio_t* f, int op, void* val, Sfdisc_t* dp)
 	case SF_ATEXIT:
 		sfdisc(f, SF_POPDISC);
 		return 0;
-	case SF_CLOSE:
+	case SF_CLOSING:
 	case SF_DPOP:
 	case SF_FINAL:
 		r = 0;
@@ -480,7 +480,7 @@ lzw_except(Sfio_t* f, int op, void* val, Sfdisc_t* dp)
 					r = -1;
 			}
 		}
-		if (op != SF_CLOSE)
+		if (op != SF_CLOSING)
 			free(dp);
 		return r;
 	case SF_READ:
@@ -722,7 +722,7 @@ sfdclzw(Sfio_t* f, int flags)
 {
 	LZW_t*	zs;
 
-	if (f->flags & SF_READ)
+	if (sfset(f, 0, 0) & SF_READ)
 	{
 		register unsigned char*	s;
 		register int		n;
@@ -755,7 +755,7 @@ sfdclzw(Sfio_t* f, int flags)
 	if (!(zs = newof(0, LZW_t, 1, 0)))
 		return -1;
 	zs->disc.exceptf = lzw_except;
-	if (f->flags & SF_READ)
+	if (sfset(f, 0, 0) & SF_READ)
 		zs->disc.readf = lzw_read;
 	else
 		zs->disc.writef = lzw_write;

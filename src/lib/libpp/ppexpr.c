@@ -653,6 +653,8 @@ ppoption(char* s)
 		return(pp.state & SPACEOUT);
 	case X_SPLICECAT:
 		return(pp.option & SPLICECAT);
+	case X_SPLICESPACE:
+		return(pp.option & SPLICESPACE);
 	case X_STRICT:
 		return(pp.state & STRICT);
 	case X_STRINGSPAN:

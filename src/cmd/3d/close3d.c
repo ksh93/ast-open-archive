@@ -33,6 +33,7 @@ close3d(int fd)
 	initialize();
 	if (fd >= 0 && fd < elementsof(state.file))
 	{
+		register int		nfd;
 		register short*		rp;
 #if FS
 		register Mount_t*	mp;
@@ -40,12 +41,16 @@ close3d(int fd)
 
 		if (rp = state.file[fd].reserved)
 		{
-			if ((*rp = FCNTL(fd, F_DUPFD, RESERVED_FD)) >= 0)
+			if ((nfd = FCNTL(fd, F_DUPFD, fd + 1)) < 0)
 			{
-				state.file[*rp].reserved = rp;
-				state.file[*rp].flags = FILE_LOCK;
+				errno = EBADF;
+				return -1;
 			}
+			*rp = nfd;
+			state.file[nfd].reserved = rp;
+			state.file[nfd].flags = FILE_LOCK;
 			state.file[fd].reserved = 0;
+			CLOSE(fd);
 		}
 #if FS
 		if ((mp = state.file[fd].mount) && fssys(mp, MSG_close))

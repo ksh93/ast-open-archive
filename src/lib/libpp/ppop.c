@@ -297,7 +297,7 @@ ppop(int op, ...)
 		if (pp.initialized) goto before;
 		if ((p = va_arg(ap, char*)) && *p)
 		{
-			if (pp.lastop) pp.lastop = pp.lastop->next = newof(0, struct oplist, 1, 0);
+			if (pp.lastop) pp.lastop = (pp.lastop->next = newof(0, struct oplist, 1, 0));
 			else pp.firstop = pp.lastop = newof(0, struct oplist, 1, 0);
 			pp.lastop->op = op;
 			pp.lastop->value = p;
@@ -422,9 +422,9 @@ ppop(int op, ...)
 #endif
 		if (pp.mode & FILEDEPS)
 		{
-			sfputc(pp.filedeps, '\n');
-			if (pp.filedeps == sfstdout) sfsync(pp.filedeps);
-			else sfclose(pp.filedeps);
+			sfputc(pp.filedeps.sp, '\n');
+			if (pp.filedeps.sp == sfstdout) sfsync(pp.filedeps.sp);
+			else sfclose(pp.filedeps.sp);
 		}
 		if (pp.state & STANDALONE) ppflushout();
 		error_info.file = 0;
@@ -438,21 +438,9 @@ ppop(int op, ...)
 		break;
 	case PP_FILEDEPS:
 		if (n = va_arg(ap, int))
-		{
-			if (!(n & PP_deps_file) && !(pp.mode & FILEDEPS))
-			{
-				pp.state |= NOTEXT;
-				pp.option |= KEEPNOTEXT;
-				pp.linesync = 0;
-			}
-			if (n & PP_deps_generated)
-				pp.mode |= GENDEPS;
-			if (n & PP_deps_local)
-				pp.mode &= ~HEADERDEPS;
-			else if (!(pp.mode & FILEDEPS))
-				pp.mode |= HEADERDEPS;
-			pp.mode |= FILEDEPS;
-		}
+			pp.filedeps.flags |= n;
+		else
+			pp.filedeps.flags = 0;
 		break;
 	case PP_FILENAME:
 		error_info.file = va_arg(ap, char*);
@@ -937,6 +925,22 @@ ppop(int op, ...)
 			(*pp.pragma)(dirname(PRAGMA), pp.pass, keyname(X_CHECKPOINT), pp.checkpoint, 1);
 		}
 #endif
+		if (n = pp.filedeps.flags)
+		{
+			if (!(n & PP_deps_file))
+			{
+				pp.state |= NOTEXT;
+				pp.option |= KEEPNOTEXT;
+				pp.linesync = 0;
+			}
+			if (n & PP_deps_generated)
+				pp.mode |= GENDEPS;
+			if (n & PP_deps_local)
+				pp.mode &= ~HEADERDEPS;
+			else if (!(pp.mode & FILEDEPS))
+				pp.mode |= HEADERDEPS;
+			pp.mode |= FILEDEPS;
+		}
 
 		/*
 		 * push the main input file -- special case for hosted mark
@@ -985,17 +989,17 @@ ppop(int op, ...)
 			}
 			*(t + 1) = 0;
 			if (pp.state & NOTEXT)
-				pp.filedeps = sfstdout;
+				pp.filedeps.sp = sfstdout;
 			else
 			{
 				*t = 'd';
-				if (!(pp.filedeps = sfopen(NiL, s, "w")))
+				if (!(pp.filedeps.sp = sfopen(NiL, s, "w")))
 					error(ERROR_SYSTEM|3, "%s: cannot create", s);
 			}
 			*t = 'o';
-			pp.column = sfprintf(pp.filedeps, "%s :", s);
+			pp.column = sfprintf(pp.filedeps.sp, "%s :", s);
 			if (*error_info.file)
-				pp.column += sfprintf(pp.filedeps, " %s", error_info.file);
+				pp.column += sfprintf(pp.filedeps.sp, " %s", error_info.file);
 		}
 		if (xp = pp.firsttx)
 		{
