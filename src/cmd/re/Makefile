@@ -14,7 +14,7 @@ egrep fgrep :LINK: grep
 
 sed :: sed.h sed0.c sed1.c sed2.c sed3.c LICENSE=since=1995,author=gsf+doug
 
-:: README RELEASE ed.tst grep.tst sed.tst hog.dat badmatch.dat debugmatch.c
+:: README RELEASE ed.tst grep.tst sed.tst
 
 TESTREFLAGS = -c
 
@@ -30,32 +30,40 @@ fmt :TEST: testfmt.c testfmt.dat
 	do	$(*:O=1) $(TESTREFLAGS) < $i
 	done
 
-fnmatch :TEST: testfnmatch.c testfnmatch.dat testre.dat testmatch.dat
+fnmatch :TEST: testfnmatch.c testfnmatch.dat testregex.dat \
+		locale.dat testmatch.dat
 	for i in $(*:O>1)
 	do	$(*:O=1) $(TESTREFLAGS) < $i
 	done
 
-match :TEST: testmatch.c testre.dat testmatch.dat
+match :TEST: testmatch.c testregex.dat locale.dat testmatch.dat
 	for i in $(*:O>1)
 	do	$(*:O=1) $(TESTREFLAGS) < $i
 	done
 
-re :TEST: testre.c testre.dat testmatch.dat testsub.dat \
-		zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat \
-		escape.dat group.dat nullgroup.dat standards.dat \
-		pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat 
+regex :TEST: testregex.c testregex.dat locale.dat testmatch.dat testsub.dat \
+		rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat \
+		minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat \
+		austin.dat xopen.dat \
+		pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat \
+		cut.dat libtre.dat
 	for i in $(*:O>1)
 	do	$(*:O=1) $(TESTREFLAGS) < $i
 	done
 
-test.regex : test.glob - test.fnmatch - test.match - test.re
+test.re : test.glob - test.fnmatch - test.match - test.regex
 
-re.tgz : README.re \
-		testfnmatch.c testglob.c testmatch.c testre.c \
-		testfnmatch.dat testglob.dat testmatch.dat testre.dat
+:: testregex.mm basic.dat categorize.dat nullsubexpr-A.dat \
+	leftassoc.dat rightassoc.dat forcedassoc.dat unknownassoc.dat
+
+testregex.tgz : README.re Makefile.re \
+		testfnmatch.c testglob.c testregex.c \
+		testfnmatch.dat testglob.dat testmatch.dat testregex.dat \
+		locale.dat rxposix.dat standards.dat
 	for f in $(*)
 	do	case $f in
 		*READ*)	echo "^^^$f^README" ;;
+		*Make*)	echo "^^^$f^Makefile" ;;
 		*.c)	echo "^^$(PROTO) $(PROTOFLAGS) -dp $f^$f^${f##*/}" ;;
 		*.dat)	echo "^^$(PROTO) $(PROTOFLAGS) -dp -c'#' $f^$f^${f##*/}" ;;
 		*)	echo "^^^$f^${f##*/}" ;;

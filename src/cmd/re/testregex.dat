@@ -192,7 +192,7 @@ EAm	abc|(ab)c	abc			(0,3)
 B	\(\(.\)\2\)*a	xxbxxyya	(3,8)(5,7)(5,6)
 B	\(\(x\)\2\)*a	xxbxxyyaa	(7,8)
 B	\(\(x\)*a\)*	xaxxaa		(0,6)(5,6)
-B	\(\(a*b*\)\2\)*	abbabbaa	(0,8)(8,8)(8,8)
+B	\(\(a*b*\)\2\)*	abbabbaa	(0,8)(6,8)(6,7)
 
 B	\(.*\)\1\1\(.*\)\2\2\2	aaa	(0,3)(0,1)(3,3)
 B	\(.*\)\1\1\(.*\)\2\2\2	aaaa	(0,4)(0,0)(0,1)
@@ -213,6 +213,14 @@ B	\(\(a\)\(b\)*\2\3\)*	aa	(0,0)
 B	\(\(a\)\(b\)*\2\3\)*	abab	(0,4)(0,4)(0,1)(1,2)
 B	\(\(a\)\(b\)*\2\3\)*	ababaab	(0,4)(0,4)(0,1)(1,2)
 B	\(\(a\)\(b\)*\2\3\)*	abbab	(0,5)(0,5)(0,1)(2,3)
+
+B	\(a\)*\1		a	NOMATCH
+B	\(a\)*b\1		ab	NOMATCH
+B	\(a\)\(b\)*\(z\)	az	(0,2)(0,1)(?,?)(1,2)
+B	\(\(a\)\(b\)*\2\3\)	aab	NOMATCH
+B	\(\(a\)\(b\)*\2\3\)*	aab	(0,0)
+B	\(\(a\)\(b*\)\2\3\)	aab	(0,2)(0,2)(0,1)(1,1)
+B	\(\(a\)\(b*\)\2\3\)*	aab	(0,2)(0,2)(0,1)(1,1)
 
 B	\(\(x\)\2\)*\(\(x\)\4\4\)*	xxxxxxy	(0,6)(4,6)(4,5)
 
@@ -236,13 +244,13 @@ EA	(a*)(b?)(b+)b{3}	aaabbbbbbb	(0,10)(0,3)(3,4)(4,7)
 EA	(a*)(b{0,1})(b{1,})b{3}	aaabbbbbbb	(0,10)(0,3)(3,4)(4,7)
 B	\(a*\)\(b\{0,1\}\)\(b\{1,\}\)b\{3\}	aaabbbbbbb	(0,10)(0,3)(3,4)(4,7)
 
-EA	(a*){1,3}	aaa	(0,3)(3,3)
+EA	(a*){1,3}	aaa	(0,3)(0,3)
 EA	(a*){2,3}	aaa	(0,3)(3,3)
-EA	(a*){1,}	aaa	(0,3)(3,3)
+EA	(a*){1,}	aaa	(0,3)(0,3)
 EA	(a*){2}		aaa	(0,3)(3,3)
-B	\(a*\)\{1,3\}	aaa	(0,3)(3,3)
+B	\(a*\)\{1,3\}	aaa	(0,3)(0,3)
 B	\(a*\)\{2,3\}	aaa	(0,3)(3,3)
-B	\(a*\)\{1,\}	aaa	(0,3)(3,3)
+B	\(a*\)\{1,\}	aaa	(0,3)(0,3)
 B	\(a*\)\{2\}	aaa	(0,3)(3,3)
 B	\(a*\)\{1,3\}\1	aaa	(0,3)(3,3)
 B	\(a*\)\{2,3\}\1	aaa	(0,3)(3,3)
@@ -274,7 +282,7 @@ EA	(a|aa|aaa|aaaaa)(aa|aaaa|aaa)	aaaaaa	(0,6)(0,3)(3,6)
 EA	(a|a.|a..|a....)(a.|a...|a..)	aaaaaa	(0,6)(0,3)(3,6)
 EA	(a*b|b*a)(a*b|b*a)		bbaa	(0,4)(0,3)(3,4)
 EA	(ab|((ab)c|abc))c*		abc	(0,3)(0,3)(0,3)(0,2)
-EA	((a*b*c*)|(a*c*b*))*		abcacb	(0,6)(6,6)(6,6)
+EA	((a*b*c*)|(a*c*b*))*		abcacb	(0,6)(3,6)(?,?)(3,6)
 EA	(a|(a|a))			a	(0,1)(0,1)
 EA	((a|a)|a)			a	(0,1)(0,1)(0,1)
 EA	a*(a|aa)			aaaa	(0,4)(3,4)
@@ -583,10 +591,11 @@ E	(abc			NULL		EPAREN
 E	((a))			abc		(0,1)(0,1)(0,1)
 E	(a)b(c)			abc		(0,3)(0,1)(2,3)
 E	a+b+c			aabbabc		(4,7)
+{E	a*?			aaa		(0,0)	min/max repetition not supported
+Em	a*			aaa		(0,0)
 BE	a**			aaa		(0,3)
 BEm	a**			aaa		(0,0)
-E	a*?			aaa		(0,0)
-Em	a*			aaa		(0,0)
+}
 E	a*			aaa		(0,3)
 E	(a*)*			-		(0,0)(0,0)
 E	(a*)+			-		(0,0)(0,0)
@@ -720,202 +729,6 @@ E	^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$	bas		(0,3)(0,3)(?,?)(0,3)
 E	^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$	bar!bas		(0,7)(0,7)(0,4)(4,7)
 E	^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$	foo!bar!bas	(0,11)(0,11)(?,?)(?,?)(4,8)(8,11)
 E	^(([^!]+!)?([^!]+)|.+!([^!]+!)([^!]+))$	foo!bas		(0,7)(0,7)(0,4)(4,7)
-
-# debug mutibyte locale
-
-{C	debug
-
-E	a.z			a<3xxx>z	(0,8)
-E	a.z			a<2az>xa<3aza>z	(7,15)
-E	[a-z][0-9]		AZ90az90	(5,7)
-E	[a-z][0-9]		A<2a1>9Z	(1,7)
-E	[a-z][0-9]		Ach9Z		(1,4)
-E	a[[.c.]]z		acz		(0,3)
-E	a[[.ch.]]z		achz		(0,4)
-
-E	[a]+			ba<2a0><3a41>ab	(1,2)
-E	[[.a.]]+		ba<2a0><3a41>ab	(1,2)
-E	[[.<2a0>.]]+		ba<2a0><3a41>ab	(2,7)
-E	[[.<2a5>.]]+		ba<2a0><3a41>ab	NOMATCH
-E	[[=<2a0>=]]+		ba<2a0><3a41>ab	(2,7)
-#E	[[=<2a5>=]]+		ba<2a0><3a41>ab	(1,14)
-
-E	[[:lower:]][[:digit:]]	AZ90az90	(5,7)
-E	[[:lower:]][[:digit:]]	B<2a1>b9Z	(6,8)
-E	[[:lower:]][[:digit:]]	B<2A1>b9Z	(6,8)
-E	[[:lower:]][[:digit:]]	Ach9Z		(2,4)
-
-E	((..)*(...)*).*		abc		(0,3)(0,3)(?,?)(0,3)
-E	((..)*(...)*).*		<2a0><3b00><1c>	(0,15)(0,15)(?,?)(0,15)
-
-Ei	[a-z][0-9]		AZ90az90	(1,3)
-Ei	[a-z][0-9]		A<2a1>9Z	(1,7)
-Ei	[a-z][0-9]		Ach9Z		(1,4)
-Ei	[a-z][0-9]		ACH9Z		(1,4)
-
-}
-
-# Deutsch locale -- latin character tests
-
-{C	de_DE
-
-E$	[[.latin-small-letter-a-with-diaeresis-above.]]	\xe4	ECOLLATE
-E$	[[.LATIN-SMALL-LETTER-A-WITH-DIAERESIS-ABOVE.]]	\xe4	ECOLLATE
-E$	[[.a-dot-box.]]					\xe4	ECOLLATE
-E$	[[.A-DOT-BOX.]]					\xe4	ECOLLATE
-
-E$	[[.latin-small-letter-a-with-diaeresis.]]	\xe4	(0,1)
-E$	[[.LATIN-SMALL-LETTER-A-WITH-DIAERESIS.]]	\xe4	(0,1)
-E$	[[.small-letter-a-with-diaeresis.]]		\xe4	(0,1)
-E$	[[.latin-small-a-with-diaeresis.]]		\xe4	(0,1)
-E$	[[.small-latin-letter-a-diaeresis.]]		\xe4	(0,1)
-E$	[[.lc-a-diaeresis.]]				\xe4	(0,1)
-E$	[[.a-diaeresis.]]				\xe4	(0,1)
-
-E$	[[.latin-capital-letter-a-with-diaeresis.]]	\xc4	(0,1)
-E$	[[.LATIN-CAPITAL-LETTER-A-WITH-DIAERESIS.]]	\xc4	(0,1)
-E$	[[.capital-letter-a-with-diaeresis.]]		\xc4	(0,1)
-E$	[[.latin-capital-a-with-diaeresis.]]		\xc4	(0,1)
-E$	[[.capital-latin-letter-a-diaeresis.]]		\xc4	(0,1)
-E$	[[.uc-a-diaeresis.]]				\xc4	(0,1)
-E$	[[.A-diaeresis.]]				\xc4	(0,1)
-
-E$	[[.a-diaeresis.]]				\xe4	(0,1)
-E$	[[.small-a-diaeresis.]]				\xe4	(0,1)
-E$	[[.small-A-diaeresis.]]				\xe4	(0,1)
-E$	[[.A-DIAERESIS.]]				\xe4	NOMATCH
-E$	[[.a-diaeresis.]]				\xc4	NOMATCH
-
-E$	[[.A-diaeresis.]]				\xc4	(0,1)
-E$	[[.capital-A-diaeresis.]]			\xc4	(0,1)
-E$	[[.capital-a-diaeresis.]]			\xc4	(0,1)
-E$	[[.A-diaeresis.]]				\xe4	NOMATCH
-
-Ei$	[[.a-diaeresis.]]				\xe4	(0,1)
-Ei$	[[.small-a-diaeresis.]]				\xe4	(0,1)
-Ei$	[[.small-A-diaeresis.]]				\xe4	(0,1)
-Ei$	[[.A-DIAERESIS.]]				\xe4	(0,1)
-Ei$	[[.a-diaeresis.]]				\xe4	(0,1)
-
-Ei$	[[.A-diaeresis.]]				\xe4	(0,1)
-Ei$	[[.capital-A-diaeresis.]]			\xe4	(0,1)
-Ei$	[[.capital-a-diaeresis.]]			\xe4	(0,1)
-Ei$	[[.A-diaeresis.]]				\xe4	(0,1)
-
-Ei$	[[.a-diaeresis.]]				\xc4	(0,1)
-Ei$	[[.small-a-diaeresis.]]				\xc4	(0,1)
-Ei$	[[.small-A-diaeresis.]]				\xc4	(0,1)
-Ei$	[[.A-DIAERESIS.]]				\xc4	(0,1)
-Ei$	[[.a-diaeresis.]]				\xc4	(0,1)
-
-Ei$	[[.A-diaeresis.]]				\xc4	(0,1)
-Ei$	[[.capital-A-diaeresis.]]			\xc4	(0,1)
-Ei$	[[.capital-a-diaeresis.]]			\xc4	(0,1)
-Ei$	[[.A-diaeresis.]]				\xc4	(0,1)
-
-E$	k[[=o=]]r	ist-k\xF6rperlich	(4,7)
-E$	k[[=o=]]r	ist-k\xD6rperlich	NOMATCH
-E$	k[[=o=]]r	ist-korperlich		(4,7)
-E$	k[[=o=]]r	ist-kOrperlich		NOMATCH
-E$	k[[=O=]]r	ist-kOrperlich		(4,7)
-
-E$	k[[=\xF6=]]r	ist-k\xF6rperlich	(4,7)
-E$	k[[=\xF6=]]r	ist-k\xD6rperlich	NOMATCH
-E$	k[[=\xF6=]]r	ist-korperlich		(4,7)
-E$	k[[=\xF6=]]r	ist-kOrperlich		NOMATCH
-E$	k[[=\xD6=]]r	ist-kOrperlich		(4,7)
-
-Ei$	k[[=o=]]r	ist-k\xF6rperlich	(4,7)
-Ei$	k[[=o=]]r	ist-k\xD6rperlich	(4,7)
-Ei$	k[[=o=]]r	ist-korperlich		(4,7)
-Ei$	k[[=o=]]r	ist-kOrperlich		(4,7)
-Ei$	k[[=O=]]r	ist-kOrperlich		(4,7)
-
-Ei$	k[[=\xF6=]]r	ist-k\xF6rperlich	(4,7)
-Ei$	k[[=\xF6=]]r	ist-k\xD6rperlich	(4,7)
-Ei$	k[[=\xF6=]]r	ist-korperlich		(4,7)
-Ei$	k[[=\xF6=]]r	ist-kOrperlich		(4,7)
-Ei$	k[[=\xD6=]]r	ist-kOrperlich		(4,7)
-
-Ei$	k[[=o=]]r	IST-K\xf6RPERLICH	(4,7)
-Ei$	k[[=o=]]r	IST-K\xd6RPERLICH	(4,7)
-Ei$	k[[=o=]]r	IST-KORPERLICH		(4,7)
-Ei$	k[[=o=]]r	IST-KoRPERLICH		(4,7)
-Ei$	k[[=O=]]r	IST-KoRPERLICH		(4,7)
-
-Ei$	k[[=\xF6=]]r	IST-K\xf6RPERLICH	(4,7)
-Ei$	k[[=\xF6=]]r	IST-K\xd6RPERLICH	(4,7)
-Ei$	k[[=\xF6=]]r	IST-KORPERLICH		(4,7)
-Ei$	k[[=\xF6=]]r	IST-KoRPERLICH		(4,7)
-Ei$	k[[=\xD6=]]r	IST-KoRPERLICH		(4,7)
-
-Ei$	K[[=O=]]R	ist-k\xF6rperlich	(4,7)
-Ei$	K[[=O=]]R	ist-k\xD6rperlich	(4,7)
-Ei$	K[[=O=]]R	ist-korperlich		(4,7)
-Ei$	K[[=O=]]R	ist-kOrperlich		(4,7)
-Ei$	K[[=o=]]R	ist-kOrperlich		(4,7)
-
-Ei$	K[[=\xF6=]]R	ist-k\xF6rperlich	(4,7)
-Ei$	K[[=\xF6=]]R	ist-k\xD6rperlich	(4,7)
-Ei$	K[[=\xF6=]]R	ist-korperlich		(4,7)
-Ei$	K[[=\xF6=]]R	ist-kOrperlich		(4,7)
-Ei$	K[[=\xD6=]]R	ist-kOrperlich		(4,7)
-
-Ei$	K[[=O=]]R	IST-K\xf6RPERLICH	(4,7)
-Ei$	K[[=O=]]R	IST-K\xd6RPERLICH	(4,7)
-Ei$	K[[=O=]]R	IST-KORPERLICH		(4,7)
-Ei$	K[[=O=]]R	IST-KoRPERLICH		(4,7)
-Ei$	K[[=o=]]R	IST-KoRPERLICH		(4,7)
-
-Ei$	K[[=\xF6=]]R	IST-K\xf6RPERLICH	(4,7)
-Ei$	K[[=\xF6=]]R	IST-K\xd6RPERLICH	(4,7)
-Ei$	K[[=\xF6=]]R	IST-KORPERLICH		(4,7)
-Ei$	K[[=\xF6=]]R	IST-KoRPERLICH		(4,7)
-Ei$	K[[=\xD6=]]R	IST-KoRPERLICH		(4,7)
-
-}
-
-# Espanol locale -- ligature tests
-
-{C	es_ES
-
-E	[[.ch.]]	ch	(0,2)
-E	[[.ch.]]	cH	NOMATCH
-E	[[.CH.]]	CH	(0,2)
-E	[[.Ch.]]	Ch	ECOLLATE
-E	[[.ch.]-d]	c	NOMATCH
-E	[[.ch.]-d]	d	(0,1)
-E	[[.ch.]-d]	ch	(0,2)
-E	[c-[.ch.]]	c	(0,1)
-E	[c-[.ch.]]	d	NOMATCH
-E	[c-[.ch.]]	ch	(0,2)
-
-Ei	[[.ch.]]	ch	(0,2)
-Ei	[[.ch.]]	cH	(0,2)
-Ei	[[.ch.]]	Ch	(0,2)
-Ei	[[.ch.]]	CH	(0,2)
-
-Ei	[[.cH.]]	ch	(0,2)
-Ei	[[.cH.]]	cH	(0,2)
-Ei	[[.cH.]]	Ch	(0,2)
-Ei	[[.cH.]]	CH	(0,2)
-
-Ei	[[.Ch.]]	ch	(0,2)
-Ei	[[.Ch.]]	cH	(0,2)
-Ei	[[.Ch.]]	Ch	(0,2)
-Ei	[[.Ch.]]	CH	(0,2)
-
-Ei	[[.CH.]]	ch	(0,2)
-Ei	[[.CH.]]	cH	(0,2)
-Ei	[[.CH.]]	Ch	(0,2)
-Ei	[[.CH.]]	CH	(0,2)
-
-Ei	[[.ch.]-d]	CH	(0,2)
-Ei	[[.CH.]-D]	c	NOMATCH
-Ei	[[.Ch.]-d]	d	(0,1)
-Ei	[[.Ch.]-d]	D	(0,1)
-
-}
 
 # shell patterns
 
@@ -1094,9 +907,9 @@ K	!(*(???)*(?????))	aaaaaa		(0,4)(0,4)
 K	!(*(???)*(?????))	aaaaaaa		(0,7)(0,7)
 K	!(*(???)*(?????))	aaaaaaaa	(0,7)(0,7)
 K	!(*(???)*(?????))	aaaaaaaaa	(0,7)(0,7)
-K	{1,3}(*(a))		aaa		(0,3)(0,3)(3,3)
+K	{1,3}(*(a))		aaa		(0,3)(0,3)(0,3)
 K	{2,3}(*(a))		aaa		(0,3)(0,3)(3,3)
-K	{1,}(*(a))		aaa		(0,3)(0,3)(3,3)
+K	{1,}(*(a))		aaa		(0,3)(0,3)(0,3)
 K	{2}(*(a))		aaa		(0,3)(0,3)(3,3)
 K	{1}(x)			.x.xx.xxx.xxxx.	(1,2)(1,2)
 K	{2}(x)			.x.xx.xxx.xxxx.	(3,5)(3,5)
@@ -1353,7 +1166,7 @@ K	!(*-*)*		ab-abcabcab-abc		(0,15)(0,2)
 K	*(!(*-*))	aaaaaaaa0aaaaaaa0aaaa-1	(0,21)(0,21)(0,21)
 K	*(!(*-*))	bbbbbbbbb0		(0,10)(0,10)(0,10)
 
-# embedded NIL or threats thereof
+# embedded NUL or threats thereof
 
 E	.*(/XXX).*			/XXX			(0,4)(0,4)
 E	.*(/XXX).*			/XX7			NOMATCH

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2002-02-11 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2002-06-25 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -627,17 +628,24 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			n = pp->ps->cpu;
 			goto percent;
 		case KEY_etime:
-			s = fmtelapsed(state.now - (unsigned long)pp->ps->start, 1);
+			if (fp->fmt == 's')
+				s = fmtelapsed(state.now - (unsigned long)pp->ps->start, 1);
+			else
+				n = pp->ps->start;
 			break;
 		case KEY_flags:
 			n = pp->ps->flags & PSS_FLAGS;
 			goto number;
+		case KEY_group:
+			if (fp->fmt == 's')
+			{
+				s = fmtgid(pp->ps->gid);
+				break;
+			}
+			/*FALLTHROUGH*/
 		case KEY_gid:
 			n = pp->ps->gid;
 			goto number;
-		case KEY_group:
-			s = fmtgid(pp->ps->gid);
-			break;
 		case KEY_nice:
 			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
@@ -679,8 +687,13 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		case KEY_start:
 			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;
-			u = pp->ps->start;
-			s = fmttime((state.now - u) >= (24 * 60 * 60) ? "%y-%m-%d" : "%H:%M:%S", u);
+			if (fp->fmt == 's')
+			{
+				u = pp->ps->start;
+				s = fmttime((state.now - u) >= (24 * 60 * 60) ? "%y-%m-%d" : "%H:%M:%S", u);
+			}
+			else
+				n = pp->ps->start;
 			break;
 		case KEY_state:
 			*(s = sbuf) = pp->ps->state;
@@ -714,12 +727,16 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 					s += i;
 			}
 			break;
+		case KEY_user:
+			if (fp->fmt == 's')
+			{
+				s = pp->user;
+				break;
+			}
+			/*FALLTHROUGH*/
 		case KEY_uid:
 			n = pp->ps->uid;
 			goto number;
-		case KEY_user:
-			s = pp->user;
-			break;
 		case KEY_wchan:
 			if (pp->ps->state == PSS_ZOMBIE)
 				goto zombie;

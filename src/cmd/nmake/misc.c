@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -280,10 +281,11 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	dp->flags |= SFFMT_VALUE;
 	switch (dp->fmt)
 	{
-	case 'c':
 	case 'C':
+		error(1, "%%%c: obsolete: use %%c format", dp->fmt);
+		/*FALLTHROUGH*/
+	case 'c':
 		value->c = *s;
-		dp->flags &= ~SFFMT_LONG;
 		break;
 	case 'd':
 		dp->size = sizeof(value->q);
@@ -305,9 +307,10 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	case 'p':
 		value->p = (char**)strtol(s, NiL, 0);
 		break;
-	case 's':
 	case 'S':
-		dp->flags &= ~SFFMT_LONG;
+		error(1, "%%%c: obsolete: use %%s format", dp->fmt);
+		/*FALLTHROUGH*/
+	case 's':
 		value->s = s;
 		if (txt)
 		{

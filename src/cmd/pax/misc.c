@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -286,33 +287,27 @@ map(register char* name)
 	register Map_t*	mp;
 	char*		to;
 	char*		from;
-	Sfio_t*		tp;
-	int		n;
 	File_t		f;
+	int		n;
 	regmatch_t	match[10];
-
-	static Sfio_t*	sp[4];
-	static int	index = 0;
 
 	if (state.filter.line > 1)
 	{
 		state.filter.line = 1;
 		name = state.filter.name;
 	}
-	index ^= 2;
 	from = to = name;
 	for (mp = state.maps; mp; mp = mp->next)
 		if (!(n = regexec(&mp->re, from, elementsof(match), match, 0)))
 		{
-			index ^= 1;
-			if (!(tp = sp[index]) && !(tp = sp[index] = sfstropen()))
-				error(ERROR_SYSTEM|3, "out of space [map]");
-			if (n = regsub(&mp->re, tp, from, mp->into, elementsof(match), match, mp->flags))
+			if (n = regsubexec(&mp->re, from, elementsof(match), match))
 				regfatal(&mp->re, 3, n);
-			to = sfstruse(tp);
-			if (mp->flags & REG_SUB_VERBOSE)
+			n = strlen(mp->re.re_sub->re_buf) + 1;
+			to = fmtbuf(n);
+			memcpy(to, mp->re.re_sub->re_buf, n);
+			if (mp->re.re_sub->re_flags & REG_SUB_PRINT)
 				sfprintf(sfstderr, "%s >> %s\n", from, to);
-			if (mp->flags & REG_SUB_STOP)
+			if (mp->re.re_sub->re_flags & REG_SUB_STOP)
 				break;
 			from = to;
 		}

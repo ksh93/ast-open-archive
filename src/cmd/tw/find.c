@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -50,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2001-10-31 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2002-04-18 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -95,6 +96,7 @@ static const char usage2[] =
 #include <modex.h>
 #include <find.h>
 #include <ftwalk.h>
+#include <dirent.h>
 #include <error.h>
 #include <proc.h>
 #include <tm.h>
@@ -139,16 +141,20 @@ enum Command
 	LEVEL, TEST, CODES
 };
 
-enum Type
-{
-	Unary, Num, Str, Exec, Op, File, Re
-};
+#define Unary		(1<<0)
+#define Num		(1<<1)
+#define Str		(1<<2)
+#define Exec		(1<<3)
+#define Op		(1<<4)
+#define File		(1<<5)
+#define Re		(1<<6)
+#define Stat		(1<<7)
 
 struct Args
 {
 	const char*	name;
 	enum Command	action;
-	enum Type	type;
+	int		type;
 	int		primary;
 	const char*	arg;
 	const char*	values;
@@ -187,20 +193,20 @@ const struct Args commands[] =
 	"Equivalent to `\\&'. \aexpr1\a \b-and\b \aexpr2\a:"
 	" Both \aexpr1\a and \aexpr2\a must evaluate \btrue\b."
 	" This is the default operator for two expression in sequence.",
-"amin",		AMIN,		Num,		0,	"minutes",	0,
+"amin",		AMIN,		Num|Stat,	0,	"minutes",	0,
 	"File was last accessed \aminutes\a minutes ago.",
-"anewer",	ANEWER,		Str,		0,	"file",	0,
+"anewer",	ANEWER,		Str|Stat,	0,	"file",	0,
 	"File was last accessed more recently than \afile\a was modified.",
-"atime",	ATIME,		Num,		0,	"days",	0,
+"atime",	ATIME,		Num|Stat,	0,	"days",	0,
 	"File was last accessed \adays\a days ago.",
 "check",	CHECK,		Unary,		0,	0,	0,
 	"Turns off \b-silent\b; enables inaccessible file and directory"
 	" warnings. This is the default.",
 "chop",		CHOP,		Unary,		0,	0,	0,
 	"Chop leading \b./\b from printed pathnames.",
-"cmin",		CMIN,		Num,		0,	"minutes",	0,
+"cmin",		CMIN,		Num|Stat,	0,	"minutes",	0,
 	"File status changed \aminutes\a minutes ago.",
-"cnewer",	CNEWER,		Str,		0,	"file",	0,
+"cnewer",	CNEWER,		Str|Stat,	0,	"file",	0,
 	"File status changed more recently than \afile\a was modified.",
 "codes",	CODES,		Str,		0,	"path",	0,
 	"Sets the \bfind\b or \blocate\b(1) database \apath\a."
@@ -208,17 +214,18 @@ const struct Args commands[] =
 "comma",	COMMA,		Op,		0,	0,	0,
 	"Equivalent to `,'. Joins two expressions; the status of the first"
 	" is ignored.",
-"cpio",		CPIO,		Unary,		1,	0,	0,
+"cpio",		CPIO,		Unary|Stat,	1,	0,	0,
 	"File is written as a binary format \bcpio\b(1) file entry.",
-"ctime",	CTIME,		Num,		0,	"days",	0,
+"ctime",	CTIME,		Num|Stat,	0,	"days",	0,
 	"File status changed \adays\a days ago.",
-"daystart",	AMIN,		Unary,		0,	0,	0,
+"daystart",	AMIN,		Unary|Stat,	0,	0,	0,
 	"Measure times (-amin -atime -cmin -ctime -mmin -mtime) from the"
 	" beginning of today. The default is 24 hours ago.",
 "depth",	POST,		Unary,		0,	0,	0,
 	"Process directory contents before the directory itself.",
-"empty",	EMPTY,		Unary,		0,	0,	0,
-	"A directory or regular file with size 0.",
+"empty",	EMPTY,		Unary|Stat,	0,	0,	0,
+	"A directory with size 0 or with no entries other than . or .., or a"
+	" regular file with size 0.",
 "exec",		EXEC,		Exec,		1,	"command ... \\;", 0,
 	"Execute \acommand ...\a; true if 0 exit status is returned."
 	" Arguments up to \\; are taken as arguments to \acommand\a."
@@ -233,20 +240,20 @@ const struct Args commands[] =
 	" details on this database. The command line arguments limit"
 	" the search and the expression, but all depth options are ignored."
 	" The remainder of the expression is applied to the matching paths.",
-"fls",		FLS,		File,		1,	"file",	0,
+"fls",		FLS,		File|Stat,	1,	"file",	0,
 	"Like -ls except the output is written to \afile\a.",
-"fprint",	FPRINT,		File,		1,	"file",	0,
+"fprint",	FPRINT,		File|Stat,	1,	"file",	0,
 	"Like -print except the output is written to \afile\a.",
-"fprint0",	FPRINT0,	File,		1,	"file",	0,
+"fprint0",	FPRINT0,	File|Stat,	1,	"file",	0,
 	"Like -print0 except the output is written to \afile\a.",
-"fprintf",	FPRINTF,	File,		1,	"file format",	0,
+"fprintf",	FPRINTF,	File|Stat,	1,	"file format",	0,
 	"Like -printf except the output is written to \afile\a.",
-"fprintx",	FPRINTX,		File,		1,	"file",	0,
+"fprintx",	FPRINTX,	File|Stat,	1,	"file",	0,
 	"Like -printx except the output is written to \afile\a.",
-"fstype",	FSTYPE,		Str,		0,	"type",	0,
+"fstype",	FSTYPE,		Str|Stat,	0,	"type",	0,
 	"File is on a filesystem \atype\a. See \bdf\b(1) or"
 	" \b-printf %F\b for local filesystem type names.",
-"group|gid",	GROUP,		Str,		0,	"id",	0,
+"group|gid",	GROUP,		Str|Stat,	0,	"id",	0,
 	"File group id name or number matches \aid\a.",
 "ignorecase",	ICASE,		Unary,		0,	0,	0,
 	"Ignore case in all pattern match expressions.",
@@ -254,7 +261,7 @@ const struct Args commands[] =
 	"A case-insensitive version of \b-lname\b \apattern\a.",
 "iname",	INAME,		Str,		0,	"pattern",	0,
 	"A case-insensitive version of \b-name\b \apattern\a.",
-"inum",		INUM,		Num,		0,	"number",	0,
+"inum",		INUM,		Num|Stat,	0,	"number",	0,
 	"File has inode number \anumber\a.",
 "ipath",	IPATH,		Str,		0,	"pattern",	0,
 	"A case-insensitive version of \b-path\b \apattern\a.",
@@ -262,15 +269,15 @@ const struct Args commands[] =
 	"A case-insensitive version of \b-regex\b \apattern\a.",
 "level",	LEVEL,		Num,		0,	"level",	0,
 	"Current level (depth) is \alevel\a.",
-"links",	LINKS,		Num,		0,	"number",	0,
+"links",	LINKS,		Num|Stat,	0,	"number",	0,
 	"File has \anumber\a links.",
 "lname",	LNAME,		Str,		0,	"pattern",	0,
 	"File is a symbolic link with text that matches \apattern\a.",
-"local",	LOCAL,		Unary,		0,	0,	0,
+"local",	LOCAL,		Unary|Stat,	0,	0,	0,
 	"File is on a local filesystem.",
 "logical|follow|L",LOGIC,	Unary,		0,	0,	0,
 	"Follow symbolic links.",
-"ls",		LS,		Unary,		1,	0,	0,
+"ls",		LS,		Unary|Stat,	1,	0,	0,
 	"List the current file in `ls -dils' format to the standard output.",
 "magic",	MAGIC,		Str,		0,	"pattern",	0,
 	"File magic number matches the \bfile\b(1) and \bmagic\b(3)"
@@ -286,26 +293,28 @@ const struct Args commands[] =
 "mindepth",	MINDEPTH,	Num,		0,	"level",	0,
 	"Do not apply tests or actions a levels less than \alevel\a."
 	" \b-mindepth 1\b processes all but the command line arguments.",
-"mmin",		MMIN,		Num,		0,	"minutes",	0,
+"mmin",		MMIN,		Num|Stat,	0,	"minutes",	0,
 	"File was modified \aminutes\a minutes ago.",
-"mount|x|xdev|X",	XDEV,		Unary,		0,	0,	0,
+"mount|x|xdev|X",XDEV,		Unary|Stat,	0,	0,	0,
 	"Do not descend into directories in different filesystems than"
 	" their parents.",
-"mtime",	MTIME,		Num,		0,	"days",	0,
+"mtime",	MTIME,		Num|Stat,	0,	"days",	0,
 	"File was modified \adays\a days ago.",
 "name",		NAME,		Str,		0,	"pattern",	0,
 	"File base name (no directory components) matches \apattern\a.",
-"ncpio",	NCPIO,		Unary,		1,	0,		0,
+"ncpio",	NCPIO,		Unary|Stat,	1,	0,		0,
 	"File is written as a character format \bcpio\b(1) file entry.",
-"newer",	NEWER,		Str,		0,	"file",	0,
+"newer",	NEWER,		Str|Stat,	0,	"file",	0,
 	"File was modified more recently than \afile\a.",
-"nogroup",	NOGROUP,	Unary,		0,	0,	0,
+"nogroup",	NOGROUP,	Unary|Stat,	0,	0,	0,
 	"There is no group name matching the file group id.",
-"noleaf",	NOLEAF,		Unary,		0,	0,	0,
-	"Ignored in this implementation.",
+"noleaf",	NOLEAF,		Unary|Stat,	0,	0,	0,
+	"Disable \b-physical\b leaf file \bstat\b(2) optimizations."
+	" Only required on filesystems with . and .. as the first entries"
+	" and link count not equal to 2 plus the number of subdirectories.",
 "not",		NOT,		Op,		0,	0,	0,
 	"\b-not\b \aexpr\a: inverts the truth value of \aexpr\a.",
-"nouser",	NOUSER,		Unary,		0,	0,	0,
+"nouser",	NOUSER,		Unary|Stat,	0,	0,	0,
 	"There is no user name matching the file user id.",
 "ok",		OK,		Exec,		1,	"command ... \\;", 0,
 	"Like \b-exec\b except a prompt is written to the terminal."
@@ -317,7 +326,7 @@ const struct Args commands[] =
 	" evaluated if \aexpr1\a is true.",
 "path",		PATH,		Str,		0,	"pattern",	0,
 	"File path name (with directory components) matches \apattern\a.",
-"perm",		PERM,		Num,		0,	"mode",	0,
+"perm",		PERM,		Num|Stat,	0,	"mode",	0,
 	"File permission bits tests; \amode\a may be octal or symbolic as"
 	" in \bchmod\b(1). \amode\a: exactly \amode\a; \a-mode\a: all"
 	" \amode\a bits are set; \a+mode\a: at least one of \amode\a"
@@ -326,18 +335,17 @@ const struct Args commands[] =
 	"Do not follow symbolic links. This is the default.",
 "post",		POST,		Unary,		0,	0,	0,
 	"Process directories before and and after the contents are processed.",
-"print",	PRINT,		Unary,		1,	0,	0,
+"print",	PRINT,		Unary|Stat,	1,	0,	0,
 	"Print the path name (including directory components) to the"
 	" standard output, followed by a newline.",
-"print0",	PRINT0,		Unary,		1,	0,	0,
+"print0",	PRINT0,		Unary|Stat,	1,	0,	0,
 	"Like \b-print\b, except that the path is followed by a NUL character.",
-"printf",	PRINTF,		Str,		1,	"format",
+"printf",	PRINTF,		Str|Stat,	1,	"format",
 	"[+----- escape sequences -----?]"
 		"[+\\a?alert]"
 		"[+\\b?backspace]"
 		"[+\\f?form feed]"
 		"[+\\n?newline]"
-		"[+\\r?carriage return]"
 		"[+\\t?horizontal tab]"
 		"[+\\v?vertical tab]"
 		"[+\\xnn?hexadecimal character \ann\a]"
@@ -374,7 +382,7 @@ const struct Args commands[] =
 	" `\\' escapes and `%' directives. \bprintf\b(3) field width"
 	" and precision are interpreted as usual, but the directive"
 	" characters have special interpretation.",
-"printx",	PRINTX,		Unary,		1,	0,	0,
+"printx",	PRINTX,		Unary|Stat,	1,	0,	0,
 	"Print the path name (including directory components) to the"
 	" standard output, with \bxargs\b(1) special characters preceded"
 	" by \b\\\b, followed by a newline.",
@@ -388,7 +396,7 @@ const struct Args commands[] =
 	"Reverse the \b-sort\b sense.",
 "silent",	SILENT,		Unary,		0,	0,	0,
 	"Do not warn about inaccessible directories or symbolic link loops.",
-"size",		SIZE,		Num,		0,	"number[bckw]]", 0,
+"size",		SIZE,		Num|Stat,	0,	"number[bckw]]", 0,
 	"File size is \anumber\a units.",
 "sort",		SORT,		Str,		0,	"option",	0,
 	"Search each directory in \a-option\a sort order, e.g., \b-name\b"
@@ -398,7 +406,7 @@ const struct Args commands[] =
 	" implementation defined test modes may also be enabled.",
 "true",		CTRUE,		Unary,		0,	0,	0,
 	"Always true.",
-"type",		TYPE,		Str,		0,	"type",
+"type",		TYPE,		Str|Stat,	0,	"type",
 		"[+b?block special]"
 		"[+c?character special]"
 		"[+d?directory]"
@@ -407,16 +415,16 @@ const struct Args commands[] =
 		"[+p?named pipe (FIFO)]"
 		"[+s?socket]",
 	"File type matches \atype\a:",
-"used",		USED,		Num,		0,	"days",	0,
+"used",		USED,		Num|Stat,	0,	"days",	0,
 	"File was accessed \adays\a days after its status changed.",
-"user|uid",		USER,		Str,	0,	"id",	0,
+"user|uid",	USER,		Str|Stat,0,	"id",	0,
 	"File user id matches the name or number \aid\a.",
 "xargs",	XARGS,		Exec,		1,	"command ... \\;", 0,
 	"Like \b-exec\b except as many file args as permitted are"
 	" appended to \acommand ...\a which may be executed"
 	" 0 or more times depending on the number of files found and"
 	" local system \bexec\b(2) argument limits.",
-"xtype",	XTYPE,		Str,		0,	"type",	0,
+"xtype",	XTYPE,		Str|Stat,	0,	"type",	0,
 	"Like \b-type\b, except if symbolic links are followed, the test"
 	" is applied to the symbolic link itself, otherwise the test is applied"
 	" to the pointed to file. Equivalent to \b-type\b if no symbolic"
@@ -453,7 +461,7 @@ struct Format
 
 static unsigned int	minlevel = 0;
 static unsigned int	maxlevel = ~0;
-static int		walkflags = FTW_PHYSICAL|FTW_SEEDOTDIR;
+static int		walkflags = FTW_PHYSICAL|FTW_DELAY|FTW_SEEDOTDIR;
 static char		buf[LS_W_LONG+LS_W_INUMBER+LS_W_BLOCKS+2*PATH_MAX+1];
 static char		txt[PATH_MAX+1];
 
@@ -498,7 +506,7 @@ lookup(register char* word)
 		second = word[1];
 		if (*word == '-' && second == '-')
 			error(ERROR_USAGE|4, "%s", opthelp(usage, word + 2));
-		while (*argp->name)
+		while (argp->name)
 		{
 			if (second == argp->name[1] && streq(word, argp->name))
 				return argp;
@@ -855,7 +863,9 @@ compile(char** argv, register struct Node* np)
 		np->name = argp->name;
 		np->action = argp->action;
 		np->second.i = 0; 
-		if (argp->type == Op)
+		if (argp->type & Stat)
+			walkflags &= ~FTW_DELAY;
+		if (argp->type & Op)
 		{
 			if (oldop == NOT || np->action != NOT && (oldop != PRINT || !oldnp))
 				error(3, "%s: operator syntax error", np->name);
@@ -864,10 +874,10 @@ compile(char** argv, register struct Node* np)
 		else
 		{
 			oldop = PRINT;
-			if (argp->type != Unary)
+			if (!(argp->type & Unary))
 			{
 				b = opt_info.arg;
-				switch (argp->type)
+				switch (argp->type & ~Stat)
 				{
 				case File:
 					if (streq(b, "/dev/stdout") || streq(b, "/dev/fd/1"))
@@ -934,6 +944,8 @@ compile(char** argv, register struct Node* np)
 			goto ignore;
 		case CHECK:
 			silent = 0;
+			goto ignore;
+		case NOLEAF:
 			goto ignore;
 		case REVERSE:
 			reverse = 1;
@@ -1203,6 +1215,8 @@ execute(Ftw_t* ftw)
 	Sfio_t*			fp;
 	struct Node*		tp;
 	struct stat		st;
+	DIR*			dir;
+	struct dirent*		ent;
 
 	if (ftw->level > maxlevel)
 	{
@@ -1235,10 +1249,10 @@ execute(Ftw_t* ftw)
 	case FTW_D:
 		if (walkflags & FTW_TWICE)
 			return 0;
-		ftw->ignorecase = (icase || (!ftw->level || !ftw->parent->ignorecase) && strchr(astconf("PATH_ATTRIBUTES", ftw->path, NiL), 'c')) ? STR_ICASE : 0;
+		ftw->ignorecase = (icase || (!ftw->level || !ftw->parent->ignorecase) && strchr(astconf("PATH_ATTRIBUTES", ftw->name, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	default:
-		ftw->ignorecase = ftw->level ? ftw->parent->ignorecase : (icase || strchr(astconf("PATH_ATTRIBUTES", ftw->path, NiL), 'c')) ? STR_ICASE : 0;
+		ftw->ignorecase = ftw->level ? ftw->parent->ignorecase : (icase || strchr(astconf("PATH_ATTRIBUTES", ftw->name, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	}
 	if (ftw->level < minlevel)
@@ -1460,7 +1474,24 @@ execute(Ftw_t* ftw)
 			val = 1;
 			break;
 		case EMPTY:
-			val = !ftw->statb.st_size && (S_ISREG(ftw->statb.st_mode) || S_ISDIR(ftw->statb.st_mode));
+			if (S_ISREG(ftw->statb.st_mode))
+				val = !ftw->statb.st_size;
+			else if (!S_ISDIR(ftw->statb.st_mode))
+				val = 0;
+			else if (!ftw->statb.st_size)
+				val = 1;
+			else if (!(dir = opendir(ftw->path)))
+			{
+				if (!silent)
+					error(2, "%s: cannot read directory", ftw->path);
+				val = 0;
+			}
+			else
+			{
+				val = 1;
+				while ((ent = readdir(dir)) && (ent->d_name[0] == '.' && (!ent->d_name[1] || ent->d_name[1] == '.' && !ent->d_name[2])));
+				closedir(dir);
+			}
 			break;
 		case CFALSE:
 			val = 0;
@@ -1553,7 +1584,7 @@ main(int argc, char** argv)
 	{
 		sfprintf(sp, "[%d:%s?%s]", ap - commands + 10, ap->name, ap->help);
 		if (ap->arg)
-			sfprintf(sp, "%c[%s]", ap->type == Num ? '#' : ':', ap->arg);
+			sfprintf(sp, "%c[%s]", (ap->type & Num) ? '#' : ':', ap->arg);
 		if (ap->values)
 			sfprintf(sp, "{%s}", ap->values);
 		sfputc(sp, '\n');
@@ -1589,6 +1620,8 @@ main(int argc, char** argv)
 	}
 	while (topnode && topnode->action == IGNORE)
 		topnode = topnode->next;
+	if (!(walkflags & FTW_PHYSICAL))
+		walkflags &= ~FTW_DELAY;
 	if (fast)
 	{
 		if (sortkey != IGNORE)

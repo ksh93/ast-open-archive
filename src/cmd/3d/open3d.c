@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -21,6 +21,7 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -42,10 +43,10 @@ vcreate(register const char* path, int flags, int mode)
 	char		buf[PATH_MAX+1];
 
 	if (!state.vmap.size || !(flags & O_CREAT))
-		return(OPEN(path, flags, mode));
+		return OPEN(path, flags, mode);
 	ep = cp = (char*)path + strlen(path);
 	if (!instance(state.path.name, cp, &state.path.st, 1))
-		return(OPEN(path, flags, mode));
+		return OPEN(path, flags, mode);
 	while (cp > (char*)path && *--cp != '/');
 	if (*cp == '/') cp++;
 	namlen = ep - cp;
@@ -59,9 +60,9 @@ vcreate(register const char* path, int flags, int mode)
 	*ep = '/';
 	strcpy(buf + dirlen + 4, cp);
 	if ((fd = OPEN(buf, flags, mode)) >= 0)
-		return(fd);
+		return fd;
 	if (errno != ENOTDIR && errno != ENOENT)
-		return(-1);
+		return -1;
 	buf[dirlen + namlen + 4] = 0;
 	if (MKDIR(buf, VERMODE))
 	{
@@ -69,9 +70,9 @@ vcreate(register const char* path, int flags, int mode)
 		if (MKDIR(buf, VERMODE))
 		{
 			if (errno != EEXIST)
-				return(-1);
+				return -1;
 			if (LSTAT(buf, &state.path.st))
-				return(-1);
+				return -1;
 
 			/*
 			 * check for old style opaque, can be removed soon
@@ -86,17 +87,17 @@ vcreate(register const char* path, int flags, int mode)
 				if (RENAME(buf, path))
 				{
 					errno = EEXIST;
-					return(-1);
+					return -1;
 				}
 				if (MKDIR(buf, VERMODE))
-					return(-1);
+					return -1;
 				buf[dirlen + 3] = '.';
 				buf[dirlen + 4] = 0;
 				strcpy(cp, state.opaque);
 				if (RENAME(buf, path))
 				{
 					errno = EEXIST;
-					return(-1);
+					return -1;
 				}
 				memcpy(cp, savebuf, 8);
 				buf[dirlen + 3] = 0;
@@ -105,12 +106,12 @@ vcreate(register const char* path, int flags, int mode)
 			else
 			{
 				errno = EEXIST;
-				return(-1);
+				return -1;
 			}
 		}
 		buf[dirlen + 3] = '/';
 		if (MKDIR(buf, VERMODE))
-			return(-1);
+			return -1;
 	}
 	buf[dirlen + namlen + 4] = '/';
 
@@ -119,18 +120,18 @@ vcreate(register const char* path, int flags, int mode)
 	 */
 
 	if ((fd = OPEN(buf, flags, mode)) < 0)
-		return(-1);
+		return -1;
 	strcpy(buf + dirlen + namlen + 5, state.vdefault);
 	*ep = 0;
 	r = RENAME(path, buf);
 	if (SYMLINK(buf + dirlen, path))
-		return(fd);
+		return fd;
 	if (r)
 	{
 		strcpy(buf + dirlen + namlen + 5, ep + 1);
 		LINK(buf, path);
 	}
-	return(fd);
+	return fd;
 }
 
 int
@@ -155,14 +156,14 @@ open3d(const char* path, int oflag, ...)
 	if (!fscall(NiL, MSG_open, 0, path, oflag, mode, 0))
 	{
 		message((-1, "DEBUG: fs open fd=%d", state.ret));
-		return(state.ret);
+		return state.ret;
 	}
 	mp = monitored();
 #endif
 	if (state.in_2d)
 	{
 		if ((r = OPEN((!path || *path) ? path : state.dot, oflag, mode)) < 0 || !state.call.monitor || state.in_2d == 1 || FSTAT(r, &st))
-			return(r);
+			return r;
 		goto done;
 	}
 	if (!(sp = pathreal(path, (oflag & O_CREAT) ? P_NOOPAQUE : 0, &st)))
@@ -189,15 +190,15 @@ open3d(const char* path, int oflag, ...)
 					goto done;
 				}
 				if (!(oflag & O_TRUNC) && (fd = OPEN(sp, O_RDONLY, 0)) < 0)
-					return(-1);
+					return -1;
 			}
 			mode = ((S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)|(st.st_mode & (S_IXUSR|S_IXGRP|S_IXOTH)));
 		}
-		if (!(sp = pathreal(path, P_PATHONLY|P_SAFE, NiL)))
+		if (!(sp = pathreal(path, (oflag & O_CREAT) ? (P_PATHONLY|P_SAFE) : 0, NiL)))
 		{
 			if (fd >= 0)
 				CLOSE(fd);
-			return(-1);
+			return -1;
 		}
 		if (synthesize)
 			fs3d_mkdir(state.pwd, S_IRWXU|S_IRWXG|S_IRWXO);
@@ -240,7 +241,7 @@ open3d(const char* path, int oflag, ...)
 			{
 				CLOSE(r);
 				CLOSE(fd);
-				return(-1);
+				return -1;
 			}
 			state.path.level = 0;
 		}
@@ -288,7 +289,7 @@ open3d(const char* path, int oflag, ...)
 #endif
 	}
 #endif
-	return(r);
+	return r;
 }
 
 /*
@@ -305,7 +306,7 @@ fs3d_open(const char* path, int oflag, mode_t mode)
 	save = state.path;
 	fd = open(path, oflag, mode);
 	state.path = save;
-	return(fd);
+	return fd;
 }
 
 #if !_nosys_open64

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -54,11 +55,12 @@ Sffmt_t*	fe;
 	return 0;
 }
 
-int	OXcount;
+static int	OXcount;
+static char*	OXstr = "abc";
 #if __STD_C
-OXprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
+DOXSprint(Sfio_t* f, Void_t* v, Sffmt_t* fe)
 #else
-OXprint(f, v, fe)
+DOXSprint(f, v, fe)
 Sfio_t*		f;
 Void_t*		v;
 Sffmt_t*	fe;
@@ -82,6 +84,11 @@ Sffmt_t*	fe;
 	case 'X' :
 		fe->fmt = 'x';
 		*((int*)v) = 12;
+		fe->flags |= SFFMT_VALUE;
+		return 0;
+
+	case 's':
+		*((char**)v) = OXstr;
 		fe->flags |= SFFMT_VALUE;
 		return 0;
 	}
@@ -164,9 +171,9 @@ Sffmt_t*	fe;
 	  case 'F' :
 		fe->fmt = 'f'; return 0;
 	  case 'S' :
-		fe->fmt = 's'; fe->flags &= ~SFFMT_LONG; return 0;
+		fe->fmt = 's'; return 0;
 	  case 'C' :
-		fe->fmt = 'c'; fe->flags &= ~SFFMT_LONG; return 0;
+		fe->fmt = 'c'; return 0;
 	  default : return -1;
 	}
 }
@@ -227,14 +234,14 @@ MAIN()
 
 	fe.version = SFIO_VERSION;
 	fe.form = NIL(char*);
-	fe.extf = OXprint;
+	fe.extf = DOXSprint;
 	fe.eventf = NIL(Sffmtevent_f);
 
-	sfsprintf(buf1,sizeof(buf1),"%4d %4o %4x %4o %4x", 10, 11, 12, 11, 10);
-	sfsprintf(buf2,sizeof(buf2),"%!%2$4d %3$4O %4$4X %3$4O %2$4x", &fe);
+	sfsprintf(buf1,sizeof(buf1),"%4d %4o %4x %4o %4x %s", 10, 11, 12, 11, 10, "abc");
+	sfsprintf(buf2,sizeof(buf2),"%!%2$4d %3$4O %4$4X %3$4O %2$4x %5$s", &fe);
 	if(strcmp(buf1,buf2) != 0)
 		terror("Failed testing $position2\n");
-	if(OXcount != 3)
+	if(OXcount != 4)
 		terror("Failed OXprint called wrong number of times %d\n",OXcount);
 
 	sfsprintf(buf1,sizeof(buf1),"%6.2f",x);
@@ -277,7 +284,7 @@ MAIN()
 	sfsprintf(buf1,sizeof(buf1),"%d %o %f %s %c", -1, -1, -1., "s", 'c');
 	sfsprintf(buf2,sizeof(buf2),"%!%D %O %F %S %C",&fe, -1, -1, -1., "s", 'c');
 	if(strcmp(buf1,buf2) != 0)
-		terror("%%!: Extension function failed5: \"%s\" expected, \"%s\" returned\n", buf1, buf2);
+		terror("%%!: Extension function failed5\n");
 
 	k = 1234567890;
 	sfsprintf(buf1,sizeof(buf1),"%I*d",sizeof(k),k);
@@ -308,6 +315,20 @@ MAIN()
 	{	char* s = sfprints("%hx",0xffffffff);
 		if(!s || strcmp(s,"ffff") != 0)
 			terror("Failed %%hx test\n");
+
+		s = sfprints("%I2x",0xffffffff);
+		if(!s || strcmp(s,"ffff") != 0)
+			terror("Failed %%I2x test\n");
+	}
+
+	if(sizeof(int) == 4 &&  sizeof(char) == 1)
+	{	char* s = sfprints("%hhx",0xffffffff);
+		if(!s || strcmp(s,"ff") != 0)
+			terror("Failed %%hhx test\n");
+
+		s = sfprints("%I1x",0xffffffff);
+		if(!s || strcmp(s,"ff") != 0)
+			terror("Failed %%I1x test\n");
 	}
 
 	sfsprintf(buf1,sizeof(buf1),"%#..16d",-0xabc);
@@ -428,6 +449,12 @@ MAIN()
 	  s = sfprints("%Iu", (~((Sflong_t)0)/2) );
 	  if(strcmp(buf,s) != 0)
 		terror("Failed conversion with I flag\n");
+
+	  if(sizeof(Sflong_t)*8 == 64)
+	  {	s = sfprints("%I64u",(~((Sflong_t)0)/2) );
+	  	if(strcmp(buf,s) != 0)
+			terror("Failed conversion with I64 flag\n");
+	  }
 	}
 #endif
 

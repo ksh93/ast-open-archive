@@ -3295,10 +3295,10 @@ IMPLEMENTATION
 "action:=default"'
 	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC ls "$usage" --man
 		OUTPUT - 'return=? option=- name=--man num=0'
-		ERROR - '(libast,3,372)
-  ls [ (libast,3,709) ]
+		ERROR - '(libast,3,396)
+  ls [ (libast,3,773) ]
 
-(libast,3,333)
+(libast,3,357)
   -Q, --(debug,ls,SpamCo,"quote")|quote=(debug,ls,SpamCo,"style:=question")
                   (debug,ls,SpamCo,"Quote names according to style:")
                     (debug,ls,SpamCo,"C")
@@ -3311,24 +3311,24 @@ IMPLEMENTATION
                           (debug,ls,SpamCo,"Shell quote if necessary.")
                     (debug,ls,SpamCo,"question|huh")
                           (debug,ls,SpamCo,"Replace unknown chars with ?.")
-                  (debug,ls,SpamCo,"(libast,3,400) question.")
+                  (debug,ls,SpamCo,"(libast,3,424) question.")
   -x,
   --(debug,ls,SpamCo,"exec|run")|exec|run[=(debug,ls,SpamCo,"action:=default")]
-                  (debug,ls,SpamCo,"Just do it.") (libast,3,401) (libast,3,400)
+                  (debug,ls,SpamCo,"Just do it.") (libast,3,425) (libast,3,424)
                   default.
 
-(libast,3,238)
-  (libast,3,812)  (debug,ls,SpamCo,"aha ")
-  (libast,3,499)  (debug,ls,SpamCo,"SpamCo")'
+(libast,3,260)
+  (libast,3,894)  (debug,ls,SpamCo,"aha ")
+  (libast,3,531)  (debug,ls,SpamCo,"SpamCo")'
 	usage=$'[-][+NAME?small]\n\nfile\n\n[+SEE?\btbig\b(1)]'
 	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC small "$usage" --man
 		EXIT 2
 		OUTPUT - $'return=? option=- name=--man num=0'
-		ERROR - $'(libast,3,325)
+		ERROR - $'(libast,3,349)
   (debug,small,libast,"small")
 
-(libast,3,372)
-  small [ (libast,3,709) ] (debug,small,libast,"file")
+(libast,3,396)
+  small [ (libast,3,773) ] (debug,small,libast,"file")
 
 (debug,small,libast,"SEE")
   (debug,small,libast,"tbig(1)")'

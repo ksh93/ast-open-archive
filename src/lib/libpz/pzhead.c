@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -48,7 +49,7 @@ pzheadread(register Pz_t* pz)
 	 * check the header magic
 	 */
 
-	if (s = (unsigned char*)sfreserve(pz->io, 2, 1))
+	if (s = (unsigned char*)sfreserve(pz->io, 4, 1))
 	{
 		i = s[0];
 		n = s[1];
@@ -57,7 +58,7 @@ pzheadread(register Pz_t* pz)
 		i = n = 0;
 	if (pz->disc->errorf)
 		(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzheadread: f=%08x i=%02x n=%02x%s", pz->path, pz->flags, i, n, s ? "" : " (nil)");
-	if (i != PZ_MAGIC_1 || n != PZ_MAGIC_2)
+	if (i != PZ_MAGIC_1 || n != PZ_MAGIC_2 || s[2] == 0 || s[3] >= 10)
 	{
 		sfread(pz->io, s, 0);
 		if (pz->flags & PZ_SPLIT)

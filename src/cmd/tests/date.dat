@@ -57,6 +57,8 @@ midnight 96060				NULL	Thu Feb 29 00:00:00 EST 1996
 2002 08 11				NULL	Sat Nov 22 20:02:00 EST 2008
 30/Sep/1997:00:00:05 -0700		NULL	Tue Sep 30 03:00:05 EDT 1997
 30/Sep/1997:00:00:05 +0700		NULL	Mon Sep 29 13:00:05 EDT 1997
+79 minutes ago				NULL	Mon Sep 22 11:00:00 EDT 1986
+107 seconds ago				NULL	Mon Sep 22 12:18:00 EDT 1986
 
 #
 # a few leap year tests
@@ -216,7 +218,7 @@ NIL	%s	527800187
 NIL	%S	47
 NIL	%t	\t
 NIL	%T	15:09:47
-NIL	%u	%u
+NIL	%u	1
 NIL	%U	38
 NIL	%v	%v
 NIL	%V	38
@@ -266,7 +268,7 @@ NIL	%0s	527800187
 NIL	%0S	47
 NIL	%0t	\t
 NIL	%0T	15:09:47
-NIL	%0u	%u
+NIL	%0u	1
 NIL	%0U	38
 NIL	%0v	%v
 NIL	%0V	38
@@ -316,7 +318,7 @@ NIL	%-s	527800187
 NIL	%-S	47
 NIL	%-t	\t
 NIL	%-T	15:09:47
-NIL	%-u	%u
+NIL	%-u	1
 NIL	%-U	38
 NIL	%-v	%v
 NIL	%-V	38
@@ -366,7 +368,7 @@ NIL	%_s	527800187
 NIL	%_S	47
 NIL	%_t	\t
 NIL	%_T	15:09:47
-NIL	%_u	%u
+NIL	%_u	1
 NIL	%_U	38
 NIL	%_v	%v
 NIL	%_V	38

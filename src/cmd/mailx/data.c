@@ -6,7 +6,7 @@
 
 #include "mailx.h"
 
-static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2002-03-17 $\0\n";
+static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2002-05-31 $\0\n";
 
 static const char	terms[] = "\n\
 @(#)Copyright (c) 1980, 1993, 1996, 2002\n\

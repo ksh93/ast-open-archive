@@ -1,3 +1,5 @@
+02-06-07 spam.c: delay lower priority tests until all headers seen
+02-05-31 imap.c: error messages to stderr -- duh
 02-03-17 spam.c: add spamtest=bitmask: 0x0001: content-type==text/html
 02-01-31 data.c: clarify imap var docs
 02-01-30 local.iffe: add to handle no <termios.h> and ftruncate()

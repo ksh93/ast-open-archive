@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -185,7 +186,7 @@ MAIN()
 	/* test to see if hidden read data still accessible */
 	if(pipe(fd) < 0)
 		terror("Can't create pipe");
-	if(!(f1 = sfnew(0, 0, -1, fd[0], SF_READ|SF_WRITE)) )
+	if(!(f1 = sfnew(0, NIL(Void_t*), (size_t)SF_UNBOUND, fd[0], SF_READ|SF_WRITE)) )
 		terror("Can't create stream");
 
 	if(write(fd[1],"0123",4) != 4)
@@ -194,11 +195,11 @@ MAIN()
 		terror("sfgetc failed");
 
 	/* hack to create hidden reserved buffer */
-	f1->file = fd[1];
+	f1->_file = fd[1];
 	if(sfwrite(f1,"4",1) != 1)
 		terror("Can't write to stream");
 	sfsync(f1);
-	f1->file = fd[0];
+	f1->_file = fd[0];
 	close(fd[1]);
 
 	/* now stack stream */

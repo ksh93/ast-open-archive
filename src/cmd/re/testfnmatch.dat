@@ -1,3 +1,27 @@
+####################################################################
+#                                                                  #
+#        Copyright (C) 2000 Free Software Foundation, Inc.         #
+#                                                                  #
+#      This is free software; you can redistribute it and/or       #
+#   modify it under the terms of the GNU General Public License    #
+#          as published by the Free Software Foundation;           #
+#     either version 2, or (at your option) any later version.     #
+#                                                                  #
+#         This software is distributed in the hope that it         #
+#            will be useful, but WITHOUT ANY WARRANTY;             #
+#       without even the implied warranty of MERCHANTABILITY       #
+#               or FITNESS FOR A PARTICULAR PURPOSE.               #
+#       See the GNU General Public License for more details.       #
+#                                                                  #
+#              You should have received a copy of the              #
+#                    GNU General Public License                    #
+#         along with this software (see the file COPYING.)         #
+#                  If not, a copy is available at                  #
+#               http://www.gnu.org/copyleft/gpl.html               #
+#                                                                  #
+#               Ulrich Drepper <drepper@redhat.com>                #
+#                                                                  #
+####################################################################
 : transcribed from the gnu glibc fnmatch() tests
 
 # Derived from the IEEE 2003.2 text.  The standard only contains some

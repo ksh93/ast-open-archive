@@ -51,7 +51,7 @@ int ZEXPORT uncompress (dest, destLen, source, sourceLen)
         inflateEnd(&stream);
         return err == Z_OK ? Z_BUF_ERROR : err;
     }
-    *destLen = stream.total_out;
+    *destLen = (uLong)stream.total_out;
 
     err = inflateEnd(&stream);
     return err;

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -20,6 +20,7 @@
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -33,7 +34,7 @@
 #endif
 
 static const char usage[] =
-"[-?@(#)$Id: look (AT&T Labs Research) 2000-12-05 $\n]"
+"[-?@(#)$Id: look (AT&T Labs Research) 2002-04-15 $\n]"
 USAGE_LICENSE
 "[+NAME?look - displays lines beginning with a given prefix]"
 "[+DESCRIPTION?\blook\b displays all lines in the sorted \afile\a arguments"
@@ -186,7 +187,11 @@ look(Sfio_t* fp, char* prefix, char* maxprefix, int flags)
 				else if (n > 0)
 					low = mid;
 				else
+				{
+					if((mid+=sfvalue(fp)) >= high)
+						break;
 					high = mid;
+				}
 			}
 		}
 		sfseek(fp, low, SEEK_SET);

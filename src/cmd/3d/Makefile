@@ -78,6 +78,9 @@ NAME3D = lib_3d.h std_3d.h vcs_3d.h
 ":lib:" : .MAKE .OPERATOR
 	local L
 	L := $(<:/-l//)
+	eval
+	_BLD_$(L) == 1
+	end
 	:: $(L)_3d.h
 	NAME3D += $(L)_3d.h
 	L := ../../$(VARIANTID:?../)lib/lib$(L)

@@ -43,25 +43,6 @@ The
 tables are flushed between each column partition group. This has a
 positive space/time effect on the gzip string match and huffman tables.
 .PP
-.xx begin=internal
-.xx link="../publications/pzip-1999-1.ps	Using Quantitative Methods to Compress Call Detail: From Data Warehouse to Data Publishing"
-is a paper presented at the AT&T QUAC symposium that describes the background
-of the
-.B pzip
-algorithms and a typical AT&T data environment; the corresponding powerpoint
-.xx link="../publications/pzip-1999-1-talk.ppt	presentation"
-is also available.
-.xx link="../publications/pzip-1999-2.ps	A Lossless Data Partition Compressor"
-is a draft conference paper that describes
-.B pzip
-and the underlying algorithms, with accompanying
-.xx link="../publications/pzip-1999-2-talk.ps	viewgraphs."
-.xx link="../publications/pzip-1999-4.html	Dynamically Induced Compression"
-is in the 1999 AT&T Software Symposium.
-.xx end=internal
-.xx link="../publications/pzip-1999-3.ps	Engineering the Compression of Massive Tables: An Experimental Approach"
-is the 2000 SODA conference paper.
-.PP
 Two other commands are part of the
 .B pzip
 package.
@@ -75,8 +56,17 @@ partitions from training data.
 .xx begin=internal
 .PP
 .B pzip
-is in production use in several AT&T projects:
-.xx link="http://greyhound.angels.att.com/	Greyhound."
+is in production use for several AT&T projects and data streams:
+.xx link="../pzmps/pzmps.html	Greyhound",
+.xx link="../pzama/pzama.html	AMA call detail",
+and the AT&T AMA database of record
+.xx link="http://fry.research.att.com/~rab/vetter_memo.html	Data Barn."
+The
+.B gzip
+portion of
+.BR pzip ,
+which has been modified to handle large (>4GB) files, is also used by the
+.xx link="http://ning09.research.att.com/~ningaui/index.html	ningaui project."
 .B pzip
 is also one of the internal AT&T CIO
 .xx link="http://www.csb.att.com/cio/awards/circle99winners.html	Circle of Excellence"
@@ -110,6 +100,35 @@ you can also send data to the
 site, which will determine if the data is suitable for
 .BR pzip .
 .xx end=internal
+.H 1 Publications
+.BL
+.LI
+.xx link="../publications/pzip-2002-1.pdf	Improving Table Compression with Combinatorial Optimization",
+with Adam Buchsbaum and Raffaele Giancarlo,
+in Proc. 13th ACM-SIAM Symp. on Discrete Algorithms, pp. 213-22, 2002. 
+.xx begin=internal
+.LI
+.xx link=../publications/"pzip-1999-4.html	Dynamically Induced Compression",
+with Don Caldwell and Ken Church,
+AT&T Software Symposium, Middletown, NJ, 1999.
+.xx end=internal
+.LI
+.xx link="../publications/pzip-2000-1.pdf	Engineering the Compression of Massive Tables: An Experimental Approach",
+with Adam Buchsbaum and Don Caldwell and Ken Church and S. Muthukrishnan,
+in Proc. 11th ACM-SIAM Symp. on Discrete Algorithms, pp. 175-184, 2000.
+.xx begin=internal
+.LI
+.xx link="../publications/pzip-1999-2.pdf	A Lossless Data Partition Compressor",
+with Don Caldwell and Ken Church,
+a draft looking for a home,
+.xx link="../publications/pzip-1999-2-talk.pdf	presentation".
+.LI
+.xx link="../publications/pzip-1999-1.pdf	Using Quantitative Methods to Compress Call Detail: From Data Warehouse to Data Publishing",
+with Don Caldwell and Ken Church,
+AT&T QUAC Symposium, February 1999,
+.xx link="../publications/pzip-1999-1-talk.ppt	powerpoint presentation".
+.xx end=internal
+.LE
 .H 1 Examples
 Generate a partition, letting
 .B pin

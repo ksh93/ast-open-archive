@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -803,7 +804,9 @@ ppop(int op, ...)
 				);
 			sfprintf(sp,
 "\
+#%s __STDC__\n\
 #%s __STDC__ #(STDC)\n\
+#%s\n\
 #%s #%s(%s)\n\
 #%s %s:%s\n\
 #%s %s:%s\n\
@@ -811,7 +814,9 @@ ppop(int op, ...)
 #%s\n\
 #%s\n\
 "
+				, dirname(IFNDEF)
 				, dirname(DEFINE)
+				, dirname(ENDIF)
 				, dirname(IF)
 				, keyname(X_OPTION)
 				, keyname(X_STRICT)

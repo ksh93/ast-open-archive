@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2002-02-02
+# @(#)probe.win32 (AT&T Labs Research) 2002-05-28
 #
 # win32 specific make C probe initialization
 # ms vc is easy on uwin
@@ -16,9 +16,27 @@ export nativepp
 for i in $probe_easy
 do	echo "#include <$i.h>"
 done
-echo 'uwin=_UWIN'
-echo 'versionb=__BORLANDC__'
-echo 'versionm=_MSC_VER'
+echo '#ifdef _UWIN'
+echo 'int uwin=_UWIN;'
+echo '#endif'
+echo '#ifdef __BORLANDC__'
+echo 'int versionb=__BORLANDC__;'
+echo '#endif'
+echo '#ifdef __DMC__'
+echo 'int versiond=__DMC__;'
+echo '#endif'
+echo '#ifdef _MSC_VER'
+echo 'int versionm=_MSC_VER;'
+echo '#endif'
+echo '#ifdef __ICL'
+echo 'int versioni=__ICL;'
+echo '#endif'
+echo '#ifdef __LCC__'
+echo 'int versionl=0+__LCC__;'
+echo '#endif'
+echo '#ifdef __MINGW32__'
+echo "int versiong=__MINGW32__"
+echo '#endif'
 } > easy.c
 
 for i in $probe_easy
@@ -27,16 +45,22 @@ done
 include=
 uwin=
 versionb=
+versiond=
 versionm=
+versioni=
+versiong=
+versionl=
 
 $cc -E easy.c 2> easy.err |
-egrep -i '^(#line 1 .*\.[hH]|(uwin|version[bm])=[0-9])' |
+egrep -i '^(#line 1 .*\.[hH]| *int +(uwin|version[bdiglm]) *= *[0-9])' |
 sed	-e 's/.*"\(.*\)".*/\1/' \
-	-e 's,^[ 	]*,,' \
-	-e 's,[ 	]*$,,' \
+	-e 's,^  *,,' \
+	-e 's,  *$,,' \
+	-e 's, *= *,=,' \
 	-e 's,^\(.\):[\\/]*,/\1/,' \
 	-e 's,[\\/][\\/]*,/,g' \
 	-e 's,^\(/.*\)/\(.*\)\.[hH]$,\2_include="\1",' \
+	-e 's, *int *,,' \
 	> easy.sh
 . ./easy.sh
 
@@ -54,7 +78,7 @@ if	test "" != "$i" -a -d "$i/include"
 then	include=$i/include
 fi
 
-case $versionb$versionm:$include in
+case $versionb$versiond$versionm$versiong$versionl:$include in
 [0-9]*:/*)
 	: the payoff
 	set -- $cc
@@ -96,14 +120,29 @@ CC.SHARED.REGISTRY =
 CC.SHARED.REGISTRY.PATH =
 CC.STATIC = -Bstatic
 !
+	if	[ X"$versiond" != X ]
+	then	inc=${include}/win32 lib=/dm
+	elif	[ X"$versionb" != X ]
+	then	inc= lib=/borland
+	elif	[ X"$versioni" != X ]
+	then	if	[ -d /msdev/vc98/inlcude ]
+		then	inc=/msdev/vc98/include
+		else	inc=/msdev/vc/include
+		fi
+		lib=
+	else	inc= lib=
+	fi
+	case $include in
+	*' '*)	include=`echo "$include" | sed -e 's/ //g'`;;
+	esac
 	case $uwin in
 	[0-9]*)	cat >&3 <<!
-CC.STDINCLUDE = /usr/include ${include}
-CC.STDLIB = /usr/lib ${include%/*}/lib
+CC.STDINCLUDE = /usr/include ${include} ${inc}
+CC.STDLIB = /usr/lib${lib} ${include%/*}/lib
 !
 		;;
 	*)	cat >&3 <<!
-CC.STDINCLUDE = ${include}
+CC.STDINCLUDE = ${include} ${inc}
 CC.STDLIB = ${include%/*}/lib
 !
 		;;

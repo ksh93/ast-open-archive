@@ -46,7 +46,10 @@ TEST 01 'date'
 TEST 02 'touch'
 	EXEC	$leap0 touch -t ${leap0#*+}:30 t
 		OUTPUT -
+	EXEC	$leap0 date -f $format -m t
+		OUTPUT - $leap0
 	EXEC	$leap0 $SHELL -c "touch -t ${leap0#*+}:30 t"
+		OUTPUT -
 	EXEC	$leap0 date -f $format -m t
 		OUTPUT - $leap0
 	EXEC	$leap0 $SHELL -c "date -f $format -m t"

@@ -8,7 +8,7 @@ pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	pax.h options.h zip.h \
 	bio.c convert.c copy.c pax.c \
 	delta.c file.c format.c misc.c \
-	-lodelta -lvdelta -lsum
+	-lardir -lodelta -lvdelta -lsum
 
 if CC.HOSTTYPE == "win32*" || "$(-mam)" == "static*"
 delta.o : .CC.NOOPTIMIZE

@@ -261,7 +261,7 @@ TkshArrayInfo *TkshArrayData(Namval_t *namval)
 		if (nf_top->disc->getval == tksh_arrgetval)
 			return array_data(nf_top);
 	}
-	nf_arr = (Namfun_t *) malloc(sizeof(Namfun_t) + sizeof(void *));
+	nf_arr = (Namfun_t *) malloc(tksh_trace_array.dsize);
 	nf_arr->next = NULL;
 	nf_arr->disc = & tksh_trace_array;
 	array_data(nf_arr)->clientData = NULL;

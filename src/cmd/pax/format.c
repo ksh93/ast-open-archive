@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -127,7 +128,6 @@ int
 getprologue(register Archive_t* ap)
 {
 	int		n;
-	off_t		size;
 
 	if (ap->volume && ap->io->mode != O_RDONLY)
 		return 0;
@@ -144,66 +144,13 @@ getprologue(register Archive_t* ap)
 	}
 	else if (!isalar(ap, alar_header))
 	{
-		if ((ap->expected < 0 || ap->expected == PORTAR || ap->expected == RANDAR) && strneq(alar_header, PORTAR_MAG, PORTAR_MAGSIZ))
+		if ((ap->expected < 0 || ap->expected == AR) && (ap->ardir = ardiropen(ap->name, NiL, 0)))
+
 		{
-			bunread(ap, alar_header, ALAR_HEADER - 8);
-			if (bread(ap, &portar_header, (off_t)0, (off_t)PORTAR_HEADER, 0) > 0)
-			{
-				if (!strneq(portar_header.ar_fmag, PORTAR_END, PORTAR_ENDSIZ) || sfsscanf(portar_header.ar_size, "%I*d", sizeof(size), &size) != 1)
-				{
-					bunread(ap, &portar_header, PORTAR_HEADER);
-					bunread(ap, PORTAR_MAG, PORTAR_MAGSIZ);
-				}
-				else
-				{
-					size += (size & 01);
-					if (strmatch(portar_header.ar_name, PORTAR_SYM) && (ap->format = PORTAR) || strmatch(portar_header.ar_name, RANDAR_SYM) && (ap->format = RANDAR))
-					{
-						if (ap->format == PORTAR && portar_header.ar_uid[0] == ' ' && portar_header.ar_gid[0] == ' ')
-							ap->separator = '\\';
-						if (bread(ap, NiL, (off_t)0, size, 0) <= 0)
-							error(3, "%s: invalid %s format symbol table", ap->name, format[ap->format].name);
-						n = bread(ap, &portar_header, (off_t)0, (off_t)PORTAR_HEADER, 0);
-					}
-					else
-					{
-						n = portar_header.ar_date[0];
-						portar_header.ar_date[0] = 0;
-						ap->format = strchr(portar_header.ar_name, PORTAR_TERM) ? PORTAR : RANDAR;
-						portar_header.ar_date[0] = n;
-						n = 1;
-					}
-					if (ap->expected >= 0)
-						ap->expected = ap->format;
-					if (n > 0)
-					{
-						while (portar_header.ar_name[0] == PORTAR_TERM && sfsscanf(portar_header.ar_size, "%I*d", sizeof(size), &size) == 1)
-						{
-							size += (size & 01);
-							if (!ap->names && portar_header.ar_name[1] == PORTAR_TERM && portar_header.ar_name[2] == ' ')
-							{
-								if (!(ap->names = newof(0, char, size, 0)))
-									error(3, "%s: cannot allocate %s format long name table", ap->name, format[ap->format].name);
-								if (bread(ap, ap->names, (off_t)0, size, 0) <= 0)
-									error(3, "%s: invalid %s format long name table", ap->name, format[ap->format].name);
-							}
-							else if (isdigit(portar_header.ar_name[1]))
-								break;
-							else if (bread(ap, NiL, (off_t)0, size, 0) <= 0)
-								error(3, "%s: invalid %s format meta data", ap->name, format[ap->format].name);
-							if ((n = bread(ap, &portar_header, (off_t)0, (off_t)PORTAR_HEADER, 0)) <= 0)
-								break;
-						}
-						if (n > 0)
-							bunread(ap, &portar_header, PORTAR_HEADER);
-					}
-				}
-			}
+			format[ap->format = AR].name = (char*)ap->ardir->meth->description;
+			if (ap->expected >= 0)
+				ap->expected = ap->format;
 		}
-		else if (strneq(alar_header, "<ar>", 4) ||	/* s5r1	 */
-			swapget(0, alar_header, 2) == 0177545 ||/* pdp11 */
-			swapget(1, alar_header, 2) == 0177545)	/* pdp11 */
-				error(3, "%s: use ar(1) for library archives", ap->name);
 		else if (!ap->compress)
 		{
 			unsigned long	m;
@@ -473,9 +420,8 @@ getepilogue(register Archive_t* ap)
 		switch (ap->format)
 		{
 		case ALAR:
+		case AR:
 		case IBMAR:
-		case PORTAR:
-		case RANDAR:
 #if SAVESET
 		case SAVESET:
 #endif
@@ -1424,62 +1370,31 @@ getheader(register Archive_t* ap, register File_t* f)
 			}
 			bunread(ap, state.tmp.buffer, ASC_HEADER);
 			break;
-		case PORTAR:
-		case RANDAR:
-			if (bread(ap, &portar_header, (off_t)0, (off_t)PORTAR_HEADER, 0) <= 0)
-				break;
-			if (strneq(portar_header.ar_fmag, PORTAR_END, PORTAR_ENDSIZ) && isdigit(portar_header.ar_date[0]) && isdigit(portar_header.ar_size[0]))
+		case AR:
+			if (!(ap->ardirent = ardirnext(ap->ardir)))
 			{
-				if (!isdigit(portar_header.ar_uid[0]))
-				{
-					n = sfsprintf(portar_header.ar_uid, sizeof(portar_header.ar_uid), "%d", state.uid);
-					portar_header.ar_uid[n] = ' ';
-				}
-				if (!isdigit(portar_header.ar_gid[0]))
-				{
-					n = sfsprintf(portar_header.ar_gid, sizeof(portar_header.ar_gid), "%d", state.gid);
-					portar_header.ar_gid[n] = ' ';
-				}
-				if (!isdigit(portar_header.ar_mode[0]))
-				{
-					n = sfsprintf(portar_header.ar_mode, sizeof(portar_header.ar_mode), "0%o", X_IRUSR|X_IWUSR|X_IRGRP|X_IWGRP|X_IROTH|X_IWOTH);
-					portar_header.ar_mode[n] = ' ';
-				}
-				if (sfsscanf(portar_header.ar_date, "%12ld%6ld%6ld%8lo%10ld",
-					&lst.mtime,
-					&lst.uid,
-					&lst.gid,
-					&lst.mode,
-					&lst.size) == 5)
-				{
-					f->name = (ap->names && portar_header.ar_name[0] == PORTAR_TERM) ? (ap->names + strtol(portar_header.ar_name + 1, NiL, 10)) : portar_header.ar_name;
-					portar_header.ar_date[0] = 0;
-					if ((s = strchr(f->name, PORTAR_TERM)) || (s = strchr(f->name, RANDAR_TERM)))
-						*s = 0;
-					if (ap->separator)
-					{
-						s = f->name;
-						while (s = strchr(f->name, ap->separator))
-							*s++ = '/';
-					}
-					f->st->st_dev = 0;
-					f->st->st_ino = 0;
-					f->st->st_mode = X_IFREG|(lst.mode&X_IPERM);
-					f->st->st_uid = lst.uid;
-					f->st->st_gid = lst.gid;
-					f->st->st_nlink = 1;
-					IDEVICE(f->st, 0);
-					f->st->st_mtime = lst.mtime;
-					f->st->st_size = lst.size;
-					f->linktype = NOLINK;
-					f->linkname = 0;
-					f->uidname = 0;
-					f->gidname = 0;
-					goto found;
-				}
+				ardirclose(ap->ardir);
+				ap->ardir = 0;
+				m = lseek(ap->io->fd, (off_t)0, SEEK_END);
+				if (m < 0 || bseek(ap, m, SEEK_SET, 0) != m)
+					break;
+				return 0;
 			}
-			bunread(ap, &portar_header, PORTAR_HEADER);
-			return 0;
+			f->name = ap->ardirent->name;
+			f->st->st_dev = 0;
+			f->st->st_ino = 0;
+			f->st->st_mode = X_IFREG|(ap->ardirent->mode&X_IPERM);
+			f->st->st_uid = ap->ardirent->uid;
+			f->st->st_gid = ap->ardirent->gid;
+			f->st->st_nlink = 1;
+			IDEVICE(f->st, 0);
+			f->st->st_mtime = ap->ardirent->mtime;
+			f->st->st_size = ap->ardirent->size;
+			f->linktype = NOLINK;
+			f->linkname = 0;
+			f->uidname = 0;
+			f->gidname = 0;
+			goto found;
 		case VDB:
 			if (!state.vdb.header.base)
 			{
@@ -2220,7 +2135,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				name = n & ((1<<16)-1);
 				size = swapget(ap->swap, s + 5, 4);
 				if (!(s = bget(ap, size + 2, NiL)))
-					error(3, "%s: %s format attribute data truncated -- %d expected\n", ap->name, format[ap->format].name, size);
+					error(3, "%s: %s format attribute data truncated -- %d expected", ap->name, format[ap->format].name, size);
 				checksum = swapget(ap->swap, s + size, 2);
 				n = 0;
 				x = (unsigned char*)s;
@@ -2229,7 +2144,7 @@ getheader(register Archive_t* ap, register File_t* f)
 					n += *x++;
 				n &= ((1<<16)-1);
 				if (checksum != n)
-					error(3, "%s: %s format attribute data checksum error\n", ap->name, format[ap->format].name);
+					error(3, "%s: %s format attribute data checksum error", ap->name, format[ap->format].name);
 				if (level == 2) switch (name)
 				{
 				case 0x800f: /* data */
@@ -2321,6 +2236,84 @@ getheader(register Archive_t* ap, register File_t* f)
 			}
 			break;
 		}
+		case OMF:
+		{
+			static time_t	stamp;
+
+			if (ap->entry == 1)
+			{
+				struct stat	st;
+
+				stamp = fstat(ap->io->fd, &st) >= 0 ? st.st_mtime : NOW;
+				if (bread(ap, tar_block, (off_t)0, (off_t)3, 0) <= 0)
+					break;
+				if (((unsigned char*)tar_block)[0] != OMF_MAGIC)
+				{
+					bunread(ap, tar_block, 3);
+					break;
+				}
+				sum = ((unsigned char*)tar_block)[1] | (((unsigned char*)tar_block)[2] << 8);
+				if (bread(ap, NiL, (off_t)0, (off_t)sum, 0) <= 0)
+					error(3, "%s: %s format header truncated -- %d expected", ap->name, format[ap->format].name, sum);
+			}
+			f->name = 0;
+			for (;;)
+			{
+				if (bread(ap, tar_block, (off_t)0, (off_t)1, 0) <= 0)
+					error(3, "%s: %s format record truncated -- %d expected for type", ap->name, format[ap->format].name, 1);
+				if (!(type = ((unsigned char*)tar_block)[0]))
+					continue;
+				if (bread(ap, tar_block, (off_t)0, (off_t)2, 0) <= 0)
+					error(3, "%s: %s format record truncated -- %d expected for size", ap->name, format[ap->format].name, 2);
+				num = sum = ((unsigned char*)tar_block)[0] | (((unsigned char*)tar_block)[1] << 8);
+				switch (type)
+				{
+				case 0x80:
+				case 0x82:
+					if (bread(ap, tar_block, (off_t)0, (off_t)1, 0) <= 0)
+						error(3, "%s: %s format record truncated -- %d expected for name length", ap->name, format[ap->format].name, 1);
+					lab = ((unsigned char*)tar_block)[0];
+					if (lab > (sizeof(ap->path.header) - 3))
+						lab = sizeof(ap->path.header) - 3;
+					num -= lab +1;
+					if (bread(ap, f->name = ap->path.header, (off_t)0, (off_t)lab, 0) <= 0)
+						error(3, "%s: %s format record truncated -- %d expected for name", ap->name, format[ap->format].name, lab);
+					f->name[lab] = 0;
+					if (s = strrchr(f->name, '.'))
+						lab = s - f->name;
+					strcpy(f->name + lab, ".o");
+					m = 0;
+					break;
+				case 0x8A:
+					if (!f->name)
+						error(3, "%s: %s format corrupted -- data record before name record", ap->name, format[ap->format].name);
+					f->st->st_dev = 0;
+					f->st->st_ino = 0;
+					f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
+					f->st->st_uid = state.uid;
+					f->st->st_gid = state.gid;
+					f->st->st_nlink = 1;
+					IDEVICE(f->st, 0);
+					f->st->st_mtime = f->st->st_ctime = f->st->st_atime = stamp;
+					m += 3;
+					f->st->st_size = m + sum;
+					if (bseek(ap, (off_t)(-m), SEEK_CUR, 0) < 0)
+						error(3, "%s: %s format seek error", ap->name, format[ap->format].name);
+					goto found;
+				case 0xf1:
+					goto vdb_eof;
+				}
+				m += sum + 3;
+				if (num > 0 && bread(ap, NiL, (off_t)0, (off_t)num, 0) <= 0)
+					error(3, "%s: %s format record truncated -- %d expected for data", ap->name, format[ap->format].name, num);
+			}
+			if (ap->io->eof && ap->entry == 1)
+			{
+				error(1, "%s: no members in %s file", ap->name, format[ap->format].name);
+				return 0;
+			}
+			break;
+		}
 		vdb_eof:
 			bflushin(ap, 0);
 			ap->io->eof = 1;
@@ -2391,6 +2384,9 @@ getheader(register Archive_t* ap, register File_t* f)
 						error(1, "junk data after volume %d", ap->volume);
 					finish(0);
 				}
+				ap->format = OMF;
+				goto again;
+			case OMF:
 				if (!state.keepgoing)
 					error(3, "%s: unknown input format", ap->name);
 				ap->format = IN_DEFAULT;

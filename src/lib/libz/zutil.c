@@ -207,8 +207,8 @@ extern void   free   OF((voidpf ptr));
 
 voidpf zcalloc (opaque, items, size)
     voidpf opaque;
-    unsigned items;
-    unsigned size;
+    uInt items;
+    uInt size;
 {
     if (opaque) items += size - size; /* make compiler happy */
     return (voidpf)calloc(items, size);

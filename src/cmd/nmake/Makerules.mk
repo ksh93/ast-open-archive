@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2002-02-14 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2002-06-11 $"
 
 /*
  * handy attributes
@@ -77,7 +77,7 @@ USRDIRS = $(LCLDIRS):$(STDDIRS)
 INSTALLROOT = $(HOME)
 
 BINDIR = $(INSTALLROOT)/bin
-DLLDIR = $(CC.SUFFIX.SHARED:N=.lib:?$(BINDIR)?$(LIBDIR)?)
+DLLDIR = $(CC.SUFFIX.DYNAMIC:N=.dll:?$(BINDIR)?$(LIBDIR)?)
 ETCDIR = $(INSTALLROOT)/etc
 FUNDIR = $(INSTALLROOT)/fun
 INCLUDEDIR = $(INSTALLROOT)/include
@@ -125,7 +125,7 @@ ldscript =
 link =
 nativepp =
 official_out = OFFICIAL
-output = $(PWD:M=.*[0-9]\.[0-9]:?$$(PWD:B:S:/-*\([0-9]\.[0-9]\)/-\1/)?$$(VERSION:Y%$$(PWD:B:S)-$$(VERSION)%$$(PWD:B)%)?)
+output = $(PWD:N=*[0-9].[0-9]*|*-$(VERSION):?$$(PWD:B:S:/---*\([^-]*\)/-\1/)?$$(VERSION:Y%$$(PWD:B:S)-$$(VERSION)%$$(PWD:B)%)?)
 package_local = win32.*
 physical =
 prefixinclude = 1
@@ -187,7 +187,7 @@ INSTRUMENT_sentinel = command=CCLD root=SE_HOME CCFLAGS=-g
 
 for .X. cat cmp cp ln mv rm
 	eval
-	STD$(.X.:F=%(upper)S) := $(STDDIRS:/:/ /G:X=bin/$(.X.):P=X:O=1)
+	STD$(.X.:F=%(upper)s) := $(STDDIRS:/:/ /G:X=bin/$(.X.):P=X:O=1)
 	end
 end
 .X. := $(STDLN)
@@ -342,6 +342,7 @@ end
 
 .BUILT. = $(...:T=XU:T=F:P=L:N!=/*$(.INSTALL.LIST.:@/ /|/G:/^./|&/)$(VROOT:?|$(VROOT)/*??)$(-global:@/:/|/G:/^./|&/):T=G)
 .CLOBBER. = $(".":L=*.([it]i|l[hn])) core
+.FILES. = $(LICENSEFILE)
 .MANIFEST.FILES. = $(*.COMMON.SAVE:T=F) $(.SELECT.:A!=.ARCHIVE|.COMMAND|.OBJECT)
 .MANIFEST. = $(.MANIFEST.FILES.:$(.RECURSE.OFFSET.:?C,^\([^/]\),$(.RECURSE.OFFSET.)/\1,??):P=C:H!)
 .SOURCES. = $(.SELECT.:A=.REGULAR:A!=.ARCHIVE|.COMMAND|.OBJECT)
@@ -594,19 +595,27 @@ include "Scanrules.mk"
 		end
 		return $(T)
 	end
-	if "$(CC.REQUIRE.$(B))"
-		$(%) : .DONTCARE
-	elif T = "$(B:B:S=.req:T=F)"
-		return $(T:T=I)
-	else
-		T := lib/$(B)
-		$(T) : .ARCHIVE
-		if ! "$(T:T=F)"
-			T := $(MAKELIB:D)/$(T)
-		end
-		if "$(T:T=F)"
+	if ! "$(.BOUND.$(B))"
+		.BOUND.$(B) := 1
+		if T = "$(CC.REQUIRE.$(B))"
+			$(%) : .DONTCARE
+			return $(T)
+		elif T = "$(B:B:S=.req:T=F)"
 			$(%) : .DONTCARE
 			return $(T:T=I)
+		else
+			T := lib/$(B)
+			$(T) : .ARCHIVE
+			if ! "$(T:T=F)"
+				T := $(MAKELIB:D)/$(T)
+			end
+			if "$(T:T=F)"
+				T := $(T:T=I)
+				if ! "$(T:N=[-+]l$(B))"
+					$(%) : .DONTCARE
+				end
+				return $(T)
+			end
 		end
 	end
 
@@ -638,6 +647,9 @@ include "Scanrules.mk"
 	local B R T D DL DR
 	B := $(%:/-l//)
 	if "$(-mam:N=static*)" && "$(%)" != "-l+([a-zA-Z0-9_])"
+		return
+	end
+	if "$(.REQUIRED.$(B))"
 		return
 	end
 	for D 1 2
@@ -866,21 +878,21 @@ include "Scanrules.mk"
 	$(CC) $(CCFLAGS) -c $(>)
 
 %.c %.h : %.y .YACC.SEMAPHORE (YACC) (YACCFLAGS)
-	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)S)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
 	$(MV) y.tab.c $(%).c
 	if	$(SILENT) test -s y.tab.h
 	then	$(STDED) $(STDEDFLAGS) y.tab.h <<'!'
 	1i
-	$("#")ifndef _$(%:F=%(upper)S)_H
-	$("#")define _$(%:F=%(upper)S)_H
+	$("#")ifndef _$(%:F=%(upper)s)_H
+	$("#")define _$(%:F=%(upper)s)_H
 	.
 	$a
-	$("#")endif $("/")* _$(%:F=%(upper)S)_H *$("/")
+	$("#")endif $("/")* _$(%:F=%(upper)s)_H *$("/")
 	.
 	w
 	q
 	!
-		$(YACCFIX.$(%):?$(STDED) $(STDEDFLAGS) y.tab.h <<!$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)S)/g$("\n")w$("\n")q$("\n")!$("\n")??)if	$(SILENT) $(CMP) $(CMPFLAGS) y.tab.h $(%).h
+		$(YACCFIX.$(%):?$(STDED) $(STDEDFLAGS) y.tab.h <<!$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!$("\n")??)if	$(SILENT) $(CMP) $(CMPFLAGS) y.tab.h $(%).h
 		then	$(RM) $(RMFLAGS) y.tab.h
 		else	$(MV) y.tab.h $(%).h
 		fi
@@ -890,7 +902,7 @@ include "Scanrules.mk"
 	fi
 
 %.c : %.l .LEX.SEMAPHORE (LEX) (LEXFLAGS) (CC)
-	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%))/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(invert)S)/g$("\n")w$("\n")q$("\n")!??)$(LEXHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")1i$("\n")#include "$(LEXHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%))/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(LEXHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")1i$("\n")#include "$(LEXHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
 	$(MV) lex.yy.c $(<)
 
 %.o : %.C (CC) (CCFLAGS)
@@ -1055,7 +1067,7 @@ DAGGERFLAGS =
 			if	$(SILENT) test -f "$(<)"
 			then	$(.DO.INSTALL.OLD. $(<))
 			fi
-			$(link:/^0$//:?$$(<:B:$$(<:A=.COMMAND:Y@@S@):N=$$(link:/^1$/*/):Y@$$$(LN) $$$(_feature_:N=ln|ln-s:O=2:Y%-s $$$(<:D=$$$(<:D:P=R=$$$(*:O=1:D)):B:S)%$$$(*:O=1)%) $$$(<) || @@)??)$(IGNORE) $(CP) $(*:O=1) $(<) $(.DO.INSTALL.OPT.)
+			$(link:/^0$//:?$$(<:B:$$(<:A=.COMMAND:Y@@S@):N=$$(link:/^1$/*/):Y@$$$(LN) $$$(_feature_:N=ln|ln-s:O=2:Y%-s $$$(*:O=1:D=$$$(<:D:P=R=$$$(*:O=1:D)):B:S)%$$$(*:O=1)%) $$$(<) || @@)??)$(IGNORE) $(CP) $(*:O=1) $(<) $(.DO.INSTALL.OPT.)
 			}
 		fi
 	fi
@@ -1332,12 +1344,12 @@ end
 				$(T1:V) : .ARCHIVE .MULTIPLE
 				if T1 == "$(CC.LD.STATIC)"
 					STATIC = 1
-					if CC.SUFFIX.SHARED == ".lib"
+					if CC.SUFFIX.DYNAMIC == ".dll"
 						continue
 					end
 				elif T1 == "$(CC.LD.DYNAMIC)"
 					STATIC = 0
-					if CC.SUFFIX.SHARED == ".lib"
+					if CC.SUFFIX.DYNAMIC == ".dll"
 						continue
 					end
 				end
@@ -1366,7 +1378,7 @@ end
 				if T2 != "$(<)?($(CC.SUFFIX.COMMAND))"
 					if STATIC
 						$(T2) : .SPECIAL CC.DLL= CC.DLLBIG= CC.PIC=
-						if CC.SUFFIX.SHARED == ".lib"
+						if CC.SUFFIX.DYNAMIC == ".dll"
 							TS += $(T2)
 							continue
 						end
@@ -1939,20 +1951,20 @@ end
 .SHARED.o : .USE (LD) (LDFLAGS) $$(LDLIBRARIES)
 	$(LD) $(LDFLAGS) $(CC.SHARED) -o $(<) $(.CC.LIB.DLL.$(CC.LIB.DLL) $(.SHARED.UNIQ. $(*:$(CC.SHARED:@??:T=F:N=*$(CC.SUFFIX.ARCHIVE)?)))) $(CC.DLL.LIBRARIES)
 
-.SHARED.DEF.lib .SHARED.DEF.x : .FUNCTION
+.SHARED.DEF.dll.a .SHARED.DEF.lib .SHARED.DEF.x : .FUNCTION
 	local A B D L S X Y Z W
 	Y := $(%:O=2)
 	B := $(Y)$(%:O=3:/[^0-9]//G)$(dll.custom:?_$(dll.custom)??)
 	D := $(CC.PREFIX.DYNAMIC)$(B:B:S=$(CC.SUFFIX.DYNAMIC))
 	if "$(%:O=1)" != "-"
-		L := $(Y:B:S=$(CC.SUFFIX.SHARED))
-		S := $(B:B:S=$(CC.SUFFIX.SHARED))
+		L := $(CC.PREFIX.SHARED)$(Y:B)$(CC.SUFFIX.SHARED)
+		S := $(CC.PREFIX.SHARED)$(B:B)$(CC.SUFFIX.SHARED)
 		Z := $(%:O>3:N=+l*)
 		X := $(Y) $(Z:/+l//)
 		Z += $(%:O>3:/.l//:N!=$(X:/ /|/):/^/-l/)
 		$(Z) : .DONTCARE
-		if CC.SUFFIX.SHARED == ".lib"
-			W := $(L:B:S=.so)
+		if CC.SUFFIX.DYNAMIC == ".dll"
+			W := $(Y:B:S=.so)
 			D := $(W)/$(D)
 			S := $(W)/$(S)
 			if "$(*.LIBRARY.STATIC.$(Y))"
@@ -1972,7 +1984,7 @@ end
 			end
 			if ! "$(.INSTALL.$(S))"
 				$(LIBDIR)/$(L) :INSTALL: $(S)
-				if CC.SUFFIX.SHARED == ".lib"
+				if CC.SUFFIX.DYNAMIC == ".dll"
 					eval
 					.NO.STATIC.$(Y) : .AFTER
 						if	$(SILENT) test -f $(LIBDIR)/$(CC.PREFIX.ARCHIVE)$(Y)$(CC.SUFFIX.ARCHIVE)
@@ -1986,13 +1998,13 @@ end
 	end
 	return $(D)
 
-.SHARED.REF.lib : .FUNCTION
+.SHARED.REF.dll.a .SHARED.REF.lib : .FUNCTION
 	local K L
 	K := *@($(.LD.KEEP.:/ /|/G:/|$//))
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
 	return $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(%:N=$(K)) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//):T=*) $(%:N!=*$(L)|$(K))
 
-.SHARED.lib : .USE $$(LDLIBRARIES)
+.SHARED.dll.a .SHARED.lib : .USE $$(LDLIBRARIES)
 	$(SILENT) test -d $(<:O=1:D) || mkdir $(<:O=1:D)
 	$(LD) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1) $(.SHARED.REF.lib $(*)) $(CC.DLL.LIBRARIES)
 
@@ -2600,7 +2612,7 @@ PACKAGES : .SPECIAL .FUNCTION
 				fi
 				$$(-silent:Y%%echo $$(.RWD.:C%$%/%)$$(<): >&2%)
 				cd $$(<)
-				$$(MAKE) --file=$$(MAKEFILE) --keepgoing $$(-) --errorid=$$(<) _BLD_$$(<:/cc-//)==1 VARIANT=$$(<:/cc-//) VARIANTID=$$(<:/cc-//:N=[a-zA-Z]*:?-??)$$(<:/cc-//) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$$(MAKEPATH) $$(=:N!=MAKEPATH=*) $$(.RECURSE.ARGS.:N!=.CC-*) $(@:V:@Q)
+				$$(MAKE) --file=$$(MAKEFILE) --keepgoing $$(-) --errorid=$$(<) _BLD_$$(<:/cc-//:/[^a-zA-Z0-9_]/_/G)==1 VARIANT=$$(<:/cc-//) VARIANTID=$$(<:/cc-//:N=[a-zA-Z]*:?-??)$$(<:/cc-//) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$$(MAKEPATH) $$(=:N!=MAKEPATH=*) $$(.RECURSE.ARGS.:N!=.CC-*) $(@:V:@Q)
 			fi
 		end
 	else
@@ -2842,7 +2854,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			end
 			T1 := $(TI) = $($(TI):N=*=*)
 			if ! T5
-				T2 := $(T2:F=%(upper)S)
+				T2 := $(T2:F=%(upper)s)
 				T5 = $(T2)HOME
 				for T3  $(T2) $(T2)HOME $(T2)_HOME $(T2)ROOT $(T2)_ROOT
 					if "$($(T3):T=F)"
@@ -2962,7 +2974,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	end
 	for T3 $(ancestor_list)
 		if T4
-			$(T4) : $($(T3:F=%(upper)S)DIR)
+			$(T4) : $($(T3:F=%(upper)s)DIR)
 			T4 =
 		else
 			T4 := $(T3)
@@ -3209,7 +3221,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		$(T3) : .CLEAR .VIRTUAL
 		for T1 $(T2)
 			if "$(T1:A!=.IMMEDIATE|.TARGET)"
-				T2 := $(".$(T1:F=%(upper)S)":A=.IMMEDIATE|.TARGET:A!=.ATTRIBUTE)
+				T2 := $(".$(T1:F=%(upper)s)":A=.IMMEDIATE|.TARGET:A!=.ATTRIBUTE)
 				if T2
 					T1 := $(T2)
 				end
@@ -3315,7 +3327,7 @@ PACKAGES : .SPECIAL .FUNCTION
 
 .MAMNAME. : .FUNCTION
 	if "$(%)" == ".[A-Z]*" && "$(%)" != ".INIT|.DONE"
-		return $(%:/.//:F=%(lower)S)
+		return $(%:/.//:F=%(lower)s)
 	end
 	if "$(%)" == "/*|$(.MAMROOT.)/*)"
 		return $(.MAMACTION. $(%))
@@ -3564,6 +3576,9 @@ end
 
 .LIST.INSTALL : .ONOBJECT .MAKE
 	print $(.INSTALL.LIST.:$(INSTALLROOT:N=.:?T=F?N=$(INSTALLROOT)/*:C%$(INSTALLROOT)/%%):C% %$("\n")%G)
+
+.LIST.INSTALLED : .ONOBJECT .MAKE
+	print $(.INSTALL.LIST.:$(INSTALLROOT:N=.:?T=F?N=$(INSTALLROOT)/*:T=F:C%$(INSTALLROOT)/%%):C% %$("\n")%G)
 
 .LIST.MANIFEST : .ONOBJECT .COMMON.SAVE .MAKE
 	print $(.MANIFEST.:/ /$("\n")/G)

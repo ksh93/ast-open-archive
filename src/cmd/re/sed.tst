@@ -130,7 +130,7 @@ TEST 11 'metacharacters in substition'
 	EXEC -f script
 		INPUT script $'1s/$/\\&/\n2s/$/\\b/\n3s/$/\\\\/\n4s/$/\\//\n5s&$&\\&&'
 		INPUT - $'1\n2\n3\n4\n5'
-		OUTPUT - $'1&\n2b\n3\\\n4/\n5'
+		OUTPUT - $'1&\n2\b\n3\\\n4/\n5'
 
 TEST 12 'branch combinations'
 	EXEC -f script
@@ -276,7 +276,7 @@ TEST 27 'assorted warnings'
 		INPUT -n - $'hello\ngoodbye'
 		OUTPUT - $'hello\ngoodbye'
 
-TEST 28 'assorted errors'
+TEST 28 'assorted diagnostics'
 	DIAGNOSTICS
 	EXEC = not_a_file
 	EXEC -e :x -e :x
@@ -297,7 +297,7 @@ TEST 28 'assorted errors'
 	EXEC $'/\\1/p'
 	EXEC s/a/b
 	EXEC s/a/b/q
-	EXEC s/a/b/g3
+	EXEC s/a/b/3g3
 	EXEC s/a/b/gg
 	EXEC s/a/b/pp
 	EXEC s/a/b/wnot_a_file

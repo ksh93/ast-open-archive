@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -833,6 +833,12 @@ make join.tst
 done join.tst
 exec - regress  join.tst
 done test.join virtual
+make test.look
+make look.tst
+done look.tst
+prev look
+exec - regress  look.tst look
+done test.look virtual
 make test.od
 make od.tst
 done od.tst

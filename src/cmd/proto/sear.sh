@@ -9,7 +9,7 @@
 #                                                                  #
 #       http://www.research.att.com/sw/license/ast-open.html       #
 #                                                                  #
-#        If you have copied this software without agreeing         #
+#    If you have copied or used this software without agreeing     #
 #        to the terms of the license you are infringing on         #
 #           the license and copyright and are violating            #
 #               AT&T's intellectual property rights.               #
@@ -19,6 +19,7 @@
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
+#                                                                  #
 ####################################################################
 : self extracting archive generator for ratz
 
@@ -34,7 +35,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2001-12-12 $
+@(#)$Id: sear (AT&T Labs Research) 2002-04-15 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -163,7 +164,7 @@ export nativepp=-1
 if	! $cc -D_SEAR_SEEK=0 -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src" "$res"
 then	exit 1
 fi
-size=$(wc -c < $out)
+size=$(wc -c < "$out")
 if	! $cc -D_SEAR_SEEK=$(($size)) -D_SEAR_EXEC="\"$cmd\"" -o "$out" "$src" "$res"
 then	exit 1
 fi

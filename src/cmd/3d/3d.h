@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -21,6 +21,7 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -350,7 +351,9 @@ typedef struct
 	int		nlinks;
 	char*		linkname;
 	int		linksize;
+#if FS
 	Mount_t*	monitor;
+#endif
 	char*		mount;
 	Table_t*	table;
 #if VCS && defined(VCS_PATH_STATE)
@@ -367,15 +370,15 @@ typedef struct
 	int		prelen;
 } Visit_t;
 
-struct Intercept;
+struct Intercept_s; typedef struct Intercept_s Intercept_t;
 
-typedef long (*Intercept_call_t)(struct Intercept*, int, int, void*, void*, void*, void*, void*, void*);
+typedef long (*Intercept_f)(Intercept_t*, int, int, void*, void*, void*, void*, void*, void*);
 
-typedef struct Intercept
+struct Intercept_s
 {
-	Intercept_call_t	call;
+	Intercept_f		call;
 	unsigned long		mask;
-} Intercept_t;
+};
 
 #if _no_exit_exit
 typedef void (*Exitfunc_t)(int);
@@ -520,7 +523,7 @@ extern char*		pathreal(const char*, int, struct stat*);
 extern ssize_t		peek(int, void*, size_t);
 extern Map_t*		search(Table_t*, const char*, int, const char*, int);
 extern Sysfunc_t	sysfunc(int);
-extern int		intercept(Intercept_call_t, unsigned long);
+extern int		intercept(Intercept_f, unsigned long);
 
 #if FS
 extern int		fileinit(int, struct stat*, Mount_t*, int);

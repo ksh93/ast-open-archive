@@ -75,7 +75,44 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-02-02-18  --- Release ksh93m+  ---
+02-06-17  --- Release ksh93n-  ---
+02-06-17  A bug in which user defined macros could cause a core dump in
+	  with MULTIBYE mode has been fixed.
+02-06-17  A bug in which printf format specifiers of the form %2$s were causing
+	  a core dump has been fixed.
+02-06-17  A bug in which setting stty to noecho mode did not prevent the
+	  echoing of characters by ksh when emacs or viraw mode
+	  was enabled has been fixed.
+02-06-17  A bug in which background job completion could cause the sleep
+	  builtin to terminate prematurely has been fixed.
+02-06-17  A bug in which the shell could core dump if getopts was called
+	  when the OPTIND variable contained a negative value has been fixed. 
+02-06-10  The edit mode prompt has been modified to hande escape sequences.  
+02-06-10  A bug which occured for interactive shells in which the builtin
+	  cat command was used in command substitution on a file whose
+	  size was larger than PIPE_BUF has been fixed.
+02-06-10  A bug in which the trap on ERR was not being processed when
+	  set inside a function has been fixed.
+02-06-07  A bug in which function definitions could cause the history count
+	  to be decremented by one (and even become negative) has been fixed.
+02-06-05  A bug in read in which share mode could be enabled has been fixed.
+02-05-28  A bug which could occur when the last command of a script was
+	  a case statement and the action selected ended in ;& instead of ;;
+	  has been fixed.
+02-05-23  A bug with unary + introduced in ksh93k has been fixed.
+02-05-07  A bug in substitutions of the form ${var/pattern/string} in which
+	  a backslash was inserted in the replacement string when it contained
+	  a special pattern character has been fixed.
+02-05-01  A bug in the emacs edit mode which occured in versions compiled
+	  for multibyte character sets which occurred when a repeated search
+	  was requested after a long line had been returned for the previous
+	  search has been fixed.
+02-04-02  vi and emacs edit modes were modified so that tab completion is
+	  disabled when invoked from the read built-in.
+
+02-03-26  --- Release ksh93m+  ---
+02-03-26  A bug in which \ was not handled correctly when used in file
+	  expansion has been fixed.
 02-02-18  A bug in which lines beginning with a # were deleted from here
 	  documents when the here-document delimiter was followed by
 	  a comment has been fixed.
@@ -877,6 +914,10 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+02-06-26 pax: fix regsubexec() edited symlink text buffer clobber
+02-05-24 pax: update to use regsubcomp(),regsubexec()
+02-05-07 pax: use <ardir.h>,-lardir for library archives
+02-04-23 pax: add dos omf library read
 01-12-07 pax: fix --meter to retain paths containing " -- "
 01-12-06 pax: fix --meter to stop at 100% (don't tell coach)
 01-10-20 pax: describe the 4 operation modes in separate paragraphs
@@ -1094,6 +1135,9 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+02-06-09 mm2html: expand mailto address pattern match
+02-05-31 mm2html: check .vG arg count before shift
+	 mm2html: \e => &#0092;
 02-03-17 mm2html: add .SG no-op
 	 mm2html: check .EX figure# label args
 	 mm2html: add .so/.sn dir search to .BP
@@ -1179,6 +1223,9 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+02-06-26 opt.tst: fix debug locale message numbers
+02-05-16 date.dat: add '60+n min/sec ago' tests for n min/sec after the hour
+	 data.dat,datey2k.dat: update for %u addition to tmfmt()
 02-03-14 opt.tst: update \f...\f --keys tests
 02-02-02 sfio/(tclose|ttpopenrw|ttell).c: add alarm to handle hung coproc
 02-01-27 sfio/terror.h: handle non-idempotent <varargs.h>
@@ -1217,6 +1264,10 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR
+02-06-14 ast_3d.h,cs.c: move fmttime() macro override to cs.c
+02-06-06 dir3d.c: fix rewinddir() bug that did not decrement intercepted count
+02-04-01 Makefile,cs.c,cs_3d.h,ast_3d.h: _WIN32 tweaks
 01-11-26 pathreal.c: empty path is an error
 01-11-16 ftruncate3d.c,truncate3d.c: use lseek3d indirection via sysfunc()
 01-10-31 fchdir3d: add along with state.file[].dir to cache open dir paths
@@ -1408,6 +1459,7 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+02-05-24 cpp.tst: add TEST 15 pragma space canonicalization tests
 02-03-15 cpp.tst: add TEST 14 for libpp/ppproto.c memory fault fix
 01-10-20 cpp.tst: add pp:splicespace "..." tests
 01-06-01 cpp.tst: add -M* dependency generation tests
@@ -1465,6 +1517,24 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+02-06-11 Makerules.mk: :F=%(...)S: => :F=%(...)s:
+	 misc.c: %S %C obsolete warning
+	 variable.c: fix $(!) that improperly skipped !rule.scan && PREREQS.scan
+02-06-07 state.c: stat() after close() instead of fstat() before for cygwin
+02-06-06 Makerules.mk: fix $(output) to handle -$(VERSION) already in $(PWD)
+02-05-28 probe.win32: updates for { mingw }
+02-05-24 probe.win32: updates for { digital-mars borland lcc }
+02-05-20 expand.c: update to use regsubcomp(),regsubexec()
+02-05-09 expand.c: fix cross() so / X foo generates /foo, not //foo
+02-05-07 archive.c: use <ardir.h>,-lardir for library archives
+02-05-06 probe.win32: add more win32 compilers
+02-04-15 Makerules.mk: fix .DO.INSTALL ln-s to use proper source path
+02-03-29 Makerules.mk: CC.SUFFIX.SHARED==".lib" => CC.SUFFIX.DYNAMIC==".dll"
+	 make.probe: cygwin CC.PREFIX.SHARED=lib CC.SUFFIX.SHARED=.dll.a
+02-03-27 Makerules.mk: fix .BIND.-l% and .REQUIRE.-l% recursion checks
+02-03-23 Makerules.mk: ensure that _BLD_<variant> is valid identifier
+	 Makerules.mk: add .LIST.INSTALLED for existing files only
+	 Makerules.mk: add $(LICENSEFILE) to .FILES.
 02-03-14 variable.c: add label to --mam "setv" 
 02-02-14 makerules: add and use CMPFLAGS
 	 makerules: add win32 ar I flag only when installing .a
@@ -2220,6 +2290,8 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+02-04-15 look.c: add look.tst, fix hang
+02-03-24 uudecode,uuencode: sfopen "rt" for \r\n -- puke
 02-01-24 look.c: drop <strings.h> ref
 01-11-26 what.c: fix doc type, add --matched
 01-10-31 what.c: fix omitted file arg doc
@@ -2283,6 +2355,8 @@ All recorded changes follow.
 
 :::::::: cql ::::::::
 
+02-06-27 cql: fix file details 0 dereference when no file name
+02-05-20 cql: update to use regsubcomp(),regsubexec()
 01-07-17 cql: call dllerror() on dllfind() error
 01-02-14 cql: fix bug that didn't propagate details to cdbopen()
 	 cql: add --regenerate to force index regeneration
@@ -4160,6 +4234,8 @@ End:
 
 :::::::: mailx ::::::::
 
+02-06-07 spam.c: delay lower priority tests until all headers seen
+02-05-31 imap.c: error messages to stderr -- duh
 02-03-17 spam.c: add spamtest=bitmask: 0x0001: content-type==text/html
 02-01-31 data.c: clarify imap var docs
 02-01-30 local.iffe: add to handle no <termios.h> and ftruncate()
@@ -4314,6 +4390,22 @@ End:
 
 :::::::: re ::::::::
 
+02-06-20 testregex.c: handle invalid (?,*) and (*,?) in match[]
+02-06-11 ed.c: fix global EOF test
+02-06-10 testregex.c: add -x to inhibit REG_NOSUB
+	 libtre.dat: add libtre regression tests
+02-06-06 ed.c: fix substitute line splice
+02-05-31 ed.c,sed.c: update to use regsubcomp(),regsubexec()
+02-05-30 testregex.c: add -R to replace answers with implementation answers
+02-05-20 testregex.c,ed.c,sed1.c,sed3.c: update to regsubcomp(),regsubexec()
+	 testsub.dat: add new regsubcomp(),regsubexec() tests
+02-05-14 testregex.c: add 'p' for REG_NOSUB, null regsub() 'g' match tests
+02-05-09 testregex.c: handle 'x' for implememntations with no REG_LENIENT
+02-05-08 testregex.c: fix "did not terminate" message
+02-04-12 README.re,Makefile.re,re.tgz: update standalone test tarball
+02-04-05 locale.dat: split from testre.dat
+02-03-27 testglob.c: fix double escape() call for GLOB_LIST
+	 testglob.dat: update tests for original pattern on no match
 02-02-14 grep: add -P,--perl-regexp == REG_EXTENDED|REG_LENIENT
 02-02-12 ed.c: add \r hacks
 02-02-02 sed0.c: add \r to blank() set
@@ -4442,6 +4534,7 @@ End:
 
 :::::::: std ::::::::
 
+02-06-25 ps.c: handle %s vs. %d --format inconsistencies
 02-02-14 touch.c: explicit epoch dates (0) are different from now (also 0)
 	 locale.c: don't output on unknown keyword
 02-02-11 ps.c: validate input pid strings
@@ -4631,6 +4724,9 @@ End:
 
 :::::::: tw ::::::::
 
+02-04-18 find: fix lookup() bug that dumped on unknown keys
+02-04-03 find: add FTW_DELAY logic, fix directory -empty
+	 tw: add FTW_DELAY logic
 02-01-16 tw: add symlink to EXPRESSIONS doc
 01-10-31 tw,find: add slocate(1) refs
 01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
@@ -4706,8 +4802,47 @@ End:
 
 :::::::: libast ::::::::
 
+02-06-27 ast_std.h: map _sysconf => _ast_sysconf for sun
+02-06-26 cdt,sfio,vmalloc: kpv sync -- is this ever easy?
+02-06-24 sfio: kpv sync, vfwscanf(),fputw() fix (wcslen(x)*sizeof(wchar_t)!!)
+	 misc/fts.c: fix symlink chdir() optimzation bug
+02-06-11 sfio/sfwrite.c: string to file fix
+	 Makefile: __OBSOLETE__==20020101
+02-06-01 regex/regcomp.c: REG_DELIMITED now consumes the delimiter
+02-05-31 regex/reglib.h,regcomp.c,regnexec.c: null subexpression fixes
+02-05-24 misc/fts.c: disable dir link counts in 3d
+	 misc/magic.c: fix "*(mkfile)" sh pattern to "*@(mkfile)"
+02-05-20 regex.h,regex/regsubcomp.c,regex/regsubexec.c: add
+	 regex/regsub.c: deprecate
+02-05-16 tm/tmfix.c: fix '60+n min/sec ago' bug for n min/sec after the hour
+02-05-14 regex/regsub.c: fix (^|x) null match early termination bug
+02-05-13 dir/dirlib.h: drop errant extern==__EXPORT__
+	 features/uwin: add uwin lib tests
+	 uwin/*.c: check features/uwin for stubs
+	 features/float: add nan representation generation
+	 sfio/sftable.h: used _ast_*_nan_init for huge values
+02-05-09 misc/fts.c: fix virtual top to force ``child'' stat()
+	 features/common: define va_copy() only if not in <stdarg.h>
+02-05-01 string/strtoip4.c: cisco inverted quad mask must have 4 parts
+02-04-30 misc/magic.tab: fix pzip version check
+02-04-19 string/strtoip4.c: handle cisco inverted quad mask n.n.n.n/i.i.i.i
+02-04-18 misc/fts.c: add chdir() verification stat() optimizations
+	 path/pathkey.c: check PROBE_ATTRIBUTES for list of vars
+02-04-12 port/astlicense.c: type=open tweak, fix author list spacing
+02-04-11 regex/regcomp.c: check for pattern number overflow
+02-04-05 tm/tmfmt.c: add %u
+02-04-04 sfkeyprintf.c: fix %c numeric value
+	 path/pathpath.c: check plain path first -- duh
+02-04-03 misc/fts.c: fix (FTS_PHYSICAL|FTS_NOSTAT) stat optimizations
+	 ftwalk.c: only clear FTW_DELAY if FTW_CHILDREN
+	 ftwalk.h: add FTW_NSOK for FTW_DELAY
+02-03-29 ast.h: drop strerror() prototype -- already in <ast_std.h>
+	 features/stdio: check for _SFIO_H redundant _Sfstd* declarations
+02-03-26 misc/glob.c: fix GLOB_LIST gl_flags values
+02-03-24 port/mnt.c: update bsd fstype name and mount option logic
+02-03-23 Makefile: add ast_wchar.h to the .check.hdr list (for mamake)
 02-03-17 features/stdio: hack around g++ 3.* clashes
-	 Makefile: add ast_nl_types.h to the .check.hdr list
+	 Makefile: add ast_nl_types.h to the .check.hdr list (for mamake)
 	 string/strtoip4.c: fix validity check bug that only checked last part
 02-03-14 misc/optget.c: fix --keys to not expand inline \f...\f
 02-03-12 port/astlicense.c: add type=free
@@ -5514,8 +5649,15 @@ End:
 	 add LS_NUMBER to fmtls()
 	 drop spurious optusage() ' '
 
+:::::::: libardir ::::::::
+
+02-06-11 ar-port.c: handle 4.4BSD `#1/size' long names
+02-06-06 #ifndef EILSEQ => EINVAL
+02-05-07 first release
+
 :::::::: libcmd ::::::::
 
+02-04-05 date.c: add %u
 02-01-24 stty.c: ifdef a few more macros for uts (yes, its still running)
 01-12-14 date.c: clarify %z doc
 01-10-31 mkdir.c: mkdir() on existing dir could fail with errno!=EEXIST
@@ -5620,6 +5762,7 @@ End:
 
 :::::::: libdll ::::::::
 
+02-06-27 dllnext.c: define _GNU_SOURCE to enable RTLD_NEXT
 02-03-17 dllfind.c: fix dll prefix search (for cygwin)
 02-01-11 features/dll: include <dlfcn.h> only if _hdr_dlfcn&&_lib_dlopen
 01-10-31 dlfcn.c: change hp.pa dlopen() prototype (<dlfcn.h> but no -ldl!)
@@ -5726,6 +5869,8 @@ End:
 
 :::::::: libz ::::::::
 
+02-06-11 add uSize == unsigned _ast_intmax_t; fix header size check
+02-05-22 zconf.h: fix __32BIT__ logic
 02-03-11 infblock.c: apply double free patch
 02-03-09 gzio.c: add stream->fatal to mark fatal errors previously ignored
 	 sfdcgzip.c: fix exception return values and mark SF_ERROR on fatal
@@ -5837,6 +5982,18 @@ End:
 
 :::::::: libpp ::::::::
 
+02-06-25 ppproto.c: fix pragma search bug that stopped after 8 comment lines
+02-06-11 ppsearch.c: fix ... next include search to skip *all* intermediates
+02-05-28 probe.win32: updates for { mingw }
+	 ppsearch.c: don't use inherited prefix for <...> -- duh
+02-05-24 ppcontrol.c: simplify getline() space canonicalization
+	 probe.win32: updates for { digital-mars borland lcc }
+02-05-20 ppcontrol.c: update to use regsubcomp(),regsubexec()
+02-05-09 ppcontrol.c: inhibit `EOF in directive': newline warning will catch it
+	 pplex.c: inhibit `newline in character constant' for hosted directives
+02-05-06 probe.win32: add more win32 compilers
+02-04-15 probe.win32: handle long long unsigned int
+02-04-12 ppproto.c: fix NOTICED check
 02-03-15 ppproto.c: fix cpp pp:compatibility double line sync memory fault
 02-03-11 pplex.c: add pp:modern to emit \a \v instead of octal forms
 02-02-14 ppargs.c: fix -D or -U as last arg core dump
@@ -6230,6 +6387,7 @@ End:
 
 :::::::: libpz ::::::::
 
+02-04-30 pzopen,pzhead: tighten pzip magic check via reasonable version number
 02-03-09 pzopen,pzdeflate,pzsync: add fatal error checks
 02-02-14 pzopen: disable PZ_UNKNOWN check if PZ_NOPZIP -- duh
 02-01-11 pzdeflate: use Sfoff_t for sfmove() return instead of ssize_t
@@ -6273,6 +6431,7 @@ End:
 
 :::::::: libtksh ::::::::
 
+02-06-25  include/nvextra.h: use an addaptable cheat for the namval offset
 02-03-17  update ksh private assoc array offsets -- should be a function call
 02-01-30  compensate for uts.390 lack of header guards for { select.h time.h }
 01-04-19  add HAVE_TIME_H HAVE_SYS_PARAM_H HAVE___FD_MASK tests to tclPort.h

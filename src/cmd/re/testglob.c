@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -27,7 +28,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-10-20 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2002-04-12 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -87,8 +88,9 @@ H("  0 pointer.\n");
 H("\n");
 H("  Field 1: the glob(3) flags to apply, one character per GLOB_feature\n");
 H("  flag. The test is skipped if GLOB_feature is not supported by the\n");
-H("  implementation. If the first character is not [KS] then the\n");
-H("  specification is a global control line.\n");
+H("  implementation. If the first character is not [SK] then the\n");
+H("  specification is a global control line. One or more of [SK] may be\n");
+H("  specified; the test will be repeated for each mode.\n");
 H("\n");
 H("    K	GLOB_AUGMENTED		augmented (ksh) patterns\n");
 H("    S	0			basic shell patterns\n");
@@ -427,6 +429,33 @@ qstrcmp(const void* a, const void* b)
 	return strcmp(*(char**)a, *(char**)b);
 }
 
+static char*
+getline(void)
+{
+	static char	buf[32 * 1024];
+
+	register char*	s = buf;
+	register char*	e = &buf[sizeof(buf)];
+	register char*	b;
+
+	for (;;)
+	{
+		if (!(b = fgets(s, e - s, stdin)))
+			return 0;
+		state.lineno++;
+		s += strlen(s) - 1;
+		if (*s != '\n')
+			break;
+		if (s == b || *(s - 1) != '\\')
+		{
+			*s = 0;
+			break;
+		}
+		s--;
+	}
+	return buf;
+}
+
 int
 main(int argc, char** argv)
 {
@@ -456,8 +485,8 @@ main(int argc, char** argv)
 	char**		v;
 	char*		field[5];
 	char		unit[64];
-	char		buf[16 * 1024];
 	char		pathbuf[1024];
+	char*		buf;
 	char*		path;
 	char*		pathmax;
 	char*		work[16];
@@ -550,8 +579,7 @@ main(int argc, char** argv)
 	work[cwd] = path;
 	work[cwd + 1] = 0;
 	ok = 0;
-	while (p = gets(buf)) {
-		state.lineno++;
+	while (p = buf = getline()) {
 
 	/* parse: */
 
@@ -768,12 +796,14 @@ main(int argc, char** argv)
 			continue;
 		if (i < 3)
 			bad("too few fields\n", NiL);
+		if (skip & level)
+			continue;
 		while (i < elementsof(field))
 			field[i++] = 0;
 		if (pat = field[1])
 			escape(pat);
-		if (skip & level)
-			continue;
+		if (ans = field[3])
+			escape(ans);
 		okre = kre;
 		osre = sre;
 		for (m = 0; m < elementsof(modes); m++) {
@@ -784,8 +814,6 @@ main(int argc, char** argv)
 				flags |= modes[m];
 			}
 			err = field[2];
-			if (ans = field[3])
-				escape(ans);
 			msg = field[4];
 			kre = okre;
 			sre = osre;
@@ -868,6 +896,7 @@ main(int argc, char** argv)
 				}
 			}
 			else if (ret != GLOB_NOMATCH) {
+#if GLOB_LIST
 				if (flags & GLOB_LIST) {
 					n = 0;
 					for (gi = gl.gl_list; gi; gi = gi->gl_next) {
@@ -878,7 +907,9 @@ main(int argc, char** argv)
 					av[n] = 0;
 					v = av;
 				}
-				else {
+				else
+#endif
+				{
 					n = gl.gl_pathc;
 					v = gl.gl_pathv;
 				}

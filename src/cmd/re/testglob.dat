@@ -1,4 +1,4 @@
-: X/Open glob tests 2001-10-20
+: X/Open glob tests 2002-03-27
 
 # test workspace
 
@@ -27,9 +27,9 @@ S	ab			OK		ab
 S	a*			OK		a[b ab ab?(cd| abcd
 S	TT*			OK		TT* TTfoo
 S	s\\*			NOMATCH
-Sn	s\\*			OK		s*
+Sn	s\\*			OK		s\\*
 S	s\\\\*			NOMATCH
-Sn	s\\\\*			OK		s\\*
+Sn	s\\\\*			OK		s\\\\*
 
 # subdir level basics
 
@@ -40,18 +40,18 @@ Sn	*/cd			OK		ab/cd
 S	*/xx			NOMATCH
 Sn	*/xx			OK		*/xx
 S	s/\\/0*			NOMATCH
-Sn	s/\\/0*			OK		s//0*
+Sn	s/\\/0*			OK		s/\\/0*
 S	s/\\\\/0*		NOMATCH
-Sn	s/\\\\/0*		OK		s/\\/0*
+Sn	s/\\\\/0*		OK		s/\\\\/0*
 S	\\\\*?/\\\\*?		NOMATCH
-Sn	\\\\*?/\\\\*?		OK		\\*?/\\*?
+Sn	\\\\*?/\\\\*?		OK		\\\\*?/\\\\*?
 S	\\\\*/\\\\*?		NOMATCH
-Sn	\\\\*/\\\\*?		OK		\\*/\\*?
+Sn	\\\\*/\\\\*?		OK		\\\\*/\\\\*?
 S	\\\\*?/\\\\*		NOMATCH
-Sn	\\\\*?/\\\\*		OK		\\*?/\\*
+Sn	\\\\*?/\\\\*		OK		\\\\*?/\\\\*
 
 S	s/\\(\\<3d\\>\\)/\\\\h'0*1'\\1\\\\h'0'/	NOMATCH
-Sn	s/\\(\\<3d\\>\\)/\\\\h'0*1'\\1\\\\h'0'/	OK	s/(<3d>)/\\h'0*1'1\\h'0'/
+Sn	s/\\(\\<3d\\>\\)/\\\\h'0*1'\\1\\\\h'0'/	OK	s/\\(\\<3d\\>\\)/\\\\h'0*1'\\1\\\\h'0'/
 
 # malformed patterns
 
@@ -98,10 +98,10 @@ Kns	(x			OK		(x
 Kns	(x/*			OK		(x/*
 K	\(x			NOMATCH
 K	\(x/*			NOMATCH
-Kn	\(x			OK		(x
-Kn	\(x/*			OK		(x/*
-Kns	\(x			OK		(x
-Kns	\(x/*			OK		(x/*
+Kn	\(x			OK		\(x
+Kn	\(x/*			OK		\(x/*
+Kns	\(x			OK		\(x
+Kns	\(x/*			OK		\(x/*
 K	%x/*			NOMATCH
 Kn	%x			OK		%x
 Kn	%x/*			OK		%x/*
@@ -109,7 +109,9 @@ Kns	%x			OK		%x
 Kns	%x/*			OK		%x/*
 K	\%x			NOMATCH
 K	\%x/*			NOMATCH
-Kn	\%x			OK		%x
-Kn	\%x/*			OK		%x/*
-Kns	\%x			OK		%x
-Kns	\%x/*			OK		%x/*
+Kn	\%x			OK		\%x
+Kn	\%x/*			OK		\%x/*
+Kns	\%x			OK		\%x
+Kns	\%x/*			OK		\%x/*
+Kns	./*/$x\)		OK		./*/$x\)
+Kns	./*-/$x\)		OK		./*-/$x\)

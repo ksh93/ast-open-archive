@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -20,6 +20,7 @@
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -27,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: uudecode (AT&T Labs Research) 2001-04-01 $\n]"
+"[-?\n@(#)$Id: uudecode (AT&T Labs Research) 2002-03-24 $\n]"
 USAGE_LICENSE
 "[+NAME?uudecode - decode a uuencoded binary file]"
 "[+DESCRIPTION?\buudecode\b decodes the named input \afile\a"
@@ -145,7 +146,7 @@ main(int argc, register char** argv)
 	{
 		if (!ipath)
 			ip = sfstdin;
-		else if (!(ip = sfopen(NiL, ipath, "r")))
+		else if (!(ip = sfopen(NiL, ipath, "rt")))
 			error(ERROR_system(1), "%s: cannot read", ipath);
 		op = 0;
 		uudecode(uu, ip, op, SF_UNBOUND, opath);

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -376,16 +377,14 @@ unsigned char *
 se(Text *script, unsigned char *pc, Text *data)
 {
 	word *q = instr(pc);
-	int flags = q[2];
-	unsigned char *p = (unsigned char*)(q+3);
-	int n = flags & ~(PFLAG|WFLAG);
+	int flags = readdr(q[1])->re_sub->re_flags;
 
-	sflag = substitute(readdr(q[1]), data, p, n);
+	sflag = substitute(readdr(q[1]), data);
 	if(!sflag)
 		return nexti(pc);
-	if(flags & PFLAG)
+	if(flags & REG_SUB_PRINT)
 		pe(script, pc, data);
-	if(flags & WFLAG)
+	if(flags & REG_SUB_WRITE)
 		return ww(script, pc, data, ((word*)nexti(pc))[-1]);
 	return nexti(pc);
 }

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -27,7 +28,7 @@
  * see testmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2001-10-18 $\0\n";
+static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2002-04-12 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -124,7 +125,7 @@ H("    and last+1 positions in the field 3 string, or NULL if subexpression\n");
 H("    array is specified and success is expected. The match[]\n");
 H("    subexpression pointer array is initialized to (-2,-2).\n");
 H("    All array elements not equal to (-2,-2) must be specified\n");
-H("    in the outcome. Unspecified endpoints are denoted by -1.\n");
+H("    in the outcome. Unspecified endpoints are denoted by ?.\n");
 H("\n");
 H("  Field 5: optional comment appended to the report.\n");
 H("\n");
@@ -144,7 +145,15 @@ H("  David Korn <dgk@research.att.com> (ksh glob matcher)\n");
 #define LOOPED		2
 #define NOTEST		(~0)
 
+#if !defined(STR_ICASE) && !defined(STR_LEFT)  && !defined(STR_MAXIMAL) && !defined(STR_RIGHT)
+#define NOT_SUPPORTED	1
+#endif
+
 static const char* unsupported[] = {
+#if NOT_SUPPORTED
+	"strmatch",
+	"strgrpmatch",
+#endif
 #ifndef STR_ICASE
 	"ICASE",
 #endif
@@ -171,6 +180,10 @@ static const char* unsupported[] = {
 #endif
 #ifndef STR_RIGHT
 #define STR_RIGHT	NOTEST
+#endif
+
+#if STR_ICASE==NOTEST && STR_LEFT==NOTEST  && STR_MAXIMAL==NOTEST && STR_RIGHT==NOTEST
+#define NOT_SUPPORTED	1
 #endif
 
 static struct
@@ -273,9 +286,13 @@ report(char* comment, char* fun, char* re, char* s, char* msg, int flags, int un
 	printf(" %s", state.which);
 	if (fun)
 		printf(" %s", fun);
-	printf(" %s", comment);
-	if (msg && comment[strlen(comment)-1] != '\n')
-		printf(": %s: ", msg);
+	if (comment[strlen(comment)-1] == '\n')
+		printf(" %s", comment);
+	else {
+		printf(" %s: ", comment);
+		if (msg)
+			printf("%s: ", msg);
+	}
 }
 
 static int
@@ -401,7 +418,7 @@ escape(char* s)
 }
 
 static void
-matchprint(int* match, int nmatch)
+matchprint(int* match, int nmatch, char* ans)
 {
 	int	i;
 
@@ -421,6 +438,8 @@ matchprint(int* match, int nmatch)
 			printf("%d", match[i+1]);
 		printf(")");
 	}
+	if (ans)
+		printf(" expected: %s", ans);
 	printf("\n");
 }
 
@@ -453,8 +472,8 @@ matchcheck(int nmatch, int* match, char* ans, char* re, char* s, int flags, int 
 			bad("improper answer\n", re, s, expand);
 		if (m!=match[i] || n!=match[i+1]) {
 			if (!query) {
-				report("failed: match was: ", NiL, re, s, NiL, flags, unspecified, expand);
-				matchprint(match, nmatch);
+				report("failed: match was", NiL, re, s, NiL, flags, unspecified, expand);
+				matchprint(match, nmatch, ans);
 			}
 			return 0;
 		}
@@ -466,15 +485,15 @@ matchcheck(int nmatch, int* match, char* ans, char* re, char* s, int flags, int 
 					state.ignore.count++;
 					return 0;
 				}
-				report("failed: match was: ", NiL, re, s, NiL, flags, unspecified, expand);
-				matchprint(match, nmatch);
+				report("failed: match was", NiL, re, s, NiL, flags, unspecified, expand);
+				matchprint(match, nmatch, ans);
 			}
 			return 0;
 		}
 	}
 	if (match[nmatch] != -2) {
-		report("failed: overran match array: ", NiL, re, s, NiL, flags, unspecified, expand);
-		matchprint(match, nmatch + 1);
+		report("failed: overran match array", NiL, re, s, NiL, flags, unspecified, expand);
+		matchprint(match, nmatch + 1, NiL);
 	}
 	return 1;
 }
@@ -511,6 +530,33 @@ gotcha(int sig)
 	longjmp(state.gotcha, 1);
 }
 
+static char*
+getline(void)
+{
+	static char	buf[32 * 1024];
+
+	register char*	s = buf;
+	register char*	e = &buf[sizeof(buf)];
+	register char*	b;
+
+	for (;;)
+	{
+		if (!(b = fgets(s, e - s, stdin)))
+			return 0;
+		state.lineno++;
+		s += strlen(s) - 1;
+		if (*s != '\n')
+			break;
+		if (s == b || *(s - 1) != '\\')
+		{
+			*s = 0;
+			break;
+		}
+		s--;
+	}
+	return buf;
+}
+
 int
 main(int argc, char** argv)
 {
@@ -535,7 +581,6 @@ main(int argc, char** argv)
 	char*		msg;
 	char*		fun;
 	char*		field[6];
-	char		buf[16 * 1024];
 	char		unit[64];
 	int		match[200];
 
@@ -594,8 +639,7 @@ main(int argc, char** argv)
 		signal(SIGBUS, gotcha);
 		signal(SIGSEGV, gotcha);
 	}
-	while (p = gets(buf)) {
-		state.lineno++;
+	while (p = getline()) {
 
 	/* parse: */
 
@@ -828,6 +872,7 @@ main(int argc, char** argv)
 
 		if (skip)
 			continue;
+#if NOT_SUPPORTED == 0
 		if (sre) {
 			state.which = "SRE";
 			sre = 0;
@@ -884,7 +929,7 @@ main(int argc, char** argv)
 					if (query)
 						skip = note(level, skip, msg);
 					else
-						report("failed: ", fun, re, s, msg, nmatch, unspecified, expand);
+						report("failed", fun, re, s, msg, nmatch, unspecified, expand);
 						if (eret == 1)
 							printf("OK expected, NOMATCH returned");
 						else
@@ -896,7 +941,7 @@ main(int argc, char** argv)
 				if (query)
 					skip = note(level, skip, msg);
 				else {
-					report("failed: ", fun, re, s, msg, nmatch, unspecified, expand);
+					report("failed", fun, re, s, msg, nmatch, unspecified, expand);
 					printf("%s expected, OK returned", ans);
 					printf("\n");
 				}
@@ -907,7 +952,7 @@ main(int argc, char** argv)
 				if (query)
 					skip = note(level, skip, msg);
 				else {
-					report("failed: ", fun, re, s, msg, nmatch, unspecified, expand);
+					report("failed", fun, re, s, msg, nmatch, unspecified, expand);
 					if (eret == 1)
 						printf("OK expected, NOMATCH returned");
 					else
@@ -920,8 +965,8 @@ main(int argc, char** argv)
 			if (query)
 				skip = note(level, skip, msg);
 			else {
-				report("should fail and didn't: ", fun, re, s, msg, nmatch, unspecified, expand);
-				matchprint(match, nmatch);
+				report("should fail and didn't", fun, re, s, msg, nmatch, unspecified, expand);
+				matchprint(match, nmatch, NiL);
 			}
 		}
 		else if (!*ans) {
@@ -929,8 +974,8 @@ main(int argc, char** argv)
 				if (query)
 					skip = note(level, skip, msg);
 				else {
-					report("failed: no match but match array assigned: ", NiL, re, s, msg, nmatch, unspecified, expand);
-					matchprint(match, nmatch);
+					report("failed: no match but match array assigned", NiL, re, s, msg, nmatch, unspecified, expand);
+					matchprint(match, nmatch, NiL);
 				}
 			}
 		}
@@ -943,6 +988,7 @@ main(int argc, char** argv)
 		else if (query)
 			skip = note(level, skip, msg);
 		goto compile;
+#endif
 	}
 	printf("TEST\t%s, %d test%s", unit, testno, testno == 1 ? "" : "s");
 	if (state.ignore.count)

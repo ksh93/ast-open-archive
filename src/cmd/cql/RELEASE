@@ -1,3 +1,5 @@
+02-06-27 cql: fix file details 0 dereference when no file name
+02-05-20 cql: update to use regsubcomp(),regsubexec()
 01-07-17 cql: call dllerror() on dllfind() error
 01-02-14 cql: fix bug that didn't propagate details to cdbopen()
 	 cql: add --regenerate to force index regeneration

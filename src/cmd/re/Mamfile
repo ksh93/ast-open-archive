@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -208,6 +208,7 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sed2.c
 done sed2.o generated
 make sed3.o
 make sed3.c
+prev ../../../include/ast/sfstr.h implicit
 prev sed.h implicit
 done sed3.c
 prev sed3.c
@@ -350,11 +351,13 @@ exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o testfnma
 done testfnmatch generated
 make testfnmatch.dat
 done testfnmatch.dat
-make testre.dat
-done testre.dat
+make testregex.dat
+done testregex.dat
+make locale.dat
+done locale.dat
 make testmatch.dat
 done testmatch.dat
-exec - for i in testfnmatch.dat testre.dat testmatch.dat
+exec - for i in testfnmatch.dat testregex.dat locale.dat testmatch.dat
 exec - do	testfnmatch -c < $i
 exec - done
 done test.fnmatch virtual
@@ -370,16 +373,17 @@ exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testmatch.c
 done testmatch.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o testmatch testmatch.o ${mam_libast}
 done testmatch generated
-prev testre.dat
+prev testregex.dat
+prev locale.dat
 prev testmatch.dat
-exec - for i in testre.dat testmatch.dat
+exec - for i in testregex.dat locale.dat testmatch.dat
 exec - do	testmatch -c < $i
 exec - done
 done test.match virtual
-make test.re
-make testre
-make testre.o
-make testre.c
+make test.regex
+make testregex
+make testregex.o
+make testregex.c
 make ../../../include/ast/stk.h implicit
 prev ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -388,16 +392,19 @@ prev ../../../include/ast/sfstr.h implicit
 prev ../../../include/ast/regex.h implicit
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/ast.h implicit
-done testre.c
-prev testre.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testre.c
-done testre.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o testre testre.o ${mam_libast}
-done testre generated
-prev testre.dat
+done testregex.c
+prev testregex.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testregex.c
+done testregex.o generated
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o testregex testregex.o ${mam_libast}
+done testregex generated
+prev testregex.dat
+prev locale.dat
 prev testmatch.dat
 make testsub.dat
 done testsub.dat
+make rxposix.dat
+done rxposix.dat
 make zero.dat
 done zero.dat
 make regex++.dat
@@ -412,10 +419,14 @@ make escape.dat
 done escape.dat
 make group.dat
 done group.dat
-make nullgroup.dat
-done nullgroup.dat
-make standards.dat
-done standards.dat
+make nullsubexpr.dat
+done nullsubexpr.dat
+make subexpr.dat
+done subexpr.dat
+make austin.dat
+done austin.dat
+make xopen.dat
+done xopen.dat
 make pcre-1.dat
 done pcre-1.dat
 make pcre-2.dat
@@ -426,8 +437,12 @@ make pcre-4.dat
 done pcre-4.dat
 make pcre-5.dat
 done pcre-5.dat
-exec - for i in testre.dat testmatch.dat testsub.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullgroup.dat standards.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat
-exec - do	testre -c < $i
+make cut.dat
+done cut.dat
+make libtre.dat
+done libtre.dat
+exec - for i in testregex.dat locale.dat testmatch.dat testsub.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat austin.dat xopen.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat cut.dat libtre.dat
+exec - do	testregex -c < $i
 exec - done
-done test.re virtual
+done test.regex virtual
 done test dontcare virtual

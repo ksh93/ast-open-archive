@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -39,19 +39,14 @@ make install
 make nmake
 make archive.o
 make archive.c
-make ../../../include/ast/int.h implicit
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
-done ../../../include/ast/int.h
-make ../../../include/ast/tm.h implicit
-make ../../../include/ast/times.h implicit
-make ../../../include/ast/ast_time.h implicit
-done ../../../include/ast/ast_time.h dontcare
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
+make ../../../include/ast/ardir.h implicit
+make ../../../include/ast/ls.h implicit
+make ../../../include/ast/ast_mode.h implicit
+done ../../../include/ast/ast_mode.h dontcare
+make ../../../include/ast/ast_fs.h implicit
+make error?--?old?ethernet?address?at?wrong?offset implicit
+done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
+done ../../../include/ast/ast_fs.h dontcare
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
 done ../../../include/ast/ast_botch.h dontcare
@@ -67,16 +62,7 @@ make ../../../include/ast/getopt.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-make ../../../include/ast/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/ast_std.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
+prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast_fs.h implicit
 done ../../../include/ast/ast_fcntl.h dontcare
 make ../../../include/ast/ast_types.h implicit
@@ -86,8 +72,10 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
-prev ../../../include/ast/ast_common.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_common.h dontcare
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
@@ -103,6 +91,13 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ls.h dontcare
+make ../../../include/ast/ast.h implicit
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -111,14 +106,7 @@ done ../../../include/ast/ast_version.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast.h dontcare
 prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/times.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/tm.h
-make ../../../include/ast/swap.h implicit
-prev ../../../include/ast/int.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/swap.h
+done ../../../include/ast/ardir.h
 make make.h implicit
 make ../../../include/ast/sfstr.h implicit
 prev ../../../include/ast/sfio.h implicit
@@ -132,7 +120,12 @@ make ../../../include/ast/tok.h implicit
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/tok.h
-prev ../../../include/ast/times.h implicit
+make ../../../include/ast/times.h implicit
+make ../../../include/ast/ast_time.h implicit
+done ../../../include/ast/ast_time.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/times.h
 make ../../../include/ast/coshell.h implicit
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -148,7 +141,12 @@ done ../../../include/ast/error.h
 make ../../../include/ast/namval.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/namval.h
-prev ../../../include/ast/swap.h implicit
+make ../../../include/ast/swap.h implicit
+make ../../../include/ast/int.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/int.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/swap.h
 make ../../../include/ast/hash.h implicit
 make ../../../include/ast/hashpart.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -265,7 +263,11 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c 
 done metarule.o generated
 make misc.o
 make misc.c
-prev ../../../include/ast/tm.h implicit
+make ../../../include/ast/tm.h implicit
+prev ../../../include/ast/times.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/tm.h
 prev ../../../include/ast/int.h implicit
 prev make.h implicit
 done misc.c
@@ -355,11 +357,12 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2002-02-14 \$\0\n"\" -c version.c
+exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2002-06-11 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
+bind -lardir
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o ${mam_libcoshell} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o ${mam_libcoshell} ${mam_libardir} ${mam_libast}
 done nmake generated
 make ppcc
 make ppcc.sh

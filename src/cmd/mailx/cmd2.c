@@ -229,7 +229,7 @@ save1(char* str, Dt_t** ignore, unsigned long flags)
 	}
 	switch (folder) {
 	case FFILE:
-		if (!(fp = fileopen(file, state.clobber ? "Ew" : "Ea")))
+		if (!(fp = fileopen(file, state.clobber ? "EMw" : "EMa")))
 			return 1;
 		for (ip = state.msg.list; ip->m_index; ip++) {
 			mp = state.msg.list + ip->m_index - 1;

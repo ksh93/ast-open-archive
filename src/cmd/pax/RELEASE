@@ -1,3 +1,7 @@
+02-06-26 pax: fix regsubexec() edited symlink text buffer clobber
+02-05-24 pax: update to use regsubcomp(),regsubexec()
+02-05-07 pax: use <ardir.h>,-lardir for library archives
+02-04-23 pax: add dos omf library read
 01-12-07 pax: fix --meter to retain paths containing " -- "
 01-12-06 pax: fix --meter to stop at 100% (don't tell coach)
 01-10-20 pax: describe the 4 operation modes in separate paragraphs

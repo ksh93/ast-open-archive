@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -56,7 +57,7 @@ MAIN()
 	if (strcmp(tst, str))
 		terror("swprintf %%S \"%s\" expected, \"%s\" returned\n", tst, str);
 
-	n = swscanf(L" hello-world ", L"%ls", &wuf);
+	n = swscanf(L" hello-world ", L"%ls", wuf);
 	if (n != 1)
 		terror("swscanf %%ls %d expected, %d returned\n", 1, n);
 	else
@@ -66,7 +67,7 @@ MAIN()
 			terror("swscanf %%ls \"%s\" expected, \"%s\" returned\n", tst, str);
 	}
 
-	n = swscanf(L" hello-world ", L"%S", &wuf);
+	n = swscanf(L" hello-world ", L"%S", wuf);
 	if (n != 1)
 		terror("swscanf %%S %d expected, %d returned\n", 1, n);
 	else
@@ -98,7 +99,7 @@ MAIN()
 	if (strcmp(tst, buf))
 		terror("sfsprintf %%S \"%s\" expected, \"%s\" returned\n", tst, buf);
 
-	n = sfsscanf(" hello-world ", "%ls", &wuf);
+	n = sfsscanf(" hello-world ", "%ls", wuf);
 	if (n != 1)
 		terror("sfsscanf %%ls %d expected, %d returned\n", 1, n);
 	else
@@ -108,7 +109,7 @@ MAIN()
 			terror("sfsscanf %%ls \"%s\" expected, \"%s\" returned\n", tst, str);
 	}
 
-	n = sfsscanf(" hello-world ", "%S", &wuf);
+	n = sfsscanf(" hello-world ", "%S", wuf);
 	if (n != 1)
 		terror("sfsscanf %%S %d expected, %d returned\n", 1, n);
 	else

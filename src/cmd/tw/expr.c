@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -497,6 +498,27 @@ refval(Expr_t* pgm, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, int el
 		break;
 	case X_cmdarg:
 		state.cmdflags &= ~CMD_IMPLICIT;
+		break;
+	case F_atime:
+	case F_blksize:
+	case F_blocks:
+	case F_ctime:
+	case F_dev:
+	case F_fstype:
+	case F_gid:
+	case F_gidok:
+	case F_ino:
+	case F_mode:
+	case F_mtime:
+	case F_nlink:
+	case F_perm:
+	case F_rdev:
+	case F_size:
+	case F_symlink:
+	case F_type:
+	case F_uid:
+	case F_uidok:
+		state.ftwflags &= ~FTW_DELAY;
 		break;
 	}
 	return v;

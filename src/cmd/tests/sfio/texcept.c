@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -165,7 +166,7 @@ MAIN()
 			terror("wrong 4 bytes\n");
 
 	sfsync(f);
-	if((o = lseek(f->file, (off_t)0, SEEK_CUR)) != 4)
+	if((o = lseek(sffileno(f), (off_t)0, SEEK_CUR)) != 4)
 		terror("Wrong seek location %lld\n", (Sfoff_t)o);
 
 	if((i = dup(sffileno(f))) < 0)

@@ -23,11 +23,12 @@ clobber = !(nmake)
 
 nmake :: FEATURES HISTORY README RELEASE REFERENCES \
 	PROMO.mm make-intro.0 nmake.1 nmake.8 Version.mk \
-	$(RULES) $(RULES:B:S=.1:N=*rules.1:F=%(lower)S) $(RULESFILES) \
+	$(RULES) $(RULES:B:S=.1:N=*rules.1:F=%(lower)s) $(RULESFILES) \
 	make.h expand.h options.h \
 	archive.c bind.c command.c dump.c expand.c main.c make.c \
 	mam.c metarule.c misc.c object.c option.c parse.c read.c \
-	rule.c scan.c state.c trap.c variable.c version.c -lcoshell
+	rule.c scan.c state.c trap.c variable.c version.c \
+	-lcoshell -lardir
 
 if CC.HOSTTYPE == "win32*" || "$(-mam)" == "static*"
 expand.o object.o : .CC.NOOPTIMIZE
@@ -131,7 +132,7 @@ Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 local T
 
 for T $(RULES:B)
-	$(T:F=%(lower)S:D=$$(RULESDIR):B:S=.mo) :INSTALL: $(T:B:S=.mo)
+	$(T:F=%(lower)s:D=$$(RULESDIR):B:S=.mo) :INSTALL: $(T:B:S=.mo)
 end
 
 /*

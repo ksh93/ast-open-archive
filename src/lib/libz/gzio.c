@@ -57,7 +57,7 @@ typedef struct gz_stream {
     int      nocrc;   /* 1 to skip 'r' crc checks */
     int      noclose; /* 1 to skip destroy fclose */
     int      verified;/* 2-byte magic read and verified ('v') */
-    uLong    previous_out; /* previous total_out for concatenated .gz files */
+    uSize    previous_out; /* previous total_out for concatenated .gz files */
 #endif
     char     mode;    /* 'w' or 'r' */
     long     startpos; /* start of compressed data in file (header skipped) */
@@ -416,7 +416,7 @@ local int destroy (s)
 int ZEXPORT gzread (file, buf, len)
     gzFile file;
     voidp buf;
-    unsigned len;
+    uInt len;
 {
     gz_stream *s = (gz_stream*)file;
     Bytef *start = (Bytef*)buf; /* starting point for crc computation */
@@ -498,8 +498,8 @@ int ZEXPORT gzread (file, buf, len)
 		 */
 		check_header(s);
 		if (s->z_err == Z_OK) {
-		    uLong total_in = s->stream.total_in;
-		    uLong total_out = s->stream.total_out;
+		    uSize total_in = s->stream.total_in;
+		    uSize total_out = s->stream.total_out;
 
 		    inflateReset(&(s->stream));
 		    s->stream.total_in = total_in;
@@ -511,7 +511,9 @@ int ZEXPORT gzread (file, buf, len)
 		    s->crc = crc32(0L, Z_NULL, 0);
 		}
 #if _PACKAGE_ast
-		else if (z != (s->stream.total_out - s->previous_out))
+		/* uLong size is stored in the header, but we can still
+		   do a modulo 32 check */
+		else if (z != ((s->stream.total_out - s->previous_out) & 0xffffffff))
 		    s->z_err = Z_DATA_ERROR;
 #endif
 		else
@@ -573,7 +575,7 @@ char * ZEXPORT gzgets(file, buf, len)
 int ZEXPORT gzwrite (file, buf, len)
     gzFile file;
     const voidp buf;
-    unsigned len;
+    uInt len;
 {
     gz_stream *s = (gz_stream*)file;
 
@@ -847,12 +849,12 @@ z_off_t ZEXPORT gzseek (file, offset, whence)
 	s->stream.next_in = s->inbuf;
         if (fseek(s->file, offset, SEEK_SET) < 0) return -1L;
 
-	s->stream.total_in = s->stream.total_out = (uLong)offset;
+	s->stream.total_in = s->stream.total_out = (uSize)offset;
 	return offset;
     }
 
     /* For a negative seek, rewind and use positive seek */
-    if ((uLong)offset >= s->stream.total_out) {
+    if ((uSize)offset >= s->stream.total_out) {
 	offset -= s->stream.total_out;
     } else if (gzrewind(file) < 0) {
 	return -1L;
@@ -976,7 +978,8 @@ int ZEXPORT gzclose (file)
         if (err != Z_OK) return destroy((gz_stream*)file);
 
         putLong (s->file, s->crc);
-        putLong (s->file, s->stream.total_in);
+	/* but for backwards compatibility this would be uSize */
+        putLong (s->file, s->stream.total_in & 0xffffffff);
 #endif
     }
     return destroy((gz_stream*)file);

@@ -9,7 +9,7 @@
 #                                                                  #
 #       http://www.research.att.com/sw/license/ast-open.html       #
 #                                                                  #
-#        If you have copied this software without agreeing         #
+#    If you have copied or used this software without agreeing     #
 #        to the terms of the license you are infringing on         #
 #           the license and copyright and are violating            #
 #               AT&T's intellectual property rights.               #
@@ -19,6 +19,7 @@
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
+#                                                                  #
 ####################################################################
 : mm2html - convert mm/man subset to html
 
@@ -42,7 +43,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2002-03-17'
+version='mm2html (AT&T Labs Research) 2002-06-09'
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
@@ -359,7 +360,7 @@ function getfiles
 	-e 's%\\f(\(..\)\([^\\]*\)%<\1>\2</\1>%g' \
 	-e 's%\\f[PR]%\\fZ%g' \
 	-e 's%\\f\(.\)\([^\\]*\)%<\1>\2</\1>%g' \
-	-e 's%&lt;\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.]*@[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.]*\)&gt;%<SMALL>\&lt;<A href=mailto:\1>\1</A>\&gt;</SMALL>%g' \
+	-e 's%&lt;\([abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][-._abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789]*@[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.]*\)&gt;%<SMALL>\&lt;<A href=mailto:\1>\1</A>\&gt;</SMALL>%g' \
 	-e 's%\[[ABCDEFGHIJKLMNOPQRSTUVWXYZ][ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz]*[0123456789][0123456789][abcdefghijklmnopqrstuvwxyz]*]%<CITE>&</CITE>%g' \
 	-e 's%</*Z>%%g' \
 	-e 's%<[146789]>%%g' \
@@ -386,7 +387,7 @@ function getfiles
 	-e 's%\\s+\(.\)\(.*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
 	-e 's%\\s-\(.\)\(.*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
 	-e 's%\\c%<JOIN>%g' \
-	-e 's%\\e%<!--NULL-->\\<!--NULL-->%g' \
+	-e 's%\\e%\&#0092;%g' \
 	-e '/^'\''[abcdefghijklmnopqrstuvwxyz][abcdefghijklmnopqrstuvwxyz]\>/s%.%.%' \
 	-e '/^\..*".*\\/s%\\%\\\\%g' \
 	"$@"
@@ -1968,11 +1969,15 @@ do	getline || {
 			print "<BODY bgcolor='#ffffff'>"
 			print "${pm}<CENTER>"
 			print "<BR><H1><FONT color=red>$2</FONT></H1><BR>"
-			shift 2
-			for name
-			do	[[ $name == "-" ]] && name=""
-				print -- "<BR>$name"
-			done
+			case $# in
+			0|1|2)	;;
+			*)	shift 2
+				for name
+				do	[[ $name == "-" ]] && name=""
+					print -- "<BR>$name"
+				done
+				;;
+			esac
 			print "</CENTER>"
 			print "<P>"
 			;;

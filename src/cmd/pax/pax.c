@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -36,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-12-07 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2002-06-26 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -135,7 +136,6 @@ char*			eomprompt = "Change to part %d and hit RETURN: ";
 
 char			alar_header[ALAR_LABEL];
 Hdr_binary_t		binary_header;
-Hdr_portar_t		portar_header;
 Hdr_tar_t		tar_header_block;
 char			zip_header[ZIP_HEADER];
 State_t			state;
@@ -153,14 +153,14 @@ Format_t		format[] =
 {ASCHK_NAME,	ASCHK_DESC,	ASCHK_REGULAR,	ASCHK_SPECIAL,	ASCHK_ALIGN,	ASCHK_FLAGS},
 {SAVESET_NAME,	SAVESET_DESC,	SAVESET_REGULAR,SAVESET_SPECIAL,SAVESET_ALIGN,	SAVESET_FLAGS},
 {PAX_NAME,	PAX_DESC,	PAX_REGULAR,	PAX_SPECIAL,	PAX_ALIGN,	PAX_FLAGS},
-{PORTAR_NAME,	PORTAR_DESC,	PORTAR_REGULAR,	PORTAR_SPECIAL,	PORTAR_ALIGN,	PORTAR_FLAGS},
-{RANDAR_NAME,	RANDAR_DESC,	RANDAR_REGULAR,	RANDAR_SPECIAL,	RANDAR_ALIGN,	RANDAR_FLAGS},
+{AR_NAME,	AR_DESC,	AR_REGULAR,	AR_SPECIAL,	AR_ALIGN,	AR_FLAGS},
 {VDB_NAME,	VDB_DESC,	VDB_REGULAR,	VDB_SPECIAL,	VDB_ALIGN,	VDB_FLAGS},
 {ZIP_NAME,	ZIP_DESC,	ZIP_REGULAR,	ZIP_SPECIAL,	ZIP_ALIGN,	ZIP_FLAGS},
 {CAB_NAME,	CAB_DESC,	CAB_REGULAR,	CAB_SPECIAL,	CAB_ALIGN,	CAB_FLAGS},
 {RPM_NAME,	RPM_DESC,	RPM_REGULAR,	RPM_SPECIAL,	RPM_ALIGN,	RPM_FLAGS},
 {MIME_NAME,	MIME_DESC,	MIME_REGULAR,	MIME_SPECIAL,	MIME_ALIGN,	MIME_FLAGS},
 {TNEF_NAME,	TNEF_DESC,	TNEF_REGULAR,	TNEF_SPECIAL,	TNEF_ALIGN,	TNEF_FLAGS},
+{OMF_NAME,	OMF_DESC,	OMF_REGULAR,	OMF_SPECIAL,	OMF_ALIGN,	OMF_FLAGS},
 
 {COMPRESS_NAME,	COMPRESS_DESC, COMPRESS_MAGIC_MASK, COMPRESS_MAGIC, 0, IN|OUT, COMPRESS_ALGORITHM, COMPRESS_UNDO},
 {GZIP_NAME,	GZIP_DESC,     GZIP_MAGIC_MASK, GZIP_MAGIC,         0, IN|OUT, GZIP_ALGORITHM,     GZIP_UNDO},
@@ -984,59 +984,26 @@ static void
 substitute(Map_t** lastmap, register char* s)
 {
 	register Map_t*	mp;
-	register int	n;
 	int		c;
 
 	for (;;)
 	{
 		while (isspace(*s))
 			s++;
-		if (!(n = *s))
+		if (!*s)
 			break;
 		if (!(mp = newof(0, Map_t, 1, 0)))
 			error(3, "no space [substitution]");
-		if (c = regcomp(&mp->re, s, REG_DELIMITED))
-			regfatal(&mp->re, 3, c);
-		if (*(s += mp->re.re_npat) == n)
-			s++;
-		mp->into = s;
-		while (*s && *s != n)
-			if (*s++ == '\\' && !*s++)
-				error(3, "`\\' cannot terminate rhs of substitution");
-		if (*s != n)
-			error(3, "missing `%c' delimiter for rhs of substitution", n);
-		*s++ = 0;
-		for (;;)
+		if (!(c = regcomp(&mp->re, s, REG_DELIMITED|REG_LENIENT|REG_NULL)))
 		{
-			switch (*s++)
-			{
-			case 0:
-				s--;
-				break;
-			case 'g':
-				mp->flags |= REG_SUB_ALL;
-				continue;
-			case 'l':
-				mp->flags |= REG_SUB_LOWER;
-				continue;
-			case 'p':
-				mp->flags |= REG_SUB_VERBOSE;
-				continue;
-			case 's':
-				mp->flags |= REG_SUB_STOP;
-				continue;
-			case 'u':
-				mp->flags |= REG_SUB_UPPER;
-				continue;
-			default:
-				if (*(s - 1) == n)
-					break;
-				error(3, "extra character%s `%s' after substitution", *s ? "s" : "", s - 1);
-				break;
-			}
-			break;
+			s += mp->re.re_npat;
+			if (!(c = regsubcomp(&mp->re, s, NiL, 0, 0)))
+				s += mp->re.re_npat;
 		}
-		mp->into = strdup(mp->into);
+		if (c)
+			regfatal(&mp->re, 3, c);
+		if (*s && !isspace(*s))
+			error(1, "invalid character after substitution: %s", s);
 		if (*lastmap)
 			*lastmap = (*lastmap)->next = mp;
 		else

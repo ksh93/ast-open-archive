@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 #include	<vthread.h>
@@ -88,7 +89,7 @@ void* writebig(arg)
 void*	arg;
 #endif
 {
-	int	r = (random()%3) + 1;	sleep(r);
+	int	r = (rand()%3) + 1;	sleep(r);
 
 	if(sfwrite(Sf,Bigz,sizeof(Bigz)) != sizeof(Bigz))
 		terror("Writing bigz");
@@ -104,7 +105,7 @@ int     sig;
 #endif
 {
 	tmesg("\tSignal %d.\n", sig);
-	exit(0);
+	TSTEXIT(0);
 }
 
 MAIN()

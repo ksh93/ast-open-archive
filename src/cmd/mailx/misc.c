@@ -270,6 +270,8 @@ normalize(char* addr, char* buf, unsigned long type)
 	char		temp[LINESIZE];
 	char		norm[LINESIZE];
 
+	while (isspace(*addr))
+		addr++;
 	if (!(type & GFROM) && (p = strrchr(addr, ':')))
 		addr = p + 1;
 	if ((type & GCOMPARE) && state.var.allnet) {

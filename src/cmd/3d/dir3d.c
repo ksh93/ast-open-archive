@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -21,6 +21,7 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -54,13 +55,17 @@ opendir3d(const char* apath)
 	long		visits = 0;
 	struct stat	st;
 
-	if (dirp = (DIR*)state.freedirp) state.freedirp = 0;
-	else if (!(dirp = newof(0, DIR, 1, 0))) return 0;
+	if (dirp = (DIR*)state.freedirp)
+		state.freedirp = 0;
+	else if (!(dirp = newof(0, DIR, 1, 0)))
+		return 0;
 	intercepted++;
 	dirp->viewp = dirp->view;
 	n = state.in_2d;
-	if (path = pathreal(apath, P_SLASH, NiL)) state.in_2d = 2;
-	else path = (char*)apath;
+	if (path = pathreal(apath, P_SLASH, NiL))
+		state.in_2d = 2;
+	else
+		path = (char*)apath;
 	dirp->viewp->dirp = OPENDIR(path);
 	state.in_2d = n;
 	if (!dirp->viewp->dirp)
@@ -104,7 +109,8 @@ opendir3d(const char* apath)
 		}
 		errno = oerrno;
 		(dirp->viewp--)->dirp = 0;
-		if (dirp->viewp <= dirp->view) dirp->overlay = 0;
+		if (dirp->viewp <= dirp->view)
+			dirp->overlay = 0;
 		else if (!(dirp->overlay = hashalloc(NiL, HASH_set, HASH_ALLOCATE, 0)))
 		{
 			closedir(dirp);
@@ -186,16 +192,19 @@ readdir3d(register DIR* dirp)
 #endif
 
 		/*
-		 * NOTE: this (slimey) method assumes READDIR() returns .
+		 * NOTE: this (slimey) method assumes READDIR() returns . first
 		 */
 
 		if (dirp->overlay && (!dirp->boundary || dp->d_name[0] != '.' || dp->d_name[1]))
 		{
-			if ((covered = (Dir_physical_t*)hashget(dirp->overlay, dp->d_name)) && covered < dirp->viewp) continue;
-			if ((dirp->viewp + 1)->dirp) hashput(dirp->overlay, 0, (char*)dirp->viewp);
+			if ((covered = (Dir_physical_t*)hashget(dirp->overlay, dp->d_name)) && covered < dirp->viewp)
+				continue;
+			if ((dirp->viewp + 1)->dirp)
+				hashput(dirp->overlay, 0, (char*)dirp->viewp);
 		}
 #if _mem_d_fileno_dirent
-		if (dp->d_fileno == dirp->viewp->opaque) continue;
+		if (dp->d_fileno == dirp->viewp->opaque)
+			continue;
 #endif
 		intercepted--;
 		return (struct dirent*)dp;
@@ -230,14 +239,21 @@ seekdir3d(register DIR* dirp, long pos)
 			if (lev == dirp->view[n].level)
 				break;
 	}
-	else n = 0;
+	else
+	{
+		n = 0;
+		hashfree(dirp->overlay);
+		dirp->overlay = hashalloc(NiL, HASH_set, HASH_ALLOCATE, 0);
+	}
 	if (dirp->view[n].dirp)
 	{
 		SEEKDIR(dirp->view[n].dirp, pos);
 		dirp->viewp = &dirp->view[n];
+		CHEATDIR(dirp);
 		while (dirp->view[++n].dirp)
 			SEEKDIR(dirp->view[n].dirp, 0L);
 	}
+	intercepted--;
 }
 
 #undef	telldir
@@ -308,7 +324,7 @@ readdir643d(register DIR* dirp)
 #endif
 
 		/*
-		 * NOTE: this (slimey) method assumes READDIR() returns .
+		 * NOTE: this (slimey) method assumes READDIR() returns . first
 		 */
 
 		if (dirp->overlay && (!dirp->boundary || dp->d_name[0] != '.' || dp->d_name[1]))
@@ -341,8 +357,9 @@ seekdir643d(register DIR* dirp, off64_t pos)
 	register int	n;
 	int		lev;
 
-	if (intercepted)
+	if (intercepted++)
 	{
+		intercepted--;
 		SEEKDIR64(dirp, pos);
 		return;
 	}
@@ -355,14 +372,23 @@ seekdir643d(register DIR* dirp, off64_t pos)
 				break;
 	}
 	else
+	{
 		n = 0;
+		if (dirp->overlay)
+		{
+			hashfree(dirp->overlay);
+			dirp->overlay = hashalloc(NiL, HASH_set, HASH_ALLOCATE, 0);
+		}
+	}
 	if (dirp->view[n].dirp)
 	{
 		SEEKDIR64(dirp->view[n].dirp, pos);
 		dirp->viewp = &dirp->view[n];
+		CHEATDIR(dirp);
 		while (dirp->view[++n].dirp)
 			SEEKDIR64(dirp->view[n].dirp, (off64_t)0);
 	}
+	intercepted--;
 }
 
 #undef	telldir
@@ -380,12 +406,7 @@ telldir643d(DIR* dirp)
 void
 rewinddir643d(register DIR* dirp)
 {
-	if (intercepted)
-	{
-		seekdir(dirp, (off64_t)0);
-		return;
-	}
-	seekdir((DIR*)dirp->viewp->dirp, (off64_t)0);
+	seekdir64(dirp, (off64_t)0);
 }
 
 #endif

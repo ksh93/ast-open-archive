@@ -89,8 +89,34 @@ TEST 03 '{ s } commands'
 		INPUT - $'1s/a//2\n2s/b//2\n3s/c//2\n4s/a/X/2\n5s/b/X/2\n6s/c/X/2\n7s/a/XX/2\n8s/b/XX/2\n9s/c/XX/2\nw\nq'
 		OUTPUT file $'abcbcabc\nabcacabc\nabcababc\nabcXbcabc\nabcaXcabc\nabcabXabc\nabcXXbcabc\nabcaXXcabc\nabcabXXabc'
 		OUTPUT - $'90\n90'
+	EXEC file
+		NOTE 'substitute null g'
+		INPUT file $'123\naaa'
+		INPUT - $'1,$s/a*/x/g\nw\nq'
+		OUTPUT file $'x1x2x3x\nxx'
+		OUTPUT - $'8\n11'
+	EXEC file
+		NOTE 'substitute splice'
+		INPUT file $'123\naaa'
+		INPUT - $'1,$s/a/&\\\nx/\nw\nq'
+		OUTPUT file $'123\na\nxaa'
+		OUTPUT - $'8\n10'
+	EXEC file
+		NOTE 'substitute previous'
+		INPUT file $'123\naaa'
+		INPUT - $'/aa/p\ns//zz/\nw\nq'
+		OUTPUT file $'123\nzza'
+		OUTPUT - $'8\naaa\n8'
 
-TEST 04 '{ t } commands'
+TEST 04 'global commands'
+	EXEC file
+		NOTE 'global substitute splice'
+		INPUT file $'yyabcyy\n123yyxx\nfoo\nbaryy\nfooyybar'
+		INPUT - $'g/yy/s//ex/g\nw\nq'
+		OUTPUT file $'exabcex\n123exxx\nfoo\nbarex\nfooexbar'
+		OUTPUT - $'35\n35'
+
+TEST 05 '{ t } commands'
 	EXEC file
 		NOTE 'copy'
 		INPUT file $'1\n2\n3\n4'

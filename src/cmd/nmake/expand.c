@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -37,6 +38,17 @@
 #define BREAKARGS	100
 #define BREAKLINE	(BREAKARGS*16)
 #define EDITCONTEXT	20
+
+static const regflags_t	submap[] =
+{
+	'g',	REG_SUB_ALL,
+	'l',	REG_SUB_LOWER,
+	'u',	REG_SUB_UPPER,
+	'G',	REG_SUB_ALL,
+	'L',	REG_SUB_LOWER,
+	'U',	REG_SUB_UPPER,
+	0,	0
+};
 
 /*
  * `$(...)' expansion
@@ -326,11 +338,12 @@ cross(Sfio_t* xp, char* v, char* w)
 				else sep = 1;
 				pos = sfstrtell(xp);
 				x = t;
-				if (dot || *s != '.' || *(s + 1))
-				{
-					if (!dot) sfprintf(xp, "%s/", s);
-					else x = s;
-				}
+				if (dot)
+					x = s;
+				else if (s[strlen(s) - 1] == '/')
+					sfprintf(xp, "%s", s);
+				else if (*s != '.' || *(s + 1))
+					sfprintf(xp, "%s/", s);
 				sfputr(xp, x, 0);
 				x = sfstrset(xp, pos);
 				pos += canon(x) - x;
@@ -1554,21 +1567,18 @@ edit(Sfio_t* xp, register char* s, char* dir, char* bas, char* suf)
  */
 
 static void
-substitute(Sfio_t* xp, regex_t* re, register char* s, char* newp, int glob)
+substitute(Sfio_t* xp, regex_t* re, register char* s)
 {
 	int		n;
 	regmatch_t	match[10];
 
 	if (*s)
 	{
-		if (!(n = regexec(re, s, elementsof(match), match, 0)))
-			n = regsub(re, xp, s, newp, elementsof(match), match, glob);
-		if (n)
-		{
-			if (n != REG_NOMATCH)
-				regfatal(re, 2, n);
-			sfputr(xp, s, -1);
-		}
+		if (!(n = regexec(re, s, elementsof(match), match, 0)) && !(n = regsubexec(re, s, elementsof(match), match)))
+			s = re->re_sub->re_buf;
+		else if (n != REG_NOMATCH)
+			regfatal(re, 2, n);
+		sfputr(xp, s, -1);
 	}
 }
 
@@ -2577,7 +2587,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 	char*			oldp;
 	char*			newp;
 	char*			eb;
-	int			glob;
+	int			old;
 	int			qual;
 	int			cnt;
 	int			cntlim;
@@ -2851,23 +2861,55 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		 * collect the operands
 		 */
 
-		if (op == 'C' || op == '/' || op == 'Y' || op == '?')
+		if (op == 'C' || op == '/')
 		{
 			/*
-			 * substitute: <delim><old><delim><new><delim>[g]
+			 * substitute: <delim><old><delim><new><delim>[flags]
+			 */
+
+			switch (op)
+			{
+			case 'C':
+				break;
+			case '/':
+				op = 'C';
+				ed--;
+				break;
+			}
+			s = ed;
+			if (!(n = regcomp(&re, ed, REG_DELIMITED|REG_LENIENT|REG_NULL)))
+			{
+				ed += re.re_npat;
+				if (!(n = regsubcomp(&re, ed, submap, 0, 0)))
+					ed += re.re_npat;
+			}
+			if (n)
+			{
+				regfatalpat(&re, 2, n, s);
+				while (*ed && *ed++ != del);
+				continue;
+			}
+			if (*ed)
+			{
+				if (*ed != del)
+					error(1, "invalid character after substitution: %s", editcontext(eb, ed));
+				while (*ed && *ed++ != del);
+			}
+			if (*++s == ' ')
+				tokenize = 0;
+		}
+		else if (op == 'Y' || op == '?')
+		{
+			/*
 			 * conditional: <delim><non-null><delim><null><delim>
 			 */
 
 			n = op;
 			switch (op)
 			{
-			case 'C':
 			case 'Y':
 				if (n = *ed)
 					ed++;
-				break;
-			case '/':
-				op = 'C';
 				break;
 			case '?':
 				op = 'Y';
@@ -2876,7 +2918,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			oldp = ed;
 			while (*ed && *ed != n)
 				if (*ed++ == '\\' && !*ed++)
-					error(3, "unterminated lhs of %s: %s", op == 'C' ? "substitution" : "conditional", editcontext(eb, ed));
+					error(3, "unterminated lhs of conditional: %s", editcontext(eb, ed));
 			s = ed;
 			if (*ed == n)
 				ed++;
@@ -2884,38 +2926,25 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			newp = ed;
 			while (*ed && *ed != n)
 				if (*ed++ == '\\' && !*ed++)
-					error(3, "unterminated rhs of %s: %s", op == 'C' ? "substitution" : "conditional", editcontext(eb, ed));
+					error(3, "unterminated rhs of conditional: %s", editcontext(eb, ed));
 			s = ed;
 			if (*ed)
 				ed++;
 			*s = 0;
-			if (op == 'C' && *oldp == ' ')
-				tokenize = 0;
-			glob = 0;
+			old = 0;
 			while (*ed && *ed != del && !isspace(*ed))
 				switch (*ed++)
 				{
-				case 'G':
-				case 'g':
 				case 'O':
 				case 'o':
-					glob |= REG_SUB_ALL;
-					break;
-				case 'L':
-				case 'l':
-					glob |= REG_SUB_LOWER;
-					break;
-				case 'U':
-				case 'u':
-					glob |= REG_SUB_UPPER;
+					old = 1;
 					break;
 				default:
-					error(1, "invalid character `%c' after %s", *(ed - 1), op == 'C' ? "substitution" : "conditional");
+					error(1, "invalid character after conditional: %s", editcontext(eb, ed));
 					break;
 				}
 			if (*ed)
 				ed++;
-			*s = 0;
 		}
 		else if (*ed == del || (qual & ED_LONG) && isspace(*ed))
 		{
@@ -3062,12 +3091,6 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				ctx = 0;
 			break;
 		case 'C':
-			if (n = regcomp(&re, oldp, REG_LENIENT|REG_NULL))
-			{
-				regfatalpat(&re, 2, n, oldp);
-				continue;
-			}
-			/*FALLTHROUGH*/
 		case 'Y':
 			ctx = 0;
 			break;
@@ -3269,7 +3292,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				}
 				break;
 			case 'C':
-				substitute(xp, &re, s, newp, glob);
+				substitute(xp, &re, s);
 				break;
 			case 'F':
 #if !_drop_this_in_3_2
@@ -3373,7 +3396,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				token(xp, s, val, sep);
 				break;
 			case 'Y':
-				expand(xp, *s ? (glob ? s : oldp) : newp);
+				expand(xp, *s ? (old ? s : oldp) : newp);
 				break;
 #if DEBUG
 			default:

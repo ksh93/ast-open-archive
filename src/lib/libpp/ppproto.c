@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -32,7 +33,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2002-03-15 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2002-04-12 $\0\n";
 
 #if PROTOMAIN
 
@@ -2002,6 +2003,7 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 #if PROTOMAIN
 	int			comlen;
 	char			com[80];
+	int			q;
 #endif
 	int			m = 0;
 
@@ -2141,12 +2143,13 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 #if PROTOMAIN
 		else if (*s == '%' && *(s + 1) == '{')
 			proto->flags |= YACC;
-		else if (notice || options)
+		if (notice || options)
 		{
 			if (*s == *com && !strncmp(s, com, comlen))
 				notice = options = 0;
 			else
 			{
+				q = 8;
 				while (*s)
 				{
 					if (*s == *NOTICED && !strncmp(s, NOTICED, sizeof(NOTICED) - 1))
@@ -2155,9 +2158,12 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 						while (*s == ' ' || *s == '\t')
 							s++;
 						if (*s == '(' && (*(s + 1) == 'c' || *(s + 1) == 'C') && *(s + 2) == ')')
+						{
 							notice = options = 0;
+							break;
+						}
 					}
-					else if (*s++ == '\n')
+					else if (*s++ == '\n' && !--q)
 						break;
 				}
 				continue;

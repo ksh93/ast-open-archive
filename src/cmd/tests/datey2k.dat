@@ -177,7 +177,7 @@ NIL	%s	951804123
 NIL	%S	03
 NIL	%t	\t
 NIL	%T	01:02:03
-NIL	%u	%u
+NIL	%u	2
 NIL	%U	09
 NIL	%v	%v
 NIL	%V	09
@@ -227,7 +227,7 @@ NIL	%0s	951804123
 NIL	%0S	03
 NIL	%0t	\t
 NIL	%0T	01:02:03
-NIL	%0u	%u
+NIL	%0u	2
 NIL	%0U	09
 NIL	%0v	%v
 NIL	%0V	09
@@ -277,7 +277,7 @@ NIL	%-s	951804123
 NIL	%-S	3
 NIL	%-t	\t
 NIL	%-T	01:02:03
-NIL	%-u	%u
+NIL	%-u	2
 NIL	%-U	9
 NIL	%-v	%v
 NIL	%-V	9
@@ -327,7 +327,7 @@ NIL	%_s	951804123
 NIL	%_S	 3
 NIL	%_t	\t
 NIL	%_T	01:02:03
-NIL	%_u	%u
+NIL	%_u	2
 NIL	%_U	 9
 NIL	%_v	%v
 NIL	%_V	 9

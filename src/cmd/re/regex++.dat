@@ -96,8 +96,6 @@ E	ab*c*	abbb	(0,4)
 E	ab*c*	accc	(0,4)
 E	ab*c*	abbcc	(0,5)
 E	*a	!	BADRPT
-E	\<*	!	BADRPT
-E	\>*	!	BADRPT
 E$	\n*	\n\n	(0,2)
 E	\**	**	(0,2)
 E	\*	*	(0,1)
@@ -111,8 +109,6 @@ E	ab+c+	abbb	NOMATCH
 E	ab+c+	accc	NOMATCH
 E	ab+c+	abbcc	(0,5)
 E	+a	!	BADRPT
-E	\<+	!	BADRPT
-E	\>+	!	BADRPT
 E$	\n+	\n\n	(0,2)
 E	\+	+	(0,1)
 E	\+	++	(0,1)
@@ -133,8 +129,6 @@ E	ab?c?	abbb	(0,2)
 E	ab?c?	accc	(0,2)
 E	ab?c?	abcc	(0,3)
 E	?a	!	BADRPT
-E	\<?	!	BADRPT
-E	\>?	!	BADRPT
 E$	\n?	\n\n	(0,1)
 E	\?	?	(0,1)
 E	\?	??	(0,1)
@@ -343,7 +337,7 @@ E	\w	[	NOMATCH
 E	\w	@	NOMATCH
 }
 # non-word:
-{E	\W	a	NOMATCH		perl \W not supported
+{E	\W	W	NOMATCH		perl \W not supported
 E	\W	z	NOMATCH
 E	\W	A	NOMATCH
 E	\W	Z	NOMATCH
@@ -352,17 +346,31 @@ E	\W	}	(0,1)
 E	\W	`	(0,1)
 E	\W	[	(0,1)
 E	\W	@	(0,1)
+
+E	\<\w+\W+	 aa  aa  a 	(1,5)
 }
+# word boundaries
+{E	\<a\>	,a,	(1,2)		word boundaries not supported
+E	\<*	!	BADRPT
+E	\>*	!	BADRPT
+E	\<+	!	BADRPT
+E	\>+	!	BADRPT
+E	\<?	!	BADRPT
+E	\>?	!	BADRPT
 # word start:
 E	\<abcd	  abcd	(2,6)
 E	\<ab	cab	NOMATCH
 E$	\\<ab	\nab	(1,3)
 E	\<tag	::tag	(2,5)
-#word end:
+# word end:
 E	abc\>	abc	(0,3)
 E	abc\>	abcd	NOMATCH
 E$	abc\\>	abc\n	(0,3)
 E	abc\>	abc::	(0,3)
+
+E	\<abc	abcabc abc\n\nabc	(0,3)
+E	\<	  ab a aaa  		(2,2)
+}
 # word boundary:
 {E	\babcd	abcd	(0,4)		perl \b not supported
 E	\babcd	:abcd:	(1,5)		perl \b not supported
@@ -373,6 +381,8 @@ E	abc\b	abc	(0,3)
 E	abc\b	abcd	NOMATCH
 E$	abc\\b	abc\n	(0,3)
 E	abc\b	abc::	(0,3)
+
+E	\b	  abb a abbb 	(0,0)
 }
 # within word:
 {E	\B	ab	(1,1)		perl \B not supported
@@ -477,7 +487,7 @@ E	a(b|c)*d	abcd	(0,4)(2,3)
 E	a(b|c)+d	abd	(0,3)(1,2)
 E	a(b|c)+d	abcd	(0,4)(2,3)
 E	a(b|c?)+d	ad	(0,2)(1,1)
-E	a(b|c?)+d	abcd	(0,4)(3,3)
+E	a(b|c?)+d	abcd	(0,4)(2,3)
 E	a(b|c){0,0}d	ad	(0,2)
 E	a(b|c){0,1}d	ad	(0,2)
 E	a(b|c){0,1}d	abd	(0,3)(1,2)
@@ -497,8 +507,8 @@ E	a(b|c){2,4}d	abcbd	(0,5)(3,4)
 E	a(b|c){2,4}d	abcbcd	(0,6)(4,5)
 E	a(b|c){2,}d	abcd	(0,4)(2,3)
 E	a(b|c){2,}d	abcbd	(0,5)(3,4)
-E	a(b+|((c)*))+d	abd	(0,3)(2,2)(2,2)
-E	a(b+|((c)*))+d	abcd	(0,4)(3,3)(3,3)
+E	a(b+|((c)*))+d	abd	(0,3)(1,2)
+E	a(b+|((c)*))+d	abcd	(0,4)(2,3)(2,3)(2,3)
 
 # - match_default normal REG_EXTENDED REG_STARTEND REG_NOSPEC literal
 L	\**?/{}	\**?/{}	(0,7)
@@ -729,7 +739,7 @@ Exz	[\S]	!	(0,1)
 Exz	\S+	  abc  	(2,5)
 }
 # - match_default normal REG_EXTENDED REG_STARTEND
-{E	\Qabc	!	NOMATCH		regex++ \Q not supported
+{E	\Qabc	abc	(0,3)		regex++ \Q not supported
 E	\Qabc\E	abcd	(0,3)
 E	\Qabc\Ed	abcde	(0,4)
 E	\Q+*?\\E	+*?\\	(0,4)
@@ -746,7 +756,7 @@ E	\X+	\2489\2494	(0,2)
 }
 
 # - match_default normal REG_EXTENDED REG_STARTEND
-E	\Aabc	abc	(0,3)
+{E	\Aabc	abc	(0,3)		regex++ \A not supported
 E	\Aabc	aabc	NOMATCH
 E	a\Aab	abc	NOMATCH
 E	abc\z	abc	(0,3)
@@ -755,7 +765,8 @@ E$	abc\\z	abc\n\n	NOMATCH
 E$	abc\\Z	abc\n	(0,3)
 E$	abc\\Z	abc\n\n	(0,3)
 E	abc\Z	abc	(0,3)
-
+E	\Aabc	abc   abc	(0,3)
+}
 
 {E	\Gabc	abc	(0,3)		perl \G not supported
 E	\G\w+\W+	abc  abc a cbbb   	(0,5)
@@ -778,8 +789,6 @@ E$	a	\na\na\na\naa	(1,2)
 E$	^	   \n\n  \n\n\n	(0,0)
 E$	^ab	ab  \nab  ab\n	(0,2)
 E$	^[^\n]*\n	   \n  \n\n  \n	(0,4)
-E	\<abc	abcabc abc\n\nabc	(0,3)
-E	\<	  ab a aaa  	(2,2)
 
 E	abc	abc	(0,3)
 E	abc	 abc abcabc 	(1,4)
@@ -787,10 +796,6 @@ E$	\n\n	 \n\n\n       \n      \n\n\n\n  	(1,3)
 
 E$	$	   \n\n  \n\n\n	(10,10)
 En$	$	   \n\n  \n\n\n	(3,3)
-
-E	\Aabc	abc   abc	(0,3)
-E	\<\w+\W+	 aa  aa  a 	(1,5)
-E	\b	  abb a abbb 	(0,0)
 
 # - match_default normal REG_EXTENDED REG_STARTEND REG_GREP REG_ICASE
 Ei	A	 a a a aa	(1,2)
@@ -885,9 +890,9 @@ En$	.$	  \n  \r\n  	(1,2)
 #
 # non-greedy repeats added 21/04/00
 # - match_default normal REG_EXTENDED
-E	a**	aaa	(0,3)
 E	a{1,3}{1}	!	BADRPT
 {E	a*?	aa	(0,0)		non-greedy repeats not supported
+E	a**	aaa	(0,3)
 E	a??	aa	(0,0)
 E	a++	!	BADRPT
 E	a+?	aa	(0,1)

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -680,7 +681,9 @@ hix_event(Hix_t* hix, int op, void* arg, Hixdisc_t* disc)
 		}
 		f->cdbdisc.version = CDB_VERSION;
 		f->cdbdisc.schema = f->schema;
-		f->cdbdisc.details = f->details ? f->details : ((Local_t*)f->record->symbol->local.pointer)->file->details;
+		f->cdbdisc.details = f->details ? f->details :
+			((Local_t*)f->record->symbol->local.pointer)->file ?
+			((Local_t*)f->record->symbol->local.pointer)->file->details : (char*)0;
 		f->cdbdisc.errorf = (Cdberror_f)errorf;
 		f->cdbdisc.eventf = cdb_event;
 		message((-1, "cdb: open %s f=%p fp=%p schema=%s offset=%lld flags=%s details=%s", hix->name, f, ip, f->cdbdisc.schema, sftell(ip), cdbflags(NiL, CDB_READ|CDB_TERMINATED|state.cdb_flags|((error_info.trace<=-8)?((error_info.trace<=-11)?(CDB_DUMP|CDB_VERBOSE):CDB_DUMP):0)), f->cdbdisc.details));

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -49,9 +50,9 @@ MAIN()
 
 	/* on some system (eg, apple), lseek does not set errno for this case */
 	errno = 0;
-	lseek(fw->file, (off_t)(-2), SEEK_SET);
+	lseek(sffileno(fw), (off_t)(-2), SEEK_SET);
 	lseek_errno = errno;
-	lseek(fw->file, (off_t)0, SEEK_SET);
+	lseek(sffileno(fw), (off_t)0, SEEK_SET);
 	errno = 0;
 
 	if(sfseek(fw, (Sfoff_t)(-2), SEEK_SET) != (Sfoff_t)(-1) )
@@ -68,7 +69,7 @@ MAIN()
 	if(pipe(fds) < 0)
 		terror("Can't create pipes");
 
-	if(!(fw = sfnew(fw, NIL(Void_t*), -1, fds[1], SF_WRITE)) )
+	if(!(fw = sfnew(fw, NIL(Void_t*), (size_t)SF_UNBOUND, fds[1], SF_WRITE)) )
 		terror("Can't create stream for pipe");
 
 	errno = 0;

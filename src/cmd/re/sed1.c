@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -163,10 +164,8 @@ addr(Text *script, Text *t)
 		break;
 	case '\\':
 		t->w++;
-		if(*t->w=='\n' ||*t->w=='\\')
-			syntax("bad regexp delimiter");
 	case '/':
-		n = recomp(&rebuf, t) | REGADR;
+		n = recomp(&rebuf, t, 0) | REGADR;
 		break;
 	case '0': case '1': case '2': case '3': case '4':
 	case '5': case '6': case '7': case '8': case '9':
@@ -440,73 +439,17 @@ qc(Text *script, Text *t)
 void
 sc(Text *script, Text *t)
 {
-	int c, flags, re, nsub;
-	word *q;
-	int n = -1;
-	int delim = *t->w;
-	switch(delim) {
-	case '\n':
-	case '\\':
-		syntax("improper delimiter");
-	}
-	re = recomp(&rebuf, t);
-	putint(script, re);
-	nsub = readdr(re)->re_nsub;
-	flags = script->w - script->s;
-	putint(script, 0);		/* space for flags */
-	while((c=*t->w++) != delim) {
-		assure(script, 3+sizeof(word*));
-		if(c == '\n')
-			syntax("unterminated command");
-		else if(c == '\\') {
-			int d = *t->w++;
-			if(d==delim)
-				;
-			else if(d=='&' || d=='\\')
-				*script->w++ = c;
-			else if(d>='0' && d<='9') {
-				if(d > '0'+nsub)
-					syntax("improper backreference");
-				*script->w++ = c;
-			}
-			c = d;
-		}
-		*script->w++ = c;
-	}
-	*script->w++ = 0;
+	regex_t* re;
+	int n;
+	n = recomp(&rebuf, t, 1);
+	putint(script, n);
+	re = readdr(n);
+	if(n = regsubcomp(re, (char*)t->w, NiL, 0, 0))
+		badre(re, n);
+	t->w += re->re_npat;
 	script->w = (unsigned char*)wordp(script->w);
-	q = (word*)(script->s + flags);
-	*q = 0;
-	for(;;) {
-		switch(*t->w) {
-		case '0': case '1': case '2': case '3': case '4':
-		case '5': case '6': case '7': case '8': case '9':
-			if(n != -1)
-				syntax("extra flags");
-			n = number(t);
-			if(n == 0 || (n&(PFLAG|WFLAG)) != 0)
-				syntax("count out of range");
-			continue;
-		case 'p':
-			if(*q & PFLAG)
-				syntax("extra flags");
-			t->w++;
-			*q |= PFLAG;
-			continue;
-		case 'g':
-			t->w++;
-			if(n != -1)
-				syntax("extra flags");
-			n = 0;
-			continue;
-		case 'w':
-			t->w++;
-			*q |= WFLAG;
-			wc(script, t);
-		}
-		break;
-	}
-	*q |= n==-1? 1: n;
+	if(re->re_sub->re_flags & REG_SUB_WRITE)
+		wc(script, t);
 }
 
 void

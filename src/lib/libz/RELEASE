@@ -1,3 +1,5 @@
+02-06-11 add uSize == unsigned _ast_intmax_t; fix header size check
+02-05-22 zconf.h: fix __32BIT__ logic
 02-03-11 infblock.c: apply double free patch
 02-03-09 gzio.c: add stream->fatal to mark fatal errors previously ignored
 	 sfdcgzip.c: fix exception return values and mark SF_ERROR on fatal

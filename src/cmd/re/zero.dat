@@ -1,5 +1,7 @@
 : regex zero width extension tests 2001-05-25
 
+{E	(?#aha)a		a		(0,1)	(?...) not supported
+
 # comments
 
 E	(?#aha)abc(?# foo )	aaabczz		(2,5)
@@ -181,12 +183,11 @@ E	abc(foo)(bar)		abcabcfoobar	(3,12)(6,9)(9,12)
 
 # external callouts
 
-{E	abc(?{ABC})			<abc>		(1,4){ABC}(1:1)		external callouts supported
+{E	abc(?{ABC})			<abc>		(1,4){ABC}(1:1)		external callouts not supported
 E	(abc(?{ABC})|xyz(?{XYZ}))	<abc>		(1,4)(1,4){ABC}(1:1)
 E	(abc(?{ABC})|xyz(?{XYZ}))+	<abcxyz>	(1,7)(4,7){ABC}(1:4){XYZ}(2:1)
 E	(abc(?{1ABC})|xyz(?{XYZ}))+	<abcxyz>	(4,7)(4,7){1ABC}(1:4){XYZ}(2:1)
 E	(a.c(?{1ABC})|abc(?{XYZ}))	<abcxyz>	(1,4)(1,4){1ABC}(1:4){XYZ}(2:4)
-E	(a.c(?{-1ABC})|abc(?{XYZ}))	<abcxyz>	NOMATCH
 
 K	abc~({ABC})			<abc>		(1,4){ABC}(1:1)
 K	(abc~({ABC})|xyz~({XYZ}))	<abc>		(1,4)(1,4){ABC}(1:1)
@@ -201,6 +202,7 @@ K	((abc~({ABC}))|(*c~({XYZ})))	<abcxyz>	(0,4)(0,4)(?,?)(0,4)
 Km	((abc~({ABC}))|(*c~({XYZ})))	<abcxyz>	(0,4)(0,4)(?,?)(0,4)
 K	(a?c~({ABC})|abc~({XYZ}))	<abcxyz>	(1,4)(1,4){ABC}(1:4){XYZ}(2:4)
 K	(a?c~({1ABC})|abc~({XYZ}))	<abcxyz>	(1,4)(1,4){1ABC}(1:4){XYZ}(2:4)
-K	(a?c~({-1ABC})|abc~({XYZ}))	<abcxyz>	NOMATCH
+
+}
 
 }

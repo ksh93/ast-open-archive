@@ -1,3 +1,6 @@
+02-06-26 opt.tst: fix debug locale message numbers
+02-05-16 date.dat: add '60+n min/sec ago' tests for n min/sec after the hour
+	 data.dat,datey2k.dat: update for %u addition to tmfmt()
 02-03-14 opt.tst: update \f...\f --keys tests
 02-02-02 sfio/(tclose|ttpopenrw|ttell).c: add alarm to handle hung coproc
 02-01-27 sfio/terror.h: handle non-idempotent <varargs.h>

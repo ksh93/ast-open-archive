@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -39,7 +40,7 @@ main()
 	if(pipe(p) < 0 )
 		terror("Making pipe for communication");
 
-	if(!(fr = sfnew(0, 0, SF_UNBOUND, p[0], SF_READ)) )
+	if(!(fr = sfnew(0, 0, (size_t)SF_UNBOUND, p[0], SF_READ)) )
 		terror("Making read stream");
 
 	for(i = 0; i < sizeof(wbuf); ++i)

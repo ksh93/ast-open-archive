@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -44,7 +45,7 @@ MAIN()
 	sfseek(fp,(Sfoff_t)0,0);
 	sfset(fp,SF_WRITE,0);
 	sfsetbuf(fp,NIL(char*),0);
-	sfsetbuf(fp,NIL(char*),SF_UNBOUND);
+	sfsetbuf(fp,NIL(char*),(size_t)SF_UNBOUND);
 
 	for(i = 0; i < 256; ++i)
 	{	if(sfread(fp,rbuf,sizeof(rbuf)) != sizeof(rbuf))

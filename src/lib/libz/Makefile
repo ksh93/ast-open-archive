@@ -31,7 +31,9 @@ example :: example.c -lz
 
 minigzip :: minigzip.c -lz
 
-test : example minigzip
-	$(*:N=*example)
-	echo hello world | $(*:N=*minigzip) | $(*:N=*minigzip) -d 
-	rm -f foo.gz
+test : example example.out minigzip minigzip.out
+	( $(*:N=*example); echo $? ) > test.tmp
+	cmp -s test.tmp $(*:N=*example.out) || echo example test failed
+	( echo hello world | $(*:N=*minigzip) | $(*:N=*minigzip) -d; echo $? ) > test.tmp
+	cmp -s test.tmp $(*:N=*minigzip.out) || echo minigzip test failed
+	rm -f foo.gz test.tmp

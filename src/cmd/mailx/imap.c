@@ -654,7 +654,7 @@ imapop(register Imap_t* imap)
 	if ((z = s + sfvalue(imap->rp)) > s && --z > s && *(z - 1) == '\r')
 		*--z = 0;
 	if (TRACING('m'))
-		note(0, "imap: mesg %s", s);
+		note(ERROR, "imap: mesg %s", s);
 
 	/*
 	 * tag or *
@@ -674,7 +674,7 @@ imapop(register Imap_t* imap)
 		op = imap->op + n;
 	}
 	if (op->state != IMAP_STATE_sent)
-		note(0, "imap: %d: internal error -- unknown operation", n);
+		note(ERROR, "imap: %d: internal error -- unknown operation", n);
 
 	/*
 	 * clear/allocate the local response vm
@@ -708,7 +708,7 @@ imapop(register Imap_t* imap)
 	op->code = (xp = (Imaplex_t*)strsearch(imapresponse, elementsof(imapresponse), sizeof(Imaplex_t), stracmp, b, NiL)) ? xp->code : IMAP_UNKNOWN;
 	op->count = n;
 	if (TRACING('r'))
-		note(0, "imap: recv %d %s %d %s", op - imap->op, imapname(imapresponse, elementsof(imapresponse), op->code), op->count, s);
+		note(ERROR, "imap: recv %d %s %d %s", op - imap->op, imapname(imapresponse, elementsof(imapresponse), op->code), op->count, s);
 
 	/*
 	 * if the message has imbedded literals there's
@@ -740,7 +740,7 @@ imapop(register Imap_t* imap)
 		if ((z = s + sfvalue(imap->rp)) > s && --z > s && *(z - 1) == '\r')
 			*--z = 0;
 		if (TRACING('m'))
-			note(0, "imap: mesg %s", s);
+			note(ERROR, "imap: mesg %s", s);
 	}
 	if (bt)
 	{
@@ -980,7 +980,7 @@ imap_FETCH(Imap_t* imap, register Imapop_t* op)
 					*s = '[';
 				}
 				if ((TRACING('u')) && !xp)
-					note(0, "imap: %s: unknown response", ap->value.name);
+					note(ERROR, "imap: %s: unknown response", ap->value.name);
 			}
 			if (ap = ap->next)
 			{
@@ -1014,7 +1014,7 @@ imap_FETCH(Imap_t* imap, register Imapop_t* op)
 					break;
 				}
 				else if (TRACING('u'))
-					note(0, "imap: %s: unknown FETCH response", ap->value.name);
+					note(ERROR, "imap: %s: unknown FETCH response", ap->value.name);
 				ap = ap->next;
 			}
 		}
@@ -1076,7 +1076,7 @@ imaprecv(register Imap_t* imap, register Imapop_t* wp)
 	{
 		if (wp->code)
 			return wp;
-		note(0, "imap: %d: operation never sent", wp - imap->op);
+		note(ERROR, "imap: %d: operation never sent", wp - imap->op);
 		return 0;
 	}
 	else
@@ -1087,14 +1087,14 @@ imaprecv(register Imap_t* imap, register Imapop_t* wp)
 		{
 		case 0:
 			if (wp)
-				note(0, "imap: %d: operation not completed", wp - imap->op);
+				note(ERROR, "imap: %d: operation not completed", wp - imap->op);
 			break;
 		case 1:
 			if (op = imapop(imap))
 			{
 				if (TRACING('a'))
 				{
-					note(0, "imap: exec op %d count %d", op->code, op->count);
+					note(ERROR, "imap: exec op %d count %d", op->code, op->count);
 					for (ap = op->args.head; ap; ap = ap->next)
 						imapdumparg(imap, ap, 0);
 				}
@@ -1144,11 +1144,11 @@ imaprecv(register Imap_t* imap, register Imapop_t* wp)
 					{
 						n = op->count - imap->mailbox.exists;
 						if (n > 0)
-							note(0, "(NOTE %d new message%s incorporated)", n, n == 1 ? "" : "s");
+							note(ERROR, "(NOTE %d new message%s incorporated)", n, n == 1 ? "" : "s");
 						else if (n < 0)
 						{
 							n = -n;
-							note(0, "(NOTE %d message%s delected by another session)", n, n == 1 ? "" : "s");
+							note(ERROR, "(NOTE %d message%s delected by another session)", n, n == 1 ? "" : "s");
 							vmclear(imap->vm);
 							state.msg.count = 0;
 						}
@@ -1220,7 +1220,7 @@ imaprecv(register Imap_t* imap, register Imapop_t* wp)
 							/*...INDENT*/
 							}
 						if (n && ap && ap->type == IMAP_string)
-							note(0, "imap: %s", ap->value.string);
+							note(ERROR, "imap: %s", ap->value.string);
 					}
 					break;
 				case IMAP_PREAUTH:
@@ -1245,7 +1245,7 @@ imaprecv(register Imap_t* imap, register Imapop_t* wp)
 			}
 			continue;
 		default:
-			note(0, "imap: lost server connection");
+			note(ERROR, "imap: lost server connection");
 			break;
 		}
 		break;
@@ -1348,10 +1348,10 @@ imapvsend(register Imap_t* imap, int retain, const char* fmt, va_list ap)
 	}
 	s = sfstruse(imap->tp);
 	if (TRACING('s'))
-		note(0, "imap: send %s", s);
+		note(ERROR, "imap: send %s", s);
 	if (sfprintf(imap->sp, "%s\r\n", s) < 0 || sfsync(imap->sp) < 0)
 	{
-		note(SYSTEM, "imap: server send error");
+		note(ERROR|SYSTEM, "imap: server send error");
 		i = 0;
 	}
 	if (!i)
@@ -1517,7 +1517,7 @@ imapconnect(register Imap_t* imap)
 	svc = sfstruse(imap->tp);
 	if ((fd = csopen(&cs, svc, 0)) < 0)
 	{
-		note(SYSTEM, "imap: %s: cannot connect to service", svc);
+		note(ERROR|SYSTEM, "imap: %s: cannot connect to service", svc);
 		return -1;
 	}
 	if (!(imap->sp = sfnew(NiL, NiL, SF_UNBOUND, fd, SF_WRITE)) ||
@@ -1530,16 +1530,16 @@ imapconnect(register Imap_t* imap)
 		}
 		else
 			close(fd);
-		note(SYSTEM, "imap: %s: cannot buffer service", svc);
+		note(ERROR|SYSTEM, "imap: %s: cannot buffer service", svc);
 		return -1;
 	}
 	imap->connected = -1;
 	if (imapexec(imap, "CAPABILITY") || imap->version < IMAP_VERSION || imap->version == IMAP_VERSION && imap->revision < IMAP_REVISION)
 	{
 		if (imap->version)
-			note(SYSTEM, "imap: %s: service version %d.%d must be at least %d.%d", svc, imap->version, imap->revision, IMAP_VERSION, IMAP_REVISION);
+			note(ERROR|SYSTEM, "imap: %s: service version %d.%d must be at least %d.%d", svc, imap->version, imap->revision, IMAP_VERSION, IMAP_REVISION);
 		else
-			note(SYSTEM, "imap: %s: service connect error", svc);
+			note(ERROR|SYSTEM, "imap: %s: service connect error", svc);
 		goto drop;
 	}
 	if (!imap->authenticated)
@@ -1553,7 +1553,7 @@ imapconnect(register Imap_t* imap)
 		imap->authenticated = -1;
 		if (imapexec(imap, "%s", imap->meth))
 		{
-			note(SYSTEM, "imap: %s: service authentication error", svc);
+			note(ERROR|SYSTEM, "imap: %s: service authentication error", svc);
 			goto drop;
 		}
 		imap->authenticated = 1;
@@ -1628,9 +1628,9 @@ imapclose(register Imap_t* imap)
 			if (!(mp->m_flag & MDELETE))
 				n++;
 		if (n)
-			note(0, "Held %d message%s in %s", n, n == 1 ? "" : "s", state.path.mail);
+			note(ERROR, "Held %d message%s in %s", n, n == 1 ? "" : "s", state.path.mail);
 		else
-			note(0, "No more messages in %s", state.path.mail);
+			note(ERROR, "No more messages in %s", state.path.mail);
 	}
 	return imapexec(imap, "CLOSE");
 }
@@ -1677,7 +1677,7 @@ imap_setptr(char* name, int isedit)
 		s = sfstruse(imap->tp);
 		if (!(t = strchr(s, '/')))
 		{
-			note(0, "imap: %s: user name expected", name);
+			note(ERROR, "imap: %s: user name expected", name);
 			return -1;
 		}
 		*t++ = 0;
@@ -1738,7 +1738,7 @@ imap_msg(int m)
 
 			ip = (Imapmsg_t*)mp->m_info;
 			for (pp = ip->parts; pp; pp = pp->next)
-				note(0, "imap: message %d id=%s content=%s type=%s encoding=%s name=%s size=%d/%d", m, pp->id, imapname(imapcontent, elementsof(imapcontent), pp->content), pp->type, pp->encoding, pp->name, pp->lines, pp->size);
+				note(ERROR, "imap: message %d id=%s content=%s type=%s encoding=%s name=%s size=%d/%d", m, pp->id, imapname(imapcontent, elementsof(imapcontent), pp->content), pp->type, pp->encoding, pp->name, pp->lines, pp->size);
 		}
 	}
 	return mp;
@@ -1799,7 +1799,7 @@ imap_command(char* s)
 				sfprintf(sfstdout, "\n");
 			if (!(xp = (Imaplex_t*)strpsearch(imapdump, elementsof(imapdump), sizeof(imapdump[0]), s, &e)))
 			{
-				note(0, "%s: unknown dump item", s);
+				note(ERROR, "%s: unknown dump item", s);
 				goto list;
 			}
 			for (s = e; isspace(*s); s++);
@@ -2132,7 +2132,7 @@ imap_getatt(Msg_t* mp, register Imappart_t* pp, register char* name, unsigned lo
 	imap->copy.fp = sfstdout;
 	fileclose(imap->copy.fp);
 	if (flags & GDISPLAY)
-		note(0, "\"%s\" %s", name, counts(1, pp->lines, pp->size));
+		note(ERROR, "\"%s\" %s", name, counts(1, pp->lines, pp->size));
 	if ((flags & GMIME) &&
 	    mime(1) &&
 	    (s = mimeview(state.part.mime, NiL, name, pp->type, pp->options)) &&
@@ -2161,14 +2161,14 @@ imap_get1(char** argv, unsigned long flags)
 
 	if (state.msg.dot < state.msg.list || state.msg.dot >= state.msg.list + state.msg.count)
 	{
-		note(0, "No current message");
+		note(ERROR, "No current message");
 		return 1;
 	}
 	mp = imap_msg(state.msg.dot - state.msg.list + 1);
 	ip = (Imapmsg_t*)mp->m_info;
 	if (!ip->attachments || !(pp = ip->parts))
 	{
-		note(0, "No attachments in current message");
+		note(ERROR, "No attachments in current message");
 		return 1;
 	}
 	if (!*argv)
@@ -2223,7 +2223,7 @@ imap_get1(char** argv, unsigned long flags)
 			}
 			else
 			{
-				note(0, "%s: invalid attachment number", s);
+				note(ERROR, "%s: invalid attachment number", s);
 				while (*e && !isspace(*e))
 					e++;
 			}
@@ -2242,13 +2242,13 @@ imap_get1(char** argv, unsigned long flags)
 			while (pp->attachment != i)
 				if (!(pp = pp->next))
 				{
-					note(0, "%d: attachment number out of range", i);
+					note(ERROR, "%d: attachment number out of range", i);
 					r = 1;
 					goto done;
 				}
 			if (pp->content != IMAP_CONTENT_attachment)
 			{
-				note(0, "%d: not an attachment", i);
+				note(ERROR, "%d: not an attachment", i);
 				continue;
 			}
 			if (name = *argv)
@@ -2328,7 +2328,7 @@ imap_flags(register Imap_t* imap, Msg_t* mp, register int flags, char* op)
 	register int	c;
 
 	if (TRACING('z'))
-		note(0, "IMAP: smap_flags msg=%d flags=0x%04x op=%s", mp - state.msg.list + 1, flags, op);
+		note(ERROR, "IMAP: smap_flags msg=%d flags=0x%04x op=%s", mp - state.msg.list + 1, flags, op);
 	sfprintf(imap->tp, "STORE %d %sFLAGS.SILENT ", mp - state.msg.list + 1, op);
 	c = '(';
 	for (i = 0; i < elementsof(imapflags); i++)
@@ -2341,7 +2341,7 @@ imap_flags(register Imap_t* imap, Msg_t* mp, register int flags, char* op)
 	{
 		sfprintf(imap->tp, ")");
 		if (!imapsend(imap, 0, "%s", sfstruse(imap->tp)))
-			note(0, "%d: message flags not updated", mp - state.msg.list + 1);
+			note(ERROR, "%d: message flags not updated", mp - state.msg.list + 1);
 	}
 	else
 		sfstrset(imap->tp, 0);
@@ -2387,7 +2387,7 @@ imap_msglist(register char* s)
 	for (; isspace(*s); s++);
 	if (*s != '(')
 	{
-		note(0, "imap: %s: invalid SEARCH expression", s);
+		note(ERROR, "imap: %s: invalid SEARCH expression", s);
 		return 0;
 	}
 	t = ++s + strlen(s);
@@ -2452,7 +2452,7 @@ imap_save(register Msg_t* mp, char* folder)
 int
 imap_setptr(char* name, int isedit)
 {
-	note(0, "imap: support not enabled");
+	note(ERROR, "imap: support not enabled");
 	return -1;
 }
 

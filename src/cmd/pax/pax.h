@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -47,6 +48,7 @@
 #include <stdarg.h>
 #include <int.h>
 #include <sum.h>
+#include <ardir.h>
 
 #include "FEATURE/local"
 
@@ -69,9 +71,6 @@
 #define holedone(fd)	do if(state.hole){lseek(fd,state.hole-1,SEEK_CUR);state.hole=0;write(fd,"",1);} while(0)
 
 #define ropath(p)	(p[0]=='.'&&(p[1]==0||p[1]=='.'&&(p[2]==0||p[2]=='.'&&p[3]==0))||p[0]=='-'&&p[1]==0)
-
-#define REG_SUB_STOP	(REG_SUB_USER<<0)	/* stop on success	*/
-#define REG_SUB_VERBOSE	(REG_SUB_USER<<1)	/* list result		*/
 
 #define SECTION_CONTROL	1			/* control io		*/
 #define SECTION_DATA	2			/* data io		*/
@@ -277,48 +276,16 @@ typedef union tar_header_block Hdr_tar_t;
 #define PAX_FLAGS	IN|OUT
 
 /*
- * portable (object) archive
+ * object archive/library
  */
 
-#define PORTAR		10
-#define PORTAR_NAME	"portarch"
-#define PORTAR_DESC	"s5r2 portable object library"
-#define PORTAR_REGULAR	0
-#define PORTAR_SPECIAL	0
-#define PORTAR_HEADER	sizeof(portar_header)
-#define PORTAR_MAG	"!<arch>\n"
-#define PORTAR_MAGSIZ	8
-#define PORTAR_SYM	"(/ |_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*"
-#define PORTAR_END	"`\n"
-#define PORTAR_ENDSIZ	2
-#define PORTAR_TERM	'/'
-#define PORTAR_ALIGN	2
-#define PORTAR_FLAGS	IN
-
-typedef struct Hdr_portar_s	/* portar header			*/
-{
-	char	ar_name[16];
-	char	ar_date[12];	/* left-adj; decimal char*; blank fill	*/
-	char	ar_uid[6];	/*	"				*/
-	char	ar_gid[6];	/*	"				*/
-	char	ar_mode[8];	/* left-adj; octal char*; blank fill	*/
-	char	ar_size[10];	/* left-adj; decimal char*; blank fill	*/
-	char	ar_fmag[2];	/* PORTAR_END				*/
-} Hdr_portar_t;
-
-/*
- * ranlib (object) archive -- almost PORTAR
- */
-
-#define RANDAR		11
-#define RANDAR_NAME	"randarch"
-#define RANDAR_DESC	"BSD ranlib object library"
-#define RANDAR_REGULAR	0
-#define RANDAR_SPECIAL	0
-#define RANDAR_SYM	"(__.SYMDEF|__________E???X)*"
-#define RANDAR_TERM	' '
-#define RANDAR_ALIGN	PORTAR_ALIGN
-#define RANDAR_FLAGS	IN
+#define AR		10
+#define AR_NAME		"library"
+#define AR_DESC		"object library archive"
+#define AR_REGULAR	0
+#define AR_SPECIAL	0
+#define AR_ALIGN	2
+#define AR_FLAGS	IN
 
 /*
  * cql virtual directory archive
@@ -326,7 +293,7 @@ typedef struct Hdr_portar_s	/* portar header			*/
 
 #include <vdb.h>
 
-#define VDB		12
+#define VDB		11
 #define VDB_NAME	VDB_MAGIC
 #define VDB_DESC	"virtual database"
 #define VDB_REGULAR	DEFBUFFER
@@ -338,7 +305,7 @@ typedef struct Hdr_portar_s	/* portar header			*/
  * zip archive
  */
 
-#define ZIP		13
+#define ZIP		12
 #define ZIP_NAME	"zip"
 #define ZIP_DESC	"zip 2.1 / PKZIP 2.04g archive"
 #define ZIP_REGULAR	DEFBUFFER
@@ -352,7 +319,7 @@ typedef struct Hdr_portar_s	/* portar header			*/
  * ms cabinet file
  */
 
-#define CAB		14
+#define CAB		13
 #define CAB_NAME	"cab"
 #define CAB_DESC	"MS cabinet file"
 #define CAB_REGULAR	DEFBUFFER
@@ -382,7 +349,7 @@ typedef struct Cab_s
  * redhat rpm file
  */
 
-#define RPM		15
+#define RPM		14
 #define RPM_NAME	"rpm"
 #define RPM_DESC	"Redhat rpm package encapsulated cpio"
 #define RPM_REGULAR	DEFBUFFER
@@ -396,7 +363,7 @@ typedef struct Cab_s
  * mime multipart
  */
 
-#define MIME		16
+#define MIME		15
 #define MIME_NAME	"mime"
 #define MIME_DESC	"encapsulated mime"
 #define MIME_MAGIC	"--"
@@ -409,7 +376,7 @@ typedef struct Cab_s
  * ms outlook tnef -- how about zip + text name=value attributes?
  */
 
-#define TNEF		17
+#define TNEF		16
 #define TNEF_NAME	"tnef"
 #define TNEF_DESC	"MS outlook transport neutral encapsulation format"
 #define TNEF_MAGIC	0x223e9f78
@@ -423,6 +390,19 @@ typedef struct Tnef_s
 	char*		format;
 	off_t		offset;
 } Tnef_t;
+
+/*
+ * ms dos omf library
+ */
+
+#define OMF		17
+#define OMF_NAME	"omf"
+#define OMF_DESC	"DOS OMF library"
+#define OMF_MAGIC	0xf0
+#define OMF_REGULAR	DEFBUFFER
+#define OMF_SPECIAL	DEFBLOCKS
+#define OMF_ALIGN	0
+#define OMF_FLAGS	IN
 
 /*
  * compression pseudo formats -- COMPRESS is first
@@ -669,8 +649,6 @@ typedef struct Map_s			/* file name map list		*/
 {
 	struct Map_s*	next;		/* next in list			*/
 	regex_t		re;		/* compiled match re		*/
-	char*		into;		/* map into this		*/
-	int		flags;		/* resub() flags		*/
 } Map_t;
 
 typedef struct Post_s			/* post processing restoration	*/
@@ -711,6 +689,8 @@ typedef struct Convert_s		/* char code conversion		*/
 
 typedef struct Archive_s		/* archive info			*/
 {
+	Ardir_t*	ardir;		/* ardir(3) handle		*/
+	Ardirent_t*	ardirent;	/* ardir(3) current entry	*/
 	unsigned long	checksum;	/* running checksum		*/
 	int		compress;	/* compression index		*/
 	Convert_t	convert[SECTION_MAX];/* data/header conversion	*/
@@ -749,7 +729,6 @@ typedef struct Archive_s		/* archive info			*/
 	int		raw;		/* don't convert sections	*/
 	int		section;	/* current archive section	*/
 	int		selected;	/* number of selected members	*/
-	int		separator;	/* alternate directory seprator	*/
 	off_t		size;		/* size				*/
 	off_t		skip;		/* base archive skip offset	*/
 	struct stat	st;		/* memver stat			*/
@@ -946,7 +925,6 @@ extern State_t			state;
 
 extern char			alar_header[ALAR_LABEL];
 extern Hdr_binary_t		binary_header;
-extern Hdr_portar_t		portar_header;
 extern Hdr_tar_t		tar_header_block;
 extern char			zip_header[ZIP_HEADER];
 

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -238,6 +238,11 @@ prev ../../../include/ast/magic.h implicit
 prev ../../../include/ast/tm.h implicit
 prev ../../../include/ast/proc.h implicit
 prev ../../../include/ast/error.h implicit
+make ../../../include/ast/dirent.h implicit
+make ../../../include/ast/ast_dirent.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/ast_dirent.h
+done ../../../include/ast/dirent.h
 prev ../../../include/ast/ftwalk.h implicit
 prev ../../../include/ast/find.h implicit
 make ../../../include/ast/modex.h implicit

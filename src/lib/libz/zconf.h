@@ -48,11 +48,13 @@
 #  define Byte		z_Byte
 #  define uInt		z_uInt
 #  define uLong		z_uLong
+#  define uSize		z_uLong
 #  define Bytef	        z_Bytef
 #  define charf		z_charf
 #  define intf		z_intf
 #  define uIntf		z_uIntf
 #  define uLongf	z_uLongf
+#  define uSizef	z_uSizef
 #  define voidpf	z_voidpf
 #  define voidp		z_voidp
 #endif
@@ -60,7 +62,7 @@
 #if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && !defined(_UWIN) && !defined(__CYGWIN__)
 #  define WIN32
 #endif
-#if defined(__GNUC__) || defined(WIN32) || defined(__386__) || defined(i386)
+#if defined(__GNUC__) || defined(WIN32) || defined(__386__) || defined(i386) || defined(_WIN32) || defined(_UWIN) || defined(__CYGWIN__)
 #  ifndef __32BIT__
 #    define __32BIT__
 #  endif
@@ -219,31 +221,6 @@
 #   define FAR
 #endif
 
-#if !defined(MACOS) && !defined(TARGET_OS_MAC)
-typedef unsigned char  Byte;  /* 8 bits */
-#endif
-typedef unsigned int   uInt;  /* 16 bits or more */
-typedef unsigned long  uLong; /* 32 bits or more */
-
-#ifdef SMALL_MEDIUM
-   /* Borland C/C++ and some old MSC versions ignore FAR inside typedef */
-#  define Bytef Byte FAR
-#else
-   typedef Byte  FAR Bytef;
-#endif
-typedef char  FAR charf;
-typedef int   FAR intf;
-typedef uInt  FAR uIntf;
-typedef uLong FAR uLongf;
-
-#ifdef STDC
-   typedef void FAR *voidpf;
-   typedef void     *voidp;
-#else
-   typedef Byte FAR *voidpf;
-   typedef Byte     *voidp;
-#endif
-
 #ifdef HAVE_UNISTD_H
 #  include <sys/types.h> /* for off_t */
 #  include <unistd.h>    /* for SEEK_* and off_t */
@@ -256,6 +233,37 @@ typedef uLong FAR uLongf;
 #endif
 #ifndef z_off_t
 #  define  z_off_t long
+#endif
+
+#if !defined(MACOS) && !defined(TARGET_OS_MAC)
+typedef unsigned char  Byte;  /* 8 bits */
+#endif
+typedef unsigned int   uInt;  /* 16 bits or more */
+typedef unsigned long  uLong; /* 32 bits or more */
+#if _PACKAGE_ast
+typedef unsigned _ast_intmax_t	uSize; /* largest integer */
+#else
+typedef z_off_t                 uSize; /* largest integer */
+#endif
+
+#ifdef SMALL_MEDIUM
+   /* Borland C/C++ and some old MSC versions ignore FAR inside typedef */
+#  define Bytef Byte FAR
+#else
+   typedef Byte  FAR Bytef;
+#endif
+typedef char  FAR charf;
+typedef int   FAR intf;
+typedef uInt  FAR uIntf;
+typedef uLong FAR uLongf;
+typedef uSize FAR uSizef;
+
+#ifdef STDC
+   typedef void FAR *voidpf;
+   typedef void     *voidp;
+#else
+   typedef Byte FAR *voidpf;
+   typedef Byte     *voidp;
 #endif
 
 /* MVS linker does not support external names larger than 8 bytes */

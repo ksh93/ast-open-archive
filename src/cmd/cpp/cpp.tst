@@ -3147,7 +3147,7 @@ int line = 6;'
 
 
 "AFX_COLL_SEG": ".text$AFX_COL1";
-#pragma code_seg (".text$"  "AFX_COL1")'
+#pragma code_seg (".text$" "AFX_COL1")'
 	EXEC -I-D
 		INPUT - $'#pragma pp:nopragmaexpand
 #pragma pp:catliteral
@@ -3175,7 +3175,7 @@ int line = 6;'
 
 
 "AFX_COLL_SEG" : ".text$" "AFX_COL1" ;
-#pragma code_seg (".text$"  "AFX_COL1")'
+#pragma code_seg (".text$" "AFX_COL1")'
 	EXEC -I-D
 		INPUT - $'#pragma pp:nopragmaexpand
 #pragma pp:nocatliteral
@@ -3425,3 +3425,21 @@ l (buf, size, n, sp) char* buf;size_t size;size_t n;Xfio_t* sp;
 m (sp) Xfio_t* sp;
 # 13
 {}'
+
+TEST 15 'pragma passing'
+	EXEC -I-D
+		INPUT - $'
+#pragma option push -b -a8 -pc -A- /*P_O_Push*/
+#pragma 	 option 	 push 	 -b 	 -a8 	 -pc 	 -A- 	 /*P_O_Push*/
+#pragma 	 option 	 push 	 -b 	 -a8 	 -pc 	 -A- 	 -B- 	 /*P_O_Push*/
+#pragma 	 option 	 push 	 -b 	 -a8 	 -pc 	 -A- 	 -B-
+#pragma 	 option 	 push 	 @b 	 @a8 	 @pc 	 @A@ 	 @B@
+#pragma 	 option 	 push 	 %b 	 %a8 	 %pc 	 %A% 	 %B%'
+		OUTPUT - $'# 1 ""
+
+#pragma option push -b -a8 -pc -A-
+#pragma option push -b -a8 -pc -A-
+#pragma option push -b -a8 -pc -A- -B-
+#pragma option push -b -a8 -pc -A- -B-
+#pragma option push @b @a8 @pc @A@ @B@
+#pragma option push %b %a8 %pc %A% %B%'

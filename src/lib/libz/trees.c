@@ -1020,8 +1020,8 @@ void _tr_flush_block(s, buf, stored_len, eof)
  */
 int _tr_tally (s, dist, lc)
     deflate_state *s;
-    unsigned dist;  /* distance of matched string */
-    unsigned lc;    /* match length-MIN_MATCH or unmatched char (if dist==0) */
+    uInt dist;  /* distance of matched string */
+    uInt lc;    /* match length-MIN_MATCH or unmatched char (if dist==0) */
 {
     s->d_buf[s->last_lit] = (ush)dist;
     s->l_buf[s->last_lit++] = (uch)lc;

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -413,10 +414,13 @@ arscan(struct rule* r)
 	int		arfd;
 	struct dir*	d;
 
-	if (r->dynamic & D_scanned) return;
+	if (r->dynamic & D_scanned)
+		return;
 	r->dynamic |= D_scanned;
-	if (r->property & P_state) r->dynamic &= ~D_entries;
-	else if (!(d = unique(r))) r->dynamic |= D_entries;
+	if (r->property & P_state)
+		r->dynamic &= ~D_entries;
+	else if (!(d = unique(r)))
+		r->dynamic |= D_entries;
 	else if (r->scan >= SCAN_USER)
 	{
 #if DEBUG
@@ -434,12 +438,16 @@ arscan(struct rule* r)
 		message((-5, "scan archive %s", r->name));
 #endif
 		d->archive = 1;
-		if (walkar(d, arfd, r->name)) r->dynamic |= D_entries;
-		else r->dynamic &= ~D_entries;
-		closear(arfd);
+		if (walkar(d, arfd, r->name))
+			r->dynamic |= D_entries;
+		else
+			r->dynamic &= ~D_entries;
+		if (closear(arfd))
+			error(1, "%s: archive scan error", r->name);
 	}
 #if DEBUG
-	else message((-5, "arscan(%s) failed", r->name));
+	else
+		message((-5, "arscan(%s) failed", r->name));
 #endif
 }
 
@@ -874,7 +882,16 @@ bindfile(register struct rule* r, char* name, int flags)
 	if (r || (r = getrule(name)))
 	{
 		if ((r->property & P_state) || (r->property & P_virtual) && !(flags & BIND_FORCE)) return 0;
-		if (r->dynamic & D_alias) r = makerule(r->name);
+		if (r->dynamic & D_alias)
+		{
+			a = r;
+			r = makerule(r->name);
+			if (r == a)
+			{
+				error(1, "%s: alias loop", r->name);
+				r->dynamic &= ~D_alias;
+			}
+		}
 		if (r->dynamic & D_bound) return r;
 		if (!name) name = r->name;
 	}

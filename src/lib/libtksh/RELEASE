@@ -1,3 +1,4 @@
+02-06-25  include/nvextra.h: use an addaptable cheat for the namval offset
 02-03-17  update ksh private assoc array offsets -- should be a function call
 02-01-30  compensate for uts.390 lack of header guards for { select.h time.h }
 01-04-19  add HAVE_TIME_H HAVE_SYS_PARAM_H HAVE___FD_MASK tests to tclPort.h

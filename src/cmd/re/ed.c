@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -26,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ed (AT&T Labs Research) 2002-02-12 $\n]"
+"[-?\n@(#)$Id: ed (AT&T Labs Research) 2002-06-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ed - edit text]"
 "[+DESCRIPTION?\bed\b is a line-oriented text editor that has two modes:"
@@ -84,10 +85,6 @@ USAGE_LICENSE
 #define MATCH_MIN	'0'
 #define MATCH_MAX	'9'
 
-#define PRINT		01
-#define PRINT_LIST	02
-#define PRINT_NUMBER	04
-
 #define REC_IGNORE	001
 #define REC_LINE	002
 #define REC_SPLICE	004
@@ -99,6 +96,7 @@ USAGE_LICENSE
 #define CUR()		(ed.line)
 #define END(n)		(ed.line+ed.match[n].rm_eo)
 #define HIT(n)		(ed.match[n].rm_eo!=-1)
+#define NUL(n)		(ed.match[n].rm_so==ed.match[n].rm_eo)
 #define NXT()		(ed.line+=ed.match[0].rm_eo)
 #define SET(p,n)	(ed.line=(ed.base=(p))+(n))
 #define SWP(a,b)	(ed.swp=(a),(a)=(b),(b)=ed.swp)
@@ -106,7 +104,6 @@ USAGE_LICENSE
 #define error		fatal
 #define errorf		fatalf
 #define trap()		do{if(ed.caught)handle();}while(0)
-
 
 typedef struct
 {
@@ -128,7 +125,6 @@ static struct		/* program state -- no other dynamic globals */
 	Sfio_t*		prompt;
 	Sfio_t*		query;
 	Sfio_t*		shell;
-	Sfio_t*		substitute;
 	Sfio_t*		work;
 	}		buffer;
 	struct
@@ -150,8 +146,12 @@ static struct		/* program state -- no other dynamic globals */
 	Sfio_t*		iop;
 	Sfio_t*		msg;
 	Sfio_t*		tmp;
+	Sfio_t*		spl;
 	char*		base;
+	char*		spbeg;
+	char*		spend;
 	char*		global;
+	char*		input;
 	char*		line;
 	char*		linebreak;
 	char*		tmpfile;
@@ -187,66 +187,39 @@ static struct		/* program state -- no other dynamic globals */
 	Sfio_t*		swp;
 }			ed;
 
+#define REG_SUB_LIST	REG_SUB_USER
+
+static const regflags_t	submap[] =
+{
+	'g',	REG_SUB_ALL,
+	'l',	REG_SUB_LIST,
+	'n',	REG_SUB_NUMBER,
+	'p',	REG_SUB_PRINT,
+	'L',	REG_SUB_LOWER,
+	'U',	REG_SUB_UPPER,
+	0,	0
+};
+
 static void		commands(void);
 static void		handle(void);
 static void		quit(int);
 
 static void
-interrupt(int sig)
+eat(void)
 {
-	signal(sig, interrupt);
-	if (ed.initialized) {
-		if (!ed.caught)
-			ed.caught = sig;
+	if (ed.global)
+	{
+		if (!*ed.global++)
+			ed.global = 0;
+		ed.lastc = '\n';
 	}
-	else if (!ed.pending)
-		ed.pending = sig;
-}
-
-static int
-getchr(void)
-{
-	int	c;
-
-	if (ed.lastc = ed.peekc) {
-		ed.peekc = 0;
-		return ed.lastc;
-	}
-	if (ed.global) {
-		if (ed.lastc = *ed.global++)
-			return ed.lastc;
-		ed.global = 0;
-		return EOF;
-	}
-	if ((ed.lastc = sfgetc(sfstdin)) == EOF)
-		trap();
-        else if (ed.lastc == '\r') {
-                if ((c = sfgetc(sfstdin)) == '\n')
-                        ed.lastc = c;
-                else if (c != EOF)
-                        sfungetc(sfstdin, c);
-        }
-	return ed.lastc;
-}
-
-static ssize_t
-helpwrite(int fd, const void* buf, size_t len)
-{
-	ssize_t	n;
-
-	NoP(fd);
-	n = ed.help ? sfwrite(sfstderr, buf, len) : ed.verbose ? sfputr(ed.msg, "?", '\n') : 0;
-	sfstrset(ed.buffer.help, 0);
-	sfwrite(ed.buffer.help, buf, len - 1);
-	sfputc(ed.buffer.help, 0);
-	return n;
+	else
+		ed.input = 0;
 }
 
 static void
 reset(int level)
 {
-	register int	c;
-
 	if (level >= 2) {
 		if (ed.iop) {
 			sfclose(ed.iop);
@@ -258,13 +231,7 @@ reset(int level)
 		ed.print = 0;
 		ed.bytes = 0;
 		ed.lines = 0;
-		if (ed.global)
-			ed.lastc = '\n';
-		ed.global = 0;
-		ed.peekc = ed.lastc;
-		if (ed.lastc)
-			while ((c = getchr()) != '\n' && c != EOF)
-				;
+		eat();
 		if (ed.initialized)
 			longjmp(ed.again, 1);
 	}
@@ -296,6 +263,106 @@ errorf(const regex_t* re, regdisc_t* disc, int level, ...)
 }
 
 static void
+interrupt(int sig)
+{
+	signal(sig, interrupt);
+	if (ed.initialized) {
+		if (!ed.caught)
+			ed.caught = sig;
+	}
+	else if (!ed.pending)
+		ed.pending = sig;
+}
+
+static int
+getchr(void)
+{
+	int	n;
+
+	if (ed.lastc = ed.peekc) {
+		ed.peekc = 0;
+		return ed.lastc;
+	}
+	if (ed.global) {
+		if (ed.lastc = *ed.global++)
+			return ed.lastc;
+		ed.global = 0;
+		return EOF;
+	}
+	if (!ed.input) {
+		if (!(ed.input = sfgetr(sfstdin, '\n', 1))) {
+			trap();
+			return EOF;
+		}
+		if ((n = sfvalue(sfstdin) - 2) >= 0 && ed.input[n] == '\r')
+			ed.input[n--] = 0;
+		ed.spbeg = ed.input;
+		ed.spend = (n >= 0 && ed.input[n] == '\\') ? (ed.input + n) : (char*)0;
+	}
+	if (!(ed.lastc = *ed.input++)) {
+		ed.input = 0;
+		ed.lastc = '\n';
+	}
+	return ed.lastc;
+}
+
+static void
+splice(void)
+{
+	char*	s;
+	int	n;
+
+	if (ed.spend) {
+		if (!ed.spl && !(ed.spl = sfstropen()))
+			error(ERROR_SYSTEM|3, "cannot initialize splice buffer");
+		sfwrite(ed.spl, ed.spbeg, ed.spend - ed.spbeg);
+		ed.spend = 0;
+		sfputc(ed.spl, '\n');
+		while (s = sfgetr(sfstdin, '\n', 1)) {
+			if ((n = sfvalue(sfstdin) - 1) > 0 && s[n - 1] == '\r')
+				n--;
+			if (n > 0 && s[n - 1] == '\\') {
+				sfwrite(ed.spl, s, n - 1);
+				sfputc(ed.spl, '\n');
+			}
+			else {
+				sfwrite(ed.spl, s, n);
+				break;
+			}
+		}
+		ed.input = sfstruse(ed.spl) + (ed.input - ed.spbeg);
+	}
+}
+
+static char*
+input(int n)
+{
+	if (ed.peekc) {
+		ed.peekc = 0;
+		n--;
+	}
+	if (ed.global)
+		return ed.global += n;
+	else if (ed.input)
+		return ed.input += n;
+	else
+		return 0;
+}
+
+static ssize_t
+helpwrite(int fd, const void* buf, size_t len)
+{
+	ssize_t	n;
+
+	NoP(fd);
+	n = ed.help ? sfwrite(sfstderr, buf, len) : ed.verbose ? sfputr(ed.msg, "?", '\n') : 0;
+	sfstrset(ed.buffer.help, 0);
+	sfwrite(ed.buffer.help, buf, len - 1);
+	sfputc(ed.buffer.help, 0);
+	return n;
+}
+
+static void
 init(void)
 {
 	register Sfio_t**	ss;
@@ -308,7 +375,7 @@ init(void)
 	ed.redisc.re_version = REG_VERSION;
 	ed.redisc.re_errorf = errorf;
 	ed.re.re_disc = &ed.redisc;
-	ed.reflags = REG_DISCIPLINE;
+	ed.reflags = REG_DISCIPLINE|REG_DELIMITED;
 	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
 		ed.reflags |= REG_LENIENT;
 	ed.verbose = 1;
@@ -366,7 +433,7 @@ putrec(register char* s)
 	register int	n;
 	register char*	t;
 
-	if ((ed.print & PRINT_LIST) && (t = fmtesc(s))) {
+	if ((ed.print & REG_SUB_LIST) && (t = fmtesc(s))) {
 		s = t;
 		n = strlen(s);
 		while (n > BREAK_LINE) {
@@ -569,7 +636,7 @@ print(void)
 	nonzero();
 	a1 = ed.addr1;
 	do {
-		if (ed.print & PRINT_NUMBER)
+		if (ed.print & REG_SUB_NUMBER)
 			sfprintf(ed.msg, "%d\t", a1 - ed.zero);
 		putrec(lineget((a1++)->offset));
 	} while (a1 <= ed.addr2);
@@ -591,27 +658,36 @@ getnum(void)
 }
 
 static void
-compile(int delimiter)
+compile(void)
 {
 	register char*	s;
 	int		c;
 
-	s = getrec(ed.buffer.line, delimiter, 0);
+	s = input(0);
 	if (*s) {
-		if (ed.compiled) {
-			ed.compiled = 0;
-			regfree(&ed.re);
+		if (*s == *(s + 1))
+			input(2);
+		else {
+			if (ed.compiled) {
+				ed.compiled = 0;
+				regfree(&ed.re);
+			}
+			if (c = regcomp(&ed.re, s, ed.reflags)) {
+				regfatal(&ed.re, 2, c);
+				eat();
+			}
+			else
+				input(ed.re.re_npat);
+			ed.compiled = 1;
+			return;
 		}
-		if (c = regcomp(&ed.re, s, ed.reflags))
-			regfatal(&ed.re, 2, c);
-		ed.compiled = 1;
 	}
-	else if (!ed.compiled)
+	if (!ed.compiled)
 		error(2, "no previous regular expression");
 }
 
 static int
-execute(Line_t* addr)
+execute(Line_t* addr, regflags_t flags)
 {
 	register char*	s;
 	register int	c;
@@ -625,7 +701,7 @@ execute(Line_t* addr)
 		s = lineget(addr->offset);
 		SET(s, 0);
 	}
-	if (c = regexec(&ed.re, s, elementsof(ed.match), ed.match, ed.reflags)) {
+	if (c = regexec(&ed.re, s, elementsof(ed.match), ed.match, ed.reflags|flags)) {
 		if (c != REG_NOMATCH)
 			regfatal(&ed.re, 2, c);
 		return 0;
@@ -679,7 +755,8 @@ address(void)
 			sign = -sign;
 			/*FALLTHROUGH*/
 		case '/':
-			compile(c);
+			input(-1);
+			compile();
 			b = a;
 			for (;;) {
 				a += sign;
@@ -687,7 +764,7 @@ address(void)
 					a = ed.dol;
 				if (a > ed.dol)
 					a = ed.zero;
-				if (execute(a))
+				if (execute(a, 0))
 					break;
 				if (a == b)
 					error(2, "pattern not found");
@@ -749,15 +826,15 @@ newline(void)
 			return;
 
 		case 'l':
-			ed.print = PRINT_LIST;
+			ed.print = REG_SUB_LIST;
 			continue;
 
 		case 'n':
-			ed.print = PRINT_NUMBER;
+			ed.print = REG_SUB_NUMBER;
 			continue;
 
 		case 'p':
-			ed.print = PRINT;
+			ed.print = REG_SUB_PRINT;
 			continue;
 
 		default:
@@ -1235,9 +1312,7 @@ global(int sense, int query)
 		error(2, "recursive global not allowed");
 	setwide();
 	squeeze(ed.dol > ed.zero);
-	if ((c = getchr()) == '\n')
-		error(2, "incomplete global expression");
-	compile(c);
+	compile();
 	if (query)
 		newline();
 	else {
@@ -1247,7 +1322,7 @@ global(int sense, int query)
 	}
 	for (a1 = ed.zero; a1 <= ed.dol; a1++) {
 		a1->offset &= ~LINE_GLOBAL;
-		if (a1 >= ed.addr1 && a1 <= ed.addr2 && execute(a1) == sense)
+		if (a1 >= ed.addr1 && a1 <= ed.addr2 && execute(a1, 0) == sense)
 			a1->offset |= LINE_GLOBAL;
 	}
 
@@ -1300,126 +1375,33 @@ join(void)
 		rdelete(a1 + 1, ed.addr2);
 }
 
-static int
-compsub(void)
-{
-	register int	seof;
-	register int	c;
-
-	seof = getchr();
-	if (isspace(seof))
-		error(2, "invalid or missing delimiter");
-	compile(seof);
-	sfstruse(ed.buffer.substitute);
-	for (;;) {
-		c = getchr();
-		if (c == '\\') {
-			sfputc(ed.buffer.substitute, c);
-			c = getchr();
-		}
-		else if (c == '\n' || c == EOF) {
-			if (!ed.global || !ed.global[0]) {
-				ed.peekc = c;
-				ed.print |= PRINT;
-				break;
-			}
-		}
-		else if (c == seof)
-			break;
-		else if (c == '%' && !sfstrtell(ed.buffer.substitute) && ((ed.peekc = getchr()) == '\n' || ed.peekc == EOF || ed.peekc == seof)) {
-			if (!*sfstrbase(ed.buffer.substitute))
-				error(2, "no saved replacement string");
-			sfstrset(ed.buffer.substitute, sfstrsize(ed.buffer.substitute) - 1);
-			continue;
-		}
-		sfputc(ed.buffer.substitute, c);
-	}
-	sfputc(ed.buffer.substitute, 0);
-	if ((ed.peekc = getchr()) == 'g') {
-		ed.peekc = 0;
-		newline();
-		return -1;
-	}
-	c = getnum();
-	newline();
-	return c;
-}
-
-static void
-dosub(void)
-{
-	register char*	s;
-	register int	c;
-	register int	n;
-
-	sfstrset(ed.buffer.work, 0);
-	if (n = BEG(0) - BAS())
-		sfwrite(ed.buffer.work, BAS(), n);
-	s = sfstrbase(ed.buffer.substitute);
-	while (c = *s++) {
-		if (c == '&') {
-			if (n = END(0) - BEG(0))
-				sfwrite(ed.buffer.work, BEG(0), n);
-			continue;
-		}
-		if (c == '\\') {
-			c = *s++;
-			if (c >= MATCH_MIN && c <= MATCH_MAX) {
-				c -= MATCH_MIN;
-				if (HIT(c) && (n = END(c) - BEG(c)))
-					sfwrite(ed.buffer.work, BEG(c), n);
-				continue;
-			}
-		}
-		sfputc(ed.buffer.work, c);
-	}
-	n = sfstrtell(ed.buffer.work);
-	sfputr(ed.buffer.work, END(0), 0);
-	SWP(ed.buffer.work, ed.buffer.line);
-	SET(sfstrbase(ed.buffer.line), n);
-}
-
 static void
 substitute(int inglob)
 {
 	register Line_t*	a1;
-	register int		m;
-	int			g;
+	char*			s;
+	char*			e;
 	int			n;
 
 	n = getnum();
-	g = compsub();
-	if (g > 0) {
-		if (n)
-			error(2, "only one substitute count expected");
-		n = g;
-		g = 0;
+	compile();
+	splice();
+	if (n = regsubcomp(&ed.re, input(0), submap, n, 0))
+		regfatal(&ed.re, 2, n);
+	else {
+		if (!(ed.re.re_sub->re_flags & REG_SUB_FULL))
+			ed.re.re_sub->re_flags |= REG_SUB_PRINT;
+		if ((n = *input(ed.re.re_npat)) && n != '\r' && n != '\n')
+			error(2, "extra characters at end of command");
+		ed.print = ed.re.re_sub->re_flags;
 	}
+	eat();
 	for (a1 = ed.addr1; a1 <= ed.addr2; a1++) {
-		if (execute(a1)){
-			m = n;
-			do {
-				int	span = END(0) - BEG(0);
-
-				if (--m <= 0) {
-					dosub();
-					if (!g)
-						break;
-					if (!span) {
-						if (!*END(0))
-							break;
-						NXT();
-					}
-				}
-				else
-					NXT();
-			} while (execute(NiL));
-			if (m <= 0) {
-				char*	s;
-				char*	e;
-
+		if (execute(a1, 0)) {
+			if (!regsubexec(&ed.re, CUR(), elementsof(ed.match), ed.match)) {
 				inglob = 1;
-				s = sfstrbase(ed.buffer.line);
+				s = ed.re.re_sub->re_buf;
+				SET(s, ed.re.re_sub->re_len);
 				if (e = strchr(s, '\n'))
 					*e++ = 0;
 				replace(a1, s);
@@ -1498,7 +1480,7 @@ commands(void)
 
 	for (;;) {
 		trap();
-		if (ed.print) {
+		if (ed.print & (REG_SUB_LIST|REG_SUB_NUMBER|REG_SUB_PRINT)) {
 			ed.addr1 = ed.addr2 = ed.dot;
 			print();
 		}
@@ -1635,7 +1617,7 @@ commands(void)
 			continue;
 
 		case 'n':
-			ed.print |= PRINT_NUMBER;
+			ed.print |= REG_SUB_NUMBER;
 			newline();
 			print();
 			continue;
@@ -1652,7 +1634,7 @@ commands(void)
 			continue;
 
 		case 'l':
-			ed.print |= PRINT_LIST;
+			ed.print |= REG_SUB_LIST;
 			/*FALLTHROUGH*/
 		case 'p':
 			newline();

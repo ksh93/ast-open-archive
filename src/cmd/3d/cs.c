@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -21,6 +21,7 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -28,7 +29,11 @@
 
 #include "3d.h"
 
+#include <ctype.h>
+
 #define CS_LIB_LOCAL	1
+
+#define _3d_fmttime(a,b)	"[NOW]"
 
 #if FS
 

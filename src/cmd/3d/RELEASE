@@ -1,3 +1,7 @@
+02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR
+02-06-14 ast_3d.h,cs.c: move fmttime() macro override to cs.c
+02-06-06 dir3d.c: fix rewinddir() bug that did not decrement intercepted count
+02-04-01 Makefile,cs.c,cs_3d.h,ast_3d.h: _WIN32 tweaks
 01-11-26 pathreal.c: empty path is an error
 01-11-16 ftruncate3d.c,truncate3d.c: use lseek3d indirection via sysfunc()
 01-10-31 fchdir3d: add along with state.file[].dir to cache open dir paths

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2002-01-11
+# @(#)make.probe (AT&T Research) 2002-03-29
 #
 # C probe for make
 #
@@ -485,14 +485,14 @@ case $pic:$so:$dynamic:$static in
 				pic=-D_BLD_DLL
 				PIC=$pic
 				sd=.dll
-				so=.lib
+				so=.dll.a
 				ldscript=".def .exp .ign .res"
 				lib_dll=option
 				lib_all=-Wl,-whole-archive
 				lib_undef=-Wl,-no-whole-archive
-				shared='-shared -Wl,--enable-auto-image-base -Wl,--out-implib=$(<:N=*.lib)'
+				shared='-shared -Wl,--enable-auto-image-base -Wl,--out-implib=$(<:N=*'$so')'
 				prefix_dynamic=cyg
-				prefix_shared=
+				prefix_shared=lib
 				break
 			fi
 		fi

@@ -215,7 +215,9 @@ usermatch(const char* a, const char* b, int to)
 				*be = 0;
 			if (TRACING('x'))
 				note(0, "spam: user match  `%s'  `%s'", ap, bp);
-			if (*bp == '@') {
+			if (*bp == 0)
+				/* skip */;
+			else if (*bp == '@') {
 				bp++;
 				for (td = ad; td; td = strchr(td, '.'))
 					if (!strcasecmp(++td, bp))
@@ -228,7 +230,7 @@ usermatch(const char* a, const char* b, int to)
 				if (to && !strcasecmp(ap, state.var.user)) {
 					*ad = '@';
 					if (TRACING('x'))
-						note(0, "user addr check `%s' suspect domain", ap);
+						note(0, "spam: user addr check `%s' suspect domain", ap);
 					goto hit;
 				}
 				if (!strcasecmp(ap, bp) || strchr(ap, '!')) {
@@ -272,6 +274,8 @@ spammed(register struct msg* mp)
 	unsigned long	q;
 	unsigned long	x;
 	unsigned long	d;
+	int		ok;
+	int		no;
 	int		proper;
 	int		ours;
 	long		test;
@@ -289,11 +293,13 @@ spammed(register struct msg* mp)
 	if (headset(&pp, mp, NiL, NiL, NiL, GFROM)) {
 		d = state.var.spamdelay;
 		q = 0;
-		proper = 0;
+		ok = no = proper = 0;
 		ours = state.var.domain ? strlen(state.var.domain) : 0;
 		test = 0;
 		while (headget(&pp)) {
 			t = pp.name;
+			if (TRACING('h'))
+				note(0, "spam: head: `%s'", t);
 			if ((*t == 'X' || *t == 'x') && *(t + 1) == '-')
 				t += 2;
 			if (*t == 'A' || *t == 'a') {
@@ -307,9 +313,11 @@ spammed(register struct msg* mp)
 				if (!strcasecmp(t, "Content-Type")) {
 					t = skin(pp.data, GDISPLAY|GCOMPARE|GFROM);
 					if (TRACING('x'))
-						note(0, "spam: test 0x0001: content-type `%s'", t);
+						note(0, "spam: content-type `%s'", t);
 					if (!strncasecmp(t, "text/html", 9))
 						test |= 0x0001;
+					if (!strncasecmp(t, "multipart/related", 17))
+						test |= 0x0002;
 				}
 			}
 			else if (*t == 'F' || *t == 'f') {
@@ -394,17 +402,31 @@ spammed(register struct msg* mp)
 						if (addrmatch(state.var.user, t))
 							proper = 1;
 						if (state.var.spamtook && usermatch(t, state.var.spamtook, state.var.local != 0))
-							return 0;
+						{
+							if (TRACING('x'))
+								note(0, "spam: spamtook `%s'", t);
+							ok++;
+						}
 						if (state.var.spamto && usermatch(t, state.var.spamto, state.var.local != 0))
-							return 1;
+						{
+							if (TRACING('x'))
+								note(0, "spam: spamto `%s'", t);
+							no++;
+						}
 					} while (s = e);
 				}
 			}
 		}
+		if (TRACING('x'))
+			note(0, "spam: proper=%d ok=%d no=%d", proper, ok, no);
 		if (proper)
 			return 0;
 		if (test & state.var.spamtest)
 			return 1;
+		if (no > ok)
+			return 1;
+		if (ok > no)
+			return 0;
 	}
 	if (state.var.local) {
 		local = state.var.local;

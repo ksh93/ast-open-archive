@@ -75,4 +75,4 @@ BUILTINS :COMMAND: cmd.h
 
 :: PROMO.mm RELEASE
 
-:TEST: cut date expr join od paste tail tr uuencode
+:TEST: cut date expr join look od paste tail tr uuencode

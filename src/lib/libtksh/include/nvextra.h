@@ -73,11 +73,7 @@
 
 typedef struct Assoc
 {
-	long		dummy1;
-	void *		dummy2;
-	void *		dummy3;
-	void *		dummy4;
-	void *		dummy5;
+	char		pad[offsetof(Namval_t, nvalue)];
 	Namval_t	*namval;
 } Assoc;
 

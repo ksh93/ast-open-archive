@@ -68,11 +68,11 @@ struct internal_state;
 typedef struct z_stream_s {
     Bytef    *next_in;  /* next input byte */
     uInt     avail_in;  /* number of bytes available at next_in */
-    uLong    total_in;  /* total nb of input bytes read so far */
+    uSize    total_in;  /* total nb of input bytes read so far */
 
     Bytef    *next_out; /* next output byte should be put there */
     uInt     avail_out; /* remaining free space at next_out */
-    uLong    total_out; /* total nb of bytes output so far */
+    uSize    total_out; /* total nb of bytes output so far */
 
     char     *msg;      /* last error message, NULL if no error */
     struct internal_state FAR *state; /* not visible by applications */
@@ -707,7 +707,7 @@ ZEXTERN int ZEXPORT gzsetparams OF((gzFile file, int level, int strategy));
    opened for writing.
 */
 
-ZEXTERN int ZEXPORT    gzread  OF((gzFile file, voidp buf, unsigned len));
+ZEXTERN int ZEXPORT    gzread  OF((gzFile file, voidp buf, uInt len));
 /*
      Reads the given number of uncompressed bytes from the compressed file.
    If the input file was not in gzip format, gzread copies the given number
@@ -716,7 +716,7 @@ ZEXTERN int ZEXPORT    gzread  OF((gzFile file, voidp buf, unsigned len));
    end of file, -1 for error). */
 
 ZEXTERN int ZEXPORT    gzwrite OF((gzFile file, 
-				   const voidp buf, unsigned len));
+				   const voidp buf, uInt len));
 /*
      Writes the given number of uncompressed bytes into the compressed file.
    gzwrite returns the number of uncompressed bytes actually written

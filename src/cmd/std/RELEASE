@@ -1,3 +1,4 @@
+02-06-25 ps.c: handle %s vs. %d --format inconsistencies
 02-02-14 touch.c: explicit epoch dates (0) are different from now (also 0)
 	 locale.c: don't output on unknown keyword
 02-02-11 ps.c: validate input pid strings

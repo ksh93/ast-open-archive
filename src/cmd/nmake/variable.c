@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -43,6 +44,7 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 	register int		i;
 	register struct list*	p;
 	register struct rule*	x;
+	struct rule*		y;
 	struct rule*		z;
 	struct list*		prereqs[4];
 	struct list		t;
@@ -85,7 +87,7 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 							scanprereqs(sp, x, dostate, all, 0, sep);
 					}
 				}
-				else if (sp && (all || ((x->property & P_state) || x->scan || !r->scan) && !(x->property & (P_ignore|P_use|P_virtual)) && (!(x->property & P_dontcare) || x->time)))
+				else if (sp && (all || ((x->property & P_state) || x->scan || (y = staterule(PREREQS, x, NiL, 0)) && y->scan || !r->scan) && !(x->property & (P_ignore|P_use|P_virtual)) && (!(x->property & P_dontcare) || x->time)))
 				{
 					x->mark |= M_generate;
 					if (all || ((x->property & P_state) != 0) == dostate)

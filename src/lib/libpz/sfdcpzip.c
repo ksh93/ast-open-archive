@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -149,7 +150,7 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 			return -1;
 		m1 = s[0];
 		m2 = s[1];
-		r = m1 == PZ_MAGIC_1 && m2 == PZ_MAGIC_2 ||
+		r = m1 == PZ_MAGIC_1 && m2 == PZ_MAGIC_2 && s[2] > 0 && s[3] < 10 ||
 		    m1 == GZ_MAGIC_1 && m2 == GZ_MAGIC_2 &&
 		    s[PZ_GZ_MAGOFF] == PZ_GZ_MAGIC_1 && s[PZ_GZ_MAGOFF+1] == PZ_GZ_MAGIC_2;
 		sfread(sp, s, 0);

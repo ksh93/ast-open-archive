@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -142,7 +142,7 @@ done system.h
 done diff.h
 done diff.c
 prev diff.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2002 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Paul Eggert <eggert@twinsun.com>][-author?Richard Stallman <rms@gnu.ai.mit.edu>][-author?Mike Haertel][-author?David Hayes][-author?Len Tower][-copyright?Copyright (c) 1988-2002 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
 done diff.o generated
 make analyze.o
 make analyze.c
@@ -228,7 +228,7 @@ prev system.h implicit
 done diff3.c
 prev diff3.c
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2002 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Randy Smith][-copyright?Copyright (c) 1988-2002 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
 done diff3.o generated
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o diff3 diff3.o ${mam_libast}
@@ -242,7 +242,7 @@ prev system.h implicit
 done sdiff.c
 prev sdiff.c
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1992-2002 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Thomas Lord][-copyright?Copyright (c) 1992-2002 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
 done sdiff.o generated
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o sdiff sdiff.o ${mam_libast}

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -532,9 +533,16 @@ lockstate(register char* file)
 			if (remove(file) < 0)
 				error(3, "cannot remove lock file %s", file);
 		}
-		if (fstat(fd, &st) < 0)
-			error(3, "cannot stat lock file %s", file);
+
+		/*
+		 * fstat() here would be best but some systems
+		 * like cygwin which shall remain nameless
+		 * return different time values after the close()
+		 */
+
 		close(fd);
+		if (stat(file, &st) < 0)
+			error(3, "cannot stat lock file %s", file);
 		lockmtime = st.st_atime < st.st_mtime || st.st_ctime < st.st_mtime;
 		locktime = LOCKTIME(&st, lockmtime);
 	}

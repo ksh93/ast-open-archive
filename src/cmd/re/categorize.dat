@@ -1,0 +1,24 @@
+NOTE	regex implementation categorization
+
+?E	(aba|a*b)(aba|a*b)	ababa	(0,5)(0,2)(2,5)				EXPECTED
+?E	(aba|a*b)(aba|a*b)	ababa	(0,4)(0,3)(3,4)				leftmost first
+
+?E	(a*)(ab)*(b*)		abc	(0,2)(0,1)(?,?)(1,2)			right associative
+?E	(a*)(ab)*(b*)		abc	(0,2)(0,0)(0,2)(2,2)			left associative
+
+?E	((a*)(ab)*)((b*)(a*))	aba	(0,3)(0,2)(0,0)(0,2)(2,3)(2,2)(2,3)	subexpression precedence
+
+?E	(aba|a*b)*		abab	(0,4)(3,4)				ordered repeat
+
+?E	((x{2,4})*)(x)		xxxxxx	(0,6)(0,5)(3,5)(5,6)			EXPECTED
+?E	((x{2,4})*)(x)		xxxxxx	(0,6)(0,5)(2,5)(5,6)			subexpression repeat order INTERP
+?E	((x{2,4})*)(x)		xxxxxx	(0,6)(0,5)(0,4)(5,6)			subexpression repeat range BUG
+
+?E	(aba|a*b)*		ababa	(0,5)(2,5)				EXPECTED
+?E	(aba|a*b)*		ababa	(0,5)(3,4)				subexpression repeat short BUG
+
+?E	^(a(b)?)+$		aba	(0,3)(2,3)				EXPECTED
+?E	^(a(b)?)+$		aba	(0,3)(2,3)(1,2)				subexpression repeat artifact BUG
+
+?E	[ab]*([ab]*)		ab	(0,2)(2,2)				EXPECTED
+?E	[ab]*([ab]*)		ab	(0,2)(0,2)				subexpression preference BUG

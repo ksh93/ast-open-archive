@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -1082,49 +1083,28 @@ value(Expr_t* prog, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 				break;
 			case B_sub:
 				{
-					int		flags;
 					regex_t		re;
+					regflags_t	flags = 0;
+					int		minmatch = 0;
 					regmatch_t	match[10];
 
-					static Sfio_t*	sub;
-
-					if (!sub && !(sub = sfstropen()))
-						error(3, "out of space [sub]");
-					if (n = regcomp(&re, ((Extype_t*)env)[1].string, REG_AUGMENTED))
+					if ((n = regcomp(&re, ((Extype_t*)env)[1].string, REG_AUGMENTED|REG_LENIENT|REG_NULL)) || (n = regsubflags(&re, ((Extype_t*)env)[3].string, NiL, 0, NiL, &minmatch, &flags)) || (n = regsubcomp(&re, ((Extype_t*)env)[2].string, NiL, minmatch, flags)))
+					{
 						regfatal(&re, 2, n);
+						val.string = ((Extype_t*)env)[0].string;
+					}
 					else
 					{
-						flags = 0;
-						s = ((Extype_t*)env)[3].string;
-						for (;;)
-						{
-							switch (*s++)
-							{
-							case 0:
-								break;
-							case 'g':
-								flags |= REG_SUB_ALL;
-								continue;
-							case 'l':
-								flags |= REG_SUB_LOWER;
-								continue;
-							case 'u':
-								flags |= REG_SUB_UPPER;
-								continue;
-							}
-							break;
-						}
-						if (!(n = regexec(&re, ((Extype_t*)env)[0].string, elementsof(match), match, 0)))
-							n = regsub(&re, sub, ((Extype_t*)env)[0].string, ((Extype_t*)env)[2].string, elementsof(match), match, flags);
-						if (n)
+						if ((n = regexec(&re, ((Extype_t*)env)[0].string, elementsof(match), match, 0)) || (n = regsubexec(&re, ((Extype_t*)env)[0].string, elementsof(match), match)))
 						{
 							if (n != REG_NOMATCH)
 								regfatal(&re, 2, n);
-							sfputr(sub, ((Extype_t*)env)[0].string, -1);
+							val.string = ((Extype_t*)env)[0].string;
 						}
+						else
+							val.string = re.re_sub->re_buf;
 						regfree(&re);
 					}
-					val.string = sfstruse(sub);
 				}
 				break;
 			}

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -819,6 +820,14 @@ filein(register Archive_t* ap, register File_t* f)
 		case ALAR:
 		case IBMAR:
 			recordin(ap, f, wfd);
+			break;
+		case AR:
+			if (ap->ardirent->offset < 0)
+				error(3, "%s: read not supported for %s format", f->name, format[ap->format].name);
+			if (ardircopy(ap->ardir, ap->ardirent, wfd) < 0)
+				error(ERROR_SYSTEM|2, "%s: copy error", f->name);
+			closeout(ap, f, wfd);
+			setfile(ap, f);
 			break;
 		case CAB:
 			{

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -32,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2001-10-31 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2002-04-03 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -425,10 +426,10 @@ tw(register Ftw_t* ftw)
 			goto pop;
 		break;
 	case FTW_D:
-		ftw->ignorecase = (state.icase || (!ftw->level || !ftw->parent->ignorecase) && strchr(astconf("PATH_ATTRIBUTES", ftw->path, NiL), 'c')) ? STR_ICASE : 0;
+		ftw->ignorecase = (state.icase || (!ftw->level || !ftw->parent->ignorecase) && strchr(astconf("PATH_ATTRIBUTES", ftw->name, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	default:
-		ftw->ignorecase = ftw->level ? ftw->parent->ignorecase : (state.icase || strchr(astconf("PATH_ATTRIBUTES", ftw->path, NiL), 'c')) ? STR_ICASE : 0;
+		ftw->ignorecase = ftw->level ? ftw->parent->ignorecase : (state.icase || strchr(astconf("PATH_ATTRIBUTES", ftw->name, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	}
 	if (state.localfs && !ftwlocal(ftw))
@@ -508,7 +509,7 @@ main(int argc, register char** argv)
 	firstdir->name = ".";
 	state.action = LIST;
 	state.cmdflags = CMD_IMPLICIT|CMD_NEWLINE;
-	state.ftwflags = ftwflags();
+	state.ftwflags = ftwflags()|FTW_DELAY;
 	state.select = ALL;
 	state.separator = '\n';
 	memset(&disc, 0, sizeof(disc));
@@ -628,6 +629,8 @@ main(int argc, register char** argv)
 		eval(x, NiL);
 	if ((x = exexpr(state.program, "select", NiL, INTEGER)) || (x = exexpr(state.program, NiL, NiL, INTEGER)))
 		state.select = x;
+	if (!(state.ftwflags & FTW_PHYSICAL))
+		state.ftwflags &= ~FTW_DELAY;
 	if (traverse)
 	{
 		if (x = exexpr(state.program, "action", NiL, 0))
@@ -732,16 +735,14 @@ main(int argc, register char** argv)
 			disc.dirs = ap = av;
 			if (firstdir != lastdir)
 				firstdir = firstdir->next;
-			do {error(-1, "AHA dir %s", firstdir->name);*ap++ = firstdir->name;} while (firstdir = firstdir->next);
+			do {*ap++ = firstdir->name;} while (firstdir = firstdir->next);
 			*ap = 0;
 			if (!(state.find = findopen(codes, state.pattern, NiL, &disc)))
 				exit(1);
 			state.ftwflags |= FTW_TOP;
 			n = state.select == ALL ? state.act : ACT_EVAL;
-error(-1, "AHA pattern=%s codes=%s state.select=%p state.act=%d n=%d", state.pattern, codes, state.select, state.act, n);
 			while (s = findread(state.find))
 			{
-error(-1, "AHA n=%d s=%s", n, s);
 				switch (n)
 				{
 				case ACT_CMDARG:

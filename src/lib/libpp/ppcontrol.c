@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -32,8 +33,6 @@
 
 #include <regex.h>
 
-#define REG_SUB_NOT	REG_SUB_USER
-
 #define TOKOP_DUP	(1<<0)
 #define TOKOP_STRING	(1<<1)
 #define TOKOP_UNSET	(1<<2)
@@ -41,16 +40,13 @@
 struct edit
 {
 	struct edit*	next;
-	regex_t*	old;
-	char*		into;
-	int		flags;
+	regex_t		re;
 };
 
 struct map
 {
 	struct map*	next;
-	regex_t*	from;
-	regex_t*	to;
+	regex_t		re;
 	struct edit*	edit;
 };
 
@@ -194,11 +190,10 @@ macsym(int tok)
  */
 
 static char*
-getline(register char* p, char* x, int sep, int disable)
+getline(register char* p, char* x, int disable)
 {
 	register int	c;
 	register char*	s;
-	register int	last;
 	char*		b;
 	long		restore;
 
@@ -206,7 +201,6 @@ getline(register char* p, char* x, int sep, int disable)
 	pp.state &= ~(NEWLINE|NOSPACE|STRIP);
 	pp.state |= EOF2NL;
 	b = p;
-	last = 0;
 	while ((c = pplex()) != '\n')
 	{
 		if (disable)
@@ -222,52 +216,20 @@ getline(register char* p, char* x, int sep, int disable)
 					pp.state |= DISABLE;
 			}
 		}
-		if (c != ' ' || last == T_ID || ppisnumber(last))
-		{
-			if (last == ' ')
-				sep = 0;
-			else if (ppisseparate(c))
+		s = pp.token;
+		while (*p = *s++)
+			if (++p >= x)
 			{
-				if (sep)
-				{
-					*p++ = ' ';
-					if (p >= x)
-					{
-						p = 0;
-						goto done;
-					}
-				}
-				sep = c != '+' && c != '-';
+				p = 0;
+				goto done;
 			}
-			else
-			{
-				if (sep < 0)
-				{
-					*p++ = ' ';
-					if (p >= x)
-					{
-						p = 0;
-						goto done;
-					}
-				}
-				sep = 0;
-			}
-			s = pp.token;
-			while (*p = *s++)
-				if (++p >= x)
-				{
-					p = 0;
-					goto done;
-				}
-		}
-		if (sep >= 0)
-			last = c;
 	}
 	if (p > b && *(p - 1) == ' ')
 		p--;
 	if (p >= x)
 		p = 0;
-	else *p = 0;
+	else
+		*p = 0;
  done:
 	pp.state &= ~(NOSPACE|STRIP);
 	pp.state |= restore;
@@ -318,7 +280,6 @@ ppcontrol(void)
 		struct pplist*		list;
 		char*			string;
 		struct ppsymbol*	symbol;
-		Sfio_t*			sp;
 		int			type;
 		PPLINESYNC		linesync;
 	}				var;
@@ -544,7 +505,7 @@ ppcontrol(void)
 	p0 = p;
 	pp.mode |= EXPOSE;
 	pp.state |= HEADER;
-	p6 = getline(p, &pp.valbuf[MAXTOKEN], -1, 0);
+	p6 = getline(p, &pp.valbuf[MAXTOKEN], 0);
 	pp.state &= ~HEADER;
 	pp.mode &= ~EXPOSE;
 	if (!p6)
@@ -562,7 +523,7 @@ ppcontrol(void)
 	var.best = 0;
 	n = 0;
 	for (map = (struct map*)pp.maps; map; map = map->next)
-		if (!(i1 = regexec(map->from, p, elementsof(match), match, 0)))
+		if (!(i1 = regexec(&map->re, p, elementsof(match), match, 0)))
 		{
 			if ((c = match[0].rm_eo - match[0].rm_so) > n)
 			{
@@ -571,7 +532,7 @@ ppcontrol(void)
 			}
 		}
 		else if (i1 != REG_NOMATCH)
-			regfatal(map->from, 3, i1);
+			regfatal(&map->re, 3, i1);
 	c = '\n';
 	if (map = var.best)
 	{
@@ -582,50 +543,21 @@ ppcontrol(void)
 				error(1, "%s: non-standard directive", p);
 			*p0 = i0;
 		}
-		if (map->to) for (n = 1;;)
-		{
-			*p6++ = '\n';
-			s = p6;
-			if (!(p6 = getline(p6, &pp.valbuf[MAXTOKEN], 0, 0)))
-			{
-				*p0 = 0;
-				error(2, "%s: nesting directive too long", pp.valbuf);
-				c = 0;
-				goto eatdirective;
-			}
-			if (!(i1 = regexec(map->from, s, elementsof(match), match, 0))) n++;
-			else if (i1 != REG_NOMATCH) regfatal(map->from, 3, i1);
-			else if (!(i1 = regexec(map->to, s, elementsof(match), match, 0)))
-			{
-				if (!--n) break;
-			}
-			else if (i1 != REG_NOMATCH) regfatal(map->from, 3, i1);
-		}
 		if (!(*pp.control & SKIP))
 		{
-			var.sp = 0;
 			n = 0;
-			s = pp.tmpbuf;
 			for (edit = map->edit; edit; edit = edit->next)
-				if (!(edit->flags & REG_SUB_NOT) || !n)
+				if (!(i0 = regexec(&edit->re, p, elementsof(match), match, 0)))
 				{
-					if (!(i0 = regexec(edit->old, p, elementsof(match), match, 0)))
-					{
-						n++;
-						if (!(var.sp = sfnew(var.sp, s, PPBUFSIZ, -1, SF_WRITE|SF_STRING)))
-							regfatal(edit->old, 3, REG_ESPACE);
-						if (i0 = regsub(edit->old, var.sp, p, edit->into, elementsof(match), match, edit->flags))
-							regfatal(edit->old, 3, i0);
-						sfputc(var.sp, 0);
-						p1 = p;
-						p = s;
-						s = p1;
-					}
-					else if (i0 != REG_NOMATCH)
-						regfatal(edit->old, 3, i0);
+					n++;
+					if (i0 = regsubexec(&edit->re, p, elementsof(match), match))
+						regfatal(&edit->re, 3, i0);
+					p = edit->re.re_sub->re_buf;
+					if (edit->re.re_sub->re_flags & REG_SUB_STOP)
+						break;
 				}
-			if (var.sp)
-				sfclose(var.sp);
+				else if (i0 != REG_NOMATCH)
+					regfatal(&edit->re, 3, i0);
 			if (n && *p)
 			{
 				p1 = s = oldof(0, char, 0, strlen(p) + 32);
@@ -1642,7 +1574,7 @@ ppcontrol(void)
 			p0 = p;
 			if (pp.option & PRAGMAEXPAND)
 				pp.state &= ~DISABLE;
-			if (!(p6 = getline(p, &pp.valbuf[MAXTOKEN], -1, !!(pp.option & PRAGMAEXPAND))))
+			if (!(p6 = getline(p, &pp.valbuf[MAXTOKEN], !!(pp.option & PRAGMAEXPAND))))
 			{
 				*p0 = 0;
 				error(2, "%s: directive too long", pp.valbuf);
@@ -1934,119 +1866,53 @@ ppcontrol(void)
 	}
 	if (c != T_STRING || !*(s = pp.token))
 	{
-		if (c) error(2, "%s: %s: address argument expected", p3, pptokstr(pp.token, 0));
+		if (c)
+			error(2, "%s: %s: address argument expected", p3, pptokstr(pp.token, 0));
 		goto eatmap;
 	}
 	map = newof(0, struct map, 1, 0);
 	
 	/*
-	 * /from/[,/to/]
+	 * /from/
 	 */
 	
-	c = *s++;
-	p0 = s;
-	while (*s)
+	if (i0 = regcomp(&map->re, s, REG_AUGMENTED|REG_DELIMITED|REG_LENIENT|REG_NULL))
+		regfatal(&map->re, 3, i0);
+	if (*(s += map->re.re_npat))
 	{
-		if (*s == c)
-		{
-			regex_t*	re;
-
-			c = *s;
-			*s = 0;
-			if (!(re = newof(0, regex_t, 1, 0)))
-				goto eatmap;
-			if (i0 = regcomp(re, p0, REG_AUGMENTED))
-				regfatal(re, 3, i0);
-			*s++ = c;
-			if (map->from)
-			{
-				if (*s)
-				{
-					error(2, "%s: %s: malformed address", p3, pp.token);
-					goto eatmap;
-				}
-				map->to = re;
-			}
-			else map->from = re;
-			if (!*s) break;
-			if (*s++ != ',' || !(c = *s++))
-			{
-				error(2, "%s: %s: malformed address", p3, pp.token);
-				goto eatmap;
-			}
-			p0 = s;
-		}
-		else if (*s++ == '\\') s++;
+		error(2, "%s: invalid characters after pattern: %s ", p3, s);
+		goto eatmap;
 	}
-	
+
 	/*
-	 * /old/new/[glnu]
+	 * /old/new/[flags]
 	 */
 	
 	edit = 0;
 	while ((c = pplex()) == T_STRING)
 	{
-		if (!(c = *(s = pp.token)))
+		if (!*(s = pp.token))
 		{
 			error(2, "%s: substitution argument expected", p3);
 			goto eatmap;
 		}
-		if (edit) edit = edit->next = newof(0, struct edit, 1, 0);
-		else edit = map->edit = newof(0, struct edit, 1, 0);
-		p0 = ++s;
-		while (*s)
+		if (edit)
+			edit = edit->next = newof(0, struct edit, 1, 0);
+		else
+			edit = map->edit = newof(0, struct edit, 1, 0);
+		if (!(i0 = regcomp(&edit->re, s, REG_AUGMENTED|REG_DELIMITED|REG_LENIENT|REG_NULL)) && !(i0 = regsubcomp(&edit->re, s += edit->re.re_npat, NiL, 0, 0)))
+			s += edit->re.re_npat;
+		if (i0)
+			regfatal(&edit->re, 3, i0);
+		if (*s)
 		{
-			if (*s == c)
-			{
-				*s = 0;
-				if (edit->old)
-				{
-					if (!(edit->into = strdup(p0)))
-						error(3, "out of space");
-					*s++ = c;
-					c = 0;
-					for (;;)
-					{
-						switch (*s++)
-						{
-						case 0:
-							break;
-						case 'g':
-							c |= REG_SUB_ALL;
-							continue;
-						case 'l':
-							c |= REG_SUB_LOWER;
-							continue;
-						case 'n':
-							c |= REG_SUB_NOT;
-							continue;
-						case 'u':
-							c |= REG_SUB_UPPER;
-							continue;
-						default:
-							error(2, "%s: %s: invalid substitution expression", p3, pp.token);
-							goto eatmap;
-						}
-						break;
-					}
-					edit->flags = c;
-					break;
-				}
-				if (!*p0 && edit == map->edit)
-					edit->old = map->from;
-				else if (!(edit->old = newof(0, regex_t, 1, 0)))
-					goto eatmap;
-				else if (i0 = regcomp(edit->old, p0, REG_AUGMENTED))
-					regfatal(edit->old, 3, i0);
-				*s++ = c;
-				p0 = s;
-			}
-			else if (*s++ == '\\') s++;
+			error(2, "%s: invalid characters after substitution: %s ", p3, s);
+			goto eatmap;
 		}
 	}
 	if (c)
 	{
-		error(1, "%s: %s: substitution argument expected", p3, pptokstr(pp.token, 0));
+		error(2, "%s: %s: substitution argument expected", p3, pptokstr(pp.token, 0));
 		goto eatmap;
 	}
 	map->next = (struct map*)pp.maps;
@@ -2301,7 +2167,10 @@ ppcontrol(void)
 		while (pplex() != '\n');
 	}
  donedirective:
-	if (!(pp.state & EOF2NL)) error(2, "%s in directive", pptokchr(0));
+#if _HUH_2002_05_09
+	if (!(pp.state & EOF2NL))
+		error(2, "%s in directive", pptokchr(0));
+#endif
 	pp.state &= ~RESTORE;
 	pp.mode &= ~RELAX;
 	if (!(*pp.control & SKIP))

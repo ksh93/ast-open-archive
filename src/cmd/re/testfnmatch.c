@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -27,7 +28,7 @@
  * see testfnmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2001-09-06 $\0\n";
+static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2002-04-12 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -91,8 +92,9 @@ H("\n");
 H("  Field 1: the regex(3) flags to apply, one character per FNM_feature\n");
 H("  flag. The test is skipped if FNM_feature is not supported by the\n");
 H("  implementation. If the first character is not [SK] then the\n");
-H("  specification is a global control line. Specifications containing\n");
-H("  testre(1T) flags are silently ignored.\n");
+H("  specification is a global control line. One or more of [SK] may be\n");
+H("  specified; the test will be repeated for each mode. Specifications\n");
+H("  containing testregex(1) flags are silently ignored.\n");
 H("\n");
 H("    S	0			SRE	(basic sh glob)\n");
 H("    K	FNM_AUGMENTED		KRE	(ksh glob)\n");
@@ -431,6 +433,33 @@ gotcha(int sig)
 	longjmp(state.gotcha, 1);
 }
 
+static char*
+getline(void)
+{
+	static char	buf[32 * 1024];
+
+	register char*	s = buf;
+	register char*	e = &buf[sizeof(buf)];
+	register char*	b;
+
+	for (;;)
+	{
+		if (!(b = fgets(s, e - s, stdin)))
+			return 0;
+		state.lineno++;
+		s += strlen(s) - 1;
+		if (*s != '\n')
+			break;
+		if (s == b || *(s - 1) != '\\')
+		{
+			*s = 0;
+			break;
+		}
+		s--;
+	}
+	return buf;
+}
+
 int
 main(int argc, char** argv)
 {
@@ -452,7 +481,6 @@ main(int argc, char** argv)
 	char*		ans;
 	char*		msg;
 	char*		field[6];
-	char		buf[16 * 1024];
 	char		unit[64];
 
 	int		catch = 0;
@@ -510,8 +538,7 @@ main(int argc, char** argv)
 		signal(SIGBUS, gotcha);
 		signal(SIGSEGV, gotcha);
 	}
-	while (p = gets(buf)) {
-		state.lineno++;
+	while (p = getline()) {
 
 	/* parse: */
 

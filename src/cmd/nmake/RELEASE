@@ -1,3 +1,21 @@
+02-06-11 Makerules.mk: :F=%(...)S: => :F=%(...)s:
+	 misc.c: %S %C obsolete warning
+	 variable.c: fix $(!) that improperly skipped !rule.scan && PREREQS.scan
+02-06-07 state.c: stat() after close() instead of fstat() before for cygwin
+02-06-06 Makerules.mk: fix $(output) to handle -$(VERSION) already in $(PWD)
+02-05-28 probe.win32: updates for { mingw }
+02-05-24 probe.win32: updates for { digital-mars borland lcc }
+02-05-20 expand.c: update to use regsubcomp(),regsubexec()
+02-05-09 expand.c: fix cross() so / X foo generates /foo, not //foo
+02-05-07 archive.c: use <ardir.h>,-lardir for library archives
+02-05-06 probe.win32: add more win32 compilers
+02-04-15 Makerules.mk: fix .DO.INSTALL ln-s to use proper source path
+02-03-29 Makerules.mk: CC.SUFFIX.SHARED==".lib" => CC.SUFFIX.DYNAMIC==".dll"
+	 make.probe: cygwin CC.PREFIX.SHARED=lib CC.SUFFIX.SHARED=.dll.a
+02-03-27 Makerules.mk: fix .BIND.-l% and .REQUIRE.-l% recursion checks
+02-03-23 Makerules.mk: ensure that _BLD_<variant> is valid identifier
+	 Makerules.mk: add .LIST.INSTALLED for existing files only
+	 Makerules.mk: add $(LICENSEFILE) to .FILES.
 02-03-14 variable.c: add label to --mam "setv" 
 02-02-14 makerules: add and use CMPFLAGS
 	 makerules: add win32 ar I flag only when installing .a

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -41,10 +42,10 @@ typedef struct {
 
 extern void	compile(Text*, Text*);
 extern void	execute(Text*, Text*);
-extern int	recomp(Text*, Text*);
+extern int	recomp(Text*, Text*, int);
 extern int	reexec(regex_t*, char*, size_t, regmatch_t*, int);
 extern int	match(unsigned char*, Text*, int);
-extern int	substitute(regex_t*, Text*, unsigned char*, int);
+extern int	substitute(regex_t*, Text*);
 extern regex_t*	readdr(int);
 extern void	tcopy(Text*, Text*);
 extern void	printscript(Text*);
@@ -112,8 +113,6 @@ extern Text	files;
 #define INACT		(~AMASK)	/* inactive bit, the sign bit */
 #define DOLLAR		AMASK		/* huge address */
 #define REGADR		(~AMASK)	/* context address */
-#define PFLAG		0x80000000	/* s/../../p */
-#define WFLAG		0x40000000	/* s/../../w */
 
 extern word	pack(int, int, int);
 extern word*	instr(unsigned char*);

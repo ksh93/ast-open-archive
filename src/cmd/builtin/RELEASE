@@ -1,3 +1,5 @@
+02-04-15 look.c: add look.tst, fix hang
+02-03-24 uudecode,uuencode: sfopen "rt" for \r\n -- puke
 02-01-24 look.c: drop <strings.h> ref
 01-11-26 what.c: fix doc type, add --matched
 01-10-31 what.c: fix omitted file arg doc

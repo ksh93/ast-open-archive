@@ -1,6 +1,6 @@
 # tests for the tw utility
 
-KEEP data
+KEEP data link
 
 mkdir data
 for i in aaa zzz
@@ -17,6 +17,8 @@ do	i=data/$i
 		done
 	done
 done
+mkdir -p link/x/y/z
+ln -s x/y link/home
 
 TEST 01 'basics'
 	EXEC	-d data
@@ -311,3 +313,12 @@ data/zzz/333/6/s.z
 data/zzz/333/7/q.c
 data/zzz/333/7/r.d
 data/zzz/333/7/s.z'
+
+TEST 04 'symlink hops'
+	EXEC -d link -e sort:name -e "if(name=='home')status=FOLLOW;"
+		OUTPUT - $'link
+link/home
+link/home/z
+link/x
+link/x/y
+link/x/y/z'

@@ -1,3 +1,15 @@
+02-06-25 ppproto.c: fix pragma search bug that stopped after 8 comment lines
+02-06-11 ppsearch.c: fix ... next include search to skip *all* intermediates
+02-05-28 probe.win32: updates for { mingw }
+	 ppsearch.c: don't use inherited prefix for <...> -- duh
+02-05-24 ppcontrol.c: simplify getline() space canonicalization
+	 probe.win32: updates for { digital-mars borland lcc }
+02-05-20 ppcontrol.c: update to use regsubcomp(),regsubexec()
+02-05-09 ppcontrol.c: inhibit `EOF in directive': newline warning will catch it
+	 pplex.c: inhibit `newline in character constant' for hosted directives
+02-05-06 probe.win32: add more win32 compilers
+02-04-15 probe.win32: handle long long unsigned int
+02-04-12 ppproto.c: fix NOTICED check
 02-03-15 ppproto.c: fix cpp pp:compatibility double line sync memory fault
 02-03-11 pplex.c: add pp:modern to emit \a \v instead of octal forms
 02-02-14 ppargs.c: fix -D or -U as last arg core dump

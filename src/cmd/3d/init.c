@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -21,6 +21,7 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -43,9 +44,9 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2001-11-26 $\0\n"
+"] (AT&T Research) 2002-06-25 $\0\n"
 #else
-"\n@(#)$Id: 3d (AT&T Research) 2001-10-31 $\0\n"
+"\n@(#)$Id: 3d (AT&T Research) 2002-06-25 $\0\n"
 #endif
 ;
 
@@ -1161,6 +1162,16 @@ set_option(Fs_t* fs, const char* arg, int argsize, const char* op, int opsize)
 		}
 		state.trace.call = ~0;
 		break;
+	case HASHKEY6('i','n','t','e','r','c'):
+		{
+			typedef int (*Init_f)(int);
+			void*		dll;
+			Init_f		init;
+
+			if ((dll = dlopen(oe, RTLD_LAZY)) && (init = (Init_f)dlsym(dll, "_3d_init")))
+				(*init)(0);
+		}
+		break;
 	case HASHKEY6('l','i','c','e','n','s'):
 		if ((char*)op >= state.table.buf && (char*)oe < state.table.buf + sizeof(state.table.buf))
 		{
@@ -1441,7 +1452,7 @@ control(void)
  */
 
 int
-intercept(Intercept_call_t call, unsigned long mask)
+intercept(Intercept_f call, unsigned long mask)
 {
 	register int	i;
 

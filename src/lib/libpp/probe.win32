@@ -1,8 +1,8 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2002-01-23
+# @(#)probe.win32 (AT&T Labs Research) 2002-05-28
 #
 # win32 specific pp C probe initialization
-# ms vc is easy on uwin
+# wrapped cc's are easy on uwin
 #
 # 2> easy.err to avoid mysterious hang with bcc
 #
@@ -16,9 +16,30 @@ export nativepp
 for i in $probe_easy
 do	echo "#include <$i.h>"
 done
-echo "uwin=_UWIN"
-echo "versionb=__BORLANDC__"
-echo "versionm=_MSC_VER"
+echo '#ifdef __cplusplus'
+echo "int cplus=__cplusplus"
+echo '#endif'
+echo '#ifdef _UWIN'
+echo "int uwin=_UWIN"
+echo '#endif'
+echo '#ifdef __BORLANDC__'
+echo "int versionb=__BORLANDC__"
+echo '#endif'
+echo '#ifdef __DMC__'
+echo "int versiond=__DMC__"
+echo '#endif'
+echo '#ifdef _MSC_VER'
+echo "int versionm=_MSC_VER"
+echo '#endif'
+echo '#ifdef __ICL'
+echo "int versioni=__ICL"
+echo '#endif'
+echo '#ifdef __LCC__'
+echo "int versionl=0+__LCC__"
+echo '#endif'
+echo '#ifdef __MINGW32__'
+echo "int versiong=__MINGW32__"
+echo '#endif'
 } > easy.c
 
 for i in $probe_easy
@@ -26,17 +47,23 @@ do	eval ${i}_include=
 done
 include=
 uwin=
+cplus=
 versionb=
+versiond=
 versionm=
+versionl=
+versiong=
 
-$cc -E easy.c > easy.out 2> easy.err
-egrep -i '^(#line 1 .*\.[hH]|(uwin|version[bm])=[0-9])' easy.out |
+$cc -E easy.c 2> easy.err |
+egrep -i '^(#line 1 .*\.[hH]| *int +(cplus|uwin|version[bdiglm]) *= *[0-9])' |
 sed	-e 's/.*"\(.*\)".*/\1/' \
-	-e 's,^[ 	]*,,' \
-	-e 's,[ 	]*$,,' \
+	-e 's,^  *,,' \
+	-e 's,  *$,,' \
+	-e 's, *= *,=,' \
 	-e 's,^\(.\):[\\/]*,/\1/,' \
 	-e 's,[\\/][\\/]*,/,g' \
 	-e 's,^\(/.*\)/\(.*\)\.[hH]$,\2_include="\1",' \
+	-e 's, *int *,,' \
 	> easy.sh
 . ./easy.sh
 
@@ -55,10 +82,59 @@ then	include=$i/include
 fi
 
 case $versionb in
-?*)	version=$versionb VERSION=__BORLANDC__ ;;
+?*)	version=$versionb VERSION=__BORLANDC__ 
+	reserved="#pragma pp:reserved __asm=GROUP __based=GROUP __cdecl __declspec=GROUP __except __export __far __fastcall __finally __huge __inline __int16 __int32 __int64 __int8 __leave __near __novtordisp __pascal __restrict __stdcall __syscall __try __unaligned __wchar_t
+#pragma pp:reserved _asm=GROUP _based=GROUP _cdecl _declspec=GROUP _except _export _far _fastcall _finally _fortran _huge _int16 _int32 _int64 _int8 _leave _near _pascal _stdcall _syscall _try
+#pragma pp:reserved cdecl const enum far fortran huge near pascal signed void volatile"
+	specific="#define <long long> __int64
+#define <__int64 int> __int64
+#define <__int64 unsigned> unsigned __int64"
+	pragmas="#pragma pp:nocatliteral
+#pragma pp:stringsplit"
+	;;
+esac
+case $versiond in
+?*)	version=$versiond VERSION=__DMC__ 
+	reserved="#pragma pp:reserved _Bool _Complex _Imaginary asm=GROUP _asm=GROUP __asm=GROUP const enum _fortran __inline _int64 __int64 __restrict signed void volatile _based=GROUP __based=GROUP cdecl _cdecl __cdecl _declspec=GROUP __declspec=GROUP _except __except _export __export far _far __far _fastcall __fastcall _finally __finally huge _huge __huge _interrupt __interrupt _leave __leave _loadds __loadds near _near __near pascal _pascal __pascal _saveregs __saveregs _segname __segname _stdcall __stdcall _syscall __syscall _try __try _cs __cs _ss __ss _unaligned __unaligned"
+	specific="#define __TIMESTAMP__   __DATE__ \" \" __TIME__"
+	pragmas="#pragma pp:transition
+#pragma pp:elseif
+#pragma pp:noallmultiple
+#pragma pp:lineid line"
+	;;
 esac
 case $versionm in
-?*)	version=$versionm VERSION=_MSC_VER ;;
+?*)	version=$versionm VERSION=_MSC_VER
+	reserved="#pragma pp:reserved __asm=GROUP __based=GROUP __cdecl __declspec=GROUP __except __export __far __fastcall __finally __huge __inline __int16 __int32 __int64 __int8 __leave __near __novtordisp __pascal __restrict __stdcall __syscall __try __unaligned __wchar_t
+#pragma pp:reserved _asm=GROUP _based=GROUP _cdecl _declspec=GROUP _except _export _far _fastcall _finally _fortran _huge _int16 _int32 _int64 _int8 _leave _near _pascal _stdcall _syscall _try
+#pragma pp:reserved cdecl const enum far fortran huge near pascal signed void volatile"
+	specific="#define <long long> __int64
+#define <__int64 int> __int64
+#define <__int64 unsigned> unsigned __int64"
+	;;
+esac
+case $versionl in
+?*)	version=$versionl VERSION=__LCC__
+	reserved="#pragma pp:reserved _Bool _Complex _asm=GROUP const enum inline __inline __int64 restrict signed void volatile _cdecl __cdecl __declspec=GROUP __except _huge _stdcall __stdcall __try"
+	specific="#pragma pp:map \"/#(pragma )?import>/\" \"/#(pragma )?import(.*)/__STDPP__IMPORT__(\2)/\"
+#macdef __STDPP__IMPORT__(x)
+#pragma pp:noallmultiple
+#include x
+#pragma pp:allmultiple
+#endmac
+"
+	pragmas="#pragma pp:hostedtransition
+#pragma pp:strict
+#pragma pp:spaceout
+#pragma pp:elseif
+"
+	;;
+esac
+case $versiong in
+?*)	version=$versiong VERSION=__MINGW32__
+	reserved="#pragma pp:reserved __declspec=GROUP __alignof=GROUP __alignof__=GROUP __attribute=GROUP __attribute__=GROUP __extension__=GROUP asm=GROUP __asm=GROUP __asm__=GROUP const __const __const__ enum inline __inline __inline__ __restrict __restrict__ signed __signed __signed__ typeof=GROUP __typeof=GROUP __typeof__=GROUP void volatile __volatile __volatile__ __cdecl _stdcall __stdcall"
+	specific="#define __declspec(x)   __attribute__((x))"
+	;;
 esac
 
 case $version:$include in
@@ -81,6 +157,20 @@ case $version:$include in
 	esac
 	standard="$standard
 #pragma pp:standard \"$include\""
+	[ X"$versiond" != X ] && standard="$standard
+#pragma pp:standard \"$include/win32\""
+	if	[ X"$versioni" != X ]
+	then	if	[ -d /msdev/vc98 ]
+		then standard="$standard
+#pragma pp:standard \"/msdev/vc98/include\""
+		else standard="$standard
+#pragma pp:standard \"/msdev/vc/include\""
+		fi
+	elif	[ X"$versiong" != X ] && [ X"$cplus" != X ]
+	then standard="$standard
+#pragma pp:include \"$include/g++-3\"
+#pragma pp:include \"$include/../mingw32/include\""
+	fi
 	: the payoff
 	set -- $cc
 	cmd=$1
@@ -97,15 +187,16 @@ case $version:$include in
 	{
 	cat <<'!'
 #ifdef unix
-echo "#define unix" unix
-echo "#define __unix__" 1
+char* str_unix = "#define unix" unix
+char* str___unix__ = "#define __unix__" 1
 #else
 #ifdef __unix__
-echo "#define __unix__" __unix__
+char* str___unix__ = "#define __unix__" __unix__
 #endif
 #endif
 !
 	premac="
+M_I86
 _ALPHA_
 _AXP64_
 _GENIA64_
@@ -120,27 +211,75 @@ _M_MRX000
 _M_PPC
 _NTSYSTEM_
 _POSIX_
+_PUSHPOP_SUPPORTED
 _STDCALL_SUPPORTED
 _UWIN
 _WIN32
 _WIN64
 _X86_
+_stdcall
 __BORLANDC__
+__CHAR_UNSIGNED__
+__DEFALIGN
+__DMC__
+__ECL__
+__EDG__
+__FPCE__
+__GNUC__
+__GNUC_MINOR__
+__GNUG__
+__I86__
+__ICL
+__INITIAL_POINTER_SIZE
+__INLINE_8087
+__INTEL_COMPILER
+__LCCDEBUGLEVEL
+__LCCOPTIMLEVEL
+__LCC__
+__MINGW32__
+__MSVCRT__
+__SC__
+__SMALL__
+__STATIC__
+__STDC__
+__STRLEN
 __TURBOC__
+__WIN32__
+__WINVER__
+__ZTC__
+__cdecl
 __cplusplus
+__i386
+__i386__
+__i486
+__i486__
+__i586
+__i586__
+__i686
+__i686__
+__k6
+__k6__
+__pentium
+__pentium__
+__pentiumpro
+__pentiumpro__
+__stdcall
 	"
+	echo "#define	s(x)	#x"
+	echo "#define	q(x)	s(x)"
 	for i in $premac
 	do	echo "#ifdef $i"
-		echo "echo \"#define $i\" $i"
+		echo "char* str_$i = \"#define $i\" q($i)"
 		echo "#endif"
 	done
 	} > easy.c
-	$cc -E easy.c > easy.sh 2> easy.err
+	$cc -E easy.c > easy.out 2> easy.err
+	sed     -e '/=/!d' -e 's,[^"]*,echo ,' easy.out > easy.sh
 	. ./easy.sh >&3
 	cat >&3 <<!
 #pragma pp:nopredefined
 
-#define <long long> __int64
+$specific
 
 #define #hosttype(${hosttype})${assert}
 #define #architecture(${machine})
@@ -151,9 +290,9 @@ __cplusplus
 #define #universe(att)
 #define #dialect(ansi)
 
-#pragma pp:reserved __asm=GROUP __based=GROUP __cdecl __declspec=GROUP __except __export __far __fastcall __finally __huge __inline __int16 __int32 __int64 __int8 __leave __near __novtordisp __pascal __restrict __stdcall __syscall __try __unaligned __wchar_t
-#pragma pp:reserved _asm=GROUP _based=GROUP _cdecl _declspec=GROUP _except _export _far _fastcall _finally _fortran _huge _int16 _int32 _int64 _int8 _leave _near _pascal _stdcall _syscall _try
-#pragma pp:reserved cdecl const enum far fortran huge near pascal signed void volatile
+$reserved
+
+$pragmas
 
 #pragma pp:pluscomment
 #pragma pp:pragmaexpand
@@ -165,6 +304,7 @@ __cplusplus
 #pragma pp:map "/#(pragma )?ident>/"
 #pragma pp:map "/#pragma lint:/" ",#pragma lint:(.*),##/*\1*/,u"
 #pragma pp:map "/#(pragma )?sccs>/"
+#pragma pp:map "/#pragma once/" ",#pragma once,#pragma pp:nomultiple,"
 !
 	exit 0
 	;;

@@ -5,37 +5,36 @@ matching routines:
 	-------			------		---------
 	testfnmatch.c		<fnmatch.h>	fnmatch()
 	testglob.c		<glob.h>	glob()
-	testmatch.c		<ast.h>		ksh93 strmatch(),strgrpmatch()
-	testre.c		<regex.h>	regcomp(),regexec()
+	testregex.c		<regex.h>	regcomp(),regexec()
 
-Each test*.c file is a main program driven by these data files:
+Each test*.c file is a main program driven by the *.dat test data files.
+testglob.dat is only for testglob; all other test data files work with
+the remaining harnesses.
 
-	testfnmatch,testmatch,testre	testre.dat,testmatch.dat
-	testglob			testglob.dat
+The Makefile has targets for building harnesses and running tests:
 
-For example, to build the fnmatch test harness and run the tests:
+	all		build all harnesses
+	test		run all tests for all harnesses
+	test.foo	build harness foo and run the foo tests
 
-	cc -o testfnmatch testfnmatch.c
-	testfnmatch < testre.dat
-	testfnmatch < testmatch.dat
+To run a single test, e.g. the standards.dat tests for testregex,
+
+	testregex < standards.dat
 
 If the local implementation hangs or dumps on some tests then run with
 the -c option.
 
-There are two input formats, described in testglob.dat and testre.dat.
-The input files exercise all features; the harnesses detect and ignore
-features not supported by the local implementation.
+The -h option lists the test data format details. The test data files
+exercise all features; the harnesses detect and ignore features not
+supported by the local implementation.
 
-strmatch() is the ksh93 augmented pattern matcher; testmatch.c will only
-compile with the AT&T <ast.h> and -last.
-
-Extensions to the standard terminology the derived from the AT&T RE
+Extensions to the standard terminology are derived from the AT&T RE
 implementation, unified under <regex.h> with these modes:
 
 	MODE	FLAGS			
 	----	-----
 	BRE	0			basic RE
-	ERE	REG_EXTENDED		egrep RE
+	ERE	REG_EXTENDED		egrep RE with perl (...) extensions
 	ARE	REG_AUGMENTED		ERE with ! negation, <> word boundaries
 	SRE	REG_SHELL		sh patterns
 	KRE	REG_SHELL|REG_AUGMENTED	ksh93 patterns: ! @ ( | & ) { }
@@ -46,7 +45,7 @@ and some additional flags to handle fnmatch():
 	REG_SHELL_PATH		FNM_PATHNAME
 	REG_SHELL_DOT		FNM_PERIOD
 
-The original testre.c was done by Doug McIlroy at Bell Labs.
+The original testregex.c was done by Doug McIlroy at Bell Labs.
 The current implementation is maintained by
 
 	Glenn Fowler <gsf@research.att.com>
@@ -56,6 +55,6 @@ Send any new tests to me and I'll roll them into the open source
 distribution at http://www.research.att.com/sw/download/ with proper
 attribution.
 
-Please note that the regression tests nail down unspecified standard behavior.
+Please note that some regression tests nail down unspecified standard behavior.
 These should be noted in the test data with 'u' but currently are not.
 Experience with other implementations will help clean this up.

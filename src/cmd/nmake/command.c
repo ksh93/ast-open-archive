@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -1044,7 +1045,7 @@ block(int check)
 			if (state.interrupt || !(job->flags & (CO_IGNORE|CO_KEEPGOING)))
 				clear = 1;
 		}
-		message((-3, "job: %s: interrupt=%d clear=%d", job->target->name, state.interrupt, clear));
+		message((-3, "job: %s: interrupt=%d clear=%d status=%d flags=%08x", job->target->name, state.interrupt, clear, cojob->status, job->flags));
 
 		/*
 		 * release semaphores

@@ -9,7 +9,7 @@
 *                                                                  *
 *       http://www.research.att.com/sw/license/ast-open.html       *
 *                                                                  *
-*        If you have copied this software without agreeing         *
+*    If you have copied or used this software without agreeing     *
 *        to the terms of the license you are infringing on         *
 *           the license and copyright and are violating            *
 *               AT&T's intellectual property rights.               *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -32,7 +33,8 @@
 
 #define SEARCH_NEXT	(SEARCH_USER<<1)/* search for next (uncover)	*/
 #define SEARCH_SKIP	(SEARCH_USER<<2)/* current binding skipped	*/
-#define SEARCH_TEST	(SEARCH_USER<<3)/* current binding skipped	*/
+#define SEARCH_TEST	(SEARCH_USER<<3)/* test for binding		*/
+#define SEARCH_FOUND	(SEARCH_USER<<4)/* current binding found	*/
 
 #define COLUMN_TAB	7
 #define COLUMN_MAX	72
@@ -127,10 +129,12 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 		*prefix = '/';
 		prefix = t;
 	}
-	message((-3, "search: %s %s%s type=%s prefix=%s flags=|%s%s%s%s%s start=%s=\"%s\" pre=%s lcl=%s std=%s",
+	message((-3, "search: %s %s%s%s%s type=%s prefix=%s flags=|%s%s%s%s%s start=%s=\"%s\" pre=%s lcl=%s std=%s cur=%s",
 		fp->name,
 		(flags & SEARCH_INCLUDE) ? "include" : "exists",
 		(flags & SEARCH_NEXT) ? " next" : "",
+		(flags & SEARCH_SKIP) ? " skip" : "",
+		(flags & SEARCH_TEST) ? " test" : "",
 		type == T_HEADER ? "<*>" : "\"*\"", prefix,
 		(fp->flags & INC_SELF) ? "SELF|" : "",
 		(fp->flags & INC_EXISTS) ? "EXISTS|" : "",
@@ -141,7 +145,8 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 		dp ? dp->name : NiL,
 		!(fp->flags & INC_MEMBER(INC_PREFIX)) && (xp = fp->bound[INC_PREFIX]) ? xp->name : NiL,
 		!(fp->flags & INC_MEMBER(INC_LOCAL)) && (xp = fp->bound[INC_LOCAL]) ? xp->name : NiL,
-		!(fp->flags & INC_MEMBER(INC_STANDARD)) && (xp = fp->bound[INC_STANDARD]) ? xp->name : NiL
+		!(fp->flags & INC_MEMBER(INC_STANDARD)) && (xp = fp->bound[INC_STANDARD]) ? xp->name : NiL,
+		error_info.file
 		));
 	for (index = -1; dp; dp = dp->next) if (dp->name)
 	{
@@ -399,20 +404,28 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 			pathcanon(pp.path, 0);
 			if (!(flags & SEARCH_SKIP))
 			{
+				int		found;
+				struct ppinstk*	in;
+
 				if (streq(error_info.file, pp.path))
-					flags |= SEARCH_SKIP;
+					found = 1;
 				else
 				{
-					struct ppinstk*	in;
-
+					found = 0;
 					for (in = pp.in; in; in = in->prev)
 						if (in->type == IN_FILE && in->file && streq(in->file, pp.path))
 						{
-							flags |= SEARCH_SKIP;
+							found = 1;
 							break;
 						}
 				}
-				continue;
+				if (found)
+				{
+					flags |= SEARCH_FOUND;
+					continue;
+				}
+				if (!(flags & SEARCH_FOUND))
+					continue;
 			}
 		}
 		if ((xp || (xp = ppgetfile(pp.path))) && (xp->flags & INC_SELF))
@@ -483,7 +496,7 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 			if (flags & SEARCH_INCLUDE)
 			{
 				if ((pp.prefix = prefix) || (pp.prefix = pp.in->prefix))
-					message((-2, "search: %s: next prefix = %s", xp->name, pp.prefix));
+					message((-2, "search: %s: prefix=%s", xp->name, pp.prefix));
 				if (!(pp.mode & ALLMULTIPLE))
 				{
 					if (xp->guard == INC_CLEAR || xp == mp)
@@ -615,6 +628,7 @@ ppsearch(char* file, int type, int flags)
 		else
 			file = error_info.file;
 		flags |= SEARCH_NEXT;
+#if _HUH_2002_05_28
 		if (pp.in->prefix)
 		{
 			sfsprintf(name, sizeof(name) - 1, "%s/%s", pp.in->prefix, file);
@@ -622,6 +636,7 @@ ppsearch(char* file, int type, int flags)
 			if ((fd = ppsearch(fp->name, type, flags)) >= 0)
 				return fd;
 		}
+#endif
 		fp = ppsetfile(file);
 		return ppsearch(fp->name, type, flags);
 	}

@@ -1,3 +1,4 @@
+02-04-30 pzopen,pzhead: tighten pzip magic check via reasonable version number
 02-03-09 pzopen,pzdeflate,pzsync: add fatal error checks
 02-02-14 pzopen: disable PZ_UNKNOWN check if PZ_NOPZIP -- duh
 02-01-11 pzdeflate: use Sfoff_t for sfmove() return instead of ssize_t
