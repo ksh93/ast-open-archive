@@ -1164,7 +1164,9 @@ statetime(register Rule_t* r, int sync)
 int
 statetimeq(Rule_t* r, Rule_t* s)
 {
-	long	d;
+	long		d;
+
+	static int	warned;
 
 	if (r->time == s->time)
 		return 1;
@@ -1179,6 +1181,15 @@ statetimeq(Rule_t* r, Rule_t* s)
 		}
 		if (d >= -state.tolerance && d <= state.tolerance)
 			return 1;
+	}
+	else if (r->time < s->time && !(r->property & P_state) && tmxsec(r->time) == tmxsec(s->time) && !tmxnsec(r->time))
+	{
+		if (!warned)
+		{
+			warned = 1;
+			error(state.exec || state.mam.out || state.regress ? -1 : 1, "file timestamp subsecond truncation");
+		}
+		return 1;
 	}
 	return 0;
 }

@@ -474,3 +474,18 @@ c :
 + : b : all :
 + : fix : a :
 + : fix : b :'
+
+TEST 18 'pattern association'
+
+	EXEC	-n
+		INPUT Makefile $'.ATTRIBUTE.RECS.% : .SCAN.IGNORE
+all : a.1.done a.2.done
+.ATTRIBUTE.RECS.%.A.N .ATTRIBUTE.RECS.%.A.C : .DONTCARE
+a.%.done : RECS.%.A.C RECS.%.A.N
+	touch $(<)
+a.%.done : RECS.%.A.N RECS.%.A.C
+	touch $(<)'
+		INPUT RECS.1.A.C
+		INPUT RECS.2.A.N
+		OUTPUT - $'+ touch a.1.done
++ touch a.2.done'

@@ -1,4 +1,4 @@
-:PACKAGE: tcl ast X11
+:PACKAGE: - X11 tcl:install ast
 
 ID			=	tksh
 LIB			=	tcl

@@ -331,13 +331,6 @@ main(int argc, char** argv)
 			close(i);
 
 	/*
-	 * initialize the code and hash tables
-	 */
-
-	initcode();
-	inithash();
-
-	/*
 	 * allocate the very temporary buffer streams
 	 */
 
@@ -348,6 +341,13 @@ main(int argc, char** argv)
 	internal.wrk = sfstropen();
 	tmp = sfstropen();
 	sfstrrsrv(tmp, 2 * MAXNAME);
+
+	/*
+	 * initialize the code and hash tables
+	 */
+
+	initcode();
+	inithash();
 
 	/*
 	 * set the default state

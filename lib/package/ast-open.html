@@ -1022,7 +1022,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-04-01-11  --- Release ksh93q  ---
+05-01-11  --- Release ksh93q  ---
+05-01-11  A bug in the integral divide by zero check has been fixed.
 05-01-11  The -l option has been added to cause /etc/profile and
 	  $HOME/.profile, if they exist, to be read before the first command.
 05-01-11  An argument parsing bug that caused `kill -s x -- n' to fail has
@@ -2215,7 +2216,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-04-12-25 bio.c: fix (*putheader)() reurn value logic, especially for ENOSPACE
+04-12-25 bio.c: fix (*putheader)() return value logic, especially for ENOSPACE
 04-12-08 listformat now handles high resolution time
 04-12-01 tv.h,tv.c,features/tv move to libast
 04-09-25 bio.c: fix ap-&gt;io-&gt;count for skipped data -- wow
@@ -3017,7 +3018,15 @@ All recorded changes follow.
 04-12-25 Makerules.mk: handle cc-,a=b
 	 Makerules.mk: check for -I. after -I-
 	 Makerules.mk: add MVFLAGS=-f for install actions
+	 Makerules.mk: relax .PACKAGE.INIT. PACKAGE_%_INCLUDE search
+	 Makerules.mk: fix list.manifest recursion
+	 Makerules.mk: add experimental --recurse=combine
+	 Scanrules.mk: assert .LCL.INCLUDE before .PREFIX.INCLUDE :T=G: bind
 	 msgcat.mk: fix _PACKAGE_ID
+	 bind.c: disable bindalias() for unbound files -- doh
+	 parse.c: drop CON_scan for over all rules; $(...) does it
+	 parse.c: drop { .ASSERT .ASSIGN } lists, add { .ASSERT. .ASSIGN. }
+	 state.c: ignore file timestamp subsecond truncation -- willya fix ext3
 04-12-08 Scanrules.mk: add .SCAN.iffe for `include previous-iffe-output'
 	 Scanrules.mk: fix $(prefixinclude:?...) =&gt; $(-prefix-include:+...)
 	 Makerules.mk: no -g CC.LIB.TYPE (in ar name) if CC.OPTIMIZE also set
@@ -5018,6 +5027,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-01-11 tw.c: --local test for directories only
 04-12-24 tw.c: cmd non-zero exit status causes tw to terminate
 04-12-08 find.c: fix `option ... path ... option' logic *again*
 04-08-01 find.c: really fix -size
@@ -5127,6 +5137,7 @@ All recorded changes follow.
 	 features/tvlib,tm/tvtouch.c: check for utimets()
 	 misc/optget.c: handle '-' or '_' option word separators
 	 sfio/_sfopen.c: allow stream mode changes after initialization
+	 sfio: sync with kpv: SF_SYNCED fix for ksh input loss bug
 05-01-09 tm/tmxfmt.c: fix %6N for n&lt;100000000
 05-01-08 regex/regcomp.c: conj() =&gt; con() to avoid C99 clash
 05-01-05 tm/*: fix { %U %V %W } logic -- my head hurts
@@ -7532,7 +7543,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>January 22, 2005</TD>
+<TD align=right>January 31, 2005</TD>
 </TR>
 </TABLE>
 <P>

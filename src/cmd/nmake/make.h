@@ -238,10 +238,11 @@
 #define BIND_RULE	(1<<3)	/* force bindfile makerule		*/
 
 #define MERGE_ALL	(1<<0)	/* merge everything			*/
-#define MERGE_ATTR	(1<<1)	/* merge just attributes		*/
-#define MERGE_BOUND	(1<<2)	/* MERGE_ALL but no bind		*/
-#define MERGE_FORCE	(1<<3)	/* override attributes			*/
-#define MERGE_SCANNED	(1<<4)	/* MERGE_ALL but no entries|scanned	*/
+#define MERGE_ASSOC	(1<<1)	/* pattern association merge		*/
+#define MERGE_ATTR	(1<<2)	/* merge just attributes		*/
+#define MERGE_BOUND	(1<<3)	/* MERGE_ALL but no bind		*/
+#define MERGE_FORCE	(1<<4)	/* override attributes			*/
+#define MERGE_SCANNED	(1<<5)	/* MERGE_ALL but no entries|scanned	*/
 
 #define COMP_BASE	(1<<0)	/* base rules prereq			*/
 #define COMP_DONTCARE	(1<<1)	/* optional include prereq		*/
@@ -579,8 +580,6 @@ typedef struct Internal_s		/* internal rule and list info	*/
 	 */
 
 	Rule_t*		args;		/* .ARGS rule pointer		*/
- 	Rule_t*		assert;		/* .ASSERT rule pointer		*/
- 	Rule_t*		assign;		/* .ASSIGN rule pointer		*/
 	Rule_t*		bind;		/* .BIND rule pointer		*/
 	Rule_t*		clear;		/* .CLEAR rule pointer		*/
 	Rule_t*		copy;		/* .COPY rule pointer		*/
@@ -612,6 +611,8 @@ typedef struct Internal_s		/* internal rule and list info	*/
 	 */
 
 	Rule_t*		append_p;	/* .APPEND. rule pointer	*/
+	Rule_t*		assert_p;	/* .ASSERT. rule pointer	*/
+	Rule_t*		assign_p;	/* .ASSIGN. rule pointer	*/
 	Rule_t*		attribute_p;	/* .ATTRIBUTE. rule pointer	*/
 	Rule_t*		bind_p;		/* .BIND. rule pointer		*/
 	Rule_t*		dontcare_p;	/* .DONTCARE. rule pointer	*/

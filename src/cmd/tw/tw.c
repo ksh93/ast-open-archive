@@ -29,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2004-12-24 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2005-01-11 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -433,7 +433,7 @@ tw(register Ftw_t* ftw)
 		ftw->ignorecase = ftw->level ? ftw->parent->ignorecase : (state.icase || strchr(astconf("PATH_ATTRIBUTES", ftw->name, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	}
-	if (state.localfs && !ftwlocal(ftw))
+	if (state.localfs && (ftw->info & FTW_D) && !ftwlocal(ftw))
 		ftw->status = FTW_SKIP;
 	else
 	{

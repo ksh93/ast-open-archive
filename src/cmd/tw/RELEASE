@@ -1,3 +1,4 @@
+05-01-11 tw.c: --local test for directories only
 04-12-24 tw.c: cmd non-zero exit status causes tw to terminate
 04-12-08 find.c: fix `option ... path ... option' logic *again*
 04-08-01 find.c: really fix -size

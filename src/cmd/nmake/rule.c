@@ -320,17 +320,22 @@ addprereq(register Rule_t* r, register Rule_t* x, int op)
 				{
 					if (op == PREREQ_DELETE)
 					{
-						if (q) q->next = p->next;
-						else r->prereqs = p->next;
+						if (q)
+							q->next = p->next;
+						else
+							r->prereqs = p->next;
 					}
-					if (!(x->property & P_multiple)) break;
+					if (!(x->property & P_multiple))
+						break;
 				}
 				if (!p->next)
 				{
 					if (op != PREREQ_DELETE)
 					{
-						if (r->property & P_state) state.savestate = 1;
-						if (!state.init && !state.readonly) r->dynamic &= ~D_compiled;
+						if (r->property & P_state)
+							state.savestate = 1;
+						if (!state.init && !state.readonly)
+							r->dynamic &= ~D_compiled;
 						if (op == PREREQ_LENGTH)
 						{
 							register int	n;
@@ -342,15 +347,18 @@ addprereq(register Rule_t* r, register Rule_t* x, int op)
 							{
 								if (!p || strlen(p->rule->name) < n)
 								{
-									if (q) q->next = cons(x, p);
-									else r->prereqs = cons(x, r->prereqs);
+									if (q)
+										q->next = cons(x, p);
+									else
+										r->prereqs = cons(x, r->prereqs);
 									break;
 								}
 								q = p;
 								p = p->next;
 							}
 						}
-						else if (op == PREREQ_INSERT) r->prereqs = cons(x, r->prereqs);
+						else if (op == PREREQ_INSERT)
+							r->prereqs = cons(x, r->prereqs);
 						else p->next = cons(x, NiL);
 					}
 					break;
@@ -361,8 +369,10 @@ addprereq(register Rule_t* r, register Rule_t* x, int op)
 		}
 		else if (op != PREREQ_DELETE)
 		{
-			if (r->property & P_state) state.savestate = 1;
-			if (!state.init && !state.readonly) r->dynamic &= ~D_compiled;
+			if (r->property & P_state)
+				state.savestate = 1;
+			if (!state.init && !state.readonly)
+				r->dynamic &= ~D_compiled;
 			r->prereqs = cons(x, NiL);
 		}
 	}
@@ -597,13 +607,16 @@ immediate(register Rule_t* r)
 			else
 			{
 				errors += make(p->rule, &tm, NiL, 0);
-				if (tm >= now) i = 1;
+				if (tm >= now)
+					i = 1;
 			}
 		}
 		if (r != internal.run)
 		{
-			if (prereqs) errors += complete(NiL, prereqs, &tm, 0);
-			if (tm >= now) i = 1;
+			if (prereqs)
+				errors += complete(NiL, prereqs, &tm, 0);
+			if (tm >= now)
+				i = 1;
 			if (action)
 			{
 				if (!errors && i)
@@ -613,7 +626,8 @@ immediate(register Rule_t* r)
 					complete(r, NiL, NiL, 0);
 				}
 			}
-			if (r == internal.make) r->property &= ~(P_always|P_local);
+			if (r == internal.make)
+				r->property &= ~(P_always|P_local);
 		}
 		r->property &= ~(P_foreground|P_make|P_read);
 	}
@@ -659,9 +673,12 @@ immediate(register Rule_t* r)
 	else if (r == internal.sync)
 	{
 		getimmediate(r, &prereqs, &action);
-		if (!prereqs) savestate();
-		else if (state.compile < COMPILED) error(2, "%s: cannot sync until make object compiled", prereqs->rule->name);
-		else compile(prereqs->rule->name, prereqs->next ? prereqs->next->rule->name : (char*)0);
+		if (!prereqs)
+			savestate();
+		else if (state.compile < COMPILED)
+			error(2, "%s: cannot sync until make object compiled", prereqs->rule->name);
+		else
+			compile(prereqs->rule->name, prereqs->next ? prereqs->next->rule->name : (char*)0);
 	}
 	else if (r == internal.reset)
 	{
@@ -673,14 +690,17 @@ immediate(register Rule_t* r)
 		getimmediate(r, &prereqs, &action);
 		complete(NiL, prereqs, NiL, 0);
 	}
-	else if ((r->property & P_attribute) && !r->attribute) return;
-	else if (!state.op && state.reading && state.compileonly) return;
+	else if ((r->property & P_attribute) && !r->attribute)
+		return;
+	else if (!state.op && state.reading && state.compileonly)
+		return;
 	else
 	{
 		maketop(r, 0, NiL);
 		getimmediate(r, &prereqs, &action);
 	}
-	if (prereqs) freelist(prereqs);
+	if (prereqs)
+		freelist(prereqs);
 	if (r->prereqs)
 	{
 		freelist(r->prereqs);
@@ -708,7 +728,8 @@ remdup(register List_t* p)
 	{
 		if (p->rule->mark & M_mark)
 		{
-			if (q) q->next = p->next;
+			if (q)
+				q->next = p->next;
 #if DEBUG
 			else
 			{
@@ -812,7 +833,8 @@ dynamic(register Rule_t* r)
 		}
 		else q = p;
 	}
-	if (added) remdup(r->prereqs);
+	if (added)
+		remdup(r->prereqs);
 	r->dynamic &= ~D_dynamic;
 	state.frame = oframe;
 	sfstrclose(tmp);
@@ -992,10 +1014,10 @@ merge(register Rule_t* from, register Rule_t* to, int op)
 			debug((-4, "merging %s%s into %s", (op & MERGE_ATTR) ? "attributes of " : null, from->name, to->name));
 #endif
 	}
-	if (to->dynamic & D_bound)
-		to->property |= from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_force|P_foreground|P_functional|P_implicit|P_joint|P_local|P_make|P_multiple|P_parameter|P_read|P_repeat|P_terminal|P_virtual);
-	else
+	if (!(to->dynamic & D_bound) || (op & (MERGE_ASSOC|MERGE_FORCE)))
 		to->property |= from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_foreground|P_functional|P_ignore|P_implicit|P_joint|P_local|P_make|P_multiple|P_parameter|P_read|P_repeat|P_terminal|P_virtual);
+	else
+		to->property |= from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_force|P_foreground|P_functional|P_implicit|P_joint|P_local|P_make|P_multiple|P_parameter|P_read|P_repeat|P_terminal|P_virtual);
 	if (from->property & P_implicit)
 		to->property &= ~P_terminal;
 	if ((from->property & (P_metarule|P_terminal)) == P_terminal)
@@ -1130,8 +1152,10 @@ negate(register Rule_t* from, register Rule_t* to)
 	to->attribute &= ~from->attribute;
 	to->property &= ~(from->property & (P_accept|P_after|P_always|P_archive|P_before|P_command|P_dontcare|P_force|P_functional|P_ignore|P_immediate|P_implicit|P_local|P_make|P_multiple|P_parameter|P_repeat|P_target|P_terminal|P_use|P_virtual));
 	to->dynamic &= ~(from->dynamic & (D_dynamic|D_entries|D_regular));
-	if (from->scan) to->scan = 0;
-	if (from->semaphore) to->semaphore = 0;
+	if (from->scan)
+		to->scan = 0;
+	if (from->semaphore)
+		to->semaphore = 0;
 }
 
 /*
@@ -1390,8 +1414,6 @@ initrule(void)
 
 	INIT(alarm,		".ALARM",	P_immediate);
 	INIT(args,		".ARGS",	P_internal);
-	INIT(assert,		".ASSERT",	0);
-	INIT(assign,		".ASSIGN",	0);
 	INIT(bind,		".BIND",	P_immediate);
 	INIT(clear,		".CLEAR",	P_attribute);
 	INIT(copy,		".COPY",	P_attribute);
@@ -1430,6 +1452,8 @@ initrule(void)
 	 */
 
 	ASOC(append_p,		".APPEND.",	0);
+	ASOC(assert_p,		".ASSERT.",	0);
+	ASOC(assign_p,		".ASSIGN.",	0);
 	ASOC(attribute_p,	".ATTRIBUTE.",	0);
 	ASOC(bind_p,		".BIND.",	0);
 	ASOC(dontcare_p,	".DONTCARE.",	0);
@@ -1492,7 +1516,8 @@ initrule(void)
 	 * expand some dynamic values now for efficiency
 	 */
 
-	if (internal.metarule->dynamic & D_dynamic) dynamic(internal.metarule);
+	if (internal.metarule->dynamic & D_dynamic)
+		dynamic(internal.metarule);
 
 	/*
 	 * some things are only done once

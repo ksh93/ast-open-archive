@@ -1,5 +1,8 @@
 info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
 setv INSTALLROOT ${INSTALLROOT}
+setv PACKAGE_X11 ${INSTALLROOT}
+setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11
+setv PACKAGE_X11_LIB ${PACKAGE_X11}/lib
 setv PACKAGE_tk ${INSTALLROOT}
 setv PACKAGE_tk_INCLUDE ${PACKAGE_tk}/include
 setv PACKAGE_tk_LIB ${PACKAGE_tk}/lib
@@ -12,9 +15,6 @@ setv PACKAGE_shell_LIB ${PACKAGE_shell}/lib
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGE_X11 ${INSTALLROOT}
-setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11
-setv PACKAGE_X11_LIB ${PACKAGE_X11}/lib
 setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
 setv ARFLAGS cr
@@ -188,13 +188,13 @@ meta tkMain.o %.c>%.o tkMain.c tkMain
 prev tkMain.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -c tkMain.c
 done tkMain.o generated
+make ${mam_libX11} archive
+done ${mam_libX11} dontcare virtual
 bind -ltk
 bind -ltcl
 bind -lshell
-bind -last
-make ${mam_libX11} archive
-done ${mam_libX11} dontcare virtual
 prev ${mam_libX11} archive
+bind -last
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tksh uinit.o tkMain.o ${mam_libtk} ${mam_libtcl} ${mam_libshell} ${mam_libshell} ${mam_libast}
 done tksh generated
 make ${INSTALLROOT}/bin

@@ -649,6 +649,11 @@ bindalias(register Rule_t* r, register Rule_t* x, char* path, Rule_t* d)
 		if (x == r || (x->dynamic & D_alias))
 			return r;
 	}
+	if (!((r->dynamic|x->dynamic)&D_bound) && !d)
+	{
+		debug((-5, "%s alias %s delayed until one or the other is bound", x->name, r->name));
+		return x;
+	}
 	message((-2, "%s is also specified as %s", unbound(r), unbound(x)));
 #if DEBUG
 	if (state.test & 0x00000040)
@@ -1521,7 +1526,7 @@ bindattribute(register Rule_t* r)
 	r->dynamic |= D_bound;
 	if (x = associate(internal.attribute_p, r, NiL, NiL))
 	{
-		merge(x, r, MERGE_ATTR);
+		merge(x, r, MERGE_ASSOC|MERGE_ATTR);
 		*x->name = ATTRCLEAR;
 		if (z = getrule(x->name))
 			negate(z, r);

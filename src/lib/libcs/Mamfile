@@ -488,7 +488,7 @@ prev cslib.h implicit
 done csvar.c
 meta csvar.o %.c>%.o csvar.c csvar
 prev csvar.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DTRUST=\""${INSTALLROOT}:${INSTALLROOT}/opt/ast:/usr/add-on/ast:/usr/addon/ast:/usr/contrib/ast:/usr/local/arch/${mam_cc_HOSTTYPE}/ast:/usr/common/ast:/usr/local/ast:/opt/ast:/home/ast:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/common:/usr/local:/:/usr"\" -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csvar.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DTRUST=\""${INSTALLROOT}:${INSTALLROOT}/opt/ast:/usr/add-on/ast:/usr/addon/ast:/usr/contrib/ast:/usr/local/arch/${mam_cc_HOSTTYPE}/ast:/usr/common/ast:/usr/local/ast:/opt/ast:/home/ast:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/common:/usr/local:${INSTALLROOT}/opt:/usr/add-on:/usr/addon:/usr/contrib:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/common:/usr/local:/opt:/home:/:/usr"\" -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csvar.c
 done csvar.o generated
 make cswrite.o
 make cswrite.c

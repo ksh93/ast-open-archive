@@ -1,4 +1,4 @@
-04-12-25 bio.c: fix (*putheader)() reurn value logic, especially for ENOSPACE
+04-12-25 bio.c: fix (*putheader)() return value logic, especially for ENOSPACE
 04-12-08 listformat now handles high resolution time
 04-12-01 tv.h,tv.c,features/tv move to libast
 04-09-25 bio.c: fix ap->io->count for skipped data -- wow

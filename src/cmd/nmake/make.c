@@ -520,7 +520,6 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 		if ((r->property & P_dontcare) && !state.unwind)
 			state.unwind = error_info.indent;
 		otime = r->time;
-if ((state.test & 2) && strmatch(r->name, "*.o")) dumprule(sfstderr, r);
 		if ((r1 = bind(r)) == r)
 			break;
 		if ((r->property & P_target) && !(r1->property & P_target))
@@ -535,7 +534,6 @@ if ((state.test & 2) && strmatch(r->name, "*.o")) dumprule(sfstderr, r);
 		r->active->target = r;
 		r->active->previous = fp;
 	}
-if ((state.test & 2) && strmatch(r->name, "*.o")) dumprule(sfstderr, r);
 	if ((r3 == r || (r->property & P_target) && !(r3->property & P_target)) && (!(r->dynamic & D_alias) || r3name == unbound(r)))
 		r3 = 0;
 	otargetview = state.targetview;

@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-12-08 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2005-01-01 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -32,21 +32,29 @@
  */
 
 .BIND.%.PFX.INCLUDE : .FUNCTION
+	if "$(%:A=.DONTCARE)"
+		$(%:B:S) : .DONTCARE
+	end
 	return $(%:B:S)
 
 .PREFIX.INCLUDE. : .FUNCTION
-	if "$(%%)" != "/*" && "$(<<:O=1:P=U)" != "." && ! "$(%%:T=XG)" && ( "$(-targetcontext)" || "$(<<:A:A=.SCAN:O=1)" == "$(<<<:A:A=.SCAN:O=1)" && "$(%%:P=U:D)" == ".|../*" )
-		local B
-		B := $(<<`;O=1;P=U;D;B=$$(%%);P=C)
-		if B == "../*"
-			B := $(<<<:O=1:P=U:D)/$(B)
-			B := $(B:P=C)
+	if "$(%%)" != "/*" && "$(<<:O=1:P=U)" != "." && ( "$(-target-context)" || "$(-recurse)" == "combine" && "$(%%:P=U)" != "*/*" || "$(<<:A:A=.SCAN:O=1)" == "$(<<<:A:A=.SCAN:O=1)" && "$(%%:P=U:D)" == ".|../*" )
+		$(%%) : .LCL.INCLUDE
+		if ! "$(%%:T=XG)"
+			local B
+			B := $(<<`;O=1;P=U;D;B=$$(%%);P=C)
+			if B == "../*"
+				B := $(<<<:O=1:P=U:D)/$(B)
+				B := $(B:P=C)
+			end
+			$(B) : .PFX.INCLUDE
+			if "$(%%:A=.DONTCARE)"
+				$(B) : .DONTCARE
+			end
+			return $(B)
 		end
-		$(B) : .PFX.INCLUDE
-		return $(B)
-	else
-		return $(%%)
 	end
+	return $(%%)
 
 .SOURCE.%.LCL.INCLUDE : .FORCE $$(*.SOURCE.c) $$(*.SOURCE) $$(*.SOURCE.h)
 

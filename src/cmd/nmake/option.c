@@ -31,8 +31,6 @@
 #include "make.h"
 #include "options.h"
 
-#define getoption(n)	((Option_t*)hashget(opt.table,(n)))
-
 #define OPT_OFFSET	10
 #define OPT_NON		'-'
 #define OPT_SEP		';'
@@ -209,12 +207,12 @@ static Option_t		options[] =	/* option table			*/
 	" \a3d\a filesystem semantics, where directories in the top views"
 	" take precedence. On by default when running in \a2d\a with"
 	" \bVPATH\b defined, off by default otherwise." },
-{ "targetcontext",OPT_targetcontext,(char*)&state.targetcontext,	0,
+{ "target-context",OPT_targetcontext,(char*)&state.targetcontext,	0,
 	"Expand and execute shell actions in the target directory context."
 	" This allows a single makefile to control a directory tree while"
 	" generating target files at the source file directory level. By"
 	" default target files are generated in the current directory." },
-{ "targetprefix",	OPT_targetprefix,(char*)&state.targetprefix,	0,
+{ "target-prefix",	OPT_targetprefix,(char*)&state.targetprefix,	0,
 	"Allow metarules to match \aseparator\a in the target to \b/\b"
 	" in the source. Used to disambiguate source file base name clashes"
 	" when target files are generated in the current directory."
@@ -319,6 +317,22 @@ typedef struct Optstate_s		/* option state			*/
 
 static Optstate_t	opt;
 
+static Option_t*
+getoption(const char* name)
+{
+	register Option_t*	op;
+	register int		c;
+
+	if (!(op = (Option_t*)hashget(opt.table, name)) && (strchr(name, '-') || strchr(name, '_')))
+	{
+		while (c = *name++)
+			if (c != '-' && c != '_')
+				sfputc(internal.tmp, c);
+		op = (Option_t*)hashget(opt.table, sfstruse(internal.tmp));
+	}
+	return op;
+}
+
 static void
 putoption(register Option_t* op, int index)
 {
@@ -327,11 +341,11 @@ putoption(register Option_t* op, int index)
 	char		buf[16];
 
 	hashput(opt.table, op->name, (char*)op);
-	if (strchr(op->name, '-'))
+	if (strchr(op->name, '-') || strchr(op->name, '_'))
 	{
 		s = op->name;
 		while (c = *s++)
-			if (c != '-')
+			if (c != '-' && c != '_')
 				sfputc(internal.tmp, c);
 		hashput(opt.table, strdup(sfstruse(internal.tmp)), (char*)op);
 	}

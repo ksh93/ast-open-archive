@@ -52,29 +52,28 @@
 #define OP_STATE	(1<<7)		/* state assignment		*/
 
 #define CON_kept	(1<<0)		/* already kept part of block	*/
-#define CON_scan	(1<<1)		/* full rule table scan		*/
-#define CON_skip	(1<<2)		/* skip this part of block	*/
-#define CON_stash	(1<<3)		/* file loop body lines stashed	*/
+#define CON_skip	(1<<1)		/* skip this part of block	*/
+#define CON_stash	(1<<2)		/* file loop body lines stashed	*/
 
-#define CON_if		(1<<4)		/* if block			*/
-#define CON_elif	(1<<5)		/* not used in flags		*/
-#define CON_else	(1<<6)		/* had else			*/
-#define CON_end		(1<<7)		/* not used in flags		*/
-#define CON_for		(1<<8)		/* for loop block		*/
-#define CON_while	(1<<9)		/* while loop block		*/
-#define CON_eval	(1<<10)		/* eval block			*/
+#define CON_if		(1<<3)		/* if block			*/
+#define CON_elif	(1<<4)		/* not used in flags		*/
+#define CON_else	(1<<5)		/* had else			*/
+#define CON_end		(1<<6)		/* not used in flags		*/
+#define CON_for		(1<<7)		/* for loop block		*/
+#define CON_while	(1<<8)		/* while loop block		*/
+#define CON_eval	(1<<9)		/* eval block			*/
 
-#define CON_break	(1<<11)		/* loop break			*/
-#define CON_continue	(2<<11)		/* loop continue		*/
-#define CON_error	(3<<11)		/* error message output		*/
-#define CON_exit	(4<<11)		/* exit				*/
-#define CON_let		(5<<11)		/* let expression		*/
-#define CON_local	(6<<11)		/* local var declaration	*/
-#define CON_print	(7<<11)		/* standard output message	*/
-#define CON_read	(8<<11)		/* read				*/
-#define CON_return	(9<<11)		/* return			*/
-#define CON_rules	(10<<11)	/* rules			*/
-#define CON_set		(11<<11)	/* set options			*/
+#define CON_break	(1<<10)		/* loop break			*/
+#define CON_continue	(2<<10)		/* loop continue		*/
+#define CON_error	(3<<10)		/* error message output		*/
+#define CON_exit	(4<<10)		/* exit				*/
+#define CON_let		(5<<10)		/* let expression		*/
+#define CON_local	(6<<10)		/* local var declaration	*/
+#define CON_print	(7<<10)		/* standard output message	*/
+#define CON_read	(8<<10)		/* read				*/
+#define CON_return	(9<<10)		/* return			*/
+#define CON_rules	(10<<10)	/* rules			*/
+#define CON_set		(11<<10)	/* set options			*/
 
 #define PUSHLOCAL(p)	do{for(p=pp->local;p;p=p->next)if(!(p->newv.property&V_scope))p->bucket->value=(char*)p->oldv;}while(0)
 #define POPLOCAL(p)	do{for(p=pp->local;p;p=p->next)if(!(p->newv.property&V_scope))p->bucket->value=(char*)&p->newv;}while(0)
@@ -114,12 +113,7 @@ typedef struct Control_s		/* flow control block stack	*/
 	Var_t*		var;		/* for loop variable		*/
 	char**		args;		/* for loop arg vector		*/
 	Sfio_t*		tmp;		/* for loop arg tmp		*/
-	Sfio_t*		vec;		/* for loop argv tmp		*/
-	union
-	{
-	char**		argv;		/* arg vector position		*/
-	Hash_position_t*scan;		/* hash table scan position	*/
-	}		pos;		/* for loop position		*/
+	Sfio_t*		vec;		/* for loop args tmp		*/
 	}		f;
 	}		loop;
 } Control_t;
@@ -231,8 +225,6 @@ unparse(int level)
 				{
 					sfstrclose(cp->loop.f.vec);
 					sfstrclose(cp->loop.f.tmp);
-					if (pp->cp->flags & CON_scan)
-						hashdone(pp->cp->loop.f.pos.scan);
 				}
 			}
 			else if (cp->flags & CON_while)
@@ -444,20 +436,9 @@ static int
 iterate(void)
 {
 	register char*		p;
-	register char**		ap;
 	register Var_t*		v = pp->cp->loop.f.var;
 
-	if (pp->cp->flags & CON_scan)
-	{
-		while (hashnext(pp->cp->loop.f.pos.scan))
-			for (ap = pp->cp->loop.f.args; p = *ap++;)
-				if (strmatch(pp->cp->loop.f.pos.scan->bucket->name, p))
-					goto matched;
-		return 0;
-	matched:
-		p = pp->cp->loop.f.pos.scan->bucket->name;
-	}
-	else if (!(p = *pp->cp->loop.f.pos.argv++))
+	if (!(p = *pp->cp->loop.f.args++))
 		return 0;
 
 	/*
@@ -1083,8 +1064,6 @@ getline(Sfio_t* sp, int lead, int term)
 				{
 					sfstrclose(pp->cp->loop.f.vec);
 					sfstrclose(pp->cp->loop.f.tmp);
-					if (pp->cp->flags & CON_scan)
-						hashdone(pp->cp->loop.f.pos.scan);
 				}
 			}
 			if (c & CON_while)
@@ -1108,29 +1087,6 @@ getline(Sfio_t* sp, int lead, int term)
 			{
 				Sfio_t*	tp;
 
-				/*
-				 * full match scan only if explicit C_MATCH outside $(...)
-				 */
-
-				c = 0;
-				for (s = t; *s; s++)
-				{
-					if (*s == '(')
-					{
-						if (c || s > t && *(s - 1) == '$')
-							c++;
-					}
-					else if (c)
-					{
-						if (*s == ')')
-							c--;
-					}
-					else if (istype(*s, C_MATCH))
-					{
-						pp->cp->flags |= CON_scan;
-						break;
-					}
-				}
 				pp->cp->loop.f.tmp = tp = sfstropen();
 				expand(tp, t);
 				tok = sfstruse(tp);
@@ -1141,10 +1097,6 @@ getline(Sfio_t* sp, int lead, int term)
 				if (*(pp->cp->loop.f.args = (char**)sfstrseek(tp, 0, SEEK_SET)))
 				{
 					pp->cp->loop.f.var = setvar(s, null, 0);
-					if (pp->cp->flags & CON_scan)
-						pp->cp->loop.f.pos.scan = hashscan(table.rule, 0);
-					else
-						pp->cp->loop.f.pos.argv = pp->cp->loop.f.args;
 					if (!iterate())
 						pp->cp->flags |= CON_kept | CON_skip;
 					else
@@ -1168,10 +1120,7 @@ getline(Sfio_t* sp, int lead, int term)
 					}
 				}
 				else
-				{
-					pp->cp->flags &= ~CON_scan;
 					pp->cp->flags |= CON_kept | CON_skip;
-				}
 			}
 			continue;
 
@@ -1985,23 +1934,17 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 		int		op;		/* assertion op		*/
 	}			*att, clr, set;
 
-	if (!(x = getrule(lhs)) || !(x->property & P_immediate))
-		for (p = internal.assert->prereqs; p; p = p->next)
-			if (((r = p->rule)->property & P_operator) && !(r->dynamic & D_bound))
-			{
-				r->dynamic |= D_bound;
-				r->uname = r->name;
-				r->name = opr ? opr->name : ":";
-				apply(r, lhs, rhs, act, CO_ALWAYS|CO_LOCAL|CO_URGENT);
-				r->dynamic &= ~D_bound;
-				r->name = r->uname;
-				r->uname = 0;
-				return;
-			}
 	if (opr)
 	{
 		debug((-6, "operator: lhs=`%s' %s rhs=`%s' act=`%-.1024s'", lhs, opr->name, rhs, act));
 		apply(opr, lhs, rhs, act, CO_ALWAYS|CO_LOCAL|CO_URGENT);
+		return;
+	}
+	if (internal.assert_p->prereqs && (opr = associate(internal.assert_p, NiL, lhs, NiL)) && opr->prereqs && (opr = opr->prereqs->rule) && (opr->property & P_operator) && !opr->uname)
+	{
+		opr->uname = lhs;
+		apply(opr, lhs, rhs, act, CO_ALWAYS|CO_LOCAL|CO_URGENT);
+		opr->uname = 0;
 		return;
 	}
 	debug((-6, "assertion: lhs=`%s' rhs=`%-.1024s' act=`%-.1024s'", lhs, rhs, act));
@@ -2010,7 +1953,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 	 * special check for internal.query
 	 */
 
-	if (x == internal.query)
+	if (getrule(lhs) == internal.query)
 	{
 		c = 0;
 		if (!(s = getarg(&rhs, NiL)))
@@ -2642,23 +2585,17 @@ static void
 assignment(char* lhs, int op, char* rhs)
 {
 	register Rule_t*	r;
-	register List_t*	p;
 	register char*		s;
 	register int		n;
 	Var_t*			v;
 
-	for (p = internal.assign->prereqs; p; p = p->next)
-		if (((r = p->rule)->property & P_operator) && !(r->dynamic & D_bound))
-		{
-			r->dynamic |= D_bound;
-			r->uname = r->name;
-			r->name = (op & OP_APPEND) ? "+=" : (op & OP_AUXILIARY) ? "&=" : (op & OP_STATE) ? "==" : "=";
-			apply(r, lhs, rhs, NiL, CO_ALWAYS|CO_LOCAL|CO_URGENT);
-			r->dynamic &= ~D_bound;
-			r->name = r->uname;
-			r->uname = 0;
-			return;
-		}
+	if (internal.assign_p->prereqs && (r = associate(internal.assign_p, NiL, lhs, NiL)) && r->prereqs && (r = r->prereqs->rule) && (r->property & P_operator) && !r->uname)
+	{
+		r->uname = (op & OP_APPEND) ? "+=" : (op & OP_AUXILIARY) ? "&=" : (op & OP_STATE) ? "==" : "=";
+		apply(r, lhs, rhs, NiL, CO_ALWAYS|CO_LOCAL|CO_URGENT);
+		r->uname = 0;
+		return;
+	}
 	debug((-6, "assignment: lhs=`%s' %s%srhs=`%-.1024s'", lhs, (op & OP_APPEND) ? "[append] " : null, (op & OP_STATE) ? "[state] " : null, rhs));
 	if (!(s = getarg(&lhs, NiL)))
 		error(1, "variable name missing in assignment");

@@ -52,7 +52,7 @@ set option=';official-output;s;-;The \bdiff\b(1) log file name for the \bofficia
 set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b-I-\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
 set option=';preserve;sv;-;Move existing \binstall\b action targets matching \apattern\a to the \bETXTBSY\b subdirectory of the install target.;pattern:!*'
 set option=';profile;b;-;Compile and link with \bprof\b(1) instrumentation options enabled.'
-set option=';recurse;s;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
+set option=';recurse;s;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+combine?Combine all recursive makefiles into one rooted at the current directory. \b::\b, \b:PACKAGE:\b, \b.SOURCE\b*, and \bLDLIBRARIES\b are intercepted to adjust relative directory and library references. Complex makefile hierarchies may not be amenable to combination.][+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
 set option=';recurse-enter;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon entering a recursive \b:MAKE:\b directory.;text'
 set option=';recurse-leave;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon leaving a recursive \b:MAKE:\b directory. If \b--recurse-leave\b is not specified then no message is printed upon leaving \b:MAKE:\b directories.;text'
 set option=';select;s;-;A catenation of edit operators that selects terminal source files.;edit-ops'
@@ -204,7 +204,7 @@ PKGDIRS = $(LIBDIR) $(*.VIEW:X=$(VROOT)/$(LIBDIR:B:S)) $(MAKERULESPATH:/:/ /G::D
 LCLDIRS = /usr/local/arch/$(_hosttype_):/usr/common:/usr/local
 OPTDIRS = $(INSTALLROOT)/opt:/usr/add-on:/usr/addon:/usr/contrib:$(LCLDIRS):/opt:/home
 STDDIRS = /:/usr
-USRDIRS = $(LCLDIRS):$(STDDIRS)
+USRDIRS = $(LCLDIRS):$(OPTDIRS):$(STDDIRS)
 
 /*
  * common directories
@@ -1555,10 +1555,10 @@ end
 				if CC.SUFFIX.OBJECT == "$(T1:S)"
 					T2 := $(T1)
 				else
-					if "$(-targetcontext)"
+					if "$(-target-context)"
 						T2 := $(T2:D=$(T1:D):B:S)
-					elif "$(-targetprefix)"
-						T2 := $(T2:D=$(T1:D):B:S:C%/%$(-targetprefix)%G)
+					elif "$(-target-prefix)"
+						T2 := $(T2:D=$(T1:D):B:S:C%/%$(-target-prefix)%G)
 					end
 					$(T2) : .SPECIAL .IMPLICIT $(T1)
 					$(T1) : .SPECIAL .TERMINAL
@@ -2348,24 +2348,121 @@ end
  */
 
 ":MAKE:" : .MAKE .OPERATOR
-	local ATT EXP LHS RHS
-	if ! ( LHS = "$(<)" )
-		LHS = .RECURSE
-		.ALL .MAIN : $(LHS)
-	end
-	ATT := $(>:A=.ATTRIBUTE)
-	for EXP $(>:N=*=*)
-		eval
-		$(EXP)
+	if "$(-recurse)" != "combine"
+		local ATT EXP LHS RHS
+		if ! ( LHS = "$(<)" )
+			LHS = .RECURSE
+			.ALL .MAIN : $(LHS)
 		end
-		export $(EXP:/=.*//)
+		ATT := $(>:A=.ATTRIBUTE)
+		for EXP $(>:N=*=*)
+			eval
+			$(EXP)
+			end
+			export $(EXP:/=.*//)
+		end
+		RHS = $(>:N!=*=*:A!=.ATTRIBUTE)
+		eval
+			$$(<) :
+				$(@:V)
+		end
+		$(LHS) : $(ATT) $$(.RECURSE.INIT. $(RHS))
+	elif ! .NONRECURSIVE.PREFIX
+		local A B I P INS APP NB NP OB OP
+		A = ::
+		A := $(@$(A):V)
+		eval
+		":NONRECURSIVE_COMMAND:" : .MAKE .OPERATOR
+			$(A:V)
+		end
+		"::" : .MAKE .OPERATOR
+			if .NONRECURSIVE.PREFIX
+				local I P
+				.PACKAGE.build.$(<:O=1) := $(.PACKAGE.build)
+				for I $(>)
+					if I != "[-+]*|$(.NONRECURSIVE.PREFIX)/*"
+						P += $(I:C,^,$(.NONRECURSIVE.PREFIX)/,)
+					else
+						P += $(I)
+					end
+				end
+				eval
+				$$(<) :NONRECURSIVE_COMMAND: $$(P)
+					$(@:V)
+				end
+			else
+				eval
+				$$(<) :NONRECURSIVE_COMMAND: $$(>)
+					$(@:V)
+				end
+			end
+		.ASSERT..SOURCE% : ":NONRECURSIVE_SOURCE:"
+		":NONRECURSIVE_SOURCE:" : .MAKE .OPERATOR
+			if .NONRECURSIVE.PREFIX
+				local I P
+				for I $(>)
+					if I != "[-+]*|$(.NONRECURSIVE.PREFIX)/*"
+						P += $(I:C,^,$(.NONRECURSIVE.PREFIX)/,)
+					else
+						P += $(I)
+					end
+				end
+				eval
+				$$(<) : $$(P)
+					$(@:V)
+				end
+			else
+				eval
+				$$(<) : $$(>)
+					$(@:V)
+				end
+			end
+		A =
+		for I $(".":W=R=$(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE):N!=-)
+			A := $(I) $(A)
+		end
+		for I $(A)
+			.NONRECURSIVE.PREFIX := $(I)
+			OP := $(.PACKAGE.)
+			.PACKAGE. = -
+			OB := $(.PACKAGE.build)
+			.PACKAGE.build = -
+			include "$(I:X=$(MAKEFILES:/:/ /G):T=F:O=1)"
+			APP =
+			INS =
+			for P $(.PACKAGE.build)
+				if P == "-"
+					INS := $(APP)
+					APP =
+				else if ! "$(OB:N=$(P))"
+					APP += $(P)
+				end
+			end
+			.PACKAGE.build := $(INS) $(OB) $(APP)
+			APP =
+			INS =
+			for P $(.PACKAGE.)
+				if P == "-"
+					INS := $(APP)
+					APP =
+				else if ! "$(OP:N=$(P))"
+					APP += $(P)
+				end
+			end
+			.PACKAGE. := $(INS) $(OP) $(APP)
+		end
+		.NONRECURSIVE.PREFIX =
+		.ASSERT. : .DELETE .SOURCE%
+		eval
+		.NONRECURSIVE.PACKAGE.LIBRARIES. : .FUNCTION
+			$(@.PACKAGE.LIBRARIES.:V)
+		end
+		.PACKAGE.LIBRARIES. : .FUNCTION
+			if ! "$(%)"
+				return $(.NONRECURSIVE.PACKAGE.LIBRARIES. $(.PACKAGE.build.$(<<:O=1)))
+			end
+		LDLIBRARIES += $$(.PACKAGE.LIBRARIES.)
 	end
-	RHS = $(>:N!=*=*:A!=.ATTRIBUTE)
-	eval
-		$$(<) :
-			$(@:V)
-	end
-	$(LHS) : $(ATT) $$(.RECURSE.INIT. $(RHS))
 
 /*
  * rhs compilation with no optimization
@@ -2487,12 +2584,18 @@ end
 	local T1 T4 T5 T6 T7
 	local B D G H I K L N P Q T V W X Z IP LP LPL LPV PFX SFX FOUND
 	if ! .PACKAGE.GLOBAL.
-		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
+		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(INSTALLROOT:T=F:P=L=*) $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
 		.PACKAGE.GLOBAL. := $(.PACKAGE.GLOBAL.:N!=$(PACKAGE_IGNORE):T=F:U)
 		.PACKAGE.CONFIG. := $(.PACKAGE.GLOBAL.:X=$(.PACKAGE.CONFIG.):T=F:U)
 		: $(.PACKAGE.PROBE.:V:R)
 	end
 	for P $(%)
+		if "$(PACKAGE_$(P)_found)" == "1"
+			.PACKAGE.$(P).found := 1
+		end
+		if "$(.PACKAGE.$(P).found)" == "1"
+			continue
+		end
 		FOUND = 0
 		I := $(PACKAGE_$(P)_INCLUDE)
 		IP := $(.PACKAGE.$(P).include)
@@ -2516,25 +2619,27 @@ end
 		if ! LP
 			LP = lib
 		end
-		if ( I && L )
+		if ( I && L || "$(.PACKAGE.$(P).rules)" != "|-" && ( "$(I:T=F)" || "$(L:T=F)" ) )
 			FOUND = 1
 		else
-			if T1 = "$(.PACKAGE.CONFIG.:L!~?(lib)($(P)|$(P)-*).pc:O=1)"
-				T1 := $(T1:T=I:/${\([^}]*\)}/$$(\1)/G)
-				local $(T1:N=+([[:alnum:]_[:space:]])=*:/=.*//)
-				$(T1:N=+([[:alnum:]_[:space:]])[:]*:/:.*//) : .CLEAR
-				: $(T1:V:R)
-				if !I
-					I := $(~Cflags:N=-I*:/-I//)
-					PACKAGE_$(P)_INCLUDE := $(I)
+			if ! "$(CC.REQUIRE.$(P))"
+				if T1 = "$(.PACKAGE.CONFIG.:L!~?(lib)($(P)|$(P)-*).pc:O=1)"
+					T1 := $(T1:T=I:/${\([^}]*\)}/$$(\1)/G)
+					local $(T1:N=+([[:alnum:]_[:space:]])=*:/=.*//)
+					$(T1:N=+([[:alnum:]_[:space:]])[:]*:/:.*//) : .CLEAR
+					: $(T1:V:R)
+					if !I
+						I := $(~Cflags:N=-I*:/-I//)
+						PACKAGE_$(P)_INCLUDE := $(I)
+					end
+					if !L
+						L := $(~Libs:N=-L*:/-L//)
+						PACKAGE_$(P)_LIB := $(L)
+					end
+					CC.REQUIRE.$(P) := $(~Libs:N=[-+]l*)
+					PACKAGE_$(P) := /
+					FOUND = 1
 				end
-				if !L
-					L := $(~Libs:N=-L*:/-L//)
-					PACKAGE_$(P)_LIB := $(L)
-				end
-				CC.REQUIRE.$(P) := $(~Libs:N=[-+]l*)
-				PACKAGE_$(P) := /
-				FOUND = 1
 			end
 			if ( !I && !L )
 				T1 = $(INSTALLROOT)/$(IP)/$(P)
@@ -2661,10 +2766,10 @@ end
 				eval
 				_PACKAGE_$(P) $(.INITIALIZED.:?=?==?) 1
 				end
-				if ! FOUND
-					I := $(I)/$(P:/[0-9]*$//)*.h*
-					if "$(I:P=G:O=1:P=X)"
+				for D $(I)/*.h*([!.]) $(I)/*/*.h*([!.])
+					if "$(D:P=G:O=1:P=X)"
 						FOUND = 1
+						break
 					end
 				end
 			end
@@ -3395,7 +3500,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	if "$(-instrument)"
 		if ! ( instrument.root = "$(-instrument:O=1:D:N!=.:T=F)" )
 			T1 = $(PATH):$(OPTDIRS)
-			instrument.root := $(T1:/:/ /G:X=$(-instrument:O=1:B)/.:P=X:D)
+			instrument.root := $(T1:/:/ /G:N!=.:X=$(-instrument:O=1:B)/.:P=X:D)
 			if ! instrument.root
 				instrument.root = $(.INSTRUMENT.notfound)
 			end
@@ -3727,7 +3832,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		_BLD_INSTRUMENT == 1
 	end
 	if T3
-		CCFLAGS &= $$(-targetcontext:?$$$(!$$$(*):A=.PFX.INCLUDE:@Y%$$$(<:P=U:D:T=*:P=L=*:/^/-I/) %%)??)$$(-targetprefix:?$$$(<:O=1:N=$$$(*:O=1:B:S=$$$(CC.SUFFIX.OBJECT)):Y%%-o $$$$(<) %)??)$(T3:V)
+		CCFLAGS &= $$(-target-context:?$$$(!$$$(*):A=.PFX.INCLUDE:@Y%$$$(<:P=U:D:T=*:P=L=*:/^/-I/) %%)??)$$(-target-prefix:?$$$(<:O=1:N=$$$(*:O=1:B:S=$$$(CC.SUFFIX.OBJECT)):Y%%-o $$$$(<) %)??)$(T3:V)
 	end
 	T3 =
 	T4 =
@@ -4210,7 +4315,11 @@ end
 	print $(.INSTALL.LIST.:$(INSTALLROOT:N=.:?T=F?N=$(INSTALLROOT)/*:T=F:C%$(INSTALLROOT)/%%):C% %$("\n")%G)
 
 .LIST.MANIFEST : .ONOBJECT .COMMON.SAVE .MAKE
-	print $(.MANIFEST.:/ /$("\n")/G)
+	if .RWD.
+		print $(.MANIFEST.:C,^\([^/]\),$(.RWD.)/\1,:/ /$("\n")/G)
+	else
+		print $(.MANIFEST.:/ /$("\n")/G)
+	end
 
 .LIST.PACKAGE.DIRS. = $(VROOT:T=F:P=L*) $(INSTALLROOT) $(PACKAGEROOT)
 

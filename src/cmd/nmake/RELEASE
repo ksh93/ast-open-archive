@@ -3,7 +3,15 @@
 04-12-25 Makerules.mk: handle cc-,a=b
 	 Makerules.mk: check for -I. after -I-
 	 Makerules.mk: add MVFLAGS=-f for install actions
+	 Makerules.mk: relax .PACKAGE.INIT. PACKAGE_%_INCLUDE search
+	 Makerules.mk: fix list.manifest recursion
+	 Makerules.mk: add experimental --recurse=combine
+	 Scanrules.mk: assert .LCL.INCLUDE before .PREFIX.INCLUDE :T=G: bind
 	 msgcat.mk: fix _PACKAGE_ID
+	 bind.c: disable bindalias() for unbound files -- doh
+	 parse.c: drop CON_scan for over all rules; $(...) does it
+	 parse.c: drop { .ASSERT .ASSIGN } lists, add { .ASSERT. .ASSIGN. }
+	 state.c: ignore file timestamp subsecond truncation -- willya fix ext3
 04-12-08 Scanrules.mk: add .SCAN.iffe for `include previous-iffe-output'
 	 Scanrules.mk: fix $(prefixinclude:?...) => $(-prefix-include:+...)
 	 Makerules.mk: no -g CC.LIB.TYPE (in ar name) if CC.OPTIMIZE also set

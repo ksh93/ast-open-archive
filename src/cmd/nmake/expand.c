@@ -1930,7 +1930,6 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 		 * return unbound name
 		 */
 
-		if ((state.test & 1) && r && !(r->property & P_state)) error(1, "AHA :P=U: alias=%d name=%s unbound=%s s=%s", !!(r->dynamic & D_alias), r->name, unbound(r), s);
 		sfputr(xp, (r && !(r->property & P_state) && !(r->dynamic & D_alias)) ? unbound(r) : s, -1);
 		return;
 	case 'V':

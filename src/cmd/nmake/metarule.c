@@ -143,9 +143,8 @@ metamatch(char* stem, register char* s, char* pattern)
 	targetprefix = state.targetprefix ? *state.targetprefix : -1;
 	while (*p != '%')
 	{
-		if (!metaccmp(pattern, *p, *s++))
+		if (!metaccmp(pattern, *p, *s))
 		{
-			s--;
 			do
 			{
 				if (*s == '/')
@@ -178,6 +177,8 @@ metamatch(char* stem, register char* s, char* pattern)
 			}
 			return 1;
 		}
+		else
+			s++;
 	}
 	t = s;
 	while (*s)

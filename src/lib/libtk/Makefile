@@ -1,4 +1,4 @@
-:PACKAGE: tcl ast X11 libtksh:force
+:PACKAGE: - X11 tcl:install ast libtksh:force
 
 ID			=	tk
 LIB			=	tk
