@@ -30,7 +30,7 @@ $(INCLUDEDIR) :INSTALLPROTO: expr.h
 
 $(INCLUDEDIR) :INSTALLDIR: exparse.h
 
-YACCFIX.exparse = ex
+:YYPREFIX: ex ast.h exparse.y
 
 /*
  * NOTE: the solaris yacc botches the yyact[] indices (large positive)

@@ -59,7 +59,7 @@
 #endif
 #endif
 
-#define CONVERT(a,b,c,f,t) \
+#define CVT(a,b,c,f,t) \
 	do \
 	{ \
 		if (c) \
@@ -81,12 +81,24 @@
 
 #define TEXT(b,c,f)	text((unsigned char*)b,c,f)
 
-#define EXTERNAL(a,b,c)	CONVERT(a,b,c,(a)->convert[SECTION(a)].internal,(a)->convert[SECTION(a)].external)
-#define INTERNAL(a,b,c)	CONVERT(a,b,c,(a)->convert[SECTION(a)].external,(a)->convert[SECTION(a)].internal)
+#define CONVERT(a,b,c)	CVT(a,b,c,(a)->convert[SECTION(a)].from,(a)->convert[SECTION(a)].to)
+#define REVERT(a,b,c)	CVT(a,b,c,(a)->convert[SECTION(a)].to,(a)->convert[SECTION(a)].from)
 
 /*
  * return 1 if b is text data in f charset
  */
+
+static const unsigned char	ascii_text[] =
+{
+	0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+};
 
 static int
 text(register unsigned char* b, ssize_t n, int f)
@@ -101,7 +113,7 @@ text(register unsigned char* b, ssize_t n, int f)
 	{
 		c = *b++;
 		c = CCMAPC(c, f, CC_ASCII);
-		if (c >= 0177 || c < 010 || c > 012 && c < 040)
+		if (!ascii_text[c])
 			return 0;
 	}
 	return 1;
@@ -382,7 +394,7 @@ bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
 			ap->memsum = memsum(b, c, ap->memsum);
 			ap->old.memsum = omemsum(b, c, ap->old.memsum);
 		}
-		INTERNAL(ap, b, c);
+		CONVERT(ap, b, c);
 #if DEBUG
 		if (ob) message((-7, "bread(%s,%d@%I*d): %-.*s%s", ap->name, c, sizeof(ap->io->count), ap->io->count, c > 32 ? 32 : c, ob, c > 32 ? "..." : ""));
 #endif
@@ -406,7 +418,7 @@ bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
 					if (ob)
 					{
 						memcpy(b, ap->io->next, c);
-						INTERNAL(ap, b, c);
+						CONVERT(ap, b, c);
 					}
 					b += c;
 					n -= c;
@@ -440,7 +452,7 @@ bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
 				if (ob)
 				{
 					memcpy(b, ap->io->next, n);
-					INTERNAL(ap, b, n);
+					CONVERT(ap, b, n);
 				}
 				ap->io->next += n;
 				ap->io->count += n;
@@ -475,7 +487,7 @@ bunread(register Archive_t* ap, void* ab, register int n)
 		if (ap->io->next < ap->io->buffer)
 			error(PANIC, "bunread(%s,%d): too much pushback", ap->name, n);
 		memcpy(ap->io->next, b, n);
-		EXTERNAL(ap, ap->io->next, n);
+		REVERT(ap, ap->io->next, n);
 	}
 	message((-7, "bunread(%s,%d@%I*d): %-.*s%s", ap->name, n, sizeof(ap->io->count), ap->io->count, n > 32 ? 32 : n, ap->io->next, n > 32 ? "..." : ""));
 }
@@ -542,7 +554,7 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 		ap->memsum = memsum(s, n, ap->memsum);
 		ap->old.memsum = omemsum(s, n, ap->old.memsum);
 	}
-	INTERNAL(ap, s, n);
+	CONVERT(ap, s, n);
 	message((-7, "bget(%s,%I*d@%I*d): %-.*s%s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, n > 32 ? 32 : (int)n, s, n > 32 ? "..." : ""));
 	return s;
 }
@@ -714,12 +726,15 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 	register int	c;
 	int		an;
 
-	EXTERNAL(ap, b, n);
-	an = ap->convert[SECTION(ap)].on ? n : 0;
-	if (ap->sum > 0)
-		ap->memsum = memsum(b, n, ap->memsum);
-	if (state.checksum.sum && SECTION(ap) == SECTION_DATA)
-		sumblock(state.checksum.sum, b, n);
+	if (!ap->raw)
+	{
+		CONVERT(ap, b, n);
+		an = ap->convert[SECTION(ap)].on ? n : 0;
+		if (ap->sum > 0)
+			ap->memsum = memsum(b, n, ap->memsum);
+		if (state.checksum.sum && SECTION(ap) == SECTION_DATA)
+			sumblock(state.checksum.sum, b, n);
+	}
 	if (ap->io->skip)
 		ap->io->skip = bskip(ap);
 	if (state.maxout && ap->io->count >= state.maxout)
@@ -792,7 +807,8 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 			}
 		}
 	}
-	INTERNAL(ap, ab, an);
+	if (!ap->raw)
+		REVERT(ap, ab, an);
 }
 
 /*
@@ -804,7 +820,7 @@ bput(register Archive_t* ap, register int n)
 {
 	ap->io->count += n;
 	message((-7, "bput(%s,%d@%ld): %-.*s%s", ap->name, n, ap->io->count, n > 32 ? 32 : n, ap->io->next, n > 32 ? "..." : ""));
-	EXTERNAL(ap, ap->io->next, n);
+	CONVERT(ap, ap->io->next, n);
 	if (ap->sum > 0)
 		ap->memsum = memsum(ap->io->next, n, ap->memsum);
 	if (state.checksum.sum && SECTION(ap) == SECTION_DATA)
@@ -818,9 +834,9 @@ bput(register Archive_t* ap, register int n)
 		 * flush out the buffer and slide over the remains
 		 */
 
-		SECTION_SKIP(ap);
+		ap->raw++;
 		bwrite(ap, ap->io->next = ap->io->buffer + state.blocksize, n);
-		SECTION_KEEP(ap);
+		ap->raw--;
 	}
 }
 

@@ -1107,7 +1107,7 @@ initarchive(const char* name, int mode)
 	ap->sum = -1;
 	ap->mio.mode = ap->tio.mode = mode;
 	ap->io = &ap->mio;
-	ap->convert[0].internal = ap->convert[0].external = CC_NATIVE;
+	ap->convert[0].from = ap->convert[0].to = CC_NATIVE;
 	return ap;
 }
 

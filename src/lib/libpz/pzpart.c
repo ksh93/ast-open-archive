@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.1 (AT&T Labs Research) 2001-02-02 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.1 (AT&T Labs Research) 2001-08-11 $\n]"
 "[a:append]"
 "[x:crc]"
 "[d:debug]#[level]"
@@ -61,6 +61,21 @@ pzpartget(Pz_t* pz, const char* name)
 		return pz->mainpart;
 	pz->flags &= ~PZ_MAINONLY;
 	return (Pzpart_t*)dtmatch(pz->partdict, name);
+}
+
+/*
+ * partition iterator
+ * return the next partition after pp
+ * first call should set pp to 0
+ * 0 returned after all partitions visited
+ */
+
+Pzpart_t*
+pzpartnext(Pz_t* pz, Pzpart_t* pp)
+{
+	if (pz->partdict)
+		return pp ? (Pzpart_t*)dtnext(pz->partdict, pp) : (Pzpart_t*)dtfirst(pz->partdict);
+	return pp ? (Pzpart_t*)0 : pz->mainpart;
 }
 
 /*
@@ -263,8 +278,14 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 	int	k;
 	size_t	n;
 
-	if (!(pz->flags & PZ_FORCE))
+	if (!(pz->flags & PZ_FORCE) || (pz->flags & PZ_SPLIT))
 	{
+		if (!pp->row)
+		{
+			if (pz->disc->errorf)
+				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: partition header corrupted", pz->path);
+			return -1;
+		}
 		if (!pp->name)
 		{
 			if (!name)
@@ -282,11 +303,20 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 			if (!(pp->name = vmstrdup(pz->vm, sfstruse(pz->tmp))))
 				return -1;
 		}
-		if (!pp->row)
+		if (!pp->nmap)
 		{
-			if (pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: partition header corrupted", pz->path);
-			return -1;
+			pp->nmap = pp->row;
+			if (!(pp->map = vmnewof(pz->vm, pp->map, size_t, VECTOR(pz, pp, pp->nmap), 0)))
+				return -1;
+			for (i = 0; i < pp->nmap; i++)
+				pp->map[i] = i;
+		}
+		if (!pp->ngrp)
+		{
+			pp->ngrp = 1;
+			if (!(pp->grp = vmnewof(pz->vm, pp->grp, size_t, VECTOR(pz, pp, pp->ngrp), 0)))
+				return -1;
+			pp->grp[0] = pp->row;
 		}
 		pp->loq = ((pz->win / 8 / pp->row) + 8) * pp->row;
 		k = VECTOR(pz, pp, pp->nmap);
@@ -353,7 +383,7 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 	pz->part = pp;
 	if (pz->options && pzoptions(pz, pp, pz->options, 0))
 		return -1;
-	if (pz->disc->eventf && (*pz->disc->eventf)(pz, PZ_PARTITION, NiL, 0, pz->disc) < 0)
+	if (pz->disc->eventf && (*pz->disc->eventf)(pz, PZ_PARTITION, pp, 0, pz->disc) < 0)
 		return -1;
 	if (pp->nfix != n)
 	{
@@ -389,10 +419,10 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 	else
 	{
 		pz->mainpart = pp;
-		if (pz->flags & (PZ_DUMP|PZ_VERBOSE))
+		if ((pz->flags & (PZ_DUMP|PZ_VERBOSE)) && !(pz->flags & PZ_SPLIT))
 			pzheadprint(pz, sfstderr, 0);
 	}
-	if (pz->flags & PZ_DUMP)
+	if ((pz->flags & PZ_DUMP) && !(pz->flags & PZ_SPLIT))
 		pzpartprint(pz, pp, sfstderr);
 	return 0;
 }
@@ -752,7 +782,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 			}
 			else if (isalpha(*s) && pzoptions(pz, pp, s, 0))
 				goto bad;
-		} while (!(n = strtol(s, NiL, 10)));
+		} while (!(n = strtol(s, &t, 10)));
 		if (pz->flags & PZ_ROWONLY)
 		{
 			if (!np || !pz->partname || streq(np, pz->partname))
@@ -791,6 +821,12 @@ pzpartition(register Pz_t* pz, const char* partition)
 		gv = hv + pp->row + 1;
 		m = 0;
 		g = 0;
+		for (s = t; isspace(*s); s++);
+		if (*s == '-')
+		{
+			sfungetc(sp, '\n');
+			sfungetc(sp, *s);
+		}
 		while (s = sfgetr(sp, '\n', 1))
 		{
 			if (pz->disc->errorf)
@@ -1184,14 +1220,17 @@ pzpartwrite(Pz_t* pz, Sfio_t* op)
 			sfwrite(op, pp->name, m);
 			sfputu(op, pp->row);
 			sfputu(op, pp->col);
-			sfputc(op, PZ_HDR_map);
-			sfputu(op, pp->nmap);
-			for (i = 0; i < pp->nmap; i++)
-				sfputu(op, pp->map[i]);
-			sfputc(op, PZ_HDR_grp);
-			sfputu(op, pp->ngrp);
-			for (i = 0; i < pp->ngrp; i++)
-				sfputu(op, pp->grp[i]);
+			if (pp->nmap != pp->row || pp->ngrp != 1)
+			{
+				sfputc(op, PZ_HDR_map);
+				sfputu(op, pp->nmap);
+				for (i = 0; i < pp->nmap; i++)
+					sfputu(op, pp->map[i]);
+				sfputc(op, PZ_HDR_grp);
+				sfputu(op, pp->ngrp);
+				for (i = 0; i < pp->ngrp; i++)
+					sfputu(op, pp->grp[i]);
+			}
 			if (pp->nfix)
 			{
 				sfputc(op, PZ_HDR_fix);

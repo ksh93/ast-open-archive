@@ -1,3 +1,10 @@
+01-08-11 Makerules.mk: reference $(CC.DLL.LIBRARIES) last and in link args only
+	 Makerules.mk: +l* in req list now checks .PACKAGE.*.library for -l*
+	 parse.c: fix `\\\r\n' to act like `\\\n'
+01-07-17 Makerules.mk: fix :LIBRARY: to honor LDLIBRARIES
+01-06-21 misc.c: fix strtoll and strtoull macro rename
+01-06-10 Makerules.mk: add CC.NATIVE for native objects
+01-06-07 command.c: fix job deadlock bug that improperly broke the loop
 01-05-31 Makerules.mk: add option rhs to :DLL:
 	 Makerules.mk: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
 	 Makerules.mk: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS

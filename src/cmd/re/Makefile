@@ -42,7 +42,8 @@ match :TEST: testmatch.c testre.dat testmatch.dat
 
 re :TEST: testre.c testre.dat testmatch.dat testsub.dat \
 		zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat \
-		escape.dat group.dat
+		escape.dat group.dat nullgroup.dat standards.dat \
+		pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat 
 	for i in $(*:O>1)
 	do	$(*:O=1) $(TESTREFLAGS) < $i
 	done

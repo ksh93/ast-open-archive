@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-05-31 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-08-11 $"
 
 /*
  * handy attributes
@@ -436,8 +436,10 @@ include "Scanrules.mk"
 	if ( L = "$(A:A=.TARGET)" )
 		return $(L)
 	end
-	if ( L = "$(A:T=F)" )
-		return $(L)
+	if ! "$(MAKERULES_DEBUG)" && "$(.PACKAGE.$(B).library)" != "-l"
+		if ( L = "$(A:T=F)" )
+			return $(L)
+		end
 	end
 	A := $(%:/+l/-l/)
 	if ! ( L = "$(A:T=F)" )
@@ -1764,7 +1766,7 @@ end
 	local L P S
 	if ! "$(%)" || ! CC.SUFFIX.STATIC
 		.NO.ARPROFILE = 1
-		for L $(%) $(CC.DLL.LIBRARIES)
+		for L $(%)
 			if "$(CC.SHARED)"
 				if L == "+l*|-ldl|-liconv" /* XXX: probe!!! */
 					S += $(L)
@@ -1798,8 +1800,8 @@ end
 	end
 	return $(.UNIQ. $(S))
 
-.SHARED.o : .USE (LD) (LDFLAGS)
-	$(LD) $(LDFLAGS) $(CC.SHARED) -o $(<) $(.CC.LIB.DLL.$(CC.LIB.DLL) $(.UNIQ. $(*:$(CC.SHARED:@??:T=F:N=*$(CC.SUFFIX.ARCHIVE)?))))
+.SHARED.o : .USE (LD) (LDFLAGS) $$(LDLIBRARIES)
+	$(LD) $(LDFLAGS) $(CC.SHARED) -o $(<) $(.CC.LIB.DLL.$(CC.LIB.DLL) $(.UNIQ. $(*:$(CC.SHARED:@??:T=F:N=*$(CC.SUFFIX.ARCHIVE)?)))) $(CC.DLL.LIBRARIES)
 
 .SHARED.DEF.lib .SHARED.DEF.x : .FUNCTION
 	local B D L S X Y Z W
@@ -1838,22 +1840,22 @@ end
 .SHARED.REF.lib : .FUNCTION
 	local L
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
-	return $(*$(L):N=*@($(CC.SUFFIX.LD:/ /|/G))) $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(*.LIBRARY.STATIC.$(L:B:/^lib//)) $(%:N!=*$(CC.SUFFIX.ARCHIVE)) $(CC.DLL.LIBRARIES)
+	return $(*$(L):N=*@($(CC.SUFFIX.LD:/ /|/G))) $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(*.LIBRARY.STATIC.$(L:B:/^lib//)) $(%:N!=*$(CC.SUFFIX.ARCHIVE))
 
 .SHARED.lib : .USE $$(LDLIBRARIES)
 	for i in $(<:B:S) # retain until 2001 #
 	do	$(SILENT) test -f $i && $(RM) -f $i
 	done
 	$(SILENT) test -d $(<:O=1:D) || mkdir $(<:O=1:D)
-	$(LD) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:D:B) $(.SHARED.REF.lib $(*))
+	$(LD) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:D:B) $(.SHARED.REF.lib $(*)) $(CC.DLL.LIBRARIES)
 
 .SHARED.REF.x : .FUNCTION
 	local L
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
-	return $(.CC.LIB.DLL.symbol $(L)) $(*.LIBRARY.STATIC.$(L:B:/^lib//)) $(%:N!=*$(CC.SUFFIX.OBJECT)) $(CC.DLL.LIBRARIES)
+	return $(.CC.LIB.DLL.symbol $(L)) $(*.LIBRARY.STATIC.$(L:B:/^lib//)) $(%:N!=*$(CC.SUFFIX.OBJECT))
 
 .SHARED.x : .USE $$(LDLIBRARIES)
-	$(CC) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:B:S) $(.SHARED.REF.x $(*))
+	$(CC) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:B:S) $(.SHARED.REF.x $(*)) $(CC.DLL.LIBRARIES)
 
 /*
  * link lhs to rhs
@@ -3224,7 +3226,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		$(SED) $(NMEDIT) > $(<)
 	.MAKE : $(F).exp
 	set $(J)
-	return $(F).exp $(%) $(CC.DLL.LIBRARIES)
+	return $(F).exp $(%)
 
 .CC.LIB.DLL.object : .FUNCTION
 	local F J
@@ -3247,7 +3249,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	return $(F)/* $(%:O>1)
 
 .CC.LIB.DLL.option : .FUNCTION
-	return $(CC.LIB.ALL) $(%:O=1) $(CC.LIB.UNDEF) $(%:O>1) $(CC.DLL.LIBRARIES)
+	return $(CC.LIB.ALL) $(%:O=1) $(CC.LIB.UNDEF) $(%:O>1)
 
 .CC.LIB.DLL.symbol : .FUNCTION
 	local F J
@@ -3293,7 +3295,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		} > $(<)
 	.MAKE : $(F)$(CC.SUFFIX.OBJECT)
 	set $(J)
-	return $(F)$(CC.SUFFIX.OBJECT) $(%) $(CC.DLL.LIBRARIES)
+	return $(F)$(CC.SUFFIX.OBJECT) $(%)
 
 .CC.LIB.DLL.undef : .FUNCTION
 	return `$(NM) $(NMFLAGS) $(%:O=1) | $(SED) $(NMEDIT) -e "s/^/-u /"` $(%)
@@ -3474,7 +3476,7 @@ if LPROF
 end
 
 .OFFICIAL : .ONOBJECT
-	$(".RWD.:=":R)$(*.VIEW:O=2:@?$$(.MANIFEST.:P=L:N!=/*:C@.*@{ $$(DIFF) $$(DIFFFLAGS) $$(*.VIEW:O=2)/& & || true; } >> $(official_out:D=$$(*.VIEW:O=2):B:S); $$(MV) & $$(*.VIEW:O=2)/&;@)?: no lower view?)
+	$(".RWD.:=":R)$(*.VIEW:O=2:@?$$(.MANIFEST.:P=L:N!=[-/]*:C@.*@{ $$(DIFF) $$(DIFFFLAGS) $$(*.VIEW:O=2)/& & || true; } >> $(official_out:D=$$(*.VIEW:O=2):B:S); $$(MV) & $$(*.VIEW:O=2)/&;@)?: no lower view?)
 
 .PAX : .COMMON.SAVE $$(*.RECURSE:@?.PAX.RECURSE?.PAX.LOCAL)
 

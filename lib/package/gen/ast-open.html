@@ -10,7 +10,6 @@
 <TABLE border=0 align=center width=96%>
 <TBODY><TR><TD valign=top align=left>
 <!--INDEX--><!--/INDEX-->
-</TD></TR></TBODY></TABLE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ast-open package">ast-open package</A></H3></CENTER></FONT></FONT>
 The AT&amp;T Labs Research ast-open package contains all of the ast open
@@ -1006,6 +1005,27 @@ All recorded changes follow.
 </PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ksh93 changes">ksh93 changes</A></H3></CENTER></FONT></FONT>
+<PRE>
+
+01-08-09  --- Release ksh93l+  ---
+01-08-09  Another bug in the optimization of for loops in ksh93l caused
+	  errors in recursive functions using local variables that
+	  contained for loops has been fixed.
+01-07-27  A bug in which IFS would be unset after a command substituion
+	  inside a here document has been fixed.
+01-07-26  To conform to the POSIX standard, if you invoked ksh name,
+	  and name does not contain a /,  it will first try to run
+	  one in the current directory whether it is executable or not
+	  before doing a path search for an executable script.  Earlier
+	  versions first checked for an executable script using the
+	  PATH variable.
+01-07-23  A bug in which unset -f invoked in a subshell could unset a
+	  function defined in the parent has been fixed.
+01-07-16  A bug in the optimization of for loops in ksh93l caused
+	  name references to be treated as invariantes has been fixed.
+01-07-09  A bug in which a discipline function applied to a local variable
+	  could cause a shell exception has been fixed.  Discipline
+	  functions can only be specified for global variables. 
 
 01-06-18  --- Release ksh93l  ---
 01-06-18  A bug in assigning integers larger than can be represented as
@@ -1502,7 +1522,7 @@ All recorded changes follow.
 95-04-31  The expansion of "$@" was incorrect when $1 was the null
 	  string.
 95-04-31  A bug which could incorrectly report a syntax error in
-	  a backquoted expression when a $ was preceded by \\
+	  a backquoted expression when a $ was preceded by 
 	  has been fixed.
 95-04-31  A bug which prevented the shell from exiting after
 	  reporting an error when failing to open a script
@@ -1684,9 +1704,13 @@ All recorded changes follow.
 	  has been fixed.
 
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pax changes">pax changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 pax: fix tar_checksum() w.r.t. CC_NATIVE!=CC_ASCII
+01-06-28 pax: fix --from --to bio logic that sometimes double converted
 01-04-24 pax: --from &amp; --to now associated with archive instead of global state
 01-04-17 pax: --from conversion only done if no control chars in first 256
 01-04-01 pax: fix --intermediate to create missing dirs first
@@ -1895,8 +1919,10 @@ All recorded changes follow.
 88-07-17 add cpio.sh and tar.sh interface scripts
 88-07-15 convert to pax
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="html changes">html changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-05-09 mm2html: ignore a few more requests
 01-05-04 mm2html: more tbl adjustments from Bruce Lilly
@@ -1950,23 +1976,31 @@ All recorded changes follow.
 97-05-01 \h'0...' for hyperlinks
 97-04-01 first release
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="proto changes">proto changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-06-26 proto.tst: add another buffer boundary test (large of course)
 01-04-01 proto: preserve file mode for -r
 01-02-06 proto.tst: add (finally)
 99-11-19 add --license, --shell, --copy, --verbose
 99-08-11 long options
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="bzip changes">bzip changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-01-01 bzip2.c: include bzlib.h first
 99-01-01 package for ast
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tests changes">tests changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 test.sf*: need $(LDFLAGS) for -L* library link paths!
 01-03-26 test.strtoi,test.strtof: add
 01-02-14 sfio: add tmpread
 01-01-31 sfio: uniform test exit codes
@@ -1989,9 +2023,12 @@ All recorded changes follow.
 99-01-23 moved library tests from std to here
 	 added optget() tests
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="3d changes">3d changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-07-17 Makefile: don't link 3d dll against ast dll
 01-02-19 close3d: dup reserved fd's higher
 01-02-14 add :VARIANT: to build dll's for CC.DLL.VARIANTS
 01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
@@ -2087,8 +2124,10 @@ All recorded changes follow.
 	 fix creat() virtual dir bug for umteenth time
 	 link() and rename() now migrate to top instead of EROFS
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="coshell changes">coshell changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 00-12-14 shell is per host attribute
 00-02-01 --- release 2.2 ---
@@ -2167,8 +2206,10 @@ All recorded changes follow.
 	 more rank tuning
 90-06-01 --- release 0.0 ---
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cpp changes">cpp changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-06-01 cpp.tst: add -M* dependency generation tests
 01-02-14 cpp.tst: pp:pragmaexpand pp:catliteral # operator interactions
@@ -2192,8 +2233,10 @@ All recorded changes follow.
 	 add -I-H for PP_HOSTED
 87-03-24 --- release 1.0 ---
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cs changes">cs changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-01-01 vcs_src/*: drop old notices, fix signal handler prototype
 00-05-09 mbb: add (message bulletin board service)
@@ -2211,8 +2254,10 @@ All recorded changes follow.
 95-04-01 start this file
 	 fix cat server read bug CS_LINE -&gt; CS_EXACT
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="msgcc changes">msgcc changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-06-10 msgcpp: add proper escapes to OMIT pattern
 01-05-29 msgcc: add similar unused message replacement, -M-similar
@@ -2220,9 +2265,18 @@ All recorded changes follow.
 01-01-31 ignore ls generation errors
 00-04-20 first release
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="nmake changes">nmake changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 Makerules.mk: reference $(CC.DLL.LIBRARIES) last and in link args only
+	 Makerules.mk: +l* in req list now checks .PACKAGE.*.library for -l*
+	 parse.c: fix `r to act like `n'
+01-07-17 Makerules.mk: fix :LIBRARY: to honor LDLIBRARIES
+01-06-21 misc.c: fix strtoll and strtoull macro rename
+01-06-10 Makerules.mk: add CC.NATIVE for native objects
+01-06-07 command.c: fix job deadlock bug that improperly broke the loop
 01-05-31 Makerules.mk: add option rhs to :DLL:
 	 Makerules.mk: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
 	 Makerules.mk: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
@@ -2449,7 +2503,7 @@ All recorded changes follow.
 	 Makerules: $(CC.DLL) uses local *.lib
 	 expand: add :P=N: for 'native-path'
 	 expand: :P=S=subdir: to handle recursive manifest
-	 parse: fix \\n splice bug that activated rules direcive
+	 parse: fix  splice bug that activated rules direcive
 	 rule: .READONLY external support
 	 bind: (P_readonly|P_terminal) does not get attribute assoc
 	 bind: add rule_compare() and rule_hash() for case hacks
@@ -2849,16 +2903,20 @@ All recorded changes follow.
 	 fix \&lt;newline&gt; action parse
 93-12-01 --- release 3.0 ---
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="probe changes">probe changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 00-08-11 probe: fix non-suid generation check
 00-01-11 probe: fix -t with writable info
 99-09-01 probe: add --override
 99-05-09 probe: long options
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ss changes">ss changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 99-05-18 ss: long options
 97-08-11 ssd: fix now used before defined bug
@@ -2868,8 +2926,10 @@ All recorded changes follow.
 95-01-19 fix user idelt time check that broke loop too soon
 	 checks every 10s, updates every CS_STAT_FREQ if not interesting
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="at changes">at changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-06-18 crontab: clarify the command&lt;=&gt;job relationship
 01-03-28 atd: fix log file rollover infinite loop
@@ -2900,8 +2960,10 @@ All recorded changes follow.
 97-10-31 fix `at date ...' arg parse bug
 96-05-24 --- release 1.0 ---
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="builtin changes">builtin changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-06-06 who.c: fix entry skip logic that listed too many entries
 01-05-31 Makefile: add PACKAGE_OPTIMIZE=space checks
@@ -2961,9 +3023,12 @@ All recorded changes follow.
 95-10-11 grab b_* list from cmd.h
 	 add void* context 3rd arg to b_main()
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cql changes">cql changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-07-17 cql: call dllerror() on dllfind() error
 01-02-14 cql: fix bug that didn't propagate details to cdbopen()
 	 cql: add --regenerate to force index regeneration
 01-02-07 cql.tst: add -l to TEST 19,20
@@ -3052,8 +3117,10 @@ All recorded changes follow.
 92-09-02 add partition db
 92-09-01 add virtual db
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="diff changes">diff changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 Thu Apr 19 14:27:41 2001  Glenn Fowler <SMALL>&lt;<A href=mailto:gsf@research.att.com>gsf@research.att.com</A>&gt;</SMALL>
 
@@ -4830,8 +4897,10 @@ left-margin: 8
 version-control: never
 End:
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ie changes">ie changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-04-25 vi.c: handle implementations with VEOL but not VEOL2
 00-02-14 ie: ie.sh script replaces ie fun
@@ -4840,8 +4909,10 @@ End:
 98-03-11 workaraound for sgi dllnext() botches
 98-02-02 initial release snarfed from ksh88i source
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="mailx changes">mailx changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-04-01 add state.var.hostname for smtp HELO
 	 add fmtident() to initialize state.version 
@@ -4943,15 +5014,21 @@ End:
 	 most command line flags have option names
 	 set all shows unset vars too
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ncsl changes">ncsl changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 99-09-01 add usage&#0091;&#0093;
 96-10-11 first release
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pzip changes">pzip changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 pzip: set error_info.id from argv for statically linked disciplines
+01-06-28 pzip: --split turns implies PZ_READ even with -p
 01-02-02 pzip.tst: add -w window size test
 00-10-04 pin: add -T0x800 TSP v3 dump
 00-10-03 pin: add -T0x400 TSP v2 dump
@@ -4979,8 +5056,10 @@ End:
 	 pop: -s schema =&gt; -f pop-schema || mps-style-format
 98-08-11 initial release
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="re changes">re changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-06-11 testre: handle embedded &nbsp; in subject string, add &nbsp; tests
 01-05-24 testre: add (?{...}) test support
@@ -5062,8 +5141,10 @@ End:
 	 ed: posix update
 95-12-01 regex: snarf Doug McIlroy's C++ implementation
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="sort changes">sort changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-04-19 sort.tst: add -s tests
 00-03-09 main.c: fix infomation typo
@@ -5091,9 +5172,14 @@ End:
 	 update testsort TEST=15 input file size to force multi-stage merge
 96-10-11 all regression tests pass for all methods
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="std changes">std changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 ls: fix nonprintable test for mb locales
+01-08-01 features/procfs: note that synthesized psinfo doesn't have pr_psargs
+01-06-27 dd: fix conv=&#0091;lu&#0093;case|x2y logic botch
 01-06-08 ps: option `-' is optional for ancient compatibility
 01-06-06 ls: drop octets for bytes -- yay
 01-05-25 locale: -m runs local locale until the standard comes to its senses
@@ -5260,14 +5346,20 @@ End:
 	 ls: add -n for LS_NUMBER
 	 ls: -C if argv&#0091;0&#0093; base is lc
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tksh changes">tksh changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-01-01  separate -ltksh from tksh main
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tw changes">tw changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
+	 cmdarg(): fix CMD_INSERT copy that omitted leading chars
 01-05-02 tw: fix -a to use CMD_POST instead of CMD_INSERT
 01-02-06 tw,find: move --local test fslocal()
 01-01-01 find: fix -newer -anewer -cnewer -perm
@@ -5327,8 +5419,10 @@ End:
 95-03-11 create this file
 	 add -H for FTW_META|FTW_PHYSICAL
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="warp changes">warp changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
 99-05-21 add: _xstat64
@@ -5337,9 +5431,23 @@ End:
 98-03-11 initial release
 98-03-05 first implementation
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libast changes">libast changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 features/common: some compilers have long long but no LL constants!
+	 features/lib: add mmap64 implementation test (for linux.s390)
+	 regex/regcomp.c: fix &nbsp;in &#0091;...&#0093; parse
+	 setlocale: retain user locale spelling in setlocale() return value
+	 features/limits.c: don't include ./limits.h -- duh
+	 fmtesc: don't escape multibyte chars
+01-08-08 features/float: some compilers (msdev) forget long long vs. double
+01-07-31 misc/optget.c: handle suboptions
+01-07-27 cdt.h: add DTDISC()
+01-07-17 iffeio.h: move to include for stdio bootstrap iffe workarounds
+01-06-25 regex: perl extensions added and tested
+01-06-21 misc/error: add ERROR_OPTIONS=prefix=string for message processing
 01-06-15 string/chresc: only 2 hex digits max for \xxx
 	 regex/regsub: handle REG_SHELL ~(nnn) rhs backrefs
 01-06-11 regex: handle embedded &nbsp; in pattern and subject string
@@ -6013,14 +6121,17 @@ End:
 95-01-01 add this RELEASE file
 	 fix strperm() to properly handle "644 file"
 	 fix tokline() to return last '&nbsp;' terminated line in string
-	 fix tokscan() to properly handle \\n splice
+	 fix tokscan() to properly handle  splice
 	 add fmtesc() to complement stresc()
 	 add LS_NUMBER to fmtls()
 	 drop spurious optusage() ' '
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcmd changes">libcmd changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-07-16 stty: fix cntl() macro for CC_NATIVE!=CC_ASCII
 01-05-31 date: fix /bin/date fallback logic
 	 stty: fix a few mismatched flags, -a and -g option logic
 	 stty: tone down sane to modify current settings rather than from zero
@@ -6113,9 +6224,12 @@ End:
 95-02-14 fix mkdir -p symlink bug
 	 fix mkdir '/' skip bug that went one too far
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libdll changes">libdll changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-07-17 dllfind: do at least one dlopen() to prime dlerror()
 01-05-29 dlopen: fix dlopen(0,0) for HP
 01-04-20 dllfind: use getconf HOSTTYPE LIBPATH LIBSUFFIX
 01-02-14 features/dll: fix unbalanced ' quote and ancient hostinfo reference
@@ -6131,8 +6245,10 @@ End:
 	 dllfind() and dllnext() in separate files (for 3d)
 97-10-11 move from libast so libast can link static
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libexpr changes">libexpr changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 99-09-22 exparse.y,exeval.c: add for(ID&#0091;DYNAMIC&#0093;)
 	 exparse.y: ref&#0091;i&#0093;.ref
@@ -6172,8 +6288,10 @@ End:
 95-01-11 prepare extoken.c for TRACE_lex==debug-level
 	 add exseek() for backup
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="librecsort changes">librecsort changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-01-01 recsort.h: _RSHDR_H =&gt; _BLD_recsort; should have been done years ago
 00-08-31 rskey.c: fix code() buffer off by one (too far)
@@ -6200,8 +6318,10 @@ End:
 96-09-20 rskey(kp,s,obsolete)
 96-09-18 first working version with -lsort (ok, so -c and -m don't work yet)
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libuu changes">libuu changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-03-27 uulib: add UU_LOCAL for local path conversion
 00-03-06 uulib: !UU_HEADER decode checks for candidate encodings
@@ -6209,16 +6329,20 @@ End:
 98-12-25 uu_encode: fix dp-&gt;fill usage
 98-11-11 uulib: add binhex encode
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libbz changes">libbz changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-01-01 bzlib.h: add _PACKAGE_ast checks
 99-09-11 sfdcbzip: return &gt;0 if discipline pushed
 99-07-17 sfdcbzip: don't free disc on SF_CLOSE
 99-03-17 split library from command, sfdcbzip.&#0091;ch&#0093;
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libz changes">libz changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 00-09-11 gzio: don't set verified=1 in check_header() for concatenation
 99-11-19 gzio: add missing _PACKAGE_ast
@@ -6233,8 +6357,10 @@ End:
 98-10-01 add SFGZ_GETPOS and SFGZ_SETPOS
 98-03-19 sfgzip =&gt; sfdcgzip
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcoshell changes">libcoshell changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-05-31 co*: add CO_CROSS, expose CO_DEVFD
 01-04-23 coquote: add state.type to avoid getenv() overwrite on some systems
@@ -6246,8 +6372,10 @@ End:
 	 coexec: CO_IGNORE for all but real ksh
 98-06-22 coinit: quote cd path arg
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcs changes">libcs changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-05-11 csserve: sync cs.* with css-&gt;*
 	 csspoll: handl cspoll() EINTR that doesn't set cs.interrupt
@@ -6317,9 +6445,16 @@ End:
 95-03-19 bsd4.4 stole devname(), so use devpath() in cspath()
 94-12-15 csinfo("-",0) gets standard info
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libpp changes">libpp changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 ppcontrol: fix ... and __VAR_ARGS__ for C99
+	 ppsearch: fix SEARCH_NEXT bug that skipped the include stack
+01-08-06 ppproto: preserve #! first line for # comments
+01-07-17 gentab.sh: fix ksh test to omit pdksh (typeset -u fails)
+01-06-26 ppproto.c: fix another buffer boundary bug that didn't preserve OTHER
 01-06-06 ppsearch.c: list PP_FILEDEPS headers once
 01-06-01 pp.h,ppop.c,ppsearch.c: allow multiple PP_FILEDEPS (-M)
 01-05-24 pp.probe: fix pp:hostedtransition probe: only suncc can __STDC__==1?
@@ -6361,7 +6496,7 @@ End:
 	 pragma: add pp:pragmaexpand to expand pragma args
 	 ppcontrol: always disable pp:* pragma expansion
 	 ppcall: fix pp:hide buffer clash
-00-06-01 pplex: fix "\\U" and "\\u"
+00-06-01 pplex: fix "" and ""
 00-05-22 ppsearch: fix uwin #include &lt;C:/foo/bar.h&gt;
 00-05-16 probe.win32: update reserved word list
 00-05-09 ppcontrol: fix C++ macro &gt;+&gt; invalid fuse
@@ -6376,10 +6511,10 @@ End:
 99-11-11 ppproto: use astlicense()
 99-10-31 ppproto: add PROTO_SHARP, update license parse
 	 pplex: fix some MARK bugs seen by #define X "A B <SMALL>&lt;<A href=mailto:C@D>C@D</A>&gt;</SMALL>"
-99-10-01 add pp:stringsplit for "...\\n..." =&gt; "..."..."
+99-10-01 add pp:stringsplit for "......" =&gt; "..."..."
 	 add pp:lineid to match PP_LINEID
 99-07-17 ppbuiltin: fix getline() canon spacing for numbers
-	 ppsearch: fix FILEDEPS not found \\n print
+	 ppsearch: fix FILEDEPS not found  print
 	 pplex: fix spurious FILEDEPS '.' empty character constant message
 	 ppargs: fix usage error call and error_info.id default value
 	 ppproto: fix up copyright notice for ksh93 style .author file
@@ -6391,7 +6526,7 @@ End:
 99-05-09 ppinput: add #pragma pp:native and (pp.option&amp;NATIVE) for native paths
 99-04-22 ppproto: finish type=open notice
 99-02-11 #define __STDC__ #(STDC); demote __STDC__ to 0 for HOSTED (thanks sun)
-99-02-04 pplex: joined strings separated by \\\n
+99-02-04 pplex: joined strings separated by n
 99-01-11 probe.win32: add _UWIN predef
 98-10-20 pplex: a few more (HOSTED|RELAX) checks
 	 -D:preserve throws a bunch of stuff -- great for imake (yuk)
@@ -6661,9 +6796,12 @@ End:
 89-10-01 inhibit pp:linetype syncs for top level #line directives
 	 ----- see HISTORY -----
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcdb changes">libcdb changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-07-17 cdblib: call dllerror() on failed dllfind()
 01-02-14 cdbtypes: add seed detail for {hash} and {rand} types
 01-01-01 cdbimage: drop span discipline that invalidated seeks
 	 cdbflat: check details in flatevent
@@ -6692,9 +6830,15 @@ End:
 97-07-11 alpha release
 	 1.0, 1.1 cdb header format
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libpz changes">libpz changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
+01-08-11 pzinit: add for static discipline library linking
+01-07-17 pzlib: call dllerror() on failed dllfind()
+01-06-28 pzpartnext: add to iterate over all partitions
+	 pzpartition: default partition can be on one line: `"label" size -'
 01-02-02 delay buffer allocation until pzpartinit()
 	 pzpart: fix non-terminated string bug for url-style paths
 01-01-01 pzopen: open new stream instead of using sfstdin for sfdcgzip()
@@ -6729,8 +6873,10 @@ End:
 98-09-09 1.3 format -- separate &lt;run,off&gt; &lt;val&gt; compression groups
 98-08-11 1.0 release
 
+</PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libtksh changes">libtksh changes</A></H3></CENTER></FONT></FONT>
+<PRE>
 
 01-04-19  add HAVE_TIME_H HAVE_SYS_PARAM_H HAVE___FD_MASK tests to tclPort.h
 00-02-10  --- Release 7.6 ---
@@ -6825,13 +6971,15 @@ End:
 96-01-29  tksh_builtin_command sets sh.exitval to 1 on error
 
 96-01-25  --- Release 1.0b1 ---
+</PRE>
 <P>
 <HR>
 <DIV align=right>
 <P>
-June 19, 2001
+August 23, 2001
 </DIV>
 
+</TD></TR></TBODY></TABLE>
 
 </BODY>
 </HTML>

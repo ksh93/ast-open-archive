@@ -515,6 +515,11 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 				}
 				message((-1, "time(%s) = %s", r->name, strtime(tevent)));
 				r->active = frame.previous;
+				if (state.unwind == error_info.indent)
+				{
+					state.unwind = 0;
+					errors = 0;
+				}
 				error_info.indent--;
 				return r->status == FAILED;
 			}
@@ -840,6 +845,11 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 							}
 							x->status = r->status;
 							message((-1, "time(%s) = %s", s, strtime(t)));
+							if (state.unwind == error_info.indent)
+							{
+								state.unwind = 0;
+								errors = 0;
+							}
 							error_info.indent--;
 							if (!x->active || x->active->parent != oframe)
 							{

@@ -33,7 +33,7 @@
  * see comments in testdate.dat for description of format
  */
 
-static const char id[] = "\n@(#)$Id: testdate (AT&T Research) 2001-04-18 $\0\n";
+static const char id[] = "\n@(#)$Id: testdate (AT&T Research) 2001-08-11 $\0\n";
 
 #include <ast.h>
 #include <ctype.h>
@@ -82,8 +82,8 @@ normal(char* s)
 	else if (!*u)
 		sfprintf(sfstdout, "NULL");
 	else for (;;)
-		switch (c = *u++) {
-
+		switch (c = *u++)
+		{
 		case 0:
 			return;
 		case '\n':
@@ -109,28 +109,35 @@ report(char* comment, char* str, char* pat, char* rem, int flags)
 {
 	state.errors++;
 	sfprintf(sfstdout, "%d:\t", state.lineno);
-	if (str) {
+	if (str)
+	{
 		normal(str);
-		if (pat) {
+		if (pat)
+		{
 			sfprintf(sfstdout, " vs ");
 			normal(pat);
 		}
 	}
 	if (flags & TM_PEDANTIC)
 		sfprintf(sfstdout, " PEDANTIC");
-	if (state.sig) {
+	if (state.sig)
+	{
 		sfprintf(sfstdout, " %s", fmtsignal(state.sig));
 		state.sig = 0;
 	}
-	if (rem && *rem) {
-		if (*rem == '\n') {
-			if (comment) {
+	if (rem && *rem)
+	{
+		if (*rem == '\n')
+		{
+			if (comment)
+			{
 				sfprintf(sfstdout, " %s", comment);
 				comment = 0;
 			}
 			sfprintf(sfstdout, "%s", rem);
 		}
-		else {
+		else
+		{
 			sfprintf(sfstdout, " at ");
 			normal(rem);
 		}
@@ -159,11 +166,12 @@ escape(char* s)
 {
 	char*	t;
 
-	for (t = s; *t = *s; s++, t++) {
+	for (t = s; *t = *s; s++, t++)
+	{
 		if (*s != '\\')
 			continue;
-		switch (*++s) {
-
+		switch (*++s)
+		{
 		case 0:
 			*++t = 0;
 			break;
@@ -197,11 +205,13 @@ sigunblock(int s)
 	sigset_t	mask;
 
 	sigemptyset(&mask);
-	if (s) {
+	if (s)
+	{
 		sigaddset(&mask, s);
 		op = SIG_UNBLOCK;
 	}
-	else op = SIG_SETMASK;
+	else
+		op = SIG_SETMASK;
 	sigprocmask(op, &mask, NiL);
 #else
 #ifdef sigmask
@@ -244,9 +254,10 @@ main(int argc, char** argv)
 
 	sfprintf(sfstdout, "TEST	tmscan");
 	while ((p = *++argv) && *p == '-')
-		for (;;) {
-			switch (*++p) {
-
+		for (;;)
+		{
+			switch (*++p)
+			{
 			case 0:
 				break;
 			case 'c':
@@ -266,28 +277,33 @@ main(int argc, char** argv)
 	if (p)
 		sfprintf(sfstdout, ", argument(s) ignored");
 	sfprintf(sfstdout, "\n");
-	if (catch) {
+	if (catch)
+	{
 		signal(SIGALRM, gotcha);
 		signal(SIGBUS, gotcha);
 		signal(SIGSEGV, gotcha);
 	}
 	t_now = time(NiL);
-	while (p = sfgetr(sfstdin, '\n', 1)) {
+	while (p = sfgetr(sfstdin, '\n', 1))
+	{
 		state.lineno++;
 
 	/* parse: */
 
 		if (*p == 0 || *p == '#')
 			continue;
-		if (*p == ':') {
+		if (*p == ':')
+		{
 			while (*++p == ' ');
 			sfprintf(sfstdout, "NOTE	%s\n", p);
 			continue;
 		}
 		i = 0;
 		field[i++] = p;
-		for (;;) {
-			switch (*p++) {
+		for (;;)
+		{
+			switch (*p++)
+			{
 
 			case 0:
 				p--;
@@ -337,7 +353,8 @@ main(int argc, char** argv)
 					bad("invalid NOW", ans, NiL);
 				sfprintf(sfstdout, "NOTE	base date is %s\n", fmttime(NiL, t_now));
 			}
-			else bad("unknown SET variable", fmt, NiL);
+			else
+				bad("unknown SET variable", fmt, NiL);
 			continue;
 		}
 		flags = 0;
@@ -350,28 +367,30 @@ main(int argc, char** argv)
 			s = fmttime(fmt, t_now);
 			escape(ans);
 			if (strcmp(s, ans))
-				report("expected", s, ans, NiL, 0);
+				report("FAILED", s, ans, NiL, 0);
 			continue;
 		}
 		t_ans = tmdate(ans, &e, &t_now);
 		if (*e)
-			report("answer error", e, NiL, NiL, 0);
+			report("answer FAILED", e, NiL, NiL, 0);
 		s = fmttime("%k", t_ans);
 		if (strcmp(ans, s))
 		{
 			testno++;
-			report("expected", s, ans, NiL, 0);
+			report("FAILED", s, ans, NiL, 0);
 		}
 		else for (;;)
 		{
 			testno++;
 			t_str = tmscan(str, &e, fmt, &f, &t_now, flags);
-			if (*e) {
-				report("subject error", str, fmt, e, flags);
+			if (*e)
+			{
+				report("subject FAILED", str, fmt, e, flags);
 				break;
 			}
-			else if (*f) {
-				report("format error", str, fmt, f, flags);
+			else if (*f)
+			{
+				report("format FAILED", str, fmt, f, flags);
 				break;
 			}
 			else if (t_str != t_ans)
@@ -381,7 +400,7 @@ main(int argc, char** argv)
 
 				n = sfsprintf(tmp, sizeof(tmp), "\n\t[%s] expecting", fmttime(NiL, t_str));
 				sfsprintf(tmp + n, sizeof(tmp) - n, " [%s]", fmttime(NiL, t_ans));
-				report("mismatch", str, fmt, tmp, flags);
+				report("FAILED", str, fmt, tmp, flags);
 				break;
 			}
 			if (flags & TM_PEDANTIC)

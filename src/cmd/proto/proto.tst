@@ -18148,3 +18148,1502 @@ static int getrchar()
 \t}
 \treturn(c);
 }'
+	EXEC -nh
+		INPUT - $'#pragma prototyped
+
+/*
+ * posix regex executor
+ * single sized-record interface
+ */
+
+/*nclude "reglib.*/
+
+#ifdef _AST_REGEX_DEBUG
+#define DEBUG_TEST(f,y,n)	((debug&(f))?(y):(n))
+#define DEBUG_CODE(f,y,n)	do if(debug&(f)){y}else{n} while(0)
+#define DEBUG_INIT()		do { char* t; if (!debug) { debug = 0x80000000; if (t = getenv("_AST_regex_debug")) debug |= strtoul(t, NiL, 0); } } while (0)
+static unsigned long	debug;
+#else
+#define DEBUG_INIT()
+#define DEBUG_TEST(f,y,n)	(n)
+#define DEBUG_CODE(f,y,n)	do {n} while(0)
+#endif
+
+#define BEG_ALT		1	/* beginning of an alt			*/
+#define BEG_ONE		2	/* beginning of one iteration of a rep	*/
+#define BEG_REP		3	/* beginning of a repetition		*/
+#define BEG_SUB		4	/* beginning of a subexpression		*/
+#define END_ANY		5	/* end of any of above			*/
+
+/*
+ * returns from parse()
+ */
+
+#define NONE		0	/* no parse found			*/
+#define GOOD		1	/* some parse was found			*/
+#define BEST		2	/* an unbeatable parse was found	*/
+#define BAD		3	/* error ocurred			*/
+
+/*
+ * REG_SHELL_DOT test
+ */
+
+#define LEADING(e,r,s)	((e)->leading&&*(s)==\'.\'&&((s)==(e)->beg||*((s)-1)==(r)->explicit))
+
+/*
+ * Pos_t is for comparing parses. An entry is made in the
+ * array at the beginning and at the end of each Group_t,
+ * each iteration in a Group_t, and each Binary_t.
+ */
+
+typedef struct
+{
+	unsigned char*	p;		/* where in string		*/
+	size_t		length;		/* length in string		*/
+	short		serial;		/* preorder subpattern number	*/
+	short		be;		/* which end of pair		*/
+} Pos_t;
+
+/* ===== begin library support ===== */
+
+#define vector(t,v,i)	(((i)<(v)->max)?(t*)((v)->vec+(i)*(v)->siz):(t*)vecseek(&(v),i))
+
+static Vector_t*
+vecopen(int inc, int siz)
+{
+	Vector_t*	v;
+	Stk_t*		sp;
+
+	if (inc <= 0)
+		inc = 16;
+	if (!(sp = stkopen(STK_SMALL|STK_NULL)))
+		return 0;
+	if (!(v = (Vector_t*)stkseek(sp, sizeof(Vector_t) + inc * siz)))
+	{
+		stkclose(sp);
+		return 0;
+	}
+	v->stk = sp;
+	v->vec = (char*)v + sizeof(Vector_t);
+	v->max = v->inc = inc;
+	v->siz = siz;
+	v->cur = 0;
+	return v;
+}
+
+static void*
+vecseek(Vector_t** p, int index)
+{
+	Vector_t*	v = *p;
+
+	if (index >= v->max)
+	{
+		while ((v->max += v->inc) <= index);
+		if (!(v = (Vector_t*)stkseek(v->stk, sizeof(Vector_t) + v->max * v->siz)))
+			return 0;
+		*p = v;
+		v->vec = (char*)v + sizeof(Vector_t);
+	}
+	return v->vec + index * v->siz;
+}
+
+static void
+vecclose(Vector_t* v)
+{
+	if (v)
+		stkclose(v->stk);
+}
+
+typedef struct
+{
+	Stk_pos_t	pos;
+	char		data[1];
+} Stk_frame_t;
+
+#define stknew(s,p)	((p)->offset=stktell(s),(p)->base=stkfreeze(s,0))
+#define stkold(s,p)	stkset(s,(p)->base,(p)->offset)
+
+#define stkframe(s)	(*((Stk_frame_t**)(s)->_next-1))
+#define stkdata(s,t)	((t*)stkframe(s)->data)
+#define stkpop(s)	stkold(s,&(stkframe(s)->pos))
+
+static void*
+stkpush(Stk_t* sp, size_t size)
+{
+	Stk_frame_t*	f;
+	Stk_pos_t	p;
+
+	stknew(sp, &p);
+	size = sizeof(Stk_frame_t) + sizeof(size_t) + size - 1;
+	if (!(f = (Stk_frame_t*)stkalloc(sp, sizeof(Stk_frame_t) + sizeof(Stk_frame_t*) + size - 1)))
+		return 0;
+	f->pos = p;
+	stkframe(sp) = f;
+	return f->data;
+}
+
+/* ===== end library support ===== */
+
+/*
+ * Match_frame_t is for saving and restoring match records
+ * around alternate attempts, so that fossils will not be
+ * left in the match array.  These are the only entries in
+ * the match array that are not otherwise guaranteed to
+ * have current data in them when they get used.
+ */
+
+typedef struct
+{
+	size_t			size;
+	regmatch_t*		match;
+	regmatch_t		save[1];
+} Match_frame_t;
+
+#define matchframe	stkdata(stkstd,Match_frame_t)
+#define matchpush(e,x)	((x)->re.group.number?_matchpush(e,x):0)
+#define matchcopy(e,x)	((x)->re.group.number?memcpy(matchframe->match,matchframe->save,matchframe->size):(void*)0)
+#define matchpop(e,x)	((x)->re.group.number?memcpy(matchframe->match,matchframe->save,matchframe->size),stkpop(stkstd):(void*)0)
+
+#define pospop(e)	(--(e)->pos->cur)
+
+/*
+ * allocate a frame and push a match onto the stack
+ */
+
+static int
+_matchpush(Env_t* env, Rex_t* rex)
+{
+	Match_frame_t*	f;
+	regmatch_t*	m;
+	regmatch_t*	e;
+	regmatch_t*	s;
+	int		num;
+
+	if (rex->re.group.number <= 0 || (num = rex->re.group.last - rex->re.group.number + 1) <= 0)
+		num = 0;
+	if (!(f = (Match_frame_t*)stkpush(stkstd, sizeof(Match_frame_t) + (num - 1) * sizeof(regmatch_t))))
+	{
+		env->error = REG_ESPACE;
+		return 1;
+	}
+	f->size = num * sizeof(regmatch_t);
+	f->match = m = env->match + rex->re.group.number;
+	e = m + num;
+	s = f->save;
+	while (m < e)
+	{
+		*s++ = *m;
+		*m++ = state.nomatch;
+	}
+	return 0;
+}
+
+/*
+ * allocate a frame and push a pos onto the stack
+ */
+
+static int
+pospush(Env_t* env, Rex_t* rex, unsigned char* p, int be)
+{
+	Pos_t*	pos;
+
+	if (!(pos = vector(Pos_t, env->pos, env->pos->cur)))
+	{
+		env->error = REG_ESPACE;
+		return 1;
+	}
+	pos->serial = rex->serial;
+	pos->p = p;
+	pos->be = be;
+	env->pos->cur++;
+	return 0;
+}
+
+/*
+ * two matches are known to have the same length
+ * os is start of old pos array, ns is start of new,
+ * oend and nend are end+1 pointers to ends of arrays.
+ * oe and ne are ends (not end+1) of subarrays.
+ * returns 1 if new is better, -1 if old, else 0.
+ */
+
+#if _AST_REGEX_DEBUG
+
+static void
+showmatch(regmatch_t* p)
+{
+	sfputc(sfstdout, \'(\');
+	if (p->rm_so < 0)
+		sfputc(sfstdout, \'?\');
+	else
+		sfprintf(sfstdout, "%d", p->rm_so);
+	sfputc(sfstdout, \',\');
+	if (p->rm_eo < 0)
+		sfputc(sfstdout, \'?\');
+	else
+		sfprintf(sfstdout, "%d", p->rm_eo);
+	sfputc(sfstdout, \')\');
+}
+
+static int
+better(Env_t* env, Pos_t* os, Pos_t* ns, Pos_t* oend, Pos_t* nend, int level)
+#define better	_better
+{
+	int	i;
+
+	DEBUG_CODE(0x0040,{sfprintf(sfstdout, "AHA better old ");for (i = 0; i <= env->nsub; i++)showmatch(&env->best[i]);sfprintf(sfstdout, "\\n           new ");for (i = 0; i <= env->nsub; i++)showmatch(&env->match[i]);sfprintf(sfstdout, "\\n");},{0;});
+	i = better(env, os, ns, oend, nend, 0);
+	DEBUG_TEST(0x0040,(sfprintf(sfstdout, "           %s\\n", i <= 0 ? "OLD" : "NEW")),(0));
+	return i;
+}
+
+#endif
+
+static int
+better(Env_t* env, Pos_t* os, Pos_t* ns, Pos_t* oend, Pos_t* nend, int level)
+{
+	Pos_t*	oe;
+	Pos_t*	ne;
+	int	k;
+	int	n;
+
+	if (env->error)
+		return -1;
+	for (;;)
+	{
+		DEBUG_CODE(0x0040,{sfprintf(sfstdout, "   %-*.*sold ", (level + 3) * 4, (level + 3) * 4, "");for (oe = os; oe < oend; oe++)sfprintf(sfstdout, "<%d,%d,%d>", oe->p - env->beg, oe->serial, oe->be);sfprintf(sfstdout, "\\n   %-*.*snew ", (level + 3) * 4, (level + 3) * 4, "");for (oe = ns; oe < nend; oe++)sfprintf(sfstdout, "<%d,%d,%d>", oe->p - env->beg, oe->serial, oe->be);sfprintf(sfstdout, "\\n");},{0;});
+		if (ns >= nend)
+			return DEBUG_TEST(0x2000,(os < oend),(0));
+		if (os >= oend)
+			return DEBUG_TEST(0x2000,(-1),(1));
+		n = os->serial;
+		if (ns->serial > n)
+			return -1;
+		if (n > ns->serial)
+		{
+			env->error = REG_PANIC;
+			return -1;
+		}
+		if (ns->p > os->p)
+			return 1;
+		if (os->p > ns->p)
+			return -1;
+		oe = os;
+		k = 0;
+		for (;;)
+			if ((++oe)->serial == n)
+			{
+				if (oe->be != END_ANY)
+					k++;
+				else if (k-- <= 0)
+					break;
+			}
+		ne = ns;
+		k = 0;
+		for (;;)
+			if ((++ne)->serial == n)
+			{
+				if (ne->be != END_ANY)
+					k++;
+				else if (k-- <= 0)
+					break;
+			}
+		if (ne->p > oe->p)
+			return 1;
+		if (oe->p > ne->p)
+			return -1;
+		if (k = better(env, os + 1, ns + 1, oe, ne, level + 1))
+			return k;
+		os = oe + 1;
+		ns = ne + 1;
+	}
+}
+
+#undef	better
+
+#define follow(e,r,c,s)	((r)->next?parse(e,(r)->next,c,s):(c)?parse(e,c,0,s):BEST)
+
+static int		parse(Env_t*, Rex_t*, Rex_t*, unsigned char*);
+
+static int
+parserep(Env_t* env, Rex_t* rex, Rex_t* cont, unsigned char* s, int n)
+{
+	int	i;
+	int	r = NONE;
+	Rex_t	catcher;
+
+	DEBUG_TEST(0x0010,(sfprintf(sfstdout, "AHA#%d parserep %d %d %d `%-.*s\'\\n", __LINE__, rex->lo, n, rex->hi, env->end - s, s)),(0));
+	if ((rex->flags & REG_MINIMAL) && n >= rex->lo && n < rex->hi)
+	{
+		if (env->stack && pospush(env, rex, s, END_ANY))
+			return BAD;
+		i = follow(env, rex, cont, s);
+		if (env->stack)
+			pospop(env);
+		switch (i)
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+		case GOOD:
+			return BEST;
+		}
+	}
+	if (n < rex->hi)
+	{
+		catcher.type = REX_REP_CATCH;
+		catcher.serial = rex->serial;
+		catcher.re.rep_catch.ref = rex;
+		catcher.re.rep_catch.cont = cont;
+		catcher.re.rep_catch.beg = s;
+		catcher.re.rep_catch.n = n + 1;
+		catcher.next = rex->next;
+		if (env->stack)
+		{
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d PUSH (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+			if (matchpush(env, rex))
+				return BAD;
+			if (pospush(env, rex, s, BEG_ONE))	
+				return BAD;
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d PUSH (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+		}
+		r = parse(env, rex->re.group.expr.rex, &catcher, s);
+		DEBUG_TEST(0x0010,(sfprintf(sfstdout, "AHA#%d parserep parse %d `%-.*s\'\\n", __LINE__, r, env->end - s, s)),(0));
+		if (env->stack)
+		{
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d POP (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+			pospop(env);
+			matchpop(env, rex);
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d POP (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+		}
+		switch (r)
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+			return BEST;
+		case GOOD:
+			if (rex->flags & REG_MINIMAL)
+				return BEST;
+			r = GOOD;
+			break;
+		}
+	}
+	if (n < rex->lo)
+		return r;
+	if (!(rex->flags & REG_MINIMAL) || n >= rex->hi)
+	{
+		if (env->stack && pospush(env, rex, s, END_ANY))
+			return BAD;
+		i = follow(env, rex, cont, s);
+		if (env->stack)
+			pospop(env);
+		switch (i)
+		{
+		case BAD:
+			r = BAD;
+			break;
+		case BEST:
+			r = BEST;
+			break;
+		case GOOD:
+			r = (rex->flags & REG_MINIMAL) ? BEST : GOOD;
+			break;
+		}
+	}
+	return r;
+}
+
+static int
+parsetrie(Env_t* env, Trie_node_t* x, Rex_t* rex, Rex_t* cont, unsigned char* s)
+{
+	unsigned char*	p;
+	int		r;
+
+	if (rex->flags & REG_ICASE)
+	{
+		p = state.fold;
+		for (;;)
+		{
+			if (s >= env->end)
+				return NONE;
+			while (x->c != p[*s])
+				if (!(x = x->sib))
+					return NONE;
+			if (x->end)
+				break;
+			x = x->son;
+			s++;
+		}
+	}
+	else
+	{
+		for (;;)
+		{
+			if (s >= env->end)
+				return NONE;
+			while (x->c != *s)
+				if (!(x = x->sib))
+					return NONE;
+			if (x->end)
+				break;
+			x = x->son;
+			s++;
+		}
+	}
+	s++;
+	if (rex->flags & REG_MINIMAL)
+		switch (follow(env, rex, cont, s))
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+		case GOOD:
+			return BEST;
+		}
+	if (x->son)
+		switch (parsetrie(env, x->son, rex, cont, s))
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+			return BEST;
+		case GOOD:
+			if (rex->flags & REG_MINIMAL)
+				return BEST;
+			r = GOOD;
+			break;
+		default:
+			r = NONE;
+			break;
+		}
+	else
+		r = NONE;
+	if (!(rex->flags & REG_MINIMAL))
+		switch (follow(env, rex, cont, s))
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+			return BEST;
+		case GOOD:
+			return GOOD;
+	}
+	return r;
+}
+
+static int
+collmatch(Rex_t* rex, unsigned char* s, unsigned char* e, unsigned char** p)
+{
+	register Celt_t*	ce;
+	unsigned char*		t;
+	wchar_t			c;
+	int			w;
+	int			r;
+	int			x;
+	Ckey_t			key;
+	Ckey_t			elt;
+
+	if ((w = mbsize(s)) > 1)
+	{
+		memcpy((char*)key, (char*)s, w);
+		key[w] = 0;
+		mbxfrm(elt, key, COLL_KEY_MAX);
+		t = s;
+		c = mbchar(t);
+		x = 0;
+	}
+	else
+	{
+		key[0] = s[0];
+		key[1] = 0;
+		r = mbxfrm(elt, key, COLL_KEY_MAX);
+		while (w < COLL_KEY_MAX && &s[w] < e)
+		{
+			key[w] = s[w];
+			key[w + 1] = 0;
+			if (mbxfrm(elt, key, COLL_KEY_MAX) != r)
+				break;
+			w++;
+		}
+		key[w] = 0;
+		mbxfrm(elt, key, COLL_KEY_MAX);
+		c = s[0];
+		x = w - 1;
+	}
+	r = 1;
+	for (ce = rex->re.collate.elements;; ce++)
+	{
+		switch (ce->typ)
+		{
+		case COLL_call:
+			if (!x && (*ce->fun)(c))
+				break;
+			continue;
+		case COLL_char:
+			if (!strcmp((char*)ce->beg, (char*)elt))
+				break;
+			continue;
+		case COLL_range:
+			if (strcmp((char*)ce->beg, (char*)elt) <= ce->min && strcmp((char*)elt, (char*)ce->end) <= ce->max)
+				break;
+			continue;
+		case COLL_range_lc:
+			if (strcmp((char*)ce->beg, (char*)elt) <= ce->min && strcmp((char*)elt, (char*)ce->end) <= ce->max && (islower(c) || !isupper(c)))
+				break;
+			continue;
+		case COLL_range_uc:
+			if (strcmp((char*)ce->beg, (char*)elt) <= ce->min && strcmp((char*)elt, (char*)ce->end) <= ce->max && (isupper(c) || !islower(c)))
+				break;
+			continue;
+		default:
+			r = 0;
+			break;
+		}
+		if (!x || r)
+			break;
+		r = 1;
+		w = x--;
+		key[w] = 0;
+		mbxfrm(elt, key, COLL_KEY_MAX);
+	}
+	*p = s + w;
+	return rex->re.collate.invert ? !r : r;
+}
+
+static int
+parse(Env_t* env, Rex_t* rex, Rex_t* cont, unsigned char* s)
+{
+	int		c;
+	int		d;
+	int		i;
+	int		m;
+	int		n;
+	int		r;
+	int*		f;
+	unsigned char*	p;
+	unsigned char*	t;
+	unsigned char*	b;
+	unsigned char*	e;
+	regmatch_t*	o;
+	Trie_node_t*	x;
+	Rex_t*		q;
+	Rex_t		catcher;
+	Rex_t		next;
+
+	for (;;)
+	{
+		switch (rex->type)
+		{
+		case REX_ALT:
+			if (matchpush(env, rex))
+				return BAD;
+			if (pospush(env, rex, s, BEG_ALT))
+				return BAD;
+			catcher.type = REX_ALT_CATCH;
+			catcher.serial = rex->serial;
+			catcher.re.alt_catch.cont = cont;
+			catcher.next = rex->next;
+			r = parse(env, rex->re.group.expr.binary.left, &catcher, s);
+			if (r < BEST || (rex->flags & REG_MINIMAL))
+			{
+				matchcopy(env, rex);
+				((Pos_t*)env->pos->vec + env->pos->cur - 1)->serial = catcher.serial = rex->re.group.expr.binary.serial;
+				n = parse(env, rex->re.group.expr.binary.right, &catcher, s);
+				if (n != NONE)
+					r = n;
+			}
+			pospop(env);
+			matchpop(env, rex);
+			return r;
+		case REX_ALT_CATCH:
+			if (pospush(env, rex, s, END_ANY))
+				return BAD;
+			r = follow(env, rex, rex->re.alt_catch.cont, s);
+			pospop(env);
+			return r;
+		case REX_BACK:
+			o = &env->match[rex->lo];
+			if (o->rm_so < 0)
+				return NONE;
+			i = o->rm_eo - o->rm_so;
+			e = s + i;
+			if (e > env->end)
+				return NONE;
+			t = env->beg + o->rm_so;
+			if (!(rex->flags & REG_ICASE))
+			{
+				while (s < e)
+					if (*s++ != *t++)
+						return NONE;
+			}
+			else if (!mbwide())
+			{
+				p = state.fold;
+				while (s < e)
+					if (p[*s++] != p[*t++])
+						return NONE;
+			}
+			else
+			{
+				while (s < e)
+				{
+					c = mbchar(s);
+					d = mbchar(t);
+					if (toupper(c) != toupper(d))
+						return NONE;
+				}
+			}
+			break;
+		case REX_BEG:
+			if ((!(rex->flags & REG_NEWLINE) || s <= env->beg || *(s - 1) != \'\\n\') && ((env->flags & REG_NOTBOL) || s != env->beg))
+				return NONE;
+			break;
+		case REX_CLASS:
+			if (LEADING(env, rex, s))
+				return NONE;
+			n = rex->hi;
+			if (n > env->end - s)
+				n = env->end - s;
+			m = rex->lo;
+			if (m > n)
+				return NONE;
+			r = NONE;
+			if (!(rex->flags & REG_MINIMAL))
+			{
+				for (i = 0; i < n; i++)
+					if (!settst(rex->re.charclass, s[i]))
+					{
+						n = i;
+						break;
+					}
+				for (s += n; n-- >= m; s--)
+					switch (follow(env, rex, cont, s))
+					{
+					case BAD:
+						return BAD;
+					case BEST:
+						return BEST;
+					case GOOD:
+						r = GOOD;
+						break;
+					}
+			}
+			else
+			{
+				for (e = s + m; s < e; s++)
+					if (!settst(rex->re.charclass, *s))
+						return r;
+				e += n - m;
+				for (;;)
+				{
+					switch (follow(env, rex, cont, s))
+					{
+					case BAD:
+						return BAD;
+					case BEST:
+					case GOOD:
+						return BEST;
+					}
+					if (s >= e || !settst(rex->re.charclass, *s))
+						break;
+					s++;
+				}
+			}
+			return r;
+		case REX_COLL_CLASS:
+			if (LEADING(env, rex, s))
+				return NONE;
+			n = rex->hi;
+			if (n > env->end - s)
+				n = env->end - s;
+			m = rex->lo;
+			if (m > n)
+				return NONE;
+			r = NONE;
+			e = env->end;
+			if (!(rex->flags & REG_MINIMAL))
+			{
+				if (!(b = (unsigned char*)stkpush(stkstd, n)))
+				{
+					env->error = REG_ESPACE;
+					return BAD;
+				}
+				for (i = 0; s < e && i < n && collmatch(rex, s, e, &t); i++)
+				{
+					b[i] = t - s;
+					s = t;
+				}
+				for (; i-- >= rex->lo; s -= b[i])
+					switch (follow(env, rex, cont, s))
+					{
+					case BAD:
+						stkpop(stkstd);
+						return BAD;
+        case BEST:
+						stkpop(stkstd);
+						return BEST;
+					case GOOD:
+						r = GOOD;
+						break;
+					}
+				stkpop(stkstd);
+			}
+		}
+	}
+}'
+	OUTPUT - $'\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \
+
+/*
+ * posix regex executor
+ * single sized-record interface
+ */
+
+/*nclude "reglib.*/
+
+#ifdef _AST_REGEX_DEBUG
+#define DEBUG_TEST(f,y,n)	((debug&(f))?(y):(n))
+#define DEBUG_CODE(f,y,n)	do if(debug&(f)){y}else{n} while(0)
+#define DEBUG_INIT()		do { char* t; if (!debug) { debug = 0x80000000; if (t = getenv("_AST_regex_debug")) debug |= strtoul(t, NiL, 0); } } while (0)
+static unsigned long	debug;
+#else
+#define DEBUG_INIT()
+#define DEBUG_TEST(f,y,n)	(n)
+#define DEBUG_CODE(f,y,n)	do {n} while(0)
+#endif
+
+#define BEG_ALT		1	/* beginning of an alt			*/
+#define BEG_ONE		2	/* beginning of one iteration of a rep	*/
+#define BEG_REP		3	/* beginning of a repetition		*/
+#define BEG_SUB		4	/* beginning of a subexpression		*/
+#define END_ANY		5	/* end of any of above			*/
+
+/*
+ * returns from parse()
+ */
+
+#define NONE		0	/* no parse found			*/
+#define GOOD		1	/* some parse was found			*/
+#define BEST		2	/* an unbeatable parse was found	*/
+#define BAD		3	/* error ocurred			*/
+
+/*
+ * REG_SHELL_DOT test
+ */
+
+#define LEADING(e,r,s)	((e)->leading&&*(s)==\'.\'&&((s)==(e)->beg||*((s)-1)==(r)->explicit))
+
+/*
+ * Pos_t is for comparing parses. An entry is made in the
+ * array at the beginning and at the end of each Group_t,
+ * each iteration in a Group_t, and each Binary_t.
+ */
+
+typedef struct
+{
+	unsigned char*	p;		/* where in string		*/
+	size_t		length;		/* length in string		*/
+	short		serial;		/* preorder subpattern number	*/
+	short		be;		/* which end of pair		*/
+} Pos_t;
+
+/* ===== begin library support ===== */
+
+#define vector(t,v,i)	(((i)<(v)->max)?(t*)((v)->vec+(i)*(v)->siz):(t*)vecseek(&(v),i))
+
+static Vector_t*
+vecopen __PARAM__((int inc, int siz), (inc, siz)) __OTORP__(int inc; int siz;)
+#line 62
+{
+	Vector_t*	v;
+	Stk_t*		sp;
+
+	if (inc <= 0)
+		inc = 16;
+	if (!(sp = stkopen(STK_SMALL|STK_NULL)))
+		return 0;
+	if (!(v = (Vector_t*)stkseek(sp, sizeof(Vector_t) + inc * siz)))
+	{
+		stkclose(sp);
+		return 0;
+	}
+	v->stk = sp;
+	v->vec = (char*)v + sizeof(Vector_t);
+	v->max = v->inc = inc;
+	v->siz = siz;
+	v->cur = 0;
+	return v;
+}
+
+static __V_*
+vecseek __PARAM__((Vector_t** p, int index), (p, index)) __OTORP__(Vector_t** p; int index;)
+#line 85
+{
+	Vector_t*	v = *p;
+
+	if (index >= v->max)
+	{
+		while ((v->max += v->inc) <= index);
+		if (!(v = (Vector_t*)stkseek(v->stk, sizeof(Vector_t) + v->max * v->siz)))
+			return 0;
+		*p = v;
+		v->vec = (char*)v + sizeof(Vector_t);
+	}
+	return v->vec + index * v->siz;
+}
+
+static void
+vecclose __PARAM__((Vector_t* v), (v)) __OTORP__(Vector_t* v;)
+#line 101
+{
+	if (v)
+		stkclose(v->stk);
+}
+
+typedef struct
+{
+	Stk_pos_t	pos;
+	char		data[1];
+} Stk_frame_t;
+
+#define stknew(s,p)	((p)->offset=stktell(s),(p)->base=stkfreeze(s,0))
+#define stkold(s,p)	stkset(s,(p)->base,(p)->offset)
+
+#define stkframe(s)	(*((Stk_frame_t**)(s)->_next-1))
+#define stkdata(s,t)	((t*)stkframe(s)->data)
+#define stkpop(s)	stkold(s,&(stkframe(s)->pos))
+
+static __V_*
+stkpush __PARAM__((Stk_t* sp, size_t size), (sp, size)) __OTORP__(Stk_t* sp; size_t size;)
+#line 121
+{
+	Stk_frame_t*	f;
+	Stk_pos_t	p;
+
+	stknew(sp, &p);
+	size = sizeof(Stk_frame_t) + sizeof(size_t) + size - 1;
+	if (!(f = (Stk_frame_t*)stkalloc(sp, sizeof(Stk_frame_t) + sizeof(Stk_frame_t*) + size - 1)))
+		return 0;
+	f->pos = p;
+	stkframe(sp) = f;
+	return f->data;
+}
+
+/* ===== end library support ===== */
+
+/*
+ * Match_frame_t is for saving and restoring match records
+ * around alternate attempts, so that fossils will not be
+ * left in the match array.  These are the only entries in
+ * the match array that are not otherwise guaranteed to
+ * have current data in them when they get used.
+ */
+
+typedef struct
+{
+	size_t			size;
+	regmatch_t*		match;
+	regmatch_t		save[1];
+} Match_frame_t;
+
+#define matchframe	stkdata(stkstd,Match_frame_t)
+#define matchpush(e,x)	((x)->re.group.number?_matchpush(e,x):0)
+#define matchcopy(e,x)	((x)->re.group.number?memcpy(matchframe->match,matchframe->save,matchframe->size):(__V_*)0)
+#define matchpop(e,x)	((x)->re.group.number?memcpy(matchframe->match,matchframe->save,matchframe->size),stkpop(stkstd):(__V_*)0)
+
+#define pospop(e)	(--(e)->pos->cur)
+
+/*
+ * allocate a frame and push a match onto the stack
+ */
+
+static int
+_matchpush __PARAM__((Env_t* env, Rex_t* rex), (env, rex)) __OTORP__(Env_t* env; Rex_t* rex;)
+#line 164
+{
+	Match_frame_t*	f;
+	regmatch_t*	m;
+	regmatch_t*	e;
+	regmatch_t*	s;
+	int		num;
+
+	if (rex->re.group.number <= 0 || (num = rex->re.group.last - rex->re.group.number + 1) <= 0)
+		num = 0;
+	if (!(f = (Match_frame_t*)stkpush(stkstd, sizeof(Match_frame_t) + (num - 1) * sizeof(regmatch_t))))
+	{
+		env->error = REG_ESPACE;
+		return 1;
+	}
+	f->size = num * sizeof(regmatch_t);
+	f->match = m = env->match + rex->re.group.number;
+	e = m + num;
+	s = f->save;
+	while (m < e)
+	{
+		*s++ = *m;
+		*m++ = state.nomatch;
+	}
+	return 0;
+}
+
+/*
+ * allocate a frame and push a pos onto the stack
+ */
+
+static int
+pospush __PARAM__((Env_t* env, Rex_t* rex, unsigned char* p, int be), (env, rex, p, be)) __OTORP__(Env_t* env; Rex_t* rex; unsigned char* p; int be;)
+#line 196
+{
+	Pos_t*	pos;
+
+	if (!(pos = vector(Pos_t, env->pos, env->pos->cur)))
+	{
+		env->error = REG_ESPACE;
+		return 1;
+	}
+	pos->serial = rex->serial;
+	pos->p = p;
+	pos->be = be;
+	env->pos->cur++;
+	return 0;
+}
+
+/*
+ * two matches are known to have the same length
+ * os is start of old pos array, ns is start of new,
+ * oend and nend are end+1 pointers to ends of arrays.
+ * oe and ne are ends (not end+1) of subarrays.
+ * returns 1 if new is better, -1 if old, else 0.
+ */
+
+#if _AST_REGEX_DEBUG
+
+static void
+showmatch __PARAM__((regmatch_t* p), (p)) __OTORP__(regmatch_t* p;)
+#line 223
+{
+	sfputc(sfstdout, \'(\');
+	if (p->rm_so < 0)
+		sfputc(sfstdout, \'?\');
+	else
+		sfprintf(sfstdout, "%d", p->rm_so);
+	sfputc(sfstdout, \',\');
+	if (p->rm_eo < 0)
+		sfputc(sfstdout, \'?\');
+	else
+		sfprintf(sfstdout, "%d", p->rm_eo);
+	sfputc(sfstdout, \')\');
+}
+
+static int
+better(Env_t* env, Pos_t* os, Pos_t* ns, Pos_t* oend, Pos_t* nend, int level)
+#define better	_better
+{
+	int	i;
+
+	DEBUG_CODE(0x0040,{sfprintf(sfstdout, "AHA better old ");for (i = 0; i <= env->nsub; i++)showmatch(&env->best[i]);sfprintf(sfstdout, "\\n           new ");for (i = 0; i <= env->nsub; i++)showmatch(&env->match[i]);sfprintf(sfstdout, "\\n");},{0;});
+	i = better(env, os, ns, oend, nend, 0);
+	DEBUG_TEST(0x0040,(sfprintf(sfstdout, "           %s\\n", i <= 0 ? "OLD" : "NEW")),(0));
+	return i;
+}
+
+#endif
+
+static int
+better __PARAM__((Env_t* env, Pos_t* os, Pos_t* ns, Pos_t* oend, Pos_t* nend, int level), (env, os, ns, oend, nend, level)) __OTORP__(Env_t* env; Pos_t* os; Pos_t* ns; Pos_t* oend; Pos_t* nend; int level;)
+#line 253
+{
+	Pos_t*	oe;
+	Pos_t*	ne;
+	int	k;
+	int	n;
+
+	if (env->error)
+		return -1;
+	for (;;)
+	{
+		DEBUG_CODE(0x0040,{sfprintf(sfstdout, "   %-*.*sold ", (level + 3) * 4, (level + 3) * 4, "");for (oe = os; oe < oend; oe++)sfprintf(sfstdout, "<%d,%d,%d>", oe->p - env->beg, oe->serial, oe->be);sfprintf(sfstdout, "\\n   %-*.*snew ", (level + 3) * 4, (level + 3) * 4, "");for (oe = ns; oe < nend; oe++)sfprintf(sfstdout, "<%d,%d,%d>", oe->p - env->beg, oe->serial, oe->be);sfprintf(sfstdout, "\\n");},{0;});
+		if (ns >= nend)
+			return DEBUG_TEST(0x2000,(os < oend),(0));
+		if (os >= oend)
+			return DEBUG_TEST(0x2000,(-1),(1));
+		n = os->serial;
+		if (ns->serial > n)
+			return -1;
+		if (n > ns->serial)
+		{
+			env->error = REG_PANIC;
+			return -1;
+		}
+		if (ns->p > os->p)
+			return 1;
+		if (os->p > ns->p)
+			return -1;
+		oe = os;
+		k = 0;
+		for (;;)
+			if ((++oe)->serial == n)
+			{
+				if (oe->be != END_ANY)
+					k++;
+				else if (k-- <= 0)
+					break;
+			}
+		ne = ns;
+		k = 0;
+		for (;;)
+			if ((++ne)->serial == n)
+			{
+				if (ne->be != END_ANY)
+					k++;
+				else if (k-- <= 0)
+					break;
+			}
+		if (ne->p > oe->p)
+			return 1;
+		if (oe->p > ne->p)
+			return -1;
+		if (k = better(env, os + 1, ns + 1, oe, ne, level + 1))
+			return k;
+		os = oe + 1;
+		ns = ne + 1;
+	}
+}
+
+#undef	better
+
+#define follow(e,r,c,s)	((r)->next?parse(e,(r)->next,c,s):(c)?parse(e,c,0,s):BEST)
+
+static int		parse __PROTO__((Env_t*, Rex_t*, Rex_t*, unsigned char*));
+
+static int
+parserep __PARAM__((Env_t* env, Rex_t* rex, Rex_t* cont, unsigned char* s, int n), (env, rex, cont, s, n)) __OTORP__(Env_t* env; Rex_t* rex; Rex_t* cont; unsigned char* s; int n;)
+#line 319
+{
+	int	i;
+	int	r = NONE;
+	Rex_t	catcher;
+
+	DEBUG_TEST(0x0010,(sfprintf(sfstdout, "AHA#%d parserep %d %d %d `%-.*s\'\\n", __LINE__, rex->lo, n, rex->hi, env->end - s, s)),(0));
+	if ((rex->flags & REG_MINIMAL) && n >= rex->lo && n < rex->hi)
+	{
+		if (env->stack && pospush(env, rex, s, END_ANY))
+			return BAD;
+		i = follow(env, rex, cont, s);
+		if (env->stack)
+			pospop(env);
+		switch (i)
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+		case GOOD:
+			return BEST;
+		}
+	}
+	if (n < rex->hi)
+	{
+		catcher.type = REX_REP_CATCH;
+		catcher.serial = rex->serial;
+		catcher.re.rep_catch.ref = rex;
+		catcher.re.rep_catch.cont = cont;
+		catcher.re.rep_catch.beg = s;
+		catcher.re.rep_catch.n = n + 1;
+		catcher.next = rex->next;
+		if (env->stack)
+		{
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d PUSH (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+			if (matchpush(env, rex))
+				return BAD;
+			if (pospush(env, rex, s, BEG_ONE))	
+				return BAD;
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d PUSH (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+		}
+		r = parse(env, rex->re.group.expr.rex, &catcher, s);
+		DEBUG_TEST(0x0010,(sfprintf(sfstdout, "AHA#%d parserep parse %d `%-.*s\'\\n", __LINE__, r, env->end - s, s)),(0));
+		if (env->stack)
+		{
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d POP (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+			pospop(env);
+			matchpop(env, rex);
+DEBUG_TEST(0x0001,(sfprintf(sfstdout,"AHA#%d POP (%d,%d)(%d,%d) (%d,%d)(%d,%d)\\n", __LINE__, rex->re.group.number, env->best[0].rm_so, env->best[0].rm_eo, env->best[1].rm_so, env->best[1].rm_eo, env->match[0].rm_so, env->match[0].rm_eo, env->match[1].rm_so, env->match[1].rm_eo)),(0));
+		}
+		switch (r)
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+			return BEST;
+		case GOOD:
+			if (rex->flags & REG_MINIMAL)
+				return BEST;
+			r = GOOD;
+			break;
+		}
+	}
+	if (n < rex->lo)
+		return r;
+	if (!(rex->flags & REG_MINIMAL) || n >= rex->hi)
+	{
+		if (env->stack && pospush(env, rex, s, END_ANY))
+			return BAD;
+		i = follow(env, rex, cont, s);
+		if (env->stack)
+			pospop(env);
+		switch (i)
+		{
+		case BAD:
+			r = BAD;
+			break;
+		case BEST:
+			r = BEST;
+			break;
+		case GOOD:
+			r = (rex->flags & REG_MINIMAL) ? BEST : GOOD;
+			break;
+		}
+	}
+	return r;
+}
+
+static int
+parsetrie __PARAM__((Env_t* env, Trie_node_t* x, Rex_t* rex, Rex_t* cont, unsigned char* s), (env, x, rex, cont, s)) __OTORP__(Env_t* env; Trie_node_t* x; Rex_t* rex; Rex_t* cont; unsigned char* s;)
+#line 408
+{
+	unsigned char*	p;
+	int		r;
+
+	if (rex->flags & REG_ICASE)
+	{
+		p = state.fold;
+		for (;;)
+		{
+			if (s >= env->end)
+				return NONE;
+			while (x->c != p[*s])
+				if (!(x = x->sib))
+					return NONE;
+			if (x->end)
+				break;
+			x = x->son;
+			s++;
+		}
+	}
+	else
+	{
+		for (;;)
+		{
+			if (s >= env->end)
+				return NONE;
+			while (x->c != *s)
+				if (!(x = x->sib))
+					return NONE;
+			if (x->end)
+				break;
+			x = x->son;
+			s++;
+		}
+	}
+	s++;
+	if (rex->flags & REG_MINIMAL)
+		switch (follow(env, rex, cont, s))
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+		case GOOD:
+			return BEST;
+		}
+	if (x->son)
+		switch (parsetrie(env, x->son, rex, cont, s))
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+			return BEST;
+		case GOOD:
+			if (rex->flags & REG_MINIMAL)
+				return BEST;
+			r = GOOD;
+			break;
+		default:
+			r = NONE;
+			break;
+		}
+	else
+		r = NONE;
+	if (!(rex->flags & REG_MINIMAL))
+		switch (follow(env, rex, cont, s))
+		{
+		case BAD:
+			return BAD;
+		case BEST:
+			return BEST;
+		case GOOD:
+			return GOOD;
+	}
+	return r;
+}
+
+static int
+collmatch __PARAM__((Rex_t* rex, unsigned char* s, unsigned char* e, unsigned char** p), (rex, s, e, p)) __OTORP__(Rex_t* rex; unsigned char* s; unsigned char* e; unsigned char** p;)
+#line 486
+{
+	register Celt_t*	ce;
+	unsigned char*		t;
+	wchar_t			c;
+	int			w;
+	int			r;
+	int			x;
+	Ckey_t			key;
+	Ckey_t			elt;
+
+	if ((w = mbsize(s)) > 1)
+	{
+		memcpy((char*)key, (char*)s, w);
+		key[w] = 0;
+		mbxfrm(elt, key, COLL_KEY_MAX);
+		t = s;
+		c = mbchar(t);
+		x = 0;
+	}
+	else
+	{
+		key[0] = s[0];
+		key[1] = 0;
+		r = mbxfrm(elt, key, COLL_KEY_MAX);
+		while (w < COLL_KEY_MAX && &s[w] < e)
+		{
+			key[w] = s[w];
+			key[w + 1] = 0;
+			if (mbxfrm(elt, key, COLL_KEY_MAX) != r)
+				break;
+			w++;
+		}
+		key[w] = 0;
+		mbxfrm(elt, key, COLL_KEY_MAX);
+		c = s[0];
+		x = w - 1;
+	}
+	r = 1;
+	for (ce = rex->re.collate.elements;; ce++)
+	{
+		switch (ce->typ)
+		{
+		case COLL_call:
+			if (!x && (*ce->fun)(c))
+				break;
+			continue;
+		case COLL_char:
+			if (!strcmp((char*)ce->beg, (char*)elt))
+				break;
+			continue;
+		case COLL_range:
+			if (strcmp((char*)ce->beg, (char*)elt) <= ce->min && strcmp((char*)elt, (char*)ce->end) <= ce->max)
+				break;
+			continue;
+		case COLL_range_lc:
+			if (strcmp((char*)ce->beg, (char*)elt) <= ce->min && strcmp((char*)elt, (char*)ce->end) <= ce->max && (islower(c) || !isupper(c)))
+				break;
+			continue;
+		case COLL_range_uc:
+			if (strcmp((char*)ce->beg, (char*)elt) <= ce->min && strcmp((char*)elt, (char*)ce->end) <= ce->max && (isupper(c) || !islower(c)))
+				break;
+			continue;
+		default:
+			r = 0;
+			break;
+		}
+		if (!x || r)
+			break;
+		r = 1;
+		w = x--;
+		key[w] = 0;
+		mbxfrm(elt, key, COLL_KEY_MAX);
+	}
+	*p = s + w;
+	return rex->re.collate.invert ? !r : r;
+}
+
+static int
+parse __PARAM__((Env_t* env, Rex_t* rex, Rex_t* cont, unsigned char* s), (env, rex, cont, s)) __OTORP__(Env_t* env; Rex_t* rex; Rex_t* cont; unsigned char* s;)
+#line 565
+{
+	int		c;
+	int		d;
+	int		i;
+	int		m;
+	int		n;
+	int		r;
+	int*		f;
+	unsigned char*	p;
+	unsigned char*	t;
+	unsigned char*	b;
+	unsigned char*	e;
+	regmatch_t*	o;
+	Trie_node_t*	x;
+	Rex_t*		q;
+	Rex_t		catcher;
+	Rex_t		next;
+
+	for (;;)
+	{
+		switch (rex->type)
+		{
+		case REX_ALT:
+			if (matchpush(env, rex))
+				return BAD;
+			if (pospush(env, rex, s, BEG_ALT))
+				return BAD;
+			catcher.type = REX_ALT_CATCH;
+			catcher.serial = rex->serial;
+			catcher.re.alt_catch.cont = cont;
+			catcher.next = rex->next;
+			r = parse(env, rex->re.group.expr.binary.left, &catcher, s);
+			if (r < BEST || (rex->flags & REG_MINIMAL))
+			{
+				matchcopy(env, rex);
+				((Pos_t*)env->pos->vec + env->pos->cur - 1)->serial = catcher.serial = rex->re.group.expr.binary.serial;
+				n = parse(env, rex->re.group.expr.binary.right, &catcher, s);
+				if (n != NONE)
+					r = n;
+			}
+			pospop(env);
+			matchpop(env, rex);
+			return r;
+		case REX_ALT_CATCH:
+			if (pospush(env, rex, s, END_ANY))
+				return BAD;
+			r = follow(env, rex, rex->re.alt_catch.cont, s);
+			pospop(env);
+			return r;
+		case REX_BACK:
+			o = &env->match[rex->lo];
+			if (o->rm_so < 0)
+				return NONE;
+			i = o->rm_eo - o->rm_so;
+			e = s + i;
+			if (e > env->end)
+				return NONE;
+			t = env->beg + o->rm_so;
+			if (!(rex->flags & REG_ICASE))
+			{
+				while (s < e)
+					if (*s++ != *t++)
+						return NONE;
+			}
+			else if (!mbwide())
+			{
+				p = state.fold;
+				while (s < e)
+					if (p[*s++] != p[*t++])
+						return NONE;
+			}
+			else
+			{
+				while (s < e)
+				{
+					c = mbchar(s);
+					d = mbchar(t);
+					if (toupper(c) != toupper(d))
+						return NONE;
+				}
+			}
+			break;
+		case REX_BEG:
+			if ((!(rex->flags & REG_NEWLINE) || s <= env->beg || *(s - 1) != \'\\n\') && ((env->flags & REG_NOTBOL) || s != env->beg))
+				return NONE;
+			break;
+		case REX_CLASS:
+			if (LEADING(env, rex, s))
+				return NONE;
+			n = rex->hi;
+			if (n > env->end - s)
+				n = env->end - s;
+			m = rex->lo;
+			if (m > n)
+				return NONE;
+			r = NONE;
+			if (!(rex->flags & REG_MINIMAL))
+			{
+				for (i = 0; i < n; i++)
+					if (!settst(rex->re.charclass, s[i]))
+					{
+						n = i;
+						break;
+					}
+				for (s += n; n-- >= m; s--)
+					switch (follow(env, rex, cont, s))
+					{
+					case BAD:
+						return BAD;
+					case BEST:
+						return BEST;
+					case GOOD:
+						r = GOOD;
+						break;
+					}
+			}
+			else
+			{
+				for (e = s + m; s < e; s++)
+					if (!settst(rex->re.charclass, *s))
+						return r;
+				e += n - m;
+				for (;;)
+				{
+					switch (follow(env, rex, cont, s))
+					{
+					case BAD:
+						return BAD;
+					case BEST:
+					case GOOD:
+						return BEST;
+					}
+					if (s >= e || !settst(rex->re.charclass, *s))
+						break;
+					s++;
+				}
+			}
+			return r;
+		case REX_COLL_CLASS:
+			if (LEADING(env, rex, s))
+				return NONE;
+			n = rex->hi;
+			if (n > env->end - s)
+				n = env->end - s;
+			m = rex->lo;
+			if (m > n)
+				return NONE;
+			r = NONE;
+			e = env->end;
+			if (!(rex->flags & REG_MINIMAL))
+			{
+				if (!(b = (unsigned char*)stkpush(stkstd, n)))
+				{
+					env->error = REG_ESPACE;
+					return BAD;
+				}
+				for (i = 0; s < e && i < n && collmatch(rex, s, e, &t); i++)
+				{
+					b[i] = t - s;
+					s = t;
+				}
+				for (; i-- >= rex->lo; s -= b[i])
+					switch (follow(env, rex, cont, s))
+					{
+					case BAD:
+						stkpop(stkstd);
+						return BAD;
+        case BEST:
+						stkpop(stkstd);
+						return BEST;
+					case GOOD:
+						r = GOOD;
+						break;
+					}
+				stkpop(stkstd);
+			}
+		}
+	}
+}'

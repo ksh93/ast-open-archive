@@ -12,6 +12,6 @@ locate :: locate.sh
 
 updatedb :: updatedb.sh
 
-:TEST: find tw
+:TEST: find tw xargs
 
 :: dag.tw dot.tw du.tw ls.tw

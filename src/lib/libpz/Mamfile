@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -210,6 +210,13 @@ done pzlib.c
 prev pzlib.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzlib.c
 done pzlib.o generated
+make pzinit.o
+make pzinit.c
+prev pzlib.h implicit
+done pzinit.c
+prev pzinit.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzinit.c
+done pzinit.o generated
 make pzread.o
 make pzread.c
 prev pzlib.h implicit
@@ -265,7 +272,7 @@ done sfdcpzip.c
 prev sfdcpzip.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c sfdcpzip.c
 done sfdcpzip.o generated
-exec - ${AR} cr libpz.a pzopen.o pzhead.o pzpart.o pzdeflate.o pzinflate.o pzlib.o pzread.o pzwrite.o pzsync.o pzsplit.o pzfixed.o pzconvert.o sfdcpzip.o
+exec - ${AR} cr libpz.a pzopen.o pzhead.o pzpart.o pzdeflate.o pzinflate.o pzlib.o pzinit.o pzread.o pzwrite.o pzsync.o pzsplit.o pzfixed.o pzconvert.o sfdcpzip.o
 exec - (ranlib libpz.a) >/dev/null 2>&1 || true
 done libpz.a generated
 done pz virtual

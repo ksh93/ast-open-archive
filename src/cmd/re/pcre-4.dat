@@ -1,0 +1,34 @@
+: converted from the pcre testdata/testinput4 2001-06-19
+
+{C	es
+E$	^[\\w]+	École	(0,5)
+E$	^[\\w]+	École	(0,5)
+E$	^[\\w]+	École	(0,5)
+E$	^[\\W]+	École	NOMATCH
+E$	^[\\W]+	École	NOMATCH
+E$	[\\b]	\b	(0,1)
+E$	SAME	a	NOMATCH
+E$	^\\w+	École	(0,5)
+E$	^\\w+	École	(0,5)
+E$	(.+)\\b(.+)	:École:	(0,7)(0,6)(6,7)
+Ei	École	École	(0,5)
+Ei	SAME	école	(0,5)
+Ei	École	École	(0,5)
+Ei	SAME	école	(0,5)
+Exi	^[\xc8-\xc9]	École	(0,1)
+Exi	SAME	école	(0,1)
+Exi	^\xc9	École	(0,1)
+Exi	SAME	école	(0,1)
+Ex	^[\xc8-\xc9]	École	(0,1)
+Ex	SAME	école	NOMATCH
+Ex	^\xc9	École	(0,1)
+Ex	SAME	école	NOMATCH
+E$xi	^[\xc8-\xc9]	École	(0,1)
+E$xi	SAME	école	(0,1)
+E$xi	^\xc9	École	(0,1)
+E$xi	SAME	école	(0,1)
+E$x	^[\xc8-\xc9]	École	(0,1)
+E$x	SAME	école	NOMATCH
+E$x	^\xc9	École	(0,1)
+E$x	SAME	école	NOMATCH
+}

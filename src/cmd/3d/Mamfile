@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -47,7 +47,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in 3d dl ast
+exec - for i in 3d dl
 exec - do	case $i in
 exec - 	"3d"|3d)
 exec - 		;;
@@ -75,8 +75,7 @@ make FEATURE/syslib implicit
 make features/syslib
 done features/syslib
 prev 3d.req
-bind -last
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/syslib
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/syslib
 done FEATURE/syslib dontcare generated
 make FEATURE/syscall implicit
 make features/syscall.sh
@@ -84,7 +83,7 @@ make sys.tab implicit
 done sys.tab
 done features/syscall.sh
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/syscall.sh sys.tab
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/syscall.sh sys.tab
 done FEATURE/syscall dontcare generated
 make FEATURE/peek implicit
 make features/peek.c
@@ -103,7 +102,7 @@ make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h
 done features/peek.c
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/peek.c
+exec - iffe -v -c '${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/peek.c
 done FEATURE/peek dontcare generated
 make vcs_3d.h implicit
 done vcs_3d.h dontcare
@@ -311,7 +310,7 @@ make FEATURE/hack implicit
 make ../../lib/libast/features/hack
 done ../../lib/libast/features/hack
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run ../../lib/libast/features/hack
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run ../../lib/libast/features/hack
 done FEATURE/hack generated
 prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
@@ -427,7 +426,7 @@ done ../../lib/libast/misc/state.c
 prev 3d.h implicit
 done ast.c
 prev ast.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c ast.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DFS -D_BLD_3d -DVCS -c ast.c
 done ast.o generated
 make cs.o
 make cs.c
@@ -528,7 +527,7 @@ done ../../lib/libcs/csdata.c dontcare
 prev 3d.h implicit
 done cs.c
 prev cs.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DFS -DVCS -c cs.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_3d -D_PACKAGE_ast -DFS -DVCS -c cs.c
 done cs.o generated
 make license.o
 make license.c
@@ -624,7 +623,7 @@ done dir_3d.h
 prev ../../../include/ast/ast_std.h implicit
 done dir3d.c
 prev dir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c dir3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_3d -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c dir3d.c
 done dir3d.o generated
 make dup23d.o
 make dup23d.c
@@ -835,7 +834,7 @@ prev dir_3d.h implicit
 prev 3d.h implicit
 done rmdir3d.c
 prev rmdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -D_PACKAGE_ast -DVCS -c rmdir3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -D_BLD_3d -D_PACKAGE_ast -DVCS -c rmdir3d.c
 done rmdir3d.o generated
 make sbrk3d.o
 make sbrk3d.c
@@ -880,7 +879,7 @@ prev dir_3d.h implicit
 prev 3d.h implicit
 done syscall3d.c
 prev syscall3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DVCS -DFS -c syscall3d.c
+exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_3d -D_PACKAGE_ast -DVCS -DFS -c syscall3d.c
 done syscall3d.o generated
 make sysent3d.o
 make sysent3d.c
@@ -986,7 +985,7 @@ exec - 	then	ENV= $SHELL -n 3d.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\"' in
+exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1' in
 exec - "")	cp 3d.sh 3d
 exec - 	;;
 exec - *)	{
@@ -994,7 +993,7 @@ exec - 	i=`(read x; echo $x) < 3d.sh`
 exec - 	case $i in
 exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\"
+exec - 	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _PACKAGE_ast=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1
 exec - 	cat 3d.sh
 exec - 	} > 3d
 exec - 	;;

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -410,4 +410,10 @@ done tw.tst
 prev tw
 exec - regress  tw.tst tw
 done test.tw virtual
+make test.xargs
+make xargs.tst
+done xargs.tst
+prev xargs
+exec - regress  xargs.tst xargs
+done test.xargs virtual
 done test dontcare virtual

@@ -25,16 +25,10 @@
 
 /*
  * glob(3) test harness
- *
- * testglob [ options ] < testglob.dat
- *
- *	-c	catch signals and non-terminating calls
- *	-v	list each test line
- *
- * see comments in testglob.dat for a description of the input format
+ * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-03-17 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-08-11 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -61,6 +55,79 @@ static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2001-03-17 $\0\n";
 #define NiL		(char*)0
 #endif
 #endif
+
+#define H(x)		fprintf(stderr,x)
+
+static void
+help(void)
+{
+H("NAME\n");
+H("  testglob - glob(3) test harness\n");
+H("\n");
+H("SYNOPSIS\n");
+H("  testglob [ options ] < testglob.dat\n");
+H("\n");
+H("DESCRIPTION\n");
+H("  testglob reads glob(3) test specifications, one per line, from the\n");
+H("  standard input and writes one output line for each failed test. A\n");
+H("  summary line is written after all tests are done. Unsupported\n");
+H("  features are noted before the first test, and tests requiring these\n");
+H("  features are silently ignored.\n");
+H("\n");
+H("OPTIONS\n");
+H("  -c	catch signals and non-terminating calls\n");
+H("  -e	ignore error code mismatches\n");
+H("  -v	list each test line\n");
+H("\n");
+H("INPUT FORMAT\n");
+H("  Input lines may be blank, a comment beginning with #, or a test\n");
+H("  specification. A specification is five fields separated by one\n");
+H("  or more tabs. NULL denotes the empty string and NIL denotes the\n");
+H("  0 pointer.\n");
+H("\n");
+H("  Field 1: the glob(3) flags to apply, one character per GLOB_feature\n");
+H("  flag. The test is skipped if GLOB_feature is not supported by the\n");
+H("  implementation. If the first character is not [KS] then the\n");
+H("  specification is a global control line.\n");
+H("\n");
+H("    K	GLOB_AUGMENTED		augmented (ksh) patterns\n");
+H("    S	0			basic shell patterns\n");
+H("\n");
+H("    a	GLOB_APPEND\n");
+H("    b	GLOB_BRACE\n");
+H("    c	GLOB_CMPLETE\\n\n");
+H("    e	GLOB_NOESCAPE\n");
+H("    E	GLOB_ERR\n");
+H("    i	GLOB_ICASE\n");
+H("    m	GLOB_MARK\n");
+H("    n	GLOB_NOCHECK\n");
+H("    s	GLOB_NOSORT\n");
+H("    u	standard unspecified behavior -- errors not counted\n");
+H("\n");
+H("  Field 1 control lines:\n");
+H("\n");
+H("    C	set LC_COLLATE and LC_CTYPE to the locale in field 2\n");
+H("    I	set gl_fignore to the pattern in field 2\n");
+H("    W	workspace file/dir; tab indentation denotes directory level\n");
+H("\n");
+H("    {				silent skip if failed until }\n");
+H("    }				end of skip\n");
+H("\n");
+H("    : comment			comment copied to output\n");
+H("\n");
+H("  Field 2: a shell filename expansion pattern\n");
+H("\n");
+H("  Field 3: the expected glob() return value, OK for success, glob\n");
+H("    return codes otherwise, with the GLOB_ prefix omitted\n");
+H("\n");
+H("  Field 4: optional space-separated matched file list\n");
+H("\n");
+H("  Field 5: optional comment appended to the report.\n");
+H("\n");
+H("CONTRIBUTORS\n");
+H("  Glenn Fowler <gsf@research.att.com> (ksh strmatch, regex extensions)\n");
+H("  David Korn <dgk@research.att.com> (ksh glob matcher)\n");
+}
 
 #ifndef elementsof
 #define elementsof(x)	(sizeof(x)/sizeof(x[0]))
@@ -429,6 +496,12 @@ main(int argc, char** argv)
 				state.ignore.error = 1;
 				printf(", ignore error code mismatches");
 				continue;
+			case 'h':
+			case '?':
+			case '-':
+				printf(", help\n\n");
+				help();
+				return 2;
 			case 'v':
 				verbose = 1;
 				printf(", verbose");

@@ -324,6 +324,7 @@ ppcontrol(void)
 		PPLINESYNC		linesync;
 	}				var;
 
+	static char			__va_args__[] = "__VA_ARGS__";
 	static int			i0;
 	static int			i1;
 	static int			i2;
@@ -836,17 +837,35 @@ ppcontrol(void)
 						while ((c = pplex()) == ',');
 					}
 #endif
-					if (c == T_ID) for (;;)
+					for (;;)
 					{
+						if (c == T_VARIADIC)
+						{
+							if (sym->flags & SYM_VARIADIC)
+								error(2, "%s: %s: duplicate macro formal argument", sym->name, pp.token);
+							sym->flags |= SYM_VARIADIC;
+							v = __va_args__;
+						}
+						else if (c == T_ID)
+						{
+							v = pp.token;
+							if (sym->flags & SYM_VARIADIC)
+								error(2, "%s: %s: macro formal argument cannot follow ...", sym->name, v);
+							else if (streq(v, __va_args__))
+								error(2, "%s: %s: invalid macro formal argument", sym->name, v);
+						}
+						else
+							break;
 						if (mac->arity < MAXFORMALS)
 						{
 							for (n = 0; n < mac->arity; n++)
-								if (streq(formargs[n], pp.token))
-									error(2, "%s: duplicate formal argument %s", sym->name, pp.token);
+								if (streq(formargs[n], v))
+									error(2, "%s: %s: duplicate macro formal argument", sym->name, v);
 							formargs[mac->arity++] = p;
-							STRAPP(p, pp.token, s);
+							STRAPP(p, v, s);
 						}
-						else error(2, "%s: formal argument %s ignored", sym->name, pp.token);
+						else
+							error(2, "%s: %s: macro formal argument ignored", sym->name, v);
 						if ((c = pplex()) == ',')
 						{
 							c = pplex();
@@ -859,30 +878,14 @@ ppcontrol(void)
 							}
 #endif
 						}
-						else if (c != T_VARIADIC) break;
-						if (c != T_ID)
+						else if (c != T_VARIADIC)
+							break;
+						else
 						{
-							if (c == T_VARIADIC)
-							{
-								sym->flags |= SYM_VARIADIC;
-								c = pplex();
-								if (mac->arity < MAXFORMALS)
-								{
-									formargs[mac->arity++] = p;
-									s = "__VA_ARGS__";
-									STRAPP(p, pp.token, s);
-								}
-								else
-									error(2, "%s: formal argument %s ignored", sym->name, pp.token);
-							}
-#if COMPATIBLE
-							else if (c == ')' && (pp.state & COMPATIBILITY))
-							{
-								if ((pp.state & STRICT) && !(pp.mode & HOSTED))
-									error(1, "%s: macro formal argument expected", sym->name);
-							}
-#endif
-							else c = ',';
+							if (sym->flags & SYM_VARIADIC)
+								error(2, "%s: %s: duplicate macro formal argument", sym->name, pp.token);
+							sym->flags |= SYM_VARIADIC;
+							c = pplex();
 							break;
 						}
 					}

@@ -314,7 +314,7 @@ getprologue(register Archive_t* ap)
 	if (ap->format < 0)
 	{
 		ap->format = ap->expected >= 0 ? ap->expected : IN_DEFAULT;
-		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_ASCII);
+		convert(ap, SECTION_CONTROL, CC_ASCII, CC_NATIVE);
 	}
 	return 1;
 }
@@ -2458,7 +2458,7 @@ getheader(register Archive_t* ap, register File_t* f)
 		ap->memsum = 0;
 	ap->old.memsum = 0;
 	ap->section = SECTION_DATA;
-	ap->convert[ap->section].on = ap->convert[ap->section].internal != ap->convert[ap->section].external;
+	ap->convert[ap->section].on = ap->convert[ap->section].from != ap->convert[ap->section].to;
 	return 1;
 }
 

@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-04-24 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2001-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1368,14 +1368,14 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			switch (op->index)
 			{
 			case OPT_from:
-				ap->convert[0].external = n;
+				ap->convert[0].from = n;
 				break;
 			case OPT_to:
-				ap->convert[0].internal = n;
+				ap->convert[0].to = n;
 				break;
 			}
 			ap->convert[0].on = 1;
-			convert(ap, SECTION_DATA, ap->convert[0].internal, ap->convert[0].external);
+			convert(ap, SECTION_DATA, ap->convert[0].from, ap->convert[0].to);
 			break;
 		case OPT_ignore:
 			if (n && *v)

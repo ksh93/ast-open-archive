@@ -82,11 +82,8 @@
 #define SECTION_DATA	2			/* data io		*/
 
 #define SECTION_MAX	3
-#define SECTION_SHIFT	2
 
-#define SECTION(p)	(((p)->section)&((1<<SECTION_SHIFT)-1))
-#define SECTION_SKIP(p)	(((p)->section)<<=SECTION_SHIFT,(p)->sum--)
-#define SECTION_KEEP(p)	(((p)->section)>>=SECTION_SHIFT,(p)->sum++)
+#define SECTION(p)	(p)->section
 
 #define METER_parts	20
 
@@ -668,8 +665,8 @@ typedef struct Delta_s			/* delta archive info		*/
 typedef struct Convert_s		/* char code conversion		*/
 {
 	int		on;		/* do the conversion		*/
-	int		internal;	/* internal char code		*/
-	int		external;	/* external char code		*/
+	int		from;		/* convert from this char code	*/
+	int		to;		/* convert to this char code	*/
 } Convert_t;
 
 typedef struct Archive_s		/* archive info			*/
@@ -709,6 +706,7 @@ typedef struct Archive_s		/* archive info			*/
 	int		part;		/* media change count		*/
 	int		peek;		/* already peeked at file entry */
 	File_t*		record;		/* record output file		*/
+	int		raw;		/* don't convert sections	*/
 	int		section;	/* current archive section	*/
 	int		selected;	/* number of selected members	*/
 	int		separator;	/* alternate directory seprator	*/

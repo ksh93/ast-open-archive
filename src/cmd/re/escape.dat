@@ -45,4 +45,4 @@ E$hx	abc\\0def\\00pqr			abc\0def\00pqr		(0,11)
 E$hx	abc\\0def\\00pqr\\000xyz		abc\0def\00pqr\000xyz	(0,15)
 E$hx	abc\\0def\\00pqr\\000xyz\\0000AB	abc\0def\00pqr\000xyz\0000AB	(0,19)
 
-K	(abc)~(1)	abcabc		(0,6)
+K	(abc)~(1)	abcabc		(0,6)(0,3)

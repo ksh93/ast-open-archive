@@ -29,10 +29,10 @@ sfio :TEST: testsfio sftest.h +last \
 	tsetbuf.c tsetfd.c tshare.c tsize.c tstack.c tstatus.c \
 	tstdio.c tstkpk.c tstring.c tswap.c tsync.c ttell.c ttmp.c \
 	ttmpfile.c tungetc.c twhole.c twrrd.c
-		set +x; $(*:O=1) $(TESTSFIOFLAGS) $(*:O>1) $(CC) $(CCFLAGS)
+		set +x; $(*:O=1) $(TESTSFIOFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
 test.sf : testsfio sftest.h +last $$(*.ARGS:D:B:S=.c) .CLEARARGS
-	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS)
+	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
 tests : settings tests.out
 

@@ -36,11 +36,11 @@
  */
 
 void
-convert(Archive_t* ap, int section, int internal, int external)
+convert(Archive_t* ap, int section, int from, int to)
 {
 	ap->convert[section].on =
-		(ap->convert[section].internal = internal) !=
-		(ap->convert[section].external = external);
+		(ap->convert[section].from = from) !=
+		(ap->convert[section].to = to);
 }
 
 /*
@@ -141,15 +141,15 @@ tar_checksum(Archive_t* ap)
 	n = 0;
 	p = (unsigned char*)tar_block;
 	e = p + TAR_HEADER;
-	if (ap->convert[SECTION_CONTROL].on)
+	if (!ap->convert[SECTION_CONTROL].on)
+		while (p < e)
+			n += *p++;
+	else
 	{
-		map = CCMAP(ap->convert[SECTION_CONTROL].internal, ap->convert[SECTION_CONTROL].external);
+		map = (state.operation & IN) ? CCMAP(ap->convert[SECTION_CONTROL].to, ap->convert[SECTION_CONTROL].from) : CCMAP(ap->convert[SECTION_CONTROL].from, ap->convert[SECTION_CONTROL].to);
 		while (p < e)
 			n += map[*p++];
 	}
-	else
-		while (p < e)
-			n += *p++;
 	return n & TAR_SUMASK;
 }
 

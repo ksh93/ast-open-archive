@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: probe (AT&T Labs Research) 2000-08-11 $\n]"
+"[-?\n@(#)$Id: probe (AT&T Labs Research) 2001-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?probe - generate/install/display language processor probe information]"
 "[+DESCRIPTION?\bprobe\b generates, installs and displays on the standard"
@@ -99,6 +99,18 @@ USAGE_LICENSE
 "\n"
 "\nlanguage tool processor\n"
 "\n"
+"[+FILES]{"
+"	[+lib/probe/\alanguage\a/\atool\a?\atool\a specific information"
+"		directory for \alanguage\a processors.]"
+"	[+$HOME/.probe?Per-user directory when \bprobe\b is installed"
+"		non-set-uid.]"
+"}"
+"[+CAVEATS?To allow probe information to be generated and shared among all"
+"	users the executable \alib/probe/probe\a must be set-uid to the owner"
+"	of the \alib/probe\a directory hierarchy.]"
+"[+?Automatic language processor probing is mostly black magic, but then"
+"	so are most language processor implementations.]"
+
 "[+SEE ALSO?\bcpp\b(1), \bnmake\b(1), \bpathkey\b(3), \bpathprobe\b(3)]"
 ;
 

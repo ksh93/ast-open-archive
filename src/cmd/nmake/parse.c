@@ -694,6 +694,16 @@ readline(int lead)
 				case EOF:
 					sfputc(pp->ip, '\\');
 					goto eof;
+				case '\r':
+					if ((c = sfgetc(pp->fp)) != '\n')
+					{
+						if (c != EOF)
+							sfungetc(pp->fp, c);
+						sfputc(pp->ip, '\\');
+						c = '\r';
+						break;
+					}
+					/*FALLTHROUGH*/
 				case '\n':
 					if (lead > 0)
 					{
@@ -703,7 +713,7 @@ readline(int lead)
 						continue;
 					}
 					pp->join = error_info.line + 2;
-					sfungetc(pp->fp, c);
+					sfungetc(pp->fp, '\n');
 					c = '\\';
 					break;
 				default:

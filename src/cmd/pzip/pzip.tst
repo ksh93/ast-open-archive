@@ -55,7 +55,7 @@ TEST 02 'pzip'
 		ERROR -
 	EXEC --regress --summary -p row.prt tst.dat
 		MOVE OUTPUT tst.pz
-		ERROR - $'total tst.dat rate 2.88 time 1.00s bpr 2.09 bps 58.5k size 60000/20862 windows 1 records 10000'
+		ERROR - $'total tst.dat rate 2.88 time 1.00s bpr 2.08 bps 58.5k size 60000/20842 windows 1 records 10000'
 	EXEC tst.pz
 		SAME OUTPUT tst.dat
 		ERROR -

@@ -6,7 +6,7 @@
  *	 so a static link needs -u _exit -l3d other-libs
  */
 
-:PACKAGE: ast
+:PACKAGE: ast:nolibrary
 
 LICENSE = since=1989,author=gsf+dgk+ekrell
 

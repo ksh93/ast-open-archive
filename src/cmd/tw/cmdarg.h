@@ -33,13 +33,14 @@
 #define _CMDARG_H
 
 #define CMD_EMPTY	(1<<0)		/* run once, even if no args	*/
-#define CMD_IGNORE	(1<<1)		/* ignore EXIT_QUIT exit	*/
-#define CMD_INSERT	(1<<2)		/* argpat for insertion		*/
-#define CMD_MINIMUM	(1<<3)		/* argmax is a minimum		*/
-#define CMD_NEWLINE	(1<<4)		/* echo separator is newline	*/
-#define CMD_POST	(1<<5)		/* argpat is post arg position	*/
-#define CMD_QUERY	(1<<6)		/* trace and query each command	*/
-#define CMD_TRACE	(1<<7)		/* trace each command		*/
+#define CMD_EXACT	(1<<1)		/* last command must have argmax*/
+#define CMD_IGNORE	(1<<2)		/* ignore EXIT_QUIT exit	*/
+#define CMD_INSERT	(1<<3)		/* argpat for insertion		*/
+#define CMD_MINIMUM	(1<<4)		/* argmax is a minimum		*/
+#define CMD_NEWLINE	(1<<5)		/* echo separator is newline	*/
+#define CMD_POST	(1<<6)		/* argpat is post arg position	*/
+#define CMD_QUERY	(1<<7)		/* trace and query each command	*/
+#define CMD_TRACE	(1<<8)		/* trace each command		*/
 
 #define CMD_USER	(1<<12)
 

@@ -1,3 +1,8 @@
+01-08-11 ppcontrol: fix ... and __VAR_ARGS__ for C99
+	 ppsearch: fix SEARCH_NEXT bug that skipped the include stack
+01-08-06 ppproto: preserve #! first line for # comments
+01-07-17 gentab.sh: fix ksh test to omit pdksh (typeset -u fails)
+01-06-26 ppproto.c: fix another buffer boundary bug that didn't preserve OTHER
 01-06-06 ppsearch.c: list PP_FILEDEPS headers once
 01-06-01 pp.h,ppop.c,ppsearch.c: allow multiple PP_FILEDEPS (-M)
 01-05-24 pp.probe: fix pp:hostedtransition probe: only suncc can __STDC__==1?

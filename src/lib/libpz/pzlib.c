@@ -38,7 +38,6 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 	register Pzdllpz_t*	pzs;
 	register int		n;
 	register char*		id;
-	const char*		options;
 	char			buf[64];
 
 	/*
@@ -84,7 +83,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 		if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY)) && (!n || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY))))
 		{
 			if (pz->disc && pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: cannot find library", dll->name + n);
+				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %s", dll->name + n, dlerror());
 			return -1;
 		}
 
@@ -92,11 +91,11 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 		 * get the initialization function
 		 */
 
-		sfsprintf(buf, sizeof(buf), "_%s_init", id);
-		if (!(dll->initf = (Pzinit_f)dlsym(dll->dll, buf + 1)) && !(dll->initf = (Pzinit_f)dlsym(dll->dll, buf)))
+		sfsprintf(buf, sizeof(buf), "%s_init", id);
+		if (!(dll->initf = (Pzinit_f)dlllook(dll->dll, buf)))
 		{
 			if (pz->disc && pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: %s: initialization function not found in library", dll->name + n, buf + 1);
+				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: %s: initialization function not found in library", dll->name + n, buf);
 			return -1;
 		}
 	}
@@ -115,26 +114,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 			pzs->pz = pz;
 			pzs->next = dll->pzs;
 			dll->pzs = pzs;
-			options = pz->disc->options;
-			if (!(dll->usage = (*dll->initf)(pz, pz->disc)))
-			{
-				if (pz->disc && pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, 2, "%s: %s_init: initialization function error", dll->name + n, id);
-				return -1;
-			}
-			optget(NiL, dll->usage);
-			if (pz->disc->options != options)
-			{
-				if (!pz->disc->options)
-					pz->options = 0;
-				else if (!(pz->options = vmstrdup(pz->vm, pz->disc->options)))
-				{
-					if (pz->disc && pz->disc->errorf)
-						(*pz->disc->errorf)(pz, pz->disc, 2, "%s: out of space", dll->name + n);
-					return -1;
-				}
-			}
-			if (pz->options && pzoptions(pz, pz->part, pz->options, 0) < 0)
+			if (!(dll->usage = pzinit(pz, dll->name + n, dll->initf)))
 				return -1;
 		}
 	}

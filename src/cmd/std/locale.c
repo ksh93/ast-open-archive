@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: locale (AT&T Labs Research) 2001-05-25 $\n]"
+"[-?\n@(#)$Id: locale (AT&T Labs Research) 2001-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?locale - get locale-specific information]"
 "[+DESCRIPTION?\blocale\b writes information about the current locale to"
@@ -539,7 +539,7 @@ list_all(Sfio_t* sp, register Lc_t* lc, unsigned long flags)
 		flags |= LC_quote;
 		sfprintf(sp, "locale=");
 	}
-	value(sp, lc->code, flags);
+	value(sp, lc->name, flags);
 	sfputc(sp, '\n');
 	if (lc->language)
 	{
@@ -693,17 +693,17 @@ scan(Sfio_t* sp, Keyword_t* key, unsigned long flags)
 		switch (flags & (LC_defined|LC_undefined))
 		{
 		case LC_defined:
-			if (!lc->index && !setlocale(LC_MONETARY, lc->code))
+			if (!lc->index && !setlocale(LC_MONETARY, lc->name))
 				continue;
 			break;
 		case LC_undefined:
-			if (lc->index || setlocale(LC_MONETARY, lc->code))
+			if (lc->index || setlocale(LC_MONETARY, lc->name))
 				continue;
 			break;
 		}
 		if (!key)
 			list_locale(sp, NiL, lc, flags);
-		else if (setlocale(LC_ALL, lc->code))
+		else if (setlocale(LC_ALL, lc->name))
 			list_keyword(sp, key, NiL, flags&~LC_quote);
 	}
 	return 0;

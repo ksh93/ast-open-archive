@@ -249,6 +249,7 @@ extern int		pzinflate(Pz_t*, Sfio_t*);
 
 extern Sfio_t*		pzfind(Pz_t*, const char*, const char*, const char*);
 extern int		pzlib(Pz_t*, const char*, int);
+extern const char*	pzinit(Pz_t*, const char*, Pzinit_f);
 
 extern int		pzoptions(Pz_t*, Pzpart_t*, char*, int);
 extern int		pzpartinit(Pz_t*, Pzpart_t*, const char*);
@@ -258,6 +259,7 @@ extern int		pzpartprint(Pz_t*, Pzpart_t*, Sfio_t*);
 extern int		pzpartread(Pz_t*);
 extern int		pzpartwrite(Pz_t*, Sfio_t*);
 extern Pzpart_t*	pzpartget(Pz_t*, const char*);
+extern Pzpart_t*	pzpartnext(Pz_t*, Pzpart_t*);
 extern Pzpart_t*	pzpartset(Pz_t*, Pzpart_t*);
 
 extern int		pzheadread(Pz_t*);

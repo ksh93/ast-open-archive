@@ -75,7 +75,7 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 	if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY)) && (!base || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY))))
 	{
 		if (disc && disc->errorf)
-			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: cannot find library", dll->name + n);
+			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: %s", dll->name + n, dlerror());
 		return -1;
 	}
 	dll->next = state.dll;
@@ -86,7 +86,7 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 	 */
 
 	sfsprintf(buf, sizeof(buf), "%s_init", id);
-	if (!(initf = (Init_f)dlsym(dll->dll, buf)))
+	if (!(initf = (Init_f)dlllook(dll->dll, buf)))
 	{
 		if (disc && disc->errorf)
 			(*disc->errorf)(NiL, disc, 2, "%s: %s: initialization function not found in library", dll->name + n, buf);

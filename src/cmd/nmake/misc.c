@@ -222,7 +222,9 @@ strtime(unsigned long t)
 
 #ifndef int_8
 #define int_8		int_4
+#undef	strtoll
 #define strtoll		strtol
+#undef	strtoull
 #define strtoull	strtoul
 #endif
 

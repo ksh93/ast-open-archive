@@ -3219,3 +3219,54 @@ TEST 11 'make dependencies'
 # 2 "b.h"
 
 # 3 "t.c"'
+
+TEST 12 'variadic macros'
+	EXEC -I-D
+		EXIT 8
+		INPUT - $'#define e1(...,...)
+#define e2(... ...)
+#define e3(__VA_ARGS__,...)
+#define e4(...,__VA_ARGS__)
+#define e5(...,a)
+
+#define f1(...)		g1(x,__VA_ARGS__)
+#define f2(a,...)	g2(a,x,__VA_ARGS__)
+#define f3(a,v...)	g2(a,x,v)
+
+f1();
+f1(1);
+f1(1,2);
+
+f2(1);
+f2(1,2);
+
+f3(1);
+f3(1,2);'
+		OUTPUT - $'# 1 ""
+
+
+
+
+
+
+
+
+
+
+g1(x, );
+g1(x, 1);
+g1(x, 1,2);
+
+g2( 1,x, );
+g2( 1,x, 2);
+
+g2( 1,x, );
+g2( 1,x, 2);'
+		ERROR - $'cpp: line 1: e1: ...: duplicate macro formal argument
+cpp: line 1: e1: __VA_ARGS__: duplicate macro formal argument
+cpp: line 2: e2: ...: duplicate macro formal argument
+cpp: line 3: e3: __VA_ARGS__: invalid macro formal argument
+cpp: line 3: e3: __VA_ARGS__: duplicate macro formal argument
+cpp: line 4: e4: __VA_ARGS__: macro formal argument cannot follow ...
+cpp: line 4: e4: __VA_ARGS__: duplicate macro formal argument
+cpp: line 5: e5: a: macro formal argument cannot follow ...'

@@ -36,10 +36,8 @@
 #	%sequence [ prefix=<prefix> ] [ index=<index> ] [ init=<init> ]
 #
 
-num=1
-((num=num+1))
-case $num in
-2)	shell=ksh
+case `(typeset -u s=a n=0; ((n=n+1)); print $s$n) 2>/dev/null` in
+A1)	shell=ksh
 	typeset -u ID
 	typeset -i counter err_line
 	;;

@@ -402,6 +402,17 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 			{
 				if (streq(error_info.file, pp.path))
 					flags |= SEARCH_SKIP;
+				else
+				{
+					struct ppinstk*	in;
+
+					for (in = pp.in; in; in = in->prev)
+						if (in->type == IN_FILE && in->file && streq(in->file, pp.path))
+						{
+							flags |= SEARCH_SKIP;
+							break;
+						}
+				}
 				continue;
 			}
 		}

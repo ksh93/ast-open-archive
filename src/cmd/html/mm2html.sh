@@ -119,7 +119,7 @@ typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
 typeset -x -A ds map nr outline
-typeset cond frame label list prev text title_end trailer type
+typeset cond frame label list prev text trailer type
 typeset license html meta nl mm index authors vg header references ss
 typeset mm_AF mm_AF_cur mm_AF_old mm_AU
 
@@ -780,7 +780,6 @@ TD { font-family:${ss}; font-size:$((vg_ps-1))pt; }
 		;;
 	esac
 	print -r -- "</HEAD>"
-	title_end=
 	case ${html.heading} in
 	?*)	case ${html.heading} in
 		?*)	html.toolbar=
@@ -821,8 +820,7 @@ $(cat $hit)
 			*)	x="" ;;
 			esac
 			print -r -- "<TABLE border=0 ${x}width=${html.width}>$nl<TBODY><TR><TD valign=top align=left>"
-			trailer="$trailer$nl"
-			title_end="</TD></TR></TBODY></TABLE>$nl"
+			trailer="$nl</TD></TR></TBODY></TABLE>$nl$trailer"
 			;;
 		esac
 		case $frame in
@@ -849,7 +847,6 @@ $(cat $hit)
 		trailer="$pm$nl$trailer"
 		;;
 	esac
-	print -r -n -- "$title_end"
 	trailer="${trailer}${nl}</BODY>"
 }
 

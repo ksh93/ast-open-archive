@@ -44,7 +44,7 @@ BUILTINS :COMMAND: cmd.h
 		end
 	else
 		$(BINDIR) :INSTALLDIR: $(BUILTINS)
-		$(BUILTINS) : .COMMAND $(&$("%.c":T=SM%)) BUILTIN=b_$$(<:B) builtin.c -lcmd $(*$("%.c":T=SM%))
+		$(BUILTINS) : .COMMAND $(&$("%.c":T=SM%)) BUILTIN=b_$$(<:B) builtin.c $(*$("%.c":T=SM%))
 			$(CAT) $(*:N=*builtin.c) > $(<).c
 			$(RM) $(RMFLAGS) $(<)
 			$(@$("%.c":T=SM%):/.*builtin.c$/$(<).c/)

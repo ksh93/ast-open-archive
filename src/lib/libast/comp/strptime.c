@@ -28,27 +28,26 @@
  * strptime implementation
  */
 
-#include <ast_lib.h>
+#include <ast_map.h>
 
 #ifdef strptime
-#define _def_strptime	1
-#else
+#undef	strptime
+#define _map_strptime	1
+#endif
+
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
 __STDPP__directive pragma pp:hide strptime
 #else
 #define strptime	______strptime
 #endif
-#endif
 
 #include <ast.h>
 #include <tm.h>
 
-#if !_def_strptime
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
 __STDPP__directive pragma pp:nohide strptime
 #else
 #undef	strptime
-#endif
 #endif
 
 #if _lib_strptime
@@ -56,6 +55,11 @@ __STDPP__directive pragma pp:nohide strptime
 NoN(strptime)
 
 #else
+
+#if _map_strptime
+#undef	strptime
+#define strptime	_ast_strptime
+#endif
 
 #if defined(__EXPORT__)
 #define extern	__EXPORT__

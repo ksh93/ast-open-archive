@@ -33,7 +33,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2001-04-19 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2001-08-06 $\0\n";
 
 #if PROTOMAIN
 
@@ -472,7 +472,7 @@ init(struct proto* proto, char* op, int flags)
 #define KEEPOUT()	(ko=op)
 #define LASTOUT()	(*(op-1))
 #define PUTCHR(c)	(*op++=(c))
-#define SYNC()		do{SYNCIN();SYNCOUT();proto->flags&=~(EXTERN|INIT|VARIADIC|VARIADIC2);proto->flags|=flags&(EXTERN|INIT|VARIADIC|VARIADIC2);proto->call=call;}while(0)
+#define SYNC()		do{SYNCIN();SYNCOUT();proto->flags&=~(EXTERN|INIT|OTHER|VARIADIC|VARIADIC2);proto->flags|=flags&(EXTERN|INIT|OTHER|VARIADIC|VARIADIC2);proto->call=call;}while(0)
 #define SYNCIN()	(proto->ip=ip)
 #define SYNCOUT()	(proto->op=op)
 #define UNGETCHR()	(ip--)
@@ -1616,7 +1616,9 @@ if !defined(va_start)\n\
 							memcopy(op - 13, "(__OTORP__(*)", 13);
 						}
 					}
-					if (flags & PLUSPLUS)
+					if (flags & OTHER)
+						;
+					else if (flags & PLUSPLUS)
 					{
 						op = om;
 						if (!(flags & TOKENS)) op = strcopy(op, "(...)");
@@ -2192,6 +2194,13 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 			proto->iz = n;
 			if (notice || options)
 			{
+				if (proto->cc[0] == '#' && proto->ip[0] == '#' && proto->ip[1] == '!')
+				{
+					s = proto->ip;
+					while (*s && *s++ != '\n');
+					proto->op = memcopy(proto->op, proto->ip, s - proto->ip);
+					proto->ip = s;
+				}
 #if PROTOMAIN
 				if ((comlen = astlicense(proto->op, proto->oz, notice, options, proto->cc[0], proto->cc[1], proto->cc[2])) < 0)
 					proto_error((char*)proto + sizeof(struct proto), 1, proto->op, NiL);

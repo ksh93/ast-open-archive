@@ -185,22 +185,18 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 		if (disc->options && (!(pz->options = vmstrdup(pz->vm, disc->options)) || pzoptions(pz, NiL, pz->options, 0) < 0))
 			goto bad;
 	}
-	if ((pz->flags & (PZ_READ|PZ_STAT)) || !disc->partition)
+	if ((pz->flags & (PZ_READ|PZ_SPLIT|PZ_STAT)) || !disc->partition)
 	{
 		if (pzheadread(pz))
 			goto bad;
+		if ((pz->flags & PZ_SPLIT) && disc->partition && pzpartition(pz, disc->partition))
+			goto bad;
 		if (pz->options && pzoptions(pz, pz->part, pz->options, 1) < 0)
 			goto bad;
-		if ((pz->flags & PZ_FORCE) && !(flags & PZ_AGAIN))
-		{
-			if (pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzopen: flags=%08x", pz->path, pz->flags);
-			return pz;
-		}
 	}
 	else
 	{
-		if (pzpartition(pz, disc->partition))
+		if (disc->partition && pzpartition(pz, disc->partition))
 			goto bad;
 		if (pz->disc->version >= PZ_VERSION_SPLIT && pz->disc->splitf)
 		{

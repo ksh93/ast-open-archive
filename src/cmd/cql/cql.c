@@ -46,7 +46,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)cql (AT&T Labs Research) 2001-02-14\n]"
+"[-?\n@(#)cql (AT&T Labs Research) 2001-07-17\n]"
 USAGE_LICENSE
 "[+NAME?cql - C query language]"
 "[+DESCRIPTION?\bcql\b applies C style expressions to flat database files."
@@ -771,12 +771,12 @@ main(int argc, char** argv)
 				if (!(sp = sfstropen()))
 					error(ERROR_SYSTEM|3, "out of space [load]");
 				if (!(dll = dllfind(compiled, NiL, RTLD_LAZY)))
-					error(ERROR_SYSTEM|3, "%s: cannot load", compiled);
+					error(ERROR_SYSTEM|3, "%s: %s", compiled, dlerror());
 				for (n = 0; n < elementsof(state.loop); n++)
 				{
 					sfprintf(sp, "%s_%s", error_info.id, state.loop[n].name);
 					name = sfstruse(sp);
-					if ((x = exexpr(prog, state.loop[n].name, NiL, 0)) && !(x->compiled.integer = (Compiled_f)dlsym(dll, name)))
+					if ((x = exexpr(prog, state.loop[n].name, NiL, 0)) && !(x->compiled.integer = (Compiled_f)dlllook(dll, name)))
 						error(3, "%s: %s function not found", compiled, name);
 				}
 				sfstrclose(sp);

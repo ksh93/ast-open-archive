@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: xargs (AT&T Labs Research) 1999-07-17 $\n]"
+"[-?\n@(#)$Id: xargs (AT&T Labs Research) 2001-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?xargs - construct arg list and execute command]"
 "[+DESCRIPTION?\bxargs\b constructs a command line consisting of the"
@@ -54,15 +54,21 @@ USAGE_LICENSE
 "	unspecified if \acommand\a attempts to read from its standard input.]"
 
 "[e:eof?Set the end of file string. The first input line matching this string"
-"	terminates the input list. Ther is no eof string if \astring\a is"
+"	terminates the input list. There is no eof string if \astring\a is"
 "	omitted. The default eof string is \b_\b if neither \b--eof\b nor"
-"	\b-E\b are specified]:?[string]"
-"[i:insert|replace?Replace occurences or \astring\a in the command"
+"	\b-E\b are specified. For backwards compatibility \astring\a"
+"	must immediately follow the \b-e\b option flag; \b-E\b follows"
+"	standard option syntax.]:?[string]"
+"[i:insert|replace?Replace occurences of \astring\a in the command"
 "	arguments with names read from the standard input. Implies"
-"	\b--exit\b and \b--lines=1\b.]:?[string:={}]"
+"	\b--exit\b and \b--lines=1\b. For backwards compatibility \astring\a"
+"	must immediately follow the \b-i\b option flag; \b-I\b follows"
+"	standard option syntax.]:?[string:={}]"
 "[l:lines|max-lines?Use at most \alines\a lines from the standard input."
 "	Lines with trailing blanks logically continue onto the"
-"	next line.]#?[lines:=1]"
+"	next line. For backwards compatibility \alines\a"
+"	must immediately follow the \b-l\b option flag; \b-L\b follows"
+"	standard option syntax.]#?[lines:=1]"
 "[n:args|max-args?Use at most \aargs\a arguments per command line."
 "	Fewer than \aargs\a will be used if \b--size\b is exceeded.]#[args]"
 "[p:interactive|prompt?Prompt to determine if each command should execute."
@@ -75,6 +81,8 @@ USAGE_LICENSE
 "[t:trace|verbose?Print the command line on the standard error"
 "	before executing it.]"
 "[x:exit?Exit if \b--size\b is exceeded.]"
+"[X:exact?If \b--args=\b\aargs\a was specified then terminate before the last"
+"	command if it would run with less than \aargs\a arguments.]"
 "[z:nonempty|no-run-if-empty?If no file names are found then do not execute"
 "	the command. By default the command is executed at least once.]"
 "[E?Equivalent to \b--eof=string\b.]:[string]"
@@ -126,6 +134,53 @@ main(int argc, register char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'e':
+			/*
+			 * backwards compatibility requires no space between
+			 * option and value
+			 */
+
+			if (opt_info.arg == argv[opt_info.index - 1])
+			{
+				opt_info.arg = 0;
+				opt_info.index--;
+			}
+			/*FALLTHROUGH*/
+		case 'E':
+			eof = opt_info.arg;
+			continue;
+		case 'i':
+			/*
+			 * backwards compatibility requires no space between
+			 * option and value
+			 */
+
+			if (opt_info.arg == argv[opt_info.index - 1])
+			{
+				opt_info.arg = 0;
+				opt_info.index--;
+			}
+			/*FALLTHROUGH*/
+		case 'I':
+			insert = opt_info.arg ? opt_info.arg : "{}";
+			flags |= CMD_INSERT;
+			continue;
+		case 'l':
+			/*
+			 * backwards compatibility requires no space between
+			 * option and value
+			 */
+
+			if (opt_info.arg == argv[opt_info.index - 1])
+			{
+				opt_info.arg = 0;
+				opt_info.index--;
+			}
+			/*FALLTHROUGH*/
+		case 'L':
+			argmax = opt_info.num ? opt_info.num : 1;
+			lines = 1;
+			continue;
 		case 'n':
 			argmax = opt_info.num;
 			continue;
@@ -147,22 +202,11 @@ main(int argc, register char** argv)
 		case 'D':
 			error_info.trace = -opt_info.num;
 			continue;
-		case 'E':
-		case 'e':
-			eof = opt_info.arg;
-			continue;
-		case 'I':
-		case 'i':
-			insert = opt_info.arg ? opt_info.arg : "{}";
-			flags |= CMD_INSERT;
-			continue;
-		case 'L':
-		case 'l':
-			argmax = opt_info.num ? opt_info.num : 1;
-			lines = 1;
-			continue;
 		case 'N':
 			null = 1;
+			continue;
+		case 'X':
+			flags |= CMD_EXACT;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);

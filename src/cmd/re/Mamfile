@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -407,7 +407,21 @@ make escape.dat
 done escape.dat
 make group.dat
 done group.dat
-exec - for i in testre.dat testmatch.dat testsub.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat
+make nullgroup.dat
+done nullgroup.dat
+make standards.dat
+done standards.dat
+make pcre-1.dat
+done pcre-1.dat
+make pcre-2.dat
+done pcre-2.dat
+make pcre-3.dat
+done pcre-3.dat
+make pcre-4.dat
+done pcre-4.dat
+make pcre-5.dat
+done pcre-5.dat
+exec - for i in testre.dat testmatch.dat testsub.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullgroup.dat standards.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat
 exec - do	testre -c < $i
 exec - done
 done test.re virtual

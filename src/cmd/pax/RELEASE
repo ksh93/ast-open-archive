@@ -1,3 +1,5 @@
+01-08-11 pax: fix tar_checksum() w.r.t. CC_NATIVE!=CC_ASCII
+01-06-28 pax: fix --from --to bio logic that sometimes double converted
 01-04-24 pax: --from & --to now associated with archive instead of global state
 01-04-17 pax: --from conversion only done if no control chars in first 256
 01-04-01 pax: fix --intermediate to create missing dirs first

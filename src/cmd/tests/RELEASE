@@ -1,3 +1,4 @@
+01-08-11 test.sf*: need $(LDFLAGS) for -L* library link paths!
 01-03-26 test.strtoi,test.strtof: add
 01-02-14 sfio: add tmpread
 01-01-31 sfio: uniform test exit codes

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -75,6 +75,13 @@ exec - ${YACC} ${YACCFLAGS} exparse.y
 exec - ed - y.tab.c <<!
 exec - g/yy/s//ex/g
 exec - g/YY/s//EX/g
+exec - w
+exec - q
+exec - !
+exec - ed - y.tab.c <<!
+exec - 1i
+exec - #include "ast.h"
+exec - .
 exec - w
 exec - q
 exec - !

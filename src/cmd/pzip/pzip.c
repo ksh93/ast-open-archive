@@ -28,10 +28,10 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pzip (AT&T Labs Research) 1999-10-01 $\n]"
+"[-?\n@(#)$Id: pzip (AT&T Labs Research) 2001-06-28 $\n]"
 USAGE_LICENSE
-"[+NAME?pzip - fixed record partition compress/decompress]"
-"[+DESCRIPTION?\bpzip\b compresses and decompresses data files of fixed"
+"[+NAME?\f?\f - fixed record partition compress/decompress]"
+"[+DESCRIPTION?\b\f?\f\b compresses and decompresses data files of fixed"
 "	length rows (records) and columns (fields). It performs better than"
 "	\bgzip\b(1) in space/time on data that has many (typically > 50%)"
 "	columns that change at a low rate (columns with a low rate of change"
@@ -198,13 +198,18 @@ main(int argc, char** argv)
 	register Pz_t*	pz;
 	Pzdisc_t	disc;
 	Sfio_t*		dp;
+	char*		s;
 
 	Method_f	method = 0;
 	int		push = 0;
 	int		testwrite = 0;
 	unsigned long	flags = PZ_READ|PZ_FORCE;
 
-	error_info.id = "pzip";
+	if (s = strrchr(*argv, '/'))
+		s++;
+	else
+		s = *argv;
+	error_info.id = s;
 	memset(&disc, 0, sizeof(disc));
 	disc.version = PZ_VERSION;
 	disc.errorf = (Pzerror_f)errorf;
@@ -248,6 +253,7 @@ main(int argc, char** argv)
 			flags |= PZ_SUMMARY;
 			continue;
 		case 'S':
+			flags |= PZ_SPLIT;
 			sfprintf(dp, "split%s%s\n", opt_info.arg ? "=" : "", opt_info.arg ? opt_info.arg : "");
 			continue;
 		case 'v':
@@ -310,6 +316,11 @@ main(int argc, char** argv)
 	if (sftell(dp) && !(disc.options = strdup(sfstruse(dp))))
 		error(ERROR_SYSTEM|3, "out of space");
 	sfclose(dp);
+	if (flags & PZ_SPLIT)
+	{
+		flags &= ~PZ_WRITE;
+		flags |= PZ_READ;
+	}
 	if (push)
 	{
 		if (*argv)

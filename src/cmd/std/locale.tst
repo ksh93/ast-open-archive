@@ -13,11 +13,12 @@ TEST 02 maps
 
 TEST 03 styles
 	EXEC TEST=Serbian
-		OUTPUT - $'sr_SP'
+		OUTPUT - $'sr'
 	EXEC TEST='Serbian (Latin)'
+	EXEC TEST='Serbian (Cyrillic)'
+		OUTPUT - $'sr.ISO8859-5'
 	EXEC TEST=sr_SP.cyrillic
 		OUTPUT - $'sr_SP.ISO8859-5'
-	EXEC TEST='Serbian (Cyrillic)'
 	EXEC TEST=sr_SP.ISO8859-5
 	EXEC TEST=sr_SP.ISO-8859-5
 	EXEC TEST=sr_SP.iso8859-5

@@ -1,3 +1,7 @@
+01-08-11 pzinit: add for static discipline library linking
+01-07-17 pzlib: call dllerror() on failed dllfind()
+01-06-28 pzpartnext: add to iterate over all partitions
+	 pzpartition: default partition can be on one line: `"label" size -'
 01-02-02 delay buffer allocation until pzpartinit()
 	 pzpart: fix non-terminated string bug for url-style paths
 01-01-01 pzopen: open new stream instead of using sfstdin for sfdcgzip()

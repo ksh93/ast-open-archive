@@ -12,7 +12,7 @@ banner :: banner.c LICENSE=since=1989,author=dgk
 
 dd :: dd.c
 
-df :: df.c
+df :: df.c $(CC.HOSTTYPE:N=sun4:?+last??)
 
 du :: du.c
 
@@ -26,7 +26,7 @@ ls :: ls.c
 
 mesg :: mesg.c LICENSE=since=1995,author=dgk
 
-$(PACKAGE_LOCAL)mount :: mount.1 mount.c LICENSE=since=1998,author=gsf
+$(PACKAGE_LOCAL)mount :: mount.1 mount.c LICENSE=since=1998,author=gsf $(CC.HOSTTYPE:N=sun4:?+last??)
 
 $(PACKAGE_LOCAL)ps :: ps.1 ps.c LICENSE=since=1998,author=gsf
 

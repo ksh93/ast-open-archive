@@ -1,3 +1,6 @@
+01-08-11 ls: fix nonprintable test for mb locales
+01-08-01 features/procfs: note that synthesized psinfo doesn't have pr_psargs
+01-06-27 dd: fix conv=[lu]case|x2y logic botch
 01-06-08 ps: option `-' is optional for ancient compatibility
 01-06-06 ls: drop octets for bytes -- yay
 01-05-25 locale: -m runs local locale until the standard comes to its senses

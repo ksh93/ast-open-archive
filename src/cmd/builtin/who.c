@@ -183,10 +183,10 @@ static void outline(Sfio_t *out,register struct utmpx *up,register State_t* sp)
 		int state = '?';
 		if(r>=0)
 			state = (statb.st_mode&S_IWOTH)?'+':'-';
-		sfprintf(out,"%-*.*s %c %-*.*s%.12s ",sp->siz_user,sp->siz_user,up->ut_user,state,sp->siz_line,sp->siz_line,up->ut_line,date+4);
+		sfprintf(out,"%-*.*s %c %-*.*s %.12s ",sp->siz_user,sp->siz_user,up->ut_user,state,sp->siz_line,sp->siz_line,up->ut_line,date+4);
 	}
 	else
-		sfprintf(out,"%-*.*s %-*.*s%.12s ",sp->siz_user,sp->siz_user,up->ut_user,sp->siz_line,sp->siz_line,up->ut_line,date+4);
+		sfprintf(out,"%-*.*s %-*.*s %.12s ",sp->siz_user,sp->siz_user,up->ut_user,sp->siz_line,sp->siz_line,up->ut_line,date+4);
 	if(sp->flags&FLAG_U)
 	{
 		time_t t = time(0)-30;
@@ -238,9 +238,9 @@ static int who(Sfio_t *in, Sfio_t *out, int flags)
 		if(state.flags&FLAG_T)
 			t = "MESG";
 		if(state.flags&FLAG_U)
-			sfprintf(out,"%-*.*s %2s %-*.*s%.12s %6s     %s\n",state.siz_user-3,state.siz_user-3,"USER",t,state.siz_line,state.siz_line,"LINE","LOGIN-TIME","IDLE","FROM");
+			sfprintf(out,"%-*.*s %2s %-*.*s %.12s %6s     %s\n",state.siz_user-3,state.siz_user-3,"USER",t,state.siz_line,state.siz_line,"LINE","LOGIN-TIME","IDLE","FROM");
 		else
-			sfprintf(out,"%-*.*s %2s %-*.*s%.12s     %s\n",state.siz_user-3,state.siz_user-3,"USER",t,state.siz_line,state.siz_line,"LINE","LOGIN-TIME","FROM");
+			sfprintf(out,"%-*.*s %2s %-*.*s %.12s     %s\n",state.siz_user-3,state.siz_user-3,"USER",t,state.siz_line,state.siz_line,"LINE","LOGIN-TIME","FROM");
 	}
 	while(sfread(in,&ut,sizeof(struct utmpx))>0)
 	{

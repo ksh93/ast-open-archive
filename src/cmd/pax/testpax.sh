@@ -230,12 +230,12 @@ do	suf=${format##*.}
 	: back to parent of $tmp
 	cd ..
 done
+cd $tmp
 
 : rw test
 
 ((tests++))
 status=0
-cd $tmp
 mkdir cpy
 "$@" -rw new cpy || status=1
 diff -r new cpy/new
@@ -245,12 +245,32 @@ case $status$? in
 esac
 TEST=$tests
 print -u2 "$TEST	copy new cpy$result"
-cd ..
+
+: conversion test
+
+((tests++))
+x=ascii
+echo $x$x$x$x$x$x$x$x$x$x$x$x$x$x$x$x > a
+for i in 1 2 3 4
+do	cat a a > b
+	cat b b > a
+done
+"$@" -wf a.pax -s ,a,b, --to=ebcdic3 a
+"$@" -rf a.pax --from=ebcdic3
+if	cmp -s a b
+then	result=
+else	result=" FAILED"
+	((errors++))
+fi
+TEST=$tests
+print -u2 "$TEST	codeset conversion$result"
 
 : clean up
 
 case $clobber in
-?*)	rm -rf $tmp ;;
+?*)	cd ..
+	rm -rf $tmp
+	;;
 esac
 
 case $errors in

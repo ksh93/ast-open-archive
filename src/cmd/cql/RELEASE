@@ -1,3 +1,4 @@
+01-07-17 cql: call dllerror() on dllfind() error
 01-02-14 cql: fix bug that didn't propagate details to cdbopen()
 	 cql: add --regenerate to force index regeneration
 01-02-07 cql.tst: add -l to TEST 19,20

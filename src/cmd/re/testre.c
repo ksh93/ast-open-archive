@@ -741,7 +741,6 @@ static int
 matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len, int flags, int query, int unspecified, int expand)
 {
 	char*	p;
-	char*	x;
 	int	i;
 	int	m;
 	int	n;
@@ -753,6 +752,8 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 		if (*p == '{')
 		{
 #if REG_DISCIPLINE
+			char*	x;
+
 			x = sfstruse(state.disc.sp);
 			if (strcmp(p, x))
 			{
@@ -933,7 +934,7 @@ main(int argc, char** argv)
 	char		buf[256];
 	regmatch_t	match[100];
 	regex_t		preg;
-#if REG_SUB_ALL
+#if _REG_sub
 	Sfio_t*		sp;
 #endif
 
@@ -1023,7 +1024,7 @@ main(int argc, char** argv)
 		}
 		printf("\n");
 	}
-#if REG_SUB_ALL
+#if _REG_sub
 	if (!(sp = sfstropen()))
 		bad("out of space [string stream]\n", NiL, NiL, 0, 0);
 #endif
@@ -1296,7 +1297,7 @@ main(int argc, char** argv)
 		msg = field[4];
 		fflush(stdout);
 		if (sub)
-#if REG_SUB_ALL
+#if _REG_sub
 			cflags |= REG_DELIMITED;
 #else
 			continue;
@@ -1405,7 +1406,7 @@ main(int argc, char** argv)
 
 		if (cret == 0)
 		{
-#if REG_SUB_ALL
+#if _REG_sub
 			if (sub)
 			{
 				p = re + preg.re_npat;

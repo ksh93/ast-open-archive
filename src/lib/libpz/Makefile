@@ -6,7 +6,7 @@ CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 pz 1.0 :LIBRARY: RELEASE pzip.3 pzip.h pzlib.h \
 	pzopen.c pzhead.c pzpart.c \
-	pzdeflate.c pzinflate.c pzlib.c \
+	pzdeflate.c pzinflate.c pzlib.c pzinit.c \
 	pzread.c pzwrite.c pzsync.c pzsplit.c \
 	pzfixed.c pzconvert.c sfdcpzip.c \
 	-lz -ldll

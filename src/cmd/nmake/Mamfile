@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-05-09
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2001-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -346,7 +346,7 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2001-05-09 \$\0\n"\" -c version.c
+exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2001-07-17 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -last

@@ -30,7 +30,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2000-06-10 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2000-06-27 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -444,6 +444,7 @@ main(int argc, char** argv)
 {
 	register char*		s;
 	register char*		v;
+	register char*		b;
 	register Operand_t*	op;
 	register Operand_t*	vp;
 	register int		f;
@@ -810,7 +811,7 @@ main(int argc, char** argv)
 			z = 0;
 		for (;;)
 		{
-			s = sfreserve(state.in.fp, SF_UNBOUND, 0);
+			b = sfreserve(state.in.fp, SF_UNBOUND, 0);
 			m = sfvalue(state.in.fp);
 			if (state.count.value.number)
 			{
@@ -825,15 +826,16 @@ main(int argc, char** argv)
 					z -= m;
 					
 			}
-			if (!s)
+			if (!b)
 			{
 				if (!m)
 					break;
 				error(ERROR_SYSTEM|((f & NOERROR) ? 2 : 3), "%s: read error", state.ifn.value.string);
-				memset(s = state.buffer, state.pad, m = c);
+				memset(b = state.buffer, state.pad, m = c);
 			}
 			for (;;)
 			{
+				s = b;
 				if (m >= c)
 				{
 					n = c;
@@ -857,7 +859,7 @@ main(int argc, char** argv)
 					}
 				}
 				if (f & SWAP)
-					swapmem(state.swap.value.number, s, s, c);
+					swapmem(state.swap.value.number, s, s, n);
 				if (state.cvt != (iconv_t)(-1))
 				{
 					cb = s;
@@ -873,19 +875,19 @@ main(int argc, char** argv)
 							error(ERROR_SYSTEM|2, "%s: %d conversion errors", state.ofn.value.string, ce);
 					}
 				}
-				ccmaps(s, c, state.from.value.number, state.to.value.number);
+				ccmaps(s, n, state.from.value.number, state.to.value.number);
 				switch (f & (LCASE|UCASE))
 				{
 				case LCASE:
 					for (v = (e = s) + n; s < v; s++)
 						if (isupper(*s))
-							*s = toupper(*s);
+							*s = tolower(*s);
 					s = e;
 					break;
 				case UCASE:
 					for (v = (e = s) + n; s < v; s++)
 						if (islower(*s))
-							*s = tolower(*s);
+							*s = toupper(*s);
 					s = e;
 					break;
 				}
@@ -899,7 +901,7 @@ main(int argc, char** argv)
 					error(ERROR_SYSTEM|3, "%s: write error", state.ofn.value.string);
 				if ((m -= n) <= 0)
 					break;
-				s += n;
+				b += n;
 			}
 		}
 	done:

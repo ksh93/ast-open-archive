@@ -1,3 +1,5 @@
+01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
+	 cmdarg(): fix CMD_INSERT copy that omitted leading chars
 01-05-02 tw: fix -a to use CMD_POST instead of CMD_INSERT
 01-02-06 tw,find: move --local test fslocal()
 01-01-01 find: fix -newer -anewer -cnewer -perm

@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2001-06-06 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2001-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -299,6 +299,7 @@ typedef struct				/* program state		*/
 	long		blocksize;	/* file block size		*/
 	unsigned long	directories;	/* directory count		*/
 	Count_t		total;		/* total counts			*/
+	int		adjust;		/* key() print with adjustment	*/
 	int		comma;		/* LS_COMMAS ftw.level crossing	*/
 	int		reverse;	/* reverse the sort		*/
 	int		scale;		/* metric scale power		*/
@@ -368,6 +369,7 @@ static char*
 printable(register char* s)
 {
 	register char*	t;
+	register char*	p;
 	register int	c;
 
 	static char*	prdata;
@@ -391,8 +393,21 @@ printable(register char* s)
 	t = prdata;
 	if (state.lsflags & LS_QUOTE)
 		*t++ = '"';
-	while (c = *s++)
-		*t++ = (iscntrl(c) || !isprint(c)) ? '?' : c;
+	if (!mbwide())
+		while (c = *s++)
+			*t++ = (iscntrl(c) || !isprint(c)) ? '?' : c;
+	else
+		for (p = s; c = mbchar(s);)
+			if (c < 0)
+			{
+				s++;
+				*t++ = '?';
+			}
+			else if (mbwidth(c) <= 0)
+				*t++ = '?';
+			else
+				while (p < s)
+					*t++ = *p++;
 	if (state.lsflags & LS_QUOTE)
 		*t++ = '"';
 	*t = 0;
@@ -639,7 +654,21 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		return 0;
 	}
 	if (s)
+	{
 		*ps = s;
+		if (mbwide())
+		{
+			register char*	p;
+			int		w;
+			int		i;
+
+			for (p = s; w = mbchar(s); p = s)
+				if (w < 0)
+					s++;
+				else if ((i = mbwidth(w)) >= 0)
+					state.adjust -= (s - p) + i - 2;
+		}
+	}
 	else if (fp->fmt == 's' && arg)
 	{
 		if (strneq(arg, fmt_mode, 4))
@@ -672,7 +701,8 @@ pr(register List_t* lp, Ftw_t* ftw, register int fill)
 		ftw->info = FTW_SL;
 #endif
 	lp->ftw = ftw;
-	fill -= sfkeyprintf(sfstdout, lp, state.format, key, NiL);
+	state.adjust = 0;
+	fill -= sfkeyprintf(sfstdout, lp, state.format, key, NiL) + state.adjust;
 	if (!(state.lsflags & LS_COMMAS))
 	{
 		if (fill > 0)
@@ -697,7 +727,8 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 	register int	i;
 	register int	n;
 	register int	files;
-	int		m;
+	register char*	s;
+	int		w;
 
 	lp->ftw = ftw;
 	if (keys[KEY_header].macro && ftw->level >= 0)
@@ -705,26 +736,38 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 	if ((files = lp->count.files) > 0)
 	{
 		if (!(state.lsflags & LS_COLUMNS) || length <= 0)
-			n = 1;
+			n = w = 1;
 		else
 		{
 			i = ftw->name[1];
 			ftw->name[1] = 0;
-			m = sfkeyprintf(state.tmp, lp, state.format, key, NiL) + 2;
-			length += m;
+			state.adjust = 2;
+			w = sfkeyprintf(state.tmp, lp, state.format, key, NiL) + state.adjust;
+			length += w;
 			n = state.width / length;
 			sfstrset(state.tmp, 0);
 			ftw->name[1] = i;
 		}
 		if (state.lsflags & LS_COMMAS)
 		{
-			length = m - 1;
+			length = w - 1;
 			i = 0;
 			n = state.width;
 			for (p = ftw->link; p; p = p->link)
 				if (p->local.number != INVISIBLE)
 				{
-					if ((n -= length + p->namelen) < 0)
+					if (!mbwide())
+						w = p->namelen;
+					else
+						for (s = p->name, w = 0; i = mbchar(s);)
+							if (i < 0)
+							{
+								s++;
+								w++;
+							}
+							else if ((n = mbwidth(i)) > 0)
+								w += n;
+					if ((n -= length + w) < 0)
 					{
 						n = state.width - (length + p->namelen);
 						if (i)

@@ -170,12 +170,10 @@ cmdflush(register Cmdarg_t* cmd)
 	register char**	p;
 	register int	n;
 
-	if (cmd->nextarg <= cmd->firstarg)
-	{
-		if (!(cmd->flags & CMD_EMPTY))
-			return 0;
+	if (cmd->flags & CMD_EMPTY)
 		cmd->flags &= ~CMD_EMPTY;
-	}
+	else if (cmd->nextarg <= cmd->firstarg)
+		return 0;
 	if ((cmd->flags & CMD_MINIMUM) && cmd->argcount < cmd->argmax)
 		error(3, "%d arg command would be too long", cmd->argcount);
 	cmd->total.args += cmd->argcount;
@@ -216,7 +214,13 @@ cmdflush(register Cmdarg_t* cmd)
 						b += sfsprintf(b, e - b, "%-.*s%s", u - t, t, a);
 						t = u + m;
 					}
-					else t = u + 1;
+					else if (b >= e)
+						break;
+					else
+					{
+						*b++ = *u++;
+						t = u;
+					}
 				}
 				if (b < e)
 					*b++ = 0;
@@ -298,8 +302,9 @@ cmdclose(Cmdarg_t* cmd)
 {
 	int	n;
 
-	if ((cmd->flags & CMD_MINIMUM) && cmd->argcount < cmd->argmax)
-		error(3, "%d: not enough arguments for last command", cmd->argcount);
+	if ((cmd->flags & CMD_EXACT) && cmd->argcount < cmd->argmax)
+		error(3, "only %d arguments for last command", cmd->argcount);
+	cmd->flags &= ~CMD_MINIMUM;
 	n = cmdflush(cmd);
 	free(cmd);
 	return n;

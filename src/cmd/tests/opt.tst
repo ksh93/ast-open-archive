@@ -1365,6 +1365,9 @@ TEST 15 'required vs. optional arguments'
 		OUTPUT - $'return=o option=-o name=--optional arg=1 num=1\nreturn=o option=-o name=--optional arg=(null) num=1\nreturn=2 option=-2 name=-2 arg=(null) num=1\nreturn=o option=-o name=--optional arg=(null) num=1\nargument=1 value="3"\nargument=2 value="4"\nargument=3 value="5"'
 	EXEC	cmd "$usage" -o1 -o -2 -o 3 4 5
 		OUTPUT - $'return=o option=-o name=-o arg=1 num=1\nreturn=o option=-o name=-o arg=(null) num=1\nreturn=2 option=-2 name=-2 arg=(null) num=1\nreturn=o option=-o name=-o arg=3 num=1\nargument=1 value="4"\nargument=2 value="5"'
+	usage=$'[-][y:sort?sort by key]:?[key]{[a?A]}'
+	EXEC	ls "$usage" -y
+		OUTPUT - $'return=y option=-y name=-y arg=(null) num=1'
 
 TEST 16 'detailed man'
 	usage=$'[-][+NAME?ah][+DESCRIPTION?\abla\a does bla and bla. The blas are:]{[+\aaha\a?bla bla aha][+\bbwaha?not bold][+bold?yes it is]}[+?Next paragraph]{[+aaa?aaa][+bbb?bbb]}'
@@ -2653,7 +2656,7 @@ OPTIONS
                     A|always
                           Always shell style.
                     shell Shell quote if necessary.
-                    q|question
+                    question
                           Replace unknown chars with ?.
                   The default value is question.
 
@@ -2739,7 +2742,48 @@ return=u option=-u name=-u arg=bozo num=1
 return=l option=-l name=-l arg=(null) num=1
 argument=1 value="123"'
 
-TEST 39 'detailed key strings'
+TEST 39 'local suboptions'
+	usage=$'[-?\naha\n][+NAME?search][x:method?The algorithm:]:[method:=linear]{[linear?Fast.][quadratic?Slower. Sub-options:]{[-][e:edges?Limit edges.]#[n:=50]}[np?Slow.][heuristic?Almost works. Sub-options:]{[-][n:nodes?Limit nodes.]#?[n:=100][f:foo?Bar.]:[huh][d:dump?Dump tables.][l:label?Set label.]:[string]}}[D:debug?Debug level.]#[level][+SEE ALSO?\afoo\a(1)]'
+	EXEC search "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'NAME
+  search
+
+SYNOPSIS
+  search [ options ]
+
+OPTIONS
+  -x, --method=method
+                  The algorithm:
+                    linear
+                          Fast.
+                    quadratic
+                          Slower. Sub-options:
+                            edges=n
+                                  Limit edges. The default value is 50.
+                    np    Slow.
+                    heuristic
+                          Almost works. Sub-options:
+                            nodes[=n]
+                                  Limit nodes. The option value may be omitted.
+                                  The default value is 100.
+                            foo=huh
+                                  Bar.
+                            dump  Dump tables.
+                            label=string
+                                  Set label.
+                  The default value is linear.
+  -D, --debug=level
+                  Debug level.
+
+SEE ALSO
+  foo(1)
+
+IMPLEMENTATION
+  version         aha'
+
+TEST 40 'detailed key strings'
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man
 		EXIT 2
@@ -2751,12 +2795,12 @@ OPTIONS
   -Q, --quote=style
                   Quote names according to style:
                     c|C   C "..." style.
-                    e|escape
+                    escape
                           \ escape if necessary.
                     A|always
                           Always shell style.
                     shell Shell quote if necessary.
-                    q|question|huh
+                    question|huh
                           Replace unknown chars with ?.
                   The default value is question.
   -x, --exec|run[=action]

@@ -25,6 +25,9 @@ E	abc(?:foo)foo		abcabcfoo	NOMATCH
 E	abc(?:foo)bar		abcabcfoobar	(3,12)
 E	abc(?:foo)(bar)		abcabcfoobar	(3,12)(9,12)
 
+E	(?=abc)			xxabcabcxx	(2,2)
+E	(?=abc)?		xxabcabcxx	BADRPT
+E	(?=abc)*		xxabcabcxx	BADRPT
 E	(?=abc)+		xxabcabcxx	BADRPT
 
 E	(?:abc)			xxabcabcxx	(2,5)

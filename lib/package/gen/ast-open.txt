@@ -66,6 +66,26 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
+01-08-09  --- Release ksh93l+  ---
+01-08-09  Another bug in the optimization of for loops in ksh93l caused
+	  errors in recursive functions using local variables that
+	  contained for loops has been fixed.
+01-07-27  A bug in which IFS would be unset after a command substituion
+	  inside a here document has been fixed.
+01-07-26  To conform to the POSIX standard, if you invoked ksh name,
+	  and name does not contain a /,  it will first try to run
+	  one in the current directory whether it is executable or not
+	  before doing a path search for an executable script.  Earlier
+	  versions first checked for an executable script using the
+	  PATH variable.
+01-07-23  A bug in which unset -f invoked in a subshell could unset a
+	  function defined in the parent has been fixed.
+01-07-16  A bug in the optimization of for loops in ksh93l caused
+	  name references to be treated as invariantes has been fixed.
+01-07-09  A bug in which a discipline function applied to a local variable
+	  could cause a shell exception has been fixed.  Discipline
+	  functions can only be specified for global variables. 
+
 01-06-18  --- Release ksh93l  ---
 01-06-18  A bug in assigning integers larger than can be represented as
 	  long integers to floating point variables has been fixed.
@@ -745,6 +765,8 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+01-08-11 pax: fix tar_checksum() w.r.t. CC_NATIVE!=CC_ASCII
+01-06-28 pax: fix --from --to bio logic that sometimes double converted
 01-04-24 pax: --from & --to now associated with archive instead of global state
 01-04-17 pax: --from conversion only done if no control chars in first 256
 01-04-01 pax: fix --intermediate to create missing dirs first
@@ -1009,6 +1031,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+01-06-26 proto.tst: add another buffer boundary test (large of course)
 01-04-01 proto: preserve file mode for -r
 01-02-06 proto.tst: add (finally)
 99-11-19 add --license, --shell, --copy, --verbose
@@ -1021,6 +1044,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+01-08-11 test.sf*: need $(LDFLAGS) for -L* library link paths!
 01-03-26 test.strtoi,test.strtof: add
 01-02-14 sfio: add tmpread
 01-01-31 sfio: uniform test exit codes
@@ -1045,6 +1069,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+01-07-17 Makefile: don't link 3d dll against ast dll
 01-02-19 close3d: dup reserved fd's higher
 01-02-14 add :VARIANT: to build dll's for CC.DLL.VARIANTS
 01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
@@ -1271,6 +1296,13 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+01-08-11 Makerules.mk: reference $(CC.DLL.LIBRARIES) last and in link args only
+	 Makerules.mk: +l* in req list now checks .PACKAGE.*.library for -l*
+	 parse.c: fix `\\\r\n' to act like `\\\n'
+01-07-17 Makerules.mk: fix :LIBRARY: to honor LDLIBRARIES
+01-06-21 misc.c: fix strtoll and strtoull macro rename
+01-06-10 Makerules.mk: add CC.NATIVE for native objects
+01-06-07 command.c: fix job deadlock bug that improperly broke the loop
 01-05-31 Makerules.mk: add option rhs to :DLL:
 	 Makerules.mk: :PACKAGE: add :(optimize|space|time) for PACKAGE_OPTIMIZE
 	 Makerules.mk: add CC.HOSTTYPE != CC.EXECTYPE for IFFEFLAGS
@@ -2007,6 +2039,7 @@ All recorded changes follow.
 
 :::::::: cql ::::::::
 
+01-07-17 cql: call dllerror() on dllfind() error
 01-02-14 cql: fix bug that didn't propagate details to cdbopen()
 	 cql: add --regenerate to force index regeneration
 01-02-07 cql.tst: add -l to TEST 19,20
@@ -3990,6 +4023,8 @@ End:
 
 :::::::: pzip ::::::::
 
+01-08-11 pzip: set error_info.id from argv for statically linked disciplines
+01-06-28 pzip: --split turns implies PZ_READ even with -p
 01-02-02 pzip.tst: add -w window size test
 00-10-04 pin: add -T0x800 TSP v3 dump
 00-10-03 pin: add -T0x400 TSP v2 dump
@@ -4129,6 +4164,9 @@ End:
 
 :::::::: std ::::::::
 
+01-08-11 ls: fix nonprintable test for mb locales
+01-08-01 features/procfs: note that synthesized psinfo doesn't have pr_psargs
+01-06-27 dd: fix conv=[lu]case|x2y logic botch
 01-06-08 ps: option `-' is optional for ancient compatibility
 01-06-06 ls: drop octets for bytes -- yay
 01-05-25 locale: -m runs local locale until the standard comes to its senses
@@ -4301,6 +4339,8 @@ End:
 
 :::::::: tw ::::::::
 
+01-07-17 xargs: fix -e -i -l option parse for backwards compatibility
+	 cmdarg(): fix CMD_INSERT copy that omitted leading chars
 01-05-02 tw: fix -a to use CMD_POST instead of CMD_INSERT
 01-02-06 tw,find: move --local test fslocal()
 01-01-01 find: fix -newer -anewer -cnewer -perm
@@ -4371,6 +4411,18 @@ End:
 
 :::::::: libast ::::::::
 
+01-08-11 features/common: some compilers have long long but no LL constants!
+	 features/lib: add mmap64 implementation test (for linux.s390)
+	 regex/regcomp.c: fix \ in [...] parse
+	 setlocale: retain user locale spelling in setlocale() return value
+	 features/limits.c: don't include ./limits.h -- duh
+	 fmtesc: don't escape multibyte chars
+01-08-08 features/float: some compilers (msdev) forget long long vs. double
+01-07-31 misc/optget.c: handle suboptions
+01-07-27 cdt.h: add DTDISC()
+01-07-17 iffeio.h: move to include for stdio bootstrap iffe workarounds
+01-06-25 regex: perl extensions added and tested
+01-06-21 misc/error: add ERROR_OPTIONS=prefix=string for message processing
 01-06-15 string/chresc: only 2 hex digits max for \xxx
 	 regex/regsub: handle REG_SHELL ~(nnn) rhs backrefs
 01-06-11 regex: handle embedded \0 in pattern and subject string
@@ -5051,6 +5103,7 @@ End:
 
 :::::::: libcmd ::::::::
 
+01-07-16 stty: fix cntl() macro for CC_NATIVE!=CC_ASCII
 01-05-31 date: fix /bin/date fallback logic
 	 stty: fix a few mismatched flags, -a and -g option logic
 	 stty: tone down sane to modify current settings rather than from zero
@@ -5145,6 +5198,7 @@ End:
 
 :::::::: libdll ::::::::
 
+01-07-17 dllfind: do at least one dlopen() to prime dlerror()
 01-05-29 dlopen: fix dlopen(0,0) for HP
 01-04-20 dllfind: use getconf HOSTTYPE LIBPATH LIBSUFFIX
 01-02-14 features/dll: fix unbalanced ' quote and ancient hostinfo reference
@@ -5341,6 +5395,11 @@ End:
 
 :::::::: libpp ::::::::
 
+01-08-11 ppcontrol: fix ... and __VAR_ARGS__ for C99
+	 ppsearch: fix SEARCH_NEXT bug that skipped the include stack
+01-08-06 ppproto: preserve #! first line for # comments
+01-07-17 gentab.sh: fix ksh test to omit pdksh (typeset -u fails)
+01-06-26 ppproto.c: fix another buffer boundary bug that didn't preserve OTHER
 01-06-06 ppsearch.c: list PP_FILEDEPS headers once
 01-06-01 pp.h,ppop.c,ppsearch.c: allow multiple PP_FILEDEPS (-M)
 01-05-24 pp.probe: fix pp:hostedtransition probe: only suncc can __STDC__==1?
@@ -5684,6 +5743,7 @@ End:
 
 :::::::: libcdb ::::::::
 
+01-07-17 cdblib: call dllerror() on failed dllfind()
 01-02-14 cdbtypes: add seed detail for {hash} and {rand} types
 01-01-01 cdbimage: drop span discipline that invalidated seeks
 	 cdbflat: check details in flatevent
@@ -5714,6 +5774,10 @@ End:
 
 :::::::: libpz ::::::::
 
+01-08-11 pzinit: add for static discipline library linking
+01-07-17 pzlib: call dllerror() on failed dllfind()
+01-06-28 pzpartnext: add to iterate over all partitions
+	 pzpartition: default partition can be on one line: `"label" size -'
 01-02-02 delay buffer allocation until pzpartinit()
 	 pzpart: fix non-terminated string bug for url-style paths
 01-01-01 pzopen: open new stream instead of using sfstdin for sfdcgzip()
