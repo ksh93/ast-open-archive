@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -86,7 +86,7 @@ USAGE_LICENSE
 "		test code according to \atest\a.]"
 "	[+-D-W, pp::warn?Enable pedantic warnings in non-hosted files.]"
 "	[+-D-X\b[\acc\a]]?Preprocess for the compiler \acc\a which must be"
-"		an executable or and executable on \b$PATH\b.]"
+"		an executable path or an executable on \b$PATH\b.]"
 "	[+-D-Z, pp::pool?Enable pool mode. See \blibpp\b(3).]"
 "	[+-D-d?List canonicalized \b#define\b statements for non-predefined"
 "		macros in the output. ]"

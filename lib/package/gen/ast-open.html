@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Labs Research) 2004-04-04">
+<META name="generator" content="mm2html (AT&T Labs Research) 2004-05-01">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
@@ -2625,6 +2625,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-05-04 open3d.c: create missing lower level dirs for O_CREAT ... file paths
 03-08-15 mount3d.c: change 3d intercept test to handle NiL || ""
 03-06-11 ast.c: add _map_malloc checks for _ast_malloc =&gt; malloc
 03-06-05 pathreal.c: fix ancient multiple relative|.. symlink bug
@@ -2920,6 +2921,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-05-06 Makerules.mk: fix CCLD CCLDFLAGS semantics
 04-04-15 expand.c: fix :V: operand check
 	 expand.c: check var alternation only before first delimiter
 	 expand.c: add :P=F: to recursively expand dir hierarchies
@@ -6633,6 +6635,9 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-05-05 conf.tab,conf.sh: update to align with standards
+	 magic.tab: ms suffix update
+04-05-04 port/lcgen.c: fix territory initialization
 04-04-15 tm/tmdate.c,include/tm.h: fix specific and ordinal days
 04-04-08 astconf: retain { HOSTTYPE LIBPATH LIBPREFIX LIBSUFFIX } strict vals
 04-04-07 vmalloc/vmbest.c: fix alpha tiny block bug
@@ -8917,7 +8922,7 @@ End:
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>April 28, 2004</TD>
+<TD align=right>May 07, 2004</TD>
 </TR>
 </TABLE>
 <P>

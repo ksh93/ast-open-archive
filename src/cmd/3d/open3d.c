@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -166,12 +166,45 @@ open3d(const char* path, int oflag, ...)
 			return r;
 		goto done;
 	}
-	if (!(sp = pathreal(path, (oflag & O_CREAT) ? P_NOOPAQUE : 0, &st)))
-		st.st_mode = 0;
-	else if (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode))
+	for (;;)
 	{
-		r = OPEN(path, oflag, mode);
-		goto done;
+		if (!(sp = pathreal(path, (oflag & O_CREAT) ? P_NOOPAQUE : 0, &st)))
+		{
+			if (oflag & O_CREAT)
+			{
+				Path_t	save;
+
+				save = state.path;
+				state.real++;
+				sp = pathreal(path, P_PATHONLY|P_DOTDOT, NiL);
+				state.real--;
+				if (!sp)
+				{
+					state.path = save;
+					errno = EROFS;
+					return -1;
+				}
+				if (state.path.level && LSTAT(sp, &st))
+				{
+					if (LSTAT(state.dot, &st) || fs3d_mkdir(sp, st.st_mode & S_IPERM))
+					{
+						state.path = save;
+						return -1;
+					}
+					state.path = save;
+					continue;
+				}
+				state.path = save;
+				sp = 0;
+			}
+			st.st_mode = 0;
+		}
+		else if (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode))
+		{
+			r = OPEN(path, oflag, mode);
+			goto done;
+		}
+		break;
 	}
 	level = state.path.level;
 	synthesize = state.path.synthesize;

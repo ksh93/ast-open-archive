@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -133,6 +133,7 @@ pathreal(const char* apath, register int type, struct stat* st)
 	int			oerrno = errno;
 	int			opaqued = 0;
 	int			len;
+	int			vir;
 	int			safesize;
 	int			safe_dir;
 	long			visits;
@@ -360,8 +361,19 @@ pathreal(const char* apath, register int type, struct stat* st)
 		return sp;
 	}
 	visits = 0;
+	vir = 1;
 	while (LSTAT(sp, st))
 	{
+		if (vir)
+		{
+			if (apath[0] == '.' && apath[1] == '.' && apath[2] == '.' && !apath[3])
+			{
+				message((-1, "pathreal: %s => %s", apath, sp));
+				LSTAT(".", st);
+				return sp;
+			}
+			vir = 0;
+		}
 		if (errno == ENOTDIR)
 		{
 			/*

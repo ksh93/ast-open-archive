@@ -14,6 +14,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS 
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -152,7 +153,7 @@ bind -lz
 bind -lbz
 bind -lpz
 bind -last
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pzip pzip.o ${mam_libz} ${mam_libbz} ${mam_libpz} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o pzip pzip.o ${mam_libz} ${mam_libbz} ${mam_libpz} ${mam_libast}
 done pzip generated
 make pop
 make pop.o
@@ -169,7 +170,7 @@ done pop.c
 prev pop.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pop.c
 done pop.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pop pop.o ${mam_libpz} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o pop pop.o ${mam_libpz} ${mam_libast}
 done pop generated
 make pin
 make pin.o
@@ -207,7 +208,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -I${INSTAL
 done pin.o generated
 bind -ltsp
 setv LICENSE -DLICENSE="since=1998,author=gsf+alb"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pin pin.o ${mam_libz} ${mam_libbz} ${mam_libtsp} ${mam_libpz} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o pin pin.o ${mam_libz} ${mam_libbz} ${mam_libtsp} ${mam_libpz} ${mam_libast}
 done pin generated
 make rectify
 make rectify.o
@@ -219,7 +220,7 @@ done rectify.c
 prev rectify.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c rectify.c
 done rectify.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o rectify rectify.o ${mam_libpz} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o rectify rectify.o ${mam_libpz} ${mam_libast}
 done rectify generated
 make funzip
 make funzip.o
@@ -231,7 +232,7 @@ done funzip.c
 prev funzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -D_PACKAGE_ast -c funzip.c
 done funzip.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o funzip funzip.o ${mam_libz} ${mam_libpz} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o funzip funzip.o ${mam_libz} ${mam_libpz} ${mam_libast}
 done funzip generated
 make ../../../bin
 exec - set -

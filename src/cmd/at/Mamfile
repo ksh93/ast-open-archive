@@ -11,6 +11,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS 
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -163,7 +164,7 @@ done at.o generated
 bind -lcoshell
 bind -lcs
 bind -last
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ast_at at.o ${mam_libcoshell} ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o ast_at at.o ${mam_libcoshell} ${mam_libcs} ${mam_libast}
 done ast_at generated
 make ast_batch
 prev ast_at
@@ -180,7 +181,7 @@ done atx.c
 prev atx.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c atx.c
 done atx.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o atx atx.o ${mam_libast} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o atx atx.o ${mam_libast} ${mam_libast}
 done atx generated
 make at.svc
 make atd.o
@@ -217,7 +218,7 @@ done atd.c
 prev atd.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c atd.c
 done atd.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o at.svc atd.o ${mam_libcs} ${mam_libast} ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o at.svc atd.o ${mam_libcs} ${mam_libast} ${mam_libcs} ${mam_libast}
 done at.svc generated
 make ast_crontab
 make crontab.sh

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -107,7 +107,8 @@ pathnext(char* sp, char* extra, long* visits)
 	strncpy(sp, vpath->val, vpathlen);
 	sp[vpathlen] = cp < ep ? '/' : 0;
 	cp = sp;
-	if (extra) strcpy(sp = ep + shift, extra);
+	if (extra)
+		strcpy(sp = ep + shift, extra);
 	state.path.level++;
 	message((-4, "pathnext: -- %s [level=%d visits=0x%08x]", cp, state.path.level, visits ? *visits : 0L));
 	return sp;

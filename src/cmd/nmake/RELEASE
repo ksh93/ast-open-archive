@@ -1,3 +1,4 @@
+04-05-06 Makerules.mk: fix CCLD CCLDFLAGS semantics
 04-04-15 expand.c: fix :V: operand check
 	 expand.c: check var alternation only before first delimiter
 	 expand.c: add :P=F: to recursively expand dir hierarchies

@@ -11,6 +11,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS 
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -182,7 +183,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast
 done msgcpp.o generated
 bind -lpp
 bind -last
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o msgcpp msgcpp.o ${mam_libpp} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msgcpp msgcpp.o ${mam_libpp} ${mam_libast}
 done msgcpp generated
 make msgcc
 make msgcc.sh
@@ -229,7 +230,7 @@ done msgcvt.c
 prev msgcvt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcvt.c
 done msgcvt.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o msgcvt msgcvt.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msgcvt msgcvt.o ${mam_libast}
 done msgcvt generated
 make msggen
 make msggen.o
@@ -246,7 +247,7 @@ done msggen.c
 prev msggen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msggen.c
 done msggen.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o msggen msggen.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msggen msggen.o ${mam_libast}
 done msggen generated
 make msgget
 make msgget.o
@@ -258,7 +259,7 @@ done msgget.c
 prev msgget.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgget.c
 done msgget.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o msgget msgget.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o msgget msgget.o ${mam_libast}
 done msgget generated
 make ../../../bin
 exec - set -

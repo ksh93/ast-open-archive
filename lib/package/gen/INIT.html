@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Labs Research) 2004-02-29">
+<META name="generator" content="mm2html (AT&T Labs Research) 2004-05-01">
 <META name="description" content="INIT package">
 <META name="keywords" content="software, package">
 <TITLE> INIT package </TITLE>
@@ -26,13 +26,13 @@ INIT</TD></TR>
 The software is covered by this license:
 <UL type=square>
 <LI>
- <A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+	<A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
 </UL>
 Individual components may be covered by separate licenses;
 refer to the component source and/or binaries for more information.
 <P>
 A recent
- <A href="#release change log">release change log</A>
+	<A href="#release change log">release change log</A>
 is also included.
 <P>
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="release change log">release change log</A></H3></FONT></FONT></CENTER>
@@ -45,6 +45,33 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="INIT changes">INIT changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-05-01 package.sh: $CC must be C, not C++; allow release command on $PATH
+04-04-15 make.probe: check probe_libdir false positives
+	 package.sh: add lib/package/*.lic src package subdirs
+	 package.mk: add mamfile=0 to inhibit Mamfile generation
+	 iffe.sh: config name_DECLARED =&gt; HAVE_name_DECL
+	 iffe.sh: fix mac to handle default value
+04-04-11 iffe.sh: normalize sed &#0091;\/&#0093; quoting
+04-04-04 package.mk: only checksum generated tarballs
+	 mamprobe.sh: add STDCHMOD
+04-04-01 C+probe: set export LANG=C for uniform error messages
+	 make.probe: another CC.STDLIB tweak
+	 package.sh: fix regress core dump pattern, expand &#0091;a-z&#0093; match ranges
+04-03-31 Makefile: add intl :MAPLIB: test
+	 make.probe: fix CC.STDLIB search; drop CC.* path duplicates
+04-03-28 iffe.sh: drop unused exec $stdin&lt;&amp;0 dup
+04-03-25 Makefile: add iconv :MAPLIB:
+	 package.sh: use ${PING:-ping -c 1 -w 4}, allowing admin.db override
+04-03-24 package.mk: add *.md5 checksum for each *.(c|exe|tgz)
+	 package.sh: update base change on md5 sum instead of size
+	 iffe.sh: adjust case label &nbsp;and keyword quoting for ancient /bin/sh
+04-03-22 probe.win32: ncc =&gt; nld
+04-03-19 CONVERT.mk: change the instructions and old source dir default
+	 package.mk: fix recurse=list check
+	 package.mk: add *.md5 checksum for each *.(c|exe|tgz)
+	 package.sh: fix update base/delta/sync existence check
+04-03-18 iffe.sh: -d2 does not remove core dumps on exit
+04-03-17 package.sh: fix make recurse arg/action order
 04-02-29 package.sh: add regress action to compare current and previous tests
 	 package.sh: fix sgi.mips&#0091;23&#0093; HOSTTYPE test for old irix cc
 	 package.sh: add `export variable ...'
@@ -598,7 +625,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>March 12, 2004</TD>
+<TD align=right>May 07, 2004</TD>
 </TR>
 </TABLE>
 <P>

@@ -11,6 +11,7 @@ setv ASFLAGS
 setv CC cc
 setv mam_cc_FLAGS 
 setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${strip?1?${mam_cc_LD_STRIP}??}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -224,7 +225,7 @@ done side.c
 prev side.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c side.c
 done side.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
 done diff generated
 make diff3
 make diff3.o
@@ -238,7 +239,7 @@ setv LICENSE -DLICENSE="author=\"Randy Smith\""
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Randy Smith][-copyright?Copyright (c) 1988-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
 done diff3.o generated
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o diff3 diff3.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o diff3 diff3.o ${mam_libast}
 done diff3 generated
 make sdiff
 make sdiff.o
@@ -252,7 +253,7 @@ setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Thomas Lord][-copyright?Copyright (c) 1992-2004 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
 done sdiff.o generated
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sdiff sdiff.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o sdiff sdiff.o ${mam_libast}
 done sdiff generated
 make ../../../bin
 exec - set -

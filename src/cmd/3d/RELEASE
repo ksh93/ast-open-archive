@@ -1,3 +1,4 @@
+04-05-04 open3d.c: create missing lower level dirs for O_CREAT ... file paths
 03-08-15 mount3d.c: change 3d intercept test to handle NiL || ""
 03-06-11 ast.c: add _map_malloc checks for _ast_malloc => malloc
 03-06-05 pathreal.c: fix ancient multiple relative|.. symlink bug

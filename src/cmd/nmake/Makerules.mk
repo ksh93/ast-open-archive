@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-04-15 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-05-06 $"
 
 /*
  * implementation version
@@ -229,7 +229,7 @@ cc = cc
 CC = cc
 CCFLAGS = $(CC.OPTIMIZE)
 CCLD = $(CC)
-CCLDFLAGS = $(CCFLAGS:N!=-[DIU]*:@C@$(CC.ALTPP.FLAGS)@@) $(LDFLAGS)
+CCLDFLAGS =
 CHGRP = chgrp
 CHMOD = chmod
 CHOWN = chown
@@ -873,9 +873,9 @@ include "Scanrules.mk"
 	$(.ARCLEAN.LIST.:K=$(RM) $(RMFLAGS))
 
 .COMMAND.o : .USE .COMMAND (CCLD) (CCLDFLAGS) $$(LDLIBRARIES)
-	$(CCLD) $(CCLDFLAGS) $(&:T=D:N!=-[DIUl]*) -o $(<) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.))
+	$(CCLD) $(CCLDFLAGS) -o $(<) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.))
 
-.OBJECT.o : .USE (LD) (CCFLAGS) (LDFLAGS)
+.OBJECT.o : .USE (LD) (LDFLAGS)
 	$(LD) -r $(LDFLAGS) -o $(<) $(*)
 
 /*
@@ -883,20 +883,20 @@ include "Scanrules.mk"
  */
 
 for .S. $(.SUFFIX.c) $(.SUFFIX.C)
-	% : %$(.S.) (CC) (CCFLAGS) (LDFLAGS) $$(LDLIBRARIES)
-		$(CC) $(CCFLAGS) $(LDFLAGS:N!=-[DIU]*) $(CCLDFLAGS) -o $(<) $(*)
+	% : %$(.S.) (CC) (CCFLAGS) (CCLDFLAGS) $$(LDLIBRARIES)
+		$(CC) $(CCFLAGS) $(CCLDFLAGS) -o $(<) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.))
 end
 
 for .S. $(.SUFFIX.f) $(.SUFFIX.r)
 	% : %$(.S.) (F77) (F77FLAGS) (LDFLAGS) $$(LDLIBRARIES)
-		$(F77) $(F77FLAGS) $(LDFLAGS) -o $(<) $(*)
+		$(F77) $(F77FLAGS) $(LDFLAGS) -o $(<) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.))
 end
 
 % : %.fql (F77) (CCFLAGS) (F77FLAGS) (LDFLAGS) $$(LDLIBRARIES)
-	$(F77) $(CCFLAGS) $(F77FLAGS) $(LDFLAGS) -o $(<) $(*)
+	$(F77) $(CCFLAGS) $(F77FLAGS) $(LDFLAGS) -o $(<) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.))
 
 % : %.s (ASFLAGS) (LDFLAGS) $$(LDLIBRARIES)
-	$(CC) $(ASFLAGS) $(LDFLAGS) -o $(<) $(*)
+	$(CC) $(ASFLAGS) $(LDFLAGS) -o $(<) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.))
 
 % : %.sh (SHELLMAGIC)
 	case $(-mam:N=static*:/:.*//):$OPTIND:$RANDOM in
@@ -3500,9 +3500,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	if "$(CC.LD.ORIGIN:V)"
 		T4 += $$(CC.LD.ORIGIN)
 	end
-	if T4
-		CCLDFLAGS &= $(T4:V)
-	end
+	CCLDFLAGS &= $$(CCFLAGS:N!=-[DIU]*:@C@$$(CC.ALTPP.FLAGS)@@) $$(LDFLAGS) $(T4:V)
 	if "$(CC.LD.STRIP:V)"
 		if "$(strip)" || "$(PACKAGE_OPTIMIZE:N=space)"
 			.PACKAGE.strip = $(CC.LD.STRIP)
@@ -4121,7 +4119,7 @@ end
 	CC = ${CC}
 	.MAM.CC.FLAGS := $(CCFLAGS:VP:N!=-O*|$(CC.OPTIMIZE)|$\(CC.OPTIMIZE\)|-g|$(CC.DEBUG)|$\(CC.DEBUG\))
 	print -um setv mam_cc_FLAGS $(.MAM.CC.FLAGS)
-	T := $(CCFLAGS:VP) ${strip?1?${mam_cc_LD_STRIP}??}
+	T := $(CCFLAGS:VP)
 	if "$(T:N=-O*|$(CC.OPTIMIZE))"
 		print -um setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 	elif "$(T:N=-g|$(CC.DEBUG))"
@@ -4130,6 +4128,8 @@ end
 		print -um setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}
 	end
 	CCFLAGS = ${mam_cc_FLAGS} ${CCFLAGS}
+	print -um setv CCLDFLAGS $(CCLDFLAGS:VP:N!=$\(*\)) ${strip?1?${mam_cc_LD_STRIP}??}
+	CCLDFLAGS = ${CCLDFLAGS}
 	CC.NATIVE = ${CC}
 	CMP = cmp 2>/dev/null
 	print -um setv COTEMP $$

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -63,7 +63,8 @@ pathcanon(char* path, int phys)
 			 * eliminate redundant /
 			 */
 
-			if (*sp == '/') continue;
+			if (*sp == '/')
+				continue;
 			if (*sp == '.')
 			{
 				if ((c = *++sp) == '/')
@@ -92,14 +93,16 @@ pathcanon(char* path, int phys)
 						 * ..
 						 */
 
-						if (dp < begin) begin += 3;
+						if (dp < begin)
+							begin += 3;
 						else
 						{
 							if (dp > begin)
 								while (*--dp != '/')
 									if (dp < begin)
 										break;
-							if (!c) break;
+							if (!c)
+								break;
 							continue;
 						}
 					}
@@ -118,7 +121,8 @@ pathcanon(char* path, int phys)
 								message((-6, "patcanon: -- %s", NiL));
 								return(0);
 							}
-							state.path.level = phys;
+							if (!state.real)
+								state.path.level = phys;
 							if (!(*(sp = dp) = c))
 							{
 								dp--;
@@ -134,7 +138,8 @@ pathcanon(char* path, int phys)
 			}
 		}
 		add_dot = 0;
-		if (!(c = *sp)) break;
+		if (!(c = *sp))
+			break;
 		*++dp = c;
 	}
 
@@ -144,7 +149,8 @@ pathcanon(char* path, int phys)
 
 	if (add_dot)
 	{
-		if (*dp != '/') *++dp = '/';
+		if (*dp != '/')
+			*++dp = '/';
 		*++dp = '.';
 	}
 	*++dp = 0;

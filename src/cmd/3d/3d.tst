@@ -1,6 +1,6 @@
 : 3d regression tests
 #
-# 3d.tst (AT&T Research) 2003-06-06
+# 3d.tst (AT&T Research) 2004-05-03
 #
 # the first section defines the test harness
 # the next section defines individual test functions
@@ -14,11 +14,10 @@
 
 export LC_ALL=C
 
-integer seconds=0
+integer seconds=1
 
 COMMAND=3d
 
-ACTIVE=
 FILE=
 FORMAT="%Y-%m-%d+%H:%M:%S"
 GROUP=
@@ -31,21 +30,17 @@ PREFIX=
 STAMP="2005-07-17+04:05:06"
 VIRTUAL=
 
-for i
-do	case $ACTIVE in
-	"")	ACTIVE=$i ;;
-	*)	ACTIVE="$ACTIVE|$i" ;;
-	esac
-done
-case $ACTIVE in
-"")	ACTIVE="*" ;;
-esac
 trap "(( ERRORS++ ))" ERR
 trap "CLEANUP 0" 0
 tmp=/tmp/$$.3d
 mkdir $tmp || exit
 cd $tmp
 mkdir bottom
+
+function ACTIVE
+{
+	DO return 0
+}
 
 function TEST
 {
@@ -64,11 +59,6 @@ function TEST
 	vpath - -
 	shift
 	print "$GROUP	$*"
-}
-
-function ACTIVE
-{
-	[[ $GROUP == @($ACTIVE) ]]
 }
 
 function FAIL # file message
@@ -113,10 +103,26 @@ function VPATH
 	vpath "$@"
 }
 
+function CP
+{
+	ACTIVE || return
+	cp "$@"
+	shift $#-1
+	NUKE="$NUKE $1"
+}
+
 function LN
 {
 	ACTIVE || return
 	ln "$@"
+	shift $#-1
+	NUKE="$NUKE $1"
+}
+
+function MV
+{
+	ACTIVE || return
+	mv "$@"
 	shift $#-1
 	NUKE="$NUKE $1"
 }
@@ -321,3 +327,18 @@ TEST 06 symlink spaghetti
 	LN -s ../../sbin/cmd usr/bin/cmd
 	CD bin
 	ACTIVE && cmd
+
+TEST 07 PWD==top top exists, bot virtual
+	VPATH top bot
+	MKDIR top
+	CD top
+	ACTIVE && echo foo > foo && echo bar > bar
+	CP foo ...
+	MV bar ...
+	CP foo ...
+	ACTIVE && [[ $(ls ...) != $'bar\nfoo' ]] && FAIL bottom incomplete -- $(ls ...)
+	ACTIVE && [[ $(2d ls) != $'foo' ]] && FAIL top incomplete -- $(2d ls)
+	CP * ...
+	ACTIVE && [[ $(cat bar) != bar ]] && FAIL bottom to bottom garbled -- $(cat bar)
+	ACTIVE && [[ $(cat foo) != foo ]] && FAIL top garbled -- $(cat foo)
+	ACTIVE && [[ $(cat .../foo) != foo ]] && FAIL top to bottom garbled -- $(cat .../foo)

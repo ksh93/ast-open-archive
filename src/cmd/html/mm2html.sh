@@ -43,13 +43,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2004-04-04' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2004-05-01' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Labs Research) 2004-04-04 $
+@(#)$Id: mm2html (AT&T Labs Research) 2004-05-01 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -298,6 +298,7 @@ ds[TM]='<FONT SIZE=-6><B><SUP>TM</SUP></B></FONT>'
 
 map[.Cs]=.EX
 map[.Ce]=.EE
+map[.Sh]=.SH
 map[.Ss]=.SS
 map[.Tp]=.TP
 
@@ -1465,7 +1466,7 @@ do	getline || {
 			;;
 		.MT)	macros=mm
 			;;
-		.ND)	ds[Dt]=$*
+		.ND|.Dt)ds[Dt]=$*
 			;;
 		.NL)	type[++lists]=.AL
 			list[lists]=OL
