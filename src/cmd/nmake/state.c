@@ -77,11 +77,11 @@ statefile(void)
 	Sfio_t*		sp;
 	Stat_t		st;
 
-	if (!state.statefile && state.makefile && state.writestate)
+	if (!state.statefile && state.makefile)
 	{
 		sp = sfstropen();
 		dir = DELETE;
-		if (streq(state.writestate, "-") || !stat(state.writestate, &st) && S_ISDIR(st.st_mode) && (dir = state.writestate))
+		if (!state.writestate || streq(state.writestate, "-") || !stat(state.writestate, &st) && S_ISDIR(st.st_mode) && (dir = state.writestate))
 			edit(sp, state.makefile, dir, KEEP, external.state);
 		else
 			expand(sp, state.writestate);
@@ -549,6 +549,7 @@ lockstate(int set)
 {
 	register int		fd;
 	register char*		file;
+	Time_t			t;
 	Stat_t			st;
 
 	static char*		lockfile;
@@ -603,7 +604,7 @@ lockstate(int set)
 	{
 		if (locktime)
 		{
-			if (stat(lockfile, &st) < 0 || LOCKTIME(&st, lockmtime) != locktime)
+			if (stat(lockfile, &st) < 0 || (t = LOCKTIME(&st, lockmtime)) != locktime && t != tmxsns(tmxsec(locktime), 0))
 			{
 				if (state.writestate)
 					error(1, "the state file lock on %s has been overridden", state.makefile);
@@ -978,7 +979,11 @@ statetime(register Rule_t* r, int sync)
 	Stat_t			ln;
 
 	if (r->property & P_state)
+	{
+		if ((r->dynamic & D_triggered) && state.exec)
+			r->time = CURTIME;
 		return r->time;
+	}
 	s = 0;
 	if (state.interrupt && r->status != EXISTS)
 		zerostate = 1;
@@ -1187,7 +1192,8 @@ statetimeq(Rule_t* r, Rule_t* s)
 		if (!warned)
 		{
 			warned = 1;
-			error(state.exec || state.mam.out || state.regress ? -1 : 1, "file timestamp subsecond truncation");
+			if (state.warn)
+				error(1, "file timestamp subsecond truncation");
 		}
 		return 1;
 	}

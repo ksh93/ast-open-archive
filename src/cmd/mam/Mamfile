@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make mamdag
 make mamdag.sh
@@ -73,7 +73,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x mamdag
+exec - silent test -w mamdag -a -x mamdag || chmod u+w,+x mamdag
 done mamdag generated
 make mamdot
 make mamdot.sh
@@ -110,7 +110,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x mamdot
+exec - silent test -w mamdot -a -x mamdot || chmod u+w,+x mamdot
 done mamdot generated
 make mamexec
 make mamexec.sh
@@ -147,7 +147,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x mamexec
+exec - silent test -w mamexec -a -x mamexec || chmod u+w,+x mamexec
 done mamexec generated
 make mamnew
 make mamnew.o
@@ -298,7 +298,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x mamsh
+exec - silent test -w mamsh -a -x mamsh || chmod u+w,+x mamsh
 done mamsh generated
 make mamstate
 make mamstate.o

@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2004-08-01 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2005-02-22 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -51,6 +51,8 @@ USAGE_LICENSE
 "		[+dynamic?All files under \adir\a are considered referenced.]"
 "		[+host?Provides a default value for the \b--hosts\b option.]"
 "		[+ignore?\adir\a is a \bksh\b(1) pattern of paths to ignore.]"
+"		[+internal?If \b--external\b is on then \adir\a is a \bksh\b(1)"
+"			pattern of internal paths.]"
 "		[+secure?Files under this dir are accessed by \bhttps:\b only.]"
 "	}"
 "	[+$HOME/wwwfiles/index.html?]"
@@ -197,6 +199,7 @@ typedef struct State_s
 	String_t	hosts;
 	String_t	ignore;
 	String_t	index;
+	String_t	internal;
 	String_t	keep;
 	String_t	limit;
 	String_t	programroot;
@@ -479,6 +482,7 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 	char*		p;
 	char*		t;
 	File_t*		f;
+	String_t*	v;
 	int		m;
 	int		perlwarn;
 	int		prefix;
@@ -583,7 +587,7 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 					error(ERROR_SYSTEM|2, "%s: directory read error", p);
 			}
 		}
-		else if (!strcasecmp(s, "ignore"))
+		else if (!strcasecmp(s, "ignore") && (v = &state->ignore) || state->external && !strcasecmp(s, "internal") && (v = &state->internal))
 		{
 			if (state->copy.size)
 			{
@@ -594,10 +598,10 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 				s = "";
 			if (t = strrchr(p, '/'))
 				*t = 0;
-			m = state->ignore.size + strlen(s) + strlen(p) + 6;
-			if (!(state->ignore.data = newof(state->ignore.data, char, m, 0)))
+			m = v->size + strlen(s) + strlen(p) + 6;
+			if (!(v->data = newof(v->data, char, m, 0)))
 				error(ERROR_SYSTEM|3, "out of space [path pattern]");
-			state->ignore.size += sfsprintf(state->ignore.data + state->ignore.size, m, "%s%s%s?(/*)", state->ignore.size ? "|" : "", s, p);
+			v->size += sfsprintf(v->data + v->size, m, "%s%s%s?(/*)", v->size ? "|" : "", s, p);
 			if (t)
 				*t = '/';
 		}
@@ -1031,6 +1035,8 @@ main(int argc, char** argv)
 			{
 				fp->flags |= CHECKED;
 				sfsprintf(p, sizeof(state->buf) - 1, "%s%s", state->copy.data, fp->name + state->root.size);
+				if (state->internal.size && strmatch(p, state->internal.data))
+					continue;
 				add(state, p, COPIED, NiL, 0, NiL);
 				if (stat(fp->name, &st))
 					error(ERROR_SYSTEM|3, "%s: cannot stat", fp->name);

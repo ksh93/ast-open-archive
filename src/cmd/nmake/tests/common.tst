@@ -18,14 +18,12 @@ TEST 01 'install with --compare and --clobber'
 	DO	touch t.sh
 
 	EXEC	--regress install
-		ERROR - $'+ cp t.sh t
-+ chmod u+w,+x t'
+		ERROR - $'+ cp t.sh t'
 
 	DO	touch t.sh
 
 	EXEC	--regress --nocompare install
 		ERROR - $'+ cp t.sh t
-+ chmod u+w,+x t
 + mv -f bin/t bin/t.old
 + ignore cp t bin/t'
 
@@ -37,7 +35,6 @@ TEST 01 'install with --compare and --clobber'
 
 	EXEC	--regress --nocompare --clobber install
 		ERROR - $'+ cp t.sh t
-+ chmod u+w,+x t
 + rm -f bin/t
 + ignore cp t bin/t'
 

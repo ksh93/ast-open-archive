@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make nmake
 make archive.o
@@ -379,7 +379,7 @@ make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.0 2005-01-01 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.0 2005-03-19 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -421,7 +421,7 @@ exec -
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x ppcc
+exec - silent test -w ppcc -a -x ppcc || chmod u+w,+x ppcc
 done ppcc generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -441,25 +441,15 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/nmake.1
 prev ${INSTALLROOT}/man/man1
 make nmake.1
-done nmake.1
+prev nmake
+make nmake.1.body
+done nmake.1.body
+make nmake.1.tail
+done nmake.1.tail
+exec - nmake --nroff 2>&1 | sed -e '/itself/r nmake.1.body' -e '/fBsh/r nmake.1.tail' > nmake.1
+done nmake.1 generated
 exec - test '' = 'nmake.1' || ${STDCMP} 2>/dev/null -s nmake.1 ${INSTALLROOT}/man/man1/nmake.1 || { ${STDMV} ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; ${STDCP} nmake.1 ${INSTALLROOT}/man/man1/nmake.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/nmake.1 generated
-make ${INSTALLROOT}/man/man1/makerules.1
-make makerules.1
-done makerules.1
-exec - test '' = 'makerules.1' || ${STDCMP} 2>/dev/null -s makerules.1 ${INSTALLROOT}/man/man1/makerules.1 || { ${STDMV} ${INSTALLROOT}/man/man1/makerules.1 ${INSTALLROOT}/man/man1/makerules.1.old 2>/dev/null || true; ${STDCP} makerules.1 ${INSTALLROOT}/man/man1/makerules.1  		    		    ;}
-done ${INSTALLROOT}/man/man1/makerules.1 generated
-make ${INSTALLROOT}/man/man8
-exec - if	silent test ! -d ${INSTALLROOT}/man/man8
-exec - then	mkdir -p ${INSTALLROOT}/man/man8
-exec - fi
-done ${INSTALLROOT}/man/man8 generated
-make ${INSTALLROOT}/man/man8/nmake.8
-prev ${INSTALLROOT}/man/man8
-make nmake.8
-done nmake.8
-exec - test '' = 'nmake.8' || ${STDCMP} 2>/dev/null -s nmake.8 ${INSTALLROOT}/man/man8/nmake.8 || { ${STDMV} ${INSTALLROOT}/man/man8/nmake.8 ${INSTALLROOT}/man/man8/nmake.8.old 2>/dev/null || true; ${STDCP} nmake.8 ${INSTALLROOT}/man/man8/nmake.8  		    		    ;}
-done ${INSTALLROOT}/man/man8/nmake.8 generated
 make ${INSTALLROOT}/lib/make
 exec - if	silent test ! -d ${INSTALLROOT}/lib/make
 exec - then	mkdir -p ${INSTALLROOT}/lib/make

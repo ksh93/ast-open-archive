@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2004-12-08 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2005-02-23 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -1058,7 +1058,7 @@ compile(char** argv, register struct Node* np)
 			argv[opt_info.index - 1] = 0;
 			if (k & CMD_INSERT)
 				i = 1;
-			if (!(np->first.xp = cmdopen(com, i, 0, "{}", k)))
+			if (!(np->first.xp = cmdopen(com, i, 0, "{}", k|CMD_IGNORE)))
 				error(ERROR_SYSTEM|3, "out of space [args]");
 			np->second.np = cmd;
 			cmd = np;

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make tw
 make tw.o
@@ -320,7 +320,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x locate
+exec - silent test -w locate -a -x locate || chmod u+w,+x locate
 done locate generated
 make updatedb
 make updatedb.sh
@@ -357,7 +357,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x updatedb
+exec - silent test -w updatedb -a -x updatedb || chmod u+w,+x updatedb
 done updatedb generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin

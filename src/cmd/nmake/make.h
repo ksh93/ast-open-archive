@@ -69,6 +69,8 @@
 #define CMDTRACE	(-6)		/* coshell trace debug level	*/
 #define EXPTRACE	(-5)		/* explanation trace debug lev	*/
 
+#define EXPLAIN		(state.user&&(state.explain||error_info.trace<=EXPTRACE))
+
 #undef	atoi
 #undef	atol
 #undef	bind
@@ -99,7 +101,7 @@
 #define putreg(name,r)	hashput(table.regress,(char*)(name),(char*)(r))
 #define putrule(name,r)	hashput(table.rule,(char*)(name),(char*)(r))
 #define putvar(name,v)	hashput(table.var,(char*)(name),(char*)(v))
-#define reason(x)	do if(state.user&&(state.explain||error_info.trace<=EXPTRACE))explain x;while(0)
+#define reason(x)	do if(EXPLAIN)explain x;while(0)
 #define ropen(f,m)	((f)==internal.openfile?(internal.openfile=0,internal.openfd):open(f,m))
 #define rsfopen(f)	((f)==internal.openfile?(internal.openfile=0,sfnew(NiL,NiL,SF_UNBOUND,internal.openfd,SF_READ)):sfopen(NiL,f,"r"))
 #define setbit(v,b)	((v)|=(1L<<(b)))
@@ -927,7 +929,7 @@ extern Rule_t*		catrule(char*, char*, char*, int);
 extern char*		colonlist(Sfio_t*, char*, int, int);
 extern void		compile(char*, char*);
 extern int		complete(Rule_t*, List_t*, Time_t*, Flags_t);
-extern void		compref(int, const char*, Time_t);
+extern void		compref(Rule_t*, int);
 extern List_t*		cons(Rule_t*, List_t*);
 extern void		dirscan(Rule_t*);
 extern void		drop(void);

@@ -637,6 +637,8 @@ compcheck(const char* s, char* v, void* h)
 						error(1, "forcing %s %s prerequisite %s", s, a ? "duplicate" : "dangling", r->name);
 					r->dynamic &= ~D_compiled;
 					comprule(r->name, (char*)r, h);
+					if (!p->rule->complink)
+						p->rule->complink = r->complink;
 					break;
 				}
 		} while (p = p->next);
@@ -943,8 +945,17 @@ compile(char* objfile, char* select)
 		 * pre 2004-09-09 will just do "--"
 		 */
 
-		sfputr(sp, "--", 0);
-		listops(sp, 'O');
+		putstring(sp, "--", 0);
+		if (object.n2a)
+		{
+			listops(internal.wrk, 'O');
+			putstring(sp, sfstruse(internal.wrk), 0);
+		}
+		else
+		{
+			listops(sp, 'O');
+			sfputc(sp, 0);
+		}
 	}
 	sfputc(sp, 0);
 
@@ -1006,7 +1017,7 @@ compile(char* objfile, char* select)
 		}
 	
 	}
-	r = bindfile(NiL, objfile, BIND_DOT|BIND_FORCE|BIND_RULE);
+	r = bindfile(NiL, objfile, BIND_FORCE|BIND_DOT|BIND_RULE);
 	r->dynamic |= D_built|D_regular;
 	r->view = 0;
 	if (state.mam.dynamic || state.mam.regress)
@@ -1024,11 +1035,11 @@ compile(char* objfile, char* select)
  */
 
 void
-compref(int type, const char* name, Time_t date)
+compref(Rule_t* r, int type)
 {
 	if (object.pp)
 	{
-		if (type)
+		if (r)
 		{
 			/*
 			 * COMP_NSEC for backwards compatibility
@@ -1036,11 +1047,11 @@ compref(int type, const char* name, Time_t date)
 			 */
 
 			sfputu(object.pp, COMP_NSEC);
-			sfputu(object.pp, tmxnsec(date));
+			sfputu(object.pp, tmxnsec(r->time));
 			putstring(object.pp, null, 0);
 			sfputu(object.pp, type);
-			sfputu(object.pp, tmxsec(date));
-			putstring(object.pp, name, 0);
+			sfputu(object.pp, tmxsec(r->time));
+			putstring(object.pp, r->name, 0);
 		}
 		else
 		{
@@ -1048,7 +1059,7 @@ compref(int type, const char* name, Time_t date)
 			object.pp = 0;
 		}
 	}
-	else if (!type && !state.makefile)
+	else if (!r && !state.makefile)
 		object.pp = sfstropen();
 }
 
@@ -1189,17 +1200,18 @@ loadinit(void)
 int
 loadable(register Sfio_t* sp, register Rule_t* r, int source)
 {
-	register Rule_t*	x;
 	register List_t*	p;
 	char*			s;
-	char*			t;
+	char*			u;
 	long			n;
 	Sfoff_t			off;
+	Time_t			t;
 	Time_t			tm;
 	Time_t			tn;
 	int			lowres;
 	int			ok = 1;
 	long			old = 0;
+	Rule_t*			x;
 
 	loadinit();
 	if ((s = sfreserve(sp, 0, 0)) && (n = sfvalue(sp)) >= 0)
@@ -1233,27 +1245,41 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 			break;
 		if (n & (COMP_BASE|COMP_FILE|COMP_GLOBAL|COMP_INCLUDE))
 		{
-			x = bindfile(NiL, s, BIND_FORCE|BIND_MAKEFILE|BIND_RULE);
-			tm = (x && lowres && tm == tmxsec(x->time)) ? x->time : tmxsns(tm, tn);
+			if (!(x = bindfile(NiL, s, BIND_MAKEFILE|BIND_RULE)))
+				t = 0;
+			else
+			{
+				t = x->time;
+
+				/*
+				 * put bound makefile prereqs in state as a query courtesy
+				 */
+
+				if (!(n & COMP_BASE) && *x->name != '/')
+					staterule(RULE, x, NiL, 1)->time = t;
+				if (!(x->dynamic & D_regular))
+					x->dynamic &= ~D_bound;
+			}
+			if (!t)
+			{
+				if (n & COMP_DONTCARE)
+					continue;
+				error(state.exec || state.mam.out ? -1 : 1, "%s: %s not found", r->name, s);
+				break;
+			}
+			if (tn && t == tmxsns(tm, 0))
+				tn = 0;
+			tm = (lowres && tm == tmxsec(t)) ? t : tmxsns(tm, tn);
 			tn = 0;
-			if (!(x->dynamic & D_regular))
-				x->dynamic &= ~D_bound;
-
-			/*
-			 * put makefile prereqs in state as query courtesy
-			 */
-
-			if (!(n & COMP_BASE) && *x->name != '/')
-				staterule(RULE, x, NiL, 1)->time = x->time;
 
 			/*
 			 * check prerequisite file time with previous
 			 */
 
-			debug((-4, "%s%s%s%s%s%sprerequisite %s [%s] state [%s]", (x->dynamic & D_regular) ? null : "non-regular ", (n & COMP_DONTCARE) ? "optional " : null, (n & COMP_BASE) ? "base " : null, (n & COMP_FILE) ? "-f " : null, (n & COMP_GLOBAL) ? "-g " : null, (n & COMP_INCLUDE) ? "include " : null, s, timestr(x->time), timestr(tm)));
-			if (((x->dynamic & D_regular) || (n & COMP_BASE)) && x->time != tm)
+			debug((-4, "%s%s%s%s%sprerequisite %s [%s] state [%s]", (n & COMP_DONTCARE) ? "optional " : null, (n & COMP_BASE) ? "base " : null, (n & COMP_FILE) ? "-f " : null, (n & COMP_GLOBAL) ? "-g " : null, (n & COMP_INCLUDE) ? "include " : null, s, timestr(t), timestr(tm)));
+			if (t != tm)
 			{
-				error(state.exec || state.mam.out ? -1 : 1, "%s: out of date with %s", r->name, x->name);
+				error(state.exec || state.mam.out ? -1 : 1, "%s: out of date with %s", r->name, s);
 				break;
 			}
 
@@ -1301,8 +1327,8 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 
 			for (p = internal.preprocess->prereqs; p; p = p->next)
 				sfputr(internal.nam, p->rule->name, p->next ? ' ' : -1);
-			t = sfstruse(internal.nam);
-			if (!streq(s, t))
+			u = sfstruse(internal.nam);
+			if (!streq(s, u))
 			{
 				error(state.exec || state.mam.out ? -1 : 1, "%s: options changed%s%s", r->name, *s ? " from " : null, s);
 				break;
@@ -1369,6 +1395,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	char*			p = 0;
 	int			promoted = 0;
 	int			recompile = 0;
+	char*			corrupt = "2005-03-01";
 	Rule_t*			oldrules = 0;
 	Rule_t*			or;
 	Rule_t*			xr;
@@ -1377,7 +1404,6 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	Var_t*			x;
 	List_t*			xd;
 	List_t*			a;
-	char*			ident;
 	int			flags;
 	int			strings;
 	int			lists;
@@ -1403,6 +1429,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	Stat_t			st;
 	unsigned long		attrmap[CHAR_BIT * sizeof(unsigned long)];
 	unsigned char		scanmap[UCHAR_MAX + 1];
+	char			ident[64];
 	Loadstate_t		ls;
 
 	int			old;
@@ -1449,6 +1476,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 
 	if (!(s = sfreserve(sp, MAGICSIZE, 0)))
 		goto badmagic;
+	errno = 0;
 	if (memcmp(s, MAGIC, MAGICSIZE) || !(s = getstring(sp)) || streq(s, OLD_VERSION))
 	{
 		old = 1;
@@ -1476,7 +1504,11 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				goto badversion;
 			sequence = 2;
 		}
-		ident = strrchr(old_stamp.version, ' ') + 1;
+		if (s = strrchr(old_stamp.version, ' '))
+			s++;
+		else
+			s = old_stamp.version;
+		strncopy(ident, s, sizeof(ident));
 		if (old_trailer.magic != old_header.magic || old_trailer.size != st.st_size)
 			goto badmagic;
 		if (state.exec && streq(objfile, state.objectfile))
@@ -1497,7 +1529,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			s++;
 		else
 			s = "old";
-		ident = strcpy((char*)scanmap, s);
+		strncopy(ident, s, sizeof(ident));
 		off = sfgetu(sp);
 		sequence = sfgetu(sp);
 		flags = sfgetu(sp);
@@ -1815,6 +1847,8 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			for (n = rulestr; n > 0; n--)
 				loadstring(&ls, sp);
 		}
+		if (sfeof(sp))
+			goto badio;
 		r->preview = state.maxview + 1;
 		o = getrule(r->name);
 		if (r->dynamic & D_index)
@@ -1941,7 +1975,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				}
 				if (!o)
 				{
-					if (state.stateview >= 0 && (r->property & P_target))
+					if (state.stateview >= 0 && (r->property & (P_joint|P_target)) == P_target)
 					{
 						r->dynamic |= D_garbage;
 						garbage++;
@@ -2012,7 +2046,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				r->time = 0;
 			if (state.stateview >= 0)
 			{
-				if (state.stateview >= 0 && (r->property & P_target))
+				if ((r->property & (P_joint|P_target)) == P_target)
 				{
 					r->dynamic |= D_garbage;
 					garbage++;
@@ -2103,14 +2137,28 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 					d->next = d + 1;
 				d++;
 			}
-			else if (n = sfgetu(sp))
+			else if (!(n = sfgetu(sp)))
+				(d - 1)->next = 0;
+			else if (n < 0)
+			{
+				if (strcmp(ident, corrupt) < 0 && (((lists - (xd - d)) * 100) / lists) >= 90)
+				{
+					error(1, "%s: pre-%s make object corruption repaired", objfile, corrupt);
+					corrupt = 0;
+					while (d < xd)
+					{
+						(d - 1)->next = 0;
+						d++;
+					}
+				}
+				break;
+			}
+			else
 			{
 				d->rule = r + n - 1;
 				d->next = d + 1;
 				d++;
 			}
-			else
-				(d - 1)->next = 0;
 		}
 		if (!old)
 		{
@@ -2118,7 +2166,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			(d - 1)->next = 0;
 		}
 	}
-	if (sfeof(sp))
+	if (sfeof(sp) && corrupt)
 		goto badio;
 
 	/*

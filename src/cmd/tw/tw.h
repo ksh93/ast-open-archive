@@ -151,6 +151,7 @@ typedef struct				/* program state		*/
 	Cmdarg_t*	cmd;		/* command arg state		*/
 	int		cmdflags;	/* cmdopen() flags		*/
 	int		compiled;	/* excomp() complete		*/
+	int		errexit;	/* exit tw when cmd exit > this	*/
 	int		errors;		/* error count			*/
 	Exdisc_t	expr;		/* expr discipline		*/
 	Find_t*		find;		/* fast find handle		*/

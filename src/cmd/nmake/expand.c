@@ -1424,26 +1424,43 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 				}
 			}
 			sfclose(sp);
-
-			/*
-			 * foolib : foo : libfoo
-			 */
-
-			if ((s = strrchr(d->name, '/')) && (s - d->name) > 3 && *(s - 1) == 'b' && *(s - 2) == 'i' && *(s - 3) == 'l' && *(s - 4) != '/')
+			if (s = strrchr(d->name, '/'))
 			{
-				*(s - 3) = 0;
-				r = makerule(d->name);
-				if (r != d)
-					addprereq(d, r, PREREQ_APPEND);
-				if (t = strrchr(d->name, '/'))
-					t++;
-				else
-					t = d->name;
-				sfprintf(internal.nam, "lib/lib%s", t);
-				r = makerule(sfstruse(internal.nam));
-				if (r != d)
-					addprereq(d, r, PREREQ_APPEND);
-				*(s - 3) = 'l';
+				if ((s - d->name) > 3 && *(s - 1) == 'b' && *(s - 2) == 'i' && *(s - 3) == 'l' && *(s - 4) != '/')
+				{
+					/*
+					 * foolib : foo : libfoo
+					 */
+
+					*(s - 3) = 0;
+					r = makerule(d->name);
+					if (r != d)
+						addprereq(d, r, PREREQ_APPEND);
+					if (t = strrchr(d->name, '/'))
+						t++;
+					else
+						t = d->name;
+					sfprintf(internal.nam, "lib/lib%s", t);
+					r = makerule(sfstruse(internal.nam));
+					if (r != d)
+						addprereq(d, r, PREREQ_APPEND);
+					*(s - 3) = 'l';
+				}
+				else if (((s - d->name) != 3 || *(s - 1) != 'b' || *(s - 2) != 'i' || *(s - 3) != 'l') && (*(s + 1) != 'l' || *(s + 2) != 'i' || *(s + 3) != 'b'))
+				{
+					/*
+					 * huh/foobar : lib/libfoo
+					 */
+
+					s++;
+					t = s + strlen(s);
+					while (--t > s)
+					{
+						sfprintf(internal.nam, "lib/lib%-.*s", t - s, s);
+						if ((r = getrule(sfstruse(internal.nam))) && r != d)
+							addprereq(d, r, PREREQ_APPEND);
+					}
+				}
 			}
 		}
 	}

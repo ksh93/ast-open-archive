@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ppsym
 make ppsym.o
@@ -192,7 +192,7 @@ exec -
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x gentab
+exec - silent test -w gentab -a -x gentab || chmod u+w,+x gentab
 done gentab generated
 make pp.tab
 done pp.tab
@@ -599,7 +599,7 @@ done ${INSTALLROOT}/include/ast generated
 make ${INSTALLROOT}/include/ast/pp.h
 prev ${INSTALLROOT}/include/ast
 prev pp.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  pp.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  pp.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/pp.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/pp.h
@@ -607,7 +607,7 @@ exec - fi
 done ${INSTALLROOT}/include/ast/pp.h generated
 make ${INSTALLROOT}/include/ast/ppkey.h
 prev ppkey.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  ppkey.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1986,author=gsf'  ppkey.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/ppkey.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/ppkey.h
@@ -738,7 +738,7 @@ exec -
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x probe
+exec - silent test -w probe -a -x probe || chmod u+w,+x probe
 done probe generated
 exec - test '' = 'probe' || ${STDCMP} 2>/dev/null -s probe ${INSTALLROOT}/lib/probe/C/pp/probe || { ${STDMV} ${INSTALLROOT}/lib/probe/C/pp/probe ${INSTALLROOT}/lib/probe/C/pp/probe.old 2>/dev/null || true; ${STDCP} probe ${INSTALLROOT}/lib/probe/C/pp/probe  		    		    ;}
 done ${INSTALLROOT}/lib/probe/C/pp/probe generated

@@ -8,12 +8,26 @@ VIEW data y2k.dat
 
 function DATA
 {
-	pax --nosummary --from=ascii -rf $data
+	case $1 in
+	pax)	pax --nosummary --from=ascii -rf $data
+		;;
+	sizes)	f=f
+		x=x
+		while	:
+		do	case $f in
+			fffffffffff)	break ;;
+			esac
+			echo $x > $f
+			f=f$f
+			x=$x$x
+		done
+		;;
+	esac
 }
 
 TEST 01 'down to the second'
 
-	DO DATA
+	DO DATA pax
 
 	EXEC --format="$listformat" *.dat
 		SAME OUTPUT list.dat
@@ -176,3 +190,64 @@ f00000072.dat  f00000148.dat  f00000224.dat  f00000300.dat
 f00000073.dat  f00000149.dat  f00000225.dat  f00000301.dat
 f00000074.dat  f00000150.dat  f00000226.dat  f00000302.dat
 f00000075.dat  f00000151.dat  f00000227.dat  f00000303.dat'
+
+TEST 02 'large sizes'
+
+	DO DATA sizes
+
+	EXEC -w24x80 -C f*
+		OUTPUT - $'f  ff  fff  ffff  fffff  ffffff  fffffff  ffffffff  fffffffff  ffffffffff'
+
+	EXEC -w24x80 -C -sk f*
+		OUTPUT - $'    1 f       1 fff       1 fffff       1 fffffff       1 fffffffff
+    1 ff      1 ffff      1 ffffff      1 ffffffff      1 ffffffffff'
+
+	EXEC --testsize=32 -sk f*
+		OUTPUT - $'8388608 f
+12582912 ff
+20971520 fff
+37748736 ffff
+71303168 fffff
+138412032 ffffff
+272629760 fffffff
+541065216 ffffffff
+1077936128 fffffffff
+2151677952 ffffffffff'
+
+	EXEC --format="%(size)22u %(name)s" f*
+		OUTPUT - $'                     2 f
+                     3 ff
+                     5 fff
+                     9 ffff
+                    17 fffff
+                    33 ffffff
+                    65 fffffff
+                   129 ffffffff
+                   257 fffffffff
+                   513 ffffffffff'
+
+	EXEC --testsize=32 --format="%(blocks)18u %(size)22u %(name)s" f*
+		OUTPUT - $'          16777216             8589934592 f
+          25165824            12884901888 ff
+          41943040            21474836480 fff
+          75497472            38654705664 ffff
+         142606336            73014444032 fffff
+         276824064           141733920768 ffffff
+         545259520           279172874240 fffffff
+        1082130432           554050781184 ffffffff
+        2155872256          1103806595072 fffffffff
+        4303355904          2203318222848 ffffffffff'
+
+	EXPORT	LC_NUMERIC=en
+
+	EXEC --testsize=32 --format="%(blocks)'18u %(size)'22u %(name)s" f*
+		OUTPUT - $'        16,777,216          8,589,934,592 f
+        25,165,824         12,884,901,888 ff
+        41,943,040         21,474,836,480 fff
+        75,497,472         38,654,705,664 ffff
+       142,606,336         73,014,444,032 fffff
+       276,824,064        141,733,920,768 ffffff
+       545,259,520        279,172,874,240 fffffff
+     1,082,130,432        554,050,781,184 ffffffff
+     2,155,872,256      1,103,806,595,072 fffffffff
+     4,303,355,904      2,203,318,222,848 ffffffffff'

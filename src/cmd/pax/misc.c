@@ -833,8 +833,8 @@ listentry(register File_t* f)
 			n = state.in->io->count > 1024 ? 10 : 0;
 			if ((p = ((state.in->io->count >> n) * 100) / (state.meter.size >> n)) > 100)
 				p = 100;
-			n = listprintf(state.tmp.str, state.in, f, state.listformat);
-			s = sfstruse(state.tmp.str);
+			n = listprintf(state.meter.tmp, state.in, f, state.listformat);
+			s = sfstruse(state.meter.tmp);
 			if (state.meter.fancy)
 			{
 				if (n > (state.meter.width - METER_parts - 1))

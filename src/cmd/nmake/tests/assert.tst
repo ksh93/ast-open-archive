@@ -159,7 +159,7 @@ TEST 07 ':INSTALLDIR:'
 + !
 + 	;;
 + esac
-+ chmod u+w,+x test
++ silent test -w test -a -x test || chmod u+w,+x test
 + if	silent test \'\' != "test"
 + then	if	silent test -d "test"
 + 	then	cp -pr test fun
@@ -389,7 +389,7 @@ TEST 15 ':: .sh rhs mismatch with lhs'
 + !
 + 	;;
 + esac
-+ chmod u+w,+x bin/foo'
++ silent test -w bin/foo -a -x bin/foo || chmod u+w,+x bin/foo'
 
 TEST 16 ':INSTALLDIR: with dir prerequisite'
 
@@ -499,7 +499,7 @@ ug gu :LINK: gg'
 + !
 + 	;;
 + esac
-+ chmod u+w,+x gg
++ silent test -w gg -a -x gg || chmod u+w,+x gg
 + if	silent test -f "ug"
 + then	cp ug ug.old
 + rm -f ug
@@ -629,7 +629,7 @@ BBB :: BBB.sh'
 + !
 + 	;;
 + esac
-+ chmod u+w,+x bin/AAA
++ silent test -w bin/AAA -a -x bin/AAA || chmod u+w,+x bin/AAA
 + case :$OPTIND:$RANDOM in
 + ?*:*:*|*::*|*:*:$RANDOM)
 + 	;;
@@ -660,7 +660,7 @@ BBB :: BBB.sh'
 + !
 + 	;;
 + esac
-+ chmod u+w,+x BBB'
++ silent test -w BBB -a -x BBB || chmod u+w,+x BBB'
 
 TEST 21 ':JOINT: + update'
 

@@ -508,7 +508,7 @@ directive(register char* s)
 						else
 						{
 							r->time = tmxgetmtime(&st);
-							compref(COMP_INCLUDE, r->name, r->time);
+							compref(r, COMP_INCLUDE);
 						}
 					}
 				}
@@ -2188,7 +2188,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 		}
 		else
 		{
-			if ((set.op & A_metarule) || !*s)
+			if ((set.op & (A_metarule|A_special)) == A_metarule || !*s)
 			{
 				if (!x)
 					x = r;

@@ -29,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2005-01-11 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2005-02-23 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -37,10 +37,7 @@ USAGE_LICENSE
 "	If \acmd arg ...\a is specified then the pathnames are collected"
 "	and appended to the end of the \aarg\alist and \acmd\a is executed"
 "	by the equivalent of \bexecvp\b(2). \acmd\a will be executed 0 or more"
-"	times, depending the number of generated pathname arguments. If"
-"	\b--ignore-errors\b is not specified then the first \acmd\a execution"
-"	that returns non-zero exit status causes \btw\b terminate and exit"
-"	with non-zero exit status.]"
+"	times, depending the number of generated pathname arguments.]"
 "[+?If the last option is \b-\b and \b--fast\b was not specified then the"
 "	pathnames are read, one per line, from the standard input, the"
 "	\b--directory\b options are ignored, and the directory tree is not"
@@ -69,8 +66,7 @@ USAGE_LICENSE
 "	matching the \bksh\b(1) \apattern\a. See \bupdatedb\b(1) for"
 "	details on this database. Any \b--expr\b expressions are applied"
 "	to the matching paths.]:[pattern]"
-"[i:ignore-errors?Ignore \acmd\a errors and inaccessible files and"
-"	directories.]"
+"[i:ignore-errors?Ignore inaccessible files and directories.]"
 "[I:ignore-case?Ignore case in pathname comparisons.]"
 "[l:local?Do not descend into non-local filesystem directories.]"
 "[m:intermediate?Before visiting a selected file select and visit"
@@ -90,6 +86,10 @@ USAGE_LICENSE
 "	is as large as possible.]#[chars]"
 "[t:trace|verbose?Print the command line on the standard error"
 "	before executing it.]"
+"[x:error-exit?Exit \btw\b with the exit code of the first \acmd\a"
+"	that returns an exit code greater than or equal to \acode\a."
+"	By default \acmd\a exit codes are ignored (mostly because of"
+"	\bgrep\b(1).)]#[code]"
 "[C:chop?Chop leading \b./\b from printed pathnames. This is implied by"
 "	\b--logical\b.]"
 "[F:codes?Set the \blocate\b(1) fast find codes database \apath\a.]:[path]"
@@ -322,13 +322,14 @@ static void		intermediate(Ftw_t*, char*);
 static void
 act(register Ftw_t* ftw, int op)
 {
+	int	i;
 	Sfio_t*	fp;
 
 	switch (op)
 	{
 	case ACT_CMDARG:
-		if (cmdarg(state.cmd, ftw->path, ftw->pathlen) && !state.ignore)
-			exit(1);
+		if ((i = cmdarg(state.cmd, ftw->path, ftw->pathlen)) >= state.errexit)
+			exit(i);
 		break;
 	case ACT_CODE:
 		if (findwrite(state.find, ftw->path, ftw->pathlen, (ftw->info & FTW_D) ? "system/dir" : (char*)0))
@@ -472,7 +473,8 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 			v = -1;
 		else if (n1 > n2)
 			v = 1;
-		else v = 0;
+		else
+			v = 0;
 	}
 	if (state.reverse)
 		v = -v;
@@ -489,6 +491,7 @@ main(int argc, register char** argv)
 	char*		codes;
 	char**		av;
 	char**		ap;
+	int		i;
 	int		count;
 	int		len;
 	int		traverse;
@@ -509,7 +512,8 @@ main(int argc, register char** argv)
 	firstdir = lastdir = newof(0, Dir_t, 1, 0);
 	firstdir->name = ".";
 	state.action = LIST;
-	state.cmdflags = CMD_IMPLICIT|CMD_NEWLINE;
+	state.cmdflags = CMD_IGNORE|CMD_IMPLICIT|CMD_NEWLINE;
+	state.errexit = EXIT_QUIT;
 	state.ftwflags = ftwflags()|FTW_DELAY;
 	state.select = ALL;
 	state.separator = '\n';
@@ -563,6 +567,9 @@ main(int argc, register char** argv)
 			continue;
 		case 't':
 			state.cmdflags |= CMD_TRACE;
+			continue;
+		case 'x':
+			state.errexit = opt_info.arg ? opt_info.num : EXIT_QUIT;
 			continue;
 		case 'C':
 			state.ftwflags |= FTW_NOSEEDOTDIR;
@@ -672,7 +679,8 @@ main(int argc, register char** argv)
 			state.cmd = cmdopen(argv, count, size, args, state.cmdflags);
 			state.ftwflags |= FTW_DOT;
 		}
-		else state.cmdflags &= ~CMD_IMPLICIT;
+		else
+			state.cmdflags &= ~CMD_IMPLICIT;
 		if (codes && (disc.flags & FIND_GENERATE))
 		{
 			char*	p;
@@ -747,8 +755,8 @@ main(int argc, register char** argv)
 				switch (n)
 				{
 				case ACT_CMDARG:
-					if (cmdarg(state.cmd, s, strlen(s)) && !state.ignore)
-						exit(1);
+					if ((i = cmdarg(state.cmd, s, strlen(s))) >= state.errexit)
+						exit(i);
 					break;
 				case ACT_LIST:
 					sfputr(sfstdout, s, '\n');
@@ -778,8 +786,8 @@ main(int argc, register char** argv)
 					break;
 				if (!n)
 					ftwalk(s, tw, state.ftwflags, NiL);
-				else if (cmdarg(state.cmd, s, len) && !state.ignore)
-					exit(1);
+				else if ((i = cmdarg(state.cmd, s, len)) >= state.errexit)
+					exit(i);
 			}
 			if (sferror(sfstdin))
 				error(ERROR_SYSTEM|2, "input read error");
@@ -794,8 +802,8 @@ main(int argc, register char** argv)
 			*ap = 0;
 			ftwalk((char*)av, tw, state.ftwflags|FTW_MULTIPLE, state.sort);
 		}
-		if (state.cmd && cmdflush(state.cmd) && !state.ignore)
-			exit(1);
+		if (state.cmd && (i = cmdflush(state.cmd)) >= state.errexit)
+			exit(i);
 		if (state.find && (findclose(state.find) || state.finderror))
 			exit(2);
 	}

@@ -127,6 +127,8 @@
 #define NOFILE		OPEN_MAX
 #endif
 
+#define blankline		allblanks
+
 #if !_PACKAGE_ast
 
 #define SIG_REG_PENDING		(-1)

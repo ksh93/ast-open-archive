@@ -545,7 +545,7 @@ Option_t		options[] =
 },
 {
 	"link",
-	0,
+	'l',
 	OPT_link,
 	"Hard link files on output if possible.",
 },
@@ -599,7 +599,7 @@ Option_t		options[] =
 },
 {
 	"local",
-	'l',
+	0,
 	OPT_local,
 	"Reject files and links that traverse outside the current directory.",
 },

@@ -29,7 +29,9 @@
 # .xx meta.NAME="CONTENT"	<meta name="NAME" content="CONTENT">
 # .xx label="LABEL"		local link label request
 # .xx link="URL\tHOT-TEXT"	link goto with url request
+# .xx linkframe="URL\tHOT-TEXT"	link goto with url request (no target=_top)
 # .xx link="HOT-TEXT"		link goto request
+# .xx linkframe="HOT-TEXT"	link goto request (no target=_top)
 # .xx ref="URL\tMIME-TYPE"	head link hint
 # .xx begin=internal		begin internal text
 # .xx end=internal		end internal text
@@ -39,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2005-01-11' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2005-02-14' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Labs Research) 2005-01-11 $
+@(#)$Id: mm2html (AT&T Labs Research) 2005-02-14 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -640,7 +642,7 @@ function getline
 						*)	labels=0 ;;
 						esac
 						;;
-					label|link|ref)
+					label|link*|ref)
 						case $val in
 						*'	'*)
 							url=${val%%'	'*}
@@ -670,12 +672,15 @@ function getline
 								print -r -- "<A $nam=\"$url\">$txt</A>"
 							fi
 							;;
-						link)	nam=href
+						link*)	nam=href
 							tar=
-							case $frame$top$vg in
-							?*)	case $url in
-								*([abcdefghijklmnopqrstuvwxyz]):*|/*)
-									tar=" target=_top"
+							case $nam in
+							link)	case $frame$top$vg in
+								?*)	case $url in
+									*([abcdefghijklmnopqrstuvwxyz]):*|/*)
+										tar=" target=_top"
+										;;
+									esac
 									;;
 								esac
 								;;

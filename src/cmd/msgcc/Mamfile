@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make msgadmin
 make msgadmin.sh
@@ -73,7 +73,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x msgadmin
+exec - silent test -w msgadmin -a -x msgadmin || chmod u+w,+x msgadmin
 done msgadmin generated
 make msgcpp
 make msgcpp.o
@@ -220,7 +220,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x msgcc
+exec - silent test -w msgcc -a -x msgcc || chmod u+w,+x msgcc
 done msgcc generated
 make msgcvt
 make msgcvt.o

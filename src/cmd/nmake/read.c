@@ -421,7 +421,6 @@ int
 readfile(register char* file, int type, char* filter)
 {
 	register Rule_t*	r;
-	char*			s;
 	Sfio_t*			rfp;
 
 	if (streq(file, "-") && (file = "/dev/null") || isdynamic(file))
@@ -434,13 +433,11 @@ readfile(register char* file, int type, char* filter)
 		sfstrclose(rfp);
 	}
 	state.init++;
-	r = bindfile(NiL, file, BIND_FORCE|BIND_MAKEFILE|BIND_RULE);
+	r = bindfile(NiL, file, BIND_MAKEFILE|BIND_RULE);
 	state.init--;
-	if (r)
+	if (r && r->time)
 	{
-		if (*(s = unbound(r)) == '/')
-			s = strrchr(s, '/') + 1;
-		compref(type, s, r->time);
+		compref(r, type);
 		r->dynamic |= D_scanned;
 		file = r->name;
 		if (rfp = filter ? fapply(internal.internal, null, file, filter, CO_ALWAYS|CO_LOCAL|CO_URGENT) : rsfopen(file))

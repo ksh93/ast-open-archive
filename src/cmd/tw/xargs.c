@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: xargs (AT&T Labs Research) 2001-07-17 $\n]"
+"[-?\n@(#)$Id: xargs (AT&T Labs Research) 2005-03-07 $\n]"
 USAGE_LICENSE
 "[+NAME?xargs - construct arg list and execute command]"
 "[+DESCRIPTION?\bxargs\b constructs a command line consisting of the"
@@ -120,8 +120,8 @@ main(int argc, register char** argv)
 	int			flags = CMD_EMPTY;
 	char*			insert = 0;
 	int			lines = 0;
-	int			null = 0;
 	size_t			size = 0;
+	int			term = -1;
 
 	NoP(argc);
 	error_info.id = "xargs";
@@ -159,6 +159,7 @@ main(int argc, register char** argv)
 		case 'I':
 			insert = opt_info.arg ? opt_info.arg : "{}";
 			flags |= CMD_INSERT;
+			term = '\n';
 			continue;
 		case 'l':
 			/*
@@ -198,7 +199,7 @@ main(int argc, register char** argv)
 			error_info.trace = -opt_info.num;
 			continue;
 		case 'N':
-			null = 1;
+			term = 0;
 			continue;
 		case 'X':
 			flags |= CMD_EXACT;
@@ -221,12 +222,12 @@ main(int argc, register char** argv)
 		error(ERROR_SYSTEM|3, "out of space [arg]");
 	sfopen(sfstdin, NiL, "rt");
 	error_info.line = 1;
-	if (null)
+	if (term >= 0)
 	{
-		while (s = sfgetr(sfstdin, 0, 0))
+		while (s = sfgetr(sfstdin, term, 0))
 		{
 			error_info.line++;
-			if (c = sfvalue(sfstdin) - 1)
+			if ((c = sfvalue(sfstdin) - 1) && (s[c-1] != '\r' || --c))
 				cmdarg(cmd, s, c);
 		}
 		if (sfvalue(sfstdin) > 0)

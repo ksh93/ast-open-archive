@@ -1,3 +1,4 @@
+05-03-07 od.c: handle -t ...z for --printable
 04-10-01 fmt.tst: update for --optget
 04-09-30 od.c: -v does not accept an offset operand
 04-08-08 uuencode.c: fix -x docs, add -b == --method=binhex

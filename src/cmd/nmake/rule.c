@@ -184,15 +184,19 @@ maprule(char* s, Rule_t* r)
 	Rule_t*			o;
 	Hash_position_t*	pos;
 
-	static unsigned char	warn;
+	static unsigned char	warned;
 
 	if ((o = getrule(s)) == r)
 		return r->name;
 	s = putrule(0, r);
 	if (o && (pos = hashscan(table.rule, 0)))
 	{
-		if (state.warn && !++warn)
-			error(1, "%d maprule() calls -- should not happen", UCHAR_MAX+1);
+		if (!warned)
+		{
+			warned++;
+			if (state.warn)
+				error(1, "%d maprule() calls -- should not happen", UCHAR_MAX+1);
+		}
 		while (hashnext(pos))
 		{
 			q = (Rule_t*)pos->bucket->value;
@@ -439,6 +443,8 @@ associate(register Rule_t* a, register Rule_t* r, register char* s, List_t** pos
 int
 prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, register List_t* oldprereqs)
 {
+	register List_t*	p;
+
 	if ((r->property & P_accept) || state.accept)
 		return 0;
 	if ((r->attribute ^ o->attribute) & ~internal.accept->attribute)
@@ -446,6 +452,7 @@ prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, registe
 		reason((1, "%s named attributes changed", r->name));
 		return 1;
 	}
+ more:
 	for (;;)
 	{
 		if (newprereqs)
@@ -474,12 +481,23 @@ prereqchange(register Rule_t* r, register List_t* newprereqs, Rule_t* o, registe
 	}
 	if (newprereqs)
 	{
-		reason((1, "%s prerequisite %s added or re-ordered", r->name, newprereqs->rule->name));
+		if ((r->dynamic & (D_entries|D_regular)) == D_entries || EXPLAIN)
+		{
+			for (p = oldprereqs; p && (newprereqs->rule != p->rule || !((newprereqs->rule->dynamic ^ p->rule->dynamic) & (D_alias|D_bound)) || getrule(newprereqs->rule) != getrule(p->rule)); p = p->next);
+			if (p)
+			{
+				if ((r->dynamic & (D_entries|D_regular)) == D_entries)
+					goto more;
+				reason((1, "%s prerequisite %s re-ordered", r->name, newprereqs->rule->name));
+			}
+			else
+				reason((1, "%s prerequisite %s added", r->name, newprereqs->rule->name));
+		}
 		return 1;
 	}
 	if (oldprereqs)
 	{
-		reason((1, "%s prerequisite %s deleted or re-ordered", r->name, oldprereqs->rule->name));
+		reason((1, "%s prerequisite %s deleted", r->name, oldprereqs->rule->name));
 		return 1;
 	}
 	return 0;

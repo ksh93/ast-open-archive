@@ -1,3 +1,7 @@
+05-03-11 features/procfs: cygwin tweaks
+05-03-10 ls.c: fix -s arithmetic and column output
+05-02-14 sum.tst: add SHA { 256 384 512 } tests
+05-02-11 pss-info.c: add lynxos info(2) proc table
 04-12-25 ls: -e == --time-style=long-iso, -E == --time-style=full-iso
 	 ls: fix --quote-style=literal to bet literal -- doh
 04-12-15 ls: --time-style=long-iso

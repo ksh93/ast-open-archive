@@ -173,9 +173,7 @@ TEST 08 'included file change'
 		INPUT Makefile $'include "test.mk"'
 		INPUT test.mk $'all :'
 
-	EXEC	# 1 sec granularity state sync for INPUT updates
-
-	DO	touch test.mk
+	DO	{ sleep 1; touch test.mk; }
 
 	EXEC	--noexec
 		ERROR - $'make: warning: Makefile.mo: out of date with test.mk
@@ -758,3 +756,104 @@ OPTIONS
 
 	EXEC	--file
 		ERROR - $'make: file: file value expected'
+
+TEST 14 'convoluted include + global makefiles'
+
+	EXEC
+		INPUT Makefile $'include "foo/foo.mk"
+all :
+	: $(<) : $(~) :
+foo FOO bar BAR global GLOBAL : .VIRTUAL'
+		INPUT foo/foo.mk $'all : foo
+.SOURCE.mk : bar
+include "bar.mk"'
+		INPUT bar/bar.mk $'all : bar'
+		ERROR - $'+ : all : foo bar :'
+
+	EXEC	--noexec
+		OUTPUT - $'+ : all : foo bar :'
+		ERROR -
+
+	EXEC	--noexec
+		INPUT bar/bar.mk $'all : BAR'
+		OUTPUT - $'+ : all : foo BAR :'
+		ERROR - $'make: warning: Makefile.mo: out of date with bar/bar.mk
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--exec
+		OUTPUT -
+		ERROR - $'+ : all : foo BAR :'
+
+	EXEC	--noexec
+		OUTPUT - $'+ : all : foo BAR :'
+		ERROR -
+
+	EXEC	--noexec
+		INPUT foo/foo.mk $'all : FOO
+.SOURCE.mk : bar
+include "bar.mk"'
+		OUTPUT - $'+ : all : FOO BAR :'
+		ERROR - $'make: warning: Makefile.mo: out of date with foo/foo.mk
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--exec
+		OUTPUT -
+		ERROR - $'+ : all : FOO BAR :'
+
+	EXEC	--noexec --include=gbl --global=global.mk
+		INPUT gbl/global.mk $'all : global'
+		OUTPUT - $'+ : all : global FOO BAR :'
+		ERROR - $'make: warning: Makefile.mo: options changed
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--exec --include=gbl --global=global.mk
+		OUTPUT -
+		ERROR - $'+ : all : global FOO BAR :'
+
+	EXEC	--noexec --include=gbl --global=global.mk
+		OUTPUT - $'+ : all : global FOO BAR :'
+		ERROR -
+
+	EXEC	--noexec --include=gbl --global=global.mk
+		INPUT gbl/global.mk $'all : GLOBAL'
+		OUTPUT - $'+ : all : GLOBAL FOO BAR :'
+		ERROR - $'make: warning: Makefile.mo: out of date with gbl/global.mk
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--exec --include=gbl --global=global.mk
+		OUTPUT -
+		ERROR - $'+ : all : GLOBAL FOO BAR :'
+
+	EXEC	--noexec
+		OUTPUT - $'+ : all : FOO BAR :'
+		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk was specified last time
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--noexec --include=gbl --global=global.mk
+		INPUT global.mk $'all : global'
+		OUTPUT - $'+ : all : global FOO BAR :'
+		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk option order changed
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--noexec
+		OUTPUT - $'+ : all : FOO BAR :'
+		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk was specified last time
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--exec --include=gbl --file=global.mk --compile
+		OUTPUT -
+		ERROR -
+
+	EXEC	--noexec --global=global.mo
+		OUTPUT - $'+ : all : global FOO BAR :'
+		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk option order changed
+make: warning: Makefile.mo: recompiling'
+
+	EXEC	--exec --global=global.mo
+		OUTPUT -
+		ERROR - $'+ : all : global FOO BAR :'
+
+	EXEC	--noexec --global=global.mo
+		INPUT global.mk $'all : GLOBAL'
+		OUTPUT - $'+ : all : global FOO BAR :'
+		ERROR -

@@ -1,3 +1,4 @@
+05-02-04 Makefile: drop -lnetinet (for lynxos)
 04-07-22 csopen.c,cssend.c,csauth.c,cslocal.c: access() => eaccess()
 04-07-19 cslocal.c: call spawnveg() for standalone 3d
 04-03-25 csrecv.c,cssend.c: OPEN_MAX_CEIL => OPEN_MAX

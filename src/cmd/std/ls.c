@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-12-25 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2005-03-10 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -84,7 +84,6 @@ USAGE_LICENSE
 "		[+dir.bytes?directory size in bytes]"
 "		[+dir.count?directory entry count]"
 "		[+dir.files?directory file count]"
-"		[+dir.octets?directory size in octets]"
 "		[+flags?command line flags in effect]"
 "		[+gid?group id]"
 "		[+header?listing header]"
@@ -105,7 +104,6 @@ USAGE_LICENSE
 "		[+total.blocks?running total block count]"
 "		[+total.bytes?running total size in bytes]"
 "		[+total.files?running total file count]"
-"		[+total.octets?running total size in octets]"
 "		[+trailer?listing trailer]"
 "		[+uid?owner id]"
 "		[+----?subformats ----]"
@@ -122,8 +120,8 @@ USAGE_LICENSE
 "			ctime as hours:minutes:seconds.]"
 "	}"
 "[F:classify?Append a character for typing each entry. Turns on \b--physical\b.]"
-"[g?\b--long\b with no owner info.]"
-"[G:group?\b--long\b with no group info.]"
+"[g:group?\b--long\b with no owner info.]"
+"[G?\b--long\b with no group info.]"
 "[h:scale|binary-scale|human-readable?Scale sizes to powers of 1024 { b K M G T }.]"
 "[i:inode?List the file serial number.]"
 "[I:ignore?Do not list implied entries matching shell \apattern\a.]:[pattern]"
@@ -133,8 +131,8 @@ USAGE_LICENSE
 "[m:commas|comma-list?List names as comma separated list.]"
 "[n:numeric-uid-gid?List numeric user and group ids instead of names.]"
 "[N:literal?Print raw entry names (don't treat e.g. control characters specially).]"
-"[o?\b--long\b with no group info.]"
-"[O:owner?\b--long\b with no owner info.]"
+"[o:owner?\b--long\b with no group info.]"
+"[O?\b--long\b with no owner info.]"
 "[p:markdir?Append / to each directory name.]"
 "[q:hide-control-chars?Print ? instead of non graphic characters.]"
 "[Q:quote-name?Enclose all entry names in \"...\".]"
@@ -208,6 +206,8 @@ USAGE_LICENSE
 "	and exit.]"
 "[104:testdate?\b--format\b time values newer than \adate\a will be printed"
 "	as \adate\a. Used for regression testing.]:[date]"
+"[105:testsize?Shift file sizes left \ashift\a bits and set file block counts"
+"	to the file size divided by 512. Used for regression testing.]#[shift]"
 
 "\n"
 "\n[ file ... ]\n"
@@ -290,14 +290,18 @@ USAGE_LICENSE
 #define KEY_trailer		30
 #define KEY_uid			31
 
+#if 0
+#define BLOCKS(st)	((state.blocksize==LS_BLOCKSIZE)?iblocks(st):(state.blocksize>LS_BLOCKSIZE)?(iblocks(st)+state.blocksize/LS_BLOCKSIZE-1)/(state.blocksize/LS_BLOCKSIZE):iblocks(st)*(LS_BLOCKSIZE/state.blocksize))
+#else
 #define BLOCKS(st)	((state.blocksize==LS_BLOCKSIZE)?iblocks(st):(iblocks(st)*LS_BLOCKSIZE+state.blocksize-1)/state.blocksize)
+#endif
 #define PRINTABLE(s)	((state.lsflags&LS_PRINTABLE)?printable(s):(s))
 
 typedef struct				/* dir/total counts		*/
 {
-	unsigned long	blocks;		/* number of blocks		*/
-	unsigned long	bytes;		/* number of bytes		*/
-	unsigned long	files;		/* number of files		*/
+	Sfulong_t	blocks;		/* number of blocks		*/
+	Sfulong_t	bytes;		/* number of bytes		*/
+	Sfulong_t	files;		/* number of files		*/
 } Count_t;
 
 typedef struct				/* sfkeyprintf() keys		*/
@@ -332,6 +336,7 @@ typedef struct				/* program state		*/
 	int		height;		/* output height in lines	*/
 	int		reverse;	/* reverse the sort		*/
 	int		scale;		/* metric scale power		*/
+	int		testsize;	/* st_size left shift		*/
 	int		width;		/* output width in chars	*/
 	char*		endflags;	/* trailing 0 in flags		*/
 	char*		format;		/* sfkeyprintf() format		*/
@@ -384,9 +389,7 @@ static Key_t	keys[] =
 
 	/* aliases */
 
-	{ "dir.octets",		KEY_dir_bytes		},
 	{ "linkname",		KEY_linkpath		},
-	{ "total.octets",	KEY_total_bytes		},
 };
 
 static State_t		state;
@@ -761,10 +764,15 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 static void
 pr(register List_t* lp, Ftw_t* ftw, register int fill)
 {
+	if (state.testsize)
+	{
+		ftw->statb.st_size <<= state.testsize;
+		ftw->statb.st_blocks = ftw->statb.st_size / LS_BLOCKSIZE;
+	}
 #ifdef S_ISLNK
 	/*
 	 * -H == --hairbrained
-	 * no way around it - this is really ugly
+	 * no way around it - this is bud tugley
 	 * symlinks should be no more visible than mount points
 	 * but I wear my user hat more than my administrator hat
 	 */
@@ -801,6 +809,7 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 	register int	files;
 	register char*	s;
 	int		w;
+	int		a;
 
 	lp->ftw = ftw;
 	if (keys[KEY_header].macro && ftw->level >= 0)
@@ -808,18 +817,21 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 	if ((files = lp->count.files) > 0)
 	{
 		if (!(state.lsflags & LS_COLUMNS) || length <= 0)
+		{
 			n = w = 1;
+			a = 0;
+		}
 		else
 		{
 			i = ftw->name[1];
 			ftw->name[1] = 0;
 			state.adjust = 2;
-			w = sfkeyprintf(state.tmp, lp, state.format, key, NiL) + state.adjust;
+			a = sfkeyprintf(state.tmp, lp, state.format, key, NiL) - 1;
+			w = a + state.adjust + 1;
 			length += w;
 			sfstrseek(state.tmp, 0, SEEK_SET);
 			ftw->name[1] = i;
 			n = ((state.width - (length + BETWEEN + 2)) < 0) ? 1 : 2;
-				
 		}
 		if (state.lsflags & LS_COMMAS)
 		{
@@ -840,9 +852,10 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 							}
 							else if ((n = mbwidth(i)) > 0)
 								w += n;
+					w += a;
 					if ((n -= length + w) < 0)
 					{
-						n = state.width - (length + p->namelen);
+						n = state.width - (length + w);
 						if (i)
 							sfputr(sfstdout, ",\n", -1);
 					}
@@ -907,8 +920,8 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 					{
 						z = 0;
 						for (l = 0, r = j; l < n && r < i; r += c, l++)
-							if (z < x[r]->namelen)
-								z = x[r]->namelen;
+							if (z < (x[r]->namelen + a))
+								z = x[r]->namelen + a;
 						w += z + BETWEEN;
 					}
 					if (w <= state.width)
@@ -924,8 +937,8 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 				{
 					siz[k] = 0;
 					for (l = 0, r = j; l < n && r < i; r += c, l++)
-						if (siz[k] < x[r]->namelen)
-							siz[k] = x[r]->namelen;
+						if (siz[k] < (x[r]->namelen + a))
+							siz[k] = x[r]->namelen + a;
 					siz[k] += BETWEEN;
 					k++;
 				}
@@ -945,8 +958,8 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 						{
 							z = 0;
 							for (l = 0; l < n && j < i; j++, l++)
-								if (z < x[j]->namelen)
-									z = x[j]->namelen;
+								if (z < (x[j]->namelen + a))
+									z = x[j]->namelen + a;
 							w += z + BETWEEN;
 						}
 						if (w <= state.width && (!state.height || (n - l) < state.height))
@@ -961,8 +974,8 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 				{
 					siz[k] = 0;
 					for (l = 0; l < n && j < i; j++, l++)
-						if (siz[k] < x[j]->namelen)
-							siz[k] = x[j]->namelen;
+						if (siz[k] < (x[j]->namelen + a))
+							siz[k] = x[j]->namelen + a;
 					siz[k] += BETWEEN;
 					k++;
 				}
@@ -1584,6 +1597,9 @@ main(int argc, register char** argv)
 			state.testdate = tmdate(opt_info.arg, &e, NiL);
 			if (*e)
 				error(3, "%s: invalid date string", opt_info.arg, opt_info.option);
+			break;
+		case -105:
+			state.testsize = opt_info.num;
 			break;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);

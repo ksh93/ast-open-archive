@@ -586,7 +586,7 @@ main(int argc, char** argv)
 	 *	 load() on internal list pointers
 	 */
 
-	compref(0, NiL, 0);
+	compref(NiL, 0);
 	if (p = internal.makefiles->prereqs)
 	{
 		p = internal.tmplist->prereqs = listcopy(p);
@@ -733,7 +733,7 @@ main(int argc, char** argv)
 
 	if (state.compileonly)
 		return 0;
-	compref(0, NiL, 0);
+	compref(NiL, 0);
 	sfstrclose(tmp);
 	state.compile = COMPILED;
 	if (state.believe)

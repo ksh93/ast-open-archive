@@ -591,7 +591,7 @@ echo $STATE
 + !
 + 	;;
 + esac
-+ chmod u+w,+x x'
++ silent test -w x -a -x x || chmod u+w,+x x'
 
 	EXEC	--silent
 		OUTPUT -

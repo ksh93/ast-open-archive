@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2004-12-25 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2005-03-19 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -884,12 +884,17 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 				state.ftwflags &= ~(FTW_META|FTW_PHYSICAL);
 			break;
 		case OPT_meter:
-			if ((state.meter.on = y) && (state.meter.fancy = isatty(sffileno(sfstderr))))
+			if (state.meter.on = y)
 			{
-				error_info.write = meterror;
-				astwinsize(1, NiL, &state.meter.width);
-				if (state.meter.width < 2 * (METER_parts + 1))
-					state.meter.width = 2 * (METER_parts + 1);
+				if (!(state.meter.tmp = sfstropen()))
+					nospace();
+				if (state.meter.fancy = isatty(sffileno(sfstderr)))
+				{
+					error_info.write = meterror;
+					astwinsize(1, NiL, &state.meter.width);
+					if (state.meter.width < 2 * (METER_parts + 1))
+						state.meter.width = 2 * (METER_parts + 1);
+				}
 			}
 			break;
 		case OPT_mkdir:

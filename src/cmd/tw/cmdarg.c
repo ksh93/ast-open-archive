@@ -268,25 +268,32 @@ cmdflush(register Cmdarg_t* cmd)
 int
 cmdarg(register Cmdarg_t* cmd, const char* file, register int len)
 {
+	int	i;
 	int	r;
 
+	r = 0;
 	if (len)
 	{
 		while ((cmd->nextstr -= len + 1) < (char*)(cmd->nextarg + cmd->offset))
 		{
 			if (cmd->nextarg == cmd->firstarg)
 				error(3, "%s: path too long for exec args", file);
-			if (r = cmdflush(cmd))
-				return r;
+			if (i = cmdflush(cmd))
+			{
+				if (r < i)
+					r = i;
+				if (!(cmd->flags & CMD_IGNORE))
+					return r;
+			}
 		}
 		*cmd->nextarg++ = cmd->nextstr;
 		memcpy(cmd->nextstr, file, len);
 		cmd->nextstr[len] = 0;
 		cmd->argcount++;
-		if (cmd->argcount >= cmd->argmax)
-			return cmdflush(cmd);
+		if (cmd->argcount >= cmd->argmax && (i = cmdflush(cmd)) > r)
+			r = i;
 	}
-	return 0;
+	return r;
 }
 
 /*

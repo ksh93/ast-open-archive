@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_X11 ${INSTALLROOT}
 setv PACKAGE_X11_INCLUDE ${PACKAGE_X11}/include/X11
@@ -38,8 +38,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make tcl
 make libtcl.a archive
@@ -663,7 +663,7 @@ done ${INSTALLROOT}/include/tcl generated
 make ${INSTALLROOT}/include/tcl/tksh.h
 prev ${INSTALLROOT}/include/tcl
 prev include/tksh.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic   include/tksh.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic   include/tksh.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tksh.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tksh.h
@@ -671,7 +671,7 @@ exec - fi
 done ${INSTALLROOT}/include/tcl/tksh.h generated
 make ${INSTALLROOT}/include/tcl/tcl.h
 prev include/tcl.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic   include/tcl.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic   include/tcl.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tcl.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tcl.h

@@ -39,6 +39,9 @@ NoN(pss_cygwin)
 #ifndef PRNODEV
 #define PRNODEV			((Pss_dev_t)(-1))
 #endif
+#ifndef PID_ZOMBIE
+#define PID_ZOMBIE		0
+#endif
 
 #undef	PR_CTIME
 #define PR_CTIME(p)		(((p)->rusage_children.ru_utime.tv_sec+(p)->rusage_children.ru_stime.tv_sec)*PR_HZ+((((p)->rusage_children.ru_utime.tv_usec+(p)->rusage_children.ru_stime.tv_usec)*PR_HZ)/1000000))

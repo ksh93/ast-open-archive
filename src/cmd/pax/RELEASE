@@ -1,3 +1,6 @@
+05-03-19 options.c: -l == --link (not --local) per posix
+05-02-08 misc.c: fix interaction between delta and --meter
+05-02-07 delta.c,pax.h: don't output delta when src==tar -- duh
 04-12-25 bio.c: fix (*putheader)() return value logic, especially for ENOSPACE
 04-12-08 listformat now handles high resolution time
 04-12-01 tv.h,tv.c,features/tv move to libast

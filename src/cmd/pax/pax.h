@@ -276,6 +276,7 @@ typedef struct Link_s			/* link info			*/
 	struct \
 	{ \
 	int		op;		/* op				*/ \
+	int		same;		/* SRC and TAR same		*/ \
 	unsigned long	checksum;	/* data checksum		*/ \
 	unsigned long	index;		/* index			*/ \
 	Member_t*	base;		/* base file pointer		*/ \
@@ -546,6 +547,7 @@ struct Filter_s
 	off_t		maxout;		/* max volume/part output count	*/ \
 	struct \
 	{ \
+	Sfio_t*		tmp;		/* tmp buffer			*/ \
 	off_t		size;		/* total size			*/ \
 	int		fancy;		/* fancy display		*/ \
 	int		last;		/* length of last display path	*/ \

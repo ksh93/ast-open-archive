@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Research) 2004-07-23
+# @(#)probe.win32 (AT&T Research) 2005-02-20
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -10,7 +10,7 @@
 
 IFS=$'\n'
 
-typeset -A headers
+typeset -A header version
 
 # we are probing on behalf of libpp and nmake
 # so the native preprocessor must be forced in
@@ -36,71 +36,65 @@ for i in $probe_header
 do	echo "#include <$i>"
 done
 echo '#ifdef __cplusplus'
-echo "int cplus=__cplusplus;"
+echo "int _Pr0b3_cplus=__cplusplus;"
 echo '#endif'
 echo '#ifdef _UWIN'
-echo "int uwin=_UWIN;"
+echo "int _Pr0b3_uwin=_UWIN;"
 echo '#endif'
 echo '#ifdef __BORLANDC__'
-echo "int versionb=__BORLANDC__;"
+echo "int _Pr0b3_version_BORLAND=__BORLANDC__;"
 echo '#endif'
 echo '#ifdef __DMC__'
-echo "int versiond=__DMC__;"
+echo "int _Pr0b3_version_DM=__DMC__;"
 echo '#endif'
 echo '#ifdef _MSC_VER'
-echo "int versionm=_MSC_VER;"
+echo "int _Pr0b3_version_MS=_MSC_VER;"
 echo '#endif'
 echo '#ifdef __ICL'
-echo "int versioni=__ICL;"
+echo "int _Pr0b3_version_ICL=__ICL;"
 echo '#endif'
 echo '#ifdef __LCC__'
-echo "int versionl=0+__LCC__;"
+echo "int _Pr0b3_version_LCC=0+__LCC__;"
 echo '#endif'
 echo '#ifdef __MINGW32__'
-echo "int versiong=__MINGW32__;"
+echo "int _Pr0b3_version_MINGW=__MINGW32__;"
 echo '#endif'
 echo '#ifdef __INTERIX'
-echo "int versiono=__INTERIX;"
+echo "int _Pr0b3_version_INTERIX=__INTERIX;"
 echo '#endif'
 echo '#ifdef __WATCOMC__'
-echo "int versionw=__WATCOMC__;"
+echo "int _Pr0b3_version_WATCOM=__WATCOMC__;"
 echo '#endif'
 } > easy.c
 
 include=
 uwin=
 cplus=
-versionb=
-versiond=
-versionm=
-versionl=
-versiong=
-versioni=
-versiono=
-versionw=
 
 $cc -E easy.c 2>&1 |
-egrep -i '^(#(line)? 1 .*\.[hH]| *int +(cplus|uwin|version[bdiglmw]) *= *[0-9])' |
-sed	-e 's/.*"\(.*\)".*/\1/' \
+egrep -i '^(#(line)? 1 .*\.[hH]| *int +_Pr0b3_[a-zA-Z_]* *= *[0-9])' |
+sed	-e 's,_Pr0b3_,,' \
+	-e 's/.*"\(.*\)".*/\1/' \
 	-e 's,^  *,,' \
 	-e 's,  *$,,' \
 	-e 's, *= *,=,' \
 	-e 's,^\(.\):[\\/]*,/\1/,' \
 	-e 's,[\\/][\\/]*,/,g' \
-	-e 's,^\(/.*\)/\(.*\)$,headers[\2]="\1",' \
+	-e 's,^\(/.*\)/\(.*\)$,header[\2]="\1",' \
 	-e 's, *int *\(.*\);.*,\1,' \
+	-e 's,^version_\(.*\)=,version[\1]=,' \
 	> easy.sh
 . ./easy.sh
 
 include=
 for i in $probe_header
-do	d=${headers[$i]}
-	if [[ $d ]]
+do	d=${header[$i]}
+	if	[[ $d ]]
 	then	include="$include
 $d"
-	elif [[ $i == */* ]]
-	then	d=${headers[${i##*/}]}
-		if [[ $d == */${i%/*} ]]
+	elif	[[ $i == */* ]]
+	then	d=${header[${i##*/}]}
+		if	[[ $d == */${i%/*} ]]
 		then	include="$include
 ${d%/${i%/*}}"
 		fi
@@ -115,7 +109,10 @@ fi
 
 stdinclude=
 for inc in $include
-do	for dup in $stdinclude
+do	if	[[ ${inc%/*} -ef /platformsdk ]]
+	then	inc=/platformsdk/${inc##*/}
+	fi
+	for dup in $stdinclude
 	do	[[ $inc -ef $dup ]] && continue 2
 	done
 	stdinclude="$stdinclude
@@ -126,8 +123,8 @@ done
 
 pragexpand='#pragma pp:pragmaexpand'
 
-case $versionb in
-?*)	version=$versionb VERSION=__BORLANDC__ 
+if	[[ ${version[BORLAND]} ]]
+then	version=${version[BORLAND]} VERSION=__BORLANDC__ 
 	reserved="#pragma pp:reserved __asm=GROUP __based=GROUP __cdecl __declspec=GROUP __except __export __far __fastcall __finally __huge __inline __int16 __int32 __int64 __int8 __leave __near __novtordisp __pascal __restrict __stdcall __syscall __try __unaligned __wchar_t
 #pragma pp:reserved _asm=GROUP _based=GROUP _cdecl _declspec=GROUP _except _export _far _fastcall _finally _fortran _huge _int16 _int32 _int64 _int8 _leave _near _pascal _stdcall _syscall _try
 #pragma pp:reserved cdecl const enum far fortran huge near pascal signed void volatile"
@@ -138,19 +135,15 @@ case $versionb in
 	pragmas="#pragma pp:nocatliteral
 #pragma pp:stringsplit
 #pragma pp:lineid line"
-	;;
-esac
-case $versiond in
-?*)	version=$versiond VERSION=__DMC__ 
+elif	[[ ${version[DM]} ]]
+then	version=${version[DM]} VERSION=__DMC__ 
 	reserved="#pragma pp:reserved _Bool _Complex _Imaginary asm=GROUP _asm=GROUP __asm=GROUP const enum _fortran __inline _int64 __int64 __restrict signed void volatile _based=GROUP __based=GROUP cdecl _cdecl __cdecl _declspec=GROUP __declspec=GROUP _except __except _export __export far _far __far _fastcall __fastcall _finally __finally huge _huge __huge _interrupt __interrupt _leave __leave _loadds __loadds near _near __near pascal _pascal __pascal _saveregs __saveregs _segname __segname _stdcall __stdcall _syscall __syscall _try __try _cs __cs _ss __ss _unaligned __unaligned"
 	specific="#define __TIMESTAMP__   __DATE__ \" \" __TIME__"
 	pragmas="#pragma pp:transition
 #pragma pp:elseif
 #pragma pp:lineid line"
-	;;
-esac
-case $versionm in
-?*)	version=$versionm VERSION=_MSC_VER
+elif	[[ ${version[MS]} ]]
+then	version=${version[MS]} VERSION=_MSC_VER
 	reserved="#pragma pp:reserved __asm=GROUP __based=GROUP __cdecl __declspec=GROUP __except __export __far __fastcall __finally __huge __inline __int16 __int32 __int64 __int8 __leave __near __novtordisp __pascal __restrict __stdcall __syscall __try __unaligned __wchar_t
 #pragma pp:reserved _asm=GROUP _based=GROUP _cdecl _declspec=GROUP _except _export _far _fastcall _finally _fortran _huge _int16 _int32 _int64 _int8 _leave _near _pascal _stdcall _syscall _try
 #pragma pp:reserved cdecl const enum far fortran huge near pascal signed void volatile"
@@ -158,10 +151,8 @@ case $versionm in
 #define <__int64 int> __int64
 #define <__int64 unsigned> unsigned __int64"
 	pragmas="#pragma pp:lineid line"
-	;;
-esac
-case $versionl in
-?*)	version=$versionl VERSION=__LCC__
+elif	[[ ${version[LCC]} ]]
+then	version=${version[LCC]} VERSION=__LCC__
 	reserved="#pragma pp:reserved _Bool _Complex _asm=GROUP const enum inline __inline __int64 restrict signed void volatile _cdecl __cdecl __declspec=GROUP __except _huge _stdcall __stdcall __try"
 	specific="#pragma pp:map \"/#(pragma )?import>/\" \"/#(pragma )?import(.*)/__STDPP__IMPORT__(\2)/\"
 #macdef __STDPP__IMPORT__(x)
@@ -175,27 +166,23 @@ case $versionl in
 #pragma pp:spaceout
 #pragma pp:elseif
 "
-	;;
-esac
-case $versiong in
-?*)	version=$versiong VERSION=__MINGW32__
+elif	[[ ${version[MINGW]} ]]
+then	version=${version[MINGW]} VERSION=__MINGW32__
 	reserved="#pragma pp:reserved __declspec=GROUP __alignof=GROUP __alignof__=GROUP __attribute=GROUP __attribute__=GROUP __extension__=GROUP asm=GROUP __asm=GROUP __asm__=GROUP const __const __const__ enum inline __inline __inline__ __restrict __restrict__ signed __signed __signed__ typeof=GROUP __typeof=GROUP __typeof__=GROUP void volatile __volatile __volatile__ __cdecl _stdcall __stdcall"
 	specific="#define __declspec(x)   __attribute__((x))"
 	pragexpand='#pragma pp:nopragmaexpand'
 	pragmas='#pragma pp:map "/#include_next>/" ",[^\<]*\<,#include <.../,"
 #pragma pp:lineid
 #pragma pp:linetype 2'
-	;;
-esac
+fi
 
 dialect=ansi
-if	[ X"$cplus" != X ]
+if	[[ $cplus ]]
 then	dialect=C++
 fi
 
-case $version:$stdinclude in
-[0-9]*:*/*)
-	hosttype=$(package)
+if	[[ $version == [0-9]* && $stdinclude ]]
+then	hosttype=$(package)
 	machine=${hosttype#*.}
 	case $uwin in
 	[0-9]*) standard="
@@ -382,5 +369,4 @@ $pragexpand
 #pragma pp:map "/#pragma once/" ",#pragma once,#pragma pp:nomultiple,"
 !
 	exit 0
-	;;
-esac
+fi

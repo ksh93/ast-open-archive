@@ -192,7 +192,7 @@ $(ETCDIR) :INSTALLDIR: a.c b.c c.c'
 
 	CD	../dev
 
-	EXEC	install # 1 sec granularity state sync for INPUT updates
+	EXEC	install
 		ERROR - $'+ mkdir -p etc'
 
 	EXEC	install
@@ -351,7 +351,7 @@ int main() { return PWD != 0; }'
 
 	CD	../top
 
-	EXEC	target # 1 sec granularity state sync for INPUT updates
+	EXEC	target
 		ERROR -
 
 	EXEC	target

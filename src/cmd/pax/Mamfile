@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-01-01
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -35,8 +35,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make pax
 make bio.o
@@ -522,7 +522,7 @@ exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?C
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x rpm2cpio
+exec - silent test -w rpm2cpio -a -x rpm2cpio || chmod u+w,+x rpm2cpio
 done rpm2cpio generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -553,7 +553,7 @@ done ${INSTALLROOT}/include/ast generated
 make ${INSTALLROOT}/include/ast/paxlib.h
 prev ${INSTALLROOT}/include/ast
 prev paxlib.h
-exec - proto -p -s -l ${INSTALLROOT}/lib/package/ast.lic '-o since=1987,author=gsf'  paxlib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1987,author=gsf'  paxlib.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/ast/paxlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/ast/paxlib.h
@@ -632,7 +632,7 @@ exec - TESTCC='${CC}'
 exec - !
 exec - 	;;
 exec - esac
-exec - chmod u+w,+x testpax
+exec - silent test -w testpax -a -x testpax || chmod u+w,+x testpax
 done testpax generated
 exec - testpax pax
 done test.testpax virtual

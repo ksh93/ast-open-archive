@@ -26,6 +26,9 @@ TEST 02 'arg replacement'
 		OUTPUT - $'AfirstZ\nAlastZ'
 	EXEC -I ARG echo AARGZ
 		OUTPUT - $'AfirstZ\nAlastZ'
+	EXEC -i echo test {}
+		INPUT - $'aaa\tbbb\nyyy zzz'
+		OUTPUT - $'test aaa\tbbb\ntest yyy zzz'
 
 TEST 03 'arg limit'
 	EXEC -n2 echo

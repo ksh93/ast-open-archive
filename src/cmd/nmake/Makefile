@@ -20,8 +20,8 @@ IDNAME == "$(ID)"
 PATHCHECK == "$(ID)"
 STAMP == "\n@(#)\$Id: $(ID) ($(OWNER)) $(VERSION:?$$(VERSION) ??)$(RELEASE:?$$(RELEASE) ??)$(DATE) \$\0\n"
 
-nmake :: make-intro.0 nmake.1 nmake.8 Version.mk \
-	$(RULES) $(RULES:B:S=.1:N=*rules.1:F=%(lower)s) $(RULESFILES) \
+nmake :: Version.mk nmake.1 \
+	$(RULES) $(RULESFILES) \
 	make.h expand.h options.h \
 	archive.c bind.c command.c dump.c expand.c main.c make.c \
 	mam.c metarule.c misc.c object.c option.c parse.c read.c \
@@ -31,6 +31,9 @@ nmake :: make-intro.0 nmake.1 nmake.8 Version.mk \
 "win32*" :NOOPTIMIZE: expand.c object.c parse.c
 
 $(RULESDIR) :INSTALLDIR: Makeinstall.mk $(RULES) $(RULESFILES) ppcc
+
+nmake.1 : nmake nmake.1.body nmake.1.tail
+	$(*:O=1) --nroff 2>&1 | sed -e '/itself/r $(*:O=2)' -e '/fBsh/r $(*:O=3)' > $(<)
 
 :: nmake.mm PROMO.mm FEATURES HISTORY README RELEASE REFERENCES
 

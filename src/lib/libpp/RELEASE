@@ -1,3 +1,4 @@
+05-02-20 probe.win32: handle /platformsdk mount
 05-01-11 ppargs.c: fix -I-S docs
 	 ppinput.c: ppproto() only for COMPATIBILITY or PLUSPLUS
 04-10-22 ppproto.c: handle `type var[x][y]' arg prototype

@@ -50,4 +50,4 @@ tst :: tst.sh'
 + !
 + 	;;
 + esac
-+ chmod u+w,+x tst'
++ silent test -w tst -a -x tst || chmod u+w,+x tst'

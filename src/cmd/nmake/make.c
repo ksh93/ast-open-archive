@@ -864,6 +864,7 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 				{
 					Rule_t*		joint;
 					Rule_t*		x;
+					Rule_t*		r5;
 					Sfio_t*		tmp;
 
 					message((-2, "check joint metarule targets"));
@@ -893,10 +894,10 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 							 * NOTE: some joint targets may not be generated
 							 */
 
-							if (!(r4 = bindfile(NiL, s, 0)) || !state.accept && (((t = r4->time), !(r4 = staterule(RULE, r4, NiL, 0))) || (r4->dynamic |= D_built, r4->time != t) || !t && !r4->event))
+							if (!(r4 = bindfile(NiL, s, 0)) || !state.accept && (((t = r4->time), !(r5 = staterule(RULE, r4, NiL, 0))) || (r5->dynamic |= D_built, !statetimeq(r4, r5)) || !t && !r4->event))
 							{
 								tevent = CURTIME;
-								reason((1, "joint metarule target %s changed", s));
+								reason((1, "joint metarule target %s [%s] changed [%s]", s, timestr(r4 ? r4->time : (Time_t)0), timestr(r5 ? r5->time : (Time_t)0)));
 							}
 							x->status = r->status;
 							message((-1, "time(%s) = %s", s, timestr(t)));

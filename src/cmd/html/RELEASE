@@ -1,3 +1,5 @@
+05-02-22 htmlrefs.c: rel=internal ignored if --external
+05-02-14 mm2html.sh: add .xx linkframe="" for no target=_top
 05-02-01 mm2html.sh: IFS may be unset!
 05-01-11 mm2html.sh: add --top
 04-12-22 mm2html.sh: fix .xx link unverified rm

@@ -238,3 +238,61 @@ make: *** exit code 1 making d.z'
 	
 	EXEC	DISABLE.a=  DISABLE.b=  DISABLE.c=  DISABLE.d=
 		ERROR -
+
+TEST 05 'virtual state'
+
+	EXEC
+		INPUT Makefile $'all : (S0)
+(S0) : .MAKE (S1) (S2) (S3) (S4) (S5)
+	print : $(<) : $(~:T>T=$(<)) :'
+		OUTPUT - $': (S0) : (S1) (S2) (S3) (S4) (S5) :'
+
+	EXEC
+		OUTPUT -
+
+	EXEC	S1=1
+		OUTPUT - $': (S0) : (S1) :'
+
+	EXEC	S1=1
+		OUTPUT -
+
+	EXEC	S1=1 S2=2
+		OUTPUT - $': (S0) : (S2) :'
+
+	EXEC	S1=1 S2=2
+		OUTPUT -
+
+	EXEC	S1=1
+		OUTPUT - $': (S0) : (S2) :'
+
+	EXEC	S1=1
+		OUTPUT -
+
+	EXEC	--
+		OUTPUT - $': (S0) : (S1) :'
+
+	EXEC	--
+		OUTPUT -
+
+TEST 06 'virtual state with long actions'
+
+	EXEC	--silent
+		INPUT Makefile $'all : (S)
+(S) : so
+	sleep 2
+	echo load $(*)
+so : si
+	echo "s output" > $(<)'
+		INPUT si $'s input'
+		OUTPUT - $'load so'
+
+	EXEC	--silent
+		OUTPUT -
+
+	DO	touch si
+
+	EXEC	--silent
+		OUTPUT - $'load so'
+
+	EXEC	--silent
+		OUTPUT -

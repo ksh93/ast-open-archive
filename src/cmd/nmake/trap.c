@@ -31,6 +31,10 @@
 
 #undef	trap
 
+#if defined(SIGIOT) && SIGIOT == SIGEMT
+#undef	SIGIOT
+#endif
+
 struct Alarms_s; typedef struct Alarms_s Alarms_t;
 
 struct Alarms_s

@@ -359,7 +359,8 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 								goto primary;
 							}
 	}
-	else matched = 1;
+	else
+		matched = 1;
 	if (b = strrchr(u, '/'))
 		b++;
 	else

@@ -137,10 +137,8 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 	char*				e;
 
 	note(DEBUG, "content multi=%d %s `%-.*s'", state.part.in.multi, cp->name, size, data);
-	if (!(ap = ((struct state_part*)disc)->head)) {
+	if (!(ap = ((struct state_part*)disc)->head))
 		ap = &state.part.global;
-		ap->flags = 1;
-	}
 	switch (cp->index) {
 	case CONTENT_boundary:
 		if (state.part.in.multi) {
@@ -176,7 +174,11 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 				size = sizeof(ap->opts) - 1;
 			strncopy(ap->opts, s, size + 1);
 			if (!mimecmp("text/plain", data, NiL) || !mimecmp("text/enriched", data, NiL))
+			{
 				ap->flags |= PART_text;
+				if (!strncmp(ap->code, "bin", 3))
+					*ap->code = 0;
+			}
 			else if (!mimecmp("message", data, NiL))
 				ap->flags |= PART_message;
 			else
@@ -188,6 +190,8 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 			size = sizeof(ap->code) - 1;
 		strncopy(ap->code, data, size + 1);
 		strlower(ap->code);
+		if ((ap->flags & PART_text) && !strncmp(ap->code, "bin", 3))
+			*ap->code = 0;
 		break;
 	case CONTENT_name:
 		if (*ap->name)

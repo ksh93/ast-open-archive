@@ -244,12 +244,13 @@ va_dcl
 
 MAIN()
 {
-	char	buf1[1024], buf2[1024], *list[4], *s;
-	double	x=0.0051;
-	int	i, j;
-	long	k;
-	Sffmt_t	fe;
-	Sfio_t*	f;
+	char		buf1[1024], buf2[1024], *list[4], *s;
+	double		x=0.0051, y;
+	Sfdouble_t	lx, ly;
+	int		i, j;
+	long		k;
+	Sffmt_t		fe;
+	Sfio_t*		f;
 
 	f = sfopen(NIL(Sfio_t*), tstfile(0), "w+");
 	sfsetbuf(f,buf1,10);
@@ -587,6 +588,17 @@ MAIN()
 			terror("%%I1d formatting failed");
 	}
 #endif
+
+	x = 0;
+	y = 1;
+	sfsprintf(buf1, sizeof(buf1), "%g %g %g", x/x, y/x, (-y)/x);
+	if (strcmp(buf1, "NaN Inf -Inf") != 0)
+		terror("Sfdouble_t NaN Inf error: %s", buf1);
+	lx = 0;
+	ly = 1;
+	sfsprintf(buf1, sizeof(buf1), "%Lg %Lg %Lg", lx/lx, ly/lx, (-ly)/lx);
+	if (strcmp(buf1, "NaN Inf -Inf") != 0)
+		terror("double NaN Inf error: %s", buf1);
 
 	TSTEXIT(0);
 }

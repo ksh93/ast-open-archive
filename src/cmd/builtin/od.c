@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Labs Research) 2004-09-30 $\n]"
+"[-?\n@(#)$Id: od (AT&T Labs Research) 2005-03-07 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files"
@@ -341,6 +341,10 @@ static const Type_t	type[] =
 	"hexadecimal",
 	'x',	"0",	0,	isize,	 2,  4,  8, 16, 32
 },
+{
+	"printable bytes",
+	'z',	0,	0,	0,	 1,  0,  0, 0, 0
+},
 };
 
 /*
@@ -371,7 +375,16 @@ format(register char* t)
 				error(3, "%c: invalid type name", c);
 				return;
 			}
-		zp = tp->size;
+		if (!(zp = tp->size) && !tp->fun)
+		{
+			switch (tp->width[0])
+			{
+			case 1:
+				state.printable = 1;
+				break;
+			}
+			continue;
+		}
 		xp = 0;
 		if (isdigit(*t))
 		{

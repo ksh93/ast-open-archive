@@ -449,6 +449,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 	register Member_t*	d;
 	int			dfd;
 
+	f->delta.same = 0;
 	if (d = op->delta && op->delta->tab && f->name ? (Member_t*)hashget(op->delta->tab, f->name) : (Member_t*)0)
 		d->mark = 1;
 	if (op->delta && op->delta->format->variant == DELTA_94)
@@ -497,7 +498,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 				f->st->st_mtime = d->mtime.tv_sec;
 		}
 	}
-	if (!d || d->mtime.tv_sec != f->st->st_mtime)
+	if (!d || !f->delta.same && d->mtime.tv_sec != f->st->st_mtime)
 	{
 		register char*	s;
 
@@ -510,11 +511,10 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 		}
 		fileout(op, f);
 	}
-	else
-	{
-		if (f->fd >= 0) close(f->fd);
-		else if (ip) fileskip(ip, f);
-	}
+	else if (f->fd >= 0)
+		close(f->fd);
+	else if (ip)
+		fileskip(ip, f);
 }
 
 /*
@@ -1291,8 +1291,14 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 	default:
 		if (gen != &data[DELTA_DEL] && !data[DELTA_SRC].vd.size && !data[DELTA_DEL].vd.size)
 			n = 0;
+		else if (gen == &data[DELTA_DEL])
+		{
+			n = vddelta((Vddisc_t*)&data[DELTA_SRC], (Vddisc_t*)&data[DELTA_TAR], (Vddisc_t*)&data[DELTA_DEL]);
+			if (n == 15)
+				f->delta.same = 1;
+		}
 		else
-			n = (gen == &data[DELTA_DEL]) ? vddelta((Vddisc_t*)&data[DELTA_SRC], (Vddisc_t*)&data[DELTA_TAR], (Vddisc_t*)&data[DELTA_DEL]) : vdupdate((Vddisc_t*)&data[DELTA_SRC], (Vddisc_t*)&data[DELTA_TAR], (Vddisc_t*)&data[DELTA_DEL]);
+			n = vdupdate((Vddisc_t*)&data[DELTA_SRC], (Vddisc_t*)&data[DELTA_TAR], (Vddisc_t*)&data[DELTA_DEL]);
 		break;
 	}
 #if DEBUG

@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dlls (AT&T Labs Research) 2004-10-22 $\n]"
+"[-?\n@(#)$Id: dlls (AT&T Labs Research) 2005-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?dlls - list dlls and shared libraries on $PATH]"
 "[+DESCRIPTION?\bdlls\b lists the base name and full path, one per line, of"
@@ -42,12 +42,15 @@ USAGE_LICENSE
 "	decimal digits and dots. Only the first path for each library"
 "	base name is listed. If no options are specified then"
 "	\b--base\b \b--path\b is assumed.]"
+"[+?\asymbol\a operands, if specified, are searched for in each matched"
+"	library. The address or lookup error is listed for each library"
+"	and \asymbol\a.]"
 "[b:base?List the \adll\a or \ashared library\a base names.]"
 "[i:info?List native dll naming and location information.]"
 "[p:path?List the \adll\a or \ashared library\a path names.]"
 
 "\n\n"
-"[ plugin [ name [ version ] ] ]\n"
+"[ plugin [ name [ version [ symbol ... ] ] ] ]\n"
 "\n"
 
 "[+SEE ALSO?\bfind\b(1), \bdllscan\b(3)]"
@@ -66,7 +69,10 @@ b_dlls(int argc, char** argv, void* context)
 	int		i;
 	int		r;
 	int		flags;
+	char**		syms;
 	char*		arg[3];
+	void*		dll;
+	void*		sym;
 	Dllscan_t*	dls;
 	Dllent_t*	dle;
 	Dllinfo_t*	dli;
@@ -98,9 +104,8 @@ b_dlls(int argc, char** argv, void* context)
 		}
 		break;
 	}
-	argc -= opt_info.index;
 	argv += opt_info.index;
-	if (error_info.errors || argc > 3)
+	if (error_info.errors)
 		error(ERROR_usage(2), "%s", optusage(NiL));
 	r = 0;
 	if (flags & LIST_INFO)
@@ -130,7 +135,8 @@ b_dlls(int argc, char** argv, void* context)
 	if (flags &= (LIST_BASE|LIST_PATH))
 	{
 		for (i = 0; i < elementsof(arg); i++)
-			arg[i] = (i >= argc || streq(argv[i], "-")) ? (char*)0 : argv[i];
+			if (arg[i] = *argv)
+				argv++;
 		r = 1;
 		for (;;)
 		{
@@ -151,10 +157,27 @@ b_dlls(int argc, char** argv, void* context)
 						sfprintf(sfstdout, "%14s %s\n", dle->name, dle->path);
 						break;
 					}
+					if (*(syms = argv))
+					{
+						if (dll = dlopen(dle->path, RTLD_LAZY))
+						{
+							do
+							{
+								sfprintf(sfstdout, "               %14s ", *syms);
+								if (sym = dlllook(dll, *syms))
+									sfprintf(sfstdout, "%p\n", sym);
+								else
+									sfprintf(sfstdout, "%s\n", dlerror());
+							} while (*++syms);
+							dlclose(dll);
+						}
+						else
+							sfprintf(sfstdout, "               %s\n", dlerror());
+					}
 				}
 				dllsclose(dls);
 			}
-			if (!r || !arg[0])
+			if (!r || !arg[0] || streq(arg[0], "-") || !arg[1] || streq(arg[1], "-"))
 				break;
 			arg[0] = 0;
 		}

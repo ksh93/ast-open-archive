@@ -1,3 +1,31 @@
+05-03-19 Makerules.mk: %.sh chmod only if not already writeable&executable
+	 object.c: don't mark (P_joint|P_target) garbage
+	 object.c: fix makefile prereq subsecond truncation time check
+	 object.c: fix makefile .SOURCE.mk prereq change bug (diagnostics:14)
+	 parse.c: .SPECIAL not interpreted as metarule -- doh
+	 state.c: triggered state var time now synced after action completes
+05-03-17 state.c: fix statefile() to return non-null for --nowritestate
+	 state.c: demote "file timestamp subsecond truncation" to --warn
+	 Makerules.mk: fix .SHARED.LIST. to honor --all-static
+	 Makerules.mk: _PACKAGE_foo=0 => ignore :PACKAGE: foo
+05-03-11 state.c: handle linux subsecond truncation after state lock inode flush
+	 expand.c: handle */foo?* : lib/libfoo in :W=O:
+05-03-09 Scanrules.mk: cobol accepts "\T \D COPY ..." !
+	 rule.c: clarify prereq list change explanations
+05-03-08 Makefile: generate nmake.1 from --nroff + make.1.body + make.1.tail
+05-03-01 object.c: fix compcheck() bug that missed some prereq->complink
+         object.c: repair pre-2005-03-01 compcheck() corruption in load()
+	 Makerules.mk: fix .LIST.PACKAGE.EDIT. , delimiter clash
+	 Makerules.mk: fix binary .LIST.PACKAGE.EDIT. to retain arch/HOSTTYPE
+	 Makerules.mk: fix plugin static :LIBRARY: dll install bug
+	 Makerules.mk: --static-link => _BLD_STATIC_LINK==1
+05-02-28 object.c: reset errno for "object file io" EOF messages
+05-02-22 make.c: fix joint metarule time comparison
+05-02-14 object.c: object option strings must be utf8
+05-02-11 Makerules.mk: check :MAKE: recursion on .
+05-02-08 Makerules.mk: shared lib link now uses ./*.req too
+05-02-06 Makerules.mk: .FIND. lib/package checks $(PACKAGEROOT) first
+05-02-04 Makerules.mk: drop .LIBRARY.CLEANUP. old plugin cleanup
 05-01-01 --- release 5.0 ---
 	 high resolution time stamps
 04-12-25 Makerules.mk: handle cc-,a=b

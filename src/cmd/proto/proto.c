@@ -45,7 +45,7 @@ USAGE_LICENSE
 "[c:comment?\ab[m[e]]]]\a are the beginning, middle, and end comment"
 "	characters. If \ae\a is omitted then it defaults to \ab\a. If \am\a is"
 "	omitted then it defaults to \ab\a. Use \"\b/*\b\" for C comments,"
-"	\"\b#\b\" for shell, and \"\b(*)\b\" for pascal. If \aa\a is \"\""
+"	\"\b#\b\" for shell, and \"\b(*)\b\" for pascal. If \abme\a is \"\""
 "	(the empty string) then the comment style is determined from the"
 "	input \afile\a suffix; no notice is prepended if the comment"
 "	style cannot be determined.]:[bme:=\"/*\"]"

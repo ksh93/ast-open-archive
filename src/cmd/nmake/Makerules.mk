@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-01-01 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-03-19 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -269,7 +269,7 @@ LICENSECLASS = $(LICENSEINFO:P=W=$(LICENSE),query=${type}.${class})
 .FIND. : .FUNCTION
 	local ( SIBLING SUFFIX FILES ... ) $(%:/:/ /G)
 	local D F P X
-	P = $(PATH) $(PKGDIRS)
+	P = $(SIBLING:N=lib/package:+$(PACKAGEROOT)/bin) $(PATH) $(PKGDIRS)
 	P := $(P:/:/ /G:D:T=F)
 	for F $(FILES)
 		if X = "$(F:T=FR)"
@@ -1066,7 +1066,7 @@ end
 	!
 		;;
 	esac
-	$(CHMOD) u+w,+x $(<)
+	$(SILENT) test -w $(<) -a -x $(<) || $(CHMOD) u+w,+x $(<)
 
 if "$("/bin/cat.exe":T=F)"
 %.exe : % .NULL
@@ -1469,7 +1469,7 @@ end
 	P := $(P)recurse|.RECURSE
 	.ORIGINAL.ARGS. := $(.ORIGINAL.ARGS.:N!=$(P))
 	.ARGS : .CLEAR $(~.ARGS:N!=$(P))
-	P := $(D:N!=-|.CC-*|cc-*)
+	P := $(D:N!=-|.|.CC-*|cc-*)
 	$(P:T!=FR) : .TERMINAL .RECURSE.DIR
 	$(P:T=FR) : .TERMINAL .RECURSE.FILE
 	.SELECT.EDIT. := $(.SELECT.EDIT.):N!=($(P:T=F:P=L=*:/ /|/G))?(/*)
@@ -1961,7 +1961,7 @@ end
  */
 
 ":LIBRARY:" : .MAKE .OPERATOR .PROBE.INIT
-	local A B L P R S T V
+	local A B L P R S T V X
 	P := $(.PACKAGE.plugin)
 	for T $(<:O>2)
 		if T == "DLL*"
@@ -1991,26 +1991,8 @@ end
 	L := $(.LIB.NAME. $(P)$(B) $(<:O=2))
 	$(L) : .ARCHIVE$(CC.SUFFIX.OBJECT)
 	if P
-		local X Y
-		/* drop the .LIBRARY.CLEANUP.$(B) code in 2005 */
-		X := $(CC.DLL.DIR)/$(.DLL.NAME. $(P)$(B) $(<:O=2)) $(CC.DLL.DIR)/$(.DLL.NAME. $(P)$(B))
-		Y := $(X:B:S)
-		X += $(X:N=*$(CC.SUFFIX.SHARED).*:C%\$(CC.SUFFIX.SHARED)\.%.oo.%)
-		X += $(X:N=*$(CC.SUFFIX.SHARED):C%\$(CC.SUFFIX.SHARED)%.oo%)
 		if ! A
-			X += $(LIBDIR)/$(.LIB.NAME. $(P)$(B) $(<:O=2))
 			:INSTALLDIR: $(L)
-			X += $(LIBDIR)/lib/$(P)$(B) $(P)$(B).req
-		end
-		X += $(Y)
-		if ! "$(>:N=[-+]l$(B))"
-			X += $(.LIB.NAME. $(B) $(<:O=2))
-		end
-		if X = "$(X:U:T=F)"
-			.LIBRARY.CLEANUP.$(B) : $(X)
-			.INSTALL : $$(*.LIBRARY.CLEANUP.$(B):T=F)
-			$(X) : .SPECIAL
-				$(RM) $(RMFLAGS) $(<)
 		end
 		X := $(.DLL.NAME. $(B) $(<:O=2):B:C%\..*%%)
 		if CC.SHARED.REGISTRY
@@ -2038,19 +2020,16 @@ end
 	$(B).VERSION := $(V)
 	D := $(>:V:N=-L*)
 	if ! P || A
-		R := $(P)$(B)
-		S := $(R) $(>:V:N=[-+]l*:/[-+]l//:N!=$(R)) $(.PACKAGE.LIBRARIES. $(.PACKAGE.build:A!=.TARGET):/^[-+]l//:N!=$(R)) $(LDLIBRARIES:N=[-+]l*:/^[-+]l//:N!=$(R))
-		if ! "$(S:N=$(R))"
-			S := $(R) $(S)
-		end
+		A := $(P)$(B)
+		S := $(A) $(>:V:N=[-+]l*::N!=[-+]l$(A)) $(.PACKAGE.LIBRARIES. $(.PACKAGE.build:A!=.TARGET):N!=[-+]l$(A)) $(LDLIBRARIES:N=[-+]l*:N!=[-+]l$(A))
 		eval
 		if ! "$(.NO.INSTALL.)"
-			$$(LIBDIR)/lib/$(R) :INSTALL: $(R).req
+			$$(LIBDIR)/lib/$(A) :INSTALL: $(A).req
 		end
-		.REQUIRE.$(R) = $(S:U)
-		(.REQUIRE.$(R)) : .PARAMETER
+		.REQUIRE.$(A) = $(S:U)
+		(.REQUIRE.$(A)) : .PARAMETER
 		if "$(-mam:N=static*,port*)"
-			$(R).req : (CC) (CCFLAGS) (LDFLAGS) (.REQUIRE.$(R))
+			$(A).req : (CC) (CCFLAGS) (LDFLAGS) (.REQUIRE.$(A))
 				set -
 				echo 'int main(){return 0;}' > 1.$(tmp).c
 				$$(CC) $$(CCFLAGS) -c 1.$(tmp).c &&
@@ -2059,9 +2038,9 @@ end
 				case "$(D)" in
 				*?)	echo " $(D)" ;;
 				esac
-				for i in $$(.REQUIRE.$(R))
+				for i in $$(.REQUIRE.$(A):/^[-+]l//)
 				do	case $i in
-					"$(R)"$(...:A=.ARCHIVE:A=.TARGET:N=$(CC.PREFIX.ARCHIVE)*$(CC.SUFFIX.ARCHIVE):/^$(CC.PREFIX.ARCHIVE)\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
+					"$(A)"$(...:A=.ARCHIVE:A=.TARGET:N=$(CC.PREFIX.ARCHIVE)*$(CC.SUFFIX.ARCHIVE):/^$(CC.PREFIX.ARCHIVE)\(.*\)$(CC.SUFFIX.ARCHIVE)/|\1/:@/ //G))
 						;;
 					*)	if	test ! -f $$(LIBDIR)/$(CC.PREFIX.ARCHIVE)$i$(CC.SUFFIX.ARCHIVE)
 						then	case `{ $$(CC) $$(CCFLAGS) $$(*.SOURCE.%.ARCHIVE:$$(.CC.NOSTDLIB.):N=*/$(CC.PREFIX.ARCHIVE)*:P=L:/^/-L/) $$(LDFLAGS) -o 1.$(tmp).x 1.$(tmp)$(CC.SUFFIX.OBJECT) $(D) -l$i 2>&1 || echo '' $x ;} | $(SED) -e 's/[][()+@?]/#/g' || :` in
@@ -2078,11 +2057,11 @@ end
 				} > $$(<)
 				$$(RM) $$(RMFLAGS) 1.$(tmp).*
 		else
-			$(R).req : (CC) (.REQUIRE.$(R)) .PREQUIRE
-				echo "" $$(.REQ. $$(.REQUIRE.$(R))) > $$(<)
+			$(A).req : (CC) (.REQUIRE.$(A)) .PREQUIRE
+				echo "" $$(.REQ. $$(.REQUIRE.$(A))) > $$(<)
 		end
-		$(L) : .INSERT $(R).req.REQUIRE
-		$(R).req.REQUIRE : .VIRTUAL .IGNORE .NULL $(R).req
+		$(L) : .INSERT $(A).req.REQUIRE
+		$(A).req.REQUIRE : .VIRTUAL .IGNORE .NULL $(A).req
 		end
 	end
 	eval
@@ -2155,9 +2134,9 @@ end
 	end
 	for L $(A)
 		if L == "+l*"
-			if ! "$(T:N=$(L))"
+			if ! "$(T:N=$(L))" && ! "$(R:N=$(L))"
 				D := $(L:/+/-/)
-				if "$(R:N=$(D))" || "$(CC.STDLIB:N=$(D:T=F:P=D))" && "$(.PACKAGE.$(L:/+l//).library)" != "+l"
+				if "$(R:N=$(D))" || ! "$(-all-static)" && "$(CC.STDLIB:N=$(D:T=F:P=D))" && "$(.PACKAGE.$(L:/+l//).library)" != "+l"
 					L := $(D)
 				end
 			end
@@ -2183,7 +2162,7 @@ end
 		else
 			S := $(B).$(%:O=3)
 		end
-		$(S) : .SHARED.o $(%:N=[!-+]*=*) $(A) $$(.SHARED.BIND. $(L))
+		$(S) : .SHARED.o $(%:N=[!-+]*=*) $(A) $$(.SHARED.BIND. $(%:O=2) $(L))
 		if ! "$(.INSTALL.$(S))" && ! "$(.NO.INSTALL.)"
 			if ! ( D = "$(.CC.DLL.DIR.$(S:C%\..*%%))" )
 				D = $(DLLDIR)
@@ -2208,10 +2187,12 @@ end
 	return $(S)
 
 .SHARED.BIND. : .FUNCTION
+	local ( B X ... ) $(%)
 	local A L P S
-	if "$(%)"
+	X += $("$(B).req":T=F:P=X:T=I:N!=$("\n")|[-+]l$(B)|$(X:/ /|/G))
+	if "$(X)"
 		let .NO.LIB.TYPE = .NO.LIB.TYPE + 1
-		for L $(%)
+		for L $(X)
 			if "$(CC.SHARED)"
 				if L == "+l*|-ldl|-liconv" /* XXX: probe!!! */
 					S += $(L)
@@ -2225,7 +2206,7 @@ end
 					end
 				else
 					L := $(L:T=F)
-					if L == "-l*"
+					if L == "-l*|*/libm.a" /* XXX: probe!!! */
 						S += $(L)
 						if CC.SUFFIX.STATIC
 							if A = "$(L:P=B:/\(.*\)\$(CC.SUFFIX.SHARED)\([0-9.]*\)$/\1$(CC.SUFFIX.STATIC)\2/)"
@@ -2590,6 +2571,9 @@ end
 		: $(.PACKAGE.PROBE.:V:R)
 	end
 	for P $(%)
+		if "$(_PACKAGE_$(P))" == "0"
+			continue
+		end
 		if "$(PACKAGE_$(P)_found)" == "1"
 			.PACKAGE.$(P).found := 1
 		end
@@ -2924,6 +2908,9 @@ PACKAGES : .SPECIAL .FUNCTION
 			else
 				P := $(T)
 				T :=
+			end
+			if "$(_PACKAGE_$(P))" == "0"
+				continue
 			end
 			I = pkg-$(P).mk
 			V := $(version)
@@ -3315,14 +3302,14 @@ PACKAGES : .SPECIAL .FUNCTION
 		.MAIN.TARGET. := $(T:O=1:B:S)
 		for X $(T)
 			T := $(.FILES.$(X:B:S):T=F:T!=G)
-			$(T:N!=[-+]l*) : -ARCHIVE -COMMAND -OBJECT
-			.UNION. : $(T) $(?$(X:B:S):T=F:P=S:T!=G)
+			$(T:N!=[-+]l*) : .SPECIAL -ARCHIVE -COMMAND -OBJECT
+			.UNION. : .SPECIAL $(T) $(?$(X:B:S):T=F:P=S:T!=G)
 		end
 	else
-		.UNION. : $(.FILES.:T=F:T!=G)
-		$(*.UNION.:N!=[-+]l*) : -ARCHIVE -COMMAND -OBJECT
-		.UNION. : $(...:T!=XS:T=F:A=.REGULAR:P=S:T!=G)
-		.UNION. : $(...:T=XSFA:T=F:A=.REGULAR:P=S:T!=G)
+		.UNION. : .SPECIAL $(.FILES.:T=F:T!=G)
+		$(*.UNION.:N!=[-+]l*) : .SPECIAL -ARCHIVE -COMMAND -OBJECT
+		.UNION. : .SPECIAL $(...:T!=XS:T=F:A=.REGULAR:P=S:T!=G)
+		.UNION. : .SPECIAL $(...:T=XSFA:T=F:A=.REGULAR:P=S:T!=G)
 	end
 	return $(*.UNION.:$(-select):$(.SELECT.EDIT.))
 
@@ -3831,6 +3818,9 @@ PACKAGES : .SPECIAL .FUNCTION
 	if "$(-instrument)"
 		_BLD_INSTRUMENT == 1
 	end
+	if "$(-static-link)"
+		_BLD_STATIC_LINK == 1
+	end
 	if T3
 		CCFLAGS &= $$(-target-context:?$$$(!$$$(*):A=.PFX.INCLUDE:@Y%$$$(<:P=U:D:T=*:P=L=*:/^/-I/) %%)??)$$(-target-prefix:?$$$(<:O=1:N=$$$(*:O=1:B:S=$$$(CC.SUFFIX.OBJECT)):Y%%-o $$$$(<) %)??)$(T3:V)
 	end
@@ -4323,7 +4313,8 @@ end
 
 .LIST.PACKAGE.DIRS. = $(VROOT:T=F:P=L*) $(INSTALLROOT) $(PACKAGEROOT)
 
-.LIST.PACKAGE.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:H!>:C%.*%C,^&/,,%:C% %:%G)
+.LIST.PACKAGE.BINARY.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:C%\(.*\)/arch/$(CC.HOSTTYPE)$%\1%:H!>:C,.*,C%^&/%%,:C, ,:,G)
+.LIST.PACKAGE.SOURCE.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:H!>:C,.*,C%^&/%%,:C, ,:,G)
 
 .LIST.PACKAGE.LICENSE : .ONOBJECT .MAKE
 	local I E
@@ -4335,7 +4326,7 @@ end
 			exit 0
 		end
 	end
-	E := $(.LIST.PACKAGE.EDIT.)
+	E := $(.LIST.PACKAGE.SOURCE.EDIT.)
 	if I = "$(LICENSEINFO:P!=S)"
 		print ;;;$(I);$(I:$(E))
 		I := $(I:D)/LICENSES/$(I:B)
@@ -4346,7 +4337,7 @@ end
 
 .LIST.PACKAGE.LOCAL : .ONOBJECT .COMMON.SAVE .MAKE
 	local I E
-	E := $(.LIST.PACKAGE.EDIT.)
+	E := $(.LIST.PACKAGE.SOURCE.EDIT.)
 	for I $(.MANIFEST.:T=F:P=A)
 		print ;;;$(I);$(I:$(E))
 	end
@@ -4354,7 +4345,7 @@ end
 .LIST.PACKAGE.BINARY : .ONOBJECT .MAKE .LIST.PACKAGE.LICENSE
 	local I E
 	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F)
-	E := $(.LIST.PACKAGE.EDIT.)
+	E := $(.LIST.PACKAGE.BINARY.EDIT.)
 	if package.strip
 		for I $(*.UNION:T=F:P=A:$(PACKAGE_OPTIMIZE:N=space:Y%:N=$(INSTALLROOT)/(bin|fun|lib)/*:N!=*$(CC.SUFFIX.ARCHIVE)|$(INSTALLROOT)/lib/lib?(/*)%%))
 			if "$(I:T=Y)" == "*/?(x-)(dll|exe)"
@@ -4373,7 +4364,7 @@ end
 	local E I X
 	X := /lib/lib*(/*) $(CC.SUFFIX.ARCHIVE) $(CC.SUFFIX.DYNAMIC) $(CC.SUFFIX.SHARED:?$(CC.SUFFIX.SHARED)+([-.0-9])??) $(CC.SUFFIX.STATIC)
 	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/(bin|lib)/*:N!=*@($(X:N=?*:/ /|/G)):T=F)
-	E := $(.LIST.PACKAGE.EDIT.)
+	E := $(.LIST.PACKAGE.BINARY.EDIT.)
 	if package.strip
 		for I $(*.UNION:T=F:P=A)
 			if "$(I:T=Y)" == "*/?(x-)(dll|exe)"
@@ -4404,7 +4395,7 @@ end
 .LIST.PACKAGE.SOURCE : .ONOBJECT .COMMON.SAVE .MAKE .LIST.PACKAGE.LICENSE
 	local E F G
 	PROTOEDIT = P=A
-	E := $(.LIST.PACKAGE.EDIT.)
+	E := $(.LIST.PACKAGE.SOURCE.EDIT.)
 	G := $(.PROTO.LICENSE.)
 	for F $(.MANIFEST.:T=F:P=A)
 		if G && F == "*.{1,3}(?)"
@@ -4417,7 +4408,7 @@ end
 .LIST.SOURCE.TGZ : .ONOBJECT .COMMON.SAVE .MAKE
 	local E N F P # vs # I N T J
 	PROTOEDIT = P=A
-	E := $(.LIST.PACKAGE.EDIT.)
+	E := $(.LIST.PACKAGE.SOURCE.EDIT.)
 	N := $(.PROTO.LICENSE.)
 	for F $(.MANIFEST.)
 		P := $(F:T=F)

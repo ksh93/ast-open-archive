@@ -388,23 +388,20 @@ target3 : target1 target2
 		INPUT Makefile $'
 .unpack : .FORCE .IGNORE
 	: $(<) ...
-	sleep 2
+	silent sleep 2
 	: $(<) done
 all : target1 target2 target3
 target1 : .unpack file1
-	sleep 3
+	silent sleep 3
 	touch $(<)
 target2 : .unpack file2
-	sleep 1
+	silent sleep 1
 	touch $(<)
 target3 : target1 target2
 	touch $(<)'
 		ERROR - $'+ : .unpack ...
-+ sleep 2
 + : .unpack done
-+ sleep 1
 + touch target2
-+ sleep 3
 + touch target1
 + touch target3'
 

@@ -23,15 +23,15 @@ Source Package Installation Instructions:
 		chmod +x bin/package
   (5) Determine the list of package names you want from the download site, then
       use the package(1) command to do the actual download:
-		bin/package authorize NAME password PASSWORD \
+		bin/package authorize "NAME" password "PASSWORD" \
 			setup source $URL PACKAGE ...
       This downloads the closure of latest source package(s); covered and
       up-to-date packages are not downloaded again unless package force ...
-      is specified. Package content is verified using md5sum. If the package
+      is specified. Package content is verified using . If the package
       root will contain only one architecture then you can install in bin and
       lib instead of arch/HOSTTYPE/bin and arch/HOSTTYPE/lib by running this
       instead:
-		bin/package authorize NAME password PASSWORD \
+		bin/package authorize "NAME" password "PASSWORD" \
 			flat setup source $URL PACKAGE ...
       To update the same packages from the same URL run:
 		bin/package setup source
@@ -89,10 +89,34 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
+05-03-03  --- Release ksh93q+  ---
+05-03-03  A bug where a SIGCHLD interrupt could cause a fifo open to fail has
+	  been fixed.
+05-02-25  A bug in which a builtin command run in the background could
+	  keep a file descriptor open which could cause a foreground
+	  process to hang has been fixed.
+05-02-24  A bug where builtin library commands (e.g., date and TZ) failed to
+	  detect environment variable changes has been fixed.
+05-02-22  The read builtin and word splitting are now consistent with respect
+	  to IFS -- both treat IFS as field delimiters.
+05-02-22  The read builtin no longer strips off trailing delimiters that
+	  are not space characters when there are fewer variables than fields.
+05-02-17  A builtin bug on systems where dlsym(libcmd) returns link-time
+	  bindings has been fixed.
+05-02-12  A bug in which the lib_init() function for .paths BUILTIN_LIB
+	  libraries was not called has been fixed.
+05-02-06  A bug on some systems in which moving the write end of a co-process
+	  to a numbered file descriptor could cause it to close has been fixed. 
+05-02-06  A bug in the vi-edit mode in which the character under the cursor
+	  was not deleted in some cases with the d% directive has been fixed.
+05-02-06  A bug where external builtin stdout/stderr redirection corrupted
+          stdout has been fixed.
+05-02-04  A bug where times formatting assumed CLK_TCK==60 has been fixed.
+
 05-01-11  --- Release ksh93q  ---
 05-01-11  A bug in the integral divide by zero check has been fixed.
-05-01-11  The -l option has been added to cause /etc/profile and
-	  $HOME/.profile, if they exist, to be read before the first command.
+05-01-11  The -l option has been added to read /etc/profile and
+	  $HOME/.profile, if they exist, before the first command.
 05-01-11  An argument parsing bug that caused `kill -s x -- n' to fail has
 	  been fixed.
 05-01-11  The .paths file, introduced in ksh93m, which can appear in
@@ -109,7 +133,7 @@ All recorded changes follow.
 04-12-24  A bug in which some SIGCHLD interrupts (from child processes exiting)
           corrupted the internal process/job list, sometimes causing the shell
 	  to hang, has been fixed.
-04-12-01  A bug in which typeset -Fn truncated in less than n digits for large
+04-12-01  A bug in which typeset -Fn truncated less than n digits for large
 	  numbers has been fixed.
 04-11-25  A bug in which standard error could be closed after a redirection
 	  to /dev/stderr has been fixed.
@@ -1280,6 +1304,9 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+05-03-19 options.c: -l == --link (not --local) per posix
+05-02-08 misc.c: fix interaction between delta and --meter
+05-02-07 delta.c,pax.h: don't output delta when src==tar -- duh
 04-12-25 bio.c: fix (*putheader)() return value logic, especially for ENOSPACE
 04-12-08 listformat now handles high resolution time
 04-12-01 tv.h,tv.c,features/tv move to libast
@@ -1569,6 +1596,8 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+05-02-22 htmlrefs.c: rel=internal ignored if --external
+05-02-14 mm2html.sh: add .xx linkframe="" for no target=_top
 05-02-01 mm2html.sh: IFS may be unset!
 05-01-11 mm2html.sh: add --top
 04-12-22 mm2html.sh: fix .xx link unverified rm
@@ -2046,6 +2075,34 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+05-03-19 Makerules.mk: %.sh chmod only if not already writeable&executable
+	 object.c: don't mark (P_joint|P_target) garbage
+	 object.c: fix makefile prereq subsecond truncation time check
+	 object.c: fix makefile .SOURCE.mk prereq change bug (diagnostics:14)
+	 parse.c: .SPECIAL not interpreted as metarule -- doh
+	 state.c: triggered state var time now synced after action completes
+05-03-17 state.c: fix statefile() to return non-null for --nowritestate
+	 state.c: demote "file timestamp subsecond truncation" to --warn
+	 Makerules.mk: fix .SHARED.LIST. to honor --all-static
+	 Makerules.mk: _PACKAGE_foo=0 => ignore :PACKAGE: foo
+05-03-11 state.c: handle linux subsecond truncation after state lock inode flush
+	 expand.c: handle */foo?* : lib/libfoo in :W=O:
+05-03-09 Scanrules.mk: cobol accepts "\T \D COPY ..." !
+	 rule.c: clarify prereq list change explanations
+05-03-08 Makefile: generate nmake.1 from --nroff + make.1.body + make.1.tail
+05-03-01 object.c: fix compcheck() bug that missed some prereq->complink
+         object.c: repair pre-2005-03-01 compcheck() corruption in load()
+	 Makerules.mk: fix .LIST.PACKAGE.EDIT. , delimiter clash
+	 Makerules.mk: fix binary .LIST.PACKAGE.EDIT. to retain arch/HOSTTYPE
+	 Makerules.mk: fix plugin static :LIBRARY: dll install bug
+	 Makerules.mk: --static-link => _BLD_STATIC_LINK==1
+05-02-28 object.c: reset errno for "object file io" EOF messages
+05-02-22 make.c: fix joint metarule time comparison
+05-02-14 object.c: object option strings must be utf8
+05-02-11 Makerules.mk: check :MAKE: recursion on .
+05-02-08 Makerules.mk: shared lib link now uses ./*.req too
+05-02-06 Makerules.mk: .FIND. lib/package checks $(PACKAGEROOT) first
+05-02-04 Makerules.mk: drop .LIBRARY.CLEANUP. old plugin cleanup
 05-01-01 --- release 5.0 ---
 	 high resolution time stamps
 04-12-25 Makerules.mk: handle cc-,a=b
@@ -3178,6 +3235,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+05-03-07 od.c: handle -t ...z for --printable
 04-10-01 fmt.tst: update for --optget
 04-09-30 od.c: -v does not accept an offset operand
 04-08-08 uuencode.c: fix -x docs, add -b == --method=binhex
@@ -3385,6 +3443,8 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+05-02-17 head.c: CONTENT_type PART_text trumps CONTENT_encoding binary
+05-02-08 local.h: blankline=>allblanks (lynxos libc symbol hijack)
 04-08-17 head.c: handle Content-Type: message
 04-07-22 lex.c: access() => eaccess()
 04-04-15 spam.c: add spamtest mask names, fix spam() ordering
@@ -3763,6 +3823,10 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+05-03-11 features/procfs: cygwin tweaks
+05-03-10 ls.c: fix -s arithmetic and column output
+05-02-14 sum.tst: add SHA { 256 384 512 } tests
+05-02-11 pss-info.c: add lynxos info(2) proc table
 04-12-25 ls: -e == --time-style=long-iso, -E == --time-style=full-iso
 	 ls: fix --quote-style=literal to bet literal -- doh
 04-12-15 ls: --time-style=long-iso
@@ -4014,6 +4078,10 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+05-03-07 xargs.c: fix -i to treat each line as an arg
+05-02-23 tw.c: add --error-exit=code to exit if cmd exit >= code
+	 find.c: ignore cmd errors
+	 cmdarg.c: fix bug that dropped a path on cmd error
 05-01-11 tw.c: --local test for directories only
 04-12-24 tw.c: cmd non-zero exit status causes tw to terminate
 04-12-08 find.c: fix `option ... path ... option' logic *again*
@@ -4113,6 +4181,23 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+05-03-23 string/ccmap.c: add ebcdic-m mvs cobol table
+05-03-11 comp/omitted.c: handle utime[s](const,const)
+	 comp/conf.tab: fix linux PID_MAX probe
+05-03-10 comp/setlocale.c: LC_* value "" => unset -- doh
+	 misc/optget.c: reorder _PACKAGE_astsa code for msgcc
+05-03-08 misc/optget.c: delete leading space in STYLE_nroff output
+05-03-07 sfio/sfhdr.h: drop extern _sfdscan -- clashes with sfvscanf.c static
+05-03-01 tm/tminit.c: add tmlocaltime() for tzset() getenv() override workaround
+05-02-20 features/tvlib: tmsettimeofday only for systems that have settimeofday
+	 features/float: fix mvs.s390 NaN tests
+05-02-18 tm/tmxmake.c: fix <0 west of GMT bug that warped to 1800's -- wow
+05-02-11 port/mnt.c: handle lynxos MOUNTED=/etc/fstab
+05-02-08 features/float,sfio.h,sfcvt.c,sftable.c: add INF and fix NAN
+05-02-04 features/lib: add _std_strtol (for lynxos)
+	 include/ast_std.h: add _std_strtol tests
+	 comp/strtod.c: #define S2F_function strtod
+	 misc/signal.c: fix ancient bsd SV_INTERRUPT vs. SV_ABORT clash
 05-01-11 sfio/sfmove.c: try to seek(fr) when fw==0
 	 comp/omitted.c: intercept utimes() too
 	 comp/omitted.c: add DOSPATHVARS env var path value conversions
@@ -5359,6 +5444,8 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+05-03-07 date.c: add --listzones to list the time zone table
+05-02-14 chmod.c: add --reference=file
 05-01-11 cat.c: restore output stream to binary mode on exit
 04-12-15 cp.c: add --preserve high resolution time support
 04-12-08 date.c: add high resolution time support
@@ -5519,6 +5606,7 @@ All recorded changes follow.
 
 :::::::: libdll ::::::::
 
+05-02-14 dllscan.c: "" || "-" => NiL
 04-10-01 dllfind.c: drop ksh "builtin" workaround
 	 dllscan.c: directory prefix in name limits search to dir and siblings
 04-07-22 dllscan.c: access() => eaccess()
@@ -5657,6 +5745,8 @@ All recorded changes follow.
 
 :::::::: libsum ::::::::
 
+05-02-14 sumlib.c: split into sum-*.c
+	 sum-sha2.c: add SHA { 256 384 512 }
 04-02-29 Makefile: compile with $(CC.PIC) for codexlib/sum $(CC.DLL)
 03-12-16 add { crc prng } generic methods and maps[] to these methods
 03-12-16 sum.h,sumlib.c: add sumdata()
@@ -5743,6 +5833,7 @@ All recorded changes follow.
 
 :::::::: libcs ::::::::
 
+05-02-04 Makefile: drop -lnetinet (for lynxos)
 04-07-22 csopen.c,cssend.c,csauth.c,cslocal.c: access() => eaccess()
 04-07-19 cslocal.c: call spawnveg() for standalone 3d
 04-03-25 csrecv.c,cssend.c: OPEN_MAX_CEIL => OPEN_MAX
@@ -5824,6 +5915,7 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+05-02-20 probe.win32: handle /platformsdk mount
 05-01-11 ppargs.c: fix -I-S docs
 	 ppinput.c: ppproto() only for COMPATIBILITY or PLUSPLUS
 04-10-22 ppproto.c: handle `type var[x][y]' arg prototype

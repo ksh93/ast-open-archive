@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2005-01-01 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2005-03-09 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -185,6 +185,7 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 
 .SCAN.cob : .SCAN
 	I|\T COPY % |M$$(.INCLUDE.SUFFIX. cob)|
+	I|\T \D COPY % |M$$(.INCLUDE.SUFFIX. cob)|
 
 $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 

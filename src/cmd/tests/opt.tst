@@ -2415,7 +2415,7 @@ eg \\- test example examples
 .SH OPTIONS
 .OP Q quote string style question
 Quote names according to \\fIstyle\\fP:
- The default value is \\fBquestion\\fP\\&.
+The default value is \\fBquestion\\fP\\&.
 .SH EXAMPLES
 .DS
 \\f5one
@@ -3942,7 +3942,10 @@ IMPLEMENTATION
 "exec|run"
 "Just do it."
 "action:=default"'
-	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC ls "$usage" --man
+
+	EXPORT	LC_ALL=debug LC_MESSAGES=debug
+
+	EXEC ls "$usage" --man
 		OUTPUT - 'return=? option=- name=--man num=0'
 		ERROR - '(libast,3,372)
   ls [ (libast,3,709) ]
