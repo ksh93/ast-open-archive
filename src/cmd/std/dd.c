@@ -1,26 +1,24 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1989-2004 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
-*                         Florham Park NJ                          *
-*                                                                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
-*******************************************************************/
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1989-2004 AT&T Corp.                  *
+*                      and is licensed under the                       *
+*          Common Public License, Version 1.0 (the "License")          *
+*                        by AT&T Corp. ("AT&T")                        *
+*      Any use, downloading, reproduction or distribution of this      *
+*      software constitutes acceptance of the License.  A copy of      *
+*                     the License is available at                      *
+*                                                                      *
+*         http://www.research.att.com/sw/license/cpl-1.0.html          *
+*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                                                      *
+***********************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -449,7 +447,6 @@ main(int argc, char** argv)
 	register Operand_t*	op;
 	register Operand_t*	vp;
 	register int		f;
-	unsigned char*		map;
 	char*			usage;
 	char*			e;
 	int			i;
@@ -801,7 +798,6 @@ main(int argc, char** argv)
 	}
 	else
 	{
-		map = ccmap(state.from.value.number, state.to.value.number);
 		if (!(c = state.ibs.value.number))
 			c = BS;
 		f = state.conv.value.number;
@@ -862,7 +858,6 @@ main(int argc, char** argv)
 							error(ERROR_SYSTEM|2, "%s: %d conversion errors", state.ofn.value.string, ce);
 					}
 				}
-				ccmapstr(map, s, n);
 				switch (f & (LCASE|UCASE))
 				{
 				case LCASE:

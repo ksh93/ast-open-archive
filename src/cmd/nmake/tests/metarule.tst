@@ -606,3 +606,29 @@ cmd :: a.c b.c'
 		OUTPUT - $'+ cc -g -O   -c a.c
 + cc -O   -c bot/b.c
 + cc  -O   -o cmd a.o b.o'
+
+TEST 21 'target equivalents'
+
+	EXEC	-n tst.out
+		INPUT Makefile $'%.out : % .NULL
+% : %.src
+	: generate $(<) from $(*) :
+tst :
+	: generate $(<) :'
+		INPUT tst.out -
+		INPUT aha.src -
+		OUTPUT - $'+ : generate tst :'
+
+	EXEC	-n tst
+
+	EXEC	-n aha
+		OUTPUT - $'+ : generate aha from aha.src :'
+
+	EXEC	-n aha.out
+
+	EXEC	-n -Q0x08000000 aha
+
+	EXEC	-n -Q0x08000000 aha.out
+		OUTPUT -
+		ERROR - $'make: don\'t know how to make aha.out'
+		EXIT 1

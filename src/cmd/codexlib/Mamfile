@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGEROOT ${PACKAGEROOT}
 setv AR ar
@@ -37,7 +37,7 @@ exec - set -
 exec - if	2d test -d aes || mkdir aes
 exec - then	echo  aes: >&2
 exec - 	cd aes
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=aes CC=cc version=2004-10-01 'dontcare test' .RWD.=aes .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=aes CC=cc version=2004-10-11 'dontcare test' .RWD.=aes .RECURSE .INSTALL test
 exec -
 exec - else	echo aes: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -47,7 +47,7 @@ exec - set -
 exec - if	2d test -d compress || mkdir compress
 exec - then	echo  compress: >&2
 exec - 	cd compress
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=compress CC=cc version=2004-10-01 'dontcare test' .RWD.=compress .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=compress CC=cc version=2004-10-11 'dontcare test' .RWD.=compress .RECURSE .INSTALL test
 exec -
 exec - else	echo compress: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -57,7 +57,7 @@ exec - set -
 exec - if	2d test -d crypt || mkdir crypt
 exec - then	echo  crypt: >&2
 exec - 	cd crypt
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=crypt CC=cc version=2004-10-01 'dontcare test' .RWD.=crypt .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=crypt CC=cc version=2004-10-11 'dontcare test' .RWD.=crypt .RECURSE .INSTALL test
 exec -
 exec - else	echo crypt: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -67,7 +67,7 @@ exec - set -
 exec - if	2d test -d lzd || mkdir lzd
 exec - then	echo  lzd: >&2
 exec - 	cd lzd
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzd CC=cc version=2004-10-01 'dontcare test' .RWD.=lzd .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzd CC=cc version=2004-10-11 'dontcare test' .RWD.=lzd .RECURSE .INSTALL test
 exec -
 exec - else	echo lzd: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -77,7 +77,7 @@ exec - set -
 exec - if	2d test -d lzh || mkdir lzh
 exec - then	echo  lzh: >&2
 exec - 	cd lzh
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzh CC=cc version=2004-10-01 'dontcare test' .RWD.=lzh .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzh CC=cc version=2004-10-11 'dontcare test' .RWD.=lzh .RECURSE .INSTALL test
 exec -
 exec - else	echo lzh: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -87,7 +87,7 @@ exec - set -
 exec - if	2d test -d lzx || mkdir lzx
 exec - then	echo  lzx: >&2
 exec - 	cd lzx
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzx CC=cc version=2004-10-01 'dontcare test' .RWD.=lzx .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=lzx CC=cc version=2004-10-11 'dontcare test' .RWD.=lzx .RECURSE .INSTALL test
 exec -
 exec - else	echo lzx: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -97,7 +97,7 @@ exec - set -
 exec - if	2d test -d quantum || mkdir quantum
 exec - then	echo  quantum: >&2
 exec - 	cd quantum
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=quantum CC=cc version=2004-10-01 'dontcare test' .RWD.=quantum .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=quantum CC=cc version=2004-10-11 'dontcare test' .RWD.=quantum .RECURSE .INSTALL test
 exec -
 exec - else	echo quantum: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -107,7 +107,7 @@ exec - set -
 exec - if	2d test -d rar || mkdir rar
 exec - then	echo  rar: >&2
 exec - 	cd rar
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=rar CC=cc version=2004-10-01 'dontcare test' .RWD.=rar .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=rar CC=cc version=2004-10-11 'dontcare test' .RWD.=rar .RECURSE .INSTALL test
 exec -
 exec - else	echo rar: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -117,7 +117,7 @@ exec - set -
 exec - if	2d test -d sum || mkdir sum
 exec - then	echo  sum: >&2
 exec - 	cd sum
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=sum CC=cc version=2004-10-01 'dontcare test' .RWD.=sum .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=sum CC=cc version=2004-10-11 'dontcare test' .RWD.=sum .RECURSE .INSTALL test
 exec -
 exec - else	echo sum: warning: cannot recurse on virtual directory >&2
 exec - fi
@@ -127,7 +127,7 @@ exec - set -
 exec - if	2d test -d zip || mkdir zip
 exec - then	echo  zip: >&2
 exec - 	cd zip
-exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=zip CC=cc version=2004-10-01 'dontcare test' .RWD.=zip .RECURSE .INSTALL test
+exec - 	${NMAKE} ${NMAKEFLAGS} --errorid=zip CC=cc version=2004-10-11 'dontcare test' .RWD.=zip .RECURSE .INSTALL test
 exec -
 exec - else	echo zip: warning: cannot recurse on virtual directory >&2
 exec - fi

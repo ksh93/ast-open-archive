@@ -555,7 +555,7 @@ bbb
 #else
 ddd
 #endif'
-		OUTPUT - $'# 1 ""\n\n\nbbb\n\n'
+		OUTPUT - $'# 1 ""\n\n\n\nbbb\n\n'
 		ERROR - $'cpp: line 3: warning: ifdef: invalid characters after directive
 cpp: line 5: more than one #else for #if
 cpp: line 5: warning: ifndef: invalid characters after directive
@@ -571,7 +571,6 @@ bbb
 #else
 ddd
 #endif'
-		OUTPUT - $'# 1 ""\n\n\nbbb\n\n'
 		ERROR - $'cpp: line 3: warning: if: invalid characters after directive
 cpp: line 5: more than one #else for #if
 cpp: line 5: warning: if: invalid characters after directive
@@ -2770,7 +2769,7 @@ fishy( fishy( 4))'
 #endif
 \nmain(){}'
 		OUTPUT - $'# 1 ""
-\n\n\nmain(){}'
+\n\n\n\n\n\nmain(){}'
 		ERROR -
 		EXIT 0
 	EXEC -I-D
@@ -3064,8 +3063,8 @@ xglue(HIGH, LOW);'
 \tprintf("bad\\n");
 #endif
 }'
-		OUTPUT - $'# 1 ""\nvoid a() {\n\n\n\tprintf("good\\n");\n\n}
-\nvoid b() { \n\n\tprintf("good\\n");\n\n\n}'
+		OUTPUT - $'# 1 ""\nvoid a() {\n\n\n\n\tprintf("good\\n");\n\n}
+\nvoid b() { \n\n\tprintf("good\\n");\n\n\n\n}'
 	EXEC -I-D
 		INPUT - $'#define echo(a)\t{ a }
 #define x\t2 * x
@@ -3571,36 +3570,37 @@ TEST 21 '#if expressions'
 		INPUT - $'#define ENV_SEP \':\'
 #define IS_ENV_SEP(ch) ((ch) == ENV_SEP)
 #if \':\' == ENV_SEP
-ok
+y : 4 : __LINE__
 #else
-bad
+n : 6 : __LINE__
 #endif
 #if (\':\') == ENV_SEP
-ok
+y : 9 : __LINE__
 #else
-bad
+n : 11 : __LINE__
 #endif
 #if (\':\' == ENV_SEP)
-ok
+y : 14 : __LINE__
 #else
-bad
+n : 16 : __LINE__
 #endif
 #if ((\':\') == ENV_SEP)
-ok
+y : 19 : __LINE__
 #else
-bad
+n : 21 : __LINE__
 #endif
 #if IS_ENV_SEP(\':\')
-ok
+y : 24 : __LINE__
 #else
-bad
+n : 26 : __LINE__
 #endif
 #if IS_ENV_SEP(\';\')
-bad
+n : 29 : __LINE__
 #else
-ok
+y : 31 : __LINE__
 #endif'
-		OUTPUT - $'# 1 ""\n\n\n\nok\n\n\n\nok\n\n\n\nok\n\n\n\nok\n\n\n\nok\n\n\n\nok'
+		OUTPUT - $'# 1 ""\n\n\n\ny : 4 : 4\n\n\n\n\ny : 9 : 9\n\n\n\n
+y : 14 : 14\n\n\n\n\ny : 19 : 19\n\n\n\n\ny : 24 : 24\n\n\n\n\n\n\ny : 31 : 31'
 
 	EXEC -I-D
 		INPUT - $'#if 0x10 == 020
@@ -4384,6 +4384,56 @@ __LINE__'
 #define a*/
 32 : __LINE__'
 		OUTPUT - $'# 1 ""\n1 : 1\n#pragma pass it on\n3 : 3\n \n# 32\n32 : 32'
+
+	EXEC -I-D -DN
+		INPUT - $'1 : __LINE__
+#if N
+3 : __LINE__
+#else
+5 : __LINE__
+6 : __LINE__
+#endif
+8 : __LINE__
+#if !N
+10 : __LINE__
+#else
+12 : __LINE__
+13 : __LINE__
+#endif
+15 : __LINE__'
+		OUTPUT - $'# 1 ""
+1 : 1
+
+3 : 3
+
+
+
+
+8 : 8
+
+
+
+12 : 12
+13 : 13
+
+15 : 15'
+	EXEC -I-D
+		OUTPUT - $'# 1 ""
+1 : 1
+
+
+
+5 : 5
+6 : 6
+
+8 : 8
+
+10 : 10
+
+
+
+
+15 : 15'
 
 TEST 29 'more hidden lines'
 

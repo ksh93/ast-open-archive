@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-09-24 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-10-01 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2684,7 +2684,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	return $(X:/\([A-Za-z_.][A-Za-z0-9_.]*\)/"$$(.PACKAGE.\1.found)"=="1"/G:@/"  *"/" \&\& "/G:E)
 
 ":PACKAGE:" : .MAKE .OPERATOR
-	local A H I T N P V version insert=0 install=1 library=-l options=1
+	local A H I T N O P V version insert=0 install=1 library=-l options=1
 	if "$(<)"
 		/* a separate include handles package definitions */
 		eval
@@ -2715,10 +2715,9 @@ PACKAGES : .SPECIAL .FUNCTION
 			install = 0
 		elif T == "--"
 			options = 0
-		elif T == "--*" && options
-			set $(T)
-		elif T == ":*" || T == "*=*" && T != "*:*"
-			for N $(T:/^--//:/:/ /G)
+		elif T == ":*" || T == "--*" && options || T != "--*" && T == "*=*" && T != "*:*"
+			for O $(T:/:/ /G)
+				N := $(O:/^--//)
 				if N == "no*"
 					V := 0
 					N := $(N:/no//)
@@ -2774,8 +2773,6 @@ PACKAGES : .SPECIAL .FUNCTION
 					else
 						library := -l
 					end
-				elif N == "debug|profile|threads"
-					set $(V:~no)$(N)
 				elif N == "insert|install|version"
 					$(N) := $(V)
 				elif N == "registry"
@@ -2786,6 +2783,8 @@ PACKAGES : .SPECIAL .FUNCTION
 					else
 						PACKAGE_IGNORE := $(V)
 					end
+				elif O == "--*" || N == "debug|profile|threads"
+					set $(O)
 				end
 			end
 		elif T == "[-+]*"

@@ -828,3 +828,17 @@ tst : .MAKE
 	set test-=0x010
 	print $(-test:F=0x%08x)'
 		OUTPUT - $'0x00000000\n0x00000001\n0x00000000\n0x00000100\n0x00000111\n0x00000101\n0x00000010\n0x00000040\n0x00000030'
+
+TEST 14 '$(-option) variations'
+
+	EXEC	-n --noforce --nojobs
+		INPUT Makefile $'all : tst
+tst :
+	:$(-F):$(-force):$(-noforce):$(-j):$(-jobs):$(-nojobs):
+	:$(--F):$(--force):$(--noforce):$(--j):$(--jobs):$(--nojobs):'
+		OUTPUT - $'+ :::1:::1:
++ :--noforce:--noforce:--noforce:--nojobs:--nojobs:--nojobs:'
+
+	EXEC	-n --force --jobs=4
+		OUTPUT - $'+ :1:1::4:4::
++ :--force:--force:--force:--jobs=4:--jobs=4:--jobs=4:'

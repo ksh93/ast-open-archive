@@ -1,27 +1,25 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1996-2004 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                          AT&T Research                           *
-*                         Florham Park NJ                          *
-*                                                                  *
-*                 Phong Vo <kpv@research.att.com>                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
-*******************************************************************/
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1996-2004 AT&T Corp.                  *
+*                      and is licensed under the                       *
+*          Common Public License, Version 1.0 (the "License")          *
+*                        by AT&T Corp. ("AT&T")                        *
+*      Any use, downloading, reproduction or distribution of this      *
+*      software constitutes acceptance of the License.  A copy of      *
+*                     the License is available at                      *
+*                                                                      *
+*         http://www.research.att.com/sw/license/cpl-1.0.html          *
+*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                   Phong Vo <kpv@research.att.com>                    *
+*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                                                      *
+***********************************************************************/
 #include	"rshdr.h"
 
 /*	Process a bunch of records
@@ -139,11 +137,18 @@ ssize_t	s_data;		/* data size		*/
 				if(rs->events & RS_READ)
 				{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
 						return -1;
-					else if(n > 0)
+					datalen = r->datalen;
+					if(n == RS_DELETE)
 						RSFREE(rs, r);
 					else if((*insertf)(rs,r) < 0)
 						return -1;
-					datalen = r->datalen;
+					else
+					{	rs->count += 1;
+						if (n == RS_INSERT)
+						{	p_loop += datalen;
+							continue;
+						}
+					}
 				}
 				else if((*insertf)(rs,r) < 0)
 					return -1;
@@ -156,7 +161,7 @@ ssize_t	s_data;		/* data size		*/
 			goto next_loop;
 		}
 
-		for(;;)
+		do
 		{	if(single)
 				datalen = s_data;
 			else if(dsamelen) /* fixed length records */
@@ -175,6 +180,7 @@ ssize_t	s_data;		/* data size		*/
 				datalen = (endd - data) + 1;
 			}
 
+		insert:
 			if(!RSALLOC(rs,r))
 				return -1;
 
@@ -231,22 +237,25 @@ ssize_t	s_data;		/* data size		*/
 			if(rs->events & RS_READ)
 			{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
 					return -1;
-				else if(n > 0)
+				datalen = r->datalen;
+				if(n == RS_DELETE)
 					RSFREE(rs, r);
 				else if((*insertf)(rs,r) < 0)
 					return -1;
-				datalen = r->datalen;
+				else
+				{	rs->count += 1;
+					p_loop += datalen;
+					if (n == RS_INSERT)
+						goto insert;
+				}
 			}
 			else if((*insertf)(rs,r) < 0)
 				return -1;
 			else
 				rs->count += 1;
-
 			data += datalen;
 			p_loop += datalen;
-			if((s_loop -= datalen) <= 0)
-				break;
-		}
+		} while ((s_loop -= datalen) > 0);
 	next_loop:
 		s_process += p_loop;
 		rs->c_size -= s_loop;

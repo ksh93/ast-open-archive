@@ -1,3 +1,5 @@
+04-09-28 recsort.h: add { RS_TERMINATE RS_DELETE RS_ACCEPT RS_INSERT }
+	 rsprocess.c,rswrite.c: initial RS_INSERT code -- not right yet
 04-08-11 rskeydump.c: list key.nproc if >1
 04-06-15 rsprocess.c: fix V format record read
 04-02-11 rskey.c: fix old ast reclen:fieldlen:offset parse

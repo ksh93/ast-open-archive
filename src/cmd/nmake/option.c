@@ -1,26 +1,24 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1984-2004 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                          AT&T Research                           *
-*                         Florham Park NJ                          *
-*                                                                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
-*******************************************************************/
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                      and is licensed under the                       *
+*          Common Public License, Version 1.0 (the "License")          *
+*                        by AT&T Corp. ("AT&T")                        *
+*      Any use, downloading, reproduction or distribution of this      *
+*      software constitutes acceptance of the License.  A copy of      *
+*                     the License is available at                      *
+*                                                                      *
+*         http://www.research.att.com/sw/license/cpl-1.0.html          *
+*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                                                      *
+***********************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -337,12 +335,20 @@ putoption(register struct option* op, int index)
 				sfputc(internal.tmp, c);
 		hashput(opt.table, strdup(sfstruse(internal.tmp)), (char*)op);
 	}
-	buf[0] = '-';
-	buf[1] = OPT(op->flags);
-	buf[2] = 0;
+	if (op->flags & Of)
+		sfsprintf(buf, sizeof(buf), "+%d", OPT(op->flags));
+	else
+	{
+		buf[0] = '-';
+		buf[1] = OPT(op->flags);
+		buf[2] = 0;
+	}
 	hashput(opt.table, strdup(buf), (char*)op);
-	sfsprintf(buf, sizeof(buf), "-%d", index);
-	hashput(opt.table, strdup(buf), (char*)op);
+	if (index >= elementsof(options))
+	{
+		sfsprintf(buf, sizeof(buf), "-%d", index);
+		hashput(opt.table, strdup(buf), (char*)op);
+	}
 }
 
 /*
@@ -382,11 +388,16 @@ struct option*
 optflag(register int flag)
 {
 	register struct option*	op;
-	char			buf[3];
+	char			buf[8];
 
-	buf[0] = '-';
-	buf[1] = OPT(flag);
-	buf[2] = 0;
+	if (flag & Of)
+		sfsprintf(buf, sizeof(buf), "+%d", OPT(flag));
+	else
+	{
+		buf[0] = '-';
+		buf[1] = OPT(flag);
+		buf[2] = 0;
+	}
 	if (!(op = getoption(buf)) && (flag & ~((1<<8)-1)))
 		error(ERROR_PANIC, "%s: unknown option flag", buf);
 	return op;
@@ -729,6 +740,8 @@ setop(register struct option* op, register int n, char* s, int type)
 				opt.hidden = opt.lasthidden = x;
 			return;
 		}
+		if (error_info.trace <= -3)
+			error(-3, "option(%s,%d,\"%s\")", showop(op), n,  s ? s : null);
 	}
 	if (type != ':')
 	{
@@ -743,8 +756,6 @@ setop(register struct option* op, register int n, char* s, int type)
 	}
 	if (state.reading)
 		op->flags |= OPT_COMPILE;
-	if (error_info.trace <= -3)
-		error(-3, "option(%s,%d,\"%s\")", showop(op), n,  s ? s : null);
 	if (op->flags & Oi)
 	{
 		if (op->flags & On)
@@ -1322,6 +1333,11 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 	case '#':
 		sfprintf(sp, "%s=", showop(op));
 		break;
+	case 0:
+		break;
+	default:
+		flag &= ~Oi;
+		break;
 	}
 	switch (op->flags & (Ob|On|Os))
 	{
@@ -1330,9 +1346,9 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 			n = *((unsigned char*)op->value);
 		else
 			n = 0;
-		if (op->flags & Oi)
+		if ((op->flags & Oi) ^ (flag & Oi))
 			n = !n;
-		if (flag && (op->flags & Oo))
+		if ((flag & Of) && (op->flags & Oo))
 			n = !n;
 		switch (setting)
 		{
@@ -1366,6 +1382,8 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 			n = 0;
 		if (op->flags & Oi)
 			n = -n;
+		if (flag & Oi)
+			n = !n;
 		switch (setting)
 		{
 		case 0:
@@ -1389,7 +1407,7 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 		sfprintf(sp, (op->flags & Oa) ? "0x%08lx" : "%ld", n);
 		break;
 	case Os:
-		if ((op->flags & Oa) && op->value)
+		if ((op->flags & Oa) && op->value && !(flag & Oi))
 		{
 			p = (*(struct rule**)op->value)->prereqs;
 			switch (setting)
@@ -1423,7 +1441,7 @@ genop(register Sfio_t* sp, register struct option* op, int setting, int flag)
 		}
 		else
 		{
-			if (op->value)
+			if (op->value && !(flag & Oi))
 				v = *((char**)op->value);
 			else
 				v = 0;
@@ -1599,9 +1617,9 @@ void
 getop(register Sfio_t* sp, char* name, int setting)
 {
 	register struct option*	op;
-	int			flag = 0;
+	int			flag;
 
-	if ((op = getoption(name)) || name[0] && !name[1] && (op = optflag(name[0])) && (flag = 1))
+	if ((op = getoption(name)) && !(flag = 0) || name[0] == 'n' && name[1] == 'o' && (op = getoption(&name[2])) && (flag = Oi) || name[0] && !name[1] && (op = optflag(name[0])) && (flag = Of))
 		genop(sp, op, setting, flag);
 }
 

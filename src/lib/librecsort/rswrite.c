@@ -1,27 +1,25 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
-*                         Florham Park NJ                          *
-*                                                                  *
-*                 Phong Vo <kpv@research.att.com>                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
-*******************************************************************/
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1996-2004 AT&T Corp.                  *
+*                      and is licensed under the                       *
+*          Common Public License, Version 1.0 (the "License")          *
+*                        by AT&T Corp. ("AT&T")                        *
+*      Any use, downloading, reproduction or distribution of this      *
+*      software constitutes acceptance of the License.  A copy of      *
+*                     the License is available at                      *
+*                                                                      *
+*         http://www.research.att.com/sw/license/cpl-1.0.html          *
+*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                   Phong Vo <kpv@research.att.com>                    *
+*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                                                      *
+***********************************************************************/
 #include	"rshdr.h"
 
 /*	Writing sorted objects.
@@ -31,17 +29,28 @@
 
 #define NOTIFY(rs,r,rsrv,endrsrv,cur,out,n) \
 	do { \
+		tmp.data = r->data; \
+		tmp.datalen = r->datalen; \
 		for (;;) \
-		{ \
-			out.data = cur; \
-			out.datalen = n = endrsrv - cur; \
-			if (rsnotify(rs, RS_WRITE, r, &out, rs->disc) < 0) \
-				return -1; \
-			if (n >= out.datalen) \
+		{	for (;;) \
+			{	out.data = cur; \
+				out.datalen = n = endrsrv - cur; \
+				if ((c = rsnotify(rs, RS_WRITE, r, &out, rs->disc)) < 0) \
+					return -1; \
+				if (c == RS_DELETE) \
+				{	out.datalen = 0; \
+					break; \
+				} \
+				if (n >= out.datalen) \
+					break; \
+				RESERVE(rs,f,rsrv,endrsrv,cur,out.datalen); \
+			} \
+			cur += out.datalen; \
+			if (c != RS_INSERT) \
 				break; \
-			RESERVE(rs,f,rsrv,endrsrv,cur,out.datalen); \
+			r->data = tmp.data; \
+			r->datalen = tmp.datalen; \
 		} \
-		cur += out.datalen; \
 	} while (0)
 
 #define RESERVE(rs,f,rsrv,endrsrv,cur,w) \
@@ -74,9 +83,21 @@ int	type;	/* RS_TEXT 		*/
 	reg Rsobj_t	*r, *e, *o;
 	reg uchar	*d, *cur, *endrsrv, *rsrv;
 	ssize_t		w, head, n;
-	int		local, flags, u;
+	int		local, flags, u, c;
 	Rsobj_t		out;
+	Rsobj_t		tmp;
+	Rsobj_t		usr;
 
+#if 0
+	if(type == RS_OTEXT && (rs->events & RS_READ))
+	{	usr.data = 0;
+		usr.datalen = 0;
+		if((n = rsnotify(rs,RS_READ,&usr,(Void_t*)0,rs->disc))<0)
+			return -1;
+		if(n == RS_INSERT && rsprocess(rs, usr.data, usr.datalen) < 0)
+			return -1;
+	}
+#endif
 	if(GETLOCAL(rs,local))
 	{	rsrv = rs->rsrv; endrsrv = rs->endrsrv; cur = rs->cur;
 		r = rs->sorted;
@@ -98,8 +119,21 @@ int	type;	/* RS_TEXT 		*/
 	{	u = (rs->events & RS_WRITE) != 0;
 		if((rs->type&RS_UNIQ) && (rs->events & RS_SUMMARY))
 		{	for(; r; r = r->right)
-			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,0,rs->disc) < 0)
-					return -1;
+			{	if(r->equal)
+				{	tmp.data = r->data;
+					tmp.datalen = r->datalen;
+					if((c = RSNOTIFY(rs,RS_SUMMARY,r,0,rs->disc)) < 0)
+						return -1;
+					if(c == RS_DELETE)
+						continue;
+					if(c == RS_INSERT)
+					{	usr = *r;
+						usr.data = tmp.data;
+						usr.datalen = tmp.datalen;
+						usr.right = r;
+						r = &usr;
+					}
+				}
 				w = r->datalen;
 				RESERVE(rs,f,rsrv,endrsrv,cur,w);
 				if (u)
@@ -187,8 +221,21 @@ int	type;	/* RS_TEXT 		*/
 
 		if((rs->type&RS_UNIQ) && (rs->events & RS_SUMMARY))
 		{	for(; r; r = r->right)
-			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,0,rs->disc) < 0)
-					return -1;
+			{	if(r->equal)
+				{	tmp.data = r->data;
+					tmp.datalen = r->datalen;
+					if((c = RSNOTIFY(rs,RS_SUMMARY,r,0,rs->disc)) < 0)
+						return -1;
+					if(c == RS_DELETE)
+						continue;
+					if(c == RS_INSERT)
+					{	usr = *r;
+						usr.data = tmp.data;
+						usr.datalen = tmp.datalen;
+						usr.right = r;
+						r = &usr;
+					}
+				}
 				w = (n = r->datalen) + head;
 				RESERVE(rs,f,rsrv,endrsrv,cur,w);
 				if(head)

@@ -44,7 +44,7 @@ This package is a superset of the following packages: ast-base ast-make ast-ksh 
 The software is covered by this license:
 <UL type=square>
 <LI>
-	<A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+	<A href="http://www.research.att.com/sw/license/cpl-1.0.html">http://www.research.att.com/sw/license/cpl-1.0.html</A>
 </UL>
 Individual components may be covered by separate licenses;
 refer to the component source and/or binaries for more information.
@@ -1032,7 +1032,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-04-09-03  --- Release ksh93p+  ---
+04-10-05  --- Release ksh93p+  ---
+04-10-05  The .paths file, introduced in ksh93m, which can appear in
+	  any directory in PATH, now allows a line of the form
+	  BUILTIN_LIB=libname.  When a command is searched for this directory,
+	  the shared library named by libname will first be searched for a
+	  built-in version of the command.
 04-09-03  &lt;&lt;&lt; here documents now handle quotes in the word token correctly. 
 04-08-08  The maximum size for read -n and and read -N was increased from
 	  4095 to 32M.
@@ -2563,6 +2568,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 proto.c: add CPL docs
 04-09-24 sear.sh: add cc -c to avoid nativepp "ratz.c" message
 04-05-20 proto.tst: add `int fun __P((int));' test
 04-03-19 proto.c: add { .cpp .hpp }, fix standalone -c parse
@@ -2669,6 +2675,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 features/syslib: _exit test now uses SIGKILL (openbsd abort() hangs)
 04-07-26 3d.sh: update runtime docs
 	 3d.1: drop in deference to the 3d.sh runtime docs
 04-07-20 3d.h: undef _BLD_DEBUG to avoid raw libast symbols
@@ -2890,6 +2897,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="cpp changes">cpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 cpp.tst: adjust for hidden line patch
 04-08-11 cpp.tst: adjust for ppproto.c patch
 03-12-12 cpp.tst: add empty macro actual tests
 03-11-25 cpp.tst: add -D-d test
@@ -2975,11 +2983,17 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 metarule.c: metaget assumes % target for ... : % .NULL (-Q0x08000000)
+	 scan.c: add \T token match for (\D|\V)
+	 Makerules.mk: :PACKAGE: --option checked first, "set" by default
+	 Scanrules.mk: .SCAN.cob COPY has "\T" lead-in instead of " \D"
+04-09-28 expand.c: fix operator separator parse (edit#17)
+	 option.c: fix $(-c) option flag lookup (option#14)
 04-09-24 option.c: optcheck() after each option table change
 04-09-21 add --option prereq scope with getopt() style "--" terminator
 	 expand.c: :P=A: now acts like :P=L!:
 	 Makerules.mk: fix $(-static) =&gt; $(-static-link)
-	 Makerules.mk: /bin/cat.exe =&gt; "%.exe : % .MAKE &gt;NULL"
+	 Makerules.mk: /bin/cat.exe =&gt; "%.exe : % .NULL"
 04-09-09 expand.c: add :T=QO: (isoption()) and :T=QR: (!!getrule())
 	 object.c: finally stomp the complist() panic via compcheck()
 	 object.c: fix loadstring() to detect early EOF
@@ -4077,6 +4091,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 fmt.tst: update for --optget
+04-09-30 od.c: -v does not accept an offset operand
 04-08-08 uuencode.c: fix -x docs, add -b == --method=binhex
 04-07-22 look.c: access() =&gt; eaccess()
 04-07-01 pr.c: add -c and -v via sfio input discipline
@@ -6418,6 +6434,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sort changes">sort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-28 main.c: fix ERROR_USAGE logic
 04-08-11 main.c: add #intermediates to -Xdump, limit intermediates to 64
 04-07-22 main.c: acces() =&gt; eaccess()
 04-06-16 main.c: -R% -R- use recfmt() to sample for record format
@@ -6467,6 +6484,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 dd.c: drop ancient unused map code
 04-09-14 ls.c: add -w&#0091;linesX&#0093;cols, last col must be visible in window
 04-07-17 ls.c: rename -f =&gt; -Z, add x/open -f
 04-03-28 ls.c: add variable column widths for minimal { -C -x } footprint
@@ -6817,6 +6835,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 normalize ident stamps
+	 port/astlicense.c: add type=cpl -- yeah
 04-09-25 string/swapop.c: return op &lt; size -- duh
 04-09-23 comp/spawnveg.c: :NOOPTIMIZE: -- volatile sometimes ignored
 04-09-21 comp/spawnveg.c: exec_errno_ptr is volatile -- duh
@@ -8026,6 +8046,11 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-11 fmt.c: fix -o,--optget sublist bugs
+04-10-08 pathchk.c: add empty path and -p - first component char
+04-10-01 fmt.c: add -o,--optget concatenated usage string format
+	 stty.c: context is ERROR_INTERCATIVE
+	 rm.c: restore 3d before exit
 04-09-24 pathchk.c: fix docs
 04-09-14 date.c: add %| and %&amp; --parse docs
 04-08-27 cp.c: add FTW_DC check -- duh
@@ -8172,6 +8197,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdll changes">libdll changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 dllfind.c: drop ksh "builtin" workaround
+	 dllscan.c: directory prefix in name limits search to dir and siblings
 04-07-22 dllscan.c: access() =&gt; eaccess()
 04-01-30 dllfind.c: dllplug(error_info.id) then dllplug(0)
 04-01-28 dllscan.c: update for new plugin scheme: lib/foo/bar.xxx
@@ -8261,6 +8288,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="librecsort changes">librecsort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-09-28 recsort.h: add { RS_TERMINATE RS_DELETE RS_ACCEPT RS_INSERT }
+	 rsprocess.c,rswrite.c: initial RS_INSERT code -- not right yet
 04-08-11 rskeydump.c: list key.nproc if &gt;1
 04-06-15 rsprocess.c: fix V format record read
 04-02-11 rskey.c: fix old ast reclen:fieldlen:offset parse
@@ -8498,6 +8527,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+04-10-01 pplex.c: really fix directive hidden newline logic
 04-08-31 pplex.c: fix directive hidden newline logic
 	 ppcall.c: fix '(' peek bug that missed the MARK
 04-08-30 add pragma pp:pragmaflags PP_PRAGMAFLAGS, pp:system_header
@@ -9155,7 +9185,7 @@ End:
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>September 28, 2004</TD>
+<TD align=right>October 12, 2004</TD>
 </TR>
 </TABLE>
 <P>

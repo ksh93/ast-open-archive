@@ -1,3 +1,4 @@
+04-10-01 cpp.tst: adjust for hidden line patch
 04-08-11 cpp.tst: adjust for ppproto.c patch
 03-12-12 cpp.tst: add empty macro actual tests
 03-11-25 cpp.tst: add -D-d test

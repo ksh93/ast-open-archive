@@ -145,16 +145,22 @@ TEST 02 'ast ascii <=> ebcdic conversion'
 	EXEC	if=a.dat conv=a2e
 		ERROR - $'0+1 records in\n0+1 records out'
 		SAME OUTPUT e.dat
+	EXEC	if=a.dat from=a to=e
 	EXEC	if=a.dat conv=a2i
 		SAME OUTPUT i.dat
+	EXEC	if=a.dat from=a to=i
 	EXEC	if=a.dat conv=a2o
 		SAME OUTPUT o.dat
+	EXEC	if=a.dat from=a to=o
 	EXEC	if=e.dat conv=e2a
 		SAME OUTPUT a.dat
+	EXEC	if=e.dat from=e to=a
 	EXEC	if=i.dat conv=i2a
 		SAME OUTPUT i2a.dat
+	EXEC	if=i.dat from=i to=a
 	EXEC	if=o.dat conv=o2a
 		SAME OUTPUT a.dat
+	EXEC	if=o.dat from=o to=a
 
 TEST 03 'record report'
 	DO	DATA k

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-09-24
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-10-01
 setv INSTALLROOT ${INSTALLROOT}
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -179,7 +179,7 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 210 in
+exec - "")	case 209 in
 exec - 	0)	cp warp.sh warp
 exec - 		;;
 exec - 	*)	{
@@ -188,7 +188,7 @@ exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
 exec - 		cat - warp.sh <<'!'
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
 exec - !
 exec - 		} > warp
 exec - 		;;
@@ -196,7 +196,7 @@ exec - 	esac
 exec - 	;;
 exec - *)	cat - warp.sh > warp <<'!'
 exec - ${mam_cc_SHELLMAGIC}
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/cpl-1.0.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
 exec - !
 exec - 	;;
 exec - esac

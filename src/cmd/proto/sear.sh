@@ -1,31 +1,30 @@
-####################################################################
-#                                                                  #
-#             This software is part of the ast package             #
-#                Copyright (c) 1990-2004 AT&T Corp.                #
-#        and it may only be used by you under license from         #
-#                       AT&T Corp. ("AT&T")                        #
-#         A copy of the Source Code Agreement is available         #
-#                at the AT&T Internet web site URL                 #
-#                                                                  #
-#       http://www.research.att.com/sw/license/ast-open.html       #
-#                                                                  #
-#    If you have copied or used this software without agreeing     #
-#        to the terms of the license you are infringing on         #
-#           the license and copyright and are violating            #
-#               AT&T's intellectual property rights.               #
-#                                                                  #
-#            Information and Software Systems Research             #
-#                          AT&T Research                           #
-#                         Florham Park NJ                          #
-#                                                                  #
-#               Glenn Fowler <gsf@research.att.com>                #
-#                                                                  #
-####################################################################
+########################################################################
+#                                                                      #
+#               This software is part of the ast package               #
+#                  Copyright (c) 1990-2004 AT&T Corp.                  #
+#                      and is licensed under the                       #
+#          Common Public License, Version 1.0 (the "License")          #
+#                        by AT&T Corp. ("AT&T")                        #
+#      Any use, downloading, reproduction or distribution of this      #
+#      software constitutes acceptance of the License.  A copy of      #
+#                     the License is available at                      #
+#                                                                      #
+#         http://www.research.att.com/sw/license/cpl-1.0.html          #
+#         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         #
+#                                                                      #
+#              Information and Software Systems Research               #
+#                            AT&T Research                             #
+#                           Florham Park NJ                            #
+#                                                                      #
+#                 Glenn Fowler <gsf@research.att.com>                  #
+#                                                                      #
+########################################################################
 : self extracting archive generator for ratz
 
 COMMAND=sear
-cc="ncc -D_DLL -O -Y-Os"
+cc="ncc -O -Y-Os"
 cmd="dir"
+dyn=-D_DLL
 ico=
 opt=
 out=install.exe
@@ -35,7 +34,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2004-09-24 $
+@(#)$Id: sear (AT&T Labs Research) 2004-09-28 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -52,6 +51,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 	was specified when the archive was generated then \acommand\a
 	is executed by \bCMD.EXE\b. The temporary directory is then
 	removed.]
+[b:bootstrap?Statically link compiler-specific libraries.]
 [c:cc?The C compiler command and flags are set to \acc\a.]:[cc:='$cc$']
 [i:icon?The resource icon is set to
 	\aicon\a.]:[icon:=$INSTALLROOT/lib/sear/sear.ico]
@@ -88,6 +88,8 @@ usage()
 
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
+	b)	dyn=-Bstatic
+		;;
 	c)	cc=$OPTARG
 		;;
 	i)	ico=$OPTARG
@@ -152,6 +154,7 @@ esac
 case $opt in
 ?*)	cc="$cc -D_SEAR_OPTS=\"-$opt\"" ;;
 esac
+cc="$cc $dyn"
 
 tmp=/tmp/sear$$
 obj=${src##*/}

@@ -1,8 +1,14 @@
+04-10-01 metarule.c: metaget assumes % target for ... : % .NULL (-Q0x08000000)
+	 scan.c: add \T token match for (\D|\V)
+	 Makerules.mk: :PACKAGE: --option checked first, "set" by default
+	 Scanrules.mk: .SCAN.cob COPY has "\T" lead-in instead of " \D"
+04-09-28 expand.c: fix operator separator parse (edit#17)
+	 option.c: fix $(-c) option flag lookup (option#14)
 04-09-24 option.c: optcheck() after each option table change
 04-09-21 add --option prereq scope with getopt() style "--" terminator
 	 expand.c: :P=A: now acts like :P=L!:
 	 Makerules.mk: fix $(-static) => $(-static-link)
-	 Makerules.mk: /bin/cat.exe => "%.exe : % .MAKE >NULL"
+	 Makerules.mk: /bin/cat.exe => "%.exe : % .NULL"
 04-09-09 expand.c: add :T=QO: (isoption()) and :T=QR: (!!getrule())
 	 object.c: finally stomp the complist() panic via compcheck()
 	 object.c: fix loadstring() to detect early EOF

@@ -636,3 +636,57 @@ main() { return STATUS; }'
 
 	EXEC	-n
 		INPUT Makeargs $'MAKEPATH = $(PWD):src'
+
+TEST 21 '.SCAN.tst'
+
+	EXEC	-n
+		INPUT Makefile $'.SCAN.tst : .SCAN
+	I|\\T COPY % |M$$(.TST.SUFFIX. tst)|
+include "scan.mk"'
+		INPUT scan.mk $'.SUFFIX.HEADER.tst = .hdr .tst
+.TST.SUFFIX. : .FUNCTION
+	local F L S T
+	L := $(%:O=1)
+	F := $(%%:/ .*//:/\\.$//:/\'\\(.*\\)\'/\\1/)
+	if ! "$(F:S)"
+		for S $(.SUFFIX.HEADER.$(L)) $(<<:S)
+			T := $(F)$(S)
+			$(T) : .SCAN.$(L)
+			if "$(T:T=F)"
+				F := $(T)
+				break
+			end
+		end
+	end
+	return $(F)
+.ATTRIBUTE.%.tst : .SCAN.tst 
+all : a.tst
+	: $(!:H) :'
+		INPUT a.tst $'123456 COPY aaa.
+       COPY bbb.
+ABCDEF COPY ccc REPLACING
+      *COPY ddd REPLACING
+ABCDE *COPY ddd REPLACING
+ABCDEF*COPY ddd REPLACING'
+		INPUT aaa.hdr -
+		INPUT bbb.tst -
+		INPUT ccc
+		OUTPUT - $'+ : a.tst aaa.hdr bbb.tst ccc :'
+
+	EXEC	-n
+		INPUT Makefile $'.SCAN.tst : .SCAN
+	I|\\D COPY % |M$$(.TST.SUFFIX. tst)|
+include "scan.mk"'
+		OUTPUT - $'+ : a.tst aaa.hdr bbb.tst :'
+
+	EXEC	-n
+		INPUT Makefile $'.SCAN.tst : .SCAN
+	I|\\V COPY % |M$$(.TST.SUFFIX. tst)|
+include "scan.mk"'
+		OUTPUT - $'+ : a.tst bbb.tst ccc :'
+
+	EXEC	-n
+		INPUT Makefile $'.SCAN.tst : .SCAN
+	I| COPY % |M$$(.TST.SUFFIX. tst)|
+include "scan.mk"'
+		OUTPUT - $'+ : a.tst bbb.tst :'

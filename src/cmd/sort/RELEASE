@@ -1,3 +1,4 @@
+04-09-28 main.c: fix ERROR_USAGE logic
 04-08-11 main.c: add #intermediates to -Xdump, limit intermediates to 64
 04-07-22 main.c: acces() => eaccess()
 04-06-16 main.c: -R% -R- use recfmt() to sample for record format

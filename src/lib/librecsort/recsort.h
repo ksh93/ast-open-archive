@@ -1,27 +1,25 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1996-2004 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
-*                         Florham Park NJ                          *
-*                                                                  *
-*                 Phong Vo <kpv@research.att.com>                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
-*******************************************************************/
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1996-2004 AT&T Corp.                  *
+*                      and is licensed under the                       *
+*          Common Public License, Version 1.0 (the "License")          *
+*                        by AT&T Corp. ("AT&T")                        *
+*      Any use, downloading, reproduction or distribution of this      *
+*      software constitutes acceptance of the License.  A copy of      *
+*                     the License is available at                      *
+*                                                                      *
+*         http://www.research.att.com/sw/license/cpl-1.0.html          *
+*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                   Phong Vo <kpv@research.att.com>                    *
+*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                                                      *
+***********************************************************************/
 #ifndef _RECSORT_H
 #define	_RECSORT_H		1
 
@@ -132,6 +130,13 @@ struct _rs_s
 #define RS_SUMMARY	000040		/* RS_UNIQ summary		*/
 #define RS_VERIFY	000100		/* objects out of order		*/
 #define RS_WRITE	000400		/* called for each write record	*/
+
+/* { RS_READ RS_SUMMARY RS_WRITE } event returns */
+#define RS_TERMINATE	(-1)		/* terminate the sort		*/
+#define RS_ACCEPT	0		/* accept possibly modified rec	*/
+#define RS_DELETE	1		/* delete/ignore record		*/
+#define RS_INSERT	2		/* insert new record		*/
+#define RS_DONE		3		/* user defined			*/
 
 #define RS_NEXT		0		/* rsdisc() next		*/
 

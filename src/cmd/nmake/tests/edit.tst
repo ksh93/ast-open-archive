@@ -468,3 +468,34 @@ all :
 + : T!=QSV : foo_yes_nothing .foo.yes.internal foo_yes_variable foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
 + : T!=QVI : foo_yes_nothing .foo.yes.internal foo_yes_variable (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :
 + : T!=QV : foo_yes_nothing (foo_yes_variable) foo_yes_rule ()foo_yes_rule foo_no_nothing .foo.no.internal foo_no_variable (foo_no_variable) foo_no_rule ()foo_no_rule :'
+
+TEST 17 ':<op><sep><value>:'
+
+	EXEC	-n
+		INPUT Makefile $'X = ^a ~b <c >d !e =f
+all :
+	: $(X:N=^*)
+	: $(X:N=~*)
+	: $(X:N=<*)
+	: $(X:N=>*)
+	: $(X:N=!*)
+	: $(X:N==*)
+	: $(X:M=^.*)
+	: $(X:M=~.*)
+	: $(X:M=<.*)
+	: $(X:M=>.*)
+	: $(X:M=!.*)
+	: $(X:M==.*)'
+		OUTPUT - $'+ : ^a
++ : ~b
++ : <c
++ : >d
++ : !e
++ : =f
++ : ^a ~b <c >d !e =f
++ : ~b
++ : ^a ~b <c >d !e =f
++ : ^a ~b <c >d !e =f
++ : 
++ : =f'
+		ERROR - $'make: regular expression: !.*: unary op not preceeded by re'

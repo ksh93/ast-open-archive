@@ -1,26 +1,24 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1984-2004 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                          AT&T Research                           *
-*                         Florham Park NJ                          *
-*                                                                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
-*******************************************************************/
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                      and is licensed under the                       *
+*          Common Public License, Version 1.0 (the "License")          *
+*                        by AT&T Corp. ("AT&T")                        *
+*      Any use, downloading, reproduction or distribution of this      *
+*      software constitutes acceptance of the License.  A copy of      *
+*                     the License is available at                      *
+*                                                                      *
+*         http://www.research.att.com/sw/license/cpl-1.0.html          *
+*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                                                      *
+***********************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -53,6 +51,7 @@
 #define NAM			'\v'	/* 0 or more var internal code	*/
 #define REP			'\r'	/* repeat group internal code	*/
 #define SPC			' '	/* 0 or more space internal code*/
+#define TOK			'\f'	/* 0 or more token chars	*/
 
 #define SCANARGS		2	/* max number % arg matches	*/
 #define SCANBUFFER		4096	/* scan buffer size		*/
@@ -218,6 +217,7 @@ scanbranch(scanstate* u, struct action* action, struct action* first, struct act
 				case NAM:
 				case REP:
 				case SPC:
+				case TOK:
 					*u++ = 1;
 					break;
 				default:
@@ -561,6 +561,9 @@ scancompile(struct rule* r, int flags)
 					{
 					case 'D':
 						t = DIG;
+						break;
+					case 'T':
+						t = TOK;
 						break;
 					case 'V':
 						t = NAM;
@@ -1193,6 +1196,43 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 	return p;
 }
 
+#if DEBUG
+static char*
+opname(scanstate* s)
+{
+	int		i;
+
+	static char	buf[8];
+
+	switch (*s)
+	{
+	case ANY:
+		return "ANY";
+	case ARG:
+		return "ARG";
+	case DIG:
+		return "DIG";
+	case NAM:
+		return "NAM";
+	case REP:
+		return "REP";
+	case SPC:
+		return "SPC";
+	case TOK:
+		return "TOK";
+	case 0:
+		return "END";
+	}
+	i = 0;
+	buf[i++] = '\'';
+	while (i < (sizeof(buf) - 3) && isprint(*s))
+		buf[i++] = *s++;
+	buf[i++] = '\'';
+	buf[i] = 0;
+	return buf;
+}
+#endif
+
 /*
  * scan fd on file r for patterns compiled in ss
  * cons prereqs on p
@@ -1293,49 +1333,57 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 			}
 			for (;;)
 			{
-				/*UNDENT*/
-	if (*s == DIG || *s == SPC || *s == NAM && istype(c, C_VARIABLE1))
-	{
-		typ = *s;
-		h = g == b + 1;
-		for (;;)
-		{
-			if (typ == SPC ? isspace(c) : typ == DIG ? isdigit(c) : istype(c, C_VARIABLE1|C_VARIABLE2))
-			{
-				if (m)
-				{
-					m = 0;
-					if (collect)
-					{
-						collect = 0;
-						arg[n++].end = g - b - 1;
-					}
-				}
 #if DEBUG
-				if (!(state.questionable & 0x00000020))
-					h = 1;
-#endif
-				if (c == '\n')
-					break;
-				h = 1;
-			}
-			else if (!c)
-			{
-				if (b >= buf + SCANBUFFER)
+				if (state.test & 0x00000080)
 				{
-					c = g - b - 1;
-					memcpy(buf + SCANBUFFER - c, b, c);
-					b = buf + SCANBUFFER - c;
+					if (!(x = (unsigned char*)strchr((char*)(g - 1), '\n')))
+						x = (g - 1) + strlen((char*)(g - 1));
+					error(2, "scanexec: %s \"%-.*s\"", opname(s), x - (g - 1), g - 1);
 				}
-				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
-					goto done;
-				g[c] = 0;
+#endif
+				/*UNDENT*/
+	if ((typ = *s) == DIG || typ == SPC || typ == NAM || typ == TOK)
+	{
+		h = g == (b + 1);
+		if (typ == DIG || typ == SPC || typ == NAM && istype(c, C_VARIABLE1) || typ == TOK && istype(c, C_VARIABLE1|C_VARIABLE2))
+			for (;;)
+			{
+				if (typ == SPC ? isspace(c) : typ == DIG ? isdigit(c) : istype(c, C_VARIABLE1|C_VARIABLE2))
+				{
+					if (m)
+					{
+						m = 0;
+						if (collect)
+						{
+							collect = 0;
+							arg[n++].end = g - b - 1;
+						}
+					}
+#if DEBUG
+					if (!(state.questionable & 0x00000020))
+						h = 1;
+#endif
+					if (c == '\n')
+						break;
+					h = 1;
+				}
+				else if (!c)
+				{
+					if (b >= buf + SCANBUFFER)
+					{
+						c = g - b - 1;
+						memcpy(buf + SCANBUFFER - c, b, c);
+						b = buf + SCANBUFFER - c;
+					}
+					if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
+						goto done;
+					g[c] = 0;
+				}
+				else if (!m)
+					break;
+				c = *g++;
 			}
-			else if (!m)
-				break;
-			c = *g++;
-		}
-		s = s + *(s + 1) + 1;
+		s += *(s + 1) + 1;
 		if (!h && !rep && (*s == ANY || *s == ARG || *s == 0))
 		{
 #if DEBUG
@@ -1347,7 +1395,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 			break;
 		}
 	}
-	else if (*s == ANY)
+	else if (typ == ANY)
 	{
 		if (pop < &any[elementsof(any)])
 		{
@@ -1358,16 +1406,16 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 		}
 		s += *(s + 1) + 1;
 	}
-	else if (*s == ARG)
+	else if (typ == ARG)
 	{
-		m = s = s + *(s + 1) + 1;
+		m = s += *(s + 1) + 1;
 		if (n < elementsof(arg))
 		{
 			collect = 1;
 			arg[n].begin = g - b - 1;
 		}
 	}
-	else if (*s == REP)
+	else if (typ == REP)
 	{
 		if (rep)
 		{
@@ -1391,13 +1439,13 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				if (x >= g)
 					break;
 			}
-			for (s = per; *s; s = s + *(s + 1) + 1);
+			for (s = per; *s; s += *(s + 1) + 1);
 			goto rephit;
 		}
 		else
-			rep = s = s + *(s + 1) + 1;
+			rep = s += *(s + 1) + 1;
 	}
-	else if (*s == 0)
+	else if (typ == 0)
 	{
  rephit:
 		if (m)
@@ -1438,7 +1486,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				arg[c++].begin = arg[n - 1].begin;
 #if DEBUG
 			if (state.test & 0x00000080)
-				error(2, "scanexec: %s: %c n=%d \"%s\" \"%s\"", r->name, ss->action[*s].type, n - 1, b + arg[0].begin, b + arg[1].begin);
+				error(2, "scanexec: HIT %s: %c n=%d \"%s\" \"%s\"", r->name, ss->action[*s].type, n - 1, b + arg[0].begin, b + arg[1].begin);
 #endif
 			a = null;
 			switch (c = ss->action[*s].type)
@@ -1510,7 +1558,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				arg[n++].end = g - b - 1;
 			}
 		}
-		s = s + *s;
+		s += *s;
 		goto next;
 	}
 	else

@@ -34,16 +34,18 @@ tst	fdview execute{
 }end
 
 tst	no_exit_exit note{ exit() bypasses _exit() }end exec{
-	_BEGIN_EXTERNS_
-	extern int abort();
-	_END_EXTERNS_
-	#if _STD_
-	void _exit(int code) { abort(); }
-	#else
-	void _exit(code) int code; { abort(); }
+	#include <sys/types.h>
+	#include <signal.h>
+	#ifdef __STDC__
+	#include <unistd.h>
 	#endif
-	main()
+	#if _STD_
+	void _exit(int code) { kill(getpid(), SIGKILL); }
+	#else
+	void _exit(code) int code; { kill(getpid(), SIGKILL); }
+	#endif
+	int main()
 	{
-		return(0);
+		return 0;
 	}
 }end

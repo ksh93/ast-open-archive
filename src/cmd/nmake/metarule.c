@@ -1,26 +1,24 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1984-2004 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                          AT&T Research                           *
-*                         Florham Park NJ                          *
-*                                                                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
-*******************************************************************/
+/***********************************************************************
+*                                                                      *
+*               This software is part of the ast package               *
+*                  Copyright (c) 1984-2004 AT&T Corp.                  *
+*                      and is licensed under the                       *
+*          Common Public License, Version 1.0 (the "License")          *
+*                        by AT&T Corp. ("AT&T")                        *
+*      Any use, downloading, reproduction or distribution of this      *
+*      software constitutes acceptance of the License.  A copy of      *
+*                     the License is available at                      *
+*                                                                      *
+*         http://www.research.att.com/sw/license/cpl-1.0.html          *
+*         (with md5 checksum 8a5e0081c856944e76c69a1cf29c2e8b)         *
+*                                                                      *
+*              Information and Software Systems Research               *
+*                            AT&T Research                             *
+*                           Florham Park NJ                            *
+*                                                                      *
+*                 Glenn Fowler <gsf@research.att.com>                  *
+*                                                                      *
+***********************************************************************/
 #pragma prototyped
 /*
  * Glenn Fowler
@@ -49,7 +47,8 @@ metarule(char* in, char* out, int force)
 	r = getrule(s);
 	if (force)
 	{
-		if (!r) r = makerule(NiL);
+		if (!r)
+			r = makerule(NiL);
 		r->property |= (P_metarule|P_use);
 		r->property &= ~(P_state|P_staterule|P_statevar);
 	}
@@ -68,7 +67,8 @@ metarule(char* in, char* out, int force)
 			}
 			else r = 0;
 		}
-		if (r && (!(r->property & P_metarule) || !r->action && !r->uname)) r = 0;
+		if (r && (!(r->property & P_metarule) || !r->action && !r->uname))
+			r = 0;
 	}
 	return r;
 }
@@ -225,7 +225,8 @@ metaexpand(Sfio_t* sp, char* stem, char* p)
 
 	while ((c = *p++) != '%')
 	{
-		if (!c) return;
+		if (!c)
+			return;
 		sfputc(sp, c);
 	}
 	sfputr(sp, stem, -1);
@@ -235,8 +236,7 @@ metaexpand(Sfio_t* sp, char* stem, char* p)
 /*
  * update the metarule closure graph
  *
- * NOTE: c==0 (PREREQ_APPEND alias) is used to cut off
-	 part of the closure recursion
+ * NOTE: c==0 (PREREQ_APPEND alias) is used to cut off part of the closure recursion
  */
 
 void
@@ -360,7 +360,8 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 							}
 	}
 	else matched = 1;
-	if (b = strrchr(u, '/')) b++;
+	if (b = strrchr(u, '/'))
+		b++;
 	else b = u;
 	terminal = (x = metainfo('T', NiL, NiL, 0)) ? x->prereqs : 0;
 	if (matched)
@@ -379,7 +380,8 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 				for (matched = 1, q = x->prereqs; q; q = q->next)
 					if ((m = metarule(q->rule->name, p->rule->name, 0)) && (!(r->property & P_terminal) || (m->property & P_terminal)))
 					{
-						if (!tmp) tmp = sfstropen();
+						if (!tmp)
+							tmp = sfstropen();
 						if (b != u && *u != '/' && *q->rule->name && ((state.questionable & 0x00000008) || !strchr(q->rule->name, '/')))
 						{
 							char*	x = u;
@@ -389,12 +391,13 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 								sfprintf(tmp, "%-.*s", b - x, x);
 								metaexpand(tmp, stem, q->rule->name);
 								t = sfstruse(tmp);
-								if ((s = bindfile(NiL, t, 0)) && s->status != UPDATE && (s->time || (s->property & P_target)))
+								if ((s = bindfile(NiL, t, 0)) && s->status != UPDATE && (s->time || (s->property & P_target)) || !(state.questionable & 0x08000000) && m->action && !*m->action && (s = makerule(t)))
 								{
 									sfstrclose(tmp);
 									goto primary;
 								}
-								if (!(x = strchr(x, '/'))) break;
+								if (!(x = strchr(x, '/')))
+									break;
 								x++;
 							}
 						}
@@ -402,8 +405,9 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 						{
 							metaexpand(tmp, stem, q->rule->name);
 							t = sfstruse(tmp);
-							if (isstatevar(t) && (s = getrule(t)) && (s = bindstate(s, NiL))) goto primary;
-							if ((s = bindfile(NiL, t, 0)) && s->status != UPDATE && (s->time || (s->property & P_target)))
+							if (isstatevar(t) && (s = getrule(t)) && (s = bindstate(s, NiL)))
+								goto primary;
+							if ((s = bindfile(NiL, t, 0)) && s->status != UPDATE && (s->time || (s->property & P_target)) || !(state.questionable & 0x08000000) && m->action && !*m->action && (s = makerule(t)))
 							{
 								sfstrclose(tmp);
 								goto primary;
@@ -418,7 +422,8 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 						for (v = terminal; v; v = v->next)
 							if (metarule(v->rule->name, NiL, 0))
 							{
-								if (!buf) buf = sfstropen();
+								if (!buf)
+									buf = sfstropen();
 								metaexpand(buf, t, v->rule->name);
 								if ((s = bindfile(NiL, sfstruse(buf), 0)) && s->status != UPDATE && s->time)
 								{
@@ -430,15 +435,18 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 								}
 							}
 					}
-		if (buf) sfstrclose(buf);
-		if (tmp) sfstrclose(tmp);
+		if (buf)
+			sfstrclose(buf);
+		if (tmp)
+			sfstrclose(tmp);
 	}
 
 	/*
 	 * unconstrained metarules ignored on recursive calls
 	 */
 
-	if (!meta) return 0;
+	if (!meta)
+		return 0;
 
 	/*
 	 * check terminal unconstrained metarules
@@ -534,15 +542,18 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 						 * use s if it exists
 						 */
 
-						if (s->status != UPDATE && (s->time || (s->property & P_target))) goto unconstrained;
+						if (s->status != UPDATE && (s->time || (s->property & P_target)))
+							goto unconstrained;
 
 						/*
 						 * use s if it can be generated
 						 */
 
-						if (metaget(s, NiL, stem, NiL)) goto unconstrained;
+						if (metaget(s, NiL, stem, NiL))
+							goto unconstrained;
 					}
-				 	else if (s && (s = bindstate(s, NiL))) goto unconstrained;
+				 	else if (s && (s = bindstate(s, NiL)))
+						goto unconstrained;
 				}
 		}
 	}
@@ -582,7 +593,8 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 					for (q = y->prereqs; q; q = q->next)
 						if (metamatch(stem, u, q->rule->name) && (x = metarule(m->uname, q->rule->name, 0)))
 						{
-							if (!x->uname) break;
+							if (!x->uname)
+								break;
 							x = 0;
 						}
 			}
@@ -599,7 +611,8 @@ metaget(struct rule* r, struct list* prereqs, char* stem, struct rule** meta)
 		}
 		*meta = m;
 	}
-	if (m->property & P_terminal) s->property |= P_terminal;
+	if (m->property & P_terminal)
+		s->property |= P_terminal;
 	else if ((x = metainfo('S', m->name, NiL, 0)) && !(x->property & P_terminal))
 		for (p = x->prereqs; p; p = p->next)
 		{
