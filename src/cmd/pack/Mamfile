@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -58,6 +58,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -70,7 +73,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -84,7 +87,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -116,7 +119,7 @@ prev ../../../include/ast/ast.h implicit
 done huffman.h
 done pack.c
 prev pack.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c pack.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c pack.c
 done pack.o generated
 make libhuff.a archive
 make huff.req
@@ -128,7 +131,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in huff  ast
+exec - for i in huff ast
 exec - do	case $i in
 exec - 	"huff"|huff)
 exec - 		;;
@@ -208,7 +211,7 @@ prev ../../../include/ast/error.h implicit
 prev huffman.h implicit
 done unpack.c
 prev unpack.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c unpack.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c unpack.c
 done unpack.o generated
 prev libhuff.a archive
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o unpack unpack.o libhuff.a ${mam_libast}
@@ -229,16 +232,17 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/pack
+prev ../../../bin
 prev pack
-exec - ${STDMV} ${INSTALLROOT}/bin/pack ${INSTALLROOT}/bin/pack.old 2>/dev/null || true; test '' = 'pack' || ${STDCMP} 2>/dev/null -s pack ${INSTALLROOT}/bin/pack || { ${STDCP} pack ${INSTALLROOT}/bin/pack  		    		    ;}
+exec - test '' = 'pack' || ${STDCMP} 2>/dev/null -s pack ${INSTALLROOT}/bin/pack || { ${STDMV} ${INSTALLROOT}/bin/pack ${INSTALLROOT}/bin/pack.old 2>/dev/null || true; ${STDCP} pack ${INSTALLROOT}/bin/pack  		    		    ;}
 done ../../../bin/pack generated
 make ../../../bin/unpack
 prev unpack
-exec - ${STDMV} ${INSTALLROOT}/bin/unpack ${INSTALLROOT}/bin/unpack.old 2>/dev/null || true; test '' = 'unpack' || ${STDCMP} 2>/dev/null -s unpack ${INSTALLROOT}/bin/unpack || { ${STDCP} unpack ${INSTALLROOT}/bin/unpack  		    		    ;}
+exec - test '' = 'unpack' || ${STDCMP} 2>/dev/null -s unpack ${INSTALLROOT}/bin/unpack || { ${STDMV} ${INSTALLROOT}/bin/unpack ${INSTALLROOT}/bin/unpack.old 2>/dev/null || true; ${STDCP} unpack ${INSTALLROOT}/bin/unpack  		    		    ;}
 done ../../../bin/unpack generated
 make ../../../bin/pcat
 prev pcat
-exec - ${STDMV} ${INSTALLROOT}/bin/pcat ${INSTALLROOT}/bin/pcat.old 2>/dev/null || true; test '' = 'pcat' || ${STDCMP} 2>/dev/null -s pcat ${INSTALLROOT}/bin/pcat || { ${STDCP} pcat ${INSTALLROOT}/bin/pcat  		    		    ;}
+exec - test '' = 'pcat' || ${STDCMP} 2>/dev/null -s pcat ${INSTALLROOT}/bin/pcat || { ${STDMV} ${INSTALLROOT}/bin/pcat ${INSTALLROOT}/bin/pcat.old 2>/dev/null || true; ${STDCP} pcat ${INSTALLROOT}/bin/pcat  		    		    ;}
 done ../../../bin/pcat generated
 make ../../../lib
 exec - set -
@@ -247,8 +251,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/libhuff.a archive
+prev ../../../lib
 prev libhuff.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libhuff.a ${PACKAGE_ast_LIB}/libhuff.a.old 2>/dev/null || true; test '' = 'libhuff.a' || ${STDCMP} 2>/dev/null -s libhuff.a ${PACKAGE_ast_LIB}/libhuff.a || { ${STDCP} libhuff.a ${PACKAGE_ast_LIB}/libhuff.a  		    		    ;}
+exec - test '' = 'libhuff.a' || ${STDCMP} 2>/dev/null -s libhuff.a ${PACKAGE_ast_LIB}/libhuff.a || { ${STDMV} ${PACKAGE_ast_LIB}/libhuff.a ${PACKAGE_ast_LIB}/libhuff.a.old 2>/dev/null || true; ${STDCP} libhuff.a ${PACKAGE_ast_LIB}/libhuff.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libhuff.a) >/dev/null 2>&1 || true
 done ../../../lib/libhuff.a generated
 make ../../../man/man3
@@ -258,9 +263,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/huff.3
+prev ../../../man/man3
 make huff.3
 done huff.3
-exec - ${STDMV} ${INSTALLROOT}/man/man3/huff.3 ${INSTALLROOT}/man/man3/huff.3.old 2>/dev/null || true; test '' = 'huff.3' || ${STDCMP} 2>/dev/null -s huff.3 ${INSTALLROOT}/man/man3/huff.3 || { ${STDCP} huff.3 ${INSTALLROOT}/man/man3/huff.3  		    		    ;}
+exec - test '' = 'huff.3' || ${STDCMP} 2>/dev/null -s huff.3 ${INSTALLROOT}/man/man3/huff.3 || { ${STDMV} ${INSTALLROOT}/man/man3/huff.3 ${INSTALLROOT}/man/man3/huff.3.old 2>/dev/null || true; ${STDCP} huff.3 ${INSTALLROOT}/man/man3/huff.3  		    		    ;}
 done ../../../man/man3/huff.3 generated
 make ../../../lib/lib
 exec - set -
@@ -269,8 +275,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/huff
+prev ../../../lib/lib
 prev huff.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/huff ${PACKAGE_ast_LIB}/lib/huff.old 2>/dev/null || true; test '' = 'huff.req' || ${STDCMP} 2>/dev/null -s huff.req ${PACKAGE_ast_LIB}/lib/huff || { ${STDCP} huff.req ${PACKAGE_ast_LIB}/lib/huff  		    		    ;}
+exec - test '' = 'huff.req' || ${STDCMP} 2>/dev/null -s huff.req ${PACKAGE_ast_LIB}/lib/huff || { ${STDMV} ${PACKAGE_ast_LIB}/lib/huff ${PACKAGE_ast_LIB}/lib/huff.old 2>/dev/null || true; ${STDCP} huff.req ${PACKAGE_ast_LIB}/lib/huff  		    		    ;}
 done ../../../lib/lib/huff generated
 done install virtual
 make test

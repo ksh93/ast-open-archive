@@ -73,9 +73,10 @@ BUILTINS :COMMAND: cmd.h
 		end
 	end
 
-:BUILTIN: dlls LICENSE=since=2002,author=gsf -ldll look mime od pr strings \
-		tr uudecode -luu uuencode -luu what who
+:BUILTIN: dlls LICENSE=since=2002,author=gsf -ldll look mime \
+		nl LICENSE=since=2003,author=dgk od pr \
+		strings tr uudecode -luu uuencode -luu what who
 
 :: PROMO.mm RELEASE
 
-:TEST: chown cut date expr join look od paste tail tr uuencode
+:TEST: chown cut date expr join look nl od paste tail tr uuencode

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -41,6 +41,10 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 	register unsigned char*	wrk;
 	register unsigned char*	pat;
 	register unsigned char*	low;
+	unsigned char*		incomplete;
+	Pzelt_t*		elt;
+	Pzelt_t*		old;
+	Dt_t*			order;
 	unsigned char*		vp;
 	unsigned char*		ve;
 	Sfoff_t			r;
@@ -89,11 +93,6 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: read error", pz->path);
 			return -1;
 		}
-		if (r > 0 && r % n)
-		{
-			if (pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: last record incomplete", pz->path);
-		}
 		if (sfsync(op) || sferror(op))
 		{
 			if (pz->disc->errorf)
@@ -117,22 +116,38 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 	low = pp->low;
 	tmp = pz->tmp;
 	peek = 0;
-	for (;;)
+	if (pz->flags & PZ_SORT)
+	{
+		if (!pz->sort.order)
+		{
+			m = sizeof(Dtlink_t) + roundof(pp->row, sizeof(Dtlink_t));
+			pz->sort.freedisc.link = offsetof(Pzelt_t, link);
+			pz->sort.orderdisc.link = offsetof(Pzelt_t, link);
+			pz->sort.orderdisc.key = offsetof(Pzelt_t, buf);
+			pz->sort.orderdisc.size = pp->row;
+			if (!(elt = (Pzelt_t*)vmnewof(pz->vm, 0, char, pp->col * m, 0)) || !(pz->sort.order = dtnew(pz->vm, &pz->sort.orderdisc, Dtobag)) || !(pz->sort.free = dtnew(pz->vm, &pz->sort.freedisc, Dtlist)))
+			{
+				if (pz->disc->errorf)
+					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
+				return -1;
+			}
+			for (i = 0; i < pp->col; i++)
+			{
+				dtinsert(pz->sort.free, elt);
+				elt = (Pzelt_t*)((char*)elt + m);
+			}
+		}
+		elt = 0;
+	}
+	incomplete = 0;
+	order = pz->sort.order;
+	do
 	{
 		if (peek)
-		{
 			peek = 0;
-			r = pp->row;
-		}
 		else if ((r = readf ? (*readf)(pz, pz->io, pat, pz->disc) : sfread(pz->io, pat, pp->row)) != pp->row)
 		{
-			if (r && pz->disc->errorf)
-			{
-				if (r > 0)
-					(*pz->disc->errorf)(pz, pz->disc, 2, "last record incomplete");
-				else
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "read error");
-			}
+			incomplete = pat;
 			break;
 		}
 		if (indexf)
@@ -141,6 +156,29 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 			index.offset = 0;
 			if ((*indexf)(pz, &index, pat, pz->disc) < 0)
 				break;
+		}
+		if (order)
+		{
+			if (!elt)
+			{
+				elt = (Pzelt_t*)dtfirst(pz->sort.free);
+				dtdelete(pz->sort.free, elt);
+				memcpy(elt->buf, pat, pp->row);
+				dtinsert(order, elt);
+			}
+			for (i = dtsize(order); i < pp->col; i++)
+			{
+				elt = (Pzelt_t*)dtfirst(pz->sort.free);
+				dtdelete(pz->sort.free, elt);
+				if ((r = readf ? (*readf)(pz, pz->io, elt->buf, pz->disc) : sfread(pz->io, elt->buf, pp->row)) != pp->row)
+				{
+					incomplete = elt->buf;
+					break;
+				}
+				dtinsert(order, elt);
+			}
+			elt = (Pzelt_t*)dtfirst(order);
+			memcpy(pat, elt->buf, pp->row);
 		}
 
 		/*
@@ -160,20 +198,19 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 		m = 1;
 		for (n = 1; n < pp->col; n++)
 		{
-			if (readf)
+			if (order)
 			{
-				if ((r = (*readf)(pz, pz->io, wrk, pz->disc)) != pp->row)
+				old = elt;
+				elt = (Pzelt_t*)dtnext(order, elt);
+				dtdelete(order, old);
+				dtinsert(pz->sort.free, old);
+				if (!elt)
 					break;
+				wrk = elt->buf;
 			}
-			else if ((r = sfread(pz->io, wrk, pp->row)) != pp->row)
+			if ((r = readf ? (*readf)(pz, pz->io, wrk, pz->disc) : sfread(pz->io, wrk, pp->row)) != pp->row)
 			{
-				if (r && pz->disc->errorf)
-				{
-					if (r > 0)
-						(*pz->disc->errorf)(pz, pz->disc, 2, "last record incomplete");
-					else
-						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "read error");
-				}
+				incomplete = wrk;
 				break;
 			}
 			for (j = 0; j < pp->row; j++)
@@ -285,11 +322,27 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "lo frequency code write error");
 			return -1;
 		}
-	}
+	} while (!incomplete);
 	sfputu(op, 0);
+	if (incomplete && !readf)
+	{
+		if (r < 0)
+		{
+			if (pz->disc->errorf)
+				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "read error");
+		}
+		else if (r > 0)
+		{
+			if (pz->disc->errorf)
+				(*pz->disc->errorf)(pz, pz->disc, 1, "last record incomplete %u/%u", r, pp->row);
+			sfputc(op, PZ_MARK_PART);
+			sfputu(op, r);
+			sfwrite(op, incomplete, r);
+		}
+	}
 	if (!(pz->flags & PZ_SECTION))
 	{
-		sfputc(op, 1);
+		sfputc(op, PZ_MARK_TAIL);
 		if (pz->disc->eventf && (*pz->disc->eventf)(pz, PZ_TAILWRITE, op, 0, pz->disc) < 0)
 			return -1;
 		sfputc(op, 0);

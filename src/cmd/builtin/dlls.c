@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2002 AT&T Corp.                *
+*                Copyright (c) 1992-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dlls (AT&T Labs Research) 2002-09-11 $\n]"
+"[-?\n@(#)$Id: dlls (AT&T Labs Research) 2003-02-11 $\n]"
 USAGE_LICENSE
 "[+NAME?dlls - list dlls and shared libraries on $PATH]"
 "[+DESCRIPTION?\bdlls\b lists the base name and full path, one per line, of"
@@ -115,7 +115,7 @@ b_dlls(int argc, char** argv, void* context)
 		sfprintf(sfstdout, "sibling=(%s", dli->sibling[0]);
 		for (i = 1; dli->sibling[i]; i++)
 			sfprintf(sfstdout, " %s", dli->sibling[i]);
-		sfprintf(sfstdout, ") prefix=%s suffix=%s flags=", dli->prefix, dli->suffix);
+		sfprintf(sfstdout, ") env=%s prefix=%s suffix=%s flags=", dli->env, dli->prefix, dli->suffix);
 		i = 0;
 		if (dli->flags & DLL_INFO_PREVER)
 		{

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Labs Research) 2002-10-24">
+<META name="generator" content="mm2html (AT&T Labs Research) 2003-03-25">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
@@ -18,7 +18,7 @@ libraries.
 Components in this package:
 <P>
 <P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>
-<TABLE  align=center bgcolor=papayawhip bordercolor=white cellpadding=2 cellspacing=2 frame=void rules=none width=99% >
+<TABLE  align=center bordercolor=white cellpadding=0 cellspacing=0 frame=void rules=none width=99% >
 <TBODY>
 <TR><TD align=left>
 <A href="#3d">3d</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;html&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#pax">pax</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#tksh">tksh</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libcs&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libtk</TD></TR>
@@ -1026,7 +1026,63 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-02-11-30  --- Release ksh93n+  ---
+03-03-18  --- Release ksh93o  ---
+03-03-18  A -N unary operator was added to test and &#0091;&#0091;...&#0093;&#0093; which returns
+	  true if the file exists and the file has been modified since it
+	  was last read.
+03-03-18  The TIMEFORMAT variable was added to control the format for
+	  the time compound command.  The formatting description is
+	  described in the man page.
+03-03-06  A -N n option was added to read which causes exactly n bytes
+	  to be read unlike -n n which causes at most n bytes to be read.
+03-03-03  Three new shell variables were added.  The variable .sh.file
+	  stores the full pathname of the file that the current command
+	  was found in.  The variable .sh.fun names the current function
+	  that is running.  The variable .sh.subshell contains the depth
+	  of the current subshell or command substitution.
+03-03-03  When the DEBUG trap is executed, the current command line after
+	  expansions is placed in the variable .sh.command.  The trap
+	  is also now triggered before each iteration of a for, select,
+	  and case command and before each assignment and redirection.
+03-02-28  Function definitions are no longer stored in the history file so
+	  that set -o nolog no longer has any meaning.
+03-02-28  All function definitions can be displayed with typeset -f not
+	  just those stored in the history file.  In addition, typeset +f
+	  displays the function name followed by a comment containg the
+	  line number and the path name for the file that defined this function.
+03-02-28  A bug in which the value of $LINENO was not correct when executing
+	  command contained inside mult-line command substitutions has been
+	  fixed.
+03-02-19  Since some existing ksh88 scripts use the undocumented and
+	  unintended ability to insert a : in front of the % and # parameter
+	  expansion operators, ksh93 was modified to accept :% as equivalent
+	  to % and :# as equivalent to # with ${name op word}.
+03-02-14  A bug which could cause a core dump when reading from standard
+	  error when standard error was a pty has been fixed.
+03-02-14  The shell arithmetic was modified to use long double on systems
+	  that provide this data type.
+03-02-09  A bug in which a function located in the first directory in FPATH
+	  would not be found when the last component of PATH was . and the
+	  current directory was one of the directories in PATH has been fixed.
+03-02-07  The trap and kill builtin commands now accept a leading SIG prefix
+	  on the signal names as documented.
+03-02-05  A bug in the expansion of ${var/$pattern}, when pattern contained
+	  \&#0091; has been fixed.
+03-02-05  A bug in which .sh.match&#0091;n&#0093;, n&gt;0, was not being set for substring
+	  matches with % and %% has been fixed.
+03-01-15  A bug in which getopts did not work for numerical arguments specified
+	  as n#var in the getopts string has been fixed.
+03-01-09  A bug in which using ${.sh.match} multiple times could lead to
+	  a memory exception has been fixed.
+03-01-06  A bug in the expansion of ${var/pattern/$string} in the case that
+	  $string contains \digit has been fixed. 
+03-01-02  A -P option was added for systems such as Solaris 8 that support
+	  profile shell.
+03-01-02  For backward compatibility with ksh88, arithmetic expansion
+	  with ((...)) and let has been modified so that if x is a zero-filled
+	  variable, $x will not be treated as an octal constant.
+
+02-12-05  --- Release ksh93n+  ---
 02-11-30  A bug that can show up in evaluating arithmetic statements that
 	  are in an autoloaded function when the function is autoload from
 	  another function has been fixed.
@@ -1083,10 +1139,10 @@ All recorded changes follow.
 02-09-03  A bug in which an assignment of the form name=(integer x=3)
 	  could be interpretted as an array assignment rather than a
 	  compound variable assignment has been fixed.
-02-08-19  A command completion bug which occured on file systems that
+02-08-19  A command completion bug which occurred on file systems that
 	  are case insensitive has been fixed.
 02-08-19  A bug which could lead to an exception on some systems (for
-	  example FREEBSD) which occured when setting PATH has been fixed.
+	  example FREEBSD) which occurred when setting PATH has been fixed.
 02-08-11  A bug in arithmetic rounding in which a value input as a decimal
 	  string would output as a rounded version of the string has
 	  been fixed.
@@ -1111,8 +1167,8 @@ All recorded changes follow.
 	  builtin to terminate prematurely has been fixed.
 02-06-17  A bug in which the shell could core dump if getopts was called
 	  when the OPTIND variable contained a negative value has been fixed. 
-02-06-10  The edit mode prompt has been modified to hande escape sequences.  
-02-06-10  A bug which occured for interactive shells in which the builtin
+02-06-10  The edit mode prompt has been modified to handle escape sequences.  
+02-06-10  A bug which occurred for interactive shells in which the builtin
 	  cat command was used in command substitution on a file whose
 	  size was larger than PIPE_BUF has been fixed.
 02-06-10  A bug in which the trap on ERR was not being processed when
@@ -1127,7 +1183,7 @@ All recorded changes follow.
 02-05-07  A bug in substitutions of the form ${var/pattern/string} in which
 	  a backslash was inserted in the replacement string when it contained
 	  a special pattern character has been fixed.
-02-05-01  A bug in the emacs edit mode which occured in versions compiled
+02-05-01  A bug in the emacs edit mode which occurred in versions compiled
 	  for multibyte character sets which occurred when a repeated search
 	  was requested after a long line had been returned for the previous
 	  search has been fixed.
@@ -1152,7 +1208,7 @@ All recorded changes follow.
 02-01-07  A bug in which the first word of a compound assignment,
 	  x=(word ...), was treated as a reserved word has been fixed.
 02-01-07  A bug in the handling of &nbsp;when noglob was enabled and a
-	  substitution of the form ${word op pattern} occured in the
+	  substitution of the form ${word op pattern} occurred in the
 	  same word has been fixed.
 02-01-07  A compilation option, CMDLIB_BLTIN in the file OPTION, has
 	  been added.  When this options is set, all commands implemented
@@ -1941,6 +1997,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-05 pax.c: tgz =&gt; ustar:gzip, tbz =&gt; ustar:bzip
+03-02-28 pax.c: handle a few common -x aliases
+03-01-14 misc.c: fix meter sign overflow for sizeof(off_t)==sizeof(int)
 02-12-13 format.c: fix TNEF bug that did bget(n) for n&gt;buffersize
 02-10-23 misc.c: fix meter buffer overflow
 02-10-20 pax: drop experimental OMF; use ardirlist() to list ar types
@@ -2176,6 +2235,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-25 mm2html: table border size '' =&gt; 0
+03-02-06 troff2html.c: fmtquote() FMT_ALWAYS update
 02-10-24 mm2html: viewgraph link target is _top too
 02-10-15 mm2html: ident footer is now a TABLE instead of a DIV
 02-08-30 mm2html: .AL with no args is equivalent to .NL
@@ -2279,6 +2340,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tests changes">tests changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-22 date.dat: add last, this, next tests
+03-03-21 date.dat,datey2k.dat: add %Q/recent/distant/
+	 opt.tst: add trailing '*' option and option args tests
+03-02-13 base64.c: add base64encode()/base64decode() tests
 02-10-04 strtof.tst: add simple cases
 02-09-15 sfio/tscanf.c: add NaNS test
 02-09-05 opt.tst: add .fp 5 CW for *roff tests
@@ -2328,6 +2393,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-28 dir3d.c,rmdir3d.c,syscall3d.c: add D_FILENO and D_TYPE ifdefs
+03-03-25 dup3d.c: fix bug that cleared Dir_t pointer just after allocation
+03-03-07 ftruncate3d.c,lseek3d.c,truncate3d.c: check _typ_off64_t
 02-10-18 features/syscall.sh: handle pseudo files in cc -E line syncs
 02-07-17 syscall3d.c: clean up user level intercept code
 02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR
@@ -2445,6 +2513,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="coshell changes">coshell changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-04 add state.remote=CS_REMOTE_SHELL
 01-12-12 resolve SETSHELL local vs. global conflict -- its both
 	 ignore attr now really ignores host -- duh
 01-12-11 add global maxidle=0 to ignore idle
@@ -2601,11 +2670,63 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-22 rules-win32.mk: drop :PACKAGE: Xm override -- handled by uwin
+03-04-15 mam.c: output P_ignore attribute
+	 Makerules.mk: fix the mam .DO.INSTALL to compare before mv to .old!!
+03-04-05 expand.c: add :W=P: for ordered recursive prereqs
+	 Makerules.mk: add recurse=prereqs
+	 pkg-X11.mk: add openbsd.* -lc_r pthread workaround
+	 Makerules.mk: add .PACKAGE.$(P).found:=1 if package lib or header found
+	 Makerules.mk: optional :PACKAGE: rhs must now be marked :dontcare
+	 Makerules.mk: pure recursion makefiles make .RECURSE first by default
+	 Makerules.mk: .NORECURSE inhibits default .RECURSE first
+	 Makerules.mk: fix .DO.INSTALL directory prereq omission
+	 Makerules.mk: add .BELIEVE for initialization, e.g., after mamake
+	 bind.c: fix rebind alias bug
+	 misc.c: limit `mtime after the epoch' warnings to { S_ISREG S_ISDIR }
+03-03-28 Makerules.mk: eliminate CC.STDINCLUDE before -I- too
+03-03-27 Makerules.mk: add :PACKAGE: *:attributes:*
+	 pkg-X11.mk: fix CC.REQUIRE.Xm
+	 rules-win32.mk: add :PACKAGE: Xm:attributes:static
+03-03-21 command.c,object.c: always emit target name for --mam=dynamic
+03-03-19 expand.c: add :W=R: for true :MAKE: recursion order
+	 state.c: add test 0x00040000 to set failed event to staterule event
+	 nmake.tst: add first regression tests since 1984 -- yes, I'm ashamed
+	 Makerules.mk: change :W=O: to :W=R:
+	 Makerules.mk: use CC.LD.RUNPATH for LDRUNPATH and non-std dirs
+	 Makerules.mk: drop MAKEDIRS .RECURSE.OFFSET. -- not needed with :W=R:
+03-03-15 Makerules.mk: fix debug=1 to delete $(CC.OPTIMIZE) from CCFLAGS
+	 expand.c: fix SORT_* comparison function selection
+03-03-11 expand.c: add ~ edit op sep
+	 expand.c: limit edit op &#0091;~!&lt;&gt;=&#0093; sep to one occurrence
+	 expand.c: add :H=&#0091;FINUV&#0093;: alternative to edit sep overload
+	 expand.c: add :L~: to use version comparison
+	 Makerules.mk: use :H=&#0091;FINUV&#0093;: and :L~:
+	 Makerules.mk: add pkgconfig(1) .pc file support in :PACKAGE:
+	 Makerules.mk: fix %.sh=&gt;% :T=E: misquote (ancient!)
+03-03-03 Makerules.mk: .MAM.INIT handles debug=1 for CC.DEBUG vs. CC.OPTIMIZE
+	 Makerules.mk: add 'test : .DONTCARE .ONOBJECT'
+	 Makerules.mk: another prefixinclude fix -- my head hurts
+	 Makerules.mk: pass recursive $(=) by value ( $(=:V) )
+	 misc.c: fix :F=&#0091;LUV&#0093;: translation
+03-02-28 Makerules.mk: YACCFIX workaround for bison yytoken addition
+	 Makerules.mk: include $(LDLIBRARIES) in %.req
+	 Makerules.mk: fix .BIND.-l% comparison on CC.PREFIX.SHARED
+	 debug.mk: handle .o scope prereqs
+	 variable.c: fix $(!) internal.val conflict
+03-02-24 option.c: drop --mismatch alias for --corrupt
+03-02-12 Makerules.mk: handle multiple lhs for :INSTALLDIR:
+03-02-06 pkg-freetype.mk: add
+03-01-31 Makerules.mk: mark .PACKAGE.LIBRARIES. hints .DONTCARE
+	 Makerules.mk: :PACKAGE: add to .PACKAGE. first, then include pkg-*.mk
+03-01-23 Makerules.mk: more prefixinclude tweaks
+03-01-11 Makerules.mk: CATALOG default is $(.CATALOG.NAME.)
+03-01-10 Makerules.mk: parameterize all silent =&gt; $(SILENT)
 02-12-21 --- release 4.3 ---
 02-12-18 Makerules.mk: :NOOPTIMIZE: "..."'d operator arg shenanigans
 02-12-16 Makerules.mk: disable .ARCOPY for linked targets
 02-12-06 Makerules.mk: sync CC.MAKE.OPTIONS,nativepp,prefixinclude logic
-02-12-04 Makerules.mk: fix contorted .so editing that botched n.n.n versions
+02-12-04 Makerules.mk: fix contorted .so editing for - and  n.n.n versions
 	 Makerules.mk: parameterize CC/cc suffixes in { .SUFFIX.c .SUFFIX.C }
 	 Makerules.mk: use { .SUFFIX.c .SUFFIX.C } in :cc: list generation
 	 Makerules.mk: parameterize fortran suffixes in { .SUFFIX.f .SUFFIX.r }
@@ -3429,6 +3550,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-05 nl.tst: generate test data file
+03-02-24 nl.c,nl.tst: add
+03-02-14 od.c,tr.c: no error message for EPIPE
+03-02-11 dlls.c: add Dllinfo_t.env
 02-11-14 what.c: stop on &lt; to catch html/xml
 	 update cmdinit() calls for 4th flag arg
 02-09-11 dlls.c: add --base &amp; --path
@@ -5396,6 +5521,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="mailx changes">mailx changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-01-17 add shquote() to quote popen pathnames; fix save to -f core dump
 02-12-12 imap.c: handle no-name attachments
 02-12-11 head.c: application of DeMorgan's law proves Murphy's
 02-12-04 local.h: include FEATURE/lcl from lcl.iffe to avoid local.h clash
@@ -5542,6 +5668,9 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pzip changes">pzip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-05 pop.c: add OP_VERBOSE for cut() trace
+03-01-04 pin.c: list range only if more than 2 elements
+02-12-25 pin: add --sort
 02-02-14 Makefile: add explicit -lz references
 01-10-31 pin: add --reorder=tsp via -ltsp
 01-10-30 pzip: fix --window doc typo
@@ -5581,6 +5710,11 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-17 ed.tst: add ! command tests for sfpopen() "" mode fix
+03-02-17 testregex.dat: add bm tests
+03-01-13 sed0.c: operate on all input files, even if some fail
+	 testfnmatch.c,testmatch.c: ignore testmatch -o option
+03-01-03 testregex.c,testregex.dat: add REG_SHELL_GROUP options and tests
 02-10-10 grep.c: ignore -a for GNU compatibility: gnugrep=tw+astgrep
 02-08-12 testregex.dat,locale.dat: add REG_MINIMAL tests for mb bug
 02-08-07 *.dat: recognize anchors in BRE subexpressions
@@ -5705,6 +5839,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sort changes">sort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-11 testsort.sh: initialize $CC from :TEST: TESTCC state var
+03-03-07 Makefile: +lsort for now
 01-04-19 sort.tst: add -s tests
 00-03-09 main.c: fix infomation typo
 00-12-25 main.c: close input before final overwrite ops
@@ -5736,6 +5872,22 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-21 ls.c: add -z,--time-style
+	 ls.c: if only -t is set then set FTW_SEEDOTDIR to keep configure happy
+03-03-11 pss.c: pid &lt;= 1 =&gt; ppid == 0 to avoid ancestor loop
+03-03-06 ps.c: add pgid alias for pgrp
+03-02-28 pss*.&#0091;ch&#0093;: add Pss_dev_t and Pss_id_t
+	 ps.c: don't warn about unsupported fields for &#0091;cfjl&#0093;
+03-02-21 pss-*.c: initf errors except no space now warnings for ps fallback
+	 Makefile: hosttype workaround to avoid botched -lkvm
+03-02-11 ps.c: flags width 2 =&gt; 3 since posix says its octal
+03-02-07 ps.c: add --children and --parents, --tree == --children --parents
+03-02-06 locale.c,ls.c: fmtquote() FMT_ALWAYS update
+03-02-01 ps*.&#0091;ch&#0093;: convert to independent Pssmeth_t methods 
+	 pss-ps.c: export _PSS_ps=1 to force for testing
+03-01-31 pss.c: add darwin.ppc kvm_getprocs() -- still needs work
+03-01-29 ps.c: check for obvious invalid pids
+03-01-10 locale.c: don't list default after unknown category/keyword
 02-12-04 du.c: add -H -L -P(default) symlink options
 02-11-22 file.c: add version type description
 02-10-10 pss.c: redefine only if not defined -- duh
@@ -5936,6 +6088,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tksh changes">tksh changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-01-02 Makefile: dynamic -lshell on CC.HOSTTYPE=*win*
 02-08-27 tkMain.c: wait loop recode to avoid WNOHANG cascade
 02-02-14 Makefile: shell:static because dll is -g =&gt; fix this situation
 01-01-01 separate -ltksh from tksh main
@@ -5945,6 +6098,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+02-01-10 tw,find: add sfsync(sfstdout) check
 02-11-07 tw: add type==DOOR (solaris S_ISDOOR)
 	 find: add -type D (solaris S_ISDOOR)
 02-07-17 updatedb.sh: add --local to skip non-local directories
@@ -6032,6 +6186,90 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-21 tm/tmdate.c: fix next hour/min logic
+03-04-15 vmalloc/malloc.c: intercept __malloc() along with __libc_malloc()
+	 string/strdup.c: intercept __strdup() along with __libc_strdup()
+	 features/mmap: consolidate from features/(lib|sfio|vmalloc)
+	 add _NO_MMAP==1 to disable all mmap()/munmap() calls
+	 path/pathposix.c: add
+03-04-14 comp/setlocale.c: fix debug_mbtowc() return value for *s==0 || n &lt; 1
+	 comp/iconv.c: fix error return errno values
+03-04-11 misc/stk.c: fix stkgrow() realloc bug
+03-04-05 string/tok.c: support readonly single token input strings
+	 disc/sfdcdio.c: fix F_DIOINFO and FDIRECT #ifdef's
+	 include/ast_std.h: allow _LARGEFILE64_SOURCE on __hppa
+	 features/common: fix `tst _foo_' =&gt; `tst foo_' typo
+	 features/float: fix `tst _foo_' =&gt; `tst foo_' typo
+	 features/float: add FLTMAX_(UINTMAX_MAX,INTMAX_MAX,INTMAX_MIN)
+	 comp/omitted.c: fix pathconf =&gt; _pathconf =&gt; _ast_pathconf loop
+03-04-03 features/float: add _ast_no_um2fm: no usinged intmax =&gt; floatmax cast
+	 vmalloc/vmbest.c: add getenv("VMCHECK") to initialize Vmcheck
+03-03-28 include/ast_dir.h: add D_TYPE; { D_FILENO D_TYPE } must be #ifdef'd
+	 misc/fts.c|getcwd.c|glob.c,preroot/getpreroot.c: add D_FILENO #ifdef's
+	 Makefile: make sure _BLD_ast is defined for all compiles
+03-03-27 ast_vfork.h: generate from features/vfork to pick up headers/pragmas
+03-03-25 comp/omitted.c: drop free() of live environ
+	 path/pathshell.c: allow trailing .exe -- pox on that
+	 string/strtoi.h: fix bug leading 3 digits before thousands sep bug
+	 string/(fmt|str)&#0091;gu&#0093;id.c: we know root when we see it
+03-03-24 misc/optget.c: handle : and ? in := default value
+03-03-21 ast_std.h: drop all spawn*() but spawnveg()
+	 obsolete/spawn.c: add for dropped spawn*()
+	 features/lib: _use_spawnveg if spawnveg() is a win over fork()/exec()
+	 features/lib: drop NutForkExecve() and _map_spawnve
+	 features/lib: fix memccpy test to clean up /tmp droppings
+	 comp/spawnveg.c: call posix_spawn() if implemented
+	 comp/omitted.c: add spawnve() intercept
+	 comp/getoptl.c: set getopt_long() optind even if no options
+	 tm/tmfmt.c: add %Q&lt;delim&gt;recent&lt;delim&gt;distant&lt;delim&gt;
+	 misc/optget.c: fix trailing '*' for option and option args
+	 sfio/sfmode.c: getenv("_AST_SFIO_OPTIONS") &#0091;,&#0093;SF_LINE&#0091;,&#0093; for fd {0,1,2}
+	 vmalloc/*: kpv sync for uwin build independent of libast
+03-03-18 port/astconf.c: switch to dynamic string values (saves 7K data/bss)
+	 string/strmatch.c: switch to dynamic regex cache (saves 3K data/bss)
+	 regex/regcoll.c,ucs_names.h: initialize rw tables from smaller ro data
+	 features/lib: add vfork test for passing SIG_IGN across exec
+	 features/lib: add spawn test for passing SIG_IGN across spawn
+03-03-17 comp/omitted.c: unlink() renames to .deleted dir in case file open
+	 sfio/sfpopen.c: handle mode "" for spawn with no pipe
+	 features/float,comp/frexp.c,comp/frexpl.c: add pow2() table alternative
+03-03-12 features/lib: fix linux.ia64 memccpy() tests -- now its their turn
+	 features/vmalloc: fix /dev/zero test
+	 features/align: _ast_intmax_t and _ast_fltmax_t join the union
+	 misc/stk.c: fix struct frame size to align data
+	 disc/sfdcdos.c: change sfslen() =&gt; sfvalue(f)
+03-03-10 misc/optget.c: handle &#0091;f<:>x:lll</:><?>ddd&#0093;</?>
+03-03-07 port/astconf.c: uninitialized CONFORMANCE + POSIXLY_CORRECT =&gt; standard
+03-03-05 comp/omitted.c: make sure at least /bin is in PATH to find cygwin dlls
+03-03-02 path/pathshell.c: write access to /bin is effectively root
+03-02-28 features/float: add (FLT|DBL|LDBL)_U?(LONG|LONGLONG|INTMAX)_(MIN|MAX)
+03-02-25 features/lib: change vfork() test to use _exit() instead of exit()
+03-02-23 include/error.h: update ERROR_VERSION for error_info.number space
+03-02-22 comp/conf.sh: wrap ksh check in eval to avoid premature exit
+03-02-21 misc/fts.c: verify chdir(..) to avoid malicious dir rename()
+03-02-19 string/strtoip4.c: isspace() instead of ' '||'\t'
+03-02-17 regex/regcomp.c: fix stats.l REX_REP logic that botched REX_BM
+03-02-13 string/base64.c: handle catenated encodings
+03-02-11 features/libpath.sh: change LIBPATH to &lt;dir&gt;&#0091;:&lt;env&gt;&#0091;:&lt;pat&gt;&#0093;&#0093;&#0091;,...&#0093;
+03-02-07 path/pathfind.c: allow "/dev/null" to be PATH_REGULAR
+03-02-06 include/ast.h,fmtquote.c: add FMT_ALWAYS|FMT_ESCAPED|FMT_SHELL|FMT_WIDE
+03-02-05 tm/tmdate.c,tm/tmword.c,string/strelapsed.c: '_' treated like ' '
+03-02-01 string/strelapsed.c: handle ps style &#0091;day-&#0093;&#0091;hour:&#0093;min:sec
+03-01-31 port/astlicense.c: fix author=* match
+03-01-30 include/tm.h: add tmisleapyear() macro
+03-01-29 comp/getopt.h,comp/getoptl.c: add gnu getopt_long(), getopt_long_only()
+	 include/ast_getopt.h: for non-gnu part of comp/getopt.h
+	 include/ast_std.h: include &lt;ast_getopt.h&gt; instead of &lt;getopt.h&gt;
+03-01-28 ast.h,string/base64.c: add base64encode() and base64decode()
+	 path/pathfind.c: verify S_ISREG()
+03-01-24 path/pathexists.c: fix abs dir bug and deal with case ignorance
+03-01-23 path/pathpath.c: honor PATH_ABSOLUTE for the easy case too
+03-01-22 path/pathprobe.c: fix search to find both the probe script and command
+03-01-17 misc/magic.tab: application/zip =&gt; appplication/(gzip|pzip|zip)
+03-01-14 misc/optget.c: change href="" to href="."
+03-01-10 include/ast_std.h: strtold() import hackery for static __CYGWIN__
+03-01-03 include/regex.h,regex/regcomp.h: add REG_SHELL_GROUP
+	 include/ast.h,string/strmatch.c: add STR_GROUP for REG_SHELL_GROUP
 02-12-15 include/error.h: errorcontext =&gt; Error_context_s (compatible til 2004)
 02-12-06 misc/sigdata.c: add NoF(sigdadata) -- why nmake was uninterruptable!
 02-12-03 comp/omitted.c,features/omitted: handle cygwin alarm() return botch
@@ -6978,6 +7216,10 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libardir changes">libardir changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-05 ar-port.c: fix bug that skipped initial long name entry
+	 ar-port.c: handle netbsd.i386 ' &lt;long-index&gt;' vs. '/&lt;long-index&gt;'
+03-02-05 ar-port.c: handle solaris TYPE_port variation
+03-01-30 ar-port.c: handle member name length == 16 (no terminator)
 02-10-20 ardir.c: add ardirlist()
 02-08-09 ardir.c: ardiropen() fails if !S_ISREG unless ARDIR_FORCE
 02-06-11 ar-port.c: handle 4.4BSD `#1/size' long names
@@ -6989,6 +7231,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-21 date.c: add %Q/recent/distant/ docs
+03-02-19 date.c: fix %+|!flag docs
 02-11-14 update for cmdinit() 4th arg and ERROR_NOTIFY for interrupt cleanup
 02-10-02 date.c: tmform() =&gt; tmfmt()
 02-09-30 date.c,uname.c: change execv() calls to procrun(): exec|exit =&gt; bad
@@ -7103,6 +7347,10 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdll changes">libdll changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-12 dllfind.c: dlopen() with RTLD_GLOBAL|RTLD_PARENT defaults
+03-02-11 dllscan.c: change LIBPATH to &lt;dir&gt;&#0091;:&lt;env&gt;&#0091;:&lt;pat&gt;&#0093;&#0093;&#0091;,...&#0093;
+03-01-08 dllscan.c: hack version logic again -- is consistency rocket science?
+03-01-07 dlfcn.c: fix darwin.ppc dlopen/dlsym/dlclose
 02-11-18 dllfind.c: add path,size args (with backwards compatibility checks)
 02-11-15 dllfind.c: check for ./path if '.' in path but no '/'
 02-08-30 dllfind.c: fix a bug that returned uninitialized value on not found
@@ -7181,6 +7429,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="librecsort changes">librecsort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-07 Makefile: generate dll for dr. ek
+03-01-21 rsmerge.c: fix typo that kicked in on large (~100K) record sizes
 01-01-01 recsort.h: _RSHDR_H =&gt; _BLD_recsort; should have been done years ago
 00-08-31 rskey.c: fix code() buffer off by one (too far)
 00-03-17 rskey.c: consult RLIMIT_DATA for size limits
@@ -7211,6 +7461,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libuu changes">libuu changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-01-07 uulib: check UU_HEADER in bx_header()
 01-03-27 uulib: add UU_LOCAL for local path conversion
 00-03-06 uulib: !UU_HEADER decode checks for candidate encodings
 00-03-04 uulib: add posix decode size check
@@ -7234,6 +7485,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libz changes">libz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-13 gzio.c: eliminate fixed gzprintf() buffer size via sfio string stream
+03-01-20 zlib.h,gzio.c: add gzreopen()
 02-09-11 zlib.h: move 64 bit counts to internal_state
 02-08-05 add z_off64_t, gzseek64() etc. to preserve old binary interface
 	 work around 2^32 file size limitations
@@ -7284,6 +7537,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcs changes">libcs changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-28 msglib.h: add D_FILENO ifdef
 02-10-02 features/lib,genlocal.sh: add ssh, pid to hang warning
 	 msglist.c: tmform() =&gt; fmttime()
 01-12-12 cssfd: CS_POLL_CLOSE now close()'s if not dropped -- double duh
@@ -7363,6 +7617,11 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-03-25 ppop.c: PP_RESERVED now deletes old symbol before redef with lex value
+03-03-14 pp.probe: fix the #include_next probe
+03-02-28 ppsearch.c: fix -MM bug that missed prefix include hosted mark
+03-02-18 pplex.c: handle COMPATIBILITY 
+03-01-23 probe.win32: mingw32 tweaks
 02-12-17 ppargs.c: document -I-!
 02-12-06 -I- pp:noprefix otherwise pp:prefix default
 02-11-29 probe.win32: added __INTSIZE, drop dm pp:noallmultiple
@@ -7788,6 +8047,14 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpz changes">libpz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-15 pzlib.h: add PZ_MARK_PART for partial last input record
+	 pzlib.h: add PZ_MARK_TAIL for tail records
+	 partial input record is now a warning and handled on inflate
+03-03-03 pzhead.c: PZ_FORCE disables unknown input diagnostic
+03-02-10 sfdczip.c,sfdcpzip.c: handle PZ_CRC and SFGZ_NOCRC
+03-02-06 pzhead.c: fmtquote() FMT_ALWAYS update
+03-01-04 pzpart.c: list range only if more than 2 elements
+02-12-25 pzip.h,pzpart.c,pzdeflate.c,pzwrite.c: add PZ_SORT
 02-12-18 pzwrite.c: add partial row buffer
 02-12-12 sfdcpzip.c: move disc arg to the end for discplined consistency
 02-12-11 sfdczip.c: add
@@ -7842,6 +8109,9 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libtksh changes">libtksh changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-04-05  src/var.c: fix off by 1 malloc() call -- for once not gsf's fault!!
+	  src/var.c: hack around nv_move() double-free bug -- needs better fix
+03-03-12  src/tcleval.c,src/tclIO.c: change sfslen() =&gt; sfvalue(f)
 02-08-27  tcl/tclNotify.c: XXX add sh_sigcheck() call -- to be cleaned up
 02-08-22  enable regex cache initialization
 02-06-25  include/nvextra.h: use an addaptable cheat for the namval offset
@@ -7946,7 +8216,7 @@ End:
 <TABLE border=0 align=center width=96%>
 <TR>
 <TD align=left></TD>
-<TD align=right>December 23, 2002</TD>
+<TD align=right>April 22, 2003</TD>
 </TR>
 </TABLE>
 <P>

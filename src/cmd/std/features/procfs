@@ -1,7 +1,11 @@
-hdr	procinfo
+hdr	kvm,procinfo,pstat
+sys	sysctl
 lib	getprocs
+lib	kvm_open,kvm_getprocs kvm.h sys/time.h sys/param.h sys/proc.h sys/sysctl.h -lkvm
+lib	pstat_getproc sys/param.h sys/pstat.h
+mem	extern_proc.p_pid,extern_proc.p_starttime sys/time.h sys/param.h sys/proc.h sys/sysctl.h -lkvm
 mem	procsinfo64.pi_pri procinfo.h
-mem	prpsinfo.pr_clname,prpsinfo.pr_cstime,prpsinfo.pr_cstime.tv_sec,prpsinfo.pr_ctime,prpsinfo.pr_cutime,prpsinfo.pr_gid,prpsinfo.pr_lttydev,prpsinfo.pr_ntpid,prpsinfo.pr_pgid,prpsinfo.pr_pgrp,prpsinfo.pr_psargs,prpsinfo.pr_refcount,prpsinfo.pr_rssize,prpsinfo.pr_sid,prpsinfo.pr_sonproc,prpsinfo.pr_start,prpsinfo.pr_start.tv_sec,prpsinfo.pr_starttime,prpsinfo.pr_starttime.tv_sec,prpsinfo.pr_stime,prpsinfo.pr_tgrp,prpsinfo.pr_time,prpsinfo.pr_time.tv_sec,prpsinfo.pr_utime,prpsinfo.pr_zomb sys/types.h sys/procfs.h
+mem	prpsinfo.pr_clname,prpsinfo.pr_cstime,prpsinfo.pr_cstime.tv_sec,prpsinfo.pr_ctime,prpsinfo.pr_cutime,prpsinfo.pr_gid,prpsinfo.pr_lttydev,prpsinfo.pr_ntpid,prpsinfo.pr_pgid,prpsinfo.pr_pgrp,prpsinfo.pr_psargs,prpsinfo.pr_refcount,prpsinfo.pr_rssize,prpsinfo.pr_sid,prpsinfo.pr_sonproc,prpsinfo.pr_start,prpsinfo.pr_start.tv_sec,prpsinfo.pr_starttime,prpsinfo.pr_starttime.tv_sec,prpsinfo.pr_stime,prpsinfo.pr_tgrp,prpsinfo.pr_time,prpsinfo.pr_time.tv_sec,prpsinfo.pr_utime,prpsinfo.pr_zomb,prpsinfo.pr_pctcpu,prpsinfo.pr_cpu,prpsinfo.pr_lwp.pr_pctcpu,prpsinfo.pr_lwp.pr_cpu -D_STRUCTURED_PROC -Dprpsinfo=psinfo  sys/types.h sys/procfs.h
 tst	run{
 	if	test -d /proc
 	then	if	test -r /proc/self/stat
@@ -229,16 +233,15 @@ tst	run{
 	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))
 	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))
 !
-		elif	test -r /proc/$$/psinfo -a ! -r /proc/$$/fd
+		elif	test -r /proc/$$/psinfo
 		then	cat <<!
 	/*
-	 * unixware style /proc
+	 * solaris/unixware style /proc
 	 */
 
-	#include <sys/procfs.h>
+	#define _STRUCTURED_PROC		1	/* solaris incantation */
 
-	#define _mem_pr_clname_prpsinfo		1
-	#define _mem_pr_psargs_prpsinfo		1
+	#include <sys/procfs.h>
 
 	#define _PS_dir		"/proc"
 	#define _PS_path_num	"/proc/%lu/%s"
@@ -247,8 +250,15 @@ tst	run{
 
 	#define prpsinfo	psinfo
 
+	#if _mem_pr_lwp_pr_pctcpu_prpsinfo
+	#define PR_CPU(p)	(((p)->pr_lwp.pr_pctcpu*100)/0x8000)
+	#else
+	#if _mem_pr_lwp_pr_cpu_prpsinfo
+	#define PR_CPU(p)	((p)->pr_lwp.pr_cpu)
+	#endif
+	#endif
+
 	#define pr_clname	pr_lwp.pr_clname
-	#define pr_cpu		pr_lwp.pr__pad[0]
 	#define pr_flag		pr_state
 	#define pr_nice		pr_lwp.pr_nice
 	#define pr_pgrp		pr_pgid
@@ -365,6 +375,123 @@ tst	output{
 		printf("#define PR_ZOMBIE(p)	((p)->pr_sname=='Z')\n");
 	#endif
 		printf("#endif\n");
+		printf("#ifndef PR_CPU\n");
+	#if _mem_pr_pctcpu_prpsinfo
+		printf("#define PR_CPU(p)	((p)->pr_pctcpu)\n");
+	#else
+	#if _mem_pr_cpu_prpsinfo
+		printf("#define PR_CPU(p)	((p)->pr_cpu)\n");
+	#else
+		printf("#define PR_CPU(p)	(0)\n");
+	#endif
+	#endif
+		printf("#endif\n");
 		return 0;
 	}
+}end
+
+tst	run{
+
+ps=/bin/ps
+if	$ps -o pid -p 1 > /dev/null 2>&1
+then	echo
+	echo "#define PSS_ps		\"$ps\""
+	echo
+	echo "#define PSS_ps_all	\"-a\""
+	a=`$ps -e 2>/dev/null | wc -l`
+	b=`$ps -ax 2>/dev/null | wc -l`
+	if	expr $a '>' $b >/dev/null 2>&1
+	then	echo "#define PSS_ps_every	\"-e\""
+	else	echo "#define PSS_ps_every	\"-ax\""
+	fi
+	a=`$ps -d 2>/dev/null | wc -l`
+	b=`$ps -x 2>/dev/null | wc -l`
+	if	expr $a '>' $b >/dev/null 2>&1
+	then	echo "#define PSS_ps_detached	\"-d\""
+	else	echo "#define PSS_ps_detached	\"-x\""
+	fi
+	a=`$ps -x 2>/dev/null | wc -l`
+	b=`$ps -d 2>/dev/null | wc -l`
+	if	expr $a '>' $b >/dev/null 2>&1
+	then	echo "#define PSS_ps_noleader	\"-x\""
+	else	echo "#define PSS_ps_noleader	\"-d\""
+	fi
+	echo
+	echo "#define PSS_pso	\\"
+	# NOTE: entries after PSS_state default to 0 for state 'Z'
+	# NOTE: PSS_args,PSS_command must be last
+	while read flag keys
+	do	for key in $keys
+		do	if	$ps -o $key -p 1 > /dev/null 2>&1
+			then	echo $flag, \"$key\", '\'
+				continue 2
+			fi
+		done
+		echo "/* not supported -- $flag $keys */ \\"
+	done <<!
+PSS_addr addr
+PSS_cpu pcpu cpu
+PSS_flags flags flag f
+PSS_gid gid rgid group rgroup
+PSS_job job jid
+PSS_npid npid ntpid
+PSS_pgrp pgrp pgid
+PSS_pid pid
+PSS_ppid ppid
+PSS_sid sid session sess tsess
+PSS_start start stime
+PSS_tgrp tgrp tid tpgid tgid
+PSS_time time etime rtime
+PSS_tty tty
+PSS_uid uid ruid user ruser
+PSS_state state stat s
+PSS_sched class
+PSS_nice nice
+PSS_pri pri
+PSS_proc proc processor psr cpu
+PSS_refcount refcount refs ref jobc
+PSS_rss rss
+PSS_size size vsize vsz
+PSS_wchan nwchan wchan
+PSS_command ucomm command comm
+PSS_args args command
+!
+	echo 0, 0
+fi
+
+}end
+
+cat{
+
+#define PSS_METHOD_null		1
+#define PSS_METHOD_cygwin	2
+#define PSS_METHOD_getprocs	3
+#define PSS_METHOD_procfs	4
+#define PSS_METHOD_kvm		5
+#define PSS_METHOD_pstat	6
+
+#if !PSS_METHOD && __CYGWIN__
+#define PSS_METHOD		PSS_METHOD_cygwin
+#endif
+
+#if !PSS_METHOD && _hdr_procinfo && _lib_getprocs
+#define PSS_METHOD		PSS_METHOD_getprocs
+#endif
+
+#if !PSS_METHOD && defined(_PS_dir)
+#define PSS_METHOD		PSS_METHOD_procfs
+#endif
+
+#if !PSS_METHOD && _hdr_kvm && _sys_sysctl && _lib_kvm_open && _lib_kvm_getprocs
+#define PSS_METHOD		PSS_METHOD_kvm
+#endif
+
+#if !PSS_METHOD && _sys_pstat && _lib_pstat_getproc
+#define PSS_METHOD		PSS_METHOD_pstat
+#endif
+
+#if !PSS_METHOD
+#define PSS_METHOD		PSS_METHOD_null
+#endif
+
 }end

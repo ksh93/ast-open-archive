@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -39,6 +39,21 @@
 #define BREAKLINE	(BREAKARGS*16)
 #define EDITCONTEXT	20
 
+#define SORT_posix	0x0000
+#define SORT_collate	0x0002
+#define SORT_numeric	0x0004
+#define SORT_version	0x0006
+
+#define SORT_invert	0x0001
+#define SORT_MASK	0x0007
+
+#define SORT_first	((SORT_MASK+1)<<0)
+#define SORT_qualified	((SORT_MASK+1)<<1)
+#define SORT_sort	((SORT_MASK+1)<<2)
+#define SORT_uniq	((SORT_MASK+1)<<3)
+
+typedef int (*Cmp_f)(const char*, const char*);
+
 static const regflags_t	submap[] =
 {
 	'g',	REG_SUB_ALL,
@@ -49,6 +64,144 @@ static const regflags_t	submap[] =
 	'U',	REG_SUB_UPPER,
 	0,	0
 };
+
+/*
+ * inverted strcmp(3)
+ */
+
+static int
+istrcmp(const char* a, const char* b)
+{
+	return strcmp(b, a);
+}
+
+/*
+ * inverted strcoll(3)
+ */
+
+static int
+istrcoll(const char* a, const char* b)
+{
+	return strcoll(b, a);
+}
+
+/*
+ * numeric strcmp(3)
+ */
+
+static int
+numcmp(const char* a, const char* b)
+{
+	char*	ea;
+	char*	eb;
+	long	na = strton(a, NiL, NiL, 0);
+	long	nb = strton(b, NiL, NiL, 0);
+
+	na = strton(a, &ea, NiL, 0);
+	nb = strton(b, &eb, NiL, 0);
+	if (na < nb)
+		return -1;
+	if (na > nb)
+		return 1;
+	if (*ea || *eb)
+		return strcmp(ea, eb);
+	return 0;
+}
+
+/*
+ * inverted numcmp(3)
+ */
+
+static int
+inumcmp(const char* a, const char* b)
+{
+	return numcmp(b, a);
+}
+
+/*
+ * version strcmp(3) -- latest first!
+ */
+
+static int
+vercmp(register const char* a, register const char* b)
+{
+	register unsigned long	na;
+	register unsigned long	nb;
+
+	for (;;)
+	{
+		if (isdigit(*a) && isdigit(*b))
+		{
+			na = nb = 0;
+			while (isdigit(*a))
+				na = na * 10 + *a++ - '0';
+			while (isdigit(*b))
+				nb = nb * 10 + *b++ - '0';
+			if (na < nb)
+				return 1;
+			if (na > nb)
+				return -1;
+		}
+		else if (*a != *b)
+			break;
+		else if (!*a)
+			return 0;
+		else
+		{
+			a++;
+			b++;
+		}
+	}
+	if (*a == 0)
+		return -1;
+	if (*b == 0)
+		return 1;
+	if (*a == '.')
+		return -1;
+	if (*b == '.')
+		return 1;
+	if (*a == '-')
+		return -1;
+	if (*b == '-')
+		return 1;
+	return *a < *b ? -1 : 1;
+}
+
+/*
+ * inverted vercmp(3)
+ */
+
+static int
+ivercmp(const char* a, const char* b)
+{
+	return vercmp(b, a);
+}
+
+static Cmp_f		sort_cmp[] =
+{
+	strcmp,
+	istrcmp,
+	/* strcoll is an ast macro */ 0,
+	istrcoll,
+	numcmp,
+	inumcmp,
+	vercmp,
+	ivercmp,
+};
+
+/*
+ * return sort comparison function for SORT_* flags
+ */
+
+static Cmp_f
+sortcmpf(int flags)
+{
+	Cmp_f	f;
+
+	if (!(f = sort_cmp[flags & SORT_MASK]))
+		f = strcoll;
+	return f;
+}
 
 /*
  * `$(...)' expansion
@@ -362,7 +515,7 @@ cross(Sfio_t* xp, char* v, char* w)
  */
 
 static void
-intersect(Sfio_t* xp, char* v, char* w,int sep)
+intersect(Sfio_t* xp, char* v, char* w, int sep)
 {
 	register struct list*	p;
 	register struct rule*	r;
@@ -526,49 +679,11 @@ linebreak(Sfio_t* xp, register char* s, char* pfx)
 }
 
 /*
- * inverted strcoll(3)
- */
-
-static int
-istrcoll(const char* a, const char* b)
-{
-	return strcoll(b, a);
-}
-
-/*
- * numeric strcmp(3)
- */
-
-static int
-numcmp(const char* a, const char* b)
-{
-	long	na = strton(a, NiL, NiL, 0);
-	long	nb = strton(b, NiL, NiL, 0);
-
-	if (na < nb) return -1;
-	if (na > nb) return 1;
-	return 0;
-}
-
-/*
- * inverted numeric strcmp(3)
- */
-
-static int
-inumcmp(const char* a, const char* b)
-{
-	return numcmp(b, a);
-}
-
-/*
  * generate list of file base names from all dirs in s matching pat
- * sep&GT sorts hi to lo
- * sep&LT sorts lo to hi
- * sep&EQ lists all base names -- otherwise only first in order
  */
 
 static void
-list(Sfio_t* xp, register char* s, char* pat, int sep)
+list(Sfio_t* xp, register char* s, char* pat, int flags)
 {
 	register struct rule*	r;
 	register char**		v;
@@ -677,30 +792,49 @@ list(Sfio_t* xp, register char* s, char* pat, int sep)
 		n = sfstrtell(hit);
 		putptr(hit, 0);
 		v = (char**)sfstrbase(hit);
-		if (sep & (LT|GT))
-			strsort(v, n / sizeof(v), (sep & GT) ? istrcoll : strcoll);
-		if (sep & EQ)
+		if (flags & SORT_sort)
+			strsort(v, n / sizeof(v), sortcmpf(flags));
+		if (flags & (SORT_first|SORT_qualified))
+		{
+			if (flags & SORT_version)
+			{
+				for (v = (char**)sfstrbase(hit); *v; v++)
+					for (w = (char**)sfstrbase(vec); s = *w++;)
+						for (f = getfile(*v); f; f = f->next)
+							if (f->dir->name == s)
+							{
+								if (flags & SORT_qualified)
+									sfprintf(xp, " %s/%s", s, *v);
+								else
+								{
+									sfputr(xp, *v, -1);
+									goto first;
+								}
+							}
+			}
+			else
+			{
+				for (w = (char**)sfstrbase(vec); s = *w++;)
+					for (v = (char**)sfstrbase(hit); *v; v++)
+						for (f = getfile(*v); f; f = f->next)
+							if (f->dir->name == s)
+							{
+								if (flags & SORT_qualified)
+									sfprintf(xp, " %s/%s", s, *v);
+								else
+								{
+									sfputr(xp, *v, -1);
+									goto first;
+								}
+							}
+			}
+		first:	;
+		}
+		else
 		{
 			sfputr(xp, *v, -1);
 			while (*++v)
 				sfprintf(xp, " %s", *v);
-		}
-		else
-		{
-			for (w = (char**)sfstrbase(vec); s = *w++;)
-				for (v = (char**)sfstrbase(hit); *v; v++)
-					for (f = getfile(*v); f; f = f->next)
-						if (f->dir->name == s)
-						{
-							if (sep & NOT)
-								sfprintf(xp, " %s/%s", s, *v);
-							else
-							{
-								sfputr(xp, *v, -1);
-								goto first;
-							}
-						}
-		first:	;
 		}
 	}
 	sfstrclose(vec);
@@ -715,22 +849,18 @@ list(Sfio_t* xp, register char* s, char* pat, int sep)
 
 /*
  * sort list s into xp
- * sep&GT sorts hi to lo
- * otherwise sorts lo to hi
- * sep&EQ does numeric sort
- * otherwise string sort
- * sep&NOT uniques after sort
  *
  * NOTE: s modified in place and not restored
  */
 
 static void
-sort(Sfio_t* xp, register char* s, int sep)
+sort(Sfio_t* xp, register char* s, int flags)
 {
 	register char**	p;
 	char*		tok;
 	long		n;
 	Sfio_t*		vec;
+	Cmp_f		cmp;
 
 	vec = sfstropen();
 	tok = tokopen(s, 0);
@@ -740,15 +870,17 @@ sort(Sfio_t* xp, register char* s, int sep)
 	if (n = sfstrtell(vec))
 	{
 		putptr(vec, 0);
-		if (!(sep & (GT|LT)))
-			sep &= NOT;
-		strsort((char**)sfstrbase(vec), n / sizeof(s), (sep & GT) ? ((sep & EQ) ? inumcmp : istrcoll) : ((sep & EQ) ? numcmp : strcoll));
+		cmp = sortcmpf(flags);
+		strsort((char**)sfstrbase(vec), n / sizeof(s), cmp);
 		p = (char**)sfstrbase(vec);
 		sfputr(xp, *p, -1);
-		sep &= NOT;
-		while (s = *++p)
-			if (!sep || !streq(s, *(p - 1)))
-				sfprintf(xp, " %s", s);
+		if (!(flags & SORT_first))
+		{
+			flags &= SORT_uniq;
+			while (s = *++p)
+				if (!flags || (*cmp)(s, *(p - 1)))
+					sfprintf(xp, " %s", s);
+		}
 	}
 	sfstrclose(vec);
 }
@@ -826,8 +958,6 @@ sepcmp(int sep, unsigned long a, unsigned long b)
  * convert path to native representation with '..' quotes if needed
  */
 
-#include "../../lib/libast/path/pathnative.c" /* drop in 2002 */
-
 static void
 native(Sfio_t* xp, const char* s)
 {
@@ -848,100 +978,273 @@ native(Sfio_t* xp, const char* s)
 	}
 }
 
+#define ORDER_INIT	"INIT"		/* no prereq dir prefix		*/
+#define ORDER_PACKAGE	"PACKAGE"	/* package assertion operator	*/
+#define ORDER_RECURSE	"MAKE"		/* recursion assertion operator	*/
+
+#define M_INIT		M_metarule
+#define M_MUST		M_mark
+#define M_LHS		M_compile
+#define M_RHS		M_scan
+
 /*
- * low level for order()
+ * order_recurse() partial order traversal support
  */
 
-static void
-descend(Sfio_t* xp, struct rule* r, int all)
+static unsigned long
+order_descend(Sfio_t* xp, struct rule* r, int all, unsigned long mark, int prereqs)
 {
 	register struct list*	p;
-	int			w;
+	unsigned long		here;
+	unsigned long		need;
 
-	w = 0;
-	r->mark &= ~M_mark;
+	need = 0;
+	here = sfstrtell(xp);
+	r->mark &= ~M_MUST;
+	r->complink = mark;
 	if (r->prereqs)
 	{
-		for (p = r->prereqs; p; p = p->next)
-			if (p->rule->mark & M_mark)
+		if (prereqs && all)
+		{
+			for (p = r->prereqs; p; p = p->next)
 			{
-				w = 1;
-				descend(xp, p->rule, all);
+				if (!need)
+				{
+					need = 1;
+					r->mark |= M_LHS;
+					sfprintf(xp, "%s :", r->name);
+				}
+				sfprintf(xp, " %s", p->rule->name);
+				p->rule->mark |= M_RHS;
 			}
+			if (need)
+			{
+				need = 0;
+				sfprintf(xp, "\n");
+			}
+		}
+		for (p = r->prereqs; p; p = p->next)
+			if (p->rule->mark & M_MUST)
+				mark = order_descend(xp, p->rule, all, mark, prereqs);
+			else if (need < p->rule->complink)
+				need = p->rule->complink;
 		freelist(r->prereqs);
 		r->prereqs = 0;
 	}
-	if (all)
+	else if (prereqs)
 	{
-		if (w)
-			sfputr(xp, "-", ' ');
-		sfputr(xp, r->name, ' ');
+		if (!all || (r->mark & M_RHS))
+			return mark;
+		r->mark |= M_LHS;
 	}
+	if (!prereqs)
+	{
+		if (!all || (r->mark & M_RHS))
+			return mark;
+		if (sfstrtell(xp) != here || mark == need)
+		{
+			if (sfstrtell(xp))
+				sfputr(xp, "-", ' ');
+			mark++;
+		}
+		sfputr(xp, r->name, ' ');
+		r->complink = mark;
+	}
+	return mark;
 }
 
-#define ORDER_INIT	"INIT"		/* no prereq dir prefix		*/
-#define ORDER_PACKAGE	"PACKAGE"	/* package assertion operator	*/
+static void	order_find(Sfio_t*, Sfio_t*, Sfio_t*, Hash_table_t*, char*, char*, char*, char*, int, int);
 
 /*
- * scan the makefiles in s and put the ordered list in xp
+ * scan makefile r for ORDER_RECURSE assertion operators and add to vec
  */
 
 static void
-order(Sfio_t* xp, register char* s, char* val)
+order_scan(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, struct rule* d, struct rule* r, char* makefiles, char* skip, int prereqs)
 {
-	register struct rule**	v;
-	register struct rule*	r;
-	register struct rule*	q;
-	char*			tok;
-	char*			t;
-	char*			u;
-	int			i;
-	int			j;
-	int			k;
-	int			p;
-	Sfio_t*			vec;
-	Sfio_t*			sp;
-	Hash_table_t*		tab;
+	register char*	s;
+	Sfio_t*		sp;
+	DIR*		dir;
+	struct dirent*	ent;
 
-	tab = hashalloc(table.rule, 0);
-	vec = sfstropen();
-	tok = tokopen(s, 1);
-	while (s = tokread(tok))
+	if (d == internal.dot)
+		d->mark |= M_MUST;
+	else
 	{
-		r = makerule(s);
-		putptr(vec, r);
-		if (s = strrchr(r->name, '/'))
-		{
-			*s = 0;
-			r = makerule(r->name);
-			*s = '/';
-			if (s = strrchr(r->name, '/'))
-				s++;
-			else
-				s = r->name;
-			if (strneq(s, ORDER_INIT, sizeof(ORDER_INIT) - 1))
-			{
-				sfputr(xp, r->name, ' ');
-				sfputr(xp, "-", ' ');
-			}
-			else
-				r->mark |= M_mark;
-			hashput(tab, s, r);
-		}
+		if (s = strrchr(d->name, '/'))
+			s++;
+		else
+			s = d->name;
+		if (!strneq(s, ORDER_INIT, sizeof(ORDER_INIT) - 1))
+			d->mark |= M_MUST;
+		else if (prereqs)
+			d->mark |= M_INIT;
 		else
 		{
-			r = internal.dot;
-			r->mark |= M_mark;
+			if (sfstrtell(xp))
+				sfputr(xp, "-", ' ');
+			sfputr(xp, d->name, ' ');
 		}
-		putptr(vec, r);
+		hashput(tab, s, d);
 	}
-	putptr(vec, 0);
-	tokclose(tok);
-	v = (struct rule**)sfstrbase(vec);
-	while (q = *v++)
+	putptr(vec, r);
+	putptr(vec, d);
+	if (makefiles && (d->mark & M_MUST) && (sp = rsfopen(r->name)))
 	{
-		r = *v++;
-		if ((r->mark & M_mark) && (sp = rsfopen(bind(q)->name)))
+		while (s = sfgetr(sp, '\n', 1))
+		{
+			while (*s)
+				if (*s++ == ':')
+				{
+					if (strneq(s, ORDER_RECURSE, sizeof(ORDER_RECURSE) - 1) && *(s += sizeof(ORDER_RECURSE) - 1) == ':')
+					{
+						while (*++s && (*s == ' ' || *s == '\t'));
+						if (*s)
+							order_find(xp, tmp, vec, tab, NiL, s, makefiles, skip, 1, prereqs);
+						else
+						{
+							d->mark |= M_RHS;
+							if (dir = opendir(d->name))
+							{
+								while (ent = readdir(dir))
+									if (*ent->d_name != '.')
+										order_find(xp, tmp, vec, tab, d->name, ent->d_name, makefiles, skip, 0, prereqs);
+								closedir(dir);
+							}
+						}
+					}
+					break;
+				}
+		}
+		sfclose(sp);
+	}
+}
+
+/*
+ * find first makefile in dir/files/makefiles and scan
+ */
+
+static void
+order_find(Sfio_t* xp, Sfio_t* tmp, Sfio_t* vec, Hash_table_t* tab, char* dir, char* files, char* makefiles, char* skip, int force, int prereqs)
+{
+	struct rule*	r;
+	struct rule*	d;
+	char*		s;
+	char*		t;
+	char*		e;
+	char*		tok;
+	struct stat	st;
+
+	tok = tokopen(files, 1);
+	while (s = tokread(tok))
+	{
+		if (skip)
+		{
+			if (t = strrchr(s, '/'))
+				t++;
+			else
+				t = s;
+			if ((*t != '.' || *(t + 1)) && strmatch(t, skip))
+				continue;
+		}
+		if (dir)
+		{
+			sfprintf(tmp, "%s/%s", dir, s);
+			t = sfstruse(tmp);
+		}
+		else
+			t = s;
+		if (force >= 0 && !stat(t, &st) && S_ISDIR(st.st_mode))
+		{
+			d = makerule(t);
+			t = makefiles;
+			while (t)
+			{
+				if (dir)
+					sfprintf(tmp, "%s/", dir);
+				if (e = strchr(t, ':'))
+				{
+					sfprintf(tmp, "%s/%-.*s", s, e - t, t);
+					t = e + 1;
+				}
+				else
+				{
+					sfprintf(tmp, "%s/%s", s, t);
+					t = 0;
+				}
+				if (r = bindfile(NiL, sfstruse(tmp), 0))
+				{
+					order_scan(xp, tmp, vec, tab, d, r, makefiles, skip, prereqs);
+					break;
+				}
+			}
+		}
+		else if (force && (r = bindfile(NiL, t, 0)))
+		{
+			if (s = strrchr(t, '/'))
+			{
+				*s = 0;
+				d = makerule(t);
+				*s = '/';
+			}
+			else
+				d = internal.dot;
+			order_scan(xp, tmp, vec, tab, d, r, makefiles, skip, prereqs);
+		}
+	}
+	tokclose(tok);
+}
+
+/*
+ * order strsort comparison function
+ */
+
+static int
+order_cmp(const void* a, const void* b)
+{
+	return strcoll((*((struct rule**)a + 1))->name, (*((struct rule**)b + 1))->name);
+}
+
+/*
+ * generate an ordered list of directories in xp based on
+ * (recursive) makefile prereqs; if targets!=0 then only
+ * those targets and prerequisites are considered
+ * directories and targets are ' ' separated
+ * force<0 for old :W=O: where directories are makefile paths
+ */
+
+static void
+order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* targets, int force, int prereqs)
+{
+	char*		s;
+	char*		t;
+	char*		u;
+	char*		tok;
+	struct rule*	r;
+	struct rule*	d;
+	struct rule**	v;
+	Sfio_t*		vec;
+	Sfio_t*		tmp;
+	Sfio_t*		sp;
+	Hash_table_t*	tab;
+	unsigned long	mark;
+	int		i;
+	int		j;
+	int		k;
+	int		p;
+
+	tab = hashalloc(table.rule, 0);
+	tmp = sfstropen();
+	vec = sfstropen();
+	order_find(xp, tmp, vec, tab, NiL, directories, makefiles, skip, force, prereqs);
+	mark = sfstrtell(vec);
+	putptr(vec, 0);
+	v = (struct rule**)sfstrbase(vec);
+	qsort(v, mark / sizeof(v) / 2, sizeof(v) * 2, order_cmp);
+	while (r = *v++)
+	{
+		d = *v++;
+		if ((d->mark & M_MUST) && (sp = rsfopen(bind(r)->name)))
 		{
 			while (s = sfgetr(sp, '\n', 1))
 			{
@@ -988,6 +1291,11 @@ order(Sfio_t* xp, register char* s, char* val)
 							p = 1;
 							k = 0;
 						}
+						else if (streq(t, ORDER_RECURSE))
+						{
+							p = -1;
+							k = 0;
+						}
 						else
 							for (u = t; *u; u++)
 								if (isupper(*u))
@@ -1007,20 +1315,20 @@ order(Sfio_t* xp, register char* s, char* val)
 								k = 0;
 								break;
 							}
-					if (k && ((q = (struct rule*)hashget(tab, t)) && (q->mark & M_mark) && q != r || *t++ == 'l' && *t++ == 'i' && *t++ == 'b' && *t && (q = (struct rule*)hashget(tab, t)) && (q->mark & M_mark) && q != r))
+					if (k && ((r = (struct rule*)hashget(tab, t)) && (r->mark & M_MUST) && r != d || *t++ == 'l' && *t++ == 'i' && *t++ == 'b' && *t && (r = (struct rule*)hashget(tab, t)) && (r->mark & M_MUST) && r != d))
 					{
-						if (t = strrchr(r->name, '/'))
+						if (t = strrchr(d->name, '/'))
 							t++;
 						else
-							t = r->name;
+							t = d->name;
 						if (t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
 							t += 3;
-						if (u = strrchr(q->name, '/'))
+						if (u = strrchr(r->name, '/'))
 							u++;
 						else
-							u = q->name;
-						if (!streq(t, u))
-							addprereq(r, q, PREREQ_APPEND);
+							u = r->name;
+						if (!streq(t, u) && (u[0] != 'l' || u[1] != 'i' || u[2] != 'b' || u[3]))
+							addprereq(d, r, PREREQ_APPEND);
 					}
 					j = i;
 				}
@@ -1028,12 +1336,13 @@ order(Sfio_t* xp, register char* s, char* val)
 			sfclose(sp);
 		}
 	}
-	if (val)
+	mark = 0;
+	if (targets)
 	{
-		tok = tokopen(val, 1);
+		tok = tokopen(targets, 1);
 		while (s = tokread(tok))
-			if ((r = (struct rule*)hashget(tab, s)) && (r->mark & M_mark))
-				descend(xp, r, 1);
+			if ((r = (struct rule*)hashget(tab, s)) && (r->mark & M_MUST))
+				mark = order_descend(xp, r, 1, mark, prereqs);
 		tokclose(tok);
 		k = 0;
 	}
@@ -1043,10 +1352,31 @@ order(Sfio_t* xp, register char* s, char* val)
 	while (*v++)
 	{
 		r = *v++;
-		if (r->mark & M_mark)
-			descend(xp, r, k);
+		if (r->mark & M_MUST)
+			mark = order_descend(xp, r, k, mark, prereqs);
+	}
+	if (prereqs)
+	{
+		sfprintf(xp, "all :");
+		v = (struct rule**)sfstrbase(vec);
+		while (*v++)
+		{
+			r = *v++;
+			if (r->mark & M_INIT)
+				sfprintf(xp, " %s", r->name);
+		}
+	}
+	v = (struct rule**)sfstrbase(vec);
+	while (*v++)
+	{
+		r = *v++;
+		if (prereqs && (r->mark & (M_INIT|M_LHS|M_MUST|M_RHS)) == M_LHS)
+			sfprintf(xp, " %s", r->name);
+		r->mark &= ~(M_INIT|M_LHS|M_MUST|M_RHS);
+		r->complink = 0;
 	}
 	sfstrclose(vec);
+	sfstrclose(tmp);
 	hashfree(tab);
 }
 
@@ -2855,7 +3185,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		}
 		else
 			tokenize = 1;
-		sep = EQ;
+		sep = 0;
 
 		/*
 		 * collect the operands
@@ -2954,23 +3284,36 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		else if (*ed)
 		{
 			/*
-			 * value: [!<>=][=][<val>]
+			 * value: [~!<>][=][<val>]
 			 */
 
-			for (sep = 0;; ed++)
+			for (;; ed++)
 			{
 				switch (*ed)
 				{
+				case '~':
+					if (sep & MAT)
+						break;
+					sep |= MAT;
+					continue;
 				case '!':
+					if (sep & NOT)
+						break;
 					sep |= NOT;
 					continue;
 				case '<':
+					if (sep & LT)
+						break;
 					sep |= LT;
 					continue;
 				case '=':
+					if (sep & EQ)
+						break;
 					sep |= EQ;
 					continue;
 				case '>':
+					if (sep & GT)
+						break;
 					sep |= GT;
 					continue;
 				}
@@ -3125,11 +3468,14 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		case 'J':
 		case 'K':
 		case 'L':
+		case 'W':
 			ctx = 0;
 			/*FALLTHROUGH*/
 		case 'N':
 		case 'O':
 		case 'U':
+			if (!sep)
+				sep = EQ;
 			if (val == KEEP || val == DELETE)
 				val = null;
 			switch (op)
@@ -3144,13 +3490,44 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				linebreak(xp, x, val);
 				continue;
 			case 'L':
-				list(xp, x, val, sep);
+				n = SORT_first;
+				if (sep & GT)
+					n |= SORT_sort|SORT_invert;
+				if (sep & LT)
+					n |= SORT_sort;
+				if (sep & EQ)
+					n &= ~SORT_first;
+				if (sep & NOT)
+					n |= SORT_qualified;
+				if (sep & MAT)
+					n |= SORT_sort|SORT_version;
+				list(xp, x, val, n);
 				continue;
 			case 'O':
 				cntlim = (*val == 'N' || *val == 'n' || *val == '*') ? -1 : (int)strtol(val, NiL, 0);
 				break;
 			case 'U':
 				uniq(xp, x, val, sep);
+				continue;
+			case 'W':
+				op = *val++;
+				if (!*val || *val == '=' && !*++val)
+					val = 0;
+				switch (op)
+				{
+				case 'O':
+					order_recurse(xp, x, NiL, NiL, val, -1, 0);
+					break;
+				case 'P':
+					order_recurse(xp, x, getval(external.files, 0), getval(external.skip, 0), val, 1, 1);
+					break;
+				case 'R':
+					order_recurse(xp, x, getval(external.files, 0), getval(external.skip, 0), val, 1, 0);
+					break;
+				default:
+					error(1, "unknown edit operator `W=%c'", op);
+					break;
+				}
 				continue;
 			}
 			break;
@@ -3161,59 +3538,59 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				sfputr(buf[1], x, 0);
 				x = sfstrset(buf[1], 0);
 			}
-			if (val != DELETE && val != KEEP)
+			n = SORT_sort;
+			if (val == DELETE || val == KEEP)
+			{
+				if (sep & GT)
+					n |= SORT_invert;
+				if (sep & EQ)
+					n |= SORT_numeric;
+				if (sep & NOT)
+					n |= SORT_uniq;
+				if (sep & MAT)
+					n |= SORT_version;
+			}
+			else
 				for (;;)
 				{
 					switch (*val++)
 					{
 					case 0:
 						break;
+					case 'C':
+					case 'c':
+						n |= SORT_collate;
+						continue;
+					case 'F':
+					case 'f':
+						n |= SORT_first;
+						continue;
+					case 'I':
+					case 'i':
+						n |= SORT_invert;
+						continue;
 					case 'N':
 					case 'n':
-					case '=':
-						sep |= EQ;
+						n |= SORT_numeric;
 						continue;
 					case 'U':
 					case 'u':
-					case '!':
-						sep |= NOT;
+						n |= SORT_uniq;
+						continue;
+					case 'V':
+					case 'v':
+						n |= SORT_version;
 						continue;
 					}
 					break;
 				}
-			sort(xp, x, sep);
+			sort(xp, x, n);
 			continue;
 		case 'R':
 			parse(NiL, x, "expand", 0);
 			continue;
 		case 'V':
 			error(1, "edit operator `%c' must appear first", op);
-			continue;
-		case 'W':
-			ctx = 0;
-			if (val == KEEP || val == DELETE)
-				val = 0;
-			if (val)
-			{
-				if (!(op = *val++))
-				{
-					op = 'O';
-					val = 0;
-				}
-				else if (!*val || *val == '=' && !*++val)
-					val = 0;
-			}
-			else
-				op = 'O';
-			switch (op)
-			{
-			case 'O':
-				order(xp, x, val);
-				break;
-			default:
-				error(1, "unknown edit operator `W=%c'", op);
-				break;
-			}
 			continue;
 		default:
 			error(1, "unknown edit operator `%c'", op);
@@ -3299,15 +3676,15 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				switch (*val)
 				{
 				case 'L':
-					val = "%(lower)S";
+					val = "%(lower)s";
 					message((-3, ":F=L: is obsolete -- use :F=%s: instead", val));
 					break;
 				case 'U':
-					val = "%(upper)S";
+					val = "%(upper)s";
 					message((-3, ":F=U: is obsolete -- use :F=%s: instead", val));
 					break;
 				case 'V':
-					val = "%(variable)S";
+					val = "%(variable)s";
 					message((-3, ":F=V: is obsolete -- use :F=%s: instead", val));
 					break;
 				}

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-g"
+setv CCFLAGS  ${mam_cc_DEBUG}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -50,12 +50,12 @@ done FEATURE/lcl dontcare generated
 done local.h
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/prototyped.h implicit
 make ../../../include/prototyped.h implicit
 done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/getopt.h dontcare
+done ../../../include/ast/ast_getopt.h dontcare
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -78,7 +78,10 @@ done ../../../include/ast/ast_unistd.h dontcare
 make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
-prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
 prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast_fs.h implicit
@@ -95,7 +98,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -316,6 +319,8 @@ make ../../../include/ast/hashpart.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/hashpart.h dontcare
 make ../../../include/ast/ast_cs.h implicit
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 done ../../../include/ast/ast_cs.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -346,8 +351,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/mailx
+prev ../../../bin
 prev mailx
-exec - ${STDMV} ${INSTALLROOT}/bin/mailx ${INSTALLROOT}/bin/mailx.old 2>/dev/null || true; test '' = 'mailx' || ${STDCMP} 2>/dev/null -s mailx ${INSTALLROOT}/bin/mailx || { ${STDCP} mailx ${INSTALLROOT}/bin/mailx  		    		    ;}
+exec - test '' = 'mailx' || ${STDCMP} 2>/dev/null -s mailx ${INSTALLROOT}/bin/mailx || { ${STDMV} ${INSTALLROOT}/bin/mailx ${INSTALLROOT}/bin/mailx.old 2>/dev/null || true; ${STDCP} mailx ${INSTALLROOT}/bin/mailx  		    		    ;}
 done ../../../bin/mailx generated
 make ../../../man/man1
 exec - set -
@@ -356,9 +362,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/mailx.1
+prev ../../../man/man1
 make mailx.1
 done mailx.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/mailx.1 ${INSTALLROOT}/man/man1/mailx.1.old 2>/dev/null || true; test '' = 'mailx.1' || ${STDCMP} 2>/dev/null -s mailx.1 ${INSTALLROOT}/man/man1/mailx.1 || { ${STDCP} mailx.1 ${INSTALLROOT}/man/man1/mailx.1  		    		    ;}
+exec - test '' = 'mailx.1' || ${STDCMP} 2>/dev/null -s mailx.1 ${INSTALLROOT}/man/man1/mailx.1 || { ${STDMV} ${INSTALLROOT}/man/man1/mailx.1 ${INSTALLROOT}/man/man1/mailx.1.old 2>/dev/null || true; ${STDCP} mailx.1 ${INSTALLROOT}/man/man1/mailx.1  		    		    ;}
 done ../../../man/man1/mailx.1 generated
 done install virtual
 make test

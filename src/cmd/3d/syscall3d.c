@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -38,6 +38,13 @@
 #define SYSCALL		syscall3d
 
 #include "dir_3d.h"
+
+#ifndef D_FILENO
+#define D_FILENO(d)	(1)
+#endif
+#ifndef D_TYPE
+#define D_TYPE(d)	(0)
+#endif
 
 #define C_EXIT		(MSG_MASK(MSG_exit))
 #define C_IO		(MSG_MASK(MSG_read)|MSG_MASK(MSG_write))
@@ -560,7 +567,7 @@ syscall3d(int call, ...)
 							bprintf(&b, e, " [");
 							while (dp < de)
 							{
-								bprintf(&b, e, " %lu \"%s\"", D_FILENO(dp), dp->d_name);
+								bprintf(&b, e, " %02d %lu \"%s\"", D_TYPE(dp), D_FILENO(dp), dp->d_name);
 								dp = (struct DIRdirent*)((char*)dp + dp->d_reclen);
 							}
 							bprintf(&b, e, " ]");

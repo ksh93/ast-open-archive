@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -49,15 +49,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
-exec - 	"")	cp msgadmin.sh msgadmin
+exec - "")	case 192 in
+exec - 	0)	cp msgadmin.sh msgadmin
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < msgadmin.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
 exec - 		cat msgadmin.sh
 exec - 		} > msgadmin
 exec - 		;;
@@ -65,8 +65,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" ;;
+exec - 	case 192 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" ;;
 exec - 	esac
 exec - 	cat msgadmin.sh
 exec - 	} > msgadmin
@@ -102,6 +103,9 @@ make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -123,7 +127,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -135,7 +139,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -175,7 +179,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done msgcpp.c
 prev msgcpp.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcpp.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcpp.c
 done msgcpp.o generated
 bind -lpp
 bind -last
@@ -194,15 +198,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
-exec - 	"")	cp msgcc.sh msgcc
+exec - "")	case 192 in
+exec - 	0)	cp msgcc.sh msgcc
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < msgcc.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"
 exec - 		cat msgcc.sh
 exec - 		} > msgcc
 exec - 		;;
@@ -210,8 +214,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" ;;
+exec - 	case 192 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" ;;
 exec - 	esac
 exec - 	cat msgcc.sh
 exec - 	} > msgcc
@@ -226,7 +231,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done msgcvt.c
 prev msgcvt.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcvt.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgcvt.c
 done msgcvt.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o msgcvt msgcvt.o ${mam_libast}
 done msgcvt generated
@@ -243,7 +248,7 @@ prev ../../../include/ast/ccode.h implicit
 prev ../../../include/ast/ast.h implicit
 done msggen.c
 prev msggen.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msggen.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msggen.c
 done msggen.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o msggen msggen.o ${mam_libast}
 done msggen generated
@@ -255,7 +260,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done msgget.c
 prev msgget.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgget.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2000-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?msgcc]"\" -c msgget.c
 done msgget.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o msgget msgget.o ${mam_libast}
 done msgget generated
@@ -266,28 +271,29 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/msgadmin
+prev ../../../bin
 prev msgadmin
-exec - ${STDMV} ${INSTALLROOT}/bin/msgadmin ${INSTALLROOT}/bin/msgadmin.old 2>/dev/null || true; test '' = 'msgadmin' || ${STDCMP} 2>/dev/null -s msgadmin ${INSTALLROOT}/bin/msgadmin || { ${STDCP} msgadmin ${INSTALLROOT}/bin/msgadmin  		    		    ;}
+exec - test '' = 'msgadmin' || ${STDCMP} 2>/dev/null -s msgadmin ${INSTALLROOT}/bin/msgadmin || { ${STDMV} ${INSTALLROOT}/bin/msgadmin ${INSTALLROOT}/bin/msgadmin.old 2>/dev/null || true; ${STDCP} msgadmin ${INSTALLROOT}/bin/msgadmin  		    		    ;}
 done ../../../bin/msgadmin generated
 make ../../../bin/msgcpp
 prev msgcpp
-exec - ${STDMV} ${INSTALLROOT}/bin/msgcpp ${INSTALLROOT}/bin/msgcpp.old 2>/dev/null || true; test '' = 'msgcpp' || ${STDCMP} 2>/dev/null -s msgcpp ${INSTALLROOT}/bin/msgcpp || { ${STDCP} msgcpp ${INSTALLROOT}/bin/msgcpp  		    		    ;}
+exec - test '' = 'msgcpp' || ${STDCMP} 2>/dev/null -s msgcpp ${INSTALLROOT}/bin/msgcpp || { ${STDMV} ${INSTALLROOT}/bin/msgcpp ${INSTALLROOT}/bin/msgcpp.old 2>/dev/null || true; ${STDCP} msgcpp ${INSTALLROOT}/bin/msgcpp  		    		    ;}
 done ../../../bin/msgcpp generated
 make ../../../bin/msgcc
 prev msgcc
-exec - ${STDMV} ${INSTALLROOT}/bin/msgcc ${INSTALLROOT}/bin/msgcc.old 2>/dev/null || true; test '' = 'msgcc' || ${STDCMP} 2>/dev/null -s msgcc ${INSTALLROOT}/bin/msgcc || { ${STDCP} msgcc ${INSTALLROOT}/bin/msgcc  		    		    ;}
+exec - test '' = 'msgcc' || ${STDCMP} 2>/dev/null -s msgcc ${INSTALLROOT}/bin/msgcc || { ${STDMV} ${INSTALLROOT}/bin/msgcc ${INSTALLROOT}/bin/msgcc.old 2>/dev/null || true; ${STDCP} msgcc ${INSTALLROOT}/bin/msgcc  		    		    ;}
 done ../../../bin/msgcc generated
 make ../../../bin/msgcvt
 prev msgcvt
-exec - ${STDMV} ${INSTALLROOT}/bin/msgcvt ${INSTALLROOT}/bin/msgcvt.old 2>/dev/null || true; test '' = 'msgcvt' || ${STDCMP} 2>/dev/null -s msgcvt ${INSTALLROOT}/bin/msgcvt || { ${STDCP} msgcvt ${INSTALLROOT}/bin/msgcvt  		    		    ;}
+exec - test '' = 'msgcvt' || ${STDCMP} 2>/dev/null -s msgcvt ${INSTALLROOT}/bin/msgcvt || { ${STDMV} ${INSTALLROOT}/bin/msgcvt ${INSTALLROOT}/bin/msgcvt.old 2>/dev/null || true; ${STDCP} msgcvt ${INSTALLROOT}/bin/msgcvt  		    		    ;}
 done ../../../bin/msgcvt generated
 make ../../../bin/msggen
 prev msggen
-exec - ${STDMV} ${INSTALLROOT}/bin/msggen ${INSTALLROOT}/bin/msggen.old 2>/dev/null || true; test '' = 'msggen' || ${STDCMP} 2>/dev/null -s msggen ${INSTALLROOT}/bin/msggen || { ${STDCP} msggen ${INSTALLROOT}/bin/msggen  		    		    ;}
+exec - test '' = 'msggen' || ${STDCMP} 2>/dev/null -s msggen ${INSTALLROOT}/bin/msggen || { ${STDMV} ${INSTALLROOT}/bin/msggen ${INSTALLROOT}/bin/msggen.old 2>/dev/null || true; ${STDCP} msggen ${INSTALLROOT}/bin/msggen  		    		    ;}
 done ../../../bin/msggen generated
 make ../../../bin/msgget
 prev msgget
-exec - ${STDMV} ${INSTALLROOT}/bin/msgget ${INSTALLROOT}/bin/msgget.old 2>/dev/null || true; test '' = 'msgget' || ${STDCMP} 2>/dev/null -s msgget ${INSTALLROOT}/bin/msgget || { ${STDCP} msgget ${INSTALLROOT}/bin/msgget  		    		    ;}
+exec - test '' = 'msgget' || ${STDCMP} 2>/dev/null -s msgget ${INSTALLROOT}/bin/msgget || { ${STDMV} ${INSTALLROOT}/bin/msgget ${INSTALLROOT}/bin/msgget.old 2>/dev/null || true; ${STDCP} msgget ${INSTALLROOT}/bin/msgget  		    		    ;}
 done ../../../bin/msgget generated
 done install virtual
 make test

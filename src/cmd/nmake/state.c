@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -900,6 +900,7 @@ statetime(register struct rule* r, int sync)
 	register struct rule*	s;
 	int			a;
 	int			n;
+	int			skip = 0;
 	int			zerostate = 0;
 	unsigned long		t;
 	struct rule*		x;
@@ -912,7 +913,17 @@ statetime(register struct rule* r, int sync)
 	if (state.interrupt && r->status != EXISTS)
 		zerostate = 1;
 	else if (r->status == FAILED)
+	{
 		st.st_mtime = 0;
+		if ((state.test & 0x00040000) && (s = staterule(RULE, r, NiL, 0)))
+		{
+			r->time = s->time;
+			if (r->property & (P_metarule|P_state))
+				r->event = s->event;
+			state.savestate = 1;
+			skip = 1;
+		}
+	}
 	else if (r->property & P_virtual)
 		r->time = st.st_mtime = CURTIME;
 	else if (checkcurrent(r, &st))
@@ -1050,8 +1061,9 @@ statetime(register struct rule* r, int sync)
 				freelist(s->prereqs);
 			s->prereqs = r->prereqs;
 		}
+		state.savestate = 1;
 	}
-	if (s->time != st.st_mtime || zerostate && s->time)
+	if (!skip && (s->time != st.st_mtime || zerostate && s->time))
 	{
 		s->time = zerostate ? 0 : st.st_mtime;
 		s->event = CURTIME;

@@ -1,5 +1,14 @@
 # regression tests for the POSIX sed utility
 
+function DATA
+{
+	for f
+	do	test -f $f && continue
+		echo $f > $f
+		chmod $f $f
+	done
+}
+
 TEST 01 'empty script and passive command combinations'
 	EXEC -f script -n
 		NOTE '=, -n, blank lines'
@@ -437,3 +446,10 @@ Description: The GNU sed stream editor.
  output.'
 		OUTPUT - 'Package: grep - GNU grep, egrep and fgrep.
 Package: sed - The GNU sed stream editor.'
+
+TEST 31 'file access'
+	DATA 000 644
+	DIAGNOSTICS
+	EXEC 's/./x/' 000 644
+		OUTPUT - $'x44'
+	EXEC 's/./x/' 644 000

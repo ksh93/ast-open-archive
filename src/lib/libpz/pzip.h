@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -76,6 +76,7 @@
 #define PZ_SUMMARY	0x00080000	/* summary trace		*/
 #define PZ_PUSHED	0x00100000	/* internal sfdcpzip() stream	*/
 #define PZ_SPLIT	0x00200000	/* open for split		*/
+#define PZ_SORT		0x00400000	/* sort window before deflate	*/
 
 #define PZ_VERIFY	PZ_STAT		/* verify but don't push	*/
 

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -178,6 +178,7 @@
  *	0x00008000 force state file garbage collection
  *	0x00010000 alarm status trace
  *	0x00020000 close internal.openfd before job exec
+ *	0x00040000 set failed state|metarule event to staterule event
  */
 
 #include "make.h"

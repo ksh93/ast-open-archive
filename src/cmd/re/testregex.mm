@@ -5,7 +5,7 @@ AT&T Labs Research regex(3) regression tests
 .AF "AT&T Labs Research - Florham Park NJ"
 .AU "Glenn Fowler <gsf@research.att.com>"
 .H 1
-.xx link="testregex.c	testregex.c 2002-07-17"
+.xx link="testregex.c	testregex.c 2003-01-03"
 is the latest source for the AT&T Labs Research regression test
 harness for the
 .xx link="http://www.opengroup.org/onlinepubs/007904975/functions/regcomp.html	X/Open regex"

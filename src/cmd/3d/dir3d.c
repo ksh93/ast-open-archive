@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -169,7 +169,7 @@ readdir3d(register DIR* dirp)
 			}
 			CHEATDIR(dirp);
 		}
-#if _mem_d_fileno_dirent
+#ifdef D_FILENO
 		if (!state.in_2d)
 		{
 			register char*	s = dp->d_name;
@@ -185,7 +185,7 @@ readdir3d(register DIR* dirp)
 				 */
 
 				if (!*s && !dirp->viewp->opaque)
-					dirp->viewp->opaque = dp->d_fileno;
+					dirp->viewp->opaque = D_FILENO(dp);
 				continue;
 			}
 		}
@@ -202,8 +202,8 @@ readdir3d(register DIR* dirp)
 			if ((dirp->viewp + 1)->dirp)
 				hashput(dirp->overlay, 0, (char*)dirp->viewp);
 		}
-#if _mem_d_fileno_dirent
-		if (dp->d_fileno == dirp->viewp->opaque)
+#ifdef D_FILENO
+		if (D_FILENO(dp) == dirp->viewp->opaque)
 			continue;
 #endif
 		intercepted--;
@@ -301,7 +301,7 @@ readdir643d(register DIR* dirp)
 			}
 			CHEATDIR(dirp);
 		}
-#if _mem_d_fileno_dirent
+#ifdef D_FILENO
 		if (!state.in_2d)
 		{
 			register char*	s = dp->d_name;
@@ -317,7 +317,7 @@ readdir643d(register DIR* dirp)
 				 */
 
 				if (!*s && !dirp->viewp->opaque)
-					dirp->viewp->opaque = dp->d_fileno;
+					dirp->viewp->opaque = D_FILENO(dp);
 				continue;
 			}
 		}
@@ -334,8 +334,8 @@ readdir643d(register DIR* dirp)
 			if ((dirp->viewp + 1)->dirp)
 				hashput(dirp->overlay, 0, (char*)dirp->viewp);
 		}
-#if _mem_d_fileno_dirent
-		if (dp->d_fileno == dirp->viewp->opaque)
+#ifdef D_FILENO
+		if (D_FILENO(dp) == dirp->viewp->opaque)
 			continue;
 #endif
 		intercepted--;

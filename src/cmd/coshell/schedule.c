@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -143,6 +143,11 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 				state.pool = a->global.pool;
 			if (a->global.set & SETPROFILE)
 				state.profile = dupstring(state.profile, a->global.profile);
+			if (a->global.set & SETREMOTE)
+			{
+				pathrepl(a->global.remote, state.home->type, "%s");
+				state.remote = dupstring(state.remote, a->global.remote);
+			}
 			if (a->global.set & SETSCHEDULE)
 			{
 				name = a->global.schedule;
@@ -429,6 +434,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 		miscadd(sp, a->misc);
 	}
 	if (a->set & SETRATING) sp->rating = a->rating;
+	if (a->set & SETREMOTE) strcpy(sp->remote, a->remote);
 	if (a->set & SETSCALE) sp->scale = a->scale;
 	if (a->set & SETSHELL) strcpy(sp->shell, a->shell);
 	if (a->set & SETTYPE) strcpy(sp->type, a->type);

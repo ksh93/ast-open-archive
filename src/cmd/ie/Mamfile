@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
+setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -86,6 +86,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make error?--?old?ethernet?address?at?wrong?offset implicit
@@ -138,7 +141,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -150,7 +153,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -210,6 +213,8 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DVSH -DESH -D_PACKAGE_ast
 done history.o generated
 make edit.o
 make edit.c
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 prev ../../../include/ast/error.h implicit
 prev edit.h implicit
 prev history.h implicit
@@ -239,15 +244,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' in
-exec - 	"")	cp ie.sh ie
+exec - "")	case 187 in
+exec - 	0)	cp ie.sh ie
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < ie.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"
 exec - 		cat ie.sh
 exec - 		} > ie
 exec - 		;;
@@ -255,8 +260,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\" ;;
+exec - 	case 187 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\" ;;
 exec - 	esac
 exec - 	cat ie.sh
 exec - 	} > ie
@@ -271,8 +277,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/libedit.a archive
+prev ../../../lib
 prev libedit.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libedit.a ${PACKAGE_ast_LIB}/libedit.a.old 2>/dev/null || true; test '' = 'libedit.a' || ${STDCMP} 2>/dev/null -s libedit.a ${PACKAGE_ast_LIB}/libedit.a || { ${STDCP} libedit.a ${PACKAGE_ast_LIB}/libedit.a  		    		    ;}
+exec - test '' = 'libedit.a' || ${STDCMP} 2>/dev/null -s libedit.a ${PACKAGE_ast_LIB}/libedit.a || { ${STDMV} ${PACKAGE_ast_LIB}/libedit.a ${PACKAGE_ast_LIB}/libedit.a.old 2>/dev/null || true; ${STDCP} libedit.a ${PACKAGE_ast_LIB}/libedit.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libedit.a) >/dev/null 2>&1 || true
 done ../../../lib/libedit.a generated
 make ../../../lib/lib
@@ -282,8 +289,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/edit
+prev ../../../lib/lib
 prev edit.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/edit ${PACKAGE_ast_LIB}/lib/edit.old 2>/dev/null || true; test '' = 'edit.req' || ${STDCMP} 2>/dev/null -s edit.req ${PACKAGE_ast_LIB}/lib/edit || { ${STDCP} edit.req ${PACKAGE_ast_LIB}/lib/edit  		    		    ;}
+exec - test '' = 'edit.req' || ${STDCMP} 2>/dev/null -s edit.req ${PACKAGE_ast_LIB}/lib/edit || { ${STDMV} ${PACKAGE_ast_LIB}/lib/edit ${PACKAGE_ast_LIB}/lib/edit.old 2>/dev/null || true; ${STDCP} edit.req ${PACKAGE_ast_LIB}/lib/edit  		    		    ;}
 done ../../../lib/lib/edit generated
 make ../../../bin
 exec - set -
@@ -292,8 +300,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/ie
+prev ../../../bin
 prev ie
-exec - ${STDMV} ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; test '' = 'ie' || ${STDCMP} 2>/dev/null -s ie ${INSTALLROOT}/bin/ie || { ${STDCP} ie ${INSTALLROOT}/bin/ie  		    		    ;}
+exec - test '' = 'ie' || ${STDCMP} 2>/dev/null -s ie ${INSTALLROOT}/bin/ie || { ${STDMV} ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; ${STDCP} ie ${INSTALLROOT}/bin/ie  		    		    ;}
 done ../../../bin/ie generated
 done install virtual
 make test

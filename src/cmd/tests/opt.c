@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2002 AT&T Corp.                *
+*                Copyright (c) 1999-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -42,6 +42,8 @@
 static int
 infof(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 {
+	if (*s == ':')
+		return sfprintf(sp, "%s", *(s + 1) == 'n' ? "" : (s + 2));
 	if (streq(s, "options"))
 		return sfprintf(sp, "[Z:zoom?Do it as fast as possible.]\fmore#1\f\fmore#2\f[B:boom?Dump into \afile\a.]:[file]");
 	if (streq(s, "zero"))

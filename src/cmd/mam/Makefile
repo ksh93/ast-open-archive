@@ -21,3 +21,5 @@ mamstate :: mamstate.c
 :INSTALLDIR: mamtst
 
 mamtst :: mamtst.c -lmam
+
+:: mamold.sh

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
@@ -12,7 +12,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -60,6 +60,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -81,7 +84,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -93,7 +96,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -144,7 +147,7 @@ done ../../../include/ast/error.h
 prev ../../../include/ast/ast.h implicit
 done pzip.c
 prev pzip.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pzip.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pzip.c
 done pzip.o generated
 bind -lz
 bind -lbz
@@ -165,7 +168,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done pop.c
 prev pop.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pop.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pop.c
 done pop.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pop pop.o ${mam_libpz} ${mam_libast}
 done pop generated
@@ -201,7 +204,7 @@ prev ../../../include/ast/ast.h implicit
 done pin.c
 prev pin.c
 setv LICENSE -DLICENSE="since=1998,author=gsf+alb"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Adam Buchsbaum <alb@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pin.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Adam Buchsbaum <alb@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pin.c
 done pin.o generated
 bind -ltsp
 setv LICENSE -DLICENSE="since=1998,author=gsf+alb"
@@ -215,7 +218,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done rectify.c
 prev rectify.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c rectify.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c rectify.c
 done rectify.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o rectify rectify.o ${mam_libpz} ${mam_libast}
 done rectify generated
@@ -227,7 +230,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done funzip.c
 prev funzip.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -D_PACKAGE_ast -c funzip.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -D_PACKAGE_ast -c funzip.c
 done funzip.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o funzip funzip.o ${mam_libz} ${mam_libpz} ${mam_libast}
 done funzip generated
@@ -238,24 +241,25 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/pzip
+prev ../../../bin
 prev pzip
-exec - ${STDMV} ${INSTALLROOT}/bin/pzip ${INSTALLROOT}/bin/pzip.old 2>/dev/null || true; test '' = 'pzip' || ${STDCMP} 2>/dev/null -s pzip ${INSTALLROOT}/bin/pzip || { ${STDCP} pzip ${INSTALLROOT}/bin/pzip  		    		    ;}
+exec - test '' = 'pzip' || ${STDCMP} 2>/dev/null -s pzip ${INSTALLROOT}/bin/pzip || { ${STDMV} ${INSTALLROOT}/bin/pzip ${INSTALLROOT}/bin/pzip.old 2>/dev/null || true; ${STDCP} pzip ${INSTALLROOT}/bin/pzip  		    		    ;}
 done ../../../bin/pzip generated
 make ../../../bin/pop
 prev pop
-exec - ${STDMV} ${INSTALLROOT}/bin/pop ${INSTALLROOT}/bin/pop.old 2>/dev/null || true; test '' = 'pop' || ${STDCMP} 2>/dev/null -s pop ${INSTALLROOT}/bin/pop || { ${STDCP} pop ${INSTALLROOT}/bin/pop  		    		    ;}
+exec - test '' = 'pop' || ${STDCMP} 2>/dev/null -s pop ${INSTALLROOT}/bin/pop || { ${STDMV} ${INSTALLROOT}/bin/pop ${INSTALLROOT}/bin/pop.old 2>/dev/null || true; ${STDCP} pop ${INSTALLROOT}/bin/pop  		    		    ;}
 done ../../../bin/pop generated
 make ../../../bin/pin
 prev pin
-exec - ${STDMV} ${INSTALLROOT}/bin/pin ${INSTALLROOT}/bin/pin.old 2>/dev/null || true; test '' = 'pin' || ${STDCMP} 2>/dev/null -s pin ${INSTALLROOT}/bin/pin || { ${STDCP} pin ${INSTALLROOT}/bin/pin  		    		    ;}
+exec - test '' = 'pin' || ${STDCMP} 2>/dev/null -s pin ${INSTALLROOT}/bin/pin || { ${STDMV} ${INSTALLROOT}/bin/pin ${INSTALLROOT}/bin/pin.old 2>/dev/null || true; ${STDCP} pin ${INSTALLROOT}/bin/pin  		    		    ;}
 done ../../../bin/pin generated
 make ../../../bin/rectify
 prev rectify
-exec - ${STDMV} ${INSTALLROOT}/bin/rectify ${INSTALLROOT}/bin/rectify.old 2>/dev/null || true; test '' = 'rectify' || ${STDCMP} 2>/dev/null -s rectify ${INSTALLROOT}/bin/rectify || { ${STDCP} rectify ${INSTALLROOT}/bin/rectify  		    		    ;}
+exec - test '' = 'rectify' || ${STDCMP} 2>/dev/null -s rectify ${INSTALLROOT}/bin/rectify || { ${STDMV} ${INSTALLROOT}/bin/rectify ${INSTALLROOT}/bin/rectify.old 2>/dev/null || true; ${STDCP} rectify ${INSTALLROOT}/bin/rectify  		    		    ;}
 done ../../../bin/rectify generated
 make ../../../bin/funzip
 prev funzip
-exec - ${STDMV} ${INSTALLROOT}/bin/funzip ${INSTALLROOT}/bin/funzip.old 2>/dev/null || true; test '' = 'funzip' || ${STDCMP} 2>/dev/null -s funzip ${INSTALLROOT}/bin/funzip || { ${STDCP} funzip ${INSTALLROOT}/bin/funzip  		    		    ;}
+exec - test '' = 'funzip' || ${STDCMP} 2>/dev/null -s funzip ${INSTALLROOT}/bin/funzip || { ${STDMV} ${INSTALLROOT}/bin/funzip ${INSTALLROOT}/bin/funzip.old 2>/dev/null || true; ${STDCP} funzip ${INSTALLROOT}/bin/funzip  		    		    ;}
 done ../../../bin/funzip generated
 done install virtual
 make test

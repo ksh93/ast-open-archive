@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -115,8 +115,10 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 static int
 genprereqs(Sfio_t* sp, struct rule* r, int dostate, int all, int sep)
 {
+	state.val++;
 	sep = scanprereqs(sp, r, dostate, all, 1, sep);
 	scanprereqs(NiL, r, dostate, all, 1, sep);
+	state.val--;
 	return sep;
 }
 

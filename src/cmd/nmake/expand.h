@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -66,11 +66,12 @@ typedef struct
 #define EQ		(1<<1)
 #define GT		(1<<2)
 #define NOT		(1<<3)
+#define MAT		(1<<4)
 
 #define NE		(NOT|EQ)
 #define LE		(LT|EQ)
 #define GE		(GT|EQ)
-#define CMP		(1<<4)
+#define CMP		(1<<5)
 
 #define ED_COPY		1
 #define ED_EDIT		2

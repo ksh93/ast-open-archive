@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1996-2002 AT&T Corp.                #
+#                Copyright (c) 1996-2003 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -29,12 +29,13 @@
 # Test some nonstandard features if present.
 
 AWK=awk
+CC=${CC:-${TESTCC:-cc}}
 NAWK=nawk
 SUM=sum
 SORT=sort
 TMP=sort.tmp
 
-export TEST AWK SUM SORT TMP
+export TEST AWK CC SUM SORT TMP
 
 case $# in
 0)	set $SORT ;;
@@ -721,8 +722,8 @@ main(){	run(0, 011);		/* 012=='\n' */
 	run(013, 0377);
 	return 0; }
 !
-cc xx.c 
-a.out >in
+$CC -o xx.exe xx.c 
+./xx.exe >in
 cat >xx.c <<!
 #include <stdio.h>
 void run(i,j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
@@ -732,8 +733,8 @@ main(){ run(0, 011);
 	run(' ', 0176);
 	return 0; }
 !
-cc xx.c
-a.out >out
+$CC -o xx.exe xx.c
+./xx.exe >out
 
 ./xsort A -i -k 2
 
@@ -753,8 +754,8 @@ main(){	run(0, 010);		/* 011=='\t', 012=='\n' */
 	run('a', 'z');
 	return 0; }
 !
-cc xx.c
-a.out >out
+$CC -o xx.exe xx.c
+./xx.exe >out
 
 ./xsort B -d -k 2
 
@@ -770,9 +771,9 @@ main(){	int i;
 	run('z'+1, 0377);
 	return 0; }
 !
-cc xx.c
-a.out >out
-rm xx.c a.out
+$CC -o xx.exe xx.c
+./xx.exe >out
+rm -f xx.c xx.o xx.exe
 
 ./xsort C -f -k 2
 
@@ -803,12 +804,12 @@ cat >xx.c <<'!'
 #include <stdio.h>
 main() { printf("\n%cb\n%ca\n",0,0); return 0; }
 !
-cc xx.c
-a.out >in
+$CC -o xx.exe xx.c
+./xx.exe >in
 $SORT -u in >xx
 cmp -s in xx >/dev/null && echo ${TEST}A failed
 test "`wc -c <in`" = "`wc -c <xx`" || echo ${TEST}B failed
-rm xx.c a.out
+rm -f xx.c xx.o xx.exe
 
 #---------------------------------------------------------------
 TEST=22; echo $TEST	# field limits

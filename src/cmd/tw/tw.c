@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2002-11-07 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2003-01-10 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -802,5 +802,7 @@ main(int argc, register char** argv)
 		error_info.errors = eval(state.select, NiL) == 0;
 	if (x = exexpr(state.program, "end", NiL, 0))
 		eval(x, NiL);
+	if (sfsync(sfstdout))
+		error(ERROR_SYSTEM|2, "write error");
 	exit(error_info.errors != 0);
 }

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -153,6 +153,14 @@ init(void* handle, int fdmax)
 	if (!(state.sh = strdup(s)))
 		error(3, "out of space [shell path]");
 	message((-1, "parameterized shell path is %s", state.sh));
+
+	/*
+	 * initialize the remote shell path
+	 */
+
+	if (!(state.remote = strdup(CS_REMOTE_SHELL)))
+		error(3, "out of space [remote shell path]");
+	message((-1, "remote shell path is %s", state.remote));
 
 	/*
 	 * set up the mesg and pump connect streams

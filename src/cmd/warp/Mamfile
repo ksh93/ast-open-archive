@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
+setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -97,6 +97,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -118,7 +121,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -130,7 +133,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -168,15 +171,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]"\" DEBUG=1 _PACKAGE_ast=1' in
-exec - 	"")	cp warp.sh warp
+exec - "")	case 214 in
+exec - 	0)	cp warp.sh warp
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < warp.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]"\" DEBUG=1 _PACKAGE_ast=1
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]"\" DEBUG=1 _PACKAGE_ast=1
 exec - 		cat warp.sh
 exec - 		} > warp
 exec - 		;;
@@ -184,8 +187,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]"\" DEBUG=1 _PACKAGE_ast=1' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]"\" DEBUG=1 _PACKAGE_ast=1 ;;
+exec - 	case 214 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]"\" DEBUG=1 _PACKAGE_ast=1 ;;
 exec - 	esac
 exec - 	cat warp.sh
 exec - 	} > warp
@@ -201,8 +205,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/libwarp.a archive
+prev ../../../lib
 prev libwarp.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libwarp.a ${PACKAGE_ast_LIB}/libwarp.a.old 2>/dev/null || true; test '' = 'libwarp.a' || ${STDCMP} 2>/dev/null -s libwarp.a ${PACKAGE_ast_LIB}/libwarp.a || { ${STDCP} libwarp.a ${PACKAGE_ast_LIB}/libwarp.a  		    		    ;}
+exec - test '' = 'libwarp.a' || ${STDCMP} 2>/dev/null -s libwarp.a ${PACKAGE_ast_LIB}/libwarp.a || { ${STDMV} ${PACKAGE_ast_LIB}/libwarp.a ${PACKAGE_ast_LIB}/libwarp.a.old 2>/dev/null || true; ${STDCP} libwarp.a ${PACKAGE_ast_LIB}/libwarp.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libwarp.a) >/dev/null 2>&1 || true
 done ../../../lib/libwarp.a generated
 make ../../../lib/lib
@@ -212,8 +217,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/warp
+prev ../../../lib/lib
 prev warp.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/warp ${PACKAGE_ast_LIB}/lib/warp.old 2>/dev/null || true; test '' = 'warp.req' || ${STDCMP} 2>/dev/null -s warp.req ${PACKAGE_ast_LIB}/lib/warp || { ${STDCP} warp.req ${PACKAGE_ast_LIB}/lib/warp  		    		    ;}
+exec - test '' = 'warp.req' || ${STDCMP} 2>/dev/null -s warp.req ${PACKAGE_ast_LIB}/lib/warp || { ${STDMV} ${PACKAGE_ast_LIB}/lib/warp ${PACKAGE_ast_LIB}/lib/warp.old 2>/dev/null || true; ${STDCP} warp.req ${PACKAGE_ast_LIB}/lib/warp  		    		    ;}
 done ../../../lib/lib/warp generated
 make ../../../bin
 exec - set -
@@ -222,8 +228,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/warp
+prev ../../../bin
 prev warp
-exec - ${STDMV} ${INSTALLROOT}/bin/warp ${INSTALLROOT}/bin/warp.old 2>/dev/null || true; test '' = 'warp' || ${STDCMP} 2>/dev/null -s warp ${INSTALLROOT}/bin/warp || { ${STDCP} warp ${INSTALLROOT}/bin/warp  		    		    ;}
+exec - test '' = 'warp' || ${STDCMP} 2>/dev/null -s warp ${INSTALLROOT}/bin/warp || { ${STDMV} ${INSTALLROOT}/bin/warp ${INSTALLROOT}/bin/warp.old 2>/dev/null || true; ${STDCP} warp ${INSTALLROOT}/bin/warp  		    		    ;}
 done ../../../bin/warp generated
 done install virtual
 make test

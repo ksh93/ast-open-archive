@@ -8,6 +8,8 @@ ast-open :PACKAGE: \
 
 :COVERS: ast-base ast-ksh
 
+:CATEGORY: devel libs mail shells utils
+
 :INDEX: ksh, pax, nmake, sfio, and ast open source commands and libraries
 
 :DESCRIPTION:

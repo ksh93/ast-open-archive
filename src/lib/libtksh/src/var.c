@@ -362,7 +362,7 @@ char *Tcl_SetVar2(Tcl_Interp *interp, char *part1, char *part2,
 			goto scalar;
 		}
 
-		listValue = (char *) malloc(len);
+		listValue = (char *) malloc(len + 1);
 		Tcl_ConvertElement(newValue, listValue, listFlags);
 		newValue = listValue;
 	}
@@ -504,6 +504,9 @@ tksh_arrputval(Namval_t *nv, const char *val, int flags, Namfun_t *nf)
 	memset(&nvcpy, 0, sizeof(nvcpy));
 	if (! nvsub)			/* Don't handle whole array put */
 	{
+#if 1 /* this hacks around a double-free interaction with nv_move() below */
+		nv->nvalue = 0;
+#endif
 		nv_putv(nv, val, flags, nf);
 		return;
 	}

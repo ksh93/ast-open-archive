@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -61,7 +61,6 @@ fs3d_dup(int ofd, int nfd)
 		}
 		if (state.file[ofd].dir && (state.file[nfd].dir = newof(0, Dir_t, 1, strlen(state.file[ofd].dir->path))))
 		{
-			state.file[nfd].dir = 0;
 			strcpy(state.file[nfd].dir->path, state.file[ofd].dir->path);
 			state.file[nfd].dir->dev = state.file[ofd].dir->dev;
 			state.file[nfd].dir->ino = state.file[ofd].dir->ino;

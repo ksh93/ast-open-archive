@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
+setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -76,11 +76,14 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -134,7 +137,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -180,6 +183,8 @@ done ../../../include/ast/hashpart.h dontcare
 make ast_cs.h implicit
 make FEATURE/cs
 make features/cs.c
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 prev FEATURE/lib implicit
 prev ../../../include/ast/ast.h implicit
 done features/cs.c
@@ -579,8 +584,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp genlocal.sh genlocal
+exec - "")	case 0 in
+exec - 	0)	cp genlocal.sh genlocal
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < genlocal.sh`
@@ -595,8 +600,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat genlocal.sh
 exec - 	} > genlocal
@@ -617,8 +623,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp genshare.sh genshare
+exec - "")	case 0 in
+exec - 	0)	cp genshare.sh genshare
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < genshare.sh`
@@ -633,8 +639,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat genshare.sh
 exec - 	} > genshare
@@ -649,8 +656,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/libcs.a archive
+prev ../../../lib
 prev libcs.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libcs.a ${PACKAGE_ast_LIB}/libcs.a.old 2>/dev/null || true; test '' = 'libcs.a' || ${STDCMP} 2>/dev/null -s libcs.a ${PACKAGE_ast_LIB}/libcs.a || { ${STDCP} libcs.a ${PACKAGE_ast_LIB}/libcs.a  		    		    ;}
+exec - test '' = 'libcs.a' || ${STDCMP} 2>/dev/null -s libcs.a ${PACKAGE_ast_LIB}/libcs.a || { ${STDMV} ${PACKAGE_ast_LIB}/libcs.a ${PACKAGE_ast_LIB}/libcs.a.old 2>/dev/null || true; ${STDCP} libcs.a ${PACKAGE_ast_LIB}/libcs.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libcs.a) >/dev/null 2>&1 || true
 done ../../../lib/libcs.a generated
 make ../../../man/man3
@@ -660,9 +668,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/cs.3
+prev ../../../man/man3
 make cs.3
 done cs.3
-exec - ${STDMV} ${INSTALLROOT}/man/man3/cs.3 ${INSTALLROOT}/man/man3/cs.3.old 2>/dev/null || true; test '' = 'cs.3' || ${STDCMP} 2>/dev/null -s cs.3 ${INSTALLROOT}/man/man3/cs.3 || { ${STDCP} cs.3 ${INSTALLROOT}/man/man3/cs.3  		    		    ;}
+exec - test '' = 'cs.3' || ${STDCMP} 2>/dev/null -s cs.3 ${INSTALLROOT}/man/man3/cs.3 || { ${STDMV} ${INSTALLROOT}/man/man3/cs.3 ${INSTALLROOT}/man/man3/cs.3.old 2>/dev/null || true; ${STDCP} cs.3 ${INSTALLROOT}/man/man3/cs.3  		    		    ;}
 done ../../../man/man3/cs.3 generated
 make ../../../lib/lib
 exec - set -
@@ -671,8 +680,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/cs
+prev ../../../lib/lib
 prev cs.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/cs ${PACKAGE_ast_LIB}/lib/cs.old 2>/dev/null || true; test '' = 'cs.req' || ${STDCMP} 2>/dev/null -s cs.req ${PACKAGE_ast_LIB}/lib/cs || { ${STDCP} cs.req ${PACKAGE_ast_LIB}/lib/cs  		    		    ;}
+exec - test '' = 'cs.req' || ${STDCMP} 2>/dev/null -s cs.req ${PACKAGE_ast_LIB}/lib/cs || { ${STDMV} ${PACKAGE_ast_LIB}/lib/cs ${PACKAGE_ast_LIB}/lib/cs.old 2>/dev/null || true; ${STDCP} cs.req ${PACKAGE_ast_LIB}/lib/cs  		    		    ;}
 done ../../../lib/lib/cs generated
 make ../../../include/ast
 exec - set -
@@ -681,6 +691,7 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/cs.h
+prev ../../../include/ast
 prev cs.h
 exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1990,author=gsf'  cs.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cs.h 1.${COTEMP}.x
@@ -727,12 +738,13 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs
 exec - fi
 done ../../../lib/cs generated
 make ../../../lib/cs/genlocal
+prev ../../../lib/cs
 prev genlocal
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/genlocal ${PACKAGE_ast_LIB}/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${PACKAGE_ast_LIB}/cs/genlocal || { ${STDCP} genlocal ${PACKAGE_ast_LIB}/cs/genlocal  		    		    ;}
+exec - test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${PACKAGE_ast_LIB}/cs/genlocal || { ${STDMV} ${PACKAGE_ast_LIB}/cs/genlocal ${PACKAGE_ast_LIB}/cs/genlocal.old 2>/dev/null || true; ${STDCP} genlocal ${PACKAGE_ast_LIB}/cs/genlocal  		    		    ;}
 done ../../../lib/cs/genlocal generated
 make ../../../lib/cs/genshare
 prev genshare
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/genshare ${PACKAGE_ast_LIB}/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${PACKAGE_ast_LIB}/cs/genshare || { ${STDCP} genshare ${PACKAGE_ast_LIB}/cs/genshare  		    		    ;}
+exec - test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${PACKAGE_ast_LIB}/cs/genshare || { ${STDMV} ${PACKAGE_ast_LIB}/cs/genshare ${PACKAGE_ast_LIB}/cs/genshare.old 2>/dev/null || true; ${STDCP} genshare ${PACKAGE_ast_LIB}/cs/genshare  		    		    ;}
 done ../../../lib/cs/genshare generated
 make ../../../share/lib/cs
 exec - set -
@@ -741,17 +753,18 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/cs
 exec - fi
 done ../../../share/lib/cs generated
 make ../../../share/lib/cs/local.ast
+prev ../../../share/lib/cs
 make local.ast
 done local.ast
-exec - ${STDMV} ${INSTALLROOT}/share/lib/cs/local.ast ${INSTALLROOT}/share/lib/cs/local.ast.old 2>/dev/null || true; test '' = 'local.ast' || ${STDCMP} 2>/dev/null -s local.ast ${INSTALLROOT}/share/lib/cs/local.ast || { ${STDCP} local.ast ${INSTALLROOT}/share/lib/cs/local.ast  		    		    ;}
+exec - test '' = 'local.ast' || ${STDCMP} 2>/dev/null -s local.ast ${INSTALLROOT}/share/lib/cs/local.ast || { ${STDMV} ${INSTALLROOT}/share/lib/cs/local.ast ${INSTALLROOT}/share/lib/cs/local.ast.old 2>/dev/null || true; ${STDCP} local.ast ${INSTALLROOT}/share/lib/cs/local.ast  		    		    ;}
 done ../../../share/lib/cs/local.ast generated
 make ../../../share/lib/cs/genlocal
 prev genlocal
-exec - ${STDMV} ${INSTALLROOT}/share/lib/cs/genlocal ${INSTALLROOT}/share/lib/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${INSTALLROOT}/share/lib/cs/genlocal || { ${STDCP} genlocal ${INSTALLROOT}/share/lib/cs/genlocal  		    		    ;}
+exec - test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${INSTALLROOT}/share/lib/cs/genlocal || { ${STDMV} ${INSTALLROOT}/share/lib/cs/genlocal ${INSTALLROOT}/share/lib/cs/genlocal.old 2>/dev/null || true; ${STDCP} genlocal ${INSTALLROOT}/share/lib/cs/genlocal  		    		    ;}
 done ../../../share/lib/cs/genlocal generated
 make ../../../share/lib/cs/genshare
 prev genshare
-exec - ${STDMV} ${INSTALLROOT}/share/lib/cs/genshare ${INSTALLROOT}/share/lib/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${INSTALLROOT}/share/lib/cs/genshare || { ${STDCP} genshare ${INSTALLROOT}/share/lib/cs/genshare  		    		    ;}
+exec - test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${INSTALLROOT}/share/lib/cs/genshare || { ${STDMV} ${INSTALLROOT}/share/lib/cs/genshare ${INSTALLROOT}/share/lib/cs/genshare.old 2>/dev/null || true; ${STDCP} genshare ${INSTALLROOT}/share/lib/cs/genshare  		    		    ;}
 done ../../../share/lib/cs/genshare generated
 make ../../../share/lib/cs/tcp
 setv mode -Dmode="+rwxt"
@@ -774,9 +787,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/make
 exec - fi
 done ../../../lib/make generated
 make ../../../lib/make/SERVICE.mk
+prev ../../../lib/make
 make SERVICE.mk
 done SERVICE.mk
-exec - ${STDMV} ${PACKAGE_ast_LIB}/make/SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk.old 2>/dev/null || true; test '' = 'SERVICE.mk' || ${STDCMP} 2>/dev/null -s SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk || { ${STDCP} SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk  		    		    ;}
+exec - test '' = 'SERVICE.mk' || ${STDCMP} 2>/dev/null -s SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk || { ${STDMV} ${PACKAGE_ast_LIB}/make/SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk.old 2>/dev/null || true; ${STDCP} SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk  		    		    ;}
 done ../../../lib/make/SERVICE.mk generated
 make ../../../lib/cs/share
 make share

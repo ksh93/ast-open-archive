@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -89,7 +89,7 @@ shellopen(register Coshell_t* sp, int fd)
 		else
 		{
 			sfprintf(vp, "%s -c 'trap \"\" HUP; %s=%s %s=%s %s= COINIT='\\''%s%s'\\'' %s /dev/fd/4 >/dev/null 2>&1 3<%s 4<&3 5>&- 6>&- 7>&- 8>&- 9>&- &'", sh, CO_ENV_HOST, sp->name, CO_ENV_TYPE, sp->type, CO_ENV_SHELL, (sp->flags & SETRATING) ? "rating=0;" : "", state.profile ? state.profile : "", sh, state.mesg);
-			av[0] = sh = CS_REMOTE_SHELL;
+			av[0] = sh = state.remote;
 			av[1] = sp->name;
 		}
 		av[2] = sfstruse(vp);

@@ -1,4 +1,4 @@
-: strmatch and strgrpmatch tests 2001-10-03
+: strmatch and strgrpmatch tests 2003-01-30
 
 # shell patterns
 
@@ -219,8 +219,10 @@ Sa	[!a-z]abc		Xabc		(0,4)
 
 # pax patterns
 
-Ka	(/ |_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*	/         	(0,10)(0,2)
-Ka	(/ |_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*	_______123EBEL_	(0,15)(0,15)
+Ka	(/ |/?*/|_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*	/         	(0,10)(0,2)
+Ka	(/ |/?*/|_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*	//         	NOMATCH
+Ka	(/ |/?*/|_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*	/1/         	(0,12)(0,3)
+Ka	(/ |/?*/|_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*	_______123EBEL_	(0,15)(0,15)
 
 # the old strgrpmatch can't handle these
 

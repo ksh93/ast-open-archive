@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -29,12 +29,16 @@
 
 #include "pzlib.h"
 
+#define METH_pzip	1
+#define METH_gzip	2
+#define METH_lzw	3
+
 /*
  * push the sfio discipline named by meth:
  *
  *	lzw
- *	gzip
- *	pzip partition
+ *	gzip [--[no]crc]
+ *	pzip [--[no]crc] [--] partition
  *
  * return:
  *	>0	discipline pushed
@@ -48,54 +52,125 @@ sfdczip(Sfio_t* sp, const char* path, register const char* meth, Error_f errorf)
 	const char*	part;
 	const char*	mesg;
 	int		r;
+	int		zip;
+	int		len;
+	unsigned long	flags;
 	Pzdisc_t	disc;
 
-	mesg = ERROR_dictionary("compress discipline error");
-	if (!path)
-	{
-		if (sp == sfstdin)
-			path = "/dev/stdin";
-		else if (sp == sfstdout)
-			path = "/dev/stdout";
-		else if (sfset(sp, 0, 0) & SF_READ)
-			path = "input";
-		else
-			path = "output";
-	}
-	if (sfset(sp, 0, 0) & SF_READ)
-	{
-		memset(&disc, 0, sizeof(disc));
-		disc.version = PZ_VERSION;
-		disc.errorf = errorf;
-		r = sfdcpzip(sp, path, 0, &disc);
-	}
-	else if (strneq(meth, "gzip", 4))
-		r = sfdcgzip(sp, 0);
-	else if (strneq(meth, "lzw", 3))
-		r = sfdclzw(sp, 0);
-	else if (strneq(meth, "pzip", 4))
-	{
-		part = meth + 4;
-		while (isspace(*part))
-			part++;
-		if (!*part)
-		{
-			mesg = ERROR_dictionary("partition file operand required");
-			r = -1;
-		}
-		else
-		{
-			memset(&disc, 0, sizeof(disc));
-			disc.version = PZ_VERSION;
-			disc.partition = part;
-			disc.errorf = errorf;
-			r = sfdcpzip(sp, path, 0, &disc);
-		}
-	}
+	if (part = (const char*)strchr(meth, ' '))
+		len = part - meth;
 	else
+		len = strlen(meth);
+	zip = 0;
+	switch (len)
+	{
+	case 3:
+		if (strneq(meth, "lzw", len))
+			zip = METH_lzw;
+		break;
+	case 4:
+		if (strneq(meth, "pzip", len))
+			zip = METH_pzip;
+		else if (strneq(meth, "gzip", len))
+			zip = METH_gzip;
+		break;
+	}
+	if (!zip)
 	{
 		mesg = ERROR_dictionary("unknown compress discipline method");
 		r = -1;
+	}
+	else
+	{
+		mesg = ERROR_dictionary("compress discipline error");
+		flags = 0;
+		if (part)
+			for (;;)
+			{ 
+				while (part[0] == ' ')
+					part++;
+				if (part[0] != '-' || part[1] != '-')
+				{
+					if (!part[0])
+						part = 0;
+					break;
+				}
+				part += 2;
+				if (part[0] == ' ')
+				{
+					while (part[0] == ' ')
+						part++;
+					if (!part[0])
+						part = 0;
+					break;
+				}
+				if (!part[0])
+				{
+					part = 0;
+					break;
+				}
+				if (part[0] == 'n' && part[1] == 'o')
+				{
+					part += 2;
+					r = 0;
+				}
+				else
+					r = 1;
+				if (!(meth = (const char*)strchr(part, ' ')))
+					meth = part + strlen(part);
+				switch (meth - part)
+				{
+				case 3:
+					if (strneq(part, "crc", 3))
+						switch (zip)
+						{
+						case METH_gzip:
+							if (!r)
+								flags |= SFGZ_NOCRC;
+							break;
+						case METH_pzip:
+							if (r)
+								flags |= PZ_CRC;
+							break;
+						}
+					break;
+				}
+				part = meth;
+			}
+		if (!path)
+		{
+			if (sp == sfstdin)
+				path = "/dev/stdin";
+			else if (sp == sfstdout)
+				path = "/dev/stdout";
+			else if (sfset(sp, 0, 0) & SF_READ)
+				path = "input";
+			else
+				path = "output";
+		}
+		switch (zip)
+		{
+		case METH_gzip:
+			r = sfdcgzip(sp, flags);
+			break;
+		case METH_lzw:
+			r = sfdclzw(sp, flags);
+			break;
+		case METH_pzip:
+			memset(&disc, 0, sizeof(disc));
+			if ((sfset(sp, 0, 0) & SF_WRITE) && !(disc.partition = part))
+			{
+				mesg = ERROR_dictionary("partition file operand required");
+				r = -1;
+			}
+			else
+			{
+				disc.version = PZ_VERSION;
+				disc.errorf = errorf;
+				r = sfdcpzip(sp, path, flags, &disc);
+			}
+			break;
+		}
 	}
 	if (r < 0 && errorf)
 		(*errorf)(NiL, NiL, 2, "%s: %s: %s", path, meth, mesg);

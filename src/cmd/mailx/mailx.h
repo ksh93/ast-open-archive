@@ -949,6 +949,7 @@ extern void		setptr(FILE*, off_t);
 extern void		setscreensize(void);
 extern void		settmp(const char*, int);
 extern int		shell(char*);
+extern void		shquote(Sfio_t*, char*);
 extern int		size(struct msg*);
 extern char*		skin(char*, unsigned long);
 extern char*		snarf(char*, int*);

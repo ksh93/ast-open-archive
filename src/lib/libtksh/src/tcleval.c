@@ -398,8 +398,8 @@ Tcl_TclEval(interp, cmd)
 			sfputc(f,0);	/* null terminate */
 			sfseek(f,0L,SEEK_SET);
 			s = sfreserve(f,SF_UNBOUND,-1);
-			if ( s[sfslen()-2] == '\n' )
-				s[sfslen()-2] = 0;
+			if ( s[sfvalue(f)-2] == '\n' )
+				s[sfvalue(f)-2] = 0;
 			Tcl_SetResult(interp, s, TCL_VOLATILE);
 			sfclose(f);
 		}

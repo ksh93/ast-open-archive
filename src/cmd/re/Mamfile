@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -63,6 +63,9 @@ make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -84,7 +87,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -96,7 +99,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -128,7 +131,7 @@ done ../../../include/ast/error.h
 prev ../../../include/ast/ast.h implicit
 done ed.c
 prev ed.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c ed.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c ed.c
 done ed.o generated
 bind -last
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ed ed.o ${mam_libast}
@@ -156,7 +159,7 @@ prev ../../../include/ast/ast.h implicit
 done grep.c
 prev grep.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c grep.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c grep.c
 done grep.o generated
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o grep grep.o ${mam_libast}
@@ -186,7 +189,7 @@ done sed.h
 done sed0.c
 prev sed0.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -D_PACKAGE_ast -c sed0.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -D_PACKAGE_ast -c sed0.c
 done sed0.o generated
 make sed1.o
 make sed1.c
@@ -225,8 +228,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/ed
+prev ../../../bin
 prev ed
-exec - ${STDMV} ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/ed.old 2>/dev/null || true; test '' = 'ed' || ${STDCMP} 2>/dev/null -s ed ${INSTALLROOT}/bin/ed || { ${STDCP} ed ${INSTALLROOT}/bin/ed  		    		    ;}
+exec - test '' = 'ed' || ${STDCMP} 2>/dev/null -s ed ${INSTALLROOT}/bin/ed || { ${STDMV} ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/ed.old 2>/dev/null || true; ${STDCP} ed ${INSTALLROOT}/bin/ed  		    		    ;}
 done ../../../bin/ed generated
 make ../../../bin/red
 prev ../../../bin/ed
@@ -237,7 +241,7 @@ exec - ln ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/red
 done ../../../bin/red generated
 make ../../../bin/grep
 prev grep
-exec - ${STDMV} ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/grep.old 2>/dev/null || true; test '' = 'grep' || ${STDCMP} 2>/dev/null -s grep ${INSTALLROOT}/bin/grep || { ${STDCP} grep ${INSTALLROOT}/bin/grep  		    		    ;}
+exec - test '' = 'grep' || ${STDCMP} 2>/dev/null -s grep ${INSTALLROOT}/bin/grep || { ${STDMV} ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/grep.old 2>/dev/null || true; ${STDCP} grep ${INSTALLROOT}/bin/grep  		    		    ;}
 done ../../../bin/grep generated
 make ../../../bin/egrep
 prev ../../../bin/grep
@@ -255,7 +259,7 @@ exec - ln ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/fgrep
 done ../../../bin/fgrep generated
 make ../../../bin/sed
 prev sed
-exec - ${STDMV} ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; test '' = 'sed' || ${STDCMP} 2>/dev/null -s sed ${INSTALLROOT}/bin/sed || { ${STDCP} sed ${INSTALLROOT}/bin/sed  		    		    ;}
+exec - test '' = 'sed' || ${STDCMP} 2>/dev/null -s sed ${INSTALLROOT}/bin/sed || { ${STDMV} ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; ${STDCP} sed ${INSTALLROOT}/bin/sed  		    		    ;}
 done ../../../bin/sed generated
 done install virtual
 make test

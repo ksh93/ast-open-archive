@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -162,7 +162,7 @@ sfdcpzip(Sfio_t* sp, const char* path, unsigned long flags, Pzdisc_t* disc)
 			if (!(flags & PZ_NOGZIP) && m1 == GZ_MAGIC_1)
 			{
 				if (m2 == GZ_MAGIC_2)
-					r = sfdcgzip(sp, 0);
+					r = sfdcgzip(sp, (flags & PZ_CRC) ? 0 : SFGZ_NOCRC);
 				else if (m2 == LZ_MAGIC_2)
 					r = sfdclzw(sp, 0);
 			}

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -510,6 +510,7 @@ server(int fd, int op, int sub, int arg, char* dat)
 		if (state.profile && *state.profile)
 			sfprintf(state.string, "   profile  %s\n", state.profile);
 		sfprintf(state.string, "      pump  %s\n", state.pump);
+		sfprintf(state.string, "    remote  %s\n", state.remote);
 		sfprintf(state.string, "   service  %s\n", state.service);
 		sfprintf(state.string, "     shell  %s\n", state.sh);
 

@@ -278,7 +278,7 @@ strtonll "0x17fffffff" "" 6442450943 OK 16
 strtoull "0x17fffffff" "" 6442450943 OK'
 
 TEST 03 'thousands separator'
-	EXEC	LC_ALL=debug 12345678 12.345.678 12.345678 12.345.67
+	EXEC	LC_ALL=debug 12345678 12.345.678 12.345678 12.345.67 1.234 123.456
 		OUTPUT - $'strtol   "12345678" "" 12345678 OK
 strton   "12345678" "" 12345678 OK 0
 strtoul  "12345678" "" 12345678 OK
@@ -305,4 +305,18 @@ strton   "12.345.67" ".67" 12345 OK 0
 strtoul  "12.345.67" ".67" 12345 OK
 strtoll  "12.345.67" ".67" 12345 OK
 strtonll "12.345.67" ".67" 12345 OK 0
-strtoull "12.345.67" ".67" 12345 OK'
+strtoull "12.345.67" ".67" 12345 OK
+
+strtol   "1.234" "" 1234 OK
+strton   "1.234" "" 1234 OK 0
+strtoul  "1.234" "" 1234 OK
+strtoll  "1.234" "" 1234 OK
+strtonll "1.234" "" 1234 OK 0
+strtoull "1.234" "" 1234 OK
+
+strtol   "123.456" "" 123456 OK
+strton   "123.456" "" 123456 OK 0
+strtoul  "123.456" "" 123456 OK
+strtoll  "123.456" "" 123456 OK
+strtonll "123.456" "" 123456 OK 0
+strtoull "123.456" "" 123456 OK'

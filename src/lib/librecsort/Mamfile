@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -47,7 +47,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in recsort  ast
+exec - for i in recsort ast
 exec - do	case $i in
 exec - 	"recsort"|recsort)
 exec - 		;;
@@ -87,6 +87,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -108,7 +111,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -120,7 +123,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -257,7 +260,7 @@ done ../../../include/ast/times.h dontcare
 prev rskeyhdr.h implicit
 done rskey.c
 prev rskey.c
-exec - ${CC}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rskey.c
+exec - ${CC} ${debug?1?${mam_cc_DEBUG}??} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rskey.c
 done rskey.o generated
 make rskeymeth.o
 make rskeymeth.c
@@ -285,8 +288,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/librecsort.a archive
+prev ../../../lib
 prev librecsort.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/librecsort.a ${PACKAGE_ast_LIB}/librecsort.a.old 2>/dev/null || true; test '' = 'librecsort.a' || ${STDCMP} 2>/dev/null -s librecsort.a ${PACKAGE_ast_LIB}/librecsort.a || { ${STDCP} librecsort.a ${PACKAGE_ast_LIB}/librecsort.a  		    		    ;}
+exec - test '' = 'librecsort.a' || ${STDCMP} 2>/dev/null -s librecsort.a ${PACKAGE_ast_LIB}/librecsort.a || { ${STDMV} ${PACKAGE_ast_LIB}/librecsort.a ${PACKAGE_ast_LIB}/librecsort.a.old 2>/dev/null || true; ${STDCP} librecsort.a ${PACKAGE_ast_LIB}/librecsort.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/librecsort.a) >/dev/null 2>&1 || true
 done ../../../lib/librecsort.a generated
 make ../../../man/man3
@@ -296,9 +300,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/recsort.3
+prev ../../../man/man3
 make recsort.3
 done recsort.3
-exec - ${STDMV} ${INSTALLROOT}/man/man3/recsort.3 ${INSTALLROOT}/man/man3/recsort.3.old 2>/dev/null || true; test '' = 'recsort.3' || ${STDCMP} 2>/dev/null -s recsort.3 ${INSTALLROOT}/man/man3/recsort.3 || { ${STDCP} recsort.3 ${INSTALLROOT}/man/man3/recsort.3  		    		    ;}
+exec - test '' = 'recsort.3' || ${STDCMP} 2>/dev/null -s recsort.3 ${INSTALLROOT}/man/man3/recsort.3 || { ${STDMV} ${INSTALLROOT}/man/man3/recsort.3 ${INSTALLROOT}/man/man3/recsort.3.old 2>/dev/null || true; ${STDCP} recsort.3 ${INSTALLROOT}/man/man3/recsort.3  		    		    ;}
 done ../../../man/man3/recsort.3 generated
 make ../../../lib/lib
 exec - set -
@@ -307,8 +312,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/recsort
+prev ../../../lib/lib
 prev recsort.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/recsort ${PACKAGE_ast_LIB}/lib/recsort.old 2>/dev/null || true; test '' = 'recsort.req' || ${STDCMP} 2>/dev/null -s recsort.req ${PACKAGE_ast_LIB}/lib/recsort || { ${STDCP} recsort.req ${PACKAGE_ast_LIB}/lib/recsort  		    		    ;}
+exec - test '' = 'recsort.req' || ${STDCMP} 2>/dev/null -s recsort.req ${PACKAGE_ast_LIB}/lib/recsort || { ${STDMV} ${PACKAGE_ast_LIB}/lib/recsort ${PACKAGE_ast_LIB}/lib/recsort.old 2>/dev/null || true; ${STDCP} recsort.req ${PACKAGE_ast_LIB}/lib/recsort  		    		    ;}
 done ../../../lib/lib/recsort generated
 make ../../../include/ast
 exec - set -
@@ -317,6 +323,7 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/recsort.h
+prev ../../../include/ast
 prev recsort.h
 exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1996,author=kpv+gsf'  recsort.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/recsort.h 1.${COTEMP}.x

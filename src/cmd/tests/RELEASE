@@ -1,3 +1,7 @@
+03-04-22 date.dat: add last, this, next tests
+03-03-21 date.dat,datey2k.dat: add %Q/recent/distant/
+	 opt.tst: add trailing '*' option and option args tests
+03-02-13 base64.c: add base64encode()/base64decode() tests
 02-10-04 strtof.tst: add simple cases
 02-09-15 sfio/tscanf.c: add NaNS test
 02-09-05 opt.tst: add .fp 5 CW for *roff tests

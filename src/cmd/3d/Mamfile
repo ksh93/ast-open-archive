@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
+setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -96,6 +96,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_tty.h implicit
@@ -137,7 +140,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -149,7 +152,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/ast_lib.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -252,6 +255,8 @@ make ../../../include/ast/hashpart.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/hashpart.h dontcare
 make ../../../include/ast/ast_cs.h implicit
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 done ../../../include/ast/ast_cs.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -320,19 +325,16 @@ prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
 done ../../lib/libast/comp/gross.c
 make ../../lib/libast/comp/spawnveg.c implicit
-make vfork.h implicit
-done vfork.h dontcare virtual
+make ../../../include/ast/ast_vfork.h implicit
+done ../../../include/ast/ast_vfork.h dontcare
+prev ../../../include/ast/sig.h implicit
+make process.h implicit
+done process.h dontcare virtual
 prev ../../../include/ast/error.h implicit
 make spawn.h implicit
 done spawn.h dontcare virtual
-make process.h implicit
-done process.h dontcare virtual
 prev ../../../include/ast/ast.h implicit
 done ../../lib/libast/comp/spawnveg.c
-make ../../lib/libast/comp/spawnve.c implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/ast_lib.h implicit
-done ../../lib/libast/comp/spawnve.c
 make ../../lib/libast/path/pathshell.c implicit
 prev ../../../include/ast/ast.h implicit
 done ../../lib/libast/path/pathshell.c
@@ -422,6 +424,13 @@ prev ../../../include/ast/ast.h implicit
 done ../../lib/libast/comp/getwd.c
 make ../../lib/libast/misc/getcwd.c implicit
 prev ../../../include/ast/fs3d.h implicit
+prev ../../../include/ast/error.h implicit
+make ../../../include/ast/ast_dir.h implicit
+make ../../../include/ast/dirent.h implicit
+make ../../../include/ast/ast_dirent.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/ast_dirent.h dontcare
+done ../../../include/ast/dirent.h dontcare
 make ../../lib/libast/dir/dirlib.h implicit
 make ../../lib/libast/dir/dirstd.h implicit
 done ../../lib/libast/dir/dirstd.h dontcare
@@ -432,14 +441,13 @@ make ../../../include/ast/ast_param.h implicit
 done ../../../include/ast/ast_param.h dontcare
 make ndir.h implicit
 done ndir.h dontcare virtual
-make ../../../include/ast/dirent.h implicit
-make ../../../include/ast/ast_dirent.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/ast_dirent.h dontcare
-done ../../../include/ast/dirent.h dontcare
+prev ../../../include/ast/dirent.h implicit
 prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
 done ../../lib/libast/dir/dirlib.h dontcare
+prev ../../../include/ast/ast_lib.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_dir.h dontcare
 prev ../../../include/ast/ast.h implicit
 done ../../lib/libast/misc/getcwd.c
 make ../../lib/libast/misc/state.c implicit
@@ -455,12 +463,7 @@ make cs.c
 make ../../lib/libcs/msgsetmask.c implicit
 make ../../lib/libcs/msglib.h implicit
 prev ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_dir.h implicit
-prev ../../../include/ast/dirent.h implicit
-prev ../../lib/libast/dir/dirlib.h implicit
-prev ../../../include/ast/ast_lib.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ast_dir.h dontcare
+prev ../../../include/ast/ast_dir.h implicit
 prev ../../lib/libcs/msg.h implicit
 make ../../lib/libcs/cs_lib.h implicit
 done ../../lib/libcs/cs_lib.h dontcare
@@ -1009,15 +1012,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1' in
-exec - 	"")	cp 3d.sh 3d
+exec - "")	case 385 in
+exec - 	0)	cp 3d.sh 3d
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < 3d.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1
 exec - 		cat 3d.sh
 exec - 		} > 3d
 exec - 		;;
@@ -1025,8 +1028,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1 ;;
+exec - 	case 385 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1 ;;
 exec - 	esac
 exec - 	cat 3d.sh
 exec - 	} > 3d
@@ -1048,8 +1052,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp opaque.sh opaque
+exec - "")	case 0 in
+exec - 	0)	cp opaque.sh opaque
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < opaque.sh`
@@ -1064,8 +1068,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat opaque.sh
 exec - 	} > opaque
@@ -1086,8 +1091,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp vex.sh vex
+exec - "")	case 0 in
+exec - 	0)	cp vex.sh vex
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < vex.sh`
@@ -1102,8 +1107,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat vex.sh
 exec - 	} > vex
@@ -1118,8 +1124,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/lib3d.a archive
+prev ../../../lib
 prev lib3d.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib3d.a ${PACKAGE_ast_LIB}/lib3d.a.old 2>/dev/null || true; test '' = 'lib3d.a' || ${STDCMP} 2>/dev/null -s lib3d.a ${PACKAGE_ast_LIB}/lib3d.a || { ${STDCP} lib3d.a ${PACKAGE_ast_LIB}/lib3d.a  		    		    ;}
+exec - test '' = 'lib3d.a' || ${STDCMP} 2>/dev/null -s lib3d.a ${PACKAGE_ast_LIB}/lib3d.a || { ${STDMV} ${PACKAGE_ast_LIB}/lib3d.a ${PACKAGE_ast_LIB}/lib3d.a.old 2>/dev/null || true; ${STDCP} lib3d.a ${PACKAGE_ast_LIB}/lib3d.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/lib3d.a) >/dev/null 2>&1 || true
 done ../../../lib/lib3d.a generated
 make ../../../lib/lib
@@ -1129,8 +1136,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/3d
+prev ../../../lib/lib
 prev 3d.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/3d ${PACKAGE_ast_LIB}/lib/3d.old 2>/dev/null || true; test '' = '3d.req' || ${STDCMP} 2>/dev/null -s 3d.req ${PACKAGE_ast_LIB}/lib/3d || { ${STDCP} 3d.req ${PACKAGE_ast_LIB}/lib/3d  		    		    ;}
+exec - test '' = '3d.req' || ${STDCMP} 2>/dev/null -s 3d.req ${PACKAGE_ast_LIB}/lib/3d || { ${STDMV} ${PACKAGE_ast_LIB}/lib/3d ${PACKAGE_ast_LIB}/lib/3d.old 2>/dev/null || true; ${STDCP} 3d.req ${PACKAGE_ast_LIB}/lib/3d  		    		    ;}
 done ../../../lib/lib/3d generated
 make ../../../bin
 exec - set -
@@ -1139,8 +1147,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/3d
+prev ../../../bin
 prev 3d
-exec - ${STDMV} ${INSTALLROOT}/bin/3d ${INSTALLROOT}/bin/3d.old 2>/dev/null || true; test '' = '3d' || ${STDCMP} 2>/dev/null -s 3d ${INSTALLROOT}/bin/3d || { ${STDCP} 3d ${INSTALLROOT}/bin/3d  		    		    ;}
+exec - test '' = '3d' || ${STDCMP} 2>/dev/null -s 3d ${INSTALLROOT}/bin/3d || { ${STDMV} ${INSTALLROOT}/bin/3d ${INSTALLROOT}/bin/3d.old 2>/dev/null || true; ${STDCP} 3d ${INSTALLROOT}/bin/3d  		    		    ;}
 done ../../../bin/3d generated
 make ../../../man/man1
 exec - set -
@@ -1149,22 +1158,23 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/2d.1
+prev ../../../man/man1
 make 2d.1
 done 2d.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/2d.1 ${INSTALLROOT}/man/man1/2d.1.old 2>/dev/null || true; test '' = '2d.1' || ${STDCMP} 2>/dev/null -s 2d.1 ${INSTALLROOT}/man/man1/2d.1 || { ${STDCP} 2d.1 ${INSTALLROOT}/man/man1/2d.1  		    		    ;}
+exec - test '' = '2d.1' || ${STDCMP} 2>/dev/null -s 2d.1 ${INSTALLROOT}/man/man1/2d.1 || { ${STDMV} ${INSTALLROOT}/man/man1/2d.1 ${INSTALLROOT}/man/man1/2d.1.old 2>/dev/null || true; ${STDCP} 2d.1 ${INSTALLROOT}/man/man1/2d.1  		    		    ;}
 done ../../../man/man1/2d.1 generated
 make ../../../man/man1/3d.1
 make 3d.1
 done 3d.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/3d.1 ${INSTALLROOT}/man/man1/3d.1.old 2>/dev/null || true; test '' = '3d.1' || ${STDCMP} 2>/dev/null -s 3d.1 ${INSTALLROOT}/man/man1/3d.1 || { ${STDCP} 3d.1 ${INSTALLROOT}/man/man1/3d.1  		    		    ;}
+exec - test '' = '3d.1' || ${STDCMP} 2>/dev/null -s 3d.1 ${INSTALLROOT}/man/man1/3d.1 || { ${STDMV} ${INSTALLROOT}/man/man1/3d.1 ${INSTALLROOT}/man/man1/3d.1.old 2>/dev/null || true; ${STDCP} 3d.1 ${INSTALLROOT}/man/man1/3d.1  		    		    ;}
 done ../../../man/man1/3d.1 generated
 make ../../../bin/opaque
 prev opaque
-exec - ${STDMV} ${INSTALLROOT}/bin/opaque ${INSTALLROOT}/bin/opaque.old 2>/dev/null || true; test '' = 'opaque' || ${STDCMP} 2>/dev/null -s opaque ${INSTALLROOT}/bin/opaque || { ${STDCP} opaque ${INSTALLROOT}/bin/opaque  		    		    ;}
+exec - test '' = 'opaque' || ${STDCMP} 2>/dev/null -s opaque ${INSTALLROOT}/bin/opaque || { ${STDMV} ${INSTALLROOT}/bin/opaque ${INSTALLROOT}/bin/opaque.old 2>/dev/null || true; ${STDCP} opaque ${INSTALLROOT}/bin/opaque  		    		    ;}
 done ../../../bin/opaque generated
 make ../../../bin/vex
 prev vex
-exec - ${STDMV} ${INSTALLROOT}/bin/vex ${INSTALLROOT}/bin/vex.old 2>/dev/null || true; test '' = 'vex' || ${STDCMP} 2>/dev/null -s vex ${INSTALLROOT}/bin/vex || { ${STDCP} vex ${INSTALLROOT}/bin/vex  		    		    ;}
+exec - test '' = 'vex' || ${STDCMP} 2>/dev/null -s vex ${INSTALLROOT}/bin/vex || { ${STDMV} ${INSTALLROOT}/bin/vex ${INSTALLROOT}/bin/vex.old 2>/dev/null || true; ${STDCP} vex ${INSTALLROOT}/bin/vex  		    		    ;}
 done ../../../bin/vex generated
 make ../../../fun
 exec - set -
@@ -1173,10 +1183,11 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/fun
 exec - fi
 done ../../../fun generated
 make ../../../fun/_2d
+prev ../../../fun
 make _2d
 done _2d
 setv mode -Dmode="+x"
-exec - ${STDMV} ${INSTALLROOT}/fun/_2d ${INSTALLROOT}/fun/_2d.old 2>/dev/null || true; test '' = '_2d' || ${STDCMP} 2>/dev/null -s _2d ${INSTALLROOT}/fun/_2d || { ${STDCP} _2d ${INSTALLROOT}/fun/_2d  		    		   && chmod ugo+x ${INSTALLROOT}/fun/_2d ;}
+exec - test '' = '_2d' || ${STDCMP} 2>/dev/null -s _2d ${INSTALLROOT}/fun/_2d || { ${STDMV} ${INSTALLROOT}/fun/_2d ${INSTALLROOT}/fun/_2d.old 2>/dev/null || true; ${STDCP} _2d ${INSTALLROOT}/fun/_2d  		    		   && chmod ugo+x ${INSTALLROOT}/fun/_2d ;}
 done ../../../fun/_2d generated
 done install virtual
 make test

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -66,6 +66,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -87,7 +90,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -99,7 +102,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -163,6 +166,8 @@ make ../../../include/ast/hashpart.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/hashpart.h dontcare
 make ../../../include/ast/ast_cs.h implicit
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 done ../../../include/ast/ast_cs.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -174,7 +179,7 @@ done ../../../include/ast/coshell.h
 prev ../../../include/ast/ast.h implicit
 done cs.c
 prev cs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cs]"\" -c cs.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cs]"\" -c cs.c
 done cs.o generated
 bind -lcs
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o cs cs.o ${mam_libcs} ${mam_libast}
@@ -191,7 +196,7 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/css.h
 done css.c
 prev css.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cs]"\" -c css.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cs]"\" -c css.c
 done css.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o css css.o ${mam_libcs} ${mam_libast}
 done css generated
@@ -259,7 +264,7 @@ prev ../../../include/ast/debug.h implicit
 prev ../../../include/ast/css.h implicit
 done mbb.c
 prev mbb.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cs]"\" -c mbb.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cs]"\" -c mbb.c
 done mbb.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mbb.svc mbb.o ${mam_libcs} ${mam_libast}
 done mbb.svc generated
@@ -584,12 +589,13 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/cs
+prev ../../../bin
 prev cs
-exec - ${STDMV} ${INSTALLROOT}/bin/cs ${INSTALLROOT}/bin/cs.old 2>/dev/null || true; test '' = 'cs' || ${STDCMP} 2>/dev/null -s cs ${INSTALLROOT}/bin/cs || { ${STDCP} cs ${INSTALLROOT}/bin/cs  		    		    ;}
+exec - test '' = 'cs' || ${STDCMP} 2>/dev/null -s cs ${INSTALLROOT}/bin/cs || { ${STDMV} ${INSTALLROOT}/bin/cs ${INSTALLROOT}/bin/cs.old 2>/dev/null || true; ${STDCP} cs ${INSTALLROOT}/bin/cs  		    		    ;}
 done ../../../bin/cs generated
 make ../../../bin/css
 prev css
-exec - ${STDMV} ${INSTALLROOT}/bin/css ${INSTALLROOT}/bin/css.old 2>/dev/null || true; test '' = 'css' || ${STDCMP} 2>/dev/null -s css ${INSTALLROOT}/bin/css || { ${STDCP} css ${INSTALLROOT}/bin/css  		    		    ;}
+exec - test '' = 'css' || ${STDCMP} 2>/dev/null -s css ${INSTALLROOT}/bin/css || { ${STDMV} ${INSTALLROOT}/bin/css ${INSTALLROOT}/bin/css.old 2>/dev/null || true; ${STDCP} css ${INSTALLROOT}/bin/css  		    		    ;}
 done ../../../bin/css generated
 make ../../../lib/cs
 exec - set -
@@ -604,9 +610,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/cat
 exec - fi
 done ../../../lib/cs/tcp/cat generated
 make ../../../lib/cs/tcp/cat/cat.svc
+prev ../../../lib/cs/tcp/cat
 prev cat.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc.old 2>/dev/null || true; test '' = 'cat.svc' || ${STDCMP} 2>/dev/null -s cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc || { ${STDCP} cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc  		    		    ;}
+exec - test '' = 'cat.svc' || ${STDCMP} 2>/dev/null -s cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc.old 2>/dev/null || true; ${STDCP} cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc  		    		    ;}
 done ../../../lib/cs/tcp/cat/cat.svc generated
 make ../../../lib/cs/tcp/dbm
 exec - set -
@@ -615,9 +622,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/dbm
 exec - fi
 done ../../../lib/cs/tcp/dbm generated
 make ../../../lib/cs/tcp/dbm/dbm.svc
+prev ../../../lib/cs/tcp/dbm
 prev dbm.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc.old 2>/dev/null || true; test '' = 'dbm.svc' || ${STDCMP} 2>/dev/null -s dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc || { ${STDCP} dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc  		    		    ;}
+exec - test '' = 'dbm.svc' || ${STDCMP} 2>/dev/null -s dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc.old 2>/dev/null || true; ${STDCP} dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc  		    		    ;}
 done ../../../lib/cs/tcp/dbm/dbm.svc generated
 make ../../../lib/cs/tcp/fs_env
 exec - set -
@@ -626,9 +634,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/fs_env
 exec - fi
 done ../../../lib/cs/tcp/fs_env generated
 make ../../../lib/cs/tcp/fs_env/fs_env.svc
+prev ../../../lib/cs/tcp/fs_env
 prev fs_env.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc.old 2>/dev/null || true; test '' = 'fs_env.svc' || ${STDCMP} 2>/dev/null -s fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc || { ${STDCP} fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc  		    		    ;}
+exec - test '' = 'fs_env.svc' || ${STDCMP} 2>/dev/null -s fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc.old 2>/dev/null || true; ${STDCP} fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc  		    		    ;}
 done ../../../lib/cs/tcp/fs_env/fs_env.svc generated
 make ../../../lib/cs/tcp/mbb
 exec - set -
@@ -637,9 +646,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/mbb
 exec - fi
 done ../../../lib/cs/tcp/mbb generated
 make ../../../lib/cs/tcp/mbb/mbb.svc
+prev ../../../lib/cs/tcp/mbb
 prev mbb.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc.old 2>/dev/null || true; test '' = 'mbb.svc' || ${STDCMP} 2>/dev/null -s mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc || { ${STDCP} mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc  		    		    ;}
+exec - test '' = 'mbb.svc' || ${STDCMP} 2>/dev/null -s mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc.old 2>/dev/null || true; ${STDCP} mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc  		    		    ;}
 done ../../../lib/cs/tcp/mbb/mbb.svc generated
 make ../../../lib/cs/fdp/nam
 exec - set -
@@ -648,9 +658,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/fdp/nam
 exec - fi
 done ../../../lib/cs/fdp/nam generated
 make ../../../lib/cs/fdp/nam/nam.svc
+prev ../../../lib/cs/fdp/nam
 prev nam.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc.old 2>/dev/null || true; test '' = 'nam.svc' || ${STDCMP} 2>/dev/null -s nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc || { ${STDCP} nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc  		    		    ;}
+exec - test '' = 'nam.svc' || ${STDCMP} 2>/dev/null -s nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc.old 2>/dev/null || true; ${STDCP} nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc  		    		    ;}
 done ../../../lib/cs/fdp/nam/nam.svc generated
 make ../../../lib/cs/udp/pid
 exec - set -
@@ -659,9 +670,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/udp/pid
 exec - fi
 done ../../../lib/cs/udp/pid generated
 make ../../../lib/cs/udp/pid/pid.svc
+prev ../../../lib/cs/udp/pid
 prev pid.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc.old 2>/dev/null || true; test '' = 'pid.svc' || ${STDCMP} 2>/dev/null -s pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc || { ${STDCP} pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc  		    		    ;}
+exec - test '' = 'pid.svc' || ${STDCMP} 2>/dev/null -s pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc.old 2>/dev/null || true; ${STDCP} pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc  		    		    ;}
 done ../../../lib/cs/udp/pid/pid.svc generated
 make ../../../lib/cs/tcp/rsh
 exec - set -
@@ -670,9 +682,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/rsh
 exec - fi
 done ../../../lib/cs/tcp/rsh generated
 make ../../../lib/cs/tcp/rsh/rsh.svc
+prev ../../../lib/cs/tcp/rsh
 prev rsh.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc.old 2>/dev/null || true; test '' = 'rsh.svc' || ${STDCMP} 2>/dev/null -s rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc || { ${STDCP} rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc  		    		    ;}
+exec - test '' = 'rsh.svc' || ${STDCMP} 2>/dev/null -s rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc.old 2>/dev/null || true; ${STDCP} rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc  		    		    ;}
 done ../../../lib/cs/tcp/rsh/rsh.svc generated
 make ../../../lib/cs/tcp/tst-old
 exec - set -
@@ -681,9 +694,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/tst-old
 exec - fi
 done ../../../lib/cs/tcp/tst-old generated
 make ../../../lib/cs/tcp/tst-old/tst-old.svc
+prev ../../../lib/cs/tcp/tst-old
 prev tst-old.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc.old 2>/dev/null || true; test '' = 'tst-old.svc' || ${STDCMP} 2>/dev/null -s tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc || { ${STDCP} tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc  		    		    ;}
+exec - test '' = 'tst-old.svc' || ${STDCMP} 2>/dev/null -s tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc.old 2>/dev/null || true; ${STDCP} tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc  		    		    ;}
 done ../../../lib/cs/tcp/tst-old/tst-old.svc generated
 make ../../../lib/cs/tcp/tst
 exec - set -
@@ -692,9 +706,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/tst
 exec - fi
 done ../../../lib/cs/tcp/tst generated
 make ../../../lib/cs/tcp/tst/tst.svc
+prev ../../../lib/cs/tcp/tst
 prev tst.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc.old 2>/dev/null || true; test '' = 'tst.svc' || ${STDCMP} 2>/dev/null -s tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc || { ${STDCP} tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc  		    		    ;}
+exec - test '' = 'tst.svc' || ${STDCMP} 2>/dev/null -s tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc.old 2>/dev/null || true; ${STDCP} tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc  		    		    ;}
 done ../../../lib/cs/tcp/tst/tst.svc generated
 make ../../../lib/cs/tcp/6263
 exec - set -
@@ -703,13 +718,14 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/6263
 exec - fi
 done ../../../lib/cs/tcp/6263 generated
 make ../../../lib/cs/tcp/6263/6263.svc
+prev ../../../lib/cs/tcp/6263
 prev 6263.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc.old 2>/dev/null || true; test '' = '6263.svc' || ${STDCMP} 2>/dev/null -s 6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc || { ${STDCP} 6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc  		    		    ;}
+exec - test '' = '6263.svc' || ${STDCMP} 2>/dev/null -s 6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc.old 2>/dev/null || true; ${STDCP} 6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc  		    		    ;}
 done ../../../lib/cs/tcp/6263/6263.svc generated
 make ../../../bin/imount
 prev imount
-exec - ${STDMV} ${INSTALLROOT}/bin/imount ${INSTALLROOT}/bin/imount.old 2>/dev/null || true; test '' = 'imount' || ${STDCMP} 2>/dev/null -s imount ${INSTALLROOT}/bin/imount || { ${STDCP} imount ${INSTALLROOT}/bin/imount  		    		    ;}
+exec - test '' = 'imount' || ${STDCMP} 2>/dev/null -s imount ${INSTALLROOT}/bin/imount || { ${STDMV} ${INSTALLROOT}/bin/imount ${INSTALLROOT}/bin/imount.old 2>/dev/null || true; ${STDCP} imount ${INSTALLROOT}/bin/imount  		    		    ;}
 done ../../../bin/imount generated
 make ../../../lib/cs/tcp/vcs
 exec - set -
@@ -718,9 +734,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/vcs
 exec - fi
 done ../../../lib/cs/tcp/vcs generated
 make ../../../lib/cs/tcp/vcs/vcs.svc
+prev ../../../lib/cs/tcp/vcs
 prev vcs.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc.old 2>/dev/null || true; test '' = 'vcs.svc' || ${STDCMP} 2>/dev/null -s vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc || { ${STDCP} vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc  		    		    ;}
+exec - test '' = 'vcs.svc' || ${STDCMP} 2>/dev/null -s vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc.old 2>/dev/null || true; ${STDCP} vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc  		    		    ;}
 done ../../../lib/cs/tcp/vcs/vcs.svc generated
 done install virtual
 make test

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -69,6 +69,9 @@ make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -87,7 +90,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -99,7 +102,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -137,6 +140,8 @@ make ../../../include/ast/hashpart.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/hashpart.h dontcare
 make ../../../include/ast/ast_cs.h implicit
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 done ../../../include/ast/ast_cs.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -151,7 +156,7 @@ prev ../../../include/ast/ast.h implicit
 done at.h
 done at.c
 prev at.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" -c at.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" -c at.c
 done at.o generated
 bind -lcoshell
 bind -lcs
@@ -224,15 +229,15 @@ exec - fi
 exec - ;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "") case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"' in
-exec - "") cp crontab.sh ast_crontab
+exec - "") case 189 in
+exec - 0) cp crontab.sh ast_crontab
 exec - ;;
 exec - *) {
 exec - i=`(read x; echo $x) < crontab.sh`
 exec - case $i in
 exec - '#!'*|*'||'*|':'*|'":"'*|"':'"*) echo $i ;;
 exec - esac
-exec - echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"
+exec - echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"
 exec - cat crontab.sh
 exec - } > ast_crontab
 exec - ;;
@@ -240,8 +245,9 @@ exec - esac
 exec - ;;
 exec - *) {
 exec - echo '${mam_cc_SHELLMAGIC}'
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"' in
-exec - ?*) echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" ;;
+exec - case 189 in
+exec - 0) ;;
+exec - *) echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" ;;
 exec - esac
 exec - cat crontab.sh
 exec - } > ast_crontab
@@ -256,8 +262,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/ast_at
+prev ../../../bin
 prev ast_at
-exec - ${STDMV} ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_at.old 2>/dev/null || true; test '' = 'ast_at' || ${STDCMP} 2>/dev/null -s ast_at ${INSTALLROOT}/bin/ast_at || { ${STDCP} ast_at ${INSTALLROOT}/bin/ast_at  		    		    ;}
+exec - test '' = 'ast_at' || ${STDCMP} 2>/dev/null -s ast_at ${INSTALLROOT}/bin/ast_at || { ${STDMV} ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_at.old 2>/dev/null || true; ${STDCP} ast_at ${INSTALLROOT}/bin/ast_at  		    		    ;}
 done ../../../bin/ast_at generated
 make ../../../bin/ast_batch
 prev ../../../bin/ast_at
@@ -274,9 +281,10 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/at/jobs 		    		   && chmod u=
 exec - fi
 done ../../../lib/at/jobs generated
 make ../../../lib/at/jobs/atx
+prev ../../../lib/at/jobs
 prev atx
 setv mode -Dmode="u=rx,go=x"
-exec - ${STDMV} ${PACKAGE_ast_LIB}/at/jobs/atx ${PACKAGE_ast_LIB}/at/jobs/atx.old 2>/dev/null || true; test '' = 'atx' || ${STDCMP} 2>/dev/null -s atx ${PACKAGE_ast_LIB}/at/jobs/atx || { ${STDCP} atx ${PACKAGE_ast_LIB}/at/jobs/atx  		    		   && chmod u=rx,go=x ${PACKAGE_ast_LIB}/at/jobs/atx ;}
+exec - test '' = 'atx' || ${STDCMP} 2>/dev/null -s atx ${PACKAGE_ast_LIB}/at/jobs/atx || { ${STDMV} ${PACKAGE_ast_LIB}/at/jobs/atx ${PACKAGE_ast_LIB}/at/jobs/atx.old 2>/dev/null || true; ${STDCP} atx ${PACKAGE_ast_LIB}/at/jobs/atx  		    		   && chmod u=rx,go=x ${PACKAGE_ast_LIB}/at/jobs/atx ;}
 done ../../../lib/at/jobs/atx generated
 make ../../../lib/cs
 exec - set -
@@ -291,13 +299,14 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/at
 exec - fi
 done ../../../lib/cs/tcp/at generated
 make ../../../lib/cs/tcp/at/at.svc
+prev ../../../lib/cs/tcp/at
 prev at.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc.old 2>/dev/null || true; test '' = 'at.svc' || ${STDCMP} 2>/dev/null -s at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc || { ${STDCP} at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc  		    		    ;}
+exec - test '' = 'at.svc' || ${STDCMP} 2>/dev/null -s at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc || { ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc.old 2>/dev/null || true; ${STDCP} at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc  		    		    ;}
 done ../../../lib/cs/tcp/at/at.svc generated
 make ../../../bin/ast_crontab
 prev ast_crontab
-exec - ${STDMV} ${INSTALLROOT}/bin/ast_crontab ${INSTALLROOT}/bin/ast_crontab.old 2>/dev/null || true; test '' = 'ast_crontab' || ${STDCMP} 2>/dev/null -s ast_crontab ${INSTALLROOT}/bin/ast_crontab || { ${STDCP} ast_crontab ${INSTALLROOT}/bin/ast_crontab  		    		    ;}
+exec - test '' = 'ast_crontab' || ${STDCMP} 2>/dev/null -s ast_crontab ${INSTALLROOT}/bin/ast_crontab || { ${STDMV} ${INSTALLROOT}/bin/ast_crontab ${INSTALLROOT}/bin/ast_crontab.old 2>/dev/null || true; ${STDCP} ast_crontab ${INSTALLROOT}/bin/ast_crontab  		    		    ;}
 done ../../../bin/ast_crontab generated
 done install virtual
 make test

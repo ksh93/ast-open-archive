@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -1264,10 +1264,11 @@ bindfile(register struct rule* r, char* name, int flags)
 				n = *s;
 				s = getarg(&b, NiL);
 			}
-			else n = 0;
+			else
+				n = 0;
 			if (s && !streq(s, name))
 			{
-				t = getarg(&b, NiL);
+				t = n ? getarg(&b, NiL) : (char*)0;
 				a = getrule(s);
 				if (n == '+')
 				{
@@ -1277,13 +1278,16 @@ bindfile(register struct rule* r, char* name, int flags)
 				}
 				else
 				{
-					if (t) st.st_mode = 0;
+					if (t)
+						st.st_mode = 0;
 					else if (rstat(s, &st, 0))
 					{
 						if (!a || !(a->dynamic & D_bound) && !(a->property & P_target))
 						{
-							if (allocated) free(name);
-							else allocated = 1;
+							if (allocated)
+								free(name);
+							else
+								allocated = 1;
 							name = strdup(s);
 							continue;
 						}
@@ -1298,9 +1302,10 @@ bindfile(register struct rule* r, char* name, int flags)
 							st.st_mtime = 0;
 						}
 					}
-					if (n == '-')
+					if (n == '-' || *b)
 					{
-						if (*s) putbound(name, makerule(s)->name);
+						if (*s)
+							putbound(name, makerule(s)->name);
 						sfputr(buf, name, 0);
 					}
 					else

@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2002-09-21
+# @(#)pp.probe (AT&T Research) 2003-03-14
 #
 # C probe for libpp
 #
@@ -73,7 +73,10 @@ echo "int f(){return 0;}" > hdrx.h
 echo "#ident \"$id\"" > ident.$src
 echo "#import \"import.h\"" > import.$src
 echo "int aaa;" > import.h
-echo "#include_next <stdio.h>" > include_next.$src
+echo "#include <inc_next.h>" > inc_next.$src
+mkdir inc0 inc1
+echo "#include_next <inc_next.h>" > inc0/inc_next.h
+echo 'char s[] = "INCLUDE_NEXT";' > inc1/inc_next.h
 echo "int i = 0;" > lineid1.i
 echo '# 1 "t.c"
 int i = 0;' > lineid2.i
@@ -258,7 +261,7 @@ $cc -S ident.$src && grep "$id" ident.s && ident=1
 
 { $cc -E import.$src | grep aaa ;} && import=1
 
-{ $cc -E include_next.$src | grep '^[ 	]*#[ 	]*[0123456789]*[ 	]*".*stdio.h"' ;} && include_next=1
+{ $cc -E -Iinc0 -Iinc1 inc_next.$src | grep INCLUDE_NEXT ;} && include_next=1
 
 if	$cc -c lineid1.i
 then	$cc -c lineid2.i || lineid=line

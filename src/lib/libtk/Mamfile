@@ -1,7 +1,7 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_tcl ${INSTALLROOT}
-setv PACKAGE_tcl_INCLUDE ${PACKAGE_tcl}/include
+setv PACKAGE_tcl_INCLUDE ${PACKAGE_tcl}/include/tcl
 setv PACKAGE_tcl_LIB ${PACKAGE_tcl}/lib
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -15,7 +15,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE}"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -53,12 +53,12 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in tk  tcl ast X11
+exec - for i in tk tcl ast X11
 exec - do	case $i in
 exec - 	"tk"|tk)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}    -L${PACKAGE_ast_LIB} ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
@@ -83,12 +83,12 @@ make compat/unistd.h implicit
 make ../../../include/tcl/tcl.h implicit
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/prototyped.h implicit
 make ../../../include/prototyped.h implicit
 done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/getopt.h dontcare
+done ../../../include/ast/ast_getopt.h dontcare
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -107,7 +107,10 @@ done ../../../include/ast/ast_unistd.h dontcare
 make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
-prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
 make ../../../include/ast/ls.h implicit
 make ../../../include/ast/ast_mode.h implicit
@@ -133,7 +136,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -172,7 +175,7 @@ prev generic/tk.h implicit
 done generic/tkInt.h
 done unix/tkUnixSelect.c
 prev unix/tkUnixSelect.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixSelect.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixSelect.c
 done tkUnixSelect.o generated
 make tkUnixInit.o
 make unix/tkUnixInit.c
@@ -182,7 +185,7 @@ prev generic/tkInt.h implicit
 prev ../../../include/ast/ast.h implicit
 done unix/tkUnixInit.c
 prev unix/tkUnixInit.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -DLIB_DIR=\""lib/tk4.2"\" -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixInit.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -DLIB_DIR=\""lib/tk4.2"\" -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixInit.c
 done tkUnixInit.o generated
 make tkUnixEvent.o
 make unix/tkUnixEvent.c
@@ -190,21 +193,21 @@ prev unix/tkUnixInt.h implicit
 prev generic/tkInt.h implicit
 done unix/tkUnixEvent.c
 prev unix/tkUnixEvent.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixEvent.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixEvent.c
 done tkUnixEvent.o generated
 make tkUnixXId.o
 make unix/tkUnixXId.c
 prev generic/tkInt.h implicit
 done unix/tkUnixXId.c
 prev unix/tkUnixXId.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixXId.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixXId.c
 done tkUnixXId.o generated
 make tkUnixCursor.o
 make unix/tkUnixCursor.c
 prev generic/tkInt.h implicit
 done unix/tkUnixCursor.c
 prev unix/tkUnixCursor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixCursor.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixCursor.c
 done tkUnixCursor.o generated
 make tkUnixDialog.o
 make unix/tkUnixDialog.c
@@ -212,49 +215,49 @@ prev unix/tkUnixInt.h implicit
 prev generic/tkInt.h implicit
 done unix/tkUnixDialog.c
 prev unix/tkUnixDialog.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDialog.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDialog.c
 done tkUnixDialog.o generated
 make tkUnixDraw.o
 make unix/tkUnixDraw.c
 prev generic/tkInt.h implicit
 done unix/tkUnixDraw.c
 prev unix/tkUnixDraw.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDraw.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDraw.c
 done tkUnixDraw.o generated
 make tkUnixWm.o
 make unix/tkUnixWm.c
 prev generic/tkInt.h implicit
 done unix/tkUnixWm.c
 prev unix/tkUnixWm.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixWm.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixWm.c
 done tkUnixWm.o generated
 make tkUnix.o
 make unix/tkUnix.c
 prev generic/tkInt.h implicit
 done unix/tkUnix.c
 prev unix/tkUnix.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnix.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnix.c
 done tkUnix.o generated
 make tk3d.o
 make generic/tk3d.c
 prev generic/tkInt.h implicit
 done generic/tk3d.c
 prev generic/tk3d.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tk3d.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tk3d.c
 done tk3d.o generated
 make tkArgv.o
 make generic/tkArgv.c
 prev generic/tkInt.h implicit
 done generic/tkArgv.c
 prev generic/tkArgv.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkArgv.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkArgv.c
 done tkArgv.o generated
 make tkAtom.o
 make generic/tkAtom.c
 prev generic/tkInt.h implicit
 done generic/tkAtom.c
 prev generic/tkAtom.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkAtom.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkAtom.c
 done tkAtom.o generated
 make tkBind.o
 make generic/tkBind.c
@@ -263,7 +266,7 @@ done generic/tkNames.h dontcare
 prev generic/tkInt.h implicit
 done generic/tkBind.c
 prev generic/tkBind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBind.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBind.c
 done tkBind.o generated
 make tkBitmap.o
 make generic/tkBitmap.c
@@ -288,7 +291,7 @@ done bitmaps/error.bmp
 prev generic/tkInt.h implicit
 done generic/tkBitmap.c
 prev generic/tkBitmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Ibitmaps -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBitmap.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Ibitmaps -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBitmap.c
 done tkBitmap.o generated
 make tkButton.o
 make generic/tkButton.c
@@ -303,14 +306,14 @@ done generic/tkDefault.h
 prev generic/tkInt.h implicit
 done generic/tkButton.c
 prev generic/tkButton.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkButton.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkButton.c
 done tkButton.o generated
 make tkCanvArc.o
 make generic/tkCanvArc.c
 prev generic/tkInt.h implicit
 done generic/tkCanvArc.c
 prev generic/tkCanvArc.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvArc.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvArc.c
 done tkCanvArc.o generated
 make tkCanvBmap.o
 make generic/tkCanvBmap.c
@@ -320,7 +323,7 @@ done generic/tkCanvas.h
 prev generic/tkInt.h implicit
 done generic/tkCanvBmap.c
 prev generic/tkCanvBmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
 done tkCanvBmap.o generated
 make tkCanvImg.o
 make generic/tkCanvImg.c
@@ -328,21 +331,21 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvImg.c
 prev generic/tkCanvImg.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
 done tkCanvImg.o generated
 make tkCanvLine.o
 make generic/tkCanvLine.c
 prev generic/tkInt.h implicit
 done generic/tkCanvLine.c
 prev generic/tkCanvLine.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvLine.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvLine.c
 done tkCanvLine.o generated
 make tkCanvPoly.o
 make generic/tkCanvPoly.c
 prev generic/tkInt.h implicit
 done generic/tkCanvPoly.c
 prev generic/tkCanvPoly.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvPoly.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvPoly.c
 done tkCanvPoly.o generated
 make tkCanvPs.o
 make generic/tkCanvPs.c
@@ -350,7 +353,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvPs.c
 prev generic/tkCanvPs.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
 done tkCanvPs.o generated
 make tkCanvText.o
 make generic/tkCanvText.c
@@ -358,7 +361,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvText.c
 prev generic/tkCanvText.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
 done tkCanvText.o generated
 make tkCanvUtil.o
 make generic/tkCanvUtil.c
@@ -366,7 +369,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvUtil.c
 prev generic/tkCanvUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
 done tkCanvUtil.o generated
 make tkCanvWind.o
 make generic/tkCanvWind.c
@@ -374,7 +377,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvWind.c
 prev generic/tkCanvWind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
 done tkCanvWind.o generated
 make tkCanvas.o
 make generic/tkCanvas.c
@@ -383,7 +386,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvas.c
 prev generic/tkCanvas.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvas.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvas.c
 done tkCanvas.o generated
 make tkClipboard.o
 make generic/tkClipboard.c
@@ -391,42 +394,42 @@ prev generic/tkSelect.h implicit
 prev generic/tkInt.h implicit
 done generic/tkClipboard.c
 prev generic/tkClipboard.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkClipboard.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkClipboard.c
 done tkClipboard.o generated
 make tkCmds.o
 make generic/tkCmds.c
 prev generic/tkInt.h implicit
 done generic/tkCmds.c
 prev generic/tkCmds.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCmds.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCmds.c
 done tkCmds.o generated
 make tkColor.o
 make generic/tkColor.c
 prev generic/tkInt.h implicit
 done generic/tkColor.c
 prev generic/tkColor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkColor.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkColor.c
 done tkColor.o generated
 make tkConfig.o
 make generic/tkConfig.c
 prev generic/tkInt.h implicit
 done generic/tkConfig.c
 prev generic/tkConfig.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConfig.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConfig.c
 done tkConfig.o generated
 make tkConsole.o
 make generic/tkConsole.c
 prev generic/tkInt.h implicit
 done generic/tkConsole.c
 prev generic/tkConsole.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConsole.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConsole.c
 done tkConsole.o generated
 make tkCursor.o
 make generic/tkCursor.c
 prev generic/tkInt.h implicit
 done generic/tkCursor.c
 prev generic/tkCursor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCursor.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCursor.c
 done tkCursor.o generated
 make tkEntry.o
 make generic/tkEntry.c
@@ -434,14 +437,14 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkEntry.c
 prev generic/tkEntry.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEntry.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEntry.c
 done tkEntry.o generated
 make tkError.o
 make generic/tkError.c
 prev generic/tkInt.h implicit
 done generic/tkError.c
 prev generic/tkError.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkError.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkError.c
 done tkError.o generated
 make tkEvent.o
 make generic/tkEvent.c
@@ -449,7 +452,7 @@ prev generic/tkPort.h implicit
 prev generic/tkInt.h implicit
 done generic/tkEvent.c
 prev generic/tkEvent.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEvent.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEvent.c
 done tkEvent.o generated
 make tkFileFilter.o
 make generic/tkFileFilter.c
@@ -460,21 +463,21 @@ done generic/tkFileFilter.h
 prev generic/tkInt.h implicit
 done generic/tkFileFilter.c
 prev generic/tkFileFilter.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFileFilter.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFileFilter.c
 done tkFileFilter.o generated
 make tkFocus.o
 make generic/tkFocus.c
 prev generic/tkInt.h implicit
 done generic/tkFocus.c
 prev generic/tkFocus.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFocus.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFocus.c
 done tkFocus.o generated
 make tkFont.o
 make generic/tkFont.c
 prev generic/tkInt.h implicit
 done generic/tkFont.c
 prev generic/tkFont.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFont.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFont.c
 done tkFont.o generated
 make tkFrame.o
 make generic/tkFrame.c
@@ -482,77 +485,77 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkFrame.c
 prev generic/tkFrame.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFrame.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFrame.c
 done tkFrame.o generated
 make tkGC.o
 make generic/tkGC.c
 prev generic/tkInt.h implicit
 done generic/tkGC.c
 prev generic/tkGC.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGC.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGC.c
 done tkGC.o generated
 make tkGeometry.o
 make generic/tkGeometry.c
 prev generic/tkInt.h implicit
 done generic/tkGeometry.c
 prev generic/tkGeometry.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGeometry.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGeometry.c
 done tkGeometry.o generated
 make tkGet.o
 make generic/tkGet.c
 prev generic/tkInt.h implicit
 done generic/tkGet.c
 prev generic/tkGet.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGet.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGet.c
 done tkGet.o generated
 make tkGrab.o
 make generic/tkGrab.c
 prev generic/tkInt.h implicit
 done generic/tkGrab.c
 prev generic/tkGrab.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrab.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrab.c
 done tkGrab.o generated
 make tkGrid.o
 make generic/tkGrid.c
 prev generic/tkInt.h implicit
 done generic/tkGrid.c
 prev generic/tkGrid.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrid.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrid.c
 done tkGrid.o generated
 make tkImage.o
 make generic/tkImage.c
 prev generic/tkInt.h implicit
 done generic/tkImage.c
 prev generic/tkImage.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImage.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImage.c
 done tkImage.o generated
 make tkImgBmap.o
 make generic/tkImgBmap.c
 prev generic/tkInt.h implicit
 done generic/tkImgBmap.c
 prev generic/tkImgBmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgBmap.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgBmap.c
 done tkImgBmap.o generated
 make tkImgGIF.o
 make generic/tkImgGIF.c
 prev generic/tkInt.h implicit
 done generic/tkImgGIF.c
 prev generic/tkImgGIF.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgGIF.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgGIF.c
 done tkImgGIF.o generated
 make tkImgPPM.o
 make generic/tkImgPPM.c
 prev generic/tkInt.h implicit
 done generic/tkImgPPM.c
 prev generic/tkImgPPM.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPPM.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPPM.c
 done tkImgPPM.o generated
 make tkImgPhoto.o
 make generic/tkImgPhoto.c
 prev generic/tkInt.h implicit
 done generic/tkImgPhoto.c
 prev generic/tkImgPhoto.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPhoto.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPhoto.c
 done tkImgPhoto.o generated
 make tkImgUtil.o
 make generic/tkImgUtil.c
@@ -561,7 +564,7 @@ done xlib/xbytes.h
 prev generic/tkInt.h implicit
 done generic/tkImgUtil.c
 prev generic/tkImgUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Ixlib -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgUtil.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Ixlib -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgUtil.c
 done tkImgUtil.o generated
 make tkListbox.o
 make generic/tkListbox.c
@@ -569,7 +572,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkListbox.c
 prev generic/tkListbox.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkListbox.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkListbox.c
 done tkListbox.o generated
 make tkMenu.o
 make generic/tkMenu.c
@@ -579,7 +582,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMenu.c
 prev generic/tkMenu.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenu.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenu.c
 done tkMenu.o generated
 make tkMenubutton.o
 make generic/tkMenubutton.c
@@ -587,7 +590,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMenubutton.c
 prev generic/tkMenubutton.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenubutton.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenubutton.c
 done tkMenubutton.o generated
 make tkMessage.o
 make generic/tkMessage.c
@@ -595,35 +598,35 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMessage.c
 prev generic/tkMessage.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMessage.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMessage.c
 done tkMessage.o generated
 make tkOption.o
 make generic/tkOption.c
 prev generic/tkInt.h implicit
 done generic/tkOption.c
 prev generic/tkOption.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkOption.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkOption.c
 done tkOption.o generated
 make tkPack.o
 make generic/tkPack.c
 prev generic/tkInt.h implicit
 done generic/tkPack.c
 prev generic/tkPack.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPack.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPack.c
 done tkPack.o generated
 make tkPlace.o
 make generic/tkPlace.c
 prev generic/tkInt.h implicit
 done generic/tkPlace.c
 prev generic/tkPlace.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPlace.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPlace.c
 done tkPlace.o generated
 make tkRectOval.o
 make generic/tkRectOval.c
 prev generic/tkInt.h implicit
 done generic/tkRectOval.c
 prev generic/tkRectOval.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkRectOval.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkRectOval.c
 done tkRectOval.o generated
 make tkScale.o
 make generic/tkScale.c
@@ -631,7 +634,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkScale.c
 prev generic/tkScale.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScale.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScale.c
 done tkScale.o generated
 make tkScrollbar.o
 make generic/tkScrollbar.c
@@ -639,7 +642,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkScrollbar.c
 prev generic/tkScrollbar.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScrollbar.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScrollbar.c
 done tkScrollbar.o generated
 make tkSelect.o
 make generic/tkSelect.c
@@ -647,21 +650,21 @@ prev generic/tkSelect.h implicit
 prev generic/tkInt.h implicit
 done generic/tkSelect.c
 prev generic/tkSelect.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSelect.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSelect.c
 done tkSelect.o generated
 make tkSend.o
 make generic/tkSend.c
 prev generic/tkInt.h implicit
 done generic/tkSend.c
 prev generic/tkSend.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSend.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSend.c
 done tkSend.o generated
 make tkSquare.o
 make generic/tkSquare.c
 prev generic/tkInt.h implicit
 done generic/tkSquare.c
 prev generic/tkSquare.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSquare.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSquare.c
 done tkSquare.o generated
 make tkTest.o
 make generic/tkTest.c
@@ -670,7 +673,7 @@ done tkWinInt.h dontcare virtual
 prev generic/tkInt.h implicit
 done generic/tkTest.c
 prev generic/tkTest.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkTest.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkTest.c
 done tkTest.o generated
 make tkText.o
 make generic/tkText.c
@@ -681,7 +684,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkText.c
 prev generic/tkText.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkText.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkText.c
 done tkText.o generated
 make tkTextBTree.o
 make generic/tkTextBTree.c
@@ -689,7 +692,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextBTree.c
 prev generic/tkTextBTree.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
 done tkTextBTree.o generated
 make tkTextDisp.o
 make generic/tkTextDisp.c
@@ -697,7 +700,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextDisp.c
 prev generic/tkTextDisp.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
 done tkTextDisp.o generated
 make tkTextIndex.o
 make generic/tkTextIndex.c
@@ -706,7 +709,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextIndex.c
 prev generic/tkTextIndex.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextIndex.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextIndex.c
 done tkTextIndex.o generated
 make tkTextMark.o
 make generic/tkTextMark.c
@@ -714,7 +717,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextMark.c
 prev generic/tkTextMark.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
 done tkTextMark.o generated
 make tkTextTag.o
 make generic/tkTextTag.c
@@ -723,7 +726,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextTag.c
 prev generic/tkTextTag.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextTag.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextTag.c
 done tkTextTag.o generated
 make tkTextWind.o
 make generic/tkTextWind.c
@@ -731,7 +734,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextWind.c
 prev generic/tkTextWind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
 done tkTextWind.o generated
 make tkTrig.o
 make generic/tkTrig.c
@@ -739,28 +742,28 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTrig.c
 prev generic/tkTrig.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
 done tkTrig.o generated
 make tkUtil.o
 make generic/tkUtil.c
 prev generic/tkInt.h implicit
 done generic/tkUtil.c
 prev generic/tkUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkUtil.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkUtil.c
 done tkUtil.o generated
 make tkVisual.o
 make generic/tkVisual.c
 prev generic/tkInt.h implicit
 done generic/tkVisual.c
 prev generic/tkVisual.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkVisual.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkVisual.c
 done tkVisual.o generated
 make tkWindow.o
 make generic/tkWindow.c
 prev generic/tkInt.h implicit
 done generic/tkWindow.c
 prev generic/tkWindow.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkWindow.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkWindow.c
 done tkWindow.o generated
 make tkMain.o
 make generic/tkMain.c
@@ -770,7 +773,7 @@ prev generic/tk.h implicit
 prev ../../../include/tcl/tcl.h implicit
 done generic/tkMain.c
 prev generic/tkMain.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${INSTALLROOT}/include/tcl -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tk -c generic/tkMain.c
+exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tk -c generic/tkMain.c
 done tkMain.o generated
 exec - ${AR} cr libtk.a tkUnixSelect.o tkUnixInit.o tkUnixEvent.o tkUnixXId.o tkUnixCursor.o tkUnixDialog.o tkUnixDraw.o tkUnixWm.o tkUnix.o tk3d.o tkArgv.o tkAtom.o tkBind.o tkBitmap.o tkButton.o tkCanvArc.o tkCanvBmap.o tkCanvImg.o tkCanvLine.o tkCanvPoly.o tkCanvPs.o tkCanvText.o tkCanvUtil.o tkCanvWind.o tkCanvas.o tkClipboard.o tkCmds.o tkColor.o tkConfig.o tkConsole.o
 exec - ${AR} cr libtk.a tkCursor.o tkEntry.o tkError.o tkEvent.o tkFileFilter.o tkFocus.o tkFont.o tkFrame.o tkGC.o tkGeometry.o tkGet.o tkGrab.o tkGrid.o tkImage.o tkImgBmap.o tkImgGIF.o tkImgPPM.o tkImgPhoto.o tkImgUtil.o tkListbox.o tkMenu.o tkMenubutton.o tkMessage.o tkOption.o tkPack.o tkPlace.o tkRectOval.o tkScale.o tkScrollbar.o tkSelect.o tkSend.o tkSquare.o tkTest.o tkText.o tkTextBTree.o tkTextDisp.o tkTextIndex.o tkTextMark.o tkTextTag.o tkTextWind.o tkTrig.o tkUtil.o tkVisual.o tkWindow.o tkMain.o
@@ -780,481 +783,487 @@ done tk virtual
 prev libtk.a archive
 make ../../../lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
+exec - if	test ! -d ${PACKAGE_tcl_LIB}
+exec - then	set -x && mkdir -p ${PACKAGE_tcl_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libtk.a archive
+prev ../../../lib
 prev libtk.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libtk.a ${PACKAGE_ast_LIB}/libtk.a.old 2>/dev/null || true; test '' = 'libtk.a' || ${STDCMP} 2>/dev/null -s libtk.a ${PACKAGE_ast_LIB}/libtk.a || { ${STDCP} libtk.a ${PACKAGE_ast_LIB}/libtk.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libtk.a) >/dev/null 2>&1 || true
+exec - test '' = 'libtk.a' || ${STDCMP} 2>/dev/null -s libtk.a ${PACKAGE_tcl_LIB}/libtk.a || { ${STDMV} ${PACKAGE_tcl_LIB}/libtk.a ${PACKAGE_tcl_LIB}/libtk.a.old 2>/dev/null || true; ${STDCP} libtk.a ${PACKAGE_tcl_LIB}/libtk.a  		    		    ;}
+exec - (ranlib ${PACKAGE_tcl_LIB}/libtk.a) >/dev/null 2>&1 || true
 done ../../../lib/libtk.a generated
 make ../../../lib/lib
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
+exec - if	test ! -d ${PACKAGE_tcl_LIB}/lib
+exec - then	set -x && mkdir -p ${PACKAGE_tcl_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/tk
+prev ../../../lib/lib
 prev tk.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/tk ${PACKAGE_ast_LIB}/lib/tk.old 2>/dev/null || true; test '' = 'tk.req' || ${STDCMP} 2>/dev/null -s tk.req ${PACKAGE_ast_LIB}/lib/tk || { ${STDCP} tk.req ${PACKAGE_ast_LIB}/lib/tk  		    		    ;}
+exec - test '' = 'tk.req' || ${STDCMP} 2>/dev/null -s tk.req ${PACKAGE_tcl_LIB}/lib/tk || { ${STDMV} ${PACKAGE_tcl_LIB}/lib/tk ${PACKAGE_tcl_LIB}/lib/tk.old 2>/dev/null || true; ${STDCP} tk.req ${PACKAGE_tcl_LIB}/lib/tk  		    		    ;}
 done ../../../lib/lib/tk generated
 make ../../../include/tcl
 exec - set -
-exec - if	test ! -d ${INSTALLROOT}/include/tcl
-exec - then	set -x && mkdir -p ${INSTALLROOT}/include/tcl 		    		   
+exec - if	test ! -d ${PACKAGE_tcl_INCLUDE}
+exec - then	set -x && mkdir -p ${PACKAGE_tcl_INCLUDE} 		    		   
 exec - fi
 done ../../../include/tcl generated
 make ../../../include/tcl/tk.h
+prev ../../../include/tcl
 prev generic/tk.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic   generic/tk.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tk.h 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGE_tcl_LIB}/package/ast.lic   generic/tk.h > 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_tcl_INCLUDE}/tk.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tk.h
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_tcl_INCLUDE}/tk.h
 exec - fi
 done ../../../include/tcl/tk.h generated
 make ../../../lib/tk4.2
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2 		    		   
+exec - if	test ! -d ${PACKAGE_tcl_LIB}/tk4.2
+exec - then	set -x && mkdir -p ${PACKAGE_tcl_LIB}/tk4.2 		    		   
 exec - fi
 done ../../../lib/tk4.2 generated
 make ../../../lib/tk4.2/bgerror.tcl
+prev ../../../lib/tk4.2
 make library/bgerror.tcl
 done library/bgerror.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl.old 2>/dev/null || true; test '' = 'library/bgerror.tcl' || ${STDCMP} 2>/dev/null -s library/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl || { ${STDCP} library/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl  		    		    ;}
+exec - test '' = 'library/bgerror.tcl' || ${STDCMP} 2>/dev/null -s library/bgerror.tcl ${PACKAGE_tcl_LIB}/tk4.2/bgerror.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/bgerror.tcl ${PACKAGE_tcl_LIB}/tk4.2/bgerror.tcl.old 2>/dev/null || true; ${STDCP} library/bgerror.tcl ${PACKAGE_tcl_LIB}/tk4.2/bgerror.tcl  		    		    ;}
 done ../../../lib/tk4.2/bgerror.tcl generated
 make ../../../lib/tk4.2/button.tcl
 make library/button.tcl
 done library/button.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl.old 2>/dev/null || true; test '' = 'library/button.tcl' || ${STDCMP} 2>/dev/null -s library/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl || { ${STDCP} library/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl  		    		    ;}
+exec - test '' = 'library/button.tcl' || ${STDCMP} 2>/dev/null -s library/button.tcl ${PACKAGE_tcl_LIB}/tk4.2/button.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/button.tcl ${PACKAGE_tcl_LIB}/tk4.2/button.tcl.old 2>/dev/null || true; ${STDCP} library/button.tcl ${PACKAGE_tcl_LIB}/tk4.2/button.tcl  		    		    ;}
 done ../../../lib/tk4.2/button.tcl generated
 make ../../../lib/tk4.2/clrpick.tcl
 make library/clrpick.tcl
 done library/clrpick.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl || { ${STDCP} library/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl  		    		    ;}
+exec - test '' = 'library/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/clrpick.tcl ${PACKAGE_tcl_LIB}/tk4.2/clrpick.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/clrpick.tcl ${PACKAGE_tcl_LIB}/tk4.2/clrpick.tcl.old 2>/dev/null || true; ${STDCP} library/clrpick.tcl ${PACKAGE_tcl_LIB}/tk4.2/clrpick.tcl  		    		    ;}
 done ../../../lib/tk4.2/clrpick.tcl generated
 make ../../../lib/tk4.2/comdlg.tcl
 make library/comdlg.tcl
 done library/comdlg.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl.old 2>/dev/null || true; test '' = 'library/comdlg.tcl' || ${STDCMP} 2>/dev/null -s library/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl || { ${STDCP} library/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl  		    		    ;}
+exec - test '' = 'library/comdlg.tcl' || ${STDCMP} 2>/dev/null -s library/comdlg.tcl ${PACKAGE_tcl_LIB}/tk4.2/comdlg.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/comdlg.tcl ${PACKAGE_tcl_LIB}/tk4.2/comdlg.tcl.old 2>/dev/null || true; ${STDCP} library/comdlg.tcl ${PACKAGE_tcl_LIB}/tk4.2/comdlg.tcl  		    		    ;}
 done ../../../lib/tk4.2/comdlg.tcl generated
 make ../../../lib/tk4.2/console.tcl
 make library/console.tcl
 done library/console.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl.old 2>/dev/null || true; test '' = 'library/console.tcl' || ${STDCMP} 2>/dev/null -s library/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl || { ${STDCP} library/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl  		    		    ;}
+exec - test '' = 'library/console.tcl' || ${STDCMP} 2>/dev/null -s library/console.tcl ${PACKAGE_tcl_LIB}/tk4.2/console.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/console.tcl ${PACKAGE_tcl_LIB}/tk4.2/console.tcl.old 2>/dev/null || true; ${STDCP} library/console.tcl ${PACKAGE_tcl_LIB}/tk4.2/console.tcl  		    		    ;}
 done ../../../lib/tk4.2/console.tcl generated
 make ../../../lib/tk4.2/dialog.tcl
 make library/dialog.tcl
 done library/dialog.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl.old 2>/dev/null || true; test '' = 'library/dialog.tcl' || ${STDCMP} 2>/dev/null -s library/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl || { ${STDCP} library/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl  		    		    ;}
+exec - test '' = 'library/dialog.tcl' || ${STDCMP} 2>/dev/null -s library/dialog.tcl ${PACKAGE_tcl_LIB}/tk4.2/dialog.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/dialog.tcl ${PACKAGE_tcl_LIB}/tk4.2/dialog.tcl.old 2>/dev/null || true; ${STDCP} library/dialog.tcl ${PACKAGE_tcl_LIB}/tk4.2/dialog.tcl  		    		    ;}
 done ../../../lib/tk4.2/dialog.tcl generated
 make ../../../lib/tk4.2/entry.tcl
 make library/entry.tcl
 done library/entry.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl.old 2>/dev/null || true; test '' = 'library/entry.tcl' || ${STDCMP} 2>/dev/null -s library/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl || { ${STDCP} library/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl  		    		    ;}
+exec - test '' = 'library/entry.tcl' || ${STDCMP} 2>/dev/null -s library/entry.tcl ${PACKAGE_tcl_LIB}/tk4.2/entry.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/entry.tcl ${PACKAGE_tcl_LIB}/tk4.2/entry.tcl.old 2>/dev/null || true; ${STDCP} library/entry.tcl ${PACKAGE_tcl_LIB}/tk4.2/entry.tcl  		    		    ;}
 done ../../../lib/tk4.2/entry.tcl generated
 make ../../../lib/tk4.2/focus.tcl
 make library/focus.tcl
 done library/focus.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl.old 2>/dev/null || true; test '' = 'library/focus.tcl' || ${STDCMP} 2>/dev/null -s library/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl || { ${STDCP} library/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl  		    		    ;}
+exec - test '' = 'library/focus.tcl' || ${STDCMP} 2>/dev/null -s library/focus.tcl ${PACKAGE_tcl_LIB}/tk4.2/focus.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/focus.tcl ${PACKAGE_tcl_LIB}/tk4.2/focus.tcl.old 2>/dev/null || true; ${STDCP} library/focus.tcl ${PACKAGE_tcl_LIB}/tk4.2/focus.tcl  		    		    ;}
 done ../../../lib/tk4.2/focus.tcl generated
 make ../../../lib/tk4.2/folder.gif
 make library/folder.gif
 done library/folder.gif
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif.old 2>/dev/null || true; test '' = 'library/folder.gif' || ${STDCMP} 2>/dev/null -s library/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif || { ${STDCP} library/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif  		    		    ;}
+exec - test '' = 'library/folder.gif' || ${STDCMP} 2>/dev/null -s library/folder.gif ${PACKAGE_tcl_LIB}/tk4.2/folder.gif || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/folder.gif ${PACKAGE_tcl_LIB}/tk4.2/folder.gif.old 2>/dev/null || true; ${STDCP} library/folder.gif ${PACKAGE_tcl_LIB}/tk4.2/folder.gif  		    		    ;}
 done ../../../lib/tk4.2/folder.gif generated
 make ../../../lib/tk4.2/license.terms
 make library/license.terms
 done library/license.terms
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms.old 2>/dev/null || true; test '' = 'library/license.terms' || ${STDCMP} 2>/dev/null -s library/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms || { ${STDCP} library/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms  		    		    ;}
+exec - test '' = 'library/license.terms' || ${STDCMP} 2>/dev/null -s library/license.terms ${PACKAGE_tcl_LIB}/tk4.2/license.terms || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/license.terms ${PACKAGE_tcl_LIB}/tk4.2/license.terms.old 2>/dev/null || true; ${STDCP} library/license.terms ${PACKAGE_tcl_LIB}/tk4.2/license.terms  		    		    ;}
 done ../../../lib/tk4.2/license.terms generated
 make ../../../lib/tk4.2/listbox.tcl
 make library/listbox.tcl
 done library/listbox.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl.old 2>/dev/null || true; test '' = 'library/listbox.tcl' || ${STDCMP} 2>/dev/null -s library/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl || { ${STDCP} library/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl  		    		    ;}
+exec - test '' = 'library/listbox.tcl' || ${STDCMP} 2>/dev/null -s library/listbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/listbox.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/listbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/listbox.tcl.old 2>/dev/null || true; ${STDCP} library/listbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/listbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/listbox.tcl generated
 make ../../../lib/tk4.2/menu.tcl
 make library/menu.tcl
 done library/menu.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl.old 2>/dev/null || true; test '' = 'library/menu.tcl' || ${STDCMP} 2>/dev/null -s library/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl || { ${STDCP} library/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl  		    		    ;}
+exec - test '' = 'library/menu.tcl' || ${STDCMP} 2>/dev/null -s library/menu.tcl ${PACKAGE_tcl_LIB}/tk4.2/menu.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/menu.tcl ${PACKAGE_tcl_LIB}/tk4.2/menu.tcl.old 2>/dev/null || true; ${STDCP} library/menu.tcl ${PACKAGE_tcl_LIB}/tk4.2/menu.tcl  		    		    ;}
 done ../../../lib/tk4.2/menu.tcl generated
 make ../../../lib/tk4.2/msgbox.tcl
 make library/msgbox.tcl
 done library/msgbox.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl || { ${STDCP} library/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl  		    		    ;}
+exec - test '' = 'library/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/msgbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/msgbox.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/msgbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/msgbox.tcl.old 2>/dev/null || true; ${STDCP} library/msgbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/msgbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/msgbox.tcl generated
 make ../../../lib/tk4.2/obsolete.tcl
 make library/obsolete.tcl
 done library/obsolete.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl.old 2>/dev/null || true; test '' = 'library/obsolete.tcl' || ${STDCMP} 2>/dev/null -s library/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl || { ${STDCP} library/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl  		    		    ;}
+exec - test '' = 'library/obsolete.tcl' || ${STDCMP} 2>/dev/null -s library/obsolete.tcl ${PACKAGE_tcl_LIB}/tk4.2/obsolete.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/obsolete.tcl ${PACKAGE_tcl_LIB}/tk4.2/obsolete.tcl.old 2>/dev/null || true; ${STDCP} library/obsolete.tcl ${PACKAGE_tcl_LIB}/tk4.2/obsolete.tcl  		    		    ;}
 done ../../../lib/tk4.2/obsolete.tcl generated
 make ../../../lib/tk4.2/optMenu.tcl
 make library/optMenu.tcl
 done library/optMenu.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl.old 2>/dev/null || true; test '' = 'library/optMenu.tcl' || ${STDCMP} 2>/dev/null -s library/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl || { ${STDCP} library/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl  		    		    ;}
+exec - test '' = 'library/optMenu.tcl' || ${STDCMP} 2>/dev/null -s library/optMenu.tcl ${PACKAGE_tcl_LIB}/tk4.2/optMenu.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/optMenu.tcl ${PACKAGE_tcl_LIB}/tk4.2/optMenu.tcl.old 2>/dev/null || true; ${STDCP} library/optMenu.tcl ${PACKAGE_tcl_LIB}/tk4.2/optMenu.tcl  		    		    ;}
 done ../../../lib/tk4.2/optMenu.tcl generated
 make ../../../lib/tk4.2/palette.tcl
 make library/palette.tcl
 done library/palette.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl.old 2>/dev/null || true; test '' = 'library/palette.tcl' || ${STDCMP} 2>/dev/null -s library/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl || { ${STDCP} library/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl  		    		    ;}
+exec - test '' = 'library/palette.tcl' || ${STDCMP} 2>/dev/null -s library/palette.tcl ${PACKAGE_tcl_LIB}/tk4.2/palette.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/palette.tcl ${PACKAGE_tcl_LIB}/tk4.2/palette.tcl.old 2>/dev/null || true; ${STDCP} library/palette.tcl ${PACKAGE_tcl_LIB}/tk4.2/palette.tcl  		    		    ;}
 done ../../../lib/tk4.2/palette.tcl generated
 make ../../../lib/tk4.2/prolog.ps
 make library/prolog.ps
 done library/prolog.ps
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps.old 2>/dev/null || true; test '' = 'library/prolog.ps' || ${STDCMP} 2>/dev/null -s library/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps || { ${STDCP} library/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps  		    		    ;}
+exec - test '' = 'library/prolog.ps' || ${STDCMP} 2>/dev/null -s library/prolog.ps ${PACKAGE_tcl_LIB}/tk4.2/prolog.ps || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/prolog.ps ${PACKAGE_tcl_LIB}/tk4.2/prolog.ps.old 2>/dev/null || true; ${STDCP} library/prolog.ps ${PACKAGE_tcl_LIB}/tk4.2/prolog.ps  		    		    ;}
 done ../../../lib/tk4.2/prolog.ps generated
 make ../../../lib/tk4.2/scale.tcl
 make library/scale.tcl
 done library/scale.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl.old 2>/dev/null || true; test '' = 'library/scale.tcl' || ${STDCMP} 2>/dev/null -s library/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl || { ${STDCP} library/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl  		    		    ;}
+exec - test '' = 'library/scale.tcl' || ${STDCMP} 2>/dev/null -s library/scale.tcl ${PACKAGE_tcl_LIB}/tk4.2/scale.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/scale.tcl ${PACKAGE_tcl_LIB}/tk4.2/scale.tcl.old 2>/dev/null || true; ${STDCP} library/scale.tcl ${PACKAGE_tcl_LIB}/tk4.2/scale.tcl  		    		    ;}
 done ../../../lib/tk4.2/scale.tcl generated
 make ../../../lib/tk4.2/scrlbar.tcl
 make library/scrlbar.tcl
 done library/scrlbar.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl.old 2>/dev/null || true; test '' = 'library/scrlbar.tcl' || ${STDCMP} 2>/dev/null -s library/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl || { ${STDCP} library/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl  		    		    ;}
+exec - test '' = 'library/scrlbar.tcl' || ${STDCMP} 2>/dev/null -s library/scrlbar.tcl ${PACKAGE_tcl_LIB}/tk4.2/scrlbar.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/scrlbar.tcl ${PACKAGE_tcl_LIB}/tk4.2/scrlbar.tcl.old 2>/dev/null || true; ${STDCP} library/scrlbar.tcl ${PACKAGE_tcl_LIB}/tk4.2/scrlbar.tcl  		    		    ;}
 done ../../../lib/tk4.2/scrlbar.tcl generated
 make ../../../lib/tk4.2/tclIndex
 make library/tclIndex
 done library/tclIndex
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex.old 2>/dev/null || true; test '' = 'library/tclIndex' || ${STDCMP} 2>/dev/null -s library/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex || { ${STDCP} library/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex  		    		    ;}
+exec - test '' = 'library/tclIndex' || ${STDCMP} 2>/dev/null -s library/tclIndex ${PACKAGE_tcl_LIB}/tk4.2/tclIndex || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/tclIndex ${PACKAGE_tcl_LIB}/tk4.2/tclIndex.old 2>/dev/null || true; ${STDCP} library/tclIndex ${PACKAGE_tcl_LIB}/tk4.2/tclIndex  		    		    ;}
 done ../../../lib/tk4.2/tclIndex generated
 make ../../../lib/tk4.2/tearoff.tcl
 make library/tearoff.tcl
 done library/tearoff.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl.old 2>/dev/null || true; test '' = 'library/tearoff.tcl' || ${STDCMP} 2>/dev/null -s library/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl || { ${STDCP} library/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl  		    		    ;}
+exec - test '' = 'library/tearoff.tcl' || ${STDCMP} 2>/dev/null -s library/tearoff.tcl ${PACKAGE_tcl_LIB}/tk4.2/tearoff.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/tearoff.tcl ${PACKAGE_tcl_LIB}/tk4.2/tearoff.tcl.old 2>/dev/null || true; ${STDCP} library/tearoff.tcl ${PACKAGE_tcl_LIB}/tk4.2/tearoff.tcl  		    		    ;}
 done ../../../lib/tk4.2/tearoff.tcl generated
 make ../../../lib/tk4.2/text.tcl
 make library/text.tcl
 done library/text.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl.old 2>/dev/null || true; test '' = 'library/text.tcl' || ${STDCMP} 2>/dev/null -s library/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl || { ${STDCP} library/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl  		    		    ;}
+exec - test '' = 'library/text.tcl' || ${STDCMP} 2>/dev/null -s library/text.tcl ${PACKAGE_tcl_LIB}/tk4.2/text.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/text.tcl ${PACKAGE_tcl_LIB}/tk4.2/text.tcl.old 2>/dev/null || true; ${STDCP} library/text.tcl ${PACKAGE_tcl_LIB}/tk4.2/text.tcl  		    		    ;}
 done ../../../lib/tk4.2/text.tcl generated
 make ../../../lib/tk4.2/textfile.gif
 make library/textfile.gif
 done library/textfile.gif
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif.old 2>/dev/null || true; test '' = 'library/textfile.gif' || ${STDCMP} 2>/dev/null -s library/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif || { ${STDCP} library/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif  		    		    ;}
+exec - test '' = 'library/textfile.gif' || ${STDCMP} 2>/dev/null -s library/textfile.gif ${PACKAGE_tcl_LIB}/tk4.2/textfile.gif || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/textfile.gif ${PACKAGE_tcl_LIB}/tk4.2/textfile.gif.old 2>/dev/null || true; ${STDCP} library/textfile.gif ${PACKAGE_tcl_LIB}/tk4.2/textfile.gif  		    		    ;}
 done ../../../lib/tk4.2/textfile.gif generated
 make ../../../lib/tk4.2/tk.tcl
 make library/tk.tcl
 done library/tk.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl.old 2>/dev/null || true; test '' = 'library/tk.tcl' || ${STDCMP} 2>/dev/null -s library/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl || { ${STDCP} library/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl  		    		    ;}
+exec - test '' = 'library/tk.tcl' || ${STDCMP} 2>/dev/null -s library/tk.tcl ${PACKAGE_tcl_LIB}/tk4.2/tk.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/tk.tcl ${PACKAGE_tcl_LIB}/tk4.2/tk.tcl.old 2>/dev/null || true; ${STDCP} library/tk.tcl ${PACKAGE_tcl_LIB}/tk4.2/tk.tcl  		    		    ;}
 done ../../../lib/tk4.2/tk.tcl generated
 make ../../../lib/tk4.2/tkfbox.tcl
 make library/tkfbox.tcl
 done library/tkfbox.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl.old 2>/dev/null || true; test '' = 'library/tkfbox.tcl' || ${STDCMP} 2>/dev/null -s library/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl || { ${STDCP} library/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl  		    		    ;}
+exec - test '' = 'library/tkfbox.tcl' || ${STDCMP} 2>/dev/null -s library/tkfbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/tkfbox.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/tkfbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/tkfbox.tcl.old 2>/dev/null || true; ${STDCP} library/tkfbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/tkfbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/tkfbox.tcl generated
 make ../../../lib/tk4.2/updir.xbm
 make library/updir.xbm
 done library/updir.xbm
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm.old 2>/dev/null || true; test '' = 'library/updir.xbm' || ${STDCMP} 2>/dev/null -s library/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm || { ${STDCP} library/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm  		    		    ;}
+exec - test '' = 'library/updir.xbm' || ${STDCMP} 2>/dev/null -s library/updir.xbm ${PACKAGE_tcl_LIB}/tk4.2/updir.xbm || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/updir.xbm ${PACKAGE_tcl_LIB}/tk4.2/updir.xbm.old 2>/dev/null || true; ${STDCP} library/updir.xbm ${PACKAGE_tcl_LIB}/tk4.2/updir.xbm  		    		    ;}
 done ../../../lib/tk4.2/updir.xbm generated
 make ../../../lib/tk4.2/xmfbox.tcl
 make library/xmfbox.tcl
 done library/xmfbox.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl.old 2>/dev/null || true; test '' = 'library/xmfbox.tcl' || ${STDCMP} 2>/dev/null -s library/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl || { ${STDCP} library/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl  		    		    ;}
+exec - test '' = 'library/xmfbox.tcl' || ${STDCMP} 2>/dev/null -s library/xmfbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/xmfbox.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/xmfbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/xmfbox.tcl.old 2>/dev/null || true; ${STDCP} library/xmfbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/xmfbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/xmfbox.tcl generated
 make ../../../lib/tk4.2/demos
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2/demos
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos 		    		   
+exec - if	test ! -d ${PACKAGE_tcl_LIB}/tk4.2/demos
+exec - then	set -x && mkdir -p ${PACKAGE_tcl_LIB}/tk4.2/demos 		    		   
 exec - fi
 done ../../../lib/tk4.2/demos generated
 make ../../../lib/tk4.2/demos/README
+prev ../../../lib/tk4.2/demos
 make library/demos/README
 done library/demos/README
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README.old 2>/dev/null || true; test '' = 'library/demos/README' || ${STDCMP} 2>/dev/null -s library/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README || { ${STDCP} library/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README  		    		    ;}
+exec - test '' = 'library/demos/README' || ${STDCMP} 2>/dev/null -s library/demos/README ${PACKAGE_tcl_LIB}/tk4.2/demos/README || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/README ${PACKAGE_tcl_LIB}/tk4.2/demos/README.old 2>/dev/null || true; ${STDCP} library/demos/README ${PACKAGE_tcl_LIB}/tk4.2/demos/README  		    		    ;}
 done ../../../lib/tk4.2/demos/README generated
 make ../../../lib/tk4.2/demos/arrow.tcl
 make library/demos/arrow.tcl
 done library/demos/arrow.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl.old 2>/dev/null || true; test '' = 'library/demos/arrow.tcl' || ${STDCMP} 2>/dev/null -s library/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl || { ${STDCP} library/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl  		    		    ;}
+exec - test '' = 'library/demos/arrow.tcl' || ${STDCMP} 2>/dev/null -s library/demos/arrow.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/arrow.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/arrow.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/arrow.tcl.old 2>/dev/null || true; ${STDCP} library/demos/arrow.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/arrow.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/arrow.tcl generated
 make ../../../lib/tk4.2/demos/bind.tcl
 make library/demos/bind.tcl
 done library/demos/bind.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl.old 2>/dev/null || true; test '' = 'library/demos/bind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl || { ${STDCP} library/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl  		    		    ;}
+exec - test '' = 'library/demos/bind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bind.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/bind.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/bind.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/bind.tcl.old 2>/dev/null || true; ${STDCP} library/demos/bind.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/bind.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/bind.tcl generated
 make ../../../lib/tk4.2/demos/bitmap.tcl
 make library/demos/bitmap.tcl
 done library/demos/bitmap.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl.old 2>/dev/null || true; test '' = 'library/demos/bitmap.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl || { ${STDCP} library/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl  		    		    ;}
+exec - test '' = 'library/demos/bitmap.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bitmap.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/bitmap.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/bitmap.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/bitmap.tcl.old 2>/dev/null || true; ${STDCP} library/demos/bitmap.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/bitmap.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/bitmap.tcl generated
 make ../../../lib/tk4.2/demos/browse
 make library/demos/browse
 done library/demos/browse
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse.old 2>/dev/null || true; test '' = 'library/demos/browse' || ${STDCMP} 2>/dev/null -s library/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse || { ${STDCP} library/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse  		    		    ;}
+exec - test '' = 'library/demos/browse' || ${STDCMP} 2>/dev/null -s library/demos/browse ${PACKAGE_tcl_LIB}/tk4.2/demos/browse || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/browse ${PACKAGE_tcl_LIB}/tk4.2/demos/browse.old 2>/dev/null || true; ${STDCP} library/demos/browse ${PACKAGE_tcl_LIB}/tk4.2/demos/browse  		    		    ;}
 done ../../../lib/tk4.2/demos/browse generated
 make ../../../lib/tk4.2/demos/button.tcl
 make library/demos/button.tcl
 done library/demos/button.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl.old 2>/dev/null || true; test '' = 'library/demos/button.tcl' || ${STDCMP} 2>/dev/null -s library/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl || { ${STDCP} library/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl  		    		    ;}
+exec - test '' = 'library/demos/button.tcl' || ${STDCMP} 2>/dev/null -s library/demos/button.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/button.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/button.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/button.tcl.old 2>/dev/null || true; ${STDCP} library/demos/button.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/button.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/button.tcl generated
 make ../../../lib/tk4.2/demos/check.tcl
 make library/demos/check.tcl
 done library/demos/check.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl.old 2>/dev/null || true; test '' = 'library/demos/check.tcl' || ${STDCMP} 2>/dev/null -s library/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl || { ${STDCP} library/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl  		    		    ;}
+exec - test '' = 'library/demos/check.tcl' || ${STDCMP} 2>/dev/null -s library/demos/check.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/check.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/check.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/check.tcl.old 2>/dev/null || true; ${STDCP} library/demos/check.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/check.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/check.tcl generated
 make ../../../lib/tk4.2/demos/clrpick.tcl
 make library/demos/clrpick.tcl
 done library/demos/clrpick.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/demos/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl || { ${STDCP} library/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl  		    		    ;}
+exec - test '' = 'library/demos/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/demos/clrpick.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/clrpick.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/clrpick.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/clrpick.tcl.old 2>/dev/null || true; ${STDCP} library/demos/clrpick.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/clrpick.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/clrpick.tcl generated
 make ../../../lib/tk4.2/demos/colors.tcl
 make library/demos/colors.tcl
 done library/demos/colors.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl.old 2>/dev/null || true; test '' = 'library/demos/colors.tcl' || ${STDCMP} 2>/dev/null -s library/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl || { ${STDCP} library/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl  		    		    ;}
+exec - test '' = 'library/demos/colors.tcl' || ${STDCMP} 2>/dev/null -s library/demos/colors.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/colors.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/colors.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/colors.tcl.old 2>/dev/null || true; ${STDCP} library/demos/colors.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/colors.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/colors.tcl generated
 make ../../../lib/tk4.2/demos/cscroll.tcl
 make library/demos/cscroll.tcl
 done library/demos/cscroll.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl.old 2>/dev/null || true; test '' = 'library/demos/cscroll.tcl' || ${STDCMP} 2>/dev/null -s library/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl || { ${STDCP} library/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl  		    		    ;}
+exec - test '' = 'library/demos/cscroll.tcl' || ${STDCMP} 2>/dev/null -s library/demos/cscroll.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/cscroll.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/cscroll.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/cscroll.tcl.old 2>/dev/null || true; ${STDCP} library/demos/cscroll.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/cscroll.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/cscroll.tcl generated
 make ../../../lib/tk4.2/demos/ctext.tcl
 make library/demos/ctext.tcl
 done library/demos/ctext.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl.old 2>/dev/null || true; test '' = 'library/demos/ctext.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl || { ${STDCP} library/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl  		    		    ;}
+exec - test '' = 'library/demos/ctext.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ctext.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/ctext.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/ctext.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/ctext.tcl.old 2>/dev/null || true; ${STDCP} library/demos/ctext.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/ctext.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/ctext.tcl generated
 make ../../../lib/tk4.2/demos/dialog1.tcl
 make library/demos/dialog1.tcl
 done library/demos/dialog1.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl || { ${STDCP} library/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl  		    		    ;}
+exec - test '' = 'library/demos/dialog1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog1.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog1.tcl.old 2>/dev/null || true; ${STDCP} library/demos/dialog1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog1.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/dialog1.tcl generated
 make ../../../lib/tk4.2/demos/dialog2.tcl
 make library/demos/dialog2.tcl
 done library/demos/dialog2.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl || { ${STDCP} library/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl  		    		    ;}
+exec - test '' = 'library/demos/dialog2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog2.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog2.tcl.old 2>/dev/null || true; ${STDCP} library/demos/dialog2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/dialog2.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/dialog2.tcl generated
 make ../../../lib/tk4.2/demos/entry1.tcl
 make library/demos/entry1.tcl
 done library/demos/entry1.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl || { ${STDCP} library/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl  		    		    ;}
+exec - test '' = 'library/demos/entry1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/entry1.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/entry1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/entry1.tcl.old 2>/dev/null || true; ${STDCP} library/demos/entry1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/entry1.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/entry1.tcl generated
 make ../../../lib/tk4.2/demos/entry2.tcl
 make library/demos/entry2.tcl
 done library/demos/entry2.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl || { ${STDCP} library/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl  		    		    ;}
+exec - test '' = 'library/demos/entry2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/entry2.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/entry2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/entry2.tcl.old 2>/dev/null || true; ${STDCP} library/demos/entry2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/entry2.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/entry2.tcl generated
 make ../../../lib/tk4.2/demos/filebox.tcl
 make library/demos/filebox.tcl
 done library/demos/filebox.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl.old 2>/dev/null || true; test '' = 'library/demos/filebox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl || { ${STDCP} library/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl  		    		    ;}
+exec - test '' = 'library/demos/filebox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/filebox.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/filebox.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/filebox.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/filebox.tcl.old 2>/dev/null || true; ${STDCP} library/demos/filebox.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/filebox.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/filebox.tcl generated
 make ../../../lib/tk4.2/demos/floor.tcl
 make library/demos/floor.tcl
 done library/demos/floor.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl.old 2>/dev/null || true; test '' = 'library/demos/floor.tcl' || ${STDCMP} 2>/dev/null -s library/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl || { ${STDCP} library/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl  		    		    ;}
+exec - test '' = 'library/demos/floor.tcl' || ${STDCMP} 2>/dev/null -s library/demos/floor.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/floor.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/floor.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/floor.tcl.old 2>/dev/null || true; ${STDCP} library/demos/floor.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/floor.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/floor.tcl generated
 make ../../../lib/tk4.2/demos/form.tcl
 make library/demos/form.tcl
 done library/demos/form.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl.old 2>/dev/null || true; test '' = 'library/demos/form.tcl' || ${STDCMP} 2>/dev/null -s library/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl || { ${STDCP} library/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl  		    		    ;}
+exec - test '' = 'library/demos/form.tcl' || ${STDCMP} 2>/dev/null -s library/demos/form.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/form.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/form.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/form.tcl.old 2>/dev/null || true; ${STDCP} library/demos/form.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/form.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/form.tcl generated
 make ../../../lib/tk4.2/demos/hello
 make library/demos/hello
 done library/demos/hello
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello.old 2>/dev/null || true; test '' = 'library/demos/hello' || ${STDCMP} 2>/dev/null -s library/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello || { ${STDCP} library/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello  		    		    ;}
+exec - test '' = 'library/demos/hello' || ${STDCMP} 2>/dev/null -s library/demos/hello ${PACKAGE_tcl_LIB}/tk4.2/demos/hello || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/hello ${PACKAGE_tcl_LIB}/tk4.2/demos/hello.old 2>/dev/null || true; ${STDCP} library/demos/hello ${PACKAGE_tcl_LIB}/tk4.2/demos/hello  		    		    ;}
 done ../../../lib/tk4.2/demos/hello generated
 make ../../../lib/tk4.2/demos/hscale.tcl
 make library/demos/hscale.tcl
 done library/demos/hscale.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/hscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl || { ${STDCP} library/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl  		    		    ;}
+exec - test '' = 'library/demos/hscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/hscale.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/hscale.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/hscale.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/hscale.tcl.old 2>/dev/null || true; ${STDCP} library/demos/hscale.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/hscale.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/hscale.tcl generated
 make ../../../lib/tk4.2/demos/icon.tcl
 make library/demos/icon.tcl
 done library/demos/icon.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl.old 2>/dev/null || true; test '' = 'library/demos/icon.tcl' || ${STDCMP} 2>/dev/null -s library/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl || { ${STDCP} library/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl  		    		    ;}
+exec - test '' = 'library/demos/icon.tcl' || ${STDCMP} 2>/dev/null -s library/demos/icon.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/icon.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/icon.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/icon.tcl.old 2>/dev/null || true; ${STDCP} library/demos/icon.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/icon.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/icon.tcl generated
 make ../../../lib/tk4.2/demos/image1.tcl
 make library/demos/image1.tcl
 done library/demos/image1.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl.old 2>/dev/null || true; test '' = 'library/demos/image1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl || { ${STDCP} library/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl  		    		    ;}
+exec - test '' = 'library/demos/image1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/image1.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/image1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/image1.tcl.old 2>/dev/null || true; ${STDCP} library/demos/image1.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/image1.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/image1.tcl generated
 make ../../../lib/tk4.2/demos/image2.tcl
 make library/demos/image2.tcl
 done library/demos/image2.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl.old 2>/dev/null || true; test '' = 'library/demos/image2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl || { ${STDCP} library/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl  		    		    ;}
+exec - test '' = 'library/demos/image2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/image2.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/image2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/image2.tcl.old 2>/dev/null || true; ${STDCP} library/demos/image2.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/image2.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/image2.tcl generated
 make ../../../lib/tk4.2/demos/items.tcl
 make library/demos/items.tcl
 done library/demos/items.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl.old 2>/dev/null || true; test '' = 'library/demos/items.tcl' || ${STDCMP} 2>/dev/null -s library/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl || { ${STDCP} library/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl  		    		    ;}
+exec - test '' = 'library/demos/items.tcl' || ${STDCMP} 2>/dev/null -s library/demos/items.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/items.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/items.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/items.tcl.old 2>/dev/null || true; ${STDCP} library/demos/items.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/items.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/items.tcl generated
 make ../../../lib/tk4.2/demos/ixset
 make library/demos/ixset
 done library/demos/ixset
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset.old 2>/dev/null || true; test '' = 'library/demos/ixset' || ${STDCMP} 2>/dev/null -s library/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset || { ${STDCP} library/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset  		    		    ;}
+exec - test '' = 'library/demos/ixset' || ${STDCMP} 2>/dev/null -s library/demos/ixset ${PACKAGE_tcl_LIB}/tk4.2/demos/ixset || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/ixset ${PACKAGE_tcl_LIB}/tk4.2/demos/ixset.old 2>/dev/null || true; ${STDCP} library/demos/ixset ${PACKAGE_tcl_LIB}/tk4.2/demos/ixset  		    		    ;}
 done ../../../lib/tk4.2/demos/ixset generated
 make ../../../lib/tk4.2/demos/label.tcl
 make library/demos/label.tcl
 done library/demos/label.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl.old 2>/dev/null || true; test '' = 'library/demos/label.tcl' || ${STDCMP} 2>/dev/null -s library/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl || { ${STDCP} library/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl  		    		    ;}
+exec - test '' = 'library/demos/label.tcl' || ${STDCMP} 2>/dev/null -s library/demos/label.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/label.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/label.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/label.tcl.old 2>/dev/null || true; ${STDCP} library/demos/label.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/label.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/label.tcl generated
 make ../../../lib/tk4.2/demos/license.terms
 make library/demos/license.terms
 done library/demos/license.terms
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms.old 2>/dev/null || true; test '' = 'library/demos/license.terms' || ${STDCMP} 2>/dev/null -s library/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms || { ${STDCP} library/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms  		    		    ;}
+exec - test '' = 'library/demos/license.terms' || ${STDCMP} 2>/dev/null -s library/demos/license.terms ${PACKAGE_tcl_LIB}/tk4.2/demos/license.terms || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/license.terms ${PACKAGE_tcl_LIB}/tk4.2/demos/license.terms.old 2>/dev/null || true; ${STDCP} library/demos/license.terms ${PACKAGE_tcl_LIB}/tk4.2/demos/license.terms  		    		    ;}
 done ../../../lib/tk4.2/demos/license.terms generated
 make ../../../lib/tk4.2/demos/menu.tcl
 make library/demos/menu.tcl
 done library/demos/menu.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl.old 2>/dev/null || true; test '' = 'library/demos/menu.tcl' || ${STDCMP} 2>/dev/null -s library/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl || { ${STDCP} library/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl  		    		    ;}
+exec - test '' = 'library/demos/menu.tcl' || ${STDCMP} 2>/dev/null -s library/demos/menu.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/menu.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/menu.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/menu.tcl.old 2>/dev/null || true; ${STDCP} library/demos/menu.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/menu.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/menu.tcl generated
 make ../../../lib/tk4.2/demos/msgbox.tcl
 make library/demos/msgbox.tcl
 done library/demos/msgbox.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/demos/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl || { ${STDCP} library/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl  		    		    ;}
+exec - test '' = 'library/demos/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/msgbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/msgbox.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/msgbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/msgbox.tcl.old 2>/dev/null || true; ${STDCP} library/demos/msgbox.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/msgbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/msgbox.tcl generated
 make ../../../lib/tk4.2/demos/plot.tcl
 make library/demos/plot.tcl
 done library/demos/plot.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl.old 2>/dev/null || true; test '' = 'library/demos/plot.tcl' || ${STDCMP} 2>/dev/null -s library/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl || { ${STDCP} library/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl  		    		    ;}
+exec - test '' = 'library/demos/plot.tcl' || ${STDCMP} 2>/dev/null -s library/demos/plot.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/plot.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/plot.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/plot.tcl.old 2>/dev/null || true; ${STDCP} library/demos/plot.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/plot.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/plot.tcl generated
 make ../../../lib/tk4.2/demos/puzzle.tcl
 make library/demos/puzzle.tcl
 done library/demos/puzzle.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl.old 2>/dev/null || true; test '' = 'library/demos/puzzle.tcl' || ${STDCMP} 2>/dev/null -s library/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl || { ${STDCP} library/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl  		    		    ;}
+exec - test '' = 'library/demos/puzzle.tcl' || ${STDCMP} 2>/dev/null -s library/demos/puzzle.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/puzzle.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/puzzle.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/puzzle.tcl.old 2>/dev/null || true; ${STDCP} library/demos/puzzle.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/puzzle.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/puzzle.tcl generated
 make ../../../lib/tk4.2/demos/radio.tcl
 make library/demos/radio.tcl
 done library/demos/radio.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl.old 2>/dev/null || true; test '' = 'library/demos/radio.tcl' || ${STDCMP} 2>/dev/null -s library/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl || { ${STDCP} library/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl  		    		    ;}
+exec - test '' = 'library/demos/radio.tcl' || ${STDCMP} 2>/dev/null -s library/demos/radio.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/radio.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/radio.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/radio.tcl.old 2>/dev/null || true; ${STDCP} library/demos/radio.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/radio.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/radio.tcl generated
 make ../../../lib/tk4.2/demos/rmt
 make library/demos/rmt
 done library/demos/rmt
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt.old 2>/dev/null || true; test '' = 'library/demos/rmt' || ${STDCMP} 2>/dev/null -s library/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt || { ${STDCP} library/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt  		    		    ;}
+exec - test '' = 'library/demos/rmt' || ${STDCMP} 2>/dev/null -s library/demos/rmt ${PACKAGE_tcl_LIB}/tk4.2/demos/rmt || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/rmt ${PACKAGE_tcl_LIB}/tk4.2/demos/rmt.old 2>/dev/null || true; ${STDCP} library/demos/rmt ${PACKAGE_tcl_LIB}/tk4.2/demos/rmt  		    		    ;}
 done ../../../lib/tk4.2/demos/rmt generated
 make ../../../lib/tk4.2/demos/rolodex
 make library/demos/rolodex
 done library/demos/rolodex
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex.old 2>/dev/null || true; test '' = 'library/demos/rolodex' || ${STDCMP} 2>/dev/null -s library/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex || { ${STDCP} library/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex  		    		    ;}
+exec - test '' = 'library/demos/rolodex' || ${STDCMP} 2>/dev/null -s library/demos/rolodex ${PACKAGE_tcl_LIB}/tk4.2/demos/rolodex || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/rolodex ${PACKAGE_tcl_LIB}/tk4.2/demos/rolodex.old 2>/dev/null || true; ${STDCP} library/demos/rolodex ${PACKAGE_tcl_LIB}/tk4.2/demos/rolodex  		    		    ;}
 done ../../../lib/tk4.2/demos/rolodex generated
 make ../../../lib/tk4.2/demos/ruler.tcl
 make library/demos/ruler.tcl
 done library/demos/ruler.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl.old 2>/dev/null || true; test '' = 'library/demos/ruler.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl || { ${STDCP} library/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl  		    		    ;}
+exec - test '' = 'library/demos/ruler.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ruler.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/ruler.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/ruler.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/ruler.tcl.old 2>/dev/null || true; ${STDCP} library/demos/ruler.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/ruler.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/ruler.tcl generated
 make ../../../lib/tk4.2/demos/sayings.tcl
 make library/demos/sayings.tcl
 done library/demos/sayings.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl.old 2>/dev/null || true; test '' = 'library/demos/sayings.tcl' || ${STDCMP} 2>/dev/null -s library/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl || { ${STDCP} library/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl  		    		    ;}
+exec - test '' = 'library/demos/sayings.tcl' || ${STDCMP} 2>/dev/null -s library/demos/sayings.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/sayings.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/sayings.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/sayings.tcl.old 2>/dev/null || true; ${STDCP} library/demos/sayings.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/sayings.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/sayings.tcl generated
 make ../../../lib/tk4.2/demos/search.tcl
 make library/demos/search.tcl
 done library/demos/search.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl.old 2>/dev/null || true; test '' = 'library/demos/search.tcl' || ${STDCMP} 2>/dev/null -s library/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl || { ${STDCP} library/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl  		    		    ;}
+exec - test '' = 'library/demos/search.tcl' || ${STDCMP} 2>/dev/null -s library/demos/search.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/search.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/search.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/search.tcl.old 2>/dev/null || true; ${STDCP} library/demos/search.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/search.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/search.tcl generated
 make ../../../lib/tk4.2/demos/square
 make library/demos/square
 done library/demos/square
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square.old 2>/dev/null || true; test '' = 'library/demos/square' || ${STDCMP} 2>/dev/null -s library/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square || { ${STDCP} library/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square  		    		    ;}
+exec - test '' = 'library/demos/square' || ${STDCMP} 2>/dev/null -s library/demos/square ${PACKAGE_tcl_LIB}/tk4.2/demos/square || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/square ${PACKAGE_tcl_LIB}/tk4.2/demos/square.old 2>/dev/null || true; ${STDCP} library/demos/square ${PACKAGE_tcl_LIB}/tk4.2/demos/square  		    		    ;}
 done ../../../lib/tk4.2/demos/square generated
 make ../../../lib/tk4.2/demos/states.tcl
 make library/demos/states.tcl
 done library/demos/states.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl.old 2>/dev/null || true; test '' = 'library/demos/states.tcl' || ${STDCMP} 2>/dev/null -s library/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl || { ${STDCP} library/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl  		    		    ;}
+exec - test '' = 'library/demos/states.tcl' || ${STDCMP} 2>/dev/null -s library/demos/states.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/states.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/states.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/states.tcl.old 2>/dev/null || true; ${STDCP} library/demos/states.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/states.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/states.tcl generated
 make ../../../lib/tk4.2/demos/style.tcl
 make library/demos/style.tcl
 done library/demos/style.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl.old 2>/dev/null || true; test '' = 'library/demos/style.tcl' || ${STDCMP} 2>/dev/null -s library/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl || { ${STDCP} library/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl  		    		    ;}
+exec - test '' = 'library/demos/style.tcl' || ${STDCMP} 2>/dev/null -s library/demos/style.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/style.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/style.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/style.tcl.old 2>/dev/null || true; ${STDCP} library/demos/style.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/style.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/style.tcl generated
 make ../../../lib/tk4.2/demos/tclIndex
 make library/demos/tclIndex
 done library/demos/tclIndex
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex.old 2>/dev/null || true; test '' = 'library/demos/tclIndex' || ${STDCMP} 2>/dev/null -s library/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex || { ${STDCP} library/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex  		    		    ;}
+exec - test '' = 'library/demos/tclIndex' || ${STDCMP} 2>/dev/null -s library/demos/tclIndex ${PACKAGE_tcl_LIB}/tk4.2/demos/tclIndex || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/tclIndex ${PACKAGE_tcl_LIB}/tk4.2/demos/tclIndex.old 2>/dev/null || true; ${STDCP} library/demos/tclIndex ${PACKAGE_tcl_LIB}/tk4.2/demos/tclIndex  		    		    ;}
 done ../../../lib/tk4.2/demos/tclIndex generated
 make ../../../lib/tk4.2/demos/tcolor
 make library/demos/tcolor
 done library/demos/tcolor
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor.old 2>/dev/null || true; test '' = 'library/demos/tcolor' || ${STDCMP} 2>/dev/null -s library/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor || { ${STDCP} library/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor  		    		    ;}
+exec - test '' = 'library/demos/tcolor' || ${STDCMP} 2>/dev/null -s library/demos/tcolor ${PACKAGE_tcl_LIB}/tk4.2/demos/tcolor || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/tcolor ${PACKAGE_tcl_LIB}/tk4.2/demos/tcolor.old 2>/dev/null || true; ${STDCP} library/demos/tcolor ${PACKAGE_tcl_LIB}/tk4.2/demos/tcolor  		    		    ;}
 done ../../../lib/tk4.2/demos/tcolor generated
 make ../../../lib/tk4.2/demos/text.tcl
 make library/demos/text.tcl
 done library/demos/text.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl.old 2>/dev/null || true; test '' = 'library/demos/text.tcl' || ${STDCMP} 2>/dev/null -s library/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl || { ${STDCP} library/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl  		    		    ;}
+exec - test '' = 'library/demos/text.tcl' || ${STDCMP} 2>/dev/null -s library/demos/text.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/text.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/text.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/text.tcl.old 2>/dev/null || true; ${STDCP} library/demos/text.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/text.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/text.tcl generated
 make ../../../lib/tk4.2/demos/timer
 make library/demos/timer
 done library/demos/timer
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer.old 2>/dev/null || true; test '' = 'library/demos/timer' || ${STDCMP} 2>/dev/null -s library/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer || { ${STDCP} library/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer  		    		    ;}
+exec - test '' = 'library/demos/timer' || ${STDCMP} 2>/dev/null -s library/demos/timer ${PACKAGE_tcl_LIB}/tk4.2/demos/timer || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/timer ${PACKAGE_tcl_LIB}/tk4.2/demos/timer.old 2>/dev/null || true; ${STDCP} library/demos/timer ${PACKAGE_tcl_LIB}/tk4.2/demos/timer  		    		    ;}
 done ../../../lib/tk4.2/demos/timer generated
 make ../../../lib/tk4.2/demos/twind.tcl
 make library/demos/twind.tcl
 done library/demos/twind.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl.old 2>/dev/null || true; test '' = 'library/demos/twind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl || { ${STDCP} library/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl  		    		    ;}
+exec - test '' = 'library/demos/twind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/twind.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/twind.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/twind.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/twind.tcl.old 2>/dev/null || true; ${STDCP} library/demos/twind.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/twind.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/twind.tcl generated
 make ../../../lib/tk4.2/demos/vscale.tcl
 make library/demos/vscale.tcl
 done library/demos/vscale.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/vscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl || { ${STDCP} library/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl  		    		    ;}
+exec - test '' = 'library/demos/vscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/vscale.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/vscale.tcl || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/vscale.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/vscale.tcl.old 2>/dev/null || true; ${STDCP} library/demos/vscale.tcl ${PACKAGE_tcl_LIB}/tk4.2/demos/vscale.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/vscale.tcl generated
 make ../../../lib/tk4.2/demos/widget
 make library/demos/widget
 done library/demos/widget
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget.old 2>/dev/null || true; test '' = 'library/demos/widget' || ${STDCMP} 2>/dev/null -s library/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget || { ${STDCP} library/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget  		    		    ;}
+exec - test '' = 'library/demos/widget' || ${STDCMP} 2>/dev/null -s library/demos/widget ${PACKAGE_tcl_LIB}/tk4.2/demos/widget || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/widget ${PACKAGE_tcl_LIB}/tk4.2/demos/widget.old 2>/dev/null || true; ${STDCP} library/demos/widget ${PACKAGE_tcl_LIB}/tk4.2/demos/widget  		    		    ;}
 done ../../../lib/tk4.2/demos/widget generated
 make ../../../lib/tk4.2/demos/images
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2/demos/images
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos/images 		    		   
+exec - if	test ! -d ${PACKAGE_tcl_LIB}/tk4.2/demos/images
+exec - then	set -x && mkdir -p ${PACKAGE_tcl_LIB}/tk4.2/demos/images 		    		   
 exec - fi
 done ../../../lib/tk4.2/demos/images generated
 make ../../../lib/tk4.2/demos/images/earth.gif
+prev ../../../lib/tk4.2/demos/images
 make library/demos/images/earth.gif
 done library/demos/images/earth.gif
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earth.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif || { ${STDCP} library/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif  		    		    ;}
+exec - test '' = 'library/demos/images/earth.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earth.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earth.gif || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earth.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earth.gif.old 2>/dev/null || true; ${STDCP} library/demos/images/earth.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earth.gif  		    		    ;}
 done ../../../lib/tk4.2/demos/images/earth.gif generated
 make ../../../lib/tk4.2/demos/images/earthris.gif
 make library/demos/images/earthris.gif
 done library/demos/images/earthris.gif
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earthris.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif || { ${STDCP} library/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif  		    		    ;}
+exec - test '' = 'library/demos/images/earthris.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earthris.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earthris.gif || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earthris.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earthris.gif.old 2>/dev/null || true; ${STDCP} library/demos/images/earthris.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/earthris.gif  		    		    ;}
 done ../../../lib/tk4.2/demos/images/earthris.gif generated
 make ../../../lib/tk4.2/demos/images/face.bmp
 make library/demos/images/face.bmp
 done library/demos/images/face.bmp
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/face.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp || { ${STDCP} library/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp  		    		    ;}
+exec - test '' = 'library/demos/images/face.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/face.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/face.bmp || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/face.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/face.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/face.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/face.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/face.bmp generated
 make ../../../lib/tk4.2/demos/images/flagdown.bmp
 make library/demos/images/flagdown.bmp
 done library/demos/images/flagdown.bmp
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagdown.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp || { ${STDCP} library/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp  		    		    ;}
+exec - test '' = 'library/demos/images/flagdown.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagdown.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagdown.bmp || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagdown.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagdown.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/flagdown.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagdown.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/flagdown.bmp generated
 make ../../../lib/tk4.2/demos/images/flagup.bmp
 make library/demos/images/flagup.bmp
 done library/demos/images/flagup.bmp
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagup.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp || { ${STDCP} library/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp  		    		    ;}
+exec - test '' = 'library/demos/images/flagup.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagup.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagup.bmp || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagup.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagup.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/flagup.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/flagup.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/flagup.bmp generated
 make ../../../lib/tk4.2/demos/images/gray25.bmp
 make library/demos/images/gray25.bmp
 done library/demos/images/gray25.bmp
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/gray25.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp || { ${STDCP} library/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp  		    		    ;}
+exec - test '' = 'library/demos/images/gray25.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/gray25.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/gray25.bmp || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/gray25.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/gray25.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/gray25.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/gray25.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/gray25.bmp generated
 make ../../../lib/tk4.2/demos/images/letters.bmp
 make library/demos/images/letters.bmp
 done library/demos/images/letters.bmp
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/letters.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp || { ${STDCP} library/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp  		    		    ;}
+exec - test '' = 'library/demos/images/letters.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/letters.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/letters.bmp || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/letters.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/letters.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/letters.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/letters.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/letters.bmp generated
 make ../../../lib/tk4.2/demos/images/noletter.bmp
 make library/demos/images/noletter.bmp
 done library/demos/images/noletter.bmp
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/noletter.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp || { ${STDCP} library/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp  		    		    ;}
+exec - test '' = 'library/demos/images/noletter.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/noletter.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/noletter.bmp || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/noletter.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/noletter.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/noletter.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/noletter.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/noletter.bmp generated
 make ../../../lib/tk4.2/demos/images/pattern.bmp
 make library/demos/images/pattern.bmp
 done library/demos/images/pattern.bmp
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/pattern.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp || { ${STDCP} library/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp  		    		    ;}
+exec - test '' = 'library/demos/images/pattern.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/pattern.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/pattern.bmp || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/pattern.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/pattern.bmp.old 2>/dev/null || true; ${STDCP} library/demos/images/pattern.bmp ${PACKAGE_tcl_LIB}/tk4.2/demos/images/pattern.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/pattern.bmp generated
 make ../../../lib/tk4.2/demos/images/tcllogo.gif
 make library/demos/images/tcllogo.gif
 done library/demos/images/tcllogo.gif
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif.old 2>/dev/null || true; test '' = 'library/demos/images/tcllogo.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif || { ${STDCP} library/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif  		    		    ;}
+exec - test '' = 'library/demos/images/tcllogo.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/tcllogo.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/tcllogo.gif || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/tcllogo.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/tcllogo.gif.old 2>/dev/null || true; ${STDCP} library/demos/images/tcllogo.gif ${PACKAGE_tcl_LIB}/tk4.2/demos/images/tcllogo.gif  		    		    ;}
 done ../../../lib/tk4.2/demos/images/tcllogo.gif generated
 make ../../../lib/tk4.2/demos/images/teapot.ppm
 make library/demos/images/teapot.ppm
 done library/demos/images/teapot.ppm
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm.old 2>/dev/null || true; test '' = 'library/demos/images/teapot.ppm' || ${STDCMP} 2>/dev/null -s library/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm || { ${STDCP} library/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm  		    		    ;}
+exec - test '' = 'library/demos/images/teapot.ppm' || ${STDCMP} 2>/dev/null -s library/demos/images/teapot.ppm ${PACKAGE_tcl_LIB}/tk4.2/demos/images/teapot.ppm || { ${STDMV} ${PACKAGE_tcl_LIB}/tk4.2/demos/images/teapot.ppm ${PACKAGE_tcl_LIB}/tk4.2/demos/images/teapot.ppm.old 2>/dev/null || true; ${STDCP} library/demos/images/teapot.ppm ${PACKAGE_tcl_LIB}/tk4.2/demos/images/teapot.ppm  		    		    ;}
 done ../../../lib/tk4.2/demos/images/teapot.ppm generated
 done install virtual
 make test

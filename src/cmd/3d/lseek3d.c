@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -46,7 +46,7 @@ __STDPP__directive pragma pp:nohide lseek
 
 #ifdef	lseek3d
 
-#if !_nosys_lseek64
+#if !_nosys_lseek64 && _typ_off64_t
 
 typedef off64_t (*Seek64_f)(int, off64_t, int);
 

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -40,6 +40,10 @@
 #include <ast_dir.h>
 #include <errno.h>
 #include <ls.h>
+
+#ifndef D_FILENO
+#define D_FILENO(d)	(1)
+#endif
 
 #ifndef errno
 extern int	errno;

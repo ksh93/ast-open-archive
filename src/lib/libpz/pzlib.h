@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -31,7 +31,7 @@
 #define _PZLIB_H	1
 
 #include <ast.h>
-#include <cdt.h>
+#include <dt.h>
 #include <ctype.h>
 #include <error.h>
 #include <times.h>
@@ -47,27 +47,38 @@
 
 struct Pz_s;
 
-typedef struct				/* read stream state		*/
+typedef struct Pzelt_s			/* window row order element	*/
+{
+	Dtlink_t	link;		/* dictionary link		*/
+	unsigned char	buf[1];		/* row data			*/
+} Pzelt_t;
+
+typedef struct Pzrs_s			/* read stream state		*/
 {
 	size_t		hi;		/* num hi frequency rows in buf	*/
 	size_t		lo;		/* rem lo frequency reps in pat	*/
 } Pzrs_t;
 
-typedef struct				/* write stream state		*/
+typedef struct Pzws_s			/* write stream state		*/
 {
 	unsigned char*	bp;		/* hi freq buf ptr		*/
 	unsigned char*	vp;		/* lo freq code val ptr		*/
 	unsigned char*	ve;		/* lo freq code val end		*/
 	unsigned char*	pb;		/* partial row buffer		*/
 
+	unsigned char*	sp;		/* PZ_SORT partial buffer	*/
+
 	size_t		pc;		/* partial row count		*/
 	size_t		rep;		/* lo freq repeat count		*/
 	size_t		row;		/* lo freq row count		*/
+	size_t		sz;		/* PZ_SORT partial buffer rem	*/
+
+	Pzelt_t*	se;		/* PZ_SORT partial element	*/
 
 	Sfio_t*		io;		/* output sync stream		*/
 } Pzws_t;
 
-typedef struct				/* split stream state		*/
+typedef struct Pzss_s			/* split stream state		*/
 {
 	char*		match;		/* strmatch() file pattern	*/
 	unsigned long	flags;		/* PZ_SPLIT_* flags		*/
@@ -95,6 +106,13 @@ typedef struct				/* split stream state		*/
 	int		terminator;	/* prefix record terminator	*/ \
 	char*		data;		/* prefix data			*/ \
 	}		prefix;		/* header prefix info		*/ \
+	struct								   \
+	{								   \
+	Dt_t*		order;		/* order dictionary		*/ \
+	Dt_t*		free;		/* free list dictionary		*/ \
+	Dtdisc_t	orderdisc;	/* order discipline		*/ \
+	Dtdisc_t	freedisc;	/* free list discipline		*/ \
+	}		sort;		/* PZ_SORT info			*/ \
 	Sfio_t*		oip;		/* original input stream	*/ \
 	Sfio_t*		oop;		/* original output stream	*/ \
 	Sfio_t*		tmp;		/* temp string stream 		*/ \
@@ -150,6 +168,9 @@ typedef struct
 #define PZ_ERROR	0x80000000	/* make pzclose() return error	*/
 
 #define PZ_INTERNAL	(PZ_HANDLE|PZ_UNKNOWN|PZ_MAINONLY|PZ_ROWONLY|PZ_AGAIN|PZ_POP|PZ_ERROR)
+
+#define PZ_MARK_TAIL	1		/* tail marker			*/
+#define PZ_MARK_PART	2		/* tail marker			*/
 
 #define PZ_HDR_ARR(x)	((x)>=0x41&&(x)<=0x5a)	/* header array op	*/
 #define PZ_HDR_BUF(x)	((x)>=0x61&&(x)<=0x7a)	/* header buffer op	*/

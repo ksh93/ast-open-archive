@@ -1,3 +1,6 @@
+03-04-05 pop.c: add OP_VERBOSE for cut() trace
+03-01-04 pin.c: list range only if more than 2 elements
+02-12-25 pin: add --sort
 02-02-14 Makefile: add explicit -lz references
 01-10-31 pin: add --reorder=tsp via -ltsp
 01-10-30 pzip: fix --window doc typo

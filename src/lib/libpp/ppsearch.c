@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -118,6 +118,7 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 	struct ppfile*		mp;
 	int			fd;
 	int			index;
+	int			hosted;
 	char*			t;
 
 	if (!(pp.option & PREFIX))
@@ -472,7 +473,14 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 				else
 					pp.mode &= ~MARKC;
 			}
-			if (dp->hosted)
+			if (!(hosted = dp->hosted) && dp->index == INC_PREFIX && (pp.mode & (FILEDEPS|HEADERDEPS|INIT)) == FILEDEPS)
+			{
+				up = dp;
+				while ((up = up->next) && !streq(up->name, dp->name));
+				if (up && up->hosted)
+					hosted = 1;
+			}
+			if (hosted)
 				pp.mode |= MARKHOSTED;
 			else
 				pp.mode &= ~MARKHOSTED;

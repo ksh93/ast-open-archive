@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -1176,25 +1176,42 @@ ppop(int op, ...)
 				error(3, "temporary buffer allocation error");
 			sfputr(sp, p, -1);
 			p = sfstruse(sp);
-			if (s = strchr(p, '=')) *s++ = 0;
-			else s = p;
-			while (*s == '_') s++;
+			if (s = strchr(p, '='))
+				*s++ = 0;
+			else
+				s = p;
+			while (*s == '_')
+				s++;
 			for (t = s + strlen(s); t > s && *(t - 1) == '_'; t--);
-			if (*t == '_') *t = 0;
-			else t = 0;
+			if (*t == '_')
+				*t = 0;
+			else
+				t = 0;
 			op = ((key = ppkeyref(pp.symtab, s)) && (key->sym.flags & SYM_LEX)) ? key->lex : T_NOISE;
-			if (pp.test & 0x0400) error(1, "reserved#1 `%s' %d", s, op);
-			if (t) *t = '_';
-			if (!(key = ppkeyget(pp.symtab, p)) || !(key->sym.flags & SYM_LEX))
-			{
-				if (key) free(key);
+			if (pp.test & 0x0400)
+				error(1, "reserved#1 `%s' %d", s, op);
+			if (t)
+				*t = '_';
+			if (!(key = ppkeyget(pp.symtab, p)))
 				key = ppkeyset(pp.symtab, NiL);
+			else if (!(key->sym.flags & SYM_LEX))
+			{
+				struct ppsymbol	tmp;
+
+				tmp = key->sym;
+				hashlook(pp.symtab, p, HASH_DELETE, NiL);
+				key = ppkeyset(pp.symtab, NiL);
+				key->sym.flags = tmp.flags;
+				key->sym.macro = tmp.macro;
+				key->sym.value = tmp.value;
+				key->sym.hidden = tmp.hidden;
 			}
 			if (!(key->sym.flags & SYM_KEYWORD))
 			{
 				key->sym.flags |= SYM_KEYWORD|SYM_LEX;
 				key->lex = op;
-				if (pp.test & 0x0400) error(1, "reserved#2 `%s' %d", p, op);
+				if (pp.test & 0x0400)
+					error(1, "reserved#2 `%s' %d", p, op);
 			}
 			sfstrclose(sp);
 		}

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -27,6 +27,9 @@
 
 /*
  * write a buffer to a pz stream
+ *
+ * code cannibalized from pzdeflate()
+ * the PZ_SORT pzsync() code could be more efficient
  */
 
 ssize_t
@@ -38,6 +41,7 @@ pzwrite(register Pz_t* pz, Sfio_t* op, const void* buf, size_t n)
 	register Pzpart_t*	pp;
 	register unsigned char*	pat;
 	register unsigned char*	low;
+	Pzelt_t*		elt;
 	unsigned char*		be;
 	size_t			k;
 	size_t			x;
@@ -65,6 +69,65 @@ pzwrite(register Pz_t* pz, Sfio_t* op, const void* buf, size_t n)
 		return r;
 	}
 	pp = pz->part;
+	if (pz->flags & PZ_SORT)
+	{
+		pz->ws.bp = pz->buf;
+		if (!pz->sort.order)
+		{
+			k = sizeof(Dtlink_t) + roundof(pp->row, sizeof(Dtlink_t));
+			pz->sort.freedisc.link = offsetof(Pzelt_t, link);
+			pz->sort.orderdisc.link = offsetof(Pzelt_t, link);
+			pz->sort.orderdisc.key = offsetof(Pzelt_t, buf);
+			pz->sort.orderdisc.size = pp->row;
+			if (!(elt = (Pzelt_t*)vmnewof(pz->vm, 0, char, pp->col * k, 0)) || !(pz->sort.order = dtnew(pz->vm, &pz->sort.orderdisc, Dtobag)) || !(pz->sort.free = dtnew(pz->vm, &pz->sort.freedisc, Dtlist)))
+			{
+				if (pz->disc->errorf)
+					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
+				return -1;
+			}
+			for (i = 0; i < pp->col; i++)
+			{
+				dtinsert(pz->sort.free, elt);
+				elt = (Pzelt_t*)((char*)elt + k);
+			}
+		}
+		bp = (unsigned char*)buf;
+		k = n;
+		if (pz->ws.sz)
+		{
+			x = pz->ws.sz;
+			if (x > n)
+				x = n;
+			memcpy(pz->ws.sp, bp, x);
+			bp += x;
+			k -= x;
+			if (pz->ws.sz -= x)
+				pz->ws.sp += x;
+			else
+				dtinsert(pz->sort.order, pz->ws.se);
+		}
+		x = pp->row;
+		while (k > 0)
+		{
+			while (!(elt = (Pzelt_t*)dtfirst(pz->sort.free)))
+				if (pzsync(pz))
+					return -1;
+			dtdelete(pz->sort.free, elt);
+			if (k < x)
+			{
+				memcpy(elt->buf, bp, k);
+				pz->ws.sp = elt->buf + k;
+				pz->ws.sz = x - k;
+				pz->ws.se = elt;
+				break;
+			}
+			memcpy(elt->buf, bp, x);
+			dtinsert(pz->sort.order, elt);
+			bp += x;
+			k -= x;
+		}
+		return n;
+	}
 	if (pz->ws.pc || n < pp->row)
 	{
 		if (!pz->ws.pb && !(pz->ws.pb = vmnewof(pz->vm, 0, unsigned char, pp->row, 0)))

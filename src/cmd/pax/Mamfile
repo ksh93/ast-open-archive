@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -84,6 +84,9 @@ make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -96,7 +99,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -109,7 +112,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -234,7 +237,7 @@ done options.h
 prev pax.h implicit
 done pax.c
 prev pax.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c pax.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c pax.c
 done pax.o generated
 make delta.o
 make delta.c
@@ -247,7 +250,7 @@ done ../../../include/ast/update.h
 prev pax.h implicit
 done delta.c
 prev delta.c
-exec - ${CC}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c delta.c
+exec - ${CC} ${debug?1?${mam_cc_DEBUG}??}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c delta.c
 done delta.o generated
 make file.o
 make file.c
@@ -294,7 +297,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done nocom.c
 prev nocom.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c nocom.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c nocom.c
 done nocom.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o nocom nocom.o ${mam_libast}
 done nocom generated
@@ -311,15 +314,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"' in
-exec - 	"")	cp rpm2cpio.sh rpm2cpio
+exec - "")	case 190 in
+exec - 	0)	cp rpm2cpio.sh rpm2cpio
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < rpm2cpio.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"
 exec - 		cat rpm2cpio.sh
 exec - 		} > rpm2cpio
 exec - 		;;
@@ -327,8 +330,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" ;;
+exec - 	case 190 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" ;;
 exec - 	esac
 exec - 	cat rpm2cpio.sh
 exec - 	} > rpm2cpio
@@ -343,8 +347,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/pax
+prev ../../../bin
 prev pax
-exec - ${STDMV} ${INSTALLROOT}/bin/pax ${INSTALLROOT}/bin/pax.old 2>/dev/null || true; test '' = 'pax' || ${STDCMP} 2>/dev/null -s pax ${INSTALLROOT}/bin/pax || { ${STDCP} pax ${INSTALLROOT}/bin/pax  		    		    ;}
+exec - test '' = 'pax' || ${STDCMP} 2>/dev/null -s pax ${INSTALLROOT}/bin/pax || { ${STDMV} ${INSTALLROOT}/bin/pax ${INSTALLROOT}/bin/pax.old 2>/dev/null || true; ${STDCP} pax ${INSTALLROOT}/bin/pax  		    		    ;}
 done ../../../bin/pax generated
 make ../../../man/man1
 exec - set -
@@ -353,13 +358,14 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/pax.1
+prev ../../../man/man1
 make pax.1
 done pax.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/pax.1 ${INSTALLROOT}/man/man1/pax.1.old 2>/dev/null || true; test '' = 'pax.1' || ${STDCMP} 2>/dev/null -s pax.1 ${INSTALLROOT}/man/man1/pax.1 || { ${STDCP} pax.1 ${INSTALLROOT}/man/man1/pax.1  		    		    ;}
+exec - test '' = 'pax.1' || ${STDCMP} 2>/dev/null -s pax.1 ${INSTALLROOT}/man/man1/pax.1 || { ${STDMV} ${INSTALLROOT}/man/man1/pax.1 ${INSTALLROOT}/man/man1/pax.1.old 2>/dev/null || true; ${STDCP} pax.1 ${INSTALLROOT}/man/man1/pax.1  		    		    ;}
 done ../../../man/man1/pax.1 generated
 make ../../../bin/nocom
 prev nocom
-exec - ${STDMV} ${INSTALLROOT}/bin/nocom ${INSTALLROOT}/bin/nocom.old 2>/dev/null || true; test '' = 'nocom' || ${STDCMP} 2>/dev/null -s nocom ${INSTALLROOT}/bin/nocom || { ${STDCP} nocom ${INSTALLROOT}/bin/nocom  		    		    ;}
+exec - test '' = 'nocom' || ${STDCMP} 2>/dev/null -s nocom ${INSTALLROOT}/bin/nocom || { ${STDMV} ${INSTALLROOT}/bin/nocom ${INSTALLROOT}/bin/nocom.old 2>/dev/null || true; ${STDCP} nocom ${INSTALLROOT}/bin/nocom  		    		    ;}
 done ../../../bin/nocom generated
 make ../../../lib/pax
 exec - set -
@@ -368,23 +374,24 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/pax
 exec - fi
 done ../../../lib/pax generated
 make ../../../lib/pax/cia.fmt
+prev ../../../lib/pax
 make cia.fmt
 done cia.fmt
-exec - ${STDMV} ${PACKAGE_ast_LIB}/pax/cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt.old 2>/dev/null || true; test '' = 'cia.fmt' || ${STDCMP} 2>/dev/null -s cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt || { ${STDCP} cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt  		    		    ;}
+exec - test '' = 'cia.fmt' || ${STDCMP} 2>/dev/null -s cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt || { ${STDMV} ${PACKAGE_ast_LIB}/pax/cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt.old 2>/dev/null || true; ${STDCP} cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt  		    		    ;}
 done ../../../lib/pax/cia.fmt generated
 make ../../../lib/pax/ppar.fmt
 make ppar.fmt
 done ppar.fmt
-exec - ${STDMV} ${PACKAGE_ast_LIB}/pax/ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt.old 2>/dev/null || true; test '' = 'ppar.fmt' || ${STDCMP} 2>/dev/null -s ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt || { ${STDCP} ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt  		    		    ;}
+exec - test '' = 'ppar.fmt' || ${STDCMP} 2>/dev/null -s ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt || { ${STDMV} ${PACKAGE_ast_LIB}/pax/ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt.old 2>/dev/null || true; ${STDCP} ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt  		    		    ;}
 done ../../../lib/pax/ppar.fmt generated
 make ../../../man/man1/bax.1
 make bax.1
 done bax.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/bax.1 ${INSTALLROOT}/man/man1/bax.1.old 2>/dev/null || true; test '' = 'bax.1' || ${STDCMP} 2>/dev/null -s bax.1 ${INSTALLROOT}/man/man1/bax.1 || { ${STDCP} bax.1 ${INSTALLROOT}/man/man1/bax.1  		    		    ;}
+exec - test '' = 'bax.1' || ${STDCMP} 2>/dev/null -s bax.1 ${INSTALLROOT}/man/man1/bax.1 || { ${STDMV} ${INSTALLROOT}/man/man1/bax.1 ${INSTALLROOT}/man/man1/bax.1.old 2>/dev/null || true; ${STDCP} bax.1 ${INSTALLROOT}/man/man1/bax.1  		    		    ;}
 done ../../../man/man1/bax.1 generated
 make ../../../bin/rpm2cpio
 prev rpm2cpio
-exec - ${STDMV} ${INSTALLROOT}/bin/rpm2cpio ${INSTALLROOT}/bin/rpm2cpio.old 2>/dev/null || true; test '' = 'rpm2cpio' || ${STDCMP} 2>/dev/null -s rpm2cpio ${INSTALLROOT}/bin/rpm2cpio || { ${STDCP} rpm2cpio ${INSTALLROOT}/bin/rpm2cpio  		    		    ;}
+exec - test '' = 'rpm2cpio' || ${STDCMP} 2>/dev/null -s rpm2cpio ${INSTALLROOT}/bin/rpm2cpio || { ${STDMV} ${INSTALLROOT}/bin/rpm2cpio ${INSTALLROOT}/bin/rpm2cpio.old 2>/dev/null || true; ${STDCP} rpm2cpio ${INSTALLROOT}/bin/rpm2cpio  		    		    ;}
 done ../../../bin/rpm2cpio generated
 done install virtual
 make test
@@ -408,15 +415,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp testpax.sh testpax
+exec - "")	case 14 in
+exec - 	0)	cp testpax.sh testpax
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < testpax.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo 
+exec - 		echo TESTCC='${CC}'
 exec - 		cat testpax.sh
 exec - 		} > testpax
 exec - 		;;
@@ -424,8 +431,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 14 in
+exec - 	0)	;;
+exec - 	*)	echo TESTCC='${CC}' ;;
 exec - 	esac
 exec - 	cat testpax.sh
 exec - 	} > testpax

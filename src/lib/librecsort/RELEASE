@@ -1,3 +1,5 @@
+03-03-07 Makefile: generate dll for dr. ek
+03-01-21 rsmerge.c: fix typo that kicked in on large (~100K) record sizes
 01-01-01 recsort.h: _RSHDR_H => _BLD_recsort; should have been done years ago
 00-08-31 rskey.c: fix code() buffer off by one (too far)
 00-03-17 rskey.c: consult RLIMIT_DATA for size limits

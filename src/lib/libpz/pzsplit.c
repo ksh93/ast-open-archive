@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -396,9 +396,9 @@ deflate(Pz_t* pz, Sfio_t* op)
 					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id slot]");
 				goto bad;
 			}
-			ip->id = rp->id;
+			if (ip->id = rp->id)
+				ip->row = rp->size;
 			ip->name = strcpy((char*)(ip + 1), s);
-			ip->row = (ip->id ? rp->size : 0);
 			if (!(ip->sp = sfstropen()))
 			{
 				if (pz->disc->errorf)
@@ -780,7 +780,8 @@ pzssplit(Pz_t* pz)
 					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id slot]");
 				goto bad;
 			}
-			ip->id = rp->id;
+			if (ip->id = rp->id)
+				ip->row = rp->size;
 			ip->name = strcpy((char*)(ip + 1), s);
 			if ((!pz->split.match || strmatch(ip->name, pz->split.match)) && !(ip->sp = sfopen(NiL, ip->name, (pz->flags & PZ_APPEND) ? "a" : "w")))
 			{
@@ -790,7 +791,7 @@ pzssplit(Pz_t* pz)
 			}
 			dtinsert(ids, ip);
 			if ((pz->flags & PZ_DUMP) && pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, 0, "split %s size %I*u", ip->name, sizeof(rp->size), rp->size);
+				(*pz->disc->errorf)(pz, pz->disc, 0, "split %s size %I*u", ip->name, sizeof(ip->row), ip->row);
 		}
 		else if (pz->disc->errorf && ip->row != rp->size && rp->size && (ip->row % rp->size))
 			(*pz->disc->errorf)(pz, pz->disc, 1, "%s: size %I*u not a multiple of %I*u", ip->name, sizeof(rp->size), rp->size, sizeof(ip->row), ip->row);

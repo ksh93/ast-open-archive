@@ -1,3 +1,5 @@
+03-03-25 mm2html: table border size '' => 0
+03-02-06 troff2html.c: fmtquote() FMT_ALWAYS update
 02-10-24 mm2html: viewgraph link target is _top too
 02-10-15 mm2html: ident footer is now a TABLE instead of a DIV
 02-08-30 mm2html: .AL with no args is equivalent to .NL

@@ -51,7 +51,7 @@ tst	output{
 	echo "#define LONGJMP	longjmp"
 }end
 
-tst	_FLOCK link{
+tst	FLOCK link{
 	#include <sys/file.h>
 	int main(argc,argv)
 	char *argv[];

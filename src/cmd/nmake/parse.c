@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -229,8 +229,8 @@ unparse(int level)
 			{
 				if (cp->loop.f.vec)
 				{
-					sfstrclose(cp->loop.f.tmp);
 					sfstrclose(cp->loop.f.vec);
+					sfstrclose(cp->loop.f.tmp);
 					if (pp->cp->flags & CON_scan)
 						hashdone(pp->cp->loop.f.pos.scan);
 				}
@@ -1015,8 +1015,8 @@ getline(Sfio_t* sp, int lead, int term)
 			{
 				if (pp->cp->loop.f.vec)
 				{
-					sfstrclose(pp->cp->loop.f.tmp);
 					sfstrclose(pp->cp->loop.f.vec);
+					sfstrclose(pp->cp->loop.f.tmp);
 					if (pp->cp->flags & CON_scan)
 						hashdone(pp->cp->loop.f.pos.scan);
 				}

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2002 AT&T Corp.                *
+*                Copyright (c) 1992-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Labs Research) 2002-08-28 $\n]"
+"[-?\n@(#)$Id: od (AT&T Labs Research) 2003-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files"
@@ -1034,7 +1034,7 @@ b_od(int argc, char** argv, void* context)
 		*(state.base + strlen(state.base) - 1) = '\n';
 		sfprintf(sfstdout, state.base, (int_max)state.offset);
 	}
-	if (sfsync(sfstdout))
+	if (sfsync(sfstdout) && errno != EPIPE)
 		error(ERROR_SYSTEM|2, "write error");
 	return error_info.errors;
 }

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -71,6 +71,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../lib/libast/ast_fcntl.h implicit
@@ -92,7 +95,7 @@ make ../../lib/libast/ast_map.h implicit
 done ../../lib/libast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../lib/libast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../lib/libast/ast_common.h implicit
 done ../../lib/libast/ast_stdio.h dontcare
@@ -104,7 +107,7 @@ done ../../lib/libast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../lib/libast/ast_hdr.h implicit
 done ../../lib/libast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../lib/libast/ast_lib.h implicit
 done ../../lib/libast/ast_lib.h dontcare
 prev ../../lib/libast/ast_common.h implicit
@@ -215,6 +218,19 @@ exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strntof
 done strntof generated
 exec - regress  strntof.tst strntof
 done test.strntof virtual
+make test.base64
+make base64
+make base64.o
+make base64.c
+prev ../../../include/ast/ast.h implicit
+done base64.c
+prev base64.c
+exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c base64.c
+done base64.o generated
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o base64 base64.o ${mam_libast}
+done base64 generated
+exec - base64
+done test.base64 virtual
 make test.date
 make date
 make date.o
@@ -452,7 +468,6 @@ done sfio/tungetc.c
 make sfio/twchar.c
 make ../../../include/ast/wchar.h implicit
 make ../../lib/libast/ast_wchar.h implicit
-prev ../../../include/ast/wchar.h implicit
 prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/stdio.h implicit
 prev ../../lib/libast/ast_common.h implicit

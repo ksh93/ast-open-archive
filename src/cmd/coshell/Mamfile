@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -61,6 +61,9 @@ make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -82,7 +85,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -94,7 +97,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -156,6 +159,8 @@ make ../../../include/ast/hashpart.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/hashpart.h dontcare
 make ../../../include/ast/ast_cs.h implicit
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 done ../../../include/ast/ast_cs.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -232,9 +237,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/coshell
+prev ../../../bin
 prev coshell.svc
 setv preserve -Dpreserve
-exec - ${STDMV} ${INSTALLROOT}/bin/coshell ${INSTALLROOT}/bin/coshell.old 2>/dev/null || true; test '' = 'coshell.svc' || ${STDCMP} 2>/dev/null -s coshell.svc ${INSTALLROOT}/bin/coshell || { ${STDCP} coshell.svc ${INSTALLROOT}/bin/coshell  		    		    ;}
+exec - test '' = 'coshell.svc' || ${STDCMP} 2>/dev/null -s coshell.svc ${INSTALLROOT}/bin/coshell || { ${STDMV} ${INSTALLROOT}/bin/coshell ${INSTALLROOT}/bin/coshell.old 2>/dev/null || true; ${STDCP} coshell.svc ${INSTALLROOT}/bin/coshell  		    		    ;}
 done ../../../bin/coshell generated
 make ../../../lib/cs/fdp/coshell
 exec - set -
@@ -249,9 +255,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/coshell.1
+prev ../../../man/man1
 make coshell.1
 done coshell.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/coshell.1 ${INSTALLROOT}/man/man1/coshell.1.old 2>/dev/null || true; test '' = 'coshell.1' || ${STDCMP} 2>/dev/null -s coshell.1 ${INSTALLROOT}/man/man1/coshell.1 || { ${STDCP} coshell.1 ${INSTALLROOT}/man/man1/coshell.1  		    		    ;}
+exec - test '' = 'coshell.1' || ${STDCMP} 2>/dev/null -s coshell.1 ${INSTALLROOT}/man/man1/coshell.1 || { ${STDMV} ${INSTALLROOT}/man/man1/coshell.1 ${INSTALLROOT}/man/man1/coshell.1.old 2>/dev/null || true; ${STDCP} coshell.1 ${INSTALLROOT}/man/man1/coshell.1  		    		    ;}
 done ../../../man/man1/coshell.1 generated
 make ../../../fun
 exec - set -
@@ -260,16 +267,17 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/fun
 exec - fi
 done ../../../fun generated
 make ../../../fun/cosh
+prev ../../../fun
 make cosh
 done cosh
 setv mode -Dmode="+x"
-exec - ${STDMV} ${INSTALLROOT}/fun/cosh ${INSTALLROOT}/fun/cosh.old 2>/dev/null || true; test '' = 'cosh' || ${STDCMP} 2>/dev/null -s cosh ${INSTALLROOT}/fun/cosh || { ${STDCP} cosh ${INSTALLROOT}/fun/cosh  		    		   && chmod ugo+x ${INSTALLROOT}/fun/cosh ;}
+exec - test '' = 'cosh' || ${STDCMP} 2>/dev/null -s cosh ${INSTALLROOT}/fun/cosh || { ${STDMV} ${INSTALLROOT}/fun/cosh ${INSTALLROOT}/fun/cosh.old 2>/dev/null || true; ${STDCP} cosh ${INSTALLROOT}/fun/cosh  		    		   && chmod ugo+x ${INSTALLROOT}/fun/cosh ;}
 done ../../../fun/cosh generated
 make ../../../fun/title
 make title
 done title
 setv mode -Dmode="+x"
-exec - ${STDMV} ${INSTALLROOT}/fun/title ${INSTALLROOT}/fun/title.old 2>/dev/null || true; test '' = 'title' || ${STDCMP} 2>/dev/null -s title ${INSTALLROOT}/fun/title || { ${STDCP} title ${INSTALLROOT}/fun/title  		    		   && chmod ugo+x ${INSTALLROOT}/fun/title ;}
+exec - test '' = 'title' || ${STDCMP} 2>/dev/null -s title ${INSTALLROOT}/fun/title || { ${STDMV} ${INSTALLROOT}/fun/title ${INSTALLROOT}/fun/title.old 2>/dev/null || true; ${STDCP} title ${INSTALLROOT}/fun/title  		    		   && chmod ugo+x ${INSTALLROOT}/fun/title ;}
 done ../../../fun/title generated
 done install virtual
 make test

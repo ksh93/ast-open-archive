@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -88,7 +88,8 @@ rstat(char* name, struct stat* st, int res)
  found:
 	if (!st->st_mtime)
 	{
-		error(1, "%s modify time must be after the epoch", name);
+		if (S_ISREG(st->st_mode) || S_ISDIR(st->st_mode))
+			error(1, "%s modify time must be after the epoch", name);
 		st->st_mtime = OLDTIME;
 	}
 	return 0;

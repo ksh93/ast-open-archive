@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -47,6 +47,8 @@
 
 #define PUSHED		010		/* currently push'd		*/
 #define STATUS		(~PUSHED)	/* status mask			*/
+
+#define MAMNAME(r)	((state.mam.dynamic||(r)!=state.frame->target||((r)->property&P_after))?mamname(r):(char*)0)
 
 #if DEBUG
 
@@ -292,7 +294,7 @@ commit(struct joblist* job, register char* s)
 				Sfio_t*	tmp = sfstropen();
 
 				sfprintf(tmp, "mkdir %s", s);
-				dumpaction(state.mam.out, (job->target != state.frame->target || (job->target->property & P_after)) ? mamname(job->target) : (char*)0, sfstruse(tmp), NiL);
+				dumpaction(state.mam.out, MAMNAME(job->target), sfstruse(tmp), NiL);
 				sfstrclose(tmp);
 			}
 			r = makerule(s);
@@ -665,7 +667,7 @@ execute(register struct joblist* job)
 		message((-99, "execute: %s: t=0x%08x &t=0x%08x", job->target->name, t, &t));
 #endif
 		if (state.mam.out)
-			dumpaction(state.mam.out, (job->target != state.frame->target || (job->target->property & P_after)) ? mamname(job->target) : (char*)0, t, NiL);
+			dumpaction(state.mam.out, MAMNAME(job->target), t, NiL);
 		if (r = getrule(external.makerun))
 			maketop(r, P_dontcare|P_foreground, NiL);
 		if ((state.test & 0x00020000) && internal.openfile)

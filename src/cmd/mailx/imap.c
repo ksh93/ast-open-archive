@@ -2090,7 +2090,10 @@ imap_getatt(Msg_t* mp, register Imappart_t* pp, register char* name, unsigned lo
 		else if (filestd(name, "w"))
 			sfprintf(state.path.temp, " | %s", state.var.pager);
 		else
-			sfprintf(state.path.temp, " -o %s", name);
+		{
+			sfprintf(state.path.temp, " -o ", name);
+			shquote(state.path.temp, name);
+		}
 		s = sfstruse(state.path.temp);
 		n = 1;
 	}

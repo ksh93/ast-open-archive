@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
+setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -87,6 +87,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -99,7 +102,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -113,7 +116,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -170,7 +173,11 @@ prev ../../../include/ast/option.h implicit
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/error.h dontcare
+make ../../../include/ast/dt.h implicit
+prev ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/cdt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/dt.h dontcare
 prev ../../../include/ast/ast.h implicit
 done pzlib.h
 done pzopen.c
@@ -226,7 +233,7 @@ make pzread.c
 prev pzlib.h implicit
 done pzread.c
 prev pzread.c
-exec - ${CC} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzread.c
+exec - ${CC} ${debug?1?${mam_cc_DEBUG}??} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzread.c
 done pzread.o generated
 make pzwrite.o
 make pzwrite.c
@@ -267,7 +274,7 @@ done ../../../include/ast/int.h
 prev pzlib.h implicit
 done pzconvert.c
 prev pzconvert.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzconvert.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzconvert.c
 done pzconvert.o generated
 make sfdcpzip.o
 make sfdcpzip.c
@@ -324,7 +331,7 @@ prev ../../../include/ast/error.h implicit
 prev pzip.h implicit
 done pzline.c
 prev pzline.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzline.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzline.c
 done pzline.o generated
 exec - ${AR} cr libpzline.a pzline.o
 exec - (ranlib libpzline.a) >/dev/null 2>&1 || true
@@ -338,8 +345,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/libpz.a archive
+prev ../../../lib
 prev libpz.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libpz.a ${PACKAGE_ast_LIB}/libpz.a.old 2>/dev/null || true; test '' = 'libpz.a' || ${STDCMP} 2>/dev/null -s libpz.a ${PACKAGE_ast_LIB}/libpz.a || { ${STDCP} libpz.a ${PACKAGE_ast_LIB}/libpz.a  		    		    ;}
+exec - test '' = 'libpz.a' || ${STDCMP} 2>/dev/null -s libpz.a ${PACKAGE_ast_LIB}/libpz.a || { ${STDMV} ${PACKAGE_ast_LIB}/libpz.a ${PACKAGE_ast_LIB}/libpz.a.old 2>/dev/null || true; ${STDCP} libpz.a ${PACKAGE_ast_LIB}/libpz.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libpz.a) >/dev/null 2>&1 || true
 done ../../../lib/libpz.a generated
 make ../../../man/man3
@@ -349,9 +357,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/pzip.3
+prev ../../../man/man3
 make pzip.3
 done pzip.3
-exec - ${STDMV} ${INSTALLROOT}/man/man3/pzip.3 ${INSTALLROOT}/man/man3/pzip.3.old 2>/dev/null || true; test '' = 'pzip.3' || ${STDCMP} 2>/dev/null -s pzip.3 ${INSTALLROOT}/man/man3/pzip.3 || { ${STDCP} pzip.3 ${INSTALLROOT}/man/man3/pzip.3  		    		    ;}
+exec - test '' = 'pzip.3' || ${STDCMP} 2>/dev/null -s pzip.3 ${INSTALLROOT}/man/man3/pzip.3 || { ${STDMV} ${INSTALLROOT}/man/man3/pzip.3 ${INSTALLROOT}/man/man3/pzip.3.old 2>/dev/null || true; ${STDCP} pzip.3 ${INSTALLROOT}/man/man3/pzip.3  		    		    ;}
 done ../../../man/man3/pzip.3 generated
 make ../../../lib/lib
 exec - set -
@@ -360,17 +369,18 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/pz
+prev ../../../lib/lib
 prev pz.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/pz ${PACKAGE_ast_LIB}/lib/pz.old 2>/dev/null || true; test '' = 'pz.req' || ${STDCMP} 2>/dev/null -s pz.req ${PACKAGE_ast_LIB}/lib/pz || { ${STDCP} pz.req ${PACKAGE_ast_LIB}/lib/pz  		    		    ;}
+exec - test '' = 'pz.req' || ${STDCMP} 2>/dev/null -s pz.req ${PACKAGE_ast_LIB}/lib/pz || { ${STDMV} ${PACKAGE_ast_LIB}/lib/pz ${PACKAGE_ast_LIB}/lib/pz.old 2>/dev/null || true; ${STDCP} pz.req ${PACKAGE_ast_LIB}/lib/pz  		    		    ;}
 done ../../../lib/lib/pz generated
 make ../../../lib/libpzline.a archive
 prev libpzline.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libpzline.a ${PACKAGE_ast_LIB}/libpzline.a.old 2>/dev/null || true; test '' = 'libpzline.a' || ${STDCMP} 2>/dev/null -s libpzline.a ${PACKAGE_ast_LIB}/libpzline.a || { ${STDCP} libpzline.a ${PACKAGE_ast_LIB}/libpzline.a  		    		    ;}
+exec - test '' = 'libpzline.a' || ${STDCMP} 2>/dev/null -s libpzline.a ${PACKAGE_ast_LIB}/libpzline.a || { ${STDMV} ${PACKAGE_ast_LIB}/libpzline.a ${PACKAGE_ast_LIB}/libpzline.a.old 2>/dev/null || true; ${STDCP} libpzline.a ${PACKAGE_ast_LIB}/libpzline.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libpzline.a) >/dev/null 2>&1 || true
 done ../../../lib/libpzline.a generated
 make ../../../lib/lib/pzline
 prev pzline.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/pzline ${PACKAGE_ast_LIB}/lib/pzline.old 2>/dev/null || true; test '' = 'pzline.req' || ${STDCMP} 2>/dev/null -s pzline.req ${PACKAGE_ast_LIB}/lib/pzline || { ${STDCP} pzline.req ${PACKAGE_ast_LIB}/lib/pzline  		    		    ;}
+exec - test '' = 'pzline.req' || ${STDCMP} 2>/dev/null -s pzline.req ${PACKAGE_ast_LIB}/lib/pzline || { ${STDMV} ${PACKAGE_ast_LIB}/lib/pzline ${PACKAGE_ast_LIB}/lib/pzline.old 2>/dev/null || true; ${STDCP} pzline.req ${PACKAGE_ast_LIB}/lib/pzline  		    		    ;}
 done ../../../lib/lib/pzline generated
 make ../../../include/ast
 exec - set -
@@ -379,6 +389,7 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/pzip.h
+prev ../../../include/ast
 prev pzip.h
 exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1998,author=gsf'  pzip.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/pzip.h 1.${COTEMP}.x

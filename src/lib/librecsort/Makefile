@@ -4,6 +4,8 @@ LICENSE = since=1996,author=kpv+gsf
 
 VERSION = 1.0
 
+CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
+
 recsort $(VERSION) :LIBRARY: RELEASE recsort.3 recsort.h rshdr.h \
 		rsclear.c rsclose.c rsdisc.c rslist.c \
 		rsmerge.c rsmethod.c rsopen.c rsprocess.c rswrite.c \

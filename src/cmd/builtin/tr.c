@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2002 AT&T Corp.                *
+*                Copyright (c) 1992-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Labs Research) 2001-05-21 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Labs Research) 2003-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"
@@ -488,9 +488,10 @@ trcopy(Tr_t* tr, Sfio_t* ip, Sfio_t* op, ssize_t ncopy)
 		sfread(ip, inbuff, c);
 	if (outbuff && (c = outp - outbuff) >= 0)
 		sfwrite(op, outbuff, c);
-	if (sfsync(op) && (c = 1) || sferror(op) && (c = 2))
+	if (sfsync(op))
 	{
-		error(ERROR_SYSTEM|2, "write error [%d]", c);
+		if (errno != EPIPE)
+			error(ERROR_SYSTEM|2, "write error [%d]", c);
 		return -1;
 	}
 	return nwrite;

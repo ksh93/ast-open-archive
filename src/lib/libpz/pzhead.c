@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -57,7 +57,7 @@ pzheadread(register Pz_t* pz)
 	else
 		i = n = 0;
 	if (pz->disc->errorf)
-		(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzheadread: f=%08x i=%02x n=%02x%s", pz->path, pz->flags, i, n, s ? "" : " (nil)");
+		(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzheadread: f=%08x i=%02x n=%02x partition=%s%s", pz->path, pz->flags, i, n, pz->disc->partition, s ? "" : " (nil)");
 	if (i != PZ_MAGIC_1 || n != PZ_MAGIC_2 || s[2] == 0 || s[3] >= 10)
 	{
 		sfread(pz->io, s, 0);
@@ -103,7 +103,7 @@ pzheadread(register Pz_t* pz)
 		}
 		if (n <= 0)
 		{
-			if (!(pz->flags & PZ_DELAY))
+			if (!(pz->flags & PZ_DELAY) && (pz->disc->partition || !(pz->flags & PZ_FORCE)))
 			{
 				if (pz->disc->errorf)
 					(*pz->disc->errorf)(pz, pz->disc, 2, "%s: unknown input format", pz->path);
@@ -245,7 +245,7 @@ pzheadprint(register Pz_t* pz, register Sfio_t* op, int parts)
 			if (pz->prefix.terminator >= 0)
 			{
 				t = pz->prefix.terminator;
-				sfprintf(op, "*%s\n", fmtquote(&t, "'", "'", 1, 1));
+				sfprintf(op, "*%s\n", fmtquote(&t, "'", "'", 1, FMT_ALWAYS));
 			}
 			else
 				sfputc(op, '\n');
@@ -304,7 +304,7 @@ pzfile(Pz_t* pz)
 		(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzfile: i=%02x", pz->path, i);
 	if (i == -1)
 		return 0;
-	if (i == 1)
+	if (i == PZ_MARK_TAIL)
 	{
 		/*
 		 * file trailer

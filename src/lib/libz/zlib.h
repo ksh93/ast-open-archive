@@ -690,13 +690,19 @@ ZEXTERN gzFile ZEXPORT gzdopen  OF((int fd, const char *mode));
 
 ZEXTERN gzFile ZEXPORT gzfopen  OF((void* fp, const char *mode));
 /*
-     gzdopen() associates a gzFile with the stdio stream pointer fp.
+     gzfopen() associates a gzFile with the stdio stream pointer fp.
    File streams are obtained from calls like fopen, and popen.
    The mode parameter is as in gzopen.
      The next call of gzclose on the returned gzFile will also close the
    stream pointer fp using fclose. Add `o' to mode to inhibit the fclose.
-     gzdopen returns NULL if there was insufficient memory to allocate
+     gzfopen returns NULL if there was insufficient memory to allocate
    the (de)compression state.
+*/
+
+ZEXTERN gzFile ZEXPORT gzreopen  OF((gzFile zp, void* fp));
+/*
+     gzreopen() reassociates the gzFile zp with the stdio stream pointer fp.
+   File streams are obtained from calls like fopen, and popen.
 */
 
 ZEXTERN int ZEXPORT gzsetparams OF((gzFile file, int level, int strategy));

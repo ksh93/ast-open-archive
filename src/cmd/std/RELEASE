@@ -1,3 +1,19 @@
+03-03-21 ls.c: add -z,--time-style
+	 ls.c: if only -t is set then set FTW_SEEDOTDIR to keep configure happy
+03-03-11 pss.c: pid <= 1 => ppid == 0 to avoid ancestor loop
+03-03-06 ps.c: add pgid alias for pgrp
+03-02-28 pss*.[ch]: add Pss_dev_t and Pss_id_t
+	 ps.c: don't warn about unsupported fields for [cfjl]
+03-02-21 pss-*.c: initf errors except no space now warnings for ps fallback
+	 Makefile: hosttype workaround to avoid botched -lkvm
+03-02-11 ps.c: flags width 2 => 3 since posix says its octal
+03-02-07 ps.c: add --children and --parents, --tree == --children --parents
+03-02-06 locale.c,ls.c: fmtquote() FMT_ALWAYS update
+03-02-01 ps*.[ch]: convert to independent Pssmeth_t methods 
+	 pss-ps.c: export _PSS_ps=1 to force for testing
+03-01-31 pss.c: add darwin.ppc kvm_getprocs() -- still needs work
+03-01-29 ps.c: check for obvious invalid pids
+03-01-10 locale.c: don't list default after unknown category/keyword
 02-12-04 du.c: add -H -L -P(default) symlink options
 02-11-22 file.c: add version type description
 02-10-10 pss.c: redefine only if not defined -- duh

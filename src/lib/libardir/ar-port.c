@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -38,12 +38,12 @@
 #define TERM_port	'/'
 #define FMAG_port_0	'`'
 #define FMAG_port_1	'\n'
-#define SYMDIR_port	"(/ |/*/|_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*"
+#define SYMDIR_port	"(/[!/]|_______[0-9_][0-9_][0-9_]E[BL]E[BL]_)*"
 #define SYMDIR_other	"(._|_.|__.|___)*"
 #define SYMDIR_age	5
 
 #define TERM_rand	' '
-#define SYMDIR_rand	"(__.SYMDEF|__________E???X)*"
+#define SYMDIR_rand	"(__.SYMDEF|__________E\?\?\?X)*"
 #define SYMDIR_strict	"__.SYMDEF SORTED*"
 
 typedef struct Header_s
@@ -114,11 +114,12 @@ portclose(Ardir_t* ar)
 static int
 portopen(Ardir_t* ar, char* buf, size_t n)
 {
-	int			i;
 	long			size;
+	size_t			i;
 	Header_t*		hdr;
 	State_t*		state;
 	char*			name;
+	char*			e;
 
 	if (n < (MAGIC_SIZE + sizeof(Header_t)))
 		return -1;
@@ -158,8 +159,6 @@ portopen(Ardir_t* ar, char* buf, size_t n)
 		state->offset += sizeof(Header_t) + size + (size & 01);
 		if ((ar->flags & ARDIR_RANLIB) && (sfsscanf(hdr->ar_date, "%lu", &ar->symtime) != 1 || (unsigned long)ar->st.st_mtime > ar->symtime + (strmatch(name, SYMDIR_strict) ? 0 : SYMDIR_age)))
 			ar->symtime = 0;
-		if (lseek(ar->fd, state->offset, SEEK_SET) < 0)
-			goto nope;
 		if (!(ar->flags & ARDIR_RANLIB) && hdr->ar_uid[0] == ' ' && hdr->ar_gid[0] == ' ')
 			state->separator = '\\';
 	}
@@ -176,14 +175,15 @@ portopen(Ardir_t* ar, char* buf, size_t n)
 		else
 			ar->flags |= ARDIR_RANLIB;
 	}
+	if (lseek(ar->fd, state->offset, SEEK_SET) < 0)
+		goto nope;
 	hdr = &state->header;
 	while (read(ar->fd, (char*)hdr, sizeof(state->header)) == sizeof(state->header) && hdr->ar_name[0] == TERM_port)
 	{
 		if (sfsscanf(hdr->ar_size, "%ld", &size) != 1)
 			goto nope;
 		size += (size & 01);
-		state->offset += sizeof(state->header) + size;
-		if (!state->names && hdr->ar_name[1] == TERM_port && hdr->ar_name[2] == ' ')
+		if (!state->names && hdr->ar_name[1] == TERM_port && (hdr->ar_name[2] == ' ' || hdr->ar_name[2] == TERM_port && hdr->ar_name[3] == ' '))
 		{
 			/*
 			 * long name string table
@@ -192,11 +192,16 @@ portopen(Ardir_t* ar, char* buf, size_t n)
 			if (!(state->names = newof(0, char, size, 0)) || read(ar->fd, state->names, size) != size)
 				goto nope;
 			ar->truncate = 0;
+			if (hdr->ar_name[1] == TERM_port)
+				for (e = (name = state->names) + size; name < e; name++)
+					if (*name == TERM_port && *(name + 1) == '\n')
+						*name = 0;
 		}
 		else if (isdigit(hdr->ar_name[1]))
 			break; 
 		else if (lseek(ar->fd, (off_t)size, SEEK_CUR) < 0)
 			goto nope;
+		state->offset += sizeof(state->header) + size;
 	}
 	return 0;
 #endif
@@ -237,17 +242,16 @@ portnext(Ardir_t* ar)
 		ar->error = EINVAL;
 		return 0;
 	}
-	ar->dirent.name = state->header.ar_name;
-	if (state->names && *ar->dirent.name == TERM_port)
-		ar->dirent.name = state->names + strtol(ar->dirent.name + 1, NiL, 10);
-	if ((s = strchr(ar->dirent.name, TERM_port)) || (s = strchr(ar->dirent.name, TERM_rand)))
-		*s = 0;
 	if (sfsscanf(state->header.ar_date, "%ld", &n) != 1)
 	{
 		ar->error = EINVAL;
 		return 0;
 	}
 	ar->dirent.mtime = n;
+	ar->dirent.name = state->header.ar_name;
+	ar->dirent.name[sizeof(state->header.ar_name)] = 0;
+	if (state->names && (*ar->dirent.name == TERM_port || *ar->dirent.name == ' '))
+		ar->dirent.name = state->names + strtol(ar->dirent.name + 1, NiL, 10);
 	if (sfsscanf(state->header.ar_uid, "%ld", &n) != 1)
 	{
 		ar->error = EINVAL;
@@ -299,6 +303,11 @@ portnext(Ardir_t* ar)
 		}
 		state->name[n] = 0;
 		ar->dirent.name = state->name;
+	}
+	else
+	{
+		for (s = ar->dirent.name + strlen(ar->dirent.name); s > ar->dirent.name && (*(s - 1) == TERM_port || *(s - 1) == TERM_rand); s--);
+		*s = 0;
 	}
 	if (state->separator)
 		for (s = ar->dirent.name; s = strchr(s, state->separator); *s++ = '/');

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -82,7 +82,7 @@ static struct option	options[] =	/* option table			*/
 	"Force makefile compilation.", 0,
 "compatibility",OPT_compatibility,(char*)&state.compatibility,	0,0,
 	"(obsolete) Enable compatibility messages.", 0,
-"corrupt|mismatch",OPT_corrupt,	(char*)&state.corrupt,		0,0,
+"corrupt",OPT_corrupt,	(char*)&state.corrupt,		0,0,
 	"\aaction\a determines the action to take for corrupt or invalid"
 	" top view state files. \baccept\b is assumed if \aaction\a is"
 	" omitted. The top view default is \berror\b and the lower view"
@@ -181,7 +181,7 @@ static struct option	options[] =	/* option table			*/
 "questionable",	OPT_questionable,(char*)&state.questionable,	0,0,
 	"Enable questionable features defined by \amask\a. Questionable"
 	" features are artifacts of previous implementations (\bnmake\b has"
-	" been around since 1985-01-01) that will eventually be dropped."
+	" been around since 1984-11-01) that will eventually be dropped."
 	" The questionable \amask\a registry is in the \bmain.c\b \bnmake\b"
 	" source file.", "mask",
 "readonly",	OPT_readonly,	(char*)&state.readonly,		0,0,

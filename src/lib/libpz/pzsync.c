@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -40,6 +40,9 @@ pzsync(register Pz_t* pz)
 	Pzpart_t*		pp;
 	Sfio_t*			tmp;
 	Sfio_t*			op;
+	Pzelt_t*		elt;
+	Pzelt_t*		old;
+	int			r;
 
 	op = pz->ws.io ? pz->ws.io : pz->io;
 	if (pz->ws.bp)
@@ -50,6 +53,23 @@ pzsync(register Pz_t* pz)
 
 		pz->ws.bp = 0;
 		pp = pz->part;
+		if (pz->flags & PZ_SORT)
+		{
+			pz->flags &= ~PZ_SORT;
+			elt = (Pzelt_t*)dtfirst(pz->sort.order);
+			n = pp->row;
+			while (elt && pzwrite(pz, op, elt->buf, n) == n)
+			{
+				old = elt;
+				elt = (Pzelt_t*)dtnext(pz->sort.order, elt);
+				dtdelete(pz->sort.order, old);
+				dtinsert(pz->sort.free, old);
+			}
+			r = pzsync(pz);
+			pz->flags |= PZ_SORT;
+			pz->ws.bp = pz->buf;
+			return r;
+		}
 		tmp = pz->tmp;
 		n = pz->ws.row;
 		if (pz->flags & PZ_SECTION)

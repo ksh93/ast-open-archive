@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -2188,6 +2188,21 @@ ppcpp(void)
 					if (m && INSPACE(rp))
 						UNGETCHR(c);
 				}
+#if COMPATIBLE
+				else if ((st & (COMPATIBILITY|TRANSITION)) == COMPATIBILITY && !INQUOTE(rp))
+				{
+					GET(c, n, tp, xp);
+					if (n == '"' || n == '\'')
+					{
+						PUTCHR(c);
+						PUTCHR(n);
+						bp = ip;
+						goto fsm_get;
+					}
+					if (n != EOB)
+						BACKIN();
+				}
+#endif
 				break;
 			case '\r':
 				/*

@@ -1,3 +1,11 @@
+03-04-15 pzlib.h: add PZ_MARK_PART for partial last input record
+	 pzlib.h: add PZ_MARK_TAIL for tail records
+	 partial input record is now a warning and handled on inflate
+03-03-03 pzhead.c: PZ_FORCE disables unknown input diagnostic
+03-02-10 sfdczip.c,sfdcpzip.c: handle PZ_CRC and SFGZ_NOCRC
+03-02-06 pzhead.c: fmtquote() FMT_ALWAYS update
+03-01-04 pzpart.c: list range only if more than 2 elements
+02-12-25 pzip.h,pzpart.c,pzdeflate.c,pzwrite.c: add PZ_SORT
 02-12-18 pzwrite.c: add partial row buffer
 02-12-12 sfdcpzip.c: move disc arg to the end for discplined consistency
 02-12-11 sfdczip.c: add

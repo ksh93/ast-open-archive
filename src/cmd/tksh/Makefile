@@ -1,4 +1,8 @@
-:PACKAGE: tk tcl shell:static ast X11
+if ! ( CC.HOSTTYPE == "*win*" && CC.SUFFIX.DYNAMIC == ".dll" || "$(PACKAGE_OPTIMIZE:N=space)" )
+	libtype = :static
+end
+
+:PACKAGE: tk tcl shell$(libtype) ast X11
 
 CCFLAGS = $(CC.OPTIMIZE)
 

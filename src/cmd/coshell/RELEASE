@@ -1,3 +1,4 @@
+03-03-04 add state.remote=CS_REMOTE_SHELL
 01-12-12 resolve SETSHELL local vs. global conflict -- its both
 	 ignore attr now really ignores host -- duh
 01-12-11 add global maxidle=0 to ignore idle

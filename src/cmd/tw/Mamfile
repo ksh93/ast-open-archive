@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -60,6 +60,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -81,7 +84,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -93,7 +96,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -170,7 +173,7 @@ prev ../../../include/ast/ast.h implicit
 done tw.h
 done tw.c
 prev tw.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c tw.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c tw.c
 done tw.o generated
 make expr.o
 make expr.c
@@ -257,7 +260,7 @@ prev ../../../include/ast/ast.h implicit
 done find.c
 prev find.c
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c find.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c find.c
 done find.o generated
 prev ftwlocal.o
 prev cmdarg.o
@@ -273,7 +276,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done xargs.c
 prev xargs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c xargs.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c xargs.c
 done xargs.o generated
 prev cmdarg.o
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o xargs xargs.o cmdarg.o ${mam_libast}
@@ -291,15 +294,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
-exec - 	"")	cp locate.sh locate
+exec - "")	case 189 in
+exec - 	0)	cp locate.sh locate
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < locate.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
 exec - 		cat locate.sh
 exec - 		} > locate
 exec - 		;;
@@ -307,8 +310,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
+exec - 	case 189 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
 exec - 	esac
 exec - 	cat locate.sh
 exec - 	} > locate
@@ -329,15 +333,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
-exec - 	"")	cp updatedb.sh updatedb
+exec - "")	case 189 in
+exec - 	0)	cp updatedb.sh updatedb
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < updatedb.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
 exec - 		cat updatedb.sh
 exec - 		} > updatedb
 exec - 		;;
@@ -345,8 +349,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
+exec - 	case 189 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
 exec - 	esac
 exec - 	cat updatedb.sh
 exec - 	} > updatedb
@@ -361,8 +366,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/tw
+prev ../../../bin
 prev tw
-exec - ${STDMV} ${INSTALLROOT}/bin/tw ${INSTALLROOT}/bin/tw.old 2>/dev/null || true; test '' = 'tw' || ${STDCMP} 2>/dev/null -s tw ${INSTALLROOT}/bin/tw || { ${STDCP} tw ${INSTALLROOT}/bin/tw  		    		    ;}
+exec - test '' = 'tw' || ${STDCMP} 2>/dev/null -s tw ${INSTALLROOT}/bin/tw || { ${STDMV} ${INSTALLROOT}/bin/tw ${INSTALLROOT}/bin/tw.old 2>/dev/null || true; ${STDCP} tw ${INSTALLROOT}/bin/tw  		    		    ;}
 done ../../../bin/tw generated
 make ../../../man/man1
 exec - set -
@@ -371,25 +377,26 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/tw.1
+prev ../../../man/man1
 make tw.1
 done tw.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/tw.1 ${INSTALLROOT}/man/man1/tw.1.old 2>/dev/null || true; test '' = 'tw.1' || ${STDCMP} 2>/dev/null -s tw.1 ${INSTALLROOT}/man/man1/tw.1 || { ${STDCP} tw.1 ${INSTALLROOT}/man/man1/tw.1  		    		    ;}
+exec - test '' = 'tw.1' || ${STDCMP} 2>/dev/null -s tw.1 ${INSTALLROOT}/man/man1/tw.1 || { ${STDMV} ${INSTALLROOT}/man/man1/tw.1 ${INSTALLROOT}/man/man1/tw.1.old 2>/dev/null || true; ${STDCP} tw.1 ${INSTALLROOT}/man/man1/tw.1  		    		    ;}
 done ../../../man/man1/tw.1 generated
 make ../../../bin/find
 prev find
-exec - ${STDMV} ${INSTALLROOT}/bin/find ${INSTALLROOT}/bin/find.old 2>/dev/null || true; test '' = 'find' || ${STDCMP} 2>/dev/null -s find ${INSTALLROOT}/bin/find || { ${STDCP} find ${INSTALLROOT}/bin/find  		    		    ;}
+exec - test '' = 'find' || ${STDCMP} 2>/dev/null -s find ${INSTALLROOT}/bin/find || { ${STDMV} ${INSTALLROOT}/bin/find ${INSTALLROOT}/bin/find.old 2>/dev/null || true; ${STDCP} find ${INSTALLROOT}/bin/find  		    		    ;}
 done ../../../bin/find generated
 make ../../../bin/xargs
 prev xargs
-exec - ${STDMV} ${INSTALLROOT}/bin/xargs ${INSTALLROOT}/bin/xargs.old 2>/dev/null || true; test '' = 'xargs' || ${STDCMP} 2>/dev/null -s xargs ${INSTALLROOT}/bin/xargs || { ${STDCP} xargs ${INSTALLROOT}/bin/xargs  		    		    ;}
+exec - test '' = 'xargs' || ${STDCMP} 2>/dev/null -s xargs ${INSTALLROOT}/bin/xargs || { ${STDMV} ${INSTALLROOT}/bin/xargs ${INSTALLROOT}/bin/xargs.old 2>/dev/null || true; ${STDCP} xargs ${INSTALLROOT}/bin/xargs  		    		    ;}
 done ../../../bin/xargs generated
 make ../../../bin/locate
 prev locate
-exec - ${STDMV} ${INSTALLROOT}/bin/locate ${INSTALLROOT}/bin/locate.old 2>/dev/null || true; test '' = 'locate' || ${STDCMP} 2>/dev/null -s locate ${INSTALLROOT}/bin/locate || { ${STDCP} locate ${INSTALLROOT}/bin/locate  		    		    ;}
+exec - test '' = 'locate' || ${STDCMP} 2>/dev/null -s locate ${INSTALLROOT}/bin/locate || { ${STDMV} ${INSTALLROOT}/bin/locate ${INSTALLROOT}/bin/locate.old 2>/dev/null || true; ${STDCP} locate ${INSTALLROOT}/bin/locate  		    		    ;}
 done ../../../bin/locate generated
 make ../../../bin/updatedb
 prev updatedb
-exec - ${STDMV} ${INSTALLROOT}/bin/updatedb ${INSTALLROOT}/bin/updatedb.old 2>/dev/null || true; test '' = 'updatedb' || ${STDCMP} 2>/dev/null -s updatedb ${INSTALLROOT}/bin/updatedb || { ${STDCP} updatedb ${INSTALLROOT}/bin/updatedb  		    		    ;}
+exec - test '' = 'updatedb' || ${STDCMP} 2>/dev/null -s updatedb ${INSTALLROOT}/bin/updatedb || { ${STDMV} ${INSTALLROOT}/bin/updatedb ${INSTALLROOT}/bin/updatedb.old 2>/dev/null || true; ${STDCP} updatedb ${INSTALLROOT}/bin/updatedb  		    		    ;}
 done ../../../bin/updatedb generated
 done install virtual
 make test

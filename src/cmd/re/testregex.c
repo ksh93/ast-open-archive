@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2002-07-17 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2003-01-03 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -219,6 +219,7 @@ T("    k	REG_ESCAPE		\\ to ecape [...] delimiter\n");
 T("    l	REG_LEFT		implicit ^...\n");
 T("    m	REG_MINIMAL		minimal match\n");
 T("    n	REG_NEWLINE		explicit \\n match\n");
+T("    o	REG_ENCLOSED		(|&) magic inside [@|&](...)\n");
 T("    p	REG_SHELL_PATH		explicit / match\n");
 T("    q	REG_DELIMITED		delimited pattern\n");
 T("    r	REG_RIGHT		implicit ...$\n");
@@ -378,6 +379,9 @@ static const char* unsupported[] =
 #ifndef REG_SHELL_ESCAPED
 	"SHELL_ESCAPED",
 #endif
+#ifndef REG_SHELL_GROUP
+	"SHELL_GROUP",
+#endif
 #ifndef REG_SHELL_PATH
 	"SHELL_PATH",
 #endif
@@ -446,6 +450,9 @@ static const char* unsupported[] =
 #endif
 #ifndef REG_SHELL_ESCAPED
 #define REG_SHELL_ESCAPED	NOTEST
+#endif
+#ifndef REG_SHELL_GROUP
+#define REG_SHELL_GROUP	NOTEST
 #endif
 #ifndef REG_SHELL_PATH
 #define REG_SHELL_PATH	NOTEST
@@ -1464,6 +1471,9 @@ main(int argc, char** argv)
 				continue;
 			case 'n':
 				cflags |= REG_NEWLINE;
+				continue;
+			case 'o':
+				cflags |= REG_SHELL_GROUP;
 				continue;
 			case 'p':
 				cflags |= REG_SHELL_PATH;

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1989-2002 AT&T Corp.                #
+#                Copyright (c) 1989-2003 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -1118,7 +1118,7 @@ extern long $u();" >> $tmp.g
 		__libc_*) W=" $r __$l __PARAM__(($d),($va)) $o{$vo $fr$w($a); }" ;;
 		__*) W=" $r _$l __PARAM__(($d),($va)) $o{$vo $fr$w($a); }" ;;
 		esac
-		echo "#define ${l}3d		${ft}_3d_stub${m}; extern __MANGLE__ $r $w __PROTO__(($p)); $r $l __PARAM__(($d),($va)) $o{$vo $fr$w($a); }$W $z" >> $tmp.d
+		echo "#define ${l}3d		${ft}_3d_stub${m} = 0; extern __MANGLE__ $r $w __PROTO__(($p)); $r $l __PARAM__(($d),($va)) $o{$vo $fr$w($a); }$W $z" >> $tmp.d
 		;;
 	esac
 	case $call:$sym in

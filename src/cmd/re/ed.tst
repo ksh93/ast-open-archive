@@ -123,3 +123,27 @@ TEST 05 '{ t } commands'
 		INPUT - $'-2\n.t.\nw\nq'
 		OUTPUT file $'1\n2\n2\n3\n4'
 		OUTPUT - $'8\n2\n10'
+
+TEST 06 '! command'
+	EXEC -h file
+		NOTE 'no saved command'
+		INPUT file
+		OUTPUT - $'"file" 0 lines, 0 characters'
+		INPUT - $'!!'
+		ERROR - $'ed: no saved shell command'
+		EXIT 1
+	EXEC
+		NOTE 'empty command'
+		INPUT - $'!'
+		ERROR - $'ed: empty shell command'
+	EXEC
+		NOTE 'to stdout'
+		INPUT - $'!echo stdout\n!!'
+		OUTPUT - $'"file" 0 lines, 0 characters\nstdout\n!\necho stdout\nstdout\n!'
+		ERROR -
+		EXIT 0
+	EXEC
+		NOTE 'to stderr'
+		INPUT - $'!echo stderr >&2\n!!'
+		OUTPUT - $'"file" 0 lines, 0 characters\n!\necho stderr >&2\n!'
+		ERROR - $'stderr\nstderr'

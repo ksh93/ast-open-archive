@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1996-2002 AT&T Corp.                #
+#                Copyright (c) 1996-2003 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -43,7 +43,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2002-10-24'
+version='mm2html (AT&T Labs Research) 2003-03-25'
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
@@ -1642,6 +1642,9 @@ do	getline || {
 				;;
 			esac
 		done
+		case ${opts.border} in
+		'')	opts.border=0 ;;
+		esac
 		case ${opts.border} in
 		0)	opts.cellpadding=0
 			opts.cellspacing=0

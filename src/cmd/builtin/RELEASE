@@ -1,3 +1,7 @@
+03-04-05 nl.tst: generate test data file
+03-02-24 nl.c,nl.tst: add
+03-02-14 od.c,tr.c: no error message for EPIPE
+03-02-11 dlls.c: add Dllinfo_t.env
 02-11-14 what.c: stop on < to catch html/xml
 	 update cmdinit() calls for 4th flag arg
 02-09-11 dlls.c: add --base & --path

@@ -1,3 +1,6 @@
+03-03-28 dir3d.c,rmdir3d.c,syscall3d.c: add D_FILENO and D_TYPE ifdefs
+03-03-25 dup3d.c: fix bug that cleared Dir_t pointer just after allocation
+03-03-07 ftruncate3d.c,lseek3d.c,truncate3d.c: check _typ_off64_t
 02-10-18 features/syscall.sh: handle pseudo files in cc -E line syncs
 02-07-17 syscall3d.c: clean up user level intercept code
 02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR

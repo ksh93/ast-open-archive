@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -49,8 +49,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp mamdag.sh mamdag
+exec - "")	case 0 in
+exec - 	0)	cp mamdag.sh mamdag
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamdag.sh`
@@ -65,8 +65,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat mamdag.sh
 exec - 	} > mamdag
@@ -87,8 +88,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp mamdot.sh mamdot
+exec - "")	case 0 in
+exec - 	0)	cp mamdot.sh mamdot
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamdot.sh`
@@ -103,8 +104,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat mamdot.sh
 exec - 	} > mamdot
@@ -125,8 +127,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp mamexec.sh mamexec
+exec - "")	case 0 in
+exec - 	0)	cp mamexec.sh mamexec
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamexec.sh`
@@ -141,8 +143,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat mamexec.sh
 exec - 	} > mamexec
@@ -173,6 +176,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -194,7 +200,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -206,7 +212,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -269,8 +275,8 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp mamsh.sh mamsh
+exec - "")	case 0 in
+exec - 	0)	cp mamsh.sh mamsh
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamsh.sh`
@@ -285,8 +291,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 0 in
+exec - 	0)	;;
+exec - 	*)	echo  ;;
 exec - 	esac
 exec - 	cat mamsh.sh
 exec - 	} > mamsh
@@ -313,20 +320,21 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/mamdag
+prev ../../../bin
 prev mamdag
-exec - ${STDMV} ${INSTALLROOT}/bin/mamdag ${INSTALLROOT}/bin/mamdag.old 2>/dev/null || true; test '' = 'mamdag' || ${STDCMP} 2>/dev/null -s mamdag ${INSTALLROOT}/bin/mamdag || { ${STDCP} mamdag ${INSTALLROOT}/bin/mamdag  		    		    ;}
+exec - test '' = 'mamdag' || ${STDCMP} 2>/dev/null -s mamdag ${INSTALLROOT}/bin/mamdag || { ${STDMV} ${INSTALLROOT}/bin/mamdag ${INSTALLROOT}/bin/mamdag.old 2>/dev/null || true; ${STDCP} mamdag ${INSTALLROOT}/bin/mamdag  		    		    ;}
 done ../../../bin/mamdag generated
 make ../../../bin/mamdot
 prev mamdot
-exec - ${STDMV} ${INSTALLROOT}/bin/mamdot ${INSTALLROOT}/bin/mamdot.old 2>/dev/null || true; test '' = 'mamdot' || ${STDCMP} 2>/dev/null -s mamdot ${INSTALLROOT}/bin/mamdot || { ${STDCP} mamdot ${INSTALLROOT}/bin/mamdot  		    		    ;}
+exec - test '' = 'mamdot' || ${STDCMP} 2>/dev/null -s mamdot ${INSTALLROOT}/bin/mamdot || { ${STDMV} ${INSTALLROOT}/bin/mamdot ${INSTALLROOT}/bin/mamdot.old 2>/dev/null || true; ${STDCP} mamdot ${INSTALLROOT}/bin/mamdot  		    		    ;}
 done ../../../bin/mamdot generated
 make ../../../bin/mamexec
 prev mamexec
-exec - ${STDMV} ${INSTALLROOT}/bin/mamexec ${INSTALLROOT}/bin/mamexec.old 2>/dev/null || true; test '' = 'mamexec' || ${STDCMP} 2>/dev/null -s mamexec ${INSTALLROOT}/bin/mamexec || { ${STDCP} mamexec ${INSTALLROOT}/bin/mamexec  		    		    ;}
+exec - test '' = 'mamexec' || ${STDCMP} 2>/dev/null -s mamexec ${INSTALLROOT}/bin/mamexec || { ${STDMV} ${INSTALLROOT}/bin/mamexec ${INSTALLROOT}/bin/mamexec.old 2>/dev/null || true; ${STDCP} mamexec ${INSTALLROOT}/bin/mamexec  		    		    ;}
 done ../../../bin/mamexec generated
 make ../../../bin/mamnew
 prev mamnew
-exec - ${STDMV} ${INSTALLROOT}/bin/mamnew ${INSTALLROOT}/bin/mamnew.old 2>/dev/null || true; test '' = 'mamnew' || ${STDCMP} 2>/dev/null -s mamnew ${INSTALLROOT}/bin/mamnew || { ${STDCP} mamnew ${INSTALLROOT}/bin/mamnew  		    		    ;}
+exec - test '' = 'mamnew' || ${STDCMP} 2>/dev/null -s mamnew ${INSTALLROOT}/bin/mamnew || { ${STDMV} ${INSTALLROOT}/bin/mamnew ${INSTALLROOT}/bin/mamnew.old 2>/dev/null || true; ${STDCP} mamnew ${INSTALLROOT}/bin/mamnew  		    		    ;}
 done ../../../bin/mamnew generated
 make ../../../man/man1
 exec - set -
@@ -335,26 +343,27 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/mamnew.1
+prev ../../../man/man1
 make mamnew.1
 done mamnew.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1.old 2>/dev/null || true; test '' = 'mamnew.1' || ${STDCMP} 2>/dev/null -s mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1 || { ${STDCP} mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1  		    		    ;}
+exec - test '' = 'mamnew.1' || ${STDCMP} 2>/dev/null -s mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1 || { ${STDMV} ${INSTALLROOT}/man/man1/mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1.old 2>/dev/null || true; ${STDCP} mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1  		    		    ;}
 done ../../../man/man1/mamnew.1 generated
 make ../../../bin/mamold
 prev mamold
-exec - ${STDMV} ${INSTALLROOT}/bin/mamold ${INSTALLROOT}/bin/mamold.old 2>/dev/null || true; test '' = 'mamold' || ${STDCMP} 2>/dev/null -s mamold ${INSTALLROOT}/bin/mamold || { ${STDCP} mamold ${INSTALLROOT}/bin/mamold  		    		    ;}
+exec - test '' = 'mamold' || ${STDCMP} 2>/dev/null -s mamold ${INSTALLROOT}/bin/mamold || { ${STDMV} ${INSTALLROOT}/bin/mamold ${INSTALLROOT}/bin/mamold.old 2>/dev/null || true; ${STDCP} mamold ${INSTALLROOT}/bin/mamold  		    		    ;}
 done ../../../bin/mamold generated
 make ../../../man/man1/mamold.1
 make mamold.1
 done mamold.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/mamold.1 ${INSTALLROOT}/man/man1/mamold.1.old 2>/dev/null || true; test '' = 'mamold.1' || ${STDCMP} 2>/dev/null -s mamold.1 ${INSTALLROOT}/man/man1/mamold.1 || { ${STDCP} mamold.1 ${INSTALLROOT}/man/man1/mamold.1  		    		    ;}
+exec - test '' = 'mamold.1' || ${STDCMP} 2>/dev/null -s mamold.1 ${INSTALLROOT}/man/man1/mamold.1 || { ${STDMV} ${INSTALLROOT}/man/man1/mamold.1 ${INSTALLROOT}/man/man1/mamold.1.old 2>/dev/null || true; ${STDCP} mamold.1 ${INSTALLROOT}/man/man1/mamold.1  		    		    ;}
 done ../../../man/man1/mamold.1 generated
 make ../../../bin/mamsh
 prev mamsh
-exec - ${STDMV} ${INSTALLROOT}/bin/mamsh ${INSTALLROOT}/bin/mamsh.old 2>/dev/null || true; test '' = 'mamsh' || ${STDCMP} 2>/dev/null -s mamsh ${INSTALLROOT}/bin/mamsh || { ${STDCP} mamsh ${INSTALLROOT}/bin/mamsh  		    		    ;}
+exec - test '' = 'mamsh' || ${STDCMP} 2>/dev/null -s mamsh ${INSTALLROOT}/bin/mamsh || { ${STDMV} ${INSTALLROOT}/bin/mamsh ${INSTALLROOT}/bin/mamsh.old 2>/dev/null || true; ${STDCP} mamsh ${INSTALLROOT}/bin/mamsh  		    		    ;}
 done ../../../bin/mamsh generated
 make ../../../bin/mamstate
 prev mamstate
-exec - ${STDMV} ${INSTALLROOT}/bin/mamstate ${INSTALLROOT}/bin/mamstate.old 2>/dev/null || true; test '' = 'mamstate' || ${STDCMP} 2>/dev/null -s mamstate ${INSTALLROOT}/bin/mamstate || { ${STDCP} mamstate ${INSTALLROOT}/bin/mamstate  		    		    ;}
+exec - test '' = 'mamstate' || ${STDCMP} 2>/dev/null -s mamstate ${INSTALLROOT}/bin/mamstate || { ${STDMV} ${INSTALLROOT}/bin/mamstate ${INSTALLROOT}/bin/mamstate.old 2>/dev/null || true; ${STDCP} mamstate ${INSTALLROOT}/bin/mamstate  		    		    ;}
 done ../../../bin/mamstate generated
 done install virtual
 make test

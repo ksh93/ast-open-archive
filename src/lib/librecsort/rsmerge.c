@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2002 AT&T Corp.                *
+*                Copyright (c) 1996-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -64,7 +64,7 @@ typedef struct _merge_s
 #define MGISEOF(mg)	(mg->eof)
 #define MGRESERVE(mg,rsrv,endrsrv,cur,r,action) \
 	{ reg ssize_t rr; \
-	  if((endrsrv-cur) < r) \
+	  if((cur+r) > endrsrv) \
 	  { if(rsrv && sfread(mg->f,rsrv,cur-rsrv) != cur-rsrv) { MGSETEOF(mg); action;} \
 	    rsrv = endrsrv = cur = NIL(uchar*); \
 	    rr = r <= RS_RESERVE ? RS_RESERVE : ((r/1024)+1)*1024; \
@@ -170,8 +170,8 @@ Merge_t*	mg;
 		}
 		else for(s = RS_RESERVE;;) /* make sure we have at least 1 record */
 		{	MGRESERVE(mg,rsrv,endrsrv,cur,s, goto last_chunk);
-			if((t = (uchar*)memchr(rsrv,rsc,endrsrv-rsrv)) )
-			{	datalen = (t-rsrv)+1;
+			if((t = (uchar*)memchr(cur,rsc,endrsrv-cur)) )
+			{	datalen = (t-cur)+1;
 				break;
 			}
 			else if(MGISEOF(mg))

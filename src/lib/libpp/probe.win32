@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2002-11-29
+# @(#)probe.win32 (AT&T Labs Research) 2003-01-23
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -183,25 +183,29 @@ case $version:$include in
 	then	if	[ X"$cplus" != X ]
 		then	if	[ -d "$include/g++-3" ]
 			then	standard="$standard
-#pragma pp:standard \"$include/g++-3\""
+#pragma pp:include \"$include/g++-3\""
 			elif	[ -d "$include"/c++/3.* ]
 			then	set X "$include"/c++/3.*
 				standard="$standard
-#pragma pp:standard \"$2\""
+#pragma pp:include \"$2\""
 				if	[ -d "$2"/mingw32 ]
 				then	standard="$standard
-#pragma pp:standard \"$2/mingw32\""
+#pragma pp:include \"$2/mingw32\""
+				fi
+				if	[ -d "$2"/backward ]
+				then	standard="$standard
+#pragma pp:include \"$2/backward\""
 				fi
 			fi
 			if	[ -d "${include%/*}"/mingw32/include ]
 			then	standard="$standard
-#pragma pp:standard \"${include%/*}/mingw32/include\""
+#pragma pp:include \"${include%/*}/mingw32/include\""
 			fi
 		fi
 		if	[ -d "${include%/*}"/lib/gcc-lib/mingw32/*/include ]
 		then	set X "${include%/*}"/lib/gcc-lib/mingw32/*/include
 			standard="$standard
-#pragma pp:standard \"$2\""
+#pragma pp:include \"$2\""
 		fi
 	fi
 	: the payoff

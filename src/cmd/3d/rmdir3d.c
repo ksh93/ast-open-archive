@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -54,8 +54,8 @@ rmfiles(char* path, char* endpath, ino_t ino)
 		}
 		else
 		{
-#if _mem_d_fileno_dirent
-			if (ep->d_fileno != ino)
+#ifdef D_FILENO
+			if (D_FILENO(ep) != ino)
 #else
 			struct stat	st;
 
@@ -71,7 +71,7 @@ rmfiles(char* path, char* endpath, ino_t ino)
 			}
 			else if (pass)
 			{
-#if _mem_d_fileno_dirent
+#ifdef D_FILENO
 				strcpy(endpath, ep->d_name);
 #endif
 				if (UNLINK(path)) break;

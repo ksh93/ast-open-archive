@@ -506,10 +506,14 @@ collect(struct header* hp, unsigned long flags)
 						t = s;
 					sfprintf(state.path.temp, "uuencode -h -x %s", (code & CODE_QP) ? "quoted-printable " : "base64 ");
 					if (t)
-						sfprintf(state.path.temp, "%s", t);
-					sfprintf(state.path.temp, " %s", s);
+						shquote(state.path.temp, t);
+					sfputc(state.path.temp, ' ');
+					shquote(state.path.temp, s);
 					if (t == state.tmp.mail)
-						sfprintf(state.path.temp, "; rm -f %s", t);
+					{
+						sfprintf(state.path.temp, "; rm -f ");
+						shquote(state.path.temp, t);
+					}
 					if (!(fp = pipeopen(sfstruse(state.path.temp), "r")))
 						break;
 				}

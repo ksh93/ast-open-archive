@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -40,8 +40,10 @@ pzread(register Pz_t* pz, void* buf, size_t z)
 	register size_t		m;
 	ssize_t			n;
 	ssize_t			w;
+	size_t			r;
 	unsigned char*		ob;
 	unsigned char*		om;
+	unsigned char*		x;
 	Pzwrite_f		writef;
 
 	pp = pz->part;
@@ -130,6 +132,25 @@ pzread(register Pz_t* pz, void* buf, size_t z)
 				return 0;
 			if (!(m = sfgetu(pz->io)))
 			{
+				if ((k = sfgetc(pz->io)) == PZ_MARK_PART)
+				{
+					if ((m = sfgetu(pz->io)) && !sferror(pz->io) && !sfeof(pz->io) && (x = (unsigned char*)sfreserve(pz->io, m, 0)))
+					{
+						r = om - ob;
+						if (m > r)
+						{
+							sfungetc(pz->io, 0);
+							memcpy(ob, x, r);
+							pz->prefix.count = m - r;
+							pz->prefix.data = (char*)x + r; 
+							return z;
+						}
+						memcpy(ob, x, m);
+						ob += m;
+					}
+				}
+				else if (k != -1)
+					sfungetc(pz->io, k);
 				switch (pzfile(pz))
 				{
 				case 0:

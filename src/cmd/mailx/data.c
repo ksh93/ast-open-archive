@@ -6,11 +6,11 @@
 
 #include "mailx.h"
 
-static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2002-12-12 $\0\n";
+static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2003-01-17 $\0\n";
 
 static const char	terms[] = "\n\
 @(#)Copyright (c) 1980, 1993, 1996, 2002\n\
-\tThe Regents of the University of California.  All rights reserved.\n\
+\tThe Regents of the University of California. All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
 modification, are permitted provided that the following conditions\n\
@@ -32,7 +32,7 @@ are met:\n\
 THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND\n\
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE\n\
 IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE\n\
-ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE\n\
+ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE\n\
 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL\n\
 DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS\n\
 OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)\n\
@@ -76,7 +76,7 @@ static const struct cmd	cmdtab[] =
 "S[ave]",	CMD(Save),		STRLIST,	0,	0,
 	X("[ message ... ]\nCopy the selected messages to a file name derived from the sender of the first message, marking the messages SAVE."),
 "Sp[lit]",	CMD(Split),		M|STRLIST,	2,	2,
-	X("[ message ... ] start directory\nSplit the messages into files numbered from start in the named directory, marking the messages SAVE. All headers are ignored.  Attachments are named n-m. A line containing <path> <n> <lines> <chars> is listed for each message. Optional attachment information is appended to each line: <n>-<m> <name> <type> <lines> <chars>."),
+	X("[ message ... ] start directory\nSplit the messages into files numbered from start in the named directory, marking the messages SAVE. All headers are ignored. Attachments are named n-m. A line containing <path> <n> <lines> <chars> is listed for each message. Optional attachment information is appended to each line: <n>-<m> <name> <type> <lines> <chars>."),
 "T[ype]",	CMD(Type),		MSGLIST,	0,	MMNDEL,
 	X("[ message ... ]\nEquivalent to Print [ message ... ]"),
 "a[lias]",	CMD(alias),		M|Z|RAWLIST,	0,	ARG_MAX,
@@ -154,7 +154,7 @@ static const struct cmd	cmdtab[] =
 "map",		CMD(map),		M|Z|STRLIST,	0,	0,
 	X("address ...\nList the result of alias expansion on the address arguments. map! gives the step-by-step details."),
 "mar[k]",	CMD(mark),		STRLIST,	0,	0,
-	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages.  The marks are: delete, dot (>), mbox (M), new (N), preserve (P), read (U), save (*), spam (X), touch. Multiple marks may be separated by , or |."),
+	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), read (U), save (*), spam (X), touch. Multiple marks may be separated by , or |."),
 "mb[ox]",	CMD(mboxit),		W|STRLIST,	0,	0,
 	X("[ message ... ]\nAppend the selected messages to ${MBOX} on normal exit."),
 "mi[me]",	CMD(capability),	M|Z|RAWLIST,	0,	ARG_MAX,
@@ -298,7 +298,7 @@ static const struct var	vartab[] =
 "HOME",		&state.var.home,		D|E|N,	".",0,
 	X("The user's home directory, also named \"~\"."),
 "IMAP",		&state.var.imap,		D|E|N,	"~/.imap",0,
-	X("IMAP host and authentication file.  Each line with `host name LOGIN name password' or `host name AUTHENTICATE method'."),
+	X("IMAP host and authentication file. Each line with `host name LOGIN name password' or `host name AUTHENTICATE method'."),
 "LISTER",	&state.var.lister,		D|E|N,	"ls",0,
 	X("The utility invoked for the folders command."),
 "MAIL",		&state.var.mail,		E,	"",set_mail,
@@ -350,7 +350,7 @@ static const struct var	vartab[] =
 "coprocess",	&state.var.coprocess,		0,	0,set_coprocess,
 	X("Run in mode where stdin and stdout are pipes."),
 "crt",		(char**)&state.var.crt,		I,	0,set_crt,
-	X("Pipe messages longer than this through ${PAGER}."),
+	X("Pipe messages longer than this through ${PAGER}. Negative values cause all messages to be paged."),
 "debug",	&state.var.debug,		0,	0,0,
 	X("Enable verbose debugging diagnostics and do not deliver messages."),
 "domain",	&state.var.domain,		N,	0,0,
@@ -360,7 +360,7 @@ static const struct var	vartab[] =
 "editheaders",	&state.var.editheaders,		0,	0,set_editheaders,
 	X("Place this list of headers in files to be edited by ~e and ~v."),
 "escape",	&state.var.escape,		N,	"~",0,
-	X("The command escape character.  Null means no command escapes."),
+	X("The command escape character. Null means no command escapes."),
 "fixedheaders",	&state.var.fixedheaders,	0,	0,0,
 	X("Add these header lines to outgoing messages."),
 "flipr",	&state.var.flipr,		0,	0,0,
@@ -382,7 +382,7 @@ static const struct var	vartab[] =
 "ignoreeof",	&state.var.ignoreeof,		0,	0,0,
 	X("Ignore the EOF char on message input. `.' or ~. must terminate the message."),
 "imap",		&state.var.imap,		0,	0,0,
-	X("IMAP host and authentication file.  Each line with `host name LOGIN name password' or `host name AUTHENTICATE method'."),
+	X("IMAP host and authentication file. Each line with `host name LOGIN name password' or `host name AUTHENTICATE method'."),
 "inbox",	&state.var.inbox,		0,	"+inbox",0,
 	X("mh incoming mailbox. If ${inbox} is a directory then SAVE messages are removed on exit."),
 "indentprefix",	&state.var.indentprefix,	N,	"\t",0,

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: locale (AT&T Labs Research) 2002-02-14 $\n]"
+"[-?\n@(#)$Id: locale (AT&T Labs Research) 2003-01-10 $\n]"
 USAGE_LICENSE
 "[+NAME?locale - get locale-specific information]"
 "[+DESCRIPTION?\blocale\b writes information about the current locale to"
@@ -1127,7 +1127,7 @@ main(int argc, char** argv)
 			for (i = 1; i < AST_LC_COUNT; i++)
 			{
 				s = setlocale(state.categories[i].external, NiL);
-				sfprintf(sfstdout, "%s=%s\n", state.categories[i].name, fmtquote(s, "\"", "\"", strlen(s), value || !getenv(state.categories[i].name)));
+				sfprintf(sfstdout, "%s=%s\n", state.categories[i].name, fmtquote(s, "\"", "\"", strlen(s), (value || !getenv(state.categories[i].name)) ? FMT_ALWAYS : 0));
 			}
 			sfprintf(sfstdout, "%s=", state.categories[0].name);
 			if (value)
@@ -1170,7 +1170,7 @@ main(int argc, char** argv)
 		else
 			list_keyword(sfstdout, key, value, flags);
 	}
-	if (error_info.errors && !state.output)
+	if (!error_info.errors && !state.output)
 		list_keyword(sfstdout, (Keyword_t*)dtmatch(state.dict, state.categories[0].name), NiL, flags);
 	return error_info.errors != 0;
 }

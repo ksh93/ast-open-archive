@@ -1,4 +1,3 @@
-VERSION=6b
 /*
  * MAM library
  */
@@ -7,6 +6,6 @@ VERSION=6b
 
 LICENSE = since=1989,author=gsf
 
-mam $(VERSION) :LIBRARY: mam.h mam.c
+mam :LIBRARY: mam.h mam.c
 
 $(INCLUDEDIR) :INSTALLPROTO: mam.h

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -222,6 +222,13 @@ pzinflate(register Pz_t* pz, Sfio_t* op)
 			if (restore(pz, pp, pz->io, op, pat, pz->wrk, pp->row, k, pp->map, pp->mix, pp->inc))
 				return -1;
 		}
+		if ((k = sfgetc(pz->io)) == PZ_MARK_PART)
+		{
+			if ((m = sfgetu(pz->io)) && !sferror(pz->io) && !sfeof(pz->io) && (pat = (unsigned char*)sfreserve(pz->io, m, 0)))
+				sfwrite(op, pat, m);
+		}
+		else if (k != -1)
+			sfungetc(pz->io, k);
 		if (sfsync(op))
 		{
 			if (pz->disc->errorf)

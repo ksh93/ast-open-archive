@@ -1,8 +1,60 @@
+03-04-22 rules-win32.mk: drop :PACKAGE: Xm override -- handled by uwin
+03-04-15 mam.c: output P_ignore attribute
+	 Makerules.mk: fix the mam .DO.INSTALL to compare before mv to .old!!
+03-04-05 expand.c: add :W=P: for ordered recursive prereqs
+	 Makerules.mk: add recurse=prereqs
+	 pkg-X11.mk: add openbsd.* -lc_r pthread workaround
+	 Makerules.mk: add .PACKAGE.$(P).found:=1 if package lib or header found
+	 Makerules.mk: optional :PACKAGE: rhs must now be marked :dontcare
+	 Makerules.mk: pure recursion makefiles make .RECURSE first by default
+	 Makerules.mk: .NORECURSE inhibits default .RECURSE first
+	 Makerules.mk: fix .DO.INSTALL directory prereq omission
+	 Makerules.mk: add .BELIEVE for initialization, e.g., after mamake
+	 bind.c: fix rebind alias bug
+	 misc.c: limit `mtime after the epoch' warnings to { S_ISREG S_ISDIR }
+03-03-28 Makerules.mk: eliminate CC.STDINCLUDE before -I- too
+03-03-27 Makerules.mk: add :PACKAGE: *:attributes:*
+	 pkg-X11.mk: fix CC.REQUIRE.Xm
+	 rules-win32.mk: add :PACKAGE: Xm:attributes:static
+03-03-21 command.c,object.c: always emit target name for --mam=dynamic
+03-03-19 expand.c: add :W=R: for true :MAKE: recursion order
+	 state.c: add test 0x00040000 to set failed event to staterule event
+	 nmake.tst: add first regression tests since 1984 -- yes, I'm ashamed
+	 Makerules.mk: change :W=O: to :W=R:
+	 Makerules.mk: use CC.LD.RUNPATH for LDRUNPATH and non-std dirs
+	 Makerules.mk: drop MAKEDIRS .RECURSE.OFFSET. -- not needed with :W=R:
+03-03-15 Makerules.mk: fix debug=1 to delete $(CC.OPTIMIZE) from CCFLAGS
+	 expand.c: fix SORT_* comparison function selection
+03-03-11 expand.c: add ~ edit op sep
+	 expand.c: limit edit op [~!<>=] sep to one occurrence
+	 expand.c: add :H=[FINUV]: alternative to edit sep overload
+	 expand.c: add :L~: to use version comparison
+	 Makerules.mk: use :H=[FINUV]: and :L~:
+	 Makerules.mk: add pkgconfig(1) .pc file support in :PACKAGE:
+	 Makerules.mk: fix %.sh=>% :T=E: misquote (ancient!)
+03-03-03 Makerules.mk: .MAM.INIT handles debug=1 for CC.DEBUG vs. CC.OPTIMIZE
+	 Makerules.mk: add 'test : .DONTCARE .ONOBJECT'
+	 Makerules.mk: another prefixinclude fix -- my head hurts
+	 Makerules.mk: pass recursive $(=) by value ( $(=:V) )
+	 misc.c: fix :F=[LUV]: translation
+03-02-28 Makerules.mk: YACCFIX workaround for bison yytoken addition
+	 Makerules.mk: include $(LDLIBRARIES) in %.req
+	 Makerules.mk: fix .BIND.-l% comparison on CC.PREFIX.SHARED
+	 debug.mk: handle .o scope prereqs
+	 variable.c: fix $(!) internal.val conflict
+03-02-24 option.c: drop --mismatch alias for --corrupt
+03-02-12 Makerules.mk: handle multiple lhs for :INSTALLDIR:
+03-02-06 pkg-freetype.mk: add
+03-01-31 Makerules.mk: mark .PACKAGE.LIBRARIES. hints .DONTCARE
+	 Makerules.mk: :PACKAGE: add to .PACKAGE. first, then include pkg-*.mk
+03-01-23 Makerules.mk: more prefixinclude tweaks
+03-01-11 Makerules.mk: CATALOG default is $(.CATALOG.NAME.)
+03-01-10 Makerules.mk: parameterize all silent => $(SILENT)
 02-12-21 --- release 4.3 ---
 02-12-18 Makerules.mk: :NOOPTIMIZE: "..."'d operator arg shenanigans
 02-12-16 Makerules.mk: disable .ARCOPY for linked targets
 02-12-06 Makerules.mk: sync CC.MAKE.OPTIONS,nativepp,prefixinclude logic
-02-12-04 Makerules.mk: fix contorted .so editing that botched n.n.n versions
+02-12-04 Makerules.mk: fix contorted .so editing for - and  n.n.n versions
 	 Makerules.mk: parameterize CC/cc suffixes in { .SUFFIX.c .SUFFIX.C }
 	 Makerules.mk: use { .SUFFIX.c .SUFFIX.C } in :cc: list generation
 	 Makerules.mk: parameterize fortran suffixes in { .SUFFIX.f .SUFFIX.r }

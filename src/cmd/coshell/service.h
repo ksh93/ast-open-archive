@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -53,6 +53,7 @@
 	char		name[NAMELEN];	/* host name			*/ \
 	char		type[TYPELEN];	/* host type			*/ \
 	char		misc[MISCLEN];	/* host misc attributes		*/ \
+	char		remote[MISCLEN];/* remote shell path		*/ \
 	char		shell[MISCLEN];	/* shell path			*/ \
 	char*		access;		/* host access expression	*/ \
 	char*		bypass;		/* idle bypass expression	*/ \
@@ -157,8 +158,7 @@
 #define SETNAME		(1<<14)		/* name was set			*/
 #define SETRATING	(1L<<15)	/* rating was set		*/
 #define SETSCALE	(1L<<16)	/* scale was set		*/
-#define SETSHELL	(1L<<17)	/* shell was set		*/
-#define SETTYPE		(1L<<18)	/* type was set			*/
+#define SETTYPE		(1L<<17)	/* type was set			*/
 
 #define SETBUSY		(1<<0)		/* global.busy was set		*/
 #define SETDEBUG	(1<<1)		/* global.debug was set		*/
@@ -177,9 +177,11 @@
 #define SETPOOL		(1<<14)		/* global.pool was set		*/
 #define SETPROFILE	(1L<<15)	/* global.profile was set	*/
 #define SETSCHEDULE	(1L<<16)	/* global.schedule was set	*/
-/*#define SETSHELL	(1L<<17)	/* global.shell was set		*/
-#define SETUPDATE	(1L<<18)	/* stat.update was set		*/
-#define SETUSERS	(1L<<19)	/* stat.users was set		*/
+#define SETUPDATE	(1L<<17)	/* stat.update was set		*/
+#define SETUSERS	(1L<<18)	/* stat.users was set		*/
+
+#define SETREMOTE	(1L<<29)	/* (global) remote was set	*/
+#define SETSHELL	(1L<<30)	/* (global) shell was set	*/
 
 #define QUEUE		(-1)		/* waiting for shell to open	*/
 #define START		(-2)		/* started but no pid		*/
@@ -191,6 +193,7 @@ typedef struct
 	char		type[TYPELEN];
 	char		misc[MISCLEN];
 	char		label[LABELLEN];
+	char		remote[MISCLEN];
 	char		shell[MISCLEN];
 	char*		access;
 	char*		bypass;
@@ -208,6 +211,7 @@ typedef struct
 	char*		identify;
 	char*		migrate;
 	char*		profile;
+	char*		remote;
 	char*		schedule;
 	char*		shell;
 	int		busy;
@@ -315,6 +319,7 @@ typedef struct
 	char*		profile;
 	char*		pump;
 	unsigned long	real;
+	char*		remote;
 	int		running;
 	struct
 	{

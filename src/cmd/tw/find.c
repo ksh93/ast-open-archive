@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -51,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2002-11-07 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2003-01-10 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -1577,6 +1577,7 @@ main(int argc, char** argv)
 	register Find_t*		fp;
 	register const struct Args*	ap;
 	Sfio_t*				sp;
+	int				r;
 	Finddisc_t			disc;
 
 	static char*	defpath[] = { ".", 0 };
@@ -1673,7 +1674,11 @@ main(int argc, char** argv)
 		cmdflush(cmd->first.xp);
 		cmd = cmd->second.np;
 	}
-	if (fp)
-		findclose(fp);
-	return (proc ? procclose(proc) : 0) || error_info.errors;
+	if (fp && findclose(fp))
+		return 1;
+	if (proc && (r = procclose(proc)))
+		return r;
+	if (sfsync(sfstdout))
+		error(ERROR_SYSTEM|2, "write error");
+	return error_info.errors;
 }

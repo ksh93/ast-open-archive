@@ -139,202 +139,202 @@ NIL	%x_%X_%y_%Y			02/29/00_01:02:03_00_2000
 NIL	%z_%Z				-0500_EST
 NIL	%Y-%m-%d			2000-02-29
 
-NIL	%a	Tue
-NIL	%A	Tuesday
-NIL	%b	Feb
-NIL	%B	February
-NIL	%c	Tue Feb 29 01:02:03 2000
-NIL	%C	20
-NIL	%d	29
-NIL	%D	02/29/00
-NIL	%e	29
-NIL	%E	29
-NIL	%f	Tue Feb 29 01:02:03 EST 2000
-NIL	%F	Tue Feb 29 01:02:03 EST 2000
-NIL	%g	Feb 29 01:02
-NIL	%G	Feb 29  2000
-NIL	%h	Feb
-NIL	%H	01
-NIL	%i	Tue Feb 29 01:02:03 -0500 EST 2000
-NIL	%I	01
-NIL	%j	060
-NIL	%J	059
-NIL	%k	Tue Feb 29 01:02:03 EST 2000
-NIL	%K	2000-02-29+01:02:03
-NIL	%l	Feb 29  2000
-NIL	%L	%L
-NIL	%m	02
-NIL	%M	02
-NIL	%o	Tue Feb 29 01:02:03 EST 2000
-NIL	%O	Tue Feb 29 01:02:03 EST 2000
-NIL	%p	AM
-NIL	%P	%P
-NIL	%q	%q
-NIL	%Q	%Q
-NIL	%r	01:02:03 AM
-NIL	%R	01:02
-NIL	%s	951804123
-NIL	%S	03
-NIL	%t	\t
-NIL	%T	01:02:03
-NIL	%u	2
-NIL	%U	09
-NIL	%v	%v
-NIL	%V	09
-NIL	%w	2
-NIL	%W	09
-NIL	%x	02/29/00
-NIL	%X	01:02:03
-NIL	%y	00
-NIL	%Y	2000
-NIL	%z	-0500
+NIL	%a		Tue
+NIL	%A		Tuesday
+NIL	%b		Feb
+NIL	%B		February
+NIL	%c		Tue Feb 29 01:02:03 2000
+NIL	%C		20
+NIL	%d		29
+NIL	%D		02/29/00
+NIL	%e		29
+NIL	%E		29
+NIL	%f		Tue Feb 29 01:02:03 EST 2000
+NIL	%F		Tue Feb 29 01:02:03 EST 2000
+NIL	%g		Feb 29 01:02
+NIL	%G		Feb 29  2000
+NIL	%h		Feb
+NIL	%H		01
+NIL	%i		Tue Feb 29 01:02:03 -0500 EST 2000
+NIL	%I		01
+NIL	%j		060
+NIL	%J		059
+NIL	%k		Tue Feb 29 01:02:03 EST 2000
+NIL	%K		2000-02-29+01:02:03
+NIL	%l		Feb 29  2000
+NIL	%L		%L
+NIL	%m		02
+NIL	%M		02
+NIL	%o		Tue Feb 29 01:02:03 EST 2000
+NIL	%O		Tue Feb 29 01:02:03 EST 2000
+NIL	%p		AM
+NIL	%P		%P
+NIL	%q		%q
+NIL	%Q/%g/%G/	Feb 29  2000
+NIL	%r		01:02:03 AM
+NIL	%R		01:02
+NIL	%s		951804123
+NIL	%S		03
+NIL	%t		\t
+NIL	%T		01:02:03
+NIL	%u		2
+NIL	%U		09
+NIL	%v		%v
+NIL	%V		09
+NIL	%w		2
+NIL	%W		09
+NIL	%x		02/29/00
+NIL	%X		01:02:03
+NIL	%y		00
+NIL	%Y		2000
+NIL	%z		-0500
 
-NIL	%0a	Tue
-NIL	%0A	Tuesday
-NIL	%0b	Feb
-NIL	%0B	February
-NIL	%0c	Tue Feb 29 01:02:03 2000
-NIL	%0C	20
-NIL	%0d	29
-NIL	%0D	02/29/00
-NIL	%0e	29
-NIL	%0E	29
-NIL	%0f	Tue Feb 29 01:02:03 EST 2000
-NIL	%0F	Tue Feb 29 01:02:03 EST 2000
-NIL	%0g	Feb 29 01:02
-NIL	%0G	Feb 29  2000
-NIL	%0h	Feb
-NIL	%0H	01
-NIL	%0i	Tue Feb 29 01:02:03 -0500 EST 2000
-NIL	%0I	01
-NIL	%0j	060
-NIL	%0J	059
-NIL	%0k	Tue Feb 29 01:02:03 EST 2000
-NIL	%0K	2000-02-29+01:02:03
-NIL	%0l	Feb 29  2000
-NIL	%0L	%L
-NIL	%0m	02
-NIL	%0M	02
-NIL	%0o	Tue Feb 29 01:02:03 EST 2000
-NIL	%0O	Tue Feb 29 01:02:03 EST 2000
-NIL	%0p	AM
-NIL	%0P	%P
-NIL	%0q	%q
-NIL	%0Q	%Q
-NIL	%0r	01:02:03 AM
-NIL	%0R	01:02
-NIL	%0s	951804123
-NIL	%0S	03
-NIL	%0t	\t
-NIL	%0T	01:02:03
-NIL	%0u	2
-NIL	%0U	09
-NIL	%0v	%v
-NIL	%0V	09
-NIL	%0w	2
-NIL	%0W	09
-NIL	%0x	02/29/00
-NIL	%0X	01:02:03
-NIL	%0y	00
-NIL	%0Y	2000
-NIL	%0z	-0500
+NIL	%0a		Tue
+NIL	%0A		Tuesday
+NIL	%0b		Feb
+NIL	%0B		February
+NIL	%0c		Tue Feb 29 01:02:03 2000
+NIL	%0C		20
+NIL	%0d		29
+NIL	%0D		02/29/00
+NIL	%0e		29
+NIL	%0E		29
+NIL	%0f		Tue Feb 29 01:02:03 EST 2000
+NIL	%0F		Tue Feb 29 01:02:03 EST 2000
+NIL	%0g		Feb 29 01:02
+NIL	%0G		Feb 29  2000
+NIL	%0h		Feb
+NIL	%0H		01
+NIL	%0i		Tue Feb 29 01:02:03 -0500 EST 2000
+NIL	%0I		01
+NIL	%0j		060
+NIL	%0J		059
+NIL	%0k		Tue Feb 29 01:02:03 EST 2000
+NIL	%0K		2000-02-29+01:02:03
+NIL	%0l		Feb 29  2000
+NIL	%0L		%L
+NIL	%0m		02
+NIL	%0M		02
+NIL	%0o		Tue Feb 29 01:02:03 EST 2000
+NIL	%0O		Tue Feb 29 01:02:03 EST 2000
+NIL	%0p		AM
+NIL	%0P		%P
+NIL	%0q		%q
+NIL	%0Q/%g/%G/	Feb 29  2000
+NIL	%0r		01:02:03 AM
+NIL	%0R		01:02
+NIL	%0s		951804123
+NIL	%0S		03
+NIL	%0t		\t
+NIL	%0T		01:02:03
+NIL	%0u		2
+NIL	%0U		09
+NIL	%0v		%v
+NIL	%0V		09
+NIL	%0w		2
+NIL	%0W		09
+NIL	%0x		02/29/00
+NIL	%0X		01:02:03
+NIL	%0y		00
+NIL	%0Y		2000
+NIL	%0z		-0500
 
-NIL	%-a	Tue
-NIL	%-A	Tuesday
-NIL	%-b	Feb
-NIL	%-B	February
-NIL	%-c	Tue Feb 29 01:02:03 2000
-NIL	%-C	20
-NIL	%-d	29
-NIL	%-D	02/29/00
-NIL	%-e	29
-NIL	%-E	29
-NIL	%-f	Tue Feb 29 01:02:03 EST 2000
-NIL	%-F	Tue Feb 29 01:02:03 EST 2000
-NIL	%-g	Feb 29 01:02
-NIL	%-G	Feb 29  2000
-NIL	%-h	Feb
-NIL	%-H	1
-NIL	%-i	Tue Feb 29 01:02:03 -0500 EST 2000
-NIL	%-I	1
-NIL	%-j	60
-NIL	%-J	59
-NIL	%-k	Tue Feb 29 01:02:03 EST 2000
-NIL	%-K	2000-02-29+01:02:03
-NIL	%-l	Feb 29  2000
-NIL	%-L	%L
-NIL	%-m	2
-NIL	%-M	2
-NIL	%-o	Tue Feb 29 01:02:03 EST 2000
-NIL	%-O	Tue Feb 29 01:02:03 EST 2000
-NIL	%-p	AM
-NIL	%-P	%P
-NIL	%-q	%q
-NIL	%-Q	%Q
-NIL	%-r	01:02:03 AM
-NIL	%-R	01:02
-NIL	%-s	951804123
-NIL	%-S	3
-NIL	%-t	\t
-NIL	%-T	01:02:03
-NIL	%-u	2
-NIL	%-U	9
-NIL	%-v	%v
-NIL	%-V	9
-NIL	%-w	2
-NIL	%-W	9
-NIL	%-x	02/29/00
-NIL	%-X	01:02:03
-NIL	%-y	0
-NIL	%-Y	2000
-NIL	%-z	-0500
+NIL	%-a		Tue
+NIL	%-A		Tuesday
+NIL	%-b		Feb
+NIL	%-B		February
+NIL	%-c		Tue Feb 29 01:02:03 2000
+NIL	%-C		20
+NIL	%-d		29
+NIL	%-D		02/29/00
+NIL	%-e		29
+NIL	%-E		29
+NIL	%-f		Tue Feb 29 01:02:03 EST 2000
+NIL	%-F		Tue Feb 29 01:02:03 EST 2000
+NIL	%-g		Feb 29 01:02
+NIL	%-G		Feb 29  2000
+NIL	%-h		Feb
+NIL	%-H		1
+NIL	%-i		Tue Feb 29 01:02:03 -0500 EST 2000
+NIL	%-I		1
+NIL	%-j		60
+NIL	%-J		59
+NIL	%-k		Tue Feb 29 01:02:03 EST 2000
+NIL	%-K		2000-02-29+01:02:03
+NIL	%-l		Feb 29  2000
+NIL	%-L		%L
+NIL	%-m		2
+NIL	%-M		2
+NIL	%-o		Tue Feb 29 01:02:03 EST 2000
+NIL	%-O		Tue Feb 29 01:02:03 EST 2000
+NIL	%-p		AM
+NIL	%-P		%P
+NIL	%-q		%q
+NIL	%-Q/%g/%G/	Feb 29  2000
+NIL	%-r		01:02:03 AM
+NIL	%-R		01:02
+NIL	%-s		951804123
+NIL	%-S		3
+NIL	%-t		\t
+NIL	%-T		01:02:03
+NIL	%-u		2
+NIL	%-U		9
+NIL	%-v		%v
+NIL	%-V		9
+NIL	%-w		2
+NIL	%-W		9
+NIL	%-x		02/29/00
+NIL	%-X		01:02:03
+NIL	%-y		0
+NIL	%-Y		2000
+NIL	%-z		-0500
 
-NIL	%_a	Tue
-NIL	%_A	Tuesday
-NIL	%_b	Feb
-NIL	%_B	February
-NIL	%_c	Tue Feb 29 01:02:03 2000
-NIL	%_C	20
-NIL	%_d	29
-NIL	%_D	02/29/00
-NIL	%_e	29
-NIL	%_E	29
-NIL	%_f	Tue Feb 29 01:02:03 EST 2000
-NIL	%_F	Tue Feb 29 01:02:03 EST 2000
-NIL	%_g	Feb 29 01:02
-NIL	%_G	Feb 29  2000
-NIL	%_h	Feb
-NIL	%_H	 1
-NIL	%_i	Tue Feb 29 01:02:03 -0500 EST 2000
-NIL	%_I	 1
-NIL	%_j	 60
-NIL	%_J	 59
-NIL	%_k	Tue Feb 29 01:02:03 EST 2000
-NIL	%_K	2000-02-29+01:02:03
-NIL	%_l	Feb 29  2000
-NIL	%_L	%L
-NIL	%_m	 2
-NIL	%_M	 2
-NIL	%_o	Tue Feb 29 01:02:03 EST 2000
-NIL	%_O	Tue Feb 29 01:02:03 EST 2000
-NIL	%_p	AM
-NIL	%_P	%P
-NIL	%_q	%q
-NIL	%_Q	%Q
-NIL	%_r	01:02:03 AM
-NIL	%_R	01:02
-NIL	%_s	951804123
-NIL	%_S	 3
-NIL	%_t	\t
-NIL	%_T	01:02:03
-NIL	%_u	2
-NIL	%_U	 9
-NIL	%_v	%v
-NIL	%_V	 9
-NIL	%_w	2
-NIL	%_W	 9
-NIL	%_x	02/29/00
-NIL	%_X	01:02:03
-NIL	%_y	 0
-NIL	%_Y	2000
-NIL	%_z	-0500
+NIL	%_a		Tue
+NIL	%_A		Tuesday
+NIL	%_b		Feb
+NIL	%_B		February
+NIL	%_c		Tue Feb 29 01:02:03 2000
+NIL	%_C		20
+NIL	%_d		29
+NIL	%_D		02/29/00
+NIL	%_e		29
+NIL	%_E		29
+NIL	%_f		Tue Feb 29 01:02:03 EST 2000
+NIL	%_F		Tue Feb 29 01:02:03 EST 2000
+NIL	%_g		Feb 29 01:02
+NIL	%_G		Feb 29  2000
+NIL	%_h		Feb
+NIL	%_H		 1
+NIL	%_i		Tue Feb 29 01:02:03 -0500 EST 2000
+NIL	%_I		 1
+NIL	%_j		 60
+NIL	%_J		 59
+NIL	%_k		Tue Feb 29 01:02:03 EST 2000
+NIL	%_K		2000-02-29+01:02:03
+NIL	%_l		Feb 29  2000
+NIL	%_L		%L
+NIL	%_m		 2
+NIL	%_M		 2
+NIL	%_o		Tue Feb 29 01:02:03 EST 2000
+NIL	%_O		Tue Feb 29 01:02:03 EST 2000
+NIL	%_p		AM
+NIL	%_P		%P
+NIL	%_q		%q
+NIL	%_Q/%g/%G/	Feb 29  2000
+NIL	%_r		01:02:03 AM
+NIL	%_R		01:02
+NIL	%_s		951804123
+NIL	%_S		 3
+NIL	%_t		\t
+NIL	%_T		01:02:03
+NIL	%_u		2
+NIL	%_U		 9
+NIL	%_v		%v
+NIL	%_V		 9
+NIL	%_w		2
+NIL	%_W		 9
+NIL	%_x		02/29/00
+NIL	%_X		01:02:03
+NIL	%_y		 0
+NIL	%_Y		2000
+NIL	%_z		-0500

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2002 AT&T Corp.                *
+*                Copyright (c) 1987-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -2225,6 +2225,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				n &= ((1<<16)-1);
 				if (checksum != n)
 					error(3, "%s: %s format attribute data checksum error", ap->name, format[ap->format].name);
+message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name, ap->entry, level, name, size));
 				if (level == 2) switch (name)
 				{
 				case 0x800f: /* data */

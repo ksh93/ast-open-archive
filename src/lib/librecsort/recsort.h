@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2002 AT&T Corp.                *
+*                Copyright (c) 1996-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -154,18 +154,21 @@ struct _rs_s
 
 _BEGIN_EXTERNS_	/* public data */
 #if _BLD_recsort && defined(__EXPORT__)
-#define extern	__EXPORT__
-#endif
+#define __PUBLIC_DATA__		__EXPORT__
+#else
 #if !_BLD_recsort && defined(__IMPORT__)
-#define extern	__IMPORT__
+#define __PUBLIC_DATA__		__IMPORT__
+#else
+#define __PUBLIC_DATA__
+#endif
 #endif
 
-extern Rsmethod_t*	Rsrasp;		/* radix + splay trees		*/
-extern Rsmethod_t*	Rsradix;	/* radix only			*/
-extern Rsmethod_t*	Rssplay;	/* splay insertion		*/
-extern Rsmethod_t*	Rsverify;	/* check for correct order	*/
+extern __PUBLIC_DATA__ Rsmethod_t* Rsrasp;	/* radix + splay trees	*/
+extern __PUBLIC_DATA__ Rsmethod_t* Rsradix;	/* radix only		*/
+extern __PUBLIC_DATA__ Rsmethod_t* Rssplay;	/* splay insertion	*/
+extern __PUBLIC_DATA__ Rsmethod_t* Rsverify;	/* verify order		*/
 
-#undef extern
+#undef __PUBLIC_DATA__
 _END_EXTERNS_
 
 _BEGIN_EXTERNS_	/* public functions */

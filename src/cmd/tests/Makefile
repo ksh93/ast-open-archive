@@ -11,6 +11,8 @@ LICENSE = since=1999,author=gsf
 
 :TEST: astconf opt strelapsed strtoi strntoi strtof strntof
 
+base64 :TEST: base64.c
+
 date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat
 	for i in $(*:N=*.dat)
 	do	DATEMSK=$(*:N=*.msk:/ /:/G) TZ=EST5EDT $(*:O=1) $(TESTDATEFLAGS) < $i
@@ -34,27 +36,6 @@ sfio :TEST: testsfio sftest.h +last \
 
 test.sf : testsfio sftest.h +last $$(*.ARGS:D:B:S=.c) .CLEARARGS
 	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
-
-tests : settings tests.out
-
-tests.out :
-	rm -f $(MAKEFILE:B:S=.ml)
-	(
-		cd ..
-		$(MAKE) $(-) 'dontcare test' recurse test
-	) > $(<) 2>&1
-	failed=$( egrep -c 'FAIL|failed|should fail| expecting ' $(<) || : )
-	case $failed in
-	1)	plural= ;;
-	*)	plural=s ;;
-	esac
-	{
-		echo
-		echo TEST $failed error$plural
-	} >> $(<)
-
-settings : .MAKE .VIRTUAL .FORCE
-	set keepgoing nowritestate
 
 :: RELEASE y2k.dat
 

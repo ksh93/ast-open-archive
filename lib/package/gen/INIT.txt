@@ -1,51 +1,141 @@
 The INIT package is required by all other packages. It contains the
 package command, support scripts, and utilities.
 
-Binary Package Installation Instructions:
+Source Package Installation Instructions:
 
   (1) Do not install packages as root/super-user. Although some components may
       have setuid executables, few must be owned by root. These are best
       changed manually when the security implications are understood.
   (2) Choose a package root directory and cd to it. This will be a local work
-      area for all packages. See (7) for installing packages for public use.
+      area for all packages.
+  (3) If your system does not have curl(1), hurl(1), or wget(1) then use
+      the alternate instructions for (3),(4),(5) in plan B below. Plan B
+      will install the hurl(1) script which works with ksh and modern bash.
+  (4) If the bin/package script does not exist then run:
+		test -d bin || mkdir bin
+		url=http://www.research.att.com/sw/download/package
+		(curl $url||wget -O bin/package $url||hurl $url) > bin/package
+		chmod +x bin/package
+  (5) Determine the list of package names you want from the download site, then
+      use the package(1) command to do the actual download:
+		bin/package setup source \
+			http://www.research.att.com/sw/download \
+			package-name ...
+      If the package root will contain only one architecture then you can
+      install in bin and lib instead of arch/HOSTTYPE/bin and arch/HOSTTYPE/lib
+      by running this instead:
+		bin/package setup flat source \
+			http://www.research.att.com/sw/download \
+			PACKAGE ...
+      To update the same packages from the same URL run:
+			bin/package setup source
+  (6) Build and install; all generated files are placed under arch/HOSTTYPE
+      ($INSTALLROOT), where HOSTTYPE is the output of bin/package (with no
+      arguments.) name=value arguments are supported; CC and debug=1 (compile
+      with -g instead of -O) are likely candidates. The output is written to
+      the terminal and captured in $INSTALLROOT/lib/package/gen/make.out:
+		bin/package make
+  (7) List make results and interesting errors:
+		bin/package results
+      Run the regression tests:
+		bin/package test
+      List test results and errors:
+		bin/package results test
+  (8) The generated binaries are position independent, i.e., they do not
+      contain hard-coded paths. However, commands with related files, like
+      file(1) and nmake(1), require the path of the bin directory to be
+      exported in PATH.
+  (9) You can run the binaries directly from the package root, or you can
+      install them in a public root after you are satisfied with the make and
+      test actions (requires the AT&T nmake(1) command):
+		bin/package install flat DIRECTORY PACKAGE
+      This will install in DIRECTORY/bin and DIRECTORY/lib. If you want to
+      preserve the arch/HOSTTYPE hierarchy under DIRECTORY then omit the
+      flat argument. If you don't have nmake(1) then the following will do a
+      flat install:
+		cd $INSTALLROOT
+		cp -p -r bin lib include DIRECTORY
+  (10) To summarize, after the first download the download, build, and
+      test cycle is:
+		bin/package setup source
+		bin/package make
+		bin/package test
+
+Source Package Installation Instructions -- Plan B:
+
   (3) Create the subdirectory lib/package/tgz and download all package archives
-      into that directory. The package(1) command maintains the contents of this
-      directory and deletes old archives as new ones are read in. Package
-      delta archives require the most recent base, so manually removing files
-      in this directory may invalidate future deltas.
-  (4) If the bin/package command does not exist then manually read the INIT
-      binary package:
-		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.HOSTTYPE.tgz |
-			tar xvf -
-      where HOSTTYPE is compatible with your host architecture. If your system
-      does not have tar(1) or gunzip(1) then download the ratz binary package,
-      install it, and manually read the INIT binary package:
+      into that directory.
+  (4) If the bin/package script does not exist then manually read the INIT
+      source package:
+		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.tgz | tar xvf -
+      If your system does not have tar(1) or gunzip(1) then download the ratz
+      source package, compile it, and manually read the INIT
+      source package:
 		mkdir bin
-		cp lib/package/tgz/ratz.YYYY-MM-DD.HOSTTYPE.exe bin/ratz
-		bin/ratz -lm < lib/package/tgz/INIT.YYYY-MM-DD.HOSTTYPE.tgz
+		cp lib/package/tgz/ratz.YYYY-MM-DD.c lib/package/tgz/ratz.c
+		cc -o bin/ratz lib/package/tgz/ratz.c
+		bin/ratz -lm < lib/package/tgz/INIT.YYYY-MM-DD.tgz
   (5) Read all unread package archive(s):
 		bin/package read
-      Both binary and source packages will be read by this step.
-  (6) Run the binaries by
-		export PATH=$INSTALLROOT/bin:$PATH
-		ksh
-      or by adding $INSTALLROOT/lib to the runtime linker search list
-      (the variable that is assigned the value ../lib in the
-      $INSTALLROOT/bin/.paths file.)
-  (7) Once you are satisfied with a package its binaries can be installed in
-      a public area by:
-		bin/package install DIRECTORY PACKAGE
-      or you can just copy the entire $INSTALLROOT directory tree. Users can
-      run the binaries by
-		export PATH=DIRECTORY/bin:$PATH
-		ksh
-      or by adding DIRECTORY/lib to the runtime linker search list.
-
+      Both source and binary packages will be read by this step.
 
 All recorded changes follow.
 
 :::::::: INIT ::::::::
 
+03-04-22 probe.win32: CC.DIALECT += "LIBPP -I-" for all cc's
+	 package.sh: fix admin write binary tarball snarf
+03-04-21 package.mk: package covered *.@(pkg|lic) too
+03-04-15 package.mk: don't generate incremental archives for lcl 
+	 package.mk: add incremental=[source:1 binary:0] archive control
+	 package.sh: generate $INSTALLROOT/bin/cc wrapper for CC != cc
+	 package.sh: admin must ditto lib/package/*.@(pkg|lic) too
+	 mamake.c: ignore time of ignore prereqs
+	 mamake.c: -D2 lists propagated times
+03-04-11 package.mk: tidy up cyg tarballs
+	 package.sh: fix old shell clash between get() and $get
+03-04-05 package.mk: restore *.inx generation somehow lost during cyg additions
+	 package.sh: add pthread_num_processors_np() last resort for cpu count
+	 package.sh: use `make believe' to accept mamake generated files
+	 package.sh: handle `make [make-flags] [target ...]'
+	 mamake.c: ignore -e
+03-03-21 package.mk: fix cyg old make typo
+	 package.sh: switch to `package setup' instructions
+03-03-19 package.sh: add registry checks for `host cpu'
+	 package.sh: `results failed' now lists core dump messages
+03-03-17 package.sh: on cygwin verify 'ntsec binmode' in $CYGWIN or die
+	 Makefile: install gcc wrapper if no cc
+	 package.mk: add :DETAILS: { :README: :EXPORT: :INSTALL: :TEST: } ops
+03-03-12 package.mk: add :DETAILS: for style-specific details
+03-03-11 package.sh: add beta setup/update support
+	 TEST.mk: add (TESTCC) prereq for .sh tests
+03-03-07 hurl.sh: add
+03-03-06 iffe.sh: fix lib win32 test cygwin vs native incompatibility
+	 iffe.sh: change internal stdio.h guard to handle C++ inline vs. macro
+03-03-03 package.sh: check for curl or wget for update
+	 package.sh: add setup action == update read make
+	 package.sh: fix packageroot() typo that showed up in non ~user shells
+	 mamake.c: treat name+=value args like name=value
+	 mamake.c: add ${var?*|value?match?no-match?}
+	 mamake.c: fix archive vs. dynamic bind logic
+03-02-28 package.sh: add the "cyg" (cygwin) package type
+	 package.mk: add "cyg" stubs, :CATEGORY: for category name(s)
+03-02-25 mamake.c: add -D4 system(3) debug trace
+03-02-24 package.mk: change --mismatch to --corrupt=accept
+03-02-14 ratz.c: add _WIN32 setmode([01],O_BINARY) and fopen "rb"/"wb"
+03-02-12 Makefile: handle getconf LIBPATH with host pattern
+03-01-31 package.mk: fix .lic search
+03-01-30 package.sh: handle { INIT ksh nmake } already installed elsewhere
+	 package.sh: admin handles command outside of $PACKAGEROOT/bin
+	 Makefile: install $(INSTALLROOT)/lib/make/package.mk
+03-01-28 package.sh: admin remote commands on one line to please syslog
+03-01-23 probe.win32: borland and mingw32 tweaks
+03-01-22 package.sh: fix $CC test to ignore set -x trace -- duh
+03-01-16 ditto.sh: tw --chop on by default
+03-01-14 package.sh: use /bin/cp to copy previous binaries to bin/ok/
+	 package.sh: admin now initiates remote exec and copy from local host
+03-01-12 package.sh: handle admin "xxx:" default root
+03-01-03 probe.win32: add /usr/include/borland path truncation workaround
 02-12-10 iffe.sh: add <&$nullin >&$nullout to checkread() $cc
 02-12-06 probe.win32: fix inlcude => include typo, add lcc lib
 	 probe.win32: CC.MAKE.OPTIONS = nativepp=0
@@ -80,7 +170,7 @@ All recorded changes follow.
 	 package.sh: tighten PACKAGE_USE logic PATH,LIBPATH,etc. validation
 	 iffe.sh: fix bug that didn't define mac variable on success
 02-09-22 package.sh: handle admin_action=ditto
-	 iffe.sh: --confix sizeof(foo) macro is SIZEOF_foo
+	 iffe.sh: --config sizeof(foo) macro is SIZEOF_foo
 	 iffe.sh: fix long.long test so it doesn't defeat uwin "typ long.long"
 	 mamprobe.sh: convert $("foo") nmake string constants
 02-09-21 mamprobe.sh: "-" info-path writes probe info to stdout

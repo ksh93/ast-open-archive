@@ -256,6 +256,82 @@ gzFile ZEXPORT gzfopen (fp, mode)
 }
 
 /* ===========================================================================
+     Reassociate a gzFile with the stdio stream fp.
+*/
+gzFile ZEXPORT gzreopen (gz, fp)
+    gzFile gz;
+    void* fp;
+{
+    gz_stream* s = (gz_stream*)gz;
+    FILE* sp = (FILE*)fp;
+    int err;
+
+    if (!s || !sp)
+       return (gzFile)Z_NULL;
+
+    s->stream.next_in = s->inbuf;
+    s->stream.next_out = s->outbuf;
+    s->stream.avail_in = 0;
+    s->stream.avail_out = Z_BUFSIZE;
+    s->z_err = Z_OK;
+    s->z_eof = 0;
+    s->crc = crc32(0L, Z_NULL, 0);
+#if _PACKAGE_ast
+    s->fatal = 0;
+    s->nocrc = 0;
+    s->previous_OUT = 0;
+    s->verified = 0;
+#endif
+    inflateReset(&(s->stream));
+    s->stream.total_in = 0;
+    s->stream.total_out = 0;
+#ifdef ZINTERNAL_STATE
+    s->stream.total_IN = 0;
+    s->stream.total_OUT = 0;
+#endif
+    s->msg = NULL;
+    s->transparent = 0;
+
+    if (s->mode == 'w') {
+#ifdef NO_DEFLATE
+        err = Z_STREAM_ERROR;
+#else
+#if _PACKAGE_ast
+        s->nocrc = 0;
+#endif
+        err = deflateReset(&(s->stream));
+#endif
+    } else {
+        err = inflateReset(&(s->stream));
+    }
+    if (err != Z_OK) {
+        return (gzFile)Z_NULL;
+    }
+
+    errno = 0;
+    if (!(s->file = fp)) {
+        return (gzFile)Z_NULL;
+    }
+    if (s->mode == 'w') {
+        /* Write a very simple .gz header:
+         */
+        fprintf(s->file, "%c%c%c%c%c%c%c%c%c%c", gz_magic[0], gz_magic[1],
+             Z_DEFLATED, 0 /*flags*/, 0,0,0,0 /*time*/, 0 /*xflags*/, OS_CODE);
+	s->startpos = 10L;
+	/* We use 10L instead of ftell(s->file) to because ftell causes an
+         * fflush on some systems. This version of the library doesn't use
+         * startpos anyway in write mode, so this initialization is not
+         * necessary.
+         */
+    } else {
+	check_header(s); /* skip the .gz header */
+	s->startpos = (ftell(s->file) - s->stream.avail_in);
+    }
+    
+    return (gzFile)s;
+}
+
+/* ===========================================================================
  * Update the compression level and strategy
  */
 int ZEXPORT gzsetparams (file, level, strategy)
@@ -626,6 +702,44 @@ int ZEXPORT gzwrite (file, buf, len)
    control of the format string, as in fprintf. gzprintf returns the number of
    uncompressed bytes actually written (0 in case of error).
 */
+#if _PACKAGE_ast
+
+#include <sfstr.h>
+
+#ifdef __STDC__
+int ZEXPORTVA gzprintf (gzFile file, const char *format, /* args */ ...)
+#else
+int ZEXPORTVA gzprintf ()
+#endif
+{
+#ifndef __STDC__
+	va_dcl
+	gzFile file;
+	char *format;
+#endif
+	va_list	ap;
+	Sfio_t*	sp;
+	ssize_t	n;
+
+	if (!(sp = sfstropen()))
+		return -1;
+#ifdef __STDC__
+	va_start(ap, format);
+#else
+	va_start(ap);
+	file = va_arg(ap, gzFile);
+	format = va_arg(ap, char*);
+#endif
+	n = sfvprintf(sp, format, ap);
+	va_end(ap);
+	if (n >= 0)
+		n = gzwrite(file, sfstrbase(sp), n);
+	sfclose(sp);
+	return n;
+}
+
+#else
+
 #ifdef STDC
 #include <stdarg.h>
 
@@ -671,6 +785,7 @@ int ZEXPORTVA gzprintf (file, format, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10,
 
     return gzwrite(file, buf, len);
 }
+#endif
 #endif
 
 /* ===========================================================================

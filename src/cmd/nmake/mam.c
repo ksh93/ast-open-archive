@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -158,10 +158,11 @@ mampop(Sfio_t* sp, register struct rule* r, long flags)
 	struct list*	p;
 
 	s = staterule(RULE, r, NiL, 0);
-	sfprintf(sp, "%sdone %s%s%s%s\n"
+	sfprintf(sp, "%sdone %s%s%s%s%s\n"
 		, state.mam.label
 		, mamname(r)
 		, (r->property & P_dontcare) ? " dontcare" : null
+		, (r->property & P_ignore) ? " ignore" : null
 		, (flags & P_joint) ? " generated" : null
 		, (flags & P_virtual) && !(r->property & P_state) && ((r->property & P_virtual) || !(r->dynamic & (D_entries|D_member|D_membertoo|D_regular)) && (!s || !s->time)) ? " virtual" : s && (s->dynamic & D_built) ? " generated" : null
 		);

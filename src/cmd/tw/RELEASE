@@ -1,3 +1,4 @@
+02-01-10 tw,find: add sfsync(sfstdout) check
 02-11-07 tw: add type==DOOR (solaris S_ISDOOR)
 	 find: add -type D (solaris S_ISDOOR)
 02-07-17 updatedb.sh: add --local to skip non-local directories

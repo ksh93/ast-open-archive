@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2002 AT&T Corp.                *
+*                Copyright (c) 1984-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -924,7 +924,7 @@ compile(char* objfile, char* select)
 	if (state.mam.dynamic || state.mam.regress)
 	{
 		mampush(state.mam.out, r, P_force);
-		sfprintf(state.mam.out, "%sexec - : compile into %s object\n", state.mam.label, error_info.id);
+		sfprintf(state.mam.out, "%sexec %s : compile into %s object\n", state.mam.label, state.mam.dynamic ? mamname(r) : null, error_info.id);
 		mampop(state.mam.out, r, 0);
 	}
 	if (state.stateview == 0 && object.garbage && object.garbage > cs.rules)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -65,8 +65,8 @@ devpath(char* path, int size, int blk, register struct stat* st)
 	{
 		while (entry = readdir(dirp))
 		{
-#if _mem_d_fileno_dirent
-			if (n && entry->d_fileno != st->st_ino)
+#ifdef D_FILENO
+			if (n && D_FILENO(entry) != st->st_ino)
 				continue;
 #endif
 			if (*entry->d_name == '.' || D_NAMLEN(entry) + (base - path) + 1 > size)
@@ -89,7 +89,7 @@ devpath(char* path, int size, int blk, register struct stat* st)
 				}
 				continue;
 			}
-#if !_mem_d_fileno_dirent
+#ifndef D_FILENO
 			if (n && tst.st_ino != st->st_ino)
 				continue;
 #endif

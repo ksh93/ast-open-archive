@@ -124,6 +124,7 @@ edstop(void)
 	else {
 		ibuf = 0;
 		if (stat(state.path.mail, &st) >= 0 && st.st_size > state.mailsize) {
+			temp = state.path.path;
 			filetemp(temp, 'B', 0);
 			if (!(obuf = fileopen(temp, "Ew"))) {
 				relsesigs();

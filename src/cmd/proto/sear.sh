@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1990-2002 AT&T Corp.                #
+#                Copyright (c) 1990-2003 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -39,7 +39,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
-[+DESCRIPTION?\bsea\b generates a win32 self extracting archive
+[+DESCRIPTION?\bsear\b generates a win32 self extracting archive
 	that can be used to install win32 files and applications.
 	Each \afile\a operand is a \btgz\b (\btar\b(1) \bgzip\b(1))
 	archive that is appended to the self extracting archive.

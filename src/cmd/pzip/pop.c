@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pop (AT&T Labs Research) 1999-06-22 $\n]"
+"[-?\n@(#)$Id: pop (AT&T Labs Research) 2003-04-05 $\n]"
 USAGE_LICENSE
 "[+NAME?pop - operate on partioned fixed row and column data]"
 "[+DESCRIPTION?\bpop\b operates on partitioned fixed row and column data files."
@@ -119,6 +119,7 @@ USAGE_LICENSE
 #define OP_MAP		0x0020
 #define OP_NL		0x0040
 #define OP_UNDIFF	0x0100
+#define OP_VERBOSE	0x0200
 
 typedef struct
 {
@@ -195,6 +196,9 @@ cut(register Pz_t* pz, register Pzpart_t* pp, int op, register size_t* map, size
 	register unsigned char*	ib;
 	register unsigned char*	ob;
 
+	if (op & OP_VERBOSE)
+		for (n = 0; n < m; n++)
+			error(0, "map %3d => %3d", map[n], n);
 	if (!(pz->wrk = vmnewof(pz->vm, 0, unsigned char, pz->win, 0)))
 		error(ERROR_SYSTEM|3, "out of space");
 	for (;;)
@@ -519,6 +523,7 @@ main(int argc, char** argv)
 			op |= OP_UNDIFF;
 			continue;
 		case 'v':
+			op |= OP_VERBOSE;
 			flags |= PZ_VERBOSE;
 			continue;
 		case 'x':

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2002-09-09 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2003-03-21 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -174,11 +174,18 @@ USAGE_LICENSE
 "	[a:across|horizontal?Multi-column across the page.]"
 "	[c:comma?Comma separated names across the page.]"
 "	[l:long|verbose?Long listing.]"
-"	[s:single-column?One column down the page.]"
-"	[m:multi-column|vertical?Multi-column by column.]"
+"	[v:multi-column|vertical?Multi-column by column.]"
+"	[1:single-column?One column down the page.]"
 "}"
-"[z:numeric-time?List both full date and full time in numeric form.]"
-"[Z:full-time?List both full date and full time.]"
+"[z:time-style?List the time according to \astyle\a:]:[style]{"
+"	[i:iso?Equivalent to \b+%K\b.]"
+"	[10:posix-iso?No change for the C or posix locales, \biso\b otherwise.]"
+"	[f:full-iso?Equivalent to \b+%Y-%m-%d+%H:%M:%S.000000%z\b.]"
+"	[11:posix-full-iso?No change for the C or posix locales, \bfull-iso\b"
+"		otherwise.]"
+"	[l:locale?Equivalent to \b+%c\b.]"
+"	[12:+\aformat\a?A \bdate\b(1) +\aformat\a.]"
+"}"
 "[1:one-column?List one file per line.]"
 "[L:logical|follow?Follow symbolic links. The default is determined by"
 "	\bgetconf PATH_RESOLVE\b.]"
@@ -188,11 +195,13 @@ USAGE_LICENSE
 "	\bgetconf PATH_RESOLVE\b.]"
 "[101:dump?Print the generated \b--format\b string on the standard output"
 "	and exit.]"
+"[102:full-time?Equivalent to \b--time-style=full-iso\b.]"
 
 "\n"
 "\n[ file ... ]\n"
 "\n"
 "[+SEE ALSO?\bchmod\b(1), \bfind\b(1), \bgetconf\b(1), \btw\b(1)]"
+"[+BUGS?Can we add options to something else now?]"
 ;
 
 #include <ast.h>
@@ -384,15 +393,15 @@ printable(register char* s)
 		if (!(state.lsflags & LS_QUOTE))
 			return fmtesc(s);
 		if (state.lsflags & LS_SHELL)
-			return fmtquote(s, "$'", "'", strlen(s), !!(state.lsflags & LS_ALWAYS));
-		return fmtquote(s, "\"", "\"", strlen(s), 1);
+			return fmtquote(s, "$'", "'", strlen(s), (state.lsflags & LS_ALWAYS) ? FMT_ALWAYS : 0);
+		return fmtquote(s, "\"", "\"", strlen(s), FMT_ALWAYS);
 	}
 	c = strlen(s) + 4;
 	if (c > prsize)
 	{
 		prsize = roundof(c, 512);
 		if (!(prdata = newof(prdata, char, prsize, 0)))
-			error(3, "out of space [printable data]");
+			error(3, "out of space");
 	}
 	t = prdata;
 	if (state.lsflags & LS_QUOTE)
@@ -435,6 +444,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	static Sfio_t*		mp;
 	static const char	fmt_mode[] = "mode";
 	static const char	fmt_perm[] = "perm";
+	static const char	fmt_time[] = "time";
 
 	if (lp = (List_t*)handle)
 	{
@@ -454,7 +464,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			return 0;
 		}
 		if (!(kp = newof(0, Key_t, 1, 0)))
-			error(3, "out of space [key]");
+			error(3, "out of space");
 		kp->name = hashput(state.keys, 0, kp);
 		kp->macro = getenv(fp->t_str + 1);
 		kp->index = KEY_environ;
@@ -464,7 +474,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	{
 		kp->disable = 1;
 		if (!mp && !(mp = sfstropen()))
-			error(3, "out of space [macro]");
+			error(3, "out of space");
 		sfkeyprintf(mp, handle, kp->macro, key, NiL);
 		s = sfstruse(mp);
 		kp->disable = 0;
@@ -555,7 +565,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			{
 				txtsize = roundof(st->st_size + 1, 512);
 				if (!(txtdata = newof(txtdata, char, txtsize, 0)))
-					error(3, "out of space [link text]");
+					error(3, "out of space");
 			}
 			if (*ftw->name == '/' || !lp->dirnam)
 				dirnam = ftw->name;
@@ -682,12 +692,20 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	}
 	else if (fp->fmt == 's' && arg)
 	{
-		if (strneq(arg, fmt_mode, 4))
+		if (strneq(arg, fmt_mode, sizeof(fmt_mode) - 1))
 			*ps = fmtmode(n, 1);
-		else if (strneq(arg, fmt_perm, 4))
+		else if (strneq(arg, fmt_perm, sizeof(fmt_perm) - 1))
 			*ps = fmtperm(n & S_IPERM);
-		else if (strneq(arg, state.timefmt, 4))
-			*ps = fmttime((*(arg + 4) == '=' ? arg : state.timefmt) + 5, (time_t)n);
+		else
+		{
+			if (strneq(arg, fmt_time, sizeof(fmt_time) - 1))
+			{
+				arg += sizeof(fmt_time) - 1;
+				if (*arg == '=')
+					arg++;
+			}
+			*ps = fmttime(*arg ? arg : state.timefmt, (time_t)n);
+		}
 	}
 	else
 		*pn = n;
@@ -1094,6 +1112,7 @@ main(int argc, register char** argv)
 	register char*	s;
 	Key_t*		kp;
 	Sfio_t*		fmt;
+	long		lsflags;
 	int		dump = 0;
 
 	static char	fmt_color[] = "%(mode:case:d*:\\E[01;34m%(name)s\\E[0m:l*:\\E[01;36m%(name)s\\E[0m:*x*:\\E[01;32m%(name)s\\E[0m:*:%(name)s)s";
@@ -1107,9 +1126,9 @@ main(int argc, register char** argv)
 	error_info.id = s;
 	state.ftwflags = ftwflags() | FTW_CHILDREN;
 	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()))
-		error(3, "out of space [tmp]");
+		error(3, "out of space");
 	if (!(state.keys = hashalloc(NiL, HASH_name, "keys", 0)))
-		error(3, "out of space [hash]");
+		error(3, "out of space");
 	for (n = 1; n < elementsof(keys); n++)
 		hashput(state.keys, keys[n].name, &keys[keys[n].index]);
 	hashset(state.keys, HASH_ALLOCATE);
@@ -1127,7 +1146,8 @@ main(int argc, register char** argv)
 		state.lsflags |= LS_COLUMNS|LS_PRINTABLE;
 	state.endflags = state.flags;
 	state.blocksize = 512;
-	state.timefmt = "time=%?%l";
+	state.timefmt = "%?%l";
+	lsflags = state.lsflags;
 	while (n = optget(argv, usage))
 	{
 		switch (n)
@@ -1243,7 +1263,40 @@ main(int argc, register char** argv)
 				}
 			break;
 		case 'z':
-			state.timefmt = "time=%K";
+			switch (opt_info.num)
+			{
+			case -10:
+				if (!strcmp(setlocale(LC_TIME, NiL), "C"))
+					break;
+				/*FALLTHROUGH*/
+			case 'i':
+				state.timefmt = "%K";
+				break;
+			case -11:
+				if (!strcmp(setlocale(LC_TIME, NiL), "C"))
+					break;
+				/*FALLTHROUGH*/
+			case 'f':
+				state.timefmt = "%Y-%m-%d+%H:%M:%S.000000%z";
+				break;
+			case 'l':
+				state.timefmt = "%c";
+				break;
+			case -12:
+				s = opt_info.arg + 1;
+				if (strchr(s, '\n'))
+				{
+					/*
+					 * gnu compatibility
+					 */
+
+					s = sfprints("%%Q\n%s\n", s);
+					if (!s || !(s = strdup(s)))
+						error(ERROR_SYSTEM|3, "out of space");
+				}
+				state.timefmt = s;
+				break;
+			}
 			break;
 		case 'A':
 			state.lsflags |= LS_MOST;
@@ -1268,7 +1321,7 @@ main(int argc, register char** argv)
 				if (!s)
 					break;
 				if (!(kp = newof(0, Key_t, 1, 0)))
-					error(3, "out of space [key]");
+					error(3, "out of space");
 				kp->name = hashput(state.keys, 0, kp);
 			}
 			if (kp->macro = s)
@@ -1345,27 +1398,18 @@ main(int argc, register char** argv)
 			state.sortflags = LS_NOSORT;
 			break;
 		case 'V':
-			if (!(s = opt_info.arg))
-				s = "f";
-			else
-				while (*s == '-')
-					s++;
-			switch (*s)
+			switch (opt_info.num)
 			{
-			case 'a':
-			case 'f':
 			case 't':
-				if ((s[0] == 'f' || s[1] == 'l' || isatty(1)) && (kp = (Key_t*)hashget(state.keys, "name")))
+				if (!isatty(1))
+					break;
+				/*FALLTHROUGH*/
+			case 'a':
+				if (kp = (Key_t*)hashget(state.keys, "name"))
 				{
 					stresc(kp->macro = fmt_color);
 					state.lsflags |= LS_STAT;
 				}
-				break;
-			case 'n':
-			case 0:
-				break;
-			default:
-				error(2, "%s: unknown %s key", opt_info.arg, opt_info.name);
 				break;
 			}
 			break;
@@ -1385,11 +1429,9 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_EXTENSION;
 			break;
 		case 'Y':
-			for (s = opt_info.arg; *s == '-'; s++);
-			switch (*s++)
+			switch (opt_info.num)
 			{
 			case 'a':
-			case 'h':
 				state.lsflags |= LS_ACROSS|LS_COLUMNS;
 				break;
 			case 'c':
@@ -1398,36 +1440,23 @@ main(int argc, register char** argv)
 			case 'l':
 				state.lsflags |= LS_LONG;
 				break;
-			case 's':
-			case '1':
-				state.lsflags &= ~(LS_ACROSS|LS_COLUMNS);
-				break;
 			case 'v':
-				if (*s++ != 'e' || *s++ != 'r' || *s++ != 't')
-				{
-					state.lsflags |= LS_LONG;
-					break;
-				}
-				/*FALLTHROUGH*/
-			case 'x':
 				state.lsflags &= ~LS_ACROSS;
 				state.lsflags |= LS_COLUMNS;
 				break;
-			case 0:
-				break;
-			default:
-				error(2, "%s: unknown %s key", opt_info.arg, opt_info.name);
+			case '1':
+				state.lsflags &= ~(LS_ACROSS|LS_COLUMNS);
 				break;
 			}
-			break;
-		case 'Z':
-			state.timefmt = "time=%c";
 			break;
 		case '1':
 			state.lsflags &= ~(LS_COLUMNS|LS_PRINTABLE);
 			break;
 		case -101:
 			dump = 1;
+			break;
+		case -102:
+			state.timefmt = "%c";
 			break;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -1445,6 +1474,8 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
+	if (state.lsflags == (lsflags|LS_TIME))
+		state.ftwflags |= FTW_SEEDOTDIR; /* keep configure happy */
 	if (state.lsflags & LS_DIRECTORY)
 		state.lsflags &= ~LS_RECURSIVE;
 	if (!state.sortflags)

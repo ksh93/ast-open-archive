@@ -1,4 +1,4 @@
-:PACKAGE: ast # + cpp
+:PACKAGE: ast cpp:force
 
 LICENSE = since=1984,author=gsf
 
@@ -12,7 +12,8 @@ DEBUG == 1
 RULES = Makerules.mk $(ALTRULES)
 RULESFILES = Scanrules.mk S.mk SYSTEM.mk TABLE.mk \
 		debug.mk mkservice.mk yacc.mk \
-		pkg-tcl.mk pkg-X11.mk rules-win32.mk
+		rules-win32.mk \
+		pkg-tcl.mk pkg-X11.mk pkg-freetype.mk
 RULESDIR = $(LIBDIR)/$(ID)
 
 IDNAME == "$(ID)"
@@ -42,6 +43,8 @@ convert :: convert.c
 
 maketest :: maketest.sh
 
+:TEST: nmake
+
 Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 	{
 		echo '/* : : generated from $(cctype) assertions : : */'
@@ -65,7 +68,7 @@ Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 		( /bin/mkdir -p /tmp/mkl$$/mk/dir ) 2>/dev/null &&
 		test ! -d ./-p &&
 		_feature_="$_feature_ mkdir-p"
-		rm -rf ./-p /tmp/mkl$$
+		rm -rf ./-p /tmp/mkl$$ || true
 		if	( ed ) < /dev/null > /dev/null 2>&1
 		then	STDED=ed
 		else	STDED=ex
@@ -88,7 +91,7 @@ Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 			shift
 		done
 		if	test -x /bin/cat.exe
-		then	if	/bin/cat /bin/cat >/dev/null 2>&1
+		then	if	/bin//cat /bin/cat >/dev/null 2>&1
 			then	: ok
 			else	: .exe challenged
 				for n in STDCAT STDCMP STDCP STDLN STDMV STDRM

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -89,10 +89,8 @@ pathbin(void)
 
 #if _lib_fork || _lib_vfork
 #undef	_lib_spawnve
-#undef	_map_spawnve
 #endif
 
-#include "spawnve.c"
 #include "spawnveg.c"	/* follows spawnve.c because of #undef's */
 
 #include "gross.c"

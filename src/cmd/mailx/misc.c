@@ -666,3 +666,121 @@ strncopy(register char* t, register const char* f, size_t n)
 	} while (*t++ = *f++);
 	return t - 1;
 }
+
+/*
+ * quote s into sp according to sh syntax
+ */
+
+void
+shquote(register Sfio_t* sp, char* s)
+{
+	register char*	t;
+	register char*	b;
+	register int	c;
+	register int	q;
+
+	if (*s == '"' && *(s + strlen(s) - 1) == '"')
+	{
+		sfprintf(sp, "\\\"%s\\\"", s);
+		return;
+	}
+	q = 0;
+	b = 0;
+	for (t = s;;)
+	{
+		switch (c = *t++)
+		{
+		case 0:
+			break;
+		case '\n':
+		case ';':
+		case '&':
+		case '|':
+		case '<':
+		case '>':
+		case '(':
+		case ')':
+		case '[':
+		case ']':
+		case '{':
+		case '}':
+		case '*':
+		case '?':
+		case ' ':
+		case '\t':
+		case '\\':
+			q |= 4;
+			continue;
+		case '\'':
+			q |= 1;
+			if (q & 2)
+				break;
+			continue;
+		case '"':
+		case '$':
+			q |= 2;
+			if (q & 1)
+				break;
+			continue;
+		case '=':
+			if (!q && !b && *(b = t) == '=')
+				b++;
+			continue;
+		default:
+			continue;
+		}
+		break;
+	}
+	if (!q)
+		sfputr(sp, s, -1);
+	else if (!(q & 1))
+	{
+		if (b)
+			sfprintf(sp, "%-.*s'%s'", b - s, s, b);
+		else
+			sfprintf(sp, "'%s'", s);
+	}
+	else if (!(q & 2))
+	{
+		if (b)
+			sfprintf(sp, "%-.*s\"%s\"", b - s, s, b);
+		else
+			sfprintf(sp, "\"%s\"", s);
+	}
+	else
+		for (t = s;;)
+			switch (c = *t++)
+			{
+			case 0:
+				return;
+			case '\n':
+				sfputc(sp, '"');
+				sfputc(sp, c);
+				sfputc(sp, '"');
+				break;
+			case ';':
+			case '&':
+			case '|':
+			case '<':
+			case '>':
+			case '(':
+			case ')':
+			case '[':
+			case ']':
+			case '{':
+			case '}':
+			case '$':
+			case '*':
+			case '?':
+			case ' ':
+			case '\t':
+			case '\\':
+			case '\'':
+			case '"':
+				sfputc(sp, '\\');
+				/*FALLTHROUGH*/
+			default:
+				sfputc(sp, c);
+				break;
+			}
+}

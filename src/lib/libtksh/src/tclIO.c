@@ -403,7 +403,7 @@ static int sfBufferSize(f)
 	Sfio_t *f;
 {
 	sfsetbuf(f,(Void_t *) 1,0);
-	return sfslen();
+	return sfvalue(f);
 }
 
 static sfsizeret_t sfReadFile(f, buf, size, disc)
@@ -484,7 +484,7 @@ static int sfWriteTmp(chanPtr)
 
 		sfseek(asyncFile, chanPtr->sfTmpPos, 0);
 		b = sfreserve(asyncFile,-1,0);
-		l = sfslen();
+		l = sfvalue(asyncFile);
 
 		written =  (chanPtr->typePtr->outputProc)(chanPtr->instanceData,
 			(void *) b, l, &errorCode);
@@ -3779,7 +3779,7 @@ Tcl_Gets(chan, lineRead)
 			if (! (buf = sfgetr(chanPtr->sfPtr, c, -1)))
 				break;
 		}
-		lineLen = sfslen();	/* Length of line including newline */
+		lineLen = sfvalue(chanPtr->sfPtr);	/* Length of line including newline */
 		Tcl_DStringSetLength(lineRead, offset + lineLen + crFlag);
 		dbuf = Tcl_DStringValue(lineRead) + offset;
 		memcpy(dbuf, buf, lineLen);

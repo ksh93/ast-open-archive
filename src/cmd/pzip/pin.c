@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pin (AT&T Labs Research) 2001-12-05 $\n]"
+"[-?\n@(#)$Id: pin (AT&T Labs Research) 2002-12-25 $\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -83,6 +83,7 @@ USAGE_LICENSE
 "[l:level?Sets the \agzip\a compression level to \alevel\a. Levels range"
 "	from 1 (fastest, worst compression) to 9 (slowest, best compression).]#"
 "		[level:=6]"
+"[o:sort?Sort the window data by row before inducing the partition.]"
 "[p:partition?Specifies the data row size and the high frequency column"
 "	partition groups and permutation. The partition file is a sequence"
 "	of lines. Comments start with # and continue to the end of the line."
@@ -216,6 +217,7 @@ static struct
 	int		cache;
 	int		level;
 	int		pairs;
+	int		sort;
 	int		test;
 	int		window;
 	int		verbose;
@@ -340,6 +342,16 @@ byrate(const void* va, const void* vb)
 	if (a->member > b->member)
 		return 1;
 	return 0;
+}
+
+/*
+ * order row lo to hi
+ */
+
+static int
+byrow(const void* va, const void* vb)
+{
+	return memcmp(va, vb, state.sort);
 }
 
 /*
@@ -593,16 +605,19 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 							state.stats[j].frequency++;
 						}
 				n = rows;
-				while ((r = sfread(ip, s = buf, row)) == row)
+				while ((r = sfread(ip, s = buf, state.window)) > 0)
 				{
-					n++;
-					for (j = 0; j < row; j++)
-						if (state.stats[j].prev != (c = *s++))
-						{
-							state.stats[j].prev = c;
-							state.stats[j].frequency++;
-						}
-					if (n > 10000000L)
+					r /= row;
+					if (state.sort)
+						qsort(s, r, row, byrow);
+					for (i = 0; i < r; i++)
+						for (j = 0; j < row; j++)
+							if (state.stats[j].prev != (c = *s++))
+							{
+								state.stats[j].prev = c;
+								state.stats[j].frequency++;
+							}
+					if ((n += r) > 10000000L)
 					{
 						/*
 						 * that'll do pig
@@ -756,7 +771,7 @@ list(Sfio_t* sp, int* lab, size_t row)
 			sfprintf(sp, " ");
 		for (j = i + 1; j < row && lab[j] == g && state.map[j] == (state.map[j - 1] + 1); j++);
 		sfprintf(sp, "%d", state.map[i]);
-		if ((j - i) > 1)
+		if (j > (i + 2))
 		{
 			i = j - 1;
 			sfprintf(sp, "-%d", state.map[i]);
@@ -1471,6 +1486,9 @@ main(int argc, char** argv)
 		case 'l':
 			state.level = opt_info.num;
 			continue;
+		case 'o':
+			state.sort = 1;
+			continue;
 		case 'p':
 			partition = opt_info.arg;
 			continue;
@@ -1646,6 +1664,11 @@ main(int argc, char** argv)
 		error(3, "input empty");
 	rows = n / row;
 	state.window = rows * row;
+	if (state.sort)
+	{
+		state.sort = row;
+		qsort(dat, rows, row, byrow);
+	}
 
 	/*
 	 * set up the cache file
@@ -1740,6 +1763,8 @@ main(int argc, char** argv)
 	if (maxgrp)
 		sfprintf(sfstdout, "# group size limited to %d columns\n", maxgrp);
 	sfprintf(sfstdout, "# row %d window %d compression level %d\n", rec, state.window, state.level);
+	if (state.sort)
+		sfprintf(sfstdout, "\nsort=1\n");
 	if (high)
 		sfprintf(sfstdout, "\n%d\t# high frequency %d\n", rec, row);
 	else

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2002 AT&T Corp.                *
+*                Copyright (c) 1987-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -598,7 +598,8 @@ listentry(register File_t* f)
 				sfprintf(sfstderr, "\n\n");
 				return;
 			}
-			if ((p = (state.in->io->count * 100) / state.meter.size) > 100)
+			n = state.in->io->count > 1024 ? 10 : 0;
+			if ((p = ((state.in->io->count >> n) * 100) / (state.meter.size >> n)) > 100)
 				p = 100;
 			n = listprintf(state.tmp.str, state.in, f, state.listformat);
 			s = sfstruse(state.tmp.str);

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -31,8 +31,14 @@
  * fall back to /bin/ps if no support -- and you better match their args!
  */
 
+#define FIELDS_default	"pid,tty,time,command"
+#define FIELDS_c	"pid,class,pri,tty,time,command"
+#define FIELDS_f	"user,pid,ppid,start,tty,time,args"
+#define FIELDS_j	"pid,pgrp,sid,tty,time,command"
+#define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
+
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2002-06-25 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2003-03-06 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -44,13 +50,15 @@ USAGE_LICENSE
 "	arguments accept either space or comma separators.]"
 
 "[a:interactive?List all processes associated with terminals.]"
-"[c:class?Equivalent to \b--fields=\"pid class pri tty time command\"\b.]"
+"[c:class?Equivalent to \b--fields=" FIELDS_c "\b.]"
+"[C:children?Display the process tree hierarchy, including the children"
+"	of all selected processes, in the \bCOMMAND\b field list.]"
 "[d:no-session?List all processes except session leaders.]"
 "[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
 "	override internal \b--format\b identifiers.]:[key[=value]]]"
 "[e|A:all?List all processes.]"
-"[f:full?Equivalent to \b--fields=\"user pid ppid start tty time args\"\b.]"
+"[f:full?Equivalent to \b--fields=" FIELDS_f "\b.]"
 "[F:format?Append to the listing format string (if \b--format\b is specified"
 "	then \b--fields\b and all options that modify \b--fields\b are"
 "	ignored.) The \bdf\b(1), \bls\b(1) and \bpax\b(1) commands also have"
@@ -71,27 +79,29 @@ USAGE_LICENSE
 "[G:groups?List processes with real group id names or numbers in the \agroup\a"
 "	list.]:[group...]"
 "[h!:heading?Output a heading line.]"
-"[j:jobs?Equivalent to \b--fields=\"pid pgrp sid tty time command\"\b.]"
-"[l:long?Equivalent to \b--fields=\"flags state user pid ppid pri nice"
-"	size rss wchan tty time command\"\b.]"
+"[j:jobs?Equivalent to \b--fields=" FIELDS_j "\b.]"
+"[l:long?Equivalent to \b--fields=" FIELDS_l "\b.]"
+"[L:leaders?List session leaders.]"
 "[n:namelist?Specifies an alternate system namelist \afile\a. Ignored by"
 "	this implementation.]"
-"[N:default?Equivalent to \b--fields=\"pid tty time command\"\b. This is the"
+"[N:default?Equivalent to \b--fields=" FIELDS_default "\b. This is the"
 "	format when \b--fields\b is not specified.]"
 "[o:fields?(\b--format\b is more general.) List information according to"
-"	\aformat\a. Multiple \b--fields\b options may be specified; the"
+"	\akey\a. Multiple \b--fields\b options may be specified; the"
 "	resulting format is a left-right ordered list with duplicate entries"
 "	deleted from the right. The default width can be overriden by"
 "	appending \a+width\a to \akey\a, and the default \alabel\a can be"
 "	overridden by appending \a=label\a to \akey\a. The keys, labels and"
 "	widths are listed under \b--format\b.]:[key[+width]][=label]]...]"
 "[p:pids?List processes in the \apid\a list.]:[pid...]"
+"[P:parents?Display the process tree hierarchy, including the parents"
+"	of all selected processes, in the \bCOMMAND\b field list.]"
 "[r|R:recursive?Recursively list the children of all selected processes.]"
 "[s:sessions?List processes with session leaders in the \asid\a list.]:[sid...]"
 "[t:terminals|ttys?List processes with controlling terminals in the \atty\a"
 "	list.]:[tty...]"
-"[T:tree|forest?Display the process tree hierarchy in the \bCOMMAND\b"
-"	field list; implies \b--recursive\b.]"
+"[T:tree|forest?Display the process tree hierarchy, including the parents and"
+"	children of all selected processes, in the \bCOMMAND\b field list.]"
 "[u|U:users?List processes with real user id names or numbers in the \auser\a"
 "	list.]:[user...]"
 "[v:verbose?List verbose error messages for inaccessible processes.]"
@@ -135,24 +145,26 @@ USAGE_LICENSE
 #define KEY_flags		7
 #define KEY_gid			8
 #define KEY_group		9
-#define KEY_nice		10
-#define KEY_npid		11
-#define KEY_pgrp		12
-#define KEY_pid			13
-#define KEY_ppid		14
-#define KEY_pri			15
-#define KEY_refcount		16
-#define KEY_rss			17
-#define KEY_sid			18
-#define KEY_size		19
-#define KEY_start		20
-#define KEY_state		21
-#define KEY_tgrp		22
-#define KEY_time		23
-#define KEY_tty			24
-#define KEY_uid			25
-#define KEY_user		26
-#define KEY_wchan		27
+#define KEY_job			10
+#define KEY_nice		11
+#define KEY_npid		12
+#define KEY_pgrp		13
+#define KEY_pid			14
+#define KEY_ppid		15
+#define KEY_pri			16
+#define KEY_proc		17
+#define KEY_refcount		18
+#define KEY_rss			19
+#define KEY_sid			20
+#define KEY_size		21
+#define KEY_start		22
+#define KEY_state		23
+#define KEY_tgrp		24
+#define KEY_time		25
+#define KEY_tty			26
+#define KEY_uid			27
+#define KEY_user		28
+#define KEY_wchan		29
 
 typedef struct Key_s			/* format key			*/
 {
@@ -192,16 +204,16 @@ typedef struct Ps_s			/* process state		*/
 	struct Ps_s*	sibling;	/* sibling list			*/
 	struct Ps_s*	root;		/* (partial) root list		*/
 	char*		user;		/* user name			*/
-	pid_t		pid;		/* pid				*/
+	Pss_id_t	pid;		/* pid				*/
 	int		level;		/* process tree level		*/
-	int		must;		/* 1:must show -1:don't show	*/
 	int		shown;		/* list state			*/
 } Ps_t;
 
 typedef struct State_s			/* program state		*/
 {
+	int		children;	/* recursively list all children*/
 	int		heading;	/* output heading		*/
-	int		recursive;	/* recursively list all children*/
+	int		parents;	/* recursively list all parents	*/
 	int		tree;		/* list proc tree		*/
 	int		hex;		/* output optional hex key form	*/
 	int		width;		/* output width			*/
@@ -283,10 +295,10 @@ static Key_t	keys[] =
 	{
 		"flags",
 		"F",
-		"State flags.",
+		"State flags (octal and additive).",
 		PSS_flags,
 		KEY_flags,
-		2
+		3
 	},
 	{
 		"gid",
@@ -307,6 +319,15 @@ static Key_t	keys[] =
 		8, 0,
 		0,0,0,
 		KEY_gid
+	},
+	{
+		"job",
+		"JOB",
+		"Job id.",
+		PSS_job,
+		KEY_job,
+		5, PID_MAX,
+		1,0,0
 	},
 	{
 		"nice",
@@ -358,6 +379,14 @@ static Key_t	keys[] =
 		"Scheduling priority.",
 		PSS_pri,
 		KEY_pri,
+		3
+	},
+	{
+		"processor",
+		"PROC",
+		"Assigned processor.",
+		PSS_proc,
+		KEY_proc,
 		3
 	},
 	{
@@ -467,16 +496,24 @@ static Key_t	keys[] =
 	/* aliases after this point */
 
 	{ "comm",	0,	0,	0,	KEY_command		},
+	{ "f",		0,	0,	0,	KEY_flags		},
+	{ "jid",	0,	0,	0,	KEY_job			},
 	{ "ntpid",	0,	0,	0,	KEY_npid		},
 	{ "pcpu",	0,	0,	0,	KEY_cpu			},
+	{ "pgid",	0,	0,	0,	KEY_pgrp		},
+	{ "proc",	0,	0,	0,	KEY_proc		},
+	{ "psr",	0,	0,	0,	KEY_proc		},
 	{ "rgroup",	0,	0,	0,	KEY_group		},
 	{ "ruser",	0,	0,	0,	KEY_user		},
+	{ "s",		0,	0,	0,	KEY_state		},
+	{ "sess",	0,	0,	0,	KEY_sid			},
+	{ "stime",	0,	0,	0,	KEY_start		},
 	{ "tid",	0,	0,	0,	KEY_tgrp		},
 	{ "vsz",	0,	0,	0,	KEY_size		},
 
 };
 
-static const char	default_format[] = "pid tty time command";
+static const char	fields_default[] = FIELDS_default;
 static const char	newline[] = "\n";
 static const char	space[] = " ";
 
@@ -496,7 +533,7 @@ optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		{
 			sfprintf(sp, "[+%s?", keys[i].name);
 			if (keys[i].head)
-				sfprintf(sp, "%s The title string is \b%s\b and the default width is %d.%s]", keys[i].desc, keys[i].head, keys[i].width, (!keys[i].field || (state.pss->fields & keys[i].field)) ? "" : " Not available on this system.");
+				sfprintf(sp, "%s The title string is \b%s\b and the default width is %d.%s]", keys[i].desc, keys[i].head, keys[i].width, (!keys[i].field || (state.pss->meth->fields & keys[i].field)) ? "" : " Not available on this system.");
 			else
 				sfprintf(sp, "Equivalent to \b%s\b.]", keys[keys[i].index].name);
 		}
@@ -539,7 +576,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			return 0;
 		}
 		if (!(kp = newof(0, Key_t, 1, strlen(fp->t_str) + 1)))
-			error(3, "out of space [key]");
+			error(ERROR_SYSTEM|3, "out of space");
 		kp->name = strcpy((char*)(kp + 1), fp->t_str);
 		kp->macro = getenv(fp->t_str + 1);
 		kp->index = KEY_environ;
@@ -555,7 +592,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	}
 	else if (!pp)
 	{
-		if (!(state.pss->fields & kp->field))
+		if (!(state.pss->meth->fields & kp->field))
 		{
 			error(1, "%s: not available on this system", kp->name);
 			return -1;
@@ -613,6 +650,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		case KEY_command:
 			s = pp->ps->command;
 		branch:
+			if (!s)
+				s = "<defunct>";
 			if ((j = pp->level) > 0)
 			{
 				for (i = 0, j--; i < j; i++)
@@ -704,7 +743,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			goto number;
 		case KEY_time:
 			if (fp->fmt == 's')
-				s = fmtelapsed(pp->ps->time, state.pss->hz);
+				s = fmtelapsed(pp->ps->time, 1);
 			else
 				n = pp->ps->time;
 			break;
@@ -811,6 +850,8 @@ ps(Ps_t* pp)
 		case KEY_command:
 			s = pr->command;
 		branch:
+			if (!s)
+				s = "<defunct>";
 			if ((j = pp->level) > 0)
 			{
 				for (i = 0, j--; i < j; i++)
@@ -828,7 +869,7 @@ ps(Ps_t* pp)
 			goto string;
 		case KEY_flags:
 			n = pr->flags & PSS_FLAGS;
-			goto hex;
+			goto octal;
 		case KEY_gid:
 			n = pr->gid;
 			goto number;
@@ -887,7 +928,7 @@ ps(Ps_t* pp)
 			n = pr->tgrp;
 			goto number;
 		case KEY_time:
-			s = fmtelapsed(pr->time, state.pss->hz);
+			s = fmtelapsed(pr->time, 1);
 			goto string;
 		case KEY_tty:
 			if (pr->state == PSS_ZOMBIE)
@@ -925,7 +966,7 @@ ps(Ps_t* pp)
 		sfprintf(sfstdout, "%*.*s%s", kp->width, kp->prec, s, kp->sep);
 		continue;
 	zombie:
-		s = "";
+		s = "-";
 		goto string;
 	percent:
 		sfprintf(state.tmp, "%%%ld", n);
@@ -942,6 +983,9 @@ ps(Ps_t* pp)
 			sfprintf(sfstdout, "%*lx%s", kp->width, n, kp->sep);
 		else
 			sfprintf(sfstdout, "%0*lx%s", kp->width, n, kp->sep);
+		continue;
+	octal:
+		sfprintf(sfstdout, "%*lo%s", kp->width, n, kp->sep);
 		continue;
 	}
 }
@@ -969,23 +1013,21 @@ kids(register Ps_t* pp, int level)
 }
 
 /*
- * return 1 if pp ancetor must be listed
+ * check if pp ancestor must be listed
  */
 
 static int
 ancestor(register Ps_t* pp)
 {
-	register Ps_t*	ap;
-
-	if (pp->ps->ppid != pp->ps->pid && (ap = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)))
+	do
 	{
-		if (!ap->must)
-			ancestor(ap);
-		pp->must = ap->must;
-	}
-	else
-		pp->must = -1;
-	return pp->must > 0;
+		if (pp->ps->pss & (PSS_ANCESTOR|PSS_EXPLICIT|PSS_MATCHED))
+		{
+			pp->ps->pss |= PSS_ANCESTOR;
+			return 1;
+		}
+	} while (pp->ps->ppid != pp->ps->pid && (pp = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)));
+	return 0;
 }
 
 /*
@@ -1000,18 +1042,27 @@ list(void)
 	register Ps_t*	zp;
 	Ps_t*		rp;
 
-	if (state.recursive)
+	if (state.children || state.parents)
 	{
 		/*
-		 * recursively list the children of selected processes
+		 * recursively list the children/parents of selected processes
 		 */
 
+		if (state.parents)
+			for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
+				if (pp->ps->pss & (PSS_EXPLICIT|PSS_MATCHED))
+				{
+					xp = pp;
+					while ((xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->ps->pss)
+						xp->ps->pss |= PSS_PARENT;
+				}
 		rp = zp = 0;
 		for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
-			if (pp->must > 0 || !pp->must && ancestor(pp))
+			if (pp->ps->pss || state.children && ancestor(pp))
 			{
-				if (pp->ps->ppid != pp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)) && xp->must > 0)
+				if (pp->ps->ppid != pp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)) && (xp->ps->pss & (PSS_EXPLICIT|PSS_MATCHED|PSS_PARENT)))
 				{
+					xp->ps->pss |= PSS_CHILD;
 					if (xp->lastchild)
 						xp->lastchild = xp->lastchild->sibling = pp;
 					else
@@ -1130,13 +1181,14 @@ byorder(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
  */
 
 static void
-addpid(Pssent_t* pe, register char* s, int must)
+addpid(Pssent_t* pe, register char* s)
 {
 	register char*		t;
 	register Ps_t*		pp;
 	register int		c;
 	char*			e;
-	pid_t			pid;
+	Pss_id_t		pid;
+	long			n;
 
 	do
 	{
@@ -1148,22 +1200,27 @@ addpid(Pssent_t* pe, register char* s, int must)
 			*s = 0;
 			if (!*t)
 				break;
-			pid = (pid_t)strtol(t, &e, 0);
-			if (*e)
-				error(3, "%s: invalid pid", t);
+			errno = 0;
+			n = strtol(t, &e, 0);
+			if (errno || n <= 0 || n > PID_MAX || *e)
+			{
+				error(2, "%s: invalid pid", t);
+				continue;
+			}
+			pid = n;
 			pe = pssread(state.pss, pid);
 		}
 		if (pe)
 		{
 			if (!(pp = state.pp) && !(state.pp = pp = newof(0, Ps_t, 1, 0)))
-				error(ERROR_SYSTEM|3, "out of space [proc]");
-			if (!(pp->ps = psssave(state.pss, pe)))
-				break;
+				error(ERROR_SYSTEM|3, "out of space");
 			pp->user = fmtuid(pe->uid);
-			pp->pid = pp->ps->pid;
-			pp->must = must != 0;
+			pp->pid = pe->pid;
+			pp->ps = pe;
 			if (!dtsearch(state.byorder, pp))
 			{
+				if (!(pp->ps = psssave(state.pss, pe)))
+					break;
 				dtinsert(state.byorder, pp);
 				state.pp = 0;
 			}
@@ -1193,11 +1250,10 @@ addid(register char* s, int index, int (*getid)(const char*))
 	if (!mp)
 	{
 		if (!(mp = newof(0, Pssmatch_t, 1, 0)))
-			error(ERROR_SYSTEM|3, "out of space [match]");
+			error(ERROR_SYSTEM|3, "out of space");
 		mp->next = state.pssdisc.match;
 		mp->field = field;
 		state.pssdisc.match = mp;
-		state.pssdisc.flags |= PSS_LEADER;
 	}
 	do
 	{
@@ -1224,7 +1280,7 @@ addid(register char* s, int index, int (*getid)(const char*))
 			continue;
 		}
 		if (!(dp = newof(0, Pssdata_t, 1, 0)))
-			error(ERROR_SYSTEM|3, "out of space [match data]");
+			error(ERROR_SYSTEM|3, "out of space");
 		dp->next = mp->data;
 		mp->data = dp;
 		dp->data = n;
@@ -1236,7 +1292,7 @@ addid(register char* s, int index, int (*getid)(const char*))
  */
 
 static void
-addkey(const char* k)
+addkey(const char* k, int ignore)
 {
 	register char*	s = (char*)k;
 	register char*	t;
@@ -1252,7 +1308,7 @@ addkey(const char* k)
 		for (kp = keys + 1; kp < keys + elementsof(keys); kp++)
 		{
 			ap = kp->head ? kp : (keys + kp->index);
-			sfprintf(sfstdout, "%-8s %-8s %s%s%s\n", kp->name, ap->head, ap->desc, ap == kp ? "" : " [alias]", (!ap->field || (state.pss->fields & ap->field)) ? "" : " [not available]");
+			sfprintf(sfstdout, "%-8s %-8s %s%s%s\n", kp->name, ap->head, ap->desc, ap == kp ? "" : " [alias]", (!ap->field || (state.pss->meth->fields & ap->field)) ? "" : " [not available]");
 		}
 		exit(0);
 	}
@@ -1295,7 +1351,7 @@ addkey(const char* k)
 			for (t = ++s; *s && !isspace(*s) && *s != ','; s++);
 			w = s - t;
 			if (!(kp->head = newof(0, char, w, 1)))
-				error(3, "out of space [head]");
+				error(ERROR_SYSTEM|3, "out of space");
 			memcpy(kp->head, t, w);
 			if (w < c)
 				w = c;
@@ -1304,9 +1360,10 @@ addkey(const char* k)
 		}
 		else if (c >= strlen(kp->head))
 			kp->width = c;
-		if (!(state.pss->fields & kp->field))
+		if (!(state.pss->meth->fields & kp->field))
 		{
-			error(1, "%s: not available on this system", kp->name);
+			if (!ignore)
+				error(1, "%s: not available on this system", kp->name);
 			continue;
 		}
 
@@ -1345,7 +1402,7 @@ pushpids(void* argv, int argc)
 	register List_t*	p;
 
 	if (!(p = newof(0, List_t, 1, 0)))
-		error(3, "out of space [pid list]");
+		error(ERROR_SYSTEM|3, "out of space");
 	p->argv = (char**)argv;
 	p->argc = argc;
 	p->next = state.pids;
@@ -1370,9 +1427,9 @@ poppids(void)
 		state.pids = p->next;
 		if (i = p->argc)
 			while (--i >= 0)
-				addpid(NiL, p->argv[i], 1);
+				addpid(NiL, p->argv[i]);
 		else
-			addpid(NiL, (char*)p->argv, 1);
+			addpid(NiL, (char*)p->argv);
 		free(p);
 	}
 	state.pssdisc.flags = flags;
@@ -1383,7 +1440,6 @@ main(int argc, register char** argv)
 {
 	register int	n;
 	register char*	s;
-	int		must;
 	Sfio_t*		fmt;
 	Key_t*		kp;
 	Ps_t*		pp;
@@ -1400,7 +1456,7 @@ main(int argc, register char** argv)
 	state.now = time((time_t*)0);
 	state.heading = 1;
 	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()) || !(state.wrk = sfstropen()))
-		error(3, "out of space [tmp]");
+		error(ERROR_SYSTEM|3, "out of space");
 
 	/*
 	 * set up the disciplines
@@ -1418,7 +1474,7 @@ main(int argc, register char** argv)
 	kd.link = offsetof(Key_t, hashed);
 	memset(&nd, 0, sizeof(nd));
 	nd.key = offsetof(Ps_t, pid);
-	nd.size = sizeof(pid_t);
+	nd.size = sizeof(Pss_id_t);
 	nd.link = offsetof(Ps_t, hashed);
 	memset(&sd, 0, sizeof(sd));
 	sd.link = offsetof(Ps_t, sorted);
@@ -1428,9 +1484,11 @@ main(int argc, register char** argv)
 	 * open the ps stream
 	 */
 
-	if (!(state.pss = pssopen(&state.pssdisc)) || !state.pss->fields)
+	if (!(state.pss = pssopen(&state.pssdisc)) || !state.pss->meth->fields)
 	{
-		execv("/bin/ps", argv);
+		s = "/bin/ps";
+		error(1, "falling back to %s", s);
+		execv(s, argv);
 		exit(EXIT_NOTFOUND);
 	}
 
@@ -1439,7 +1497,7 @@ main(int argc, register char** argv)
 	 */
 
 	if (!(state.keys = dtopen(&kd, Dthash)) || !(state.bypid = dtopen(&nd, Dthash)) || !(state.byorder = dtopen(&sd, Dttree)))
-		error(3, "out of space [dict]");
+		error(ERROR_SYSTEM|3, "out of space");
 	for (n = 1; n < elementsof(keys); n++)
 		dtinsert(state.keys, keys + n);
 
@@ -1452,20 +1510,20 @@ main(int argc, register char** argv)
 		switch (optget(argv, usage))
 		{
 		case 'a':
-			state.pssdisc.flags |= PSS_ALL|PSS_DETACHED;
+			state.pssdisc.flags |= PSS_ATTACHED|PSS_NOLEADER;
 			continue;
 		case 'c':
-			addkey("pid class pri tty time command");
+			addkey(FIELDS_c, 1);
 			continue;
 		case 'd':
-			state.pssdisc.flags |= PSS_ALL;
+			state.pssdisc.flags |= PSS_NOLEADER;
 			continue;
 		case 'e':
 		case 'A':
-			state.pssdisc.flags |= PSS_ALL|PSS_LEADER;
+			state.pssdisc.flags |= PSS_ALL;
 			continue;
 		case 'f':
-			addkey("user pid ppid start tty time args");
+			addkey(FIELDS_f, 1);
 			continue;
 		case 'h':
 			state.heading = opt_info.num;
@@ -1474,22 +1532,22 @@ main(int argc, register char** argv)
 			addid(opt_info.arg, KEY_pgrp, NiL);
 			continue;
 		case 'j':
-			addkey("pid pgrp sid tty time command");
+			addkey(FIELDS_j, 1);
 			continue;
 		case 'l':
-			addkey("flags state user pid ppid pri nice size rss wchan tty time command");
+			addkey(FIELDS_l, 1);
 			continue;
 		case 'n':
 			continue;
 		case 'o':
-			addkey(opt_info.arg);
+			addkey(opt_info.arg, 0);
 			continue;
 		case 'p':
 			pushpids(opt_info.arg, 0);
 			continue;
 		case 'r':
 		case 'R':
-			state.recursive = 1;
+			state.children = 1;
 			continue;
 		case 's':
 			addid(opt_info.arg, KEY_sid, NiL);
@@ -1504,7 +1562,10 @@ main(int argc, register char** argv)
 			state.pssdisc.flags |= PSS_VERBOSE;
 			continue;
 		case 'x':
-			state.pssdisc.flags |= PSS_DETACHED|PSS_LEADER;
+			state.pssdisc.flags |= PSS_DETACHED;
+			continue;
+		case 'C':
+			state.tree = state.children = 1;
 			continue;
 		case 'D':
 			if (s = strchr(opt_info.arg, '='))
@@ -1519,7 +1580,7 @@ main(int argc, register char** argv)
 				if (!s)
 					continue;
 				if (!(kp = newof(0, Key_t, 1, strlen(opt_info.arg) + 1)))
-					error(ERROR_SYSTEM|3, "out of space [macro]");
+					error(ERROR_SYSTEM|3, "out of space");
 				kp->name = strcpy((char*)(kp + 1), opt_info.arg);
 				dtinsert(state.keys, kp);
 			}
@@ -1534,11 +1595,17 @@ main(int argc, register char** argv)
 		case 'G':
 			addid(opt_info.arg, KEY_group, strgid);
 			continue;
+		case 'L':
+			state.pssdisc.flags |= PSS_LEADER;
+			continue;
 		case 'N':
-			addkey(default_format);
+			addkey(fields_default, 1);
+			continue;
+		case 'P':
+			state.tree = state.parents = 1;
 			continue;
 		case 'T':
-			state.tree = state.recursive = 1;
+			state.tree = state.parents = state.children = 1;
 			continue;
 		case 'X':
 			state.hex = !state.hex;
@@ -1566,7 +1633,7 @@ main(int argc, register char** argv)
 		sfclose(fmt);
 		fmt = 0;
 		if (!state.fields)
-			addkey(default_format);
+			addkey(fields_default, 1);
 	}
 	head();
 
@@ -1575,20 +1642,12 @@ main(int argc, register char** argv)
 	 */
 
 	if (*argv)
-	{
-		state.pssdisc.flags |= PSS_ALL|PSS_ATTACHED;
 		pushpids(argv, argc);
-	}
-	if (state.recursive || !state.pids)
+	if (state.children || state.parents || !state.pids)
 	{
-		if (state.pids)
-		{
-			must = 0;
-			state.pssdisc.flags |= PSS_ALL;
-		}
-		else
-			must = -1;
-		if (!(state.pssdisc.flags & (PSS_ALL|PSS_ATTACHED|PSS_DETACHED|PSS_LEADER)))
+		if (state.children || state.parents)
+			state.pssdisc.flags |= PSS_UNMATCHED;
+		if (!state.pids && !state.pssdisc.match && !(state.pssdisc.flags & (PSS_ALL|PSS_ATTACHED|PSS_DETACHED|PSS_LEADER|PSS_NOLEADER)))
 		{
 			state.pssdisc.flags |= PSS_UID;
 			state.pssdisc.uid = geteuid();
@@ -1602,8 +1661,8 @@ main(int argc, register char** argv)
 		}
 		poppids();
 		while (pe = pssread(state.pss, PSS_SCAN))
-			addpid(pe, NiL, must);
-		if (state.recursive)
+			addpid(pe, NiL);
+		if (state.children || state.parents)
 			for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
 				dtinsert(state.bypid, pp);
 	}

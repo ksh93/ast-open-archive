@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -59,6 +59,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -80,7 +83,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -92,7 +95,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -127,6 +130,8 @@ make ../../../include/ast/hashpart.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/hashpart.h dontcare
 make ../../../include/ast/ast_cs.h implicit
+make cell_sys_headers.h implicit
+done cell_sys_headers.h dontcare virtual
 done ../../../include/ast/ast_cs.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -134,7 +139,7 @@ done ../../../include/ast/cs.h
 prev ../../../include/ast/ast.h implicit
 done ss.c
 prev ss.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ss]"\" -c ss.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ss]"\" -c ss.c
 done ss.o generated
 bind -lcs
 bind -last
@@ -174,8 +179,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/ss
+prev ../../../bin
 prev ss
-exec - ${STDMV} ${INSTALLROOT}/bin/ss ${INSTALLROOT}/bin/ss.old 2>/dev/null || true; test '' = 'ss' || ${STDCMP} 2>/dev/null -s ss ${INSTALLROOT}/bin/ss || { ${STDCP} ss ${INSTALLROOT}/bin/ss  		    		    ;}
+exec - test '' = 'ss' || ${STDCMP} 2>/dev/null -s ss ${INSTALLROOT}/bin/ss || { ${STDMV} ${INSTALLROOT}/bin/ss ${INSTALLROOT}/bin/ss.old 2>/dev/null || true; ${STDCP} ss ${INSTALLROOT}/bin/ss  		    		    ;}
 done ../../../bin/ss generated
 make ../../../man/man1
 exec - set -
@@ -184,9 +190,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/ss.1
+prev ../../../man/man1
 make ss.1
 done ss.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/ss.1 ${INSTALLROOT}/man/man1/ss.1.old 2>/dev/null || true; test '' = 'ss.1' || ${STDCMP} 2>/dev/null -s ss.1 ${INSTALLROOT}/man/man1/ss.1 || { ${STDCP} ss.1 ${INSTALLROOT}/man/man1/ss.1  		    		    ;}
+exec - test '' = 'ss.1' || ${STDCMP} 2>/dev/null -s ss.1 ${INSTALLROOT}/man/man1/ss.1 || { ${STDMV} ${INSTALLROOT}/man/man1/ss.1 ${INSTALLROOT}/man/man1/ss.1.old 2>/dev/null || true; ${STDCP} ss.1 ${INSTALLROOT}/man/man1/ss.1  		    		    ;}
 done ../../../man/man1/ss.1 generated
 make ../../../lib
 exec - set -
@@ -195,11 +202,12 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/ssd
+prev ../../../lib
 prev ssd
 setv group -Dgroup="kmem"
 setv mode -Dmode="ug+s,+x"
 setv preserve -Dpreserve
-exec - ${STDMV} ${PACKAGE_ast_LIB}/ssd ${PACKAGE_ast_LIB}/ssd.old 2>/dev/null || true; test '' = 'ssd' || ${STDCMP} 2>/dev/null -s ssd ${PACKAGE_ast_LIB}/ssd || { ${STDCP} ssd ${PACKAGE_ast_LIB}/ssd  		   && { chgrp kmem ${PACKAGE_ast_LIB}/ssd || true ;} 		   && chmod ug+s,+x ${PACKAGE_ast_LIB}/ssd ;}
+exec - test '' = 'ssd' || ${STDCMP} 2>/dev/null -s ssd ${PACKAGE_ast_LIB}/ssd || { ${STDMV} ${PACKAGE_ast_LIB}/ssd ${PACKAGE_ast_LIB}/ssd.old 2>/dev/null || true; ${STDCP} ssd ${PACKAGE_ast_LIB}/ssd  		   && { chgrp kmem ${PACKAGE_ast_LIB}/ssd || true ;} 		   && chmod ug+s,+x ${PACKAGE_ast_LIB}/ssd ;}
 done ../../../lib/ssd generated
 make ../../../man/man8
 exec - set -
@@ -208,9 +216,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man8
 exec - fi
 done ../../../man/man8 generated
 make ../../../man/man8/ssd.8
+prev ../../../man/man8
 make ssd.8
 done ssd.8
-exec - ${STDMV} ${INSTALLROOT}/man/man8/ssd.8 ${INSTALLROOT}/man/man8/ssd.8.old 2>/dev/null || true; test '' = 'ssd.8' || ${STDCMP} 2>/dev/null -s ssd.8 ${INSTALLROOT}/man/man8/ssd.8 || { ${STDCP} ssd.8 ${INSTALLROOT}/man/man8/ssd.8  		    		    ;}
+exec - test '' = 'ssd.8' || ${STDCMP} 2>/dev/null -s ssd.8 ${INSTALLROOT}/man/man8/ssd.8 || { ${STDMV} ${INSTALLROOT}/man/man8/ssd.8 ${INSTALLROOT}/man/man8/ssd.8.old 2>/dev/null || true; ${STDCP} ssd.8 ${INSTALLROOT}/man/man8/ssd.8  		    		    ;}
 done ../../../man/man8/ssd.8 generated
 make ../../../share
 exec - set -

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -12,7 +12,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE}"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -74,12 +74,12 @@ make tcl/panic.c
 make include/tcl.h implicit
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/prototyped.h implicit
 make ../../../include/prototyped.h implicit
 done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/getopt.h dontcare
+done ../../../include/ast/ast_getopt.h dontcare
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -98,7 +98,10 @@ done ../../../include/ast/ast_unistd.h dontcare
 make ../../../include/ast/re_comp.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/re_comp.h dontcare
-prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
 make ../../../include/ast/ls.h implicit
 make ../../../include/ast/ast_mode.h implicit
@@ -124,7 +127,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -189,11 +192,6 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/nval.h dontcare
 make name.h implicit
 done name.h dontcare virtual
-make ../../../include/ast/history.h implicit
-prev ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/history.h dontcare
 prev ../../../include/ast/cdt.h implicit
 make ../../../include/ast/cmd.h implicit
 make ../../../include/ast/dlldefs.h implicit
@@ -590,8 +588,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/libtcl.a archive
+prev ../../../lib
 prev libtcl.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libtcl.a ${PACKAGE_ast_LIB}/libtcl.a.old 2>/dev/null || true; test '' = 'libtcl.a' || ${STDCMP} 2>/dev/null -s libtcl.a ${PACKAGE_ast_LIB}/libtcl.a || { ${STDCP} libtcl.a ${PACKAGE_ast_LIB}/libtcl.a  		    		    ;}
+exec - test '' = 'libtcl.a' || ${STDCMP} 2>/dev/null -s libtcl.a ${PACKAGE_ast_LIB}/libtcl.a || { ${STDMV} ${PACKAGE_ast_LIB}/libtcl.a ${PACKAGE_ast_LIB}/libtcl.a.old 2>/dev/null || true; ${STDCP} libtcl.a ${PACKAGE_ast_LIB}/libtcl.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libtcl.a) >/dev/null 2>&1 || true
 done ../../../lib/libtcl.a generated
 make ../../../lib/lib
@@ -601,8 +600,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/tcl
+prev ../../../lib/lib
 prev tcl.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/tcl ${PACKAGE_ast_LIB}/lib/tcl.old 2>/dev/null || true; test '' = 'tcl.req' || ${STDCMP} 2>/dev/null -s tcl.req ${PACKAGE_ast_LIB}/lib/tcl || { ${STDCP} tcl.req ${PACKAGE_ast_LIB}/lib/tcl  		    		    ;}
+exec - test '' = 'tcl.req' || ${STDCMP} 2>/dev/null -s tcl.req ${PACKAGE_ast_LIB}/lib/tcl || { ${STDMV} ${PACKAGE_ast_LIB}/lib/tcl ${PACKAGE_ast_LIB}/lib/tcl.old 2>/dev/null || true; ${STDCP} tcl.req ${PACKAGE_ast_LIB}/lib/tcl  		    		    ;}
 done ../../../lib/lib/tcl generated
 make ../../../include/tcl
 exec - set -
@@ -611,6 +611,7 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/include/tcl
 exec - fi
 done ../../../include/tcl generated
 make ../../../include/tcl/tksh.h
+prev ../../../include/tcl
 prev include/tksh.h
 exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special'  include/tksh.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tksh.h 1.${COTEMP}.x
@@ -633,34 +634,35 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tksh7.6
 exec - fi
 done ../../../lib/tksh7.6 generated
 make ../../../lib/tksh7.6/init.ksh
+prev ../../../lib/tksh7.6
 make lib/tksh7.6/init.ksh
 done lib/tksh7.6/init.ksh
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.ksh' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh || { ${STDCP} lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh  		    		    ;}
+exec - test '' = 'lib/tksh7.6/init.ksh' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh || { ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh  		    		    ;}
 done ../../../lib/tksh7.6/init.ksh generated
 make ../../../lib/tksh7.6/init.tcl
 make lib/tksh7.6/init.tcl
 done lib/tksh7.6/init.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl || { ${STDCP} lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl  		    		    ;}
+exec - test '' = 'lib/tksh7.6/init.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl || { ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl  		    		    ;}
 done ../../../lib/tksh7.6/init.tcl generated
 make ../../../lib/tksh7.6/ldAout.tcl
 make lib/tksh7.6/ldAout.tcl
 done lib/tksh7.6/ldAout.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/ldAout.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl || { ${STDCP} lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl  		    		    ;}
+exec - test '' = 'lib/tksh7.6/ldAout.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl || { ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl  		    		    ;}
 done ../../../lib/tksh7.6/ldAout.tcl generated
 make ../../../lib/tksh7.6/license.terms
 make lib/tksh7.6/license.terms
 done lib/tksh7.6/license.terms
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms.old 2>/dev/null || true; test '' = 'lib/tksh7.6/license.terms' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms || { ${STDCP} lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms  		    		    ;}
+exec - test '' = 'lib/tksh7.6/license.terms' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms || { ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms  		    		    ;}
 done ../../../lib/tksh7.6/license.terms generated
 make ../../../lib/tksh7.6/parray.tcl
 make lib/tksh7.6/parray.tcl
 done lib/tksh7.6/parray.tcl
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/parray.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl || { ${STDCP} lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl  		    		    ;}
+exec - test '' = 'lib/tksh7.6/parray.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl || { ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl  		    		    ;}
 done ../../../lib/tksh7.6/parray.tcl generated
 make ../../../lib/tksh7.6/tclIndex
 make lib/tksh7.6/tclIndex
 done lib/tksh7.6/tclIndex
-exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex.old 2>/dev/null || true; test '' = 'lib/tksh7.6/tclIndex' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex || { ${STDCP} lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex  		    		    ;}
+exec - test '' = 'lib/tksh7.6/tclIndex' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex || { ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex.old 2>/dev/null || true; ${STDCP} lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex  		    		    ;}
 done ../../../lib/tksh7.6/tclIndex generated
 done install virtual
 make test

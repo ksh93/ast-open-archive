@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2002 AT&T Corp.                *
+*                Copyright (c) 1996-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -5995,7 +5995,7 @@ main(int argc, char** argv)
 				continue;
 			}
 			if (v = strchr(argv[opt_info.index - 1], '='))
-				v = sfprints("%s=%s", opt_info.name + 2, fmtquote(v + 1, "\"", "\"", strlen(v + 1), 1));
+				v = sfprints("%s=%s", opt_info.name + 2, fmtquote(v + 1, "\"", "\"", strlen(v + 1), FMT_ALWAYS));
 			else
 				v = opt_info.name + 2;
 			stropt(v, options, sizeof(*options), setopt, options);

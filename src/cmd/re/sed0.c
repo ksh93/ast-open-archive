@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2002 AT&T Corp.                *
+*                Copyright (c) 1995-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -26,7 +26,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Labs Research) 2002-05-20 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Labs Research) 2003-01-13 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"
@@ -63,8 +63,8 @@ USAGE_LICENSE
 
 void	readscript(Text*, char*);
 void	copyscript(Text*, unsigned char*);
-void	initinput(int, char **);
-Sfio_t*	aopen(char*);
+int	initinput(int, char **);
+Sfio_t*	aopen(char*, int);
 
 #define ustrncmp(a,b,c) (unsigned char*)strncmp((char*)(a), (char*)(b), c)
 
@@ -135,16 +135,16 @@ main(int argc, char **argv)
 	printscript(&script);
 #endif
 
-	initinput(argc, argv);
-	for(;;) {
-		data.w = data.s;
-		if(!readline(&data))
-			break;
-		execute(&script, &data);
-	}
-	if(sfclose(sfstdout) == EOF)
+	if (initinput(argc, argv))
+		for(;;) {
+			data.w = data.s;
+			if(!readline(&data))
+				break;
+			execute(&script, &data);
+		}
+	if(sfclose(sfstdout) < 0)
 		error(ERROR_SYSTEM|3, stdouterr);
-	return 0;
+	return error_info.errors != 0;
 }
 
 void
@@ -173,7 +173,7 @@ void
 readscript(Text *t, char *s)
 {
 	int n;
-	Sfio_t *f = aopen(s);
+	Sfio_t *f = aopen(s, 3);
 	for(;;) {
 		assure(t, 4);
 		n = sfread(f, t->w, t->e - t->w - 3);
@@ -235,10 +235,12 @@ readline(Text *t)
 		}
 		error_info.file = 0;
 		error_info.line = 0;
-		if (--input.iargc <= 0)
-			return 0;
 		sfclose(input.ifile);
-		input.ifile = aopen(*++input.iargv);
+		do
+		{
+			if (--input.iargc <= 0)
+				return 0;
+		} while (!(input.ifile = aopen(*++input.iargv, 2)));
 		error_info.file = *input.iargv;
 	}
 	assure(t, c);
@@ -265,7 +267,7 @@ ateof(void)
 	return input.iargc <= 0;
 }	
 
-void
+int
 initinput(int argc, char **argv)
 {
 	input.iargc = argc;
@@ -274,17 +276,22 @@ initinput(int argc, char **argv)
 		input.iargc = 1;	/* for ateof() */
 		input.ifile = sfstdin;
 	} else {
-		input.ifile = aopen(*input.iargv);
+		while (!(input.ifile = aopen(*input.iargv, 2))) {
+			if (--input.iargc <= 0)
+				return 0;
+			++input.iargv;
+		}
 		error_info.file = *input.iargv;
 	}
+	return 1;
 }
 
 Sfio_t *
-aopen(char *s)
+aopen(char *s, int level)
 {
 	Sfio_t *f = sfopen(NiL, s, "r");
 	if(f == 0)
-		error(ERROR_SYSTEM|3, "%s: cannot open", s);
+		error(ERROR_SYSTEM|level, "%s: cannot open", s);
 	return f;
 }
 

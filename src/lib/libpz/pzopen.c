@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -202,6 +202,7 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 		{
 			pz->split.flags |= PZ_SPLIT_DEFLATE;
 			pz->flags |= PZ_ACCEPT|PZ_SECTION;
+			pz->flags &= ~PZ_SORT;
 		}
 		if (pz->options && pzoptions(pz, pz->part, pz->options, 1) < 0)
 			goto bad;
@@ -249,16 +250,18 @@ pzclose(register Pz_t* pz)
 		 * finish up the pzwrite() stream
 		 */
 
+		sfputu(op, 0);
 		if (pz->ws.pc)
 		{
 			if (pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, 2, "last record incomplete %u/%u", pz->ws.pc, pz->row);
-			return -1;
+				(*pz->disc->errorf)(pz, pz->disc, 1, "last record incomplete %u/%u", pz->ws.pc, pz->row);
+			sfputc(op, PZ_MARK_PART);
+			sfputu(op, pz->ws.pc);
+			sfwrite(op, pz->ws.pb, pz->ws.pc);
 		}
-		sfputu(op, 0);
 		if (!(pz->flags & PZ_SECTION))
 		{
-			sfputc(op, 1);
+			sfputc(op, PZ_MARK_TAIL);
 			if (pz->disc->eventf && (*pz->disc->eventf)(pz, PZ_TAILWRITE, op, 0, pz->disc) < 0)
 				return -1;
 			sfputc(op, 0);

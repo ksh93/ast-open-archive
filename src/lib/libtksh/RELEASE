@@ -1,3 +1,6 @@
+03-04-05  src/var.c: fix off by 1 malloc() call -- for once not gsf's fault!!
+	  src/var.c: hack around nv_move() double-free bug -- needs better fix
+03-03-12  src/tcleval.c,src/tclIO.c: change sfslen() => sfvalue(f)
 02-08-27  tcl/tclNotify.c: XXX add sh_sigcheck() call -- to be cleaned up
 02-08-22  enable regex cache initialization
 02-06-25  include/nvextra.h: use an addaptable cheat for the namval offset

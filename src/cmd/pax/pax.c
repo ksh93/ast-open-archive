@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2002 AT&T Corp.                *
+*                Copyright (c) 1987-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2002-12-13 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2003-03-05 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1253,57 +1253,70 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			ap = getarchive(state.operation);
 			if (!n)
 				ap->format = -1;
-			else if (s = strdup(streq(v, "tgz") ? "tar:gzip" : v)) do
+			else
 			{
-				for (e = s;;)
-				{
-					switch (*e++)
+				if (streq(v, "tgz"))
+					v = "ustar:gzip";
+				else if (streq(v, "tbz"))
+					v = "ustar:bzip2";
+				if (s = strdup(v))
+					do
 					{
-					case 0:
-						e = 0;
-						break;
-					case ' ':
-					case '\t':
-					case '\n':
-					case ':':
-					case ',':
-						*(e - 1) = 0;
-						if (*s) break;
-						s = e;
-						continue;
-					default:
-						continue;
-					}
-					break;
-				}
-				if ((n = getformat(s)) >= DELTA)
-				{
-					initdelta(ap);
-					switch (n)
-					{
-					case DELTA_IGNORE:
-					case DELTA_PATCH:
-						ap->delta->format = n;
-						break;
-					default:
-						ap->delta->version = n;
-						break;
-					}
-				}
-				else if (n >= COMPRESS)
-					ap->compress = n;
-				else if ((ap->format = n) < 0)
-				{
-					Sfio_t*	sp;
+						for (e = s;;)
+						{
+							switch (*e++)
+							{
+							case 0:
+								e = 0;
+								break;
+							case ' ':
+							case '\t':
+							case '\n':
+							case ':':
+							case ',':
+							case '.':
+								*(e - 1) = 0;
+								if (*s) break;
+								s = e;
+								continue;
+							default:
+								continue;
+							}
+							break;
+						}
+						if (s[0] == 'g' && s[1] == 'z')
+							s = "gzip";
+						else if (s[0] == 'b' && s[1] == 'z')
+							s = "bzip2";
+						if ((n = getformat(s)) >= DELTA)
+						{
+							initdelta(ap);
+							switch (n)
+							{
+							case DELTA_IGNORE:
+							case DELTA_PATCH:
+								ap->delta->format = n;
+								break;
+							default:
+								ap->delta->version = n;
+								break;
+							}
+						}
+						else if (n >= COMPRESS)
+							ap->compress = n;
+						else if ((ap->format = n) < 0)
+						{
+							Sfio_t*	sp;
 
-					if (!pathpath(tar_block, "lib/pax", opt.arg0, PATH_EXECUTE) || sfsprintf(alar_header, sizeof(alar_header) - 1, "%s/%s.fmt", tar_block, s) <= 0 || !(sp = sfopen(NiL, alar_header, "r")))
-						error(3, "%s: unknown archive format", s);
-					while (e = sfgetr(sp, '\n', 1))
-						if (*e != '#')
-							setoptions(e, NiL, state.usage, ap);
-					sfclose(sp);
-				}
-			} while (s = e);
+							if (!pathpath(tar_block, "lib/pax", opt.arg0, PATH_EXECUTE) || sfsprintf(alar_header, sizeof(alar_header) - 1, "%s/%s.fmt", tar_block, s) <= 0 || !(sp = sfopen(NiL, alar_header, "r")))
+								error(3, "%s: unknown archive format", s);
+							while (e = sfgetr(sp, '\n', 1))
+								if (*e != '#')
+									setoptions(e, NiL, state.usage, ap);
+							sfclose(sp);
+						}
+					} while (s = e);
+			}
 			ap->expected = ap->format;
 			if (!state.operation)
 				state.format = ap->format;

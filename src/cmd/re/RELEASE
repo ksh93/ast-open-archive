@@ -1,3 +1,8 @@
+03-03-17 ed.tst: add ! command tests for sfpopen() "" mode fix
+03-02-17 testregex.dat: add bm tests
+03-01-13 sed0.c: operate on all input files, even if some fail
+	 testfnmatch.c,testmatch.c: ignore testmatch -o option
+03-01-03 testregex.c,testregex.dat: add REG_SHELL_GROUP options and tests
 02-10-10 grep.c: ignore -a for GNU compatibility: gnugrep=tw+astgrep
 02-08-12 testregex.dat,locale.dat: add REG_MINIMAL tests for mb bug
 02-08-07 *.dat: recognize anchors in BRE subexpressions

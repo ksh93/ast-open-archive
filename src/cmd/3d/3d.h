@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -99,8 +99,8 @@ __STDPP__directive pragma pp:nohide ftruncate mount readlink sbrk truncate utime
 #if defined(__STDPP__directive) && defined(__STDPP__note)
 #if !_typ_off64_t && !noticed(off64_t)
 #undef	off64_t
-#ifdef int_8
-#define off64_t		int_8
+#ifdef _ast_int8_t
+#define off64_t		_ast_int8_t
 #else
 #define off64_t		long
 #endif

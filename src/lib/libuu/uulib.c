@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -29,7 +29,7 @@
  * uuencode/uudecode methods
  */
 
-static char id[] = "\n@(#)$Id: uulib (AT&T Research) 2000-03-06 $\0\n";
+static char id[] = "\n@(#)$Id: uulib (AT&T Research) 2003-01-07 $\0\n";
 
 static const char lib[] = "libuu:uu";
 
@@ -824,11 +824,16 @@ bx_header(register Uu_t* uu)
 	unsigned long	crx;
 	char		buf[UCHAR_MAX + 2];
 
-	do
-	{
-		if (!(s = sfgetr(uu->ip, '\n', 0)))
-			return -1;
-	} while (*s != '(' || strncmp(s, "(This file", 10));
+	if (uu->flags & UU_HEADER)
+		do
+		{
+			if (!(s = sfgetr(uu->ip, '\n', 0)))
+			{
+				if (uu->disc->errorf)
+					(*uu->disc->errorf)(uu, uu->disc, 2, "unknown encoding");
+				return -1;
+			}
+		} while (*s != '(' || strncmp(s, "(This file", 10));
 	bol = 1;
 	for (;;)
 	{

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -60,6 +60,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -81,7 +84,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -93,7 +96,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -143,7 +146,7 @@ done ../../../include/ast/error.h
 prev ../../../include/ast/ast.h implicit
 done main.c
 prev main.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?sort]"\" -c main.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?sort]"\" -c main.c
 done main.o generated
 bind -lrecsort
 bind -lz
@@ -157,8 +160,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/sort
+prev ../../../bin
 prev sort
-exec - ${STDMV} ${INSTALLROOT}/bin/sort ${INSTALLROOT}/bin/sort.old 2>/dev/null || true; test '' = 'sort' || ${STDCMP} 2>/dev/null -s sort ${INSTALLROOT}/bin/sort || { ${STDCP} sort ${INSTALLROOT}/bin/sort  		    		    ;}
+exec - test '' = 'sort' || ${STDCMP} 2>/dev/null -s sort ${INSTALLROOT}/bin/sort || { ${STDMV} ${INSTALLROOT}/bin/sort ${INSTALLROOT}/bin/sort.old 2>/dev/null || true; ${STDCP} sort ${INSTALLROOT}/bin/sort  		    		    ;}
 done ../../../bin/sort generated
 make ../../../man/man1
 exec - set -
@@ -167,9 +171,10 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/sort.1
+prev ../../../man/man1
 make sort.1
 done sort.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/sort.1 ${INSTALLROOT}/man/man1/sort.1.old 2>/dev/null || true; test '' = 'sort.1' || ${STDCMP} 2>/dev/null -s sort.1 ${INSTALLROOT}/man/man1/sort.1 || { ${STDCP} sort.1 ${INSTALLROOT}/man/man1/sort.1  		    		    ;}
+exec - test '' = 'sort.1' || ${STDCMP} 2>/dev/null -s sort.1 ${INSTALLROOT}/man/man1/sort.1 || { ${STDMV} ${INSTALLROOT}/man/man1/sort.1 ${INSTALLROOT}/man/man1/sort.1.old 2>/dev/null || true; ${STDCP} sort.1 ${INSTALLROOT}/man/man1/sort.1  		    		    ;}
 done ../../../man/man1/sort.1 generated
 done install virtual
 make test
@@ -193,15 +198,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp testsort.sh testsort
+exec - "")	case 14 in
+exec - 	0)	cp testsort.sh testsort
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < testsort.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo 
+exec - 		echo TESTCC='${CC}'
 exec - 		cat testsort.sh
 exec - 		} > testsort
 exec - 		;;
@@ -209,8 +214,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
+exec - 	case 14 in
+exec - 	0)	;;
+exec - 	*)	echo TESTCC='${CC}' ;;
 exec - 	esac
 exec - 	cat testsort.sh
 exec - 	} > testsort

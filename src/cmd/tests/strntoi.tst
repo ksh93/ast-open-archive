@@ -200,7 +200,7 @@ strntoll  "0x17fffffff123" "123" 6442450943 OK
 strntoull "0x17fffffff123" "123" 6442450943 OK'
 
 TEST 03 'thousands separator'
-	EXEC	LC_ALL=debug 8 12345678123 10 12.345.678123 9 12.345678123 9 12.345.67123
+	EXEC	LC_ALL=debug 8 12345678123 10 12.345.678123 9 12.345678123 9 12.345.67123 5 1.234 7 123.456
 		OUTPUT - $'strntol   "12345678123" "123" 12345678 OK
 strntoul  "12345678123" "123" 12345678 OK
 strntoll  "12345678123" "123" 12345678 OK
@@ -219,4 +219,14 @@ strntoull "12.345678123" ".345678123" 12 OK
 strntol   "12.345.67123" ".67123" 12345 OK
 strntoul  "12.345.67123" ".67123" 12345 OK
 strntoll  "12.345.67123" ".67123" 12345 OK
-strntoull "12.345.67123" ".67123" 12345 OK'
+strntoull "12.345.67123" ".67123" 12345 OK
+
+strntol   "1.234" "" 1234 OK
+strntoul  "1.234" "" 1234 OK
+strntoll  "1.234" "" 1234 OK
+strntoull "1.234" "" 1234 OK
+
+strntol   "123.456" "" 123456 OK
+strntoul  "123.456" "" 123456 OK
+strntoll  "123.456" "" 123456 OK
+strntoull "123.456" "" 123456 OK'

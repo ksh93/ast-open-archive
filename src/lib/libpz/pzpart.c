@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.2 (AT&T Labs Research) 2002-12-18 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.2 (AT&T Labs Research) 2003-04-15 $\n]"
 "[a:append]"
 "[c:comment]:[text]"
 "[x:crc]"
@@ -38,6 +38,7 @@ static const char usage[] =
 "[l:library]:[library]"
 "[n:name]:[name]"
 "[X:prefix?]:[count[*terminator]]]"
+"[O:sort]"
 "[P!:pzip]"
 "[Q:regress]"
 "[r:row]#[row-size]"
@@ -583,6 +584,12 @@ pzoptions(register Pz_t* pz, register Pzpart_t* pp, char* options, int must)
 					}
 					else if (e > opt_info.arg)
 						pz->prefix.skip = 1;
+					break;
+				case 'O':
+					if (opt_info.num)
+						pz->flags |= PZ_SORT;
+					else
+						pz->flags &= ~PZ_SORT;
 					break;
 				case 'P':
 					if (!opt_info.num)
@@ -1290,7 +1297,7 @@ pzpartprint(Pz_t* pz, register Pzpart_t* pp, register Sfio_t* op)
 		{
 			for (j = i + 1; j < pp->nfix && pp->fix[j] == pp->fix[j - 1] + 1 && pp->value[pp->fix[j]] == pp->value[pp->fix[j - 1]]; j++);
 			sfprintf(op, "%I*u", sizeof(pp->fix[i]), pp->fix[i]);
-			if ((j - i) > 1)
+			if (j > (i + 2))
 			{
 				i = j - 1;
 				sfprintf(op, "-%I*u", sizeof(pp->fix[i]), pp->fix[i]);
@@ -1312,7 +1319,7 @@ pzpartprint(Pz_t* pz, register Pzpart_t* pp, register Sfio_t* op)
 			sfprintf(op, " ");
 		for (j = i + 1; j < pp->nmap && pp->map[j] == pp->map[j - 1] + 1 && pp->lab[j] == g; j++);
 		sfprintf(op, "%I*u", sizeof(pp->map[i]), pp->map[i]);
-		if ((j - i) > 1)
+		if (j > (i + 2))
 		{
 			i = j - 1;
 			sfprintf(op, "-%I*u", sizeof(pp->map[i]), pp->map[i]);

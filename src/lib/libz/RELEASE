@@ -1,3 +1,5 @@
+03-03-13 gzio.c: eliminate fixed gzprintf() buffer size via sfio string stream
+03-01-20 zlib.h,gzio.c: add gzreopen()
 02-09-11 zlib.h: move 64 bit counts to internal_state
 02-08-05 add z_off64_t, gzseek64() etc. to preserve old binary interface
 	 work around 2^32 file size limitations

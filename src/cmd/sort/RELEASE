@@ -1,3 +1,5 @@
+03-03-11 testsort.sh: initialize $CC from :TEST: TESTCC state var
+03-03-07 Makefile: +lsort for now
 01-04-19 sort.tst: add -s tests
 00-03-09 main.c: fix infomation typo
 00-12-25 main.c: close input before final overwrite ops

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2002 AT&T Corp.                *
+*                Copyright (c) 1995-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -31,7 +31,7 @@ USAGE_LICENSE
 "	for lines containing a match for the given \apatterns\a."
 "	Matching lines are printed by default. The standard input is searched"
 "	if no files are given or when the file \b-\b is specified.]"
-"[+?There are five variants of \bgrep\b, each one using a different form of"
+"[+?There are six variants of \bgrep\b, each one using a different form of"
 "	\apattern\a, controlled either by option or the command path"
 "	base name. Details of each variant may be found in \bregex\b(3).]"
 "	{"

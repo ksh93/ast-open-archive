@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2002 AT&T Corp.                *
+*                Copyright (c) 1990-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -784,6 +784,20 @@ attributes(register char* s, register Coattr_t* p, Coattr_t* d)
 				continue;
 			case HASHKEY6('r','a','t','i','n','g'):
 				if (p->rating = sp ? sp->rating : strton(v, NiL, NiL, 100)) p->set |= SETRATING;
+				continue;
+			case HASHKEY6('r','e','m','o','t','e'):
+				if (p->set & SETNAME)
+				{
+					p->set |= SETREMOTE;
+					copystring(p->remote, sizeof(p->remote), v, n);
+				}
+				else
+				{
+					static String_t	save;
+
+					p->global.set |= SETREMOTE;
+					p->global.remote = savestring(&save, v, n);
+				}
 				continue;
 			case HASHKEY5('s','c','a','l','e'):
 				if (p->scale = sp ? sp->scale : (int)strtol(v, NiL, 0)) p->set |= SETSCALE;

@@ -802,7 +802,7 @@ getopts (AT&T Research) 1999-02-02'
 <TITLE>getopts man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;getopts&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>getopts&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;getopts&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>getopts&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -1144,6 +1144,18 @@ RKVG FGNGHF
 
 VZCYRZRAGNGVBA
   irefvba         trgbcgf (NG&G Erfrnepu) 1999-02-02'
+	usage=$'[-][a:aaa?AAA]:[delimiter:=\\::][b:bbb?BBB]:[string:=??][c]:[ccc:==??::=]'
+	EXEC	tooalso "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  tooalso [ options ]
+
+OPTIONS
+  -a, --aaa=delimiter
+                  AAA The default value is \\:.
+  -b, --bbb=string
+                  BBB The default value is ?.
+  -c ccc The default value is =?:=.'
 
 TEST 06 'bugs of omission'
 	usage=$'[-][+NAME?locate][a:again?Look again.][b:noback?Don\'t look back.][n:notnow?Don\'t look now.][t:twice?Look twice.][+FOO]{[+foo?aha]}[+BAR?bahah]'
@@ -1509,7 +1521,7 @@ TEST 16 'detailed man'
 <TITLE>cmd man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;cmd&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>cmd&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;cmd&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>cmd&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -1811,7 +1823,7 @@ TEST 24 'detailed html'
 <TITLE>test man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;test&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>test&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;test&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>test&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -2032,7 +2044,7 @@ TEST 30 'library interfaces'
 <TITLE>sum man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;sum&nbsp;(&nbsp;3&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER LIBRARY</A><TH align=right>sum&nbsp;(&nbsp;3&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;sum&nbsp;(&nbsp;3&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER LIBRARY</A><TH align=right>sum&nbsp;(&nbsp;3&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -3132,7 +3144,7 @@ SpamCo'
 <TITLE>eg man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
-<H4><TABLE width=100%><TR><TH align=left>&nbsp;eg&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>eg&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;eg&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>eg&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
 <DL compact>
 <DT><H4><A name="NAME">NAME</A></H4>
@@ -3253,7 +3265,137 @@ TEST 41 'cache exercizes'
 [1] argument=1 value="OPT"
 [1] argument=2 value="--foo"'
 
-TEST 42 'detailed key strings'
+TEST 42 'optional long names'
+	usage=$'[-][a:aaa][b:bbb?BBB][c?CCC][d:?DDD][e\f:n:eee\f][f\f:y:fff\f?FFF][g:ggg?GGG]'
+	EXEC tst "$usage" -a --aaa -b --bbb -c -d -e --eee -f --fff -g -ggg
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=a option=-a name=--aaa arg=(null) num=1
+return=b option=-b name=-b arg=(null) num=1
+return=b option=-b name=--bbb arg=(null) num=1
+return=c option=-c name=-c arg=(null) num=1
+return=d option=-d name=-d arg=(null) num=1
+return=e option=-e name=-e arg=(null) num=1
+return=e option=-e name=--eee arg=(null) num=1
+return=f option=-f name=-f arg=(null) num=1
+return=f option=-f name=--fff arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1
+return=g option=-g name=-g arg=(null) num=1'
+	EXEC tst "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  tst [ options ]
+
+OPTIONS
+  -a, --aaa
+  -b, --bbb       BBB
+  -c              CCC
+  -d              DDD
+  -e
+  -f, --fff       FFF
+  -g, --ggg       GGG'
+	usage=$'[-][a:aaa]:[av][b:bbb?BBB]:[bv][c?CCC]:[cv][d:?DDD]:[dv][e\f:n:eee\f]:[ev][f\f:y:fff\f?FFF]:[fv][g:ggg?GGG]:[gv]'
+	EXEC tst "$usage" -a AV --aaa=LAV -bBV --bbb=LBV -c CV -dDV -e EV --eee LEV -f FV --fff=LFV -gGV -ggg LGV
+		EXIT 0
+		OUTPUT - $'return=a option=-a name=-a arg=AV num=1
+return=a option=-a name=--aaa arg=LAV num=1
+return=b option=-b name=-b arg=BV num=1
+return=b option=-b name=--bbb arg=LBV num=1
+return=c option=-c name=-c arg=CV num=1
+return=d option=-d name=-d arg=DV num=1
+return=e option=-e name=-e arg=EV num=1
+return=e option=-e name=--eee arg=LEV num=1
+return=f option=-f name=-f arg=FV num=1
+return=f option=-f name=--fff arg=LFV num=1
+return=g option=-g name=-g arg=GV num=1
+return=g option=-g name=-g arg=gg num=1
+argument=1 value="LGV"'
+		ERROR -
+	EXEC tst "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  tst [ options ]
+
+OPTIONS
+  -a, --aaa=av
+  -b, --bbb=bv    BBB
+  -c cv           CCC
+  -d dv           DDD
+  -e ev
+  -f, --fff=fv    FFF
+  -g, --ggg=gv    GGG'
+
+TEST 43 'trailing wild card'
+	usage=$'[-][z:zzz]:[style][A:a*][B:b*][C:c*]'
+	EXEC wild "$usage" -A -B -C --a --b --c --axx --bxx --cxx
+		OUTPUT - $'return=A option=-A name=-A arg=(null) num=1
+return=B option=-B name=-B arg=(null) num=1
+return=C option=-C name=-C arg=(null) num=1
+return=A option=-A name=--a arg=(null) num=1
+return=B option=-B name=--b arg=(null) num=1
+return=C option=-C name=--c arg=(null) num=1
+return=A option=-A name=--a arg=(null) num=1
+return=B option=-B name=--b arg=(null) num=1
+return=C option=-C name=--c arg=(null) num=1'
+	usage=$'[-][z:zzz]:[style]{[A:a*][B:b*][C:c*]}'
+	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
+		OUTPUT - $'return=z option=-z name=-z arg=A num=65
+return=z option=-z name=-z arg=B num=66
+return=z option=-z name=-z arg=C num=67
+return=z option=-z name=-z arg=a num=65
+return=z option=-z name=-z arg=b num=66
+return=z option=-z name=-z arg=c num=67
+return=z option=-z name=-z arg=axx num=65
+return=z option=-z name=-z arg=bxx num=66
+return=z option=-z name=-z arg=cxx num=67'
+	usage=$'[-][z:zzz]:[style]{[A:a*?aaa][B:b*?bbb][C:c*?ccc]}'
+	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
+	EXEC wild "$usage" -z
+		EXIT 1
+		OUTPUT - $'return=: option=-z name=-z num=0'
+		ERROR - $'wild: -z: style argument expected'
+	EXEC wild "$usage" --zzz
+		OUTPUT - $'return=: option=-z name=--zzz num=0'
+		ERROR - $'wild: --zzz: style value expected'
+	usage=$'[-][z:zzz]:[style]{[A:a\aget\a?aaa][B:b\aoutta\a?bbb][C:c\atown\a?ccc]}'
+	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
+		EXIT 0
+		OUTPUT - $'return=z option=-z name=-z arg=A num=65
+return=z option=-z name=-z arg=B num=66
+return=z option=-z name=-z arg=C num=67
+return=z option=-z name=-z arg=a num=65
+return=z option=-z name=-z arg=b num=66
+return=z option=-z name=-z arg=c num=67
+return=z option=-z name=-z arg=axx num=65
+return=z option=-z name=-z arg=bxx num=66
+return=z option=-z name=-z arg=cxx num=67'
+		ERROR -
+	EXEC wild "$usage" -z
+		EXIT 1
+		OUTPUT - $'return=: option=-z name=-z num=0'
+		ERROR - $'wild: -z: style argument expected'
+	EXEC wild "$usage" --zzz
+		OUTPUT - $'return=: option=-z name=--zzz num=0'
+		ERROR - $'wild: --zzz: style value expected'
+	EXEC wild "$usage" --man
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'SYNOPSIS
+  wild [ options ]
+
+OPTIONS
+  -z, --zzz=style
+                    A|aget
+                          aaa
+                    B|boutta
+                          bbb
+                    C|ctown
+                          ccc'
+
+TEST 44 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man
 		EXIT 2

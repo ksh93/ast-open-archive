@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -59,6 +59,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
@@ -80,7 +83,7 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -92,7 +95,7 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -125,7 +128,7 @@ prev ../../../include/ast/ast.h implicit
 done html2rtf.h
 done html2rtf.c
 prev html2rtf.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2rtf.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2rtf.c
 done html2rtf.o generated
 bind -last
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o html2rtf html2rtf.o ${mam_libast}
@@ -137,7 +140,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done html2db.c
 prev html2db.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2db.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2db.c
 done html2db.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o html2db html2db.o ${mam_libast}
 done html2db generated
@@ -160,7 +163,7 @@ done ../../../include/ast/cdt.h
 prev ../../../include/ast/ast.h implicit
 done htmlrefs.c
 prev htmlrefs.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c htmlrefs.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c htmlrefs.c
 done htmlrefs.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o htmlrefs htmlrefs.o ${mam_libast}
 done htmlrefs generated
@@ -177,15 +180,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"' in
-exec - 	"")	cp mm2html.sh mm2html
+exec - "")	case 191 in
+exec - 	0)	cp mm2html.sh mm2html
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mm2html.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"
 exec - 		cat mm2html.sh
 exec - 		} > mm2html
 exec - 		;;
@@ -193,8 +196,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" ;;
+exec - 	case 191 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" ;;
 exec - 	esac
 exec - 	cat mm2html.sh
 exec - 	} > mm2html
@@ -238,7 +242,7 @@ prev ../../../include/ast/ast.h implicit
 done troff2html.h
 done troff2html.c
 prev troff2html.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c troff2html.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c troff2html.c
 done troff2html.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o troff2html troff2html.o ${mam_libast}
 done troff2html generated
@@ -255,15 +259,15 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"' in
-exec - 	"")	cp download.sh download
+exec - "")	case 191 in
+exec - 	0)	cp download.sh download
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < download.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"
+exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"
 exec - 		cat download.sh
 exec - 		} > download
 exec - 		;;
@@ -271,8 +275,9 @@ exec - 	esac
 exec - 	;;
 exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"' in
-exec - 	?*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2002 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" ;;
+exec - 	case 191 in
+exec - 	0)	;;
+exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" ;;
 exec - 	esac
 exec - 	cat download.sh
 exec - 	} > download
@@ -287,8 +292,9 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/bin
 exec - fi
 done ../../../bin generated
 make ../../../bin/html2rtf
+prev ../../../bin
 prev html2rtf
-exec - ${STDMV} ${INSTALLROOT}/bin/html2rtf ${INSTALLROOT}/bin/html2rtf.old 2>/dev/null || true; test '' = 'html2rtf' || ${STDCMP} 2>/dev/null -s html2rtf ${INSTALLROOT}/bin/html2rtf || { ${STDCP} html2rtf ${INSTALLROOT}/bin/html2rtf  		    		    ;}
+exec - test '' = 'html2rtf' || ${STDCMP} 2>/dev/null -s html2rtf ${INSTALLROOT}/bin/html2rtf || { ${STDMV} ${INSTALLROOT}/bin/html2rtf ${INSTALLROOT}/bin/html2rtf.old 2>/dev/null || true; ${STDCP} html2rtf ${INSTALLROOT}/bin/html2rtf  		    		    ;}
 done ../../../bin/html2rtf generated
 make ../../../man/man1
 exec - set -
@@ -297,35 +303,36 @@ exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/html2rtf.1
+prev ../../../man/man1
 make html2rtf.1
 done html2rtf.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1.old 2>/dev/null || true; test '' = 'html2rtf.1' || ${STDCMP} 2>/dev/null -s html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1 || { ${STDCP} html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1  		    		    ;}
+exec - test '' = 'html2rtf.1' || ${STDCMP} 2>/dev/null -s html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1 || { ${STDMV} ${INSTALLROOT}/man/man1/html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1.old 2>/dev/null || true; ${STDCP} html2rtf.1 ${INSTALLROOT}/man/man1/html2rtf.1  		    		    ;}
 done ../../../man/man1/html2rtf.1 generated
 make ../../../bin/html2db
 prev html2db
-exec - ${STDMV} ${INSTALLROOT}/bin/html2db ${INSTALLROOT}/bin/html2db.old 2>/dev/null || true; test '' = 'html2db' || ${STDCMP} 2>/dev/null -s html2db ${INSTALLROOT}/bin/html2db || { ${STDCP} html2db ${INSTALLROOT}/bin/html2db  		    		    ;}
+exec - test '' = 'html2db' || ${STDCMP} 2>/dev/null -s html2db ${INSTALLROOT}/bin/html2db || { ${STDMV} ${INSTALLROOT}/bin/html2db ${INSTALLROOT}/bin/html2db.old 2>/dev/null || true; ${STDCP} html2db ${INSTALLROOT}/bin/html2db  		    		    ;}
 done ../../../bin/html2db generated
 make ../../../bin/htmlrefs
 prev htmlrefs
-exec - ${STDMV} ${INSTALLROOT}/bin/htmlrefs ${INSTALLROOT}/bin/htmlrefs.old 2>/dev/null || true; test '' = 'htmlrefs' || ${STDCMP} 2>/dev/null -s htmlrefs ${INSTALLROOT}/bin/htmlrefs || { ${STDCP} htmlrefs ${INSTALLROOT}/bin/htmlrefs  		    		    ;}
+exec - test '' = 'htmlrefs' || ${STDCMP} 2>/dev/null -s htmlrefs ${INSTALLROOT}/bin/htmlrefs || { ${STDMV} ${INSTALLROOT}/bin/htmlrefs ${INSTALLROOT}/bin/htmlrefs.old 2>/dev/null || true; ${STDCP} htmlrefs ${INSTALLROOT}/bin/htmlrefs  		    		    ;}
 done ../../../bin/htmlrefs generated
 make ../../../bin/mm2html
 prev mm2html
-exec - ${STDMV} ${INSTALLROOT}/bin/mm2html ${INSTALLROOT}/bin/mm2html.old 2>/dev/null || true; test '' = 'mm2html' || ${STDCMP} 2>/dev/null -s mm2html ${INSTALLROOT}/bin/mm2html || { ${STDCP} mm2html ${INSTALLROOT}/bin/mm2html  		    		    ;}
+exec - test '' = 'mm2html' || ${STDCMP} 2>/dev/null -s mm2html ${INSTALLROOT}/bin/mm2html || { ${STDMV} ${INSTALLROOT}/bin/mm2html ${INSTALLROOT}/bin/mm2html.old 2>/dev/null || true; ${STDCP} mm2html ${INSTALLROOT}/bin/mm2html  		    		    ;}
 done ../../../bin/mm2html generated
 make ../../../man/man1/mm2html.1
 make mm2html.1
 done mm2html.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1.old 2>/dev/null || true; test '' = 'mm2html.1' || ${STDCMP} 2>/dev/null -s mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1 || { ${STDCP} mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1  		    		    ;}
+exec - test '' = 'mm2html.1' || ${STDCMP} 2>/dev/null -s mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1.old 2>/dev/null || true; ${STDCP} mm2html.1 ${INSTALLROOT}/man/man1/mm2html.1  		    		    ;}
 done ../../../man/man1/mm2html.1 generated
 make ../../../bin/troff2html
 prev troff2html
-exec - ${STDMV} ${INSTALLROOT}/bin/troff2html ${INSTALLROOT}/bin/troff2html.old 2>/dev/null || true; test '' = 'troff2html' || ${STDCMP} 2>/dev/null -s troff2html ${INSTALLROOT}/bin/troff2html || { ${STDCP} troff2html ${INSTALLROOT}/bin/troff2html  		    		    ;}
+exec - test '' = 'troff2html' || ${STDCMP} 2>/dev/null -s troff2html ${INSTALLROOT}/bin/troff2html || { ${STDMV} ${INSTALLROOT}/bin/troff2html ${INSTALLROOT}/bin/troff2html.old 2>/dev/null || true; ${STDCP} troff2html ${INSTALLROOT}/bin/troff2html  		    		    ;}
 done ../../../bin/troff2html generated
 make ../../../man/man1/troff2html.1
 make troff2html.1
 done troff2html.1
-exec - ${STDMV} ${INSTALLROOT}/man/man1/troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1.old 2>/dev/null || true; test '' = 'troff2html.1' || ${STDCMP} 2>/dev/null -s troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1 || { ${STDCP} troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1  		    		    ;}
+exec - test '' = 'troff2html.1' || ${STDCMP} 2>/dev/null -s troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1 || { ${STDMV} ${INSTALLROOT}/man/man1/troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1.old 2>/dev/null || true; ${STDCP} troff2html.1 ${INSTALLROOT}/man/man1/troff2html.1  		    		    ;}
 done ../../../man/man1/troff2html.1 generated
 make ../../../lib/html
 exec - set -
@@ -334,58 +341,59 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/html
 exec - fi
 done ../../../lib/html generated
 make ../../../lib/html/ast.mm
+prev ../../../lib/html
 make ast.mm
 done ast.mm
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/ast.mm ${PACKAGE_ast_LIB}/html/ast.mm.old 2>/dev/null || true; test '' = 'ast.mm' || ${STDCMP} 2>/dev/null -s ast.mm ${PACKAGE_ast_LIB}/html/ast.mm || { ${STDCP} ast.mm ${PACKAGE_ast_LIB}/html/ast.mm  		    		    ;}
+exec - test '' = 'ast.mm' || ${STDCMP} 2>/dev/null -s ast.mm ${PACKAGE_ast_LIB}/html/ast.mm || { ${STDMV} ${PACKAGE_ast_LIB}/html/ast.mm ${PACKAGE_ast_LIB}/html/ast.mm.old 2>/dev/null || true; ${STDCP} ast.mm ${PACKAGE_ast_LIB}/html/ast.mm  		    		    ;}
 done ../../../lib/html/ast.mm generated
 make ../../../lib/html/strings.mm
 make strings.mm
 done strings.mm
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/strings.mm ${PACKAGE_ast_LIB}/html/strings.mm.old 2>/dev/null || true; test '' = 'strings.mm' || ${STDCMP} 2>/dev/null -s strings.mm ${PACKAGE_ast_LIB}/html/strings.mm || { ${STDCP} strings.mm ${PACKAGE_ast_LIB}/html/strings.mm  		    		    ;}
+exec - test '' = 'strings.mm' || ${STDCMP} 2>/dev/null -s strings.mm ${PACKAGE_ast_LIB}/html/strings.mm || { ${STDMV} ${PACKAGE_ast_LIB}/html/strings.mm ${PACKAGE_ast_LIB}/html/strings.mm.old 2>/dev/null || true; ${STDCP} strings.mm ${PACKAGE_ast_LIB}/html/strings.mm  		    		    ;}
 done ../../../lib/html/strings.mm generated
 make ../../../lib/html/man.tr
 make man.tr
 done man.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/man.tr ${PACKAGE_ast_LIB}/html/man.tr.old 2>/dev/null || true; test '' = 'man.tr' || ${STDCMP} 2>/dev/null -s man.tr ${PACKAGE_ast_LIB}/html/man.tr || { ${STDCP} man.tr ${PACKAGE_ast_LIB}/html/man.tr  		    		    ;}
+exec - test '' = 'man.tr' || ${STDCMP} 2>/dev/null -s man.tr ${PACKAGE_ast_LIB}/html/man.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/man.tr ${PACKAGE_ast_LIB}/html/man.tr.old 2>/dev/null || true; ${STDCP} man.tr ${PACKAGE_ast_LIB}/html/man.tr  		    		    ;}
 done ../../../lib/html/man.tr generated
 make ../../../lib/html/mm.tr
 make mm.tr
 done mm.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/mm.tr ${PACKAGE_ast_LIB}/html/mm.tr.old 2>/dev/null || true; test '' = 'mm.tr' || ${STDCMP} 2>/dev/null -s mm.tr ${PACKAGE_ast_LIB}/html/mm.tr || { ${STDCP} mm.tr ${PACKAGE_ast_LIB}/html/mm.tr  		    		    ;}
+exec - test '' = 'mm.tr' || ${STDCMP} 2>/dev/null -s mm.tr ${PACKAGE_ast_LIB}/html/mm.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mm.tr ${PACKAGE_ast_LIB}/html/mm.tr.old 2>/dev/null || true; ${STDCP} mm.tr ${PACKAGE_ast_LIB}/html/mm.tr  		    		    ;}
 done ../../../lib/html/mm.tr generated
 make ../../../lib/html/mandoc.tr
 make mandoc.tr
 done mandoc.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr.old 2>/dev/null || true; test '' = 'mandoc.tr' || ${STDCMP} 2>/dev/null -s mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr || { ${STDCP} mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr  		    		    ;}
+exec - test '' = 'mandoc.tr' || ${STDCMP} 2>/dev/null -s mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr.old 2>/dev/null || true; ${STDCP} mandoc.tr ${PACKAGE_ast_LIB}/html/mandoc.tr  		    		    ;}
 done ../../../lib/html/mandoc.tr generated
 make ../../../lib/html/mdoc.tr
 make mdoc.tr
 done mdoc.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr.old 2>/dev/null || true; test '' = 'mdoc.tr' || ${STDCMP} 2>/dev/null -s mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr || { ${STDCP} mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr  		    		    ;}
+exec - test '' = 'mdoc.tr' || ${STDCMP} 2>/dev/null -s mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr.old 2>/dev/null || true; ${STDCP} mdoc.tr ${PACKAGE_ast_LIB}/html/mdoc.tr  		    		    ;}
 done ../../../lib/html/mdoc.tr generated
 make ../../../lib/html/mdoc-common.tr
 make mdoc-common.tr
 done mdoc-common.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr.old 2>/dev/null || true; test '' = 'mdoc-common.tr' || ${STDCMP} 2>/dev/null -s mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr || { ${STDCP} mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr  		    		    ;}
+exec - test '' = 'mdoc-common.tr' || ${STDCMP} 2>/dev/null -s mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr.old 2>/dev/null || true; ${STDCP} mdoc-common.tr ${PACKAGE_ast_LIB}/html/mdoc-common.tr  		    		    ;}
 done ../../../lib/html/mdoc-common.tr generated
 make ../../../lib/html/mdoc-nroff.tr
 make mdoc-nroff.tr
 done mdoc-nroff.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr.old 2>/dev/null || true; test '' = 'mdoc-nroff.tr' || ${STDCMP} 2>/dev/null -s mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr || { ${STDCP} mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr  		    		    ;}
+exec - test '' = 'mdoc-nroff.tr' || ${STDCMP} 2>/dev/null -s mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr.old 2>/dev/null || true; ${STDCP} mdoc-nroff.tr ${PACKAGE_ast_LIB}/html/mdoc-nroff.tr  		    		    ;}
 done ../../../lib/html/mdoc-nroff.tr generated
 make ../../../lib/html/mdoc-syms.tr
 make mdoc-syms.tr
 done mdoc-syms.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr.old 2>/dev/null || true; test '' = 'mdoc-syms.tr' || ${STDCMP} 2>/dev/null -s mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr || { ${STDCP} mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr  		    		    ;}
+exec - test '' = 'mdoc-syms.tr' || ${STDCMP} 2>/dev/null -s mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr.old 2>/dev/null || true; ${STDCP} mdoc-syms.tr ${PACKAGE_ast_LIB}/html/mdoc-syms.tr  		    		    ;}
 done ../../../lib/html/mdoc-syms.tr generated
 make ../../../lib/html/mdoc-troff.tr
 make mdoc-troff.tr
 done mdoc-troff.tr
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr.old 2>/dev/null || true; test '' = 'mdoc-troff.tr' || ${STDCMP} 2>/dev/null -s mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr || { ${STDCP} mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr  		    		    ;}
+exec - test '' = 'mdoc-troff.tr' || ${STDCMP} 2>/dev/null -s mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr || { ${STDMV} ${PACKAGE_ast_LIB}/html/mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr.old 2>/dev/null || true; ${STDCP} mdoc-troff.tr ${PACKAGE_ast_LIB}/html/mdoc-troff.tr  		    		    ;}
 done ../../../lib/html/mdoc-troff.tr generated
 make ../../../lib/html/download
 prev download
-exec - ${STDMV} ${PACKAGE_ast_LIB}/html/download ${PACKAGE_ast_LIB}/html/download.old 2>/dev/null || true; test '' = 'download' || ${STDCMP} 2>/dev/null -s download ${PACKAGE_ast_LIB}/html/download || { ${STDCP} download ${PACKAGE_ast_LIB}/html/download  		    		    ;}
+exec - test '' = 'download' || ${STDCMP} 2>/dev/null -s download ${PACKAGE_ast_LIB}/html/download || { ${STDMV} ${PACKAGE_ast_LIB}/html/download ${PACKAGE_ast_LIB}/html/download.old 2>/dev/null || true; ${STDCP} download ${PACKAGE_ast_LIB}/html/download  		    		    ;}
 done ../../../lib/html/download generated
 done install virtual
 make test

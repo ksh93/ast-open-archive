@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2002-12-21
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
+setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -47,7 +47,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in z  ast
+exec - for i in z ast
 exec - do	case $i in
 exec - 	"z"|z)
 exec - 		;;
@@ -77,6 +77,9 @@ done ../../../include/prototyped.h dontcare
 done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make windows.h implicit
@@ -105,32 +108,10 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c
 done crc32.o generated
 make gzio.o
 make gzio.c
-make zutil.h implicit
-make ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/sfstr.h implicit
+make ../../../include/ast/sfio.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
-prev ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_stdio.h dontcare
-done ../../../include/ast/stdio.h dontcare
-make unix.h implicit
-done unix.h dontcare virtual
-make ../../../include/ast/limits.h implicit
-make ../../../include/ast/ast_limits.h implicit
-done ../../../include/ast/ast_limits.h dontcare
-done ../../../include/ast/limits.h dontcare
-prev ../../../include/ast/stdio.h implicit
-make alloc.h implicit
-done alloc.h dontcare virtual
-prev ../../../include/ast/stdio.h implicit
-prev ../../../include/ast/getopt.h implicit
-prev zlib.h implicit
-done zutil.h
-prev ../../../include/ast/stdio.h implicit
-make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
@@ -154,16 +135,42 @@ make ../../../include/ast/ast_types.h implicit
 done ../../../include/ast/ast_types.h dontcare
 make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
-prev ../../../include/ast/limits.h implicit
+make ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast_stdio.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_stdio.h dontcare
+done ../../../include/ast/stdio.h dontcare
+prev ../../../include/ast/getopt.h implicit
+make ../../../include/ast/limits.h implicit
+make ../../../include/ast/ast_limits.h implicit
+done ../../../include/ast/ast_limits.h dontcare
+done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/ast_hdr.h implicit
 done ../../../include/ast/ast_hdr.h dontcare
-prev ../../../include/ast/getopt.h implicit
+prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
 done ../../../include/ast/sfio.h dontcare
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/sfstr.h dontcare
+make zutil.h implicit
+prev ../../../include/ast/stdio.h implicit
+make unix.h implicit
+done unix.h dontcare virtual
+prev ../../../include/ast/limits.h implicit
+prev ../../../include/ast/stdio.h implicit
+make alloc.h implicit
+done alloc.h dontcare virtual
+prev zlib.h implicit
+done zutil.h
+prev ../../../include/ast/stdio.h implicit
+make ../../../include/ast/ast.h implicit
+prev ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -172,7 +179,7 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast.h dontcare
 done gzio.c
 prev gzio.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c gzio.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_z -c gzio.c
 done gzio.o generated
 make uncompr.o
 make uncompr.c
@@ -313,8 +320,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}
 exec - fi
 done ../../../lib generated
 make ../../../lib/libz.a archive
+prev ../../../lib
 prev libz.a archive
-exec - ${STDMV} ${PACKAGE_ast_LIB}/libz.a ${PACKAGE_ast_LIB}/libz.a.old 2>/dev/null || true; test '' = 'libz.a' || ${STDCMP} 2>/dev/null -s libz.a ${PACKAGE_ast_LIB}/libz.a || { ${STDCP} libz.a ${PACKAGE_ast_LIB}/libz.a  		    		    ;}
+exec - test '' = 'libz.a' || ${STDCMP} 2>/dev/null -s libz.a ${PACKAGE_ast_LIB}/libz.a || { ${STDMV} ${PACKAGE_ast_LIB}/libz.a ${PACKAGE_ast_LIB}/libz.a.old 2>/dev/null || true; ${STDCP} libz.a ${PACKAGE_ast_LIB}/libz.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libz.a) >/dev/null 2>&1 || true
 done ../../../lib/libz.a generated
 make ../../../lib/lib
@@ -324,8 +332,9 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/z
+prev ../../../lib/lib
 prev z.req
-exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/z ${PACKAGE_ast_LIB}/lib/z.old 2>/dev/null || true; test '' = 'z.req' || ${STDCMP} 2>/dev/null -s z.req ${PACKAGE_ast_LIB}/lib/z || { ${STDCP} z.req ${PACKAGE_ast_LIB}/lib/z  		    		    ;}
+exec - test '' = 'z.req' || ${STDCMP} 2>/dev/null -s z.req ${PACKAGE_ast_LIB}/lib/z || { ${STDMV} ${PACKAGE_ast_LIB}/lib/z ${PACKAGE_ast_LIB}/lib/z.old 2>/dev/null || true; ${STDCP} z.req ${PACKAGE_ast_LIB}/lib/z  		    		    ;}
 done ../../../lib/lib/z generated
 make ../../../include/ast
 exec - set -
@@ -334,12 +343,13 @@ exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE}
 exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/zlib.h
+prev ../../../include/ast
 prev zlib.h
-exec - ${STDMV} ${PACKAGE_ast_INCLUDE}/zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h.old 2>/dev/null || true; test '' = 'zlib.h' || ${STDCMP} 2>/dev/null -s zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h || { ${STDCP} zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h  		    		    ;}
+exec - test '' = 'zlib.h' || ${STDCMP} 2>/dev/null -s zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h.old 2>/dev/null || true; ${STDCP} zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h  		    		    ;}
 done ../../../include/ast/zlib.h generated
 make ../../../include/ast/zconf.h
 prev zconf.h
-exec - ${STDMV} ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/dev/null || true; test '' = 'zconf.h' || ${STDCMP} 2>/dev/null -s zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h || { ${STDCP} zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h  		    		    ;}
+exec - test '' = 'zconf.h' || ${STDCMP} 2>/dev/null -s zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/dev/null || true; ${STDCP} zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h  		    		    ;}
 done ../../../include/ast/zconf.h generated
 make ../../../include/ast/sfdcgzip.h
 prev sfdcgzip.h
