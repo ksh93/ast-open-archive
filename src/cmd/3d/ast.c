@@ -94,3 +94,25 @@ pathbin(void)
 #include "spawnveg.c"	/* follows spawnve.c because of #undef's */
 
 #include "gross.c"
+
+#if _map_malloc
+
+#undef	calloc
+#undef	free
+#undef	malloc
+#undef	realloc
+#undef	strdup
+
+extern void*	calloc(size_t, size_t);
+extern void	free(void*);
+extern void*	malloc(size_t);
+extern void*	realloc(void*, size_t);
+extern char*	strdup(const char*);
+
+extern void*	_ast_calloc(size_t n, size_t m) { return calloc(n, m); }
+extern void	_ast_free(void* p) { free(p); }
+extern void*	_ast_malloc(size_t n) { return malloc(n); }
+extern void*	_ast_realloc(void* p, size_t n) { return realloc(p, n); }
+extern char*	_ast_strdup(const char* s) { return strdup(s); }
+
+#endif

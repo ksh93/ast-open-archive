@@ -754,7 +754,7 @@ int		type;	/* RS_IPRINT|RS_OPRINT		*/
 		{	if(uniq)
 			{	/* we assume here that mg->f is RS_UNIQ */
 				obj = mg->obj+mg->cpos; mg->cpos += 1;
-				if(rs->disc->eventf) /* prepare for RS_SUMMARY */
+				if(rs->disc->events & RS_SUMMARY)
 				{	for(m = mg->equi; m; m = m->equi)
 					{	o = m->obj+m->cpos;
 						EQUAL(obj,o,t);

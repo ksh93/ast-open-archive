@@ -36,6 +36,7 @@
 #endif
 
 #include <ctype.h>
+#include <ccode.h>
 
 #ifndef UCHAR_MAX
 #define UCHAR_MAX	((unsigned char)(~0))
@@ -70,8 +71,11 @@ typedef struct Field_s			/* key field			*/
 {
 	struct Field_s*	next;		/* next in list			*/
 	Coder_t		coder;		/* encode data into key		*/
+	int		binary;		/* binary data			*/
+	int		code;		/* coder ccode or conversion	*/
 	int		index;		/* field definition index	*/
 	int		flag;		/* code flag			*/
+	int		freetrans;	/* free trans on close		*/
 	unsigned char*	trans;		/* translation table		*/
 	unsigned char*	keep;		/* deletion table		*/
 	Position_t	begin;		/* key begins here		*/

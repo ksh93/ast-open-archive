@@ -37,10 +37,8 @@
 
 _BEGIN_EXTERNS_
 
-#if !_SFIO_H
 extern int	sprintf _ARG_((char*, const char*, ...));
 extern int	vsprintf _ARG_((char*, const char*, va_list));
-#endif
 
 extern int	atexit _ARG_((void (*)(void)));
 extern void	exit _ARG_((int));

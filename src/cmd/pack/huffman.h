@@ -27,11 +27,7 @@
  * The coding is the same as that used with the System V pack program
  *
  *   David Korn
- *   AT&T Bell Laboratories
- *   Room 3C-526B
- *   Murray Hill, N. J. 07974
- *   Tel. x7975
- *   ulysses!dgk
+ *   AT&T Laboratories
  */
 
 #ifndef _HUFFMAN_H_
@@ -39,7 +35,7 @@
 
 #include	<ast.h>
 
-#define HUFFLEV		24	/* maximum number of bits per code */
+#define HUFFLEV		32	/* maximum number of bits per code */
 #define HUFFMAG1	037	/* ascii <US> */
 #define HUFFMAG2	036	/* ascii <RS> */
 
@@ -47,8 +43,8 @@ typedef struct
 {
 	char		length[(1<<CHAR_BIT)+1];
 	unsigned char	levcount[HUFFLEV+1];
-	long		insize;
-	long		outsize;
+	Sfoff_t		insize;
+	Sfoff_t		outsize;
 	long		buffer;
 	long		id;
 	int		left;
@@ -57,11 +53,11 @@ typedef struct
 	int		excess;
 } Huff_t;
 
-Huff_t*		huffinit(Sfio_t*,long);
+Huff_t*		huffinit(Sfio_t*,Sfoff_t);
 Huff_t*		huffgethdr(Sfio_t*);
 int	 	huffputhdr(Huff_t*,Sfio_t*);
-int		huffencode(Huff_t*,Sfio_t*,Sfio_t*,int);
-int		huffdecode(Huff_t*,Sfio_t*,Sfio_t*,int);
+Sfoff_t		huffencode(Huff_t*,Sfio_t*,Sfio_t*,int);
+Sfoff_t		huffdecode(Huff_t*,Sfio_t*,Sfio_t*,int);
 Sfio_t*		huffdisc(Sfio_t*);
 
 #define huffend(hp)	free((void*)(hp))

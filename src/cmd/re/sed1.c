@@ -26,7 +26,6 @@
 #include "sed.h"
 
 #include <ctype.h>
-#include <ccode.h>
 
 #define ustrlen(p) strlen((char*)(p))
 #define ustrcmp(p, q) strcmp((char*)(p), (char*)(q))
@@ -626,14 +625,14 @@ compile(Text *script, Text *t)
 		for(;;) {
 			while(blank(t));
 			cmd = *t->w++;
-			if(neg && docom[ccmapc(cmd,CC_NATIVE,CC_ASCII)&0x7f]==Ic)
+			if(neg && docom[ccmapchr(map,cmd)&0x7f]==Ic)
 				syntax("improper !");
 			if(cmd != '!')
 				break;
 			neg = NEG;
 		}
 		if(!neg) {
-			switch(adrs[ccmapc(cmd,CC_NATIVE,CC_ASCII)]) {
+			switch(adrs[ccmapchr(map,cmd)]) {
 			case 1:
 				if(naddr <= 1)
 					break;
@@ -643,7 +642,7 @@ compile(Text *script, Text *t)
 				syntax("too many addresses");
 			}
 		}
-		(*docom[ccmapc(cmd,CC_NATIVE,CC_ASCII)&0x7f])(script, t);
+		(*docom[ccmapchr(map,cmd)&0x7f])(script, t);
 		while(*t->w == ' ' || *t->w == '\t' || *t->w == '\r')
 		{
 			t->w++;

@@ -89,6 +89,9 @@ do	case $# in
 			;;
 		esac
 		case $opt in
+		C++|c++)
+			ppld=$value
+			;;
 		DOTI|doti)
 			doti=$value
 			;;

@@ -50,7 +50,7 @@ extern void             TclExprFloatError _ANSI_ARGS_((Tcl_Interp *interp,
 #endif
 
 extern double strtod();
-#if 1
+#if 0
 /* Bug in sprintf */
 #ifdef sprintf
 #undef sprintf
@@ -78,5 +78,3 @@ EXTERN int TclRegExec _ANSI_ARGS_((regexp *prog, char *string, char *start));
 EXTERN void TclRegSub _ANSI_ARGS_((regexp *prog, char *source, char *dest));
 EXTERN void TclRegError _ANSI_ARGS_((char *msg));
 EXTERN char *TclGetRegError _ANSI_ARGS_((void));
-
-#define sprintf _stdsprintf

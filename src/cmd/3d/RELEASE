@@ -1,3 +1,6 @@
+03-06-11 ast.c: add _map_malloc checks for _ast_malloc => malloc
+03-06-05 pathreal.c: fix ancient multiple relative|.. symlink bug
+03-06-04 3d.sh: change `shift $OPTIND-1' to `set x "@"; shift $OPTIND'
 03-03-28 dir3d.c,rmdir3d.c,syscall3d.c: add D_FILENO and D_TYPE ifdefs
 03-03-25 dup3d.c: fix bug that cleared Dir_t pointer just after allocation
 03-03-07 ftruncate3d.c,lseek3d.c,truncate3d.c: check _typ_off64_t

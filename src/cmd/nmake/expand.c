@@ -3519,10 +3519,10 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					order_recurse(xp, x, NiL, NiL, val, -1, 0);
 					break;
 				case 'P':
-					order_recurse(xp, x, getval(external.files, 0), getval(external.skip, 0), val, 1, 1);
+					order_recurse(xp, x, getval(external.files, VAL_PRIMARY|VAL_AUXILIARY), getval(external.skip, VAL_PRIMARY|VAL_AUXILIARY), val, 1, 1);
 					break;
 				case 'R':
-					order_recurse(xp, x, getval(external.files, 0), getval(external.skip, 0), val, 1, 0);
+					order_recurse(xp, x, getval(external.files, VAL_PRIMARY|VAL_AUXILIARY), getval(external.skip, VAL_PRIMARY|VAL_AUXILIARY), val, 1, 0);
 					break;
 				default:
 					error(1, "unknown edit operator `W=%c'", op);
@@ -3935,7 +3935,7 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 #endif
 
 	/*
-	 * some operators must appear first
+	 * some operators must appear first (and before expansion)
 	 */
 
 	exp = 1;
@@ -3954,41 +3954,51 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 					{
 					case ED_AUXILLIARY:
 						exp = 0;
-						aux = -1;
+						aux |= VAL_AUXILIARY;
 						continue;
 					case ED_LITERAL:
 						exp = 0;
 						continue;
 					case ED_PRIMARY:
 						exp = 0;
-						aux = 1;
+						aux |= VAL_PRIMARY;
 						continue;
 					}
 				ed = t;
 				break;
 			}
+			else if (op != 'V')
+				break;
 			else
 			{
-				if (op == 'V')
+				for (exp = 0;; ed++)
 				{
-					exp = 0;
-					if (*(ed + 1) == 'A')
+					switch (*(ed + 1))
 					{
-						ed++;
-						aux = -1;
+					case 'A':
+						aux |= VAL_AUXILIARY;
+						continue;
+					case 'F':
+						aux |= VAL_FILE;
+						continue;
+					case 'P':
+						aux |= VAL_PRIMARY;
+						continue;
+					case 'U':
+						aux |= VAL_UNBOUND;
+						continue;
 					}
-					else if (*(ed + 1) == 'P')
-					{
-						ed++;
-						aux = 1;
-					}
+					break;
 				}
-				else break;
-				if (*++ed && *ed++ != del)
-					error(3, "edit operator `%c' does not take a value", op);
+				t = ++ed;
+				while (*ed && *ed++ != del);
+				if ((ed - t) > 1)
+					error(1, "edit operator `%c' value `%-.*s' invalid", op, ed - t - (*(ed - 1) == del), t);
 			}
 		}
 	}
+	if (!(aux & (VAL_PRIMARY|VAL_AUXILIARY)))
+		aux |= VAL_PRIMARY|VAL_AUXILIARY;
 	for (;;)
 	{
 #if DEBUG
@@ -4000,7 +4010,8 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 #endif
 		if ((*s == '"' || *s == MARK_QUOTE) && *(s + 1) && *(t = s + strlen(s) - 1) == *s)
 		{
-			if (!cvt) cvt = sfstropen();
+			if (!cvt)
+				cvt = sfstropen();
 			*t = 0;
 			sfputr(cvt, s + 1, 0);
 			*t = *s;
@@ -4010,7 +4021,8 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 		{
 			if (strchr(s, '$'))
 			{
-				if (!cvt) cvt = sfstropen();
+				if (!cvt)
+					cvt = sfstropen();
 				expand(cvt, s);
 				v = sfstruse(cvt);
 			}
@@ -4018,9 +4030,11 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 			if (nvars == 1 && streq(v, "..."))
 			{
 				exp = -1;
-				if (!ed) ed = null;
+				if (!ed)
+					ed = null;
 			}
-			else v = getval(v, aux);
+			else
+				v = getval(v, aux);
 		}
 		if (state.mam.statix && nvars > 1 && strmatch(v, "${mam_*}") && (!ed || !*ed))
 		{
@@ -4051,28 +4065,32 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 		{
 			if (ed)
 			{
-				if (!cvt) cvt = sfstropen();
+				if (!cvt)
+					cvt = sfstropen();
 				if (v == sfstrbase(internal.val))
 				{
 					tmp = internal.val;
-					if (!val) val = sfstropen();
+					if (!val)
+						val = sfstropen();
 					internal.val = val;
 				}
 				else
 				{
 					tmp = 0;
-					if (v == sfstrbase(cvt)) v = 0;
+					if (v == sfstrbase(cvt))
+						v = 0;
 				}
 				pos = sfstrtell(cvt);
 				expand(cvt, ed);
 				sfputc(cvt, 0);
 				expandops(xp, v ? v : sfstrbase(cvt), sfstrbase(cvt) + pos, del, exp);
-				if (tmp) internal.val = tmp;
+				if (tmp)
+					internal.val = tmp;
 			}
-			else if (*v) expand(xp, v);
+			else if (*v)
+				expand(xp, v);
 			break;
-		}
-		while (*s++);
+		} while (*s++);
 	}
 #if DEBUG
 	if (msg)
@@ -4084,8 +4102,10 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 		sfstrclose(msg);
 	}
 #endif
-	if (cvt) sfstrclose(cvt);
-	if (val) sfstrclose(val);
+	if (cvt)
+		sfstrclose(cvt);
+	if (val)
+		sfstrclose(val);
 	level--;
 }
 

@@ -441,8 +441,15 @@ openout(register Archive_t* ap, register File_t* f)
 		}
 		setfile(ap, f);
 		if (!exists || f->chmod)
+		{
 			listentry(f);
-		return state.update && exists ? -1 : -2;
+			fd = -1;
+		}
+		else if (state.update && exists)
+			fd = -1;
+		else
+			fd = -2;
+		return fd;
 	case X_IFLNK:
 		if (!*f->linkname)
 			return -2;
@@ -471,7 +478,7 @@ openout(register Archive_t* ap, register File_t* f)
 		}
 		setfile(ap, f);
 		listentry(f);
-		return -2;
+		return -1;
 	}
 	if (!addlink(ap, f))
 		return -1;
@@ -1106,7 +1113,6 @@ initarchive(const char* name, int mode)
 	ap->sum = -1;
 	ap->mio.mode = ap->tio.mode = mode;
 	ap->io = &ap->mio;
-	ap->convert[0].from = ap->convert[0].to = CC_NATIVE;
 	return ap;
 }
 

@@ -955,7 +955,7 @@ cdbparse(register Cdb_t* cdb, const char* schema)
 						if (separator)
 							sp->variable = 1;
 					}
-					end = separator ? CCMAPC(*separator, CC_NATIVE, code) : -1;
+					end = separator ? ccmapc(*separator, CC_NATIVE, code) : -1;
 					if (i <= ((c & CDB_FLOATING) ? -1 : 0))
 						i = 10;
 					while (m-- > 0)
@@ -963,9 +963,9 @@ cdbparse(register Cdb_t* cdb, const char* schema)
 						fp->delimiter.str = separator;
 						fp->delimiter.chr = end;
 						fp->delimiter.dir = d;
-						fp->escape.chr = (fp->escape.str = escape) ? CCMAPC(*escape, CC_NATIVE, code) : -1;
-						fp->quotebegin.chr = (fp->quotebegin.str = quotebegin) ? CCMAPC(*quotebegin, CC_NATIVE, code) : -1;
-						fp->quoteend.chr = (fp->quoteend.str = quoteend) ? CCMAPC(*quoteend, CC_NATIVE, code) : fp->quotebegin.chr;
+						fp->escape.chr = (fp->escape.str = escape) ? ccmapc(*escape, CC_NATIVE, code) : -1;
+						fp->quotebegin.chr = (fp->quotebegin.str = quotebegin) ? ccmapc(*quotebegin, CC_NATIVE, code) : -1;
+						fp->quoteend.chr = (fp->quoteend.str = quoteend) ? ccmapc(*quoteend, CC_NATIVE, code) : fp->quotebegin.chr;
 						d = 0;
 						fp->width = w;
 						fp->base = i;
@@ -1068,7 +1068,7 @@ cdbparse(register Cdb_t* cdb, const char* schema)
 		}
 		else if (!sp->fixed && !sp->terminator.str)
 			sp->terminator.str = CDB_TERMINATOR;
-		sp->terminator.chr = sp->terminator.str ? CCMAPC(*sp->terminator.str, CC_NATIVE, sp->code) : -1;
+		sp->terminator.chr = sp->terminator.str ? ccmapc(*sp->terminator.str, CC_NATIVE, sp->code) : -1;
 	}
 	cdb->table[0]->head = cdb->table[0];
 

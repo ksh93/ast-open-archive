@@ -188,7 +188,8 @@
 #define PP_TRANSITION		55	/* on COMPATIBILITY boundary	*/
 #define PP_TRUNCATE		56	/* truncate macro names		*/
 #define PP_UNDEF		57	/* undef symbol after ppdefault	*/
-#define PP_WARN			58	/* enable annoying warnings	*/
+#define PP_VENDOR		58	/* vendor file dirs follow	*/
+#define PP_WARN			59	/* enable annoying warnings	*/
 
 #define PP_comment		(1<<0)	/* PP_COMMENT is set		*/
 #define PP_compatibility	(1<<1)	/* PP_COMPATIBILITY is set	*/

@@ -840,7 +840,7 @@ internal_be(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, const char* b, size_t n,
 				v = dp->string.length;
 				if (!(e = vmoldof(cdb->record->vm, 0, unsigned char, v + 1, 0)))
 					return -1;
-				s = (unsigned char*)ccmapcpy((char*)e, (char*)s, v, CC_ASCII, fp->code);
+				s = (unsigned char*)ccmapm((char*)e, (char*)s, v, CC_ASCII, fp->code);
 				s[v] = 0;
 				dp->flags = CDB_STRING|CDB_TERMINATED|CDB_CACHED;
 			}
@@ -931,7 +931,7 @@ external_be(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, char* b, size_t n, Cdbty
 			v >>= 8;
 		}
 		s += fp->width;
-		ccmapcpy((char*)s, dp->string.base, dp->string.length, fp->code, CC_ASCII);
+		ccmapm((char*)s, dp->string.base, dp->string.length, fp->code, CC_ASCII);
 		s[dp->string.length] = 0;
 		return c;
 	}
@@ -1047,7 +1047,7 @@ internal_le(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, const char* b, size_t n,
 				v = dp->string.length;
 				if (!(e = vmoldof(cdb->record->vm, 0, unsigned char, v + 1, 0)))
 					return -1;
-				s = (unsigned char*)ccmapcpy((char*)e, (char*)s, v, CC_ASCII, fp->code);
+				s = (unsigned char*)ccmapm((char*)e, (char*)s, v, CC_ASCII, fp->code);
 				s[v] = 0;
 				dp->flags = CDB_STRING|CDB_TERMINATED|CDB_CACHED;
 			}
@@ -1138,7 +1138,7 @@ external_le(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, char* b, size_t n, Cdbty
 			*s++ = v;
 			v >>= 8;
 		}
-		ccmapcpy((char*)s, dp->string.base, dp->string.length, fp->code, CC_ASCII);
+		ccmapm((char*)s, dp->string.base, dp->string.length, CC_ASCII, fp->code);
 		s[dp->string.length] = 0;
 		return c;
 	}
@@ -1366,7 +1366,7 @@ external_sf(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, char* b, size_t n, Cdbty
 		{
 			if ((c += dp->string.length + 1) > n)
 				return -(c + 1);
-			ccmapcpy(s, dp->string.base, dp->string.length, fp->code, CC_ASCII);
+			ccmapm(s, dp->string.base, dp->string.length, fp->code, CC_ASCII);
 			s[dp->string.length] = 0;
 		}
 		return c;

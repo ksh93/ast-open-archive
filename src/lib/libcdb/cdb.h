@@ -345,22 +345,19 @@ struct Cdb_s				/* cdb info handle		*/
 };
 
 #if _BLD_cdb && defined(__EXPORT__)
-#define __PUBLIC_DATA__		__EXPORT__
-#else
+#define extern		__EXPORT__
+#endif
 #if !_BLD_cdb && defined(__IMPORT__)
-#define __PUBLIC_DATA__		__IMPORT__
-#else
-#define __PUBLIC_DATA__
-#endif
+#define extern		extern __IMPORT__
 #endif
 
-extern __PUBLIC_DATA__ Cdbmeth_t* Cdb;		/* cdb format		*/
-extern __PUBLIC_DATA__ Cdbmeth_t* Cdbflat;	/* flat file format	*/
-extern __PUBLIC_DATA__ Cdbmeth_t* Cdbgzip;	/* gzip compression	*/
-extern __PUBLIC_DATA__ Cdbmeth_t* Cdbpzip;	/* pzip compression	*/
-extern __PUBLIC_DATA__ Cdbmeth_t* Cdbvdelta;	/* vdelta compression	*/
+extern Cdbmeth_t* Cdb;		/* cdb format		*/
+extern Cdbmeth_t* Cdbflat;	/* flat file format	*/
+extern Cdbmeth_t* Cdbgzip;	/* gzip compression	*/
+extern Cdbmeth_t* Cdbpzip;	/* pzip compression	*/
+extern Cdbmeth_t* Cdbvdelta;	/* vdelta compression	*/
 
-#undef	__PUBLIC_DATA__
+#undef	extern
 
 #if _BLD_cdb && defined(__EXPORT__)
 #define extern		__EXPORT__

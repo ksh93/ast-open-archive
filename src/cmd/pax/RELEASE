@@ -1,3 +1,6 @@
+03-06-21 format.c: add ccode conversion check to putheader()
+03-05-28 file.c: fix -vrw directory double list
+	 update to new <ccode.h> interface
 03-03-05 pax.c: tgz => ustar:gzip, tbz => ustar:bzip
 03-02-28 pax.c: handle a few common -x aliases
 03-01-14 misc.c: fix meter sign overflow for sizeof(off_t)==sizeof(int)

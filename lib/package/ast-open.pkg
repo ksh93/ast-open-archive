@@ -6,7 +6,7 @@ ast-open :PACKAGE: \
 		at builtin cql diff ie mailx mam ncsl pack pzip \
 		re sort std tksh tw warp libcdb libpz libtksh libtk
 
-:COVERS: ast-base ast-ksh
+:COVERS: ast-base
 
 :CATEGORY: devel libs mail shells utils
 

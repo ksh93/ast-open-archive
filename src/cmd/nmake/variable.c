@@ -32,6 +32,8 @@
 #include "make.h"
 #include "options.h"
 
+#define BINDING(r,f)	(((f)&VAL_UNBOUND)?unbound(r):state.localview?localview(r):(r)->name)
+
 /*
  * generator for genprereqs()
  * sp!=0 is the first pass that sets M_generate
@@ -39,7 +41,7 @@
  */
 
 static int
-scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, int sep)
+scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, int sep, int op)
 {
 	register int		i;
 	register struct list*	p;
@@ -84,7 +86,7 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 					{
 						x->mark &= ~M_generate;
 						if (top >= 0)
-							scanprereqs(sp, x, dostate, all, 0, sep);
+							scanprereqs(sp, x, dostate, all, 0, sep, op);
 					}
 				}
 				else if (sp && (all || ((x->property & P_state) || x->scan || (y = staterule(PREREQS, x, NiL, 0)) && y->scan || !r->scan) && !(x->property & (P_ignore|P_use|P_virtual)) && (!(x->property & P_dontcare) || x->time)))
@@ -96,10 +98,10 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
 							sfputc(sp, ' ');
 						else
 							sep = 1;
-						sfputr(sp, state.localview ? localview(x) : ((x->dynamic & D_alias) ? x->uname : x->name), -1);
+						sfputr(sp, (op & VAL_UNBOUND) ? unbound(x) : state.localview ? localview(x) : ((x->dynamic & D_alias) ? x->uname : x->name), -1);
 					}
 					if (top >= 0)
-						sep = scanprereqs(sp, x, dostate, all, 0, sep);
+						sep = scanprereqs(sp, x, dostate, all, 0, sep, op);
 				}
 			} while (x = z);
 		}
@@ -113,11 +115,11 @@ scanprereqs(register Sfio_t* sp, struct rule* r, int dostate, int all, int top, 
  */
 
 static int
-genprereqs(Sfio_t* sp, struct rule* r, int dostate, int all, int sep)
+genprereqs(Sfio_t* sp, struct rule* r, int dostate, int all, int sep, int op)
 {
 	state.val++;
-	sep = scanprereqs(sp, r, dostate, all, 1, sep);
-	scanprereqs(NiL, r, dostate, all, 1, sep);
+	sep = scanprereqs(sp, r, dostate, all, 1, sep, op);
+	scanprereqs(NiL, r, dostate, all, 1, sep, op);
 	state.val--;
 	return sep;
 }
@@ -125,7 +127,7 @@ genprereqs(Sfio_t* sp, struct rule* r, int dostate, int all, int sep)
 /*
  * return the value of a variable given its name
  * the internal automatic variables are (lazily) expanded here
- * op: <0:auxiliary 0:primary+auxiliary >0:primary
+ * op: VAL_PRIMARY|VAL_AUXILIARY|VAL_UNBOUND
  */
 
 char*
@@ -298,7 +300,7 @@ getval(register char* s, int op)
 			case '<': /* target name */
 				if ((r->property & (P_joint|P_target)) != (P_joint|P_target))
 				{
-					val = state.localview ? localview(r) : r->name;
+					val = BINDING(r, op);
 					break;
 				}
 				r = r->prereqs->rule;
@@ -312,7 +314,7 @@ getval(register char* s, int op)
 				if (r->active && (t = r->active->primary))
 				{
 					x = makerule(t);
-					t = state.localview ? localview(x) : x->name;
+					t = BINDING(x, op);
 					if (c == '>')
 					{
 						val = t;
@@ -330,12 +332,12 @@ getval(register char* s, int op)
 				e = (c == '>' && !(state.questionable & 0x01000000) && (z = staterule(RULE, r, NiL, -1))) ? z->time : r->time;
 				for (p = r->prereqs; p; p = p->next)
 				{
-					if (p->rule != x && (c == '~' || !notfile(p->rule) &&
+					if (p->rule != x && (c == '~' && (!(op & VAL_FILE) || !notfile(p->rule)) || !notfile(p->rule) &&
 					    (c != '>' || !(p->rule->dynamic & D_same) &&
 					     (!(r->property & P_archive) && (p->rule->time >= state.start || p->rule->time > e || !(z = staterule(RULE, p->rule, NiL, -1)) || !z->time || !(state.questionable & 0x01000000) && z->time > e) ||
 					      (r->property & P_archive) && !(p->rule->dynamic & D_member) && p->rule->time))))
 					{
-						t = state.localview ? localview(p->rule) : p->rule->name;
+						t = BINDING(p->rule, op);
 						if (n)
 							sfputc(internal.val, ' ');
 						else
@@ -376,7 +378,7 @@ getval(register char* s, int op)
 			case '!':	/* explicit and generated file prerequisites  */
 			case '&':	/* explicit and generated state prerequisites */
 			case '?':	/* all explicit and generated prerequisites   */
-				sep = genprereqs(internal.val, r, c == '&', c == '?', sep);
+				sep = genprereqs(internal.val, r, c == '&', c == '?', sep, op);
 				val = 0;
 				break;
 
@@ -493,31 +495,19 @@ getval(register char* s, int op)
 			if (istype(*s, C_ID1))
 				v->property |= V_frozen;
 		}
-		t = v->value;
 		if (state.mam.regress && state.user > 1 && (v->property & (V_import|V_local_E)) == V_import)
 		{
 			v->property |= V_local_E;
 			dumpregress(state.mam.out, "setv", v->name, v->value);
 		}
-		if (v->property & V_auxiliary)
+		t = (op & VAL_PRIMARY) ? v->value : null;
+		if ((v->property & V_auxiliary) && (op & VAL_AUXILIARY) && (a = auxiliary(v->name, 0)) && *a->value)
 		{
-			if (op <= 0)
-			{
-				if ((a = auxiliary(v->name, 0)) && *a->value)
-				{
-					if (op < 0)
-						return a->value;
-					if (*v->value)
-						sfprintf(internal.val, "%s ", v->value);
-					sfputr(internal.val, a->value, -1);
-					t = sfstruse(internal.val);
-				}
-				else if (op < 0)
-					t = null;
-			}
+			if (!*t)
+				return a->value;
+			sfprintf(internal.val, "%s %s", t, a->value);
+			t = sfstruse(internal.val);
 		}
-		else if (op < 0)
-			t = null;
 		return t;
 	}
 	if (state.reading && !state.global && istype(*s, C_ID1) && (v = setvar(s, null, 0)))

@@ -795,7 +795,7 @@ bindstate(register struct rule* r, register char* val)
 		{
 			tmp = sfstropen();
 			r->dynamic |= D_bound;
-			expand(tmp, getval(v->name, 1));
+			expand(tmp, getval(v->name, VAL_PRIMARY));
 			r->dynamic &= ~D_bound;
 			val = sfstruse(tmp);
 		}

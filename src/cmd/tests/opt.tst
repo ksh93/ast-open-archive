@@ -1239,6 +1239,22 @@ Yada yada.
 .PP'
 
 TEST 08 'optstr() tests'
+	usage=$'[-][a:aaa?AAA][v:vvv?VVV]:[xxx]'
+	EXEC	- dll "$usage" 'vvv=zzz foo: aaa bar: aaa'
+		OUTPUT - $'return=v option=-v name=vvv arg=zzz num=1
+return=# option=: name=foo arg=(null) num=0
+return=a option=-a name=aaa arg=(null) num=1
+return=# option=: name=bar arg=(null) num=0
+return=a option=-a name=aaa arg=(null) num=1'
+	EXEC	- dll "$usage" '???TEST,???NOEMPHASIS,man'
+		EXIT 2
+		OUTPUT - $'return=? option=-? name=man num=0'
+		ERROR - $'SYNOPSIS
+  dll [ options ]
+
+OPTIONS
+  -a, --aaa       AAA
+  -v, --vvv=xxx   VVV'
 	usage=$'[-?@(#)pax (AT&T Labs Research) 1999-02-14\n]
 [a:append?Append to end of archive.]
 [101:atime?Preserve or set access time.]:?[time]
@@ -1253,9 +1269,11 @@ TEST 08 'optstr() tests'
 [-license?http://www.research.att.com/sw/tools/reuse]
 '
 	EXEC	- pax "$usage" 'append base="aaa zzz" charset=us'
+		EXIT 0
 		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
 return=z option=-z name=base arg=aaa zzz num=1
 return=-103 option=-103 name=charset arg=us num=1'
+		ERROR -
 	EXEC	- pax "$usage" '14 foo'
 		EXIT 1
 		OUTPUT - $'return=: option= name=14 num=0 str=14 foo\nreturn=: option= name=foo num=0 str=14 foo'
@@ -2933,6 +2951,10 @@ IMPLEMENTATION
 "html"
 "Read html from \afile\a."
 "file[?name=value;...]"'
+	EXEC ls $'[-][w:width]#[screen-width]' -wx
+		OUTPUT - $'return=: option=-w name=-w num=0'
+		ERROR - $'ls: -w: numeric screen-width argument expected'
+		EXIT 1
 
 TEST 38 'ancient compatibility for modern implementations -- ok, I still use vi'
 	usage=$'[-1o][a:all][f:full][l:long][u:user]:[uid]\n\n[ pid ... ]\n\n'
@@ -3395,7 +3417,18 @@ OPTIONS
                     C|ctown
                           ccc'
 
-TEST 44 'detailed key strings' # this test must be last
+TEST 44 'getopt_long() compatibility'
+	usage=$'[-1p1]\n[h:help]\n[V:version]\n[v:verbose]\n[X]\n[259:save-temps]\n[s:std]:[string]\n[d:debug]\n[262:static]\n[263:dynamic]\n[264:free]\n[265:fixed]\n[266:column]:[string]\n[267:MT]:[string]\n[268:MF]:[string]\n[269:fmain]\n[270:fno-main]\n[W:Wall]\n[272:Wobsolete]\n[273:Wno-obsolete]\n[274:Warchaic]\n[275:Wno-archaic]\n[276:Wcolumn-overflow]\n[277:Wno-column-overflow]\n[278:Wconstant]\n[279:Wno-constant]\n[280:Wparentheses]\n[281:Wno-parentheses]\n[282:Wimplicit-terminator]\n[283:Wno-implicit-terminator]\n[284:Wstrict-typing]\n[285:Wno-strict-typing]\n[?]\n[E]\n[P]\n[C]\n[S]\n[c]\n[m]\n[g]\n[o]:[]\n[I]:[]\n'
+	EXEC cobcc "$usage" -static -I foo -Ibar -debug -C -Wparen tst.cob
+		OUTPUT - $'return=-262 option=-262 name=-static arg=(null) num=1
+return=I option=-262 name=-I arg=foo num=1
+return=I option=-262 name=-I arg=bar num=1
+return=d option=-d name=-debug arg=(null) num=1
+return=C option=-d name=-C arg=(null) num=1
+return=-280 option=-280 name=-Wparentheses arg=(null) num=1
+argument=1 value="tst.cob"'
+
+TEST 45 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man
 		EXIT 2

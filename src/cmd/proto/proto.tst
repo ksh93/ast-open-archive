@@ -19659,3 +19659,9 @@ void fun(int arg)
 void fun __PARAM__((int arg), (arg)) __OTORP__(int arg;){
 	SPAN(next) = ratio * STSIZE(arg);
 }'
+
+TEST 11 'libpp splice'
+	EXEC -nhf
+	INPUT - $'int a = val>0?vau:0;
+int b = val>0?val:0;'
+	SAME OUTPUT INPUT

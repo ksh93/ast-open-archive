@@ -76,6 +76,8 @@ sfpzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 		if (op != SF_CLOSING)
 			free(dp);
 		return r;
+	case SF_DBUFFER:
+		return 1;
 	case SF_SYNC:
 		return val ? 0 : pzsync(pz->pz);
 	case SFPZ_HANDLE:
@@ -147,7 +149,12 @@ sfdcpzip(Sfio_t* sp, const char* path, unsigned long flags, Pzdisc_t* disc)
 		int		m1;
 		int		m2;
 
-		if (!(s = (unsigned char*)sfreserve(sp, PZ_GZ_MAGOFF + 2, 1)))
+		if (!(r = sfset(sp, 0, 0) & SF_SHARE))
+			sfset(sp, SF_SHARE, 1);
+		s = (unsigned char*)sfreserve(sp, PZ_GZ_MAGOFF + 2, 1);
+		if (!r)
+			sfset(sp, SF_SHARE, 0);
+		if (!s)
 			return -1;
 		m1 = s[0];
 		m2 = s[1];
@@ -159,12 +166,17 @@ sfdcpzip(Sfio_t* sp, const char* path, unsigned long flags, Pzdisc_t* disc)
 			return r;
 		if (!r)
 		{
-			if (!(flags & PZ_NOGZIP) && m1 == GZ_MAGIC_1)
+			if (!(flags & PZ_NOGZIP))
 			{
-				if (m2 == GZ_MAGIC_2)
-					r = sfdcgzip(sp, (flags & PZ_CRC) ? 0 : SFGZ_NOCRC);
-				else if (m2 == LZ_MAGIC_2)
-					r = sfdclzw(sp, 0);
+				if (m1 == GZ_MAGIC_1)
+				{
+					if (m2 == GZ_MAGIC_2)
+						r = sfdcgzip(sp, (flags & PZ_CRC) ? 0 : SFGZ_NOCRC);
+					else if (m2 == LZ_MAGIC_2)
+						r = sfdclzw(sp, 0);
+				}
+				else if (m1 == 'B' && m2 == 'Z' && s[2] == 'h' && s[3] >= '1' && s[3] <= '9')
+					r = sfdcbzip(sp, 0);
 			}
 			return r;
 		}

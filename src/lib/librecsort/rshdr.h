@@ -39,7 +39,11 @@
 */
 #define RS_RESERVE	(128*1024)	/* for I/O reservation		*/
 
+struct Rsstack_s; typedef struct Rsstack_s Rsstack_t;
+
 #define _RS_PRIVATE_ \
+	unsigned long	events;		/* active events		*/ \
+	Rsstack_t*	stack;		/* discipline stack		*/ \
 	Void_t*		methdata;	/* private method data		*/ \
 	Vmalloc_t*	vm;		/* region to allocate temp data	*/ \
 	ssize_t		c_max;		/* max datasize per chain	*/ \
@@ -52,6 +56,13 @@
 	unsigned char	*rsrv, *endrsrv, *cur;	/* for fast writes	*/
 
 #include		"recsort.h"
+
+struct Rsstack_s
+{
+	Rsstack_t*	prev;
+	Rsstack_t*	next;
+	Rsdisc_t*	disc;
+};
 
 /* internal control bits */
 #define RS_SORTED	010000		/* context has been sorted	*/
@@ -171,5 +182,11 @@ Kpvimport Void_t*	memchr _ARG_((const Void_t*, int, size_t));
 Kpvimport Void_t*	memcpy _ARG_((Void_t*, const Void_t*, size_t));
 _END_EXTERNS_
 #endif
+
+#define RSNOTIFY(r,o,v,d)	((r->events&o)?rsnotify(r,o,(Void_t*)v,d):(0))
+
+#define rsnotify	_rs_notify
+
+extern int		rsnotify _ARG_((Rs_t*, int, Void_t*, Rsdisc_t*));
 
 #endif /*_RSHDR_H*/

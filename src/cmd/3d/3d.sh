@@ -36,7 +36,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: 3d (AT&T Labs Research) 2000-12-14 $
+@(#)$Id: 3d (AT&T Labs Research) 2003-06-04 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?3d - execute a command with nDFS filesystem services enabled]
@@ -252,7 +252,8 @@ do	case $OPT in
 	*)	exit 2 ;;
 	esac
 done
-shift $OPTIND-1
+set x "$@"
+shift $OPTIND
 case $cflag in
 1)	set -- -c "$@" ;;
 esac

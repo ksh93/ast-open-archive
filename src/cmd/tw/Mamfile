@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -43,9 +44,7 @@ make ../../../include/ast/wait.h implicit
 make ../../../include/ast/ast_wait.h implicit
 done ../../../include/ast/ast_wait.h dontcare
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -85,7 +84,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -102,6 +102,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -156,10 +161,7 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/find.h
 prev ../../../include/ast/ls.h implicit
 make ../../../include/ast/expr.h implicit
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h dontcare
+prev ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/cdt.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/ast_std.h implicit
@@ -173,7 +175,7 @@ prev ../../../include/ast/ast.h implicit
 done tw.h
 done tw.c
 prev tw.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c tw.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c tw.c
 done tw.o generated
 make expr.o
 make expr.c
@@ -193,7 +195,7 @@ done ../../../include/ast/int.h
 prev tw.h implicit
 done expr.c
 prev expr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c expr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c expr.c
 done expr.o generated
 make ftwlocal.o
 make ftwlocal.c
@@ -202,7 +204,7 @@ prev ftwlocal.h implicit
 done ftwlocal.c
 prev ftwlocal.c
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ftwlocal.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ftwlocal.c
 done ftwlocal.o generated
 make cmdarg.o
 make cmdarg.c
@@ -213,11 +215,12 @@ prev ../../../include/ast/ast.h implicit
 done cmdarg.c
 prev cmdarg.c
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmdarg.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmdarg.c
 done cmdarg.o generated
 bind -lexpr
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tw tw.o expr.o ftwlocal.o cmdarg.o ${mam_libexpr} ${mam_libast}
+bind -lm dontcare
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tw tw.o expr.o ftwlocal.o cmdarg.o ${mam_libexpr} ${mam_libast} ${mam_libm}
 done tw generated
 make find
 make find.o
@@ -260,12 +263,12 @@ prev ../../../include/ast/ast.h implicit
 done find.c
 prev find.c
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c find.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c find.c
 done find.o generated
 prev ftwlocal.o
 prev cmdarg.o
 setv LICENSE -DLICENSE="since=1989,author=gsf+dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o find find.o ftwlocal.o cmdarg.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o find find.o ftwlocal.o cmdarg.o ${mam_libast} ${mam_libm}
 done find generated
 make xargs
 make xargs.o
@@ -276,10 +279,10 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done xargs.c
 prev xargs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c xargs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" -c xargs.c
 done xargs.o generated
 prev cmdarg.o
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o xargs xargs.o cmdarg.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o xargs xargs.o cmdarg.o ${mam_libast} ${mam_libm}
 done xargs generated
 make locate
 make locate.sh
@@ -302,7 +305,7 @@ exec - 		i=`(read x; echo $x) < locate.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
+exec - 		echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"'
 exec - 		cat locate.sh
 exec - 		} > locate
 exec - 		;;
@@ -312,7 +315,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 189 in
 exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
+exec - 	*)	echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' ;;
 exec - 	esac
 exec - 	cat locate.sh
 exec - 	} > locate
@@ -341,7 +344,7 @@ exec - 		i=`(read x; echo $x) < updatedb.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"
+exec - 		echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"'
 exec - 		cat updatedb.sh
 exec - 		} > updatedb
 exec - 		;;
@@ -351,7 +354,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 189 in
 exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\" ;;
+exec - 	*)	echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?tw]"\"' ;;
 exec - 	esac
 exec - 	cat updatedb.sh
 exec - 	} > updatedb

@@ -38,8 +38,8 @@ Rs_t*	rs;
 {
 	reg int	rv;
 
-	if(rs->disc->eventf &&
-	   (rv = (*rs->disc->eventf)(rs,RS_CLOSE,NIL(Void_t*),rs->disc)) < 0)
+	while (rsdisc(rs, NIL(Rsdisc_t*), RS_POP));
+	if ((rv = RSNOTIFY(rs,RS_CLOSE,0,rs->disc)) < 0)
 		return rv;
 
 	if(rs->vm)

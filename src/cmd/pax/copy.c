@@ -234,7 +234,7 @@ recordout(Archive_t* ap, File_t* f, Sfio_t* fp)
 				break;
 			}
 			if (state.record.charset && ap->format == IBMAR)
-				ccmaps(recdat, p - recdat, CC_NATIVE, CC_EBCDIC1);
+				ccmapstr(state.map.n2e, recdat, p - recdat);
 			count++;
 			if (p >= &blk[state.blocksize] || state.record.format == 'U')
 				break;
@@ -577,7 +577,7 @@ recordin(register Archive_t* ap, register File_t* f, int wfd)
 			}
 			m = i += k;
 			if (state.record.charset && ap->format == IBMAR)
-				ccmaps(&state.tmp.buffer[j], m - j, CC_EBCDIC1, CC_NATIVE);
+				ccmapstr(state.map.e2n, &state.tmp.buffer[j], m - j);
 			if (state.record.line) switch (f->record.format)
 			{
 			case 'F':

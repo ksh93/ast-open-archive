@@ -159,8 +159,11 @@ struct loadstate			/* load state			*/
 static struct				/* object global state		*/
 {
 	Sfio_t*		pp;		/* prerequisite ref pointer	*/
+	unsigned char*	a2n;		/* CC_ASCII=>CC_NATIVE		*/
+	unsigned char*	n2a;		/* CC_NATIVE=>CC_ASCII		*/
 	unsigned long	garbage;	/* state garbage count		*/
 	unsigned long	rules;		/* state rule count		*/
+	int		initialized;	/* state initialized		*/
 } object;
 
 /*
@@ -275,6 +278,21 @@ static struct OLD_header old_stamp =	/* old object header is fixed	*/
 };
 
 /*
+ * initialize the object ccode tables
+ */
+
+void
+initcode(void)
+{
+	if (!object.initialized)
+	{
+		object.initialized = 1;
+		object.a2n = ccmap(CC_ASCII, CC_NATIVE);
+		object.n2a = ccmap(CC_NATIVE, CC_ASCII);
+	}
+}
+
+/*
  * read canonical 0 terminated string from object file
  */
 
@@ -284,7 +302,7 @@ getstring(Sfio_t* sp)
 	char*	s;
 
 	if (s = sfgetr(sp, 0, 0))
-		ccmaps(s, sfvalue(sp), CC_ASCII, CC_NATIVE);
+		ccmapstr(object.a2n, s, sfvalue(sp));
 	return s;
 }
 
@@ -295,23 +313,18 @@ getstring(Sfio_t* sp)
 static void
 putstring(register Sfio_t* sp, register const char* s, int sep)
 {
-	register int	c;
+	register int		c;
+	register unsigned char*	map;
 
-	if (CC_NATIVE == CC_ASCII)
-		sfputr(sp, s, sep);
-	else
+	if (map = object.n2a)
 	{
-		while (c = *s++)
-		{
-			c = ccmapc(c, CC_NATIVE, CC_ASCII);
-			sfputc(sp, c);
-		}
+		while (c = *(unsigned char*)s++)
+			sfputc(sp, map[c]);
 		if (sep >= 0)
-		{
-			c = ccmapc(sep, CC_NATIVE, CC_ASCII);
-			sfputc(sp, c);
-		}
+			sfputc(sp, map[sep]);
 	}
+	else
+		sfputr(sp, s, sep);
 }
 
 /*
@@ -361,21 +374,19 @@ markgarbage(register struct rule* r, int garbage)
 static void
 compstring(register struct compstate* cs, register char* s)
 {
-	register int	c;
+	register int		c;
+	register unsigned char*	map;
 
 	if (s)
 	{
 		c = strlen(s) + 1;
 		cs->strings += c;
 		sfputu(cs->fp, c);
-		if (CC_NATIVE == CC_ASCII)
-			sfwrite(cs->fp, s, c - 1);
-		else
+		if (map = object.n2a)
 			while (c = *s++)
-			{
-				c = ccmapc(c, CC_NATIVE, CC_ASCII);
-				sfputc(cs->fp, c);
-			}
+				sfputc(cs->fp, map[c]);
+		else
+			sfwrite(cs->fp, s, c - 1);
 	}
 	else
 		sfputu(cs->fp, 0);
@@ -1044,8 +1055,18 @@ loadstring(struct loadstate* ls, Sfio_t* sp)
 	s = ls->sp;
 	ls->sp += n--;
 	sfread(sp, s, n);
-	ccmaps(s, n, CC_ASCII, CC_NATIVE);
+	ccmapstr(object.a2n, s, n);
 	return s;
+}
+
+/*
+ * initialize object state
+ */
+
+static void
+loadinit(void)
+{
+	object.garbage = object.rules = 0;
 }
 
 /*
@@ -1066,6 +1087,7 @@ loadable(register Sfio_t* sp, register struct rule* r, int source)
 	int			ok = 1;
 	long			old = 0;
 
+	loadinit();
 	if ((s = sfreserve(sp, 0, 0)) && (n = sfvalue(sp)) >= 0)
 	{
 		if (n >= MAGICSIZE && !memcmp(s, MAGIC, MAGICSIZE) || n >= sizeof(old) && ((old = OLD_MAGIC, swapop(s, &old, sizeof(old)) >= 0) || (old = OLD_OLD_MAGIC, swapop(s, &old, sizeof(old)) >= 0)))
@@ -1262,6 +1284,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 	struct OLD_header	old_header;
 	struct OLD_trailer	old_trailer;
 
+	loadinit();
 	zero(ls);
 
 	/*

@@ -3698,6 +3698,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 	int		quote;
 	int		n;
 	int		m;
+	unsigned char*	map;
 	Tag_t*		tp;
 	int		argv[ARGS];
 	struct stat	st;
@@ -3717,6 +3718,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 	cc = 0;
 	lastc = 0;
 	quote = 0;
+	map = ccmap(CC_NATIVE, CC_ASCII);
 	for (;;)
 	{
 		switch (c = GETC())
@@ -4465,7 +4467,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 				cc = s - buf;
 				continue;
 			}
-			else if ((n = ccmapc(c, CC_NATIVE, CC_ASCII)) > 0177)
+			else if ((n = ccmapchr(map, c)) > 0177)
 			{
 				ONE();
 				code_2(OP_cc, n & 0377);

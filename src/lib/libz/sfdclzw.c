@@ -483,6 +483,8 @@ lzw_except(Sfio_t* f, int op, void* val, Sfdisc_t* dp)
 		if (op != SF_CLOSING)
 			free(dp);
 		return r;
+	case SF_DBUFFER:
+		return 1;
 	case SF_READ:
 	case SF_WRITE:
 		return *((ssize_t*)val) < 0 ? -1 : 0;
@@ -734,7 +736,12 @@ sfdclzw(Sfio_t* f, int flags)
 		 *	0x1f9d	sfdclzw		compress
 		 */
 		
-		if (!(s = (unsigned char*)sfreserve(f, 2, 1)))
+		if (!(n = sfset(f, 0, 0) & SF_SHARE))
+			sfset(f, SF_SHARE, 1);
+		s = (unsigned char*)sfreserve(f, 2, 1);
+		if (!n)
+			sfset(f, SF_SHARE, 0);
+		if (!s)
 			return -1;
 		if (*s != 0x1f)
 			n = -1;
@@ -774,6 +781,7 @@ sfdclzw(Sfio_t* f, int flags)
 	roffset = 0;
 	size = 0;
 
+	sfset(f, SF_SHARE|SF_PUBLIC, 0);
 	if (sfdisc(f, &zs->disc) != &zs->disc)
 	{	
 		free(zs);

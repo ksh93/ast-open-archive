@@ -75,11 +75,11 @@ isalar(Archive_t* ap, register char* hdr)
 	if (ap->expected >= 0 && ap->expected != ALAR && ap->expected != IBMAR)
 		return 0;
 	memcpy(buf, hdr, 4);
-	ccmaps(buf, 4, CC_ASCII, CC_NATIVE);
+	ccmapstr(state.map.a2n, buf, 4);
 	if ((ap->expected < 0 || ap->expected == ALAR) && strneq(hdr, "VOL1", 4))
 	{
 		ap->format = ALAR;
-		ccmaps(hdr, ALAR_HEADER, CC_ASCII, CC_NATIVE);
+		ccmapstr(state.map.a2n, hdr, ALAR_HEADER);
 		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_ASCII);
 		if (!ap->convert[0].on)
 			convert(ap, SECTION_DATA, CC_NATIVE, CC_ASCII);
@@ -87,10 +87,10 @@ isalar(Archive_t* ap, register char* hdr)
 	else if (ap->expected < 0 || ap->expected == IBMAR)
 	{
 		memcpy(buf, hdr, 4);
-		ccmaps(buf, 4, CC_EBCDIC1, CC_NATIVE);
+		ccmapstr(state.map.e2n, buf, 4);
 		if (!strneq(buf, "VOL1", 4))
 			return 0;
-		ccmaps(hdr, ALAR_HEADER, CC_EBCDIC1, CC_NATIVE);
+		ccmapstr(state.map.e2n, hdr, ALAR_HEADER);
 		ap->format = IBMAR;
 		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_EBCDIC1);
 		if (!ap->convert[0].on)
@@ -558,7 +558,7 @@ putepilogue(register Archive_t* ap)
 		case CPIO:
 		case ASC:
 		case ASCHK:
-			putinfo(ap, CPIO_TRAILER, ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA) ? ap->delta->index + 1 : 0, 0);
+			putinfo(ap, strcpy(tar_block, CPIO_TRAILER), ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA) ? ap->delta->index + 1 : 0, 0);
 			boundary = ap->io->unblocked ? BLOCKSIZE : state.blocksize;
 			break;
 		case PAX:
@@ -2631,7 +2631,7 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 		ap->memsum = 0;
 	ap->old.memsum = 0;
 	ap->section = SECTION_DATA;
-	ap->convert[ap->section].on = ap->convert[ap->section].from != ap->convert[ap->section].to;
+	ap->convert[ap->section].on = ap->convert[ap->section].f2t != 0;
 	return 1;
 }
 
@@ -3180,6 +3180,7 @@ putheader(register Archive_t* ap, register File_t* f)
 	if (state.checksum.sum)
 		suminit(state.checksum.sum);
 	ap->section = SECTION_DATA;
+	ap->convert[ap->section].on = ap->convert[ap->section].f2t != 0;
 }
 
 /*

@@ -376,6 +376,15 @@
 #define V_CLEARSTATE	(V_free|V_restored)
 #define V_CLEAROBJECT	(~(V_auxiliary|V_builtin|V_functional|V_import|V_retain|V_scan|V_scope))
 
+/*
+ * getval() flags
+ */
+
+#define VAL_AUXILIARY	(1<<0)		/* auxilliary value		*/
+#define VAL_FILE	(1<<1)		/* !notfile(r)			*/
+#define VAL_PRIMARY	(1<<2)		/* primary value		*/
+#define VAL_UNBOUND	(1<<3)		/* unbound name			*/
+
 struct fileid				/* unique file id		*/
 {
 	long		dev;		/* device number		*/
@@ -900,6 +909,7 @@ extern char**		globv(char*);
 extern int		handle(void);
 extern int		hasattribute(struct rule*, struct rule*, struct rule*);
 extern void		immediate(struct rule*);
+extern void		initcode(void);
 extern void		inithash(void);
 extern void		initrule(void);
 extern void		initscan(int);

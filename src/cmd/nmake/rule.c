@@ -1319,7 +1319,7 @@ view(register char* s, register char* d, struct list* p)
 	if (i > 2 && d[i - 1] == '/')
 		d[--i] = 0;
 	r = makerule(d);
-	if ((unique(r) || !r->time) && r != internal.dot)
+	if ((unique(r) || !r->time) && !streq(r->name, internal.dot->name) && !streq(r->name, internal.pwd))
 	{
 		if (state.maxview < MAXVIEW - 1)
 		{

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -43,9 +44,7 @@ make ../../../include/ast/ccode.h implicit
 make ../../../include/ast/ast_ccode.h implicit
 done ../../../include/ast/ast_ccode.h dontcare
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -85,7 +84,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -102,6 +102,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -135,11 +140,12 @@ done ../../../include/ast/cmd.h
 done banner.c
 prev banner.c
 setv LICENSE -DLICENSE="since=1989,author=dgk"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c banner.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c banner.c
 done banner.o generated
 bind -last
+bind -lm dontcare
 setv LICENSE -DLICENSE="since=1989,author=dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o banner banner.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o banner banner.o ${mam_libast} ${mam_libm}
 done banner generated
 make dd
 make dd.o
@@ -167,9 +173,9 @@ prev ../../../include/ast/ccode.h implicit
 prev ../../../include/ast/ast.h implicit
 done dd.c
 prev dd.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c dd.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c dd.c
 done dd.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o dd dd.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o dd dd.o ${mam_libast} ${mam_libm}
 done dd generated
 make df
 make df.o
@@ -192,9 +198,9 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done df.c
 prev df.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c df.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c df.c
 done df.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o df df.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o df df.o ${mam_libast} ${mam_libm}
 done df generated
 make du
 make du.o
@@ -217,9 +223,9 @@ prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
 done du.c
 prev du.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c du.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c du.c
 done du.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o du du.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o du du.o ${mam_libast} ${mam_libm}
 done du generated
 make file
 make file.o
@@ -233,9 +239,9 @@ done ../../../include/ast/magic.h
 prev ../../../include/ast/ast.h implicit
 done file.c
 prev file.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c file.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c file.c
 done file.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o file file.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o file file.o ${mam_libast} ${mam_libm}
 done file generated
 make iconv
 make iconv.o
@@ -245,9 +251,9 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done iconv.c
 prev iconv.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c iconv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c iconv.c
 done iconv.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o iconv iconv.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o iconv iconv.o ${mam_libast} ${mam_libm}
 done iconv generated
 make locale
 make locale.o
@@ -261,7 +267,7 @@ prev ../../../include/ast/nl_types.h implicit
 make FEATURE/locales implicit
 make features/locales
 done features/locales
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/locales
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} : run features/locales
 done FEATURE/locales generated
 make ../../../include/ast/regex.h implicit
 prev ../../../include/ast/ast_common.h implicit
@@ -286,9 +292,9 @@ prev ../../../include/ast/cdt.h implicit
 prev ../../../include/ast/ast.h implicit
 done locale.c
 prev locale.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c locale.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c locale.c
 done locale.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o locale locale.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o locale locale.o ${mam_libast} ${mam_libm}
 done locale generated
 make ls
 make ls.o
@@ -302,9 +308,9 @@ prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
 done ls.c
 prev ls.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ls.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ls.c
 done ls.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ls ls.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ls ls.o ${mam_libast} ${mam_libm}
 done ls generated
 make mesg
 make mesg.o
@@ -314,10 +320,10 @@ prev ../../../include/ast/cmd.h implicit
 done mesg.c
 prev mesg.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mesg.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mesg.c
 done mesg.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mesg mesg.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mesg mesg.o ${mam_libast} ${mam_libm}
 done mesg generated
 make ast_mount
 make mount.o
@@ -325,7 +331,7 @@ make mount.c
 make FEATURE/unmount implicit
 make features/unmount
 done features/unmount
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/unmount
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} : run features/unmount
 done FEATURE/unmount generated
 prev ../../../include/ast/sfstr.h implicit
 prev ../../../include/ast/ast_fs.h implicit
@@ -337,10 +343,10 @@ prev ../../../include/ast/ast.h implicit
 done mount.c
 prev mount.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mount.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mount.c
 done mount.o generated
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ast_mount mount.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ast_mount mount.o ${mam_libast} ${mam_libm}
 done ast_mount generated
 make ast_ps
 make ps.o
@@ -371,7 +377,7 @@ prev ../../../include/ast/ast.h implicit
 done ps.c
 prev ps.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ps.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ps.c
 done ps.o generated
 make pss.o
 make pss.c
@@ -379,7 +385,7 @@ make psslib.h implicit
 make FEATURE/procfs implicit
 make features/procfs
 done features/procfs
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/procfs
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} : run features/procfs
 done FEATURE/procfs dontcare generated
 prev pss.h implicit
 make ../../../include/ast/ast_windows.h implicit
@@ -387,10 +393,7 @@ make windows.h implicit
 done windows.h dontcare virtual
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_windows.h dontcare
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h dontcare
+prev ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/dirent.h implicit
@@ -405,7 +408,7 @@ done psslib.h
 done pss.c
 prev pss.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss.c
 done pss.o generated
 make pss-null.o
 make pss-null.c
@@ -413,7 +416,7 @@ prev psslib.h implicit
 done pss-null.c
 prev pss-null.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-null.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-null.c
 done pss-null.o generated
 make pss-procfs.o
 make pss-procfs.c
@@ -421,7 +424,7 @@ prev psslib.h implicit
 done pss-procfs.c
 prev pss-procfs.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-procfs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-procfs.c
 done pss-procfs.o generated
 make pss-getprocs.o
 make pss-getprocs.c
@@ -433,7 +436,7 @@ prev psslib.h implicit
 done pss-getprocs.c
 prev pss-getprocs.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-getprocs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-getprocs.c
 done pss-getprocs.o generated
 make pss-cygwin.o
 make pss-cygwin.c
@@ -441,7 +444,7 @@ prev psslib.h implicit
 done pss-cygwin.c
 prev pss-cygwin.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-cygwin.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-cygwin.c
 done pss-cygwin.o generated
 make pss-kvm.o
 make pss-kvm.c
@@ -451,7 +454,7 @@ prev psslib.h implicit
 done pss-kvm.c
 prev pss-kvm.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-kvm.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-kvm.c
 done pss-kvm.o generated
 make pss-pstat.o
 make pss-pstat.c
@@ -459,7 +462,7 @@ prev psslib.h implicit
 done pss-pstat.c
 prev pss-pstat.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-pstat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-pstat.c
 done pss-pstat.o generated
 make pss-ps.o
 make pss-ps.c
@@ -468,12 +471,12 @@ prev psslib.h implicit
 done pss-ps.c
 prev pss-ps.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-ps.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pss-ps.c
 done pss-ps.o generated
 make ${mam_libkvm} archive
 done ${mam_libkvm} dontcare virtual
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ast_ps ps.o pss.o pss-null.o pss-procfs.o pss-getprocs.o pss-cygwin.o pss-kvm.o pss-pstat.o pss-ps.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ast_ps ps.o pss.o pss-null.o pss-procfs.o pss-getprocs.o pss-cygwin.o pss-kvm.o pss-pstat.o pss-ps.o ${mam_libast} ${mam_libm}
 done ast_ps generated
 make shar
 make shar.sh
@@ -497,7 +500,7 @@ exec - 		i=`(read x; echo $x) < shar.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\"
+exec - 		echo USAGE_LICENSE='\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\"'
 exec - 		cat shar.sh
 exec - 		} > shar
 exec - 		;;
@@ -507,7 +510,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 188 in
 exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" ;;
+exec - 	*)	echo USAGE_LICENSE='\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\"' ;;
 exec - 	esac
 exec - 	cat shar.sh
 exec - 	} > shar
@@ -523,10 +526,10 @@ prev ../../../include/ast/cmd.h implicit
 done split.c
 prev split.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c split.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c split.c
 done split.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o split split.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o split split.o ${mam_libast} ${mam_libm}
 done split generated
 make csplit
 prev split
@@ -555,10 +558,10 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/sum.h
 done sum.c
 prev sum.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c sum.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c sum.c
 done sum.o generated
 bind -lsum
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sum sum.o ${mam_libsum} ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sum sum.o ${mam_libsum} ${mam_libast} ${mam_libm}
 done sum generated
 make cksum
 prev sum
@@ -583,9 +586,9 @@ prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
 done touch.c
 prev touch.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c touch.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c touch.c
 done touch.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o touch touch.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o touch touch.o ${mam_libast} ${mam_libm}
 done touch generated
 make tsort
 make tsort.o
@@ -596,10 +599,10 @@ prev ../../../include/ast/ast.h implicit
 done tsort.c
 prev tsort.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c tsort.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c tsort.c
 done tsort.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tsort tsort.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tsort tsort.o ${mam_libast} ${mam_libm}
 done tsort generated
 make unexpand
 make unexpand.o
@@ -608,10 +611,10 @@ prev ../../../include/ast/cmd.h implicit
 done unexpand.c
 prev unexpand.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c unexpand.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c unexpand.c
 done unexpand.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o unexpand unexpand.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o unexpand unexpand.o ${mam_libast} ${mam_libm}
 done unexpand generated
 make expand
 prev unexpand
@@ -725,6 +728,12 @@ exec - ln ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/expand
 done ../../../bin/expand generated
 done install virtual
 make test
+make test.dd
+make dd.tst
+done dd.tst
+prev dd
+exec - regress  dd.tst dd
+done test.dd virtual
 make test.locale
 make locale.tst
 done locale.tst

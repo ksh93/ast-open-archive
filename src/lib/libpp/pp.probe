@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2003-03-14
+# @(#)pp.probe (AT&T Research) 2003-04-30
 #
 # C probe for libpp
 #
@@ -454,6 +454,14 @@ case "`grep -c '__STDC__[-0 	]*[=!]=[ 	]*0' $usrinclude/stdio.h 2>/dev/null`" in
 0)	;;
 *)	hostedtransition=1 ;;
 esac
+
+mapinclude=
+for i in builtins
+do	echo "#include <$i.h>" > t.$src
+	if	$cc -E t.$src
+	then	mapinclude="$mapinclude <$i.h>=\".\""
+	fi
+done
 
 #
 # the payoff
@@ -999,6 +1007,9 @@ case $plusplus in
 		;;
 	esac
 	;;
+esac
+case $mapinclude in
+?*)	echo "#pragma pp:mapinclude hosted$mapinclude" ;;
 esac
 case $lineid in
 ?*)	echo "#pragma pp:lineid line" ;;

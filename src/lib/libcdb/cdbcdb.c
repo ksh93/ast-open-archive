@@ -390,15 +390,14 @@ cdbrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 				if (n = dp->string.length)
 				{
 					sfputu(io, n + 1);
-					if (CC_NATIVE != CC_ASCII)
-					{
-						n++;
-						if (!(s = (char*)sfreserve(io, n, 0)))
-							goto bad;
-						ccmapcpy(s, dp->string.base, n, CC_NATIVE, CC_ASCII);
-					}
-					else
-						sfwrite(io, dp->string.base, n);
+#if CC_NATIVE != CC_ASCII
+					n++;
+					if (!(s = (char*)sfreserve(io, n, 0)))
+						goto bad;
+					ccmapm(s, dp->string.base, n, CC_NATIVE, CC_ASCII);
+#else
+					sfwrite(io, dp->string.base, n);
+#endif
 					sfputc(io, 0);
 				}
 				else
@@ -468,8 +467,9 @@ cdbrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 							if (CC_NATIVE != CC_ASCII)
 								x = sfstrtell(cdb->tmp);
 							sfwrite(cdb->tmp, dp->string.base, n);
-							if (CC_NATIVE != CC_ASCII)
-								CCMAPS(sfstrbase(cdb->tmp) + x, n, CC_NATIVE, CC_ASCII);
+#if CC_NATIVE != CC_ASCII
+							ccmaps(sfstrbase(cdb->tmp) + x, n, CC_NATIVE, CC_ASCII);
+#endif
 							sfputc(cdb->tmp, 0);
 						}
 						else
@@ -555,8 +555,7 @@ getstr(Cdb_t* cdb, int save)
 	{
 		if (!(s = vmstrdup(cdb->vm, s)))
 			return 0;
-		if (CC_NATIVE != CC_ASCII)
-			CCMAPS(s, sfvalue(cdb->io), CC_ASCII, CC_NATIVE);
+		ccmaps(s, sfvalue(cdb->io), CC_ASCII, CC_NATIVE);
 	}
 	return s;
 }
@@ -571,15 +570,14 @@ putstr(Cdb_t* cdb, register const char* s)
 	register char*	t;
 	register int	n;
 
-	if (CC_NATIVE != CC_ASCII)
-	{
-		n = strlen(s) + 1;
-		if (!(t = (char*)sfreserve(cdb->io, n, 0)))
-			return -1;
-		ccmapcpy(t, s, n, CC_NATIVE, CC_ASCII);
-	}
-	else
-		sfputr(cdb->io, s, 0);
+#if CC_NATIVE != CC_ASCII
+	n = strlen(s) + 1;
+	if (!(t = (char*)sfreserve(cdb->io, n, 0)))
+		return -1;
+	ccmapm(t, s, n, CC_NATIVE, CC_ASCII);
+#else
+	sfputr(cdb->io, s, 0);
+#endif
 	return 0;
 }
 

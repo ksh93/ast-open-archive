@@ -186,13 +186,15 @@ static void banner(const char *string,const char *delim,int width)
 	register unsigned mask;
 	register int c,i,n,j = strlen(string);
 	register const char *cp,*dp;
+	register unsigned char* map;
 	
+	map = ccmap(CC_NATIVE, CC_ASCII);
 	if(j > width/8)
 		error(ERROR_exit(1),"up to %d char%s per arg",width/8,(width/8)==1?"":"s");
 	for(i=0; i < CHAR_HEIGHT; i++)
 	{
 		dp = delim;
-		for(n=0,cp=string; c= ccmapc(*cp++, CC_NATIVE, CC_ASCII)&0x07f;dp++)
+		for (n = 0, cp = string; c = ccmapchr(map, *cp++) & 0x07f; dp++)
 		{
 			if(*dp==0)
 				dp = delim;

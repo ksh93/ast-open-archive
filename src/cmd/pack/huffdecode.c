@@ -26,12 +26,7 @@
  * huffman coding decoding
  *
  *   David Korn
- *   AT&T Bell Laboratories
- *   Room 3C-526B
- *   Murray Hill, N. J. 07974
- *   Tel. x7975
- *   ulysses!dgk
- *
+ *   AT&T Laboratories
  */
 
 #include	"huffman.h"
@@ -67,9 +62,10 @@ static unsigned	char *getbuff(void);
  * decode <input> using huffman tree defined in <hp> onto <output>
  * if size>0, then decode until size bytes have been decoded
  * otherwise, the complete file is decoded.
+ * The number of bytes written is returned or -1 on error
  */
 
-int huffdecode(register Huff_t *hp,Sfio_t *input,Sfio_t *output,int size)
+Sfoff_t huffdecode(register Huff_t *hp,Sfio_t *input,Sfio_t *output,int size)
 {
 	register long buffer;
 	register int left, i, n;
@@ -78,7 +74,7 @@ int huffdecode(register Huff_t *hp,Sfio_t *input,Sfio_t *output,int size)
 	register unsigned char *inp;
 	unsigned char *outend;
 	unsigned char *outbuff;
-	long insize = hp->outsize;
+	Sfoff_t insize = hp->outsize;
 	/* decode the header if called with different hp */
 	if(lastid!=hp->id)
 	{

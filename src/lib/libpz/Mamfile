@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS ${mam_cc_DLL}
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,19 +42,19 @@ make libpz.a archive
 make pz.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in pz z dll ast
+exec - for i in pz bz z dll ast
 exec - do	case $i in
 exec - 	"pz"|pz)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -141,6 +142,7 @@ done ../../../include/ast/vmalloc.h dontcare
 make ../../../include/ast/sfdcgzip.h implicit
 make ../../../include/ast/sfdisc.h implicit
 make ../../../include/ast/ast.h implicit
+prev ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -182,35 +184,35 @@ prev ../../../include/ast/ast.h implicit
 done pzlib.h
 done pzopen.c
 prev pzopen.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzopen.c
 done pzopen.o generated
 make pzhead.o
 make pzhead.c
 prev pzlib.h implicit
 done pzhead.c
 prev pzhead.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzhead.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzhead.c
 done pzhead.o generated
 make pzpart.o
 make pzpart.c
 prev pzlib.h implicit
 done pzpart.c
 prev pzpart.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzpart.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzpart.c
 done pzpart.o generated
 make pzdeflate.o
 make pzdeflate.c
 prev pzlib.h implicit
 done pzdeflate.c
 prev pzdeflate.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzdeflate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzdeflate.c
 done pzdeflate.o generated
 make pzinflate.o
 make pzinflate.c
 prev pzlib.h implicit
 done pzinflate.c
 prev pzinflate.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzinflate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzinflate.c
 done pzinflate.o generated
 make pzlib.o
 make pzlib.c
@@ -219,35 +221,35 @@ done ../../../include/ast/dlldefs.h
 prev pzlib.h implicit
 done pzlib.c
 prev pzlib.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzlib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzlib.c
 done pzlib.o generated
 make pzinit.o
 make pzinit.c
 prev pzlib.h implicit
 done pzinit.c
 prev pzinit.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzinit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzinit.c
 done pzinit.o generated
 make pzread.o
 make pzread.c
 prev pzlib.h implicit
 done pzread.c
 prev pzread.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzread.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzread.c
 done pzread.o generated
 make pzwrite.o
 make pzwrite.c
 prev pzlib.h implicit
 done pzwrite.c
 prev pzwrite.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzwrite.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzwrite.c
 done pzwrite.o generated
 make pzsync.o
 make pzsync.c
 prev pzlib.h implicit
 done pzsync.c
 prev pzsync.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzsync.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzsync.c
 done pzsync.o generated
 make pzsplit.o
 make pzsplit.c
@@ -256,14 +258,14 @@ prev ../../../include/ast/cdt.h implicit
 prev pzlib.h implicit
 done pzsplit.c
 prev pzsplit.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzsplit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzsplit.c
 done pzsplit.o generated
 make pzfixed.o
 make pzfixed.c
 prev pzlib.h implicit
 done pzfixed.c
 prev pzfixed.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzfixed.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c pzfixed.c
 done pzfixed.o generated
 make pzconvert.o
 make pzconvert.c
@@ -274,21 +276,21 @@ done ../../../include/ast/int.h
 prev pzlib.h implicit
 done pzconvert.c
 prev pzconvert.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzconvert.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzconvert.c
 done pzconvert.o generated
 make sfdcpzip.o
 make sfdcpzip.c
 prev pzlib.h implicit
 done sfdcpzip.c
 prev sfdcpzip.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c sfdcpzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c sfdcpzip.c
 done sfdcpzip.o generated
 make sfdczip.o
 make sfdczip.c
 prev pzlib.h implicit
 done sfdczip.c
 prev sfdczip.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c sfdczip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -c sfdczip.c
 done sfdczip.o generated
 exec - ${AR} cr libpz.a pzopen.o pzhead.o pzpart.o pzdeflate.o pzinflate.o pzlib.o pzinit.o pzread.o pzwrite.o pzsync.o pzsplit.o pzfixed.o pzconvert.o sfdcpzip.o sfdczip.o
 exec - (ranlib libpz.a) >/dev/null 2>&1 || true
@@ -300,8 +302,8 @@ make libpzline.a archive
 make pzline.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -311,8 +313,8 @@ exec - do	case $i in
 exec - 	"pzline"|pzline|pz)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -331,7 +333,7 @@ prev ../../../include/ast/error.h implicit
 prev pzip.h implicit
 done pzline.c
 prev pzline.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzline.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzline.c
 done pzline.o generated
 exec - ${AR} cr libpzline.a pzline.o
 exec - (ranlib libpzline.a) >/dev/null 2>&1 || true

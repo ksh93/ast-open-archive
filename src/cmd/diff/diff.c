@@ -918,8 +918,12 @@ specify_format (var, value)
 }
 
 static void
+#if __STDC__ /* otherwise mvs.390 cc barfs */
+specify_style (enum output_style style)
+#else
 specify_style (style)
      enum output_style style;
+#endif
 {
   if (output_style != OUTPUT_NORMAL
       && output_style != style)

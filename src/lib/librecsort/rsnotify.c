@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1985-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -18,22 +18,36 @@
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                David Korn <dgk@research.att.com>                 *
 *                 Phong Vo <kpv@research.att.com>                  *
+*               Glenn Fowler <gsf@research.att.com>                *
 *                                                                  *
 *******************************************************************/
-/*
- * include this to enable file/line attribution in VMTRACE for ast malloc()
- */
+#include	"rshdr.h"
 
-#ifndef _VMTRACE_H
-#define _VMTRACE_H	1
-#define _BLD_ast	1
-#if !#match(__SOURCE__,".*vmalloc/.*")
-#define VMFL		1
-#pragma pp:include "../../../../include/ast"
-#pragma pp:include "../../../include/ast"
-#include <vmalloc.h>
+/*	Discipline event notification.
+*/
+
+#if __STD_C
+int rsnotify(Rs_t* rs, int op, Void_t* data, Rsdisc_t* disc)
+#else
+int rsnotify(rs, op, data, disc)
+Rs_t*		rs;
+int		op;
+Void_t*		data;
+Rsdisc_t*	disc;
 #endif
-#endif
+{
+	reg Rsstack_t*	stack;
+
+	if (rs->events & op)
+	{
+		for (stack = rs->stack; stack; stack = stack->next)
+			if ((stack->disc->events & op) &&
+			    (*stack->disc->eventf)(rs, op, data, stack->disc) < 0)
+				return -1;
+		if ((rs->disc->events & op) &&
+		    (*rs->disc->eventf)(rs, op, data, disc) < 0)
+			return -1;
+	}
+	return 0;
+}

@@ -1,6 +1,6 @@
 : 3d regression tests
 #
-# 3d.tst (AT&T Research) 2000-02-29
+# 3d.tst (AT&T Research) 2003-06-06
 #
 # the first section defines the test harness
 # the next section defines individual test functions
@@ -313,3 +313,11 @@ TEST 05 top symlink
 	if	LN -s text link
 	then	[[ -L link ]] || FAIL lstat does stat
 	fi
+
+TEST 06 symlink spaghetti
+	MKDIR usr/bin sbin
+	ACTIVE && echo : > sbin/cmd && chmod +x sbin/cmd
+	LN -s usr/bin bin
+	LN -s ../../sbin/cmd usr/bin/cmd
+	CD bin
+	ACTIVE && cmd

@@ -1,4 +1,4 @@
-: REG_MINIMAL tests 2001-11-20
+: REG_MINIMAL tests 2003-06-09
 
 E	(abc)+(xyz)+		abcabcxyzxyz	(0,12)(3,6)(9,12)
 Em	(abc)+(xyz)+		abcabcxyzxyz	(0,9)(3,6)(6,9)
@@ -48,6 +48,17 @@ SK	*!*			a!b			(0,3)
 SK	*\!*			a!b			(0,3)
 SK	*~*			a~b			(0,3)
 SK	*\~*			a~b			(0,3)
+
+E	.*(o+).*		foo/fun/bar		(0,11)(2,3)
+Em	.*(o+).*		foo/fun/bar		(0,2)(1,2)
+E	.*?(o+).*		foo/fun/bar		(0,11)(1,3)
+E	(?-g).*(o+).*		foo/fun/bar		(0,2)(1,2)
+E	(?-g:.*)(o+).*		foo/fun/bar		(0,11)(1,3)
+
+K	*+(o)*			foo/fun/bar		(0,11)(2,3)
+Km	*+(o)*			foo/fun/bar		(0,2)(1,2)
+K	~(-g)*+(o)*		foo/fun/bar		(0,2)(1,2)
+K	~(-g:*)+(o)*		foo/fun/bar		(0,11)(1,3)
 
 # check locale regnexec()
 

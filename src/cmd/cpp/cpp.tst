@@ -20,6 +20,14 @@ function DATA
 #define hdr     _CAT(<,hdra,.h>)
 #include hdr' > $f ;;
 		hdrx.h)	print -r -- $'int f(){return 0;}' > $f ;;
+		map1.c)	print -r -- $'#include <tst_usr.h>\n#include <tst_std.h>' > $f ;;
+		map2.c)	print -r -- $'#include <tst_std.h>\n#include <tst_usr.h>' > $f ;;
+		pmap1.c)print -r -- $'#pragma pp:mapinclude hosted <tst_usr.h> = "."\n#include <tst_usr.h>\n#include <tst_std.h>' > $f ;;
+		pmap2.c)print -r -- $'#pragma pp:mapinclude hosted <tst_usr.h> = "."\n#include <tst_std.h>\n#include <tst_usr.h>' > $f ;;
+		lcl/map.map) mkdir -p lcl && print -r -- $'hosted <tst_usr.h>="."' > $f ;;
+		lcl/tst_usr.h) mkdir -p lcl && print -r -- $'int lcl_tst_usr;' > $f ;;
+		std/tst_std.h) mkdir -p std && print -r -- $'#include <tst_usr.h>' > $f ;;
+		std/tst_usr.h) mkdir -p std && print -r -- $'int std_tst_usr;' > $f ;;
 		nl1.c)	print -r -- $'#warning before\n#include "nl1.h"\n#warning after' > $f ;;
 		nl1.h)	print -r -n -- $'#warning during' > $f ;;
 		nl2.c)	print -r -- $'#warning before\n#include "nl2.h"\n#warning after' > $f ;;
@@ -3515,3 +3523,142 @@ cpp: "nl4.c", line 3: warning: after'
 		ERROR - $'cpp: "nl5.c", line 1: warning: before
 cpp: "nl5.h", line 1: warning: file does not end with `newline\'
 cpp: "nl5.c", line 3: warning: after'
+
+TEST 17 'pp:mapinclude'
+	DO	DATA map1.c pmap1.c map2.c pmap2.c lcl/map.map lcl/tst_usr.h std/tst_std.h std/tst_usr.h
+	EXEC -I-D -Ilcl -I-H -Istd pmap1.c
+		OUTPUT - $'# 1 "pmap1.c"
+
+# 1
+
+# 1 "lcl/tst_usr.h"
+int lcl_tst_usr;
+# 2 "pmap1.c"
+
+# 1 "std/tst_std.h"
+
+# 1 "std/tst_usr.h"
+int std_tst_usr;
+# 2 "std/tst_std.h"
+
+# 3 "pmap1.c"'
+	EXEC -I-D -D:mapinclude='hosted <tst_usr.h>="."' -Ilcl -I-H -Istd map1.c
+		OUTPUT - $'# 1 "map1.c"
+
+# 1 "lcl/tst_usr.h"
+int lcl_tst_usr;
+# 2 "map1.c"
+
+# 1 "std/tst_std.h"
+
+# 1 "std/tst_usr.h"
+int std_tst_usr;
+# 2 "std/tst_std.h"
+
+# 3 "map1.c"'
+	EXEC -I-D -I-Mmap.map -Ilcl -I-H -Istd map1.c
+		OUTPUT - $'# 1 "map.map"
+
+# 1 "map1.c"
+
+# 1 "lcl/tst_usr.h"
+int lcl_tst_usr;
+# 2 "map1.c"
+
+# 1 "std/tst_std.h"
+
+# 1 "std/tst_usr.h"
+int std_tst_usr;
+# 2 "std/tst_std.h"
+
+# 3 "map1.c"
+
+# 1
+'
+	EXEC -I-D -Ilcl -I-H -Istd pmap2.c
+		OUTPUT - $'# 1 "pmap2.c"
+
+# 1
+
+# 1 "std/tst_std.h"
+
+# 1 "std/tst_usr.h"
+int std_tst_usr;
+# 2 "std/tst_std.h"
+
+# 2 "pmap2.c"
+
+# 1 "lcl/tst_usr.h"
+int lcl_tst_usr;
+# 3 "pmap2.c"'
+	EXEC -I-D -D:mapinclude='hosted <tst_usr.h>="."' -Ilcl -I-H -Istd map2.c
+		OUTPUT - $'# 1 "map2.c"
+
+# 1 "std/tst_std.h"
+
+# 1 "std/tst_usr.h"
+int std_tst_usr;
+# 2 "std/tst_std.h"
+
+# 2 "map2.c"
+
+# 1 "lcl/tst_usr.h"
+int lcl_tst_usr;
+# 3 "map2.c"'
+	EXEC -I-D -D:mapinclude='hosted <tst_usr.h>="."' -Ilcl -I-H -Istd map2.c
+	EXEC -I-D -I-Mmap.map -Ilcl -I-H -Istd map2.c
+		OUTPUT - $'# 1 "map.map"
+
+# 1 "map2.c"
+
+# 1 "std/tst_std.h"
+
+# 1 "std/tst_usr.h"
+int std_tst_usr;
+# 2 "std/tst_std.h"
+
+# 2 "map2.c"
+
+# 1 "lcl/tst_usr.h"
+int lcl_tst_usr;
+# 3 "map2.c"
+
+# 1
+'
+
+TEST 18 'inappropriate pushback'
+	EXEC -I-D
+		INPUT - $'#define A(a)	(a)
+#define B	A(C*)
+#define C(a)	a
+#(getmac A);
+B;
+#(getmac A);'
+		OUTPUT - $'# 1 ""\n\n\n
+"( @A1)";
+( C*);
+"( @A1)";'
+
+TEST 19 'stray macro disable'
+	EXEC -I-D
+		INPUT - $'#define INIT(x) = x
+#define Nullav Null(AV*)
+#define Nullfp Null(PerlIO*)
+#define Null(type) ((type)NULL)
+#define NULL ((void*)0)
+#define PerlIO PerlIO
+#define PERLVARI(var,type,init) type PL_##var INIT(init);
+PERLVARI(Irsfp, PerlIO*, Nullfp)
+PERLVARI(Irsfp_filters, AV*, Nullav)'
+		OUTPUT - $'# 1 ""\n\n\n\n\n\n\n
+PerlIO* PL_Irsfp = (( PerlIO*)((void*)0));
+AV* PL_Irsfp_filters = (( AV*)((void*)0));'
+
+TEST 20 'transition splice'
+	EXEC -I-D -D:transition -P
+	INPUT - $'#pragma prototyped
+int a = val>0?vau:0;
+int b = val>0?val:0;'
+	OUTPUT - $'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+int a = val>0?vau:0;
+int b = val>0?val:0;'

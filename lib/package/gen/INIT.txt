@@ -8,24 +8,27 @@ Source Package Installation Instructions:
       changed manually when the security implications are understood.
   (2) Choose a package root directory and cd to it. This will be a local work
       area for all packages.
-  (3) If your system does not have curl(1), hurl(1), or wget(1) then use
-      the alternate instructions for (3),(4),(5) in plan B below. Plan B
-      will install the hurl(1) script which works with ksh and modern bash.
+  (3) These instructions bypass the click to download package links on the
+      download site. If you already clicked, or if your system does not have
+      curl(1), hurl(1), or wget(1) then use the alternate instructions for
+      (3),(4),(5) in plan B below. Plan B installs the hurl(1)
+      script which works with ksh and modern bash. The top level URL is:
+		URL=http://www.research.att.com/sw/download
   (4) If the bin/package script does not exist then run:
 		test -d bin || mkdir bin
-		url=http://www.research.att.com/sw/download/package
+		url=$URL/package
 		(curl $url||wget -O bin/package $url||hurl $url) > bin/package
 		chmod +x bin/package
   (5) Determine the list of package names you want from the download site, then
       use the package(1) command to do the actual download:
-		bin/package setup source \
-			http://www.research.att.com/sw/download \
+		bin/package setup source $URL \
 			package-name ...
+      This downloads the latest source package(s); up-to-date local packages
+      are not downloaded again unless package force ... is specified.
       If the package root will contain only one architecture then you can
       install in bin and lib instead of arch/HOSTTYPE/bin and arch/HOSTTYPE/lib
       by running this instead:
-		bin/package setup flat source \
-			http://www.research.att.com/sw/download \
+		bin/package setup flat source $URL \
 			PACKAGE ...
       To update the same packages from the same URL run:
 			bin/package setup source
@@ -55,8 +58,8 @@ Source Package Installation Instructions:
       flat install:
 		cd $INSTALLROOT
 		cp -p -r bin lib include DIRECTORY
-  (10) To summarize, after the first download the download, build, and
-      test cycle is:
+  (10) To summarize, after the first time the download, build, and test cycle
+      for the latest source release is:
 		bin/package setup source
 		bin/package make
 		bin/package test
@@ -83,6 +86,34 @@ All recorded changes follow.
 
 :::::::: INIT ::::::::
 
+03-06-21 package.sh: fix INITROOT initialization bug
+	 package.sh: make sure admin logs exists before tail'ing
+03-06-11 probe.win32: fix $(BINDIR) typo that expanded in sh instead of make
+	 cc.mvs.390: return code 4 yields exit code 3 but its *really* ok
+	 package.sh: fix onpath function global var conflict
+	 make.probe: add CC.DIALECT { GNU -dD }
+	 package.mk: add Mamfile to lcl manifest
+03-06-10 package.sh: fix setup action typo that only checked the INIT package
+	 package.sh: *.s390x => *.s390-64
+03-06-09 package.mk: add cyg :POSTINSTALL:
+03-06-08 make.probe: fix CC.STDLIB logic
+	 hurl.sh: add User-Agent identification
+	 package.sh: tweak source and binary installation instructions
+	 cc.hp.pa,ld.hp.pa: +-Wl,+cdp,${INSTALLROOT}/lib/: drops abs lib paths
+	 ldd.hp.pa: add
+03-06-06 package.sh: fix $INSTALLROOT/bin/ldd check
+	 make.probe: add CC.STDLIB verification
+03-06-04 make.probe: add +forceread +noforceread
+03-05-11 hurl.sh: handle http://host:port/path
+03-05-06 package.sh: fix setup action PACKAGEROOT and INIT logic
+03-05-05 package.mk: fix cygwin tarball names
+03-04-30 package.sh: move (cc|ld|ldd).$HOSTTYPE updates from Makefile
+03-04-27 make.probe: fix mvs CC.PREFIX.SHARED "lib" => ""
+	 make.probe: add CC.DLL.DIR = $(BINDIR) or $(LIBDIR) 
+	 make.probe: add { CC.LD.LAZY CC.LD.NOLAZY CC.LD.RECORD CC.LD.NORECORD }
+	 probe.win32: sync with latest CC.*
+03-04-25 mamprobe.sh: add args to `. $makeprobe' for ancient sh
+03-04-23 package.mk: fix dup "covered by" licenses
 03-04-22 probe.win32: CC.DIALECT += "LIBPP -I-" for all cc's
 	 package.sh: fix admin write binary tarball snarf
 03-04-21 package.mk: package covered *.@(pkg|lic) too

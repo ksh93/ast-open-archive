@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.tab (AT&T Labs Research) 2002-08-21
+# @(#)pp.tab (AT&T Labs Research) 2003-06-10
 #
 # C preprocessor tables and states
 #
@@ -60,6 +60,7 @@
 	linetype
 	macref
 	map
+	mapinclude
 	modern
 	multiple
 	native
@@ -92,6 +93,7 @@
 	text
 	transition
 	truncate
+	vendor
 	version
 	warn
 	zeof
@@ -171,6 +173,7 @@
 %flags # options : uncoupled, low frequency
 
 	ALLPOSSIBLE		# ignore top level conditionals
+	DEFINITIONS		# output macro definitions
 	ELSEIF			# #else if|ifdef|ifndef ok
 	FINAL			# final hosted macro value
 	HEADEREXPAND		# HEADEREXPANDALL but macro args not expanded
@@ -190,6 +193,7 @@
 	PLUSSPLICE		# C++ // \<newline> does not splice
 	PRAGMAEXPAND		# expand #pragma args
 	PREDEFINED		# mark macro definitions predefined
+	PREDEFINITIONS		# output predefined macro definitions
 	PREFIX			# prefix include for compatibility
 	PRESERVE		# preserve input layout
 	PROTOTYPED		# force all input to be prototyped

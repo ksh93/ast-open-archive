@@ -30,7 +30,7 @@
 
 #include "rskeyhdr.h"
 
-static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2000-08-31 $\0\n";
+static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2003-05-23 $\0\n";
 
 static const char lib[] = "librecsort:rskey";
 
@@ -82,17 +82,19 @@ Rskeydisc_t*	disc;
 
 	if (!state.dict[' '])
 		initialize();
-	if (!(kp = vmnewof(Vmheap, 0, Rskey_t, 1, 0)))
+	if (!(kp = vmnewof(Vmheap, 0, Rskey_t, 1, sizeof(Rsdisc_t))))
 		return 0;
 	kp->id = lib;
+	kp->disc = (Rsdisc_t*)(kp + 1);
+	kp->disc->version = RS_VERSION;
 	kp->keydisc = disc;
-	kp->disc.version = RS_VERSION;
 	kp->state = &state;
 	kp->insize = INSIZE;
 	kp->outsize = OUTSIZE;
 	kp->procsize = PROCSIZE;
 	kp->field.head = kp->field.tail = &kp->field.global;
 	kp->field.global.end.field = MAXFIELD;
+	kp->code = kp->field.global.code = CC_NATIVE;
 	kp->meth = Rsrasp;
 	return kp;
 }
@@ -118,6 +120,8 @@ Rskey_t*	kp;
 	while (fp = np)
 	{
 		np = fp->next;
+		if (fp->freetrans)
+			vmfree(Vmheap, fp->trans);
 		vmfree(Vmheap, fp);
 	}
 	np = kp->accumulate.head;

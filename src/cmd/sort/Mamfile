@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -43,9 +44,7 @@ make ../../../include/ast/wait.h implicit
 make ../../../include/ast/ast_wait.h implicit
 done ../../../include/ast/ast_wait.h dontcare
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -85,7 +84,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -102,6 +102,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -111,10 +116,7 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/wait.h
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h
+prev ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/sfstr.h implicit
 prev ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/prototyped.h implicit
@@ -138,6 +140,8 @@ make ../../../include/ast/fs3d.h implicit
 prev ../../../include/ast/ast_fs.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/fs3d.h
+make ../../../include/ast/dlldefs.h implicit
+done ../../../include/ast/dlldefs.h
 make ../../../include/ast/error.h implicit
 prev ../../../include/ast/option.h implicit
 prev ../../../include/ast/ast.h implicit
@@ -146,12 +150,14 @@ done ../../../include/ast/error.h
 prev ../../../include/ast/ast.h implicit
 done main.c
 prev main.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?sort]"\" -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?sort]"\" -c main.c
 done main.o generated
 bind -lrecsort
+bind -ldll
 bind -lz
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sort main.o ${mam_librecsort} ${mam_libz} ${mam_libast}
+bind -lm dontcare
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sort main.o ${mam_librecsort} ${mam_libdll} ${mam_libz} ${mam_libast} ${mam_libm}
 done sort generated
 make ../../../bin
 exec - set -
@@ -206,7 +212,7 @@ exec - 		i=`(read x; echo $x) < testsort.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo TESTCC='${CC}'
+exec - 		echo TESTCC=\'\$\{CC\}\'
 exec - 		cat testsort.sh
 exec - 		} > testsort
 exec - 		;;
@@ -216,7 +222,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 14 in
 exec - 	0)	;;
-exec - 	*)	echo TESTCC='${CC}' ;;
+exec - 	*)	echo TESTCC=\'\$\{CC\}\' ;;
 exec - 	esac
 exec - 	cat testsort.sh
 exec - 	} > testsort

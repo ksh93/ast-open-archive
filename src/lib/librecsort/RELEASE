@@ -1,3 +1,9 @@
+03-05-27 rskey.c: add Ci[o] code set [conversion]
+03-05-26 rskey.c: add 'p' packed decimal (bcd)
+03-05-23 recsort.h: add Rskey_t.code for global ccode index
+03-05-22 rskey.c: handle -k.reclen -k.position.length
+03-05-21 recsort.h: add events mask to Rsdisc_t, change Rskey_t disc to pointer
+	 rsnotify.c: add
 03-03-07 Makefile: generate dll for dr. ek
 03-01-21 rsmerge.c: fix typo that kicked in on large (~100K) record sizes
 01-01-01 recsort.h: _RSHDR_H => _BLD_recsort; should have been done years ago

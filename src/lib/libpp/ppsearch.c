@@ -118,7 +118,8 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 	struct ppfile*		mp;
 	int			fd;
 	int			index;
-	int			hosted;
+	int			need;
+	int			markhosted;
 	char*			t;
 
 	if (!(pp.option & PREFIX))
@@ -130,9 +131,11 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 		*prefix = '/';
 		prefix = t;
 	}
-	message((-3, "search: %s %s%s%s%s type=%s prefix=%s flags=|%s%s%s%s%s start=%s=\"%s\" pre=%s lcl=%s std=%s cur=%s",
+	message((-3, "search: %s %s%s%s%s%s%s type=%s prefix=%s flags=|%s%s%s%s%s%s start=%s=\"%s\" pre=%s lcl=%s vnd=%s std=%s cur=%s",
 		fp->name,
 		(flags & SEARCH_INCLUDE) ? "include" : "exists",
+		(flags & SEARCH_VENDOR) ? " vendor" : "",
+		(flags & SEARCH_HOSTED) ? " hosted" : "",
 		(flags & SEARCH_NEXT) ? " next" : "",
 		(flags & SEARCH_SKIP) ? " skip" : "",
 		(flags & SEARCH_TEST) ? " test" : "",
@@ -141,25 +144,35 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 		(fp->flags & INC_EXISTS) ? "EXISTS|" : "",
 		(fp->flags & INC_BOUND(INC_PREFIX)) ? "PREFIX|" : "",
 		(fp->flags & INC_BOUND(INC_LOCAL)) ? "LOCAL|" : "",
+		(fp->flags & INC_BOUND(INC_VENDOR)) ? "VENDOR|" : "",
 		(fp->flags & INC_BOUND(INC_STANDARD)) ? "STANDARD|" : "",
-		dp ? (dp->index == INC_PREFIX ? "pre" : dp->index == INC_LOCAL ? "lcl" : "std") : NiL,
+		dp ? (dp->index == INC_PREFIX ? "pre" : dp->index == INC_LOCAL ? "lcl" : dp->index == INC_VENDOR ? "vnd" : "std") : NiL,
 		dp ? dp->name : NiL,
 		!(fp->flags & INC_MEMBER(INC_PREFIX)) && (xp = fp->bound[INC_PREFIX]) ? xp->name : NiL,
 		!(fp->flags & INC_MEMBER(INC_LOCAL)) && (xp = fp->bound[INC_LOCAL]) ? xp->name : NiL,
+		!(fp->flags & INC_MEMBER(INC_VENDOR)) && (xp = fp->bound[INC_VENDOR]) ? xp->name : NiL,
 		!(fp->flags & INC_MEMBER(INC_STANDARD)) && (xp = fp->bound[INC_STANDARD]) ? xp->name : NiL,
 		error_info.file
 		));
-	for (index = -1; dp; dp = dp->next) if (dp->name)
+	if (flags & SEARCH_HOSTED)
+		need = TYPE_HOSTED;
+	else if (flags & SEARCH_VENDOR)
+		need = TYPE_VENDOR;
+	else
+		need = TYPE_INCLUDE;
+	for (index = -1; dp; dp = dp->next)
+		if (dp->type & need)
 	{
+		message((-3, "search: fp=%s need=%02x index=%d dp=%s type=%02x index=%d", fp->name, need, index, dp->name, dp->type, dp->index));
 #if ARCHIVE
-		if (!dp->type)
+		if (!(dp->type & (TYPE_ARCHIVE|TYPE_DIRECTORY)))
 		{
 			struct stat	st;
 
 			if (stat(dp->name, &st))
 			{
 				message((-3, "search: omit %s", dp->name));
-				dp->name = 0;
+				dp->type = 0;
 				continue;
 			}
 			if (S_ISREG(st.st_mode))
@@ -180,7 +193,7 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 				if (!(sp = sfopen(NiL, dp->name, "r")))
 				{
 					error(ERROR_SYSTEM|1, "%s: ignored -- cannot open", dp->name);
-					dp->name = 0;
+					dp->type = 0;
 					continue;
 				}
 				variant = sfsprintf(pp.tmpbuf, MAXTOKEN, "%c%s%c%s:archive", VDB_DELIMITER, VDB_MAGIC, VDB_DELIMITER, pp.pass);
@@ -188,7 +201,7 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 				{
 					sfclose(sp);
 					error(1, "%s: ignored -- not a directory or archive", dp->name);
-					dp->name = 0;
+					dp->type = 0;
 					continue;
 				}
 
@@ -246,7 +259,7 @@ search(register struct ppfile* fp, register struct ppdirs* dp, int type, int fla
 				notvdb:
 					sfclose(sp);
 					error(1, "%s: ignored -- cannot load archive", dp->name);
-					dp->name = 0;
+					dp->type = 0;
 					continue;
 				}
 				if (variant = *s != 0)
@@ -327,22 +340,25 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 			{
 				up = newof(0, struct ppdirs, 1, 0);
 				up->name = prefix;
+				up->type = dp->type;
 				up->next = dp->info.subdir;
 				dp->info.subdir = up;
 				if (!*dp->name)
 					t = prefix;
 				else
 					sfsprintf(t = pp.path, PATH_MAX - 1, "%s/%s", dp->name, prefix);
-				if (!(up->hosted = !access(t, X_OK)))
+				if (access(t, X_OK))
 				{
 					message((-3, "search: omit %s", t));
 					continue;
 				}
+				up->type |= TYPE_HOSTED;
 			}
-			else if (!up->hosted) continue;
+			else if (!(up->type & TYPE_HOSTED))
+				continue;
 		}
 		mp = xp = 0;
-		if (!(flags & SEARCH_NEXT) && index != dp->index)
+		if (!(flags & SEARCH_NEXT) && index != dp->index && (!(need & TYPE_HOSTED) || dp->index == INC_STANDARD) && (!(need & TYPE_VENDOR) || dp->index == INC_VENDOR))
 		{
 			if (index >= 0 && !(fp->flags & INC_MEMBER(index)))
 				fp->flags |= INC_BOUND(index);
@@ -466,6 +482,7 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 		}
 		if (fd >= 0)
 		{
+			pp.found = dp;
 			if ((pp.option & (PLUSPLUS|NOPROTO)) == PLUSPLUS && !(pp.test & TEST_noproto))
 			{
 				if (dp->c)
@@ -473,14 +490,14 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 				else
 					pp.mode &= ~MARKC;
 			}
-			if (!(hosted = dp->hosted) && dp->index == INC_PREFIX && (pp.mode & (FILEDEPS|HEADERDEPS|INIT)) == FILEDEPS)
+			if (!(markhosted = (dp->type & TYPE_HOSTED)) && dp->index == INC_PREFIX && (pp.mode & (FILEDEPS|HEADERDEPS|INIT)) == FILEDEPS)
 			{
 				up = dp;
 				while ((up = up->next) && !streq(up->name, dp->name));
-				if (up && up->hosted)
-					hosted = 1;
+				if (up && (up->type & TYPE_HOSTED))
+					markhosted = 1;
 			}
-			if (hosted)
+			if (markhosted)
 				pp.mode |= MARKHOSTED;
 			else
 				pp.mode &= ~MARKHOSTED;
@@ -492,7 +509,7 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 #endif
 				fp->flags |= INC_BOUND(index);
 				fp->bound[index] = xp;
-				if (index == INC_STANDARD && type != T_HEADER && !(fp->flags & INC_BOUND(INC_LOCAL)))
+				if ((index == INC_STANDARD || index == INC_VENDOR) && type != T_HEADER && !(fp->flags & INC_BOUND(INC_LOCAL)))
 				{
 					fp->flags |= INC_BOUND(INC_LOCAL);
 					fp->bound[INC_LOCAL] = xp;
@@ -605,8 +622,17 @@ ppsearch(char* file, int type, int flags)
 			break;
 		}
 	fp = ppsetfile(file);
-	while (fp->flags & INC_MAPPED)
-		fp = fp->bound[INC_MAP];
+	while ((fp->flags & INC_MAPALL) || (fp->flags & INC_MAPHOSTED) && (pp.mode & HOSTED) || (fp->flags & INC_MAPNOHOSTED) && !(pp.mode & HOSTED))
+	{
+		if (!(xp = fp->bound[type == T_HEADER ? INC_STANDARD : INC_LOCAL]) || xp == fp)
+			break;
+		message((-1, "map: %s -> %s", fp->name, xp->name));
+		fp = xp;
+	}
+	if ((fp->flags & INC_MAPNOLOCAL) && (pp.mode & HOSTED))
+		flags |= SEARCH_HOSTED;
+	else if (pp.vendor)
+		flags |= SEARCH_VENDOR;
 	pp.original = fp;
 	if (type == T_HEADER && strneq(fp->name, "...", 3) && (!fp->name[3] || fp->name[3] == '/'))
 	{

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS ${mam_cc_DLL}
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,8 +42,8 @@ make libexpr.a archive
 make expr.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -52,8 +53,8 @@ exec - do	case $i in
 exec - 	"expr"|expr)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -71,7 +72,9 @@ make exparse.y
 done exparse.y
 make exparse.c
 prev exparse.y
-exec - ${YACC} ${YACCFLAGS} exparse.y
+exec - if	silent ${YACC} --version >/dev/null 2>&1
+exec - then	${YACC} ${YACCFLAGS} -oexparse.c -pex exparse.y
+exec - else	${YACC} ${YACCFLAGS} exparse.y
 exec - ${STDED} ${STDEDFLAGS} y.tab.c <<!
 exec - g/yytoken/s//yy_token/g
 exec - g/yy/s//ex/g
@@ -86,9 +89,9 @@ exec - .
 exec - w
 exec - q
 exec - !
-exec - mv y.tab.c exparse.c
-exec - if	silent test -s y.tab.h
-exec - then	${STDED} ${STDEDFLAGS} y.tab.h <<'!'
+exec - 	mv y.tab.c exparse.c
+exec - 	if	silent test -s y.tab.h
+exec - 	then	${STDED} ${STDEDFLAGS} y.tab.h <<'!'
 exec - 1i
 exec - #ifndef _EXPARSE_H
 exec - #define _EXPARSE_H
@@ -99,7 +102,7 @@ exec - .
 exec - w
 exec - q
 exec - !
-exec - 	${STDED} ${STDEDFLAGS} y.tab.h <<!
+exec - 		${STDED} ${STDEDFLAGS} y.tab.h <<!
 exec - g/yytoken/s//yy_token/g
 exec - g/yy/s//ex/g
 exec - g/YY/s//EX/g
@@ -107,12 +110,13 @@ exec - w
 exec - q
 exec - !
 exec - if	silent cmp 2>/dev/null -s y.tab.h exparse.h
-exec - 	then	rm -f y.tab.h
-exec - 	else	mv y.tab.h exparse.h
+exec - 		then	rm -f y.tab.h
+exec - 		else	mv y.tab.h exparse.h
+exec - 		fi
 exec - 	fi
-exec - fi
-exec - if	silent test -f y.output
-exec - then	mv y.output exparse.grammar
+exec - 	if	silent test -f y.output
+exec - 	then	mv y.output exparse.grammar
+exec - 	fi
 exec - fi
 exec - if	grep -c ',[0-9][0-9][0-9][0-9][0-9]*,' exparse.c >/dev/null
 exec - then	: ${YACC} is botched : yyact indices are bogus :
@@ -196,6 +200,10 @@ done ../../../include/ast/sfstr.h dontcare
 make ../../../include/ast/error.h implicit
 make ../../../include/ast/option.h implicit
 make ../../../include/ast/ast.h implicit
+make ../../../include/ast/vmalloc.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/vmalloc.h dontcare
 prev ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -209,10 +217,7 @@ prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/error.h dontcare
 make expr.h implicit
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h dontcare
+prev ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/cdt.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/ast_std.h implicit
@@ -231,28 +236,28 @@ done exlib.h dontcare
 done exgram.h
 prev ../../../include/ast/ast.h implicit
 done exparse.c generated
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exparse.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exparse.c
 done exparse.o generated
 make excc.o
 make excc.c
 prev exlib.h implicit
 done excc.c
 prev excc.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excc.c
 done excc.o generated
 make excontext.o
 make excontext.c
 prev exlib.h implicit
 done excontext.c
 prev excontext.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excontext.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excontext.c
 done excontext.o generated
 make exdata.o
 make exdata.c
 prev exlib.h implicit
 done exdata.c
 prev exdata.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exdata.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exdata.c
 done exdata.o generated
 make exeval.o
 make exeval.c
@@ -277,56 +282,56 @@ done exop.h generated
 prev exlib.h implicit
 done exeval.c
 prev exeval.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exeval.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exeval.c
 done exeval.o generated
 make exexpr.o
 make exexpr.c
 prev exlib.h implicit
 done exexpr.c
 prev exexpr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exexpr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exexpr.c
 done exexpr.o generated
 make exerror.o
 make exerror.c
 prev exlib.h implicit
 done exerror.c
 prev exerror.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exerror.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exerror.c
 done exerror.o generated
 make exopen.o
 make exopen.c
 prev exlib.h implicit
 done exopen.c
 prev exopen.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exopen.c
 done exopen.o generated
 make exrewind.o
 make exrewind.c
 prev exlib.h implicit
 done exrewind.c
 prev exrewind.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exrewind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exrewind.c
 done exrewind.o generated
 make extoken.o
 make extoken.c
 prev exlib.h implicit
 done extoken.c
 prev extoken.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extoken.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extoken.c
 done extoken.o generated
 make extype.o
 make extype.c
 prev exlib.h implicit
 done extype.c
 prev extype.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extype.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extype.c
 done extype.o generated
 make exzero.o
 make exzero.c
 prev exlib.h implicit
 done exzero.c
 prev exzero.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exzero.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exzero.c
 done exzero.o generated
 exec - ${AR} cr libexpr.a exparse.o excc.o excontext.o exdata.o exeval.o exexpr.o exerror.o exopen.o exrewind.o extoken.o extype.o exzero.o
 exec - (ranlib libexpr.a) >/dev/null 2>&1 || true

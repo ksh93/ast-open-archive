@@ -605,6 +605,8 @@ execute(register struct joblist* job)
 	job->target->mark &= ~M_waiting;
 	if (state.targetcontext || state.maxview && !state.fsview && *job->target->name != '/' && (!(job->target->dynamic & D_regular) || job->target->view))
 		commit(job, job->target->name);
+	if ((state.mam.dynamic || state.mam.regress) && state.user && !(job->target->property & (P_after|P_before|P_dontcare|P_make|P_state|P_virtual)))
+		sfprintf(state.mam.out, "%sinit %s %lu\n", state.mam.label, mamname(job->target), state.mam.regress ? 0L : CURTIME);
 	if (!(job->flags & CO_ALWAYS))
 	{
 		if (state.touch)
@@ -823,7 +825,7 @@ done(register struct joblist* job, int clear, Cojob_t* cojob)
 		job->target->status = (job->flags & CO_ERRORS) ? ((job->target->property & P_dontcare) ? IGNORE : FAILED) : EXISTS;
 	tm = statetime(job->target, 0);
 	if (n = cojob && (state.mam.dynamic || state.mam.regress) && state.user && !(job->target->property & (P_after|P_before|P_dontcare|P_make|P_state|P_virtual)))
-		sfprintf(state.mam.out, "%scode %s %d %lu%s%s\n", state.mam.label, (job->target != state.frame->target || (job->target->property & P_after)) ? mamname(job->target) : "-", EXIT_CODE(cojob->status), state.mam.regress ? 0L : tm, (job->target->dynamic & D_same) ? " same" : null, cojob->status && (job->flags & CO_IGNORE) ? " ignore" : null);
+		sfprintf(state.mam.out, "%scode %s %d %lu %lu%s%s\n", state.mam.label, (job->target != state.frame->target || (job->target->property & P_after)) ? mamname(job->target) : "-", EXIT_CODE(cojob->status), state.mam.regress ? 0L : tm, state.mam.regress ? 0L : CURTIME, (job->target->dynamic & D_same) ? " same" : null, cojob->status && (job->flags & CO_IGNORE) ? " ignore" : null);
 	if ((job->target->property & (P_joint|P_target)) == (P_joint|P_target))
 		for (p = job->target->prereqs->rule->prereqs; p; p = p->next)
 			if (p->rule != job->target)

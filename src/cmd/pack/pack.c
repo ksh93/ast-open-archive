@@ -28,12 +28,12 @@
  * pack files using Huffman coding
  *
  *   David Korn
- *   AT&T Research
+ *   AT&T Labs Research
  *
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pack (AT&T Labs Research) 2002-03-09 $\n]"
+"[-?\n@(#)$Id: pack (AT&T Labs Research) 2003-04-28 $\n]"
 USAGE_LICENSE
 "[+NAME?pack - pack files using Huffman coding]"
 "[+DESCRIPTION?\bpack\b attempts to store the specified files in a compressed "
@@ -162,14 +162,17 @@ main(int argc, register char *argv[])
 		else
 		{
 			chown(outfile,statb.st_uid,statb.st_gid);
-			if(!(hp = huffinit(fpin,-1L)))
+			if(!(hp = huffinit(fpin,(Sfoff_t)-1)))
 				error(2, "%s: read error", infile);
-			else if(sfseek(fpin,0L,0) < 0)
+			else if(sfseek(fpin,(Sfoff_t)0,0) < 0)
 				error(ERROR_system(0),"%s: seek error", infile);
 			else if((dsize = huffputhdr(hp,fpout)) < 0)
 				error(2, "%s: write error", infile);
 			else if(!force && block(huffisize(hp)) <= block(huffosize(hp)+dsize))
+{
+sfprintf(sfstderr,"%insize=%lld outsize=%lld\n",huffisize(hp),huffosize(hp));
 				error(2, "%s:no savings - file unchanged", infile);
+}
 			else if(huffencode(hp,fpin,fpout,SF_UNBOUND)<0)
 				error(2, "%s: read error", infile);
 			else
@@ -224,7 +227,7 @@ static char *outname(char *infile)
 
 static void vprint(Huff_t *hp,int dsize)
 {
-	sfprintf(sfstdout,"	from %ld to %ld bytes\n", huffisize(hp), huffosize(hp));
+	sfprintf(sfstdout,"	from %lld to %lld bytes\n", huffisize(hp), huffosize(hp));
 	sfprintf(sfstdout,"	Huffman tree has %d levels below root\n", hp->maxlev);
 	sfprintf(sfstdout,"	%d distinct bytes in input\n", hp->nchars);
 	sfprintf(sfstdout,"	dictionary overhead = %ld bytes\n", dsize);

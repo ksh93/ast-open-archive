@@ -207,18 +207,15 @@ struct Cs_s				/* thread state			*/
 };
 
 #if _BLD_cs && defined(__EXPORT__)
-#define __PUBLIC_DATA__		__EXPORT__
-#else
+#define extern		__EXPORT__
+#endif
 #if !_BLD_cs && defined(__IMPORT__)
-#define __PUBLIC_DATA__		__IMPORT__
-#else
-#define __PUBLIC_DATA__
-#endif
+#define extern		extern __IMPORT__
 #endif
 
-extern __PUBLIC_DATA__ Cs_t		cs;
+extern Cs_t		cs;
 
-#undef	__PUBLIC_DATA__
+#undef	extern
 
 #if _BLD_cs && defined(__EXPORT__)
 #define extern		__EXPORT__

@@ -449,6 +449,7 @@ main(int argc, char** argv)
 	register Operand_t*	op;
 	register Operand_t*	vp;
 	register int		f;
+	unsigned char*		map;
 	char*			usage;
 	char*			e;
 	int			i;
@@ -610,11 +611,11 @@ main(int argc, char** argv)
 		break;
 	case A2E:
 		state.from.value.string = "ascii";
-		state.to.value.string = "ebcdic-1";
+		state.to.value.string = "ebcdic-e";
 		break;
 	case A2I:
 		state.from.value.string = "ascii";
-		state.to.value.string = "ebcdic-2";
+		state.to.value.string = "ebcdic-i";
 		break;
 	case A2N:
 		state.from.value.string = "ascii";
@@ -622,14 +623,14 @@ main(int argc, char** argv)
 		break;
 	case A2O:
 		state.from.value.string = "ascii";
-		state.to.value.string = "ebcdic-3";
+		state.to.value.string = "ebcdic-o";
 		break;
 	case E2A:
-		state.from.value.string = "ebcdic-1";
+		state.from.value.string = "ebcdic-e";
 		state.to.value.string = "ascii";
 		break;
 	case I2A:
-		state.from.value.string = "ebcdic-2";
+		state.from.value.string = "ebcdic-i";
 		state.to.value.string = "ascii";
 		break;
 	case N2A:
@@ -637,7 +638,7 @@ main(int argc, char** argv)
 		state.to.value.string = "ascii";
 		break;
 	case O2A:
-		state.from.value.string = "ebcdic-3";
+		state.from.value.string = "ebcdic-o";
 		state.to.value.string = "ascii";
 		break;
 	default:
@@ -802,6 +803,7 @@ main(int argc, char** argv)
 	}
 	else
 	{
+		map = ccmap(state.from.value.number, state.to.value.number);
 		if (!(c = state.ibs.value.number))
 			c = BS;
 		f = state.conv.value.number;
@@ -880,7 +882,7 @@ main(int argc, char** argv)
 							error(ERROR_SYSTEM|2, "%s: %d conversion errors", state.ofn.value.string, ce);
 					}
 				}
-				ccmaps(s, n, state.from.value.number, state.to.value.number);
+				ccmapstr(map, s, n);
 				switch (f & (LCASE|UCASE))
 				{
 				case LCASE:

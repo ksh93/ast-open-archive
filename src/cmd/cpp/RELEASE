@@ -1,3 +1,7 @@
+03-06-21 cpp.tst: add T_INVALID ? splice bug test
+03-05-19 cpp.tst: add stray SKIPMACRO test
+03-05-18 cpp.tst: add SYS_FUNCTION ungetchr() bug fix test
+03-04-30 cpp.tst: add pp:mapinclude tests
 02-11-07 cpp.c: exit() => return for lame linters
 02-10-10 cpp.tst: add does not end with `newline' tests
 02-05-24 cpp.tst: add TEST 15 pragma space canonicalization tests

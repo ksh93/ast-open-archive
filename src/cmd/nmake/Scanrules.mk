@@ -8,6 +8,8 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2003-05-07 $"
+
 /*
  * $(.INCLUDE. <lang> [<flag>])
  *
@@ -175,3 +177,30 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 	I| *< % |A.DONTCARE|M$$(%:C%.*[`$&].*%%:C%['"]%%:C%["']$%%)|
 
 .ATTRIBUTE.features/%.sh : .SCAN.exec.sh
+
+.INCLUDE.cob : .FUNCTION
+	local F
+	F := $(%%:/ .*//:/\.$//)
+	$(F) : .SCAN.cob
+	if ! "$(F:T=F)" && ( ! "$(F:S)" || "$(F:S:N!=$(<<:S)|$(.SUFFIX.cob:/ /|/G))" )
+		F := $(F)$(<<:S)
+	end
+	return $(F)
+
+.COBOL.MAIN : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
+	if COBOLMAIN
+		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLMAIN)
+	end
+
+.MAIN.cob : .FUNCTION
+	if "$(%%)" == "MAIN"
+		return .COBOL.MAIN
+	end
+
+.SCAN.cob : .SCAN
+	I| \D COPY % |M$$(.INCLUDE.cob)|
+	I| \D \*( % )\*|M$$(.MAIN.cob)|
+
+$(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
+
+.SOURCE.%.SCAN.cob : . $$(*.SOURCE.cob) $$(*.SOURCE)

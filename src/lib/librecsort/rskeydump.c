@@ -46,6 +46,7 @@ char*			type;
 	sfprintf(sp, "\t begin char = %d\n", fp->begin.index);
 	sfprintf(sp, "\t  end field = %d\n", fp->end.field);
 	sfprintf(sp, "\t   end char = %d\n", fp->end.index);
+	sfprintf(sp, "\t      ccode = %d\n", fp->code);
 	sfprintf(sp, "\t      coder = %c\n", fp->flag ? fp->flag : '?');
 	sfprintf(sp, "\t       keep = %s\n", fp->keep == kp->state->all ? "all" : fp->keep == kp->state->print ? "print" : fp->keep == kp->state->dict ? "dict" : fp->keep ? "UNKNOWN" : "all");
 	sfprintf(sp, "\t      trans = %s\n", fp->trans == kp->state->ident ? "ident" : fp->trans == kp->state->fold ? "fold" : fp->trans ? "UNKNOWN" : "ident");
@@ -79,7 +80,7 @@ register Sfio_t*	sp;
 	if (kp->fixed)
 		sfprintf(sp, " fixed=%d", kp->fixed);
 	sfprintf(sp, "\n");
-	sfprintf(sp, "\trecsort data%s %d key%s %d\n", (kp->disc.type & RS_DSAMELEN) ? " DSAMELEN" : "", kp->disc.data, (kp->disc.type & RS_KSAMELEN) ? " KSAMELEN" : "", kp->disc.keylen);
+	sfprintf(sp, "\trecsort data%s %d key%s %d\n", (kp->disc->type & RS_DSAMELEN) ? " DSAMELEN" : "", kp->disc->data, (kp->disc->type & RS_KSAMELEN) ? " KSAMELEN" : "", kp->disc->keylen);
 	for (fp = &kp->field.global; fp; fp = fp->next)
 		dump(kp, sp, fp, "field");
 	for (fp = kp->accumulate.head; fp; fp = fp->next)

@@ -1247,6 +1247,8 @@ set(register char* s)
 	}
 }
 
+#define OPT_OFFSET	10
+
 /*
  * set command line options with optget(3)
  * options may appear in any position before --
@@ -1285,7 +1287,7 @@ scanargs(int argc, char** argv, int* argf)
 				sfputc(up, '!');
 			sfputc(up, '=');
 		}
-		sfprintf(up, "%d:%s?%s", op - options + 10, op->name, op->description);
+		sfprintf(up, "%d:%s?%s", op - options + OPT_OFFSET, op->name, op->description);
 		if (op->arg)
 		{
 			if (*op->arg == '{')
@@ -1312,7 +1314,7 @@ scanargs(int argc, char** argv, int* argf)
 		}
 		else
 		{
-			op = &options[-10 - i];
+			op = &options[-OPT_OFFSET - i];
 			n = (op->flag & On) ? (opt_info.arg ? opt_info.num : 0) : 1;
 			if (*opt_info.option == '+')
 				n = !n;
@@ -1436,7 +1438,7 @@ punt(int old)
 			hashdone(pos);
 		}
 		s = sfstruse(internal.tmp);
-		putptr(vec, getval(external.old, 1));
+		putptr(vec, getval(external.old, VAL_PRIMARY));
 		if (s[1]) putptr(vec, strdup(s));
 
 		/*

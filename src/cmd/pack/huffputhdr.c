@@ -26,11 +26,7 @@
  * huffman coding routine to write pack format file header
  *
  *   David Korn
- *   AT&T Bell Laboratories
- *   Room 3C-526B
- *   Murray Hill, N. J. 07974
- *   Tel. x7975
- *   ulysses!dgk
+ *   AT&T Laboratories
  */
 
 #include	"huffman.h"
@@ -47,6 +43,14 @@ int huffputhdr(register Huff_t *hp,Sfio_t *outfile)
 	/* output magic number */
 	sfputc(fp,HUFFMAG1);
 	sfputc(fp,HUFFMAG2);
+	if(sizeof(Sfoff_t)>4 && hp->insize >= ((Sfoff_t)1)<<(4*CHAR_BIT))
+	{
+		sfputc(fp,hp->insize>>(7*CHAR_BIT));
+		sfputc(fp,hp->insize>>(6*CHAR_BIT));
+		sfputc(fp,hp->insize>>(5*CHAR_BIT));
+		sfputc(fp,hp->insize>>(4*CHAR_BIT));
+		sfputc(fp,0);
+	}
 	/* output the length and the dictionary */
 	sfputc(fp,hp->insize>>(3*CHAR_BIT));
 	sfputc(fp,hp->insize>>(2*CHAR_BIT));

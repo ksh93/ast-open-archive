@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -97,6 +98,10 @@ done ../../../include/ast/ast_std.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ls.h dontcare
 make ../../../include/ast/ast.h implicit
+make ../../../include/ast/vmalloc.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/vmalloc.h dontcare
 make ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
@@ -170,7 +175,7 @@ prev ../../../include/ast/ast.h implicit
 done make.h
 done archive.c
 prev archive.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c archive.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c archive.c
 done archive.o generated
 make bind.o
 make bind.c
@@ -180,7 +185,7 @@ done ../../../include/ast/glob.h
 prev make.h implicit
 done bind.c
 prev bind.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c bind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c bind.c
 done bind.o generated
 make command.o
 make command.c
@@ -189,14 +194,14 @@ done ../../../include/ast/sig.h
 prev make.h implicit
 done command.c
 prev command.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c command.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c command.c
 done command.o generated
 make dump.o
 make dump.c
 prev make.h implicit
 done dump.c
 prev dump.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dump.c
 done dump.o generated
 make expand.o
 make expand.c
@@ -214,14 +219,11 @@ done expand.h
 prev make.h implicit
 done expand.c
 prev expand.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expand.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expand.c
 done expand.o generated
 make main.o
 make main.c
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h
+prev ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/vecargs.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/vecargs.h
@@ -238,28 +240,28 @@ done options.h
 prev make.h implicit
 done main.c
 prev main.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
 done main.o generated
 make make.o
 make make.c
 prev make.h implicit
 done make.c
 prev make.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c make.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c make.c
 done make.o generated
 make mam.o
 make mam.c
 prev make.h implicit
 done mam.c
 prev mam.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c mam.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c mam.c
 done mam.o generated
 make metarule.o
 make metarule.c
 prev make.h implicit
 done metarule.c
 prev metarule.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c metarule.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c metarule.c
 done metarule.o generated
 make misc.o
 make misc.c
@@ -272,7 +274,7 @@ prev ../../../include/ast/int.h implicit
 prev make.h implicit
 done misc.c
 prev misc.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c misc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c misc.c
 done misc.o generated
 make object.o
 make object.c
@@ -285,7 +287,7 @@ done ../../../include/ast/ccode.h
 prev make.h implicit
 done object.c
 prev object.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c object.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c object.c
 done object.o generated
 make option.o
 make option.c
@@ -294,7 +296,7 @@ prev options.h implicit
 prev make.h implicit
 done option.c
 prev option.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
 make parse.o
 make parse.c
@@ -303,14 +305,14 @@ prev options.h implicit
 prev make.h implicit
 done parse.c
 prev parse.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c parse.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c parse.c
 done parse.o generated
 make read.o
 make read.c
 prev make.h implicit
 done read.c
 prev read.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c read.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c read.c
 done read.o generated
 make rule.o
 make rule.c
@@ -318,7 +320,7 @@ prev options.h implicit
 prev make.h implicit
 done rule.c
 prev rule.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c rule.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c rule.c
 done rule.o generated
 make scan.o
 make scan.c
@@ -326,7 +328,7 @@ prev ../../../include/ast/tm.h implicit
 prev make.h implicit
 done scan.c
 prev scan.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c scan.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c scan.c
 done scan.o generated
 make state.o
 make state.c
@@ -334,7 +336,7 @@ prev options.h implicit
 prev make.h implicit
 done state.c
 prev state.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c state.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c state.c
 done state.o generated
 make trap.o
 make trap.c
@@ -343,7 +345,7 @@ prev ../../../include/ast/sig.h implicit
 prev make.h implicit
 done trap.c
 prev trap.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c trap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c trap.c
 done trap.o generated
 make variable.o
 make variable.c
@@ -351,18 +353,19 @@ prev options.h implicit
 prev make.h implicit
 done variable.c
 prev variable.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c variable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c variable.c
 done variable.o generated
 make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.3 2003-04-15 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.3 2003-06-21 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o ${mam_libcoshell} ${mam_libardir} ${mam_libast}
+bind -lm dontcare
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o ${mam_libcoshell} ${mam_libardir} ${mam_libast} ${mam_libm}
 done nmake generated
 make ppcc
 make ppcc.sh

@@ -227,13 +227,6 @@ pathreal(const char* apath, register int type, struct stat* st)
 	}
 
 	/*
-	 * save last character
-	 */
-
-	while (*sp)
-		sp++;
-
-	/*
 	 * put absolute pathname into state.path
 	 */
 
@@ -251,7 +244,8 @@ pathreal(const char* apath, register int type, struct stat* st)
 	ip = state.path.name + elementsof(state.path.name);
 	while (sp < ip && (*sp = *cp++))
 		sp++;
-	if (type & P_DOTDOT) strcpy(sp, "/..");
+	if (type & P_DOTDOT)
+		strcpy(sp, "/..");
 	sp = state.path.name;
 	if (!(ip = pathcanon(sp + safe_dir, 0)))
 	{
@@ -516,7 +510,7 @@ pathreal(const char* apath, register int type, struct stat* st)
 	if (S_ISLNK(st->st_mode) && (len = checklink(sp, st, type)) > 1 && !(type & (P_LSTAT|P_READLINK)) && state.path.nlinks++ < MAXSYMLINKS)
 	{
 		path = strcpy(buf, state.path.name);
-		message((-5, "pathreal: == again %s", path));
+		message((-1, "pathreal: == again %s", path));
 		if (*path != '/')
 			state.path.level = 0;
 		type &= ~(P_DOTDOT|P_SAFE);
@@ -552,7 +546,7 @@ checklink(const char* asp, struct stat* st, int type)
 
 	if (sp < state.path.name || sp >= state.path.name + sizeof(state.path.name))
 	{
-		message((-1, "AHA checklink bounds sp=%p state.path.name=%p sp=%s", sp, state.path.name, sp));
+		message((-1, "AHA#%d checklink bounds sp=%p state.path.name=%p sp=%s", __LINE__, sp, state.path.name, sp));
 		sp = strncpy(state.path.name, sp, sizeof(state.path.name) - 1);
 	}
 	while (S_ISLNK(st->st_mode))
@@ -609,7 +603,7 @@ checklink(const char* asp, struct stat* st, int type)
 			else if (!(type & (P_LSTAT|P_PATHONLY|P_READLINK)) && *ip == '.' && *(ip + 1) == '.' && (*(ip + 2) == '/' || *(ip + 2) == 0))
 			{
 				memcpy(buf, ip, len + 1);
-				bp = sp;
+				bp = state.path.name;
 				while (ip > bp && *(ip - 1) == '/')
 					ip--;
 				for (;;)

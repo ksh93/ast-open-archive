@@ -24,6 +24,7 @@
 #pragma prototyped
 
 #include <ast.h>
+#include <ccode.h>
 #include <error.h>
 
 #include "regex.h"
@@ -79,6 +80,8 @@ extern int	bflag;
 extern char*	stdouterr;
 
 extern Text	files;
+
+extern unsigned char*	map;
 
 /* SCRIPT LAYOUT
 

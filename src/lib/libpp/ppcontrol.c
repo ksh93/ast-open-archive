@@ -1220,7 +1220,7 @@ ppcontrol(void)
 			}
 			else if (!pp.truncate) ppfsm(FSM_MACRO, sym->name);
 			mac->value = newof(mac->value, char, (mac->size = p - mac->value) + 1, 0);
-			if ((pp.option & REGUARD) && !sym->hidden && !(sym->flags & SYM_MULTILINE) && !(pp.mode & INIT) && !(pp.state & NOTEXT))
+			if ((pp.option & (DEFINITIONS|PREDEFINITIONS|REGUARD)) && !sym->hidden && !(sym->flags & SYM_MULTILINE) && ((pp.option & PREDEFINITIONS) || !(pp.mode & INIT)) && ((pp.option & (DEFINITIONS|PREDEFINITIONS)) || !(pp.state & NOTEXT)))
 			{
 				ppprintf("#%s %s", dirname(DEFINE), sym->name);
 				if (sym->flags & SYM_FUNCTION)
@@ -1262,8 +1262,10 @@ ppcontrol(void)
 						}
 						ppcheckout();
 					}
-					ppcheckout();
 				}
+				if (pp.state & NOTEXT)
+					ppputchar('\n');
+				ppcheckout();
 			}
 		benign:
 			if (pp.mode & BUILTIN) sym->flags |= SYM_BUILTIN;
@@ -1923,6 +1925,9 @@ ppcontrol(void)
 	POP_LINE();
 				/*INDENT*/
 				break;
+			case X_MAPINCLUDE:
+				ppmapinclude(NiL, p5);
+				break;
 			case X_MODERN:
 				setoption(MODERN, i0);
 				break;
@@ -2041,6 +2046,9 @@ ppcontrol(void)
 			case X_TRUNCATE:
 				ppop(PP_TRUNCATE, i0 ? (p ? strtol(p, NiL, 0) : TRUNCLENGTH) : 0);
 				break;
+			case X_VENDOR:
+				tokop(PP_VENDOR, p3, p, i0, TOKOP_UNSET|TOKOP_STRING|TOKOP_DUP);
+				break;
 			case X_VERSION:
 				if (pp.pragma && !(pp.state & NOTEXT))
 				{
@@ -2133,8 +2141,13 @@ ppcontrol(void)
 					free(mac);
 					mac = sym->macro = 0;
 				}
-				if ((pp.option & REGUARD) && !sym->hidden && !(sym->flags & SYM_MULTILINE) && !(pp.mode & INIT) && !(pp.state & NOTEXT))
+				if ((pp.option & (DEFINITIONS|PREDEFINITIONS|REGUARD)) && !sym->hidden && !(sym->flags & SYM_MULTILINE) && ((pp.option & PREDEFINITIONS) || !(pp.mode & INIT)) && ((pp.option & (DEFINITIONS|PREDEFINITIONS)) || !(pp.state & NOTEXT)))
+				{
 					ppprintf("#%s %s", dirname(UNDEF), sym->name);
+					if (pp.state & NOTEXT)
+						ppputchar('\n');
+					ppcheckout();
+				}
 				sym->flags &= ~(SYM_BUILTIN|SYM_FUNCTION|SYM_INIT|SYM_MULTILINE|SYM_PREDEFINED|SYM_REDEFINE|SYM_VARIADIC);
 				n2 = error_info.line;
 				goto benign;
@@ -2190,6 +2203,8 @@ ppcontrol(void)
 			{
 				error_info.line++;
 				PUSH_FILE(pp.include, n);
+				if (!pp.vendor && (pp.found->type & TYPE_VENDOR))
+					pp.vendor = 1;
 				pp.include = 0;
 				return(0);
 			}

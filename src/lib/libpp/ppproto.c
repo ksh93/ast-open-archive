@@ -33,7 +33,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2002-04-12 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2003-06-21 $\0\n";
 
 #if PROTOMAIN
 
@@ -996,26 +996,30 @@ lex(register struct proto* proto, register long flags)
 		goto fsm_start;
 
 	default:
-		if (c == '\\' && (state & SPLICE))
+		if (state & SPLICE)
 		{
-			if (!(n = GETCHR()))
+			if (c == '\\')
 			{
-				goto fsm_eob;
+				if (!(n = GETCHR()))
+				{
+					goto fsm_eob;
  fsm_splice:
-				c = '\\';
-				n = GETCHR();
+					c = '\\';
+					n = GETCHR();
+				}
+				if (n == '\n')
+				{
+					proto->line++;
+					PUTCHR('\\');
+					PUTCHR('\n');
+					bp = ip;
+					goto fsm_get;
+				}
+				UNGETCHR();
 			}
-			if (n == '\n')
-			{
-				proto->line++;
-				PUTCHR('\\');
-				PUTCHR('\n');
-				bp = ip;
-				goto fsm_get;
-			}
-			UNGETCHR();
 			state &= ~SPLICE;
-			if (state >= TERMINAL) goto fsm_terminal;
+			if (state >= TERMINAL)
+				goto fsm_terminal;
 			rp = fsm[state];
 		}
 		PUTCHR(c);

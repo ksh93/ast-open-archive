@@ -129,6 +129,7 @@ TEST 05 'posix cksum algorithm'
 TEST 06 'md5 message digest algorithm'
 	DO	DATA big.dat chars.dat xyz.dat zyx.dat zero.dat
 	EXEC	-x md5
+		INPUT -
 		OUTPUT - $'d41d8cd98f00b204e9800998ecf8427e'
 	EXEC	-x md5 /dev/null
 		OUTPUT - $'d41d8cd98f00b204e9800998ecf8427e /dev/null'
@@ -166,3 +167,27 @@ TEST 07 'text vs binary mode'
 		OUTPUT - $'3518178554 2'
 	EXEC	-x posix -T
 		INPUT -n - $'\r\n\r\n'
+
+TEST 08 'SHA-1 secure hash algorithm 1'
+	DO	DATA big.dat chars.dat xyz.dat zyx.dat zero.dat
+	EXEC	-x sha1
+		INPUT -
+		OUTPUT - $'da39a3ee5e6b4b0d3255bfef95601890afd80709'
+	EXEC	-x sha1 /dev/null
+		OUTPUT - $'da39a3ee5e6b4b0d3255bfef95601890afd80709 /dev/null'
+	EXEC	-x sha1 xyz.dat zyx.dat
+		OUTPUT - $'83305e292107a8d1955ac0c0047912ff62c5d6dc xyz.dat\nf1bac0f6f8e8d09b07cbc04c2e70b1b606fb9dd5 zyx.dat'
+	EXEC	-x sha1 -t xyz.dat zyx.dat
+		OUTPUT - $'728a9edfd9ef784a9291008c2a09a349643e4b09'
+	EXEC	-x sha1 big.dat
+		OUTPUT - $'d3e7a9584187f017342dd759bc8f3061b74c5faf big.dat'
+	EXEC	-x sha1 chars.dat
+		OUTPUT - $'4916d6bdb7f78e6803698cab32d1586ea457dfc8 chars.dat'
+	EXEC	-x sha1 zero.dat
+		OUTPUT - $'b376885ac8452b6cbf9ced81b1080bfd570d9b91 zero.dat'
+	EXEC	-x sha1
+		INPUT -n - $'abc'
+		OUTPUT - $'a9993e364706816aba3e25717850c26c9cd0d89d'
+	EXEC	-x sha1
+		INPUT -n - $'abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq'
+		OUTPUT - $'84983e441c3bd26ebaae4aa1f95129e5e54670f1'

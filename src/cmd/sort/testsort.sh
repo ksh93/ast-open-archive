@@ -117,7 +117,7 @@ fi
 o=:	# officially obsolescent features: +1 -2
 O=:	# really obsolescent features: displaced -o (o=)
 g=:	# -g numeric sort including e-format numbers (g=)
-k=:	# -kr:l:o fixed records
+k=:	# -Rr -k.p.l fixed records and fields
 M=:	# -M sort by month names (M=)
 s=:	# -s stable, do not compare raw bytes on equal keys (s=)
 S=:	# -S unstable, compare raw bytes on equal keys (S=)
@@ -135,8 +135,8 @@ if $SORT /dev/null -o xx 2>/dev/null; then O=
 				echo '	displaced -o'; fi
 if $SORT -g </dev/null 2>/dev/null; then g=
 				echo '	-g g-format numbers'; fi
-if test Xxzxax = X`echo xaxzx | $SORT -r -k2:1:1 2>/dev/null`; then k=
-				echo '	-kr:l:o fixed length records'; fi
+if test Xcx.by.az = X`echo by.cx.az | $SORT -R3 -k.2.1 2>/dev/null`; then k=
+				echo '	-Rr -k.p:l fixed length records'; fi
 if $SORT -M </dev/null 2>/dev/null; then M=
 				echo '	-M months'; fi
 if $SORT -s </dev/null 2>/dev/null; then s=
@@ -315,7 +315,7 @@ echo test numbers denote progress, not trouble
 # check for and loop on alternate methods
 
 case $x in
-'')	set `$SORT -l < /dev/null | sed 's/[ 	].*//'` ;;
+'')	set `$SORT --list < /dev/null | sed 's/[ 	].*//'` ;;
 *)	set '' ;;
 esac
 
@@ -337,7 +337,7 @@ do	case $# in
 	esac
 
 #---------------------------------------------------------------
-TEST=01; echo $TEST	# -c status, checksum
+TEST=01; echo $TEST	"-c status, checksum"
 			# obsolescent features go together
 cat >in <<!
 b
@@ -352,7 +352,7 @@ $SORT -c in 2>/dev/null && echo ${TEST}A failed
 $o $SORT -o in +0 in || echo ${TEST}C failed
 
 #---------------------------------------------------------------
-TEST=02; echo $TEST	# output from -c
+TEST=02; echo $TEST	"output from -c"
 cat >in <<!
 x
 y
@@ -366,7 +366,7 @@ $SORT -c /dev/null 2>xx || echo ${TEST}C failed
 test -s xx && echo ${TEST}D failed
 
 #---------------------------------------------------------------
-TEST=03; echo $TEST	# -n
+TEST=03; echo $TEST	"-n"
 cat >in <<!
 -99.0
 -99.1
@@ -397,7 +397,7 @@ x
 ./xsort "" -n
 
 #---------------------------------------------------------------
-TEST=04; echo $TEST	# -b without fields, piping, -c status return
+TEST=04; echo $TEST	"-b without fields, piping, -c status return"
 cat >in <<!
   b
  a
@@ -412,7 +412,7 @@ cmp -s xx out >/dev/null || echo ${TEST}B failed
 $SORT in | $SORT -cr 2>/dev/null && echo ${TEST}C failed
 
 #---------------------------------------------------------------
-TEST=05; echo $TEST	# fields, reverse fields, -c status return
+TEST=05; echo $TEST	"fields, reverse fields, -c status return"
 cat >in <<!
 b b p
 a b q
@@ -439,7 +439,7 @@ $o ./xsort B +1 -2 +2r
 $SORT -c -k 2 in 2>/dev/null && ${TEST}G failed
 
 #---------------------------------------------------------------
-TEST=06; echo $TEST	# -t
+TEST=06; echo $TEST	"-t"
 cat >in <<!
 a:
 a!
@@ -455,7 +455,7 @@ $o ./xsort B -t : +0 -1
 ./xsort D -t : -k 1,1
 
 #---------------------------------------------------------------
-TEST=07; echo $TEST	# -t, character positions in fields
+TEST=07; echo $TEST	"-t, character positions in fields"
 	# -t: as 1 arg is not strictly conforming, but classical
 cat >in <<!
 : ab
@@ -475,7 +475,7 @@ $o ./xsort B -t: +1.1r
 ./xsort D -t: -k 2.2r
 
 #---------------------------------------------------------------
-TEST=08; echo $TEST	# space and tab as -t characters
+TEST=08; echo $TEST	"space and tab as -t characters"
 cat >in <<!
  b c
  b	c
@@ -514,7 +514,7 @@ cat >out <<!
 ./xsort F -k2b
 
 #---------------------------------------------------------------
-TEST=09; echo $TEST	# alphabetic as -t character
+TEST=09; echo $TEST	"alphabetic as -t character"
 cat >in <<!
 zXa
 yXa
@@ -525,7 +525,7 @@ cp in out
 ./xsort "" -tX -k2 -k1r,1
 
 #---------------------------------------------------------------
-TEST=10; echo $TEST	# -m
+TEST=10; echo $TEST	"-m"
 cat >in <<!
 a
 ab
@@ -557,7 +557,7 @@ $SORT -m in in1 >xx
 cmp -s xx out >/dev/null || echo ${TEST}A failed
 
 #---------------------------------------------------------------
-TEST=11; echo $TEST	# multiple files, -o overwites input, -m, -mu
+TEST=11; echo $TEST	"multiple files, -o overwites input, -m, -mu"
 cat >in <<!
 a
 b
@@ -574,7 +574,7 @@ $SORT -o in -m  in in in in in in in in in in in in in in in in in
 cmp -s in xx >/dev/null || echo ${TEST}C failed
 
 #---------------------------------------------------------------
-TEST=12; echo $TEST	# does -mu pick the first among equals?
+TEST=12; echo $TEST	"does -mu pick the first among equals?"
 cat >in <<!
 3B
 3b
@@ -597,7 +597,7 @@ cat >out <<!
 ./xsort B -mudf -k1 || echo "(other behavior is legal, not classical)"
 
 #---------------------------------------------------------------
-TEST=13; echo $TEST	# long records (>8000 bytes, keys >16000), -r
+TEST=13; echo $TEST	"long records (>8000 bytes, keys >16000), -r"
 $AWK '
 BEGIN {	x="x"
 	for(i=1; i<=12; i++) x = x x
@@ -614,7 +614,7 @@ BEGIN {	x="x"
 ./xsort B -k 1,1r -k 1
 
 #---------------------------------------------------------------
-TEST=14; echo $TEST
+TEST=14; echo $TEST	"-n and -u"
 cp 14.in in
 rm -f out
 
@@ -632,7 +632,7 @@ $AWK '
 ./xsort C -n -u
 
 #---------------------------------------------------------------
-TEST=15; echo $TEST 	# force intermediate files if possible
+TEST=15; echo $TEST 	"force intermediate files if possible"
 #	option -y4096 ($y) should force a multi-stage internal merge
 #	option -Xread ($X) should force read over mmap
 case "$y" in
@@ -661,7 +661,7 @@ cmp -s in1 out >/dev/null || echo ${TEST}I failed
 rm in in1 out
 
 #---------------------------------------------------------------
-TEST=16; echo $TEST	# -nr, -nm, file name -
+TEST=16; echo $TEST	"-nr, -nm, file name -"
 $AWK 'BEGIN { for(i=-100; i<=100; i+=2) printf "%.10d\n", i }' >in </dev/null
 
 $AWK 'BEGIN { for(i=-99; i<=100; i+=2) print i }' </dev/null |
@@ -673,7 +673,7 @@ $AWK 'BEGIN { for(i=-99; i<=100; i+=2) print i }' </dev/null |
 $AWK '$0+0 != -101+NR { print "'${TEST}B' failed"; exit }' xx
 
 #---------------------------------------------------------------
-TEST=17; echo $TEST	# -d, fields without end, modifier override
+TEST=17; echo $TEST	"-d, fields without end, modifier override"
 cat >in <<!
 a-B
 a+b
@@ -694,7 +694,7 @@ $o ./xsort A -df +0 +0d
 ./xsort B -df -k 1 -k 1d
 
 #---------------------------------------------------------------
-TEST=18; echo $TEST	# -u on key only
+TEST=18; echo $TEST	"-u on key only"
 cat >in <<!
 12	y
 13	z
@@ -714,7 +714,7 @@ $SORT -u -k 1,1 in >xx
 ./linecount C xx 2
 
 #---------------------------------------------------------------
-TEST=19; echo $TEST	# -i, -d, -f
+TEST=19; echo $TEST	"-i, -d, -f"
 cat >xx.c <<!
 #include <stdio.h>
 void run(i,j){ for( ; i<=j; i++) printf("%.3o %c\n",i,i); }
@@ -778,7 +778,7 @@ rm -f xx.c xx.o xx.exe
 ./xsort C -f -k 2
 
 #---------------------------------------------------------------
-TEST=20; echo $TEST	# -d, -f, -b applies only to fields
+TEST=20; echo $TEST	"-d, -f, -b applies only to fields"
 cat >in <<!
  b
 'C
@@ -799,7 +799,7 @@ a
 ./xsort C -dfb
 
 #---------------------------------------------------------------
-TEST=21; echo $TEST	# behavior of null bytes
+TEST=21; echo $TEST	"behavior of null bytes"
 cat >xx.c <<'!'
 #include <stdio.h>
 main() { printf("\n%cb\n%ca\n",0,0); return 0; }
@@ -812,7 +812,7 @@ test "`wc -c <in`" = "`wc -c <xx`" || echo ${TEST}B failed
 rm -f xx.c xx.o xx.exe
 
 #---------------------------------------------------------------
-TEST=22; echo $TEST	# field limits
+TEST=22; echo $TEST	"field limits"
 cat >in <<!
 a	2
 a	1
@@ -829,7 +829,7 @@ a	2
 ./xsort "" -r -k1,1 -k2n
 
 #---------------------------------------------------------------
-TEST=23; echo $TEST	# empty file, compact -o
+TEST=23; echo $TEST	"empty file, compact -o"
 
 echo hi >xx
 
@@ -841,7 +841,7 @@ $SORT -c </dev/null || echo ${TEST}B failed
 $SORT -cu </dev/null || echo ${TEST}C failed
 
 #---------------------------------------------------------------
-TEST=24; echo $TEST	# many fields
+TEST=24; echo $TEST	"many fields"
 cat >in <<!
 0:2:3:4:5:6:7:8:9
 1:1:3:4:5:6:7:8:9
@@ -868,7 +868,7 @@ cat >out <<!
 ./xsort "" -t: -k9 -k8 -k7 -k6 -k5 -k4 -k3 -k2 -k1
 
 #---------------------------------------------------------------
-TEST=25; echo $TEST	# variously specified alpha fields
+TEST=25; echo $TEST	"variously specified alpha fields"
 			# numbers give the correct orderings
 cat >in <<!
 01:04:19:01:16:01:21:01 a
@@ -915,7 +915,7 @@ $SORT -b -k2,2b -k2 in >xx 			# perhaps same as G
  "(standard is not clear on this)"
 
 #---------------------------------------------------------------
-TEST=26; echo $TEST	# empty fields, out of bounds fields	
+TEST=26; echo $TEST	"empty fields, out of bounds fields	"
 cat >in <<!
 0 5
 1 4
@@ -929,14 +929,14 @@ cp in out
 ./xsort "" -k2.2,2.1 -k2.3,2.4
 
 #---------------------------------------------------------------
-TEST=27; echo $TEST	# displaced -o
+TEST=27; echo $TEST	"displaced -o"
 rm -f out
 
 $O $SORT /dev/null -o out || $o echo ${TEST}B failed
 $O test -f out || $O echo ${TEST}C failed
 
 #---------------------------------------------------------------
-TEST=28; echo $TEST	# apparently nonmonotone field specs
+TEST=28; echo $TEST	"apparently nonmonotone field specs"
 cat >in <<!
 aaaa c
 x a
@@ -949,7 +949,7 @@ $o ./xsort A +1 -0.3 +1.4 -1.5
 ./xsort B -k2,1.3 -k2.5,2.5
 
 #---------------------------------------------------------------
-TEST=29; echo $TEST	# determination of end of option list
+TEST=29; echo $TEST	"determination of end of option list"
 cat >-k <<!
 x
 !
@@ -970,14 +970,14 @@ cmp -s in out >/dev/null || echo ${TEST}C failed
 test -s in1 && echo ${TEST}D failed
 
 #---------------------------------------------------------------
-TEST=30; echo $TEST	# missing newline
+TEST=30; echo $TEST	"missing newline"
 $AWK 'BEGIN{ printf "%s", "x"}' >in
 echo x >out
 
 ./xsort "" 2>/dev/null
 
 #---------------------------------------------------------------
-TEST=31; echo $TEST	# -M, multiple fields
+TEST=31; echo $TEST	"-M, multiple fields"
 cat >in <<!
 jan 10 1900
 Feb 26 1900
@@ -1026,7 +1026,7 @@ dec 25 1990
 $M ./xsort "" -k3n -k1M -k2n
 
 #---------------------------------------------------------------
-TEST=32; echo $TEST	# -M case insensitivity, -r
+TEST=32; echo $TEST	"-M case insensitivity, -r"
 cat >in <<!
 x
 june
@@ -1043,7 +1043,7 @@ x
 $M ./xsort "" -Mr
 
 #---------------------------------------------------------------
-TEST=33; echo $TEST	# -g, big enough for IEEE floating point
+TEST=33; echo $TEST	"-g, big enough for IEEE floating point"
 cat >in <<!
 2
 1
@@ -1076,7 +1076,7 @@ cat >out <<!
 $g ./xsort "" -g
 
 #---------------------------------------------------------------
-TEST=34; echo $TEST	# -g wide operands
+TEST=34; echo $TEST	"-g wide operands"
 cat >in <<!
 .99999999999999999999
 099999999999999999999e-21
@@ -1102,7 +1102,7 @@ cat >out <<!
 ./xsort B -n
 
 #---------------------------------------------------------------
-TEST=35; echo $TEST	#-g, -u with different fp reps
+TEST=35; echo $TEST	"-g, -u with different fp reps"
 cat >in <<!
 +0
 -0
@@ -1130,7 +1130,7 @@ $g $SORT -gu in >xx && $g $SORT -c -gu xx || echo ${TEST}B failed
 $g ./linecount C xx 3
 
 #---------------------------------------------------------------
-TEST=36; echo $TEST	# -s
+TEST=36; echo $TEST	"-s"
 cat >in <<!
 a 2
 b 1
@@ -1151,7 +1151,7 @@ c 1
 $s ./xsort "" -s -k1,1
 
 #---------------------------------------------------------------
-TEST=37; echo $TEST	# -s, multiple files
+TEST=37; echo $TEST	"-s, multiple files"
 cat >in <<!
 a 2
 c 2
@@ -1181,7 +1181,7 @@ $s $SORT -sru -k1,1 in in in1 in1 >xx
 $s cmp -s xx out >/dev/null || echo ${TEST}B failed
 
 #---------------------------------------------------------------
-TEST=38; echo $TEST	# -s
+TEST=38; echo $TEST	"-s"
 $s $AWK '
 	BEGIN {
 		for(i=1; i<50; i++)
@@ -1203,7 +1203,7 @@ $s $AWK '
 	' out
 
 #---------------------------------------------------------------
-TEST=39; echo $TEST	# empty fields
+TEST=39; echo $TEST	"empty fields"
 cat >in <<!
 bXXa
 aXXb
@@ -1216,7 +1216,7 @@ cp in out
 ./xsort D -r -k4 -tX
 
 #---------------------------------------------------------------
-TEST=40; echo $TEST	# deceptive field boundaries
+TEST=40; echo $TEST	"deceptive field boundaries"
 cat >in <<!
     1.2
   1.10
@@ -1236,11 +1236,11 @@ cp in out
 
 $M ./xsort C -k1.1,1.4M
 #---------------------------------------------------------------
-TEST=41; echo $TEST	# fixed length records
+TEST=41; echo $TEST	"fixed length records"
 echo bdpoweonwekjbkgizohoeioilasho > in
 echo hozopoonbkkjoieigishwewebdlao > out
 
-$k ./xsort A -s -r -k2:1:1
+$k ./xsort A -s -r -R2 -k.2.1
 
 ( echo; echo ) >> in
 
@@ -1250,7 +1250,7 @@ lakjhogieibkbd
 
 !
 
-$k ./xsort B -s -r -k2:
+$k ./xsort B -s -r -R2
 
 echo ' aza zaz mzm mam
 
@@ -1262,23 +1262,23 @@ echo ' zaz mam mzm aza
 
 ' > out
 
-$k ./xsort C -s -r -k4:1:1
-$k ./xsort D -s -r -k4: -k1.2,1.2
+$k ./xsort C -s -r -R4 -k.2.1
+$k ./xsort D -s -r -R4 -k1.2,1.2
 
 echo ' zaz mzm mam aza
 
 
 ' > out
 
-$k ./xsort E -s -r -k4:2:1
-$k ./xsort F -s -r -k4: -k1.2,1.3
-$k ./xsort G -s -r -k4: -k1.2,1.2 -k1.3,1.3
+$k ./xsort E -s -r -R4 -k.2.2
+$k ./xsort F -s -r -R4 -k1.2,1.3
+$k ./xsort G -s -r -R4 -k1.2,1.2 -k1.3,1.3
 
 echo ' mzm aza zaz mam
 
 
 ' > out
 
-$k ./xsort H -s -r -k4: -k1.3,1.3 -k1.2,1.2
+$k ./xsort H -s -r -R4 -k1.3,1.3 -k1.2,1.2
 
 done

@@ -29,12 +29,12 @@
  * unpack files that have been Huffman encoded
  *
  *   David Korn
- *   AT&T Research
+ *   AT&T Labs
  *
  */
 
 static const char usage_head[] =
-"[-?@(#)$Id: unpack (AT&T Labs Research) 2002-03-09 $\n]"
+"[-?@(#)$Id: unpack (AT&T Labs Research) 2003-04-28 $\n]"
 USAGE_LICENSE
 ;
 

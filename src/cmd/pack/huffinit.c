@@ -26,11 +26,7 @@
  * huffman coding initialization
  *
  *   David Korn
- *   AT&T Bell Laboratories
- *   Room 3C-526B
- *   Murray Hill, N. J. 07974
- *   Tel. x7975
- *   ulysses!dgk
+ *   AT&T Laboratories
  */
 
 #include	"huffman.h"
@@ -49,13 +45,13 @@ static long	count[END+1];
 static int	lastnode;
 static void	heapify(Heap_t*, int, int);
 
-Huff_t *huffinit(Sfio_t *infile,long insize)
+Huff_t *huffinit(Sfio_t *infile, Sfoff_t insize)
 {
 	register int		n;
 	register unsigned char *inbuff;
 	register int		i, c;
 	register Huff_t		*hp;
-	register long		size = insize;
+	register Sfoff_t	size = insize;
 	int			parent[2*END+1];
 	Heap_t 			heap[END+2];
 	if(!(hp=newof(0, Huff_t, 1, 0)))

@@ -26,11 +26,7 @@
  * huffman coding encoding
  *
  *   David Korn
- *   AT&T Bell Laboratories
- *   Room 3C-526B
- *   Murray Hill, N. J. 07974
- *   Tel. x7975
- *   ulysses!dgk
+ *   AT&T Laboratories
  */
 
 #include	"huffman.h"
@@ -64,7 +60,7 @@ static int 	putbuff(Sfio_t*,unsigned char*);
  * encode until end-of-file of <size> < 0.
  */
 
-int huffencode(register Huff_t *hp,Sfio_t *infile,Sfio_t *outfile,int size)
+Sfoff_t huffencode(register Huff_t *hp,Sfio_t *infile,Sfio_t *outfile,int size)
 {
 	register long buffer;
 	register int left, i, c;

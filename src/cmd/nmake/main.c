@@ -313,7 +313,8 @@ main(int argc, char** argv)
 	 * 3 may be /dev/tty on some systems
 	 * 0..9 for user redirection in shell
 	 * 10..19 left open by bugs in some shells
-	 * any close-on-exec fd's must have been done for us
+	 * error_info.fd interited from parent
+	 * any close-on-exec fd's must have been done on our behalf
 	 */
 
 	i = 3;
@@ -324,9 +325,10 @@ main(int argc, char** argv)
 			close(i);
 
 	/*
-	 * initialize the hash tables
+	 * initialize the code and hash tables
 	 */
 
+	initcode();
 	inithash();
 
 	/*
@@ -595,7 +597,7 @@ main(int argc, char** argv)
 		imp = sfstropen();
 		sep = 0;
 		s = 0;
-		if (*(t = getval(external.convert, 1)))
+		if (*(t = getval(external.convert, VAL_PRIMARY)))
 		{
 			sfputr(tmp, t, 0);
 			sfstrrsrv(tmp, MAXNAME);
@@ -862,18 +864,27 @@ finish(int n)
 
 	case 0:
 		/*
-		 * disable listing and make the done trap
+		 * disable listing and wait for any jobs to finish
 		 */
 
 		state.finish++;
 		alarm(0);
 		state.list = 0;
 		message((-1, "%s cleanup", state.interrupt ? "interrupt" : n > 0 ? "error" : "normal"));
+		complete(NiL, NiL, NiL, 0);
+		/*FALLTHROUGH*/
+
+	case 1:
+		/*
+		 * make the done trap
+		 */
+
+		state.finish++;
 		if (!state.compileonly && (r = getrule(external.done)))
 			maketop(r, P_dontcare, NiL);
 		/*FALLTHROUGH*/
 
-	case 1:
+	case 2:
 		/*
 		 * make the makedone trap
 		 */
@@ -883,7 +894,7 @@ finish(int n)
 			maketop(r, P_dontcare, NiL);
 		/*FALLTHROUGH*/
 
-	case 2:
+	case 3:
 		/*
 		 * wait for any job(s) to finish
 		 */
@@ -892,7 +903,7 @@ finish(int n)
 		complete(NiL, NiL, NiL, 0);
 		/*FALLTHROUGH*/
 
-	case 3:
+	case 4:
 		/*
 		 * put all jobs in foreground and save state
 		 */
@@ -902,7 +913,7 @@ finish(int n)
 		savestate();
 		/*FALLTHROUGH*/
 
-	case 4:
+	case 5:
 		/*
 		 * clean up temporaries
 		 */
@@ -911,7 +922,7 @@ finish(int n)
 		remtmp(1);
 		/*FALLTHROUGH*/
 
-	case 5:
+	case 6:
 		/*
 		 * drop the coshell
 		 */
@@ -920,7 +931,7 @@ finish(int n)
 		drop();
 		/*FALLTHROUGH*/
 
-	case 6:
+	case 7:
 		/*
 		 * dump
 		 */
@@ -936,7 +947,7 @@ finish(int n)
 		dump(sfstdout, error_info.trace <= -14);
 		/*FALLTHROUGH*/
 
-	case 7:
+	case 8:
 		/*
 		 * final output
 		 */

@@ -196,18 +196,15 @@ typedef struct
 #define msg_info	_msg_info_
 
 #if _BLD_cs && defined(__EXPORT__)
-#define __PUBLIC_DATA__		__EXPORT__
-#else
+#define extern		__EXPORT__
+#endif
 #if !_BLD_cs && defined(__IMPORT__)
-#define __PUBLIC_DATA__		__IMPORT__
-#else
-#define __PUBLIC_DATA__
-#endif
+#define extern		extern __IMPORT__
 #endif
 
-extern __PUBLIC_DATA__ Msg_info_t	msg_info;
+extern Msg_info_t	msg_info;
 
-#undef	__PUBLIC_DATA__
+#undef	extern
 
 #ifndef msgreserve
 #define msgreserve(p)

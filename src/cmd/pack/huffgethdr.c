@@ -26,11 +26,7 @@
  * huffman coding routine to read a pack format header
  *
  *   David Korn
- *   AT&T Bell Laboratories
- *   Room 3C-526B
- *   Murray Hill, N. J. 07974
- *   Tel. x7975
- *   ulysses!dgk
+ *   AT&T Laboratories
  */
 
 #include	"huffman.h"
@@ -56,6 +52,13 @@ Huff_t *huffgethdr(register Sfio_t *infile)
 		hp->insize = (hp->insize<<CHAR_BIT)+ sfgetc(infile);
 	/* get number of levels in maxlev, */
 	hp->maxlev = sfgetc(infile);
+	if(hp->maxlev==0)
+	{
+		/* larger than  2**32 */
+		for (i=0; i<4; i++)
+			hp->insize = (hp->insize<<CHAR_BIT)+ sfgetc(infile);
+		hp->maxlev = sfgetc(infile);
+	}
 	if(hp->maxlev < 0 || hp->maxlev > HUFFLEV)
 		goto error;
 	/* get number of leaves on level i  */

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,8 +42,8 @@ make libardir.a archive
 make ardir.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -52,8 +53,8 @@ exec - do	case $i in
 exec - 	"ardir"|ardir)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -72,9 +73,7 @@ make ardirlib.h implicit
 make ../../../include/ast/error.h implicit
 make ../../../include/ast/option.h implicit
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -114,7 +113,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -131,6 +131,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -151,7 +156,7 @@ prev ../../../include/ast/ast.h implicit
 done ardirlib.h
 done ardir.c
 prev ardir.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ardir.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ardir.c
 done ardir.o generated
 make ar-aix.o
 make ar-aix.c
@@ -168,7 +173,7 @@ done ../../../include/ast/tm.h
 prev ardirlib.h implicit
 done ar-aix.c
 prev ar-aix.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aix.c
 done ar-aix.o generated
 make ar-aixbig.o
 make ar-aixbig.c
@@ -176,7 +181,7 @@ prev ../../../include/ast/tm.h implicit
 prev ardirlib.h implicit
 done ar-aixbig.c
 prev ar-aixbig.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aixbig.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-aixbig.c
 done ar-aixbig.o generated
 make ar-local.o
 make ar-local.c
@@ -184,7 +189,7 @@ prev ../../../include/ast/tm.h implicit
 prev ardirlib.h implicit
 done ar-local.c
 prev ar-local.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-local.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-local.c
 done ar-local.o generated
 make ar-omf.o
 make ar-omf.c
@@ -197,7 +202,7 @@ done ../../../include/ast/cdt.h
 prev ardirlib.h implicit
 done ar-omf.c
 prev ar-omf.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-omf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-omf.c
 done ar-omf.o generated
 make ar-pdp11.o
 make ar-pdp11.c
@@ -211,7 +216,7 @@ done ../../../include/ast/swap.h
 prev ardirlib.h implicit
 done ar-pdp11.c
 prev ar-pdp11.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-pdp11.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-pdp11.c
 done ar-pdp11.o generated
 make ar-port.o
 make ar-port.c
@@ -219,7 +224,7 @@ prev ../../../include/ast/tm.h implicit
 prev ardirlib.h implicit
 done ar-port.c
 prev ar-port.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-port.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-port.c
 done ar-port.o generated
 make ar-s5r0.o
 make ar-s5r0.c
@@ -228,7 +233,7 @@ prev ../../../include/ast/swap.h implicit
 prev ardirlib.h implicit
 done ar-s5r0.c
 prev ar-s5r0.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-s5r0.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ar-s5r0.c
 done ar-s5r0.o generated
 exec - ${AR} cr libardir.a ardir.o ar-aix.o ar-aixbig.o ar-local.o ar-omf.o ar-pdp11.o ar-port.o ar-s5r0.o
 exec - (ranlib libardir.a) >/dev/null 2>&1 || true

@@ -1708,7 +1708,7 @@ ppcpp(void)
 			ip++;
 			PUTCHR('\n');
 		}
-		if ((st & NOTEXT) && (pp.mode & FILEDEPS))
+		if ((st & NOTEXT) && ((pp.mode & FILEDEPS) || (pp.option & (DEFINITIONS|PREDEFINITIONS))))
 		{
 			BACKOUT();
 			goto fsm_start;
@@ -1983,6 +1983,7 @@ ppcpp(void)
 						}
 						if (pp.in->type == IN_EXPAND)
 						{
+							st &= ~SKIPMACRO;
 							PUTCHR(c);
 							PUTCHR('X');
 						}

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,8 +42,8 @@ make libvdelta.a archive
 make vdelta.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -52,8 +53,8 @@ exec - do	case $i in
 exec - 	"vdelta"|vdelta)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -130,35 +131,35 @@ done vdelta.h dontcare
 done vdelhdr.h
 done vddelta.c
 prev vddelta.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vddelta.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vddelta.c
 done vddelta.o generated
 make vdio.o
 make vdio.c
 prev vdelhdr.h implicit
 done vdio.c
 prev vdio.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdio.c
 done vdio.o generated
 make vdupdate.o
 make vdupdate.c
 prev vdelhdr.h implicit
 done vdupdate.c
 prev vdupdate.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdupdate.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdupdate.c
 done vdupdate.o generated
 make vdsqueeze.o
 make vdsqueeze.c
 prev vdelhdr.h implicit
 done vdsqueeze.c
 prev vdsqueeze.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdsqueeze.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdsqueeze.c
 done vdsqueeze.o generated
 make vdexpand.o
 make vdexpand.c
 prev vdelhdr.h implicit
 done vdexpand.c
 prev vdexpand.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdexpand.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vdexpand.c
 done vdexpand.o generated
 make vddelta01.o
 make vd01/vddelta01.c
@@ -169,21 +170,21 @@ done vd01/vdelta01.h dontcare
 done vd01/vdelhdr01.h
 done vd01/vddelta01.c
 prev vd01/vddelta01.c
-exec - ${CC} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vddelta01.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vddelta01.c
 done vddelta01.o generated
 make vdio01.o
 make vd01/vdio01.c
 prev vd01/vdelhdr01.h implicit
 done vd01/vdio01.c
 prev vd01/vdio01.c
-exec - ${CC} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdio01.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdio01.c
 done vdio01.o generated
 make vdupdate01.o
 make vd01/vdupdate01.c
 prev vd01/vdelhdr01.h implicit
 done vd01/vdupdate01.c
 prev vd01/vdupdate01.c
-exec - ${CC} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdupdate01.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Ivd01 -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vd01/vdupdate01.c
 done vdupdate01.o generated
 exec - ${AR} cr libvdelta.a vddelta.o vdio.o vdupdate.o vdsqueeze.o vdexpand.o vddelta01.o vdio01.o vdupdate01.o
 exec - (ranlib libvdelta.a) >/dev/null 2>&1 || true

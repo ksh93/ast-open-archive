@@ -102,6 +102,7 @@ int		len;
 	int		nib = 0;	/* high nibble 1, low nibble 0 */
 	unsigned char*	xp = dp;
 	unsigned char*	ep = xp + len;	/* end pointer */
+	unsigned char*	trans = f->trans;
 	int		zeros = 0;	/* count zeros seen but not installed */
 	int		sigdig = 1024;
 	int		neg = f->rflag;	/* 0 for +, 1 for - */
@@ -115,14 +116,14 @@ int		len;
 	 * eat blanks
 	 */
 
-	while (xp < ep && blank(*xp)) xp++;
+	while (xp < ep && blank(trans[*xp])) xp++;
 
 	/*
 	 * eat sign
 	 */
 
 	if (xp < ep)
-		switch (*xp)
+		switch (trans[*xp])
 		{
 		case '-':
 			neg ^= 1;
@@ -136,14 +137,14 @@ int		len;
 	 * eat leading zeros
 	 */
 
-	while (xp < ep && *xp == '0') xp++;
-	if (xp < ep && *xp == '.')
+	while (xp < ep && trans[*xp] == '0') xp++;
+	if (xp < ep && trans[*xp] == '.')
 	{
 		decimal++;
-		for (xp++; xp < ep && *xp == '0'; xp++)
+		for (xp++; xp < ep && trans[*xp] == '0'; xp++)
 			sigdig--;
 	}
-	if (xp >= ep || *xp > '9' || *xp < '0')
+	if (xp >= ep || trans[*xp] > '9' || trans[*xp] < '0')
 	{
 		/*
 		 * no significant digit
@@ -155,7 +156,7 @@ int		len;
 	}
 	for (; xp < ep; xp++)
 	{
-		switch (*xp)
+		switch (trans[*xp])
 		{
 		case '.':
 			if (decimal)
@@ -171,7 +172,7 @@ int		len;
 		case '6': case '7': case '8': case '9':
 			for (; zeros > 0; zeros--)
 				putdig(0);
-			n = *xp - '0';
+			n = trans[*xp] - '0';
 			putdig(n);
 			if (!decimal)
 				sigdig++;
@@ -181,7 +182,7 @@ int		len;
 			if (f->flag != 'g')
 				goto out;
 			inv = 1;
-			if (xp < ep) switch(*++xp)
+			if (xp < ep) switch(trans[*++xp])
 			{
 			case '-':
 				inv = -1;
@@ -190,11 +191,11 @@ int		len;
 				xp++;
 				break;
 			}
-			if (xp >= ep || *xp > '9' || *xp < '0')
+			if (xp >= ep || trans[*xp] > '9' || trans[*xp] < '0')
 				goto out;
 			for (n = 0; xp < ep; xp++)
 			{
-				int	c = *xp;
+				int	c = trans[*xp];
 
 				if (c < '0' || c > '9')
 					break;
@@ -214,12 +215,75 @@ int		len;
 	{
 		sigdig = sigdig < 0 ? 0 : 2047;
 		if (kp->keydisc->errorf)
-			(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: numeric field overflow", dp);
+			(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: numeric field overflow", len, dp);
 		dig = cp + 1;
 		*dig = 0;
 		nib = 0;
 	}
  retzero:
+	if (neg) sigdig = 2048 - sigdig;
+	else sigdig = 2048 + sigdig;
+	cp[0] = sigdig >> 4;
+	cp[1] |= sigdig << 4;
+	putdig(-1);
+	return dig - cp + 1 - nib;
+}
+
+/*
+ * packed decimal (bcd)
+ */
+
+static int
+#if __STD_C
+key_p_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+#else
+key_p_code(kp, f, dp, cp, len)
+Rskey_t*	kp;
+Field_t*	f;
+unsigned char*	dp;
+unsigned char*	cp;
+int		len;
+#endif
+{
+	unsigned char*	dig = cp + 1;	/* byte for next digit */
+	int		nib = 0;	/* high nibble 1, low nibble 0 */
+	unsigned char*	xp = dp;
+	unsigned char*	ep = xp + len;	/* end pointer */
+	unsigned char*	trans = f->trans;
+	int		sigdig = 1024;
+	int		neg = f->rflag;	/* 0 for +, 1 for - */
+	int		n;
+	int		c;
+
+	cp[1] = 0;
+
+	/*
+	 * sign
+	 */
+
+	if ((trans[*(ep - 1)] & 0xF) == 0xD)
+		neg ^= 1;
+	while (xp < ep)
+	{
+		c = trans[*xp++];
+		n = (c >> 4) & 0xF;
+		putdig(n);
+		sigdig++;
+		n = c & 0xF;
+		if (n > 0x9)
+			break;
+		putdig(n);
+		sigdig++;
+	}
+	if (sigdig >= 2047)
+	{
+		sigdig = 2047;
+		if (kp->keydisc->errorf)
+			(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: numeric field overflow", dp);
+		dig = cp + 1;
+		*dig = 0;
+		nib = 0;
+	}
 	if (neg) sigdig = 2048 - sigdig;
 	else sigdig = 2048 + sigdig;
 	cp[0] = sigdig >> 4;
@@ -307,15 +371,16 @@ int		len;
 	int		j = -1;
 	int		i;
 	unsigned char*	xp;
+	unsigned char*	trans = f->trans;
 
-	for (; len > 0 && blank(*dp); dp++, len--);
+	for (; len > 0 && blank(trans[*dp]); dp++, len--);
 	if (len >= 3)
 		while (++j < elementsof(month))
 		{
 			xp = (unsigned char*)month[j];
 			for (i = 0; i < 3; i++)
 			{
-				c = dp[i];
+				c = trans[dp[i]];
 				if (isupper(c))
 					c = tolower(c);
 				if (c != *xp++)
@@ -348,7 +413,7 @@ int		keylen;
 Rsdisc_t*	disc;
 #endif
 {
-	Rskey_t*	kp = (Rskey_t*)((char*)rs->disc - offsetof(Rskey_t, disc));
+	Rskey_t*	kp = (Rskey_t*)((char*)rs->disc - sizeof(Rskey_t));
 	unsigned char*	cp;
 	Field_t*	fp;
 	unsigned char*	ep;
@@ -463,7 +528,7 @@ int		c;
 		if (kp->keydisc->errorf)
 		{
 			if (key)
-				(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: invalid key field specification", key + fp->standard - 1);
+				(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: invalid key field specification", key);
 			else
 				(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "field[%d]: invalid key field specification", fp->index);
 		}
@@ -481,13 +546,14 @@ int		c;
 
 static void
 #if __STD_C
-addcoder(Rskey_t* kp, Field_t* fp, Coder_t np, int c)
+addcoder(Rskey_t* kp, Field_t* fp, Coder_t np, int c, int b)
 #else
-addcoder(kp, fp, np, c)
+addcoder(kp, fp, np, c, b)
 Rskey_t*	kp;
 Field_t*	fp;
 Coder_t		np;
 int		c;
+int		b;
 #endif
 {
 	NoP(kp);
@@ -495,6 +561,7 @@ int		c;
 		conflict(kp, c);
 	fp->coder = np;
 	fp->flag = c;
+	fp->binary = b;
 }
 
 /*
@@ -524,17 +591,23 @@ unsigned char*	np;
 
 static int
 #if __STD_C
-addopt(Rskey_t* kp, register Field_t* fp, int c, int end)
+addopt(Rskey_t* kp, register Field_t* fp, register char* s, int end)
 #else
-addopt(kp, fp, c, end)
+addopt(kp, fp, s, end)
 Rskey_t*		kp;
 register Field_t*	fp;
-int			c;
+register char*		s;
 int			end;
 #endif
 {
-	switch (c)
+	int	c;
+	int	x;
+	char*	b = s;
+
+	switch (c = *s++)
 	{
+	case 0:
+		return 0;
 	case 'a':
 		if (!fp->aflag)
 		{
@@ -553,11 +626,61 @@ int			end;
 			else
 				kp->accumulate.head = kp->accumulate.tail = fp;
 		}
-		return 1;
+		return s - b;
 	case 'b':
-		if (end) fp->eflag = 1;
-		else fp->bflag = 1;
-		return 1;
+		if (end)
+			fp->eflag = 1;
+		else
+			fp->bflag = 1;
+		return s - b;
+	case 'C':
+		switch (*s++)
+		{
+		case 'a':
+			x = CC_ASCII;
+			break;
+		case 'e':
+			x = CC_EBCDIC_E;
+			break;
+		case 'i':
+			x = CC_EBCDIC_I;
+			break;
+		case 'o':
+			x = CC_EBCDIC_O;
+			break;
+		case 'x':
+			x = CC_NATIVE;
+			break;
+		default:
+			if (kp->keydisc->errorf)
+				(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "field[%d]: %s: invalid code set", fp->index, s - 1);
+			kp->keydisc->flags |= RSKEY_ERROR;
+			return 0;
+		}
+		switch (*s++)
+		{
+		case 'a':
+			x = CCOP(x, CC_ASCII);
+			break;
+		case 'e':
+			x = CCOP(x, CC_EBCDIC_E);
+			break;
+		case 'i':
+			x = CCOP(x, CC_EBCDIC_I);
+			break;
+		case 'o':
+			x = CCOP(x, CC_EBCDIC_O);
+			break;
+		case 'x':
+			x = CCOP(x, CC_NATIVE);
+			break;
+		default:
+			s--;
+			break;
+		}
+		if (x != CC_NATIVE && CCIN(x) != CCOUT(x))
+			fp->code = x;
+		return s - b;
 	case 'd':
 		addtable(kp, c, &fp->keep, kp->state->dict);
 		break;
@@ -566,24 +689,27 @@ int			end;
 		break;
 	case 'g':
 	case 'n':
-		addcoder(kp, fp, key_n_code, c);
+		addcoder(kp, fp, key_n_code, c, 0);
 		break;
 	case 'i':
 		addtable(kp, c, &fp->keep, kp->state->print);
 		break;
 	case 'M':
-		addcoder(kp, fp, key_m_code, c);
+		addcoder(kp, fp, key_m_code, c, 0);
+		break;
+	case 'p':
+		addcoder(kp, fp, key_p_code, c, 1);
 		break;
 	case 'r':
 		fp->rflag = 1;
-		return 1;
+		return s - b;
 	default:
 		return 0;
 	}
 	kp->coded = 1;
 	if (kp->keydisc->errorf && fp != kp->field.tail)
 		(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "field spec precedes global option %c", c);
-	return 1;
+	return s - b;
 }
 
 /*
@@ -603,21 +729,24 @@ int		all;
 #endif
 {
 	register Field_t*	fp;
-	register int		c;
+	register int		i;
 	char*			s;
 
 	fp = all ? kp->field.head : kp->field.tail;
 	s = (char*)key;
-	while (addopt(kp, fp, c = *s++, 0));
-	if (fp->standard && (c == ',' || c == ' '))
+	while (i = addopt(kp, fp, s, 0))
+		s += i;
+	if (fp->standard && (*s == ',' || *s == ' '))
 	{
+		s++;
 		if ((fp->end.field = (int)strtol(s, (char**)&s, 10) - 1) > kp->field.maxfield)
 			kp->field.maxfield = fp->end.field;
 		if (*s == '.' && !(fp->end.index = (int)strtol(s + 1, &s, 10)))
 			fp->end.index = -1;
-		while (addopt(kp, fp, c = *s++, 1));
+		while (i = addopt(kp, fp, s, 1))
+			s += i;
 	}
-	return checkfield(kp, fp, key, c);
+	return checkfield(kp, fp, key, *s);
 }
 
 /*
@@ -635,47 +764,62 @@ int		obsolete;
 #endif
 {
 	register Field_t*	fp;
+	int			o;
 	int			n;
-	int			m;
 	int			standard;
-	char*			s = (char*)key;
+	char*			s;
+	char*			t;
 	char			buf[32];
 
-	n = (int)strtol(s, &s, 10);
-	if (standard = !obsolete)
+	s = (char*)key;
+	if (*s == '.')
 	{
-		if (*s == ':')
+		n = (int)strtol(s + 1, &t, 10);
+		if (!*t)
 		{
-			kp->fixed = n;
-			if (!*++s)
-				return 0;
-			n = strtol(s, &s, 10);
-			m = 0;
-			if (*s)
+			if (n != kp->fixed && kp->fixed)
 			{
-				if (*s != ':')
-				{
-					if (kp->keydisc->errorf)
-						(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: invalid fixed record key length", key);
-					kp->keydisc->flags |= RSKEY_ERROR;
-					return -1;
-				}
-				if (*++s)
-				{
-					m = strtol(s, &s, 10);
-					if (*s && (*s != ':' || *++s))
-					{
-						if (kp->keydisc->errorf)
-							(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: invalid fixed key offset", key);
-						kp->keydisc->flags |= RSKEY_ERROR;
-						return -1;
-					}
-				}
+				if (kp->keydisc->errorf)
+					(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: fixed record length mismatch -- %d expected", key, kp->fixed);
+				kp->keydisc->flags |= RSKEY_ERROR;
+				return -1;
 			}
-			key = (const char*)(s = buf);
-			sfsprintf(s, sizeof(buf), ".%d,1.%d", m + 1, m + n);
-			n = 1;
+			kp->fixed = n;
+			return 0;
 		}
+	}
+	n = (int)strtol(s, &t, 10);
+	if (s == t)
+		n = 1;
+	else
+		s = t;
+	if ((standard = !obsolete) && *s == ':')
+	{
+		if (n)
+		{
+			if (n != kp->fixed && kp->fixed)
+			{
+				if (kp->keydisc->errorf)
+					(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: fixed record key length mismatch -- %d expected", key, kp->fixed);
+				kp->keydisc->flags |= RSKEY_ERROR;
+				return -1;
+			}
+			kp->fixed = n;
+		}
+		if (!*++s)
+			return 0;
+		n = (int)strtol(s, &s, 10);
+		o = *s == ':' ? (int)(strtol(s + 1, &s, 10) + 1) : 1;
+		if (kp->fixed && (o + n) > kp->fixed)
+		{
+			if (kp->keydisc->errorf)
+				(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: fixed field exceeds record length %d", key, kp->fixed);
+			kp->keydisc->flags |= RSKEY_ERROR;
+			return -1;
+		}
+		key = (const char*)(s = buf);
+		sfsprintf(s, sizeof(buf), ".%d,1.%d", o, o + n);
+		n = 1;
 	}
 	if (obsolete == '-')
 	{
@@ -708,10 +852,69 @@ int		obsolete;
 		if ((fp->begin.field = n - fp->standard) > kp->field.maxfield)
 			kp->field.maxfield = fp->begin.field;
 		fp->end.field = MAXFIELD;
+		fp->code = kp->field.head->code;
 		if (*s == '.')
+		{
 			fp->begin.index = (int)strtol(s + 1, &s, 10) - fp->standard;
+			if (*s == '.')
+			{
+				fp->end.field = fp->begin.field;
+				fp->end.index = fp->begin.index + (int)strtol(s + 1, &s, 10);
+			}
+		}
 	}
 	return *s ? rskeyopt(kp, s, 0) : 0;
+}
+
+/*
+ * set up field character transform
+ */
+
+static int
+#if __STD_C
+transform(Rskey_t* kp, register Field_t* fp)
+#else
+transform(kp, fp)
+Rskey_t*		kp;
+register Field_t*	fp;
+#endif
+{
+	register unsigned char*	m;
+	register unsigned char*	t;
+	register unsigned char*	x;
+	register int		c;
+
+	if (fp->code)
+	{
+		if (fp->binary)
+		{
+			if (CCCONVERT(fp->code))
+				fp->trans = ccmap(fp->code, 0);
+		}
+		else if (m = ccmap(fp->code, CC_NATIVE))
+		{
+			if (!fp->trans)
+				fp->trans = m;
+			else if (!(x = vmnewof(Vmheap, 0, unsigned char, UCHAR_MAX, 1)))
+			{
+				if (kp->keydisc->errorf)
+					(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "out of space");
+				kp->keydisc->flags |= RSKEY_ERROR;
+				return -1;
+			}
+			else
+			{
+				t = fp->trans;
+				for (c = 0; c <= UCHAR_MAX; c++)
+					x[c] = t[m[c]];
+				fp->trans = x;
+				fp->freetrans = 1;
+			}
+		}
+	}
+	if (!fp->trans)
+		fp->trans = kp->state->ident;
+	return 0;
 }
 
 /*
@@ -745,8 +948,8 @@ register Rskey_t*	kp;
 		fp->coder = key_t_code;
 		fp->flag = 't';
 	}
-	if (!fp->trans)
-		fp->trans = kp->state->ident;
+	if (transform(kp, fp))
+		return -1;
 	if (!fp->keep)
 		fp->keep = kp->state->all;
 	if (fp->rflag)
@@ -754,6 +957,7 @@ register Rskey_t*	kp;
 		fp->rflag = 0;
 		kp->type |= RS_REVERSE;
 	}
+	kp->code = fp->code;
 	while (fp = fp->next)
 	{
 		n = 0;
@@ -763,13 +967,12 @@ register Rskey_t*	kp;
 			fp->flag = 't';
 		}
 		else n = 1;
-		if(!fp->trans) fp->trans = kp->state->ident;
-		else n = 1;
 		if(!fp->keep) fp->keep = kp->state->all;
 		else n = 1;
-		if (!n && !fp->bflag && !fp->eflag && !fp->rflag)
+		if (!n && !fp->trans && !fp->bflag && !fp->eflag && !fp->rflag)
 		{
 			fp->coder = kp->field.global.coder;
+			fp->code = kp->field.global.code;
 			fp->flag = kp->field.global.flag;
 			fp->trans = kp->field.global.trans;
 			fp->keep = kp->field.global.keep;
@@ -778,8 +981,13 @@ register Rskey_t*	kp;
 			if (fp->standard)
 				fp->eflag = kp->field.global.bflag;
 		}
-		else if (kp->type & RS_REVERSE)
-			fp->rflag = !fp->rflag;
+		else
+		{
+			if (transform(kp, fp))
+				return -1;
+			if (kp->type & RS_REVERSE)
+				fp->rflag = !fp->rflag;
+		}
 		if (fp->standard)
 		{
 			if (!fp->end.index)
@@ -820,9 +1028,9 @@ register Rskey_t*	kp;
 		kp->field.head = fp;
 		if (!fp->next && !kp->tab && !fp->begin.field && !fp->end.field && fp->end.index > 0 && fp->flag == 't' && fp->trans == kp->state->ident && fp->keep == kp->state->all && !fp->bflag && !fp->eflag && !fp->rflag)
 		{
-			kp->disc.type |= RS_KSAMELEN;
-			kp->disc.key = fp->begin.index;
-			kp->disc.keylen = fp->end.index - fp->begin.index;
+			kp->disc->type |= RS_KSAMELEN;
+			kp->disc->key = fp->begin.index;
+			kp->disc->keylen = fp->end.index - fp->begin.index;
 		}
 		else
 			kp->coded = 1;
@@ -830,8 +1038,8 @@ register Rskey_t*	kp;
 	if (kp->coded)
 	{
 		kp->field.maxfield += 2;
-		kp->disc.defkeyf = code;
-		kp->disc.key = 2 * kp->field.maxfield;
+		kp->disc->defkeyf = code;
+		kp->disc->key = 2 * kp->field.maxfield;
 		if (!(kp->field.positions = vmnewof(Vmheap, 0, unsigned char*, kp->field.maxfield, 0)))
 		{
 			if (kp->keydisc->errorf)
@@ -842,14 +1050,14 @@ register Rskey_t*	kp;
 	}
 	if (kp->fixed)
 	{
-		kp->disc.type |= RS_DSAMELEN;
-		kp->disc.data = kp->fixed;
+		kp->disc->type |= RS_DSAMELEN;
+		kp->disc->data = kp->fixed;
 	}
 	else
 	{
-		if (!kp->disc.keylen)
-			kp->disc.keylen = -1;
-		kp->disc.data = '\n';
+		if (!kp->disc->keylen)
+			kp->disc->keylen = -1;
+		kp->disc->data = '\n';
 	}
 
 	/*

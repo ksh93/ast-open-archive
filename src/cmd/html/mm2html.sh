@@ -43,13 +43,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2003-03-25'
+version='mm2html (AT&T Labs Research) 2003-03-25' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: '$version$' $
+@(#)$Id: mm2html (AT&T Labs Research) 2003-03-25 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]

@@ -1,3 +1,5 @@
+03-05-27 main.c: add -C, --codeset={a,e,i,o,n}
+03-05-23 main.c: add -R, --reclen=reclen
 03-03-11 testsort.sh: initialize $CC from :TEST: TESTCC state var
 03-03-07 Makefile: +lsort for now
 01-04-19 sort.tst: add -s tests

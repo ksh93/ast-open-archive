@@ -11,3 +11,5 @@ pcat :: unpack.c libhuff.a
 huff 1.0 :LIBRARY: huff.3 huffman.h \
 		huffinit.c huffgethdr.c huffputhdr.c \
 		huffencode.c huffdecode.c
+
+:TEST: pack

@@ -41,7 +41,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2001-03-09 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2003-05-27 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -56,10 +56,37 @@ USAGE_LICENSE
 "	operand position when neither the \b-c\b nor the \b--\b options"
 "	are specified.]"
 
+"[k:key?Restrict the sort key to a string beginning at \apos1\a and"
+"	ending at \apos2\a. \apos1\a and \apos2\a each have the form \am.n\a,"
+"	counting from 1, optionally followed by one or more of the flags"
+"	\bCMbdfginpr\b; \bm\b counts fields from the beginning of the"
+"	line and \bn\b counts characters from the beginning of the"
+"	field. If any flags are present they override all the"
+"	global ordering options for this key. If \a.n\a is missing"
+"	from \apos1\a, it is taken to be 1; if missing from \apos2\a,"
+"	it is taken to be the end of the field. If \apos2\a is"
+"	missing, it is taken to be end of line. The second form"
+"	specifies a fixed record length \areclen\a, and the last form"
+"	specifies a fixed field at byte position \aposition\a"
+"	(counting from 1) of \alength\a bytes.]:"
+"		[pos1[,pos2]]|.reclen|.position.length]]]]]"
+"[K:oldkey?Specified in pairs: \b-K\b \apos1\a \b-K\b \apos2\a,"
+"	where positions count from 0.]#"
+"		[pos]"
+"[R:reclen?Sets the fixed record length to \areclen\a; newlines will be"
+"	treated as normal characters.]#[reclen]"
 "[b:ignorespace?Ignore leading white space (spaces and tabs) in field"
 "	comparisons.]"
 "[d:dictionary?`Phone directory' order: only letters, digits and white space"
 "	are significant in string comparisons.]"
+"[C:codeset|convert?The field data codeset is \acodeset\a or the field data"
+"	must be converted from the \afrom\a codeset to the \ato\a"
+"	codeset. The codesets are:]:[codeset|from::to]{"
+"	[+a?ascii (ISO-8859-1)]"
+"	[+e?X/Open \bdd\b(1) ebcdic]"
+"	[+i?X/Open \bdd\b(1) ibm ebcdic]"
+"	[+o?mvs OpenEdition ebcdic (IBM-1047)]"
+"}"
 "[f:fold|ignorecase?Fold lower case letters onto upper case.]"
 "[i:ignorecontrol?Ignore characters outside the ASCII range 040-0176 in"
 "	string comparisons.]"
@@ -67,28 +94,13 @@ USAGE_LICENSE
 "	space, optional sign, and a nonempty string of digits"
 "	with optional decimal point, is sorted by value.]"
 "[g:floating?Numeric, like \b-n\b, with \be\b-style exponents allowed.]"
+"[p:bcd|packed-decimal?Compare packed decimal (bcd) numbers with trailing"
+"	sign.]"
 "[M:months?Compare as month names. The first three characters"
 "	after optional white space are folded to lower case and"
 "	compared. Invalid fields compare low to \bjan\b.]"
 "[r:reverse|invert?Reverse the sense of comparisons.]"
 "[t:tabs?`Tab character' separating fields is \achar\a.]:[tab-char]"
-"[k:key?Restrict the sort key to a string beginning at \apos1\a and"
-"	ending at \apos2\a. \apos1\a and \apos2\a each have the form \am.n\a,"
-"	counting from 1, optionally followed by one or more of the flags"
-"	\bMbdfginr\b; \bm\b counts fields from the beginning of the"
-"	line and \bn\b counts characters from the beginning of the"
-"	field. If any flags are present they override all the"
-"	global ordering options for this key. If \a.n\a is missing"
-"	from \apos1\a, it is taken to be 1; if missing from \apos2\a,"
-"	it is taken to be the end of the field. If \apos2\a is"
-"	missing, it is taken to be end of line. The second form"
-"	specifies fixed length records of \areclen\a bytes."
-"	\afieldlen\a and \aoffset\a optionally specify a fixed field"
-"	length and offset within the record.]:"
-"		[pos1[,pos2]]|reclen[::fieldlen[::offset]]]]]"
-"[K:oldkey?Specified in pairs: \b-K\b \apos1\a \b-K\b \apos2\a,"
-"	where positions count from 0.]#"
-"		[pos]"
 "[c:check?Check that the single input file is sorted according to"
 "	the ordering rules; give no output unless the file is"
 "	out of sort.]"
@@ -106,8 +118,12 @@ USAGE_LICENSE
 "	standard output. This file may be the same as one of"
 "	the inputs. The option may appear among the file arguments,"
 "	except after \b--\b.]:[output]"
+"[l:library?Load the external sort discipline \alibrary\a with optional comma"
+"	separated \aname=value\a arguments. Libraries are loaded, in left"
+"	to right order, after the sort method has been"
+"	initialized.]:[library[,name=value...]]]"
 "[T:tempdir?Put temporary files in \atempdir\a.]:[tempdir:=/usr/tmp]"
-"[l:list?List the available sort methods. See the \b-x\b option.]"
+"[L:list?List the available sort methods. See the \b-x\b option.]"
 "[x:method?Specify the sort method to apply:]:[method:=rasp]{\fmethods\f}"
 "[v:verbose?Trace the sort progress on the standard error.]"
 "[z:size|zip?Suggest using the specified number of bytes of internal store"
@@ -147,7 +163,7 @@ USAGE_LICENSE
 "	Thus +1 -1.3 is the same as \b-k\b 2,2.3 and +1r -3 is the"
 "	same as \b-k\b 2r,3.]"
 "[+?Under option \b-t\b\ax\a fields are strings separated by \ax\a;"
-"	other wise fields are non-empty strings separated by white space."
+"	otherwise fields are non-empty strings separated by white space."
 "	White space before a field is part of the field, except"
 "	under option \b-b\b. A \bb\b flag may be attached independently to"
 "	\apos1\a and \apos2\a.]"
@@ -163,8 +179,8 @@ USAGE_LICENSE
 "	such as \b-cnrt:\b. The option combination \b-di\b and the combination"
 "	of \b-n\b with any of \b-diM\b are improper. Posix argument"
 "	conventions are supported.]"
-"[+?Options \b-g\b, \b-j\b, \b-M\b, \b-s\b, \b-S\b, \b-T\b, and \b-z\b"
-"	are not in the Posix or X/Open standards.]"
+"[+?Options \b-C\b, \b-g\b, \b-j\b, \b-M\b, \b-p\b, \b-s\b, \b-S\b, \b-T\b,"
+"	and \b-z\b are not in the Posix or X/Open standards.]"
 
 
 "[+DIAGNOSTICS?\asort\a comments and exits with non-zero status for various"
@@ -179,6 +195,7 @@ USAGE_LICENSE
 #include <ast.h>
 #include <error.h>
 #include <ctype.h>
+#include <dlldefs.h>
 #include <fs3d.h>
 #include <ls.h>
 #include <option.h>
@@ -197,6 +214,16 @@ USAGE_LICENSE
 #define TEST_keys	0x40000000	/* dump keys			*/
 #define TEST_read	0x20000000	/* force sfread()		*/
 #define TEST_show	0x10000000	/* show but don't do		*/
+
+struct Library_s; typedef struct Library_s Library_t;
+
+typedef Rsdisc_t* (*Rslib_f)(Rs_t*, Rskey_t*, const char*);
+
+struct Library_s			/* library discipline list	*/
+{
+	Library_t*	next;		/* next in list			*/
+	char		args[1];	/* library name and args	*/
+};
 
 typedef struct
 {
@@ -223,6 +250,8 @@ typedef struct
 	Sfio_t*		tp;		/* TEST_keys tmp stream		*/
 	Sfio_t*		op;		/* output stream		*/
 	Job_t*		jobs;		/* multi-proc job table		*/
+	Library_t*	libraries;	/* discipline library list	*/
+	Library_t*	lastlib;	/* library list tail		*/
 	char*		overwrite;	/* -o input overwrite tmp file	*/
 	char*		buf;		/* input buffer			*/
 	size_t		cur;		/* input buffer index		*/
@@ -256,6 +285,18 @@ optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 }
 
 /*
+ * handle RS_VERIFY event
+ */
+
+static int
+verify(Rs_t* rs, int op, Void_t* data, Rsdisc_t* disc)
+{
+	if (op == RS_VERIFY)
+		error(3, "disorder at record %lld", (Sflong_t)((Rsobj_t*)data)->order);
+	return 0;
+}
+
+/*
  * process argv as in sort(1)
  */
 
@@ -268,9 +309,10 @@ parse(register Sort_t* sp, char** argv)
 	char*			e;
 	char**			a;
 	char**			v;
+	Library_t*		p;
 	size_t			z;
 	int			obsolescent = 1;
-	char			opt[2];
+	char			opt[16];
 	Optdisc_t		optdisc;
 
 	memset(&optdisc, 0, sizeof(optdisc));
@@ -282,6 +324,13 @@ parse(register Sort_t* sp, char** argv)
 	case 'c':
 		obsolescent = 0;
 		kp->meth = Rsverify;
+		kp->disc->events = RS_VERIFY;
+		kp->disc->eventf = verify;
+		break;
+	case 'C':
+		sfsprintf(opt, sizeof(opt), "%c%s", n, opt_info.arg);
+		if (rskeyopt(kp, opt, 1))
+			return 0;
 		break;
 	case 'j':
 		kp->nproc = opt_info.num;
@@ -291,8 +340,15 @@ parse(register Sort_t* sp, char** argv)
 			return -1;
 		break;
 	case 'l':
-		rskeylist(kp, sfstdout, 0);
-		exit(0);
+		if (!(p = vmnewof(Vmheap, 0, Library_t, 1, strlen(opt_info.arg))))
+			error(ERROR_SYSTEM|3, "out of space");
+		strcpy(p->args, opt_info.arg);
+		if (sp->libraries)
+			sp->lastlib->next = p;
+		else
+			sp->libraries = p;
+		sp->lastlib = p;
+		break;
 	case 'm':
 		kp->merge = n;
 		break;
@@ -377,6 +433,17 @@ parse(register Sort_t* sp, char** argv)
 		if (rskey(kp, opt_info.arg, *opt_info.option))
 			return -1;
 		break;
+	case 'L':
+		rskeylist(kp, sfstdout, 0);
+		exit(0);
+	case 'R':
+		if (opt_info.num != kp->fixed && kp->fixed)
+		{
+			error(2, "%d: fixed record length mismatch -- %d expected", (int)opt_info.num, kp->fixed);
+			return -1;
+		}
+		kp->fixed = opt_info.num;
+		break;
 	case 'S':
 		kp->type |= RS_DATA;
 		break;
@@ -450,18 +517,6 @@ parse(register Sort_t* sp, char** argv)
 }
 
 /*
- * capture events
- */
-
-static int
-capture(Rs_t* rs, int op, Void_t* data, Rsdisc_t* disc)
-{
-	if (op == RS_VERIFY)
-		error(3, "disorder at record %lld", (Sflong_t)((Rsobj_t*)data)->order);
-	return 0;
-}
-
-/*
  * dump keys to stderr
  */
 
@@ -500,8 +555,14 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	unsigned long		x;
 	unsigned long		z;
 	size_t			fixed;
+	Library_t*		lib;
+	Library_t*		nxt;
+	void*			dll;
+	Rslib_f			fun;
+	Rsdisc_t*		disc;
 	struct stat		is;
 	struct stat		os;
+	char			path[PATH_MAX];
 
 	memset(sp, 0, sizeof(*sp));
 	sfset(sfstdout, SF_SHARE, 0);
@@ -573,20 +634,20 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 			if (sp->buf = (char*)vmalign(Vmheap, x, sp->key->alignsize))
 				break;
 			if ((x >>= 1) < INMIN)
-				error(ERROR_SYSTEM|3, "out of space [input buffer]");
+				error(ERROR_SYSTEM|3, "out of space");
 		}
 		sp->hit = x - sp->key->alignsize;
 	}
 	if (sp->test & TEST_keys)
 	{
-		if (!sp->key->disc.defkeyf)
+		if (!sp->key->disc->defkeyf)
 			error(2, "no key function to intercept");
 		else if (!(sp->tp = sfstropen()))
-			error(ERROR_SYSTEM|3, "out of space [keys tmp stream]");
+			error(ERROR_SYSTEM|3, "out of space");
 		else
 		{
-			sp->defkeyf = sp->key->disc.defkeyf;
-			sp->key->disc.defkeyf = dumpkey;
+			sp->defkeyf = sp->key->disc->defkeyf;
+			sp->key->disc->defkeyf = dumpkey;
 		}
 	}
 	if (sp->key->nproc > 1)
@@ -743,13 +804,33 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	 * finally ready for recsort now
 	 */
 
-	if (!(sp->rec = rsopen(&sp->key->disc, sp->key->meth, sp->key->procsize, sp->key->type)))
+	if (!(sp->rec = rsopen(sp->key->disc, sp->key->meth, sp->key->procsize, sp->key->type)))
 	{
 		error(ERROR_SYSTEM|2, "internal error");
 		rskeyclose(sp->key);
 		return -1;
 	}
-	sp->rec->disc->eventf = capture;
+
+	/*
+	 * load and library disciplines
+	 */
+
+	for (lib = sp->libraries; lib; lib = nxt)
+	{
+		nxt = lib->next;
+		if (s = strchr(lib->args, ','))
+			*s++ = 0;
+		if (!(dll = dllfind(lib->args, NiL, RTLD_LAZY, path, sizeof(path))))
+			error(3, "%s: library not found", lib->args);
+		t = "rs_disc";
+		if (!(fun = (Rslib_f)dlllook(dll, t)))
+			error(3, "%s: %s: initialization function not found in library", path, t);
+		if (!(disc = (*fun)(sp->rec, sp->key, s)))
+			return -1;
+		if (!rsdisc(sp->rec, disc, RS_PUSH))
+			error(3, "%s: %s: cannot push library discipline", path, t);
+		vmfree(Vmheap, lib);
+	}
 
 	/*
 	 * check the output file for clash with the input files
@@ -1048,7 +1129,7 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 			{
 				sp->cur = n - p;
 				if (!(b = vmnewof(Vmheap, 0, char, sp->cur, 1)))
-					error(ERROR_SYSTEM|3, "out of space [buf]");
+					error(ERROR_SYSTEM|3, "out of space");
 				memcpy(b, sp->buf + p, sp->cur);
 				b[sp->cur++] = '\n';
 				sp->buf = b;

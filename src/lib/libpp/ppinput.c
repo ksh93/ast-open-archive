@@ -187,6 +187,7 @@ pppush(register int t, register char* s, register char* p, int n)
 		pushcontrol();
 		cur->control = pp.control;
 		*pp.control = 0;
+		cur->vendor = pp.vendor;
 		if (cur->type != IN_RESCAN)
 		{
 			if (cur->type == IN_INIT)

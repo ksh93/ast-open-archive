@@ -24,21 +24,25 @@
 #pragma prototyped
 
 /*
- * sfio { lzw gzip pzip } deflate discipline wrapper
+ * sfio { lzw gzip pzip bzip } discipline wrapper
  */
 
 #include "pzlib.h"
 
-#define METH_pzip	1
-#define METH_gzip	2
-#define METH_lzw	3
+#define METH_bzip	'b'
+#define METH_gzip	'g'
+#define METH_lzw	'l'
+#define METH_pzip	'p'
+#define METH_qzip	'q'
 
 /*
  * push the sfio discipline named by meth:
  *
- *	lzw
+ *	bzip
  *	gzip [--[no]crc]
- *	pzip [--[no]crc] [--] partition
+ *	lzw
+ *	pzip [--[no]crc] [--] [ partition ]
+ *	qzip [--] [ record-size ]
  *
  * return:
  *	>0	discipline pushed
@@ -57,23 +61,47 @@ sfdczip(Sfio_t* sp, const char* path, register const char* meth, Error_f errorf)
 	unsigned long	flags;
 	Pzdisc_t	disc;
 
-	if (part = (const char*)strchr(meth, ' '))
-		len = part - meth;
-	else
-		len = strlen(meth);
-	zip = 0;
-	switch (len)
+	if (meth)
 	{
-	case 3:
-		if (strneq(meth, "lzw", len))
-			zip = METH_lzw;
-		break;
-	case 4:
-		if (strneq(meth, "pzip", len))
-			zip = METH_pzip;
-		else if (strneq(meth, "gzip", len))
-			zip = METH_gzip;
-		break;
+		if (part = (const char*)strchr(meth, ' '))
+			len = part - meth;
+		else
+			len = strlen(meth);
+		zip = 0;
+		switch ((len<<8)|meth[0])
+		{
+		case (4<<8)|'b':
+			if (strneq(meth, "bzip", len))
+				zip = METH_bzip;
+			break;
+		case (4<<8)|'g':
+			if (strneq(meth, "gzip", len))
+				zip = METH_gzip;
+			break;
+		case (3<<8)|'l':
+			if (strneq(meth, "lzw", len))
+				zip = METH_lzw;
+			break;
+		case (4<<8)|'p':
+			if (strneq(meth, "pzip", len))
+				zip = METH_pzip;
+			break;
+#if 0
+		case (4<<8)|'q':
+			if (strneq(meth, "qzip", len))
+				zip = METH_qzip;
+			break;
+#endif
+		}
+	}
+	else
+	{
+		/*
+		 * defer to sfdcpzip() for SF_READ recognition
+		 */
+
+		zip = METH_pzip;
+		part = 0;
 	}
 	if (!zip)
 	{
@@ -150,6 +178,9 @@ sfdczip(Sfio_t* sp, const char* path, register const char* meth, Error_f errorf)
 		}
 		switch (zip)
 		{
+		case METH_bzip:
+			r = sfdcbzip(sp, flags);
+			break;
 		case METH_gzip:
 			r = sfdcgzip(sp, flags);
 			break;

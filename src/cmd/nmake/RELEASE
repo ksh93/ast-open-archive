@@ -1,3 +1,30 @@
+03-06-21 parse.c: fix expr() quote recursion bug
+	 Makerules.mk: fix .DLL.INSTALL logic
+	 object.c: add initcode() to initialize the ccode maps early enough
+	 main.c: add initcode() startup call
+03-06-11 Makerules.mk: reinstate install .a on .dll+.lib systems
+	 rules-win32.mk: inhibit libast.a install since cc does implicit ast.lib
+	 Makerules.mk: drop DIALECT==CLOSURE check for new -l* binding 
+	 Makerules.mk: add --mam ${mam_cc_FLAGS} to handle user CCFLAGS override
+	 Makerules.mk: fix :DLL: to honor CCFLAGS
+	 Makerules.mk: add -D_BLD_DEBUG to mam CCFLAGS
+03-06-10 debug.mk: add libpp(3) -D-d to %.i rules
+03-06-09 main.c: wait for jobs to finish before making .DONE
+	 expand.c: change `V edit op value' error to be a warning
+	 Makerules.mk: fall back to flex if lex not found
+03-06-06 expand.c: add :VFU: to expand unbound internal var names
+	 Makerules.mk: use .SHARED.LIST. to generate -l* +l* list
+03-06-02 ppcc.sh: -o C++ implies -o PPLD for link time instantiation
+03-05-21 Makerules.mk: fix %.sh=>% :T=E: echo quote bug
+03-05-19 Makerules.mk: runtime check for flex -[oP] and bison -[op]
+	 Makerules.mk: add strip=1 ala debug=1
+03-05-11 rule.c: fix MAKEPATH=$PWD:$PWD loop
+03-05-09 command.c: add "init TARGET CURTIME" dynamic mam
+	 command.c: add CURTIME to mam "code TARGET STATETIME CURTIME ..."
+03-05-07 Makerules.mk: add COBOL COBOLFLAGS COBOLMAIN COBOLLIBRARIES .SUFFIX.cob
+	 Scanrules.mk: add .SCAN.cob, `*( MAIN )*' for main source
+	 scan.c: add \D (0 or more digits), \V (0 or more variable chars)
+03-04-27 Makerules.mk: don't build dlls in subdir for CC.SUFFIX.SHARED==".x"
 03-04-22 rules-win32.mk: drop :PACKAGE: Xm override -- handled by uwin
 03-04-15 mam.c: output P_ignore attribute
 	 Makerules.mk: fix the mam .DO.INSTALL to compare before mv to .old!!

@@ -652,7 +652,7 @@ r = sfvalue(cdb->io);
 					goto nospace;
 				else
 					dp->flags = CDB_CACHED|CDB_TERMINATED;
-				b = (char*)ccmapcpy(t, b, w, fp->code, CC_NATIVE);
+				b = (char*)ccmapm(t, b, w, fp->code, CC_NATIVE);
 				if (fp->flags & CDB_SPACE)
 				{
 					for (; isspace(*b); b++, w--);
@@ -1275,7 +1275,7 @@ flatfixread(Cdb_t* cdb, Cdbkey_t* key)
 		{
 			if (!(t = vmoldof(vp, 0, char, w, 1)))
 				goto nospace;
-			b = (char*)ccmapcpy(t, b, w, fp->code, CC_NATIVE);
+			b = (char*)ccmapm(t, b, w, fp->code, CC_NATIVE);
 			if (fp->flags & CDB_SPACE)
 			{
 				for (; isspace(*b); b++, w--);
@@ -1514,7 +1514,7 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 							{
 								n = sfprintf(cdb->tmp, buf, dp->number.floating);
 								s = sfstruse(cdb->tmp);
-								CCMAPS(s, n, CC_NATIVE, fp->code);
+								ccmaps(s, n, CC_NATIVE, fp->code);
 								sfwrite(op, s, n);
 							}
 						}
@@ -1548,7 +1548,7 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 								{
 									n = sfprintf(cdb->tmp, buf, dp->number.linteger);
 									s = sfstruse(cdb->tmp);
-									CCMAPS(s, n, CC_NATIVE, fp->code);
+									ccmaps(s, n, CC_NATIVE, fp->code);
 									sfwrite(op, s, n);
 								}
 							}
@@ -1560,7 +1560,7 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 								{
 									n = sfprintf(cdb->tmp, buf, dp->number.integer);
 									s = sfstruse(cdb->tmp);
-									CCMAPS(s, n, CC_NATIVE, fp->code);
+									ccmaps(s, n, CC_NATIVE, fp->code);
 									sfwrite(op, s, n);
 								}
 							}
@@ -1581,7 +1581,7 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 								else if (!(s = (char*)sfreserve(op, dp->string.length, 0)))
 									return -1;
 								else
-									ccmapcpy(s, dp->string.base, dp->string.length, CC_NATIVE, fp->code);
+									ccmapm(s, dp->string.base, dp->string.length, CC_NATIVE, fp->code);
 							}
 							if ((n = fp->width - dp->string.length) > 0)
 							{
@@ -1627,7 +1627,7 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 				}
 				if (n)
 				{
-					CCMAPS(s, n, CC_NATIVE, fp->code);
+					ccmaps(s, n, CC_NATIVE, fp->code);
 					sfwrite(op, s, n);
 				}
 				if ((n = fp->width - n) > 0)

@@ -1,7 +1,7 @@
 The AT&T Software Technology ast-open package from AT&T Labs Research
 contains all of the ast open source commands and libraries.  This
-package is a superset of the following packages: ast-base ast-ksh; you
-won't need these if you download ast-open.
+package is a superset of the following packages: ast-base ast-ksh ksh;
+you won't need these if you download ast-open.
 
 Source Package Installation Instructions:
 
@@ -10,24 +10,27 @@ Source Package Installation Instructions:
       changed manually when the security implications are understood.
   (2) Choose a package root directory and cd to it. This will be a local work
       area for all packages.
-  (3) If your system does not have curl(1), hurl(1), or wget(1) then use
-      the alternate instructions for (3),(4),(5) in plan B below. Plan B
-      will install the hurl(1) script which works with ksh and modern bash.
+  (3) These instructions bypass the click to download package links on the
+      download site. If you already clicked, or if your system does not have
+      curl(1), hurl(1), or wget(1) then use the alternate instructions for
+      (3),(4),(5) in plan B below. Plan B installs the hurl(1)
+      script which works with ksh and modern bash. The top level URL is:
+		URL=http://www.research.att.com/sw/download
   (4) If the bin/package script does not exist then run:
 		test -d bin || mkdir bin
-		url=http://www.research.att.com/sw/download/package
+		url=$URL/package
 		(curl $url||wget -O bin/package $url||hurl $url) > bin/package
 		chmod +x bin/package
   (5) Determine the list of package names you want from the download site, then
       use the package(1) command to do the actual download:
-		bin/package setup source \
-			http://www.research.att.com/sw/download \
+		bin/package setup source $URL \
 			package-name ...
+      This downloads the latest source package(s); up-to-date local packages
+      are not downloaded again unless package force ... is specified.
       If the package root will contain only one architecture then you can
       install in bin and lib instead of arch/HOSTTYPE/bin and arch/HOSTTYPE/lib
       by running this instead:
-		bin/package setup flat source \
-			http://www.research.att.com/sw/download \
+		bin/package setup flat source $URL \
 			PACKAGE ...
       To update the same packages from the same URL run:
 			bin/package setup source
@@ -57,8 +60,8 @@ Source Package Installation Instructions:
       flat install:
 		cd $INSTALLROOT
 		cp -p -r bin lib include DIRECTORY
-  (10) To summarize, after the first download the download, build, and
-      test cycle is:
+  (10) To summarize, after the first time the download, build, and test cycle
+      for the latest source release is:
 		bin/package setup source
 		bin/package make
 		bin/package test
@@ -84,6 +87,67 @@ Source Package Installation Instructions -- Plan B:
 All recorded changes follow.
 
 :::::::: ksh93 ::::::::
+
+03-06-26  --- Release ksh93o+  ---
+03-06-26  Additional fields were added to the ulimit builtin.  Fields not
+	  supported by the local system are listed with reasonable sysconf(3),
+	  pathconf(3), or confstr(3) counterparts. Otherwise unsupported
+	  values are listed as "not supported".
+03-06-26  A bug in ulimit that improperly printed long long limit values
+	  has been fixed.
+03-06-23  A bug in which ${@:offset:len} could core dump when there
+	  were no arguments has been fixed.
+03-06-23  A bug in which ${X[@]:offset:len} could core dump when X
+	  was unset has been fixed.
+03-06-22  The -x option was added to the command builtin.  If this
+	  option is on, and the number of arguments would exceed ARG_MAX,
+	  the command will be invoked multiple times with a subset of
+	  the arguments.  For example, with alias grep='command -x grep,
+	  any number of arguments can be specified.
+03-06-14  A bug in which could cause a core dump on some systems with
+	  vi and emacs editors with the MULTIBYTE option has been fixed.
+03-06-06  A bug in which the shell could core dump when a script was
+	  run from its directory, and the script name a symlink to a file
+	  beginning with .., has been fixed.
+03-06-05  A bug in which the shell could core dump when a child process
+	  that it is unaware of terminates while it is calling malloc()
+	  has been fixed.
+03-06-02  An option named globstar (set -G) has been added.  When enabled,
+	  during pathname expansion, any component that consists only of ** is
+	  matches all files and any number of directory levels.
+03-05-30  A bug in which the PATH search could give incorrect results when
+	  run from directory foo and PATH contained .:foo:xxx has been fixed.
+03-05-29  Some changes were made to the code that displays the prompt in edit 
+	  mode to better handle escape sequences in the prompt.
+03-05-27  I added = to the list of characters that mark the beginning of
+	  a word for edit completion so that filenames in assignments
+	  can be completed.
+03-05-20  A bug in which read -N could hang on some systems when reading
+	  from a terminal or a pipe has been fixed.
+03-05-19  A bug in which the ouput of uname from a command substitution
+	  would go to the standard output of the invoking command when
+	  uname was invoked with a non-standard option has been fixed.
+03-05-19  A job control bug which would cause the shell to exit because 
+	  it hadn't take back the terminal has been fixed.  The bug
+	  could occur when running a function that contained a pipeline
+	  whose last element was a function.
+03-05-19  A job control timing bug introduced in ksh93o on some systems
+	  which could cause a pipeline to hang if the first component
+	  completed quickly has been fixed.
+03-05-13  The read builtin has been modified so that the builtin editors
+	  will not overwrite output from a previous incomplete line. 
+03-05-13  A bug in which the name of an identifier could have the string
+	  .sh. prefixed to it after expanding a variable whose name begins
+	  with .sh. has been fixed.
+03-05-13  A bug in the expansion of $var for compound variables in which
+	  some elements would not be output when the name was a prefix
+	  of another name in the compound variable has been fixed.
+03-05-08  The last item in the ksh93o release on 03-01-02 has been
+	  altered sligthly to preserve the leading 0's when the
+	  preceding character is a digit.  Thus, with typeset -LZ3 x=10,
+	  $(( 1$x)) will be 1010 whereas $(( $x) will be 10.
+03-04-25  A bug in which if x is a name reference, then nameref y=x.foo
+	  did not follow x has been fixed.
 
 03-03-18  --- Release ksh93o  ---
 03-03-18  A -N unary operator was added to test and [[...]] which returns
@@ -1053,6 +1117,9 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+03-06-21 format.c: add ccode conversion check to putheader()
+03-05-28 file.c: fix -vrw directory double list
+	 update to new <ccode.h> interface
 03-03-05 pax.c: tgz => ustar:gzip, tbz => ustar:bzip
 03-02-28 pax.c: handle a few common -x aliases
 03-01-14 misc.c: fix meter sign overflow for sizeof(off_t)==sizeof(int)
@@ -1360,6 +1427,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+03-06-21 proto.tst: add T_INVALID ? splice bug test
 02-07-31 sear.sh: make sure output files has a suffix
 02-03-12 proto.c: add type=free
 02-01-07 proto.tst: add TEST 05 -- no fix yet
@@ -1384,6 +1452,9 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+03-05-25 opt.tst: add optstr() ???* internal option tests
+03-05-11 strtoi.tst: add malformation tests
+03-05-06 opt.tst: add getopt_long() compatibility tests
 03-04-22 date.dat: add last, this, next tests
 03-03-21 date.dat,datey2k.dat: add %Q/recent/distant/
 	 opt.tst: add trailing '*' option and option args tests
@@ -1434,6 +1505,9 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+03-06-11 ast.c: add _map_malloc checks for _ast_malloc => malloc
+03-06-05 pathreal.c: fix ancient multiple relative|.. symlink bug
+03-06-04 3d.sh: change `shift $OPTIND-1' to `set x "@"; shift $OPTIND'
 03-03-28 dir3d.c,rmdir3d.c,syscall3d.c: add D_FILENO and D_TYPE ifdefs
 03-03-25 dup3d.c: fix bug that cleared Dir_t pointer just after allocation
 03-03-07 ftruncate3d.c,lseek3d.c,truncate3d.c: check _typ_off64_t
@@ -1635,6 +1709,10 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+03-06-21 cpp.tst: add T_INVALID ? splice bug test
+03-05-19 cpp.tst: add stray SKIPMACRO test
+03-05-18 cpp.tst: add SYS_FUNCTION ungetchr() bug fix test
+03-04-30 cpp.tst: add pp:mapinclude tests
 02-11-07 cpp.c: exit() => return for lame linters
 02-10-10 cpp.tst: add does not end with `newline' tests
 02-05-24 cpp.tst: add TEST 15 pragma space canonicalization tests
@@ -1696,6 +1774,33 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+03-06-21 parse.c: fix expr() quote recursion bug
+	 Makerules.mk: fix .DLL.INSTALL logic
+	 object.c: add initcode() to initialize the ccode maps early enough
+	 main.c: add initcode() startup call
+03-06-11 Makerules.mk: reinstate install .a on .dll+.lib systems
+	 rules-win32.mk: inhibit libast.a install since cc does implicit ast.lib
+	 Makerules.mk: drop DIALECT==CLOSURE check for new -l* binding 
+	 Makerules.mk: add --mam ${mam_cc_FLAGS} to handle user CCFLAGS override
+	 Makerules.mk: fix :DLL: to honor CCFLAGS
+	 Makerules.mk: add -D_BLD_DEBUG to mam CCFLAGS
+03-06-10 debug.mk: add libpp(3) -D-d to %.i rules
+03-06-09 main.c: wait for jobs to finish before making .DONE
+	 expand.c: change `V edit op value' error to be a warning
+	 Makerules.mk: fall back to flex if lex not found
+03-06-06 expand.c: add :VFU: to expand unbound internal var names
+	 Makerules.mk: use .SHARED.LIST. to generate -l* +l* list
+03-06-02 ppcc.sh: -o C++ implies -o PPLD for link time instantiation
+03-05-21 Makerules.mk: fix %.sh=>% :T=E: echo quote bug
+03-05-19 Makerules.mk: runtime check for flex -[oP] and bison -[op]
+	 Makerules.mk: add strip=1 ala debug=1
+03-05-11 rule.c: fix MAKEPATH=$PWD:$PWD loop
+03-05-09 command.c: add "init TARGET CURTIME" dynamic mam
+	 command.c: add CURTIME to mam "code TARGET STATETIME CURTIME ..."
+03-05-07 Makerules.mk: add COBOL COBOLFLAGS COBOLMAIN COBOLLIBRARIES .SUFFIX.cob
+	 Scanrules.mk: add .SCAN.cob, `*( MAIN )*' for main source
+	 scan.c: add \D (0 or more digits), \V (0 or more variable chars)
+03-04-27 Makerules.mk: don't build dlls in subdir for CC.SUFFIX.SHARED==".x"
 03-04-22 rules-win32.mk: drop :PACKAGE: Xm override -- handled by uwin
 03-04-15 mam.c: output P_ignore attribute
 	 Makerules.mk: fix the mam .DO.INSTALL to compare before mv to .old!!
@@ -2564,6 +2669,9 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+03-06-10 who.c: ctime() arg must be time_t* (linux.s390-64)
+03-05-21 asa.c,asa.tst: add
+03-05-15 join.tst: add -v2 tests
 03-04-05 nl.tst: generate test data file
 03-02-24 nl.c,nl.tst: add
 03-02-14 od.c,tr.c: no error message for EPIPE
@@ -4656,6 +4764,8 @@ End:
 
 :::::::: pack ::::::::
 
+2003-05-21 pack.tst: add
+2003-04-28 pack,unpack: handle file size > 2Gb (and > 4Gb)
 2002-03-09 pack,unpack: diagnostic if no file operands
 1999-05-03 add optget() docs
 
@@ -4700,6 +4810,7 @@ End:
 
 :::::::: re ::::::::
 
+03-06-09 minimal.dat: add tests
 03-03-17 ed.tst: add ! command tests for sfpopen() "" mode fix
 03-02-17 testregex.dat: add bm tests
 03-01-13 sed0.c: operate on all input files, even if some fail
@@ -4826,6 +4937,8 @@ End:
 
 :::::::: sort ::::::::
 
+03-05-27 main.c: add -C, --codeset={a,e,i,o,n}
+03-05-23 main.c: add -R, --reclen=reclen
 03-03-11 testsort.sh: initialize $CC from :TEST: TESTCC state var
 03-03-07 Makefile: +lsort for now
 01-04-19 sort.tst: add -s tests
@@ -4856,6 +4969,10 @@ End:
 
 :::::::: std ::::::::
 
+03-06-21 pss-procfs.c: fix PR_TIME(),PR_CTIME() normalization
+03-06-11 mount.c: reorder includes for mvs.390
+03-05-26 dd.tst: add
+03-04-28 sum.tst: add sha1 tests
 03-03-21 ls.c: add -z,--time-style
 	 ls.c: if only -t is set then set FTW_SEEDOTDIR to keep configure happy
 03-03-11 pss.c: pid <= 1 => ppid == 0 to avoid ancestor loop
@@ -5158,6 +5275,48 @@ End:
 
 :::::::: libast ::::::::
 
+03-06-21 misc/sigcrit.c: block SIGCHLD if _lib_sigprocmask || _lib_sigsetmask
+	 comp/spawnveg.c,sfio/sfmode.c: use sigcritical() SIG_REG_* macros
+	 comp/spawnveg.c: drop ENOEXEC logic
+	 vmalloc/*: snarf kpv KPVCOMPACT() fix
+	 vmalloc/vmbest.c: export VMCHECK=2 to disable KPVCOMPACT (just in case)
+	 string/strdup.c: drop __strdup() etc. intercepts -- malloc gets it
+	 features/mem: define _mem_method and _mem_* possible values
+	 vmalloc/malloc.c: _AST_mem_method==_mem_* to force mem get method
+	 sfio/sfputr.c: __ia64 memccpy is bogus -- how many tries do they get?
+	 path/pathshell.c: verify abs path and access(path,X_OK) -- duh
+	 vmalloc/vmhdr.h: add private _Vmessage() for non-sfio ASSERT() 
+	 port/astconf.c: fix bug that always returned the minmax value
+03-06-11 comp/*.c: reorder macro hding for mvs.390 and <ast_map.h> 
+	 features/vmalloc: add _lib_brk and _lib_sbrk verification
+	 include/ast_std.h,etc.: add _map_malloc for malloc => _ast_malloc
+	 comp/conf.sh: fix SI_* and *_SI_* macro redefs
+	 ast.h: VMDEBUG or _BLD_DEBUG enable <vmalloc.h> and VMFL tracing
+	 vmalloc/vmtrace.c: _PACKAGE_ast __FUNCTION__ is a string
+	 vmalloc/vmtrace.c: set trace file fd FD_CLOEXEC
+	 vmalloc/vmbest.c: set /dev/zero mmap fd FD_CLOEXEC
+	 features/mmap: fix ancient read() vs. mmap() time arithmetic typo
+	 vmalloc/malloc.c: _AST_std_malloc==1 to force standard malloc
+03-06-09 comp/omitted.c: add _imp__FUNCTION sybols for __CYGWIN__ static link
+	 vmalloc/vmbest.c: handle systems with sbrk() but no brk()
+03-06-04 port/astconf.c: drop non-standard diagnostics
+03-06-03 comp/conf.sh: rework symbol collision logic
+03-05-30 conf.tab,conf.sh,astconf.c: add <sys/systeminfo.h> sysinfo() SI_*
+03-05-29 ccode.h: rework for extensibility, drop obsolete mematoe(), memetoa()
+03-05-28 regex/*: recode to use isw*() directly when needed, is*() otherwise
+03-05-27 features/vmalloc: fix _std_malloc test
+03-05-25 misc/optget.c: fix optstr() ???* internal options
+03-05-24 misc/optget.c: fix (ancient) argv null dereference
+03-05-23 comp/getcwd.c: don't intercept on _WINIX -- unreliable st_ino
+03-05-22 sfio/sfsprintf.c: n<0 => don't append '\0'
+03-05-18 misc/fts.c: re-stat FTS_DP to update nlink/times 
+	 misc/fts.c: add FTSENT.stack to eliminate getlist() recursion
+	 regex/ucs_names.h: use "..." catenation to placate some cc's
+03-05-11 string/strtoi.h: handle "-" "+" "0x" "11#"
+03-05-09 vmalloc/vmbest.c: large memory allocation tweaks
+03-05-06 misc/optget.c: fix getopt_long() prefix==1 bug that missed short flags
+03-04-27 comp/system.c: handle <ast_map.h>
+03-04-24 vmalloc/vmmopen.c: drop dup <unistd.h>
 03-04-21 tm/tmdate.c: fix next hour/min logic
 03-04-15 vmalloc/malloc.c: intercept __malloc() along with __libc_malloc()
 	 string/strdup.c: intercept __strdup() along with __libc_strdup()
@@ -6197,6 +6356,14 @@ End:
 
 :::::::: libcmd ::::::::
 
+03-06-20 uname.c: fix -p constant string overwrite
+03-06-04 stty.c: add undef to control assignment docs
+03-05-31 uname.c: add -f and sysinfo()/confstr() compatibility via astconf()
+03-05-27 rm.c: fix inappropriate "/.." append path overflow
+	 cut.c: snarf from dgk
+03-05-18 rm.c: check st_nlink to verify progress w.r.t. ftwalk/fts
+03-05-15 join.c: fix stealth -v2 bug (thanks ahs)
+03-05-04 wc.c: drop trailing space for `wc -l < file'
 03-03-21 date.c: add %Q/recent/distant/ docs
 03-02-19 date.c: fix %+|!flag docs
 02-11-14 update for cmdinit() 4th arg and ERROR_NOTIFY for interrupt cleanup
@@ -6386,6 +6553,12 @@ End:
 
 :::::::: librecsort ::::::::
 
+03-05-27 rskey.c: add Ci[o] code set [conversion]
+03-05-26 rskey.c: add 'p' packed decimal (bcd)
+03-05-23 recsort.h: add Rskey_t.code for global ccode index
+03-05-22 rskey.c: handle -k.reclen -k.position.length
+03-05-21 recsort.h: add events mask to Rsdisc_t, change Rskey_t disc to pointer
+	 rsnotify.c: add
 03-03-07 Makefile: generate dll for dr. ek
 03-01-21 rsmerge.c: fix typo that kicked in on large (~100K) record sizes
 01-01-01 recsort.h: _RSHDR_H => _BLD_recsort; should have been done years ago
@@ -6413,6 +6586,11 @@ End:
 96-09-20 rskey(kp,s,obsolete)
 96-09-18 first working version with -lsort (ok, so -c and -m don't work yet)
 
+:::::::: libsum ::::::::
+
+03-04-28 sumlib.c: drop md5 `zeroize' for performance
+	 sumlib.c: add FIPS 180-1 SHA-1
+
 :::::::: libuu ::::::::
 
 03-01-07 uulib: check UU_HEADER in bx_header()
@@ -6424,6 +6602,7 @@ End:
 
 :::::::: libbz ::::::::
 
+03-05-13 sfdcbzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
 02-02-14 blocksort.c: drop -O for msvc
 02-01-24 bzhdr.h: rename from bzlib_private.h for 14 char fs
 01-01-01 bzlib.h: add _PACKAGE_ast checks
@@ -6433,6 +6612,7 @@ End:
 
 :::::::: libz ::::::::
 
+03-05-13 sfdcgzip.c,sfdclzw.c: add SF_DBUFFER exception, SF_SHARE+sfreserve()
 03-03-13 gzio.c: eliminate fixed gzprintf() buffer size via sfio string stream
 03-01-20 zlib.h,gzio.c: add gzreopen()
 02-09-11 zlib.h: move 64 bit counts to internal_state
@@ -6556,6 +6736,14 @@ End:
 
 :::::::: libpp ::::::::
 
+03-06-21 ppproto.c: fix T_INVALID ? splice bug that did 0?val => 0?vaL
+03-06-10 ppargs.c: add -D-d and -D-m
+	 ppargs.c: add gnu options { -dD -dM -imacros -include -lang-* -lint }
+03-05-19 pplex.c: fix stray SKIPMACRO bug
+03-05-18 ppcall.c: add SYM_FUNCTION '(' peek to avoid inappropriate ungetchr()
+03-04-30 pp:mapinclude hosted <std.h>="." will search only hosted dirs
+	 pp.probe: add pp:mapinclude probe for namespace incursions
+03-04-29 ignore()=>ppmapinclude(), add pp:mapinclude
 03-03-25 ppop.c: PP_RESERVED now deletes old symbol before redef with lex value
 03-03-14 pp.probe: fix the #include_next probe
 03-02-28 ppsearch.c: fix -MM bug that missed prefix include hosted mark
@@ -6980,6 +7168,8 @@ End:
 
 :::::::: libpz ::::::::
 
+03-05-13 sfdcpzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
+03-05-05 sfdcpzip.c,sfdczip.c: add bzip support
 03-04-15 pzlib.h: add PZ_MARK_PART for partial last input record
 	 pzlib.h: add PZ_MARK_TAIL for tail records
 	 partial input record is now a warning and handled on inflate
@@ -7039,6 +7229,7 @@ End:
 
 :::::::: libtksh ::::::::
 
+03-06-13  include/tclInt.h: disable #undef sprintf that masked its prototype
 03-04-05  src/var.c: fix off by 1 malloc() call -- for once not gsf's fault!!
 	  src/var.c: hack around nv_move() double-free bug -- needs better fix
 03-03-12  src/tcleval.c,src/tclIO.c: change sfslen() => sfvalue(f)

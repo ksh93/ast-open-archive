@@ -670,8 +670,14 @@ typedef struct Delta_s			/* delta archive info		*/
 typedef struct Convert_s		/* char code conversion		*/
 {
 	int		on;		/* do the conversion		*/
+#if 0
 	int		from;		/* convert from this char code	*/
 	int		to;		/* convert to this char code	*/
+#endif
+	unsigned char*	f2t;		/* from=>to map			*/
+	unsigned char*	t2f;		/* to=>from map			*/
+	unsigned char*	f2a;		/* from=>CC_ASCII map		*/
+	unsigned char*	t2a;		/* to=>CC_ASCII map		*/
 } Convert_t;
 
 typedef struct Archive_s		/* archive info			*/
@@ -804,6 +810,12 @@ typedef struct State_s			/* program state		*/
 	int		list;		/* full file trace		*/
 	char*		listformat;	/* verbose listing format	*/
 	int		local;		/* reject files/links outside .	*/
+	struct
+	{
+	unsigned char*	a2n;		/* CC_ASCII=>CC_NATIVE		*/
+	unsigned char*	e2n;		/* CC_EBCDIC=>CC_NATIVE		*/
+	unsigned char*	n2e;		/* CC_NATIVE=>CC_EBCDIC		*/
+	}		map;		/* ccode maps			*/
 	Map_t*		maps;		/* file name maps		*/
 	int		matchsense;	/* pattern match sense		*/
 	off_t		maxout;		/* max volume/part output count	*/

@@ -17,7 +17,7 @@ the package command, support scripts, and utilities.
 Components in this package:
 <P>
 <P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>
-<TABLE  align=center bordercolor=white cellpadding=0 cellspacing=0 frame=void rules=none width=99% >
+<TABLE  align=center border=0 bordercolor=white cellpadding=0 cellspacing=0 frame=void rules=none width=99% >
 <TBODY>
 <TR><TD align=left>
 INIT</TD></TR>
@@ -45,6 +45,34 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="INIT changes">INIT changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-06-21 package.sh: fix INITROOT initialization bug
+	 package.sh: make sure admin logs exists before tail'ing
+03-06-11 probe.win32: fix $(BINDIR) typo that expanded in sh instead of make
+	 cc.mvs.390: return code 4 yields exit code 3 but its *really* ok
+	 package.sh: fix onpath function global var conflict
+	 make.probe: add CC.DIALECT { GNU -dD }
+	 package.mk: add Mamfile to lcl manifest
+03-06-10 package.sh: fix setup action typo that only checked the INIT package
+	 package.sh: *.s390x =&gt; *.s390-64
+03-06-09 package.mk: add cyg :POSTINSTALL:
+03-06-08 make.probe: fix CC.STDLIB logic
+	 hurl.sh: add User-Agent identification
+	 package.sh: tweak source and binary installation instructions
+	 cc.hp.pa,ld.hp.pa: +-Wl,+cdp,${INSTALLROOT}/lib/: drops abs lib paths
+	 ldd.hp.pa: add
+03-06-06 package.sh: fix $INSTALLROOT/bin/ldd check
+	 make.probe: add CC.STDLIB verification
+03-06-04 make.probe: add +forceread +noforceread
+03-05-11 hurl.sh: handle http://host:port/path
+03-05-06 package.sh: fix setup action PACKAGEROOT and INIT logic
+03-05-05 package.mk: fix cygwin tarball names
+03-04-30 package.sh: move (cc|ld|ldd).$HOSTTYPE updates from Makefile
+03-04-27 make.probe: fix mvs CC.PREFIX.SHARED "lib" =&gt; ""
+	 make.probe: add CC.DLL.DIR = $(BINDIR) or $(LIBDIR) 
+	 make.probe: add { CC.LD.LAZY CC.LD.NOLAZY CC.LD.RECORD CC.LD.NORECORD }
+	 probe.win32: sync with latest CC.*
+03-04-25 mamprobe.sh: add args to `. $makeprobe' for ancient sh
+03-04-23 package.mk: fix dup "covered by" licenses
 03-04-22 probe.win32: CC.DIALECT += "LIBPP -I-" for all cc's
 	 package.sh: fix admin write binary tarball snarf
 03-04-21 package.mk: package covered *.@(pkg|lic) too
@@ -528,7 +556,7 @@ All recorded changes follow.
 <TABLE border=0 align=center width=96%>
 <TR>
 <TD align=left></TD>
-<TD align=right>April 23, 2003</TD>
+<TD align=right>June 26, 2003</TD>
 </TR>
 </TABLE>
 <P>

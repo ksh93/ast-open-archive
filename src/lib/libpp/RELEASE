@@ -1,3 +1,11 @@
+03-06-21 ppproto.c: fix T_INVALID ? splice bug that did 0?val => 0?vaL
+03-06-10 ppargs.c: add -D-d and -D-m
+	 ppargs.c: add gnu options { -dD -dM -imacros -include -lang-* -lint }
+03-05-19 pplex.c: fix stray SKIPMACRO bug
+03-05-18 ppcall.c: add SYM_FUNCTION '(' peek to avoid inappropriate ungetchr()
+03-04-30 pp:mapinclude hosted <std.h>="." will search only hosted dirs
+	 pp.probe: add pp:mapinclude probe for namespace incursions
+03-04-29 ignore()=>ppmapinclude(), add pp:mapinclude
 03-03-25 ppop.c: PP_RESERVED now deletes old symbol before redef with lex value
 03-03-14 pp.probe: fix the #include_next probe
 03-02-28 ppsearch.c: fix -MM bug that missed prefix include hosted mark

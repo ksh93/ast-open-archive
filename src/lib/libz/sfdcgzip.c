@@ -67,6 +67,8 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 		if (op != SF_CLOSING)
 			free(dp);
 		return r;
+	case SF_DBUFFER:
+		return 1;
 	case SF_SYNC:
 		if (!val && gzsync(gz->gz, (z_off_t)(-1)) < 0)
 			sp->_flags |= SF_ERROR;
@@ -123,9 +125,11 @@ sfdcgzip(Sfio_t* sp, int flags)
 {
 	char*		m;
 	Sfgzip_t*	gz;
+	int		rd;
 	char		mode[10];
 
-	if (sfset(sp, 0, 0) & SF_READ)
+	rd = sfset(sp, 0, 0) & SF_READ;
+	if (rd)
 	{
 		register unsigned char*	s;
 		register int		n;
@@ -137,7 +141,12 @@ sfdcgzip(Sfio_t* sp, int flags)
 		 *	0x1f9d	sfdclzw		compress
 		 */
 		
-		if (!(s = (unsigned char*)sfreserve(sp, 2, 1)))
+		if (!(n = sfset(sp, 0, 0) & SF_SHARE))
+			sfset(sp, SF_SHARE, 1);
+		s = (unsigned char*)sfreserve(sp, 2, 1);
+		if (!n)
+			sfset(sp, SF_SHARE, 0);
+		if (!s)
 			return -1;
 		if (s[0] != 0x1f)
 			n = -1;
@@ -160,12 +169,12 @@ sfdcgzip(Sfio_t* sp, int flags)
 	if (!(gz = newof(0, Sfgzip_t, 1, 0)))
 		return -1;
 	gz->disc.exceptf = sfgzexcept;
-	if (sfset(sp, 0, 0) & SF_READ)
+	if (rd)
 		gz->disc.readf = sfgzread;
 	else
 		gz->disc.writef = sfgzwrite;
 	m = mode;
-	*m++ = (sfset(sp, 0, 0) & SF_READ) ? 'r' : 'w';
+	*m++ = rd ? 'r' : 'w';
 	*m++ = 'b';
 	if (flags & SFGZ_NOCRC)
 		*m++ = 'n';
@@ -173,6 +182,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 	if ((flags &= 0xf) > 0 && flags <= 9)
 		*m++ = '0' + flags;
 	*m = 0;
+	sfset(sp, SF_SHARE|SF_PUBLIC, 0);
 	if (sfdisc(sp, &gz->disc) != &gz->disc || !(gz->gz = gzdopen(sffileno(sp), mode)))
 	{
 		free(gz);
@@ -194,7 +204,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 #else
 	sfsetbuf(sp, NiL, SF_BUFSIZE);
 #endif
-	if (!(sfset(sp, 0, 0) & SF_READ))
+	if (!rd)
 		sfset(sp, SF_IOCHECK, 1);
 	return 1;
 }

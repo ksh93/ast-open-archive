@@ -1,3 +1,4 @@
+03-06-21 proto.tst: add T_INVALID ? splice bug test
 02-07-31 sear.sh: make sure output files has a suffix
 02-03-12 proto.c: add type=free
 02-01-07 proto.tst: add TEST 05 -- no fix yet

@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2002-12-06 $\n]"
+"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2003-06-10 $\n]"
 USAGE_LICENSE
 "[+NAME?cpp - C language preprocessor]"
 "[+DESCRIPTION?\bcpp\b is the preprocessor for all C language dialects. It is"
@@ -88,6 +88,10 @@ USAGE_LICENSE
 "	[+-D-X\b[\acc\a]]?Preprocess for the compiler \acc\a which must be"
 "		an executable or and executable on \b$PATH\b.]"
 "	[+-D-Z, pp::pool?Enable pool mode. See \blibpp\b(3).]"
+"	[+-D-d?List canonicalized \b#define\b statements for non-predefined"
+"		macros in the output. ]"
+"	[+-D-m?List canonicalized \b#define\b statements for all macros. All"
+"		other output is disabled.]"
 "	[+-D-+, pp::plusplus?Preprocess for the C++ dialect.]"
 "}"
 "[I:include?Append \adirectory\a to the list of directories searched for"
@@ -155,6 +159,22 @@ USAGE_LICENSE
 #include "pplib.h"
 
 #include <ctype.h>
+
+/*
+ * convert lint comments to pragmas
+ */
+
+static void
+pplint(char* head, char* comment, char* tail, int line)
+{
+	NoP(line);
+	if (strmatch(comment, "(ARGSUSED|PRINTFLIKE|PROTOLIB|SCANFLIKE|VARARGS)*([0-9])|CONSTCOND|CONSTANTCOND|CONSTANTCONDITION|EMPTY|FALLTHRU|FALLTHROUGH|LINTLIBRARY|LINTED*|NOTREACHED"))
+	{
+		strncopy(pp.token, comment, MAXTOKEN);
+		ppprintf("\n#%s %s:%s\n", dirname(PRAGMA), pp.pass, pp.token);
+		ppline(error_info.line, NiL);
+	}
+}
 
 /*
  * if last!=0 then argv[opt_info.index]==0 with return(0)
@@ -245,6 +265,9 @@ ppargs(char** argv, int last)
 				case 'T':
 					ppop(PP_TEST, s);
 					goto hasarg;
+				case 'V':
+					ppop(PP_VENDOR, "-", n);
+					break;
 				case 'W':
 					ppop(PP_WARN, n);
 					break;
@@ -253,6 +276,14 @@ ppargs(char** argv, int last)
 					goto hasarg;
 				case 'Z':
 					ppop(PP_POOL, n);
+					break;
+				case 'd':
+					pp.option |= DEFINITIONS;
+					break;
+				case 'm':
+					pp.state |= NOTEXT;
+					pp.option |= KEEPNOTEXT|DEFINITIONS|PREDEFINITIONS;
+					pp.linesync = 0;
 					break;
 				case '+':
 					ppop(PP_PLUSPLUS, n);
@@ -345,6 +376,9 @@ ppargs(char** argv, int last)
 				case 'T':
 					ppop(PP_TEXT, s);
 					break;
+				case 'V':
+					ppop(PP_VENDOR, s, n);
+					break;
 				default:
 					error(1, "%s: unknown -I option overload", p);
 					break;
@@ -432,6 +466,74 @@ ppargs(char** argv, int last)
 
 			if (!(s = argv[opt_info.index]))
 				error(3, "%s", opt_info.arg);
+			if (opt_info.offset == 2 && (pp.arg_style & STYLE_gnu))
+			{
+				p = argv[opt_info.index + 1];
+				if (streq(s, "-$"))
+				{
+					ppop(PP_OPTION, "noid \"$\"");
+					goto ignore;
+				}
+				else if (streq(s, "-dD"))
+				{
+					pp.option |= DEFINITIONS;
+					goto ignore;
+				}
+				else if (streq(s, "-dM"))
+				{
+					pp.state |= NOTEXT;
+					pp.option |= KEEPNOTEXT|DEFINITIONS|PREDEFINITIONS;
+					pp.linesync = 0;
+					goto ignore;
+				}
+				else if (streq(s, "-imacros"))
+				{
+					if (p)
+					{
+						ppop(PP_READ, p);
+						opt_info.index++;
+						opt_info.offset = 0;
+					}
+					goto ignore;
+				}
+				else if (streq(s, "-include"))
+				{
+					if (p)
+					{
+						ppop(PP_TEXT, p);
+						opt_info.index++;
+						opt_info.offset = 0;
+					}
+					opt_info.offset = 0;
+					goto ignore;
+				}
+				else if (strneq(s, "-lang-", 6))
+				{
+					s += 6;
+					if (streq(s, "c"))
+						c = 0;
+					else if (streq(s, "c++"))
+						c = 1;
+					else if (streq(s, "objc"))
+						c = 2;
+					else if (streq(s, "objc++"))
+						c = 3;
+					ppop(PP_PLUSPLUS, c & 1);
+					if (c & 2)
+						ppop(PP_DIRECTIVE, "pragma pp:map \"/#(pragma )?import>/\" \"/#(pragma )?import(.*)/__STDPP__IMPORT__(\\2)/\"\n\
+#macdef __STDPP__IMPORT__(x)\n\
+#pragma pp:noallmultiple\n\
+#include x\n\
+#pragma pp:allmultiple\n\
+#endmac");
+					goto ignore;
+				}
+				else if (streq(s, "-lint"))
+				{
+					ppop(PP_COMMENT, pplint);
+					goto ignore;
+				}
+			}
 			s += opt_info.offset - 1;
 			if (strmatch(s, "i*.h"))
 				ppop((pp.arg_style & STYLE_gnu) || s[1] == '/' ? PP_READ : PP_TEXT, s + 1);
@@ -476,6 +578,7 @@ ppargs(char** argv, int last)
 				opt_info.index++;
 				opt_info.offset = 0;
 			}
+		ignore:
 			while (argv[opt_info.index][opt_info.offset]) opt_info.offset++;
 			break;
 		}

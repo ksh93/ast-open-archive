@@ -25,7 +25,7 @@
 #ifndef _RECSORT_H
 #define	_RECSORT_H		1
 
-#define RS_VERSION	19961031L
+#define RS_VERSION	20030521L
 #define RSKEY_VERSION	19961031L
 
 #include	<sfio.h>
@@ -61,6 +61,7 @@ struct _rsdisc_s
 	ssize_t		keylen;	/* >0 for key length else end-offset	*/
 	Rsdefkey_f	defkeyf;/* to define key from data		*/
 	Rsevent_f	eventf;	/* to announce various events		*/
+	unsigned long	events;	/* events to announce			*/
 };
 
 struct _rsobj_s
@@ -83,7 +84,7 @@ struct _rskeydisc_s
 struct _rskey_s
 {	const char*	id;		/* library id			*/
 	Rskeydisc_t*	keydisc;	/* rskey discipline		*/
-	Rsdisc_t	disc;		/* rsopen() discipline		*/
+	Rsdisc_t*	disc;		/* rsopen() discipline		*/
 	Rsmethod_t*	meth;		/* rsopen() method		*/
 	int		type;		/* rsopen() type		*/
 
@@ -103,6 +104,7 @@ struct _rskey_s
 	int		nproc;		/* max number of processes	*/
 	int		tab;		/* global tab char		*/
 	int		verbose;	/* trace execution		*/
+	int		code;		/* global ccode translation	*/
 #ifdef _RSKEY_PRIVATE_
 	_RSKEY_PRIVATE_
 #endif
@@ -119,11 +121,15 @@ struct _rs_s
 };
 
 /* events */
-#define RS_CLOSE	1		/* sort context is being closed	*/
-#define RS_DISC		2		/* discipline is being changed	*/
-#define RS_METHOD	3		/* method is being changed	*/
-#define RS_VERIFY	4		/* objects out of order		*/
-#define RS_SUMMARY	5		/* outputting in RS_UNIQ mode	*/
+#define RS_CLOSE	(1<<0)		/* sort context is being closed	*/
+#define RS_DISC		(1<<1)		/* discipline is being changed	*/
+#define RS_METHOD	(1<<2)		/* method is being changed	*/
+#define RS_POP		(1<<3)		/* discipline is being popped	*/
+#define RS_PUSH		(1<<4)		/* discipline is being pushed	*/
+#define RS_SUMMARY	(1<<5)		/* RS_UNIQ summary		*/
+#define RS_VERIFY	(1<<6)		/* objects out of order		*/
+
+#define RS_NEXT		0		/* rsdisc() next		*/
 
 /* sort controls */
 #define RS_UNIQ		000001		/* remove duplicates		*/
@@ -154,21 +160,18 @@ struct _rs_s
 
 _BEGIN_EXTERNS_	/* public data */
 #if _BLD_recsort && defined(__EXPORT__)
-#define __PUBLIC_DATA__		__EXPORT__
-#else
+#define extern		__EXPORT__
+#endif
 #if !_BLD_recsort && defined(__IMPORT__)
-#define __PUBLIC_DATA__		__IMPORT__
-#else
-#define __PUBLIC_DATA__
-#endif
+#define extern		__IMPORT__
 #endif
 
-extern __PUBLIC_DATA__ Rsmethod_t* Rsrasp;	/* radix + splay trees	*/
-extern __PUBLIC_DATA__ Rsmethod_t* Rsradix;	/* radix only		*/
-extern __PUBLIC_DATA__ Rsmethod_t* Rssplay;	/* splay insertion	*/
-extern __PUBLIC_DATA__ Rsmethod_t* Rsverify;	/* verify order		*/
+extern Rsmethod_t* Rsrasp;	/* radix + splay trees	*/
+extern Rsmethod_t* Rsradix;	/* radix only		*/
+extern Rsmethod_t* Rssplay;	/* splay insertion	*/
+extern Rsmethod_t* Rsverify;	/* verify order		*/
 
-#undef __PUBLIC_DATA__
+#undef extern
 _END_EXTERNS_
 
 _BEGIN_EXTERNS_	/* public functions */
@@ -183,7 +186,7 @@ extern ssize_t		rsprocess _ARG_((Rs_t*, Void_t*, ssize_t));
 extern Rsobj_t*		rslist _ARG_((Rs_t*));
 extern int		rswrite _ARG_((Rs_t*, Sfio_t*, int));
 extern int		rsmerge _ARG_((Rs_t*, Sfio_t*, Sfio_t**, int, int));
-extern Rsdisc_t*	rsdisc _ARG_((Rs_t*, Rsdisc_t*));
+extern Rsdisc_t*	rsdisc _ARG_((Rs_t*, Rsdisc_t*, int));
 extern Rsmethod_t*	rsmethod _ARG_((Rs_t*, Rsmethod_t*));
 
 extern Rskey_t*		rskeyopen _ARG_((Rskeydisc_t*));

@@ -76,7 +76,7 @@ reg Rsobj_t*	obj;
 
 		/* out of order */
 		if((cmp == 0 && (rs->type&RS_UNIQ)) || cmp < 0 )
-		{	if(!rs->disc->eventf)
+		{	if(!(rs->disc->events & RS_VERIFY))
 				return -1;
 
 			obj->equal = obj->left = obj->right = NIL(Rsobj_t*);
@@ -89,7 +89,7 @@ reg Rsobj_t*	obj;
 			obj->order = verify->n;
 			p->order = verify->o;
 
-			n = (*rs->disc->eventf)(rs,RS_VERIFY,(Void_t*)obj,rs->disc);
+			n = RSNOTIFY(rs,RS_VERIFY,obj,rs->disc);
 
 			obj->order = oh; p->order = ph;
 

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -42,9 +43,7 @@ make html2rtf.c
 make ../../../include/ast/error.h implicit
 make ../../../include/ast/option.h implicit
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -84,7 +83,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -101,6 +101,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -128,10 +133,11 @@ prev ../../../include/ast/ast.h implicit
 done html2rtf.h
 done html2rtf.c
 prev html2rtf.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2rtf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2rtf.c
 done html2rtf.o generated
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o html2rtf html2rtf.o ${mam_libast}
+bind -lm dontcare
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o html2rtf html2rtf.o ${mam_libast} ${mam_libm}
 done html2rtf generated
 make html2db
 make html2db.o
@@ -140,9 +146,9 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done html2db.c
 prev html2db.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2db.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c html2db.c
 done html2db.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o html2db html2db.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o html2db html2db.o ${mam_libast} ${mam_libm}
 done html2db generated
 make htmlrefs
 make htmlrefs.o
@@ -163,9 +169,9 @@ done ../../../include/ast/cdt.h
 prev ../../../include/ast/ast.h implicit
 done htmlrefs.c
 prev htmlrefs.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c htmlrefs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c htmlrefs.c
 done htmlrefs.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o htmlrefs htmlrefs.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o htmlrefs htmlrefs.o ${mam_libast} ${mam_libm}
 done htmlrefs generated
 make mm2html
 make mm2html.sh
@@ -188,7 +194,7 @@ exec - 		i=`(read x; echo $x) < mm2html.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"
+exec - 		echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"'
 exec - 		cat mm2html.sh
 exec - 		} > mm2html
 exec - 		;;
@@ -198,7 +204,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 191 in
 exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" ;;
+exec - 	*)	echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"' ;;
 exec - 	esac
 exec - 	cat mm2html.sh
 exec - 	} > mm2html
@@ -242,9 +248,9 @@ prev ../../../include/ast/ast.h implicit
 done troff2html.h
 done troff2html.c
 prev troff2html.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c troff2html.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" -c troff2html.c
 done troff2html.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o troff2html troff2html.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o troff2html troff2html.o ${mam_libast} ${mam_libm}
 done troff2html generated
 make download
 make download.sh
@@ -267,7 +273,7 @@ exec - 		i=`(read x; echo $x) < download.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"
+exec - 		echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"'
 exec - 		cat download.sh
 exec - 		} > download
 exec - 		;;
@@ -277,7 +283,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 191 in
 exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\" ;;
+exec - 	*)	echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?html]"\"' ;;
 exec - 	esac
 exec - 	cat download.sh
 exec - 	} > download

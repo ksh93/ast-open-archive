@@ -177,6 +177,14 @@ ppcall(register struct ppsymbol* sym, int tok)
 		}
 		if (sym->flags & SYM_FUNCTION)
 		{
+			/*
+			 * a quick and dirty '(' peek to avoid possibly
+			 * inappropriate ungetchr()'s below
+			 */
+
+			for (p = pp.in->nextchr; isspace(*p); p++);
+			if ((c = *p) != '(' && c != '/' && c != 0)
+				goto disable;
 			old_token = pp.token;
 			mp = pp.macp->next;
 			if ((pp.token = (char*)&mp->arg[mac->arity + 1]) > pp.maxmac)
@@ -197,12 +205,14 @@ ppcall(register struct ppsymbol* sym, int tok)
 				if (c)
 				{
 					p = pp.toknxt;
-					while (p > pp.token) ungetchr(*--p);
+					while (p > pp.token)
+						ungetchr(*--p);
 #if COMPATIBLE
 					if ((pp.state & (COMPATIBILITY|STRICT)) == (COMPATIBILITY|STRICT))
 						error(1, "%s: macro arguments omitted", sym->name);
 #endif
-					if (c == T_ID && !(pp.state & HIDDEN)) ungetchr(' ');
+					if (c == T_ID && !(pp.state & HIDDEN))
+						ungetchr(' ');
 				}
 				if (pp.hidden != old_hidden)
 				{

@@ -127,8 +127,8 @@ tst	run{
 			&(p)->pr_wchan
 	
 	#define PR_HZ		HZ
-	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))
-	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))
+	#define PR_TIME(p)	((((p)->pr_utime+(p)->pr_stime))/HZ)
+	#define PR_CTIME(p)	((((p)->pr_cutime+(p)->pr_cstime))/HZ)
 !
 		elif	test -r /proc/curproc/status
 		then	cat <<!

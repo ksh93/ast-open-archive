@@ -370,3 +370,10 @@ TEST 20 'nuttin'
 		INPUT f1 $' a 1\nb 2'
 		INPUT f2 $' a Y\nb Z'
 		OUTPUT - $'a 1 Y\nb 2 Z'
+
+TEST 21 '-v1 vs. -v2 inconsistencies'
+	EXEC	-11 -21 -v2 f1 f2
+		INPUT f1 $'a\nb\nc'
+		INPUT f2 $'a 1\nb 2\nb 3\nc 4'
+		OUTPUT -
+	EXEC	-11 -21 -v1 f2 f1

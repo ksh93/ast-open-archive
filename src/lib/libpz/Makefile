@@ -9,7 +9,7 @@ pz 1.0 :LIBRARY: RELEASE pzip.3 pzip.h pzlib.h \
 	pzdeflate.c pzinflate.c pzlib.c pzinit.c \
 	pzread.c pzwrite.c pzsync.c pzsplit.c \
 	pzfixed.c pzconvert.c sfdcpzip.c sfdczip.c \
-	-lz -ldll
+	-lbz -lz -ldll
 
 pzline 1.0 :LIBRARY: pzline.c -lpz
 

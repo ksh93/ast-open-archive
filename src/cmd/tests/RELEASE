@@ -1,3 +1,6 @@
+03-05-25 opt.tst: add optstr() ???* internal option tests
+03-05-11 strtoi.tst: add malformation tests
+03-05-06 opt.tst: add getopt_long() compatibility tests
 03-04-22 date.dat: add last, this, next tests
 03-03-21 date.dat,datey2k.dat: add %Q/recent/distant/
 	 opt.tst: add trailing '*' option and option args tests

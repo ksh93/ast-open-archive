@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2003-03-05 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2003-06-21 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1041,14 +1041,18 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 {
 	int		c;
 	int		n;
+	int		cvt;
 	int		index;
 	int		offset;
+	int		from;
+	int		to;
 	char*		e;
 	char*		s;
 	char*		v;
 	Option_t*	op;
 	Value_t*	vp;
 
+	cvt = 0;
 	index = opt_info.index;
 	offset = opt_info.offset;
 	while (c = line ? optstr(line, usage) : optget(argv, usage))
@@ -1323,20 +1327,23 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			break;
 		case OPT_from:
 		case OPT_to:
+			if (!cvt)
+			{
+				cvt = 1;
+				from = to = CC_NATIVE;
+			}
 			ap = getarchive(state.operation);
 			if ((n = ccmapid(v)) < 0)
 				error(3, "%s: unknown character code set", v);
 			switch (op->index)
 			{
 			case OPT_from:
-				ap->convert[0].from = n;
+				from = n;
 				break;
 			case OPT_to:
-				ap->convert[0].to = n;
+				to = n;
 				break;
 			}
-			ap->convert[0].on = 1;
-			convert(ap, SECTION_DATA, ap->convert[0].from, ap->convert[0].to);
 			break;
 		case OPT_ignore:
 			if (n && *v)
@@ -1641,6 +1648,11 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 		opt_info.index = index;
 		opt_info.offset = offset;
 	}
+	if (cvt)
+	{
+		ap->convert[0].on = 1;
+		convert(ap, SECTION_DATA, from, to);
+	}
 }
 
 /*
@@ -1699,6 +1711,9 @@ main(int argc, char** argv)
 	state.descend = RESETABLE;
 	state.format = OUT_DEFAULT;
 	state.header.name = "HEADER!!!";
+	state.map.a2n = ccmap(CC_ASCII, CC_NATIVE);
+	state.map.e2n = ccmap(CC_EBCDIC, CC_NATIVE);
+	state.map.n2e = ccmap(CC_NATIVE, CC_EBCDIC);
 	if (!(opt.ignore = sfstropen()) || !(opt.ignore_extended = sfstropen()))
 		error(3, "out of space [ignore]");
 	if (!(opt.listformat = sfstropen()))

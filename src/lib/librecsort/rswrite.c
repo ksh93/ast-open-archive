@@ -57,7 +57,6 @@ int	type;	/* RS_TEXT 		*/
 	reg uchar	*d, *cur, *endrsrv, *rsrv;
 	ssize_t		w, head, n;
 	int		local, flags;
-	Rsevent_f	eventf;
 
 	if(GETLOCAL(rs,local))
 	{	rsrv = rs->rsrv; endrsrv = rs->endrsrv; cur = rs->cur;
@@ -77,10 +76,10 @@ int	type;	/* RS_TEXT 		*/
 	head = (rs->type&RS_DSAMELEN) ? 0 : sizeof(ssize_t);
 
 	if(type&RS_TEXT) /* write in plain text */
-	{	if((rs->type&RS_UNIQ) && (eventf = rs->disc->eventf) )
+	{	if((rs->type&RS_UNIQ) && (rs->events & RS_SUMMARY))
 		{	for(; r; r = r->right)
-			{	if(r->equal)
-					(*eventf)(rs,RS_SUMMARY,r,rs->disc);
+			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,rs->disc) < 0)
+					return -1;
 				w = r->datalen;
 				RESERVE(f,rsrv,endrsrv,cur,w);
 				WRITE(cur,r->data,w,d);
@@ -145,10 +144,10 @@ int	type;	/* RS_TEXT 		*/
 			WRITE(cur,(uchar*)(&n),sizeof(ssize_t),d);
 		}
 
-		if((rs->type&RS_UNIQ) && (eventf = rs->disc->eventf))
+		if((rs->type&RS_UNIQ) && (rs->disc->events & RS_SUMMARY))
 		{	for(; r; r = r->right)
-			{	if(r->equal)
-					(*eventf)(rs,RS_SUMMARY,r,rs->disc);
+			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,rs->disc) < 0)
+					return -1;
 				w = (n = r->datalen) + head;
 				RESERVE(f,rsrv,endrsrv,cur,w);
 				if(head)

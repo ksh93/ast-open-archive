@@ -61,6 +61,8 @@ sfbzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 		if (op != SF_CLOSING)
 			free(dp);
 		return r;
+	case SF_DBUFFER:
+		return 1;
 	case SF_READ:
 	case SF_WRITE:
 		return *((ssize_t*)val) < 0 ? -1 : 0;
@@ -131,7 +133,12 @@ sfdcbzip(Sfio_t* sp, int flags)
 		 *	BZh[0-9]	sfdcbzip	bzip	
 		 */
 		
-		if (!(s = (unsigned char*)sfreserve(sp, 4, 1)))
+		if (!(n = sfset(sp, 0, 0) & SF_SHARE))
+			sfset(sp, SF_SHARE, 1);
+		s = (unsigned char*)sfreserve(sp, 4, 1);
+		if (!n)
+			sfset(sp, SF_SHARE, 0);
+		if (!s)
 			return -1;
 		n = s[0] == 'B' && s[1] == 'Z' && s[2] == 'h' && (s[3] >= '0' && s[3] <= '9');
 		sfread(sp, s, 0);

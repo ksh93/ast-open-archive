@@ -71,7 +71,7 @@ int		type;	/* sort controls			*/
 	rs->c_max = c_max;
 	rs->type = type;
 
-	rsdisc(rs,disc);
+	rsdisc(rs,disc,RS_DISC);
 
 	return rs;
 }

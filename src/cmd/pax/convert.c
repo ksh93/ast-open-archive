@@ -38,9 +38,12 @@
 void
 convert(Archive_t* ap, int section, int from, int to)
 {
-	ap->convert[section].on =
-		(ap->convert[section].from = from) !=
-		(ap->convert[section].to = to);
+	if (ap->convert[section].on = (ap->convert[section].f2t = ccmap(from, to)) != 0)
+	{
+		ap->convert[section].t2f = ccmap(to, from);
+		ap->convert[section].f2a = ccmap(from, CC_ASCII);
+		ap->convert[section].t2a = ccmap(to, CC_ASCII);
+	}
 }
 
 /*
@@ -152,7 +155,7 @@ tar_checksum(Archive_t* ap)
 			n += *p++;
 	else
 	{
-		map = (state.operation & IN) ? CCMAP(ap->convert[SECTION_CONTROL].to, ap->convert[SECTION_CONTROL].from) : CCMAP(ap->convert[SECTION_CONTROL].from, ap->convert[SECTION_CONTROL].to);
+		map = (state.operation & IN) ? ap->convert[SECTION_CONTROL].t2f : ap->convert[SECTION_CONTROL].f2t;
 		while (p < e)
 			n += map[*p++];
 	}

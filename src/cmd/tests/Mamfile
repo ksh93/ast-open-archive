@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -54,9 +55,7 @@ make ../../../include/ast/debug.h implicit
 make ../../../include/ast/error.h implicit
 make ../../../include/ast/option.h implicit
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../lib/libast/ast_common.h implicit
 done ../../lib/libast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -96,7 +95,8 @@ done ../../lib/libast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../lib/libast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../lib/libast/ast_common.h implicit
 done ../../lib/libast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -113,6 +113,11 @@ done ../../lib/libast/ast_lib.h dontcare
 prev ../../lib/libast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../lib/libast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -132,10 +137,11 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done opt.c
 prev opt.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c opt.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c opt.c
 done opt.o generated
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o opt opt.o ${mam_libast}
+bind -lm dontcare
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o opt opt.o ${mam_libast} ${mam_libm}
 done opt generated
 exec - regress  opt.tst opt
 done test.opt virtual
@@ -148,9 +154,9 @@ make strelapsed.c
 prev ../../../include/ast/ast.h implicit
 done strelapsed.c
 prev strelapsed.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strelapsed.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strelapsed.c
 done strelapsed.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strelapsed strelapsed.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strelapsed strelapsed.o ${mam_libast} ${mam_libm}
 done strelapsed generated
 exec - regress  strelapsed.tst strelapsed
 done test.strelapsed virtual
@@ -164,9 +170,9 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done strtoi.c
 prev strtoi.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtoi.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtoi.c
 done strtoi.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strtoi strtoi.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strtoi strtoi.o ${mam_libast} ${mam_libm}
 done strtoi generated
 exec - regress  strtoi.tst strtoi
 done test.strtoi virtual
@@ -180,9 +186,9 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done strntoi.c
 prev strntoi.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntoi.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntoi.c
 done strntoi.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strntoi strntoi.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strntoi strntoi.o ${mam_libast} ${mam_libm}
 done strntoi generated
 exec - regress  strntoi.tst strntoi
 done test.strntoi virtual
@@ -196,9 +202,9 @@ prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/ast.h implicit
 done strtof.c
 prev strtof.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtof.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtof.c
 done strtof.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strtof strtof.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strtof strtof.o ${mam_libast} ${mam_libm}
 done strtof generated
 exec - regress  strtof.tst strtof
 done test.strtof virtual
@@ -212,9 +218,9 @@ prev ../../../include/ast/stdio.h implicit
 prev ../../../include/ast/ast.h implicit
 done strntof.c
 prev strntof.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntof.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntof.c
 done strntof.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strntof strntof.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strntof strntof.o ${mam_libast} ${mam_libm}
 done strntof generated
 exec - regress  strntof.tst strntof
 done test.strntof virtual
@@ -225,9 +231,9 @@ make base64.c
 prev ../../../include/ast/ast.h implicit
 done base64.c
 prev base64.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c base64.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c base64.c
 done base64.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o base64 base64.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o base64 base64.o ${mam_libast} ${mam_libm}
 done base64 generated
 exec - base64
 done test.base64 virtual
@@ -248,9 +254,9 @@ done ../../../include/ast/tm.h
 prev ../../../include/ast/ast.h implicit
 done date.c
 prev date.c
-exec - ${CC} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c date.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c date.c
 done date.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o date date.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o date date.o ${mam_libast} ${mam_libm}
 done date generated
 make date.msk
 done date.msk
@@ -271,16 +277,16 @@ make sfio/sftest.h
 done sfio/sftest.h
 make sfio/talarm.c
 prev sfio/sftest.h implicit
-prev ../../../include/ast/limits.h implicit
 make sfio/terror.h implicit
 prev ../../lib/libast/ast_common.h implicit
 done sfio/terror.h
+prev ../../../include/ast/ast.h implicit
 make ../../../include/ast/sfio_t.h implicit
 prev ../../../include/ast/sfio.h implicit
 done ../../../include/ast/sfio_t.h dontcare
 prev ../../../include/ast/sfio.h implicit
 make FEATURE/sfio implicit
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def sfio
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} : def sfio
 done FEATURE/sfio generated
 done sfio/talarm.c
 make sfio/talign.c
@@ -482,6 +488,6 @@ done sfio/twhole.c
 make sfio/twrrd.c
 prev sfio/sftest.h implicit
 done sfio/twrrd.c
-exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tshare.c sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${CCFLAGS}  -I. -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}
+exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} ${mam_libm} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tshare.c sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}
 done test.sfio virtual
 done test dontcare virtual

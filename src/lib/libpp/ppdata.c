@@ -52,7 +52,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2003-03-25 $\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2003-06-10 $\0\n";
 
 #include "pplib.h"
 
@@ -79,12 +79,12 @@ static struct ppinstk	instack =	/* input stream stack		*/
 
 static struct ppdirs	stddir =	/* standard include directory	*/
 {
-	PPSTANDARD,	0,		1, 1, INC_STANDARD, 0
+	PPSTANDARD,	0,		1, INC_STANDARD, TYPE_INCLUDE|TYPE_DIRECTORY|TYPE_HOSTED
 };
 
 static struct ppdirs	firstdir =	/* first include directory	*/
 {
-	"",		&stddir,	0, 0, INC_PREFIX, TYPE_DIRECTORY
+	"",		&stddir,	0, INC_PREFIX, TYPE_INCLUDE|TYPE_DIRECTORY
 };
 
 struct ppglobals pp =

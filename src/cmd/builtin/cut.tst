@@ -87,7 +87,14 @@ TEST 08 'two empty fields'
 		INPUT f1 $':'
 		OUTPUT - $''
 
-TEST 09 'misc errors'
+TEST 09 'fixed length records'
+	EXEC	 -r5 -b2-4 f1
+		INPUT -n f1 $'abcdefghij'
+		OUTPUT - $'bcd\nghi'
+	EXEC	 -N -r5 -b2-4 f1
+		OUTPUT -n - $'bcdghi'
+
+TEST 10 'misc errors'
 	DIAGNOSTICS
 	EXEC
 		EXIT [12]

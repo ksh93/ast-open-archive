@@ -2619,7 +2619,7 @@ nextarg(char* s, char** p, char** end, long* val)
 		{
 			c = *varend;
 			*varend = 0;
-			arg = getval(var, 0);
+			arg = getval(var, VAL_PRIMARY|VAL_AUXILIARY);
 			*varend = c;
 			*p = s;
 
@@ -2825,9 +2825,12 @@ expr(Sfio_t* xp, register char* s)
 {
 	register char*	t;
 	register int	p;
+	register char**	v;
 	int		c;
 	long		top;
+	char*		restore[PARSEDEPTH];
 
+	v = restore;
 	t = s;
 	p = 0;
 	for (;;)
@@ -2845,7 +2848,8 @@ expr(Sfio_t* xp, register char* s)
 			if (p <= 1)
 			{
 				p = !p;
-				*(t - 1) = MARK_QUOTE;
+				if (v < &restore[elementsof(restore)])
+					*(*v++ = t - 1) = MARK_QUOTE;
 			}
 			break;
 		case '\\':
@@ -2859,9 +2863,8 @@ expr(Sfio_t* xp, register char* s)
 			top = sfstrtell(xp);
 			expand(xp, s);
 			sfputc(xp, 0);
-			while (s < t)
-				if (*s++ == MARK_QUOTE)
-					*(s - 1) = '"';
+			while (v > restore)
+				**--v = '"';
 			*t = c;
 			return strexpr(sfstrset(xp, top), NiL, makeexpr, NiL);
 		}

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS ${mam_cc_DLL}
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,8 +42,8 @@ make librecsort.a archive
 make recsort.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -52,8 +53,8 @@ exec - do	case $i in
 exec - 	"recsort"|recsort)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -136,13 +137,15 @@ make features/recsort
 done features/recsort
 prev recsort.req
 bind -last
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/recsort
+bind -lm dontcare
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} ${mam_libast} ${mam_libm} : run features/recsort
 done FEATURE/recsort dontcare generated
 make ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/vmalloc.h dontcare
 make ../../../include/ast/ast.h implicit
+prev ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -153,101 +156,114 @@ done ../../../include/ast/ast.h dontcare
 done rshdr.h
 done rsclear.c
 prev rsclear.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsclear.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsclear.c
 done rsclear.o generated
 make rsclose.o
 make rsclose.c
 prev rshdr.h implicit
 done rsclose.c
 prev rsclose.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsclose.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsclose.c
 done rsclose.o generated
 make rsdisc.o
 make rsdisc.c
 prev rshdr.h implicit
 done rsdisc.c
 prev rsdisc.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsdisc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsdisc.c
 done rsdisc.o generated
+make rsnotify.o
+make rsnotify.c
+prev rshdr.h implicit
+done rsnotify.c
+prev rsnotify.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsnotify.c
+done rsnotify.o generated
 make rslist.o
 make rslist.c
 prev rshdr.h implicit
 done rslist.c
 prev rslist.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rslist.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rslist.c
 done rslist.o generated
 make rsmerge.o
 make rsmerge.c
 prev rshdr.h implicit
 done rsmerge.c
 prev rsmerge.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsmerge.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsmerge.c
 done rsmerge.o generated
 make rsmethod.o
 make rsmethod.c
 prev rshdr.h implicit
 done rsmethod.c
 prev rsmethod.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsmethod.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsmethod.c
 done rsmethod.o generated
 make rsopen.o
 make rsopen.c
 prev rshdr.h implicit
 done rsopen.c
 prev rsopen.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsopen.c
 done rsopen.o generated
 make rsprocess.o
 make rsprocess.c
 prev rshdr.h implicit
 done rsprocess.c
 prev rsprocess.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsprocess.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rsprocess.c
 done rsprocess.o generated
 make rswrite.o
 make rswrite.c
 prev rshdr.h implicit
 done rswrite.c
 prev rswrite.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rswrite.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rswrite.c
 done rswrite.o generated
 make rs-radix.o
 make rs-radix.c
 prev rshdr.h implicit
 done rs-radix.c
 prev rs-radix.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-radix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-radix.c
 done rs-radix.o generated
 make rs-rasp.o
 make rs-rasp.c
 prev rshdr.h implicit
 done rs-rasp.c
 prev rs-rasp.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-rasp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-rasp.c
 done rs-rasp.o generated
 make rs-splay.o
 make rs-splay.c
 prev rshdr.h implicit
 done rs-splay.c
 prev rs-splay.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-splay.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-splay.c
 done rs-splay.o generated
 make rs-verify.o
 make rs-verify.c
 prev rshdr.h implicit
 done rs-verify.c
 prev rs-verify.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-verify.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rs-verify.c
 done rs-verify.o generated
 make rskeyopen.o
 make rskeyopen.c
 make rskeyhdr.h implicit
 prev rshdr.h implicit
+make ../../../include/ast/ccode.h implicit
+make ../../../include/ast/ast_ccode.h implicit
+done ../../../include/ast/ast_ccode.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ccode.h dontcare
 prev ../../../include/ast/ast.h implicit
 done rskeyhdr.h
 done rskeyopen.c
 prev rskeyopen.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeyopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeyopen.c
 done rskeyopen.o generated
 make rskey.o
 make rskey.c
@@ -260,23 +276,23 @@ done ../../../include/ast/times.h dontcare
 prev rskeyhdr.h implicit
 done rskey.c
 prev rskey.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rskey.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rskey.c
 done rskey.o generated
 make rskeymeth.o
 make rskeymeth.c
 prev rskeyhdr.h implicit
 done rskeymeth.c
 prev rskeymeth.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeymeth.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeymeth.c
 done rskeymeth.o generated
 make rskeydump.o
 make rskeydump.c
 prev rskeyhdr.h implicit
 done rskeydump.c
 prev rskeydump.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeydump.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeydump.c
 done rskeydump.o generated
-exec - ${AR} cr librecsort.a rsclear.o rsclose.o rsdisc.o rslist.o rsmerge.o rsmethod.o rsopen.o rsprocess.o rswrite.o rs-radix.o rs-rasp.o rs-splay.o rs-verify.o rskeyopen.o rskey.o rskeymeth.o rskeydump.o
+exec - ${AR} cr librecsort.a rsclear.o rsclose.o rsdisc.o rsnotify.o rslist.o rsmerge.o rsmethod.o rsopen.o rsprocess.o rswrite.o rs-radix.o rs-rasp.o rs-splay.o rs-verify.o rskeyopen.o rskey.o rskeymeth.o rskeydump.o
 exec - (ranlib librecsort.a) >/dev/null 2>&1 || true
 done librecsort.a generated
 done recsort virtual

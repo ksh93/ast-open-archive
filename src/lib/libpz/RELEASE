@@ -1,3 +1,5 @@
+03-05-13 sfdcpzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
+03-05-05 sfdcpzip.c,sfdczip.c: add bzip support
 03-04-15 pzlib.h: add PZ_MARK_PART for partial last input record
 	 pzlib.h: add PZ_MARK_TAIL for tail records
 	 partial input record is now a warning and handled on inflate

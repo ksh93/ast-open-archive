@@ -26,7 +26,6 @@
 #include "sed.h"
 
 #include <ctype.h>
-#include <ccode.h>
 
 #define ustrchr(p, c) (unsigned char*)strchr((char*)(p), c)
 
@@ -510,7 +509,7 @@ execute(Text *script, Text *data)
 			int cmd = code(*instr(pc));
 			if(sel==2 && cmd=='c')
 				cmd = 'd';
-			pc = (*excom[ccmapc(cmd,CC_NATIVE,CC_ASCII)])(script, pc, data);
+			pc = (*excom[ccmapchr(map,cmd)])(script, pc, data);
 			if(pc == 0)
 				return;
 		} else

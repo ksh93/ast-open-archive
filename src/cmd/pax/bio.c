@@ -59,14 +59,14 @@
 #endif
 #endif
 
-#define CVT(a,b,c,f,t) \
+#define CVT(a,b,c,m,t) \
 	do \
 	{ \
 		if (c) \
 			switch ((a)->convert[SECTION(a)].on) \
 			{ \
 			case 1: \
-				if (SECTION(a) != SECTION_DATA || TEXT(b,c,f)) \
+				if (SECTION(a) != SECTION_DATA || TEXT(b,c,t)) \
 					(a)->convert[SECTION(a)].on = 2; \
 				else \
 				{ \
@@ -74,17 +74,17 @@
 					break; \
 				} \
 			case 2: \
-				ccmaps(b, c, f, t); \
+				ccmapstr(m, b, c); \
 				break; \
 			} \
 		if ((a)->swapio) \
 			swapmem((a)->swapio, b, b, c); \
 	} while (0)
 
-#define TEXT(b,c,f)	text((unsigned char*)b,c,f)
+#define TEXT(b,c,t)	text(t,(unsigned char*)b,c)
 
-#define CONVERT(a,b,c)	CVT(a,b,c,(a)->convert[SECTION(a)].from,(a)->convert[SECTION(a)].to)
-#define REVERT(a,b,c)	CVT(a,b,c,(a)->convert[SECTION(a)].to,(a)->convert[SECTION(a)].from)
+#define CONVERT(a,b,c)	CVT(a,b,c,(a)->convert[SECTION(a)].f2t,(a)->convert[SECTION(a)].f2a)
+#define REVERT(a,b,c)	CVT(a,b,c,(a)->convert[SECTION(a)].t2f,(a)->convert[SECTION(a)].t2a)
 
 /*
  * return 1 if b is text data in f charset
@@ -103,7 +103,7 @@ static const unsigned char	ascii_text[] =
 };
 
 static int
-text(register unsigned char* b, ssize_t n, int f)
+text(unsigned char* map, register unsigned char* b, ssize_t n)
 {
 	register unsigned char*	e;
 	register int		c;
@@ -114,7 +114,7 @@ text(register unsigned char* b, ssize_t n, int f)
 	while (b < e)
 	{
 		c = *b++;
-		c = CCMAPC(c, f, CC_ASCII);
+		c = ccmapchr(map, c);
 		if (!ascii_text[c])
 			return 0;
 	}

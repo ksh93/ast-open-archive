@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2003-04-15 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2003-06-21 $"
 
 /*
  * handy attributes
@@ -77,7 +77,7 @@ USRDIRS = $(LCLDIRS):$(STDDIRS)
 INSTALLROOT = $(HOME)
 
 BINDIR = $(INSTALLROOT)/bin
-DLLDIR = $(CC.SUFFIX.DYNAMIC:N=.dll:?$(BINDIR)?$(LIBDIR)?)
+DLLDIR = $(CC.DLL.DIR)
 ETCDIR = $(INSTALLROOT)/etc
 FUNDIR = $(INSTALLROOT)/fun
 INCLUDEDIR = $(INSTALLROOT)/include
@@ -109,6 +109,7 @@ MAKESKIP = *-*
 
 .SUFFIX.c = .c
 .SUFFIX.C = .C .cc .cpp .cxx .c++
+.SUFFIX.cob = .cob .COB .cbl .CBL
 .SUFFIX.f = .f .F
 .SUFFIX.r = .r .R
 
@@ -145,6 +146,7 @@ recurse_exit =
 select =
 skeleton =
 static =
+strip =
 threads =
 tmp = ${COTEMP}
 variants =
@@ -229,6 +231,10 @@ CHMOD = chmod
 CHOWN = chown
 CMP = cmp
 CMPFLAGS = -s
+COBOL = cobc
+COBOLFLAGS = -static -std=mvs -C
+COBOLLIBRARIES = -lcob
+COBOLMAIN = -fmain
 CP = cp
 CPIO = cpio
 CPP = $(MAKEPP)
@@ -258,8 +264,13 @@ IFFELDFLAGS = $(LDFLAGS)
 IGNORE = ignore
 LD = $(CC.LD)
 LDRUNPATH =
+if ! "$(PATH:/:/ /G:X=lex:P=X)" && "$(PATH:/:/ /G:X=flex:P=X)"
+LEX = $(FLEX)
+LEXFLAGS = $(FLEXFLAGS)
+else
 LEX = lex
 LEXFLAGS =
+end
 
 .T. = $(USRDIRS:/:/ /G:X=lib/lint) $(USRDIRS:/:/ /G:X=lib/cmplrs/cc) $(USRDIRS:/:/ /G:X=ccs/lib)
 if .T. = "$(.T.:X=lint1:P=X:O=1)"
@@ -362,8 +373,8 @@ end
  */
 
 (AR) (ARFLAGS) (AS) (ASFLAGS) (CPP) (CC) (CCFLAGS) (CCLD) \
-	(CCLDFLAGS) (COATTRIBUTES) (F77) (F77FLAGS) (IFFE) \
-	(IFFEFLAGS) (LD) (LDFLAGS) (LDLIBRARIES) (LEX) (LEXFLAGS) \
+	(CCLDFLAGS) (COATTRIBUTES) (COBOL) (COBOLFLAGS) (F77) (F77FLAGS) \
+	(IFFE) (IFFEFLAGS) (LD) (LDFLAGS) (LDLIBRARIES) (LEX) (LEXFLAGS) \
 	(M4) (M4FLAGS) (SHELLMAGIC) (YACC) (YACCFLAGS) : .PARAMETER
 
 /*
@@ -471,7 +482,7 @@ include "Scanrules.mk"
 	if ( L = "$(A:A=.TARGET)" )
 		return $(L)
 	end
-	if ! "$(.LIBRARY.LIST.)" || "$(.PACKAGE.$(B).library)" != "-l"
+	if ! "$(.LIBRARY.LIST.)" || "$(.PACKAGE.LIBRARY. $(B))" != "-l"
 		if ( L = "$(A:T=F)" )
 			return $(L)
 		end
@@ -509,7 +520,7 @@ include "Scanrules.mk"
 	if ( T = "$(.ARPROFILE. $(B))" )
 		return $(T)
 	end
-	if ( static || "$(.PACKAGE.$(B).library)" == "+l" ) && "$(<<)" != ".BIND.+l%"
+	if ( static || "$(.PACKAGE.LIBRARY. $(B))" == "+l" ) && "$(<<)" != ".BIND.+l%"
 		V := $(CC.PREFIX.ARCHIVE)$(B)$(CC.SUFFIX.ARCHIVE)
 		if ( T = "$(V:A=.TARGET)" )
 			return $(T)
@@ -669,6 +680,8 @@ include "Scanrules.mk"
  * hints for prereq libs
  */
 
+"{" "}" : .VIRTUAL .IGNORE .DONTCARE
+
 .REQUIRE.RULES. : .FUNCTION
 	local B R T D DL DR
 	B := $(%:/-l//)
@@ -691,7 +704,7 @@ include "Scanrules.mk"
 				if ( T = "$(T:T=F)" )
 					return $(T:T=I)
 				end
-				return
+				return $(%)
 			end
 		end
 		if "$(.PACKAGE.$(B).rules)"
@@ -712,7 +725,7 @@ include "Scanrules.mk"
 		if ! ( T = "$(R:T=F)" )
 			R := $(MAKELIB:D)/$(R)
 			if ! ( T = "$(R:T=F)" )
-				return
+				return $(%)
 			end
 		end
 		if "$(-mam:N=static*,port*)"
@@ -727,7 +740,7 @@ include "Scanrules.mk"
 					break
 				end
 				if D == "$(DL)"
-					return
+					return $(%)
 				end
 			end
 		end
@@ -751,16 +764,8 @@ include "Scanrules.mk"
 			end
 		end
 	end
-	if "$(CC.DIALECT:N=CLOSURE)"
-		L := $(R:O=1)
-		if L == "$(%)"
-			if "$(L:T=F:S:N=$(CC.SUFFIX.SHARED))" && ! "$(CC.REQUIRE.$(L:/-l//))"
-				R := $(L)
-			end
-		end
-	end
 	B := $(%:/[-+]l//)
-	if "$(.PACKAGE.$(B).library)" == "+l"
+	if "$(.PACKAGE.LIBRARY. $(B))" == "+l"
 		if allstatic
 			H =
 			for L $(R)
@@ -771,11 +776,11 @@ include "Scanrules.mk"
 					H += $(S)
 				end
 			end
-			return $(H)
+			return { $(H) }
 		end
-		return $(R:/-l$(B)/+l$(B)/)
+		return { $(R:/-l$(B)/+l$(B)/) }
 	end
-	return $(R)
+	return { $(R) }
 
 .REQUIRE.+l% : .FUNCTION
 	local A B L S
@@ -838,7 +843,7 @@ include "Scanrules.mk"
 	$(.ARCLEAN.LIST.:K=$(RM) $(RMFLAGS))
 
 .COMMAND.o : .USE .COMMAND (CCLD) (CCLDFLAGS) $$(LDLIBRARIES)
-	$(CCLD) $(CCLDFLAGS) $(&:T=D:N!=-[DIUl]*) -o $(<) $(.SHARED.UNIQ. $(*))
+	$(CCLD) $(CCLDFLAGS) $(&:T=D:N!=-[DIUl]*) -o $(<) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.))
 
 .OBJECT.o : .USE (LD) (CCFLAGS) (LDFLAGS)
 	$(LD) -r $(LDFLAGS) -o $(<) $(*)
@@ -881,7 +886,7 @@ end
 			case $i in
 			'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 			esac
-			echo $(&:T=E)
+			echo $(&:T=E:Q)
 			cat $(>)
 			} > $(<)
 			;;
@@ -891,7 +896,7 @@ end
 		echo '$(SHELLMAGIC)'
 		case $(&:T=E:@O!) in
 		0)	;;
-		*)	echo $(&:T=E) ;;
+		*)	echo $(&:T=E:Q) ;;
 		esac
 		cat $(>)
 		} > $(<)
@@ -908,6 +913,15 @@ for .S. $(.SUFFIX.c) $(.SUFFIX.C)
 		$(CC) $(CCFLAGS) -c $(>)
 end
 
+.COBOL.INIT : .MAKE .VIRTUAL .FORCE .IGNORE
+	$(COBOLLIBRARIES) : .DONTCARE
+	LDLIBRARIES += $$(!:A=.SCAN.cob:@?$$(COBOLLIBRARIES)??)
+
+for .S. $(.SUFFIX.cob)
+	%.c %.c.h : %$(.S.) (COBOL) (COBOLFLAGS) .COBOL.INIT
+		$(COBOL) $(COBOLFLAGS) $(>)
+end
+
 for .S. $(.SUFFIX.f) $(.SUFFIX.r)
 	%.o : %$(.S.) (F77) (F77FLAGS)
 		$(F77) $(F77FLAGS) -c $(>)
@@ -920,10 +934,12 @@ end
 	$(CC) $(CCFLAGS) -c $(>)
 
 %.c %.h : %.y .YACC.SEMAPHORE (YACC) (YACCFLAGS)
-	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
-	$(MV) y.tab.c $(%).c
-	if	$(SILENT) test -s y.tab.h
-	then	$(STDED) $(STDEDFLAGS) y.tab.h <<'!'
+	if	silent $(YACC) --version >/dev/null 2>&1
+	then	$(YACC) $(YACCFLAGS) -o$(<:N=*.c) $(YACCFIX.$(%):?-p$(YACCFIX.$(%))??) $(>)
+	else	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+		$(MV) y.tab.c $(%).c
+		if	$(SILENT) test -s y.tab.h
+		then	$(STDED) $(STDEDFLAGS) y.tab.h <<'!'
 	1i
 	$("#")ifndef _$(%:F=%(upper)s)_H
 	$("#")define _$(%:F=%(upper)s)_H
@@ -934,18 +950,22 @@ end
 	w
 	q
 	!
-		$(YACCFIX.$(%):?$(STDED) $(STDEDFLAGS) y.tab.h <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!$("\n")??)if	$(SILENT) $(CMP) $(CMPFLAGS) y.tab.h $(%).h
-		then	$(RM) $(RMFLAGS) y.tab.h
-		else	$(MV) y.tab.h $(%).h
+			$(YACCFIX.$(%):?$(STDED) $(STDEDFLAGS) y.tab.h <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!$("\n")??)if	$(SILENT) $(CMP) $(CMPFLAGS) y.tab.h $(%).h
+			then	$(RM) $(RMFLAGS) y.tab.h
+			else	$(MV) y.tab.h $(%).h
+			fi
 		fi
-	fi
-	if	$(SILENT) test -f y.output
-	then	$(MV) y.output $(%).grammar
+		if	$(SILENT) test -f y.output
+		then	$(MV) y.output $(%).grammar
+		fi
 	fi
 
 %.c : %.l .LEX.SEMAPHORE (LEX) (LEXFLAGS) (CC)
-	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%))/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(LEXHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")1i$("\n")#include "$(LEXHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
-	$(MV) lex.yy.c $(<)
+	if	silent $(LEX) --version >/dev/null 2>&1
+	then	$(LEX) $(LEXFLAGS) -o$(<) $(LEXFIX.$(%):?-P$(LEXFIX.$(%))??) $(>)
+	else	$(LEX) $(LEXFLAGS) $(>)$(LEXFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")g/yy/s//$(LEXFIX.$(%))/g$("\n")g/YY/s//$(LEXFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(LEXHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) lex.yy.c <<!$("\n")1i$("\n")#include "$(LEXHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+		$(MV) lex.yy.c $(<)
+	fi
 
 %.mo : %.mk
 	$(MAKE) $(-) --base --compile --file=$(>) $(CCFLAGS:N=-[I][!-]*) $(&:T=E)
@@ -1131,9 +1151,9 @@ DAGGERFLAGS =
 .DO.NOTHING : .USE .NULL
 
 .NOOPTIMIZE.c .CC.NOOPTIMIZE /* drop .CC.* in 2004 */ : .MAKE .LOCAL
-	CCFLAGS := $(.MAM.CCFLAGS|CCFLAGS:VP:N!=-O*|$(CC.OPTIMIZE)|$\(CC.OPTIMIZE\))
+	CCFLAGS := $(.MAM.CC.FLAGS|CCFLAGS:VP:N!=-O*|$(CC.OPTIMIZE)|$\(CC.OPTIMIZE\))
 	if "$(-mam)"
-		CCFLAGS := ${debug?1?${mam_cc_DEBUG}??} $(CCFLAGS:VP:N!=-g|$(CC.DEBUG)|$\(CC.DEBUG\))
+		CCFLAGS := ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}
 	elif debug
 		CCFLAGS := $(CC.DEBUG) $(CCFLAGS:VP:N!=-g|$(CC.DEBUG)|$\(CC.DEBUG\))
 	end
@@ -1512,32 +1532,10 @@ end
  * make dll via cc- if not already made at this level
  */
 
-":DLL:" : .MAKE .OPERATOR
-	local DIR OPT
-	if "$(PWD:B)" != "cc-*"
-		if ! ( OPT = "$(>:N=-*)" )
-			OPT := $(CC.OPTIMIZE)
-		end
-		if "$(>:N=big|BIG)"
-			.ALL : .DLLBIG
-			OPT += $(CC.DLLBIG)
-		else
-			.ALL : .DLL
-			OPT += $(CC.DLL)
-		end
-		DIR := cc$(OPT:/ /,/G)
-		.DLL.LIST. += $$(.LIBRARY.LIST.)
-		.VARIANT.$(DIR) := VARIANT=DLL
-	end
-
-.DLL .DLLBIG : .MAKE
+.RECURSE.DLL : .MAKE .USE
 	local DIR
 	if .DLL.LIST. && ! "$(-mam:N=static*,port*)" && ! "$(.SHARED.ON.)" && ( CC.SUFFIX.DYNAMIC || CC.SUFFIX.SHARED )
-		if "$(<)" == ".DLLBIG"
-			DIR := cc$(CC.DEBUG),$(CC.DLLBIG:/ /,/G)
-		else
-			DIR := cc$(CC.DEBUG),$(CC.DLL:/ /,/G)
-		end
+		DIR := $(<:/^.DLL.//)
 		if ! "$(DIR:T=F)"
 			{ test -d $(DIR) || $(MKDIR) $(DIR) }
 		end
@@ -1545,9 +1543,34 @@ end
 		make $(DIR)
 	end
 
+":DLL:" : .MAKE .OPERATOR
+	local DIR OPT
+	if "$(PWD:B)" != "cc-*"
+		if ! ( OPT = "$(>:N=-*)" )
+			OPT := $(CC.OPTIMIZE)
+		end
+		if "$(>:N=big|BIG)"
+			OPT += $(CC.DLLBIG)
+		else
+			OPT += $(CC.DLL)
+		end
+		DIR := cc$(OPT:/ /,/G)
+		.DLL.LIST. += $$(.LIBRARY.LIST.)
+		.VARIANT.$(DIR) := VARIANT=DLL
+		.ALL : .DLL.$(DIR)
+		.DLL.$(DIR) : .RECURSE.DLL
+	end
+
 .DLL.ALL : $$(.DLL.LIST.)
 
-.DLL.INSTALL : $$(*.INSTALL:N=*$$(.DLL.LIST.:/ /|/G)*)
+.DLL.INSTALL. : .FUNCTION
+	local L R
+	for L $(.DLL.LIST.)
+		R += $(*.INSTALL:N=*/$(.DLL.NAME. $(L))*)
+	end
+	return $(R)
+
+.DLL.INSTALL : $$(.DLL.INSTALL.)
 
 .DLL.CHECK : .USE .MAKE .VIRTUAL .FORCE
 	local B L
@@ -1750,9 +1773,6 @@ end
 		if ! "$(CC.DLL:N=-D_BLD_DLL)"
 			_BLD_DLL == 1
 		end
-		if CC.SUFFIX.DYNAMIC == ".dll" && CC.SUFFIX.SHARED == ".lib"
-			.INSTALL.$(L) := .
-		end
 	else
 		if ! "$(CC.DLL:N=-D_BLD_DLL)"
 			_BLD_DLL ==
@@ -1841,10 +1861,11 @@ end
 		else
 			I := -l$(I)
 			if Q = "$(.REQUIRE.-l% $(I))"
-				if "$(Q:N=$(I))" || "$(MAKE_QUESTIONABLE_require)"
-					R += $(I)
+				if ! "$(Q:N=$(I))" && ! "$(MAKE_QUESTIONABLE_require)"
+					continue
 				end
-			elif "$(I:T=F)"
+			end
+			if "$(I:T=F)"
 				R += $(I)
 			end
 		end
@@ -1860,17 +1881,48 @@ end
 		return 1
 	end
 
-.SHARED.UNIQ. : .FUNCTION
-	local I U
-	for I $(%)
-		if I == "-l*"
-			if "$(U:N=$(I))"
-				U := $(U:N!=$(I))
+.SHARED.LIST.LIBS. : .FUNCTION
+	if $(MAKEVERSION:@/.* //:/-//G) >= 20030609
+		return $(~~:VFU)
+	end
+	return $(~~:A!=.USE)
+
+.SHARED.LIST. : .FUNCTION
+	local N=0 L D X W G A R
+	for L $(%)
+		if L == "{"
+			let N = N + 1
+		elif L == "}"
+			let N = N - 1
+		elif L == "[-+]l*|*$(CC.SUFFIX.ARCHIVE)"
+			if N <= 0
+				G := $(L) $(G)
+			elif N > 1
+				W := $(L) $(W)
+			else
+				X := $(X) $(L)
+			end
+		else
+			X := $(X) $(L)
+		end
+	end
+	A := $(X) $(W) $(G)
+	A := $(A:U)
+	for L $(G) $(W)
+		if L == "+l*"
+			if ! "$(X:N=$(L))"
+				D := $(L:/+/-/)
+				if "$(A:N=$(D))" || "$(CC.STDLIB:N=$(D:T=F:P=D))"
+					L := $(D)
+				end
 			end
 		end
-		U += $(I)
+		if ! "$(R:N=$(L))"
+			R := $(L) $(R)
+		end
 	end
-	return $(U)
+	R := $(X) $(R)
+	return $(R:T=F)
 
 .SHARED. : .FUNCTION
 	local B L S T
@@ -1944,10 +1996,10 @@ end
 			end
 		end
 	end
-	return $(.SHARED.UNIQ. $(S))
+	return $(.SHARED.LIST. $(S))
 
 .SHARED.o : .USE (LD) (LDFLAGS) $$(LDLIBRARIES)
-	$(LD) $(LDFLAGS) $(CC.SHARED) -o $(<) $(.CC.LIB.DLL.$(CC.LIB.DLL) $(.SHARED.UNIQ. $(*:$(CC.SHARED:@??:T=F:N=*$(CC.SUFFIX.ARCHIVE)?)))) $(CC.DLL.LIBRARIES)
+	$(LD) $(LDFLAGS) $(CC.SHARED) -o $(<) $(.CC.LIB.DLL.$(CC.LIB.DLL) $(.SHARED.LIST. $(.SHARED.LIST.LIBS.:$(CC.SHARED:@??:T=F:N=*$(CC.SUFFIX.ARCHIVE)?)))) $(CC.DLL.LIBRARIES)
 
 .SHARED.DEF.dll.a .SHARED.DEF.lib .SHARED.DEF.x : .FUNCTION
 	local A B D L S X Y Z W
@@ -1961,7 +2013,7 @@ end
 		X := $(Y) $(Z:/+l//)
 		Z += $(%:O>3:/.l//:N!=$(X:/ /|/):/^/-l/)
 		$(Z) : .DONTCARE
-		if CC.SUFFIX.DYNAMIC == ".dll"
+		if CC.DLL.DIR == "$\(BINDIR)"
 			W := $(Y:B:S=.so)
 			D := $(W)/$(D)
 			S := $(W)/$(S)
@@ -1991,19 +2043,19 @@ end
 	local K L
 	K := *@($(.LD.KEEP.:/ /|/G:/|$//))
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
-	return $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(%:N=$(K)) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//):T=*) $(%:N!=*$(L)|$(K))
+	return $(CC.LIB.ALL) $(L) $(CC.LIB.UNDEF) $(%:N=$(K)) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//):T=*) $(.SHARED.LIST. $(%:N!=*$(L)|$(K)))
 
 .SHARED.dll.a .SHARED.lib : .USE $$(LDLIBRARIES)
 	$(SILENT) test -d $(<:O=1:D) || mkdir $(<:O=1:D)
-	$(LD) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1) $(.SHARED.REF.lib $(*)) $(CC.DLL.LIBRARIES)
+	$(LD) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1) $(.SHARED.REF.lib $(.SHARED.LIST.LIBS.)) $(CC.DLL.LIBRARIES)
 
 .SHARED.REF.x : .FUNCTION
 	local L
 	L := $(%:N=*$(CC.SUFFIX.ARCHIVE):O=1)
-	return $(.CC.LIB.DLL.symbol $(L)) $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//):T=*) $(%:N!=*$(CC.SUFFIX.OBJECT))
+	return $(.CC.LIB.DLL.symbol $(L)) $(.SHARED.LIST. $(*.LIBRARY.STATIC.$(L:B:/^$(CC.PREFIX.ARCHIVE)//):T=*) $(%:N!=$(L)|*$(CC.SUFFIX.OBJECT)))
 
 .SHARED.x : .USE $$(LDLIBRARIES)
-	$(CC) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:B:S) $(.SHARED.REF.x $(*)) $(CC.DLL.LIBRARIES)
+	$(CC) $(LDFLAGS) $(CCFLAGS:N=-[gG]*) $(CC.SHARED) -o $(<:O=1:B:S) $(.SHARED.REF.x $(.SHARED.LIST.LIBS.)) $(CC.DLL.LIBRARIES)
 
 /*
  * link lhs to rhs
@@ -2127,10 +2179,22 @@ end
 .PACKAGE.stdlib = $(*.SOURCE.a) $(CC.STDLIB) /usr/lib /lib
 .PACKAGE.strip =
 
+.PACKAGE.LIBRARY. : .FUNCTION
+	local P R
+	if P = "$(<:T=M:A=.COMMAND:O=1)"
+		if R = "$(.PACKAGE.$(%).library.$(P))"
+			return $(R)
+		end
+		if R = "$(.PACKAGE.$(%).library.weak.$(P))"
+			return $(R)
+		end
+	end
+	return $(.PACKAGE.$(%).library)
+
 .PACKAGE.LIBRARIES. : .FUNCTION
 	local L P R
 	for L $(%)
-		if P = "$(.PACKAGE.$(L).library)"
+		if P = "$(.PACKAGE.LIBRARY. $(L))"
 			if ! "$(**:B:S:N=[-+]l$(L)|$(CC.PREFIX.ARCHIVE)$(L)$(CC.LIB.TYPE:?*($(CC.LIB.TYPE:/ /|/G))??)$(CC.SUFFIX.ARCHIVE))"
 				$(P)$(L) : .DONTCARE
 				R += $(P)$(L)
@@ -2410,7 +2474,7 @@ PACKAGES : .SPECIAL .FUNCTION
 				if N == "optimize"
 					if "$(PACKAGE_OPTIMIZE:N=space)"
 						N = dynamic
-						.PACKAGE.strip = $(CC.PACKAGE.STRIP)
+						.PACKAGE.strip = $(CC.LD.STRIP)
 					elif "$(PACKAGE_OPTIMIZE:N=time)"
 						N = static
 					else
@@ -2419,7 +2483,7 @@ PACKAGES : .SPECIAL .FUNCTION
 				elif N == "space"
 					if ! "$(PACKAGE_OPTIMIZE:N=time)"
 						N = dynamic
-						.PACKAGE.strip = $(CC.PACKAGE.STRIP)
+						.PACKAGE.strip = $(CC.LD.STRIP)
 					else
 						N =
 					end
@@ -3258,6 +3322,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			$(CC) $(CC.SHARED) -o $(<) $(*$(**):N!=*$(CC.SUFFIX.ARCHIVE))
 		.ATTRIBUTE.%.a : -ARCHIVE
 	end
+	COBOLFLAGS &= $$(.INCLUDE. cob -I) $$(&:T=D)
 	IFFEFLAGS += -c '$$(IFFECC) $$(IFFECCFLAGS) $$(IFFELDFLAGS)' $$(-mam:N=static*:??-S '$$(CC.STATIC)')
 	if "$(-cross)" || "$(CC.EXECTYPE)" && "$(CC.HOSTTYPE)" != "$(CC.EXECTYPE)"
 		set cross
@@ -3284,7 +3349,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		CCLDFLAGS &= $(T4:V)
 	end
 	if "$(CC.LD.STRIP:V)"
-		if "$(PACKAGE_OPTIMIZE:N=space)"
+		if "$(strip)" || "$(PACKAGE_OPTIMIZE:N=space)"
 			.PACKAGE.strip = $(CC.LD.STRIP)
 		end
 		CCLDFLAGS += $$(.PACKAGE.strip)
@@ -3873,16 +3938,17 @@ end
 	ASFLAGS = ${ASFLAGS}
 	print -um setv CC $(-mam:N=static*,port*:?$(cctype:O=1:B:S)?$(CC)?)
 	CC = ${CC}
-	.MAM.CCFLAGS := $(CCFLAGS:VP)
-	T := $(CCFLAGS:VP)
+	.MAM.CC.FLAGS := $(CCFLAGS:VP:N!=-O*|$(CC.OPTIMIZE)|$\(CC.OPTIMIZE\)|-g|$(CC.DEBUG)|$\(CC.DEBUG\))
+	print -um setv mam_cc_FLAGS $(.MAM.CC.FLAGS)
+	T := $(CCFLAGS:VP) ${strip?1?${mam_cc_LD_STRIP}??}
 	if "$(T:N=-O*|$(CC.OPTIMIZE))"
-		print -um setv CCFLAGS $(T:N!=-O*|$(CC.OPTIMIZE)) ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+		print -um setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 	elif "$(T:N=-g|$(CC.DEBUG))"
-		print -um setv CCFLAGS $(T:N!=-g|$(CC.DEBUG)) ${mam_cc_DEBUG}
+		print -um setv CCFLAGS ${mam_cc_DEBUG}
 	else
-		print -um setv CCFLAGS $(T) ${debug?1?${mam_cc_DEBUG}??}
+		print -um setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}
 	end
-	CCFLAGS = ${CCFLAGS}
+	CCFLAGS = ${mam_cc_FLAGS} ${CCFLAGS}
 	CC.NATIVE = ${CC}
 	CMP = cmp 2>/dev/null
 	print -um setv COTEMP $$

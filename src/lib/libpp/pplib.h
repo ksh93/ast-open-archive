@@ -99,9 +99,11 @@
 #define PROTO_USER		(1<<13)	/* first user flag		*/
 
 #define SEARCH_EXISTS		0	/* ppsearch for existence	*/
-#define SEARCH_IGNORE		(1<<0)	/* ignore if not found		*/
-#define SEARCH_INCLUDE		(1<<1)	/* ppsearch for include		*/
-#define SEARCH_USER		(1<<2)	/* first user flag		*/
+#define SEARCH_HOSTED		(1<<0)	/* search hosted dirs only	*/
+#define SEARCH_IGNORE		(1<<1)	/* ignore if not found		*/
+#define SEARCH_INCLUDE		(1<<2)	/* ppsearch for include		*/
+#define SEARCH_VENDOR		(1<<3)	/* search vendor dirs only	*/
+#define SEARCH_USER		(1<<4)	/* first user flag		*/
 
 #define STYLE_gnu		(1<<0)	/* gnu style args		*/
 
@@ -148,6 +150,7 @@ struct ppinstk				/* input stream stack frame	*/
 	int		buflen;		/* buffer count			*/
 #endif
 	int		line;		/* saved line number		*/
+	int		vendor;		/* saved pp.vendor		*/
 	short		fd;		/* file descriptor		*/
 	short		hide;		/* hide index (from pp.hide)	*/
 	short		flags;		/* IN_[a-z]* flags		*/
@@ -297,6 +300,8 @@ struct pptuple				/* tuple macro			*/
 	struct oplist*	chop;		/* include prefix chop list	*/ \
 	struct ppfile*	insert;		/* inserted line sync file	*/ \
 	struct ppfile*	original;	/* original include name	*/ \
+	struct ppdirs*	found;		/* last successful ppsearch dir	*/ \
+	int		vendor;		/* vendor includes only		*/ \
 	Hash_table_t*	dirtab;		/* directive hash table		*/ \
 	Hash_table_t*	strtab;		/* string hash table		*/ \
 	PPBUILTIN	builtin;	/* builtin macro handler	*/ \
@@ -333,7 +338,6 @@ struct pptuple				/* tuple macro			*/
 
 #define _PP_DIRS_PRIVATE_		/* ppdirs private additions	*/ \
 	unsigned char	c;		/* files here are C language	*/ \
-	unsigned char	hosted;		/* files found here are hosted	*/ \
 	unsigned char	index;		/* prefix,local,standard index	*/ \
 	unsigned char	type;		/* dir type			*/ \
 	union								   \
@@ -483,17 +487,23 @@ struct pptuple				/* tuple macro			*/
 #define INC_PREFIX	0
 #define INC_LOCAL	1
 #define INC_STANDARD	2
-#define INC_MAX		3
-#define INC_MAP		INC_PREFIX
+#define INC_VENDOR	3
+#define INC_MAX		4
 #define INC_SELF	(1<<(2*INC_MAX+0))
 #define INC_EXISTS	(1<<(2*INC_MAX+1))
 #define INC_LISTED	(1<<(2*INC_MAX+2))
-#define INC_MAPPED	(1<<(2*INC_MAX+3))
+#define INC_MAPALL	(1<<(2*INC_MAX+3))
+#define INC_MAPHOSTED	(1<<(2*INC_MAX+4))
+#define INC_MAPNOHOSTED	(1<<(2*INC_MAX+5))
+#define INC_MAPNOLOCAL	(1<<(2*INC_MAX+6))
 
 #define TYPE_ARCHIVE	(1<<0)
 #define TYPE_BUFFER	(1<<1)
 #define TYPE_CHECKPOINT	(1<<2)
 #define TYPE_DIRECTORY	(1<<3)
+#define TYPE_HOSTED	(1<<4)
+#define TYPE_INCLUDE	(1<<5)
+#define TYPE_VENDOR	(1<<6)
 
 #define PRAGMA_COMMAND	01		/* option had command prefix	*/
 #define PRAGMA_PP	02		/* pp command prefix		*/
@@ -526,7 +536,7 @@ struct pptuple				/* tuple macro			*/
 	} while (0)
 
 #define PUSH_BUFFER(f,p,n)		\
-	pppush(IN_BUFFER,f,p,n);
+	pppush(IN_BUFFER,f,p,n)
 
 #define PUSH_COPY(p,n)		\
 	do \
@@ -782,6 +792,7 @@ extern char*		ppinstr(struct ppinstk*);
 extern char*		ppkeyname(int, int);
 extern char*		pplexstr(int);
 extern void		ppload(char*);
+extern void		ppmapinclude(char*, char*);
 extern char*		ppmodestr(long);
 extern int		ppmultiple(struct ppfile*, struct ppsymbol*);
 extern void		ppnest(void);

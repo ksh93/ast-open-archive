@@ -96,6 +96,11 @@ MAIN()
 	if(!(f = sfopen(NIL(Sfio_t*),file,"w+")) )
 		terror("Opening temporary file %s\n", file);
 
+	/* open file for appending */
+	for(i = 0; i < N_PROC; ++i)
+		if(!(fa[i] = sfopen(NIL(Sfio_t*), file, "a")) )
+			terror("Open %s to append", file);
+
 	/* fork processes */
 	for(i = 0; i < N_PROC; ++i)
 	{
@@ -104,14 +109,12 @@ MAIN()
 #define RETURN(v)
 #else
 #define FORK()		fork()
-#define RETURN(v)	return(v)
+#define RETURN(v)	exit(v)
 #endif
 		if((pid = (int)FORK()) < 0 )
 			terror("Creating process %d\n", i);
 		else if(pid == 0)
-		{	/* create temp file and write to it */
-			if(!(fa[i] = sfopen(NIL(Sfio_t*), file, "a")) )
-				terror("Open %s to append", file);
+		{	/* write to file */
 			sfsetbuf(fa[i], (Void_t*)buf[i], sizeof(buf[i]));
 			sfset(fa[i], SF_WHOLE, 1);
 			Disc[i].writef = inspect;

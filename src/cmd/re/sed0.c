@@ -26,7 +26,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Labs Research) 2003-01-13 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Labs Research) 2003-05-29 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"
@@ -75,6 +75,8 @@ int qflag;		/* command q executed */
 int sflag;		/* substitution has occurred */
 int bflag;		/* strip leading blanks from c,a,i <text> */
 
+unsigned char*	map;	/* CC_NAT*IVE => CC_ASCII map */
+
 main(int argc, char **argv)
 {
 	int c;
@@ -83,6 +85,7 @@ main(int argc, char **argv)
 	error_info.id = "sed";
 	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
 		reflags = REG_LENIENT;
+	map = ccmap(CC_NATIVE, CC_ASCII);
 	while (c = optget(argv, usage))
 		switch (c)
 		{

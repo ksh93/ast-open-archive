@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: who (AT&T Labs Research) 2001-06-06 $\n]"
+"[-?\n@(#)$Id: who (AT&T Labs Research) 2003-06-10 $\n]"
 USAGE_LICENSE
 "[+NAME?who - display who is on the system]"
 "[+DESCRIPTION?\bwho\b displays various pieces of information about "
@@ -170,7 +170,8 @@ typedef struct
 static void outline(Sfio_t *out,register struct utmpx *up,register State_t* sp)
 {
 	struct stat statb;
-	char *date = ctime(&up->ut_time);
+	time_t t = up->ut_time;
+	char *date = ctime(&t);
 	char line[sizeof(up->ut_line)+6];
 	int r = 0;
 	if(sp->flags&(FLAG_T|FLAG_U))

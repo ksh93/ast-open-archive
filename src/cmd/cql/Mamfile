@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -43,9 +44,7 @@ make ../../../include/ast/wait.h implicit
 make ../../../include/ast/ast_wait.h implicit
 done ../../../include/ast/ast_wait.h dontcare
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -85,7 +84,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -102,6 +102,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -152,10 +157,7 @@ prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/tm.h
 prev ../../../include/ast/ls.h implicit
 make ../../../include/ast/expr.h implicit
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h dontcare
+prev ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/cdt.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/ast_std.h implicit
@@ -181,14 +183,14 @@ prev ../../../include/ast/ast.h implicit
 done cql.h
 done cql.c
 prev cql.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cql.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cql.c
 done cql.o generated
 make decl.o
 make decl.c
 prev cql.h implicit
 done decl.c
 prev decl.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c decl.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c decl.c
 done decl.o generated
 make expr.o
 make expr.c
@@ -199,14 +201,14 @@ done ../../../include/ast/regex.h
 prev cql.h implicit
 done expr.c
 prev expr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expr.c
 done expr.o generated
 make file.o
 make file.c
 prev cql.h implicit
 done file.c
 prev file.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c file.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c file.c
 done file.o generated
 make hix.o
 make hix.c
@@ -228,13 +230,14 @@ prev ../../../include/ast/sfio.h implicit
 done ../../../include/ast/sfio_t.h
 done hix.c
 prev hix.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c hix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c hix.c
 done hix.o generated
 bind -lcdb
 bind -ldll
 bind -lexpr
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o cql cql.o decl.o expr.o file.o hix.o ${mam_libcdb} ${mam_libdll} ${mam_libexpr} ${mam_libast}
+bind -lm dontcare
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o cql cql.o decl.o expr.o file.o hix.o ${mam_libcdb} ${mam_libdll} ${mam_libexpr} ${mam_libast} ${mam_libm}
 done cql generated
 make cdb
 make cdb.o
@@ -244,9 +247,9 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/cdb.h implicit
 done cdb.c
 prev cdb.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cdb.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cdb.c
 done cdb.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o cdb cdb.o ${mam_libcdb} ${mam_libdll} ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o cdb cdb.o ${mam_libcdb} ${mam_libdll} ${mam_libast} ${mam_libm}
 done cdb generated
 make ../../../bin
 exec - set -

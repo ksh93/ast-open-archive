@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS ${mam_cc_DLL}
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,8 +42,8 @@ make libbz.a archive
 make bz.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -52,8 +53,8 @@ exec - do	case $i in
 exec - 	"bz"|bz)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -135,42 +136,42 @@ prev ../../../include/ast/ast_std.h implicit
 done bzhdr.h
 done blocksort.c
 prev blocksort.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??} ${mam_cc_DLL}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
 done blocksort.o generated
 make huffman.o
 make huffman.c
 prev bzhdr.h implicit
 done huffman.c
 prev huffman.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c huffman.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c huffman.c
 done huffman.o generated
 make crctable.o
 make crctable.c
 prev bzhdr.h implicit
 done crctable.c
 prev crctable.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c crctable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c crctable.c
 done crctable.o generated
 make randtable.o
 make randtable.c
 prev bzhdr.h implicit
 done randtable.c
 prev randtable.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c randtable.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c randtable.c
 done randtable.o generated
 make compress.o
 make compress.c
 prev bzhdr.h implicit
 done compress.c
 prev compress.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c compress.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c compress.c
 done compress.o generated
 make decompress.o
 make decompress.c
 prev bzhdr.h implicit
 done decompress.c
 prev decompress.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c decompress.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c decompress.c
 done decompress.o generated
 make bzlib.o
 make bzlib.c
@@ -179,13 +180,17 @@ done io.h dontcare virtual
 prev bzhdr.h implicit
 done bzlib.c
 prev bzlib.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c bzlib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c bzlib.c
 done bzlib.o generated
 make sfdcbzip.o
 make sfdcbzip.c
 make sfdcbzip.h implicit
 make ../../../include/ast/sfdisc.h implicit
 make ../../../include/ast/ast.h implicit
+make ../../../include/ast/vmalloc.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
+done ../../../include/ast/vmalloc.h dontcare
 make ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
@@ -207,7 +212,7 @@ prev ../../../include/ast/sfio.h implicit
 done ../../../include/ast/sfio_t.h
 done sfdcbzip.c
 prev sfdcbzip.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c sfdcbzip.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c sfdcbzip.c
 done sfdcbzip.o generated
 exec - ${AR} cr libbz.a blocksort.o huffman.o crctable.o randtable.o compress.o decompress.o bzlib.o sfdcbzip.o
 exec - (ranlib libbz.a) >/dev/null 2>&1 || true

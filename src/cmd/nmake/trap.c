@@ -313,7 +313,7 @@ handle(void)
 					{
 						v = setvar(external.interrupt, s, 0);
 						maketop(r, P_dontcare|P_force|P_ignore|P_repeat|(r->property & P_make)?0:P_foreground, s);
-						w = (r->property & P_functional) ? getval(r->name, 1) : v->value;
+						w = (r->property & P_functional) ? getval(r->name, VAL_PRIMARY) : v->value;
 						if (r->status == EXISTS && (!(r->property & P_functional) || streq(w, s) || streq(w, "continue")))
 						{
 							message((-1, "trap %s handler %s status CONTINUE return %s", s, r->name, w));

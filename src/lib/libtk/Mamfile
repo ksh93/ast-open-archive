@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_tcl ${INSTALLROOT}
 setv PACKAGE_tcl_INCLUDE ${PACKAGE_tcl}/include/tcl
@@ -15,7 +15,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -47,8 +48,8 @@ make libtk.a archive
 make tk.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -58,8 +59,8 @@ exec - do	case $i in
 exec - 	"tk"|tk)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -96,8 +97,7 @@ done ../../../include/ast/ast_common.h dontcare
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/ast_common.h implicit
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
@@ -142,6 +142,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -175,7 +180,7 @@ prev generic/tk.h implicit
 done generic/tkInt.h
 done unix/tkUnixSelect.c
 prev unix/tkUnixSelect.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixSelect.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixSelect.c
 done tkUnixSelect.o generated
 make tkUnixInit.o
 make unix/tkUnixInit.c
@@ -185,7 +190,7 @@ prev generic/tkInt.h implicit
 prev ../../../include/ast/ast.h implicit
 done unix/tkUnixInit.c
 prev unix/tkUnixInit.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -DLIB_DIR=\""lib/tk4.2"\" -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixInit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -DLIB_DIR=\""lib/tk4.2"\" -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixInit.c
 done tkUnixInit.o generated
 make tkUnixEvent.o
 make unix/tkUnixEvent.c
@@ -193,21 +198,21 @@ prev unix/tkUnixInt.h implicit
 prev generic/tkInt.h implicit
 done unix/tkUnixEvent.c
 prev unix/tkUnixEvent.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixEvent.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixEvent.c
 done tkUnixEvent.o generated
 make tkUnixXId.o
 make unix/tkUnixXId.c
 prev generic/tkInt.h implicit
 done unix/tkUnixXId.c
 prev unix/tkUnixXId.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixXId.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixXId.c
 done tkUnixXId.o generated
 make tkUnixCursor.o
 make unix/tkUnixCursor.c
 prev generic/tkInt.h implicit
 done unix/tkUnixCursor.c
 prev unix/tkUnixCursor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixCursor.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixCursor.c
 done tkUnixCursor.o generated
 make tkUnixDialog.o
 make unix/tkUnixDialog.c
@@ -215,49 +220,49 @@ prev unix/tkUnixInt.h implicit
 prev generic/tkInt.h implicit
 done unix/tkUnixDialog.c
 prev unix/tkUnixDialog.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDialog.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDialog.c
 done tkUnixDialog.o generated
 make tkUnixDraw.o
 make unix/tkUnixDraw.c
 prev generic/tkInt.h implicit
 done unix/tkUnixDraw.c
 prev unix/tkUnixDraw.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDraw.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixDraw.c
 done tkUnixDraw.o generated
 make tkUnixWm.o
 make unix/tkUnixWm.c
 prev generic/tkInt.h implicit
 done unix/tkUnixWm.c
 prev unix/tkUnixWm.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixWm.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnixWm.c
 done tkUnixWm.o generated
 make tkUnix.o
 make unix/tkUnix.c
 prev generic/tkInt.h implicit
 done unix/tkUnix.c
 prev unix/tkUnix.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnix.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c unix/tkUnix.c
 done tkUnix.o generated
 make tk3d.o
 make generic/tk3d.c
 prev generic/tkInt.h implicit
 done generic/tk3d.c
 prev generic/tk3d.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tk3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tk3d.c
 done tk3d.o generated
 make tkArgv.o
 make generic/tkArgv.c
 prev generic/tkInt.h implicit
 done generic/tkArgv.c
 prev generic/tkArgv.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkArgv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkArgv.c
 done tkArgv.o generated
 make tkAtom.o
 make generic/tkAtom.c
 prev generic/tkInt.h implicit
 done generic/tkAtom.c
 prev generic/tkAtom.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkAtom.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkAtom.c
 done tkAtom.o generated
 make tkBind.o
 make generic/tkBind.c
@@ -266,7 +271,7 @@ done generic/tkNames.h dontcare
 prev generic/tkInt.h implicit
 done generic/tkBind.c
 prev generic/tkBind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBind.c
 done tkBind.o generated
 make tkBitmap.o
 make generic/tkBitmap.c
@@ -291,7 +296,7 @@ done bitmaps/error.bmp
 prev generic/tkInt.h implicit
 done generic/tkBitmap.c
 prev generic/tkBitmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Ibitmaps -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBitmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Ibitmaps -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkBitmap.c
 done tkBitmap.o generated
 make tkButton.o
 make generic/tkButton.c
@@ -306,14 +311,14 @@ done generic/tkDefault.h
 prev generic/tkInt.h implicit
 done generic/tkButton.c
 prev generic/tkButton.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkButton.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkButton.c
 done tkButton.o generated
 make tkCanvArc.o
 make generic/tkCanvArc.c
 prev generic/tkInt.h implicit
 done generic/tkCanvArc.c
 prev generic/tkCanvArc.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvArc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvArc.c
 done tkCanvArc.o generated
 make tkCanvBmap.o
 make generic/tkCanvBmap.c
@@ -323,7 +328,7 @@ done generic/tkCanvas.h
 prev generic/tkInt.h implicit
 done generic/tkCanvBmap.c
 prev generic/tkCanvBmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvBmap.c
 done tkCanvBmap.o generated
 make tkCanvImg.o
 make generic/tkCanvImg.c
@@ -331,21 +336,21 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvImg.c
 prev generic/tkCanvImg.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvImg.c
 done tkCanvImg.o generated
 make tkCanvLine.o
 make generic/tkCanvLine.c
 prev generic/tkInt.h implicit
 done generic/tkCanvLine.c
 prev generic/tkCanvLine.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvLine.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvLine.c
 done tkCanvLine.o generated
 make tkCanvPoly.o
 make generic/tkCanvPoly.c
 prev generic/tkInt.h implicit
 done generic/tkCanvPoly.c
 prev generic/tkCanvPoly.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvPoly.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCanvPoly.c
 done tkCanvPoly.o generated
 make tkCanvPs.o
 make generic/tkCanvPs.c
@@ -353,7 +358,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvPs.c
 prev generic/tkCanvPs.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvPs.c
 done tkCanvPs.o generated
 make tkCanvText.o
 make generic/tkCanvText.c
@@ -361,7 +366,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvText.c
 prev generic/tkCanvText.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvText.c
 done tkCanvText.o generated
 make tkCanvUtil.o
 make generic/tkCanvUtil.c
@@ -369,7 +374,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvUtil.c
 prev generic/tkCanvUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvUtil.c
 done tkCanvUtil.o generated
 make tkCanvWind.o
 make generic/tkCanvWind.c
@@ -377,7 +382,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvWind.c
 prev generic/tkCanvWind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvWind.c
 done tkCanvWind.o generated
 make tkCanvas.o
 make generic/tkCanvas.c
@@ -386,7 +391,7 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkCanvas.c
 prev generic/tkCanvas.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvas.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkCanvas.c
 done tkCanvas.o generated
 make tkClipboard.o
 make generic/tkClipboard.c
@@ -394,42 +399,42 @@ prev generic/tkSelect.h implicit
 prev generic/tkInt.h implicit
 done generic/tkClipboard.c
 prev generic/tkClipboard.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkClipboard.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkClipboard.c
 done tkClipboard.o generated
 make tkCmds.o
 make generic/tkCmds.c
 prev generic/tkInt.h implicit
 done generic/tkCmds.c
 prev generic/tkCmds.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCmds.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCmds.c
 done tkCmds.o generated
 make tkColor.o
 make generic/tkColor.c
 prev generic/tkInt.h implicit
 done generic/tkColor.c
 prev generic/tkColor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkColor.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkColor.c
 done tkColor.o generated
 make tkConfig.o
 make generic/tkConfig.c
 prev generic/tkInt.h implicit
 done generic/tkConfig.c
 prev generic/tkConfig.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConfig.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConfig.c
 done tkConfig.o generated
 make tkConsole.o
 make generic/tkConsole.c
 prev generic/tkInt.h implicit
 done generic/tkConsole.c
 prev generic/tkConsole.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConsole.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkConsole.c
 done tkConsole.o generated
 make tkCursor.o
 make generic/tkCursor.c
 prev generic/tkInt.h implicit
 done generic/tkCursor.c
 prev generic/tkCursor.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCursor.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkCursor.c
 done tkCursor.o generated
 make tkEntry.o
 make generic/tkEntry.c
@@ -437,14 +442,14 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkEntry.c
 prev generic/tkEntry.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEntry.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEntry.c
 done tkEntry.o generated
 make tkError.o
 make generic/tkError.c
 prev generic/tkInt.h implicit
 done generic/tkError.c
 prev generic/tkError.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkError.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkError.c
 done tkError.o generated
 make tkEvent.o
 make generic/tkEvent.c
@@ -452,7 +457,7 @@ prev generic/tkPort.h implicit
 prev generic/tkInt.h implicit
 done generic/tkEvent.c
 prev generic/tkEvent.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEvent.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkEvent.c
 done tkEvent.o generated
 make tkFileFilter.o
 make generic/tkFileFilter.c
@@ -463,21 +468,21 @@ done generic/tkFileFilter.h
 prev generic/tkInt.h implicit
 done generic/tkFileFilter.c
 prev generic/tkFileFilter.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFileFilter.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFileFilter.c
 done tkFileFilter.o generated
 make tkFocus.o
 make generic/tkFocus.c
 prev generic/tkInt.h implicit
 done generic/tkFocus.c
 prev generic/tkFocus.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFocus.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFocus.c
 done tkFocus.o generated
 make tkFont.o
 make generic/tkFont.c
 prev generic/tkInt.h implicit
 done generic/tkFont.c
 prev generic/tkFont.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFont.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFont.c
 done tkFont.o generated
 make tkFrame.o
 make generic/tkFrame.c
@@ -485,77 +490,77 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkFrame.c
 prev generic/tkFrame.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFrame.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkFrame.c
 done tkFrame.o generated
 make tkGC.o
 make generic/tkGC.c
 prev generic/tkInt.h implicit
 done generic/tkGC.c
 prev generic/tkGC.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGC.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGC.c
 done tkGC.o generated
 make tkGeometry.o
 make generic/tkGeometry.c
 prev generic/tkInt.h implicit
 done generic/tkGeometry.c
 prev generic/tkGeometry.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGeometry.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGeometry.c
 done tkGeometry.o generated
 make tkGet.o
 make generic/tkGet.c
 prev generic/tkInt.h implicit
 done generic/tkGet.c
 prev generic/tkGet.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGet.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGet.c
 done tkGet.o generated
 make tkGrab.o
 make generic/tkGrab.c
 prev generic/tkInt.h implicit
 done generic/tkGrab.c
 prev generic/tkGrab.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrab.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrab.c
 done tkGrab.o generated
 make tkGrid.o
 make generic/tkGrid.c
 prev generic/tkInt.h implicit
 done generic/tkGrid.c
 prev generic/tkGrid.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrid.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkGrid.c
 done tkGrid.o generated
 make tkImage.o
 make generic/tkImage.c
 prev generic/tkInt.h implicit
 done generic/tkImage.c
 prev generic/tkImage.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImage.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImage.c
 done tkImage.o generated
 make tkImgBmap.o
 make generic/tkImgBmap.c
 prev generic/tkInt.h implicit
 done generic/tkImgBmap.c
 prev generic/tkImgBmap.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgBmap.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgBmap.c
 done tkImgBmap.o generated
 make tkImgGIF.o
 make generic/tkImgGIF.c
 prev generic/tkInt.h implicit
 done generic/tkImgGIF.c
 prev generic/tkImgGIF.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgGIF.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgGIF.c
 done tkImgGIF.o generated
 make tkImgPPM.o
 make generic/tkImgPPM.c
 prev generic/tkInt.h implicit
 done generic/tkImgPPM.c
 prev generic/tkImgPPM.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPPM.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPPM.c
 done tkImgPPM.o generated
 make tkImgPhoto.o
 make generic/tkImgPhoto.c
 prev generic/tkInt.h implicit
 done generic/tkImgPhoto.c
 prev generic/tkImgPhoto.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPhoto.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgPhoto.c
 done tkImgPhoto.o generated
 make tkImgUtil.o
 make generic/tkImgUtil.c
@@ -564,7 +569,7 @@ done xlib/xbytes.h
 prev generic/tkInt.h implicit
 done generic/tkImgUtil.c
 prev generic/tkImgUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Ixlib -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgUtil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Ixlib -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkImgUtil.c
 done tkImgUtil.o generated
 make tkListbox.o
 make generic/tkListbox.c
@@ -572,7 +577,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkListbox.c
 prev generic/tkListbox.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkListbox.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkListbox.c
 done tkListbox.o generated
 make tkMenu.o
 make generic/tkMenu.c
@@ -582,7 +587,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMenu.c
 prev generic/tkMenu.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenu.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenu.c
 done tkMenu.o generated
 make tkMenubutton.o
 make generic/tkMenubutton.c
@@ -590,7 +595,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMenubutton.c
 prev generic/tkMenubutton.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenubutton.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMenubutton.c
 done tkMenubutton.o generated
 make tkMessage.o
 make generic/tkMessage.c
@@ -598,35 +603,35 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkMessage.c
 prev generic/tkMessage.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMessage.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkMessage.c
 done tkMessage.o generated
 make tkOption.o
 make generic/tkOption.c
 prev generic/tkInt.h implicit
 done generic/tkOption.c
 prev generic/tkOption.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkOption.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkOption.c
 done tkOption.o generated
 make tkPack.o
 make generic/tkPack.c
 prev generic/tkInt.h implicit
 done generic/tkPack.c
 prev generic/tkPack.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPack.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPack.c
 done tkPack.o generated
 make tkPlace.o
 make generic/tkPlace.c
 prev generic/tkInt.h implicit
 done generic/tkPlace.c
 prev generic/tkPlace.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPlace.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkPlace.c
 done tkPlace.o generated
 make tkRectOval.o
 make generic/tkRectOval.c
 prev generic/tkInt.h implicit
 done generic/tkRectOval.c
 prev generic/tkRectOval.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkRectOval.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkRectOval.c
 done tkRectOval.o generated
 make tkScale.o
 make generic/tkScale.c
@@ -634,7 +639,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkScale.c
 prev generic/tkScale.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScale.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScale.c
 done tkScale.o generated
 make tkScrollbar.o
 make generic/tkScrollbar.c
@@ -642,7 +647,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkScrollbar.c
 prev generic/tkScrollbar.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScrollbar.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkScrollbar.c
 done tkScrollbar.o generated
 make tkSelect.o
 make generic/tkSelect.c
@@ -650,21 +655,21 @@ prev generic/tkSelect.h implicit
 prev generic/tkInt.h implicit
 done generic/tkSelect.c
 prev generic/tkSelect.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSelect.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSelect.c
 done tkSelect.o generated
 make tkSend.o
 make generic/tkSend.c
 prev generic/tkInt.h implicit
 done generic/tkSend.c
 prev generic/tkSend.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSend.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSend.c
 done tkSend.o generated
 make tkSquare.o
 make generic/tkSquare.c
 prev generic/tkInt.h implicit
 done generic/tkSquare.c
 prev generic/tkSquare.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSquare.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkSquare.c
 done tkSquare.o generated
 make tkTest.o
 make generic/tkTest.c
@@ -673,7 +678,7 @@ done tkWinInt.h dontcare virtual
 prev generic/tkInt.h implicit
 done generic/tkTest.c
 prev generic/tkTest.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkTest.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkTest.c
 done tkTest.o generated
 make tkText.o
 make generic/tkText.c
@@ -684,7 +689,7 @@ prev generic/tkDefault.h implicit
 prev generic/tkInt.h implicit
 done generic/tkText.c
 prev generic/tkText.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkText.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkText.c
 done tkText.o generated
 make tkTextBTree.o
 make generic/tkTextBTree.c
@@ -692,7 +697,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextBTree.c
 prev generic/tkTextBTree.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextBTree.c
 done tkTextBTree.o generated
 make tkTextDisp.o
 make generic/tkTextDisp.c
@@ -700,7 +705,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextDisp.c
 prev generic/tkTextDisp.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextDisp.c
 done tkTextDisp.o generated
 make tkTextIndex.o
 make generic/tkTextIndex.c
@@ -709,7 +714,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextIndex.c
 prev generic/tkTextIndex.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextIndex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextIndex.c
 done tkTextIndex.o generated
 make tkTextMark.o
 make generic/tkTextMark.c
@@ -717,7 +722,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextMark.c
 prev generic/tkTextMark.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextMark.c
 done tkTextMark.o generated
 make tkTextTag.o
 make generic/tkTextTag.c
@@ -726,7 +731,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextTag.c
 prev generic/tkTextTag.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextTag.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -Iunix -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextTag.c
 done tkTextTag.o generated
 make tkTextWind.o
 make generic/tkTextWind.c
@@ -734,7 +739,7 @@ prev generic/tkText.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTextWind.c
 prev generic/tkTextWind.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTextWind.c
 done tkTextWind.o generated
 make tkTrig.o
 make generic/tkTrig.c
@@ -742,28 +747,28 @@ prev generic/tkCanvas.h implicit
 prev generic/tkInt.h implicit
 done generic/tkTrig.c
 prev generic/tkTrig.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_BLD_tk -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -c generic/tkTrig.c
 done tkTrig.o generated
 make tkUtil.o
 make generic/tkUtil.c
 prev generic/tkInt.h implicit
 done generic/tkUtil.c
 prev generic/tkUtil.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkUtil.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkUtil.c
 done tkUtil.o generated
 make tkVisual.o
 make generic/tkVisual.c
 prev generic/tkInt.h implicit
 done generic/tkVisual.c
 prev generic/tkVisual.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkVisual.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkVisual.c
 done tkVisual.o generated
 make tkWindow.o
 make generic/tkWindow.c
 prev generic/tkInt.h implicit
 done generic/tkWindow.c
 prev generic/tkWindow.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkWindow.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DHAVE_UNISTD_H -DHAVE_LIMITS_H -D_BLD_tk -c generic/tkWindow.c
 done tkWindow.o generated
 make tkMain.o
 make generic/tkMain.c
@@ -773,7 +778,7 @@ prev generic/tk.h implicit
 prev ../../../include/tcl/tcl.h implicit
 done generic/tkMain.c
 prev generic/tkMain.c
-exec - ${CC} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tk -c generic/tkMain.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -Igeneric -I${PACKAGE_tcl_INCLUDE} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_tk -c generic/tkMain.c
 done tkMain.o generated
 exec - ${AR} cr libtk.a tkUnixSelect.o tkUnixInit.o tkUnixEvent.o tkUnixXId.o tkUnixCursor.o tkUnixDialog.o tkUnixDraw.o tkUnixWm.o tkUnix.o tk3d.o tkArgv.o tkAtom.o tkBind.o tkBitmap.o tkButton.o tkCanvArc.o tkCanvBmap.o tkCanvImg.o tkCanvLine.o tkCanvPoly.o tkCanvPs.o tkCanvText.o tkCanvUtil.o tkCanvWind.o tkCanvas.o tkClipboard.o tkCmds.o tkColor.o tkConfig.o tkConsole.o
 exec - ${AR} cr libtk.a tkCursor.o tkEntry.o tkError.o tkEvent.o tkFileFilter.o tkFocus.o tkFont.o tkFrame.o tkGC.o tkGeometry.o tkGet.o tkGrab.o tkGrid.o tkImage.o tkImgBmap.o tkImgGIF.o tkImgPPM.o tkImgPhoto.o tkImgUtil.o tkListbox.o tkMenu.o tkMenubutton.o tkMessage.o tkOption.o tkPack.o tkPlace.o tkRectOval.o tkScale.o tkScrollbar.o tkSelect.o tkSend.o tkSquare.o tkTest.o tkText.o tkTextBTree.o tkTextDisp.o tkTextIndex.o tkTextMark.o tkTextTag.o tkTextWind.o tkTrig.o tkUtil.o tkVisual.o tkWindow.o tkMain.o

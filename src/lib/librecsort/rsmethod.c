@@ -43,8 +43,7 @@ Rsmethod_t*	meth;
 	if(!meth)
 		return old;
 
-	if(rs->disc->eventf &&
-	   (*rs->disc->eventf)(rs,RS_METHOD,(Void_t*)meth,rs->disc) < 0)
+	if (RSNOTIFY(rs,RS_METHOD,meth,rs->disc) < 0)
 		return NIL(Rsmethod_t*);
 
 	if(meth->size <= 0)

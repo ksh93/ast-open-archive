@@ -320,3 +320,75 @@ strtoul  "123.456" "" 123456 OK
 strtoll  "123.456" "" 123456 OK
 strtonll "123.456" "" 123456 OK 0
 strtoull "123.456" "" 123456 OK'
+
+TEST 04 'malformations'
+	EXEC - + 0x -0x +0x 11# -11# +11# 11#A 11#B
+		OUTPUT - $'strtol   "-" "-" 0 OK
+strton   "-" "-" 0 OK 10
+strtoul  "-" "-" 0 OK
+strtoll  "-" "-" 0 OK
+strtonll "-" "-" 0 OK 10
+strtoull "-" "-" 0 OK
+
+strtol   "+" "+" 0 OK
+strton   "+" "+" 0 OK 10
+strtoul  "+" "+" 0 OK
+strtoll  "+" "+" 0 OK
+strtonll "+" "+" 0 OK 10
+strtoull "+" "+" 0 OK
+
+strtol   "0x" "x" 0 OK
+strton   "0x" "x" 0 OK 10
+strtoul  "0x" "x" 0 OK
+strtoll  "0x" "x" 0 OK
+strtonll "0x" "x" 0 OK 10
+strtoull "0x" "x" 0 OK
+
+strtol   "-0x" "x" 0 OK
+strton   "-0x" "x" 0 OK 10
+strtoul  "-0x" "x" 0 OK
+strtoll  "-0x" "x" 0 OK
+strtonll "-0x" "x" 0 OK 10
+strtoull "-0x" "x" 0 OK
+
+strtol   "+0x" "x" 0 OK
+strton   "+0x" "x" 0 OK 10
+strtoul  "+0x" "x" 0 OK
+strtoll  "+0x" "x" 0 OK
+strtonll "+0x" "x" 0 OK 10
+strtoull "+0x" "x" 0 OK
+
+strtol   "11#" "#" 0 OK
+strton   "11#" "#" 0 OK 10
+strtoul  "11#" "#" 0 OK
+strtoll  "11#" "#" 0 OK
+strtonll "11#" "#" 0 OK 10
+strtoull "11#" "#" 0 OK
+
+strtol   "-11#" "#" 0 OK
+strton   "-11#" "#" 0 OK 10
+strtoul  "-11#" "#" 0 OK
+strtoll  "-11#" "#" 0 OK
+strtonll "-11#" "#" 0 OK 10
+strtoull "-11#" "#" 0 OK
+
+strtol   "+11#" "#" 0 OK
+strton   "+11#" "#" 0 OK 10
+strtoul  "+11#" "#" 0 OK
+strtoll  "+11#" "#" 0 OK
+strtonll "+11#" "#" 0 OK 10
+strtoull "+11#" "#" 0 OK
+
+strtol   "11#A" "" 10 OK
+strton   "11#A" "" 10 OK 11
+strtoul  "11#A" "" 10 OK
+strtoll  "11#A" "" 10 OK
+strtonll "11#A" "" 10 OK 11
+strtoull "11#A" "" 10 OK
+
+strtol   "11#B" "#B" 0 OK
+strton   "11#B" "#B" 0 OK 10
+strtoul  "11#B" "#B" 0 OK
+strtoll  "11#B" "#B" 0 OK
+strtonll "11#B" "#B" 0 OK 10
+strtoull "11#B" "#B" 0 OK'

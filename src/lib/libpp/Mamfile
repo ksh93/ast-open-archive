@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -40,9 +41,7 @@ make ppsym
 make ppsym.o
 make ppsym.c
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -82,7 +81,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -99,6 +99,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -109,18 +114,19 @@ done ../../../include/ast/ast.h
 done ppsym.c
 prev ppsym.c
 setv _BLD_pp -U_BLD_pp
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsym.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsym.c
 done ppsym.o generated
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ppsym ppsym.o ${mam_libast} ${mam_libast}
+bind -lm dontcare
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ppsym ppsym.o ${mam_libast} ${mam_libm}
 done ppsym generated
 make pp
 make libpp.a archive
 make pp.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -130,8 +136,8 @@ exec - do	case $i in
 exec - 	"pp"|pp)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -147,10 +153,7 @@ done pp.req generated
 make ppargs.o
 make ppargs.c
 make pplib.h implicit
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h dontcare
+prev ../../../include/ast/vmalloc.h implicit
 make ppkey.h implicit
 done ppkey.h dontcare
 make ppdef.h implicit
@@ -225,7 +228,7 @@ prev ../../../include/ast/ast.h implicit
 done pplib.h
 done ppargs.c
 prev ppargs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpp]"\" -c ppargs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpp]"\" -c ppargs.c
 done ppargs.o generated
 make ppbuiltin.o
 make ppbuiltin.c
@@ -242,28 +245,28 @@ done ../../../include/ast/times.h
 prev pplib.h implicit
 done ppbuiltin.c
 prev ppbuiltin.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppbuiltin.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppbuiltin.c
 done ppbuiltin.o generated
 make ppcall.o
 make ppcall.c
 prev pplib.h implicit
 done ppcall.c
 prev ppcall.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcall.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcall.c
 done ppcall.o generated
 make ppcomment.o
 make ppcomment.c
 prev pplib.h implicit
 done ppcomment.c
 prev ppcomment.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcomment.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcomment.c
 done ppcomment.o generated
 make ppcontext.o
 make ppcontext.c
 prev pplib.h implicit
 done ppcontext.c
 prev ppcontext.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcontext.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcontext.c
 done ppcontext.o generated
 make ppcontrol.o
 make ppcontrol.c
@@ -274,7 +277,7 @@ done ../../../include/ast/regex.h
 prev pplib.h implicit
 done ppcontrol.c
 prev ppcontrol.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcontrol.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcontrol.c
 done ppcontrol.o generated
 make ppcpp.o
 make ppcpp.c
@@ -292,21 +295,21 @@ prev pplib.h implicit
 done pplex.c
 done ppcpp.c
 prev ppcpp.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcpp.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcpp.c
 done ppcpp.o generated
 make ppdata.o
 make ppdata.c
 prev pplib.h implicit
 done ppdata.c
 prev ppdata.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppdata.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppdata.c
 done ppdata.o generated
 make pperror.o
 make pperror.c
 prev pplib.h implicit
 done pperror.c
 prev pperror.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pperror.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pperror.c
 done pperror.o generated
 make ppexpr.o
 make ppexpr.c
@@ -314,7 +317,7 @@ prev ../../../include/ast/regex.h implicit
 prev pplib.h implicit
 done ppexpr.c
 prev ppexpr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppexpr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppexpr.c
 done ppexpr.o generated
 make ppfsm.o
 make ppfsm.c
@@ -322,14 +325,14 @@ prev ppfsm.h implicit
 prev pplib.h implicit
 done ppfsm.c
 prev ppfsm.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppfsm.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppfsm.c
 done ppfsm.o generated
 make ppincref.o
 make ppincref.c
 prev pplib.h implicit
 done ppincref.c
 prev ppincref.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppincref.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppincref.c
 done ppincref.o generated
 make ppinput.o
 make ppinput.c
@@ -340,7 +343,7 @@ prev ../../../include/ast/sfstr.h implicit
 prev pplib.h implicit
 done ppinput.c
 prev ppinput.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppinput.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppinput.c
 done ppinput.o generated
 make ppkey.o
 make ppkey.c
@@ -348,33 +351,33 @@ prev ppkey.h implicit
 prev pplib.h implicit
 done ppkey.c
 prev ppkey.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppkey.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppkey.c
 done ppkey.o generated
 make pplex.o
 prev pplex.c
 prev pplex.c
-exec - ${CC} ${debug?1?${mam_cc_DEBUG}??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pplex.c
+exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pplex.c
 done pplex.o generated
 make ppline.o
 make ppline.c
 prev pplib.h implicit
 done ppline.c
 prev ppline.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppline.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppline.c
 done ppline.o generated
 make ppmacref.o
 make ppmacref.c
 prev pplib.h implicit
 done ppmacref.c
 prev ppmacref.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppmacref.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppmacref.c
 done ppmacref.o generated
 make ppmisc.o
 make ppmisc.c
 prev pplib.h implicit
 done ppmisc.c
 prev ppmisc.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppmisc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppmisc.c
 done ppmisc.o generated
 make ppop.o
 make ppop.c
@@ -390,21 +393,21 @@ done pptab.h generated
 prev pplib.h implicit
 done ppop.c
 prev ppop.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppop.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppop.c
 done ppop.o generated
 make pppragma.o
 make pppragma.c
 prev pplib.h implicit
 done pppragma.c
 prev pppragma.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pppragma.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pppragma.c
 done pppragma.o generated
 make ppprintf.o
 make ppprintf.c
 prev pplib.h implicit
 done ppprintf.c
 prev ppprintf.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppprintf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppprintf.c
 done ppprintf.o generated
 make ppproto.o
 make ppproto.c
@@ -419,7 +422,7 @@ prev pplib.h implicit
 prev ppfsm.c implicit
 done ppproto.c
 prev ppproto.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppproto.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppproto.c
 done ppproto.o generated
 make ppsearch.o
 make ppsearch.c
@@ -430,7 +433,7 @@ done ../../../include/ast/vdb.h dontcare
 prev pplib.h implicit
 done ppsearch.c
 prev ppsearch.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsearch.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsearch.c
 done ppsearch.o generated
 make pptrace.o
 make pptrace.c
@@ -533,7 +536,7 @@ prev ppfsm.h implicit
 prev pplib.h implicit
 done pptrace.c
 prev pptrace.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pptrace.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pptrace.c
 done pptrace.o generated
 exec - ${AR} cr libpp.a ppargs.o ppbuiltin.o ppcall.o ppcomment.o ppcontext.o ppcontrol.o ppcpp.o ppdata.o pperror.o ppexpr.o ppfsm.o ppincref.o ppinput.o ppkey.o pplex.o ppline.o ppmacref.o ppmisc.o ppop.o pppragma.o ppprintf.o ppproto.o ppsearch.o pptrace.o
 exec - (ranlib libpp.a) >/dev/null 2>&1 || true

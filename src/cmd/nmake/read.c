@@ -167,7 +167,7 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 						op = sfstropen();
 						np = sfstropen();
 						edit(op, state.rules, DELETE, KEEP, DELETE);
-						edit(np, b = getval(external.rules, 1), DELETE, KEEP, DELETE);
+						edit(np, b = getval(external.rules, VAL_PRIMARY), DELETE, KEEP, DELETE);
 						if (strcmp(sfstruse(op), sfstruse(np)))
 						{
 							message((-2, "%s: base rules changed to %s", state.rules, b));
@@ -217,7 +217,7 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 		 */
 
 		s = 0;
-		if (*(t = getval(external.convert, 1)))
+		if (*(t = getval(external.convert, VAL_PRIMARY)))
 		{
 			if (e = strchr(r->name, '/'))
 				e++;
@@ -332,7 +332,7 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 				*(b + n) = c;
 			}
 			if (!state.rules)
-				state.rules = getval(external.rules, 1);
+				state.rules = getval(external.rules, VAL_PRIMARY);
 			readrules();
 			r = getrule(name);
 		}

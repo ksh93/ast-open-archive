@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS ${mam_cc_DLL}
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,8 +42,8 @@ make lib3d.a archive
 make 3d.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -52,8 +53,8 @@ exec - do	case $i in
 exec - 	"3d"|3d)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -77,7 +78,7 @@ make FEATURE/syslib implicit
 make features/syslib
 done features/syslib
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/syslib
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/syslib
 done FEATURE/syslib dontcare generated
 make FEATURE/syscall implicit
 make features/syscall.sh
@@ -85,7 +86,7 @@ make sys.tab implicit
 done sys.tab
 done features/syscall.sh
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/syscall.sh sys.tab
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/syscall.sh sys.tab
 done FEATURE/syscall dontcare generated
 make FEATURE/peek implicit
 make features/peek.c
@@ -107,13 +108,11 @@ make ../../../include/ast/ast_lib.h implicit
 done ../../../include/ast/ast_lib.h
 done features/peek.c
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_BLD_ast ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/peek.c
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_BLD_ast ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run features/peek.c
 done FEATURE/peek dontcare generated
 make ../../lib/libcs/msg.h implicit
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -141,7 +140,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -157,6 +157,11 @@ prev ../../../include/ast/ast_lib.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -216,35 +221,35 @@ prev ../../../include/ast/ast_std.h implicit
 done 3d.h
 done init.c
 prev init.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DIDNAME=\""3d"\" -DVCS -DFS -DDEBUG -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c init.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DIDNAME=\""3d"\" -DVCS -DFS -DDEBUG -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c init.c
 done init.o generated
 make bio.o
 make bio.c
 prev 3d.h implicit
 done bio.c
 prev bio.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c bio.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c bio.c
 done bio.o generated
 make copy.o
 make copy.c
 prev 3d.h implicit
 done copy.c
 prev copy.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c copy.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c copy.c
 done copy.o generated
 make error.o
 make error.c
 prev 3d.h implicit
 done error.c
 prev error.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -DVCS -DFS -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c error.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG -DVCS -DFS -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c error.c
 done error.o generated
 make execv.o
 make execv.c
 prev 3d.h implicit
 done execv.c
 prev execv.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c execv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c execv.c
 done execv.o generated
 make fs.o
 make fs.c
@@ -264,7 +269,7 @@ done ../../../include/ast/cs.h dontcare
 prev 3d.h implicit
 done fs.c
 prev fs.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -D_BLD_dll -c fs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -D_BLD_dll -c fs.c
 done fs.o generated
 make lib.o
 make lib.c
@@ -272,35 +277,35 @@ prev ../../../include/ast/cs.h implicit
 prev 3d.h implicit
 done lib.c
 prev lib.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -DVCS -D_BLD_dll -c lib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -DVCS -D_BLD_dll -c lib.c
 done lib.o generated
 make map.o
 make map.c
 prev 3d.h implicit
 done map.c
 prev map.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG_TABLE=0 -DPATHCHECK=\""3d"\" -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c map.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DDEBUG_TABLE=0 -DPATHCHECK=\""3d"\" -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c map.c
 done map.o generated
 make pathcanon.o
 make pathcanon.c
 prev 3d.h implicit
 done pathcanon.c
 prev pathcanon.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pathcanon.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pathcanon.c
 done pathcanon.o generated
 make pathnext.o
 make pathnext.c
 prev 3d.h implicit
 done pathnext.c
 prev pathnext.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pathnext.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pathnext.c
 done pathnext.o generated
 make pathreal.o
 make pathreal.c
 prev 3d.h implicit
 done pathreal.c
 prev pathreal.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c pathreal.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -DDEBUG -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c pathreal.c
 done pathreal.o generated
 make peek.o
 make peek.c
@@ -308,7 +313,7 @@ prev ../../../include/ast/cs.h implicit
 prev 3d.h implicit
 done peek.c
 prev peek.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -D_BLD_dll -c peek.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -D_BLD_dll -c peek.c
 done peek.o generated
 make ast.o
 make ast.c
@@ -319,7 +324,7 @@ make FEATURE/hack implicit
 make ../../lib/libast/features/hack
 done ../../lib/libast/features/hack
 prev 3d.req
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run ../../lib/libast/features/hack
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include : run ../../lib/libast/features/hack
 done FEATURE/hack generated
 prev ../../../include/ast/ls.h implicit
 prev ../../../include/ast/ast.h implicit
@@ -456,7 +461,7 @@ done ../../lib/libast/misc/state.c
 prev 3d.h implicit
 done ast.c
 prev ast.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/port -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DFS -D_BLD_3d -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libast/comp -I../../lib/libast/dir -I../../lib/libast/hash -I../../lib/libast/misc -I../../lib/libast/path -I../../lib/libast/port -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DFS -D_BLD_3d -DVCS -D_BLD_cs -D_BLD_dll -c ast.c
 done ast.o generated
 make cs.o
 make cs.c
@@ -549,7 +554,7 @@ done ../../lib/libcs/csdata.c dontcare
 prev 3d.h implicit
 done cs.c
 prev cs.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_BLD_3d -D_PACKAGE_ast -D_BLD_cs -DFS -DVCS -D_BLD_dll -c cs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_BLD_3d -D_PACKAGE_ast -D_BLD_cs -DFS -DVCS -D_BLD_dll -c cs.c
 done cs.o generated
 make license.o
 make license.c
@@ -557,35 +562,35 @@ prev ../../lib/libast/string/tokscan.c implicit
 prev 3d.h implicit
 done license.c
 prev license.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -D_BLD_cs -D_BLD_dll -c license.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libast/string -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DVCS -DFS -D_BLD_cs -D_BLD_dll -c license.c
 done license.o generated
 make vcs.o
 make vcs.c
 prev 3d.h implicit
 done vcs.c
 prev vcs.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c vcs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c vcs.c
 done vcs.o generated
 make access3d.o
 make access3d.c
 prev 3d.h implicit
 done access3d.c
 prev access3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c access3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c access3d.c
 done access3d.o generated
 make brk3d.o
 make brk3d.c
 prev 3d.h implicit
 done brk3d.c
 prev brk3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c brk3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c brk3d.c
 done brk3d.o generated
 make chdir3d.o
 make chdir3d.c
 prev 3d.h implicit
 done chdir3d.c
 prev chdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c chdir3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c chdir3d.c
 done chdir3d.o generated
 make chmod3d.o
 make chmod3d.c
@@ -593,28 +598,28 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done chmod3d.c
 prev chmod3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c chmod3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c chmod3d.c
 done chmod3d.o generated
 make chown3d.o
 make chown3d.c
 prev 3d.h implicit
 done chown3d.c
 prev chown3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c chown3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c chown3d.c
 done chown3d.o generated
 make close3d.o
 make close3d.c
 prev 3d.h implicit
 done close3d.c
 prev close3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c close3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c close3d.c
 done close3d.o generated
 make creat3d.o
 make creat3d.c
 prev 3d.h implicit
 done creat3d.c
 prev creat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c creat3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c creat3d.c
 done creat3d.o generated
 make dir3d.o
 make dir3d.c
@@ -642,63 +647,63 @@ done dir_3d.h
 prev ../../../include/ast/ast_std.h implicit
 done dir3d.c
 prev dir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_3d -DDEBUG -D_BLD_ast -D_PACKAGE_ast -DVCS -DFS -D_BLD_cs -D_BLD_dll -c dir3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_3d -DDEBUG -D_BLD_ast -D_PACKAGE_ast -DVCS -DFS -D_BLD_cs -D_BLD_dll -c dir3d.c
 done dir3d.o generated
 make dup23d.o
 make dup23d.c
 prev 3d.h implicit
 done dup23d.c
 prev dup23d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c dup23d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c dup23d.c
 done dup23d.o generated
 make dup3d.o
 make dup3d.c
 prev 3d.h implicit
 done dup3d.c
 prev dup3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c dup3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c dup3d.c
 done dup3d.o generated
 make execve3d.o
 make execve3d.c
 prev 3d.h implicit
 done execve3d.c
 prev execve3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c execve3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c execve3d.c
 done execve3d.o generated
 make exit3d.o
 make exit3d.c
 prev 3d.h implicit
 done exit3d.c
 prev exit3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c exit3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c exit3d.c
 done exit3d.o generated
 make fchdir3d.o
 make fchdir3d.c
 prev 3d.h implicit
 done fchdir3d.c
 prev fchdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fchdir3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fchdir3d.c
 done fchdir3d.o generated
 make fchmod3d.o
 make fchmod3d.c
 prev 3d.h implicit
 done fchmod3d.c
 prev fchmod3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fchmod3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fchmod3d.c
 done fchmod3d.o generated
 make fchown3d.o
 make fchown3d.c
 prev 3d.h implicit
 done fchown3d.c
 prev fchown3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fchown3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fchown3d.c
 done fchown3d.o generated
 make fcntl3d.o
 make fcntl3d.c
 prev 3d.h implicit
 done fcntl3d.c
 prev fcntl3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fcntl3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fcntl3d.c
 done fcntl3d.o generated
 make fork3d.o
 make fork3d.c
@@ -706,14 +711,14 @@ prev ../../../include/ast/cs.h implicit
 prev 3d.h implicit
 done fork3d.c
 prev fork3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -D_BLD_dll -c fork3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -DFS -DVCS -D_BLD_dll -c fork3d.c
 done fork3d.o generated
 make fpathconf3d.o
 make fpathconf3d.c
 prev 3d.h implicit
 done fpathconf3d.c
 prev fpathconf3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fpathconf3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fpathconf3d.c
 done fpathconf3d.o generated
 make fstat3d.o
 make fstat3d.c
@@ -721,7 +726,7 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done fstat3d.c
 prev fstat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fstat3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fstat3d.c
 done fstat3d.o generated
 make fstatfs3d.o
 make fstatfs3d.c
@@ -730,49 +735,49 @@ prev ../../lib/libcs/cs_lib.h implicit
 prev 3d.h implicit
 done fstatfs3d.c
 prev fstatfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -DVCS -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c fstatfs3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -DVCS -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c fstatfs3d.c
 done fstatfs3d.o generated
 make fstatvfs3d.o
 make fstatvfs3d.c
 prev 3d.h implicit
 done fstatvfs3d.c
 prev fstatvfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fstatvfs3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fstatvfs3d.c
 done fstatvfs3d.o generated
 make fsync3d.o
 make fsync3d.c
 prev 3d.h implicit
 done fsync3d.c
 prev fsync3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fsync3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c fsync3d.c
 done fsync3d.o generated
 make ftruncate3d.o
 make ftruncate3d.c
 prev 3d.h implicit
 done ftruncate3d.c
 prev ftruncate3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c ftruncate3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c ftruncate3d.c
 done ftruncate3d.o generated
 make getdents3d.o
 make getdents3d.c
 prev 3d.h implicit
 done getdents3d.c
 prev getdents3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c getdents3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c getdents3d.c
 done getdents3d.o generated
 make kill3d.o
 make kill3d.c
 prev 3d.h implicit
 done kill3d.c
 prev kill3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c kill3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c kill3d.c
 done kill3d.o generated
 make link3d.o
 make link3d.c
 prev 3d.h implicit
 done link3d.c
 prev link3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c link3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c link3d.c
 done link3d.o generated
 make lseek3d.o
 make lseek3d.c
@@ -780,14 +785,14 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done lseek3d.c
 prev lseek3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c lseek3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c lseek3d.c
 done lseek3d.o generated
 make lstat3d.o
 make lstat3d.c
 prev 3d.h implicit
 done lstat3d.c
 prev lstat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c lstat3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c lstat3d.c
 done lstat3d.o generated
 make mkdir3d.o
 make mkdir3d.c
@@ -795,7 +800,7 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done mkdir3d.c
 prev mkdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c mkdir3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c mkdir3d.c
 done mkdir3d.o generated
 make mknod3d.o
 make mknod3d.c
@@ -803,56 +808,56 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done mknod3d.c
 prev mknod3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c mknod3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c mknod3d.c
 done mknod3d.o generated
 make mount3d.o
 make mount3d.c
 prev 3d.h implicit
 done mount3d.c
 prev mount3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c mount3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c mount3d.c
 done mount3d.o generated
 make open3d.o
 make open3d.c
 prev 3d.h implicit
 done open3d.c
 prev open3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c open3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DVCS -DFS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c open3d.c
 done open3d.o generated
 make pathconf3d.o
 make pathconf3d.c
 prev 3d.h implicit
 done pathconf3d.c
 prev pathconf3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pathconf3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pathconf3d.c
 done pathconf3d.o generated
 make pipe3d.o
 make pipe3d.c
 prev 3d.h implicit
 done pipe3d.c
 prev pipe3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pipe3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c pipe3d.c
 done pipe3d.o generated
 make read3d.o
 make read3d.c
 prev 3d.h implicit
 done read3d.c
 prev read3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c read3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c read3d.c
 done read3d.o generated
 make readlink3d.o
 make readlink3d.c
 prev 3d.h implicit
 done readlink3d.c
 prev readlink3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c readlink3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c readlink3d.c
 done readlink3d.o generated
 make rename3d.o
 make rename3d.c
 prev 3d.h implicit
 done rename3d.c
 prev rename3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c rename3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c rename3d.c
 done rename3d.o generated
 make rmdir3d.o
 make rmdir3d.c
@@ -860,21 +865,21 @@ prev dir_3d.h implicit
 prev 3d.h implicit
 done rmdir3d.c
 prev rmdir3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -D_BLD_ast -DDEBUG -D_BLD_3d -D_PACKAGE_ast -DVCS -D_BLD_cs -D_BLD_dll -c rmdir3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -D_BLD_ast -DDEBUG -D_BLD_3d -D_PACKAGE_ast -DVCS -D_BLD_cs -D_BLD_dll -c rmdir3d.c
 done rmdir3d.o generated
 make sbrk3d.o
 make sbrk3d.c
 prev 3d.h implicit
 done sbrk3d.c
 prev sbrk3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c sbrk3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c sbrk3d.c
 done sbrk3d.o generated
 make stat3d.o
 make stat3d.c
 prev 3d.h implicit
 done stat3d.c
 prev stat3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c stat3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c stat3d.c
 done stat3d.o generated
 make statfs3d.o
 make statfs3d.c
@@ -883,21 +888,21 @@ prev ../../lib/libcs/cs_lib.h implicit
 prev 3d.h implicit
 done statfs3d.c
 prev statfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -DVCS -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c statfs3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DDEBUG -DVCS -D_BLD_cs -D_BLD_ast -D_PACKAGE_ast -D_BLD_dll -c statfs3d.c
 done statfs3d.o generated
 make statvfs3d.o
 make statvfs3d.c
 prev 3d.h implicit
 done statvfs3d.c
 prev statvfs3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c statvfs3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c statvfs3d.c
 done statvfs3d.o generated
 make symlink3d.o
 make symlink3d.c
 prev 3d.h implicit
 done symlink3d.c
 prev symlink3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c symlink3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c symlink3d.c
 done symlink3d.o generated
 make syscall3d.o
 make syscall3d.c
@@ -905,28 +910,28 @@ prev dir_3d.h implicit
 prev 3d.h implicit
 done syscall3d.c
 prev syscall3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_BLD_3d -D_PACKAGE_ast -DVCS -DFS -D_BLD_cs -D_BLD_dll -c syscall3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -D_BLD_ast -DDEBUG -D_BLD_3d -D_PACKAGE_ast -DVCS -DFS -D_BLD_cs -D_BLD_dll -c syscall3d.c
 done syscall3d.o generated
 make sysent3d.o
 make sysent3d.c
 prev FEATURE/syscall implicit
 done sysent3d.c
 prev sysent3d.c
-exec - ${CC} ${CCFLAGS}  -I.  -c sysent3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I.  -c sysent3d.c
 done sysent3d.o generated
 make truncate3d.o
 make truncate3d.c
 prev 3d.h implicit
 done truncate3d.c
 prev truncate3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c truncate3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c truncate3d.c
 done truncate3d.o generated
 make unlink3d.o
 make unlink3d.c
 prev 3d.h implicit
 done unlink3d.c
 prev unlink3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c unlink3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c unlink3d.c
 done unlink3d.o generated
 make utime3d.o
 make utime3d.c
@@ -934,42 +939,42 @@ prev FEATURE/syscall implicit
 prev 3d.h implicit
 done utime3d.c
 prev utime3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c utime3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c utime3d.c
 done utime3d.o generated
 make utimes3d.o
 make utimes3d.c
 prev 3d.h implicit
 done utimes3d.c
 prev utimes3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c utimes3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c utimes3d.c
 done utimes3d.o generated
 make vfork3d.o
 make vfork3d.c
 prev ../../../include/ast/ast_lib.h implicit
 done vfork3d.c
 prev vfork3d.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  -c vfork3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  -c vfork3d.c
 done vfork3d.o generated
 make write3d.o
 make write3d.c
 prev 3d.h implicit
 done write3d.c
 prev write3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c write3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c write3d.c
 done write3d.o generated
 make acl3d.o
 make acl3d.c
 prev 3d.h implicit
 done acl3d.c
 prev acl3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c acl3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c acl3d.c
 done acl3d.o generated
 make facl3d.o
 make facl3d.c
 prev 3d.h implicit
 done facl3d.c
 prev facl3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c facl3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libcs -I${PACKAGE_ast_INCLUDE} -DFS -DVCS -D_BLD_cs -D_BLD_ast -DDEBUG -D_PACKAGE_ast -D_BLD_dll -c facl3d.c
 done facl3d.o generated
 make dll3d.o
 make dll3d.c
@@ -994,7 +999,7 @@ prev dll_3d.h implicit
 prev ../../../include/ast/ast_std.h implicit
 done dll3d.c
 prev dll3d.c
-exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libdll -I${PACKAGE_ast_INCLUDE} -D_BLD_dll -D_BLD_ast -DDEBUG -D_PACKAGE_ast -c dll3d.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I../../lib/libdll -I${PACKAGE_ast_INCLUDE} -D_BLD_dll -D_BLD_ast -DDEBUG -D_PACKAGE_ast -c dll3d.c
 done dll3d.o generated
 exec - ${AR} cr lib3d.a init.o bio.o copy.o error.o execv.o fs.o lib.o map.o pathcanon.o pathnext.o pathreal.o peek.o ast.o cs.o license.o vcs.o access3d.o brk3d.o chdir3d.o chmod3d.o chown3d.o close3d.o creat3d.o dir3d.o dup23d.o dup3d.o execve3d.o exit3d.o fchdir3d.o fchmod3d.o
 exec - ${AR} cr lib3d.a fchown3d.o fcntl3d.o fork3d.o fpathconf3d.o fstat3d.o fstatfs3d.o fstatvfs3d.o fsync3d.o ftruncate3d.o getdents3d.o kill3d.o link3d.o lseek3d.o lstat3d.o mkdir3d.o mknod3d.o mount3d.o open3d.o pathconf3d.o pipe3d.o read3d.o readlink3d.o rename3d.o rmdir3d.o sbrk3d.o stat3d.o statfs3d.o statvfs3d.o symlink3d.o syscall3d.o sysent3d.o truncate3d.o unlink3d.o utime3d.o utimes3d.o vfork3d.o write3d.o acl3d.o facl3d.o dll3d.o
@@ -1020,7 +1025,7 @@ exec - 		i=`(read x; echo $x) < 3d.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1
+exec - 		echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"' IDNAME='\""3d"\"' VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK='\""3d"\"' _BLD_3d=1
 exec - 		cat 3d.sh
 exec - 		} > 3d
 exec - 		;;
@@ -1030,7 +1035,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 385 in
 exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" IDNAME=\""3d"\" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK=\""3d"\" _BLD_3d=1 ;;
+exec - 	*)	echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"' IDNAME='\""3d"\"' VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK='\""3d"\"' _BLD_3d=1 ;;
 exec - 	esac
 exec - 	cat 3d.sh
 exec - 	} > 3d

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS  ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS 
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -69,8 +70,7 @@ make system.h implicit
 make ../../../include/ast/error.h implicit
 make ../../../include/ast/option.h implicit
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/ast_common.h implicit
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
@@ -112,6 +112,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -138,14 +143,15 @@ make config.h implicit
 make config.iffe
 done config.iffe
 bind -last
-exec - iffe -o config.h -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run config.iffe
+bind -lm dontcare
+exec - iffe -o config.h -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} : run config.iffe
 prev ../../../include/ast/ast_std.h implicit
 done config.h generated
 done system.h
 done diff.h
 done diff.c
 prev diff.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2003 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2003 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
 done diff.o generated
 make analyze.o
 make analyze.c
@@ -154,49 +160,49 @@ done cmpbuf.h
 prev diff.h implicit
 done analyze.c
 prev analyze.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c analyze.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c analyze.c
 done analyze.o generated
 make dir.o
 make dir.c
 prev diff.h implicit
 done dir.c
 prev dir.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c dir.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c dir.c
 done dir.o generated
 make io.o
 make io.c
 prev diff.h implicit
 done io.c
 prev io.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c io.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c io.c
 done io.o generated
 make util.o
 make util.c
 prev diff.h implicit
 done util.c
 prev util.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
 done util.o generated
 make context.o
 make context.c
 prev diff.h implicit
 done context.c
 prev context.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c context.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c context.c
 done context.o generated
 make ed.o
 make ed.c
 prev diff.h implicit
 done ed.c
 prev ed.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ed.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ed.c
 done ed.o generated
 make ifdef.o
 make ifdef.c
 prev diff.h implicit
 done ifdef.c
 prev ifdef.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ifdef.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ifdef.c
 done ifdef.o generated
 make cmpbuf.o
 make cmpbuf.c
@@ -204,23 +210,23 @@ prev cmpbuf.h implicit
 prev system.h implicit
 done cmpbuf.c
 prev cmpbuf.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmpbuf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmpbuf.c
 done cmpbuf.o generated
 make normal.o
 make normal.c
 prev diff.h implicit
 done normal.c
 prev normal.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c normal.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c normal.c
 done normal.o generated
 make side.o
 make side.c
 prev diff.h implicit
 done side.c
 prev side.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c side.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c side.c
 done side.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast} ${mam_libm}
 done diff generated
 make diff3
 make diff3.o
@@ -231,10 +237,10 @@ prev system.h implicit
 done diff3.c
 prev diff3.c
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2003 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2003 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
 done diff3.o generated
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o diff3 diff3.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o diff3 diff3.o ${mam_libast} ${mam_libm}
 done diff3 generated
 make sdiff
 make sdiff.o
@@ -245,10 +251,10 @@ prev system.h implicit
 done sdiff.c
 prev sdiff.c
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1992-2003 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1992-2003 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
 done sdiff.o generated
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sdiff sdiff.o ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o sdiff sdiff.o ${mam_libast} ${mam_libm}
 done sdiff generated
 make ../../../bin
 exec - set -

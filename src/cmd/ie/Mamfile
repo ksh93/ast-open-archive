@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-04-15
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-06-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,8 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS ${mam_cc_DLL} ${debug?1?${mam_cc_DEBUG}?${mam_cc_OPTIMIZE}?}
+setv mam_cc_FLAGS ${mam_cc_DLL}
+setv CCFLAGS ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -41,8 +42,8 @@ make libedit.a archive
 make edit.req
 exec - set -
 exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
+exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
 exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
@@ -52,8 +53,8 @@ exec - do	case $i in
 exec - 	"edit"|edit)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
 exec - 				;;
@@ -100,7 +101,8 @@ done features/ielib
 prev edit.req
 bind -ldll
 bind -last
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/ielib
+bind -lm dontcare
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libm} ${mam_libast} ${mam_libm} : run features/ielib
 done FEATURE/ielib dontcare generated
 make FEATURE/options implicit
 make features/options.sh
@@ -108,15 +110,13 @@ make OPTIONS implicit
 done OPTIONS
 done features/options.sh
 prev edit.req
-exec - iffe -v -c '${CC} ${CCFLAGS}   -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/options.sh OPTIONS
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libm} ${mam_libast} ${mam_libm} : run features/options.sh OPTIONS
 done FEATURE/options dontcare generated
 done sh_config.h
 make ../../../include/ast/error.h implicit
 make ../../../include/ast/option.h implicit
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/sfio.h implicit
-make ../../../include/ast/sfio_s.h implicit
-done ../../../include/ast/sfio_s.h dontcare
+make ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
@@ -142,7 +142,8 @@ done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 prev ../../../include/ast/ast_getopt.h implicit
-prev ../../../include/ast/sfio_s.h implicit
+make ../../../include/ast/sfio_s.h implicit
+done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
@@ -159,6 +160,11 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/sfio_s.h implicit
+prev ../../../include/ast/ast_common.h implicit
+prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/sfio.h dontcare
 prev ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_version.h implicit
@@ -175,7 +181,7 @@ prev ../../../include/ast/ast.h implicit
 done io.h
 done editlib.c
 prev editlib.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DLDYNAMIC -DESH -DVSH -D_PACKAGE_ast -c editlib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DLDYNAMIC -DESH -DVSH -D_PACKAGE_ast -c editlib.c
 done editlib.o generated
 make vi.o
 make vi.c
@@ -187,7 +193,7 @@ make defs.h implicit
 done defs.h dontcare virtual
 done vi.c
 prev vi.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c vi.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c vi.c
 done vi.o generated
 make emacs.o
 make emacs.c
@@ -197,7 +203,7 @@ prev io.h implicit
 prev defs.h implicit
 done emacs.c
 prev emacs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c emacs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c emacs.c
 done emacs.o generated
 make history.o
 make history.c
@@ -209,7 +215,7 @@ done builtins.h dontcare virtual
 prev defs.h implicit
 done history.c
 prev history.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DVSH -DESH -D_PACKAGE_ast -c history.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DVSH -DESH -D_PACKAGE_ast -c history.c
 done history.o generated
 make edit.o
 make edit.c
@@ -224,7 +230,7 @@ prev terminal.h implicit
 prev defs.h implicit
 done edit.c
 prev edit.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c edit.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH -D_PACKAGE_ast -c edit.c
 done edit.o generated
 exec - ${AR} cr libedit.a editlib.o vi.o emacs.o history.o edit.o
 exec - (ranlib libedit.a) >/dev/null 2>&1 || true
@@ -252,7 +258,7 @@ exec - 		i=`(read x; echo $x) < ie.sh`
 exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"
+exec - 		echo USAGE_LICENSE='\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"'
 exec - 		cat ie.sh
 exec - 		} > ie
 exec - 		;;
@@ -262,7 +268,7 @@ exec - *)	{
 exec - 	echo '${mam_cc_SHELLMAGIC}'
 exec - 	case 187 in
 exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\" ;;
+exec - 	*)	echo USAGE_LICENSE='\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' ;;
 exec - 	esac
 exec - 	cat ie.sh
 exec - 	} > ie

@@ -2,6 +2,9 @@
  * win32 specific makerules
  */
 
+.INSTALL.libast.a = .
+.INSTALL.libast-g.a = .
+
 RC = rc
 RCFLAGS = -x
 

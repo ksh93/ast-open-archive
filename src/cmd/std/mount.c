@@ -106,6 +106,13 @@ USAGE_LICENSE
 "[+SEE ALSO?\bdf\b(1), \bmount\b(1), \bumount\b(2), \bfstab\b(4)]"
 ;
 
+#if defined(__STDPP__directive) && defined(__STDPP__hide)
+__STDPP__directive pragma pp:hide umount unmount
+#else
+#define umount		______umount
+#define unmount		______unmount
+#endif
+
 #include <ast.h>
 #include <error.h>
 #include <cdt.h>
@@ -118,13 +125,7 @@ USAGE_LICENSE
 #include "FEATURE/unmount"
 
 #if _sys_mount
-#if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide mount umount unmount
-#else
 #define mount		______mount
-#define umount		______umount
-#define unmount		______unmount
-#endif
 #if __bsdi__ || __bsdi || bsdi
 #include <sys/param.h>
 #endif
@@ -132,13 +133,14 @@ __STDPP__directive pragma pp:hide mount umount unmount
 #define NGROUPS	NGROUPS_MAX
 #endif
 #include <sys/mount.h>
-#if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide mount umount unmount
-#else
 #undef	mount
+#endif
+
+#if defined(__STDPP__directive) && defined(__STDPP__hide)
+__STDPP__directive pragma pp:nohide umount unmount
+#else
 #undef	umount
 #undef	unmount
-#endif
 #endif
 
 extern int	mount(const char*, const char*, int, const char*, const char*, int);

@@ -48,6 +48,8 @@
 
 #define ANY			'\t'	/* 0 or more internal code	*/
 #define ARG			'\n'	/* grab arg internal code	*/
+#define DIG			'\b'	/* 0 or more digit internal code*/
+#define NAM			'\v'	/* 0 or more var internal code	*/
 #define REP			'\r'	/* repeat group internal code	*/
 #define SPC			' '	/* 0 or more space internal code*/
 
@@ -209,6 +211,8 @@ scanbranch(scanstate* u, struct action* action, struct action* first, struct act
 				}
 				switch (*u++ = a->pattern[i++])
 				{
+				case DIG:
+				case NAM:
 				case REP:
 				case SPC:
 					*u++ = 1;
@@ -542,12 +546,23 @@ scancompile(struct rule* r, int flags)
 				{
 					if (!(t = *s++))
 						break;
+					switch (t)
+					{
+					case 'D':
+						t = DIG;
+						break;
+					case 'V':
+						t = NAM;
+						break;
+					}
+					if (n > a->pattern && *(n - 1) == t)
+						continue;
 				}
 				else if (isspace(t))
 				{
-					if (n > a->pattern && *(n - 1) == SPC)
-						continue;
 					t = SPC;
+					if (n > a->pattern && *(n - 1) == t)
+						continue;
 				}
 				else if (t == '%')
 				{
@@ -1189,6 +1204,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 	int			iflev;
 	int			h;
 	int			t;
+	int			typ;
 	struct frame		frame;
 	struct rule*		u;
 	struct var*		v;
@@ -1260,12 +1276,13 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 			for (;;)
 			{
 				/*UNDENT*/
-	if (*s == SPC)
+	if (*s == DIG || *s == SPC || *s == NAM && istype(c, C_VARIABLE1))
 	{
+		typ = *s;
 		h = g == b + 1;
 		for (;;)
 		{
-			if (isspace(c))
+			if (typ == SPC ? isspace(c) : typ == DIG ? isdigit(c) : istype(c, C_VARIABLE1|C_VARIABLE2))
 			{
 				if (m)
 				{
@@ -1295,14 +1312,6 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
 					goto done;
 				g[c] = 0;
-			}
-			else if (ss->type[c] & (t = (m ? (QUOTE_blank|QUOTE_comment|QUOTE_quote) : QUOTE_comment)))
-			{
-				if ((x = scanquote(fd, buf, &b, g, ss->quote, t)) == g)
-					break;
-				g = x;
-				if (ss->type[c] & QUOTE_comment)
-					h = 1;
 			}
 			else if (!m)
 				break;
