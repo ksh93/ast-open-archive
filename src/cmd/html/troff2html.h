@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2002 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -249,6 +249,8 @@ typedef struct State_s
 	Sfio_t*		tmp;		/* temporary buffer		*/
 
 	unsigned char*	in;		/* input buffer pointer		*/
+
+	unsigned char	ta[ARGS];	/* .ta stops			*/
 
 	Pushin_t	in_stack[STKS];	/* input stream stack		*/
 	Pushin_t*	in_top;		/* input stream stack top	*/

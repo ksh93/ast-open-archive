@@ -1477,9 +1477,11 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 	struct rule*		x;
 	int			c;
 	int			i;
+	int			chop;
 	int			root;
 	struct stat		st;
 	long			pos;
+	Sfio_t*			tmp;
 
 	n = islower(*op) ? toupper(*op) : *op;
 	if (r = getrule(s))
@@ -1619,6 +1621,28 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 				sfputc(xp, '/');
 			}
 			sfputr(xp, s, -1);
+		}
+		return;
+	case 'F':
+		sep = 0;
+		if (!r)
+			r = makerule(s);
+		r = bind(r);
+		if (!(chop = streq(r->name, ".")))
+			sfputr(xp, r->name, -1);
+		if (!(r->dynamic & D_regular))
+		{
+			tmp = sfstropen();
+			if (chop)
+				sfprintf(tmp, "**");
+			else
+				sfprintf(tmp, "%s/**", s);
+			for (p = globv(sfstruse(tmp)); *p; p++)
+			{
+				sfputc(xp, ' ');
+				sfputr(xp, *p, -1);
+			}
+			sfstrclose(tmp);
 		}
 		return;
 	case 'G':
@@ -3023,6 +3047,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 	int			cnt;
 	int			cntlim;
 	int			ctx;
+	int			expall;
 	int			n;
 	int			m;
 	int			sep;
@@ -3266,16 +3291,12 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 #endif
 			op = *ed++;
 		}
-		if (all && (!strchr("ABCDFGMNPQSTY/?", op) || op == 'O' && (!*ed || *ed == del)))
-		{
-			expandall(xp, exp < 0 ? 0 : all);
-			all = 0;
-		}
 
 		/*
 		 * check for tokenization
 		 */
 
+		expall = op == 'O' && (!*ed || *ed == del);
 		if (op == '@')
 		{
 			tokenize = 0;
@@ -3501,6 +3522,18 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		case 'S':
 			suf = val;
 			goto parts;
+		case 'E':
+		case 'H':
+		case 'I':
+		case 'J':
+		case 'K':
+		case 'L':
+		case 'R':
+		case 'U':
+		case 'W':
+		case 'X':
+			tokenize = 0;
+			break;
 		}
 		qual = 0;
 
@@ -3508,6 +3541,11 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		 * validate the operator and apply non-tokenizing operators
 		 */
 
+		if (all && (expall || !tokenize))
+		{
+			expandall(xp, exp < 0 ? 0 : all);
+			all = 0;
+		}
 		if (!all)
 		{
 			if (xp)
@@ -3515,9 +3553,11 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				sfputc(xp, 0);
 				x = sfstrset(xp, beg);
 			}
-			else x = v;
+			else
+				x = v;
 			out = !out;
-			if (!(xp = buf[out])) xp = buf[out] = sfstropen();
+			if (!(xp = buf[out]))
+				xp = buf[out] = sfstropen();
 			beg = top[out];
 		}
 		ctx = !!state.context;
@@ -4015,6 +4055,7 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 	int		exp;
 	int		op;
 	int		aux;
+	int		ign;
 	long		pos;
 	Edit_map_t*	map;
 	Sfio_t*		cvt = 0;
@@ -4077,15 +4118,24 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 				break;
 			else
 			{
-				for (exp = 0;; ed++)
+				exp = ign = 0;
+				for (;;)
 				{
-					switch (*(ed + 1))
+					switch (*++ed)
 					{
+					case 0:
+						break;
 					case 'A':
 						aux |= VAL_AUXILIARY;
 						continue;
+					case 'B':
+						aux |= VAL_BRACE;
+						continue;
 					case 'F':
 						aux |= VAL_FILE;
+						continue;
+					case 'I':
+						ign = 1;
 						continue;
 					case 'P':
 						aux |= VAL_PRIMARY;
@@ -4093,13 +4143,18 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 					case 'U':
 						aux |= VAL_UNBOUND;
 						continue;
+					default:
+						if (*ed == del)
+						{
+							ed++;
+							break;
+						}
+						if (!ign)
+							error(1, "edit operator `%c' operand `%c' ignored", op, *ed);
+						continue;
 					}
 					break;
 				}
-				t = ++ed;
-				while (*ed && *ed++ != del);
-				if ((ed - t) > 1)
-					error(1, "edit operator `%c' value `%-.*s' invalid", op, ed - t - (*(ed - 1) == del), t);
 			}
 		}
 	}
@@ -4224,6 +4279,7 @@ expand(register Sfio_t* xp, register char* a)
 {
 	register int	c;
 	register char*	s;
+	int		alt;
 	int		del;
 	int		p;
 	int		q;
@@ -4247,7 +4303,8 @@ expand(register Sfio_t* xp, register char* a)
 	a = s;
 	while (*a)
 	{
-		if (*a != '$') sfputc(xp, *a++);
+		if (*a != '$')
+			sfputc(xp, *a++);
 		else if (*++a == '(')
 		{
 			if (isspace(*++a))
@@ -4261,33 +4318,38 @@ expand(register Sfio_t* xp, register char* a)
 				var = sfstrtell(xp);
 				ed = 0;
 				nvars = 1;
+				alt = '|';
 				del = ':';
 				q = 0;
 				p = 1;
 				while (c = *a++)
 				{
-					if (c == '"') q = !q;
-					else if (q) /* quoted */;
-					else if (c == '(') p++;
+					if (c == '"')
+						q = !q;
+					else if (q)
+						/* quoted */;
+					else if (c == '(')
+						p++;
 					else if (c == ')')
 					{
-						if (!--p) break;
+						if (!--p)
+							break;
 					}
 					else if (!ed && p == 1)
 					{
-						if (c == '|')
+						if (c == alt)
 						{
 							c = 0;
 							nvars++;
 						}
 						else if (c == del)
 						{
-							c = 0;
+							alt = c = 0;
 							ed = sfstrtell(xp);
 						}
 						else if (c == '`')
 						{
-							c = 0;
+							alt = c = 0;
 							ed = sfstrtell(xp);
 							if (!(del = *a++))
 							{
@@ -4297,7 +4359,7 @@ expand(register Sfio_t* xp, register char* a)
 						}
 						else if (isspace(c))
 						{
-							while (isspace(*a)) a++;
+							for (alt = 0; isspace(*a); a++);
 							if (*a == del || *a == '`')
 								continue;
 						}
@@ -4317,10 +4379,13 @@ expand(register Sfio_t* xp, register char* a)
 		else if (*a == '$')
 		{
 			for (s = a; *s == '$'; s++);
-			if (*s != '(') sfputc(xp, '$');
-			while (a < s) sfputc(xp, *a++);
+			if (*s != '(')
+				sfputc(xp, '$');
+			while (a < s)
+				sfputc(xp, *a++);
 		}
-		else sfputc(xp, '$');
+		else
+			sfputc(xp, '$');
 	}
 	if (val)
 	{

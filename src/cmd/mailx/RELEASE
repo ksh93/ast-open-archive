@@ -1,3 +1,4 @@
+04-04-15 spam.c: add spamtest mask names, fix spam() ordering
 04-03-25 mailx.h: shquote=>shellquote to avoid netbsd clash in <stdlib.h>!!
 04-03-17 spam.c: fix usermatch() loop
 04-01-28 data.c: k,K are now autoprint (like d)

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-03-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -486,4 +486,53 @@ prev sfio/sftest.h implicit
 done sfio/twrrd.c
 exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tshare.c sfio/tsize.c sfio/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}
 done test.sfio virtual
+make test.vmalloc
+make vmalloc/testvmalloc
+done vmalloc/testvmalloc
+make vmalloc/vmtest.h
+done vmalloc/vmtest.h
+make vmalloc/talign.c
+prev vmalloc/vmtest.h implicit
+prev sfio/terror.h implicit
+make ../../lib/libast/vmalloc/vmhdr.h implicit
+prev ../../../include/ast/vmalloc.h implicit
+make FEATURE/vmalloc implicit
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def vmalloc
+done FEATURE/vmalloc dontcare generated
+prev ../../lib/libast/ast_common.h implicit
+prev ../../../include/ast/ast.h implicit
+done ../../lib/libast/vmalloc/vmhdr.h
+done vmalloc/talign.c
+make vmalloc/tcompact.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tcompact.c
+make vmalloc/tlast.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tlast.c
+make vmalloc/tmalloc.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tmalloc.c
+make vmalloc/tmrandom.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tmrandom.c
+make vmalloc/tpool.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tpool.c
+make vmalloc/trandom.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/trandom.c
+make vmalloc/tresize.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tresize.c
+make vmalloc/tsmall.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tsmall.c
+make vmalloc/tstat.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/tstat.c
+make vmalloc/twalk.c
+prev vmalloc/vmtest.h implicit
+done vmalloc/twalk.c
+exec - 	set +x; vmalloc/testvmalloc  vmalloc/vmtest.h ${mam_libast} vmalloc/talign.c vmalloc/tcompact.c vmalloc/tlast.c vmalloc/tmalloc.c vmalloc/tmrandom.c vmalloc/tpool.c vmalloc/trandom.c vmalloc/tresize.c vmalloc/tsmall.c vmalloc/tstat.c vmalloc/twalk.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -Isfio -Ivmalloc -I../../lib/libast -I../../lib/libast/vmalloc -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}
+done test.vmalloc virtual
 done test dontcare virtual

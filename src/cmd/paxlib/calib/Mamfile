@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-03-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -39,10 +39,7 @@ make calib
 make libpaxcalib.a archive
 make calib.o
 make calib.c
-make ../../../../include/ast/tm.h implicit
-make ../../../../include/ast/times.h implicit
-make ../../../../include/ast/ast_time.h implicit
-done ../../../../include/ast/ast_time.h dontcare
+make camap.c implicit
 make ../../../../include/ast/ast.h implicit
 make ../../../../include/ast/vmalloc.h implicit
 make ../../../../include/ast/ast_common.h implicit
@@ -111,7 +108,13 @@ make ../../../../include/ast/ast_version.h implicit
 prev ../../../../include/ast/prototyped.h implicit
 done ../../../../include/ast/ast_version.h dontcare
 prev ../../../../include/ast/prototyped.h implicit
-done ../../../../include/ast/ast.h dontcare
+done ../../../../include/ast/ast.h
+done camap.c
+make ../../../../include/ast/tm.h implicit
+make ../../../../include/ast/times.h implicit
+make ../../../../include/ast/ast_time.h implicit
+done ../../../../include/ast/ast_time.h dontcare
+prev ../../../../include/ast/ast.h implicit
 prev ../../../../include/ast/prototyped.h implicit
 done ../../../../include/ast/times.h dontcare
 prev ../../../../include/ast/ast.h implicit
@@ -153,7 +156,7 @@ prev ../../../../include/ast/prototyped.h implicit
 done ../../../../include/ast/paxlib.h
 done calib.c
 prev calib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c calib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c calib.c
 done calib.o generated
 exec - ${AR} cr libpaxcalib.a calib.o
 exec - (ranlib libpaxcalib.a) >/dev/null 2>&1 || true

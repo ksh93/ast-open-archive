@@ -6,6 +6,8 @@ end
 
 CCFLAGS = $(CC.OPTIMIZE)
 
+LICENSE = since=1996,author=dgk+jlk
+
 tksh :: tksh.1 uinit.c tkMain.c
 
 :: PROMO.mm README RELEASE

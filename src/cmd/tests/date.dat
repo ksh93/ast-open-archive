@@ -64,6 +64,49 @@ midnight 96060				NULL	Thu Feb 29 00:00:00 EST 1996
 107_seconds_ago				NULL	Mon Sep 22 12:18:00 EDT 1986
 
 #
+# we can't forget the amazing dr ek
+#
+
+monday					NULL	Mon Sep 22 12:19:47 EDT 1986
+wednesday				NULL	Wed Sep 24 12:19:47 EDT 1986
+sunday					NULL	Sun Sep 28 12:19:47 EDT 1986
+this monday				NULL	Mon Sep 22 00:00:00 EDT 1986
+this wednesday				NULL	Wed Sep 24 00:00:00 EDT 1986
+this sunday				NULL	Sun Sep 28 00:00:00 EDT 1986
+last monday				NULL	Mon Sep 15 00:00:00 EDT 1986
+last wednesday				NULL	Wed Sep 17 00:00:00 EDT 1986
+last sunday				NULL	Sun Sep 21 00:00:00 EDT 1986
+next monday				NULL	Mon Sep 29 00:00:00 EDT 1986
+next wednesday				NULL	Wed Oct  1 00:00:00 EDT 1986
+next sunday				NULL	Sun Oct  5 00:00:00 EDT 1986
+
+2004.04.16-16:57			NULL	Fri Apr 16 16:57:00 EDT 2004
+monday 2004 april			NULL	Mon Apr  5 00:00:00 EDT 2004
+monday 2004 april 16:57			NULL	Mon Apr  5 16:57:00 EDT 2004
+monday 2004.04.16-16:57			NULL	Fri Apr 16 12:57:00 EDT 2004
+2004.04.16-16:57 monday			NULL	Mon Apr 19 16:57:00 EDT 2004
+2004.04.16-16:57 this monday		NULL	Mon Apr 19 16:57:00 EDT 2004
+2004.04.16-16:57 next monday		NULL	Mon Apr 26 16:57:00 EDT 2004
+2004.04.16-16:57 last monday		NULL	Mon Apr 12 16:57:00 EDT 2004
+
+1st monday may 2004			NULL	Mon May  3 00:00:00 EDT 2004
+2nd monday may 2004			NULL	Mon May 10 00:00:00 EDT 2004
+3rd monday may 2004			NULL	Mon May 17 00:00:00 EDT 2004
+4th monday may 2004			NULL	Mon May 24 00:00:00 EDT 2004
+5th monday may 2004			NULL	Mon May 31 00:00:00 EDT 2004
+6th monday may 2004			NULL	Mon Jun  7 00:00:00 EDT 2004
+first monday may 2004			NULL	Mon May  3 00:00:00 EDT 2004
+second monday may 2004			NULL	Mon May 10 00:00:00 EDT 2004
+third monday may 2004			NULL	Mon May 17 00:00:00 EDT 2004
+fourth monday may 2004			NULL	Mon May 24 00:00:00 EDT 2004
+fifth monday may 2004			NULL	Mon May 31 00:00:00 EDT 2004
+sixth monday may 2004			NULL	Mon Jun  7 00:00:00 EDT 2004
+final monday may 2004			NULL	Mon May 31 00:00:00 EDT 2004
+final monday in may 2004		NULL	Mon May 31 00:00:00 EDT 2004
+last monday in may 2004			NULL	Mon May 31 00:00:00 EDT 2004
+last monday may 2004			NULL	Mon Apr 26 00:00:00 EDT 2004
+
+#
 # a few leap year tests
 #
 

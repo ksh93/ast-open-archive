@@ -18,7 +18,7 @@
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
-*                 Phong Vo <kpv@research.att.com>                  *
+*               Glenn Fowler <gsf@research.att.com>                *
 *                                                                  *
 *******************************************************************/
 #pragma prototyped
@@ -159,6 +159,7 @@ typedef struct				/* ex global state		*/
 	Exnode_t*	procedure;	/* current procedure		*/
 	Exref_t*	refs;		/* . reference list		*/
 	Switch_t*	swstate;	/* switch parse state		*/
+	char		nullstring[1];	/* ""				*/
 } Exstate_t;
 
 extern Exid_t		exbuiltin[];

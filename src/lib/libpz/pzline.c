@@ -153,7 +153,7 @@ lineevent(Pz_t* pz, int op, void* data, size_t size, Pzdisc_t* disc)
 			if (!(state->logfile = vmstrdup(pz->vm, opt_info.arg)))
 			{
 				if (disc->errorf)
-					(*disc->errorf)(pz, disc, ERROR_SYSTEM|2, "%s: out of space", data);
+					(*disc->errorf)(pz, disc, ERROR_SYSTEM|2, "out of space");
 				return -1;
 			}
 			if (!(state->log = sfopen(NiL, state->logfile, "w")))

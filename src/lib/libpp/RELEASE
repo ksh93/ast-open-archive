@@ -1,3 +1,5 @@
+04-04-15 probe.win32: sync up with uwin 2003-08-06 master -- oops
+04-04-01 pp.probe: add stdinclude usrinclude path cleanup
 04-02-29 ppproto.c: fix bug that skipped prototyped check during notices check
 	 ppproto.c: recognize `Copyright nn'
 04-02-14 ppproto.c: comment[0]==0 => no notice

@@ -18,7 +18,7 @@
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
-*                 Phong Vo <kpv@research.att.com>                  *
+*               Glenn Fowler <gsf@research.att.com>                *
 *                                                                  *
 *******************************************************************/
 #pragma prototyped
@@ -59,13 +59,15 @@ lexname(int op, int subop)
 			sfsprintf(b, MAXNAME, "%s=", exop[subop - MINTOKEN]);
 		else if (subop > ' ' && subop <= '~')
 			sfsprintf(b, MAXNAME, "%c=", subop);
-		else sfsprintf(b, MAXNAME, "(%d)=", subop);
+		else
+			sfsprintf(b, MAXNAME, "(%d)=", subop);
 	}
 	else if (subop < 0)
 		sfsprintf(b, MAXNAME, "(EXTERNAL:%d)", op);
 	else if (op > ' ' && op <= '~')
 		sfsprintf(b, MAXNAME, "%c", op);
-	else sfsprintf(b, MAXNAME, "(%d)", op);
+	else
+		sfsprintf(b, MAXNAME, "(%d)", op);
 	return b;
 }
 
@@ -359,23 +361,36 @@ scformat(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	case 'f':
 	case 'g':
 		if (node->type != FLOATING)
+		{
 			exerror("scanf: %s: floating variable address argument expected", node->data.variable.symbol->name);
+			return -1;
+		}
 		fmt->fmt.size = sizeof(double);
+		*((void**)vp) = &node->data.variable.symbol->value->data.constant.value;
 		break;
 	case 's':
 		if (node->type != STRING)
+		{
 			exerror("scanf: %s: string variable address argument expected", node->data.variable.symbol->name);
-		fmt->fmt.size = -1;
+			return -1;
+		}
+		if (node->data.variable.symbol->value->data.constant.value.string == expr.nullstring)
+			node->data.variable.symbol->value->data.constant.value.string = 0;
+		fmt->fmt.size = 1024;
+		*((void**)vp) = node->data.variable.symbol->value->data.constant.value.string = vmnewof(fmt->expr->vm, node->data.variable.symbol->value->data.constant.value.string, char, fmt->fmt.size, 0);
 		break;
 	default:
 		if (node->type != INTEGER && node->type != UNSIGNED)
+		{
 			exerror("scanf: %s: integer variable address argument expected", node->data.variable.symbol->name);
+			return -1;
+		}
 		dp->size = sizeof(Sflong_t);
+		*((void**)vp) = &node->data.variable.symbol->value->data.constant.value;
 		break;
 	}
 	fmt->actuals = fmt->actuals->data.operand.right;
 	dp->flags |= SFFMT_VALUE;
-	*((void**)vp) = &node->data.variable.symbol->value->data.constant.value;
 	return 0;
 }
 
@@ -417,8 +432,6 @@ scan(Expr_t* ex, Exnode_t* expr, void* env, Sfio_t* sp)
 	fmt.fmt.form = u.string;
 	fmt.actuals = expr->data.scan.args;
 	n = sp ? sfscanf(sp, "%!", &fmt) : sfsscanf(v.string, "%!", &fmt);
-	if (fmt.tmp)
-		sfstrclose(fmt.tmp);
 	if (fmt.actuals)
 		exerror("scanf: %s: too many arguments", fmt.actuals->data.operand.left->data.variable.symbol->name);
 	return n;
@@ -657,27 +670,28 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		{
 			if (!(t = x->data.select.constant))
 				n = 1;
-			else for (; *t; t++)
-			{
-				switch ((int)i.integer)
+			else
+				for (; *t; t++)
 				{
-				case INTEGER:
-				case UNSIGNED:
-					if ((*t)->integer == v.integer)
-						break;
-					continue;
-				case STRING:
-					if ((ex->disc->version >= 19981111L && ex->disc->matchf) ? (*ex->disc->matchf)(ex, x, (*t)->string, expr->data.operand.left, v.string, env, ex->disc) : strmatch((*t)->string, v.string))
-						break;
-					continue;
-				case FLOATING:
-					if ((*t)->floating == v.floating)
-						break;
-					continue;
+					switch ((int)i.integer)
+					{
+					case INTEGER:
+					case UNSIGNED:
+						if ((*t)->integer == v.integer)
+							break;
+						continue;
+					case STRING:
+						if ((ex->disc->version >= 19981111L && ex->disc->matchf) ? (*ex->disc->matchf)(ex, x, (*t)->string, expr->data.operand.left, v.string, env, ex->disc) : strmatch((*t)->string, v.string))
+							break;
+						continue;
+					case FLOATING:
+						if ((*t)->floating == v.floating)
+							break;
+						continue;
+					}
+					n = 1;
+					break;
 				}
-				n = 1;
-				break;
-			}
 			if (n)
 			{
 				if (!x->data.select.statement)
@@ -766,7 +780,8 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 	case ID:
 		if (expr->data.variable.index)
 			i = eval(ex, expr->data.variable.index, env);
-		else i.integer = EX_SCALAR;
+		else
+			i.integer = EX_SCALAR;
 		return (*ex->disc->getf)(ex, expr, expr->data.variable.symbol, expr->data.variable.reference, env, (int)i.integer, ex->disc);
 	case INC:
 		n = 1;
@@ -802,7 +817,8 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 			{
 				if (x->data.variable.index)
 					v = eval(ex, x->data.variable.index, env);
-				else v.integer = EX_SCALAR;
+				else
+					v.integer = EX_SCALAR;
 				v = (*ex->disc->getf)(ex, x, x->data.variable.symbol, x->data.variable.reference, env, (int)v.integer, ex->disc);
 			}
 			switch (x->type)
@@ -822,12 +838,14 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 				case '/':
 					if (r.floating == 0.0)
 						exerror("floating divide by 0");
-					else v.floating /= r.floating;
+					else
+						v.floating /= r.floating;
 					break;
 				case '%':
 					if ((r.integer = r.floating) == 0)
 						exerror("floating 0 modulus");
-					else v.floating = ((Sflong_t)v.floating) % r.integer;
+					else
+						v.floating = ((Sflong_t)v.floating) % r.integer;
 					break;
 				case '&':
 					v.floating = ((Sflong_t)v.floating) & ((Sflong_t)r.floating);
@@ -868,12 +886,14 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 				case '/':
 					if (r.integer == 0)
 						exerror("integer divide by 0");
-					else v.integer /= r.integer;
+					else
+						v.integer /= r.integer;
 					break;
 				case '%':
 					if (r.integer == 0)
 						exerror("integer 0 modulus");
-					else v.integer %= r.integer;
+					else
+						v.integer %= r.integer;
 					break;
 				case '&':
 					v.integer &= r.integer;
@@ -925,7 +945,8 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		}
 		else if (x->op == DYNAMIC)
 			getdyn(ex, x, env, &assoc);
-		else assoc = 0;
+		else
+			assoc = 0;
 		r = v;
 		goto set;
 	case ';':
@@ -987,7 +1008,8 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		case '-':
 			if (x)
 				v.floating -= r.floating;
-			else v.floating = -v.floating;
+			else
+				v.floating = -v.floating;
 			return v;
 		case '+':
 			v.floating += r.floating;
@@ -1007,12 +1029,14 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		case '/':
 			if (r.floating == 0.0)
 				exerror("floating divide by 0");
-			else v.floating /= r.floating;
+			else
+				v.floating /= r.floating;
 			return v;
 		case '%':
 			if ((r.integer = r.floating) == 0)
 				exerror("floating 0 modulus");
-			else v.floating = (Sflong_t)v.floating % r.integer;
+			else
+				v.floating = (Sflong_t)v.floating % r.integer;
 			return v;
 		case '<':
 			v.integer = v.floating < r.floating;
@@ -1125,7 +1149,8 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		case '-':
 			if (x)
 				v.integer -= r.integer;
-			else v.integer = -v.integer;
+			else
+				v.integer = -v.integer;
 			return v;
 		case '+':
 			v.integer += r.integer;
@@ -1145,12 +1170,14 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		case '/':
 			if (r.integer == 0)
 				exerror("integer divide by 0");
-			else v.integer /= r.integer;
+			else
+				v.integer /= r.integer;
 			return v;
 		case '%':
 			if (r.integer == 0)
 				exerror("integer 0 modulus");
-			else v.integer %= r.integer;
+			else
+				v.integer %= r.integer;
 			return v;
 		case EQ:
 			v.integer = v.integer == r.integer;

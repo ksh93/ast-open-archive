@@ -1,3 +1,5 @@
+04-04-15 exeval.c: handle scanf %s -- forgot that regression test!
+04-04-01 exparse.y: drop #pragma prototyped
 04-02-26 add scanf() and sscanf()
 02-10-02 exeval.c: tmform() => fmttime(), static nmbuf[] => fmtbuf()
 02-09-11 expr.h: move exbuiltin[] to private exlib.h

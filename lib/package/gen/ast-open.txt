@@ -89,6 +89,22 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
+04-04-28  --- Release ksh93p+  ---
+04-04-28  If the first character of assigment to an integer variable was 0,
+          the variable had been treated as unsigned.  This behavior was
+          undocumented and has been removed.
+04-04-05  A bug in which the positioning of standard input could be incorrect
+	  after reading from standard input from a subshell has been fixed.
+04-03-30  A bug in the for loop optimizer which in rare cases could cause
+	  memory corruption has been fixed.
+04-03-29  The preset alias source='command .' has been added.
+04-03-29  A bug introduced in ksh93p on some systems in which invoked by
+	  name with #! on the first line would not get the signals handling
+	  initialized correctly has been fixed. 
+04-03-29  A bug introduced in ksh93p in which a HUP signal received by
+	  a shell that is a session group leader was not passed down to
+	  its children has been fixed.
+
 04-02-28  --- Release ksh93p  ---
 04-02-28  The ability to apply an append discipline to any variable has
 	  been added.
@@ -112,7 +128,7 @@ All recorded changes follow.
 	  arguments of size long long on systems that support this.
 04-01-06  A bug in which unsetting all elements of an associative array
 	  would cause it to be treated as an indexed array has been fixed.
-03-12-15  A bug in which q quoted string ending with an unescaped $ would
+03-12-15  A bug in which a quoted string ending with an unescaped $ would
 	  delete the ending $ in certain cases has been fixed.
 03-12-05  A bug in which the shell could hang when set -x tracing a command
 	  when an invalid multibyte character is encountered has been fixed. 
@@ -1478,6 +1494,8 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+04-04-26 troff2html: handle .ta
+04-04-04 mm2html: .xx link|text separated by tab for table entry urls
 04-02-29 mm2html: .TS box => void lines
 03-08-11 mm2html: handle man .TH args>2
 03-03-25 mm2html: table border size '' => 0
@@ -1581,6 +1599,8 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+04-04-15 date.dat: add specific and ordinal day tests
+04-04-01 vmalloc: snarf vmalloc tests from kpv
 04-02-29 sfio/tscanf.c: add %! test
 	 opt.tst: add html escape test
 04-02-04 sfio/texcept.c: add sfraise(0,a,b) test
@@ -1920,6 +1940,30 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+04-04-15 expand.c: fix :V: operand check
+	 expand.c: check var alternation only before first delimiter
+	 expand.c: add :P=F: to recursively expand dir hierarchies
+	 expand.c: fix ancient $(...) non-tokenizing edit op bug
+	 parse.c: fix dup scope prereq value append
+	 bind.c: check for consistent ../* bound directory rebind
+	 Makerules.mk: fix :PACKAGE: :noinclude:nolib:noroot
+	 Makerules.mk: add :P=F: to .MANIFEST.
+	 Makerules.mk: add :INIT:
+	 Makerules.mk: drop obsolete MAKESKIP var definition
+	 Makerules.mk: proto notice generation disabled unless LICENSE=="*=*"
+	 Makerules.mk: package/PACKAGE.(lic|pkg) on PKGDIRS inhibits "not found"
+	 Makerules.mk: "test" action checks for gnu "check"
+	 Makerules.mk: fix recurse action target selection
+	 Scanrules.mk: fix .INCLUDE.cob to search lower and upper case suffixes
+	 rules-win32.mk: add SYSDIR
+04-04-14 Makerules.mk,Scanrules.mk: add COBOLIPF,COBOLSQL
+04-04-12 Makefile: add STDCHMOD (for osf.alpha cmd :LIBRARY:)
+04-04-04 bind.c: don't alias 2d directories -- duh
+04-04-01 Makerules.mk: .BIND.+l% checks .REQUIRE.-l% for disable
+04-03-31 expand.c: add :VB: for VAL_BRACE { ... }
+	 Makerules.mk: fix .SHARED.LIST. again
+	 Makerules.mk: add :PACKAGE: noCC.* CC.*=value probe overrides
+04-03-30 Makerules.mk: omit -L*/local/* if in CC.STDLIB (00-03-17 repeal)
 04-03-25 pkg-X11.mk: drop openbsd.i386 -lc_r workaround
 	 Makerules.mk: fix .SHARED.BIND. CC.SUFFIX.STATIC -l* expansion bug
 04-03-17 expand.c: check { :: :LIBRARY: } lhs
@@ -2877,6 +2921,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+04-04-14 tr.c: char* => unsigned char* to avoid sign extension
 03-10-11 od.c: add --map=ccode, -tm, generate doc from tables
 03-09-18 tail.tst: add header and timeout tests
 03-07-28 expr.tst: add
@@ -4850,6 +4895,7 @@ End:
 
 :::::::: mailx ::::::::
 
+04-04-15 spam.c: add spamtest mask names, fix spam() ordering
 04-03-25 mailx.h: shquote=>shellquote to avoid netbsd clash in <stdlib.h>!!
 04-03-17 spam.c: fix usermatch() loop
 04-01-28 data.c: k,K are now autoprint (like d)
@@ -5452,6 +5498,7 @@ End:
 
 :::::::: tksh ::::::::
 
+04-03-31 uinit.c: unalias ksh "source" to uncover tcl builtin by same name
 03-01-02 Makefile: dynamic -lshell on CC.HOSTTYPE=*win*
 02-08-27 tkMain.c: wait loop recode to avoid WNOHANG cascade
 02-02-14 Makefile: shell:static because dll is -g => fix this situation
@@ -5459,6 +5506,9 @@ End:
 
 :::::::: tw ::::::::
 
+04-04-15 tw.tst: add %s scanf tests
+04-04-01 find.c: handle `-sort -KEY' and `-sort KEY'
+	 find.tst: add `-sort -name' for uniform results -- duh
 04-02-26 tw.tst: add scanf tests
 03-12-02 find.c: -print does not require leaf stat -- duh
 03-11-16 find.tst,tw.tst: add leading . pattern match tests
@@ -5546,6 +5596,11 @@ End:
 
 :::::::: libast ::::::::
 
+04-04-15 tm/tmdate.c,include/tm.h: fix specific and ordinal days
+04-04-08 astconf: retain { HOSTTYPE LIBPATH LIBPREFIX LIBSUFFIX } strict vals
+04-04-07 vmalloc/vmbest.c: fix alpha tiny block bug
+	 vmalloc/malloc.c: re-enable on alpha
+04-03-30 tm/tminit.c: GMT => UCT only if tz.daylight not defined
 04-03-25 vmalloc/malloc.c: _AST_std_malloc=1 for __alpha
 	 path/pathprobe.c: per-user probe dir => $HOME/.probe/$HOSTTYPE
 04-03-23 regex/reglib.h: fix isw*() redefines
@@ -6714,9 +6769,11 @@ End:
 
 :::::::: libcmd ::::::::
 
+04-04-15 chmod.c: follow symlink for relative mode
+04-04-12 Makefile: add STDCHMOD (for osf.alpha)
 04-03-19 tail.c: handle -f sfreserve() large chunk failure
 04-02-29 cp.c: decouple -f and -i for standard CONFORMANCE
-	 cp.c: mv attempts rename() before remove()+rename()
+	 cp.c: mv now attempts rename() before remove()+rename()
 	 date.c: -f format or +format disables system clock set
 04-02-14 cp.c: add -F --fsync to call fsync(2) for each copied file
 04-01-05 head.c: -s now uses opt_info.number for >2Gb skip
@@ -6884,6 +6941,8 @@ End:
 
 :::::::: libexpr ::::::::
 
+04-04-15 exeval.c: handle scanf %s -- forgot that regression test!
+04-04-01 exparse.y: drop #pragma prototyped
 04-02-26 add scanf() and sscanf()
 02-10-02 exeval.c: tmform() => fmttime(), static nmbuf[] => fmtbuf()
 02-09-11 expr.h: move exbuiltin[] to private exlib.h
@@ -7133,6 +7192,8 @@ End:
 
 :::::::: libpp ::::::::
 
+04-04-15 probe.win32: sync up with uwin 2003-08-06 master -- oops
+04-04-01 pp.probe: add stdinclude usrinclude path cleanup
 04-02-29 ppproto.c: fix bug that skipped prototyped check during notices check
 	 ppproto.c: recognize `Copyright nn'
 04-02-14 ppproto.c: comment[0]==0 => no notice
@@ -7590,6 +7651,7 @@ End:
 
 :::::::: libpz ::::::::
 
+04-04-08 add pznospace()
 04-02-29 pzip.h,pzline.c: fix pz_init() prototype
 03-11-04 pzpart.c: use PZ_HEAD to avoid multiple PZ_UPDATE, fix wrk overflow
 03-07-23 pzsplit.c: --split file size limited to --window

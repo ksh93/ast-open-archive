@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-03-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -354,7 +354,7 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.4 2004-03-17 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.4 2004-04-15 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -450,7 +450,7 @@ exec - {
 exec - 	echo '/* : : generated from cc assertions : : */'
 exec - 	set -
 exec - 	f=`${INSTALLROOT}/lib/probe/probe -kg C pp cc`
-exec - 	a="`sed -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_ STDCAT STDCMP STDCP STDED STDEDFLAGS STDLN STDMV STDRM"
+exec - 	a="`sed -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_ STDCAT STDCHMOD STDCMP STDCP STDED STDEDFLAGS STDLN STDMV STDRM"
 exec - 	for n in $a
 exec - 	do	eval $n=
 exec - 	done
@@ -474,7 +474,7 @@ exec - 	then	STDED=ed
 exec - 	else	STDED=ex
 exec - 	fi
 exec - 	STDEDFLAGS=-
-exec - 	set STDCAT cat STDCMP cmp STDCP cp STDLN ln STDMV mv STDRM rm
+exec - 	set STDCAT cat STDCHMOD chmod STDCMP cmp STDCP cp STDLN ln STDMV mv STDRM rm
 exec - 	while	:
 exec - 	do	case $# in
 exec - 		0|1)	break ;;
@@ -494,7 +494,7 @@ exec - 	if	test -x /bin/cat.exe
 exec - 	then	if	/bin//cat /bin/cat >/dev/null 2>&1
 exec - 		then	: ok
 exec - 		else	: .exe challenged
-exec - 			for n in STDCAT STDCMP STDCP STDLN STDMV STDRM
+exec - 			for n in STDCAT STDCHMOD STDCMP STDCP STDLN STDMV STDRM
 exec - 			do	eval $n=\"execrate \$$n\"
 exec - 			done
 exec - 		fi

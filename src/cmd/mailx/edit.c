@@ -179,7 +179,7 @@ run_editor(register FILE* fp, off_t size, struct header* hp, int type, int reado
 		fileclose(pp.fp);
 	}
 	/*
-	 * Ensure that the tempEdit file ends with two newlines.  
+	 * Ensure that the tempEdit file ends with two newlines.
 	 *
 	 * XXX
 	 * Probably ought to have a `From' line, as well.

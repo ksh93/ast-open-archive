@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -56,8 +56,7 @@ pzinit(register Pz_t* pz, register const char* name, Pzinit_f initf)
 			pz->options = 0;
 		else if (!(pz->options = vmstrdup(pz->vm, pz->disc->options)))
 		{
-			if (pz->disc && pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: out of space", name);
+			pznospace(pz);
 			return 0;
 		}
 	}

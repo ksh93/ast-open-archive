@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -323,14 +323,16 @@ done:
 }
 
 #if __STD_C
-static void mgclose(Rs_t* rs, Merge_t* mg)
+static int mgclose(Rs_t* rs, Merge_t* mg)
 #else
-static void mgclose(rs, mg)
+static int mgclose(rs, mg)
 Rs_t*		rs;
 Merge_t*	mg;
 #endif
 {
-	mgflush(rs);
+	int	ret;
+
+	ret = mgflush(rs);
 
 	if(rs->disc->defkeyf && mg->vm)
 		vmclose(mg->vm);
@@ -341,6 +343,8 @@ Merge_t*	mg;
 	sfset(mg->f,(mg->flags&(SF_WRITE|SF_SHARE|SF_PUBLIC)),1);
 
 	vmfree(Vmheap,mg);
+
+	return ret;
 }
 
 #if __STD_C
@@ -762,7 +766,9 @@ int		type;	/* RS_IPRINT|RS_OPRINT		*/
 				for(;;)
 				{	m = mg->equi;
 					if(mg->cpos >= mg->cend && mgrefresh(rs,mg) < 0)
-						mgclose(rs,mg);
+					{	if (mgclose(rs,mg) < 0)
+							return mgerror(rs,list,n_list-1);
+					}
 					else	n_list = mginsert(rs,list,n_list,mg);
 					if(!(mg = m) )
 						break;
@@ -777,7 +783,9 @@ int		type;	/* RS_IPRINT|RS_OPRINT		*/
 				for(;;)
 				{	m = mg->equi;
 					if(mg->cpos >= mg->cend && mgrefresh(rs,mg) < 0)
-						mgclose(rs,mg);
+					{	if (mgclose(rs,mg) < 0)
+							return mgerror(rs,list,n_list-1);
+					}
 					else	n_list = mginsert(rs,list,n_list,mg);
 					if(!(mg = m))
 						break;
@@ -810,7 +818,8 @@ int		type;	/* RS_IPRINT|RS_OPRINT		*/
 				}
 
 				if(mgrefresh(rs,mg) < 0)
-				{	mgclose(rs,mg);
+				{	if (mgclose(rs,mg) < 0)
+						return mgerror(rs,list,n_list-1);
 					break;
 				}
 				else
@@ -872,8 +881,11 @@ int		type;	/* RS_IPRINT|RS_OPRINT		*/
 					return mgerror(rs,list,n_list);
 			}
 
-			mgmove(rs,mg,-1); /* now do the remainder */
-			mgclose(rs,mg);
+			/* now do the remainder */
+			if (mgmove(rs,mg,-1) < 0)
+				return mgerror(rs,list,n_list);
+			if (mgclose(rs,mg) < 0)
+				return mgerror(rs,list,n_list-1);
 		}
 	}
 

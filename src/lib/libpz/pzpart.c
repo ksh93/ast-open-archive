@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.3 (AT&T Labs Research) 2003-11-04 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.4 (AT&T Labs Research) 2004-04-04 $\n]"
 "[a:append]"
 "[c:comment]:[text]"
 "[x:crc]"
@@ -209,7 +209,7 @@ fixed(Pz_t* pz, register Pzpart_t* pp, int n, int m, int k)
 	if (!pp->value)
 	{
 		if (!(pp->value = vmnewof(pz->vm, 0, int, pp->row, 0)))
-			return -1;
+			return pznospace(pz);
 		for (i = 0; i < pp->row; i++)
 			pp->value[i] = -1;
 	}
@@ -312,7 +312,7 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 		{
 			pp->nmap = pp->row;
 			if (!(pp->map = vmnewof(pz->vm, pp->map, size_t, VECTOR(pz, pp, pp->nmap), 0)))
-				return -1;
+				return pznospace(pz);
 			for (i = 0; i < pp->nmap; i++)
 				pp->map[i] = i;
 		}
@@ -320,7 +320,7 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 		{
 			pp->ngrp = 1;
 			if (!(pp->grp = vmnewof(pz->vm, pp->grp, size_t, VECTOR(pz, pp, pp->ngrp), 0)))
-				return -1;
+				return pznospace(pz);
 			pp->grp[0] = pp->row;
 		}
 		pp->loq = ((pz->win / 8 / pp->row) + 8) * pp->row;
@@ -329,11 +329,11 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 		    !(pp->mix = vmnewof(pz->vm, 0, unsigned char*, k, 0)) ||
 		    !(pp->inc = vmnewof(pz->vm, 0, size_t, k, 0)) ||
 		    !(pp->lab = vmnewof(pz->vm, 0, size_t, k, 0)))
-			return -1;
+			return pznospace(pz);
 		if (pp->nfix)
 		{
 			if (!(pp->fix = vmnewof(pz->vm, 0, size_t, VECTOR(pz, pp, pp->nfix), 0)))
-				return -1;
+				return pznospace(pz);
 			for (i = k = 0; i < pp->row; i++)
 				if (pp->value[i] >= 0)
 					pp->fix[k++] = i;
@@ -355,7 +355,7 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 			n = ((pz->win / 8 / m) + 8 ) * m;
 			if (!(pz->val = vmnewof(pz->vm, pz->val, unsigned char, n, 0)) ||
 			    !(pz->pat = vmnewof(pz->vm, pz->pat, unsigned char, m, 0)))
-				return -1;
+				return pznospace(pz);
 		}
 	}
 	if (pz->win > pz->mwin)
@@ -367,16 +367,12 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 		if (pz->flags & PZ_WRITE)
 			n *= 2;
 		if (!(pz->buf = vmnewof(pz->vm, pz->buf, unsigned char, n, 0)))
-		{
-			if (pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
-			return -1;
-		}
+			return pznospace(pz);
 		if (pz->flags & PZ_WRITE)
 			pz->wrk = pz->buf + pz->mwin;
 	}
 	if (m && !(pz->flags & PZ_WRITE) && !(pz->wrk = vmnewof(pz->vm, pz->wrk, unsigned char, m, 0)))
-		return -1;
+		return pznospace(pz);
 
 	/*
 	 * the discipline functions may change the partition name
@@ -391,7 +387,7 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 	if (pp->nfix != n)
 	{
 		if (!(pp->fix = vmnewof(pz->vm, pp->fix, size_t, VECTOR(pz, pp, pp->nfix), 0)))
-			return -1;
+			return pznospace(pz);
 		for (i = k = 0; i < pp->row; i++)
 			if (pp->value[i] >= 0)
 				pp->low[pp->fix[k++] = i] = 0;
@@ -519,11 +515,7 @@ pzoptions(register Pz_t* pz, register Pzpart_t* pp, char* options, int must)
 					break;
 				case 'c':
 					if (!pz->disc->comment && !(pz->disc->comment = vmstrdup(pz->vm, opt_info.arg)))
-					{
-						if (pz->disc->errorf)
-							(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
-						return -1;
-					}
+						return pznospace(pz);
 					break;
 				case 'x':
 					if (opt_info.num)
@@ -845,7 +837,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 			continue;
 		}
 		if (!(pp = vmnewof(pz->vm, 0, Pzpart_t, 1, 0)))
-			goto bad;
+			goto nope;
 		pp->row = n;
 		if (np)
 		{
@@ -853,7 +845,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 			np = 0;
 		}
 		if (!(cv = vmnewof(vm, 0, int, (pp->row + 1) * 4, 0)))
-			goto bad;
+			goto nope;
 		cp = cv;
 		ce = hv = cv + (pp->row + 1) * 2;
 		gv = hv + pp->row + 1;
@@ -948,7 +940,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 			pp->ngrp = 1;
 		if (!(pp->map = vmnewof(pz->vm, 0, size_t, VECTOR(pz, pp, pp->nmap), 0)) ||
 		    !(pp->grp = vmnewof(pz->vm, 0, size_t, VECTOR(pz, pp, pp->ngrp), 0)))
-			goto bad;
+			goto nope;
 		m = 0;
 		cp = cv;
 		g = 0;
@@ -992,6 +984,8 @@ pzpartition(register Pz_t* pz, const char* partition)
 	}
 	pz->pin = 0;
 	return 0;
+ nope:
+	pznospace(pz);
  bad:
 	pz->pin = 0;
 	if (sp)
@@ -1025,7 +1019,7 @@ array(register Pz_t* pz, Pzpart_t* pp, size_t** pv, size_t* pn, size_t check)
 		if (!n)
 			v = 0;
 		else if (!(v = vmnewof(pz->vm, *pv, size_t, VECTOR(pz, pp, n), 0)))
-			return -1;
+			return pznospace(pz);
 		*pv = v;
 		if (pn)
 			*pn = n;
@@ -1066,7 +1060,7 @@ buffer(register Pz_t* pz, Pzpart_t* pp, char** pv, size_t* pn)
 	if (pv)
 	{
 		if (!(v = vmnewof(pz->vm, *pv, char, n, 0)))
-			return -1;
+			return pznospace(pz);
 		*pv = v;
 		if (pn)
 			*pn = n;
@@ -1097,7 +1091,7 @@ pzpartread(register Pz_t* pz)
 		sfungetc(pz->io, i);
 	}
 	if (!(pp = vmnewof(pz->vm, 0, Pzpart_t, 1, 0)))
-		return -1;
+		return pznospace(pz);
 	if (pz->major == 1)
 	{
 		pp->row = sfgetu(pz->io);
@@ -1124,7 +1118,7 @@ pzpartread(register Pz_t* pz)
 			if (!pp->value)
 			{
 				if (!(pp->value = vmnewof(pz->vm, 0, int, pp->row, 0)))
-					return -1;
+					return pznospace(pz);
 				for (i = 0; i < pp->row; i++)
 					pp->value[i] = -1;
 			}
@@ -1155,7 +1149,7 @@ pzpartread(register Pz_t* pz)
 				if (pp = pz->freepart)
 					pz->freepart = 0;
 				else if (!(pp = vmnewof(pz->vm, 0, Pzpart_t, 1, 0)))
-					return -1;
+					return pznospace(pz);
 			}
 			buffer(pz, pp, (char**)&pp->name, NiL);
 			pp->row = sfgetu(pz->io);

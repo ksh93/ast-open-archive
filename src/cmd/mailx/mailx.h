@@ -215,7 +215,7 @@ struct esc {
 
 struct lab {
 	const char*	name;		/* Header label name */
-	int		type;		/* G* type */
+	long		type;		/* G* type */
 };
 
 /*
@@ -983,6 +983,7 @@ extern void		set_screen(struct var*, const char*);
 extern void		set_sendmail(struct var*, const char*);
 extern void		set_shell(struct var*, const char*);
 extern void		set_spambody(struct var*, const char*);
+extern void		set_spamtest(struct var*, const char*);
 extern void		set_toplines(struct var*, const char*);
 extern void		set_trace(struct var*, const char*);
 extern void		set_user(struct var*, const char*);

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2003 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -39,6 +39,7 @@
 #define PZ_VERSION_SPLIT	19990811L	/* splitf added		*/
 
 #define state		_pz_info	/* library private state	*/
+#define pznospace	_pz_nospace
 #define pzsdeflate	_pz_sdeflate
 #define pzsinflate	_pz_sinflate
 #define pzssplit	_pz_ssplit
@@ -223,6 +224,7 @@ typedef struct
 
 extern Pzstate_t	state;
 
+extern int		pznospace(Pz_t*);
 extern int		pzsdeflate(Pz_t*, Sfio_t*);
 extern int		pzsinflate(Pz_t*, Sfio_t*);
 extern int		pzssplit(Pz_t*);

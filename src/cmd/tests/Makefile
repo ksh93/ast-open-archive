@@ -37,6 +37,18 @@ sfio :TEST: testsfio sftest.h +last \
 test.sf : testsfio sftest.h +last $$(*.ARGS:D:B:S=.c) .CLEARARGS
 	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
 
+.SOURCE : vmalloc
+.SOURCE.h : ../../lib/libast/vmalloc
+
+vmalloc :TEST: testvmalloc vmtest.h +last \
+	vmalloc/talign.c vmalloc/tcompact.c vmalloc/tlast.c vmalloc/tmalloc.c \
+	vmalloc/tmrandom.c vmalloc/tpool.c vmalloc/trandom.c vmalloc/tresize.c \
+	vmalloc/tsmall.c vmalloc/tstat.c vmalloc/twalk.c
+		set +x; $(*:O=1) $(TESTVMALLOCFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
+
+test.vm : testvmalloc vmtest.h +last $$(*.ARGS:D:B:S=.c) .CLEARARGS
+	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
+
 :: RELEASE y2k.dat
 
 install :

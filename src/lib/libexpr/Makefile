@@ -4,7 +4,7 @@
 
 :PACKAGE: ast
 
-LICENSE = since=1989,author=kpv
+LICENSE = since=1989,author=gsf
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
 

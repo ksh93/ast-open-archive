@@ -8,6 +8,8 @@
 RC = rc
 RCFLAGS = -x
 
+SYSDIR = $(INSTALLROOT:D:B=sys:T=F:??$(INSTALLROOT)/sys?O)
+
 .SOURCE.%.SCAN.rc : $$(*.SOURCE.rc) $$(*.SOURCE) $$(*.SOURCE.h:D:X=mfc/include include)
 
 .SCAN.rc : .SCAN

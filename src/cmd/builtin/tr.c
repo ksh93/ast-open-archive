@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2003 AT&T Corp.                *
+*                Copyright (c) 1992-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Labs Research) 2003-02-14 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Labs Research) 2004-04-14 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"
@@ -120,8 +120,8 @@ typedef struct
 	int		type;
 	int		truncate;
 	regclass_t	isit;
-	char*		base;
-	char*		next;
+	unsigned char*	base;
+	unsigned char*	next;
 } Tr_t;
 
 static const char*	typename[] = { "source", "destination" };
@@ -138,7 +138,7 @@ nextchar(register Tr_t* tr)
 {
 	register int	c;
 	int		q;
-	char*		e;
+	unsigned char*	e;
 	regclass_t	f;
 	char		buf[32];
 
@@ -172,7 +172,7 @@ nextchar(register Tr_t* tr)
 		c = tr->level ? -2 : tr->type && !tr->truncate ? tr->prev : -1;
 		break;
 	case '\\':
-		c = chresc(tr->next - 1, &tr->next);
+		c = chresc((char*)tr->next - 1, (char**)&tr->next);
 		break;
 	case '[':
 		switch (*tr->next)
@@ -187,7 +187,7 @@ nextchar(register Tr_t* tr)
 					c = *tr->next;
 					goto member;
 				}
-				else if (!strncmp(tr->next, ":lower:", 7) || !strncmp(tr->next, ":upper:", 7))
+				else if (!strncmp((char*)tr->next, ":lower:", 7) || !strncmp((char*)tr->next, ":upper:", 7))
 				{
 					f = tr->isit;
 					tr->convert = c;
@@ -198,7 +198,7 @@ nextchar(register Tr_t* tr)
 						return -2;
 				}
 			}
-			if (!(tr->isit = regclass(tr->next, &e)))
+			if (!(tr->isit = regclass((char*)tr->next, (char**)&e)))
 			{
 				if (f)
 					tr->isit = f;
@@ -213,7 +213,7 @@ nextchar(register Tr_t* tr)
 			return nextchar(tr);
 		case '.':
 		case '=':
-			if ((q = regcollate(tr->next, &e, buf, sizeof(buf))) >= 0)
+			if ((q = regcollate((char*)tr->next, (char**)&e, buf, sizeof(buf))) >= 0)
 			{
 				tr->next = e;
 				c = q ? buf[0] : 0;
@@ -234,7 +234,7 @@ nextchar(register Tr_t* tr)
 				c = nextchar(tr);
 				if (*tr->next == '*')
 				{
-					if (!(tr->count = (int)strtol(tr->next + 1, &tr->next, 0)))
+					if (!(tr->count = (int)strtol((char*)tr->next + 1, (char**)&tr->next, 0)))
 					{
 						if (tr->type == 0)
 							return -2;
@@ -295,7 +295,7 @@ nextchar(register Tr_t* tr)
  */
 
 static Tr_t*
-tropen(char* src, char* dst, int flags)
+tropen(unsigned char* src, unsigned char* dst, int flags)
 {
 	register Tr_t*	tr;
 	register int	c;
@@ -533,7 +533,7 @@ b_tr(int argc, char** argv, void* context)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (tr = tropen(argv[0], argv[0] ? argv[1] : NiL, flags))
+	if (tr = tropen((unsigned char*)argv[0], (unsigned char*)argv[0] ? (unsigned char*)argv[1] : (unsigned char*)0, flags))
 	{
 		trcopy(tr, sfstdin, sfstdout, SF_UNBOUND);
 		trclose(tr);

@@ -1,28 +1,3 @@
-/*******************************************************************
-*                                                                  *
-*             This software is part of the ast package             *
-*                Copyright (c) 1986-2004 AT&T Corp.                *
-*        and it may only be used by you under license from         *
-*                       AT&T Corp. ("AT&T")                        *
-*         A copy of the Source Code Agreement is available         *
-*                at the AT&T Internet web site URL                 *
-*                                                                  *
-*       http://www.research.att.com/sw/license/ast-open.html       *
-*                                                                  *
-*    If you have copied or used this software without agreeing     *
-*        to the terms of the license you are infringing on         *
-*           the license and copyright and are violating            *
-*               AT&T's intellectual property rights.               *
-*                                                                  *
-*            Information and Software Systems Research             *
-*                        AT&T Labs Research                        *
-*                         Florham Park NJ                          *
-*                                                                  *
-*               Glenn Fowler <gsf@research.att.com>                *
-*                David Korn <dgk@research.att.com>                 *
-*                 Phong Vo <kpv@research.att.com>                  *
-*                                                                  *
-*******************************************************************/
 #pragma prototyped
 
 /*
@@ -47,6 +22,8 @@
 #include <ctype.h>
 #include <tm.h>
 
+#include "camap.c"
+
 #define MAGIC		"\301\304\331\100\323\311\302\331\306"
 #define CHUNK		64
 
@@ -65,6 +42,7 @@ typedef struct Ar_s
 	unsigned char*	imap;
 	unsigned char*	buffer;
 	unsigned char*	next;
+	int		camap;
 	int		count;
 	int		digits;
 	int		flags;
@@ -83,6 +61,7 @@ typedef struct Ar_s
 	size_t		left;
 	Cadir_t*	dirs;
 	Cadir_t*	dir;
+	void*		cam;
 } Ar_t;
 
 #define CALIB_LINE	256
@@ -259,6 +238,23 @@ _cagetbits(Ar_t* ar, int nbits)
 }
 
 static int
+calib_done(Pax_t* pax, register Paxarchive_t* ap)
+{
+	Ar_t*	ar;
+
+	if (ar = (Ar_t*)ap->data)
+	{
+		if (ar->cam)
+			camap_close(ar->cam);
+		if (ar->dirs)
+			free(ar->dirs);
+		free(ar);
+		ap->data = 0;
+	}
+	return 0;
+}
+
+static int
 calib_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_t* f, unsigned char* buf, size_t size)
 {
 	register Ar_t*		ar;
@@ -331,22 +327,12 @@ calib_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfil
 	dp->size = 0;
 	ar->dirs = ar->dir = db;
 	ap->data = ar;
-	return 1;
-}
-
-static int
-calib_done(Pax_t* pax, register Paxarchive_t* ap)
-{
-	Ar_t*	ar;
-
-	if (ar = (Ar_t*)ap->data)
+	if (!(ar->cam = camap_open()))
 	{
-		if (ar->dirs)
-			free(ar->dirs);
-		free(ar);
-		ap->data = 0;
+		calib_done(pax, ap);
+		return -1;
 	}
-	return 0;
+	return 1;
 }
 
 static int
@@ -370,6 +356,7 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 	char*			suffix;
 	size_t			block;
 	size_t			index;
+	ssize_t			z;
 	off_t			n;
 	Sfio_t*			wfp;
 	char			from[CALIB_LINE + 1];
@@ -393,6 +380,8 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 		(*pax->errorf)(NiL, pax, 2, "%s: cannot write", f->name);
 		return -1;
 	}
+	else if (ar->camap)
+		camap_init(ar->cam);
 	comment[0] = from[0] = to[0] = 0;
 	sequence = ar->digits && ar->increment && (ar->position + ar->digits) <= ar->linesize ? ar->sequence : -1;
 	noted = !wfp || !pax->warn;
@@ -642,7 +631,7 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 									m = b;
 								else
 								{
-									if (*++b == '*' || *b == ' ' || !*b)
+									if (*++b == '*' || *b == ' ' || *b == '\n')
 									{
 										c = m - outbuf - 8;
 										memcpy(from, outbuf + 8, c);
@@ -656,17 +645,22 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 							}
 					}
 				}
-				else if (outbuf[0] == '-' && outbuf[1] == 'I' && outbuf[2] == 'N' && outbuf[3] == 'C' && outbuf[4] == ' ' && !pax->strict && !(pax->test & 0010000))
+				else if (!pax->strict && !(pax->test & 0010000) && outbuf[0] == '-' && outbuf[1] == 'I' && outbuf[2] == 'N' && outbuf[3] == 'C' && outbuf[4] == ' ')
 				{
 					for (b = outbuf + 5; *b == ' '; b++);
 					for (m = b; m < (out - 1) && *m != ' '; m++);
 					if (from[0])
-						c = sfsprintf((char*)outbuf, sizeof(outbuf), "       COPY %-.*s REPLACING =%s= BY =%s=.\n", m - b, b, from, to);
+						c = sfsprintf((char*)outbuf, sizeof(outbuf), "       COPY %-.*s REPLACING ==%s== BY ==%s==.\n", m - b, b, from, to);
 					else
 						c = sfsprintf((char*)outbuf, sizeof(outbuf), "       COPY %-.*s.\n", m - b, b);
 					out = outbuf + c;
 				}
-				sfwrite(wfp, outbuf, out - outbuf);
+				z = out - outbuf;
+				if (sfwrite(wfp, outbuf, z) != z || ar->camap && camap_write(ar->cam, outbuf, z) < 0)
+				{
+					(*pax->errorf)(NiL, pax, 2, "%s: write error", f->name);
+					goto bad;
+				}
 			}
 			else
 			{
@@ -702,13 +696,21 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 	error_info.file = ofile;
 	if (wfp)
 	{
-		sfsync(wfp);
+		if (sfsync(wfp) || ar->camap && camap_done(ar->cam, f->name, wfd) < 0)
+		{
+			(*pax->errorf)(NiL, pax, 2, "%s: write error", f->name);
+			goto bad;
+		}
 		wfp->_file = -1;
 		sfclose(wfp);
 	}
 	else if (suffix)
 		strcpy(ar->suffix, suffix);
 	return 1;
+ bad:
+	wfp->_file = -1;
+	sfclose(wfp);
+	return -1;
 }
 
 static int
@@ -898,14 +900,21 @@ calib_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 		if (!isalnum(*s) && *s != '.')
 			*s = '_';
 	ar->line = h - ar->buffer;
+	ar->camap = 0;
 	if (ar->suffix)
 	{
 		calib_getdata(pax, ap, f, -1);
 		ar->line = h - ar->buffer;
 		ar->suffix = 0;
 	}
-	for (i = 0, s = f->name; *s && *s != '.'; s++)
-		if (islower(*s))
+	for (i = 0, s = f->name; *s; s++)
+		if (*s == '.')
+		{
+			if (!(pax->test & 0010000) && (!strcasecmp(s + 1, "COB") || !strcasecmp(s + 1, "CPY")))
+				ar->camap = 1;
+			break;
+		}
+		else if (islower(*s))
 			i = 1;
 	if (i && *s)
 		while (*++s)

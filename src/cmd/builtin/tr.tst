@@ -298,3 +298,8 @@ TEST 12	'gnu complains about these'
 		OUTPUT -n - $'Y'
 	EXEC	-cs '[:cntrl:]' 'X[Y*]'
 		OUTPUT - $'Y'
+
+TEST 13 'unlucky char sign extension?'
+	EXEC	$'\x8d' $'\n'
+		INPUT -n - $'x\x8d'
+		OUTPUT - $'x'

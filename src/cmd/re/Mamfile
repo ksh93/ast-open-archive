@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-03-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-04-15
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -173,13 +173,6 @@ exec - then	rm -f egrep
 exec - fi
 exec - ln grep egrep
 done egrep generated
-make fgrep
-prev grep
-exec - if	silent test -f "fgrep"
-exec - then	rm -f fgrep
-exec - fi
-exec - ln grep fgrep
-done fgrep generated
 make sed
 make sed0.o
 make sed0.c
@@ -251,13 +244,6 @@ exec - then	rm -f ${INSTALLROOT}/bin/egrep
 exec - fi
 exec - ln ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/egrep
 done ../../../bin/egrep generated
-make ../../../bin/fgrep
-prev ../../../bin/grep
-exec - if	silent test -f "${INSTALLROOT}/bin/fgrep"
-exec - then	rm -f ${INSTALLROOT}/bin/fgrep
-exec - fi
-exec - ln ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/fgrep
-done ../../../bin/fgrep generated
 make ../../../bin/sed
 prev sed
 exec - test '' = 'sed' || ${STDCMP} 2>/dev/null -s sed ${INSTALLROOT}/bin/sed || { ${STDMV} ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; ${STDCP} sed ${INSTALLROOT}/bin/sed  		    		    ;}

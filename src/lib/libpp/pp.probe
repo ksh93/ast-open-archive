@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2003-04-30
+# @(#)pp.probe (AT&T Research) 2004-04-01
 #
 # C probe for libpp
 #
@@ -25,6 +25,101 @@ architecture=
 cpu=
 model=
 machine=
+
+#
+# path cleanup
+#
+
+for i in stdinclude usrinclude
+do	eval o='$'$i
+	v=$o
+	case $v in
+	*//*)	v=`echo $v | sed 's,///*,/,g'` ;;
+	esac
+	if	(test . -ef "`pwd`")
+	then	k=
+		for x in $v
+		do	case $x in
+			*/../*|*/..)
+				case $x in
+				/*)	a=/ ;;
+				*)	a= ;;
+				esac
+				IFS=/
+				set '' $x
+				IFS=$ifs
+				r=
+				for d
+				do	r="$d $r"
+				done
+				p=
+				g=
+				for d in $r
+				do	case $d in
+					..)	g="$g $d" ;;
+					*)	case $g in
+						'')	case $p in
+							'')	p=$d ;;
+							*)	p=$d/$p ;;
+							esac
+							;;
+						*)	set $g
+							shift
+							g=$*
+							;;
+						esac
+						;;
+					esac
+				done
+				case $a in
+				'')	for d in $g
+					do	p=$d/$p
+					done
+					;;
+				*)	p=$a$p
+					;;
+				esac
+				case $p in
+				/)	continue ;;
+				esac
+				test $x -ef $p && x=$p
+				;;
+			esac
+			k="$k $x"
+		done
+		set '' $k
+		shift
+		v=$1
+		case $# in
+		0)	;;
+		*)	shift
+			while	:
+			do	case $# in
+				0)	break ;;
+				esac
+				k=
+				for d
+				do	for j in $v
+					do	test $d -ef $j && continue 2
+					done
+					k="$k $d"
+				done
+				set '' $k
+				case $# in
+				1)	break ;;
+				esac
+				shift
+				v="$v $1"
+				shift
+			done
+			;;
+		esac
+	fi
+	case $v in
+	$o)	;;
+	*)	eval $i='$'v ;;
+	esac
+done
 
 id="::IDENT::`date`::IDENT::"
 echo '#assert test(ok)

@@ -40,7 +40,7 @@ function DATA
 
 TEST 01 'basics'
 	DO	DATA data
-	EXEC	data
+	EXEC	data -sort -name
 		OUTPUT - $'data
 data/aaa
 data/aaa/111
@@ -146,14 +146,14 @@ data/zzz/333/7
 data/zzz/333/7/q.c
 data/zzz/333/7/r.d
 data/zzz/333/7/s.z'
-	EXEC	data -print
-	EXEC	data --print
-	EXEC	-print data
-	EXEC	--print data
+	EXEC	data -sort -name -print
+	EXEC	data -sort -name --print
+	EXEC	-sort -name -print data
+	EXEC	--sort --name --print data
 
 TEST 02 'patterns'
 	DO	DATA data
-	EXEC	data -name '*.c'
+	EXEC	data -sort -name -name '*.c'
 		OUTPUT - $'data/aaa/111/4/q.c
 data/aaa/111/5/q.c
 data/aaa/111/6/q.c
@@ -178,8 +178,8 @@ data/zzz/333/4/q.c
 data/zzz/333/5/q.c
 data/zzz/333/6/q.c
 data/zzz/333/7/q.c'
-	EXEC	data -name '*.c' -print
-	EXEC	data -name '*.[cd]'
+	EXEC	data -sort -name -name '*.c' -print
+	EXEC	data -sort -name -name '*.[cd]'
 		OUTPUT - $'data/aaa/111/4/q.c
 data/aaa/111/4/r.d
 data/aaa/111/5/q.c
@@ -228,10 +228,10 @@ data/zzz/333/6/q.c
 data/zzz/333/6/r.d
 data/zzz/333/7/q.c
 data/zzz/333/7/r.d'
-	EXEC	data \( -name '*.c' \|\| -name '*.d' \)
-	EXEC	data \( -name '*.c' -or -name '*.d' \)
-	EXEC	data \( -name '*.c' -or -name '*.d' \) -print
-	EXEC	data \( -name '*.c' -prune \) -or \( -name '*.d' -print \)
+	EXEC	data -sort -name \( -name '*.c' \|\| -name '*.d' \)
+	EXEC	data -sort -name \( -name '*.c' -or -name '*.d' \)
+	EXEC	data -sort -name \( -name '*.c' -or -name '*.d' \) -print
+	EXEC	data -sort -name \( -name '*.c' -prune \) -or \( -name '*.d' -print \)
 		OUTPUT - $'data/aaa/111/4/r.d
 data/aaa/111/5/r.d
 data/aaa/111/6/r.d
@@ -256,7 +256,7 @@ data/zzz/333/4/r.d
 data/zzz/333/5/r.d
 data/zzz/333/6/r.d
 data/zzz/333/7/r.d'
-	EXEC	data \( -name 'zzz|*.c' -prune \) -or \( -name '*.d' -print \)
+	EXEC	data -sort -name \( -name 'zzz|*.c' -prune \) -or \( -name '*.d' -print \)
 		OUTPUT - $'data/aaa/111/4/r.d
 data/aaa/111/5/r.d
 data/aaa/111/6/r.d
@@ -272,7 +272,7 @@ data/aaa/333/7/r.d'
 
 TEST 03 'types'
 	DO	DATA data
-	EXEC	data -type d
+	EXEC	data -sort -name -type d
 		OUTPUT - $'data
 data/aaa
 data/aaa/111
@@ -306,7 +306,7 @@ data/zzz/333/4
 data/zzz/333/5
 data/zzz/333/6
 data/zzz/333/7'
-	EXEC	data -type f
+	EXEC	data -sort -name -type f
 		OUTPUT - $'data/aaa/111/4/q.c
 data/aaa/111/4/r.d
 data/aaa/111/4/s.z
@@ -382,7 +382,7 @@ data/zzz/333/7/s.z'
 
 TEST 04 'modes'
 	DO	DATA mode
-	EXEC	mode -perm -000
+	EXEC	mode -sort -name -perm -000
 		OUTPUT - 'mode
 mode/000
 mode/111
@@ -392,43 +392,43 @@ mode/444
 mode/555
 mode/666
 mode/777'
-	EXEC	mode -perm  000
+	EXEC	mode -sort -name -perm  000
 		OUTPUT - 'mode/000'
-	EXEC	mode -perm +000
+	EXEC	mode -sort -name -perm +000
 		OUTPUT -
-	EXEC	mode -perm -111
+	EXEC	mode -sort -name -perm -111
 		OUTPUT - 'mode
 mode/111
 mode/333
 mode/555
 mode/777'
-	EXEC	mode -perm  111
+	EXEC	mode -sort -name -perm  111
 		OUTPUT - 'mode/111'
-	EXEC	mode -perm +111
+	EXEC	mode -sort -name -perm +111
 		OUTPUT - 'mode
 mode/111
 mode/333
 mode/555
 mode/777'
-	EXEC	mode -perm -222
+	EXEC	mode -sort -name -perm -222
 		OUTPUT - 'mode/222
 mode/333
 mode/666
 mode/777'
-	EXEC	mode -perm  222
+	EXEC	mode -sort -name -perm  222
 		OUTPUT - 'mode/222'
-	EXEC	mode -perm +222
+	EXEC	mode -sort -name -perm +222
 		OUTPUT - 'mode
 mode/222
 mode/333
 mode/666
 mode/777'
-	EXEC	mode -perm -333
+	EXEC	mode -sort -name -perm -333
 		OUTPUT - 'mode/333
 mode/777'
-	EXEC	mode -perm  333
+	EXEC	mode -sort -name -perm  333
 		OUTPUT - 'mode/333'
-	EXEC	mode -perm +333
+	EXEC	mode -sort -name -perm +333
 		OUTPUT - 'mode
 mode/111
 mode/222
@@ -436,27 +436,27 @@ mode/333
 mode/555
 mode/666
 mode/777'
-	EXEC	mode -perm -444
+	EXEC	mode -sort -name -perm -444
 		OUTPUT - 'mode
 mode/444
 mode/555
 mode/666
 mode/777'
-	EXEC	mode -perm  444
+	EXEC	mode -sort -name -perm  444
 		OUTPUT - 'mode/444'
-	EXEC	mode -perm +444
+	EXEC	mode -sort -name -perm +444
 		OUTPUT - 'mode
 mode/444
 mode/555
 mode/666
 mode/777'
-	EXEC	mode -perm -555
+	EXEC	mode -sort -name -perm -555
 		OUTPUT - 'mode
 mode/555
 mode/777'
-	EXEC	mode -perm  555
+	EXEC	mode -sort -name -perm  555
 		OUTPUT - 'mode/555'
-	EXEC	mode -perm +555
+	EXEC	mode -sort -name -perm +555
 		OUTPUT - 'mode
 mode/111
 mode/333
@@ -464,12 +464,12 @@ mode/444
 mode/555
 mode/666
 mode/777'
-	EXEC	mode -perm -666
+	EXEC	mode -sort -name -perm -666
 		OUTPUT - 'mode/666
 mode/777'
-	EXEC	mode -perm  666
+	EXEC	mode -sort -name -perm  666
 		OUTPUT - 'mode/666'
-	EXEC	mode -perm +666
+	EXEC	mode -sort -name -perm +666
 		OUTPUT - 'mode
 mode/222
 mode/333
@@ -477,11 +477,11 @@ mode/444
 mode/555
 mode/666
 mode/777'
-	EXEC	mode -perm -777
+	EXEC	mode -sort -name -perm -777
 		OUTPUT - 'mode/777'
-	EXEC	mode -perm  777
+	EXEC	mode -sort -name -perm  777
 		OUTPUT - 'mode/777'
-	EXEC	mode -perm +777
+	EXEC	mode -sort -name -perm +777
 		OUTPUT - 'mode
 mode/111
 mode/222
@@ -493,19 +493,19 @@ mode/777'
 
 TEST 05 '-name pattern'
 	DO	DATA match
-	EXEC	match
+	EXEC	match -sort -name
 		OUTPUT - $'match
-match/def
 match/.abc
-match/jkl
-match/jkl/vwx
-match/jkl/.stu
 match/.ghi
+match/.ghi/.mno
 match/.ghi/pqr
-match/.ghi/.mno'
-	EXEC	match -name '*'
-	EXEC	match -name '.*'
-		OUTPUT - $'match/.abc
+match/def
+match/jkl
 match/jkl/.stu
+match/jkl/vwx'
+	EXEC	match -sort -name -name '*'
+	EXEC	match -sort -name -name '.*'
+		OUTPUT - $'match/.abc
 match/.ghi
-match/.ghi/.mno'
+match/.ghi/.mno
+match/jkl/.stu'

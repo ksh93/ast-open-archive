@@ -64,7 +64,7 @@ next(struct msg* msgvec)
 	skip = MDELETE|MNONE;
 	if (msgvec->m_index) {
 		/*
-		 * If some messages were supplied, find the 
+		 * If some messages were supplied, find the
 		 * first applicable one following dot using
 		 * wrap around.
 		 */

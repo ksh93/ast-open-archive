@@ -53,6 +53,85 @@
 
 #define strcasecmp(s,p)	(!strgrpmatch(s,p,NiL,0,STR_ICASE|STR_MAXIMAL|STR_LEFT|STR_RIGHT))
 
+#define SPAM_advertisement		0x1	/* Advertisement: found		*/
+#define SPAM_authentication_outsider	0x2	/* Authentication: outsider	*/
+#define SPAM_authentication_protocol	0x4	/* Authentication: protocol bad	*/
+#define SPAM_authentication_warning	0x8	/* Authentication: warning	*/
+#define SPAM_content_multipart_related	0x10	/* multipart/related		*/
+#define SPAM_content_text_html		0x20	/* text/html			*/
+#define SPAM_delay_spam			0x40	/* hop delay looks like spam	*/
+#define SPAM_external_spam		0x80	/* external spam checker hit	*/
+#define SPAM_from_forged		0x100	/* From: forged			*/
+#define SPAM_from_spam			0x200	/* From: spam			*/
+#define SPAM_message_id_spam		0x400	/* Message-id: spam		*/
+#define SPAM_mime_autoconverted		0x800	/* Mime: autoconverted		*/
+#define SPAM_received_forged		0x1000	/* Received: forged		*/
+#define SPAM_received_unknown		0x2000	/* Received: unknown		*/
+#define SPAM_subject_spam		0x4000	/* Subject: spam		*/
+#define SPAM_to_spam			0x8000	/* To: spam			*/
+
+#define SPAM_DEFAULT		(SPAM_advertisement|SPAM_delay_spam|SPAM_external_spam|SPAM_from_spam|SPAM_message_id_spam|SPAM_received_forged|SPAM_received_unknown|SPAM_subject_spam|SPAM_to_spam)
+
+static const struct lab	spamtest[] =
+{
+	"advertisement",		SPAM_advertisement,
+	"authentication_outsider",	SPAM_authentication_outsider,
+	"authentication_protocol",	SPAM_authentication_protocol,
+	"authentication_warning",	SPAM_authentication_warning,
+	"content_multipart_related",	SPAM_content_multipart_related,
+	"content_text_html",		SPAM_content_text_html,
+	"delay_spam",			SPAM_delay_spam,
+	"external_spam",		SPAM_external_spam,
+	"from_forged",			SPAM_from_forged,
+	"from_spam",			SPAM_from_spam,
+	"message_id_spam",		SPAM_message_id_spam,
+	"mime_autoconverted",		SPAM_mime_autoconverted,
+	"received_forged",		SPAM_received_forged,
+	"received_unknown",		SPAM_received_unknown,
+	"subject_spam",			SPAM_subject_spam,
+	"to_spam",			SPAM_to_spam,
+};
+
+/*
+ * Trap spamtest variable assignment.
+ */
+
+void
+set_spamtest(struct var* vp, const char* value)
+{
+	register char*			s;
+	register char*			t;
+	register int			n;
+	register const struct lab*	p;
+	long				test;
+
+	s = (char*)value;
+	if (!isdigit(*s)) {
+		test = *((long*)vp->variable);
+		do {
+			for (t = s; *t && *t != ',' && *t != '|'; t++);
+			if (n = t - s)
+				for (p = spamtest;; p++) {
+					if (p >= &spamtest[elementsof(spamtest)]) {
+						if (!strncasecmp(s, "clear", n))
+							test = 0;
+						else if (!strncasecmp(s, "default", n))
+							test = SPAM_DEFAULT;
+						else
+							note(WARNING, "%-.*s: unknown %s value", n, s, vp->name);
+						break;
+					}
+					if (!strncasecmp(s, p->name, n)) {
+						test |= p->type;
+						break;
+					}
+				}
+			s = t;
+		} while (*s++);
+		*((long*)vp->variable) = test;
+	}
+}
+
 /*
  * Return 1 if the intersection of the <,><space> separated
  * address strings a and b is not empty.
@@ -338,7 +417,7 @@ usermatch(const char* a, const char* b, int to)
 }
 
 /*
- * check if s cam from inside the domain
+ * check if s came from inside the domain
  */
 
 static int
@@ -369,16 +448,15 @@ spammed(register struct msg* mp)
 	char*		t;
 	char*		e;
 	char*		to;
-	char*		cc;
 	char*		local;
 	char*		domain2;
 	unsigned long	q;
 	unsigned long	x;
 	unsigned long	d;
 	int		n;
+	int		me;
 	int		ok;
 	int		no;
-	int		proper;
 	int		ours;
 	int		ours2;
 	int		fromours;
@@ -391,15 +469,12 @@ spammed(register struct msg* mp)
 			note(0, "spam: To: header missing");
 		return 1;
 	}
-	if ((cc = grab(mp, GCC|GCOMPARE|GDISPLAY, NiL)) && addrmatch(state.var.user, cc))
-		return 0;
-	if (state.var.spamsub && (s = grab(mp, GSUB|GCOMPARE|GDISPLAY, NiL)) && wordmatch(strlower(s), state.var.spamsub))
-		return 1;
 	if (headset(&pp, mp, NiL, NiL, NiL, GFROM))
 	{
 		d = state.var.spamdelay;
 		q = 0;
-		ok = no = proper = fromours = 0;
+		ok = no = fromours = me = 0;
+		test = 0;
 		if (state.var.domain)
 		{
 			ours = strlen(state.var.domain);
@@ -416,7 +491,6 @@ spammed(register struct msg* mp)
 			ours = ours2 = 0;
 			domain2 = 0;
 		}
-		test = 0;
 		while (headget(&pp))
 		{
 			t = pp.name;
@@ -430,35 +504,43 @@ spammed(register struct msg* mp)
 				{
 					if (TRACING('x'))
 						note(0, "spam: advertisement header");
-					return 1;
+					test |= SPAM_advertisement;
 				}
-				else if ((TRACING('t') || (state.var.spamtest & 0x0060)) && !strcasecmp(t, "Authentication-Warning"))
+				else if (!strcasecmp(t, "Authentication-Warning"))
 				{
-					test |= 0x0004;
+					test |= SPAM_authentication_warning;
 					if (t = strrchr(pp.data, ' '))
 					{
 						*t++ = 0;
 						if (streq(t, "-f"))
 						{
 							if ((t = strrchr(pp.data, ' ')) && streq(t + 1, "using") && !(*t = 0) && (t = strrchr(pp.data, ' ')) && insider(t + 1, NiL, 0, state.var.domain, ours, domain2, ours2))
-								test |= 0x0040;
+								test |= SPAM_authentication_outsider;
 						}
 						else if (streq(t, "protocol"))
-							test |= 0x0020;
+							test |= SPAM_authentication_protocol;
 					}
 				}
 			}
 			else if (*t == 'C' || *t == 'c')
 			{
-				if (!strcasecmp(t, "Content-Type"))
+				if (!strcasecmp(t, "Cc"))
+				{
+					t = skin(pp.data, GDISPLAY|GCOMPARE|GFROM);
+					if (TRACING('x'))
+						note(0, "spam: cc `%s'", t);
+					if (addrmatch(state.var.user, t))
+						me = 1;
+				}
+				else if (!strcasecmp(t, "Content-Type"))
 				{
 					t = skin(pp.data, GDISPLAY|GCOMPARE|GFROM);
 					if (TRACING('x'))
 						note(0, "spam: content-type `%s'", t);
 					if (!strncasecmp(t, "text/html", 9))
-						test |= 0x0001;
-					if (!strncasecmp(t, "multipart/related", 17))
-						test |= 0x0002;
+						test |= SPAM_content_text_html;
+					else if (!strncasecmp(t, "multipart/related", 17))
+						test |= SPAM_content_multipart_related;
 				}
 			}
 			else if (*t == 'F' || *t == 'f')
@@ -470,14 +552,10 @@ spammed(register struct msg* mp)
 						*s = 0;
 					if (TRACING('x'))
 						note(0, "spam: from `%s'", t);
-					if (addrmatch(t, state.var.user))
+					if (addrmatch(t, state.var.user) || state.var.spamfromok && usermatch(t, state.var.spamfromok, 0))
 						return 0;
-					if (state.var.spamfromok && usermatch(t, state.var.spamfromok, 0))
-						return 0;
-					if (state.var.spamfrom && usermatch(t, state.var.spamfrom, 0))
-						return 1;
-					if (addrmatch(t, to))
-						return 1;
+					else if (addrmatch(t, to) || state.var.spamfrom && usermatch(t, state.var.spamfrom, 0))
+						test |= SPAM_from_spam;
 					if (fromours >= 0)
 						fromours = insider(t, NiL, fromours, state.var.domain, ours, domain2, ours2);
 				}
@@ -490,13 +568,13 @@ spammed(register struct msg* mp)
 					if (TRACING('x'))
 						note(0, "spam: message-id `%s'", t);
 					if (!*t)
-						return 1;
+						test |= SPAM_message_id_spam;
 				}
 				else if (!strcasecmp(t, "Mime-Autoconverted"))
 				{
 					if (TRACING('x'))
 						note(0, "spam: mime autoconverted");
-					test |= 0x0008;
+					test |= SPAM_mime_autoconverted;
 				}
 			}
 			else if (*t == 'R' || *t == 'r')
@@ -511,7 +589,7 @@ spammed(register struct msg* mp)
 							{
 								if (TRACING('x'))
 									note(0, "spam: unknown host name");
-								return 1;
+								test |= SPAM_received_unknown;
 							}
 						}
 						else if (*t == 'f' && (t == pp.data || *(t - 1) == ' '))
@@ -520,7 +598,7 @@ spammed(register struct msg* mp)
 							{
 								if (TRACING('x'))
 									note(0, "spam: forged");
-								return 1;
+								test |= SPAM_received_forged;
 							}
 							else if (ours && strneq(t, "from ", 4))
 							{
@@ -554,12 +632,33 @@ spammed(register struct msg* mp)
 							{
 								if (TRACING('x'))
 									note(0, "spam: delay %ld", (q > x) ? (q - x) : (x - q));
-								return 1;
+								test |= SPAM_delay_spam;
 							}
 							q = x;
 						}
 					}
 #endif
+				}
+			}
+			else if (*t == 'S' || *t == 's')
+			{
+				if (!strcasecmp(t, "Spam-Flag"))
+				{
+					t = pp.data;
+					if (*t == 'Y' || *t == 'y' || *t == '1')
+					{
+						if (TRACING('x'))
+							note(0, "spam: external spam check hit");
+						test |= SPAM_external_spam;
+					}
+				}
+				else if (!strcasecmp(t, "Subject"))
+				{
+					if (state.var.spamsub)
+					{
+						if (wordmatch(strlower(pp.data), state.var.spamsub))
+							test |= SPAM_subject_spam;
+					}
 				}
 			}
 			else if (*t == 'T' || *t == 't')
@@ -576,16 +675,19 @@ spammed(register struct msg* mp)
 						if (TRACING('x'))
 							note(0, "spam: to `%s'", t);
 						if (*t == 0)
-							return 1;
+						{
+							test |= SPAM_to_spam;
+							break;
+						}
 						if (addrmatch(state.var.user, t))
-							proper = 1;
-						if (state.var.spamtook && usermatch(t, state.var.spamtook, state.var.local != 0))
+							me = 1;
+						else if (state.var.spamtook && usermatch(t, state.var.spamtook, state.var.local != 0))
 						{
 							if (TRACING('x'))
 								note(0, "spam: spamtook `%s'", t);
 							ok++;
 						}
-						if (state.var.spamto && usermatch(t, state.var.spamto, state.var.local != 0))
+						else if (state.var.spamto && usermatch(t, state.var.spamto, state.var.local != 0))
 						{
 							if (TRACING('x'))
 								note(0, "spam: spamto `%s'", t);
@@ -596,17 +698,33 @@ spammed(register struct msg* mp)
 			}
 		}
 		if (fromours > 0 && !ours)
-			test |= 0x0010;
-		if (TRACING('t') || TRACING('x'))
-			note(0, "spam: proper=%d ok=%d no=%d test=0x%04x", proper, ok, no, test);
-		if (proper)
-			return 0;
-		if (test & state.var.spamtest)
-			return 1;
+			test |= SPAM_from_forged;
+		if (TRACING('t') || TRACING('x')) {
+			const struct lab*	p;
+			char			buf[1024];
+
+			s = buf;
+			e = s + sizeof(buf) - 1;
+			for (p = spamtest; p < &spamtest[elementsof(spamtest)]; p++)
+				if (test & p->type)
+				{
+					for (t = (char*)p->name; *t && s < e; *s++ = *t++);
+					if (s < e)
+						*s++ = '|';
+				}
+			if (s > buf)
+				s--;
+			*s = 0;
+			note(0, "spam: ok=%d no=%d test=%s", ok, no, buf);
+		}
 		if (no > ok)
 			return 1;
 		if (ok > no)
 			return 0;
+		if (me)
+			return 0;
+		if (test & state.var.spamtest)
+			return 1;
 	}
 	if (state.var.local)
 	{

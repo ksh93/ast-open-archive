@@ -2,7 +2,6 @@
 
 ID			=	tksh
 LIB			=	tcl
-LICENSE			=	type=special
 
 TCL_VERSION		=	7.6
 TK_VERSION		=	4.2

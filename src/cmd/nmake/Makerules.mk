@@ -16,7 +16,13 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-03-25 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2004-04-15 $"
+
+/*
+ * implementation version
+ */
+
+.MAKEVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
 /*
  * handy attributes
@@ -96,12 +102,6 @@ HTMLINITFILES = 2HTML:$(HOME)/.2html
 LICENSE =
 LICENSEFILE = LICENSE
 LICENSEFILES = $(LICENSEFILE):$(.PACKAGE.:D=$(LIBDIR)/package:B:S=.lic)
-
-/*
- * recursion defaults
- */
-
-MAKESKIP = *-*
 
 /*
  * language processor suffix equivalences
@@ -237,8 +237,11 @@ CMP = cmp
 CMPFLAGS = -s
 COBOL = cobc
 COBOLFLAGS = -static -std=mvs -C
+COBOLIPF = -xipf
+COBOLIPFCOPY =
 COBOLLIBRARIES = -lcob
 COBOLMAIN = -fmain
+COBOLSQL = -xsql
 CP = cp
 CPIO = cpio
 CPP = $(MAKEPP)
@@ -371,7 +374,7 @@ end
 .CLOBBER. = $(".":L=*.([it]i|l[hn])) core
 .FILES. = $(LICENSEFILE)
 .MANIFEST.FILES. = $(*.COMMON.SAVE:T=F) $(.SELECT.:A!=.ARCHIVE|.COMMAND|.OBJECT)
-.MANIFEST. = $(.MANIFEST.FILES.:P=C:H=U)
+.MANIFEST. = $(.MANIFEST.FILES.:P=F:P=C:H=U)
 .SOURCES. = $(.SELECT.:A=.REGULAR:A!=.ARCHIVE|.COMMAND|.OBJECT)
 
 /*
@@ -490,8 +493,10 @@ include "Scanrules.mk"
 		return $(L)
 	end
 	if ! "$(.LIBRARY.LIST.)" || "$(.PACKAGE.LIBRARY. $(B))" != "-l"
-		if ( L = "$(A:T=F)" )
-			return $(L)
+		if "$(.REQUIRE.-l% -l$(B):/[-+]l//:N=$(B))"
+			if ( L = "$(A:T=F)" )
+				return $(L)
+			end
 		end
 	end
 	A := $(%:/+l/-l/)
@@ -768,7 +773,11 @@ include "Scanrules.mk"
 	elif "$(-mam:N=static*,port*)"
 		return ${mam_lib$(B)}
 	end
-	return $(T:T=I)
+	T := $(T:T=I)
+	if "$(T:N=+l$(B))"
+		.PACKAGE.$(B).library := +l
+	end
+	return $(T)
 
 .REQUIRE.-l% : .FUNCTION
 	local B H L R S
@@ -1277,11 +1286,12 @@ end
 
 .RECURSE.ARGS. : .FUNCTION
 	local A L V
+	L = .TARGET
 	for A $(.ORIGINAL.ARGS.)
-		if ! L && ! "$(A:A=.TARGET)" && ( T = "$(A:/.*/.&/U:A=.TARGET)" )
+		if ! "$(A:A=.TARGET)" && ( T = "$(A:/.*/.&/U:A=$(L))" )
 			A := $(T)
 		else
-			L = 1
+			L = .ONOBJECT
 		end
 		if "$(A:A!=.ACTIVE:N!=.RECURSE)" || "$(A:A=.ONOBJECT)"
 			V += $(A)
@@ -1309,7 +1319,7 @@ end
 		exit 0
 	end
 	$(D) : .OBJECT
-	P := $(D:B:S:/ /|/G)
+	P := $(D:B:S:N!=$(...:A=.ONOBJECT:N=.*:/.\(.*\)/\1/L:N!=*.*:/ /|/G):/ /|/G)
 	if P
 		P := $(P)|
 	end
@@ -1343,8 +1353,12 @@ end
 
 "::" : .MAKE .OPERATOR .PROBE.INIT
 	if ! "$(<)"
-		$(>:N=[!-.]*|.[!A-Z]*) : .SPECIAL
-		.FILES. += $(>:N=[!-.]*|.[!A-Z]*)
+		if ! "$(>)"
+			.FILES. += .
+		else
+			$(>:N=[!-.]*|.[!A-Z]*) : .SPECIAL
+			.FILES. += $(>:N=.|[!-.]*|.[!A-Z]*)
+		end
 	elif "$(<:O=2)"
 		error 2 $(<:O=2): only one target expected
 	else
@@ -1612,6 +1626,28 @@ end
 ":FUNCTION:" : .MAKE .OPERATOR
 	eval
 	$$(<:V) : .SPECIAL .FUNCTION $$(>:V)
+		$(@:V)
+	end
+
+/*
+ * add an initialization make action
+ * rhs is optional name
+ */
+
+":INIT:" : .MAKE .OPERATOR
+	local T
+	if ( T = $(>:O=1) )
+		T := $(.GENSYM.)
+	end
+	if T != ".*"
+		T := .$(T)
+	end
+	if T != "*.(INIT|init)"
+		T := $(T).init
+	end
+	.MAKEINIT : $(T)
+	eval
+	$$(T) : .MAKE .VIRTUAL .FORCE
 		$(@:V)
 	end
 
@@ -1905,15 +1941,19 @@ end
 	$(T) : $(L) $(.SHARED. $(L) $(B) $(V|"-") $(>:V:N=[!-+]*=*) $(>:V:N=[-+]l*))
 
 .REQ. : .FUNCTION
-	local I Q R
+	local B I Q R
 	for I $(%)
-		I := $(I:/^[-+]l//)
-		if "$(.REQUIRE.$(I))"
-			R += -l$(I)
+		if I == "[-+]l*"
+			B := $(I:/^[-+]l//)
 		else
+			B := $(I)
 			I := -l$(I)
+		end
+		if "$(.REQUIRE.$(B))"
+			R += $(I)
+		else
 			if Q = "$(.REQUIRE.-l% $(I))"
-				if ! "$(Q:N=$(I))" && ! "$(MAKE_QUESTIONABLE_require)"
+				if ! "$(Q:N=[-+]l$(B))" && ! "$(MAKE_QUESTIONABLE_require)"
 					continue
 				end
 			end
@@ -1944,47 +1984,42 @@ end
 	end
 
 .SHARED.LIST.LIBS. : .FUNCTION
-	if $(MAKEVERSION:@/.* //:/-//G) >= 20030609
+	if .MAKEVERSION. >= 20040415
+		return $(~~:VBFUI)
+	elif .MAKEVERSION. >= 20030609
 		return $(~~:VFU)
 	end
 	return $(~~:A!=.USE)
 
 .SHARED.LIST. : .FUNCTION
-	local N=0 L D X W G A R M
+	local A D L M R T N=0
 	M := [-+]l*|*$(CC.SUFFIX.ARCHIVE)|*$(CC.SUFFIX.SHARED)
 	for L $(%)
+		if A
+			L := $(L:/^$(CC.PREFIX.ARCHIVE)\(.*\)\$(CC.SUFFIX.ARCHIVE)/+l\1/)
+		end
+		A := $(L) $(A)
 		if L == "{"
 			let N = N + 1
 		elif L == "}"
 			let N = N - 1
-		elif L == "$(M)"
-			if N <= 0
-				G := $(L) $(G)
-			elif N > 1
-				W := $(L) $(W)
-			elif ! "$(X:N=$(L))"
-				X := $(X) $(L)
-			end
-		else
-			X := $(X) $(L)
+		elif N <= 1
+			T := $(T) $(L)
 		end
 	end
-	A := $(X) $(W) $(G)
-	A := $(A:U)
-	for L $(G) $(W)
+	for L $(A)
 		if L == "+l*"
-			if ! "$(X:N=$(L))"
+			if ! "$(T:N=$(L))"
 				D := $(L:/+/-/)
-				if "$(A:N=$(D))" || "$(CC.STDLIB:N=$(D:T=F:P=D))"
+				if "$(R:N=$(D))" || "$(CC.STDLIB:N=$(D:T=F:P=D))" && "$(.PACKAGE.$(L:/+l//).library)" != "+l"
 					L := $(D)
 				end
 			end
 		end
-		if ! "$(R:N=$(L))"
+		if L != "$(M)" || ! "$(R:N=$(L))"
 			R := $(L) $(R)
 		end
 	end
-	R := $(X) $(R)
 	return $(R:T=F)
 
 .SHARED. : .FUNCTION
@@ -2134,7 +2169,7 @@ end
 		$(D) : .VIRTUAL .IGNORE $(<:D)
 		$(<) : .DO.LINK $(D) $(>)
 	else
-		if U = "$(<:N!=/*)"
+		if U = "$(<:N!=/*:T!=FD:O=1)"
 			.ALL : $(U)
 			$(U) : .SPECIAL .DO.LINK $(>)
 		end
@@ -2242,6 +2277,7 @@ end
 .PACKAGE.build =
 .PACKAGE.install =
 .PACKAGE.libraries =
+.PACKAGE.license =
 .PACKAGE.plugin =
 .PACKAGE.registry = 1
 .PACKAGE.stdlib = $(*.SOURCE.a) $(CC.STDLIB) /usr/lib /lib
@@ -2286,6 +2322,7 @@ end
 .PACKAGE.CONFIG. = lib/pkgconfig
 .PACKAGE.GLOBAL. =
 .PACKAGE.LOCAL. =
+.PACKAGE.PROBE. =
 
 .PACKAGE.INIT. : .FUNCTION .PROBE.INIT
 	local T1 T4 T5 T6 T7
@@ -2294,6 +2331,7 @@ end
 		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
 		.PACKAGE.GLOBAL. := $(.PACKAGE.GLOBAL.:N!=$(PACKAGE_IGNORE):T=F:U)
 		.PACKAGE.CONFIG. := $(.PACKAGE.GLOBAL.:X=$(.PACKAGE.CONFIG.):T=F:U)
+		: $(.PACKAGE.PROBE.:V:R)
 	end
 	for P $(%)
 		FOUND = 0
@@ -2442,7 +2480,7 @@ end
 			end
 			if T1
 				.PACKAGE.DIRS. += $(T1)
-				if !I
+				if !I && IP != "-"
 					I := $(T1)/$(IP)
 					H := $(I)/$(P)/.
 					if "$(H:P=X)"
@@ -2452,7 +2490,7 @@ end
 					PACKAGE_$(P)_INCLUDE = $(I)
 					end
 				end
-				if !L
+				if !L && LP != "-"
 					L := $(T1)/$(LP)
 					eval
 					PACKAGE_$(P)_LIB = $(L)
@@ -2582,6 +2620,17 @@ PACKAGES : .SPECIAL .FUNCTION
 					end
 				end
 			end
+		elif T == "CC.*=*|noCC.*"
+			if T == "no*"
+				T := $(T:V:/no//) =
+			end
+			if .PACKAGE.GLOBAL.
+				eval
+				$(T:V)
+				end
+			else
+				.PACKAGE.PROBE. += $("\n")$(T:V)
+			end
 		elif T != "*:(command|force|prereq)"
 			if T == "*:*"
 				P := $(T:/:.*//)
@@ -2664,7 +2713,22 @@ PACKAGES : .SPECIAL .FUNCTION
 						.PACKAGE.$(P).library :=
 					end
 				elif N == "include|lib"
-					.PACKAGE.$(P).$(N) := $(V)
+					if V != 1
+						if V == 0
+							V = -
+						end
+						.PACKAGE.$(P).$(N) := $(V)
+					end
+				elif N == "license"
+					if V && ! .PACKAGE.license
+						.PACKAGE.license := $(P)
+					end
+				elif N == "root"
+					if V == 0
+						.PACKAGE.$(P).include := -
+						.PACKAGE.$(P).lib := -
+						.PACKAGE.$(P).library :=
+					end
 				elif N == "version"
 					PACKAGE_$(P)_VERSION := $(V)
 				elif N == "install"
@@ -3242,7 +3306,10 @@ PACKAGES : .SPECIAL .FUNCTION
 					K.$(K) := 1
 				end
 			elif ! K && ! "$(.PACKAGE.$(P).dontcare)"
-				error 3 $(P): package not found
+				if ! "$(PKGDIRS:X=package/$(P).lic package/$(P).pkg:T=F)"
+					error 3 $(P): package not found
+				end
+				.PACKAGE.$(P).dontcare := 1
 			end
 			T2 += $(P)
 			T4 =
@@ -3321,7 +3388,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		.CC.NOSTDLIB. := $(CC.STDLIB:V:N!=*[()]*|$(T4:@C@ @|@G):C@ @|@G:C@^@N!=@)
 	else
 		.CC.NOSTDINCLUDE. := $(CC.STDINCLUDE:N!=$(T3:@C@ @|@G):C@ @|@G:C@^@N!=@)
-		.CC.NOSTDLIB. := $(CC.STDLIB:N!=*/local/*:N!=$(T4:@C@ @|@G):C@ @|@G:C@^@N!=@)
+		.CC.NOSTDLIB. := $(CC.STDLIB:N!=$(T4:@C@ @|@G):C@ @|@G:C@^@N!=@)
 	end
 	T3 = $(PACKAGE_PATH:/:/ /G) $(.PACKAGE.DIRS.) $(.PACKAGE.GLOBAL.)
 	.SOURCE.a : $(T3:X=lib:N!=$(.PACKAGE.stdlib:/ /|/G):T=F)
@@ -3621,7 +3688,7 @@ PACKAGES : .SPECIAL .FUNCTION
  *	$(.SOURCES.)	non-generated source files in $(.SELECT.)
  */
 
-test : .SPECIAL .DONTCARE .ONOBJECT
+test : .SPECIAL .DONTCARE .ONOBJECT $$("check":A=.TARGET:A!=.ARCHIVE|.COMMAND|.OBJECT)
 
 .ALL : .VIRTUAL
 
@@ -3643,10 +3710,10 @@ test : .SPECIAL .DONTCARE .ONOBJECT
 	.BASE. := $(N)
 
 .BASE : .BASE.UPDATE .COMMON.SAVE
-	$(PAX) -w -f $(.BASE.) -z - $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $(.BASE.) -z - $(PAXFLAGS) $(.MANIFEST.)
 
 .DELTA : .BASE.VERIFY .COMMON.SAVE
-	$(PAX) -w -f $("":T=R:F=%($(.BASE.DATE.FORMAT.))T).$(.BASE.) -z $(.BASE.) $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $("":T=R:F=%($(.BASE.DATE.FORMAT.))T).$(.BASE.) -z $(.BASE.) $(PAXFLAGS) $(.MANIFEST.)
 
 /*
  * believe generated files and clean up archive intermediates
@@ -3878,7 +3945,7 @@ end
 .LIST.PACKAGE.LOCAL : .ONOBJECT .COMMON.SAVE .MAKE
 	local I E
 	E := $(.LIST.PACKAGE.EDIT.)
-	for I $(.MANIFEST.:P=A)
+	for I $(.MANIFEST.:T=F:P=A)
 		print ;;;$(I);$(I:$(E))
 	end
 
@@ -3887,7 +3954,7 @@ end
 	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F)
 	E := $(.LIST.PACKAGE.EDIT.)
 	if package.strip
-		for I $(*.UNION:P=A:$(PACKAGE_OPTIMIZE:N=space:Y%:N=$(INSTALLROOT)/(bin|fun|lib)/*:N!=*$(CC.SUFFIX.ARCHIVE)|$(INSTALLROOT)/lib/lib?(/*)%%))
+		for I $(*.UNION:T=F:P=A:$(PACKAGE_OPTIMIZE:N=space:Y%:N=$(INSTALLROOT)/(bin|fun|lib)/*:N!=*$(CC.SUFFIX.ARCHIVE)|$(INSTALLROOT)/lib/lib?(/*)%%))
 			if "$(I:T=Y)" == "*/?(x-)(dll|exe)"
 				print ;;filter $(STRIP) $(STRIPFLAGS) $(I);$(I);$(I:$(E))
 			else
@@ -3895,43 +3962,50 @@ end
 			end
 		end
 	else
-		for I $(*.UNION:P=A)
+		for I $(*.UNION:T=F:P=A)
 			print ;;;$(I);$(I:$(E))
 		end
 	end
 
+.PROTO.LICENSE. : .FUNCTION
+	local F G
+	if .PACKAGE.license || LICENSE == "*=*"
+		G = 1
+	elif LICENSE
+		G = 0
+	elif F = "$(LICENSEFILE:T=F)"
+		G := $(sh egrep -c "^(contributor|license)=\($" $(F) || true)
+	else
+		G = 0
+	end
+	return $(G)
+
 .LIST.PACKAGE.SOURCE : .ONOBJECT .COMMON.SAVE .MAKE
-	local I E
+	local E F G
 	PROTOEDIT = P=A
 	E := $(.LIST.PACKAGE.EDIT.)
-	for I $(.MANIFEST.:P=A)
-		if I == "*.{1,3}(?)"
-			print ;;$(PROTO) $(PROTOFLAGS) -c '' -dp $(I);$(I);$(I:$(E))
+	G := $(.PROTO.LICENSE.)
+	for F $(.MANIFEST.:T=F:P=A)
+		if G && F == "*.{1,3}(?)"
+			print ;;$(PROTO) $(PROTOFLAGS) -c '' -dp $(F);$(F);$(F:$(E))
 		else
-			print ;;;$(I);$(I:$(E))
+			print ;;;$(F);$(F:$(E))
 		end
 	end
 
 .LIST.SOURCE.TGZ : .ONOBJECT .COMMON.SAVE .MAKE
-	local E F P
+	local E N F P # vs # I N T J
 	PROTOEDIT = P=A
 	E := $(.LIST.PACKAGE.EDIT.)
+	N := $(.PROTO.LICENSE.)
 	for F $(.MANIFEST.)
 		P := $(F:T=F)
-		if F == "*.{1,3}(?)"
+		if N && F == "*.{1,3}(?)"
 			print ;;$(PROTO) $(PROTOFLAGS) -c '' -dp $(P);$(P);$(F:$(E))
 		else
 			print ;;;$(P);$(F:$(E))
 		end
 	end
-
-.LIST.SHIP : .ONOBJECT .MAKE
-	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F:C%$(INSTALLROOT)/%%)
-	print $(*.UNION:/ /$("\n")/G)
-
-.LIST.SHIP.BIN : .ONOBJECT .MAKE
-	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F:C%$(INSTALLROOT)/%%:N!=include/*|lib/lib*.a|man/man[!18]?(/*))
-	print $(*.UNION:/ /$("\n")/G)
 
 .LIST.SYMBOLS : .ALWAYS
 	lib="$(...:A=.ARCHIVE:A=.TARGET:T=F:N!=*[-/]*)"
@@ -3964,7 +4038,7 @@ end
 .PAX : .COMMON.SAVE $$(*.RECURSE:@?.PAX.RECURSE?.PAX.LOCAL)
 
 .PAX.LOCAL : .COMMON.SAVE
-	$(PAX) -w -f $(output).pax $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $(output).pax $(PAXFLAGS) $(.MANIFEST.)
 
 .PAX.RECURSE : .COMMON.SAVE
 	$(MAKE) --noexec --file=$(MAKEFILE) $(-) recurse list.manifest |
@@ -3975,7 +4049,7 @@ end
 	$(PR) $(PRFLAGS) $(.SOURCES.:N!=*.[0-9]*([!./])) $(LPR:@?| $(LPR) $(LPRFLAGS)??)
 
 .SAVE : .COMMON.SAVE
-	$(PAX) -w -f $(output).$("":T=R:F=%($(.BASE.DATE.FORMAT.))T) $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $(output).$("":T=R:F=%($(.BASE.DATE.FORMAT.))T) $(PAXFLAGS) $(.MANIFEST.)
 
 .SHAR : .COMMON.SAVE
 	$(SHAR) $(SHARFLAGS) $(.MANIFEST.) > $(output).shar
@@ -3984,12 +4058,12 @@ end
 	$(TAR) cf$(TARFLAGS) $(output).tar $(.MANIFEST.)
 
 .TARBALL : .COMMON.SAVE
-	$(PAX) -w -f $(output).tgz -x tar:gzip $(PAXFLAGS) -s ',^[^/],$(PWD:B:/-.*//)$(VERSION:?-$(VERSION)??)/,' $(.MANIFEST.)
+	$(PAX) -d -w -f $(output).tgz -x tar:gzip $(PAXFLAGS) -s ',^[^/],$(PWD:B:/-.*//)$(VERSION:?-$(VERSION)??)/,' $(.MANIFEST.)
 
 .TGZ : .COMMON.SAVE $$(*.RECURSE:@?.TGZ.RECURSE?.TGZ.LOCAL)
 
 .TGZ.LOCAL : .COMMON.SAVE
-	$(PAX) -w -f $(output).tgz -x tar:gzip $(PAXFLAGS) $(.MANIFEST.)
+	$(PAX) -d -w -f $(output).tgz -x tar:gzip $(PAXFLAGS) $(.MANIFEST.)
 
 .TGZ.RECURSE : .COMMON.SAVE
 	$(MAKE) --noexec --file=$(MAKEFILE) $(-) recurse list.manifest |

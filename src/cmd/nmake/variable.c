@@ -332,7 +332,7 @@ getval(register char* s, int op)
 				e = (c == '>' && !(state.questionable & 0x01000000) && (z = staterule(RULE, r, NiL, -1))) ? z->time : r->time;
 				for (p = r->prereqs; p; p = p->next)
 				{
-					if (p->rule != x && (c == '~' && (!(op & VAL_FILE) || !notfile(p->rule)) || !notfile(p->rule) &&
+					if (p->rule != x && (c == '~' && (!(op & VAL_FILE) || !notfile(p->rule) || (op & VAL_BRACE) && (*p->rule->name == '{' || *p->rule->name == '}') && !*(p->rule->name + 1)) || !notfile(p->rule) &&
 					    (c != '>' || !(p->rule->dynamic & D_same) &&
 					     (!(r->property & P_archive) && (p->rule->time >= state.start || p->rule->time > e || !(z = staterule(RULE, p->rule, NiL, -1)) || !z->time || !(state.questionable & 0x01000000) && z->time > e) ||
 					      (r->property & P_archive) && !(p->rule->dynamic & D_member) && p->rule->time))))

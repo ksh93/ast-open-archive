@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2003 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -126,11 +126,7 @@ pzdeflate(register Pz_t* pz, Sfio_t* op)
 			pz->sort.orderdisc.key = offsetof(Pzelt_t, buf);
 			pz->sort.orderdisc.size = pp->row;
 			if (!(elt = (Pzelt_t*)vmnewof(pz->vm, 0, char, pp->col * m, 0)) || !(pz->sort.order = dtnew(pz->vm, &pz->sort.orderdisc, Dtobag)) || !(pz->sort.free = dtnew(pz->vm, &pz->sort.freedisc, Dtlist)))
-			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
-				return -1;
-			}
+				return pznospace(pz);;
 			for (i = 0; i < pp->col; i++)
 			{
 				dtinsert(pz->sort.free, elt);

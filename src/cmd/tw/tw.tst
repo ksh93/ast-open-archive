@@ -371,6 +371,38 @@ match/jkl/.stu'
 
 TEST 06 'expressions and functions'
 
+	EXEC 	-n -e '	int i;
+			char* s = "abc pdq xyz";
+			char* a, p, x;
+			i = sscanf(s, "%s %s %s", &a, &p, &x);
+			printf("i=%d a=\"%s\" p=\"%s\" x=\"%s\"\n", i, a, p, x);'
+		OUTPUT - 'i=3 a="abc" p="pdq" x="xyz"'
+
+	EXEC 	-n -e '	int i;
+			char* s = "abc pdq xyz";
+			char* a, p, x;
+			i = sscanf(s, "%s %s %s", &a, &p, &x);
+			printf("i=%d x=\"%s\" p=\"%s\" a=\"%s\"\n", i, x, p, a);'
+		OUTPUT - 'i=3 x="xyz" p="pdq" a="abc"'
+
+	EXEC 	-n -e '	int i;
+			char* s = "abc pdq xyz";
+			char* a, p, x;
+			i = sscanf(s, "%s", &a);
+			printf("i=%d a=\"%s\"\n", i, a);
+			i = sscanf(s, "%s %s", &a, &p);
+			printf("i=%d a=\"%s\" p=\"%s\"\n", i, a, p);
+			i = sscanf(s, "%s %s %s", &a, &p, &x);
+			printf("i=%d a=\"%s\" p=\"%s\" x=\"%s\"\n", i, a, p, x);
+			i = sscanf(s, "%s %s %s", &a, &p, &x);
+			printf("i=%d x=\"%s\" p=\"%s\" a=\"%s\"\n", i, x, p, a);
+			printf("i=%d a=\"%s\" p=\"%s\" x=\"%s\"\n", i, a, p, x);'
+		OUTPUT - 'i=1 a="abc"
+i=2 a="abc" p="pdq"
+i=3 a="abc" p="pdq" x="xyz"
+i=3 x="xyz" p="pdq" a="abc"
+i=3 a="abc" p="pdq" x="xyz"'
+
 	EXEC 	-n -e '	int i,n;
 			float f;
 			char* s = "123 3.45e6";

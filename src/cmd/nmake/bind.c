@@ -319,7 +319,8 @@ newfile(register struct rule* r, char* dir, unsigned long date)
 		*s = 0;
 		if ((z = getrule(nam)) && (z->dynamic & D_entries))
 		{
-			if (t = strchr(s + 1, '/')) *t = 0;
+			if (t = strchr(s + 1, '/'))
+				*t = 0;
 
 			/*
 			 * sequential scan is OK since this is uncommon
@@ -338,7 +339,8 @@ newfile(register struct rule* r, char* dir, unsigned long date)
 				}
 				hashdone(pos);
 			}
-			if (t) *t = '/';
+			if (t)
+				*t = '/';
 		}
 		*s++ = '/';
 	} while (s = strchr(s, '/'));
@@ -359,11 +361,17 @@ dirscan(struct rule* r)
 	int			n;
 	struct stat		st;
 
-	if (r->dynamic & D_scanned) return;
-	if ((n = strlen(r->name)) > 1) s = canon(r->name) - 1;
-	else s = r->name;
-	if (s > r->name && *s == '/') *s-- = 0;
-	if ((s - r->name + 1) != n) r->name = putrule(r->name, r);
+	error(-3, "dirscan %s", r->name);
+	if (r->dynamic & D_scanned)
+		return;
+	if ((n = strlen(r->name)) > 1)
+		s = canon(r->name) - 1;
+	else
+		s = r->name;
+	if (s > r->name && *s == '/')
+		*s-- = 0;
+	if ((s - r->name + 1) != n)
+		r->name = putrule(r->name, r);
 	r->dynamic |= D_scanned;
 	r->dynamic &= ~D_entries;
 	if (!(r->property & P_state))
@@ -371,36 +379,31 @@ dirscan(struct rule* r)
 		if (d = unique(r))
 		{
 			s = r->name;
-			if (d->directory)
+			if (d->directory && (dirp = opendir(s)))
 			{
-				if (dirp = opendir(s))
-				{
 #if DEBUG
-					message((-5, "scan directory %s", s));
+				message((-5, "scan directory %s", s));
 #endif
-					while (entry = readdir(dirp))
-						if (!FIGNORE(entry->d_name))
-							addfile(d, entry->d_name, NOTIME);
-					r->dynamic |= D_entries;
-					if (!(r->dynamic & D_bound) && !stat(s, &st))
-					{
-						r->dynamic |= D_bound;
-						r->time = st.st_mtime;
-						if (!r->view && ((state.questionable & 0x00000800) || !(r->property & P_target)) && *s == '/' && (strncmp(s, internal.pwd, internal.pwdlen) || *(s + internal.pwdlen) != '/'))
-							r->dynamic |= D_global;
-					}
-				}
-				if (dirp)
+				while (entry = readdir(dirp))
+					if (!FIGNORE(entry->d_name))
+						addfile(d, entry->d_name, NOTIME);
+				r->dynamic |= D_entries;
+				if (!(r->dynamic & D_bound) && !stat(s, &st))
 				{
-					closedir(dirp);
-					return;
+					r->dynamic |= D_bound;
+					r->time = st.st_mtime;
+					if (!r->view && ((state.questionable & 0x00000800) || !(r->property & P_target)) && *s == '/' && (strncmp(s, internal.pwd, internal.pwdlen) || *(s + internal.pwdlen) != '/'))
+						r->dynamic |= D_global;
 				}
+				closedir(dirp);
+				return;
 			}
 #if DEBUG
 			message((-5, "dirscan(%s) failed", s));
 #endif
 		}
-		else if (r->time) r->dynamic |= D_entries;
+		else if (r->time)
+			r->dynamic |= D_entries;
 	}
 }
 
@@ -606,7 +609,7 @@ globv(char* s)
 		gl.gl_dirclose = glob_dirclose;
 		gl.gl_type = glob_type;
 	}
-	if (i = glob(s, GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STACK, 0, &gl))
+	if (i = glob(s, GLOB_AUGMENTED|GLOB_DISC|GLOB_NOCHECK|GLOB_STACK|GLOB_STARSTAR, 0, &gl))
 	{
 		if (!trap())
 			error(2, "glob() internal error %d", i);
@@ -651,7 +654,8 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 	}
 	message((-2, "%s is also specified as %s", unbound(r), unbound(x)));
 #if DEBUG
-	if (state.test & 0x00000040) error(2, "bindalias: path=%s r=%s%s%s x=%s%s%s", path, r->name, r->uname ? "==" : null, r->uname ? r->uname : null, x->name, x->uname ? "==" : null, x->uname ? x->uname : null);
+	if (state.test & 0x00000040)
+		error(2, "bindalias: path=%s r=%s%s%s x=%s%s%s", path, r->name, r->uname ? "==" : null, r->uname ? r->uname : null, x->name, x->uname ? "==" : null, x->uname ? x->uname : null);
 #endif
 	r->dynamic |= (D_alias|D_bound);
 	merge(r, x, MERGE_ALL|MERGE_BOUND);
@@ -673,7 +677,8 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 		if (z != x && z != r)
 		{
 #if DEBUG
-			if (state.test & 0x00000040) error(2, "           z=%s%s%s", z->name, z->uname ? "==" : null, z->uname ? z->uname : null);
+			if (state.test & 0x00000040)
+				error(2, "           z=%s%s%s", z->name, z->uname ? "==" : null, z->uname ? z->uname : null);
 #endif
 			x->dynamic |= (D_alias|D_bound);
 			merge(x, z, MERGE_ALL|MERGE_BOUND);
@@ -709,13 +714,25 @@ bindalias(register struct rule* r, register struct rule* x, char* path, struct r
 	}
 	if (!(state.questionable & 0x00002000))
 	{
-		if ((s = getbound(x->name)) || x->uname && (s = getbound(x->uname)))
+		if ((!x->uname || x->uname[0] != '.' && x->uname[1] != '.' && x->uname[2] != '/') && ((s = getbound(x->name)) || x->uname && (s = getbound(x->uname))))
+		{
+			message((-5, "%s rebind %s => %s", r->name, getbound(r->name), s));
 			putbound(r->name, s);
-		else if ((s = getbound(r->name)) || r->uname && (s = getbound(r->uname)))
+		}
+		else if ((!r->uname || r->uname[0] != '.' && r->uname[1] != '.' && r->uname[2] != '/') && ((s = getbound(r->name)) || r->uname && (s = getbound(r->uname))))
+		{
+			message((-5, "%s rebind %s => %s", x->name, getbound(x->name), s));
 			putbound(x->name, s);
+		}
+		else
+		{
+			message((-5, "no rebind for %s or %s", unbound(r), unbound(x)));
+			s = 0;
+		}
 		for (i = 0; i < na; i++)
 		{
-			if (s) putbound(a[i]->name, s);
+			if (s)
+				putbound(a[i]->name, s);
 			x->attribute |= a[i]->attribute;
 		}
 		for (i = 0; i < na; i++)
@@ -740,9 +757,12 @@ localrule(register struct rule* r, int force)
 	char*			v;
 	Sfio_t*			tmp;
 
-	if (r->property & P_state) return force ? 0 : r;
-	if (r->dynamic & D_alias) r = makerule(r->name);
-	if (!r->view) return 0;
+	if (r->property & P_state)
+		return force ? 0 : r;
+	if (r->dynamic & D_alias)
+		r = makerule(r->name);
+	if (!r->view)
+		return 0;
 	if (!strncmp(r->name, state.view[r->view].path, state.view[r->view].pathlen))
 	{
 		s = r->name + state.view[r->view].pathlen;
@@ -751,8 +771,10 @@ localrule(register struct rule* r, int force)
 		case 0:
 			return internal.dot;
 		case '/':
-			if (!(x = getrule(s)) && force) x = makerule(s);
-			if (x && (x->dynamic & D_alias)) x = makerule(x->name);
+			if (!(x = getrule(s)) && force)
+				x = makerule(s);
+			if (x && (x->dynamic & D_alias))
+				x = makerule(x->name);
 			if (x && !x->view && (x != r || force))
 			{
 				merge(r, x, MERGE_ATTR|MERGE_FORCE);
@@ -782,14 +804,18 @@ localrule(register struct rule* r, int force)
 				sfprintf(tmp, "%s/%s", internal.pwd, p);
 				v = sfstruse(tmp);
 				*s = '/';
-				if (!(x = getrule(v)) && force) x = makerule(v);
-				if (x && (x->dynamic & D_alias)) x = makerule(x->name);
+				if (!(x = getrule(v)) && force)
+					x = makerule(v);
+				if (x && (x->dynamic & D_alias))
+					x = makerule(x->name);
 				sfstrclose(tmp);
 				if (x && !x->view && (force || x != r))
 				{
 					merge(r, x, MERGE_ATTR);
-					if (!x->uname) x->uname = r->uname;
-					if (!x->time) x->time = r->time;
+					if (!x->uname)
+						x->uname = r->uname;
+					if (!x->time)
+						x->time = r->time;
 					return x;
 				}
 				return 0;
@@ -838,7 +864,8 @@ bindfile(register struct rule* r, char* name, int flags)
 
 	if (r || (r = getrule(name)))
 	{
-		if ((r->property & P_state) || (r->property & P_virtual) && !(flags & BIND_FORCE)) return 0;
+		if ((r->property & P_state) || (r->property & P_virtual) && !(flags & BIND_FORCE))
+			return 0;
 		if (r->dynamic & D_alias)
 		{
 			a = r;
@@ -849,8 +876,10 @@ bindfile(register struct rule* r, char* name, int flags)
 				r->dynamic &= ~D_alias;
 			}
 		}
-		if (r->dynamic & D_bound) return r;
-		if (!name) name = r->name;
+		if (r->dynamic & D_bound)
+			return r;
+		if (!name)
+			name = r->name;
 	}
 	buf = sfstropen();
 	tmp = sfstropen();
@@ -914,7 +943,8 @@ bindfile(register struct rule* r, char* name, int flags)
 
 		edit(tmp, name, KEEP, DELETE, DELETE);
 		dir = sfstruse(tmp);
-		if (*dir) base = name + strlen(dir) + 1;
+		if (*dir)
+			base = name + strlen(dir) + 1;
 		else
 		{
 			dir = 0;
@@ -1074,23 +1104,29 @@ bindfile(register struct rule* r, char* name, int flags)
 	{
 		if (c)
 		{
-			if (s = strchr(s, '/')) *s = 0;
+			if (s = strchr(s, '/'))
+				*s = 0;
 			z = catrule(d->name, "/", dir, -1);
 			if (z->dynamic & (D_entries|D_scanned))
 			{
-				if (s) *s = '/';
-				if (!(z->dynamic & D_entries)) continue;
+				if (s)
+					*s = '/';
+				if (!(z->dynamic & D_entries))
+					continue;
 			}
 			else
 			{
 				for (f = getfile(dir), b = d->name; f; f = f->next)
-					if (f->dir->name == b) break;
+					if (f->dir->name == b)
+						break;
 				if (!f)
 				{
 					z->dynamic |= D_scanned;
 					z->dynamic &= ~D_entries;
-					if (s) *s = '/';
-					if (state.test & 0x00000008) error(2, "prune: %s + %s HASH", d->name, dir);
+					if (s)
+						*s = '/';
+					if (state.test & 0x00000008)
+						error(2, "prune: %s + %s HASH", d->name, dir);
 					continue;
 				}
 				if (s)
@@ -1099,18 +1135,20 @@ bindfile(register struct rule* r, char* name, int flags)
 					z->dynamic |= D_entries;
 				}
 			}
-			if (s) d = catrule(d->name, "/", dir, -1);
-			else d = z;
+			if (s)
+				d = catrule(d->name, "/", dir, -1);
+			else
+				d = z;
 		}
-		else if (!(state.questionable & 0x00000080)) d = catrule(d->name, "/", dir, -1);
-		else for (;;)
-		{
-			if (*s++ != '.' || *s++ != '.' || *s++ != '/')
-			{
-				d = *(s - 1) ? catrule(d->name, "/", dir, -1) : makerule(dir);
-				break;
-			}
-		}
+		else if (!(state.questionable & 0x00000080))
+			d = catrule(d->name, "/", dir, -1);
+		else
+			for (;;)
+				if (*s++ != '.' || *s++ != '.' || *s++ != '/')
+				{
+					d = *(s - 1) ? catrule(d->name, "/", dir, -1) : makerule(dir);
+					break;
+				}
 		if (!(d->dynamic & D_scanned))
 		{
 			d->view = od->view;
@@ -1136,8 +1174,10 @@ bindfile(register struct rule* r, char* name, int flags)
 			s = f->dir->name;
 			if (s == d->name && !f->dir->archive)
 			{
-				if (s == internal.dot->name) sfputr(buf, base, -1);
-				else sfprintf(buf, "%s/%s", s, base);
+				if (s == internal.dot->name)
+					sfputr(buf, base, -1);
+				else
+					sfprintf(buf, "%s/%s", s, base);
 				tm = f->time;
 				s = sfstruse(buf);
 				canon(s);
@@ -1147,7 +1187,8 @@ bindfile(register struct rule* r, char* name, int flags)
 					x = 0;
 					if (state.believe && d->view >= (state.believe - 1))
 					{
-						if (!r) r = makerule(name);
+						if (!r)
+							r = makerule(name);
 						r->view = d->view;
 						r->mark |= M_bind;
 						x = staterule(RULE, r, NiL, 0);
@@ -1159,14 +1200,16 @@ bindfile(register struct rule* r, char* name, int flags)
 						tm = x->time;
 						message((-3, "%s: believe time [%s] from view %d", r->name, strtime(tm), view));
 					}
-					else if (rstat(s, &st, 0)) tm = 0;
+					else if (rstat(s, &st, 0))
+						tm = 0;
 					else
 					{
 						tm = st.st_mtime;
 						view = state.fsview ? iview(&st) : d->view;
 					}
 				}
-				else view = d->view;
+				else
+					view = d->view;
 				if (tm)
 				{
 					if (!(flags & BIND_DOT) || !view)
@@ -1176,9 +1219,11 @@ bindfile(register struct rule* r, char* name, int flags)
 						found = 1;
 						goto clear;
 					}
-					if (d->view > view) break;
+					if (d->view > view)
+						break;
 				}
-				else if (errno == ENODEV) view = d->view;
+				else if (errno == ENODEV)
+					view = d->view;
 			}
 		}
 	}
@@ -1323,13 +1368,16 @@ bindfile(register struct rule* r, char* name, int flags)
 		 *	view	view index of dir containing file
 		 */
 
-		if (view > state.maxview) view = 0;
+		if (view > state.maxview)
+			view = 0;
 		b = sfstrset(buf, 0);
 #if DEBUG
-		message((-11, "bindfile(%s): path=%s rule=%s alias=%s view=%d time=%s", name, b, r ? r->name : (char*)0, (x = getrule(b)) ? x->name : (char*)0, view, strtime(tm)));
+		message((-11, "bindfile(%s): path=%s rule=%s alias=%s view=%d time=%s", name, b, r ? r->name : (char*)0, (x = getrule(b)) && x != r ? x->name : (char*)0, view, strtime(tm)));
 #endif
-		if (!r) r = makerule(name);
-		if (internal.openfile) internal.openfile = r->name;
+		if (!r)
+			r = makerule(name);
+		if (internal.openfile)
+			internal.openfile = r->name;
 		if (!(r->dynamic & D_member) || tm > r->time)
 		{
 			if (r->dynamic & D_member)
@@ -1340,8 +1388,10 @@ bindfile(register struct rule* r, char* name, int flags)
 			r->time = tm;
 			if (!(r->dynamic & D_entries))
 			{
-				if (S_ISREG(st.st_mode) || !st.st_mode) r->dynamic |= D_regular;
-				if (!(r->dynamic & D_source)) r->view = view;
+				if (S_ISREG(st.st_mode) || !st.st_mode)
+					r->dynamic |= D_regular;
+				if (!(r->dynamic & D_source))
+					r->view = view;
 			}
 			if (!r->view && *b == '/')
 			{
@@ -1361,14 +1411,16 @@ bindfile(register struct rule* r, char* name, int flags)
 				x = makerule(name);
 			if (x && x != r)
 			{
-				if (st.st_mode) internal.openfile = x->name;
+				if (st.st_mode)
+					internal.openfile = x->name;
 				if (r->property & x->property & P_target)
 				{
 					message((-2, "%s not aliased to %s", unbound(r), unbound(x)));
 					if (!(state.questionable & 0x00000040))
 						found = 0;
 				}
-				else r = bindalias(r, x, b, od);
+				else if (r->dynamic & D_regular)
+					r = bindalias(r, x, b, od);
 			}
 			else
 			{
@@ -1379,7 +1431,8 @@ bindfile(register struct rule* r, char* name, int flags)
 
 				s = r->name;
 				r->name = putrule(b, r);
-				if (st.st_mode) internal.openfile = r->name;
+				if (st.st_mode)
+					internal.openfile = r->name;
 				if (r->name != s)
 				{
 					r->uname = s;
@@ -1389,7 +1442,7 @@ bindfile(register struct rule* r, char* name, int flags)
 			}
 			if ((r->dynamic & D_source) && r->uname)
 				r->view = r->preview = view;
-			if (r->view && (x = localrule(r, 0)))
+			if ((r->dynamic & D_regular) && r->view && (x = localrule(r, 0)))
 				merge(x, r, MERGE_ALL|MERGE_BOUND);
 		}
 		else if (!state.accept && !view)
@@ -1515,16 +1568,21 @@ rebind(register struct rule* r, register int op)
 
 	if (!(r->property & P_state))
 	{
-		if (r->uname) oldname(r);
+		if (r->uname)
+			oldname(r);
 		r->dynamic &= ~(D_bound|D_entries|D_member|D_scanned);
-		if (op > 0) r->dynamic |= D_bound;
+		if (op > 0)
+			r->dynamic |= D_bound;
 		else
 		{
 			newfile(r, NiL, NOTIME);
-			if ((t = strchr(r->name, '/')) && (x = getrule(t + 1)) && (x = bindfile(x, NiL, 0))) r = x;
-			else bindfile(r, NiL, 0);
+			if ((t = strchr(r->name, '/')) && (x = getrule(t + 1)) && (x = bindfile(x, NiL, 0)))
+				r = x;
+			else
+				bindfile(r, NiL, 0);
 		}
-		if (op >= 0) r->dynamic |= D_triggered;
+		if (op >= 0)
+			r->dynamic |= D_triggered;
 		if (!state.exec)
 		{
 			r->time = CURTIME;
@@ -1563,7 +1621,8 @@ unbind(const char* s, char* v, void* h)
 	{
 		message((-2, "unbind(%s)%s%s", r->name, h ? " check-alias" : null, s && streq(s, r->name) ? null : " diff-hash"));
 		r->mark &= ~M_mark;
-		if (r->property & P_metarule) r->uname = 0;
+		if (r->property & P_metarule)
+			r->uname = 0;
 		else
 		{
 			int	u = 0;
@@ -1606,7 +1665,8 @@ source(register struct rule* r)
 {
 	register struct rule*	x;
 
-	if (state.compile > COMPILED) return r;
+	if (state.compile > COMPILED)
+		return r;
 	if (state.compile < COMPILED)
 	{
 		x = r;
@@ -1846,12 +1906,14 @@ localview(register struct rule* r)
 {
 	register struct rule*	x;
 
-	if (r->dynamic & D_alias) r = makerule(r->name);
+	if (r->dynamic & D_alias)
+		r = makerule(r->name);
 	if (state.context && !(r->property & (P_state|P_virtual)))
 	{
 		register char*	s = r->name;
 
-		if (*s == '/' || iscontext(s)) return s;
+		if (*s == '/' || iscontext(s))
+			return s;
 		sfprintf(state.context, "%c%s%c", MARK_CONTEXT, s, MARK_CONTEXT);
 		x = makerule(sfstruse(state.context));
 		if (!(x->dynamic & D_alias))
@@ -1863,6 +1925,7 @@ localview(register struct rule* r)
 		}
 		return x->uname;
 	}
-	if (!state.maxview || state.fsview && !state.expandview) return r->name;
+	if (!state.maxview || state.fsview && !state.expandview)
+		return r->name;
 	return (x = localrule(r, 1)) ? x->name : (r->view && r->uname ? r->uname : r->name);
 }

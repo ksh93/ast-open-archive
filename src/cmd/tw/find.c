@@ -51,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2003-12-02 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2004-04-01 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -500,22 +500,17 @@ static Sfio_t*		tmp;
 static struct Args*
 lookup(register char* word)
 {
-	register struct Args*	argp = (struct Args*)commands;
+	register struct Args*	argp;
 	register int		second;
 
-	if (word && *word)
+	while (*word == '-')
+		word++;
+	if (*word)
 	{
 		second = word[1];
-		if (*word == '-' && second == '-')
-			error(ERROR_USAGE|4, "%s", opthelp(usage, word + 2));
-		while (argp->name)
-		{
+		for (argp = (struct Args*)commands; argp->name; argp++)
 			if (second == argp->name[1] && streq(word, argp->name))
 				return argp;
-			argp++;
-		}
-		if (*word == '-')
-			error(ERROR_USAGE|4, "%s", opthelp(usage, word + 1));
 	}
 	return 0;
 }

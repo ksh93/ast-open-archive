@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -18,9 +18,8 @@
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
-*               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
-*                 Phong Vo <kpv@research.att.com>                  *
+*                 Jeff Korn <jlk@research.att.com>                 *
 *                                                                  *
 *******************************************************************/
 #pragma prototyped
@@ -35,7 +34,13 @@ static void tksh_userinit(int subshell)
 	char *end = av[0] + strlen(av[0]);
 	int len = strlen(av[0]);
 	char *args[2];
+	Namval_t *np;
 
+	if(np = nv_open("source",sh.alias_tree,NV_NOADD))
+	{
+		nv_unset(np);
+		nv_close(np);
+	}
 	if (subshell < 0)
 	{
 		sh_trap("tkloop", 0);

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2003 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -389,3 +389,16 @@ pzclose(register Pz_t* pz)
 		sfclose(pz->det);
 	return r;
 }
+
+/*
+ * common out of space message
+ */
+
+int
+pznospace(Pz_t* pz)
+{
+	if (pz->disc->errorf)
+		(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
+	return -1;
+}
+

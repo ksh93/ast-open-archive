@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-02-14 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-04-15 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -179,18 +179,21 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 .ATTRIBUTE.features/%.sh : .SCAN.exec.sh
 
 .INCLUDE.cob : .FUNCTION
-	local F
+	local F S T
 	F := $(%%:/ .*//:/\.$//)
 	if ! "$(F:S)"
-		if "$(<<:S)" == "*[[:lower:]]*"
-			F := $(F)$(.SUFFIX.HEADER.cob:O=1:F=%(lower)s)
-		else
-			F := $(F)$(.SUFFIX.HEADER.cob:O=1:F=%(upper)s)
+		for S $(.SUFFIX.HEADER.cob) $(<<:S)
+			T := $(F)$(S)
+			$(T) : .SCAN.cob
+			if "$(T:T=F)"
+				F := $(T)
+				break
+			end
 		end
 	end
 	$(F) : .SCAN.cob
-	if ! "$(F:T=F)" && ( ! "$(F:S)" || "$(F:S:N!=$(<<:S)|$(.SUFFIX.cob:/ /|/G)|$(.SUFFIX.HEADER.cob:/ /|/G))" )
-		F := $(F)$(<<:S)
+	if COBOLIPF && COBOLIPFCOPY && "$(F:B)" == "$(COBOLIPFCOPY)"
+		F += .COBOL.IPF
 	end
 	return $(F)
 
@@ -199,8 +202,20 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLMAIN)
 	end
 
+.COBOL.IPF : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
+	if COBOLIPF
+		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLIPF)
+	end
+
+.COBOL.SQL : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
+	if COBOLSQL
+		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLSQL)
+	end
+
 .SCAN.cob : .SCAN
 	I| \D COPY % |M$$(.INCLUDE.cob)|
+	T| \D EXEC SQL |M.COBOL.SQL|
+	T| \D INVOKE |M.COBOL.IPF|
 	S|M.COBOL.MAIN|
 
 $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob

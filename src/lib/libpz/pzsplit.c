@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2003 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -332,17 +332,9 @@ deflate(Pz_t* pz, Sfio_t* op)
 	memset(&def, 0, sizeof(def));
 	def.pz = pz;
 	if (!(state.buf = sfstropen()) || !(def.xp = sfstropen()))
-	{
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [string streams]");
-		goto bad;
-	}
+		goto nospace;
 	if (!(def.ids = dtopen(&iddisc, Dttree)) || !(def.sqs = dtopen(&sqdisc, Dttree)))
-	{
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id table]");
-		goto bad;
-	}
+		goto nospace;
 	def.seq = 0;
 
 	/*
@@ -401,11 +393,7 @@ deflate(Pz_t* pz, Sfio_t* op)
 			else
 				sfsprintf(s = num, sizeof(num), "%lu", rp->id);
 			if (!(ip = newof(0, Id_t, 1, strlen(s) + 1)))
-			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id slot]");
-				goto bad;
-			}
+				goto nospace;
 			if (ip->id = rp->id)
 				ip->row = rp->size;
 			ip->name = strcpy((char*)(ip + 1), s);
@@ -473,6 +461,8 @@ deflate(Pz_t* pz, Sfio_t* op)
 	}
 	i = 0;
 	goto done;
+ nospace:
+	pznospace(pz);
  bad:
 	i = -1;
  done:
@@ -521,23 +511,11 @@ inflate(Pz_t* pz, Sfio_t* op)
 	iddisc.size = -1;
 	iddisc.freef = freeid;
 	if (!(ids = dtopen(&iddisc, Dttree)))
-	{
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id table]");
-		goto bad;
-	}
+		goto nospace;
 	if (!(state.buf = sfstropen()))
-	{
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [string stream]");
-		goto bad;
-	}
+		goto nospace;
 	if (!(win = newof(0, char, pz->win, 0)))
-	{
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [window buffer]");
-		goto bad;
-	}
+		goto nospace;
 
 	/*
 	 * loop on all windows
@@ -566,11 +544,7 @@ inflate(Pz_t* pz, Sfio_t* op)
 		{
 			n = roundof(parts, 64);
 			if (!(tab = newof(tab, Id_t*, n, 0)))
-			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [%I*u element partition table]", sizeof(n), n);
-				goto bad;
-			}
+				goto nospace;
 			tabsiz = n;
 		}
 
@@ -589,11 +563,7 @@ inflate(Pz_t* pz, Sfio_t* op)
 			if (!(ip = (Id_t*)dtmatch(ids, id)))
 			{
 				if (!(ip = newof(0, Id_t, 1, sfvalue(pz->io))))
-				{
-					if (pz->disc->errorf)
-						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id slot]");
-					goto bad;
-				}
+					goto nospace;
 				ip->name = strcpy((char*)(ip + 1), id);
 				ip->row = row;
 				if ((ip->part = pzpartget(pz, ip->name)) && pz->disc->errorf && ip->row && ip->part->row != ip->row)
@@ -707,6 +677,8 @@ inflate(Pz_t* pz, Sfio_t* op)
 	}
 	i = 0;
 	goto done;
+ nospace:
+	pznospace(pz);
  bad:
 	i = -1;
  done:
@@ -775,11 +747,7 @@ pzssplit(Pz_t* pz)
 #endif
 	iddisc.freef = freeid;
 	if (!(ids = dtopen(&iddisc, Dttree)))
-	{
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id table]");
-		goto bad;
-	}
+		goto nospace;
 
 	/*
 	 * loop on the records and split by id
@@ -801,11 +769,7 @@ pzssplit(Pz_t* pz)
 			else
 				sfsprintf(s = num, sizeof(num), "%lu", rp->id);
 			if (!(ip = newof(0, Id_t, 1, strlen(s) + 1)))
-			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [id slot]");
-				goto bad;
-			}
+				goto nospace;
 			if (ip->id = rp->id)
 				ip->row = rp->size;
 			ip->name = strcpy((char*)(ip + 1), s);
@@ -859,6 +823,8 @@ pzssplit(Pz_t* pz)
 		}
 	i = 0;
 	goto done;
+ nospace:
+	pznospace(pz);
  bad:
 	i = -1;
  done:

@@ -847,7 +847,7 @@ echo(register char** argv)
  */
 int
 cmdif(char** argv)
-{	
+{
 	register char*	s;
 	register char*	t;
 	register char*	x;

@@ -1,3 +1,6 @@
+04-04-15 tw.tst: add %s scanf tests
+04-04-01 find.c: handle `-sort -KEY' and `-sort KEY'
+	 find.tst: add `-sort -name' for uniform results -- duh
 04-02-26 tw.tst: add scanf tests
 03-12-02 find.c: -print does not require leaf stat -- duh
 03-11-16 find.tst,tw.tst: add leading . pattern match tests

@@ -1,3 +1,5 @@
+04-04-15 date.dat: add specific and ordinal day tests
+04-04-01 vmalloc: snarf vmalloc tests from kpv
 04-02-29 sfio/tscanf.c: add %! test
 	 opt.tst: add html escape test
 04-02-04 sfio/texcept.c: add sfraise(0,a,b) test

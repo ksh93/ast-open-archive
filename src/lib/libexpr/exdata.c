@@ -18,7 +18,7 @@
 *                        AT&T Labs Research                        *
 *                         Florham Park NJ                          *
 *                                                                  *
-*                 Phong Vo <kpv@research.att.com>                  *
+*               Glenn Fowler <gsf@research.att.com>                *
 *                                                                  *
 *******************************************************************/
 #pragma prototyped
@@ -29,7 +29,7 @@
  * expression library readonly tables
  */
 
-static const char id[] = "\n@(#)$Id: libexpr (AT&T Research) 2004-02-26 $\0\n";
+static const char id[] = "\n@(#)$Id: libexpr (AT&T Research) 2004-04-15 $\0\n";
 
 #include <exlib.h>
 

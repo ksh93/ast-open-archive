@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2003-01-23
+# @(#)probe.win32 (AT&T Labs Research) 2003-08-06
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -7,10 +7,14 @@
 # 2> easy.err to avoid mysterious hang with bcc
 #
 
-probe_easy="winerror"
-
 nativepp=-1
 export nativepp
+
+echo 	"#include <winerror.h>" > easy.c
+if	$cc -E easy.c > /dev/null 2> easy.err 
+then	probe_easy=winerror
+else	probe_easy=stddef
+fi
 
 {
 for i in $probe_easy
@@ -40,6 +44,12 @@ echo '#endif'
 echo '#ifdef __MINGW32__'
 echo "int versiong=__MINGW32__"
 echo '#endif'
+echo '#ifdef __INTERIX'
+echo "int versiono=__INTERIX"
+echo '#endif'
+echo '#ifdef __WATCOMC__'
+echo "int versionw=__WATCOMC__"
+echo '#endif'
 } > easy.c
 
 for i in $probe_easy
@@ -53,9 +63,12 @@ versiond=
 versionm=
 versionl=
 versiong=
+versioni=
+versiono=
+versionw=
 
 $cc -E easy.c 2> easy.err |
-egrep -i '^(#line 1 .*\.[hH]| *int +(cplus|uwin|version[bdiglm]) *= *[0-9])' |
+egrep -i '^(#line 1 .*\.[hH]| *int +(cplus|uwin|version[bdiglmw]) *= *[0-9])' |
 sed	-e 's/.*"\(.*\)".*/\1/' \
 	-e 's,^  *,,' \
 	-e 's,  *$,,' \
@@ -145,6 +158,11 @@ case $versiong in
 	;;
 esac
 
+dialect=ansi
+if	[ X"$cplus" != X ]
+then	dialect=C++
+fi
+
 case $version:$include in
 [0-9]*:/*)
 	hosttype=$(package)
@@ -171,13 +189,16 @@ case $version:$include in
 #pragma pp:standard \"$include/win32\""
 	if	[ X"$versioni" != X ]
 	then	if	[ -d /msdev/vc98 ]
-		then standard="$standard
-#pragma pp:standard \"/msdev/vc98/include\""
+		then 	inc=/msdev/vc98
 		elif	[ -d /msdev/vc7 ]
-		then standard="$standard
-#pragma pp:standard \"/msdev/vc7/include\""
-		else standard="$standard
-#pragma pp:standard \"/msdev/vc/include\""
+		then 	inc=/msdev/vc7
+		else	inc=/msdev/vc
+		fi
+		standard="$standard
+#pragma pp:standard \"$inc/include\""
+		if	[ -d $inc/PlatformSDK ]
+		then	standard="$standard
+#pragma pp:standard \"$inc/PlatformSDK/include\""
 		fi
 	elif	[ X"$versiong" != X ]
 	then	if	[ X"$cplus" != X ]
@@ -207,6 +228,9 @@ case $version:$include in
 			standard="$standard
 #pragma pp:include \"$2\""
 		fi
+	elif	[ X"$versionm" != X ] && [ -d /msdev/vc7/PlatformSDK/include ]
+	then	standard="$standard
+#pragma pp:standard \"/msdev/vc7/PlatformSDK/include\""
 	fi
 	: the payoff
 	set -- $cc
@@ -234,8 +258,16 @@ char* str___unix__ = "#define __unix__" __unix__ ;
 !
 	premac="
 M_I86
+M_I386
+M_I386CM
+M_I386LM
+M_I386MM
+M_I386SM
+MSDOS
+NO_EXT_KEYS
 _ALPHA_
 _AXP64_
+_CPPUNWIND
 _GENIA64_
 _INTEGRAL_MAX_BITS
 _MSC_EXTENSIONS
@@ -256,26 +288,40 @@ _WIN64
 _X86_
 _stdcall
 __BORLANDC__
+__CHAR_SIGNED__
 __CHAR_UNSIGNED__
+__COMPACT__
 __DEFALIGN
 __DMC__
+__DOS__
 __ECL__
 __EDG__
+__FLAT__
 __FPCE__
+__FPI__
 __GNUC__
 __GNUC_MINOR__
 __GNUG__
+__HUGE__
 __I86__
 __ICL
 __INITIAL_POINTER_SIZE
 __INLINE_8087
+__INLINE__FUNCTIONS__
 __INTEL_COMPILER
+__INTERIX
 __INTSIZE
+__LARGE__
 __LCCDEBUGLEVEL
 __LCCOPTIMLEVEL
 __LCC__
+__MEDIUM__
 __MINGW32__
 __MSVCRT__
+__NT__
+__OPENNT
+__OS2__
+__QNX__
 __SC__
 __SMALL__
 __STATIC__
@@ -287,7 +333,10 @@ __STDC_ISO_10646__
 __STDC_VERSION__
 __STRLEN
 __TURBOC__
+__WATCOMC__
 __WIN32__
+__WINDOWS__
+__WINDOWS_386__
 __WINVER__
 __ZTC__
 __cdecl
@@ -331,7 +380,7 @@ $specific
 #define #addressing()
 #define #preroot()
 #define #universe(att)
-#define #dialect(ansi)
+#define #dialect(${dialect})
 
 $reserved
 

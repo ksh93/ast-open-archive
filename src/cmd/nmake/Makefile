@@ -50,7 +50,7 @@ Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 		echo '/* : : generated from $(cctype) assertions : : */'
 		set -
 		f=$(*|"`$(LIBDIR)/probe/probe -kg C pp $(cctype:Q)`")
-		a="`$(SED) -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_ STDCAT STDCMP STDCP STDED STDEDFLAGS STDLN STDMV STDRM"
+		a="`$(SED) -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_ STDCAT STDCHMOD STDCMP STDCP STDED STDEDFLAGS STDLN STDMV STDRM"
 		for n in $a
 		do	eval $n=
 		done
@@ -74,7 +74,7 @@ Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 		else	STDED=ex
 		fi
 		STDEDFLAGS=-
-		set STDCAT cat STDCMP cmp STDCP cp STDLN ln STDMV mv STDRM rm
+		set STDCAT cat STDCHMOD chmod STDCMP cmp STDCP cp STDLN ln STDMV mv STDRM rm
 		while	:
 		do	case $# in
 			0|1)	break ;;
@@ -94,7 +94,7 @@ Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 		then	if	/bin//cat /bin/cat >/dev/null 2>&1
 			then	: ok
 			else	: .exe challenged
-				for n in STDCAT STDCMP STDCP STDLN STDMV STDRM
+				for n in STDCAT STDCHMOD STDCMP STDCP STDLN STDMV STDRM
 				do	eval $n=\"execrate \$$n\"
 				done
 			fi

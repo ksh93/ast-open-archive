@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: troff2html (AT&T Labs Research) 2001-03-01 $\n]"
+"[-?\n@(#)$Id: troff2html (AT&T Labs Research) 2004-04-26 $\n]"
 USAGE_LICENSE
 "[+NAME?troff2html - convert troff/groff input to html]"
 "[+DESCRIPTION?\btroff2html\b converts \btroff\b(1) (or \bgroff\b(1),"
@@ -178,12 +178,13 @@ USAGE_LICENSE
 #define OP_ps		26
 #define OP_sub		27
 #define OP_sup		28
-#define OP_tab		29
-#define OP_tab_data	30
-#define OP_tab_head	31
-#define OP_tab_row	32
-#define OP_title	33
-#define OP_RAW		34
+#define OP_ta		29
+#define OP_tab		30
+#define OP_tab_data	31
+#define OP_tab_head	32
+#define OP_tab_row	33
+#define OP_title	34
+#define OP_RAW		35
 
 #define OP_ft		(OP_ft1-1)
 
@@ -3244,6 +3245,29 @@ troff_sp(Tag_t* tp, Arg_t* ap)
 }
 
 static void
+troff_ta(Tag_t* tp, Arg_t* ap)
+{
+	int		i;
+	unsigned char	ta[elementsof(state.ta)];
+
+	NoP(tp);
+	if (ap->argc < 1)
+	{
+		state.ta[0] = 8;
+		i = 1;
+	}
+	else
+	{
+		if (ap->argc >= elementsof(ta))
+			ap->argc = elementsof(ta) - 1;
+		for (i = 0; i < ap->argc; i++)
+			ta[i] = expression(ap->argv[i+1], NiL, 'u');
+	}
+	ta[i] = 0;
+	code_n(OP_ta, (char*)ta);
+}
+
+static void
 troff_ti(Tag_t* tp, Arg_t* ap)
 {
 	int	n;
@@ -4613,7 +4637,7 @@ static Tag_t tags[] =
 	".sty",		0,		0,			0,0,0,0,
 	".sv",		0,		0,			0,0,0,0,
 	".sy",		groff_sy,	0,			0,0,0,0,
-	".ta",		0,		0,			0,0,0,0,
+	".ta",		troff_ta,	TAG_BREAK,		0,0,0,0,
 	".tc",		0,		0,			0,0,0,0,
 	".ti",		troff_ti,	TAG_BREAK,		0,0,0,0,
 	".tkf",		0,		0,			0,0,0,0,
@@ -4762,6 +4786,8 @@ init(void)
 	state.tag_top = state.tag_stack;
 	state.pc = DEFAULT_pc;
 	state.list = state.list_stack;
+	state.ta[0] = 8;
+	state.ta[1] = 0;
 	state.t = 1;
 	iop("stderr", 1)->sp = sfstderr;
 	state.groff &= 1;
@@ -5015,6 +5041,8 @@ html(register unsigned char* s, Sfio_t* op)
 	unsigned char*		u;
 	int			n;
 	int			m;
+	int			ta;
+	int			ts;
 	int			ft = 1;
 	int			hot = 0;
 	int			label = 0;
@@ -5708,6 +5736,9 @@ html(register unsigned char* s, Sfio_t* op)
 					u = v;
 				sfprintf(op, "<A name=\"%s\">%s</A>", v, u);
 				break;
+			case OP_ta:
+				strcpy((char*)state.ta, (char*)v);
+				break;
 			case OP_RAW:
 				DATA();
 				if (col)
@@ -5744,10 +5775,17 @@ html(register unsigned char* s, Sfio_t* op)
 		case '\t':
 			if (nf)
 			{
+				ta = state.ta[ts = 0];
+				while (col >= ta)
+				{
+					if (state.ta[ts+1])
+						ts++;
+					ta += state.ta[ts];
+				}
 				do
 				{
 					sfputc(op, ' ');
-				} while (++col % 8);
+				} while (++col < ta);
 			}
 			else
 			{

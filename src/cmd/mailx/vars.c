@@ -226,8 +226,12 @@ varset(register const char* name, register const char* value)
 		note(0, "\"%s\": readonly variable", name);
 		return 1;
 	}
-	else if (vp->flags & I)
-		*((long*)vp->variable) = value ? strtol(value, NiL, 0) : (long)0;
+	else if (vp->flags & I) {
+		if (!value)
+			*((long*)vp->variable) = 0;
+		else if (isdigit(*value) || *value == '-' || *value == '+')
+			*((long*)vp->variable) = strtol(value, NiL, 0);
+	}
 	else {
 		if (*vp->variable && *vp->variable != state.on && *vp->variable != (char*)vp->initialize)
 			free(*vp->variable);
@@ -245,7 +249,7 @@ varset(register const char* name, register const char* value)
 		(*vp->set)(vp, value);
 	return 0;
 }
-		
+
 /*
  * Get a variable value.
  */

@@ -382,9 +382,10 @@
  */
 
 #define VAL_AUXILIARY	(1<<0)		/* auxilliary value		*/
-#define VAL_FILE	(1<<1)		/* !notfile(r)			*/
-#define VAL_PRIMARY	(1<<2)		/* primary value		*/
-#define VAL_UNBOUND	(1<<3)		/* unbound name			*/
+#define VAL_BRACE	(1<<1)		/* { }				*/
+#define VAL_FILE	(1<<2)		/* !notfile(r)			*/
+#define VAL_PRIMARY	(1<<3)		/* primary value		*/
+#define VAL_UNBOUND	(1<<4)		/* unbound name			*/
 
 struct fileid				/* unique file id		*/
 {

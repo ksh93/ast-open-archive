@@ -263,7 +263,14 @@ declare(char* t, int line, long flags)
 
 	if (d = strchr(t, '='))
 		*d = 0;
-	if (v = getvar(t))
+	if (!(v = getvar(t)))
+	{
+		for (s = t; *s; s++)
+			if (istype(*s, C_TERMINAL))
+				error(3, "%s: invalid local variable name", t);
+		v = setvar(t, null, 0);
+	}
+	else if (!(flags & V_scope))
 	{
 		/*
 		 * check for duplicate declarations
@@ -282,13 +289,6 @@ declare(char* t, int line, long flags)
 				setvar(v->name, d, 0);
 				return;
 			}
-	}
-	else
-	{
-		for (s = t; *s; s++)
-			if (istype(*s, C_TERMINAL))
-				error(3, "%s: invalid local variable name", t);
-		v = setvar(t, null, 0);
 	}
 	newlocal(p);
 	p->next = pp->local;
@@ -2130,7 +2130,10 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 				}
 			}
 			else if (set.op & A_scope)
+			{
 				r->dynamic |= D_scope;
+				set.rule.dynamic |= D_hasscope;
+			}
 			if (!(set.rule.dynamic & D_dynamic) && !(r->dynamic & D_scope) && isdynamic(r->name))
 				set.rule.dynamic |= D_dynamic;
 			if (r->property & P_use)

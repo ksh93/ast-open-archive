@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2003 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -24,7 +24,7 @@
 #include	<ast_common.h>
 
 #ifndef NIL
-#define NIL(t)		((t)0)
+#define NIL(t)	((t)0)
 #endif
 
 #ifndef va_start
@@ -37,9 +37,12 @@
 
 _BEGIN_EXTERNS_
 
+#if !_SFIO_H
 extern int	sprintf _ARG_((char*, const char*, ...));
 extern int	vsprintf _ARG_((char*, const char*, va_list));
+#endif
 
+#if !__STDC__ && !_hdr_stdlib
 extern int	atexit _ARG_((void (*)(void)));
 extern void	exit _ARG_((int));
 extern size_t	strlen _ARG_((const char*));
@@ -49,6 +52,7 @@ extern char*	getenv _ARG_((const char*));
 extern int	strncmp _ARG_((const char*, const char*, size_t));
 extern int	strcmp _ARG_((const char*, const char*));
 extern int	system _ARG_((const char*));
+#endif
 
 #if !_hdr_unistd
 extern int	alarm _ARG_((int));
@@ -140,12 +144,21 @@ va_list	args;
 	for(n = 0; n < sizeof(buf); ++n)
 		buf[n] = 0;
 
-	s = buf;
+	s = buf; n = 0;
 	if(line >= 0)
-	{	sprintf(s,"\tLine=%d: ", line);
-		s += strlen(s);
+	{
+#if _SFIO_H
+		sfsprintf(s, sizeof(buf), "\tLine=%d: ", line);
+#else
+		sprintf(s, "\tLine=%d: ", line);
+#endif
+		s += (n = strlen(s));
 	}
-	vsprintf(s,form,args);
+#if _SFIO_H
+	sfvsprintf(s, sizeof(buf)-n, form, args);
+#else
+	vsprintf(s, form, args);
+#endif
 
 	if((n = strlen(buf)) > 0)
 	{	if(buf[n-1] != '\n')
@@ -175,7 +188,12 @@ va_dcl
 	form = va_arg(args,char*);
 #endif
 
+#if _SFIO_H
+	sfsprintf(failform, sizeof(failform), "Failure: %s", form);
+#else
 	sprintf(failform, "Failure: %s", form);
+#endif
+
 	tstputmesg(Tstline,failform,args);
 
 	va_end(args);
@@ -252,7 +270,11 @@ int	n;
 	if(!Tstfile[n][0])
 	{
 #ifdef DEBUG
+#if _SFIO_H
+		sfsprintf(Tstfile[n], sizeof(Tstfile[0]), "Tstfile.%c%c%c", '0'+n, '0'+n, '0'+n);
+#else
 		sprintf(Tstfile[n], "Tstfile.%c%c%c", '0'+n, '0'+n, '0'+n);
+#endif
 #else
 		static int	pid;
 		static char*	tmp;
@@ -261,7 +283,11 @@ int	n;
 				tmp = "/tmp";
 			pid = (int)getpid() % 10000;
                 }
+#if _SFIO_H
+                sfsprintf(Tstfile[n], sizeof(Tstfile[0]), "%s/sft.%c.%d", tmp, '0'+n, pid);
+#else
                 sprintf(Tstfile[n], "%s/sft.%c.%d", tmp, '0'+n, pid);
+#endif
 #endif
 	}
 

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 2002-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
-*                 Phong Vo <kpv@research.att.com>                  *
 *                                                                  *
 *******************************************************************/
 #include <ast.h>

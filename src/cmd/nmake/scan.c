@@ -1436,7 +1436,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				error(2, "scanexec: %s: %c n=%d \"%s\" \"%s\"", r->name, ss->action[*s].type, n - 1, b + arg[0].begin, b + arg[1].begin);
 #endif
 			a = null;
-			switch (ss->action[*s].type)
+			switch (c = ss->action[*s].type)
 			{
 			case 'A':
 				if (state.archive)
@@ -1462,10 +1462,11 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 				iflev--;
 				break;
 			case 'I':
+			case 'T':
 				a = (char*)b + arg[0].begin;
 				break;
 			}
-			p = scanmatch(p, &ss->action[*s], r, (char*)b, a, iflev, a != null && a > (char*)b && (c = *(a - 1)) != '"' && c != '\'' && (c != '<' || arg[0].replace != '>'));
+			p = scanmatch(p, &ss->action[*s], r, (char*)b, a, iflev, c == 'T' ? -1 : a != null && a > (char*)b && (c = *(a - 1)) != '"' && c != '\'' && (c != '<' || arg[0].replace != '>'));
 			for (c = 0; c < n; c++)
 				*(b + arg[c].end) = arg[c].replace;
 		}

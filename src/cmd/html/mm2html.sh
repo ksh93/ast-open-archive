@@ -43,13 +43,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2004-02-29' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2004-04-04' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Labs Research) 2003-08-11 $
+@(#)$Id: mm2html (AT&T Labs Research) 2004-04-04 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -681,7 +681,7 @@ function getline
 							if	[[ $frame != '' && $title == '' ]]
 							then	rm $framebody
 								framelink=$pfx$url
-							else	data="$data <A $nam=\"$pfx$url\"$tar>$txt</A>"
+							else	data="$data	<A $nam=\"$pfx$url\"$tar>$txt</A>"
 							fi
 							;;
 						ref)	case $txt in
@@ -701,6 +701,8 @@ function getline
 						;;
 					ident|logo*|title|[ABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
 						eval html.$nam='$'val
+						;;
+					text)	data="$data	$val"
 						;;
 					*)	eval license.$nam='$'val
 						;;
@@ -1730,7 +1732,14 @@ do	getline || {
 				then	a="$a colspan=$s"
 					(( s=1 ))
 				fi
-				print -rn -u$tbl_fd -- "<TD$a>$b$1$e</TD>"
+				v=$1
+				case $i in
+				*'*'*)	case $v in
+					*'=>'*)	v="<A href=\"${v##*'=>'}\">${v%'=>'}</A>" ;;
+					*)	v="<A href=\"$v\">$v</A>" ;;
+					esac
+				esac
+				print -rn -u$tbl_fd -- "<TD$a>$b$v$e</TD>"
 				case $# in
 				0|1)	break ;;
 				esac

@@ -1,3 +1,27 @@
+04-04-15 expand.c: fix :V: operand check
+	 expand.c: check var alternation only before first delimiter
+	 expand.c: add :P=F: to recursively expand dir hierarchies
+	 expand.c: fix ancient $(...) non-tokenizing edit op bug
+	 parse.c: fix dup scope prereq value append
+	 bind.c: check for consistent ../* bound directory rebind
+	 Makerules.mk: fix :PACKAGE: :noinclude:nolib:noroot
+	 Makerules.mk: add :P=F: to .MANIFEST.
+	 Makerules.mk: add :INIT:
+	 Makerules.mk: drop obsolete MAKESKIP var definition
+	 Makerules.mk: proto notice generation disabled unless LICENSE=="*=*"
+	 Makerules.mk: package/PACKAGE.(lic|pkg) on PKGDIRS inhibits "not found"
+	 Makerules.mk: "test" action checks for gnu "check"
+	 Makerules.mk: fix recurse action target selection
+	 Scanrules.mk: fix .INCLUDE.cob to search lower and upper case suffixes
+	 rules-win32.mk: add SYSDIR
+04-04-14 Makerules.mk,Scanrules.mk: add COBOLIPF,COBOLSQL
+04-04-12 Makefile: add STDCHMOD (for osf.alpha cmd :LIBRARY:)
+04-04-04 bind.c: don't alias 2d directories -- duh
+04-04-01 Makerules.mk: .BIND.+l% checks .REQUIRE.-l% for disable
+04-03-31 expand.c: add :VB: for VAL_BRACE { ... }
+	 Makerules.mk: fix .SHARED.LIST. again
+	 Makerules.mk: add :PACKAGE: noCC.* CC.*=value probe overrides
+04-03-30 Makerules.mk: omit -L*/local/* if in CC.STDLIB (00-03-17 repeal)
 04-03-25 pkg-X11.mk: drop openbsd.i386 -lc_r workaround
 	 Makerules.mk: fix .SHARED.BIND. CC.SUFFIX.STATIC -l* expansion bug
 04-03-17 expand.c: check { :: :LIBRARY: } lhs

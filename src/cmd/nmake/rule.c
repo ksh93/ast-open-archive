@@ -828,6 +828,7 @@ hasattribute(register struct rule* r, register struct rule* a, register struct r
 			if (a == internal.member) return n & (D_member|D_membertoo);
 			if (a == internal.regular) return n & D_regular;
 			if (a == internal.scanned) return n & D_scanned;
+			if (a == internal.source) return n & D_source;
 			if (a == internal.triggered) return n & D_triggered;
 			if (a == internal.file) return (n & D_bound) && !(r->property & (P_state|P_virtual)) && r->time;
 

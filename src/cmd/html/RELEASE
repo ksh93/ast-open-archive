@@ -1,3 +1,5 @@
+04-04-26 troff2html: handle .ta
+04-04-04 mm2html: .xx link|text separated by tab for table entry urls
 04-02-29 mm2html: .TS box => void lines
 03-08-11 mm2html: handle man .TH args>2
 03-03-25 mm2html: table border size '' => 0

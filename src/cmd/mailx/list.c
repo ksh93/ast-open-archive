@@ -227,7 +227,7 @@ metamess(int meta, int f)
 		return -1;
 
 	case '.':
-		/* 
+		/*
 		 * Current message.
 		 */
 		m = state.msg.dot - state.msg.list + 1;
