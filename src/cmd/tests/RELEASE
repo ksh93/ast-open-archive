@@ -1,3 +1,6 @@
+03-09-11 opt.tst: add n:=v tests
+03-09-05 opt.tst: [f:l*?] test 43 update
+03-08-11 date.dat: add arithmetic tests
 03-05-25 opt.tst: add optstr() ???* internal option tests
 03-05-11 strtoi.tst: add malformation tests
 03-05-06 opt.tst: add getopt_long() compatibility tests

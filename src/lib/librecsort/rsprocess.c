@@ -31,6 +31,7 @@
 
 #define RS_ALLOC	1024
 #define RSALLOC(rs,r)	((r = rs->free) ? ((rs->free = r->right),r) : (r = rsalloc(rs)) )
+#define RSFREE(rs,r)	(r->right = rs->free, rs->free = r)
 
 #if __STD_C
 static Rsobj_t* rsalloc(Rs_t* rs)
@@ -72,7 +73,7 @@ ssize_t	s_data;		/* data size		*/
 	ssize_t		keylen = rs->disc->keylen;
 	reg uchar	*m_key, *c_key, *endd;
 	reg ssize_t	s_key, k, s_process, c_max, s_loop, p_loop;
-	reg int		single;
+	reg int		single, n;
 
 	if((single = s_data <= 0 ? 1 : 0) ) /* a single record */
 		s_data = dsamelen ? d : -s_data;
@@ -135,10 +136,19 @@ ssize_t	s_data;		/* data size		*/
 				r->key = data+key;
 				r->keylen = keylen;
 
-				if((*insertf)(rs,r) < 0)
+				if(rs->events & RS_READ)
+				{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
+						return -1;
+					else if(n > 0)
+						RSFREE(rs, r);
+					else if((*insertf)(rs,r) < 0)
+						return -1;
+					datalen = r->datalen;
+				}
+				else if((*insertf)(rs,r) < 0)
 					return -1;
-
-				rs->count += 1;
+				else
+					rs->count += 1;
 				data += datalen;
 				p_loop += datalen;
 				s_loop -= datalen;
@@ -153,6 +163,11 @@ ssize_t	s_data;		/* data size		*/
 			{	if(s_loop < d)
 					break;
 				datalen = d;
+			}
+			else if (d < 0) /* 4 byte ibm BE length descriptor */
+			{	if(s_loop < 4)
+					break;
+				datalen = ((data[2]<<16)|(data[3])) + 4;
 			}
 			else /* records separated by some separator	*/
 			{	if(!(endd = (uchar*)memchr(data,(int)d,s_loop)) )
@@ -213,10 +228,20 @@ ssize_t	s_data;		/* data size		*/
 				}
 			}
 
-			if((*insertf)(rs,r) < 0)
+			if(rs->events & RS_READ)
+			{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
+					return -1;
+				else if(n > 0)
+					RSFREE(rs, r);
+				else if((*insertf)(rs,r) < 0)
+					return -1;
+				datalen = r->datalen;
+			}
+			else if((*insertf)(rs,r) < 0)
 				return -1;
+			else
+				rs->count += 1;
 
-			rs->count += 1;
 			data += datalen;
 			p_loop += datalen;
 			if((s_loop -= datalen) <= 0)

@@ -55,6 +55,42 @@ Sffmt_t*	fe;
 	return 0;
 }
 
+typedef union Value_u
+{
+	unsigned char	c;
+	short		h;
+	int		i;
+	long		l;
+	Sflong_t	ll;
+	Sfdouble_t	ld;
+	double		d;
+	float		f;
+	char		*s;
+	int		*ip;
+	char		**p;
+} Value_t;
+
+#if __STD_C
+nulprint(Sfio_t* f, Void_t* val, Sffmt_t* fe)
+#else
+nulprint(f, val, fe)
+Sfio_t*		f;
+Void_t*		val;
+Sffmt_t*	fe;
+#endif
+{
+	if(fe->fmt == 'Z')
+	{	fe->fmt = 'c';
+		fe->size = -1;
+		fe->base = -1;
+		fe->flags &= ~SFFMT_LONG;
+		fe->flags |= SFFMT_VALUE;
+		((Value_t*)val)->l = 0x04050607;
+		((Value_t*)val)->c = 0;
+	}
+	return 0;
+}
+
 static int	OXcount;
 static char*	OXstr = "abc";
 #if __STD_C
@@ -178,7 +214,6 @@ Sffmt_t*	fe;
 	}
 }
 
-
 #if __STD_C
 void stkprint(char* buf, int n, char* form, ...)
 #else
@@ -300,6 +335,22 @@ MAIN()
 	sfsprintf(buf2,sizeof(buf2),"%!%(%d %d)c",&fe,&Coord);
 	if(strcmp(buf1,buf2) != 0)
 		terror("%%()c `%s' != `%s'\n", buf1, buf2);
+
+	fe.form = NIL(char*);
+	fe.extf = nulprint;
+	buf2[0] = buf2[1] = buf2[2] = buf2[3] = buf2[4] = 3;
+	sfsprintf(buf2,sizeof(buf2),"%!\001%Z\002",&fe);
+	if(buf2[0]!=1||buf2[1]!=0||buf2[2]!=2||buf2[3]!=0||buf2[4]!=3)
+		terror("%%Z <1,0,2,0,3> != <%o,%o,%o,%o,%o>\n",
+			buf2[0], buf2[1], buf2[2], buf2[3], buf2[4]);
+
+	fe.form = NIL(char*);
+	fe.extf = nulprint;
+	buf2[0] = buf2[1] = buf2[2] = buf2[3] = buf2[4] = 3;
+	sfsprintf(buf2,sizeof(buf2),"%!%c%Z%c",&fe,1,2);
+	if(buf2[0]!=1||buf2[1]!=0||buf2[2]!=2||buf2[3]!=0||buf2[4]!=3)
+		terror("%%Z <1,0,2,0,3> != <%o,%o,%o,%o,%o>\n",
+			buf2[0], buf2[1], buf2[2], buf2[3], buf2[4]);
 
 	sfsprintf(buf1,sizeof(buf1),"%d %d %d %d",1,2,3,4);
 	stkprint(buf2,sizeof(buf2),"%d %d",1,2);
@@ -517,6 +568,15 @@ MAIN()
 	sfsprintf(buf1, sizeof(buf1), "%#.2c%#.2c", '\n', 255);
 	if(strcmp(buf1, "\\n\\n\\377\\377") != 0)
 		terror("%%#c formatting failed");
+
+	/* test printing of signed integer of length 1 */
+#if defined(__STDC__)
+	{	signed char	c = -128;
+		sfsprintf(buf1, sizeof(buf1), "%I1d", c);
+		if(strcmp(buf1, "-128") != 0)
+			terror("%%I1d formatting failed");
+	}
+#endif
 
 	TSTEXIT(0);
 }

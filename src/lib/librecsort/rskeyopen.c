@@ -30,7 +30,7 @@
 
 #include "rskeyhdr.h"
 
-static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2003-05-23 $\0\n";
+static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2003-09-04 $\0\n";
 
 static const char lib[] = "librecsort:rskey";
 
@@ -87,6 +87,8 @@ Rskeydisc_t*	disc;
 	kp->id = lib;
 	kp->disc = (Rsdisc_t*)(kp + 1);
 	kp->disc->version = RS_VERSION;
+	kp->disc->keylen = -1;
+	kp->disc->data = '\n';
 	kp->keydisc = disc;
 	kp->state = &state;
 	kp->insize = INSIZE;
@@ -94,7 +96,6 @@ Rskeydisc_t*	disc;
 	kp->procsize = PROCSIZE;
 	kp->field.head = kp->field.tail = &kp->field.global;
 	kp->field.global.end.field = MAXFIELD;
-	kp->code = kp->field.global.code = CC_NATIVE;
 	kp->meth = Rsrasp;
 	return kp;
 }

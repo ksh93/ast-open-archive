@@ -210,21 +210,21 @@ main(int argc, char** argv)
 				sfprintf(sfstdout, "[%d] ", loop);
 			if (n == '?')
 			{
-				sfprintf(sfstdout, "return=%c option=%s name=%s num=%d\n", n, opt_info.option, opt_info.name, opt_info.num);
+				sfprintf(sfstdout, "return=%c option=%s name=%s num=%I*d%s\n", n, opt_info.option, opt_info.name, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
 				error(ERROR_USAGE|4, "%s", opt_info.arg);
 			}
 			else if (n == ':')
 			{
-				sfprintf(sfstdout, "return=%c option=%s name=%s num=%d", n, opt_info.option, opt_info.name, opt_info.num);
+				sfprintf(sfstdout, "return=%c option=%s name=%s num=%I*d%s", n, opt_info.option, opt_info.name, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
 				if (!opt_info.option[0])
 					sfprintf(sfstdout, " str=%s", argv[opt_info.index - 1]);
 				sfputc(sfstdout, '\n');
 				error(2, "%s", opt_info.arg);
 			}
 			else if (n > 0)
-				sfprintf(sfstdout, "return=%c option=%s name=%s arg=%s num=%d\n", n, opt_info.option, opt_info.name, opt_info.arg, opt_info.num);
+				sfprintf(sfstdout, "return=%c option=%s name=%s arg%-.1s=%s num=%I*d%s\n", n, opt_info.option, opt_info.name, &opt_info.assignment, opt_info.arg, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
 			else
-				sfprintf(sfstdout, "return=%d option=%s name=%s arg=%s num=%d\n", n, opt_info.option, opt_info.name, opt_info.arg, opt_info.num);
+				sfprintf(sfstdout, "return=%d option=%s name=%s arg%-.1s=%s num=%I*d%s\n", n, opt_info.option, opt_info.name, &opt_info.assignment, opt_info.arg, sizeof(opt_info.number), opt_info.number, opt_info.number == opt_info.num ? "" : "LL");
 			if (extra)
 			{
 				for (n = 0; n < ext; n += 2)

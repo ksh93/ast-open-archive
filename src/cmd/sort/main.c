@@ -41,7 +41,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2003-05-27 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2003-09-06 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -59,7 +59,7 @@ USAGE_LICENSE
 "[k:key?Restrict the sort key to a string beginning at \apos1\a and"
 "	ending at \apos2\a. \apos1\a and \apos2\a each have the form \am.n\a,"
 "	counting from 1, optionally followed by one or more of the flags"
-"	\bCMbdfginpr\b; \bm\b counts fields from the beginning of the"
+"	\bCMbdfginprZ\b; \bm\b counts fields from the beginning of the"
 "	line and \bn\b counts characters from the beginning of the"
 "	field. If any flags are present they override all the"
 "	global ordering options for this key. If \a.n\a is missing"
@@ -73,8 +73,15 @@ USAGE_LICENSE
 "[K:oldkey?Specified in pairs: \b-K\b \apos1\a \b-K\b \apos2\a,"
 "	where positions count from 0.]#"
 "		[pos]"
-"[R:reclen?Sets the fixed record length to \areclen\a; newlines will be"
-"	treated as normal characters.]#[reclen]"
+"[R:record|recfmt?Sets the record format to \aformat\a; newlines will be"
+"	treated as normal characters. The formats are:]:[format]{"
+"		[+d[\aterminator\a]]?Variable length with record"
+"			\aterminator\a character, \b\\n\b by default.]"
+"		[+[f]]\areclen\a?Fixed record length \areclen\a.]"
+"		[+v[b]]?Variable length with 4 byte IBM length descriptor."
+"			\bb\b optionally specifies a 4 byte IBM block"
+"			length descriptor.]"
+"}"
 "[b:ignorespace?Ignore leading white space (spaces and tabs) in field"
 "	comparisons.]"
 "[d:dictionary?`Phone directory' order: only letters, digits and white space"
@@ -86,10 +93,14 @@ USAGE_LICENSE
 "	[+e?X/Open \bdd\b(1) ebcdic]"
 "	[+i?X/Open \bdd\b(1) ibm ebcdic]"
 "	[+o?mvs OpenEdition ebcdic (IBM-1047)]"
+"	[+x?native codeset]"
 "}"
 "[f:fold|ignorecase?Fold lower case letters onto upper case.]"
 "[i:ignorecontrol?Ignore characters outside the ASCII range 040-0176 in"
 "	string comparisons.]"
+"[J:shuffle|jumble?Do a random shuffle of the sort keys. \aseed\a specifies"
+"	a pseudo random number generator seed. A \aseed\a of 0 generates a"
+"	seed based on time and pid.]#[seed]"
 "[n:numeric?An initial numeric string, consisting of optional white"
 "	space, optional sign, and a nonempty string of digits"
 "	with optional decimal point, is sorted by value.]"
@@ -126,6 +137,8 @@ USAGE_LICENSE
 "[L:list?List the available sort methods. See the \b-x\b option.]"
 "[x:method?Specify the sort method to apply:]:[method:=rasp]{\fmethods\f}"
 "[v:verbose?Trace the sort progress on the standard error.]"
+"[Z:zd|zoned-decimal?Compare zoned decimal (ZD) numbers with embedded"
+"	trailing sign.]"
 "[z:size|zip?Suggest using the specified number of bytes of internal store"
 "	to tune performance. Type is a single character and may be one of:]:"
 "		[type[size]]]{"
@@ -180,7 +193,7 @@ USAGE_LICENSE
 "	of \b-n\b with any of \b-diM\b are improper. Posix argument"
 "	conventions are supported.]"
 "[+?Options \b-C\b, \b-g\b, \b-j\b, \b-M\b, \b-p\b, \b-s\b, \b-S\b, \b-T\b,"
-"	and \b-z\b are not in the Posix or X/Open standards.]"
+"	\b-Z\b, and \b-z\b are not in the Posix or X/Open standards.]"
 
 
 "[+DIAGNOSTICS?\asort\a comments and exits with non-zero status for various"
@@ -195,7 +208,6 @@ USAGE_LICENSE
 #include <ast.h>
 #include <error.h>
 #include <ctype.h>
-#include <dlldefs.h>
 #include <fs3d.h>
 #include <ls.h>
 #include <option.h>
@@ -214,16 +226,6 @@ USAGE_LICENSE
 #define TEST_keys	0x40000000	/* dump keys			*/
 #define TEST_read	0x20000000	/* force sfread()		*/
 #define TEST_show	0x10000000	/* show but don't do		*/
-
-struct Library_s; typedef struct Library_s Library_t;
-
-typedef Rsdisc_t* (*Rslib_f)(Rs_t*, Rskey_t*, const char*);
-
-struct Library_s			/* library discipline list	*/
-{
-	Library_t*	next;		/* next in list			*/
-	char		args[1];	/* library name and args	*/
-};
 
 typedef struct
 {
@@ -250,8 +252,6 @@ typedef struct
 	Sfio_t*		tp;		/* TEST_keys tmp stream		*/
 	Sfio_t*		op;		/* output stream		*/
 	Job_t*		jobs;		/* multi-proc job table		*/
-	Library_t*	libraries;	/* discipline library list	*/
-	Library_t*	lastlib;	/* library list tail		*/
 	char*		overwrite;	/* -o input overwrite tmp file	*/
 	char*		buf;		/* input buffer			*/
 	size_t		cur;		/* input buffer index		*/
@@ -289,7 +289,7 @@ optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
  */
 
 static int
-verify(Rs_t* rs, int op, Void_t* data, Rsdisc_t* disc)
+verify(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 {
 	if (op == RS_VERIFY)
 		error(3, "disorder at record %lld", (Sflong_t)((Rsobj_t*)data)->order);
@@ -303,13 +303,12 @@ verify(Rs_t* rs, int op, Void_t* data, Rsdisc_t* disc)
 static int
 parse(register Sort_t* sp, char** argv)
 {
-	register Rskey_t*	kp = sp->key;
+	register Rskey_t*	key = sp->key;
 	register int		n;
 	register char*		s;
 	char*			e;
 	char**			a;
 	char**			v;
-	Library_t*		p;
 	size_t			z;
 	int			obsolescent = 1;
 	char			opt[16];
@@ -323,57 +322,52 @@ parse(register Sort_t* sp, char** argv)
 	{
 	case 'c':
 		obsolescent = 0;
-		kp->meth = Rsverify;
-		kp->disc->events = RS_VERIFY;
-		kp->disc->eventf = verify;
+		key->meth = Rsverify;
+		key->disc->events = RS_VERIFY;
+		key->disc->eventf = verify;
 		break;
 	case 'C':
+	case 'J':
 		sfsprintf(opt, sizeof(opt), "%c%s", n, opt_info.arg);
-		if (rskeyopt(kp, opt, 1))
+		if (rskeyopt(key, opt, 1))
 			return 0;
 		break;
 	case 'j':
-		kp->nproc = opt_info.num;
+		key->nproc = opt_info.num;
 		break;
 	case 'k':
-		if (rskey(kp, opt_info.arg, 0))
+		if (rskey(key, opt_info.arg, 0))
 			return -1;
 		break;
 	case 'l':
-		if (!(p = vmnewof(Vmheap, 0, Library_t, 1, strlen(opt_info.arg))))
-			error(ERROR_SYSTEM|3, "out of space");
-		strcpy(p->args, opt_info.arg);
-		if (sp->libraries)
-			sp->lastlib->next = p;
-		else
-			sp->libraries = p;
-		sp->lastlib = p;
+		if (rslib(key, opt_info.arg))
+			return -1;
 		break;
 	case 'm':
-		kp->merge = n;
+		key->merge = n;
 		break;
 	case 'o':
-		kp->output = opt_info.arg;
+		key->output = opt_info.arg;
 		break;
 	case 's':
-		kp->type &= ~RS_DATA;
+		key->type &= ~RS_DATA;
 		break;
 	case 't':
-		if (kp->tab)
-			error(1, "%s: %c conflicts with %c", opt_info.option, *opt_info.arg, kp->tab);
+		if (key->tab)
+			error(1, "%s: %c conflicts with %c", opt_info.option, *opt_info.arg, key->tab);
 		if (*(opt_info.arg + 1))
 			error(1, "%s %s: single character expected", opt_info.option, opt_info.arg);
-		kp->tab = *opt_info.arg;
+		key->tab = *opt_info.arg;
 		break;
 	case 'u':
-		kp->type &= ~RS_DATA;
-		kp->type |= RS_UNIQ;
+		key->type &= ~RS_DATA;
+		key->type |= RS_UNIQ;
 		break;
 	case 'v':
-		kp->verbose = n;
+		key->verbose = n;
 		break;
 	case 'x':
-		if (!(kp->meth = rskeymeth(kp, opt_info.arg)))
+		if (!(key->meth = rskeymeth(key, opt_info.arg)))
 			error(2, "%s: unknown method", opt_info.arg);
 		break;
 	case 'y':
@@ -395,23 +389,23 @@ parse(register Sort_t* sp, char** argv)
 		switch (n)
 		{
 		case 'a':
-			kp->alignsize = z;
+			key->alignsize = z;
 			break;
 		case 'c':
 			sp->chunk = 1;
-			kp->alignsize = kp->insize = z;
+			key->alignsize = key->insize = z;
 			break;
 		case 'i':
-			kp->insize = z;
+			key->insize = z;
 			break;
 		case 'p':
-			kp->procsize = z;
+			key->procsize = z;
 			break;
 		case 'o':
-			kp->outsize = z;
+			key->outsize = z;
 			break;
 		case 'r':
-			kp->recsize = z;
+			key->recsize = z;
 			break;
 		case 'I':
 			sp->zip |= SF_READ;
@@ -430,22 +424,59 @@ parse(register Sort_t* sp, char** argv)
 			opt_info.offset = 0;
 			opt_info.index++;
 		}
-		if (rskey(kp, opt_info.arg, *opt_info.option))
+		if (rskey(key, opt_info.arg, *opt_info.option))
 			return -1;
 		break;
 	case 'L':
-		rskeylist(kp, sfstdout, 0);
+		rskeylist(key, sfstdout, 0);
 		exit(0);
 	case 'R':
-		if (opt_info.num != kp->fixed && kp->fixed)
+		switch (*(s = opt_info.arg))
 		{
-			error(2, "%d: fixed record length mismatch -- %d expected", (int)opt_info.num, kp->fixed);
+		case 'd':
+		case 'D':
+			key->disc->data = *(e = ++s) ? chresc(s, &e) : '\n';
+			break;
+		case 'f':
+		case 'F':
+			s++;
+		case '+':
+		case '0': case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+			if ((n = strton(s, &e, NiL, 0)) <= 0)
+				e = opt_info.arg;
+			else if (n != key->fixed && key->fixed)
+			{
+				error(2, "%d: fixed record length mismatch -- %d expected", n, key->fixed);
+				return -1;
+			}
+			else
+				key->fixed = n;
+			break;
+		case 'v':
+		case 'V':
+			if (*++s == 'b' || *s == 'B')
+			{
+				s++;
+				n = -('B');
+			}
+			else
+				n = -('V');
+			key->disc->data = n;
+			e = s;
+			break;
+		default:
+			e = s;
+			break;
+		}
+		if (*e)
+		{
+			error(2, "%s: invalid record format", opt_info.arg);
 			return -1;
 		}
-		kp->fixed = opt_info.num;
 		break;
 	case 'S':
-		kp->type |= RS_DATA;
+		key->type |= RS_DATA;
 		break;
 	case 'T':
 		pathtemp(NiL, 0, opt_info.arg, "/TMPPATH", NiL);
@@ -472,9 +503,9 @@ parse(register Sort_t* sp, char** argv)
 				error(1, "%s: unknown test", s);
 		}
 		if (*opt_info.option == '+')
-			kp->test &= ~opt_info.num;
+			key->test &= ~opt_info.num;
 		else
-			kp->test |= opt_info.num;
+			key->test |= opt_info.num;
 		break;
 	case '?':
 		error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -485,11 +516,11 @@ parse(register Sort_t* sp, char** argv)
 	default:
 		opt[0] = n;
 		opt[1] = 0;
-		if (rskeyopt(kp, opt, 1))
+		if (rskeyopt(key, opt, 1))
 			return 0;
 		break;
 	}
-	kp->input = argv += opt_info.index;
+	key->input = argv += opt_info.index;
 	if (obsolescent && (opt_info.index <= 1 || !streq(*(argv - 1), "--")))
 	{
 		/*
@@ -506,7 +537,7 @@ parse(register Sort_t* sp, char** argv)
 					error(2, "-o: output argument expected");
 					break;
 				}
-				kp->output = s;
+				key->output = s;
 			}
 			else
 				*v++ = s;
@@ -548,6 +579,7 @@ dumpkey(Rs_t* rs, unsigned char* dat, int datlen, unsigned char* key, int keylen
 static int
 init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 {
+	register Rskey_t*	key;
 	register char*		s;
 	register char**		p;
 	char*			t;
@@ -555,14 +587,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	unsigned long		x;
 	unsigned long		z;
 	size_t			fixed;
-	Library_t*		lib;
-	Library_t*		nxt;
-	void*			dll;
-	Rslib_f			fun;
-	Rsdisc_t*		disc;
 	struct stat		is;
 	struct stat		os;
-	char			path[PATH_MAX];
 
 	memset(sp, 0, sizeof(*sp));
 	sfset(sfstdout, SF_SHARE, 0);
@@ -571,43 +597,43 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	dp->version = RSKEY_VERSION;
 	dp->flags = 0;
 	dp->errorf = errorf;
-	if (!(sp->key = rskeyopen(dp)))
+	if (!(sp->key = key = rskeyopen(dp)))
 		return -1;
-	z = sp->key->insize = 2 * INMAX;
+	z = key->insize = 2 * INMAX;
 #if 0
 	if (!strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
 #endif
-	sp->key->type |= RS_DATA;
+	key->type |= RS_DATA;
 	if ((n = strtol(astconf("PAGESIZE", NiL, NiL), &t, 0)) > 0 && !*t)
-		sp->key->alignsize = n;
-	if (parse(sp, argv) || rskeyinit(sp->key))
+		key->alignsize = n;
+	if (parse(sp, argv) || rskeyinit(key))
 	{
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-		rskeyclose(sp->key);
+		rskeyclose(key);
 		return -1;
 	}
-	sp->test = sp->key->test;
-	sp->verbose = sp->key->verbose || (sp->test & TEST_show);
+	sp->test = key->test;
+	sp->verbose = key->verbose || (sp->test & TEST_show);
 
 	/*
 	 * finalize the buffer dimensions
 	 */
 
-	if ((x = sp->key->insize) != z)
+	if ((x = key->insize) != z)
 		z = 0;
 	if (x > INMAX)
 		x = INMAX;
 	else if (x < INMIN && !sp->chunk)
 		x = INMIN;
-	if (sp->single = !sp->key->input[1])
+	if (sp->single = !key->input[1])
 	{
-		if (streq(sp->key->input[0], "-"))
+		if (streq(key->input[0], "-"))
 		{
 			if (fstat(sffileno(sfstdin), &is))
 				error(ERROR_SYSTEM|3, "cannot stat standard input");
 		}
-		else if (stat(sp->key->input[0], &is))
-			error(ERROR_SYSTEM|3, "%s: cannot stat", sp->key->input[0]);
+		else if (stat(key->input[0], &is))
+			error(ERROR_SYSTEM|3, "%s: cannot stat", key->input[0]);
 		sp->total = is.st_size;
 		if (!S_ISREG(is.st_mode))
 			sp->test |= TEST_read;
@@ -616,7 +642,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	}
 	else
 		sp->test |= TEST_read;
-	fixed = sp->key->fixed;
+	fixed = key->fixed;
 	if (!(sp->test & TEST_read))
 	{
 		sp->map = 1;
@@ -626,31 +652,31 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	else
 	{
 		if (z)
-			x = sp->key->procsize / 4;
+			x = key->procsize / 4;
 		for (;;)
 		{
 			if (fixed)
 				x += fixed - x % fixed;
-			if (sp->buf = (char*)vmalign(Vmheap, x, sp->key->alignsize))
+			if (sp->buf = (char*)vmalign(Vmheap, x, key->alignsize))
 				break;
 			if ((x >>= 1) < INMIN)
 				error(ERROR_SYSTEM|3, "out of space");
 		}
-		sp->hit = x - sp->key->alignsize;
+		sp->hit = x - key->alignsize;
 	}
 	if (sp->test & TEST_keys)
 	{
-		if (!sp->key->disc->defkeyf)
+		if (!key->disc->defkeyf)
 			error(2, "no key function to intercept");
 		else if (!(sp->tp = sfstropen()))
 			error(ERROR_SYSTEM|3, "out of space");
 		else
 		{
-			sp->defkeyf = sp->key->disc->defkeyf;
-			sp->key->disc->defkeyf = dumpkey;
+			sp->defkeyf = key->disc->defkeyf;
+			key->disc->defkeyf = dumpkey;
 		}
 	}
-	if (sp->key->nproc > 1)
+	if (key->nproc > 1)
 	{
 		off_t		offset;
 		off_t		total;
@@ -659,19 +685,19 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		int		i;
 		Job_t*		jp;
 
-		if (!sp->map || streq(sp->key->input[0], "-"))
+		if (!sp->map || streq(key->input[0], "-"))
 		{
 	uno:
-			sp->key->nproc = 1;
+			key->nproc = 1;
 		}
-		else if ((n = (sp->total + sp->key->procsize - 1) / (sp->key->procsize)) <= 1)
+		else if ((n = (sp->total + key->procsize - 1) / (key->procsize)) <= 1)
 			goto uno;
 		else
 		{
-			if (n < sp->key->nproc)
-				sp->key->nproc = n;
+			if (n < key->nproc)
+				key->nproc = n;
 			else
-				n = sp->key->nproc;
+				n = key->nproc;
 			if (!(sp->jobs = vmnewof(Vmheap, 0, Job_t, n, 0)))
 				goto uno;
 			size = (sp->total + n - 1) / n;
@@ -701,16 +727,16 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 					jp->intermediates = i;
 					offset += size;
 				}
-				if (sp->key->procsize > chunk)
-					sp->key->procsize = chunk;
+				if (key->procsize > chunk)
+					key->procsize = chunk;
 				else
 				{
-					size = sp->key->procsize;
+					size = key->procsize;
 					i = (chunk + size - 1) / size;
 					size = chunk / i;
 					if (size % fixed)
 						size += fixed - size % fixed;
-					sp->key->procsize = size;
+					key->procsize = size;
 				}
 			}
 			else
@@ -735,7 +761,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 					scan = (ideal / 32) * 4;
 				offset = 0;
 				total = sp->total;
-				file = sp->key->input[0];
+				file = key->input[0];
 				if (!(ip = sfopen(NiL, file, "r")))
 					error(ERROR_SYSTEM|3, "%s: cannot read", file);
 				for (jp = sp->jobs; jp < sp->jobs + n; jp++)
@@ -794,62 +820,30 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 					offset += size;
 				}
 				sfclose(ip);
-				sp->key->procsize = (sp->key->procsize > chunk) ? chunk : chunk / ((chunk + sp->key->procsize - 1) / sp->key->procsize);
+				key->procsize = (key->procsize > chunk) ? chunk : chunk / ((chunk + key->procsize - 1) / key->procsize);
 			}
 		}
 	}
-	sp->key->insize = sp->end = x;
-
-	/*
-	 * finally ready for recsort now
-	 */
-
-	if (!(sp->rec = rsopen(sp->key->disc, sp->key->meth, sp->key->procsize, sp->key->type)))
-	{
-		error(ERROR_SYSTEM|2, "internal error");
-		rskeyclose(sp->key);
-		return -1;
-	}
-
-	/*
-	 * load and library disciplines
-	 */
-
-	for (lib = sp->libraries; lib; lib = nxt)
-	{
-		nxt = lib->next;
-		if (s = strchr(lib->args, ','))
-			*s++ = 0;
-		if (!(dll = dllfind(lib->args, NiL, RTLD_LAZY, path, sizeof(path))))
-			error(3, "%s: library not found", lib->args);
-		t = "rs_disc";
-		if (!(fun = (Rslib_f)dlllook(dll, t)))
-			error(3, "%s: %s: initialization function not found in library", path, t);
-		if (!(disc = (*fun)(sp->rec, sp->key, s)))
-			return -1;
-		if (!rsdisc(sp->rec, disc, RS_PUSH))
-			error(3, "%s: %s: cannot push library discipline", path, t);
-		vmfree(Vmheap, lib);
-	}
+	key->insize = sp->end = x;
 
 	/*
 	 * check the output file for clash with the input files
 	 */
 
-	if (!sp->key->output || streq(sp->key->output, "-") || streq(sp->key->output, "/dev/stdout"))
+	if (!key->output || streq(key->output, "-") || streq(key->output, "/dev/stdout"))
 	{
-		sp->key->output = "/dev/stdout";
+		key->output = "/dev/stdout";
 		sp->op = sfstdout;
 	}
-	else if (sp->key->input)
+	else if (key->input)
 	{
-		if (!stat(sp->key->output, &os))
+		if (!stat(key->output, &os))
 		{
-			if (access(sp->key->output, W_OK))
-				error(ERROR_SYSTEM|3, "%s: cannot write", sp->key->output);
+			if (access(key->output, W_OK))
+				error(ERROR_SYSTEM|3, "%s: cannot write", key->output);
 			if (!fs3d(FS3D_TEST) || !iview(&os))
 			{
-				p = sp->key->input;
+				p = key->input;
 				while (s = *p++)
 					if (!streq(s, "-"))
 					{
@@ -857,9 +851,9 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 							error(ERROR_SYSTEM|2, "%s: not found", s);
 						else if (os.st_dev == is.st_dev && os.st_ino == is.st_ino)
 						{
-							if (t = strrchr(sp->key->output, '/'))
+							if (t = strrchr(key->output, '/'))
 							{
-								s = sp->key->output;
+								s = key->output;
 								*t = 0;
 							}
 							else s = ".";
@@ -867,7 +861,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 								sp->op = sfnew(NiL, NiL, SF_UNBOUND, n, SF_WRITE);
 							if (t) *t = '/';
 							if (!sp->op || fstat(n, &is))
-								error(ERROR_SYSTEM|3, "%s: cannot create overwrite file %s", sp->key->output, sp->overwrite);
+								error(ERROR_SYSTEM|3, "%s: cannot create overwrite file %s", key->output, sp->overwrite);
 							if (os.st_uid != is.st_uid || os.st_gid != is.st_gid)
 								sp->preserve = 1;
 							break;
@@ -875,13 +869,24 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 					}
 			}
 		}
-		if (!sp->overwrite && !(sp->op = sfopen(NiL, sp->key->output, "w")))
-			error(ERROR_SYSTEM|3, "%s: cannot write", sp->key->output);
+		if (!sp->overwrite && !(sp->op = sfopen(NiL, key->output, "w")))
+			error(ERROR_SYSTEM|3, "%s: cannot write", key->output);
 	}
-	if (sp->key->outsize > 0)
-		sfsetbuf(sp->op, NiL, sp->key->outsize);
+	if (key->outsize > 0)
+		sfsetbuf(sp->op, NiL, key->outsize);
 	if (sp->zip & SF_WRITE)
 		sfdcgzip(sp->op, 0);
+
+	/*
+	 * finally ready for recsort now
+	 */
+
+	if (!(sp->rec = rsopen(key->disc, key->meth, key->procsize, key->type)))
+	{
+		error(ERROR_SYSTEM|2, "internal error");
+		rskeyclose(key);
+		return -1;
+	}
 	return 0;
 }
 
@@ -1290,6 +1295,8 @@ jobs(register Sort_t* sp)
 static void
 done(register Sort_t* sp)
 {
+	if (rsclose(sp->rec))
+		error(2, "sort error");
 	if ((sp->op == sfstdout && !(sp->zip & SF_WRITE)) ? sfsync(sp->op) : sfclose(sp->op))
 		error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 	if (sp->map > 2)
@@ -1329,13 +1336,8 @@ done(register Sort_t* sp)
 		free(sp->overwrite);
 		sp->overwrite = 0;
 	}
-
-	/*
-	 * drop all the handles
-	 */
-
-	rsclose(sp->rec);
-	rskeyclose(sp->key);
+	if (rskeyclose(sp->key))
+		error(2, "sort key error");
 }
 
 int

@@ -35,6 +35,8 @@
 
 #include "rskeyhdr.h"
 
+#include <hashpart.h>
+
 #if _sys_resource && _lib_getrlimit
 
 #include <times.h>
@@ -290,6 +292,92 @@ int		len;
 	cp[1] |= sigdig << 4;
 	putdig(-1);
 	return dig - cp + 1 - nib;
+}
+
+/*
+ * zoned decimal
+ */
+
+static int
+#if __STD_C
+key_z_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+#else
+key_z_code(kp, f, dp, cp, len)
+Rskey_t*	kp;
+Field_t*	f;
+unsigned char*	dp;
+unsigned char*	cp;
+int		len;
+#endif
+{
+	unsigned char*	dig = cp + 1;	/* byte for next digit */
+	int		nib = 0;	/* high nibble 1, low nibble 0 */
+	unsigned char*	xp = dp;
+	unsigned char*	ep = xp + len;	/* end pointer */
+	unsigned char*	trans = f->trans;
+	int		sigdig = 1024;
+	int		neg = f->rflag;	/* 0 for +, 1 for - */
+	int		n;
+	int		c;
+
+	cp[1] = 0;
+
+	/*
+	 * sign
+	 */
+
+	if (trans[*(ep - 1)] & 0x10)
+		neg ^= 1;
+	while (xp < ep)
+	{
+		c = trans[*xp++];
+		n = c & 0xF;
+		putdig(n);
+		sigdig++;
+	}
+	if (sigdig >= 2047)
+	{
+		sigdig = 2047;
+		if (kp->keydisc->errorf)
+			(*kp->keydisc->errorf)(kp, kp->keydisc, 1, "%-.*s: numeric field overflow", dp);
+		dig = cp + 1;
+		*dig = 0;
+		nib = 0;
+	}
+	if (neg) sigdig = 2048 - sigdig;
+	else sigdig = 2048 + sigdig;
+	cp[0] = sigdig >> 4;
+	cp[1] |= sigdig << 4;
+	putdig(-1);
+	return dig - cp + 1 - nib;
+}
+
+/*
+ * random shuffle
+ */
+
+static int
+#if __STD_C
+key_j_code(Rskey_t* kp, Field_t* f, unsigned char* dp, unsigned char* cp, int len)
+#else
+key_j_code(kp, f, dp, cp, len)
+Rskey_t*	kp;
+Field_t*	f;
+unsigned char*	dp;
+unsigned char*	cp;
+int		len;
+#endif
+{
+	unsigned char*	xp = cp;
+	int		c;
+
+	while (--len >= 0)
+	{
+		c = *dp++;
+		kp->shuffle = HASHPART(kp->shuffle, c);
+		*xp++ = (kp->shuffle >> 4) & 0xff;
+	}
+	return xp - cp;
 }
 
 /*
@@ -600,9 +688,10 @@ register char*		s;
 int			end;
 #endif
 {
-	int	c;
-	int	x;
-	char*	b = s;
+	char*		b = s;
+	char*		e;
+	int		c;
+	int		x;
 
 	switch (c = *s++)
 	{
@@ -657,6 +746,8 @@ int			end;
 			kp->keydisc->flags |= RSKEY_ERROR;
 			return 0;
 		}
+		if (*s == ':')
+			s++;
 		switch (*s++)
 		{
 		case 'a':
@@ -679,7 +770,11 @@ int			end;
 			break;
 		}
 		if (x != CC_NATIVE && CCIN(x) != CCOUT(x))
+		{
 			fp->code = x;
+			if (fp == kp->field.head)
+				kp->code = fp->code;
+		}
 		return s - b;
 	case 'd':
 		addtable(kp, c, &fp->keep, kp->state->dict);
@@ -694,6 +789,13 @@ int			end;
 	case 'i':
 		addtable(kp, c, &fp->keep, kp->state->print);
 		break;
+	case 'J':
+		kp->shuffle = strtoul(s, &e, 0);
+		s = e;
+		if (!kp->shuffle)
+			kp->shuffle = (unsigned long)time(NiL) * (unsigned long)getpid();
+		addcoder(kp, fp, key_j_code, c, 0);
+		break;
 	case 'M':
 		addcoder(kp, fp, key_m_code, c, 0);
 		break;
@@ -703,6 +805,9 @@ int			end;
 	case 'r':
 		fp->rflag = 1;
 		return s - b;
+	case 'Z':
+		addcoder(kp, fp, key_z_code, c, 1);
+		break;
 	default:
 		return 0;
 	}
@@ -918,7 +1023,7 @@ register Field_t*	fp;
 }
 
 /*
- * initialize key info after all rskey()/rskeyargs() calls
+ * initialize key info after all rskey() calls
  */
 
 int
@@ -1052,12 +1157,8 @@ register Rskey_t*	kp;
 	{
 		kp->disc->type |= RS_DSAMELEN;
 		kp->disc->data = kp->fixed;
-	}
-	else
-	{
-		if (!kp->disc->keylen)
-			kp->disc->keylen = -1;
-		kp->disc->data = '\n';
+		if (kp->disc->keylen < 0)
+			kp->disc->keylen = 0;
 	}
 
 	/*

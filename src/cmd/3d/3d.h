@@ -500,7 +500,7 @@ typedef struct
 extern State_t		state;
 
 extern int		bprintf(char**, char*, const char*, ...);
-extern int		bvprintf(char**, char*, const char*, va_list);
+extern ssize_t		bvprintf(char**, char*, const char*, va_list);
 extern void		calldump(char**, char*);
 extern void		callinit(void);
 extern int		checklink(const char*, struct stat*, int);

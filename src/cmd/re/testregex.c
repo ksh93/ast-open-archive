@@ -181,7 +181,7 @@ T("  -s	use stack instead of malloc\n");
 T("  -x	do not repeat successful tests with REG_NOSUB\n");
 T("  -v	list each test line\n");
 T("  -A	list failed test lines with actual answers\n");
-T("  -B	list all tests lines with actual answers\n");
+T("  -B	list all test lines with actual answers\n");
 T("  -F	list failed test lines\n");
 T("  -P	list passed test lines\n");
 T("  -S	output one summary line\n");

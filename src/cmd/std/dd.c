@@ -30,7 +30,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2002-09-30 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2003-09-18 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -571,7 +571,7 @@ main(int argc, char** argv)
 			} while (v = e);
 			break;
 		case FLAG:
-			op->value.number = opt_info.num;
+			op->value.number = opt_info.number;
 			break;
 		case NUMBER:
 			c = 0;

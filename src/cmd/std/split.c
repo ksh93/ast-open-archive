@@ -29,7 +29,7 @@
  */
 
 static const char split_usage[] =
-"[-?\n@(#)$Id: split (AT&T Labs Research) 1996-06-11 $\n]"
+"[-?\n@(#)$Id: split (AT&T Labs Research) 2003-09-18 $\n]"
 USAGE_LICENSE
 "[+NAME?split - split files into pieces]"
 "[+DESCRIPTION?\bsplit\b reads an input file and writes one or more"
@@ -54,9 +54,9 @@ USAGE_LICENSE
 "[l:lines]#[line_count:=1000?\aline_count\a specified the number of lines"
 "	for each piece except the last. If the input does not end in"
 "	a newline, the partial line is included in the last piece.]"
-"[a]#[suffix_len:=2?\asuffix_len\a defines the number of letters that"
-"	form the suffix portion of the file names for each of the"
-"	pieces that the file is split into.]"
+"[a|n:suffix-length]#[suffix_len:=2?\asuffix_len\a defines the number of"
+"	letters that form the suffix portion of the file names for each of"
+"	the pieces that the file is split into.]"
 "[b:bytes]#[n?Splits the file into byte size pieces defined by \an\a"
 "	rather than lines.]"
 "[C:line-bytes]#[n?Splits the file into lines totaling a most \an\a bytes.]"
@@ -71,7 +71,7 @@ USAGE_LICENSE
 ;
 
 static const char csplit_usage[] =
-"[-?\n@(#)$Id: csplit (AT&T Labs Research) 1996-06-11 $\n]"
+"[-?\n@(#)$Id: csplit (AT&T Labs Research) 2003-08-21 $\n]"
 USAGE_LICENSE
 "[+NAME?csplit - split a file into sections determined by context lines]"
 "[+DESCRIPTION?\bcsplit\b creates zero or more output files containing"
@@ -121,7 +121,7 @@ USAGE_LICENSE
 "	name suffix.]:[format:=\b%02d\b]"
 "[f:prefix?Use \aprefix\a to generate the file name prefix.]:[prefix:=\bxx\b]"
 "[k:keep-files?Do not remove output files on errors.]"
-"[a|n:digits?Use \adigits\a in the generated file name suffixes.]:[digits:=2]"
+"[a|n:digits?Use \adigits\a in the generated file name suffixes.]#[digits:=2]"
 "[s:silent|quiet?Do not print output file counts and sizes.]"
 "[z:elide-empty-files?Remove empty output files.]"
 "\n"
@@ -165,30 +165,31 @@ struct fname
 struct op
 {
 	struct op*	next;
-	long		size;
-	int		repeat;
-	char*		expr;
+	Sfoff_t		size;
+	size_t		repeat;
 	int		flags;
+	regex_t*	re;
 };
 
 /*
  * create an operation structure
  */
 static struct op*
-getop(struct op** prev, long size, int repeat, int flags, void* expr)
+getop(struct op** prev, Sfoff_t size, size_t repeat, int flags, int re)
 {
 	struct op*	op;
 
-	if (op = newof(0, struct op, 1, 0))
+	if (op = newof(0, struct op, 1, re ? sizeof(regex_t) : 0))
 	{
 		op->repeat = repeat;
 		op->flags = flags;
 		op->size = size;
 		op->next = 0;
-		op->expr = expr;
+		if (re)
+			op->re = (regex_t*)(op + 1);
 		*prev = op;
 	}
-	return(op);
+	return op;
 }
 
 /*
@@ -200,54 +201,37 @@ static struct op*
 getexpr(struct op** prev, const char* arg)
 {
 	char*		cp = (char*)arg;
-	register int	delim;
-	register int	c;
-	register char*	xp;
+	char*		ep;
+	int		n;
 	struct op*	op;
-	long		size;
 
-	/*
-	 * search for trailing delimiter
-	 */
-
-	delim = *cp++;
-	while (c = *cp++)
+	if (op = getop(prev, 0, 1, *cp == '/' ? OP_SEARCH : OP_SKIP, 1))
 	{
-		if (c == '\\' && *cp)
-			cp++;
-		else if (c == delim)
-			break;
-	}
-	if (!(xp = newof(0, char, cp - arg - 1, 0)))
-		error(ERROR_SYSTEM|3, "out of space [arg]");
-	memcpy(xp, arg + 1, cp - arg - 2);
-	if (c)
-	{
-		/*
-		 * handle offsets
-		 */
-
-		if ((c = *cp) == '+' || c == '-')
-			cp++;
-		size = strtol(cp, &cp, 10);
+		if (n = regcomp(op->re, cp, REG_DELIMITED|REG_NOSUB))
+		{
+			regfatal(op->re, 2, n);
+			return 0;
+		}
+		cp += op->re->re_npat;
 		if (*cp)
-			error(ERROR_exit(1), "%s: invalid offset", arg);
-		if (c == '-')
-			size = -size;
+		{
+			op->size = strtoll(cp, &ep, 10);
+			if (*ep)
+				error(ERROR_exit(1), "%s: invalid offset", cp);
+		}
 	}
-	op = getop(prev, size, 1, delim == '/' ? OP_SEARCH : OP_SKIP, (void*)xp);
-	return(op);
+	return op;
 }
 
 /*
- * set up file name generator whose form is <name>... where ... is
+ * set up file name generator whose form is <prefix>... where ... is
  * suflen characters from low..high
  * returns a pointer to a structure that can be used to create
  * file names
  */
 
 static struct fname*
-setfname(const char* name, char* format, int suflen, int low, int high)
+setfname(const char* prefix, char* format, int suflen, int low, int high)
 {
 	struct fname*	fp;
 	int		flen;
@@ -255,19 +239,21 @@ setfname(const char* name, char* format, int suflen, int low, int high)
 	int		len;
 	char*		cp;
 
-	flen = strlen(name);
+	flen = strlen(prefix);
 	len = flen + suflen + 1;
 	if (format)
 	{
 		slen = strlen(format);
 		len += flen + slen + 1;
 	}
+	else
+		slen = 0;
 	if (fp = newof(0, struct fname, 1, len))
 	{
 		cp = (char*)(fp + 1);
 		if (format)
 		{
-			strcpy(fp->format = cp, name);
+			strcpy(fp->format = cp, prefix);
 			cp += flen;
 			strcpy(cp, format);
 			cp += slen + 1;
@@ -275,14 +261,14 @@ setfname(const char* name, char* format, int suflen, int low, int high)
 		fp->low = low;
 		fp->high = high;
 		fp->count = 0;
-		strcpy(fp->fname = cp, name);
+		strcpy(fp->fname = cp, prefix);
 		cp += flen;
 		fp->suffix = cp;
 		while (suflen-- > 0)
 			*cp++ = low;
 		*cp-- = 0;
 		fp->last = cp;
-		*cp -= 1;
+		(*cp)--;
 		flen = _POSIX_NAME_MAX;
 		if (cp = strrchr(fp->fname, '/'))
 		{
@@ -302,9 +288,9 @@ setfname(const char* name, char* format, int suflen, int low, int high)
 				flen = pathconf(".", _PC_NAME_MAX);
 		}
 		if (len > flen)
-			error(ERROR_exit(1), "%s: filename too long", name);
+			error(ERROR_exit(1), "%s: filename too long", prefix);
 	}
-	return(fp);
+	return fp;
 }
 
 /*
@@ -324,11 +310,11 @@ getfname(struct fname* fp)
 		if (cp < fp->suffix)
 		{
 			error(0, "file limit reached");
-			return(0);
+			return 0;
 		}
 	}
 	fp->count++;
-	return(fp->fname);
+	return fp->fname;
 }
 
 /*
@@ -386,23 +372,26 @@ msize(Sfio_t* in, long len)
 static int
 split(Sfio_t* in, struct fname* fp, struct op* op, int flags)
 {
-	register Sfio_t*	out = 0;
 	register char*		cp;
+	register char*		s;
+	Sfoff_t			len;
+	Sfoff_t			z;
+	Sfoff_t			size;
+	size_t			repeat;
+	int			c;
+
+	register Sfio_t*	out = 0;
 	register char*		peek = 0;
 	register long		n = 0;
-	int			delim = (flags & B_FLAG ? -1 : '\n');
-	long			len;
-	long			z;
-	long			lineno = 1;
-	Sfoff_t			size;
-	int			repeat;
+	int			delim = (flags & B_FLAG) ? -1 : '\n';
+	size_t			lineno = 1;
 
 	while (op)
 	{
 		if (op->flags == OP_LINES)
 			len = op->size;
 		repeat = op->repeat;
-		while (repeat--)
+		do
 		{
 			if (op->flags != OP_SKIP)
 			{
@@ -438,47 +427,41 @@ split(Sfio_t* in, struct fname* fp, struct op* op, int flags)
 			}
 			else
 			{
-				register char*	s;
-				regex_t		re;
-
-				if (n = regcomp(&re, op->expr, REG_NOSUB))
+				if (peek)
 				{
-					regfatal(&re, 2, n);
-					goto err;
+					if (out && (n = sfputr(out, peek, delim)) <= 0)
+						goto done;
+					lineno++;
+					peek = 0;
 				}
-				while ((s = peek) && !(peek = 0) || (s = sfgetr(in, delim, 1)))
+				while (s = sfgetr(in, delim, 1))
 				{
-					if (!(n = regexec(&re, s, 0, NiL, 0)))
+					if (!(c = regexec(op->re, s, 0, NiL, 0)))
 						break;
 					lineno++;
-					if (n != REG_NOMATCH)
+					if (c != REG_NOMATCH)
 					{
-						regfatal(&re, 2, n);
+						regfatal(op->re, 2, c);
 						goto err;
 					}
 					if (out && (n = sfputr(out, s, delim)) <= 0)
-					{
-						regfree(&re);
 						goto done;
-					}
 				}
-				regfree(&re);
 				if (!(peek = s))
-				{
-					n = 0;
-					goto done;
-				}
-				if (!out)
-					continue;
+					while (op->next)
+						op = op->next;
 			}
-			size = sfseek(out, (Sfoff_t)0, SEEK_END);
-			if (!(flags & S_FLAG))
-				sfprintf(sfstdout, "%I*d\n", size);
-			sfclose(out);
-			out = 0;
-			if ((flags & Z_FLAG) && size <= 0)
-				remove(cp);
-		}
+			if (out)
+			{
+				size = sfseek(out, (Sfoff_t)0, SEEK_END);
+				if (!(flags & S_FLAG))
+					sfprintf(sfstdout, "%I*d\n", sizeof(size), size);
+				sfclose(out);
+				out = 0;
+				if ((flags & Z_FLAG) && size <= 0)
+					remove(cp);
+			}
+		} while (!repeat || --repeat);
 		op = op->next;
 	}
  done:
@@ -489,39 +472,46 @@ split(Sfio_t* in, struct fname* fp, struct op* op, int flags)
 			remove(cp);
 	}
 	if (n >= 0)
-		return(0);
+		return 0;
  err:
 	if (!(flags & K_FLAG))
 		removeall(fp);
-	return(1);
+	return 1;
 }
 
 int
 main(int argc, char** argv)
 {
-	register int	n;
 	struct fname*	fp;
 	struct op*	top;
 	char*		cp;
+	char*		prefix;
 	const char*	usage;
 	Sfio_t*		in;
+	int		flags;
+	ssize_t		n;
 
-	char*		name = "xx";
 	char*		format = 0;
-	long		size = 10000;
+	Sfoff_t		size = 10000;
 	int		suflen = 2;
-	int		flags = C_FLAG;
 
-	if (cp = strrchr(*argv, '/')) cp++;
-	else cp = *argv;
+	if (cp = strrchr(*argv, '/'))
+		cp++;
+	else
+		cp = *argv;
 	error_info.id = cp;
 	if (streq(cp, "split"))
 	{
 		usage = split_usage;
 		flags = S_FLAG|K_FLAG;
-		name = "x";
+		prefix = "x";
 	}
-	else usage = csplit_usage;
+	else
+	{
+		usage = csplit_usage;
+		flags = C_FLAG;
+		prefix = "xx";
+	}
 	for (;;)
 	{
 		switch (optget(argv, usage))
@@ -530,7 +520,8 @@ main(int argc, char** argv)
 			break;
 		case 'l':
 			flags &= ~(B_FLAG|M_FLAG);
-			size = opt_info.num;
+			if ((size = opt_info.number) <= 0)
+				error(1, "%s: invalid size", opt_info.arg);
 			continue;
 		case 'k':
 			flags |= K_FLAG;
@@ -542,7 +533,7 @@ main(int argc, char** argv)
 			flags |= Z_FLAG;
 			continue;
 		case 'f':
-			name = opt_info.arg;
+			prefix = opt_info.arg;
 			continue;
 		case 'a':
 		case 'n':
@@ -553,10 +544,9 @@ main(int argc, char** argv)
 		case 'b':
 			if (flags & S_FLAG)
 			{
-				size = strton(opt_info.arg, &cp, NiL, 1);
-				flags |= B_FLAG;
-				if (*cp)
+				if ((size = opt_info.number) <= 0)
 					error(1, "%s: invalid size", opt_info.arg);
+				flags |= B_FLAG;
 			}
 			else
 				format = opt_info.arg;
@@ -590,27 +580,35 @@ main(int argc, char** argv)
 				op = getexpr(op ? &op->next : &top, sp);
 				break;
 			case '{':
-				op->repeat = strtol(sp + 1, &sp, 10);
+				if (!op)
+					error(ERROR_exit(1), "%s: pattern expected for repeat count", *(argv - 1));
+				if (*++sp == '*' && *(sp + 1) == '}' && !*(sp + 2))
+					op->repeat = 0;
+				else
+				{
+					if ((n = strtol(sp, &sp, 10)) <= 0 || *sp != '}' || *(sp + 1))
+						error(ERROR_exit(1), "%s: invalid repeat count", *(argv - 1));
+					op->repeat = n + 1;
+				}
 				if (op->flags == OP_ABSOLUTE)
 					op->flags = OP_LINES;
 				break;
 			default:
-				size = strtol(sp, &sp, 10);
-				if (*sp)
-					error(ERROR_exit(1), "%s: bad line number", *(argv - 1));
+				if ((size = strtoll(sp, &sp, 10)) <= 0 || *sp)
+					error(ERROR_exit(1), "%s: invalid line number", *(argv - 1));
 				op = getop(op ? &op->next : &top, size, 1, OP_ABSOLUTE, 0);
 				break;
 			}
 		}
-		op = getop(&op->next, SF_UNBOUND, 1, OP_LINES, 0);
-		fp = setfname(name, format, suflen, '0', '9');
+		op = getop(op ? &op->next : &top, SF_UNBOUND, 1, OP_LINES, 0);
+		fp = setfname(prefix, format, suflen, '0', '9');
 	}
 	else
 	{
 		if (cp && *argv)
-			name = *argv;
+			prefix = *argv;
 		getop(&top, size, SF_UNBOUND, OP_LINES, 0);
-		fp = setfname(name, format, suflen, 'a', 'z');
+		fp = setfname(prefix, format, suflen, 'a', 'z');
 	}
 	if (!cp || streq(cp, "-"))
 		in = sfstdin;
@@ -619,5 +617,5 @@ main(int argc, char** argv)
 	n = split(in, fp, top, flags);
 	if (in != sfstdin)
 		sfclose(in);
-	exit(n);
+	return n;
 }

@@ -25,7 +25,7 @@
 #ifndef _RECSORT_H
 #define	_RECSORT_H		1
 
-#define RS_VERSION	20030521L
+#define RS_VERSION	20030811L
 #define RSKEY_VERSION	19961031L
 
 #include	<sfio.h>
@@ -37,7 +37,7 @@ typedef struct _rsdisc_s	Rsdisc_t;
 typedef int 			(*Rsdefkey_f)
 				  _ARG_((Rs_t*, unsigned char*, int,
 					 unsigned char*, int, Rsdisc_t*));
-typedef int			(*Rsevent_f)_ARG_((Rs_t*, int, Void_t*, Rsdisc_t*));
+typedef int			(*Rsevent_f)_ARG_((Rs_t*, int, Void_t*, Void_t*, Rsdisc_t*));
 
 typedef struct _rskey_s		Rskey_t;
 typedef struct _rskeydisc_s	Rskeydisc_t;
@@ -62,6 +62,7 @@ struct _rsdisc_s
 	Rsdefkey_f	defkeyf;/* to define key from data		*/
 	Rsevent_f	eventf;	/* to announce various events		*/
 	unsigned long	events;	/* events to announce			*/
+	Rsdisc_t*	disc;	/* next in stack			*/
 };
 
 struct _rsobj_s
@@ -121,13 +122,16 @@ struct _rs_s
 };
 
 /* events */
-#define RS_CLOSE	(1<<0)		/* sort context is being closed	*/
-#define RS_DISC		(1<<1)		/* discipline is being changed	*/
-#define RS_METHOD	(1<<2)		/* method is being changed	*/
-#define RS_POP		(1<<3)		/* discipline is being popped	*/
-#define RS_PUSH		(1<<4)		/* discipline is being pushed	*/
-#define RS_SUMMARY	(1<<5)		/* RS_UNIQ summary		*/
-#define RS_VERIFY	(1<<6)		/* objects out of order		*/
+#define RS_CLOSE	000001		/* sort context is being closed	*/
+#define RS_DISC		000002		/* discipline is being changed	*/
+#define RS_METHOD	000004		/* method is being changed	*/
+#define RS_OPEN		001000		/* rsopen() is being called	*/
+#define RS_POP		000010		/* discipline is being popped	*/
+#define RS_PUSH		000020		/* discipline is being pushed	*/
+#define RS_READ		000200		/* called for each read record	*/
+#define RS_SUMMARY	000040		/* RS_UNIQ summary		*/
+#define RS_VERIFY	000100		/* objects out of order		*/
+#define RS_WRITE	000400		/* called for each write record	*/
 
 #define RS_NEXT		0		/* rsdisc() next		*/
 
@@ -183,6 +187,7 @@ extern Rs_t*		rsopen _ARG_((Rsdisc_t*, Rsmethod_t*, ssize_t, int));
 extern int		rsclear _ARG_((Rs_t*));
 extern int		rsclose _ARG_((Rs_t*));
 extern ssize_t		rsprocess _ARG_((Rs_t*, Void_t*, ssize_t));
+extern int		rslib _ARG_((Rskey_t*, const char*));
 extern Rsobj_t*		rslist _ARG_((Rs_t*));
 extern int		rswrite _ARG_((Rs_t*, Sfio_t*, int));
 extern int		rsmerge _ARG_((Rs_t*, Sfio_t*, Sfio_t**, int, int));

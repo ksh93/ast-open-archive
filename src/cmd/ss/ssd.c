@@ -31,7 +31,7 @@
  * setgid to kmem for better performance
  */
 
-static const char id[] = "\n@(#)$Id: ssd (AT&T Research) 1997-08-11 $\0\n";
+static const char id[] = "\n@(#)$Id: ssd (AT&T Research) 2003-07-29 $\0\n";
 
 #include <ast.h>
 #include <cs.h>
@@ -40,7 +40,6 @@ static const char id[] = "\n@(#)$Id: ssd (AT&T Research) 1997-08-11 $\0\n";
 #include <proc.h>
 #include <sig.h>
 #include <times.h>
-#include <utmp.h>
 #include <dirent.h>
 #include <ast_param.h>
 
@@ -107,6 +106,36 @@ struct whod
 #define	CP_SYS		2
 #endif
 
+#if _hdr_utmpx
+
+#include <utmpx.h>
+
+#define utmp		utmpx
+#define ut_name		ut_user
+
+#ifdef	UTMPX_FILE
+#define UTMP_FILE	UTMPX_FILE
+#endif
+#ifdef	UTMPX_PATH
+#define UTMP_PATH	UTMPX_PATH
+#endif
+#ifdef	UTMPX_PATHNAME
+#define UTMP_PATHNAME	UTMPX_PATHNAME
+#endif	
+#ifdef	_PATH_UTMPX
+#define _PATH_UTMP	_PATH_UTMPX
+#endif     
+
+#define X		"x"
+
+#else
+
+#include <utmp.h>
+
+#define X
+
+#endif
+
 static char*		usrfiles[] =
 {
 #ifdef	UTMP_FILE
@@ -124,9 +153,9 @@ static char*		usrfiles[] =
 #ifdef	_PATH_UTMP
 	_PATH_UTMP,
 #endif
-	"/etc/utmp",
-	"/var/adm/utmp",
-	"/var/run/utmp"
+	"/etc/utmp" X,
+	"/var/adm/utmp" X,
+	"/var/run/utmp" X
 };
 
 static char*		usrfile;

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
@@ -155,8 +155,7 @@ bind -lz
 bind -lbz
 bind -lpz
 bind -last
-bind -lm dontcare
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pzip pzip.o ${mam_libz} ${mam_libbz} ${mam_libpz} ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pzip pzip.o ${mam_libz} ${mam_libbz} ${mam_libpz} ${mam_libast}
 done pzip generated
 make pop
 make pop.o
@@ -173,7 +172,7 @@ done pop.c
 prev pop.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c pop.c
 done pop.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pop pop.o ${mam_libpz} ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pop pop.o ${mam_libpz} ${mam_libast}
 done pop generated
 make pin
 make pin.o
@@ -184,7 +183,7 @@ done ../../../include/ast/tsp.h dontcare
 make FEATURE/local implicit
 make features/local
 done features/local
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libpz} ${mam_libast} ${mam_libm} : run features/local
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libpz} ${mam_libast} : run features/local
 done FEATURE/local generated
 make ../../../include/ast/bzlib.h implicit
 make windows.h implicit
@@ -211,7 +210,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -I${INSTAL
 done pin.o generated
 bind -ltsp
 setv LICENSE -DLICENSE="since=1998,author=gsf+alb"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pin pin.o ${mam_libz} ${mam_libbz} ${mam_libtsp} ${mam_libpz} ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pin pin.o ${mam_libz} ${mam_libbz} ${mam_libtsp} ${mam_libpz} ${mam_libast}
 done pin generated
 make rectify
 make rectify.o
@@ -223,7 +222,7 @@ done rectify.c
 prev rectify.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -c rectify.c
 done rectify.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o rectify rectify.o ${mam_libpz} ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o rectify rectify.o ${mam_libpz} ${mam_libast}
 done rectify generated
 make funzip
 make funzip.o
@@ -235,7 +234,7 @@ done funzip.c
 prev funzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pzip]"\" -D_PACKAGE_ast -c funzip.c
 done funzip.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o funzip funzip.o ${mam_libz} ${mam_libpz} ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o funzip funzip.o ${mam_libz} ${mam_libpz} ${mam_libast}
 done funzip generated
 make ../../../bin
 exec - set -
@@ -264,6 +263,18 @@ make ../../../bin/funzip
 prev funzip
 exec - test '' = 'funzip' || ${STDCMP} 2>/dev/null -s funzip ${INSTALLROOT}/bin/funzip || { ${STDMV} ${INSTALLROOT}/bin/funzip ${INSTALLROOT}/bin/funzip.old 2>/dev/null || true; ${STDCP} funzip ${INSTALLROOT}/bin/funzip  		    		    ;}
 done ../../../bin/funzip generated
+make ../../../lib/pz
+exec - set -
+exec - if	test ! -d ${PACKAGE_ast_LIB}/pz
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/pz 		    		   
+exec - fi
+done ../../../lib/pz generated
+make ../../../lib/pz/gzip.prt
+prev ../../../lib/pz
+make gzip.prt
+done gzip.prt
+exec - test '' = 'gzip.prt' || ${STDCMP} 2>/dev/null -s gzip.prt ${PACKAGE_ast_LIB}/pz/gzip.prt || { ${STDMV} ${PACKAGE_ast_LIB}/pz/gzip.prt ${PACKAGE_ast_LIB}/pz/gzip.prt.old 2>/dev/null || true; ${STDCP} gzip.prt ${PACKAGE_ast_LIB}/pz/gzip.prt  		    		    ;}
+done ../../../lib/pz/gzip.prt generated
 done install virtual
 make test
 make test.pzip

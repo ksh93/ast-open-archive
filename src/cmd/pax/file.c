@@ -196,12 +196,10 @@ missdir(register Archive_t* ap, register File_t* f)
 	{
 		if (!state.mkdir)
 		{
-			static int	warned;
-
-			if (!warned)
+			if (!state.warnmkdir)
 			{
+				state.warnmkdir = 1;
 				error(1, "omit the --nomkdir option to create intermediate directories");
-				warned = 1;
 			}
 			return -1;
 		}
@@ -309,12 +307,12 @@ openout(register Archive_t* ap, register File_t* f)
 			if (s = getenv("VPATH"))
 			{
 				if (!(s = strdup(s)))
-					error(ERROR_SYSTEM|3, "out of space [VPATH]");
+					nospace();
 				do
 				{
 					if (e = strchr(s, ':')) *e++ = 0;
 					if (!(vp = newof(0, View_t, 1, 0)))
-						error(ERROR_SYSTEM|3, "out of space [view]");
+						nospace();
 					vp->root = s;
 					if (stat(s, &st))
 					{
@@ -451,9 +449,9 @@ openout(register Archive_t* ap, register File_t* f)
 			fd = -2;
 		return fd;
 	case X_IFLNK:
-		if (!*f->linkname)
+		if (!*f->linkpath)
 			return -2;
-		if (streq(f->name, f->linkname))
+		if (streq(f->name, f->linkpath))
 		{
 			error(1, "%s: symbolic link loops to self", f->name);
 			return -1;
@@ -463,16 +461,16 @@ openout(register Archive_t* ap, register File_t* f)
 			error(ERROR_SYSTEM|2, "cannot remove current %s", f->name);
 			return -1;
 		}
-		if (pathsetlink(f->linkname, f->name))
+		if (pathsetlink(f->linkpath, f->name))
 		{
 			if (!exists && missdir(ap, f))
 			{
 				error(ERROR_SYSTEM|2, "%s: cannot create intermediate directories", f->name);
 				return -1;
 			}
-			if (exists || pathsetlink(f->linkname, f->name))
+			if (exists || pathsetlink(f->linkpath, f->name))
 			{
-				error(ERROR_SYSTEM|2, "%s: cannot symlink to %s", f->name, f->linkname);
+				error(ERROR_SYSTEM|2, "%s: cannot symlink to %s", f->name, f->linkpath);
 				return -1;
 			}
 		}
@@ -661,33 +659,6 @@ closeout(register Archive_t* ap, register File_t* f, int fd)
 	return r;
 }
 
-typedef struct
-{
-	char*	data;
-	size_t	size;
-} Path_t;
-
-/*
- * save path in pp
- */
-
-static char*
-savepath(register Path_t* pp, const char* path, size_t len)
-{
-	if (!len)
-		len = strlen(path);
-	len++;
-	if (len > pp->size)
-	{
-		pp->size = roundof(len, 1024);
-		if (!(pp->data = newof(pp->data, char, pp->size, 0)))
-			error(3, "out of space [savepath]");
-	}
-	if (path)
-		memcpy(pp->data, path, len);
-	return pp->data;
-}
-
 /*
  * get file info for output
  */
@@ -697,12 +668,6 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 {
 	register char*		name;
 	register int		n;
-
-	static struct stat	st;
-	static Path_t		pathbuffer;
-	static Path_t		namebuffer;
-	static Path_t		peekbuffer;
-	static Path_t		linkbuffer;
 
 	name = ftw->path;
 	message((-4, "getfile(%s)", name));
@@ -736,7 +701,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 			 */
 
 			n = ftw->pathlen;
-			name = savepath(&peekbuffer, name, n);
+			name = stash(&ap->path.peek, name, n);
 			name[n] = '/';
 			if (!state.peekfile || !strncmp(state.peekfile, name, n))
 				while ((state.peekfile = sfgetr(sfstdin, '\n', 1)) && !strncmp(state.peekfile, name, n));
@@ -746,35 +711,35 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	}
 	if (ap->delta)
 		ap->delta->hdr = ap->delta->hdrbuf;
-	name = savepath(&namebuffer, name, ftw->pathlen);
+	name = stash(&ap->path.name, name, ftw->pathlen);
 	pathcanon(name, 0);
-	f->path = savepath(&pathbuffer, name, ftw->pathlen);
+	f->path = stash(&ap->path.path, name, ftw->pathlen);
 	f->name = map(name);
 	if (state.files && state.operation == (IN|OUT) && dirprefix(state.destination, name))
 		return 0;
 	f->namesize = strlen(f->name) + 1;
-	st = ftw->statb;
-	f->st = &st;
-	f->perm = st.st_mode & S_IPERM;
+	ap->st = ftw->statb;
+	f->st = &ap->st;
+	f->perm = f->st->st_mode & S_IPERM;
 	f->st->st_mode = modex(f->st->st_mode);
 	f->uidname = 0;
 	f->gidname = 0;
 	f->link = 0;
 	if ((f->type = X_ITYPE(f->st->st_mode)) == X_IFLNK)
 	{
-		f->linknamesize = f->st->st_size + 1;
-		f->linkname = savepath(&linkbuffer, NiL, f->linknamesize);
-		if (pathgetlink(f->path, f->linkname, f->linknamesize) != f->st->st_size)
+		f->linkpathsize = f->st->st_size + 1;
+		f->linkpath = stash(&ap->path.link, NiL, f->linkpathsize);
+		if (pathgetlink(f->path, f->linkpath, f->linkpathsize) != f->st->st_size)
 		{
 			error(2, "%s: cannot read symbolic link", f->path);
 			ftw->status = FTW_SKIP;
 			return 0;
 		}
 		f->linktype = SOFTLINK;
-		pathcanon(f->linkname, 0);
+		pathcanon(f->linkpath, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
-			f->linkname = map(f->linkname);
-		if (streq(f->path, f->linkname))
+			f->linkpath = map(f->linkpath);
+		if (streq(f->path, f->linkpath))
 		{
 			error(2, "%s: symbolic link loops to self", f->path);
 			ftw->status = FTW_SKIP;
@@ -784,8 +749,8 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	else
 	{
 		f->linktype = NOLINK;
-		f->linkname = 0;
-		f->linknamesize = 0;
+		f->linkpath = 0;
+		f->linkpathsize = 0;
 	}
 	f->ro = ropath(f->name);
 	if (!validout(ap, f))
@@ -798,6 +763,8 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	}
 	ap->entries++;
 	f->delta.op = 0;
+	f->longname = 0;
+	f->longlink = 0;
 	f->skip = 0;
 	message((-2, "getfile(): path=%s name=%s mode=%s size=%I*d", name, f->name, fmtmode(f->st->st_mode, 1), sizeof(f->st->st_size), f->st->st_size));
 	return 1;
@@ -811,8 +778,6 @@ int
 validout(register Archive_t* ap, register File_t* f)
 {
 	register char*	s;
-
-	static char	idbuffer[ALAR_NAMESIZE + 1];
 
 	if (f->ro)
 		return 0;
@@ -847,31 +812,17 @@ validout(register Archive_t* ap, register File_t* f)
 			error(1, "%s: file name stripped to %s", f->name, s);
 		}
 		else s = f->name;
-		if (strlen(s) > sizeof(idbuffer) - 1)
+		if (strlen(s) > sizeof(ap->id.id) - 1)
 		{
 			error(2, "%s: file name too long", f->name);
 			return 0;
 		}
-		f->id = strupper(strcpy(idbuffer, s));
+		f->id = strupper(strcpy(ap->id.id, s));
 		break;
 	case BINARY:
-		if (f->namesize > BINARY_NAMESIZE)
+		if (f->namesize > (BINARY_NAMESIZE + 1))
 		{
 			error(2, "%s: file name too long", f->name);
-			return 0;
-		}
-		break;
-	case PAX:
-	case TAR:
-	case USTAR:
-		if (f->namesize > sizeof(tar_header.name) + ((ap->format == TAR) ? -(f->type == X_IFDIR) : sizeof(tar_header.prefix)))
-		{
-			error(2, "%s: file name too long", f->name);
-			return 0;
-		}
-		if (f->linknamesize > sizeof(tar_header.linkname))
-		{
-			error(2, "%s: link name too long", f->name);
 			return 0;
 		}
 		break;
@@ -892,8 +843,6 @@ addlink(register Archive_t* ap, register File_t* f)
 	int			n;
 	Fileid_t		id;
 	unsigned short		us;
-
-	static int		warned;
 
 	id.dev = f->st->st_dev;
 	id.ino = f->st->st_ino;
@@ -946,7 +895,7 @@ addlink(register Archive_t* ap, register File_t* f)
 		{
 			if (f->linktype == NOLINK)
 				return 1;
-			f->linkname = map(f->linkname);
+			f->linkpath = map(f->linkpath);
 			goto linked;
 		}
 		/*FALLTHROUGH*/
@@ -969,42 +918,40 @@ addlink(register Archive_t* ap, register File_t* f)
 		f->st->st_ino = p->id.ino;
 		f->link = p;
 		f->linktype = HARDLINK;
-		f->linkname = p->name;
+		f->linkpath = p->name;
 		if (state.pass && (state.operation & OUT) || !state.pass && state.operation == OUT)
 			return 0;
 	linked:
-		message((-1, "addlink(%s,%s)", f->name, f->linkname));
+		message((-1, "addlink(%s,%s)", f->name, f->linkpath));
 
 		/*
 		 * compensate for a pre 951031 pax bug
 		 * that added linknamesize to st_size
 		 */
 
-		if (ap->format == CPIO && f->st->st_size == f->linknamesize && bread(ap, state.tmp.buffer, (off_t)0, n = f->st->st_size + 6, 0) > 0)
+		if (ap->format == CPIO && f->st->st_size == f->linkpathsize && bread(ap, state.tmp.buffer, (off_t)0, n = f->st->st_size + 6, 0) > 0)
 		{
 			bunread(ap, state.tmp.buffer, n);
 			state.tmp.buffer[6] = 0;
 			state.tmp.buffer[n] = 0;
 			if (strtol(state.tmp.buffer, NiL, 8) == CPIO_MAGIC && strtol(state.tmp.buffer + f->st->st_size, NiL, 8) != CPIO_MAGIC)
 			{
-				static int	warned;
-
 				f->st->st_size = 0;
-				if (!warned)
+				if (!ap->warnlinkhead)
 				{
-					warned = 1;
+					ap->warnlinkhead = 1;
 					error(1, "%s: compensating for invalid %s header hard link sizes", ap->name, format[ap->format].name);
 				}
 			}
 		}
-		if (streq(f->name, f->linkname))
+		if (streq(f->name, f->linkpath))
 		{
 			error(2, "%s: hard link loops to self", f->name);
 			return 0;
 		}
 		if (!state.list)
 		{
-			s = f->linkname;
+			s = f->linkpath;
 			if (access(s, 0))
 			{
 				f->skip = 1;
@@ -1026,7 +973,7 @@ addlink(register Archive_t* ap, register File_t* f)
 				}
 				if (link(s, f->name))
 				{
-					error(ERROR_SYSTEM|2, "%s: cannot link to %s", f->linkname, f->name);
+					error(ERROR_SYSTEM|2, "%s: cannot link to %s", f->linkpath, f->name);
 					return -1;
 				}
 			}
@@ -1045,9 +992,9 @@ addlink(register Archive_t* ap, register File_t* f)
 	hashput(state.linktab, NiL, p);
 	return -1;
  toomany:
-	if (!warned)
+	if (!state.warnlinknum)
 	{
-		warned = 1;
+		state.warnlinknum = 1;
 		error(1, "too many hard links -- some links may become copies");
 	}
 	return -1;
@@ -1077,7 +1024,8 @@ setidnames(register File_t* f)
 	{
 		if ((id = struid(f->uidname)) < 0)
 		{
-			if (id == -1 && state.owner) error(1, "%s: invalid user name", f->uidname);
+			if (id == -1 && state.owner)
+				error(1, "%s: invalid user name", f->uidname);
 			f->uidname = 0;
 			id = state.uid;
 		}
@@ -1087,7 +1035,8 @@ setidnames(register File_t* f)
 	{
 		if ((id = strgid(f->gidname)) < 0)
 		{
-			if (id == -1 && state.owner) error(1, "%s: invalid group name", f->gidname);
+			if (id == -1 && state.owner)
+				error(1, "%s: invalid group name", f->gidname);
 			f->gidname = 0;
 			id = state.gid;
 		}
@@ -1105,8 +1054,8 @@ initarchive(const char* name, int mode)
 	Archive_t*	ap;
 
 	if (!(ap = newof(0, Archive_t, 1, 0)))
-		error(3, "out of space [initarchive]");
-	initfile(ap, &ap->file, NiL, 0);
+		nospace();
+	initfile(ap, &ap->file, &ap->st, NiL, 0);
 	ap->name = (char*)name;
 	ap->expected = ap->format = -1;
 	ap->section = 0;
@@ -1135,12 +1084,10 @@ getarchive(int op)
  */
 
 void
-initfile(register Archive_t* ap, register File_t* f, register char* name, int mode)
+initfile(register Archive_t* ap, register File_t* f, struct stat* st, register char* name, int mode)
 {
-	static struct stat	st;
-
 	memzero(f, sizeof(*f));
-	f->st = ap ? &ap->st : &st;
+	f->st = st;
 	memzero(f->st, sizeof(*f->st));
 	if (name)
 	{
@@ -1161,7 +1108,7 @@ setfile(register Archive_t* ap, register File_t* f)
 	register Post_t*	p;
 	Post_t			post;
 
-	if (f->skip)
+	if (f->skip || f->extended)
 		return;
 	switch (f->type)
 	{
@@ -1202,11 +1149,11 @@ setfile(register Archive_t* ap, register File_t* f)
 #endif
 		return;
 	case X_IFDIR:
-		if (f->chmod || state.modtime || state.owner || (f->perm & S_IRWXU) != S_IRWXU)
+		if (f->chmod || state.acctime || state.modtime || state.owner || (f->perm & S_IRWXU) != S_IRWXU)
 		{
 			if (!(p = newof(0, Post_t, 1, 0)))
 				error(3, "not enough space for file restoration info");
-			p->mtime = f->st->st_mtime;
+			tvgetstat(f->st, &p->atime, &p->mtime, NiL);
 			p->uid = f->st->st_uid;
 			p->gid = f->st->st_gid;
 			p->mode = f->perm;
@@ -1224,7 +1171,7 @@ setfile(register Archive_t* ap, register File_t* f)
 		break;
 	}
 	p = &post;
-	p->mtime = f->st->st_mtime;
+	tvgetstat(f->st, &p->atime, &p->mtime, NiL);
 	p->uid = f->st->st_uid;
 	p->gid = f->st->st_gid;
 	p->mode = f->perm;
@@ -1237,9 +1184,9 @@ setfile(register Archive_t* ap, register File_t* f)
  */
 
 void
-settime(const char* name, time_t atime, time_t mtime)
+settime(const char* name, Tv_t* ap, Tv_t* mp, Tv_t* cp)
 {
-	if (*name && touch(name, atime, mtime, 0))
+	if (*name && tvtouch(name, ap, mp, cp, 1))
 		error(1, "%s: cannot set times", name);
 }
 
@@ -1280,7 +1227,7 @@ restore(register const char* name, char* ap, void* handle)
 		}
 	}
 	if (state.modtime)
-		settime(name, p->mtime, p->mtime);
+		settime(name, &p->atime, &p->mtime, NiL);
 	return 0;
 }
 

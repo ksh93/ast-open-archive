@@ -97,9 +97,9 @@ isalar(Archive_t* ap, register char* hdr)
 			convert(ap, SECTION_DATA, CC_NATIVE, CC_EBCDIC1);
 	}
 	getlabstr(hdr, 5, 6, state.id.volume);
-	getlabstr(hdr, 25, 6, state.id.format);
-	getlabstr(hdr, 31, 7, state.id.implementation);
-	getlabstr(hdr, 38, 14, state.id.owner);
+	getlabstr(hdr, 25, 6, ap->id.format);
+	getlabstr(hdr, 31, 7, ap->id.implementation);
+	getlabstr(hdr, 38, 14, ap->id.owner);
 	ap->io->blocked = !bcount(ap);
 	return 1;
 }
@@ -131,7 +131,7 @@ getprologue(register Archive_t* ap)
 {
 	int		n;
 
-	if (ap->volume && ap->io->mode != O_RDONLY)
+	if (state.id.volume && ap->io->mode != O_RDONLY)
 		return 0;
 	state.id.volume[0] = 0;
 	ap->format = -1;
@@ -234,7 +234,7 @@ getprologue(register Archive_t* ap)
 
 					ap->io->fd = proc->rfd;
 					if (!(p = newof(0, List_t, 1, 0)))
-						error(3, "out of space [state.proc]");
+						nospace();
 					p->item = (void*)proc;
 					p->next = state.proc;
 					state.proc = p;
@@ -313,7 +313,7 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
 		sfprintf(np, "%c%c%c", INFO_SEP, INFO_SEP, INFO_SEP);
 		file = sfstruse(np);
 	}
-	initfile(ap, f, file, X_IFREG);
+	initfile(ap, f, f->st, file, X_IFREG);
 	f->skip = 1;
 	f->st->st_mtime = mtime;
 	f->st->st_uid = DELTA_LO(checksum);
@@ -355,25 +355,25 @@ putprologue(register Archive_t* ap)
 		else
 #endif
 		ap->io->blocked = !ap->io->unblocked;
-		if (!state.id.owner[0])
+		if (!ap->id.owner[0])
 		{
-			strncpy(state.id.owner, fmtuid(getuid()), sizeof(state.id.owner) - 1);
-			state.id.owner[sizeof(state.id.owner) - 1] = 0;
+			strncpy(ap->id.owner, fmtuid(getuid()), sizeof(ap->id.owner) - 1);
+			ap->id.owner[sizeof(ap->id.owner) - 1] = 0;
 		}
-		strupper(state.id.owner);
+		strupper(ap->id.owner);
 		if (!state.id.volume[0])
 		{
-			strncpy(state.id.volume, state.id.owner, sizeof(state.id.volume) - 1);
+			strncpy(state.id.volume, ap->id.owner, sizeof(state.id.volume) - 1);
 			state.id.volume[sizeof(state.id.volume) - 1] = 0;
 		}
 		strupper(state.id.volume);
-		strncpy(state.id.format, ALAR_ID, sizeof(state.id.format) - 1);
-		strncpy(state.id.implementation, IMPLEMENTATION, sizeof(state.id.implementation) - 1);
-		if (ap->format == IBMAR) sfsprintf(state.id.standards, sizeof(state.id.standards), "%-5.5s%-5.5s%-5.5s%-4.4s", "ATT", "1", "EBCDIC", "1979");
-		else sfsprintf(state.id.standards, sizeof(state.id.standards), "%-5.5s%-5.5s%-5.5s%-4.4s", "ISO", "646", "IRV", "1990");
-		sfsprintf(alar_header, sizeof(alar_header), "VOL1%-6.6s              %-6.6s%-7.7s%-14.14s                            4", state.id.volume, state.id.format, state.id.implementation, state.id.owner);
+		strncpy(ap->id.format, ALAR_ID, sizeof(ap->id.format) - 1);
+		strncpy(ap->id.implementation, IMPLEMENTATION, sizeof(ap->id.implementation) - 1);
+		if (ap->format == IBMAR) sfsprintf(ap->id.standards, sizeof(ap->id.standards), "%-5.5s%-5.5s%-5.5s%-4.4s", "ATT", "1", "EBCDIC", "1979");
+		else sfsprintf(ap->id.standards, sizeof(ap->id.standards), "%-5.5s%-5.5s%-5.5s%-4.4s", "ISO", "646", "IRV", "1990");
+		sfsprintf(alar_header, sizeof(alar_header), "VOL1%-6.6s              %-6.6s%-7.7s%-14.14s                            4", state.id.volume, ap->id.format, ap->id.implementation, ap->id.owner);
 		bwrite(ap, alar_header, ALAR_HEADER);
-		sfsprintf(alar_header, sizeof(alar_header), "VOL2%-19.19s                                                         ", state.id.standards);
+		sfsprintf(alar_header, sizeof(alar_header), "VOL2%-19.19s                                                         ", ap->id.standards);
 		bwrite(ap, alar_header, ALAR_HEADER);
 		if (ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA))
 		{
@@ -472,7 +472,7 @@ getepilogue(register Archive_t* ap)
 						{
 							if (ap->format == TAR || ap->format == USTAR)
 							{
-								if (!isdigit(tar_header.chksum[0]) || !isdigit(tar_header.chksum[1]) || !isdigit(tar_header.chksum[2]) || !isdigit(tar_header.chksum[3]) || !isdigit(tar_header.chksum[4]) || !isdigit(tar_header.chksum[5]) || !isdigit(tar_header.chksum[6]) || sfsscanf(tar_header.chksum, "%7lo", &sum) != 1 || (sum & TAR_SUMASK) != tar_checksum(ap))
+								if (!isdigit(tar_header.chksum[0]) || !isdigit(tar_header.chksum[1]) || !isdigit(tar_header.chksum[2]) || !isdigit(tar_header.chksum[3]) || !isdigit(tar_header.chksum[4]) || !isdigit(tar_header.chksum[5]) || !isdigit(tar_header.chksum[6]) || sfsscanf(tar_header.chksum, "%7lo", &sum) != 1 || !tar_checksum(ap, -1, sum))
 									continue;
 								if (i = MAXBLOCKS - i)
 									error(1, "%s: %d junk block%s after volume %d", ap->name, i, i == 1 ? "" : "s", ap->volume);
@@ -506,8 +506,6 @@ putepilogue(register Archive_t* ap)
 	register ssize_t	n;
 	register off_t		boundary;
 
-	static int		selected;
-
 	if (state.install.path)
 	{
 		if (sfclose(state.install.sp))
@@ -531,8 +529,9 @@ putepilogue(register Archive_t* ap)
 		state.filter.line = 0;
 	}
 	ap->section = SECTION_CONTROL;
-	if (ap->selected > selected)
+	if (ap->selected > state.selected)
 	{
+		state.selected = ap->selected;
 		if (ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA))
 			switch (ap->format)
 			{
@@ -545,7 +544,6 @@ putepilogue(register Archive_t* ap)
 				putinfo(ap, NiL, ap->delta->index + 1, 0);
 				break;
 			}
-		selected = ap->selected;
 		boundary = ap->io->count;
 		switch (ap->format)
 		{
@@ -715,47 +713,47 @@ addxopnum(Archive_t* ap, int op, Sflong_t n)
 #endif
 
 /*
+ * get key [ug]id value
+ */
+
+static void
+getkeyid(Archive_t* ap, File_t* f, int index, uid_t* ip, int d)
+{
+	register Option_t*	op;
+
+	op = &options[index];
+	if (op->level < 7)
+	{
+		if (op->entry == ap->entry)
+			*ip = op->temp.number;
+		else if (op->level > 0 && op->perm.string)
+			*ip = op->perm.number;
+	}
+	else if (op->level >= 8)
+		*ip = d;
+}
+
+/*
  * get key name value
  */
 
 static void
-getkeyname(Archive_t* ap, File_t* f, int index, char** nm)
+getkeyname(Archive_t* ap, File_t* f, int index, char** sp, uid_t* ip, int d)
 {
 	register Option_t*	op;
 
-	static int		uinit;
-	static int		ginit;
-	static uid_t		euid;
-	static gid_t		egid;
-
 	op = &options[index];
-	if (op->level >= 6) switch (index)
+	if (op->level < 7)
 	{
-	case OPT_gname:
-		*nm = 0;
-		if (!uinit)
-		{
-			uinit = 1;
-			euid = geteuid();
-		}
-		f->st->st_uid = euid;
-		break;
-	case OPT_uname:
-		*nm = 0;
-		if (!ginit)
-		{
-			ginit = 1;
-			egid = getegid();
-		}
-		f->st->st_gid = egid;
-		break;
+		if (op->entry == ap->entry)
+			*sp = op->temp.string;
+		else if (op->level > 0 && op->perm.string)
+			*sp = op->perm.string;
 	}
-	else if (op->level < 5)
+	else if (ip && op->level >= 8)
 	{
-		if (op->entry == ap->entry || op->level > 3)
-			*nm = op->temp.string;
-		else if (op->level >= 1 && op->level < 3)
-			*nm = op->perm.string;
+		*sp = 0;
+		*ip = d;
 	}
 }
 
@@ -764,18 +762,18 @@ getkeyname(Archive_t* ap, File_t* f, int index, char** nm)
  */
 
 static void
-getkeysize(Archive_t* ap, File_t* f, int index, off_t* size)
+getkeysize(Archive_t* ap, File_t* f, int index, off_t* zp)
 {
 	register Option_t*	op;
 
 	NoP(f);
 	op = &options[index];
-	if (op->level < 5)
+	if (op->level < 7)
 	{
-		if (op->entry == ap->entry || op->level >= 3)
-			*size = strtoll(op->temp.string, NiL, 10);
-		else if (op->level >= 1)
-			*size = strtoll(op->perm.string, NiL, 10);
+		if (op->entry == ap->entry)
+			*zp = strtoll(op->temp.string, NiL, 10);
+		else if (op->level > 0)
+			*zp = strtoll(op->perm.string, NiL, 10);
 	}
 }
 
@@ -784,20 +782,43 @@ getkeysize(Archive_t* ap, File_t* f, int index, off_t* size)
  */
 
 static void
-getkeytime(Archive_t* ap, File_t* f, int index, time_t* tm)
+getkeytime(Archive_t* ap, File_t* f, int index)
 {
 	register Option_t*	op;
+	register Value_t*	vp;
+	Tv_t			tv;
 
 	NoP(f);
 	op = &options[index];
-	if (op->level >= 6)
-		*tm = NOW;
-	else if (op->level < 5)
+	if (op->level < 7)
 	{
-		if (op->entry == ap->entry || op->level >= 3)
-			*tm = op->temp.number;
-		else if (op->level >= 1)
-			*tm = op->perm.number;
+		if (op->entry == ap->entry)
+			vp = &op->temp;
+		else if (op->level > 0)
+			vp = &op->perm;
+		else
+			return;
+		tv.tv_sec = vp->number;
+		tv.tv_nsec = vp->fraction;
+		switch (index)
+		{
+		case OPT_atime:
+			tvsetstat(f->st, &tv, NiL, NiL);
+			break;
+		case OPT_mtime:
+			tvsetstat(f->st, NiL, &tv, NiL);
+			break;
+		case OPT_ctime:
+			tvsetstat(f->st, NiL, NiL, &tv);
+			break;
+		}
+	}
+	else if (op->level >= 8)
+	{
+		tvgettime(&tv);
+		vp = &op->perm;
+		vp->number = tv.tv_sec;
+		vp->fraction = tv.tv_nsec;
 	}
 }
 
@@ -912,7 +933,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	off_t		m;
 	struct tm	tm;
 	long		num;
-	long		sum;
+	off_t		z;
 	int		warned;
 	int		checkdelta;
 	int		lab;
@@ -920,6 +941,8 @@ getheader(register Archive_t* ap, register File_t* f)
 	int		ordered;
 	int		loop;
 	int_2		magic;
+	Option_t*	op;
+	char		one;
 
 	struct
 	{
@@ -931,20 +954,13 @@ getheader(register Archive_t* ap, register File_t* f)
 		long	nlink;
 		long	rdev;
 		long	mtime;
-	_ast_intmax_t	size;
+		off_t	size;
 		long	dev_major;
 		long	dev_minor;
 		long	rdev_major;
 		long	rdev_minor;
 		long	checksum;
 	}		lst;
-
-	static char*	nam;
-	static int	namlen;
-	static char	idbuffer[ALAR_NAMESIZE + 1];
-
-	static struct tar_header_info	tar_last[16];
-	static int			tar_last_index;
 
 	ap->section = SECTION_CONTROL;
 	ap->sum++;
@@ -957,6 +973,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	ap->memsum = 0;
 	for (;;)
 	{
+		f->name = 0;
 		f->record.format = 0;
 		f->skip = 0;
 		message((-2, "%s:", format[ap->format].name));
@@ -965,7 +982,6 @@ getheader(register Archive_t* ap, register File_t* f)
 		case ALAR:
 		case IBMAR:
 			if (!(lab = getlabel(ap, f))) return 0;
-			f->name = ap->path.header;
 			f->st->st_dev = 0;
 			f->st->st_ino = 0;
 			f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
@@ -975,7 +991,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			IDEVICE(f->st, 0);
 			f->st->st_size = 0;
 			f->linktype = NOLINK;
-			f->linkname = 0;
+			f->linkpath = 0;
 			f->uidname = 0;
 			f->gidname = 0;
 			type = 0;
@@ -997,7 +1013,7 @@ getheader(register Archive_t* ap, register File_t* f)
 					if (getlabnum(alar_header, 4, 1, 10) != ++type) error(3, "%s format HDR label out of sequence", format[ap->format].name);
 					if (type == 1)
 					{
-						s = ap->path.header;
+						s = f->name = stash(&ap->path.head, NiL, ALAR_NAMESIZE + 3);
 						for (i = 4; i <= ALAR_NAMESIZE + 3; i++)
 						{
 							if (alar_header[i] == ' ')
@@ -1010,11 +1026,11 @@ getheader(register Archive_t* ap, register File_t* f)
 						if ((n = getlabnum(alar_header, 40, 2, 10)) > 0 && n < 99) sfsprintf(s, 3, ".%02d", n);
 						else *s = 0;
 						f->record.section = getlabnum(alar_header, 28, 4, 10);
-						getlabstr(alar_header, 5, ALAR_NAMESIZE, f->id = idbuffer);
-						getlabstr(alar_header, 61, 6, state.id.format);
-						getlabstr(alar_header, 67, 7, state.id.implementation);
+						getlabstr(alar_header, 5, ALAR_NAMESIZE, f->id = ap->id.id);
+						getlabstr(alar_header, 61, 6, ap->id.format);
+						getlabstr(alar_header, 67, 7, ap->id.implementation);
 #if SAVESET
-						if (streq(state.id.format, SAVESET_ID) && streq(state.id.implementation, SAVESET_IMPL))
+						if (streq(ap->id.format, SAVESET_ID) && streq(ap->id.implementation, SAVESET_IMPL))
 							ap->format = SAVESET;
 #endif
 						f->st->st_mtime = 0;
@@ -1072,7 +1088,6 @@ getheader(register Archive_t* ap, register File_t* f)
 			state.saveset.bp = state.saveset.block + state.blocksize;
 			/*FALLTHROUGH*/
 		case SAVESET:
-			f->name = ap->path.header;
 			if (!getsaveset(ap, f, 1)) goto again;
 #endif
 			goto found;
@@ -1098,10 +1113,9 @@ getheader(register Archive_t* ap, register File_t* f)
 				f->st->st_size = cpio_long(binary_header.size);
 			cpio_common:
 				f->linktype = NOLINK;
-				f->linkname = 0;
+				f->linkpath = 0;
 				f->uidname = 0;
 				f->gidname = 0;
-				f->name = ap->path.header;
 				switch (ap->format)
 				{
 				case BINARY:
@@ -1122,26 +1136,17 @@ getheader(register Archive_t* ap, register File_t* f)
 					if (n = (n + f->namesize) % i) i -= n;
 					else i = 0;
 				}
-				if (f->namesize >= sizeof(ap->path.header))
+				f->name = stash(&ap->path.head, NiL, f->namesize + i);
+				bread(ap, f->name, (off_t)0, (off_t)(f->namesize + i), 1);
+				if (f->name[f->namesize - 1])
 				{
-					error(2, "%s: entry %d.%d file name too long", ap->name, ap->volume, ap->entry);
-					for (n = f->namesize + i; n > 0; n -= sizeof(ap->path.header))
-						bread(ap, ap->path.header, (off_t)0, n > sizeof(ap->path.header) ? (off_t)sizeof(ap->path.header) : n, 1);
-					f->skip = 1;
+					bunread(ap, &f->name[f->namesize - 1], 1);
+					f->name[f->namesize - 1] = 0;
+					error(state.keepgoing ? 1 : 3, "%s: entry %d.%d file name terminating null missing", ap->name, ap->volume, ap->entry);
 				}
-				else
-				{
-					bread(ap, ap->path.header, (off_t)0, (off_t)(f->namesize + i), 1);
-					if (ap->path.header[f->namesize - 1])
-					{
-						bunread(ap, &ap->path.header[f->namesize - 1], 1);
-						ap->path.header[f->namesize - 1] = 0;
-						error(state.keepgoing ? 1 : 3, "%s: entry %d.%d file name terminating null missing", ap->name, ap->volume, ap->entry);
-					}
 #if CPIO_EXTENDED
-					getxops(ap, f);
+				getxops(ap, f);
 #endif
-				}
 				if (streq(f->name, CPIO_TRAILER))
 				{
 					getdeltaheader(ap, f);
@@ -1160,7 +1165,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				case X_IFSOCK:
 					break;
 				default:
-					error(1, "%s: unknown file type %07o -- regular file assumed", f->name, f->type);
+					error(1, "%s: %s: unknown file type %07o -- regular file assumed", ap->name, f->name, f->type);
 					f->type = X_IFREG;
 					break;
 				}
@@ -1169,24 +1174,17 @@ getheader(register Archive_t* ap, register File_t* f)
 				switch (f->type)
 				{
 				case X_IFLNK:
-					if (f->st->st_size > sizeof(ap->path.link) - 1)
+					f->linkpath = stash(&ap->path.link, NiL, f->st->st_size);
+					f->linktype = SOFTLINK;
+					s = f->linkpath;
+					while (bread(ap, s, (off_t)1, (off_t)1, 1) > 0)
 					{
-						error(2, "%s: entry %d.%d symbolic link text too long", ap->name, ap->volume, ap->entry);
-						f->skip = 1;
-					}
-					else
-					{
-						f->linktype = SOFTLINK;
-						s = f->linkname = ap->path.link;
-						while (bread(ap, s, (off_t)1, (off_t)1, 1) > 0)
+						f->st->st_size--;
+						if (!*s++) break;
+						if (!f->st->st_size)
 						{
-							f->st->st_size--;
-							if (!*s++) break;
-							if (!f->st->st_size)
-							{
-								*s = 0;
-								break;
-							}
+							*s = 0;
+							break;
 						}
 					}
 					break;
@@ -1245,34 +1243,29 @@ getheader(register Archive_t* ap, register File_t* f)
 			if (sfsscanf(tar_header.mtime, "%11lo", &num) != 1) goto notar;
 			f->st->st_mtime = num;
 			if (sfsscanf(tar_header.chksum, "%7lo", &num) != 1) goto notar;
-			if ((num &= TAR_SUMASK) != (sum = tar_checksum(ap)))
+			if (!tar_checksum(ap, 1, num) && ap->entry == 1)
 			{
-				if (ap->entry == 1)
+				if (!ap->swapio)
 				{
-					if (!ap->swapio)
-					{
-						long	x;
-						char	tmp[sizeof(tar_header.chksum) + 1];
+					char	tmp[sizeof(tar_header.chksum) + 1];
 
-						tmp[sizeof(tar_header.chksum)] = 0;
-						for (i = 1; i < 4; i++)
+					tmp[sizeof(tar_header.chksum)] = 0;
+					for (i = 1; i < 4; i++)
+					{
+						memcpy(tmp, tar_header.chksum, sizeof(tar_header.chksum));
+						swapmem(i, tmp, tmp, sizeof(tar_header.chksum));
+						if (sfsscanf(tmp, "%7lo", &num) == 1 && tar_checksum(ap, 1, num))
 						{
-							memcpy(tmp, tar_header.chksum, sizeof(tar_header.chksum));
-							swapmem(i, tmp, tmp, sizeof(tar_header.chksum));
-							if (sfsscanf(tmp, "%7lo", &x) == 1 && (x & TAR_SUMASK) == sum)
-							{
-								ap->swapio = i;
-								bunread(ap, tar_block, TAR_HEADER);
-								goto again;
-							}
+							ap->swapio = i;
+							bunread(ap, tar_block, TAR_HEADER);
+							goto again;
 						}
 					}
-					goto notar;
 				}
-				error(state.keepgoing ? 1 : 3, "%s format checksum error (%ld != %ld)", format[ap->format].name, num, sum);
+				goto notar;
 			}
-			if (sfsscanf(tar_header.size, "%11lo", &num) == 1)
-				f->st->st_size = num;
+			if (sfsscanf(tar_header.size, "%11I*o", sizeof(z), &z) == 1)
+				f->st->st_size = z;
 			else if (((unsigned char*)tar_header.size)[0] != TAR_LARGENUM)
 				goto notar;
 			else
@@ -1307,11 +1300,15 @@ getheader(register Archive_t* ap, register File_t* f)
 			}
 			*(tar_header.name + sizeof(tar_header.name)) = 0;
 			if (ap->format != TAR && *tar_header.prefix)
-				sfsprintf(f->name = ap->path.header, sizeof(ap->path.header), "%-.*s/%s", sizeof(tar_header.prefix), tar_header.prefix, tar_header.name);
-			else f->name = tar_header.name;
+			{
+				f->name = stash(&ap->path.head, NiL, sizeof(tar_header.prefix) + sizeof(tar_header.name) + 2);
+				sfsprintf(f->name, sizeof(tar_header.prefix) + sizeof(tar_header.name) + 2, "%-.*s/%-.*s", sizeof(tar_header.prefix), tar_header.prefix, sizeof(tar_header.name), tar_header.name);
+			}
+			else
+				f->name = tar_header.name;
 			*(tar_header.linkname + sizeof(tar_header.name)) = 0;
 			f->linktype = NOLINK;
-			f->linkname = 0;
+			f->linkpath = 0;
 			f->st->st_nlink = 1;
 			switch (tar_header.typeflag)
 			{
@@ -1321,12 +1318,12 @@ getheader(register Archive_t* ap, register File_t* f)
 				f->st->st_nlink = 2;
 				if (!ap->delta)
 					f->st->st_size = 0;
-				f->linkname = strcpy(ap->path.link, tar_header.linkname);
+				f->linkpath = stash(&ap->path.link, tar_header.linkname, 0);
 				break;
 			case SYMTYPE:
 				f->linktype = SOFTLINK;
 				f->st->st_mode |= X_IFLNK;
-				f->linkname = strcpy(ap->path.link, tar_header.linkname);
+				f->linkpath = stash(&ap->path.link, tar_header.linkname, 0);
 				break;
 			case CHRTYPE:
 				f->st->st_mode |= X_IFCHR;
@@ -1351,38 +1348,60 @@ getheader(register Archive_t* ap, register File_t* f)
 				break;
 #endif
 			case EXTTYPE:
+			case GLBTYPE:
 				ap->format = PAX;
 				if (f->st->st_size > 0)
 				{
 					if (s = bget(ap, f->st->st_size, NiL))
 					{
 						s[f->st->st_size - 1] = 0;
-						setoptions(s, NiL, state.usage, ap);
+						setoptions(s, NiL, state.usage, ap, tar_header.typeflag);
 					}
-					else error(3, "invalid %s format extended header", format[ap->format].name);
+					else
+						error(3, "invalid %s format '%c' extended header", format[ap->format].name, tar_header.typeflag);
 				}
 				gettrailer(ap, f);
 				goto again;
+
+			case LLNKTYPE:
+			case LREGTYPE:
+				if ((n = f->st->st_size) > 0)
+				{
+					if (!(s = bget(ap, n, NiL)))
+					{
+						error(2, "%s: invalid %s format long path header", ap->name, format[ap->format].name);
+						return 0;
+					}
+					op = &options[tar_header.typeflag == LLNKTYPE ? OPT_linkpath : OPT_path];
+					op->level = 6;
+					op->entry = ap->entry;
+					stash(&op->temp, s, (size_t)n);
+				}
+				gettrailer(ap, f);
+				goto again;
+
+			case VERTYPE:
+				error(1, "version file archive members not supported -- regular file assumed");
+				goto regular;
+
 			default:
-				error(1, "unknown file type `%c' -- regular file assumed", tar_header.typeflag);
+				error(1, "%s: %s: unknown %s format file type `%c' -- regular file assumed", ap->name, f->name, format[ap->format].name, tar_header.typeflag);
 				/*FALLTHROUGH*/
 			case REGTYPE:
 			case AREGTYPE:
-				f->namesize = strlen(f->name) + 1;
-				if (f->name[f->namesize - 2] == '/')
-				{
-					f->st->st_mode |= X_IFDIR;
-					if (f->namesize > 2) f->name[--f->namesize - 1] = 0;
-				}
-				else f->st->st_mode |= X_IFREG;
+			case CONTTYPE:
+			regular:
+				f->st->st_mode |= X_IFREG;
 				break;
 			}
 			f->uidname = 0;
 			f->gidname = 0;
 			if (ap->format != TAR)
 			{
-				if (*tar_header.uname) f->uidname = tar_header.uname;
-				if (*tar_header.gname) f->gidname = tar_header.gname;
+				if (*tar_header.uname && (strtoll(tar_header.uname, &t, 0), *t))
+					f->uidname = tar_header.uname;
+				if (*tar_header.gname && (strtoll(tar_header.gname, &t, 0), *t))
+					f->gidname = tar_header.gname;
 			}
 			goto found;
 		notar:
@@ -1444,7 +1463,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			f->st->st_mtime = ap->ardirent->mtime;
 			f->st->st_size = ap->ardirent->size;
 			f->linktype = NOLINK;
-			f->linkname = 0;
+			f->linkpath = 0;
 			f->uidname = 0;
 			f->gidname = 0;
 			goto found;
@@ -1506,7 +1525,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			f->st->st_nlink = 1;
 			IDEVICE(f->st, 0);
 			f->linktype = NOLINK;
-			f->linkname = 0;
+			f->linkpath = 0;
 			f->uidname = 0;
 			f->gidname = 0;
 			bflushin(ap, 0);
@@ -1638,8 +1657,8 @@ getheader(register Archive_t* ap, register File_t* f)
 				return 0;
 			}
 			state.id.volume[0] = i;
-			sfsprintf(idbuffer, sizeof(idbuffer), "%s %d.%d", format[RPM].name, magic.major, magic.minor);
-			ap->package = idbuffer;
+			sfsprintf(ap->id.id, sizeof(ap->id.id), "%s %d.%d", format[RPM].name, magic.major, magic.minor);
+			ap->package = ap->id.id;
 			goto volume;
 		}
 		case ZIP:
@@ -1662,36 +1681,31 @@ getheader(register Archive_t* ap, register File_t* f)
 					return 0;
 				}
 				n = swapget(3, &zip_header[ZIP_CEN_NAM], 2);
-				if (n >= namlen)
+				s = stash(&ap->path.zip, NiL, n);
+				if (bread(ap, s, n, n, 0) <= 0)
 				{
-					namlen = roundof(n + 1, PATH_MAX);
-					if (!(nam = newof(nam, char, namlen, 0)))
-						error(ERROR_SYSTEM|3, "out of space [name]");
-				}
-				if (bread(ap, nam, n, n, 0) <= 0)
-				{
-					error(2, "%s: invalid %s format verification header name [size=%ld]", ap->name, format[ap->format].name, n);
+					error(2, "%s: invalid %s format verification header name [size=%I*u]", ap->name, format[ap->format].name, sizeof(n), n);
 					return 0;
 				}
-				if (nam[n - 1] == '/')
+				if (s[n - 1] == '/')
 					n--;
-				nam[n] = 0;
+				s[n] = 0;
 				if ((n = swapget(3, &zip_header[ZIP_CEN_EXT], 2)) && bread(ap, NiL, n, n, 0) <= 0)
 				{
-					error(2, "%s: %s: invalid %s format verification header extended data [size=%ld]", ap->name, nam, format[ap->format].name, n);
+					error(2, "%s: %s: invalid %s format verification header extended data [size=%I*u]", ap->name, s, format[ap->format].name, sizeof(n), n);
 					return 0;
 				}
 				if ((n = swapget(3, &zip_header[ZIP_CEN_COM], 2)) && bread(ap, NiL, n, n, 0) <= 0)
 				{
-					error(2, "%s: %s: invalid %s format verification header comment data [size=%ld]", ap->name, nam, format[ap->format].name, n);
+					error(2, "%s: %s: invalid %s format verification header comment data [size=%I*u]", ap->name, s, format[ap->format].name, sizeof(n), n);
 					return 0;
 				}
 				ap->verified++;
 				if (ap->tab)
 				{
-					if (!hashget(ap->tab, nam))
+					if (!hashget(ap->tab, s))
 					{
-						error(1, "%s: %s: file data not found", ap->name, nam);
+						error(1, "%s: %s: file data not found", ap->name, s);
 						goto again;
 					}
 					n = ((unsigned long)swapget(3, &zip_header[ZIP_CEN_ATX], 4) >> 16) & 0xffff;
@@ -1703,10 +1717,10 @@ getheader(register Archive_t* ap, register File_t* f)
 					case X_IFDIR:
 						break;
 					case X_IFLNK:
-						error(1, "%s: %s: symbolic link copied as regular file", ap->name, nam);
+						error(1, "%s: %s: symbolic link copied as regular file", ap->name, s);
 						break;
 					default:
-						error(1, "%s: %s: unknown file type %07o -- regular file assumed (0x%08x)", ap->name, nam, X_ITYPE(n), n);
+						error(1, "%s: %s: unknown file type %07o -- regular file assumed (0x%08x)", ap->name, s, X_ITYPE(n), n);
 						break;
 					}
 				}
@@ -1734,18 +1748,12 @@ getheader(register Archive_t* ap, register File_t* f)
 				break;
 			}
 			n = swapget(3, &zip_header[ZIP_LOC_NAM], 2);
-			if (n >= namlen)
-			{
-				namlen = roundof(n + 1, PATH_MAX);
-				if (!(nam = newof(nam, char, namlen, 0)))
-					error(ERROR_SYSTEM|3, "out of space [name]");
-			}
-			if (bread(ap, nam, n, n, 0) <= 0)
+			f->name = stash(&ap->path.zip, NiL, n);
+			if (bread(ap, f->name, n, n, 0) <= 0)
 				break;
 			num += n;
-			f->st->st_mode = (n > 0 && nam[n - 1] == '/') ? (X_IFDIR|X_IRUSR|X_IWUSR|X_IXUSR|X_IRGRP|X_IXGRP|X_IROTH|X_IXOTH) : (X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
-			nam[n] = 0;
-			f->name = nam;
+			f->st->st_mode = (n > 0 && f->name[n - 1] == '/') ? (X_IFDIR|X_IRUSR|X_IWUSR|X_IXUSR|X_IRGRP|X_IXGRP|X_IROTH|X_IXOTH) : (X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
+			f->name[n] = 0;
 			if ((n = swapget(3, &zip_header[ZIP_LOC_EXT], 2)) > 0)
 			{
 				if (bread(ap, NiL, n, n, 0) <= 0)
@@ -1768,7 +1776,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			tm.tm_sec = ((n<<1)&037);
 			f->st->st_mtime = tmtime(&tm, TM_LOCALZONE);
 			f->linktype = NOLINK;
-			f->linkname = 0;
+			f->linkpath = 0;
 			f->uidname = 0;
 			f->gidname = 0;
 			checkdelta = 0;
@@ -1849,7 +1857,7 @@ getheader(register Archive_t* ap, register File_t* f)
 					break;
 				}
 				if (!(cab = newof(0, Cab_t, 1, hdr.chunks * sizeof(Cabchunk_t) + hdr.files * sizeof(Cabfile_t))))
-					error(ERROR_SYSTEM|3, "out of space [cab header]");
+					nospace();
 				cab->chunk = (Cabchunk_t*)(cab + 1);
 				cab->file = (Cabfile_t*)(cab->chunk + hdr.chunks);
 				ap->data = (void*)cab;
@@ -1877,13 +1885,13 @@ getheader(register Archive_t* ap, register File_t* f)
 					while (bread(ap, s, 1, 1, 1) > 0 && *s++);
 					*s = 0;
 					if (!(cab->optional.prev.name = strdup(state.tmp.buffer)))
-						error(ERROR_SYSTEM|3, "out of space [cab optional header]");
+						nospace();
 					for (s = state.tmp.buffer; bread(ap, s, 1, 1, 1) > 0 && *s; s++)
 						if (*s == '\\')
 							*s = '/';
 					*s = 0;
 					if (!(cab->optional.prev.disk = strdup(state.tmp.buffer)))
-						error(ERROR_SYSTEM|3, "out of space [cab optional header]");
+						nospace();
 					message((-1, "cab prev name=%s disk=%s", cab->optional.prev.name, cab->optional.prev.disk));
 				}
 				if (hdr.flags & CAB_FLAG_HASNEXT)
@@ -1892,20 +1900,20 @@ getheader(register Archive_t* ap, register File_t* f)
 					while (bread(ap, s, 1, 1, 1) > 0 && *s++);
 					*s = 0;
 					if (!(cab->optional.next.name = strdup(state.tmp.buffer)))
-						error(ERROR_SYSTEM|3, "out of space [cab optional header]");
+						nospace();
 					for (s = state.tmp.buffer; bread(ap, s, 1, 1, 1) > 0 && *s; s++)
 						if (*s == '\\')
 							*s = '/';
 					*s = 0;
 					if (!(cab->optional.next.disk = strdup(state.tmp.buffer)))
-						error(ERROR_SYSTEM|3, "out of space [cab optional header]");
+						nospace();
 					message((-1, "cab next name=%s disk=%s", cab->optional.next.name, cab->optional.next.disk));
 				}
 				if (bread(ap, cab->chunk, (off_t)(hdr.chunks * sizeof(Cabchunk_t)), (off_t)(hdr.chunks * sizeof(Cabchunk_t)), 0) <= 0)
 					return 0;
 				message((-1, "cab %s header info:\n\thdrsum=%u\n\tsize=%u\n\tchunksum=%u\n\tfileoff=%u\n\tdatasum=%u\n\tversion=%04x\n\tchunks=%u\n\tfiles=%u\n\tflags=%06o\n\tid=%u\n\tnumber=%u", ap->name, hdr.hdrsum, hdr.size, hdr.chunksum, hdr.fileoff, hdr.datasum, hdr.version, hdr.chunks, hdr.files, hdr.flags, hdr.id, hdr.number));
 				if (!(tp = sfstropen()))
-					error(ERROR_SYSTEM|3, "out of space [cab type]");
+					nospace();
 				k = 1 << CAB_TYPE_NONE;
 				for (i = 0; i < hdr.chunks; i++)
 				{
@@ -1941,7 +1949,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				}
 				s = sfstruse(tp);
 				if (*s && !(cab->format = strdup(s)))
-					error(ERROR_SYSTEM|3, "out of space [cab type]");
+					nospace();
 				sfstrclose(tp);
 				for (i = 0; i < hdr.files; i++)
 				{
@@ -1953,7 +1961,7 @@ getheader(register Archive_t* ap, register File_t* f)
 						if (*s == '\\')
 							*s = '/';
 					if (!(cab->file[i].name = strdup(state.tmp.buffer)))
-						error(ERROR_SYSTEM|3, "out of space [cab entry]");
+						nospace();
 					num = (cab->file[i].entry.date << 16) | cab->file[i].entry.time;
 					memset(&tm, 0, sizeof(tm));
 					tm.tm_year = ((num>>25)&0377) + 80;
@@ -1980,7 +1988,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			}
 			if ((i = cab->index++) >= cab->header.files)
 				return 0;
-			f->linkname = 0;
+			f->linkpath = 0;
 			f->name = cab->file[i].name;
 			f->st->st_dev = 0;
 			f->st->st_ino = 0;
@@ -2016,7 +2024,7 @@ getheader(register Archive_t* ap, register File_t* f)
 					t--;
 				state.mime.length = t - s;
 				if (!(state.mime.magic = newof(0, char, state.mime.length, 1)))
-					error(ERROR_SYSTEM|3, "out of space [mime]");
+					nospace();
 				memcpy(state.mime.magic, s, state.mime.length);
 				message((-1, "mime magic `%s'", state.mime.magic));
 				bread(ap, NiL, (off_t)0, n, 0);
@@ -2074,10 +2082,7 @@ getheader(register Archive_t* ap, register File_t* f)
 					for (; *s == ';' || isspace(*s); s++);
 					if (!f->name && n == 4 && !strncasecmp(t, "name", 4) || n == 8 && !strncasecmp(t, "filename", 8))
 					{
-						f->name = ap->path.header;
-						if (m > sizeof(ap->path.header))
-							error(3, "%s: %s format member %d name too long", ap->name, format[MIME].name, ap->entries + 1);
-						strcpy(f->name, v);
+						f->name = stash(&ap->path.head, v, m);
 						undos(f);
 					}
 				}
@@ -2088,7 +2093,8 @@ getheader(register Archive_t* ap, register File_t* f)
 					s++;
 				else
 					s = ap->name;
-				sfsprintf(f->name = ap->path.header, sizeof(ap->path.header), "%s-%d", s, ap->entries + 1);
+				f->name = stash(&ap->path.head, s, strlen(s) + 16);
+				sfsprintf(f->name, ap->path.head.size, "%s-%d", s, ap->entries + 1);
 			}
 			if (!ap->io->seekable)
 				seekable(ap);
@@ -2126,7 +2132,7 @@ getheader(register Archive_t* ap, register File_t* f)
 						f->st->st_nlink = 1;
 						IDEVICE(f->st, 0);
 						f->linktype = NOLINK;
-						f->linkname = 0;
+						f->linkpath = 0;
 						f->uidname = 0;
 						f->gidname = 0;
 						goto found;
@@ -2144,7 +2150,6 @@ getheader(register Archive_t* ap, register File_t* f)
 			unsigned char*		x;
 			size_t			n;
 			size_t			m;
-			size_t			q;
 			size_t			z;
 			unsigned _ast_int4_t	magic;
 			unsigned int		level;
@@ -2169,10 +2174,10 @@ getheader(register Archive_t* ap, register File_t* f)
 			if (!(tnef = (Tnef_t*)ap->data))
 			{
 				if (!(tnef = newof(0, Tnef_t, 1, 0)))
-					error(ERROR_SYSTEM|3, "out of space [tnef header]");
+					nospace();
 				ap->data = (void*)tnef;
 			}
-			*(f->name = ap->path.header) = 0;
+			*(f->name = stash(&ap->path.head, NiL, PATH_MAX)) = 0;
 			f->st->st_dev = 0;
 			f->st->st_ino = 0;
 			f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
@@ -2233,12 +2238,8 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 					tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0) - size - 2;
 					break;
 				case 0x8010: /* title */
-					if (!*f->name)
-					{
-						if (size >= sizeof(ap->path.header))
-							size = sizeof(ap->path.header) - 1;
-						memcpy(f->name, s, size);
-					}
+					if (!f->name)
+						f->name = stash(&ap->path.head, s, size);
 					break;
 				case 0x8013: /* date */
 					if (type == 0x0003 && size >= 12)
@@ -2290,12 +2291,7 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 									z = swapget(ap->swap, s, 4); s += 4;
 									z = roundof(z, 4);
 									if (name == 0x3707)
-									{
-										q = z;
-										if (q >= sizeof(ap->path.header))
-											q = sizeof(ap->path.header) - 1;
-										memcpy(f->name, s, q);
-									}
+										f->name = stash(&ap->path.head, s, z);
 									s += z;
 								}
 								break;
@@ -2397,7 +2393,7 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 	skip:
 		if (ap->io->eof) return 0;
 		i = 3;
-		if (state.keepgoing && bread(ap, ap->path.header, (off_t)0, (off_t)1, 0) > 0)
+		if (state.keepgoing && bread(ap, &one, (off_t)0, (off_t)1, 0) > 0)
 		{
 			if (warned) continue;
 			warned = 1;
@@ -2407,6 +2403,8 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 		if (ap->entry > 1) ap->entry++;
 	}
  found:
+	if (!f->name)
+		error(3, "%s: %s format entry %d.%d name not set", ap->name, format[ap->format].name, ap->volume, ap->entry);
 	if (checkdelta || ap->delta)
 	{
 		if (!f->st->st_size && !f->st->st_dev && !f->st->st_ino && !(f->st->st_mode & (X_IRWXU|X_IRWXG|X_IRWXO)) && strmatch(f->name, INFO_MATCH))
@@ -2523,31 +2521,45 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 	}
 	ap->entries++;
 	getkeysize(ap, f, OPT_size, &f->st->st_size);
-	getkeytime(ap, f, OPT_atime, &f->st->st_atime);
-	getkeytime(ap, f, OPT_ctime, &f->st->st_ctime);
-	getkeytime(ap, f, OPT_mtime, &f->st->st_mtime);
-	getkeyname(ap, f, OPT_gname, &f->gidname);
-	getkeyname(ap, f, OPT_path, &f->name);
-	getkeyname(ap, f, OPT_linkpath, &f->linkname);
-	getkeyname(ap, f, OPT_uname, &f->uidname);
-	if (f->name != ap->path.header)
-		f->name = strcpy(ap->path.header, f->name);
-	for (i = strlen(f->name); i > 2 && *(f->name + i - 1) == '/'; i--);
-	*(f->name + i) = 0;
-	pathcanon(f->name, 0);
-	f->path = strcpy(ap->path.name, f->name);
+	getkeytime(ap, f, OPT_atime);
+	getkeytime(ap, f, OPT_ctime);
+	getkeytime(ap, f, OPT_mtime);
+	getkeyid(ap, f, OPT_gid, &f->st->st_gid, state.gid);
+	getkeyname(ap, f, OPT_gname, &f->gidname, &f->st->st_gid, state.gid);
+	getkeyname(ap, f, OPT_path, &f->name, NiL, 0);
+	getkeyname(ap, f, OPT_linkpath, &f->linkpath, NiL, 0);
+	getkeyid(ap, f, OPT_uid, &f->st->st_uid, state.uid);
+	getkeyname(ap, f, OPT_uname, &f->uidname, &f->st->st_uid, state.uid);
+	if (!state.list)
+		setidnames(f);
+	if (f->name != ap->path.head.string)
+		f->name = stash(&ap->path.head, f->name, 0);
+	s = pathcanon(f->name, 0);
+	if (s > f->name + 1 && *(s - 1) == '/')
+		s--;
+	if ((f->type = X_ITYPE(f->st->st_mode)) == X_IFREG && *s == '/')
+		switch (ap->format)
+		{
+		case PAX:
+		case TAR:
+		case USTAR:
+			f->st->st_mode &= ~X_IFREG;
+			f->st->st_mode |= (f->type = X_IFDIR);
+			f->datasize = f->st->st_size;
+			break;
+		}
+	*s = 0;
+	f->path = stash(&ap->path.name, f->name, 0);
 	f->name = map(f->name);
 	f->namesize = strlen(f->name) + 1;
-	if (f->linkname)
+	if (f->linkpath)
 	{
-		pathcanon(f->linkname, 0);
+		pathcanon(f->linkpath, 0);
 		if (!(state.ftwflags & FTW_PHYSICAL))
-			f->linkname = map(f->linkname);
-		f->linknamesize = strlen(f->linkname) + 1;
+			f->linkpath = map(f->linkpath);
+		f->linkpathsize = strlen(f->linkpath) + 1;
 	}
-	else f->linknamesize = 0;
-	if (f->uidname || f->gidname) setidnames(f);
-	f->type = X_ITYPE(f->st->st_mode);
+	else f->linkpathsize = 0;
 	f->perm = modei(f->st->st_mode);
 	f->ro = ropath(f->name);
 	getdeltaheader(ap, f);
@@ -2557,7 +2569,7 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 		s = &state.tmp.buffer[0];
 		if (f->record.format) sfsprintf(s, state.tmp.buffersize, " [%c,%d,%d]", f->record.format, state.blocksize, state.record.size);
 		else *s = 0;
-		message((-1, "archive=%s path=%s name=%s entry=%d.%d size=%I*d delta=%c%s", ap->name, f->path, f->name, ap->volume, ap->entry, sizeof(f->st->st_size), f->st->st_size, f->delta.op ? f->delta.op : DELTA_nop, s));
+		message((-1, "archive=%s path=%s name=%s entry=%d.%d size=%I*u delta=%c%s", ap->name, f->path, f->name, ap->volume, ap->entry, sizeof(f->st->st_size), (Sfulong_t)f->st->st_size, f->delta.op ? f->delta.op : DELTA_nop, s));
 	}
 #endif
 	if (ap->entry == 1)
@@ -2569,11 +2581,12 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 		 * but are still in the output buffer
 		 */
 
-		if ((ap->format == PAX || ap->format == TAR || ap->format == USTAR) && ap->volume > 1)
-			for (i = 0; i < elementsof(tar_last); i++)
-				if (!memcmp((char*)&tar_last[i], (char*)&tar_header, sizeof(tar_header)))
+		if (ap->tar.last && ap->volume > 1)
+			for (i = 0; i < ap->tar.lastsize; i++)
+				if (!memcmp((char*)(ap->tar.last + i), (char*)&tar_header, sizeof(tar_header)))
 				{
-					if (--ap->volume == 1) error(1, "junk data after volume %d", ap->volume);
+					if (--ap->volume == 1)
+						error(1, "junk data after volume %d", ap->volume);
 					return 0;
 				}
 		if (ap->parent)
@@ -2614,18 +2627,25 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 				sfprintf(sfstderr, " %s swapped", "unix\0nuxi\0ixun\0xinu" + 5 * ap->swapio);
 			if (error_info.trace)
 			{
-				if (*state.id.format)
-					sfprintf(sfstderr, " %s", state.id.format);
-				if (*state.id.implementation)
-					sfprintf(sfstderr, " implementation %s", state.id.implementation);
+				if (*ap->id.format)
+					sfprintf(sfstderr, " %s", ap->id.format);
+				if (*ap->id.implementation)
+					sfprintf(sfstderr, " implementation %s", ap->id.implementation);
 			}
 			sfprintf(sfstderr, "\n");
 		}
 	}
 	if (ap->format == PAX || ap->format == TAR || ap->format == USTAR)
 	{
-		if (++tar_last_index >= elementsof(tar_last)) tar_last_index = 0;
-		tar_last[tar_last_index] = tar_header;
+		if (!ap->tar.last)
+		{
+			ap->tar.lastsize = 16;
+			if (!(ap->tar.last = newof(0, Tar_t, ap->tar.lastsize, 0)))
+				nospace();
+		}
+		if (++ap->tar.lastindex >= ap->tar.lastsize)
+			ap->tar.lastindex = 0;
+		ap->tar.last[ap->tar.lastindex] = tar_header;
 	}
 	if (!ap->delta || !ap->delta->trailer)
 		ap->memsum = 0;
@@ -2640,15 +2660,16 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
  */
 
 static void
-putkey(Sfio_t* sp, Sfio_t* tp, const char* name, int op, const char* value)
+putkey(Sfio_t* sp, Sfio_t* tp, Option_t* op, const char* value)
 {
 	register const char*	s;
 	register int		c;
 	register int		n;
 
-	sfprintf(tp, " %s", name);
-	if (op) sfputc(tp, op);
-	sfputc(tp, '=');
+	sfputc(tp, ' ');
+	if (op->flags & OPT_VENDOR)
+		sfprintf(tp, "%s.", VENDOR);
+	sfprintf(tp, "%s=", op->name);
 	n = 0;
 	s = value;
 	for (;;)
@@ -2702,17 +2723,354 @@ putkey(Sfio_t* sp, Sfio_t* tp, const char* name, int op, const char* value)
 }
 
 /*
+ * check if tar file name may be split to fit in header
+ * return
+ *	<0	extension header required with error message for non-extension formats
+ *	 0	no split needed
+ *	>0	f->name offset to split
+ */
+
+static int
+tar_longname(Archive_t* ap, File_t* f)
+{
+	register char*	s;
+	register char*	b;
+	register int	n;
+
+	if (!(n = f->namesize) || --n <= sizeof(tar_header.name))
+		return 0;
+	switch (ap->format)
+	{
+	case PAX:
+	case USTAR:
+		if (n > (sizeof(tar_header.prefix) + sizeof(tar_header.name) + 1))
+		{
+			if (ap->format != PAX && state.strict)
+				goto toolong;
+			f->longname = 1;
+			return -1;
+		}
+		s = f->name + n;
+		b = s - sizeof(tar_header.name) - 1;
+		while (--s >= b)
+			if (*s == '/' && (n = s - f->name) <= sizeof(tar_header.prefix))
+			{
+				if (!n)
+					break;
+				return s - f->name;
+			}
+		if (ap->format != PAX && state.strict)
+		{
+			error(2, "%s: file base name too long -- %d max", f->name, sizeof(tar_header.name));
+			f->skip = 1;
+		}
+		else
+			f->longname = 1;
+		return -1;
+	case TAR:
+	toolong:
+		error(2, "%s: file name too long -- %d max", f->name, sizeof(tar_header.prefix) + sizeof(tar_header.name) + !!strchr(f->name, '/'));
+		f->skip = 1;
+		return -1;
+	}
+	return 0;
+}
+
+/*
+ * check if f->linkpath is too long
+ * return
+ *	<0	extension header required with error message for non-extension formats
+ *	 0	it fits
+ */
+
+static int
+tar_longlink(Archive_t* ap, File_t* f)
+{
+	if (f->linktype != NOLINK && strlen(f->linkpath) > sizeof(tar_header.linkname))
+	{
+		switch (ap->format)
+		{
+		case USTAR:
+			if (!state.strict)
+				break;
+			/*FALLTHROUGH*/
+		case TAR:
+			error(2, "%s: link name too long -- %d max", f->linkpath, sizeof(tar_header.linkname));
+			f->skip = 1;
+			return -1;
+		}
+		f->longlink = 1;
+		return -1;
+	}
+	return 0;
+}
+
+/*
+ * generate extended header path name from fmt
+ */
+
+static char*
+headname(Archive_t* ap, File_t* f, const char* fmt)
+{
+	char*	s;
+	char*	t;
+	size_t	n;
+
+	if (!ap->tmp.hdr && !(ap->tmp.hdr = sfstropen()))
+		nospace();
+	listprintf(ap->tmp.hdr, ap, f, fmt);
+	if (sfstrtell(ap->tmp.hdr) > sizeof(tar_header.name))
+	{
+		sfstrset(ap->tmp.hdr, 0);
+		s = f->name;
+		if (t = strrchr(s, '/'))
+			f->name = t + 1;
+		if ((n = strlen(f->name)) > sizeof(tar_header.name) / 2)
+			f->name = f->name + n - sizeof(tar_header.name) / 2;
+		listprintf(ap->tmp.hdr, ap, f, fmt);
+		f->name = s;
+	}
+	return sfstruse(ap->tmp.hdr);
+}
+
+/*
+ * synthesize and extended tar header
+ */
+
+static void
+synthesize(Archive_t* ap, File_t* f, char* name, int type, char* buf, size_t n)
+{
+	Buffer_t*	bp;
+	char*		base;
+	char*		next;
+	File_t		h;
+	struct stat	st;
+
+	initfile(ap, &h, &st, name, X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
+	h.extended = type;
+	h.st->st_gid = f->st->st_gid;
+	h.st->st_uid = f->st->st_uid;
+	h.st->st_mtime = NOW;
+	h.st->st_size = n;
+	h.fd = setbuffer(0);
+	bp = getbuffer(h.fd);
+	base = bp->base;
+	next = bp->next;
+	bp->base = bp->next = buf;
+	fileout(ap, &h);
+	bp->base = base;
+	bp->next = next;
+}
+
+/*
+ * output an extended tar header
+ */
+
+static int
+extend(Archive_t* ap, File_t* f, int type)
+{
+	unsigned long		n;
+	char*			s;
+	char*			fmt;
+	Hash_position_t*	pos;
+	Option_t*		op;
+	Value_t*		vp;
+	int			lev;
+	int			alt;
+	int			split;
+	Tv_t			tv;
+	char			num[64];
+
+	if (!ap->tmp.ext && (!(ap->tmp.ext = sfstropen()) || !(ap->tmp.key = sfstropen())))
+		nospace();
+	switch (type)
+	{
+	case EXTTYPE:
+		fmt = state.header.extended;
+		lev = alt = 7;
+		break;
+	case GLBTYPE:
+		fmt = state.header.global;
+		lev = 3;
+		alt = 0;
+		if (ap->entry == 1 && (pos = hashscan(state.options, 0)))
+		{
+			while (hashnext(pos))
+			{
+				op = (Option_t*)pos->bucket->value;
+				if ((op->flags & (OPT_GLOBAL|OPT_READONLY)) == OPT_GLOBAL && op->name == pos->bucket->name && (op->level == lev || op->level == alt) && (s = op->perm.string))
+					putkey(ap->tmp.ext, ap->tmp.key, op, s);
+			}
+			hashdone(pos);
+		}
+		break;
+	default:
+		return 0;
+	}
+	if (pos = hashscan(state.options, 0))
+	{
+		while (hashnext(pos))
+		{
+			op = (Option_t*)pos->bucket->value;
+			if ((op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER && op->name == pos->bucket->name && (op->level == lev || op->level == alt))
+			{
+message((-5, "extend %s level=%d:%d:%d entry=%d:%d perm=(%s,%I*d) temp=(%s,%I*d)", op->name, op->level, lev, alt, op->entry, ap->entry, op->perm.string, sizeof(op->perm.number), op->perm.number, op->temp.string, sizeof(op->temp.number), op->temp.number));
+				vp = &op->perm;
+				s = vp->string;
+				switch (op->index)
+				{
+				case OPT_atime:
+				case OPT_ctime:
+				case OPT_mtime:
+					if (op->flags & OPT_SET)
+						s = vp->string;
+					else if (type != EXTTYPE)
+						continue;
+					else
+					{
+						switch (op->index)
+						{
+						case OPT_atime:
+							tvgetstat(f->st, &tv, NiL, NiL);
+							break;
+						case OPT_mtime:
+							tvgetstat(f->st, NiL, &tv, NiL);
+							break;
+						case OPT_ctime:
+							tvgetstat(f->st, NiL, NiL, &tv);
+							if (!tv.tv_nsec)
+								continue;
+							break;
+						}
+						sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
+						for (s = num + strlen(num); *(s - 1) == '0'; s--);
+						if (*(s - 1) == '.')
+							*s++ = '0';
+						*s = 0;
+						s = num;
+					}
+					break;
+				case OPT_comment:
+					s = state.header.comment;
+					break;
+				case OPT_gid:
+					if (op->flags & OPT_SET)
+						f->st->st_gid = vp->number;
+					else if (type != EXTTYPE)
+						f->st->st_gid = state.gid;
+					if (f->st->st_gid <= 07777777)
+						continue;
+					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_gid), f->st->st_gid);
+					break;
+				case OPT_gname:
+					if (op->flags & OPT_SET)
+						f->gidname = s;
+					if (!f->gidname || strlen(f->gidname) < sizeof(tar_header.gname) && portable(f->gidname))
+						continue;
+					s = f->gidname;
+					break;
+				case OPT_size:
+					if (type == GLBTYPE)
+						continue;
+					if (f->st->st_size <= (off_t)077777777777)
+						continue;
+					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_size), f->st->st_size);
+					break;
+				case OPT_uid:
+					if (op->flags & OPT_SET)
+						f->st->st_uid = vp->number;
+					else if (type != EXTTYPE)
+						f->st->st_uid = state.uid;
+					if (f->st->st_uid <= 07777777)
+						continue;
+					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_uid), f->st->st_uid);
+					break;
+				case OPT_uname:
+					if (op->flags & OPT_SET)
+						f->uidname = s;
+					if (!f->uidname || strlen(f->uidname) < sizeof(tar_header.uname) && portable(f->uidname))
+						continue;
+					s = f->uidname;
+					break;
+				default:
+					if (!s && (op->flags & OPT_SET))
+						sfsprintf(s = num, sizeof(num), "%ld", vp->number);
+					break;
+				}
+				if (s)
+					putkey(ap->tmp.ext, ap->tmp.key, op, s);
+			}
+		}
+		hashdone(pos);
+	}
+	if (type == EXTTYPE)
+	{
+		if ((split = tar_longname(ap, f)) < 0 || !portable(f->name))
+			putkey(ap->tmp.ext, ap->tmp.key, &options[OPT_path], f->name);
+		if (f->linkpath && (tar_longlink(ap, f) < 0 || !portable(f->linkpath)))
+			putkey(ap->tmp.ext, ap->tmp.key, &options[OPT_linkpath], f->linkpath);
+	}
+	else
+		split = 0;
+	if (n = sfstrtell(ap->tmp.ext))
+		synthesize(ap, f, headname(ap, f, fmt), type, sfstruse(ap->tmp.ext), n);
+	return split;
+}
+
+/*
  * write next archive entry header
  */
 
 void
 putheader(register Archive_t* ap, register File_t* f)
 {
-	register char*	s;
 	register off_t	n;
+	char*		s;
 	int		c;
 	int		q;
+	int		split;
 
+	if (f->extended)
+		split = 0;
+	else
+	{
+		ap->entry++;
+		switch (ap->format)
+		{
+		case PAX:
+			if (ap->entry == 1)
+				extend(ap, f, GLBTYPE);
+			split = extend(ap, f, EXTTYPE);
+			break;
+		case USTAR:
+			if ((split = tar_longname(ap, f)) < 0)
+			{
+				if (state.strict)
+				{
+					ap->entry--;
+					return;
+				}
+				synthesize(ap, f, headname(ap, f, "@PaxPathText.%(sequence)s"), LREGTYPE, f->name, f->namesize);
+			}
+			if (tar_longlink(ap, f) < 0)
+			{
+				if (state.strict)
+				{
+					ap->entry--;
+					return;
+				}
+				synthesize(ap, f, headname(ap, f, "@PaxLinkText.%(sequence)s"), LLNKTYPE, f->linkpath, strlen(f->linkpath) + 1);
+			}
+			break;
+		case TAR:
+			if ((split = tar_longname(ap, f)) || tar_longlink(ap, f))
+			{
+				ap->entry--;
+				return;
+			}
+			break;
+		}
+	}
 	ap->section = SECTION_CONTROL;
 	setdeltaheader(ap, f);
 	if (state.install.sp)
@@ -2730,128 +3088,6 @@ putheader(register Archive_t* ap, register File_t* f)
 		}
 		if (c || (f->st->st_mode & (S_ISUID|S_ISGID)))
 			sfprintf(state.install.sp, "chmod %04o %s\n", modex(f->st->st_mode & S_IPERM), f->name);
-	}
-	if (!f->extended)
-	{
-		ap->entry++;
-		if (ap->format == PAX)
-		{
-			unsigned long		t;
-			char*			base;
-			char*			next;
-			Buffer_t*		bp;
-			File_t			h;
-			Hash_position_t*	pos;
-			Option_t*		op;
-			Sfio_t*			hp;
-			Sfio_t*			tp;
-			Value_t*		vp;
-			char			num[64];
-
-			if (!(hp = sfstropen()) || !(tp = sfstropen()))
-				error(3, "out of space [extended]");
-			if (pos = hashscan(state.options, 0))
-			{
-				while (hashnext(pos))
-				{
-					op = (Option_t*)pos->bucket->value;
-					if ((op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER && op->name == pos->bucket->name && (!op->level || op->level >= (ap->entry == 1 ? 1 : 3) && op->level < 5))
-					{
-						vp = (op->level >= 3) ? &op->temp : &op->perm;
-						s = vp->string;
-						switch (op->index)
-						{
-						case OPT_atime:
-						case OPT_ctime:
-						case OPT_mtime:
-							if (op->flags & OPT_SET) t = vp->number;
-							else switch (op->index)
-							{
-							case OPT_atime:
-								t = f->st->st_atime;
-								break;
-							case OPT_ctime:
-								t = f->st->st_ctime;
-								break;
-							case OPT_mtime:
-								/* already in tar_header */
-								continue;
-							}
-							sfsprintf(s = num, sizeof(num), "%lu.0", t);
-							break;
-						case OPT_gname:
-							if (op->flags & OPT_SET)
-							{
-								f->gidname = s;
-								s = 0;
-							}
-							getidnames(f);
-							if (strlen(f->gidname) >= sizeof(tar_header.gname) || !portable(f->gidname))
-								s = f->gidname;
-							break;
-						case OPT_size:
-							if (f->st->st_size > 0x7fffffff)
-								sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_size), f->st->st_size);
-							else s = 0;
-							break;
-						case OPT_uname:
-							if (op->flags & OPT_SET)
-							{
-								f->uidname = s;
-								s = 0;
-							}
-							getidnames(f);
-							if (strlen(f->uidname) >= sizeof(tar_header.uname) || !portable(f->uidname))
-								s = f->uidname;
-							break;
-						default:
-							if (!s && (op->flags & OPT_SET))
-								sfsprintf(s = num, sizeof(num), "%ld", vp->number);
-							break;
-						}
-						if (s) putkey(hp, tp, op->name, !op->level || op->level >= 3 ? ':' : 0, s);
-					}
-				}
-				hashdone(pos);
-			}
-			s = f->name;
-			if (f->namesize > sizeof(tar_header.name) - (f->type == X_IFDIR))
-				for (; s = strchr(s, '/'); s++)
-				{
-					if ((n = s - f->name) >= sizeof(tar_header.prefix))
-					{
-						s = 0;
-						break;
-					}
-					if (f->namesize <= sizeof(tar_header.name) + n)
-						break;
-				}
-			if (!s || !portable(f->name))
-				putkey(hp, tp, options[OPT_path].name, ':', f->name);
-			if (f->linktype != NOLINK && (f->linknamesize > sizeof(tar_header.linkname) || !portable(f->linkname)))
-				putkey(hp, tp, options[OPT_linkpath].name, ':', f->linkname);
-			if (n = sfstrtell(hp))
-			{
-				s = sfstruse(hp);
-				listprintf(tp, ap, f, state.header.name);
-				initfile(ap, &h, sfstruse(tp), X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
-				h.extended = 1;
-				h.st->st_gid = f->st->st_gid;
-				h.st->st_uid = f->st->st_uid;
-				h.st->st_mtime = NOW;
-				h.st->st_size = n;
-				h.fd = setbuffer(0);
-				bp = getbuffer(h.fd);
-				base = bp->base;
-				next = bp->next;
-				bp->base = bp->next = s;
-				fileout(ap, &h);
-				bp->base = base;
-				bp->next = next;
-			}
-			sfstrclose(hp);
-			sfstrclose(tp);
-		}
 	}
 	if (state.complete)
 	{
@@ -2906,7 +3142,7 @@ putheader(register Archive_t* ap, register File_t* f)
 	case BINARY:
 		binary_header.magic = CPIO_MAGIC;
 		binary_header.namesize = f->namesize;
-		cpio_short(binary_header.size, f->st->st_size + (f->type == X_IFLNK ? f->linknamesize : 0));
+		cpio_short(binary_header.size, f->st->st_size + (f->type == X_IFLNK ? f->linkpathsize : 0));
 		binary_header.dev = f->st->st_dev;
 		binary_header.ino = f->st->st_ino;
 		binary_header.mode = f->st->st_mode;
@@ -2923,9 +3159,9 @@ putheader(register Archive_t* ap, register File_t* f)
 		if (f->type == X_IFLNK)
 		{
 		cpio_link:
-			if (streq(f->name, f->linkname))
+			if (streq(f->name, f->linkpath))
 				error(1, "%s: symbolic link loops to self", f->name);
-			bwrite(ap, f->linkname, f->linknamesize);
+			bwrite(ap, f->linkpath, f->linkpathsize);
 			putdeltaheader(ap, f);
 		}
 		break;
@@ -2969,7 +3205,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			(long)CPIO_TRUNCATE(idevice(f->st)),
 			(long)f->st->st_mtime,
 			(long)f->namesize,
-			sizeof(_ast_intmax_t), (_ast_intmax_t)(f->st->st_size + (f->type == X_IFLNK ? f->linknamesize : 0)));
+			sizeof(_ast_intmax_t), (_ast_intmax_t)(f->st->st_size + (f->type == X_IFLNK ? f->linkpathsize : 0)));
 		bwrite(ap, state.tmp.buffer, CPIO_HEADER);
 #if CPIO_EXTENDED
 		putxops(ap, f);
@@ -2990,7 +3226,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			(long)f->st->st_gid,
 			(long)f->st->st_nlink,
 			(long)f->st->st_mtime,
-			(long)f->st->st_size + (long)f->linknamesize,
+			(long)f->st->st_size + (long)f->linkpathsize,
 			(long)major(f->st->st_dev),
 			(long)minor(f->st->st_dev),
 			(long)major(idevice(f->st)),
@@ -3007,49 +3243,28 @@ putheader(register Archive_t* ap, register File_t* f)
 	case TAR:
 	case USTAR:
 		memzero(tar_block, TAR_HEADER);
-		s = f->name;
-		if (f->namesize > sizeof(tar_header.name) - (f->type == X_IFDIR))
+		if (f->longname)
+			s = headname(ap, f, "@PaxPathFile.%(sequence)s");
+		else
 		{
-			if (f->namesize > sizeof(tar_header.prefix) + sizeof(tar_header.name) - (f->type == X_IFDIR))
+			if (split)
 			{
-				error(2, "%s: file name too long -- %d max", f->name, sizeof(tar_header.prefix) + sizeof(tar_header.name) - (f->type == X_IFDIR));
-				f->skip = 1;
-				return;
+				memcpy(tar_header.prefix, f->name, split);
+				split++;
 			}
-			for (;; s++)
-			{
-				if (!(s = strchr(s, '/')))
-				{
-					error(2, "%s: file base name too long -- %d max", f->name, sizeof(tar_header.name));
-					f->skip = 1;
-					return;
-				}
-				if ((f->namesize - (s - f->name)) <= sizeof(tar_header.name))
-				{
-					*s = 0;
-					sfsprintf(tar_header.prefix, sizeof(tar_header.prefix), "%-.*s", sizeof(tar_header.prefix), f->name);
-					*s++ = '/';
-					break;
-				}
-			}
+			s = f->name + split;
 		}
 		sfsprintf(tar_header.name, sizeof(tar_header.name), "%s%s", s, f->type == X_IFDIR ? "/" : "");
 		q = 0;
 		if (f->extended)
-			tar_header.typeflag = EXTTYPE;
+			tar_header.typeflag = f->extended;
 		else
 			switch (f->linktype)
 			{
 			case HARDLINK:
 				tar_header.typeflag = LNKTYPE;
 			linked:
-				if (strlen(f->linkname) > sizeof(tar_header.linkname))
-				{
-					error(2, "%s: link name too long -- %d max", f->linkname, sizeof(tar_header.linkname));
-					f->skip = 1;
-					return;
-				}
-				sfsprintf(tar_header.linkname, sizeof(tar_header.linkname), "%s", f->linkname);
+				sfsprintf(tar_header.linkname, sizeof(tar_header.linkname), "%s", f->longlink ? headname(ap, f, "@PaxLinkFile.%(sequence)s") : f->linkpath);
 				break;
 			case SOFTLINK:
 				tar_header.typeflag = SYMTYPE;
@@ -3076,8 +3291,8 @@ putheader(register Archive_t* ap, register File_t* f)
 					q = 1;
 					break;
 				default:
-					if (!f->skip)
-						error(1, "%s: unknown file type 0%03o -- assuming regular file", f->name, f->type >> 12);
+					if (!f->skip && !f->delta.op)
+						error(1, "%s: %s: unknown file type %07o -- regular file assumed", ap->name, f->name, f->type);
 					/*FALLTHROUGH*/
 				case X_IFREG:
 					tar_header.typeflag = REGTYPE;
@@ -3085,12 +3300,12 @@ putheader(register Archive_t* ap, register File_t* f)
 				}
 				break;
 			}
-		sfsprintf(tar_header.devmajor, sizeof(tar_header.devmajor), "%0*o ", sizeof(tar_header.devmajor) - 2, q ? major(idevice(f->st)) : 0);
-		sfsprintf(tar_header.devminor, sizeof(tar_header.devminor), "%0*o ", sizeof(tar_header.devminor) - 2, q ? minor(idevice(f->st)) : 0);
-		sfsprintf(tar_header.mode, sizeof(tar_header.mode), "%0*o ", sizeof(tar_header.mode) - 2, f->st->st_mode & X_IPERM);
-		sfsprintf(tar_header.uid, sizeof(tar_header.uid), "%0*o ", sizeof(tar_header.uid) - 2, f->st->st_uid);
-		sfsprintf(tar_header.gid, sizeof(tar_header.gid), "%0*o ", sizeof(tar_header.gid) - 2, f->st->st_gid);
-		if (f->st->st_size > (unsigned long)037777777777)
+		sfsprintf(tar_header.devmajor, sizeof(tar_header.devmajor), "%0*o ", sizeof(tar_header.devmajor) - 1, q ? major(idevice(f->st)) : 0);
+		sfsprintf(tar_header.devminor, sizeof(tar_header.devminor), "%0*o ", sizeof(tar_header.devminor) - 1, q ? minor(idevice(f->st)) : 0);
+		sfsprintf(tar_header.mode, sizeof(tar_header.mode), "%0*o ", sizeof(tar_header.mode) - 1, f->st->st_mode & X_IPERM);
+		sfsprintf(tar_header.uid, sizeof(tar_header.uid), "%0*o ", sizeof(tar_header.uid) - 1, f->st->st_uid & (unsigned long)07777777);
+		sfsprintf(tar_header.gid, sizeof(tar_header.gid), "%0*o ", sizeof(tar_header.gid) - 1, f->st->st_gid & (unsigned long)07777777);
+		if (ap->format != PAX && f->st->st_size > (unsigned long)037777777777)
 		{
 			tar_header.size[0] = TAR_LARGENUM;
 			n = f->st->st_size;
@@ -3102,7 +3317,7 @@ putheader(register Archive_t* ap, register File_t* f)
 		}
 		else
 			sfsprintf(tar_header.size, sizeof(tar_header.size), "%0*lo ", sizeof(tar_header.size) - 1, (long)f->st->st_size);
-		sfsprintf(tar_header.mtime, sizeof(tar_header.mtime), "%0*lo ", sizeof(tar_header.mtime) - 2, f->st->st_mtime);
+		sfsprintf(tar_header.mtime, sizeof(tar_header.mtime), "%0*lo ", sizeof(tar_header.mtime) - 1, f->st->st_mtime & (unsigned long)037777777777);
 		if (ap->format != TAR)
 		{
 			strncpy(tar_header.magic, TMAGIC, sizeof(tar_header.magic));
@@ -3111,7 +3326,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			strcpy(tar_header.uname, f->uidname);
 			strcpy(tar_header.gname, f->gidname);
 		}
-		sfsprintf(tar_header.chksum, sizeof(tar_header.chksum), "%0*lo ", sizeof(tar_header.chksum) - 1, tar_checksum(ap));
+		sfsprintf(tar_header.chksum, sizeof(tar_header.chksum), "%0*lo ", sizeof(tar_header.chksum) - 1, tar_checksum(ap, 0, 0));
 		bwrite(ap, tar_block, TAR_HEADER);
 		break;
 	case VDB:
@@ -3231,7 +3446,7 @@ puttrailer(register Archive_t* ap, register File_t* f)
 			{
 				sumprint(state.checksum.sum, state.tmp.str, 0);
 				if (!(f->link->checksum = strdup(sfstruse(state.tmp.str))))
-					error(ERROR_SYSTEM|3, "out of space [link checksum]");
+					nospace();
 			}
 			sfputr(state.checksum.sp, f->link->checksum, -1);
 		}
@@ -3279,10 +3494,7 @@ getlabel(register Archive_t* ap, register File_t* f)
 	register int	c;
 	register int	n;
 
-	static char	last[5];
-	static int	done;
-
-	if (done || (c = bread(ap, alar_header, (off_t)ALAR_HEADER, (off_t)ALAR_LABEL, 0)) < ALAR_HEADER) return *last = done = c = 0;
+	if (ap->label.done || (c = bread(ap, alar_header, (off_t)ALAR_HEADER, (off_t)ALAR_LABEL, 0)) < ALAR_HEADER) return *ap->label.last = ap->label.done = c = 0;
 	if (alar_header[4] == 'V' && ((n = getlabnum(alar_header, 4, 1, 10)) < 1 || n > 3) && (n = getlabnum(alar_header, 6, 4, 10)) != c)
 	{
 		if ((c = n - c) > 0)
@@ -3297,9 +3509,9 @@ getlabel(register Archive_t* ap, register File_t* f)
 		else if (n <= ALAR_VARHDR) c = ALAR_VARHDR;
 		else c = n;
 	}
-	if (!ap->io->blocked && !*last && alar_header[3] == '2' && (strneq(alar_header, "HDR", 3) || strneq(alar_header, "EOF", 3) || strneq(alar_header, "EOV", 3)))
-		getlabstr(alar_header, 26, 4, last);
-	if (*last && strneq(alar_header, last, 4)) done = 1;
+	if (!ap->io->blocked && !*ap->label.last && alar_header[3] == '2' && (strneq(alar_header, "HDR", 3) || strneq(alar_header, "EOF", 3) || strneq(alar_header, "EOV", 3)))
+		getlabstr(alar_header, 26, 4, ap->label.last);
+	if (*ap->label.last && strneq(alar_header, ap->label.last, 4)) ap->label.done = 1;
 	message((-4, "label: %-*.*s", c, c, alar_header));
 	return c;
 }
@@ -3313,30 +3525,28 @@ putlabels(register Archive_t* ap, register File_t* f, char* type)
 {
 	struct tm*	tm;
 
-	static int	section = 1;
-	static int	sequence;
-
 	switch (*type)
 	{
 	case 'E':
 		bwrite(ap, alar_header, 0);
 		break;
 	case 'H':
-		sequence++;
+		ap->label.sequence++;
 		break;
 	}
 	tm = gmtime(&f->st->st_mtime);
-	sfsprintf(alar_header, sizeof(alar_header), "%s1%-17.17s000001%04d%04d000100 %02d%03d 00000 %06d%-6.6sD%-7.7s       ", type, f->id, section, sequence, tm->tm_year, tm->tm_yday, f->record.blocks, state.id.format, state.id.implementation);
+	sfsprintf(alar_header, sizeof(alar_header), "%s1%-17.17s000001%04d%04d000100 %02d%03d 00000 %06d%-6.6sD%-7.7s       ", type, f->id, ap->label.section, ap->label.sequence, tm->tm_year, tm->tm_yday, f->record.blocks, ap->id.format, ap->id.implementation);
 	bwrite(ap, alar_header, ALAR_HEADER);
 	sfsprintf(alar_header, sizeof(alar_header), "%s2%c%05d%05d%010d%s%c                     00                            ", type, state.record.format, state.blocksize, state.record.size, f->st->st_size, type, '2');
 	bwrite(ap, alar_header, ALAR_HEADER);
 	bwrite(ap, alar_header, 0);
 	if (streq(type, "EOV"))
 	{
-		section++;
-		sequence = 0;
+		ap->label.section++;
+		ap->label.sequence = 0;
 	}
-	else section = 1;
+	else
+		ap->label.section = 1;
 }
 
 #ifdef SAVESET
@@ -3393,7 +3603,7 @@ getsaveset(register Archive_t* ap, register File_t* f, int header)
 				i = swapget(1, p + FILHDR_size, 2);
 				if (p + FILHDR_data + i > state.saveset.block + state.blocksize)
 					error(3, "invalid %s format file attribute", format[ap->format].name);
-				t = f->name;
+				t = f->name = stash(&ap->path.head, NiL, i);
 				n = 0;
 				for (s = p + FILHDR_data + 1; s < p + FILHDR_data + i; s++)
 				{

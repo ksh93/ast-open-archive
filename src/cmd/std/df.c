@@ -400,6 +400,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	register Key_t*		kp;
 	char*			t;
 
+	if (!fp->t_str)
+		return 0;
 	if (!(kp = (Key_t*)dtmatch(state.keys, fp->t_str)))
 	{
 		if (*fp->t_str != '$')

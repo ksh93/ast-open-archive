@@ -667,7 +667,8 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, int hig
 			}
 			if (high < 0)
 			{
-				freq = state.stats[0].frequency * (-high) / 100;
+				high = -high;
+				freq = state.stats[0].frequency * high / 100;
 				for (j = 0; j < row; j++)
 					if (state.stats[j].frequency <= freq)
 						break;
@@ -677,7 +678,8 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, int hig
 			}
 			if (maxhigh < 0)
 			{
-				if (high > (row * (-maxhigh) / 100))
+				maxhigh = -maxhigh;
+				if (high > (row * maxhigh / 100))
 					error(6, "high frequency count %d exceeds %d%% of %d", high, maxhigh, row);
 			}
 			else if (maxhigh > 0)
@@ -1141,13 +1143,12 @@ reorder_tsp(Reorder_method_t* method, unsigned char* buf, unsigned char* dat, in
 	Tsp_cost_t*	v;
 	Tsp_disc_t	disc;
 
-	i = row * row;
-	if (!(v = newof(0, Tsp_cost_t, i, row * sizeof(Tsp_cost_t*))))
+	if (!(cost = newof(0, Tsp_cost_t*, row, row * row * sizeof(Tsp_cost_t))))
 		error(ERROR_SYSTEM|3, "out of space [%d X %d cost matrix]", row, row);
-	cost = (Tsp_cost_t**)(v + i);
-	for (j = 0; j < row; j++)
+	v = (Tsp_cost_t*)(cost + row);
+	for (i = 0; i < row; i++)
 	{
-		cost[j] = v;
+		cost[i] = v;
 		v += row;
 	}
 	self = vector(row);

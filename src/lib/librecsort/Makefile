@@ -7,10 +7,11 @@ VERSION = 1.0
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 recsort $(VERSION) :LIBRARY: RELEASE recsort.3 recsort.h rshdr.h \
-		rsclear.c rsclose.c rsdisc.c rsnotify.c rslist.c \
+		rsclear.c rsclose.c rsdisc.c rsnotify.c rslist.c rslib.c \
 		rsmerge.c rsmethod.c rsopen.c rsprocess.c rswrite.c \
 		rs-radix.c rs-rasp.c rs-splay.c rs-verify.c \
-		rskeyopen.c rskey.c rskeymeth.c rskeydump.c
+		rskeyopen.c rskey.c rskeymeth.c rskeydump.c \
+		-ldll
 
 $(INCLUDEDIR) :INSTALLPROTO: recsort.h
 

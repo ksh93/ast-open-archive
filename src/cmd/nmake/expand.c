@@ -2125,7 +2125,12 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 				{
 					sfprintf(xp, "%s=", v->name);
 					if (*p)
-						shquote(xp, p);
+					{
+						if (*p == '"' || *p == '\'')
+							sfputr(xp, p, -1);
+						else
+							shquote(xp, p);
+					}
 				}
 			}
 			if (tmp)

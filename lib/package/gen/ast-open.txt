@@ -1,7 +1,7 @@
 The AT&T Software Technology ast-open package from AT&T Labs Research
 contains all of the ast open source commands and libraries.  This
-package is a superset of the following packages: ast-base ast-ksh ksh;
-you won't need these if you download ast-open.
+package is a superset of the following packages: ast-base ast-ksh ksh
+ast-ast; you won't need these if you download ast-open.
 
 Source Package Installation Instructions:
 
@@ -87,6 +87,28 @@ Source Package Installation Instructions -- Plan B:
 All recorded changes follow.
 
 :::::::: ksh93 ::::::::
+
+03-09-12  --- Release ksh93p-  ---
+03-09-12  To improve conformance with ksh88, leading zeros will be ignored
+	  when getting the numerical value of a string variable so that
+	  they will not be treated as octal constants.
+03-09-03  The builtin kill command now processes obsolete invocations
+	  such as kill -1 -pid.
+03-09-02  The restriction on modifying FPATH in a restricted shell (sh -r)
+	  has been documented.
+03-09-02  The restricted shell (sh -r) has been modified to disallow
+	  executing command -p.
+03-08-07  A bug in which the KEYBD trap was not being invoked when
+	  characters with the 8th bit set has been fixed.
+03-08-02  A parser bug introduced in ksh93o which caused the character
+	  after () in a Posix function definition to be skipped 
+	  when reading from standard input has been fixed.
+03-08-01  A bug in which "${foo#pattern}(x)" treated (x) as if it were
+	  part of the pattern has been fixed.
+03-08-01  The command -x option has been modified so that any trailing
+	  arguments that do expand to a single word will be included
+	  on each invocation, so that commands like command -x mv * dir
+	  work as expected.
 
 03-07-20  --- Release ksh93o+  ---
 03-07-20  A bug in which could cause memory corruption when a posix
@@ -1125,6 +1147,12 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+03-09-11 default output format now ustar -- should eventually be pax
+	 format rename: tar=>oldtar, ustar=>ustar|tar
+	 add --testdate=date regression test hook
+	 add --uid=id --gid=id
+03-09-10 private static cleanup
+03-09-09 xopen sync and { pax ustar } format fixes, <tv.h> interface
 03-06-21 format.c: add ccode conversion check to putheader()
 03-05-28 file.c: fix -vrw directory double list
 	 update to new <ccode.h> interface
@@ -1363,6 +1391,7 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+03-08-11 mm2html: handle man .TH args>2
 03-03-25 mm2html: table border size '' => 0
 03-02-06 troff2html.c: fmtquote() FMT_ALWAYS update
 02-10-24 mm2html: viewgraph link target is _top too
@@ -1460,6 +1489,9 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+03-09-11 opt.tst: add n:=v tests
+03-09-05 opt.tst: [f:l*?] test 43 update
+03-08-11 date.dat: add arithmetic tests
 03-05-25 opt.tst: add optstr() ???* internal option tests
 03-05-11 strtoi.tst: add malformation tests
 03-05-06 opt.tst: add getopt_long() compatibility tests
@@ -1513,6 +1545,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+03-08-15 mount3d.c: change 3d intercept test to handle NiL || ""
 03-06-11 ast.c: add _map_malloc checks for _ast_malloc => malloc
 03-06-05 pathreal.c: fix ancient multiple relative|.. symlink bug
 03-06-04 3d.sh: change `shift $OPTIND-1' to `set x "@"; shift $OPTIND'
@@ -1782,6 +1815,12 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+03-09-22 Makerules.mk: don;t clobber $(CATALOG).msg
+03-09-19 Makerules.mk: fix %.sh USAGE_LICENSE quoting
+	 expand.c: fix :T=E: quoting
+03-09-16 archive.c: inhibit `member newer than archive' for ranlib time skew
+03-08-27 Makerules.mk: honor explicit :MAKE: rhs order
+03-08-11 make.c: change -T0x00300000 to -Q0x00300000 as documented
 03-07-17 archive.c: add arupdate()
 	 state.c: don't skew sync archives (avoids possible ranlib interference)
 03-06-21 parse.c: fix expr() quote recursion bug
@@ -2637,6 +2676,7 @@ All recorded changes follow.
 
 :::::::: ss ::::::::
 
+03-07-29 ssd.c,features/cmd: add utmpx support
 99-05-18 ss: long options
 97-08-11 ssd: fix now used before defined bug
 95-05-09 fix ssd nlists feature tests
@@ -2679,6 +2719,8 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+03-09-18 tail.tst: add header and timeout tests
+03-07-28 expr.tst: add
 03-07-14 fmt.tst: add
 03-06-10 who.c: ctime() arg must be time_t* (linux.s390-64)
 03-05-21 asa.c,asa.tst: add
@@ -4784,6 +4826,7 @@ End:
 
 03-07-17 pzip.c: update --split doc
 	 pin.c: add --maxhigh=N% high frequency column hard limit
+	 pin.c: fix tsp cost matrix free() bug
 03-04-05 pop.c: add OP_VERBOSE for cut() trace
 03-01-04 pin.c: list range only if more than 2 elements
 02-12-25 pin: add --sort
@@ -4823,6 +4866,8 @@ End:
 
 :::::::: re ::::::::
 
+03-08-11 ed.c: fix . value after s
+03-08-08 ed.c: fix bug that botched the remembered RE parse
 03-07-17 testregex.dat: add REG_SHELL|REG_AUGMENTED tests
 03-06-09 minimal.dat: add tests
 03-03-17 ed.tst: add ! command tests for sfpopen() "" mode fix
@@ -4951,7 +4996,11 @@ End:
 
 :::::::: sort ::::::::
 
-03-05-27 main.c: add -C, --codeset={a,e,i,o,n}
+03-09-06 main.c: add -Z, --zd, --zoned-decimal
+03-09-04 main.c: change -R to --record=format | --recfmt=format
+03-08-31 main.c: -l implemented by rslib()
+03-08-15 main.c: add -J, --shuffle=seed
+03-05-27 main.c: add -C, --codeset={a,e,i,o,n}, -p, --bcd, --packed-decimal
 03-05-23 main.c: add -R, --reclen=reclen
 03-03-11 testsort.sh: initialize $CC from :TEST: TESTCC state var
 03-03-07 Makefile: +lsort for now
@@ -4983,6 +5032,11 @@ End:
 
 :::::::: std ::::::::
 
+03-09-18 dd.c: numeric option arg values are now intmax
+	 split.c: -b -C -l are now intmax
+03-09-11 ls.c: add --testdate=date for testing
+03-08-21 split.c: fix csplit pattern matching -- did it ever work?
+	 csplit.tst: add regression tests
 03-06-21 pss-procfs.c: fix PR_TIME(),PR_CTIME() normalization
 03-06-11 mount.c: reorder includes for mvs.390
 03-05-26 dd.tst: add
@@ -5289,6 +5343,33 @@ End:
 
 :::::::: libast ::::::::
 
+03-09-22 regex.h,regcomp.c: add regncomp()
+	 regclass.c: fix for loop dangling ; in regaddclass()
+03-09-20 sftable.c,sfvprintf.c: fix SFFMT_CHAR handling to match extf api
+03-09-19 sfmode.c: update release to kpv's
+03-09-16 regnexec.c: exec time REG_LEFT => don't advance past initial position
+	 regclass.c: add regaddclass() for user defined [:class:]
+	 regexec.h: REG_VERSION_N2X, add redisc_t {re_map} ccode map
+	 regstat.c: add regstat_t
+03-09-11 optget.c: --n:=v sets opt_info.assign=':', opt_info.number enabled
+03-09-09 disc/sfkeyprintf.c: *pn on lookup is arg separator; lookup "" arg too
+03-09-05 optget.c: [f:l*?] preserves user long name past '*' in opt_info.name[]
+03-09-03 sfstr.h: add sfstrpend() for #pending bytes in read buffer
+03-08-25 regex: add REG_FIRST, optimize bm
+	 features/lib: _AST_no_spawnveg==1 falls back to fork/exec
+03-08-22 features/stdio,stdio/asprintf.c,stdio/vasprintf.c: add
+03-08-21 path/pathnative.c,path/pathposix.c: interix updates
+	 features/botched: add cygwin _stat => _stat64
+03-08-15 include/ast.h: map out bsd strmode()
+	 features/common: add interix _ast_intmax_t workarounds
+	 misc/fs3d.c: 3d mount test now uses "" instead of NiL (or cygwin dumps)
+03-08-11 string/fmtesc.c: fix optional quoting checks
+	 tm/tmdate.c: fix > 1 year of seconds arithmetic
+	 tm/tmfix.c: fix leap year adjustments
+03-08-01 features/lib: beef up sock_peek test for interix
+03-07-29 features/float: add -lm to frexp... test
+	 Makefile: fix -lm astmath test sense
+03-07-26 features/mem.c: favor _mem_sbrk over _mem_mmap_*
 03-07-22 vmalloc/vmbest.c: fall back to sbrk() if mmap() fails
 	 features/mem.c: _mem_sbrk means sbrk() and brk() work
 03-07-17 regex/regcomp.c: fix bug that treated KRE X{n,m} like {n,m}(X)
@@ -6363,6 +6444,7 @@ End:
 
 :::::::: libardir ::::::::
 
+03-09-17 ardir.c: rewind initial peek to open position in case its /dev/stdin
 03-04-05 ar-port.c: fix bug that skipped initial long name entry
 	 ar-port.c: handle netbsd.i386 ' <long-index>' vs. '/<long-index>'
 03-02-05 ar-port.c: handle solaris TYPE_port variation
@@ -6375,7 +6457,12 @@ End:
 
 :::::::: libcmd ::::::::
 
-03-07-15 fmt.c: ix trailing space bug
+03-09-18 tail.c: add --log
+03-09-11 rm.c: add --unconditional
+03-08-11 fold.c: add --delimiter=c to break at c
+03-07-28 features/time: change settimeofday() test to 2nd arg of (void*)0
+	 expr.c: add {match,substr,index,length,quote}
+03-07-15 fmt.c: fix trailing space bug
 03-06-20 uname.c: fix -p constant string overwrite
 03-06-04 stty.c: add undef to control assignment docs
 03-05-31 uname.c: add -f and sysinfo()/confstr() compatibility via astconf()
@@ -6573,6 +6660,13 @@ End:
 
 :::::::: librecsort ::::::::
 
+03-09-18 rswrite.c: fix RS_WRITE exceptions
+03-09-06 rskey.c: add 'Z' key_z_code for zoned decimal
+03-09-04 rsprocess.c: rs->disc->data==-1 => ibm v format records
+03-09-03 rslib.c: rslib() separator expanded to [,\t\r\n]
+03-09-01 recsort.h: add rslib(), discipline stack, extra event arg
+03-08-29 recsort.h: add RS_READ and RS_WRITE events
+03-08-15 rskey.c: add -Jseed for random shuffle (jumble)
 03-05-27 rskey.c: add Ci[o] code set [conversion]
 03-05-26 rskey.c: add 'p' packed decimal (bcd)
 03-05-23 recsort.h: add Rskey_t.code for global ccode index
@@ -6679,6 +6773,7 @@ End:
 
 :::::::: libcs ::::::::
 
+03-08-01 csdata.c: add NoF pure data workaround, drop const + prototyped
 03-03-28 msglib.h: add D_FILENO ifdef
 02-10-02 features/lib,genlocal.sh: add ssh, pid to hang warning
 	 msglist.c: tmform() => fmttime()

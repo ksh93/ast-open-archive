@@ -29,7 +29,7 @@
 **	Written by Kiem-Phong Vo (07/08/96)
 */
 
-static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2000-03-17 $\0\n";
+static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2003-09-04 $\0\n";
 
 #if __STD_C
 Rs_t* rsopen(Rsdisc_t* disc, Rsmethod_t* meth, ssize_t c_max, int type)
@@ -62,16 +62,20 @@ int		type;	/* sort controls			*/
 	}
 
 	if(!(rs->methdata = (Void_t*)vmresize(Vmheap,NIL(Void_t*),meth->size,VM_RSZERO)) )
-	{	vmclose(rs->vm);
-		vmfree(Vmheap,rs);
-		return NIL(Rs_t*);
-	}
-	else	rs->meth = meth;
+		goto bad;
 
+	rs->meth = meth;
 	rs->c_max = c_max;
 	rs->type = type;
 
 	rsdisc(rs,disc,RS_DISC);
 
+	if (RSNOTIFY(rs, RS_OPEN, 0, 0, rs->disc) < 0)
+		goto bad;
+
 	return rs;
+ bad:
+	vmclose(rs->vm);
+	vmfree(Vmheap,rs);
+	return NIL(Rs_t*);
 }

@@ -130,12 +130,14 @@ cpio_short(register unsigned short* s, long n)
  */
 
 long
-tar_checksum(Archive_t* ap)
+tar_checksum(Archive_t* ap, int check, long sum)
 {
 	register unsigned char*		p;
 	register unsigned char*		e;
 	register unsigned char*		t;
-	register unsigned long		n;
+	register unsigned long		u;
+	register unsigned long		s;
+	register long			c;
 	register const unsigned char*	map;
 	unsigned char			tmp[sizeof(tar_header.chksum)];
 
@@ -147,24 +149,61 @@ tar_checksum(Archive_t* ap)
 		*t++ = *p;
 		*p++ = ' ';
 	}
-	n = 0;
+	u = 0;
+	s = 0;
 	p = (unsigned char*)tar_block;
 	e = p + TAR_HEADER;
 	if (!ap->convert[SECTION_CONTROL].on)
 		while (p < e)
-			n += *p++;
+		{
+			c = *p++;
+			u += c;
+			if (check)
+			{
+				if (c & 0x80)
+					c |= (-1) << 8;
+				s += c;
+			}
+		}
 	else
 	{
 		map = (state.operation & IN) ? ap->convert[SECTION_CONTROL].t2f : ap->convert[SECTION_CONTROL].f2t;
 		while (p < e)
-			n += map[*p++];
+		{
+			c = map[*p++];
+			u += c;
+			if (check)
+			{
+				if (c & 0x80)
+					c |= (-1) << 8;
+				s += c;
+			}
+		}
 	}
 	p = (unsigned char*)tar_header.chksum;
 	e = p + sizeof(tar_header.chksum);
 	t = tmp;
 	while (p < e)
 		*p++ = *t++;
-	return n & TAR_SUMASK;
+	u &= TAR_SUMASK;
+	if (check)
+	{
+		if ((sum &= TAR_SUMASK) == u)
+			return 1;
+		if (sum == (s &= TAR_SUMASK))
+		{
+			if (!ap->old.warned)
+			{
+				ap->old.warned = 1;
+				error(1, "%s: %s format archive generated with signed checksums", ap->name, format[ap->format].name);
+			}
+			return 1;
+		}
+		if (ap->entry > 1)
+			error(state.keepgoing ? 1 : 3, "%s: %s format checksum error (%ld != %ld or %ld)", ap->name, format[ap->format].name, sum, u, s);
+		return 0;
+	}
+	return u;
 }
 
 /*

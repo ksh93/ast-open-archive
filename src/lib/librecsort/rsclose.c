@@ -39,7 +39,7 @@ Rs_t*	rs;
 	reg int	rv;
 
 	while (rsdisc(rs, NIL(Rsdisc_t*), RS_POP));
-	if ((rv = RSNOTIFY(rs,RS_CLOSE,0,rs->disc)) < 0)
+	if ((rv = RSNOTIFY(rs,RS_CLOSE,0,0,rs->disc)) < 0)
 		return rv;
 
 	if(rs->vm)

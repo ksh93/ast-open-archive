@@ -21,7 +21,6 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                                                                  *
 *******************************************************************/
-#pragma prototyped
 /*
  * Glenn Fowler
  * AT&T Research
@@ -29,10 +28,14 @@
  * cs library data
  */
 
-static const char id_cs[] = "\n@(#)$Id: libcs (AT&T Research) 2001-12-12 $\0\n";
+static char id_cs[] = "\n@(#)$Id: libcs (AT&T Research) 2001-12-12 $\0\n";
 
 #include "cslib.h"
 
 static Csdisc_t	disc = { CS_VERSION };
 
 Cs_t		cs = { "libcs:cs", &disc };
+
+#ifdef NoF
+NoF(csdata)
+#endif

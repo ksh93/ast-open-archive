@@ -22,6 +22,8 @@ rectify :: rectify.c
 
 funzip :: funzip.c -lz
 
+$(LIBDIR)/pz :INSTALLDIR: gzip.prt
+
 :TEST: pzip
 
 :: NOTES RELEASE PROMO.mm compare mkprt tabulate

@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2003-03-21 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2003-09-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -196,6 +196,8 @@ USAGE_LICENSE
 "[101:dump?Print the generated \b--format\b string on the standard output"
 "	and exit.]"
 "[102:full-time?Equivalent to \b--time-style=full-iso\b.]"
+"[103:testdate?\b--format\b time values newer than \adate\a will be printed"
+"	as \adate\a. Used for regression testing.]:[date]"
 
 "\n"
 "\n[ file ... ]\n"
@@ -212,6 +214,7 @@ USAGE_LICENSE
 #include <sfdisc.h>
 #include <sfstr.h>
 #include <hash.h>
+#include <tm.h>
 
 #define LS_ACROSS	(LS_USER<<0)	/* multi-column row order	*/
 #define LS_ALL		(LS_USER<<1)	/* list all			*/
@@ -310,6 +313,7 @@ typedef struct				/* program state		*/
 	long		timeflags;	/* time LS_* flags		*/
 	long		blocksize;	/* file block size		*/
 	unsigned long	directories;	/* directory count		*/
+	unsigned long	testdate;	/* --format test date		*/
 	Count_t		total;		/* total counts			*/
 	int		adjust;		/* key() print with adjustment	*/
 	int		comma;		/* LS_COMMAS ftw.level crossing	*/
@@ -446,6 +450,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	static const char	fmt_perm[] = "perm";
 	static const char	fmt_time[] = "time";
 
+	if (!fp->t_str)
+		return 0;
 	if (lp = (List_t*)handle)
 	{
 		ftw = lp->ftw;
@@ -704,6 +710,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				if (*arg == '=')
 					arg++;
 			}
+			if ((unsigned long)n >= state.testdate)
+				n = state.testdate;
 			*ps = fmttime(*arg ? arg : state.timefmt, (time_t)n);
 		}
 	}
@@ -1110,6 +1118,7 @@ main(int argc, register char** argv)
 {
 	register int	n;
 	register char*	s;
+	char*		e;
 	Key_t*		kp;
 	Sfio_t*		fmt;
 	long		lsflags;
@@ -1146,6 +1155,7 @@ main(int argc, register char** argv)
 		state.lsflags |= LS_COLUMNS|LS_PRINTABLE;
 	state.endflags = state.flags;
 	state.blocksize = 512;
+	state.testdate = ~0;
 	state.timefmt = "%?%l";
 	lsflags = state.lsflags;
 	while (n = optget(argv, usage))
@@ -1457,6 +1467,11 @@ main(int argc, register char** argv)
 			break;
 		case -102:
 			state.timefmt = "%c";
+			break;
+		case -103:
+			state.testdate = tmdate(opt_info.arg, &e, NiL);
+			if (*e)
+				error(3, "%s: invalid date string", opt_info.arg, opt_info.option);
 			break;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);

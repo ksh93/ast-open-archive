@@ -97,7 +97,6 @@ typedef struct _merge_s
 	  } \
 	}
 
-
 /* write out any pending records */
 #if __STD_C
 static int mgflush(reg Rs_t* rs)
@@ -576,11 +575,9 @@ ssize_t		n;
 		}
 		else if(rs->type&RS_TEXT)
 		{	for(; n_obj > 0; --n_obj)
-			{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,
-					  sizeof(ssize_t),break);
+			{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,sizeof(ssize_t),break);
 				d = (uchar*)(&len); MEMCPY(d,mgcur,sizeof(ssize_t));
 				MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,break);
-
 				RSRESERVE(rs,rsrv,endrsrv,cur,len, goto done);
 				MEMCPY(cur,mgcur,len);
 			}
@@ -754,7 +751,7 @@ int		type;	/* RS_IPRINT|RS_OPRINT		*/
 		{	if(uniq)
 			{	/* we assume here that mg->f is RS_UNIQ */
 				obj = mg->obj+mg->cpos; mg->cpos += 1;
-				if(rs->disc->events & RS_SUMMARY)
+				if(rs->events & RS_SUMMARY)
 				{	for(m = mg->equi; m; m = m->equi)
 					{	o = m->obj+m->cpos;
 						EQUAL(obj,o,t);

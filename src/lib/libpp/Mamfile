@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -117,8 +117,7 @@ setv _BLD_pp -U_BLD_pp
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsym.c
 done ppsym.o generated
 bind -last
-bind -lm dontcare
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ppsym ppsym.o ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ppsym ppsym.o ${mam_libast}
 done ppsym generated
 make pp
 make libpp.a archive
@@ -176,22 +175,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < gentab.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat gentab.sh
+exec - 		cat - gentab.sh <<'!'
+exec - 
+exec - !
 exec - 		} > gentab
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat gentab.sh
-exec - 	} > gentab
+exec - *)	cat - gentab.sh > gentab <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x gentab
@@ -709,22 +705,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < probe.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat probe.sh
+exec - 		cat - probe.sh <<'!'
+exec - 
+exec - !
 exec - 		} > probe
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat probe.sh
-exec - 	} > probe
+exec - *)	cat - probe.sh > probe <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x probe

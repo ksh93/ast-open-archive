@@ -12,7 +12,7 @@ TEST 01 'simple checks'
 
 TEST 02 'two fields'
 	EXEC	-k1.1,1.0 f1
-		INPUT f1
+		INPUT -n f1
 	EXEC	-k1.1,1 f1
 	EXEC	-k1,1 f1
 	EXEC	-k1 f1

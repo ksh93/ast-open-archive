@@ -43,13 +43,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2003-03-25' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2003-08-11' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Labs Research) 2003-03-25 $
+@(#)$Id: mm2html (AT&T Labs Research) 2003-08-11 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -1505,7 +1505,7 @@ do	getline || {
 		.SU)	: ignore $op
 			;;
 		.TH|.TL): .TL junk junk
-			: .TH item section
+			: .TH item section foot_center foot_left head_center
 			case $macros:$op in
 			:.TH)	macros=man ;;
 			:.TL)	macros=mm ;;
@@ -1521,30 +1521,41 @@ do	getline || {
 			esac
 			title $title
 			case $op in
-			.TH)	case $2 in
-				1*)	sec="USER COMMANDS " ;;
-				2*)	sec="SYSTEM CALLS" ;;
-				3C)	sec="COMPATIBILITY FUNCTIONS" ;;
-				3F)	sec="FORTRAN LIBRARY ROUTINES" ;;
-				3K)	sec="KERNEL VM LIBRARY FUNCTIONS" ;;
-				3L)	sec="LIGHTWEIGHT PROCESSES LIBRARY" ;;
-				3M)	sec="MATHEMATICAL LIBRARY" ;;
-				3N)	sec="NETWORK FUNCTIONS" ;;
-				3R)	sec="RPC SERVICES LIBRARY" ;;
-				3S)	sec="STANDARD I/O FUNCTIONS" ;;
-				3V)	sec="SYSTEM V LIBRARY" ;;
-				3X)	sec="MISCELLANEOUS LIBRARY FUNCTIONS" ;;
-				3*)	sec="C LIBRARY FUNCTIONS" ;;
-				4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
-				4F)	sec="PROTOCOL FAMILIES" ;;
-				4P)	sec="PROTOCOLS" ;;
-				4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
-				5*)	sec="FILE FORMATS" ;;
-				6*)	sec="GAMES AND DEMOS" ;;
-				7*)	sec="PUBLIC FILES AND TABLES" ;;
-				8*)	sec="MAINTENANCE COMMANDS" ;;
-				L*)	sec="LOCAL COMMANDS" ;;
-				*)	sec="SECTION $2" ;;
+			.TH)	case $3 in
+				?*)	dc[++dcs]=$3 ;;
+				esac
+				case $4 in
+				?*)	dl[++dls]=$4 ;;
+				esac
+				case $5 in
+				'')	case $2 in
+					1*)	sec="USER COMMANDS " ;;
+					2*)	sec="SYSTEM CALLS" ;;
+					3C)	sec="COMPATIBILITY FUNCTIONS" ;;
+					3F)	sec="FORTRAN LIBRARY ROUTINES" ;;
+					3K)	sec="KERNEL VM LIBRARY FUNCTIONS" ;;
+					3L)	sec="LIGHTWEIGHT PROCESSES LIBRARY" ;;
+					3M)	sec="MATHEMATICAL LIBRARY" ;;
+					3N)	sec="NETWORK FUNCTIONS" ;;
+					3R)	sec="RPC SERVICES LIBRARY" ;;
+					3S)	sec="STANDARD I/O FUNCTIONS" ;;
+					3V)	sec="SYSTEM V LIBRARY" ;;
+					3X)	sec="MISCELLANEOUS LIBRARY FUNCTIONS" ;;
+					3*)	sec="C LIBRARY FUNCTIONS" ;;
+					4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
+					4F)	sec="PROTOCOL FAMILIES" ;;
+					4P)	sec="PROTOCOLS" ;;
+					4*)	sec="DEVICES AND NETWORK INTERFACES" ;;
+					5*)	sec="FILE FORMATS" ;;
+					6*)	sec="GAMES AND DEMOS" ;;
+					7*)	sec="PUBLIC FILES AND TABLES" ;;
+					8*)	sec="MAINTENANCE COMMANDS" ;;
+					L*)	sec="LOCAL COMMANDS" ;;
+					*)	sec="SECTION $2" ;;
+					esac
+					;;
+				*)	sec=$5
+					;;
 				esac
 				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$1($2)</TH><TH align=center><A href=\"\" TITLE=\"Command Index\">$sec</A></TH><TH align=right>$1($2)</TH></TR></TBODY></TABLE></H3>"
 				print -r -- "<HR>"
@@ -2080,8 +2091,8 @@ esac
 print -r -- "<P>"
 print -r -- "<HR>"
 print -r -- "<TABLE border=0 align=center width=96%>"
-integer dls=0 drs=0
-typeset d dl dr
+integer dls=0 dcs=0 drs=0
+typeset d dl dc dr
 case ${html.ident} in
 1)	case ${license.author} in
 	?*)	IFS=',+'
@@ -2123,7 +2134,7 @@ esac
 dr[++drs]="${ds[Dt]}"
 (( drs < dls )) && (( drs = dls ))
 for (( dls = 1; dls <= drs; dls++ ))
-do	print -r -- "<TR>$nl<TD align=left>${dl[dls]}</TD>$nl<TD align=right>${dr[dls]}</TD>$nl</TR>"
+do	print -r -- "<TR>$nl<TD align=left>${dl[dls]}</TD>$nl<TD align=center>${dc[dls]}</TD>$nl<TD align=right>${dr[dls]}</TD>$nl</TR>"
 done
 print -r -- "</TABLE>"
 print -r -- "<P>"

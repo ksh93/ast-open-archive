@@ -4,7 +4,7 @@ ast-base :PACKAGE: \
 		libz tests 3d coshell cpp cs mam msgcc nmake probe ss \
 		libcoshell libcs libmam libpp
 
-:COVERS: ast-ksh
+:COVERS: ast-ksh ast-ast
 
 :CATEGORY: devel libs shells
 

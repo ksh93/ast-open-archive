@@ -39,7 +39,7 @@ mount3d(const char* aspc, char* path, int mode, void* a4, void* a5, void* a6)
 	int			oerrno;
 	unsigned long		x;
 
-	if (!spc && !path && !mode) return(0);
+	if ((!spc || !*spc) && (!path || !*path) && !mode) return(0);
 	if (mode & FS3D_ALL)
 	{
 		initialize();

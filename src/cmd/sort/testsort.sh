@@ -107,7 +107,7 @@ trap "cd ..; rm -rf $TMP; exit" 0 1 2 13 15
 rm -rf $TMP
 if	mkdir $TMP
 then	cd $TMP
-else	echo "mkdir $TMP failed"
+else	echo "mkdir $TMP FAILED"
 	exit 1
 fi
 
@@ -172,13 +172,13 @@ cat >xsort <<!
 		if test -f out
 		then
 			cmp -s xx out >/dev/null && exit 0
-			echo \$TEST\$X comparison failed
+			echo \$TEST\$X comparison FAILED
 		else
 			test "\`$SUM <in\`" = "\`$SUM <xx\`" && exit 0
-			echo \$TEST\$X checksum failed
+			echo \$TEST\$X checksum FAILED
 		fi
 	else
-		echo \$TEST\$X failed
+		echo \$TEST\$X FAILED
 	fi
 	exit 1
 !
@@ -209,7 +209,7 @@ chmod +x ysort
 # lines in "file" differs from "count"
 
 cat >linecount <<'!'
-$AWK 'END{ if(NR!='$3') print "'$TEST$1' failed" }' $2
+$AWK 'END{ if(NR!='$3') print "'$TEST$1' FAILED" }' $2
 !
 chmod +x linecount
 
@@ -345,11 +345,11 @@ a
 !
 rm -f out -o
 
-$SORT -c in 2>/dev/null && echo ${TEST}A failed
+$SORT -c in 2>/dev/null && echo ${TEST}A FAILED
 
 ./xsort B || echo ${TEST}B $SUM is probably unsuitable - see comments
 
-$o $SORT -o in +0 in || echo ${TEST}C failed
+$o $SORT -o in +0 in || echo ${TEST}C FAILED
 
 #---------------------------------------------------------------
 TEST=02; echo $TEST	"output from -c"
@@ -358,12 +358,12 @@ x
 y
 !
 
-$SORT -cr in >out 2>xx && echo ${TEST}A failed
-test -s out && echo ${TEST}B failed
+$SORT -cr in >out 2>xx && echo ${TEST}A FAILED
+test -s out && echo ${TEST}B FAILED
 test -s xx || echo option -c is quiet "(legal, not classical)"
 
-$SORT -c /dev/null 2>xx || echo ${TEST}C failed
-test -s xx && echo ${TEST}D failed
+$SORT -c /dev/null 2>xx || echo ${TEST}C FAILED
+test -s xx && echo ${TEST}D FAILED
 
 #---------------------------------------------------------------
 TEST=03; echo $TEST	"-n"
@@ -407,9 +407,9 @@ cp in out
 ./xsort A -b
 
 cat in | $SORT | cat >xx
-cmp -s xx out >/dev/null || echo ${TEST}B failed
+cmp -s xx out >/dev/null || echo ${TEST}B FAILED
 
-$SORT in | $SORT -cr 2>/dev/null && echo ${TEST}C failed
+$SORT in | $SORT -cr 2>/dev/null && echo ${TEST}C FAILED
 
 #---------------------------------------------------------------
 TEST=05; echo $TEST	"fields, reverse fields, -c status return"
@@ -436,7 +436,7 @@ $o ./xsort B +1 -2 +2r
 
 ./xsort F -k 2,2 -k 1,1 -k 3
 
-$SORT -c -k 2 in 2>/dev/null && ${TEST}G failed
+$SORT -c -k 2 in 2>/dev/null && ${TEST}G FAILED
 
 #---------------------------------------------------------------
 TEST=06; echo $TEST	"-t"
@@ -554,7 +554,7 @@ ca
 !
 
 $SORT -m in in1 >xx
-cmp -s xx out >/dev/null || echo ${TEST}A failed
+cmp -s xx out >/dev/null || echo ${TEST}A FAILED
 
 #---------------------------------------------------------------
 TEST=11; echo $TEST	"multiple files, -o overwites input, -m, -mu"
@@ -571,7 +571,7 @@ $SORT -o in -mu in in in in in in in in in in in in in in in in in
 ./linecount B in 4
 $SORT -o in -m  in in in in in in in in in in in in in in in in in
 
-cmp -s in xx >/dev/null || echo ${TEST}C failed
+cmp -s in xx >/dev/null || echo ${TEST}C FAILED
 
 #---------------------------------------------------------------
 TEST=12; echo $TEST	"does -mu pick the first among equals?"
@@ -625,7 +625,7 @@ rm -f out
 # next test is unclean: xx is a hidden side-effect of xsort
 
 $AWK '
-	$0 < x { print "test '${TEST}C' failed"; exit }
+	$0 < x { print "test '${TEST}C' FAILED"; exit }
 	"X" $0 != "X" x { print >"out"; x = $0 }
 ' xx
 
@@ -657,7 +657,7 @@ $X ./xsort G -u -r $y -Xread
 $X cat in | $X ./xsort - H -u -r $y -Xread
 
 $SORT -r -u -m -o in1 in1
-cmp -s in1 out >/dev/null || echo ${TEST}I failed
+cmp -s in1 out >/dev/null || echo ${TEST}I FAILED
 rm in in1 out
 
 #---------------------------------------------------------------
@@ -666,11 +666,11 @@ $AWK 'BEGIN { for(i=-100; i<=100; i+=2) printf "%.10d\n", i }' >in </dev/null
 
 $AWK 'BEGIN { for(i=-99; i<=100; i+=2) print i }' </dev/null |
 	 $SORT -nr in - >xx
-$AWK '$0+0 != 101-NR { print "'${TEST}A' failed"; exit }' xx
+$AWK '$0+0 != 101-NR { print "'${TEST}A' FAILED"; exit }' xx
 
 $AWK 'BEGIN { for(i=-99; i<=100; i+=2) print i }' </dev/null |
 	 $SORT -mn - in >xx
-$AWK '$0+0 != -101+NR { print "'${TEST}B' failed"; exit }' xx
+$AWK '$0+0 != -101+NR { print "'${TEST}B' FAILED"; exit }' xx
 
 #---------------------------------------------------------------
 TEST=17; echo $TEST	"-d, fields without end, modifier override"
@@ -807,8 +807,8 @@ main() { printf("\n%cb\n%ca\n",0,0); return 0; }
 $CC -o xx.exe xx.c
 ./xx.exe >in
 $SORT -u in >xx
-cmp -s in xx >/dev/null && echo ${TEST}A failed
-test "`wc -c <in`" = "`wc -c <xx`" || echo ${TEST}B failed
+cmp -s in xx >/dev/null && echo ${TEST}A FAILED
+test "`wc -c <in`" = "`wc -c <xx`" || echo ${TEST}B FAILED
 rm -f xx.c xx.o xx.exe
 
 #---------------------------------------------------------------
@@ -834,11 +834,11 @@ TEST=23; echo $TEST	"empty file, compact -o"
 echo hi >xx
 
 $SORT -oxx </dev/null
-cmp -s xx /dev/null >/dev/null || echo ${TEST}A failed
+cmp -s xx /dev/null >/dev/null || echo ${TEST}A FAILED
 
-$SORT -c </dev/null || echo ${TEST}B failed
+$SORT -c </dev/null || echo ${TEST}B FAILED
 
-$SORT -cu </dev/null || echo ${TEST}C failed
+$SORT -cu </dev/null || echo ${TEST}C FAILED
 
 #---------------------------------------------------------------
 TEST=24; echo $TEST	"many fields"
@@ -897,21 +897,21 @@ cat >in <<!
 24:17:05:07:05:11:05:20    ba
 !
 $SORT -k2b -k2 in >xx  
-	$SORT -c -t: -k2n xx 2>/dev/null || echo ${TEST}A failed
+	$SORT -c -t: -k2n xx 2>/dev/null || echo ${TEST}A FAILED
 $SORT -k2,2.1b -k2 in >xx  
-	$SORT -c -t: -k3n xx 2>/dev/null || echo ${TEST}B failed
+	$SORT -c -t: -k3n xx 2>/dev/null || echo ${TEST}B FAILED
 $SORT -k2.3 -k2 in >xx  
-	$SORT -c -t: -k4n xx 2>/dev/null || echo ${TEST}C failed
+	$SORT -c -t: -k4n xx 2>/dev/null || echo ${TEST}C FAILED
 $SORT -k2b,2.3 -k2 in >xx  
-	$SORT -c -t: -k5n xx 2>/dev/null || echo ${TEST}D failed
+	$SORT -c -t: -k5n xx 2>/dev/null || echo ${TEST}D FAILED
 $SORT -k2.3,2.1b -k2 in >xx  
-	$SORT -c -t: -k6n xx 2>/dev/null || echo ${TEST}E failed
+	$SORT -c -t: -k6n xx 2>/dev/null || echo ${TEST}E FAILED
 $SORT -k2,2.1b -k2r in >xx  
-	$SORT -c -t: -k7n xx 2>/dev/null || echo ${TEST}F failed
+	$SORT -c -t: -k7n xx 2>/dev/null || echo ${TEST}F FAILED
 $SORT -b -k2,2 -k2 in >xx  
-	$SORT -c -t: -k8n xx 2>/dev/null || echo ${TEST}G failed
+	$SORT -c -t: -k8n xx 2>/dev/null || echo ${TEST}G FAILED
 $SORT -b -k2,2b -k2 in >xx 			# perhaps same as G
-	$SORT -c -t: -k3n xx 2>/dev/null || echo ${TEST}H failed\
+	$SORT -c -t: -k3n xx 2>/dev/null || echo ${TEST}H FAILED\
  "(standard is not clear on this)"
 
 #---------------------------------------------------------------
@@ -932,8 +932,8 @@ cp in out
 TEST=27; echo $TEST	"displaced -o"
 rm -f out
 
-$O $SORT /dev/null -o out || $o echo ${TEST}B failed
-$O test -f out || $O echo ${TEST}C failed
+$O $SORT /dev/null -o out || $o echo ${TEST}B FAILED
+$O test -f out || $O echo ${TEST}C FAILED
 
 #---------------------------------------------------------------
 TEST=28; echo $TEST	"apparently nonmonotone field specs"
@@ -955,8 +955,8 @@ x
 !
 rm -f out -c
 
-$SORT -- -k </dev/null >xx || echo ${TEST}A argument failed
-cmp -s xx -k || echo ${TEST}A comparison failed
+$SORT -- -k </dev/null >xx || echo ${TEST}A argument FAILED
+cmp -s xx -k || echo ${TEST}A comparison FAILED
 
 cat >in <<!
 xxx
@@ -966,8 +966,8 @@ xxx
 >in1
 
 $SORT -- -o in1 - <in >out
-cmp -s in out >/dev/null || echo ${TEST}C failed
-test -s in1 && echo ${TEST}D failed
+cmp -s in out >/dev/null || echo ${TEST}C FAILED
+test -s in1 && echo ${TEST}D FAILED
 
 #---------------------------------------------------------------
 TEST=30; echo $TEST	"missing newline"
@@ -1126,7 +1126,7 @@ x
 
 $g ./xsort A -g
 
-$g $SORT -gu in >xx && $g $SORT -c -gu xx || echo ${TEST}B failed
+$g $SORT -gu in >xx && $g $SORT -c -gu xx || echo ${TEST}B FAILED
 $g ./linecount C xx 3
 
 #---------------------------------------------------------------
@@ -1169,7 +1169,7 @@ c 2
 !
 
 $s $SORT -su -k1,1 in in in1 in1 >xx
-$s cmp -s xx out >/dev/null || echo ${TEST}A failed
+$s cmp -s xx out >/dev/null || echo ${TEST}A FAILED
 
 cat >out <<!
 c 1
@@ -1178,7 +1178,7 @@ a 1
 !
 
 $s $SORT -sru -k1,1 in in in1 in1 >xx
-$s cmp -s xx out >/dev/null || echo ${TEST}B failed
+$s cmp -s xx out >/dev/null || echo ${TEST}B FAILED
 
 #---------------------------------------------------------------
 TEST=38; echo $TEST	"-s"
@@ -1194,7 +1194,7 @@ $s $AWK '
 $s $SORT -m -s -k1,1n in in1 >out
 
 $s $AWK '
-	func stop()	{ print "'$TEST' failed"; exit }
+	func stop()	{ print "'$TEST' FAILED"; exit }
 	$1!=last1 	{ if(count!=last1 || $2!=2) stop();
 			  count = 0}
 	$1==last1 && $2!=last2 { if(count!=last1 || $2!=1) stop();

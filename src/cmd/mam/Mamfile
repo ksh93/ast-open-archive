@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -56,22 +56,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamdag.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat mamdag.sh
+exec - 		cat - mamdag.sh <<'!'
+exec - 
+exec - !
 exec - 		} > mamdag
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat mamdag.sh
-exec - 	} > mamdag
+exec - *)	cat - mamdag.sh > mamdag <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x mamdag
@@ -95,22 +92,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamdot.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat mamdot.sh
+exec - 		cat - mamdot.sh <<'!'
+exec - 
+exec - !
 exec - 		} > mamdot
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat mamdot.sh
-exec - 	} > mamdot
+exec - *)	cat - mamdot.sh > mamdot <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x mamdot
@@ -134,22 +128,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamexec.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat mamexec.sh
+exec - 		cat - mamexec.sh <<'!'
+exec - 
+exec - !
 exec - 		} > mamexec
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat mamexec.sh
-exec - 	} > mamexec
+exec - *)	cat - mamexec.sh > mamexec <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x mamexec
@@ -252,8 +243,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast
 done mamnew.o generated
 bind -lmam
 bind -last
-bind -lm dontcare
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamnew mamnew.o ${mam_libmam} ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamnew mamnew.o ${mam_libmam} ${mam_libast}
 done mamnew generated
 make mamold
 make mamold.o
@@ -266,7 +256,7 @@ done mamold.c
 prev mamold.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c mamold.c
 done mamold.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamold mamold.o ${mam_libmam} ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamold mamold.o ${mam_libmam} ${mam_libast}
 done mamold generated
 make mamsh
 make mamsh.sh
@@ -287,22 +277,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < mamsh.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat mamsh.sh
+exec - 		cat - mamsh.sh <<'!'
+exec - 
+exec - !
 exec - 		} > mamsh
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat mamsh.sh
-exec - 	} > mamsh
+exec - *)	cat - mamsh.sh > mamsh <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x mamsh
@@ -317,7 +304,7 @@ done mamstate.c
 prev mamstate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c mamstate.c
 done mamstate.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamstate mamstate.o ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamstate mamstate.o ${mam_libast}
 done mamstate generated
 make ../../../bin
 exec - set -

@@ -17,6 +17,10 @@ function DATA
 			do	print $i
 			done
 			;;
+		a.dat)	print a
+			;;
+		b.dat)	print b
+			;;
 		esac > $f
 	done
 }
@@ -46,3 +50,41 @@ TEST 01 'basic'
 	EXEC	-6c 100.dat
 	EXEC	-c +287 100.dat
 	EXEC	+287c 100.dat
+
+TEST 02 'headers'
+	DO	DATA a.dat b.dat
+	EXEC	a.dat
+		OUTPUT - $'a'
+	EXEC	-v a.dat
+		OUTPUT - $'==> a.dat <==\na'
+	EXEC	a.dat b.dat
+		OUTPUT - $'==> a.dat <==\na\n\n==> b.dat <==\nb'
+	EXEC	-v a.dat b.dat
+	EXEC	-h a.dat
+		OUTPUT - $'a'
+	EXEC	-h a.dat b.dat
+		OUTPUT - $'a\nb'
+
+TEST 03 'timeouts'
+	DO	DATA a.dat b.dat
+	EXEC	-f -t 2 a.dat
+		OUTPUT - $'a'
+		ERROR - $'tail: warning: a.dat: 2.00s timeout'
+	EXEC	-f -t 2 a.dat b.dat
+		OUTPUT - $'==> a.dat <==\na\n\n==> b.dat <==\nb'
+		ERROR - $'tail: warning: a.dat: 2.00s timeout\ntail: warning: b.dat: 2.00s timeout'
+	EXEC	-s -f -t 2 a.dat
+		OUTPUT - $'a'
+		ERROR -
+	EXEC	-s -f -t 2 a.dat b.dat
+		OUTPUT - $'==> a.dat <==\na\n\n==> b.dat <==\nb'
+	EXEC	-h -s -f -t 2 a.dat
+		OUTPUT - $'a'
+	EXEC	-h -s -f -t 2 a.dat b.dat
+		OUTPUT - $'a\nb'
+	EXEC	-h -f -t 2 a.dat
+		OUTPUT - $'a'
+		ERROR - $'tail: warning: a.dat: 2.00s timeout'
+	EXEC	-h -f -t 2 a.dat b.dat
+		OUTPUT - $'a\nb'
+		ERROR - $'tail: warning: a.dat: 2.00s timeout\ntail: warning: b.dat: 2.00s timeout'

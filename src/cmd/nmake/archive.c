@@ -74,10 +74,7 @@ walkar(register Ardir_t* ar, struct dir* d, char* name)
 		if (d)
 		{
 			if (ent->mtime > ar->st.st_mtime)
-			{
-				error(1, "member %s is newer than archive %s", ent->name, name);
-				ent->mtime = ar->st.st_mtime;
-			}
+				message((-1, "member %s is newer than archive %s", ent->name, name));
 			addfile(d, ent->name, ent->mtime);
 		}
 		else if ((r = getrule(ent->name)) && r->status == TOUCH)

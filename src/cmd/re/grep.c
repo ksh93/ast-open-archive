@@ -24,7 +24,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Labs Research) 2002-10-10 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Labs Research) 2003-08-25 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -502,7 +502,7 @@ main(int argc, char** argv)
 
 	NoP(argc);
 	state.match = 1;
-	state.options = REG_NOSUB|REG_NULL;
+	state.options = REG_FIRST|REG_NOSUB|REG_NULL;
 	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
 		state.options |= REG_LENIENT;
 	if (s = strrchr(argv[0], '/'))
@@ -576,8 +576,17 @@ main(int argc, char** argv)
 				if (*s)
 					error(3, "%s: invalid characters after test", s);
 				break;
+			case 'f':
+				state.options |= REG_FIRST;
+				break;
+			case 'l':
+				state.options |= REG_LEFT;
+				break;
 			case 'n':
 				state.buffer.noshare = 1;
+				break;
+			case 'r':
+				state.options |= REG_RIGHT;
 				break;
 			default:
 				error(3, "%s: unknown test", s);
@@ -590,7 +599,7 @@ main(int argc, char** argv)
 		case 'a':
 			break;
 		case 'b':
-			state.options &= ~REG_NOSUB;
+			state.options &= ~(REG_FIRST|REG_NOSUB);
 			break;
 		case 'c':
 			state.count = 1;
@@ -652,10 +661,10 @@ main(int argc, char** argv)
 			error(3, "no pattern");
 		addstring(&state.pattern, *argv++);
 	}
-	if (!(state.options & REG_NOSUB))
+	if (!(state.options & (REG_FIRST|REG_NOSUB)))
 	{
 		if (state.count || state.list || state.query || (state.options & REG_INVERT))
-			state.options |= REG_NOSUB;
+			state.options |= REG_FIRST|REG_NOSUB;
 		else
 		{
 			state.pos = state.posvec;

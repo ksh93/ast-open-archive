@@ -1,4 +1,8 @@
-03-05-27 main.c: add -C, --codeset={a,e,i,o,n}
+03-09-06 main.c: add -Z, --zd, --zoned-decimal
+03-09-04 main.c: change -R to --record=format | --recfmt=format
+03-08-31 main.c: -l implemented by rslib()
+03-08-15 main.c: add -J, --shuffle=seed
+03-05-27 main.c: add -C, --codeset={a,e,i,o,n}, -p, --bcd, --packed-decimal
 03-05-23 main.c: add -R, --reclen=reclen
 03-03-11 testsort.sh: initialize $CC from :TEST: TESTCC state var
 03-03-07 Makefile: +lsort for now

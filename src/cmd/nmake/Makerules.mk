@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2003-06-21 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2003-09-22 $"
 
 /*
  * handy attributes
@@ -361,7 +361,7 @@ end
  * special symbols
  */
 
-.BUILT. = $(...:T=XU:T=F:P=L:N!=/*$(.INSTALL.LIST.:@/ /|/G:/^./|&/)$(VROOT:?|$(VROOT)/*??)$(-global:@/:/|/G:/^./|&/):T=G)
+.BUILT. = $(...:T=XU:T=F:P=L:N!=/*$(.INSTALL.LIST.:@/ /|/G:/^./|&/)$(VROOT:?|$(VROOT)/*??)$(-global:@/:/|/G:/^./|&/)|$(CATALOG).msg:T=G)
 .CLOBBER. = $(".":L=*.([it]i|l[hn])) core
 .FILES. = $(LICENSEFILE)
 .MANIFEST.FILES. = $(*.COMMON.SAVE:T=F) $(.SELECT.:A!=.ARCHIVE|.COMMAND|.OBJECT)
@@ -884,22 +884,19 @@ end
 		*)	{
 			i=`(read x; echo $x) < $(>)`
 			case $i in
-			'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+			'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 			esac
-			echo $(&:T=E:Q)
-			cat $(>)
+			cat - $(>) <<'!'
+	$(&:T=E)
+	!
 			} > $(<)
 			;;
 		esac
 		;;
-	*)	{
-		echo '$(SHELLMAGIC)'
-		case $(&:T=E:@O!) in
-		0)	;;
-		*)	echo $(&:T=E:Q) ;;
-		esac
-		cat $(>)
-		} > $(<)
+	*)	cat - $(>) > $(<) <<'!'
+	$(SHELLMAGIC)
+	$(&:T=E)
+	!
 		;;
 	esac
 	$(CHMOD) u+w,+x $(<)
@@ -1280,7 +1277,9 @@ end
 		print $(D:W=P=$(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE))
 		exit 0
 	end
-	D := $(D:W=R=$(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE))
+	if D == "."
+		D := $(D:W=R=$(.RECURSE.ARGS.:A!=.ONOBJECT:N!=.RECURSE))
+	end
 	if recurse == "list"
 		print $(D:/ /$("\n")/G)
 		exit 0

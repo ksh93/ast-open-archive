@@ -29,7 +29,22 @@
 **	Written by Kiem-Phong Vo (07/08/96).
 */
 
-#define RESERVE(f,rsrv,endrsrv,cur,w) \
+#define NOTIFY(rs,r,rsrv,endrsrv,cur,out,n) \
+	do { \
+		for (;;) \
+		{ \
+			out.data = cur; \
+			out.datalen = n = endrsrv - cur; \
+			if (rsnotify(rs, RS_WRITE, r, &out, rs->disc) < 0) \
+				return -1; \
+			if (n >= out.datalen) \
+				break; \
+			RESERVE(rs,f,rsrv,endrsrv,cur,out.datalen); \
+		} \
+		cur += out.datalen; \
+	} while (0)
+
+#define RESERVE(rs,f,rsrv,endrsrv,cur,w) \
 	{ reg ssize_t rw; \
 	  if((endrsrv-cur) < w) \
 	  { if(rsrv && sfwrite(f,rsrv,cur-rsrv) != cur-rsrv) return -1; \
@@ -42,7 +57,10 @@
 	  } \
 	}
 
-#define WRITE(to,fr,len,t)	{ t = (fr); MEMCPY(to,t,len); }
+#define WRITE(rs,to,fr,len,t)	{ \
+		t = (fr); \
+		MEMCPY(to,t,len); \
+	}
 
 #if __STD_C
 int rswrite(Rs_t* rs, Sfio_t* f, int type)
@@ -56,7 +74,8 @@ int	type;	/* RS_TEXT 		*/
 	reg Rsobj_t	*r, *e, *o;
 	reg uchar	*d, *cur, *endrsrv, *rsrv;
 	ssize_t		w, head, n;
-	int		local, flags;
+	int		local, flags, u;
+	Rsobj_t		out;
 
 	if(GETLOCAL(rs,local))
 	{	rsrv = rs->rsrv; endrsrv = rs->endrsrv; cur = rs->cur;
@@ -76,28 +95,38 @@ int	type;	/* RS_TEXT 		*/
 	head = (rs->type&RS_DSAMELEN) ? 0 : sizeof(ssize_t);
 
 	if(type&RS_TEXT) /* write in plain text */
-	{	if((rs->type&RS_UNIQ) && (rs->events & RS_SUMMARY))
+	{	u = (rs->events & RS_WRITE) != 0;
+		if((rs->type&RS_UNIQ) && (rs->events & RS_SUMMARY))
 		{	for(; r; r = r->right)
-			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,rs->disc) < 0)
+			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,0,rs->disc) < 0)
 					return -1;
 				w = r->datalen;
-				RESERVE(f,rsrv,endrsrv,cur,w);
-				WRITE(cur,r->data,w,d);
+				RESERVE(rs,f,rsrv,endrsrv,cur,w);
+				if (u)
+					NOTIFY(rs,r,rsrv,endrsrv,cur,out,n);
+				else
+					WRITE(rs,cur,r->data,w,d);
 			}
 		}
 		else if(local || (rs->type&RS_UNIQ) )
 		{	if(head)
 			{	for(; r; r = r->right)
 				{	w = r->datalen;
-					RESERVE(f,rsrv,endrsrv,cur,w);
-					WRITE(cur,r->data,w,d);
+					RESERVE(rs,f,rsrv,endrsrv,cur,w);
+					if (u)
+						NOTIFY(rs,r,rsrv,endrsrv,cur,out,n);
+					else
+						WRITE(rs,cur,r->data,w,d);
 				}
 			}
 			else
 			{	w = r->datalen;
 				for(; r; r = r->right)
-				{	RESERVE(f,rsrv,endrsrv,cur,w);
-					WRITE(cur,r->data,w,d);
+				{	RESERVE(rs,f,rsrv,endrsrv,cur,w);
+					if (u)
+						NOTIFY(rs,r,rsrv,endrsrv,cur,out,n);
+					else
+						WRITE(rs,cur,r->data,w,d);
 				}
 			}
 		}
@@ -105,23 +134,35 @@ int	type;	/* RS_TEXT 		*/
 		{	if(head)
 			{	for(; r; r = r->right)
 				{	w = r->datalen;
-					RESERVE(f,rsrv,endrsrv,cur,w);
-					WRITE(cur,r->data,w,d);
+					RESERVE(rs,f,rsrv,endrsrv,cur,w);
+					if (u)
+						NOTIFY(rs,r,rsrv,endrsrv,cur,out,n);
+					else
+						WRITE(rs,cur,r->data,w,d);
 					for(e = r->equal; e; e = e->right)
 					{	w = e->datalen;
-						RESERVE(f,rsrv,endrsrv,cur,w);
-						WRITE(cur,e->data,w,d);
+						RESERVE(rs,f,rsrv,endrsrv,cur,w);
+						if (u)
+							NOTIFY(rs,e,rsrv,endrsrv,cur,out,n);
+						else
+							WRITE(rs,cur,e->data,w,d);
 					}
 				}
 			}
 			else
 			{	w = r->datalen;
 				for(; r; r = r->right)
-				{	RESERVE(f,rsrv,endrsrv,cur,w);
-					WRITE(cur,r->data,w,d);
+				{	RESERVE(rs,f,rsrv,endrsrv,cur,w);
+					if (u)
+						NOTIFY(rs,r,rsrv,endrsrv,cur,out,n);
+					else
+						WRITE(rs,cur,r->data,w,d);
 					for(e = r->equal; e; e = e->right)
-					{	RESERVE(f,rsrv,endrsrv,cur,w);
-						WRITE(cur,e->data,w,d);
+					{	RESERVE(rs,f,rsrv,endrsrv,cur,w);
+						if (u)
+							NOTIFY(rs,e,rsrv,endrsrv,cur,out,n);
+						else
+							WRITE(rs,cur,e->data,w,d);
 					}
 				}
 			}
@@ -140,34 +181,34 @@ int	type;	/* RS_TEXT 		*/
 		n = -n;
 	write_size:
 		if(n != 0)
-		{	RESERVE(f,rsrv,endrsrv,cur,sizeof(ssize_t));
-			WRITE(cur,(uchar*)(&n),sizeof(ssize_t),d);
+		{	RESERVE(rs,f,rsrv,endrsrv,cur,sizeof(ssize_t));
+			WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
 		}
 
-		if((rs->type&RS_UNIQ) && (rs->disc->events & RS_SUMMARY))
+		if((rs->type&RS_UNIQ) && (rs->events & RS_SUMMARY))
 		{	for(; r; r = r->right)
-			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,rs->disc) < 0)
+			{	if(r->equal && RSNOTIFY(rs,RS_SUMMARY,r,0,rs->disc) < 0)
 					return -1;
 				w = (n = r->datalen) + head;
-				RESERVE(f,rsrv,endrsrv,cur,w);
+				RESERVE(rs,f,rsrv,endrsrv,cur,w);
 				if(head)
-					WRITE(cur,(uchar*)(&n),sizeof(ssize_t),d);
-				WRITE(cur,r->data,n,d);
+					WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
+				WRITE(rs,cur,r->data,n,d);
 			}
 		}
 		else if(head)
 		{	for(; r; r = r->right)
 			{	w = (n = r->datalen) + head;
-				RESERVE(f,rsrv,endrsrv,cur,w);
-				WRITE(cur,(uchar*)(&n),sizeof(ssize_t),d);
-				WRITE(cur,r->data,n,d);
+				RESERVE(rs,f,rsrv,endrsrv,cur,w);
+				WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
+				WRITE(rs,cur,r->data,n,d);
 			}
 		}
 		else
 		{	w = r->datalen;
 			for(; r; r = r->right)
-			{	RESERVE(f,rsrv,endrsrv,cur,w);
-				WRITE(cur,r->data,w,d);
+			{	RESERVE(rs,f,rsrv,endrsrv,cur,w);
+				WRITE(rs,cur,r->data,w,d);
 			}
 		}
 	}
@@ -185,11 +226,11 @@ int	type;	/* RS_TEXT 		*/
 			}
 
 			w = r->datalen + head + sizeof(ssize_t);
-			RESERVE(f,rsrv,endrsrv,cur,w);
-			WRITE(cur,(uchar*)(&n),sizeof(ssize_t),d);
+			RESERVE(rs,f,rsrv,endrsrv,cur,w);
+			WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
 			if(head)
-				WRITE(cur,(uchar*)(&r->datalen),sizeof(ssize_t),d);
-			WRITE(cur,r->data,r->datalen,d);
+				WRITE(rs,cur,(uchar*)(&r->datalen),sizeof(ssize_t),d);
+			WRITE(rs,cur,r->data,r->datalen,d);
 
 			if((o = r->equal) )
 				r = r->right;
@@ -200,16 +241,16 @@ int	type;	/* RS_TEXT 		*/
 			if(head)
 			{	for(; o != e; o = o->right)
 				{	w = (n = o->datalen) + sizeof(ssize_t);
-					RESERVE(f,rsrv,endrsrv,cur,w);
-					WRITE(cur,(uchar*)(&n),sizeof(ssize_t),d);
-					WRITE(cur,o->data,n,d);
+					RESERVE(rs,f,rsrv,endrsrv,cur,w);
+					WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
+					WRITE(rs,cur,o->data,n,d);
 				}
 			}
 			else
 			{	w = o->datalen;
 				for(; o != e; o = o->right)
-				{	RESERVE(f,rsrv,endrsrv,cur,w);
-					WRITE(cur,o->data,w,d);
+				{	RESERVE(rs,f,rsrv,endrsrv,cur,w);
+					WRITE(rs,cur,o->data,w,d);
 				}
 			}
 		}

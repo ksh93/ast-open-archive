@@ -35,7 +35,7 @@
  * stripped down printf -- only { %c %[l[l]][dopux] %s }
  */
 
-int
+ssize_t
 bvprintf(char** buf, char* end, register const char* format, va_list ap)
 {
 	register int	c;
@@ -48,6 +48,7 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 	int		r;
 	long		n;
 	unsigned long	u;
+	ssize_t		z;
 #ifdef _ast_int8_t
 	_ast_int8_t		q;
 	unsigned _ast_int8_t	v;
@@ -350,18 +351,18 @@ bvprintf(char** buf, char* end, register const char* format, va_list ap)
 	if (p < e) *p = 0;
 	if (buf)
 	{
-		c = p - *buf;
+		z = p - *buf;
 		*buf = p;
 	}
-	else c = p - end;
-	return(c);
+	else z = p - end;
+	return(z);
 }
 
 int
 bprintf(char** buf, char* end, const char* format, ...)
 {
 	va_list	ap;
-	int	n;
+	ssize_t	n;
 
 	va_start(ap, format);
 	n = bvprintf(buf, end, format, ap);
@@ -369,8 +370,8 @@ bprintf(char** buf, char* end, const char* format, ...)
 	return(n);
 }
 
-int
-sfsprintf(char* buffer, int size, const char* format, ...)
+ssize_t
+sfsprintf(char* buffer, size_t size, const char* format, ...)
 {
 	va_list	ap;
 	char**	buf;

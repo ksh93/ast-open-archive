@@ -245,9 +245,9 @@ void
 initdelta(Archive_t* ap)
 {
 	if (!ap->delta && !(ap->delta = newof(0, Delta_t, 1, 0)))
-		error(3, "out of space [delta]");
+		nospace();
 	if (!ap->delta->tab && !(ap->delta->tab = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_name, "delta", 0)))
-		error(3, "out of space [delta table]");
+		nospace();
 }
 
 /*
@@ -374,7 +374,7 @@ deltaprefix(Archive_t* ip, Archive_t* op, register Member_t* d)
 		if (!(m = (Member_t*)hashget(ip->delta->tab, d->info->name)))
 		{
 			if (!(m = newof(0, Member_t, 1, 0)))
-				error(3, "out of space [member]");
+				nospace();
 			m->mark = 1;
 			hashput(ip->delta->tab, 0, m);
 		}
@@ -400,7 +400,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 		d->mark = 1;
 	if (op->delta && (op->delta->format == COMPRESS || op->delta->format == DELTA))
 	{
-		if (f->type == X_IFREG && f->linktype == NOLINK && (!d || f->st->st_mtime != d->mtime))
+		if (f->type == X_IFREG && f->linktype == NOLINK && (!d || f->st->st_mtime != d->mtime.tv_sec))
 		{
 			if (f->ordered)
 			{
@@ -440,12 +440,11 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 			if (ip)
 				fileskip(ip, f);
 			f->st->st_size = 0;
-message((-1, "AHA delta %s f %s d %s", f->name, fmtmode(f->st->st_mode, 0), fmtmode(d->mode, 0)));
 			if (f->delta.op == DELTA_update && f->type != X_IFREG && f->st->st_mode == d->mode)
-				f->st->st_mtime = d->mtime;
+				f->st->st_mtime = d->mtime.tv_sec;
 		}
 	}
-	if (!d || d->mtime != f->st->st_mtime)
+	if (!d || d->mtime.tv_sec != f->st->st_mtime)
 	{
 		register char*	s;
 
@@ -518,7 +517,7 @@ deltadelete(register Archive_t* ap)
 				{
 					ap->entries++;
 					ap->selected++;
-					initfile(ap, f, pos->bucket->name, X_IFREG);
+					initfile(ap, f, f->st, pos->bucket->name, X_IFREG);
 					f->delta.op = DELTA_delete;
 					putheader(ap, f);
 					puttrailer(ap, f);
@@ -665,7 +664,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 				else fileskip(ip, f);
 				break;
 			case DELTA_verify:
-				if (!f->delta.base || f->delta.base->mtime != f->st->st_mtime)
+				if (!f->delta.base || f->delta.base->mtime.tv_sec != f->st->st_mtime)
 					error(3, "%s: base archive mismatch [%s#%d]", f->name, __FILE__, __LINE__);
 			pass:
 				if (validout(op, f) && selectfile(op, f))
@@ -720,8 +719,8 @@ deltapass(Archive_t* ip, Archive_t* op)
 					op->entries++;
 					if (d->info->linktype == HARDLINK)
 					{
-						if (!(h = (Member_t*)hashget(ip->delta->tab, d->info->linkname)))
-							error(1, "%s: %s: %s: hard link not in base archive", ip->name, d->info->name, d->info->linkname);
+						if (!(h = (Member_t*)hashget(ip->delta->tab, d->info->linkpath)))
+							error(1, "%s: %s: %s: hard link not in base archive", ip->name, d->info->name, d->info->linkpath);
 						else if (!h->mark || h->info->delta.op == DELTA_delete)
 						{
 							h->info->name = d->info->name;
@@ -833,8 +832,6 @@ delwrite(void* buf, int n, Vdoff_t off, Vddisc_t* vd)
 	return write(dp->fd, buf, n);
 }
 
-#define DELTA_WINDOW		(128*1024L)
-
 /*
  * delta/update algorithm wrapper
  */
@@ -853,16 +850,10 @@ paxdelta(Archive_t* ip, Archive_t* ap, File_t* f, int op, ...)
 	Vdio_t*			gen = 0;
 	Vdio_t			data[3];
 
-	static int		bufferindex;
-	static int		buffersize = DELTA_WINDOW >> 1;
-
 #if DEBUG
 	static const char*	dataname[] = { "src", "tar", "del", "HUH" };
 #endif
 
-#if 0
-if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I*d", ip->name, ap->name, f->name, f->linktype, f->delta.op, f->ro, sizeof(f->st->st_size), f->st->st_size);
-#endif
 	va_start(vp, op);
 	if (ap && ap->delta)
 	{
@@ -986,12 +977,12 @@ if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I
 	if (!gen) error(PANIC, "paxdelta(): no DELTA_OUTPUT");
 	if (gen->pfd)
 	{
-		if (!(state.test & 020) && version != DELTA_88 && (state.buffer[bufferclash ? (bufferindex = !bufferindex) : bufferindex].base || (state.buffer[bufferindex].base = newof(0, char, buffersize, 0)) || (buffersize >>= 1) && (state.buffer[bufferindex].base = newof(0, char, buffersize, 0))))
+		if (!(state.test & 020) && version != DELTA_88 && (state.buffer[bufferclash ? (state.delta.bufferindex = !state.delta.bufferindex) : state.delta.bufferindex].base || (state.buffer[state.delta.bufferindex].base = newof(0, char, state.delta.buffersize, 0)) || (state.delta.buffersize >>= 1) && (state.buffer[state.delta.bufferindex].base = newof(0, char, state.delta.buffersize, 0))))
 		{
-			gen->fd = setbuffer(bufferindex);
+			gen->fd = setbuffer(state.delta.bufferindex);
 			bp = getbuffer(gen->fd);
 			bp->next = bp->base;
-			bp->past = bp->base + buffersize;
+			bp->past = bp->base + state.delta.buffersize;
 		}
 		else if ((gen->fd = open(state.tmp.file, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
 			error(3, "%s: cannot create delta temporary file", state.tmp.file);
@@ -1024,7 +1015,7 @@ if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I
 					{
 					case DELTA_BIO:
 						if (!(data[op].vd.data = malloc(data[op].vd.size)))
-							error(3, "out of space [%s]", format[version].name);
+							nospace();
 						if (bread(data[op].bp, data[op].vd.data, data[op].vd.size, data[op].vd.size, 1) != data[op].vd.size)
 							error(3, "%s: delta bread error", f->name);
 						data[op].op &= ~DELTA_BIO;
@@ -1032,7 +1023,7 @@ if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I
 						break;
 					case DELTA_FD:
 						if (!(data[op].vd.data = malloc(data[op].vd.size)))
-							error(3, "out of space [%s]", format[version].name);
+							nospace();
 						if (data[op].base && lseek(data[op].fd, data[op].base, SEEK_SET) != data[op].base)
 							error(3, "%s: delta seek error", f->name);
 						if (read(data[op].fd, data[op].vd.data, data[op].vd.size) != data[op].vd.size)
@@ -1062,7 +1053,7 @@ if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I
 					{
 					case DELTA_BIO:
 						if (!(data[op].vd.data = malloc(data[op].vd.size)))
-							error(3, "out of space [%s]", format[version].name);
+							nospace();
 						if (bread(data[op].bp, data[op].vd.data, data[op].vd.size, data[op].vd.size, 1) != data[op].vd.size)
 							error(3, "%s: delta bread error", f->name);
 						/*FALLTHROUGH*/

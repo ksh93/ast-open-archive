@@ -36,6 +36,7 @@ ardiropen(const char* file, Ardirmeth_t* meth, int flags)
 {
 	Ardir_t*	ar;
 	char*		skip;
+	off_t		pos;
 	ssize_t		n = 0;
 	char		buf[1024];
 
@@ -48,7 +49,7 @@ ardiropen(const char* file, Ardirmeth_t* meth, int flags)
 		ardirclose(ar);
 		return 0;
 	}
-	if (ar->fd >= 0 && ((n = read(ar->fd, buf, sizeof(buf))) < 0 || lseek(ar->fd, (off_t)0, SEEK_SET)))
+	if (ar->fd >= 0 && ((pos = lseek(ar->fd, (off_t)0, SEEK_CUR)) < 0 || (n = read(ar->fd, buf, sizeof(buf))) < 0 || lseek(ar->fd, pos, SEEK_SET) != pos))
 	{
 		ardirclose(ar);
 		return 0;

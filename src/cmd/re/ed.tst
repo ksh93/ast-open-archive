@@ -147,3 +147,17 @@ TEST 06 '! command'
 		INPUT - $'!echo stderr >&2\n!!'
 		OUTPUT - $'"file" 0 lines, 0 characters\n!\necho stderr >&2\n!'
 		ERROR - $'stderr\nstderr'
+
+TEST 07 'REs'
+	EXEC file
+		NOTE 'remembered RE'
+		INPUT file $'foo 1\nfoo 2\nfoo 3'
+		INPUT - $'/foo\n//\n/'
+		OUTPUT - $'18\nfoo 1\nfoo 2\nfoo 3'
+
+TEST 08 '.'
+	EXEC file
+		NOTE '. before and after'
+		INPUT file $'1\n2\n3'
+		INPUT - $'.=\n1,$s/^/x/\n.=\n1\n1,$s/^/x/\n.=\ng/[12]/s/^/z/\n.=\nQ'
+		OUTPUT - $'6\n3\n3\nx1\n3\n2'

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -1017,28 +1017,25 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 385 in
+exec - "")	case 373 in
 exec - 	0)	cp 3d.sh 3d
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < 3d.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"' IDNAME='\""3d"\"' VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK='\""3d"\"' _BLD_3d=1
-exec - 		cat 3d.sh
+exec - 		cat - 3d.sh <<'!'
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
+exec - !
 exec - 		} > 3d
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 385 in
-exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE='\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"' IDNAME='\""3d"\"' VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK='\""3d"\"' _BLD_3d=1 ;;
-exec - 	esac
-exec - 	cat 3d.sh
-exec - 	} > 3d
+exec - *)	cat - 3d.sh > 3d <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x 3d
@@ -1063,22 +1060,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < opaque.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat opaque.sh
+exec - 		cat - opaque.sh <<'!'
+exec - 
+exec - !
 exec - 		} > opaque
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat opaque.sh
-exec - 	} > opaque
+exec - *)	cat - opaque.sh > opaque <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x opaque
@@ -1102,22 +1096,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < vex.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat vex.sh
+exec - 		cat - vex.sh <<'!'
+exec - 
+exec - !
 exec - 		} > vex
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat vex.sh
-exec - 	} > vex
+exec - *)	cat - vex.sh > vex <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x vex

@@ -1,3 +1,9 @@
+03-09-11 default output format now ustar -- should eventually be pax
+	 format rename: tar=>oldtar, ustar=>ustar|tar
+	 add --testdate=date regression test hook
+	 add --uid=id --gid=id
+03-09-10 private static cleanup
+03-09-09 xopen sync and { pax ustar } format fixes, <tv.h> interface
 03-06-21 format.c: add ccode conversion check to putheader()
 03-05-28 file.c: fix -vrw directory double list
 	 update to new <ccode.h> interface

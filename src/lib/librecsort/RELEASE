@@ -1,3 +1,10 @@
+03-09-18 rswrite.c: fix RS_WRITE exceptions
+03-09-06 rskey.c: add 'Z' key_z_code for zoned decimal
+03-09-04 rsprocess.c: rs->disc->data==-1 => ibm v format records
+03-09-03 rslib.c: rslib() separator expanded to [,\t\r\n]
+03-09-01 recsort.h: add rslib(), discipline stack, extra event arg
+03-08-29 recsort.h: add RS_READ and RS_WRITE events
+03-08-15 rskey.c: add -Jseed for random shuffle (jumble)
 03-05-27 rskey.c: add Ci[o] code set [conversion]
 03-05-26 rskey.c: add 'p' packed decimal (bcd)
 03-05-23 recsort.h: add Rskey_t.code for global ccode index

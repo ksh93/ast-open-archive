@@ -29,8 +29,12 @@
  * <mnt.h> based mount/umount
  */
 
+#include "FEATURE/unmount"
+
+#if _lib_mount && ( _lib_umount || _lib_unmount )
+
 static const char mount_usage[] =
-"[-?\n@(#)$Id: mount (AT&T Labs Research) 2002-02-02 $\n]"
+"[-?\n@(#)$Id: mount (AT&T Labs Research) 2003-07-29 $\n]"
 USAGE_LICENSE
 "[+NAME?mount - mount and display filesystems]"
 "[+DESCRIPTION?\bmount\b attaches a named filesystem \afs\a to the"
@@ -122,8 +126,6 @@ __STDPP__directive pragma pp:hide umount unmount
 #include <ast_fs.h>
 #include <sfstr.h>
 
-#include "FEATURE/unmount"
-
 #if _sys_mount
 #define mount		______mount
 #if __bsdi__ || __bsdi || bsdi
@@ -158,8 +160,6 @@ extern int	unmount(const char*);
 #ifndef MS_DATA
 #define MS_DATA		(1L<<28)
 #endif
-
-#ifdef MS_DATA
 
 #define MATCH_HOST	001
 #define MATCH_NOHOST	002

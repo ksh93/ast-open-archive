@@ -1,3 +1,4 @@
+03-09-17 ardir.c: rewind initial peek to open position in case its /dev/stdin
 03-04-05 ar-port.c: fix bug that skipped initial long name entry
 	 ar-port.c: handle netbsd.i386 ' <long-index>' vs. '/<long-index>'
 03-02-05 ar-port.c: handle solaris TYPE_port variation

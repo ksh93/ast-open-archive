@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -97,8 +97,7 @@ make features/lib
 done features/lib
 prev cs.req
 bind -last
-bind -lm dontcare
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} ${mam_libast} ${mam_libm} : run features/lib
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/lib
 done FEATURE/lib generated
 exec - cmp 2>/dev/null -s FEATURE/lib cs_lib.h || { rm -f cs_lib.h; silent test -d . || mkdir .; cp FEATURE/lib cs_lib.h; }
 done cs_lib.h dontcare generated
@@ -195,7 +194,7 @@ prev FEATURE/lib implicit
 prev ../../../include/ast/ast.h implicit
 done features/cs.c
 prev cs.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} ${mam_libast} ${mam_libm} : run features/cs.c
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/cs.c
 done FEATURE/cs generated
 exec - cmp 2>/dev/null -s FEATURE/cs ast_cs.h || { rm -f ast_cs.h; silent test -d . || mkdir .; cp FEATURE/cs ast_cs.h; }
 done ast_cs.h dontcare generated
@@ -596,22 +595,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < genlocal.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat genlocal.sh
+exec - 		cat - genlocal.sh <<'!'
+exec - 
+exec - !
 exec - 		} > genlocal
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat genlocal.sh
-exec - 	} > genlocal
+exec - *)	cat - genlocal.sh > genlocal <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x genlocal
@@ -635,22 +631,19 @@ exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < genshare.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo 
-exec - 		cat genshare.sh
+exec - 		cat - genshare.sh <<'!'
+exec - 
+exec - !
 exec - 		} > genshare
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 0 in
-exec - 	0)	;;
-exec - 	*)	echo  ;;
-exec - 	esac
-exec - 	cat genshare.sh
-exec - 	} > genshare
+exec - *)	cat - genshare.sh > genshare <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - 
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x genshare

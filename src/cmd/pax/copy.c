@@ -98,7 +98,6 @@ recordout(Archive_t* ap, File_t* f, Sfio_t* fp)
 	int		truncated = 0;
 
 	static char	span_out[] = "0132";
-	static char*	pardat;
 
 	if (!fp) error(3, "cannot handle record output from buffer");
 	ap->record = f;
@@ -146,7 +145,7 @@ recordout(Archive_t* ap, File_t* f, Sfio_t* fp)
 
 			if (partial)
 			{
-				memcpy(recdat, pardat, partial);
+				memcpy(recdat, f->record.partial, partial);
 				p += partial;
 				partial = 0;
 			}
@@ -184,9 +183,9 @@ recordout(Archive_t* ap, File_t* f, Sfio_t* fp)
 						 * save partial record for next block
 						 */
 
-						if (!pardat && !(pardat = newof(0, char, state.blocksize, 0)))
-							error(3, "out of space [record pushback buffer]");
-						memcpy(pardat, recdat, partial);
+						if (!f->record.partial && !(f->record.partial = newof(0, char, state.blocksize, 0)))
+							nospace();
+						memcpy(f->record.partial, recdat, partial);
 					}
 					p = rec;
 					goto eob;
@@ -262,7 +261,8 @@ recordout(Archive_t* ap, File_t* f, Sfio_t* fp)
 	}
  eof:
 	ap->record = 0;
-	if (truncated) error(1, "%s: %d out of %d record%s truncated", f->name, truncated, count, count == 1 ? "" : "s");
+	if (truncated)
+		error(1, "%s: %d out of %d record%s truncated", f->name, truncated, count, count == 1 ? "" : "s");
 }
 
 /*
@@ -388,7 +388,7 @@ fileout(register Archive_t* ap, register File_t* f)
 								n = 1024 * 8;
 								error(1, "EIO read error -- falling back to aligned reads");
 								if (!(buf = malloc(state.buffersize + n)))
-									error(ERROR_SYSTEM|3, "out of space [realign buffer]");
+									nospace();
 								buf += n - (((ssize_t)buf) & (n - 1));
 							}
 							if ((n = read(f->fd, buf, m)) > 0)
@@ -424,8 +424,14 @@ fileout(register Archive_t* ap, register File_t* f)
 		}
 		puttrailer(ap, f);
 	}
-	if (state.acctime && f->type != X_IFLNK && !f->skip)
-		settime(f->name, f->st->st_atime, f->st->st_mtime);
+	if (state.acctime && f->type != X_IFLNK && !f->skip && !f->extended)
+	{
+		Tv_t	av;
+		Tv_t	mv;
+
+		tvgetstat(f->st, &av, &mv, NiL);
+		settime(f->name, &av, &mv, NiL);
+	}
 }
 
 /*
@@ -740,7 +746,7 @@ filein(register Archive_t* ap, register File_t* f)
 		else paxdelta(NiL, ap, f, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT, wfd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ap, f->st->st_size, 0);
 		break;
 	case DELTA_update:
-		if (!f->delta.base || (unsigned long)f->delta.base->mtime >= (unsigned long)f->st->st_mtime)
+		if (!f->delta.base || (unsigned long)f->delta.base->mtime.tv_sec >= (unsigned long)f->st->st_mtime)
 			error(3, "%s: base archive mismatch [%s#%d]", f->name, __FILE__, __LINE__);
 		c = f->st->st_size;
 		if ((wfd = openout(ap, f)) < 0)
@@ -758,7 +764,7 @@ filein(register Archive_t* ap, register File_t* f)
 			paxdelta(NiL, ap, f, DELTA_SRC|DELTA_FD|DELTA_SIZE|DELTA_FREE, dfd, f->delta.base->expand, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT, wfd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ap, c, 0);
 		break;
 	case DELTA_verify:
-		if (!f->delta.base || f->delta.base->mtime != f->st->st_mtime)
+		if (!f->delta.base || f->delta.base->mtime.tv_sec != f->st->st_mtime)
 			error(3, "%s: base archive mismatch [%s#%d]", f->name, __FILE__, __LINE__);
 		if ((*state.statf)(f->name, &st))
 			error(2, "%s: not copied from base archive", f->name);
@@ -901,6 +907,7 @@ void
 fileskip(register Archive_t* ap, register File_t* f)
 {
 	Member_t*	d;
+	off_t		n;
 
 	if (ap->delta && (d = (Member_t*)hashget(ap->delta->tab, f->name)))
 		d->info->delta.op = DELTA_delete;
@@ -918,7 +925,7 @@ fileskip(register Archive_t* ap, register File_t* f)
 		break;
 #endif
 	default:
-		if (bread(ap, NiL, (off_t)0, f->st->st_size, 1) < 0)
+		if ((n = f->st->st_size) > 0 && (f->type == X_IFREG || (n = f->datasize)) && bread(ap, NiL, (off_t)0, n, 1) < 0)
 			error(ERROR_SYSTEM|2, "%s: skip error", f->name);
 		break;
 	}
@@ -932,19 +939,18 @@ fileskip(register Archive_t* ap, register File_t* f)
 int
 copyinout(Ftw_t* ftw)
 {
+	register File_t*	f = &state.out->file;
+	register char*		s;
 	register off_t		c;
 	register ssize_t	n;
 	register int		rfd;
 	register int		wfd;
-	register File_t*	f = &state.out->file;
-
-	static char		path[PATH_MAX];
 
 	if (getfile(state.out, f, ftw) && selectfile(state.out, f))
 	{
-		strcpy(path, state.pwd);
-		strcpy(path + state.pwdlen, f->name + (*f->name == '/'));
-		f->name = path;
+		s = f->name;
+		f->name = stash(&state.out->path.copy, NiL, state.pwdlen + f->namesize);
+		strcpy(strcopy(f->name, state.pwd), s + (*s == '/'));
 		if ((wfd = openout(state.out, f)) >= 0)
 		{
 			if ((rfd = openin(state.out, f)) >= 0)

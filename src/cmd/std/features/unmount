@@ -1,1 +1,1 @@
-lib	umount,unmount
+lib	mount,umount,unmount

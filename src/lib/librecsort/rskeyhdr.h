@@ -99,6 +99,7 @@ typedef struct
 
 #define _RSKEY_PRIVATE_ \
 	State_t*	state;		/* readonly state		*/ \
+	Rsdisc_t*	tail;		/* rslib() disc stack tail	*/ \
 	struct								   \
 	{								   \
 	Field_t		global;		/* global field info		*/ \
@@ -114,6 +115,7 @@ typedef struct
 	Field_t*	head;		/* accumulate list head		*/ \
 	Field_t*	tail;		/* accumulate list tail		*/ \
 	}		accumulate;	/* accumulate field info	*/ \
+	unsigned long	shuffle;	/* shuffle seed			*/ \
 	unsigned char	coded;		/* coded keys specified		*/
 
 #include "rshdr.h"

@@ -27,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ed (AT&T Labs Research) 2002-06-11 $\n]"
+"[-?\n@(#)$Id: ed (AT&T Labs Research) 2003-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ed - edit text]"
 "[+DESCRIPTION?\bed\b is a line-oriented text editor that has two modes:"
@@ -665,22 +665,26 @@ compile(void)
 
 	s = input(0);
 	if (*s) {
-		if (*s == *(s + 1))
-			input(2);
-		else {
-			if (ed.compiled) {
-				ed.compiled = 0;
-				regfree(&ed.re);
+		if (*(s + 1)) {
+			if (*s == *(s + 1))
+				input(2);
+			else {
+				if (ed.compiled) {
+					ed.compiled = 0;
+					regfree(&ed.re);
+				}
+				if (c = regcomp(&ed.re, s, ed.reflags)) {
+					regfatal(&ed.re, 2, c);
+					eat();
+				}
+				else
+					input(ed.re.re_npat);
+				ed.compiled = 1;
+				return;
 			}
-			if (c = regcomp(&ed.re, s, ed.reflags)) {
-				regfatal(&ed.re, 2, c);
-				eat();
-			}
-			else
-				input(ed.re.re_npat);
-			ed.compiled = 1;
-			return;
 		}
+		else
+			input(1);
 	}
 	if (!ed.compiled)
 		error(2, "no previous regular expression");
@@ -1414,6 +1418,7 @@ substitute(int inglob)
 	}
 	if (!inglob)
 		error(2, "global pattern not found");
+	ed.dot = ed.addr2;
 }
 
 static void

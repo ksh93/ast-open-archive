@@ -39,9 +39,9 @@ int		op;
 #endif
 {
 	reg Rsdisc_t*	old;
-	reg Rsstack_t*	cur;
-	reg Rsstack_t*	prv;
-	reg Rsstack_t*	top;
+	reg Rsdisc_t*	cur;
+	reg Rsdisc_t*	prv;
+	reg Rsdisc_t*	top;
 
 	switch (op)
 	{
@@ -49,7 +49,7 @@ int		op;
 		old = rs->disc;
 		if(disc)
 		{	if(old && (old->events & RS_DISC) &&
-			   (*old->eventf)(rs,RS_DISC,(Void_t*)disc,old) < 0)
+			   (*old->eventf)(rs,RS_DISC,(Void_t*)disc,(Void_t*)0,old) < 0)
 				return NIL(Rsdisc_t*);
 
 			rs->type &= ~(RS_DSAMELEN|RS_KSAMELEN);
@@ -60,40 +60,42 @@ int		op;
 
 			rs->disc = disc;
 			rs->events = rs->disc->events;
-			for (cur = rs->stack; cur; cur = cur->next)
-				rs->events |= cur->disc->events;
+			for (cur = rs->disc; cur; cur = cur->disc)
+				rs->events |= cur->events;
 		}
 		return old;
 	case RS_NEXT:
-		cur = rs->stack;
+		cur = rs->disc;
 		if (disc)
 			while (top = cur)
 			{
-				cur = cur->next;
-				if (disc == top->disc)
+				cur = cur->disc;
+				if (disc == top)
 					break;
 			}
-		return cur ? cur->disc : (Rsdisc_t*)0;
+		return cur;
 	case RS_POP:
 		prv = 0;
-		cur = rs->stack;
+		cur = rs->disc;
 		if (disc)
-			while (cur && cur->disc != disc)
-				cur = (prv = cur)->next;
+			while (cur && cur != disc)
+				cur = (prv = cur)->disc;
 		if (cur)
 		{
-			disc = cur->disc;
+			disc = cur;
 			if (prv)
-				prv->next = cur->next;
+				prv->disc = cur->disc;
 			else
-				rs->stack = cur->next;
-			vmfree(Vmheap, cur);
+				rs->disc = cur->disc;
 			if ((disc->events & RS_POP) &&
-			    (*disc->eventf)(rs, RS_POP, (Void_t*)0, disc) < 0)
+			    (*disc->eventf)(rs, RS_POP, (Void_t*)0, (Void_t*)0, disc) < 0)
 				return 0;
-			rs->events = rs->disc->events;
-			for (cur = rs->stack; cur; cur = cur->next)
-				rs->events |= cur->disc->events;
+			if (rs->disc)
+			{
+				rs->events = rs->disc->events;
+				for (cur = rs->disc; cur; cur = cur->disc)
+					rs->events |= cur->events;
+			}
 		}
 		else
 			disc = 0;
@@ -101,8 +103,8 @@ int		op;
 	case RS_PUSH:
 		if (!disc)
 			return 0;
-		for (prv = 0, cur = rs->stack; cur; cur = (prv = cur)->next)
-			if (cur->disc == disc)
+		for (prv = 0, cur = rs->disc; cur; cur = (prv = cur)->disc)
+			if (cur == disc)
 			{
 				if (prv)
 				{
@@ -110,17 +112,14 @@ int		op;
 					 * move to front
 					 */
 
-					prv->next = cur->next;
-					cur->next = rs->stack;
-					rs->stack = cur;
+					prv->disc = cur->disc;
+					cur->disc = rs->disc;
+					rs->disc = cur;
 				}
 				return disc;
 			}
-		if (!(cur = (Rsstack_t*)vmalloc(Vmheap, sizeof(Rsstack_t*))))
-			return 0;
-		cur->disc = disc;
-		cur->next = rs->stack;
-		rs->stack = cur;
+		disc->disc = rs->disc;
+		rs->disc = disc;
 		rs->events |= disc->events;
 		return disc;
 	}

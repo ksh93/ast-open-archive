@@ -28,26 +28,23 @@
 */
 
 #if __STD_C
-int rsnotify(Rs_t* rs, int op, Void_t* data, Rsdisc_t* disc)
+int rsnotify(Rs_t* rs, int op, Void_t* data, Void_t* arg, reg Rsdisc_t* disc)
 #else
-int rsnotify(rs, op, data, disc)
+int rsnotify(rs, op, data, arg, disc)
 Rs_t*		rs;
 int		op;
 Void_t*		data;
-Rsdisc_t*	disc;
+Void_t*		arg;
+reg Rsdisc_t*	disc;
 #endif
 {
-	reg Rsstack_t*	stack;
+	int	r;
 
+	r = 0;
 	if (rs->events & op)
-	{
-		for (stack = rs->stack; stack; stack = stack->next)
-			if ((stack->disc->events & op) &&
-			    (*stack->disc->eventf)(rs, op, data, stack->disc) < 0)
-				return -1;
-		if ((rs->disc->events & op) &&
-		    (*rs->disc->eventf)(rs, op, data, disc) < 0)
-			return -1;
-	}
-	return 0;
+		for (; disc; disc = disc->disc)
+			if ((disc->events & op) &&
+			    (r = (*disc->eventf)(rs, op, data, arg, disc)))
+				break;
+	return r;
 }

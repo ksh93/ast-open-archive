@@ -135,12 +135,10 @@ blokread(register Archive_t* ap, char* buf, int n)
 	register int		j;
 	char			c;
 
-	static int		eof;
-
 	if (!ap->io->blokflag)
 	{
+		ap->io->blokeof = 0;
 		ap->io->blokflag = 1;
-		eof = 0;
 		if ((i = read(ap->io->fd, buf, ap->io->blok ? 4 : n)) < 4 || !strneq(buf, "\002\014\017\013", 4))
 		{
 			if (ap->io->blok) error(3, "%s: input archive is not a BLOK file", ap->name);
@@ -156,7 +154,16 @@ blokread(register Archive_t* ap, char* buf, int n)
 		do
 		{
 			if ((i = read(ap->io->fd, &c, 1)) < 1)
-				return i < 0 && ++eof == 1 ? 0 : -1;
+			{
+				if (!i)
+					return 0;
+				if (!ap->io->blokeof)
+				{
+					ap->io->blokeof = 1;
+					return 0;
+				}
+				return -1;
+			}
 			j <<= 7;
 			j |= c & 0177;
 		} while (c & 0200);
@@ -943,9 +950,6 @@ newio(register Archive_t* ap, int c, int n)
 	Sfio_t*		pp = 0;
 	int		oerrno = errno;
 
-	static int	locked;
-	static off_t	total;
-
 	if (!ap->part)
 		ap->part++;
 	vol = 0;
@@ -961,11 +965,11 @@ newio(register Archive_t* ap, int c, int n)
 			{
 			case ALAR:
 			case IBMAR:
-				if (locked)
+				if (ap->locked)
 					return;
-				locked = 1;
+				ap->locked = 1;
 				putlabels(ap, state.record.file, "EOV");
-				locked = 0;
+				ap->locked = 0;
 				vol = 1;
 				break;
 			}
@@ -1017,10 +1021,10 @@ newio(register Archive_t* ap, int c, int n)
 		error(ERROR_SYSTEM|1, "%s: %s %s error", ap->name, io, rw);
 		break;
 	}
-	if (total == z)
+	if (ap->total == z)
 		error(1, "%s: no %s on part %d", ap->name, io, ap->part--);
 	else
-		total = z;
+		ap->total = z;
 	if (!file && (ap->name == definput || ap->name == defoutput))
 	{
 		dev.path = 0;
@@ -1043,7 +1047,7 @@ newio(register Archive_t* ap, int c, int n)
 		{
 			c = s - ap->name;
 			if (!(t = newof(0, char, s - ap->name, 16)))
-				error(ERROR_SYSTEM|3, "out of space");
+				nospace();
 			strcpy(t, ap->name);
 			s = (ap->name = t) + c;
 		}
@@ -1085,7 +1089,7 @@ newio(register Archive_t* ap, int c, int n)
 			{
 
 				if (!cp && !(cp = sfstropen()))
-					error(ERROR_SYSTEM|3, "out of space [eom]");
+					nospace();
 				sfprintf(cp, "%s %s %d", eomprompt + 1, rw, ap->part + 1);
 				if (ap->name)
 					sfprintf(cp, " %s", ap->name);
@@ -1148,11 +1152,11 @@ newio(register Archive_t* ap, int c, int n)
 	}
 	else
 		ap->part++;
-	if (vol && !locked)
+	if (vol && !ap->locked)
 	{
-		locked = 1;
+		ap->locked = 1;
 		putprologue(ap);
 		putlabels(ap, state.record.file, "HDR");
-		locked = 0;
+		ap->locked = 0;
 	}
 }

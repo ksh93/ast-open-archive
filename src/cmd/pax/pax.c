@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2003-06-21 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2003-09-11 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -144,32 +144,32 @@ State_t			state;
 Format_t		format[] =
 {
 
-{ALAR_NAME,	ALAR_DESC,	ALAR_REGULAR,	ALAR_SPECIAL,	ALAR_ALIGN,	ALAR_FLAGS},
-{BINARY_NAME,	BINARY_DESC,	BINARY_REGULAR,	BINARY_SPECIAL,	BINARY_ALIGN,	BINARY_FLAGS},
-{CPIO_NAME,	CPIO_DESC,	CPIO_REGULAR,	CPIO_SPECIAL,	CPIO_ALIGN,	CPIO_FLAGS},
-{IBMAR_NAME,	IBMAR_DESC,	IBMAR_REGULAR,	IBMAR_SPECIAL,	IBMAR_ALIGN,	IBMAR_FLAGS},
-{TAR_NAME,	TAR_DESC,	TAR_REGULAR,	TAR_SPECIAL,	TAR_ALIGN,	TAR_FLAGS},
-{USTAR_NAME,	USTAR_DESC,	USTAR_REGULAR,	USTAR_SPECIAL,	USTAR_ALIGN,	USTAR_FLAGS},
-{ASC_NAME,	ASC_DESC,	ASC_REGULAR,	ASC_SPECIAL,	ASC_ALIGN,	ASC_FLAGS},
-{ASCHK_NAME,	ASCHK_DESC,	ASCHK_REGULAR,	ASCHK_SPECIAL,	ASCHK_ALIGN,	ASCHK_FLAGS},
-{SAVESET_NAME,	SAVESET_DESC,	SAVESET_REGULAR,SAVESET_SPECIAL,SAVESET_ALIGN,	SAVESET_FLAGS},
-{PAX_NAME,	PAX_DESC,	PAX_REGULAR,	PAX_SPECIAL,	PAX_ALIGN,	PAX_FLAGS},
-{AR_NAME,	AR_DESC,	AR_REGULAR,	AR_SPECIAL,	AR_ALIGN,	AR_FLAGS},
-{VDB_NAME,	VDB_DESC,	VDB_REGULAR,	VDB_SPECIAL,	VDB_ALIGN,	VDB_FLAGS},
-{ZIP_NAME,	ZIP_DESC,	ZIP_REGULAR,	ZIP_SPECIAL,	ZIP_ALIGN,	ZIP_FLAGS},
-{CAB_NAME,	CAB_DESC,	CAB_REGULAR,	CAB_SPECIAL,	CAB_ALIGN,	CAB_FLAGS},
-{RPM_NAME,	RPM_DESC,	RPM_REGULAR,	RPM_SPECIAL,	RPM_ALIGN,	RPM_FLAGS},
-{MIME_NAME,	MIME_DESC,	MIME_REGULAR,	MIME_SPECIAL,	MIME_ALIGN,	MIME_FLAGS},
-{TNEF_NAME,	TNEF_DESC,	TNEF_REGULAR,	TNEF_SPECIAL,	TNEF_ALIGN,	TNEF_FLAGS},
+{ALAR_NAME,	ALAR_MATCH,	ALAR_DESC,	ALAR_REGULAR,	ALAR_SPECIAL,	ALAR_ALIGN,	ALAR_FLAGS},
+{BINARY_NAME,	BINARY_MATCH,	BINARY_DESC,	BINARY_REGULAR,	BINARY_SPECIAL,	BINARY_ALIGN,	BINARY_FLAGS},
+{CPIO_NAME,	CPIO_MATCH,	CPIO_DESC,	CPIO_REGULAR,	CPIO_SPECIAL,	CPIO_ALIGN,	CPIO_FLAGS},
+{IBMAR_NAME,	IBMAR_MATCH,	IBMAR_DESC,	IBMAR_REGULAR,	IBMAR_SPECIAL,	IBMAR_ALIGN,	IBMAR_FLAGS},
+{TAR_NAME,	TAR_MATCH,	TAR_DESC,	TAR_REGULAR,	TAR_SPECIAL,	TAR_ALIGN,	TAR_FLAGS},
+{USTAR_NAME,	USTAR_MATCH,	USTAR_DESC,	USTAR_REGULAR,	USTAR_SPECIAL,	USTAR_ALIGN,	USTAR_FLAGS, },
+{ASC_NAME,	ASC_MATCH,	ASC_DESC,	ASC_REGULAR,	ASC_SPECIAL,	ASC_ALIGN,	ASC_FLAGS},
+{ASCHK_NAME,	ASCHK_MATCH,	ASCHK_DESC,	ASCHK_REGULAR,	ASCHK_SPECIAL,	ASCHK_ALIGN,	ASCHK_FLAGS},
+{SAVESET_NAME,	SAVESET_MATCH,	SAVESET_DESC,	SAVESET_REGULAR,SAVESET_SPECIAL,SAVESET_ALIGN,	SAVESET_FLAGS},
+{PAX_NAME,	PAX_MATCH,	PAX_DESC,	PAX_REGULAR,	PAX_SPECIAL,	PAX_ALIGN,	PAX_FLAGS},
+{AR_NAME,	AR_MATCH,	AR_DESC,	AR_REGULAR,	AR_SPECIAL,	AR_ALIGN,	AR_FLAGS},
+{VDB_NAME,	VDB_MATCH,	VDB_DESC,	VDB_REGULAR,	VDB_SPECIAL,	VDB_ALIGN,	VDB_FLAGS},
+{ZIP_NAME,	ZIP_MATCH,	ZIP_DESC,	ZIP_REGULAR,	ZIP_SPECIAL,	ZIP_ALIGN,	ZIP_FLAGS},
+{CAB_NAME,	CAB_MATCH,	CAB_DESC,	CAB_REGULAR,	CAB_SPECIAL,	CAB_ALIGN,	CAB_FLAGS},
+{RPM_NAME,	RPM_MATCH,	RPM_DESC,	RPM_REGULAR,	RPM_SPECIAL,	RPM_ALIGN,	RPM_FLAGS},
+{MIME_NAME,	MIME_MATCH,	MIME_DESC,	MIME_REGULAR,	MIME_SPECIAL,	MIME_ALIGN,	MIME_FLAGS},
+{TNEF_NAME,	TNEF_MATCH,	TNEF_DESC,	TNEF_REGULAR,	TNEF_SPECIAL,	TNEF_ALIGN,	TNEF_FLAGS},
 
-{COMPRESS_NAME,	COMPRESS_DESC, COMPRESS_MAGIC_MASK, COMPRESS_MAGIC, 0, IN|OUT, COMPRESS_ALGORITHM, COMPRESS_UNDO},
-{GZIP_NAME,	GZIP_DESC,     GZIP_MAGIC_MASK, GZIP_MAGIC,         0, IN|OUT, GZIP_ALGORITHM,     GZIP_UNDO},
-{BZIP_NAME,	BZIP_DESC,     BZIP_MAGIC_MASK, BZIP_MAGIC,         0, IN|OUT, BZIP_ALGORITHM,     BZIP_UNDO},
+{COMPRESS_NAME,	COMPRESS_MATCH,	COMPRESS_DESC, COMPRESS_MAGIC_MASK, COMPRESS_MAGIC, 0, IN|OUT, COMPRESS_ALGORITHM, COMPRESS_UNDO},
+{GZIP_NAME,	GZIP_MATCH,	GZIP_DESC,     GZIP_MAGIC_MASK, GZIP_MAGIC,         0, IN|OUT, GZIP_ALGORITHM,     GZIP_UNDO},
+{BZIP_NAME,	BZIP_MATCH,	BZIP_DESC,     BZIP_MAGIC_MASK, BZIP_MAGIC,         0, IN|OUT, BZIP_ALGORITHM,     BZIP_UNDO},
 
-{DELTA_NAME,		DELTA_DESC,          0,0,0, IN|OUT, DELTA_ALGORITHM},
-{DELTA_88_NAME,		DELTA_88_DESC,       0,0,0, IN,     DELTA_88_ALGORITHM},
-{DELTA_IGNORE_NAME,	DELTA_IGNORE_DESC,   0,0,0, IN|OUT},
-{DELTA_PATCH_NAME,	DELTA_PATCH_DESC,    0,0,0, IN|OUT},
+{DELTA_NAME,		DELTA_MATCH,		DELTA_DESC,          0,0,0, IN|OUT, DELTA_ALGORITHM},
+{DELTA_88_NAME,		DELTA_88_MATCH,		DELTA_88_DESC,       0,0,0, IN,     DELTA_88_ALGORITHM},
+{DELTA_IGNORE_NAME,	DELTA_IGNORE_MATCH,	DELTA_IGNORE_DESC,   0,0,0, IN|OUT},
+{DELTA_PATCH_NAME,	DELTA_PATCH_MATCH,	DELTA_PATCH_DESC,    0,0,0, IN|OUT},
 
 {0}
 
@@ -247,7 +247,7 @@ Option_t		options[] =
 	"chksum",
 	0,
 	OPT_chksum,
-	0,
+	"The header checksum string; empty if not supported.",
 	0,
 	0,
 	OPT_READONLY,
@@ -304,10 +304,18 @@ Option_t		options[] =
 	OPT_NUMBER,
 },
 {
+	"delete",
+	0,
+	OPT_delete,
+	"\bdelete\b=\apattern\a ignores all global and extended header keywords\
+	matching the \bksh\b(1) \apattern\a.",
+	"pattern",
+},
+{
 	"delta",
 	0,
 	OPT_delta,
-	0,
+	"The header delta operation; empty if not a delta archive member.",
 	0,
 	0,
 	OPT_READONLY,
@@ -325,7 +333,7 @@ Option_t		options[] =
 	"device",
 	0,
 	OPT_device,
-	0,
+	"The device major and minor number string, empty if not a device file.",
 	0,
 	0,
 	OPT_READONLY,
@@ -334,7 +342,7 @@ Option_t		options[] =
 	"devmajor",
 	0,
 	OPT_devmajor,
-	0,
+	"The major device number, 0 if not supported.",
 	0,
 	0,
 	OPT_READONLY,
@@ -343,7 +351,16 @@ Option_t		options[] =
 	"devminor",
 	0,
 	OPT_devminor,
+	"The minor device number, 0 if not supported.",
 	0,
+	0,
+	OPT_READONLY,
+},
+{
+	"dir",
+	0,
+	OPT_dir,
+	"File directory name (base elided).",
 	0,
 	0,
 	OPT_READONLY,
@@ -370,6 +387,15 @@ Option_t		options[] =
 	[+u?Convert \anew\a to upper case.]",
 },
 {
+	"entry",
+	0,
+	OPT_entry,
+	"File entry ordinal.",
+	0,
+	0,
+	OPT_HEADER,
+},
+{
 	"eom",
 	0,
 	OPT_eom,
@@ -383,18 +409,11 @@ Option_t		options[] =
 	"Exit after each file arg matches exactly once.",
 },
 {
-	"extended-ignore",
+	"exthdr.name",
 	0,
-	OPT_extended_ignore,
-	"Ignore/omit extended header keywords matching \apattern\a.",
-	"pattern",
-},
-{
-	"extended-path",
-	0,
-	OPT_extended_path,
-	"Extended header pathname. The default is HEADER!!!.",
-	"pattern",
+	OPT_extended_name,
+	"Equivalent to \bheader\b:=\aformat\a.",
+	"format",
 },
 {
 	"file",
@@ -438,9 +457,9 @@ Option_t		options[] =
 	"format",
 	'x',
 	OPT_format,
-	"Archive format. The default is \bcpio\b. Formats are automatically\
-	detected on read. A basic and compress format may be combined,\
-	separated by \b:\b. The supported formats are:",
+	"Archive format. The default ouput format is \bustar\b. Formats are\
+	automatically detected on read. A basic and compress format may be\
+	combined, separated by \b:\b. The supported formats are:",
 	"format",
 },
 {
@@ -458,26 +477,60 @@ Option_t		options[] =
 	[+IBM-1047?Another EBCDIC flavor.]",
 },
 {
-	"gname|gid",
+	"gid",
+	0,
+	OPT_gid,
+	"Header group id. The default is the group id of the invoking process.",
+	"group",
+	0,
+	OPT_HEADER|OPT_NUMBER,
+},
+{
+	"globexthdr.name",
+	0,
+	OPT_global_name,
+	"Equivalent to \bheader\b=\aformat\a.",
+	"format",
+},
+{
+	"gname",
 	0,
 	OPT_gname,
-	"Override the default file group name.",
+	"Header group name. The default is the group name of the invoking process..",
 	"group",
 	0,
 	OPT_HEADER,
 },
 {
+	"header",
+	0,
+	OPT_header,
+	"\bheader\b=\aformat\a sets the global header path name format to the\
+	\blistopt\b \aformat\a. The default is \b" HEADER_EXTENDED_STD "\b\
+	when strict conformance is in effect (see \bgetconf\b(1) CONFORMANCE)\
+	and \b" HEADER_EXTENDED "\b otherwise. \bheader\b:=\aformat\a\
+	sets the extended header path name format to the \blistopt\b\
+	\aformat\a. The default is \b" HEADER_GLOBAL_STD "\b when strict\
+	conformance is in effect and \b" HEADER_GLOBAL "\b otherwise.\
+	The strict conformance defaults are prone to global header filename\
+	collisions and are ill-defined when extended header names exceed the\
+	underlying header format limits.",
+	"format",
+},
+{
 	"ignore",
 	0,
 	OPT_ignore,
-	"Ignore/omit all header keywords matching \apattern\a.",
+	"\bignore\b=\apattern\a ignores all global and extended header keywords\
+	matching the \bksh\b(1) \apattern\a; \bignore\b:=\apattern\a ignores\
+	all extended header keywords matching \apattern\a.",
 	"pattern",
 },
 {
 	"ino",
 	0,
 	OPT_ino,
-	0,
+	"The file serial number, 0 if not supported.",
 	0,
 	0,
 	OPT_READONLY,
@@ -508,11 +561,11 @@ Option_t		options[] =
 	OPT_invalid,
 	"Invalid path action:",
 	"action",
-	"[+ignore?Silently ignore.]\
-	[+prompt?Prompt for new name.]\
-	[+translate?Automatically translate and/or truncate\
+	"[i:bypass|ignore?Silently ignore.]\
+	[p:rename|prompt?Prompt for new name.]\
+	[t:write|translate?Automatically translate and/or truncate\
 		to local specifications.]\
-	[+UTF8?Convert to UTF8.]",
+	[u:utf-8|UTF-8?Convert to UTF-8.]",
 },
 {
 	"invert",
@@ -530,14 +583,9 @@ Option_t		options[] =
 	"label",
 	0,
 	OPT_label,
-	"Append \astring\a to the volume label.",
+	"Append \astring\a to the volume label; \blabel\b:=\astring\a\
+	prepends \astring\a.",
 	"string",
-},
-{
-	"label-insert",
-	0,
-	OPT_label_insert,
-	"Insert \astring\a into the volume label.",
 },
 {
 	"link",
@@ -556,25 +604,33 @@ Option_t		options[] =
 	"linkop",
 	0,
 	OPT_linkop,
-	0,
+	"The link operation string, \b==\b for hard links, \b->\b for\
+	symbolic links, otherwise empty.",
 	0,
 	0,
 	OPT_READONLY,
 },
 {
-	"linkpath|linkname",
+	"linkpath",
 	0,
 	OPT_linkpath,
 	"Header symbolic link pathname.",
-	0,
+	"path",
 	0,
 	OPT_HEADER,
 },
 {
-	"listformat",
+	"listformat|listopt",
 	0,
 	OPT_listformat,
-	"Member listing format. See \als\a(1) \b--format\b.",
+	"Append to the member listing format string. \aformat\a follows\
+	\bprintf\b(3) conventions, except that \bsfio\b(3) inline ids\
+	are used instead of arguments:\
+	%[-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a.\
+	If \achar\a is \bs\b then the string form of the item is listed,\
+	otherwise the corresponding numeric form is listed. \asubformat\a\
+	overrides the default formatting for \aid\a. All of the file related\
+	options are supported as \aid\as, along with the following:",
 	"format",
 },
 {
@@ -601,7 +657,7 @@ Option_t		options[] =
 	"magic",
 	0,
 	OPT_magic,
-	0,
+	"The header magic string; empty if not supported.",
 	0,
 	0,
 	OPT_READONLY,
@@ -610,9 +666,15 @@ Option_t		options[] =
 	"mark",
 	0,
 	OPT_mark,
+	"The file type mark character string:",
 	0,
-	0,
-	0,
+	"[+=?hard link]\
+	[+@?symbolic link]\
+	[+/?directory]\
+	[+|?fifo]\
+	[+=?socket]\
+	[+$?block or character special]\
+	[+*?executable]",
 	OPT_READONLY,
 },
 {
@@ -649,7 +711,7 @@ Option_t		options[] =
 	"mode",
 	0,
 	OPT_mode,
-	0,
+	"The file type and acces mode.",
 	0,
 	0,
 	OPT_READONLY,
@@ -667,7 +729,7 @@ Option_t		options[] =
 	"name",
 	0,
 	OPT_name,
-	"Header file name.",
+	"File base name (directory elided).",
 	0,
 	0,
 	OPT_HEADER,
@@ -676,7 +738,7 @@ Option_t		options[] =
 	"nlink",
 	0,
 	OPT_nlink,
-	0,
+	"The hard link count.",
 	0,
 	0,
 	OPT_READONLY,
@@ -706,8 +768,8 @@ Option_t		options[] =
 	"path",
 	0,
 	OPT_path,
-	"Header path name.",
-	0,
+	"File path name.",
+	"path",
 	0,
 	OPT_HEADER,
 },
@@ -717,6 +779,12 @@ Option_t		options[] =
 	OPT_physical,
 	"Don't follow symbolic links.\
 	The default is determined by \bgetconf PATH_RESOLVE\b.",
+},
+{
+	"pid",
+	0,
+	OPT_pid,
+	"\bpax\b process id.",
 },
 {
 	"preserve",
@@ -756,7 +824,7 @@ Option_t		options[] =
 	"record-format",
 	0,
 	OPT_record_format,
-	"Labelled tape record format:",
+	"Labeled tape record format:",
 	"DFSUV",
 	"[+D?decimal variable]\
 	[+F?fixed length]\
@@ -806,6 +874,15 @@ Option_t		options[] =
 	"string",
 },
 {
+	"release",
+	0,
+	OPT_release,
+	"The \bpax\b implementation release stamp.",
+	"string",
+	0,
+	OPT_GLOBAL|OPT_IGNORE|OPT_VENDOR,
+},
+{
 	"reset-atime",
 	't',
 	OPT_reset_atime,
@@ -815,7 +892,8 @@ Option_t		options[] =
 	"sequence",
 	0,
 	OPT_sequence,
-	0,
+	"The archive member sequence number. Numbers for volumes >1 are of the\
+	form \avolume\a.\asequence\a.",
 	0,
 	0,
 	OPT_READONLY,
@@ -824,10 +902,17 @@ Option_t		options[] =
 	"size",
 	0,
 	OPT_size,
+	"File size.",
+	"size",
 	0,
-	0,
-	0,
-	OPT_HEADER,
+	OPT_HEADER|OPT_OPTIONAL,
+},
+{
+	"strict",
+	'S',
+	OPT_strict,
+	"Disable non-standard \b--write\b mode extensions. The default is\
+	determined by the \bgetconf\b(1) CONFORMANCE setting.",
 },
 {
 	"summary",
@@ -869,6 +954,27 @@ Option_t		options[] =
 	OPT_NUMBER,
 },
 {
+	"testdate",
+	0,
+	OPT_testdate,
+	"\b--listformat\b time values newer than \adate\a will be printed\
+	as \adate\a. Used for regression testing.",
+	"date",
+},
+{
+	"times",
+	0,
+	OPT_times,
+	"Preserve \batime\b, \bctime\b, and \bmtime\b.",
+},
+{
+	"tmp",
+	0,
+	OPT_tmp,
+	"The value of the \bTMPDIR\b environment variable if defined,\
+	otherwise \b/tmp\b.",
+},
+{
 	"to",
 	0,
 	OPT_to,
@@ -879,16 +985,25 @@ Option_t		options[] =
 	"typeflag",
 	0,
 	OPT_typeflag,
-	0,
+	"The header type flag string; empty if not supported.",
 	0,
 	0,
 	OPT_READONLY,
 },
 {
-	"uname|uid",
+	"uid",
+	0,
+	OPT_uid,
+	"Header user id. The default is the user id of the invoking process.",
+	"user",
+	0,
+	OPT_HEADER|OPT_NUMBER,
+},
+{
+	"uname",
 	0,
 	OPT_uname,
-	"Header user name. The default is the invoking user.",
+	"Header user name. The default is the user name of the invoking process.",
 	"user",
 	0,
 	OPT_HEADER,
@@ -923,7 +1038,7 @@ Option_t		options[] =
 	"version",
 	0,
 	OPT_version,
-	0,
+	"The header version string; empty if not supported.",
 	0,
 	0,
 	OPT_READONLY,
@@ -956,8 +1071,8 @@ static int		signals[] =	/* signals caught by interrupt() */
 static struct
 {
 	char*		arg0;
-	Sfio_t*		ignore;
-	Sfio_t*		ignore_extended;
+	Sfio_t*		ignore_all;
+	Sfio_t*		ignore_ext;
 	Map_t*		lastmap;
 	Sfio_t*		listformat;
 	char*		owner;
@@ -1034,18 +1149,21 @@ meterror(int fd, const void* buf, size_t n)
 
 /*
  * set options from line if != 0 or argv according to usage
+ * type: 0:command EXTTYPE:extended GLBTYPE:global
  */
 
 void
-setoptions(char* line, char** argv, char* usage, Archive_t* ap)
+setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 {
+	_ast_intmax_t	n;
 	int		c;
-	int		n;
+	int		y;
 	int		cvt;
 	int		index;
 	int		offset;
 	int		from;
 	int		to;
+	int		last;
 	char*		e;
 	char*		s;
 	char*		v;
@@ -1055,7 +1173,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 	cvt = 0;
 	index = opt_info.index;
 	offset = opt_info.offset;
-	while (c = line ? optstr(line, usage) : optget(argv, usage))
+	for (last = 0; c = line ? optstr(line, usage) : optget(argv, usage); last = opt_info.offset)
 	{
 		if (c > 0)
 		{
@@ -1069,60 +1187,101 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				 *	 as a single unit to setoptions()
 				 */
 
-				if (!ap || !strmatch(opt_info.name, "+([0-9])"))
+				if (type && strneq(opt_info.name, VENDOR, sizeof(VENDOR) - 1) && opt_info.arg[sizeof(VENDOR) - 1] == '.')
+				{
+					while (isspace(line[last]))
+						last++;
+					opt_info.offset = last + sizeof(VENDOR); 
+					continue;
+				}
+				if (!type || islower(*opt_info.name) && !strmatch(opt_info.name, "+([0-9])|*.*"))
 					error(2, "%s", opt_info.arg);
 			}
 			continue;
 		}
-		n = opt_info.num;
+		y = (n = opt_info.number) != 0;
 		if (!(v = opt_info.arg))
-		{
 			v = "";
-		}
 		else if (!n)
-			n = 1;
+			y = 1;
 		op = options - c;
-		c = 1 + !ap + 2 * (n < 0);
+
+		/*
+		 * option precedence levels
+		 *
+		 *	8	ignore all
+		 *	7	command:=
+		 *	6	ignore extended
+		 *	5	extended:=
+		 *	4	extended=
+		 *	3	command=
+		 *	2	global:=
+		 *	1	global=
+		 */
+
+		switch (type)
+		{
+		case EXTTYPE:
+			c = (opt_info.assignment == ':') ? 5 : 4;
+			vp = &op->temp;
+			break;
+		case GLBTYPE:
+			c = (opt_info.assignment == ':') ? 2 : 1;
+			vp = &op->perm;
+			break;
+		default:
+			c = (opt_info.assignment == ':') ? 7 : 3;
+			vp = &op->perm;
+			break;
+		}
 		if (op->level > c)
 			continue;
-		if (ap)
-			op->entry = ap->entry + 1;
-		vp = (c >= 3) ? &op->temp : &op->perm;
-		if (n && *v && (op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER)
+		if (y && (op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER)
 		{
-			if (!ap || c != 4)
+			if (vp == &op->temp)
+				op->entry = ap->entry;
+			else
 				op->level = c;
-			op->flags |= OPT_SET;
-			c = strlen(v) + 1;
-			if (c > vp->size)
+			if (*v)
 			{
-				c = roundof(c, 64);
-				if (!(vp->string = newof(vp->string, char, c, 0)))
-					error(3, "out of space [value]");
-				vp->size = c;
+				op->flags |= OPT_SET;
+				if (op->flags & OPT_NUMBER)
+					vp->number = n;
+				stash(vp, v, 0);
 			}
-			strcpy(vp->string, v);
+			else
+				vp = 0;
 		}
 		else
 			vp = 0;
-		message((-4, "option: %s%s%s%s%s", n ? "" : "no", op->name, (n < 0) ? ":=" : *v ? "=" : "", v, vp ? " HEADER" : ""));
+		message((-4, "option: %s%s%-.1s=%s type=%c entry=%d level=%d number=%I*d", y ? "" : "no", op->name, &opt_info.assignment, v, type ? type : '-', op->entry, op->level, sizeof(opt_info.num), opt_info.num));
 		switch (op->index)
 		{
 		case OPT_append:
-			state.append = n;
+			state.append = y;
 			break;
 		case OPT_atime:
-			state.acctime = n;
 			if (vp)
 			{
 			settime:
-				vp->number = strtoul(vp->string, &e, NiL);
-				if (*e == '.')
-					strtol(e + 1, &e, NiL);
+				vp->number = strtoul(vp->string, &e, 10);
+				vp->fraction = 0;
 				if (*e)
 				{
-					vp->number = tmdate(vp->string, &e, NiL);
-					if (*e) error(2, "%s: invalid %s date string", vp->string, options[op->index].name);
+					if (*e != '.')
+						vp->number = tmdate(vp->string, &e, NiL);
+					if (*e == '.')
+						vp->fraction = strtoul(s = e + 1, &e, 10);
+					if (*e)
+						error(2, "%s: invalid %s date string", vp->string, options[op->index].name);
+					else if (vp->fraction)
+					{
+						y = e - s;
+						for (y = e - s; y < 9; y++)
+							vp->fraction *= 10;
+						for (; y > 9; y--)
+							vp->fraction /= 10;
+					}
 				}
 			}
 			break;
@@ -1130,7 +1289,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			ap = getarchive(state.operation);
 			if (ap->delta)
 				error(3, "base archive already specified");
-			if (n)
+			if (y)
 			{
 				initdelta(ap);
 				if (!*v || streq(v, "-"))
@@ -1147,9 +1306,9 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			}
 			break;
 		case OPT_blocksize:
-			if (n)
+			if (y)
 			{
-				state.blocksize = strton(v, &e, NiL, BLOCKSIZE);
+				state.blocksize = n;
 				if (*e) error(3, "%s: invalid block size", v);
 				if (state.blocksize < MINBLOCK)
 					error(3, "block size must be at least %d", MINBLOCK);
@@ -1174,7 +1333,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			}
 			break;
 		case OPT_checksum:
-			if (n)
+			if (y)
 			{
 				if (e = strchr(v, ':'))
 					*e++ = 0;
@@ -1191,52 +1350,51 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				state.checksum.name = 0;
 			break;
 		case OPT_clobber:
-			state.clobber = n;
+			state.clobber = y;
 			break;
 		case OPT_comment:
-			state.header.comment = n ? strdup(v) : (char*)0;
+			state.header.comment = y ? strdup(v) : (char*)0;
 			break;
 		case OPT_complete:
-			state.complete = n;
+			state.complete = y;
 			break;
 		case OPT_crossdevice:
-			if (!n) state.ftwflags |= FTW_MOUNT;
+			if (!y) state.ftwflags |= FTW_MOUNT;
 			else state.ftwflags &= ~FTW_MOUNT;
 			break;
 		case OPT_ctime:
 			if (vp) goto settime;
 			break;
 		case OPT_debug:
-			if (n)
+			if (y)
 			{
-				n = error_info.trace;
-				error_info.trace = -strton(v, &e, NiL, 0);
-				if (*e) error(3, "%s: invalid debug level", v);
-				if (!n) message((-10, "usage %s", usage));
+				y = error_info.trace;
+				error_info.trace = -(int)n;
+				if (!y) message((-10, "usage %s", usage));
 			}
 			else error_info.trace = 0;
 			break;
+		case OPT_delete:
+			if (y && *v)
+				sfprintf(opt.ignore_all, "%s(%s)", sfstrtell(opt.ignore_all) ? "|" : "", v);
+			break;
 		case OPT_descend:
-			state.descend = n;
+			state.descend = y;
 			break;
 		case OPT_dots:
-			state.drop = n;
+			state.drop = y;
 			break;
 		case OPT_edit:
 			substitute(&opt.lastmap, (char*)v);
 			break;
 		case OPT_eom:
-			eomprompt = n ? strdup(v) : (char*)0;
+			eomprompt = y ? strdup(v) : (char*)0;
 			break;
 		case OPT_exact:
-			state.exact = n;
+			state.exact = y;
 			break;
-		case OPT_extended_ignore:
-			if (n && *v)
-				sfprintf(opt.ignore_extended, "%s(%s)", sfstrtell(opt.ignore_extended) ? "|" : "", v);
-			break;
-		case OPT_extended_path:
-			state.header.name = n ? strdup(v) : (char*)0;
+		case OPT_extended_name:
+			state.header.extended = y ? strdup(v) : (char*)0;
 			break;
 		case OPT_file:
 			ap = getarchive(state.operation);
@@ -1245,7 +1403,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			ap->name = strdup(v);
 			break;
 		case OPT_filter:
-			if (n && *v)
+			if (y && *v)
 			{
 				state.filter.command = v;
 				state.descend = 0;
@@ -1255,14 +1413,14 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			break;
 		case OPT_format:
 			ap = getarchive(state.operation);
-			if (!n)
+			if (!y)
 				ap->format = -1;
 			else
 			{
 				if (streq(v, "tgz"))
-					v = "ustar:gzip";
+					v = "tar:gzip";
 				else if (streq(v, "tbz"))
-					v = "ustar:bzip2";
+					v = "tar:bzip2";
 				if (s = strdup(v))
 					do
 					{
@@ -1292,23 +1450,23 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 							s = "gzip";
 						else if (s[0] == 'b' && s[1] == 'z')
 							s = "bzip2";
-						if ((n = getformat(s)) >= DELTA)
+						if ((y = getformat(s)) >= DELTA)
 						{
 							initdelta(ap);
-							switch (n)
+							switch (y)
 							{
 							case DELTA_IGNORE:
 							case DELTA_PATCH:
-								ap->delta->format = n;
+								ap->delta->format = y;
 								break;
 							default:
-								ap->delta->version = n;
+								ap->delta->version = y;
 								break;
 							}
 						}
-						else if (n >= COMPRESS)
-							ap->compress = n;
-						else if ((ap->format = n) < 0)
+						else if (y >= COMPRESS)
+							ap->compress = y;
+						else if ((ap->format = y) < 0)
 						{
 							Sfio_t*	sp;
 
@@ -1316,7 +1474,10 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 								error(3, "%s: unknown archive format", s);
 							while (e = sfgetr(sp, '\n', 1))
 								if (*e != '#')
-									setoptions(e, NiL, state.usage, ap);
+								{
+									setoptions(e, NiL, state.usage, ap, type);
+									line += opt_info.offset;
+								}
 							sfclose(sp);
 						}
 					} while (s = e);
@@ -1333,75 +1494,92 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				from = to = CC_NATIVE;
 			}
 			ap = getarchive(state.operation);
-			if ((n = ccmapid(v)) < 0)
+			if ((y = ccmapid(v)) < 0)
 				error(3, "%s: unknown character code set", v);
 			switch (op->index)
 			{
 			case OPT_from:
-				from = n;
+				from = y;
 				break;
 			case OPT_to:
-				to = n;
+				to = y;
 				break;
 			}
 			break;
+		case OPT_global_name:
+			state.header.global = y ? strdup(v) : (char*)0;
+			break;
+		case OPT_header:
+			v = y ? strdup(v) : (char*)0;
+			if (opt_info.assignment == ':')
+				state.header.extended = v;
+			else
+				state.header.global = v;
+			break;
 		case OPT_ignore:
-			if (n && *v)
-				sfprintf(opt.ignore, "%s(%s)", sfstrtell(opt.ignore) ? "|" : "", v);
+			if (y && *v)
+			{
+				if (opt_info.assignment == ':')
+					sfprintf(opt.ignore_ext, "%s(%s)", sfstrtell(opt.ignore_ext) ? "|" : "", v);
+				else
+					sfprintf(opt.ignore_all, "%s(%s)", sfstrtell(opt.ignore_all) ? "|" : "", v);
+			}
 			break;
 		case OPT_install:
-			state.install.name = n ? strdup(v) : (char*)0;
+			state.install.name = y ? strdup(v) : (char*)0;
 			break;
 		case OPT_intermediate:
-			state.intermediate = n;
+			state.intermediate = y;
 			break;
 		case OPT_invalid:
-			if (!n || !*v || streq(v, "ignore") || streq(v, "bypass"))
+			switch (opt_info.num)
+			{
+			case 'i':
 				state.header.invalid = INVALID_ignore;
-			else if (streq(v, "prompt") || streq(v, "rename"))
+				break;
+			case 'p':
 				state.header.invalid = INVALID_prompt;
-			else if (streq(v, "translate") || streq(v, "write"))
+				break;
+			case 't':
 				state.header.invalid = INVALID_translate;
-			else if (streq(v, "UTF8"))
+				break;
+			case 'u':
 				state.header.invalid = INVALID_UTF8;
+				break;
+			}
 			break;
 		case OPT_invert:
-			state.matchsense = !n;
+			state.matchsense = !y;
 			break;
 		case OPT_keepgoing:
-			state.keepgoing = n;
+			state.keepgoing = y;
 			break;
 		case OPT_label:
 			if (*state.id.volume)
 			{
-				sfsprintf(tar_block, sizeof(tar_block), "%s %s", state.id.volume, v);
-				v = tar_block;
-			}
-			strncpy(state.id.volume, v, sizeof(state.id.volume) - 2);
-			break;
-		case OPT_label_insert:
-			if (*state.id.volume)
-			{
-				sfsprintf(tar_block, sizeof(tar_block), "%s %s", v, state.id.volume);
+				if (opt_info.assignment == ':')
+					sfsprintf(tar_block, sizeof(tar_block), "%s %s", v, state.id.volume);
+				else
+					sfsprintf(tar_block, sizeof(tar_block), "%s %s", state.id.volume, v);
 				v = tar_block;
 			}
 			strncpy(state.id.volume, v, sizeof(state.id.volume) - 2);
 			break;
 		case OPT_link:
-			if (n)
+			if (y)
 				state.linkf = link;
 			else
 				state.linkf = 0;
 			break;
 		case OPT_linkdata:
-			state.header.linkdata = n;
+			state.header.linkdata = y;
 			break;
 		case OPT_listformat:
-			if (n && *v)
+			if (y && *v)
 				sfputr(opt.listformat, v, ' ');
 			break;
 		case OPT_listmacro:
-			if (n && *v)
+			if (y && *v)
 			{
 				if (s = strchr(v, '='))
 					*s++ = 0;
@@ -1409,7 +1587,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				{
 					if (!s) break;
 					if (!(op = newof(0, Option_t, 1, 0)))
-						error(3, "out of space [option]");
+						nospace();
 					op->name = hashput(state.options, 0, op);
 				}
 				if (s)
@@ -1424,23 +1602,18 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			state.local = 1;
 			break;
 		case OPT_logical:
-			if (n) state.ftwflags &= ~FTW_PHYSICAL;
+			if (y) state.ftwflags &= ~FTW_PHYSICAL;
 			else state.ftwflags |= FTW_PHYSICAL;
 			break;
 		case OPT_maxout:
-			if (n)
-			{
-				state.maxout = strton(v, &e, NiL, 0);
-				if (*e) error(3, "%s: invalid block count", v);
-			}
-			else state.maxout = 0;
+			state.maxout = n;
 			break;
 		case OPT_metaphysical:
-			if (n) state.ftwflags |= FTW_META|FTW_PHYSICAL;
+			if (y) state.ftwflags |= FTW_META|FTW_PHYSICAL;
 			else state.ftwflags &= ~(FTW_META|FTW_PHYSICAL);
 			break;
 		case OPT_meter:
-			if ((state.meter.on = n) && (state.meter.fancy = isatty(sffileno(sfstderr))))
+			if ((state.meter.on = y) && (state.meter.fancy = isatty(sffileno(sfstderr))))
 			{
 				error_info.write = meterror;
 				astwinsize(1, NiL, &state.meter.width);
@@ -1449,25 +1622,27 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			}
 			break;
 		case OPT_mkdir:
-			state.mkdir = n;
+			state.mkdir = y;
 			break;
 		case OPT_mtime:
-			state.modtime = n;
 			if (vp) goto settime;
 			break;
 		case OPT_options:
 			if (v)
-				setoptions(v, NiL, usage, ap);
+			{
+				setoptions(v, NiL, usage, ap, type);
+				line += opt_info.offset;
+			}
 			break;
 		case OPT_ordered:
-			state.ordered = n;
+			state.ordered = y;
 			break;
 		case OPT_owner:
-			if (!(state.owner = n)) opt.owner = 0;
+			if (!(state.owner = y)) opt.owner = 0;
 			else if (*v) opt.owner = strdup(v);
 			break;
 		case OPT_physical:
-			if (n)
+			if (y)
 			{
 				state.ftwflags &= ~FTW_META;
 				state.ftwflags |= FTW_PHYSICAL;
@@ -1492,7 +1667,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 					state.chmod = 1;
 					continue;
 				case 'm':
-					state.modtime = 1;
+					state.modtime = 0;
 					continue;
 				case 'o':
 					state.owner = 1;
@@ -1512,22 +1687,22 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			}
 			break;
 		case OPT_read:
-			if (n) state.operation |= IN;
+			if (y) state.operation |= IN;
 			else state.operation &= ~IN;
 			break;
 		case OPT_record_charset:
-			state.record.charset = n;
+			state.record.charset = y;
 			break;
 		case OPT_record_delimiter:
-			if (!n) state.record.delimiter = 0;
+			if (!y) state.record.delimiter = 0;
 			else if (!*v) state.record.delimiter = VDB_DELIMITER;
 			else state.record.delimiter = *v;
 			break;
 		case OPT_record_format:
-			state.record.format = n ? *v : 0;
+			state.record.format = y ? *v : 0;
 			break;
 		case OPT_record_header:
-			if (!n)
+			if (!y)
 			{
 				state.record.header = 0;
 				state.record.headerlen = 0;
@@ -1536,20 +1711,19 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				state.record.headerlen = 1;
 			break;
 		case OPT_record_line:
-			state.record.line = n;
+			state.record.line = y;
 			break;
 		case OPT_record_match:
-			state.record.pattern = n ? strdup(v) : (char*)0;
+			state.record.pattern = y ? strdup(v) : (char*)0;
 			break;
 		case OPT_record_pad:
-			state.record.pad = n;
+			state.record.pad = y;
 			break;
 		case OPT_record_size:
-			state.record.size = strton(v, &e, NiL, 0);
-			if (*e) error(3, "%s: invalid record size", v);
+			state.record.size = n;
 			break;
 		case OPT_record_trailer:
-			if (!n)
+			if (!y)
 			{
 				state.record.trailer = 0;
 				state.record.trailerlen = 0;
@@ -1558,13 +1732,18 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				state.record.trailerlen = 1;
 			break;
 		case OPT_reset_atime:
-			state.acctime = n;
+			state.acctime = y;
+			break;
+		case OPT_size:
+			break;
+		case OPT_strict:
+			state.strict = y;
 			break;
 		case OPT_summary:
-			state.summary = n;
+			state.summary = y;
 			break;
 		case OPT_symlink:
-			if (n) state.linkf = pathsetlink;
+			if (y) state.linkf = pathsetlink;
 			else state.linkf = 0;
 			break;
 		case OPT_tape:
@@ -1578,12 +1757,12 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				switch (*e++)
 				{
 				case 'k':
-					if (!(n = strtol(e, &e, 0))) n = -1;
+					if (!(n = strtonll(e, &e, 0, 1))) n = -1;
 					ap->io->keep = n;
 					ap->io->mode = O_RDWR;
 					continue;
 				case 's':
-					if (!(n = strtol(e, &e, 0))) n = -1;
+					if (!(n = strtonll(e, &e, 0, 1))) n = -1;
 					ap->io->skip = n;
 					ap->io->mode = O_RDWR;
 					continue;
@@ -1594,15 +1773,24 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			if (*e) error(3, "%s: invalid tape unit specification [%s]", v, e);
 			break;
 		case OPT_test:
-			if (n)
-			{
-				state.test |= strton(v, &e, NiL, 0);
-				if (*e) error(3, "%s: invalid test mask", v);
-			}
+			if (y) state.test |= (unsigned long)n;
 			else state.test = 0;
 			break;
+		case OPT_testdate:
+			if (y)
+			{
+				state.testdate = tmdate(v, &e, NiL);
+				if (*e)
+					error(3, "%s: invalid %s date string", v, options[op->index].name);
+			}
+			else state.testdate = ~0;
+			break;
+		case OPT_times:
+			setoptions("atime:= ctime:= mtime:=", NiL, usage, ap, type);
+			line += opt_info.offset;
+			break;
 		case OPT_unblocked:
-			if (!*v) getarchive(IN)->io->unblocked = getarchive(OUT)->io->unblocked = n;
+			if (!*v) getarchive(IN)->io->unblocked = getarchive(OUT)->io->unblocked = y;
 			else while (*v) switch (*v++)
 			{
 			case 'i':
@@ -1617,16 +1805,16 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			}
 			break;
 		case OPT_update:
-			state.update = n;
+			state.update = y;
 			break;
 		case OPT_verbose:
-			state.verbose = n;
+			state.verbose = y;
 			break;
 		case OPT_verify:
-			state.verify = n;
+			state.verify = y;
 			break;
 		case OPT_write:
-			if (n) state.operation |= OUT;
+			if (y) state.operation |= OUT;
 			else state.operation &= ~OUT;
 			if (!(state.operation & IN) && state.in && !state.out)
 			{
@@ -1636,10 +1824,11 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			}
 			break;
 		case OPT_yes:
-			state.verify = state.yesno = n;
+			state.verify = state.yesno = y;
 			break;
 		default:
-			error(1, "%s: option index %d not handled", op->name, op->index);
+			if (!type && !(op->flags & OPT_HEADER) || !(op->flags & (OPT_IGNORE|OPT_SET)))
+				error(1, "%s: option ignored [index=%d]", op->name, op->index);
 			break;
 		}
 	}
@@ -1656,6 +1845,16 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 }
 
 /*
+ * option match with VENDOR check
+ */
+
+static int
+matchopt(const char* name, const char* pattern, Option_t* op)
+{
+	return strmatch(name, pattern) || (op->flags & OPT_VENDOR) && strmatch(sfprints("%s.%s", VENDOR, name), pattern);
+}
+
+/*
  * mark ignored header keywords
  */
 
@@ -1668,27 +1867,27 @@ ignore(void)
 	char*			ext;
 	int			lev;
 
-	all = sfstrtell(opt.ignore) ? sfstruse(opt.ignore) : (char*)0;
-	ext = sfstrtell(opt.ignore_extended) ? sfstruse(opt.ignore_extended) : (char*)0;
+	all = sfstrtell(opt.ignore_all) ? sfstruse(opt.ignore_all) : (char*)0;
+	ext = sfstrtell(opt.ignore_ext) ? sfstruse(opt.ignore_ext) : (char*)0;
 	if ((all || ext) && (pos = hashscan(state.options, 0)))
 	{
 		while (hashnext(pos))
-			if (all && strmatch(pos->bucket->name, all) && (lev = 6) || ext && strmatch(pos->bucket->name, ext) && (lev = 5))
-			{
-				op = (Option_t*)pos->bucket->value;
-				if (!(op->flags & OPT_READONLY))
-					op->level = lev;
-			}
+		{
+			op = (Option_t*)pos->bucket->value;
+			if (!(op->flags & OPT_READONLY) && (all && matchopt(pos->bucket->name, all, op) && (lev = 8) || ext && matchopt(pos->bucket->name, ext, op) && (lev = 6)) && op->level < lev)
+				op->level = lev;
+		}
 		hashdone(pos);
 	}
-	sfstrclose(opt.ignore);
-	sfstrclose(opt.ignore_extended);
+	sfstrclose(opt.ignore_all);
+	sfstrclose(opt.ignore_ext);
 }
 
 int
 main(int argc, char** argv)
 {
 	register int		i;
+	register int		j;
 	register char*		s;
 	register Archive_t*	ap;
 	char*			p;
@@ -1701,28 +1900,36 @@ main(int argc, char** argv)
 
 	setlocale(LC_ALL, "");
 	error_info.id = "pax";
+	state.strict = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
 	state.gid = getegid();
 	state.uid = geteuid();
+	state.pid = getpid();
 	umask(state.modemask = umask(0));
 	state.modemask |= S_ISUID|S_ISGID;
 	state.ftwflags = ftwflags()|FTW_DOT;
 	state.buffersize = DEFBUFFER * DEFBLOCKS;
 	state.clobber = 1;
+	state.delta.buffersize = DELTA_WINDOW >> 1;
 	state.descend = RESETABLE;
 	state.format = OUT_DEFAULT;
-	state.header.name = "HEADER!!!";
+	state.header.extended = state.strict ? HEADER_EXTENDED_STD : HEADER_EXTENDED;
+	state.header.global = state.strict ? HEADER_GLOBAL_STD : HEADER_GLOBAL;
 	state.map.a2n = ccmap(CC_ASCII, CC_NATIVE);
 	state.map.e2n = ccmap(CC_EBCDIC, CC_NATIVE);
 	state.map.n2e = ccmap(CC_NATIVE, CC_EBCDIC);
-	if (!(opt.ignore = sfstropen()) || !(opt.ignore_extended = sfstropen()))
-		error(3, "out of space [ignore]");
+	if (!(opt.ignore_all = sfstropen()) || !(opt.ignore_ext = sfstropen()))
+		nospace();
 	if (!(opt.listformat = sfstropen()))
-		error(3, "out of space [listformat]");
+		nospace();
 	state.matchsense = 1;
 	state.mkdir = 1;
 	state.modtime = 1;
+	if (!(state.tmp.fmt = sfstropen()) || !(state.tmp.lst = sfstropen()) || !(state.tmp.str = sfstropen()))
+		nospace();
+	stash(&options[OPT_release].perm, release(), 0);
+	options[OPT_release].flags |= OPT_SET;
 	if (!(state.options = hashalloc(NiL, HASH_name, "options", 0)))
-		error(3, "out of space [options]");
+		nospace();
 	for (i = 1; i < elementsof(options); i++)
 	{
 		p = options[i].name;
@@ -1738,15 +1945,13 @@ main(int argc, char** argv)
 	hashset(state.options, HASH_ALLOCATE);
 	state.record.charset = 1;
 	state.record.line = 1;
-	state.strict = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
 	state.summary = 1;
+	state.testdate = ~0;
 	if (!(state.tmp.file = pathtemp(NiL, 0, NiL, error_info.id, NiL)))
-		error(3, "out of space [tmp]");
-	if (!(state.tmp.lst = sfstropen()) || !(state.tmp.str = sfstropen()))
-		error(3, "out of space [lst|str]");
+		nospace();
 	sfputr(state.tmp.str, usage, -1);
 	for (i = 1; i < elementsof(options); i++)
-		if (options[i].description)
+		if (!(options[i].flags & OPT_READONLY))
 		{
 			sfputc(state.tmp.str, '[');
 			if (options[i].flag)
@@ -1784,8 +1989,34 @@ main(int argc, char** argv)
 					}
 					else if (n == DELTA)
 						sfprintf(state.tmp.str, "[+----?delta methods ----]");
-					sfprintf(state.tmp.str, "[+%s?%s%s]", format[n].name, format[n].desc, (format[n].flags & OUT) ? "" : "; for input only");
+					sfprintf(state.tmp.str, "[+%s%s%s?%s%s]", format[n].name, format[n].match ? "|" : "", format[n].match ? format[n].match : "", format[n].desc, (format[n].flags & OUT) ? "" : "; for input only");
 				}
+				sfputc(state.tmp.str, '}');
+			}
+			else if (i == OPT_listformat)
+			{
+				sfputc(state.tmp.str, '\n');
+				sfputc(state.tmp.str, '{');
+				for (j = 1; j < elementsof(options); j++)
+					if (options[j].flags & OPT_READONLY)
+					{
+						sfprintf(state.tmp.str, "[+%s?%s]\n", options[j].name, options[j].description);
+						if (options[j].details)
+							sfprintf(state.tmp.str, "{\n%s\n}", options[j].details);
+					}
+				sfprintf(state.tmp.str, "%s",
+"	[+----?subformats ----]"
+"	[+case\b::\bp\b\a1\a::\bs\b\a1\a::...::\bp\b\an\a::\bs\b\an\a?Expands"
+"		to \bs\b\ai\a if the value of \aid\a matches the shell"
+"		pattern \bp\b\ai\a, or the empty string if there is no"
+"		match.]"
+"	[+mode?The integral value as a \bfmtmode\b(3) string.]"
+"	[+perm?The integral value as a \bfmtperm\b(3) string.]"
+"	[+time[=\aformat\a]]?The integral value as a \bstrftime\b(3)"
+"		string. For example,"
+"		\b--format=\"%8(mtime)u %(ctime:time=%H:%M:%S)s\"\b"
+"		lists the mtime in seconds since the epoch and the"
+"		ctime as hours:minutes:seconds.]");
 				sfputc(state.tmp.str, '}');
 			}
 			sfputc(state.tmp.str, '\n');
@@ -1793,7 +2024,7 @@ main(int argc, char** argv)
 	sfputr(state.tmp.str, usage2, -1);
 	state.usage = sfstruse(state.tmp.str);
 	opt.arg0 = argv[0];
-	setoptions(NiL, argv, state.usage, NiL);
+	setoptions(NiL, argv, state.usage, NiL, 0);
 	argv += opt_info.index;
 	argc -= opt_info.index;
 	if (error_info.errors)
@@ -1809,7 +2040,7 @@ main(int argc, char** argv)
 	if (!state.meter.on)
 		sfputc(opt.listformat, '\n');
 	if (!(state.listformat = strdup(sfstruse(opt.listformat))))
-		error(3, "out of space [listformat]");
+		nospace();
 	sfstrclose(opt.listformat);
 	ignore();
 	if (s = state.filter.command)
@@ -1820,7 +2051,7 @@ main(int argc, char** argv)
 			s = "sh -c";
 		}
 		if (!(s = strdup(s)))
-			error(3, "out of space [filter]");
+			nospace();
 		p = s;
 		n = 3;
 		while (i = *s++)
@@ -1969,7 +2200,7 @@ main(int argc, char** argv)
 		state.buffersize = state.blocksize;
 	state.tmp.buffersize = state.buffersize;
 	if (!(state.tmp.buffer = newof(0, char, state.tmp.buffersize, 0)))
-		error(3, "out of space [tmp buffer]");
+		nospace();
 	message((-1, "blocksize=%d buffersize=%d recordsize=%d", state.blocksize, state.buffersize, state.record.size));
 
 	/*
@@ -2015,7 +2246,7 @@ main(int argc, char** argv)
 				error(3, "%s: cannot redirect %s filter output", ap->name, format[ap->compress].name);
 			close(n);
 			if (!(p = newof(0, List_t, 1, 0)))
-				error(3, "out of space [state.proc]");
+				nospace();
 			p->item = (void*)proc;
 			p->next = state.proc;
 			state.proc = p;
@@ -2023,7 +2254,7 @@ main(int argc, char** argv)
 		if (state.checksum.name)
 		{
 			if (!(state.checksum.path = pathtemp(NiL, 0, NiL, error_info.id, NiL)))
-				error(3, "out of space [checksum temporary]");
+				nospace();
 			if (!(state.checksum.sp = sfopen(NiL, state.checksum.path, "w")))
 				error(3, "%s: cannot write checksum temporary", state.checksum.path);
 			sfprintf(state.checksum.sp, "method=%s\n", state.checksum.sum->name);
@@ -2032,7 +2263,7 @@ main(int argc, char** argv)
 		if (state.install.name)
 		{
 			if (!(state.install.path = pathtemp(NiL, 0, NiL, error_info.id, NiL)))
-				error(3, "out of space [install script]");
+				nospace();
 			if (!(state.install.sp = sfopen(NiL, state.install.path, "w")))
 				error(3, "%s: cannot write install temporary", state.install.path);
 		}
@@ -2213,4 +2444,25 @@ finish(int code)
 		pause();
 	}
 	exit(code ? code : error_info.errors != 0);
+}
+
+/*
+ * return release stamp
+ */
+
+char*
+release(void)
+{
+	register char*	b;
+	register char*	s;
+	register char*	t;
+
+	if ((s = strchr(usage, '@')) && (t = strchr(s, '\n')) && (b = fmtbuf(t - s + 1)))
+	{
+		memcpy(b, s, t - s);
+		b[t - s] = 0;
+	}
+	else
+		b = fmtident(usage);
+	return b;
 }

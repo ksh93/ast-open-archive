@@ -7,7 +7,7 @@ DEBUG == 1
 pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	pax.h options.h zip.h \
 	bio.c convert.c copy.c pax.c \
-	delta.c file.c format.c misc.c \
+	delta.c file.c format.c misc.c tv.c \
 	-lardir -lodelta -lvdelta -lsum
 
 "win32*" :NOOPTIMIZE: delta.c
@@ -30,4 +30,14 @@ tar :: tar.sh
 
 :TEST: testpax.sh pax
 
-:: link.dat mode.dat y2k.dat
+::	data/link.dat data/mode.dat \
+	data/aha.dat data/ro.dat \
+	data/star-all-fail-1.dat \
+	data/star-gnu-fail-1.dat \
+	data/star-gnu-fail-2.dat \
+	data/star-long-1.dat \
+	data/star-long-1.lst \
+	data/star-long-2.dat \
+	data/star-long-2.lst \
+	data/star-test.dat \
+	data/y2k.dat

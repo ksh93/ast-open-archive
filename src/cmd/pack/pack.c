@@ -169,10 +169,7 @@ main(int argc, register char *argv[])
 			else if((dsize = huffputhdr(hp,fpout)) < 0)
 				error(2, "%s: write error", infile);
 			else if(!force && block(huffisize(hp)) <= block(huffosize(hp)+dsize))
-{
-sfprintf(sfstderr,"%insize=%lld outsize=%lld\n",huffisize(hp),huffosize(hp));
 				error(2, "%s:no savings - file unchanged", infile);
-}
 			else if(huffencode(hp,fpin,fpout,SF_UNBOUND)<0)
 				error(2, "%s: read error", infile);
 			else

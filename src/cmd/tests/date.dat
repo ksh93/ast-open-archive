@@ -208,6 +208,13 @@ next 01:00 pm				NULL	Mon Sep 22 13:00:00 EDT 1986
 198610080045.19				NULL	Wed Oct  8 00:45:19 EDT 1986
 
 #
+# arithmetic
+#
+
+,#0					NULL	Wed Dec 31 19:00:00 EST 1969
+,#0 + 1022731200 seconds		NULL	Thu May 30 00:00:00 EDT 2002
+
+#
 # tricks and well known bugs
 #
 

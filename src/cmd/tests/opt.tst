@@ -1309,6 +1309,11 @@ OPTIONS
 return=z option=-z name=base arg=aaa zzz num=1
 return=-103 option=-103 name=charset arg=us num=1'
 		ERROR -
+	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us,block+=077777777777'
+		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
+return=z option=-z name=base arg=aaa,zzz num=1
+return=-103 option=-103 name=charset arg:=us num=1
+return=b option=-b name=blocksize arg+=077777777777 num=8589934591LL'
 	EXEC	- pax "$usage" '14 foo'
 		EXIT 1
 		OUTPUT - $'return=: option= name=14 num=0 str=14 foo\nreturn=: option= name=foo num=0 str=14 foo'
@@ -3394,9 +3399,9 @@ return=C option=-C name=-C arg=(null) num=1
 return=A option=-A name=--a arg=(null) num=1
 return=B option=-B name=--b arg=(null) num=1
 return=C option=-C name=--c arg=(null) num=1
-return=A option=-A name=--a arg=(null) num=1
-return=B option=-B name=--b arg=(null) num=1
-return=C option=-C name=--c arg=(null) num=1'
+return=A option=-A name=--axx arg=(null) num=1
+return=B option=-B name=--bxx arg=(null) num=1
+return=C option=-C name=--cxx arg=(null) num=1'
 	usage=$'[-][z:zzz]:[style]{[A:a*][B:b*][C:c*]}'
 	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
 		OUTPUT - $'return=z option=-z name=-z arg=A num=65
@@ -3463,7 +3468,15 @@ return=C option=-d name=-C arg=(null) num=1
 return=-280 option=-280 name=-Wparentheses arg=(null) num=1
 argument=1 value="tst.cob"'
 
-TEST 45 'detailed key strings' # this test must be last
+TEST 45 'n=v vs. n:=v'
+	usage=$'[-][a:aaa?AAA]:[vvv]'
+	EXEC pax "$usage" -a 1 --a=xx --a:=yy
+		OUTPUT - $'return=a option=-a name=-a arg=1 num=1
+return=a option=-a name=--aaa arg=xx num=1
+return=a option=-a name=--aaa arg:=yy num=1'
+	EXEC pax "$usage" -a 1 --aaa=xx --aaa:=yy
+
+TEST 99 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man
 		EXIT 2
@@ -3547,3 +3560,15 @@ IMPLEMENTATION
 
 (debug,small,libast,"SEE")
   (debug,small,libast,"tbig(1)")'
+	usage=$'[-][Y:layout?Listing layout \akey\a:]:[key]{\n[a:across|horizontal?Multi-column across the page.][1:single-column?One column down the page.]\n}'
+	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC ls "$usage" --man
+		ERROR - $'(libast,3,372)
+  ls [ (libast,3,709) ]
+
+(libast,3,333)
+  -Y, --(debug,ls,libast,"layout")|layout=(debug,ls,libast,"key")
+                  (debug,ls,libast,"Listing layout key:")
+                    (debug,ls,libast,"across|horizontal")
+                          (debug,ls,libast,"Multi-column across the page.")
+                    (debug,ls,libast,"single-column")
+                          (debug,ls,libast,"One column down the page.")'

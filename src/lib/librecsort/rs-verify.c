@@ -89,7 +89,7 @@ reg Rsobj_t*	obj;
 			obj->order = verify->n;
 			p->order = verify->o;
 
-			n = RSNOTIFY(rs,RS_VERIFY,obj,rs->disc);
+			n = RSNOTIFY(rs,RS_VERIFY,obj,0,rs->disc);
 
 			obj->order = oh; p->order = ph;
 

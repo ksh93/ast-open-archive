@@ -1,3 +1,8 @@
+03-09-18 dd.c: numeric option arg values are now intmax
+	 split.c: -b -C -l are now intmax
+03-09-11 ls.c: add --testdate=date for testing
+03-08-21 split.c: fix csplit pattern matching -- did it ever work?
+	 csplit.tst: add regression tests
 03-06-21 pss-procfs.c: fix PR_TIME(),PR_CTIME() normalization
 03-06-11 mount.c: reorder includes for mvs.390
 03-05-26 dd.tst: add

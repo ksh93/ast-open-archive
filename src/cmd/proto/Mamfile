@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -163,8 +163,7 @@ prev proto.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I../../lib/libpp -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -c proto.c
 done proto.o generated
 bind -last
-bind -lm dontcare
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o proto proto.o ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o proto proto.o ${mam_libast}
 done proto generated
 make mamake
 make mamake.o
@@ -178,7 +177,7 @@ setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/mamake.c
 done mamake.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamake mamake.o ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mamake mamake.o ${mam_libast}
 done mamake generated
 make ratz
 make ratz.o
@@ -200,7 +199,7 @@ done ../INIT/ratz.c
 prev ../INIT/ratz.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ../INIT/ratz.c
 done ratz.o generated
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ratz ratz.o ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o ratz ratz.o ${mam_libast}
 done ratz generated
 make release
 make release.o
@@ -214,7 +213,7 @@ setv LICENSE -DLICENSE="since=1999,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1999-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\" -D_PACKAGE_ast -c ../INIT/release.c
 done release.o generated
 setv LICENSE -DLICENSE="since=1999,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o release release.o ${mam_libast} ${mam_libm}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o release release.o ${mam_libast}
 done release generated
 make sear
 make sear.sh
@@ -230,28 +229,25 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 235 in
+exec - "")	case 231 in
 exec - 	0)	cp sear.sh sear
 exec - 		;;
 exec - 	*)	{
 exec - 		i=`(read x; echo $x) < sear.sh`
 exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
-exec - 		echo USAGE_LICENSE='\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"'
-exec - 		cat sear.sh
+exec - 		cat - sear.sh <<'!'
+exec - USAGE_LICENSE="[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"
+exec - !
 exec - 		} > sear
 exec - 		;;
 exec - 	esac
 exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case 235 in
-exec - 	0)	;;
-exec - 	*)	echo USAGE_LICENSE='\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"\"' ;;
-exec - 	esac
-exec - 	cat sear.sh
-exec - 	} > sear
+exec - *)	cat - sear.sh > sear <<'!'
+exec - ${mam_cc_SHELLMAGIC}
+exec - USAGE_LICENSE="[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2001-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?proto]"
+exec - !
 exec - 	;;
 exec - esac
 exec - chmod u+w,+x sear

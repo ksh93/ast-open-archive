@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-07-17
+info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -48,7 +48,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in recsort ast
+exec - for i in recsort dll ast
 exec - do	case $i in
 exec - 	"recsort"|recsort)
 exec - 		;;
@@ -136,9 +136,9 @@ make FEATURE/recsort implicit
 make features/recsort
 done features/recsort
 prev recsort.req
+bind -ldll
 bind -last
-bind -lm dontcare
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libm} ${mam_libast} ${mam_libm} : run features/recsort
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/recsort
 done FEATURE/recsort dontcare generated
 make ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/ast_common.h implicit
@@ -186,6 +186,28 @@ done rslist.c
 prev rslist.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rslist.c
 done rslist.o generated
+make rslib.o
+make rslib.c
+make ../../../include/ast/option.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/option.h
+make ../../../include/ast/dlldefs.h implicit
+done ../../../include/ast/dlldefs.h
+make rskeyhdr.h implicit
+prev rshdr.h implicit
+make ../../../include/ast/ccode.h implicit
+make ../../../include/ast/ast_ccode.h implicit
+done ../../../include/ast/ast_ccode.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ccode.h dontcare
+prev ../../../include/ast/ast.h implicit
+done rskeyhdr.h
+done rslib.c
+prev rslib.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rslib.c
+done rslib.o generated
 make rsmerge.o
 make rsmerge.c
 prev rshdr.h implicit
@@ -251,16 +273,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_rec
 done rs-verify.o generated
 make rskeyopen.o
 make rskeyopen.c
-make rskeyhdr.h implicit
-prev rshdr.h implicit
-make ../../../include/ast/ccode.h implicit
-make ../../../include/ast/ast_ccode.h implicit
-done ../../../include/ast/ast_ccode.h dontcare
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ccode.h dontcare
-prev ../../../include/ast/ast.h implicit
-done rskeyhdr.h
+prev rskeyhdr.h implicit
 done rskeyopen.c
 prev rskeyopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeyopen.c
@@ -273,6 +286,9 @@ done ../../../include/ast/ast_time.h dontcare
 prev ../../../include/ast/ast.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/times.h dontcare
+make ../../../include/ast/hashpart.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/hashpart.h
 prev rskeyhdr.h implicit
 done rskey.c
 prev rskey.c
@@ -292,7 +308,7 @@ done rskeydump.c
 prev rskeydump.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rskeydump.c
 done rskeydump.o generated
-exec - ${AR} cr librecsort.a rsclear.o rsclose.o rsdisc.o rsnotify.o rslist.o rsmerge.o rsmethod.o rsopen.o rsprocess.o rswrite.o rs-radix.o rs-rasp.o rs-splay.o rs-verify.o rskeyopen.o rskey.o rskeymeth.o rskeydump.o
+exec - ${AR} cr librecsort.a rsclear.o rsclose.o rsdisc.o rsnotify.o rslist.o rslib.o rsmerge.o rsmethod.o rsopen.o rsprocess.o rswrite.o rs-radix.o rs-rasp.o rs-splay.o rs-verify.o rskeyopen.o rskey.o rskeymeth.o rskeydump.o
 exec - (ranlib librecsort.a) >/dev/null 2>&1 || true
 done librecsort.a generated
 done recsort virtual

@@ -1,3 +1,9 @@
+03-09-22 Makerules.mk: don;t clobber $(CATALOG).msg
+03-09-19 Makerules.mk: fix %.sh USAGE_LICENSE quoting
+	 expand.c: fix :T=E: quoting
+03-09-16 archive.c: inhibit `member newer than archive' for ranlib time skew
+03-08-27 Makerules.mk: honor explicit :MAKE: rhs order
+03-08-11 make.c: change -T0x00300000 to -Q0x00300000 as documented
 03-07-17 archive.c: add arupdate()
 	 state.c: don't skew sync archives (avoids possible ranlib interference)
 03-06-21 parse.c: fix expr() quote recursion bug
