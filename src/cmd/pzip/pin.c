@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pin (AT&T Labs Research) 2002-12-25 $\n]"
+"[-?\n@(#)$Id: pin (AT&T Labs Research) 2003-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -83,6 +83,9 @@ USAGE_LICENSE
 "[l:level?Sets the \agzip\a compression level to \alevel\a. Levels range"
 "	from 1 (fastest, worst compression) to 9 (slowest, best compression).]#"
 "		[level:=6]"
+"[m:maxhigh?Exit with exit code 3 if the number of high frequency columns"
+"	exceeds \bmaxhigh\b. If \bmaxhigh\b is followed by `%' then the limit"
+"	is \bmaxhigh\b percent of the total number of columns.]:[maxhigh:=40%]"
 "[o:sort?Sort the window data by row before inducing the partition.]"
 "[p:partition?Specifies the data row size and the high frequency column"
 "	partition groups and permutation. The partition file is a sequence"
@@ -526,7 +529,7 @@ merge(unsigned char* t, unsigned char* s, int i, Part_t* pp, register Part_t* np
  */
 
 static size_t
-filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t high, int percent, size_t row, size_t tot)
+filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, int high, int maxhigh, size_t row, size_t tot)
 {
 	register int	i;
 	register int	j;
@@ -595,7 +598,12 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 			else
 			{
 				if (state.verbose)
-					sfprintf(sfstderr, "filter top %d%s high frequency columns\n", high, percent ? "%" : "");
+				{
+					if (high < 0)
+						sfprintf(sfstderr, "filter top %d%% high frequency columns\n", -high);
+					else if (high > 0)
+						sfprintf(sfstderr, "filter top %d high frequency columns\n", high);
+				}
 				s = dat;
 				for (i = 0; i < rows; i++)
 					for (j = 0; j < row; j++)
@@ -657,15 +665,25 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 				if (state.verbose)
 					sfprintf(sfstderr, "filter done -- %u rows\n", n);
 			}
-			if (percent)
+			if (high < 0)
 			{
-				freq = state.stats[0].frequency * high / 100;
+				freq = state.stats[0].frequency * (-high) / 100;
 				for (j = 0; j < row; j++)
 					if (state.stats[j].frequency <= freq)
 						break;
 				high = j;
 				if (state.verbose)
 					sfprintf(sfstderr, "%d high frequency column%s out of %d\n", high, high == 1 ? "" : "s", row);
+			}
+			if (maxhigh < 0)
+			{
+				if (high > (row * (-maxhigh) / 100))
+					error(6, "high frequency count %d exceeds %d%% of %d", high, maxhigh, row);
+			}
+			else if (maxhigh > 0)
+			{
+				if (high > maxhigh)
+					error(6, "high frequency count %d exceeds %d", high, maxhigh);
 			}
 
 			/*
@@ -1444,12 +1462,12 @@ main(int argc, char** argv)
 	Optdisc_t	optdisc;
 
 	int		op = 0;
-	size_t		high = 10;
+	int		high = -10;
+	int		maxhigh = -40;
 	int		maxgrp = 0;
 	size_t		row = 0;
 	Pz_t*		pz = 0;
 	char*		partition = 0;
-	int		percent = 1;
 
 	Optimize_method_t*	optimize_method = &optimize_methods[0];
 	Reorder_method_t*	reorder_method = &reorder_methods[0];
@@ -1478,13 +1496,26 @@ main(int argc, char** argv)
 			continue;
 		case 'h':
 			high = strtol(opt_info.arg, &s, 0);
-			if (percent = *s == '%')
+			if (*s == '%')
+			{
 				s++;
+				high = -high;
+			}
 			if (*s)
 				error(3, "%s: %s: invalid number", opt_info.name, opt_info.arg);
 			continue;
 		case 'l':
 			state.level = opt_info.num;
+			continue;
+		case 'm':
+			maxhigh = strtol(opt_info.arg, &s, 0);
+			if (*s == '%')
+			{
+				s++;
+				maxhigh = -maxhigh;
+			}
+			if (*s)
+				error(3, "%s: %s: invalid number", opt_info.name, opt_info.arg);
 			continue;
 		case 'o':
 			state.sort = 1;
@@ -1597,7 +1628,6 @@ main(int argc, char** argv)
 			{
 				row = pz->part->row;
 				high = pz->part->nmap;
-				percent = 0;
 			}
 			else
 			{
@@ -1634,7 +1664,7 @@ main(int argc, char** argv)
 			if ((m = sfread(ip, dat, win)) < 0)
 				m = 0;
 			rows = m / row;
-			if (filter(ip, &buf, &dat, pz, high, percent, row, row * rows) == row)
+			if (filter(ip, &buf, &dat, pz, high, maxhigh, row, row * rows) == row)
 				row = 0;
 		}
 		if (!n)
@@ -1653,7 +1683,7 @@ main(int argc, char** argv)
 	}
 	if (!(rec = row))
 		error(3, "-r row-size is required");
-	if (!percent && high > row)
+	if (high > (int)row)
 		error(3, "-h col-count must be <= -r row-size");
 	state.window = (state.window / row) * row;
 	if (!(dat = newof(0, unsigned char, state.window, 0)))
@@ -1692,7 +1722,7 @@ main(int argc, char** argv)
 	 * filter out the high frequency columns
 	 */
 
-	if (row = filter(ip, &buf, &dat, pz, high, percent, row, row * rows))
+	if (row = filter(ip, &buf, &dat, pz, high, maxhigh, row, row * rows))
 	{
 		tot = row * rows;
 		if (!(lab = newof(0, int, row, 0)))

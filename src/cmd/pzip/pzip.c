@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pzip (AT&T Labs Research) 2002-10-31 $\n]"
+"[-?\n@(#)$Id: pzip (AT&T Labs Research) 2003-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - fixed record partition compress/decompress]"
 "[+DESCRIPTION?\b\f?\f\b compresses and decompresses data files of fixed"
@@ -150,7 +150,8 @@ USAGE_LICENSE
 "	the \aid\a file is not modified. \b--split\b should be used in a"
 "	separate directory, and the directory should be cleared when"
 "	\b--append\b is not specified to avoid mixing inconsistent"
-"	data.]:?[pattern]"
+"	data. No records will be written to a split file with size"
+"	>= \b--window\b bytes.]:?[pattern]"
 "[s:summary?Enable summary tracing to the standard error. Runtime libraries"
 "	may add addtional information to the default \bpzip\b(3) library"
 "	summary output. Compression summary includes the compression rate,"

@@ -1,3 +1,5 @@
+03-07-17 archive.c: add arupdate()
+	 state.c: don't skew sync archives (avoids possible ranlib interference)
 03-06-21 parse.c: fix expr() quote recursion bug
 	 Makerules.mk: fix .DLL.INSTALL logic
 	 object.c: add initcode() to initialize the ccode maps early enough

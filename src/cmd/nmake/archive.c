@@ -33,64 +33,37 @@
 
 #include <ardir.h>
 
-#define arpointer(x)	((x)>=0&&(x)<elementsof(artab)?artab[x]:0)
-
-static Ardir_t*		artab[2];	/* open archive table		*/
-
 static int		ntouched;	/* count of touched members	*/
 
-#define UPDATE_rand	"$(RANLIB) $(<)"
-
 /*
- * open an archive and determine its type
+ * return the update command for the named archive
  */
 
-int
-openar(char* name, char* mode)
+char*
+arupdate(char* name)
 {
-	int	arfd;
+	Ardir_t*	ar;
+	char*		update;
 
-	for (arfd = 0; arfd < elementsof(artab); arfd++)
-		if (!artab[arfd])
-			break;
-	if (arfd >= elementsof(artab))
-		return -1;
-	if (!(artab[arfd] = ardiropen(name, NiL, ARDIR_LOCAL|(strchr(mode, '+') ? ARDIR_UPDATE : 0))))
-		return -1;
-	internal.arupdate = streq(artab[arfd]->meth->name, "local") ? "($(RANLIB|\":\") $(<)) >/dev/null 2>&1 || true" : (artab[arfd]->flags & ARDIR_RANLIB) ? "$(RANLIB) $(<)" : (char*)0;
-	return arfd;
-}
-
-/*
- * close an archive opened by openar()
- */
-
-int
-closear(int arfd)
-{
-	register Ardir_t*	ar;
-
-	if (!(ar = arpointer(arfd)))
-		return -1;
-	artab[arfd] = 0;
-	return ardirclose(ar);
+	if (!(ar = ardiropen(name, NiL, ARDIR_LOCAL)))
+		return 0;
+	update = streq(ar->meth->name, "local") ? "($(RANLIB|\":\") $(<)) >/dev/null 2>&1 || true" : (ar->flags & ARDIR_RANLIB) ? "$(RANLIB) $(<)" : (char*)0;
+	ardirclose(ar);
+	return update;
 }
 
 /*
  * walk through an archive
- * d==0 updates the modify time of preselected members (see touchar())
+ * d==0 updates the modify time of preselected members (see artouch())
  * else each member is recorded using addfile()
  */
 
-int
-walkar(struct dir* d, int arfd, char* name)
+static int
+walkar(register Ardir_t* ar, struct dir* d, char* name)
 {
-	register Ardir_t*	ar;
 	register Ardirent_t*	ent;
 	register struct rule*	r;
 
-	if (!(ar = arpointer(arfd)))
-		return 0;
 	if (d)
 	{
 		putar(d->name, d);
@@ -146,10 +119,10 @@ chktouch(const char* s, char* v, void* h)
  */
 
 void
-touchar(char* name, register char* member)
+artouch(char* name, register char* member)
 {
 	register struct rule*	r;
-	int			arfd;
+	Ardir_t*		ar;
 
 	if (member)
 	{
@@ -161,10 +134,10 @@ touchar(char* name, register char* member)
 			ntouched++;
 		}
 	}
-	else if ((arfd = openar(name, "br+")) >= 0)
+	else if (ar = ardiropen(name, NiL, ARDIR_LOCAL|ARDIR_UPDATE))
 	{
-		walkar(NiL, arfd, name);
-		if (closear(arfd))
+		walkar(ar, NiL, name);
+		if (ardirclose(ar))
 			error(1, "error touching archive %s", name);
 		if (ntouched > 0)
 		{
@@ -173,4 +146,51 @@ touchar(char* name, register char* member)
 		}
 		ntouched = 0;
 	}
+}
+
+/*
+ * scan archive r and record all its entries
+ */
+
+void
+arscan(struct rule* r)
+{
+	Ardir_t*	ar;
+	struct dir*	d;
+
+	if (r->dynamic & D_scanned)
+		return;
+	r->dynamic |= D_scanned;
+	if (r->property & P_state)
+		r->dynamic &= ~D_entries;
+	else if (!(d = unique(r)))
+		r->dynamic |= D_entries;
+	else if (r->scan >= SCAN_USER)
+	{
+#if DEBUG
+		message((-5, "scan aggregate %s", r->name));
+#endif
+		d->archive = 1;
+		state.archive = d;
+		scan(r, NiL);
+		state.archive = 0;
+		r->dynamic |= D_entries;
+	}
+	else if (ar = ardiropen(r->name, NiL, ARDIR_LOCAL))
+	{
+#if DEBUG
+		message((-5, "scan archive %s", r->name));
+#endif
+		d->archive = 1;
+		if (walkar(ar, d, r->name))
+			r->dynamic |= D_entries;
+		else
+			r->dynamic &= ~D_entries;
+		if (ardirclose(ar))
+			error(1, "%s: archive scan error", r->name);
+	}
+#if DEBUG
+	else
+		message((-5, "arscan(%s) failed", r->name));
+#endif
 }

@@ -118,7 +118,7 @@ accept(register struct rule* r)
 	{
 		if (state.exec)
 		{
-			touchar(r->name, NiL);
+			artouch(r->name, NiL);
 			statetime(r, 0);
 		}
 		if (!state.silent)
@@ -136,7 +136,7 @@ accept(register struct rule* r)
 			r->name = putrule(t + 1, r);
 		}
 		if (state.exec)
-			touchar(r->active->parent->target->name, r->name);
+			artouch(r->active->parent->target->name, r->name);
 		else if (!state.silent)
 			error(0, "touch %s/%s", r->active->parent->target->name, r->name);
 		if (!(r->dynamic & D_regular))

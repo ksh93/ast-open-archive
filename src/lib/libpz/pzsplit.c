@@ -47,11 +47,13 @@ typedef struct Id_s
 	unsigned long	id;
 	int		row;
 	size_t		size;
+	size_t		count;
 	char*		bp;
 	char*		name;
 	unsigned long	used;
 	unsigned long	windows;
 	Sfulong_t	modules;
+	Sfulong_t	total;
 } Id_t;
 
 typedef struct Deflate_s
@@ -121,6 +123,8 @@ byulong(Dt_t* dt, void*a, void* b, Dtdisc_t* disc)
 static void
 freeid(Dt_t* dt, Void_t* ip, Dtdisc_t* disc)
 {
+	if (((Id_t*)ip)->sp)
+		sfclose(((Id_t*)ip)->sp);
 	free(ip);
 }
 
@@ -139,6 +143,10 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 	int		i;
 	int		line;
 
+	static size_t	use;
+
+	if (!use && (!(dp->pz->test & 04) || !(file = getenv("_AST_pzip_debug_use")) || !(use = strton(file, NiL, NiL, 1))))
+		use = 8 * 1024;
 	dp->pz->count.windows++;
 	if ((dp->pz->flags & (PZ_DUMP|PZ_VERBOSE)) && dp->pz->disc->errorf)
 		(*dp->pz->disc->errorf)(dp->pz, dp->pz->disc, 0, "window %I*u %I*u", sizeof(dp->pz->count.windows), dp->pz->count.windows, sizeof(w), w);
@@ -159,7 +167,7 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 		{
 			i++;
 			ip->windows++;
-			if (n >= (dp->pz->win / 16))
+			if (n >= use && (!ip->row || (n / ip->row) > 16))
 			{
 				if (!ip->used++ && !ip->part && dp->pz->disc->errorf && (dp->pz->flags & (PZ_SUMMARY|PZ_VERBOSE|PZ_DUMP)))
 					(*dp->pz->disc->errorf)(dp->pz, dp->pz->disc, 1, "%s: generate a partition to improve compression", ip->name);
@@ -372,6 +380,8 @@ deflate(Pz_t* pz, Sfio_t* op)
 		}
 		else
 			z = rp->size;
+		if (!rp->size)
+			continue;
 		if ((index.offset + z) > m)
 		{
 			if (flush(&def, index.offset, op))
@@ -409,7 +419,9 @@ deflate(Pz_t* pz, Sfio_t* op)
 				(*pz->disc->errorf)(pz, pz->disc, 1, "%s: partition row %I*u != data row %I*u", ip->name, sizeof(ip->part->row), ip->part->row, sizeof(ip->row), ip->row);
 			dtinsert(def.ids, ip);
 		}
-		else if (pz->disc->errorf && ip->row != rp->size && rp->size && (ip->row % rp->size))
+		else if (!ip->id)
+			ip->total += rp->size;
+		else if (pz->disc->errorf && ip->row != rp->size && (ip->row % rp->size))
 			(*pz->disc->errorf)(pz, pz->disc, 1, "%s: size %I*u not a multiple of %I*u", ip->name, sizeof(rp->size), rp->size, sizeof(ip->row), ip->row);
 		if (!ip->seq)
 		{
@@ -419,9 +431,9 @@ deflate(Pz_t* pz, Sfio_t* op)
 		sfputu(def.xp, ip->seq);
 		if (!ip->id)
 		{
-			o = sfseek(ip->sp, (Sfoff_t)0, SEEK_CUR);
+			o = sfstrtell(ip->sp);
 			sfputu(ip->sp, rp->size);
-			o = sfseek(ip->sp, (Sfoff_t)0, SEEK_CUR) - o;
+			o = sfstrtell(ip->sp) - o;
 			index.offset += o;
 			extra += o;
 		}
@@ -454,8 +466,11 @@ deflate(Pz_t* pz, Sfio_t* op)
 		goto bad;
 	}
 	if ((pz->flags & PZ_DUMP) && pz->disc->errorf)
+	{
+		(*pz->disc->errorf)(pz, pz->disc, 0, "totals");
 		for (ip = (Id_t*)dtfirst(def.ids); ip; ip = (Id_t*)dtnext(def.ids, ip))
-			(*pz->disc->errorf)(pz, pz->disc, 0, "%8I*u %12s %2u %4I*u %4I*u %12I*u %12I*u%s", sizeof(ip->windows), ip->windows, ip->name, !!ip->part, sizeof(ip->used), ip->used, sizeof(ip->row), ip->row, sizeof(ip->modules), ip->modules * ip->row, sizeof(ip->modules), ip->modules, ip->used && !ip->part ? "  GENERATE PARTITION" : "");
+			(*pz->disc->errorf)(pz, pz->disc, 0, "%8I*u %12s %2u %4I*u %4I*u %12I*u %12I*u%s", sizeof(ip->windows), ip->windows, ip->name, !!ip->part, sizeof(ip->used), ip->used, sizeof(ip->row), ip->row, sizeof(ip->total), ip->total ? ip->total : ip->modules * ip->row, sizeof(ip->modules), ip->modules, ip->used && !ip->part ? "  GENERATE PARTITION" : "");
+	}
 	i = 0;
 	goto done;
  bad:
@@ -659,6 +674,7 @@ inflate(Pz_t* pz, Sfio_t* op)
 					n = (n << SF_UBITS) | (i & (SF_MORE - 1));
 				n = (n << SF_UBITS) | i;
 			}
+#if 1
 			if (!(s = (char*)sfreserve(op, n, 0)))
 			{
 				if (pz->disc->errorf)
@@ -666,6 +682,14 @@ inflate(Pz_t* pz, Sfio_t* op)
 				goto bad;
 			}
 			memcpy(s, p, n);
+#else
+			if (sfwrite(op, p, n) != n)
+			{
+				if (pz->disc->errorf)
+					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%I*u byte write error", sizeof(n), n);
+				goto bad;
+			}
+#endif
 			ip->bp = (char*)p + n;
 		}
 	}
@@ -728,6 +752,7 @@ pzssplit(Pz_t* pz)
 	char*		s;
 	int		line;
 	int		i;
+	size_t		window;
 	Id_t*		ip;
 	Dt_t*		ids;
 	char		num[16];
@@ -738,6 +763,7 @@ pzssplit(Pz_t* pz)
 			(*pz->disc->errorf)(pz, pz->disc, 2, "%s: split discipline library expected", pz->path);
 		return -1;
 	}
+	window = pz->disc->window ? pz->disc->window : PZ_WINDOW;
 	file = error_info.file;
 	line = error_info.line;
 	memset(&iddisc, 0, sizeof(iddisc));
@@ -783,39 +809,47 @@ pzssplit(Pz_t* pz)
 			if (ip->id = rp->id)
 				ip->row = rp->size;
 			ip->name = strcpy((char*)(ip + 1), s);
-			if ((!pz->split.match || strmatch(ip->name, pz->split.match)) && !(ip->sp = sfopen(NiL, ip->name, (pz->flags & PZ_APPEND) ? "a" : "w")))
+			if (!pz->split.match || strmatch(ip->name, pz->split.match))
 			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: cannot create split stream", ip->name);
-				goto bad;
+				if (!(ip->sp = sfopen(NiL, ip->name, (pz->flags & PZ_APPEND) ? "a" : "w")))
+				{
+					if (pz->disc->errorf)
+						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: cannot create split stream", ip->name);
+					goto bad;
+				}
+				ip->count = sfsize(ip->sp);
 			}
 			dtinsert(ids, ip);
 			if ((pz->flags & PZ_DUMP) && pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, 0, "split %s size %I*u", ip->name, sizeof(ip->row), ip->row);
 		}
+		else if (!ip->id)
+			ip->total += rp->size;
 		else if (pz->disc->errorf && ip->row != rp->size && rp->size && (ip->row % rp->size))
 			(*pz->disc->errorf)(pz, pz->disc, 1, "%s: size %I*u not a multiple of %I*u", ip->name, sizeof(rp->size), rp->size, sizeof(ip->row), ip->row);
 		if (ip->sp)
 		{
-			if (sfwrite(ip->sp, rp->data, rp->size) != rp->size)
+			if (ip->count < window)
 			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %I*u byte write error", ip->name, sizeof(rp->size), rp->size);
-				goto bad;
+				if (sfwrite(ip->sp, rp->data, rp->size) != rp->size)
+				{
+					if (pz->disc->errorf)
+						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %I*u byte write error", ip->name, sizeof(rp->size), rp->size);
+					goto bad;
+				}
+				ip->count += rp->size;
 			}
 			ip->modules++;
 			pz->count.modules++;
 		}
 	}
 	if ((pz->flags & PZ_DUMP) && pz->disc->errorf)
+	{
+		(*pz->disc->errorf)(pz, pz->disc, 0, "totals");
 		for (ip = (Id_t*)dtfirst(ids); ip; ip = (Id_t*)dtnext(ids, ip))
 			if (ip->sp)
-				(*pz->disc->errorf)(pz, pz->disc, 0, "%8I*u %12s %2u %4I*u %4I*u %12I*u %12I*u%s", sizeof(ip->windows), ip->windows, ip->name, !!ip->part, sizeof(ip->used), ip->used, sizeof(ip->row), ip->row, sizeof(ip->modules), ip->modules * ip->row, sizeof(ip->modules), ip->modules, ip->used && !ip->part ? "  GENERATE PARTITION" : "");
-
-	/*
-	 * close all the split output files
-	 */
-
+				(*pz->disc->errorf)(pz, pz->disc, 0, "%8I*u %12s %2u %4I*u %4I*u %12I*u %12I*u%s", sizeof(ip->windows), ip->windows, ip->name, !!ip->part, sizeof(ip->used), ip->used, sizeof(ip->row), ip->row, sizeof(ip->total), ip->total ? ip->total : ip->modules * ip->row, sizeof(ip->modules), ip->modules, ip->used && !ip->part ? "  GENERATE PARTITION" : "");
+	}
 	for (ip = (Id_t*)dtfirst(ids); ip; ip = (Id_t*)dtnext(ids, ip))
 		if (ip->sp && sfclose(ip->sp))
 		{

@@ -6,7 +6,7 @@
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
 </HEAD>
-<BODY  bgcolor=white link=slateblue vlink=teal >
+<BODY bgcolor=white link=slateblue vlink=teal >
 <TABLE border=0 align=center width=96%>
 <TBODY><TR><TD valign=top align=left>
 <!--INDEX--><!--/INDEX-->
@@ -18,7 +18,7 @@ libraries.
 Components in this package:
 <P>
 <P></P><TABLE border=0 frame=void rules=none width=100%><TBODY><TR><TD>
-<TABLE  align=center border=0 bordercolor=white cellpadding=0 cellspacing=0 frame=void rules=none width=99% >
+<TABLE align=center border=0 bordercolor=white cellpadding=0 cellspacing=0 frame=void rules=none width=99% >
 <TBODY>
 <TR><TD align=left>
 <A href="#3d">3d</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;html&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#pax">pax</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;<A href="#tksh">tksh</A>&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libcs&nbsp;&nbsp;</TD><TD align=left>&nbsp;&nbsp;libtk</TD></TR>
@@ -1027,16 +1027,24 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-03-06-26  --- Release ksh93o+  ---
-03-06-26  Additional fields were added to the ulimit builtin.  Fields not
-	  supported by the local system are listed with reasonable sysconf(3),
-	  pathconf(3), or confstr(3) counterparts. Otherwise unsupported
-	  values are listed as "not supported".
-03-06-26  A bug in ulimit that improperly printed long long limit values
-	  has been fixed.
-03-06-23  A bug in which ${@:offset:len} could core dump when there
+03-07-20  --- Release ksh93o+  ---
+03-07-20  A bug in which could cause memory corruption when a posix
+	  function invoked another one has been fixed.
+03-07-15  A bug in which a file descriptor&gt;2 could be closed before
+	  executing a script has been fixed.
+03-07-15  A parsing error for &lt;() and &gt;() process subsitituions inside
+	  command substitution has been fixed.
+03-07-15  A parsing error for patterns of the form {...}(...) when
+	  used inside ${...} has been fixed.
+03-07-15  An error in which expanding an indexed array inside a compound
+	  variable could cause a core dump has been fixed.
+03-07-15  A bug in which under on rare ocassions a job completion interrupt
+	  could cause to core dump has been fixed.
+03-06-26  A bug in which process substitution embeded within command
+	  substitution would generate a syntax error has been fixed.
+03-96-23  A bug in which ${@:offset:len} could core dump when there
 	  were no arguments has been fixed.
-03-06-23  A bug in which ${X&#0091;@&#0093;:offset:len} could core dump when X
+03-96-23  A bug in which ${X&#0091;@&#0093;:offset:len} could core dump when X
 	  was unset has been fixed.
 03-06-22  The -x option was added to the command builtin.  If this
 	  option is on, and the number of arguments would exceed ARG_MAX,
@@ -2746,6 +2754,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-07-17 archive.c: add arupdate()
+	 state.c: don't skew sync archives (avoids possible ranlib interference)
 03-06-21 parse.c: fix expr() quote recursion bug
 	 Makerules.mk: fix .DLL.INSTALL logic
 	 object.c: add initcode() to initialize the ccode maps early enough
@@ -3653,6 +3663,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-07-14 fmt.tst: add
 03-06-10 who.c: ctime() arg must be time_t* (linux.s390-64)
 03-05-21 asa.c,asa.tst: add
 03-05-15 join.tst: add -v2 tests
@@ -5776,6 +5787,8 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pzip changes">pzip changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-07-17 pzip.c: update --split doc
+	 pin.c: add --maxhigh=N% high frequency column hard limit
 03-04-05 pop.c: add OP_VERBOSE for cut() trace
 03-01-04 pin.c: list range only if more than 2 elements
 02-12-25 pin: add --sort
@@ -5818,6 +5831,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-07-17 testregex.dat: add REG_SHELL|REG_AUGMENTED tests
 03-06-09 minimal.dat: add tests
 03-03-17 ed.tst: add ! command tests for sfpopen() "" mode fix
 03-02-17 testregex.dat: add bm tests
@@ -6301,6 +6315,11 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-07-22 vmalloc/vmbest.c: fall back to sbrk() if mmap() fails
+	 features/mem.c: _mem_sbrk means sbrk() and brk() work
+03-07-17 regex/regcomp.c: fix bug that treated KRE X{n,m} like {n,m}(X)
+	 misc/magic.c: check MAGIC_VERBOSE for all load() messages
+03-07-14 misc/optget.c: handle &#0091;...&#0093;{&#0091;...&#0093;<.>..</.><.>..}</.>
 03-06-21 misc/sigcrit.c: block SIGCHLD if _lib_sigprocmask || _lib_sigsetmask
 	 comp/spawnveg.c,sfio/sfmode.c: use sigcritical() SIG_REG_* macros
 	 comp/spawnveg.c: drop ENOEXEC logic
@@ -7388,6 +7407,7 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-07-15 fmt.c: ix trailing space bug
 03-06-20 uname.c: fix -p constant string overwrite
 03-06-04 stty.c: add undef to control assignment docs
 03-05-31 uname.c: add -f and sysinfo()/confstr() compatibility via astconf()
@@ -8236,6 +8256,11 @@ End:
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpz changes">libpz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+03-07-23 pzsplit.c: --split file size limited to --window
+03-07-17 pzpart.c: fix "//" partition translation
+	 pzpart.c: add include="file", library="..." disabled during include
+	 pzpart.c: default split window threshhold is now 16K
+	 pzsplit.c: free Id_t when done
 03-05-13 sfdcpzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
 03-05-05 sfdcpzip.c,sfdczip.c: add bzip support
 03-04-15 pzlib.h: add PZ_MARK_PART for partial last input record
@@ -8408,7 +8433,7 @@ End:
 <TABLE border=0 align=center width=96%>
 <TR>
 <TD align=left></TD>
-<TD align=right>June 26, 2003</TD>
+<TD align=right>July 25, 2003</TD>
 </TR>
 </TABLE>
 <P>

@@ -404,53 +404,6 @@ dirscan(struct rule* r)
 	}
 }
 
-/*
- * scan archive r and record all its entries
- */
-
-static void
-arscan(struct rule* r)
-{
-	int		arfd;
-	struct dir*	d;
-
-	if (r->dynamic & D_scanned)
-		return;
-	r->dynamic |= D_scanned;
-	if (r->property & P_state)
-		r->dynamic &= ~D_entries;
-	else if (!(d = unique(r)))
-		r->dynamic |= D_entries;
-	else if (r->scan >= SCAN_USER)
-	{
-#if DEBUG
-		message((-5, "scan aggregate %s", r->name));
-#endif
-		d->archive = 1;
-		state.archive = d;
-		scan(r, NiL);
-		state.archive = 0;
-		r->dynamic |= D_entries;
-	}
-	else if ((arfd = openar(r->name, "br")) >= 0)
-	{
-#if DEBUG
-		message((-5, "scan archive %s", r->name));
-#endif
-		d->archive = 1;
-		if (walkar(d, arfd, r->name))
-			r->dynamic |= D_entries;
-		else
-			r->dynamic &= ~D_entries;
-		if (closear(arfd))
-			error(1, "%s: archive scan error", r->name);
-	}
-#if DEBUG
-	else
-		message((-5, "arscan(%s) failed", r->name));
-#endif
-}
-
 struct globstate
 {
 	char*		name;

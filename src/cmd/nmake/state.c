@@ -971,10 +971,10 @@ statetime(register struct rule* r, int sync)
 
 		/*
 		 * check for file system and local system time consistency
-		 * directories and multi hard link files are not sync'd
+		 * directories, archives and multi hard link files not sync'd
 		 */
 
-		if (st.st_nlink <= 1 && !S_ISDIR(st.st_mode))
+		if (st.st_nlink <= 1 && !S_ISDIR(st.st_mode) && !(r->property & P_archive))
 		{
 
 #if DEBUG
@@ -1004,7 +1004,6 @@ statetime(register struct rule* r, int sync)
 				 *	 only built files are sync'd
 				 */
 
-				n = 0;
 				for (;;)
 				{
 					t = CURTIME + localskew;
@@ -1013,7 +1012,7 @@ statetime(register struct rule* r, int sync)
 						error(ERROR_SYSTEM|1, "%s not sync'd to local time", r->name);
 						break;
 					}
-					if (n || localtest || localskew)
+					if (localtest)
 					{
 						st.st_mtime = t;
 						break;
@@ -1024,6 +1023,7 @@ statetime(register struct rule* r, int sync)
 					 * remote skew in the utime() call
 					 * >> this never works <<
 					 * members of the club include
+					 *	darwin.ppc
 					 *	netbsd.i386
 					 */
 
@@ -1032,18 +1032,23 @@ statetime(register struct rule* r, int sync)
 						error(ERROR_SYSTEM|1, "%s not found", r->name);
 						break;
 					}
+					localtest = 1;
 					if (st.st_mtime == t)
-					{
-						localtest = 1;
 						break;
-					}
-					if (!localtest)
-					{
-						localtest = 1;
-						error(1, "the utime(2) or utimes(2) system call is botched for the filesystem containing %s -- the state may be out of sync", r->name);
-					}
 					localskew = t - st.st_mtime;
-					n = 0;
+					error(1, "the utime(2) or utimes(2) system call is botched for the filesystem containing %s (the current time is adjusted by %d seconds) -- the state may be out of sync", r->name, localskew);
+
+					/*
+					 * the botch may only be for times near
+					 * "now" -- localskew=1 handles this
+					 */
+
+					if (localskew != 1)
+					{
+						t = CURTIME + 1;
+						if (!touch(r->name, (time_t)0, t, 0) && !stat(r->name, &st) && st.st_mtime == t)
+							localskew = 1;
+					}
 				}
 			}
 		}

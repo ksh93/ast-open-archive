@@ -222,13 +222,16 @@ pzinflate(register Pz_t* pz, Sfio_t* op)
 			if (restore(pz, pp, pz->io, op, pat, pz->wrk, pp->row, k, pp->map, pp->mix, pp->inc))
 				return -1;
 		}
-		if ((k = sfgetc(pz->io)) == PZ_MARK_PART)
+		if (!(pz->flags & PZ_SECTION))
 		{
-			if ((m = sfgetu(pz->io)) && !sferror(pz->io) && !sfeof(pz->io) && (pat = (unsigned char*)sfreserve(pz->io, m, 0)))
-				sfwrite(op, pat, m);
+			if ((k = sfgetc(pz->io)) == PZ_MARK_PART)
+			{
+				if ((m = sfgetu(pz->io)) && !sferror(pz->io) && !sfeof(pz->io) && (pat = (unsigned char*)sfreserve(pz->io, m, 0)))
+					sfwrite(op, pat, m);
+			}
+			else if (k != EOF)
+				sfungetc(pz->io, k);
 		}
-		else if (k != -1)
-			sfungetc(pz->io, k);
 		if (sfsync(op))
 		{
 			if (pz->disc->errorf)

@@ -1,3 +1,8 @@
+03-07-23 pzsplit.c: --split file size limited to --window
+03-07-17 pzpart.c: fix "//" partition translation
+	 pzpart.c: add include="file", library="..." disabled during include
+	 pzpart.c: default split window threshhold is now 16K
+	 pzsplit.c: free Id_t when done
 03-05-13 sfdcpzip.c: add SF_DBUFFER exception, SF_SHARE before sfreserve()
 03-05-05 sfdcpzip.c,sfdczip.c: add bzip support
 03-04-15 pzlib.h: add PZ_MARK_PART for partial last input record

@@ -28,13 +28,14 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.2 (AT&T Labs Research) 2003-04-15 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.3 (AT&T Labs Research) 2003-07-17 $\n]"
 "[a:append]"
 "[c:comment]:[text]"
 "[x:crc]"
 "[d:debug]#[level]"
 "[D:dump]"
 "[G!:gzip]"
+"[i:include]:[file]"
 "[l:library]:[library]"
 "[n:name]:[name]"
 "[X:prefix?]:[count[*terminator]]]"
@@ -445,6 +446,7 @@ pzoptions(register Pz_t* pz, register Pzpart_t* pp, char* options, int must)
 	int			r;
 	int			x;
 	int			skip;
+	Sfio_t*			sp;
 	Pzpart_t*		opp;
 
 	optget(NiL, usage);
@@ -544,16 +546,26 @@ pzoptions(register Pz_t* pz, register Pzpart_t* pp, char* options, int must)
 					else
 						pz->flags &= ~PZ_NOGZIP;
 					break;
+				case 'i':
+					if (pz->pin && (sp = pzfind(pz, opt_info.arg, PZ_PART_SUF, "r")))
+					{
+						sfstack(pz->pin, sp);
+						return 0;
+					}
+					break;
 				case 'l':
-					if (i = pz->options == options)
-						pz->options = 0;
-					r = pzlib(pz, opt_info.arg, 0);
-					if (pz->disc->errorf)
-						(*pz->disc->errorf)(pz, pz->disc, -2, "pzlib: %s status=%d", opt_info.arg, r);
-					if (i)
-						pz->options = options;
-					if (r < 0)
-						return -1;
+					if (!pz->pin || !sfstacked(pz->pin))
+					{
+						if (i = pz->options == options)
+							pz->options = 0;
+						r = pzlib(pz, opt_info.arg, 0);
+						if (pz->disc->errorf)
+							(*pz->disc->errorf)(pz, pz->disc, -2, "pzlib: %s status=%d", opt_info.arg, r);
+						if (i)
+							pz->options = options;
+						if (r < 0)
+							return -1;
+					}
 					break;
 				case 'n':
 					pz->partname = vmstrdup(pz->vm, opt_info.arg);
@@ -714,7 +726,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 	if (s[0] == '/' && s[i=strlen(s)-1] == '/')
 	{
 		if (streq(s, "/") || streq(s, "//") || streq(s, "/gzip/"))
-			n = sfsprintf(buf, sizeof(buf), "set nopzip\n1\n0-0\n");
+			n = sfsprintf(buf, sizeof(buf), "nopzip\n1\n0-0\n");
 		else
 		{
 			n = (int)strtol(s + 1, &e, 10);
@@ -768,6 +780,7 @@ pzpartition(register Pz_t* pz, const char* partition)
 	np = 0;
 	pp = 0;
 	s = "";
+	pz->pin = sp;
 	do
 	{
 		vmclear(vm);
@@ -801,8 +814,12 @@ pzpartition(register Pz_t* pz, const char* partition)
 				if (!(np = vmstrdup(pz->vm, e)))
 					goto bad;
 			}
-			else if (isalpha(*s) && pzoptions(pz, pp, s, 1))
-				goto bad;
+			else if (isalpha(*s))
+			{
+				if (pzoptions(pz, pp, s, 1))
+					goto bad;
+				s = "";
+			}
 		} while (!(n = strtol(s, &t, 10)));
 		if (pz->flags & PZ_ROWONLY)
 		{
@@ -973,8 +990,10 @@ pzpartition(register Pz_t* pz, const char* partition)
 		error_info.file = file;
 		error_info.line = line;
 	}
+	pz->pin = 0;
 	return 0;
  bad:
+	pz->pin = 0;
 	if (sp)
 		sfclose(sp);
 	if (vm)

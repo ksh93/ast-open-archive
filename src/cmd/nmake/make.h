@@ -603,7 +603,6 @@ struct internal				/* internal rule and list info	*/
 	char*		freerules;	/* free rules list		*/
 	char*		freevars;	/* free variables list		*/
 
-	char*		arupdate;	/* archive sym tab update cmds	*/
 	char*		issource;	/* internal.source* match pat	*/
 	char*		openfile;	/* bind()-scan() optimization	*/
 	char*		pwd;		/* PWD value			*/
@@ -867,6 +866,9 @@ extern void		addprereq(struct rule*, struct rule*, int);
 extern struct list*	append(struct list*, struct list*);
 extern int		apply(struct rule*, char*, char*, char*, unsigned long);
 extern void		argcount(void);
+extern void		arscan(struct rule*);
+extern void		artouch(char*, char*);
+extern char*		arupdate(char*);
 extern struct rule*	associate(struct rule*, struct rule*, char*, struct list**);
 extern struct var*	auxiliary(char*, int);
 extern char*		b_getconf(char**);
@@ -879,7 +881,6 @@ extern int		block(int);
 extern void		candidates(void);
 extern char*		call(struct rule*, char*);
 extern struct rule*	catrule(char*, char*, char*, int);
-extern int		closear(int);
 extern int		cmptime(unsigned long, unsigned long);
 extern char*		colonlist(Sfio_t*, char*, int);
 extern void		compile(char*, char*);
@@ -950,7 +951,6 @@ extern struct rule*	metarule(char*, char*, int);
 extern void		negate(struct rule*, struct rule*);
 extern void*		newchunk(char**, size_t);
 extern void		newfile(struct rule*, char*, unsigned long);
-extern int		openar(char*, char*);
 extern struct option*	opentry(int, int);
 extern void		optcheck(void);
 extern void		optinit(void);
@@ -986,11 +986,9 @@ extern unsigned long	statetime(struct rule*, int);
 extern int		strprintf(Sfio_t*, const char*, char*, int, int);
 extern char*		strtime(unsigned long);
 extern void		terminate(void);
-extern void		touchar(char*, char*);
 extern void		trigger(struct rule*, struct rule*, char*, unsigned long);
 extern int		unbind(const char*, char*, void*);
 extern struct dir*	unique(struct rule*);
 extern void		unparse(int);
 extern struct var*	varstate(struct rule*, int);
 extern void		wakeup(unsigned long, struct list*);
-extern int		walkar(struct dir*, int, char*);

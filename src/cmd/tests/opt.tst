@@ -261,6 +261,41 @@ QRFPEVCGVBA
 
 FRR NYFB
   Oyn.'
+	usage=$'[-][+NAME?aha - just do it][+DESCRIPTION?Bla bla.]{[+before?insert]\fzero\f[+after?append]}'
+	EXEC	aha "$usage" --man
+		OUTPUT - $'return=? option=- name=--man num=0'
+		ERROR - $'NAME
+  aha - just do it
+
+SYNOPSIS
+  aha [ options ]
+
+DESCRIPTION
+  Bla bla.
+    before
+          insert
+    yabba dabba
+    doo   aroni
+    after append'
+	usage=$'[-][+NAME?aha - just do it][+DESCRIPTION?Bla bla.][o]:?[option?bla bla bla:]{[+before?insert]\fzero\f[+after?append]}'
+	EXEC	aha "$usage" --man
+		ERROR - $'NAME
+  aha - just do it
+
+SYNOPSIS
+  aha [ options ]
+
+DESCRIPTION
+  Bla bla.
+
+OPTIONS
+  -o[option]      bla bla bla:
+                    before
+                          insert
+                    yabba dabba
+                    doo   aroni
+                    after append
+                  The option value may be omitted.'
 
 TEST 04 'oh man'
 	usage=$'

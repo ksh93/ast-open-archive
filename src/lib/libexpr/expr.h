@@ -43,14 +43,17 @@
 #define extern		extern __IMPORT__
 #endif
 
-#include <exparse.h>
-
 /*
  * bison -pPREFIX misses YYSTYPE
  */
 
-#ifdef YYSTYPE
+#if defined(YYSTYPE) || defined(YYBISON)
 #define EXSTYPE		YYSTYPE
+#else
+#include <exparse.h>
+#if defined(YYSTYPE) || defined(yystype)
+#define EXSTYPE		YYSTYPE
+#endif
 #endif
 
 #undef	extern

@@ -1,3 +1,4 @@
+03-07-17 testregex.dat: add REG_SHELL|REG_AUGMENTED tests
 03-06-09 minimal.dat: add tests
 03-03-17 ed.tst: add ! command tests for sfpopen() "" mode fix
 03-02-17 testregex.dat: add bm tests

@@ -2074,24 +2074,20 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		matched = 1;
 		break;
 	case 'A':
-		if (r->scan != SCAN_IGNORE || *ops == 'F' || *ops == 'f')
+		if ((r->scan != SCAN_IGNORE || *ops == 'F' || *ops == 'f') && (s = arupdate(r->name)))
 		{
-			closear(openar(r->name, "br"));
-			if (internal.arupdate)
-			{
-				struct frame*	oframe;
-				struct frame	frame;
+			struct frame*	oframe;
+			struct frame	frame;
 
-				oframe = state.frame;
-				if (!(state.frame = r->active))
-				{
-					zero(frame);
-					frame.target = r;
-					state.frame = frame.parent = &frame;
-				}
-				expand(xp, internal.arupdate);
-				state.frame = oframe;
+			oframe = state.frame;
+			if (!(state.frame = r->active))
+			{
+				zero(frame);
+				frame.target = r;
+				state.frame = frame.parent = &frame;
 			}
+			expand(xp, s);
+			state.frame = oframe;
 		}
 		return;
 	case 'D':

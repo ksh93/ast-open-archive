@@ -118,6 +118,7 @@ typedef struct Pzss_s			/* split stream state		*/
 	Sfio_t*		tmp;		/* temp string stream 		*/ \
 	Sfio_t*		str;		/* sfstrtmp() string stream	*/ \
 	Sfio_t*		det;		/* processed options stream	*/ \
+	Sfio_t*		pin;		/* partition input stream	*/ \
 	char*		headoptions;	/* header options		*/ \
 	char*		options;	/* current options		*/ \
 	Pzrs_t		rs;		/* read stream state		*/ \

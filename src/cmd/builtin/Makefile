@@ -79,4 +79,4 @@ BUILTINS :COMMAND: cmd.h
 
 :: PROMO.mm RELEASE
 
-:TEST: asa chown cut date expr join look nl od paste tail tr uuencode
+:TEST: asa chown cut date expr fmt join look nl od paste tail tr uuencode
