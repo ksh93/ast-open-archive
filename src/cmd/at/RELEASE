@@ -1,0 +1,18 @@
+00-01-22 --- release 1.2 ---
+00-01-22 crontab: fix getopts check
+99-10-11 at,atd: fix job dictionary bugs
+99-08-11 at: fix usage for at+batch
+	 at.h: add AT_STRICT
+99-06-23 atd: fix job queue handle lookup that dropped jobs
+99-06-23 --- release 1.1 ---
+99-05-09 tweak uwin FAT checks -- how do you get FAT security?
+	 at,batch,crontab: long options
+99-04-01 crontab.sh: "..." path vars
+	 the official off-by-one bug of the millenium
+98-07-17 fix bad scanf base 64 format
+98-02-14 get it working
+	 add -A for admin commands (all entries, all queues)
+97-11-11 atd: use csread(CS_RESTART) to avoid SIGCHLD interrupts
+	 atd: add state.atxd in.atxd code for systems with incomplete chmod u+s 
+97-10-31 fix `at date ...' arg parse bug
+96-05-24 --- release 1.0 ---

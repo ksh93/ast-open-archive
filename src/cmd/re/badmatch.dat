@@ -1,0 +1,47 @@
+Ka	*(!(*-*)|-)	xxxxxxxxxxxxxxxxxxxx-x		(0,22)(0,22)(21,22)
+Kam	*(!(*-*)|-)	xxxxxxxxxxxxxxxxxxxx-x		(0,22)(0,22)(21,22)
+
+Ka	(x*1)		xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Ka	(a*0|x*1)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Ka	(x*1|a*0)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Ka	*(x*1)		xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Ka	*(a*0|x*1)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Ka	*(x*1|a*0)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Ka	*(!(*-*)|x*1)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)(19,20)
+
+Kam	(x*1)		xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Kam	(a*0|x*1)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Kam	(x*1|a*0)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Kam	*(x*1)		xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Kam	*(a*0|x*1)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Kam	*(x*1|a*0)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)
+Kam	*(!(*-*)|x*1)	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,22)(19,20)
+Kam	**(!(*-*))	xxxxxxxxxxxxxxxxxxxx-1		(0,22)(0,0)(0,0)
+
+Kam	*(!(*-*))	x-1				NOMATCH
+Kam	*(!(*-*))	xx-1				NOMATCH
+Kam	*(!(*-*))	xxx-1				NOMATCH
+Kam	*(!(*-*))	xxxx-1				NOMATCH
+Kam	*(!(*-*))	xxxxx-1				NOMATCH
+Kam	*(!(*-*))	xxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxx-1			NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxxx-1		NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxxxx-1		NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxxxxx-1		NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxxxxxx-1		NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxxxxxxx-1		NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxxxxxxxx-1		NOMATCH
+Kam	*(!(*-*))	xxxxxxxxxxxxxxxxxxxx-1		NOMATCH
+
+Kam	*(!(*-*))	aa0a-1				NOMATCH
+Kam	*(!(*-*))	aaa0aa0a-1			NOMATCH
+Kam	*(!(*-*))	aaaa0aaa0aa0a-1			NOMATCH
+Kam	*(!(*-*))	aaaaa0aaaa0aaa0aa0a-1		NOMATCH
+Kam	*(!(*-*))	aaaaaa0aaaaa0aaaa0aaa0aa0a-1	NOMATCH
+Kam	*(!(*-*))	aaaaaaaaa0aaaaaaaa0aaaaa-1	NOMATCH

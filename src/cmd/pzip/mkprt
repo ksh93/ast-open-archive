@@ -1,0 +1,5 @@
+for i
+do	print
+	print "\"${i%.*}\""
+	grep -v '^#' $i
+done

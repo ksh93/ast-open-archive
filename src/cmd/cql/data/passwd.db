@@ -1,0 +1,5 @@
+dgk:*:1001:1001:David Korn:/home/dgk:/bin/ksh
+gsf:*:1002:1002:Glenn Fowler,gsf_loc:/home/gsf:/bin/ksh
+kpv:*:1003:1003:Phong Vo,,kpv_room:/home/kpv:/bin/ksh
+dfwc:*:1004:1004:Don Caldwell,,,dfwc_ext:/home/dfwc:/bin/ksh
+bozo:*:1005:1005:Bozo T. Clown,Big Top,,bozo_ext:/home/bozo

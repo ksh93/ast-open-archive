@@ -1,7 +1,29 @@
+################################################################
+#                                                              #
+#           This software is part of the ast package           #
+#              Copyright (c) 1987-2000 AT&T Corp.              #
+#      and it may only be used by you under license from       #
+#                     AT&T Corp. ("AT&T")                      #
+#       A copy of the Source Code Agreement is available       #
+#              at the AT&T Internet web site URL               #
+#                                                              #
+#     http://www.research.att.com/sw/license/ast-open.html     #
+#                                                              #
+#     If you received this software without first entering     #
+#       into a license with AT&T, you have an infringing       #
+#           copy and cannot use it without violating           #
+#             AT&T's intellectual property rights.             #
+#                                                              #
+#               This software was created by the               #
+#               Network Services Research Center               #
+#                      AT&T Labs Research                      #
+#                       Florham Park NJ                        #
+#                                                              #
+#             Glenn Fowler <gsf@research.att.com>              #
+#                                                              #
+################################################################
 :
-# Glenn Fowler
-# AT&T Bell Laboratories
-# @(#)cpio.sh (gsf@research.att.com) 08/11/90
+# @(#)cpio.sh (AT&T Labs Research) 1990-08-11
 #
 # cpio -> pax interface script
 #
@@ -12,106 +34,129 @@ Usage: $command -o[acvBV] [-C size] [-M mesg] [-O file | >file ] <list
        $command -i[bcdfkmrtsuvBSV6] [-I file | <file] [pattern ...]
        $command -p[adlmuvV] directory"
 
-case $1 in
-*i*)	mode="-r" ;;
-*o*)	mode="-w" ;;
-*p*)	mode="-rw" ;;
-*)	echo "$command: one of -i, -o, -p must be specified$usage" >&2; exit 1 ;;
-esac
-options=""
+OPTSTR='abcdfiklmoprstuvBSV6C:[size]H:[format]M:[message]O:[file]?D [ pattern | directory ]'
+
+options="-d"
 blocksize=1b
-debug=
+exec=eval
 format=binary
 list=""
 logphys=-P
-d_default="-d"
-m_default="-m"
+mode=""
+d_default="-o nomkdir"
+m_default="-pm"
 u_default="-u"
 r_ok="1"
 w_ok="1"
 p_ok="1"
-while	:
-do	case $# in
-	0)	break ;;
-	esac
-	case $1 in
-	--)	shift; break ;;
-	-*)	for opt in `echo '' $1 | sed -e 's/-//' -e 's/./& /g'`
-		do	case $opt in
-			'#')	case $debug in
-				"")	debug=echo ;;
-				*)	debug=args ;;
-				esac
-				;;
-			[bsS6]) ;;
-			[klvV])	options="$options -$opt" ;;
-			a)	r_ok="" options="$options -p" ;;
-			c)	format=cpio ;;
-			d)	w_ok="" d_default="" ;;
-			f)	w_ok="" p_ok="" options="$options -c" ;;
-			i)	w_ok="" p_ok="" ;;
-			m)	w_ok="" m_default="" ;;
-			o)	r_ok="" p_ok="" u_default="" ;;
-			p)	r_ok="" w_ok="" ;;
-			r)	w_ok="" p_ok="" options="$options -i" ;;
-			t)	w_ok="" p_ok="" list="1" ;;
-			u)	w_ok="" u_default="" ;;
-			B)	blocksize=5k ;;
-			L)	logphys=-L ;;
-			[CIMO])	a=`echo '' $1 | sed -e "s/[^$opt]*$opt//"`
-				case $a in
-				"")	case $# in
-					1)	echo "$command: option -$opt requires an argument$usage" >&2; exit 1 ;;
-					esac
-					shift
-					a=$1
-					;;
-				esac
-				case $opt in
-				C)	case $a in
-					*[0-9])	a=${a}c ;;
-					esac
-					blocksize=$a
-					;;
-				I)	w_ok="" p_ok="" options="$options -f '$a'" ;;
-				O)	r_ok="" p_ok="" options="$options -f '$a'" ;;
-				M)	options="$options -$opt '$a'" ;;
-				esac
-				break
-				;;
-			*)	echo "$command: invalid option -$opt$usage" >&2; exit 1 ;;
-			esac
-		done
+
+while	getopts -a $command "$OPTSTR" OPT
+do	case $OPT in
+	'D')	case $exec in
+		eval)	exec=print ;;
+		*)	exec="eval args" ;;
+		esac
 		;;
-	*)	break ;;
+	[bsS6]) ;;
+	[klvV])	options="$options -$OPT" ;;
+	a)	r_ok="" options="$options -p" ;;
+	c)	format=cpio ;;
+	d)	w_ok="" d_default="" ;;
+	f)	w_ok="" p_ok="" options="$options -c" ;;
+	i)	w_ok="" p_ok=""
+		case $mode in
+		'')	mode=-r ;;
+		-r)	;;
+		*)	mode=x ;;
+		esac
+		;;
+	m)	w_ok="" m_default="" ;;
+	o)	r_ok="" p_ok="" u_default=""
+		case $mode in
+		'')	mode=-w ;;
+		-w)	;;
+		*)	mode=x ;;
+		esac
+		;;
+	p)	r_ok="" w_ok=""
+		case $mode in
+		'')	mode=-rw ;;
+		-rw)	;;
+		*)	mode=x ;;
+		esac
+		;;
+	r)	w_ok="" p_ok="" options="$options -i" ;;
+	t)	w_ok="" p_ok="" list="1" ;;
+	u)	w_ok="" u_default="" ;;
+	B)	blocksize=5k ;;
+	L)	logphys=-L ;;
+	C)	case $OPTARG in
+		*[0-9])	blocksize=${OPTARG}c ;;
+		*)	blocksize=${OPTARG} ;;
+		esac
+		;;
+	H)	case $OPTARG in
+		asc|ASC)	format=asc ;;
+		crc|CRC)	format=aschk ;;
+		odc|ODC)	format=cpio ;;
+		tar|TAR)	format=tar ;;
+		ustar|USTAR)	format=ustar ;;
+		*)		print -u2 "$command: $OPTARG: formats are {asc,crc,odc,tar,star}"; exit 1 ;;
+		esac
+		;;
+	I)	w_ok="" p_ok="" options="$options -f '$OPTARG'" ;;
+	O)	r_ok="" p_ok="" options="$options -f '$OPTARG'" ;;
+	M)	options="$options -o eom=\"'$OPTARG'\"" ;;
 	esac
-	shift
 done
+shift $(($OPTIND-1))
 case $mode in
 -r)	case $r_ok in
-	"")	echo "$command: options inconsistent with archive read" >&2; exit 1 ;;
+	"")	print -u2 "$command: options inconsistent with archive read"
+		exit 2
+		;;
 	esac
 	options="$options -b $blocksize"
 	;;
 -w)	case $w_ok in
-	"")	echo "$command: options inconsistent with archive write" >&2; exit 1 ;;
+	"")	print -u2 "$command: options inconsistent with archive write"
+		exit 2
+		;;
 	esac
 	case $# in
 	0)	;;
-	*)	echo "$command: arguments not expected" >&2; exit 1 ;;
+	*)	print "$command: arguments not expected"
+		exit 2
+		;;
 	esac
 	options="$options -x $format -b $blocksize"
+	d_default="" m_default="" u_default=""
 	;;
 -rw)	case $p_ok in
-	"")	echo "$command: options inconsistent with file pass" >&2; exit 1 ;;
+	"")	print -u2 "$command: options inconsistent with file pass"
+		exit 2
+		;;
 	esac
 	case $# in
 	1)	;;
-	*)	echo "$command: a single directory argument is expected$usage" >&2; exit 1 ;;
+	*)	print -u2 "$command: a single directory argument is expected$usage"
+		exit 2
+		;;
 	esac
 	;;
+'')	print -u2 "$command: one of -i, -o, -p must be specified$usage"
+	exit 2
+	;;
+*)	print -u2 "$command: only one of -i, -o, -p may be specified$usage"
+	exit 2
+	;;
 esac
+
 case $list in
 "1")	mode="" d_default="" m_default="" u_default="" ;;
 esac
-$debug pax $mode $logphys $options $d_default $m_default $u_default "$@"
+
+case $exec in
+eval) $exec pax $mode $logphys $options $d_default $m_default $u_default '"$@"' ;;
+*) $exec pax $mode $logphys $options $d_default $m_default $u_default "$@" ;;
+esac

@@ -1,0 +1,90 @@
+.\"
+.\" G. S. Fowler
+.\" D. G. Korn
+.\" AT&T Bell Laboratories
+.\"
+.\" @(#)2d.1 (gsf@research.att.com) 11/11/91
+.\"
+.de L		\" literal font
+.ft 5
+.it 1 }N
+.if !\\$1 \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
+..
+.de LR
+.}S 5 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de RL
+.}S 1 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH 2D 1
+.SH NAME
+2d \- Run a command in a 2d environment
+.SH SYNOPSIS
+.B 2d
+[
+.B \-
+]
+[
+.B \+
+]
+[
+.I arg
+] ...
+.SH DESCRIPTION
+.B 2d
+without arguments,
+invokes a version of the shell that does
+not support the 3d file system.
+If
+.I arg
+does not begin with a
+.BR \- ,
+then
+.B 2d
+executes the command
+in an environment which does not support the 3d file system.
+If
+.I arg
+begines with a
+.BR \- ,
+and is not exactly
+.BR \- ,
+then
+.B 2d
+executes
+.B $\s-1SHELL\s+1
+.IR arg ...
+in an environment which does not support the 3d file system.
+.PP
+If the first argument to
+.B 2d
+is
+.B \+
+then all subsequent commands issued from the same environment
+until
+.B "2d -" 
+will be executed in an environment that does not support
+the 3d file system.
+All remaining arguments are ignored.
+.PP
+.SH "SEE ALSO"
+vmap(1),
+vpath(1),
+opaque(1),
+3d(1),
+ksh(1)

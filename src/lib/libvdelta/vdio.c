@@ -1,45 +1,25 @@
-/*
- * CDE - Common Desktop Environment
- *
- * Copyright (c) 1993-2012, The Open Group. All rights reserved.
- *
- * These libraries and programs are free software; you can
- * redistribute them and/or modify them under the terms of the GNU
- * Lesser General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option)
- * any later version.
- *
- * These libraries and programs are distributed in the hope that
- * they will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with these librararies and programs; if not, write
- * to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301 USA
- */
 /***************************************************************
 *                                                              *
-*                      AT&T - PROPRIETARY                      *
+*           This software is part of the ast package           *
+*              Copyright (c) 1995-2000 AT&T Corp.              *
+*      and it may only be used by you under license from       *
+*                     AT&T Corp. ("AT&T")                      *
+*       A copy of the Source Code Agreement is available       *
+*              at the AT&T Internet web site URL               *
 *                                                              *
-*         THIS IS PROPRIETARY SOURCE CODE LICENSED BY          *
-*                          AT&T CORP.                          *
+*     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*                Copyright (c) 1995 AT&T Corp.                 *
-*                     All Rights Reserved                      *
-*                                                              *
-*           This software is licensed by AT&T Corp.            *
-*       under the terms and conditions of the license in       *
-*       http://www.research.att.com/orgs/ssr/book/reuse        *
+*     If you received this software without first entering     *
+*       into a license with AT&T, you have an infringing       *
+*           copy and cannot use it without violating           *
+*             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
-*           Software Engineering Research Department           *
-*                    AT&T Bell Laboratories                    *
+*               Network Services Research Center               *
+*                      AT&T Labs Research                      *
+*                       Florham Park NJ                        *
 *                                                              *
-*               For further information contact                *
-*                     gsf@research.att.com                     *
+*               Phong Vo <kpv@research.att.com>                *
 *                                                              *
 ***************************************************************/
 #include	"vdelhdr.h"
@@ -50,9 +30,9 @@
 */
 
 #if __STD_C
-static _vdinit(reg Vdio_t* io)
+static void _vdinit(reg Vdio_t* io)
 #else
-static _vdinit(io)
+static void _vdinit(io)
 reg Vdio_t*	io;
 #endif
 {
@@ -68,9 +48,9 @@ reg Vdio_t*	io;
 
 
 #if __STD_C
-static _vdfilbuf(reg Vdio_t* io)
+static int _vdfilbuf(reg Vdio_t* io)
 #else
-static _vdfilbuf(io)
+static int _vdfilbuf(io)
 reg Vdio_t*	io;
 #endif
 {	reg int	n;
@@ -89,9 +69,9 @@ reg Vdio_t*	io;
 }
 
 #if __STD_C
-static _vdflsbuf(reg Vdio_t* io)
+static int _vdflsbuf(reg Vdio_t* io)
 #else
-static _vdflsbuf(io)
+static int _vdflsbuf(io)
 reg Vdio_t*	io;
 #endif
 {	reg int n;
@@ -130,9 +110,9 @@ reg ulong	v;
 }
 
 #if __STD_C
-static _vdputu(reg Vdio_t* io, ulong v)
+static int _vdputu(reg Vdio_t* io, ulong v)
 #else
-static _vdputu(io, v)
+static int _vdputu(io, v)
 reg Vdio_t*	io;
 reg ulong	v;
 #endif
@@ -164,9 +144,9 @@ reg ulong	v;
 }
 
 #if __STD_C
-static _vdread(Vdio_t* io, reg uchar* s, reg int n)
+static int _vdread(Vdio_t* io, reg uchar* s, reg int n)
 #else
-static _vdread(io, s, n)
+static int _vdread(io, s, n)
 Vdio_t*		io;
 reg uchar*	s;
 reg int		n;
@@ -191,9 +171,9 @@ reg int		n;
 }
 
 #if __STD_C
-static _vdwrite(Vdio_t* io, reg uchar* s, reg int n)
+static int _vdwrite(Vdio_t* io, reg uchar* s, reg int n)
 #else
-static _vdwrite(io, s, n)
+static int _vdwrite(io, s, n)
 Vdio_t*		io;
 reg uchar*	s;
 reg int		n;

@@ -1,0 +1,95 @@
+: ie : run command with interactive editor on stdin
+
+# @(#)ie (AT&T Labs Research) 1998-11-30
+
+function ie
+{
+	typeset env show command histfile prefix dll suffix ifs root
+	case $1 in
+	-n)	show=print; shift ;;
+	esac
+	command=$(whence $1)
+	shift
+	histfile=${command##*/}
+	case $histfile in
+	[nox]?*)	histfile=${histfile#?} ;;
+	esac
+	ifs=$IFS
+	IFS=:
+	set -A path $PATH
+	IFS=$ifs
+	for root in ${path[@]}
+	do	root=${root%/*}
+		set -A lib $root/@(bin|lib)/@(lib|)edit*([0-9]).@(dll|s[ol]*([0-9.]))
+		dll=${lib[${#lib[@]}-1]}
+		if	test -f $dll
+		then	break
+		fi
+	done
+	prefix=${dll%.@(dll|s[ol]*([0-9.]))}
+	suffix=${dll##$prefix}
+	prefix=${prefix#$root/}
+	env="HISTFILE=$HOME/.${histfile}.ie LD_PRELOAD=$dll${LD_PRELOAD:+\ $LD_PRELOAD}"
+	if	test -f $root/$prefix-n32$suffix
+	then	env="$env _RLD64_LIST=$dll"
+		case $_RLD64_LIST in
+		"")	env="$env:DEFAULT" ;;
+		*)	env="$env:$_RLD64_LIST" ;;
+		esac
+		env="$env _RLDN32_LIST=$root/$prefix-n32$suffix"
+		case $_RLDN32_LIST in
+		"")	env="$env:DEFAULT" ;;
+		*)	env="$env:$_RLDN32_LIST" ;;
+		esac
+		env="$env _RLD_LIST=$root/$prefix-o32$suffix"
+		case $_RLD_LIST in
+		"")	env="$env:DEFAULT" ;;
+		*)	env="$env:$_RLD_LIST" ;;
+		esac
+	elif	test -f $root/$prefix-64$suffix -o -f $root/$prefix-o32$suffix
+	then	env="$env _RLD64_LIST=$root/$prefix-64$suffix"
+		case $_RLD64_LIST in
+		"")	env="$env:DEFAULT" ;;
+		*)	env="$env:$_RLD64_LIST" ;;
+		esac
+		env="$env _RLDN32_LIST=$dll"
+		case $_RLDN32_LIST in
+		"")	env="$env:DEFAULT" ;;
+		*)	env="$env:$_RLDN32_LIST" ;;
+		esac
+		env="$env _RLD_LIST=$root/$prefix-o32$suffix"
+		case $_RLD_LIST in
+		"")	env="$env:DEFAULT" ;;
+		*)	env="$env:$_RLD_LIST" ;;
+		esac
+	else	case $root in
+		*/sgi.mips[2-9]*)
+			root=${root%?}
+			env="$env _RLD64_LIST=${root}4/$prefix$suffix"
+			case $_RLD64_LIST in
+			"")	env="$env:DEFAULT" ;;
+			*)	env="$env:$_RLD64_LIST" ;;
+			esac
+			env="$env _RLDN32_LIST=${root}3/$prefix$suffix"
+			case $_RLDN32_LIST in
+			"")	env="$env:DEFAULT" ;;
+			*)	env="$env:$_RLDN32_LIST" ;;
+			esac
+			env="$env _RLD_LIST=${root}2/$prefix$suffix"
+			case $_RLD_LIST in
+			"")	env="$env:DEFAULT" ;;
+			*)	env="$env:$_RLD_LIST" ;;
+			esac
+			;;
+		*)	env="$env _RLD_LIST=$dll"
+			case $_RLD_LIST in
+			"")	env="$env:DEFAULT" ;;
+			*)	env="$env:$_RLD_LIST" ;;
+			esac
+		esac
+	fi
+	case $show in
+	"")	eval $env '$command "$@"' ;;
+	*)	$show $env $command "$@" ;;
+	esac
+}

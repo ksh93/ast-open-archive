@@ -1,0 +1,91 @@
+.de X		\" fixed width font
+.nh
+.ft 5
+.it 1 }N
+.if !\\$1 \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
+.HY
+..
+.de XR
+.}S 5 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de RX
+.}S 1 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de XI
+.}S 5 2 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de IX
+.}S 2 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH HTML2RTF 1
+.SH NAME \" @(#)html2rtf.1 (AT&T Labs Research) 1997-04-01
+html2rtf \- convert html input to rtf
+.SH SYNOPSIS
+.B html2rtf
+[
+.B \-v
+] [
+.B \-d
+.I debug-level
+] [
+.B \-f
+.I font-size
+] [
+.B \-p
+.I project-file
+] [
+.I file
+\&.\|.\|.
+]
+.SH DESCRIPTION
+.I html2rtf
+converts input
+.IR html (1)
+documents to an
+.B RTF
+document on the standard output.
+.I html2rtf
+expects properly nested begin/end tags in the input HTML and
+warns about imbalance.
+.SS Options
+.TP
+.BI \-d " debug-level"
+Sets the debug trace level to
+.IR debug-level .
+Higher levels produce more output.
+.TP
+.BI \-f " font-size"
+Sets the initial font size to
+.I font-size
+points.
+The default is
+.BR 12 .
+.TP
+.BI \-p " project-file"
+Appends MS HELP project information to the help project file
+.IR project-file .
+This file combines individual RTF files into a hyper-linked collection.
+Note that MS expects a
+.B .hlp
+file extension for
+.IR project-file .
+.TP
+.B \-v
+Enables verbose error and warning messages.
+.SH "SEE ALSO"
+man(1), mm(1), mm2html(1), troff(1), troff2html(1)

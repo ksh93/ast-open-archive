@@ -1,45 +1,25 @@
-/*
- * CDE - Common Desktop Environment
- *
- * Copyright (c) 1993-2012, The Open Group. All rights reserved.
- *
- * These libraries and programs are free software; you can
- * redistribute them and/or modify them under the terms of the GNU
- * Lesser General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option)
- * any later version.
- *
- * These libraries and programs are distributed in the hope that
- * they will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with these librararies and programs; if not, write
- * to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301 USA
- */
 /***************************************************************
 *                                                              *
-*                      AT&T - PROPRIETARY                      *
+*           This software is part of the ast package           *
+*              Copyright (c) 1995-2000 AT&T Corp.              *
+*      and it may only be used by you under license from       *
+*                     AT&T Corp. ("AT&T")                      *
+*       A copy of the Source Code Agreement is available       *
+*              at the AT&T Internet web site URL               *
 *                                                              *
-*         THIS IS PROPRIETARY SOURCE CODE LICENSED BY          *
-*                          AT&T CORP.                          *
+*     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*                Copyright (c) 1995 AT&T Corp.                 *
-*                     All Rights Reserved                      *
-*                                                              *
-*           This software is licensed by AT&T Corp.            *
-*       under the terms and conditions of the license in       *
-*       http://www.research.att.com/orgs/ssr/book/reuse        *
+*     If you received this software without first entering     *
+*       into a license with AT&T, you have an infringing       *
+*           copy and cannot use it without violating           *
+*             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
-*           Software Engineering Research Department           *
-*                    AT&T Bell Laboratories                    *
+*               Network Services Research Center               *
+*                      AT&T Labs Research                      *
+*                       Florham Park NJ                        *
 *                                                              *
-*               For further information contact                *
-*                     gsf@research.att.com                     *
+*               Phong Vo <kpv@research.att.com>                *
 *                                                              *
 ***************************************************************/
 #ifndef _VDELHDR_H
@@ -55,7 +35,7 @@
 #else
 #include	<sys/types.h>
 #endif
-#endif
+#endif /*_PACKAGE_ast*/
 
 #ifdef DEBUG
 _BEGIN_EXTERNS_
@@ -71,6 +51,7 @@ _END_EXTERNS_
 #endif
 
 /* short-hand notations */
+#define NIL(t)		((t)0)
 #define reg		register
 #define uchar		unsigned char
 #define uint		unsigned int
@@ -78,8 +59,7 @@ _END_EXTERNS_
 
 /* default window size - Chosen to suit malloc() even on 16-bit machines. */
 #define MAXINT		((int)(((uint)~0) >> 1))
-#define MAXWINDOW	((int)(((uint)~0) >> 2))
-#define DFLTWINDOW	(MAXWINDOW <= (1<<14) ? (1<<14) : (1<<16) )
+#define DFLTWINDOW	(MAXINT <= 0x7fff ? 0x7fff : (1<<17) )
 #define HEADER(w)	((w)/4)
 
 #define M_MIN		4	/* min number of bytes to match	*/
@@ -226,7 +206,7 @@ typedef struct _vdio_s
 	int		size;
 	long		here;
 	Vddisc_t*	delta;
-	uchar		buf[512];
+	uchar		buf[1024];
 } Vdio_t;
 
 #define ENDB(io)	((io)->endb)
@@ -244,6 +224,26 @@ typedef struct _vdio_s
 				(int)(*(io)->next++ = (uchar)(c)) : -1 )
 #define VDGETC(io)	((REMAIN(io) > 0 || (*_Vdfilbuf)(io) > 0) ? \
 				(int)(*(io)->next++) : -1 )
+#define VDREWIND(io)	((io)->next = (io)->data)
+
+/* fast string I/O */
+#define STRPUTC(tab,c)		(*(tab)->delta++ = (uchar)(c))
+#define STRWRITE(tab,s,n)	{memcpy((tab)->delta,(s),(n)); (tab)->delta += (n);}
+#define STRPUTU(tab,u,buf) \
+	{	reg uchar *s, *endb; reg ulong v = (u); \
+		s = (endb = &buf[sizeof(buf)])-1; *s = I_CODE(v); \
+		while((v >>= I_SHIFT)) *--s = I_CODE(v)|I_MORE; v = endb-s;\
+		memcpy((tab)->delta,s,v); (tab)->delta += v; \
+	}
+#define STRGETC(tab)		(*(tab)->delta++)
+#define STRREAD(tab,s,n)	{memcpy((s),(tab)->delta,(n)); (tab)->delta += (n);}
+#define STRGETU(tab,u) \
+	{	reg int c; \
+		for(u = 0;; ) \
+		{	c = *(tab)->delta++; u = (u<<I_SHIFT) | (c & (I_MORE-1)); \
+			if(!(c&I_MORE)) break; \
+		} \
+	}
 
 typedef struct _vdbufio_s
 {	int(*	vdfilbuf)_ARG_((Vdio_t*));
@@ -262,6 +262,7 @@ typedef struct _vdbufio_s
 
 _BEGIN_EXTERNS_
 extern Vdbufio_t	_Vdbufio;
+extern long		_vdupdate_01 _ARG_((Vddisc_t*, Vddisc_t*, Vddisc_t*));
 extern Void_t*		memcpy _ARG_((Void_t*, const Void_t*, size_t));
 extern Void_t*		malloc _ARG_((size_t));
 extern void		free _ARG_((Void_t*));

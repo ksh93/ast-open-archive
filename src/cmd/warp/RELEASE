@@ -1,0 +1,6 @@
+99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
+99-05-21 add: _xstat64
+99-04-01 add :WWW:, change from function to script
+98-04-01 add in factor code and intercepts
+98-03-11 initial release
+98-03-05 first implementation

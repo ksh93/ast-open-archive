@@ -1,0 +1,87 @@
+99-07-17 fix imap reply via imap_setinput() omission
+	 @x.y.z in spam list matches x.y.z domain suffix
+	 tone down hostmatch(), check unknown in Received:
+	 fix $MAIL lock by check syscall return value -- how novel
+	 add -S, -o justfrom
+	 add -NS to print info and exit
+	 spam: Message-Id: <>
+	 spam: To: suppressed
+	 spam: strgrpmatch() instead of strcasecmp()
+	 imap: normalize imap message before send
+98-12-25 "text/enriched" treated like "text/plain"
+	 PART_text && PART_inline => in the body
+98-11-11 `save +' with `set followup=+From' saves msg in `+From/sender'
+98-06-01 fix header parse for message/rfc822
+	 add sendmail=smtp://host sendmail=/dev/tcp/host/inet.smtp
+98-02-14 more spam stuff
+	 to==from==user isn't spam
+	 Status: header means already scanned (MSCAN)
+	 spam check in setinput() (either here or in setptr())
+	 `---*' can separate headers from body
+98-02-07 defined(SFIO_VERSION) insead of defined(printf) for sfio disciplines
+98-01-11 set spam to mark spam candidates X
+	 set spamlog=file to automatically log spam msgs on quit
+	 set spamto=addr1,...,addrN for candidate spam recipients
+	 set spamfrom=addr1,...,addrN for candidate spam senders
+	 set spamsub=word1,...,wordN for candidate subject word prefixes
+	 add :!x for messages not matching x
+	 set local=domain1,...,domainN
+	 check for nuls in mail file
+	 set headerbotch treats \n\nReturn-Path: as From line if not in header
+97-11-27 couldn't resist the date
+97-11-11 change fflush() (in stdio.h) to do physical seek to logical position
+	 this should squash the empty message bug
+97-10-31 replace ferror() checks with checks at the io ops
+97-08-11 ~m with no messages no longer dumps core
+	 sendmail="<_PATH_SENDMAIL> -oi" to retain `.' lines (least suprise?)
+	 keep most descriptive content-type
+97-07-17 -t implies SEND mode
+	 set quiet still lists folder status on startup
+	 attachments named n-m instead of n:m for fat fs
+	 if no encoding type and mimeview(encoding) then its an encoding
+97-02-14 [Ss]plit now takes message list arg, Split ignores headers
+	 no longer dumps for non-empty files with no From
+	 ~f preserves attachment encoding/boundaries
+	 text/plain with name="" is now an attachment
+	 ${MAIL} is default system mailbox
+	 ${MAIL}/.. is default system mailbox dir
+96-09-06 version 9.6
+	 set headerbotch to handle mailers that add space between std headers
+	 set more[=prompt] to enable sfio more discipline (overrides PAGER)
+	 alias < file (note space around <) to read sendmail alias file for map
+	 join [messagelist] -- reply with auto ~m ~v
+	 Join [messagelist] -- Reply with auto ~m ~v
+	 multipart content converted to print/type/split (attachment) lines
+	 get attachment-index [path] after print/type decodes attachment to file
+	 ~g file interpolates content for multipart message
+	 ~g `uuencode -h -x base64': no header/trailer, base64 encoding
+	 set fixedheaders="hdr1\nhdr2..." added to outgoing message header
+	 help [ command | ~ [ command ] set [ variable ] ]
+	 set MAILCAP; get checks ${MAILCAP} for view command(s), Get doesn't
+	 mime [ pattern[;] command | < file ] -- add/del/list mime capabilities
+	 alias case insensitive -- mail addrs and sendmail aliases are anyway
+	 use <cdt.h>
+	 use <mime.h>
+	 mark [messagelist] mark
+	 folder directories treated as mh folders
+	 set inbox=+inbox -- SAVE messages not held in this mh folder
+	 SAVE messages deleted from any mailbox
+	 cast off_t %ld to (long) -- how do you say long long in portable?
+	 if displayed message from me then don't ignore To:
+	 mailbox() attempts all standard places
+	 retain mime type/encoding in lower case
+96-08-11 version 9.0
+	 convert to prototyped ANSI C
+	 all non-shared externs static
+	 globals into state.*
+	 internalize mail.help and mail.tildehelp
+	 alternates: equivalent to: alias alt[i] myname
+	 split to split messages into numbered files
+	 blast,Blast to blast message headers and body into name=value list
+	 if "a" [ == != ] "b"
+	 ${mode} is readonly with value either "send" or "receive"
+	 some options are readonly
+	 some options may only be set on command line
+	 some options may not ne set while sourcing
+	 most command line flags have option names
+	 set all shows unset vars too

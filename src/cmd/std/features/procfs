@@ -1,0 +1,301 @@
+mem	prpsinfo.pr_clname,prpsinfo.pr_lttydev,prpsinfo.pr_ntpid,prpsinfo.pr_psargs,prpsinfo.pr_refcount,prpsinfo.pr_tgrp,prpsinfo.pr_zomb sys/types.h sys/procfs.h
+tst	run{
+	if	test -d /proc
+	then	if	test -r /proc/self/stat
+		then	cat <<!
+	/*
+	 * linux style /proc
+	 */
+
+	#include <asm/param.h>
+
+	#ifndef PRNODEV
+	#define PRNODEV		(0)
+	#endif
+
+	#ifndef HZ
+	#define HZ		100
+	#endif
+
+	#define _PS_dir		"/proc"
+	#define _PS_path_num	"/proc/%lu/%s"
+	#define _PS_path_str	"/proc/%s/%s"
+	#define _PS_status	"stat"
+	#define _PS_scan_boot	1
+
+	struct prpsinfo
+	{
+		long		pr_pid;
+		char		pr_comm[64];
+		char		pr_state;
+		long		pr_ppid;
+		long		pr_pgrp;
+		long		pr_session;
+		long		pr_tty;
+		long		pr_tpgid;
+		unsigned long	pr_flags;
+		unsigned long	pr_minflt;
+		unsigned long	pr_cminflt;
+		unsigned long	pr_majflt;
+		unsigned long	pr_cmajflt;
+		unsigned long	pr_utime;
+		unsigned long	pr_stime;
+		unsigned long	pr_cutime;
+		unsigned long	pr_cstime;
+		long		pr_counter;
+		long		pr_priority;
+		long		pr_timeout;
+		unsigned long	pr_itrealvalue;
+		unsigned long	pr_starttime;
+		unsigned long	pr_vsize;
+		unsigned long	pr_rss;
+		unsigned long	pr_rlim;
+		unsigned long	pr_startcode;
+		unsigned long	pr_endcode;
+		unsigned long	pr_startstack;
+		unsigned long	pr_kstkesp;
+		unsigned long	pr_kstkeip;
+		unsigned long	pr_signal;
+		unsigned long	pr_blocked;
+		unsigned long	pr_sigignore;
+		unsigned long	pr_sigcatch;
+		unsigned long	pr_wchan;
+
+		/* must be added after the stat file is read */
+
+		unsigned long	pr_uid;		/* fstat(stat-fd) */
+		unsigned long	pr_gid;		/* fstat(stat-fd) */
+		long		pr_nice;	/* pr_priority-15 */
+		int		pr_cpu;		/* ??? */
+	};
+
+	#define pr_addr		pr_startcode
+	#define pr_fname	pr_comm
+	#define pr_flag		pr_state
+	#define pr_pri		pr_priority
+	#define pr_rssize	pr_rss
+	#define pr_sid		pr_session
+	#define pr_size		pr_vsize
+	#define pr_sname	pr_state
+	#define pr_start	pr_starttime
+	#define pr_ttydev	pr_tty
+	
+	#define _PS_scan_format	"%ld %s %c %ld %ld %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %ld %ld %ld %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu"
+	#define _PS_scan_count	35
+	#define _PS_scan_args(p) \
+			&(p)->pr_pid, \
+			(p)->pr_comm, \
+			&(p)->pr_state, \
+			&(p)->pr_ppid, \
+			&(p)->pr_pgrp, \
+			&(p)->pr_session, \
+			&(p)->pr_tty, \
+			&(p)->pr_tpgid, \
+			&(p)->pr_flags, \
+			&(p)->pr_minflt, \
+			&(p)->pr_cminflt, \
+			&(p)->pr_majflt, \
+			&(p)->pr_cmajflt, \
+			&(p)->pr_utime, \
+			&(p)->pr_stime, \
+			&(p)->pr_cutime, \
+			&(p)->pr_cstime, \
+			&(p)->pr_counter, \
+			&(p)->pr_priority, \
+			&(p)->pr_timeout, \
+			&(p)->pr_itrealvalue, \
+			&(p)->pr_starttime, \
+			&(p)->pr_vsize, \
+			&(p)->pr_rss, \
+			&(p)->pr_rlim, \
+			&(p)->pr_startcode, \
+			&(p)->pr_endcode, \
+			&(p)->pr_startstack, \
+			&(p)->pr_kstkesp, \
+			&(p)->pr_kstkeip, \
+			&(p)->pr_signal, \
+			&(p)->pr_blocked, \
+			&(p)->pr_sigignore, \
+			&(p)->pr_sigcatch, \
+			&(p)->pr_wchan
+	
+	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime)*HZ)
+	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime)*HZ)
+	#define PR_START(p)	((p)->pr_start)
+!
+		elif	test -r /proc/curproc/status
+		then	cat <<!
+	/*
+	 * bsd style /proc
+	 */
+
+	#ifndef PRNODEV
+	#define PRNODEV		(0)
+	#endif
+
+	#define _PS_dir		"/proc"
+	#define _PS_path_num	"/proc/%lu/%s"
+	#define _PS_path_str	"/proc/%s/%s"
+	#define _PS_status	"status"
+
+	struct prpsinfo
+	{
+		long		pr_pid;
+		char		pr_comm[64];
+		char		pr_state;
+		long		pr_ppid;
+		long		pr_pgrp;
+		long		pr_session;
+		long		pr_tty;
+		long		pr_tpgid;
+		unsigned long	pr_flags;
+		unsigned long	pr_minflt;
+		unsigned long	pr_cminflt;
+		unsigned long	pr_majflt;
+		unsigned long	pr_cmajflt;
+		unsigned long	pr_utime;
+		unsigned long	pr_stime;
+		unsigned long	pr_cutime;
+		unsigned long	pr_cstime;
+		long		pr_counter;
+		long		pr_priority;
+		long		pr_timeout;
+		unsigned long	pr_itrealvalue;
+		unsigned long	pr_starttime;
+		unsigned long	pr_vsize;
+		unsigned long	pr_rss;
+		unsigned long	pr_rlim;
+		unsigned long	pr_startcode;
+		unsigned long	pr_endcode;
+		unsigned long	pr_startstack;
+		unsigned long	pr_kstkesp;
+		unsigned long	pr_kstkeip;
+		unsigned long	pr_signal;
+		unsigned long	pr_blocked;
+		unsigned long	pr_sigignore;
+		unsigned long	pr_sigcatch;
+		unsigned long	pr_wchan;
+
+		/* must be added after the stat file is read */
+
+		unsigned long	pr_uid;		/* fstat(stat-fd) */
+		unsigned long	pr_gid;		/* fstat(stat-fd) */
+		long		pr_nice;	/* pr_priority-15 */
+		int		pr_cpu;		/* ??? */
+		long		pr_tty_major;
+		long		pr_tty_minor;
+		char		pr_flag_str[64];
+		long		pr_long_ignore;
+	};
+
+	#define pr_addr		pr_startcode
+	#define pr_fname	pr_comm
+	#define pr_flag		pr_state
+	#define pr_pri		pr_priority
+	#define pr_rssize	pr_rss
+	#define pr_sid		pr_session
+	#define pr_size		pr_vsize
+	#define pr_sname	pr_state
+	#define pr_start	pr_starttime
+	#define pr_ttydev	pr_tty
+	
+	#define _PS_scan_format	"%s %ld %ld %ld %ld %ld,%ld %s %lu,%lu %lu,%lu %lu,%lu"
+	#define _PS_scan_count	14
+	#define _PS_scan_args(p) \
+			(p)->pr_comm, \
+			&(p)->pr_pid, \
+			&(p)->pr_ppid, \
+			&(p)->pr_pgrp, \
+			&(p)->pr_session, \
+			&(p)->pr_tty_major, \
+			&(p)->pr_tty_minor, \
+			(p)->pr_flag_str, \
+			&(p)->pr_start, \
+			&(p)->pr_long_ignore, \
+			&(p)->pr_utime, \
+			&(p)->pr_long_ignore, \
+			&(p)->pr_stime, \
+			&(p)->pr_long_ignore
+	#define _PS_scan_fix(p) { \
+			(p)->pr_tty = ((p)->pr_tty_major == -1 || (p)->pr_tty_minor == -1) ? PRNODEV : ((p)->pr_tty_major << 8) | (p)->pr_tty_minor; \
+			}
+	
+	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))
+	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))
+	#define PR_START(p)	((p)->pr_start)
+!
+		elif	test -r /proc/$$/psinfo -a ! -r /proc/$$/fd
+		then	cat <<!
+	/*
+	 * unixware style /proc
+	 */
+
+	#include <sys/procfs.h>
+
+	#define _mem_pr_clname_prpsinfo		1
+	#define _mem_pr_psargs_prpsinfo		1
+
+	#define _PS_dir		"/proc"
+	#define _PS_path_num	"/proc/%lu/%s"
+	#define _PS_path_str	"/proc/%s/%s"
+	#define _PS_status	"psinfo"
+
+	#define prpsinfo	psinfo
+
+	#define pr_clname	pr_lwp.pr_clname
+	#define pr_cpu		pr_lwp.pr__pad[0]
+	#define pr_flag		pr_state
+	#define pr_nice		pr_lwp.pr_nice
+	#define pr_pgrp		pr_pgid
+	#define pr_pri		pr_lwp.pr_pri
+	#define pr_sname	pr_lwp.pr_sname
+	#define pr_state	pr_lwp.pr_state
+	#define pr_wchan	pr_lwp.pr_wchan
+	
+	#define _PS_scan_binary	1
+	
+	#define PR_TIME(p)	((p)->pr_time.tv_sec)
+	#define PR_CTIME(p)	PR_TIME(p)
+	#define PR_START(p)	((p)->pr_start.tv_sec)
+!
+		else
+			if	test -d /proc/pinfo
+			then	dir=/proc/pinfo
+			else	dir=/proc
+			fi
+			cat <<!
+	#include <sys/procfs.h>
+	#include <sys/ioctl.h>
+
+	#ifndef PRNODEV
+	#define PRNODEV		(-1)
+	#endif
+
+	#define _PS_dir		"$dir"
+	#define _PS_path_num	"$dir/%lu"
+	#define _PS_path_str	"$dir/%s"
+	#define _PS_status	0
+
+	#define PR_START(p)	((p)->pr_start.tv_sec)
+	#if _mem_pr_lttydev_prpsinfo && !defined(pr_ttydev)
+	#define PR_TIME(p)	((p)->pr_time)
+	#define PR_CTIME(p)	((p)->pr_ctime)
+	#define pr_ttydev	pr_lttydev
+	#else
+	#define PR_TIME(p)	((p)->pr_time.tv_sec)
+	#define PR_CTIME(p)	((p)->pr_ctime.tv_sec)
+	#endif
+!
+		fi
+		cat <<!
+	#if _mem_pr_zomb_prpsinfo
+	#define PR_ZOMBIE(p)		((p)->pr_zomb)
+	#else
+	#define PR_ZOMBIE(p)		((p)->pr_sname=='Z')
+	#endif
+!
+	fi
+	if	test -r /proc/self/cmdline
+	then	echo '#define _PS_args	"cmdline"'
+	fi
+}end

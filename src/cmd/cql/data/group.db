@@ -1,0 +1,12 @@
+GR_staff:*:101:dgk,ek,gsf,kpv,smb,dfwc
+GR_1124:*:102:ek,smb,dgb,kpv,griffin,albert,khp,jap
+GR_3d:*:103:dgk,chen,herman
+GR_ftpdist:*:104:ftpdist,smb,dgk,gsf
+GR_ifs:*:105:kpv,jjs
+GR_reveng:*:106:ek,kpv
+GR_ship:*:107:dgk,gsf,kpv,advsoft,ek
+GR_dgk:*:1001:dgk
+GR_gsf:*:1002:gsf
+GR_kpv:*:1003:kpv
+GR_dfwc:*:1004:dfwc
+GR_bozo:*:1005:bozo

@@ -1,0 +1,8 @@
+cql -lcdb
+	finalize Cdbkey_t interface
+set terminator
+get all schema pseudo-values (currently settable only)
+define schema like global struct to hang computation results
+awk NF?
+current record image
+	cql.input; better name might be cql.data

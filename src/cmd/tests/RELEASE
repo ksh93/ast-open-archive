@@ -1,0 +1,8 @@
+00-01-10 opt.tst: fix USAGE_LICENSE
+99-10-22 date: test all % formats
+99-08-11 sfio: fix 3 tests for uwin
+	 sfio: tscanf for netbsd
+99-03-25 :TEST: don't forget about foo.c for foo.tst
+	 sfio/testsfio: fix option parse for `-x *,*' and cc.* and *.cc
+99-01-23 moved library tests from std to here
+	 added optget() tests

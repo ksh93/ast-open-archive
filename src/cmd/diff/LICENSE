@@ -1,0 +1,8 @@
+license=(
+	type=gpl
+	package=diff
+	author="Paul Eggert <eggert@twinsun.com>,Richard Stallman <rms@gnu.ai.mit.edu>,Mike Haertel,David Hayes,Len Tower"
+	since=1988
+	company="Free Software Foundation"
+	url=http://www.gnu.org/copyleft/gpl.html
+)

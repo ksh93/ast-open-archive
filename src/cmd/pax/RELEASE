@@ -1,8 +1,83 @@
-portable archive interchange changes since the last release
-
-07/17/95 fix -w output to stdout initialization bug
+00-01-04 pax: fix rpm embedded archive hard seek
+	 pax: --filter implies --nodescend
+	 pax: add --meter
+	 pax: handle ms PORTAR '\' => '/' path separator
+99-11-19 pax: try `ratz -c' if `gunzip' not found
+99-11-11 add --checksum, --install, --local, --preserve=s
+99-11-04 fix zip for archives with EXTLOC headers
+	 don't generate //* file names
+99-10-31 pax: add tgz == tar:gzip, --filter=-
+99-08-11 bio: fix end of medium handling
+99-06-01 restore -T == --test
+99-05-28 pax: add rpm read
+99-05-21 pax: fix -rw umask(0) bug
+99-05-17 pax: fix chmod() delay for ug+s,+t
+99-05-11 nocom: long options
+99-05-09 pax: sfopen(sfstdin,0,"rt") for input file list
+99-05-01 pax: state.xdev => FTW_MOUNT!!
+99-04-01 pax: fix Integral_t for sizeof(long)==8
+	 pax: fix ]] in optget usage
+99-03-17 pax: better st_mode preservation
+99-03-01 pax: fix dirprefix() prune to work in all cases
+	 pax: add savepath() to handle >PATH_MAX paths
+99-02-06 pax: update to new optget()
+99-01-11 pax: add bzip2 compression support
+98-10-01 pax: fix -rw hard link bug
+	 pax: fix -o preserve=* option.level inconsistencies
+98-08-11 cpio.sh: fix with getopts
+	 pax: increase -rw default buffer size
+	 pax: use REG_DELIMITED to parse -s
+98-04-01 fix tar delta bug that set st_size=0 before consuming delta head/tail
+	 pax -<flag> '?' lists help info for flag
+	 fix -rw bugs introduced by recent delta fixes
+	 testpax: add regression tests
+	 fileout: add EIO memalign fallback to track sgi bug
+98-03-19 fix tar delta epilogue check
+	 fix delta pass checks
+	 fix off_t vs. file size mismatches
+98-03-17 umask(0) only if -o preserve=* in effect
+	 add File_t.ro to mark readonly files/paths
+98-02-14 add -o intermediate to copy output to intermediate before commit
+98-01-23 use %I#d scanf format to get off_t right
+98-01-11 -K == -o keepgoing
+	 -x format on read accepts that format only (useful with -o keepgoing)
+97-12-07 add 4 NULs to work around gunzip bug that peeks beyond EOF
+97-11-11 use PROC_FD_PARENT to let procopen() close parent fd
+97-10-31 cab list works; anyone have LZX or QUANTUM decompress code?
+97-09-22 fix vdb format write
+97-08-11 fix omitted missdir() call
+97-07-17 -r attempts chmod u+w along with missdir and remove
+	 -rl preserves existing links if possible
+	 beginnings of cab file read
+97-05-09 fix putepilogue() with off_t boundary
+96-12-25 zip archive header magic fix
+	 use MTIOCGETBLKINFO to determine default tape blocksize
+	 -o eom=!command uses $(command read|write part [file]) for next file
+	 -s ',.*,-,' cats to stdout
+	 -x pax support for >2GB file size
+96-11-28 off64_t tweaks
+	 drop -r -w -x order dependency
+	 undo ccmaps() in bunread()
+	 add explicit O_RDONLY checks (!= 0 on some systems)
+96-10-11 change to <ccode.h> from mem[ae]to[ae]()
+96-08-11 add -o to={ascii|ebcdic} -o from={ascii|ebcdic} from mvs
+96-02-29 enable -rw setfile() -- why was it disabled in the first place?
+	 fix stdin file list peek bug that dropped leading files
+96-02-09 handle zip archives on input
+96-01-18 AT&T Research now
+	 switch to <regex.h>
+95-11-24 don't check for compressed format if already uncompressing
+95-11-18 ignore empty file list lines
+95-10-31 fix and compensate for cpio header hard link size bug
+95-10-11 drop "blocking ignored in pass mode" message
+	 aschk symlink data need not have trailing '\0'
+95-09-01 fix nocom \ handling
+95-08-11 builtin nocom for -o filter=nocomment
+	 more delta tracing
+	 vd02 delta algorithm
+95-07-17 fix -w output to stdout initialization bug
 	 fix stdin file list peek bug that dropped trailing files
-05/09/95 don't check member count unless its really a trailer
+95-05-09 don't check member count unless its really a trailer
 	 sfkeyprintf lookup string arg is now the format conversion character
 	 initialize output archive for -rw to stdout archive
 	 misc.c had putc() and fgets()!
@@ -11,101 +86,101 @@ portable archive interchange changes since the last release
 	 fix delta pass missing dir fd bug
 	 fix dirprefix for /
 	 add bax.sh as an *example*
-04/01/95 with proto va_start() must come before any arg references
+95-04-01 with proto va_start() must come before any arg references
 	 fix delta bug that failed to mark emitted or skipped members
 	 allow -z for patch deltas
 	 be sure to set ap->format before binit()
 	 fix ordering bug that botched most deltas!
 	 use file.name (after -s maps) rather than file.path in delta hash
 	 fix bget() bug that skipped checksum
-03/19/95 first round with POSIX 1003.2 1995 
+95-03-19 first round with POSIX 1003.2 1995 
 	 handle file holes on input
 	 delta header contains member index and trailer size
 	 delta trailer contains member checksum
 	 delta epilogue contains member count
-03/01/95 internal redesign using Archive_t handles instead of global state
+95-03-01 internal redesign using Archive_t handles instead of global state
 	 -o ordered (-O) allows single pass through base
-02/14/95 make -u work with VPATH
+95-02-14 make -u work with VPATH
 	 -x composes gzip,compress,delta,delta88,ignore,patch with real formats
 	 -x gzip:tar, -x gzip,tar, -x 'gzip tar' accepted
 	 -x delta is equivalent to -z -
 	 -o delta deleted
 	 fix OPT_owner null dereference
 	 fix archive pass bug that didn't update DELTA_create members
-01/19/95 detect compress and gzip on input
+95-01-19 detect compress and gzip on input
 	 add -f -z grouping with -r -w to support -r -f -z -w -f -z
 	 fix a few compress/delta ineraction bugs
 	 add -t s[#]k[#] to skip all [#] and/or keep all [#] tape volumes
 	 use new <align.h> ALIGN_ identifiers
-01/11/95 add s option to -s to stop on success
+95-01-11 add s option to -s to stop on success
 	 add delta 94 (vdelta)
 	 add long option names
 	 deprecate most flag options
 	 DELTA_TEMP <64K avoids temp file
 	 add -o delta=patch for patch archives
-12/25/94 add lib/pax/*.fmt args files for unknown formats
+94-12-25 add lib/pax/*.fmt args files for unknown formats
 	 fix mknod() calls to use the right file type!
-11/11/94 fix ar out of phase warning
-08/11/94 add -Rh'header' and -Rt'trailer' for vdb write
+94-11-11 fix ar out of phase warning
+94-08-11 add -Rh'header' and -Rt'trailer' for vdb write
 	 -e now works for -rw
-08/11/93 add vdb `virtual database' r/w format
-06/11/93 fix bug that didn't output non-regular files
+93-08-11 add vdb `virtual database' r/w format
+93-06-11 fix bug that didn't output non-regular files
 	 -w now uses FTW_POST to preserve dir modes
-04/01/93 handle PORTAR long member name table
-04/01/92 copy all 0 length files out regardless of read permission
-08/11/91 add check for garbage after end tar implementation bug
-10/01/90 add mips ar format out of date check
-08/11/90 header/trailer alignment now table driven
-07/20/90 fix binary output bug that set header size and time to 1
-06/01/90 fix misc delta compression bugs
-05/01/90 fix DELTA_create bug that did not check COMPRESS
-03/28/90 bump regular output block size to 8k
-02/11/90 delta changes held off by #if new_delta_format until new libdelta
+93-04-01 handle PORTAR long member name table
+92-04-01 copy all 0 length files out regardless of read permission
+91-08-11 add check for garbage after end tar implementation bug
+90-10-01 add mips ar format out of date check
+90-08-11 header/trailer alignment now table driven
+90-07-20 fix binary output bug that set header size and time to 1
+90-06-01 fix misc delta compression bugs
+90-05-01 fix DELTA_create bug that did not check COMPRESS
+90-03-28 bump regular output block size to 8k
+90-02-11 delta changes held off by #if new_delta_format until new libdelta
 	 base archive checksums incompatible with previous versions
-02/06/90 fix newio() bug that looped when write() returned 0
-01/25/90 add proposed posix 1003.1b archive/interchange format
+90-02-06 fix newio() bug that looped when write() returned 0
+90-01-25 add proposed posix 1003.1b archive/interchange format
 	 tune buffering
 	 change -R option for general record support
 	 generalize delta id file name -- incompatible with old format
 	 prepare for new libdelta and subsequent incompatibilities
-12/01/89 add self-delta support, delete -A option (one algorithm with versions)
-11/18/89 fix dir mode restoration bug
-11/11/89 fix delta update with older file
-10/31/89 add portarch and randarch readonly object formats
-10/11/89 allow -f with -rwz
-10/01/89 add -Bmaxblocks and -C to match latest tar/cpio extensions
-08/22/89 align read() buffers to IOALIGN
-07/27/89 add EFBIG & EDQUOT checks to newio()
-07/04/89 fix cpio binary header mtime and size swab bug
+89-12-01 add self-delta support, delete -A option (one algorithm with versions)
+89-11-18 fix dir mode restoration bug
+89-11-11 fix delta update with older file
+89-10-31 add portarch and randarch readonly object formats
+89-10-11 allow -f with -rwz
+89-10-01 add -Bmaxblocks and -C to match latest tar/cpio extensions
+89-08-22 align read() buffers to IOALIGN
+89-07-27 add EFBIG & EDQUOT checks to newio()
+89-07-04 fix cpio binary header mtime and size swab bug
 	 fix -rw bug that makes it work now!
 	 redo file post processing restoration
-05/11/89 handle GNU-tar USTAR format botch
+89-05-11 handle GNU-tar USTAR format botch
 	 missing intermediate directories inherit mode of nearest ancestor
 	 fix names on stdin bug that only did -P
 	 incorporate lar changes from David Muir
 	 expand -R arg syntax
 	 handle ansi/ibm D,F,S,U,V formats on output
-03/28/89 fix bget() buffer boundary error for reads < buffersize
-03/01/89 ignore DELTA_PASS file set*() calls
-02/22/89 fix bread bug for 0 count and bget memcpy overlap
-01/18/89 fix copyout() rfd<0 delta bug that generated multiple entries
-01/11/89 fix dirsize!=0 bug; change ftwalk XDEV implementation
-12/11/88 fix symlink->nowhere bug
-11/22/88 add vmsbackup readonly format; fix lseek validity checks
-11/17/88 add -T040 to simulate tape device blocking on input
-11/11/88 add s5r4 asc and aschk formats
-11/07/88 hard links and deltas don't cross volumes
-11/01/88 add -n to read exact file list
-10/20/88 add bread(0,...) to skip, bget() and bput() io optimizations
-10/11/88 fix delta ops to use pattern args
-10/04/88 fix argc bug that botched -rw with file args
-10/01/88 for delta update, verify that untouched files match base archive
-09/30/88 fix allocate() bug: malloc() -> calloc()
-08/23/88 use libx/memsum() for checksum calculations
-08/20/88 add `![command]' to end of medium replies
-08/18/88 table of contents output to stdout
-08/08/88 update for libx/ftwalk() and libx/strls()
-07/28/88 streamline ftwalk() interface
-07/21/88 finish up -a and -u tar compatibility
-07/17/88 add cpio.sh and tar.sh interface scripts
-07/15/88 convert to pax
+89-03-28 fix bget() buffer boundary error for reads < buffersize
+89-03-01 ignore DELTA_PASS file set*() calls
+89-02-22 fix bread bug for 0 count and bget memcpy overlap
+89-01-18 fix copyout() rfd<0 delta bug that generated multiple entries
+89-01-11 fix dirsize!=0 bug; change ftwalk XDEV implementation
+88-12-11 fix symlink->nowhere bug
+88-11-22 add vmsbackup readonly format; fix lseek validity checks
+88-11-17 add -T040 to simulate tape device blocking on input
+88-11-11 add s5r4 asc and aschk formats
+88-11-07 hard links and deltas don't cross volumes
+88-11-01 add -n to read exact file list
+88-10-20 add bread(0,...) to skip, bget() and bput() io optimizations
+88-10-11 fix delta ops to use pattern args
+88-10-04 fix argc bug that botched -rw with file args
+88-10-01 for delta update, verify that untouched files match base archive
+88-09-30 fix allocate() bug: malloc() -> calloc()
+88-08-23 use libx/memsum() for checksum calculations
+88-08-20 add `![command]' to end of medium replies
+88-08-18 table of contents output to stdout
+88-08-08 update for libx/ftwalk() and libx/strls()
+88-07-28 streamline ftwalk() interface
+88-07-21 finish up -a and -u tar compatibility
+88-07-17 add cpio.sh and tar.sh interface scripts
+88-07-15 convert to pax

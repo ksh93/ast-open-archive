@@ -1,21 +1,31 @@
 :PACKAGE: ast
 
+LICENSE = since=1987,author=gsf
+
 DEBUG == 1
 
-pax :: RELEASE HISTORY pax.1 pax.1.posix \
-	pax.h options.h \
+pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
+	pax.h options.h zip.h \
 	bio.c convert.c copy.c pax.c \
 	delta.c file.c format.c misc.c \
-	-lodelta -lvdelta
+	-lodelta -lvdelta -lsum
 
 nocom :: nocom.c
 
 $(LIBDIR)/pax :INSTALLDIR: cia.fmt ppar.fmt
 
-:INSTALLDIR: cpio tar
+:INSTALLDIR: bax cpio tar testpax
 
 bax :: bax.1 bax.sh
 
 cpio :: cpio.sh
 
+rpm2cpio :: rpm2cpio.sh
+
 tar :: tar.sh
+
+:TEST: pax
+
+:TEST: testpax.sh pax
+
+:: mode.dat y2k.dat

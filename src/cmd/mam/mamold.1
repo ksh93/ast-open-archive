@@ -1,0 +1,149 @@
+.\"
+.\" G. S. Fowler
+.\" AT&T Bell Laboratories
+.\"
+.\" @(#)mamold.1 (gsf@research.att.com) 01/11/88
+.\"
+.ds nM nmake\"	`make' someday
+.ds oM make\"	`omake' someday
+.de L		\" literal font
+.ft 5
+.it 1 }N
+.if !\\$1 \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
+..
+.de LR
+.}S 5 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de RL
+.}S 1 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH MAMOLD 1
+.SH NAME
+mamold \- convert make abstract machine input to an \*(oM makefile
+.SH SYNOPSIS
+.B mamold
+[
+.B \-2\-g
+] [
+.B \-2\-x
+.I path
+] [
+.I "target ..."
+]
+.SH DESCRIPTION
+.I mamold
+converts an
+.IR \*(nM (1)
+makefile to old
+.IR \*(oM (1)
+compatable format on the standard output.
+.I mamold
+accepts
+.I \*(nM
+target arguments and options and should be run in the same directory as
+.I \*(nM
+would have been run.
+Only active targets are listed in the output makefile.
+.PP
+The
+.B \-2\-g
+options (pass 2) causes only dependency graph information to be output
+in lines of the form
+.EX
+	target : prerequisites ...
+.EE
+The
+.BI \-2\-x " path"
+option (pass 2) specifies an absolute (rooted at
+.BR / )
+directory
+.I path
+to be excluded.
+Any target or prerequisite file with the path prefix
+.I path
+is omitted from the
+.I \*(oM
+makefile target and prerequisite lists.
+Multiple
+.B \-2\-x
+options accumulate.
+Targets with the path prefix
+.B /usr/include
+are always excluded.
+.PP
+The conversion process is divided into two passes.
+The first pass is
+.I \*(nM
+with the
+.B "\-o oldfile"
+option set.
+The second pass constructs the
+.I \*(oM
+makefile on the standard output based on information supplied by the first pass.
+.PP
+Symbolic information is preserved where possible in the output makefile.
+Comments, however, are lost.
+.PP
+Most makefiles can be converted using either 
+.B mamold
+or
+.BR "mamold install clobber print ..." .
+.SH FILES
+Makefile, makefile
+.SH DIAGNOSTICS
+Messages from 
+.I mamold
+are preceded by 
+.BR "mamold: " ;
+all other messages are produced by
+.I \*(nM .
+.SH "SEE ALSO"
+\*(nM(1), mamnew(1), \*(oM(1)
+.SH CAVEATS
+Absolute directory path names are given symbolic names.
+Common absolute directory prefixes are named
+.BI COM .nn
+and other absolute directory paths are named
+.BI DIR .nn.
+It may be necessary to redefine the
+.BI COM .nn
+directory paths when porting makefiles to other systems.
+.PP
+Certain actions may require the 
+.I \*(oM
+command line variable definition
+.EX
+	newline='$(null)
+	'
+.EE
+.I "here documents"
+and multi-line shell constructs in particular require this.
+.PP
+The following shell scripts (or functions) must also be available in the
+.I \*(oM
+environment:
+.EX
+ignore:
+	# ignore command ...
+	"$@"
+	exit 0
+silent:
+	# silent command ...
+	# (no-op for \*(oM)
+	"$@"
+.EE

@@ -1,45 +1,25 @@
-/*
- * CDE - Common Desktop Environment
- *
- * Copyright (c) 1993-2012, The Open Group. All rights reserved.
- *
- * These libraries and programs are free software; you can
- * redistribute them and/or modify them under the terms of the GNU
- * Lesser General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option)
- * any later version.
- *
- * These libraries and programs are distributed in the hope that
- * they will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with these librararies and programs; if not, write
- * to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301 USA
- */
 /***************************************************************
 *                                                              *
-*                      AT&T - PROPRIETARY                      *
+*           This software is part of the ast package           *
+*              Copyright (c) 1995-2000 AT&T Corp.              *
+*      and it may only be used by you under license from       *
+*                     AT&T Corp. ("AT&T")                      *
+*       A copy of the Source Code Agreement is available       *
+*              at the AT&T Internet web site URL               *
 *                                                              *
-*         THIS IS PROPRIETARY SOURCE CODE LICENSED BY          *
-*                          AT&T CORP.                          *
+*     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*                Copyright (c) 1995 AT&T Corp.                 *
-*                     All Rights Reserved                      *
-*                                                              *
-*           This software is licensed by AT&T Corp.            *
-*       under the terms and conditions of the license in       *
-*       http://www.research.att.com/orgs/ssr/book/reuse        *
+*     If you received this software without first entering     *
+*       into a license with AT&T, you have an infringing       *
+*           copy and cannot use it without violating           *
+*             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
-*           Software Engineering Research Department           *
-*                    AT&T Bell Laboratories                    *
+*               Network Services Research Center               *
+*                      AT&T Labs Research                      *
+*                       Florham Park NJ                        *
 *                                                              *
-*               For further information contact                *
-*                     gsf@research.att.com                     *
+*               Phong Vo <kpv@research.att.com>                *
 *                                                              *
 ***************************************************************/
 #include	"vdelhdr.h"
@@ -54,9 +34,11 @@
 **	that array in bytes must be storable in an "int". This is
 **	used in various cast from "long" to "int".
 **
-**	Written by (Kiem-)Phong Vo, kpv@research.att.com, 5/20/94
+**	Written by Kiem-Phong Vo, kpv@research.att.com, 5/20/94
 */
-typedef struct _table_s
+
+/* structure for update table */
+typedef struct _utable_s
 {	Vdio_t		io;		/* io structure			*/
 	Vddisc_t*	source;		/* source data discipline	*/
 	Vddisc_t*	target;		/* target data discipline	*/
@@ -66,18 +48,18 @@ typedef struct _table_s
 	long		n_tar;
 	long		s_org;		/* start of window in source	*/
 	long		t_org;		/* start of window in target	*/
-	uchar		data[128];	/* buffer for data transferring	*/
+	uchar		data[1024];	/* buffer for data transferring	*/
 	char		s_alloc;	/* 1 if source was allocated	*/
 	char		t_alloc;	/* 1 if target was allocated	*/
 	char		compress;	/* 1 if compressing only	*/
 	K_UDECL(quick,recent,rhere);	/* address caches		*/
-} Table_t;
+} Utable_t;
 
 #if __STD_C
-static vdunfold(Table_t* tab)
+static int vdunfold(Utable_t* tab)
 #else
-static vdunfold(tab)
-Table_t*	tab;
+static int vdunfold(tab)
+Utable_t*	tab;
 #endif
 {
 	reg long	size, copy;
@@ -293,7 +275,7 @@ Vddisc_t*	delta;		/* delta data	*/
 	reg long	t, p, window, n_src, n_tar;
 	reg uchar	*data;
 	uchar		magic[8];
-	Table_t		tab;
+	Utable_t	tab;
 
 	if(!target || (!target->data && !target->writef) )
 		return -1;
@@ -306,14 +288,24 @@ Vddisc_t*	delta;		/* delta data	*/
 	tab.target = target;
 
 	/* check magic header */
+	/* VD_MAGIC is the preferred binary magic */
+	/* VD_MAGIC_OLD is the deprecated ascii magic */
 	data = (uchar*)(VD_MAGIC);
-	for(n = 0; data[n]; ++n)
-		;
+	n = sizeof(VD_MAGIC) - 1;
 	if((*_Vdread)(&tab.io,magic,n) != n)
 		return -1;
-	for(n -= 1; n >= 0; --n)
-		if(data[n] != magic[n])
-			return -1;
+	for(r = 0; r < n; ++r)
+		if(data[r] != magic[r])
+		{	data = (uchar*)(VD_MAGIC_OLD);
+			for (r = 0; r < n; ++r)
+				if(data[r] != magic[r])
+#if _PACKAGE_ast
+					return _vdupdate_01(source,target,delta);
+#else
+					return -1;
+#endif
+			break;
+		}
 
 	/* get true target size */
 	if((t = (long)(*_Vdgetu)(&tab.io,0)) < 0 ||
@@ -342,18 +334,22 @@ Vddisc_t*	delta;		/* delta data	*/
 	tab.tar = tab.src = NIL(uchar*);
 	tab.t_alloc = tab.s_alloc = 0;
 
-	if(n_tar > 0 && !target->data && window < (long)MAXINT)
-		n = (int)window;
-	else	n = 0;
+	n = (!target->data && window < (long)MAXINT) ? (int)window : 0;
+	if(n > n_tar)
+		n = n_tar;
 	if(n > 0 && (tab.tar = (uchar*)malloc(n*sizeof(uchar))) )
 		tab.t_alloc = 1;
 
-	if(n_src > 0 && !source->data && window < (long)MAXINT)
-		n = (int)window;
-	else if(n_src == 0 && window < n_tar && !target->data &&
-		HEADER(window) < (long)MAXINT)
-		n = (int)HEADER(window);
-	else	n = 0;
+	if(n_src <= 0)
+	{	if(target->data || window >= (long)MAXINT || window >= n_tar)
+			n = 0;
+		else	n = (int)HEADER(window);
+	}
+	else
+	{	n = (!source->data && window < (long)MAXINT) ? (int)window : 0;
+		if(n > n_src)
+			n = n_src;
+	}
 	if(n > 0 && (tab.src = (uchar*)malloc(n*sizeof(uchar))) )
 		tab.s_alloc = 1;
 
@@ -362,7 +358,7 @@ Vddisc_t*	delta;		/* delta data	*/
 	for(t = 0; t < n_tar; )
 	{	tab.t_org = t;	/* current location in target stream */
 
-		if(n_src == 0)	/* data compression */
+		if(n_src <= 0)	/* data compression */
 		{	tab.s_org = 0;
 
 			if(t == 0)
@@ -387,12 +383,14 @@ Vddisc_t*	delta;		/* delta data	*/
 			}
 		}
 		else	/* data differencing */
-		{	tab.n_src = window;
-			if(t < n_src)
-			{	if((t+window) > n_src)
+		{	if(t < n_src)
+			{	if(window >= n_src)
+					p = 0;
+				else if((t+window) > n_src)
 					p = n_src-window;
 				else	p = t;
-
+				if((tab.n_src = n_src-p) > window)
+					tab.n_src = window;
 				tab.s_org = p;
 
 				if(src)
@@ -404,6 +402,7 @@ Vddisc_t*	delta;		/* delta data	*/
 						goto done;
 				}
 			}
+			/* else use last window */
 		}
 
 		if(tar)

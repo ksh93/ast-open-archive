@@ -1,0 +1,117 @@
+======================================
+Tksh -  Tcl/Tk extension for KornShell
+======================================
+
+Jeff Korn
+jlk@cs.princeton.edu
+
+4/10/97	(7.6 Beta 1)
+
+Introduction
+------------
+
+This directory contains source and documentation for Tksh, an
+implementation of the Tcl C library on top of the Kornshell
+API.  Tksh allows Tcl libraries such as Tk to run on top of
+ksh93 without modification, and will also interpret Tcl
+scripts.  Tcl version 7.5 is implemented.
+
+Documentation
+-------------
+
+In the "doc" directory, there is TeX source for a paper
+describing Tksh.  Running latex on the file "tksh.tex" should
+produce a dvi file which can then be printed.
+
+This directory contains the man page for tksh ("tksh.1").
+To print the man page, use troff with the normal -man macros:
+	troff -man tksh.1
+
+For more up to date information, check the Tksh hompage, at
+	http://www.cs.princeton.edu/~jlk/tksh
+
+Prerequisites
+-------------
+
+Tksh requires that you have the following software:
+
+1.  Binary for the Tk library, version 4.1
+
+2.  The AST libraries (libshell.a, libcmd.a and libast.a) and required
+    header files.  If you do not have these libraries, you can obtain a
+    free copy for noncommercial use at:
+	http://www.research.att.com/orgs/ssr/book/reuse
+    If your version of libshell.a is for ksh93d, you will also need
+    the object file "main.o" from the ksh distribution (it is included
+    here for Sun, Linux and Alpha).  Versions from ksh93e on do not
+    require this.  There are a few relavent bugs in 93d that have been
+    corrected in 93e, so using 93e is stronly recommended.
+
+Installing Tksh
+---------------
+
+Tksh will install with any ANSI C compiler (tested with gcc) and
+make.   Typing "make" will run the configuration script and compile
+Tksh.
+
+Installation takes place in the "build" directory.  In that
+directory, threre is an configuration script looks on your system
+for the required libraries/includes and generates a Makefile that
+can be used to build Tksh.  If you have wish installed, it will
+give you a chance to modify the locations via a user interface.  If
+you don't, you can edit the Makefile in the "build" directory to set
+up the directories appropriately.
+
+Once you have set up the directories, everything should compile
+by typing "make" in the "build directory".  If compilation is succesful,
+you can try out tksh by running the binary "tksh" in the compile directory.
+
+There is a demo that you can run (the standard Tk demo) by typing
+	./tksh widget
+
+If you are installing for multiple architectures, you can use
+the command
+	make BUILDDIR=<name of directory>
+which will create a new directory specified by BUILDDIR and make
+symbolic links to the appropriate files in the "build" directory.
+
+Tests
+-----
+
+If you have the Tcl test files installed, the command "make test"
+issued from the "build" directory will run the Tcl test scripts using
+the Tksh Tcl compatiblity mode.  Setting the variable "TCL_TESTDIR" on the
+make line will set the location of the test files, and setting the variable
+"TEST" will run a specific test.  Alternatively, you can run the tests with
+the command:
+
+	./tclksh tests/dotests [Tcl Test Directory] [Test Name]
+
+There are also some simple Tk Kornshell scripts in the "test"
+directory.
+
+Examples
+--------
+
+In the "scripts" directory, there are a couple of example scripts
+written in Tksh.  The script "watchdir" is a good example
+of using shell and Tk together.  It should be run interactively
+(by using the "." command in ksh).  The script "mailfile" is
+a script that implements an open file dialog box and allows the
+user to email a file or directory.
+
+Debugging
+---------
+
+To compile a version for debugging, define "DEBUG".  If Tksh is
+compiled as a debug version, setting the environment variable
+"TKSHDEBUG" (for example, by running the command as "TKSHDEBUG=1 ./tksh")
+will cause Tksh to print (many!) debug messages to stderr.
+
+Bugs
+----
+
+Send bug reports to me (jlk@cs.princeton.edu).  I'll try to fix
+problems when I can, but I don't have too much time to support
+this software.  Please include as much information as possible
+in your bug report.

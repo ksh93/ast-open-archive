@@ -1,7 +1,29 @@
+################################################################
+#                                                              #
+#           This software is part of the ast package           #
+#              Copyright (c) 1987-2000 AT&T Corp.              #
+#      and it may only be used by you under license from       #
+#                     AT&T Corp. ("AT&T")                      #
+#       A copy of the Source Code Agreement is available       #
+#              at the AT&T Internet web site URL               #
+#                                                              #
+#     http://www.research.att.com/sw/license/ast-open.html     #
+#                                                              #
+#     If you received this software without first entering     #
+#       into a license with AT&T, you have an infringing       #
+#           copy and cannot use it without violating           #
+#             AT&T's intellectual property rights.             #
+#                                                              #
+#               This software was created by the               #
+#               Network Services Research Center               #
+#                      AT&T Labs Research                      #
+#                       Florham Park NJ                        #
+#                                                              #
+#             Glenn Fowler <gsf@research.att.com>              #
+#                                                              #
+################################################################
 :
-# Glenn Fowler
-# AT&T Bell Laboratories
-# @(#)tar.sh (gsf@research.att.com) 04/06/89
+# @(#)tar.sh (AT&T Labs Research) 1989-04-06
 #
 # tar -> pax interface script
 #
@@ -12,15 +34,16 @@ Usage: $command c[vwfbB[[0-9][hlm]]] [pathname ...]
        $command r[vwfbB[[0-9][hlm]]] [files ...]
        $command t[vwfbB[[0-9][hlm]]
        $command u[vwfbB[[0-9][hlm]]] [pathname ...]
-       $command x[vwfblmB[[0-9][hlm]]] [pathname ...]"
+       $command x[vwfblmpB[[0-9][hlm]]] [pathname ...]"
 
 case $1 in
 *[tx]*)		mode="-r" ;;
 *[cru]*)	mode="-w" ;;
-*)		echo "$command: one of crtux must be specified$usage" >&2; exit 1 ;;
+*)		print -u2 "$command: one of crtux must be specified$usage"; exit 1 ;;
 esac
 options="-P"
-file="-t 0"
+exec=eval
+file="-o tape=0"
 list=""
 r_ok="1"
 w_ok="1"
@@ -29,7 +52,7 @@ lastopt=""
 shift
 for opt in `echo '' $arg | sed -e 's/^ -//' -e 's/./& /g'`
 do	case $opt in
-	[0-9])	file="-t $opt" ;;
+	[0-9])	file="-o tape=$opt" ;;
 	[hlm])	case $lastopt in
 		[0-9])	file="${file}$opt" ;;
 		*)	case $opt in
@@ -42,38 +65,44 @@ do	case $opt in
 		;;
 	[v])	options="$options -$opt" ;;
 	b)	case $# in
-		0)	echo "$command: blocking factor argument expected$usage" >&2; exit 1 ;;
+		0)	print -u2 "$command: blocking factor argument expected$usage"; exit 1 ;;
 		esac
 		options="$options -b ${1}b"
 		shift
 		;;
 	c)	r_ok="" ;;
 	f)	case $# in
-		0)	echo "$command: file name argument expected$usage" >&2; exit 1 ;;
+		0)	print -u2 "$command: file name argument expected$usage"; exit 1 ;;
 		esac
 		case $1 in
 		-)	file="" ;;
-		*)	file="-f $1" ;;
+		*)	file="-f '$1'" ;;
 		esac
 		shift
 		;;
+	p)	options="$options -pe" ;;
 	r)	r_ok="" options="$options -a" ;;
 	t)	w_ok="" list="1" ;;
 	u)	r_ok="" options="$options -u" ;;
-	w)	options="$options -y" ;;
+	w)	options="$options -o yes" ;;
 	x)	w_ok="" ;;
 	B)	options="$options -b 10k" ;;
-	*)	echo "$command: invalid option -$opt$usage" >&2; exit 1 ;;
+	D)	case $exec in
+		eval)	exec=print ;;
+		*)	exec="eval args" ;;
+		esac
+		;;
+	*)	print -u2 "$command: invalid option -$opt$usage"; exit 1 ;;
 	esac
 	lastopt=$opt
 done
 case $mode in
 -r)	case $r_ok in
-	"")	echo "$command: options inconsistent with archive read" >&2; exit 1 ;;
+	"")	print -u2 "$command: options inconsistent with archive read"; exit 1 ;;
 	esac
 	;;
 -w)	case $w_ok in
-	"")	echo "$command: options inconsistent with archive write" >&2; exit 1 ;;
+	"")	print -u2 "$command: options inconsistent with archive write"; exit 1 ;;
 	esac
 	case $# in
 	0)	set - "." ;;
@@ -84,4 +113,7 @@ esac
 case $list in
 "1")	mode="" ;;
 esac
-pax $mode $options $file "$@"
+case $exec in
+eval)	$exec pax $mode $options $file '"$@"' ;;
+*)	$exec pax $mode $options $file "$@" ;;
+esac

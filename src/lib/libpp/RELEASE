@@ -1,0 +1,290 @@
+00-01-11 pp.probe: hosttype now in C.probe
+99-11-19 is[a-z]*( => ppis[a-z]*(
+	 ppproto: "..." [A-Z_]+ "..." ignores [A-Z_]+ if PROTOMAIN
+99-11-11 ppproto: use astlicense()
+99-10-31 ppproto: add PROTO_SHARP, update license parse
+	 pplex: fix some MARK bugs seen by #define X "A B <C@D>"
+99-10-01 add pp:stringsplit for "...\\n..." => "..."\n"..."
+	 add pp:lineid to match PP_LINEID
+99-07-17 ppbuiltin: fix getline() canon spacing for numbers
+	 ppsearch: fix FILEDEPS not found \\n print
+	 pplex: fix spurious FILEDEPS '.' empty character constant message
+	 ppargs: fix usage error call and error_info.id default value
+	 ppproto: fix up copyright notice for ksh93 style .author file
+	 ppproto: check if notice text if file path
+99-06-02 ppproto: add __MANGLE_package_DATA__ & __MANGLE_package_FUNC__
+99-05-26 ppcontrol: all pragmas but prototyped need pp:
+99-05-25 ppargs: long options
+99-05-22 ppproto: changes for full ast vs. PROTO_STANDALONE
+99-05-09 ppinput: add #pragma pp:native and (pp.option&NATIVE) for native paths
+99-04-22 ppproto: finish type=open notice
+99-02-11 #define __STDC__ #(STDC); demote __STDC__ to 0 for HOSTED (thanks sun)
+99-02-04 pplex: joined strings separated by \\\n
+99-01-11 probe.win32: add _UWIN predef
+98-10-20 pplex: a few more (HOSTED|RELAX) checks
+	 -D:preserve throws a bunch of stuff -- great for imake (yuk)
+98-05-11 pplex: fix "..." \n off by one line count
+98-02-14 ppcontrol: fix HEADEREXPAND missing NUL
+98-01-23 ppproto: add _GNUC_ to _WIN32 check
+	 ppfsm: don't optimize for hp.pa
+97-11-11 ppcontrol: fix recursive use of pp.hdrbuf for HEADEREXPAND
+97-10-31 ppmacref,pp.h: add ppmacref sum arg -- some parts assumed it!
+97-10-01 pplex: loosen HEADEREXPAND check
+97-08-11 pplex: fix COMPILE pplex() bug that did not reset NEWLINE for S_MACRO
+	 pplex: PP_PRESERVE does not pp.pragma <token> ... # <pragma-stuff>
+	 pp.def: add UWIN
+	 ppcall: fix macro actual arg error checks
+97-07-17 ppproto.c: C++ __INLINE__ prefixed with extern __MANGLE__
+	 ppop.c: fix PP_RESERVED T_* lookup
+97-05-09 pp.def: add MVS :architecture:
+	 ppfsm.c: change C_* pseudo codes to not clash with ebcdic
+	 pp.probe: fix stdc.$src sed script
+97-04-01 ppcontrol.c: fix tokop() for PP_RESERVED
+96-12-25 add ms #@ charize to complement # stringize
+	 pp.probe now detects preincludes
+	 ppproto: allow #ifdef'd function definions before {
+	 ppproto: NoN() is not a function
+	 pp.key,ppkey.h: add int64
+	 ppargs.c: fix -M{DGM}*
+96-12-06 add pp:headerexpand for ms that expands macros in expanded <...>
+96-10-31 a few more line sync tweaks for EDG C++
+96-10-11 fix pp:macref off by one for standalone pp (big suprise)
+96-10-01 -D:macref -D-L -> #line (n-2)\n#pragma pp:macref ...
+96-08-11 fix transition macro expansion
+	 compatibility \" or \' does not start quote
+96-02-29 use <hashkey.h>
+	 drop ungetchr() in ppcall that modified macro values
+	 tighten the DEBUG PANIC case in ppcontrol.c
+	 unify #architecture() and #machine() probe
+	 add POSIX,WIN32,X86 to pp.sym
+	 tweak pp.probe
+96-02-14 pp:noallmultiple works on hosted files too
+	 fix #define /* EOF loop
+96-01-31 fix ## as arg to stringize macro to have ## value, not #
+	 add nonstopux and SYSTYPE_SVR4 to pp.def
+96-01-01 AT&T Research now
+	 fix catliteral line sync line number bug
+	 ppproto() converts non-directive <num>u to (unsigned)<num>
+	 switch to <regex.h>
+95-10-31 fix PP_COMPILE PP_TRANSITION bug that didn't allow space before #
+	 fix PP_TRANSITION \newline in definition complaint
+95-10-11 fix ppproto() PROTO_PLUSPLUS bug
+	 change ignored pp.incref PP_SYNC_POP to PP_SYNC_IGNORE
+	 add PP_PEDANTIC to handle gnu oversights (can't beat em ...)
+	 add memfatal() call
+	 relax newline in quote semantics
+	 proto inline -> __INLINE__
+	 fix __INLINE__ proto def for __GCC__>=2
+95-08-11 pp:preserve for easel (aka IFS) and imake
+	 fix pp:reguard ## macro output
+	 fix MARK PANIC with CATLITERAL
+	 PP_INPUT *.(s|S|as|AS|asm|ASM) implies pp:nocatliteral pp:spaceout
+	 ppargs() can't use isid() until after FSM_INIT
+	 -D#... for assert, -D%... for directives
+	 __STRICT_ANSI__ && __GNUC__ requires -pedantic for PP_STRICT
+	 #include <.../x> for include_next
+95-05-09 fix tokop() bug that concatenated adjacent strings
+	 don't concatenate directive string literals in proto
+	 split pp.mode into pp.mode and pp.option
+	 restrict pp.probe hostinfo output to the first token
+	 fix EOB/EOF pplex() nonterminating loop
+	 unused var cleanup
+	 add pp:reguard to emit #define and #undef (for C++ templates)
+	 add a few ppproto '\r's for NT
+	 fix T_BUILTIN ppsymbol -> ppsymkey pun
+	 fix pp:stringspan `#define x "' hang
+95-04-01 fix pp:hide for macros defined before the hide
+	 fix pp:map getline space canonicalization
+	 fix proto `<digits>[uU]'
+	 proto does // comments by default (fixes bug introduced 07/17/94)
+	 proto does "..." "..." string literal concatenation
+	 spice up proto copyright comments for nonexclusive license
+	 add hosttype assertion
+	 fix proto `typedef type fun(args)'
+	 proto copyright finishing touches
+	 fix overzealous "empty character constant" message
+95-02-14 pp:nopredefined probe info defines are now pp:builtin
+	 clean up pp:hosted conflicts
+	 tighten up unknown directive warning
+	 PP_INPUT *.(s|as|AS|asm|ASM) implies pp:nocatliteral pp:spaceout
+	 change newof(0,char,n,0) to newof(0,char,0,n) if 0 init not needed
+	 don't emit unkown directives inside #if 0 ... #endif
+95-01-19 *strict-* does not force STRICT
+	 token##null-last-variadic-arg consumes token (to match gcc)
+	 variadic actuals call be one less than arity (to match gcc)
+	 fix PLUSPLUS digraph bug that lost comment state
+	 tighten up PLUSPLUS //, /*, */ interaction warnings
+	 macro formals in "..." for COMPATIBILITY|TRANSITION
+	 macro formals in '...' for COMPATIBILITY|TRANSITION|!STRICT
+	 STRINGSPAN allows '\n' in '... too
+	 add PP_SYNC_* flags for pp.incref arg 3
+	 add PP_SYNC_INSERT for invented file references
+	 fix C++ fsm bug that popped out of comment in // /* */ ...
+	 PP_INPUT *.(s|S|asm|ASM) implies pp:nocatliteral pp:spaceout
+95-01-01 avoid string literal concatenation in pp.probe #if #predicate() tests
+	 fix pplib.h memcpy,strncmp PROTOMAIN prototypes (its a nop tho)
+94-11-11 fix readonly memory reference in refill
+	 add C++ digraphs (digraph = --trigraph)
+	 add C++ T_EXPLICIT -- did dos take over C++?
+	 fix improper ppproto() C++ __PARAM__ expansion
+94-11-01 allow #include string header arg concatenation (yes, its not ansi)
+	 #macdef macros are recursive
+94-10-01 fix C++ } loop in ppfsm/refill
+	 T_NOISES consumes symbol and optional paren group
+	 __builtin_* T_NOISES by default
+	 fix "..." "...MARK..." join
+	 fix STANDALONE */*comment*/
+94-09-11 fix pp.probe cp+strip with chmod u+w
+94-08-11 add -I<vdb-archive> to handle pax -x ppar header archives
+	 fix -D-Q header checkpoints
+	 add `pp:chop prefix' to chop prefix/ from include prefix/*/*
+	 add pp:keyargs for key=value macro formals/actuals (not for C!)
+94-06-01 fix ppcontrol/tokop() that botched pp:id, etc.
+	 add pp:plussplice to handle cfront // \<newline> ignorance
+	 inhibit trigraph conversion for pp:compatibility, duh
+	 new C++ keywords enabled by pp:keyword
+	 proto: int fun xxx((yyy)) is macro call, not decl
+	 fix !ALLMULTIPLE pp:load to SKIP between duplicated line syncs
+	 fix PP_DUMP for pp:noallmultiple, optimize pp:load format
+	 fix CPP CACHEOUTX() buffer boundary bug
+94-04-01 drop warnings for -X*
+	 fix ppproto() %% in comment bug for yacc proto
+	 PP_COMMENT now truncates comments to MAXTOKEN-4
+94-03-01 no pp:truncate for #pragma pp:macref
+94-01-01 fix STANDALONE+PP_TRUNCATE fsm macro bug
+	 drop __VOID__ from ppproto.c
+93-12-01 release
+93-11-11 fix PP_COMPILE+PP_TRUNCATE=8 bug for continue,unsigned,etc.
+	 add PP_LINEBASE for compilers that botch long line sync paths
+	 fix #if unsigned promotions
+	 aggressive interactive line splice flush
+	 fix #else inside multiline null dereference
+	 fix "..." newline space # COMPATIBILITY CATLITERAL bug
+	 fix m(a)b compatibility token pasting [cpp/test/ess.01.c]
+	 fix nested @X mark bug [cpp/test/net.02.c]
+93-10-11 add FSM_COMPATIBILITY for floating point hex -- yo ansi, anybody home
+	 add #else if|ifdef|ifndef for COMPATIBILITY but with warning
+	 drop PP_HOSTED, add ppop(PP_CDIR|PP_HOSTED,"-",n), -D-I for pp:cdir
+93-10-01 add pp:opspace to tokenize <binop><space>= to <binop>=
+93-08-11 drop ancient BCD constant (`...`) detection -- wake up cfront
+	 fix PP_TRUNCATE macro fsm bug that missed some expansions
+	 fix stringize bug that choked if space preceded #
+	 fix <function-like-macro> <identifier> bug that omitted space
+93-07-17 minor transition mode fix for string concatenation
+	 fix standalone macdef line sync buffer bug
+	 pp:noline turns off linesync, pp:line restores it
+93-06-22 add pp:prefix to control prefix include compatibility
+93-04-01 use probe_verbose in predefined symbol probe
+93-03-11 close fd after last file block read -- relaxes open fd limit
+	 remove pp.control nesting limit
+	 add `#rename old new'
+	 __STDC__ not defined for plusplus (until they figure it out)
+93-01-22 fix ansi macro args recursion bug
+93-01-11 fix '\377'<0 for signed char compilers
+	 add RELAX for __STDPP__directive directives
+92-12-25 fix #include guard test that omitted IN_tokens for CPP=1
+92-12-11 fix pp:truncate for STANDALONE and COMPILE
+	 fix pp:allmultiple again!
+92-11-30 add pp:final, pp:initial
+	 add __STDPP__directive and #(directive) as ??= alternative
+	 relax obsolete macro expand warning for _xxx||xxx
+	 retain quoted \newline when PP_LINEID != ""
+	 fix CATLITERAL hidden newline line sync
+92-11-11 fix COMPATIBILITY EOF in macro arg list and # in macro body
+	 fix [?\] on 4K buffer boundary bug that lost next refill()
+	 fix ppproto bug that botched -ih comments
+92-10-31 fix standalone -C bug that duplicated output buffer
+	 add pp:stringspan to handle gnu "<newline>" extension
+92-10-12 fix T_X_GROUP asm bug
+	 allow `#define a "b' pp:compatibility hack
+92-08-11 add PP_PLUSCOMMENT, pp:pluscomment probe
+	 add #(default v,d) #(empty v) #(iterate m,...)
+	 compatibility allows #define f(a,,b) for 2 args!
+	 probe now handles gcc -E -g3 to get gnu predefines
+92-07-17 fix pp:multiple again, fix ppproto() out of bounds
+	 PP_STANDARD is always PP_CDIR and PP_HOSTED
+92-07-11 add #import and #include_next probes
+92-06-11 fix bug where comments dissappeared after disabled macro in standalone
+	 COMPATIBILITY macro recursion bug fix may cause some to be missed
+	 PP_MACREF or -D-L- ignores #line until #line with file arg
+92-06-01 add pp:ignore
+	 fix probe of stdpp to handle -I[-+][CH]
+92-05-11 add pp:hide <id>, pp:note <id>, noticed(<id>), exists(<...>)
+	 add defined(__STDPP__<pragma>) feature test
+	 add PP_CDIR, pp:cdir for C++ extern "C" { ... } include wrapping
+	 pp.probe now handles predefines with values other than 1
+92-04-11 add inverse proto (K&R -> prototype) to ppproto
+92-04-01 release
+92-02-29 #include <...> inside <xxx.h> gets next xxx.h on -I list
+	 non-libpp generated symbols containing ' ' are not truncated
+92-02-11 conversion to new lexer brings time close to reiser (esp. w/gcc -O)
+	 combine standalone (ppcpp) tokenizing (pplex) and proto lex tables
+	 recode ppproto for standalone operation via PROTOMAIN
+	 add PP_NOHASH for PP_COMPILE front ends that rehash T_ID anyway
+	 delete PP_NOQUOTE
+	 delete #option(strict) test in probe in favor of non-hosted warnings
+	 add unsigned to ppexpr()
+91-10-11 add pp:truncate <len> for non-flexname compilers
+91-09-11 fix ppproto aggression on f(*y); -> f __PROTO__((*y));
+91-08-11 switch seterror() to error_info.*
+	 add pp:linefile to force file name in line sync
+	 add pp:spaceout for probed compilers that don't allow pp override
+91-06-11 fix ignored -I/usr/include bug
+91-04-11 set SYM_INIT in pp.macref for -U on cmd line
+91-01-31 replace pp:pragma and pp:directive with pp:map
+	 replace #assert and #unassert with #define #... and #undef #...
+	 #assert and #unassert compatibility retained via pp:map
+	 replace -D#directive with -D%directive (because of #assert change)
+	 add pp:splicecat for \<newline> #define token paste
+	 fix \<newline> bug that added space in COMPATIBILITY quoted strings
+90-12-11 fix #pragma pp:multiple
+90-11-11 generalize handling of non-standard keywords for COMPILE
+	 replace pp:identifier/PP_IDENTIFIER with pp:reserved/PP_RESERVED
+	 pp*keys* -> ppkey
+	 add PP_NOISE
+	 (gag) handle msdos paths by changing \ to / and retrying on failure
+	 (gag) handle msdos :> operator by pplex() '+' return
+	 add #pragma prototyped and ppproto.c for prototype conversion
+	 add unsigned long arg to PP_MACREF for hashed macro arity+value
+90-10-11 0f is not a float constant
+	 change -I-M to -I-I, file just lists include files to be ignored
+	 fix ppprobe for __STDC__==0 hybrids
+	 add pp.flags and PP_[a-z0-9]+ for exported state info
+90-10-01 fix standalone ppmacref for directives
+	 add `try' to C++ keywords
+	 fine tune a few COMPILE error messages
+	 privatize pp.h
+90-08-11 use opt_again in cmdargs() option parsers
+	 (gag) add pp:macref macro reference pragma to handle CC preprocessors
+	 (gag) add pp:spaceout to handle ansi + asm hacks
+90-07-17 remove spaces from macdef line sync (blew sun cc)
+90-06-11 add internal ppsymkey to avoid ppsymbol.value pun for SYM_KEYWORD
+90-05-01 fix catliteral bug of `"..." << ' -> `"..." <='
+90-04-01 fix `ifndef-define-endif' include wrapper test
+90-03-27 add setpreroot() to ppop() [ sleazy but well hidden ]
+90-03-22 pp.macref called for all undef's
+90-03-20 add <prefix>cpp checks to ppprobe
+	 add pp:hostdir before pp:include in ppprobe
+	 fix PP_HOSTDIR op with no dir arg
+90-03-15 System V CCS compatibility update
+	 add PP_ASSERT
+	 add -A for PP_ASSERT and -YI,dir for PP_STANDARD
+	 add ppincref.c and -H to use it
+	 -Xa defines __STDC__ to 0 (gak)
+90-03-09 duplicate macro formals cause level 2 error
+90-03-01 add #(ARGC) for (variadic) macro arg count
+90-02-11 fix line sync number bug in pppush()
+89-12-01 ignore leading = in pragma map for old pragma compatibility
+	 check for NEWLINE on first macdef line sync
+89-11-11 add -1 arg to pp.incref -- include skipped
+	 STRICT 0x7e-macro is T_INVALID per standard
+89-10-31 put all C keys in ppckeys.c, C++ keys in pppkeys.c
+	 add pp:identifier pragma to selectively undo PP_COMPILE keywords
+	 add tokop() to ppcontrol to support multi-valued pragmas
+	 add #ifndef...#endif include optimization for STRICT
+89-10-27 use REF_NORMAL, REF_IF, REF_UNDEF for pp.macref arg2
+89-10-17 fix c(x)y compatibility pasting bug
+	 #line 1 "f" now marks "f" included
+89-10-11 enable -I. during initialization
+89-10-01 inhibit pp:linetype syncs for top level #line directives
+	 ----- see HISTORY -----

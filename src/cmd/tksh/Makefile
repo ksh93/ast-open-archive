@@ -1,0 +1,112 @@
+ID			=	tksh
+LICENSE			=	type=special
+
+CCFLAGS			=	-O $(CC.DLL)
+
+TCL_VERSION		=	7.6
+TK_VERSION		=	4.2
+
+LIB_DIR			==	"lib/$(ID)$(TCL_VERSION)"
+TKSH_LIBRARY    	==      "$(LIBDIR)/$(ID)$(TCL_VERSION)"
+TCL_PACKAGE_PATH	==      "$(LIBDIR)"
+TKSH_V75		==	$(TCL_VERSION:N=7.5:?1)
+
+nvenv			==	nvprivate[0]
+
+:PACKAGE: ast tk:version=$(TK_VERSION):noinclude X11
+
+.SOURCE : src tcl
+.SOURCE.h : include
+
+/*
+ * Files that are different for 7.5 and 7.6
+ */
+
+FILES_version =
+FILES_version += $(TCL_VERSION:N=7.5:?tclUnixChan75.c?tclUnixChan.c?)
+FILES_version += $(TCL_VERSION:N=7.5:?tclIOUtil75.c?tclIOUtil.c?)
+
+/*
+ * Rules
+ */
+
+$(ID) ::	uinit.c tkMain.c +ltksh -ltk +lshell
+
+$(ID) $(TCL_VERSION) $(CC.HOSTTYPE:N=mvs.*:??DLL?) :LIBRARY: \
+	float.h nvextra.h shcompat.h tclInt.h \
+	tclPort.h tclcmd.h tclcmd7.5.h tk.h tksh.h tksh7.5.h \
+	panic.c regexp.c tclHash.c tclGet.c tclAsync.c tclLink.c tclExpr.c \
+	tclCmdAH.c tclCmdMZ.c tclCmdIL.c tclParse.c tclGlob.c tclUtil.c \
+	tclEvent.c tclPreserve.c tclNotify.c tclClock.c tclDate.c tclInterp.c \
+	tclUnixFile.c tclUnixTime.c tclLoad.c tclLoadDl.c tclPkg.c \
+	tclPosixStr.c tclFHandle.c tclIOCmd.c tclUnixNotfy.c init.c debug.c \
+	var.c eval.c list.c shcompat.c tcleval.c tclproc.c commands.c \
+	varcmd.c tclMain.c basic.c filecmd.c tclIO.c $(FILES_version)
+
+::	TODO tcl/README tcl/license.terms gen tksh.mk widget \
+	README RELEASE PROMO.mm tksh.1 scripts/mailfile scripts/watchdir
+
+$(LIBDIR)/$(ID)$(TCL_VERSION):INSTALLDIR: \
+	lib/tksh7.6/init.ksh \
+	lib/tksh7.6/init.tcl \
+	lib/tksh7.6/ldAout.tcl \
+	lib/tksh7.6/license.terms \
+	lib/tksh7.6/parray.tcl \
+	lib/tksh7.6/tclIndex
+
+:: \
+	lib/tksh7.6/init.ksh \
+	lib/tksh7.6/init.tcl \
+	lib/tksh7.6/ldAout.tcl \
+	lib/tksh7.6/license.terms \
+	lib/tksh7.6/parray.tcl \
+	lib/tksh7.6/tclIndex
+
+::	\
+	desksh/desksh \
+	desksh/desksh.1 \
+	desksh/lib/routines-desksh \
+	desksh/lib/routines-file-browser \
+	desksh/lib/routines-fman \
+	desksh/lib/routines-menu-file \
+	desksh/lib/routines-menu-help \
+	desksh/lib/routines-menu-util \
+	desksh/lib/routines-pman \
+	desksh/lib/routines-utilities \
+	desksh/lib/routines-windows \
+	desksh/lib/deskshrc \
+	desksh/lib/directory_dialog \
+	desksh/lib/find_popup \
+	desksh/lib/generate \
+	desksh/lib/utils \
+	desksh/lib/twrc \
+	desksh/lib/s1.c \
+	desksh/lib/s2.c \
+	desksh/lib/sample.c \
+	desksh/lib/desksh-options \
+	desksh/lib/imgs/blocks.gif \
+	desksh/lib/imgs/const.gif \
+	desksh/lib/imgs/copy.gif \
+	desksh/lib/imgs/edit.gif \
+	desksh/lib/imgs/exec.gif \
+	desksh/lib/imgs/exit.gif \
+	desksh/lib/imgs/key.gif \
+	desksh/lib/imgs/move.gif \
+	desksh/lib/imgs/search.gif \
+	desksh/lib/imgs/tools.gif \
+	desksh/lib/imgs/tools2.gif \
+	desksh/lib/imgs/trash.gif \
+	desksh/lib/imgs/write.gif 
+
+LIBS_opt := -lm +ljobs +li
+if ! "$(-mam:N=static*)" && ! "$(CC.HOSTTYPE:N=sgi.mips*)"
+	LIBS_opt += +lsocket +lnsl
+end
+LIBS_opt += -ldl -ldld +lintl
+$(LIBS_opt) : .DONTCARE
+
+LDLIBRARIES = $(LIBS_opt)
+
+if TGZ
+PAXFLAGS        +=      -x gzip -x ustar -s '@^@$(ID)$(TCL_VERSION)\/@g'
+end

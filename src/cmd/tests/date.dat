@@ -1,0 +1,364 @@
+#
+# tmscan() test data for the C locale
+#
+
+SET			NOW			Mon Sep 22 12:19:47 EDT 1986
+
+Mon			%a			Mon Sep 22 12:19:47 EDT 1986
+Sun			%a			Sun Sep 28 12:19:47 EDT 1986
+Fri			%a			Fri Sep 26 12:19:47 EDT 1986
+September		%B			Mon Sep  1 12:19:47 EDT 1986
+January			%B			Thu Jan  1 12:19:47 EST 1987
+December		%B			Mon Dec  1 12:19:47 EST 1986
+Sep Mon			%b %a			Mon Sep  1 12:19:47 EDT 1986
+jan fri			%b %a			Fri Jan  2 12:19:47 EST 1987
+DEC MON			%b %a			Mon Dec  1 12:19:47 EST 1986
+Jan Wed 1989		%b %a %Y		Wed Jan  4 12:19:47 EST 1989
+Fri 9			%a %H			Fri Sep 26 09:00:00 EDT 1986
+Feb 10:30		%b %H:%S		Sun Feb  1 10:00:30 EST 1987
+10:30			%H:%M			Tue Sep 23 10:30:00 EDT 1986
+13:30			%H:%M			Mon Sep 22 13:30:00 EDT 1986
+00 96059		%H %y%j			Wed Feb 28 00:00:00 EST 1996
+00 96060		%H %y%j			Thu Feb 29 00:00:00 EST 1996
+00 96061		%H %y%j			Fri Mar  1 00:00:00 EST 1996
+
+#
+# export DATEMSK=testdate.msk for the following
+#
+
+10/1/87 4 PM				NIL	Thu Oct  1 16:00:00 EDT 1987
+Friday					NIL	Fri Sep 26 12:19:47 EDT 1986
+Friday September 18, 1987, 10:30:30	NIL	Fri Sep 18 10:30:30 EDT 1987
+24,9,1986 10:30				NIL	Wed Sep 24 10:30:00 EDT 1986
+at monday the 1st of december in 1986	NIL	Mon Dec  1 12:19:47 EST 1986
+run job at 3 PM, december 2nd		NIL	Tue Dec  2 15:00:00 EST 1986
+1/1/00 12 AM				NIL	Sat Jan  1 00:00:00 EST 2000
+
+#
+# the rest should kick in tmdate()
+#
+
+Wed Jul 17 7 AM 2005			NULL	Sun Jul 17 07:00:00 EDT 2005
+07/17/2005				NULL	Sun Jul 17 12:19:47 EDT 2005
+7/17/2005				NULL	Sun Jul 17 12:19:47 EDT 2005
+7/17/05					NULL	Sun Jul 17 12:19:47 EDT 2005
+7/4/00					NULL	Tue Jul  4 12:19:47 EDT 2000
+Sat Aug 11 2 PM 1979			NULL	Sat Aug 11 14:00:00 EDT 1979
+Sat Dec 31 5:03 PM 1983			NULL	Sat Dec 31 17:03:00 EST 1983
+Sat Dec 31 8:03 PM 1983 EST		NULL	Sat Dec 31 20:03:00 EST 1983
+Sat Dec 31 8:03 PM 1983 -0500		NULL	Sat Dec 31 20:03:00 EST 1983
+Sat Dec 31 8:03 PM 1983 EET		NULL	Sat Dec 31 13:03:00 EST 1983
+Sat Dec 31 8:03 PM 1983 +0200		NULL	Sat Dec 31 13:03:00 EST 1983
+midnight 96060				NULL	Thu Feb 29 00:00:00 EST 1996
+1997198					NULL	Thu Jul 17 00:00:00 EDT 1997
+1997-198				NULL	Thu Jul 17 12:19:47 EDT 1997
+2002-08-11				NULL	Sun Aug 11 12:19:47 EDT 2002
+2002.08.11				NULL	Sun Aug 11 12:19:47 EDT 2002
+2002 08 11				NULL	Sat Nov 22 20:02:00 EST 2008
+30/Sep/1997:00:00:05 -0700		NULL	Tue Sep 30 03:00:05 EDT 1997
+30/Sep/1997:00:00:05 +0700		NULL	Mon Sep 29 13:00:05 EDT 1997
+
+#
+# a few leap year tests
+#
+
+1996-02-29 00:00:00			NULL	Thu Feb 29 00:00:00 EST 1996
+1996-02-29/01:23:45			NULL	Thu Feb 29 01:23:45 EST 1996
+1996-02-29+10:32:54			NULL	Thu Feb 29 10:32:54 EST 1996
+1998-02-29 00:00:00			NULL	Sun Mar  1 00:00:00 EST 1998
+1998-02-29/01:23:45			NULL	Sun Mar  1 01:23:45 EST 1998
+1998-02-29+10:32:54			NULL	Sun Mar  1 10:32:54 EST 1998
+2000-02-29 00:00:00			NULL	Tue Feb 29 00:00:00 EST 2000
+
+#
+# signed upper limit
+#
+
+,#2147483647				NULL	Mon Jan 18 22:14:07 EST 2038
+
+#
+# at command examples
+#
+
+2pm + 1 week				NULL	Mon Sep 29 14:00:00 EDT 1986
+2pm next week				NULL	Mon Sep 29 14:00:00 EDT 1986
+1800					NULL	Mon Sep 22 18:00:00 EDT 1986
+0730 tomorrow				NULL	Tue Sep 23 07:30:00 EDT 1986
+now + 1 hour				NULL	Mon Sep 22 13:19:47 EDT 1986
+now + 3 hours				NULL	Mon Sep 22 15:19:47 EDT 1986
++0 1 minute				NULL	Mon Sep 22 12:19:00 EDT 1986
++1 1 minute				NULL	Mon Sep 22 12:20:00 EDT 1986
++2 1 minute				NULL	Mon Sep 22 12:21:00 EDT 1986
++ 5 hours 10 minutes			NULL	Mon Sep 22 17:29:00 EDT 1986
+in 7 hours				NULL	Mon Sep 22 19:19:47 EDT 1986
+in 7 days				NULL	Mon Sep 29 12:19:47 EDT 1986
+0815AM Jan 24				NULL	Fri Jan 24 08:15:00 EST 1986
+8 : 15am jan24				NULL	Fri Jan 24 08:15:00 EST 1986
+now + 1day				NULL	Tue Sep 23 12:19:47 EDT 1986
+1700 utc				NULL	Mon Sep 22 13:00:00 EDT 1986
+2110 UCT+ 30minutes			NULL	Mon Sep 22 17:40:00 EDT 1986
+1 min					NULL	Mon Sep 22 12:20:00 EDT 1986
+next min				NULL	Mon Sep 22 12:20:00 EDT 1986
+exact next min				NULL	Mon Sep 22 12:20:47 EDT 1986
+2 min					NULL	Mon Sep 22 12:21:00 EDT 1986
+next 2 min				NULL	Mon Sep 22 12:21:00 EDT 1986
+exact next 2 min			NULL	Mon Sep 22 12:21:47 EDT 1986
+1 hour					NULL	Mon Sep 22 13:19:47 EDT 1986
+next hour				NULL	Mon Sep 22 13:19:47 EDT 1986
+exact next hour				NULL	Mon Sep 22 13:19:47 EDT 1986
+1 day					NULL	Tue Sep 23 12:19:47 EDT 1986
+next day				NULL	Tue Sep 23 12:19:47 EDT 1986
+exact next day				NULL	Tue Sep 23 12:19:47 EDT 1986
+2 days					NULL	Wed Sep 24 12:19:47 EDT 1986
+next 2 days				NULL	Wed Sep 24 12:19:47 EDT 1986
+
+#
+# cron command examples
+#
+
+0 0 1,15 * 1				NULL	Mon Sep 29 00:00:00 EDT 1986
+0 0 * * 1				NULL	Mon Sep 29 00:00:00 EDT 1986
+0 0 * * *				NULL	Tue Sep 23 00:00:00 EDT 1986
+15 0 * * *				NULL	Tue Sep 23 00:15:00 EDT 1986
+15 4 * * *				NULL	Tue Sep 23 04:15:00 EDT 1986
+40 4 * * *				NULL	Tue Sep 23 04:40:00 EDT 1986
+0 0 * * 1-5				NULL	Tue Sep 23 00:00:00 EDT 1986
+0 0 * * 0,6				NULL	Sat Sep 27 00:00:00 EDT 1986
+
+#
+# date command examples
+#
+
+10080045				NULL	Wed Oct  8 00:45:00 EDT 1986
+
+#
+# tricks and well known bugs
+#
+
+,#951800399				NULL	Mon Feb 28 23:59:59 EST 2000
+,#951800400				NULL	Tue Feb 29 00:00:00 EST 2000
+,#951800401				NULL	Tue Feb 29 00:00:01 EST 2000
+,#986108399				NULL	Sun Apr  1 01:59:59 EST 2001
+,#986108400				NULL	Sun Apr  1 03:00:00 EDT 2001
+,#986108401				NULL	Sun Apr  1 03:00:01 EDT 2001
+,#986709599				NULL	Sun Apr  8 01:59:59 EDT 2001
+,#986709600				NULL	Sun Apr  8 02:00:00 EDT 2001
+,#986709601				NULL	Sun Apr  8 02:00:01 EDT 2001
+,#986713199				NULL	Sun Apr  8 02:59:59 EDT 2001
+,#986713200				NULL	Sun Apr  8 03:00:00 EDT 2001
+,#986713201				NULL	Sun Apr  8 03:00:01 EDT 2001
+
+# format tests
+
+SET			NOW			Mon Sep 22 15:09:47 EDT 1986
+
+NIL	%% %a %A %b %B			% Mon Monday Sep September
+NIL	%d_%D_%e_%h_%H			22_09/22/86_22_Sep_15
+NIL	%I_%j_%_I_%_H_%m		03_265_ 3_15_09
+NIL	%H%M%S%-H%-M%-S%_H%_M%_S	1509471594715 947
+NIL	%M_%n_%p_%r			09_\n_PM_03:09:47 PM
+NIL	%s_%S_%t_%T			527800187_47_\t_15:09:47
+NIL	%U_%V_%w_%W			38_38_1_38
+NIL	%x_%X_%y_%Y			09/22/86_15:09:47_86_1986
+NIL	%z_%Z				+05_EDT
+NIL	%Y-%m-%d			1986-09-22
+
+NIL	%a	Mon
+NIL	%A	Monday
+NIL	%b	Sep
+NIL	%B	September
+NIL	%c	Mon Sep 22 15:09:47 1986
+NIL	%C	19
+NIL	%d	22
+NIL	%D	09/22/86
+NIL	%e	22
+NIL	%E	22
+NIL	%f	%f
+NIL	%F	%F
+NIL	%g	%g
+NIL	%G	%G
+NIL	%h	Sep
+NIL	%H	15
+NIL	%i	Mon Sep 22 15:09:47 +05 EDT 1986
+NIL	%I	03
+NIL	%j	265
+NIL	%J	264
+NIL	%k	Mon Sep 22 15:09:47 EDT 1986
+NIL	%K	1986-09-22+15:09:47
+NIL	%l	Sep 22  1986
+NIL	%L	%L
+NIL	%m	09
+NIL	%M	09
+NIL	%o	Mon Sep 22 15:09:47 EDT 1986
+NIL	%O	Mon Sep 22 15:09:47 EDT 1986
+NIL	%p	PM
+NIL	%P	%P
+NIL	%q	%q
+NIL	%Q	%Q
+NIL	%r	03:09:47 PM
+NIL	%R	15:09
+NIL	%s	527800187
+NIL	%S	47
+NIL	%t	\t
+NIL	%T	15:09:47
+NIL	%u	%u
+NIL	%U	38
+NIL	%v	%v
+NIL	%V	38
+NIL	%w	1
+NIL	%W	38
+NIL	%x	09/22/86
+NIL	%X	15:09:47
+NIL	%y	86
+NIL	%Y	1986
+NIL	%z	+05
+
+NIL	%0a	Mon
+NIL	%0A	Monday
+NIL	%0b	Sep
+NIL	%0B	September
+NIL	%0c	Mon Sep 22 15:09:47 1986
+NIL	%0C	19
+NIL	%0d	22
+NIL	%0D	09/22/86
+NIL	%0e	22
+NIL	%0E	22
+NIL	%0f	%f
+NIL	%0F	%F
+NIL	%0g	%g
+NIL	%0G	%G
+NIL	%0h	Sep
+NIL	%0H	15
+NIL	%0i	Mon Sep 22 15:09:47 +05 EDT 1986
+NIL	%0I	03
+NIL	%0j	265
+NIL	%0J	264
+NIL	%0k	Mon Sep 22 15:09:47 EDT 1986
+NIL	%0K	1986-09-22+15:09:47
+NIL	%0l	Sep 22  1986
+NIL	%0L	%L
+NIL	%0m	09
+NIL	%0M	09
+NIL	%0o	Mon Sep 22 15:09:47 EDT 1986
+NIL	%0O	Mon Sep 22 15:09:47 EDT 1986
+NIL	%0p	PM
+NIL	%0P	%P
+NIL	%0q	%q
+NIL	%0Q	%Q
+NIL	%0r	03:09:47 PM
+NIL	%0R	15:09
+NIL	%0s	527800187
+NIL	%0S	47
+NIL	%0t	\t
+NIL	%0T	15:09:47
+NIL	%0u	%u
+NIL	%0U	38
+NIL	%0v	%v
+NIL	%0V	38
+NIL	%0w	1
+NIL	%0W	38
+NIL	%0x	09/22/86
+NIL	%0X	15:09:47
+NIL	%0y	86
+NIL	%0Y	1986
+NIL	%0z	+05
+
+NIL	%-a	Mon
+NIL	%-A	Monday
+NIL	%-b	Sep
+NIL	%-B	September
+NIL	%-c	Mon Sep 22 15:09:47 1986
+NIL	%-C	19
+NIL	%-d	22
+NIL	%-D	09/22/86
+NIL	%-e	22
+NIL	%-E	22
+NIL	%-f	%f
+NIL	%-F	%F
+NIL	%-g	%g
+NIL	%-G	%G
+NIL	%-h	Sep
+NIL	%-H	15
+NIL	%-i	Mon Sep 22 15:09:47 +05 EDT 1986
+NIL	%-I	3
+NIL	%-j	265
+NIL	%-J	264
+NIL	%-k	Mon Sep 22 15:09:47 EDT 1986
+NIL	%-K	1986-09-22+15:09:47
+NIL	%-l	Sep 22  1986
+NIL	%-L	%L
+NIL	%-m	9
+NIL	%-M	9
+NIL	%-o	Mon Sep 22 15:09:47 EDT 1986
+NIL	%-O	Mon Sep 22 15:09:47 EDT 1986
+NIL	%-p	PM
+NIL	%-P	%P
+NIL	%-q	%q
+NIL	%-Q	%Q
+NIL	%-r	03:09:47 PM
+NIL	%-R	15:09
+NIL	%-s	527800187
+NIL	%-S	47
+NIL	%-t	\t
+NIL	%-T	15:09:47
+NIL	%-u	%u
+NIL	%-U	38
+NIL	%-v	%v
+NIL	%-V	38
+NIL	%-w	1
+NIL	%-W	38
+NIL	%-x	09/22/86
+NIL	%-X	15:09:47
+NIL	%-y	86
+NIL	%-Y	1986
+NIL	%-z	+05
+
+NIL	%_a	Mon
+NIL	%_A	Monday
+NIL	%_b	Sep
+NIL	%_B	September
+NIL	%_c	Mon Sep 22 15:09:47 1986
+NIL	%_C	19
+NIL	%_d	22
+NIL	%_D	09/22/86
+NIL	%_e	22
+NIL	%_E	22
+NIL	%_f	%f
+NIL	%_F	%F
+NIL	%_g	%g
+NIL	%_G	%G
+NIL	%_h	Sep
+NIL	%_H	15
+NIL	%_i	Mon Sep 22 15:09:47 +05 EDT 1986
+NIL	%_I	 3
+NIL	%_j	265
+NIL	%_J	264
+NIL	%_k	Mon Sep 22 15:09:47 EDT 1986
+NIL	%_K	1986-09-22+15:09:47
+NIL	%_l	Sep 22  1986
+NIL	%_L	%L
+NIL	%_m	 9
+NIL	%_M	 9
+NIL	%_o	Mon Sep 22 15:09:47 EDT 1986
+NIL	%_O	Mon Sep 22 15:09:47 EDT 1986
+NIL	%_p	PM
+NIL	%_P	%P
+NIL	%_q	%q
+NIL	%_Q	%Q
+NIL	%_r	03:09:47 PM
+NIL	%_R	15:09
+NIL	%_s	527800187
+NIL	%_S	47
+NIL	%_t	\t
+NIL	%_T	15:09:47
+NIL	%_u	%u
+NIL	%_U	38
+NIL	%_v	%v
+NIL	%_V	38
+NIL	%_w	1
+NIL	%_W	38
+NIL	%_x	09/22/86
+NIL	%_X	15:09:47
+NIL	%_y	86
+NIL	%_Y	1986
+NIL	%_z	+05

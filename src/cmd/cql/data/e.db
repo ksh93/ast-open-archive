@@ -1,0 +1,23 @@
+5c12490b;fstream;t;f03e9821;;cl;170;0;180;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class fstream;y
+b4c44e8f;fstreambase;t;f03e9821;;cl;113;0;128;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class fstreambase;y
+c7c53a9e;iostream;t;224786e8;;cl;1429;0;1436;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class iostream;y
+7e30e5c6;ios;t;224786e8;;cl;214;0;288;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class ios;y
+9181075c;unsafe_fstreambase;t;f03e9821;;cl;83;0;103;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class unsafe_fstreambase;y
+3e57abfb;ostream;t;224786e8;;cl;1235;0;1314;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class ostream;y
+550d641e;istream;t;224786e8;;cl;898;0;1002;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class istream;y
+c228e547;unsafe_ostream;t;224786e8;;cl;1109;0;1193;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class unsafe_ostream;y
+5a9de915;unsafe_istream;t;224786e8;;cl;714;0;835;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class unsafe_istream;y
+2e10ec2e;unsafe_ios;t;224786e8;;cl;44;0;191;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class unsafe_ios;y
+536871a7;stream_MT;t;14385158;;cl;59;0;78;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class stream_MT;y
+adada133;stream_rmutex;t;14385158;;cl;37;0;55;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class stream_rmutex;y
+d9cf5ab5;Iostream_init;t;224786e8;;cl;1514;0;1523;df;00000000;01f5f11b;01f5f11b;ex;01f5f11b;;class Iostream_init;y
+2e2807a1;open_mode;t;224786e8;;en;56;0;65;df;00000000;01f5f11b;01f5f11b;pb;2e10ec2e;;enum unsafe_ios::open_mode;y
+9511240f;seek_dir;t;224786e8;;en;68;0;68;df;00000000;01f5f11b;01f5f11b;pb;2e10ec2e;;enum unsafe_ios::seek_dir;y
+b11dff33;type-71-7;t;224786e8;;en;71;0;87;df;00000000;01f5f11b;01f5f11b;pb;2e10ec2e;;enum unsafe_ios::<unnamed>;y
+bf9f9b5d;type-147-7;t;224786e8;;en;147;0;147;df;00000000;01f5f11b;01f5f11b;pt;2e10ec2e;;enum unsafe_ios::<unnamed>;y
+ca17ab4e;io_state;t;224786e8;;en;47;0;53;df;00000000;01f5f11b;01f5f11b;pb;2e10ec2e;;enum unsafe_ios::io_state;y
+4b35dfb1;type-66-10;t;14385158;;en;66;0;66;df;00000000;01f5f11b;01f5f11b;pb;536871a7;;enum stream_MT::<unnamed>;y
+01f5f11b;;e;01f5f11b;;;0;0;0;df;00000000;01f5f11b;01f5f11b;;01f5f11b;;;n
+14385158;/usr/common/SUNWspro/SC4.2/include/CC/rlocks.h;f;14385158;;;1;5;128;df;00000000;01f5f11b;01f5f11b;;01f5f11b;;;n
+224786e8;/usr/common/SUNWspro/SC4.2/include/CC/iostream.h;f;224786e8;;;1;13;1526;df;00000000;01f5f11b;01f5f11b;;01f5f11b;;;n
+f03e9821;/usr/common/SUNWspro/SC4.2/include/CC/fstream.h;f;f03e9821;;;1;11;186;df;00000000;01f5f11b;01f5f11b;;01f5f11b;;;n

@@ -1,0 +1,117 @@
+00-01-25 touch: add invalid st_mtime value CAVEAT
+	 ls.tst: limit max st_mtime to 0x7fffffe to avoid stat(2) EOVERFLOW
+00-01-11 tsort: fix
+99-12-25 ps: fix linux -o args
+99-11-19 mount,umount: fix umount usage[]
+	 ls: fix --format doc
+99-11-18 ls: -H + cmd link non-dir symlink => lstat() (H == hairbrained)
+99-10-31 sum: change --check, add --header --permissions for verifcation
+99-10-22 date: fix %C %k %y doc
+99-08-11 ps: netbsd + unixware fixes
+	 ls: fix SEE ALSO
+99-07-17 ps: fix cancel logic to eliminate (null) header
+99-06-23 rm: fix -f exit status to be !=0 on errors, even if no diagnostic
+99-06-17 expand/unexpand: long options
+99-06-14 rm: dir arg requires -r, diagnostic even with -f
+99-06-11 df: minimize mntread calls when args given
+	 ps: all key.cancel format mods on rhs
+	 sum: binary mode by default, local text mode implementation
+99-06-01 dd: fix conv=* bitmasks
+99-05-20 df: F_BASETYPE() for redhat 6.0 linux statvfs incompatibility
+99-05-18 date: add settimeofday() and stime() checks/calls
+	 date: use %Y in /bin/date punt
+99-05-11 ps: use pr_sid for session leader checks
+99-05-09 sum: sfopen(sfstdin,0,"rt") file lists
+99-05-06 date: fix inconsistency between date(1) touch(1) tmdate(3)
+	 shar: add
+99-05-05 sum: add md5sum options
+99-05-01 touch,tsort: long options
+99-04-28 banner,df,du,file,mesg,mount,ps,sum: long options
+99-04-01 ls: long options, gnu compatibility
+	 date: fix +format for new optget()
+99-03-11 dd: convert to optget()
+	 ls: (time_t) cast fmttime() arg
+99-03-01 ps: fix static key table inititialization
+99-02-04 ps: add maxval to determine default width 
+99-01-23 testdate: check date output format too
+	 move sfio,date,opt tests to src/cmd/tests
+	 move pax tests to src/cmd/pax
+99-01-11 sfio/t*.c: make a few tests more portable
+98-11-21 touch: add obsolete mmddhh & mmddhhyy
+98-10-20 dd: fix in/out partial block reports
+	 sum: add ast4|32x4|tw checksum
+98-08-11 ps: implement -G
+98-07-17 ps: fix -t dump
+98-06-26 rm: tighten hard link to directory test
+98-04-01 sfio: fix ttmpfile by intercepting open64() and creat64()
+98-03-11 dd: fix conv=* check
+	 du: list all command line args
+98-02-18 date: modify tests for tmfix() 1900+tm_year leap year fix
+98-01-23 df: add -O for mnt.options
+	 date: add y2k date tests
+97-12-20 ps: add (but name ast_ps until it's broken in)
+97-12-11 rm: fix -r bug that looped when remove() silently failed
+97-07-17 rm: `rm -rf' just prints usage; it used to do `rm -rf .'
+	 du: change -kblocksize to -bblocksize, -k => -b1024
+	 date: a few more tests
+97-05-09 rm: fix FTW_AGAIN code for multi-getdents() dirs
+	 df: add ERROR_SYSTEM to -v output
+96-12-25 dd: add from=<ccode> to=<ccode>
+	 tsort: fix empty list bug
+	 df: fix sync() prototype
+	 date: add -p input-format to supplement DATEMSK
+	 ls: fix boundary problem with %(path) by using %(name)
+	 ls: add -A
+	 rm: add -F to clear and sync data before remove()
+96-10-11 file: update for magic discipline
+	 dd: update for <ccode.h>
+	 *: change opt_arg to opt_info.arg
+	 mesg: add
+	 df: "UNKNOWN" fs type -> "local"
+96-08-11 dd: set error_info.exit after options
+96-06-19 fix ftwalk() top level children anomalies (fts is underneath now)
+96-05-09 date: Xopen DATEMSK tests
+	 df: Xopen update
+	 du: Xopen update
+	 ls: Xopen update
+	 find: move to tw
+	 rm: add
+96-02-29 df: list some stat errors -- well, maybe not
+	 sum: add cksum link and att,bsd,posix,zip,md5 algorithms
+96-02-07 df: (long) cast to handle (unsigned long) vs. (long) header diffs
+96-01-30 banner: unused var cleanup
+96-01-01 AT&T Research now
+	 banner: add
+	 split: add
+95-12-25 find: add -nouser, -nogroup POSIX unary ops
+95-12-08 df: cap = use / (use + avail)
+	 expand: new
+	 unexpand: new
+95-11-18 file: ignore empty file list lines
+	 df: add Mnt_t.options and Mnt_t.flags
+95-11-16 this is the place for single file standard commands
+95-11-11 df: new
+	 tsort: new
+	 file: fix aix shared library
+95-07-17 date: add gnu -d string
+	 ls: fix "total..." aggressive output
+95-05-09 file: switch to <magic.h> and libast/magic()
+	 file: add posix -h == -P
+	 ls: sfkeyprintf lookup string arg is now the format conversion char
+	 ls: #ifdef check S_ISSOCK
+95-04-01 ls: fix -c botch that treated it like -u
+95-03-19 ls: add -H for posix FTW_META|FTW_PHYSICAL
+	 ls: add -f format to match pax -o listformat
+	 ls: add -D key=value to match pax -o listmacro
+	 ls: dir.sh to mimic dos -- ouch
+	 ls: don't stresc() possibly readonly string literals
+95-03-11 find: add -metaphysical (posix -H) for FTW_META|FTW_PHYSICAL
+95-02-14 file: add -p pattern to select types that match pattern
+95-01-19 file: add linux kernel and minix as,ld
+95-01-01 file: start RELEASE file
+	 file: add JPEG, dot
+	 file: fix GIF
+	 file: stresc() match strings too
+	 file: add pax compressed and delta formats
+	 ls: add -n for LS_NUMBER
+	 ls: -C if argv[0] base is lc

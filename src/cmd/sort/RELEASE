@@ -1,0 +1,21 @@
+99-11-19 main.c: use rskeylist() for method usage
+99-11-11 main.c: unstable sort is the default for backwards compatibility
+99-08-11 main.c: fix usage[]
+99-06-07 main.c: add -o in any file position for backwards compatibility
+99-03-03 main.c: add long options
+	 sort.tst: add gnu tests; `b' is tricky
+99-01-11 fix buffer boundary bug that emitted `newline appended' on 4k systems
+98-03-17 add -zI -zO to zip input/output
+98-03-11 fix sfmove() error checks
+	 close output before rename
+97-12-07 -Td1:d2:...:dn works via pathtmp(0,p,"/TMP_PATH",0)
+	 pathtmp(0,0,"/cycle",0) could be used to control phase tmp files
+96-07-17 insize is much less aggressive -- must nail down reasonable proc mem
+	 fix bug that required 2 ^D for interactive input
+96-12-25 drop sfset(sfstdin,SF_SHARE,0)
+96-10-22 sfreserve tweaks
+	 multi-stage merge now keeps previous stages out until next stage
+	 sfreserve() only if 1 S_ISREG() input file
+96-10-17 increase merge file limit to (OPEN_MAX-16) where possible
+	 update testsort TEST=15 input file size to force multi-stage merge
+96-10-11 all regression tests pass for all methods

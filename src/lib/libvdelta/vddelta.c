@@ -1,52 +1,32 @@
-/*
- * CDE - Common Desktop Environment
- *
- * Copyright (c) 1993-2012, The Open Group. All rights reserved.
- *
- * These libraries and programs are free software; you can
- * redistribute them and/or modify them under the terms of the GNU
- * Lesser General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option)
- * any later version.
- *
- * These libraries and programs are distributed in the hope that
- * they will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with these librararies and programs; if not, write
- * to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301 USA
- */
 /***************************************************************
 *                                                              *
-*                      AT&T - PROPRIETARY                      *
+*           This software is part of the ast package           *
+*              Copyright (c) 1995-2000 AT&T Corp.              *
+*      and it may only be used by you under license from       *
+*                     AT&T Corp. ("AT&T")                      *
+*       A copy of the Source Code Agreement is available       *
+*              at the AT&T Internet web site URL               *
 *                                                              *
-*         THIS IS PROPRIETARY SOURCE CODE LICENSED BY          *
-*                          AT&T CORP.                          *
+*     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*                Copyright (c) 1995 AT&T Corp.                 *
-*                     All Rights Reserved                      *
-*                                                              *
-*           This software is licensed by AT&T Corp.            *
-*       under the terms and conditions of the license in       *
-*       http://www.research.att.com/orgs/ssr/book/reuse        *
+*     If you received this software without first entering     *
+*       into a license with AT&T, you have an infringing       *
+*           copy and cannot use it without violating           *
+*             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
-*           Software Engineering Research Department           *
-*                    AT&T Bell Laboratories                    *
+*               Network Services Research Center               *
+*                      AT&T Labs Research                      *
+*                       Florham Park NJ                        *
 *                                                              *
-*               For further information contact                *
-*                     gsf@research.att.com                     *
+*               Phong Vo <kpv@research.att.com>                *
 *                                                              *
 ***************************************************************/
 #include	"vdelhdr.h"
 
 /*	Compute a transformation that takes source data to target data
 **
-**	Written by (Kiem-)Phong Vo, kpv@research.att.com, 5/20/94
+**	Written by Kiem-Phong Vo, kpv@research.att.com, 5/20/94
 */
 
 #ifdef DEBUG
@@ -60,11 +40,7 @@ long	N_merge;	/* # of merged instructions			*/
 			 (c) > 0 && C_ISTINY(c) && \
 			 (k) >= K_SELF )
 
-typedef struct _match_s	Match_t;
 typedef struct _table_s	Table_t;
-struct _match_s
-{	Match_t*	next;		/* linked list ptr	*/
-};
 struct _table_s
 {	Vdio_t		io;		/* io structure		*/
 	uchar*		src;		/* source string	*/
@@ -72,34 +48,34 @@ struct _table_s
 	uchar*		tar;		/* target string	*/
 	int		n_tar;
 	K_DDECL(quick,recent,rhere);	/* address caches	*/
-	Match_t*	base;		/* base of elements	*/
+	int*		link;		/* links of elements	*/
 	int		size;		/* size of hash table	*/
-	Match_t**	table;		/* hash table		*/
+	int*		hash;		/* hash table		*/
 };
 
 /* encode and output delta instructions */
 #if __STD_C
-static vdputinst(Table_t* tab, uchar* begs, uchar* here, Match_t* match, int n_copy)
+static int vdputinst(Table_t* tab, uchar* begs, uchar* here, reg int copy, int n_copy)
 #else
-static vdputinst(tab, begs, here, match, n_copy)
+static int vdputinst(tab, begs, here, copy, n_copy)
 Table_t*	tab;
 uchar*		begs;	/* ADD data if any	*/
 uchar*		here;	/* current location	*/
-Match_t*	match;	/* best match if any	*/
+reg int		copy;	/* best match if >= 0	*/
 int		n_copy;	/* length of match	*/
 #endif
 {
 	reg int	n_add, i_add, i_copy, k_type;
-	reg int	n, c_addr, copy, best, d;
+	reg int	n, c_addr, best, d;
 
 	n_add = begs ? here-begs : 0;		/* add size		*/
 	c_addr = (here-tab->tar)+tab->n_src;	/* current address	*/
 	k_type = 0;
 
-	if(match)	/* process the COPY instruction */
+	if(n_copy > 0)	/* process the COPY instruction */
 	{	/**/DBTOTAL(N_copy,1); DBTOTAL(S_copy,n_copy); DBMAX(M_copy,n_copy);
 
-		best = copy = match - tab->base;
+		best = copy;
 		k_type = K_SELF;
 		if((d = c_addr - copy) < best)
 		{	best = d;
@@ -169,10 +145,6 @@ int		n_copy;	/* length of match	*/
 				return -1;
 		}
 	}
-	else
-	{	if((*_Vdflsbuf)((Vdio_t*)tab) < 0)
-			return -1;
-	}
 
 	return 0;
 }
@@ -180,58 +152,50 @@ int		n_copy;	/* length of match	*/
 
 /* Fold a string */
 #if __STD_C
-static vdfold(Table_t* tab, int output)
+static int vdfold(Table_t* tab, reg uchar* fold, reg uchar* endfold, int target)
 #else
-static vdfold(tab, output)
+static int vdfold(tab, fold, endfold, target)
 Table_t*	tab;
-int		output;
+reg uchar*	fold;		/* start of area to fold	*/
+reg uchar*	endfold;	/* end of area to fold		*/
+int		target;		/* 1 if doing the target stream	*/
 #endif
 {
 	reg ulong	key, n;
-	reg uchar	*s, *sm, *ends, *ss, *heade;
-	reg Match_t	*m, *list, *curm, *bestm;
-	reg uchar	*add, *endfold;
+	reg uchar	*sm, *ends, *ss, *endh;
+	reg int		m, list, curm, bestm;
+	reg uchar	*add;
 	reg int		head, len, n_src = tab->n_src;
-	reg int		size = tab->size;
 	reg uchar	*src = tab->src, *tar = tab->tar;
-	reg Match_t	*base = tab->base, **table = tab->table;
+	reg int		size = tab->size, *link = tab->link, *hash = tab->hash;
 
-	if(!output)
-	{	if(tab->n_src < M_MIN)
-			return 0;
-		endfold = (s = src) + tab->n_src;
-		curm = base;
-	}
-	else
-	{	endfold = (s = tar) + tab->n_tar;
-		curm = base+n_src;
-		if(tab->n_tar < M_MIN)
-			return vdputinst(tab,s,endfold,NIL(Match_t*),0);
+	if((endfold-fold) < M_MIN)	/* not much to do */
+	{	add = fold;
+		goto done;
 	}
 
-	add = NIL(uchar*);
-	bestm = NIL(Match_t*);
+	if(target)
+		curm = (fold - tab->tar) + n_src;
+	else	curm = (fold - tab->src);
+	bestm = -1;
 	len = M_MIN-1;
-	HINIT(key,s,n);
+	add = NIL(uchar*);
+	HINIT(key,fold,n);
 	for(;;)
 	{	for(;;)	/* search for the longest match */
-		{	if(!(m = table[key&size]) )
+		{	if((m = hash[key&size]) < 0)
 				goto endsearch;
-			list = m = m->next;	/* head of list */
+			list = m = link[m];	/* head of list */
 
-			if(bestm) /* skip over past elements */
-			{	for(;;)
-				{	if(m >= bestm+len)
-						break;
-					if((m = m->next) == list)
+			if(bestm >= 0) /* skip over past elements */
+				for(n = bestm+len; m < n;)
+					if((m = link[m]) == list)
 						goto endsearch;
-				}
-			}
 
 			head = len - (M_MIN-1); /* header before the match */
-			heade = s+head;
+			endh = fold+head;
 			for(;;)
-			{	if((n = m-base) < n_src)
+			{	if((n = m) < n_src)
 				{	if(n < head)
 						goto next;
 					sm = src + n;
@@ -243,30 +207,31 @@ int		output;
 				}
 
 				/* make sure that the M_MIN bytes match */
-				if(!EQUAL(heade,sm))
+				if(!EQUAL(endh,sm))
 					goto next;
 
 				/* make sure this is a real match */
-				for(sm -= head, ss = s; ss < heade; )
+				for(sm -= head, ss = fold; ss < endh; )
 					if(*sm++ != *ss++)
 						goto next;
+
+				/* extend forward as much as possible */
 				ss += M_MIN;
 				sm += M_MIN;
 				ends = endfold;
-				if((m-base) < n_src && (n = (src+n_src)-sm) < (ends-s) )
-					ends = s+n;
-				for(; ss < ends; ++ss, ++sm)
-					if(*sm != *ss)
+				if(m < n_src && (n = (src+n_src)-sm) < (ends-fold) )
+					ends = fold+n;
+				for(;; ++ss, ++sm)
+					if(ss >= ends || *sm != *ss)
 						goto extend;
-				goto extend;
 
-			next:	if((m = m->next) == list )
+			next:	if((m = link[m]) == list )
 					goto endsearch;
 			}
 
 		extend: bestm = m-head;
 			n = len;
-			len = ss-s;
+			len = ss-fold;
 			if(ss >= endfold)	/* already match everything */
 				goto endsearch;
 
@@ -278,26 +243,26 @@ int		output;
 		}
 
 	endsearch:
-		if(bestm)
-		{	if(output && vdputinst(tab,add,s,bestm,len) < 0)
+		if(bestm >= 0)
+		{	if(target && vdputinst(tab,add,fold,bestm,len) < 0)
 				return -1;
 
 			/* add a sufficient number of suffices */
-			ends = (s += len);
+			ends = (fold += len);
 			ss = ends - (M_MIN-1);
-			if(!output)
-				curm = base + (ss-src);
-			else	curm = base + n_src + (ss-tar);
+			if(target)
+				curm = n_src + (ss-tar);
+			else	curm = (ss-src);
 
 			len = M_MIN-1;
 			add = NIL(uchar*);
-			bestm = NIL(Match_t*);
+			bestm = -1;
 		}
 		else
 		{	if(!add)
-				add = s;
-			ss = s;
-			ends = (s += 1);	/* add one prefix */
+				add = fold;
+			ss = fold;
+			ends = (fold += 1);	/* add one prefix */
 		}
 
 		if(ends > (endfold - (M_MIN-1)) )
@@ -305,46 +270,116 @@ int		output;
 
 		if(ss < ends) for(;;)	/* add prefices/suffices */
 		{	n = key&size;
-			if(!(m = table[n]) )
-				curm->next = curm;
+			if((m = hash[n]) < 0 )
+				link[curm] = curm;
 			else
-			{	curm->next = m->next;
-				m->next = curm;
+			{	link[curm] = link[m];
+				link[m] = curm;
 			}
-			table[n] = curm++;
+			hash[n] = curm++;
 
 			if((ss += 1) >= ends)
 				break;
 			HNEXT(key,ss,n);
 		}
 
-		if(s > endfold-M_MIN)	/* too short to match */
+		if((endfold-fold) < M_MIN)	/* too short to match */
 		{	if(!add)
-				add = s;
-			break;
+				add = fold;
+			goto done;
 		}
 
-		HNEXT(key,s,n);
+		HNEXT(key,fold,n);
 	}
 
-	if(output)	/* flush output */
-		return vdputinst(tab,add,endfold,NIL(Match_t*),0);
+done:
+	if(target)
+	{	if((len = (tab->tar+tab->n_tar) - endfold) > 0 ) /* match at end */
+			bestm = n_src - len;
+		else	bestm = -1;
+		if(add || bestm >= 0)
+			return vdputinst(tab,add,endfold,bestm,len);
+	}
+
 	return 0;
+}
+
+#if __STD_C
+static int vdprocess(Table_t* tab)
+#else
+static int vdprocess(tab)
+Table_t*	tab;
+#endif
+{
+	reg uchar	*tar, *src, *endsrc, *endtar, *endt;
+	reg int		hn, tn, n_src, n_tar;
+
+	/* check boundary conditions */
+	src = tab->src;
+	tar = tab->tar;
+	if((n_tar = tab->n_tar) <= 0)
+		return 0;
+	if((n_src = tab->n_src) <= 0)
+		return vdfold(tab,tar,tar+n_tar,1);
+
+	/* see if there is a large enough match at the start */
+#define LARGE_MATCH	(8*M_MIN)
+	endtar = tar + (n_tar < n_src ? n_tar : n_src);
+	for(; tar < endtar; ++tar, ++src)
+		if(*tar != *src)
+			break;
+	if((hn = tar - tab->tar) < LARGE_MATCH )
+	{	tar = tab->tar;
+		src = tab->src;
+		hn  = 0;
+	}
+	else
+	{	if(vdputinst(tab,NIL(uchar*),tab->tar,0,hn) < 0)
+			return -1;
+		if(hn == n_tar)
+			return 0;
+	}
+
+	/* see if there is a large enough match at the end */
+	endtar = tab->tar + n_tar - 1;
+	endsrc = tab->src + n_src - 1;
+	endt = endtar - (n_tar < n_src ? n_tar : n_src);
+	if(endt < tar-1)
+		endt = tar-1;
+	for(; endtar > endt; --endtar, --endsrc)
+		if(*endtar != *endsrc)
+			break;
+	endtar += 1; endsrc += 1;
+
+	if((tn = (tab->tar+n_tar) - endtar) < LARGE_MATCH)
+	{	endtar = tab->tar+n_tar;
+		endsrc = tab->src+n_src;
+		tn = 0;
+	}
+
+	/* maintain big enough data for matching the remained */
+	if((endtar-tar) >= (n_tar/4))
+	{	src -= hn/4;
+		endsrc += tn/4;
+	}
+	if(vdfold(tab,src,endsrc,0) < 0)
+		return -1;
+
+	return vdfold(tab,tar,endtar,1);
 }
 
 
 #if __STD_C
-long vddelta(Vddisc_t* source, Vddisc_t* target, Vddisc_t* delta, long window)
+long vddelta(Vddisc_t* source, Vddisc_t* target, Vddisc_t* delta)
 #else
-long vddelta(source, target, delta, window)
+long vddelta(source, target, delta)
 Vddisc_t*	source;	/* source data			*/
 Vddisc_t*	target;	/* target data			*/
 Vddisc_t*	delta;	/* transform output data	*/
-long		window;	/* amount to process each time	*/
 #endif
 {
 	reg int		size, k, n;
-	reg long	p, n_src, n_tar;
+	reg long	p, n_src, n_tar, window;
 	Table_t		tab;
 
 	if(!target || (n_tar = target->size) < 0)
@@ -362,57 +397,53 @@ long		window;	/* amount to process each time	*/
 
 	tab.n_src = tab.n_tar = tab.size = 0;
 	tab.tar = tab.src = NIL(uchar*);
-	tab.base = NIL(Match_t*);
-	tab.table = NIL(Match_t**);
+	tab.link = NIL(int*);
+	tab.hash = NIL(int*);
 	INIT(&tab.io,delta);
 
-	if(window <= 0)
-		window = DFLTWINDOW;
-	else if(window > MAXWINDOW)
-		window = MAXWINDOW;
-	if(window > n_tar)
-		window = n_tar;
-	if(n_src > 0 && window > n_src)
-		window = n_src;
-
 	/* try to allocate working space */
+	window = DFLTWINDOW;
 	while(window > 0)
 	{	/* space for the target string */
-		size = (n_tar == 0 || target->data) ? 0 : (int)window;
-		if((long)size > n_tar)
+		if((long)(size = (int)window) > n_tar)
 			size = (int)n_tar;
-		if(size > 0 && !(tab.tar = (uchar*)malloc(size*sizeof(uchar))) )
+		if(!target->data && !(tab.tar = (uchar*)malloc(size*sizeof(uchar))) )
 			goto reduce_window;
+		k = size;
 
 		/* space for sliding header or source string */
 		if(n_src <= 0)	/* compression only */
-			size = target->data ? 0 : HEADER(window);
+		{	if((long)window >= n_tar)
+			{	size = 0;
+				k += n_tar;
+			}
+			else
+			{	size = (int)HEADER(window);
+				k += size;
+			}
+		}
 		else		/* differencing */
-		{	size = source->data ? 0 : window;
-			if((long)size > n_src)
+		{	if((long)(size = (int)window) > n_src)
 				size = (int)n_src;
+			k += size;
+			if(source->data)
+				size = 0;
 		}
 		if(size > 0 && !(tab.src = (uchar*)malloc(size*sizeof(uchar))) )
 			goto reduce_window;
 
-		/* space for the hash table elements */
-		size = (int)(window < n_tar ? window : n_tar);
-		if(n_src <= 0)
-			size += (int)(window < n_tar ? HEADER(window) : 0);
-		else	size += (int)(window < n_src ? window : n_src);
-		if(!(tab.base = (Match_t*)malloc(size*sizeof(Match_t))) )
-			goto reduce_window;
-
-		/* space for the hash table */
-		n = size/2;
+		/* space for the hash table itself */
+		n = k/2;
 		do (size = n); while((n &= n-1) != 0);
 		if(size < 64)
 			size = 64;
-		while(!(tab.table = (Match_t**)malloc(size*sizeof(Match_t*))) )
-			if((size >>= 1) <= 0)
-				goto reduce_window;
+		k += size;
 
-		/* if get here, successful */
+		if(!(tab.hash = (int*)malloc(k*sizeof(int))) )
+			goto reduce_window;
+
+		/* successful */
+		tab.link = tab.hash+size;
 		tab.size = size-1;
 		break;
 
@@ -425,10 +456,6 @@ long		window;	/* amount to process each time	*/
 		{	free((Void_t*)tab.src);
 			tab.src = NIL(uchar*);
 		}
-		if(tab.base)
-		{	free((Void_t*)tab.base);
-			tab.base = NIL(Match_t*);
-		}
 		if((window >>= 1) <= 0)
 			return -1;
 	}
@@ -437,8 +464,7 @@ long		window;	/* amount to process each time	*/
 	n = 0;
 
 	/* output magic bytes and sizes */
-	for(k = 0; VD_MAGIC[k]; k++)
-		;
+	k = sizeof(VD_MAGIC) - 1;
 	if((*_Vdwrite)(&tab.io,(uchar*)VD_MAGIC,k) != k ||
 	   (*_Vdputu)(&tab.io,(ulong)n_tar) <= 0 ||
 	   (*_Vdputu)(&tab.io,(ulong)n_src) <= 0 ||
@@ -463,24 +489,25 @@ long		window;	/* amount to process each time	*/
 		}
 		else	/* data differencing */
 		{	if(n < n_src)
-			{	if(n+window > n_src)
+			{	if(window >= n_src)
+					p = 0;
+				else if((n+window) > n_src)
 					p = n_src-window;
 				else	p = n;
+				if((size = n_src-p) > (int)window)
+					size = (int)window;
 				if(source->data)
 					tab.src = (uchar*)source->data + p;
-				else
-				{	size = (*source->readf)
-						(tab.src, (int)window, p, source);
-					if((long)size != window)
-						goto done;
-				}
-			} /* else use last window */
-
-			tab.n_src = window;
+				else if((*source->readf)(tab.src,size,p,source) != size)
+					goto done;
+				tab.n_src = size;
+			}
+			/* else use last window */
 		}
 
 		/* prepare the target string */
-		size = (int)((n_tar-n) < window ? (n_tar-n) : window);
+		if((size = (int)(n_tar-n)) > (int)window)
+			size = (int)window;
 		tab.n_tar = size;
 		if(target->data)
 			tab.tar = (uchar*)target->data + n;
@@ -492,26 +519,24 @@ long		window;	/* amount to process each time	*/
 
 		/* reinitialize table before processing */
 		for(k = tab.size; k >= 0; --k)
-			tab.table[k] = NIL(Match_t*);
+			tab.hash[k] = -1;
 		K_INIT(tab.quick,tab.recent,tab.rhere);
 
-		if(tab.n_src > 0 && vdfold(&tab,0) < 0)
-			goto done;
-		if(vdfold(&tab,1) < 0)
+		if(vdprocess(&tab) < 0)
 			goto done;
 
 		n += size;
 	}
 
 done:
+	(void)(*_Vdflsbuf)(&tab.io);
+
 	if(!target->data && tab.tar)
 		free((Void_t*)tab.tar);
 	if(tab.src && ((n_src <= 0 && !target->data) || (n_src > 0 && !source->data) ) )
 		free((Void_t*)tab.src);
-	if(tab.base)
-		free((Void_t*)tab.base);
-	if(tab.table)
-		free((Void_t*)tab.table);
+	if(tab.hash)
+		free((Void_t*)tab.hash);
 
 	return tab.io.here + (tab.io.next - tab.io.data);
 }

@@ -1,8 +1,8 @@
 .\"
 .\" Glenn Fowler
-.\" AT&T Bell Laboratories
+.\" AT&T Research
 .\"
-.\" @(#)pax.1 (gsf@research.att.com) 01/11/95
+.\" @(#)pax.1 (gsf@research.att.com) 02/09/96
 .\"
 .TH PAX 1
 .SH NAME
@@ -308,6 +308,15 @@ and
 ANSI standard label VMS backup savset tape format.
 Valid only for input tape devices.
 .TP
+.B zip
+The
+.I PKZIP
+format.
+The
+.IR gunzip (1)
+command is used to uncompress each archive member.
+Valid only on input.
+.TP
 .I format
 Formats can be defined as extensions to the builtin formats.
 For any non-builtin format
@@ -413,6 +422,9 @@ exits if
 is encountered.
 .TP
 .B l
+For
+.BR \-r ,
+existing links are preserved when possible.
 For
 .BR \-rw ,
 files are linked rather than copied when possible.
@@ -532,7 +544,7 @@ Valid only with
 .TP
 .B C
 Archive entries smaller than
-.BI \-B " maxblocks"
+.BI \-B " maxout"
 must be contained within a single part.
 Valid only with
 .BR \-B .
@@ -670,7 +682,8 @@ Copies the
 directory hierarchy to
 .IR newdir .
 .SH "SEE ALSO"
-ar(1), cpio(1), find(1), ksh(1), tar(1), tw(1), libdelta(3), cpio(5), tar(5)
+ar(1), cpio(1), find(1), gunzip(1), gzip(1), ksh(1), tar(1), tw(1)
+libdelta(3), cpio(5), tar(5)
 .SH BUGS
 Special privileges may be required to copy special files.
 .br

@@ -1,0 +1,3 @@
+99-11-19 Makefile: fix sh_config.h for 2d -- eventually should use iffe
+98-03-11 workaraound for sgi dllnext() botches
+98-02-02 initial release snarfed from ksh88i source

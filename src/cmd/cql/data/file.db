@@ -1,0 +1,1412 @@
+;vdb;cia 1.0 db for ciaex
+.SCHEMA.
+/*
+ * cia db definitions for cql
+ */
+
+symbol
+{ 
+	char*		id;
+	register char*	name; 
+	map*		kind; 
+	symbol*		file; 
+	char*		dtype;
+	map*		sclass;
+	int		bline;
+	int		hline;
+	int		eline;
+	map*		def; 
+	char*		chksum; 
+}
+
+reference
+{ 
+	map*		kind1; 
+	symbol*		id1; 
+	map*		kind2;
+	symbol*		id2;
+	char*		usage; 
+	char*		rkind; 
+}
+
+map
+{ 
+	char*		key;
+	char*		value; 
+}
+
+symbol.kind.input = reference.id1.kind.input = reference.id2.kind.input =
+reference.kind1.input = reference.kind2.input = 
+{
+	";_ERROR_",	"f;file",	"p;function", 
+	"v;variable",	"m;macro",	"t;type"
+};
+
+symbol.sclass.input = reference.id1.sclass.input = reference.id2.sclass.input =
+{
+	";_ERROR_",	
+	"n;none",					/* file */
+	"t;typedef",    "n;none", 			/* type */
+	"d;macdef",	"u;macudef",    		/* macro */
+	"e;extern",	"s;static",	"l;libsym",	/* func & var */
+	"m;enum",					/* var */
+	"g;global"					/* func & var */
+};
+
+symbol.def.input = reference.id1.def.input = reference.id2.def.input =
+{
+	";_ERROR_",	"df;def",	"dc;dec",
+	"ud;undef"      				/* macros */
+};
+
+%%
+REFERENCE
+t;289;t;638;95;
+f;8;m;713;40@41@49;
+p;689;t;434;179;
+p;297;t;221;59;
+p;142;t;434;199;
+t;561;m;87;33;
+f;22;f;15;56;
+p;93;t;434;178;
+p;567;t;221;47;
+p;194;t;616;61;
+f;21;m;714;169;
+p;329;t;434;158;
+t;353;t;674;107;
+p;317;t;434;150;
+p;148;t;221;41;
+f;21;m;538;80;
+f;21;m;576;100;
+p;96;t;665;48;
+t;135;t;540;121;
+p;61;t;221;144;
+p;121;t;221;125;
+f;16;m;505;10;
+p;340;t;434;134;
+p;146;t;616;185;
+p;100;t;616;129;
+t;221;t;387;14;
+p;440;t;434;129;
+t;447;t;328;142;
+t;156;t;674;43;
+p;612;t;616;48;
+p;248;m;140;62;
+p;316;t;141;164;
+p;336;t;616;95;
+p;237;t;434;185;
+t;156;m;302;49;
+f;21;m;715;44;
+p;475;t;434;131;
+p;94;t;434;148;
+p;49;t;542;50;
+t;540;t;262;111;
+p;572;t;425;124;
+f;21;m;716;205;
+p;699;t;221;12;
+f;4;m;714;80@85@176;
+t;425;t;135;117;
+p;355;t;434;164;
+f;18;m;714;79@84@91;
+p;450;t;665;44;
+t;613;t;294;15;
+p;527;t;616;74;
+t;202;t;86;56;
+p;81;t;434;166;
+f;18;m;538;34;
+p;533;t;161;49@51;
+f;10;m;713;4@42;
+p;528;t;616;55;
+p;248;m;232;34;
+f;7;m;717;103@135;
+p;545;t;557;165;
+t;496;t;708;126;
+p;106;t;616;159;
+p;697;t;361;50;
+t;327;v;44;97;
+f;4;m;587;1;
+p;106;t;434;159;
+t;262;t;474;113;
+f;5;m;718;2;
+t;62;t;251;33;
+p;248;t;613;26@76;
+f;4;m;719;216;
+p;650;t;434;209;
+v;554;t;434;119;
+p;510;t;221;142;
+p;298;t;616;167;
+f;21;m;720;92@95@102@105;
+v;492;m;38;118;
+p;536;t;616;131;
+f;22;m;721;48;
+t;73;t;550;34;
+t;489;t;563;21;
+f;4;m;716;204;
+f;21;f;7;31;
+f;18;m;716;99;
+p;389;t;616;49;
+f;21;m;722;73@120@157@169@205;
+p;50;t;542;136;
+t;422;t;257;182;
+p;88;t;221;13;
+t;474;t;353;103;
+t;135;m;364;119;
+p;459;t;141;162;
+p;119;t;434;149;
+p;672;t;361;53;
+f;4;m;232;66;
+t;277;m;230;73;
+v;458;t;183;52;
+f;7;m;713;15@189;
+p;248;v;247;86;
+f;9;m;134;9;
+p;701;t;434;168;
+p;657;t;221;129;
+p;615;t;434;200;
+t;73;t;289;35;
+t;550;t;60;12;
+f;20;f;17;10;
+t;277;m;558;71;
+t;463;t;341;21;
+f;20;f;22;9;
+p;79;t;616;52;
+f;5;m;232;89;
+f;22;f;6;58;
+p;446;t;526;156;
+f;18;m;723;103;
+f;4;m;720;37@40@100@103@108@112;
+p;498;t;434;170;
+f;8;m;514;8;
+t;225;t;294;76;
+f;21;m;724;73@120@157@169@205;
+p;452;t;221;49;
+f;21;m;725;80;
+p;478;t;221;128;
+p;484;t;221;58;
+p;419;t;616;57;
+t;373;m;448;29;
+p;310;t;557;163;
+f;8;m;726;40;
+t;90;t;156;42;
+p;168;t;665;132;
+f;21;m;296;33;
+t;73;m;589;33;
+f;22;f;9;57;
+f;4;m;722;80@85@96@176@191@198@204@216;
+t;51;t;636;152;
+f;22;f;14;61;
+f;21;m;590;90;
+t;568;t;665;45;
+f;22;f;5;53;
+p;43;t;361;57;
+f;18;m;722;79@84@91@99;
+f;7;m;727;103@131;
+t;414;t;493;49;
+t;277;t;239;73;
+f;4;m;538;35;
+p;537;t;434;173;
+p;560;t;616;132;
+p;375;t;221;48;
+p;337;t;616;63;
+f;7;m;728;131@135;
+f;21;m;467;1;
+t;407;m;681;21@22@23;
+f;5;m;624;8;
+f;20;f;23;8;
+t;123;t;483;63;
+p;339;t;434;151;
+t;155;t;306;74;
+p;367;t;125;154;
+t;398;t;662;51;
+p;216;t;278;34;
+p;513;t;434;127;
+t;662;t;568;40;
+p;168;m;495;132;
+f;7;m;211;139;
+t;183;t;73;32;
+f;4;m;724;80@85@96@176@191@198@204@216;
+f;4;m;725;35;
+p;250;t;141;166;
+t;568;m;495;45;
+f;18;m;724;79@84@91@99;
+f;19;m;190;10;
+t;493;m;624;52;
+p;25;t;434;183;
+f;4;m;547;73;
+f;18;m;725;34;
+p;579;t;616;132;
+p;378;t;434;187;
+f;13;m;436;11;
+t;239;t;486;54;
+p;579;t;434;132;
+f;22;f;16;59;
+f;18;m;296;44;
+t;542;t;120;18;
+p;286;t;221;141;
+f;7;m;729;159@164@173;
+p;130;t;434;206;
+f;18;m;381;1;
+f;22;f;12;60;
+p;444;t;58;60;
+f;4;m;730;198@216;
+p;248;m;330;22@50@53;
+t;353;t;550;105;
+t;423;t;153;161;
+p;160;t;665;45;
+f;22;m;731;10;
+t;398;m;109;51;
+t;407;t;407;20;
+p;170;t;434;207;
+t;407;t;86;21;
+p;532;t;434;194;
+p;319;t;616;163;
+f;21;m;717;62;
+t;434;t;322;95;
+p;600;t;161;33;
+f;17;f;4;7;
+p;403;t;434;174;
+t;278;t;479;15;
+p;332;t;58;59;
+t;526;t;305;68;
+f;17;f;18;18;
+p;459;t;616;162;
+f;21;f;10;177;
+v;492;t;434;118;
+p;404;t;616;142;
+p;42;t;434;125;
+t;80;t;434;27;
+t;353;t;289;106;
+t;125;t;301;63;
+t;152;t;327;84;
+p;209;t;221;143;
+f;7;m;732;109@173;
+f;4;m;733;214;
+p;32;t;221;14;
+p;541;t;616;140;
+f;22;f;19;55;
+t;407;t;373;26;
+t;561;t;501;33;
+p;180;t;434;136;
+p;601;t;434;128;
+p;684;t;434;152;
+t;568;t;550;41;
+f;12;m;181;10;
+f;22;m;206;43;
+f;22;f;13;63;
+p;115;t;221;138;
+v;229;t;463;31;
+f;10;m;593;1;
+p;396;t;202;98;
+p;264;t;434;184;
+f;23;f;4;1;
+p;582;t;434;208;
+t;156;t;278;47;
+f;21;m;713;3@145@214;
+p;285;t;155;159;
+p;385;t;616;65;
+t;135;t;489;118;
+t;108;t;257;160;
+p;177;t;434;169;
+p;290;t;221;131;
+p;244;t;221;11;
+p;706;t;221;61;
+t;568;t;289;42;
+t;568;m;103;43;
+p;659;t;616;161;
+p;357;t;221;127;
+p;659;t;434;161;
+t;674;t;281;18;
+p;34;t;665;46;
+p;545;t;434;165;
+t;398;m;118;51;
+f;22;f;8;52;
+f;4;m;296;47;
+p;33;t;434;167;
+p;562;t;221;140;
+p;497;t;434;195;
+t;135;m;558;120;
+p;485;t;183;145;
+f;11;m;279;11;
+f;20;m;734;31@54@63@69@83@89;
+p;267;t;616;69;
+t;361;t;80;26;
+p;660;t;221;46;
+p;57;t;221;16;
+t;639;t;165;26;
+t;203;t;277;70;
+p;683;t;616;192;
+p;673;t;616;81;
+t;373;t;493;27;
+p;250;t;616;166;
+f;21;m;727;62;
+t;154;t;45;15;
+f;7;m;720;120@173;
+p;577;t;434;145;
+p;578;t;616;60;
+f;21;m;728;73@120@157@205;
+f;4;m;713;3@285;
+p;629;t;616;76;
+t;161;t;407;19;
+f;18;m;713;3@110;
+p;307;t;221;45;
+t;83;t;488;76;
+f;5;m;448;8;
+p;99;t;616;175;
+t;58;t;347;33;
+f;21;m;211;73@120@157;
+t;353;t;489;104;
+p;520;t;221;14;
+f;22;f;11;62;
+t;407;t;664;23;
+t;501;t;559;19;
+m;702;m;702;233;
+f;12;m;735;93;
+p;298;t;141;167;
+f;22;f;23;49;
+f;7;m;260;12;
+f;17;m;726;17;
+t;665;t;561;31;
+p;653;t;434;130;
+t;327;v;553;98;
+f;8;m;736;40;
+f;14;m;413;10;
+f;15;m;643;9;
+t;518;t;402;36;
+t;493;m;448;52;
+t;373;m;624;29;
+t;636;t;496;153@154;
+t;156;t;489;45;
+p;310;t;434;163;
+t;442;t;153;183;
+f;4;m;728;96@191@198@204@216;
+p;227;t;434;155;
+f;6;m;599;10;
+p;464;t;221;55;
+f;18;m;728;99;
+f;17;f;21;19;
+t;669;t;398;49;
+p;127;t;221;126;
+f;737;f;4;7;
+t;750;t;153;223;
+f;739;m;724;44@168@255;
+f;737;f;738;10;
+t;811;t;153;269;
+f;739;m;538;126;
+p;845;m;487;37;
+p;797;t;613;115@122;
+t;850;t;789;266;
+f;739;m;863;168@255;
+t;757;m;781;58;
+t;751;t;817;70;
+p;797;v;813;119@148;
+p;797;m;803;129@139;
+t;832;t;153;186;
+f;739;m;864;271;
+f;739;m;392;216;
+f;739;m;747;24;
+f;739;m;384;212@216;
+f;739;m;865;250;
+t;794;t;442;161;
+t;757;t;814;58;
+p;846;t;767;26;
+f;739;f;740;260;
+f;740;m;760;26;
+t;767;t;795;20;
+p;773;m;799;89@92@94@96;
+t;838;t;757;57;
+t;795;t;857;22;
+t;806;t;844;45;
+p;845;v;491;37;
+p;753;t;767;27;
+t;757;m;828;58;
+f;739;m;854;212@216;
+p;845;t;463;29;
+t;782;t;153;42;
+t;757;m;744;58;
+p;845;p;773;36;
+f;740;m;781;41;
+f;737;f;22;8;
+f;738;m;726;25;
+t;768;t;153;193;
+t;836;t;743;91;
+p;845;t;613;27;
+p;797;p;815;137@140;
+p;773;m;803;90@91@93@95@97;
+f;739;m;720;56@63@69@73@97@106;
+f;739;m;728;191@263;
+f;739;m;866;271;
+p;773;p;797;89@90@91@92@93@94@95@96@97;
+p;845;t;221;23;
+f;739;m;725;126;
+p;773;t;708;48@72;
+t;842;t;442;162;
+f;739;m;822;151;
+f;740;m;828;53;
+f;739;f;7;29;
+p;797;m;487;138@141;
+f;740;m;744;37;
+f;739;m;714;255;
+f;737;f;17;9;
+f;737;m;734;31@66@85;
+f;740;m;720;45@48;
+t;853;t;755;179;
+t;762;t;762;17;
+f;739;m;867;168@271;
+t;756;t;153;95;
+t;791;t;817;71;
+f;739;m;868;156;
+f;739;m;388;212;
+t;741;t;257;183;
+t;829;t;836;92;
+t;857;t;762;11;
+f;739;m;869;222@226;
+f;738;f;739;7;
+f;739;m;590;136;
+t;841;t;790;170;
+p;815;v;813;157;
+f;739;m;390;216;
+f;739;m;746;206;
+t;757;m;834;58;
+p;797;m;799;127@136;
+f;739;m;722;190;
+t;789;t;153;267;
+p;773;m;586;72;
+p;797;v;491;138@141;
+f;739;m;837;146;
+t;778;t;743;89;
+v;875;m;103;11;
+f;870;f;17;9;
+f;870;f;22;8;
+p;876;p;877;28;
+f;870;f;23;7;
+p;876;m;296;27;
+p;874;m;872;39;
+p;876;m;368;27;
+p;874;m;460;44;
+p;877;m;460;17;
+p;248;v;605;42@43;
+p;248;p;594;52;
+p;248;p;845;92;
+p;248;p;536;76;
+p;248;p;374;53@79@86@93@95;
+p;248;p;464;86;
+p;248;p;877;46@51;
+p;248;p;879;53;
+p;248;p;880;78;
+p;248;p;629;50;
+p;248;p;591;34;
+p;248;p;484;53@78@86@92;
+p;248;v;229;92;
+p;773;p;629;75;
+p;797;v;229;138@141;
+p;797;p;536;122@125;
+p;797;p;484;132;
+p;797;p;877;123@126@131@142;
+p;773;p;253;82;
+p;815;p;399;156;
+p;797;p;455;145@146;
+p;773;p;536;72@77;
+p;845;v;229;36;
+p;797;p;286;137.138@140.141;
+p;797;p;629;124;
+p;797;p;374;133;
+p;773;p;313;100.103;
+p;773;p;560;79;
+p;845;p;562;36.37;
+p;797;p;556;128@130;
+p;797;p;880;132;
+p;773;p;399;64;
+p;874;p;340;44;
+p;876;p;536;27;
+p;877;v;492;17;
+p;877;p;374;18;
+p;877;p;340;17;
+p;876;p;629;27;
+p;874;v;492;44;
+p;876;p;594;29;
+p;874;p;345;43;
+SYMBOL
+2;<void>;f;2;;n;0;0;0;dc;100041c4
+3;<libc.a>;f;3;;l;0;0;0;dc;10004204
+4;/usr/include/stdio.h;f;4;;n;1;288;288;df;548d0998
+5;libcbt/cbt.h;f;5;;n;1;104;104;df;ef6f7af
+6;libpdb/file.h;f;6;;n;1;63;63;df;42e7403e
+7;/usr/include/sgidefs.h;f;7;;n;1;193;193;df;141dad68
+8;ast/re.h;f;8;;n;1;60;60;df;353cd5fd
+9;libpdb/field.h;f;9;;n;1;171;171;df;b6e001a9
+10;/usr/include/getopt.h;f;10;;n;1;46;46;df;2a031fc6
+11;libpdb/pathmap.h;f;11;;n;1;17;17;df;88e02c94
+12;libpdb/query.h;f;12;;n;1;146;146;df;13bfef1d
+13;libpdb/view.h;f;13;;n;1;15;15;df;a7dd4e7c
+14;libpdb/format.h;f;14;;n;1;54;54;df;bd9ebea8
+15;libpdb/buffer.h;f;15;;n;1;19;19;df;581faffe
+16;libpdb/index.h;f;16;;n;1;66;66;df;87f1ed40
+17;ciafan.h;f;17;;n;1;600;31;df;1d2a8241
+18;/usr/include/string.h;f;18;;n;1;113;113;df;7bdd1c95
+19;libpdb/error.h;f;19;;n;1;63;63;df;42ae7868
+20;main.c;f;20;;n;1;2121;99;df;ae98ae01
+21;/usr/include/stdlib.h;f;21;;n;1;456;217;df;41cdd104
+22;libpdb/infoview.h;f;22;;n;1;1133;65;df;be47ac
+23;ast/stdio.h;f;23;;n;1;290;1;df;1f4ff3a4
+24;bdump;v;5;int;e;87;0;87;dc;49dc5df
+25;getw;p;4;int;e;183;0;183;dc;bcbf3587
+26;RKIND_EXPAND;v;9;enum FieldExpansion;m;95;0;105;df;9098c1e
+27;FILEDEF_MATCH;v;12;enum MatchSpec;m;84;0;98;df;622b2661
+28;NO_PATH;v;6;enum PathSpec;m;15;0;16;df;4574de61
+29;get_sepchar;p;9;char;e;160;0;160;dc;a65fb0bd
+30;REFU_NAME1;v;9;enum FieldNumber;m;12;0;59;df;c7e289af
+31;REFU_NAME2;v;9;enum FieldNumber;m;12;0;72;df;ceb668ef
+32;view_line;p;13;ErrorCode;e;14;0;14;dc;e522e4d0
+33;rewind;p;4;void;e;167;0;167;dc;d53c7faf
+34;refree;p;8;void;e;46;0;46;dc;5613ec77
+35;ERR_UNKNOWN_FIELD;v;19;enum ErrorCode;m;14;0;17;df;dd8960da
+36;FILENAME_MAX;m;4;;d;71;0;71;df;cf2ead51
+37;defined;m;20;;u;0;0;0;ud;d521d18e
+38;_NFILE;m;4;;d;52;0;52;df;dc8f0207
+39;FORMATFILE;m;22;;d;30;0;30;df;f1c7a03
+40;ERR_VIEWDEF_USAGE;v;19;enum ErrorCode;m;14;0;44;df;6fe1661c
+41;seek_file;p;6;int;e;56;0;56;dc;2b7ff05d
+42;tmpfile;p;4;FILE *;e;125;0;125;dc;dacd691c
+43;GetFileHandle;p;16;FileHandle *;e;57;0;57;dc;8fb79869
+44;REF_MATCH;v;12;enum MatchSpec;m;84;0;85;df;3ba04640
+45;enum PathSpec;t;6;;n;15;0;20;df;3eebc334
+46;BTREEFILE;m;22;;d;33;0;33;df;16d051d0
+47;strstr;p;18;char *;e;71;0;71;dc;3a694b7b
+48;isatty;p;21;int;e;181;0;181;dc;6010e877
+49;exp_field;p;14;ExpandCode;e;50;0;50;dc;b92d1f9
+50;exp_field;p;12;ExpandCode;e;136;0;136;dc;b92d1f9
+51;relation_struct;t;9;struct relation_struct;t;152;0;156;df;179b4c25
+52;rename;p;4;int;e;124;0;124;dc;cf14f912
+53;tranid;v;5;long;e;88;0;88;dc;c4ba9ed9
+54;ERR_ENVIRONMENT;v;19;enum ErrorCode;m;14;0;27;df;6f1ce9bd
+55;getchar;p;4;int;e;153;0;153;dc;ecbf4be0
+56;getchar;m;4;;d;231;0;231;df;b9a7d68e
+57;map_path;p;11;ErrorCode;e;16;0;16;dc;913ac4eb
+58;SymbolType;t;16;enum SymbolType;t;33;0;38;df;1df04744
+59;ndadr;m;5;;d;81;0;81;df;a9f59c1a
+60;enum FieldNumber;t;9;;n;12;0;90;df;d530b749
+61;viewfile;p;12;ErrorCode;e;144;0;144;dc;57a55234
+62;FieldSpec;t;14;enum FieldSpec;t;33;0;39;df;8405082e
+63;clearerr_locked;m;4;;d;247;0;247;df;b714e90a
+64;REFU_FINDEX1;v;9;enum FieldNumber;m;12;0;62;df;468adb5c
+65;__uint64_t;t;7;unsigned long long;t;142;0;142;df;9fe9f2e
+66;REFU_FINDEX2;v;9;enum FieldNumber;m;12;0;75;df;ad3c1372
+67;VPLEN;m;16;;d;15;0;15;df;6e3142af
+68;REFU_ELINE1;v;9;enum FieldNumber;m;12;0;67;df;d5719cf2
+69;ERR_VIEWBODY_USAGE;v;19;enum ErrorCode;m;14;0;47;df;4ecb203f
+70;REFU_ELINE2;v;9;enum FieldNumber;m;12;0;80;df;124e4310
+71;init_line;p;6;void;e;61;0;61;dc;8ed7055
+72;term_env;p;6;void;e;45;0;45;dc;2ab9e4a5
+73;struct FormatSpecification;t;12;;n;32;0;36;df;4657cc8a
+74;_SBFSIZ;m;4;;d;53;0;53;df;cdb61ce4
+75;NO_ERR;v;19;enum ErrorCode;m;14;0;15;df;a032a6fa
+76;get_buffer;p;15;char *;e;15;0;15;dc;75e88a43
+77;_bufendtab;v;4;unsigned char *;e;120;0;120;dc;342620b8
+78;ttyslot;p;21;int;e;191;0;191;dc;b072d2f5
+79;strncpy;p;18;char *;e;52;0;52;dc;49123c56
+80;struct FileHandle;t;6;;n;26;0;33;df;4b224e59
+81;ftell;p;4;long;e;166;0;166;dc;27f6016
+82;lcong48;p;21;void;e;202;0;202;dc;9bc57a73
+83;lfaddr;t;5;struct cbt_h_3;t;76;0;80;df;d7759420
+84;EXP_OK;v;12;enum ExpandCode;m;18;0;19;df;1c9c3fde
+85;vsprintf;p;4;int;e;147;0;147;dc;620e2002
+86;struct hdr;t;5;;n;56;0;62;df;62993727
+87;RE_NMATCH;m;8;;d;17;0;17;df;b0ad3400
+88;buffer_line;p;15;ErrorCode;e;13;0;13;dc;f05b70a1
+89;swab;p;21;void;e;189;0;189;dc;3e2b3624
+90;SearchResult;t;16;struct SearchResult;t;42;0;52;df;8a307e6a
+91;BUFSIZ;m;4;;d;51;0;51;df;1c46c384
+92;REFU_LEVEL1;v;9;enum FieldNumber;m;12;0;61;df;e76268a5
+93;fdopen;p;4;FILE *;e;178;0;178;dc;9bb3a600
+94;fgetc;p;4;int;e;148;0;148;dc;6e71b6c6
+95;FOPEN_MAX;m;4;;d;70;0;70;df;9f41eca1
+96;resub;p;8;char *;e;48;0;48;dc;77f399de
+97;REFU_LEVEL2;v;9;enum FieldNumber;m;12;0;74;df;d77d3a19
+98;ctermid;p;4;char *;e;180;0;180;dc;2fdbe1c
+99;getcwd;p;21;char *;e;175;0;175;dc;3a00e39a
+100;calloc;p;21;void *;e;129;0;129;dc;6787bc99
+101;read_fieldn;p;9;char *;e;165;0;165;dc;70ac4054
+102;SYM_LENGTH;v;9;enum FieldNumber;m;12;0;18;df;f5c44771
+103;MAXLINE;m;22;;d;14;0;14;df;a2aeb5c0
+104;INDEX_TO;v;16;enum SearchSpec;m;18;0;22;df;c23077c8
+105;cuserid;p;4;char *;e;181;0;181;dc;692b6663
+106;fread;p;4;size_t;e;159;0;159;dc;f7bff171
+107;tmpnam;p;4;char *;e;126;0;126;dc;888b6aac
+108;__psint_t;t;7;__int32_t;t;160;0;160;df;1b058ebe
+109;NUMFIELDS;m;22;;d;18;0;18;df;952c2931
+110;TRUE;m;22;;d;16;0;16;df;40cb48ee
+111;LEVEL_ALL;m;12;;d;14;0;14;df;d33fde7c
+112;tell_file;p;6;long;e;57;0;57;dc;9b0baac0
+113;SYM_FILENAME;v;9;enum FieldNumber;m;12;0;16;df;7b23d29c
+114;DEFU_DINDEX;v;9;enum FieldNumber;m;12;0;41;df;d155c36
+115;query;p;12;ErrorCode;e;138;0;138;dc;f33cb488
+116;EXP_STR;v;12;enum ExpandCode;m;18;0;20;df;f529d36f
+117;BTALL;m;5;;d;42;0;42;df;2aa1c5e2
+118;MAXFIELDS;m;22;;d;19;0;19;df;bc17f692
+119;fgets;p;4;char *;e;149;0;149;dc;8a9b43d2
+120;enum ExpandCode;t;12;;n;18;0;23;df;65823916
+121;BuildMatchTable1;p;12;ErrorCode;e;125;0;125;dc;f47397f7
+122;SYM_INVALID;v;16;enum SymbolType;m;33;0;37;df;fab50938
+123;trailer;t;5;struct cbt_h_2;t;63;0;66;df;d0029bdc
+124;SYM_CPPLENGTH;v;9;enum FieldNumber;m;12;0;19;df;88efa327
+125;div_t;t;21;struct stdlib_h_1;t;63;0;66;df;d4e6397c
+126;FieldDescriptionSize;v;14;int;e;53;0;53;dc;68b35e5
+127;BuildMatchTable2;p;12;ErrorCode;e;126;0;126;dc;4f46f740
+128;REFU_HLINE1;v;9;enum FieldNumber;m;12;0;66;df;95febba4
+129;REFU_HLINE2;v;9;enum FieldNumber;m;12;0;79;df;915a60d9
+130;flockfile;p;4;void;e;206;0;206;dc;752cacc0
+131;PROGRESS;m;14;;d;18;0;18;df;ee090fa0
+132;feof_unlocked;m;4;;d;259;0;259;df;4cb329e1
+133;ffs;p;18;int;e;87;0;87;dc;136a461
+134;FIELD_H;m;9;;d;10;0;10;df;be5fb952
+135;struct SearchStrategy;t;12;;n;117;0;122;df;eb2e4433
+136;SEPENV;m;22;;d;41;0;41;df;e15f9cb6
+137;getpw;p;21;int;e;179;0;179;dc;78fe969d
+138;set_sepchar;p;9;void;e;161;0;161;dc;5e58f0e5
+139;getsubopt;p;10;int;e;35;0;35;dc;bab00d35
+140;WILDCARD;m;17;;d;8;0;8;df;3cbe06ae
+141;wchar_t;t;21;long;t;103;0;103;df;2f8e80d3
+142;__semputc;p;4;int;e;199;0;199;dc;622b8303
+143;DINDEX_EXPAND;v;9;enum FieldExpansion;m;95;0;104;df;ee0845b5
+144;DEFFLAG_EXPAND;v;9;enum FieldExpansion;m;95;0;101;df;fcbdcd24
+145;drand48;p;21;double;e;194;0;194;dc;66a58076
+146;memalign;p;21;void *;e;185;0;185;dc;d0b7d82f
+147;__int64_t;t;7;long long;t;141;0;141;df;36bace0f
+148;init_format;p;14;ErrorCode;e;41;0;41;dc;c862d3e4
+149;__us_rsthread_stdio;v;4;int;e;201;0;201;dc;afb13e09
+150;init_env;p;6;void;e;44;0;44;dc;84b071c1
+151;SYM_PROC;v;9;enum FieldNumber;m;12;0;29;df;5b5c1cdd
+152;MatchSpec;t;12;enum MatchSpec;t;84;0;100;df;9c25803a
+153;__uint32_t;t;7;unsigned;t;118;0;118;df;d0f1cc11
+154;PathSpec;t;6;enum PathSpec;t;15;0;20;df;1d4aa8ec
+155;lldiv_t;t;21;struct stdlib_h_3;t;74;0;77;df;c729473a
+156;struct SearchResult;t;16;;n;42;0;52;df;4903e471
+157;SYM_STRING;v;16;enum SymbolType;m;33;0;36;df;385db2a1
+158;DEFU_NAME;v;9;enum FieldNumber;m;12;0;46;df;f0a06226
+159;RAND_MAX;m;21;;d;42;0;42;df;3d6e6770
+160;reexec;p;8;int;e;45;0;45;dc;73c9cd40
+161;bfile;t;5;struct bfile;t;19;0;32;df;2f7dd881
+162;ssize_t;t;21;int;t;93;0;93;df;9e807ad2
+163;I_LENGTH_EXPAND;v;9;enum FieldExpansion;m;95;0;118;df;f87e5f35
+164;FILE_MAP;v;16;enum FileUseSpec;m;26;0;29;df;ef957acf
+165;enum FileUseSpec;t;16;;n;26;0;30;df;c3d16131
+166;getchar_locked;m;4;;d;245;0;245;df;ba40469a
+167;ERR_UNKNOWN_KIND;v;19;enum ErrorCode;m;14;0;19;df;c9fa8b9f
+168;GrepCompile;p;12;reprogram *;e;132;0;132;dc;8ce9d5d0
+169;ERR_FMTREF_USAGE;v;19;enum ErrorCode;m;14;0;50;df;2ab44f5b
+170;funlockfile;p;4;void;e;207;0;207;dc;31609bbd
+171;MAXNAME;m;22;;d;15;0;15;df;f4d73872
+172;ERR_FILE_OPEN;v;19;enum ErrorCode;m;14;0;16;df;3dc179cc
+173;strpbrk;p;18;char *;e;67;0;67;dc;2ab8d30e
+174;error_file;p;6;int;e;60;0;60;dc;ee144744
+175;DEFINITION;v;22;enum Dbase;m;21;0;23;df;3cc1b0fc
+176;I_DTYPE_EXPAND;v;9;enum FieldExpansion;m;95;0;109;df;f4754506
+177;feof;p;4;int;e;169;0;169;dc;e6d81b0
+178;feof;m;4;;d;235;0;235;df;e6fe1277
+179;SYM_HLINE;v;9;enum FieldNumber;m;12;0;25;df;c5eab074
+180;fscanf;p;4;int;e;136;0;136;dc;8f91faef
+181;QUERY_H;m;12;;d;11;0;11;df;a2d3e134
+182;clean_buffer;p;15;void;e;14;0;14;dc;39a2d135
+183;FormatSpecification;t;12;struct FormatSpecification;t;32;0;36;df;654eb18b
+184;I_NAME_EXPAND;v;9;enum FieldExpansion;m;95;0;106;df;9636b666
+185;_IOMYBUF;m;4;;d;64;0;64;df;a254b93
+186;_IONBF;m;4;;d;57;0;57;df;d759da7f
+187;set_map;p;6;void;e;52;0;52;dc;c140ef69
+188;putc_locked;m;4;;d;242;0;244;df;a8e44d49
+189;reerror;p;8;void;e;47;0;47;dc;ed35395a
+190;ERROR_H;m;19;;d;11;0;11;df;4e9af0b8
+191;DB_PATH;v;6;enum PathSpec;m;15;0;17;df;14a0dd6e
+192;DEFU_HLINE;v;9;enum FieldNumber;m;12;0;52;df;dbcc889f
+193;ERR_REF_OVERFLOW;v;19;enum ErrorCode;m;14;0;41;df;d0442263
+194;strxfrm;p;18;size_t;e;61;0;61;dc;66cb266c
+195;nfree;m;5;;d;67;0;67;df;dbc66ef
+196;getpass;p;21;char *;e;178;0;178;dc;7026fe8b
+197;REFU_DINDEX1;v;9;enum FieldNumber;m;12;0;58;df;f20e7712
+198;strrchr;p;18;char *;e;68;0;68;dc;1af0c56f
+199;SYM_SCLASS;v;9;enum FieldNumber;m;12;0;23;df;96ae18b5
+200;REF_BLINE;v;9;enum FieldNumber;m;12;0;36;df;508df6d1
+201;REFU_DINDEX2;v;9;enum FieldNumber;m;12;0;71;df;4b36f408
+202;hdr;t;5;struct hdr;t;56;0;62;df;da753eb4
+203;relation;t;12;struct relation;t;70;0;74;df;5a7d9d47
+204;ERR_BAD_INDEX;v;19;enum ErrorCode;m;14;0;40;df;346f2e7
+205;USE_SEPCHAR;m;12;;d;29;0;29;df;d3df4b25
+206;SEPCHAR;m;22;;d;44;0;44;df;f7d404cd
+207;nrand48;p;21;long;e;197;0;197;dc;b0cce92d
+208;_MIPS_SIM_ABI32;m;7;;d;59;0;59;df;1eb2e3d
+209;viewref;p;12;ErrorCode;e;143;0;143;dc;7969d10c
+210;RE_MATCH;m;8;;d;13;0;13;df;4f411b02
+211;_LONGLONG;m;7;;d;132;0;132;df;6a50b6f6
+212;BNOMEM;m;5;;d;40;0;40;df;2796ec64
+213;DEFU_FILENAME;v;9;enum FieldNumber;m;12;0;42;df;74d17f23
+214;fcvt;p;21;char *;e;174;0;174;dc;76bb222f
+215;getenv;p;21;char *;e;137;0;137;dc;6a04d6f8
+216;bkey;p;5;mbuf;e;34;0;34;dc;375249a4
+217;perror;p;4;void;e;171;0;171;dc;b12aff1e
+218;L_tmpnam;m;4;;d;89;0;89;df;fc9ce415
+219;REF_DINDEX1;v;9;enum FieldNumber;m;12;0;32;df;a34efcbc
+220;REF_DINDEX2;v;9;enum FieldNumber;m;12;0;34;df;2bfe4b19
+221;ErrorCode;t;19;enum ErrorCode;t;14;0;51;df;71e6883b
+222;fileno_unlocked;m;4;;d;261;0;261;df;965f4ebf
+223;REFU_DEFFLAG1;v;9;enum FieldNumber;m;12;0;68;df;8847e2ff
+224;REFU_DEFFLAG2;v;9;enum FieldNumber;m;12;0;81;df;22e0ce1e
+225;retr_tbl;t;12;struct retr_tbl;t;76;0;80;df;16b79f6c
+226;P_tmpdir;m;4;;d;86;0;86;df;85f64945
+227;putc;p;4;int;e;155;0;155;dc;d0d0efaf
+228;putc;m;4;;d;230;0;230;df;63b18dfe
+229;NO_FLAGS;v;14;FormatFlags;e;31;0;31;dc;d6f5b7b2
+230;MAX_NUM_FIELDS;m;12;;d;69;0;69;df;ab23971
+231;_IOLBF;m;4;;d;56;0;56;df;9a13170a
+232;EOF;m;4;;d;67;0;67;df;8db89dd0
+233;FILEREF_MATCH;v;12;enum MatchSpec;m;84;0;97;df;305b1344
+234;RE_EDSTYLE;m;8;;d;11;0;11;df;f47c24af
+235;seed48;p;21;unsigned short *;e;201;0;201;dc;6ca920f
+236;rand_r;p;21;int;e;207;0;207;dc;c3d3a7bb
+237;pclose;p;4;int;e;185;0;185;dc;2ab50f8
+238;ERR_MASK;v;19;enum ErrorCode;m;14;0;28;df;185a8287
+239;FieldPair;t;12;struct FieldPair;t;54;0;61;df;1e2b26b
+240;BIOWRT;m;5;;d;39;0;39;df;ff5b5c04
+241;NULLOUT;m;12;;d;66;0;66;df;ee81794a
+242;_IOERR;m;4;;d;59;0;59;df;61117542
+243;USECHAR;m;22;;d;46;0;46;df;774e4ce4
+244;print_line;p;15;ErrorCode;e;11;0;11;dc;5b9f6c67
+245;srand48;p;21;void;e;200;0;200;dc;2989df18
+246;get_line;p;6;int;e;62;0;62;dc;f8a193b0
+247;FILE_READ;v;16;enum FileUseSpec;m;26;0;28;df;58ce06e9
+248;main;p;20;int;g;14;16;96;df;89265dea
+249;ERR_VIEWREF_USAGE;v;19;enum ErrorCode;m;14;0;45;df;846517ec
+250;mbstowcs;p;21;size_t;e;166;0;166;dc;fc89e42e
+251;enum FieldSpec;t;14;;n;33;0;39;df;9b36f51a
+252;get_num_fields;p;9;int;e;162;0;162;dc;2ab59b34
+253;get_sym_fields;p;9;void;e;168;0;168;dc;8ae8b7a1
+254;FALSE;m;22;;d;17;0;17;df;d984c84d
+255;ttyname;p;21;char *;e;190;0;190;dc;f74b4aa7
+256;DEFU_LEVEL;v;9;enum FieldNumber;m;12;0;47;df;b4f1abc4
+257;__int32_t;t;7;int;t;117;0;117;df;1d47d49c
+258;ltol3;p;21;void;e;184;0;184;dc;591d7914
+259;puts;p;4;int;e;157;0;157;dc;ac466b72
+260;__SGIDEFS_H__;m;7;;d;13;0;13;df;3a87f445
+261;INDEX;m;5;;d;69;0;69;df;4f2283ec
+262;struct MultiMatch;t;12;;n;111;0;114;df;e3da8d1f
+263;mkstemp;p;4;int;e;193;0;193;dc;ea814936
+264;putw;p;4;int;e;184;0;184;dc;4c219443
+265;SYM_CHKSUM;v;9;enum FieldNumber;m;12;0;28;df;750823fb
+266;term_pathmap;p;11;void;e;15;0;15;dc;f8363e9b
+267;strspn;p;18;size_t;e;69;0;69;dc;a8b0f6ae
+268;I_DEFFLAG_EXPAND;v;9;enum FieldExpansion;m;95;0;113;df;c6bc122e
+269;RE_EXTERNAL;m;8;;d;15;0;15;df;3156c901
+270;BERROR;m;5;;d;36;0;36;df;483afa7e
+271;treeonly;m;5;;d;72;0;72;df;28aacf4b
+272;GETOPTDONE;m;10;;d;26;0;26;df;779b716a
+273;strerror;p;18;char *;e;75;0;75;dc;6292564d
+274;SRC_PATH;v;6;enum PathSpec;m;15;0;18;df;98ff9acb
+275;_sobuf;v;4;unsigned char;e;121;0;121;dc;8ba8a7ba
+276;ERR_BUFFER_OVERFLOW;v;19;enum ErrorCode;m;14;0;25;df;b10f35a0
+277;struct relation;t;12;;n;70;0;74;df;a1a0e0a9
+278;mbuf;t;5;struct cbt_h_1;t;15;0;18;df;3c32e7de
+279;PATHMAP_H;m;11;;d;12;0;12;df;869d6893
+280;feof_locked;m;4;;d;248;0;248;df;fa1b015b
+281;enum SearchSpec;t;16;;n;18;0;23;df;90122c42
+282;getchar_unlocked;p;4;int;e;210;0;210;dc;a86971cd
+283;getchar_unlocked;m;4;;d;256;0;256;df;5faf138c
+284;EXP_SKIP;v;12;enum ExpandCode;m;18;0;22;df;f70e36bc
+285;lldiv;p;21;lldiv_t;e;159;0;159;dc;1ea87535
+286;ref;p;12;ErrorCode;e;141;0;141;dc;bae807c5
+287;putchar_locked;m;4;;d;246;0;246;df;98c62fe2
+288;REF_USAGE;v;9;enum FieldNumber;m;12;0;35;df;d6decea
+289;FieldExpansion;t;9;enum FieldExpansion;t;95;0;120;df;664f418
+290;AddMatchEntry;p;12;ErrorCode;e;131;0;131;dc;13f155d2
+291;term_index;p;16;void;e;56;0;56;dc;19abe126
+292;atexit;p;21;int;e;135;0;135;dc;9797451f
+293;_MIPS_SIM;m;20;;d;0;0;0;df;31a0bf4c
+294;struct retr_tbl;t;12;;n;76;0;80;df;779eae06
+295;I_KIND_EXPAND;v;9;enum FieldExpansion;m;95;0;116;df;208b291b
+296;NULL;m;4;;d;48;0;48;df;1bae2598
+297;record_err;p;19;ErrorCode;e;59;0;59;dc;d5f7ffaa
+298;wcstombs;p;21;size_t;e;167;0;167;dc;d804c91e
+299;REFU_KIND1;v;9;enum FieldNumber;m;12;0;60;df;6c465daa
+300;a64l;p;21;long;e;171;0;171;dc;dd5cdb97
+301;struct stdlib_h_1;t;21;;n;63;0;66;df;833d8bc5
+302;MAXSEARCHVAL;m;16;;d;41;0;41;df;5ef5f113
+303;I_SCLASS_EXPAND;v;9;enum FieldExpansion;m;95;0;117;df;a05c73e7
+304;REFU_KIND2;v;9;enum FieldNumber;m;12;0;73;df;fb15198c
+305;struct stdlib_h_2;t;21;;n;68;0;71;df;942b6321
+306;struct stdlib_h_3;t;21;;n;74;0;77;df;966e13c9
+307;print_heading;p;14;ErrorCode;e;45;0;45;dc;f6c8513e
+308;ERR_SYMBOL;v;19;enum ErrorCode;m;14;0;29;df;1324ce66
+309;RE_UPPER;m;8;;d;14;0;14;df;211b6df2
+310;fgetpos;p;4;int;e;163;0;163;dc;d3b29c80
+311;get_ref_fields;p;9;void;e;170;0;170;dc;f3aad875
+312;DEFU_DEFFLAG;v;9;enum FieldNumber;m;12;0;54;df;874aeb4a
+313;printf;p;4;int;e;138;0;138;dc;ca717145
+314;TMP_MAX;m;4;;d;78;0;78;df;8046f768
+315;ERR_BAD_KEYSET;v;19;enum ErrorCode;m;14;0;31;df;b37c1a84
+316;wctomb;p;21;int;e;164;0;164;dc;49ff8f78
+317;fputc;p;4;int;e;150;0;150;dc;69a64ca2
+318;strchr;p;18;char *;e;64;0;64;dc;340337a8
+319;mblen;p;21;int;e;163;0;163;dc;faf08156
+320;mblen;m;21;;d;211;0;211;df;29325488
+321;strtok_r;p;18;char *;e;100;0;100;dc;a47c29d4
+322;struct __file_s;t;4;;n;95;0;116;df;a0e5fc93
+323;LEV_EXPAND;v;9;enum FieldExpansion;m;95;0;97;df;1a79b8bd
+324;ERR_NONE_FOUND;v;19;enum ErrorCode;m;14;0;32;df;17cbe28f
+325;I_ELINE_EXPAND;v;9;enum FieldExpansion;m;95;0;112;df;2540ad98
+326;l64a;p;21;char *;e;183;0;183;dc;7011aa7f
+327;enum MatchSpec;t;12;;n;84;0;100;df;ab7bf6fd
+328;struct file_struct;t;9;;n;142;0;150;df;e06e9fa5
+329;ungetc;p;4;int;e;158;0;158;dc;192d349b
+330;MAXKINDLEN;m;17;;d;9;0;12;df;e61b42a2
+331;dump_formats;p;14;int;e;42;0;42;dc;d6c30fe6
+332;ClassifyIndex;p;16;SymbolType;e;59;0;59;dc;45fdc198
+333;REFU_DTYPE1;v;9;enum FieldNumber;m;12;0;63;df;777bba67
+334;lrand48;p;21;long;e;196;0;196;dc;1eea8589
+335;REFU_DTYPE2;v;9;enum FieldNumber;m;12;0;76;df;7769a05f
+336;strncasecmp;p;18;int;e;95;0;95;dc;6f394a8b
+337;memchr;p;18;void *;e;63;0;63;dc;1030697b
+338;ferror_locked;m;4;;d;249;0;249;df;f61f301f
+339;fputs;p;4;int;e;151;0;151;dc;4d8ab3a9
+340;fprintf;p;4;int;e;134;0;134;dc;52122e7c
+341;struct FormatFlags;t;14;;n;21;0;29;df;b3c2148a
+342;tempnam;p;4;char *;e;182;0;182;dc;48f32e08
+343;SYMINDEXFILE;m;22;;d;31;0;31;df;5c02de5e
+344;DEFU_KIND;v;9;enum FieldNumber;m;12;0;43;df;93ecdc02
+345;strcat;p;18;char *;e;54;0;54;dc;33b80b12
+346;debug;p;17;void;e;31;0;31;dc;8535bb9d
+347;enum SymbolType;t;16;;n;33;0;38;df;5727b432
+348;SYM_FINDEX;v;9;enum FieldNumber;m;12;0;21;df;f4379470
+349;srand;p;21;void;e;127;0;127;dc;7c68616d
+350;RAW_FIELDS;v;14;enum FieldSpec;m;33;0;36;df;d4f27447
+351;lfadr;m;5;;d;82;0;82;df;db899d3a
+352;_IOFBF;m;4;;d;55;0;55;df;d1b50cf3
+353;struct SingleMatch;t;12;;n;103;0;108;df;50da8084
+354;llabs;p;21;long long;e;158;0;158;dc;163b379e
+355;fseek;p;4;int;e;164;0;164;dc;649a8773
+356;ERR_VIEWFILE_USAGE;v;19;enum ErrorCode;m;14;0;48;df;a6d6dcda
+357;SetupKeys;p;12;ErrorCode;e;127;0;127;dc;edc75ed3
+358;system;p;21;int;e;138;0;138;dc;4baed2cd
+359;system;p;4;int;e;186;0;186;dc;4baed2cd
+360;shared;m;5;;d;73;0;73;df;63796732
+361;FileHandle;t;6;struct FileHandle;t;26;0;33;df;17a05a1f
+362;_sibuf;v;4;unsigned char;e;121;0;121;dc;1d802cb4
+363;READONLY;m;5;;d;70;0;70;df;3682d5b
+364;MAX_KEY;m;12;;d;82;0;82;df;5a4ebd86
+365;GetEnvironmentVariable;p;6;char *;e;46;0;46;dc;2f14ce69
+366;clearerr_unlocked;m;4;;d;258;0;258;df;dc93e232
+367;div;p;21;div_t;e;154;0;154;dc;825ddfcd
+368;NIL;m;17;;d;13;0;13;df;3cfb167f
+369;RCFILE;m;22;;d;29;0;29;df;f1eaa583
+370;DEFU_LENGTH;v;9;enum FieldNumber;m;12;0;44;df;aedf3d48
+371;KIND_EXPAND;v;9;enum FieldExpansion;m;95;0;99;df;2fd25496
+372;EXIT_FAILURE;m;21;;d;38;0;38;df;e775b867
+373;struct rdptr;t;5;;n;26;0;30;df;a50dfb2c
+374;exit;p;21;void;e;136;0;136;dc;675200e5
+375;SpecHeading;p;14;ErrorCode;e;48;0;48;dc;a95c7083
+376;putchar;p;4;int;e;156;0;156;dc;1fca3d95
+377;putchar;m;4;;d;232;0;232;df;d858fb0e
+378;fileno;p;4;int;e;187;0;187;dc;8018f9a7
+379;fileno;m;4;;d;237;0;237;df;d919d915
+380;ERR_NO_MAP;v;19;enum ErrorCode;m;14;0;21;df;86092f6b
+381;__STRING_H__;m;18;;d;2;0;2;df;50c0f50a
+382;gets_file;p;6;char *;e;58;0;58;dc;da824c4f
+383;dbs;v;20;char;e;12;0;12;dc;80c8c178
+384;_MIPS_ISA_MIPS1;m;7;;d;49;0;49;df;43d99c5a
+385;strcspn;p;18;size_t;e;65;0;65;dc;6672ad4e
+386;get_file_fields;p;9;void;e;169;0;169;dc;811c1f1d
+387;enum ErrorCode;t;19;;n;14;0;51;df;26f0cf99
+388;_MIPS_ISA_MIPS2;m;7;;d;50;0;50;df;36d8f714
+389;memmove;p;18;void *;e;49;0;49;dc;9130159d
+390;_MIPS_ISA_MIPS3;m;7;;d;51;0;51;df;29d851ce
+391;PutEnvironmentVariable;p;6;void;e;47;0;47;dc;ca28127f
+392;_MIPS_ISA_MIPS4;m;7;;d;52;0;52;df;1cd7ac88
+393;ERR_DEF_USAGE;v;19;enum ErrorCode;m;14;0;42;df;7d595184
+394;stringdup;p;17;char *;e;30;0;30;dc;1e6ed005
+395;stringdup;p;17;char *;e;20;0;20;dc;dc550126
+396;alloc_hdr;p;5;hdr *;e;98;0;98;dc;cf3e13b8
+397;EXIT_SUCCESS;m;21;;d;39;0;39;df;47088af
+398;struct MatchTable;t;12;;n;49;0;52;df;f08c5d93
+399;strcmp;p;18;int;e;58;0;58;dc;3488d54b
+400;_MIPS_SIM_ABI64;m;7;;d;60;0;60;df;8551ac23
+401;GrepMatch;p;12;int;e;134;0;134;dc;7e8e7281
+402;struct LineBuf;t;6;;n;36;0;39;df;f95cf646
+403;__flsbuf;p;4;int;e;174;0;174;dc;ba36fc6f
+404;qsort;p;21;void;e;142;0;143;dc;1d37f0b9
+405;SymbolToIndex;p;16;int;e;58;0;58;dc;2b4bc153
+406;OLDSYMINDEXFILE;m;22;;d;32;0;32;df;731c730e
+407;struct bfile;t;5;;n;19;0;32;df;86399ebe
+408;optopt;v;10;int;e;40;0;40;dc;a308d0ca
+409;FreePattern;p;12;void;e;133;0;133;dc;da379aa4
+410;close_file;p;6;void;e;54;0;54;dc;25bc69f4
+411;ERR_BAD_PATTERN;v;19;enum ErrorCode;m;14;0;35;df;5c7a35f4
+412;putenv;p;21;int;e;187;0;187;dc;e6a9c2da
+413;FORMAT_H;m;14;;d;11;0;11;df;d3b9cedc
+414;dkey;t;5;struct dkey;t;49;0;53;df;6130cb01
+415;BLASTE;m;5;;d;44;0;44;df;a0aafccd
+416;SYM_NAME;v;9;enum FieldNumber;m;12;0;20;df;85251b4f
+417;REFR_BLINE;v;9;enum FieldNumber;m;12;0;88;df;3f2e73da
+418;stdin;m;4;;d;91;0;91;df;7315d985
+419;memcmp;p;18;int;e;57;0;57;dc;eda74606
+420;atof;p;21;double;e;114;0;114;dc;b96eab37
+421;REF_ELINE;v;9;enum FieldNumber;m;12;0;37;df;f4c015bb
+422;__scint_t;t;7;__int32_t;t;182;0;182;df;c0173f29
+423;__psunsigned_t;t;7;__uint32_t;t;161;0;161;df;c70f090b
+424;PRINT_UNIQUE;m;14;;d;15;0;15;df;64402c02
+425;SearchStrategy;t;12;struct SearchStrategy;t;117;0;122;df;c6c4b32a
+426;fieldn;p;9;char *;e;163;0;163;dc;1fb6ab08
+427;atoi;p;21;int;e;115;0;115;dc;fba9a46b
+428;SepChar;v;9;char;e;158;0;158;dc;a5989827
+429;SCLASS_EXPAND;v;9;enum FieldExpansion;m;95;0;100;df;de0eb7d2
+430;atol;p;21;long int;e;116;0;116;dc;86e32d8a
+431;atol;p;16;long;e;64;0;64;dc;14e87a5f
+432;I_CPPLEN_EXPAND;v;9;enum FieldExpansion;m;95;0;119;df;bcf753b4
+433;REFERENCE;v;22;enum Dbase;m;21;0;22;df;fb2e4d71
+434;FILE;t;4;struct __file_s;t;95;0;116;df;4c899537
+435;SYM_BLINE;v;9;enum FieldNumber;m;12;0;24;df;b4d1dd9
+436;VIEW_H;m;13;;d;12;0;12;df;ce1de6ec
+437;CALLER_ERR_START;m;19;;d;56;0;56;df;4e7d4699
+438;erand48;p;21;double;e;195;0;195;dc;b918221
+439;abort;p;21;void;e;134;0;134;dc;44144894
+440;fopen;p;4;FILE *;e;129;0;129;dc;e4e6554e
+441;stdout;m;4;;d;92;0;92;df;f5144234
+442;__scunsigned_t;t;7;__uint32_t;t;183;0;183;df;2972245e
+443;NextSearchItem;p;16;char *;e;62;0;62;dc;3d0064a2
+444;IndexToSymbol;p;16;SymbolType;e;60;0;60;dc;93ddf1fb
+445;ERR_BAD_DBFILE;v;19;enum ErrorCode;m;14;0;34;df;96552477
+446;ldiv;p;21;ldiv_t;e;156;0;156;dc;a59553
+447;file_struct;t;9;struct file_struct;t;142;0;150;df;63f807b0
+448;MAXKLEN;m;5;;d;7;0;7;df;bc7d9d9
+449;I_PROC_EXPAND;v;9;enum FieldExpansion;m;95;0;115;df;7c0fd5b5
+450;recomp;p;8;reprogram *;e;44;0;44;dc;45f8ffea
+451;atoll;p;21;long long int;e;121;0;121;dc;5c68070f
+452;SpecData;p;14;ErrorCode;e;49;0;49;dc;6d41fc56
+453;LOGFILE;m;22;;d;35;0;35;df;b2276ae5
+454;NOTFOUND;m;5;;d;95;0;95;df;a9252116
+455;free;p;21;void;e;130;0;130;dc;4a17ec30
+456;RE_LOWER;m;8;;d;12;0;12;df;91a0df15
+457;DEFU_BLINE;v;9;enum FieldNumber;m;12;0;51;df;71f70c1b
+458;FieldDescription;v;14;FormatSpecification;e;52;0;52;dc;c54ebee7
+459;mbtowc;p;21;int;e;162;0;162;dc;e1c0a7cc
+460;stderr;m;4;;d;93;0;93;df;11d04e56
+461;ERR_NO_SPACE;v;19;enum ErrorCode;m;14;0;26;df;3bb6b1e0
+462;abs;p;21;int;e;151;0;151;dc;fe338af8
+463;FormatFlags;t;14;struct FormatFlags;t;21;0;29;df;e97b042f
+464;init_index;p;16;ErrorCode;e;55;0;55;dc;7b5c2ebe
+465;SHARED;m;5;;d;68;0;68;df;f35600df
+466;rand;p;21;int;e;126;0;126;dc;4b8a2b90
+467;__STDLIB_H__;m;21;;d;2;0;2;df;99046bdd
+468;INDEX_NONE;v;16;enum SearchSpec;m;18;0;19;df;ccfd1489
+469;MAXMAP;m;6;;d;42;0;42;df;2b0330c5
+470;INDEX_SYM;v;16;enum SearchSpec;m;18;0;20;df;2c7792b7
+471;jrand48;p;21;long;e;199;0;199;dc;66b0b8c9
+472;ecvt;p;21;char *;e;173;0;173;dc;951604fe
+473;PRINT;m;14;;d;14;0;14;df;63360e38
+474;SingleMatch;t;12;struct SingleMatch;t;103;0;108;df;1f3f840a
+475;setbuf;p;4;void;e;131;0;131;dc;d87e2aa1
+476;strtoull;p;21;unsigned long long int;e;123;0;123;dc;7fe356c4
+477;ERR_UNKNOWN_RELATION;v;19;enum ErrorCode;m;14;0;18;df;2b23bb22
+478;GenerateCurrKeys;p;12;ErrorCode;e;128;0;128;dc;351d6d1c
+479;struct cbt_h_1;t;5;;n;15;0;18;df;6d732428
+480;DEFU_SCLASS;v;9;enum FieldNumber;m;12;0;50;df;885c1b7e
+481;mktemp;p;21;char *;e;186;0;186;dc;5ae68975
+482;mktemp;p;4;char *;e;192;0;192;dc;5ae68975
+483;struct cbt_h_2;t;5;;n;63;0;66;df;91bb948e
+484;interp_err;p;19;ErrorCode;e;58;0;58;dc;453d8405
+485;GetFieldDescriptor;p;12;FormatSpecification *;e;145;0;145;dc;aaaa41e4
+486;struct FieldPair;t;12;;n;54;0;61;df;c1f32086
+487;LEVEL_VIEWPATH;m;12;;d;15;0;15;df;474a5a6e
+488;struct cbt_h_3;t;5;;n;76;0;80;df;2f0ad62d
+489;Dbase;t;22;enum Dbase;t;21;0;24;df;7863a88e
+490;SYM_DEFFLAG;v;9;enum FieldNumber;m;12;0;27;df;8d54df85
+491;ALL_FIELDS;v;14;enum FieldSpec;m;33;0;34;df;bf8c6e62
+492;__iob;v;4;FILE;e;118;0;118;dc;233e3ddb
+493;struct dkey;t;5;;n;49;0;53;df;12877c18
+494;FNAME_EXPAND;v;9;enum FieldExpansion;m;95;0;98;df;e2acc370
+495;REGTYPE;m;12;;d;38;0;38;df;8468bf73
+496;symbol_struct;t;9;struct symbol_struct;t;126;0;140;df;d446888f
+497;setlinebuf;p;4;int;e;195;0;195;dc;fe5c882f
+498;ferror;p;4;int;e;170;0;170;dc;681fcd32
+499;ferror;m;4;;d;236;0;236;df;84979eab
+500;DEFU_CPPLENGTH;v;9;enum FieldNumber;m;12;0;45;df;83b059c6
+501;rematch;t;8;struct re_h_1;t;19;0;23;df;50622aa6
+502;SYM_OK;v;16;enum SymbolType;m;33;0;35;df;d0ba5d2f
+503;mustwrite;m;5;;d;83;0;83;df;2568bbac
+504;REFU_CHKSUM1;v;9;enum FieldNumber;m;12;0;69;df;7f7393b6
+505;INDEX_H;m;16;;d;11;0;11;df;a968edd6
+506;ERR_BAD_VPATH;v;19;enum ErrorCode;m;14;0;37;df;8959d10
+507;REFU_CHKSUM2;v;9;enum FieldNumber;m;12;0;82;df;53cecf52
+508;ERR_FILE_CLOSE;v;19;enum ErrorCode;m;14;0;22;df;63c26059
+509;DATADIR;m;22;;d;39;0;39;df;71fb0735
+510;viewdef;p;12;ErrorCode;e;142;0;142;dc;2f72daee
+511;strtoul;p;21;unsigned long int;e;119;0;119;dc;146033ff
+512;opterr;v;10;int;e;38;0;38;dc;577f7e20
+513;fclose;p;4;int;e;127;0;127;dc;8878383e
+514;RE_ALL;m;8;;d;10;0;10;df;e0ddd31
+515;ferror_unlocked;m;4;;d;260;0;260;df;974c1202
+516;next_bufline;p;15;char *;e;18;0;18;dc;f2cc7e0f
+517;EXP_ERR;v;12;enum ExpandCode;m;18;0;21;df;be77cfe0
+518;LineBuf;t;6;struct LineBuf;t;36;0;39;df;1c5c429e
+519;read_line;p;9;char *;e;166;0;166;dc;4eb38ab0
+520;init_pathmap;p;11;ErrorCode;e;14;0;14;dc;f0432b3
+521;get_format;p;14;int;e;43;0;43;dc;9f0ccb3
+522;get_bufline;p;15;char *;e;17;0;17;dc;b6cd1fbb
+523;SYMFILE;m;22;;d;27;0;27;df;770a15
+524;labs;p;21;long int;e;155;0;155;dc;fa760c3f
+525;BRDERR;m;5;;d;43;0;43;df;38ddeafa
+526;ldiv_t;t;21;struct stdlib_h_2;t;68;0;71;df;ed1d01e9
+527;memset;p;18;void *;e;74;0;74;dc;fdd1aab2
+528;strncat;p;18;char *;e;55;0;55;dc;74583c5a
+529;BUTRAN;m;5;;d;37;0;37;df;d6c3c4a7
+530;BNOWRITE;m;5;;d;38;0;38;df;1fd982a8
+531;I_LEV_EXPAND;v;9;enum FieldExpansion;m;95;0;107;df;89207ea8
+532;setbuffer;p;4;int;e;194;0;194;dc;70c25c04
+533;open_btree;p;6;bfile *;e;51;0;51;dc;8652301e
+534;open_btree;p;6;bfile *;e;49;0;49;dc;8652301e
+535;DEFU_CHKSUM;v;9;enum FieldNumber;m;12;0;55;df;4ce1181d
+536;malloc;p;21;void *;e;131;0;131;dc;be14d9f6
+537;__filbuf;p;4;int;e;173;0;173;dc;e9e07c72
+538;_SIZE_T;m;4;;d;36;0;36;df;ef4f7234
+539;ERR_NO_INDEX;v;19;enum ErrorCode;m;14;0;38;df;3a29e839
+540;MultiMatch;t;12;struct MultiMatch;t;111;0;114;df;ea7a1631
+541;bsearch;p;21;void *;e;140;0;141;dc;bc19c81f
+542;ExpandCode;t;12;enum ExpandCode;t;18;0;23;df;70508d6b
+543;SYM_DINDEX;v;9;enum FieldNumber;m;12;0;15;df;3b19e09f
+544;getc_file;p;6;int;e;59;0;59;dc;fd89cae0
+545;fsetpos;p;4;int;e;165;0;165;dc;862ebb04
+546;L_ctermid;m;4;;d;81;0;81;df;323a7952
+547;SEEK_SET;m;4;;d;74;0;74;df;d9d12974
+548;ERR_STACK_OVERFLOW;v;19;enum ErrorCode;m;14;0;36;df;cf233116
+549;ERR_FILE_READ;v;19;enum ErrorCode;m;14;0;30;df;8ff9f2
+550;FieldNumber;t;9;enum FieldNumber;t;12;0;90;df;e48a1a7d
+551;I_CHKSUM_EXPAND;v;9;enum FieldExpansion;m;95;0;114;df;7f48c8ba
+552;L_cuserid;m;4;;d;82;0;82;df;d825f461
+553;DEF_MATCH;v;12;enum MatchSpec;m;84;0;86;df;89e62628
+554;_lastbuf;v;4;FILE *;e;119;0;119;dc;a68de0cf
+555;term_err;p;19;void;e;61;0;61;dc;9347eb05
+556;sprintf;p;4;int;e;142;0;142;dc;e0c09af
+557;fpos_t;t;4;long;t;45;0;45;df;df58eed1
+558;MAX_REL_NAME;m;12;;d;68;0;68;df;610575d0
+559;struct re_h_1;t;8;;n;19;0;23;df;fbd776f7
+560;realloc;p;21;void *;e;132;0;132;dc;f92366a3
+561;struct re_h_2;t;8;;n;31;0;34;df;f7580b4c
+562;def;p;12;ErrorCode;e;140;0;140;dc;70f111a7
+563;enum Dbase;t;22;;n;21;0;24;df;ec061bae
+564;BUFFER;m;14;;d;16;0;16;df;b08bc9dc
+565;REFR_FILENAME;v;9;enum FieldNumber;m;12;0;87;df;e15e8a47
+566;fatal;p;17;void;e;29;0;29;dc;ed659a86
+567;fmtline;p;14;ErrorCode;e;47;0;47;dc;4c65eb0b
+568;struct MatchTableEntry;t;12;;n;40;0;47;df;424313da
+569;_IOWRT;m;4;;d;62;0;62;df;da985bd4
+570;ERR_BAD_BTFILE;v;19;enum ErrorCode;m;14;0;39;df;1d4fff65
+571;optarg;v;10;char *;e;37;0;37;dc;bc95f880
+572;LookupStrategy;p;12;SearchStrategy *;e;124;0;124;dc;6a9a1548
+573;ERR_VIEWHEAD_USAGE;v;19;enum ErrorCode;m;14;0;46;df;4f981897
+574;l3tol;p;21;void;e;182;0;182;dc;20647d14
+575;dup2;p;21;int;e;172;0;172;dc;2503f56d
+576;_WCHAR_T;m;21;;d;101;0;101;df;7cdee373
+577;vfprintf;p;4;int;e;145;0;145;dc;2d05a7ff
+578;strncmp;p;18;int;e;60;0;60;dc;25785c7b
+579;setvbuf;p;4;int;e;132;0;132;dc;f9eaa7c0
+580;LINEBUF_SIZE;m;6;;d;35;0;35;df;c670249a
+581;FNAMELEN;m;5;;d;103;0;103;df;43bdb07e
+582;getc_unlocked;p;4;int;e;208;0;208;dc;88f1e708
+583;getc_unlocked;m;4;;d;253;0;253;df;7ce68e53
+584;ERR_REF_USAGE;v;19;enum ErrorCode;m;14;0;43;df;fff82e3
+585;remove;p;4;int;e;123;0;123;dc;bca016ae
+586;allocate;m;17;;d;14;0;14;df;66f86c1a
+587;__STDIO_H__;m;4;;d;2;0;2;df;9ea27c1
+588;SYM_KIND;v;9;enum FieldNumber;m;12;0;17;df;426dd85b
+589;MAX_FIELD_NAME;m;12;;d;31;0;31;df;9cb546ff
+590;_SSIZE_T;m;21;;d;91;0;91;df;8c7bf264
+591;getopt;p;10;int;e;34;0;34;dc;af6e477f
+592;NO_EXPAND;v;9;enum FieldExpansion;m;95;0;96;df;fdfb4265
+593;__GETOPT_H__;m;10;;d;2;0;2;df;8a2b8026
+594;strcpy;p;18;char *;e;50;0;50;dc;6ce056ae
+595;scanf;p;4;int;e;140;0;140;dc;76ae7cd0
+596;DEFU_PROC;v;9;enum FieldNumber;m;12;0;56;df;e0ed3cc0
+597;GETOPTHUH;m;10;;d;32;0;32;df;7fe7fcf5
+598;INDEX_FROM;v;16;enum SearchSpec;m;18;0;21;df;d9fb11ad
+599;FILE_H;m;6;;d;11;0;11;df;d35dc4c9
+600;bopen;p;5;bfile *;e;33;0;33;dc;89981546
+601;fflush;p;4;int;e;128;0;128;dc;3916af8a
+602;errno;v;5;int;e;45;0;45;dc;d2fe3795
+603;HOME_PATH;v;6;enum PathSpec;m;15;0;19;df;78454b1f
+604;getc_locked;m;4;;d;240;0;241;df;305c543f
+605;optind;v;10;int;e;39;0;39;dc;3d6be7a2
+606;MB_CUR_MAX;m;21;;d;112;0;112;df;99fb2c36
+607;BFATAL;m;5;;d;41;0;41;df;bed04451
+608;DKEYSZ;m;5;;d;54;0;54;df;65a2b9c3
+609;REF_KIND1;v;9;enum FieldNumber;m;12;0;31;df;16114d8c
+610;DEFU_FINDEX;v;9;enum FieldNumber;m;12;0;48;df;eb78c37f
+611;mrand48;p;21;long;e;198;0;198;dc;de560802
+612;memcpy;p;18;void *;e;48;0;48;dc;c3a3fe2d
+613;SELECTOR;t;17;struct retr_tbl;t;15;0;15;df;83433e5e
+614;REF_KIND2;v;9;enum FieldNumber;m;12;0;33;df;a55cf206
+615;__semgetc;p;4;int;e;200;0;200;dc;17db3c47
+616;size_t;t;4;unsigned int;t;38;0;38;df;86189e7
+617;strtod;p;21;double;e;117;0;117;dc;5852b738
+618;_IOREAD;m;4;;d;61;0;61;df;161ff0ff
+619;strtoll;p;21;long long int;e;122;0;122;dc;d857859d
+620;REFU_SCLASS1;v;9;enum FieldNumber;m;12;0;64;df;494eb17b
+621;ttyname_r;p;21;char *;e;208;0;208;dc;c28f6077
+622;CONDENSE_FIELDS;v;14;enum FieldSpec;m;33;0;38;df;5b5d6060
+623;REFU_SCLASS2;v;9;enum FieldNumber;m;12;0;77;df;6b5b5745
+624;NDSZ;m;5;;d;5;0;5;df;4ac290c2
+625;init_err;p;19;void;e;60;0;60;dc;ed3e7821
+626;strtok;p;18;char *;e;72;0;72;dc;81532918
+627;REFR_ELINE;v;9;enum FieldNumber;m;12;0;89;df;f0727837
+628;strtol;p;21;long int;e;118;0;118;dc;5afa2140
+629;strlen;p;18;size_t;e;76;0;76;dc;d3035d7a
+630;strcasecmp;p;18;int;e;94;0;94;dc;f0c5f43b
+631;EXPAND_USE_FIELDS;v;14;enum FieldSpec;m;33;0;37;df;b8b01197
+632;I_BLINE_EXPAND;v;9;enum FieldExpansion;m;95;0;110;df;9cbe3278
+633;realpath;p;21;char *;e;188;0;188;dc;62f7acbc
+634;_MIPS_ISA;m;20;;d;0;0;0;df;75750ff5
+635;stamped;m;5;;d;101;0;101;df;2bb877fd
+636;struct relation_struct;t;9;;n;152;0;156;df;38a82ee0
+637;get_buflen;p;15;int;e;16;0;16;dc;602b3bee
+638;enum FieldExpansion;t;9;;n;95;0;120;df;1d2e58d9
+639;FileUseSpec;t;16;enum FileUseSpec;t;26;0;30;df;71dbcf8
+640;strdup;p;18;char *;e;86;0;86;dc;4f1a18b1
+641;REFU_USAGE;v;9;enum FieldNumber;m;12;0;84;df;d22da00a
+642;getlogin;p;21;char *;e;176;0;176;dc;65dacff7
+643;BUFFER_H;m;15;;d;10;0;10;df;78b9546d
+644;SYM_ELINE;v;9;enum FieldNumber;m;12;0;26;df;94074fd
+645;INFOVIEW_VERSION;m;22;;d;9;0;9;df;ea1765e4
+646;bf_type;m;5;;d;71;0;71;df;73a4d522
+647;__ctype;v;21;unsigned char;e;110;0;110;dc;a7830ee3
+648;gcvt;p;21;char *;e;180;0;180;dc;77b01386
+649;REFU_PROC1;v;9;enum FieldNumber;m;12;0;70;df;47e4a835
+650;putc_unlocked;p;4;int;e;209;0;209;dc;7c7bc13c
+651;putc_unlocked;m;4;;d;254;0;255;df;d6f0330c
+652;REFU_PROC2;v;9;enum FieldNumber;m;12;0;83;df;5a45d34e
+653;freopen;p;4;FILE *;e;130;0;130;dc;2ce04523
+654;DEFU_ELINE;v;9;enum FieldNumber;m;12;0;53;df;52388b69
+655;sscanf;p;4;int;e;144;0;144;dc;821eb53a
+656;FOUND;m;5;;d;96;0;96;df;1eb0087f
+657;NextKeySet;p;12;ErrorCode;e;129;0;129;dc;818215a7
+658;VIEW;m;14;;d;17;0;17;df;d70791ca
+659;fwrite;p;4;size_t;e;161;0;161;dc;46b0f7b5
+660;print_data;p;14;ErrorCode;e;46;0;46;dc;c7b64839
+661;PGMDIR;m;22;;d;40;0;40;df;59d03fb4
+662;MatchTableEntry;t;12;struct MatchTableEntry;t;40;0;47;df;ba3c641c
+663;ERR_FMTDEF_USAGE;v;19;enum ErrorCode;m;14;0;49;df;3fb08917
+664;ndaddr;t;5;long;t;13;0;13;df;5f07991b
+665;reprogram;t;8;struct re_h_2;t;31;0;34;df;f4925480
+666;strcoll;p;18;int;e;59;0;59;dc;f627ecaa
+667;SEEK_END;m;4;;d;76;0;76;df;a3e22301
+668;ERR_UNKNOWN_DESC;v;19;enum ErrorCode;m;14;0;23;df;a5b9e2b4
+669;MatchTable;t;12;struct MatchTable;t;49;0;52;df;e504e4aa
+670;SYM_ERROR;v;16;enum SymbolType;m;33;0;34;df;e0ad5ab6
+671;fileno_locked;m;4;;d;250;0;250;df;e4327891
+672;dup_file;p;6;FileHandle *;e;53;0;53;dc;262679c
+673;memccpy;p;18;void *;e;81;0;81;dc;146c7098
+674;SearchSpec;t;16;enum SearchSpec;t;18;0;23;df;48211135
+675;HEADER_MAGIC1;m;5;;d;99;0;99;df;7249e700
+676;FILE_NONE;v;16;enum FileUseSpec;m;26;0;27;df;39e0df90
+677;Copyright;v;22;char *;s;11;0;11;df;52dcd9ff
+678;cbt_alloc;m;5;;d;100;0;100;df;8ce5cc8a
+679;_IORW;m;4;;d;63;0;63;df;f1e04253
+680;getlpid;p;5;long;e;88;0;88;dc;83029f58
+681;MXHT;m;5;;d;12;0;12;df;f06347db
+682;ctermid_r;p;4;char *;e;205;0;205;dc;81244b63
+683;valloc;p;21;void *;e;192;0;192;dc;31c0730f
+684;getc;p;4;int;e;152;0;152;dc;657cc273
+685;getc;m;4;;d;229;0;229;df;1e107ef0
+686;I_FILE_EXPAND;v;9;enum FieldExpansion;m;95;0;108;df;5e47fb01
+687;putchar_unlocked;p;4;int;e;211;0;211;dc;e396d0a2
+688;putchar_unlocked;m;4;;d;257;0;257;df;cec68944
+689;popen;p;4;FILE *;e;179;0;179;dc;7af19a98
+690;SYM_DTYPE;v;9;enum FieldNumber;m;12;0;22;df;696f49de
+691;REFU_BLINE1;v;9;enum FieldNumber;m;12;0;65;df;abb6da4c
+692;vprintf;p;4;int;e;146;0;146;dc;60732980
+693;REFU_BLINE2;v;9;enum FieldNumber;m;12;0;78;df;14ba5c0
+694;I_HLINE_EXPAND;v;9;enum FieldExpansion;m;95;0;111;df;8e54d4e9
+695;ERR_BAD_FORMAT;v;19;enum ErrorCode;m;14;0;20;df;69d77bad
+696;ERR_BAD_BREAD;v;19;enum ErrorCode;m;14;0;33;df;13dec4e8
+697;open_file;p;6;FileHandle *;e;50;0;50;dc;dda693fa
+698;readonly;m;5;;d;74;0;74;df;59997164
+699;print_line_unique;p;15;ErrorCode;e;12;0;12;dc;cab30c0
+700;read_file;p;6;long;e;55;0;55;dc;c5db3c13
+701;clearerr;p;4;void;e;168;0;168;dc;f1662440
+702;clearerr;m;4;;u;233;0;233;ud;d092e9bc
+703;REFFILE;m;22;;d;28;0;28;df;e101dc61
+704;DEFAULT_FIELDS;v;14;enum FieldSpec;m;33;0;35;df;d91ac7a4
+705;SEEK_CUR;m;4;;d;75;0;75;df;dbdcae83
+706;BeginSearch;p;16;ErrorCode;e;61;0;61;dc;cda7973b
+707;get_fieldn;p;9;char *;e;164;0;164;dc;2e15aadb
+708;struct symbol_struct;t;9;;n;126;0;140;df;8a431044
+709;DEFU_DTYPE;v;9;enum FieldNumber;m;12;0;49;df;db76a54e
+710;gets;p;4;char *;e;154;0;154;dc;db0a0440
+711;_IOEOF;m;4;;d;58;0;58;df;2732e0b9
+712;ERR_BAD_SELECTOR;v;19;enum ErrorCode;m;14;0;24;df;10437311
+713;__cplusplus;m;2;;n;0;0;0;dc;10004504
+714;_SVR4_SOURCE;m;2;;n;0;0;0;dc;10004504
+715;_LANGUAGE_ASSEMBLY;m;2;;n;0;0;0;dc;10004504
+716;_SGI_REENTRANT_FUNCTIONS;m;2;;n;0;0;0;dc;10004504
+717;_LANGUAGE_C_PLUS_PLUS;m;2;;n;0;0;0;dc;10004504
+718;TEST;m;2;;n;0;0;0;dc;10004504
+719;_ABI_SOURCE;m;2;;n;0;0;0;dc;10004504
+720;_MIPS_SZLONG;m;2;;n;0;0;0;dc;10004504
+721;FILE;m;2;;n;0;0;0;dc;10004504
+722;_XOPEN_SOURCE;m;2;;n;0;0;0;dc;10004504
+723;__INLINE_INTRINSICS;m;2;;n;0;0;0;dc;10004504
+724;_POSIX_SOURCE;m;2;;n;0;0;0;dc;10004504
+725;_SIZE_T_;m;2;;n;0;0;0;dc;10004504
+726;__STDC__;m;2;;n;0;0;0;dc;10004504
+727;_LANGUAGE_C;m;2;;n;0;0;0;dc;10004504
+728;_SGI_SOURCE;m;2;;n;0;0;0;dc;10004504
+729;_MIPS_SZPTR;m;2;;n;0;0;0;dc;10004504
+730;_SGI_MP_SOURCE;m;2;;n;0;0;0;dc;10004504
+731;lint;m;2;;n;0;0;0;dc;10004504
+732;_MIPS_SZINT;m;2;;n;0;0;0;dc;10004504
+733;_LINT;m;2;;n;0;0;0;dc;10004504
+734;DEBUG;m;2;;n;0;0;0;dc;10004504
+735;TRANFILE;m;2;;n;0;0;0;dc;10004504
+736;c_plusplus;m;2;;n;0;0;0;dc;10004504
+737;ciafan.c;f;737;;n;1;2326;159;df;51eeb4bb
+738;user_format.h;f;738;;n;1;435;33;df;1754c6e5
+739;/usr/include/sys/types.h;f;739;;n;1;402;336;df;f91bb092
+740;/usr/include/sys/select.h;f;740;;n;1;66;66;df;8fe695be
+741;int32_t;t;739;__int32_t;t;183;0;183;df;f368fb98
+742;defined;m;737;;u;0;0;0;ud;d521d18e
+743;ushort_t;t;739;unsigned short;t;33;0;33;df;14cb8912
+744;FD_SETSIZE;m;740;;d;38;0;38;df;565c4979
+745;uid_t;t;739;long;t;100;0;100;df;e038a3ce
+746;NODEV;m;739;;d;207;0;207;df;c3f722fa
+747;_SYS_TYPES_H;m;739;;d;25;0;25;df;cb648f79
+748;mode_t;t;739;unsigned long;t;98;0;98;df;7dc37b33
+749;u_int16_t;t;739;unsigned short;t;185;0;185;df;12e20a68
+750;fpreg_t;t;739;__uint32_t;t;223;0;223;df;939684be
+751;major_t;t;739;ulong_t;t;70;0;70;df;a64800f6
+752;FD_ZERO;m;740;;d;64;0;64;df;49ec4af8
+753;user_print_line;p;738;void;e;27;0;27;dc;7797de3c
+754;LEFT_JUST;v;738;enum user_format_h_2;m;16;0;16;df;6c840f67
+755;struct _quad;t;739;;n;179;0;179;df;b6a8f98b
+756;o_ino_t;t;739;__uint32_t;t;95;0;95;df;9af55efe
+757;struct fd_set;t;740;;n;57;0;59;df;207bc55
+758;uint;t;739;unsigned int;t;175;0;175;df;725b38cf
+759;uchar_t;t;739;unsigned char;t;32;0;32;df;a41910e4
+760;_SYS_SELECT_H;m;740;;d;27;0;27;df;f6fa19e9
+761;swblk_t;t;739;long;t;116;0;116;df;1f3d2ad9
+762;struct user_field;t;738;;n;11;0;18;df;f684dd44
+763;id_t;t;739;long;t;57;0;57;df;620d6c2c
+764;uint_t;t;739;unsigned int;t;34;0;34;df;f2cc1a44
+765;enum user_format_h_1;t;738;;n;15;0;15;df;c57ae5da
+766;enum user_format_h_2;t;738;;n;16;0;16;df;8b4e978f
+767;UFORMAT;t;738;struct user_format;t;20;0;23;df;a648b75e
+768;inst_t;t;739;__uint32_t;t;193;0;193;df;cbd81eeb
+769;off_t;t;739;long;t;117;0;117;df;84fe9f67
+770;use_t;t;739;unsigned char;t;120;0;120;df;6fcdc374
+771;key_t;t;739;int;t;119;0;119;df;3258503
+772;B_TRUE;v;739;enum types_h_1;m;45;0;45;df;48e4babc
+773;computefan;p;737;int;s;43;46;105;df;6daad279
+774;computefan;p;737;int;s;15;0;15;dc;df316c37
+775;int16_t;t;739;short;t;182;0;182;df;7824e7cd
+776;ciafan_flags;v;737;int;s;19;0;19;df;2896becc
+777;addr_t;t;739;char *;t;38;0;38;df;87c10ff9
+778;o_mode_t;t;739;ushort_t;t;89;0;89;df;de486f4a
+779;USER_SEP;m;738;;d;9;0;9;df;4b36db32
+780;hostid_t;t;739;long;t;235;0;235;df;1316f6b6
+781;NBBY;m;740;;d;42;0;42;df;19f154d0
+782;pfn_t;t;739;__uint32_t;t;42;0;42;df;682cc194
+783;nlink_t;t;739;unsigned long;t;102;0;102;df;d6077ee7
+784;ino_t;t;739;unsigned long;t;104;0;104;df;86036ff
+785;machreg_t;t;739;unsigned;t;213;0;213;df;6daf3d68
+786;P_MYID;m;739;;d;188;0;188;df;af66fb27
+787;daddr_t;t;739;long;t;40;0;40;df;b82b62e5
+788;FD_CLR;m;740;;d;62;0;62;df;a542128e
+789;struct types_h_1;t;739;;n;266;0;268;df;74a9c192
+790;struct types_h_2;t;739;;n;170;0;170;df;fe89f8c2
+791;minor_t;t;739;ulong_t;t;71;0;71;df;c0af8262
+792;pgno_t;t;739;long;t;41;0;41;df;d61efc75
+793;STRING;v;738;enum user_format_h_1;m;15;0;15;df;43ed5f20
+794;bitnum_t;t;739;__scunsigned_t;t;161;0;161;df;3732ce98
+795;struct user_format;t;738;;n;20;0;23;df;59b0a815
+796;lock_t;t;739;unsigned int;t;123;0;123;df;9486de05
+797;fan;p;737;int;s;107;113;149;df;2edfcf4e
+798;fan;p;737;int;s;17;0;17;dc;ff4752cf
+799;FANIN;m;737;;d;12;0;12;df;d9139af7
+800;index_t;t;739;short;t;122;0;122;df;74d37ac3
+801;o_nlink_t;t;739;short;t;93;0;93;df;72c66057
+802;ulong;t;739;unsigned long;t;177;0;177;df;af5e2e03
+803;FANOUT;m;737;;d;13;0;13;df;8174b0a4
+804;P_MYHOSTID;m;739;;d;243;0;243;df;5e6d4941
+805;o_dev_t;t;739;short;t;90;0;90;df;2ff18ce8
+806;boolean_t;t;739;enum types_h_1;t;45;0;45;df;696a177e
+807;u_char;t;739;unsigned char;t;172;0;172;df;fc1e5e3
+808;qaddr_t;t;739;long *;t;192;0;192;df;f65443a1
+809;ushort;t;739;unsigned short;t;173;0;173;df;ed61227d
+810;processorid_t;t;739;int;t;165;0;165;df;50bb33b7
+811;k_fltset_t;t;739;__uint32_t;t;269;0;269;df;d7af7b0d
+812;u_long;t;739;unsigned long;t;178;0;178;df;fd241e27
+813;fancount;v;737;int;s;18;0;18;df;1cfe436
+814;fd_mask;t;740;unsigned long;t;46;0;46;df;7ebee555
+815;increment;p;737;int;s;151;154;159;df;6eb02b46
+816;increment;p;737;int;s;16;0;16;dc;9aeccd95
+817;ulong_t;t;739;unsigned long;t;35;0;35;df;bce7c38
+818;_MIPS_SIM;m;737;;d;0;0;0;df;31a0bf4c
+819;P_MYPID;m;739;;d;196;0;196;df;83bc8a0d
+820;u_short;t;739;unsigned short;t;174;0;174;df;33e76179
+821;FD_SET;m;740;;d;61;0;61;df;8181aa8c
+822;_CLOCK_T;m;739;;d;152;0;152;df;32c875e2
+823;caddr_t;t;739;char *;t;39;0;39;df;5e64311
+824;NOPID;m;739;;d;204;0;204;df;947f1e16
+825;B_FALSE;v;739;enum types_h_1;m;45;0;45;df;3dda9044
+826;dbs;v;737;char;e;21;0;21;dc;80c8c178
+827;o_pid_t;t;739;short;t;94;0;94;df;4e89df6
+828;howmany;m;740;;d;54;0;54;df;e05ebb6
+829;o_gid_t;t;739;o_uid_t;t;92;0;92;df;928ace32
+830;dev_t;t;739;unsigned long;t;99;0;99;df;a87d2478
+831;FD_ISSET;m;740;;d;63;0;63;df;c0fdb23a
+832;u_int32_t;t;739;__uint32_t;t;186;0;186;df;204da738
+833;pl_t;t;739;int (*)();t;245;0;245;df;b334c14e
+834;NFDBITS;m;740;;d;52;0;52;df;6d0a5e85
+835;MID_JUST;v;738;enum user_format_h_2;m;16;0;16;df;23ea71f
+836;o_uid_t;t;739;ushort_t;t;91;0;91;df;b372dd92
+837;_TIME_T;m;739;;d;147;0;147;df;8001f9b8
+838;fd_set;t;740;struct fd_set;t;57;0;59;df;d41ebf58
+839;unchar;t;739;unsigned char;t;171;0;171;df;4cb836ba
+840;paddr_t;t;739;unsigned long;t;118;0;118;df;ebf4ead6
+841;physadr;t;739;struct types_h_2 *;t;170;0;170;df;3bdf37a7
+842;bitlen_t;t;739;__scunsigned_t;t;162;0;162;df;5c996a5f
+843;INT;v;738;enum user_format_h_1;m;15;0;15;df;b08d0fd2
+844;enum types_h_1;t;739;;n;45;0;45;df;23481d16
+845;ciafan;p;737;ErrorCode;g;23;29;38;df;145f9608
+846;user_print_header;p;738;void;e;26;0;26;dc;eb58be8d
+847;clock_t;t;739;long;t;153;0;153;df;b8eb0cca
+848;u_int8_t;t;739;unsigned char;t;184;0;184;df;f963817d
+849;RIGHT_JUST;v;738;enum user_format_h_2;m;16;0;16;df;9386e15d
+850;k_sigset_t;t;739;struct types_h_1;t;266;0;268;df;a2be7618
+851;time_t;t;739;long;t;148;0;148;df;e21a2370
+852;sysid_t;t;739;short;t;121;0;121;df;89f1f3ff
+853;quad;t;739;struct _quad;t;179;0;179;df;ac0a47d2
+854;_MIPS_ISA;m;737;;d;0;0;0;df;75750ff5
+855;int8_t;t;739;char;t;181;0;181;df;882bccf2
+856;u_int;t;739;unsigned int;t;176;0;176;df;b086b663
+857;UFIELD;t;738;struct user_field;t;11;0;18;df;43489b63
+858;pid_t;t;739;long;t;103;0;103;df;213bde31
+859;toid_t;t;739;int;t;166;0;166;df;c8ba477f
+860;cpuid_t;t;739;signed char;t;124;0;124;df;f9767f91
+861;cnt_t;t;739;short;t;43;0;43;df;bd8ac16e
+862;gid_t;t;739;long;t;101;0;101;df;9641adb0
+863;_BSD_TYPES;m;2;;n;0;0;0;dc;10004504
+864;_STANDALONE;m;2;;n;0;0;0;dc;10004504
+865;_BSD_COMPAT;m;2;;n;0;0;0;dc;10004504
+866;_KMEMUSER;m;2;;n;0;0;0;dc;10004504
+867;_KERNEL;m;2;;n;0;0;0;dc;10004504
+868;__mips;m;2;;n;0;0;0;dc;10004504
+869;_MIPS_FPSET;m;2;;n;0;0;0;dc;10004504
+870;util.c;f;870;;n;1;2068;46;df;ad6a23f6
+871;defined;m;870;;u;0;0;0;ud;d521d18e
+872;MAX_DEBUG_LEVELS;m;870;;d;38;0;38;df;29eb778a
+873;_MIPS_SIM;m;870;;d;0;0;0;df;31a0bf4c
+874;debug;p;870;void;g;33;36;45;df;6a17bf69
+875;dbs;v;870;char;g;11;0;11;df;cd3e02a7
+876;stringdup;p;870;char *;g;21;23;31;df;c04f1580
+877;fatal;p;870;void;g;13;15;19;df;5561e5
+878;_MIPS_ISA;m;870;;d;0;0;0;df;75750ff5
+879;expand_kwd;p;2;;n;0;0;0;dc;1000455c
+880;expand_selector;p;2;;n;0;0;0;dc;1000455c
+DIRECTORY
+ .SCHEMA. 35 1034 DATE=754865466 MODE=0644
+;REFERENCE;1079;7857;DATE=753978523;MODE=0644
+;SYMBOL;8943;42904;DATE=753978523;MODE=0644
+;DIRECTORY;0000051857;0000000166

@@ -1,0 +1,46 @@
+00-01-06 pr: fix empty field in multi-col output
+99-11-19 pr: -t == -T
+99-10-01 strings: att --long-strings
+99-08-11 mime,strings: fix usage[]
+99-06-25 who: fix printing of data strings with no \0
+99-06-20 who: fix -i
+99-06-17 who: add
+99-06-11 pr: fix date failure logic
+99-06-08 expr.tst: add -- it needs more too
+99-05-21 paste.tst: add -- but it needs more
+99-05-01 mime,strings,what: long options
+99-04-28 uuencode,uudecode: long options, file arg interpretation fix
+99-03-17 od: --swap=0 for testing
+	 od: allow space and , in --format, --type==--format
+99-03-11 od: add -w number-per-line, long options
+	 strings: drop debug error(1) call
+99-03-01 tr: fixes for gnu tests, long options
+	 join.tst,tr.tst: add gnu tests
+	 cut.tst: create from gnu tests
+99-01-11 tail.tst
+98-12-25 od: fix cform() for fmtesc \"
+	 uuencode.tst: update for uulib/uu_encode fill bug fix
+98-11-11 uuencode.tst
+98-08-11 uuencode,uudecode: use <uu.h> and -luu
+98-07-01 strings: fix for default format!
+98-06-01 strings: fix offset format with I*
+98-05-29 join.tst: TEST 09
+98-05-18 what: change "%s%-*s" to "%s%-.*s" and fix buffer boundary bug
+98-03-01 tr: fix char class range bugs
+	 tr.tst: add
+97-10-01 strings: add -m for multibyte
+97-07-17 join: more tests in join.tst
+	 uudecode: ignore chars after counted limit
+	 uudecode: add binhex (decode only)
+	 uudecode: fix posix/ucb uu_decode()! time for uu.tst
+96-12-25 od: add od.tst
+	 od: off_t -> int_max
+96-11-28 uudecode: fix buffer boundary bug in qp_decode
+96-09-06 tr: fix [A-Z] [a-z] bug
+96-05-09 what: I don't know (third base)
+	 uuencode: add
+	 uudecode: add
+	 tr: add
+96-04-15 od: add
+95-10-11 grab b_* list from cmd.h
+	 add void* context 3rd arg to b_main()

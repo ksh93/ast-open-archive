@@ -1,0 +1,356 @@
+The AT&T Labs Research ast-open package contains all of the ast open
+source commands and libraries.
+
+How to build, install and use source packages:
+
+  (1) Choose a package root directory and cd to it. This will be a local work
+      area for all packages. See (8) for installing packages for public use.
+  (2) Create the subdirectory lib/package/tgz and download all package archives
+      into that directory. The package command maintains the contents of this
+      directory and deletes old archives as new ones are read in. Package
+      delta archives require the most recent base, so manually removing files
+      in this directory may invalidate future deltas.
+  (3) If bin/package does not exist then manually read the INIT source package:
+		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.0000 | tar xvf -
+      If your system does not have tar(1) or gunzip(1) then download ratz.c:
+		mkdir bin
+		cc -o bin/ratz lib/package/tgz/ratz.c
+		bin/ratz -lv < lib/package/tgz/INIT.YYYY-MM-DD.0000
+  (4) Read all unread package archive(s):
+		bin/package read
+  (5) Build and install; all generated files are placed under arch/$HOSTTYPE
+      ($INSTALLROOT), where $HOSTTYPE is defined by the output of
+      bin/package (with no arguments.) name=value arguments are supported; CC
+      and CCFLAGS are likely candidates. The output is written to the terminal
+      and captured in $INSTALLROOT/lib/package/gen/make.out:
+		bin/package make
+  (6) List make results and interesting errors from (5):
+		bin/package results
+      Run the regression tests:
+		bin/package test
+      List test results and errors:
+		bin/package results test
+  (7) When (5) or (6) complete run "bin/package use" to get an interactive
+      $SHELL that sets up the environment for using package binaries:
+	$HOSTTYPE	the current host type
+	$PACKAGEROOT	the root directory for all packages ($P)
+	$INSTALLROOT	the installation root for the current host type ($A)
+	$PATH		$INSTALLROOT/bin:$PACKAGEROOT/bin prepended
+	$VPATH		a two level view; all building done in $INSTALLROOT
+        dll-magic	environment magic for locating package shared libraries
+      From this shell you can run "nmake" in any directory under
+      $INSTALLROOT/src and rebuild just that part. If $INSTALLROOT/bin/nmake
+      does not exist then the script $PACKAGEROOT/bin/nmake runs mamake
+      on Mamfile. nmake is open source - download ast-make to simplify future
+      builds or to make new or delta packages.
+  (8) Once you are satisfied with a package its binaries can be installed in
+      a public area by:
+		bin/package install PACKAGE DIRECTORY
+      and users can access the binaries by
+		bin/package use DIRECTORY
+      or by exporting the environment variable definitions listed by
+		bin/package show use DIRECTORY
+
+
+Changes since 1999-08-01 follow.
+
+:::::::: at ::::::::
+
+00-01-22 --- release 1.2 ---
+00-01-22 crontab: fix getopts check
+99-10-11 at,atd: fix job dictionary bugs
+99-08-11 at: fix usage for at+batch
+	 at.h: add AT_STRICT
+
+:::::::: builtin ::::::::
+
+00-01-06 pr: fix empty field in multi-col output
+99-11-19 pr: -t == -T
+99-10-01 strings: att --long-strings
+99-08-11 mime,strings: fix usage[]
+
+:::::::: coshell ::::::::
+
+00-02-01 --- release 2.2 ---
+
+:::::::: cql ::::::::
+
+99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
+99-10-01 cql: fix up array[n] format
+99-09-22 cql: for (member[index]) support
+99-08-11 cql: all assignment in end() -- handy to check maps
+
+:::::::: cs ::::::::
+
+99-09-22 cs: update for CS_MNT_TAIL
+
+:::::::: html ::::::::
+
+00-02-03 mm2html: fix -o nohtml.logo
+00-01-20 mm2html: fix -o quoted arg parse
+	 htmlrefs: add --perlwarn for embedded perl constructs
+99-08-11 mm2html,troff2html: add .xx begin=x end=x
+	 mm2html: handle simple .TS ... .TE; room for improvement
+	 mm2html: fix <TABLE><TR>...</TR></TABLE> nesting
+	 mm2html: add SEE ALSO hot links
+	 mm2html: hot link man name not (section)
+
+:::::::: ie ::::::::
+
+99-11-19 Makefile: fix sh_config.h for 2d -- eventually should use iffe
+
+:::::::: ksh93 ::::::::
+
+00-10-28  --- Release ksh93i ---
+00-10-28  Most of the built-in commands and ksh itself are now
+          self documenting.  Running command --man will produce
+          screen output.  Running command --html produces the
+          man page in html format.
+00-10-28  The getopts builtin can process command description
+          strings to produce man pages.
+00-01-28  A bug in which a script could terminate when getopts
+          encountered an error when invoked inside a function
+          has been fixed.
+00-01-28  When a symbolic link was specified as the name of
+          the script to invoke by name, the value of $0 was
+          set to the real file name rather than the link name
+          in some cases and this has been fixed.
+00-01-28  A bug in which the precision given as an argument
+	  to printf was not working has been fixed.
+
+
+:::::::: ncsl ::::::::
+
+99-09-01 add usage[]
+
+:::::::: nmake ::::::::
+
+00-02-01 --- release 4.0 ---
+00-01-31 Makerules: add $(CC.SUFFIX.LD) in .SHARED.REF.lib
+00-01-25 Makerules: add _MAKE_PROBE_WORKAROUND_ for broken cc -G like sco.i386
+00-01-11 Makerules,probe.win32: -Bwhole-archive + -Bstatic -- whew!
+	 Makerules: make $(LICENSEFILES) for --mam
+	 Makerules: add $(DICTIONARY) to USAGE_LICENSE
+	 make.probe: hosttype now in C.probe
+	 expand: fix :P=L: path buffer overrun
+99-11-11 expand: add :P=W: for astlicense()
+	 expand: :P=N: null input generates null (not '')
+	 bind: fix 2d globv() and bindfile() by adding state.view[].root - wow
+	 bind: fix 2d :P=L=*:
+	 mam: capture important empty exec make-done pairs
+	 main: make sure external.pwd is valid
+	 Makerules: iffe --static=x => iffe -S x
+	 Makerules: explicit :INSTALL: inhibits :: install
+	 Makerules: add MM2HTML
+	 Makerules: install cc- => cc-install
+	 Makerules: add .MAM.CCFLAGS to handle .CC.NOOPTIMIZE
+	 option.c: clean up --errorid
+	 option.c: add set readonly for state.readonly hook
+	 Makerules: use set readonly for INSTALLROOT and PACKAGEROOT
+	 make.probe: sco CC.WARN=-w3
+	 make.probe: CC.MEMBERS => CC.LIB.ALL CC.LIB.DLL CC.LIB.UNDEF
+	 expand: add :U[!]: for uniq [file equality] list
+	 Makerules: IFFEFLAGS initialized in .MAKEINIT
+	 rule: make sure PWD and VPATH are both logical or physical
+	 parse: add "x" <|>[=] "y"
+	 Makerules: add LDLIBRARIES to .SHARED.lib
+99-10-31 Makerules: add :PACKAGE: => :package: if lhs
+	 Makerules: :MAKE: with no rhs driven by MAKEDIRS and MAKESKIP
+	 Makerules: add :Q: to "::" assertion scope items (yuk)
+	 Makerules: add LICENSE hooks, USAGE_LICENSE
+	 expand.c: add :P=G: to do viewpath glob, :W=O: to order subdir descent
+	 expand.c: add :O=N:
+	 expand.c: pretty up :Q:
+	 expand.c: add :P=V0: for top view logical name of bound file
+	 rule.c: add globv() for rhs patterns -- strictly . relative down view
+	 make.probe: fix nmflags logic (for aix -p, portable not)
+99-10-01 Makerules: add %.iffe
+	 make.c: handle metarule .ACCEPT
+
+:::::::: pax ::::::::
+
+00-01-04 pax: fix rpm embedded archive hard seek
+	 pax: --filter implies --nodescend
+	 pax: add --meter
+	 pax: handle ms PORTAR '\' => '/' path separator
+99-11-19 pax: try `ratz -c' if `gunzip' not found
+99-11-11 add --checksum, --install, --local, --preserve=s
+99-11-04 fix zip for archives with EXTLOC headers
+	 don't generate //* file names
+99-10-31 pax: add tgz == tar:gzip, --filter=-
+99-08-11 bio: fix end of medium handling
+
+:::::::: probe ::::::::
+
+00-01-11 probe: fix -t with writable info
+99-09-01 probe: add --override
+
+:::::::: proto ::::::::
+
+99-11-19 add --license, --shell, --copy, --verbose
+99-08-11 long options
+
+:::::::: pzip ::::::::
+
+99-11-03 pin: alb optimize()+solution() update (quadratic loop)
+99-09-25 pzip: change --split to --split[=pattern]
+99-09-11 pzip: change --split=dir to --split
+99-08-11 pzip: add --append, --split=dir
+	 pzip: fix SEE ALSO
+
+:::::::: re ::::::::
+
+99-12-12 sed: delay peek for .==$
+99-08-11 grep: don't complain about EISDIR read error
+	 ed: usage to stderr
+
+:::::::: sort ::::::::
+
+99-11-19 main.c: use rskeylist() for method usage
+99-11-11 main.c: unstable sort is the default for backwards compatibility
+99-08-11 main.c: fix usage[]
+
+:::::::: std ::::::::
+
+00-01-25 touch: add invalid st_mtime value CAVEAT
+	 ls.tst: limit max st_mtime to 0x7fffffe to avoid stat(2) EOVERFLOW
+00-01-11 tsort: fix
+99-12-25 ps: fix linux -o args
+99-11-19 mount,umount: fix umount usage[]
+	 ls: fix --format doc
+99-11-18 ls: -H + cmd link non-dir symlink => lstat() (H == hairbrained)
+99-10-31 sum: change --check, add --header --permissions for verifcation
+99-10-22 date: fix %C %k %y doc
+99-08-11 ps: netbsd + unixware fixes
+	 ls: fix SEE ALSO
+
+:::::::: tw ::::::::
+
+99-10-11 tw: tighten up --generate exit codes
+	 updatedb: add a few options
+99-08-11 find: fix -size
+	 find: undef NOGROUP NOUSER -- (net)bsd stomps again
+
+:::::::: warp ::::::::
+
+99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
+
+:::::::: tests ::::::::
+
+00-01-10 opt.tst: fix USAGE_LICENSE
+99-10-22 date: test all % formats
+99-08-11 sfio: fix 3 tests for uwin
+	 sfio: tscanf for netbsd
+
+:::::::: libast ::::::::
+
+00-02-02 vm*: add NoF() for data only files
+00-01-27 fts: fix top level .==.. statp bug (thanks to dr. ek)
+00-01-25 conf.tab: fix LFS*_*LAGS typo
+00-01-24 astlicense: handle type=verbose, license.notice, author=*
+00-01-11 pathprobe: generate info for first probe script on PATH - duh
+	 ast.h: add NoF(x) for files that define no functions
+	 tmpfile: fix implementation
+	 global change for string ERROR_translate() dictionary names
+	 optget: fix new way but no long names off by one
+	 optget: handle [--dictionary?name]
+99-11-19 comp/conf.sh: `expr length XXX` is not universal
+	 drop sfstdio; stdio via functions everywhere
+	 drop Makefile conditionals (and follow our own advice for once)
+	 sfio: new stream after atexit() bug fix
+	 tm: Tm_zone_t.daylight=0 for standard time within zone
+	 stdio: fopen => _ast_fopen: only way short of binary compatibility
+	 Makefile: atmain.C falls back to atmain.c
+	 optget: add --keys, s<section> option
+	 stdio: _UWIN check for foreign stdio
+99-11-11 astlicense: add
+99-10-31 glob: fix regexec pattern; add PATH_ATTRIBUTES case check
+	 pathpath: path==0 means malloc space
+99-10-22 tmfmt: %C=2-digit-century, %k=date(1), %y=2-digit-year-in-century
+99-10-18 fastfind: expanded default db lookup
+99-08-11 magic: fix off by one registry malloc
+	 features/fs: add __RENAME checks for stat familiy (netbsd)
+	 features/fs: major()/minor() fixes for s5
+	 features/libpath.sh: netbsd fix -- ld.so not in std places
+	 misc/fastfind: fix codes path generation bug
+	 optget: beef up --?* description, fix <TR>...</TR> nesting
+	 pathprobe: check for override (writable key file) first
+	 features/time: int tmtimeofday(struct timeval*);
+	 optget: fix opt_info.num, even if opt_info.arg!=0
+	 fts: FTS_PHYSICAL => FTS_SEEDOTDIR, add FTS_CHOP
+	 fastfind: init dir tab with logical and physical name
+	 glob: add gnu GLOB_ALTDIRFUNC
+
+:::::::: libcdb ::::::::
+
+99-10-01 add: cdbimage() CDB_IMAGE
+99-08-11 cdbopen: fix referenced checks
+	 cdbflat: add test for fixed length records with terminator
+	 cdbpzip: pass details to pzip discipline
+
+:::::::: libcmd ::::::::
+
+00-01-27 getconf: add "-a" and "-v spec" for sol7.* compatibility
+99-09-09 join: fix -j1 vs. -j 1, add --ignorecase
+
+:::::::: libcoshell ::::::::
+
+1999-11-19 co*: add CO_OSH for bsdi lack of times(1)
+	   coexec: CO_IGNORE for all but real ksh
+
+:::::::: libcs ::::::::
+
+00-02-03 features/lib: add sys/types.h to htons etc. header refs
+00-01-25 genlocal: use package instead of hostinfo
+99-10-07 csbind: NODELAY for CS_ADDR_NOW only
+99-09-22 cs*: add CS_MNT_TAIL for multi-char mount files
+	 css: _UWIN workaround for st_ino verification
+
+:::::::: libdll ::::::::
+
+00-01-26 dlllook: add -- dlsym() with `_' weak prefix fallback
+
+:::::::: libexpr ::::::::
+
+99-09-22 exparse.y,exeval.c: add for(ID[DYNAMIC])
+	 exparse.y: ref[i].ref
+
+:::::::: libpp ::::::::
+
+00-01-11 pp.probe: hosttype now in C.probe
+99-11-19 is[a-z]*( => ppis[a-z]*(
+	 ppproto: "..." [A-Z_]+ "..." ignores [A-Z_]+ if PROTOMAIN
+99-11-11 ppproto: use astlicense()
+99-10-31 ppproto: add PROTO_SHARP, update license parse
+	 pplex: fix some MARK bugs seen by #define X "A B <C@D>"
+99-10-01 add pp:stringsplit for "...\\n..." => "..."\n"..."
+	 add pp:lineid to match PP_LINEID
+
+:::::::: librecsort ::::::::
+
+00-01-25 rskey.c: win32.i386 optimizer generates bad code for key_n_code
+99-11-19 rskeylist.c: add usage
+
+:::::::: libbz ::::::::
+
+99-09-11 sfdcbzip: return >0 if discipline pushed
+
+:::::::: libz ::::::::
+
+99-11-19 gzio: add missing _PACKAGE_ast
+99-09-11 sfdcgzip,sfdclzw: return 1 if discipline pushed
+99-08-11 gzio: fix gzread() z_err to keep Z_STREAM_END after check_header()
+
+:::::::: libpz ::::::::
+
+00-01-26 pzlib: dlsym() for NAME and _NAME (some don't map `_' automatically)
+99-08-11 discipline cleanup
+	 pzdeflate: last record incomplete is an error
+	 pzline: add
+	 pzpart: add partition#name partition?name=value,...
+	 pzclose: add scaled bps to PZ_SUMMARY
+	 pzfixed: use size if available and do 2 col freq check
+	 pzfixed: add optional pz for tracing
+	 pzip.h: add PZ_REGRESS, Pz_t.test, drop PZ_TEST*
+	 *: details => options, use optstr() with usage for PZ_OPTION
+	 pzpart: fix off-by one max col check

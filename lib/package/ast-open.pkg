@@ -1,0 +1,8 @@
+ast-open :PACKAGE: \
+		3d at builtin bzip coshell cpp cql cs diff gmake \
+		html ie ksh93 m4 mailx mam ncsl nmake pack pax probe proto \
+		pzip re sort ss std tksh tw warp libast libcdb libcmd \
+		libcoshell libcs libdll libexpr libmam libodelta libpp \
+		librecsort libuu libvdelta libbz libz libpz tests
+	The AT&T Labs Research ast-open package contains all of the ast open
+	source commands and libraries.

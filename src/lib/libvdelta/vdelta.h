@@ -1,58 +1,44 @@
-/*
- * CDE - Common Desktop Environment
- *
- * Copyright (c) 1993-2012, The Open Group. All rights reserved.
- *
- * These libraries and programs are free software; you can
- * redistribute them and/or modify them under the terms of the GNU
- * Lesser General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option)
- * any later version.
- *
- * These libraries and programs are distributed in the hope that
- * they will be useful, but WITHOUT ANY WARRANTY; without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- * PURPOSE. See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with these librararies and programs; if not, write
- * to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
- * Floor, Boston, MA 02110-1301 USA
- */
 /***************************************************************
 *                                                              *
-*                      AT&T - PROPRIETARY                      *
+*           This software is part of the ast package           *
+*              Copyright (c) 1995-2000 AT&T Corp.              *
+*      and it may only be used by you under license from       *
+*                     AT&T Corp. ("AT&T")                      *
+*       A copy of the Source Code Agreement is available       *
+*              at the AT&T Internet web site URL               *
 *                                                              *
-*         THIS IS PROPRIETARY SOURCE CODE LICENSED BY          *
-*                          AT&T CORP.                          *
+*     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*                Copyright (c) 1995 AT&T Corp.                 *
-*                     All Rights Reserved                      *
-*                                                              *
-*           This software is licensed by AT&T Corp.            *
-*       under the terms and conditions of the license in       *
-*       http://www.research.att.com/orgs/ssr/book/reuse        *
+*     If you received this software without first entering     *
+*       into a license with AT&T, you have an infringing       *
+*           copy and cannot use it without violating           *
+*             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
-*           Software Engineering Research Department           *
-*                    AT&T Bell Laboratories                    *
+*               Network Services Research Center               *
+*                      AT&T Labs Research                      *
+*                       Florham Park NJ                        *
 *                                                              *
-*               For further information contact                *
-*                     gsf@research.att.com                     *
+*               Phong Vo <kpv@research.att.com>                *
 *                                                              *
 ***************************************************************/
 #ifndef _VDELTA_H
 #define _VDELTA_H	1
 
+/*	Header for the vdelta library
+**	Written by Kiem-Phong Vo (kpv@research.att.com)
+*/
+
+/* standardize conventions */
 #ifndef __KPV__
 #define __KPV__		1
 
+/* The symbol __STD_C indicates that the language is ANSI-C or C++ */
 #ifndef __STD_C
 #ifdef __STDC__
 #define	__STD_C		1
 #else
-#if __cplusplus
+#if __cplusplus || c_plusplus
 #define __STD_C		1
 #else
 #define __STD_C		0
@@ -60,8 +46,9 @@
 #endif /*__STDC__*/
 #endif /*__STD_C*/
 
+/* For C++, extern symbols must be protected against name mangling */
 #ifndef _BEGIN_EXTERNS_
-#if __cplusplus
+#if __cplusplus || c_plusplus
 #define _BEGIN_EXTERNS_	extern "C" {
 #define _END_EXTERNS_	}
 #else
@@ -70,6 +57,7 @@
 #endif
 #endif /*_BEGIN_EXTERNS_*/
 
+/* _ARG_ simplifies function prototypes between K&R-C and more modern Cs */
 #ifndef _ARG_
 #if __STD_C
 #define _ARG_(x)	x
@@ -78,6 +66,7 @@
 #endif
 #endif /*_ARG_*/
 
+/* The type Void_t is properly defined so that Void_t* can address any type */
 #ifndef Void_t
 #if __STD_C
 #define Void_t		void
@@ -86,9 +75,18 @@
 #endif
 #endif /*Void_t*/
 
-#ifndef NIL
-#define NIL(type)	((type)0)
-#endif /*NIL*/
+/* The below are for DLLs on systems such as WINDOWS that only
+** allows pointers across client ** and library code.
+*/
+#ifndef _PTR_
+#if  _DLL_INDIRECT_DATA && !_DLL_BLD	/* building client code			*/
+#define _ADR_ 		/* cannot export whole structs - data access via ptrs	*/
+#define _PTR_	*
+#else					/* library code or a normal system	*/
+#define _ADR_	&	/* exporting whole struct is ok				*/
+#define _PTR_ 
+#endif
+#endif /*_PTR_*/
 
 #endif /*__KPV__*/
 
@@ -103,11 +101,14 @@ struct _vddisc_s
 };
 
 /* magic header for delta output */
-#define VD_MAGIC	"vd01"
+#define VD_MAGIC	"\026\004\000\002"
+#define VD_MAGIC_OLD	"vd02"
 
 _BEGIN_EXTERNS_
-extern long	vddelta _ARG_((Vddisc_t*,Vddisc_t*,Vddisc_t*,long));
+extern long	vddelta _ARG_((Vddisc_t*,Vddisc_t*,Vddisc_t*));
 extern long	vdupdate _ARG_((Vddisc_t*,Vddisc_t*,Vddisc_t*));
+extern int	vdsqueeze _ARG_((Void_t*, int, Void_t*));
+extern int	vdexpand _ARG_((Void_t*, int, Void_t*));
 _END_EXTERNS_
 
 #endif /*_VDELTA_H*/

@@ -1,0 +1,46 @@
+set	config
+hdr	dirent,fcntl,limits,ndir,time,unistd,vfork
+hdr	float,stdarg,stdlib,string
+key	const =
+lib	dup2,memchr,sigaction,strchr,tmpnam
+lib	vfork = fork
+mem	stat.st_blksize sys/stat.h
+sys	dir,file,ndir,wait
+typ	pid_t = int
+
+tst	note{ signal handler return type }end compile{
+		#include <sys/types.h>
+		#include <signal.h>
+		#undef signal
+		extern void (*signal())();
+	}end yes{	
+		#define RETSIGTYPE void
+	}end no{
+		#define RETSIGTYPE int
+	}end
+
+tst	CLOSEDIR_VOID note{ closedir() is a void function }end nocompile{
+		#include <dirent.h>
+		main()
+		{
+			return closedir(0);
+		}
+	}end
+
+cat{
+	#if _PACKAGE_ast
+	#include <ast_std.h>
+	#endif
+}end
+
+run{
+	case $HAVE_FLOAT_H$HAVE_STDARG_H$HAVE_STDLIB_H$HAVE_STRING_H in
+	1111)	echo "#define STDC_HEADERS 1" ;;
+	esac
+	case $HAVE_ST_BLKSIZE_IN_STAT in
+	1)	echo "#define HAVE_ST_BLKSIZE	1" ;;
+	esac
+	case $HAVE_VFORK_H in
+	1)	echo "#include <vfork.h>" ;;
+	esac
+}end

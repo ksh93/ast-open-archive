@@ -1,0 +1,161 @@
+.de X		\" fixed width font
+.ft 5
+.it 1 }N
+.if !\\$1 \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
+..
+.de XR
+.}S 5 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de RX
+.}S 1 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de XI
+.}S 5 2 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de IX
+.}S 2 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH MOUNT 1
+.SH NAME \" @(#)mount.1 (gsf@research.att.com) 1998-05-22
+mount, umount \- mount and unmount filesystems
+.SH SYNOPSIS
+.B mount
+[
+.B \-afpru
+] [
+.B \-h
+.RI [!] host [,...]
+] [
+.B \-o
+.IR option [,...]
+] [
+.B \-t
+.RI [!] type [,...]
+] [
+.B \-M
+.I mtab
+] [
+.I fs
+[
+.I dir
+] ]
+.sp
+.B umount
+[
+.I options
+] [
+.I dir
+]
+.SH DESCRIPTION
+.I mount
+attaches a named filesystem
+.I fs
+to the directory
+.IR dir ,
+which must already exist.
+The contents of
+.I dir
+are hidden until the filesystem is unmounted.
+.P
+.I umount
+unmounts a mounted filesystem.
+.P
+Both
+.I mount
+and
+.I umount
+consult the filesystem table
+.B /etc/fstab
+when
+.I fs
+and/or
+.I dir
+are omitted.
+.SH OPTIONS
+Options that take list arguments allow
+.I space
+and
+.I comma
+separators.
+The options are:
+.TP
+.B \-a
+Operate on all filesystems in
+.BR /etc/fstab .
+The
+.B \-h
+and
+.B \-t
+options can be used to match classes of filesystems in
+.BR /etc/fstab .
+.TP
+.B \-f
+Show (fake) the
+.IR mount (2)
+or
+.IR umount (2)
+system calls without doing the operations.
+.TP
+\fB\-h\fP [!]\fIhost\fP[,...]
+Limits the
+.B /etc/fstab
+scan to entries matching the listed host names.
+A leading
+.B !
+inverts the match sense.
+.TP
+\fB\-o\fP [!]\fIoption\fP[,...]
+Specify filesystem specific mount options.
+Options are a comma separated list of words
+preceded by an optional
+.B no
+to turn the option off, or
+.IR name = value
+pairs.
+Multiple
+.B \-o
+options are concatenated with a comma separator.
+.IR fstab (4)
+provides a detailed description of option names and values.
+.TP
+.B \-r
+Mount the filesystems readonly.
+Equivalent to
+.BR "\-o ro" .
+.TP
+\fB\-t\fP [!]\fItype\fP[,...]
+Limits the
+.B /etc/fstab
+scan to entries matching the listed types.
+A leading
+.B !
+inverts the match sense.
+.IR fstab (4)
+provides a detailed description of supported filesystem types.
+.TP
+.BI \-M " fstab"
+Use
+.I fstab
+instead of
+.BR /etc/fstab .
+.SH "SEE ALSO"
+.IR df (1),
+.IR mount (2) ,
+.IR umount (2) ,
+.IR mnt (3)
+.IR fstab (4)

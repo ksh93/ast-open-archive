@@ -1,0 +1,18 @@
+96-01-31 --- release 2.0 ---
+92-04-01 update for new libpp
+92-04-01 --- release 1.1 ---
+90-10-11 update cpp.1
+88-06-08 update makefile to install Makeinstall.mk ALTPP.LINK links
+88-02-29 redo PP_INITDIR initialization
+87-10-11 update man page
+87-09-18 add ppop(PP_DONE) call
+87-04-24 recode for updated library interface
+87-04-03 add -D-Ttest to enable debugging test code
+87-04-02 add -I-Rfile for PP_READ
+	 move #include "ppdefault.h" to ppargs.c using PP_READ
+	 add -D-I[id] to name line sync directive ("line" if id omitted)
+87-03-31 change -Nfilename to -D-Ffilename
+87-03-30 add -D-Llanguage for PP_LANGUAGE,language
+	 add -D-H for PP_NOHOSTED
+	 add -I-H for PP_HOSTED
+87-03-24 --- release 1.0 ---

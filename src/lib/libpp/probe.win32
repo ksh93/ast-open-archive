@@ -1,0 +1,136 @@
+:
+# @(#)probe.win32 (AT&T Labs Research) 1999-07-17
+#
+# win32 specific pp C probe initialization
+# ms vc is easy on uwin
+#
+# 2> easy.err to avoid mysterious hang with bcc
+#
+
+probe_easy="winerror"
+
+{
+for i in $probe_easy
+do	echo "#include <$i.h>"
+done
+echo "uwin=_UWIN"
+echo "versionb=__BORLANDC__"
+echo "versionm=_MSC_VER"
+} > easy.c
+
+for i in $probe_easy
+do	eval ${i}_include=
+done
+include=
+uwin=
+versionb=
+versionm=
+
+$cc -E easy.c > easy.out 2> easy.err
+egrep -i '^(#line 1 .*\.[hH]|(uwin|version[bm])=[0-9])' easy.out |
+sed	-e 's/.*"\(.*\)".*/\1/' \
+	-e 's,^[ 	]*,,' \
+	-e 's,[ 	]*$,,' \
+	-e 's,^\(.\):[\\/]*,/\1/,' \
+	-e 's,[\\/][\\/]*,/,g' \
+	-e 's,^\(/.*\)/\(.*\)\.[hH]$,\2_include="\1",' \
+	> easy.sh
+. ./easy.sh
+
+for i in $probe_easy
+do	eval d=\"\$${i}_include\"
+	case $d in
+	?*)	include=$d
+		break
+		;;
+	esac
+done
+
+i=$($cc -V 2> easy.err)
+if	test "" != "$i" -a -d "$i/include"
+then	include=$i/include
+fi
+
+case $versionb in
+?*)	version=$versionb VERSION=__BORLANDC__ ;;
+esac
+case $versionm in
+?*)	version=$versionm VERSION=_MSC_VER ;;
+esac
+
+case $version:$include in
+[0-9]*:/*)
+	hosttype=`hostinfo type`
+	machine=${hosttype#*.}
+	case $uwin in
+	[0-9]*) standard="
+#pragma pp:include \"/usr/include\""
+		assert="
+#define #system(unix)
+#define #release(V)
+#define #release(system5)
+#define #version(${version})"
+		;;
+	*)	predefined=""
+		standard=""
+		assert=""
+		;;
+	esac
+	standard="$standard
+#pragma pp:standard \"$include\""
+	: the payoff
+	cat >&3 <<!
+/* `whence $cc`
+*/
+
+#pragma pp:predefined
+#define _STD_INCLUDE_DIR ${include}
+#define _${machine}_ 1
+!
+	{
+	cat <<'!'
+#ifdef unix
+echo "#define unix" unix
+echo "#define __unix__" 1
+#else
+#ifdef __unix__
+echo "#define __unix__" __unix__
+#endif
+#endif
+!
+	for i in _ALPHA_ _INTEGRAL_MAX_BITS _MSC_EXTENSIONS _MSC_VER \
+		_M_ALPHA_ _M_IX86 _POSIX_ _UWIN _WIN32 _X86_ \
+		__BORLANDC__ __TURBOC__ \
+		__cplusplus
+	do	echo "#ifdef $i"
+		echo "echo \"#define $i\" $i"
+		echo "#endif"
+	done
+	} > easy.c
+	$cc -E easy.c > easy.sh 2> easy.err
+	. ./easy.sh >&3
+	cat >&3 <<!
+#pragma pp:nopredefined
+
+#define #hosttype(${hosttype})${assert}
+#define #architecture(${machine})
+#define #model()
+#define #machine(${machine})
+#define #addressing()
+#define #preroot()
+#define #universe(att)
+#define #dialect(ansi)
+
+#pragma pp:reserved _asm=GROUP __asm=GROUP const enum fortran _fortran __inline signed void volatile cdecl _cdecl far _far huge _huge near _near pascal _pascal _based=GROUP _except _export _fastcall _finally _leave _stdcall _syscall _try
+#pragma pp:pluscomment
+#pragma pp:id "$"${standard}
+#pragma pp:nocatliteral
+#pragma pp:stringsplit
+#pragma pp:headerexpand
+#pragma pp:map "/#(pragma )?ident>/"
+#pragma pp:map "/#pragma lint:/" ",#pragma lint:(.*),##/*\1*/,u"
+#pragma pp:map "/#(pragma )?sccs>/"
+!
+	exit 0
+	;;
+esac

@@ -1,0 +1,97 @@
+.de L		\" literal font
+.ft 5
+.it 1 }N
+.if !\\$1 \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
+..
+.de LR
+.}S 5 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de RL
+.}S 1 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH DATE 1
+.SH NAME
+date \- print and set the date
+.SH SYNOPSIS
+.B date
+[
+.B \-ilnsu
+] [
+.B \-f
+.I format
+] [
+.I date
+]
+.br
+.B date
+[
+.B \-aclmu
+] [
+.B \-f
+.I format
+]
+.BR file " ..."
+.SH DESCRIPTION
+If no arguments are given, the current date and time are printed.
+Providing an argument sets the systems time to the
+.IR tmdate (3)
+date expression
+.IR date .
+Only the superuser can set the date.
+If
+.B \-s
+is specified then the date is just listed and the system time is not set.
+The
+.I -u
+option displays or sets the date in UTC (universal coordinated or GMT) time.
+.BI \-f " format"
+displays the date according to the
+.IR tmform (3)
+format specification
+.IR format .
+.PP
+If
+.BR \-a ,
+.B \-c
+or
+.B \-m
+are specified then the dates corresponding to the
+.IR access ,
+.RI ( inode ) changed
+or
+.I modify
+times (respectively) of the
+.I file
+arguments are listed.
+.PP
+The
+.B \-l
+option causes leap seconds to be taken into account.
+The
+.B \-i
+option sets the system time by incrementaly adjusting the system clock.
+This allows the time to be safely set on running systems.
+The
+.B \-n
+option sets only the local system time as opposed to setting the
+time of all systems on the network.
+.SH FILES
+.B /bin/date
+is executed to set the system time.
+.SH SEE ALSO
+/bin/date(1), tm(3)

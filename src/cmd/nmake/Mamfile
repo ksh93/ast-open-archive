@@ -1,0 +1,722 @@
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-01
+setv INSTALLROOT ../../..
+setv PACKAGE_ast ${INSTALLROOT}
+setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include
+setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
+setv PACKAGEROOT ../../../../..
+setv AR ar
+setv ARFLAGS cr
+setv AS as
+setv ASFLAGS
+setv CC cc
+setv CCFLAGS "-O"
+setv COTEMP $$
+setv CPIO cpio
+setv CPIOFLAGS
+setv CPP "${CC} -E"
+setv F77 f77
+setv HOSTCC ${CC}
+setv IGNORE
+setv LD ld
+setv LDFLAGS 
+setv LEX lex
+setv LEXFLAGS
+setv LPR lpr
+setv LPRFLAGS
+setv M4FLAGS 
+setv MAKE nmake
+setv MAKEFLAGS
+setv PR pr
+setv PRFLAGS
+setv SHELL /bin/sh
+setv SILENT
+setv TAR tar
+setv YACC yacc
+setv YACCFLAGS -d
+make ${PACKAGE_ast_LIB}/package/ast.lic
+done ${PACKAGE_ast_LIB}/package/ast.lic
+make install
+make nmake
+make archive.o
+make archive.c
+make ${PACKAGE_ast_INCLUDE}/ast/int.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_common.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast/int.h
+make ${PACKAGE_ast_INCLUDE}/ast/tm.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/times.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_time.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_time.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/ast_unistd.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_unistd.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/re_comp.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast/re_comp.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/ast_fcntl.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_mode.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/ast_fs.h implicit
+make error?--?old?ethernet?address?at?wrong?offset implicit
+done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
+done ${PACKAGE_ast_INCLUDE}/ast/ast_fs.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ls.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/ast_types.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_types.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/stdio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast/ast_hdr.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_hdr.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_std.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_version.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/times.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/tm.h
+make ${PACKAGE_ast_INCLUDE}/ast/swap.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/int.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/swap.h
+make make.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/sfstr.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/sfstr.h
+make ${PACKAGE_ast_INCLUDE}/ast/sfdisc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/sfdisc.h
+make ${PACKAGE_ast_INCLUDE}/ast/tok.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/tok.h
+prev ${PACKAGE_ast_INCLUDE}/ast/times.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/coshell.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/coshell.h
+make ${PACKAGE_ast_INCLUDE}/ast/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/option.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/option.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/error.h
+make ${PACKAGE_ast_INCLUDE}/ast/namval.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/namval.h
+prev ${PACKAGE_ast_INCLUDE}/ast/swap.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/hash.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/hashpart.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/hashpart.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/hash.h
+make ${PACKAGE_ast_INCLUDE}/ast/fs3d.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/fs3d.h
+make ${PACKAGE_ast_INCLUDE}/ast/dirent.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/dirent.h
+prev ${PACKAGE_ast_INCLUDE}/ast/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+done make.h
+done archive.c
+prev archive.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c archive.c
+done archive.o generated
+make bind.o
+make bind.c
+make ${PACKAGE_ast_INCLUDE}/ast/glob.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/glob.h
+prev make.h implicit
+done bind.c
+prev bind.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c bind.c
+done bind.o generated
+make command.o
+make command.c
+make ${PACKAGE_ast_INCLUDE}/ast/sig.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/sig.h
+prev make.h implicit
+done command.c
+prev command.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c command.c
+done command.o generated
+make dump.o
+make dump.c
+prev make.h implicit
+done dump.c
+prev dump.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dump.c
+done dump.o generated
+make expand.o
+make expand.c
+make ${PACKAGE_ast_INCLUDE}/ast/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/regex.h
+make expand.h implicit
+done expand.h
+prev make.h implicit
+done expand.c
+prev expand.c
+exec - ${CC}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expand.c
+done expand.o generated
+make main.o
+make main.c
+make ${PACKAGE_ast_INCLUDE}/ast/vmalloc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/vmalloc.h
+make ${PACKAGE_ast_INCLUDE}/ast/vecargs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/vecargs.h
+make ${PACKAGE_ast_INCLUDE}/ast/stak.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/stk.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/stk.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/stak.h
+prev ${PACKAGE_ast_INCLUDE}/ast/sig.h implicit
+make options.h implicit
+done options.h
+prev make.h implicit
+done main.c
+prev main.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
+done main.o generated
+make make.o
+make make.c
+prev make.h implicit
+done make.c
+prev make.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c make.c
+done make.o generated
+make mam.o
+make mam.c
+prev make.h implicit
+done mam.c
+prev mam.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c mam.c
+done mam.o generated
+make metarule.o
+make metarule.c
+prev make.h implicit
+done metarule.c
+prev metarule.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c metarule.c
+done metarule.o generated
+make misc.o
+make misc.c
+make ../../lib/libast/misc/glob.c implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/glob.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_dir.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/dirent.h implicit
+make dirlib.h implicit
+done dirlib.h dontcare virtual
+prev ${PACKAGE_ast_INCLUDE}/ast/ast_lib.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_dir.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/stak.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+done ../../lib/libast/misc/glob.c dontcare
+make ../../lib/libast/port/astlicense.c implicit
+make ${PACKAGE_ast_INCLUDE}/ast/hashkey.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/hashkey.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+done ../../lib/libast/port/astlicense.c dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/tm.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/int.h implicit
+prev make.h implicit
+done misc.c
+prev misc.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c misc.c
+done misc.o generated
+make object.o
+make object.c
+make ${PACKAGE_ast_INCLUDE}/ast/ccode.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast/ast_ccode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ast_ccode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast/ccode.h
+prev make.h implicit
+done object.c
+prev object.c
+exec - ${CC}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c object.c
+done object.o generated
+make option.o
+make option.c
+prev ${PACKAGE_ast_INCLUDE}/ast/option.h implicit
+prev options.h implicit
+prev make.h implicit
+done option.c
+prev option.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
+done option.o generated
+make parse.o
+make parse.c
+prev ${PACKAGE_ast_INCLUDE}/ast/sig.h implicit
+prev options.h implicit
+prev make.h implicit
+done parse.c
+prev parse.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c parse.c
+done parse.o generated
+make read.o
+make read.c
+prev make.h implicit
+done read.c
+prev read.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c read.c
+done read.o generated
+make rule.o
+make rule.c
+prev options.h implicit
+prev make.h implicit
+done rule.c
+prev rule.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c rule.c
+done rule.o generated
+make scan.o
+make scan.c
+prev ${PACKAGE_ast_INCLUDE}/ast/tm.h implicit
+prev make.h implicit
+done scan.c
+prev scan.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c scan.c
+done scan.o generated
+make state.o
+make state.c
+prev options.h implicit
+prev make.h implicit
+done state.c
+prev state.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c state.c
+done state.o generated
+make trap.o
+make trap.c
+prev ${PACKAGE_ast_INCLUDE}/ast/vmalloc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast/sig.h implicit
+prev make.h implicit
+done trap.c
+prev trap.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c trap.c
+done trap.o generated
+make variable.o
+make variable.c
+prev options.h implicit
+prev make.h implicit
+done variable.c
+prev variable.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c variable.c
+done variable.o generated
+make version.o
+make version.c
+done version.c
+prev version.c
+exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)make (AT&T Research) 4.0 2000-02-01\0\n"\" -c version.c
+done version.o generated
+setv mam_libcoshell ${mam_cc_L+-lcoshell}${mam_cc_L-${PACKAGE_ast_LIB}/libcoshell.a}
+setv mam_libcoshell `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcoshell,${INSTALLROOT}/lib/libcoshell.a,} ${PACKAGE_ast_LIB}/lib/coshell`
+setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o ${mam_libcoshell} ${mam_libast}
+done nmake generated
+make ppcc
+make ppcc.sh
+done ppcc.sh
+prev ppcc.sh
+exec - case static,port:$OPTIND:$RANDOM in
+exec - ?*:*:*|*::*|*:*:$RANDOM)
+exec - 	;;
+exec - *)	if	ENV= x= $SHELL -n -c '${list[level]} ' 2>/dev/null
+exec - 	then	ENV= $SHELL -n ppcc.sh
+exec - 	fi
+exec - 	;;
+exec - esac
+exec - case '' in
+exec - "")	cp ppcc.sh ppcc
+exec - 	;;
+exec - *)	{
+exec - 	i=`(read x; echo $x) < ppcc.sh`
+exec - 	case $i in
+exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	esac
+exec - 	echo 
+exec - 	cat ppcc.sh
+exec - 	} > ppcc
+exec - 	;;
+exec - esac
+exec - chmod u+w,+x ppcc
+done ppcc generated
+make ${INSTALLROOT}/bin
+exec - set -
+exec - if	test ! -d ${INSTALLROOT}/bin
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
+exec - 	{
+exec - 		test -d ./-p && rm -rf ./-p
+exec - 		p=
+exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		do	case $p in
+exec - 			"")	p=$d ;;
+exec - 			*)	p=$p/$d ;;
+exec - 			esac
+exec - 			case $d in
+exec - 			.|..)	;;
+exec - 			*)	if	test ! -d $p
+exec - 				then	rm -f $p
+exec - 					set -x && mkdir $p && set -
+exec - 				fi
+exec - 				;;
+exec - 			esac
+exec - 		done
+exec - 	} && set -x 		    		   
+exec - fi
+done ${INSTALLROOT}/bin generated
+make ${INSTALLROOT}/bin/nmake
+prev nmake
+exec - mv ${INSTALLROOT}/bin/nmake ${INSTALLROOT}/bin/nmake.old 2>/dev/null || true; cp nmake ${INSTALLROOT}/bin/nmake
+done ${INSTALLROOT}/bin/nmake generated
+make ${INSTALLROOT}/man/man1
+exec - set -
+exec - if	test ! -d ${INSTALLROOT}/man/man1
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
+exec - 	{
+exec - 		test -d ./-p && rm -rf ./-p
+exec - 		p=
+exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		do	case $p in
+exec - 			"")	p=$d ;;
+exec - 			*)	p=$p/$d ;;
+exec - 			esac
+exec - 			case $d in
+exec - 			.|..)	;;
+exec - 			*)	if	test ! -d $p
+exec - 				then	rm -f $p
+exec - 					set -x && mkdir $p && set -
+exec - 				fi
+exec - 				;;
+exec - 			esac
+exec - 		done
+exec - 	} && set -x 		    		   
+exec - fi
+done ${INSTALLROOT}/man/man1 generated
+make ${INSTALLROOT}/man/man1/nmake.1
+make nmake.1
+done nmake.1
+exec - mv ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; cp nmake.1 ${INSTALLROOT}/man/man1/nmake.1
+done ${INSTALLROOT}/man/man1/nmake.1 generated
+make ${INSTALLROOT}/man/man1/makerules.1
+make makerules.1
+done makerules.1
+exec - mv ${INSTALLROOT}/man/man1/makerules.1 ${INSTALLROOT}/man/man1/makerules.1.old 2>/dev/null || true; cp makerules.1 ${INSTALLROOT}/man/man1/makerules.1
+done ${INSTALLROOT}/man/man1/makerules.1 generated
+make ${INSTALLROOT}/man/man8
+exec - set -
+exec - if	test ! -d ${INSTALLROOT}/man/man8
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man8 2>/dev/null && set - ||
+exec - 	{
+exec - 		test -d ./-p && rm -rf ./-p
+exec - 		p=
+exec - 		for d in `echo ${INSTALLROOT}/man/man8 | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		do	case $p in
+exec - 			"")	p=$d ;;
+exec - 			*)	p=$p/$d ;;
+exec - 			esac
+exec - 			case $d in
+exec - 			.|..)	;;
+exec - 			*)	if	test ! -d $p
+exec - 				then	rm -f $p
+exec - 					set -x && mkdir $p && set -
+exec - 				fi
+exec - 				;;
+exec - 			esac
+exec - 		done
+exec - 	} && set -x 		    		   
+exec - fi
+done ${INSTALLROOT}/man/man8 generated
+make ${INSTALLROOT}/man/man8/nmake.8
+make nmake.8
+done nmake.8
+exec - mv ${INSTALLROOT}/man/man8/nmake.8 ${INSTALLROOT}/man/man8/nmake.8.old 2>/dev/null || true; cp nmake.8 ${INSTALLROOT}/man/man8/nmake.8
+done ${INSTALLROOT}/man/man8/nmake.8 generated
+make ${PACKAGE_ast_LIB}/make
+exec - set -
+exec - if	test ! -d ${PACKAGE_ast_LIB}/make
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/make 2>/dev/null && set - ||
+exec - 	{
+exec - 		test -d ./-p && rm -rf ./-p
+exec - 		p=
+exec - 		for d in `echo ${PACKAGE_ast_LIB}/make | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		do	case $p in
+exec - 			"")	p=$d ;;
+exec - 			*)	p=$p/$d ;;
+exec - 			esac
+exec - 			case $d in
+exec - 			.|..)	;;
+exec - 			*)	if	test ! -d $p
+exec - 				then	rm -f $p
+exec - 					set -x && mkdir $p && set -
+exec - 				fi
+exec - 				;;
+exec - 			esac
+exec - 		done
+exec - 	} && set -x 		    		   
+exec - fi
+done ${PACKAGE_ast_LIB}/make generated
+make ${PACKAGE_ast_LIB}/make/Makeinstall.mk
+make Makeinstall.mk
+exec - {
+exec - 	echo '/* : : generated from cc assertions : : */'
+exec - 	set -
+exec - 	f=`${INSTALLROOT}/lib/probe/probe -kg C pp cc`
+exec - 	a="`sed -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_"
+exec - 	for n in $a
+exec - 	do	eval $n=
+exec - 	done
+exec - 	eval `sed -n -e 's/^#define #\(.*\)(\(.*\))/_\1_="$_\1_ \2"/p' $f`
+exec - 	: some systems botch the symlink and sticky dir combo
+exec - 	rm -rf /tmp/mkl$$
+exec - 	mkdir /tmp/mkl$$
+exec - 	text='hard link'
+exec - 	echo "$text" > /tmp/mkl$$/nl
+exec - 	( ln /tmp/mkl$$/nl /tmp/mkl$$/hl ) 2>/dev/null &&
+exec - 	case `cat /tmp/mkl$$/hl` in
+exec - 	"$text")	_feature_="$_feature_ ln" ;;
+exec - 	esac
+exec - 	ln -s /tmp/mkl$$/hl /tmp/mkl$$/sl 2>/dev/null && rm /tmp/mkl$$/sl && _feature_="$_feature_ ln-s"
+exec - 	rm -rf /tmp/mkl$$
+exec - 	set -x
+exec - 	for n in $a
+exec - 	do	eval echo \$n = \$$n
+exec - 	done
+exec - } > Makeinstall.mk
+done Makeinstall.mk generated
+exec - mv ${PACKAGE_ast_LIB}/make/Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk.old 2>/dev/null || true; cp Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk
+done ${PACKAGE_ast_LIB}/make/Makeinstall.mk generated
+make ${PACKAGE_ast_LIB}/make/Makerules.mk
+make Makerules.mk
+make Localrules.mk implicit
+done Localrules.mk dontcare virtual
+make rules-${_hosttype_=`package`}.mk implicit
+done rules-${_hosttype_=`package`}.mk dontcare virtual
+prev Makeinstall.mk implicit
+make Scanrules.mk implicit
+done Scanrules.mk dontcare
+done Makerules.mk
+exec - mv ${PACKAGE_ast_LIB}/make/Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk.old 2>/dev/null || true; cp Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk
+done ${PACKAGE_ast_LIB}/make/Makerules.mk generated
+make ${PACKAGE_ast_LIB}/make/Scanrules.mk
+prev Scanrules.mk
+exec - mv ${PACKAGE_ast_LIB}/make/Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk.old 2>/dev/null || true; cp Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk
+done ${PACKAGE_ast_LIB}/make/Scanrules.mk generated
+make ${PACKAGE_ast_LIB}/make/S.mk
+make S.mk
+done S.mk
+exec - mv ${PACKAGE_ast_LIB}/make/S.mk ${PACKAGE_ast_LIB}/make/S.mk.old 2>/dev/null || true; cp S.mk ${PACKAGE_ast_LIB}/make/S.mk
+done ${PACKAGE_ast_LIB}/make/S.mk generated
+make ${PACKAGE_ast_LIB}/make/SYSTEM.mk
+make SYSTEM.mk
+done SYSTEM.mk
+exec - mv ${PACKAGE_ast_LIB}/make/SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk.old 2>/dev/null || true; cp SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk
+done ${PACKAGE_ast_LIB}/make/SYSTEM.mk generated
+make ${PACKAGE_ast_LIB}/make/TABLE.mk
+make TABLE.mk
+done TABLE.mk
+exec - mv ${PACKAGE_ast_LIB}/make/TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk.old 2>/dev/null || true; cp TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk
+done ${PACKAGE_ast_LIB}/make/TABLE.mk generated
+make ${PACKAGE_ast_LIB}/make/debug.mk
+make debug.mk
+done debug.mk
+exec - mv ${PACKAGE_ast_LIB}/make/debug.mk ${PACKAGE_ast_LIB}/make/debug.mk.old 2>/dev/null || true; cp debug.mk ${PACKAGE_ast_LIB}/make/debug.mk
+done ${PACKAGE_ast_LIB}/make/debug.mk generated
+make ${PACKAGE_ast_LIB}/make/mkservice.mk
+make mkservice.mk
+done mkservice.mk
+exec - mv ${PACKAGE_ast_LIB}/make/mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk.old 2>/dev/null || true; cp mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk
+done ${PACKAGE_ast_LIB}/make/mkservice.mk generated
+make ${PACKAGE_ast_LIB}/make/yacc.mk
+make yacc.mk
+done yacc.mk
+exec - mv ${PACKAGE_ast_LIB}/make/yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk.old 2>/dev/null || true; cp yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk
+done ${PACKAGE_ast_LIB}/make/yacc.mk generated
+make ${PACKAGE_ast_LIB}/make/pkg-tcl.mk
+make pkg-tcl.mk
+done pkg-tcl.mk
+exec - mv ${PACKAGE_ast_LIB}/make/pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk.old 2>/dev/null || true; cp pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk
+done ${PACKAGE_ast_LIB}/make/pkg-tcl.mk generated
+make ${PACKAGE_ast_LIB}/make/pkg-X11.mk
+make pkg-X11.mk
+done pkg-X11.mk
+exec - mv ${PACKAGE_ast_LIB}/make/pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk.old 2>/dev/null || true; cp pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk
+done ${PACKAGE_ast_LIB}/make/pkg-X11.mk generated
+make ${PACKAGE_ast_LIB}/make/rules-win32.mk
+make rules-win32.mk
+done rules-win32.mk
+exec - mv ${PACKAGE_ast_LIB}/make/rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk.old 2>/dev/null || true; cp rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk
+done ${PACKAGE_ast_LIB}/make/rules-win32.mk generated
+make ${PACKAGE_ast_LIB}/make/ppcc
+prev ppcc
+exec - mv ${PACKAGE_ast_LIB}/make/ppcc ${PACKAGE_ast_LIB}/make/ppcc.old 2>/dev/null || true; cp ppcc ${PACKAGE_ast_LIB}/make/ppcc
+done ${PACKAGE_ast_LIB}/make/ppcc generated
+make ${PACKAGE_ast_LIB}/probe/C/make
+exec - set -
+exec - if	test ! -d ${PACKAGE_ast_LIB}/probe/C/make
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/probe/C/make 2>/dev/null && set - ||
+exec - 	{
+exec - 		test -d ./-p && rm -rf ./-p
+exec - 		p=
+exec - 		for d in `echo ${PACKAGE_ast_LIB}/probe/C/make | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		do	case $p in
+exec - 			"")	p=$d ;;
+exec - 			*)	p=$p/$d ;;
+exec - 			esac
+exec - 			case $d in
+exec - 			.|..)	;;
+exec - 			*)	if	test ! -d $p
+exec - 				then	rm -f $p
+exec - 					set -x && mkdir $p && set -
+exec - 				fi
+exec - 				;;
+exec - 			esac
+exec - 		done
+exec - 	} && set -x 		    		   
+exec - fi
+done ${PACKAGE_ast_LIB}/probe/C/make generated
+make ${PACKAGE_ast_LIB}/probe/C/make/probe
+make probe
+make probe.sh
+make ${PACKAGE_ast_LIB}/probe/C/probe
+done ${PACKAGE_ast_LIB}/probe/C/probe
+make make.probe
+done make.probe
+exec - cat ${PACKAGE_ast_LIB}/probe/C/probe make.probe > probe.sh
+done probe.sh generated
+exec - case static,port:$OPTIND:$RANDOM in
+exec - ?*:*:*|*::*|*:*:$RANDOM)
+exec - 	;;
+exec - *)	if	ENV= x= $SHELL -n -c '${list[level]} ' 2>/dev/null
+exec - 	then	ENV= $SHELL -n probe.sh
+exec - 	fi
+exec - 	;;
+exec - esac
+exec - case '' in
+exec - "")	cp probe.sh probe
+exec - 	;;
+exec - *)	{
+exec - 	i=`(read x; echo $x) < probe.sh`
+exec - 	case $i in
+exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
+exec - 	esac
+exec - 	echo 
+exec - 	cat probe.sh
+exec - 	} > probe
+exec - 	;;
+exec - esac
+exec - chmod u+w,+x probe
+done probe generated
+exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe ${PACKAGE_ast_LIB}/probe/C/make/probe.old 2>/dev/null || true; cp probe ${PACKAGE_ast_LIB}/probe/C/make/probe
+done ${PACKAGE_ast_LIB}/probe/C/make/probe generated
+make ${PACKAGE_ast_LIB}/probe/C/make/probe.ini
+make probe.ini
+make probe.win32
+done probe.win32
+exec - t=${_hosttype_=`package`}
+exec - ifs=$IFS
+exec - IFS=.
+exec - set x $t
+exec - IFS=$ifs
+exec - t=$2
+exec - set x probe.win32
+exec - while	:
+exec - do	shift
+exec - 	case $# in
+exec - 	0)	break ;;
+exec - 	esac
+exec - 	case $1 in
+exec - 	*probe.$t)
+exec - 		break
+exec - 	esac
+exec - done
+exec - case $1 in
+exec - ?*)	cmp -s $1 probe.ini || cp $1 probe.ini ;;
+exec - *)	: > probe.ini
+exec - esac
+done probe.ini generated
+exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini.old 2>/dev/null || true; cp probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini
+done ${PACKAGE_ast_LIB}/probe/C/make/probe.ini generated
+make ${INSTALLROOT}/lib/make
+exec - set -
+exec - if	test ! -d ${INSTALLROOT}/lib/make
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/make 2>/dev/null && set - ||
+exec - 	{
+exec - 		test -d ./-p && rm -rf ./-p
+exec - 		p=
+exec - 		for d in `echo ${INSTALLROOT}/lib/make | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		do	case $p in
+exec - 			"")	p=$d ;;
+exec - 			*)	p=$p/$d ;;
+exec - 			esac
+exec - 			case $d in
+exec - 			.|..)	;;
+exec - 			*)	if	test ! -d $p
+exec - 				then	rm -f $p
+exec - 					set -x && mkdir $p && set -
+exec - 				fi
+exec - 				;;
+exec - 			esac
+exec - 		done
+exec - 	} && set -x 		    		   
+exec - fi
+done ${INSTALLROOT}/lib/make virtual
+make ${INSTALLROOT}/lib/make/makerules.mo
+make Makerules.mo
+prev Makerules.mk
+exec - ${MAKE} $MAKEFLAGS --base --compile --file=Makerules.mk
+done Makerules.mo generated
+exec - mv ${INSTALLROOT}/lib/make/makerules.mo ${INSTALLROOT}/lib/make/makerules.mo.old 2>/dev/null || true; cp Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo
+done ${INSTALLROOT}/lib/make/makerules.mo virtual
+done install virtual
+make test
+done test dontcare

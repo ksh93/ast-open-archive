@@ -1,0 +1,506 @@
+00-02-01 --- release 4.0 ---
+00-01-31 Makerules: add $(CC.SUFFIX.LD) in .SHARED.REF.lib
+00-01-25 Makerules: add _MAKE_PROBE_WORKAROUND_ for broken cc -G like sco.i386
+00-01-11 Makerules,probe.win32: -Bwhole-archive + -Bstatic -- whew!
+	 Makerules: make $(LICENSEFILES) for --mam
+	 Makerules: add $(DICTIONARY) to USAGE_LICENSE
+	 make.probe: hosttype now in C.probe
+	 expand: fix :P=L: path buffer overrun
+99-11-11 expand: add :P=W: for astlicense()
+	 expand: :P=N: null input generates null (not '')
+	 bind: fix 2d globv() and bindfile() by adding state.view[].root - wow
+	 bind: fix 2d :P=L=*:
+	 mam: capture important empty exec make-done pairs
+	 main: make sure external.pwd is valid
+	 Makerules: iffe --static=x => iffe -S x
+	 Makerules: explicit :INSTALL: inhibits :: install
+	 Makerules: add MM2HTML
+	 Makerules: install cc- => cc-install
+	 Makerules: add .MAM.CCFLAGS to handle .CC.NOOPTIMIZE
+	 option.c: clean up --errorid
+	 option.c: add set readonly for state.readonly hook
+	 Makerules: use set readonly for INSTALLROOT and PACKAGEROOT
+	 make.probe: sco CC.WARN=-w3
+	 make.probe: CC.MEMBERS => CC.LIB.ALL CC.LIB.DLL CC.LIB.UNDEF
+	 expand: add :U[!]: for uniq [file equality] list
+	 Makerules: IFFEFLAGS initialized in .MAKEINIT
+	 rule: make sure PWD and VPATH are both logical or physical
+	 parse: add "x" <|>[=] "y"
+	 Makerules: add LDLIBRARIES to .SHARED.lib
+99-10-31 Makerules: add :PACKAGE: => :package: if lhs
+	 Makerules: :MAKE: with no rhs driven by MAKEDIRS and MAKESKIP
+	 Makerules: add :Q: to "::" assertion scope items (yuk)
+	 Makerules: add LICENSE hooks, USAGE_LICENSE
+	 expand.c: add :P=G: to do viewpath glob, :W=O: to order subdir descent
+	 expand.c: add :O=N:
+	 expand.c: pretty up :Q:
+	 expand.c: add :P=V0: for top view logical name of bound file
+	 rule.c: add globv() for rhs patterns -- strictly . relative down view
+	 make.probe: fix nmflags logic (for aix -p, portable not)
+99-10-01 Makerules: add %.iffe
+	 make.c: handle metarule .ACCEPT
+99-07-17 mam.c: outer make...done for virtual joint target
+	 command.c: fix job deadlock detection
+	 Makerules: don't pp probe if CC.CC == ""
+	 Makerules: allstatic=1 for +l propagation, 0 for item only
+	 Makerules: fix $(.SHARED. ...) usage
+	 Makerules: :INSTALL*: now handles dir on rhs
+	 Makerules: add %.cxx
+	 Makerules: add .ti to clobber list
+	 Makerules: cc-: `~' => space if specified, otherwise `,' => space
+	 Makerules: add recurse_enter and recurse_exit
+	 misc.c: add %[eFfFgG] print formats
+	 expand.c: generate() lists primary and secondary by default
+	 Makerules: add .author and PROTOID to PROTOCOPYRIGHT
+	 Makerules: allow state on :INSTALL*: rhs
+	 Makerules: .CC.MEMBER: jobs>0 workaround: a bug coverup
+	 Makerules: add :PACKAGE: debug profile CC.LIB.TYPE
+	 expand.c: fix putptr(0) base addr switch
+	 .SCAN.IGNORE: don't block on these - duh
+99-07-17 --- release 3.6 ---
+99-06-24 Makerules: fix .SHARED.ON. test
+99-06-15 make.probe: shlib before others, /var/shlib, -none == ! -all
+99-06-14 Makerules: +lfoo applies to self, not to .req members
+99-05-09 option: separate usage string stream
+99-05-01 main: long options
+99-04-22 Makerules: fix :LIBRARY: for version "-" (no version)
+99-04-01 Makerules: -mam cleanup
+	 Makerules: %.req version bug fix
+	 Makerules: :PACKAGE: :nolibrary means it -- don't pull it in
+	 Makerules: .REQ. fix
+	 Makerules: fix .req -mam cc script
+	 expand: regfatalpat() for regcomp() pattern in error messages
+	 option: first optget() interface -- could be more complete
+99-03-17 Makerules: %.req just binds -- duh
+	 Makerules: .RECURSE clears .RWD.
+	 Makerules: handle `lib - :LIBRARY: ...' => no VERSION
+	 make.probe: CC.DEBUG CC.HOSTTYPE CC.OPTIMIZE CC.STRICT CC.WARN
+	 main.c: command line scripts done after .MAKEINIT
+	 main.c: test 0x00020000 to close openfd before coexec
+	 make.c: D_scope prereqs take effect in make() too
+99-03-01 Makerules: add :P=C: to .MANIFEST.
+99-02-14 make.probe: move some init stuff from C.probe
+	 make.probe: deal with gcc/ld writing errors to stderr with 0 exit code
+	 trap: clean up .INTERRUPT interface
+	 Makerules: :PACKAGE: -l* .MULTIPLE
+	 Makerules: fix :: :LIBRARY: for cmd and lib by same name
+	 object.c: retain D_global in load()
+	 Scanrules: fix .PFX.INCLUDE test
+99-01-23 Makerules: *.req.REQUIRE : .IGNORE
+	 Makerules: add -f $(MAKEFILE) to .RECURSE $(MAKE) args
+	 Makerules: .REQUIRE.-l% checks $(PACKAGE_%_LIB)/lib/% first
+	 Makerules: make :PACKAGE: search picky about version
+	 Makerules: handle :PACKAGE: -lfoo
+	 Makerules: PACKAGE_%_VERSION defined
+	 make.probe: use full path for NM, etc.
+	 make.probe: libpath not added to CC.STDLIB
+99-01-11 Makerules,make.probe: CC.MEMBERS.UNDEF
+	 Makerules: fixed .SHARED.lib wrt :PACKAGE:
+	 make.probe: tweak CC.STDLIB
+98-12-25 Makerules: :LIBRARY: initializes VERSION var if not set
+	 Makerules: add tgz, tarball; drop update*; pax and tgz recursive
+	 Makerules: tarball uses VERSION
+	 Makerules: `:: dir' adds dir to manifest
+	 Makerules: arch-$(_hosttype_).mk architecture specific additions
+	 Makerules: $(CC.DLL) uses local *.lib
+	 expand: add :P=N: for 'native-path'
+	 expand: :P=S=subdir: to handle recursive manifest
+	 parse: fix \\n splice bug that activated rules direcive
+	 rule: .READONLY external support
+	 bind: (P_readonly|P_terminal) does not get attribute assoc
+	 bind: add rule_compare() and rule_hash() for case hacks
+	 option: -o writeobject (on by default)
+	 expand: regcomp(REG_SHELL) needs REG_LEFT|REG_RIGHT -- duh
+	 rule: include + "file" to include file as global makefile
+	 make,rule: fix state.force and P_force for P_dontcare
+98-12-25 --- release 3.5 ---
+98-11-11 expand: :G=x: tokenized
+	 add ms %.def:%.sym
+	 make: recheck require_p prereqs
+98-11-01 expand: fix ignorecase bug in :L:
+98-08-11 probe: add probe.ini for arch specific shortcuts
+	 probe: add opional CC.MAKE.OPTIONS
+	 Makerules: check CC.MAKE.OPTIONS
+	 bind.c,scan.c: a few more uwin file path workarounds
+	 parse.c: readline() now converts \r\n => \n
+	 variable.c: V_functional looks for "v->name" and ".v->name." rule
+98-07-17 Makerules: check before assuming /usr/lib or /lib
+	 command.c: fix P_before P_repeat FAILED bug
+	 Makerules: add .UNBIND to .PACKAGE.LIBRARIES. (must be a better way)
+	 Makerules: add static=1 to favor lib instead of dll (except for std)
+98-05-26 make.probe: add /usr/lib /lib verification
+98-05-01 rule.c: add .RUN .WAIT for background job control
+	 rule.c: add .MAKEPROMPT .MAKERUN sequence points
+	 rule.c: add .RESET to reset rule info to start state
+	 parse.c: interactive sfpoll sfstdin and state.coshell->msgfp
+98-04-01 expand: plug leak by calling regfree() for :C:
+	 Makerules: adjust .IFFE.REF. fix to not include package being built
+	 Makerules: add %.cpp for C++
+	 scan.c: don't tokenize quoted implicit prereqs!
+98-03-17 Makerules: fix .IFFE.REF. to expand package include dirs
+98-02-14 Makerules: fix .IFFE.REF. to expand required libraries
+98-01-23 Makerules: add _hosttype_ to .MAM.INIT
+	 Makerules: :PACKAGE: x attempts include - "pkg-x.mk"
+	 Makerules: handle :LIBRARY: rhs +l*
+	 pkg-tcl.mk: initial release
+98-01-11 Makerules,probe: add CC.SHARED.REGISTRY and CC.SHARED.REGISTRY.PATH
+97-10-31 Makerules: CC.PIC not that easy to deprecate!
+	 Makerules: fix -L option for *.req rule
+	 Makerules: LDRUNPATH unset by default
+	 Makerules: no CC.SUFFIX.LD to AR
+97-10-11 Makerules: fix :LIBRARY: *.req prerequisites
+	 probe: fix ld probe, add CC.SUFFIX.LD=".def .exp" for uwin
+	 make.c: REQUIRE map => - marks rule virtual
+97-08-11 Makerules: .BASE.DATE.FORMAT. for y2k
+	 Makerules: drop weird xxx.a install in .SHARED.DEF.lib
+	 Makerules: add $(.sh.) as non-frozen version of $(sh)
+97-07-17 Makerules: move $(MAKELIB) to the front of PACKAGE search
+	 Makerules: required libraries linked with dll too
+	 version.c: tighten initdynamic[] loop termination
+97-05-09 Makerules: /usr/local/arch/$(_hosttype_) first in LCLDIRS
+	 Makerules,make.probe: add mvs.390 dll support
+	 expand: don't :T=A: if .SCAN.IGNORE
+	 variable: allow `export name=value'
+	 Makerules: allow `:MAKE: name=value' => `export name=value'
+	 Makerules: bias package binding to fully qualified PATH dirs
+	 Makerules: IFFEFLAGS uses CCLDFLAGS instead of LDFLAGS
+	 Makerules: don't change -Wl., in cc-% (hack alert)
+	 Makerules: CC.PIC deprecated for CC.DLL
+	 Makerules: _INSTRUMENT_ deprecated for _BLD_INSTRUMENT
+	 Makerules: _TRACE_ deprecated for _BLD_DEBUG
+	 command: -t attempts to touch fs .o as well as .a/.o
+96-12-25 --- release 3.4 ---
+	 add CC.LD.DYNAMIC and CC.LD.STATIC to make.probe and makerules
+	 add .PROBE.LOAD and .PROBE.SPECIAL. to catch/start early probe
+	 addfile(xxx) for xxx.exe on _WIN32
+	 bind.c: check for _WIN32 C:/ prefix
+	 parse.c: -FUNCTIONAL now clears var.functional too
+	 Makerules: .CC.MEMBERS. fixed for small ARG_MAX systems
+	 Makerules: OFFICIAL file now in lower view
+	 Makerules: drop -G* from CC.PROFILE
+	 Makerules: remove global +lxxx => -lxxx==+lxxx
+	 archive.c: add `/*/' to SYMDIR_port (for sgi.mips4)
+	 Makerules: if $(CC.PROFILE) and $(CC.PIC) then don't install .ARCHIVE
+	 make.c: relax `modifying lower view file' message via dontcare
+	 Makerules: fix +lxxx MAM bind
+	 Makerules: fix :LIBRARY: req file generator
+	 Makerules: fix :PACKAGE: LIBDIR search
+	 ppcc: install in $(MAKELIB)
+	 ARG_SCRIPT: fix bug that mishandled `+' and `&' in cmd line targets
+	 Makerules,probe: add CC.SUFFIX.LD and ldscript for ld scripts
+	 Makerules: add $(sh command): where has this been hiding
+	 a:-TARGET now works
+	 .ARCHIVE not scanned if rule.scan==.SCAN.IGNORE
+	 :LIBRARY: sets .MAIN.TARGET. too
+	 make.probe: don't automatically place /usr/lib last
+	 make.probe: add CC.SUFFIX.LD
+	 Makerules: handle cc-opt1,-opt2 by splitting options on ,
+	 bind.c,metarule.c: handle _WIN32 directory ignorecase
+	 Makerules: add :DLL: .DLL for dll generation
+	 Makerules: fix .MAKEINIT premature :T=F: that botched .SOURCExVPATH
+	 object.c: fix to handle 01/24/89 format objects (yes it still works)
+	 ppcc,Makerules.mk: generalize $(CC.DIALECT) option passing
+	 metarule: case sensitive match for patterns matching `[-+]*'
+	 archive.c,object.c: (Sfoff_t) for K&R compilers
+	 MAKEFILES=Nmakefile:nmakefile:Makefile:makefile -- thanks bill
+	 MAKEARGS=Nmakeargs:nmakeargs:Makeargs:makeargs -- thanks again bill
+	 probe: add CC.LD.RUNPATH
+	 Makerules.mk: add LDRUNPATH and CC.LD.RUNPATH support
+	 Makerules.mk: tone down PTR prereq scan
+	 .GETCONF: first builtin function
+96-11-28 ccmaps .mo for ascii/ebcdic compatibility
+96-10-31 outstanding bug reports addressed
+	 :LIBRARY: defines _BLD_<lib>==1
+	 use PATH=$(STDDIRS):$PATH to find STDRM etc. in Makerules.mk
+	 add CC.SUFFIX.DYNAMIC for win32 .dll .lib .a
+96-10-11 metarule rhs prefix dir check even if rhs has prefix questionable=0x8
+	 alias check path suffix in bindfile questionable=0x10000
+	 add more instrument guesswork
+	 .PFX.INCLUDE headers must be .TERMINAL
+	 fix $(...) bug that let some unselected items slip through
+96-10-01 update make.probe for probe_libdir to catch alpha /usr/shlib
+96-09-09 add CC.PROBEPP to override pp probe info
+	 add $(INCLUDEDIR) and $(LIBDIR) to .SOURCE* from $(ancestor_list)
+96-08-11 --- release 3.3 ---
+96-07-17 don't pass -D-* to cc in ppcc
+	 add ``X|external-scan $(%)'' external scan
+	 clean up makerules/probe readonly
+96-05-31 fix $(".":P=L*) for no views
+96-05-09 make.probe: drop multiple / in stdlib
+	 try to stat non-readable files
+96-04-22 fix staterule()->scan assignment evaluation order ambiguity in scan.c
+96-02-29 -lxxx binds to +lxxx if +lxxx bound first
+	 add pkg to OPTDIRS
+	 cut off botched metaclose recursion unless questionable=0x100
+	 `.XXX : .USE .IMMEDIATE .ATTRIBUTE' -> `xxx yyy' -> `xxx : yyy'
+	 fix :PACKAGE: search bug that forced package name to be in root path
+	 add REGRESS + REGRESSFLAGS
+	 aliases may produce more than one :P=D: bound dir
+	 fix nonterminating D_scanned loop in scan()
+	 handle -L* on :LIBRARY: rhs
+96-02-14 $(CC.SUFFIX.COMMAND) appened only if no suffix
+	 :PACKAGE: xxx:version=n.m:static:dynamic:nolibrary:noinstall:
+96-02-07 archive scan handles multiple port|rand meta entries
+	 rescan check on (s|alt)&P_force
+	 scan A action can now set (.+) or clear (-) attributes
+96-01-31 :PACKAGE: libs now .DONTCARE
+	 fix touch bug that kept the blasted libast conf*.[ch] out of date
+96-01-01 AT&T Research
+	 uwin Makerules.mk and make.probe tweaks
+	 :I<: for literal intersection, otherwise pathname intersection
+	 convert to <regex.h>
+	 condition LN on _feature_=ln
+95-12-08 fix :LIBRARY: -lxxx probe
+	 add uwin dll to make.probe and :LIBRARY:
+	 BINED -> ED
+95-11-24 . :INSTALLDIR: does not add to all or man
+95-11-11 installed CC.SUFFIX.SHARED are now readonly
+	 CC.SUFFIX.SHARED==CC.SUFFIX.OBJECT expands -l*
+	 CC.SUFFIX.SHARED installed readonly
+	 CC.SUFFIX.SHARED hard linked to CC.SUFFIX.SHARED.major.minor
+	 P_target && D_dynamic does not imply generated (questionable=0x4000)
+95-10-11 fix :TABLE: options `no' and `NO' entries
+	 D_source is now cleared in make object for .SOURCE cross product
+	 $(^) subject to localview() too
+	 fix :WORKAROUND: for in-place changes
+	 set include=dir appends to .SOURCE.mk
+	 .ASSERT intercepts not applied to .IMMEDIATE targets
+	 -d4 lists make object prerequisite file info
+	 fix state.targetcontext expand bug that dropped too many marks
+	 add %.o:%.S to makerules/scanrules
+	 intersect() now handles invented :P=D: .. dirs not in .SOURCE*
+	 drop $(CC.REPOSITORY:@?-l??) from PPCC
+	 add sun -[Qq](dir|option|path|produce) to ppcc
+	 add proto -x to :INSTALLPROTO:
+	 fix compvar() V_oldvalue bug that put command line def in .mo
+	 internal.export -> internal.exported for proto export keyword
+	 :T=G: never matches non-target .TERMINAL
+95-10-01 add :TABLE: novariables to inhibit leaf variable assignments
+	 add preliminary long edit op names and converter
+	 D_global if not P_target (questionable=0x800 for old behavior)
+	 alias if !streq(name,r->name) (questionable=0x1000 for old behavior)
+	 fix scanrules .PREFIX.INCLUDE. handling of ../*
+	 more aggressive putbound() in bindalias() (-Q0020000 for old)
+	 `.FORCE : x' sets P_force too
+	 longest metarule patterns applied first
+	 more alias fixes
+	 move scan attribute/property additions before staterule() call
+	 :INSTALLMAP: ... scan now more selective
+	 .UNBIND now sets rule.time=0
+95-07-17 --- release 3.2 ---
+	 :F=%x: sfio 'u' internal format now handled
+	 fix .PTR.OPTIONS. initial condition
+	 fix .ERROR to work like 2.2 if !.FUNCTIONAL
+	 .FUNCTIONAL .ERROR return value: new level, no msg if already printed
+95-06-28 add *.ii to .CLOBBER. for EDG C++
+95-05-09 add SYMDIR_strict for strict ranlib uptodate check
+	 change $(!$(*:O=1)) to $(!$(*)) since lists are ok now
+	 drop .SAVE. since :: already handles it
+	 add old value to state variable changed explanation
+	 add .DO.READONLY.-xMerge
+	 unused var cleanup
+	 another make.probe preroot workaround
+	 add .CC.NOOPTIMIZE local scope
+	 handle `t {}' and strip lead space in {...}
+	 fix r==0 dereference in :P=B:
+	 don't force CCFLAGS=-g for instrument=purify
+	 fix .BIND.-l% version interactions with -lxxx.[0-9]
+	 add -o noalias to diable directory aliasing (for .INSTALL.LIST)
+	 make.probe pic test must check linker too
+	 calm down +([a-z]) => .+([A-Z]) conversion for :ALL: and .ARGS
+	 &error_info cannot be in a static initializer
+	 .OFFICIAL uses .MANIFEST. instead of .SOURCES.
+	 fix scope var bug that appended twice
+	 add - stack debug command to query
+	 drop extra .so's from ship.list.bin
+	 state.mam.out && !state.mam.port doesn't rebind after build
+95-04-01 `:: xxx' marks xx .TERMINAL
+	 fix recursion bug in :G:
+	 define PACKAGE_* vars if !mam too
+	 fix ciadb to exclude headers that may generate %.o (e.g., *.c)
+	 fix stray M_mark bug caused by expand() inside intersect()
+	 fix :INSTALLMAP: with no lhs
+	 :PACKAGE: is a little less restrictive on package root search
+	 use $(CCLDFLAGS) in %:%.s
+	 change :T=G: to check .TERMINAL state before .TERMINAL
+	 fix ppcc.sh pattern match ksh93ism for bsh compatibility
+	 fix PROTOFLAGS expansion with :Q:
+	 generated .SCAN.c do not get .PFX.INCLUDE
+	 scan prereqs for .JOINT targets are in staterules(PREREQS)
+	 change obsolete MAM -expandview ref to static*,port*
+	 fix trap bug that used elementsof(int*caught)
+	 makerules PTRMUST -> PTRMKDIR
+	 alpha archive symbol directory has word size embedded _64E[BL]E[BL]_
+	 fix \0 in output of recursive print -um
+	 fix bindfile() .. test for terminal directories [via Rich Drechsler]
+	 tablook() prototype tweak
+	 fix putbound() test in bindfile [via Dan Tiernan]
+	 beef up makerules $SHELL -n test
+	 drop newlines from PROTOCOPYRIGHT for MAM
+95-03-19 fix .AFTER job freelist bug in trigger() [via Rich Drechsler]
+	 add makerules STDDIRS; SYSRM -> STDRM {cmp,cp,ln,mv,rm}
+	 clean up makerules INSTRUMENT_* interface
+	 -v no longer turns on ppcc verbose
+	 fix cc- MAKEPATH override by $(=)
+95-02-14 fix targetcontext mkdir() test
+	 fix printarg() for proper sfio interface
+95-01-19 add CC.ARFLAGS for $(CC) that generates libraries
+	 add CC.DIALECT=PTRIMPLICIT for implicit C++ ptr dir name
+	 add CC.DIALECT=PTRMKDIR if C++ local ptr must exist
+	 add CC.DIALECT=PTRCOPY if C++ PTRMKDIR contents copied 
+	 fix CC.READONLY probe to cast the const pointer assignment
+	 punt() now assumes oldmake has mam if options set
+	 add a few .SPECIAL's in ::
+	 fix rule.time update for .NULL action in trigger()
+	 add A_* flags instead of assertion() set.clear, etc.
+	 OP_NONE assertions are A_special
+	 x :LIBRARY: makes x virtual prereq of .ALL
+	 "local" statement mods for operator and function arg handling
+	 local same-name same-name gives dup name initial value of 1
+	 local name=value now accepted
+	 local -[n] arg ... sets $(1) ... [empties missing up to n]
+	 local (formal ...) actual ... sets formals from actuals
+	 $(;) returns the state data (formerly $(#))
+	 $(#) is the arg count from local -[n] | (formal ...) ...
+	 add TABLE.mk for :TABLE: table and map lookup
+	 add SS.mk for :SS: directory hierarchy subsystems
+	 don't forceread if global (questionable=0x400 for old behavior)
+	 add -o targetcontext to expand action in target dir context
+	 add state.context and MARK_CONTEXT for state.targetcontext
+	 fix a few more alias bugs
+	 .MAKE .LOCAL actions can contain parent scope assignments
+	 add base and delta common actions for pax -z support
+	 add :SYSTEM: to :SS: in SYSTEM.mk and delete SS.mk
+	 fix rebind to first clear D_entries|D_scanned
+	 add "*.[sS]|*.[aA][sS][mM]" to ppcc source list
+95-01-01 fix .CLOBBER $(-global) expansion
+	 .NULL metarule now provides equivalence for :G:
+	 avoid multiple entries in make.probe CC.REQUIRE.++ 
+94-12-25 ppcc, MAM -l<shared>, probe tweaks
+	 fix port/rand ar touch bug that modified member terminator
+	 fix .DO.INSTALL bug that asserted x : x
+	 avoid a few more 'not compiled' panics
+	 add -o mam=<type>[,noport] to inhibit porting hints
+	 drop mam_port and use noport mam option
+	 fix V_retain bug that took value from lowest view statefile
+	 fix PACKAGE .SOURCE.(h|a) that blew the CC.STD(INCLUDE|LIB) order
+	 fix .REBIND to work like .UNBIND on directories
+	 PACKAGE lib not .DONTCARE by default
+94-11-11 --- release 3.1 ---
+	 detect loops in complete() to avoid `did not complete'
+	 fix D_entries|D_scanned propagation in merge()
+	 fix .BIND. view and state.targetview propagation
+	 add :WORKAROUND: for external distribution workarounds
+	 merge(MERGE_ALL) does not propagate rule.scan==SCAN_NULL
+	 .OFFICIAL diffs changed files into ./OFFICIAL
+	 fix scan attribute propagation interaction with dirscan()
+	 fix uninitialized od reference in bindfile()
+	 fix ppcc -O over shift and empty rm
+94-10-01 CC.DIALECT DOTI : *.i accepted as preprocessed input
+	 CC.DIALECT TOUCHO : cc link may touch *.o
+	 $(CCC) dropped in favor of simpler $(PPCC)
+	 $(FEATURE) changed to $(IFFE)
+	 add -o mam=<type>[,dontcare] to list dontcare targets too
+	 fix staterule() to accept top view state if time matches
+	 fix bindfile()+putbound() for ..
+	 fix VOFFSET,VROOT for non-3d
+	 fix bindstate() recursion
+	 fix metaclose() bug that forced artificial metarule ordering
+94-08-11 add state.questionable mask (looks like it should go but not sure)
+	 move some state.test bits to state.questionable
+	 add MAM generated attribute
+	 add fs3d view loop test
+	 Os option arguments must be specified
+94-07-17 --- release 3.1 ---
+94-06-11 add -o believe=level (-B level) for 2d
+	 -b no longer implies -c
+	 -b implies no makerules
+	 uncouple state.keepgoing from state.mam (should have learned by now!)
+	 dirscan() sets rule.bound and rule.time
+	 add .SYNC : file [edit-select]
+	 fix .QUERY longjmp active frames and error trap hold
+	 fix pattern association parse that botched ../*%*
+	 avoid pathcanon() in metarule makerule() calls
+	 change include from control statement to immediate rule
+	 use rule in include list uses action as include file filter
+	 add makerules mam_port=0 to inhibit -o mam=static ${mam_*} mappings
+	 promote lower view state to top on load if no previous top iview state
+94-05-22 virtual preview not propagated
+	 fix nested loops in file input
+	 fix unalias() bug that dropped original binding
+	 fix merge() bug that called bind() while bind in progress
+	 fix -ptr *again* for CC 3.0.3
+	 add $(^) for current line in scan
+	 :A>pattern: matches rule prereqs
+	 fix statevar stateview search that unnecessarily forced re-scan
+	 .PARAMETER file checks now done after .INIT
+	 update CIA rules to use DOT instead of DAG
+94-04-01 .ERROR made for levels > 0; return 1 inhibits message print
+	 $(.ERROR) set to level and message text inside .ERROR
+	 stateview() now binds before searching state views
+	 fix CC.SO install for live replacement
+	 add .COMPDONE to fit the .INIT+.DONE pattern
+	 add rule.mark and M_* to eliminate mark clashes
+	 add .INTERRUPT.<signal> for signal specific handlers
+	 add .ALARM:<elapsed> immediate rule to set alarm
+	 add $(.ALARM) to be absolute time for next alarm, 0 for no alarm
+	 add .SYNC immediate rule to sync statefile
+	 maketop() now resets property when complete
+	 maketop(P_ignore) temporarily sets keepgoing=1
+	 xxx -> .XXX immediate test for all `no operator on line' statements
+	 .FORCE : xxx forces xxx to be new
+	 { action } -> .ALWAYS :$("\n\t")action
+	 immediate a b c -> .IMMEDIATE : a b c
+	 attribute a b c -> a b c : .ATTRIBUTE
+	 a b c { action } -> a : b c$("\n\t")action
+	 :MAKE: allows rhs a/b
+	 .DO.l.CC dropped -- let C++ fend for itself
+	 (<id>*)<stuff> can appear as target
+	 $("":D) no longer produces ``.''
+	 print -n -u[0-9m] -f "format" +-[io] path -p command data ...
+	 read -n -u[0-9m] +-i path +-o path -p command variable
+	 -uxxx may appear in $(INSTALLROOT)/lib/lib/<LIB>
+	 fix scan | ... % | bug that forced trailing space
+	 replace CC.OBJ and CC.SO with CC.SUFFIX.*
+	 .MAKE .OPERATOR prereqs made before operator applied
+	 add .PROBEINIT to .MAKEINIT and "::"
+	 .SHARED. now links with CC.SUFFIX.SHARED sibling library if it exists
+	 fix alias .UNBIND
+94-03-01 unify mam with gmake (additions done by gsf)
+	 -o mam={dynamic|regress|static}[:file[:[label][:root]]]
+	 -M no longer implies -nF
+	 -o mamtrace=file (-m) dropped
+	 -o regress=root dropped
+	 -o never (-N) added to override .ALWAYS
+	 fix scan bug that assigned strategy before binding
+	 frozen V_functional always causes .mo recompile
+	 add oldname(r) to fix unbind bug that omitted putbound(r,0)
+	 ``else if'' now accepted for ``elif''
+	 complain about extra chars after else and end
+	 add :T=Z[CERS]: for {cancel,event,relative,state} time
+	 fix circular implicit prereq actions
+	 fix aix shared library probe
+	 finish now handles errors in .MAKEDONE and .DONE
+	 fix stray D_mark unbind with D_markbind,D_markprereq,D_markscan 
+	 fix :READONLY: probe for mips
+	 base rules unbound after reading (so make can install them!)
+	 delay statefile load until after makefile read
+	 add complete() for MAKING implicit prereq
+	 add CC.REPOSITORY with repository dir value
+	 delete PTREPOSITORY from CC.DIALECT
+	 stop .INSERT|.APPEND from adding duplicate prereqs unless .MULTIPLE
+	 .QUERY now pushes an active frame (shows up in $(<))
+	 fix state view resolution in stateview()
+	 fix :G=a/b: with no %
+94-02-14 warn about implicit reference while action in progress
+	 add print -opath
+94-01-31 .CLEAR now checks staterule before freeing prereq list
+	 .UNBIND now clears D_global, D_regular and preview
+	 add :F=%(time-format)T:
+	 add :F=%(invert|lower|upper|variable)S:
+	 change :F=[LUV]: to :F=%(lower|upper|variable)S: with obsolete warning
+	 fix .MEMBER view/preview mismatch that triggerred unnecessary actions
+94-01-11 $("":T=R) operates on current date
+	 add print -n -u[12m] -f "format"
+	 fix \<newline> action parse
+93-12-01 --- release 3.0 ---

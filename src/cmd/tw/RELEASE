@@ -1,0 +1,50 @@
+99-10-11 tw: tighten up --generate exit codes
+	 updatedb: add a few options
+99-08-11 find: fix -size
+	 find: undef NOGROUP NOUSER -- (net)bsd stomps again
+99-07-17 xargs: newline *and* space separated args -- duh
+99-05-24 find: fix PRINT!=0 enum logic bug
+	 find.tst,tw.tst: add
+99-05-21 tw: fix print --man
+99-05-09 tw,xargs: sfopen(sfstdin,0,"rt") file list
+99-04-01 find: get -o -or and -a -and disambiguation order correct
+	 find: -*time -*min fix
+	 find: -exec {} malloc bug fix
+	 find: fix exit status
+	 xargs: long options, \r\n, fix exit status
+	 tw: long options, fix exit status
+99-03-11 find: convert to optget()
+99-03-03 tw: CMD_INSERT instead of CMD_POST, fix `-' file list on stdin
+	 find: FTW_SEEDOTDIR, CMD_INSERT instead of CMD_POST
+99-02-14 cmdarg: use astconf("ARG_MAX")
+	 find: -fast to execute() just like tw
+	 find: -xargs command ';'
+99-01-23 locate,updatedb: add
+	 cmdarg: fix bug that did not 0 last terminator in file list
+98-11-11 find: -ls => ls -lis
+	 find,tw: add astconf("PATH_ATTRIBUTES") and strmatch(STR_ICASE)
+98-08-11 tw: add 32x4 file content checksum
+	 cmdarg: fix off-by-1 bug that lost 1 arg per cmdflush()
+98-07-01 tw: fix expr convert disc
+98-05-28 find: add -magic pattern and -mime pattern
+98-03-11 tw: fix p=pwd initialization bug
+	 tw: fix -m interaction bug with action
+98-02-14 find: add -icase for -fast ignorecase
+	 tw: add -I for -f ignorecase
+	 use FTW_MULTIPLE to get ordering on cmd arg dir list too
+	 pass dir list to findopen(read)
+	 tw: -G now takes format arg
+98-02-04 find: add -fast primary to handle std `find x' == `find x -print'
+97-05-09 tw: mime && magic now use PATH(ftw)
+96-11-28 find: add optget()
+96-10-11 find: fix multiple -exec bug
+	 tw: strdup() compile time strings!
+96-10-01 update for magic discipline
+96-05-09 add find and xargs
+	 tw,find,xargs now use cmdarg.[ch] for exec arg limits
+	 tw: add -F codes to read/write fast find codes
+96-02-29 use EXIT_STATUS() to properly report command exit status
+95-05-09 add string magic field
+	 add -X (don't cross device boundaries)
+95-03-11 create this file
+	 add -H for FTW_META|FTW_PHYSICAL

@@ -1,0 +1,346 @@
+.de X		\" fixed width font
+.ft 5
+.it 1 }N
+.if !\\$1 \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
+..
+.de XR
+.}S 5 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de RX
+.}S 1 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de XI
+.}S 5 2 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de IX
+.}S 2 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH PS 1
+.SH NAME \" @(#)ps.1 (gsf@research.att.com) 1997-12-20
+ps \- report process status
+.SH SYNOPSIS
+.B ps
+[
+.B \-acdefjlvxADT
+] [
+.B \-g
+.I process-group
+\&...
+] [
+.B \-G
+.I group-id
+\&...
+] [
+.B \-n
+.I namelist
+] [
+.B \-o
+.IR field [= label ]
+\&...
+] [
+.B \-p
+.I process-id
+\&...
+] [
+.B \-s
+.I session-id
+\&...
+] [
+.B \-t
+.I tty-name
+\&...
+] [
+.B \-u
+.I user-id
+\&...
+] [
+.B \-U
+.I user-id
+\&...
+] [
+.I process-id
+\&...
+]
+.SH DESCRIPTION
+.I ps
+writes process information to the standard output, limited by the
+privileges of the calling process.
+.P
+By default,
+.I ps
+selects all processes with the same effective user id and controlling
+terminal as the calling process.
+.SH OPTIONS
+Options that take list arguments allow
+.I space
+and
+.I comma
+separators.
+The absence of selection options is equivalent to
+.BR "\-o pid,tty,time,command" .
+The options are:
+.TP
+.B \-a
+Select all processes with a controlling terminal except session leaders.
+.TP
+.B \-A
+.PD 0
+.TP
+.B \-e
+.PD
+Select all processes.
+.TP
+.B \-c
+Equivalent to
+.BR "\-o pid,class,pri,tty,time,command" .
+.TP
+.B \-d
+Select all processes except session leaders.
+.TP
+.B \-f
+Equivalent to
+.BR "\-o user,pid,ppid,start,tty,time,args" .
+.TP
+.BI \-g " process-group ..."
+Select processes whose process group leaders are in the
+.I process-group
+list.
+.TP
+.BI \-G " group-id ..."
+Select processes whose real group id names or numbers are in the
+.I group-id
+list.
+.TP
+.B \-j
+Equivalent to
+.BR "\-o pid,pgrp,sid,tty,time,command" .
+.TP
+.B \-l
+Equivalent to
+.BR "\-o flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command" .
+.TP
+.BI \-n " namelist"
+Specify the
+.I namelist
+file, used to resolve
+.I wchan
+addresses.
+Ignored by this implementation.
+.TP
+.BI \-o " format"
+Write information according to the keys in
+.IR format .
+Format keys are described in the
+.B STDOUT
+section.
+Multiple
+.B \-o
+options are allowed; the result is the ordered union of all format keys
+(i.e., duplicates are removed from the right.)
+.B \-o?
+writes a description of each supported key to the standard output.
+.TP
+.BI \-p " process-id ..."
+Select processes whose process ids are in the
+.I process-group
+list.
+.TP
+.BI \-s " session-id ..."
+Select processes whose session leaders are in the
+.I session-id
+list.
+.TP
+.BI \-t " tty-name ..."
+Select processes whose controlling terminals are in the
+.I tty-name
+list.
+Terminal names may be specified as a full path, the device name with
+the leading
+.B /dev/
+omitted, or the device name with the leading
+.B /dev/tty
+omitted.
+.TP
+.BI \-u " user-id ..."
+Select processes whose user id names or numbers are in the
+.I user-id
+list.
+.TP
+.BI \-U " user-id ..."
+Equivalent to
+.BI \-u " user-id ..."
+in this implementation.
+.TP
+.B \-v
+Enable verbose warning and error messages about processes not requested
+by process id.
+Normally messages about non-existent processes are suppressed under the
+assumption that the process terminated in the window between process id
+collection and process status gathering.
+.TP
+.B \-x
+List process id numbers (process id, process group, terminal group, session)
+in hex.
+.TP
+.B \-D
+Equivalent to the default listing format
+.BR "\-o pid,tty,time,command" .
+.SH STDOUT
+The
+.B \-o
+option specifies a format key list that determines the information written to
+the standard output.
+The output consists of a heading line followed by one line of information
+per selected process.
+Each key has a default width that may be overridden by
+.BI \-o " key:width"
+and a default heading label that may be overridden by
+.BI \-o " key=label",
+and both may be specified by
+.BI \-o " key:width=label".
+If
+.I label
+contains
+.I space
+or
+.I comma
+characters then the next key must be specified with a separate
+.B \-o
+option.
+The output column width is set to
+.I width
+or the length of
+.I label
+or the larger of both if both are specified.
+Some format keys are not supported on some systems.
+.B "ps \-o?"
+reports the supported format keys.
+The keys and labels are:
+.TP
+.B "addr	ADDR"
+The physical address.
+Interpretation is system dependent.
+.TP
+.B "args	COMMAND"
+The command path with arguments.
+.TP
+.B "class	CLS"
+The scheduling class.
+Interpretation is system dependent.
+.TP
+.B "command	COMMAND"
+The command file base name.
+.TP
+.B "cpu	%CPU"
+The cpu percent usage.
+.TP
+.B "etime	ELAPSED"
+The elapsed time since start.
+.TP
+.B "flags	F"
+The state flags.
+Interpretation is system dependent.
+.TP
+.B "gid	GROUP"
+The numeric group id.
+.TP
+.B "group	GROUP"
+The group id name.
+.TP
+.B "nice	NI"
+The adjusted scheduling priority.
+.TP
+.B "ntpid	NTPID"
+The nt process id.
+.TP
+.B "pgrp	PGRP"
+The process group id.
+.TP
+.B "pid	PID"
+The process id.
+.TP
+.B "ppid	PPID"
+The parent process id.
+.TP
+.B "pri	PRI"
+The scheduling priority.
+.TP
+.B "refcount	REFS"
+The nt reference count.
+.TP
+.B "rss	RSS"
+The resident page set size in kilobytes.
+.TP
+.B "sid	SID"
+The session id.
+.TP
+.B "size	SIZE"
+The virtual memory size in kilobytes.
+.TP
+.B "start	START"
+The start time.
+.TP
+.B "state	S"
+The basic state.
+.TP
+.B "tgrp	TGRP"
+The terminal group id.
+.TP
+.B "time	TIME"
+The usr+sys time.
+.TP
+.B "tty	TT"
+The controlling terminal base name.
+.TP
+.B "uid	USER"
+The numeric user id.
+.TP
+.B "user	USER"
+The user id name.
+.TP
+.B "wchan	WCHAN"
+The wait address.
+.P
+The following format key aliases are also recognized:
+.TP
+.B comm
+Equivalent to
+.BR command .
+.TP
+.B pcpu
+Equivalent to
+.BR cpu .
+.TP
+.B rgroup
+Equivalent to
+.BR group .
+.TP
+.B ruser
+Equivalent to
+.BR user .
+.TP
+.B tid
+Equivalent to
+.BR tgrp .
+.TP
+.B vsz
+Equivalent to
+.BR size .
+.SH "SEE ALSO"
+.IR kill (1),
+.IR nice (1)

@@ -1,0 +1,111 @@
+:
+# @(#)probe.win32 (AT&T Labs Research) 2000-01-11
+#
+# win32 specific make C probe initialization
+# ms vc is easy on uwin
+#
+# 2> easy.err to avoid mysterious hang with bcc
+#
+
+probe_easy="winerror"
+
+{
+for i in $probe_easy
+do	echo "#include <$i.h>"
+done
+echo 'uwin=_UWIN'
+echo 'versionb=__BORLANDC__'
+echo 'versionm=_MSC_VER'
+} > easy.c
+
+for i in $probe_easy
+do	eval ${i}_include=
+done
+include=
+uwin=
+versionb=
+versionm=
+
+$cc -E easy.c 2> easy.err |
+egrep -i '^(#line 1 .*\.[hH]|(uwin|version[bm])=[0-9])' |
+sed	-e 's/.*"\(.*\)".*/\1/' \
+	-e 's,^[ 	]*,,' \
+	-e 's,[ 	]*$,,' \
+	-e 's,^\(.\):[\\/]*,/\1/,' \
+	-e 's,[\\/][\\/]*,/,g' \
+	-e 's,^\(/.*\)/\(.*\)\.[hH]$,\2_include="\1",' \
+	> easy.sh
+. ./easy.sh
+
+for i in $probe_easy
+do	eval d=\"\$${i}_include\"
+	case $d in
+	?*)	include=${d// /}
+		break
+		;;
+	esac
+done
+
+i=$($cc -V 2> easy.err)
+if	test "" != "$i" -a -d "$i/include"
+then	include=$i/include
+fi
+
+case $versionb$versionm:$include in
+[0-9]*:/*)
+	: the payoff
+	cat >&3 <<!
+CC.CC = `whence $cc`
+CC.ALTPP.FLAGS = -Yp,\$(CPP:D)
+CC.ALTPP.ENV =
+CC.ARFLAGS =
+CC.DEBUG = -g
+CC.DIALECT = ANSI DYNAMIC
+CC.DLL = -D_DLL
+CC.DYNAMIC =
+CC.HOSTTYPE = `package CC=$cc`
+CC.LD = /usr/bin/ld
+CC.LD.DYNAMIC = -Bdynamic
+CC.LD.STATIC = -Bstatic
+CC.LIB.DLL = option
+CC.LIB.ALL = -Bwhole-archive
+CC.LIB.UNDEF = -Bno-whole-archive
+CC.MAKE.OPTIONS = nativepp=-1
+CC.NM = nm
+CC.NMEDIT =
+CC.NMFLAGS =
+CC.OPTIMIZE = -O
+CC.READONLY =
+CC.SHARED = -G
+CC.STATIC =
+!
+	case $uwin in
+	[0-9]*)	cat >&3 <<!
+CC.STDINCLUDE = /usr/include ${include}
+CC.STDLIB = /usr/lib ${include%/*}/lib
+!
+		;;
+	*)	cat >&3 <<!
+CC.STDINCLUDE = ${include}
+CC.STDLIB = ${include%/*}/lib
+!
+		;;
+	esac
+	cat >&3 <<!
+CC.STRICT =
+CC.SUFFIX.ARCHIVE = .a
+CC.SUFFIX.COMMAND =
+CC.SUFFIX.DYNAMIC = .dll
+CC.SUFFIX.LD = .def .exp .res
+CC.SUFFIX.OBJECT = .o
+CC.SUFFIX.SHARED = .lib
+CC.SUFFIX.SOURCE = .c
+CC.SUFFIX.STATIC =
+CC.SYMPREFIX =
+CC.WARN =
+CC.PREROOT =
+CC.UNIVERSE = att
+!
+	exit 0
+	;;
+esac

@@ -1,0 +1,495 @@
+.de X		\" fixed width font
+.ft 5
+.it 1 }N
+.if !\\$1 \&\\$1 \\$2 \\$3 \\$4 \\$5 \\$6
+..
+.de XR
+.}S 5 1 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de RX
+.}S 1 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de XI
+.}S 5 2 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de IX
+.}S 2 5 \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
+..
+.de EX		\" start example
+.ta 1i 2i 3i 4i 5i 6i
+.PP
+.RS 
+.PD 0
+.ft 5
+.nf
+..
+.de EE		\" end example
+.fi
+.ft
+.PD
+.RE
+.PP
+..
+.TH CQL 1
+.SH NAME \" @(#)cql.1 (gsf@research.att.com) 1995-08-11
+cql \- C query language
+.SH SYNOPSIS
+.B cql
+[
+.B \-aglnruw
+] [
+.B \-e
+.I expression
+] [
+.B \-f
+.I file
+] [
+.B \-I
+.I directory
+] [
+.B \-L
+.I directory
+] [
+.I data
+\&...
+]
+.SH DESCRIPTION
+.I cql
+applies C style expressions to flat database files.
+A flat database is a sequence of
+.B newline
+terminated records of
+.B delimiter
+separated fields.
+.PP
+Files are processed as follows.
+.I cql
+first evaluates the
+.X begin
+expression if defined, then sequentially applies the
+.X select
+expression to all records.
+The
+.X action
+expression is evaluated for each record that
+.X select
+evaluates to non-0.
+After all records have been checked the
+.X done
+expression is evaluated if defined, and
+.I cql
+exits.
+The default
+.X select
+expression is
+.X 1
+(all records are selected) and the default
+.X action
+expression prints the record on the standard output.
+.PP
+Depending on the input file declarations,
+.I cql
+may generate index files for quick record access.
+Indexes are used to filter out records for which
+.X select
+would evaluate to 0.
+Index files are placed in the current directory and each is named
+by changing the case of the corresponding flat database file name, starting
+from the last character, and proceeding backwards until the first `.'.
+.PP
+The options are:
+.TP
+.B a
+Run
+.I cql
+in active mode by reading declarations and expressions from the standard input.
+The special sequence
+.X %%
+separates the declarations from the expressions.
+.X %%
+after an expression applies that expression to the input files.
+.B EOF
+terminates the active session.
+Active mode error message lines are prefixed with
+.XR "%% cql:" .
+.TP
+.BI e " expression"
+.I expression
+defines the database schemas and the labelled expressions
+that control database traversal.
+Multiple
+.B \-e
+expressions are parsed in order from left to right.
+A schema is similar to a C
+.X struct
+declaration with the
+.X struct 
+keyword omitted.
+A schema specifies names and types for the fields in a database record.
+The types are:
+.RS
+.TP
+.X char*
+A null-terminated C string.
+.TP
+.X date_t
+A C
+.X "unsigned long"
+variable whose string representation is a date.
+.TP
+.X elapsed_t
+A C
+.X long
+variable whose string representation is elapsed time in 1/100 seconds.
+.TP
+.X float
+A C
+.X double
+variable.
+.TP
+.X hex
+A C
+.X "unsigned long"
+variable whose string representation is hexadecimal.
+.TP
+.X int
+A C
+.X long
+variable.
+.TP
+.X string
+Equivalent to
+A null-terminated C
+.X char*.
+.TP
+.X unsigned
+A C
+.X "unsigned long"
+variable.
+.RE
+.IP
+Schemas are themselves types.
+.I "schema field;"
+declares a subfield within the record and
+.I "schema* field;"
+declares a field that indexes another schema.
+In this case the field is a string key value that is used to match the
+first field in the referenced schema.
+The
+.X register
+prefix denotes fields that should be indexed;
+references to other schemas are always indexed.
+.IP
+The first declared schema becomes the main schema
+(the schema of the databse to be scanned).
+The main schema may also be set by
+.XI schema= schema ; .
+.IX schema .delimiter= delimiter ;
+sets the schema delimiter and
+.IX schema .input= \"file\" ;
+sets the schema input.
+The default delimiter is
+.XR ; .
+The main schema input is the
+.I file
+command line argument if specified.
+Otherwise schema input file names are determined by the schema name
+with an optional
+.B .db
+suffix.
+Multiple schemas may be placed in a single file using the
+.IR pax (1)
+.B vdb
+archive format.
+Traversal expression syntax is described below.
+The expression labels are:
+.RS
+.TP
+.X action
+Evaluated for each record in which
+.X select
+returns non-zero.
+The default
+.X action
+lists each selected record as it appeared in the databse.
+.TP
+.X begin
+Evaluated once before the traversal begins.
+The return value is ignored.
+.TP
+.X end
+Evaluated once after the traversal ends.
+The return value is ignored.
+.TP
+.X select
+Evaluated once for each record.
+If the return value is non-zero then
+.X action
+is evaluated.
+The default
+.X select
+return value is always non-zero.
+.RE
+.TP
+.BI f " file"
+Equivalent to \fB\-e "#include '\fP\fIfile\fP\fB'"\fP.
+.TP
+.B g
+Override
+.X action
+by listing selected records in
+.IR g2 (5)
+format.
+.TP
+.B l
+By default index files are only generated in the directory containing
+the data files;
+.B \-l
+allows index files to be generated locally.
+.TP
+.B n
+Do not generate any index files.
+If index files are required then
+.I cql
+exits with non-zero status.
+.TP
+.B w
+Turn off malformed database warning messages.
+.TP
+.BI I " directory"
+Search for 
+.X #include
+files in
+.I directory
+before the default
+.IX INSTALLROOT /lib/cql .
+Multiple
+.B \-I
+directories are searched in order from left to right.
+.TP
+.BI L " directory"
+Search for database and index files in
+.IR directory .
+Multiple
+.B \-L
+directories are searched in order from left to right.
+.SS Expressions
+A labelled expression is defined by:
+.EX
+    \fIlabel : statement-list\fP
+.EE
+or
+.EX
+    \fIlabel() { statement-list }\fP
+.EE
+where
+.I label
+is one of
+.XR action ,
+.XR begin ,
+.X end
+or
+.X select
+and each statement in
+.I statement-list
+is an
+.IR expr (3)
+C style expression, including
+.XI int " variable, ..."
+and
+.XI float " variable, ..."
+declarations,
+.X (int)
+and
+.X (float)
+casts,
+.XR if \- else
+conditionals,
+.X for
+and
+.X while
+loops, and
+.XR { " ... " }
+blocks.
+The trailing
+.B ;
+in any expression is optional.
+.X select
+is assumed when
+.IR label :
+or
+.IR label ()
+is omitted.
+In the absense of a
+.X return
+statement
+the expression value is the value of the last evaluated expression in
+.IR statement-list .
+Numbers and comments follow C syntax.
+String operands must be quoted with either
+\fB"..."\fP or \fB'...'\fP.
+String comparisons
+.RB ( ==
+and
+.BR != )
+treat the right hand operand as a
+.IR ksh (1)
+file match pattern.
+.PP
+The expressions operate on the fields in the current input record.
+The
+.X begin
+and
+.X end
+expressions operate on a null valued current record.
+If a
+.X date_t
+type field is an operand to a binary operator then the other operand
+may be a string that is interpreted as a
+.IR tm (3)
+date expression.
+If a
+.X elapsed_t
+type field is an operand to a binary operator then the other operand
+may be a string that is interpreted as a
+.IR ast (3)
+elapsed time expression.
+.PP
+.I cql
+provides a predefined readonly schema
+.X cql
+with the following elements:
+.TP
+.X "elapsed_t clock"
+The elapsed time in 1/100 seconds since this
+.I cql
+started.
+.TP
+.X "date_t date"
+The date when this
+.I cql
+started.
+.TP
+.X "int errors"
+The current soft error count.
+.I cql
+continues after a soft error but exits with a non-zero
+exit status when complete.
+.TP
+.X "int line"
+The current input file line number.
+.TP
+.X "int offset"
+The current input file byte offset.
+.TP
+.X "int record"
+The current input file record number.
+.TP
+.X "int select"
+The current number of selected records.
+.TP
+.X "int size"
+The size in bytes of the current input record.
+.TP
+.X "date_t time"
+The current date and time.
+.PP
+The following
+.IR expr (3)
+functions are also supported:
+.TP
+.XI cql.getenv( name )
+Returns the value of the environment variable
+.IR name .
+The empty string is returned for undefined environment variables.
+.TP
+.XI cql.path( name , len )
+Truncates the file pathname
+.I name
+to
+.I len
+bytes.
+.TP
+.XI cql.sub( string,old,new,flags )
+Returns the substituted value of
+.I string
+the first match of the
+.IR egrep (1)
+style regular expression
+.I old
+replaced by
+.IR new .
+.I flags
+may be any combination of:
+.B g
+\- substitute all matches of
+.IR old ;
+.B l
+\- convert matches to lower case;
+.B u
+\- convert matches to upper case.
+.TP
+.XI exit( expr )
+Causes
+.I cql
+to exit with the exit code
+.IR expr .
+.I expr
+defaults to
+.X 0
+if omitted.
+.TP
+.XI printf( format [, arg... ])
+.PD 0
+.TP
+.XI eprintf( format [, arg... ])
+.PD
+Print the arguments on
+.X stdout
+.RX ( stderr )
+using the
+.IR printf (3)
+specification
+.IR format .
+The
+.X h
+(short) format modifier is not supported.
+.TP
+.XI query( format [, arg... ])
+Prompt with the
+.IR printf (3)
+message on
+.X stderr
+for an interactive response.
+A line beginning with
+.B y
+returns 1,
+.B q
+or
+.B EOF
+causes 
+.I cql
+to exit immediately, and any other input returns 0.
+.SH EXAMPLES
+.EX
+cql -l -e "
+	passwd {
+		register char* name;
+		char* passwd;
+		register int uid, gid;
+		info info;
+		char* home, shell;
+	}
+	info { char* name, address, office, home; }
+	delimiter = ':';
+	" -e "
+    	void action() { printf('%s\et%s\en', name, info.name); }
+    	uid < 10 && passwd=='';
+	" /etc/passwd
+.EE
+Scans the file
+.X /etc/passwd
+and lists the login names for users with
+no password and uid number less than 10.
+.SH "SEE ALSO"
+awk(1), ksh(1), pax(1), tw(1), ast(3), expr(3), printf(3), tm(3), g2(5)

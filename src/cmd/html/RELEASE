@@ -1,0 +1,17 @@
+00-02-03 mm2html: fix -o nohtml.logo
+00-01-20 mm2html: fix -o quoted arg parse
+	 htmlrefs: add --perlwarn for embedded perl constructs
+99-08-11 mm2html,troff2html: add .xx begin=x end=x
+	 mm2html: handle simple .TS ... .TE; room for improvement
+	 mm2html: fix <TABLE><TR>...</TR></TABLE> nesting
+	 mm2html: add SEE ALSO hot links
+	 mm2html: hot link man name not (section)
+99-05-17 download,html2db,mm2html: long options
+99-05-13 html2rtf: long options
+99-04-01 fix .xx link
+	 long options, macro search bug fix
+99-01-01 html2rtf: fix </LI> with no <LI> core dump
+98-04-01 add company corporation location meta.* organization
+97-05-09 info tollbar=path for junk before </BODY>
+97-05-01 \h'0...' for hyperlinks
+97-04-01 first release

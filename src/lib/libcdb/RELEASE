@@ -1,0 +1,22 @@
+99-10-01 add: cdbimage() CDB_IMAGE
+99-08-11 cdbopen: fix referenced checks
+	 cdbflat: add test for fixed length records with terminator
+	 cdbpzip: pass details to pzip discipline
+99-03-19 cdbopen.c: drop <dlfcn.h>
+98-12-25 fix cdbmove bug
+98-11-11 cdbflat: {.}q {.}Q
+98-09-18 2.2 Cdbdisc_t expansion
+	 Cdbdisc_t: add indexf(cdb,key,disc)
+	 cdbflat: add flatfixread() with test for indexf
+98-06-04 cdbopen: add magicmeth() to recognize !<cdb-METHOD[-MAJOR.MINOR]>\n
+98-05-28 {.}[+-]d for subdelimiter push/pop
+98-05-18 flatrecread: add delimiter==terminator
+	 cdbtypes: add heka numbers, *native* be+le CDB_FLOATING
+97-11-11 flatpureread: avoid sfgetr() '\n' reset -- HACK
+	 CDB_TEST1 required to enable flatpureread tests (util bugs fixed)
+97-10-01 initial release
+	 TBD: Cdbkey_t
+97-08-11 beta release
+	 2.0 cdb header format
+97-07-11 alpha release
+	 1.0, 1.1 cdb header format

@@ -1,0 +1,1012 @@
+2;<void>;f;2;;n;0;0;0;dc;40df34
+3;<libc.a>;f;3;;l;0;0;0;dc;40df7c
+4;BASELIB.C;f;4;;n;1;1374;516;df;db6f2b08
+5;/c/msdev/include/time.h;f;5;;n;1;326;326;df;faa2b983
+6;/c/msdev/include/stdio.h;f;6;;n;1;532;532;df;b64df2c8
+7;/usr/include/astwin32.h;f;7;;n;1;0;0;df;5ffbdf8c
+8;putchar;p;6;int;e;372;0;372;dc;8c2c9c71
+9;putchar;m;6;;d;471;0;471;df;ac3bc925
+10;fileno;p;6;int;e;344;0;344;dc;dfdef223
+11;clock;p;5;clock_t;e;228;0;228;dc;aaa29880
+12;fgetws;p;6;wchar_t *;e;421;0;421;dc;3cdc2d84
+13;rewind;p;6;void;e;377;0;377;dc;8e3130cb
+14;__IMPORT__;m;4;;d;0;0;0;df;7756a617
+15;FILENAME_MAX;m;6;;d;214;0;214;df;792969e5
+16;_NFILE;m;6;;d;133;0;133;df;4e401b84
+17;tmpfile;p;6;FILE *;e;387;0;387;dc;cb6219d8
+18;CLK_TCK;m;5;;d;278;0;278;df;5a2b1497
+19;ungetwc;p;6;wint_t;e;419;0;419;dc;e03f4505
+20;struct _iobuf;t;6;;n;163;0;172;df;41f45a15
+21;_snwprintf;p;6;int;e;428;0;428;dc;25277dfd
+22;_flsbuf;p;6;int;e;317;0;317;dc;10a8773f
+23;cvec;p;4;void;g;457;463;513;df;ea391023
+24;rename;p;6;int;e;376;0;376;dc;aed4438e
+25;sfsscanf;p;6;int;e;385;0;385;dc;59828339
+26;wctype_t;t;6;wchar_t;t;101;0;101;df;b253e15e
+27;getchar;p;6;int;e;363;0;363;dc;4c85445c
+28;getchar;m;6;;d;470;0;470;df;a3a2dcaa
+29;ctime;p;5;char *;e;227;0;227;dc;fa35a5f6
+30;stdin;m;6;;d;290;0;290;df;4d88a41
+31;daylight;v;5;int;e;304;0;304;dc;811d2064
+32;_getw;p;6;int;e;366;0;366;dc;c6ed824f
+33;sclear;p;4;void;g;305;305;310;df;799a8129
+34;_wfdopen;p;6;FILE *;e;443;0;443;dc;e436d28d
+35;_FPOS_T_DEFINED;m;6;;d;286;0;286;df;5bbfb387
+36;lscomp;p;4;int;g;82;88;97;df;3b89e9c9
+37;_INC_TIME;m;5;;d;21;0;21;df;9d8ab368
+38;FILE;t;6;struct _iobuf;t;173;0;173;df;e1636c1d
+39;noop;p;4;void;g;42;42;49;df;8b642904
+40;ftell;p;6;long;e;360;0;360;dc;62455892
+41;stdout;m;6;;d;291;0;291;df;4a813a20
+42;fopen;p;6;FILE *;e;350;0;350;dc;f369886a
+43;_wstrdate;p;5;wchar_t *;e;266;0;266;dc;7d516561
+44;_wtmpnam;p;6;wchar_t *;e;450;0;450;dc;5eaea43a
+45;getwc;p;6;wint_t;e;415;0;415;dc;e8a0e634
+46;getwc;m;6;;d;440;0;440;df;33d5bb4f
+47;_P_tmpdir;m;6;;d;182;0;182;df;ec94b821
+48;vsprintf;p;6;int;e;394;0;394;dc;f26474ca
+49;_NSTREAM_;m;6;;d;137;0;137;df;b2fc6918
+50;_iob;v;6;FILE [];e;252;0;252;dc;fd1f08f7
+51;_WTIME_DEFINED;m;5;;d;269;0;269;df;8ab47dd5
+52;BUFSIZ;m;6;;d;125;0;125;df;4e6466bc
+53;FOPEN_MAX;m;6;;d;215;0;215;df;737119da
+54;stderr;m;6;;d;292;0;292;df;4a6fcd2a
+55;fdopen;p;6;FILE *;e;330;0;330;dc;c26bd65c
+56;fgetc;p;6;int;e;338;0;338;dc;dad415a2
+57;_UWIN;m;4;;d;0;0;0;df;4fbcf16d
+58;getwchar;p;6;wint_t;e;416;0;416;dc;d0e7a391
+59;getwchar;m;6;;d;438;0;438;df;ecdfe35
+60;_snprintf;p;6;int;e;383;0;383;dc;801686ff
+61;_WCTYPE_T_DEFINED;m;6;;d;102;0;102;df;ac9457dd
+62;cvicl;p;4;void;g;348;353;378;df;6aaf08b
+63;tmpnam;p;6;char *;e;388;0;388;dc;79201b68
+64;fread;p;6;size_t;e;355;0;355;dc;f56bb8ad
+65;TRUE;m;4;;d;3;0;3;df;40cb48ee
+66;_INC_STDIO;m;6;;d;20;0;20;df;6d91fe61
+67;_IOB_ENTRIES;m;6;;d;143;0;143;df;d37cb3a6
+68;setbuf;p;6;void;e;380;0;380;dc;bd57fa7d
+69;_wfreopen;p;6;FILE *;e;445;0;445;dc;483fa771
+70;fgets;p;6;char *;e;341;0;341;dc;b153742e
+71;_IOAPPEND;m;6;;d;308;0;308;df;d0550c48
+72;_getmaxstdio;p;6;int;e;364;0;364;dc;609dce6f
+73;cvicz;p;4;void;g;382;387;398;df;1a37ef99
+74;asctime;p;5;char *;e;226;0;226;dc;1cc522da
+75;_stdscanf;p;6;int;e;379;0;379;dc;93fac2c2
+76;_FPOSOFF;m;6;;d;269;0;269;df;39e2d668
+77;_FPOSOFF;m;6;;u;264;0;264;ud;decf8ace
+78;wint_t;t;6;wchar_t;t;100;0;100;df;831cebe2
+79;ferror;p;6;int;e;336;0;336;dc;c7e5c5ae
+80;ferror;m;6;;d;464;0;464;df;8726cfa9
+81;iscan;p;4;int;g;240;246;266;df;49aa26ef
+82;_wfsopen;p;6;FILE *;e;406;0;406;dc;4660f9ec
+83;_wstrtime;p;5;wchar_t *;e;267;0;267;dc;a243bbd2
+84;wchar_t;t;6;unsigned short;t;94;0;94;df;4fe86ded
+85;_fgetwchar;p;6;wint_t;e;412;0;412;dc;dc43a258
+86;_wtempnam;p;6;wchar_t *;e;449;0;449;dc;b35eb167
+87;_tzname;v;5;char *[];e;217;0;217;dc;52e00a7
+88;fclose;p;6;int;e;326;0;326;dc;e83e30ba
+89;_unlink;p;6;int;e;390;0;390;dc;f9f29181
+90;_STDIO_DEFINED;m;6;;d;457;0;457;df;40fa9162
+91;_fileno;m;6;;d;465;0;465;df;f0b7cf8d
+92;wcsftime;p;5;size_t;e;264;0;265;dc;9e77fd19
+93;_wpopen;p;6;FILE *;e;447;0;447;dc;69502d16
+94;iscan1;p;4;int;g;218;223;236;df;3c2db566
+95;CLOCKS_PER_SEC;m;5;;d;140;0;140;df;fa919736
+96;_FILE_DEFINED;m;6;;d;174;0;174;df;e54f6d6a
+97;_timezone;v;5;long;e;214;0;214;dc;27ff7d9f
+98;swscanf;p;6;int;e;435;0;435;dc;7466c85c
+99;cvci;p;4;void;g;152;157;170;df;f5ac1c7
+100;gmtime;p;5;struct tm *;e;230;0;230;dc;25018048
+101;_dstbias;v;5;long;e;211;0;211;dc;56128e11
+102;__cdecl;m;6;;d;82;0;82;df;d33170b0
+103;feof;p;6;int;e;335;0;335;dc;ba98fdec
+104;feof;m;6;;d;463;0;463;df;27260e88
+105;_rmtmp;p;6;int;e;378;0;378;dc;27addae0
+106;fputwc;p;6;wint_t;e;413;0;413;dc;90adb474
+107;fscanf;p;6;int;e;357;0;357;dc;ea2cfbcb
+108;vwprintf;p;6;int;e;431;0;431;dc;753f0355
+109;_putws;p;6;int;e;424;0;424;dc;5dee83ff
+110;_IOMYBUF;m;6;;d;302;0;302;df;794eb93c
+111;_filbuf;p;6;int;e;316;0;316;dc;e4dfc142
+112;smove;p;4;void;g;7;13;38;df;75d9bc45
+113;tzset;p;5;void;e;310;0;310;dc;175c314a
+114;tzset;p;5;void;e;240;0;240;dc;175c314a
+115;_IONBF;m;6;;d;300;0;300;df;676338e9
+116;fsetpos;p;6;int;e;358;0;358;dc;1e7aa940
+117;_wperror;p;6;void;e;446;0;446;dc;4c5d24cb
+118;L_ctermid;m;6;;d;202;0;202;df;323a7952
+119;cvic;p;4;void;g;314;319;344;df;3cce78ab
+120;time;p;5;time_t;e;237;0;237;dc;805e2bfd
+121;SEEK_SET;m;6;;d;211;0;211;df;d9d12974
+122;iabsl;p;4;long;g;62;64;67;df;eba3c175
+123;itrim;p;4;int;g;422;425;440;df;4f39169a
+124;pause;p;4;void;g;444;444;453;df;71f9a2ab
+125;fputws;p;6;int;e;422;0;422;dc;1adfe29a
+126;_wP_tmpdir;m;6;;d;183;0;183;df;25c3826e
+127;L_cuserid;m;6;;d;203;0;203;df;e90d3892
+128;sprintf;m;4;;d;0;0;0;df;c8021514
+129;fpos_t;t;6;long;t;268;0;268;df;df58eed1
+130;_CLOCK_T_DEFINED;m;5;;d;102;0;102;df;cdc017c8
+131;_DLL_INDIRECT_DATA;m;4;;d;0;0;0;df;b5a2d121
+132;L_tmpnam;m;6;;d;195;0;195;df;4228e695
+133;perror;p;6;void;e;367;0;367;dc;4326d45a
+134;_IOWRT;m;6;;d;296;0;296;df;18ddb4ce
+135;_IOSTRG;m;6;;d;305;0;305;df;943e930
+136;iabs;p;4;int;g;53;55;58;df;e676bc9c
+137;_wctime;p;5;wchar_t *;e;263;0;263;dc;6a126ebf
+138;blkbuf;p;4;void;g;291;294;301;df;35972b8d
+139;_wremove;p;6;int;e;448;0;448;dc;945b567b
+140;WinMain;m;4;;d;0;0;0;df;a67fffb7
+141;_fcloseall;p;6;int;e;327;0;327;dc;7f406ce9
+142;vfprintf;p;6;int;e;391;0;391;dc;5cfc2cf7
+143;putc;p;6;int;e;371;0;371;dc;c165a06b
+144;putc;m;6;;d;468;0;469;df;8a8867bb
+145;_setmaxstdio;p;6;int;e;381;0;381;dc;f58e2d0f
+146;_CRTIMP;m;6;;d;73;0;73;df;3d29c835
+147;EOF;m;6;;d;159;0;159;df;8db89dd0
+148;_IOLBF;m;6;;d;299;0;299;df;6a274f07
+149;setvbuf;p;6;int;e;382;0;382;dc;62c38a7c
+150;_SIZE_T_DEFINED;m;6;;d;88;0;88;df;5166eb9a
+151;_IOERR;m;6;;d;304;0;304;df;b00533ca
+152;_wfopen;p;6;FILE *;e;444;0;444;dc;ebfd87ac
+153;_TIME_T_DEFINED;m;5;;d;97;0;97;df;553eaa1e
+154;FALSE;m;4;;d;4;0;4;df;d984c84d
+155;remove;p;6;int;e;375;0;375;dc;4790404a
+156;puts;p;6;int;e;373;0;373;dc;d9244ace
+157;clock_t;t;5;long;t;101;0;101;df;b8eb0cca
+158;putwc;p;6;wint_t;e;417;0;417;dc;1f4c7169
+159;putwc;m;6;;d;441;0;441;df;8b59fd52
+160;scanf;m;4;;d;0;0;0;df;14292ff2
+161;setdate;p;4;void;g;270;273;287;df;a1106b4b
+162;fflush;p;6;int;e;337;0;337;dc;98dca806
+163;cvcil;p;4;void;g;174;179;192;df;ae2b8e7c
+164;_vsnwprintf;p;6;int;e;432;0;432;dc;ba1a95b4
+165;_popen;p;6;FILE *;e;369;0;369;dc;edce4478
+166;cviczl;p;4;void;g;402;407;418;df;86591c07
+167;size_t;t;6;unsigned int;t;87;0;87;df;86189e7
+168;_SYS_OPEN;m;6;;d;216;0;216;df;fac670fc
+169;_TM_DEFINED;m;5;;d;134;0;134;df;e29c24d9
+170;_strdate;p;5;char *;e;235;0;235;dc;b56793
+171;putwchar;p;6;wint_t;e;418;0;418;dc;332bb587
+172;putwchar;m;6;;d;439;0;439;df;ea2fe640
+173;_IOREAD;m;6;;d;295;0;295;df;6d073739
+174;_flushall;p;6;int;e;349;0;349;dc;4fccd80a
+175;time_t;t;5;long;t;96;0;96;df;e21a2370
+176;wscanf;p;6;int;e;436;0;436;dc;8dc59951
+177;_wasctime;p;5;wchar_t *;e;262;0;262;dc;a2a77b83
+178;_fputchar;p;6;int;e;353;0;353;dc;2d53cc38
+179;_daylight;v;5;int;e;208;0;208;dc;80a862f0
+180;_getsystime;p;5;unsigned int;e;247;0;247;dc;c9493559
+181;_fsopen;p;6;FILE *;e;320;0;320;dc;ea009cce
+182;NULL;m;6;;d;226;0;226;df;d745b938
+183;_putw;p;6;int;e;374;0;374;dc;2a32100b
+184;_STD_HEADER;m;4;;d;0;0;0;df;8e743877
+185;wprintf;p;6;int;e;427;0;427;dc;9bdd96ae
+186;WEOF;m;6;;d;402;0;402;df;a8702c48
+187;va_list;t;6;char *;t;114;0;114;df;692b9ca
+188;scnbuf;p;4;void;g;101;108;148;df;265f1abf
+189;localtime;p;5;struct tm *;e;231;0;231;dc;5e84c8fe
+190;_stdsprintf;p;6;int;e;384;0;384;dc;e56f7f21
+191;timezone;v;5;long;e;305;0;305;dc;5066d23
+192;fwscanf;p;6;int;e;434;0;434;dc;15c74610
+193;_vsnprintf;p;6;int;e;393;0;393;dc;a9c9fe7e
+194;fgetpos;p;6;int;e;340;0;340;dc;c117ae9c
+195;_fgetchar;p;6;int;e;339;0;339;dc;fed9680b
+196;TMP_MAX;m;6;;d;217;0;217;df;48927fc7
+197;printf;p;6;int;e;370;0;370;dc;b7d68361
+198;freopen;p;6;FILE *;e;356;0;356;dc;903f593f
+199;vfwprintf;p;6;int;e;430;0;430;dc;17c0e104
+200;fputc;p;6;int;e;352;0;352;dc;96842bfe
+201;sscanf;m;4;;d;0;0;0;df;4169412f
+202;_fputwchar;p;6;wint_t;e;414;0;414;dc;baacd7de
+203;fwrite;p;6;size_t;e;361;0;361;dc;505817b1
+204;difftime;p;5;double;e;229;0;229;dc;6d2e5c25
+205;ungetc;p;6;int;e;389;0;389;dc;76c11997
+206;SEEK_END;m;6;;d;210;0;210;df;a3e22301
+207;_strtime;p;5;char *;e;236;0;236;dc;dd581d7c
+208;fwprintf;p;6;int;e;426;0;426;dc;33cb2d05
+209;_tempnam;p;6;char *;e;386;0;386;dc;326776b8
+210;failure;p;4;void;g;71;73;78;df;ac222d26
+211;struct tm;t;5;;n;123;0;133;df;353d70e1
+212;fputs;p;6;int;e;354;0;354;dc;e1d9d65
+213;fprintf;p;6;int;e;351;0;351;dc;31d178f8
+214;strftime;p;5;size_t;e;233;0;234;dc;3b5a737b
+215;_VA_LIST_DEFINED;m;6;;d;116;0;116;df;192914cb
+216;_setsystime;p;5;unsigned int;e;248;0;248;dc;dbf61fdb
+217;vswprintf;p;6;int;e;433;0;433;dc;44fc00b8
+218;iunsc1;p;4;int;g;196;201;214;df;e063242e
+219;_IORW;m;6;;d;306;0;306;df;5e5c843
+220;_IOFBF;m;6;;d;298;0;298;df;360fc3dd
+221;getc;p;6;int;e;362;0;362;dc;11a83eaf
+222;getc;m;6;;d;466;0;467;df;47739dca
+223;fseek;p;6;int;e;359;0;359;dc;461b48ef
+224;_pclose;p;6;int;e;368;0;368;dc;fe1c5140
+225;_WSTDIO_DEFINED;m;6;;d;453;0;453;df;3eaf1a76
+226;_CRTAPI1;m;6;;d;46;0;46;df;98d74357
+227;_CRTAPI2;m;6;;d;57;0;57;df;dce2438
+228;vprintf;p;6;int;e;392;0;392;dc;b6b78908
+229;_WCHAR_T_DEFINED;m;6;;d;95;0;95;df;c5eb0719
+230;swprintf;p;6;int;e;429;0;429;dc;e64e15e1
+231;fgetwc;p;6;wint_t;e;411;0;411;dc;b1ec2147
+232;_getws;p;6;wchar_t *;e;423;0;423;dc;2d476386
+233;clearerr;p;6;void;e;325;0;325;dc;1e44039c
+234;SEEK_CUR;m;6;;d;209;0;209;df;dbdcae83
+235;tzname;v;5;char *[];e;306;0;306;dc;63c41153
+236;mktime;p;5;time_t;e;232;0;232;dc;8caf1845
+237;_IOEOF;m;6;;d;303;0;303;df;26c2798a
+238;gets;p;6;char *;e;365;0;365;dc;3acffcbc
+239;_NTSDK;m;2;;n;0;0;0;dc;40e39c
+240;_POSIX_;m;2;;n;0;0;0;dc;40e39c
+241;_DLL;m;2;;n;0;0;0;dc;40e39c
+242;_MAC;m;2;;n;0;0;0;dc;40e39c
+243;_WIN32;m;2;;n;0;0;0;dc;40e39c
+244;__cplusplus;m;2;;n;0;0;0;dc;40e39c
+245;_MT;m;2;;n;0;0;0;dc;40e39c
+246;_M_MPPC;m;2;;n;0;0;0;dc;40e39c
+247;_M_ALPHA;m;2;;n;0;0;0;dc;40e39c
+248;_MSC_VER;m;2;;n;0;0;0;dc;40e39c
+249;__STDC__;m;2;;n;0;0;0;dc;40e39c
+250;_M_IX86;m;2;;n;0;0;0;dc;40e39c
+251;_M_M68K;m;2;;n;0;0;0;dc;40e39c
+252;filedecl.h;f;252;;n;1;9;9;df;3acabaac
+253;longrp.h;f;253;;n;1;5;5;df;463f06bb
+254;unitinfo.h;f;254;;n;1;12;12;df;e1bc7950
+255;CAND.C;f;255;;n;1;792;104;df;f5218dda
+256;repout.h;f;256;;n;1;6;6;df;e92515ec
+257;offnam.h;f;257;;n;1;6;6;df;d9cc6752
+258;cardrd.h;f;258;;n;1;5;5;df;33ebe48f
+259;candnm.h;f;259;;n;1;5;5;df;df526b22
+260;precvt.h;f;260;;n;1;13;13;df;ad0a44d5
+261;office.h;f;261;;n;1;35;35;df;afd88735
+262;dcand.h;f;262;;n;1;5;5;df;fc7fe2
+263;weltab.h;f;263;;n;1;36;36;df;4552e6f4
+264;precin.h;f;264;;n;1;19;19;df;f8a60ff
+265;noffic;v;263;int;g;24;0;24;df;9854836e
+266;PERCENT;m;261;;d;33;0;33;df;b316f976
+267;untavcbs;v;254;int;g;4;0;4;df;c491a096
+268;filereport;v;252;FILE *;g;3;0;3;df;d3abb7f9
+269;partnm;v;259;char [];g;3;0;3;df;e5ca5c9f
+270;__IMPORT__;m;255;;d;0;0;0;df;7756a617
+271;headc;v;253;char [];g;3;0;3;df;82247f77
+272;vtunit;v;260;int;g;4;0;4;df;f6f79182
+273;flprecid;v;252;FILE *;g;6;0;6;df;3f589ebb
+274;longrep;v;253;char [];g;3;0;3;df;36290cab
+275;LOGICAL;m;263;;d;2;0;2;df;c259b654
+276;vtpoll;v;260;long;g;6;0;6;df;705a3e5
+277;MAXCAND;m;263;;d;13;0;13;df;13563dad
+278;electn;v;263;char [];g;33;0;33;df;4347c7b4
+279;report;v;256;char [];g;3;0;3;df;9782ab39
+280;EXISTS;m;254;;d;9;0;9;df;ddd6b08
+281;BYWARD;m;254;;d;10;0;10;df;76dd83c2
+282;prtinf;v;261;int [];g;31;0;31;df;ece33fac
+283;untwards;v;254;int;g;5;0;5;df;1b2a11f3
+284;_UWIN;m;255;;d;0;0;0;df;4fbcf16d
+285;abs;m;263;;d;7;0;7;df;c55aac94
+286;dcname;v;262;char [];g;3;0;3;df;2df42fbb
+287;TRUE;m;263;;d;3;0;3;df;40cb48ee
+288;PRECID;m;261;;d;17;0;17;df;8aac20a8
+289;ncand;v;263;int;g;29;0;29;df;32f23928
+290;vtdate;v;260;char [];g;10;0;10;df;69684f67
+291;MAXDUAL;m;263;;d;19;0;19;df;a420331d
+292;flprecinfo;v;252;FILE *;g;4;0;4;df;e2bc3554
+293;DUALLOCATION;m;261;;d;9;0;9;df;11aa1800
+294;precno;v;264;long;g;4;0;4;df;d14ad2e3
+295;ALLOWREPR;m;261;;d;22;0;22;df;6254312b
+296;MAXDAREC;m;263;;d;20;0;20;df;a6a71343
+297;flcand;v;252;FILE *;g;5;0;5;df;6ed263fb
+298;VOTESPERVOTER;m;261;;d;7;0;7;df;3e6c01c
+299;fltotals;v;252;FILE *;g;7;0;7;df;d4828494
+300;nprec;v;263;int;g;22;0;22;df;47c52ecb
+301;card;v;258;char [];g;3;0;3;df;1417eded
+302;untnprec;v;254;int;g;4;0;4;df;3265b102
+303;PAPER;m;264;;d;14;0;14;df;785756e5
+304;congr;v;264;int;g;6;0;6;df;322df8cc
+305;ndual;v;263;int;g;24;0;24;df;803bbd0c
+306;VALUE;m;261;;d;16;0;16;df;26891780
+307;distct;v;264;int;g;8;0;8;df;f3c7d32b
+308;PUNCHCARD;m;264;;d;13;0;13;df;9afc790
+309;vttime;v;260;char [];g;11;0;11;df;650a87f8
+310;WRITEINCOUNT;m;261;;d;8;0;8;df;f6d4ec03
+311;vtindx;v;260;int;g;3;0;3;df;f5d1caa5
+312;min;m;263;;d;6;0;6;df;660d6e77
+313;allowch;v;261;char [];g;14;0;14;df;7a67d1c8
+314;LINECOUNT;m;263;;d;34;0;34;df;a7e87369
+315;candnm;v;259;char [];g;3;0;3;df;e9c052dd
+316;nunit;v;263;int;g;22;0;22;df;30c17d8a
+317;flglobal;v;252;FILE *;g;4;0;4;df;8a4203cd
+318;MAXDCAND;m;263;;d;17;0;17;df;b392f000
+319;trace;v;263;int;g;9;0;9;df;f5b0f43a
+320;unitnm;v;254;char [];g;3;0;3;df;97c0b867
+321;sprintf;m;255;;d;0;0;0;df;c8021514
+322;unitno;v;264;int;g;3;0;3;df;825cdefd
+323;filevotes;v;252;FILE *;g;6;0;6;df;81aeda7a
+324;_DLL_INDIRECT_DATA;m;255;;d;0;0;0;df;b5a2d121
+325;untsplit;v;254;int;g;5;0;5;df;954a3386
+326;ALLOWPREC;m;261;;d;26;0;26;df;8072f528
+327;WinMain;m;255;;d;0;0;0;df;a67fffb7
+328;dualnm;v;257;char [];g;4;0;4;df;e2e74532
+329;ALLOWALL;m;261;;d;19;0;19;df;f4da8685
+330;ALLOWWARD;m;261;;d;27;0;27;df;3ca9f045
+331;uncode;v;254;char [];g;3;0;3;df;a49cf7d0
+332;ALLOWSEN;m;261;;d;23;0;23;df;5cc86754
+333;entrer;v;260;char [];g;8;0;8;df;2508ee47
+334;TYPE;m;261;;d;15;0;15;df;7ee154f7
+335;ALLOWDIST;m;261;;d;25;0;25;df;28c4d179
+336;fldualcand;v;252;FILE *;g;5;0;5;df;72f9f4ca
+337;main;p;255;int;g;17;17;68;df;dcacc614
+338;FALSE;m;263;;d;4;0;4;df;d984c84d
+339;offnam;v;257;char [];g;3;0;3;df;c1d42950
+340;nwrite;v;263;int;g;24;0;24;df;e90e4e2b
+341;MACHINE;m;264;;d;12;0;12;df;2378e532
+342;flunitinfo;v;252;FILE *;g;3;0;3;df;1ca6fd4c
+343;vote;v;260;long [];g;7;0;7;df;bbf129a4
+344;CANDCOUNT;m;261;;d;5;0;5;df;36f86215
+345;scanf;m;255;;d;0;0;0;df;14292ff2
+346;floffice;v;252;FILE *;g;4;0;4;df;244026b
+347;allow;v;261;long [];g;13;0;13;df;f79a1780
+348;ALLOWCONG;m;261;;d;24;0;24;df;dd439a23
+349;ALLOWUNIT;m;261;;d;20;0;20;df;97b86c90
+350;max;m;263;;d;5;0;5;df;e63631fb
+351;MAXOFFICE;m;263;;d;18;0;18;df;656ff352
+352;CANDSTART;m;261;;d;6;0;6;df;8b6b647b
+353;floffnam;v;252;FILE *;g;5;0;5;df;4ba153e5
+354;commis;v;264;int [];g;17;0;17;df;9a6a616c
+355;fileoffices;v;252;FILE *;g;4;0;4;df;d0c2487a
+356;flprecvote;v;252;FILE *;g;6;0;6;df;4c7d6d0e
+357;ducand;v;263;int;g;29;0;29;df;f6033d15
+358;offset;v;263;long;g;11;0;11;df;d35b659b
+359;senate;v;264;int;g;7;0;7;df;a1faba00
+360;_STD_HEADER;m;255;;d;0;0;0;df;8e743877
+361;NONE;m;254;;d;8;0;8;df;6817535
+362;verifr;v;260;char [];g;9;0;9;df;d88d63b5
+363;regist;v;264;int;g;5;0;5;df;90836c16
+364;college;v;264;int;g;9;0;9;df;6b995180
+365;candhead;p;255;void;g;72;75;101;df;c7441de1
+366;fldualoff;v;252;FILE *;g;5;0;5;df;4e3f9dfd
+367;DUALSTART;m;261;;d;10;0;10;df;78b5719f
+368;sscanf;m;255;;d;0;0;0;df;4169412f
+369;vothow;v;264;int;g;11;0;11;df;e631057f
+370;repre;v;264;int [];g;16;0;16;df;1e7df3aa
+371;ALLOWCOMM;m;261;;d;21;0;21;df;8173d555
+372;offinf;v;261;int [];g;4;0;4;df;b417698d
+373;vtprec;v;260;long;g;5;0;5;df;78968e88
+374;STATE;m;261;;d;32;0;32;df;6ef91573
+375;untstart;v;254;int;g;4;0;4;df;3e9fc248
+376;MAXPRECINCT;m;263;;d;15;0;15;df;6bf5cad6
+377;fulltrace;v;263;int;g;10;0;10;df;dd33bca1
+378;ALLOWCOLL;m;261;;d;28;0;28;df;c4cd79a9
+379;cumtvt.h;f;379;;n;1;14;14;df;3ec484c6
+380;CANV.C;f;380;;n;1;1221;519;df;6252a92a
+381;__IMPORT__;m;380;;d;0;0;0;df;7756a617
+382;lfoffinf;v;380;int [];g;22;0;22;df;acfd9782
+383;prfini;v;379;int [];g;10;0;10;df;cb5d53f7
+384;canvend;v;380;int;g;18;0;18;df;a9b5c221
+385;rtoffinf;v;380;int [];g;22;0;22;df;ca673b0d
+386;rtallow;v;380;long [];g;23;0;23;df;3f4bb1b7
+387;_DLL_INDIRECT_DATA;m;380;;d;0;0;0;df;b5a2d121
+388;main;p;380;int;g;27;27;437;df;cec1fee7
+389;canvcount;v;380;int;g;18;0;18;df;deb9d11f
+390;lfallowch;v;380;char [];g;24;0;24;df;f7e0d49d
+391;prpoll;v;379;long [];g;11;0;11;df;9d92f86c
+392;cmprec;v;379;long;g;3;0;3;df;995f1df6
+393;canvw;p;380;void;g;441;446;516;df;43cf8974
+394;_UWIN;m;380;;d;0;0;0;df;4fbcf16d
+395;cmpoll;v;379;long;g;4;0;4;df;27ce3353
+396;revised;v;380;int;g;19;0;19;df;fdab0a97
+397;cmelec;v;379;char [];g;9;0;9;df;4726f92a
+398;lfprtinf;v;380;int [];g;25;0;25;df;e5c96da1
+399;cmdate;v;379;char [];g;6;0;6;df;62e29f15
+400;lfallow;v;380;long [];g;23;0;23;df;c31d4fd5
+401;sprintf;m;380;;d;0;0;0;df;c8021514
+402;cmtime;v;379;char [];g;7;0;7;df;f1f4056
+403;WinMain;m;380;;d;0;0;0;df;a67fffb7
+404;scanf;m;380;;d;0;0;0;df;14292ff2
+405;rtprtinf;v;380;int [];g;25;0;25;df;6c7c0cab
+406;rtallowch;v;380;char [];g;24;0;24;df;2e6d5823
+407;_STD_HEADER;m;380;;d;0;0;0;df;8e743877
+408;cmreg;v;379;long;g;5;0;5;df;7798208d
+409;canvstart;v;380;int;g;18;0;18;df;c15bd50e
+410;sscanf;m;380;;d;0;0;0;df;4169412f
+411;cumt;v;379;long [];g;8;0;8;df;1bd11837
+412;CCIBM.C;f;412;;n;1;584;52;df;280a2a8d
+413;__IMPORT__;m;412;;d;0;0;0;df;7756a617
+414;_UWIN;m;412;;d;0;0;0;df;4fbcf16d
+415;sprintf;m;412;;d;0;0;0;df;c8021514
+416;_DLL_INDIRECT_DATA;m;412;;d;0;0;0;df;b5a2d121
+417;WinMain;m;412;;d;0;0;0;df;a67fffb7
+418;main;p;412;int;g;4;4;51;df;17be27dc
+419;scanf;m;412;;d;0;0;0;df;14292ff2
+420;_STD_HEADER;m;412;;d;0;0;0;df;8e743877
+421;sscanf;m;412;;d;0;0;0;df;4169412f
+422;CCIBMX.C;f;422;;n;1;586;54;df;665a4d60
+423;__IMPORT__;m;422;;d;0;0;0;df;7756a617
+424;_UWIN;m;422;;d;0;0;0;df;4fbcf16d
+425;sprintf;m;422;;d;0;0;0;df;c8021514
+426;_DLL_INDIRECT_DATA;m;422;;d;0;0;0;df;b5a2d121
+427;WinMain;m;422;;d;0;0;0;df;a67fffb7
+428;main;p;422;int;g;4;4;53;df;90df9f4b
+429;scanf;m;422;;d;0;0;0;df;14292ff2
+430;_STD_HEADER;m;422;;d;0;0;0;df;8e743877
+431;sscanf;m;422;;d;0;0;0;df;4169412f
+432;CCIBMXP.C;f;432;;n;1;593;61;df;941b22ce
+433;__IMPORT__;m;432;;d;0;0;0;df;7756a617
+434;_UWIN;m;432;;d;0;0;0;df;4fbcf16d
+435;sprintf;m;432;;d;0;0;0;df;c8021514
+436;_DLL_INDIRECT_DATA;m;432;;d;0;0;0;df;b5a2d121
+437;WinMain;m;432;;d;0;0;0;df;a67fffb7
+438;main;p;432;int;g;4;4;60;df;47048390
+439;scanf;m;432;;d;0;0;0;df;14292ff2
+440;_STD_HEADER;m;432;;d;0;0;0;df;8e743877
+441;sscanf;m;432;;d;0;0;0;df;4169412f
+442;CNV1.C;f;442;;n;1;1237;535;df;cf1b51d9
+443;__IMPORT__;m;442;;d;0;0;0;df;7756a617
+444;lfoffinf;v;442;int [];g;23;0;23;df;acfd9782
+445;canvend;v;442;int;g;19;0;19;df;a9b5c221
+446;rtoffinf;v;442;int [];g;23;0;23;df;ca673b0d
+447;rtallow;v;442;long [];g;24;0;24;df;3f4bb1b7
+448;_DLL_INDIRECT_DATA;m;442;;d;0;0;0;df;b5a2d121
+449;main;p;442;int;g;28;28;453;df;b69f264
+450;canvcount;v;442;int;g;19;0;19;df;deb9d11f
+451;lfallowch;v;442;char [];g;25;0;25;df;f7e0d49d
+452;canvw;p;442;void;g;457;462;532;df;43cf8974
+453;_UWIN;m;442;;d;0;0;0;df;4fbcf16d
+454;revised;v;442;int;g;20;0;20;df;fdab0a97
+455;lfprtinf;v;442;int [];g;26;0;26;df;e5c96da1
+456;lfallow;v;442;long [];g;24;0;24;df;c31d4fd5
+457;sprintf;m;442;;d;0;0;0;df;c8021514
+458;WinMain;m;442;;d;0;0;0;df;a67fffb7
+459;scanf;m;442;;d;0;0;0;df;14292ff2
+460;rtprtinf;v;442;int [];g;26;0;26;df;6c7c0cab
+461;rtallowch;v;442;char [];g;25;0;25;df;2e6d5823
+462;_STD_HEADER;m;442;;d;0;0;0;df;8e743877
+463;canvstart;v;442;int;g;19;0;19;df;c15bd50e
+464;sscanf;m;442;;d;0;0;0;df;4169412f
+465;CNV1A.C;f;465;;n;1;1246;544;df;e437fed5
+466;__IMPORT__;m;465;;d;0;0;0;df;7756a617
+467;lfoffinf;v;465;int [];g;24;0;24;df;acfd9782
+468;canvend;v;465;int;g;20;0;20;df;a9b5c221
+469;rtoffinf;v;465;int [];g;24;0;24;df;ca673b0d
+470;rtallow;v;465;long [];g;25;0;25;df;3f4bb1b7
+471;_DLL_INDIRECT_DATA;m;465;;d;0;0;0;df;b5a2d121
+472;main;p;465;int;g;29;29;462;df;331b67a5
+473;canvcount;v;465;int;g;20;0;20;df;deb9d11f
+474;lfallowch;v;465;char [];g;26;0;26;df;f7e0d49d
+475;canvw;p;465;void;g;466;471;541;df;43cf8974
+476;_UWIN;m;465;;d;0;0;0;df;4fbcf16d
+477;revised;v;465;int;g;21;0;21;df;fdab0a97
+478;lfprtinf;v;465;int [];g;27;0;27;df;e5c96da1
+479;lfallow;v;465;long [];g;25;0;25;df;c31d4fd5
+480;sprintf;m;465;;d;0;0;0;df;c8021514
+481;WinMain;m;465;;d;0;0;0;df;a67fffb7
+482;scanf;m;465;;d;0;0;0;df;14292ff2
+483;rtprtinf;v;465;int [];g;27;0;27;df;6c7c0cab
+484;rtallowch;v;465;char [];g;26;0;26;df;2e6d5823
+485;_STD_HEADER;m;465;;d;0;0;0;df;8e743877
+486;canvstart;v;465;int;g;20;0;20;df;c15bd50e
+487;sscanf;m;465;;d;0;0;0;df;4169412f
+488;CPRINT.C;f;488;;n;1;658;126;df;fa78fdf3
+489;__IMPORT__;m;488;;d;0;0;0;df;7756a617
+490;_UWIN;m;488;;d;0;0;0;df;4fbcf16d
+491;sprintf;m;488;;d;0;0;0;df;c8021514
+492;_DLL_INDIRECT_DATA;m;488;;d;0;0;0;df;b5a2d121
+493;WinMain;m;488;;d;0;0;0;df;a67fffb7
+494;LINESPERPAGE;m;488;;d;3;0;3;df;d2cb936f
+495;main;p;488;int;g;5;5;125;df;e3ffaa3e
+496;scanf;m;488;;d;0;0;0;df;14292ff2
+497;_STD_HEADER;m;488;;d;0;0;0;df;8e743877
+498;sscanf;m;488;;d;0;0;0;df;4169412f
+499;CUMT.C;f;499;;n;1;1124;422;df;691057d8
+500;__IMPORT__;m;499;;d;0;0;0;df;7756a617
+501;_UWIN;m;499;;d;0;0;0;df;4fbcf16d
+502;sprintf;m;499;;d;0;0;0;df;c8021514
+503;_DLL_INDIRECT_DATA;m;499;;d;0;0;0;df;b5a2d121
+504;WinMain;m;499;;d;0;0;0;df;a67fffb7
+505;main;p;499;int;g;18;18;176;df;3dfe9d4b
+506;dhead;p;499;void;g;361;365;421;df;b499230d
+507;scanf;m;499;;d;0;0;0;df;14292ff2
+508;chead;p;499;void;g;180;182;218;df;d5fd1a99
+509;_STD_HEADER;m;499;;d;0;0;0;df;8e743877
+510;showdone;p;499;void;g;222;225;357;df;260430b7
+511;sscanf;m;499;;d;0;0;0;df;4169412f
+512;EJCN88.C;f;512;;n;1;1218;501;df;df2ef683
+513;state.h;f;513;;n;1;15;15;df;cf39c83f
+514;__IMPORT__;m;512;;d;0;0;0;df;7756a617
+515;form;v;513;long [][];g;3;0;3;df;f457bba
+516;_DLL_INDIRECT_DATA;m;512;;d;0;0;0;df;b5a2d121
+517;outpos;v;513;int;g;2;0;2;df;1b1258f3
+518;main;p;512;int;g;23;23;216;df;1bd557c3
+519;lhead;p;512;void;g;468;473;498;df;f20e20b4
+520;prtpag;p;512;void;g;220;224;464;df;b4323b04
+521;WARDTOT;m;513;;d;11;0;11;df;fa9203ee
+522;_UWIN;m;512;;d;0;0;0;df;4fbcf16d
+523;TOTAL;m;513;;d;9;0;9;df;7e2e6ae1
+524;fofficename;v;512;char [];g;21;0;21;df;f119445b
+525;NVOTE;m;513;;d;8;0;8;df;f725c638
+526;fprecname;v;512;char [];g;21;0;21;df;a2088bc1
+527;CAND;m;513;;d;6;0;6;df;abb9a6f3
+528;sprintf;m;512;;d;0;0;0;df;c8021514
+529;UNITTOT;m;513;;d;10;0;10;df;24d72687
+530;WinMain;m;512;;d;0;0;0;df;a67fffb7
+531;POSN;m;513;;d;7;0;7;df;fe6aff4e
+532;scanf;m;512;;d;0;0;0;df;14292ff2
+533;nform;v;513;int;g;2;0;2;df;c9cd8a96
+534;_STD_HEADER;m;512;;d;0;0;0;df;8e743877
+535;sscanf;m;512;;d;0;0;0;df;4169412f
+536;head0;v;513;char [];g;4;0;4;df;7a3b25f3
+537;head1;v;513;char [];g;5;0;5;df;40868b5
+538;head2;v;513;char [];g;5;0;5;df;93da8fc1
+539;head3;v;513;char [];g;5;0;5;df;dad5560d
+540;LANDSCAPE;m;513;;d;13;0;13;df;1a14c179
+541;FIXW.C;f;541;;n;1;778;90;df;1760ff28
+542;__IMPORT__;m;541;;d;0;0;0;df;7756a617
+543;_UWIN;m;541;;d;0;0;0;df;4fbcf16d
+544;sprintf;m;541;;d;0;0;0;df;c8021514
+545;_DLL_INDIRECT_DATA;m;541;;d;0;0;0;df;b5a2d121
+546;WinMain;m;541;;d;0;0;0;df;a67fffb7
+547;main;p;541;int;g;17;17;87;df;93b3288
+548;scanf;m;541;;d;0;0;0;df;14292ff2
+549;_STD_HEADER;m;541;;d;0;0;0;df;8e743877
+550;sscanf;m;541;;d;0;0;0;df;4169412f
+551;LANS.C;f;551;;n;1;1210;493;df;f8a8848e
+552;__IMPORT__;m;551;;d;0;0;0;df;7756a617
+553;_DLL_INDIRECT_DATA;m;551;;d;0;0;0;df;b5a2d121
+554;main;p;551;int;g;23;23;210;df;7fadbc4c
+555;lhead;p;551;void;g;462;467;490;df;8c7f1ccc
+556;prtpag;p;551;void;g;214;218;458;df;b4323b04
+557;_UWIN;m;551;;d;0;0;0;df;4fbcf16d
+558;fofficename;v;551;char [];g;21;0;21;df;f119445b
+559;fprecname;v;551;char [];g;21;0;21;df;a2088bc1
+560;sprintf;m;551;;d;0;0;0;df;c8021514
+561;WinMain;m;551;;d;0;0;0;df;a67fffb7
+562;scanf;m;551;;d;0;0;0;df;14292ff2
+563;_STD_HEADER;m;551;;d;0;0;0;df;8e743877
+564;sscanf;m;551;;d;0;0;0;df;4169412f
+565;LANSXX.C;f;565;;n;1;1207;490;df;c09ae2e7
+566;__IMPORT__;m;565;;d;0;0;0;df;7756a617
+567;_DLL_INDIRECT_DATA;m;565;;d;0;0;0;df;b5a2d121
+568;main;p;565;int;g;22;22;208;df;4ac98bf
+569;lhead;p;565;void;g;459;464;487;df;8c7f1ccc
+570;prtpag;p;565;void;g;212;216;455;df;bbed3da2
+571;_UWIN;m;565;;d;0;0;0;df;4fbcf16d
+572;fofficename;v;565;char [];g;20;0;20;df;f119445b
+573;fprecname;v;565;char [];g;20;0;20;df;a2088bc1
+574;sprintf;m;565;;d;0;0;0;df;c8021514
+575;WinMain;m;565;;d;0;0;0;df;a67fffb7
+576;scanf;m;565;;d;0;0;0;df;14292ff2
+577;_STD_HEADER;m;565;;d;0;0;0;df;8e743877
+578;sscanf;m;565;;d;0;0;0;df;4169412f
+579;LINECOUN.C;f;579;;n;1;582;50;df;80b9fe69
+580;__IMPORT__;m;579;;d;0;0;0;df;7756a617
+581;_UWIN;m;579;;d;0;0;0;df;4fbcf16d
+582;sprintf;m;579;;d;0;0;0;df;c8021514
+583;_DLL_INDIRECT_DATA;m;579;;d;0;0;0;df;b5a2d121
+584;WinMain;m;579;;d;0;0;0;df;a67fffb7
+585;main;p;579;int;g;4;4;49;df;c6c823c7
+586;scanf;m;579;;d;0;0;0;df;14292ff2
+587;_STD_HEADER;m;579;;d;0;0;0;df;8e743877
+588;sscanf;m;579;;d;0;0;0;df;4169412f
+589;OFCA.C;f;589;;n;1;1023;335;df;f01ccd50
+590;__IMPORT__;m;589;;d;0;0;0;df;7756a617
+591;_UWIN;m;589;;d;0;0;0;df;4fbcf16d
+592;sprintf;m;589;;d;0;0;0;df;c8021514
+593;_DLL_INDIRECT_DATA;m;589;;d;0;0;0;df;b5a2d121
+594;WinMain;m;589;;d;0;0;0;df;a67fffb7
+595;main;p;589;int;g;17;17;259;df;e6cb0b21
+596;scanf;m;589;;d;0;0;0;df;14292ff2
+597;_STD_HEADER;m;589;;d;0;0;0;df;8e743877
+598;sscanf;m;589;;d;0;0;0;df;4169412f
+599;allowcard;p;589;void;g;263;263;332;df;706e6f0
+600;PGET.C;f;600;;n;1;986;298;df;a0cc44c2
+601;__IMPORT__;m;600;;d;0;0;0;df;7756a617
+602;_UWIN;m;600;;d;0;0;0;df;4fbcf16d
+603;sprintf;m;600;;d;0;0;0;df;c8021514
+604;_DLL_INDIRECT_DATA;m;600;;d;0;0;0;df;b5a2d121
+605;WinMain;m;600;;d;0;0;0;df;a67fffb7
+606;main;p;600;int;g;17;17;295;df;f3d9faad
+607;scanf;m;600;;d;0;0;0;df;14292ff2
+608;_STD_HEADER;m;600;;d;0;0;0;df;8e743877
+609;sscanf;m;600;;d;0;0;0;df;4169412f
+610;POLL.C;f;610;;n;1;1090;402;df;33f7c947
+611;__IMPORT__;m;610;;d;0;0;0;df;7756a617
+612;whoentrer;p;610;void;g;375;375;399;df;95348132
+613;_UWIN;m;610;;d;0;0;0;df;4fbcf16d
+614;sprintf;m;610;;d;0;0;0;df;c8021514
+615;_DLL_INDIRECT_DATA;m;610;;d;0;0;0;df;b5a2d121
+616;WinMain;m;610;;d;0;0;0;df;a67fffb7
+617;main;p;610;int;g;17;17;371;df;2155d195
+618;scanf;m;610;;d;0;0;0;df;14292ff2
+619;_STD_HEADER;m;610;;d;0;0;0;df;8e743877
+620;sscanf;m;610;;d;0;0;0;df;4169412f
+621;PREC.C;f;621;;n;1;985;297;df;67455571
+622;__IMPORT__;m;621;;d;0;0;0;df;7756a617
+623;phead;p;621;void;g;240;245;294;df;b7aa792e
+624;_UWIN;m;621;;d;0;0;0;df;4fbcf16d
+625;sprintf;m;621;;d;0;0;0;df;c8021514
+626;_DLL_INDIRECT_DATA;m;621;;d;0;0;0;df;b5a2d121
+627;WinMain;m;621;;d;0;0;0;df;a67fffb7
+628;main;p;621;int;g;17;17;236;df;633e782
+629;scanf;m;621;;d;0;0;0;df;14292ff2
+630;_STD_HEADER;m;621;;d;0;0;0;df;8e743877
+631;sscanf;m;621;;d;0;0;0;df;4169412f
+632;R01TMP.C;f;632;;n;1;1201;484;df;9fc8a00
+633;__IMPORT__;m;632;;d;0;0;0;df;7756a617
+634;rshead;p;632;void;g;453;458;481;df;fae0888a
+635;_DLL_INDIRECT_DATA;m;632;;d;0;0;0;df;b5a2d121
+636;main;p;632;int;g;23;23;201;df;af688a24
+637;_UWIN;m;632;;d;0;0;0;df;4fbcf16d
+638;fofficename;v;632;char [];g;21;0;21;df;f119445b
+639;fprecname;v;632;char [];g;21;0;21;df;a2088bc1
+640;rsprtpag;p;632;void;g;205;209;449;df;82d77209
+641;sprintf;m;632;;d;0;0;0;df;c8021514
+642;WinMain;m;632;;d;0;0;0;df;a67fffb7
+643;scanf;m;632;;d;0;0;0;df;14292ff2
+644;_STD_HEADER;m;632;;d;0;0;0;df;8e743877
+645;sscanf;m;632;;d;0;0;0;df;4169412f
+646;R101TMP.C;f;646;;n;1;1201;484;df;ebd9780f
+647;__IMPORT__;m;646;;d;0;0;0;df;7756a617
+648;rshead;p;646;void;g;453;458;481;df;fae0888a
+649;_DLL_INDIRECT_DATA;m;646;;d;0;0;0;df;b5a2d121
+650;main;p;646;int;g;23;23;201;df;4c0664d3
+651;_UWIN;m;646;;d;0;0;0;df;4fbcf16d
+652;fofficename;v;646;char [];g;21;0;21;df;f119445b
+653;fprecname;v;646;char [];g;21;0;21;df;a2088bc1
+654;rsprtpag;p;646;void;g;205;209;449;df;82d77209
+655;sprintf;m;646;;d;0;0;0;df;c8021514
+656;WinMain;m;646;;d;0;0;0;df;a67fffb7
+657;scanf;m;646;;d;0;0;0;df;14292ff2
+658;_STD_HEADER;m;646;;d;0;0;0;df;8e743877
+659;sscanf;m;646;;d;0;0;0;df;4169412f
+660;R11TMP.C;f;660;;n;1;1201;484;df;f795e26a
+661;__IMPORT__;m;660;;d;0;0;0;df;7756a617
+662;rshead;p;660;void;g;453;458;481;df;fae0888a
+663;_DLL_INDIRECT_DATA;m;660;;d;0;0;0;df;b5a2d121
+664;main;p;660;int;g;23;23;201;df;a4487e86
+665;_UWIN;m;660;;d;0;0;0;df;4fbcf16d
+666;fofficename;v;660;char [];g;21;0;21;df;f119445b
+667;fprecname;v;660;char [];g;21;0;21;df;a2088bc1
+668;rsprtpag;p;660;void;g;205;209;449;df;82d77209
+669;sprintf;m;660;;d;0;0;0;df;c8021514
+670;WinMain;m;660;;d;0;0;0;df;a67fffb7
+671;scanf;m;660;;d;0;0;0;df;14292ff2
+672;_STD_HEADER;m;660;;d;0;0;0;df;8e743877
+673;sscanf;m;660;;d;0;0;0;df;4169412f
+674;R26TMP.C;f;674;;n;1;1201;484;df;bc172064
+675;__IMPORT__;m;674;;d;0;0;0;df;7756a617
+676;rshead;p;674;void;g;453;458;481;df;fae0888a
+677;_DLL_INDIRECT_DATA;m;674;;d;0;0;0;df;b5a2d121
+678;main;p;674;int;g;23;23;201;df;94665480
+679;_UWIN;m;674;;d;0;0;0;df;4fbcf16d
+680;fofficename;v;674;char [];g;21;0;21;df;f119445b
+681;fprecname;v;674;char [];g;21;0;21;df;a2088bc1
+682;rsprtpag;p;674;void;g;205;209;449;df;82d77209
+683;sprintf;m;674;;d;0;0;0;df;c8021514
+684;WinMain;m;674;;d;0;0;0;df;a67fffb7
+685;scanf;m;674;;d;0;0;0;df;14292ff2
+686;_STD_HEADER;m;674;;d;0;0;0;df;8e743877
+687;sscanf;m;674;;d;0;0;0;df;4169412f
+688;R51TMP.C;f;688;;n;1;1201;484;df;7d527183
+689;__IMPORT__;m;688;;d;0;0;0;df;7756a617
+690;rshead;p;688;void;g;453;458;481;df;fae0888a
+691;_DLL_INDIRECT_DATA;m;688;;d;0;0;0;df;b5a2d121
+692;main;p;688;int;g;23;23;201;df;a2562a7
+693;_UWIN;m;688;;d;0;0;0;df;4fbcf16d
+694;fofficename;v;688;char [];g;21;0;21;df;f119445b
+695;fprecname;v;688;char [];g;21;0;21;df;a2088bc1
+696;rsprtpag;p;688;void;g;205;209;449;df;82d77209
+697;sprintf;m;688;;d;0;0;0;df;c8021514
+698;WinMain;m;688;;d;0;0;0;df;a67fffb7
+699;scanf;m;688;;d;0;0;0;df;14292ff2
+700;_STD_HEADER;m;688;;d;0;0;0;df;8e743877
+701;sscanf;m;688;;d;0;0;0;df;4169412f
+702;RCVR.C;f;702;;n;1;998;296;df;2c394339
+703;__IMPORT__;m;702;;d;0;0;0;df;7756a617
+704;_UWIN;m;702;;d;0;0;0;df;4fbcf16d
+705;sprintf;m;702;;d;0;0;0;df;c8021514
+706;_DLL_INDIRECT_DATA;m;702;;d;0;0;0;df;b5a2d121
+707;WinMain;m;702;;d;0;0;0;df;a67fffb7
+708;main;p;702;int;g;18;18;293;df;43bc345d
+709;scanf;m;702;;d;0;0;0;df;14292ff2
+710;_STD_HEADER;m;702;;d;0;0;0;df;8e743877
+711;sscanf;m;702;;d;0;0;0;df;4169412f
+712;RSUM.C;f;712;;n;1;1201;484;df;a4bae114
+713;__IMPORT__;m;712;;d;0;0;0;df;7756a617
+714;rshead;p;712;void;g;453;458;481;df;fae0888a
+715;_DLL_INDIRECT_DATA;m;712;;d;0;0;0;df;b5a2d121
+716;main;p;712;int;g;23;23;201;df;60e91e58
+717;_UWIN;m;712;;d;0;0;0;df;4fbcf16d
+718;fofficename;v;712;char [];g;21;0;21;df;f119445b
+719;fprecname;v;712;char [];g;21;0;21;df;a2088bc1
+720;rsprtpag;p;712;void;g;205;209;449;df;82d77209
+721;sprintf;m;712;;d;0;0;0;df;c8021514
+722;WinMain;m;712;;d;0;0;0;df;a67fffb7
+723;scanf;m;712;;d;0;0;0;df;14292ff2
+724;_STD_HEADER;m;712;;d;0;0;0;df;8e743877
+725;sscanf;m;712;;d;0;0;0;df;4169412f
+726;RSUMXX.C;f;726;;n;1;1198;481;df;31ca6e90
+727;__IMPORT__;m;726;;d;0;0;0;df;7756a617
+728;rshead;p;726;void;g;450;455;478;df;fae0888a
+729;_DLL_INDIRECT_DATA;m;726;;d;0;0;0;df;b5a2d121
+730;main;p;726;int;g;22;22;199;df;3d63aebb
+731;_UWIN;m;726;;d;0;0;0;df;4fbcf16d
+732;fofficename;v;726;char [];g;20;0;20;df;f119445b
+733;fprecname;v;726;char [];g;20;0;20;df;a2088bc1
+734;rsprtpag;p;726;void;g;203;207;446;df;c9f81dc6
+735;sprintf;m;726;;d;0;0;0;df;c8021514
+736;WinMain;m;726;;d;0;0;0;df;a67fffb7
+737;scanf;m;726;;d;0;0;0;df;14292ff2
+738;_STD_HEADER;m;726;;d;0;0;0;df;8e743877
+739;sscanf;m;726;;d;0;0;0;df;4169412f
+740;SAMP.C;f;740;;n;1;881;193;df;5f248a8e
+741;__IMPORT__;m;740;;d;0;0;0;df;7756a617
+742;_UWIN;m;740;;d;0;0;0;df;4fbcf16d
+743;sprintf;m;740;;d;0;0;0;df;c8021514
+744;_DLL_INDIRECT_DATA;m;740;;d;0;0;0;df;b5a2d121
+745;WinMain;m;740;;d;0;0;0;df;a67fffb7
+746;main;p;740;int;g;17;17;148;df;7ed9e470
+747;scanf;m;740;;d;0;0;0;df;14292ff2
+748;_STD_HEADER;m;740;;d;0;0;0;df;8e743877
+749;shead;p;740;void;g;152;155;190;df;2133f065
+750;sscanf;m;740;;d;0;0;0;df;4169412f
+751;SPED.C;f;751;;n;1;970;282;df;eff35544
+752;__IMPORT__;m;751;;d;0;0;0;df;7756a617
+753;_UWIN;m;751;;d;0;0;0;df;4fbcf16d
+754;sprintf;m;751;;d;0;0;0;df;c8021514
+755;_DLL_INDIRECT_DATA;m;751;;d;0;0;0;df;b5a2d121
+756;WinMain;m;751;;d;0;0;0;df;a67fffb7
+757;main;p;751;int;g;19;19;279;df;195c64fb
+758;scanf;m;751;;d;0;0;0;df;14292ff2
+759;_STD_HEADER;m;751;;d;0;0;0;df;8e743877
+760;sscanf;m;751;;d;0;0;0;df;4169412f
+761;SPOL.C;f;761;;n;1;1145;457;df;caee4da9
+762;__IMPORT__;m;761;;d;0;0;0;df;7756a617
+763;whoentrer;p;761;void;g;430;430;454;df;95348132
+764;_UWIN;m;761;;d;0;0;0;df;4fbcf16d
+765;sprintf;m;761;;d;0;0;0;df;c8021514
+766;_DLL_INDIRECT_DATA;m;761;;d;0;0;0;df;b5a2d121
+767;WinMain;m;761;;d;0;0;0;df;a67fffb7
+768;main;p;761;int;g;17;17;426;df;46875f34
+769;scanf;m;761;;d;0;0;0;df;14292ff2
+770;_STD_HEADER;m;761;;d;0;0;0;df;8e743877
+771;sscanf;m;761;;d;0;0;0;df;4169412f
+772;TOTL.C;f;772;;n;1;1143;441;df;1e836e2c
+773;__IMPORT__;m;772;;d;0;0;0;df;7756a617
+774;_UWIN;m;772;;d;0;0;0;df;4fbcf16d
+775;sprintf;m;772;;d;0;0;0;df;c8021514
+776;_DLL_INDIRECT_DATA;m;772;;d;0;0;0;df;b5a2d121
+777;WinMain;m;772;;d;0;0;0;df;a67fffb7
+778;showpoll;p;772;void;g;223;225;389;df;ea931bc6
+779;main;p;772;int;g;18;18;179;df;452eee9
+780;scanf;m;772;;d;0;0;0;df;14292ff2
+781;chead;p;772;void;g;183;185;219;df;bf20ba2d
+782;_STD_HEADER;m;772;;d;0;0;0;df;8e743877
+783;sscanf;m;772;;d;0;0;0;df;4169412f
+784;pollhead;p;772;void;g;393;397;438;df;fa36cbd2
+785;UNPR.C;f;785;;n;1;1077;360;df;dd9aee
+786;__IMPORT__;m;785;;d;0;0;0;df;7756a617
+787;_UWIN;m;785;;d;0;0;0;df;4fbcf16d
+788;sprintf;m;785;;d;0;0;0;df;c8021514
+789;_DLL_INDIRECT_DATA;m;785;;d;0;0;0;df;b5a2d121
+790;WinMain;m;785;;d;0;0;0;df;a67fffb7
+791;main;p;785;int;g;19;19;357;df;5d8cfaba
+792;scanf;m;785;;d;0;0;0;df;14292ff2
+793;_STD_HEADER;m;785;;d;0;0;0;df;8e743877
+794;sscanf;m;785;;d;0;0;0;df;4169412f
+795;VEDT.C;f;795;;n;1;1211;523;df;144fd8dd
+796;__IMPORT__;m;795;;d;0;0;0;df;7756a617
+797;_UWIN;m;795;;d;0;0;0;df;4fbcf16d
+798;sprintf;m;795;;d;0;0;0;df;c8021514
+799;_DLL_INDIRECT_DATA;m;795;;d;0;0;0;df;b5a2d121
+800;WinMain;m;795;;d;0;0;0;df;a67fffb7
+801;main;p;795;int;g;17;17;464;df;b08045da
+802;scanf;m;795;;d;0;0;0;df;14292ff2
+803;_STD_HEADER;m;795;;d;0;0;0;df;8e743877
+804;askchange;p;795;void;g;468;474;520;df;c90bf14b
+805;sscanf;m;795;;d;0;0;0;df;4169412f
+806;VFIX.C;f;806;;n;1;1219;531;df;6fab4e31
+807;__IMPORT__;m;806;;d;0;0;0;df;7756a617
+808;_UWIN;m;806;;d;0;0;0;df;4fbcf16d
+809;sprintf;m;806;;d;0;0;0;df;c8021514
+810;_DLL_INDIRECT_DATA;m;806;;d;0;0;0;df;b5a2d121
+811;WinMain;m;806;;d;0;0;0;df;a67fffb7
+812;main;p;806;int;g;17;17;472;df;24645985
+813;scanf;m;806;;d;0;0;0;df;14292ff2
+814;_STD_HEADER;m;806;;d;0;0;0;df;8e743877
+815;askchange;p;806;void;g;476;482;528;df;c90bf14b
+816;sscanf;m;806;;d;0;0;0;df;4169412f
+817;VFUL.C;f;817;;n;1;871;169;df;c4c776c8
+818;__IMPORT__;m;817;;d;0;0;0;df;7756a617
+819;_UWIN;m;817;;d;0;0;0;df;4fbcf16d
+820;sprintf;m;817;;d;0;0;0;df;c8021514
+821;_DLL_INDIRECT_DATA;m;817;;d;0;0;0;df;b5a2d121
+822;WinMain;m;817;;d;0;0;0;df;a67fffb7
+823;main;p;817;int;g;18;18;166;df;75051dc5
+824;scanf;m;817;;d;0;0;0;df;14292ff2
+825;_STD_HEADER;m;817;;d;0;0;0;df;8e743877
+826;sscanf;m;817;;d;0;0;0;df;4169412f
+827;VSET.C;f;827;;n;1;782;106;df;d6661a1a
+828;__IMPORT__;m;827;;d;0;0;0;df;7756a617
+829;_UWIN;m;827;;d;0;0;0;df;4fbcf16d
+830;sprintf;m;827;;d;0;0;0;df;c8021514
+831;_DLL_INDIRECT_DATA;m;827;;d;0;0;0;df;b5a2d121
+832;WinMain;m;827;;d;0;0;0;df;a67fffb7
+833;main;p;827;int;g;16;16;103;df;4d5447af
+834;scanf;m;827;;d;0;0;0;df;14292ff2
+835;_STD_HEADER;m;827;;d;0;0;0;df;8e743877
+836;sscanf;m;827;;d;0;0;0;df;4169412f
+837;VTOT.C;f;837;;n;1;866;164;df;642cf65f
+838;__IMPORT__;m;837;;d;0;0;0;df;7756a617
+839;_UWIN;m;837;;d;0;0;0;df;4fbcf16d
+840;sprintf;m;837;;d;0;0;0;df;c8021514
+841;_DLL_INDIRECT_DATA;m;837;;d;0;0;0;df;b5a2d121
+842;WinMain;m;837;;d;0;0;0;df;a67fffb7
+843;main;p;837;int;g;18;18;161;df;42ec9218
+844;scanf;m;837;;d;0;0;0;df;14292ff2
+845;_STD_HEADER;m;837;;d;0;0;0;df;8e743877
+846;sscanf;m;837;;d;0;0;0;df;4169412f
+847;longrp.x;f;847;;n;1;5;5;df;3da5c8c2
+848;filedecl.x;f;848;;n;1;9;9;df;96dd8a41
+849;unitinfo.x;f;849;;n;1;12;12;df;7a2c054b
+850;repout.x;f;850;;n;1;6;6;df;6086e00d
+851;offnam.x;f;851;;n;1;6;6;df;ec970ecc
+852;cardrd.x;f;852;;n;1;5;5;df;96313f98
+853;candnm.x;f;853;;n;1;5;5;df;4a22fa73
+854;WELLIB.C;f;854;;n;1;1307;619;df;9df597e8
+855;office.x;f;855;;n;1;35;35;df;e0e10a39
+856;precvt.x;f;856;;n;1;13;13;df;36b609c6
+857;dcand.x;f;857;;n;1;5;5;df;fb763223
+858;weltab.x;f;858;;n;1;36;36;df;fb4d834b
+859;precin.x;f;859;;n;1;19;19;df;6fb63c01
+860;confrm;p;854;int;g;391;391;409;df;f29356e3
+861;noffic;v;858;int;e;24;0;24;dc;d2327352
+862;PERCENT;m;855;;d;33;0;33;df;b316f976
+863;untavcbs;v;849;int;e;4;0;4;dc;97fc35fa
+864;filereport;v;848;FILE *;e;3;0;3;dc;acf3879d
+865;gtcand;p;854;void;g;203;209;221;df;a8666513
+866;partnm;v;853;char [];e;3;0;3;dc;4499b23
+867;__IMPORT__;m;854;;d;0;0;0;df;7756a617
+868;headc;v;847;char [];e;3;0;3;dc;97de5cb1
+869;vtunit;v;856;int;e;4;0;4;dc;30d58166
+870;flprecid;v;848;FILE *;e;6;0;6;dc;5dd7dd3f
+871;longrep;v;847;char [];e;3;0;3;dc;d240a43e
+872;lhprint;p;854;void;g;300;303;314;df;e223f93
+873;LOGICAL;m;858;;d;2;0;2;df;c259b654
+874;vtpoll;v;856;long;e;6;0;6;dc;ea14fb49
+875;getoff;p;854;void;g;413;415;434;df;ac080b4c
+876;MAXCAND;m;858;;d;13;0;13;df;13563dad
+877;electn;v;858;char [];e;33;0;33;dc;971c4b78
+878;report;v;850;char [];e;3;0;3;dc;eb572efd
+879;EXISTS;m;849;;d;9;0;9;df;ddd6b08
+880;gtdual;p;854;void;g;244;248;259;df;77467ea3
+881;BYWARD;m;849;;d;10;0;10;df;76dd83c2
+882;prtinf;v;855;int [];e;31;0;31;dc;aa1e43b0
+883;untwards;v;849;int;e;5;0;5;dc;3c64c397
+884;gtdcnd;p;854;void;g;263;267;278;df;adcb002d
+885;_UWIN;m;854;;d;0;0;0;df;4fbcf16d
+886;abs;m;858;;d;7;0;7;df;c55aac94
+887;dcname;v;857;char [];e;3;0;3;dc;81c8b37f
+888;TRUE;m;858;;d;3;0;3;df;40cb48ee
+889;PRECID;m;855;;d;17;0;17;df;8aac20a8
+890;ncand;v;858;int;e;29;0;29;dc;31f349ac
+891;vtdate;v;856;char [];e;10;0;10;dc;bd3cd32b
+892;MAXDUAL;m;858;;d;19;0;19;df;a420331d
+893;flprecinfo;v;848;FILE *;e;4;0;4;dc;3eb498d8
+894;DUALLOCATION;m;855;;d;9;0;9;df;11aa1800
+895;precno;v;859;long;e;4;0;4;dc;b45a2a47
+896;ALLOWREPR;m;855;;d;22;0;22;df;6254312b
+897;MAXDAREC;m;858;;d;20;0;20;df;a6a71343
+898;flcand;v;848;FILE *;e;5;0;5;dc;8f13197f
+899;tellprec;p;854;void;g;318;322;340;df;bb1fecd7
+900;VOTESPERVOTER;m;855;;d;7;0;7;df;3e6c01c
+901;fltotals;v;848;FILE *;e;7;0;7;dc;b791dbf8
+902;nprec;v;858;int;e;22;0;22;dc;9b99b28f
+903;card;v;852;char [];e;3;0;3;dc;d152f1f1
+904;untnprec;v;849;int;e;4;0;4;dc;53a062a6
+905;PAPER;m;859;;d;14;0;14;df;785756e5
+906;congr;v;859;int;e;6;0;6;dc;312f0950
+907;ndual;v;858;int;e;24;0;24;dc;13d95e30
+908;VALUE;m;855;;d;16;0;16;df;26891780
+909;distct;v;859;int;e;8;0;8;dc;2da5c30f
+910;gtoffi;p;854;void;g;225;229;240;df;ba35bdec
+911;PUNCHCARD;m;859;;d;13;0;13;df;9afc790
+912;vttime;v;856;char [];e;11;0;11;dc;4819df5c
+913;WRITEINCOUNT;m;855;;d;8;0;8;df;f6d4ec03
+914;vtindx;v;856;int;e;3;0;3;dc;2fafba89
+915;min;m;858;;d;6;0;6;df;660d6e77
+916;allowch;v;855;char [];e;14;0;14;dc;ce3c558c
+917;LINECOUNT;m;858;;d;34;0;34;df;a7e87369
+918;candnm;v;853;char [];e;3;0;3;dc;3d94d6a1
+919;nunit;v;858;int;e;22;0;22;dc;2fc28e0e
+920;flglobal;v;848;FILE *;e;4;0;4;dc;c9af1a11
+921;MAXDCAND;m;858;;d;17;0;17;df;b392f000
+922;trace;v;858;int;e;9;0;9;dc;f4b204be
+923;cprint;p;854;void;g;17;19;31;df;72f06cec
+924;unitnm;v;849;char [];e;3;0;3;dc;b63ff6eb
+925;sprintf;m;854;;d;0;0;0;df;c8021514
+926;unitno;v;859;int;e;3;0;3;dc;bc3acee1
+927;filevotes;v;848;FILE *;e;6;0;6;dc;d5835e3e
+928;_DLL_INDIRECT_DATA;m;854;;d;0;0;0;df;b5a2d121
+929;untsplit;v;849;int;e;5;0;5;dc;37b64e8a
+930;getprec;p;854;void;g;438;445;486;df;9410a768
+931;ALLOWPREC;m;855;;d;26;0;26;df;8072f528
+932;WinMain;m;854;;d;0;0;0;df;a67fffb7
+933;dualnm;v;851;char [];e;4;0;4;dc;36bbc8f6
+934;ALLOWALL;m;855;;d;19;0;19;df;f4da8685
+935;ALLOWWARD;m;855;;d;27;0;27;df;3ca9f045
+936;uncode;v;849;char [];e;3;0;3;dc;87ac4f34
+937;ALLOWSEN;m;855;;d;23;0;23;df;5cc86754
+938;entrer;v;856;char [];e;8;0;8;dc;81845ab
+939;TYPE;m;855;;d;15;0;15;df;7ee154f7
+940;wtcand;p;854;void;g;122;128;142;df;dfb6f2b0
+941;cread;p;854;void;g;54;57;85;df;9992cd1
+942;ALLOWDIST;m;855;;d;25;0;25;df;28c4d179
+943;fldualcand;v;848;FILE *;e;5;0;5;dc;6952d4ce
+944;FALSE;m;858;;d;4;0;4;df;d984c84d
+945;offnam;v;851;char [];e;3;0;3;dc;15a8ad14
+946;nwrite;v;858;int;e;24;0;24;dc;571278ef
+947;MACHINE;m;859;;d;12;0;12;df;2378e532
+948;flunitinfo;v;848;FILE *;e;3;0;3;dc;b0449e70
+949;vote;v;856;long [];e;7;0;7;dc;2fc7888
+950;CANDCOUNT;m;855;;d;5;0;5;df;36f86215
+951;scanf;m;854;;d;0;0;0;df;14292ff2
+952;floffice;v;848;FILE *;e;4;0;4;dc;36cf0b6f
+953;allow;v;855;long [];e;13;0;13;dc;8b37b8a4
+954;putoff;p;854;void;g;603;605;616;df;de0f260a
+955;ALLOWCONG;m;855;;d;24;0;24;df;dd439a23
+956;ALLOWUNIT;m;855;;d;20;0;20;df;97b86c90
+957;max;m;858;;d;5;0;5;df;e63631fb
+958;MAXOFFICE;m;858;;d;18;0;18;df;656ff352
+959;CANDSTART;m;855;;d;6;0;6;df;8b6b647b
+960;floffnam;v;848;FILE *;e;5;0;5;dc;2eb0ab49
+961;commis;v;859;int [];e;17;0;17;dc;57a56570
+962;fileoffices;v;848;FILE *;e;4;0;4;dc;70fc4ffe
+963;wtdual;p;854;void;g;165;169;180;df;6cb01e8b
+964;flprecvote;v;848;FILE *;e;6;0;6;dc;81087612
+965;welcom;p;854;void;g;35;37;50;df;54be0d2d
+966;ducand;v;858;int;e;29;0;29;dc;89a0de39
+967;offset;v;858;long;e;11;0;11;dc;b66abcff
+968;senate;v;859;int;e;7;0;7;dc;dbd8a9e4
+969;_STD_HEADER;m;854;;d;0;0;0;df;8e743877
+970;wtdcnd;p;854;void;g;184;188;199;df;1df0ac80
+971;NONE;m;849;;d;8;0;8;df;6817535
+972;verifr;v;856;char [];e;9;0;9;dc;bb9cbb19
+973;regist;v;859;int;e;5;0;5;dc;ca615bfa
+974;lallow;p;854;int;g;490;495;599;df;bef06dc9
+975;college;v;859;int;e;9;0;9;dc;334b19c4
+976;fldualoff;v;848;FILE *;e;5;0;5;dc;6cbedc81
+977;DUALSTART;m;855;;d;10;0;10;df;78b5719f
+978;sscanf;m;854;;d;0;0;0;df;4169412f
+979;vothow;v;859;int;e;11;0;11;dc;200ef563
+980;repre;v;859;int [];e;16;0;16;dc;3fb8a54e
+981;ALLOWCOMM;m;855;;d;21;0;21;df;8173d555
+982;cnread;p;854;void;g;89;92;118;df;88444b5e
+983;offinf;v;855;int [];e;4;0;4;dc;71526d91
+984;userreply;p;854;void;g;344;347;387;df;dd7e5f3
+985;vtprec;v;856;long;e;5;0;5;dc;5ba5e5ec
+986;STATE;m;855;;d;32;0;32;df;6ef91573
+987;wtoffi;p;854;void;g;146;150;161;df;a2be296
+988;untstart;v;849;int;e;4;0;4;dc;e10bdd4c
+989;MAXPRECINCT;m;858;;d;15;0;15;df;6bf5cad6
+990;fulltrace;v;858;int;e;10;0;10;dc;9a6ec0a5
+991;ALLOWCOLL;m;855;;d;28;0;28;df;c4cd79a9
+992;lprint;p;854;void;g;282;284;296;df;2baea11
+993;XFIX.C;f;993;;n;1;1203;515;df;85aee60c
+994;__IMPORT__;m;993;;d;0;0;0;df;7756a617
+995;_UWIN;m;993;;d;0;0;0;df;4fbcf16d
+996;sprintf;m;993;;d;0;0;0;df;c8021514
+997;_DLL_INDIRECT_DATA;m;993;;d;0;0;0;df;b5a2d121
+998;WinMain;m;993;;d;0;0;0;df;a67fffb7
+999;main;p;993;int;g;17;17;456;df;96b29b48
+1000;scanf;m;993;;d;0;0;0;df;14292ff2
+1001;_STD_HEADER;m;993;;d;0;0;0;df;8e743877
+1002;askchange;p;993;void;g;460;466;512;df;c90bf14b
+1003;sscanf;m;993;;d;0;0;0;df;4169412f
+1004;ltoa;p;2;;n;0;0;0;dc;40e0d0
+1005;exit;p;3;;l;0;0;0;dc;40e0bc
+1006;strlen;p;3;;l;0;0;0;dc;40e0bc
+1007;fcvt;p;3;;l;0;0;0;dc;40e0bc
+1008;atoi;p;3;;l;0;0;0;dc;40e0bc
+1009;fcloseall;p;2;;n;0;0;0;dc;40e0d0
+1010;itoa;p;2;;n;0;0;0;dc;40e0d0
+1011;atol;p;3;;l;0;0;0;dc;40e0bc
+1012;access;p;3;;l;0;0;0;dc;40e0bc
+1013;toupper;p;2;;n;0;0;0;dc;40e0d0

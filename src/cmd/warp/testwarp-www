@@ -1,0 +1,601 @@
+#!/bin/ksh
+: regress [options] unit [ path [ arg ... ] ]
+
+# run regression tests in command.tst
+#
+# @(#)regress (AT&T Research) 1997-10-11
+
+command=regress
+
+function FATAL # message
+{
+	print -r -u2 "$command: $*"
+	GROUP=FINI
+	exit 1
+}
+
+function EMPTY
+{
+	typeset i
+	typeset -n ARRAY=$1
+	for i in ${!ARRAY[@]}
+	do	unset ARRAY[$i]
+	done
+}
+
+function INITIALIZE # void
+{
+	typeset i j
+	cd "$TMP"
+	case $KEEP in
+	"")	rm -f *
+		;;
+	*)	for i in *
+		do	case $i in
+			!($KEEP))	j="$j $i" ;;
+			esac
+		done
+		case $j in
+		?*)	rm -f $j ;;
+		esac
+		;;
+	esac
+	: >INPUT >OUTPUT.out >ERROR.out
+	BODY=""
+	DIAGNOSTICS=""
+	DONE=""
+	ERROR=""
+	EXEC=-
+	EXIT=0
+	IGNORE=""
+	INIT=""
+	INPUT=""
+	MOVE=""
+	OUTPUT=""
+	EMPTY SAME
+}
+
+function INTRO
+{
+	print -u2 "TEST	$COMMAND"
+}
+
+function TALLY
+{
+	typeset msg
+	case $GROUP in
+	INIT)	;;
+	*)	msg="TEST	$COMMAND, $TESTS test"
+		case $TESTS in
+		1)	;;
+		*)	msg=${msg}s ;;
+		esac
+		msg="$msg, $ERRORS error"
+		case $ERRORS in
+		1)	;;
+		*)	msg=${msg}s ;;
+		esac
+		print -u2 "$msg"
+		GROUP=INIT
+		TESTS=0
+		ERRORS=0
+		;;
+	esac
+}
+
+function CLEANUP # status
+{
+	case $dump in
+	"")	cd $SOURCE
+		rm -rf "$TMP"
+		;;
+	esac
+	TALLY
+	exit $1
+}
+
+function RUN # void
+{
+	typeset failed i j s
+	typeset -L70 SHOW
+	case $GROUP in
+	INIT)	INTRO
+		;;
+	FINI)	;;
+	$select)print -nu2 "$TEST"
+		file=""
+		exec >/dev/null
+		compare=""
+		for i in $INPUT
+		do	case " $OUTPUT " in
+			*" $i "*)
+				if	test -f $i.sav
+				then	cp $i.sav $i
+					compare="$compare $i"
+				elif	test -f $i
+				then	cp $i $i.sav
+					compare="$compare $i"
+				fi
+				;;
+			esac
+		done
+		for i in $INIT
+		do	$i $TEST INIT
+		done
+		case $BODY in
+		"")	COMMAND "${ARGS[@]}" <INPUT >OUTPUT 2>ERROR
+			failed=""
+			ignore=""
+			set -- $MOVE
+			MOVE=""
+			while	:
+			do	case $# in
+				0|1)	break ;;
+				*)	mv $1 $2; ignore="$ignore $1" ;;
+				esac
+				shift 2
+			done
+			for i in $compare OUTPUT ERROR
+			do	case " $IGNORE $ignore " in
+				*" $i "*)	continue ;;
+				esac
+				ignore="$ignore $i"
+				case ${SAME[$i]} in
+				"")	for s in out sav err
+					do	test -f $i.$s && break
+					done
+					j=$i.$s
+					;;
+				*)	j=${SAME[$i]}
+					;;
+				esac
+				case $DIAGNOSTICS:$i in
+				?*:ERROR)
+					case $STATUS in
+					0)	test ! -s ERROR && failed=$failed${failed:+,}DIAGNOSTICS ;;
+					esac
+					continue
+					;;
+				*)	cmp -s $i $j && continue
+					;;
+				esac
+				failed=$failed${failed:+,}$i
+				case $verbose in
+				?*)	print -u2 "	=== diff $i <actual >expected ==="
+					diff $i $j >&2
+					;;
+				esac
+			done
+			case $failed in
+			"")	case $STATUS in
+				$EXIT)	;;
+				*)	failed="exit code $EXIT expected" ;;
+				esac
+				;;
+			esac
+			case $failed in
+			"")	SHOW=$DESCRIPTION
+				print -r -u2 "	$SHOW"
+				;;
+			?*)	((ERRORS++))
+				SHOW="FAILED [ $failed ] $DESCRIPTION"
+				print -r -u2 "	$SHOW"
+				case $dump in
+				?*)	GROUP=FINI; exit ;;
+				esac
+				;;
+			esac
+			;;
+		*)	SHOW=$DESCRIPTION
+			print -r -u2 "	$SHOW"
+			for i in $BODY
+			do	$i $TEST BODY
+			done
+			;;
+		esac
+		for i in $DONE
+		do	$i $TEST DONE $STATUS
+		done
+		;;
+	esac
+}
+
+function TEST # number description arg ...
+{
+	case $1 in
+	+([0-9]))
+		RUN
+		TEST=$1
+		DESCRIPTION=$2
+		unset ARGS
+		file=""
+		case $TEST in
+		${GROUP}*)
+			;;
+		*)	GROUP=${TEST%%+([a-zA-Z])}
+			case $GROUP in
+			$select)INITIALIZE ;;
+			esac
+			;;
+		esac
+		;;
+	*)	case $GROUP in
+		INIT)	;;
+		*)	RUN
+			TALLY
+			;;
+		esac
+		COMMAND=$1
+		shift
+		typeset cmd=$(PATH=$SOURCE:/usr/5bin:/bin:/usr/bin:$PATH whence $COMMAND)
+		#if	test "" = "$cmd" -o ! -x "$cmd"
+		#then	FATAL $cmd: not found
+		#fi
+		COMMAND=$cmd
+		case $# in
+		0)	;;
+		*)	COMMAND="$COMMAND $*" ;;
+		esac
+		;;
+	esac
+}
+
+function EXEC # arg ...
+{
+	case $GROUP in
+	!($select))	return ;;
+	esac
+	case $# in
+	0)	set -- "${ARGS[@]}" ;;
+	esac
+	case $EXEC in
+	-)	EXEC=$DESCRIPTION
+		LINE1=$LINE
+		;;
+	*)	case $TEST in
+		*:*)	;;
+		*)	print -r -u2 "$TEST	$EXEC"
+			TEST=$TEST:$LINE1
+			case $DESCRIPTION in
+			"$EXEC") DESCRIPTION="$(print -r -f '%q ' -- "${ARGS[@]}")" ;;
+			esac
+			;;
+		esac
+		RUN
+		TEST=${TEST%:*}:$LINE
+		DESCRIPTION="$(print -r -f '%q ' -- "$@")"
+		;;
+	esac
+	ARGS=("$@")
+}
+
+function NOTE # description
+{
+	DESCRIPTION=$*
+}
+
+function IO # INPUT|OUTPUT|ERROR [-n] file|- data ...
+{
+	typeset op i v f file
+	case $GROUP in
+	!($select))	return ;;
+	esac
+	op=$1
+	shift
+	file=$op
+	case $1 in
+	-n)	f=$1; shift ;;
+	esac
+	case $# in
+	0)	;;
+	*)	case $1 in
+		-)	;;
+		*)	file=$1
+			eval i='$'$op
+			case " $i " in
+			*" $file "*)
+				;;
+			*)	eval $op='"$'$op' $file"'
+				;;
+			esac
+			;;
+		esac
+		shift
+		;;
+	esac
+	case " $IGNORE " in
+	*" $file "*)
+		for i in $IGNORE
+		do	case $i in
+			$file)	;;
+			*)	v="$v $i" ;;
+			esac
+		done
+		IGNORE=$v
+		;;
+	esac
+	case $op in
+	OUTPUT|ERROR)	file=$file.out ;;
+	esac
+	unset SAME[$op]
+	rm -f $file.sav
+	case $#:$f in
+	0:)	: > $file ;;
+	*)	print $f -r -- "$@" > $file ;;
+	esac
+}
+
+function INPUT # file|- data ...
+{
+	IO $0 "$@"
+}
+
+function MOVE # from to
+{
+	case $GROUP in
+	!($select))	return ;;
+	esac
+	MOVE="$MOVE $@"
+}
+
+function SAME # new old
+{
+	typeset i file v
+	case $GROUP in
+	!($select))	return ;;
+	esac
+	case $# in
+	2)	SAME[$1]=$2
+		file=$1
+		;;
+	3)	SAME[$2]=$3
+		file=$2
+		eval i='$'$1
+		case " $i " in
+		*" $2 "*)
+			;;
+		*)	eval $1='"$'$1' $2"'
+			;;
+		esac
+		;;
+	esac
+	case " $IGNORE " in
+	*" $file "*)
+		for i in $IGNORE
+		do	case $i in
+			$file)	;;
+			*)	v="$v $i" ;;
+			esac
+		done
+		IGNORE=$v
+		;;
+	esac
+}
+
+function OUTPUT # file|- data ...
+{
+	IO $0 "$@"
+}
+
+function ERROR # file|- data ...
+{
+	IO $0 "$@"
+}
+
+function REMOVE # file ...
+{
+	typeset i
+	for i
+	do	rm -f $i $i.sav
+	done
+}
+
+function IGNORE # file ...
+{
+	typeset i
+	for i
+	do	case " $IGNORE " in
+		*" $i "*)
+			;;
+		*)	IGNORE="$IGNORE $i"
+			;;
+		esac
+	done
+}
+
+function KEEP # pattern ...
+{
+	typeset i
+	for i
+	do	case $KEEP in
+		"")	KEEP="$i" ;;
+		*)	KEEP="$KEEP|$i" ;;
+		esac
+	done
+}
+
+function DIAGNOSTICS # void
+{
+	DIAGNOSTICS=1
+	EXIT='*'
+}
+
+function EXIT # status
+{
+	EXIT=$1
+}
+
+function INFO # info description
+{
+	typeset -R15 info=$1
+	case $1 in
+	"")	info=no ;;
+	esac
+	shift
+	print -r -u2 "$info " "$@"
+}
+
+function COMMAND # arg ...
+{
+	((TESTS++))
+	$COMMAND "$@"
+	STATUS=$?
+	return $STATUS
+}
+
+function SET # [no]name[=value]
+{
+	typeset i
+	for i
+	do	case $i in
+		no?*)	eval ${i#no}='""' ;;
+		*=*)	eval $i ;;
+		*)	eval $i=1 ;;
+		esac
+	done
+}
+
+function VIEW # var [ file ]
+{
+	nameref var=$1
+	typeset file pwd view root offset
+	case $# in
+	1)	file=$1 ;;
+	*)	file=$2 ;;
+	esac
+	pwd=${PWD%/*}
+	case $var in
+	'')	var=$pwd/$file
+		if	test ! -r $var
+		then	ifs=$IFS
+			IFS=:
+			set -- $VPATH
+			IFS=$ifs
+			for view
+			do	case $view in
+				/*)	;;
+				*)	view=$pwd/$view ;;
+				esac
+				case $offset in
+				'')	offset=${pwd#$view} ;;
+				esac
+				if	test -r $view$offset/$file
+				then	var=$view$offset/$file
+					break
+				fi
+			done
+		fi
+		;;
+	esac
+}
+
+# main
+
+set warp
+
+integer ERRORS=0 TESTS=0
+typeset ARGS COMMAND DIAGNOSTICS ERROR EXEC GROUP=INIT 
+typeset IGNORE INPUT KEEP OUTPUT TEST SOURCE MOVE
+typeset dump file select trace verbose
+typeset -A SAME
+
+OPTSTR='ko:[[no]name[=value]]t:[test]v unit [path [arg ...]]'
+while	getopts "$OPTSTR" OPT
+do	case $OPT in
+	k)	SET dump=1
+		;;
+	o)	SET $OPTARG
+		;;
+	t)	case $select in
+		"")	select="${OPTARG//,/\|}" ;;
+		*)	select="$select|${OPTARG//,/\|}" ;;
+		esac
+		;;
+	v)	SET verbose=1
+		;;
+	*)	GROUP=FINI
+		exit 2
+		;;
+	esac
+done
+shift $OPTIND-1
+case $# in
+0)	FATAL test unit name omitted ;;
+esac
+SOURCE=$PWD
+PATH=$SOURCE:$PATH
+COMMAND=$1
+shift
+REGRESS=$COMMAND
+COMMAND=${COMMAND##*/}
+COMMAND=${COMMAND%.tst}
+TMP=$COMMAND.tmp
+case $1 in
+""|[-+]*)
+	;;
+*)	COMMAND=$1
+	shift
+	;;
+esac
+TEST $COMMAND "$@"
+case $select in
+"")	select="[0-9]*" ;;
+*'|'*)	select="@($select)" ;;
+esac
+
+# all work done in local temp dir
+
+trap "RUN; CLEANUP 0" 0
+trap "CLEANUP $?" 1 2 13 15
+rm -rf "$TMP"
+mkdir "$TMP" || FATAL "$TMP": cannot create directory
+cd "$TMP"
+TMP=$PWD
+case $trace in
+?*)	PS4='+$LINENO+ '
+	set -x
+	;;
+esac
+
+# some last minute shenanigans
+
+alias BODY='BODY=BODY; function BODY'
+alias DO='[[ $GROUP == $select ]] &&'
+alias DONE='DONE=DONE; function DONE'
+alias EXEC='LINE=$LINENO; EXEC'
+alias INIT='INIT=INIT; function INIT'
+
+# do the tests
+
+# tests for the warp command
+
+KEEP "*.dat"
+
+format=%Y-%m-%d+%H:%M
+
+y2k0=1999-12-31+23:59
+y2k1=2000-01-01+00:00
+y2k2=2000-01-01+00:01
+
+leap0=2000-02-28+00:00
+leap1=2000-02-29+00:00
+leap2=2000-03-01+00:00
+
+TEST 01 'date'
+	EXEC	$y2k0 date -f $format
+		OUTPUT - $y2k0
+	EXEC	$y2k0 $SHELL -c "date -f $format"
+	EXEC	$y2k1 date -f $format
+		OUTPUT - $y2k1
+	EXEC	$y2k2 date -f $format
+		OUTPUT - $y2k2
+	EXEC	$y2k2 $SHELL -c "date -f $format"
+	EXEC	$leap0 date -f $format
+		OUTPUT - $leap0
+	EXEC	$leap0 $SHELL -c "date -f $format"
+	EXEC	$leap1 date -f $format
+		OUTPUT - $leap1
+	EXEC	$leap1 $SHELL -c "date -f $format"
+	EXEC	$leap2 date -f $format
+		OUTPUT - $leap2
+	EXEC	$leap2 $SHELL -c "date -f $format"

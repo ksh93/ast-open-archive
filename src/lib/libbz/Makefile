@@ -1,0 +1,13 @@
+:PACKAGE: ast
+
+LICENSE = type=special
+
+CCFLAGS = -O $(CC.DLL)
+
+bz 2.0 :LIBRARY: bzlib.h bzlib_private.h sfdcbzip.h \
+	blocksort.c huffman.c crctable.c randtable.c compress.c \
+	decompress.c bzlib.c sfdcbzip.c
+
+$(INCLUDEDIR) :INSTALLPROTO: sfdcbzip.h bzlib.h
+
+:: README

@@ -1,0 +1,71 @@
+99-12-12 sed: delay peek for .==$
+99-08-11 grep: don't complain about EISDIR read error
+	 ed: usage to stderr
+99-05-01 ed,sed: long options
+99-04-23 testre.dat: add ksh pattern parse tests
+99-03-01 grep: long options
+98-11-11 testmatch: add STR_ICASE tests
+98-09-22 sed: REG_LENIENT => delim not special inside [...]
+98-07-17 grep: add -w, -G
+98-04-01 sed: \n => newline for LHS and RHS of y if REG_LENIENT
+98-03-01 grep.tst,testre.dat: update for regcollate() [..] fix
+98-02-06 testre: char class range bug fix checks
+	 testmatch: char class range bug fix checks
+98-01-23 sed: use regerror(0 for more informative error messages
+97-05-09 sed: fix adrs[] by adding ccmapc()
+97-04-01 sed: fix s/old/new/w file
+96-12-25 sed: uchar -> unsigned char for the bsd holdouts
+	 sed: sfset(sfstdin,SF_SHARE,1) if q command compiled
+	 sed: ccmapc() command table indices
+	 sed: ; separator warning only if CONFORMANCE==standard
+	 ed: add <sfdisc.h>
+	 sed: hp.pa cpp can't handle #define f(/*a z*/a)
+	 ed: line mark bit constants now use sizeof(off_t)*CHAR_BIT
+96-08-31 testre: add BM tests
+96-08-11 ed: -? and arg errors now verbose
+96-05-09 testre: add RE_SHELL_* tests
+96-02-29 grep: fix line buffer span bug that forgot to add the newline
+	 grep: fix -h, add -H
+	 sed: fix compiled expression alignment errors by typedef word
+	 regress: move to lib0ast
+	 grep: fix exit status and keep going on input open error
+96-02-14 grep: -Ts keeps SF_SHARE input
+96-02-09 grep: fix end of buffer test
+96-02-06 grep: add regrexec() -- now its close to gre speed
+96-01-30 ed: ,==.,$ ;==1,$ %==1,$
+	 grep: turn off SF_SHARE on input pipe
+	 ed,grep,sed: unused var cleanup
+96-01-22 testre: add match overrun test
+	 testre: drop dups from testre.dat
+	 ed: add trap() call to append()
+	 ed: drop malloc/realloc ptr diff hack in append() 
+	 ed,grep,sed: REG_LENIENT (-O) is default, -S for strict
+	 ed,grep,sed: astconf("CONFORMANCE")=="posix" for strict
+	 sed: REG_LENIENT allows space between addresses
+96-01-19 regress: INPUT|OUTPUT|ERROR -n for no trailing newline
+	 sed: fix incomplete last line handling
+	 grep: add incomplete last line handling
+	 testre: handle \n \r \t \xXX in re and s fields
+96-01-16 testre: standardize for outside exchange
+96-01-11 sed: convert sed.h enum to #define for K&R
+	 ed: add restricted red
+	 ed: fix s///g bug that botched more than 1 sub!
+	 ed: fix s///<num> bug that missed the point
+96-01-08 regex: convert from C++ to C
+95-12-25 regex: add REG_SHELL, REG_SHELL|REG_AUGMENTED
+	 regex: drop REG_ANCH, reganch() -- REG_LEFT|REG_RIGHT always done
+95-12-21 regex: snarf from Doug; now we have negation and conjunction
+	 regex: REG_MINIMAL converts pattern to pattern&(pattern.+)!
+95-12-19 regress: new
+	 convert test*.sh to *.tst for use with regress
+95-12-11 ed: undo for all ops
+	 ed: initial tested.sh
+95-12-08 ed: no hard limits
+	 ed: !command added
+	 ed: a,b!command writes to command and reads back
+	 ed: program state in ed struct
+95-12-04 regex: add REG_SHELL,REG_LEFT,REG_RIGHT and strgrpmatch()
+	 regex: add REG_MINIMAL placeholder
+	 ed: new from v10
+	 ed: posix update
+95-12-01 regex: snarf Doug McIlroy's C++ implementation
