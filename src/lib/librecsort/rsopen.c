@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,7 +21,6 @@
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"rshdr.h"
 
@@ -30,7 +29,7 @@
 **	Written by Kiem-Phong Vo (07/08/96)
 */
 
-static const char id[] = "\n@(#)recsort library (AT&T Research) 2000-03-17\0\n";
+static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2000-03-17 $\0\n";
 
 #if __STD_C
 Rs_t* rsopen(Rsdisc_t* disc, Rsmethod_t* meth, ssize_t c_max, int type)

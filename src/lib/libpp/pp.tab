@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.tab (AT&T Labs Research) 2000-09-11
+# @(#)pp.tab (AT&T Labs Research) 2000-12-25
 #
 # C preprocessor tables and states
 #
@@ -145,6 +145,7 @@
 	BUILTIN			# mark macro definitions builtin
 	CATLITERAL		# concatenate adjacent "..."
 	DUMP			# do a checkpoint dump
+	EXPOSE			# expose hidden macros
 	FILEDEPS		# output file dependencies
 	GENDEPS			# missings FILEDEPS are generated
 	HEADERDEPS		# <...> too for FILEDEPS

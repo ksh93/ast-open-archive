@@ -1,4 +1,7 @@
+01-01-01 opt.tst: add enumerated option argument values
+00-12-11 date.dat: add a few more crontab(1) forms
 00-10-31 date.dat: add date(1) and touch(1) forms
+	 sfio: kpv updates to handle mac os X
 00-10-17 sfio/thole.c: move large buffer from stack to global
 00-10-03 testy2k.dat: `Feb 29 01:02' => `Feb 29  2000'
 00-04-01 Makefile: add ../../lib/libast to .SOURCE for features/sfio

@@ -1,8 +1,29 @@
+01-01-01 expand: fix :D: to preserve leading / -- how long has this been wrong?
+	 makerules: fix .PACKAGE.INIT. for dir == /
+	 makerules: $(PACKAGE_PATH) is list of default package root dirs
+	 makerules: add recurse=list to list recursion order and exit
+	 makerules: _BLD_DLL==1 when building dll's
+	 makerules: link dll with static -l*
+	 expand: eliminate loops from :W=O:
+	 parse: add exit [code]
+	 bind: eliminate dups for 2d glob
+00-12-25 makerules: add header arg to :YYPREFIX:
+	 makerules: add :T=AF: for .ARCOPY
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+00-12-18 ppcc: check for old bash
+00-12-15 makerules: handle uwin $(CC.DLL) => -D_BLD_DLL change
+00-12-14 main: initialize version with fmtident()
+00-12-12 makerules: bias :PACKAGE: search for $(INSTALLROOT)
+	 make: use stat() instead of access() for better NFS behavior
+00-12-11 makerules: _BLD_DLL only for _DLL lib members
+00-12-03 debug.mk: add %.inc for -H include nesting
 00-10-31 option: --corrupt={accept|error|ignore}, --mismatch => --corrupt
 	 makerules: req file must be seen at of before the lib
 	 makerules: fix AWK and NAWK default definitions
 	 makerules: physical=1 => 2d iff in 3d
 	 pkg-tcl.mk: add CC.DLL, don't clobber TCLROOT
+	 makerules: define _PACKAGE_foo in .PACKAGE.INIT.
+	 makerules: add .VIEW to .MAMEDIT and .MAMACTION
 00-10-28 makerules: drop MAKEFILES filter on .SELECT. (why was it there?)
 00-10-26 make.c: fix .JOINT sync bug
 	 makerules: add $(PACKAGES expr) and :VARIANT: rhs expr

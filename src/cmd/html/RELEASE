@@ -1,3 +1,16 @@
+01-01-01 mm2html: fix incorrect \h'... #local refs
+	 mm2html: append <!--LABELS-->...<!--/LABELS--> for second pass
+00-12-14 mm2html: fix tbl colspan
+00-12-12 mm2html: ignore bgcolor for table with no box
+00-12-07 download: .tar.gz => .tgz
+	 htmlrefs: add --delete
+00-12-05 mm2html: add .PM
+	 mm2html: <id@id.id...> => mailto:
+00-11-27 mm2html: --frame is now 1 level instead of 2; no *-body and *-head
+	 mm2html: add .IS ... .IE indentation
+	 mm2html: .LR foo (1) generates man link
+	 htmlrefs: add https support
+00-10-31 htmlrefs: remove if internal filter leaves <= 1 line
 00-05-25 mm2html: add viewgraph outline and navigation
 00-05-11 mm2html: add .vG viewgraph macros
 00-03-04 htmlrefs: add <LINK rel=dynamic>

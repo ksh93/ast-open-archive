@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -34,7 +33,7 @@
  * see comments in testdate.dat for description of format
  */
 
-static const char id[] = "\n@(#)testdate (AT&T Research) 1999-10-22\0\n";
+static const char id[] = "\n@(#)$Id: testdate (AT&T Research) 1999-10-22 $\0\n";
 
 #include <ast.h>
 #include <ctype.h>

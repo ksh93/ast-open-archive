@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -50,7 +49,7 @@
  * NOTE: the scans cheat by using dbm_blkptr and dbm_keyptr
  */
 
-static const char id[] = "\n@(#)cs.dbm (AT&T Bell Laboratories) 05/09/95\0\n";
+static const char id[] = "\n@(#)$Id: cs.dbm (AT&T Bell Laboratories) 1995-05-09 $\0\n";
 
 #include <ast.h>
 #include <error.h>
@@ -308,7 +307,7 @@ svc_read(void* handle, int fd)
 			n = sfsprintf(ret, sizeof(ret), "I ready to scan\n");
 			break;
 		case 'v':
-			n = sfsprintf(ret, sizeof(ret), "I %s %s %u\n", id + 5, csname(0L), getpid());
+			n = sfsprintf(ret, sizeof(ret), "I %s %s %u\n", id + 10, csname(0L), getpid());
 			break;
 		default:
 			n = sfsprintf(ret, sizeof(ret), "E invalid command %s\n", cmd);

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)html2db (AT&T Labs Research) 1998-11-10\n]"
+"[-?\n@(#)$Id: html2db (AT&T Labs Research) 1998-11-10 $\n]"
 USAGE_LICENSE
 "[+NAME?html2db - extract flat file database from html tables]"
 "[+DESCRIPTION?\bhtml2db\b extracts a flat file database from tables in the"

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,13 +20,12 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 /*
  * File: server.c
  */
 
-static char id[] = "\n@(#)vcs+ifs (AT&T Research) 02/29/96\0\n";
+static char id[] = "\n@(#)$Id: vcs+ifs (AT&T Research) 1996-02-29 $\0\n";
 
 #include "ifs_agent.h"
 #include "ifs_errno.h"
@@ -130,7 +129,7 @@ int	own;
 time_t	uptm;
 {
     sprintf( buf, "I Hi! %s, vcs[%d] by %s@%s at %s [%s]\n",
-		fmtuid(uid), getpid(), fmtuid(own), csname(0), fmttime(NiL, uptm), id + 5 );
+		fmtuid(uid), getpid(), fmtuid(own), csname(0), fmttime(NiL, uptm), id + 10 );
     return 0;
 }
 

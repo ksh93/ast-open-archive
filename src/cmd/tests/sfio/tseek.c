@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -89,7 +88,7 @@ MAIN()
 	two = (Sfoff_t)lseek(sffileno(f), (off_t)0, 2);
 	if(one != two)
 		terror("seeking1\n");
-	if(sfseek(f,(Sfoff_t)(-1),2) != (Sfoff_t)lseek(sffileno(f), (off_t)(-1),2))
+	if(sfseek(f,(Sfoff_t)(-1),2) != (Sfoff_t)lseek(sffileno(f), (off_t)(-1), 2))
 		terror("seeking2\n");
 
 	if(!(f = sfopen(f,tstfile(0),"w")))

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,7 +21,6 @@
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 /*	Verify that records are sorted.
 **
@@ -168,4 +167,8 @@ static Rsmethod_t _Rsverify =
 	"Verify that the input is sorted."
 };
 
-Rsmethod_t*	Rsverify = &_Rsverify;
+__DEFINE__(Rsmethod_t*, Rsverify, &_Rsverify);
+
+#ifdef NoF
+NoF(rsverify)
+#endif

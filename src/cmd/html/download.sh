@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1996-2000 AT&T Corp.                #
+#                Copyright (c) 1996-2001 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -20,7 +20,6 @@
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
-#                                                                  #
 ####################################################################
 : download item hosttype ...
 
@@ -29,7 +28,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)download (AT&T Labs Research) 2000-06-01
+@(#)download (AT&T Labs Research) 2000-12-07
 ]
 '$USAGE_LICENSE$'
 [+NAME?download - generate web site download instructions for an mm document]
@@ -83,7 +82,7 @@ print -r -- "are also available for these system architectures:"
 print -r -- ".BL"
 for type
 do	print -r -- ".LI"
-	print -r -- ".xx link=\"./${item}-${type}.tar.gz	${type}\""
+	print -r -- ".xx link=\"./${item}-${type}.tgz	${type}\""
 done
 print -r -- ".LE"
 print -r -- ".PP"

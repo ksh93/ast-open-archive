@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,19 +20,17 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
 /*	Test for /dev/null and hole-preserving code */
 
-char	buf[256*1024], b[256*1024];
-
 MAIN()
 {
-	Sfio_t*	null;
-	Sfio_t*	f;
-	int	k, n;
+	Sfio_t*		null;
+	Sfio_t*		f;
+	int		k, n;
+	static char	buf[256*1024], b[256*1024];
 
 	if(!(null = sfopen(NIL(Sfio_t*),"/dev/null","w")) )
 		terror("Opening /dev/null");

@@ -10,4 +10,4 @@ bz 2.0 :LIBRARY: bzlib.h bzlib_private.h sfdcbzip.h \
 
 $(INCLUDEDIR) :INSTALLPROTO: sfdcbzip.h bzlib.h
 
-:: README
+:: README RELEASE

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -851,12 +850,17 @@ descend(Sfio_t* xp, struct rule* r, int all)
 
 	w = 0;
 	r->mark &= ~M_mark;
-	for (p = r->prereqs; p; p = p->next)
-		if (p->rule->mark & M_mark)
-		{
-			w = 1;
-			descend(xp, p->rule, all);
-		}
+	if (r->prereqs)
+	{
+		for (p = r->prereqs; p; p = p->next)
+			if (p->rule->mark & M_mark)
+			{
+				w = 1;
+				descend(xp, p->rule, all);
+			}
+		freelist(r->prereqs);
+		r->prereqs = 0;
+	}
 	if (all)
 	{
 		if (w)
@@ -927,7 +931,7 @@ order(Sfio_t* xp, register char* s, char* val)
 	while (q = *v++)
 	{
 		r = *v++;
-		if ((r->mark & M_mark) && (sp = sfopen(NiL, bind(q)->name, "r")))
+		if ((r->mark & M_mark) && (sp = rsfopen(bind(q)->name)))
 		{
 			while (s = sfgetr(sp, '\n', 1))
 			{
@@ -938,7 +942,7 @@ order(Sfio_t* xp, register char* s, char* val)
 					for (t = s; (i = *s) && i != ' ' && i != '\t' && i != '"' && i != '\'' && i != '\\' && i != ':'; s++)
 						if (i == '/')
 							t = s + 1;
-						else if (i == '.' && t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
+						else if (i == '.' && *(s + 1) != 'c' && *(s + 1) != 'C' && t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
 							*s = 0;
 					if (*s)
 						*s++ = 0;
@@ -987,9 +991,19 @@ order(Sfio_t* xp, register char* s, char* val)
 								k = 0;
 								break;
 							}
-					if (k)
+					if (k && ((q = (struct rule*)hashget(tab, t)) && (q->mark & M_mark) && q != r || *t++ == 'l' && *t++ == 'i' && *t++ == 'b' && *t && (q = (struct rule*)hashget(tab, t)) && (q->mark & M_mark) && q != r))
 					{
-						if ((q = (struct rule*)hashget(tab, t)) && (q->mark & M_mark) && q != r || t[0] == 'l' && t[1] == 'i' && t[2] == 'b' && t[3] && (q = (struct rule*)hashget(tab, t + 3)) && (q->mark & M_mark) && q != r)
+						if (t = strrchr(r->name, '/'))
+							t++;
+						else
+							t = r->name;
+						if (t[0] == 'l' && t[1] == 'i' && t[2] == 'b')
+							t += 3;
+						if (u = strrchr(q->name, '/'))
+							u++;
+						else
+							u = q->name;
+						if (!streq(t, u))
 							addprereq(r, q, PREREQ_APPEND);
 					}
 					j = i;
@@ -1290,7 +1304,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 					}
 					t = sfstruse(internal.nam);
 					pathcanon(t, 0);
-					if (!access(t, 0))
+					if (!stat(t, &st))
 					{
 						if (sep)
 							sfputc(xp, ' ');
@@ -1432,7 +1446,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 		 * op[1] == 'P' does physical test
 		 */
 
-		if ((*(op + 1) == 'P' ? !lstat(s, &st) : !access(s, 0)) == (sep == EQ))
+		if ((*(op + 1) == 'P' ? !lstat(s, &st) : !stat(s, &st)) == (sep == EQ))
 			sfputr(xp, s, -1);
 		return;
 	case 'Z':
@@ -1466,7 +1480,8 @@ edit(Sfio_t* xp, register char* s, char* dir, char* bas, char* suf)
 	register char*	q;
 	long		pos;
 
-	if (!*s) return;
+	if (!*s)
+		return;
 	pos = sfstrtell(xp);
 
 	/*
@@ -1474,16 +1489,21 @@ edit(Sfio_t* xp, register char* s, char* dir, char* bas, char* suf)
 	 */
 
 	q = dir;
-	if (q != DELETE && q != KEEP && (!*q || *q == '.' && !*(q + 1))) q = DELETE;
+	if (q != DELETE && q != KEEP && (!*q || *q == '.' && !*(q + 1)))
+		q = DELETE;
 	if (p = strrchr(s, '/'))
 	{
-		if (q == KEEP) while (s <= p) sfputc(xp, *s++);
-		else s = ++p;
+		if (q == KEEP)
+			while (s <= p)
+				sfputc(xp, *s++);
+		else
+			s = ++p;
 	}
 	if (q != DELETE && q != KEEP)
 	{
 		sfputr(xp, q, -1);
-		if (*q && *(sfstrrel(xp, 0) - 1) != '/') sfputc(xp, '/');
+		if (*q && *(sfstrrel(xp, 0) - 1) != '/')
+			sfputc(xp, '/');
 	}
 
 	/*
@@ -1491,27 +1511,37 @@ edit(Sfio_t* xp, register char* s, char* dir, char* bas, char* suf)
 	 */
 
 	q = bas;
-	if (!(p = strrchr(s, '.')) || p == s) p = s + strlen(s);
-	else while (p > s && *(p - 1) == '.') p--;
-	if (q == KEEP) while (s < p) sfputc(xp, *s++);
-	else s = p;
-	if (q != DELETE && q != KEEP) sfputr(xp, q, -1);
+	if (!(p = strrchr(s, '.')) || p == s)
+		p = s + strlen(s);
+	else
+		while (p > s && *(p - 1) == '.')
+			p--;
+	if (q == KEEP)
+		while (s < p)
+			sfputc(xp, *s++);
+	else
+		s = p;
+	if (q != DELETE && q != KEEP)
+		sfputr(xp, q, -1);
 
 	/*
 	 * suffix
 	 */
 
 	q = suf;
-	if (*p && q == KEEP) sfputr(xp, s, -1);
-	else if (q != DELETE && q != KEEP) sfputr(xp, q, -1);
+	if (*p && q == KEEP)
+		sfputr(xp, s, -1);
+	else if (q != DELETE && q != KEEP)
+		sfputr(xp, q, -1);
 
 	/*
 	 * cleanup
 	 */
 
-	p = sfstrbase(xp) + pos;
+	p = sfstrbase(xp) + pos + 1;
 	q = sfstrrel(xp, 0);
-	while (q > p && *(q - 1) == '/') q--;
+	while (q > p && *(q - 1) == '/')
+		q--;
 	pos = q - sfstrbase(xp);
 	sfstrset(xp, pos);
 }
@@ -1641,7 +1671,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		matched = 1;
 		break;
 	case 'A':
-		if (r->scan != SCAN_IGNORE)
+		if (r->scan != SCAN_IGNORE || *ops == 'F' || *ops == 'f')
 		{
 			closear(openar(r->name, "r"));
 			if (internal.arupdate)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -435,6 +434,7 @@ struct globstate
 	DIR*		dirp;
 	int		view;
 	int		root;
+	Hash_table_t*	overlay;
 };
 
 /*
@@ -449,6 +449,8 @@ glob_diropen(glob_t* gp, const char* path)
 	register int		i;
 	register int		n;
 
+	if (!(gs->overlay = hashalloc(NiL, HASH_set, HASH_ALLOCATE, 0)))
+		return 0;
 	gs->view = 0;
 	gs->root = 0;
 	dir = path;
@@ -481,6 +483,7 @@ glob_diropen(glob_t* gp, const char* path)
 			if (gs->dirp = opendir(sfstruse(internal.nam)))
 				return (void*)gs;
 		}
+	hashfree(gs->overlay);
 	return 0;
 }
 
@@ -502,6 +505,9 @@ glob_dirnext(glob_t* gp, void* handle)
 			if (FIGNORE(dp->d_name))
 				continue;
 			HACKSPACE(dp->d_name, s);
+			if (hashget(gs->overlay, dp->d_name))
+				continue;
+			hashput(gs->overlay, 0, (char*)gs);
 			return dp->d_name;
 		}
 		closedir(gs->dirp);
@@ -535,6 +541,8 @@ glob_dirclose(glob_t* gp, void* handle)
 
 	if (gs->dirp)
 		closedir(gs->dirp);
+	if (gs->overlay)
+		hashfree(gs->overlay);
 }
 
 /*

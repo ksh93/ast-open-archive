@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -54,6 +53,7 @@
 	char		name[NAMELEN];	/* host name			*/ \
 	char		type[TYPELEN];	/* host type			*/ \
 	char		misc[MISCLEN];	/* host misc attributes		*/ \
+	char		shell[MISCLEN];	/* shell path			*/ \
 	char*		access;		/* host access expression	*/ \
 	char*		bypass;		/* idle bypass expression	*/ \
 	unsigned long	addr;		/* host address			*/ \
@@ -189,6 +189,7 @@ typedef struct
 	char		type[TYPELEN];
 	char		misc[MISCLEN];
 	char		label[LABELLEN];
+	char		shell[MISCLEN];
 	char*		access;
 	char*		bypass;
 	int		bias;

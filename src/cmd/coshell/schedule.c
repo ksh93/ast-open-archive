@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -427,6 +426,7 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 	}
 	if (a->set & SETRATING) sp->rating = a->rating;
 	if (a->set & SETSCALE) sp->scale = a->scale;
+	if (a->set & SETSHELL) strcpy(sp->shell, a->shell);
 	if (a->set & SETTYPE) strcpy(sp->type, a->type);
 	if (a->set & SETCPU)
 	{

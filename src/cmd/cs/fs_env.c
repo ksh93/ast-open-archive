@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -35,7 +34,7 @@
  *	<op> <mount> <path> [pwd=<pwd>] [<name>=<value>] ...
  */
 
-static const char id[] = "@(#)cs.fs_env (AT&T Research) 05/05/97\0\n";
+static const char id[] = "@(#)$Id: cs.fs_env (AT&T Research) 1997-05-05 $\0\n";
 
 #ifndef DEBUG
 #define DEBUG	1

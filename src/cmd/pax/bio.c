@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2000 AT&T Corp.                *
+*                Copyright (c) 1987-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -36,6 +35,9 @@
 #if _sys_mtio
 #include <ast_tty.h>
 #include <sys/mtio.h>
+#if _sys_ioctl
+#include <sys/ioctl.h>
+#endif
 #endif
 #ifdef MTIOCTOP
 #if defined(MTIOBSF) && !defined(MTBSF)

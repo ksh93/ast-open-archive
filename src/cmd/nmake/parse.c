@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -47,7 +46,7 @@
 
 #define OP_ASSERT	(1<<0)		/* assertion statement		*/
 #define OP_ASSIGN	(1<<1)		/* assignment statement		*/
-#define OP_NONE		(1<<2)		/* no operator found		*/
+#define OP_EMPTY	(1<<2)		/* no operator found		*/
 #define OP_STATEMENT	((1<<3)-1)	/* statement type mask		*/
 
 #define OP_ACTION	(1<<3)		/* operator takes action	*/
@@ -72,13 +71,14 @@
 #define CON_break	(1<<11)		/* loop break			*/
 #define CON_continue	(2<<11)		/* loop continue		*/
 #define CON_error	(3<<11)		/* error message output		*/
-#define CON_let		(4<<11)		/* let expression		*/
-#define CON_local	(5<<11)		/* local var declaration	*/
-#define CON_print	(6<<11)		/* standard output message	*/
-#define CON_read	(7<<11)		/* read				*/
-#define CON_return	(8<<11)		/* return			*/
-#define CON_rules	(9<<11)		/* rules			*/
-#define CON_set		(10<<11)	/* set options			*/
+#define CON_exit	(4<<11)		/* exit				*/
+#define CON_let		(5<<11)		/* let expression		*/
+#define CON_local	(6<<11)		/* local var declaration	*/
+#define CON_print	(7<<11)		/* standard output message	*/
+#define CON_read	(8<<11)		/* read				*/
+#define CON_return	(9<<11)		/* return			*/
+#define CON_rules	(10<<11)	/* rules			*/
+#define CON_set		(11<<11)	/* set options			*/
 
 #define PUSHLOCAL(p)	do{for(p=pp->local;p;p=p->next)if(!(p->newv.property&V_scope))p->bucket->value=(char*)p->oldv;}while(0)
 #define POPLOCAL(p)	do{for(p=pp->local;p;p=p->next)if(!(p->newv.property&V_scope))p->bucket->value=(char*)&p->newv;}while(0)
@@ -165,6 +165,7 @@ static Namval_t		controls[] =	/* control keywords		*/
 	"end",		CON_end,
 	"error",	CON_error,
 	"eval",		CON_eval,
+	"exit",		CON_exit,
 	"for",		CON_for,
 	"if",		CON_if,
 	"let",		CON_let,
@@ -1237,6 +1238,17 @@ getline(Sfio_t* sp, int lead, int term)
 			}
 			continue;
 
+		case CON_exit:
+			if (!(pp->cp->flags & CON_skip))
+			{
+				n = sfstrtell(sp);
+				expand(sp, t);
+				sfputc(sp, 0);
+				i = strtol(sfstrset(sp, n), &tok, 0);
+				finish(i);
+			}
+			continue;
+
 		case CON_print:
 		case CON_read:
 			if (!(pp->cp->flags & CON_skip))
@@ -1684,7 +1696,7 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 	}
 	else
 	{
-		op = OP_NONE;
+		op = OP_EMPTY;
 		p = s - 1;
 		s = sfstrbase(sp);
 		while (p > s && isspace(*(p - 1)))
@@ -2996,7 +3008,7 @@ parse(Sfio_t* fp, char* bp, char* name, int scoped)
 			assignment(lhs, op, rhs);
 			break;
 
-		case OP_NONE:
+		case OP_EMPTY:
 			if (*lhs || *act)
 			{
 				tmp = sfstropen();

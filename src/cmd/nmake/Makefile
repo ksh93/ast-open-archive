@@ -17,7 +17,7 @@ RULESDIR = $(LIBDIR)/$(ID)
 
 IDNAME == "$(ID)"
 PATHCHECK == "$(ID)"
-STAMP == "\n@(#)$(ID) ($(OWNER)) $(VERSION:?$$(VERSION) ??)$(RELEASE:?$$(RELEASE) ??)$(DATE)\0\n"
+STAMP == "\n@(#)\$Id: $(ID) ($(OWNER)) $(VERSION:?$$(VERSION) ??)$(RELEASE:?$$(RELEASE) ??)$(DATE) \$\0\n"
 
 clobber = !(nmake)
 
@@ -75,7 +75,7 @@ Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 		echo '/* : : generated from $(cctype) assertions : : */'
 		set -
 		f=$(*|"`$(LIBDIR)/probe/probe -kg C pp $(cctype:Q)`")
-		a="`sed -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_"
+		a="`$(SED) -n -e 's/^#define #\(.*\)(\(.*\))/_\1_/p' $f | sort -u` _feature_"
 		for n in $a
 		do	eval $n=
 		done

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2000 AT&T Corp.                *
+*                Copyright (c) 1987-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -1538,18 +1537,17 @@ getheader(register Archive_t* ap, register File_t* f)
 				bunread(ap, &magic, sizeof(magic));
 				break;
 			}
-			switch (magic.major)
+			if (magic.major == 1)
 			{
-			case 1:
 				if (bread(ap, &lead_old, (off_t)sizeof(lead_old), (off_t)sizeof(lead_old), 0) <= 0)
 					break;
 				if (ap->swap)
 					swapmem(ap->swap, &lead_old, &lead_old, sizeof(lead_old));
 				if (bseek(ap, (off_t)lead_old.archoff, SEEK_SET, 0) != (off_t)lead_old.archoff)
 					error(3, "%s: %s imbedded archive seek error", ap->name, format[ap->compress].name);
-				break;
-			case 2:
-			case 3:
+			}
+			else if (magic.major)
+			{
 				if (bread(ap, &lead, (off_t)sizeof(lead), (off_t)sizeof(lead), 0) <= 0)
 					break;
 				memcpy(state.id.volume, lead.name, sizeof(state.id.volume) - 1);
@@ -1629,8 +1627,9 @@ getheader(register Archive_t* ap, register File_t* f)
 					error(2, "%s: %s format header %ld byte entry+data block expected", ap->name, format[ap->format].name, num);
 					return 0;
 				}
-				break;
-			default:
+			}
+			else
+			{
 				error(2, "%s: %s format version %d.%d not supported", ap->name, format[ap->format].name, magic.major, magic.minor);
 				return 0;
 			}

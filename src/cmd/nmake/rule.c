@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -1279,7 +1278,7 @@ initview(void)
 			sfputr(tmp, "/...", -1);
 		sfputc(tmp, 0);
 		s = t = sfstrrel(tmp, 0);
-		while (!access(t -= 4, 0))
+		while (!stat(t -= 4, &top))
 		{
 			if (state.maxview >= MAXVIEW - 1)
 			{

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -37,7 +36,7 @@
  * <mount> == /dev/fd translates fd to path if possible
  */
 
-static const char id[] = "@(#)cs.nam (AT&T Research) 02/29/96\0\n";
+static const char id[] = "@(#)$Id: cs.nam (AT&T Research) 1996-02-29 $\0\n";
 
 #include <cs.h>
 #include <hashkey.h>

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -101,6 +100,7 @@ MAIN()
 	Sfio_t*	f;
 	char	buf[1024];
 	char	rbuf[4*1024];
+	off_t	o;
 	int	i;
 
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
@@ -164,13 +164,19 @@ MAIN()
 	for(i = 0; i < 4; ++i)
 		if(rbuf[i] != i)
 			terror("wrong 4 bytes\n");
+
 	sfsync(f);
+	if((o = lseek(f->file, (off_t)0, SEEK_CUR)) != 4)
+		terror("Wrong seek location %lld\n", (Sfoff_t)o);
+
 	if((i = dup(sffileno(f))) < 0)
 		terror("Can't dup file descriptor\n");
+	if((o = lseek(i, (off_t)0, SEEK_CUR)) != 4)
+		terror("Wrong seek location %lld\n", (Sfoff_t)o);
 
 	sfclose(f);
-	if(lseek(i,0,1) != 4)
-		terror("Wrong seek location\n");
+	if((o = lseek(i, (off_t)0, SEEK_CUR)) != 4)
+		terror("Wrong seek location %lld\n", (Sfoff_t)o);
 
 	TSTRETURN(0);
 }

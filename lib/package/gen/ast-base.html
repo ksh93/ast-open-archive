@@ -1,0 +1,3443 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META name="generator" content="mm2html (AT&T Labs Research) 2001-01-01">
+<META name="description" content="ast-base package">
+<META name="keywords" content="software, package">
+<TITLE> ast-base package </TITLE>
+<META name="author" content="gsf+dgk+kpv">
+</HEAD>
+<BODY  bgcolor=white vlink=teal link=slateblue >
+<TABLE border=0 align=center width=96%><TR><TD valign=top align=left>
+<!--INDEX--><!--/INDEX-->
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ast-base package">ast-base package</A></H3></CENTER></FONT></FONT>
+The AT&amp;T Labs Research ast-base package contains commands and libraries
+required by all other ast based packages. Included are ksh93, a pax
+that generates compact delta archives, nmake, the 3d user level
+versioning filesystem, coshell for network execution, a multi-dialect C
+preprocessor and companion library, gnu-make that uses coshell for
+network execution, and libraries shared by the other ast packages.
+Components in this package:
+<P>
+<TABLE  bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center >
+<TR><TD align=left>
+<A href="#3d">3d</A></TD><TD align=left>html</TD><TD align=left><A href="#pax">pax</A></TD><TD align=left>libast</TD><TD align=left>libdll</TD><TD align=left>librecsort</TD></TR>
+<TR><TD align=left>
+bzip</TD><TD align=left><A href="#ksh93">ksh93</A></TD><TD align=left>probe</TD><TD align=left>libbz</TD><TD align=left>libexpr</TD><TD align=left>libsum</TD></TR>
+<TR><TD align=left>
+<A href="#coshell">coshell</A></TD><TD align=left>mam</TD><TD align=left><A href="#proto">proto</A></TD><TD align=left>libcmd</TD><TD align=left>libmam</TD><TD align=left>libuu</TD></TR>
+<TR><TD align=left>
+cpp</TD><TD align=left><A href="#msgcc">msgcc</A></TD><TD align=left>ss</TD><TD align=left>libcoshell</TD><TD align=left>libodelta</TD><TD align=left>libvdelta</TD></TR>
+<TR><TD align=left>
+cs</TD><TD align=left><A href="#nmake">nmake</A></TD><TD align=left>tests</TD><TD align=left>libcs</TD><TD align=left>libpp</TD><TD align=left>libz</TD></TR>
+</TABLE>
+<P>
+This package is a superset of the following package: ast-ksh; you won't need this if you download ast-base.
+The software is covered by this license:
+<UL type=square>
+<LI>
+<A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+</UL>
+Individual components may be covered by separate licenses;
+refer to the component source and/or binaries for more information.
+<P>
+A recent
+<A href="#release change log">release change log</A>
+is also included.
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="3d">3d</A></H3></CENTER></FONT></FONT>
+<STRONG>3d</STRONG>
+is the historical name for
+<EM>n</EM><STRONG>DFS</STRONG><EM>,</EM>
+the multiple dimension file system.
+It is implemented as a shared library that is preloaded
+before any other shared library using the recently documented
+(<EM>ahem</EM>)
+<STRONG>LD_PRELOAD</STRONG>
+or
+<STRONG>_RLD_LIST</STRONG>
+feature of the runtime linker.
+<STRONG>3d</STRONG>
+intercepts pathname system calls (and other calls if tracing is
+turned on) and provides a logical namespace on top of the underlying
+physical file system.
+The shared library implementation currently works
+only on
+<EM>bsd.i386</EM>,
+<EM>linux.i386</EM>,
+<EM>osf.alpha</EM>,
+<EM>sun4</EM>,
+<EM>sol.*</EM>,
+and
+<EM>sgi.*</EM>.
+<P>
+<STRONG>3d</STRONG>
+works in conjunction with
+<STRONG>ksh88</STRONG>
+or
+<STRONG>ksh93</STRONG>.
+The
+<STRONG>3d</STRONG>
+command with no arguments enters a
+<STRONG>3d</STRONG>
+shell.
+The
+<STRONG>vpath</STRONG>
+builtin controls the logical
+filesystem view:
+<PRE>
+     vpath dir_1 dir_2
+</PRE>
+mounts the directory hierarchy
+<EM>dir_1</EM>
+on top of
+<EM>dir_2</EM>.
+Files under
+<EM>dir_1</EM>
+overlay files under
+<EM>dir_2</EM>.
+Files under
+<EM>dir_2</EM>
+are readonly;
+any files under
+<EM>dir_2</EM>
+that are modified are first copied to the
+corresponding place in
+<EM>dir_1</EM>.
+<EM>vpaths</EM>
+may be chained:
+<PRE>
+     vpath dir_2 dir_3
+</PRE>
+<EM>vpaths</EM>
+are per-process; every process may have a different view.
+<EM>vpaths</EM>
+are a handy way to separate source and generated files.
+Typical
+<STRONG>advsoft</STRONG>
+users set up
+<STRONG>3d</STRONG>
+at login or
+<STRONG>xterm</STRONG>
+time:
+<PRE>
+     export HOSTTYPE=$(package)
+     vpath $HOME/arch/$HOSTTYPE $HOME
+</PRE>
+with source files in
+<TT>$HOME/src/(cmd|lib)/*</TT>.
+<STRONG>nmake</STRONG>
+is run in
+<TT>$HOME/arch/$HOSTTYPE/src/(cmd|lib)/*</TT>
+and generated files (objects and executables) are dropped in the top hierarchy.
+<P>
+<STRONG>2d</STRONG>
+can prefix any command to disable 
+<STRONG>3d</STRONG>
+for that command:
+<PRE>
+     2d ls *.c
+</PRE>
+<P>
+<STRONG>3d</STRONG>
+also provides tracing, monitoring and call intercept services.
+<STRONG>vpm</STRONG>
+uses monitoring to graph the process and io hierarchy.
+The
+<EM>cs</EM>
+name server uses pathname call intercepts to translate network
+pathnames.
+Try this for any host:
+<PRE>
+     cat /dev/tcp/hostname/inet.daytime
+</PRE>
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="coshell">coshell</A></H3></CENTER></FONT></FONT>
+<STRONG>coshell</STRONG>
+executes blocks of shell commands on lightly loaded hosts in the local network.
+There is one
+<STRONG>coshell</STRONG>
+server per user.
+This server runs as a daemon on the user's home host,
+and only processes running on the home host have access to the server.
+The server controls a background
+<STRONG>ksh</STRONG>
+shell process, initiated by
+<STRONG>rsh</STRONG>,
+on each of the connected hosts.
+<P>
+<STRONG>coshell</STRONG>
+is easy to use and administer.
+The only privilege required for installation, administration or use is
+<STRONG>rsh</STRONG>
+access to the local hosts.
+<STRONG>coshell</STRONG>
+does requires a uniform file namespace across all hosts on the local network.
+<P>
+<STRONG>nmake</STRONG>
+and
+<STRONG>gmake</STRONG>
+users can take advantage of network execution with
+no makefile modifications.
+Shell level access is similar to but more efficient than
+<STRONG>rsh</STRONG>
+and allows host expression matching to replace the explicit host name argument.
+<P>
+Factor of 5 compilation speedups are typical.
+<P>
+To start your local daemon:
+<PRE>
+     coshell +
+</PRE>
+To send
+<STRONG>nmake</STRONG>
+or
+<STRONG>gmake</STRONG>
+actions to
+<STRONG>coshell</STRONG>
+at concurrency level 8:
+<PRE>
+     export COSHELL=coshell
+     export NPROC=8
+</PRE>
+To run shell commands on a lightly loaded host:
+<PRE>
+     coshell -r - 'hostname; sort a &gt; b' &amp;
+     pid=$!
+     # other stuff
+     wait $pid
+</PRE>
+For interactive
+<STRONG>coshell</STRONG>
+status:
+<PRE>
+     coshell -
+     coshell&gt; s
+     <EM> ... status ...</EM>
+     coshell&gt; h
+     <EM> ... help ...</EM>
+     coshell&gt; q
+</PRE>
+<STRONG>package</STRONG>
+generates static host information and
+<STRONG>ss</STRONG>
+lists the dynamic status of hosts on the local network.
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ksh93">ksh93</A></H3></CENTER></FONT></FONT>
+KSH-93 is the most recent version of the KornShell Language
+described in
+"The KornShell Command and Programming Language,"
+by Morris Bolsky and David Korn of AT&amp;T Bell Laboratories, ISBN 0-13-182700-6.
+The KornShell is a shell programming language,
+which is upward compatible with "sh" (the Bourne Shell),
+and is intended to conform to the IEEE P1003.2/ISO 9945.2 Shell and
+Utilities standard.
+KSH-93 provides an enhanced programming environment in
+addition to the major command-entry features of the BSD
+shell "csh".  With KSH-93, medium-sized programming tasks can be
+performed at shell-level without a significant loss in performance.
+In addition, "sh" scripts can be run on KSH-93 without modification.
+<P>
+The code should conform to the IEEE POSIX 1003.1 standard and to the
+proposed ANSI-C standard so that it should be portable to all
+such systems.  Like the previous version, KSH-88,
+it is designed to accept eight bit character sets
+transparently, thereby making it internationally compatible.
+It can support multi-byte characters sets with some characteristics
+of the character set given at run time.
+<P>
+KSH-93 provides the following features, many of which were also inherent
+in KSH-88:
+<UL type=square>
+<LI>
+Enhanced Command Re-entry Capability:  The KSH-93 history
+function records commands entered at any shell level and stores
+them, up to a user-specified limit, even after you log off.
+This allows you to re-enter long commands with a few keystrokes
+- even those commands you entered yesterday.
+The history file allows for eight bit characters in
+commands and supports essentially unlimited size histories.
+<LI>
+In-line Editing: In "sh", the only way to fix mistyped
+commands is to backspace or retype the line. KSH-93 allows you
+to edit a command line using a choice of EMACS-TC or "vi"
+functions.
+You can use the in-line editors to complete filenames as
+you type them.
+You may also use this editing feature when entering
+command lines from your history file.
+A user can capture keystrokes and rebind keys to customize the
+editing interface.
+<LI>
+Extended I/O Capabilities:  KSH-93 provides several I/O
+capabilities not available in "sh", including the ability to:
+<UL type=circle>
+<LI>
+specify a file descriptor for input and output
+<LI>
+start up and run co-processes
+<LI>
+produce a prompt at the terminal before a read
+<LI>
+easily format and interpret responses to a menu
+<LI>
+echo lines exactly as output without escape processing
+<LI>
+format output using printf formats.
+<LI>
+read and echo lines ending in "<NULL>\<NULL>".
+</UL>
+<LI>
+Improved performance: KSH-93 executes many scripts faster
+than the System V Bourne shell. A major reason for this is
+that many of the standard utilities are built-in.
+To reduce the time to initiate a command, KSH-93 allows
+commands to be added as built-ins at run time
+on systems that support dynamic loading such as System V Release 4.
+<LI>
+Arithmetic: KSH-93 allows you to do integer arithmetic in any
+base from two to sixty-four.  You can also do double
+precision floating point arithmetic.
+Almost the complete set of C language operators are available
+with the same syntax and precedence.
+Arithmetic expressions can be used to as an argument expansion 
+or as a separate command.
+In addition there is an arithmetic for command that works
+like the for statement in C.
+<LI>
+Arrays: KSH-93 supports both indexed and associative arrays.
+The subscript for an indexed array is an arithmetic expression,
+whereas, the subscript for an associative array is a string.
+<LI>
+Shell Functions and Aliases: Two mechanisms - functions and
+aliases - can be used to assign a user-selected identifier to
+an existing command or shell script.
+Functions allow local variables and provide scoping
+for exception handling.
+Functions can be searched for and loaded on first reference the
+way scripts are.
+<LI>
+Substring Capabilities:  KSH-93 allows you to create a
+substring of any given string either by specifying the starting
+offset and length, or by stripping off leading
+or trailing substrings during parameter substitution.
+You can also specify attributes, such as upper and lower case,
+field width, and justification to shell variables.
+<LI>
+More pattern matching capabilities:  KSH-93 allows you to specify
+extended regular expressions for file and string matches.
+<LI>
+KSH-93 uses a hierarchal name space for variables.
+Compound variables can be defined and variables can
+be passed by reference.  In addition, each variable
+can have one or more disciplines associated with
+it to intercept assignments and references.
+<LI>
+Improved debugging:  KSH-93 can generate line numbers on execution
+traces.  Also, I/O redirections are now traced.
+There is a DEBUG trap that gets evaluated after each command
+so that errors can be localized.
+<LI>
+Job Control: On systems that support job control, including
+System V Release 4, KSH-93
+provides a job-control mechanism almost identical to that of
+the BSD "csh", version 4.1.
+This feature allows you
+to stop and restart programs, and to move programs between the
+foreground and the background.
+<LI>
+Added security:
+KSH-93 can execute scripts which do not have read permission
+and scripts which have the setuid and/or setgid set when
+invoked by name, rather than as an argument to the shell.
+It is possible to log or control the execution of setuid and/or
+setgid scripts.
+The noclobber option prevents you from accidentally erasing
+a file by redirecting to an existing file.
+<LI>
+KSH-93 can be extended by adding built-in commands at run time.
+In addition, KSH-93 can be used as a library that can
+be embedded into an application to allow scripting.
+</UL>
+Documentation for KSH-93 consists of an "Introduction to KSH-93",
+"Compatibility with the Bourne Shell" and a manual page and a
+README file.  In addition, the "New KornShell Command and Programming
+Language," book is available from Prentice Hall.
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="msgcc">msgcc</A></H3></CENTER></FONT></FONT>
+<STRONG>msgcc</STRONG>
+and
+<STRONG>msgcpp</STRONG>
+extract message text from C source for
+<NOBR><A href="/~gsf/man/man1/gencat.html"><STRONG>gencat</STRONG></A>(1)</NOBR>
+message catalogs.
+<NOBR><A href="/~gsf/man/man1/msggen.html"><STRONG>msggen</STRONG></A>(1)</NOBR>
+is a
+<NOBR><A href="/~gsf/man/man1/gencat.html"><STRONG>gencat</STRONG></A>(1)</NOBR>
+replacement that generates machine independent binary message
+catalogs that are compatible with the
+<STRONG>ast</STRONG>
+<NOBR><A href="/~gsf/man/man3/catgets.html"><STRONG>catgets</STRONG></A>(3)</NOBR>
+implementation.
+<STRONG>catgets</STRONG>
+also supports native message catalogs where available.
+<NOBR><A href="/~gsf/man/man1/msgcvt.html"><STRONG>msgcvt</STRONG></A>(1)</NOBR>
+and
+<NOBR><A href="/~gsf/man/man1/msgadmin.html"><STRONG>msgadmin</STRONG></A>(1)</NOBR>
+are administrative commands that support machine translation
+of C locale message catalogs.
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="nmake">nmake</A></H3></CENTER></FONT></FONT>
+<STRONG>nmake</STRONG>
+is the AT&amp;T
+<STRONG>nmake</STRONG>,
+first released in 1985.
+<STRONG>nmake</STRONG>
+is a modern variant of the traditional Feldman
+<STRONG>make</STRONG>
+with an important difference:
+<STRONG>nmake</STRONG>
+maintains state that records
+information for future runs.
+The state includes:
+<UL type=square>
+<LI>
+file modification times
+<LI>
+explicit prerequisites (from makefile assertions)
+<LI>
+implicit prerequisites (from
+<EM>#include</EM>
+scanning)
+<LI>
+action text (used to build targets)
+<LI>
+variable values
+<LI>
+target attributes
+</UL>
+State
+<EM>and</EM>
+a language to manipulate it finally makes concise
+makefiles a reality; concise because rules traditionally placed in
+each makefile can now be implemented in a general way in a single
+<EM>base rules</EM>
+file.
+The base rules are such a fundamental part of
+<STRONG>nmake</STRONG>
+that most of its visible features are controlled by them.
+<P>
+Most makefiles are just a few lines:
+<PRE>
+     :PACKAGE: X11
+     
+     xgame :: README xgame.6 xgame.h xgame.c xutil.c -lXaw -lXmu -lXt
+</PRE>
+Automatically generated
+<STRONG>probe</STRONG>
+information provides convenient compiler abstractions:
+<PRE>
+     CCFLAGS = $(CC.PIC)
+     
+     ast 4.0 :LIBRARY: ast.c strmatch.c
+</PRE>
+In this case if the compiler supports
+<EM>pic</EM>
+(position independent code)
+and shared libraries then
+<TT>nmake install</TT>
+will generate
+<EM>libast.a</EM>
+and
+<EM>libast.so.4.0</EM>
+(or the appropriate shared library suffix determined by
+<STRONG>CC.SUFFIX.SHARED</STRONG>).
+There are no
+<STRONG>nmake</STRONG>
+makefile generators (because the makefiles are so small),
+there is no separate
+<TT>make depend</TT>
+(because the files with
+<EM>.SCAN</EM>
+attributes are automatically scanned for implicit prerequisites),
+and there is no cheating (because all time stamp changes
+are detected, not just
+<EM>newer-than</EM>).
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pax">pax</A></H3></CENTER></FONT></FONT>
+<STRONG>pax</STRONG>
+is a POSIX 1003.2 conformant replacement for
+<STRONG>tar</STRONG>
+and
+<STRONG>cpio</STRONG>
+that handles most UNIX archive and tape formats.
+<STRONG>pax</STRONG>
+uses the
+<EM>vdelta</EM>
+algorithm to construct efficient delta archives that contain bytewise
+changes from a given base archive. 
+<STRONG>gzip</STRONG>
+and
+<STRONG>compress</STRONG>
+archives are also handled on input and output.
+<P>
+To create a
+<EM>vdelta</EM>
+compressed base archive:
+<PRE>
+     tw | pax -w -f base -z -
+</PRE>
+To create a delta archive on the base above (record file changes only):
+<PRE>
+     tw | pax -w -f delta -z base
+</PRE>
+To read the delta archive:
+<PRE>
+     pax -r -f delta -z base
+</PRE>
+To create a delta archive from linux-1.2.0 to linux-1.2.5:
+<PRE>
+     pax -rf linux-1.2.5.tar.gz -wf 0-5.pax.gz -x gzip -z linux-1.2.0.tar.gz
+</PRE>
+To create the linux-1.2.5 archive:
+<PRE>
+     pax -rf 0-5.pax.gz -z linux-1.2.0.tar.gz -wf linux-1.2.5.tar.gz -x tar -x gzip
+</PRE>
+The
+<STRONG>bax</STRONG>
+script, shipped with
+<STRONG>pax</STRONG>,
+combines
+<STRONG>tw</STRONG>
+and
+<STRONG>pax</STRONG>
+for handy backup control.
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="proto">proto</A></H3></CENTER></FONT></FONT>
+<STRONG>proto</STRONG>
+converts ANSI C prototype constructs to constructs compatible
+with K&amp;R C, ANSI C, and C++.
+Only files with the line
+<PRE>
+     #pragma prototyped
+</PRE>
+in the first 64 lines are processed; other files are silently ignored.
+This is how
+<STRONG>advsoft</STRONG>
+source is first shipped to foreign architectures.
+Once
+<STRONG>advsoft</STRONG>
+is bootstrapped the
+non-<STRONG>proto</STRONG>
+source can be built using the
+<STRONG>advsoft</STRONG>
+tools.
+<P>
+<STRONG>proto</STRONG>
+also converts in the other direction by providing
+<EM>extern</EM>
+prototypes for a collection of K&amp;R source files and by converting
+K&amp;R source files in place.
+K&amp;R to ANSI is not 100%, but is a good starting point for manual conversion.
+<P>
+<STRONG>proto</STRONG>
+is token based (no C grammar); this allows it to convert 
+before C preprocessing, and also allows
+<STRONG>proto</STRONG>
+to be inserted into
+the standalone
+<STRONG>cpp</STRONG>.
+This is how
+<STRONG>nmake</STRONG>
+compiles ANSI C source with K&amp;R compilers.
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="release change log">release change log</A></H3></CENTER></FONT></FONT>
+<!--LABELS-->
+<B><FONT font face="verdana,arial,helvetica,geneva,sans-serif">
+<TABLE bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center><TR>
+<TD align=left><A href="#ksh93 changes">ksh93</A></TD>
+<TD align=left><A href="#pax changes">pax</A></TD>
+<TD align=left><A href="#html changes">html</A></TD>
+<TD align=left><A href="#proto changes">proto</A></TD>
+<TD align=left><A href="#bzip changes">bzip</A></TD>
+<TD align=left><A href="#tests changes">tests</A></TD>
+</TR><TR>
+<TD align=left><A href="#3d changes">3d</A></TD>
+<TD align=left><A href="#coshell changes">coshell</A></TD>
+<TD align=left><A href="#cpp changes">cpp</A></TD>
+<TD align=left><A href="#cs changes">cs</A></TD>
+<TD align=left><A href="#msgcc changes">msgcc</A></TD>
+<TD align=left><A href="#nmake changes">nmake</A></TD>
+<TD align=left><A href="#probe changes">probe</A></TD>
+<TD align=left><A href="#ss changes">ss</A></TD>
+</TR><TR>
+<TD align=left><A href="#libast changes">libast</A></TD>
+<TD align=left><A href="#libcmd changes">libcmd</A></TD>
+<TD align=left><A href="#libdll changes">libdll</A></TD>
+<TD align=left><A href="#libexpr changes">libexpr</A></TD>
+<TD align=left><A href="#librecsort changes">librecsort</A></TD>
+<TD align=left><A href="#libuu changes">libuu</A></TD>
+<TD align=left><A href="#libbz changes">libbz</A></TD>
+<TD align=left><A href="#libz changes">libz</A></TD>
+</TR><TR>
+<TD align=left><A href="#libcoshell changes">libcoshell</A></TD>
+<TD align=left><A href="#libcs changes">libcs</A></TD>
+<TD align=left><A href="#libpp changes">libpp</A></TD>
+</TR></TABLE>
+</FONT></B>
+<!--/LABELS-->
+<PRE>
+
+All recorded changes follow.
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ksh93 changes">ksh93 changes</A></H3></CENTER></FONT></FONT>
+
+01-01-25  --- Release ksh93k+  ---
+01-01-25  allow arithmetic expressions with float%int and treat them
+	  as ((int)float)%int rather than as an error. 
+01-01-19  read -n1 was not working and has been fixed.
+01-01-17  ksh now handes the case in which a here document in command
+	  substitution $() is terminated by the trailing ).  Previously,
+	  a new-line was needed at the end of the delimiter word. 
+01-01-02  A bug in which a KEYBD trap would cause a multi-line token
+	  to be processed incorrectly has been fixed.
+00-12-10  Arithmetic integer constants can now have L and U suffices. 
+00-12-10  A bug in the processing of arithmetic expressions with compound
+	  variables when the -n option is on has been fixed.
+00-12-08  A bug in M-f and M-b from emacs mode has been fixed.  This
+	  bug only occurs when ksh93 is compiled without MULTIBYTE enabled.
+00-11-29  A bug in which jobs -p would yield 0 for background
+	  jobs run in a script has been fixed.
+00-11-21  A bug in integer arrays in which the number of elements is
+	  incorrect when the ++ operator is applied to a non-existing
+	  element has been fixed.  For example, integer x; ((x&#0091;3&#0093;++)).
+00-11-20  A timing bug in which the shell could reset the terminal
+	  group to the wrong value in the case that the a new process
+	  changes the terminal group during startup has been fixed.
+
+00-10-27  --- Release ksh93k  ---
+00-10-27  Using tab for completion now works only when applied
+	  after a non-blank character at the end of the current line.
+	  In other case a tab is inserted.
+00-10-27  A bug in the emacs edit mode for ^X^E has been fixed.
+	  The ^X^E sequence is supposed to invoke the full editor
+	  on the current command.
+00-10-18  A bug in which expansions of the form ${var//pattern/string}
+	  did not work correctly when pattern was '/' or "/" has
+	  been fixed.
+00-10-18  The output format for indexed arrays in compound variables
+	  has been modified so that it can be used as input.
+00-10-18  Assignments with name references (typeset -n) will no
+	  implicitly unreference an existing name reference.
+00-10-17  A bug the += append operator when a single array element
+	  is appended to a variable that is not an array has been fixed.
+00-10-16  A bug in which the SIGCONT signal was being sent to
+	  each process will kill -0 or kill -n 0 has been fixed.
+00-10-12  The arithmetic evaluation portion has been rewritten to
+	  perform a number of optimizations.
+00-10-10  A bug in which name prefix matching ${!name.*} was not
+	  checking name to see if it was a name reference has been fixed.
+00-09-26  A bug in the multibyte version in which the width of for
+	  non-printing characters was not correct has been fixed.
+00-09-12  Made changes to get multibyte editing work on UWIN for windows
+00-09-12  A bug in which multibyte characters would be displayed incorrectly
+	  has been fixed.
+00-08-08  Removed build dependency on iswprint() and iswalph().
+00-07-20  In some cases the read builtin would read more than a single
+	  line from a pipe on standard input and therefore leave the seek
+	  position in the wrong location.
+00-07-05  If the directory / is on the path, a / will not be inserted
+	  between the directory and the file name during path searching
+	  to avoid searching // for systems that treat this specially.
+00-06-26  A bug in which on rare occasions wait could return before all
+	  jobs have completed has been fixed.
+00-06-21  A bug in which backspace did not work correctly during the
+	  R replace directive in vi-mode has been fixed.
+00-06-12  Added variable name completion/expansion/listing  to the set of
+	  completions.  Variable name completions begin with $ or "$ followed
+	  by a letter. 
+00-05-09  --- Release ksh93j  ---
+00-05-09  Modified command substitution to avoid using /tmp files when
+          run on read-only file systems. 
+00-04-17  Modified printf to handle '%..Xc' and '%..Xs' options where X
+	  is not an alpha character.  Previous versions core dumped with this.
+00-04-10  Changes to multibyte editing code were made to use standard
+	  ISO C functions rather than methods devised before the standard.
+00-04-09  Add %H options to printf to output strings with &lt;"'&amp;\t&gt; properly
+	  converted for use in HTML and XML documents.
+00-04-07  Modified getopts builtin to handle <.>..</.>< >in usage string</ >
+	  by invoking specified function.
+00-04-04  Added self generating man pages for bg, fc, fg, disown, jobs,
+	  hist, let, ., and ulimit.
+00-03-30  The append operator += has been added and can be used
+	  for all assignments, strings, arrays, and compound variables.
+00-03-30  Code was modified in several places to support automatic
+	  generation of C locale dictionaries.
+00-03-28  A bug in which the set and trap commands invoked with --name
+	  type arguments would terminate the invoking script  has
+	  been fixed.
+00-03-27  A bug in which the library path variable was not updated  
+	  correctly on some systems as described in the 'g' point
+	  release has been fixed. 
+00-03-07  printf now returns a non-zero exit status when one of
+          its arguments cannot be converted to the given type. 
+00-03-05  The return value and error message for a command that
+          was found on the path but was not executable was set
+          incorrectly.
+00-03-05  A prototype for ioctl() was removed from the vi edit mode.
+
+00-01-28  --- Release ksh93i  ---
+00-01-28  Most of the built-in commands and ksh itself are now
+          self documenting.  Running command --man will produce
+          screen output.  Running command --html produces the
+          man page in html format.
+00-01-28  The getopts builtin can process command description
+          strings to produce man pages.
+00-01-28  A bug in which a script could terminate when getopts
+          encountered an error when invoked inside a function
+          has been fixed.
+00-01-28  When a symbolic link was specified as the name of
+          the script to invoke by name, the value of $0 was
+          set to the real file name rather than the link name
+          in some cases and this has been fixed.
+00-01-28  A bug in which the precision given as an argument
+	  to printf was not working has been fixed.
+
+99-03-31  --- Release ksh93h  ---
+99-03-31  The PATH search algorithm has been modified to look
+	  for a file named .fpath in each bin directory and if
+	  found, to search for functions in this directory if
+	  it cannot find the command in that directory.
+99-03-31  When performing pathname expansion, the shell checks
+	  to see whether each directory it reads is case sensitive
+	  or not, and performs the matching accordingly.
+99-03-31  The %T format for printing formatted date/time.
+99-03-31  The emacs and vi modes now handle arrow keys when
+          they use standard ANSI escape sequences.
+99-03-31  The TAB key can be used for completion in emacs and viraw mode.
+99-03-31  A bug in setting .sh.editchar during the KEYBD trap
+	  for the MULTIBYTE option was fixed in release ksh93h.
+99-03-31  A bug in shcomp for compilation of unary operators with &#0091;&#0091;...&#0093;&#0093;
+	  has been fixed.
+99-03-31  A bug in which the value of $? was changed when executing
+	  a keyboard trap has been fixed. 
+99-03-31  The handling of SIGCHLD has been changed so that the
+	  trap is not triggered while executing trap commands
+	  to avoid recursive trap calls.
+99-03-31  A bug in which a local variable in a function declared readonly
+	  would generated an error when the function went out of
+	  scope has been fixed.
+99-03-31  A bug in which \&lt;new_line&gt; entered from the keyboard
+	  with the KEYBD trap enabled has been fixed.
+99-03-31  The error message for a misplaced ((, for example print ((3),
+	  was often garbled and has been fixed.
+99-03-31  A bug in the KEYBD trap in which escape sequences of the form
+	  &lt;ESC&gt;&#0091;#~ were not being handled as a unit has been fixed.
+99-03-31  A bug in which ksh would consider expressions like &#0091;&#0091; (a) &#0093;&#0093;
+	  as syntax errors has been fixed.
+99-03-31  A function defined as foo() without a function body
+	  was not reported as a syntax error.
+99-03-31  A bug in which ksh could run out of file descriptors when
+	  a stream was repeatedly opened with exec and read from
+	  has been fixed.
+
+98-04-30  --- Release ksh93g  ---
+98-04-30  The pipefail option has been added.  With pipefail
+	  enabled, a pipeline will not complete until all
+	  commands are complete, and the return value will
+	  be that of the last command to fail, or zero if
+	  all complete successfully.
+98-04-30  The name-value pair library uses the cdt library rather
+	  than the hash library.  This change should be transparent
+	  to applications.
+98-04-30  On the U/WIN version for Window 95 and Windows NT,
+          when a directory beginning with a letter followed by
+          a colon is given to cd, it is assumed to be an absolute
+          directory
+98-04-30  When an executable is found on a given path,
+	  the appropriate library path variable is prepended
+	  with a corresponding library directory.
+98-04-30  A bug in which a name reference could be created to
+	  itself and later cause the shell to get into an infinite
+	  loop has been fixed.
+98-04-30  A bug in shcomp relating to compound variables was fixed.
+98-04-30  A bug introduced in ksh93e in which leading 0's in -Z
+	  fields caused the value to be treated as octal for arithmetic
+	  evaluation has been fixed.
+98-04-30  A bug when a name reference with a shorter name than
+          the variable it references was the subject of a compound
+	  assignment has been fixed. 
+98-04-30  A bug which in which assignment to array variables in
+	  a subshell could effect the parent shell has been
+	  fixed.
+98-04-30  read name?prompt was putting a 0 byte at the end of the
+	  prompt on standard error.
+98-04-30  A bug in &#0091;&#0091; string1 &gt; string2 &#0093;&#0093; when ksh was run with -x
+	  has been fixed.
+98-04-30  A bug in which the escape character was not processed
+	  correctly inside {...} when brace expansion is enabled
+	  has been fixed, for example {\$foo}.
+98-04-30  A bug in line continuation in here-documents has been
+	  fixed.
+98-04-30  The default base when not specified with typeset -i is
+	  10 in accordance with the documentation.  Previously,
+	  the value was determined by the first assignment.   
+98-04-30  A parsing bug in which a # preceded alphanumeric
+	  characters inside a command substitution caused
+	  a syntax error to be reported has been fixed.
+98-04-30  A bug in which a decimal constant represented as 10#ddd
+	  where ddd was more than five digits generated a syntax
+	  error has been fixed.
+98-04-30  A bug in here document expansion in which ${...} expansions
+	  were split across buffer boundaries has been fixed.
+98-04-30  The sh_fun() function now takes third argument which
+	  is an argument list for the invoked discipline function
+	  or built-in.
+98-04-30  A callback function can be installed which will give
+          notification of file duplications and file closes.
+98-04-30  When ksh is compiled on systems that do not use fork()
+	  current option settings where not propagated to sub-shells.
+
+97-06-30  --- Release ksh93f  ---
+97-06-30  Hostnames in addition to host addresses can be given in
+	  /dev/tcp/host/port virtual file names.
+97-06-30  File name completion and expansion now quotes special
+	  characters in file names from both emacs and vi edit modes.
+97-06-30  An empty for list behave like a for list with null expansions.
+	  It produces a warning message with sh -n.
+97-06-30  The code has been modified to work with EBCDIC as well as ASCII.
+97-06-30  A bug which would cause the secondary prompt to be
+	  displayed when a user entered a literal carriage
+	  return has been fixed.
+97-06-30  A bug which caused ksh read -s name to core dump was
+	  fixed.
+97-06-30  A bug with the expansion of \} and \&#0093; inside double
+	  quoted strings that also contained variable expansions
+	  has been fixed
+97-06-30  Changes in the ksh93e point release caused autoload
+	  functions invoked from within command substitution
+	  to fail.  This has been fixed.
+97-06-30  A bug in the processing of here-documents that could
+	  prevent variable substitution to occur after $(...) command
+	  substitution for long here documents has been fixed.
+97-06-30  A bug caused by a race condition that could cause SIGTERM
+	  to be ignored by a child process has been fixed.
+97-06-30  A bug which prevented the startup of a coprocess immediately
+	  after killing a running coprocess has been fixed.
+97-06-30  ulimit foobar, where foobar is not an arithmetic
+	  expression, now gives an error message as it did with ksh88
+	  instead of setting the file size limit to 0.
+97-06-30  A bug which could cause an interactive shell to terminate when
+	  the last process of a pipeline was a POSIX function was fixed.
+97-06-30  A bug which could cause command substitution of a shell script
+	  to core dump has been fixed.
+97-06-30  A security hole was fixed in suid_exec.
+97-06-30  Arithmetic functions such as pow() that take more than
+	  one argument, did not work if arguments other than the
+	  first contained parenthesized sub-expression.
+97-06-30  The error message from a script containing an incomplete
+	  arithmetic expression has been corrected.
+97-06-30  A bug which caused a core dump on some machines when
+	  the value of a name reference contained a positional
+	  parameter and the name reference was not defined inside
+	  a function has been fixed.
+97-06-30  Arithmetic expressions now correctly handle hexidecimal
+	  constants.
+97-06-30  A bug in which integer variables could be expanded
+	  with a leading 10# when declared with typeset -i
+	  multiple times has been corrected.
+97-06-30  A bug in which IFS wasn't correctly restored when
+	  set within command substitution has been fixed.
+97-06-30  The _ character is now considered as part of a word
+	  with the M-f and M-b emacs directives as it was in ksh88.
+97-06-30  A bug in brace pattern expansions that caused expressions
+          such as {foo\,bar,bam} to expand incorrectly have been fixed.
+
+
+96-07-31  --- Release ksh93e  ---
+96-07-31  The math functions, atan2, hypot, fmod, and pow were added.
+96-07-31  When a shared library is loaded, if the function lib_init()
+	  is defined in the library, it is invoked the first time that
+	  the library is loaded with builtin -f library.
+96-07-31  The k-shell information abstraction database option, KIA,
+          has been revamped.
+96-07-31  Empty command substitutions of the form $() now work.
+	  whence -v foo now gives the correct result after calling
+	  builtin -d foo. 
+96-07-31  A bug in right to left arithmetic assignment for which
+	  the arithmetic expression (( y = x = 1.5 )) did not
+	  yield 1 for y when x was declared typeset -i was fixed.
+96-07-31  printf has been fixed to handle format  containing &nbsp;
+	  and/or &nbsp;145 correctly.  In addition, characters following
+	  %b in the format string are no longer displayed when
+	  the operand contains <JOIN>.
+96-07-31  A bug in printf that could cause the %E format to
+	  produce unnormalized results has been fixed.
+96-07-31  A bug which causes some arithmetic expressions to be
+	  incorrectly evaluated as integer expressions rather
+	  that floating point has been fixed.
+96-07-31  Functions defined inside a subshell no longer remain
+	  defined when the subshell completes.
+96-07-31  The error message from sh -c ';echo foo' has been
+	  corrected.
+96-07-31  The format for umask -S has been changed to agree
+	  with the specification in the POSIX standard.
+96-07-31  A bug that caused side effects in subscript evaluation
+	  when tracing was enabled for subscripts using ++ or --
+	  has been fixed.
+96-07-31  To conform to the Posix standard getopts has been changed
+	  so that the option char is set to ? when it returns with
+	  a non-zero exit status.
+96-07-31  The handling of \} inside ${name...} has been fixed so
+	  that the &nbsp;quotes the }.
+96-07-31  A bug that caused the read builtin to resume execution
+	  after processing a trap has been fixed.
+96-07-31  &#0091;&#0091; -s file &#0093;&#0093; has been fixed so that if file is open
+	  by ksh, it is flushed first.
+96-07-31  In some cases attributes and sizes for non exported
+	  variables weren't being reset before running a script.
+96-07-31  The value of TMOUT was affected by changes make to
+	  it in a subshell.
+96-07-31  The jobs command did not reflect changes make by
+	  sending the CONT signal to a command.
+96-07-31  The error message for ksh -o unknown was incorrect.
+96-07-31  Functions invoked as name=value name, did not use
+	  values from the calling scope when evaluating value.
+96-07-31  A bug in which the shell would reexecute previously
+	  executed code when a shell script or coprocess was
+	  run in the background has been fixed.
+96-07-31  A bug in which an empty here-document would leave
+	  a file descriptor open has been fixed.
+96-07-31  A bug in which $(set -A array ...) would leave a
+	  side effect has been fixed.
+96-07-31  A discipline function for a global variable defined
+	  within a function defined with the function keyword,
+	  incorrectly created a local variable of the same name
+	  and applied the discipline to it.
+
+95-08-28  --- Release ksh93d  ---
+95-08-28  The &nbsp;character was not handled correctly in replacement
+	  patterns with ${x/pattern/replace}.
+95-08-28  A bug with read in which the line did not end with
+	  a new-line has been fixed.
+95-08-28  A bug in file name generation which sometimes
+	  appended a . for filenames that ended in / has
+	  been fixed.
+95-08-28  If a process is waited for after a status has
+	  been returned by a previous wait, wait now
+	  returns 127.
+95-08-28  A bug with hist (fc) -e which prevented a command
+	  to re-executed after it had been edited has been fixed.
+95-08-28  A bug which prevented quoting from removing the meaning
+	  of unary test operators has been fixed.
+95-08-28  A bug with typeahead and KEYBOARD traps with the
+          MULTIBYTE option set has been fixed.
+95-08-28  Builtin functions can take a third argument which is
+          a void*.
+95-08-28  The nv_scan() function can restrict the scope of a walk
+          to the top scope.
+
+95-04-31  --- Release ksh93c  ---
+95-04-31  The expansion of "$@" was incorrect when $1 was the null
+	  string.
+95-04-31  A bug which could incorrectly report a syntax error in
+	  a backquoted expression when a $ was preceded by \\
+	  has been fixed.
+95-04-31  A bug which prevented the shell from exiting after
+	  reporting an error when failing to open a script
+	  has been fixed.
+95-04-31  A bug that could lead to memory corruption when a
+	  large here document that required parameter or command
+	  substitution was expanded has been fixed.
+95-04-31  A bug that could cause a core dump on some systems
+	  after ksh detected an error when reading a function
+	  has been fixed.
+95-04-31  A bug which could cause a coprocess to hang when
+	  reading from a process that has terminated has been fixed.
+95-04-31  A bug which caused a script to terminate when set -e
+	  was on and the first command of and &amp;&amp; or || list
+	  failed has been fixed.
+95-04-31  A bug with here documents inside $(...) when the delimiter
+	  word is an identifier has been fixed.
+95-04-31  A bug which caused $0 to display the wrong value when
+	  a script was invoked as an argument to the . command
+	  and the eval command has been fixed.
+95-04-31  A bug that could cause the built-in sleep to hang
+	  has been fixed.
+95-04-31  A bug introduces in 12/28/93b which caused the backslash
+	  to be removed when it was followed by digit inside double
+	  quotes in some instances has been fixed.
+95-04-31  A bug which could cause a core dump if ksh was invoked with
+	  standard input closed has been fixed.
+95-04-31  A bug which could cause a core dump if typeset -A was
+	  specified for an existing variable has been fixed.
+95-04-31  Variables that were unset but had attributes such as readonly
+	  and export were not listed with readonly, export and typeset.
+95-04-31  Several problems with signals have been fixed.
+95-04-31  A bug which prevented ulimit -t from working has been fixed. 
+	  Also, a bug in which failed ulimits could cause a core dump
+	  has also been fixed.
+95-04-31  A bug in expansion of the form ${name/#pattern/string} and
+	  ${name/%pattern/string} has been fixed.
+95-04-31  A bug which caused read -r on a line that contained only
+	  blanks to get a non-null value has been fixed.
+95-04-31  A bug introduced in the 'a' point release in which
+	  ${x='\'} expanded to &nbsp;when x was unset has been fixed.
+95-04-31  A bug which prevented a trap on EXIT from being executed
+	  when the last command in a script was a function invocation
+	  has been fixed.
+95-04-31  A bug which caused an interactive shell ignore input when
+	  standard error was redirected to a file with exec,
+	  and then restored with exec 2&gt;&amp;1 has been fixed.
+95-04-31  An interactive shell turns on monitor mode even when
+	  standard error has been redirected to a file.
+95-04-31  A bug which could cause standard input to be incorrectly
+	  positioned for the last command of a script has been fixed.
+95-04-31  A bug in the edit modes which allowed walking back in
+	  the history file for more than HISTSIZE commands has
+	  beed fixed.
+95-04-31  A bug which could cause a core dump if variable TMPDIR was
+	  changed between two command substitutions has been fixed.
+95-04-31. A bug which prevented a trap on EXIT from being cleared
+	  has been fixed.
+95-04-31  A bug fixed for the v directive in vi MULTIBYTE has been
+          fixed.
+95-04-31  Code to for IFS handling of multibyte characters has
+          been added.
+95-04-31  The displaying of multibyte strings in export, readonly,
+          typeset, and execution traces has been fixed.
+95-04-31  Variables inside functions are now statically scoped.
+	  The previous behavior was never documented.
+95-04-31  Variables inside functions are now statically scoped.
+          The previous behavior was never documented.
+95-04-31  A few changes have been made to the name-value library
+          that affect built-ins that use disciplines.  The
+          changes allow disciplines to be shared by variables
+          and should make it possible to add new disciplines
+          without recompilation.
+95-04-31  The name-value library interface has undergone significant
+          change for this revision.  See the new nval.3 man page.
+
+94-12-31  --- Release ksh93b  ---
+94-12-31  Variables inside functions are now statically scoped.
+          The previous behavior was never documented.
+94-12-31  If IFS contains two consecutive identical characters belonging
+	  to the &#0091;:space:&#0093; class, then this character is treated as
+	  a non-space delimiter so that each instance will delimit
+	  a field.  For example, IFS=$'\t\t' will cause two consecutive
+	  tabs to delimit a null field.
+94-12-31  The getopts command has a -a name option that specifies a
+	  name that will be used for usage messages.
+94-12-31  A bug which caused unset RANDOM to dump core has been
+	  fixed.
+94-12-31  A bug which prevented return for terminating a profile
+	  or ENV file has been fixed.
+94-12-31  A bug which prevented standard input from being
+	  directed to /dev/null for background jobs when
+	  monitor mode was turned off has been fixed.
+94-12-31  Statements of the form typeset -options var&#0091;expr&#0093;=value
+	  did not perform substitutions on expr as expected.
+94-12-31  A bug which prevented the shell from sending a HUP
+	  signal to some background jobs that were not disowned
+	  has been fixed.
+94-12-31  A bug which allowed a script to trap signals that are
+	  ignored at the time that the shell was invoked by exec
+	  has been fixed.
+94-12-31  A bug which could cause a core dump when a discipline
+	  function was unset within a discipline was fixed.
+94-12-31  The typeset builtin now accepts a first argument of
+	  + or - for compatibility with ksh88.
+94-12-31  For compatibility with ksh88, the results of expansions
+	  of command arguments will treat the extended character
+	  match characters ()|&amp; as ordinary characters.
+94-12-31  A bug which caused read to fail on a file that was
+	  open for read/write with &lt;&gt; when the first operation
+	  was print or printf has been fixed.
+94-12-31  When a job is suspended, it is put on the top of
+	  the job list as required by the POSIX standard.
+94-12-31  The value of OPTARG when an option that required
+	  an argument but didn't have one was incorrect in the
+	  case the the option string began with a :.
+94-12-31  A bug which caused the terminal to get into a bad
+	  state with some KEYBD traps in vi-mode has been fixed.
+94-12-31  A bug which caused an invalid trap to cause a script
+	  to terminate, rather than just return an error, has
+	  been fixed.
+94-12-31  Backreferencing sub-expressions in patterns and replacement
+	  strings now works.
+94-12-31  A bug in chmod which caused the -R option to fail has
+	  been fixed.
+94-12-31  More signal names have been added for Solaris
+
+94-06-30  --- Release ksh93a  ---
+94-06-30  An expansion bug which causes portions of a word after
+	  a $((...)) expansion that contains a nested $var expansion
+	  to be lost has been fixed.
+94-06-30  A bug that caused a core dump when a script that did not
+	  have PWD set and did a cd inside command substitution
+	  has been fixed.
+94-06-30  A bug which caused a core dump on some machines when
+	  the LANG variable was assigned to has been fixed.
+94-06-30  A bug which incorrectly handled set disciplines that
+	  performed arithmetic evaluation when the discipline
+	  was called from the arithmetic evaluator has been fixed.
+94-06-30  A bug caused by an EXIT trap inside a function that
+	  was executed in a subshell was fixed.
+94-06-30  If foo is a function, and not a program, then command foo
+	  now reports that foo isn't found rather than invoking foo.
+94-06-30  The previous version incorrectly listed -A as an
+	  invocation option.  The -A option is only for set. 
+94-06-30  A bug was fixed which caused ksh to loop when execution trace
+	  was enabled and the PS4 prompt required command substitution.
+94-06-30  A bug which could cause the job control switch character
+	  to be disabled when a script that enabled monitor mode
+	  terminated was fixed.
+94-06-30  A bug in the macro expansion global replacement operator //,
+	  when the pattern began with a &#0091; or +( has been fixed.
+94-06-30  A bug which prevented ~ expansion from occurring when
+	  it was terminated with a colon inside an assignment
+	  has been fixed.
+94-06-30  A bug in the dot command which prevented autoload functions
+	  from working has been fixed.
+94-06-30  A bug which caused a variable to be unset if the
+	  its value were expanded inside a set discipline has
+	  been fixed.
+94-06-30  Whence -a now longer reports that a defined function
+	  is undefined.
+94-06-30  A bug on some systems in which $0 would be incorrect
+	  in scripts invoked by name has been fixed.
+94-06-30  Here documents with an empty body now work.
+94-06-30  A bug which disabled argument passing and resetting
+	  of options for a script invoked by name inside a
+	  function has been fixed.
+94-06-30  A bug in which an EXIT trap set the caller of a function
+	  would be executed if a command called inside a function
+	  was not found has been fixed.
+94-06-30  A bug which allowed a script to trap signals that are
+	  ignored at the time that the shell was invoked has
+	  been fixed.
+94-06-30  A bug which caused 2&lt;&amp;1- when applied to a shell built-in
+	  to leave standard input closed has been fixed.
+94-06-30  A bug which caused the shell to incorrectly parse
+	  $() command substitutions with nested case statements
+	  has been fixed.
+
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pax changes">pax changes</A></H3></CENTER></FONT></FONT>
+
+00-10-31 format.c: handle rpm 4.0 and newer
+00-09-20 copy.c: always allocate state.tmp.lst!
+00-08-31 change paths in delta archive: -rf i -z - -s e -wf o -z - &#0091;almost&#0093;
+00-08-11 copy.c: drop memalign() call for _std_malloc==1 in libast
+	 copy.c: save filter path from sfgetr() reset
+00-06-01 pax: fix mime format size by dropping last \r
+00-05-26 pax: astconf("CONFORMANCE",0,0)=="standard" inhibits some extensions
+	 pax: check USTAR file and link name lengths
+00-04-01 pax.tst: export TZ=EST5EDT; new tests should be UCT
+00-03-11 pax: add encapsulated mime format read
+	 pax: fix vdb block count
+00-02-14 pax: fix hard link read that didn't apply -s edit
+	 pax: logical|physical filter options
+00-01-04 pax: fix rpm embedded archive hard seek
+	 pax: --filter implies --nodescend
+	 pax: add --meter
+	 pax: handle ms PORTAR '' =&gt; '/' path separator
+99-11-19 pax: try `ratz -c' if `gunzip' not found
+99-11-11 add --checksum, --install, --local, --preserve=s
+99-11-04 fix zip for archives with EXTLOC headers
+	 don't generate //* file names
+99-10-31 pax: add tgz == tar:gzip, --filter=-
+99-08-11 bio: fix end of medium handling
+99-06-01 restore -T == --test
+99-05-28 pax: add rpm read
+99-05-21 pax: fix -rw umask(0) bug
+99-05-17 pax: fix chmod() delay for ug+s,+t
+99-05-11 nocom: long options
+99-05-09 pax: sfopen(sfstdin,0,"rt") for input file list
+99-05-01 pax: state.xdev =&gt; FTW_MOUNT!!
+99-04-01 pax: fix Integral_t for sizeof(long)==8
+	 pax: fix &#0093;&#0093; in optget usage
+99-03-17 pax: better st_mode preservation
+99-03-01 pax: fix dirprefix() prune to work in all cases
+	 pax: add savepath() to handle &gt;PATH_MAX paths
+99-02-06 pax: update to new optget()
+99-01-11 pax: add bzip2 compression support
+98-10-01 pax: fix -rw hard link bug
+	 pax: fix -o preserve=* option.level inconsistencies
+98-08-11 cpio.sh: fix with getopts
+	 pax: increase -rw default buffer size
+	 pax: use REG_DELIMITED to parse -s
+98-04-01 fix tar delta bug that set st_size=0 before consuming delta head/tail
+	 pax -&lt;flag&gt; '?' lists help info for flag
+	 fix -rw bugs introduced by recent delta fixes
+	 testpax: add regression tests
+	 fileout: add EIO memalign fallback to track sgi bug
+98-03-19 fix tar delta epilogue check
+	 fix delta pass checks
+	 fix off_t vs. file size mismatches
+98-03-17 umask(0) only if -o preserve=* in effect
+	 add File_t.ro to mark readonly files/paths
+98-02-14 add -o intermediate to copy output to intermediate before commit
+98-01-23 use %I#d scanf format to get off_t right
+98-01-11 -K == -o keepgoing
+	 -x format on read accepts that format only (useful with -o keepgoing)
+97-12-07 add 4 NULs to work around gunzip bug that peeks beyond EOF
+97-11-11 use PROC_FD_PARENT to let procopen() close parent fd
+97-10-31 cab list works; anyone have LZX or QUANTUM decompress code?
+97-09-22 fix vdb format write
+97-08-11 fix omitted missdir() call
+97-07-17 -r attempts chmod u+w along with missdir and remove
+	 -rl preserves existing links if possible
+	 beginnings of cab file read
+97-05-09 fix putepilogue() with off_t boundary
+96-12-25 zip archive header magic fix
+	 use MTIOCGETBLKINFO to determine default tape blocksize
+	 -o eom=!command uses $(command read|write part &#0091;file&#0093;) for next file
+	 -s ',.*,-,' cats to stdout
+	 -x pax support for &gt;2GB file size
+96-11-28 off64_t tweaks
+	 drop -r -w -x order dependency
+	 undo ccmaps() in bunread()
+	 add explicit O_RDONLY checks (!= 0 on some systems)
+96-10-11 change to &lt;ccode.h&gt; from mem&#0091;ae&#0093;to&#0091;ae&#0093;()
+96-08-11 add -o to={ascii|ebcdic} -o from={ascii|ebcdic} from mvs
+96-02-29 enable -rw setfile() -- why was it disabled in the first place?
+	 fix stdin file list peek bug that dropped leading files
+96-02-09 handle zip archives on input
+96-01-18 AT&amp;T Research now
+	 switch to &lt;regex.h&gt;
+95-11-24 don't check for compressed format if already uncompressing
+95-11-18 ignore empty file list lines
+95-10-31 fix and compensate for cpio header hard link size bug
+95-10-11 drop "blocking ignored in pass mode" message
+	 aschk symlink data need not have trailing '&nbsp;'
+95-09-01 fix nocom &nbsp;handling
+95-08-11 builtin nocom for -o filter=nocomment
+	 more delta tracing
+	 vd02 delta algorithm
+95-07-17 fix -w output to stdout initialization bug
+	 fix stdin file list peek bug that dropped trailing files
+95-05-09 don't check member count unless its really a trailer
+	 sfkeyprintf lookup string arg is now the format conversion character
+	 initialize output archive for -rw to stdout archive
+	 misc.c had putc() and fgets()!
+	 unused var cleanup
+	 add return to listprintf()
+	 fix delta pass missing dir fd bug
+	 fix dirprefix for /
+	 add bax.sh as an *example*
+95-04-01 with proto va_start() must come before any arg references
+	 fix delta bug that failed to mark emitted or skipped members
+	 allow -z for patch deltas
+	 be sure to set ap-&gt;format before binit()
+	 fix ordering bug that botched most deltas!
+	 use file.name (after -s maps) rather than file.path in delta hash
+	 fix bget() bug that skipped checksum
+95-03-19 first round with POSIX 1003.2 1995 
+	 handle file holes on input
+	 delta header contains member index and trailer size
+	 delta trailer contains member checksum
+	 delta epilogue contains member count
+95-03-01 internal redesign using Archive_t handles instead of global state
+	 -o ordered (-O) allows single pass through base
+95-02-14 make -u work with VPATH
+	 -x composes gzip,compress,delta,delta88,ignore,patch with real formats
+	 -x gzip:tar, -x gzip,tar, -x 'gzip tar' accepted
+	 -x delta is equivalent to -z -
+	 -o delta deleted
+	 fix OPT_owner null dereference
+	 fix archive pass bug that didn't update DELTA_create members
+95-01-19 detect compress and gzip on input
+	 add -f -z grouping with -r -w to support -r -f -z -w -f -z
+	 fix a few compress/delta ineraction bugs
+	 add -t s&#0091;#&#0093;k&#0091;#&#0093; to skip all &#0091;#&#0093; and/or keep all &#0091;#&#0093; tape volumes
+	 use new &lt;align.h&gt; ALIGN_ identifiers
+95-01-11 add s option to -s to stop on success
+	 add delta 94 (vdelta)
+	 add long option names
+	 deprecate most flag options
+	 DELTA_TEMP &lt;64K avoids temp file
+	 add -o delta=patch for patch archives
+94-12-25 add lib/pax/*.fmt args files for unknown formats
+	 fix mknod() calls to use the right file type!
+94-11-11 fix ar out of phase warning
+94-08-11 add -Rh'header' and -Rt'trailer' for vdb write
+	 -e now works for -rw
+93-08-11 add vdb `virtual database' r/w format
+93-06-11 fix bug that didn't output non-regular files
+	 -w now uses FTW_POST to preserve dir modes
+93-04-01 handle PORTAR long member name table
+92-04-01 copy all 0 length files out regardless of read permission
+91-08-11 add check for garbage after end tar implementation bug
+90-10-01 add mips ar format out of date check
+90-08-11 header/trailer alignment now table driven
+90-07-20 fix binary output bug that set header size and time to 1
+90-06-01 fix misc delta compression bugs
+90-05-01 fix DELTA_create bug that did not check COMPRESS
+90-03-28 bump regular output block size to 8k
+90-02-11 delta changes held off by #if new_delta_format until new libdelta
+	 base archive checksums incompatible with previous versions
+90-02-06 fix newio() bug that looped when write() returned 0
+90-01-25 add proposed posix 1003.1b archive/interchange format
+	 tune buffering
+	 change -R option for general record support
+	 generalize delta id file name -- incompatible with old format
+	 prepare for new libdelta and subsequent incompatibilities
+89-12-01 add self-delta support, delete -A option (one algorithm with versions)
+89-11-18 fix dir mode restoration bug
+89-11-11 fix delta update with older file
+89-10-31 add portarch and randarch readonly object formats
+89-10-11 allow -f with -rwz
+89-10-01 add -Bmaxblocks and -C to match latest tar/cpio extensions
+89-08-22 align read() buffers to IOALIGN
+89-07-27 add EFBIG &amp; EDQUOT checks to newio()
+89-07-04 fix cpio binary header mtime and size swab bug
+	 fix -rw bug that makes it work now!
+	 redo file post processing restoration
+89-05-11 handle GNU-tar USTAR format botch
+	 missing intermediate directories inherit mode of nearest ancestor
+	 fix names on stdin bug that only did -P
+	 incorporate lar changes from David Muir
+	 expand -R arg syntax
+	 handle ansi/ibm D,F,S,U,V formats on output
+89-03-28 fix bget() buffer boundary error for reads &lt; buffersize
+89-03-01 ignore DELTA_PASS file set*() calls
+89-02-22 fix bread bug for 0 count and bget memcpy overlap
+89-01-18 fix copyout() rfd&lt;0 delta bug that generated multiple entries
+89-01-11 fix dirsize!=0 bug; change ftwalk XDEV implementation
+88-12-11 fix symlink-&gt;nowhere bug
+88-11-22 add vmsbackup readonly format; fix lseek validity checks
+88-11-17 add -T040 to simulate tape device blocking on input
+88-11-11 add s5r4 asc and aschk formats
+88-11-07 hard links and deltas don't cross volumes
+88-11-01 add -n to read exact file list
+88-10-20 add bread(0,...) to skip, bget() and bput() io optimizations
+88-10-11 fix delta ops to use pattern args
+88-10-04 fix argc bug that botched -rw with file args
+88-10-01 for delta update, verify that untouched files match base archive
+88-09-30 fix allocate() bug: malloc() -&gt; calloc()
+88-08-23 use libx/memsum() for checksum calculations
+88-08-20 add `!&#0091;command&#0093;' to end of medium replies
+88-08-18 table of contents output to stdout
+88-08-08 update for libx/ftwalk() and libx/strls()
+88-07-28 streamline ftwalk() interface
+88-07-21 finish up -a and -u tar compatibility
+88-07-17 add cpio.sh and tar.sh interface scripts
+88-07-15 convert to pax
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="html changes">html changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 mm2html: fix incorrect \h'... #local refs
+	 mm2html: append &lt;!--LABELS--&gt;...&lt;!--/LABELS--&gt; for second pass
+00-12-14 mm2html: fix tbl colspan
+00-12-12 mm2html: ignore bgcolor for table with no box
+00-12-07 download: .tar.gz =&gt; .tgz
+	 htmlrefs: add --delete
+00-12-05 mm2html: add .PM
+	 mm2html: <SMALL>&lt;<A href=mailto:id@id.id...>id@id.id...</A>&gt;</SMALL> =&gt; mailto:
+00-11-27 mm2html: --frame is now 1 level instead of 2; no *-body and *-head
+	 mm2html: add .IS ... .IE indentation
+	 mm2html: .LR foo (1) generates man link
+	 htmlrefs: add https support
+00-10-31 htmlrefs: remove if internal filter leaves &lt;= 1 line
+00-05-25 mm2html: add viewgraph outline and navigation
+00-05-11 mm2html: add .vG viewgraph macros
+00-03-04 htmlrefs: add &lt;LINK rel=dynamic&gt;
+00-02-14 htmlrefs: add .htaccess and &lt;LINK&gt; checks
+	 mm2html: add .xx ref=...
+	 mm2html: use "..." tag attribute quote instead of '...'
+	 mm2html: .BL =&gt; &lt;UL&gt; square circle disc
+00-02-03 mm2html: fix -o nohtml.ident
+00-01-20 mm2html: fix -o quoted arg parse
+	 htmlrefs: add --perlwarn for embedded perl constructs
+99-08-11 mm2html,troff2html: add .xx begin=x end=x
+	 mm2html: handle simple .TS ... .TE; room for improvement
+	 mm2html: fix &lt;TABLE&gt;&lt;TR&gt;...&lt;/TR&gt;&lt;/TABLE&gt; nesting
+	 mm2html: add SEE ALSO hot links
+	 mm2html: hot link man name not (section)
+99-05-17 download,html2db,mm2html: long options
+99-05-13 html2rtf: long options
+99-04-01 fix .xx link
+	 long options, macro search bug fix
+99-01-01 html2rtf: fix &lt;/LI&gt; with no &lt;LI&gt; core dump
+98-04-01 add company corporation location meta.* organization
+97-05-09 info tollbar=path for junk before &lt;/BODY&gt;
+97-05-01 \h'0...' for hyperlinks
+97-04-01 first release
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="proto changes">proto changes</A></H3></CENTER></FONT></FONT>
+
+99-11-19 add --license, --shell, --copy, --verbose
+99-08-11 long options
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="bzip changes">bzip changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 bzip2.c: include bzlib.h first
+99-01-01 package for ast
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tests changes">tests changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 opt.tst: add enumerated option argument values
+00-12-11 date.dat: add a few more crontab(1) forms
+00-10-31 date.dat: add date(1) and touch(1) forms
+	 sfio: kpv updates to handle mac os X
+00-10-17 sfio/thole.c: move large buffer from stack to global
+00-10-03 testy2k.dat: `Feb 29 01:02' =&gt; `Feb 29  2000'
+00-04-01 Makefile: add ../../lib/libast to .SOURCE for features/sfio
+00-03-07 opt.tst: add printf +1 bug fix test
+00-02-14 opt.tst: fix for "..." attribute quote
+	 datey2k.dat: oops: %l fails for old (2000-02-29) NOW
+00-01-10 opt.tst: fix USAGE_LICENSE
+99-10-22 date: test all % formats
+99-08-11 sfio: fix 3 tests for uwin
+	 sfio: tscanf for netbsd
+99-03-25 :TEST: don't forget about foo.c for foo.tst
+	 sfio/testsfio: fix option parse for `-x *,*' and cc.* and *.cc
+99-01-23 moved library tests from std to here
+	 added optget() tests
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="3d changes">3d changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
+00-12-14 3d.sh: fix -c
+00-10-31 ast.c add pathtemp.c
+00-10-19 init.c: initialize _3d_2d
+00-07-17 fix fchown to call MSG_fchown (not MSG_fchown); fixes vim dump!
+00-02-14 3d command long options (finally)
+99-01-01 --- release 4.0 ---
+99-04-01 dll: sfsprintf =&gt; _3d_sfsprintf
+	 check for __*_nc (osf.alpha)
+99-02-14 pathreal: copy to state.path.name if not already there
+	 rewinddir3d: just call seekdir(p,0); fixes `top' core dump
+99-01-11 lseek3d,syscall3d: add sysfunc() for off_t!=long
+99-01-01 --- release 3.0 ---
+98-02-14 3d.sh: fix _RLD32_LIST =&gt; _RLDN32_LIST typo
+	 pathreal: fix (P_LSTAT|P_READLINK) under pwd bug that did phys on .
+	 features/syscall.sh: tighten up version __call header grep
+	 unlink: trap remove() too
+	 features/syscall.sh: favor strong (_ prefix) name for some arch's
+98-02-06 syscall3d: handle longjmp with cp-&gt;active
+98-01-23 features/syscall.sh: check for _xstat vs __xstat
+98-01-01 add readdir64 rewinddir64 seekdir64 telldir64
+97-10-11 fix lefty's virtual dir touch bug -- recursive doubling on stbuf
+97-07-17 CS_INTERFACE=2
+97-04-01 features/syscall.sh: fix __exit() test for new sgi
+96-12-25 handle stat64() implementations on top of _xstat()
+	 3d.tst must be run under 3d!
+	 _SCO_STAT_VER tweaks
+	 sgi _RLD_NEXT_PATHNAME fix for -32 -n32 -64 differentiation
+	 _*xstat() hacks around proto in *stat3d.c
+	 add constant casts for long shift counts
+	 fix pathnext() to report version instance level in state.path.level
+96-11-28 fix rename() to do physical stat on subject path!
+96-02-29 handle syscall loops caused by botched libs like solaris libsocket.so
+	 generalize name service interface to handle ifs+vcs
+	 catch acl,facl even if not on local sys
+	 fix features/syscall.sh bug that set $stdc incorrectly
+	 use alloca() in execve() if possible
+	 add 3d.tst and test makefile action
+	 fix a few important virtual dir / create / append bugs
+	 fix null dereference in open3d() for state.in_2d
+96-02-14 add NFS acl,facl
+96-02-08 fix 2d bug in link,rename,symlink that generated empty arg 1
+96-01-30 fix features/syscall.sh for compilers that ignore prototypes
+96-01-22 P_TOP only takes effect for files in virtual dir!
+95-11-24 optimize exec $shell to eval in 3d.sh
+95-11-11 don't fs3d_copy opaqued files
+95-10-11 fs3d_mkdir virtual dir fix 
+	 fix 2d virtual dir test in pathreal()
+	 solaris _rename() != weak rename()
+	 solaris exit() doesn't call _exit()
+	 all static data in state
+	 test state.in_2d in link3d()
+	 fix opaque.sh that was broken sometime after 91
+	 linux LD_BIND_NOW not needed with ld.so-1.7.9
+95-07-17 handle irix-5.3 struct stat64 and off64_t
+	 dlsym(__exit) before dlsym(_exit)
+95-05-09 fix pathcanon() bug that incremented state.path.level too far on ...
+	 percolate inode metadata changes to the top level too (no more EROFS)
+	 add P_TOP to truncate() too!
+	 feature/syscall.sh does not generate #include, up to *3d.c
+	 spawnveg.c must come after spawnve.c in ast.c
+	 cspoll.c must come after cs*.c in cs.c
+	 fix 3d to work like $SHELL if no shared 3d lib found
+	 fix chdir .. symlink bug that set state.pwd to physical path
+	 add %n.n.nd to bvprintf
+	 ignore a few more non-initialization setcwd() errors
+95-01-19 fix undefined var ref for _VER_ hack calls in features/syscall.sh
+95-01-11 access W_OK succeeds if on lower view
+94-12-01 add /#fs/NAME/load to load shared lib fs
+	 add user system call trap() stack
+	 VPATH=*::* or VPATH=*:-:* to separate disjoint views
+	 change trap() to intercept()
+94-07-17 add /#fs/safe
+94-06-01 fix symlink() and link() bug that didn't instantiate virtual dir
+	 fix &#0091;f&#0093;statvfs() infinite loop for att hybrids
+94-05-11 merge with the real vcs
+	 add char*_3d_2d: if _3d_2d!=0&amp;&amp;getenv(_3d_2d)==0 then 2d
+	 trailing slash in pathreal() interpreted as slash dot (off/w test=010)
+93-05-28 add /#option/limit=n to limit view depth
+93-04-01 --- release 2.0 ---
+93-03-11 change /dev/3d/* to /#*
+	 remove anno and rpl specific hooks
+	 add name,monitor,active fs mounts
+92-04-01 --- release 1.1 ---
+92-02-11 change retained mounts to /dev/3d/dev
+92-01-11 add $SHELL and /bin/sh exec() checks to force 3d sh
+	 fix checklink() to concatenate relative links with original prefix
+91-11-11 --- release 1.0 ---
+	 add feature/syscall.sh to handle att s5r4, hp snake, sun 4.1
+	 change umask() 3d state toggle to mount(-,/dev/3d/option/{2d,3d})
+	 fix creat() virtual dir bug for umteenth time
+	 link() and rename() now migrate to top instead of EROFS
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="coshell changes">coshell changes</A></H3></CENTER></FONT></FONT>
+
+00-12-14 shell is per host attribute
+00-02-01 --- release 2.2 ---
+99-06-24 cosh: change exit to return
+99-06-24 --- release 2.1 ---
+97-12-07 update for CS_SVC_SUFFIX
+96-12-25 add constant casts for long shift counts
+96-05-09 coinit(CO_SERVER)
+96-02-29 use &lt;hashkey.h&gt;
+96-01-31 AT&amp;T Research
+96-01-31 --- release 2.0 ---
+95-07-17 add perhost job limit
+	 all specific misc attr expr to override idle
+95-05-09 convert init script to hostinfo
+	 fix indirect bug that forgot to poll the command stream!
+95-04-01 change streval() to strexpr()
+95-01-01 don't bias out home host with cpu&gt;1
+	 add shell=path to set remote shell path
+	 add debug=level to set debug level as an attribute
+	 add identify=1 to identify remote command output
+	 identify="format with %s"
+	 attributes may be set on the command line
+	 add COINIT to cosh so .coshrc can check for new coshell
+	 add state.grace to g output
+94-11-11 csstat() lazy evaluation in expressions
+94-07-17 --- release 1.1 ---
+94-06-11 add disable=secs to disable hosts of jobs killed by SIGKILL
+	 handle shell quoted space in -r strings
+94-04-01 add per host access=(expression) to control access
+	 add per host bypass=(expression) to bypass min idle
+	 add uid, gid, day (monday:1,sunday:7), hour, min to expressions
+	 add periodic check for share/lib/cs/access for access control
+	 add grace=n for busy job grace running time
+	 add scale=n (default == # cpu) load average scale
+	 add migrate="command" to override default SIGSTOP for hogs
+	 add profile="command" to override default ". .profile"
+94-03-11 fix pseudo-float and elapsed-time constant operand conversions
+	 add static minidle to disambiguate from dynamic idle
+	 fix remote shellopen to work for csh users (there's still some left?)
+94-03-01 fix maxload to be pseudo-float
+93-10-11 add CO_OPT_ACK coexec() ack
+	 add maxload,percpu,perserver,peruser job limits
+93-03-11 reschedule jobs queued on hung shells
+92-11-11 minor fixes to handle `coshell -' on pipeline
+92-09-26 /dev/tcp/* supported as alternative to /dev/fdp/*
+92-04-01 --- release 1.0 ---
+92-02-29 fix COATTRIBUTES quote bug, handle aaa==bbb@ccc in expressions
+92-02-11 add `noattr' to delete misc attributes
+91-10-11 add COTEMP temp file base to job environment
+91-08-11 jobs queued for shell open now in job table
+91-07-17 add heterogenous pool support
+	 add % weight for additional cpus
+	 fix (type@xxx) expression evaluation
+91-03-11 fix handling of down hosts
+91-02-11 add string comparisons to attribute evaluation
+	 update for new message interface
+91-01-31 add -?
+90-12-11 if . has idle=0 then local bias entry is ignored
+90-11-11 local host not reported down if status missing
+90-10-11 . $ENV after .profile in $COINIT
+	 add -l &lt;expr&gt; to list hosts matching &lt;expr&gt;
+	 change CO_{attr,close,open} msgs to CO_server
+	 add load and up readonly attributes
+90-10-01 libx/cs -&gt; libcs
+90-08-11 check auto=0 file attribute
+	 fix bug that dropped multiple SHELL job status messages
+	 arbitrary attributes and C-style attribute expressions supported
+	 ks &lt;job&gt; and kc &lt;job&gt; added to stop and continue jobs
+	 signals sent to remote shells use signal name rather than number
+	 add shell/job label attribute
+90-07-17 add auto=&#0091;01&#0093; attribute for automatic scheduling pool
+	 tune scheduling
+	 add server protocol check (narrows unix-domain socket panic window)
+	 catch SIGHUP to reconnect connect stream path
+90-07-11 bad rank shells dropped from pool
+	 more rank tuning
+90-06-01 --- release 0.0 ---
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cpp changes">cpp changes</A></H3></CENTER></FONT></FONT>
+
+96-01-31 --- release 2.0 ---
+92-04-01 update for new libpp
+92-04-01 --- release 1.1 ---
+90-10-11 update cpp.1
+88-06-08 update makefile to install Makeinstall.mk ALTPP.LINK links
+88-02-29 redo PP_INITDIR initialization
+87-10-11 update man page
+87-09-18 add ppop(PP_DONE) call
+87-04-24 recode for updated library interface
+87-04-03 add -D-Ttest to enable debugging test code
+87-04-02 add -I-Rfile for PP_READ
+	 move #include "ppdefault.h" to ppargs.c using PP_READ
+	 add -D-I&#0091;id&#0093; to name line sync directive ("line" if id omitted)
+87-03-31 change -Nfilename to -D-Ffilename
+87-03-30 add -D-Llanguage for PP_LANGUAGE,language
+	 add -D-H for PP_NOHOSTED
+	 add -I-H for PP_HOSTED
+87-03-24 --- release 1.0 ---
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cs changes">cs changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 vcs_src/*: drop old notices, fix signal handler prototype
+00-05-09 mbb: add (message bulletin board service)
+99-09-22 cs: update for CS_MNT_TAIL
+99-05-18 cs,css: long options
+98-05-01 css: add
+97-05-09 imount: add
+96-12-25 cs: fix -i eof logic
+96-02-29 nam protocol change
+	 add vcs+ifs beta
+	 drop getdomainname() call
+	 vcs: use ast equivalents for strstr ftruncate realpath
+95-12-08 add -r raw interactive mode
+95-07-17 add /trust=user when server not in PATH
+95-04-01 start this file
+	 fix cat server read bug CS_LINE -&gt; CS_EXACT
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="msgcc changes">msgcc changes</A></H3></CENTER></FONT></FONT>
+
+00-04-20 first release
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="nmake changes">nmake changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 expand: fix :D: to preserve leading / -- how long has this been wrong?
+	 makerules: fix .PACKAGE.INIT. for dir == /
+	 makerules: $(PACKAGE_PATH) is list of default package root dirs
+	 makerules: add recurse=list to list recursion order and exit
+	 makerules: _BLD_DLL==1 when building dll's
+	 makerules: link dll with static -l*
+	 expand: eliminate loops from :W=O:
+	 parse: add exit &#0091;code&#0093;
+	 bind: eliminate dups for 2d glob
+00-12-25 makerules: add header arg to :YYPREFIX:
+	 makerules: add :T=AF: for .ARCOPY
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+00-12-18 ppcc: check for old bash
+00-12-15 makerules: handle uwin $(CC.DLL) =&gt; -D_BLD_DLL change
+00-12-14 main: initialize version with fmtident()
+00-12-12 makerules: bias :PACKAGE: search for $(INSTALLROOT)
+	 make: use stat() instead of access() for better NFS behavior
+00-12-11 makerules: _BLD_DLL only for _DLL lib members
+00-12-03 debug.mk: add %.inc for -H include nesting
+00-10-31 option: --corrupt={accept|error|ignore}, --mismatch =&gt; --corrupt
+	 makerules: req file must be seen at of before the lib
+	 makerules: fix AWK and NAWK default definitions
+	 makerules: physical=1 =&gt; 2d iff in 3d
+	 pkg-tcl.mk: add CC.DLL, don't clobber TCLROOT
+	 makerules: define _PACKAGE_foo in .PACKAGE.INIT.
+	 makerules: add .VIEW to .MAMEDIT and .MAMACTION
+00-10-28 makerules: drop MAKEFILES filter on .SELECT. (why was it there?)
+00-10-26 make.c: fix .JOINT sync bug
+	 makerules: add $(PACKAGES expr) and :VARIANT: rhs expr
+	 expand.c: add :T=F&#0091;BCFLPR&#0093;: to test file type
+	 makerules: cut down the number of --mam -L options for .req
+00-10-25 makerules: set +x =&gt; set -
+	 makerules: add set - to .req MAM action for zsh
+00-10-24 makerules: add :PACKAGE: name:lib=lib:include=include name:command
+	 makerules: add :VARIANT: to cc-%
+00-10-18 C+probe: mac os10 additions
+	 add cc.darwin.ppc for max os10
+00-10-16 object.c: don't compile makefile prereqs if state.base
+00-10-12 misc.c: add %x and %X formats to printf extension
+00-10-04 makerules: fix bug that passed -I- to non--I- CC
+00-10-03 makerules: add :YYPREFIX:
+00-09-21 expand.c: add libxxx and xxx to makefile ordered prereqs
+00-09-07 makerules: handle rhs a=b in :LIBRARY:
+00-08-11 archive.c: add aix &lt;bigaf&gt; archive format
+	 bind.c: add glob() gl_intr check
+00-07-17 makerules: fix $(cctype) freeze in makerules.mo
+00-06-20 makerules: mam_lib_* always checks lib/lib/* file
+00-06-19 makerules: generate dll in lib.so/libNN.dll
+00-06-01 main,state: a few _UWIN tweaks for W98 FAT
+00-05-31 shquote: fix for `foo == bar'
+00-05-26 option: fix scanargs() bug that skipped some targets before options
+00-05-22 makerules: drop .ORIGINAL.ALL
+00-05-11 makerules: add :PACKAGE: { a b } to pick first of a b (thanks Dr. ek)
+00-05-01 makerules: add $(STDCAT) initialization
+00-04-01 makerules: add skeleton=1 to mkdir virtual directories in 2d
+	 makerules: add CATALOG and ERROR_CATALOG
+00-03-17 make.probe: fix CC.NMEDIT to grab only external text symbols
+	 makerules: add :NOOPTIMIZE:
+	 makerules: allow N.Ntag :LIBRARY: versions (and dll.custom)
+	 makerules: insert $(*FLAGS_DEFAULT) on *FLAGS
+	 makerules: don't omit -L*/local/* even if in CC.STDLIB
+	 parse.c: `unknown operator' now a warning
+00-03-07 pkg-X11.mk: add -lXaw candidate required libraries
+00-03-06 add probe.lcl check
+00-02-14 --- release 4.0 ---
+00-02-10 Makerules: add CC.DLLBIG, :PACKAGE_INIT:
+	 Makerules: add .ARCHIVE.OMIT. to .ARCLEAN.LIST.
+	 Makerules: adjust :PACKAGE: search for X11 =&gt; X
+	 Makerules: add .COMMON.SAVE to .LIST.PACKAGE.* source actions
+	 Makerules: fix setv PACKAGE dirs
+	 Makerules: add $(PACKAGE_LOCAL) and package_local=arch cmd prefix
+	 Makerules: apply %.X&gt;% for `f :: b.X'
+	 state.c: add local skew test for touch(3) { utime(2) or utimes(2) }
+	 make.c: don't apply metarule if lhs has dir and metarule doesn't
+00-02-08 believe if state.believe&gt;0 and  view level &gt;= (state.believe-1)
+	 pkg-X11.mk: add PACKAGE_X11_VERSION=6 for X11R6 installations
+	 pkg-X11.mk: add -ldnet_stub for osf.alpha
+	 Makerules: fix .REQUIRE.-l%
+00-01-31 Makerules: add $(CC.SUFFIX.LD) in .SHARED.REF.lib
+00-01-25 Makerules: add _MAKE_PROBE_WORKAROUND_ for broken cc -G like sco.i386
+00-01-11 Makerules,probe.win32: -Bwhole-archive + -Bstatic -- whew!
+	 Makerules: make $(LICENSEFILES) for --mam
+	 Makerules: add $(DICTIONARY) to USAGE_LICENSE
+	 make.probe: hosttype now in C.probe
+	 expand: fix :P=L: path buffer overrun
+99-11-11 expand: add :P=W: for astlicense()
+	 expand: :P=N: null input generates null (not '')
+	 bind: fix 2d globv() and bindfile() by adding state.view&#0091;&#0093;.root - wow
+	 bind: fix 2d :P=L=*:
+	 mam: capture important empty exec make-done pairs
+	 main: make sure external.pwd is valid
+	 Makerules: iffe --static=x =&gt; iffe -S x
+	 Makerules: explicit :INSTALL: inhibits :: install
+	 Makerules: add MM2HTML
+	 Makerules: install cc- =&gt; cc-install
+	 Makerules: add .MAM.CCFLAGS to handle .CC.NOOPTIMIZE
+	 option.c: clean up --errorid
+	 option.c: add set readonly for state.readonly hook
+	 Makerules: use set readonly for INSTALLROOT and PACKAGEROOT
+	 make.probe: sco CC.WARN=-w3
+	 make.probe: CC.MEMBERS =&gt; CC.LIB.ALL CC.LIB.DLL CC.LIB.UNDEF
+	 expand: add :U&#0091;!&#0093;: for uniq &#0091;file equality&#0093; list
+	 Makerules: IFFEFLAGS initialized in .MAKEINIT
+	 rule: make sure PWD and VPATH are both logical or physical
+	 parse: add "x" &lt;|&gt;&#0091;=&#0093; "y"
+	 Makerules: add LDLIBRARIES to .SHARED.lib
+99-10-31 Makerules: add :PACKAGE: =&gt; :package: if lhs
+	 Makerules: :MAKE: with no rhs driven by MAKEDIRS and MAKESKIP
+	 Makerules: add :Q: to "::" assertion scope items (yuk)
+	 Makerules: add LICENSE hooks, USAGE_LICENSE
+	 expand.c: add :P=G: to do viewpath glob, :W=O: to order subdir descent
+	 expand.c: add :O=N:
+	 expand.c: pretty up :Q:
+	 expand.c: add :P=V0: for top view logical name of bound file
+	 rule.c: add globv() for rhs patterns -- strictly . relative down view
+	 make.probe: fix nmflags logic (for aix -p, portable not)
+99-10-01 Makerules: add %.iffe
+	 make.c: handle metarule .ACCEPT
+99-07-17 mam.c: outer make...done for virtual joint target
+	 command.c: fix job deadlock detection
+	 Makerules: don't pp probe if CC.CC == ""
+	 Makerules: allstatic=1 for +l propagation, 0 for item only
+	 Makerules: fix $(.SHARED. ...) usage
+	 Makerules: :INSTALL*: now handles dir on rhs
+	 Makerules: add %.cxx
+	 Makerules: add .ti to clobber list
+	 Makerules: cc-: `~' =&gt; space if specified, otherwise `,' =&gt; space
+	 Makerules: add recurse_enter and recurse_exit
+	 misc.c: add %&#0091;eFfFgG&#0093; print formats
+	 expand.c: generate() lists primary and secondary by default
+	 Makerules: add .author and PROTOID to PROTOCOPYRIGHT
+	 Makerules: allow state on :INSTALL*: rhs
+	 Makerules: .CC.MEMBER: jobs&gt;0 workaround: a bug coverup
+	 Makerules: add :PACKAGE: debug profile CC.LIB.TYPE
+	 expand.c: fix putptr(0) base addr switch
+	 .SCAN.IGNORE: don't block on these - duh
+99-07-17 --- release 3.6 ---
+99-06-24 Makerules: fix .SHARED.ON. test
+99-06-15 make.probe: shlib before others, /var/shlib, -none == ! -all
+99-06-14 Makerules: +lfoo applies to self, not to .req members
+99-05-09 option: separate usage string stream
+99-05-01 main: long options
+99-04-22 Makerules: fix :LIBRARY: for version "-" (no version)
+99-04-01 Makerules: -mam cleanup
+	 Makerules: %.req version bug fix
+	 Makerules: :PACKAGE: :nolibrary means it -- don't pull it in
+	 Makerules: .REQ. fix
+	 Makerules: fix .req -mam cc script
+	 expand: regfatalpat() for regcomp() pattern in error messages
+	 option: first optget() interface -- could be more complete
+99-03-17 Makerules: %.req just binds -- duh
+	 Makerules: .RECURSE clears .RWD.
+	 Makerules: handle `lib - :LIBRARY: ...' =&gt; no VERSION
+	 make.probe: CC.DEBUG CC.HOSTTYPE CC.OPTIMIZE CC.STRICT CC.WARN
+	 main.c: command line scripts done after .MAKEINIT
+	 main.c: test 0x00020000 to close openfd before coexec
+	 make.c: D_scope prereqs take effect in make() too
+99-03-01 Makerules: add :P=C: to .MANIFEST.
+99-02-14 make.probe: move some init stuff from C.probe
+	 make.probe: deal with gcc/ld writing errors to stderr with 0 exit code
+	 trap: clean up .INTERRUPT interface
+	 Makerules: :PACKAGE: -l* .MULTIPLE
+	 Makerules: fix :: :LIBRARY: for cmd and lib by same name
+	 object.c: retain D_global in load()
+	 Scanrules: fix .PFX.INCLUDE test
+99-01-23 Makerules: *.req.REQUIRE : .IGNORE
+	 Makerules: add -f $(MAKEFILE) to .RECURSE $(MAKE) args
+	 Makerules: .REQUIRE.-l% checks $(PACKAGE_%_LIB)/lib/% first
+	 Makerules: make :PACKAGE: search picky about version
+	 Makerules: handle :PACKAGE: -lfoo
+	 Makerules: PACKAGE_%_VERSION defined
+	 make.probe: use full path for NM, etc.
+	 make.probe: libpath not added to CC.STDLIB
+99-01-11 Makerules,make.probe: CC.MEMBERS.UNDEF
+	 Makerules: fixed .SHARED.lib wrt :PACKAGE:
+	 make.probe: tweak CC.STDLIB
+98-12-25 Makerules: :LIBRARY: initializes VERSION var if not set
+	 Makerules: add tgz, tarball; drop update*; pax and tgz recursive
+	 Makerules: tarball uses VERSION
+	 Makerules: `:: dir' adds dir to manifest
+	 Makerules: arch-$(_hosttype_).mk architecture specific additions
+	 Makerules: $(CC.DLL) uses local *.lib
+	 expand: add :P=N: for 'native-path'
+	 expand: :P=S=subdir: to handle recursive manifest
+	 parse: fix \\n splice bug that activated rules direcive
+	 rule: .READONLY external support
+	 bind: (P_readonly|P_terminal) does not get attribute assoc
+	 bind: add rule_compare() and rule_hash() for case hacks
+	 option: -o writeobject (on by default)
+	 expand: regcomp(REG_SHELL) needs REG_LEFT|REG_RIGHT -- duh
+	 rule: include + "file" to include file as global makefile
+	 make,rule: fix state.force and P_force for P_dontcare
+98-12-25 --- release 3.5 ---
+98-11-11 expand: :G=x: tokenized
+	 add ms %.def:%.sym
+	 make: recheck require_p prereqs
+98-11-01 expand: fix ignorecase bug in :L:
+98-08-11 probe: add probe.ini for arch specific shortcuts
+	 probe: add opional CC.MAKE.OPTIONS
+	 Makerules: check CC.MAKE.OPTIONS
+	 bind.c,scan.c: a few more uwin file path workarounds
+	 parse.c: readline() now converts \r=&gt; 
+	 variable.c: V_functional looks for "v-&gt;name" and ".v-&gt;name." rule
+98-07-17 Makerules: check before assuming /usr/lib or /lib
+	 command.c: fix P_before P_repeat FAILED bug
+	 Makerules: add .UNBIND to .PACKAGE.LIBRARIES. (must be a better way)
+	 Makerules: add static=1 to favor lib instead of dll (except for std)
+98-05-26 make.probe: add /usr/lib /lib verification
+98-05-01 rule.c: add .RUN .WAIT for background job control
+	 rule.c: add .MAKEPROMPT .MAKERUN sequence points
+	 rule.c: add .RESET to reset rule info to start state
+	 parse.c: interactive sfpoll sfstdin and state.coshell-&gt;msgfp
+98-04-01 expand: plug leak by calling regfree() for :C:
+	 Makerules: adjust .IFFE.REF. fix to not include package being built
+	 Makerules: add %.cpp for C++
+	 scan.c: don't tokenize quoted implicit prereqs!
+98-03-17 Makerules: fix .IFFE.REF. to expand package include dirs
+98-02-14 Makerules: fix .IFFE.REF. to expand required libraries
+98-01-23 Makerules: add _hosttype_ to .MAM.INIT
+	 Makerules: :PACKAGE: x attempts include - "pkg-x.mk"
+	 Makerules: handle :LIBRARY: rhs +l*
+	 pkg-tcl.mk: initial release
+98-01-11 Makerules,probe: add CC.SHARED.REGISTRY and CC.SHARED.REGISTRY.PATH
+97-10-31 Makerules: CC.PIC not that easy to deprecate!
+	 Makerules: fix -L option for *.req rule
+	 Makerules: LDRUNPATH unset by default
+	 Makerules: no CC.SUFFIX.LD to AR
+97-10-11 Makerules: fix :LIBRARY: *.req prerequisites
+	 probe: fix ld probe, add CC.SUFFIX.LD=".def .exp" for uwin
+	 make.c: REQUIRE map =&gt; - marks rule virtual
+97-08-11 Makerules: .BASE.DATE.FORMAT. for y2k
+	 Makerules: drop weird xxx.a install in .SHARED.DEF.lib
+	 Makerules: add $(.sh.) as non-frozen version of $(sh)
+97-07-17 Makerules: move $(MAKELIB) to the front of PACKAGE search
+	 Makerules: required libraries linked with dll too
+	 version.c: tighten initdynamic&#0091;&#0093; loop termination
+97-05-09 Makerules: /usr/local/arch/$(_hosttype_) first in LCLDIRS
+	 Makerules,make.probe: add mvs.390 dll support
+	 expand: don't :T=A: if .SCAN.IGNORE
+	 variable: allow `export name=value'
+	 Makerules: allow `:MAKE: name=value' =&gt; `export name=value'
+	 Makerules: bias package binding to fully qualified PATH dirs
+	 Makerules: IFFEFLAGS uses CCLDFLAGS instead of LDFLAGS
+	 Makerules: don't change -Wl., in cc-% (hack alert)
+	 Makerules: CC.PIC deprecated for CC.DLL
+	 Makerules: _INSTRUMENT_ deprecated for _BLD_INSTRUMENT
+	 Makerules: _TRACE_ deprecated for _BLD_DEBUG
+	 command: -t attempts to touch fs .o as well as .a/.o
+96-12-25 --- release 3.4 ---
+	 add CC.LD.DYNAMIC and CC.LD.STATIC to make.probe and makerules
+	 add .PROBE.LOAD and .PROBE.SPECIAL. to catch/start early probe
+	 addfile(xxx) for xxx.exe on _WIN32
+	 bind.c: check for _WIN32 C:/ prefix
+	 parse.c: -FUNCTIONAL now clears var.functional too
+	 Makerules: .CC.MEMBERS. fixed for small ARG_MAX systems
+	 Makerules: OFFICIAL file now in lower view
+	 Makerules: drop -G* from CC.PROFILE
+	 Makerules: remove global +lxxx =&gt; -lxxx==+lxxx
+	 archive.c: add `/*/' to SYMDIR_port (for sgi.mips4)
+	 Makerules: if $(CC.PROFILE) and $(CC.PIC) then don't install .ARCHIVE
+	 make.c: relax `modifying lower view file' message via dontcare
+	 Makerules: fix +lxxx MAM bind
+	 Makerules: fix :LIBRARY: req file generator
+	 Makerules: fix :PACKAGE: LIBDIR search
+	 ppcc: install in $(MAKELIB)
+	 ARG_SCRIPT: fix bug that mishandled `+' and `&amp;' in cmd line targets
+	 Makerules,probe: add CC.SUFFIX.LD and ldscript for ld scripts
+	 Makerules: add $(sh command): where has this been hiding
+	 a:-TARGET now works
+	 .ARCHIVE not scanned if rule.scan==.SCAN.IGNORE
+	 :LIBRARY: sets .MAIN.TARGET. too
+	 make.probe: don't automatically place /usr/lib last
+	 make.probe: add CC.SUFFIX.LD
+	 Makerules: handle cc-opt1,-opt2 by splitting options on ,
+	 bind.c,metarule.c: handle _WIN32 directory ignorecase
+	 Makerules: add :DLL: .DLL for dll generation
+	 Makerules: fix .MAKEINIT premature :T=F: that botched .SOURCExVPATH
+	 object.c: fix to handle 01/24/89 format objects (yes it still works)
+	 ppcc,Makerules.mk: generalize $(CC.DIALECT) option passing
+	 metarule: case sensitive match for patterns matching `&#0091;-+&#0093;*'
+	 archive.c,object.c: (Sfoff_t) for K&amp;R compilers
+	 MAKEFILES=Nmakefile:nmakefile:Makefile:makefile -- thanks bill
+	 MAKEARGS=Nmakeargs:nmakeargs:Makeargs:makeargs -- thanks again bill
+	 probe: add CC.LD.RUNPATH
+	 Makerules.mk: add LDRUNPATH and CC.LD.RUNPATH support
+	 Makerules.mk: tone down PTR prereq scan
+	 .GETCONF: first builtin function
+96-11-28 ccmaps .mo for ascii/ebcdic compatibility
+96-10-31 outstanding bug reports addressed
+	 :LIBRARY: defines _BLD_&lt;lib&gt;==1
+	 use PATH=$(STDDIRS):$PATH to find STDRM etc. in Makerules.mk
+	 add CC.SUFFIX.DYNAMIC for win32 .dll .lib .a
+96-10-11 metarule rhs prefix dir check even if rhs has prefix questionable=0x8
+	 alias check path suffix in bindfile questionable=0x10000
+	 add more instrument guesswork
+	 .PFX.INCLUDE headers must be .TERMINAL
+	 fix $(...) bug that let some unselected items slip through
+96-10-01 update make.probe for probe_libdir to catch alpha /usr/shlib
+96-09-09 add CC.PROBEPP to override pp probe info
+	 add $(INCLUDEDIR) and $(LIBDIR) to .SOURCE* from $(ancestor_list)
+96-08-11 --- release 3.3 ---
+96-07-17 don't pass -D-* to cc in ppcc
+	 add ``X|external-scan $(%)'' external scan
+	 clean up makerules/probe readonly
+96-05-31 fix $(".":P=L*) for no views
+96-05-09 make.probe: drop multiple / in stdlib
+	 try to stat non-readable files
+96-04-22 fix staterule()-&gt;scan assignment evaluation order ambiguity in scan.c
+96-02-29 -lxxx binds to +lxxx if +lxxx bound first
+	 add pkg to OPTDIRS
+	 cut off botched metaclose recursion unless questionable=0x100
+	 `.XXX : .USE .IMMEDIATE .ATTRIBUTE' -&gt; `xxx yyy' -&gt; `xxx : yyy'
+	 fix :PACKAGE: search bug that forced package name to be in root path
+	 add REGRESS + REGRESSFLAGS
+	 aliases may produce more than one :P=D: bound dir
+	 fix nonterminating D_scanned loop in scan()
+	 handle -L* on :LIBRARY: rhs
+96-02-14 $(CC.SUFFIX.COMMAND) appened only if no suffix
+	 :PACKAGE: xxx:version=n.m:static:dynamic:nolibrary:noinstall:
+96-02-07 archive scan handles multiple port|rand meta entries
+	 rescan check on (s|alt)&amp;P_force
+	 scan A action can now set (.+) or clear (-) attributes
+96-01-31 :PACKAGE: libs now .DONTCARE
+	 fix touch bug that kept the blasted libast conf*.&#0091;ch&#0093; out of date
+96-01-01 AT&amp;T Research
+	 uwin Makerules.mk and make.probe tweaks
+	 :I&lt;: for literal intersection, otherwise pathname intersection
+	 convert to &lt;regex.h&gt;
+	 condition LN on _feature_=ln
+95-12-08 fix :LIBRARY: -lxxx probe
+	 add uwin dll to make.probe and :LIBRARY:
+	 BINED -&gt; ED
+95-11-24 . :INSTALLDIR: does not add to all or man
+95-11-11 installed CC.SUFFIX.SHARED are now readonly
+	 CC.SUFFIX.SHARED==CC.SUFFIX.OBJECT expands -l*
+	 CC.SUFFIX.SHARED installed readonly
+	 CC.SUFFIX.SHARED hard linked to CC.SUFFIX.SHARED.major.minor
+	 P_target &amp;&amp; D_dynamic does not imply generated (questionable=0x4000)
+95-10-11 fix :TABLE: options `no' and `NO' entries
+	 D_source is now cleared in make object for .SOURCE cross product
+	 $(^) subject to localview() too
+	 fix :WORKAROUND: for in-place changes
+	 set include=dir appends to .SOURCE.mk
+	 .ASSERT intercepts not applied to .IMMEDIATE targets
+	 -d4 lists make object prerequisite file info
+	 fix state.targetcontext expand bug that dropped too many marks
+	 add %.o:%.S to makerules/scanrules
+	 intersect() now handles invented :P=D: .. dirs not in .SOURCE*
+	 drop $(CC.REPOSITORY:@?-l??) from PPCC
+	 add sun -&#0091;Qq&#0093;(dir|option|path|produce) to ppcc
+	 add proto -x to :INSTALLPROTO:
+	 fix compvar() V_oldvalue bug that put command line def in .mo
+	 internal.export -&gt; internal.exported for proto export keyword
+	 :T=G: never matches non-target .TERMINAL
+95-10-01 add :TABLE: novariables to inhibit leaf variable assignments
+	 add preliminary long edit op names and converter
+	 D_global if not P_target (questionable=0x800 for old behavior)
+	 alias if !streq(name,r-&gt;name) (questionable=0x1000 for old behavior)
+	 fix scanrules .PREFIX.INCLUDE. handling of ../*
+	 more aggressive putbound() in bindalias() (-Q0020000 for old)
+	 `.FORCE : x' sets P_force too
+	 longest metarule patterns applied first
+	 more alias fixes
+	 move scan attribute/property additions before staterule() call
+	 :INSTALLMAP: ... scan now more selective
+	 .UNBIND now sets rule.time=0
+95-07-17 --- release 3.2 ---
+	 :F=%x: sfio 'u' internal format now handled
+	 fix .PTR.OPTIONS. initial condition
+	 fix .ERROR to work like 2.2 if !.FUNCTIONAL
+	 .FUNCTIONAL .ERROR return value: new level, no msg if already printed
+95-06-28 add *.ii to .CLOBBER. for EDG C++
+95-05-09 add SYMDIR_strict for strict ranlib uptodate check
+	 change $(!$(*:O=1)) to $(!$(*)) since lists are ok now
+	 drop .SAVE. since :: already handles it
+	 add old value to state variable changed explanation
+	 add .DO.READONLY.-xMerge
+	 unused var cleanup
+	 another make.probe preroot workaround
+	 add .CC.NOOPTIMIZE local scope
+	 handle `t {}' and strip lead space in {...}
+	 fix r==0 dereference in :P=B:
+	 don't force CCFLAGS=-g for instrument=purify
+	 fix .BIND.-l% version interactions with -lxxx.&#0091;0-9&#0093;
+	 add -o noalias to diable directory aliasing (for .INSTALL.LIST)
+	 make.probe pic test must check linker too
+	 calm down +(&#0091;a-z&#0093;) =&gt; .+(&#0091;A-Z&#0093;) conversion for :ALL: and .ARGS
+	 &amp;error_info cannot be in a static initializer
+	 .OFFICIAL uses .MANIFEST. instead of .SOURCES.
+	 fix scope var bug that appended twice
+	 add - stack debug command to query
+	 drop extra .so's from ship.list.bin
+	 state.mam.out &amp;&amp; !state.mam.port doesn't rebind after build
+95-04-01 `:: xxx' marks xx .TERMINAL
+	 fix recursion bug in :G:
+	 define PACKAGE_* vars if !mam too
+	 fix ciadb to exclude headers that may generate %.o (e.g., *.c)
+	 fix stray M_mark bug caused by expand() inside intersect()
+	 fix :INSTALLMAP: with no lhs
+	 :PACKAGE: is a little less restrictive on package root search
+	 use $(CCLDFLAGS) in %:%.s
+	 change :T=G: to check .TERMINAL state before .TERMINAL
+	 fix ppcc.sh pattern match ksh93ism for bsh compatibility
+	 fix PROTOFLAGS expansion with :Q:
+	 generated .SCAN.c do not get .PFX.INCLUDE
+	 scan prereqs for .JOINT targets are in staterules(PREREQS)
+	 change obsolete MAM -expandview ref to static*,port*
+	 fix trap bug that used elementsof(int*caught)
+	 makerules PTRMUST -&gt; PTRMKDIR
+	 alpha archive symbol directory has word size embedded _64E&#0091;BL&#0093;E&#0091;BL&#0093;_
+	 fix &nbsp; in output of recursive print -um
+	 fix bindfile() .. test for terminal directories &#0091;via Rich Drechsler&#0093;
+	 tablook() prototype tweak
+	 fix putbound() test in bindfile &#0091;via Dan Tiernan&#0093;
+	 beef up makerules $SHELL -n test
+	 drop newlines from PROTOCOPYRIGHT for MAM
+95-03-19 fix .AFTER job freelist bug in trigger() &#0091;via Rich Drechsler&#0093;
+	 add makerules STDDIRS; SYSRM -&gt; STDRM {cmp,cp,ln,mv,rm}
+	 clean up makerules INSTRUMENT_* interface
+	 -v no longer turns on ppcc verbose
+	 fix cc- MAKEPATH override by $(=)
+95-02-14 fix targetcontext mkdir() test
+	 fix printarg() for proper sfio interface
+95-01-19 add CC.ARFLAGS for $(CC) that generates libraries
+	 add CC.DIALECT=PTRIMPLICIT for implicit C++ ptr dir name
+	 add CC.DIALECT=PTRMKDIR if C++ local ptr must exist
+	 add CC.DIALECT=PTRCOPY if C++ PTRMKDIR contents copied 
+	 fix CC.READONLY probe to cast the const pointer assignment
+	 punt() now assumes oldmake has mam if options set
+	 add a few .SPECIAL's in ::
+	 fix rule.time update for .NULL action in trigger()
+	 add A_* flags instead of assertion() set.clear, etc.
+	 OP_NONE assertions are A_special
+	 x :LIBRARY: makes x virtual prereq of .ALL
+	 "local" statement mods for operator and function arg handling
+	 local same-name same-name gives dup name initial value of 1
+	 local name=value now accepted
+	 local -&#0091;n&#0093; arg ... sets $(1) ... &#0091;empties missing up to n&#0093;
+	 local (formal ...) actual ... sets formals from actuals
+	 $(;) returns the state data (formerly $(#))
+	 $(#) is the arg count from local -&#0091;n&#0093; | (formal ...) ...
+	 add TABLE.mk for :TABLE: table and map lookup
+	 add SS.mk for :SS: directory hierarchy subsystems
+	 don't forceread if global (questionable=0x400 for old behavior)
+	 add -o targetcontext to expand action in target dir context
+	 add state.context and MARK_CONTEXT for state.targetcontext
+	 fix a few more alias bugs
+	 .MAKE .LOCAL actions can contain parent scope assignments
+	 add base and delta common actions for pax -z support
+	 add :SYSTEM: to :SS: in SYSTEM.mk and delete SS.mk
+	 fix rebind to first clear D_entries|D_scanned
+	 add "*.&#0091;sS&#0093;|*.&#0091;aA&#0093;&#0091;sS&#0093;&#0091;mM&#0093;" to ppcc source list
+95-01-01 fix .CLOBBER $(-global) expansion
+	 .NULL metarule now provides equivalence for :G:
+	 avoid multiple entries in make.probe CC.REQUIRE.++ 
+94-12-25 ppcc, MAM -l&lt;shared&gt;, probe tweaks
+	 fix port/rand ar touch bug that modified member terminator
+	 fix .DO.INSTALL bug that asserted x : x
+	 avoid a few more 'not compiled' panics
+	 add -o mam=&lt;type&gt;&#0091;,noport&#0093; to inhibit porting hints
+	 drop mam_port and use noport mam option
+	 fix V_retain bug that took value from lowest view statefile
+	 fix PACKAGE .SOURCE.(h|a) that blew the CC.STD(INCLUDE|LIB) order
+	 fix .REBIND to work like .UNBIND on directories
+	 PACKAGE lib not .DONTCARE by default
+94-11-11 --- release 3.1 ---
+	 detect loops in complete() to avoid `did not complete'
+	 fix D_entries|D_scanned propagation in merge()
+	 fix .BIND. view and state.targetview propagation
+	 add :WORKAROUND: for external distribution workarounds
+	 merge(MERGE_ALL) does not propagate rule.scan==SCAN_NULL
+	 .OFFICIAL diffs changed files into ./OFFICIAL
+	 fix scan attribute propagation interaction with dirscan()
+	 fix uninitialized od reference in bindfile()
+	 fix ppcc -O over shift and empty rm
+94-10-01 CC.DIALECT DOTI : *.i accepted as preprocessed input
+	 CC.DIALECT TOUCHO : cc link may touch *.o
+	 $(CCC) dropped in favor of simpler $(PPCC)
+	 $(FEATURE) changed to $(IFFE)
+	 add -o mam=&lt;type&gt;&#0091;,dontcare&#0093; to list dontcare targets too
+	 fix staterule() to accept top view state if time matches
+	 fix bindfile()+putbound() for ..
+	 fix VOFFSET,VROOT for non-3d
+	 fix bindstate() recursion
+	 fix metaclose() bug that forced artificial metarule ordering
+94-08-11 add state.questionable mask (looks like it should go but not sure)
+	 move some state.test bits to state.questionable
+	 add MAM generated attribute
+	 add fs3d view loop test
+	 Os option arguments must be specified
+94-07-17 --- release 3.1 ---
+94-06-11 add -o believe=level (-B level) for 2d
+	 -b no longer implies -c
+	 -b implies no makerules
+	 uncouple state.keepgoing from state.mam (should have learned by now!)
+	 dirscan() sets rule.bound and rule.time
+	 add .SYNC : file &#0091;edit-select&#0093;
+	 fix .QUERY longjmp active frames and error trap hold
+	 fix pattern association parse that botched ../*%*
+	 avoid pathcanon() in metarule makerule() calls
+	 change include from control statement to immediate rule
+	 use rule in include list uses action as include file filter
+	 add makerules mam_port=0 to inhibit -o mam=static ${mam_*} mappings
+	 promote lower view state to top on load if no previous top iview state
+94-05-22 virtual preview not propagated
+	 fix nested loops in file input
+	 fix unalias() bug that dropped original binding
+	 fix merge() bug that called bind() while bind in progress
+	 fix -ptr *again* for CC 3.0.3
+	 add $(^) for current line in scan
+	 :A&gt;pattern: matches rule prereqs
+	 fix statevar stateview search that unnecessarily forced re-scan
+	 .PARAMETER file checks now done after .INIT
+	 update CIA rules to use DOT instead of DAG
+94-04-01 .ERROR made for levels &gt; 0; return 1 inhibits message print
+	 $(.ERROR) set to level and message text inside .ERROR
+	 stateview() now binds before searching state views
+	 fix CC.SO install for live replacement
+	 add .COMPDONE to fit the .INIT+.DONE pattern
+	 add rule.mark and M_* to eliminate mark clashes
+	 add .INTERRUPT.&lt;signal&gt; for signal specific handlers
+	 add .ALARM:&lt;elapsed&gt; immediate rule to set alarm
+	 add $(.ALARM) to be absolute time for next alarm, 0 for no alarm
+	 add .SYNC immediate rule to sync statefile
+	 maketop() now resets property when complete
+	 maketop(P_ignore) temporarily sets keepgoing=1
+	 xxx -&gt; .XXX immediate test for all `no operator on line' statements
+	 .FORCE : xxx forces xxx to be new
+	 { action } -&gt; .ALWAYS :$("t")action
+	 immediate a b c -&gt; .IMMEDIATE : a b c
+	 attribute a b c -&gt; a b c : .ATTRIBUTE
+	 a b c { action } -&gt; a : b c$("t")action
+	 :MAKE: allows rhs a/b
+	 .DO.l.CC dropped -- let C++ fend for itself
+	 (&lt;id&gt;*)&lt;stuff&gt; can appear as target
+	 $("":D) no longer produces ``.''
+	 print -n -u&#0091;0-9m&#0093; -f "format" +-&#0091;io&#0093; path -p command data ...
+	 read -n -u&#0091;0-9m&#0093; +-i path +-o path -p command variable
+	 -uxxx may appear in $(INSTALLROOT)/lib/lib/&lt;LIB&gt;
+	 fix scan | ... % | bug that forced trailing space
+	 replace CC.OBJ and CC.SO with CC.SUFFIX.*
+	 .MAKE .OPERATOR prereqs made before operator applied
+	 add .PROBEINIT to .MAKEINIT and "::"
+	 .SHARED. now links with CC.SUFFIX.SHARED sibling library if it exists
+	 fix alias .UNBIND
+94-03-01 unify mam with gmake (additions done by gsf)
+	 -o mam={dynamic|regress|static}&#0091;:file&#0091;:&#0091;label&#0093;&#0091;:root&#0093;&#0093;&#0093;
+	 -M no longer implies -nF
+	 -o mamtrace=file (-m) dropped
+	 -o regress=root dropped
+	 -o never (-N) added to override .ALWAYS
+	 fix scan bug that assigned strategy before binding
+	 frozen V_functional always causes .mo recompile
+	 add oldname(r) to fix unbind bug that omitted putbound(r,0)
+	 ``else if'' now accepted for ``elif''
+	 complain about extra chars after else and end
+	 add :T=Z&#0091;CERS&#0093;: for {cancel,event,relative,state} time
+	 fix circular implicit prereq actions
+	 fix aix shared library probe
+	 finish now handles errors in .MAKEDONE and .DONE
+	 fix stray D_mark unbind with D_markbind,D_markprereq,D_markscan 
+	 fix :READONLY: probe for mips
+	 base rules unbound after reading (so make can install them!)
+	 delay statefile load until after makefile read
+	 add complete() for MAKING implicit prereq
+	 add CC.REPOSITORY with repository dir value
+	 delete PTREPOSITORY from CC.DIALECT
+	 stop .INSERT|.APPEND from adding duplicate prereqs unless .MULTIPLE
+	 .QUERY now pushes an active frame (shows up in $(&lt;))
+	 fix state view resolution in stateview()
+	 fix :G=a/b: with no %
+94-02-14 warn about implicit reference while action in progress
+	 add print -opath
+94-01-31 .CLEAR now checks staterule before freeing prereq list
+	 .UNBIND now clears D_global, D_regular and preview
+	 add :F=%(time-format)T:
+	 add :F=%(invert|lower|upper|variable)S:
+	 change :F=&#0091;LUV&#0093;: to :F=%(lower|upper|variable)S: with obsolete warning
+	 fix .MEMBER view/preview mismatch that triggerred unnecessary actions
+94-01-11 $("":T=R) operates on current date
+	 add print -n -u&#0091;12m&#0093; -f "format"
+	 fix \&lt;newline&gt; action parse
+93-12-01 --- release 3.0 ---
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="probe changes">probe changes</A></H3></CENTER></FONT></FONT>
+
+00-08-11 probe: fix non-suid generation check
+00-01-11 probe: fix -t with writable info
+99-09-01 probe: add --override
+99-05-09 probe: long options
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ss changes">ss changes</A></H3></CENTER></FONT></FONT>
+
+99-05-18 ss: long options
+97-08-11 ssd: fix now used before defined bug
+95-05-09 fix ssd nlists feature tests
+	 add a few more utmp file macros from &lt;utmp.h&gt;
+95-02-14 fix an extremely botched since() macro
+95-01-19 fix user idelt time check that broke loop too soon
+	 checks every 10s, updates every CS_STAT_FREQ if not interesting
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libast changes">libast changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 features/common: fix uwin __DEFINE__
+	 sftable: initialize decimal and thousand
+	 magic.tab: add forel wordperfect document
+	 syslog: add LOG_LEVEL, add ' only if needed
+	 include/tm.h: #undef daylight for _WIN32
+	 sfio.h: add _SF_APPEND and _SF_CLOSE for native namespace incursion
+	 ast_std.h: add AST_LC_multibyte for MB_CUR_MAX&gt;1
+	 setlocale: set AST_LC_multibyte
+	 strmatch: check AST_LC_multibyte
+	 features/limits.c: add _BITS_POSIX1_LIM_H guard for linux
+	 features/libpath.sh: fix for aix LIBPATH
+	 optget.c: add enumerated option argument values
+	 procopen,procclose: block SIGCHLD if PROC_FOREGROUND (e.g., system(3))
+00-12-25 mnt.c: handle " and ' quoting for fstab
+	 sftmp.c: let pathtemp() open the fd O_EXCL
+00-12-15 conf.sh: add -v for verbose trace
+	 features/(limits|unistd).c: no FEATURE/types because of _POSIX_SOURCE
+	 features/time: add default for CLOCKS_PER_SEC
+	 features/lib: std_malloc now handles NeXT
+00-12-13 strton: recognize qualifier only if preceded by a digit
+	 features/lib: change return in vfork() test to exit() for linux sparc
+	 fmtquote: fix $'...' quote logic
+00-12-11 tmdate: fix cron format bug that mishandled months
+00-12-01 optget: handle $Id: ... $ in --?-version
+	 features/fcntl.c: fix _STDPP_ mmap munmap
+00-11-27 magic: drop dup sfclose() in load()
+	 optget: handle error_info.id==0
+00-11-22 features/stdio: add _FILEDEFED for sol9.sun4
+	 strton,stronll: handle &#0091;u|U&#0093;&#0091;l|L&#0093;&#0091;ll|LL&#0093; qualifiers
+00-10-31 tmdate: add TM_DATESTYLE and mmddHHMM&#0091;cc&#0093;yy
+	 astlicense.c: #include &lt;hashkey.h&gt; MAM workaround
+	 astlicense.c: check for non-empty CONTRIBUTORS
+00-10-26 features/stdio: add _FILE and __FILE for gnu
+	 misc/stk.c: fix stack pointer check off-by-one (dgk does it too!)
+00-10-23 syslog.h: sync with bsd values
+00-10-18 _STUB_* now functions instead of common symbols
+	 all extern data declared with definition to eliminate common symbols
+	 fastfind: add mac/bsd /var/db/locate.database
+00-10-17 features/lib: add apple osX (darwin.ppc) workarounds
+00-10-12 add: fmtbuf(), fmtclock(), fmtip4(), strtoip4()
+	 fmt*() now use fmtbuf() for tmp fmt buf allocation
+00-10-05 regex: add REG_DISCIPLINE and regdisc_t for alloc/error disc
+00-09-29 features/lib: pipe_rw==0 for sgi: boot rw == bin incompatibility
+00-09-21 astlicense: handle ' and 
+00-09-20 sfwrite: fix write() error in sfprintf() loop
+00-08-11 hdr,vmhdr.h: check/hide { getpagesize sbrk } prototypes
+	 astlicense: add noncommercial
+00-07-31 fflush: don't seek on pipes
+	 sfresize: add
+	 setlocale: fix bad newof() call
+00-06-01 strmatch: initialize match.current.beg&#0091;0&#0093; to avoid dump at line 670
+	 sfio/stdio: a few more errno tweaks
+	 astquery: sfstdin/sfstderr by default
+00-05-26 sfmode: errno=EBADF for invalid stream use
+00-05-22 rewind: fix for xopen test
+00-05-18 mcfind: returns absolute path
+00-05-16 optget: --keys must catch <.>..</.>< >too</ >
+	 translate,mc: errno cleanup
+00-05-09 magic: add netbsd binary magic
+	 fts: PATH_RESOLVE!=logical =&gt; FTS_SEEDOTDIR
+	 ftwflags: call fts_flags()
+	 astconf: astconf(0,0,0) re-syncs with _AST_FEATURES
+00-05-08 optget: --usage &amp; --keys for last -catalog group only
+00-05-02 iconv.c: add; use codes&#0091;&#0093; in ccmapid() and ccmapname(); "" for native
+00-05-01 pathtmp: copy env values (libshell or putenv may change)
+00-04-01 optget: drop bar from &#0091;-foo?bar&#0093; for --??keys
+	 sfvscanf: add %X -- duh
+	 features/common: fix va_listval() for power pc
+	 findopen: fix FIND_GENERATE codes file search
+	 magic: add ERROR_translate() and msgcat.key
+	 tmlocale: add for LC_TIME locale info
+	 tmlex: check tm_info.format and tm_data.format
+	 tmfix: fix for tm_wday special case (via nl_langinfo on LC_TIME fields)
+	 strftime: fix for nl_langinfo special case
+	 ast_std.h: provide LC_* defauls if not defined
+	 sfnew: check ${_AST_sfio_bufsize} -- don't tell kpv
+	 catopen,nl_types.h: add intercept to mc* routines
+	 magic.tab: add ast message catalog
+	 strerror: add _ast_strerror intercept with ERROR_translate("errno")
+	 fmtquote: escapes &gt;0177 only if (flags&amp;2)
+00-03-17 feof: stdio macro functions only for _UWIN
+	 optget: proper ERROR_translate() calls
+	 astgetconf: add for thread safe error message control
+	 astlicense: fix type=special but with non-null notice
+	 errorx: add for ERROR_translate() support
+	 ERROR_translate: add locale id args for alternate dictionary
+	 option.h: move _OPT_PRIVATE_ to pointer to avoid dll size mismatch
+	 ftwalk: fix FTW_CHILDREN bug that hit top level non-dirs twice
+	 translate.c: default error_info.translate
+	 astconf: fix dup loop thrash that never returns, add _AST_VERSION
+00-03-10 ast_std.h: do _LARGEFILE_SOURCE initialization before std headers
+	 fmtquote: handle $'...' quotes
+00-03-07 optget: fix numeric option support test
+	 sfkeyprintf: add %q for '...' quoting with ansi escapes
+00-03-06 features/stdio: fix _sfflsbuf prototype (dingold@gte.net)
+00-02-14 pathtmp: fix pid cache bug that sometimes repeated after ~10 attempts
+	 optget: "..." attribute quote
+	 pathfind: eliminate *: prefix in lib, not type
+	 proc: PROC_FOREGROUND for system(3) semantics (wait status return)
+	 pathtmp: fix mktemp() logic
+	 fts: fix FTS_NOSEEDOTDIR bug that botched ./* in top list
+	 include/ast/prototyped.h includes include/prototyped.h
+	 pathpath: fix strdup(0) bug
+	 optget: --html <SMALL>&lt;<A href=mailto:foo@bar>foo@bar</A>&gt;</SMALL> =&gt; ...mailto:foo@bar...
+	 sscanf: fix sfsscanf =&gt; sfvsscanf typo
+	 magic.tab: strengthen tar recognition
+00-02-08 conf.sh: fix ifdef for systems that think sysconf(FOO) is const
+00-02-04 glob: fix globlist_t.gl_flags
+00-02-02 vm*: add NoF() for data only files
+00-01-27 fts: fix top level .==.. statp bug (thanks to dr. ek)
+00-01-25 conf.tab: fix LFS*_*LAGS typo
+00-01-24 astlicense: handle type=verbose, license.notice, author=*
+00-01-11 pathprobe: generate info for first probe script on PATH - duh
+	 ast.h: add NoF(x) for files that define no functions
+	 tmpfile: fix implementation
+	 global change for string ERROR_translate() dictionary names
+	 optget: fix new way but no long names off by one
+	 optget: handle &#0091;--dictionary?name&#0093;
+99-11-19 comp/conf.sh: `expr length XXX` is not universal
+	 drop sfstdio; stdio via functions everywhere
+	 drop Makefile conditionals (and follow our own advice for once)
+	 sfio: new stream after atexit() bug fix
+	 tm: Tm_zone_t.daylight=0 for standard time within zone
+	 stdio: fopen =&gt; _ast_fopen: only way short of binary compatibility
+	 Makefile: atmain.C falls back to atmain.c
+	 optget: add --keys, s&lt;section&gt; option
+	 stdio: _UWIN check for foreign stdio
+99-11-11 astlicense: add
+99-10-31 glob: fix regexec pattern; add PATH_ATTRIBUTES case check
+	 pathpath: path==0 means malloc space
+99-10-22 tmfmt: %C=2-digit-century, %k=date(1), %y=2-digit-year-in-century
+99-10-18 fastfind: expanded default db lookup
+99-08-11 magic: fix off by one registry malloc
+	 features/fs: add __RENAME checks for stat familiy (netbsd)
+	 features/fs: major()/minor() fixes for s5
+	 features/libpath.sh: netbsd fix -- ld.so not in std places
+	 misc/fastfind: fix codes path generation bug
+	 optget: beef up --?* description, fix &lt;TR&gt;...&lt;/TR&gt; nesting
+	 pathprobe: check for override (writable key file) first
+	 features/time: int tmtimeofday(struct timeval*);
+	 optget: fix opt_info.num, even if opt_info.arg!=0
+	 fts: FTS_PHYSICAL =&gt; FTS_SEEDOTDIR, add FTS_CHOP
+	 fastfind: init dir tab with logical and physical name
+	 glob: add gnu GLOB_ALTDIRFUNC
+99-07-17 sfio: kpv update and sfhdr.h sync!
+99-06-24 stdio: fix fflush() to ignore sfseek(0) return value
+99-06-23 magic: '\r' is text not control to placate m$
+99-06-08 stdio: fix fseek,ftell semantics
+	 uwin stdio: fflush() =&gt; _doflsh() to avoid __cplusplus clash
+	 getopt: call liberror() to avoid error() conflict
+	 tmfmt,tmscan: %N zone type (nation code), %z zone minutes west offset
+	 tmfmt: - no pad _ space pad 0 leading 0 pad
+99-05-28 magic: fix 'x' == '*' for any number, magic.tab tweaks
+	 features/lib: verify that stat64 really works
+99-05-21 tm*: add TM_WINDOW==69 for consistent century windowing guard year
+99-05-18 tmtime: add century leap year calc anticipating unsigned time_t
+99-05-17 sfkeyprintf: handle %o and %x!!
+99-05-09 pathprobe: $HOME/.probe if not suid and st_uid!=geteuid()
+99-04-28 magic,magic.tab: add registry()
+99-04-24 regcomp: fix ksh pattern +! parse
+	 regfatalpat: add
+	 optget: make : ? &#0093; double escape consistent in all contexts
+99-04-01 features: drop iffeio.h and stdio.h when only printf() used
+	 regex: fix stats() .l and .k count
+	 fmtquote: added; most general fmtesc() form
+99-03-22 fmtesc.c,ast.h: add fmtnesq()
+	 optget: --?x works for -x option flag
+99-03-17 features/limits.c: workaround solaris __EXTENSIONS__ _timespec bug
+	 workaround limits.h circular prereq with ignore stdio.h
+	 sfvprintf: %04e left-pad zero fixed
+99-03-03 fts: uncle already: add FTS_SEEDOTDIR to retain leading ./
+	 regex: REG_MULTIPLE, BM for fixed string alternation
+	 optget: embedded `-' optional in long options, prefix={0,1,2}
+99-02-14 fastfind: fix dir format bug that emitted wrong paths
+	 astconf: fix redef off by one bug
+99-02-11 pathcanon(): don't cache astconf("PATH_LEADING_SLASHES", NiL, NiL)
+99-01-23 optget: move &lt;old_opt.h&gt; back into &lt;option.h&gt;, no open-close
+	 optget: add "&#0091;index:long-name:description&#0093;" for --long-name
+	 comp/gross: add weak __libc_attr for irix &lt; 6.5 compatibility
+	 features/limits.c: tweak the guards again
+99-01-11 fastfind: handle old format count byte order
+	 magic.tab: fix elf to use real phdr offset
+	 magic.c,magic.tab: fix | to act like switch/case
+	 comp/fross.c,features/hack: for gross hacks
+	 features/stdio: avoid sfio namespace pollution
+98-12-25 tmdate: yyyy.mm.dd
+	 pathprobe: fix procrun() cmd path bug
+	 fmtesq: add
+	 features/common: win32.alpha va_list
+	 magic: add pc alpha object
+98-11-11 strmatch: add STR_ICASE
+	 pathprobe: punt to $HOME/.probe/&lt;key+HOSTTYPE&gt; if not S_ISUID
+	 tmzone,tmdate: handle +-minutes, nn/MMM/yyyy
+	 stropt: fix nested quote pop
+	 tmfmt: add %K =&gt; %Y-%m-%d/%H:%M:%S
+	 sfio/stdio: fix fseek() SF_PUBLIC omissions
+	 fmtesc: catch '\' (duh)
+	 vmalloc: vmbest round bug fix
+98-11-01 fts.c: no pathcanon() if (fts_flags &amp; FTS_PHYSICAL)
+98-10-01 features/stdio prototype fixes
+	 optget: strton() instead of strtol() for #
+98-09-22 regcomp: add REG_DELIMITED and REG_ESCAPE delimited re support
+98-09-15 fix _LARGEFILE64_SOURCE stuff
+	 ast_std.h: provide mmap() prototype
+98-08-11 fix sfpopen() to ignore SIGPIPE by ignoresig() for sfio but not stdio
+	 fix procopen() to ignore SIGPIPE by ignoresig() for PROC_IGNORE
+	 sfio sfpopen/popen update
+	 magic.src: fix ustar entry
+98-07-17 fix ftwalk() short by one malloc()
+	 add fts_notify()
+98-06-25 sfdcmore,sfdcprefix: add
+98-06-19 tokscan: add %f %g
+98-06-01 disc/sf*.c: memset(0) after disc malloc()
+98-05-11 strelapsed: y==Y
+	 fts: pathcanon() top list 
+98-04-01 error: error_info.time for all msgs, just after cmd id
+	 error: no sfsync(sfstdin)
+	 sfio: sfpool, Sffmt_t update
+	 magic.tab: sgi core dumps -- why aren't these elf?
+	 stropt: (v+n) for unknown option is option value if n!=0
+	 procopen: fix setsid() for spawnveg() only
+98-03-19 malloc: add realloc foreign region check
+	 sfdisc.h: rename to match kpv disciplines
+	 fastfind: fix strcasecmp/strcmp directory prefix mixup
+98-03-17 features/fcntl.c,pathtmp,sftmp: add O_TEMPORARY
+98-03-01 pathcanon: fix PATH_LEADING_SLASHES to stat() both slashes
+	 pathcanon: add PATH_VERIFIED
+	 tmdate: add skip&#0091;&#0093; to expand separator char set
+	 fastfind: FIND_OLD for old 7 bit db, FIND_TYPE for new 8 bit typed db
+	 fastfind: default generates gnu LOCATE02 8 bit db
+	 magic: handle %s in mime description
+	 cdt: kpv update
+	 sfio: kpv update
+	 stdio: fpos64_t fseek64(), ftell64(), fgetpos64(), fsetpos64()
+	 stdio: fseek() =&gt; sfseek(SF_PUBLIC) to avoid locking
+	 fts: initialize parent stat&#0091;bp&#0093; from top level *after* statf done
+	 astmath: add -lm requirement test
+	 *: Astlong_t =&gt; _ast_*_t
+	 regex: simplify regcollate() (from doug)
+	 tmtime: preserve Tm_t*tm when calling tminit()
+	 astconf: add readonly PATH_ATTRIBUTES=&#0091;cirw&#0093;
+98-02-14 fastfind: add FIND_ICASE to ignore case
+	 tmdate,tmgoff: handle (+|-)hh&#0091;&#0091;:&#0093;mm&#0091;&#0091;:&#0093;ss&#0093;&#0093; absolute timezone
+	 tmdate: `&lt;n&gt; &lt;part&gt;' now assumes `next &lt;n&gt; &lt;part&gt;' instead of `this'
+	 tmfix: fix leap year bug that forgot to add 1900
+	 proc: add PROC_ZOMBIE
+98-02-06 strmatch() char class range bug fix
+	 regex char class range bug fix
+98-01-23 _WIN32: changed the #if logic again to accomodate _GNUC_
+	 mnt: grab the mount options too
+	 ast_std.h: hide getopt,getsubopt from stdlib.h
+	 features/limits.c: add gnu guard macros to avoid limits.h recursion
+	 features/mode.c: include "limits.h" instead of "FEATURE/limits.lcl"
+98-01-11 sfio.h: use Astlong_t, move Sfio_t Sfdisc_t typedef to top for stdio.h
+	 sfhdr.h: #undef SETLOCAL for hpux
+	 sfvprintf,sfvscanf: %I*x for sizeof(int_arg)
+	 handle ftruncate64 and truncate64
+	 dtopen.c: __hppa dll needs Dtset Dtlist Dttree refs here
+97-12-18 fmtnum: add
+97-12-11 magic: handle sgi 64 bit core dumps
+97-12-07 pathtmp: add override for TMPPATH,TMPDIR and cycling
+97-11-11 tm: handle 0 return from gmtime(),localtime() (dos negative time_t)
+	 features/stdio: fix fflush() macro to do physical sync
+97-10-31 astconf PATH_RESOLVE is logical if 3d&amp;&amp;!std, metaphysical otherwise
+	 magic: fix #! mime bug
+	 tm: tmtime() now calls tmfix() and adjusts tm_isdst too=&gt;mtime() works
+97-10-11 dllfind,dlfcn: move to separate -ldll so -last can link static, duh
+	 Makefile,state.c: move forced header generation state.c =&gt; Makefile
+	 sfio: update including SF_WHOLE
+97-10-01 sfdostext: add \r=&gt; sfio discipline
+	 stropt: NiL table =&gt; p=name for all name=value
+97-08-11 pathtmp: check pid to note forks
+	 procopen: FD_CLOEXEC rfd &amp;&amp; wfd
+	 fts: fts_close() after fts_children() with no fts_read() now works
+97-07-17 error: sfsync(sfstdin,sfstdout,sfstderr) instead of sfsync(NiL)
+	 _sfcvinit: add sfio internal interface to base conversion tables
+	 strton: use _Sfcv* base conversion tables instead of sfsscanf()
+	 sfvscanf: use _Sfcv* base conversion tables
+	 mime: x- permutations now matched if exact fails
+	 mime: original- stripped from content-* headers
+	 tmdate: add yyyy-jjj, yyyy-mm-dd
+	 dllfind: add
+	 ccmapid: fix buf copy loop limit
+	 ccmapname,ccmapcpy: add
+	 sfstrtmp: add
+97-05-09 streval: fix up casts for pseudo-ansi cc
+	 features/types: use _ast_int_8 vars to verify support
+	 string/modedata: check for mvs.390 S_IFMT
+	 include/ast(_std).h: add #define __FILE_typedef
+	 magic: add ccode text check
+	 include/ftwalk.h: FTW_PATH=&gt;FTS_NOCHDIR to avoid FTS_AGAIN (duh)
+	 fts: clear status for FTS_AGAIN (fixes rm -r bug)
+	 mnt: add mvs openedition w_getmntent()
+	 sfhdr: _hdr_float &amp;&amp; &lt;float.h&gt; for correct MAXDOUBLE
+	 vmalloc/vmbest: if _std_malloc then use malloc()/free() not sbrk()
+	 remove: check _std_remove
+	 procopen: handle pio&#0091;{0,1}&#0093;=={0,1}
+	 setenviron,features/uinstd: test for mvs.390 dll environ hacks
+96-12-25 &lt;sfio_p.h&gt; -&gt; &lt;ast_common.h&gt;
+	 __EXTERN__(type,object)
+	 __DEFINE__(type,object,value)
+	 magic: check strings in !CC_NATIVE code set too
+	 system: cmd==0 means check for shell access (xopen)
+	 sfhdr.h: fix sfrsrv prototype
+	 add __libc_malloc etc for gnu/linux
+	 astconf(NiL,path,name) == astconf(name,path,NiL) + no liberror
+	 fts_open: if toplist() stat fails return 0
+	 ftwalk: handle fts_open()==0 via one phony userf() call
+	 sfmode: S_ISFIFO default is SF_SHARE=0
+	 features/lib: _WIN32 _lib_vfork=1 by default
+	 unsigned&lt;0 comparison and other fixes via sgi.mips4 cc
+	 stk.c: use &lt;align.h&gt; ALIGN_BOUND for stkalloc()
+	 features/lib,vfork: uwin fix
+	 ast_std.h: fix strto&#0091;u&#0093;ll prototypes with features/types _ast_int_8
+	 getsubopt: add for xopen 4.2 compatibility
+	 drop function __IMPORT__
+	 magic: more magic
+	 change #define FILE from Sfio_t to struct _sfio_s
+	 state.c: add generated includes that may be hit by std for MAM
+	 bytesex: forgot about sizeof(long)=&gt;7; could we fix the name too?
+	 vmalloc.h: fix vmnewof() definition
+	 sfio.h,stdio.h,ast_common.h: pollution cleanup
+	 magic.c: add | op for switch
+	 Makefile: stdio.h was on both HEADERSRC and HEADERGEN -- don't do that
+	 drop pp:notice to get &lt;sfio.h&gt; ... &lt;ast.h&gt; to work 
+	 regex: add &#0091;&#0091;:&lt;:&#0093;&#0093;==\&lt; and &#0091;&#0091;:&gt;:&#0093;&#0093;==\&gt; for bsd compat
+	 mime.c: ignore X-* headers while scanning for Content-*
+	 magic.c: check for negative indirect offsets
+	 magic.tab: fix dos entry that generated negative indirect offsets
+	 vmalloc.h: add vmstrdup() prototype
+	 hash.h: add hashgetbucket() macro
+	 magic.c: MAGIFILE is now a : file list
+	 mnt.c: another 4.4 bsd fix -- users must include &lt;sys/crap.h&gt;
+	 common: fix _WIN32 chicken&amp;egg with va_copy
+	 sfio: forgot to set f-&gt;val along with _Sfi in sfexcept() 
+	 Makefile: add mini target for uwin libmini.a
+	 sfcvt.c: workaround for flaky long double optimizers
+	 features/common: fix to work with va_list==void*
+	 regexec.c: fix REG_STARTEND subexpression offsets
+	 strmatch.c: don't forget &lt;wctype.h&gt;
+	 regrexec.c: fix REG_INVERT end boundary bug that missed last record
+	 astconf.c: notify(0,0,"a=b") called for each setenviron("a=b")
+	 pathcanon.c: check astconf(PATH_LEADING_SLASHES) to preserve //*
+96-11-28 _LARGEFILE64_SOURCE by default if possible: NOTE: assumes xopen
+	 regerror: fix for xopen
+	 getopt: fix for xopen
+	 magic: add ciao virtual database
+	 astconf: posix/strict/xopen implies "standard" conformance
+	 fs3d.h: hide mount prototype
+	 ast_std.h,mnt.c,features/fs: ncr port tweaks
+96-10-31 version 5.0
+	 add strtoll() strtoull()
+	 sfkeyprintf: upgrade to int_max args
+	 ast.h: add ssizeof() to work around unsigned botch
+	 conf.sh: add shell actions to conf.tab
+	 _DLL*: drop for _BLD_&lt;lib&gt; + __EXPORT__ + __IMPORT__
+	 sfio,cdt,vmalloc: kpv update
+96-10-11 &lt;ccode.h&gt;: add character code map support
+	 procclose: return shell style exit status
+	 features/fs: pun statvfs.f_basetype to statvfs.f_reserved7 for mvs
+	 uwin: add subdir for uwin additions
+	 ast_std.h: swab() is from &lt;stdlib.h&gt;
+	 sfio.h: &lt;ast_std.h&gt; if _PACKAGE_ast
+	 magic.tab: add mips&#0091;1-4&#0093;, 64-bit
+	 port tweaks for sol.sun4 and sun4
+96-09-06 strerror: add
+	 fmterror: uses strerror
+	 str*search: use sfiso646() order
+	 strpsearch: add
+	 magic: add Magic_t.mime mime type return for magictype()
+	 mime.h: add
+	 strton: use sfsscanf()
+	 strperm: factor in umask() if no who
+	 pathtmp: add TMPPATH check
+	 libevent: add
+	 magic: add discipline to magicopen()
+	 mime: add discipline to mimeopen()
+96-08-31 regex: fix BM fail table generator
+96-08-11 mntread: fix mnt.type for SCO variant
+	 conf.tab: add SCO KERNEL_* sysconf() vars
+	 fastfind: add findwrite(), fix findread() FF_OFF omission
+	 ftwalk: reimplement on top of fts
+	 fnmatch,re_comp,regexp: reimplement on top of regex
+	 basename,dirname,fmtmsg,fts,ftw,getdate,getsubopt,glob: add
+	 hsearch,nftw,realpath,strftime,strptime,swab,tempnam: add
+	 tsearch,wordexp: add
+	 getcwd: cache last path for easy test
+96-07-17 error: sfsync(NiL) ... write ... sfsync(sfstderr)
+	 astconf: handle readonly *(DEV|DIR) vars
+96-04-01 swapop: fix stupid return value bug
+	 features/int.c: fix int_swap generation bug
+	 regnexec,regrexec: fix unsigned underflow init error
+	 ls.h: fix iblocks() to be in units of LS_BLOCKSIZE
+96-02-29 magic: space before function is definition with no call
+	 hash: drop hash_info from public interface
+	 hash: OBSOLETE hashlast()
+	 hash: add Hash_root_t.Hash_last_t to public interface
+	 add strsearch() and strnsearch() to complement strlook()
+	 add hashkey.h for keyword-&gt;long hash
+	 pathpath: pathpath(0,0,"",0) disables $0 $_ $PWD relative search
+	 sfio: sfstrtod+sfhdr update
+	 regex: fix REG_LENIENT to map BRE \&#0091;+?|&#0093; to ERE &#0091;+?|&#0093;
+	 change _std_malloc iffe test so it doesn't hang on alpha
+	 sfhdr.h: features/sfio generates _lib_cvt instead of _i386_cvt
+	 ast_hdr.h: add va_copy(a,b) to copy va_list b to a
+	 getopt: fix stupid getopt() -&gt; optget() bug
+	 sfvprintf: %h? now downcasts
+	 regex: handle strto?l() errno in regcomp()
+	 sfstrtod: _Sfstrtod_already_defined -&gt; _STUB_sfstrtod
+	 ast_std.h: hide valloc() and ignore &lt;strings.h&gt;
+	 sfkeyprintf: pass phony va_list for '2'
+	 regex: change HIT var type from int to size_t in special()
+	 ast.h: add EXIT_STATUS(x) to convert wait() status to sh exit status
+96-02-14 regex: add _ to \&lt;...\&gt; isalnum test
+	 regex: fix BM inner loop breakout
+	 features/types: size_t is signed on some systems! =&gt; _ast_size_t
+	 sfio: sfrd discipline peek optimization
+	 vmalloc: vmalloc.h malloc family macro upgrade
+	 tokopen: fix newline bug for non-restore open
+	 sfio: no inline for gcc until it emits for -g too
+96-02-12 sfio: internal upgrade
+96-02-09 regex: Boyer-Moore boundary fix
+	 vmalloc: snarf latest
+96-02-06 regex: add regrecord() and regrexec() for Boyer-Moore record filtering
+	 regex: rearrange regnexec() args to match buffer,count arg style
+96-01-31 stk: add STK_NULL to stk.h and stk.c
+	 regex: privatize regex.h and fix min re length computation
+	 workaround lazy strdup() implementations in features/lib _std_malloc
+	 fix stkclose() to free(stream) -- purify missed because of sfio links
+	 unused var cleanup
+	 port/mnt.c must include &lt;ls.h&gt; to get &lt;ast_fs.h&gt;
+	 add SF_FINAL to sfio and stk
+	 sfio reads now on natural block boundaries
+	 add #!!! &lt;level&gt; &lt;message&gt; !!! to tokline()
+	 add REX_BM pre-filter to regcomp/regnexec
+96-01-22 add regcomp env.paren overflow checks
+96-01-11 add Doug McIlroy's regex (converted to C from C++ by gsf)
+	 AT&amp;T Research now
+	 sfgetr optimization
+	 regex buglets
+96-01-05 tweak magic.tab for win32
+95-12-25 add !(...) -&gt; (...)! to fmtre()
+	 nt tweaks -- functions with no header proto must be defined extern
+95-11-24 version 4.1
+	 add mnt.h mntopen mntread mntclose
+	 convert fmtfs to mnt.h
+	 add RE_LEFTANCHOR and RE_RIGHTANCHOR
+	 gcc inlines must also have global library function instantiation!
+	 add hashview()
+	 fix strtape() internal buffer flow
+	 fix mntread() fs/dir transposition for uts mnttab
+95-10-31 change features/unistd.c includes to break limits-param cycle
+	 add cdt from kpv
+	 sfio snarf from kpv
+	 add &#0091;ht&#0093;search for _WIN32
+95-10-11 clarify PARANOID pathcheck() warning
+	 fix procopen() LIB_SPAWN environ bug with setenviron() cache
+	 fix setenviron() bug that forgot to reset environ if == 0
+	 add %Z '&nbsp;' output format to sfkeyprintf()
+	 sfio snarf for sfvprintf fix
+	 allow multiple hashscan() with scope caveat
+	 add comp/fakelink.h to synthesize a few symlink text patterns
+	 add !&lt;xxx&gt; magic to misc/magic.tab
+	 add FTW_TOP to inhibit recursion (for ftw side effects on top level)
+	 add memfatal() common malloc fatal exception message
+	 add dos \rtest to misc/magic.c/cklang()
+	 sftmp() O_EXCL+random to avoid collisions
+	 pathtemp() uses sftmp() randomizing
+	 features/fs uses SF_APPENDWR
+	 sftmp() uses pathtemp() -- don't worry, its not circular
+	 a few more _WIN32 compatibility additions
+	 realloc fixed to use VM_RSCOPY|VM_RSMOVE instead of obsolete 1
+	 add hashlook(tab, oldname, HASH_RENAME, newname)
+	 a few more tweaks to satisfy port warnings
+	 add _SFIO_INLINE_PRIVATE to provide real function too
+	 fix &lt;dirent.h&gt; installation test
+	 oops object / shared library compat with _sfgetl2 _sfgetu2
+95-09-11 add getopt() compatibility
+	 add fstat,lstat,mknod,stat fixes for _x versions in sys/stat.h
+	 add getconf CONFORMANCE - posix for things that aren't ast default
+	 sfio_t.h: #ifndef _SFIO_H #include "sfio.h" #endif
+	 snarf vmalloc from kpv
+95-08-11 fix malloc bug in magic
+	 update linux and bsd 386 magic entries
+	 error_info.auxilliary returns new level, |=ERROR_OUTPUT if msg done
+	 drop fnmatch from strmatch for sparc (solaris) until it collates
+95-07-17 fix port/astconf universe initialization
+	 fix misc/optget opt_info.nopt initialization
+	 drop tmset() TZ=... because it only worked when TZ=... was ignored
+95-05-09 mongo &lt;ast.h&gt; namespace cleanup
+	 drop &gt; 2 year old obsolete interfaces
+	 sfvprintf.c fix for (char:8 short:16 int:32 long:64) architectures
+	 TMP_MAX back into conf.tab
+	 pathbin() and pathshell() now use astconf()
+	 fix pathtemp() to not cache getenv("TMPDIR")
+	 fix ftwalk() metaphysical to handle non-dirs too
+	 initialize *_info = { 0 }; for ancient ld semantics (NeXT)
+	 fix magic() to do vmfree()
+	 astconf(X_OK) must prefix lines with "getconf"
+	 use &lt;wchar.h&gt; and wctype in strmatch() if available
+	 _lib_utime_now checks utime(path,0)
+	 _lib_poll_notimer checks poll(x,0,timeout)
+	 add another _lib_utime_now check to port/touch.c
+	 fix dd_buf cast in dir/opendir.c
+	 split getconf.h into conftab.h and conftab.c for :READONLY:
+	 use mbtowc() only if MB_LEN_MAX&gt;1
+	 sfio char* -&gt; Void_t* cleanup
+	 handle old syntax in misc/magic.c
+	 sigdata.c holds readonly signal strings
+	 pathcheck() does AT&amp;T checks for tools matching PARANOID - yuk
+	 unused var cleanup
+	 deprecate hash_info in favor of hashlast()
+	 fix bad conf.sh ksh integer interactions
+	 dll cleanup
+	 magic.c falls back to malloc for now
+	 add environ to &lt;ast.h&gt; -- C library global data syms are *RESERVED*
+	 sfhdr.h memccpy(1,2,3,size_t) prototype
+95-04-01 version 4.0
+	 convert to vmalloc
+	 allow sigcritical() nesting mismatch to work around vfork() bug
+	 add strexpr() primitive for streval() with user handle (like ftwalk)
+	 add &lt;magic.h&gt; and magic.c file command magic interface
+	 update magic mail message entry
+	 fix keyprintf() invisible char count nesting bug
+	 add sfstrnew(SF_READ|SF_WRITE) for alternate sfstropen() modes
+	 sfstrnew(SF_READ) but reading requires sfseek(), sfreserve()
+	 add conf.tab and conf.sh to nail C/POSIX limits/unistd macros
+	 add getconf() string interface to *conf*
+	 _DLL_INTERMEDIATE_DATA for systems that require indirect globals
+	 _DLL for building shared libraries with _DLL_INTERMEDIATE_DATA
+	 vecfile() restricted to S_ISREG()
+	 add spawnveg() for job control
+	 convert procopen() PROC_PGRP(id) to spawnveg()
+	 fmterror() returns error text given errno (strerror() does same)
+	 fmtsignal() returns signal text given errno (strsignal() does same)
+	 {sig_name,sig_text,SIG_MAX} -&gt; sig_info.{name,text,sigmax}
+	 liberror("",...) omits &#0091;%s library&#0093; prefix
+	 update features/signal.c table
+	 add vmdisc() and change vmnewof() to use vmresize()
+	 fix conf.sh to allow refs to previously defined limits
+	 fix undefined entries in getconf()
+	 magic data in magic.tab
+	 fix stropt() pointer cast
+	 vmalloc() exception handler replaces nomalloc()
+	 merge sigdata.c into fmtsignal.c -- sun link needs function w/ data!
+	 sftmp() bug fix
+	 drop local &lt;unistd.h&gt; even with _POSIX_SOURCE
+	 fix vmstrdup() macro arg miscount
+	 fix conf.sh to handle enum'd symbolic constants in unistd.h
+	 drop malloc() et.al. prototypes from vmalloc.h
+	 fix sfvprintf() %d argument reference
+	 add OSF/1 AES symbol(s) to conf.tab
+	 determine standards prefix from conf.tab
+	 add _CS_SHELL to conf.tab
+	 getpath() default is confstr(_CS_PATH)
+	 getshell() default is confstr(_CS_SHELL)
+	 unify keyprintf user function args (should have learned by now!)
+	 add quad type to magic
+	 add astfeature() to unify universe style dynamic features
+	 add ftwflags() to determine FTW_* flags from astfeature()
+95-03-11 fix stropt() to not modify its *const* arg
+	 handle "'&nbsp;quotes and chresc() in stropt() values
+	 , treated like :space: between stropt() options
+	 fix procopen() fd dup to ignore self-dups
+	 add library id&#0091;&#0093; to misc/state.c
+	 add ftwalk(FTW_METAPHYSICAL) for posix -H
+	 sfvprintf() now handles balanced () in %()
+	 add tmfmt() with buffer size check to replace tmform()
+	 add fmttime() calling tmfmt() to fit fmt*() mold
+	 add &lt;keyprintf.h&gt; and keyprintf() to support %(...)? in commands
+	 add Hash_table_t for size==0 in stropt()
+	 add EXTTYPE extended header to tar.h
+95-02-14 sfmove() buffer size overflow fix
+	 add _SFSTDIO_H to sfio.h
+	 rename setenv() to setenviron() -- posix finally decided
+	 rename &lt;option.h&gt; opt_* to opt_info.*
+	 update features/unistd.c for _SC_* and _PC_* posix additions
+95-01-19 (char*)uchar cast in fmtesc()
+	 fix hash bucket memory leak in hashlook() &#0091;via John Mocenigo&#0093;
+	 update strings/strtape()
+	 fix optget()/optjoin() to handle leading +
+	 add ALIGN_ prefix to &lt;align.h&gt; identifiers
+95-01-11 change tm/*.c tmset(0) to tmset(tm_info.zone) to keep user setting
+	 fix tmform() %Z null pointer dereference
+95-01-01 add this RELEASE file
+	 fix strperm() to properly handle "644 file"
+	 fix tokline() to return last '&nbsp;' terminated line in string
+	 fix tokscan() to properly handle \\n splice
+	 add fmtesc() to complement stresc()
+	 add LS_NUMBER to fmtls()
+	 drop spurious optusage() ' '
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcmd changes">libcmd changes</A></H3></CENTER></FONT></FONT>
+
+00-12-01 cut: multibyte support
+00-10-31 mkdir: handle races by checking EEXIST
+00-09-20 cp: copy argv to stack before modifying in place
+00-05-18 add setlocale(LC_ALL,"")
+00-04-30 join: drop wierd opt_info.argv reference
+00-03-17 expr: add == operator -- duh
+	 cp,ln,mv: delay pathcanon() on destination to verify `cp a b/.'
+	 getconf: use astgetconf for proper message control
+	 ERROR_translate: dictionary update
+00-03-08 tail: handle multiple -f files
+00-03-07 fmt: add
+00-03-07 dirname: handle PATH_LEADING_SLASHES as documented
+	 tail: accept + options
+00-02-14 chmod: --ignore-umask to ignore umask(2) in symbolic expressions
+	 chmod,chgrp,cp: use FTS_NOSEEDOTDIR for correct path construction
+	 cat: fix -n (was ignored, wow)
+00-01-27 getconf: add "-a" and "-v spec" for sol7.* compatibility
+99-09-09 join: fix -j1 vs. -j 1, add --ignorecase
+99-06-22 paste: defualt delim in writable string
+99-06-16 cat: fix --dos-ouput typo
+99-06-11 cp: tighten chown() diagnostics
+99-06-08 expr: nothing for NULL string bug fix
+99-05-21 paste: fix missing newline columnize bug
+99-05-20 mv: do not check for `mv foo foo' since rename() handles it
+99-05-01 cmp,comm,cp/mv/ln,expr,fold,getconf,head: long options
+	 join,logname,paste,pathchk,tail,tee: long options
+99-04-10 uname: long options, stdize -a
+	 chmod,head,tail,rev: long options
+	 cut: long options, pass regression test 02
+99-04-07 cat: long options, fix O_TEXT modes
+99-01-11 tail: fix +n
+	 join: another ggs/psm bug
+	 join: all 1 and/or 2 to be unseekable
+99-01-01 cp: fix -p
+	 chmod: drop -l option because of clash with l (lock) mode
+98-12-25 cat: add -T to sfopen(,,"rt")
+98-11-11 chgrp,chmod: cannot open file stream =&gt; not found
+	 join: fix another ggs/psm bug; thanks guys
+98-10-20 cp: fix cp -rp to update dir times too
+98-09-22 join: fix ggs null field bug
+98-08-11 join: fix last regression test bug
+98-05-29 join: add jp-&gt;common to handle boundary conditions
+98-03-11 cat,cp,rev,tee: fix sfmove() error checks
+98-03-01 join: fix bug that emitted records more than once after eof
+	 cp: fix sfmove() error check
+98-02-14 cp: -R physical, -&#0091;HLP&#0093;, -r getconf(PATH_RESOLVE)
+98-01-11 cp: check sfclose() return value
+98-01-07 chown,chgrp,chmod: use fts for -R
+	 mkdir: fix -p default mode
+97-12-07 mkdir: fix umask() reset
+97-11-11 chown,chgrp: proper interpretation of -h,-l for lchown()
+	 chown,chgrp: only chown() if uid or gid change
+97-10-31 mkdir: do umask right
+97-08-11 cmdinit: clear opt_info.index to allow multiple calls
+	 cp,ln,mv: add
+97-07-17 join: fix a few more -a bugs
+97-05-31 expr: optget() only if CONFORMANCE==standard
+97-04-01 join: fix a few bugs that make it work!
+96-12-25 head: sfset(sfstdin,SF_SHARE,1)
+	 Makefile: add -last to cmd lib list
+	 drop function __IMPORT__
+96-08-11 tail: check for truncated file and rewind for -f
+96-04-08 update &lt;cmd.h&gt;
+96-02-29 uname: -a like std, -l for everything
+	 id: add -a (default)
+96-02-14 wc: speed up inner loop newline breakout
+96-01-30 unused var cleanup
+96-01-01 AT&amp;T Research now
+	 pathchk: handle getcwd(0,0) error
+	 expr: switch to &lt;regex.h&gt;
+95-11-11 add expr.c
+	 fix cut exit code and -s optimization
+95-10-11 add extern b_* to cmd.h
+	 add void* context 3rd arg to b_main()
+95-05-09 add getconf
+	 cat -u avoids mmap
+	 add chown|chgrp -m uid|gid map file
+	 add chown|chgrp -P for systems with lchown(2)
+	 chown|chgrp -P =&gt; lstat() too!
+	 chmod|chown|chgrp -HLP
+95-04-01 version 1.2
+	 add rmdir
+95-02-14 fix mkdir -p symlink bug
+	 fix mkdir '/' skip bug that went one too far
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libdll changes">libdll changes</A></H3></CENTER></FONT></FONT>
+
+00-01-26 dlllook: add -- dlsym() with `_' weak prefix fallback
+99-04-01 features/dll: drop &lt;stdio.h&gt; -- iffe protos printf
+99-03-19 static=1 for all but win32.*
+98-06-01 dllfind: fix version search
+98-03-11 features/dll: probe for _DLL_RLD_SYM
+98-03-01 dllnext: fix to work!
+98-01-23 -ldl test moved to lib0ast
+98-01-11 update for astconf("LIBPATH")
+	 add dllnext(flags) to uncover next layer
+	 dllfind() and dllnext() in separate files (for 3d)
+97-10-11 move from libast so libast can link static
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libexpr changes">libexpr changes</A></H3></CENTER></FONT></FONT>
+
+99-09-22 exparse.y,exeval.c: add for(ID&#0091;DYNAMIC&#0093;)
+	 exparse.y: ref&#0091;i&#0093;.ref
+98-12-25 excc: fmtesq() to handle 
+98-11-11 expr.h: add disc matchf for strmatch
+	 exlib.h: fix exeval string mem leak with Expr_t.ve
+98-09-11 expr.h: move Exdata_t to last public element of Exnode_t
+98-07-17 label: return type INTEGER
+	 add exdump() for debugging
+98-05-22 STRING * STRING == common chars by position, ' ' for diff
+98-05-11 add function args; NOTE: auto's still global
+98-04-01 sfprintf Sffmt_t update
+98-02-14 fix aggressive freenode
+98-02-04 finally drop exstr*() for vmalloc regions
+97-12-07 preprint adjusts l count for %&#0091;doux&#0093;
+97-10-31 tweak INTEGER &lt;=&gt; auto conversions
+97-10-01 INTEGER is now Sflong_t
+97-08-11 add pathfind()
+	 add '$' to identifier set
+	 eliminate S2B at PROCEDURE level
+97-07-17 discipline interface (incompatible but only tw,cql affected)
+	 add excc() to generate C expression code
+	 drop exinclude()
+	 add printf base param (%width.precision.base&lt;format&gt;)
+96-12-25 rearrange exparse.y to keep yacc and bison happy
+95-08-11 drop exseek(), add exstatement(), exrewind()
+	 tune excontext()
+95-05-09 drop %token for tokens in %binary,%left,%right to avoid redef errors
+	 add EX_CALL and EX_SCALAR to refval|getval|setval elt arg
+	 excomp with sp==0 and fp==0 resumes from previous context
+	 fix exseek()
+	 loosen excast() restrictions
+	 fix Oexparse.&#0091;ch&#0093; generation
+95-04-01 add solaris yacc bogus yyact index makefile workaround
+	 fix switch newof() size=0!
+95-03-19 fix exstore() alignment bug
+95-01-11 prepare extoken.c for TRACE_lex==debug-level
+	 add exseek() for backup
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="librecsort changes">librecsort changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 recsort.h: _RSHDR_H =&gt; _BLD_recsort; should have been done years ago
+00-08-31 rskey.c: fix code() buffer off by one (too far)
+00-03-17 rskey.c: consult RLIMIT_DATA for size limits
+00-01-25 rskey.c: win32.i386 optimizer generates bad code for key_n_code
+99-11-19 rskeylist.c: add usage
+99-07-28 rskey.c: factor number of key fields into rs.disc.key
+99-03-03 recsort.h: add RSKEYDISC() to get Rskey_t.keydisc from Rsdisc_t*
+98-08-11 add rsmerge() write error detection
+96-12-25 add (ulong) for alpha 64 bit &lt;&lt; bug (ahem..correct stdc interpretation)
+	 add (int) for unsigned char subtracts
+	 drop function __IMPORT__
+	 use vmalloc() for all allocations
+	 we're getting sick of bsd: &lt;stdlib.h&gt; has a radixsort() prototype!
+	 unroll rs-rasp.c for the hp.pa compiler; don't trust it!
+96-10-31 sfio,dll update
+	 drop MAXFIELD restriction by converting to linked list
+	 add -k*a to accumulate fields from dup keys
+96-10-22 K&amp;R cast cleanup
+96-10-17 iffe test for sizeof(long)==8
+96-10-15 oops -- regression test bug let rswrite() bug through
+96-10-11 all regression tests pass for all methods
+96-10-01 rskey discipline and eventf; remove libast dependencies
+96-09-20 rskey(kp,s,obsolete)
+96-09-18 first working version with -lsort (ok, so -c and -m don't work yet)
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libuu changes">libuu changes</A></H3></CENTER></FONT></FONT>
+
+00-03-04 uulib: add posix decode size check
+98-12-25 uu_encode: fix dp-&gt;fill usage
+98-11-11 uulib: add binhex encode
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libbz changes">libbz changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 bzlib.h: add _PACKAGE_ast checks
+99-09-11 sfdcbzip: return &gt;0 if discipline pushed
+99-07-17 sfdcbzip: don't free disc on SF_CLOSE
+99-03-17 split library from command, sfdcbzip.&#0091;ch&#0093;
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libz changes">libz changes</A></H3></CENTER></FONT></FONT>
+
+00-09-11 gzio: don't set verified=1 in check_header() for concatenation
+99-11-19 gzio: add missing _PACKAGE_ast
+99-09-11 sfdcgzip,sfdclzw: return 1 if discipline pushed
+99-08-11 gzio: fix gzread() z_err to keep Z_STREAM_END after check_header()
+99-07-17 sfdclzw: don't free disc on SF_CLOSE
+99-06-23 fix gzread/gzwrite to return -1 on error (fixes sfio disc loop)
+99-02-14 fix SFGZ_SETPOS to flush/sync for mode=='w' only
+99-02-04 add SF_CLOSE to output trailer before the underlying stream is closed!
+98-12-01 drop lzwWrite and lzwSeek in sfdclzw 
+98-11-01 pushed stream buffer size is SF_BUFSIZE
+98-10-01 add SFGZ_GETPOS and SFGZ_SETPOS
+98-03-19 sfgzip =&gt; sfdcgzip
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcoshell changes">libcoshell changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 cokill: killjob =&gt; cokilljob, killshell =&gt; cokillshell
+00-12-18 coinit: CO_OSH ? "${!-$$}" : "${!:-$$}"
+00-10-25 codata: $ZSH_VERSION is not ksh
+00-02-14 procrun,system: system(3) returns wait() status (not shell status)
+99-11-19 co*: add CO_OSH for bsdi lack of times(1)
+	 coexec: CO_IGNORE for all but real ksh
+98-06-22 coinit: quote cd path arg
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcs changes">libcs changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 cspoll: fix getmsg() flag arg
+	 csaddr: fix local host addr initialization
+00-06-01 csopen: handle dynamic ip assignment underfoot
+00-05-11 csopen: handle /dev/tcp/local/9876/FOO/other
+00-05-09 cssfd: CS_POLL_WRITE implies O_NONBLOCK
+00-02-14 cschallenge(): add stat() to verify touch()
+00-02-03 features/lib: add sys/types.h to htons etc. header refs
+00-01-25 genlocal: use package instead of hostinfo
+99-10-07 csbind: NODELAY for CS_ADDR_NOW only
+99-09-22 cs*: add CS_MNT_TAIL for multi-char mount files
+	 css: _UWIN workaround for st_ino verification
+99-07-17 csaddr: clear more state-&gt;flags bits to avoid prev csopen() carryover
+99-05-20 msg*: handle f_basetype and f_fsid for redhat 6.0 linux -- boo
+99-05-13 css: fix disc.wakeup logic
+	 cspoll: add debug=6 poll trace
+99-04-23 csaddr: check for 127.0.0.&#0091;01&#0093; from hostname lookup == local
+98-06-29 cs.h: add Cs == (&amp;cs)
+98-06-03 csserve: fix SIGCHLD exit bug
+98-02-14 csopen: add PROC_ZOMBIE for systems that don't fork() in csdaemon()
+97-11-27 csopen: /dev/tcp/*/inet.*/user for client inet.* authentication
+	 css.h: add CSS_AUTHENTICATE for server inet.* authentication
+97-11-11 csread: add CS_RESTART to restart on interrupt
+	 cslib: CS_AUTH_MODE for authentication file mode
+	 cs.h: drop CS_SVC_SERVICE, add CS_SVC_SUFFIX
+	 SERVICE.mk: executable name changed from server =&gt; `service'.svc
+	 csopen: rm CS_MOUNT_PROCESS if no connect and pid invalid
+97-07-17 add css.h, csserve() on top of css
+	 CS_INTERFACE=2 for thread safe state instead of global cs.*
+	 cspoll(CS_POLL_WRITE) events cleared on write
+	 csspoll(timeout,CSS_INTERRUPT|CSS_ERROR)
+	 cs.h,msg.h: fix dll import/export
+97-05-09 cslib.h: check _hdr_netdb,_hdr_netinet_in,_hdr_netinet_tcp
+	 features/lib: statvfs.f_fstr
+	 msglib.h: &lt;ast.h&gt; before "cs_lib.h"
+97-04-01 csport: htons() done too soon
+96-12-25 genlocal: add correct nslookup query
+	 fix sizeof(long)==4 assumptions
+	 install genlocal and genshare in $(INSTALLROOT)/lib/$(ID)
+96-02-29 use &lt;hashkey.h&gt;
+	 add csport()
+	 drop CS_MOUNT_*; use csvar(CS_VAR_*,trust) instead
+	 CS_VAR_PROXY ($CS_MOUNT_PROXY) names proxy connect stream
+	 csopen() attempts proxy open on local failure
+	 hold CS_PROC_FD_TST cssend() fds until next cssend()
+	 csread(CS_LINE) really means 1 line
+	 fix cslocal() and csopen() fdp initiate timing bug
+96-01-31 add warning to local rather than generate on install
+96-01-22 no &lt;sys/uio.h&gt; on linux (defined(MAX_IOVEC))
+95-11-11 trap 127.0.0.&#0091;01&#0093; local address alias in cspath() and csntoa()
+95-10-31 CS_MNT_OTHER '.' -&gt; '#' to placate NT (trailing . ignored -- thanks)
+95-10-11 export -&gt; coexport
+	 add dirsize() to cslib.h
+	 check _mem_d_reclen_dirent for d_reclen
+95-08-11 (done)(handle,EXIT_TERM(signal)) called on csserve() interrupt
+		0 return ignores signal
+	 csserve() now creates local auth dir if not there, duh
+	 fix genlocal hostinfo timeout
+95-07-17 fix remote auth off by one error
+95-05-09 add linux /proc/&lt;pid&gt;/fd/&lt;fd&gt; to cssend()-csrecv()
+	 add bsd4.4 msghdr.msg_accrights -&gt; msghdr.msg_control mods
+	 bsd4.4 thinks S_ISFIFO() and S_ISSOCK() are the same!
+	 features/cs.c now uses sfio
+95-04-01 convert genlocal.sh to hostinfo
+95-03-19 bsd4.4 stole devname(), so use devpath() in cspath()
+94-12-15 csinfo("-",0) gets standard info
+
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libpp changes">libpp changes</A></H3></CENTER></FONT></FONT>
+
+01-01-01 pp:headerexpand: space ok if no IN_MACRO
+	 ppcall: hide if IN_FILE|IN_MACRO|IN_EXPAND
+	 pplex: don't complain about ^L or ^Z as last char in file
+	 ppsearch: fix #include &lt;.../foo.h&gt; loop
+	 ppcontrol: manulally increment IN_RESCAN error_info.line
+00-12-25 add EXPOSE to expose hidden macros (for #import ...)
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+	 pp.probe: filter out invalid symbols for predefined macro scan, duh
+	 pp:headerexpand: limit expansion to IN_MACRO
+00-10-31 __STDC__==0 if HOSTED &amp;&amp; _UWIN
+00-10-26 pplib.h: change SEEK_SET to O_RDONLY for aix
+00-10-17 pp.probe: __IMPORT__ =&gt; __STDPP__IMPORT__
+00-09-18 add __FUNCTION__=#(FUNCTION), #define &lt;a b&gt; c
+	 pp.probe: add probe_longlong
+	 probe.win32: add #define &lt;long long&gt;
+00-09-11 add pp:noproto (NOPROTO pp.option) to disable ppproto()
+00-09-01 ppproto: fix buffer slide bug
+00-08-11 pplb.h: check for &lt;unistd.h&gt; already included for PROTOMAIN
+	 pragma: add pp:pragmaexpand to expand pragma args
+	 ppcontrol: always disable pp:* pragma expansion
+	 ppcall: fix pp:hide buffer clash
+00-06-01 pplex: fix "\\U" and "\\u"
+00-05-22 ppsearch: fix uwin #include &lt;C:/foo/bar.h&gt;
+00-05-16 probe.win32: update reserved word list
+00-05-09 ppcontrol: fix C++ macro &gt;+&gt; invalid fuse
+	 ppcontrol: 'macro' expansion only for COMPATIBILITY | TRANSITION
+	 c9x: up to date with proposed standard
+00-04-01 pp.tab: add allpossible and ALLPOSSIBLE
+	 ppmacref: fix ref inside literal catenation
+00-02-14 pppopen(): general comments with "bme" (begin middle end) string
+00-01-11 pp.probe: hosttype now in C.probe
+99-11-19 is&#0091;a-z&#0093;*( =&gt; ppis&#0091;a-z&#0093;*(
+	 ppproto: "..." &#0091;A-Z_&#0093;+ "..." ignores &#0091;A-Z_&#0093;+ if PROTOMAIN
+99-11-11 ppproto: use astlicense()
+99-10-31 ppproto: add PROTO_SHARP, update license parse
+	 pplex: fix some MARK bugs seen by #define X "A B <SMALL>&lt;<A href=mailto:C@D>C@D</A>&gt;</SMALL>"
+99-10-01 add pp:stringsplit for "...\\n..." =&gt; "..."..."
+	 add pp:lineid to match PP_LINEID
+99-07-17 ppbuiltin: fix getline() canon spacing for numbers
+	 ppsearch: fix FILEDEPS not found \\n print
+	 pplex: fix spurious FILEDEPS '.' empty character constant message
+	 ppargs: fix usage error call and error_info.id default value
+	 ppproto: fix up copyright notice for ksh93 style .author file
+	 ppproto: check if notice text if file path
+99-06-02 ppproto: add __MANGLE_package_DATA__ &amp; __MANGLE_package_FUNC__
+99-05-26 ppcontrol: all pragmas but prototyped need pp:
+99-05-25 ppargs: long options
+99-05-22 ppproto: changes for full ast vs. PROTO_STANDALONE
+99-05-09 ppinput: add #pragma pp:native and (pp.option&amp;NATIVE) for native paths
+99-04-22 ppproto: finish type=open notice
+99-02-11 #define __STDC__ #(STDC); demote __STDC__ to 0 for HOSTED (thanks sun)
+99-02-04 pplex: joined strings separated by \\\n
+99-01-11 probe.win32: add _UWIN predef
+98-10-20 pplex: a few more (HOSTED|RELAX) checks
+	 -D:preserve throws a bunch of stuff -- great for imake (yuk)
+98-05-11 pplex: fix "..." off by one line count
+98-02-14 ppcontrol: fix HEADEREXPAND missing NUL
+98-01-23 ppproto: add _GNUC_ to _WIN32 check
+	 ppfsm: don't optimize for hp.pa
+97-11-11 ppcontrol: fix recursive use of pp.hdrbuf for HEADEREXPAND
+97-10-31 ppmacref,pp.h: add ppmacref sum arg -- some parts assumed it!
+97-10-01 pplex: loosen HEADEREXPAND check
+97-08-11 pplex: fix COMPILE pplex() bug that did not reset NEWLINE for S_MACRO
+	 pplex: PP_PRESERVE does not pp.pragma &lt;token&gt; ... # &lt;pragma-stuff&gt;
+	 pp.def: add UWIN
+	 ppcall: fix macro actual arg error checks
+97-07-17 ppproto.c: C++ __INLINE__ prefixed with extern __MANGLE__
+	 ppop.c: fix PP_RESERVED T_* lookup
+97-05-09 pp.def: add MVS :architecture:
+	 ppfsm.c: change C_* pseudo codes to not clash with ebcdic
+	 pp.probe: fix stdc.$src sed script
+97-04-01 ppcontrol.c: fix tokop() for PP_RESERVED
+96-12-25 add ms #@ charize to complement # stringize
+	 pp.probe now detects preincludes
+	 ppproto: allow #ifdef'd function definions before {
+	 ppproto: NoN() is not a function
+	 pp.key,ppkey.h: add int64
+	 ppargs.c: fix -M{DGM}*
+96-12-06 add pp:headerexpand for ms that expands macros in expanded &lt;...&gt;
+96-10-31 a few more line sync tweaks for EDG C++
+96-10-11 fix pp:macref off by one for standalone pp (big suprise)
+96-10-01 -D:macref -D-L -&gt; #line (n-2)pragma pp:macref ...
+96-08-11 fix transition macro expansion
+	 compatibility 
+96-02-29 use &lt;hashkey.h&gt;
+	 drop ungetchr() in ppcall that modified macro values
+	 tighten the DEBUG PANIC case in ppcontrol.c
+	 unify #architecture() and #machine() probe
+	 add POSIX,WIN32,X86 to pp.sym
+	 tweak pp.probe
+96-02-14 pp:noallmultiple works on hosted files too
+	 fix #define /* EOF loop
+96-01-31 fix ## as arg to stringize macro to have ## value, not #
+	 add nonstopux and SYSTYPE_SVR4 to pp.def
+96-01-01 AT&amp;T Research now
+	 fix catliteral line sync line number bug
+	 ppproto() converts non-directive &lt;num&gt;u to (unsigned)&lt;num&gt;
+	 switch to &lt;regex.h&gt;
+95-10-31 fix PP_COMPILE PP_TRANSITION bug that didn't allow space before #
+	 fix PP_TRANSITION wline in definition complaint
+95-10-11 fix ppproto() PROTO_PLUSPLUS bug
+	 change ignored pp.incref PP_SYNC_POP to PP_SYNC_IGNORE
+	 add PP_PEDANTIC to handle gnu oversights (can't beat em ...)
+	 add memfatal() call
+	 relax newline in quote semantics
+	 proto inline -&gt; __INLINE__
+	 fix __INLINE__ proto def for __GCC__&gt;=2
+95-08-11 pp:preserve for easel (aka IFS) and imake
+	 fix pp:reguard ## macro output
+	 fix MARK PANIC with CATLITERAL
+	 PP_INPUT *.(s|S|as|AS|asm|ASM) implies pp:nocatliteral pp:spaceout
+	 ppargs() can't use isid() until after FSM_INIT
+	 -D#... for assert, -D%... for directives
+	 __STRICT_ANSI__ &amp;&amp; __GNUC__ requires -pedantic for PP_STRICT
+	 #include &lt;.../x&gt; for include_next
+95-05-09 fix tokop() bug that concatenated adjacent strings
+	 don't concatenate directive string literals in proto
+	 split pp.mode into pp.mode and pp.option
+	 restrict pp.probe hostinfo output to the first token
+	 fix EOB/EOF pplex() nonterminating loop
+	 unused var cleanup
+	 add pp:reguard to emit #define and #undef (for C++ templates)
+	 add a few ppproto '\r's for NT
+	 fix T_BUILTIN ppsymbol -&gt; ppsymkey pun
+	 fix pp:stringspan `#define x "' hang
+95-04-01 fix pp:hide for macros defined before the hide
+	 fix pp:map getline space canonicalization
+	 fix proto `&lt;digits&gt;&#0091;uU&#0093;'
+	 proto does // comments by default (fixes bug introduced 07/17/94)
+	 proto does "..." "..." string literal concatenation
+	 spice up proto copyright comments for nonexclusive license
+	 add hosttype assertion
+	 fix proto `typedef type fun(args)'
+	 proto copyright finishing touches
+	 fix overzealous "empty character constant" message
+95-02-14 pp:nopredefined probe info defines are now pp:builtin
+	 clean up pp:hosted conflicts
+	 tighten up unknown directive warning
+	 PP_INPUT *.(s|as|AS|asm|ASM) implies pp:nocatliteral pp:spaceout
+	 change newof(0,char,n,0) to newof(0,char,0,n) if 0 init not needed
+	 don't emit unkown directives inside #if 0 ... #endif
+95-01-19 *strict-* does not force STRICT
+	 token##null-last-variadic-arg consumes token (to match gcc)
+	 variadic actuals call be one less than arity (to match gcc)
+	 fix PLUSPLUS digraph bug that lost comment state
+	 tighten up PLUSPLUS //, /*, */ interaction warnings
+	 macro formals in "..." for COMPATIBILITY|TRANSITION
+	 macro formals in '...' for COMPATIBILITY|TRANSITION|!STRICT
+	 STRINGSPAN allows ' in '... too
+	 add PP_SYNC_* flags for pp.incref arg 3
+	 add PP_SYNC_INSERT for invented file references
+	 fix C++ fsm bug that popped out of comment in // /* */ ...
+	 PP_INPUT *.(s|S|asm|ASM) implies pp:nocatliteral pp:spaceout
+95-01-01 avoid string literal concatenation in pp.probe #if #predicate() tests
+	 fix pplib.h memcpy,strncmp PROTOMAIN prototypes (its a nop tho)
+94-11-11 fix readonly memory reference in refill
+	 add C++ digraphs (digraph = --trigraph)
+	 add C++ T_EXPLICIT -- did dos take over C++?
+	 fix improper ppproto() C++ __PARAM__ expansion
+94-11-01 allow #include string header arg concatenation (yes, its not ansi)
+	 #macdef macros are recursive
+94-10-01 fix C++ } loop in ppfsm/refill
+	 T_NOISES consumes symbol and optional paren group
+	 __builtin_* T_NOISES by default
+	 fix "..." "...MARK..." join
+	 fix STANDALONE */*comment*/
+94-09-11 fix pp.probe cp+strip with chmod u+w
+94-08-11 add -I&lt;vdb-archive&gt; to handle pax -x ppar header archives
+	 fix -D-Q header checkpoints
+	 add `pp:chop prefix' to chop prefix/ from include prefix/*/*
+	 add pp:keyargs for key=value macro formals/actuals (not for C!)
+94-06-01 fix ppcontrol/tokop() that botched pp:id, etc.
+	 add pp:plussplice to handle cfront // \&lt;newline&gt; ignorance
+	 inhibit trigraph conversion for pp:compatibility, duh
+	 new C++ keywords enabled by pp:keyword
+	 proto: int fun xxx((yyy)) is macro call, not decl
+	 fix !ALLMULTIPLE pp:load to SKIP between duplicated line syncs
+	 fix PP_DUMP for pp:noallmultiple, optimize pp:load format
+	 fix CPP CACHEOUTX() buffer boundary bug
+94-04-01 drop warnings for -X*
+	 fix ppproto() %% in comment bug for yacc proto
+	 PP_COMMENT now truncates comments to MAXTOKEN-4
+94-03-01 no pp:truncate for #pragma pp:macref
+94-01-01 fix STANDALONE+PP_TRUNCATE fsm macro bug
+	 drop __VOID__ from ppproto.c
+93-12-01 release
+93-11-11 fix PP_COMPILE+PP_TRUNCATE=8 bug for continue,unsigned,etc.
+	 add PP_LINEBASE for compilers that botch long line sync paths
+	 fix #if unsigned promotions
+	 aggressive interactive line splice flush
+	 fix #else inside multiline null dereference
+	 fix "..." newline space # COMPATIBILITY CATLITERAL bug
+	 fix m(a)b compatibility token pasting &#0091;cpp/test/ess.01.c&#0093;
+	 fix nested @X mark bug &#0091;cpp/test/net.02.c&#0093;
+93-10-11 add FSM_COMPATIBILITY for floating point hex -- yo ansi, anybody home
+	 add #else if|ifdef|ifndef for COMPATIBILITY but with warning
+	 drop PP_HOSTED, add ppop(PP_CDIR|PP_HOSTED,"-",n), -D-I for pp:cdir
+93-10-01 add pp:opspace to tokenize &lt;binop&gt;&lt;space&gt;= to &lt;binop&gt;=
+93-08-11 drop ancient BCD constant (`...`) detection -- wake up cfront
+	 fix PP_TRUNCATE macro fsm bug that missed some expansions
+	 fix stringize bug that choked if space preceded #
+	 fix &lt;function-like-macro&gt; &lt;identifier&gt; bug that omitted space
+93-07-17 minor transition mode fix for string concatenation
+	 fix standalone macdef line sync buffer bug
+	 pp:noline turns off linesync, pp:line restores it
+93-06-22 add pp:prefix to control prefix include compatibility
+93-04-01 use probe_verbose in predefined symbol probe
+93-03-11 close fd after last file block read -- relaxes open fd limit
+	 remove pp.control nesting limit
+	 add `#rename old new'
+	 __STDC__ not defined for plusplus (until they figure it out)
+93-01-22 fix ansi macro args recursion bug
+93-01-11 fix '\377'&lt;0 for signed char compilers
+	 add RELAX for __STDPP__directive directives
+92-12-25 fix #include guard test that omitted IN_tokens for CPP=1
+92-12-11 fix pp:truncate for STANDALONE and COMPILE
+	 fix pp:allmultiple again!
+92-11-30 add pp:final, pp:initial
+	 add __STDPP__directive and #(directive) as ??= alternative
+	 relax obsolete macro expand warning for _xxx||xxx
+	 retain quoted wline when PP_LINEID != ""
+	 fix CATLITERAL hidden newline line sync
+92-11-11 fix COMPATIBILITY EOF in macro arg list and # in macro body
+	 fix &#0091;?\&#0093; on 4K buffer boundary bug that lost next refill()
+	 fix ppproto bug that botched -ih comments
+92-10-31 fix standalone -C bug that duplicated output buffer
+	 add pp:stringspan to handle gnu "&lt;newline&gt;" extension
+92-10-12 fix T_X_GROUP asm bug
+	 allow `#define a "b' pp:compatibility hack
+92-08-11 add PP_PLUSCOMMENT, pp:pluscomment probe
+	 add #(default v,d) #(empty v) #(iterate m,...)
+	 compatibility allows #define f(a,,b) for 2 args!
+	 probe now handles gcc -E -g3 to get gnu predefines
+92-07-17 fix pp:multiple again, fix ppproto() out of bounds
+	 PP_STANDARD is always PP_CDIR and PP_HOSTED
+92-07-11 add #import and #include_next probes
+92-06-11 fix bug where comments dissappeared after disabled macro in standalone
+	 COMPATIBILITY macro recursion bug fix may cause some to be missed
+	 PP_MACREF or -D-L- ignores #line until #line with file arg
+92-06-01 add pp:ignore
+	 fix probe of stdpp to handle -I&#0091;-+&#0093;&#0091;CH&#0093;
+92-05-11 add pp:hide &lt;id&gt;, pp:note &lt;id&gt;, noticed(&lt;id&gt;), exists(&lt;...&gt;)
+	 add defined(__STDPP__&lt;pragma&gt;) feature test
+	 add PP_CDIR, pp:cdir for C++ extern "C" { ... } include wrapping
+	 pp.probe now handles predefines with values other than 1
+92-04-11 add inverse proto (K&amp;R -&gt; prototype) to ppproto
+92-04-01 release
+92-02-29 #include &lt;...&gt; inside &lt;xxx.h&gt; gets next xxx.h on -I list
+	 non-libpp generated symbols containing ' ' are not truncated
+92-02-11 conversion to new lexer brings time close to reiser (esp. w/gcc -O)
+	 combine standalone (ppcpp) tokenizing (pplex) and proto lex tables
+	 recode ppproto for standalone operation via PROTOMAIN
+	 add PP_NOHASH for PP_COMPILE front ends that rehash T_ID anyway
+	 delete PP_NOQUOTE
+	 delete #option(strict) test in probe in favor of non-hosted warnings
+	 add unsigned to ppexpr()
+91-10-11 add pp:truncate &lt;len&gt; for non-flexname compilers
+91-09-11 fix ppproto aggression on f(*y); -&gt; f __PROTO__((*y));
+91-08-11 switch seterror() to error_info.*
+	 add pp:linefile to force file name in line sync
+	 add pp:spaceout for probed compilers that don't allow pp override
+91-06-11 fix ignored -I/usr/include bug
+91-04-11 set SYM_INIT in pp.macref for -U on cmd line
+91-01-31 replace pp:pragma and pp:directive with pp:map
+	 replace #assert and #unassert with #define #... and #undef #...
+	 #assert and #unassert compatibility retained via pp:map
+	 replace -D#directive with -D%directive (because of #assert change)
+	 add pp:splicecat for \&lt;newline&gt; #define token paste
+	 fix \&lt;newline&gt; bug that added space in COMPATIBILITY quoted strings
+90-12-11 fix #pragma pp:multiple
+90-11-11 generalize handling of non-standard keywords for COMPILE
+	 replace pp:identifier/PP_IDENTIFIER with pp:reserved/PP_RESERVED
+	 pp*keys* -&gt; ppkey
+	 add PP_NOISE
+	 (gag) handle msdos paths by changing &nbsp;to / and retrying on failure
+	 (gag) handle msdos :&gt; operator by pplex() '+' return
+	 add #pragma prototyped and ppproto.c for prototype conversion
+	 add unsigned long arg to PP_MACREF for hashed macro arity+value
+90-10-11 0f is not a float constant
+	 change -I-M to -I-I, file just lists include files to be ignored
+	 fix ppprobe for __STDC__==0 hybrids
+	 add pp.flags and PP_&#0091;a-z0-9&#0093;+ for exported state info
+90-10-01 fix standalone ppmacref for directives
+	 add `try' to C++ keywords
+	 fine tune a few COMPILE error messages
+	 privatize pp.h
+90-08-11 use opt_again in cmdargs() option parsers
+	 (gag) add pp:macref macro reference pragma to handle CC preprocessors
+	 (gag) add pp:spaceout to handle ansi + asm hacks
+90-07-17 remove spaces from macdef line sync (blew sun cc)
+90-06-11 add internal ppsymkey to avoid ppsymbol.value pun for SYM_KEYWORD
+90-05-01 fix catliteral bug of `"..." &lt;&lt; ' -&gt; `"..." &lt;='
+90-04-01 fix `ifndef-define-endif' include wrapper test
+90-03-27 add setpreroot() to ppop() &#0091; sleazy but well hidden &#0093;
+90-03-22 pp.macref called for all undef's
+90-03-20 add &lt;prefix&gt;cpp checks to ppprobe
+	 add pp:hostdir before pp:include in ppprobe
+	 fix PP_HOSTDIR op with no dir arg
+90-03-15 System V CCS compatibility update
+	 add PP_ASSERT
+	 add -A for PP_ASSERT and -YI,dir for PP_STANDARD
+	 add ppincref.c and -H to use it
+	 -Xa defines __STDC__ to 0 (gak)
+90-03-09 duplicate macro formals cause level 2 error
+90-03-01 add #(ARGC) for (variadic) macro arg count
+90-02-11 fix line sync number bug in pppush()
+89-12-01 ignore leading = in pragma map for old pragma compatibility
+	 check for NEWLINE on first macdef line sync
+89-11-11 add -1 arg to pp.incref -- include skipped
+	 STRICT 0x7e-macro is T_INVALID per standard
+89-10-31 put all C keys in ppckeys.c, C++ keys in pppkeys.c
+	 add pp:identifier pragma to selectively undo PP_COMPILE keywords
+	 add tokop() to ppcontrol to support multi-valued pragmas
+	 add #ifndef...#endif include optimization for STRICT
+89-10-27 use REF_NORMAL, REF_IF, REF_UNDEF for pp.macref arg2
+89-10-17 fix c(x)y compatibility pasting bug
+	 #line 1 "f" now marks "f" included
+89-10-11 enable -I. during initialization
+89-10-01 inhibit pp:linetype syncs for top level #line directives
+	 ----- see HISTORY -----
+</PRE>
+<HR>
+<P>
+January 27, 2001
+
+</TD></TR></TABLE>
+</BODY>
+</HTML>

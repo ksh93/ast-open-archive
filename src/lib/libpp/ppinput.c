@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2000 AT&T Corp.                *
+*                Copyright (c) 1986-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -196,10 +195,10 @@ pppush(register int t, register char* s, register char* p, int n)
 		pushcontrol();
 		cur->control = pp.control;
 		*pp.control = 0;
-		if (cur->type == IN_RESCAN) cur->line++;
-		else
+		if (cur->type != IN_RESCAN)
 		{
-			if (cur->type == IN_INIT) pp.mode |= MARKHOSTED;
+			if (cur->type == IN_INIT)
+				pp.mode |= MARKHOSTED;
 			error_info.file = s;
 			error_info.line = n;
 		}

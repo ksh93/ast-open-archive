@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -45,7 +44,7 @@ static const char usage1[] =
 "+"
 "[-?%s\n]"
 USAGE_LICENSE
-"[+NAME?nmake - configure, manage and update files hierarchies]"
+"[+NAME?nmake - configure, manage and update file hierarchies]"
 "[+DESCRIPTION?\bnmake\b reads input \amakefiles\a and triggers shell"
 "	actions to build target files that are out of date with prerequisite"
 "	files. Most information used to build targets is contained in"

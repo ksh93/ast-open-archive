@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -22,7 +22,6 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -98,6 +97,13 @@ __STDPP__directive pragma pp:hide _getdents __getdents getdents64 _getdents64 __
 #define _BLD_ast	1
 #include <ast_dir.h>
 #undef	_BLD_ast
+
+#if _lib_readdir64 && _typ_struct_dirent64
+#undef	dirent
+#undef	DIRdirent
+#define DIRdirent	dirent
+#endif
+
 #include <hash.h>
 
 #if !defined(SYS3D_opendir)

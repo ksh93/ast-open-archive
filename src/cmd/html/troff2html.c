@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -35,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)troff2html (AT&T Labs Research) 1999-08-11\n]"
+"[-?\n@(#)$Id: troff2html (AT&T Labs Research) 1999-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?troff2html - convert troff/groff input to html]"
 "[+DESCRIPTION?\btroff2html\b converts \btroff\b(1) (or \bgroff\b(1),"

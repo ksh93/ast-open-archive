@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 #include	<signal.h>
@@ -70,7 +69,7 @@ MAIN()
 
 	if(pipe(fd) < 0)
 		terror("Can't make pipe\n");
-	if(sfnew(sfstdin,NIL(char*),(size_t)SF_UNBOUND,fd[0],SF_READ) != sfstdin)
+	if(sfnew(sfstdin,NIL(Void_t*),(size_t)SF_UNBOUND,fd[0],SF_READ) != sfstdin)
 		terror("Can't renew stdin\n");
 	sfdisc(sfstdin,&Disc);
 	sfset(sfstdin,SF_SHARE,1);

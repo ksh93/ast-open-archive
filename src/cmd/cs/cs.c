@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)cs (AT&T Labs Research) 1999-09-22\n]"
+"[-?\n@(#)$Id: cs (AT&T Labs Research) 1999-09-22 $\n]"
 USAGE_LICENSE
 "[+NAME?cs - connect stream control]"
 "[+DESCRIPTION?\bcs\b displays, initiates, and terminates connect stream"

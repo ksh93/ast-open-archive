@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -31,6 +30,7 @@ MAIN()
 	Sfio_t*	fw;
 	Sfio_t*	fr;
 	int	fds[2];
+	int	lseek_errno;
 
 	if(!(fw = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
 		terror("Can't create temp file %s to write", tstfile(0));
@@ -44,17 +44,24 @@ MAIN()
 	if(sfwrite(fr, "a", 1) == 1)
 		terror("sfwrite should have failed on a read stream");
 	if(errno != EBADF)
-		terror("Wrong errno after sfwrite failed");
+		terror("Wrong errno %d after sfwrite, expecting %d", errno, EBADF);
+
+	/* on some system (eg, apple), lseek does not set errno for this case */
+	errno = 0;
+	lseek(fw->file, (off_t)(-1), SEEK_SET);
+	lseek_errno = errno;
+	lseek(fw->file, (off_t)0, SEEK_SET);
+	errno = 0;
 
 	sfseek(fw, (Sfoff_t)(-1), SEEK_SET);
-	if(errno != EINVAL)
-		terror("Wrong errno after sfseek to -1");
+	if(errno != lseek_errno)
+		terror("Wrong errno %d after sfseek, expecting %d", errno, lseek_errno);
 
 	errno = 0;
 	if(sfseek(fw, (Sfoff_t)0, SEEK_SET|SEEK_CUR|SEEK_END) >= 0)
 		terror("sfseek should not have succeeded");
 	if(errno != EINVAL)
-		terror("Wrong errno after bad sfseek call");
+		terror("Wrong errno %d after sfseek, expecting %d", errno, EINVAL);
 
 	if(pipe(fds) < 0)
 		terror("Can't create pipes");
@@ -62,17 +69,18 @@ MAIN()
 	if(!(fw = sfnew(fw, NIL(Void_t*), -1, fds[1], SF_WRITE)) )
 		terror("Can't create stream for pipe");
 
+	errno = 0;
 	if(sfseek(fw, (Sfoff_t)0, SEEK_SET) >= 0)
 		terror("sfseek should have failed on a pipe");
 	if(errno != ESPIPE)
-		terror("Wrong errno after sfseek failed");
+		terror("Wrong errno %d after sfseek, expecting %d", ESPIPE);
 
 	close(sffileno(fw));
 	errno = 0;
 	if(sfseek(fw, (Sfoff_t)0, SEEK_END) >= 0)
 		terror("sfseek should have failed on a closed file descriptor");
 	if(errno != EBADF)
-		terror("Wrong errno after sfseek failed");
+		terror("Wrong errno %d after sfseek, expecting %d", EBADF);
 
 	TSTRETURN(0);
 }

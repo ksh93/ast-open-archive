@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,7 +21,6 @@
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #ifndef _RECSORT_H
 #define	_RECSORT_H		1
@@ -154,10 +153,10 @@ struct _rs_s
 #define rscount(rs)	((rs)->count)	/* count # of rsprocess() objs	*/
 
 _BEGIN_EXTERNS_	/* public data */
-#if _RSHDR_H && defined(__EXPORT__)
+#if _BLD_recsort && defined(__EXPORT__)
 #define extern	__EXPORT__
 #endif
-#if !_RSHDR_H && defined(__IMPORT__)
+#if !_BLD_recsort && defined(__IMPORT__)
 #define extern	__IMPORT__
 #endif
 
@@ -170,7 +169,7 @@ extern Rsmethod_t*	Rsverify;	/* check for correct order	*/
 _END_EXTERNS_
 
 _BEGIN_EXTERNS_	/* public functions */
-#if _RSHDR_H && defined(__EXPORT__)
+#if _BLD_recsort && defined(__EXPORT__)
 #define extern	__EXPORT__
 #endif
 

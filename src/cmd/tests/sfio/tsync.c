@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -175,12 +174,12 @@ MAIN()
 	if((off = sftell(f2)) != 1)
 		terror("Wrong sfseek location %lld\n", off);
 	sfsync(0);
-	if((off = (Sfoff_t)lseek(sffileno(f2),0L,1)) != 1)
+	if((off = (Sfoff_t)lseek(sffileno(f2), (off_t)0, 1)) != 1)
 		terror("Wrong lseek location %lld\n", off);
 
 	dupf2 = dup(sffileno(f2));
 	sfclose(f2);
-	if((off = (Sfoff_t)lseek(dupf2,0L,1)) != 1)
+	if((off = (Sfoff_t)lseek(dupf2, (off_t)0, 1)) != 1)
 		terror("Wrong lseek location %lld\n", off);
 
 	/* test to see if data is written correctly */

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -30,11 +29,11 @@
  * expression library readonly tables
  */
 
-static const char id[] = "\n@(#)libexpr (AT&T Research) 2000-01-01\0\n";
+static const char id[] = "\n@(#)$Id: libexpr (AT&T Research) 2000-01-01 $\0\n";
 
 #include <exlib.h>
 
-const char*	exversion = id + 5;
+const char*	exversion = id + 10;
 
 Exid_t		exbuiltin[] =
 {

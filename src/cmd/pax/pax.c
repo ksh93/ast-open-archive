@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2000 AT&T Corp.                *
+*                Copyright (c) 1987-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -38,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pax (AT&T Labs Research) 2000-09-20\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2000-09-20 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -360,7 +359,7 @@ Option_t		options[] =
 	OPT_edit,
 	"Pathname substitution from \aold\a to \anew\a.\
 	The first character is the expression delimiter.\
-	There may be more than edit expression;\
+	There may be more than one edit expression;\
 	each is applied in order from left to right.",
 	",old,new,[glsu]]",
 	"[+g?All \aold\a patterns.]\

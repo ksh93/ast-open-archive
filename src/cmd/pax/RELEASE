@@ -1,3 +1,5 @@
+00-12020 bio.c: include <sys/ioctl.h> for systems that miss _IOW() etc.
+00-10-31 format.c: handle rpm 4.0 and newer
 00-09-20 copy.c: always allocate state.tmp.lst!
 00-08-31 change paths in delta archive: -rf i -z - -s e -wf o -z - [almost]
 00-08-11 copy.c: drop memalign() call for _std_malloc==1 in libast

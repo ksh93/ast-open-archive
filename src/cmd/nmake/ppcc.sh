@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1984-2000 AT&T Corp.                #
+#                Copyright (c) 1984-2001 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -20,21 +20,22 @@
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
-#                                                                  #
 ####################################################################
-: ppcc [ options ] pp-command ... cc-command ...
-#
 # preprocess with pp-command then run cc-command
 #
-# @(#)ppcc (AT&T Research) 02/14/97
-#
+# @(#)ppcc (AT&T Research) 1997-02-14
+
+case $-:$BASH_VERSION in
+*x*:[0-9]*)	: bash set -x is broken :; set +ex; old=1 ;;
+*)		old= ;;
+esac
+
 command=ppcc
 clobber=
 doti=
 exec=1
 linki=
 multiopt=o
-old=
 post=
 ppfile=
 ppld=
@@ -170,6 +171,13 @@ trap '	status=$?
 	esac
 	exit $status
 ' 0 1 2 3 15
+case $old in
+'')	case `(set -A a no ok; echo "${a[1]}") 2>/dev/null` in
+	ok)	;;
+	*)	old=1 ;;
+	esac
+	;;
+esac
 case $old:$RANDOM in
 *:$RANDOM|1:*)
 	# the hard way -- it has not kept up with the easy way below

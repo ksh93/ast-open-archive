@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -29,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)htmlrefs (AT&T Labs Research) 2000-03-04\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2000-12-08 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -54,7 +53,9 @@ USAGE_LICENSE
 "			the data root directory should contain a pseudo index"
 "			for its references.]"
 "		[+dynamic?All files under \adir\a are considered referenced.]"
+"		[+host?Provides a default value for the \b--hosts\b option.]"
 "		[+ignore?\adir\a is a \bksh\b(1) pattern of paths to ignore.]"
+"		[+secure?Files under this dir are accessed by \bhttps:\b only.]"
 "	}"
 "	[+$HOME/wwwfiles/index.html?]"
 "	[+$HOME/public_html/index.html?]"
@@ -80,6 +81,8 @@ USAGE_LICENSE
 "	\bhttp://\b\apattern\a\b/\b.]:[pattern]"
 "[k:keep?\apattern\a is used to match file base names that are always"
 "	considered referenced.]:[pattern:=.htaccess]"
+"[l:limit?Limit \b--copy\b and \b--remove\b operations to path names matching"
+"	\apattern\a.]:[pattern]"
 "[m:missing?List missing local file references.]"
 "[n!:exec?Enable file modification operations. \b--noexec\b lists the"
 "	operations but does not do them.]"
@@ -88,6 +91,8 @@ USAGE_LICENSE
 "	translating left bracket to \b&#0091;\b avoids unwanted \bperl\b"
 "	interactions (why didn't they use tags like everyone else?)"
 "	\bmm2html\b(1) and \boptget\b(3) do the translation by default.]"
+"[X:remove?Unreferenced files are removed when \b--unreferenced\b and"
+"	\b--nocopy\b are specified.]"
 "[r:root?The local \adirectory\a for \b--user\b"
 "	references.]:[directory:=~\auser\a]"
 "[s:strict?By default unreferenced \b--index\b files and the containing"
@@ -113,7 +118,7 @@ USAGE_LICENSE
 "		references to the local host \bwww.research.att.com\b.]"
 "	[+htmlrefs -n -h www.research.att.com -c ~/external/wwwfiles -e -x?Copy"
 "		the local hierarchy to \b~/external/wwwfiles\b for external"
-"		release, and delete unreferenced files in the copy.]"
+"		release, and remove unreferenced files in the copy.]"
 "}"
 "[+SEE ALSO?\bhtml2rtf\b(1), \bmm2html\b(1)]"
 ;
@@ -137,7 +142,8 @@ USAGE_LICENSE
 #define INTERNAL		0x020
 #define MISSING			0x040
 #define SCANNED			0x080
-#define VERBOSE			0x100
+#define SECURE			0x100
+#define VERBOSE			0x200
 
 #define HIT			(-1)
 #define MISS			(-2)
@@ -180,22 +186,27 @@ typedef struct State_s
 	int		missing;
 	int		more;
 	int		perlwarn;
+	int		remove;
 	int		strict;
 	int		unreferenced;
 	int		verbose;
 	int		warn;
 
 	String_t	copy;
+	String_t	dataroot;
 	String_t	documentroot;
-	String_t	index;
-	String_t	keep;
 	String_t	hosts;
 	String_t	ignore;
+	String_t	index;
+	String_t	keep;
+	String_t	limit;
+	String_t	programroot;
 	String_t	root;
 	String_t	user;
 
 	char		buf[PATH_MAX];
 	char		dir[PATH_MAX];
+	char		tmp[PATH_MAX];
 } State_t;
 
 static const char	internal[] = "<!--INTERNAL-->";
@@ -243,13 +254,24 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 
 	if (!(flags & COPIED))
 	{
+		if (ref && (ref->flags & SECURE))
+			flags |= SECURE;
 		if (state->hosts.size)
 		{
 			if (t = strchr(s, ':'))
 			{
-				if (!strneq(s, "http://", t - s + 3))
+				if (strneq(s, "http://", t - s + 3))
+				{
+					s = t + 3;
+					flags &= ~SECURE;
+				}
+				else if (strneq(s, "https://", t - s + 4))
+				{
+					s = t + 4;
+					flags |= SECURE;
+				}
+				else
 					return 0;
-				s = t + 3;
 				if (t = strchr(s, '/'))
 					*t = 0;
 				if (!strmatch(s, state->hosts.data))
@@ -261,7 +283,7 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 			}
 			if (*s == '/')
 			{
-				if (ref)
+				if (ref && !streq(s, ref->name))
 				{
 					if (*(s + 1) != '~')
 						return 0;
@@ -273,12 +295,12 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 						s += 2 + state->user.size;
 					if (state->documentroot.size)
 					{
-						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s", state->documentroot.data, s);
+						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s%s", state->documentroot.data, (flags & SECURE) ? "/secure" : "", s);
 						pathcanon(s = state->buf, 0);
 					}
 					else if (state->root.size)
 					{
-						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s", state->root.data, s);
+						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s", state->root.data, (flags & SECURE) ? "/secure" : "", s);
 						pathcanon(s = state->buf, 0);
 					}
 				}
@@ -287,6 +309,11 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 			{
 				sfsprintf(state->buf, sizeof(state->buf) - 1, "%-.*s%s", prefix, path, s);
 				pathcanon(s = state->buf, 0);
+			}
+			else if (flags & SECURE)
+			{
+				sfsprintf(state->tmp, sizeof(state->tmp), "secure/%s", s);
+				s = state->tmp;
 			}
 		}
 		if (*s == '.' && *(s + 1) == '/')
@@ -368,6 +395,33 @@ order(FTSENT* const* a, FTSENT* const* b)
 }
 
 /*
+ * parse and set root dir r from s
+ * possibly using tmp buffer buf
+ */
+
+static void
+rootdir(State_t* state, register String_t* r, register char* s, char* buf, size_t z)
+{
+	register char*	t;
+	register int	n;
+
+	if (t = strrchr(s, '/'))
+		*t = 0;
+	if (*s == '/')
+		n = strlen(s);
+	else
+	{
+		n = sfsprintf(buf, z, "%s/%s", state->root.data, s);
+		s = buf;
+	}
+	if (!(r->data = strdup(s)))
+		error(ERROR_SYSTEM|3, "out of space [rootdir]");
+	r->size = n;
+	if (t)
+		*t = '/';
+}
+
+/*
  * process refs in path
  */
 
@@ -385,6 +439,7 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 	int		m;
 	int		perlwarn;
 	int		prefix;
+	unsigned int	secure;
 	unsigned int	flags;
 
 	char		buf[8 * 1024];
@@ -456,38 +511,34 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 	else if (f)
 	{
 		p = f->name;
-		if (!strcasecmp(s, "document-root"))
+		if (!strcasecmp(s, "data-root"))
+			rootdir(state, &state->dataroot, p, buf, sizeof(buf));
+		else if (!strcasecmp(s, "document-root"))
+			rootdir(state, &state->documentroot, p, buf, sizeof(buf));
+		else if (!strcasecmp(s, "host") || !strcasecmp(s, "hosts"))
 		{
-			if (t = strrchr(p, '/'))
-				*t = 0;
-			if (*p == '/')
-				m = strlen(p);
-			else
-			{
-				m = sfsprintf(buf, sizeof(buf), "%s/%s", state->root.data, p);
-				p = buf;
-			}
-			if (!(state->documentroot.data = strdup(p)))
-				error(ERROR_SYSTEM|3, "out of space [documentroot]");
-			state->documentroot.size = m;
-			if (t)
-				*t = '/';
+			if (!state->hosts.size && (state->hosts.size = strlen(p)) && !(state->hosts.data = strdup(p)))
+				error(ERROR_SYSTEM|3, "out of space [hosts]");
 		}
-		else if (!strcasecmp(s, "dynamic"))
+		else if (!strcasecmp(s, "program-root"))
+			rootdir(state, &state->programroot, p, buf, sizeof(buf));
+		else if ((secure = strcasecmp(s, "secure") ? 0 : SECURE) || !strcasecmp(s, "dynamic"))
 		{
 			FTS*	fts;
 			FTSENT*	ent;
 
 			if (t = strrchr(p, '/'))
 				*t = 0;
-			if (!(fts = fts_open((char**)p, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPOSTORDER, order)))
-				error(ERROR_SYSTEM|3, "%s: cannot search directory", p);
+			fts = fts_open((char**)p, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPOSTORDER, order);
 			if (t)
 				*t = '/';
-			while (ent = fts_read(fts))
-				add(state, ent->fts_path + prefix, flags, f->name, prefix, f);
-			if (fts_close(fts))
-				error(ERROR_SYSTEM|3, "%s: directory read error", p);
+			if (fts)
+			{
+				while (ent = fts_read(fts))
+					add(state, ent->fts_path + prefix, flags|secure, f->name, prefix, f);
+				if (fts_close(fts))
+					error(ERROR_SYSTEM|2, "%s: directory read error", p);
+			}
 		}
 		else if (!strcasecmp(s, "ignore"))
 		{
@@ -723,6 +774,7 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 
 /*
  * filter out internal text
+ * return: <0:error 0:drop >0:keep
  */
 
 static int
@@ -730,13 +782,17 @@ filter(register State_t* state, register Sfio_t* ip, Sfio_t* op)
 {
 	register char*	s;
 	register size_t	n;
+	register size_t	lines = 0;
 
 	for (;;)
 	{
 		if (!(s = sfgetr(ip, '\n', 0)))
 			break;
 		if ((n = sfvalue(ip)) != sizeof(internal) || !strneq(s, internal, sizeof(internal) - 1))
+		{
 			sfwrite(op, s, n);
+			lines++;
+		}
 		else
 		{
 			while ((s = sfgetr(ip, '\n', 0)) && (sfvalue(ip) != sizeof(external) || !strneq(s, external, sizeof(external) - 1)));
@@ -746,7 +802,7 @@ filter(register State_t* state, register Sfio_t* ip, Sfio_t* op)
 	}
 	if (sfvalue(ip) && (s = sfgetr(ip, -1, 0)) && (n = sfvalue(ip)))
 		sfwrite(op, s, n);
-	return 0;
+	return lines > 1;
 }
 
 main(int argc, char** argv)
@@ -761,6 +817,7 @@ main(int argc, char** argv)
 	FTSENT*			ent;
 	struct passwd*		pwd;
 	Sfio_t*			op;
+	char*			dirs[4];
 	int			i;
 	int			n;
 	struct stat		st;
@@ -806,6 +863,9 @@ main(int argc, char** argv)
 		case 'k':
 			state->keep.size = strlen(state->keep.data = opt_info.arg);
 			continue;
+		case 'l':
+			state->limit.size = strlen(state->limit.data = opt_info.arg);
+			continue;
 		case 'm':
 			state->missing = opt_info.num ? MISSING : 0;
 			continue;
@@ -829,6 +889,9 @@ main(int argc, char** argv)
 			continue;
 		case 'x':
 			state->unreferenced = opt_info.num;
+			continue;
+		case 'X':
+			state->remove = opt_info.num;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -916,6 +979,8 @@ main(int argc, char** argv)
 				add(state, p, COPIED, NiL, 0, NiL);
 				if (stat(fp->name, &st))
 					error(ERROR_SYSTEM|3, "%s: cannot stat", fp->name);
+				if (state->limit.size && !strmatch(p, state->limit.data))
+					continue;
 				if (stat(p, &ts))
 				{
 					ts.st_mtime = 0;
@@ -938,8 +1003,13 @@ main(int argc, char** argv)
 				}
 				else if (fp->flags & DIRECTORY)
 				{
-					if (!ts.st_mtime && mkdir(p, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH))
-						error(ERROR_SYSTEM|2, "%s: cannot create directory", p);
+					if (!ts.st_mtime)
+					{
+						if (state->verbose)
+							sfprintf(sfstdout, " mkdir %s\n", p);
+						if (mkdir(p, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH))
+							error(ERROR_SYSTEM|2, "%s: cannot create directory", p);
+					}
 				}
 				else if (state->force || st.st_mtime != ts.st_mtime)
 				{
@@ -963,7 +1033,7 @@ main(int argc, char** argv)
 							if (state->verbose)
 								sfprintf(sfstdout, "  copy %s\n", p);
 							if (sfmove(ip, op, SF_UNBOUND, -1) >= 0 && sfeof(ip))
-								n = 0;
+								n = 1;
 							else
 								n = -1;
 						}
@@ -972,10 +1042,20 @@ main(int argc, char** argv)
 						if (sfclose(op))
 							error(ERROR_SYSTEM|2, "%s: write error", p);
 						sfclose(ip);
-						if ((st.st_mode &= S_IPERM) != (ts.st_mode &= S_IPERM) && chmod(p, st.st_mode))
-							error(ERROR_SYSTEM|2, "%s: cannot set mode", p);
-						if (touch(p, st.st_mtime, st.st_mtime, 0))
-							error(ERROR_SYSTEM|2, "%s: cannot set times", p);
+						if (n > 0)
+						{
+							if ((st.st_mode &= S_IPERM) != (ts.st_mode &= S_IPERM) && chmod(p, st.st_mode))
+								error(ERROR_SYSTEM|2, "%s: cannot set mode", p);
+							if (touch(p, st.st_mtime, st.st_mtime, 0))
+								error(ERROR_SYSTEM|2, "%s: cannot set times", p);
+						}
+						else if (!n)
+						{
+							if (state->verbose)
+								sfprintf(sfstdout, " %s %s\n", (fp->flags & DIRECTORY) ? "rmdir" : "   rm", p);
+							if (((fp->flags & DIRECTORY) ? rmdir : remove)(p))
+								error(ERROR_SYSTEM|2, "%s: cannot remove", p);
+						}
 					}
 				}
 			}
@@ -984,7 +1064,7 @@ main(int argc, char** argv)
 			if (!(fts = fts_open((char**)state->copy.data, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
 				error(ERROR_SYSTEM|3, "%s: cannot search directory", state->copy.data);
 			while (ent = fts_read(fts))
-				if ((!(fp = dtmatch(state->files, ent->fts_path)) || !(fp->flags & COPIED)) && (!state->ignore.size || !strmatch(ent->fts_path, state->ignore.data)))
+				if ((!(fp = dtmatch(state->files, ent->fts_path)) || !(fp->flags & COPIED)) && (!state->ignore.size || !strmatch(ent->fts_path, state->ignore.data)) && (!state->limit.size || strmatch(ent->fts_path, state->limit.data)))
 				{
 					if (state->verbose || !state->exec)
 						sfprintf(sfstdout, " %s %s\n", (ent->fts_info & FTS_D) ? "rmdir" : "   rm", ent->fts_path);
@@ -997,15 +1077,37 @@ main(int argc, char** argv)
 	}
 	else if (state->unreferenced)
 	{
-		if (!state->root.data)
-			state->root.size = strlen(state->root.data = ".");
-		if (!(fts = fts_open((char**)state->root.data, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
+		i = 0;
+		if (state->documentroot.data)
+			dirs[i++] = state->documentroot.data;
+		else
+		{
+			if (!state->root.data)
+				state->root.size = strlen(state->root.data = ".");
+			dirs[i++] = state->root.data;
+		}
+		if (state->dataroot.data)
+			dirs[i++] = state->dataroot.data;
+		if (state->programroot.data)
+			dirs[i++] = state->programroot.data;
+		dirs[i] = 0;
+		if (!(fts = fts_open(dirs, FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
 			error(ERROR_SYSTEM|3, "%s: cannot search directory", state->root.data);
 		while (ent = fts_read(fts))
 			if (!dtmatch(state->files, ent->fts_path) && (!strmatch(ent->fts_name, state->keep.data) || state->ignore.size && strmatch(ent->fts_path, state->ignore.data)))
 			{
 				if (state->strict || !streq(ent->fts_name, state->index.data))
-					sfprintf(sfstdout, "%s\n", fmtquote(ent->fts_path, "\"", "\"", ent->fts_pathlen, 0));
+				{
+					if (!state->remove)
+						sfprintf(sfstdout, "%s\n", fmtquote(ent->fts_path, "\"", "\"", ent->fts_pathlen, 0));
+					else if (!state->limit.size || strmatch(ent->fts_path, state->limit.data))
+					{
+						if (state->verbose || !state->exec)
+							sfprintf(sfstdout, " %s %s\n", (ent->fts_info & FTS_D) ? "rmdir" : "   rm", ent->fts_path);
+						if (state->exec && ((ent->fts_info & FTS_D) ? rmdir : remove)(ent->fts_path))
+							error(ERROR_SYSTEM|2, "%s: cannot remove", ent->fts_path);
+					}
+				}
 				else if (s = strrchr(ent->fts_path, '/'))
 				{
 					*s = 0;

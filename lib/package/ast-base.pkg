@@ -1,0 +1,13 @@
+ast-base ast-ksh :PACKAGE: \
+		ksh93 pax html proto bzip libast libcmd libdll libexpr \
+		libodelta librecsort libsum libuu libvdelta libbz libz tests \
+		3d coshell cpp cs mam msgcc nmake probe ss \
+		libcoshell libcs libmam libpp
+	The AT&T Labs Research ast-base package contains commands and libraries
+	required by all other ast based packages. Included are ksh93, a pax
+	that generates compact delta archives, nmake, the 3d user level
+	versioning filesystem, coshell for network execution, a multi-dialect C
+	preprocessor and companion library, gnu-make that uses coshell for
+	network execution, and libraries shared by the other ast packages.
+
+:INDEX: ksh, pax, nmake, sfio, and ast libraries

@@ -1,3 +1,12 @@
+01-01-01 pp:headerexpand: space ok if no IN_MACRO
+	 ppcall: hide if IN_FILE|IN_MACRO|IN_EXPAND
+	 pplex: don't complain about ^L or ^Z as last char in file
+	 ppsearch: fix #include <.../foo.h> loop
+	 ppcontrol: manulally increment IN_RESCAN error_info.line
+00-12-25 add EXPOSE to expose hidden macros (for #import ...)
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+	 pp.probe: filter out invalid symbols for predefined macro scan, duh
+	 pp:headerexpand: limit expansion to IN_MACRO
 00-10-31 __STDC__==0 if HOSTED && _UWIN
 00-10-26 pplib.h: change SEEK_SET to O_RDONLY for aix
 00-10-17 pp.probe: __IMPORT__ => __STDPP__IMPORT__

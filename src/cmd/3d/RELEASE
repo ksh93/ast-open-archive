@@ -1,3 +1,6 @@
+01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
+00-12-14 3d.sh: fix -c
+00-10-31 ast.c add pathtemp.c
 00-10-19 init.c: initialize _3d_2d
 00-07-17 fix fchown to call MSG_fchown (not MSG_fchown); fixes vim dump!
 00-02-14 3d command long options (finally)

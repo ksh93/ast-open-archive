@@ -99,6 +99,12 @@ typedef
    bz_stream;
 
 
+#if _PACKAGE_ast
+#include <ast_std.h>
+#endif
+
+#include <stdio.h>
+
 #if _BLD_bz && defined(__EXPORT__)
 
 #define BZ_API(func)	func
@@ -107,7 +113,6 @@ typedef
 #else
 
 #if defined(_WIN32) && !defined(_UWIN)
-#   include <stdio.h>
 #   include <windows.h>
 #   ifdef small
       /* windows.h define small to char */

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,7 +21,6 @@
 *                                                                  *
 *                 Phong Vo <kpv@research.att.com>                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 /*	Splay sort
 **
@@ -210,4 +209,8 @@ static Rsmethod_t _Rssplay =
 	"Splay tree sort."
 };
 
-Rsmethod_t* Rssplay = &_Rssplay;
+__DEFINE__(Rsmethod_t*, Rssplay, &_Rssplay);
+
+#ifdef NoF
+NoF(rssplay)
+#endif

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -94,6 +93,8 @@
  *   1999             (3.6)             .	AT&T Research
  *                      .               .
  *   2000             (4.0)             .	AT&T Research
+ *                      .               .
+ *   2001             (4.1)             .	AT&T Research
  *
  * command line arguments are of three types
  *
@@ -198,6 +199,10 @@ char			null[] = "";	/* null string			*/
 char			tmpname[MAXNAME];/* temporary name buffer	*/
 short			ctypes[UCHAR_MAX+1];/* istype() character types	*/
 
+#if __OBSOLETE__ < 20020101
+#include "../../lib/libast/string/fmtident.c"
+#endif
+
 /*
  * user error message intercept
  */
@@ -281,6 +286,7 @@ main(int argc, char** argv)
 	 * initialize dynamic globals
 	 */
 
+	version = strdup(fmtident(version));
 	setlocale(LC_ALL, "");
 	error_info.id = idname;
 	error_info.version = version;

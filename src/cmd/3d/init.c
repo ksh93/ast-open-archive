@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -22,7 +22,6 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -34,7 +33,7 @@
 
 static const char id[] =
 #if defined(__STDC__) || defined(__STDPP__)
-"\n@(#)3d [ "
+"\n@(#)$Id: 3d [ "
 #if DEBUG
 	"debug "
 #endif
@@ -45,9 +44,9 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2000-07-17\0\n"
+"] (AT&T Research) 2001-01-01 $\0\n"
 #else
-"\n@(#)3d (AT&T Research) 2000-07-17\0\n"
+"\n@(#)$Id: 3d (AT&T Research) 2001-01-01 $\0\n"
 #endif
 ;
 
@@ -883,7 +882,7 @@ dump(const char* op, const char* oe)
 	e = (b = state.path.name) + sizeof(state.path.name) - 1;
 	if (list & DUMP_state)
 	{
-		bprintf(&b, e, "\nstate %s\n\n", id + 5);
+		bprintf(&b, e, "\nstate %s\n\n", id + 10);
 		if (state.limit == TABSIZE) bprintf(&b, e, "           %cd  on\n", state.in_2d ? '2' : '3');
 		else bprintf(&b, e, "           2d  %d\n", state.limit);
 		bprintf(&b, e, "     boundary  %s\n", state.boundary ? "on" : "off");
@@ -1348,7 +1347,7 @@ setshell(register const char* s)
 
 State_t	state =
 {
-	id + 5,				/* id			*/
+	id + 10,			/* id			*/
 	IDNAME,				/* cmd			*/
 	".",				/* dot			*/
 	"",				/* null			*/

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -28,6 +27,7 @@ MAIN()
 {
 	Sfio_t	*f;
 	int	fd;
+	off_t	sk;
 
 	if(!(f = sfopen((Sfio_t*)0,tstfile(0),"w+")))
 		terror("Opening file\n");
@@ -50,8 +50,8 @@ MAIN()
 
 	if(sfsetfd(f,-1) != -1 || sffileno(f) != -1)
 		terror("setfd2\n");
-	if(lseek(fd,0L,1) != 1L)
-		terror("Bad seek address %d\n",lseek(fd,0L,1));
+	if((sk = lseek(fd, (off_t)0, 1)) != (off_t)1)
+		terror("Bad seek address %lld\n", (Sfoff_t)sk );
 	if(sfgetc(f) >= 0)
 		terror("sfgetc2\n");
 

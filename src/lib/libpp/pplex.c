@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2000 AT&T Corp.                *
+*                Copyright (c) 1986-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -553,7 +552,7 @@ ppcpp(void)
 						if (!(cur->flags & IN_newline))
 						{
 							st |= EOF2NL;
-							if ((pp.mode & (HOSTED|PEDANTIC)) == PEDANTIC)
+							if ((pp.mode & (HOSTED|PEDANTIC)) == PEDANTIC && LASTCHR() != '\f' && LASTCHR() != 032)
 								error(1, "file does not end with %s", pptokchr('\n'));
 #if CPP
 							PUTCHR('\n');
@@ -781,7 +780,7 @@ ppcpp(void)
 #else
 		if ((quot = c) == '<')
 		{
-			if (!(st & HEADER) || (pp.option & HEADEREXPAND) && pp.in->type != IN_FILE)
+			if (!(st & HEADER) || (pp.option & HEADEREXPAND) && pp.in->type == IN_MACRO)
 			{
 				PUTCHR(c);
 				bp = ip;

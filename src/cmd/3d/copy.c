@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -22,7 +22,6 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
 *                 Eduardo Krell <ekrell@adexus.cl>                 *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -42,32 +41,9 @@ struct utimbuf
 
 #if __sun__ || sun
 
-#if _lib_mmap && (_hdr_mman || _sys_mman)
-
-#if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide mmap munmap
-#else
-#define mmap		______mmap
-#define munmap		______munmap
-#endif
-
-#if _hdr_mman
-#include <mman.h>
-#else
-#include <sys/mman.h>
-#endif
+#if _lib_mmap
 
 #define COPYMAP		(32*COPYBUF)
-
-#if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide mmap munmap
-#else
-#undef	mmap
-#undef	munmap
-#endif
-
-extern int		munmap(caddr_t, size_t);
-extern void*		mmap(void*, size_t, int, int, int, off_t);
 
 #endif
 

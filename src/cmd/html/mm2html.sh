@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1996-2000 AT&T Corp.                #
+#                Copyright (c) 1996-2001 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -20,7 +20,6 @@
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
-#                                                                  #
 ####################################################################
 : mm2html - convert mm/man subset to html
 
@@ -42,7 +41,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2000-07-17'
+version='mm2html (AT&T Labs Research) 2001-01-01'
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
@@ -57,9 +56,9 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	standard input is read. \btroff2html\b(1) is similar but does a full
 	\btroff\b(1) parse.]
 [f:frame?Generate framed HTML files in:]:[name]{
-	[+\aname\a\b.html?The main frameset.]
-	[+\aname\a\b-head.html?The static frame head.]
-	[+\aname\a\b-body.html?The scrolling frame body.]
+	[+\aname\a\b.html?The main body.]
+	[+\aname\a\b-index.html?The frame index (if \b--index\b specified).]
+	[+\aname\a\b-temp.html?Temporary frame goto labels.]
 }
 [g:global-index?Generate a standalone \bindex.html\b for framed HTML.]
 [h:html?Read html options from \afile\a. Unknown options
@@ -74,7 +73,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	\afile\a.]:[file[??name=value;...]]]
 [o:option?Sets a space or \b,\b separated list of \b--license\b options. Option
 	values with embedded spaces must be quoted.]:[[no]]name=value]
-[x:index?Generate a standalone \aname\a\bindex.html\b for framed HTML where
+[x:index?Generate a standalone \aname\a\b-index.html\b for framed HTML where
 	\aname\a is specified by \b--frame\b.]
 
 [ file ... ]
@@ -113,29 +112,29 @@ esac
 set -o noglob
 
 integer count fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4 row n s
-integer labels=0
+integer labels=0 reference=1
 typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
 typeset -x -A ds map nr outline
 typeset cond frame label list prev text trailer type
-typeset license html meta mm index authors vg header
+typeset license html meta nl mm index authors vg header references ss
+typeset mm_AF mm_AF_cur mm_AF_old mm_AU
+
+nl=$'\n'
 
 license=(
 	author=
 )
 html=(
-	ident=1
-	logo=(
-		src=
-	)
 	BODY=(
 		bgcolor=#ffffff
 	)
 	TABLE=(
+		align=left
 		bgcolor=#ffd0d0
-		border=1
 		bordercolor=#ffffff
+		border=0
 	)
 	H1=(
 		align=center
@@ -146,27 +145,32 @@ html=(
 		frameborder=0
 		framespacing=0
 	)
-	FRAME=(
-		marginwidth=0
-		marginheight=0
-	)
 	home=(
 		href=
+	)
+	ident=1
+	index=(
+		left=
+		top=
+	)
+	logo=(
+		src=
 	)
 	magic=(
 		plain='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">'
 		frame='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN" "http://www.w3.org/TR/REC-html40/frameset.dtd">'
 	)
-	index=(
-		left=
-		top=
-	)
+	width=96%
 )
 
 code=0
 figure=1
 file=
 font=
+frame=
+framebody=
+framelink=
+framerefs=
 hp=
 ifs=$IFS
 inch="     "
@@ -174,7 +178,10 @@ indent=
 indent_prev=
 macros=
 pd='<P>'
+pm=
 primary=".BL|.LI|.IX"
+ss="verdana,arial,helvetica,geneva,sans-serif"
+vg_ps=20
 
 function options
 {
@@ -277,6 +284,7 @@ HTMLPATH=${HTMLPATH#:}
 
 ds[Cr]='&#169;'
 ds[Dt]=$(date -f "%B %d, %Y" $x)
+ds[Rf]="\\u[$reference]\\d"
 ds[Rg]='&#174;'
 ds[CM]='&#169;'
 ds[RM]='&#174;'
@@ -487,18 +495,22 @@ function getline
 				: primary macros take precedence
 				;;
 			.[BILMRUX]?([BILMRUX])|.F|.FR|.MW|.RF)
+				case $macros:${text[0]} in
+				mm:.RF)	break ;;
+				esac
 				typeset font1 font2 op
 				set -- "${text[@]}"
 				op=$1
 				shift
 				case $op in
-				.[BI]R)	case $#:$2 in
+				.[BIL]R)case $#:$2 in
 					2':('[0-9]')'*([,.?!:;]))
 						x=${2#'('*')'}
 						y=${2%$x}
 						n=$y
 						case $op in
 						.B*)	font1=STRONG ;;
+						.L*)	font1=TT ;;
 						*)	font1=EM ;;
 						esac
 						case $macros in
@@ -597,6 +609,8 @@ function getline
 				esac
 				continue
 				;;
+			.PF|.PH)continue
+				;;
 			.SB)	set -- "${text[@]}"
 				shift
 				case $# in
@@ -634,7 +648,7 @@ function ident
 	esac
 	print -r -- "<HTML>"
 	print -r -- "<HEAD>"
-	print -r -- "<META name=\"generator\" content=\"$version\">"
+	print -r -- "<META name=\"generator\" content=\"$version\">${meta}"
 }
 
 function title
@@ -653,6 +667,12 @@ function title
 		?*)	print -r -- "<SCRIPT language='javascript'>last_slide=$pages</SCRIPT>" ;;
 		esac
 		print -r -- "<STYLE>
+BODY { font-family:times; font-size:$((vg_ps))pt; }
+H1 { font-family:times; font-size:$((vg_ps+4))pt; }
+H2 { font-family:times; font-size:$((vg_ps+2))pt; }
+H3 { font-family:times; font-size:$((vg_ps))pt; }
+TH { font-family:${ss}; font-size:$((vg_ps-1))pt; }
+TD { font-family:${ss}; font-size:$((vg_ps-1))pt; }
 #notes {
 	position:relative;
 	text-align:center;
@@ -704,9 +724,12 @@ $(cat $hit)
 		;;
 	*)	print -r -- "<BODY" ${html.BODY/'('@(*)')'/\1} ">"
 		case ${html.width} in
-		?*)	print -r -- "<TABLE border=0 width=${html.width}><TR><TD valign=top align=left>"
-			trailer="$trailer
-</TD></TR></TABLE>"
+		?*)	case ${html.width} in
+			*%)	x="align=center " ;;
+			*)	x="" ;;
+			esac
+			print -r -- "<TABLE border=0 ${x}width=${html.width}><TR><TD valign=top align=left>"
+			trailer="$trailer$nl</TD></TR></TABLE>"
 			;;
 		esac
 		case $frame in
@@ -725,20 +748,80 @@ $(cat $hit)
 			esac
 			;;
 		esac
+		print -r -- "<!--INDEX--><!--/INDEX-->"
 		;;
 	esac
-	trailer="$trailer
-</BODY>"
+	case $pm in
+	?*)	print -r "$pm"
+		trailer="$pm$nl$trailer"
+		;;
+	esac
+	trailer="${trailer}${nl}</BODY>"
+}
+
+function heading
+{
+	typeset op=$1 i o options beg end
+	integer count
+
+	shift
+	case $op in
+	.H)	case $# in
+		0)	count=1 ;;
+		*)	count=$1; shift ;;
+		esac
+		options=
+		;;
+	.H*|.AS)count=1
+		options=" align=center"
+		;;
+	*)	count=2
+		options=" align=center"
+		;;
+	esac
+	case "$op $count" in
+	".H"*" 1")print -n -r -- "<P><HR>" ;;
+	esac
+	case $* in
+	"")	print -r -- "<P>"
+		;;
+	*)	eval o='$'{html.H$count}
+		for i in $o
+		do	case $i in
+			align=center)
+				beg="$beg<CENTER>"
+				end="</CENTER>$end"
+				;;
+			color=*|face=*)
+				beg="$beg<FONT $i>"
+				end="</FONT>$end"
+				;;
+			esac
+		done
+		(( count += head ))
+		print -nr -- "$beg<H$count$options>"
+		case $count in
+		[0123])	print -nr -- "<A name=\"$*\">$*</A>"
+			label[labels++]=$*
+			;;
+		*)	print -nr "$*"
+			;;
+		esac
+		print -r -- "</H$count>$end"
+		;;
+	esac
 }
 
 if	[[ $frame != '' ]]
-then	framebody=$frame-body.html
+then	framebody=$frame.html
 	exec > $framebody || exit
 fi
 document="$@"
 
 sed	\
 	-e 's%\\".*%%' \
+	-e 's%\\(>=%>=%g' \
+	-e 's%\\(<=%<=%g' \
 	-e 's%&%\&amp;%g' \
 	-e 's%<%\&lt;%g' \
 	-e 's%>%\&gt;%g' \
@@ -769,10 +852,9 @@ sed	\
 	-e 's%\\u\([^\\]*\)\\d%<SUP>\1</SUP>%g' \
 	-e 's%\\v\(.\)-\([^\\]*\)\1\(.*\)\\v\1+*\2\1%<SUB>\3</SUB>%g' \
 	-e 's%\\v\(.\)+*\([^\\]*\)\1\(.*\)\\v\1-\2\1%<SUP>\3</SUP>%g' \
-	-e 's%\\h'\''0\*\\w"\([^:/"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="#\1">\2</A>%g' \
 	-e 's%\\h'\''0\*\\w"\([a-z]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
 	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
-	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_parent>\2</A>%g' \
+	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1">\2</A>%g' \
 	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%<A href="#\1">\1</A>%g' \
 	-e 's%\\h'\''0\*1'\''\([a-z]*:[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
 	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
@@ -786,6 +868,7 @@ sed	\
 	-e 's%\\f(\(..\)\([^\\]*\)%<\1>\2</\1>%g' \
 	-e 's%\\f[PR]%\\fZ%g' \
 	-e 's%\\f\(.\)\([^\\]*\)%<\1>\2</\1>%g' \
+	-e 's%&lt;\([a-zA-Z0-9_.]*@[a-zA-Z0-9_.]*\)&gt;%<SMALL>\&lt;<A href=mailto:\1>\1</A>\&gt;</SMALL>%g' \
 	-e 's%\[[A-Z][A-Za-z]*[0-9][0-9][a-z]*]%<CITE>&</CITE>%g' \
 	-e 's%</*Z>%%g' \
 	-e 's%<[146-9]>%%g' \
@@ -808,6 +891,7 @@ sed	\
 	-e 's%</CW>%</TT>%g' \
 	-e 's%<EM>\([^<]*\)</EM>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>\2</NOBR>%g' \
 	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>\2</NOBR>%g' \
+	-e 's%<TT>\([^<]*\)</TT>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><TT>\1</TT></A>\2</NOBR>%g' \
 	-e 's%\\s+\(.\)\(.*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
 	-e 's%\\s-\(.\)\(.*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
 	-e 's%\\c%<JOIN>%g' \
@@ -828,7 +912,25 @@ do	getline || {
 			;;
 		.AE)	: ignore $op
 			;;
-		.AL|.RS|.VL)
+		.AF)	case $mm_AF_cur in
+			"")	mm_AF_cur="<P><I>$*" ;;
+			*)	mm_AF_cur="${mm_AF_cur}<BR>$*" ;;
+			esac
+			;;
+		.AL|.[IR]S|.VL)
+			case $macros:$op in
+			mm:.RS)	Rf="\\u[$reference]\\d"
+				references="$references$nl<DT>[$reference]<DD>"
+				while	getline
+				do	case $1 in
+					.RF)	break ;;
+					esac
+					references="$references$nl$*"
+				done
+				(( reference++ ))
+				continue
+				;;
+			esac
 			type[++lists]=.AL
 			list[lists]=DL
 			print -r -- "<DL COMPACT>"
@@ -841,7 +943,7 @@ do	getline || {
 					;;
 				esac
 				;;
-			.RS)	print -r -- "<DT><DD>"
+			.[IR]S)	print -r -- "<DT><DD>"
 				;;
 			esac
 			;;
@@ -871,9 +973,10 @@ do	getline || {
 			fi
 			(( pp = lists ))
 			print -r -- "<P>"
+			end=
 			case ${mm.title} in
 			?*)	print -r -- "<HR>"
-				case ${mm.author}${mm.keywords} in
+				case ${mm_AU}${mm.author}${mm.keywords} in
 				?*)	print -r -- "<CENTER>" ;;
 				esac
 				for i in ${html.H1}
@@ -907,13 +1010,24 @@ do	getline || {
 					done
 					;;
 				esac
-				case ${mm.author}${mm.keywords} in
+				case $mm_AU in
+				?*)	print -r -- "$mm_AU"
+					case $mm_AF_cur in
+					?*)	mm_AF="${mm_AF_cur}</I>" ;;
+					esac
+					case $mm_AF in
+					?*)	print -r -- "$mm_AF" ;;
+					esac
+					;;
+				esac
+				case ${mm_AU}${mm.author}${mm.keywords} in
 				?*)	print -r -- "</CENTER>" ;;
 				esac
 				;;
 			esac
 			case $op in
-			.AS)	print -r -- "<$H align=center>Abstract</$H>"
+			.AS)	print -r -- "<P>"
+				heading $op Abstract
 				;;
 			.ce)	case $# in
 				0)	count=1 ;;
@@ -953,57 +1067,24 @@ do	getline || {
 					end=
 					;;
 				esac
-				case $op in
-				.H)	case $# in
-					0)	count=1 ;;
-					*)	count=$1 ;;
-					esac
-					options=
-					;;
-				*)	count=2
-					options=" align=center"
-					;;
-				esac
-				case $# in
-				[!0])	shift ;;
-				esac
-				case "$op $count" in
-				".H 1")	print -n -r -- "<P><HR>" ;;
-				esac
-				case $* in
-				"")	print -r -- "<P>"
-					;;
-				*)	eval o='$'{html.H$count}
-					for i in $o
-					do	case $i in
-						align=center)
-							beg="$beg<CENTER>"
-							end="</CENTER>$end"
-							;;
-						color=*|face=*)
-							beg="$beg<FONT $i>"
-							end="</FONT>$end"
-							;;
-						esac
-					done
-					(( count += head ))
-					print -nr -- "$beg<H$count$options>"
-					case $count in
-					[0123])	print -nr -- "<A name=\"$*\">$*</A>"
-						label[labels++]=$*
-						;;
-					*)	print -nr "$*"
-						;;
-					esac
-					print -r -- "</H$count>$end"
-					;;
-				esac
+				heading $op "$@"
 				;;
 			esac
 			;;
 		.AT)	: ignore $op
 			;;
-		.AU)	mm.author="${mm.author}:$1:$7"
+		.AU)	case $mm_AF_cur in
+			?*)	case $mm_AF in
+				?*)	case $mm_AU in
+					?*)	mm_AU="${mm_AU}${mm_AF}" ;;
+					esac
+					;;
+				esac
+				mm_AF="${mm_AF_cur}</I>"
+				mm_AF_cur=""
+				;;
+			esac
+			mm_AU="${mm_AU}<BR>$1"
 			;;
 		.BL|.bL|.sL)
 			i=
@@ -1125,7 +1206,7 @@ do	getline || {
 			;;
 		.IX)	: ignore $op
 			;;
-		.LE|.RE|.bE|.sE)
+		.LE|.[IR]E|.bE|.sE)
 			case ${type[@]} in
 			*.[Aa][Ll]*)
 				while	(( lists > 0 ))
@@ -1139,7 +1220,7 @@ do	getline || {
 				;;
 			esac
 			case $op:$pd in
-			.RE:?*)	print -r -- "$pd" ;;
+			.[IR]E:?*)	print -r -- "$pd" ;;
 			esac
 			;;
 		.LX)	: ignore $op
@@ -1162,7 +1243,25 @@ do	getline || {
 			esac
 			print -r -- "$x"
 			;;
-		.PM)	: ignore $op
+		.PM|.pM)case ${html.company} in
+			'')	pm= ;;
+			*)	pm="${html.company//\&/&amp\;} " ;;
+			esac
+			case $1 in
+			'')	pm= ;;
+			C|NDA)	pm="${pm}CONFIDENTIAL" ;;
+			RG)	pm="${pm}PROPRIETARY (REGISTERED)" ;;
+			RS)	pm="${pm}PROPRIETARY (RESTRICTED)" ;;
+			*)	pm="${pm}PROPRIETARY" ;;
+			esac
+			case $pm in
+			?*)	
+				case $op in
+				.pM)	pm="<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR><TD><FONT font face=\"${ss}\"><B>${pm}</B></FONT></TD></TR></TABLE>" ;;
+				*)	pm="<HR><CENTER><$H>${pm}</$H></CENTER>" ;;
+				esac
+				;;
+			esac
 			;;
 		.PU)	: ignore $op
 			;;
@@ -1186,9 +1285,6 @@ do	getline || {
 				;;
 			esac
 			title $title
-			case $frame in
-			?*)	title $title > $frame-head.html || exit ;;
-			esac
 			case $op in
 			.TH)	case $2 in
 				1*)	sec="USER COMMANDS " ;;
@@ -1229,6 +1325,9 @@ do	getline || {
 			;;
 		.TS)	ifs=$IFS
 			(( row=0 ))
+			unset opts
+			eval "opts=${html.TABLE}"
+			tab=$'\t'
 			while	getline
 			do	set -- ${@//[-\|_=]/ }
 				case $# in
@@ -1240,52 +1339,89 @@ do	getline || {
 				.TE)	continue 2 ;;
 				esac
 				case $* in
-				*";")	(( row=0 )) ;;
-				*".")	break ;;
+				*";")	(( row=0 ))
+					for i in ${@//[,\;]/ }
+					do	case $i in
+						center)	opts.align=center
+							;;
+						expand)	opts.align=center opts.width="90%"
+							;;
+						*box)	opts.border=1
+							;;
+						linesize'('*')')
+							opts.border=${i//*'('@(*)')'*/\1}
+							;;
+						tab'('*')'*)
+							tab=${i//*'('@(*)')'*/\1}
+							;;
+						tab'(')	case $* in
+							*'tab(,'*)	tab=',' ;;
+							*'tab(;'*)	tab=';' ;;
+							*'tab( '*)	tab=' ' ;;
+							*)		tab=$'\t' ;;
+							esac
+							;;
+						esac
+					done
+					;;
+				*".")	break
+					;;
 				esac
 			done
-			print -r -- "<CENTER><TABLE" ${html.TABLE/'('@(*)')'/\1} ">"
+			case ${opts.border} in
+			0)	opts.cellpadding=0
+				opts.cellspacing=0
+				unset opts.bgcolor
+				;;
+			*)	case ${opts.cellpadding} in
+				'')	opts.cellpadding=2 ;;
+				esac
+				case ${opts.cellspacing} in
+				'')	opts.cellspacing=2 ;;
+				esac
+				;;
+			esac
+			print -r -- "<TABLE" ${opts/'('@(*)')'/\1} ">"
 			for ((n = 1; n < row; n++))
 			do	getline || break
 				case $1 in
 				[_=]*)	((n--)); continue ;;
 				esac
 				print -rn -- "<TR>"
-				IFS=$'\t'
+				IFS=$tab
 				set -- $*
 				IFS=$ifs
-				(( s=0 ))
-				for i in ${tbl[n]}
-				do	case $i in
-					*s*)	(( s++ ))
-						;;
-					*)	case $s in
-						0)	(( s=1 ))
-							continue
-							;;
-						1)	print -rn -- "<TH>"
-							;;
-						*)	print -rn -- "<TH colspan=$s>"
-							;;
-						esac
-						print -rn -- "$1</TH>"
-						case $# in
-						0|1)	break ;;
-						esac
-						shift
+				set -A Q ${tbl[n]}
+				(( q=0 ))
+				(( s=1 ))
+				while	:
+				do	a= b= e=
+					i=${Q[q++]}
+					case $i in
+					'')	break ;;
+					*s*)	(( s++ )); continue ;;
+					*c*)	a="$a align=center" ;;
+					*l*)	a="$a align=left" ;;
+					*r*)	a="$a align=right" ;;
+					esac
+					case $i in
+					*b*)	b="<B>" e="</B>" ;;
+					*i*)	b="<I>" e="</I>" ;;
+					esac
+					while	[[ ${Q[q]} == *s* ]]
+					do	(( s++ ))
+						(( q++ ))
+					done
+					if	(( s > 1 ))
+					then	a="$a colspan=$s"
 						(( s=1 ))
-						;;
+					fi
+					print -rn -- "<TH$a>$b$1$e</TH>"
+					case $# in
+					0|1)	break ;;
 					esac
+					shift
 				done
-				if	(( s ))
-				then	case $s in
-					1)	print -rn -- "<TH>"
-						;;
-					*)	print -rn -- "<TH colspan=$s>"
-						;;
-					esac
-					print -rn -- "$1</TH>"
-				fi
 				print -r -- "</TR>"
 			done
 			prev=
@@ -1295,6 +1431,9 @@ do	getline || {
 				[_=]*)	continue ;;
 				.TE)	break ;;
 				esac
+				IFS=$tab
+				set -- $*
+				IFS=$ifs
 				case $* in
 				*"\\")	prev=$prev$'\n'${*/"\\"/}
 					;;
@@ -1328,7 +1467,7 @@ do	getline || {
 					;;
 				esac
 			done
-			print -r -- "</TABLE></CENTER>"
+			print -r -- "</TABLE>"
 			;;
 		.TX)	: ignore $op
 			;;
@@ -1431,7 +1570,7 @@ do	getline || {
 				(( so++ ))
 			fi
 			;;
-		.sp)	case $1 in
+		.sp|.SP)case $1 in
 			[0-9]*)	count=$1
 				while	(( count >= 0 ))
 				do	(( count-- ))
@@ -1495,27 +1634,31 @@ do	getline || {
 						print -r -- "<A $nam=\"$url\">$txt</A>"
 						;;
 					link)	nam=href
+						tar=
 						case $frame in
 						?*)	case $url in
-							*([a-z]):*|/*) tar=" target=_top" ;;
-							*)		tar=" target=_parent" ;;
+							*([a-z]):*|/*)	tar=" target=_top" ;;
 							esac
 							;;
 						esac
 						if	[[ $frame != '' && $title == '' ]]
 						then	rm $framebody
-							framebody=$url
+							framelink=$pfx$url
 						else	print -r -- "<A $nam=\"$pfx$url\"$tar>$txt</A>"
 						fi
 						;;
 					ref)	case $txt in
-						$url)	print -r -- "<LINK href=\"$url\">" ;;
-						*)	print -r -- "<LINK href=\"$url\" type=\"$txt\">" ;;
+						$url)	x="<LINK href=\"$url\">" ;;
+						*)	x="<LINK href=\"$url\" type=\"$txt\">" ;;
+						esac
+						case $framelink in
+						'')	meta="$meta$nl$x" ;;
+						*)	framerefs="$framerefs$nl$x" ;;
 						esac
 						;;
 					esac
 					;;
-				meta.*)	print -r -- "<META name=\"${nam#*.}\" content=\"$val\">"
+				meta.*)	meta="$meta$nl<META name=\"${nam#*.}\" content=\"$val\">"
 					;;
 				logo)	eval html.$nam.src='$'val
 					;;
@@ -1536,19 +1679,20 @@ do	getline || {
 			header='<BASEFONT face="geneva,arial,helvetica" size=5>'
 			title "${2//\<*([!>])\>/}"
 			print "<BODY bgcolor='#ffffff'>"
-			print "<CENTER>"
-			print "<BR><BR><H1><FONT color=red>$2</FONT></H1><BR><BR>"
+			print "${pm}<CENTER>"
+			print "<BR><H1><FONT color=red>$2</FONT></H1><BR>"
 			shift 2
 			for name
-			do	print -- "<BR>$name"
+			do	[[ $name == "-" ]] && name=""
+				print -- "<BR>$name"
 			done
 			print "</CENTER>"
 			print "<P>"
 			;;
 		.vH)	print -r -- "<CENTER>
-<BR><BR>
+<BR>
 <H1><FONT color=red> $1 </FONT></H1>
-<BR><BR>
+<BR>
 </CENTER>"
 			;;
 		.vP)	while	(( lists > 0 ))
@@ -1562,8 +1706,8 @@ do	getline || {
 			trailer=
 			title "${1//\<*([!>])\>/}"
 			print "<BODY bgcolor='#ffffff'>"
-			print "<CENTER>"
-			print "<BR><BR><H1><FONT color=red>$1</FONT></H1>"
+			print "${pm}<CENTER>"
+			print "<BR><H1><FONT color=red>$1</FONT></H1>"
 			print "</CENTER>"
 			print "<P>"
 			;;
@@ -1617,6 +1761,14 @@ done
 while	(( lists > 0 ))
 do	print -r -- "</${list[lists--]}>"
 done
+case $references in
+?*)	heading .H 1 References
+	print "<P>"
+	print "<DL compact>"
+	print -r -- "$references"
+	print "</DL>"
+	;;
+esac
 print -r -- "<HR>"
 case ${html.ident} in
 1)	case ${license.author} in
@@ -1663,7 +1815,7 @@ case ${html.ident} in
 	for i in "${authors[@]}" "${license.organization}" "${license.corporation} ${license.company}" "${license.address}" "${license.location}" "${license.phone}"
 	do	case $i in
 		''|' ')	;;
-		*)	print -r -- "$sp$i"; sp="<BR>" ;;
+		*)	print -r -- "$sp${i//\&/&amp\;}"; sp="<BR>" ;;
 		esac
 	done
 	;;
@@ -1727,60 +1879,63 @@ $(cat $hit)
 	esac
 	;;
 esac
-trailer="$trailer
-</HTML>"
+trailer="$trailer$nl</HTML>"
 print -r -- "$trailer"
 case $frame in
-?*)	exec >> $frame-head.html || exit
-	case ${html.ident}:${html.logo} in
-	1:?*)	case ${html.home.href} in
-		?*)	print -r -- "<A" ${html.home/'('@(*)')'/\1} " target=_parent><IMG" ${html.logo/'('@(*)')'/\1} "></A>" ;;
-		*)	print -r -- "<IMG" ${html.logo/'('@(*)')'/\1} ">" ;;
-		esac
-		;;
-	esac
-	if	[[ $framebody == *-body.html && ${html.labels} != '' ]]
+?*)	if	[[ $framelink == '' && ${html.labels} != '' ]] && (( labels > 1 ))
 	then
-		print -r -- "<CENTER><FONT size=-1>"
-		print -r -- "   <A href=\"javascript:parent.history.go(-1)\" title=\"Previous frame\">Back</A>"
-		case $labels in
-		0|1)	;;
-		*)	for ((n = 0; n < labels; n++))
-			do	print -r -- " | <A href=\"$frame-body.html#${label[n]}\" target=\"${frame}_body\">${label[n]}</A>"
-			done
-			;;
-		esac
-		print -r -- "<FONT></CENTER>"
+		exec > $frame-temp.html || exit
+		print -r -- "<B><FONT font face=\"${ss}\">"
+		print -r -- "<TABLE align=center cellpadding=2 border=4 bgcolor=lightgrey><TR>"
+		for ((n = 0; n < labels; n++))
+		do	print -r -- "<TD><A href=\"#${label[n]}\">${label[n]}</A></TD>"
+		done
+		print -r -- "</TR></TABLE>"
+		print -r -- "</FONT></B>"
+		exec > /dev/null || exit
+		ed $framebody <<!
+/<!--INDEX-->/r $frame-temp.html
+w
+q
+!
+		rm $frame-temp.html
 	fi
-	print -r -- "$trailer"
-	exec > $frame.html || exit
-	ident
-	print -r -- "<TITLE>$title</TITLE>
-</HEAD>
-<FRAMESET" ${html.FRAMESET/'('@(*)')'/\1} ">
-	<FRAME src=\"$frame-head.html\" name=\"${frame}_head\" scrolling=no" ${html.FRAME/'('@(*)')'/\1} ">
-	<FRAME src=\"$framebody\" name=\"${frame}_body\" scrolling=auto" ${html.FRAME/'('@(*)')'/\1} ">
-</FRAMESET>
-</HTML>"
 	case $index in
 	?*)	case $index in
 		local)	exec > $frame-index.html || exit ;;
 		global)	exec > index.html || exit ;;
 		esac
-		unset html.FRAMESET.rows html.FRAMESET.cols html.FRAME.src
+		unset html.FRAMESET.rows html.FRAMESET.cols
 		ident
-		print -r -- "<TITLE>$title</TITLE>
+		case $framelink in
+		'')	framelink=$frame.html ;;
+		esac
+		print -r -- "<TITLE>$title</TITLE>$framerefs
 </HEAD>
 <FRAMESET" ${html.FRAMESET/'('@(*)')'/\1} ${html.index.top.FRAMESET/'('@(*)')'/\1} ">
-	<FRAME" ${html.FRAME/'('@(*)')'/\1} ${html.index.top.FRAME/'('@(*)')'/\1} "scrolling=no>
-	<FRAMESET" ${html.FRAMESET/'('@(*)')'/\1} ${html.index.left.FRAMESET/'('@(*)')'/\1} ">
-		<FRAME" ${html.FRAME/'('@(*)')'/\1} ${html.index.left.FRAME/'('@(*)')'/\1} "scrolling=no>
-		<FRAME" ${html.FRAME/'('@(*)')'/\1} src="'$frame.html'" "scrolling=auto>
-	</FRAMESET>
+	<FRAME" marginwidth=0 marginheight=0 ${html.FRAME/'('@(*)')'/\1} ${html.index.top.FRAME/'('@(*)')'/\1} "scrolling=no>
+	<FRAME" marginwidth=0 marginheight=0 ${html.FRAME/'('@(*)')'/\1} src="'$framelink'" "scrolling=auto>
 </FRAMESET>
 </HTML>"
 		;;
 	esac
+	;;
+*)	if	[[ ${html.labels} != '' ]] && (( labels > 1 ))
+	then
+		print -r -- "<!--LABELS-->"
+		print -r -- "<B><FONT font face=\"${ss}\">"
+		print -r -- "<TABLE bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center><TR>"
+		for ((n = 0; n < labels; n++))
+		do	if (( labels > 8 && (n & 7) == 7 ))
+			then	print -r -- "</TR><TR>"
+			fi
+			print -r -- "<TD align=left><A href=\"#${label[n]}\">${label[n]}</A></TD>"
+		done
+		print -r -- "</TR></TABLE>"
+		print -r -- "</FONT></B>"
+		print -r -- "<!--/LABELS-->"
+	fi
+	;;
 esac
 case $vg in
 ?*)	frame=$vg
@@ -1797,8 +1952,8 @@ case $vg in
 	exec > outline.html
 	title "${title} outline"
 	print -r -- "<BODY  bgcolor='#ffffff'>
-<CENTER>
-<BR><BR><H1><FONT color=red>outline</FONT></H1>
+${pm}<CENTER>
+<BR><H1><FONT color=red>outline</FONT></H1>
 <P>
 <TABLE cellspacing=1 cellpadding=1 border=1 class=box>"
 	for ((page=1; page <= pages; page++))

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -792,12 +791,17 @@ attributes(register char* s, register Coattr_t* p, Coattr_t* d)
 				}
 				continue;
 			case HASHKEY5('s','h','e','l','l'):
-				if (!sp)
+				if (sp)
 				{
 					static String_t	save;
 
 					p->global.set |= SETSHELL;
 					p->global.shell = savestring(&save, v, n);
+				}
+				else
+				{
+					p->set |= SETSHELL;
+					copystring(p->shell, sizeof(p->shell), v, n);
 				}
 				continue;
 			case HASHKEY4('s','t','a','t'):

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -95,8 +94,9 @@ mamerror(int fd, const void* b, size_t n)
 char*
 mamname(register struct rule* r)
 {
-	char*	a;
-	char*	s;
+	char*		a;
+	char*		s;
+	struct stat	st;
 
 	if (r->property & P_state)
 		return r->name;
@@ -105,7 +105,7 @@ mamname(register struct rule* r)
 	a = (r->property & P_target) ? unbound(r) : (state.mam.regress || state.expandview) ? r->name : localview(r);
 	if (state.mam.statix && (s = call(makerule(external.mamname), a)) && !streq(a, s))
 		a = s;
-	if (state.mam.root && (*a == '/' || (r->dynamic & (D_entries|D_member|D_membertoo|D_regular)) || access(r->name, R_OK)))
+	if (state.mam.root && (*a == '/' || (r->dynamic & (D_entries|D_member|D_membertoo|D_regular)) || stat(r->name, &st)))
 	{
 		if (*a != '/')
 			sfprintf(internal.nam, "%s/", internal.pwd);

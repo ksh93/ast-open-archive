@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -498,7 +497,7 @@ server(int fd, int op, int sub, int arg, char* dat)
 		break;
 	case 'g':
 		sfprintf(state.string, "\n");
-		sfprintf(state.string, "   version  %s\n", version);
+		sfprintf(state.string, "   version  %-.*s\n", strlen(version) - 1, version);
 		sfprintf(state.string, "      mesg  %s\n", state.mesg);
 		if (state.identify)
 			sfprintf(state.string, "  identify  %s\n", fmtesc(state.identify));
@@ -508,7 +507,7 @@ server(int fd, int op, int sub, int arg, char* dat)
 			sfprintf(state.string, "   profile  %s\n", state.profile);
 		sfprintf(state.string, "      pump  %s\n", state.pump);
 		sfprintf(state.string, "   service  %s\n", state.service);
-		sfprintf(state.string, "        sh  %s\n", state.sh);
+		sfprintf(state.string, "     shell  %s\n", state.sh);
 		sfprintf(state.string, "\n");
 
 		sfprintf(state.string, "    access  %-7s", state.access < cs.time ? "EXPIRED" : fmtelapsed(state.access - cs.time, 1));
@@ -689,6 +688,8 @@ server(int fd, int op, int sub, int arg, char* dat)
 						sfprintf(state.string, " access=%s", sp->access);
 					if (sp->bypass)
 						sfprintf(state.string, " bypass=%s", sp->bypass);
+					if (sp->shell[0])
+						sfprintf(state.string, " shell=%s", sp->shell);
 					sfprintf(state.string, " %s\n", sp->misc);
 					break;
 				case 'p':
@@ -779,7 +780,7 @@ server(int fd, int op, int sub, int arg, char* dat)
 			}
 		break;
 	case 'v':
-		sfprintf(state.string, "%s\n", version);
+		sfprintf(state.string, "%-.*s\n", strlen(version) - 1, version);
 		break;
 	case 'Q':
 		exit(arg);

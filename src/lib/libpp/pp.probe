@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2000-10-17
+# @(#)pp.probe (AT&T Research) 2001-01-01
 #
 # C probe for libpp
 #
@@ -61,6 +61,11 @@ echo "#ident \"$id\"" > ident.$src
 echo "#import \"import.h\"" > import.$src
 echo "int aaa;" > import.h
 echo "#include_next <stdio.h>" > include_next.$src
+echo "int i = 0;" > lineid1.i
+echo '# 1 "t.c"
+int i = 0;' > lineid2.i
+echo '# 1 "t.c"
+int i = 0;' > lineid3.$src
 echo "#include <stdio.h>" > linetype.$src
 echo '#include <sys/types.h>
 main()
@@ -173,6 +178,7 @@ headerexpand=
 ident=
 import=
 include_next=
+lineid=
 linetype=
 opspace=
 pluscom=
@@ -215,6 +221,11 @@ $cc -S ident.$src && grep "$id" ident.s && ident=1
 { $cc -E import.$src | grep aaa ;} && import=1
 
 { $cc -E include_next.$src | grep '^[ 	]*#[ 	]*[0-9]*[ 	]*".*stdio.h"' ;} && include_next=1
+
+if	$cc -c lineid1.i
+then	$cc -c lineid2.i || lineid=line
+else	$cc -c lineid3.c || lineid=line
+fi
 
 if	$cc -E linetype.$src | grep '^[ 	]*#[ 	]*[0-9]*[ 	]*".*"[ 	]*[12]' > linetype
 then	if	grep '^[ 	]*#[ 	]*[0-9]*[ 	]*".*"[ 	]*[12][ 	][ 	]*3' linetype
@@ -355,8 +366,9 @@ echo "$predef" >> all.pp
 	echo "struct { char* name; long value; } predef[] = {"
 	while read sym junk
 	do	case $sym in
-		_*)	set ${sym} ;;
-		*)	set ${sym} _${sym} _${sym}_ __${sym} __${sym}__ ;;
+		_*)		set ${sym} ;;
+		[a-zA-Z]*)	set ${sym} _${sym} _${sym}_ __${sym} __${sym}__ ;;
+		*)		continue ;;
 		esac
 		for sym
 		do	echo "#ifdef $sym"
@@ -888,6 +900,9 @@ case $plusplus in
 		;;
 	esac
 	;;
+esac
+case $lineid in
+?*)	echo "#pragma pp:lineid line" ;;
 esac
 case $linetype in
 1)	echo "#pragma pp:linetype" ;;

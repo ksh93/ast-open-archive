@@ -1,45 +1,86 @@
-<META name="description" content="INIT package">
-<META name="keywords" content="software, package">
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Labs Research) 2000-07-17">
+<META name="generator" content="mm2html (AT&T Labs Research) 2001-01-01">
+<META name="description" content="INIT package">
+<META name="keywords" content="software, package">
 <TITLE> INIT package </TITLE>
 </HEAD>
-<BODY  marginheight=0 leftmargin=0 topmargin=0 marginwidth=0 bgcolor=white vlink=teal link=slateblue >
-<TABLE border=0 width=640><TR><TD valign=top align=left>
+<BODY  bgcolor=white vlink=teal link=slateblue >
+<TABLE border=0 align=center width=96%><TR><TD valign=top align=left>
+<!--INDEX--><!--/INDEX-->
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="INIT package">INIT package</A></H3></CENTER></FONT></FONT>
 The INIT package is required by all other packages. It contains
 the package command, support scripts, and utilities.
 Components in this package:
-<PRE>
-    INIT
-</PRE>
 <P>
-The software is covered by these licenses:
+<TABLE  align=center bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 >
+<TR><TD align=left>
+INIT</TD></TR>
+</TABLE>
+<P>
+The software is covered by this license:
 <UL type=square>
 <LI>
 <A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
-<LI>
-<A href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</A>
 </UL>
+Individual components may be covered by separate licenses;
+refer to the component source and/or binaries for more information.
+<P>
 A recent
 <A href="#release change log">release change log</A>
 is also included.
-<PRE>
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="release change log">release change log</A></H3></CENTER></FONT></FONT>
+<!--LABELS-->
+<B><FONT font face="verdana,arial,helvetica,geneva,sans-serif">
+<TABLE bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center><TR>
+<TD align=left><A href="#INIT changes">INIT</A></TD>
+</TR></TABLE>
+</FONT></B>
+<!--/LABELS-->
+<PRE>
 
 All recorded changes follow.
 
 <P>
-<H4>INIT</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="INIT changes">INIT changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 ratz.c: #ifdef for uwin ncc
+	 iffe.sh,package.sh: check PACKAGE_PATH for local installations
+	 package.sh: add psrinfo for osf.alpha host cpu 
+	 package.sh: change pax --meter probe; some hang on /dev/tty
+	 package.sh: fix `install flat ARCH'
+	 mamake: eliminate loops from scan order
+	 C+probe: add probe_verbose -V for aix cc=xlc
+	 cc.ibm.risc,ldd.ibm.risc: add
+	 package.mk: list refs to top-level licenses only
+	 package.mk: add local link table to change log html
+00-12-25 package.sh: `no package archives' is a hard error, duh
+	 package.sh: reorder host type logic for lame shells
+	 mamake.c: getcwd =&gt; getwd for NeXT -- how about posix==default guys
+	 iffe.sh: really gross workaround for NeXT -lposix stdout null's
+	 iffe.sh: handle cc -E that insist on compiling
+00-12-15 iffe.sh: ancient sh function call blows $*; call only when $# == 0
+	 *.sh: `getopts 2&gt;/dev/null` =&gt; `(getopts)2&gt;/dev/null` for ancient sh
+	 package.sh: fix LD_LIBRARY*_PATH initialization
+	 cc.next.m68k: add for _POSIX_SOURCE and linker multiply defined syms
+00-12-12 ratz: add --meter
+	 package.sh: a few VPATH fixes
+	 Makefile: don't override *.mips* cc if -version not accepted
+00-12-11 package.mk: *.inx now contains name=value
+00-12-07 package.sh: handle PC netscape . =&gt; _ pathname mangle
+	 WWW.mk: .tar.gz =&gt; .tgz
+00-11-27 package.sh: add checklicense() to do license checks at read time
+	 package.mk: change component list from preformat to table
 00-10-31 package.mk: *.pkg must assert closure
 	 package.mk: add cc- variants to list.package.binary
 	 package.sh: omit dups from package list
 	 package.sh: invalid arg gives one line Usage
+	 package.sh: relax checkaout checks for non-owners
+	 package.sh: package use sets NPROC if not already set or &#0091;01&#0093;
+	 proto.c: add $(INSTALLROOT)/include/ast hack
 00-10-26 WWW.mk: add .SOURCE rhs to :WWWPAGE:
 00-10-25 package: fix install
 	 package.mk: add list.install
@@ -228,7 +269,7 @@ All recorded changes follow.
 </PRE>
 <HR>
 <P>
-November 13, 2000
+January 27, 2001
 
 </TD></TR></TABLE>
 </BODY>

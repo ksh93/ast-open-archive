@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 
@@ -70,7 +69,7 @@ MAIN()
 		terror("Did not get Line1 for sfgetr\n");
 	sfsync(sfstdin);
 	system(sfprints("%s -r",argv[0]));
-	sfseek(sfstdin,(Sfoff_t)lseek(sffileno(sfstdin),0L,1),0);
+	sfseek(sfstdin, (Sfoff_t)lseek(sffileno(sfstdin), (off_t)0, 1), 0);
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line4") != 0)
 		terror("Did not get Line4 for sfgetr\n");
 
@@ -81,7 +80,7 @@ MAIN()
 		terror("Did not get Line1 for sfmove\n");
 	sfsync(sfstdin);
 	system(sfprints("%s -m",argv[0]));
-	sfseek(sfstdin,(Sfoff_t)lseek(sffileno(sfstdin),0L,1),0);
+	sfseek(sfstdin, (Sfoff_t)lseek(sffileno(sfstdin), (off_t)0, 1), 0);
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line4") != 0)
 		terror("Did not get Line4 for sfmove\n");
 
@@ -93,7 +92,7 @@ MAIN()
 		terror("Did not get Line1 for head\n");
 	sfsync(sfstdin);
 	system("head -2 > /dev/null"); /* for testing the head program */
-	sfseek(sfstdin,(Sfoff_t)lseek(sffileno(sfstdin),0L,1),0);
+	sfseek(sfstdin, (Sfoff_t)lseek(sffileno(sfstdin), (off_t)0, 1), 0);
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line4") != 0)
 		terror("Did not get Line4 for head\n");
 #endif

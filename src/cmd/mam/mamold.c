@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  * to an oldmake makefile on stdout
  */
 
-static const char id[] = "\n@(#)mamold (gsf@research.att.com) 1989-03-22\0\n";
+static const char id[] = "\n@(#)$Id: mamold (gsf@research.att.com) 1989-03-22 $\0\n";
 
 #include <ast.h>
 #include <mam.h>

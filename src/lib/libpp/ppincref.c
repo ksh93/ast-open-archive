@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2000 AT&T Corp.                *
+*                Copyright (c) 1986-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -36,7 +35,19 @@
 void
 ppincref(char* parent, char* file, int line, int type)
 {
+	register struct ppinstk*	sp;
+	int				level;
+
 	NoP(parent);
 	NoP(line);
-	if (type & PP_SYNC_PUSH) error(0, "%s", file);
+	if (type & PP_SYNC_PUSH)
+	{
+		level = 0;
+		for (sp = pp.in; sp; sp = sp->prev)
+			if (sp->type == IN_FILE)
+				level++;
+		if (level > 0)
+			level--;
+		error(0, "%-*s%s", level * 4, "", file);
+	}
 }

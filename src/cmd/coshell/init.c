@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -30,9 +29,9 @@
  * remote coshell initialization script
  */
 
-static const char id[] = "\n@(#)coshell (AT&T Research) 1999-04-01\0\n";
+static const char id[] = "\n@(#)$Id: coshell (AT&T Research) 2000-12-14 $\0\n";
 
-const char*	version = id + 5;
+const char*	version = id + 10;
 
 const char	corinit[] = "\
 print -u3 n 0 $HOSTNAME $$\n\

@@ -1,7 +1,7 @@
 #
 # list of known old cpp predefined symbols
 #
-# @(#)pp.def (gsf@research.att.com) 2000-05-09
+# @(#)pp.def (gsf@research.att.com) 2001-01-01
 #
 # symbols will be tested for the common `_' permutations
 # qualifiers may be combinations of
@@ -16,6 +16,9 @@
 #
 ABI_SOURCE	:source:
 AES_SOURCE	:source:
+AIX		:architecture:
+AIX32		:architecture:
+AIX64		:architecture:
 AM29000		:architecture:
 AM29K		:architecture:
 ANSI_CPP	:dialect:
@@ -52,6 +55,7 @@ LANGUAGE_C_PLUS_PLUS	:dialect:
 LARGE		:architecture:
 LARGE_M
 LATTICE		:vendor:
+LONG_LONG	:dialect:
 LONGLONG	:dialect:
 M68010		:machine:
 M68020		:machine:
@@ -109,6 +113,7 @@ POSIX
 POSIX2_SOURCE	:source:
 POSIX_C_SOURCE	:source:
 POSIX_SOURCE	:source:
+POWER		:architecture:
 PTRDIFF_TYPE
 PWB
 RES

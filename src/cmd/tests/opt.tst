@@ -469,6 +469,14 @@ IMPLEMENTATION
 		EXIT 1
 		OUTPUT - $'return=: option=-? name=--? num=0'
 		ERROR - $'sum: -foo: unknown option'
+	EXEC	sum "$usage" -m A
+		ERROR -
+		OUTPUT - $'return=m option=-m name=-m arg=(null) num=0\nargument=1 value="A"'
+		EXIT 0
+	EXEC	sum "$usage" -m L A
+		OUTPUT - $'return=m option=-m name=-m arg=(null) num=0\nargument=1 value="L"\nargument=2 value="A"'
+	EXEC	sum "$usage" -m 0L A
+		OUTPUT - $'return=m option=-m name=-m arg=0L num=0\nargument=1 value="A"'
 
 TEST 05 'should at least generate its own man page'
 	usage=$'[-?@(#)getopts (AT&T Research) 1999-02-02\n]
@@ -2617,3 +2625,52 @@ id=(null) catalog=libast text="Usage"'
 "<* three info ok *>"
 "again|back"
 "<* two info ok *>"'
+
+TEST 35 'alternate version ids'
+	EXEC id $'[-?\n@(#)id (spamco) 2000-12-01\n]' --?-version
+		OUTPUT - $'return=? option=-? name=--?-version num=0'
+		ERROR - $'  version         id (spamco) 2000-12-01'
+		EXIT 2
+	EXEC id $'[-?\n@(#)  \t  id (spamco) 2000-12-01\n]' --?-version
+	EXEC id $'[-?\n$Id: id (spamco) 2000-12-01 $\n]' --?-version
+		ERROR - $'  version         id (spamco) 2000-12-01'
+	EXEC id $'[-?\n@(#)$Id: id (spamco) 2000-12-01 $\n]' --?-version
+	EXEC id $'[-?\n$Id: @(#)id (spamco) 2000-12-01 $\n]' --?-version
+
+TEST 36 'enumerated option argument values'
+	usage=$'[-?\naha\n][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n[c:C?C style.][A:always?Always shell style.][101:shell?Shell quote if necessary.][q:question?Replace unknown chars with ?.]\n}'
+	EXEC ls "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'SYNOPSIS
+  ls [ options ]
+
+OPTIONS
+  -Q, --quote=style
+                  Quote names according to style:
+                    c|C   C style.
+                    A|always
+                          Always shell style.
+                    shell Shell quote if necessary.
+                    q|question
+                          Replace unknown chars with ?.
+                  The default value is question.
+
+IMPLEMENTATION
+  version         aha'
+	EXEC ls "$usage" --quote
+		EXIT 1
+		OUTPUT - 'return=: option=-Q name=--quote num=0'
+		ERROR - 'ls: --quote: style value expected'
+	EXEC ls "$usage" --quote=alx
+		ERROR - 'ls: --quote: alx: unknown option argument value'
+	EXEC ls "$usage" --quote=c
+		EXIT 0
+		OUTPUT - 'return=Q option=-Q name=--quote arg=c num=99'
+		ERROR -
+	EXEC ls "$usage" --quote=C
+		OUTPUT - 'return=Q option=-Q name=--quote arg=C num=99'
+	EXEC ls "$usage" -Q shell
+		OUTPUT - 'return=Q option=-Q name=-Q arg=shell num=-101'
+	EXEC ls "$usage" -Qs
+		OUTPUT - 'return=Q option=-Q name=-Q arg=s num=-101'

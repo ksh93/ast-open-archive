@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)css (AT&T Labs Research) 1998-05-01\n]"
+"[-?\n@(#)$Id: css (AT&T Labs Research) 1998-05-01 $\n]"
 USAGE_LICENSE
 "[+NAME?css - multiplex multiple clients on one connect stream server]"
 "[+DESCRIPTION?\bcss\b multiplexes multiple clients on one filter server."

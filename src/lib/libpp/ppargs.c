@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2000 AT&T Corp.                *
+*                Copyright (c) 1986-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -32,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)cpp (AT&T Labs Research) 1999-11-19\n]"
+"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2001-01-01 $\n]"
 USAGE_LICENSE
 "[+NAME?cpp - C language preprocessor]"
 "[+DESCRIPTION?\bcpp\b is the preprocessor for all C language dialects. It is"
@@ -121,7 +120,7 @@ USAGE_LICENSE
 "	compatibility.]:[assertion]"
 "[E:preprocess?Ignored for compatibility with ancient compilers.]"
 "[H:include-reference?Emit \b#include\b file paths on the standard error,"
-"	one per line. For compatibility with some forgotten system.]"
+"	one per line, indented to show nesting.]"
 "[T?If not \bgcc\b(1) then truncate identifiers to \alength\a"
 "	characters for compatibility with old AT&T (I guess only Lucent needs"
 "	them now) compilers.]#?[length]"

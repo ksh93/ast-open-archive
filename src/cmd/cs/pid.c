@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -31,7 +30,7 @@
  * local pid monitor service
  */
 
-static const char id[] = "\n@(#)cs.pid (AT&T Bell Laboratories) 11/11/93\0\n";
+static const char id[] = "\n@(#)$Id: cs.pid (AT&T Bell Laboratories) 11/11/93 $\0\n";
 
 #include <ast.h>
 #include <cs.h>
@@ -151,7 +150,7 @@ svc_read(void* handle, int fd)
 				break;
 			case 'v':
 				m = state->buf;
-				n = sfsprintf(m, sizeof(state->buf), "%s %s %u\n", id + 5, csname(0L), getpid());
+				n = sfsprintf(m, sizeof(state->buf), "%s %s %u\n", id + 10, csname(0L), getpid());
 				break;
 			default:
 				if (*m < '0' || *m > '9')

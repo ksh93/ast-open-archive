@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2000 AT&T Corp.                *
+*                Copyright (c) 1986-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -517,12 +516,15 @@ ppcontrol(void)
 
 				if (!(p = pp.hdrbuf) && !(p = pp.hdrbuf = newof(0, char, MAXTOKEN, 0)))
 					error(3, "out of space");
+				pp.state &= ~NOSPACE;
 				while ((c = pplex()) && c != '>')
 				{
+					v = p + 1;
 					STRCOPY(p, pp.token, s);
-					while (p > pp.hdrbuf && *(p - 1) == ' ')
+					if (p == v && *(p - 1) == ' ' && pp.in->type != IN_MACRO)
 						p--;
 				}
+				pp.state |= NOSPACE;
 				*p++ = 0;
 				memcpy(pp.token, pp.hdrbuf, p - pp.hdrbuf);
 				c = T_HEADER;
@@ -541,7 +543,12 @@ ppcontrol(void)
 	*p++ = '#';
 	STRCOPY(p, pp.token, s);
 	p0 = p;
-	if (!(p6 = getline(p, &pp.valbuf[MAXTOKEN], -1, 0)))
+	pp.mode |= EXPOSE;
+	pp.state |= HEADER;
+	p6 = getline(p, &pp.valbuf[MAXTOKEN], -1, 0);
+	pp.state &= ~HEADER;
+	pp.mode &= ~EXPOSE;
+	if (!p6)
 	{
 		*p0 = 0;
 		error(2, "%s: directive too long", pp.valbuf);
@@ -627,7 +634,9 @@ ppcontrol(void)
 				debug((-4, "map: %s", p1));
 				*s++ = '\n';
 				*s = 0;
+				error_info.line++;
 				PUSH_RESCAN(p1);
+				error_info.line--;
 				directive = LINE;
 			}
 		}

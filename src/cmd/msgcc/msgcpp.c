@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                  Copyright (c) 2000 AT&T Corp.                   *
+*                Copyright (c) 2000-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)msgcpp (AT&T Labs Research) 2000-05-17\n]"
+"[-?\n@(#)$Id: msgcpp (AT&T Labs Research) 2000-05-17 $\n]"
 USAGE_LICENSE
 "[+NAME?msgcpp - C language message catalog preprocessor]"
 "[+DESCRIPTION?\bmsgcpp\b is a C language message catalog preprocessor."
@@ -53,7 +52,7 @@ USAGE_LICENSE
 "[+?The input source file is preprocessed with the \bpp:allpossible\b"
 "	option on. This enables non-C semantics; all source should first"
 "	be compiled error-free with a real compiler before running \bmsgcpp\b."
-"	The following changes are enabled for the top level files, i.e.,"
+"	The following changes are enabled for the top level files (i.e.,"
 "	included file behavior is not affected):]{"
 "		[+(1)?All \b#if\b, \b#ifdef\b and \b#ifndef\b branches"
 "			are enabled.]"

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1989-2000 AT&T Corp.                #
+#                Copyright (c) 1989-2001 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -22,7 +22,6 @@
 #               Glenn Fowler <gsf@research.att.com>                #
 #                David Korn <dgk@research.att.com>                 #
 #                 Eduardo Krell <ekrell@adexus.cl>                 #
-#                                                                  #
 ####################################################################
 # NOTE: retain this comment
 dir=$_ # NOTE: this line must appear before any commands
@@ -37,7 +36,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)3d (AT&T Labs Research) 2000-02-14
+@(#)3d (AT&T Labs Research) 2000-12-14
 ]
 '$USAGE_LICENSE$'
 [+NAME?3d - execute a command with nDFS filesystem services enabled]
@@ -55,7 +54,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	level are readonly; if a lower level file is modified it is first
 	copied to the top level before modification. Viewpath mounts
 	directories can be chained. All levels but the top in a chain are
-	readonly. The traditional \bVPATH=\b\ad1:d2:d3 viewpathing is
+	readonly. The traditional \bVPATH=\b\ad1:d2:d3\a viewpathing is
 	specified by the two \b3d\b mounts "\ad1 d2\a" and "\ad2 d3\a".]
 [+?The following service mounts are initialized by default:]{
 	[+/dev/fd?\b/dev/fd/\b\an\a refers to the open file descriptor \an\a
@@ -94,42 +93,42 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	control the semantics of \b3d\b and allow services to be attached to
 	the file namespace. Unsupported \bfs\b paths are silently ignored. The
 	supported \bfs\b paths are:]{
-	[+/#fd?]
-	[+/#fs/\aname\a[/\aoption\a/...]]?]
-	[+/#map?]
-	[+/#null?]
-	[+/#option?]{
-		[+2d?]
-		[+3d?]
-		[+boundary?]
-		[+call=\avalue\a?]
-		[+count=\avalue\a?]
-		[+debug=\alevel\a?]
-		[+dump=\b[\avalue\a]]?]{
-			[+call=\avalue\a?]
-			[+file=\avalue\a?]
-			[+fs=\avalue\a?]
-			[+map=\avalue\a?]
-			[+mount=\avalue\a?]
-			[+safe=\avalue\a?]
-			[+state=\avalue\a?]
-			[+view=\avalue\a?]
+	[+/#fd? ]
+	[+/#fs/\aname\a[/\aoption\a/...]]? ]
+	[+/#map? ]
+	[+/#null? ]
+	[+/#option? ]{
+		[+2d? ]
+		[+3d? ]
+		[+boundary? ]
+		[+call=\avalue\a? ]
+		[+count=\avalue\a? ]
+		[+debug=\alevel\a? ]
+		[+dump=\b[\avalue\a]]? ]{
+			[+call=\avalue\a? ]
+			[+file=\avalue\a? ]
+			[+fs=\avalue\a? ]
+			[+map=\avalue\a? ]
+			[+mount=\avalue\a? ]
+			[+safe=\avalue\a? ]
+			[+state=\avalue\a? ]
+			[+view=\avalue\a? ]
 		}
-		[+file=\avalue\a?]
-		[+fork?]
-		[+init?]
-		[+license=\apath\a?]
-		[+mount=\avalue\a?]
-		[+table=\avalue\a?]
-		[+test=\abitmask\a?]
-		[+timeout=\avalue\a?]
-		[+timestamp?]
-		[+trace=\avalue\a?]
-		[+version=1?]
+		[+file=\avalue\a? ]
+		[+fork? ]
+		[+init? ]
+		[+license=\apath\a? ]
+		[+mount=\avalue\a? ]
+		[+table=\avalue\a? ]
+		[+test=\abitmask\a? ]
+		[+timeout=\avalue\a? ]
+		[+timestamp? ]
+		[+trace=\avalue\a? ]
+		[+version=1? ]
 	}
-	[+/#pwd?]
-	[+/#safe?]
-	[+/#view?]
+	[+/#pwd? ]
+	[+/#safe? ]
+	[+/#view? ]
 }
 [+DETAILS?\an\a\bDFS\b semantics are applied by intercepting system calls with
 	a dll that is preloaded at process startup before \amain\a() is called.
@@ -156,12 +155,12 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	\bsgi.mips3\b that support multiple a.out formats may have multiple
 	versions of the \b3d\b dll. In all cases the \b3d\b script handles
 	the dll search.]
-[+EXAMPLES?]{
-	[+$ 3d?]
-	[+$ 3d $INSTALLROOT $PACKAGEROOT?]
-	[+$ VPATH=$INSTALLROOT:$PACKAGEROOT 3d?]
-	[+$ 3d ls -l?]
-	[+$ 2d ls -l?]
+[+EXAMPLES? ]{
+	[+\b$ 3d? ]
+	[+\b$ 3d $INSTALLROOT $PACKAGEROOT? ]
+	[+\b$ VPATH=$INSTALLROOT::$PACKAGEROOT 3d? ]
+	[+\b$ 3d ls -l? ]
+	[+\b$ 2d ls -l? ]
 }
 [+SEE ALSO?\benv\b(1), \bie\b(1), \bsh\b(1), \btrace\b(1), \bwarp\b(1),
 	\bstat\b(2)]
@@ -204,15 +203,16 @@ case $dir in
 	fi
 	;;
 esac
-version=
-mount="- -"
+cflag=
 full="/dev/fdp/local/nam/user /#fs/nam/name/unique /dev/fdp /#nam /dev/tcp /#nam /dev/udp /#nam /dev/fd /#fd"
+mount="- -"
 options=
 output=
 show=
 shell=$SHELL
 trace=
 SHELL=
+version=
 case $VPATH in
 *:*)	ifs=$IFS
 	IFS=:
@@ -236,7 +236,7 @@ esac
 
 while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
-	c)	break ;;
+	c)	cflag=1; break ;;
 	d)	trace="$trace/debug=$OPTARG" ;;
 	l)	full= ;;
 	m)	mount="$mount $OPTARG" ;;
@@ -254,6 +254,9 @@ do	case $OPT in
 	esac
 done
 shift $OPTIND-1
+case $cflag in
+1)	set -- -c "$@" ;;
+esac
 
 case $full in
 ?*)	mount="$full $mount" ;;
@@ -350,18 +353,11 @@ case $1:$#:$options in
 	esac
 	;;
 esac
-case "$shell : $1" in
-"$SHELL : -c")
-	shift
-	$show eval "$@"
-	;;
-*)	case $show in
-	"")	exec $shell "$@" ;;
-	*)	case $version in
-		"")	$show __="'$__'" exec $shell "$@" ;;
-		*)	$show __="'$__'" $exp exec $shell "$@" ;;
-		esac
-		;;
+case $show in
+"")	exec $shell "$@" ;;
+*)	case $version in
+	"")	$show __="'$__'" exec $shell "$@" ;;
+	*)	$show __="'$__'" $exp exec $shell "$@" ;;
 	esac
 	;;
 esac

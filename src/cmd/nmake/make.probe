@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2000-10-18
+# @(#)make.probe (AT&T Research) 2001-01-01
 #
 # C probe for make
 #
@@ -497,6 +497,13 @@ case $pic:$so:$dynamic:$static in
 		ar cr libxxx.$lib shared.$obj
 		ranlib libxxx.$lib
 		eval set x $probe_lib_all
+		rm -f xxx$dll
+		if	$ld $shared -o xxx$dll libxxx.$lib && test -r xxx$dll
+		then	if	$nm $nmflags xxx$dll | grep ShareD
+			then	lib_dll=OPTION
+				set x
+			fi
+		fi
 		while	:
 		do	shift
 			case $# in
@@ -512,6 +519,8 @@ case $pic:$so:$dynamic:$static in
 			fi
 		done
 		case $lib_dll in
+		OPTION)	lib_dll=option
+			;;
 		option)	rm -f libyyy.$lib
 			ar cr libyyy.$lib notall.$obj
 			ranlib libyyy.$lib
@@ -665,26 +674,33 @@ then	eval set x $probe_arflags
 	done
 fi
 
-case $lib_dll in
-symbol)	echo 'extern int f();
-main() { f(); return 0; }' > main.$src
-	echo '#include <stdio.h>
-int f() { printf("hello world"); return 0; }' > member.$src
-	if	$cc -c main.$src && $cc -c member.$src
-	then	echo f > lib.exp
-		rm -f lib.$obj main.exe
-		if	$ld -o lib.$obj -L: -bexport:lib.exp -berok -bmodtype:SRE -T512 -H512 -lm -lc member.$obj && $cc -o main.exe main.$obj lib.$obj
-		then	shared='-T512 -H512 -L$(LIBDIR): -berok -bmodtype:SRE'
-			lib_dll=export
-			ldscript=.exp
-			case $pic in
-			"")	pic=-D_PIC_ ;;
-			esac
-			case $so in
-			"")	so=.$obj ;;
-			esac
+case $shared in
+-G)	case $pic in
+	"")	pic=-D_PIC_ ;;
+	esac
+	;;
+*)	case $lib_dll in
+	symbol)	echo 'extern int f();
+	main() { f(); return 0; }' > main.$src
+		echo '#include <stdio.h>
+	int f() { printf("hello world"); return 0; }' > member.$src
+		if	$cc -c main.$src && $cc -c member.$src
+		then	echo f > lib.exp
+			rm -f lib.$obj main.exe
+			if	$ld -o lib.$obj -L: -bexport:lib.exp -berok -bmodtype:SRE -T512 -H512 -lm -lc member.$obj && $cc -o main.exe main.$obj lib.$obj
+			then	shared='-T512 -H512 -L$(LIBDIR): -berok -bmodtype:SRE'
+				lib_dll=export
+				ldscript=.exp
+				case $pic in
+				"")	pic=-D_PIC_ ;;
+				esac
+				case $so in
+				"")	so=.$obj ;;
+				esac
+			fi
 		fi
-	fi
+		;;
+	esac
 	;;
 esac
 

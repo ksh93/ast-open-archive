@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2000 AT&T Corp.                *
+*                Copyright (c) 1986-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -108,6 +107,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 			pp.token = p = oldof(0, char, 0, n);
 			q = p + MAXTOKEN;
 			*pp.token++ = ' ';
+			old_hidden = pp.hidden;
 			while (c = pplex())
 			{
 				if (c == '\n')
@@ -160,7 +160,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 			}
 			if (pp.token > p && *(pp.token - 1) == ' ')
 				pp.token--;
-			if (pp.hidden)
+			if (pp.hidden != old_hidden)
 				*pp.token++ = '\n';
 			*pp.token = 0;
 			pp.state = old_state;
@@ -411,7 +411,7 @@ ppcall(register struct ppsymbol* sym, int tok)
 		}
 	}
  disable:
-	if (ret < 0 && sym->hidden)
+	if (ret < 0 && sym->hidden && !(pp.mode & EXPOSE) && (pp.in->type == IN_FILE || pp.in->type == IN_MACRO || pp.in->type == IN_EXPAND))
 	{
 		struct ppinstk*	inp;
 

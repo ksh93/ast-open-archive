@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -38,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)probe (AT&T Labs Research) 2000-08-11\n]"
+"[-?\n@(#)$Id: probe (AT&T Labs Research) 2000-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?probe - generate/install/display language processor probe information]"
 "[+DESCRIPTION?\bprobe\b generates, installs and displays on the standard"

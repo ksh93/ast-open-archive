@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2000 AT&T Corp.                *
+*                Copyright (c) 1999-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #include	"sftest.h"
 #ifdef SF_APPEND
@@ -61,7 +60,7 @@ MAIN()
 
 	if(write(fd,buf,sizeof(buf)) != sizeof(buf))
 		terror("Writing to file\n");
-	if(lseek(fd,0L,0) < 0)
+	if(lseek(fd, (off_t)0, 0) < 0)
 		terror("Seeking back to origin\n");
 
 	if(!(f = sfnew((Sfio_t*)0,buf,sizeof(buf),fd,SF_WRITE)))

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                  Copyright (c) 2000 AT&T Corp.                   *
+*                Copyright (c) 2000-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -29,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)msggen (AT&T Labs Research) 2000-04-26\n]"
+"[-?\n@(#)$Id: msggen (AT&T Labs Research) 2000-04-26 $\n]"
 USAGE_LICENSE
 "[+NAME?msggen - generate a machine independent formatted message catalog]"
 "[+DESCRIPTION?\bmsggen\b merges the message text source files \amsgfile\a"

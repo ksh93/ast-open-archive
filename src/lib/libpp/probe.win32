@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2000-09-15
+# @(#)probe.win32 (AT&T Labs Research) 2001-01-01
 #
 # win32 specific pp C probe initialization
 # ms vc is easy on uwin
@@ -63,7 +63,7 @@ esac
 
 case $version:$include in
 [0-9]*:/*)
-	hosttype=`hostinfo type`
+	hosttype=$(package)
 	machine=${hosttype#*.}
 	case $uwin in
 	[0-9]*) standard="
@@ -82,12 +82,16 @@ case $version:$include in
 	standard="$standard
 #pragma pp:standard \"$include\""
 	: the payoff
+	set -- $cc
+	cmd=$1
+	shift
+	set -- $(whence $cmd) "$@"
 	cat >&3 <<!
-/* `whence $cc`
+/* $*
 */
 
 #pragma pp:predefined
-#define _STD_INCLUDE_DIR ${include}
+#define _STD_INCLUDE_DIR ...
 #define _${machine}_ 1
 !
 	{

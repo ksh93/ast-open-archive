@@ -135,17 +135,18 @@
   Some stuff for all platforms.
 --*/
 
+#include <bzlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <math.h>
-#include "bzlib.h"
 
 #define ERROR_IF_EOF(i)       { if ((i) == EOF)  ioError(); }
 #define ERROR_IF_NOT_ZERO(i)  { if ((i) != 0)    ioError(); }
 #define ERROR_IF_MINUS_ONE(i) { if ((i) == (-1)) ioError(); }
 
+#define panic	bzpanic
 
 /*---------------------------------------------*/
 /*--

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -79,7 +78,8 @@ cspoll(Cs_t* state, Cspoll_t* fds, int num, int ms)
 	for (mp = (pp = fds) + num; pp < mp; pp++)
 		if (pp->fd >= 0)
 		{
-			if (pp->fd > width) width = pp->fd;
+			if (pp->fd > width)
+				width = pp->fd;
 			if (pp->events & CS_POLL_READ)
 			{
 				events |= CS_POLL_READ;
@@ -114,36 +114,40 @@ cspoll(Cs_t* state, Cspoll_t* fds, int num, int ms)
 	num = select(width + 1, rp, wp, ms);
 #endif
 	messagef((state->id, NiL, -6, "poll: %s num=%d", fmttime("%K", CSTIME()), num));
-	if (num < 0) messagef((state->id, NiL, -1, "poll: select error"));
-	else for (num = 0, pp = fds; pp < mp; pp++)
-	{
-		pp->status = 0;
-		if (pp->fd >= 0)
+	if (num < 0)
+		messagef((state->id, NiL, -1, "poll: select error"));
+	else
+		for (num = 0, pp = fds; pp < mp; pp++)
 		{
-			if (rp && FD_ISSET(pp->fd, rp))
+			pp->status = 0;
+			if (pp->fd >= 0)
 			{
+				if (rp && FD_ISSET(pp->fd, rp))
+				{
 #if CS_LIB_V10
-				long	n;
+					long	n;
 
-				if ((pp->event & CS_POLL_CONTROL) && ioctl(fd, FIONREAD, &n)) pp->status |= CS_POLL_CLOSE;
-				else if (!n) pp->status |= CS_POLL_CONTROL;
-				else
+					if ((pp->event & CS_POLL_CONTROL) && ioctl(fd, FIONREAD, &n))
+						pp->status |= CS_POLL_CLOSE;
+					else if (!n)
+						pp->status |= CS_POLL_CONTROL;
+					else
 #endif
-				pp->status |= CS_POLL_READ;
-			}
-			if (wp && FD_ISSET(pp->fd, wp))
-				pp->status |= CS_POLL_WRITE;
+					pp->status |= CS_POLL_READ;
+				}
+				if (wp && FD_ISSET(pp->fd, wp))
+					pp->status |= CS_POLL_WRITE;
 #if CS_LIB_SOCKET
-			if (ep && FD_ISSET(pp->fd, ep))
-				pp->status |= CS_POLL_CONTROL;
+				if (ep && FD_ISSET(pp->fd, ep))
+					pp->status |= CS_POLL_CONTROL;
 #endif
-			if (pp->status)
-			{
-				pp->status |= pp->events & (CS_POLL_AUTH|CS_POLL_CONNECT|CS_POLL_USER);
-				num++;
+				if (pp->status)
+				{
+					pp->status |= pp->events & (CS_POLL_AUTH|CS_POLL_CONNECT|CS_POLL_USER);
+					num++;
+				}
 			}
 		}
-	}
 	return num;
 	
 #else
@@ -157,7 +161,8 @@ cspoll(Cs_t* state, Cspoll_t* fds, int num, int ms)
 #else
 	n = poll(fds, num, ms);
 #endif
-	if (n < 0) messagef((state->id, NiL, -1, "poll: poll error"));
+	if (n < 0)
+		messagef((state->id, NiL, -1, "poll: poll error"));
 	else if (n > 0)
 	{
 		int		i;
@@ -172,10 +177,16 @@ cspoll(Cs_t* state, Cspoll_t* fds, int num, int ms)
 			{
 				pp->status |= pp->events & (CS_POLL_AUTH|CS_POLL_CONNECT|CS_POLL_USER);
 #ifdef RS_HIPRI
-				if ((pp->status & CS_POLL_CONTROL) && getmsg(pp->fd, NiL, &buf, RS_HIPRI))
-					pp->status &= ~CS_POLL_CONTROL;
+				if (pp->status & CS_POLL_CONTROL)
+				{
+					int	f = RS_HIPRI;
+
+					if (getmsg(pp->fd, NiL, &buf, &f))
+						pp->status &= ~CS_POLL_CONTROL;
+				}
 #endif
-				if (--i <= 0) break;
+				if (--i <= 0)
+					break;
 			}
 		}
 	}

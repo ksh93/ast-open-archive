@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -556,16 +555,3 @@ b_getconf(char** args)
 	value = *args;
 	return astconf(name, path, value);
 }
-
-/*
- * porting bootstrap workarounds to get nmake built first
- */
-
-#if _UWIN	/* drop 2000-04-01 */
-
-#undef	COMMENT
-
-#include "../../lib/libast/port/astlicense.c"
-#include "../../lib/libast/misc/glob.c"
-
-#endif

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -88,7 +87,19 @@ realaddr(register Cs_t* state, const char* name)
 	if (!*s && n == 4)
 	{
 		if (!addr.l || addr.c[0] == 127 && addr.c[1] == 0 && addr.c[2] == 0 && addr.c[3] <= 1)
+		{
 			addr.l = csaddr(state, NiL);
+			if (local == CS_LOCAL)
+			{
+				addr.c[0] = 127;
+				addr.c[1] = 0;
+				addr.c[2] = 0;
+				addr.c[3] = 1;
+				local = addr.l;
+			}
+			else
+				addr.l = local;
+		}
 		state->flags |= CS_ADDR_NUMERIC;
 		messagef((state->id, NiL, -8, "realaddr(%s) = %s, flags = |%s%s%s", name, csntoa(state, addr.l), (state->flags & CS_ADDR_LOCAL) ? "LOCAL|" : "", (state->flags & CS_ADDR_REMOTE) ? "REMOTE|" : "", (state->flags & CS_ADDR_SHARE) ? "SHARE|" : ""));
 		return addr.l;
@@ -109,7 +120,12 @@ realaddr(register Cs_t* state, const char* name)
 	addr.l = ((hp = gethostbyname(name)) && hp->h_addrtype == AF_INET && hp->h_length <= sizeof(struct in_addr)) ? (unsigned long)((struct in_addr*)hp->h_addr)->s_addr : 0;
 #endif
 	if (addr.c[0] == 127 && addr.c[1] == 0 && addr.c[2] == 0 && addr.c[3] <= 1)
-		addr.l = csaddr(state, NiL);
+	{
+		if (local == CS_LOCAL)
+			local = addr.l;
+		else
+			addr.l = local;
+	}
 	messagef((state->id, NiL, -8, "realaddr(%s) = %s, flags = |%s%s%s", name, csntoa(state, addr.l), (state->flags & CS_ADDR_LOCAL) ? "LOCAL|" : "", (state->flags & CS_ADDR_REMOTE) ? "REMOTE|" : "", (state->flags & CS_ADDR_SHARE) ? "SHARE|" : ""));
 #else
 	messagef((state->id, NiL, -8, "realaddr(%s) not found", name));
@@ -146,8 +162,9 @@ csaddr(register Cs_t* state, const char* aname)
 		if (!state->db)
 			state->db = -1;
 #endif
-		if (!(local = realaddr(state, csname(state, 0))))
-			local = CS_LOCAL;
+		local = CS_LOCAL;
+		if (addr = realaddr(state, csname(state, 0)))
+			local = addr;
 	}
 	if (!name)
 	{

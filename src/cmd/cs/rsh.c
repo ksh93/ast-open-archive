@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2000 AT&T Corp.                *
+*                Copyright (c) 1990-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -32,7 +31,7 @@
  * if its the only way in
  */
 
-static const char id[] = "@(#)cs.rsh (AT&T Bell Laboratories) 10/13/95\0\n";
+static const char id[] = "@(#)$Id: cs.rsh (AT&T Bell Laboratories) 1995-10-13 $\0\n";
 
 #include <cs.h>
 #include <proc.h>

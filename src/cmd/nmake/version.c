@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -33,7 +32,7 @@
  */
 
 #ifndef STAMP
-#define STAMP		"\n@(#)make (AT&T Research) BOOTLEG\0\n"
+#define STAMP		"\n@(#)$Id: make (AT&T Research) BOOTLEG $\0\n"
 #endif
 
 #ifndef IDNAME
@@ -44,7 +43,7 @@ static char		id[] = STAMP;
 
 char*			idname = IDNAME;
 
-char*			version = id + 5;
+char*			version = id;
 
 char*			initstatic =
 "\

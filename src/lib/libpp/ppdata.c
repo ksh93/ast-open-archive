@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2000 AT&T Corp.                *
+*                Copyright (c) 1986-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -53,7 +52,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)libpp (AT&T Research) 2000-09-18\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2001-01-01 $\0\n";
 
 #include "pplib.h"
 
@@ -90,7 +89,7 @@ struct ppglobals pp =
 {
 	/* public globals */
 
-	&id[5],				/* version			*/
+	&id[10],			/* version			*/
 	"",				/* lineid			*/
 	"/dev/stdout",			/* outfile			*/
 	IDNAME,				/* pass				*/

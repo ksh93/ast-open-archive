@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2000-09-15
+# @(#)probe.win32 (AT&T Labs Research) 2000-12-25
 #
 # win32 specific make C probe initialization
 # ms vc is easy on uwin
@@ -57,17 +57,21 @@ fi
 case $versionb$versionm:$include in
 [0-9]*:/*)
 	: the payoff
+	set -- $cc
+	cmd=$1
+	shift
+	set -- $(whence $cmd) "$@"
 	cat >&3 <<!
-CC.CC = `whence $cc`
+CC.CC = $*
 CC.ALTPP.FLAGS = -Yp,\$(CPP:D)
 CC.ALTPP.ENV =
 CC.ARFLAGS =
 CC.DEBUG = -g
 CC.DIALECT = ANSI DYNAMIC
-CC.DLL = -D_DLL
-CC.DLLBIG = -D_DLL
+CC.DLL = -D_BLD_DLL
+CC.DLLBIG = -D_BLD_DLL
 CC.DYNAMIC =
-CC.HOSTTYPE = `package CC=$cc`
+CC.HOSTTYPE = $(package)
 CC.LD = /usr/bin/ld
 CC.LD.DYNAMIC = -Bdynamic
 CC.LD.STATIC = -Bstatic
