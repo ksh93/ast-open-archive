@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -25,8 +25,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -135,7 +135,7 @@ done ../../../include/ast/error.h
 prev ../../../include/ast/ast.h implicit
 done probe.c
 prev probe.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?probe]"\" -c probe.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?probe]"\" -c probe.c
 done probe.o generated
 bind -last
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o probe probe.o ${mam_libast}

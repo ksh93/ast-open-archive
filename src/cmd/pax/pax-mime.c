@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -47,9 +47,9 @@ mime_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, un
 	size_t			n;
 
 	s = state.tmp.buffer;
-	if (bread(ap, s, (off_t)0, (off_t)MIME_HEADER, 0) <= 0)
+	if (paxread(pax, ap, s, (off_t)0, (off_t)MIME_HEADER, 0) <= 0)
 		return 0;
-	bunread(ap, s, MIME_HEADER);
+	paxunread(pax, ap, s, MIME_HEADER);
 	if (s[0] != '-' || s[1] != '-' || !(t = (char*)memchr(s, '\n', MIME_HEADER - 2)) || (t - s + 8) >= MIME_HEADER || strncasecmp(t + 1, "Content", 7))
 		return 0;
 	n = t - s + 1;
@@ -65,7 +65,7 @@ mime_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, un
 	mime->length = n;
 	memcpy(mime->magic, s, mime->length);
 	message((-1, "mime magic `%s'", mime->magic));
-	bread(ap, NiL, (off_t)0, n, 0);
+	paxread(pax, ap, NiL, (off_t)0, n, 0);
 	return 1;
 }
 
@@ -88,25 +88,26 @@ mime_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	register char*		t;
 	register char*		v;
 	off_t			m;
+	off_t			b;
 	size_t			n;
 	int			loop;
 
-	if (bread(ap, s = state.tmp.buffer, mime->length + 2, mime->length + 2, 1) <= 0 || memcmp(s, mime->magic, mime->length))
+	if (paxread(pax, ap, s = state.tmp.buffer, mime->length + 2, mime->length + 2, 1) <= 0 || memcmp(s, mime->magic, mime->length))
 		error(3, "%s: corrupt %s format member header -- separator not found", ap->name, ap->format->name);
 	else if (*(s += mime->length) == '-' && *(s + 1) == '-')
 	{
-		while (bread(ap, s, 1, 1, 1) > 0 && *s != '\n');
+		while (paxread(pax, ap, s, 1, 1, 1) > 0 && *s != '\n');
 		return 0;
 	}
 	else if (*s == '\n')
-		bunread(ap, s + 1, 1);
+		paxunread(pax, ap, s + 1, 1);
 	else if (*s != '\r' && *(s + 1) != '\n')
 		error(3, "%s: corrupt %s format member header -- separator line not found", ap->name, ap->format->name);
 	f->name = 0;
 	for (;;)
 	{
 		for (t = (s = state.tmp.buffer) + state.buffersize - 1; s < t; s++)
-			if (bread(ap, s, 1, 1, 1) <= 0)
+			if (paxread(pax, ap, s, 1, 1, 1) <= 0)
 				error(3, "%s: unexpected %s format EOF", ap->name, ap->format->name);
 			else if (*s == '\n')
 			{
@@ -143,7 +144,7 @@ mime_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 				*s++ = 0;
 			for (; *s == ';' || isspace(*s); s++);
 			if (!f->name && n == 4 && !strncasecmp(t, "name", 4) || n == 8 && !strncasecmp(t, "filename", 8))
-				f->name = stash(&ap->stash.head, v, m);
+				f->name = paxstash(pax, &ap->stash.head, v, m);
 		}
 	}
 	if (!f->name)
@@ -152,29 +153,30 @@ mime_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			s++;
 		else
 			s = ap->name;
-		f->name = stash(&ap->stash.head, s, strlen(s) + 16);
+		f->name = paxstash(pax, &ap->stash.head, s, strlen(s) + 16);
 		sfsprintf(f->name, ap->stash.head.size, "%s-%d", s, ap->entries + 1);
 	}
 	if (!ap->io->seekable)
 		seekable(ap);
-	bsave(ap);
 	f->st->st_size = 0;
 	loop = 0;
-	while (s = bget(ap, 0, &m))
+	b = paxseek(pax, ap, 0, SEEK_CUR, 0);
+	while (s = paxget(pax, ap, 0, &m))
 	{
 		if (m < mime->length)
 		{
 			if (loop++)
 				error(3, "%s: corrupt %s format member header [too short]", ap->name, ap->format->name);
-			bseek(ap, -m, SEEK_CUR, 0);
-			bflushin(ap, 0);
+			paxseek(pax, ap, -m, SEEK_CUR, 0);
+			paxsync(pax, ap, 0);
 			continue;
 		}
 		v = s;
 		for (t = s + m - mime->length; s = memchr(s, '-', t - s); s++)
 			if (!memcmp(s, mime->magic, mime->length))
 			{
-				brestore(ap);
+				paxseek(pax, ap, b, SEEK_CUR, 0);
+				paxsync(pax, ap, 0);
 				if (s > v && *(s - 1) == '\n')
 				{
 					mime->fill++;
@@ -196,8 +198,8 @@ mime_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 				f->gidname = 0;
 				return 1;
 			}
-		bseek(ap, -(off_t)mime->length, SEEK_CUR, 0);
-		bflushin(ap, 0);
+		paxseek(pax, ap, -(off_t)mime->length, SEEK_CUR, 0);
+		paxsync(pax, ap, 0);
 		f->st->st_size += m;
 	}
 	return 0;
@@ -213,9 +215,11 @@ Format_t	pax_mime_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,
-	pax_mime_next,
+	PAXNEXT(pax_mime_next),
 	0,
 	mime_done,
 	mime_getprologue,
 	mime_getheader,
 };
+
+PAXLIB(&pax_mime_format)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -128,10 +128,7 @@ main(int argc, register char** argv)
 	 * set up the disciplines
 	 */
 
-	memset(&od, 0, sizeof(od));
-	od.version = OPT_VERSION;
-	od.infof = optinfo;
-	opt_info.disc = &od;
+	optinit(&od, optinfo);
 
 	/*
 	 * grab the options

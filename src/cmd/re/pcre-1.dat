@@ -1085,8 +1085,11 @@ E$ck	SAME	A missing angle <user@some.where	(17,32)
 E$ck	SAME	The quick brown fox	NOMATCH
 E$hx	abc\\0def\\00pqr\\000xyz\\0000AB	abc\0def\00pqr\000xyz\0000AB	(0,19)
 E$hx	SAME	abc456 abc\0def\00pqr\000xyz\0000ABCDE	(7,26)
-E$	abc\\x0def\\x00pqr\\x000xyz\\x0000AB	abc\x0def\x00pqr\x000xyz\x0000AB	(0,20)
-E$	SAME	abc456 abc\x0def\x00pqr\x000xyz\x0000ABCDE	(7,27)
+E$	abc\\x{0d}ef\\x00pqr\\x{00}0xyz\\x{00}00AB	abc\x{0d}ef\x{00}pqr\x{00}0xyz\x{00}00AB	(0,20)
+E$	abc\\x000d\\x00pqr\\x000xyz\\x0000AB	abc\x000d\x00pqr\x000xyz\x0000AB	(0,13)
+Ex$	SAME	abc\x000d\x00pqr\x000xyz\x0000AB		(0,13)
+#E$	abc\\x0def\\x00pqr\\x000xyz\\x0000AB	abc456 abc\x0def\x00pqr\x000xyz\x0000ABCDE	(7,27)
+#Ex$	abc\\x0def\\x00pqr\\x000xyz\\x0000AB	abc456 abc\x0def\x00pqr\x000xyz\x0000ABCDE	(7,27)
 E$	^[\\000-\\037]	\0A	(0,1)
 E$	SAME	\01B	(0,1)
 E$	SAME	\037C	(0,1)
@@ -1096,10 +1099,11 @@ E$	SAME	An A\0\x0\0Z	(3,8)
 E$	SAME	A\0Z	NOMATCH
 E$	SAME	A\0\x0\0\x0Z	NOMATCH
 E$z	^(cow|)\\1(bell)	cowcowbell	(0,10)(0,3)(6,10)
-E$z	SAME	bell	(0,4)(0,0)(0,4)
-E$z	SAME	cowbell	NOMATCH
-E$	^\\s	\040abc	(0,1)
-E$	SAME	\x0cabc	(0,1)
+E$z	SAME	bell		(0,4)(0,0)(0,4)
+E$z	SAME	cowbell		NOMATCH
+E$	^\\s	\040abc		(0,1)
+E$	SAME	\x{0c}abc	(0,1)
+E$	SAME	\x0cxyz		(0,1)
 E$	SAME	\fabc	(0,1)
 E$	SAME	\nabc	(0,1)
 E$	SAME	\rabc	(0,1)
@@ -1191,17 +1195,18 @@ E$	SAME	abc\n	NOMATCH
 E$n	SAME	abc\n	(0,3)
 E$	SAME	abc\ndef	NOMATCH
 E$n	SAME	abc\ndef	(0,3)
-E$	(abc)\\123	abc\x53	(0,4)(0,3)
-E$	(abc)\\223	abc\x93	(0,4)(0,3)
-E$	(abc)\\323	abc\xd3	(0,4)(0,3)
-E$h	(abc)\\500	abc\x40	ESUBREG
-E$h	SAME	abc\100	ESUBREG
-E$h	(abc)\\1000	abc\x400	(0,5)(0,3)
-E$h	SAME	abc\x40\x30	(0,5)(0,3)
-E$h	SAME	abc\1000	(0,5)(0,3)
-E$h	SAME	abc\100\x30	(0,5)(0,3)
-E$h	SAME	abc\100\060	(0,5)(0,3)
-E$h	SAME	abc\100\60	(0,5)(0,3)
+E$	(abc)\\123	abc\x53		(0,4)(0,3)
+E$	(abc)\\223	abc\x93		(0,4)(0,3)
+E$	(abc)\\323	abc\xd3		(0,4)(0,3)
+E$h	(abc)\\500	abc\x40		ESUBREG
+E$h	SAME		abc\100		ESUBREG
+E$h	(abc)\\1000	abc\x{40}0	(0,5)(0,3)
+E$h	SAME		abc\x40\x30	(0,5)(0,3)
+E$h	SAME		abc\1000	(0,5)(0,3)
+E$h	SAME		abc\100\x30	(0,5)(0,3)
+E$h	SAME		abc\100\060	(0,5)(0,3)
+E$h	SAME		abc\100\60	(0,5)(0,3)
+E$h	(abc)\\100z	abc\x40z	(0,5)(0,3)
 E$	abc\\71	abc\071	ESUBREG
 E$h	abc\\71	abc\071	(0,4)
 E$	abc\\81	abc\081	ESUBREG

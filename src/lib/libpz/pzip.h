@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2003 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -231,6 +231,14 @@ struct Pz_s				/* pzip context			*/
 #endif
 
 };
+
+#if defined(__EXPORT__)
+#define extern		__EXPORT__
+#endif
+
+extern const char*	pz_init(Pz_t*, Pzdisc_t*);
+
+#undef	extern
 
 #if _BLD_pz && defined(__EXPORT__)
 #define extern		__EXPORT__

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -81,7 +81,7 @@ ar_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 	if (!(ar->ent = ardirnext(ar->dir)))
 	{
 		pos = lseek(ap->io->fd, (off_t)0, SEEK_END);
-		return (pos < 0 || bseek(ap, pos, SEEK_SET, 0) != pos) ? -1 : 0;
+		return (pos < 0 || paxseek(pax, ap, pos, SEEK_SET, 0) != pos) ? -1 : 0;
 	}
 	f->name = ar->ent->name;
 	f->st->st_dev = 0;
@@ -139,7 +139,7 @@ Format_t	pax_ar_format =
 	0,
 	0,
 	2,
-	pax_ar_next,
+	PAXNEXT(pax_ar_next),
 	0,
 	ar_done,
 	ar_getprologue,
@@ -148,3 +148,5 @@ Format_t	pax_ar_format =
 	0,
 	ar_getepilogue
 };
+
+PAXLIB(&pax_ar_format)

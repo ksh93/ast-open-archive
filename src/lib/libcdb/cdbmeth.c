@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1997-2002 AT&T Corp.                *
+*                Copyright (c) 1997-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -76,7 +76,7 @@ cdbgetmeth(const char* name)
 					memcpy(buf, s, n);
 					s = buf;
 					s[n] = 0;
-					if (cdblib(s, 0, NiL) < 0)
+					if (cdblib(s, NiL) < 0)
 						goto nope;
 					lib = 1;
 					mp = state.methods;
@@ -133,7 +133,7 @@ cdbgettype(const char* name)
 
 	if (!name)
 		return state.types;
-	for (type = state.types, lib = 0; (type || !lib++ && cdblib(name, 0, NiL) >= 0 && (type = state.types)) && !streq(name, type->name); type = type->next);
+	for (type = state.types, lib = 0; (type || !lib++ && cdblib(name, NiL) >= 0 && (type = state.types)) && !streq(name, type->name); type = type->next);
 	return type;
 }
 
@@ -161,6 +161,6 @@ cdbgetmap(const char* name)
 
 	if (!name)
 		return state.maps;
-	for (map = state.maps, lib = 0; (map || !lib++ && cdblib(name, 0, NiL) >= 0 && (map = state.maps)) && !streq(name, map->name); map = map->next);
+	for (map = state.maps, lib = 0; (map || !lib++ && cdblib(name, NiL) >= 0 && (map = state.maps)) && !streq(name, map->name); map = map->next);
 	return map;
 }

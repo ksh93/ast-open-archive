@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: df (AT&T Labs Research) 2001-10-31 $\n]"
+"[-?\n@(#)$Id: df (AT&T Labs Research) 2004-02-11 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -659,6 +659,8 @@ main(int argc, register char** argv)
 	register int	n;
 	int		rem;
 	int		head;
+	int		i;
+	int*		match;
 	dev_t		dirdev;
 	dev_t		mntdev;
 	dev_t*		dev;
@@ -685,10 +687,7 @@ main(int argc, register char** argv)
 	 * set up the disciplines
 	 */
 
-	memset(&optdisc, 0, sizeof(optdisc));
-	optdisc.version = OPT_VERSION;
-	optdisc.infof = optinfo;
-	opt_info.disc = &optdisc;
+	optinit(&optdisc, optinfo);
 	memset(&keydisc, 0, sizeof(keydisc));
 	keydisc.key = offsetof(Key_t, name);
 	keydisc.size = -1;
@@ -773,7 +772,6 @@ main(int argc, register char** argv)
 			append(fmt, fmt_opt);
 			continue;
 		case 'P':
-			append(fmt, fmt_std);
 			state.posix = 1;
 			continue;
 		case 'q':
@@ -800,7 +798,7 @@ main(int argc, register char** argv)
 	argc -= opt_info.index;
 	argv += opt_info.index;
 	if (!sfstrtell(fmt))
-		append(fmt, fmt_def);
+		append(fmt, state.posix > 0 ? fmt_std : fmt_def);
 	sfputc(fmt, '\n');
 	format = sfstruse(fmt);
 	stresc(format);
@@ -895,6 +893,44 @@ main(int argc, register char** argv)
 #endif
 					st.st_dev;
 		}
+		if (rem && (match = newof(0, int, n, 0)))
+		{
+			/*
+			 * scan the mount table (up to 3x) for prefix matches
+			 * to avoid the more expensive stat() and statvfs()
+			 * calls in the final loop below
+			 */
+
+			while (df.mnt = mntread(mp))
+
+				for (n = 0; n < argc; n++)
+					if (argv[n] && (i = strlen(df.mnt->dir)) > 1 && i > match[n] && strneq(argv[n], df.mnt->dir, i) && (argv[n][i] == '/' || !argv[n][i]))
+						match[n] = i;
+			mntclose(mp);
+			if (!(mp = mntopen(NiL, "r")))
+				error(ERROR_SYSTEM|3, "cannot reopen mount table");
+			while (rem && (df.mnt = mntread(mp)))
+				for (n = 0; n < argc; n++)
+					if (match[n] && (i = strlen(df.mnt->dir)) == match[n] && strneq(argv[n], df.mnt->dir, i) && (argv[n][i] == '/' || !argv[n][i]))
+					{
+						argv[n][match[n]] = 0;
+						if (!status(argv[n], &df.vfs))
+						{
+							entry(&df, format);
+							argv[n] = 0;
+							match[n] = 0;
+							if (!--rem)
+								break;
+						}
+					}
+			free(match);
+			if (rem)
+			{
+				mntclose(mp);
+				if (!(mp = mntopen(NiL, "r")))
+					error(ERROR_SYSTEM|3, "cannot reopen mount table");
+			}
+		}
 		while ((!argc || rem) && (df.mnt = mntread(mp)))
 		{
 			if (stat(df.mnt->dir, &st))
@@ -904,7 +940,7 @@ main(int argc, register char** argv)
 				continue;
 			}
 			dirdev = st.st_dev;
-			mntdev = stat(df.mnt->fs, &st) ? dirdev : st.st_dev;
+			mntdev = *df.mnt->fs != '/' || stat(df.mnt->fs, &st) ? dirdev : st.st_dev;
 			if (argc)
 			{
 				for (n = 0; n < argc; n++)
@@ -935,8 +971,7 @@ main(int argc, register char** argv)
 		if (argc > 0)
 		{
 			df.mnt = &mnt;
-			mnt.fs = 0;
-			mnt.flags = 0;
+			memset(&mnt, 0, sizeof(mnt));
 			for (n = 0; n < argc; n++)
 				if ((mnt.dir = argv[n]) && !status(mnt.dir, &vfs))
 					entry(&df, format);

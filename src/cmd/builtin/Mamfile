@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -28,8 +28,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -96,7 +96,6 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
@@ -144,7 +143,7 @@ done dlls.c
 prev dlls.c
 setv STANDALONE -DSTANDALONE="b_dlls"
 setv LICENSE -DLICENSE="since=2002,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_dlls -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c dlls.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_dlls -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c dlls.c
 done dlls.o generated
 bind -ldll
 bind -last
@@ -158,7 +157,7 @@ prev ../../../include/ast/cmd.h implicit
 done look.c
 prev look.c
 setv STANDALONE -DSTANDALONE="b_look"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_look -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c look.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_look -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c look.c
 done look.o generated
 setv STANDALONE -DSTANDALONE="b_look"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o look look.o ${mam_libcmd} ${mam_libast}
@@ -179,7 +178,7 @@ prev ../../../include/ast/cmd.h implicit
 done mime.c
 prev mime.c
 setv STANDALONE -DSTANDALONE="b_mime"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_mime -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c mime.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_mime -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c mime.c
 done mime.o generated
 setv STANDALONE -DSTANDALONE="b_mime"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o mime mime.o ${mam_libcmd} ${mam_libast}
@@ -196,7 +195,7 @@ done nl.c
 prev nl.c
 setv STANDALONE -DSTANDALONE="b_nl"
 setv LICENSE -DLICENSE="since=2003,author=dgk"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_nl -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c nl.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_nl -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c nl.c
 done nl.o generated
 setv STANDALONE -DSTANDALONE="b_nl"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o nl nl.o ${mam_libcmd} ${mam_libast}
@@ -216,6 +215,17 @@ done asa generated
 make od
 make od.o
 make od.c
+make ../../../include/ast/iconv.h implicit
+make ../../../include/ast/ast_iconv.h implicit
+prev ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_iconv.h
+done ../../../include/ast/iconv.h
+make ../../../include/ast/ccode.h implicit
+make ../../../include/ast/ast_ccode.h implicit
+done ../../../include/ast/ast_ccode.h dontcare
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ccode.h
 make ../../../include/ast/swap.h implicit
 make ../../../include/ast/int.h implicit
 prev ../../../include/ast/ast_common.h implicit
@@ -229,7 +239,7 @@ prev ../../../include/ast/cmd.h implicit
 done od.c
 prev od.c
 setv STANDALONE -DSTANDALONE="b_od"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_od -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c od.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_od -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c od.c
 done od.o generated
 setv STANDALONE -DSTANDALONE="b_od"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o od od.o ${mam_libcmd} ${mam_libast}
@@ -252,7 +262,7 @@ prev ../../../include/ast/cmd.h implicit
 done pr.c
 prev pr.c
 setv STANDALONE -DSTANDALONE="b_pr"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_pr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c pr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_pr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c pr.c
 done pr.o generated
 setv STANDALONE -DSTANDALONE="b_pr"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pr pr.o ${mam_libcmd} ${mam_libast}
@@ -264,7 +274,7 @@ prev ../../../include/ast/cmd.h implicit
 done strings.c
 prev strings.c
 setv STANDALONE -DSTANDALONE="b_strings"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_strings -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c strings.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_strings -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c strings.c
 done strings.o generated
 setv STANDALONE -DSTANDALONE="b_strings"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o strings strings.o ${mam_libcmd} ${mam_libast}
@@ -278,7 +288,7 @@ prev ../../../include/ast/cmd.h implicit
 done tr.c
 prev tr.c
 setv STANDALONE -DSTANDALONE="b_tr"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_tr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c tr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_tr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c tr.c
 done tr.o generated
 setv STANDALONE -DSTANDALONE="b_tr"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o tr tr.o ${mam_libcmd} ${mam_libast}
@@ -296,7 +306,7 @@ prev ../../../include/ast/ast.h implicit
 done uudecode.c
 prev uudecode.c
 setv STANDALONE -DSTANDALONE="b_uudecode"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uudecode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c uudecode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uudecode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c uudecode.c
 done uudecode.o generated
 bind -luu
 setv STANDALONE -DSTANDALONE="b_uudecode"
@@ -312,7 +322,7 @@ prev ../../../include/ast/ast.h implicit
 done uuencode.c
 prev uuencode.c
 setv STANDALONE -DSTANDALONE="b_uuencode"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uuencode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c uuencode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uuencode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c uuencode.c
 done uuencode.o generated
 setv STANDALONE -DSTANDALONE="b_uuencode"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o uuencode uuencode.o ${mam_libuu} ${mam_libcmd} ${mam_libast}
@@ -324,7 +334,7 @@ prev ../../../include/ast/cmd.h implicit
 done what.c
 prev what.c
 setv STANDALONE -DSTANDALONE="b_what"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_what -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c what.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_what -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c what.c
 done what.o generated
 setv STANDALONE -DSTANDALONE="b_what"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o what what.o ${mam_libcmd} ${mam_libast}
@@ -341,279 +351,14 @@ prev ../../../include/ast/cmd.h implicit
 done who.c
 prev who.c
 setv STANDALONE -DSTANDALONE="b_who"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_who -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c who.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_who -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?builtin]"\" -c who.c
 done who.o generated
 setv STANDALONE -DSTANDALONE="b_who"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o who who.o ${mam_libcmd} ${mam_libast}
 done who generated
-make basename
-make builtin.c
-prev ../../../include/ast/cmd.h implicit
-done builtin.c
-setv BUILTIN -DBUILTIN="b_basename"
-exec - /bin/cat builtin.c > basename.c
-exec - ${STDRM} -f basename
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_basename -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o basename basename.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f basename.c
-done basename generated
-make cat
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_cat"
-exec - /bin/cat builtin.c > cat.c
-exec - ${STDRM} -f cat
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_cat -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o cat cat.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f cat.c
-done cat generated
-make chgrp
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_chgrp"
-exec - /bin/cat builtin.c > chgrp.c
-exec - ${STDRM} -f chgrp
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_chgrp -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o chgrp chgrp.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f chgrp.c
-done chgrp generated
-make chmod
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_chmod"
-exec - /bin/cat builtin.c > chmod.c
-exec - ${STDRM} -f chmod
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_chmod -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o chmod chmod.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f chmod.c
-done chmod generated
-make chown
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_chown"
-exec - /bin/cat builtin.c > chown.c
-exec - ${STDRM} -f chown
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_chown -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o chown chown.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f chown.c
-done chown generated
-make cmp
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_cmp"
-exec - /bin/cat builtin.c > cmp.c
-exec - ${STDRM} -f cmp
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_cmp -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o cmp cmp.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f cmp.c
-done cmp generated
-make comm
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_comm"
-exec - /bin/cat builtin.c > comm.c
-exec - ${STDRM} -f comm
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_comm -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o comm comm.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f comm.c
-done comm generated
-make cp
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_cp"
-exec - /bin/cat builtin.c > cp.c
-exec - ${STDRM} -f cp
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_cp -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o cp cp.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f cp.c
-done cp generated
-make cut
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_cut"
-exec - /bin/cat builtin.c > cut.c
-exec - ${STDRM} -f cut
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_cut -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o cut cut.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f cut.c
-done cut generated
-make date
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_date"
-exec - /bin/cat builtin.c > date.c
-exec - ${STDRM} -f date
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_date -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o date date.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f date.c
-done date generated
-make dirname
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_dirname"
-exec - /bin/cat builtin.c > dirname.c
-exec - ${STDRM} -f dirname
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_dirname -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o dirname dirname.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f dirname.c
-done dirname generated
-make expr
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_expr"
-exec - /bin/cat builtin.c > expr.c
-exec - ${STDRM} -f expr
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_expr -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o expr expr.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f expr.c
-done expr generated
-make fmt
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_fmt"
-exec - /bin/cat builtin.c > fmt.c
-exec - ${STDRM} -f fmt
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_fmt -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o fmt fmt.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f fmt.c
-done fmt generated
-make fold
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_fold"
-exec - /bin/cat builtin.c > fold.c
-exec - ${STDRM} -f fold
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_fold -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o fold fold.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f fold.c
-done fold generated
-make getconf
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_getconf"
-exec - /bin/cat builtin.c > getconf.c
-exec - ${STDRM} -f getconf
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_getconf -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o getconf getconf.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f getconf.c
-done getconf generated
-make head
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_head"
-exec - /bin/cat builtin.c > head.c
-exec - ${STDRM} -f head
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_head -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o head head.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f head.c
-done head generated
-make id
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_id"
-exec - /bin/cat builtin.c > id.c
-exec - ${STDRM} -f id
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_id -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o id id.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f id.c
-done id generated
-make join
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_join"
-exec - /bin/cat builtin.c > join.c
-exec - ${STDRM} -f join
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_join -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o join join.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f join.c
-done join generated
-make logname
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_logname"
-exec - /bin/cat builtin.c > logname.c
-exec - ${STDRM} -f logname
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_logname -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o logname logname.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f logname.c
-done logname generated
-make mkdir
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_mkdir"
-exec - /bin/cat builtin.c > mkdir.c
-exec - ${STDRM} -f mkdir
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_mkdir -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o mkdir mkdir.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f mkdir.c
-done mkdir generated
-make mkfifo
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_mkfifo"
-exec - /bin/cat builtin.c > mkfifo.c
-exec - ${STDRM} -f mkfifo
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_mkfifo -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o mkfifo mkfifo.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f mkfifo.c
-done mkfifo generated
-make paste
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_paste"
-exec - /bin/cat builtin.c > paste.c
-exec - ${STDRM} -f paste
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_paste -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o paste paste.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f paste.c
-done paste generated
-make pathchk
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_pathchk"
-exec - /bin/cat builtin.c > pathchk.c
-exec - ${STDRM} -f pathchk
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_pathchk -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o pathchk pathchk.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f pathchk.c
-done pathchk generated
-make rev
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_rev"
-exec - /bin/cat builtin.c > rev.c
-exec - ${STDRM} -f rev
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_rev -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o rev rev.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f rev.c
-done rev generated
-make rm
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_rm"
-exec - /bin/cat builtin.c > rm.c
-exec - ${STDRM} -f rm
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_rm -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o rm rm.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f rm.c
-done rm generated
-make rmdir
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_rmdir"
-exec - /bin/cat builtin.c > rmdir.c
-exec - ${STDRM} -f rmdir
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_rmdir -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o rmdir rmdir.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f rmdir.c
-done rmdir generated
-make stty
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_stty"
-exec - /bin/cat builtin.c > stty.c
-exec - ${STDRM} -f stty
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_stty -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o stty stty.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f stty.c
-done stty generated
-make tail
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_tail"
-exec - /bin/cat builtin.c > tail.c
-exec - ${STDRM} -f tail
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_tail -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o tail tail.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f tail.c
-done tail generated
-make tee
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_tee"
-exec - /bin/cat builtin.c > tee.c
-exec - ${STDRM} -f tee
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_tee -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o tee tee.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f tee.c
-done tee generated
-make tty
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_tty"
-exec - /bin/cat builtin.c > tty.c
-exec - ${STDRM} -f tty
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_tty -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o tty tty.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f tty.c
-done tty generated
-make uname
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_uname"
-exec - /bin/cat builtin.c > uname.c
-exec - ${STDRM} -f uname
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_uname -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o uname uname.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f uname.c
-done uname generated
-make uniq
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_uniq"
-exec - /bin/cat builtin.c > uniq.c
-exec - ${STDRM} -f uniq
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_uniq -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o uniq uniq.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f uniq.c
-done uniq generated
-make wc
-prev builtin.c
-setv BUILTIN -DBUILTIN="b_wc"
-exec - /bin/cat builtin.c > wc.c
-exec - ${STDRM} -f wc
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DBUILTIN=b_wc -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}} -o wc wc.c ${mam_libast} ${mam_libcmd}
-exec - ${STDRM} -f wc.c
-done wc generated
 make ln
-prev cp
+make cp
+done cp
 exec - if	silent test -f "ln"
 exec - then	${STDRM} -f ln
 exec - fi
@@ -691,153 +436,6 @@ exec - if	test ! -d ${INSTALLROOT}/bin
 exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ${INSTALLROOT}/bin virtual
-make ${INSTALLROOT}/bin/basename
-prev ${INSTALLROOT}/bin
-prev basename
-exec - test '' = 'basename' || ${STDCMP} 2>/dev/null -s basename ${INSTALLROOT}/bin/basename || { ${STDMV} ${INSTALLROOT}/bin/basename ${INSTALLROOT}/bin/basename.old 2>/dev/null || true; ${STDCP} basename ${INSTALLROOT}/bin/basename  		    		    ;}
-done ${INSTALLROOT}/bin/basename virtual
-make ${INSTALLROOT}/bin/cat
-prev cat
-exec - test '' = 'cat' || ${STDCMP} 2>/dev/null -s cat ${INSTALLROOT}/bin/cat || { ${STDMV} ${INSTALLROOT}/bin/cat ${INSTALLROOT}/bin/cat.old 2>/dev/null || true; ${STDCP} cat ${INSTALLROOT}/bin/cat  		    		    ;}
-done ${INSTALLROOT}/bin/cat virtual
-make ${INSTALLROOT}/bin/chgrp
-prev chgrp
-exec - test '' = 'chgrp' || ${STDCMP} 2>/dev/null -s chgrp ${INSTALLROOT}/bin/chgrp || { ${STDMV} ${INSTALLROOT}/bin/chgrp ${INSTALLROOT}/bin/chgrp.old 2>/dev/null || true; ${STDCP} chgrp ${INSTALLROOT}/bin/chgrp  		    		    ;}
-done ${INSTALLROOT}/bin/chgrp virtual
-make ${INSTALLROOT}/bin/chmod
-prev chmod
-exec - test '' = 'chmod' || ${STDCMP} 2>/dev/null -s chmod ${INSTALLROOT}/bin/chmod || { ${STDMV} ${INSTALLROOT}/bin/chmod ${INSTALLROOT}/bin/chmod.old 2>/dev/null || true; ${STDCP} chmod ${INSTALLROOT}/bin/chmod  		    		    ;}
-done ${INSTALLROOT}/bin/chmod virtual
-make ${INSTALLROOT}/bin/chown
-prev chown
-exec - test '' = 'chown' || ${STDCMP} 2>/dev/null -s chown ${INSTALLROOT}/bin/chown || { ${STDMV} ${INSTALLROOT}/bin/chown ${INSTALLROOT}/bin/chown.old 2>/dev/null || true; ${STDCP} chown ${INSTALLROOT}/bin/chown  		    		    ;}
-done ${INSTALLROOT}/bin/chown virtual
-make ${INSTALLROOT}/bin/cmp
-prev cmp
-exec - test '' = 'cmp' || ${STDCMP} 2>/dev/null -s cmp ${INSTALLROOT}/bin/cmp || { ${STDMV} ${INSTALLROOT}/bin/cmp ${INSTALLROOT}/bin/cmp.old 2>/dev/null || true; ${STDCP} cmp ${INSTALLROOT}/bin/cmp  		    		    ;}
-done ${INSTALLROOT}/bin/cmp virtual
-make ${INSTALLROOT}/bin/comm
-prev comm
-exec - test '' = 'comm' || ${STDCMP} 2>/dev/null -s comm ${INSTALLROOT}/bin/comm || { ${STDMV} ${INSTALLROOT}/bin/comm ${INSTALLROOT}/bin/comm.old 2>/dev/null || true; ${STDCP} comm ${INSTALLROOT}/bin/comm  		    		    ;}
-done ${INSTALLROOT}/bin/comm virtual
-make ${INSTALLROOT}/bin/cp
-prev cp
-exec - test '' = 'cp' || ${STDCMP} 2>/dev/null -s cp ${INSTALLROOT}/bin/cp || { ${STDMV} ${INSTALLROOT}/bin/cp ${INSTALLROOT}/bin/cp.old 2>/dev/null || true; ${STDCP} cp ${INSTALLROOT}/bin/cp  		    		    ;}
-done ${INSTALLROOT}/bin/cp virtual
-make ${INSTALLROOT}/bin/cut
-prev cut
-exec - test '' = 'cut' || ${STDCMP} 2>/dev/null -s cut ${INSTALLROOT}/bin/cut || { ${STDMV} ${INSTALLROOT}/bin/cut ${INSTALLROOT}/bin/cut.old 2>/dev/null || true; ${STDCP} cut ${INSTALLROOT}/bin/cut  		    		    ;}
-done ${INSTALLROOT}/bin/cut virtual
-make ${INSTALLROOT}/bin/date
-prev date
-exec - test '' = 'date' || ${STDCMP} 2>/dev/null -s date ${INSTALLROOT}/bin/date || { ${STDMV} ${INSTALLROOT}/bin/date ${INSTALLROOT}/bin/date.old 2>/dev/null || true; ${STDCP} date ${INSTALLROOT}/bin/date  		    		    ;}
-done ${INSTALLROOT}/bin/date virtual
-make ${INSTALLROOT}/bin/dirname
-prev dirname
-exec - test '' = 'dirname' || ${STDCMP} 2>/dev/null -s dirname ${INSTALLROOT}/bin/dirname || { ${STDMV} ${INSTALLROOT}/bin/dirname ${INSTALLROOT}/bin/dirname.old 2>/dev/null || true; ${STDCP} dirname ${INSTALLROOT}/bin/dirname  		    		    ;}
-done ${INSTALLROOT}/bin/dirname virtual
-make ${INSTALLROOT}/bin/expr
-prev expr
-exec - test '' = 'expr' || ${STDCMP} 2>/dev/null -s expr ${INSTALLROOT}/bin/expr || { ${STDMV} ${INSTALLROOT}/bin/expr ${INSTALLROOT}/bin/expr.old 2>/dev/null || true; ${STDCP} expr ${INSTALLROOT}/bin/expr  		    		    ;}
-done ${INSTALLROOT}/bin/expr virtual
-make ${INSTALLROOT}/bin/fmt
-prev fmt
-exec - test '' = 'fmt' || ${STDCMP} 2>/dev/null -s fmt ${INSTALLROOT}/bin/fmt || { ${STDMV} ${INSTALLROOT}/bin/fmt ${INSTALLROOT}/bin/fmt.old 2>/dev/null || true; ${STDCP} fmt ${INSTALLROOT}/bin/fmt  		    		    ;}
-done ${INSTALLROOT}/bin/fmt virtual
-make ${INSTALLROOT}/bin/fold
-prev fold
-exec - test '' = 'fold' || ${STDCMP} 2>/dev/null -s fold ${INSTALLROOT}/bin/fold || { ${STDMV} ${INSTALLROOT}/bin/fold ${INSTALLROOT}/bin/fold.old 2>/dev/null || true; ${STDCP} fold ${INSTALLROOT}/bin/fold  		    		    ;}
-done ${INSTALLROOT}/bin/fold virtual
-make ${INSTALLROOT}/bin/getconf
-prev getconf
-exec - test '' = 'getconf' || ${STDCMP} 2>/dev/null -s getconf ${INSTALLROOT}/bin/getconf || { ${STDMV} ${INSTALLROOT}/bin/getconf ${INSTALLROOT}/bin/getconf.old 2>/dev/null || true; ${STDCP} getconf ${INSTALLROOT}/bin/getconf  		    		    ;}
-done ${INSTALLROOT}/bin/getconf virtual
-make ${INSTALLROOT}/bin/head
-prev head
-exec - test '' = 'head' || ${STDCMP} 2>/dev/null -s head ${INSTALLROOT}/bin/head || { ${STDMV} ${INSTALLROOT}/bin/head ${INSTALLROOT}/bin/head.old 2>/dev/null || true; ${STDCP} head ${INSTALLROOT}/bin/head  		    		    ;}
-done ${INSTALLROOT}/bin/head virtual
-make ${INSTALLROOT}/bin/id
-prev id
-exec - test '' = 'id' || ${STDCMP} 2>/dev/null -s id ${INSTALLROOT}/bin/id || { ${STDMV} ${INSTALLROOT}/bin/id ${INSTALLROOT}/bin/id.old 2>/dev/null || true; ${STDCP} id ${INSTALLROOT}/bin/id  		    		    ;}
-done ${INSTALLROOT}/bin/id virtual
-make ${INSTALLROOT}/bin/join
-prev join
-exec - test '' = 'join' || ${STDCMP} 2>/dev/null -s join ${INSTALLROOT}/bin/join || { ${STDMV} ${INSTALLROOT}/bin/join ${INSTALLROOT}/bin/join.old 2>/dev/null || true; ${STDCP} join ${INSTALLROOT}/bin/join  		    		    ;}
-done ${INSTALLROOT}/bin/join virtual
-make ${INSTALLROOT}/bin/logname
-prev logname
-exec - test '' = 'logname' || ${STDCMP} 2>/dev/null -s logname ${INSTALLROOT}/bin/logname || { ${STDMV} ${INSTALLROOT}/bin/logname ${INSTALLROOT}/bin/logname.old 2>/dev/null || true; ${STDCP} logname ${INSTALLROOT}/bin/logname  		    		    ;}
-done ${INSTALLROOT}/bin/logname virtual
-make ${INSTALLROOT}/bin/mkdir
-prev mkdir
-exec - test '' = 'mkdir' || ${STDCMP} 2>/dev/null -s mkdir ${INSTALLROOT}/bin/mkdir || { ${STDMV} ${INSTALLROOT}/bin/mkdir ${INSTALLROOT}/bin/mkdir.old 2>/dev/null || true; ${STDCP} mkdir ${INSTALLROOT}/bin/mkdir  		    		    ;}
-done ${INSTALLROOT}/bin/mkdir virtual
-make ${INSTALLROOT}/bin/mkfifo
-prev mkfifo
-exec - test '' = 'mkfifo' || ${STDCMP} 2>/dev/null -s mkfifo ${INSTALLROOT}/bin/mkfifo || { ${STDMV} ${INSTALLROOT}/bin/mkfifo ${INSTALLROOT}/bin/mkfifo.old 2>/dev/null || true; ${STDCP} mkfifo ${INSTALLROOT}/bin/mkfifo  		    		    ;}
-done ${INSTALLROOT}/bin/mkfifo virtual
-make ${INSTALLROOT}/bin/paste
-prev paste
-exec - test '' = 'paste' || ${STDCMP} 2>/dev/null -s paste ${INSTALLROOT}/bin/paste || { ${STDMV} ${INSTALLROOT}/bin/paste ${INSTALLROOT}/bin/paste.old 2>/dev/null || true; ${STDCP} paste ${INSTALLROOT}/bin/paste  		    		    ;}
-done ${INSTALLROOT}/bin/paste virtual
-make ${INSTALLROOT}/bin/pathchk
-prev pathchk
-exec - test '' = 'pathchk' || ${STDCMP} 2>/dev/null -s pathchk ${INSTALLROOT}/bin/pathchk || { ${STDMV} ${INSTALLROOT}/bin/pathchk ${INSTALLROOT}/bin/pathchk.old 2>/dev/null || true; ${STDCP} pathchk ${INSTALLROOT}/bin/pathchk  		    		    ;}
-done ${INSTALLROOT}/bin/pathchk virtual
-make ${INSTALLROOT}/bin/rev
-prev rev
-exec - test '' = 'rev' || ${STDCMP} 2>/dev/null -s rev ${INSTALLROOT}/bin/rev || { ${STDMV} ${INSTALLROOT}/bin/rev ${INSTALLROOT}/bin/rev.old 2>/dev/null || true; ${STDCP} rev ${INSTALLROOT}/bin/rev  		    		    ;}
-done ${INSTALLROOT}/bin/rev virtual
-make ${INSTALLROOT}/bin/rm
-prev rm
-exec - test '' = 'rm' || ${STDCMP} 2>/dev/null -s rm ${INSTALLROOT}/bin/rm || { ${STDMV} ${INSTALLROOT}/bin/rm ${INSTALLROOT}/bin/rm.old 2>/dev/null || true; ${STDCP} rm ${INSTALLROOT}/bin/rm  		    		    ;}
-done ${INSTALLROOT}/bin/rm virtual
-make ${INSTALLROOT}/bin/rmdir
-prev rmdir
-exec - test '' = 'rmdir' || ${STDCMP} 2>/dev/null -s rmdir ${INSTALLROOT}/bin/rmdir || { ${STDMV} ${INSTALLROOT}/bin/rmdir ${INSTALLROOT}/bin/rmdir.old 2>/dev/null || true; ${STDCP} rmdir ${INSTALLROOT}/bin/rmdir  		    		    ;}
-done ${INSTALLROOT}/bin/rmdir virtual
-make ${INSTALLROOT}/bin/stty
-prev stty
-exec - test '' = 'stty' || ${STDCMP} 2>/dev/null -s stty ${INSTALLROOT}/bin/stty || { ${STDMV} ${INSTALLROOT}/bin/stty ${INSTALLROOT}/bin/stty.old 2>/dev/null || true; ${STDCP} stty ${INSTALLROOT}/bin/stty  		    		    ;}
-done ${INSTALLROOT}/bin/stty virtual
-make ${INSTALLROOT}/bin/tail
-prev tail
-exec - test '' = 'tail' || ${STDCMP} 2>/dev/null -s tail ${INSTALLROOT}/bin/tail || { ${STDMV} ${INSTALLROOT}/bin/tail ${INSTALLROOT}/bin/tail.old 2>/dev/null || true; ${STDCP} tail ${INSTALLROOT}/bin/tail  		    		    ;}
-done ${INSTALLROOT}/bin/tail virtual
-make ${INSTALLROOT}/bin/tee
-prev tee
-exec - test '' = 'tee' || ${STDCMP} 2>/dev/null -s tee ${INSTALLROOT}/bin/tee || { ${STDMV} ${INSTALLROOT}/bin/tee ${INSTALLROOT}/bin/tee.old 2>/dev/null || true; ${STDCP} tee ${INSTALLROOT}/bin/tee  		    		    ;}
-done ${INSTALLROOT}/bin/tee virtual
-make ${INSTALLROOT}/bin/tty
-prev tty
-exec - test '' = 'tty' || ${STDCMP} 2>/dev/null -s tty ${INSTALLROOT}/bin/tty || { ${STDMV} ${INSTALLROOT}/bin/tty ${INSTALLROOT}/bin/tty.old 2>/dev/null || true; ${STDCP} tty ${INSTALLROOT}/bin/tty  		    		    ;}
-done ${INSTALLROOT}/bin/tty virtual
-make ${INSTALLROOT}/bin/uname
-prev uname
-exec - test '' = 'uname' || ${STDCMP} 2>/dev/null -s uname ${INSTALLROOT}/bin/uname || { ${STDMV} ${INSTALLROOT}/bin/uname ${INSTALLROOT}/bin/uname.old 2>/dev/null || true; ${STDCP} uname ${INSTALLROOT}/bin/uname  		    		    ;}
-done ${INSTALLROOT}/bin/uname virtual
-make ${INSTALLROOT}/bin/uniq
-prev uniq
-exec - test '' = 'uniq' || ${STDCMP} 2>/dev/null -s uniq ${INSTALLROOT}/bin/uniq || { ${STDMV} ${INSTALLROOT}/bin/uniq ${INSTALLROOT}/bin/uniq.old 2>/dev/null || true; ${STDCP} uniq ${INSTALLROOT}/bin/uniq  		    		    ;}
-done ${INSTALLROOT}/bin/uniq virtual
-make ${INSTALLROOT}/bin/wc
-prev wc
-exec - test '' = 'wc' || ${STDCMP} 2>/dev/null -s wc ${INSTALLROOT}/bin/wc || { ${STDMV} ${INSTALLROOT}/bin/wc ${INSTALLROOT}/bin/wc.old 2>/dev/null || true; ${STDCP} wc ${INSTALLROOT}/bin/wc  		    		    ;}
-done ${INSTALLROOT}/bin/wc virtual
-make ${INSTALLROOT}/bin/ln
-prev ${INSTALLROOT}/bin/cp
-exec - if	silent test -f "${INSTALLROOT}/bin/ln"
-exec - then	${STDRM} -f ${INSTALLROOT}/bin/ln
-exec - fi
-exec - ${STDLN} ${INSTALLROOT}/bin/cp ${INSTALLROOT}/bin/ln
-done ${INSTALLROOT}/bin/ln virtual
-make ${INSTALLROOT}/bin/mv
-prev ${INSTALLROOT}/bin/cp
-exec - if	silent test -f "${INSTALLROOT}/bin/mv"
-exec - then	${STDRM} -f ${INSTALLROOT}/bin/mv
-exec - fi
-exec - ${STDLN} ${INSTALLROOT}/bin/cp ${INSTALLROOT}/bin/mv
-done ${INSTALLROOT}/bin/mv virtual
 done install virtual
 make test
 make test.asa

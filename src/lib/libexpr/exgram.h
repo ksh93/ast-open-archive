@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -377,7 +377,7 @@ call(Exref_t* ref, register Exid_t* fun, register Exnode_t* args)
 }
 
 /*
- * precompile a printf call
+ * precompile a printf/scanf call
  */
 
 static Print_t*
@@ -411,7 +411,7 @@ preprint(register Exnode_t* args)
 		if (*s == '%')
 		{
 			if (!*++s)
-				exerror("%s: trailing %% in printf format", f);
+				exerror("%s: trailing %% in format", f);
 			if (*s != '%')
 				break;
 		}
@@ -435,19 +435,19 @@ preprint(register Exnode_t* args)
 				switch (c = *s++)
 				{
 				case 0:
-					exerror("unterminated %%... in printf format");
+					exerror("unterminated %%... in format");
 					goto done;
 				case '*':
 					if (i >= elementsof(x->param))
 					{
 						*s = 0;
-						exerror("printf format %s has too many * arguments", f);
+						exerror("format %s has too many * arguments", f);
 						goto done;
 					}
 					if (!args)
 					{
 						*s = 0;
-						exerror("printf format %s * argument expected", f);
+						exerror("format %s * argument expected", f);
 						goto done;
 					}
 					x->param[i++] = args->data.operand.left;
@@ -485,7 +485,7 @@ preprint(register Exnode_t* args)
 					t = FLOATING;
 					goto specified;
 				case 'h':
-					exerror("short printf formats not supported");
+					exerror("short formats not supported");
 					goto done;
 				case 'l':
 					t = INTEGER;
@@ -516,7 +516,7 @@ preprint(register Exnode_t* args)
 					if (!*++s)
 					{
 						*e = 0;
-						exerror("%s: trailing %% in printf format", f);
+						exerror("%s: trailing %% in format", f);
 						goto done;
 					}
 					if (*s != '%')
@@ -530,7 +530,7 @@ preprint(register Exnode_t* args)
 			if (!args)
 			{
 				*e = 0;
-				exerror("%s printf argument expected", f);
+				exerror("%s format argument expected", f);
 				goto done;
 			}
 			x->arg = args->data.operand.left;
@@ -552,11 +552,11 @@ preprint(register Exnode_t* args)
 					if (x->arg->op == CONSTANT && x->arg->data.constant.reference && expr.program->disc->convertf)
 					{
 						if ((*expr.program->disc->convertf)(expr.program, x->arg, STRING, x->arg->data.constant.reference, 0, expr.program->disc) < 0)
-							exerror("cannot convert string printf argument");
+							exerror("cannot convert string format argument");
 						else x->arg->data.constant.value.string = vmstrdup(expr.program->vm, x->arg->data.constant.value.string);
 					}
 					else if (!expr.program->disc->convertf || x->arg->op != ID && x->arg->op != DYNAMIC && x->arg->op != F2X && x->arg->op != I2X && x->arg->op != S2X)
-						exerror("string printf argument expected");
+						exerror("string format argument expected");
 					else
 						x->arg = exnewnode(expr.program, x->arg->type == FLOATING ? F2S : INTEGRAL(x->arg->type) ? I2S : X2S, 0, STRING, x->arg, x->arg->op == ID ? x->arg : (Exnode_t*)0);
 				}
@@ -570,7 +570,7 @@ preprint(register Exnode_t* args)
 		f = s;
 	}
 	if (args)
-		exerror("too many printf arguments");
+		exerror("too many format arguments");
  done:
 	sfstrset(expr.program->tmp, 0);
 	return p;

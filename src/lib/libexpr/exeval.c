@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -127,7 +127,7 @@ typedef struct
  */
 
 static int
-format(Sfio_t* sp, void* vp, Sffmt_t* dp)
+prformat(Sfio_t* sp, void* vp, Sffmt_t* dp)
 {
 	register Fmt_t*		fmt = (Fmt_t*)dp;
 	register Exnode_t*	node;
@@ -308,7 +308,7 @@ print(Expr_t* ex, Exnode_t* expr, void* env, Sfio_t* sp)
 	}
 	memset(&fmt, 0, sizeof(fmt));
 	fmt.fmt.version = SFIO_VERSION;
-	fmt.fmt.extf = format;
+	fmt.fmt.extf = prformat;
 	fmt.expr = ex;
 	fmt.env = env;
 	x = expr->data.print.args;
@@ -336,6 +336,92 @@ print(Expr_t* ex, Exnode_t* expr, void* env, Sfio_t* sp)
 	if (fmt.tmp)
 		sfstrclose(fmt.tmp);
 	return 1;
+}
+
+/*
+ * scanf %! extension function
+ */
+
+static int
+scformat(Sfio_t* sp, void* vp, Sffmt_t* dp)
+{
+	register Fmt_t*		fmt = (Fmt_t*)dp;
+	register Exnode_t*	node;
+
+	if (!fmt->actuals)
+	{
+		exerror("scanf: not enough arguments");
+		return -1;
+	}
+	node = fmt->actuals->data.operand.left;
+	switch (dp->fmt)
+	{
+	case 'f':
+	case 'g':
+		if (node->type != FLOATING)
+			exerror("scanf: %s: floating variable address argument expected", node->data.variable.symbol->name);
+		fmt->fmt.size = sizeof(double);
+		break;
+	case 's':
+		if (node->type != STRING)
+			exerror("scanf: %s: string variable address argument expected", node->data.variable.symbol->name);
+		fmt->fmt.size = -1;
+		break;
+	default:
+		if (node->type != INTEGER && node->type != UNSIGNED)
+			exerror("scanf: %s: integer variable address argument expected", node->data.variable.symbol->name);
+		dp->size = sizeof(Sflong_t);
+		break;
+	}
+	fmt->actuals = fmt->actuals->data.operand.right;
+	dp->flags |= SFFMT_VALUE;
+	*((void**)vp) = &node->data.variable.symbol->value->data.constant.value;
+	return 0;
+}
+
+/*
+ * do scanf
+ */
+
+static int
+scan(Expr_t* ex, Exnode_t* expr, void* env, Sfio_t* sp)
+{
+	Extype_t		v;
+	Extype_t		u;
+	Fmt_t			fmt;
+	int			n;
+
+	if (!sp)
+	{
+		if (expr->data.scan.descriptor)
+		{
+			v = eval(ex, expr->data.scan.descriptor, env);
+			if (expr->data.scan.descriptor->type == STRING)
+				goto get;
+		}
+		else
+			v.integer = 0;
+		if (v.integer < 0 || v.integer >= elementsof(ex->file) || !(sp = ex->file[v.integer]) && !(sp = ex->file[v.integer] = sfnew(NiL, NiL, SF_UNBOUND, v.integer, SF_READ|SF_WRITE)))
+		{
+			exerror("scanf: %d: invalid descriptor", v.integer);
+			return 0;
+		}
+	}
+ get:
+	memset(&fmt, 0, sizeof(fmt));
+	fmt.fmt.version = SFIO_VERSION;
+	fmt.fmt.extf = scformat;
+	fmt.expr = ex;
+	fmt.env = env;
+	u = eval(ex, expr->data.scan.format, env);
+	fmt.fmt.form = u.string;
+	fmt.actuals = expr->data.scan.args;
+	n = sp ? sfscanf(sp, "%!", &fmt) : sfsscanf(v.string, "%!", &fmt);
+	if (fmt.tmp)
+		sfstrclose(fmt.tmp);
+	if (fmt.actuals)
+		exerror("scanf: %s: too many arguments", fmt.actuals->data.operand.left->data.variable.symbol->name);
+	return n;
 }
 
 /*
@@ -697,6 +783,10 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		ex->loopcount = 32767;
 		ex->loopop = expr->op;
 		return ex->loopret;
+	case SCANF:
+	case SSCANF:
+		v.integer = scan(ex, expr, env, NiL);
+		return v;
 	case SPRINTF:
 		print(ex, expr, env, ex->tmp);
 		v.string = vmstrdup(ex->ve, sfstruse(ex->tmp));

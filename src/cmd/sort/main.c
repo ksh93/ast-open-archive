@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -41,7 +41,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2003-09-06 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2004-02-11 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -68,8 +68,9 @@ USAGE_LICENSE
 "	missing, it is taken to be end of line. The second form"
 "	specifies a fixed record length \areclen\a, and the last form"
 "	specifies a fixed field at byte position \aposition\a"
-"	(counting from 1) of \alength\a bytes.]:"
-"		[pos1[,pos2]]|.reclen|.position.length]]]]]"
+"	(counting from 1) of \alength\a bytes. The obsolescent"
+"	\breclen:fieldlen:offset\b (byte offset from 0) is also"
+"	accepted.]:[pos1[,pos2]]|.reclen|.position.length]]]]]"
 "[K:oldkey?Specified in pairs: \b-K\b \apos1\a \b-K\b \apos2\a,"
 "	where positions count from 0.]#"
 "		[pos]"
@@ -81,6 +82,11 @@ USAGE_LICENSE
 "		[+v[b]]?Variable length with 4 byte IBM length descriptor."
 "			\bb\b optionally specifies a 4 byte IBM block"
 "			length descriptor.]"
+"		[+%?If the fixed record size is not otherwise specified,"
+"			and the first input file name ends with \b%\b\asize\a"
+"			or \b%\b\asize\a\b.\b*, where \asize\a is a qualified"
+"			integer, then the fixed record size is set"
+"			to \asize\a.]"
 "}"
 "[b:ignorespace?Ignore leading white space (spaces and tabs) in field"
 "	comparisons.]"
@@ -88,13 +94,7 @@ USAGE_LICENSE
 "	are significant in string comparisons.]"
 "[C:codeset|convert?The field data codeset is \acodeset\a or the field data"
 "	must be converted from the \afrom\a codeset to the \ato\a"
-"	codeset. The codesets are:]:[codeset|from::to]{"
-"	[+a?ascii (ISO-8859-1)]"
-"	[+e?X/Open \bdd\b(1) ebcdic]"
-"	[+i?X/Open \bdd\b(1) ibm ebcdic]"
-"	[+o?mvs OpenEdition ebcdic (IBM-1047)]"
-"	[+x?native codeset]"
-"}"
+"	codeset. The codesets are:]:[codeset|from::to]{\fcodesets\f}"
 "[f:fold|ignorecase?Fold lower case letters onto upper case.]"
 "[i:ignorecontrol?Ignore characters outside the ASCII range 040-0176 in"
 "	string comparisons.]"
@@ -140,11 +140,12 @@ USAGE_LICENSE
 "[Z:zd|zoned-decimal?Compare zoned decimal (ZD) numbers with embedded"
 "	trailing sign.]"
 "[z:size|zip?Suggest using the specified number of bytes of internal store"
-"	to tune performance. Type is a single character and may be one of:]:"
-"		[type[size]]]{"
+"	to tune performance. Type is a single character and may be one"
+"	of:]:[type[size]]]{"
 "		[+a?Buffer alignment.]"
 "		[+c?Input chunk size; sort chunks of this size and disable merge.]"
 "		[+i?Input buffer size.]"
+"		[+m?Maximum number of intermediate merge files.]"
 "		[+p?Input sort size; sort chunks of this size before merge.]"
 "		[+o?Output buffer size.]"
 "		[+r?Maximum record size.]"
@@ -216,6 +217,7 @@ USAGE_LICENSE
 #include <sfstr.h>
 #include <vmalloc.h>
 #include <wait.h>
+#include <iconv.h>
 
 #define INBRK		(128*1024)	/* default heap increment	*/
 #define INMIN		(1024)		/* min input buffer size	*/
@@ -254,6 +256,7 @@ typedef struct
 	Job_t*		jobs;		/* multi-proc job table		*/
 	char*		overwrite;	/* -o input overwrite tmp file	*/
 	char*		buf;		/* input buffer			*/
+	Sfio_t*		opened;		/* fileopen() peek stream	*/
 	size_t		cur;		/* input buffer index		*/
 	size_t		hit;		/* input buffer index overflow	*/
 	size_t		end;		/* max input buffer index	*/
@@ -265,6 +268,7 @@ typedef struct
 	int		map;		/* sfreserve() input		*/
 	int		mfiles;		/* multi-stage files[] count	*/
 	int		nfiles;		/* files[] count		*/
+	int		xfiles;		/* max files[] count		*/
 	int		preserve;	/* rename() tmp output to input	*/
 	int		single;		/* one input file		*/
 	int		verbose;	/* trace main actions		*/
@@ -279,7 +283,18 @@ typedef struct
 static int
 optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 {
-	if (streq(s, "methods"))
+	register iconv_list_t*	ic;
+	register int		n;
+
+	if (streq(s, "codesets"))
+	{
+		n = 0;
+		for (ic = iconv_list(NiL); ic; ic = iconv_list(ic))
+			if (ic->ccode >= 0)
+				n += sfprintf(sp, "[%c:%s?%s]", ic->match[ic->match[0] == '('], ic->name, ic->desc);
+		return n;
+	}
+	else if (streq(s, "methods"))
 		return rskeylist(NiL, sp, 1);
 	return 0;
 }
@@ -310,14 +325,12 @@ parse(register Sort_t* sp, char** argv)
 	char**			a;
 	char**			v;
 	size_t			z;
+	int			fixedfile = 0;
 	int			obsolescent = 1;
 	char			opt[16];
 	Optdisc_t		optdisc;
 
-	memset(&optdisc, 0, sizeof(optdisc));
-	optdisc.version = OPT_VERSION;
-	optdisc.infof = optinfo;
-	opt_info.disc = &optdisc;
+	optinit(&optdisc, optinfo);
 	while (n = optget(argv, usage)) switch (n)
 	{
 	case 'c':
@@ -376,12 +389,12 @@ parse(register Sort_t* sp, char** argv)
 		goto size;
 	case 'z':
 		if (isalpha(n = *(s = opt_info.arg)))
-			*s++;
+			s++;
 		else
 			n = 'r';
 	size:
 		z = strton(s, &e, NiL, 1);
-		if (*e || z < ((n == 'r' || n == 'o' || isupper(n)) ? 0 : 512))
+		if (*e || z < ((n == 'm' || n == 'o' || n == 'r' || isupper(n)) ? 0 : 512))
 		{
 			error(2, "%s %c%s: invalid size", opt_info.option, n, s);
 			return -1;
@@ -397,6 +410,11 @@ parse(register Sort_t* sp, char** argv)
 			break;
 		case 'i':
 			key->insize = z;
+			break;
+		case 'm':
+			if (z <= 0 || z > elementsof(sp->files))
+				z = elementsof(sp->files);
+			sp->xfiles = z;
 			break;
 		case 'p':
 			key->procsize = z;
@@ -465,6 +483,10 @@ parse(register Sort_t* sp, char** argv)
 			key->disc->data = n;
 			e = s;
 			break;
+		case '%':
+			fixedfile = 1;
+			e = s + 1;
+			break;
 		default:
 			e = s;
 			break;
@@ -521,6 +543,15 @@ parse(register Sort_t* sp, char** argv)
 		break;
 	}
 	key->input = argv += opt_info.index;
+	if (fixedfile)
+		for (n = 0; s = key->input[n]; n++)
+			if ((s = strrchr(s, '%')) && (z = strton(s + 1, &e, NiL, 0)) && (!*e || *e == '.' && !strchr(e, '/')))
+			{
+				if (!key->fixed)
+					key->fixed = z;
+				else if (key->fixed != z)
+					error(2, "%s: file fixed record length mismatch -- %d expected", key->input[n], key->fixed);
+			}
 	if (obsolescent && (opt_info.index <= 1 || !streq(*(argv - 1), "--")))
 	{
 		/*
@@ -573,6 +604,29 @@ dumpkey(Rs_t* rs, unsigned char* dat, int datlen, unsigned char* key, int keylen
 }
 
 /*
+ * return read stream for path
+ */
+
+static Sfio_t*
+fileopen(register Sort_t* sp, const char* path)
+{
+	Sfio_t*		fp;
+
+	if (fp = sp->opened)
+		sp->opened = 0;
+	else if (streq(path, "-") || streq(path, "/dev/stdin"))
+	{
+		if (sp->hadstdin)
+			error(3, "%s: can only read once", path);
+		sp->hadstdin = 1;
+		fp = sfstdin;
+	}
+	else if (!(fp = sfopen(NiL, path, "r")))
+		error(ERROR_SYSTEM|3, "%s: cannot open", path);
+	return fp;
+}
+
+/*
  * initialize sp from argv
  */
 
@@ -591,6 +645,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	struct stat		os;
 
 	memset(sp, 0, sizeof(*sp));
+	sp->xfiles = elementsof(sp->files);
 	sfset(sfstdout, SF_SHARE, 0);
 	sfset(sfstderr, SF_SHARE, 0);
 	Vmdcsbrk->round = INBRK;
@@ -608,8 +663,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		key->alignsize = n;
 	if (parse(sp, argv) || rskeyinit(key))
 	{
-		error(ERROR_USAGE|4, "%s", optusage(NiL));
 		rskeyclose(key);
+		error(ERROR_USAGE|4, "%s", optusage(NiL));
 		return -1;
 	}
 	sp->test = key->test;
@@ -627,12 +682,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		x = INMIN;
 	if (sp->single = !key->input[1])
 	{
-		if (streq(key->input[0], "-"))
-		{
-			if (fstat(sffileno(sfstdin), &is))
-				error(ERROR_SYSTEM|3, "cannot stat standard input");
-		}
-		else if (stat(key->input[0], &is))
+		sp->opened = fileopen(sp, key->input[0]);
+		if (fstat(sffileno(sp->opened), &is))
 			error(ERROR_SYSTEM|3, "%s: cannot stat", key->input[0]);
 		sp->total = is.st_size;
 		if (!S_ISREG(is.st_mode))
@@ -706,7 +757,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 				if (size % fixed)
 					size += fixed - size % fixed;
 				i = (size + x - 1) / x;
-				if (i * n > elementsof(sp->files))
+				if (i * n > sp->xfiles)
 				{
 					error(1, "multi-process multi-stage not implemented; falling back to one processor");
 					goto uno;
@@ -750,7 +801,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 				Sfio_t*		ip;
 
 				i = (size + x - 1) / x;
-				if (i * n > elementsof(sp->files))
+				if (i * n > sp->xfiles)
 				{
 					error(1, "multi-process multi-stage not implemented; falling back to one processor");
 					goto uno;
@@ -830,18 +881,23 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	 * check the output file for clash with the input files
 	 */
 
+	n = stat("/dev/null", &is);
 	if (!key->output || streq(key->output, "-") || streq(key->output, "/dev/stdout"))
 	{
 		key->output = "/dev/stdout";
 		sp->op = sfstdout;
+		if (!n && !fstat(sffileno(sp->op), &os) && os.st_dev == is.st_dev && os.st_ino == is.st_ino)
+			key->type |= RS_IGNORE;
 	}
 	else if (key->input)
 	{
 		if (!stat(key->output, &os))
 		{
-			if (access(key->output, W_OK))
+			if (!n && os.st_dev == is.st_dev && os.st_ino == is.st_ino)
+				key->type |= RS_IGNORE;
+			else if (access(key->output, W_OK))
 				error(ERROR_SYSTEM|3, "%s: cannot write", key->output);
-			if (!fs3d(FS3D_TEST) || !iview(&os))
+			else if (!fs3d(FS3D_TEST) || !iview(&os))
 			{
 				p = key->input;
 				while (s = *p++)
@@ -858,7 +914,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 							}
 							else s = ".";
 							if (sp->overwrite = pathtemp(NiL, 0, s, error_info.id, &n))
-								sp->op = sfnew(NiL, NiL, SF_UNBOUND, n, SF_WRITE);
+								sp->op = sfnew(sfstdout, NiL, SF_UNBOUND, n, SF_WRITE);
 							if (t) *t = '/';
 							if (!sp->op || fstat(n, &is))
 								error(ERROR_SYSTEM|3, "%s: cannot create overwrite file %s", key->output, sp->overwrite);
@@ -869,7 +925,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 					}
 			}
 		}
-		if (!sp->overwrite && !(sp->op = sfopen(NiL, key->output, "w")))
+		if (!sp->overwrite && !(sp->op = sfopen(sfstdout, key->output, "w")))
 			error(ERROR_SYSTEM|3, "%s: cannot write", key->output);
 	}
 	if (key->outsize > 0)
@@ -909,7 +965,7 @@ clear(register Sort_t* sp, Sfio_t* fp)
 	else
 	{
 		sp->nfiles = sp->mfiles;
-		if (sp->mfiles >= (elementsof(sp->files) - 1))
+		if (sp->mfiles >= (sp->xfiles - 1))
 			sp->mfiles = 0;
 	}
 }
@@ -961,7 +1017,7 @@ flush(register Sort_t* sp, register size_t r)
 		 * multi-stage merge when open file limit exceeded
 		 */
 
-		if (sp->nfiles >= elementsof(sp->files))
+		if (sp->nfiles >= sp->xfiles)
 		{
 			if (sp->child || !(fp = sftmp(0)))
 				error(ERROR_SYSTEM|3, "cannot create intermediate merge file");
@@ -1024,7 +1080,7 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 	 * loop on insize chunks
 	 */
 
-	error_info.file = (char*)name;
+	error_info.file = ip == sfstdin ? (char*)0 : (char*)name;
 	sfset(ip, SF_SHARE, 0);
 	if (sp->map)
 	{
@@ -1241,8 +1297,7 @@ jobs(register Sort_t* sp)
 	j = 0;
 	for (jp = sp->jobs; jp < xp; jp++)
 	{
-		if (!(ip = sfopen(NiL, file, "r")))
-			error(ERROR_SYSTEM|3, "%s: cannot read", file);
+		ip = fileopen(sp, file);
 		switch (fork())
 		{
 		case -1:
@@ -1324,7 +1379,8 @@ done(register Sort_t* sp)
 						error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 					sfclose(op);
 				}
-				else error(ERROR_SYSTEM|2, "%s: cannot write", sp->key->output);
+				else
+					error(ERROR_SYSTEM|2, "%s: cannot write", sp->key->output);
 				sfclose(ip);
 				remove(sp->overwrite);
 			}
@@ -1353,75 +1409,73 @@ main(int argc, char** argv)
 		exit(1);
 	if (sort.test & TEST_dump)
 		rskeydump(sort.key, sfstderr);
-	merge = sort.key->merge && sort.key->input[0] && sort.key->input[1] ? sort.key->input : (char**)0;
-	fp = 0;
-	if (sort.jobs)
-		jobs(&sort);
-	else if (sort.test & TEST_show)
-		exit(0);
-	else while (s = *sort.key->input++)
+	if (sort.key->type & RS_CAT)
 	{
-		if (streq(s, "-") || streq(s, "/dev/stdin"))
+		while (s = *sort.key->input++)
 		{
-			if (sort.hadstdin)
-				error(3, "%s: can only read once", s);
-			sort.hadstdin = 1;
-			s = 0;
-			fp = sfstdin;
+			fp = fileopen(&sort, s);
+			if ((sfmove(fp, sfstdout, SF_UNBOUND, -1) < 0 || !sfeof(fp)))
+				error(ERROR_SYSTEM|2, "%s: read error", s);
+			if (sferror(sfstdout))
+				break;
+			sfclose(fp);
 		}
-		else if (!(fp = sfopen(NiL, s, "r")))
-		{
-			if (merge)
-			{
-				clear(&sort, NiL);
-				sort.key->input = merge;
-				merge = 0;
-				continue;
-			}
-			error(ERROR_SYSTEM|3, "%s: cannot open", s);
-		}
-		if (merge)
-		{
-			if (sort.nfiles >= elementsof(sort.files))
-			{
-				clear(&sort, NiL);
-				sort.key->input = merge;
-				merge = 0;
-				if (fp != sfstdin)
-					sfclose(fp);
-				fp = 0;
-				continue;
-			}
-			sort.files[sort.nfiles++] = fp;
-		}
-		else
-		{
-			input(&sort, fp, s);
-			if (fp != sfstdin && !sort.map)
-			{
-				sfclose(fp);
-				fp = 0;
-			}
-		}
-	}
-	if (sort.nfiles)
-	{
-		if (sort.cur)
-			flush(&sort, sort.cur);
-		if (sort.verbose)
-			error(0, "%s merge text", error_info.id);
-		if (rsmerge(sort.rec, sort.op, sort.files, sort.nfiles, merge ? RS_TEXT : RS_OTEXT))
-			error(ERROR_SYSTEM|2, "merge error");
-		clear(&sort, NiL);
 	}
 	else
 	{
-		if (sort.verbose)
-			error(0, "%s write text", error_info.id);
-		if (rswrite(sort.rec, sort.op, RS_OTEXT))
-			error(ERROR_SYSTEM|2, "%s: write error", sort.key->output);
-		if (fp && fp != sfstdin)
-			sfclose(fp);
+		merge = sort.key->merge && sort.key->input[0] && sort.key->input[1] ? sort.key->input : (char**)0;
+		fp = 0;
+		if (sort.jobs)
+			jobs(&sort);
+		else if (sort.test & TEST_show)
+			exit(0);
+		else
+			while (s = *sort.key->input++)
+			{
+				fp = fileopen(&sort, s);
+				if (merge)
+				{
+					if (sort.nfiles >= sort.xfiles)
+					{
+						clear(&sort, NiL);
+						sort.key->input = merge;
+						merge = 0;
+						if (fp != sfstdin)
+							sfclose(fp);
+						fp = 0;
+						continue;
+					}
+					sort.files[sort.nfiles++] = fp;
+				}
+				else
+				{
+					input(&sort, fp, s);
+					if (fp != sfstdin && !sort.map)
+					{
+						sfclose(fp);
+						fp = 0;
+					}
+				}
+			}
+		if (sort.nfiles)
+		{
+			if (sort.cur)
+				flush(&sort, sort.cur);
+			if (sort.verbose)
+				error(0, "%s merge text", error_info.id);
+			if (rsmerge(sort.rec, sort.op, sort.files, sort.nfiles, merge ? RS_TEXT : RS_OTEXT))
+				error(ERROR_SYSTEM|2, "merge error");
+			clear(&sort, NiL);
+		}
+		else
+		{
+			if (sort.verbose)
+				error(0, "%s write text", error_info.id);
+			if (rswrite(sort.rec, sort.op, RS_OTEXT))
+				error(ERROR_SYSTEM|2, "%s: write error", sort.key->output);
+			if (fp && fp != sfstdin)
+				sfclose(fp);
+		}
 	}
 	done(&sort);
 	exit(error_info.errors != 0);

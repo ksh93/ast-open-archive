@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -97,7 +97,9 @@ struct scan				/* scan info			*/
 	struct action*	after;		/* do this after scanexec	*/
 	struct quote*	quote;		/* quote patterns		*/
 	struct action*	action;		/* action table			*/
+	struct action*	classid;	/* classid action		*/
 	scanstate*	state;		/* state transition table	*/
+	void*		data;		/* private data			*/
 };
 
 /*
@@ -285,7 +287,7 @@ scanaction(struct action* a, register char* s)
 						if (!a->scan)
 							a->scan = u->scan;
 					}
-					else if (u->attribute)
+					else if (u->attribute && !(u->property & P_ignore))
 					{
 						a->attrprop = 1;
 						if (t == '-')
@@ -387,6 +389,11 @@ scancompile(struct rule* r, int flags)
 		switch (*s++)
 		{
 		case 0:
+			break;
+		case 'C':
+			ss->classid = newof(0, struct action, 1, 0);
+			scanaction(ss->classid, s);
+			ss->data = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_name, r->name, 0);
 			break;
 		case 'D':
 			if (!(ss->flags & SCAN_define))
@@ -1035,8 +1042,8 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 	int		n;
 	char*		t;
 	char*		o;
-	struct rule*	u = 0;
-	struct rule*	x = 0;
+	struct rule*	u;
+	struct rule*	x;
 	Sfio_t*		tmp = 0;
 
 	static char	label[] = "X-scan-action";
@@ -1056,14 +1063,13 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 		{
 			tmp = sfstropen();
 			expand(tmp, a->map);
+			s = sfstruse(tmp);
 		}
 		state.frame->original = o;
 		state.frame->stem = t;
 	}
-	if (tmp || *s)
+	if (*s)
 	{
-		if (tmp)
-			s = sfstruse(tmp);
 		if (split)
 			t = tokopen(s, 1);
 		do
@@ -1078,6 +1084,8 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 				} while (o = strchr(o, ' '));
 				o = s;
 			}
+			if (!*s || *s == '-' && !*(s + 1))
+				break;
 #if _WINIX
 			if (isalpha(*s) && *(s + 1) == ':' && (*(s + 2) == '/' || *(s + 2) == '\\'))
 			{
@@ -1156,8 +1164,6 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 		} while (split);
 		if (split)
 			tokclose(t);
-		if (tmp)
-			sfstrclose(tmp);
 	}
 	else
 	{
@@ -1177,6 +1183,8 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 			}
 		}
 	}
+	if (tmp)
+		sfstrclose(tmp);
 	return p;
 }
 
@@ -1198,6 +1206,10 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 	scanstate*		rep;
 	scanstate*		per;
 	char*			a;
+	Hash_table_t*		tab;
+	Hash_position_t*	pos;
+	int			d;
+	int			e;
 	int			hit;
 	int			n;
 	int			collect;
@@ -1245,6 +1257,7 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 	}
 	else if (state.frame != r->active)
 		state.frame = r->active;
+	tab = ss->classid ? (Hash_table_t*)ss->data : (Hash_table_t*)0;
 	iflev = (r->property & P_dontcare) ? 1 : 0;
 	g = buf + 2 * SCANBUFFER;
 	g[0] = 0;
@@ -1574,9 +1587,71 @@ scanexec(int fd, struct rule* r, struct scan* ss, struct list* p)
 					*g = c;
 				}
 			}
+			else if (tab && istype(c, C_ID1))
+			{
+				d = e = 0;
+				h = 0;
+				b = g - 1;
+				for (;;)
+				{
+					while (!(c = *g++))
+					{
+						if (b >= buf + SCANBUFFER)
+						{
+							c = g - b - 1;
+							memcpy(buf + SCANBUFFER - c, b, c);
+							b = buf + SCANBUFFER - c;
+						}
+						if ((c = read(fd, g = buf + SCANBUFFER, SCANBUFFER)) <= 0)
+							goto done;
+						g[c] = 0;
+					}
+					if (!istype(c, C_ID1|C_VARIABLE2))
+					{
+						if (e && d > 1)
+						{
+							h = e;
+							break;
+						}
+						if (!isspace(c))
+						{
+							h = 0;
+							break;
+						}
+						if (!h)
+							h = g - b - 1;
+					}
+					else if (c == '.')
+					{
+						d++;
+						e = g - b - 1;
+					}
+					else if (h)
+						break;
+				}
+				g--;
+				if (h)
+				{
+					c = b[h];
+					b[h] = 0;
+					hashput(tab, b, 1);
+					b[h] = c;
+				}
+				break;
+			}
 		}
 	}
  done:
+	if (tab && (pos = hashscan(tab, 0)))
+	{
+		while (hashnext(pos))
+			if (pos->bucket->value)
+			{
+				pos->bucket->value = 0;
+				p = scanmatch(p, ss->classid, r, pos->bucket->name, pos->bucket->name, 0, 0);
+			}
+		hashdone(pos);
+	}
 	r->active = frame.previous;
 	state.frame = frame.parent;
 	return p;

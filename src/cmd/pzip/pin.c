@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2003 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -1473,11 +1473,8 @@ main(int argc, char** argv)
 	Optimize_method_t*	optimize_method = &optimize_methods[0];
 	Reorder_method_t*	reorder_method = &reorder_methods[0];
 
-	memset(&optdisc, 0, sizeof(optdisc));
-	optdisc.version = OPT_VERSION;
-	optdisc.infof = optinfo;
-	opt_info.disc = &optdisc;
 	error_info.id = "pin";
+	optinit(&optdisc, optinfo);
 	state.level = 6;
 	state.window = PZ_WINDOW;
 	if (!(dp = sfstropen()))

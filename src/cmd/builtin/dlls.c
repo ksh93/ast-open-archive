@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2003 AT&T Corp.                *
+*                Copyright (c) 1992-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -32,16 +32,16 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dlls (AT&T Labs Research) 2003-02-11 $\n]"
+"[-?\n@(#)$Id: dlls (AT&T Labs Research) 2004-01-28 $\n]"
 USAGE_LICENSE
 "[+NAME?dlls - list dlls and shared libraries on $PATH]"
 "[+DESCRIPTION?\bdlls\b lists the base name and full path, one per line, of"
 "	\adlls\a and \ashared libraries\a found in the directories or"
 "	sibling directories in the \bPATH\b environment variable. The"
-"	\aprefix\a operand matches libraries with that prefix in the base"
-"	name. If omitted or \b-\b then no prefixes are matched. The \aname\a"
-"	operand is the library base name. All base names are matched if"
-"	omitted or \b-\b. The \aversion\a operand specifies a specific"
+"	\aplugin\a operand matches plugin libraries for the particular"
+"	\aplugin\a. If omitted or \b-\b then no plugins are matched. The"
+"	\aname\a operand is the library base name. All base names are matched"
+"	if omitted or \b-\b. The \aversion\a operand specifies a specific"
 "	library version and is an implementation specific sequence of"
 "	decimal digits and dots. Only the first path for each library"
 "	base name is listed. If no options are specified then"
@@ -51,7 +51,7 @@ USAGE_LICENSE
 "[p:path?List the \adll\a or \ashared library\a path names.]"
 
 "\n\n"
-"[ prefix [ name [ version ] ] ]\n"
+"[ plugin [ name [ version ] ] ]\n"
 "\n"
 
 "[+SEE ALSO?\bfind\b(1), \bdllscan\b(3)]"

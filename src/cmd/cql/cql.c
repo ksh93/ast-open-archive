@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2002 AT&T Corp.                *
+*                Copyright (c) 1991-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -770,7 +770,7 @@ main(int argc, char** argv)
 				message((-2, ":::: load expression C code from %s", compiled));
 				if (!(sp = sfstropen()))
 					error(ERROR_SYSTEM|3, "out of space [load]");
-				if (!(dll = dllfind(compiled, NiL, RTLD_LAZY, buf, sizeof(buf))))
+				if (!(dll = dllplug(error_info.id, compiled, NiL, RTLD_LAZY, buf, sizeof(buf))))
 					error(ERROR_SYSTEM|3, "%s: %s", compiled, dlerror());
 				for (n = 0; n < elementsof(state.loop); n++)
 				{

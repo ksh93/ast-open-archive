@@ -1,3 +1,5 @@
+04-02-29 pzip.h,pzline.c: fix pz_init() prototype
+03-11-04 pzpart.c: use PZ_HEAD to avoid multiple PZ_UPDATE, fix wrk overflow
 03-07-23 pzsplit.c: --split file size limited to --window
 03-07-17 pzpart.c: fix "//" partition translation
 	 pzpart.c: add include="file", library="..." disabled during include

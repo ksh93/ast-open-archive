@@ -1,3 +1,11 @@
+04-01-28 data.c: k,K are now autoprint (like d)
+04-01-22 data.c: K is alias for mark; omitted mark defaults to nospam
+	 list.c: addr- shorthand for addr-$
+04-01-20 data.c: k is alias for mark; omitted mark defaults to spam
+04-01-16 main.c: mark -f option value optional
+03-12-10 spam.c: fix word match bug that matched prefixes instead of full word
+03-11-20 main.c: optget() if _PACKAGE_ast -- finally
+03-11-14 add spamsubhead=1 to edit spam subject heading list
 03-01-17 add shquote() to quote popen pathnames; fix save to -f core dump
 02-12-12 imap.c: handle no-name attachments
 02-12-11 head.c: application of DeMorgan's law proves Murphy's

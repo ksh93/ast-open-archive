@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -76,7 +76,7 @@ typedef struct Saveset_s
  */
 
 static int
-getsaveset(register Archive_t* ap, register File_t* f, register Saveset_t* ss, int header)
+getsaveset(Pax_t* pax, register Archive_t* ap, register File_t* f, register Saveset_t* ss, int header)
 {
 	register char*	p;
 	register char*	s;
@@ -91,7 +91,7 @@ getsaveset(register Archive_t* ap, register File_t* f, register Saveset_t* ss, i
 		{
 			ss->bp = ss->block;
 			ss->lastsize = 0;
-			if (bread(ap, ss->bp, (off_t)0, (off_t)state.blocksize, 0) <= 0)
+			if (paxread(pax, ap, ss->bp, (off_t)0, (off_t)state.blocksize, 0) <= 0)
 			{
 				ap->format = getformat("slt", 1);
 				if (header)
@@ -121,7 +121,7 @@ getsaveset(register Archive_t* ap, register File_t* f, register Saveset_t* ss, i
 				i = swapget(1, p + FILHDR_size, 2);
 				if (p + FILHDR_data + i > ss->block + state.blocksize)
 					error(3, "invalid %s format file attribute", ap->format->name);
-				t = f->name = stash(&ap->stash.head, NiL, i);
+				t = f->name = paxstash(pax, &ap->stash.head, NiL, i);
 				n = 0;
 				for (s = p + FILHDR_data + 1; s < p + FILHDR_data + i; s++)
 				{
@@ -214,7 +214,7 @@ vmsbackup_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wf
 	j = 0;
 	k = 0;
 	c = 0;
-	while (getsaveset(ap, f, ss, 0))
+	while (getsaveset(pax, ap, f, ss, 0))
 	{
 		/*
 		 * this part transcribed from vmsbackup
@@ -329,7 +329,7 @@ Format_t	pax_vmsbackup_format =
 	0,
 	0,
 	0,
-	pax_vmsbackup_next,
+	PAXNEXT(pax_vmsbackup_next),
 	0,
 	vmsbackup_done,
 	0,
@@ -347,3 +347,5 @@ Format_t	pax_vmsbackup_format =
 	0,
 	vmsbackup_validate
 };
+
+PAXLIB(&pax_vmsbackup_format)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -610,6 +610,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 	Member_t*		d;
 	Member_t*		h;
 	char*			p;
+	Filter_t*		fp;
 	Hash_position_t*	pos;
 
 	if (state.delta2delta != 2)
@@ -665,7 +666,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 						f->delta.op = DELTA_create;
 						paxdelta(ip, op, f, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
 					}
-					else if (state.filter.argv)
+					else if (fp = filter(op, f))
 					{
 						int		wfd;
 
@@ -698,7 +699,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 						close(wfd);
 						p = f->path;
 						f->path = tmp;
-						f->fd = filter(op, f);
+						f->fd = apply(op, f, fp);
 						if (remove(f->path))
 							error(1, "%s: cannot remove filter temporary", p, f->path);
 						f->path = p;

@@ -1,3 +1,10 @@
+04-02-11 main.c: document the obsolescent -k reclen:fieldlen:offset
+	 sort.tst: add -k reclen:fieldlen:offset vs. -k .r -k .o.f tests
+03-11-11 main.c: fix sfread vs. sfreserve logic fooled by SFOPEN_INTERCEPT
+03-11-04 sfopen.c: add SFOPEN_INTERCEPT experiment 
+03-10-16 main.c: add RS_CAT check
+03-10-11 main.c: add RS_IGNORE checks, -R% to get size from path%lrecl
+	 sort.tst: add -R% tests
 03-09-06 main.c: add -Z, --zd, --zoned-decimal
 03-09-04 main.c: change -R to --record=format | --recfmt=format
 03-08-31 main.c: -l implemented by rslib()

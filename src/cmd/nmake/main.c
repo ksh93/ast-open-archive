@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -95,8 +95,9 @@
  *   2000             (4.0)             .	AT&T Research
  *                      .               .
  *   2001             (4.1)             .	AT&T Research
- *   2001             (4.2)             .	AT&T Research
+ *   2002             (4.2)             .	AT&T Research
  *   2003             (4.3)             .	AT&T Research
+ *   2004             (4.4)             .	AT&T Research
  *
  * command line arguments are of three types
  *
@@ -157,6 +158,7 @@
  *	0x00800000 2001-10-05 disable early r->status=FAILED when errors!=0
  *	0x01000000 2002-10-02 $(>) doesn't check min(rule.time,state.time)
  *	0x02000000 2002-12-04 don't inhibit .UNBIND of M_bind rules
+ *	0x04000000 2004-01-20 don't include triggered time==0 targets in :T=F: 
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *
@@ -370,8 +372,7 @@ main(int argc, char** argv)
 	state.view[0].path = ".";
 #endif
 	state.view[0].pathlen = 1;
-	state.writeobject = 1;
-	state.writestate = 1;
+	state.writeobject = state.writestate = "-";
 
 	/*
 	 * pwd initialization
@@ -464,7 +465,8 @@ main(int argc, char** argv)
 	state.readonly = 1;
 	state.argv = argv;
 	state.argc = argc;
-	args = scanargs(state.argc, state.argv, state.argf);
+	if ((args = scanargs(state.argc, state.argv, state.argf)) < 0)
+		return 1;
 	state.readonly = 0;
 	state.init = 1;
 	if (state.base)
@@ -720,7 +722,7 @@ main(int argc, char** argv)
 	 * read the state file
 	 */
 
-	readstate(state.statefile);
+	readstate();
 
 	/*
 	 * place the command line targets in internal.args

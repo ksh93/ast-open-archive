@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2003 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -45,6 +45,30 @@
 #define MAXD	(double)(~((unsigned long)0))
 #endif
 
+typedef struct Fmt_s
+{
+	Sffmt_t		fmt;
+	Void_t**	args[2];
+	int		arg;
+} Fmt_t;
+
+static int
+#if __STD_C
+extf(Sfio_t* sp, Void_t* vp, Sffmt_t* dp)
+#else
+extf(sp, vp, dp)
+Sfio_t*		sp;
+Void_t*		vp;
+Sffmt_t*	dp;
+#endif
+{
+	register Fmt_t*		fmt = (Fmt_t*)dp;
+
+	dp->flags |= SFFMT_VALUE;
+	*((Void_t**)vp) = fmt->args[fmt->arg++];
+	return 0;
+}
+
 MAIN()
 {
 	char		str[8], c[4], cl[8];
@@ -55,6 +79,7 @@ MAIN()
 	char*		s;
 	Void_t*		vp;
 	Sfio_t*		sf;
+	Fmt_t		fmt;
 
 	str[0] = 'x'; str[1] = 0;
 	n = sfsscanf("123","%[a-z]%d",str,&i);
@@ -210,6 +235,17 @@ MAIN()
 
 	if(sfsscanf("NaNS", "%g", &f) != 1)
 		terror("Scanning NaN failed");
+
+	fmt.fmt.version = SFIO_VERSION;
+	fmt.fmt.extf = extf;
+	fmt.fmt.eventf = 0;
+	fmt.fmt.form = "%d %g";
+	fmt.arg = 0;
+	fmt.args[0] = (Void_t*)&n; n = 0;
+	fmt.args[1] = (Void_t*)&f; f = 0;
+	i = sfsscanf("123 3.1415", "%!", &fmt.fmt);
+	if(i != 2 || n != 123 || f <= 3.1414 || f >= 3.1416)
+		terror("%%! failed i=%d n=%d d=%g", i, n, f);
 
 	TSTEXIT(0);
 }

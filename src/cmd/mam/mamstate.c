@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -24,7 +24,7 @@
 #pragma prototyped
 /*
  * AT&T Bell Laboratories
- * make abstract machine file state support
+ * mamexec state support
  *
  * mamstate reference [ file ... | <files ]
  *
@@ -35,28 +35,39 @@
 
 static const char id[] = "\n@(#)$Id: mamstate (AT&T Bell Laboratories) 1989-06-26 $\0\n";
 
-#include <ast.h>
-#include <ls.h>
-#include <error.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 main(int argc, register char** argv)
 {
 	register char*	s;
-	long		ref;
+	char*		id;
+	unsigned long	ref;
 	struct stat	st;
+	char		buf[1024];
 
-	NoP(argc);
-	error_info.id = "mamstate";
-	if (!(s = *++argv) || stat(s, &st))
-		error(ERROR_USAGE|4, optusage("reference [ file ... | <files ]"));
-	ref = (long)st.st_mtime;
-	if (s = *++argv) do
+	id = "mamstate";
+	if (!(s = *++argv))
 	{
-		if (!stat(s, &st))
-			sfprintf(sfstdout, "%s %ld\n", s, (long)st.st_mtime - ref);
-	} while (s = *++argv);
-	else while (s = sfgetr(sfstdin, '\n', 1))
-		if (!stat(s, &st))
-			sfprintf(sfstdout, "%s %ld\n", s, (long)st.st_mtime - ref);
-	exit(0);
+		fprintf(stderr, "%s: reference file argument expected\n", id);
+		return 1;
+	}
+	if (stat(s, &st))
+	{
+		fprintf(stderr, "%s: %s: cannot stat\n", id, s);
+		return 1;
+	}
+	ref = (unsigned long)st.st_mtime;
+	if (s = *++argv)
+		do
+		{
+			if (!stat(s, &st))
+				printf("%s %ld\n", s, (unsigned long)st.st_mtime - ref);
+		} while (s = *++argv);
+	else
+		while (s = fgets(buf, sizeof(buf), stdin))
+			if (!stat(s, &st))
+				printf("%s %ld\n", s, (unsigned long)st.st_mtime - ref);
+	return 0;
 }

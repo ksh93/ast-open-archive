@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1997-2003 AT&T Corp.                *
+*                Copyright (c) 1997-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -359,6 +359,14 @@ extern Cdbmeth_t* Cdbvdelta;	/* vdelta compression	*/
 
 #undef	extern
 
+#if !_BLD_cdb && defined(__EXPORT__)
+#define extern		__EXPORT__
+#endif
+
+extern int		cdb_lib(void);
+
+#undef	extern
+
 #if _BLD_cdb && defined(__EXPORT__)
 #define extern		__EXPORT__
 #endif
@@ -380,7 +388,7 @@ extern int		cdbdrop(Cdb_t*, Cdbrecord_t*);
 extern int		cdbempty(Cdb_t*, Cdbdata_t*, Cdbformat_t*, size_t);
 extern ssize_t		cdbimage(Cdb_t*, Cdbrecord_t*, Sfio_t*, int);
 
-extern int		cdblib(const char*, int, Cdbdisc_t*);
+extern int		cdblib(const char*, Cdbdisc_t*);
 
 extern int		cdbaddmap(Cdbmapmeth_t*);
 extern Cdbmapmeth_t*	cdbgetmap(const char*);

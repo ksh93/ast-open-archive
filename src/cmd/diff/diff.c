@@ -716,6 +716,10 @@ main (argc, argv)
       prev = c;
 #endif
     }
+#if _PACKAGE_ast
+  if (error_info.errors)
+    return 1;
+#endif
 
   if (argc - optind != 2)
     try_help (argc - optind < 2 ? "missing operand" : "extra operand");

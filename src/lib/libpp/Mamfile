@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -25,8 +25,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -193,7 +193,7 @@ exec - chmod u+w,+x gentab
 done gentab generated
 make pp.tab
 done pp.tab
-exec - PATH=.:$PATH gentab -d pp.tab > ppdef.h
+exec - ./gentab -d pp.tab > ppdef.h
 done ppdef.h dontcare generated
 make pp.h implicit
 make ../../../include/ast/ccode.h implicit
@@ -223,7 +223,7 @@ prev ../../../include/ast/ast.h implicit
 done pplib.h
 done ppargs.c
 prev ppargs.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpp]"\" -c ppargs.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpp]"\" -c ppargs.c
 done ppargs.o generated
 make ppbuiltin.o
 make ppbuiltin.c
@@ -383,7 +383,7 @@ prev ../../../include/ast/ls.h implicit
 make pptab.h implicit
 prev gentab
 prev pp.tab
-exec - PATH=.:$PATH gentab -t pp.tab > pptab.h
+exec - ./gentab -t pp.tab > pptab.h
 done pptab.h generated
 prev pplib.h implicit
 done ppop.c

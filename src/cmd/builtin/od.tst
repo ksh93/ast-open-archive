@@ -12,6 +12,12 @@ function DATA
 	for f
 	do	test -f $f && continue
 		case $f in
+		ascii.dat)
+			typeset -i8 o
+			for ((o = 0; o < 256; o++))
+			do	print -f "\\${o#8#}"
+			done | dd silent=1 from=native to=ascii
+			;;
 		big.dat)for ((i = 0; i <= 10000; i++))
 			do	print $i
 			done
@@ -21,6 +27,12 @@ function DATA
 			for ((o = 0; o < 256; o++))
 			do	print -f "\\${o#8#}"
 			done
+			;;
+		ebcdic.dat)
+			typeset -i8 o
+			for ((o = 0; o < 256; o++))
+			do	print -f "\\${o#8#}"
+			done | dd silent=1 from=native to=ebcdic
 			;;
 		xyz.dat)print x
 			print y
@@ -81,7 +93,7 @@ TEST 01 'compatibility'
 0000400'
 
 TEST 02 'ascii compatibility'
-	DO	DATA chars.dat
+	DO	DATA ascii.dat chars.dat ebcdic.dat
 	EXEC
 		OUTPUT - $'0000000'
 	EXEC	-c chars.dat
@@ -101,4 +113,40 @@ TEST 02 'ascii compatibility'
 0000320 320 321 322 323 324 325 326 327 330 331 332 333 334 335 336 337
 0000340 340 341 342 343 344 345 346 347 350 351 352 353 354 355 356 357
 0000360 360 361 362 363 364 365 366 367 370 371 372 373 374 375 376 377
+0000400'
+	EXEC	-ma -tm1 ascii.dat
+		OUTPUT - $'0000000 00 01 02 03 04 05 06 \\a \\b \\t \\n \\v \\f \\r 0e 0f
+0000020 10 11 12 13 14 15 16 17 18 19 1a \\E 1c 1d 1e 1f
+0000040     !  "  #  $  %  &  \'  (  )  *  +  ,  -  .  /
+0000060  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?
+0000100  @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O
+0000120  P  Q  R  S  T  U  V  W  X  Y  Z  [  \\  ]  ^  _
+0000140  `  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o
+0000160  p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~ 7f
+0000200 80 81 82 83 84 85 86 87 88 89 8a 8b 8c 8d 8e 8f
+0000220 90 91 92 93 94 95 96 97 98 99 9a 9b 9c 9d 9e 9f
+0000240 a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 aa ab ac ad ae af
+0000260 b0 b1 b2 b3 b4 b5 b6 b7 b8 b9 ba bb bc bd be bf
+0000300 c0 c1 c2 c3 c4 c5 c6 c7 c8 c9 ca cb cc cd ce cf
+0000320 d0 d1 d2 d3 d4 d5 d6 d7 d8 d9 da db dc dd de df
+0000340 e0 e1 e2 e3 e4 e5 e6 e7 e8 e9 ea eb ec ed ee ef
+0000360 f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 fa fb fc fd fe ff
+0000400'
+	EXEC	-me -tm1 ebcdic.dat
+		OUTPUT - $'0000000 00 01 02 03 04 05 06 \\a \\b \\t \\n \\v \\f \\r 0e 0f
+0000020 10 11 12 13 14 15 16 17 18 19 1a \\E 1c 1d 1e 1f
+0000040     !  "  #  $  %  &  \'  (  )  *  +  ,  -  .  /
+0000060  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ?
+0000100  @  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O
+0000120  P  Q  R  S  T  U  V  W  X  Y  Z  [  \\  ]  ^  _
+0000140  `  a  b  c  d  e  f  g  h  i  j  k  l  m  n  o
+0000160  p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~ 7f
+0000200 80 81 82 83 84 85 86 87 88 89 8a 8b 8c 8d 8e 8f
+0000220 90 91 92 93 94 95 96 97 98 99 9a 9b 9c 9d 9e 9f
+0000240 a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 aa ab ac ad ae af
+0000260 b0 b1 b2 b3 b4 b5 b6 b7 b8 b9 ba bb bc bd be bf
+0000300 c0 c1 c2 c3 c4 c5 c6 c7 c8 c9 ca cb cc cd ce cf
+0000320 d0 d1 d2 d3 d4 d5 d6 d7 d8 d9 da db dc dd de df
+0000340 e0 e1 e2 e3 e4 e5 e6 e7 e8 e9 ea eb ec ed ee ef
+0000360 f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 fa fb fc fd fe ff
 0000400'

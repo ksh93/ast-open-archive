@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -895,7 +895,7 @@ int		obsolete;
 	}
 	n = (int)strtol(s, &t, 10);
 	if (s == t)
-		n = 1;
+		n = *s != ':';
 	else
 		s = t;
 	if ((standard = !obsolete) && *s == ':')
@@ -923,7 +923,7 @@ int		obsolete;
 			return -1;
 		}
 		key = (const char*)(s = buf);
-		sfsprintf(s, sizeof(buf), ".%d,1.%d", o, o + n);
+		sfsprintf(s, sizeof(buf), ".%d,1.%d", o, o + n - 1);
 		n = 1;
 	}
 	if (obsolete == '-')

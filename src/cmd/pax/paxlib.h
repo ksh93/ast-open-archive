@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -26,7 +26,7 @@
  * Glenn Fowler
  * AT&T Research
  *
- * paxlib() definitions
+ * pax_lib() definitions
  */
 
 #ifndef _PAXLIB_H
@@ -36,6 +36,10 @@
 #include <error.h>
 #include <ls.h>
 #include <modex.h>
+
+#if _BLD_DEBUG
+#include <vmalloc.h>
+#endif
 
 #define PAX_IN		(1<<0)		/* copy in			*/
 #define PAX_OUT		(1<<1)		/* copy out			*/
@@ -55,6 +59,7 @@
 #define PAX_STANDARD	(1L<<15)	/* the standard format		*/
 #define PAX_SUM		(1L<<16)	/* inline member checksum	*/
 
+#define PAX_BLOCK	512		/* io block size		*/
 #define PAX_DEFBLOCKS	20		/* default blocking		*/
 #define PAX_DEFBUFFER	16		/* default io buffer blocking	*/
 
@@ -150,6 +155,9 @@ struct Paxarchive_s			/* archive info			*/
 	Paxformat_t*	format;		/* format			*/
 	int		flags;		/* format flags			*/
 	int		incomplete;	/* file requires new volume	*/
+	int		volume;		/* volume number		*/
+	size_t		entries;	/* total number of entries	*/
+	size_t		entry;		/* current entry index		*/
 	Paxio_t*	io;		/* current io			*/
 	struct				/* paxstash() values		*/
 	{
@@ -168,6 +176,7 @@ struct Paxarchive_s			/* archive info			*/
 struct Pax_s				/* global state			*/
 {
 	const char*	id;		/* interface id			*/
+	const char*	passphrase;	/* encryption passphrase	*/
 	int		flags;		/* flags			*/
 	int		gid;		/* current group id		*/
 	int		keepgoing;	/* keep going on error		*/
@@ -189,12 +198,14 @@ struct Pax_s				/* global state			*/
 
 	int		(*dataf)(Pax_t*, Paxarchive_t*, Paxfile_t*, int, void*, off_t);
 	void*		(*getf)(Pax_t*, Paxarchive_t*, off_t, off_t*);
+	Sfio_t*		(*partf)(Pax_t*, Paxarchive_t*, off_t);
 	int		(*putf)(Pax_t*, Paxarchive_t*, off_t);
 	off_t		(*readf)(Pax_t*, Paxarchive_t*, void*, off_t, off_t, int);
 	off_t		(*seekf)(Pax_t*, Paxarchive_t*, off_t, int, int);
 	char*		(*stashf)(Pax_t*, Paxvalue_t*, const char*, size_t);
+	int		(*syncf)(Pax_t*, Paxarchive_t*, int);
 	int		(*unreadf)(Pax_t*, Paxarchive_t*, void*, off_t);
-	int		(*writef)(Pax_t*, Paxarchive_t*, void*, off_t);
+	int		(*writef)(Pax_t*, Paxarchive_t*, const void*, off_t);
 
 	int		(*corruptf)(Pax_t*, Paxarchive_t*, Paxfile_t*, const char*);
 	int		(*checksumf)(Pax_t*, Paxarchive_t*, Paxfile_t*, unsigned long, unsigned long);
@@ -211,19 +222,38 @@ struct Pax_s				/* global state			*/
 #define paxdata(p,a,f,d,b,n)	(*(p)->dataf)(p,a,f,d,b,n)
 #define paxget(p,a,o,r)		(*(p)->getf)(p,a,o,r)
 #define paxnospace(p)		(*(p)->nospacef)(p)
+#define paxpart(p,a,n)		(*(p)->partf)(p,a,n)
 #define paxput(p,a,b,n)		(*(p)->putf)(p,a,b,n)
 #define paxread(p,a,b,n,m,f)	(*(p)->readf)(p,a,b,n,m,f)
 #define paxseek(p,a,o,w,f)	(*(p)->seekf)(p,a,o,w,f)
 #define paxstash(p,v,s,z)	(*(p)->stashf)(p,v,s,z)
+#define paxsync(p,a,f)		(*(p)->syncf)(p,a,f)
 #define paxunread(p,a,b,n)	(*(p)->unreadf)(p,a,b,n)
 #define paxwrite(p,a,b,n)	(*(p)->writef)(p,a,b,n)
 
-#if !defined(_PAX_ARCHIVE_PRIVATE_) && defined(__EXPORT__)
+#ifdef _PAX_ARCHIVE_PRIVATE_
+
+#define PAXLIB(m)
+#define PAXNEXT(m)	m
+
+#else
+
+#ifdef __STDC__
+#define PAXLIB(f)	extern Paxformat_t* pax_lib(Pax_t* pax) {return f;}
+#else
+#define PAXLIB(f)	extern Paxformat_t* pax_lib(pax) Pax_t* pax; {return f;}
+#endif
+
+#define PAXNEXT(m)	0
+
+#if defined(__EXPORT__)
 #define extern		__EXPORT__
 #endif
 
-extern Paxformat_t*	paxlib(Pax_t*);
+extern Paxformat_t*	pax_lib(Pax_t*);
 
 #undef	extern
+
+#endif
 
 #endif

@@ -1,3 +1,43 @@
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*Copyright (c) 1978-2004 The Regents of the University of Californi*
+*                                                                  *
+*          Permission is hereby granted, free of charge,           *
+*       to any person obtaining a copy of THIS SOFTWARE FILE       *
+*            (the "Software"), to deal in the Software             *
+*              without restriction, including without              *
+*           limitation the rights to use, copy, modify,            *
+*                merge, publish, distribute, and/or                *
+*            sell copies of the Software, and to permit            *
+*            persons to whom the Software is furnished             *
+*          to do so, subject to the following disclaimer:          *
+*                                                                  *
+*THIS SOFTWARE IS PROVIDED BY The Regents of the University of Cali*
+*         ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,         *
+*            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED            *
+*            WARRANTIES OF MERCHANTABILITY AND FITNESS             *
+*             FOR A PARTICULAR PURPOSE ARE DISCLAIMED.             *
+*IN NO EVENT SHALL The Regents of the University of California and *
+*         BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,          *
+*           SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES           *
+*           (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT            *
+*          OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,           *
+*           DATA, OR PROFITS; OR BUSINESS INTERRUPTION)            *
+*          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,          *
+*          WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT          *
+*           (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING            *
+*           IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,            *
+*        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.        *
+*                                                                  *
+*            Information and Software Systems Research             *
+*The Regents of the University of California and AT&T Labs Research*
+*                         Florham Park NJ                          *
+*                                                                  *
+*                        Kurt Shoens (UCB)                         *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Mail -- a mail program
@@ -37,7 +77,37 @@ printhead(int mesg, int who)
 	else if (mp->m_flag & MSAVE)
 		dispc = '*';
 	else if (mp->m_flag & MSPAM)
+	{
 		dispc = 'X';
+		if (subjline && state.var.spamsubhead)
+		{
+			register int	c;
+			register char*	s;
+			register char*	t;
+			register char*	u;
+
+			s = t = subjline;
+			while (c = *s++)
+			{
+				if (!isalnum(c) && c == *s)
+				{
+					while (*s == c)
+						s++;
+					for (u = s; *u && *u != c; u++);
+					if (*u == c && *(u + 1) == c)
+					{
+						for (s = u; *s == c; s++);
+						if (t == subjline)
+							while (isspace(*s))
+								s++;
+						continue;
+					}
+				}
+				*t++ = c;
+			}
+			*t = 0;
+		}
+	}
 	else if (!(mp->m_flag & (MREAD|MNEW)))
 		dispc = 'U';
 	else if ((mp->m_flag & (MREAD|MNEW)) == MNEW)
@@ -637,7 +707,7 @@ static const struct mark marks[] = {
  * Mark the indicated messages with the named mark or flags by default.
  */
 static int
-mark1(char* str, int flags)
+mark1(char* str, int set, int clr)
 {
 	register struct msg*		ip;
 	register struct msg*		mp;
@@ -646,12 +716,9 @@ mark1(char* str, int flags)
 	register char*			next;
 	int				f;
 	int				no;
-	int				set;
-	int				clear;
 
-	clear = 0;
-	set = 0;
-	if (mark = snarf(str, &f)) {
+	if ((mark = snarf(str, &f)) && isalpha(*mark)) {
+		set = clr = 0;
 		do {
 			if ((next = strchr(mark, ',')) || (next = strchr(mark, '|')))
 				*next++ = 0;
@@ -672,27 +739,32 @@ mark1(char* str, int flags)
 				return 1;
 			}
 			if (no) {
-				flags |= kp->clear;
-				clear |= kp->set;
+				set |= kp->clear;
+				clr |= kp->set;
 			}
 			else {
-				flags |= kp->set;
-				clear |= kp->clear;
+				set |= kp->set;
+				clr |= kp->clear;
 			}
 		} while (mark = next);
 	}
 	else if (f < 0)
 		return 1;
 	else {
-		clear = 0;
-		if (!(set = flags))
-			flags = MMARK;
-		else
-			for (kp = marks; kp < &marks[elementsof(marks)]; kp++)
-				if (kp->flag & set) {
-					flags |= kp->set;
-					clear |= kp->clear;
-				}
+		if (f)
+			*(mark - 1) = ' ';
+		else if (mark)
+			f = 1;
+		if (!clr) {
+			if (!set)
+				set = MMARK;
+			else
+				for (kp = marks; kp < &marks[elementsof(marks)]; kp++)
+					if (kp->flag & set) {
+						set |= kp->set;
+						clr |= kp->clear;
+					}
+		}
 	}
 	if (!f) {
 		if (!(state.msg.list->m_index = first(0, MMNORM))) {
@@ -703,19 +775,20 @@ mark1(char* str, int flags)
 	}
 	else if (getmsglist(str, 0) < 0)
 		return 1;
-	set = 0;
-	if (flags & MSTATUS) {
-		flags &= ~MSTATUS;
-		set |= MSTATUS;
-	}
-	flags |= set;
-	clear |= MMARK;
+	clr |= MMARK;
 	for (mp = 0, ip = state.msg.list; ip->m_index; ip++) {
 		mp = state.msg.list + ip->m_index - 1;
-		msgflags(mp, flags, clear);
+		msgflags(mp, set, clr);
 	}
-	if (mp && (flags & MMARK))
-		state.msg.dot = mp;
+	if (mp) {
+		if (set & MMARK)
+			state.msg.dot = mp;
+		else if ((set|clr) & MSPAM) {
+			state.msg.dot = mp;
+			if (f = first(0, MDELETE|MSPAM))
+				state.msg.dot = state.msg.list + f - 1;
+		}
+	}
 	return 0;
 }
 
@@ -725,7 +798,7 @@ mark1(char* str, int flags)
 int
 mark(char* str)
 {
-	return mark1(str, 0);
+	return isupper(*state.cmd->c_name) ? mark1(str, 0, MSPAM) : mark1(str, MSPAM, 0);
 }
 
 /*
@@ -735,7 +808,7 @@ mark(char* str)
 int
 cmdtouch(char* str)
 {
-	return mark1(str, MTOUCH);
+	return mark1(str, MTOUCH, 0);
 }
 
 /*
@@ -744,7 +817,7 @@ cmdtouch(char* str)
 int
 mboxit(char* str)
 {
-	return mark1(str, MBOX);
+	return mark1(str, MBOX, 0);
 }
 
 /*
@@ -754,7 +827,7 @@ mboxit(char* str)
 int
 preserve(char* str)
 {
-	return mark1(str, MPRESERVE);
+	return mark1(str, MPRESERVE, 0);
 }
 
 /*
@@ -763,7 +836,7 @@ preserve(char* str)
 int
 unread(char* str)
 {
-	return mark1(str, MREAD);
+	return mark1(str, MREAD, 0);
 }
 
 /*

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -68,7 +68,7 @@
 			switch ((a)->convert[SECTION(a)].on) \
 			{ \
 			case 1: \
-				if (SECTION(a) != SECTION_DATA || TEXT(b,c,t)) \
+				if (state.forceconvert || SECTION(a) != SECTION_DATA || TEXT(b,c,t)) \
 					(a)->convert[SECTION(a)].on = 2; \
 				else \
 				{ \
@@ -242,24 +242,21 @@ void
 binit(register Archive_t* ap)
 {
 	unsigned long	n;
+	unsigned long	u;
 
 	if (ap->delta)
 		ap->delta->hdr = ap->delta->hdrbuf;
 	ap->io->buffersize = state.buffersize;
 	n = 2 * state.buffersize;
-	if (!(ap->io->mode & O_WRONLY))
-		n += MAXUNREAD;
+	if (ap->io->mode == O_RDONLY)
+		u = MAXUNREAD;
 	else if (!(ap->format->flags & OUT))
 		error(3, "%s: archive format not supported on output" , ap->format->name);
-	if (ap->io->buffer)
-	{
-		message((-1, "blocksize=%d buffersize=%d recordsize=%d", state.blocksize, state.buffersize, state.record.size));
-		if (!(state.tmp.buffer = newof(0, char, state.tmp.buffersize, 0)))
-			nospace();
-	}
-	if (!(ap->io->buffer = newof(ap->io->buffer, char, n, 0)))
+	else
+		u = 0;
+	if (!(ap->io->buffer = newof(0, char, n, u)))
 		error(3, "%s: cannot allocate buffer", ap->name);
-	ap->io->next = ap->io->last = ap->io->buffer;
+	ap->io->next = ap->io->last = ap->io->buffer + u;
 }
 
 /*
@@ -296,7 +293,8 @@ bskip(register Archive_t* ap)
 			mt.mt_count = 1;
 			if (ioctl(ap->io->fd, MTIOCTOP, &mt) >= 0)
 			{
-				if (ap->io->mode != O_RDONLY) ap->io->eof = 1;
+				if (ap->io->mode != O_RDONLY)
+					ap->io->eof = 1;
 				break;
 			}
 			mteom = 0;
@@ -314,7 +312,8 @@ bskip(register Archive_t* ap)
 			}
 			if (errno != ENOTTY)
 			{
-				if (ap->io->mode != O_RDONLY) ap->io->eof = 1;
+				if (ap->io->mode != O_RDONLY)
+					ap->io->eof = 1;
 				break;
 			}
 			mtfsf = 0;
@@ -324,7 +323,8 @@ bskip(register Archive_t* ap)
 		while ((c = read(ap->io->fd, state.tmp.buffer, state.tmp.buffersize)) > 0);
 		if (c < 0)
 		{
-			if (ap->io->mode != O_RDONLY) ap->io->eof = 1;
+			if (ap->io->mode != O_RDONLY)
+				ap->io->eof = 1;
 			break;
 		}
 		skip--;
@@ -487,17 +487,16 @@ bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
  */
 
 void
-bunread(register Archive_t* ap, void* ab, register int n)
+bunread(register Archive_t* ap, void* b, register int n)
 {
-	register char*	b = (char*)ab;
-
 	ap->io->eof = 0;
 	ap->io->count -= n;
 	if ((ap->io->next -= n) < ap->io->buffer + MAXUNREAD)
 	{
 		if (ap->io->next < ap->io->buffer)
 			error(PANIC, "bunread(%s,%d): too much pushback", ap->name, n);
-		memcpy(ap->io->next, b, n);
+		if (b)
+			memcpy(ap->io->next, b, n);
 		REVERT(ap, ap->io->next, n);
 	}
 	message((-7, "bunread(%s,%d@%I*d): %s", ap->name, n, sizeof(ap->io->count), ap->io->count, show(ap->io->next, n)));
@@ -511,10 +510,14 @@ bunread(register Archive_t* ap, void* ab, register int n)
 char*
 bget(register Archive_t* ap, register off_t n, off_t* p)
 {
-	register char*	s;
+	register char*	b;
+	char*		t;
+	size_t		i;
+	size_t		j;
+	size_t		m;
 	int		must;
 
-	if (ap->io->mode & O_WRONLY)
+	if (ap->io->mode != O_RDONLY)
 	{
 		*p = ap->io->last - ap->io->next;
 		return ap->io->next;
@@ -524,90 +527,73 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 		n = -n;
 		must = 0;
 	}
+	else if (n > 0)
+		must = 1;
 	else
 	{
-		must = 1;
-		if (n == 0)
+		if (!ap->io->eof && ap->io->seekable)
 		{
-			if (ap->io->eof || !ap->io->seekable)
-				return 0;
 			if (ap->io->last > ap->io->next)
 				n = ap->io->last - ap->io->next;
 			else if ((n = ap->io->size - (ap->io->offset + ap->io->count)) < 0)
-				return 0;
+				n = 0;
 			else if (n > ap->io->buffersize)
 				n = ap->io->buffersize;
+		}
+		if (p)
+			*p = n;
+		return n ? ap->io->next : (char*)0;
+	}
+	if (n > ap->io->buffersize)
+	{
+		i = ap->io->next - ap->io->buffer;
+		j = ap->io->last - ap->io->buffer;
+		m = roundof(n, PAX_DEFBUFFER * PAX_BLOCK);
+		message((-8, "bget(%s,%I*d,%d): reallocate %u=>%d", ap->name, sizeof(n), n, must, ap->io->buffersize, m));
+		if (!(b = newof(ap->io->buffer, char, 2 * m, MAXUNREAD)))
+			error(3, "%s: cannot reallocate buffer", ap->name);
+		ap->io->buffersize = m;
+		if (b != ap->io->buffer)
+		{
+			ap->io->buffer = b;
+			ap->io->next = b + i;
+			ap->io->last = b + j;
 		}
 	}
 	if (p)
 		*p = n;
-	s = ap->io->next;
+	b = ap->io->next;
 	ap->io->next += n;
 	while (ap->io->next > ap->io->last)
 	{
 		if (ap->io->last > ap->io->buffer + MAXUNREAD + ap->io->buffersize)
 		{
-                        register char*  b;
-                        register int    k;
-                        register int    m;
-			int		r;
-
-                        k = ap->io->last - s;
-			r = roundof(k, IOALIGN) - k;
-#if DEBUG
-			if (r)
-				message((-8, "bget(%s) buffer alignment offset=%d", ap->name, r));
-#endif
-                        b = ap->io->next = ap->io->buffer + MAXUNREAD + r;
-                        ap->io->last = b + k;
-                        if (m = s - b)
+                        i = ap->io->last - b;
+			j = roundof(i, IOALIGN) - i;
+                        t = ap->io->next = ap->io->buffer + MAXUNREAD + j;
+                        ap->io->last = t + i;
+                        if (m = b - t)
 			{
-                        	while (k > m)
+                        	while (i > m)
                         	{
-                                	message((-8, "bget(%s) overlapping memcpy n=%I*d k=%d m=%d next=%p last=%p", ap->name, sizeof(n), n, k, m, ap->io->next + n, ap->io->last));
-                                	memcpy(b, s, m);
+                                	message((-8, "bget(%s,%I*d,%d) overlapping memcpy n=%I*d i=%d m=%d next=%p last=%p", ap->name, sizeof(n), n, must, sizeof(n), n, i, m, ap->io->next + n, ap->io->last));
+                                	memcpy(t, b, m);
+                                	t += m;
                                 	b += m;
-                                	s += m;
-                                	k -= m;
+                                	i -= m;
                         	}
-                        	memcpy(b, s, k);
+				message((-8, "bget(%s,%I*d,%d): slide %u align %u", ap->name, sizeof(n), n, must, i, j));
+                        	memcpy(t, b, i);
 			}
-			s = ap->io->next;
+			b = ap->io->next;
 			ap->io->next += n;
-			if (ap->io->next > (ap->io->buffer + 2 * ap->io->buffersize))
-			{
-				k = ap->io->next - ap->io->buffer;
-				k = ap->io->buffersize = roundof(k, BLOCKSIZE);
-				k = 2 * k + MAXUNREAD;
-				if (!(b = newof(0, char, k, 0)))
-					error(3, "%s: cannot reallocate buffer", ap->name);
-				m = ap->io->last - s;
-				ap->io->buffer = b;
-				b += MAXUNREAD + r;
-				ap->io->next = b + n;
-				ap->io->last = b + m;
-				memcpy(b, s, m);
-				s = b;
-			}
 		}
 		if (bfill(ap, must) < 0)
 			return 0;
 	}
-	chunk(ap, s, s, n, s);
-	message((-7, "bget(%s,%I*d@%I*d): %s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, show(s, n)));
-	return s;
-}
-
-/*
- * restore input to bsave()'d position
- */
-
-void
-brestore(Archive_t* ap)
-{
-	*ap->io = state.backup;
-	bseek(ap, ap->io->offset + ap->io->count, SEEK_SET, 1);
-	bflushin(ap, 0);
+	chunk(ap, b, b, n, b);
+	message((-7, "bget(%s,%I*d@%I*d,%d): %s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, must, show(b, n)));
+	return b;
 }
 
 /*
@@ -679,7 +665,7 @@ bflushin(register Archive_t* ap, int hard)
 	ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
 	if (hard && !ap->io->eof)
 	{
-		while (read(ap->io->fd, state.tmp.buffer, ap->io->buffersize) > 0);
+		while (read(ap->io->fd, ap->io->next, ap->io->buffersize) > 0);
 		ap->io->eof = 1;
 	}
 }
@@ -697,7 +683,7 @@ bseek(register Archive_t* ap, off_t pos, int op, int hard)
 	message((-8, "bseek(%s,%I*d,%d,%d)", ap->name, sizeof(pos), pos, op, hard));
 	if (hard)
 	{
-		if (op != SEEK_SET)
+		if (op == SEEK_CUR)
 			return -1;
 	}
 	else

@@ -1,0 +1,46 @@
+the paxlib cabinet method is based on the GPL'd cabextract 0.6
+original attribution follows
+
+--------------------------------------------------------------------------------
+
+cabextract 0.6 - a program to extract Microsoft Cabinet files
+
+(C) 2000-2002 Stuart Caie <kyzer@4u.net>
+
+--------------------------------------------------------------------------------
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+--------------------------------------------------------------------------------
+
+This is NOT a general purpose cabinet library with a front end tacked
+on. If you want a comprehensive library to read and write cabinet
+files, please get "libcabinet". If you want to create CAB files on UNIX
+systems, get "Cablinux".
+
+Get the official Microsoft CAB SDK from here:
+   http://msdn.microsoft.com/workshop/management/cab/cab-sdk.exe
+You can use cabextract on this file to extract the contents.
+
+Many thanks to Dirk Stoecker, Matthew Russoto and Dave Tritscher and,
+of course, Microsoft for the documentation they _did_ provide wholly
+and accurately. MSZIP is a one-byte adaption of the deflate and inflate
+methods created by Phil Katz. Quantum is based on the Quantum archiver,
+created by David Stafford. LZX is an adaption of the LZX method created
+by Jonathan Forbes and Tomi Poutanen.
+
+Furthermore, thanks to Jae Jung, for single-handedly fixing all the
+bugs with LZX decompression in cabextract 0.1, and Eric Sharkey for the
+original manual page.

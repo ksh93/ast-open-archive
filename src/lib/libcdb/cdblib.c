@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1997-2002 AT&T Corp.                *
+*                Copyright (c) 1997-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -34,11 +34,10 @@
 typedef int (*Init_f)(void);
 
 int
-cdblib(register const char* name, int base, Cdbdisc_t* disc)
+cdblib(register const char* name, Cdbdisc_t* disc)
 {
 	register Cdbdll_t*	dll;
 	register char*		id;
-	register int		n;
 	Init_f			initf;
 	char			buf[64];
 	char			path[PATH_MAX];
@@ -51,12 +50,6 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 		id++;
 	else
 		id = (char*)state.id;
-	n = strlen(id);
-	if (!strneq(name, id, n))
-	{
-		sfsprintf(buf, sizeof(buf), "%s%s", id, name);
-		name = (const char*)buf;
-	}
 
 	/*
 	 * see if the dll is already loaded
@@ -73,10 +66,10 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 	if (!(dll = newof(0, Cdbdll_t, 1, strlen(name) + 1)))
 		return -1;
 	dll->name = strcpy((char*)(dll + 1), name);
-	if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY, path, sizeof(path))) && (!base || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY, path, sizeof(path)))))
+	if (!(dll->dll = dllplug(id, dll->name, NiL, RTLD_LAZY, path, sizeof(path))))
 	{
 		if (disc && disc->errorf)
-			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: %s", dll->name + n, dlerror());
+			(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "%s: %s", dll->name, dlerror());
 		return -1;
 	}
 	dll->next = state.dll;
@@ -86,7 +79,7 @@ cdblib(register const char* name, int base, Cdbdisc_t* disc)
 	 * get and call the initialization function
 	 */
 
-	sfsprintf(buf, sizeof(buf), "%s_init", id);
+	sfsprintf(buf, sizeof(buf), "%s_lib", id);
 	if (!(initf = (Init_f)dlllook(dll->dll, buf)))
 	{
 		if (disc && disc->errorf)

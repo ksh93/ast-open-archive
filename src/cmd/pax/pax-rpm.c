@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -97,12 +97,12 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 	{
 		if (size < (sizeof(magic) + sizeof(lead_old)))
 			return 0;
-		bread(ap, NiL, (off_t)sizeof(magic), (off_t)sizeof(magic), 0);
-		if (bread(ap, &lead_old, (off_t)sizeof(lead_old), (off_t)sizeof(lead_old), 0) <= 0)
+		paxread(pax, ap, NiL, (off_t)sizeof(magic), (off_t)sizeof(magic), 0);
+		if (paxread(pax, ap, &lead_old, (off_t)sizeof(lead_old), (off_t)sizeof(lead_old), 0) <= 0)
 			return 0;
 		if (swap)
 			swapmem(swap, &lead_old, &lead_old, sizeof(lead_old));
-		if (bseek(ap, (off_t)lead_old.archoff, SEEK_SET, 0) != (off_t)lead_old.archoff)
+		if (paxseek(pax, ap, (off_t)lead_old.archoff, SEEK_SET, 0) != (off_t)lead_old.archoff)
 		{
 			error(2, "%s: %s embedded archive seek error", ap->name, fp->name);
 			return -1;
@@ -112,8 +112,8 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 	{
 		if (size < (sizeof(magic) + sizeof(lead)))
 			return 0;
-		bread(ap, NiL, (off_t)sizeof(magic), (off_t)sizeof(magic), 0);
-		if (bread(ap, &lead, (off_t)sizeof(lead), (off_t)sizeof(lead), 0) <= 0)
+		paxread(pax, ap, NiL, (off_t)sizeof(magic), (off_t)sizeof(magic), 0);
+		if (paxread(pax, ap, &lead, (off_t)sizeof(lead), (off_t)sizeof(lead), 0) <= 0)
 			return 0;
 		memcpy(state.volume, lead.name, sizeof(state.volume) - 1);
 		if (s = strrchr(ap->name, '/'))
@@ -133,7 +133,7 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 			num = 256;
 			break;
 		case 5:
-			if (bread(ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
+			if (paxread(pax, ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
 			{
 				error(2, "%s: %s format header magic expected at offset %ld", ap->name, fp->name, ap->io->offset + ap->io->count);
 				return -1;
@@ -145,7 +145,7 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 				error(2, "%s: invalid %s format signature header magic", ap->name, fp->name);
 				return -1;
 			}
-			if (bread(ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
+			if (paxread(pax, ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
 			{
 				error(2, "%s: %s format signature header expected", ap->name, fp->name);
 				return -1;
@@ -159,14 +159,14 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 			error(2, "%s: %s format version %d.%d signature type %d not supported", ap->name, fp->name, magic.major, magic.minor, lead.sigtype);
 			return -1;
 		}
-		if (num && bread(ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
+		if (num && paxread(pax, ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
 		{
 			error(2, "%s: %s format header %ld byte data block expected", ap->name, fp->name, num);
 			return -1;
 		}
 		if (magic.major >= 3)
 		{
-			if (bread(ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
+			if (paxread(pax, ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
 			{
 				error(2, "%s: %s format header magic expected", ap->name, fp->name);
 				return -1;
@@ -179,7 +179,7 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 				return -1;
 			}
 		}
-		if (bread(ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
+		if (paxread(pax, ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
 		{
 			error(2, "%s: %s format header expected", ap->name, fp->name);
 			return -1;
@@ -187,7 +187,7 @@ rpm_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 		if (swap)
 			swapmem(swap, &head, &head, sizeof(head));
 		num = head.entries * sizeof(Rpm_entry_t) + head.datalen;
-		if (num && bread(ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
+		if (num && paxread(pax, ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
 		{
 			error(2, "%s: %s format header %ld byte entry+data block expected", ap->name, fp->name, num);
 			return -1;
@@ -223,8 +223,10 @@ Format_t	pax_rpm_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,
-	pax_rpm_next,
+	PAXNEXT(pax_rpm_next),
 	0,
 	0,
 	rpm_getprologue,
 };
+
+PAXLIB(&pax_rpm_format)

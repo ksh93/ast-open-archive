@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -74,6 +74,7 @@
 #undef	atol
 #undef	bind
 #undef	clrbit		/* netbsd has one in <sys/param.h> */
+#undef	optinit
 #undef	setbit		/* netbsd has one in <sys/param.h> */
 
 #define bind		bindrule /* avoids possible socket clash */
@@ -650,6 +651,7 @@ struct external				/* external engine name info	*/
 	char*		makerun;	/* made just before each job	*/
 	char*		mamname;	/* external mam atom name	*/
 	char*		mamaction;	/* external mam action		*/
+	char*		order;		/* :W=[OPR]: favorites		*/
 
 	/*
 	 * related file suffixes
@@ -766,8 +768,6 @@ struct state				/* program state		*/
 	unsigned char	virtualdot;	/* fsview . is virtual		*/
 	unsigned char	waiting;	/* waiting for job completion	*/
 	unsigned char	warn;		/* enable source file warnings	*/
-	unsigned char	writeobject;	/* write recompiled object file	*/
-	unsigned char	writestate;	/* write state file on exit	*/
 
 	int		argc;		/* global argc			*/
 	int		believe;	/* believe state from this level*/
@@ -796,6 +796,8 @@ struct state				/* program state		*/
 	char*		statefile;	/* state variable file name	*/
 	char*		tmppchar;	/* macro char* temporary	*/
 	char*		tmpfile;	/* temporary file name		*/
+	char*		writeobject;	/* 0:nowrite or object file def	*/
+	char*		writestate;	/* 0:nowrite or state file def	*/
 
 	int*		argf;		/* global argv ARG_* flags	*/
 
@@ -928,7 +930,7 @@ extern int		load(Sfio_t*, const char*, int);
 extern int		loadable(Sfio_t*, struct rule*, int);
 extern void		localvar(Sfio_t*, struct var*, char*, int);
 extern char*		localview(struct rule*);
-extern void		lockstate(char*);
+extern void		lockstate(int);
 extern int		make(struct rule*, unsigned long*, char*, long);
 extern int		makeafter(struct rule*);
 extern int		makebefore(struct rule*);
@@ -965,7 +967,7 @@ extern void		readcheck(void);
 extern void		readclear(void);
 extern void		readenv(void);
 extern int		readfile(char*, int, char*);
-extern void		readstate(char*);
+extern void		readstate(void);
 extern void		rebind(struct rule*, int);
 extern void		remdup(struct list*);
 extern void		remtmp(int);
@@ -981,6 +983,7 @@ extern struct var*	setvar(char*, char*, int);
 extern void		shquote(Sfio_t*, char*);
 extern struct rule*	source(struct rule*);
 extern int		special(struct rule*);
+extern char*		statefile(void);
 extern struct rule*	staterule(int, struct rule*, char*, int);
 extern unsigned long	statetime(struct rule*, int);
 extern int		strprintf(Sfio_t*, const char*, char*, int, int);

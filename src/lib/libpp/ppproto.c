@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -33,7 +33,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2003-06-21 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2004-02-29 $\0\n";
 
 #if PROTOMAIN
 
@@ -2007,7 +2007,6 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 #if PROTOMAIN
 	int			comlen;
 	char			com[80];
-	int			q;
 #endif
 	int			m = 0;
 
@@ -2063,10 +2062,11 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 	proto->op = proto->ob = iob;
 	proto->ip = proto->ib = iob + proto->oz + n;
 	if (m) proto->options |= REGULAR;
-	if (!comment || !comment[0])
+	if (!comment)
 		comment = "/*";
-	proto->cc[0] = comment[0];
-	if (comment[1])
+	if (!(proto->cc[0] = comment[0]))
+		notice = options = 0;
+	else if (comment[1])
 	{
 		proto->cc[1] = comment[1];
 		proto->cc[2] = comment[2] ? comment[2] : comment[0];
@@ -2152,8 +2152,6 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 			if (*s == *com && !strncmp(s, com, comlen))
 				notice = options = 0;
 			else
-			{
-				q = 8;
 				while (*s)
 				{
 					if (*s == *NOTICED && !strncmp(s, NOTICED, sizeof(NOTICED) - 1))
@@ -2161,17 +2159,18 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 						s += sizeof(NOTICED) - 1;
 						while (*s == ' ' || *s == '\t')
 							s++;
-						if (*s == '(' && (*(s + 1) == 'c' || *(s + 1) == 'C') && *(s + 2) == ')')
+						if (*s == '(' && (*(s + 1) == 'c' || *(s + 1) == 'C') && *(s + 2) == ')' || *s >= '0' && *s <= '9' && *(s + 1) >= '0' && *(s + 1) <= '9')
 						{
 							notice = options = 0;
 							break;
 						}
 					}
-					else if (*s++ == '\n' && !--q)
+					else if (*s++ == '\n')
+					{
+						s--;
 						break;
+					}
 				}
-				continue;
-			}
 		}
 #endif
 		while (*s && *s++ != '\n');
@@ -2216,10 +2215,13 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
 					proto->iz = n -= m;
 				}
 #if PROTOMAIN
-				if ((comlen = astlicense(proto->op, proto->oz, notice, options, proto->cc[0], proto->cc[1], proto->cc[2])) < 0)
-					proto_error((char*)proto + sizeof(struct proto), 1, proto->op, NiL);
-				else
-					proto->op += comlen;
+				if (proto->cc[0])
+				{
+					if ((comlen = astlicense(proto->op, proto->oz, notice, options, proto->cc[0], proto->cc[1], proto->cc[2])) < 0)
+						proto_error((char*)proto + sizeof(struct proto), 1, proto->op, NiL);
+					else
+						proto->op += comlen;
+				}
 				if (!(flags & PROTO_CLASSIC) && !(proto->flags & YACC))
 #endif
 				proto->op = linesync(proto, proto->op, 1);

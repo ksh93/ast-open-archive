@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -119,7 +119,6 @@ typedef struct Tarheader_s Tarheader_t;
 #define FMT_DELTA	"delta"		/* default delta output format	*/
 #define FMT_IGNORE	"ignore"	/* delta ignore output format	*/
 #define FMT_PATCH	"patch"		/* delta patch output format	*/
-#define FMT_ZIP		"gzip"		/* default DELTA_zip format	*/
 
 #define IN		PAX_IN		/* copy in			*/
 #define OUT		PAX_OUT		/* copy out			*/
@@ -177,7 +176,6 @@ typedef struct Tarheader_s Tarheader_t;
 #define DELTA_pass	'p'		/* delta pass pseudo op		*/
 #define DELTA_update	'u'		/* delta update data op		*/
 #define DELTA_verify	'v'		/* delta verify data op		*/
-#define DELTA_zip	'z'		/* delta zip data op		*/
 
 #define DELTA_TRAILER	10		/* delta trailer output size	*/
 
@@ -204,7 +202,7 @@ typedef struct Tarheader_s Tarheader_t;
 #define HARDLINK	PAX_HARDLINK	/* hard link to previous entry	*/
 #define SOFTLINK	PAX_SOFTLINK	/* soft link to previous entry	*/
 
-#define BLOCKSIZE	512		/* block size			*/
+#define BLOCKSIZE	PAX_BLOCK	/* block size			*/
 #define IOALIGN		ALIGN_BOUND1	/* io buffer alignment		*/
 #define MINBLOCK	1		/* smallest block size		*/
 #define DEFBLOCKS	PAX_DEFBLOCKS	/* default blocking		*/
@@ -229,6 +227,7 @@ typedef int (*Stat_f)(const char*, struct stat*);
 
 struct Archive_s; typedef struct Archive_s Archive_t;
 struct File_s; typedef struct File_s File_t;
+struct Filter_s; typedef struct Filter_s Filter_t;
 struct Format_s; typedef struct Format_s Format_t;
 struct List_s; typedef struct List_s List_t;
 struct Map_s; typedef struct Map_s Map_t;
@@ -395,18 +394,34 @@ typedef struct Delta_s			/* delta archive info		*/
 	char*		version;	/* optional delta version	*/
 } Delta_t;
 
+typedef struct Part_s
+{
+	Sfdisc_t	disc;
+	off_t		n;
+	struct State_s*	pax;
+	Archive_t*	ap;
+	Sfio_t*		sp;
+} Part_t;
+
+struct Filter_s
+{
+	Filter_t*	next;		/* next in list			*/
+	regex_t*	re;		/* path pattern or default if 0	*/
+	char*		command;	/* original command line	*/
+	char**		argv;		/* command argv			*/
+	char**		patharg;	/* file arg in argv		*/
+};
+
 #define _PAX_ARCHIVE_PRIVATE_ \
 	unsigned long	checksum;	/* running checksum		*/ \
 	int		checkdelta;	/* getprologue delta check	*/ \
 	Format_t*	compress;	/* compression format		*/ \
 	Convert_t	convert[SECTION_MAX];/* data/header conversion	*/ \
 	Delta_t*	delta;		/* delta info			*/ \
-	int		entries;	/* total number of entries	*/ \
-	int		entry;		/* current entry index		*/ \
 	int		errors;		/* intermediate error count	*/ \
 	Format_t*	expected;	/* expected format		*/ \
 	File_t		file;		/* current member file info	*/ \
-	File_t*		info;		/* last deltabase() member	*/  \
+	File_t*		info;		/* last deltabase() member	*/ \
 	int		locked;		/* newio() recursion lock	*/ \
 	Bio_t		mio;		/* main buffered io		*/ \
 	unsigned long	memsum;		/* member checksum		*/ \
@@ -419,8 +434,9 @@ typedef struct Delta_s			/* delta archive info		*/
 	int		warned;		/* old checksum warning		*/ \
 	}		old; \
 	char*		package;	/* package id			*/ \
-	Archive_t*	parent;	/* parent (delta) for base	*/ \
+	Archive_t*	parent;		/* parent (delta) for base	*/ \
 	int		part;		/* media change count		*/ \
+	Part_t*		partio;		/* archive part sfio info	*/ \
 	struct				/* stash() values		*/ \
 	{ \
 	Paxvalue_t	copy;		/* copy() path buffer		*/ \
@@ -453,8 +469,6 @@ typedef struct Delta_s			/* delta archive info		*/
 	off_t		total;		/* newio() total io check	*/ \
 	char*		type;		/* archive type			*/ \
 	off_t		uncompressed;	/* uncompressed size estimate	*/ \
-	int		verified;	/* number of verified entries	*/ \
-	int		volume;		/* volume number		*/ \
 	int		warnlinkhead;	/* invalid hard link header	*/
 
 #define _PAX_PRIVATE_ \
@@ -490,16 +504,18 @@ typedef struct Delta_s			/* delta archive info		*/
 	char**		files;		/* alternate file name list	*/ \
 	struct \
 	{ \
-	char**		argv;		/* filter command argv		*/ \
-	char**		patharg;	/* filter file arg in argv	*/ \
+	Filter_t*	list;		/* filter list			*/ \
+	Filter_t*	last;		/* filter list tail		*/ \
+	Filter_t*	all;		/* match all filter		*/ \
 	char*		options;	/* line mode options		*/ \
 	char*		command;	/* line mode command		*/ \
 	char*		path;		/* line mode physical path	*/ \
 	char*		name;		/* line mode logical path	*/ \
 	int		line;		/* line mode			*/ \
 	}		filter;		/* file output filter state	*/ \
-	int		ftwflags;	/* ftwalk() flags		*/ \
+	int		forceconvert;	/* force binary conversion	*/ \
 	Format_t*	format;		/* default output format	*/ \
+	int		ftwflags;	/* ftwalk() flags		*/ \
 	struct \
 	{ \
 	char*		comment;	/* comment text			*/ \
@@ -558,6 +574,7 @@ typedef struct Delta_s			/* delta archive info		*/
 	int		pass;		/* archive to archive		*/ \
 	char**		patterns;	/* name match patterns		*/ \
 	char*		peekfile;	/* stdin file list peek		*/ \
+	int		peeklen;	/* peekfile length		*/ \
 	char		pwd[PATH_MAX];	/* full path of .		*/ \
 	int		pwdlen;		/* pwd length sans null		*/ \
 	List_t*		proc;		/* procopen() list for finish	*/ \
@@ -584,6 +601,7 @@ typedef struct Delta_s			/* delta archive info		*/
 	int		setgid;		/* set file gid to this value	*/ \
 	int		setuid;		/* set file uid to this value	*/ \
 	Stat_f		statf;		/* -L=pathstat() -P=lstat()	*/ \
+	int		sync;		/* fsync() each file after copy	*/ \
 	unsigned long	testdate;	/* listformat test date		*/ \
 	struct \
 	{ \
@@ -620,14 +638,15 @@ typedef struct Delta_s			/* delta archive info		*/
 #include "paxlib.h"
 #include "options.h"
 
-extern char*			definput;
-extern char*			defoutput;
-extern char*			eomprompt;
-extern Format_t*		formats;
-extern State_t			state;
+extern char*		definput;
+extern char*		defoutput;
+extern char*		eomprompt;
+extern Format_t*	formats;
+extern State_t		state;
 
 extern int		addlink(Archive_t*, File_t*);
 extern void		append(Archive_t*);
+extern int		apply(Archive_t*, File_t*, Filter_t*);
 extern long		asc_checksum(char*, int, unsigned long);
 extern void		backup(Archive_t*);
 extern long		bblock(int);
@@ -637,7 +656,6 @@ extern char*		bget(Archive_t*, off_t, off_t*);
 extern void		binit(Archive_t*);
 extern void		bput(Archive_t*, off_t);
 extern off_t		bread(Archive_t*, void*, off_t, off_t, int);
-extern void		brestore(Archive_t*);
 extern off_t		bseek(Archive_t*, off_t, int, int);
 extern int		bskip(Archive_t*);
 extern void		bunread(Archive_t*, void*, int);
@@ -650,8 +668,6 @@ extern void		copy(Archive_t*, int(*)(Ftw_t*));
 extern void		copyin(Archive_t*);
 extern int		copyinout(Ftw_t*);
 extern int		copyout(Ftw_t*);
-extern long		cpio_long(unsigned short*);
-extern void		cpio_short(unsigned short*, long);
 extern void		deltabase(Archive_t*);
 extern int		deltacheck(Archive_t*, File_t*);
 extern void		deltadelete(Archive_t*);
@@ -663,7 +679,7 @@ extern int		dirprefix(char*, char*);
 extern void		filein(Archive_t*, File_t*);
 extern void		fileout(Archive_t*, File_t*);
 extern void		fileskip(Archive_t*, File_t*);
-extern int		filter(Archive_t*, File_t*);
+extern Filter_t*	filter(Archive_t*, File_t*);
 extern void		finish(int);
 extern Archive_t*	getarchive(int);
 extern void		getdeltaheader(Archive_t*, File_t*);

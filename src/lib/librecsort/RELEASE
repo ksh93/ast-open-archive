@@ -1,3 +1,4 @@
+04-02-11 rskey.c: fix old ast reclen:fieldlen:offset parse
 03-10-11 recsort.h: add RS_IGNORE Rs_t.type hint
 03-09-18 rswrite.c: fix RS_WRITE exceptions
 03-09-06 rskey.c: add 'Z' key_z_code for zoned decimal

@@ -1,3 +1,19 @@
+04-02-29 format.c: drop ap->format=0 for possible deltaverify()
+	 format.c: handle CC_ASCII=>CC_NATIVE getprologue() header translation
+	 options.h,options.c: add --forceconvert to force --from
+04-02-25 pax.c: regcomp REG_SHELL => REG_LEFT|REG_RIGHT
+04-02-24 pax.c: add --action
+	 copy.c: fix file list peek premature '\n' => '\0' bug
+	 pax.tst: add --action,--checksum,--filter,--install tests
+04-02-21 file.c: fix VPATH state.pwd corruption
+04-02-14 add -F --fsync to call fsync(2) for each copied file
+04-01-27 bio.c: fix bget() buffer size alignment/mismatch overflow
+04-01-24 pax-*.c: use paxlib.h interfaces
+04-01-03 pax-cab.c: move to paxlib/cab as standalone plugin
+	 pax-calib.c: move to paxlib/calib as standalone plugin
+04-01-01 add --passphrase=passphrase, -E
+03-12-24 pax-zip.c: move to paxlib/zip as standalone plugin
+03-12-18 paxlib.h: add paxpart(), link with -lcodex for paxlib plugins
 03-12-05 pax-zip.c: fix EXT header logic
 03-12-01 rename OPT_delta_size to OPT_uncompressed: !=0 => compressed
 	 list compression % in delta op field

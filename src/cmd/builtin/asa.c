@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2003 AT&T Corp.                *
+*                Copyright (c) 1992-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -34,7 +34,7 @@ static const char usage[] =
 "[-?\n@(#)$Id: asa (AT&T Labs Research) 2003-03-25 $\n]"
 "[-author?David Korn <dgk@research.att.com>]"
 "[-license?http://www.research.att.com/sw/tools/reuse]"
-"[+NAME? asa - interpret carriage-control characters ]"
+"[+NAME?asa - interpret carriage-control characters]"
 "[+DESCRIPTION?\basa\b writes its input files to standard output mapping "
 	"carriage control characters to line-printer control sequences.]"
 "[+?The first character of each line or record is removed from the input and "

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -291,6 +291,37 @@ context(Sfio_t* sp, int level, int flags)
 	return 1;
 }
 #endif
+
+/*
+ * reset include guard
+ */
+
+static int
+unguard(const char* name, char* v, void* handle)
+{
+	register struct ppfile*		fp = (struct ppfile*)v;
+
+	fp->guard = 0;
+	return 0;
+}
+
+/*
+ * reset macro definition
+ */
+
+static void
+undefine(void* p)
+{
+	struct ppmacro*		mac = ((struct ppsymbol*)p)->macro;
+
+	if (mac)
+	{
+		if (mac->formals)
+			free(mac->formals);
+		free(mac->value);
+		free(mac);
+	}
+}
 
 /*
  * pp operations
@@ -610,6 +641,9 @@ ppop(int op, ...)
 		break;
 	case PP_INCREF:
 		pp.incref = va_arg(ap, PPINCREF);
+		break;
+	case PP_RESET:
+		pp.reset.on = 1;
 		break;
 	case PP_INIT:
 		if (pp.initialized)
@@ -996,6 +1030,27 @@ ppop(int op, ...)
 				pp.state |= STANDALONE;
 			ppfsm(FSM_PLUSPLUS, NiL);
 			pp.initialized = 1;
+			if (pp.reset.on)
+			{
+				pp.reset.symtab = pp.symtab;
+				pp.symtab = 0;
+				pp.reset.ro_state = pp.ro_state;
+				pp.reset.ro_mode = pp.ro_mode;
+				pp.reset.ro_option = pp.ro_option;
+			}
+		}
+		if (pp.reset.on)
+		{
+			if (pp.symtab)
+			{
+				hashwalk(pp.filtab, 0, unguard, NiL);
+				hashfree(pp.symtab);
+			}
+			pp.symtab = hashalloc(NiL, HASH_name, "symbols", HASH_free, undefine, HASH_set, HASH_ALLOCATE|HASH_BUCKET, 0);
+			hashview(pp.symtab, pp.reset.symtab);
+			pp.ro_state = pp.reset.ro_state;
+			pp.ro_mode = pp.reset.ro_mode;
+			pp.ro_option = pp.reset.ro_option;
 		}
 #if CHECKPOINT
 		if (pp.mode & DUMP)

@@ -1,3 +1,5 @@
+04-02-13 testmatch.dat: add strmatch() cache boundary tests
+03-10-17 testregex.c: add regexec() REG_LEFT tests, fix \x.... tests
 03-08-11 ed.c: fix . value after s
 03-08-08 ed.c: fix bug that botched the remembered RE parse
 03-07-17 testregex.dat: add REG_SHELL|REG_AUGMENTED tests

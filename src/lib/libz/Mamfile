@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -25,8 +25,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -308,6 +308,7 @@ make sfdclzw.o
 make sfdclzw.c
 prev sfdcgzip.h implicit
 prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/sfio_t.h implicit
 done sfdclzw.c
 prev sfdclzw.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -D_PACKAGE_ast -c sfdclzw.c

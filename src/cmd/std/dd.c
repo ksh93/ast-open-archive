@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -30,7 +30,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2003-09-18 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2003-10-12 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -285,7 +285,7 @@ static State_t		state =
 	{
 		"a2o",
 		A2O,
-		"ascii to old ebcdic",
+		"ascii to open edition ebcdic",
 	},
 	{
 		"ascii",
@@ -350,7 +350,7 @@ static State_t		state =
 	{
 		"o2a",
 		O2A,
-		"old ibm to ascii",
+		"open edition ibm to ascii",
 	},
 	{
 		"ospecial",
@@ -461,7 +461,6 @@ main(int argc, char** argv)
 	Sflong_t		m;
 	Sflong_t		n;
 	Sflong_t		r;
-	Sflong_t		z;
 	struct stat		st;
 	Sfdisc_t		disc;
 
@@ -469,7 +468,7 @@ main(int argc, char** argv)
 	error_info.id = "dd";
 	state.from.value.string = state.to.value.string = "";
 	if (!(sp = sfstropen()))
-		error(ERROR_SYSTEM|3, "out of space [usage]");
+		error(ERROR_SYSTEM|3, "out of space");
 	sfputr(sp, usage1, '\n');
 	for (op = &state.operand_begin; op <= &state.operand_end; op++)
 	{
@@ -646,13 +645,12 @@ main(int argc, char** argv)
 	}
 	if (streq(state.from.value.string, state.to.value.string))
 		state.cvt = (iconv_t)(-1);
-	else  if ((state.cvt = iconv_open(state.to.value.string, state.from.value.string)) != (iconv_t)(-1))
-	{
-		if (!(state.tmp = sfstropen()))
-			error(ERROR_SYSTEM|3, "out of space [conversion stream]");
-	}
-	else if (*state.from.value.string && *state.to.value.string)
+	else  if ((state.cvt = iconv_open(state.to.value.string, state.from.value.string)) == (iconv_t)(-1))
 		error(3, "cannot convert from %s to %s", state.from.value.string, state.to.value.string);
+	else if (state.cvt == (iconv_t)(0)) /* ast iconv identity */
+		state.cvt = (iconv_t)(-1);
+	else if (!(state.tmp = sfstropen()))
+		error(ERROR_SYSTEM|3, "out of space");
 	if ((state.conv.value.number & (BLOCK|UNBLOCK)) == (BLOCK|UNBLOCK))
 		error(3, "only one of %s=%s and %s=%s may be specified", state.conv.name, state.block.value.string, state.conv.name, state.unblock.value.string);
 	if ((state.conv.value.number & (SYNC|UNBLOCK)) == (SYNC|UNBLOCK))
@@ -731,7 +729,7 @@ main(int argc, char** argv)
 	if (state.cbs.value.number > state.bs.value.number)
 		state.bs.value.number = state.cbs.value.number;
 	if (!(state.buffer = newof(0, char, state.bs.value.number, 0)))
-		error(ERROR_SYSTEM|3, "out of space [io buffer]");
+		error(ERROR_SYSTEM|3, "out of space");
 	if (n = state.skip.value.number)
 	{
 		if (!state.ibs.value.number)
@@ -809,30 +807,12 @@ main(int argc, char** argv)
 		f = state.conv.value.number;
 		if (!state.in.special)
 			f &= ~NOERROR;
-		if (state.count.value.number)
-		{
-			z = state.count.value.number * c;
-			r = 0;
-		}
-		else
-			z = 0;
-		for (;;)
+		if (!(r = state.count.value.number))
+			r = -1;
+		while (state.in.complete != r)
 		{
 			b = sfreserve(state.in.fp, SF_UNBOUND, 0);
 			m = sfvalue(state.in.fp);
-			if (state.count.value.number)
-			{
-				if (!z || r++ >= state.count.value.number)
-					goto done;
-				if (m > z)
-				{
-					m = z;
-					z = 0;
-				}
-				else
-					z -= m;
-					
-			}
 			if (!b)
 			{
 				if (!m)
@@ -840,7 +820,7 @@ main(int argc, char** argv)
 				error(ERROR_SYSTEM|((f & NOERROR) ? 2 : 3), "%s: read error", state.ifn.value.string);
 				memset(b = state.buffer, state.pad, m = c);
 			}
-			for (;;)
+			while (state.in.complete != r)
 			{
 				s = b;
 				if (m >= c)

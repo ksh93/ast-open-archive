@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -29,7 +29,7 @@
  */
 
 static const char split_usage[] =
-"[-?\n@(#)$Id: split (AT&T Labs Research) 2003-09-18 $\n]"
+"[-?\n@(#)$Id: split (AT&T Labs Research) 2004-01-22 $\n]"
 USAGE_LICENSE
 "[+NAME?split - split files into pieces]"
 "[+DESCRIPTION?\bsplit\b reads an input file and writes one or more"
@@ -48,6 +48,8 @@ USAGE_LICENSE
 "		[+b?512 bytes.]"
 "		[+k?1-killobytes.]"
 "		[+m?1-megabyte.]"
+"		[+g?1-gigabyte.]"
+"		[+t?1-terabyte.]"
 "	}"
 "[+?For backwards compatibility, \b-\b\aline_count\a is equivalent to"
 "	 \b-l\b \aline_count\a.]"
@@ -448,8 +450,11 @@ split(Sfio_t* in, struct fname* fp, struct op* op, int flags)
 						goto done;
 				}
 				if (!(peek = s))
+				{
 					while (op->next)
 						op = op->next;
+					repeat = 1;
+				}
 			}
 			if (out)
 			{

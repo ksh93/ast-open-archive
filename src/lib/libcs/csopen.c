@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2003 AT&T Corp.                *
+*                Copyright (c) 1990-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -267,11 +267,17 @@ initiate(register Cs_t* state, char* user, char* path, char* service, char* name
 static int
 reopen(register Cs_t* state, char* path)
 {
-	int	ret;
-	Cs_t	tmp;
+	int		ret;
+	Cs_t		tmp;
 
+	static int	level;
+
+	if (level >= 8)
+		return -1;
 	tmp = *state;
+	level++;
 	ret = csopen(&tmp, path, CS_OPEN_TEST);
+	level--;
 	state->addr = tmp.addr;
 	state->port = tmp.port;
 	return ret;

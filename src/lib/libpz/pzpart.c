@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2003 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.3 (AT&T Labs Research) 2003-07-17 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.3 (AT&T Labs Research) 2003-11-04 $\n]"
 "[a:append]"
 "[c:comment]:[text]"
 "[x:crc]"
@@ -279,8 +279,10 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 	int	i;
 	int	j;
 	int	k;
+	size_t	m;
 	size_t	n;
 
+	m = 0;
 	if (!(pz->flags & PZ_FORCE) || (pz->flags & PZ_SPLIT))
 	{
 		if (!pp->row)
@@ -349,10 +351,10 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 
 		if (pp->row > pz->mrow)
 		{
-			pz->mrow = roundof(pp->row, 1024);
-			n = ((pz->win / 8 / pz->mrow) + 8 ) * pz->mrow;
-			if (!(pz->val = vmnewof(pz->vm, 0, unsigned char, n, 0)) ||
-			    !(pz->pat = vmnewof(pz->vm, pz->pat, unsigned char, pz->mrow, 0)))
+			m = pz->mrow = roundof(pp->row, 1024);
+			n = ((pz->win / 8 / m) + 8 ) * m;
+			if (!(pz->val = vmnewof(pz->vm, pz->val, unsigned char, n, 0)) ||
+			    !(pz->pat = vmnewof(pz->vm, pz->pat, unsigned char, m, 0)))
 				return -1;
 		}
 	}
@@ -361,22 +363,20 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 		if (pz->disc->errorf)
 			(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzpartinit: win=%I*u mwin=%I*u buf=%p", pz->path, sizeof(pz->win), pz->win, sizeof(pz->mwin), pz->mwin, pz->buf);
 		pz->mwin = roundof(pz->win, 32);
-		if (pz->buf)
-			vmfree(pz->vm, pz->buf);
 		n = pz->mwin;
 		if (pz->flags & PZ_WRITE)
 			n *= 2;
-		else
-			n += pz->mrow;
-		if (!(pz->buf = vmnewof(pz->vm, 0, unsigned char, n, 0)))
+		if (!(pz->buf = vmnewof(pz->vm, pz->buf, unsigned char, n, 0)))
 		{
 			if (pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
-			pz->wrk = 0;
 			return -1;
 		}
-		pz->wrk = pz->buf + pz->mwin;
+		if (pz->flags & PZ_WRITE)
+			pz->wrk = pz->buf + pz->mwin;
 	}
+	if (m && !(pz->flags & PZ_WRITE) && !(pz->wrk = vmnewof(pz->vm, pz->wrk, unsigned char, m, 0)))
+		return -1;
 
 	/*
 	 * the discipline functions may change the partition name
@@ -1251,9 +1251,9 @@ pzpartwrite(Pz_t* pz, Sfio_t* op)
 	}
 	while (pp)
 	{
-		if (pp->flags & PZ_UPDATE)
+		if ((pp->flags & (PZ_UPDATE|PZ_HEAD)) == PZ_UPDATE)
 		{
-			pp->flags &= ~PZ_UPDATE;
+			pp->flags |= PZ_HEAD;
 			sfputc(op, PZ_HDR_part);
 			m = strlen(pp->name) + 1;
 			sfputu(op, m);

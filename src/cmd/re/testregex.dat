@@ -1,4 +1,4 @@
-: X/Open regex tests 2003-07-17
+: X/Open regex tests 2003-10-17
 
 # basic sanity
 
@@ -602,6 +602,16 @@ L	aaaa\nbbbb\ncccc\nddddd\neeeeee\nfffffff\ngggg\nhhhh\niiiii\njjjjj\nkkkkk\nlll
 
 E	a*a*a*a*a*b		aaaaaaaaac	NOMATCH
 E	a*a*a*a*a*b		aaaaaaaaab	(0,10)
+
+# regexec() REG_LEFT
+
+BEA	^b			aaabbb		NOMATCH
+BEAy	b			aaabbb		NOMATCH
+BEA	b			aaabbb		(3,4)
+EA	^(b)			aaabbb		NOMATCH
+EA	(^b)			aaabbb		NOMATCH
+EAy	(b)			aaabbb		NOMATCH
+EA	(b)			aaabbb		(3,4)(3,4)
 
 # Tom Lord's rx tests
 

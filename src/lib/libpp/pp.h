@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -179,17 +179,18 @@
 #define PP_READ			46	/* include file without output	*/
 #define PP_REGUARD		47	/* file pop emits guard define	*/
 #define PP_RESERVED		48	/* COMPILE reserved keyword	*/
-#define PP_SPACEOUT		49	/* pplex returns space,newline	*/
-#define PP_STANDALONE		50	/* standalone preprocessor	*/
-#define PP_STANDARD		51	/* standard include dir		*/
-#define PP_STRICT		52	/* strict implementation	*/
-#define PP_TEST			53	/* enable (undocumented) tests	*/
-#define PP_TEXT			54	/* include file with output	*/
-#define PP_TRANSITION		55	/* on COMPATIBILITY boundary	*/
-#define PP_TRUNCATE		56	/* truncate macro names		*/
-#define PP_UNDEF		57	/* undef symbol after ppdefault	*/
-#define PP_VENDOR		58	/* vendor file dirs follow	*/
-#define PP_WARN			59	/* enable annoying warnings	*/
+#define PP_RESET		49	/* reset to initiali predefs	*/
+#define PP_SPACEOUT		50	/* pplex returns space,newline	*/
+#define PP_STANDALONE		51	/* standalone preprocessor	*/
+#define PP_STANDARD		52	/* standard include dir		*/
+#define PP_STRICT		53	/* strict implementation	*/
+#define PP_TEST			54	/* enable (undocumented) tests	*/
+#define PP_TEXT			55	/* include file with output	*/
+#define PP_TRANSITION		56	/* on COMPATIBILITY boundary	*/
+#define PP_TRUNCATE		57	/* truncate macro names		*/
+#define PP_UNDEF		58	/* undef symbol after ppdefault	*/
+#define PP_VENDOR		59	/* vendor file dirs follow	*/
+#define PP_WARN			60	/* enable annoying warnings	*/
 
 #define PP_comment		(1<<0)	/* PP_COMMENT is set		*/
 #define PP_compatibility	(1<<1)	/* PP_COMPATIBILITY is set	*/

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -189,6 +189,8 @@ struct Pss_s
 #endif
 
 };
+
+#define pssinit(d,e)	(memset(d,0,sizeof(*(d))),(d)->version=PSS_VERSION,(d)->errorf=(Error_f)(e))
 
 extern Pss_t*		pssopen(Pssdisc_t*);
 extern Pssent_t*	pssread(Pss_t*, Pss_id_t);

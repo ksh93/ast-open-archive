@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -19,6 +19,8 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
+*                David Korn <dgk@research.att.com>                 *
+*                 Phong Vo <kpv@research.att.com>                  *
 *                                                                  *
 *******************************************************************/
 #pragma prototyped
@@ -39,9 +41,14 @@
  *	0400000 trace record headers in base 4 (alternate format)
  */
 
-#include "format.h"
+#include <paxlib.h>
+#include <codex.h>
+#include <ccode.h>
+#include <ctype.h>
+#include <tm.h>
 
 #define MAGIC		"\301\304\331\100\323\311\302\331\306"
+#define CHUNK		64
 
 typedef struct Cadir_s
 {
@@ -50,7 +57,7 @@ typedef struct Cadir_s
 	size_t		size;
 } Cadir_t;
 
-typedef struct Calib_s
+typedef struct Ar_s
 {
 	char*		format;
 	char*		suffix;
@@ -74,8 +81,9 @@ typedef struct Calib_s
 	size_t		line;
 	size_t		buf;
 	size_t		left;
+	Cadir_t*	dirs;
 	Cadir_t*	dir;
-} Calib_t;
+} Ar_t;
 
 #define CALIB_LINE	256
 
@@ -85,7 +93,7 @@ typedef struct Calib_s
 #define casize4(x)	((((unsigned char*)x)[0]<<24)|(((unsigned char*)x)[1]<<16)|(((unsigned char*)x)[2]<<8)|(((unsigned char*)x)[3]))
 
 /*
- * ca cobol keyword map
+ * cobol keyword map
  */
 
 static const char*	cakey[] =
@@ -224,36 +232,36 @@ static const char*	cakey[] =
  * return next nbits nibble from the input line
  */
 
-#define cagetbits(ca,n)  ((n)<=(ca)->left? \
-				((((ca)->buf)>>((ca)->left-=(n)))&((1L<<(n))-1)):\
-				_cagetbits((ca), (n)))
+#define cagetbits(ar,n)  ((n)<=(ar)->left? \
+				((((ar)->buf)>>((ar)->left-=(n)))&((1L<<(n))-1)):\
+				_cagetbits((ar), (n)))
 
 static int
-_cagetbits(Calib_t* ca, int nbits)
+_cagetbits(Ar_t* ar, int nbits)
 {
 	int	c;
 
-	while (ca->left <= 8 * (sizeof(ca->buf) - 1))
+	while (ar->left <= 8 * (sizeof(ar->buf) - 1))
 	{
-		if (ca->count-- > 0)
+		if (ar->count-- > 0)
 		{
-			c = *ca->next++;
-			ca->buf <<= 8;
-			ca->buf |= c;
-			ca->left += 8;
+			c = *ar->next++;
+			ar->buf <<= 8;
+			ar->buf |= c;
+			ar->left += 8;
 		}
-		else if (ca->left < nbits)
+		else if (ar->left < nbits)
 			return 0;
 		else
 			break;
 	}
-	return cagetbits(ca, nbits);
+	return cagetbits(ar, nbits);
 }
 
 static int
-calib_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, unsigned char* buf, size_t size)
+calib_getprologue(Pax_t* pax, Paxformat_t* fp, register Paxarchive_t* ap, Paxfile_t* f, unsigned char* buf, size_t size)
 {
-	register Calib_t*	ca;
+	register Ar_t*		ar;
 	register Cadir_t*	dp;
 	register Cadir_t*	de;
 	register Cadir_t*	db;
@@ -261,83 +269,90 @@ calib_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, u
 	unsigned char		dir[22];
 	unsigned char		blk[16];
 	off_t			n;
+	size_t			m;
 	int			j;
 	int			k;
 
 	if (sizeof(hdr) <= size)
 		memcpy(hdr, buf, sizeof(hdr));
-	else if (bread(ap, hdr, (off_t)sizeof(hdr), (off_t)sizeof(hdr), 0) <= 0)
+	else if (paxread(pax, ap, hdr, (off_t)sizeof(hdr), (off_t)sizeof(hdr), 0) <= 0)
 		return 0;
 	else
-		bunread(ap, hdr, sizeof(hdr));
+		paxunread(pax, ap, hdr, sizeof(hdr));
 	if (memcmp(hdr, MAGIC, sizeof(MAGIC) - 1))
 		return 0;
-	if (!(ca = newof(0, Calib_t, 1, 0)))
-		nospace();
-	ca->imap = (ca->map = ccmap(CC_EBCDIC_O, CC_NATIVE)) ? ca->map : ccmap(0, 0);
-	ca->bufsize = casize2(&hdr[24]);
-	ca->linesize = 80;
-	if (state.buffersize < ca->bufsize)
+	if (!(ar = newof(0, Ar_t, 1, 0)))
 	{
-		state.buffersize = ca->bufsize;
-		binit(ap);
+		paxnospace(pax);
+		return -1;
 	}
+	ar->imap = (ar->map = ccmap(CC_EBCDIC_O, CC_NATIVE)) ? ar->map : ccmap(0, 0);
+	ar->bufsize = casize2(&hdr[24]);
+	ar->linesize = 80;
 	db = dp = de = 0;
 	j = 3;
 	do
 	{
-		n = j * ca->bufsize;
-		if (bseek(ap, n, SEEK_SET, 1) != n)
-			error(3, "%s: %s format block header seek error", ap->name, ap->format->name);
-		if (bread(ap, blk, (off_t)sizeof(blk), (off_t)sizeof(blk), 0) <= 0)
-			error(3, "%s: %s format block header read error", ap->name, ap->format->name);
+		n = j * ar->bufsize;
+		if (paxseek(pax, ap, n, SEEK_SET, 1) != n)
+			(*pax->errorf)(NiL, pax, 3, "%s: %s format block header seek error", ap->name, ap->format->name);
+		if (paxread(pax, ap, blk, (off_t)sizeof(blk), (off_t)sizeof(blk), 0) <= 0)
+			(*pax->errorf)(NiL, pax, 3, "%s: %s format block header read error", ap->name, ap->format->name);
 		j = casize2(&blk[10]);
 		k = casize2(&blk[12]);
-		if (state.test & 0400000)
-			error(1, "blk %c%c%c%c%c%c%c%c %02x %02x %02x %02x %02x %02x %02x %02x", ccmapchr(ca->map, blk[0]), ccmapchr(ca->map, blk[1]), ccmapchr(ca->map, blk[2]), ccmapchr(ca->map, blk[3]), ccmapchr(ca->map, blk[4]), ccmapchr(ca->map, blk[5]), ccmapchr(ca->map, blk[6]), ccmapchr(ca->map, blk[7]), blk[8], blk[9], blk[10], blk[11], blk[12], blk[13], blk[14], blk[15]);
+		if (pax->test & 0400000)
+			(*pax->errorf)(NiL, pax, 1, "blk %c%c%c%c%c%c%c%c %02x %02x %02x %02x %02x %02x %02x %02x", ccmapchr(ar->map, blk[0]), ccmapchr(ar->map, blk[1]), ccmapchr(ar->map, blk[2]), ccmapchr(ar->map, blk[3]), ccmapchr(ar->map, blk[4]), ccmapchr(ar->map, blk[5]), ccmapchr(ar->map, blk[6]), ccmapchr(ar->map, blk[7]), blk[8], blk[9], blk[10], blk[11], blk[12], blk[13], blk[14], blk[15]);
 		while (k-- > 0)
 		{
-			if (bread(ap, dir, (off_t)sizeof(dir), (off_t)sizeof(dir), 0) <= 0)
-				error(3, "%s: %s format header read error", ap->name, ap->format->name);
-			if (state.test & 0400000)
-				error(1, "dir %c%c%c%c%c%c%c%c %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", ccmapchr(ca->map, dir[0]), ccmapchr(ca->map, dir[1]), ccmapchr(ca->map, dir[2]), ccmapchr(ca->map, dir[3]), ccmapchr(ca->map, dir[4]), ccmapchr(ca->map, dir[5]), ccmapchr(ca->map, dir[6]), ccmapchr(ca->map, dir[7]), dir[8], dir[9], dir[10], dir[11], dir[12], dir[13], dir[14], dir[15], dir[16], dir[17], dir[18], dir[19], dir[20], dir[21]);
+			if (paxread(pax, ap, dir, (off_t)sizeof(dir), (off_t)sizeof(dir), 0) <= 0)
+				(*pax->errorf)(NiL, pax, 3, "%s: %s format header read error", ap->name, ap->format->name);
+			if (pax->test & 0400000)
+				(*pax->errorf)(NiL, pax, 1, "dir %c%c%c%c%c%c%c%c %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x", ccmapchr(ar->map, dir[0]), ccmapchr(ar->map, dir[1]), ccmapchr(ar->map, dir[2]), ccmapchr(ar->map, dir[3]), ccmapchr(ar->map, dir[4]), ccmapchr(ar->map, dir[5]), ccmapchr(ar->map, dir[6]), ccmapchr(ar->map, dir[7]), dir[8], dir[9], dir[10], dir[11], dir[12], dir[13], dir[14], dir[15], dir[16], dir[17], dir[18], dir[19], dir[20], dir[21]);
 			if (dp >= de)
 			{
-				n = dp - db + 64;
-				if (!(db = newof(db, Cadir_t, n, 0)))
-					nospace();
-				dp = db + n - 64;
-				de = db + n - 1;
+				m = dp - db + CHUNK;
+				if (!(db = newof(db, Cadir_t, m, 0)))
+				{
+					free(ar);
+					paxnospace(pax);
+					return -1;
+				}
+				dp = db + m - CHUNK;
+				de = db + m - 1;
 			}
 			dp->offset = casize2(&dir[9]);
 			dp->blocks = dir[14];
-			dp->size = cabcd5(&dir[15]) * ca->linesize;
-			ccmapstr(ca->map, dir, sizeof(dir));
+			dp->size = cabcd5(&dir[15]) * ar->linesize;
+			ccmapstr(ar->map, dir, sizeof(dir));
 			dp++;
 		}
 	} while (j);
 	dp->offset = 0;
 	dp->size = 0;
-	ca->dir = db;
-	ap->data = ca;
+	ar->dirs = ar->dir = db;
+	ap->data = ar;
 	return 1;
 }
 
 static int
-calib_done(Pax_t* pax, register Archive_t* ap)
+calib_done(Pax_t* pax, register Paxarchive_t* ap)
 {
-	if (ap->data)
+	Ar_t*	ar;
+
+	if (ar = (Ar_t*)ap->data)
 	{
-		free(ap->data);
+		if (ar->dirs)
+			free(ar->dirs);
+		free(ar);
 		ap->data = 0;
 	}
 	return 0;
 }
 
 static int
-calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
+calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int wfd)
 {
-	register Calib_t*	ca = (Calib_t*)ap->data;
+	register Ar_t*		ar = (Ar_t*)ap->data;
 	const char*		s;
 	unsigned char*		out;
 	long			sequence;
@@ -366,7 +381,7 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 				       /*01234567890123456789012345678901234567890123456789012345678901234*/
 	static char		map[] = "? ~.<(+|&!$*);^-/,%_>?:#@'=\"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-	if (ca->suffix)
+	if (ar->suffix)
 	{
 		wfp = 0;
 		suffix = 0;
@@ -375,63 +390,63 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 		return 1;
 	else if (!(wfp = sfnew(NiL, NiL, SF_UNBOUND, wfd, SF_WRITE)))
 	{
-		error(2, "%s: cannot write", f->name);
+		(*pax->errorf)(NiL, pax, 2, "%s: cannot write", f->name);
 		return -1;
 	}
 	comment[0] = from[0] = to[0] = 0;
-	sequence = ca->digits && ca->increment && (ca->position + ca->digits) <= ca->linesize ? ca->sequence : -1;
-	noted = !wfp || !state.warn;
-	if (state.test & 0001000)
+	sequence = ar->digits && ar->increment && (ar->position + ar->digits) <= ar->linesize ? ar->sequence : -1;
+	noted = !wfp || !pax->warn;
+	if (pax->test & 0001000)
 		sequence = -1;
-	generate = ca->flags != 0xf1;
+	generate = ar->flags != 0xf1;
 	block = 0;
 	oline = error_info.line;
 	error_info.line = 0;
 	ofile = error_info.file;
 	error_info.file = f->name;
-	version = (state.test & 0002000) ? -1 : ca->version;
+	version = (pax->test & 0002000) ? -1 : ar->version;
 	for (;;)
 	{
 		block++;
-		while (ca->line <= ca->blocksize - ca->headsize + 1)
+		while (ar->line <= ar->blocksize - ar->headsize + 1)
 		{
-			ca->next = &ca->buffer[index = ca->line];
-			hdr = ca->next;
-			flags = ca->next[1];
+			ar->next = &ar->buffer[index = ar->line];
+			hdr = ar->next;
+			flags = ar->next[1];
 			if (flags & 0x0c)
 				break;
-			ca->line += ca->next[0];
-			ca->next += ca->headsize;
+			ar->line += ar->next[0];
+			ar->next += ar->headsize;
 			if (flags & 0x80)
 			{
-				ca->next += 2;
+				ar->next += 2;
 				if (!(flags & 0x01))
-					ca->next += 1;
+					ar->next += 1;
 			}
-			if (version >= 0 && hdr[ca->headsize - 3] != version)
+			if (version >= 0 && hdr[ar->headsize - 3] != version)
 				continue;
-			while ((ca->count = ca->next[-1]) == 1 && ca->next[0] == 0)
-				ca->next += 2;
+			while ((ar->count = ar->next[-1]) == 1 && ar->next[0] == 0)
+				ar->next += 2;
 			error_info.line++;
-			if (state.test & 0100000)
-				error(0, "%03d %3u %3u %5u %3u %03o %4u %4u %4u %4u %4u %4o %4o %4o %4u %4u", error_info.line, ca->count, ca->next - hdr, ca->next - ca->buffer, hdr[0], hdr[1], hdr[2], hdr[3], hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9], hdr[10], hdr[11]);
-			if (state.test & 0200000)
-				error(0, "%03d %3u %3u %3u %03o %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u", error_info.line, ca->count, ca->next - hdr, hdr[0], hdr[1], hdr[2], hdr[3], hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9], hdr[10], hdr[11]);
-			if (state.test & 0400000)
-				error(0, "%03d %3d %03d:%02x:%04..4u:%03u | %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u",
+			if (pax->test & 0100000)
+				(*pax->errorf)(NiL, pax, 0, "%03d %3u %3u %5u %3u %03o %4u %4u %4u %4u %4u %4o %4o %4o %4u %4u", error_info.line, ar->count, ar->next - hdr, ar->next - ar->buffer, hdr[0], hdr[1], hdr[2], hdr[3], hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9], hdr[10], hdr[11]);
+			if (pax->test & 0200000)
+				(*pax->errorf)(NiL, pax, 0, "%03d %3u %3u %3u %03o %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u %04..4u", error_info.line, ar->count, ar->next - hdr, hdr[0], hdr[1], hdr[2], hdr[3], hdr[4], hdr[5], hdr[6], hdr[7], hdr[8], hdr[9], hdr[10], hdr[11]);
+			if (pax->test & 0400000)
+				(*pax->errorf)(NiL, pax, 0, "%03d %3d %03d:%02x:%04..4u:%03u | %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u %03d:%02x:%04..4u:%03u",
 					error_info.line,
-					ca->count,
-					ca->next[-1], ca->next[-1], ca->next[-1], ca->next[-1] & 0x7f,
-					ca->next[0], ca->next[0], ca->next[0], ca->next[0] & 0x7f,
-					ca->next[1], ca->next[1], ca->next[1], ca->next[1] & 0x7f,
-					ca->next[2], ca->next[2], ca->next[2], ca->next[2] & 0x7f,
-					ca->next[3], ca->next[3], ca->next[3], ca->next[3] & 0x7f,
-					ca->next[4], ca->next[4], ca->next[4], ca->next[4] & 0x7f,
-					ca->next[5], ca->next[5], ca->next[5], ca->next[5] & 0x7f);
+					ar->count,
+					ar->next[-1], ar->next[-1], ar->next[-1], ar->next[-1] & 0x7f,
+					ar->next[0], ar->next[0], ar->next[0], ar->next[0] & 0x7f,
+					ar->next[1], ar->next[1], ar->next[1], ar->next[1] & 0x7f,
+					ar->next[2], ar->next[2], ar->next[2], ar->next[2] & 0x7f,
+					ar->next[3], ar->next[3], ar->next[3], ar->next[3] & 0x7f,
+					ar->next[4], ar->next[4], ar->next[4], ar->next[4] & 0x7f,
+					ar->next[5], ar->next[5], ar->next[5], ar->next[5] & 0x7f);
 			if (flags & 0x40)
 			{
 				bits = 8;
-				m = ca->imap;
+				m = ar->imap;
 			}
 			else
 			{
@@ -439,42 +454,42 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 				m = (unsigned char*)map;
 			}
 			out = outbuf;
-			if (state.warn)
+			if (pax->warn)
 				noted = 0;
-			while (ca->count && (ca->next - ca->buffer) < ca->line)
+			while (ar->count && (ar->next - ar->buffer) < ar->line)
 			{
-				if (ca->count < 64)
+				if (ar->count < 64)
 				{
-					ca->left = 0;
-					while ((c = cagetbits(ca, bits)) || bits == 8 && ca->count > 0)
-						if (out < &outbuf[ca->linesize])
+					ar->left = 0;
+					while ((c = cagetbits(ar, bits)) || bits == 8 && ar->count > 0)
+						if (out < &outbuf[ar->linesize])
 							*out++ = m[c];
 						else if (!noted)
 						{
 							noted = 1;
-							error(2, "%s: overbyte (bits=%d offset=%I*u+%I*u block=%I*u)", ap->name, bits, sizeof(off_t), bseek(ap, (off_t)0, SEEK_CUR, 0) - ca->bufsize, sizeof(index), index, sizeof(block), block);
+							(*pax->errorf)(NiL, pax, 2, "%s: overbyte (bits=%d offset=%I*u+%I*u block=%I*u)", ap->name, bits, sizeof(off_t), paxseek(pax, ap, (off_t)0, SEEK_CUR, 0) - ar->bufsize, sizeof(index), index, sizeof(block), block);
 						}
-					if ((ca->next - ca->buffer) >= ca->line)
+					if ((ar->next - ar->buffer) >= ar->line)
 						break;
-					if ((c = (*ca->next ^ 64)) & 0x80)
+					if ((c = (*ar->next ^ 64)) & 0x80)
 						c = 0;
 					else
-						ca->next++;
+						ar->next++;
 				}
-				else if (ca->count & 0x80)
+				else if (ar->count & 0x80)
 				{
-					if (state.test & 0040000)
-						error(1, "part c=%d n=%d k=%d \"%-.*s\"", c, out - outbuf, ca->count & 0x7f, out - outbuf, outbuf);
+					if (pax->test & 0040000)
+						(*pax->errorf)(NiL, pax, 1, "part c=%d n=%d k=%d \"%-.*s\"", c, out - outbuf, ar->count & 0x7f, out - outbuf, outbuf);
 					goto key;
 				}
-				else if ((c = ca->count - 64) & 0x80)
+				else if ((c = ar->count - 64) & 0x80)
 					c = (c + 64) & 0x7f;
-				if (state.test & 0040000)
-					error(1, "part c=%d:%d:%d r=%d:%d bits=%d n=%d x=%u \"%-.*s\"", c, &outbuf[ca->linesize] - out, c ^ 64, ca->next - ca->buffer, ca->line, bits, out - outbuf, *ca->next, out - outbuf, outbuf);
-				if (c > (&outbuf[ca->linesize] - out))
+				if (pax->test & 0040000)
+					(*pax->errorf)(NiL, pax, 1, "part c=%d:%d:%d r=%d:%d bits=%d n=%d x=%u \"%-.*s\"", c, &outbuf[ar->linesize] - out, c ^ 64, ar->next - ar->buffer, ar->line, bits, out - outbuf, *ar->next, out - outbuf, outbuf);
+				if (c > (&outbuf[ar->linesize] - out))
 				{
-					ca->count = c ^ 64;
-					if (bits == 8 && ca->count <= (&outbuf[ca->linesize] - out))
+					ar->count = c ^ 64;
+					if (bits == 8 && ar->count <= (&outbuf[ar->linesize] - out))
 						continue;
 					goto key;
 				}
@@ -483,21 +498,21 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 					memset(out, ' ', c);
 					out += c;
 				}
-				while ((ca->next - ca->buffer) < ca->line && (ca->count = *ca->next++) & 0x80)
+				while ((ar->next - ar->buffer) < ar->line && (ar->count = *ar->next++) & 0x80)
 				{
 				key:
-					s = cakey[ca->count & 0x7f];
-					if (state.warn && *s == '{')
-						error(1, "%s: keyword %s (bits=%d offset=%I*u+%I*u block=%I*u)", ap->name, s, bits, sizeof(off_t), bseek(ap, (off_t)0, SEEK_CUR, 0) - ca->bufsize, sizeof(index), index, sizeof(block), block);
+					s = cakey[ar->count & 0x7f];
+					if (pax->warn && *s == '{') /*'}'*/
+						(*pax->errorf)(NiL, pax, 1, "%s: keyword %s (bits=%d offset=%I*u+%I*u block=%I*u)", ap->name, s, bits, sizeof(off_t), paxseek(pax, ap, (off_t)0, SEEK_CUR, 0) - ar->bufsize, sizeof(index), index, sizeof(block), block);
 					while (c = *s++)
-						if (out < &outbuf[ca->linesize])
+						if (out < &outbuf[ar->linesize])
 							*out++ = c;
 						else
 						{
 							if (!noted)
 							{
 								noted = 1;
-								error(2, "%s: key overbyte (bits=%d offset=%I*u+%I*u block=%I*u)", ap->name, bits, sizeof(off_t), bseek(ap, (off_t)0, SEEK_CUR, 0) - ca->bufsize, sizeof(index), index, sizeof(block), block);
+								(*pax->errorf)(NiL, pax, 2, "%s: key overbyte (bits=%d offset=%I*u+%I*u block=%I*u)", ap->name, bits, sizeof(off_t), paxseek(pax, ap, (off_t)0, SEEK_CUR, 0) - ar->bufsize, sizeof(index), index, sizeof(block), block);
 							}
 							break;
 						}
@@ -511,6 +526,20 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 					for (; b < out && isdigit(*b); b++);
 					for (; b < out && *b == ' '; b++);
 					for (m = b; b < out && *b != ' '; b++);
+					if ((out - b) > 6 && *m == '/' && *(m + 1) == '*')
+					{
+						while ((out - ++b) > 4)
+						{
+							if (*b == 'R' && *(b + 1) == 'E' && *(b + 2) == 'X' && *(b + 3) == 'X')
+							{
+								suffix = ".REXX";
+								break;
+							}
+						}
+						if (suffix)
+							break;
+						continue;
+					}
 					if (m == outbuf)
 					{
 						if ((b - m) == 7 && strneq((char*)m, "NEWPAGE", 7) || (b - m) == 4 && strneq((char*)m, "FILE", 4))
@@ -584,24 +613,24 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 			{
 				if (sequence >= 0)
 				{
-					if ((b = outbuf + ca->position) >= out || *b == ' ' || isdigit(*b) || (out - outbuf) == ca->linesize && (b = out - ca->digits))
+					if ((b = outbuf + ar->position) >= out || *b == ' ' || isdigit(*b) || (out - outbuf) == ar->linesize && (b = out - ar->digits))
 					{
-						if ((c = ca->position - (out - outbuf)) > 0)
+						if ((c = ar->position - (out - outbuf)) > 0)
 						{
 							memset(out, ' ', c);
 							out += c;
 						}
-						b += sfsprintf((char*)b, ca->digits, "%0.*lu", ca->digits, generate ? sequence : casize3(&hdr[2]));
+						b += sfsprintf((char*)b, ar->digits, "%0.*lu", ar->digits, generate ? sequence : casize3(&hdr[2]));
 						if (out < b)
 							out = b;
 					}
-					sequence += ca->increment;
+					sequence += ar->increment;
 				}
 				for (; out > outbuf && *(out - 1) == ' '; out--);
 				*out++ = '\n';
 				if ((out - outbuf) > 10 && outbuf[6] == '*' && outbuf[7] == '/')
 				{
-					if ((out - outbuf) == 11 && outbuf[8] == '/' && outbuf[9] == '*')
+					if ((out - outbuf) == 11 && outbuf[8] == '/' && (outbuf[9] == '*' || outbuf[9] == ' ' || !outbuf[9]))
 						from[0] = to[0] = 0;
 					else
 					{
@@ -613,7 +642,7 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 									m = b;
 								else
 								{
-									if (*++b == '*')
+									if (*++b == '*' || *b == ' ' || !*b)
 									{
 										c = m - outbuf - 8;
 										memcpy(from, outbuf + 8, c);
@@ -627,7 +656,7 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 							}
 					}
 				}
-				else if (outbuf[0] == '-' && outbuf[1] == 'I' && outbuf[2] == 'N' && outbuf[3] == 'C' && outbuf[4] == ' ' && !(state.test & 0010000))
+				else if (outbuf[0] == '-' && outbuf[1] == 'I' && outbuf[2] == 'N' && outbuf[3] == 'C' && outbuf[4] == ' ' && !pax->strict && !(pax->test & 0010000))
 				{
 					for (b = outbuf + 5; *b == ' '; b++);
 					for (m = b; m < (out - 1) && *m != ' '; m++);
@@ -642,48 +671,50 @@ calib_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 			else
 			{
 				error_info.line--;
-				if (state.warn)
+				if (pax->warn)
 				{
 					for (b = outbuf; b < out && *b == ' '; b++);
 					for (; out > outbuf && *(out - 1) == ' '; out--);
 					*out = 0;
 					if (!streq((char*)b, comment))
-						error(0, "comment %s \"%s\"", error_info.file, strcpy(comment, (char*)b));
+						(*pax->errorf)(NiL, pax, 0, "comment %s \"%s\"", error_info.file, strcpy(comment, (char*)b));
 				}
 			}
 		}
+	hit:
 		if (!wfp)
 			break;
-		if (--ca->nblocks <= 0)
+		if (--ar->nblocks <= 0)
 			break;
-		if (ca->buffer[2] == 0xff)
+		if (ar->buffer[2] == 0xff)
 		{
-			n = casize2(ca->buffer + ca->blocksize + (block != 1)) * ca->bufsize;
-			if (bseek(ap, n, SEEK_SET, 1) != n)
-				error(3, "%s: %s format data seek error", ap->name, ap->format->name);
+			n = casize2(ar->buffer + ar->blocksize + (block != 1)) * ar->bufsize;
+			if (paxseek(pax, ap, n, SEEK_SET, 1) != n)
+				(*pax->errorf)(NiL, pax, 3, "%s: %s format data seek error", ap->name, ap->format->name);
 		}
-		if (!(ca->buffer = (unsigned char*)bget(ap, (off_t)ca->bufsize, NiL)))
-			error(3, "%s: format member read error (offset=%I*u block=%I*u)", ap->name, sizeof(off_t), bseek(ap, (off_t)0, SEEK_CUR, 0), sizeof(block), block);
-		ca->blocksize = casize2(ca->buffer);
-		ca->next = ca->buffer;
-		ca->line = 4;
+		if (!(ar->buffer = (unsigned char*)paxget(pax, ap, (off_t)ar->bufsize, NiL)))
+			(*pax->errorf)(NiL, pax, 3, "%s: format member read error (offset=%I*u block=%I*u)", ap->name, sizeof(off_t), paxseek(pax, ap, (off_t)0, SEEK_CUR, 0), sizeof(block), block);
+		ar->blocksize = casize2(ar->buffer);
+		ar->next = ar->buffer;
+		ar->line = 4;
 	}
 	error_info.line = oline;
 	error_info.file = ofile;
 	if (wfp)
 	{
+		sfsync(wfp);
+		wfp->_file = -1;
 		sfclose(wfp);
-		setfile(ap, f);
 	}
 	else if (suffix)
-		strcpy(ca->suffix, suffix);
+		strcpy(ar->suffix, suffix);
 	return 1;
 }
 
 static int
-calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
+calib_getheader(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f)
 {
-	register Calib_t*	ca = (Calib_t*)ap->data;
+	register Ar_t*		ar = (Ar_t*)ap->data;
 	register unsigned char*	h;
 	register off_t		n;
 	char*			s;
@@ -695,21 +726,21 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 	int			x;
 	char			suf[4];
 
-	if (!ca->dir->offset)
+	if (!ar->dir->offset)
 		return 0;
-	n = ca->bufsize * ca->dir->offset;
-	if (bseek(ap, n, SEEK_SET, 1) != n)
-		error(3, "%s: %s format member seek error", ap->name, ap->format->name);
-	ca->nblocks = ca->dir->blocks;
-	if (!(ca->buffer = (unsigned char*)bget(ap, (off_t)ca->bufsize, NiL)))
-		error(3, "%s: %s format member read error", ap->name, ap->format->name);
-	ca->blocksize = casize2(&ca->buffer[0]) + 1;
-	ca->headsize = 6;
-	ca->version = -1;
-	ca->next = ca->buffer;
+	n = ar->bufsize * ar->dir->offset;
+	if (paxseek(pax, ap, n, SEEK_SET, 1) != n)
+		(*pax->errorf)(NiL, pax, 3, "%s: %s format member seek error", ap->name, ap->format->name);
+	ar->nblocks = ar->dir->blocks;
+	if (!(ar->buffer = (unsigned char*)paxget(pax, ap, (off_t)ar->bufsize, NiL)))
+		(*pax->errorf)(NiL, pax, 3, "%s: %s format member read error", ap->name, ap->format->name);
+	ar->blocksize = casize2(&ar->buffer[0]) + 1;
+	ar->headsize = 6;
+	ar->version = -1;
+	ar->next = ar->buffer;
 	s = 0;
 	k = 0;
-	for (j = 1, x = 0, h = ca->buffer + 4; !x && h < ca->buffer + ca->bufsize; j++, h += i)
+	for (j = 1, x = 0, h = ar->buffer + 4; !x && h < ar->buffer + ar->bufsize; j++, h += i)
 	{
 		if ((i = *h) == 78)
 		{
@@ -729,7 +760,7 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 		if (!(k & (1<<j)))
 		{
 			k |= (1<<j);
-			if (state.test & 0020000)
+			if (pax->test & 0020000)
 			{
 				int	y;
 
@@ -741,68 +772,62 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 			switch (j)
 			{
 			case 0:
-				switch (ca->flags = h[32])
+				switch (ar->flags = h[32])
 				{
 				case 0x40:
-					ca->headsize = 5;
+					ar->headsize = 5;
 					break;
 				case 0xf1:
-					ca->headsize = 8;
+					ar->headsize = 8;
 					break;
 				}
-				ca->version = h[-3];
-				ca->position = h[33];
-				ca->digits = h[34] + 1;
-				ca->increment = casize2(&h[35]);
-				if ((ca->sequence = casize2(&h[37])) > 0x7fff)
-					ca->sequence = ca->sequence - 0x10000;
-				ca->sequence += ca->increment;
-				ccmapstr(ca->map, h, 24);
-				f->name = stash(&ap->stash.head, (char*)h, 13);
+				ar->version = h[-3];
+				ar->position = h[33];
+				ar->digits = h[34] + 1;
+				ar->increment = casize2(&h[35]);
+				if ((ar->sequence = casize2(&h[37])) > 0x7fff)
+					ar->sequence = ar->sequence - 0x10000;
+				ar->sequence += ar->increment;
+				ccmapstr(ar->map, h, 24);
+				f->name = paxstash(pax, &ap->stash.head, (char*)h, 28);
 				for (s = f->name + 8; *(s - 1) == ' '; s--);
-				*(ca->suffix = s) = 0;
+				*(ar->suffix = s) = 0;
 				f->st->st_mtime = f->st->st_ctime = f->st->st_atime = tmscan(sfprints("%-.6s%02u%02u%02u", memcmp(h + 18, "000000", 6) ? (h + 18) : (h + 12), h[24], h[25], h[26]), NiL, "%y%m%d%H%M%S", NiL, NiL, 0);
-				if (state.test & 0004000)
-					error(0, "head %-8s %d %03o %03o %03o %03o %03o %03o %03o", f->name, j, h[32], h[33], h[34], h[35], h[36], h[37], h[38]);
+				if (pax->test & 0004000)
+					(*pax->errorf)(NiL, pax, 0, "head %-8s %d %03o %03o %03o %03o %03o %03o %03o", f->name, j, h[32], h[33], h[34], h[35], h[36], h[37], h[38]);
 				break;
 			case 1:
-				switch (ca->flags = h[32])
+				switch (ar->flags = h[32])
 				{
 				case 0x40:
-					ca->headsize = 3;
+					ar->headsize = 3;
 					break;
 				}
 				if (h[31] == 0x48)
 				{
-					ca->digits = 0;
-					ca->linesize = 133;
+					ar->digits = 0;
+					ar->linesize = 133;
 				}
 				else
 				{
-					ca->position = h[33];
-					ca->digits = h[34] + 1;
-					ca->increment = casize2(&h[35]);
-					if ((ca->sequence = casize2(&h[37])) > 0x7fff)
-						ca->sequence = ca->sequence - 0x10000;
-					ca->sequence += ca->increment;
+					ar->position = h[33];
+					ar->digits = h[34] + 1;
+					ar->increment = casize2(&h[35]);
+					if ((ar->sequence = casize2(&h[37])) > 0x7fff)
+						ar->sequence = ar->sequence - 0x10000;
+					ar->sequence += ar->increment;
 				}
-				ccmapstr(ca->map, h, 32);
-				f->name = stash(&ap->stash.head, (char*)h, 13);
+				ccmapstr(ar->map, h, 32);
+				f->name = paxstash(pax, &ap->stash.head, (char*)h, 13);
 				for (s = f->name + 8; *(s - 1) == ' '; s--);
-				*(ca->suffix = s) = 0;
+				*(ar->suffix = s) = 0;
 				f->st->st_mtime = f->st->st_ctime = f->st->st_atime = tmscan(sfprints("%-.6s%-.4s00", memcmp(h + 18, "000000", 6) ? (h + 18) : (h + 12), h + 24), NiL, "%m%d%y%H%M%S", NiL, NiL, 0);
-				if (state.test & 0004000)
-					error(0, "head %-8s %d %03o %03o %03o %03o %03o %03o %03o", f->name, j, h[32], h[33], h[34], h[35], h[36], h[37], h[38]);
+				if (pax->test & 0004000)
+					(*pax->errorf)(NiL, pax, 0, "head %-8s %d %03o %03o %03o %03o %03o %03o %03o", f->name, j, h[32], h[33], h[34], h[35], h[36], h[37], h[38]);
 				break;
 			case 5:
 				if (s)
 				{
-					if (state.test & 4)
-					{
-						memcpy(suf, h + 34, 3);
-						ccmapstr(ca->map, suf, 4);
-						sfprintf(sfstdout, "%02x %02x %-.3s %s\n", h[38], h[39], suf, f->name);
-					}
 					switch (h[38])
 					{
 					case 0x31:
@@ -821,17 +846,17 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 						break;
 					default:
 						t = (char*)h + 34;
-						ccmapstr(ca->map, t, 3);
+						ccmapstr(ar->map, t, 3);
 						v = suf;
 						while (t < ((char*)h + 37) && *t != ' ')
 							*v++ = *t++;
 						*v = 0;
 						if (!*(v = suf))
 						{
-							if (ca->linesize == 133)
+							if (ar->linesize == 133)
 							{
 								v = "LST";
-								ca->suffix = 0;
+								ar->suffix = 0;
 							}
 							else
 								switch (h[38])
@@ -846,8 +871,8 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 									break;
 								default:
 									v = 0;
-									if (state.warn)
-										error(1, "%s: no suffix for type=%02x", f->name, h[38]);
+									if (pax->warn)
+										(*pax->errorf)(NiL, pax, 1, "%s: no suffix for type=%02x", f->name, h[38]);
 									break;
 								}
 						}
@@ -862,7 +887,7 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 						*s++ = '.';
 						strcpy(s, v);
 						if (streq(v, "EZT") || streq(v, "PLI"))
-							ca->suffix = 0;
+							ar->suffix = 0;
 					}
 				}
 				break;
@@ -872,12 +897,12 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 	for (s = f->name; *s; s++)
 		if (!isalnum(*s) && *s != '.')
 			*s = '_';
-	ca->line = h - ca->buffer;
-	if (ca->suffix)
+	ar->line = h - ar->buffer;
+	if (ar->suffix)
 	{
 		calib_getdata(pax, ap, f, -1);
-		ca->line = h - ca->buffer;
-		ca->suffix = 0;
+		ar->line = h - ar->buffer;
+		ar->suffix = 0;
 	}
 	for (i = 0, s = f->name; *s && *s != '.'; s++)
 		if (islower(*s))
@@ -890,29 +915,31 @@ calib_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f)
 	f->st->st_dev = 0;
 	f->st->st_ino = 0;
 	f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
-	f->st->st_uid = state.uid;
-	f->st->st_gid = state.gid;
+	f->st->st_uid = pax->uid;
+	f->st->st_gid = pax->gid;
 	f->st->st_nlink = 1;
 	IDEVICE(f->st, 0);
-	f->st->st_size = ca->dir->size;
-	ca->dir++;
+	f->st->st_size = ar->dir->size;
+	ar->dir++;
 	return 1;
 }
 
-Format_t	pax_calib_format =
+Paxformat_t	pax_calib_format =
 {
 	"ca-librarian",
 	"calib|librarian",
 	"mvs CA-librarian file",
 	0,
-	ARCHIVE|NOHARDLINKS|IN,
-	DEFBUFFER,
-	DEFBLOCKS,
+	PAX_ARCHIVE|PAX_NOHARDLINKS|PAX_IN,
+	PAX_DEFBUFFER,
+	PAX_DEFBLOCKS,
 	0,
-	pax_calib_next,
+	PAXNEXT(pax_calib_next),
 	0,
 	calib_done,
 	calib_getprologue,
 	calib_getheader,
 	calib_getdata,
 };
+
+PAXLIB(&pax_calib_format)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -33,6 +33,19 @@ Option_t		options[] =
 {
 {
 	0,
+},
+{
+	"action",
+	'A',
+	OPT_action,
+	"Input/output file path match and filter command. \acommand\a\
+	is applied to each file that matches \apattern\a as it is read\
+	from or written to the archive. \bX\b is any delimiter not occurring\
+	in \apattern\a. \acommand\a is split into space separated arguments,\
+	and is executed with the pathname of the file to be processed as the\
+	last argument. The standard output of the resulting command is read\
+	by \bpax\b.",
+	"\bX\bpattern\bX\bcommand",
 },
 {
 	"append",
@@ -387,6 +400,13 @@ Option_t		options[] =
 		resulting path is still subject to any \b--edit\b options.]"
 },
 {
+	"forceconvert",
+	0,
+	OPT_forceconvert,
+	"Force \b--from\b conversion even if the data contains control\
+	characters in the first 256 bytes.",
+},
+{
 	"format",
 	'x',
 	OPT_format,
@@ -696,6 +716,14 @@ Option_t		options[] =
 	"uid",
 },
 {
+	"passphrase",
+	'E',
+	OPT_passphrase,
+	"Passphrase for formats that support encryption. The default value is"
+	" prompted on and read from \b/dev/tty\b.",
+	"passphrase",
+},
+{
 	"path",
 	0,
 	OPT_path,
@@ -842,8 +870,8 @@ Option_t		options[] =
 	"strict",
 	'S',
 	OPT_strict,
-	"Disable non-standard \b--write\b mode extensions. The default is\
-	determined by the \bgetconf\b(1) CONFORMANCE setting.",
+	"Disable non-standard extensions. The default is determined\
+	by the \bgetconf\b(1) CONFORMANCE setting.",
 },
 {
 	"summary",
@@ -856,6 +884,12 @@ Option_t		options[] =
 	0,
 	OPT_symlink,
 	"symlink files if possible.",
+},
+{
+	"sync|fsync",
+	'F',
+	OPT_sync,
+	"\bfsync\b(2) each file after it is copied.",
 },
 {
 	"tape",

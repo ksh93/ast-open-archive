@@ -3722,3 +3722,74 @@ C'
 
 B
 D E F'
+
+TEST 23 'empty macro actuals'
+	EXEC -I-D
+		INPUT - $'#define f(a) F[a]
+0 : f();
+1 : f(1);
+2 : f(1,2);'
+		OUTPUT - $'# 1 ""
+
+0 : F[ ];
+1 : F[ 1];
+2 : F[ 1];'
+		ERROR - $'cpp: line 2: warning: f: 1 actual argument expected
+cpp: line 4: warning: f: 1 actual argument expected'
+	EXEC -I-D
+		INPUT - $'#define f(a,b) F[a][b]
+0 : f();
+1 : f(1);
+2 : f(1,2);
+3 : f(1,2,3);'
+		OUTPUT - $'# 1 ""
+
+0 : F[ ][ ];
+1 : F[ 1][ ];
+2 : F[ 1][ 2];
+3 : F[ 1][ 2];'
+		ERROR - $'cpp: line 2: warning: f: 2 actual arguments expected
+cpp: line 3: warning: f: 2 actual arguments expected
+cpp: line 5: warning: f: 2 actual arguments expected'
+	EXEC -I-D
+		INPUT - $'#define f(a,b) F[a][b]
+f(1);
+f();
+f(1,2);
+f(1,);
+f(,2);
+f(,);
+f(1,2,3);
+f(1,2,);
+f(1,,3);
+f(1,,);
+f(,2,3);
+f(,2,);
+f(,,3);
+f(,,);'
+		OUTPUT - $'# 1 ""
+
+F[ 1][ ];
+F[ ][ ];
+F[ 1][ 2];
+F[ 1][ ];
+F[ ][ 2];
+F[ ][ ];
+F[ 1][ 2];
+F[ 1][ 2];
+F[ 1][ ];
+F[ 1][ ];
+F[ ][ 2];
+F[ ][ 2];
+F[ ][ ];
+F[ ][ ];'
+		ERROR - $'cpp: line 2: warning: f: 2 actual arguments expected
+cpp: line 3: warning: f: 2 actual arguments expected
+cpp: line 8: warning: f: 2 actual arguments expected
+cpp: line 9: warning: f: 2 actual arguments expected
+cpp: line 10: warning: f: 2 actual arguments expected
+cpp: line 11: warning: f: 2 actual arguments expected
+cpp: line 12: warning: f: 2 actual arguments expected
+cpp: line 13: warning: f: 2 actual arguments expected
+cpp: line 14: warning: f: 2 actual arguments expected
+cpp: line 15: warning: f: 2 actual arguments expected'

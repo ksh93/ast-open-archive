@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -96,8 +96,8 @@
 #define OPT_undef	('U'|Os|Ox)	/* passed to preprocessor	*/
 #define OPT_vardump	('v'|Ob|Ox)	/* dump variable definitions	*/
 #define OPT_warn	('w'|Ob)	/* enable source file warnings	*/
-#define OPT_writeobject	('Y'|Ob|Of|Ox)	/* write recompiled object file	*/
-#define OPT_writestate	('W'|Ob|Of|Ox)	/* write state file on exit	*/
+#define OPT_writeobject	('Y'|Of|Os|Ox|Ov) /* write recompiled object	*/
+#define OPT_writestate	('W'|Of|Os|Ox|Ov) /* write state file on exit	*/
 
 struct option				/* option table entry		*/
 {

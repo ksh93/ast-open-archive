@@ -1,3 +1,43 @@
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*Copyright (c) 1978-2004 The Regents of the University of Californi*
+*                                                                  *
+*          Permission is hereby granted, free of charge,           *
+*       to any person obtaining a copy of THIS SOFTWARE FILE       *
+*            (the "Software"), to deal in the Software             *
+*              without restriction, including without              *
+*           limitation the rights to use, copy, modify,            *
+*                merge, publish, distribute, and/or                *
+*            sell copies of the Software, and to permit            *
+*            persons to whom the Software is furnished             *
+*          to do so, subject to the following disclaimer:          *
+*                                                                  *
+*THIS SOFTWARE IS PROVIDED BY The Regents of the University of Cali*
+*         ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,         *
+*            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED            *
+*            WARRANTIES OF MERCHANTABILITY AND FITNESS             *
+*             FOR A PARTICULAR PURPOSE ARE DISCLAIMED.             *
+*IN NO EVENT SHALL The Regents of the University of California and *
+*         BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,          *
+*           SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES           *
+*           (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT            *
+*          OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,           *
+*           DATA, OR PROFITS; OR BUSINESS INTERRUPTION)            *
+*          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,          *
+*          WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT          *
+*           (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING            *
+*           IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,            *
+*        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.        *
+*                                                                  *
+*            Information and Software Systems Research             *
+*The Regents of the University of California and AT&T Labs Research*
+*                         Florham Park NJ                          *
+*                                                                  *
+*                        Kurt Shoens (UCB)                         *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Mail -- a mail program
@@ -6,6 +46,83 @@
  */
 
 #include "mailx.h"
+
+#if _PACKAGE_ast
+
+#include "stamp.h"
+
+static const char usage[] =
+"[-?" STAMP "]"
+USAGE_LICENSE
+"[+NAME?mailx - send and receive mail]"
+"[+DESCRIPTION?\bmailx\b is a mail processing command. The options place"
+"	\bmailx\b in either \asend\a or \areceive\a mode. Send mode composes"
+"	and sends messages from text on the standard input. Receive mode"
+"	provides both an interactive command language and non-interactive"
+"	command line actions. Receive mode, on startup, reads commands and"
+"	variable settings from the file \b$HOME/.mailxrc\b, if it exists.]"
+"[+?\bmailx\b provides commands for saving, deleting and responding to"
+"	messages. Message composition supports editing, reviewing and"
+"	other modifications as the message is entered.]"
+"[+?Incoming mail is stored in one or more unspecified locations for each"
+"	user, collectively called the system mailbox for that user. When"
+"	\bmailx\b is invoked in \areceive\a mode, the system mailbox is"
+"	searched by default.]"
+"[+?For additional help run \bmailx\b with no options or operands,"
+"	and then enter the \bhelp\b command at the interactive prompt.]"
+"[A:articles?Treat mail folders as netnews article.]"
+"[F:followup?Automatically include the previous message (followup) text"
+"	when composing a reply.]"
+"[H:headers?List all headers and exit.]"
+"[I:interactive?Force interactive receive mode.]"
+"[N!:list-headers?List a screen of headers on receive mode startup.]"
+"[P:pipe?Coprocess receive mode from a pipe.]"
+"[Q:query?List the status character and sender address for the \acount\a"
+"	most recent messages, one line per message, and exit. See \b--status\b"
+"	for message status characters details.]:[count]"
+"[S:status?List the status character and sender address for all messages,"
+"	one line per message, and exit. The message status characters are:]{"
+"		[M?To be saved in \bmbox\b and marked for delete on exit.]"
+"		[N?New message.]"
+"		[P?Preserved and will not be deleted.]"
+"		[R?Already read.]"
+"		[U?Unread message from previous session.]"
+"		[X?Possible spam.]"
+"		[\b*\b?Saved to a folder and marked for delete on exit.]"
+"}"
+"[T:oldnews?Read/deleted netnews article names are appended to \afile\a]:[file]"
+"[b:bcc?Prompt for the blind carbon copy recipient list when composing"
+"	messages.]"
+"[c:cc?Prompt for the carbon copy recipient list when composing messages.]"
+"[d:debug?Enable implementation specific debug output.]"
+"[e:check?Silently exit 0 if there is mail, 1 otherwise.]"
+"[f:folder?Mail is read from \afolder\a instead of the default"
+"	user mailbox.]:?[folder:=$HOME/mbox]"
+"[i:ignore-interrupts?Ignore interrupts.]"
+"[n!:master?Read commands from \b/etc/mailx.rc\b on receive mode startup.]"
+"[o:set?Set \aname\a=\avalue\a options. The interactive mail command"
+"	\bhelp set all\b lists details for each option.]:[name=value]"
+"[s:subject?The non-interactive send mode subject text.]:[text]"
+"[t:sendheaders?Check for headers in send mode message text.]"
+"[u:user?Pretend to be this user. For debugging.]"
+"[v:verbose?Enable implementation specific send mode verbose trace.]"
+"\n"
+"\n[ address ... ]\n"
+"\n"
+"[+SEE ALSO?\b/bin/mail\b(1), \bMail\b(1)]"
+;
+
+#define optarg		opt_info.arg
+#define optnum		opt_info.num
+#define optind		opt_info.index
+
+#define getopt(c,v,u)	optget(v,u)
+
+#else
+
+static const char usage[] = "AFHINPQ:ST:b:c:defino:s:tu:v";
+
+#endif
 
 /*
  * Interrupt printing of the headers.
@@ -111,7 +228,8 @@ main(int argc, char** argv)
 	ef = 0;
 	opterr = 0;
 	for (;;) {
-		switch (getopt(argc, argv, "AFHINPQ:ST:b:c:defino:s:tu:v")) {
+		switch (getopt(argc, argv, usage)) {
+		case 0:
 		case EOF:
 			break;
 		case 'A':
@@ -193,6 +311,10 @@ main(int argc, char** argv)
 			state.var.quiet = state.on;
 			continue;
 		case 'f':
+#if _PACKAGE_ast
+			if (!(ef = opt_info.arg))
+				ef = "&";
+#else
 			/*
 			 * User is specifying file to "edit" with Mail,
 			 * as opposed to reading system mailbox.
@@ -206,6 +328,7 @@ main(int argc, char** argv)
 				ef = argv[optind++];
 			else
 				ef = "&";
+#endif
 			continue;
 		case 'i':
 			/*
@@ -253,10 +376,20 @@ main(int argc, char** argv)
 			 */
 			op = setopt(op, "verbose", NiL);
 			continue;
+#if _PACKAGE_ast
+		case '?':
+			error(ERROR_USAGE|4, "%s", opt_info.arg);
+			break;
+		case ':':
+			error(2, "%s", opt_info.arg);
+			break;
+#else
 		case '?':
 			note(FATAL, "\
 Usage: mail [-o [no]name[=value]] [-s subject] [-c cc] [-b bcc] to ...\n\
        mail [-o [no]name[=value]] [-f [folder]]");
+			break;
+#endif
 		}
 		break;
 	}

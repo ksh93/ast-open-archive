@@ -31,6 +31,7 @@ static int
 sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 {
 	register Sfgzip_t*	gz = (Sfgzip_t*)dp;
+	int			f;
 	int			r;
 
 	NoP(sp);
@@ -58,9 +59,11 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	case SF_FINAL:
 		if (gz->gz)
 		{
+			SFDCNEXT(sp, f);
 			if (r = gzclose(gz->gz) ? -1 : 0)
 				sp->_flags |= SF_ERROR;
 			gz->gz = 0;
+			SFDCPREV(sp, f);
 		}
 		else
 			r = 0;

@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2003-11-19 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2004-02-14 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -62,7 +62,7 @@
 	D| \# define %|
 	B| \# if|
 	E| \# endif|
-	I| \# include <%>|A.STD.INCLUDE|
+	I| \# include <%>|A.STD.INCLUDE|M$$(%:S:?$$(%)??)|
 	I| \# include "%"|A.LCL.INCLUDE|$(prefixinclude:/0//:?M$$$(.PREFIX.INCLUDE.)|??)
 	I| \# pragma library "%"|A.VIRTUAL|A.ACCEPT|M.LIBRARY.$$(%)|
 
@@ -197,11 +197,6 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 .COBOL.MAIN : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
 	if COBOLMAIN && "$(<<<<:B:N=$(<<:B))"
 		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLMAIN)
-	end
-
-.MAIN.cob : .FUNCTION
-	if "$(%%)" == "MAIN"
-		return .COBOL.MAIN
 	end
 
 .SCAN.cob : .SCAN

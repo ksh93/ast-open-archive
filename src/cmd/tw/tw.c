@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2003-01-10 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2003-09-23 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -42,7 +42,7 @@ USAGE_LICENSE
 "	and appended to the end of the \aarg\alist and \acmd\a is executed"
 "	by the equivalent of \bexecvp\b(2). \acmd\a will be executed 0 or more"
 "	times, depending the number of generated pathname arguments.]"
-"[+?If the last option is \b-\b and \b--find\b was not specified then the"
+"[+?If the last option is \b-\b and \b--fast\b was not specified then the"
 "	pathnames are read, one per line, from the standard input, the"
 "	\b--directory\b options are ignored, and the directory tree is not"
 "	traversed.]"
@@ -596,7 +596,7 @@ main(int argc, register char** argv)
 			state.icase = 1;
 			continue;
 		case 'L':
-			state.ftwflags &= ~(FTW_META|FTW_PHYSICAL);
+			state.ftwflags &= ~(FTW_META|FTW_PHYSICAL|FTW_SEEDOTDIR);
 			continue;
 		case 'P':
 			state.ftwflags &= ~FTW_META;

@@ -59,6 +59,7 @@
  * Diomidis Spinellis <dds@doc.ic.ac.uk>.
  */
 
+#include <sfio_t.h>
 #include <ast.h>
 #include <sfdcgzip.h>
 
@@ -457,6 +458,7 @@ static int
 lzw_except(Sfio_t* f, int op, void* val, Sfdisc_t* dp)
 {
 	register LZW_t*	zs = (LZW_t*)dp;
+	int		flags;
 	int		r;
 
 	NoP(f);
@@ -471,6 +473,7 @@ lzw_except(Sfio_t* f, int op, void* val, Sfdisc_t* dp)
 		r = 0;
 		if (dp->writef)
 		{
+			SFDCNEXT(f, flags);
 			if (output(zs, f, (code_int) ent, dp) == -1)
 				r = -1;
 			else
@@ -479,6 +482,7 @@ lzw_except(Sfio_t* f, int op, void* val, Sfdisc_t* dp)
 				if (output(zs, f, (code_int) -1, dp) == -1)
 					r = -1;
 			}
+			SFDCPREV(f, flags);
 		}
 		if (op != SF_CLOSING)
 			free(dp);

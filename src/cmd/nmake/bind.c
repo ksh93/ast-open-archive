@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -42,19 +42,19 @@
 #define FIGNORE(s)	((s)[0]=='.'&&((s)[1]==0||(s)[1]=='.'&&(s)[2]==0))
 
 #if DEBUG
-#define DEBUGSOURCE(n,d,p) \
+#define DEBUGSOURCE(n,r,p) \
 	do \
 	{ \
 		if (error_info.trace <= -14) \
 		{ \
 			struct list*	q; \
-			message((-14, "  [%d] %s", n, (d)->name)); \
+			message((-14, "  [%d] %s", n, (r)->name)); \
 			for (q = p; q; q = q->next) \
 				message((-14, "      %s", q->rule->name)); \
 		} \
 	} while (0)
 #else
-#define DEBUGSOURCE(n,d,p)
+#define DEBUGSOURCE(n,r,p)
 #endif
 
 #if _WINIX

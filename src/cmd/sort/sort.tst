@@ -214,3 +214,61 @@ TEST 23 'stable sort'
 	EXEC	-s -r -k2,2
 		OUTPUT - $'2 A\n1 A'
 	EXEC	-s -r -k2,2r
+
+TEST 24 'fixed records'
+	EXEC	fixed%6
+		INPUT fixed%6 $'PDQRS\nBCDEF\nCD\nAB'
+		OUTPUT - $'AB\nBCDEF\nCD\nPDQRS'
+	EXEC	-R6 fixed%6
+		OUTPUT - $'BCDEF\nCD\nAB\nPDQRS'
+	EXEC	-R% fixed%6
+	EXEC	-R6 fixed%6.dat
+		INPUT fixed%6.dat $'PDQRS\nBCDEF\nCD\nAB'
+	EXEC	-R% fixed%6.dat
+	EXEC	fixed%6 fixed%7
+		INPUT fixed%7 $'UVWXYZ'
+		OUTPUT - $'AB
+BCDEF
+CD
+PDQRS
+UVWXYZ'
+	EXEC	-R6 fixed%6 fixed%6
+		OUTPUT - $'BCDEF
+BCDEF
+CD
+AB
+CD
+AB
+PDQRS
+PDQRS'
+	EXEC	-R% fixed%6 fixed%6
+	EXEC	-R% fixed%6 fixed_6
+		INPUT fixed_6 $'PDQRS\nBCDEF\nCD\nAB'
+	EXEC	-R6 fixed%6 fixed_6
+	EXEC	-R% fixed_6 fixed%6
+	EXEC	-R6 fixed_6 fixed%6
+	EXEC	-R6 fixed%6 fixed%7
+		OUTPUT -n - $'BCDEF
+CD
+AB
+PDQRS
+UVWXYZ'
+		ERROR - $'sort: warning: incomplete record length=1'
+	EXEC	-R% fixed%6 fixed%7
+		OUTPUT -
+		ERROR - $'sort: fixed%7: file fixed record length mismatch -- 6 expected
+Usage: sort [-bdfingpMrcmusSLvZ] [-k pos1[,pos2]|.reclen|.position.length]]]
+            [-K pos] [-R format] [-C codeset|from:to] [-J seed] [-t tab-char]
+            [-j processes] [-o output] [-l library[,name=value...]]
+            [-T tempdir] [-x method] [-z type[size]] [-y size] [-X test]
+            [-D level] [ file ... ]'
+		EXIT 2
+
+TEST 25 'fixed records and fields'
+	EXEC	-s -k .5 -k .2.2
+		INPUT - $'zbc2\nabc1'
+		OUTPUT - $'zbc2\nabc1'
+	EXEC	-s -k 5:2:1
+	EXEC	-s -k .5 -k .2.3
+		OUTPUT - $'abc1\nzbc2'
+	EXEC	-s -k 5:3:1

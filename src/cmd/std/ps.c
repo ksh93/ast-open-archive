@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -38,7 +38,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2003-03-06 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2003-11-17 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -1015,24 +1015,6 @@ kids(register Ps_t* pp, int level)
 }
 
 /*
- * check if pp ancestor must be listed
- */
-
-static int
-ancestor(register Ps_t* pp)
-{
-	do
-	{
-		if (pp->ps->pss & (PSS_ANCESTOR|PSS_EXPLICIT|PSS_MATCHED))
-		{
-			pp->ps->pss |= PSS_ANCESTOR;
-			return 1;
-		}
-	} while (pp->ps->ppid != pp->ps->pid && (pp = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)));
-	return 0;
-}
-
-/*
  * ps() the selected procs
  */
 
@@ -1047,7 +1029,7 @@ list(void)
 	if (state.children || state.parents)
 	{
 		/*
-		 * recursively list the children/parents of selected processes
+		 * list the child/parent branches of selected processes
 		 */
 
 		if (state.parents)
@@ -1055,12 +1037,33 @@ list(void)
 				if (pp->ps->pss & (PSS_EXPLICIT|PSS_MATCHED))
 				{
 					xp = pp;
-					while ((xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->ps->pss)
+					do
+					{
 						xp->ps->pss |= PSS_PARENT;
+					} while ((xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->ps->pss);
+				}
+		if (state.children)
+			for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
+				if (!(pp->ps->pss & (PSS_EXPLICIT|PSS_MATCHED|PSS_PARENT)))
+				{
+					xp = pp;
+					do
+					{
+						if (xp->ps->pss & (PSS_ANCESTOR|PSS_EXPLICIT|PSS_MATCHED))
+						{
+							xp->ps->pss |= PSS_ANCESTOR;
+							xp = pp;
+							do
+							{
+								xp->ps->pss |= PSS_PARENT;
+							} while ((xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->ps->pss);
+							break;
+						}
+					} while (xp->ps->ppid != xp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)));
 				}
 		rp = zp = 0;
 		for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
-			if (pp->ps->pss || state.children && ancestor(pp))
+			if (pp->ps->pss)
 			{
 				if (pp->ps->ppid != pp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps->ppid)) && (xp->ps->pss & (PSS_EXPLICIT|PSS_MATCHED|PSS_PARENT)))
 				{
@@ -1464,12 +1467,8 @@ main(int argc, register char** argv)
 	 * set up the disciplines
 	 */
 
-	state.pssdisc.version = PSS_VERSION;
-	state.pssdisc.errorf = errorf;
-	memset(&od, 0, sizeof(od));
-	od.version = OPT_VERSION;
-	od.infof = optinfo;
-	opt_info.disc = &od;
+	pssinit(&state.pssdisc, errorf);
+	optinit(&od, optinfo);
 	memset(&kd, 0, sizeof(kd));
 	kd.key = offsetof(Key_t, name);
 	kd.size = -1;

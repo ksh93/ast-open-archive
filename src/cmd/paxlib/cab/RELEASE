@@ -1,0 +1,6 @@
+04-02-01 quantum cabinet decode requires 32k aligment (like lzx)
+04-01-23 fix folder sync logic
+04-01-22 fix old cabextract logic that assumed extension archives exist
+04-01-18 first codex release
+04-01-15 first release using cabextract private decoders
+04-01-03 first release

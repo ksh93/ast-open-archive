@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -36,32 +36,14 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 {
 	register Pzdll_t*	dll;
 	register Pzdllpz_t*	pzs;
-	register int		n;
-	register char*		id;
+	char*			id;
 	char			buf[64];
 	char			path[PATH_MAX];
 
-	/*
-	 * prepend local part of state.id to name if not already there
-	 */
-
-	if (id = strchr((char*)state.id, ':'))
+	if (id = strrchr(state.id, ':'))
 		id++;
 	else
 		id = (char*)state.id;
-	if (strchr(name, '/') || strchr(name, '\\'))
-		n = 0;
-	else
-	{
-		n = strlen(id);
-		if (strneq(name, id, n))
-			n = 0;
-		else
-		{
-			sfsprintf(buf, sizeof(buf), "%s%s", id, name);
-			name = (const char*)buf;
-		}
-	}
 
 	/*
 	 * see if the dll is already loaded
@@ -81,10 +63,10 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 		state.dll = dll;
 		if (ignore)
 			return 0;
-		if (!(dll->dll = dllfind(dll->name, NiL, RTLD_LAZY, path, sizeof(path))) && (!n || !(dll->dll = dllfind(dll->name + n, NiL, RTLD_LAZY, path, sizeof(path)))))
+		if (!(dll->dll = dllplug(id, dll->name, NiL, RTLD_LAZY, path, sizeof(path))))
 		{
 			if (pz->disc && pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %s", dll->name + n, dlerror());
+				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: %s", dll->name, dlerror());
 			return -1;
 		}
 
@@ -115,7 +97,7 @@ pzlib(register Pz_t* pz, register const char* name, int ignore)
 			pzs->pz = pz;
 			pzs->next = dll->pzs;
 			dll->pzs = pzs;
-			if (!(dll->usage = pzinit(pz, dll->name + n, dll->initf)))
+			if (!(dll->usage = pzinit(pz, dll->name, dll->initf)))
 				return -1;
 		}
 	}

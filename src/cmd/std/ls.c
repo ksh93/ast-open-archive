@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2003-09-11 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2004-02-26 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -600,6 +600,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			s = "@";
 		else if (S_ISDIR(st->st_mode))
 			s = "/";
+#ifdef S_ISDOOR
+		else if (S_ISDOOR(st->st_mode))
+			s = ">";
+#endif
 		else if (S_ISFIFO(st->st_mode))
 			s = "|";
 #ifdef S_ISSOCK
@@ -699,7 +703,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	else if (fp->fmt == 's' && arg)
 	{
 		if (strneq(arg, fmt_mode, sizeof(fmt_mode) - 1))
-			*ps = fmtmode(n, 1);
+			*ps = fmtmode(n, 0);
 		else if (strneq(arg, fmt_perm, sizeof(fmt_perm) - 1))
 			*ps = fmtperm(n & S_IPERM);
 		else
@@ -1383,7 +1387,7 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_PRINTABLE|LS_SHELL|LS_QUOTE|LS_ESCAPE;
 			break;
 		case 'L':
-			state.ftwflags &= ~(FTW_META|FTW_PHYSICAL);
+			state.ftwflags &= ~(FTW_META|FTW_PHYSICAL|FTW_SEEDOTDIR);
 			break;
 		case 'N':
 			state.lsflags &= ~LS_PRINTABLE;

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -135,12 +135,14 @@ struct parseinfo			/* recursive parse state stack	*/
 
 	int		argc;		/* local argc			*/
 	char*		name;		/* current level input name	*/
+	char*		here;		/* <<? termination string	*/
 	Sfio_t*		fp;		/* input file pointer		*/
 	Sfio_t*		ip;		/* readline write string	*/
 	char*		bp;		/* input buffer pointer		*/
 	char*		stashget;	/* loop body stash get		*/
 	char*		pushback;	/* line pushback pointer	*/
 	struct local*	local;		/* local variables		*/
+	int		checkhere;	/* possible <<?			*/
 	int		join;		/* join line			*/
 	int		line;		/* prev level input line number	*/
 	short		indent;		/* active indentation level	*/
@@ -637,6 +639,7 @@ readline(int lead)
 			if (sps[0] == state.coshell->msgfp || n > 1 && sps[1] == state.coshell->msgfp)
 				while (block(1));
 		} while (sps[0] != pp->fp && (n <= 1 || sps[1] != pp->fp));
+		pp->checkhere = 0;
 		n = 0;
 		for (;;)
 		{
@@ -819,6 +822,9 @@ readline(int lead)
 							goto newline;
 						}
 				break;
+			case '<':
+				pp->checkhere = 1;
+				break;
 			}
 			sfputc(pp->ip, c);
 		}
@@ -880,6 +886,17 @@ getline(Sfio_t* sp, int lead, int term)
 	struct control*	cp;
 	Namval_t*	nv;
 
+	if (pp->here && !lead)
+	{
+		t = pp->here;
+		pp->here = 0;
+		while ((s = sfgetr(pp->fp, '\n', 1)) && !streq(s, t))
+			sfputr(sp, s, term);
+		if (!s)
+			error(3, "here document terminator \"%s\" not found", t);
+		free(t);
+		return sfstrtell(sp) != 0;
+	}
 	while (s = lin = readline(lead))
 	{
 		indent = 0;
@@ -1787,6 +1804,23 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 	}
 	else if (op & OP_ACTION)
 	{
+		if (pp->checkhere)
+		{
+			b = sfstrbase(sp) + rhs_pos;
+			for (t = p - 1; t > b; t--)
+				if (*t == '<')
+				{
+					if (*(t - 1) == '<' && *(t + 1))
+					{
+						pp->here = strdup(t + 1);
+						for (t -= 2; t >= b && isspace(*t); t--);
+						*(t + 1) = 0;
+						if (!*b)
+							rhs_pos = -1;
+					}
+					break;
+				}
+		}
 		act_pos = ++p - sfstrbase(sp);
 		sfstrset(sp, act_pos);
 		while (getline(sp, 0, '\n'));
@@ -2097,7 +2131,7 @@ assertion(char* lhs, struct rule* opr, char* rhs, char* act, int op)
 			}
 			else if (set.op & A_scope)
 				r->dynamic |= D_scope;
-			if (!(set.rule.dynamic & D_dynamic) && isdynamic(r->name))
+			if (!(set.rule.dynamic & D_dynamic) && !(r->dynamic & D_scope) && isdynamic(r->name))
 				set.rule.dynamic |= D_dynamic;
 			if (r->property & P_use)
 				merge(r, &set.rule, MERGE_ATTR);

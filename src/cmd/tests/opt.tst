@@ -3484,6 +3484,51 @@ return=a option=-a name=--aaa arg=xx num=1
 return=a option=-a name=--aaa arg:=yy num=1'
 	EXEC pax "$usage" -a 1 --aaa=xx --aaa:=yy
 
+TEST 46 'html escapism'
+	usage=$'[-][+NAME?codex - encode/decode filter][+?Methods:]{[+and?things]{[+of?this <= 64.]:[nature][+govern?ator]}}\n\n[ [ <,> ] method [ <,>,| method ... ] ]\n\n[+SEE ALSO?\bcodex\b(3), \bvcodex\b(3)]'
+	EXEC codex "$usage" --html
+		EXIT 2
+		OUTPUT - $'return=? option=- name=--html num=0'
+		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<TITLE>codex man document</TITLE>
+</HEAD>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;codex&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="." title="Index">USER COMMANDS</A><TH align=right>codex&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<HR>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
+<DT>codex - encode/decode filter
+<P>
+</DL>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
+<DT><B>codex</B> &#0091; <I>options</I> &#0093; &#0091; &#0091; &lt;,&gt; &#0093; method &#0091; &lt;,&gt;,| method
+... &#0093; &#0093;
+<P>
+<DT>Methods:
+<DL compact>
+<DL compact>
+<DT><A name="and"><B>and</B></A><DD>things
+<DL compact>
+<DL compact>
+<DT><A name="of=nature"><B>of=<I>nature</I></B></A><DD>this &lt;= 64.
+<DT><A name="govern"><B>govern</B></A><DD>ator
+</DL>
+</DL>
+</DL>
+</DL>
+</DL>
+<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DL compact>
+<DT><NOBR><A href="../man3/codex.html"><B>codex</B></A>(3),</NOBR> <NOBR><A href="../man3/vcodex.html"><B>vcodex</B></A>(3)</NOBR>
+</DL></DL>
+</BODY>
+</HTML>'
+
 TEST 99 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
 	EXEC ls "$usage" --man

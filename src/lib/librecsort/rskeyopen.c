@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -30,7 +30,7 @@
 
 #include "rskeyhdr.h"
 
-static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2003-09-04 $\0\n";
+static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2004-02-11 $\0\n";
 
 static const char lib[] = "librecsort:rskey";
 

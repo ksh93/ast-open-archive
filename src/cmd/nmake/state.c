@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -68,6 +68,28 @@ catrule(register char* s1, register char* s2, register char* s3, int force)
 }
 
 /*
+ * return the state file name
+ * assumes the main makefile has already been read
+ */
+
+char*
+statefile(void)
+{
+	Sfio_t*		sp;
+
+	if (!state.statefile && state.makefile)
+	{
+		sp = sfstropen();
+		if (!state.writestate || streq(state.writestate, "-"))
+			edit(sp, state.makefile, DELETE, KEEP, external.state);
+		else
+			expand(sp, state.writestate);
+		state.statefile = strdup(sfstruse(sp));
+	}
+	return state.statefile;
+}
+
+/*
  * reconcile s with state view from r
  *
  * NOTE: requires state.maxview>0 && 0<=view<=state.maxview
@@ -103,7 +125,7 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 				n = sfstrtell(tmp);
 			}
 			else n = 0;
-			edit(tmp, state.statefile, state.view[view].path, KEEP, KEEP);
+			edit(tmp, statefile(), state.view[view].path, KEEP, KEEP);
 			sfputc(tmp, 0);
 			file = sfstrset(tmp, n);
 			if (fp = sfopen(NiL, file, "br"))
@@ -284,7 +306,7 @@ staterule(int op, register struct rule* r, char* var, int force)
 		if (s = getrule(nam))
 			nam = s->name;
 	}
-	if (state.maxview && state.readstate && state.statefile && !nobind)
+	if (state.maxview && state.readstate && state.makefile && !nobind)
 	{
 		b = &r->checked[op];
 		k = 0;
@@ -465,8 +487,10 @@ badlock(char* file, int view, unsigned long date)
 
 	if ((d = (CURTIME - date)) > 24 * 60 * 60)
 		error(1, "%s is probably an invalid lock file", file);
-	else
+	else if (d > 0)
 		error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(d, 1));
+	else
+		error(1, "another make is running on %s in %s", state.makefile, state.view[view].path);
 	error(3, "use -%c to override", OPT(OPT_ignorelock));
 }
 
@@ -492,20 +516,21 @@ badlock(char* file, int view, unsigned long date)
 #define LOCKTIME(p,m)	((unsigned long)((m)?(p)->st_mtime:(p)->st_ctime))
 
 void
-lockstate(register char* file)
+lockstate(int set)
 {
 	register int		fd;
+	register char*		file;
 	struct stat		st;
 
 	static char*		lockfile;
 	static unsigned long	locktime;
 	static int		lockmtime;
 
-	if (file)
+	if (set)
 	{
 		if (!state.exec || state.virtualdot || !state.writestate)
 			return;
-		edit(internal.nam, file, DELETE, KEEP, external.lock);
+		edit(internal.nam, statefile(), DELETE, KEEP, external.lock);
 		file = strdup(sfstruse(internal.nam));
 		if (!state.ignorelock)
 		{
@@ -569,21 +594,25 @@ lockstate(register char* file)
  */
 
 void
-readstate(char* file)
+readstate(void)
 {
 	register Sfio_t*	fp;
+	char*			file;
 
-	if (file)
+	if (state.makefile)
 	{
-		lockstate(file);
-		if (state.readstate && (fp = sfopen(NiL, file, "br")))
+		lockstate(1);
+		if (state.readstate && (fp = sfopen(NiL, file = statefile(), "br")))
 		{
 			state.stateview = 0;
 			message((-2, "loading state file %s", file));
 			makerule(file)->dynamic |= D_built;
-			if (load(fp, file, 10) > 0) state.view[0].flags |= BIND_EXISTS;
-			else if (!state.corrupt) error(3, "use -%c%c to accept current state or -%c to remake", OPT(OPT_accept), OPT(OPT_readstate), OPT(OPT_readstate));
-			else if (*state.corrupt == 'a') state.accept = 1;
+			if (load(fp, file, 10) > 0)
+				state.view[0].flags |= BIND_EXISTS;
+			else if (!state.corrupt)
+				error(3, "use -%c%c to accept current state or -%c to remake", OPT(OPT_accept), OPT(OPT_readstate), OPT(OPT_readstate));
+			else if (*state.corrupt == 'a')
+				state.accept = 1;
 			state.stateview = -1;
 			sfclose(fp);
 		}
@@ -743,21 +772,26 @@ candidates(void)
 void
 savestate(void)
 {
-	if (state.statefile && state.user && state.compile == COMPILED)
+	char*	file;
+
+	if (state.makefile && state.user && state.compile == COMPILED)
 	{
 		if (state.writestate)
 		{
-			if (state.finish) state.compile = SAVED;
+			if (state.finish)
+				state.compile = SAVED;
 			if (state.exec && state.savestate)
 			{
-				message((-2, "saving state in %s", state.statefile));
+				file = statefile();
+				message((-2, "saving state in %s", file));
 				state.stateview = 0;
-				compile(state.statefile, NiL);
+				compile(file, NiL);
 				state.stateview = -1;
 				state.savestate = 0;
 			}
 		}
-		if (state.finish) lockstate(NiL);
+		if (state.finish)
+			lockstate(0);
 	}
 }
 

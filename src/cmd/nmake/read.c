@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -93,9 +93,11 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 	char*		name;
 	char*		b;
 	char*		e;
+	char*		objectfile;
 	struct rule*	x;
 	Sfio_t*		fp;
 
+	objectfile = 0;
 	name = r->name;
 	if (!state.makefile)
 	{
@@ -107,10 +109,11 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 		setvar(external.file, r->name, 0)->property |= V_compiled;
 		edit(fp, r->name, DELETE, KEEP, KEEP);
 		state.makefile = strdup(sfstruse(fp));
-		edit(fp, r->name, DELETE, KEEP, external.object);
-		state.objectfile = strdup(sfstruse(fp));
-		edit(fp, r->name, DELETE, KEEP, external.state);
-		state.statefile = strdup(sfstruse(fp));
+		if (!state.writeobject || streq(state.writeobject, "-"))
+			edit(fp, r->name, DELETE, KEEP, external.object);
+		else
+			expand(fp, state.writeobject);
+		objectfile = state.objectfile = strdup(sfstruse(fp));
 		sfstrclose(fp);
 	}
 	needrules = !state.base && !state.rules;
@@ -141,9 +144,13 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 	if (state.global || !state.forceread && (!(type & COMP_FILE) || needrules))
 	{
 		fp = sfstropen();
-		edit(fp, r->name, DELETE, KEEP, external.object);
+		if (!objectfile)
+		{
+			edit(fp, r->name, DELETE, KEEP, external.object);
+			objectfile = sfstruse(fp);
+		}
 		state.init++;
-		x = bindfile(NiL, sfstruse(fp), 0);
+		x = bindfile(NiL, objectfile, 0);
 		state.init--;
 		sfstrclose(fp);
 		if (!x || !x->time)
@@ -256,6 +263,7 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 			{
 				int	c;
 				int	d;
+				int	old;
 
 				if (n > 0)
 				{
@@ -270,6 +278,7 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 				 * checking for base rules
 				 */
 
+				old = 0;
 				splice = 0;
 				b = s;
 				c = *(s + n);
@@ -298,10 +307,15 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 							break;
 						}
 						else if (!strmatch(s, "assert|comment|define|elif|else|endif|endmac|error|ident|if|ifdef|ifndef|include|line|macdef|pragma|unassert|undef|warning"))
-							punt(1);
+							old = 1;
 						else if (!preprocess)
 							preprocess = 1;
 						*t = d;
+					}
+					else if (*s == '<' && *(s + 1) == '<')
+					{
+						old = preprocess = 0;
+						break;
 					}
 					else
 					{
@@ -311,15 +325,44 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 						{
 							for (s += 5; *s == ' ' || *s == '\t'; s++);
 							rules(*s == '/' && *(s + 1) == '*' ? null : s);
+							old = 0;
 							break;
 						}
-						else if (*s == '/' && *++s == '*')
+						else if (strneq(s, ".SOURCE", 7) && (*(s + 7) == '.' || *(s + 7) == ':' || isspace(*(s + 7))))
 						{
-							if (!(t = e))
+							old = 0;
+							break;
+						}
+						else
+						{
+							d = ':';
+							while (*s)
+							{
+								if (*s == '/' && *(s + 1) == '*' && (isspace(*(s + 2)) || !*(s + 2)))
+									break;
+								else if (*s == d)
+								{
+									if (*++s == d)
+										s++;
+									else if (isalnum(*s))
+									{
+										while (isalnum(*s))
+											s++;
+										if (*s == d)
+											break;
+									}
+									d = 0;
+								}
+								while (*s && *s != d && !isspace(*s))
+									s++;
+								while (isspace(*s))
+									s++;
+							}
+							if (*s)
+							{
+								old = 0;
 								break;
-							while (t > s && isspace(*--t));
-							if (*t-- != '/' || t <= s || *t != '*')
-								break;
+							}
 						}
 					}
 					if (!(s = e))
@@ -330,6 +373,8 @@ readfp(Sfio_t* sp, register struct rule* r, int type)
 				if (e)
 					*e = '\n';
 				*(b + n) = c;
+				if (old)
+					punt(1);
 			}
 			if (!state.rules)
 				state.rules = getval(external.rules, VAL_PRIMARY);

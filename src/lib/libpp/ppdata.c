@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -52,7 +52,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2003-11-25 $\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2004-01-28 $\0\n";
 
 #include "pplib.h"
 

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2003 AT&T Corp.                *
+*                Copyright (c) 1995-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -28,7 +28,7 @@
  * see testmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2003-01-13 $\0\n";
+static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 2003-10-17 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -318,6 +318,7 @@ bad(char* comment, char* re, char* s, int expand)
 static void
 escape(char* s)
 {
+	char*	e;
 	char*	t;
 	char*	q;
 	int	c;
@@ -361,31 +362,38 @@ escape(char* s)
 			case 'v':
 				*t = '\v';
 				break;
+			case 'u':
 			case 'x':
 				c = 0;
-				q = ++s;
-				for (;;)
+				q = c == 'u' ? (s + 5) : (char*)0;
+				e = s + 1;
+				while (!e || !q || s < q)
 				{
-					switch (*s)
+					switch (*++s)
 					{
 					case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-						c = (c << 4) + *s++ - 'a' + 10;
+						c = (c << 4) + *s - 'a' + 10;
 						continue;
 					case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-						c = (c << 4) + *s++ - 'A' + 10;
+						c = (c << 4) + *s - 'A' + 10;
 						continue;
 					case '0': case '1': case '2': case '3': case '4':
 					case '5': case '6': case '7': case '8': case '9':
-						c = (c << 4) + *s++ - '0';
+						c = (c << 4) + *s - '0';
 						continue;
 					case '{':
-						if (q != s)
+					case '[':
+						if (s != e)
+						{
+							s--;
 							break;
-						s++;
+						}
+						e = 0;
 						continue;
 					case '}':
-						if (*q == '{')
-							s++;
+					case ']':
+						if (e)
+							s--;
 						break;
 					default:
 						s--;
@@ -803,6 +811,9 @@ main(int argc, char** argv)
 				continue;
 			case 'x':
 				cflags = NOTEST;
+				continue;
+			case 'y':
+				eflags = NOTEST;
 				continue;
 			case 'z':
 				cflags = NOTEST;

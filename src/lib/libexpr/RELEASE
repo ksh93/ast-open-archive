@@ -1,3 +1,4 @@
+04-02-26 add scanf() and sscanf()
 02-10-02 exeval.c: tmform() => fmttime(), static nmbuf[] => fmtbuf()
 02-09-11 expr.h: move exbuiltin[] to private exlib.h
 99-09-22 exparse.y,exeval.c: add for(ID[DYNAMIC])

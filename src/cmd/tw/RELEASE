@@ -1,3 +1,8 @@
+04-02-26 tw.tst: add scanf tests
+03-12-02 find.c: -print does not require leaf stat -- duh
+03-11-16 find.tst,tw.tst: add leading . pattern match tests
+03-11-14 updatedb.sh: add /proc to default prune paths
+03-09-23 tw.c: -L => ~FTS_SEEDOTDIR
 02-01-10 tw,find: add sfsync(sfstdout) check
 02-11-07 tw: add type==DOOR (solaris S_ISDOOR)
 	 find: add -type D (solaris S_ISDOOR)

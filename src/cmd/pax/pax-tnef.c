@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -48,7 +48,7 @@ tnef_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, un
 	if (size < 6)
 		return 0;
 	magic = TNEF_MAGIC;
-	if ((ap->swap = swapop(&magic, buf, 4)) < 0 || bread(ap, NiL, (off_t)6, (off_t)6, 0) != 6)
+	if ((ap->swap = swapop(&magic, buf, 4)) < 0 || paxread(pax, ap, NiL, (off_t)6, (off_t)6, 0) != 6)
 		return 0;
 	if (!(tnef = newof(0, Tnef_t, 1, 0)))
 		nospace();
@@ -74,7 +74,7 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	size_t			part;
 	Tm_t			tm;
 
-	*(f->name = stash(&ap->stash.head, NiL, PATH_MAX)) = 0;
+	*(f->name = paxstash(pax, &ap->stash.head, NiL, PATH_MAX)) = 0;
 	f->st->st_dev = 0;
 	f->st->st_ino = 0;
 	f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
@@ -84,7 +84,7 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	IDEVICE(f->st, 0);
 	f->st->st_mtime = f->st->st_ctime = f->st->st_atime = NOW;
 	f->st->st_size = 0;
-	while (bread(ap, s = state.tmp.buffer, (off_t)0, (off_t)9, 0) > 0)
+	while (paxread(pax, ap, s = state.tmp.buffer, (off_t)0, (off_t)9, 0) > 0)
 	{
 		level = swapget(ap->swap, s + 0, 1);
 		n = swapget(ap->swap, s + 1, 4);
@@ -101,7 +101,7 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 				if (name == 0x800f)
 				{
 					f->st->st_size = size;
-					tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0);
+					tnef->offset = paxseek(pax, ap, (off_t)0, SEEK_CUR, 0);
 				}
 				else
 					error(1, "%s: %s format 0x%04x attribute ignored", ap->name, ap->format->name, name);
@@ -109,7 +109,7 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			while (size > part)
 			{
 				size -= part;
-				if (!(s = bget(ap, part, NiL)))
+				if (!(s = paxget(pax, ap, part, NiL)))
 					error(3, "%s: %s format 0x%04x attribute data truncated -- %d expected", ap->name, ap->format->name, name, part);
 				x = (unsigned char*)s;
 				e = s + part;
@@ -117,7 +117,7 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 					n += *x++;
 			}
 		}
-		if (!(s = bget(ap, size + 2, NiL)))
+		if (!(s = paxget(pax, ap, size + 2, NiL)))
 			error(3, "%s: %s format 0x%04x attribute data truncated -- %d expected", ap->name, ap->format->name, name, size);
 		checksum = swapget(ap->swap, s + size, 2);
 		x = (unsigned char*)s;
@@ -132,11 +132,11 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			{
 			case 0x800f: /* data */
 				f->st->st_size = size;
-				tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0) - size - 2;
+				tnef->offset = paxseek(pax, ap, (off_t)0, SEEK_CUR, 0) - size - 2;
 				break;
 			case 0x8010: /* title */
 				if (!f->name)
-					f->name = stash(&ap->stash.head, s, size);
+					f->name = paxstash(pax, &ap->stash.head, s, size);
 				break;
 			case 0x8013: /* date */
 				if (type == 0x0003 && size >= 12)
@@ -188,7 +188,7 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 								z = swapget(ap->swap, s, 4); s += 4;
 								z = roundof(z, 4);
 								if (name == 0x3707)
-									f->name = stash(&ap->stash.head, s, z);
+									f->name = paxstash(pax, &ap->stash.head, s, z);
 								s += z;
 							}
 							break;
@@ -196,8 +196,8 @@ tnef_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 					}
 				}
 				n = tnef->offset;
-				tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0);
-				if (bseek(ap, n, SEEK_SET, 1) != n)
+				tnef->offset = paxseek(pax, ap, (off_t)0, SEEK_CUR, 0);
+				if (paxseek(pax, ap, n, SEEK_SET, 1) != n)
 					error(3, "%s: %s input must be seekable", ap->name, ap->format->name);
 				return 1;
 			}
@@ -223,7 +223,7 @@ tnef_gettrailer(Pax_t* pax, Archive_t* ap, File_t* f)
 {
 	register Tnef_t*	tnef = (Tnef_t*)ap->data;
 
-	if (bseek(ap, tnef->offset, SEEK_SET, 1) != tnef->offset)
+	if (paxseek(pax, ap, tnef->offset, SEEK_SET, 1) != tnef->offset)
 		error(3, "%s: %s format seek error", ap->name, ap->format->name);
 	return 1;
 }
@@ -238,7 +238,7 @@ Format_t	pax_tnef_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,
-	pax_tnef_next,
+	PAXNEXT(pax_tnef_next),
 	0,
 	tnef_done,
 	tnef_getprologue,
@@ -246,3 +246,5 @@ Format_t	pax_tnef_format =
 	0,
 	tnef_gettrailer,
 };
+
+PAXLIB(&pax_tnef_format)

@@ -25,10 +25,10 @@ $(ID) 2.0 :LIBRARY: BUGS NOTES RELEASE HISTORY pp.3 \
 "sol*.i386"	:NOOPTIMIZE: ppcpp.c pplex.c
 
 ppdef.h : gentab pp.tab
-	PATH=.:$PATH $(*:N=*gentab) -d $(*:N=*.tab) > $(<)
+	$(*:N=*gentab:P=A) -d $(*:N=*.tab) > $(<)
 
 pptab.h : gentab pp.tab
-	PATH=.:$PATH $(*:N=*gentab) -t $(*:N=*.tab) > $(<)
+	$(*:N=*gentab:P=A) -t $(*:N=*.tab) > $(<)
 
 :INSTALLDIR: gentab ppsym
 
@@ -99,7 +99,7 @@ probe.ini : (CC.HOSTTYPE) probe.win32
 	w
 	q
 	!
-	$(HOSTCC) -o $(tmp).exe 1.$(tmp).c
+	$(CC.NATIVE|CC) -o $(tmp).exe 1.$(tmp).c
 	./$(tmp).exe > $(<)
 	$(RM) -f 1.$(tmp).c $(tmp).exe
 

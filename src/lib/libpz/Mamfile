@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -25,8 +25,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -53,7 +53,7 @@ exec - do	case $i in
 exec - 	"pz"|pz)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -L${PACKAGE_ast_LIB} ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
@@ -103,7 +103,6 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -276,7 +275,7 @@ done ../../../include/ast/int.h
 prev pzlib.h implicit
 done pzconvert.c
 prev pzconvert.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzconvert.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzconvert.c
 done pzconvert.o generated
 make sfdcpzip.o
 make sfdcpzip.c
@@ -297,49 +296,20 @@ exec - (ranlib libpz.a) >/dev/null 2>&1 || true
 done libpz.a generated
 done pz virtual
 prev libpz.a archive
-make pzline
+make line
 make libpzline.a archive
-make pzline.req
-exec - set -
-exec - echo 'main(){return(0);}' > 1.${COTEMP}.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    -c 1.${COTEMP}.c &&
-exec - x=`${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o -l'*' 2>&1 | sed -e 's/[][()+@?]/#/g' || :` &&
-exec - {
-exec - case "" in
-exec - *?)	echo " " ;;
-exec - esac
-exec - for i in pzline pz ast
-exec - do	case $i in
-exec - 	"pzline"|pzline|pz)
-exec - 		;;
-exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 			*$x*)	case `{ ${CC} ${mam_cc_FLAGS} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
-exec - 				*$x*) continue ;;
-exec - 				esac
-exec - 				;;
-exec - 			esac
-exec - 		fi
-exec - 		;;
-exec - 	esac
-exec - 	echo " -l$i"
-exec - done
-exec - } > pzline.req
-exec - rm -f 1.${COTEMP}.*
-done pzline.req generated
 make pzline.o
 make pzline.c
 prev ../../../include/ast/error.h implicit
 prev pzip.h implicit
 done pzline.c
 prev pzline.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzline.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzline.c
 done pzline.o generated
 exec - ${AR} cr libpzline.a pzline.o
 exec - (ranlib libpzline.a) >/dev/null 2>&1 || true
 done libpzline.a generated
-done pzline virtual
-prev libpzline.a archive
+done line virtual
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
@@ -375,15 +345,6 @@ prev ../../../lib/lib
 prev pz.req
 exec - test '' = 'pz.req' || ${STDCMP} 2>/dev/null -s pz.req ${PACKAGE_ast_LIB}/lib/pz || { ${STDMV} ${PACKAGE_ast_LIB}/lib/pz ${PACKAGE_ast_LIB}/lib/pz.old 2>/dev/null || true; ${STDCP} pz.req ${PACKAGE_ast_LIB}/lib/pz  		    		    ;}
 done ../../../lib/lib/pz generated
-make ../../../lib/libpzline.a archive
-prev libpzline.a archive
-exec - test '' = 'libpzline.a' || ${STDCMP} 2>/dev/null -s libpzline.a ${PACKAGE_ast_LIB}/libpzline.a || { ${STDMV} ${PACKAGE_ast_LIB}/libpzline.a ${PACKAGE_ast_LIB}/libpzline.a.old 2>/dev/null || true; ${STDCP} libpzline.a ${PACKAGE_ast_LIB}/libpzline.a  		    		    ;}
-exec - (ranlib ${PACKAGE_ast_LIB}/libpzline.a) >/dev/null 2>&1 || true
-done ../../../lib/libpzline.a generated
-make ../../../lib/lib/pzline
-prev pzline.req
-exec - test '' = 'pzline.req' || ${STDCMP} 2>/dev/null -s pzline.req ${PACKAGE_ast_LIB}/lib/pzline || { ${STDMV} ${PACKAGE_ast_LIB}/lib/pzline ${PACKAGE_ast_LIB}/lib/pzline.old 2>/dev/null || true; ${STDCP} pzline.req ${PACKAGE_ast_LIB}/lib/pzline  		    		    ;}
-done ../../../lib/lib/pzline generated
 make ../../../include/ast
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_INCLUDE}

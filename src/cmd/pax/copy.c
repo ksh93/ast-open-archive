@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -232,51 +232,6 @@ filein(register Archive_t* ap, register File_t* f)
 		else if (st.st_size != f->delta.base->size || state.modtime && st.st_mtime != f->st->st_mtime)
 			error(1, "%s: changed from base archive", f->name);
 		break;
-	case DELTA_zip:
-		if ((wfd = openout(ap, f)) >= 0)
-		{
-			Compress_format_t*	zip = (Compress_format_t*)getformat(FMT_ZIP, 1)->data;
-
-			Proc_t*		proc;
-			long		ops[2];
-			char*		cmd[3];
-
-			cmd[0] = zip->undo[0];
-			cmd[1] = zip->undo[1];
-			cmd[2] = 0;
-			ops[0] = PROC_FD_DUP(wfd, 1, PROC_FD_PARENT|PROC_FD_CHILD);
-			ops[1] = 0;
-			if (!(proc = procopen(*cmd, cmd, NiL, ops, PROC_WRITE)))
-				error(3, "%s: cannot execute %s filter", f->name, zip->undo[0]);
-			for (c = f->st->st_size; c > 0; c -= n)
-			{
-				n = (c > state.buffersize) ? state.buffersize : c;
-				if (!(s = bget(ap, n, NiL)))
-				{
-					error(ERROR_SYSTEM|2, "%s: read error", f->name);
-					break;
-				}
-				if (write(proc->wfd, s, n) != n)
-				{
-					error(ERROR_SYSTEM|2, "%s: write error", f->name);
-					break;
-				}
-			}
-
-			/*
-			 * some versions of gunzip look past EOF and bomb
-			 * if nothing's there; the extra bytes should be
-			 * benign for other implementations
-			 */
-
-			if (write(proc->wfd, "\0\0\0", 4) != 4)
-				error(ERROR_SYSTEM|2, "%s: pad write error", f->name);
-			if (n = procclose(proc))
-				error(2, "%s: %s filter exit status %d", f->name, zip->undo[0], n);
-			setfile(ap, f);
-		}
-		else goto skip;
-		break;
 	case DELTA_delete:
 		if (!f->delta.base)
 			error(3, "%s: base archive mismatch [%s#%d]", f->name, __FILE__, __LINE__);
@@ -463,10 +418,15 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 		for (;;)
 		{
 			if (s = state.peekfile)
+			{
 				state.peekfile = 0;
+				c = state.peeklen;
+			}
 			else if (!(s = sfgetr(sfstdin, '\n', 1)))
 				break;
-			sfprintf(state.tmp.lst, "%s", s);
+			else
+				c = sfvalue(sfstdin) - 1;
+			sfwrite(state.tmp.lst, s, c);
 			s = sfstruse(state.tmp.lst);
 			flags = state.ftwflags;
 			if (state.filter.line)

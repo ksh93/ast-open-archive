@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -52,7 +52,7 @@ scan(void)
 		while (dle = dllsread(dls))
 			if (dll = dlopen(dle->path, RTLD_LAZY))
 			{
-				if ((init = (Paxlib_f)dlsym(dll, "paxlib")) && (lp = (*init)(&state)))
+				if ((init = (Paxlib_f)dlllook(dll, "pax_lib")) && (lp = (*init)(&state)))
 					fp = fp->next = lp;
 				else
 					dlclose(dll);
@@ -489,7 +489,6 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 					{
 					case 0:
 					case DELTA_pass:
-					case DELTA_zip:
 						return 0;
 					case DELTA_create:
 						s = "create";

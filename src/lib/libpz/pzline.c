@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2002 AT&T Corp.                *
+*                Copyright (c) 1998-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -173,11 +173,7 @@ lineevent(Pz_t* pz, int op, void* data, size_t size, Pzdisc_t* disc)
  * install the pzip verification discipline
  */
 
-#ifdef __EXPORT__
-#define extern	__EXPORT__
-#endif
-
-extern const char*
+const char*
 pz_init(Pz_t* pz, Pzdisc_t* disc)
 {
 	register State_t*	state;

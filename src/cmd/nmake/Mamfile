@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -25,8 +25,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -290,12 +290,11 @@ exec - ${CC} ${mam_cc_FLAGS} ${debug?1?${mam_cc_DEBUG} -D_BLD_DEBUG??}  -I. -I${
 done object.o generated
 make option.o
 make option.c
-prev ../../../include/ast/option.h implicit
 prev options.h implicit
 prev make.h implicit
 done option.c
 prev option.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
 make parse.o
 make parse.c
@@ -357,7 +356,7 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.3 2003-09-19 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.4 2004-02-29 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -592,7 +591,7 @@ make ${INSTALLROOT}/lib/make/makerules.mo
 prev ${INSTALLROOT}/lib/make
 make Makerules.mo
 prev Makerules.mk
-exec - ${MAKE} $MAKEFLAGS --base --compile --file=Makerules.mk
+exec - ${NMAKE} ${NMAKEFLAGS} --base --compile --file=Makerules.mk
 done Makerules.mo generated
 exec - test '' = 'Makerules.mo' || ${STDCMP} 2>/dev/null -s Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo || { ${STDMV} ${INSTALLROOT}/lib/make/makerules.mo ${INSTALLROOT}/lib/make/makerules.mo.old 2>/dev/null || true; ${STDCP} Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo  		    		    ;}
 done ${INSTALLROOT}/lib/make/makerules.mo virtual

@@ -5,11 +5,12 @@
  */
 
 #include "mailx.h"
+#include "stamp.h"
 
-static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2003-01-17 $\0\n";
+static const char	id[] = STAMP;
 
 static const char	terms[] = "\n\
-@(#)Copyright (c) 1980, 1993, 1996, 2002\n\
+@(#)Copyright (c) 1980, 1993, 1996 - 2004\n\
 \tThe Regents of the University of California. All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
@@ -63,6 +64,8 @@ static const struct cmd	cmdtab[] =
 	X("[ attachment [ file ... ] ]\nEquivalent to get except the ${MAILCAP} command is not executed."),
 "J[oin]",	CMD(Join),		R|I|MSGLIST,	0,	MMNDEL,
 	X("[ message ...]\nEquivalent to the command sequence Reply ~m ~v."),
+"K",	CMD(mark),		STRLIST,	0,	0,
+	X("[ message ... ]\nAn alias for ``mark [ message ... ] nospam''."),
 "M[ore]",	CMD(More),		MSGLIST,	0,	MMNDEL,
 	X("[ message ...]\nPipe the selected messages and all headers through ${PAGER}."),
 "Pa[ge]",	CMD(More),		MSGLIST,	0,	MMNDEL,
@@ -143,6 +146,8 @@ static const struct cmd	cmdtab[] =
 	X("\nAppend any new mail to the current mailbox."),
 "j[oin]",	CMD(join),		R|I|MSGLIST,	0,	MMNDEL,
 	X("[ message ...]\nEquivalent to the command sequence reply ~m ~v."),
+"k",	CMD(mark),		W|P|STRLIST,	0,	0,
+	X("[ message ... ]\nAn alias for ``mark [ message ... ] spam''."),
 "lic[ense]",	CMD(license),		M|Z|NOLIST,	0,	0,
 	X("\nList the software license."),
 "l[ist]",	CMD(list),		M|Z|NOLIST,	0,	0,
@@ -154,7 +159,7 @@ static const struct cmd	cmdtab[] =
 "map",		CMD(map),		M|Z|STRLIST,	0,	0,
 	X("address ...\nList the result of alias expansion on the address arguments. map! gives the step-by-step details."),
 "mar[k]",	CMD(mark),		STRLIST,	0,	0,
-	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), read (U), save (*), spam (X), touch. Multiple marks may be separated by , or |."),
+	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), read (U), save (*), spam (X), touch. Multiple marks may be separated by , or |. If no mark is omitted then spam is assumed."),
 "mb[ox]",	CMD(mboxit),		W|STRLIST,	0,	0,
 	X("[ message ... ]\nAppend the selected messages to ${MBOX} on normal exit."),
 "mi[me]",	CMD(capability),	M|Z|RAWLIST,	0,	ARG_MAX,
@@ -469,6 +474,8 @@ static const struct var	vartab[] =
 	X("spamfromok"),
 "spamsub",	&state.var.spamsub,		N,	"ad,adv,advertisement,spam",set_list,
 	X("Case-insensitive candidate spam Subject: word prefix list."),
+"spamsubhead",	&state.var.spamsubhead,		N,	0,0,
+	X("Spam subject heading list edit expression."),
 "spamtest",	(char**)&state.var.spamtest,	I,	"0",0,
 	X("Spam test bitmask -- see the source, Luke."),
 "spamto",	&state.var.spamto,		N,	"-,*@(friend|money|suppressed|undisclosed)*,u,you",set_list,

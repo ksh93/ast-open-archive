@@ -1,3 +1,4 @@
+04-02-29 history.c: use pathtemp() instead of mktemp()
 01-04-25 vi.c: handle implementations with VEOL but not VEOL2
 00-02-14 ie: ie.sh script replaces ie fun
 	 ie: convert configure/* => features(ielib|options.sh)

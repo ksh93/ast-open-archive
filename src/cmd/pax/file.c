@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -47,7 +47,7 @@
  */
 
 int
-filter(register Archive_t* ap, register File_t* f)
+apply(register Archive_t* ap, register File_t* f, Filter_t* fp)
 {
 	register int	n;
 	char*		arg;
@@ -62,6 +62,7 @@ filter(register Archive_t* ap, register File_t* f)
 			error(ERROR_SYSTEM|2, "%s: cannot read", f->path);
 		return rfd;
 	}
+	message((-4, "filter: %s %s", fp->command, f->path));
 	if ((wfd = open(state.tmp.file, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
 	{
 		error(2, "%s: cannot create filter temporary %s", f->path, state.tmp.file);
@@ -80,7 +81,7 @@ filter(register Archive_t* ap, register File_t* f)
 	if (ap->format->checksum)
 		f->checksum = 0;
 	f->st->st_size = 0;
-	if (streq(*state.filter.argv, "nocomment"))
+	if (streq(*fp->argv, "nocomment"))
 	{
 		int	errors = error_info.errors;
 		off_t	count;
@@ -88,7 +89,7 @@ filter(register Archive_t* ap, register File_t* f)
 		Sfio_t*	op;
 
 		if ((ip = sfopen(NiL, f->path, "r")) && (op = sfnew(NiL, NiL, SF_UNBOUND, wfd, SF_WRITE)) && (count = nocomment(ip, op)) < 0)
-			error(2, "%s: %s: filter error", f->path, *state.filter.argv);
+			error(2, "%s: %s: filter error", f->path, *fp->argv);
 		if (ip)
 		{
 			sfclose(ip);
@@ -111,10 +112,10 @@ filter(register Archive_t* ap, register File_t* f)
 	{
 		Proc_t*		proc;
 
-		*state.filter.patharg = arg;
-		if (!(proc = procopen(*state.filter.argv, state.filter.argv, NiL, NiL, PROC_READ)))
+		*fp->patharg = arg;
+		if (!(proc = procopen(*fp->argv, fp->argv, NiL, NiL, PROC_READ)))
 		{
-			error(2, "%s: cannot execute filter %s", f->path, *state.filter.argv);
+			error(2, "%s: cannot execute filter %s", f->path, *fp->argv);
 			close(rfd);
 			close(wfd);
 			return -1;
@@ -133,9 +134,9 @@ filter(register Archive_t* ap, register File_t* f)
 		}
 		holedone(wfd);
 		if (n < 0)
-			error(ERROR_SYSTEM|2, "%s: %s filter read error", f->path, *state.filter.argv);
+			error(ERROR_SYSTEM|2, "%s: %s filter read error", f->path, *fp->argv);
 		if (n = procclose(proc))
-			error(2, "%s: %s filter exit code %d", f->path, *state.filter.argv, n);
+			error(2, "%s: %s filter exit code %d", f->path, *fp->argv, n);
 	}
 	close(wfd);
 	message((-1, "%s: filter file size = %ld", f->path, f->st->st_size));
@@ -150,12 +151,13 @@ int
 openin(register Archive_t* ap, register File_t* f)
 {
 	register int	n;
+	Filter_t*	fp;
 	int		rfd;
 
 	if (f->type != X_IFREG)
 		rfd = -1;
-	else if (state.filter.argv && f->st->st_size)
-		rfd = filter(ap, f);
+	else if (fp = filter(ap, f))
+		rfd = apply(ap, f, fp);
 	else if ((rfd = open(f->st->st_size ? f->path : "/dev/null", O_RDONLY|O_BINARY)) < 0)
 		error(ERROR_SYSTEM|2, "%s: cannot read", f->path);
 	else if (ap->format->checksum)
@@ -351,6 +353,8 @@ openout(register Archive_t* ap, register File_t* f)
 								tp = tp->next;
 								free(vp);
 							}
+							if (e)
+								*e = '/';
 							goto found;
 						}
 					if (e)
@@ -678,7 +682,11 @@ closeout(register Archive_t* ap, register File_t* f, int fd)
 	register char*	s;
 	int		r;
 
-	r = close(fd);
+	r = 0;
+	if (state.sync && fsync(fd))
+		r = -1;
+	if (close(fd))
+		r = -1;
 	if (s = f->intermediate)
 	{
 		f->intermediate = 0;
@@ -747,7 +755,12 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 			name = stash(&ap->path.peek, name, n);
 			name[n] = '/';
 			if (!state.peekfile || !strncmp(state.peekfile, name, n))
-				while ((state.peekfile = sfgetr(sfstdin, '\n', 1)) && !strncmp(state.peekfile, name, n));
+				while (state.peekfile = sfgetr(sfstdin, '\n', 1))
+					if (strncmp(state.peekfile, name, n))
+					{
+						state.peeklen = sfvalue(sfstdin) - 1;
+						break;
+					}
 			name[n] = 0;
 		}
 		break;

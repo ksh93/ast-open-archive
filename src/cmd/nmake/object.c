@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -1029,7 +1029,7 @@ void
 remtmp(int fatal)
 {
 	if (fatal && state.stateview == 0 && state.tmpfile)
-		error(2, "%s: state file not updated", state.statefile);
+		error(2, "%s: state file not updated", statefile());
 	if (state.tmpfile)
 	{
 		if (remove(state.tmpfile) && errno != ENOENT)
@@ -1037,7 +1037,7 @@ remtmp(int fatal)
 		state.tmpfile = 0;
 	}
 	if (fatal)
-		lockstate(NiL);
+		lockstate(0);
 }
 
 /*
@@ -1829,7 +1829,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			 */
 
 			o->attribute |= r->attribute & internal.retain->attribute;
-			o->property |= r->property & (P_dontcare|P_terminal);
+			o->property |= r->property & (P_dontcare|P_ignore|P_terminal);
 			setoldrule(r, o);
 		}
 		else
@@ -1850,7 +1850,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 				 */
 
 				r->attribute &= internal.retain->attribute;
-				r->property &= (P_attribute|P_dontcare|P_parameter|P_state|P_staterule|P_statevar|P_terminal);
+				r->property &= (P_attribute|P_dontcare|P_ignore|P_parameter|P_state|P_staterule|P_statevar|P_terminal);
 				r->dynamic &= D_garbage;
 			}
 		}

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -290,6 +290,14 @@ struct pptuple				/* tuple macro			*/
 	int		input;		/* pool input			*/ \
 	int		output;		/* pool output			*/ \
 	}		pool;		/* loop on input,output,error	*/ \
+	struct								   \
+	{								   \
+	long		ro_state;	/* original pp.ro_state		*/ \
+	long		ro_mode;	/* original pp.ro_mode		*/ \
+	long		ro_option;	/* original pp.ro_option	*/ \
+	int		on;		/* PP_RESET enabled		*/ \
+	Hash_table_t*	symtab;		/* original pp.symtab scope	*/ \
+	}		reset;		/* PP_RESET state		*/ \
 	int		truncate;	/* identifier truncation length	*/ \
 	struct ppmacstk* macp;		/* top of macro actual stack	*/ \
 	char*		maxmac;		/* maximum size of macro stack	*/ \

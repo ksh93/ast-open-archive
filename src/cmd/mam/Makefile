@@ -10,9 +10,9 @@ mamdot :: mamdot.sh
 
 mamexec :: mamexec.sh
 
-mamnew :: mamnew.1 mamnew.c -lmam
+mamnew :: mamnew.c -lmam
 
-mamold :: mamold.1 mamold.c -lmam
+mamold :: mamold.c -lmam
 
 mamsh :: mamsh.sh
 
@@ -22,4 +22,4 @@ mamstate :: mamstate.c
 
 mamtst :: mamtst.c -lmam
 
-:: mamold.sh
+:: mamold.sh shmam.awk

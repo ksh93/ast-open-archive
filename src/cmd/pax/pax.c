@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -38,7 +38,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2003-12-09 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2004-02-29 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -51,8 +51,8 @@ USAGE_LICENSE
 "	arguments are given then the standard input is read to get a list of"
 "	pathnames to copy, one pathname per line.  In this case only those"
 "	pathnames appearing on the standard input are copied.]"
-"[+?\bpax -r\b reads files from the standard input that is assumed to be"
-"	the result of a previous \bpax -w\b command.  Only files with names"
+"[+?\bpax -r\b reads the standard input that is assumed to be the result of a"
+"	previous \bpax -w\b command.  Only member files with names"
 "	that match any of the \apattern\a arguments are selected.  Matching"
 "	is done before any \b-i\b or \b-s\b options are applied.  A"
 "	\apattern\a is given in the name-generating notation of \bsh\b(1),"
@@ -71,8 +71,9 @@ USAGE_LICENSE
 "	copy, one pathname per line.  In this case only those pathnames"
 "	appearing on the standard input are copied.  \adirectory\a must exist"
 "	before the copy.]"
-"[+?\bpax\b (\b-r\b and \b-w\b omitted) accepts \b-r\b operands and lists a"
-"	table of contents of the selected files on the standard output.]"
+"[+?\bpax\b (\b-r\b and \b-w\b omitted) reads the standard input that is"
+"	assumed to be the result of a previous \bpax -w\b command and lists"
+"	table of contents of the selected member files on the standard output.]"
 "[+?The standard archive formats are automatically detected on input."
 "	The default output archive format is \b\fdefault\f\b, but may be"
 "	overridden by the \b-x\b option described below. \bpax\b archives may"
@@ -119,7 +120,7 @@ static const char usage2[] =
 "}"
 "[+SEE ALSO?\bar\b(1), \bcpio\b(1), \bfind\b(1), \bgetconf\b(1), \bgzip\b(1),"
 "	\bksh\b(1), \bratz\b(1), \bstar\b(1), \btar\b(1), \btw\b(1),"
-"	\blibdelta\b(3), \bcpio\b(5), \btar\b(5)]"
+"	\bfsync\b(2), \blibdelta\b(3), \bcpio\b(5), \btar\b(5)]"
 "[+BUGS?Special privileges may be required to copy special files."
 "	Some archive formats have hard upper limits on member string, numeric"
 "	and data sizes. Attribute values larger than the standard min-max"
@@ -233,6 +234,120 @@ meterror(int fd, const void* buf, size_t n)
 }
 
 /*
+ * construct an action from command
+ */
+
+static Filter_t*
+action(const char* command, int pattern)
+{
+	register Filter_t*	fp;
+	register char*		s;
+	register char*		t;
+	register int		c;
+	register int		q;
+	register int		n;
+	regex_t*		re;
+
+	s = (char*)command;
+	if (pattern && *s && *s == *(s + 1))
+	{
+		s += 2;
+		pattern = 0;
+	}
+	if (pattern)
+	{
+		if (!(re = newof(0, regex_t, 1, 0)))
+			nospace();
+		if (c = regcomp(re, s, REG_SHELL|REG_AUGMENTED|REG_DELIMITED|REG_LENIENT|REG_NULL|REG_LEFT|REG_RIGHT))
+			regfatal(re, 3, c);
+		s += re->re_npat;
+	}
+	else
+		re = 0;
+	command = (const char*)s;
+	q = 0;
+	n = 3;
+	while (c = *s++)
+		if (c == '"' || c == '\'')
+		{
+			if (!q)
+				q = c;
+			else if (q == c)
+				q = 0;
+		}
+		else if (c == '\\')
+		{
+			if (q != '\'' && *s)
+				s++;
+		}
+		else if (!q && isspace(c))
+		{
+			n++;
+			while (isspace(*s))
+				s++;
+		}
+	if (!(fp = newof(0, Filter_t, 1, n * sizeof(char**) + 2 * (s - (char*)command))))
+		nospace();
+	fp->re = re;
+	fp->argv = (char**)(fp + 1);
+	fp->command = (char*)(fp->argv + n);
+	s = strcopy(fp->command, command) + 1;
+	strcpy(s, command);
+	fp->argv[0] = s;
+	q = 0;
+	n = 1;
+	t = s;
+	while (c = *s++)
+		if (c == '"' || c == '\'')
+		{
+			if (!q)
+				q = c;
+			else if (q == c)
+				q = 0;
+			else
+				*t++ = c;
+		}
+		else if (c == '\\')
+		{
+			if (q == '\'')
+				*t++ = c;
+			else if (*s)
+				*t++ = *s++;
+		}
+		else if (q || !isspace(c))
+			*t++ = c;
+		else
+		{
+			*t++ = 0;
+			while (isspace(*s))
+				s++;
+			if (*(t = s))
+				fp->argv[n++] = s;
+		}
+	*t = 0;
+	fp->patharg = fp->argv + n;
+	return fp;
+}
+
+/*
+ * return action for f, 0 if no match
+ */
+
+Filter_t*
+filter(Archive_t* ap, File_t* f)
+{
+	register Filter_t*	fp;
+
+	if (f->st->st_size && (fp = state.filter.list))
+		do
+		{
+			if (!fp->re || !regexec(fp->re, f->name, NiL, 0, 0))
+				return fp;
+		} while (fp = fp->next);
+	return 0;
+}
+
+/*
  * set options from line if != 0 or argv according to usage
  * type: 0:command EXTTYPE:extended GLBTYPE:global
  */
@@ -251,6 +366,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 	char*		e;
 	char*		s;
 	char*		v;
+	Filter_t*	xp;
 	Format_t*	fp;
 	Option_t*	op;
 	Sfio_t*		sp;
@@ -329,6 +445,22 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 		message((-4, "option: %s%s%-.1s=%s type=%c entry=%d level=%d number=%I*u", y ? "" : "no", op->name, &opt_info.assignment, v, type ? type : '-', op->entry, op->level, sizeof(opt_info.number), opt_info.number));
 		switch (op->index)
 		{
+		case OPT_action:
+			if (*v)
+			{
+				xp = action(v, 1);
+				if (!xp->re)
+					state.filter.all = xp;
+				else
+				{
+					if (state.filter.last)
+						state.filter.last->next = xp;
+					else
+						state.filter.list = xp;
+					state.filter.last = xp;
+				}
+			}
+			break;
 		case OPT_append:
 			state.append = y;
 			break;
@@ -776,6 +908,9 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			else if (*v)
 				opt.owner = strdup(v);
 			break;
+		case OPT_passphrase:
+			state.passphrase = y ? strdup(v) : (char*)0;
+			break;
 		case OPT_physical:
 			if (y)
 			{
@@ -886,6 +1021,13 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 				state.linkf = pathsetlink;
 			else
 				state.linkf = 0;
+			break;
+		case OPT_sync:
+#if _lib_fsync
+			state.sync = y;
+#else
+			error(1, "%s not implemented on this system", op->name);
+#endif
 			break;
 		case OPT_tape:
 			ap = getarchive(state.operation);
@@ -1218,10 +1360,7 @@ main(int argc, char** argv)
 
 	setlocale(LC_ALL, "");
 	paxinit(&state, error_info.id = "pax");
-	memset(&optdisc, 0, sizeof(optdisc));
-	optdisc.version = OPT_VERSION;
-	optdisc.infof = optinfo;
-	opt_info.disc = &optdisc;
+	optinit(&optdisc, optinfo);
 	state.strict = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
 	state.gid = getegid();
 	state.uid = geteuid();
@@ -1330,38 +1469,12 @@ main(int argc, char** argv)
 			state.filter.line = -1;
 			s = "sh -c";
 		}
-		if (!(s = strdup(s)))
-			nospace();
-		p = s;
-		n = 3;
-		while (i = *s++)
-			if (isspace(i))
-			{
-				n++;
-				while (isspace(*s))
-					s++;
-			}
-		if (!(state.filter.argv = newof(0, char*, n, 0)))
-			error(3, "no space [filter]");
-		s = p;
-		state.filter.argv[0] = s;
-		if (n > 3)
-		{
-			n = 1;
-			while (i = *s++)
-				if (isspace(i))
-				{
-					*(s - 1) = 0;
-					while (isspace(*s))
-						s++;
-					if (*s)
-						state.filter.argv[n++] = s;
-				}
-		}
-		else
-			n = 1;
-		state.filter.patharg = state.filter.argv + n;
+		state.filter.all = action(s, 0);
 	}
+	if (state.filter.last)
+		state.filter.last->next = state.filter.all;
+	else
+		state.filter.list = state.filter.all;
 	state.statf = (state.ftwflags & FTW_PHYSICAL) ? lstat : pathstat;
 
 	/*

@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1996-2003 AT&T Corp.                #
+#                Copyright (c) 1996-2004 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -43,7 +43,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2003-08-11' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2004-02-29' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
@@ -1557,7 +1557,7 @@ do	getline || {
 				*)	sec=$5
 					;;
 				esac
-				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$1($2)</TH><TH align=center><A href=\"\" TITLE=\"Command Index\">$sec</A></TH><TH align=right>$1($2)</TH></TR></TBODY></TABLE></H3>"
+				print -r -- "<H3><TABLE width=100%><TBODY><TR><TH align=left>$1($2)</TH><TH align=center><A href=\".\" TITLE=\"Index\">$sec</A></TH><TH align=right>$1($2)</TH></TR></TBODY></TABLE></H3>"
 				print -r -- "<HR>"
 				;;
 			.TL)	getline || break
@@ -1624,8 +1624,8 @@ do	getline || {
 						opts.frame="box"
 						opts.rules="all"
 						;;
-					box)	opts.border=1
-						opts.frame="box"
+					box)	opts.border=
+						opts.frame="void"
 						opts.rules="none"
 						;;
 					doublebox)
@@ -1654,9 +1654,6 @@ do	getline || {
 			esac
 		done
 		case ${opts.border} in
-		'')	opts.border=0 ;;
-		esac
-		case ${opts.border} in
 		0)	opts.cellpadding=0
 			opts.cellspacing=0
 			unset opts.bgcolor
@@ -1668,6 +1665,9 @@ do	getline || {
 			'')	opts.cellspacing=2 ;;
 			esac
 			;;
+		esac
+		case ${opts.border} in
+		'')	opts.border=0 ;;
 		esac
 		if ((!augment))
 		then	(( augment=1 ))

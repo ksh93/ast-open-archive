@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -95,6 +95,25 @@ getprocs_read(Pss_t* pss, Pss_id_t pid)
 			return -1;
 		state->last = 0;
 	}
+	else
+		while (state->index >= state->count)
+		{
+			if (state->last)
+				return 0;
+			state->index = 0;
+			state->count = getprocs(state->entry, sizeof(state->entry[0]), NiL, 0, &pss->pid, elementsof(state->entry));
+			if (state->count < elementsof(state->entry))
+			{
+				state->last = 1;
+				if (state->count < 0)
+					return -1;
+				if (!state->count)
+					return 0;
+			}
+			if (!state->entry[0].pi_pid)
+				state->index++;
+		}
+	state->pr = state->entry + state->index++;
 	return 1;
 }
 
@@ -104,26 +123,9 @@ getprocs_part(register Pss_t* pss, register Pssent_t* pe)
 	register State_t*		state = (State_t*)pss->data;
 	register struct procsinfo*	pr;
 
-	while (state->index >= state->count)
-	{
-		if (state->last)
-			return 0;
-		state->index = 0;
-		state->count = getprocs(state->entry, sizeof(state->entry[0]), NiL, 0, &pss->pid, elementsof(state->entry));
-		if (state->count < elementsof(state->entry))
-		{
-			state->last = 1;
-			if (state->count < 0)
-				return -1;
-			if (!state->count)
-				return 0;
-		}
-		if (!state->entry[0].pi_pid)
-			state->index++;
-	}
-	pr = state->pr = state->entry + state->index++;
+	pr = state->pr;
+	pe->pid = state->pr->pi_pid;
 	pe->pgrp = pr->pi_pgrp;
-	pe->pid = pr->pi_pid;
 	pe->sid = pr->pi_sid;
 	pe->tty = pr->pi_ttyp ? pr->pi_ttyd : PSS_NODEV;
 	pe->uid = pr->pi_uid;
@@ -201,7 +203,7 @@ getprocs_full(register Pss_t* pss, register Pssent_t* pe)
 static Pssmeth_t getprocs_method =
 {
 	"getprocs",
-	"[-version?@(#)$Id: pss getprocs (AT&T Labs Research) 2003-02-01 $\n]"
+	"[-version?@(#)$Id: pss getprocs (AT&T Labs Research) 2004-02-29 $\n]"
 	"[-author?Glenn Fowler <gsf@research.att.com>]",
 	PSS_all,
 	getprocs_init,

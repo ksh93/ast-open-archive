@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2002 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sum (AT&T Labs Research) 1999-11-11 $\n]"
+"[-?\n@(#)$Id: sum (AT&T Labs Research) 2003-12-17 $\n]"
 USAGE_LICENSE
 "[+NAME?cksum,md5sum,sum - print file checksum and block count]"
 "[+DESCRIPTION?\bsum\b lists the checksum, and for most methods the block"
@@ -39,6 +39,8 @@ USAGE_LICENSE
 "	\bsum\b method: \batt\b for the \batt\b universe, \bbsd\b otherwise."
 "	The default for the other commands is the command name itself. The"
 "	\batt\b method is a true sum, all others are order dependent.]"
+"[+?Method names consist of a leading identifier and 0 or more options"
+"	separated by -.]"
 "[+?\bgetconf PATH_RESOLVE\b determines how symbolic links are handled. This"
 "	can be explicitly overridden by the \b--logical\b, \b--metaphysical\b,"
 "	and \b--physical\b options below. \bPATH_RESOLVE\b can be one of:]{"
@@ -84,7 +86,8 @@ USAGE_LICENSE
 "[T:text?Read files in text mode (i.e., treat \b\\r\\n\b as \b\\n\b).]"
 "[w!:warn?Warn about invalid \b--check\b lines.]"
 "[x:method|algorithm?Specifies the checksum \amethod\a to"
-"	apply:]:[method]{\fmethods\f}"
+"	apply. Parenthesized method options are readonly implementation"
+"	details.]:[method]{\fmethods\f}"
 "[L:logical|follow?Follow symbolic links when traversing directories. The"
 "	default is determined by \bgetconf PATH_RESOLVE\b.]"
 "[H:metaphysical?Follow command argument symbolic links, otherwise don't"
@@ -489,10 +492,7 @@ main(int argc, register char** argv)
 	error_info.id = s;
 	flags = ftwflags();
 	state.warn = 1;
-	memset(&optdisc, 0, sizeof(optdisc));
-	optdisc.version = OPT_VERSION;
-	optdisc.infof = optinfo;
-	opt_info.disc = &optdisc;
+	optinit(&optdisc, optinfo);
 	for (;;)
 	{
 		switch (optget(argv, usage))

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_tcl ${INSTALLROOT}
 setv PACKAGE_tcl_INCLUDE ${PACKAGE_tcl}/include/tcl
@@ -31,8 +31,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -84,12 +84,6 @@ make compat/unistd.h implicit
 make ../../../include/tcl/tcl.h implicit
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/ast_getopt.h dontcare
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -105,10 +99,15 @@ done ../../../include/ast/ast_botch.h dontcare
 make ../../../include/ast/ast_unistd.h implicit
 done ../../../include/ast/ast_unistd.h dontcare
 make ../../../include/ast/re_comp.h implicit
-prev ../../../include/ast/prototyped.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit

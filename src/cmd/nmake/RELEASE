@@ -1,3 +1,42 @@
+04-02-29 state.c: fix `another make running' message to handle <=0 elapsed time
+	 Makerules.mk: CC.LD.RUNPATH used only if LDRUNPATH set (. to kick in)
+	 Makerules.mk: mam ${MAKE} => ${NMAKE}, ${MAKEFLAGS} => ${NMAKEFLAGS}
+	 Makerules.mk: localize plugin DLLDIR and CC.SHARED.REGISTRY
+	 Makerules.mk: do not install plugin CC.SUFFIX.SHARED libs
+	 Makerules.mk: fix CC.SUFFIX.SHARED CC.SUFFIX.ARCHIVE clash
+	 variable.c: mam $(-): $MAKEFLAGS => ${NMAKEFLAGS}
+	 nmake.tst: 001 now ebcdic immune
+04-02-14 scan.c: add class identifier match action 'C'
+	 expand.c: add :P=E: for PATH independent executable name
+	 expand.c: static mam :P=A: expands ``.'' for pwd
+	 expand.c: :N=pat: now uses regcomp() instead of strmatch()
+	 expand.c: :T=F: lstat() (as always) :T>F: pathstat()
+	 read.c: extend new vs. old makefile type check
+	 parse.c: add <<'end' ... end for literal actions
+	 Makerules.mk: let proto -c '' determine .LIST.PACKAGE.* comment style
+	 Makerules.mk: add $(CC.EXPORT.DYNAMIC) to default cobol LDFLAGS
+	 Makerules.mk: add $(CC.SHARED.LD) to differentiate -r and $(CC.SHARED)
+         option.c: add --writeobject[=file] --writestate[=file]
+04-02-11 Makerules.mk: .LIST.PACKAGE.* generates top view relative paths
+	 Makerules.mk: add $(CC.AR) for ar
+	 option.c: fix optget() usage bug that treated --nofoo as --foo
+04-02-02 Makerules.mk: :LIBRARY: plugin static still installs req
+	 Makerules.mk: fix :PACKAGE: foo:nolibrary
+	 Scanrules.mk: ignore C++ include <foo> (no suffix)
+	 object.c: retain reference .IGNORE in state
+	 option.c: non-0 exit for invalid command line options
+	 parse.c: don't check D_scope for D_dynamic
+	 rule.c: add external.order for .ORDER, :W=[OPR]:, :PACKAGE: X:order
+	 scan.c: null map means ignore; handle |A.IGNORE|
+04-01-30 Makerules.mk: add .LIBRARY.CLEANUP.* to clean up after plugin renam
+	 Makerules.mk: :PACKAGE_INIT: lhs for pre-installed $(BINDIR) files
+04-01-28 Makerules.mk: add ``lib version plugin=id :LIBRARY: ...''
+	 expand.c: :W=[OPR]: now favors make if its in the mix
+04-01-22 Makerules.mk: add .PREQUIRE check to ensure up to date *.req
+04-01-20 expand.c: :T=F: includes triggered time==0 targets
+04-01-01 --- release 4.4 ---
+03-12-31 Makerules.mk: $(LDRUNPATH) overrides defaults for CC.LD.RUNPATH
+03-12-19 expand.c: add `foolib:foo:libfoo' to :W=[OPR]:
 03-11-25 Makerules.mk: CC=c++ not found => search for any existing c++ compiler
 03-11-19 Scanrules.mk: default cobol include suffix is .CPY (or .cpy)
 03-09-29 Makerules.mk: fix $(PACKAGES) logic inversion typo (:VARIANT: bug)

@@ -1,29 +1,45 @@
 # tests for the find utility
 
-KEEP data mode
-
-mkdir data
-for i in aaa zzz
-do	i=data/$i
-	mkdir $i
-	for j in 111 222 333
-	do	mkdir $i/$j
-		for k in 4 5 6 7
-		do	mkdir $i/$j/$k
-			for l in q.c r.d s.z
-			do	print $i $j $k $l > $i/$j/$k/$l
-				chmod $k$k$k $i/$j/$k/$l
+function DATA
+{
+	typeset f i j k
+	for f
+	do	test -d $f && continue
+		KEEP $f
+		case $f in
+		data)	mkdir data
+			for i in aaa zzz
+			do	i=data/$i
+				mkdir $i
+				for j in 111 222 333
+				do	mkdir $i/$j
+					for k in 4 5 6 7
+					do	mkdir $i/$j/$k
+						for l in q.c r.d s.z
+						do	print $i $j $k $l > $i/$j/$k/$l
+							chmod $k$k$k $i/$j/$k/$l
+						done
+					done
+				done
 			done
-		done
+			;;
+		match)	mkdir -p match/.ghi match/jkl
+			: > match/.abc > match/def
+			: > match/.ghi/.mno > match/.ghi/pqr
+			: > match/jkl/.stu > match/jkl/vwx
+			;;
+		mode)	mkdir mode
+			for i in 0 1 2 3 4 5 6 7
+			do	: > mode/$i$i$i
+				chmod $i$i$i mode/$i$i$i
+			done
+			;;
+		esac
 	done
-done
-mkdir mode
-for i in 0 1 2 3 4 5 6 7
-do	: > mode/$i$i$i
-	chmod $i$i$i mode/$i$i$i
-done
+}
 
 TEST 01 'basics'
+	DO	DATA data
 	EXEC	data
 		OUTPUT - $'data
 data/aaa
@@ -136,6 +152,7 @@ data/zzz/333/7/s.z'
 	EXEC	--print data
 
 TEST 02 'patterns'
+	DO	DATA data
 	EXEC	data -name '*.c'
 		OUTPUT - $'data/aaa/111/4/q.c
 data/aaa/111/5/q.c
@@ -254,6 +271,7 @@ data/aaa/333/6/r.d
 data/aaa/333/7/r.d'
 
 TEST 03 'types'
+	DO	DATA data
 	EXEC	data -type d
 		OUTPUT - $'data
 data/aaa
@@ -363,6 +381,7 @@ data/zzz/333/7/r.d
 data/zzz/333/7/s.z'
 
 TEST 04 'modes'
+	DO	DATA mode
 	EXEC	mode -perm -000
 		OUTPUT - 'mode
 mode/000
@@ -471,3 +490,22 @@ mode/444
 mode/555
 mode/666
 mode/777'
+
+TEST 05 '-name pattern'
+	DO	DATA match
+	EXEC	match
+		OUTPUT - $'match
+match/def
+match/.abc
+match/jkl
+match/jkl/vwx
+match/jkl/.stu
+match/.ghi
+match/.ghi/pqr
+match/.ghi/.mno'
+	EXEC	match -name '*'
+	EXEC	match -name '.*'
+		OUTPUT - $'match/.abc
+match/jkl/.stu
+match/.ghi
+match/.ghi/.mno'

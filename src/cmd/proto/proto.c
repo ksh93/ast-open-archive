@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1990-2003 AT&T Corp.                *
+*                Copyright (c) 1990-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -36,7 +36,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Labs Research) 2002-03-12 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Labs Research) 2004-02-14 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -49,7 +49,10 @@ USAGE_LICENSE
 "[c:comment?\ab[m[e]]]]\a are the beginning, middle, and end comment"
 "	characters. If \ae\a is omitted then it defaults to \ab\a. If \am\a is"
 "	omitted then it defaults to \ab\a. Use \"\b/*\b\" for C comments,"
-"	\"\b#\b\" for shell, and \"\b(*)\b\" for pascal.]:[bme:=\"/*\"]"
+"	\"\b#\b\" for shell, and \"\b(*)\b\" for pascal. If \aa\a is \"\""
+"	(the empty string) then the comment style is determined from the"
+"	input \afile\a suffix; no notice is prepended if the comment"
+"	style cannot be determined.]:[bme:=\"/*\"]"
 "[d:disable?Disable prototype conversion but still emit the identification"
 "	comment.]"
 "[e:externs?All \bextern\b references are for \apackage\a. Some systems"
@@ -340,6 +343,72 @@ proto(char* file, char* license, char* options, char* package, char* copy, char*
 #undef	error
 #endif
 
+typedef struct Sufcom_s
+{
+	char		suffix[4];
+	char		comment[4];
+} Sufcom_t;
+
+static const Sufcom_t	sufcom[] =
+{
+	"c",		"/*",
+	"cxx",		"/*",
+	"c++",		"/*",
+	"C",		"/*",
+	"CXX",		"/*",
+	"C++",		"/*",
+	"f",		"C",
+	"F",		"C",
+	"h",		"/*",
+	"hxx",		"/*",
+	"H",		"/*",
+	"HXX",		"/*",
+	"ksh",		"#",
+	"KSH",		"#",
+	"l",		"/*",
+	"L",		"/*",
+	"p",		"(*)",
+	"pas",		"(*)",
+	"P",		"(*)",
+	"PAS",		"(*)",
+	"pl",		"#",
+	"PL",		"#",
+	"pl1",		"/*",
+	"pli",		"/*",
+	"PL1",		"/*",
+	"PLI",		"/*",
+	"sh",		"#",
+	"SH",		"#",
+	"sml",		"(*)",
+	"SML",		"(*)",
+	"y",		"/*",
+	"Y",		"/*",
+};
+
+/*
+ * if !comment || !*comment then return a value compatible with file
+ */
+
+static char*
+type(register char* file, char* comment)
+{
+	register char*	suffix;
+	register int	i;
+
+	if (file && (!comment || !*comment))
+	{
+		suffix = 0;
+		while (*file)
+			if (*file++ == '.')
+				suffix = file;
+		if (suffix && strlen(suffix) <= 3)
+			for (i = 0; i < sizeof(sufcom) / sizeof(sufcom[0]); i++)
+				if (!strcmp(suffix, sufcom[i].suffix))
+					return (char*)sufcom[i].comment;
+	}
+	return comment;
+}
+
 int
 main(int argc, char** argv)
 {
@@ -578,15 +647,15 @@ main(int argc, char** argv)
 			if (b > buf)
 			{
 				*b = 0;
-				flags = proto(buf, license, options, package, copy, comment, flags);
+				flags = proto(buf, license, options, package, copy, type(buf, comment), flags);
 			}
 		} while (n > 0);
 		if (fd > 0)
 			close(fd);
 	}
 	if (file)
-		do flags = proto(file, license, options, package, copy, comment, flags); while (file = *++argv);
+		do flags = proto(file, license, options, package, copy, type(file, comment), flags); while (file = *++argv);
 	else if (!list)
-		flags = proto(file, license, options, package, copy, comment, flags);
+		flags = proto(file, license, options, package, copy, type(file, comment), flags);
 	return errors ? 1 : (flags & PROTO_ERROR) ? 2 : 0;
 }

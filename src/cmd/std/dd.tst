@@ -104,10 +104,29 @@ function DATA
 	typeset -i8 n
 	for f
 	do	test -f $f.dat && continue
-		eval d=\$${f}_dat
-		for o in $d
-		do	print -f "\\$o"
-		done > $f.dat
+		case $f in
+		*k)	print 1234567890abcde > 1k.dat
+			for ((i=1;i<=3;i++))
+			do	cat 1k.dat 1k.dat > t
+				cat t t > 1k.dat
+			done
+			cat 1k.dat 1k.dat > 2k.dat
+			cat 2k.dat 2k.dat > 4k.dat
+			cat 4k.dat 4k.dat > 8k.dat
+			cat 8k.dat 8k.dat > 1024k.dat
+			for ((i=1;i<=3;i++))
+			do	cat 1024k.dat 1024k.dat > t
+				cat t t > 1024k.dat
+			done
+			head -c 1000 1k.dat > 1000.dat
+			rm t
+			;;
+		*)	eval d=\$${f}_dat
+			for o in $d
+			do	print -f "\\$o"
+			done > $f.dat
+			;;
+		esac
 	done
 }
 
@@ -136,3 +155,29 @@ TEST 02 'ast ascii <=> ebcdic conversion'
 		SAME OUTPUT i2a.dat
 	EXEC	if=o.dat conv=o2a
 		SAME OUTPUT a.dat
+
+TEST 03 'record report'
+	DO	DATA k
+	EXEC	if=1k.dat of=t.dat bs=1k count=1
+		SAME t.dat 1k.dat
+		ERROR - $'1+0 records in\n1+0 records out'
+	EXEC	if=2k.dat of=t.dat bs=2k count=1
+		SAME t.dat 2k.dat
+	EXEC	if=4k.dat of=t.dat bs=4k count=1
+		SAME t.dat 4k.dat
+	EXEC	if=8k.dat of=t.dat bs=8k count=1
+		SAME t.dat 8k.dat
+	EXEC	if=1024k.dat of=t.dat bs=1024k count=1
+		SAME t.dat 1024k.dat
+	EXEC	if=1k.dat of=t.dat bs=1000
+		SAME t.dat 1k.dat
+		ERROR - $'1+1 records in\n1+1 records out'
+	EXEC	if=1k.dat of=t.dat bs=1000 count=1
+		SAME t.dat 1000.dat
+		ERROR - $'1+0 records in\n1+0 records out'
+	EXEC	if=1k.dat of=t.dat bs=100 count=10
+		SAME t.dat 1000.dat
+		ERROR - $'10+0 records in\n10+0 records out'
+	EXEC	if=1k.dat of=t.dat bs=10 count=100
+		SAME t.dat 1000.dat
+		ERROR - $'100+0 records in\n100+0 records out'

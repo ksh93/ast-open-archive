@@ -12,6 +12,55 @@ testformat='%(mtime:time=%K)s %(mode)s %(mode:case:-*:%(size)u:*:0)8s %(path)s%(
 
 VIEW data
 
+KEEP 't.?'
+
+function DATA
+{
+	for i
+	do	test -f $i ||
+		case $i in
+		t.c1)	print $'method=md5
+permissions
+168805c362787f61c79f9a52d6ee8fc0 0644 - - t.r
+2cd322e2bee9b35c7a4c2595e5593330 4700 - - t.s
+74d9a83219cabaab06a69fd318873f33 0755 - - t.x' > $i
+			;;
+		t.c2)	print $'method=md5
+permissions
+6105347ebb9825ac754615ca55ff3b0c 0644 - - t.n
+6105347ebb9825ac754615ca55ff3b0c 0644 - - t.r
+6105347ebb9825ac754615ca55ff3b0c 4700 - - t.s' > $i
+			;;
+		t.c3)	print $'method=md5
+permissions
+7389db8ac880351b920e55906980a570 0644 - - t.n
+8880cd8c1fb402585779766f681b868b 0644 - - t.r
+4d50db1dc6bd8d4f8dc1ca9b83bdc187 4700 - - t.s' > $i
+			;;
+		t.c4)	print $'method=md5
+permissions
+7389db8ac880351b920e55906980a570 0644 - - fn.dat
+6105347ebb9825ac754615ca55ff3b0c 0644 - - fr.dat
+2cd322e2bee9b35c7a4c2595e5593330 4700 - - t.s' > $i
+			;;
+		t.i)	print $'chmod 4700 t.s' > $i
+			;;
+		t.n)	echo ' 000 ' > $i
+			chmod 644 $i
+			;;
+		t.r)	echo ' hit ' > $i
+			chmod 644 $i
+			;;
+		t.s)	echo ' HIT ' > $i
+			chmod 4700 $i
+			;;
+		t.x)	echo true > $i
+			chmod 755 $i
+			;;
+		esac
+	done
+}
+
 TEST 01 'basics'
 
 	EXEC --nosummary --listformat="$testformat" -vf $data/aha.dat
@@ -752,3 +801,41 @@ pax: $data/delta.pax: delete.dat: corrupt archive: checksum mismatch -- expected
 
 	EXEC --nosummary --listformat="$testformat" -vf $data/delta-1.pax -z $data/base.pax
 		ERROR - "pax: $data/delta-1.pax: zelta: delta method not supported"
+
+TEST 12 'extraction basics'
+
+	EXEC --nosummary -rf $data/extract.pax
+	PROG md5sum *.dat
+		MOVE OUTPUT sum
+	PROG diff sum md5
+
+TEST 13 '--install and --checksum'
+
+	DO DATA t.c1 t.i t.r t.s t.x
+
+	EXEC --nosummary --install=INSTALL -wf t.pax t.r t.s t.x
+	EXEC --nosummary -rf t.pax INSTALL
+	PROG diff INSTALL t.i
+
+	EXEC --nosummary --checksum=md5:CHECKSUM -wf t.pax t.r t.s t.x
+	EXEC --nosummary -rf t.pax CHECKSUM
+	PROG diff CHECKSUM t.c1
+
+TEST 14 '--filter and --action'
+
+	DO DATA t.c2 t.c3 t.c4 t.n t.r t.s
+
+	EXEC --nosummary --checksum=md5:CHECKSUM --filter='sed "s/^ ... $/---/"' -wf t.pax t.n t.r t.s
+	EXEC --nosummary -rf t.pax CHECKSUM
+	PROG diff CHECKSUM t.c2
+
+	EXEC --nosummary --checksum=md5:CHECKSUM --action='/*.r/sed "s/^ ... $/AAA/"' --action='/*.s/sed "s/^ ... $/ZZZ/"' -wf t.pax t.n t.r t.s
+	EXEC --nosummary -rf t.pax CHECKSUM
+	PROG diff CHECKSUM t.c3
+
+	EXEC --nosummary --checksum=md5:CHECKSUM --filter=- -wf t.pax
+		INPUT - $';;;t.n;fn.dat
+;;sed "s/^ ... $/---/" < t.r;t.r;fr.dat
+;;;t.s'
+	EXEC --nosummary -rf t.pax CHECKSUM
+	PROG diff CHECKSUM t.c4

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2003 AT&T Corp.                *
+*                Copyright (c) 1996-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -42,22 +42,19 @@ const char*	lib;
 {
 	register char*		s;
 	void*			dll;
-	char*			p;
 	Rsdisc_t*		disc;
 	Rslib_f			fun;
 	char			path[PATH_MAX];
 	Opt_t			opt;
 
-	static const char	prefix[] = "sort";
 	static const char	symbol[] = "rs_disc";
 
 	for (s = (char*)lib; *s && *s != ',' && *s != '\t' && *s != '\r' && *s != '\n'; s++);
-	sfsprintf(path, sizeof(path), "%s%-.*s", prefix, s - (char*)lib, lib);
-	p = strchr(path, '/') ? (path + sizeof(prefix) - 1) : path;
-	if (!(dll = dllfind(p, NiL, RTLD_LAZY, path, sizeof(path))))
+	sfsprintf(path, sizeof(path), "%-.*s", s - (char*)lib, lib);
+	if (!(dll = dllplug("sort", path, NiL, RTLD_LAZY, path, sizeof(path))))
 	{
 		if (kp->keydisc->errorf)
-			(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: library not found", p);
+			(*kp->keydisc->errorf)(kp, kp->keydisc, 2, "%s: library not found", path);
 		return -1;
 	}
 	if (!(fun = (Rslib_f)dlllook(dll, symbol)))

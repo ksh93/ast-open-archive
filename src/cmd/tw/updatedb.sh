@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1989-2002 AT&T Corp.                #
+#                Copyright (c) 1989-2004 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -25,7 +25,7 @@
 
 codes_default="lib/find/codes"
 dirs_default="/"
-drop_default="/afs|/backup|/dev|/tmp|/usr/tmp|/var/tmp"
+drop_default="/afs|/backup|/dev|/proc|/tmp|/usr/tmp|/var/tmp"
 keep_default="/home|/usr/local|/usr/common"
 
 COMMAND=updatedb
@@ -33,7 +33,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: updatedb (AT&T Labs Research) 2002-07-17 $
+@(#)$Id: updatedb (AT&T Labs Research) 2003-11-14 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?updatedb - generate locate pathname database]

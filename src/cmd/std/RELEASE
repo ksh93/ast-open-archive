@@ -1,3 +1,15 @@
+04-02-29 pss-getprocs.c: fix readf/partf semantic mixup
+04-02-26 ls.c: handle solaris S_ISDOOR for -F
+04-02-11 df.c: rescan mount table to avoid more expensive stat()/statvfs()
+04-01-14 split.c: fix csplit {*} EOF detection
+03-12-17 sum.c: update docs for new -lsum interface
+03-12-09 df.c: don't stat() mount table fs paths that don't start with /
+03-11-17 ps.c: fix --children bug that lost lower level ancestor links
+03-10-12 dd.c: add ast iconv identity check
+03-10-08 dd.c: fix count=n short-read when bs > underlying read size
+03-10-07 df.c: fix -Pi to do "portable" -i
+03-09-23 ls.c: call fmtmode() with internal mode
+	 ls.c: -L => ~FTS_SEEDOTDIR
 03-09-18 dd.c: numeric option arg values are now intmax
 	 split.c: -b -C -l are now intmax
 03-09-11 ls.c: add --testdate=date for testing

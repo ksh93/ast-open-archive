@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -76,7 +76,7 @@ pds_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 		nospace();
 	pds->map = ccmap(CC_EBCDIC_O, CC_NATIVE);
 	links = 0;
-	while ((b = (unsigned char*)bget(ap, -256, NiL)) && !b[0])
+	while ((b = (unsigned char*)paxget(pax, ap, -256, NiL)) && !b[0])
 	{
 		n = b[1];
 		b += 2;
@@ -188,10 +188,12 @@ Format_t	pax_pds_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,
-	pax_pds_next,
+	PAXNEXT(pax_pds_next),
 	0,
 	pds_done,
 	pds_getprologue,
 	pds_getheader,
 	pds_getdata,
 };
+
+PAXLIB(&pax_pds_format)

@@ -11,7 +11,7 @@ pz 1.0 :LIBRARY: RELEASE pzip.3 pzip.h pzlib.h \
 	pzfixed.c pzconvert.c sfdcpzip.c sfdczip.c \
 	-lbz -lz -ldll
 
-pzline 1.0 :LIBRARY: pzline.c -lpz
+line 1.0 plugin=pz :LIBRARY: pzline.c -lpz
 
 $(INCLUDEDIR) :INSTALLPROTO: pzip.h
 

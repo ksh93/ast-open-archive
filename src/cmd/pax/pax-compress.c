@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -55,8 +55,10 @@ Format_t	pax_compress_format =
 	0,
 	0,
 	0,
-	pax_compress_next,
+	PAXNEXT(pax_compress_next),
 	&pax_compress_data,
 	0,
 	compress_getprologue,
 };
+
+PAXLIB(&pax_compress_format)

@@ -1,4 +1,4 @@
-: strmatch and strgrpmatch tests 2003-01-30
+: strmatch and strgrpmatch tests 2004-02-13
 
 # shell patterns
 
@@ -311,3 +311,8 @@ K	ast*([0-9])?(.dll)	ast54.dll		(0,9)(3,5)(5,9)
 K	ast???(.dll)		ast54.dll		(0,9)(5,9)
 K	*/ast???(.dll)		ast.so/ast54.dll	(0,16)(12,16)
 K	?(ast.so/)ast???(.dll)	ast.so/ast54.dll	(0,16)(0,7)(12,16)
+
+# strmatch() cache boundaries
+
+SK	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	(0,127)
+SK	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx	(0,128)

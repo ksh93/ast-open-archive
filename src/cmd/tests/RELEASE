@@ -1,3 +1,7 @@
+04-02-29 sfio/tscanf.c: add %! test
+	 opt.tst: add html escape test
+04-02-04 sfio/texcept.c: add sfraise(0,a,b) test
+04-01-14 sfio/tmmap2read.c: fix mmap() override for linux/bsd
 03-10-12 strtoi.tst: add strton[ll] suffix multiplier tests
 03-09-23 opt.tst: more optstr() tests
 03-09-11 opt.tst: add n:=v tests

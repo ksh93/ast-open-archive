@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2003-01-03 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2003-10-17 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -228,6 +228,7 @@ T("    t	REG_MUSTDELIM		all delimiters must be specified\n");
 T("    u	standard unspecified behavior -- errors not counted\n");
 T("    w	REG_NOSUB		no subexpression match array\n");
 T("    x	REG_LENIENT		let some errors slide\n");
+T("    y	REG_LEFT		regexec() implicit ^...\n");
 T("    z	REG_NULL		NULL subexpressions ok\n");
 T("    $	                        expand C \\c escapes in fields 2 and 3\n");
 T("    /	                        field 2 is a regsubcomp() expression\n");
@@ -732,36 +733,36 @@ escape(char* s)
 			case 'v':
 				*t = '\v';
 				break;
+			case 'u':
 			case 'x':
 				c = 0;
-				q = ++s + 2;
-				e = s;
-				for (;;)
+				q = c == 'u' ? (s + 5) : (char*)0;
+				e = s + 1;
+				while (!e || !q || s < q)
 				{
-					if (e && s >= q)
-					{
-						s--;
-						break;
-					}
-					switch (*s)
+					switch (*++s)
 					{
 					case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-						c = (c << 4) + *s++ - 'a' + 10;
+						c = (c << 4) + *s - 'a' + 10;
 						continue;
 					case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-						c = (c << 4) + *s++ - 'A' + 10;
+						c = (c << 4) + *s - 'A' + 10;
 						continue;
 					case '0': case '1': case '2': case '3': case '4':
 					case '5': case '6': case '7': case '8': case '9':
-						c = (c << 4) + *s++ - '0';
+						c = (c << 4) + *s - '0';
 						continue;
 					case '{':
+					case '[':
 						if (s != e)
+						{
+							s--;
 							break;
+						}
 						e = 0;
-						s++;
 						continue;
 					case '}':
+					case ']':
 						if (e)
 							s--;
 						break;
@@ -1501,6 +1502,9 @@ main(int argc, char** argv)
 					cflags |= REG_LENIENT;
 				else
 					test |= TEST_LENIENT;
+				continue;
+			case 'y':
+				eflags |= REG_LEFT;
 				continue;
 			case 'z':
 				cflags |= REG_NULL;

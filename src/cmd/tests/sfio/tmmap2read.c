@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2003 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,11 +21,11 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                                                                  *
 *******************************************************************/
-#define _SFIO_H_ONLY	1
-#define mmap	______mmap
-#define mmap64	______mmap64
 #include	"sftest.h"
+
 #undef	off_t
+#undef	mmap
+#undef	mmap64
 
 /*	This test causes mmap() to fail so that read() must be used.
 	On a system such as BSDI, malloc uses mmap() so if mmap()

@@ -38,7 +38,7 @@ standards.
 .B testregex
 is currently built against these reference implementations:
 .TS
-center;
+center box;
 rb cb lb
 r c l.
 NAME	LABEL	AUTHORS
@@ -47,7 +47,7 @@ bsd	\h'0*\w"ftp://ftp.netbsd.org/pub/NetBSD/NetBSD-1.5.2/source/sets/src.tgz"'B\
 old gnu	\h'0*\w"http://www.gnu.org"'G\h'0'	\|
 gnu	\h'0*\w"http://www.gnu.org"'H\h'0'	Isamu Hasegawa
 irix	\h'0*\w"http://www.sgi.com"'I\h'0'	\|
-regex++	\h'0*\w"http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm"'M\h'0'	John Maddox
+regex++	\h'0*\w"http://ourworld.compuserve.com/homepages/John_Maddock/regexpp.htm"'M\h'0'	John Maddock
 pcre perl compatible	\h'0*\w"http://www.pcre.org/"'P\h'0'	Philip Hazel
 rx	\h'0*\w"ftp://regexps.com/pub/src/hackerlab/"'R\h'0'	Tom Lord
 spencer	\h'0*\w"http://arglist.com/regex/rxspencer-alpha3.8.g2.tar.gz"'S\h'0'	Henry Spencer
@@ -55,7 +55,7 @@ libtre	\h'0*\w"http://kouli.iki.fi/~vlaurika/libtre/"'T\h'0'	Ville Laurikari
 .TE
 .H 1 "Test Data Repository"
 .TS
-center;
+center box;
 r l.
 \h'0*\w"basic.dat"'basic.dat\h'0'	\|\|basic regex(3) -- all implementations should pass these
 \h'0*\w"categorize.dat"'categorize.dat\h'0'	\|\|\h'0*\w"./re-categorize.html"'implementation categorization\h'0'

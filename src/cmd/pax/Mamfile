@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -25,8 +25,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -46,30 +46,19 @@ make pax.h implicit
 make options.h implicit
 done options.h dontcare
 make paxlib.h implicit
-make ../../../include/ast/modex.h implicit
-make ../../../include/ast/modecanon.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/modecanon.h dontcare
-make ../../../include/ast/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ../../../include/ast/ast_fs.h dontcare
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/modex.h dontcare
-make ../../../include/ast/ls.h implicit
-make ../../../include/ast/ast_mode.h implicit
-done ../../../include/ast/ast_mode.h dontcare
-prev ../../../include/ast/ast_fs.h implicit
+make ../../../include/ast/vmalloc.h implicit
+make ../../../include/ast/ast_common.h implicit
+done ../../../include/ast/ast_common.h dontcare
 make ../../../include/ast/ast_std.h implicit
 make ../../../include/ast/ast_botch.h implicit
 done ../../../include/ast/ast_botch.h dontcare
 make ../../../include/ast/ast_unistd.h implicit
 done ../../../include/ast/ast_unistd.h dontcare
 make ../../../include/ast/re_comp.h implicit
-prev ../../../include/ast/prototyped.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
 make ../../../include/ast/ast_getopt.h implicit
@@ -78,7 +67,16 @@ done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit
-prev ../../../include/ast/ls.h implicit
+make ../../../include/ast/ls.h implicit
+make ../../../include/ast/ast_mode.h implicit
+done ../../../include/ast/ast_mode.h dontcare
+make ../../../include/ast/ast_fs.h implicit
+make error?--?old?ethernet?address?at?wrong?offset implicit
+done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
+done ../../../include/ast/ast_fs.h dontcare
+prev ../../../include/ast/ast_std.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ls.h dontcare
 prev ../../../include/ast/ast_fs.h implicit
 done ../../../include/ast/ast_fcntl.h dontcare
 make ../../../include/ast/ast_types.h implicit
@@ -89,8 +87,7 @@ make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
-make ../../../include/ast/ast_common.h implicit
-done ../../../include/ast/ast_common.h dontcare
+prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_stdio.h dontcare
 done ../../../include/ast/stdio.h dontcare
 prev ../../../include/ast/getopt.h implicit
@@ -106,15 +103,19 @@ done ../../../include/ast/ast_lib.h dontcare
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/ast_std.h dontcare
+done ../../../include/ast/vmalloc.h dontcare
+make ../../../include/ast/modex.h implicit
+make ../../../include/ast/modecanon.h implicit
 prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/ls.h dontcare
+done ../../../include/ast/modecanon.h dontcare
+prev ../../../include/ast/ast_fs.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/modex.h dontcare
+prev ../../../include/ast/ls.h implicit
 make ../../../include/ast/error.h implicit
 make ../../../include/ast/option.h implicit
 make ../../../include/ast/ast.h implicit
-make ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/ast_common.h implicit
-prev ../../../include/ast/ast_std.h implicit
-done ../../../include/ast/vmalloc.h dontcare
+prev ../../../include/ast/vmalloc.h implicit
 make ../../../include/ast/sfio.h implicit
 prev ../../../include/ast/sfio_s.h implicit
 prev ../../../include/ast/ast_common.h implicit
@@ -248,7 +249,7 @@ done ../../../include/ast/ardir.h
 prev pax.h implicit
 done pax.c
 prev pax.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c pax.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c pax.c
 done pax.o generated
 make options.o
 make options.c
@@ -338,23 +339,6 @@ done pax-bzip.c
 prev pax-bzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c pax-bzip.c
 done pax-bzip.o generated
-make pax-cab.o
-make pax-cab.c
-prev ../../../include/ast/vmalloc.h implicit
-prev ../../../include/ast/tm.h implicit
-prev ../../../include/ast/int.h implicit
-prev format.h implicit
-done pax-cab.c
-prev pax-cab.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c pax-cab.c
-done pax-cab.o generated
-make pax-calib.o
-make pax-calib.c
-prev format.h implicit
-done pax-calib.c
-prev pax-calib.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c pax-calib.c
-done pax-calib.o generated
 make pax-compress.o
 make pax-compress.c
 prev format.h implicit
@@ -466,20 +450,13 @@ done pax-saveset.c
 prev pax-saveset.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c pax-saveset.c
 done pax-saveset.o generated
-make pax-zip.o
-make pax-zip.c
-prev ../../../include/ast/tm.h implicit
-prev format.h implicit
-done pax-zip.c
-prev pax-zip.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c pax-zip.c
-done pax-zip.o generated
 bind -lardir
 bind -lodelta
 bind -lvdelta
+bind -lcodex
 bind -lsum
 bind -ldll
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pax bio.o convert.o copy.o pax.o options.o delta.o file.o format.o misc.o paxlib.o tv.o pax-ar.o pax-bzip.o pax-cab.o pax-calib.o pax-compress.o pax-cpio.o pax-delta.o pax-delta_88.o pax-gzip.o pax-ignore.o pax-mime.o pax-patch.o pax-pds.o pax-rpm.o pax-slt.o pax-tar.o pax-tnef.o pax-vdb.o pax-saveset.o pax-zip.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libsum} ${mam_libdll} ${mam_libast}
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o pax bio.o convert.o copy.o pax.o options.o delta.o file.o format.o misc.o paxlib.o tv.o pax-ar.o pax-bzip.o pax-compress.o pax-cpio.o pax-delta.o pax-delta_88.o pax-gzip.o pax-ignore.o pax-mime.o pax-patch.o pax-pds.o pax-rpm.o pax-slt.o pax-tar.o pax-tnef.o pax-vdb.o pax-saveset.o ${mam_libardir} ${mam_libodelta} ${mam_libvdelta} ${mam_libcodex} ${mam_libsum} ${mam_libdll} ${mam_libast}
 done pax generated
 make nocom
 make nocom.o
@@ -489,7 +466,7 @@ prev ../../../include/ast/error.h implicit
 prev ../../../include/ast/ast.h implicit
 done nocom.c
 prev nocom.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c nocom.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"\" -c nocom.c
 done nocom.o generated
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}   -o nocom nocom.o ${mam_libast}
 done nocom generated
@@ -515,7 +492,7 @@ exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
 exec - 		cat - rpm2cpio.sh <<'!'
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"
 exec - !
 exec - 		} > rpm2cpio
 exec - 		;;
@@ -523,7 +500,7 @@ exec - 	esac
 exec - 	;;
 exec - *)	cat - rpm2cpio.sh > rpm2cpio <<'!'
 exec - ${mam_cc_SHELLMAGIC}
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1987-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pax]"
 exec - !
 exec - 	;;
 exec - esac

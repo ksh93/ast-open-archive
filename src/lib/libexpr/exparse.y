@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -64,6 +64,7 @@
 %token	STRING
 %token	VOID
 
+%token	ADDRESS
 %token	BREAK
 %token	CALL
 %token	CASE
@@ -89,7 +90,9 @@
 %token	PROCEDURE
 %token	QUERY
 %token	RETURN
+%token	SCANF
 %token	SPRINTF
+%token	SSCANF
 %token	SWITCH
 %token	WHILE
 
@@ -140,6 +143,7 @@
 %type <id>		IF		WHILE		FOR
 %type <id>		BREAK		CONTINUE	print
 %type <id>		RETURN		DYNAMIC		SWITCH
+%type <id>		SCANF		SSCANF		scan
 %type <floating>	FLOATING
 %type <integer>		INTEGER		UNSIGNED	array
 %type <string>		STRING
@@ -698,6 +702,10 @@ expr		:	'(' expr ')'
 		{
 			$$ = $2;
 		}
+		|	'&' variable	%prec UNARY
+		{
+			$$ = exnewnode(expr.program, ADDRESS, 0, T($2->type), $2, NiL);
+		}
 		|	reference FUNCTION '(' args ')'
 		{
 			$$ = exnewnode(expr.program, FUNCTION, 1, T($2->type), call($1, $2, $4), $4);
@@ -740,6 +748,41 @@ expr		:	'(' expr ')'
 				break;
 			}
 			$$->data.print.args = preprint($3);
+		}
+		|	scan '(' args ')'
+		{
+			register Exnode_t*	x;
+
+			$$ = exnewnode(expr.program, $1->index, 0, $1->type, NiL, NiL);
+			if ($3 && $3->data.operand.left->type == INTEGER)
+			{
+				$$->data.scan.descriptor = $3->data.operand.left;
+				$3 = $3->data.operand.right;
+			}
+			else switch ($1->index)
+			{
+			case SCANF:
+				$$->data.scan.descriptor = 0;
+				break;
+			case SSCANF:
+				if ($3 && $3->data.operand.left->type == STRING)
+				{
+					$$->data.scan.descriptor = $3->data.operand.left;
+					$3 = $3->data.operand.right;
+				}
+				else
+					exerror("%s: string argument expected", $1->name);
+				break;
+			}
+			if (!$3 || !$3->data.operand.left || $3->data.operand.left->type != STRING)
+				exerror("%s: format argument expected", $1->name);
+			$$->data.scan.format = $3->data.operand.left;
+			for (x = $$->data.scan.args = $3->data.operand.right; x; x = x->data.operand.right)
+			{
+				if (x->data.operand.left->op != ADDRESS)
+					exerror("%s: address argument expected", $1->name);
+				x->data.operand.left = x->data.operand.left->data.operand.left;
+			}
 		}
 		|	STRING '.' ID
 		{
@@ -835,6 +878,10 @@ constant	:	CONSTANT
 print		:	PRINTF
 		|	QUERY
 		|	SPRINTF
+		;
+
+scan		:	SCANF
+		|	SSCANF
 		;
 
 variable	:	reference ID index

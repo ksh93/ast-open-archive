@@ -1,3 +1,4 @@
+04-02-29 mm2html: .TS box => void lines
 03-08-11 mm2html: handle man .TH args>2
 03-03-25 mm2html: table border size '' => 0
 03-02-06 troff2html.c: fmtquote() FMT_ALWAYS update

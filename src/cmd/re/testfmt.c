@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2002 AT&T Corp.                *
+*                Copyright (c) 1995-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -187,6 +187,7 @@ bad(char* comment, char* re, char* s, int expand)
 static void
 escape(char* s)
 {
+	char*	e;
 	char*	t;
 	char*	q;
 	int	c;
@@ -231,10 +232,12 @@ escape(char* s)
 			case 'v':
 				*t = '\v';
 				break;
+			case 'u':
 			case 'x':
 				c = 0;
-				q = ++s;
-				for (;;)
+				q = c == 'u' ? (s + 4) : (char*)0;
+				e = s;
+				while (!e || !q || s < q)
 				{
 					switch (*s)
 					{
@@ -249,16 +252,18 @@ escape(char* s)
 						c = (c << 4) + *s++ - '0';
 						continue;
 					case '{':
-						if (q != s)
+					case '[':
+						if (s != e)
 							break;
+						e = 0;
 						s++;
 						continue;
 					case '}':
-						if (*q == '{')
+					case ']':
+						if (!e)
 							s++;
 						break;
 					default:
-						s--;
 						break;
 					}
 					break;

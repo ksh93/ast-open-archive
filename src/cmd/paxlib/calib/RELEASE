@@ -1,0 +1,4 @@
+04-02-14 pax->strict disables -INC => COPY..REPLACING
+04-01-30 add rexx suffix check
+04-01-28 relax COPY REPLACING equivalent comment syntax check
+04-01-03 first release

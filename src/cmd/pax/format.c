@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -159,6 +159,7 @@ getprologue(register Archive_t* ap)
 				if ((fp->flags & ARCHIVE) && fp->getprologue)
 				{
 					message((-2, "check %s", fp->name));
+					convert(ap, SECTION_CONTROL, (fp->flags & CONV) ? CC_NATIVE : CC_ASCII, CC_NATIVE);
 					if ((n = (*fp->getprologue)(&state, fp, ap, f, buf, sizeof(buf))) < 0)
 						return 0;
 					if (n > 0)
@@ -172,6 +173,7 @@ getprologue(register Archive_t* ap)
 				}
 			if (fp)
 				break;
+			convert(ap, SECTION_CONTROL, CC_NATIVE, CC_NATIVE);
 			if (!state.keepgoing || ap->io->eof || bread(ap, buf, (off_t)0, (off_t)1, 0) < 1)
 			{
 				if (ap->expected)
@@ -401,7 +403,6 @@ getepilogue(register Archive_t* ap)
 		if (ap->format->done)
 			(*ap->format->done)(&state, ap);
 		ap->swapio = 0;
-		ap->format = 0;
 	}
 }
 
@@ -725,7 +726,7 @@ putheader(register Archive_t* ap, register File_t* f)
 		suminit(state.checksum.sum);
 	ap->section = SECTION_DATA;
 	ap->convert[ap->section].on = ap->convert[ap->section].f2t != 0;
-	if (state.install.sp)
+	if (state.install.sp && !f->extended)
 	{
 		n = 0;
 		if (f->st->st_gid != state.gid && ((f->st->st_mode & S_ISGID) || (f->st->st_mode & S_IRGRP) && !(f->st->st_mode & S_IROTH) || (f->st->st_mode & S_IXGRP) && !(f->st->st_mode & S_IXOTH)))
@@ -781,7 +782,7 @@ puttrailer(register Archive_t* ap, register File_t* f)
 {
 	register int	n;
 
-	if (state.checksum.sum)
+	if (state.checksum.sum && !f->extended)
 	{
 		sumdone(state.checksum.sum);
 		if (f->link)

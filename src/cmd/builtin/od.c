@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2003 AT&T Corp.                *
+*                Copyright (c) 1992-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Labs Research) 2003-02-14 $\n]"
+"[-?\n@(#)$Id: od (AT&T Labs Research) 2003-10-11 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files"
@@ -67,30 +67,19 @@ USAGE_LICENSE
 "}"
 "[j:skip-bytes?Skip \bbytes\b bytes into the data before formatting.]#[bytes]"
 "[N:count|read-bytes?Output only \bbytes\b bytes of data.]#[bytes]"
-"[p:printable?Output the printable bytes in the last data column."
-"	Non-printable byte values are printed as `.']"
+"[m:map?\b--printable\b and \b--format=m\b bytes are converted from"
+"	\acodeset\a to the native codeset. The codesets"
+"	are:]:[codeset]{\fcodesets\f}"
+"[p:printable?Output the printable bytes (after \b--map\b if specified), in"
+"	the last data column. Non-printable byte values are printed as `.'.]"
 "[z:strings?Output NUL terminated strings of at least \alength\a bytes.]#?"
 "	[length:=3]"
 "[t:format|type?The data item output \aformat\a and \asize\a. A decimal byte" 
-"	count or size code may follow all but the \ba\b and \bc\b formats.]:"
-"	[format[size]]:=o2]{"
-"		[+a?named character (ASCII 3-characters)]"
-"		[+c?ASCII character or backslash escape]"
-"		[+d?signed decimal]"
-"		[+f?floating point]"
-"		[+o?octal]"
-"		[+u?unsigned decimal]"
-"		[+x?hexadecimal]"
-"		[+----- sizes -----?]"
-"		[+C?sizeof(char)]"
-"		[+S?sizeof(short)]"
-"		[+I?sizeof(int)]"
-"		[+L|l?sizeof(long)]"
-"		[+D|ll?sizeof(long long)]"
-"}"
+"	count or size code may follow all but the \ba\b, \bc\b and \bm\b"
+"	formats.]:[format[size]]:=o2]{\ftypes\f}"
 "[T:test?Enable internal implementation specific tests.]:[test]{"
-"	[+bn?Allocate a fixed input buffer of size \an\a.]"
-"	[+mn?Set the mapped input buffer size to \an\a.]"
+"	[+b\an\a?Allocate a fixed input buffer of size \an\a.]"
+"	[+m\an\a?Set the mapped input buffer size to \an\a.]"
 "	[+n?Turn off the \bSF_SHARE\b input buffer flag.]"
 "}"
 "[v:all|output-duplicates?Output all data.]"
@@ -126,7 +115,9 @@ USAGE_LICENSE
 #include <int.h>
 #include <sig.h>
 #include <swap.h>
+#include <ccode.h>
 #include <ctype.h>
+#include <iconv.h>
 
 #define NEW		(1<<0)
 #define OLD		(1<<1)
@@ -150,8 +141,9 @@ USAGE_LICENSE
 
 typedef char* (*Format_f)(int);
 
-typedef struct
+typedef struct Size_s
 {
+	char*		desc;
 	char		name;
 	char		map;
 	char		dflt;
@@ -160,8 +152,9 @@ typedef struct
 	char		size;
 } Size_t;
 
-typedef struct
+typedef struct Type_s
 {
+	char*		desc;
 	char		name;
 	const char*	fill;
 	Format_f	fun;
@@ -169,9 +162,9 @@ typedef struct
 	char		width[5];
 } Type_t;
 
-typedef struct Format
+typedef struct Format_s
 {
-	struct Format*	next;
+	struct Format_s*next;
 	const Type_t*	type;
 	Format_f	fun;
 	char		form[16];
@@ -185,38 +178,79 @@ typedef struct Format
 	short		us;
 } Format_t;
 
+static struct State_s
+{
+	int		addr;
+	char		base[8];
+	int		block;
+	char		buf[256];
+	struct
+	{
+	char*		base;
+	size_t		size;
+	int		noshare;
+	}		buffer;
+	size_t		count;
+	struct
+	{
+	char		buf[1024];
+	char*		data;
+	int		mark;
+	size_t		size;
+	}		dup;
+	char*		file;
+	Format_t*	form;
+	Format_t*	last;
+	unsigned char*	map;
+	int_max		offset;
+	struct
+	{
+	char*		data;
+	size_t		size;
+	}		peek;
+	int		printable;
+	int		size;
+	size_t		skip;
+	int		strings;
+	int		style;
+	int		swap;
+	size_t		total;
+	int		verbose;
+	int		width;
+} state;
+
 static const Size_t	csize[] =
 {
-	'C',	0,	1,	0,	0,	1,
-	0,	0,	0,	0,	0,	0
+"char",		'C',	0,	1,	0,	0,	1,
+0
 };
 
 static const Size_t	isize[] =
 {
-	'C',	0,	0,	0,	0,	1,
-	'S',	0,	0,	0,	0,	sizeof(short),
-	'I',	0,	1,	0,	0,	sizeof(int),
-	'L',	0,	0,	0,	"l",	sizeof(long),
-	'D',	0,	0,	0,
+"char",		'C',	0,	0,	0,	0,	1,
+"short",	'S',	0,	0,	0,	0,	sizeof(short),
+"int",		'I',	0,	1,	0,	0,	sizeof(int),
+"long",		'L',	0,	0,	0,	"l",	sizeof(long),
+"long long",	'D',	0,	0,	0,
 #ifdef int_8
-					"ll",	sizeof(int_8),
+						"ll",	sizeof(int_8),
 #else
-					0,	sizeof(long),
+						0,	sizeof(long),
 #endif
-	0,	0,	0,	0,	0,	0
+	0
 };
 
 static const Size_t	fsize[] =
 {
-	'F',	'e',	0,	8,	0,	sizeof(float),
-	'D',	'e',	1,	16,	0,	sizeof(double),
-	'L',	'e',	0,
+"float",	'F',	'e',	0,	8,	0,	sizeof(float),
+"double",	'D',	'e',	1,	16,	0,	sizeof(double),
+"long double",	'L',	'e',	0,
 #if _typ_long_double
-				34,	"L",	sizeof(long double),
+					34,	"L",	sizeof(long double),
 #else
-				16,	0,	sizeof(double),
+					16,	0,	sizeof(double),
 #endif
-	0,	0,	0,	0,	0,	0
+0
 };
 
 static char*
@@ -257,56 +291,61 @@ cform(int c)
 	return s;
 }
 
+static char*
+mform(int c)
+{
+	register char*	s;
+
+	static char	buf[2];
+
+	switch (buf[0] = ccmapchr(state.map, c))
+	{
+	case 0:
+		return "00";
+	case '\\':
+		return "\\";
+	}
+	s = fmtesc(buf);
+	if (*s == '\\' && isdigit(*(s + 1)))
+		sfsprintf(s, 4, "%02lx", strtol(s + 1, NiL, 8));
+	return s;
+}
+
 static const Type_t	type[] =
 {
-	{ 'a',	0,	aform,	csize,	 3,  0,  0,  0,  0  },
-	{ 'c',	0,	cform,	csize,	 3,  0,  0,  0,  0  },
-	{ 'd',	0,	0,	isize,	 4,  6, 11, 21, 31  },
-	{ 'f',	0,	0,	fsize,	 9,  9, 15, 24, 42  },
-	{ 'o',	"0",	0,	isize,	 3,  6, 11, 22, 33  },
-	{ 'u',	0,	0,	isize,	 3,  5, 10, 20, 30  },
-	{ 'x',	"0",	0,	isize,	 2,  4,  8, 16, 32  },
-};
-
-static struct
 {
-	int		addr;
-	char		base[8];
-	int		block;
-	char		buf[256];
-	struct
-	{
-	char*		base;
-	size_t		size;
-	int		noshare;
-	}		buffer;
-	size_t		count;
-	struct
-	{
-	char		buf[1024];
-	char*		data;
-	int		mark;
-	size_t		size;
-	}		dup;
-	char*		file;
-	Format_t*	form;
-	Format_t*	last;
-	int_max		offset;
-	struct
-	{
-	char*		data;
-	size_t		size;
-	}		peek;
-	int		printable;
-	int		size;
-	size_t		skip;
-	int		strings;
-	int		style;
-	int		swap;
-	size_t		total;
-	int		verbose;
-	int		width;
-} state;
+	"named character (ASCII 3-characters)",
+	'a',	0,	aform,	csize,	 3,  0,  0,  0,  0
+},
+{
+	"ASCII character or backslash escape",
+	'c',	0,	cform,	csize,	 3,  0,  0,  0,  0
+},
+{
+	"signed decimal",
+	'd',	0,	0,	isize,	 4,  6, 11, 21, 31
+},
+{
+	"floating point",
+	'f',	0,	0,	fsize,	 9,  9, 15, 24, 42
+},
+{
+	"\b--map\b mapped character or hexadecimal value if not printable",
+	'm',	0,	mform,	csize,	 2,  0,  0,  0,  0
+},
+{
+	"octal",
+	'o',	"0",	0,	isize,	 3,  6, 11, 22, 33
+},
+{
+	"unsigned decimal",
+	'u',	0,	0,	isize,	 3,  5, 10, 20, 30
+},
+{
+	"hexadecimal",
+	'x',	"0",	0,	isize,	 2,  4,  8, 16, 32
+},
+};
 
 /*
  * add format type t to the format list
@@ -499,7 +538,7 @@ static int
 block(Sfio_t* op, char* bp, char* ep, int_max base)
 {
 	register Format_t*	fp;
-	register char*		u;
+	register unsigned char*	u;
 	register char*		f;
 	unsigned long		n;
 	int_max			x;
@@ -537,7 +576,7 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 			else
 				sfprintf(op, "%-*.*s ", BASE_WIDTH, BASE_WIDTH, "");
 		}
-		u = bp;
+		u = (unsigned char*)bp;
 		for (;;)
 		{
 			if (fp->fun)
@@ -596,7 +635,7 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 				}
 			}
 			sfprintf(op, "%*s", state.width * fp->size.external / state.size, f);
-			if ((u += fp->size.external) < ep)
+			if ((u += fp->size.external) < (unsigned char*)ep)
 				sfputc(op, ' ');
 			else
 			{
@@ -607,9 +646,9 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 					if (c = (state.block - (ep - bp)) / state.size * (state.width + 1))
 						sfprintf(op, "%*s", c, "");
 					sfputc(op, ' ');
-					for (u = bp; u < ep;)
+					for (u = (unsigned char*)bp; u < (unsigned char*)ep;)
 					{
-						if ((c = *u++) < 040 || c >= 0177)
+						if ((c = ccmapchr(state.map, *u++)) < 040 || c >= 0177)
 							c = '.';
 						sfputc(op, c);
 					}
@@ -771,6 +810,53 @@ od(char** files)
 	return -1;
 }
 
+/*
+ * optinfo() size description
+ */
+
+static int
+optsize(Sfio_t* sp, const Size_t* zp)
+{
+	register int	n;
+
+	for (n = 0; zp->name; zp++)
+		if (zp->qual && (*zp->qual != zp->name || *(zp->qual + 1)))
+			n += sfprintf(sp, "[%c|%s?sizeof(%s)]", zp->name, zp->qual, zp->desc);
+		else
+			n += sfprintf(sp, "[%c?sizeof(%s)]", zp->name, zp->desc);
+	return n;
+}
+
+/*
+ * optget() info discipline function
+ */
+
+static int
+optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
+{
+	register iconv_list_t*	ic;
+	register int		i;
+	register int		n;
+
+	n = 0;
+	switch (*s)
+	{
+	case 'c':
+		for (ic = iconv_list(NiL); ic; ic = iconv_list(ic))
+			if (ic->ccode >= 0)
+				n += sfprintf(sp, "[%c:%s?%s]", ic->match[ic->match[0] == '('], ic->name, ic->desc);
+		break;
+	case 't':
+		for (i = 0; i < elementsof(type); i++)
+			n += sfprintf(sp, "[%c?%s]", type[i].name, type[i].desc);
+		n += sfprintf(sp, "[+----- sizes -----?]");
+		n += optsize(sp, isize);
+		n += optsize(sp, fsize);
+		break;
+	}
+	return n;
+}
+
 int
 b_od(int argc, char** argv, void* context)
 {
@@ -780,12 +866,15 @@ b_od(int argc, char** argv, void* context)
 	char*			e;
 	int			per;
 	char			buf[4];
+	Optdisc_t		optdisc;
 
 	NoP(argc);
 	cmdinit(argv, context, ERROR_CATALOG, 0);
+	optinit(&optdisc, optinfo);
 	memset(&state, 0, sizeof(state));
 	per = 0;
 	state.swap = int_swap;
+	state.map = ccmap(CC_ASCII, CC_ASCII);
 	for (;;)
 	{
 		switch (optget(argv, usage))
@@ -809,6 +898,11 @@ b_od(int argc, char** argv, void* context)
 			}
 			state.skip = opt_info.num;
 			state.style |= NEW;
+			continue;
+		case 'm':
+			if ((n = ccmapid(opt_info.arg)) < 0)
+				error(3, "%s: unknown character code set", opt_info.arg);
+			state.map = ccmap(n, CC_NATIVE);
 			continue;
 		case 'N':
 			state.count = opt_info.num;

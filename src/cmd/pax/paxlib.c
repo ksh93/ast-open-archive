@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -35,10 +35,12 @@
 #undef	paxdata
 #undef	paxget
 #undef	paxnospace
+#undef	paxpart
 #undef	paxput
 #undef	paxread
 #undef	paxseek
 #undef	paxstash
+#undef	paxsync
 #undef	paxunread
 #undef	paxwrite
 
@@ -85,6 +87,16 @@ paxstash(Pax_t* pax, Value_t* v, const char* s, size_t z)
 }
 
 static int
+paxsync(Pax_t* pax, Paxarchive_t* ap, int hard)
+{
+	if (ap->io->mode == O_RDONLY)
+		bflushin(ap, hard);
+	else
+		bflushout(ap);
+	return 0;
+}
+
+static int
 paxunread(Pax_t* pax, Paxarchive_t* ap, void* b, off_t n)
 {
 	bunread(ap, b, n);
@@ -92,9 +104,9 @@ paxunread(Pax_t* pax, Paxarchive_t* ap, void* b, off_t n)
 }
 
 static int
-paxwrite(Pax_t* pax, Paxarchive_t* ap, void* b, off_t n)
+paxwrite(Pax_t* pax, Paxarchive_t* ap, const void* b, off_t n)
 {
-	bwrite(ap, b, n);
+	bwrite(ap, (void*)b, n);
 	return 0;
 }
 
@@ -112,7 +124,7 @@ paxchecksum(Pax_t* pax, Paxarchive_t* ap, Paxfile_t* f, unsigned long expected, 
 
 	if (expected != value)
 	{
-		z = ((expected | value) & 0xff00) ? 4 : 2;
+		z = ((expected | value) & 0xffff0000) ? 8 : 4;
 		(*pax->errorf)(NiL, pax, 2, "%s%s%s: %s archive checksum error -- expected %0*lx != %0*lx", ap->name, TXT(f, f->name), ap->format->name, z, expected, z, value);
 		return -1;
 	}
@@ -127,6 +139,74 @@ paxnospace(Pax_t* pax)
 }
 
 /*
+ * archive part sfio discipline
+ */
+
+static ssize_t
+part_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
+{
+	register Part_t*	part = (Part_t*)disc;
+	ssize_t			r;
+
+	if (part->n <= 0)
+		return part->n;
+	if (n > part->n)
+		n = part->n;
+	if ((r = paxread(part->pax, part->ap, buf, n, 0, 0)) > 0)
+		part->n -= r;
+	return r;
+}
+
+static ssize_t
+part_write(Sfio_t* sp, const void* buf, size_t n, Sfdisc_t* disc)
+{
+	register Part_t*	part = (Part_t*)disc;
+	ssize_t			r;
+
+	if ((r = paxwrite(part->pax, part->ap, buf, n)) > 0)
+		part->n += r;
+	return r;
+}
+
+static Sfio_t*
+paxpart(Pax_t* pax, Paxarchive_t* ap, off_t n)
+{
+	register Part_t*	part;
+
+	static int		fd = -1;
+
+	if (!(part = ap->partio))
+	{
+		if (!(part = newof(0, Part_t, 1, 0)) || !(part->sp = sfstropen()))
+		{
+			paxnospace(pax);
+			return 0;
+		}
+		part->sp->_flags &= ~(SF_READ|SF_WRITE|SF_STRING);
+		if (ap->flags & PAX_IN)
+			part->sp->_flags |= SF_READ;
+		else
+			part->sp->_flags |= SF_WRITE;
+		if (fd < 0)
+			fd = open("/dev/null", O_RDWR);
+		part->sp->_file = fd;
+		part->disc.readf = part_read;
+		part->disc.writef = part_write;
+		if (sfdisc(part->sp, &part->disc) != &part->disc)
+		{
+			sfclose(part->sp);
+			free(part);
+			return 0;
+		}
+		part->pax = pax;
+		part->ap = ap;
+		ap->partio = part;
+	}
+	part->n = n;
+	return part->sp;
+}
+
+/*
  * initialize the external library callbacks
  */
 
@@ -138,10 +218,12 @@ paxinit(register Pax_t* pax, const char* id)
 
 	pax->dataf = paxdata;
 	pax->getf = paxget;
+	pax->partf = paxpart;
 	pax->putf = paxput;
 	pax->readf = paxread;
 	pax->seekf = paxseek;
 	pax->stashf = paxstash;
+	pax->syncf = paxsync;
 	pax->unreadf = paxunread;
 	pax->writef = paxwrite;
 

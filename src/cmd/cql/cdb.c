@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2002 AT&T Corp.                *
+*                Copyright (c) 1991-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -36,7 +36,7 @@ USAGE_LICENSE
 "[+NAME?cdb - display cql data files]"
 "[+DESCRIPTION?\bcdb\b displays \bcql\b(1) and \bcdb\b(3) data files."
 "	Input data information is optional if the input is self describing."
-"	Otherwise the deafult input format is \bflat\b, the default input"
+"	Otherwise the default input format is \bflat\b, the default input"
 "	schema is best guess, and the default input comment is empty. The"
 "	default output format is \bflat\b, the default output schema is the"
 "	same as the input schema with external types and virtuals omitted, and"
@@ -204,7 +204,7 @@ set(char* line, char** argv, const char* usage, int* op, Db_t* db, Db_t* input, 
 				set(opt_info.arg, NiL, usage, op, db, input, output);
 			continue;
 		case 'l':
-			cdblib(opt_info.arg, 1, &input->disc);
+			cdblib(opt_info.arg, &input->disc);
 			continue;
 		case 'm':
 			*op |= METHODS;

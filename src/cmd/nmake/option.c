@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -34,8 +34,6 @@
 
 #include "make.h"
 #include "options.h"
-
-#include <option.h>
 
 #define getoption(n)	((struct option*)hashget(opttab,(n)))
 #define putoption(n,o)	hashput(opttab,(n),(char*)(o))
@@ -229,15 +227,19 @@ static struct option	options[] =	/* option table			*/
 	" error when \bnmake\b exits.", 0,
 "warn",		OPT_warn,	(char*)&state.warn,		0,0,
 	"Enable verbose warning messages. Currently ignored.", 0,
-"writeobject",	OPT_writeobject,(char*)&state.writeobject,	0,0,
-	"Generate a \b.mo\b make object file that can be read instead of"
-	" the input makefiles on the next \bnmake\b invocation. On by default."
-	" \b--nowriteobject\b prevents the generation.", 0,
-"writestate",	OPT_writestate,	(char*)&state.writestate,	0,0,
-	"Generate a \b.ms\b make state file when \bnmake\b exits."
+"writeobject",	OPT_writeobject,	0,			0,0,
+	"Generate a \b.mo\b make object file in \afile\a that can be read"
+	" instead of the input makefiles on the next \bnmake\b invocation."
+	" On by default. \b--nowriteobject\b prevents the generation."
+	" The default name is used if \afile\a is omitted or \b-\b.",
+	"file:=$(MAKEFILE::B::S=.mo)",
+"writestate",	OPT_writestate,		0,			0,0,
+	"Generate a \b.ms\b make state file in \afile\a when \bnmake\b exits."
 	"The state contains the time stamps of all prerequisites and targets"
 	" that have been accessed since the state file was first generated."
-	" On by default. \b--nowritestate\b prevents the generation.", 0,
+	" On by default. \b--nowritestate\b prevents the generation."
+	" The default name is used if \afile\a is omitted or \b-\b.",
+	"file:=$(MAKEFILE::B::S=.ms)",
 
 };
 
@@ -248,7 +250,6 @@ static const char usage2[] =
 "[+SEE ALSO?\b3d\b(1), \bar\b(1), \bcc\b(1), \bcoshell\b(1), \bcpp\b(1),"
 "	\bprobe\b(1), \bsh\b(1)]"
 ;
-#line 193
 
 struct oplist				/* linked option list		*/
 {
@@ -716,6 +717,34 @@ setop(register struct option* op, register int n, char* s)
 	case OPT(OPT_tolerance):
 		if ((state.tolerance = n) > 60)
 			error(1, "the time comparison tolerance should probably be less than a minute");
+		return;
+	case OPT(OPT_writeobject):
+		if (!n)
+			s = 0;
+		else if (state.makefile)
+		{
+			error(1, "%s: object file name cannot change after %s read", op->name, state.makefile);
+			return;
+		}
+		else if (!s)
+			s = "-";
+		else
+			s = strdup(s);
+		state.writeobject = s;
+		return;
+	case OPT(OPT_writestate):
+		if (!n)
+			s = 0;
+		else if (!s)
+			s = "-";
+		else
+			s = strdup(s);
+		state.writestate = s;
+		if (state.statefile)
+		{
+			free(state.statefile);
+			state.statefile = 0;
+		}
 		return;
 	}
 	if (op->value)
@@ -1315,10 +1344,8 @@ scanargs(int argc, char** argv, int* argf)
 		else
 		{
 			op = &options[-OPT_OFFSET - i];
-			n = (op->flag & On) ? (opt_info.arg ? opt_info.num : 0) : 1;
+			n = (op->flag & On) ? (opt_info.arg ? opt_info.num : 0) : (op->flag & Ob) ? (opt_info.num != 0) : 1;
 			if (*opt_info.option == '+')
-				n = !n;
-			if (op->flag & Oo)
 				n = !n;
 			if ((s = opt_info.arg) && (!*s || !(op->flag & Os)))
 				s = 0;
@@ -1369,7 +1396,7 @@ scanargs(int argc, char** argv, int* argf)
 		}
 	}
 	sfstrclose(up);
-	return args ? args : argc;
+	return error_info.errors ? -1 : args ? args : argc;
 }
 
 /*

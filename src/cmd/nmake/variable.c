@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -181,7 +181,7 @@ getval(register char* s, int op)
 				return sfstruse(internal.val);
 			}
 			if (state.mam.statix && (state.never || state.frame->target && !(state.frame->target->property & P_always)))
-				return "$MAKEFLAGS";
+				return "${NMAKEFLAGS}";
 			if (var == '-')
 			{
 				listops(internal.val, 0);

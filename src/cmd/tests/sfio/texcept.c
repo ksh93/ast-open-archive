@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1999-2003 AT&T Corp.                *
+*                Copyright (c) 1999-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -24,6 +24,7 @@
 #include	"sftest.h"
 
 static int	Type;
+static int	Sfn;
 
 #if __STD_C
 static int except(Sfio_t* f, int type, Void_t* data, Sfdisc_t* disc)
@@ -38,6 +39,7 @@ Sfdisc_t*	disc;
 	switch(type)
 	{
 	case SF_WRITE :
+		Sfn += 1;
 		return 0;
 	case SF_CLOSING:
 		if(Type == SF_CLOSING)
@@ -97,7 +99,7 @@ static Sfdisc_t	Disc, Disc2;
 
 MAIN()
 {
-	Sfio_t*	f;
+	Sfio_t	*f, *f2;
 	char	buf[1024];
 	char	rbuf[4*1024];
 	off_t	o;
@@ -114,6 +116,17 @@ MAIN()
 	sfdisc(f,&Disc);
 	if(Type != SF_DPUSH)
 		terror("Did not get push event\n");
+
+	/* this is to test sfraise(NULL,...) */
+	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
+		terror("Can't open file\n");
+	sfdisc(f2,&Disc);
+
+	Sfn = 0;
+	if(sfraise(0, SF_WRITE, 0) < 0)
+		terror("sfraise failed\n");
+	if(Sfn != 2)
+		terror("Didn't get right event count");
 
 	sfdisc(f,NIL(Sfdisc_t*));
 	if(Type != SF_DPOP)

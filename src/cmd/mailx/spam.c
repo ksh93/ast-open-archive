@@ -1,3 +1,43 @@
+/*******************************************************************
+*                                                                  *
+*             This software is part of the ast package             *
+*Copyright (c) 1978-2004 The Regents of the University of Californi*
+*                                                                  *
+*          Permission is hereby granted, free of charge,           *
+*       to any person obtaining a copy of THIS SOFTWARE FILE       *
+*            (the "Software"), to deal in the Software             *
+*              without restriction, including without              *
+*           limitation the rights to use, copy, modify,            *
+*                merge, publish, distribute, and/or                *
+*            sell copies of the Software, and to permit            *
+*            persons to whom the Software is furnished             *
+*          to do so, subject to the following disclaimer:          *
+*                                                                  *
+*THIS SOFTWARE IS PROVIDED BY The Regents of the University of Cali*
+*         ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,         *
+*            INCLUDING, BUT NOT LIMITED TO, THE IMPLIED            *
+*            WARRANTIES OF MERCHANTABILITY AND FITNESS             *
+*             FOR A PARTICULAR PURPOSE ARE DISCLAIMED.             *
+*IN NO EVENT SHALL The Regents of the University of California and *
+*         BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,          *
+*           SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES           *
+*           (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT            *
+*          OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,           *
+*           DATA, OR PROFITS; OR BUSINESS INTERRUPTION)            *
+*          HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,          *
+*          WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT          *
+*           (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING            *
+*           IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,            *
+*        EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.        *
+*                                                                  *
+*            Information and Software Systems Research             *
+*The Regents of the University of California and AT&T Labs Research*
+*                         Florham Park NJ                          *
+*                                                                  *
+*                        Kurt Shoens (UCB)                         *
+*               Glenn Fowler <gsf@research.att.com>                *
+*                                                                  *
+*******************************************************************/
 #pragma prototyped
 /*
  * Mail -- a mail program
@@ -150,7 +190,8 @@ hostmatch(const char* a, const char* b)
 
 /*
  * Return 1 if string a contains any words whose prefixes
- * match the <,><space> separated prefix list in b.
+ * ignorecase match the <,><space> separated lower case
+ * prefix list in b.
  */
 static int
 wordmatch(const char* a, const char* b)
@@ -161,6 +202,8 @@ wordmatch(const char* a, const char* b)
 	register char*	bb;
 	register char*	be;
 	register char*	bm;
+	register int	u;
+	register int	l;
 
 	bb = (char*)b;
 	for (;;)
@@ -169,27 +212,38 @@ wordmatch(const char* a, const char* b)
 			bb++;
 		if (!(be = strchr(bb, ',')))
 			be = bb + strlen(bb);
+		l = *bb;
+		u = toupper(l);
 		ab = ap = (char*)a;
-		while (ap = strchr(ap, *bb))
+		do
 		{
-			if (ap == ab || !isalnum(ap[-1]))
+			if ((*ap == l || *ap == u) && (ap == ab || !isalnum(*(ap - 1))))
 			{
 				am = ap;
 				bm = bb;
-				do
+				for (;;)
 				{
-					if (bm >= be)
+					if (bm >= be && !isalpha(*am))
 					{
-						if (isalnum(*am))
-							break;
 						if (TRACING('x'))
 							note(0, "spam: word match `%-.*s'", bm - bb, bb);
 						return 1;
 					}
-				} while (*bm++ == *am++);
+					else if (*am == *bm || *am == toupper(*bm))
+					{
+						am++;
+						bm++;
+					}
+					else if (!isalnum(*am) && !isspace(*am))
+					{
+						if (!*am++)
+							break;
+					}
+					else
+						break;
+				}
 			}
-			ap++;
-		}
+		} while (*++ap);
 		if (*be == 0)
 			break;
 		bb = be + 1;

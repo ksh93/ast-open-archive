@@ -1,3 +1,9 @@
+04-02-29 ppproto.c: fix bug that skipped prototyped check during notices check
+	 ppproto.c: recognize `Copyright nn'
+04-02-14 ppproto.c: comment[0]==0 => no notice
+04-02-11 Makefile: fix %.yacc to handle cross-compile
+04-01-28 pp.h,pplib.h,ppop.c: add PP_RESET to restore original pp.symtab scope
+03-12-12 ppcall.c: missing macro actual warned but expanded
 03-11-12 ppexpr.c: fix premature #if expression token strip
 03-06-21 ppproto.c: fix T_INVALID ? splice bug that did 0?val => 0?vaL
 03-06-10 ppargs.c: add -D-d and -D-m

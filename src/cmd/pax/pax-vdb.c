@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -165,10 +165,10 @@ vdb_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	f->linkpath = 0;
 	f->uidname = 0;
 	f->gidname = 0;
-	bflushin(ap, 0);
+	paxsync(pax, ap, 0);
 	return 1;
  eof:
-	bflushin(ap, 0);
+	paxsync(pax, ap, 0);
 	ap->io->eof = 1;
 	ap->io->offset = 0;
 	ap->io->count = lseek(ap->io->fd, (off_t)0, SEEK_END);
@@ -187,7 +187,7 @@ vdb_putprologue(Pax_t* pax, register Archive_t* ap)
 		ap->data = vdb;
 	}
 	sfprintf(vdb->directory, "%c%s%c%s\n", VDB_DELIMITER, VDB_MAGIC, VDB_DELIMITER, state.volume);
-	bwrite(ap, sfstrbase(vdb->directory), sfstrtell(vdb->directory));
+	paxwrite(pax, ap, sfstrbase(vdb->directory), sfstrtell(vdb->directory));
 	sfstrset(vdb->directory, 0);
 	sfprintf(vdb->directory, "%s\n", VDB_DIRECTORY);
 	return 1;
@@ -204,11 +204,11 @@ vdb_putheader(Pax_t* pax, Archive_t* ap, File_t* f)
 	if (state.complete)
 		complete(ap, f, state.record.header ? state.record.headerlen : f->namesize);
 	if (state.record.header)
-		bwrite(ap, state.record.header, state.record.headerlen);
+		paxwrite(pax, ap, state.record.header, state.record.headerlen);
 	else
 	{
 		f->name[f->namesize - 1] = '\n';
-		bwrite(ap, f->name, f->namesize);
+		paxwrite(pax, ap, f->name, f->namesize);
 		f->name[f->namesize - 1] = 0;
 	}
 	if (!(c = state.record.delimiter))
@@ -267,7 +267,7 @@ static int
 vdb_puttrailer(Pax_t* pax, Archive_t* ap, File_t* f)
 {
 	if (state.record.trailer)
-		bwrite(ap, state.record.trailer, state.record.trailerlen);
+		paxwrite(pax, ap, state.record.trailer, state.record.trailerlen);
 	return 0;
 }
 
@@ -277,9 +277,9 @@ vdb_putepilogue(Pax_t* pax, Archive_t* ap)
 	register Vdb_t*	vdb = (Vdb_t*)ap->data;
 
 	if (state.record.header)
-		bwrite(ap, state.record.header, state.record.headerlen);
+		paxwrite(pax, ap, state.record.header, state.record.headerlen);
 	sfprintf(vdb->directory, "%c%s%c%0*I*d%c%0*I*d\n", VDB_DELIMITER, VDB_DIRECTORY, VDB_DELIMITER, VDB_FIXED, sizeof(ap->io->offset), ap->io->offset + ap->io->count + sizeof(VDB_DIRECTORY), VDB_DELIMITER, VDB_FIXED, sizeof(Sfoff_t), sftell(vdb->directory) - sizeof(VDB_DIRECTORY) + VDB_LENGTH + 1);
-	bwrite(ap, sfstrbase(vdb->directory), sfstrtell(vdb->directory));
+	paxwrite(pax, ap, sfstrbase(vdb->directory), sfstrtell(vdb->directory));
 	sfstrclose(vdb->directory);
 	return ap->io->count;
 }
@@ -294,7 +294,7 @@ Format_t	pax_vdb_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	0,
-	pax_vdb_next,
+	PAXNEXT(pax_vdb_next),
 	0,
 	vdb_done,
 	vdb_getprologue,
@@ -308,3 +308,5 @@ Format_t	pax_vdb_format =
 	vdb_puttrailer,
 	vdb_putepilogue,
 };
+
+PAXLIB(&pax_vdb_format)

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -149,6 +149,6 @@ tvtouch(const char* path, register const Tv_t* av, register const Tv_t* mv, cons
 	}
 	return utimes(path, am);
 #else
-	return touch(path, av ? av->tv_sec : 
+	return touch(path, av ? av->tv_sec : 0, mv ? mv->tv_sec : 0, 0);
 #endif
 }

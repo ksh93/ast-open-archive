@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -1222,7 +1222,9 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	char*		tok;
 	struct rule*	r;
 	struct rule*	d;
+	struct rule*	order;
 	struct rule**	v;
+	struct list*	q;
 	Sfio_t*		vec;
 	Sfio_t*		tmp;
 	Sfio_t*		sp;
@@ -1233,6 +1235,7 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 	int		k;
 	int		p;
 
+	order = targets ? (struct rule*)0 : getrule(external.order);
 	tab = hashalloc(table.rule, 0);
 	tmp = sfstropen();
 	vec = sfstropen();
@@ -1272,7 +1275,12 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 							p = 2;
 						else if (p == 1)
 						{
-							if (i != ':' || !strneq(s, "command", 7))
+							if (i == ':' && strneq(s, "order", 5))
+							{
+								if (order)
+									order->prereqs = append(order->prereqs, cons(makerule(t), NiL));
+							}
+							else if (i != ':' || !strneq(s, "command", 7))
 							{
 								sfprintf(internal.nam, "lib%s", t);
 								t = sfstruse(internal.nam);
@@ -1334,6 +1342,19 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 				}
 			}
 			sfclose(sp);
+
+			/*
+			 * foolib : foo : libfoo
+			 */
+
+			if ((s = strrchr(d->name, '/')) && (s - d->name) > 3 && *(s - 1) == 'b' && *(s - 2) == 'i' && *(s - 3) == 'l')
+			{
+				*(s - 3) = 0;
+				r = makerule(d->name);
+				*(s - 3) = 'l';
+				if (r != d)
+					addprereq(d, r, PREREQ_APPEND);
+			}
 		}
 	}
 	mark = 0;
@@ -1347,7 +1368,20 @@ order_recurse(Sfio_t* xp, char* directories, char* makefiles, char* skip, char* 
 		k = 0;
 	}
 	else
+	{
+		/*
+		 * favor external.order prereqs if they are in the mix
+		 */
+
+		if (order)
+			for (q = order->prereqs; q; q = q->next)
+				if ((r = (struct rule*)hashget(tab, unbound(q->rule))) && (r->mark & M_MUST))
+				{
+					mark = order_descend(xp, r, 1, mark, prereqs);
+					sfputr(xp, "-", ' ');
+				}
 		k = 1;
+	}
 	v = (struct rule**)sfstrbase(vec);
 	while (*v++)
 	{
@@ -1430,7 +1464,7 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			if (*s == '/')
 				sfputr(xp, s, 0);
 			else
-				sfprintf(xp, "%s/%s%c", internal.pwd, s, 0);
+				sfprintf(xp, "%s/%s%c", state.mam.statix ? internal.dot->name : internal.pwd, s, 0);
 			s = sfstrset(xp, pos);
 			pos += canon(s) - s;
 			sfstrset(xp, pos);
@@ -1519,6 +1553,24 @@ pathop(Sfio_t* xp, register char* s, char* op, int sep)
 			if (sep)
 				sfputc(xp, ' ');
 			sfputc(xp, '.');
+		}
+		return;
+	case 'E':
+		/*
+		 * construct a PATH independent executable pathname for s
+		 */
+
+		if (*s)
+		{
+			pos = sfstrtell(xp);
+			if (state.mam.statix && r && !(r->property & P_state) && !(r->dynamic & D_alias))
+				s = unbound(r);
+			if (*s != '/' && (*s != '.' || *(s + 1) != '/' && (*(s + 1) != '.' || *(s + 2) != '/')))
+			{
+				sfputc(xp, '.');
+				sfputc(xp, '/');
+			}
+			sfputr(xp, s, -1);
 		}
 		return;
 	case 'G':
@@ -1987,7 +2039,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	{
 	case 'N':
 	case 'V':
-		if ((*s == 0) == ((op == 'V') == (sep == EQ)))
+		if ((*s == 0) == ((op == 'V') == !(sep & NOT)))
 			/*NOP*/;
 		else if (*p)
 			expand(xp, p);
@@ -2026,7 +2078,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			tst = !!getrule(s);
 			break;
 		}
-		if (tst == (sep == EQ))
+		if (tst == !(sep & NOT))
 			sfputr(xp, s, -1);
 		return;
 	}
@@ -2066,7 +2118,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		}
 		return;
 	}
-	tst = (notfile(r) || !r->time || r->status == IGNORE || state.exec && r->status != NOTYET && (x = staterule(RULE, r, NiL, 0)) && !x->time || (r->dynamic & (D_member|D_membertoo)) == D_member) ? 0 : 'F';
+	tst = (notfile(r) || !r->time && ((state.questionable & 0x04000000) || !(r->dynamic & D_triggered)) || r->status == IGNORE || state.exec && r->status != NOTYET && (x = staterule(RULE, r, NiL, 0)) && !x->time || (r->dynamic & (D_member|D_membertoo)) == D_member) ? 0 : 'F';
 	switch (op)
 	{
 	case 0:
@@ -2143,7 +2195,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			matched = (op == tst);
 			break;
 		}
-		if (tst != 'F' || lstat(r->name, &st))
+		if (tst != 'F' || ((sep & GT) ? pathstat(r->name, &st) : lstat(r->name, &st)))
 		{
 			matched = 0;
 			break;
@@ -2420,7 +2472,7 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 		matched = (op == tst);
 		break;
 	}
-	if (matched == (sep == EQ))
+	if (matched == !(sep & NOT))
 	{
 		if (*p)
 			expand(xp, p);
@@ -3445,20 +3497,12 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		case 'X':
 			ctx = 0;
 			/*FALLTHROUGH*/
-		case 'M':
 		case 'P':
 		case 'T':
 			if (val == KEEP || val == DELETE)
 				error(3, "edit operator value omitted: %s", editcontext(eb, ed));
 			switch (op)
 			{
-			case 'M':
-				if (n = regcomp(&re, val, REG_AUGMENTED|REG_LENIENT|REG_NOSUB|REG_NULL))
-				{
-					regfatalpat(&re, 2, n, val);
-					continue;
-				}
-				break;
 			case 'X':
 				cross(xp, x, val);
 				continue;
@@ -3472,6 +3516,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		case 'W':
 			ctx = 0;
 			/*FALLTHROUGH*/
+		case 'M':
 		case 'N':
 		case 'O':
 		case 'U':
@@ -3504,6 +3549,20 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					n |= SORT_sort|SORT_version;
 				list(xp, x, val, n);
 				continue;
+			case 'M':
+				if (n = regcomp(&re, val, REG_AUGMENTED|REG_LENIENT|REG_NOSUB|REG_NULL))
+				{
+					regfatalpat(&re, 2, n, val);
+					continue;
+				}
+				break;
+			case 'N':
+				if (n = regcomp(&re, val, REG_SHELL|REG_AUGMENTED|REG_LEFT|REG_RIGHT|REG_LENIENT|REG_NOSUB|REG_NULL))
+				{
+					regfatalpat(&re, 2, n, val);
+					continue;
+				}
+				break;
 			case 'O':
 				cntlim = (*val == 'N' || *val == 'n' || *val == '*') ? -1 : (int)strtol(val, NiL, 0);
 				break;
@@ -3707,13 +3766,10 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					generate(xp, s, val, sep);
 				break;
 			case 'M':
+			case 'N':
 				if ((n = regexec(&re, s, 0, NiL, 0)) && n != REG_NOMATCH)
 					regfatal(&re, 2, n);
 				else if ((n == 0) == (sep == EQ))
-					sfputr(xp, s, -1);
-				break;
-			case 'N':
-				if (strmatch(s, val) == (sep == EQ))
 					sfputr(xp, s, -1);
 				break;
 			case 'O':
@@ -3883,6 +3939,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 			break;
 		case 'C':
 		case 'M':
+		case 'N':
 			regfree(&re);
 			break;
 		}

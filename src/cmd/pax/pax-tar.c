@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -489,7 +489,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	int		i;
 
  again:
-	if (bread(ap, &tar->header, (off_t)0, (off_t)TAR_HEADER, 0) <= 0)
+	if (paxread(pax, ap, &tar->header, (off_t)0, (off_t)TAR_HEADER, 0) <= 0)
 		return 0;
 	if (!*tar->header.name)
 	{
@@ -525,7 +525,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 				if (sfsscanf(tmp, "%7lo", &num) == 1 && tar_checksum(ap, 1, num))
 				{
 					ap->swapio = i;
-					bunread(ap, &tar->header, TAR_HEADER);
+					paxunread(pax, ap, &tar->header, TAR_HEADER);
 					goto again;
 				}
 			}
@@ -570,7 +570,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	*(tar->header.name + TARSIZEOF(name)) = 0;
 	if (ap->format->variant != OLD && *tar->header.prefix)
 	{
-		f->name = stash(&ap->stash.head, NiL, TARSIZEOF(prefix) + TARSIZEOF(name) + 2);
+		f->name = paxstash(pax, &ap->stash.head, NiL, TARSIZEOF(prefix) + TARSIZEOF(name) + 2);
 		sfsprintf(f->name, TARSIZEOF(prefix) + TARSIZEOF(name) + 2, "%-.*s/%-.*s", TARSIZEOF(prefix), tar->header.prefix, TARSIZEOF(name), tar->header.name);
 	}
 	else
@@ -587,12 +587,12 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		f->st->st_nlink = 2;
 		if (!ap->delta)
 			f->st->st_size = 0;
-		f->linkpath = stash(&ap->stash.link, tar->header.linkname, 0);
+		f->linkpath = paxstash(pax, &ap->stash.link, tar->header.linkname, 0);
 		break;
 	case SYMTYPE:
 		f->linktype = SOFTLINK;
 		f->st->st_mode |= X_IFLNK;
-		f->linkpath = stash(&ap->stash.link, tar->header.linkname, 0);
+		f->linkpath = paxstash(pax, &ap->stash.link, tar->header.linkname, 0);
 		break;
 	case CHRTYPE:
 		f->st->st_mode |= X_IFCHR;
@@ -623,7 +623,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		ap->format = &pax_pax_format;
 		if (f->st->st_size > 0)
 		{
-			if (s = bget(ap, f->st->st_size, NiL))
+			if (s = paxget(pax, ap, f->st->st_size, NiL))
 			{
 				s[f->st->st_size - 1] = 0;
 				setoptions(s, NiL, state.usage, ap, tar->header.typeflag);
@@ -643,7 +643,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	case LREGTYPE:
 		if ((n = f->st->st_size) > 0)
 		{
-			if (!(s = bget(ap, n, NiL)))
+			if (!(s = paxget(pax, ap, n, NiL)))
 			{
 				error(2, "%s: invalid %s format long path header", ap->name, ap->format->name);
 				return 0;
@@ -651,7 +651,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 			op = &options[tar->header.typeflag == LLNKTYPE ? OPT_linkpath : OPT_path];
 			op->level = 6;
 			op->entry = ap->entry;
-			stash(&op->temp, s, (size_t)n);
+			paxstash(pax, &op->temp, s, (size_t)n);
 		}
 		gettrailer(ap, f);
 		goto again;
@@ -684,7 +684,7 @@ tar_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	tar->last[tar->lastindex] = tar->header;
 	return 1;
  nope:
-	bunread(ap, &tar->header, TAR_HEADER);
+	paxunread(pax, ap, &tar->header, TAR_HEADER);
 	return 0;
 }
 
@@ -857,7 +857,7 @@ tar_putheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 		strcpy(tar->header.gname, f->gidname);
 	}
 	sfsprintf(tar->header.chksum, TARSIZEOF(chksum), "%0*lo ", TARSIZEOF(chksum) - 1, tar_checksum(ap, 0, 0));
-	bwrite(ap, &tar->header, TAR_HEADER);
+	paxwrite(pax, ap, &tar->header, TAR_HEADER);
 	return 1;
 }
 
@@ -867,8 +867,8 @@ tar_putepilogue(Pax_t* pax, Archive_t* ap)
 	register Tar_t*	tar = (Tar_t*)ap->data;
 
 	memzero(&tar->header, TAR_HEADER);
-	bwrite(ap, &tar->header, TAR_HEADER);
-	bwrite(ap, &tar->header, TAR_HEADER);
+	paxwrite(pax, ap, &tar->header, TAR_HEADER);
+	paxwrite(pax, ap, &tar->header, TAR_HEADER);
 	return ap->io->unblocked ? BLOCKSIZE : state.blocksize;
 }
 
@@ -1028,7 +1028,7 @@ Format_t	pax_ustar_format =
 	DEFBUFFER,
 	DEFBLOCKS,
 	BLOCKSIZE,
-	pax_ustar_next,
+	PAXNEXT(pax_ustar_next),
 	0,
 	tar_done,
 	tar_getprologue,
@@ -1048,3 +1048,5 @@ Format_t	pax_ustar_format =
 	tar_event,
 	EVENT_SKIP_JUNK
 };
+
+PAXLIB(&pax_ustar_format)

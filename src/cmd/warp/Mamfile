@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.3 2003-09-19
+info mam static 00000 1994-07-17 make (AT&T Research) 4.4 2004-02-29
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -25,8 +25,8 @@ setv LEXFLAGS
 setv LPR lpr
 setv LPRFLAGS
 setv M4FLAGS 
-setv MAKE nmake
-setv MAKEFLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
 setv PR pr
 setv PRFLAGS
 setv SHELL /bin/sh
@@ -120,7 +120,6 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 prev ../../../include/ast/ast_common.h implicit
@@ -185,7 +184,7 @@ exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
 exec - 		cat - warp.sh <<'!'
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
 exec - !
 exec - 		} > warp
 exec - 		;;
@@ -193,7 +192,7 @@ exec - 	esac
 exec - 	;;
 exec - *)	cat - warp.sh > warp <<'!'
 exec - ${mam_cc_SHELLMAGIC}
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2003 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2004 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?warp]" DEBUG=1 _PACKAGE_ast=1
 exec - !
 exec - 	;;
 exec - esac

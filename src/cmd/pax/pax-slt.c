@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2003 AT&T Corp.                *
+*                Copyright (c) 1987-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -108,7 +108,7 @@ getlabstr(register char* p, int byte, int width, register char* s)
  */
 
 static int
-getlabel(register Archive_t* ap, register File_t* f)
+getlabel(Pax_t* pax, register Archive_t* ap, register File_t* f)
 {
 	register Slt_t*	slt = (Slt_t*)ap->data;
 	register int	c;
@@ -119,13 +119,13 @@ getlabel(register Archive_t* ap, register File_t* f)
 		slt->peek = 0;
 		return c;
 	}
-	if (slt->done || (c = bread(ap, slt->buf, (off_t)HDR_SIZE, (off_t)LABEL_MAX, 0)) < HDR_SIZE)
+	if (slt->done || (c = paxread(pax, ap, slt->buf, (off_t)HDR_SIZE, (off_t)LABEL_MAX, 0)) < HDR_SIZE)
 		return *slt->last = slt->done = c = 0;
 	if (slt->buf[4] == 'V' && ((n = getlabnum(slt->buf, 4, 1, 10)) < 1 || n > 3) && (n = getlabnum(slt->buf, 6, 4, 10)) != c)
 	{
 		if ((c = n - c) > 0)
 		{
-			if (ap->io->blocked || bread(ap, slt->buf + HDR_SIZE, (off_t)0, (off_t)c, 1) != c)
+			if (ap->io->blocked || paxread(pax, ap, slt->buf + HDR_SIZE, (off_t)0, (off_t)c, 1) != c)
 			{
 				c = HDR_SIZE;
 				error(2, "%s: %-*.*s: variable length label record too short", f->name, c, c, slt->buf);
@@ -151,7 +151,7 @@ getlabel(register Archive_t* ap, register File_t* f)
  */
 
 static void
-putlabels(register Archive_t* ap, register File_t* f, char* type)
+putlabels(Pax_t* pax, register Archive_t* ap, register File_t* f, char* type)
 {
 	register Slt_t*	slt = (Slt_t*)ap->data;
 	Tm_t*		tm;
@@ -159,7 +159,7 @@ putlabels(register Archive_t* ap, register File_t* f, char* type)
 	switch (*type)
 	{
 	case 'E':
-		bwrite(ap, slt->buf, 0);
+		paxwrite(pax, ap, slt->buf, 0);
 		break;
 	case 'H':
 		slt->sequence++;
@@ -167,10 +167,10 @@ putlabels(register Archive_t* ap, register File_t* f, char* type)
 	}
 	tm = gmtime(&f->st->st_mtime);
 	sfsprintf(slt->buf, sizeof(slt->buf), "%s1%-17.17s000001%04d%04d000100 %02d%03d 00000 %06d%-6.6sD%-7.7s       ", type, f->id, slt->section, slt->sequence, tm->tm_year, tm->tm_yday, f->record.blocks, slt->format, slt->implementation);
-	bwrite(ap, slt->buf, HDR_SIZE);
+	paxwrite(pax, ap, slt->buf, HDR_SIZE);
 	sfsprintf(slt->buf, sizeof(slt->buf), "%s2%c%05d%05d%010d%s%c                     00                            ", type, state.record.format, state.blocksize, state.record.size, f->st->st_size, type, '2');
-	bwrite(ap, slt->buf, HDR_SIZE);
-	bwrite(ap, slt->buf, 0);
+	paxwrite(pax, ap, slt->buf, HDR_SIZE);
+	paxwrite(pax, ap, slt->buf, 0);
 	if (streq(type, "EOV"))
 	{
 		slt->section++;
@@ -188,6 +188,7 @@ slt_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 	char*			t;
 	int			lab;
 	long			n;
+	off_t			x;
 	char			hdr[HDR_SIZE + 1];
 
 	static const char	key[] = "VOL1";
@@ -224,10 +225,11 @@ slt_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 	getlabstr(hdr, 25, 6, slt->format);
 	getlabstr(hdr, 31, 7, slt->implementation);
 	getlabstr(hdr, 38, 14, slt->owner);
-	ap->io->blocked = !bcount(ap);
+	paxget(pax, ap, 0, &x);
+	ap->io->blocked = !x;
 	if (ap->checkdelta)
 	{
-		if (!(lab = getlabel(ap, f)))
+		if (!(lab = getlabel(pax, ap, f)))
 			return 0;
 		if (strneq(slt->buf, "UVL1", 4) && strneq(slt->buf + 5, ID, IDLEN))
 		{
@@ -269,7 +271,7 @@ slt_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 	int		type;
 
  again:
-	if (!(lab = getlabel(ap, f)))
+	if (!(lab = getlabel(pax, ap, f)))
 		return 0;
 	f->st->st_dev = 0;
 	f->st->st_ino = 0;
@@ -292,7 +294,7 @@ slt_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 				error(3, "%s format HDR label out of sequence", ap->format->name);
 			if (type == 1)
 			{
-				s = f->name = stash(&ap->stash.head, NiL, NAME_SIZE + 3);
+				s = f->name = paxstash(pax, &ap->stash.head, NiL, NAME_SIZE + 3);
 				for (i = 4; i <= NAME_SIZE + 3; i++)
 				{
 					if (slt->buf[i] == ' ')
@@ -353,12 +355,12 @@ slt_getheader(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 		}
 		else if (!ap->io->blocked && strneq(slt->buf, "VOL1", 4))
 		{
-			bunread(ap, slt->buf, lab);
+			paxunread(pax, ap, slt->buf, lab);
 			if (!(getprologue(ap)))
 				return 0;
 			goto again;
 		}
-	} while ((lab = getlabel(ap, f)));
+	} while ((lab = getlabel(pax, ap, f)));
 	return 1;
 }
 
@@ -389,24 +391,24 @@ slt_getdata(Pax_t* pax, register Archive_t* ap, register File_t* f, int wfd)
 	for (;;)
 	{
 		if (ap->io->blocked)
-			n = bread(ap, state.tmp.buffer, (off_t)0, (off_t)state.buffersize, 0);
+			n = paxread(pax, ap, state.tmp.buffer, (off_t)0, (off_t)state.buffersize, 0);
 		else if ((m = f->st->st_size - size) <= 0)
 			n = 0;
 		else if (wfp) 
 		{
 			if (m > state.buffersize)
 				m = state.buffersize;
-			n = bread(ap, state.tmp.buffer, (off_t)0, m, 1);
+			n = paxread(pax, ap, state.tmp.buffer, (off_t)0, m, 1);
 		}
 		else
-			n = bread(ap, NiL, (off_t)0, m, 1);
+			n = paxread(pax, ap, NiL, (off_t)0, m, 1);
 		if (n < 0)
 			break;
 		if (n == 0)
 		{
 			k = 1;
 			ap->sum--;
-			while (getlabel(ap, f))
+			while (getlabel(pax, ap, f))
 			{
 				if (strneq(slt->buf, "EOV1", 4))
 					k = 0;
@@ -608,7 +610,7 @@ slt_putprologue(Pax_t* pax, Archive_t* ap)
 	{
 		slt->vol = 0;
 		ap->locked = 1;
-		putlabels(ap, state.record.file, "HDR");
+		putlabels(pax, ap, state.record.file, "HDR");
 		ap->locked = 0;
 	}
 	if (ap->format->flags & CONV)
@@ -642,13 +644,13 @@ slt_putprologue(Pax_t* pax, Archive_t* ap)
 	else
 		sfsprintf(slt->standards, sizeof(slt->standards), "%-5.5s%-5.5s%-5.5s%-4.4s", "ISO", "646", "IRV", "1990");
 	sfsprintf(slt->buf, sizeof(slt->buf), "VOL1%-6.6s              %-6.6s%-7.7s%-14.14s                            4", state.volume, slt->format, slt->implementation, slt->owner);
-	bwrite(ap, slt->buf, HDR_SIZE);
+	paxwrite(pax, ap, slt->buf, HDR_SIZE);
 	sfsprintf(slt->buf, sizeof(slt->buf), "VOL2%-19.19s                                                         ", slt->standards);
-	bwrite(ap, slt->buf, HDR_SIZE);
+	paxwrite(pax, ap, slt->buf, HDR_SIZE);
 	if (ap->delta && !(ap->delta->format->flags & PSEUDO))
 	{
 		sfsprintf(slt->buf, sizeof(slt->buf), "UVL1 %-6.6s%c%-6.6s%010ld%010ld                                         ", ID, ap->delta->compress ? TYPE_COMPRESS : TYPE_DELTA, ((Compress_format_t*)ap->delta->format)->variant, state.operation == OUT ? (long)ap->size : (long)0, state.operation == OUT ? ap->checksum : 0L);
-		bwrite(ap, slt->buf, HDR_SIZE);
+		paxwrite(pax, ap, slt->buf, HDR_SIZE);
 	}
 	return 1;
 }
@@ -658,12 +660,12 @@ slt_putheader(Pax_t* pax, Archive_t* ap, File_t* f)
 {
 	if (state.complete)
 		complete(ap, f, 4 * HDR_SIZE);
-	putlabels(ap, f, "HDR");
+	putlabels(pax, ap, f, "HDR");
 	return 1;
 }
 
 static int
-recordout(Archive_t* ap, File_t* f, Sfio_t* fp)
+recordout(Pax_t* pax, Archive_t* ap, File_t* f, Sfio_t* fp)
 {
 	register Slt_t*	slt = (Slt_t*)ap->data;
 	register int	c;
@@ -840,7 +842,7 @@ recordout(Archive_t* ap, File_t* f, Sfio_t* fp)
 			blk[3] = 0;
 			break;
 		}
-		bwrite(ap, blk, p - blk);
+		paxwrite(pax, ap, blk, p - blk);
 		f->record.blocks++;
 	}
  eof:
@@ -893,7 +895,7 @@ slt_putdata(Pax_t* pax, Archive_t* ap, File_t* f, int rfd)
 						memcpy(ap->io->next, bp->next, m);
 						bp->next += m;
 					}
-					else if (bread(f->ap, state.tmp.buffer, (off_t)0, (off_t)m, 1) <= 0)
+					else if (paxread(pax, f->ap, state.tmp.buffer, (off_t)0, (off_t)m, 1) <= 0)
 						n = -1;
 				}
 				if (n <= 0)
@@ -913,7 +915,7 @@ slt_putdata(Pax_t* pax, Archive_t* ap, File_t* f, int rfd)
 						memzero(state.tmp.buffer + n, state.record.size - n);
 						n = state.record.size;
 					}
-					bwrite(ap, state.tmp.buffer, n);
+					paxwrite(pax, ap, state.tmp.buffer, n);
 				}
 			}
 			ap->record = 0;
@@ -921,7 +923,7 @@ slt_putdata(Pax_t* pax, Archive_t* ap, File_t* f, int rfd)
 				close(rfd);
 		}
 		else if (rfd < 0)
-			recordout(ap, f, NiL);
+			recordout(pax, ap, f, NiL);
 		else if (!(rfp = sfnew(NiL, NiL, SF_UNBOUND, rfd, SF_READ)))
 		{
 			error(1, "%s: cannot read", f->path);
@@ -929,7 +931,7 @@ slt_putdata(Pax_t* pax, Archive_t* ap, File_t* f, int rfd)
 		}
 		else
 		{
-			recordout(ap, f, rfp);
+			recordout(pax, ap, f, rfp);
 			sfclose(rfp);
 		}
 	}
@@ -939,7 +941,7 @@ slt_putdata(Pax_t* pax, Archive_t* ap, File_t* f, int rfd)
 static int
 slt_puttrailer(Pax_t* pax, Archive_t* ap, File_t* f)
 {
-	putlabels(ap, f, "EOF");
+	putlabels(pax, ap, f, "EOF");
 	return 0;
 }
 
@@ -951,12 +953,12 @@ slt_putepilogue(Pax_t* pax, Archive_t* ap)
 	if (!ap->locked)
 	{
 		ap->locked = 1;
-		putlabels(ap, state.record.file, "EOV");
+		putlabels(pax, ap, state.record.file, "EOV");
 		ap->locked = 0;
 		slt->vol = 1;
 	}
-	bwrite(ap, slt->buf, 0);
-	bwrite(ap, slt->buf, 0);
+	paxwrite(pax, ap, slt->buf, 0);
+	paxwrite(pax, ap, slt->buf, 0);
 	return ap->io->count;
 }
 
@@ -1041,7 +1043,7 @@ Format_t	pax_ibm_format =
 	4,
 	4,
 	0,
-	pax_ibm_next,
+	PAXNEXT(pax_ibm_next),
 	0,
 	slt_done,
 	ibm_getprologue,
@@ -1059,3 +1061,5 @@ Format_t	pax_ibm_format =
 	0,
 	slt_validate
 };
+
+PAXLIB(&pax_ibm_format)

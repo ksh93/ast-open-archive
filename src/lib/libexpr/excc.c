@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -145,6 +145,41 @@ print(Excc_t* cc, Exnode_t* expr)
 }
 
 /*
+ * generate scanf()
+ */
+
+static void
+scan(Excc_t* cc, Exnode_t* expr)
+{
+	register Print_t*	x;
+	register int		i;
+
+	if (x = expr->data.print.args)
+	{
+		sfprintf(cc->ccdisc->text, "sfscanf(sfstdin, \"%s", fmtesq(x->format, quote));
+		while (x = x->next)
+			sfprintf(cc->ccdisc->text, "%s", fmtesq(x->format, quote));
+		sfprintf(cc->ccdisc->text, "\"");
+		for (x = expr->data.print.args; x; x = x->next)
+		{
+			if (x->arg)
+			{
+				for (i = 0; i < elementsof(x->param) && x->param[i]; i++)
+				{
+					sfprintf(cc->ccdisc->text, ", &(");
+					gen(cc, x->param[i]);
+					sfprintf(cc->ccdisc->text, ")");
+				}
+				sfprintf(cc->ccdisc->text, ", &(");
+				gen(cc, x->arg);
+				sfprintf(cc->ccdisc->text, ")");
+			}
+		}
+		sfprintf(cc->ccdisc->text, ");\n");
+	}
+}
+
+/*
  * internal excc
  */
 
@@ -251,6 +286,9 @@ gen(Excc_t* cc, register Exnode_t* expr)
 		sfprintf(cc->ccdisc->text, "return(");
 		gen(cc, x);
 		sfprintf(cc->ccdisc->text, ");\n");
+		return;
+	case SCANF:
+		scan(cc, expr);
 		return;
 	case SWITCH:
 		t = x->type;

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2003 AT&T Corp.                *
+*                Copyright (c) 1984-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -19,6 +19,7 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *                David Korn <dgk@research.att.com>                 *
+*                           Pat Sullivan                           *
 *                                                                  *
 *******************************************************************/
 /*
@@ -157,7 +158,7 @@ retry:
 		/* don't allow root a history_file in /tmp */
 		if(sh.userid)
 #endif	/* KSHELL */
-			fd = io_mktmp(fname);
+			fd = io_mktmp(fname, sizeof(fname));
 	}
 	if(fd<0)
 		return(0);
@@ -1162,18 +1163,20 @@ register int 	fb;
 	return(fb);
 }
 
-static char template[] = "/tmp/histXXXXXX";
 /*
  * return file descriptor for an open file
  */
 
-static int io_mktmp(fname)
+static int io_mktmp(fname, len)
 register char *fname;
+int len;
 {
 	int fd;
-	strcpy(fname,template);
-	if((fd=open(mktemp(fname),O_CREAT|O_RDWR,RW_ALL)) < 0)
-		sh_fail(fname,e_create);
+	if(!pathtemp(fname,len,NiL,"hist",&fd))
+	{
+		sh_fail("tmp-file",e_create);
+		fd = -1;
+	}
 	return(fd);
 }
 

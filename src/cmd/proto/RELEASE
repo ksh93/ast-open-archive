@@ -1,3 +1,6 @@
+04-02-29 proto.tst: add -f -p option tests
+04-01-14 proto.c: add suffix-comment table
+04-02-11 proto.c: default comment style set to match file suffix
 03-06-21 proto.tst: add T_INVALID ? splice bug test
 02-07-31 sear.sh: make sure output files has a suffix
 02-03-12 proto.c: add type=free

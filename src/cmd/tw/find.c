@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -51,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2003-01-10 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2003-12-02 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -335,10 +335,10 @@ const struct Args commands[] =
 	"Do not follow symbolic links. This is the default.",
 "post",		POST,		Unary,		0,	0,	0,
 	"Process directories before and and after the contents are processed.",
-"print",	PRINT,		Unary|Stat,	1,	0,	0,
+"print",	PRINT,		Unary,		1,	0,	0,
 	"Print the path name (including directory components) to the"
 	" standard output, followed by a newline.",
-"print0",	PRINT0,		Unary|Stat,	1,	0,	0,
+"print0",	PRINT0,		Unary,		1,	0,	0,
 	"Like \b-print\b, except that the path is followed by a NUL character.",
 "printf",	PRINTF,		Str|Stat,	1,	"format",
 	"[+----- escape sequences -----?]"
@@ -382,7 +382,7 @@ const struct Args commands[] =
 	" `\\' escapes and `%' directives. \bprintf\b(3) field width"
 	" and precision are interpreted as usual, but the directive"
 	" characters have special interpretation.",
-"printx",	PRINTX,		Unary|Stat,	1,	0,	0,
+"printx",	PRINTX,		Unary,		1,	0,	0,
 	"Print the path name (including directory components) to the"
 	" standard output, with \bxargs\b(1) special characters preceded"
 	" by \b\\\b, followed by a newline.",

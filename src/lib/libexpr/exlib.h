@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2003 AT&T Corp.                *
+*                Copyright (c) 1989-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -84,7 +84,13 @@ typedef struct Print_s			/* compiled printf arg node	*/
 	Exnode_t*	body;		/* body				*/ \
 	Dt_t*		frame;		/* local symbol frame		*/ \
 	int		arity;		/* # formal args		*/ \
-	}		procedure;	/* procedure args and body	*/
+	}		procedure;	/* procedure args and body	*/ \
+	struct								   \
+	{								   \
+	Exnode_t*	descriptor;	/* Expr_t.file index		*/ \
+	Exnode_t*	format;		/* format arg			*/ \
+	Exnode_t*	args;		/* actual args			*/ \
+	}		scan;		/* printf			*/
 
 #define _EX_NODE_PRIVATE_ \
 	Exshort_t	subop;		/* operator qualifier		*/ \

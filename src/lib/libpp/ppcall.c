@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2003 AT&T Corp.                *
+*                Copyright (c) 1986-2004 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -356,8 +356,8 @@ ppcall(register struct ppsymbol* sym, int tok)
 						error(
 #if COMPATIBLE
 							(pp.state & COMPATIBILITY) ? 3 :
-							2, "%s: %s in macro argument list", sym->name, pptokchr(0));
 #endif
+							2, "%s: %s in macro argument list", sym->name, pptokchr(0));
 						goto endactuals;
 					}
 					continue;
@@ -404,18 +404,16 @@ ppcall(register struct ppsymbol* sym, int tok)
 				{
 					n = mac->arity;
 					if (!(sym->flags & SYM_VARIADIC))
-					{
 						error(1, "%s: %d actual argument%s expected", sym->name, n, n == 1 ? "" : "s");
-						if (!c)
-							goto disable;
-					}
 					else if (c < --n)
-					{
 						error(1, "%s: at least %d actual argument%s expected", sym->name, n, n == 1 ? "" : "s");
-						if (!c)
-							goto disable;
-					}
+#if COMPATIBLE
+					if (!c && (pp.state & (COMPATIBILITY|STRICT)) == (COMPATIBILITY|STRICT))
+						goto disable;
+#endif
 				}
+				if (!c)
+					++c;
 				while (c < mac->arity)
 					mp->arg[c++] = "\0" + 1;
 			}
