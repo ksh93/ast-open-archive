@@ -85,5 +85,5 @@ MAIN()
 	if(sfvalue(f) <= 0)
 		terror("There is no buffer?\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -33,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)ps (AT&T Labs Research) 2000-10-23\n]"
+"[-?\n@(#)$Id: ps (AT&T Labs Research) 2001-01-01 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -46,6 +45,8 @@ USAGE_LICENSE
 
 "[a:interactive?List all processes associated with terminals.]"
 "[c:class?Equivalent to \b--fields=\"pid class pri tty time command\"\b.]"
+"[C:command?List for commands that match the \begrep\b(1) RE"
+"	\apattern\a.]:[pattern]"
 "[d:no-session?List all processes except session leaders.]"
 "[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
@@ -71,6 +72,7 @@ USAGE_LICENSE
 "	list.]:[pgrp...]"
 "[G:groups?List processes with real group id names or numbers in the \agroup\a"
 "	list.]:[group...]"
+"[h!:heading?Output a heading line.]"
 "[j:jobs?Equivalent to \b--fields=\"pid pgrp sid tty time command\"\b.]"
 "[l:long?Equivalent to \b--fields=\"flags state user pid ppid pri nice"
 "	size rss wchan tty time command\"\b.]"
@@ -86,15 +88,17 @@ USAGE_LICENSE
 "	overridden by appending \a=label\a to \akey\a. The keys, labels and"
 "	widths are listed under \b--format\b.]:[key[+width]][=label]]...]"
 "[p:pids?List processes in the \apid\a list.]:[pid...]"
+"[r|R:recursive?Recursively list the children of all selected processes.]"
 "[s:sessions?List processes with session leaders in the \asid\a list.]:[sid...]"
 "[t:terminals|ttys?List processes with controlling terminals in the \atty\a"
 "	list.]:[tty...]"
 "[T:tree|forest?Display the process tree hierarchy in the \bCOMMAND\b"
-"	field list.]"
+"	field list; implies \b--recursive\b.]"
 "[u|U:users?List processes with real user id names or numbers in the \auser\a"
 "	list.]:[user...]"
 "[v:verbose?List verbose error messages for inaccessible processes.]"
-"[x:hex?List numeric entries in hexadecimal notation.]"
+"[x:detached?List all processes not associated with terminals.]"
+"[X:hex?List numeric entries in hexadecimal notation.]"
 
 "\n"
 "\n[ pid ... ]\n"
@@ -115,6 +119,7 @@ USAGE_LICENSE
 #include <sfdisc.h>
 #include <sfstr.h>
 #include <tm.h>
+#include <regex.h>
 
 #include "FEATURE/procfs"
 
@@ -183,6 +188,13 @@ typedef struct				/* generic id table entry	*/
 	char		name[1];	/* id name			*/
 } Id_t;
 
+typedef struct List_s			/* pid list			*/
+{
+	struct List_s*	next;		/* next in list			*/
+	char**		argv;		/* , separated string vector	*/
+	int		argc;		/* elementsof(argv)		*/
+} List_t;
+
 typedef struct Ps_s			/* process state		*/
 {
 	Dtlink_t	hashed;		/* pid hash link		*/
@@ -203,8 +215,11 @@ typedef struct				/* program state		*/
 	int		all;		/* popular categories		*/
 	int		controlled;	/* matching state.ttydev only	*/
 	int		detached;	/* detached too			*/
+	int		heading;	/* output heading		*/
 	int		leader;		/* pg leaders too		*/
 	int		idindex;	/* id select index		*/
+	int		match;		/* command name match		*/
+	int		recursive;	/* recursively list all children*/
 	int		tree;		/* list proc tree		*/
 	int		verbose;	/* verbose error messages	*/
 	int		hex;		/* output optional hex key form	*/
@@ -216,6 +231,7 @@ typedef struct				/* program state		*/
 	dev_t		ttydev;		/* controlling tty		*/
 	uid_t		caller;		/* caller effective uid		*/
 	Key_t*		fields;		/* format field list		*/
+	List_t*		pids;		/* pid vectors			*/
 	char*		format;		/* sfkeyprintf() format		*/
 	Key_t*		lastfield;	/* end of format list		*/
 	Dt_t*		keys;		/* format keys			*/
@@ -228,6 +244,7 @@ typedef struct				/* program state		*/
 	Sfio_t*		nul;		/* temporary string stream	*/
 	Sfio_t*		tmp;		/* temporary string stream	*/
 	Sfio_t*		wrk;		/* temporary string stream	*/
+	regex_t		re;		/* command match RE		*/
 	char		branch[1024];	/* process tree branch		*/
 	char		buf[1024];	/* work buffer			*/
 } State_t;
@@ -273,7 +290,7 @@ static Key_t	keys[] =
 		"COMMAND",
 		"Command path with arguments.",
 		KEY_args,
-		-12, 0,
+		-32, 0,
 		0,0,0,
 		KEY_command
 	},
@@ -290,7 +307,7 @@ static Key_t	keys[] =
 		"COMMAND",
 		"Command file base name.",
 		KEY_command,
-		-12, 0,
+		-16, 0,
 		0,0,0,
 		KEY_args
 	},
@@ -856,7 +873,10 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			goto number;
 #endif
 		case KEY_time:
-			s = fmtelapsed(PR_TIME(&pp->ps), PR_HZ);
+			if (fp->fmt == 's')
+				s = fmtelapsed(PR_TIME(&pp->ps), PR_HZ);
+			else
+				n = PR_TIME(&pp->ps);
 			break;
 		case KEY_tty:
 			if (PR_ZOMBIE(&pp->ps))
@@ -894,7 +914,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			s = "";
 			break;
 		percent:
-			sfprintf(state.tmp, "%%%ld", n);
+			sfprintf(state.tmp, "%%%I*d", sizeof(n), n);
 			s = sfstruse(state.tmp);
 			break;
 		number:
@@ -1133,12 +1153,17 @@ ps(Ps_t* pp)
 static void
 kids(register Ps_t* pp, int level)
 {
-	pp->level = level;
-	ps(pp);
-	if (level > 0)
-		state.branch[level - 1] = pp->sibling != 0;
-	if (level < elementsof(state.branch) - 1)
-		level++;
+	if (state.tree)
+	{
+		pp->level = level;
+		ps(pp);
+		if (level > 0)
+			state.branch[level - 1] = pp->sibling != 0;
+		if (level < elementsof(state.branch) - 1)
+			level++;
+	}
+	else
+		ps(pp);
 	for (pp = pp->children; pp; pp = pp->sibling)
 		kids(pp, level);
 }
@@ -1177,10 +1202,6 @@ list(void)
 	register Key_t*	kp;
 	Ps_t*		rp;
 
-	/*
-	 * output the header
-	 */
-
 	if (state.fields)
 	{
 		while (state.fields->skip)
@@ -1209,24 +1230,23 @@ list(void)
 			kp->width = 0;
 		if (kp->index == KEY_args)
 			kp->prec = 80;
-		if (n)
+		if (n && state.heading)
 			for (kp = state.fields; kp; kp = kp->next)
 				sfprintf(sfstdout, "%*s%s", kp->width, kp->head, kp->sep);
 	}
-	else
+	else if (state.heading)
 		sfkeyprintf(sfstdout, NiL, state.format, key, NiL);
-	if (state.tree)
+	if (state.recursive)
 	{
 		/*
-		 * list the process tree
+		 * recursively list the children of selected processes
 		 */
 
 		rp = zp = 0;
 		for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
-		{
-			if (pp->must > 0 || ancestor(pp))
+			if (pp->must > 0 || !pp->must && ancestor(pp))
 			{
-				if (pp->ps.pr_ppid != pp->ps.pr_pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps.pr_ppid)))
+				if (pp->ps.pr_ppid != pp->ps.pr_pid && (xp = (Ps_t*)dtmatch(state.bypid, &pp->ps.pr_ppid)) && xp->must > 0)
 				{
 					if (xp->lastchild)
 						xp->lastchild = xp->lastchild->sibling = pp;
@@ -1238,7 +1258,6 @@ list(void)
 				else
 					rp = zp = pp;
 			}
-		}
 		for (pp = rp; pp; pp = pp->root)
 			kids(pp, 0);
 	}
@@ -1289,6 +1308,7 @@ order(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 		return 1;
 	return 0;
 }
+
 /*
  * add the procs in the pid list
  */
@@ -1375,18 +1395,28 @@ addpid(register char* s, int must, int verbose)
 				error(ERROR_SYSTEM|2, "%s: cannot get process info", t);
 				return;
 			}
-			if (state.controlled)
+			if (must <= 0)
 			{
-				if (pr->pr_ttydev != state.ttydev || pr->pr_uid != state.caller)
+				if (state.controlled)
+				{
+					if (pr->pr_ttydev != state.ttydev || pr->pr_uid != state.caller)
+						return;
+				}
+				else if (!state.detached && pr->pr_ttydev == (dev_t)(-1))
 					return;
-			}
-			else if (!state.detached && pr->pr_ttydev == (dev_t)(-1))
-				return;
-			else if (!state.leader && pr->pr_pid == pr->pr_sid)
-				return;
-			if (!state.all)
-			{
-				if (state.idindex)
+				else if (state.detached < 0 && (pr->pr_ttydev != (dev_t)(-1) || PR_ZOMBIE(pr)))
+					return;
+				else if (!state.leader && pr->pr_pid == pr->pr_sid)
+					return;
+				if (state.match && (n = regexec(&state.re, pr->pr_fname, 0, NiL, 0)))
+					{
+						if (n != REG_NOMATCH)
+							regfatal(&state.re, 3, n);
+						if (!state.recursive)
+							return;
+						must = 0;
+					}
+				if (!state.all && state.idindex)
 				{
 					switch (state.idindex)
 					{
@@ -1414,7 +1444,7 @@ addpid(register char* s, int must, int verbose)
 				}
 			}
 			pp->user = fmtuid(pr->pr_uid);
-			pp->must = must;
+			pp->must = must != 0;
 			if (!dtsearch(state.byorder, pp))
 			{
 				dtinsert(state.byorder, pp);
@@ -1586,6 +1616,45 @@ addkey(const char* k)
 	} while (*s != '=' && *s++);
 }
 
+/*
+ * add pid vector for subsequent poppids()
+ */
+
+static void
+pushpids(void* argv, int argc)
+{
+	register List_t*	p;
+
+	if (!(p = newof(0, List_t, 1, 0)))
+		error(3, "out of space [pid list]");
+	p->argv = (char**)argv;
+	p->argc = argc;
+	p->next = state.pids;
+	state.pids = p;
+}
+
+/*
+ * pop state.pids by calling addpid()
+ */
+
+static void
+poppids(void)
+{
+	register List_t*	p;
+	register int		i;
+
+	while (p = state.pids)
+	{
+		state.pids = p->next;
+		if (i = p->argc)
+			while (--i >= 0)
+				addpid(p->argv[i], 1, 1);
+		else
+			addpid((char*)p->argv, 1, 1);
+		free(p);
+	}
+}
+
 int
 main(int argc, register char** argv)
 {
@@ -1608,6 +1677,7 @@ main(int argc, register char** argv)
 	setlocale(LC_ALL, "");
 	state.now = time((time_t*)0);
 	state.caller = geteuid();
+	state.heading = 1;
 	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()) || !(state.wrk = sfstropen()))
 		error(3, "out of space [tmp]");
 
@@ -1666,6 +1736,9 @@ main(int argc, register char** argv)
 		case 'f':
 			addkey("user pid ppid start tty time args");
 			continue;
+		case 'h':
+			state.heading = opt_info.num;
+			continue;
 		case 'g':
 			addid(opt_info.arg, KEY_pgrp, NiL);
 			continue;
@@ -1681,7 +1754,11 @@ main(int argc, register char** argv)
 			addkey(opt_info.arg);
 			continue;
 		case 'p':
-			addpid(opt_info.arg, 1, 1);
+			pushpids(opt_info.arg, 0);
+			continue;
+		case 'r':
+		case 'R':
+			state.recursive = 1;
 			continue;
 		case 's':
 			addid(opt_info.arg, KEY_sid, NiL);
@@ -1696,7 +1773,12 @@ main(int argc, register char** argv)
 			state.verbose = 1;
 			continue;
 		case 'x':
-			state.hex = !state.hex;
+			state.detached = -1;
+			continue;
+		case 'C':
+			if (n = regcomp(&state.re, opt_info.arg, REG_AUGMENTED))
+				regfatal(&state.re, 3, n);
+			state.match = 1;
 			continue;
 		case 'D':
 			if (s = strchr(opt_info.arg, '='))
@@ -1730,7 +1812,10 @@ main(int argc, register char** argv)
 			addkey(default_format);
 			continue;
 		case 'T':
-			state.tree = 1;
+			state.tree = state.recursive = 1;
+			continue;
+		case 'X':
+			state.hex = !state.hex;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -1742,6 +1827,7 @@ main(int argc, register char** argv)
 		break;
 	}
 	argv += opt_info.index;
+	argc -= opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	if (sfstrtell(fmt))
@@ -1761,16 +1847,20 @@ main(int argc, register char** argv)
 	 * add each proc by name
 	 */
 
-	if (argv[0])
+	if (*argv)
 	{
-		state.all = state.detached = state.leader = 1;
-		while (s = *argv++)
-			addpid(s, 1, 1);
+		state.all = state.detached = 1;
+		pushpids(argv, argc);
 	}
-	if (state.tree || !dtsize(state.byorder))
+	if (state.recursive || !state.pids)
 	{
-		if (!(must = !dtsize(state.byorder)))
+		if (state.pids)
+		{
+			must = 0;
 			state.all = 1;
+		}
+		else
+			must = -1;
 		if (state.controlled = !state.all && !state.detached && !state.ids)
 			for (n = 0; n <= 2; n++)
 				if (isatty(n) && !fstat(n, &st))
@@ -1778,16 +1868,20 @@ main(int argc, register char** argv)
 					state.ttydev = st.st_rdev;
 					break;
 				}
+		error(-1, "state all=%d controlled=%d detached=%d leader=%d must=%d", state.all, state.controlled, state.detached, state.leader, must);
+		poppids();
 		if (!(dir = opendir(_PS_dir)))
 			error(ERROR_SYSTEM|3, "%s: cannot read process directory", _PS_dir);
 		while (ent = readdir(dir))
 			if (isdigit(*ent->d_name))
 				addpid(ent->d_name, must, state.verbose);
 		closedir(dir);
-		if (state.tree)
+		if (state.recursive)
 			for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
 				dtinsert(state.bypid, pp);
 	}
+	else
+		poppids();
 
 	/*
 	 * list the procs
@@ -1798,9 +1892,6 @@ main(int argc, register char** argv)
 	list();
 	return error_info.errors != 0;
 }
-#if __OBSOLETE__ < 20010101
-#include "../../lib/libast/disc/sfkeyprintf.c"
-#endif
 
 #else
 

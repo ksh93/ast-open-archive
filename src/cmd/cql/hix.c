@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2000 AT&T Corp.                *
+*                Copyright (c) 1991-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  * hash index file implementation
  */
 
-static const char ID[] = "\n@(#)hix (AT&T Research) 1998-11-01\0\n";
+static const char ID[] = "\n@(#)$Id: hix (AT&T Research) 2001-01-01 $\0\n";
 
 #include <sfio_t.h>
 #include <ast.h>
@@ -876,7 +875,7 @@ hixopen(const char* primary, const char* secondary, const char* info, int* id, H
 	if (!state.announce)
 	{
 		state.announce = 1;
-		message((-1, ":::: %s", ID + 5));
+		message((-1, ":::: %s", fmtident(ID)));
 	}
 
 	/*
@@ -1379,7 +1378,7 @@ hixop(register Hix_t* hix, int op, long hash)
 			while (v = ioget(p))
 				if (v == h)
 				{
-					p->offset = ioget(p) + p->part->base - 1;
+					p->offset = ioget(p) + p->part->base;
 					goto found;
 				}
 			p->data = p->last;
@@ -1412,7 +1411,7 @@ hixget(register Hix_t* hix, int partition)
 	int			v;
 	void*			r;
 
-error(-1, "AHA hixget%s%s%s", (hix->flags & HIX_ERROR) ? " ERROR" : "", (hix->flags & HIX_SCAN) ? " SCAN" : "", (hix->pc <= hix->pb) ? " hix->pc <= hix->pb" : "");
+	message((-19, "hix: get%s%s%s", (hix->flags & HIX_ERROR) ? " ERROR" : "", (hix->flags & HIX_SCAN) ? " SCAN" : "", (hix->pc <= hix->pb) ? " hix->pc <= hix->pb" : ""));
 	if ((hix->flags & (HIX_ERROR|HIX_SCAN)) || hix->pc <= hix->pb)
 	{
 		if (!hix->part)
@@ -1465,7 +1464,7 @@ error(-1, "AHA hixget%s%s%s", (hix->flags & HIX_ERROR) ? " ERROR" : "", (hix->fl
 			if (p->offset == offset)
 			{
 				if ((p->offset = ioget(p)) && !(p->offset & HASHMARK))
-					p->offset += p->part->base - 1;
+					p->offset += p->part->base;
 				else for (;;)
 				{
 					if (!(p->part = p->part->next))
@@ -1478,7 +1477,7 @@ error(-1, "AHA hixget%s%s%s", (hix->flags & HIX_ERROR) ? " ERROR" : "", (hix->fl
 					while (n = ioget(p))
 						if (n == p->hash)
 						{
-							p->offset = ioget(p) + p->part->base - 1;
+							p->offset = ioget(p) + p->part->base;
 							goto hit;
 						}
 				}
@@ -1493,7 +1492,8 @@ error(-1, "AHA hixget%s%s%s", (hix->flags & HIX_ERROR) ? " ERROR" : "", (hix->fl
 		}
 		if (v)
 		{
-			if ((hix->offset = offset) >= hix->part->base + hix->part->vio.size)
+			message((-8, "hix: get offset %llu", offset - 1));
+			if ((hix->offset = --offset) >= hix->part->base + hix->part->vio.size)
 				goto notfound;
 			offset += hix->part->vio.offset - hix->part->base;
 			if (sfseek(hix->part->vio.sp, offset, SEEK_SET) != offset)

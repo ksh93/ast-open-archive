@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2000 AT&T Corp.                *
+*                Copyright (c) 1991-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -1313,7 +1312,8 @@ commit(register File_t* f)
 			{
 				Sfio_t*	sp;
 
-				if (!state.replace) sp = sfstdout;
+				if (!state.replace)
+					sp = sfstdout;
 				else
 				{
 					error(1, "%s: update replacement not implemented yet", filename(f));
@@ -1333,6 +1333,7 @@ commit(register File_t* f)
 					register int		n;
 					register int		m;
 					register int		d;
+					register char*		s;
 
 					m = f->record->subfields - 1;
 					while (field = record(f, NiL, 0, 0, 0, -1))
@@ -1341,7 +1342,9 @@ commit(register File_t* f)
 						for (n = 0; n <= m; n++)
 						{
 							if (n == m ) d = f->terminator;
-							if (sfputr(sp, (field + n)->f_string, d) <= 0)
+							if (!(s = (field + n)->f_string))
+								s = "";
+							if (sfputr(sp, s, d) <= 0)
 							{
 								error(2, "%s: update sfputr(%lu) error", filename(f), f->hix->offset);
 								break;

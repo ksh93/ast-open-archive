@@ -1,3 +1,4 @@
+01-01-31 sfio: uniform test exit codes
 01-01-01 opt.tst: add enumerated option argument values
 00-12-11 date.dat: add a few more crontab(1) forms
 00-10-31 date.dat: add date(1) and touch(1) forms

@@ -1,3 +1,6 @@
+01-01-01 fix map bug that retained alias after expansion
+	 smtp: add domain to RCPT TO: if omitted
+00-11-27 add Date: and From: to smtp
 00-09-21 drop leading */ from user name
 00-05-09 add cd,pwd,${PWD},${OLDPWD} with ${CDPATH} check
 00-05-04 lex: flush stdout before prompt!

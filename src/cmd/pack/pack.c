@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1993-2000 AT&T Corp.                *
+*                Copyright (c) 1993-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *                David Korn <dgk@research.att.com>                 *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -34,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pack (AT&T Labs Research) 1999-05-03\n]"
+"[-?\n@(#)$Id: pack (AT&T Labs Research) 1999-05-03 $\n]"
 USAGE_LICENSE
 "[+NAME?pack - pack files using Huffman coding]"
 "[+DESCRIPTION?\bpack\b attempts to store the specified files in a compressed "

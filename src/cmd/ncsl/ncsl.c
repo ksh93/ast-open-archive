@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1994-2000 AT&T Corp.                *
+*                Copyright (c) 1994-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -34,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)ncsl (AT&T Labs Research) 1996-10-11\n]"
+"[-?\n@(#)$Id: ncsl (AT&T Labs Research) 1996-10-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ncsl - list the number of non-comment source lines for each C file]"
 "[+DESCRIPTION?\bncsl\b lists the number of non-comment source lines for"

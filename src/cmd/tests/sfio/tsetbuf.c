@@ -101,5 +101,5 @@ MAIN()
 		terror("sfreserve3 returns the wrong value\n");
 	sfwrite(f,s,0);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

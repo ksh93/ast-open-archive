@@ -1,4 +1,4 @@
-.H 1 std
+.H 1 at
 The
 .B ast
 .B at

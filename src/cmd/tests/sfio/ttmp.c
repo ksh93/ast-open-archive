@@ -145,5 +145,5 @@ MAIN()
 	if(pid != 0)
 		wait(&pid);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

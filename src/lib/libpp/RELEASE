@@ -1,3 +1,6 @@
+01-02-06 fix readonly buffer write (cpp test 07:2873)
+01-02-04 fix -M* to properly handle .cxx .cpp .C input
+	 fix IN_BUFFER pop bug that did not reset the token pointer
 01-01-01 pp:headerexpand: space ok if no IN_MACRO
 	 ppcall: hide if IN_FILE|IN_MACRO|IN_EXPAND
 	 pplex: don't complain about ^L or ^Z as last char in file

@@ -84,5 +84,5 @@ MAIN()
 	if(Count != 10)
 		terror("Wrong number of writes2\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

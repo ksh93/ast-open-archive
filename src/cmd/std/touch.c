@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)touch (AT&T Labs Research) 2000-10-31\n]"
+"[-?\n@(#)$Id: touch (AT&T Labs Research) 2000-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?touch - change file access and modification times]"
 "[+DESCRIPTION?\btouch\b changes the modification time, access time or both"

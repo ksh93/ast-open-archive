@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -138,7 +137,7 @@ pzinflate(register Pz_t* pz, Sfio_t* op)
 
 	if (pz->prefix.count)
 	{
-		if (pz->prefix.data && sfwrite(op, pz->prefix.data, pz->prefix.count) != pz->prefix.count)
+		if (!pz->prefix.skip && pz->prefix.data && sfwrite(op, pz->prefix.data, pz->prefix.count) != pz->prefix.count)
 		{
 			if (pz->disc->errorf)
 				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: output write error", pz->path);

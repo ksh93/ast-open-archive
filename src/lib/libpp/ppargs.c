@@ -41,7 +41,7 @@ USAGE_LICENSE
 "	by the \b-D-X\b command line option.]"
 "[+?If \aoutput\a is omitted then the standard output is written; if \ainput\a"
 "	is also omitted then the standard input is read. NOTE: this is an"
-"	ancient, non-standard, non-intuitiive file operand syntax, that is"
+"	ancient, non-standard, non-intuitiive file operand syntax that is"
 "	required by \bcc\b(1); use shell file name expansion at your peril.]"
 "[+?\bcpp\b specific options are set by the \b-D-\b and \b-I-\b options.]"
 
@@ -109,7 +109,7 @@ USAGE_LICENSE
 "[M:dependencies?Generate \bmake\b(1) dependencies. Not needed with"
 "	\bnmake\b(1). \b-M\b may be followed by optional \aflags\a to change"
 "	dependency output styles:]{"
-"	[+D?Generate dependencies in a separate file.]"
+"	[+D?Generate dependencies in a separate \b.d\b file.]"
 "	[+G?Generate missing dependencies too.]"
 "	[+M?Only generate local header dependencies.]"
 "}"

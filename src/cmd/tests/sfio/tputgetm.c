@@ -41,5 +41,5 @@ MAIN()
 		if((r = (unsigned int)sfgetm(fp,100000)) != i)
 			terror("Input=%u, Expect=%u\n",r,i);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

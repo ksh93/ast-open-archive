@@ -52,7 +52,7 @@
  *	only within macro bodies
  */
 
-static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2001-01-01 $\0\n";
+static const char id[] = "\n@(#)$Id: libpp (AT&T Research) 2001-02-06 $\0\n";
 
 #include "pplib.h"
 
@@ -70,9 +70,11 @@ static char	tmpbuf[MAXTOKEN+1];	/* very temporary buffer	*/
 static char	tokbuf[2*MAXTOKEN+1];	/* token buffer			*/
 static char	valbuf[MAXTOKEN+1];	/* builtin macro value buffer	*/
 
+static char	null[1];
+
 static struct ppinstk	instack =	/* input stream stack		*/
 {
-	""				/* nextchr			*/
+	&null[0]			/* nextchr			*/
 };
 
 static struct ppdirs	stddir =	/* standard include directory	*/

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1997-2000 AT&T Corp.                *
+*                Copyright (c) 1997-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -81,8 +80,12 @@ typedef struct				/* schema map			*/
 	{								   \
 	Cdbrecord_t*	next;		/* next in cache chain		*/ \
 	Cdbrecord_t*	prev;		/* previous in cache chain	*/ \
-	void*		image;		/* cdbimage() state		*/ \
-	}		cache;		/* cdbcache() pointers		*/
+	}		cache;		/* cdbcache() pointers		*/ \
+	struct								   \
+	{								   \
+	char*		data;		/* spanned record prefix buffer	*/ \
+	size_t		size;		/* spanned record prefix size	*/ \
+	}		image;		/* cdbimage() state		*/
 
 #define _CDB_SCHEMA_PRIVATE_ \
 	Cdbschema_t*	head;		/* cdbparse() partition chain	*/ \
@@ -107,6 +110,8 @@ typedef struct				/* schema map			*/
 	int		clear;		/* cdbread() vmclear() ok	*/ \
 	int		closeio;	/* cdbclose() to close io	*/ \
 	int		common;		/* # common fields		*/ \
+	int		options;	/* default options		*/ \
+	int		defopts;	/* really default options	*/ \
 	int		strings;	/* max referenced string+1	*/
 
 #include <cdbmethod.h>

@@ -29,7 +29,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)msgadmin (AT&T Labs Research) 2000-04-26
+@(#)msgadmin (AT&T Labs Research) 2001-01-31
 ]
 '$USAGE_LICENSE$'
 [+NAME?'$command$' - message catalog file administration]
@@ -112,7 +112,7 @@ case $op in
 generate)
 	dir=$dir/lib/locale
 	[[ -d $dir ]] || { print -u2 $"$command: $dir: not found"; exit 1; }
-	(( ! $# )) && set -- C $(ls *-*.msg | sed 's,.*-\(.*\)\.msg,\1,' | sort -u)
+	(( ! $# )) && set -- C $(ls *-*.msg 2>/dev/null | sed 's,.*-\(.*\)\.msg,\1,' | sort -u)
 	owd=$PWD
 	for locale
 	do	case $locale in

@@ -68,5 +68,5 @@ MAIN()
 		if(b[k] != buf[k])
 			terror("Bad data");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

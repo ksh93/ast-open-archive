@@ -1,5 +1,5 @@
 #include	"dthdr.h"
-static char     *Version = "\n@(#)Version 10/25/95-cdt-kpv\n";
+static char     *Version = "\n@(#)$Id: Version 1995-10-25-cdt-kpv $\n";
 
 /* 	Make a new dictionary
 **

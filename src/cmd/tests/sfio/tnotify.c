@@ -69,5 +69,5 @@ MAIN()
 	if(sfgetc(sfstdout) >= 0 || Type != SF_READ)
 		terror("Notify did not announce SF_READ event\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

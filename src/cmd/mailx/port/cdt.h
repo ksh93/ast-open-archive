@@ -70,7 +70,7 @@
 
 /* For DLLs on systems allowing only pointers across client and library code.  */
 #ifndef _PTR_
-#if _PACKAGE_ast && !_DLL_BLD && _DLL_INDIRECT_DATA
+#if _PACKAGE_ast && !__BLD_DLL && _DLL_INDIRECT_DATA
 #define _ADR_ 		/* data access via ptrs	only	*/
 #define _PTR_	*
 #else
@@ -79,7 +79,7 @@
 #endif
 #endif /*_PTR_*/
 
-#if !_PACKAGE_ast && _DLL_BLD && defined(_WIN32)
+#if !_PACKAGE_ast && _BLD_DLL && defined(_WIN32)
 #if _KPV_ONLY		/* internal code compilation	*/
 #define extern	__declspec(dllexport)
 #else			/* client code compilation	*/

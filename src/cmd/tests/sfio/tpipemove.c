@@ -58,5 +58,5 @@ MAIN()
 			terror("Wrong data\n");
 	}
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

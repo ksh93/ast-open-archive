@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -22,7 +22,6 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                 Phong Vo <kpv@research.att.com>                  *
 *            Doug McIlroy <doug@research.bell-labs.com>            *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -33,7 +32,7 @@
  * generate test data
  */
 
-static const char id[] = "\n@(#)gen (AT&T Research) 1998-05-11\0\n";
+static const char id[] = "\n@(#)$Id: gen (AT&T Research) 1998-05-11 $\0\n";
 
 #include <ast.h>
 #include <error.h>

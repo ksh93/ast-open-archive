@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2000 AT&T Corp.                *
+*                Copyright (c) 1995-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -35,7 +34,7 @@
  * see comments in testre.dat for description of format
  */
 
-static const char id[] = "\n@(#)testmatch (AT&T Research) 1998-11-11\0\n";
+static const char id[] = "\n@(#)$Id: testmatch (AT&T Research) 1998-11-11 $\0\n";
 
 #include <ast.h>
 #include <ctype.h>
@@ -280,7 +279,7 @@ main(int argc, char** argv)
 	int		verbose = 0;
 
 	sfprintf(sfstdout, "TEST	");
-	sfprintf(sfstdout, "%s", id + 5);
+	sfprintf(sfstdout, "%s", id + 10);
 	s = "strmatch";
 	p = unit;
 	while (p < &unit[sizeof(unit)-1] && (*p = *s++) && !isspace(*p))

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -33,7 +32,7 @@
  *	$PWD/AT_EXEC_FILE $SHELL <job>
  */
 
-static const char id[] = "\n@(#)atx (AT&T Research) 2000-06-16\0\n";
+static const char id[] = "\n@(#)$Id: atx (AT&T Research) 2000-06-16 $\0\n";
 
 #include "at.h"
 

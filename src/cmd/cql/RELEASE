@@ -1,3 +1,5 @@
+01-01-01 cql: add space.cql test
+00-12-12 cql: fix 0 pointer deref in commit()
 00-09-13 cql: fix state.active repeat lookups (still should avoid generate())
 99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
 99-10-01 cql: fix up array[n] format

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2000 AT&T Corp.                *
+*                Copyright (c) 1991-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -32,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)cdb (AT&T Labs Research) 1999-05-01\n]"
+"[-?\n@(#)$Id: cdb (AT&T Labs Research) 1999-05-01 $\n]"
 USAGE_LICENSE
 "[+NAME?cdb - display cql data files]"
 "[+DESCRIPTION?\bcdb\b displays \bcql\b(1) and \bcdb\b(3) data files."

@@ -1,7 +1,7 @@
-:PACKAGE: ast X11
+:PACKAGE: tcl ast X11 libtksh:force
 
 ID			=	tk
-CCFLAGS			=	$(CC.OPTIMIZE)
+LIB			=	tk
 TK_VERSION		=	4.2
 TCL_VERSION		= 	7.6
 
@@ -10,11 +10,17 @@ LIB_DIR			==	"lib/$(ID)$(TK_VERSION)"
 HAVE_LIMITS_H		==	1
 HAVE_UNISTD_H		==	1
 
+if CC.HOSTTYPE == "win32.*"
+CCFLAGS			=	$(CC.OPTIMIZE) $(CC.DLL)
+else
+CCFLAGS			=	$(CC.OPTIMIZE)
+end
+
 .SOURCE : generic unix
 .SOURCE.h : include bitmaps xlib generic tcl
 
-$(ID) $(TK_VERSION) :LIBRARY: \
-	tkUnixSelect.c tkUnixInit.c tkAppInit.c tkUnixEvent.c tkUnixXId.c \
+$(LIB) $(TK_VERSION) :LIBRARY: \
+	tkUnixSelect.c tkUnixInit.c tkUnixEvent.c tkUnixXId.c \
 	tkUnixCursor.c tkUnixDialog.c tkUnixDraw.c tkUnixWm.c tkUnix.c \
 	tk3d.c tkArgv.c tkAtom.c tkBind.c tkBitmap.c tkButton.c \
 	tkCanvArc.c tkCanvBmap.c tkCanvImg.c tkCanvLine.c tkCanvPoly.c \
@@ -30,16 +36,11 @@ $(ID) $(TK_VERSION) :LIBRARY: \
 	tkUtil.c tkVisual.c tkWindow.c \
 	tkDefault.h tkFileFilter.h tkSelect.h tkNnames.h tkInt.h \
 	tkText.h tk.h tkPatch.h tkCanvas.h tkPort.h tkUnixDefault.h \
-	tkUnixInt.h tkUnixPort.h \
-	tcl.h
+	tkUnixInt.h tkUnixPort.h
 
-$(INSTALLROOT)/include/$(ID) :INSTALLDIR: tcl.h tk.h
+$(INCLUDEDIR) :INSTALLPROTO: tk.h
 
-:: README ToDo changes license.terms tkMain.c
-
-if TGZ
-PAXFLAGS        +=      -x gzip -x ustar -s '@^@$(ID)$(TK_VERSION)\/@g'
-end
+:: README ToDo changes license.terms tkMain.c tkAppInit.c
 
 /* Generated with: ksh gen library '/$(ID)$(TK_VERSION)' */
 

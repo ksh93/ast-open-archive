@@ -1,3 +1,12 @@
+01-01-31 ls: handle --sort=size
+01-01-01 ps: change (-x,--hex)=>(-X,--hex), add (-x,--detached)
+	 ls: really ignore --tabs, add --quote-style --scale, --thousands
+	 rm: -i and -f cancel each other
+00-12-13 df: change type default width to 10 for linux
+	 ps: fix --format '%(time)d'
+00-12-11 ps: fix --tree graph
+00-12-08 ps: no -e for pid args
+	 ps: add --heading
 00-10-31 date: mmddHHMMccyy doc and code fixes, test
 	 touch: ccyymmddHHMM doc and code fixes, --time=mtime common sense, test
 00-10-23 ps: -Tp pid gets pid and all children

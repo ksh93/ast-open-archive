@@ -86,5 +86,5 @@ MAIN()
 	if(sfpoll(&fr,1,1000) != 1)
 		terror("Data should be available\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

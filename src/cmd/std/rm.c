@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)rm (AT&T Labs Research) 2000-03-17\n]"
+"[-?\n@(#)$Id: rm (AT&T Labs Research) 2001-01-01 $\n]"
 USAGE_LICENSE
 "[+NAME?rm - remove files]"
 "[+DESCRIPTION?\brm\b removes the named \afile\a arguments. By default it"
@@ -323,9 +322,11 @@ main(int argc, register char** argv)
 			continue;
 		case 'f':
 			state.force = 1;
+			state.interactive = 0;
 			continue;
 		case 'i':
 			state.interactive = 1;
+			state.force = 0;
 			continue;
 		case 'r':
 		case 'R':

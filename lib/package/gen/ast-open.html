@@ -1,38 +1,51 @@
-<META name="description" content="ast-open package">
-<META name="keywords" content="software, package">
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Labs Research) 2000-07-17">
+<META name="generator" content="mm2html (AT&T Labs Research) 2001-01-01">
+<META name="description" content="ast-open package">
+<META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
 <META name="author" content="gsf+dgk+kpv">
 </HEAD>
-<BODY  marginheight=0 leftmargin=0 topmargin=0 marginwidth=0 bgcolor=white vlink=teal link=slateblue >
-<TABLE border=0 width=640><TR><TD valign=top align=left>
+<BODY  bgcolor=white vlink=teal link=slateblue >
+<TABLE border=0 align=center width=96%><TR><TD valign=top align=left>
+<!--INDEX--><!--/INDEX-->
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ast-open package">ast-open package</A></H3></CENTER></FONT></FONT>
 The AT&amp;T Labs Research ast-open package contains all of the ast open
 source commands and libraries.
 Components in this package:
-<PRE>
-    <A href="#3d">3d</A>		diff	    <A href="#nmake">nmake</A>	ss	    libcdb	libpp
-    <A href="#at">at</A>		html	    pack	<A href="#std">std</A>	    libcmd	libpz
-    <A href="#builtin">builtin</A>	<A href="#ie">ie</A>	    <A href="#pax">pax</A>		tests	    libcoshell	librecsort
-    bzip	<A href="#ksh93">ksh93</A>	    probe	<A href="#tksh">tksh</A>	    libcs	libsum
-    <A href="#coshell">coshell</A>	mailx	    <A href="#proto">proto</A>	<A href="#tw">tw</A>	    libdll	libtk
-    cpp		mam	    <A href="#pzip">pzip</A>	<A href="#warp">warp</A>	    libexpr	libuu
-    cql		<A href="#msgcc">msgcc</A>	    re		libast	    libmam	libvdelta
-    cs		ncsl	    <A href="#sort">sort</A>	libbz	    libodelta	libz
-</PRE>
+<P>
+<TABLE  bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center >
+<TR><TD align=left>
+<A href="#3d">3d</A></TD><TD align=left>html</TD><TD align=left><A href="#pax">pax</A></TD><TD align=left><A href="#tksh">tksh</A></TD><TD align=left>libdll</TD><TD align=left><A href="#libtksh">libtksh</A></TD></TR>
+<TR><TD align=left>
+<A href="#at">at</A></TD><TD align=left><A href="#ie">ie</A></TD><TD align=left>probe</TD><TD align=left><A href="#tw">tw</A></TD><TD align=left>libexpr</TD><TD align=left>libuu</TD></TR>
+<TR><TD align=left>
+<A href="#builtin">builtin</A></TD><TD align=left><A href="#ksh93">ksh93</A></TD><TD align=left><A href="#proto">proto</A></TD><TD align=left><A href="#warp">warp</A></TD><TD align=left>libmam</TD><TD align=left>libvdelta</TD></TR>
+<TR><TD align=left>
+bzip</TD><TD align=left>mailx</TD><TD align=left><A href="#pzip">pzip</A></TD><TD align=left>libast</TD><TD align=left>libodelta</TD><TD align=left>libz</TD></TR>
+<TR><TD align=left>
+<A href="#coshell">coshell</A></TD><TD align=left>mam</TD><TD align=left>re</TD><TD align=left>libbz</TD><TD align=left>libpp</TD></TR>
+<TR><TD align=left>
+cpp</TD><TD align=left><A href="#msgcc">msgcc</A></TD><TD align=left><A href="#sort">sort</A></TD><TD align=left>libcdb</TD><TD align=left>libpz</TD></TR>
+<TR><TD align=left>
+cql</TD><TD align=left>ncsl</TD><TD align=left>ss</TD><TD align=left>libcmd</TD><TD align=left>librecsort</TD></TR>
+<TR><TD align=left>
+cs</TD><TD align=left><A href="#nmake">nmake</A></TD><TD align=left><A href="#std">std</A></TD><TD align=left>libcoshell</TD><TD align=left>libsum</TD></TR>
+<TR><TD align=left>
+diff</TD><TD align=left>pack</TD><TD align=left>tests</TD><TD align=left>libcs</TD><TD align=left>libtk</TD></TR>
+</TABLE>
 <P>
 This package is a superset of the following packages: ast-base ast-ksh; you won't need these if you download ast-open.
-The software is covered by these licenses:
+The software is covered by this license:
 <UL type=square>
 <LI>
 <A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
-<LI>
-<A href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</A>
 </UL>
+Individual components may be covered by separate licenses;
+refer to the component source and/or binaries for more information.
+<P>
 A recent
 <A href="#release change log">release change log</A>
 is also included.
@@ -144,7 +157,7 @@ Try this for any host:
      cat /dev/tcp/hostname/inet.daytime
 </PRE>
 <P>
-<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="std">std</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="at">at</A></H3></CENTER></FONT></FONT>
 The
 <STRONG>ast</STRONG>
 <STRONG>at</STRONG>
@@ -901,14 +914,140 @@ is omitted.
      (warp) date -f %Y-%m-%d/%H:%M
      2000-03-19/18:58
 </PRE>
-<PRE>
+<P>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tksh">tksh</A></H3></CENTER></FONT></FONT>
+<EM>tksh</EM>
+is an implementation of the Tcl C library
+written on top of the library for the new KornShell
+(<EM>ksh93</EM>).
+<EM>tksh</EM>
+emulates the behavior of Tcl by using the API that is provided for extending
+<EM>ksh93</EM>,
+which is similar to the Tcl library in that it allows access to
+variables, functions and other state of the interpreter.
+This implementation requires no modification to
+<EM>ksh93</EM>,
+and allows Tcl libraries such as Tk to run on top of
+<EM>ksh93</EM>
+unchanged,
+making it possible to use shell scripts in
+place of Tcl scripts. 
+<EM>ksh93</EM>
+is well suited for use with Tk because it is
+backward compatible with
+<EM>sh</EM>,
+making it both easy to learn and easy to extend
+existing scripts to provide a graphical user interface.
+<P>
+<EM>tksh</EM>
+is not yet
+another port of Tk to another language -- it allows Tcl scripts to run without
+modification using the ksh93 internals.
+This makes it possible to combine
+Tcl and
+<EM>ksh93</EM>,
+which is useful for writing
+<EM>ksh93</EM>
+scripts that use components that have been implemented in Tcl
+(such as Tk widgets).
+<P>
+<EM>tksh</EM>
+was developed by
+<A href="http://www.research.att.com/~jlk" target=_top>Jeff Korn</A>
+and is distributed by
+<A href="mailto:advsoft@research.att.com" target=_top>advsoft@research.att.com</A>.
+For the latest information vist the
+<EM>tksh</EM>
+<A href="http://www.cs.princeton.edu/~jlk/tksh" target=_top>home page</A>.
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="release change log">release change log</A></H3></CENTER></FONT></FONT>
+<!--LABELS-->
+<B><FONT font face="verdana,arial,helvetica,geneva,sans-serif">
+<TABLE bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center><TR>
+<TD align=left><A href="#ksh93 changes">ksh93</A></TD>
+<TD align=left><A href="#pax changes">pax</A></TD>
+<TD align=left><A href="#html changes">html</A></TD>
+<TD align=left><A href="#proto changes">proto</A></TD>
+<TD align=left><A href="#bzip changes">bzip</A></TD>
+<TD align=left><A href="#tests changes">tests</A></TD>
+<TD align=left><A href="#3d changes">3d</A></TD>
+<TD align=left><A href="#coshell changes">coshell</A></TD>
+</TR><TR>
+<TD align=left><A href="#cpp changes">cpp</A></TD>
+<TD align=left><A href="#cs changes">cs</A></TD>
+<TD align=left><A href="#msgcc changes">msgcc</A></TD>
+<TD align=left><A href="#nmake changes">nmake</A></TD>
+<TD align=left><A href="#probe changes">probe</A></TD>
+<TD align=left><A href="#ss changes">ss</A></TD>
+<TD align=left><A href="#at changes">at</A></TD>
+<TD align=left><A href="#builtin changes">builtin</A></TD>
+</TR><TR>
+<TD align=left><A href="#cql changes">cql</A></TD>
+<TD align=left><A href="#diff changes">diff</A></TD>
+<TD align=left><A href="#ie changes">ie</A></TD>
+<TD align=left><A href="#mailx changes">mailx</A></TD>
+<TD align=left><A href="#ncsl changes">ncsl</A></TD>
+<TD align=left><A href="#pzip changes">pzip</A></TD>
+<TD align=left><A href="#re changes">re</A></TD>
+<TD align=left><A href="#sort changes">sort</A></TD>
+</TR><TR>
+<TD align=left><A href="#std changes">std</A></TD>
+<TD align=left><A href="#tksh changes">tksh</A></TD>
+<TD align=left><A href="#tw changes">tw</A></TD>
+<TD align=left><A href="#warp changes">warp</A></TD>
+<TD align=left><A href="#libast changes">libast</A></TD>
+<TD align=left><A href="#libcmd changes">libcmd</A></TD>
+<TD align=left><A href="#libdll changes">libdll</A></TD>
+<TD align=left><A href="#libexpr changes">libexpr</A></TD>
+</TR><TR>
+<TD align=left><A href="#librecsort changes">librecsort</A></TD>
+<TD align=left><A href="#libuu changes">libuu</A></TD>
+<TD align=left><A href="#libbz changes">libbz</A></TD>
+<TD align=left><A href="#libz changes">libz</A></TD>
+<TD align=left><A href="#libcoshell changes">libcoshell</A></TD>
+<TD align=left><A href="#libcs changes">libcs</A></TD>
+<TD align=left><A href="#libpp changes">libpp</A></TD>
+<TD align=left><A href="#libcdb changes">libcdb</A></TD>
+</TR><TR>
+<TD align=left><A href="#libpz changes">libpz</A></TD>
+<TD align=left><A href="#libtksh changes">libtksh</A></TD>
+</TR></TABLE>
+</FONT></B>
+<!--/LABELS-->
+<PRE>
 
 All recorded changes follow.
 
 <P>
-<H4>ksh93</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ksh93 changes">ksh93 changes</A></H3></CENTER></FONT></FONT>
+
+01-02-05  --- Release ksh93k+  ---
+01-02-05  The sequence \&lt;newline&gt; inside $'...' was not incrementing
+	  the line count and this has been fixed.
+01-02-05  Modified expansion of "${@-}" so that if no arguments are set
+	  it results in null string rather than nothing.
+01-02-02  memory leak problem with local variables in functions fixed.
+01-01-25  allow arithmetic expressions with float%int and treat them
+	  as ((int)float)%int rather than as an error. 
+01-01-19  read -n1 was not working and has been fixed.
+01-01-17  ksh now handes the case in which a here document in command
+	  substitution $() is terminated by the trailing ).  Previously,
+	  a new-line was needed at the end of the delimiter word. 
+01-01-02  A bug in which a KEYBD trap would cause a multi-line token
+	  to be processed incorrectly has been fixed.
+00-12-10  Arithmetic integer constants can now have L and U suffices. 
+00-12-10  A bug in the processing of arithmetic expressions with compound
+	  variables when the -n option is on has been fixed.
+00-12-08  A bug in M-f and M-b from emacs mode has been fixed.  This
+	  bug only occurs when ksh93 is compiled without MULTIBYTE enabled.
+00-11-29  A bug in which jobs -p would yield 0 for background
+	  jobs run in a script has been fixed.
+00-11-21  A bug in integer arrays in which the number of elements is
+	  incorrect when the ++ operator is applied to a non-existing
+	  element has been fixed.  For example, integer x; ((x&#0091;3&#0093;++)).
+00-11-20  A timing bug in which the shell could reset the terminal
+	  group to the wrong value in the case that the a new process
+	  changes the terminal group during startup has been fixed.
 
 00-10-27  --- Release ksh93k  ---
 00-10-27  Using tab for completion now works only when applied
@@ -1419,8 +1558,11 @@ All recorded changes follow.
 
 
 <P>
-<H4>pax</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pax changes">pax changes</A></H3></CENTER></FONT></FONT>
 
+01-02-02 file.c: fix duplicate -s map in addlink()
+00-12-20 bio.c: include &lt;sys/ioctl.h&gt; for systems that miss _IOW() etc.
+00-10-31 format.c: handle rpm 4.0 and newer
 00-09-20 copy.c: always allocate state.tmp.lst!
 00-08-31 change paths in delta archive: -rf i -z - -s e -wf o -z - &#0091;almost&#0093;
 00-08-11 copy.c: drop memalign() call for _std_malloc==1 in libast
@@ -1621,8 +1763,27 @@ All recorded changes follow.
 88-07-15 convert to pax
 
 <P>
-<H4>html</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="html changes">html changes</A></H3></CENTER></FONT></FONT>
 
+01-01-31 htmlrefs: fix nul char bug in &lt;!--INTERNAL--&gt; filter
+01-01-01 mm2html: fix incorrect \h'... #local refs
+	 mm2html: append &lt;!--LABELS--&gt;...&lt;!--/LABELS--&gt; for second pass
+	 mm2html: add .xx &#0091;no&#0093;index to inhibit or restart index labels
+	 mm2html: add .xx noFOO, .xx &#0091;no&#0093;index
+	 mm2html: .xx begin|end before &lt;BODY&gt; gets copied to &lt;HEAD&gt;
+	 mm2html: identification trailer aligned right
+	 htmlrefs: &lt;!--INTERNAL--&gt; in index.html &lt;HEAD&gt; skips file/dir
+00-12-14 mm2html: fix tbl colspan
+00-12-12 mm2html: ignore bgcolor for table with no box
+00-12-07 download: .tar.gz =&gt; .tgz
+	 htmlrefs: add --delete
+00-12-05 mm2html: add .PM
+	 mm2html: <SMALL>&lt;<A href=mailto:id@id.id...>id@id.id...</A>&gt;</SMALL> =&gt; mailto:
+00-11-27 mm2html: --frame is now 1 level instead of 2; no *-body and *-head
+	 mm2html: add .IS ... .IE indentation
+	 mm2html: .LR foo (1) generates man link
+	 htmlrefs: add https support
+00-10-31 htmlrefs: remove if internal filter leaves &lt;= 1 line
 00-05-25 mm2html: add viewgraph outline and navigation
 00-05-11 mm2html: add .vG viewgraph macros
 00-03-04 htmlrefs: add &lt;LINK rel=dynamic&gt;
@@ -1649,20 +1810,26 @@ All recorded changes follow.
 97-04-01 first release
 
 <P>
-<H4>proto</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="proto changes">proto changes</A></H3></CENTER></FONT></FONT>
 
+01-02-06 proto.tst: add (finally)
 99-11-19 add --license, --shell, --copy, --verbose
 99-08-11 long options
 
 <P>
-<H4>bzip</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="bzip changes">bzip changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 bzip2.c: include bzlib.h first
 99-01-01 package for ast
 
 <P>
-<H4>tests</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tests changes">tests changes</A></H3></CENTER></FONT></FONT>
 
+01-01-31 sfio: uniform test exit codes
+01-01-01 opt.tst: add enumerated option argument values
+00-12-11 date.dat: add a few more crontab(1) forms
 00-10-31 date.dat: add date(1) and touch(1) forms
+	 sfio: kpv updates to handle mac os X
 00-10-17 sfio/thole.c: move large buffer from stack to global
 00-10-03 testy2k.dat: `Feb 29 01:02' =&gt; `Feb 29  2000'
 00-04-01 Makefile: add ../../lib/libast to .SOURCE for features/sfio
@@ -1679,8 +1846,11 @@ All recorded changes follow.
 	 added optget() tests
 
 <P>
-<H4>3d</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="3d changes">3d changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
+00-12-14 3d.sh: fix -c
+00-10-31 ast.c add pathtemp.c
 00-10-19 init.c: initialize _3d_2d
 00-07-17 fix fchown to call MSG_fchown (not MSG_fchown); fixes vim dump!
 00-02-14 3d command long options (finally)
@@ -1772,8 +1942,9 @@ All recorded changes follow.
 	 link() and rename() now migrate to top instead of EROFS
 
 <P>
-<H4>coshell</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="coshell changes">coshell changes</A></H3></CENTER></FONT></FONT>
 
+00-12-14 shell is per host attribute
 00-02-01 --- release 2.2 ---
 99-06-24 cosh: change exit to return
 99-06-24 --- release 2.1 ---
@@ -1851,8 +2022,9 @@ All recorded changes follow.
 90-06-01 --- release 0.0 ---
 
 <P>
-<H4>cpp</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cpp changes">cpp changes</A></H3></CENTER></FONT></FONT>
 
+01-02-05 cpp.tst: add (finally)
 96-01-31 --- release 2.0 ---
 92-04-01 update for new libpp
 92-04-01 --- release 1.1 ---
@@ -1873,8 +2045,9 @@ All recorded changes follow.
 87-03-24 --- release 1.0 ---
 
 <P>
-<H4>cs</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cs changes">cs changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 vcs_src/*: drop old notices, fix signal handler prototype
 00-05-09 mbb: add (message bulletin board service)
 99-09-22 cs: update for CS_MNT_TAIL
 99-05-18 cs,css: long options
@@ -1891,18 +2064,43 @@ All recorded changes follow.
 	 fix cat server read bug CS_LINE -&gt; CS_EXACT
 
 <P>
-<H4>msgcc</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="msgcc changes">msgcc changes</A></H3></CENTER></FONT></FONT>
 
+01-01-31 ignore ls generation errors
 00-04-20 first release
 
 <P>
-<H4>nmake</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="nmake changes">nmake changes</A></H3></CENTER></FONT></FONT>
 
+01-02-02 makerules: bias package search to viewpath and make installroot
+	 makerules: *.req can be down the view
+01-01-01 expand: fix :D: to preserve leading / -- how long has this been wrong?
+	 makerules: fix .PACKAGE.INIT. for dir == /
+	 makerules: $(PACKAGE_PATH) is list of default package root dirs
+	 makerules: add recurse=list to list recursion order and exit
+	 makerules: _BLD_DLL==1 when building dll's
+	 makerules: link dll with static -l*
+	 makerules: check =l% bound dir in .REQUIRE.-l% PACKAGE_%_LIB
+	 expand: eliminate loops from :W=O:
+	 parse: add exit &#0091;code&#0093;
+	 bind: eliminate dups for 2d glob
+00-12-25 makerules: add header arg to :YYPREFIX:
+	 makerules: add :T=AF: for .ARCOPY
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+00-12-18 ppcc: check for old bash
+00-12-15 makerules: handle uwin $(CC.DLL) =&gt; -D_BLD_DLL change
+00-12-14 main: initialize version with fmtident()
+00-12-12 makerules: bias :PACKAGE: search for $(INSTALLROOT)
+	 make: use stat() instead of access() for better NFS behavior
+00-12-11 makerules: _BLD_DLL only for _DLL lib members
+00-12-03 debug.mk: add %.inc for -H include nesting
 00-10-31 option: --corrupt={accept|error|ignore}, --mismatch =&gt; --corrupt
 	 makerules: req file must be seen at of before the lib
 	 makerules: fix AWK and NAWK default definitions
 	 makerules: physical=1 =&gt; 2d iff in 3d
 	 pkg-tcl.mk: add CC.DLL, don't clobber TCLROOT
+	 makerules: define _PACKAGE_foo in .PACKAGE.INIT.
+	 makerules: add .VIEW to .MAMEDIT and .MAMACTION
 00-10-28 makerules: drop MAKEFILES filter on .SELECT. (why was it there?)
 00-10-26 make.c: fix .JOINT sync bug
 	 makerules: add $(PACKAGES expr) and :VARIANT: rhs expr
@@ -2462,7 +2660,7 @@ All recorded changes follow.
 93-12-01 --- release 3.0 ---
 
 <P>
-<H4>probe</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="probe changes">probe changes</A></H3></CENTER></FONT></FONT>
 
 00-08-11 probe: fix non-suid generation check
 00-01-11 probe: fix -t with writable info
@@ -2470,7 +2668,7 @@ All recorded changes follow.
 99-05-09 probe: long options
 
 <P>
-<H4>ss</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ss changes">ss changes</A></H3></CENTER></FONT></FONT>
 
 99-05-18 ss: long options
 97-08-11 ssd: fix now used before defined bug
@@ -2481,8 +2679,9 @@ All recorded changes follow.
 	 checks every 10s, updates every CS_STAT_FREQ if not interesting
 
 <P>
-<H4>at</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="at changes">at changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 atd: add actual and expected info to atx log messages
 00-09-28 crontab: update USAGE
 00-06-16 atd,atx: use base 36 instead of 64 in job names (now just lower case)
 00-05-22 crontab: clarify crontab jobs w.r.t at(1)
@@ -2509,9 +2708,11 @@ All recorded changes follow.
 96-05-24 --- release 1.0 ---
 
 <P>
-<H4>builtin</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="builtin changes">builtin changes</A></H3></CENTER></FONT></FONT>
 
-00-04-01 uuencode: umask 022 fior consistent header comparisons
+00-12-04 look: add
+00-12-01 what: add RCS ident(1) $Id:
+00-04-01 uuencode: umask 022 for consistent header comparisons
 00-02-14 fmt: move to libcmd
 00-01-06 pr: fix empty field in multi-col output
 99-11-19 pr: -t == -T
@@ -2561,8 +2762,10 @@ All recorded changes follow.
 	 add void* context 3rd arg to b_main()
 
 <P>
-<H4>cql</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="cql changes">cql changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 cql: add space.cql test
+00-12-12 cql: fix 0 pointer deref in commit()
 00-09-13 cql: fix state.active repeat lookups (still should avoid generate())
 99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
 99-10-01 cql: fix up array&#0091;n&#0093; format
@@ -2645,13 +2848,13 @@ All recorded changes follow.
 92-09-01 add virtual db
 
 <P>
-<H4>diff</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="diff changes">diff changes</A></H3></CENTER></FONT></FONT>
 
-Wed Jul 19 16:01:22 2000  Glenn Fowler &lt;gsf@research.att.com&gt;
+Wed Jul 19 16:01:22 2000  Glenn Fowler <SMALL>&lt;<A href=mailto:gsf@research.att.com>gsf@research.att.com</A>&gt;</SMALL>
 
 	* diff3 : call execvp() instead of execve()
 
-Sat Oct  1 05:24:19 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
+Sat Oct  1 05:24:19 1994  Paul Eggert  <SMALL>&lt;<A href=mailto:eggert@twinsun.com>eggert@twinsun.com</A>&gt;</SMALL>
 
 	* Version 2.7 released.
 
@@ -2670,12 +2873,12 @@ Sat Oct  1 05:24:19 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
 	* diff3.c (read_diff): If STAT_BLOCKSIZE yields zero,
 	adjust it to a more reasonable value.
 
-Sat Sep 24 20:36:40 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
+Sat Sep 24 20:36:40 1994  Paul Eggert  <SMALL>&lt;<A href=mailto:eggert@twinsun.com>eggert@twinsun.com</A>&gt;</SMALL>
 
 	* sdiff.c (exists, private_tempname): Adopt latest GNU libc algorithm.
 	(private_tempnam): Specialize for sdiff to avoid portability problems.
 
-Thu Sep 22 16:47:00 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
+Thu Sep 22 16:47:00 1994  Paul Eggert  <SMALL>&lt;<A href=mailto:eggert@twinsun.com>eggert@twinsun.com</A>&gt;</SMALL>
 
 	* configure.in (AC_ARG_PROGRAM): Added.
 	(AC_OUTPUT): Add &#0091;date &gt; stamp-h&#0093;.
@@ -2725,7 +2928,7 @@ Thu Sep 22 16:47:00 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
 	(main): Use SYSTEM_QUOTE_ARG.
 	(private_tempnam): Don't access "/tmp" directly; use PVT_tmpdir.
 
-Tue Sep 13 18:46:43 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
+Tue Sep 13 18:46:43 1994  Paul Eggert  <SMALL>&lt;<A href=mailto:eggert@twinsun.com>eggert@twinsun.com</A>&gt;</SMALL>
 
 	* configure.in (AC_FUNC_MEMCHR): Remove.  Autoconf didn't adopt this,
 	since we need not worry about an old experimental library
@@ -2741,7 +2944,7 @@ Tue Sep 13 18:46:43 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
 	* Makefile.in (srcs): Remove memcmp.c.
 	We use bcmp if memcmp doesn't work, since we only test for equality.
 
-Mon Sep 12 15:52:22 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
+Mon Sep 12 15:52:22 1994  Paul Eggert  <SMALL>&lt;<A href=mailto:eggert@twinsun.com>eggert@twinsun.com</A>&gt;</SMALL>
 
 	* configure.in (AC_CONFIG_HEADER): Rename config.h.in to config.hin.
 	(AC_ISC_POSIX, AC_MINIX): Go back to these old names for Autoconf 2.
@@ -2783,7 +2986,7 @@ Mon Sep 12 15:52:22 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
 
 	* waitpid.c (waitpid): Fix typo with internal scoping.
 
-Thu Sep  8 08:23:15 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
+Thu Sep  8 08:23:15 1994  Paul Eggert  <SMALL>&lt;<A href=mailto:eggert@twinsun.com>eggert@twinsun.com</A>&gt;</SMALL>
 
 	* configure.in: Revamp for Autoconf 2.
 	* memchr.c, waitpid.c: New source files for substitute functions.
@@ -2801,7 +3004,7 @@ Thu Sep  8 08:23:15 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
 	* diff.c (option_help): New variable.
 	(filetype): Add Posix.1b file types.
 
-Fri Sep  2 16:01:49 1994  Paul Eggert  &lt;eggert@twinsun.com&gt;
+Fri Sep  2 16:01:49 1994  Paul Eggert  <SMALL>&lt;<A href=mailto:eggert@twinsun.com>eggert@twinsun.com</A>&gt;</SMALL>
 
 	* configure.in: Switch to new autoconf names.  Add sys/file.h test.
 	* Makefile.in (distclean): Clean config.cache, config.log
@@ -4419,7 +4622,7 @@ version-control: never
 End:
 
 <P>
-<H4>ie</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ie changes">ie changes</A></H3></CENTER></FONT></FONT>
 
 00-02-14 ie: ie.sh script replaces ie fun
 	 ie: convert configure/* =&gt; features(ielib|options.sh)
@@ -4428,8 +4631,11 @@ End:
 98-02-02 initial release snarfed from ksh88i source
 
 <P>
-<H4>mailx</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="mailx changes">mailx changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 fix map bug that retained alias after expansion
+	 smtp: add domain to RCPT TO: if omitted
+00-11-27 add Date: and From: to smtp
 00-09-21 drop leading */ from user name
 00-05-09 add cd,pwd,${PWD},${OLDPWD} with ${CDPATH} check
 00-05-04 lex: flush stdout before prompt!
@@ -4526,14 +4732,15 @@ End:
 	 set all shows unset vars too
 
 <P>
-<H4>ncsl</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ncsl changes">ncsl changes</A></H3></CENTER></FONT></FONT>
 
 99-09-01 add usage&#0091;&#0093;
 96-10-11 first release
 
 <P>
-<H4>pzip</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pzip changes">pzip changes</A></H3></CENTER></FONT></FONT>
 
+01-02-02 pzip.tst: add -w window size test
 00-10-04 pin: add -T0x800 TSP v3 dump
 00-10-03 pin: add -T0x400 TSP v2 dump
 00-10-02 pin: fix -p bug that botched the input read
@@ -4561,7 +4768,7 @@ End:
 98-08-11 initial release
 
 <P>
-<H4>re</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="re changes">re changes</A></H3></CENTER></FONT></FONT>
 
 99-12-12 sed: delay peek for .==$
 99-08-11 grep: don't complain about EISDIR read error
@@ -4636,8 +4843,9 @@ End:
 95-12-01 regex: snarf Doug McIlroy's C++ implementation
 
 <P>
-<H4>sort</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="sort changes">sort changes</A></H3></CENTER></FONT></FONT>
 
+00-12-25 main.c: close input before final overwrite ops
 00-08-31 main.c: add -zcCHUNK to sort in chunks with merge disabled
 99-11-19 main.c: use rskeylist() for method usage
 99-11-11 main.c: unstable sort is the default for backwards compatibility
@@ -4662,8 +4870,17 @@ End:
 96-10-11 all regression tests pass for all methods
 
 <P>
-<H4>std</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="std changes">std changes</A></H3></CENTER></FONT></FONT>
 
+01-01-31 ls: handle --sort=size
+01-01-01 ps: change (-x,--hex)=&gt;(-X,--hex), add (-x,--detached)
+	 ls: really ignore --tabs, add --quote-style --scale, --thousands
+	 rm: -i and -f cancel each other
+00-12-13 df: change type default width to 10 for linux
+	 ps: fix --format '%(time)d'
+00-12-11 ps: fix --tree graph
+00-12-08 ps: no -e for pid args
+	 ps: add --heading
 00-10-31 date: mmddHHMMccyy doc and code fixes, test
 	 touch: ccyymmddHHMM doc and code fixes, --time=mtime common sense, test
 00-10-23 ps: -Tp pid gets pid and all children
@@ -4801,104 +5018,16 @@ End:
 	 ls: -C if argv&#0091;0&#0093; base is lc
 
 <P>
-<H4>tksh</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tksh changes">tksh changes</A></H3></CENTER></FONT></FONT>
 
-00-02-10  --- Release 7.6 ---
-00-02-10  Update README file
-00-02-09  Deleted unreferenced vars, dropped tcl 7.5 compatibility,
-	  added _PACKAGE_ast &lt;tm.h&gt; routines to tclUnixTime.c, added
-	  forward refs to the Tcl_LinkVar() Tcl_UnlinkVar() tk callbacks,
-	  changed Makefile library refs
-00-02-07  Modified shcompat.c and shcompat.h to handle
-          change to ksh93 where nvenv is now private.
-00-02-07  Included Tk4.2 in distribution to avoid
-          compatibility problems.  Modified Makefile.
-00-02-07  Using new packaging provided by gsf 
-97-06-24  src/tclIO.c proto tweaks &#0091;gsf&#0093;
-
-97-04-10  --- Release 7.6b1 ---
-97-04-09  tcl_open |command works
-97-04-09  Default interp mode is INTERP_TCL
-97-03-09  Combined tksh.c interp.c to init.c	
-97-03-09  Incorporated changes for Tcl 7.6
-97-03-09  waitevent sets interp type to tcl instead of having eval guess
-97-03-09  Inserted code to null terminate argv in InterpProc
-97-01-20  Integrated in tcl 7.5p1
-97-01-20  Integrated tclIO.c written on sfio
-97-01-20  using nmake makefile
-97-01-20  integrated changes for uwin
-96-09-04  Reorganization of directory
-96-09-04  Works with Tcl 7.5
-96-09-04  Doesn't work with Tcl 7.4, Tcl 7.4 (requires Tk4.0)
-96-09-04  Lots of new files, deleted files
-96-02-29  Tcl_RegExp*() changed to use posix regex
-96-02-29  Tcl_RegExp*() cache change to avoid copying
-96-02-29  Tcl_RegExpCompile arg 3 for case ignore match
-96-02-29  drop stdarg.h from :: src list
-96-02-29  drop malloc.h from tksh.h
-96-02-25  unset TK_LIBRARY in tk.ksh
-96-02-25  modifications to Makefile, config.sh and config.tcl:
-          make debug, make BASE=, removed debug option in interface
-96-02-25  setsub now creates a null subscript
-96-02-25  init.ksh sets argv0 &amp; argv, uses discipline for env instead of trace
-96-02-25  bug in Tksh_ConvertList fixed (didn't check errors properly)
-96-02-25  Man page updated
-
-96-02-21  --- Release 1.0b2 ---
-96-02-21  New version of Tksh paper
-96-02-21  Man page updated
-96-02-21  ksh version of source accepts standard input ; uses sfio
-96-02-15  Tcl_EvalFile works with Tcl mode
-96-02-15  Result only printed if stdout is a string.
-96-02-13  Added sh_sigcheck to Tcl_TclEval, making it possible to stop an
-          infinite loop in a builtin.
-96-02-13  Traces turned off in subshell
-96-02-11  Added array data field in array discipline, used for array searches.
-          TkshMakeArray now called TkshArrayData, separate nv_makearray macro.
-	  Search ids allocated like tcl, using array data instead of hash table
-	  set.test would pass, except ordering of elements is different (5 fail)
-	  however, it meets specs.
-96-02-11  Cleaned up tksh.h a bit
-96-02-11  Added in .sh.result traced to interp-&gt;result
-96-02-11  Added builtin setlist
-96-02-08  Added Tcl_UpVar, Tcl_UpVar2 functions
-96-02-08  regexp.c used instead of shell patterns
-96-02-08  fixed bug in proc test (but now file crashes)
-96-02-08  changed behavior of "info commands" to strip off tcl_ so that
-	  info.test passes
-96-02-06  rewrote portions of var.c - now the code is a lot easier to follow.
-	  Set up to use the new NV_NODISC flag.  Two more trace tests pass.
-	  Note - only one unset disc is called after a function clears scope.
-96-02-06  Added pid command
-96-02-04  button.ksh invoke does not redirect stderr and stdout to /dev/null
-96-02-03  Moved TclOpen and TclRead from tk.c to tclunix.c
-96-02-03  File reorganization:
-	    New file varcmd.c which has commands associated with vars
-              (taken from tclcommand.c)
-	    tclcommand.c renamed commands.c, command.c renamed eval.c
-	    commands.c has tclinfo.c and tclsource.c
-96-02-03  Removed tcllist.c, tclstring.c and tclresult.c and put tclUtil.c
-	  into tcl directory (only a couple of changes necessary to tclUtil.c)
-96-02-03  Tcl_SetErrorCode.c remvoed from tclerr.c (in tclUtil.c)
-96-02-03  Makefile updated accordingly
-96-02-03  Fixed bug with bind : #! in bindscript was ignored
-96-02-02  Fixed up/down arrow key problem in tk library
-96-02-01  Removed printing of "after" for entry widgets
-96-02-01  Removed return in Tcl_UntraceVar (return void doesn't work for sgi)
-96-01-30  Added in checks to config.sh for -lsocket and -lnsl
-96-01-30  Added fixstrtod (used in libtk.a on Solaris)
-96-01-30  Moved "widget" to scripts directory and made symbolic link to it
-96-01-30  Created "tksh" directory for binaries
-96-01-29  Changed name of directory "kshmain" to "obsolete"
-96-01-29  Fixed ifdef 0 in tk.c
-96-01-29  tclinfo.c and interp.c use function TkshLibDir(), defined in tksh.c
-96-01-29  tksh_builtin_command sets sh.exitval to 1 on error
-
-96-01-25  --- Release 1.0b1 ---
+01-01-01  separate -ltksh from tksh main
 
 <P>
-<H4>tw</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tw changes">tw changes</A></H3></CENTER></FONT></FONT>
 
+01-02-06 tw,find: move --local test fslocal()
+01-01-01 find: fix -newer -anewer -cnewer -perm
+00-11-14 updatedb: add --dir-format (it was already the default)
 00-08-11 tw: add --recursive
 00-05-23 cmdarg: fix -a strchr loop (thanks dr ek)
 00-05-01 find: add &#0091;f&#0093;printx and %&#0091;xX&#0093; -- or use tw
@@ -4955,7 +5084,7 @@ End:
 	 add -H for FTW_META|FTW_PHYSICAL
 
 <P>
-<H4>warp</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="warp changes">warp changes</A></H3></CENTER></FONT></FONT>
 
 99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
 99-05-21 add: _xstat64
@@ -4965,9 +5094,44 @@ End:
 98-03-05 first implementation
 
 <P>
-<H4>libast</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libast changes">libast changes</A></H3></CENTER></FONT></FONT>
 
+01-02-06 sfraise.c: add SF_FINAL check to avoid (posibly) freed disciplines
+01-01-01 features/common: fix uwin __DEFINE__
+	 sftable: initialize decimal and thousand
+	 magic.tab: add corel wordperfect document
+	 syslog: add LOG_LEVEL, add ' only if needed
+	 include/tm.h: #undef daylight for _WIN32
+	 sfio.h: add _SF_APPEND and _SF_CLOSE for native namespace incursion
+	 ast_std.h: add AST_LC_multibyte for MB_CUR_MAX&gt;1
+	 setlocale: set AST_LC_multibyte
+	 strmatch: check AST_LC_multibyte
+	 features/limits.c: add _BITS_POSIX1_LIM_H guard for linux
+	 features/libpath.sh: fix for aix LIBPATH
+	 procopen,procclose: block SIGCHLD if PROC_FOREGROUND (e.g., system(3))
+	 optget.c: add enumerated option argument values
+	 optget.c: add &lt;!--INTERNAL--&gt; for private --html
+	 optget.c: fix memory leak that hit shell builtins hard
+	 sfio: drop sfread small chunk logic
+00-12-25 mnt.c: handle " and ' quoting for fstab
+	 sftmp.c: let pathtemp() open the fd O_EXCL
+00-12-15 conf.sh: add -v for verbose trace
+	 features/(limits|unistd).c: no FEATURE/types because of _POSIX_SOURCE
+	 features/time: add default for CLOCKS_PER_SEC
+	 features/lib: std_malloc now handles NeXT
+00-12-13 strton: recognize qualifier only if preceded by a digit
+	 features/lib: change return in vfork() test to exit() for linux sparc
+	 fmtquote: fix $'...' quote logic
+00-12-11 tmdate: fix cron format bug that mishandled months
+00-12-01 optget: handle $Id: ... $ in --?-version
+	 features/fcntl.c: fix _STDPP_ mmap munmap
+00-11-27 magic: drop dup sfclose() in load()
+	 optget: handle error_info.id==0
+00-11-22 features/stdio: add _FILEDEFED for sol9.sun4
+	 strton,stronll: handle &#0091;u|U&#0093;&#0091;l|L&#0093;&#0091;ll|LL&#0093; qualifiers
 00-10-31 tmdate: add TM_DATESTYLE and mmddHHMM&#0091;cc&#0093;yy
+	 astlicense.c: #include &lt;hashkey.h&gt; MAM workaround
+	 astlicense.c: check for non-empty CONTRIBUTORS
 00-10-26 features/stdio: add _FILE and __FILE for gnu
 	 misc/stk.c: fix stack pointer check off-by-one (dgk does it too!)
 00-10-23 syslog.h: sync with bsd values
@@ -5039,7 +5203,7 @@ End:
 	 fts: fix FTS_NOSEEDOTDIR bug that botched ./* in top list
 	 include/ast/prototyped.h includes include/prototyped.h
 	 pathpath: fix strdup(0) bug
-	 optget: --html &lt;foo@bar&gt; =&gt; ...mailto:foo@bar...
+	 optget: --html <SMALL>&lt;<A href=mailto:foo@bar>foo@bar</A>&gt;</SMALL> =&gt; ...mailto:foo@bar...
 	 sscanf: fix sfsscanf =&gt; sfvsscanf typo
 	 magic.tab: strengthen tar recognition
 00-02-08 conf.sh: fix ifdef for systems that think sysconf(FOO) is const
@@ -5529,8 +5693,10 @@ End:
 	 drop spurious optusage() ' '
 
 <P>
-<H4>libcmd</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcmd changes">libcmd changes</A></H3></CENTER></FONT></FONT>
 
+01-01-23 cp: `cp foo' =&gt; `cp foo .' only for CONFORMANCE!=standard
+00-12-01 cut: multibyte support
 00-10-31 mkdir: handle races by checking EEXIST
 00-09-20 cp: copy argv to stack before modifying in place
 00-05-18 add setlocale(LC_ALL,"")
@@ -5616,7 +5782,7 @@ End:
 	 fix mkdir '/' skip bug that went one too far
 
 <P>
-<H4>libdll</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libdll changes">libdll changes</A></H3></CENTER></FONT></FONT>
 
 00-01-26 dlllook: add -- dlsym() with `_' weak prefix fallback
 99-04-01 features/dll: drop &lt;stdio.h&gt; -- iffe protos printf
@@ -5631,7 +5797,7 @@ End:
 97-10-11 move from libast so libast can link static
 
 <P>
-<H4>libexpr</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libexpr changes">libexpr changes</A></H3></CENTER></FONT></FONT>
 
 99-09-22 exparse.y,exeval.c: add for(ID&#0091;DYNAMIC&#0093;)
 	 exparse.y: ref&#0091;i&#0093;.ref
@@ -5672,8 +5838,9 @@ End:
 	 add exseek() for backup
 
 <P>
-<H4>librecsort</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="librecsort changes">librecsort changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 recsort.h: _RSHDR_H =&gt; _BLD_recsort; should have been done years ago
 00-08-31 rskey.c: fix code() buffer off by one (too far)
 00-03-17 rskey.c: consult RLIMIT_DATA for size limits
 00-01-25 rskey.c: win32.i386 optimizer generates bad code for key_n_code
@@ -5699,21 +5866,22 @@ End:
 96-09-18 first working version with -lsort (ok, so -c and -m don't work yet)
 
 <P>
-<H4>libuu</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libuu changes">libuu changes</A></H3></CENTER></FONT></FONT>
 
 00-03-04 uulib: add posix decode size check
 98-12-25 uu_encode: fix dp-&gt;fill usage
 98-11-11 uulib: add binhex encode
 
 <P>
-<H4>libbz</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libbz changes">libbz changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 bzlib.h: add _PACKAGE_ast checks
 99-09-11 sfdcbzip: return &gt;0 if discipline pushed
 99-07-17 sfdcbzip: don't free disc on SF_CLOSE
 99-03-17 split library from command, sfdcbzip.&#0091;ch&#0093;
 
 <P>
-<H4>libz</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libz changes">libz changes</A></H3></CENTER></FONT></FONT>
 
 00-09-11 gzio: don't set verified=1 in check_header() for concatenation
 99-11-19 gzio: add missing _PACKAGE_ast
@@ -5729,8 +5897,10 @@ End:
 98-03-19 sfgzip =&gt; sfdcgzip
 
 <P>
-<H4>libcoshell</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcoshell changes">libcoshell changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 cokill: killjob =&gt; cokilljob, killshell =&gt; cokillshell
+00-12-18 coinit: CO_OSH ? "${!-$$}" : "${!:-$$}"
 00-10-25 codata: $ZSH_VERSION is not ksh
 00-02-14 procrun,system: system(3) returns wait() status (not shell status)
 99-11-19 co*: add CO_OSH for bsdi lack of times(1)
@@ -5738,8 +5908,10 @@ End:
 98-06-22 coinit: quote cd path arg
 
 <P>
-<H4>libcs</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcs changes">libcs changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 cspoll: fix getmsg() flag arg
+	 csaddr: fix local host addr initialization
 00-06-01 csopen: handle dynamic ip assignment underfoot
 00-05-11 csopen: handle /dev/tcp/local/9876/FOO/other
 00-05-09 cssfd: CS_POLL_WRITE implies O_NONBLOCK
@@ -5805,8 +5977,20 @@ End:
 94-12-15 csinfo("-",0) gets standard info
 
 <P>
-<H4>libpp</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libpp changes">libpp changes</A></H3></CENTER></FONT></FONT>
 
+01-02-06 fix readonly buffer write (cpp test 07:2873)
+01-02-04 fix -M* to properly handle .cxx .cpp .C input
+	 fix IN_BUFFER pop bug that did not reset the token pointer
+01-01-01 pp:headerexpand: space ok if no IN_MACRO
+	 ppcall: hide if IN_FILE|IN_MACRO|IN_EXPAND
+	 pplex: don't complain about ^L or ^Z as last char in file
+	 ppsearch: fix #include &lt;.../foo.h&gt; loop
+	 ppcontrol: manulally increment IN_RESCAN error_info.line
+00-12-25 add EXPOSE to expose hidden macros (for #import ...)
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+	 pp.probe: filter out invalid symbols for predefined macro scan, duh
+	 pp:headerexpand: limit expansion to IN_MACRO
 00-10-31 __STDC__==0 if HOSTED &amp;&amp; _UWIN
 00-10-26 pplib.h: change SEEK_SET to O_RDONLY for aix
 00-10-17 pp.probe: __IMPORT__ =&gt; __STDPP__IMPORT__
@@ -5833,7 +6017,7 @@ End:
 	 ppproto: "..." &#0091;A-Z_&#0093;+ "..." ignores &#0091;A-Z_&#0093;+ if PROTOMAIN
 99-11-11 ppproto: use astlicense()
 99-10-31 ppproto: add PROTO_SHARP, update license parse
-	 pplex: fix some MARK bugs seen by #define X "A B &lt;C@D&gt;"
+	 pplex: fix some MARK bugs seen by #define X "A B <SMALL>&lt;<A href=mailto:C@D>C@D</A>&gt;</SMALL>"
 99-10-01 add pp:stringsplit for "...\\n..." =&gt; "..."..."
 	 add pp:lineid to match PP_LINEID
 99-07-17 ppbuiltin: fix getline() canon spacing for numbers
@@ -6120,8 +6304,10 @@ End:
 	 ----- see HISTORY -----
 
 <P>
-<H4>libcdb</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libcdb changes">libcdb changes</A></H3></CENTER></FONT></FONT>
 
+01-01-01 cdbimage: drop span discipline that invalidated seeks
+	 cdbflat: check details in flatevent, fix CDB_SPACE
 00-02-14 cdbimage: fix record span bug that caused cql regression test failures
 99-10-01 add: cdbimage() CDB_IMAGE
 99-08-11 cdbopen: fix referenced checks
@@ -6147,8 +6333,12 @@ End:
 	 1.0, 1.1 cdb header format
 
 <P>
-<H4>libpz</H4>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libpz changes">libpz changes</A></H3></CENTER></FONT></FONT>
 
+01-02-02 delay buffer allocation until pzpartinit()
+	 pzpart: fix non-terminated string bug for url-style paths
+01-01-01 pzopen: open new stream instead of using sfstdin for sfdcgzip()
+00-12-11 pzpart(): add -X0 =&gt; prefix.skip =&gt; skip prefix on uncompress
 00-10-04 pzhead(): accept empty input for compression -- duh
 00-05-31 pzclose(): check for pz-&gt;io == 0
 00-02-14 PZ_DELAY|PZ_HANDLE|PZ_UNKNOWN for 'unknown format' after pzlib() done
@@ -6178,10 +6368,109 @@ End:
 98-10-01 2.0 format and interface -- Pzpart_t for multiple partitions
 98-09-09 1.3 format -- separate &lt;run,off&gt; &lt;val&gt; compression groups
 98-08-11 1.0 release
-</PRE>
-<HR>
+
 <P>
-November 13, 2000
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="libtksh changes">libtksh changes</A></H3></CENTER></FONT></FONT>
+
+00-02-10  --- Release 7.6 ---
+00-02-10  Update README file
+00-02-09  Deleted unreferenced vars, dropped tcl 7.5 compatibility,
+	  added _PACKAGE_ast &lt;tm.h&gt; routines to tclUnixTime.c, added
+	  forward refs to the Tcl_LinkVar() Tcl_UnlinkVar() tk callbacks,
+	  changed Makefile library refs
+00-02-07  Modified shcompat.c and shcompat.h to handle
+          change to ksh93 where nvenv is now private.
+00-02-07  Included Tk4.2 in distribution to avoid
+          compatibility problems.  Modified Makefile.
+00-02-07  Using new packaging provided by gsf 
+97-06-24  src/tclIO.c proto tweaks &#0091;gsf&#0093;
+
+97-04-10  --- Release 7.6b1 ---
+97-04-09  tcl_open |command works
+97-04-09  Default interp mode is INTERP_TCL
+97-03-09  Combined tksh.c interp.c to init.c	
+97-03-09  Incorporated changes for Tcl 7.6
+97-03-09  waitevent sets interp type to tcl instead of having eval guess
+97-03-09  Inserted code to null terminate argv in InterpProc
+97-01-20  Integrated in tcl 7.5p1
+97-01-20  Integrated tclIO.c written on sfio
+97-01-20  using nmake makefile
+97-01-20  integrated changes for uwin
+96-09-04  Reorganization of directory
+96-09-04  Works with Tcl 7.5
+96-09-04  Doesn't work with Tcl 7.4, Tcl 7.4 (requires Tk4.0)
+96-09-04  Lots of new files, deleted files
+96-02-29  Tcl_RegExp*() changed to use posix regex
+96-02-29  Tcl_RegExp*() cache change to avoid copying
+96-02-29  Tcl_RegExpCompile arg 3 for case ignore match
+96-02-29  drop stdarg.h from :: src list
+96-02-29  drop malloc.h from tksh.h
+96-02-25  unset TK_LIBRARY in tk.ksh
+96-02-25  modifications to Makefile, config.sh and config.tcl:
+          make debug, make BASE=, removed debug option in interface
+96-02-25  setsub now creates a null subscript
+96-02-25  init.ksh sets argv0 &amp; argv, uses discipline for env instead of trace
+96-02-25  bug in Tksh_ConvertList fixed (didn't check errors properly)
+96-02-25  Man page updated
+
+96-02-21  --- Release 1.0b2 ---
+96-02-21  New version of Tksh paper
+96-02-21  Man page updated
+96-02-21  ksh version of source accepts standard input ; uses sfio
+96-02-15  Tcl_EvalFile works with Tcl mode
+96-02-15  Result only printed if stdout is a string.
+96-02-13  Added sh_sigcheck to Tcl_TclEval, making it possible to stop an
+          infinite loop in a builtin.
+96-02-13  Traces turned off in subshell
+96-02-11  Added array data field in array discipline, used for array searches.
+          TkshMakeArray now called TkshArrayData, separate nv_makearray macro.
+	  Search ids allocated like tcl, using array data instead of hash table
+	  set.test would pass, except ordering of elements is different (5 fail)
+	  however, it meets specs.
+96-02-11  Cleaned up tksh.h a bit
+96-02-11  Added in .sh.result traced to interp-&gt;result
+96-02-11  Added builtin setlist
+96-02-08  Added Tcl_UpVar, Tcl_UpVar2 functions
+96-02-08  regexp.c used instead of shell patterns
+96-02-08  fixed bug in proc test (but now file crashes)
+96-02-08  changed behavior of "info commands" to strip off tcl_ so that
+	  info.test passes
+96-02-06  rewrote portions of var.c - now the code is a lot easier to follow.
+	  Set up to use the new NV_NODISC flag.  Two more trace tests pass.
+	  Note - only one unset disc is called after a function clears scope.
+96-02-06  Added pid command
+96-02-04  button.ksh invoke does not redirect stderr and stdout to /dev/null
+96-02-03  Moved TclOpen and TclRead from tk.c to tclunix.c
+96-02-03  File reorganization:
+	    New file varcmd.c which has commands associated with vars
+              (taken from tclcommand.c)
+	    tclcommand.c renamed commands.c, command.c renamed eval.c
+	    commands.c has tclinfo.c and tclsource.c
+96-02-03  Removed tcllist.c, tclstring.c and tclresult.c and put tclUtil.c
+	  into tcl directory (only a couple of changes necessary to tclUtil.c)
+96-02-03  Tcl_SetErrorCode.c remvoed from tclerr.c (in tclUtil.c)
+96-02-03  Makefile updated accordingly
+96-02-03  Fixed bug with bind : #! in bindscript was ignored
+96-02-02  Fixed up/down arrow key problem in tk library
+96-02-01  Removed printing of "after" for entry widgets
+96-02-01  Removed return in Tcl_UntraceVar (return void doesn't work for sgi)
+96-01-30  Added in checks to config.sh for -lsocket and -lnsl
+96-01-30  Added fixstrtod (used in libtk.a on Solaris)
+96-01-30  Moved "widget" to scripts directory and made symbolic link to it
+96-01-30  Created "tksh" directory for binaries
+96-01-29  Changed name of directory "kshmain" to "obsolete"
+96-01-29  Fixed ifdef 0 in tk.c
+96-01-29  tclinfo.c and interp.c use function TkshLibDir(), defined in tksh.c
+96-01-29  tksh_builtin_command sets sh.exitval to 1 on error
+
+96-01-25  --- Release 1.0b1 ---
+</PRE>
+<P>
+<HR>
+<DIV align=right>
+<P>
+February 06, 2001
+</DIV>
 
 </TD></TR></TABLE>
 </BODY>

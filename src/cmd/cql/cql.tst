@@ -1001,3 +1001,14 @@ TEST 18 'member arrays'
 	EXEC	-I$data -l -f array1.cql $data/array1.db
 		OUTPUT - $'gsf one\ngsf two\ngsf three\ndfwc five\ndfwc six'
 	EXEC	-I$data -l -f array2.cql $data/array2.db
+
+TEST 19 'buffer boundaries and hix steady state'
+	EXEC	-e 't {int n; register char* a;}; a=="x";' $data/span.db
+		OUTPUT - $'1;x\n3;x'
+	EXEC
+
+TEST 20 '-lcdb details'
+	EXEC	-I$data -f space.cql -e 'action:printf(":%s:\n", name.last)'
+		OUTPUT - $':Fowler:\n:Sword:\n:Bennett:\n:Haralick:'
+	EXEC	-I$data -f space.cql -e 'dat.details="nospace";' -e 'action:printf(":%s:\n", name.last)'
+		OUTPUT - $':Fowler:\n: Sword:\n:Bennett :\n: Haralick :'

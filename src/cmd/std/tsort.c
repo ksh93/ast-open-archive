@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,12 +20,11 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)tsort (AT&T Labs Research) 2000-01-11\n]"
+"[-?\n@(#)$Id: tsort (AT&T Labs Research) 2000-01-11 $\n]"
 USAGE_LICENSE
 "[+NAME?tsort - topological sort]"
 "[+DESCRIPTION?\btsort\b writes to the standard output a totally ordered"

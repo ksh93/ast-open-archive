@@ -284,7 +284,8 @@ mapuser(Dt_t* dt, void* object, void* context)
 			return 0;
 		}
 	}
-	dictsearch(&wm->next, (char*)np, INSERT|IGNORECASE|STACK|OBJECT);
+	if (!dictsearch(&state.aliases, np->name, LOOKUP))
+		dictsearch(&wm->next, (char*)np, INSERT|IGNORECASE|STACK|OBJECT);
 	return 0;
 }
 

@@ -41,5 +41,5 @@ MAIN()
 		if((v = sfgetd(fp)) != f)
 			terror("Element=%d Input=%f, Expect=%f\n",i,v,f);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char mount_usage[] =
-"[-?\n@(#)mount (AT&T Labs Research) 1999-11-19\n]"
+"[-?\n@(#)$Id: mount (AT&T Labs Research) 1999-11-19 $\n]"
 USAGE_LICENSE
 "[+NAME?mount - mount and display filesystems]"
 "[+DESCRIPTION?\bmount\b attaches a named filesystem \afs\a to the"
@@ -76,7 +75,7 @@ USAGE_LICENSE
 ;
 
 static const char unmount_usage[] =
-"[-?\n@(#)umount (AT&T Labs Research) 1999-11-19\n]"
+"[-?\n@(#)$Id: umount (AT&T Labs Research) 1999-11-19 $\n]"
 USAGE_LICENSE
 "[+NAME?umount - unmount filesystems]"
 "[+DESCRIPTION?\bumount\b unmounts one or more currently mounted filesystems,"

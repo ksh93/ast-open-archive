@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.1 2001-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -39,97 +39,97 @@ make install
 make diff
 make diff.o
 make diff.c
-make ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/getopt.h
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/getopt.h
 make diff.h implicit
-make ${INSTALLROOT}/include/ast/regex.h implicit
-make ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_common.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/regex.h
-make ${INSTALLROOT}/include/ast/stdio.h implicit
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/stdio.h
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/regex.h
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/stdio.h
 make system.h implicit
-make ${INSTALLROOT}/include/ast/error.h implicit
-make ${INSTALLROOT}/include/ast/option.h implicit
-make ${INSTALLROOT}/include/ast/ast.h implicit
-make ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-make ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_botch.h implicit
-done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
-make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
-done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
-make ${INSTALLROOT}/include/ast/re_comp.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/re_comp.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
-make ${INSTALLROOT}/include/ast/ls.h implicit
-make ${INSTALLROOT}/include/ast/ast_mode.h implicit
-done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
-make ${INSTALLROOT}/include/ast/ast_fs.h implicit
+make ${PACKAGE_ast_INCLUDE}/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/option.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
+make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ls.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
-done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
-make ${INSTALLROOT}/include/ast/ast_types.h implicit
-done ${INSTALLROOT}/include/ast/ast_types.h dontcare
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/limits.h implicit
-done ${INSTALLROOT}/include/ast/limits.h dontcare
-make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
-done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_lib.h implicit
-done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_std.h dontcare
-done ${INSTALLROOT}/include/ast/sfio.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_version.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_version.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/option.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/error.h dontcare
-prev ${INSTALLROOT}/include/ast/limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/option.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/error.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/limits.h implicit
 make vfork.h implicit
 done vfork.h dontcare virtual
 make ndir.h implicit
 done ndir.h dontcare virtual
-make ${INSTALLROOT}/include/ast/dirent.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/dirent.h dontcare
+make ${PACKAGE_ast_INCLUDE}/dirent.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/dirent.h dontcare
 make config.h implicit
 make config.iffe
 done config.iffe
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${INSTALLROOT}/lib/libast.a}`
-exec - iffe -o config.h -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -I/usr/common/ast/include ${mam_libast} : run config.iffe
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
+exec - iffe -o config.h -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run config.iffe
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done config.h generated
 done system.h
 done diff.h
 done diff.c
 prev diff.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2000 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2001 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -c diff.c
 done diff.o generated
 make analyze.o
 make analyze.c
@@ -138,49 +138,49 @@ done cmpbuf.h
 prev diff.h implicit
 done analyze.c
 prev analyze.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c analyze.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c analyze.c
 done analyze.o generated
 make dir.o
 make dir.c
 prev diff.h implicit
 done dir.c
 prev dir.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c dir.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c dir.c
 done dir.o generated
 make io.o
 make io.c
 prev diff.h implicit
 done io.c
 prev io.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c io.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c io.c
 done io.o generated
 make util.o
 make util.c
 prev diff.h implicit
 done util.c
 prev util.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DPR_PROGRAM=\""pr"\" -D_PACKAGE_ast -c util.c
 done util.o generated
 make context.o
 make context.c
 prev diff.h implicit
 done context.c
 prev context.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c context.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c context.c
 done context.o generated
 make ed.o
 make ed.c
 prev diff.h implicit
 done ed.c
 prev ed.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ed.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ed.c
 done ed.o generated
 make ifdef.o
 make ifdef.c
 prev diff.h implicit
 done ifdef.c
 prev ifdef.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c ifdef.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ifdef.c
 done ifdef.o generated
 make cmpbuf.o
 make cmpbuf.c
@@ -188,51 +188,51 @@ prev cmpbuf.h implicit
 prev system.h implicit
 done cmpbuf.c
 prev cmpbuf.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmpbuf.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmpbuf.c
 done cmpbuf.o generated
 make normal.o
 make normal.c
 prev diff.h implicit
 done normal.c
 prev normal.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c normal.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c normal.c
 done normal.o generated
 make side.o
 make side.c
 prev diff.h implicit
 done side.c
 prev side.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c side.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c side.c
 done side.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o diff diff.o analyze.o dir.o io.o util.o context.o ed.o ifdef.o cmpbuf.o normal.o side.o ${mam_libast}
 done diff generated
 make diff3
 make diff3.o
 make diff3.c
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev system.h implicit
 done diff3.c
 prev diff3.c
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2000 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1988-2001 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDIFF_PROGRAM=\""diff"\" -c diff3.c
 done diff3.o generated
 setv LICENSE -DLICENSE="author=\"Randy Smith\""
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o diff3 diff3.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o diff3 diff3.o ${mam_libast}
 done diff3 generated
 make sdiff
 make sdiff.o
 make sdiff.c
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev system.h implicit
 done sdiff.c
 prev sdiff.c
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1992-2000 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-copyright?Copyright (c) 1992-2001 Free Software Foundation][-license?http://www.gnu.org/copyleft/gpl.html][--catalog?diff]"\" -DRELEASE=\""1994-10-01"\" -DVERSION=\""2.7"\" -D_PACKAGE_ast -DDEFAULT_EDITOR_PROGRAM=\""ed"\" -DDIFF_PROGRAM=\""diff"\" -c sdiff.c
 done sdiff.o generated
 setv LICENSE -DLICENSE="since=1992,author=\"Thomas Lord\""
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o sdiff sdiff.o ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o sdiff sdiff.o ${mam_libast}
 done sdiff generated
 make ${INSTALLROOT}/bin
 exec - set -

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -40,7 +39,7 @@
  * <time> is the earliest absolute time the job can be run
  */
 
-static const char id[] = "\n@(#)at.svc (AT&T Research) 2000-06-16\0\n";
+static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2001-01-01 $\0\n";
 
 #include "at.h"
 
@@ -188,6 +187,10 @@ static const char*	queuedefs[] =
 };
 
 static int	schedule(State_t*);
+
+#if __OBSOLETE__ < 20020101
+#include "../../lib/libast/string/fmtident.c"
+#endif
 
 /*
  * return user info given name or uid
@@ -840,7 +843,7 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 		if (!++usr->admin)
 			usr->admin = 1;
 		error_info.trace = -strtol(s, &t, 0);
-		message((error_info.trace, "%s", id + 5));
+		message((error_info.trace, "%s", fmtident(id)));
 		break;
 	case AT_INFO:
 		error(ERROR_OUTPUT|0, con->fd, "at service daemon pid %ld user %s", state->con[0].id.pid, fmtuid(state->admin[0]));
@@ -1111,7 +1114,7 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 				error(ERROR_OUTPUT|0, con->fd, "%-9.9s %5lu %5lu %3d %3d %s", usr->name, usr->admin, usr->total, usr->pending, usr->running, usr->home);
 		break;
 	case AT_VERSION:
-		error(ERROR_OUTPUT|0, con->fd, "%s", id + 5);
+		error(ERROR_OUTPUT|0, con->fd, "%s", fmtident(id));
 		break;
 	default:
 		error(ERROR_OUTPUT|2, con->fd, "%c: unknown command", *(s - 1));
@@ -1357,14 +1360,14 @@ init(const char* path)
 		error(AT_STRICT, "%s: directory owner %s does not match daemon %s", s, fmtuid(hs.st_uid), fmtuid(state->admin[0]));
 	sfsprintf(s, state->bufsiz, "%s/%s", state->pwd, AT_EXEC_FILE);
 	pathcanon(s, 0);
-	if (lstat(s, &xs) || !S_ISREG(xs.st_mode))
+	if (lstat(s, &xs))
 		error(ERROR_SYSTEM|3, "%s: job exec command not found", s);
 	if (!S_ISREG(xs.st_mode))
-		error(3, "%s: invalid #%d", s, __LINE__);
+		error(3, "%s: invalid mode %s -- regular file expected", s, fmtmode(xs.st_mode, 0));
 	if ((xs.st_mode&(S_IXUSR|S_IXGRP|S_IWOTH|S_IXOTH)) != (S_IXUSR|S_IXGRP|S_IXOTH))
-		error(3, "%s: invalid #%d", s, __LINE__);
+		error(3, "%s: invalid mode %s", s, fmtmode(xs.st_mode, 0));
 	if (!(xs.st_mode&S_ISUID) && geteuid() != 0 && geteuid() != xs.st_uid)
-		error(3, "%s: invalid #%d", s, __LINE__);
+		error(3, "%s: invalid euid %d -- %d expected", s, geteuid(), xs.st_uid);
 #if 0
 	if (!AT_EXEC_OK(&ds, &xs))
 		error(3, "%s: invalid [ mode=%04o uid=%d euid=%d t1=%04o t2=%04o==%04o ]", s, xs.st_mode, xs.st_uid, geteuid(), S_ISREG(xs.st_mode), xs.st_mode&(S_IXUSR|S_IXGRP|S_IWOTH|S_IXOTH), (S_IXUSR|S_IXGRP|S_IXOTH));

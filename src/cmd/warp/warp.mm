@@ -1,10 +1,10 @@
-.xx title=warp
-.xx logo=warp.gif logotitle
 .xx meta.description="warp executes a dynamically linked command in a different time frame"
 .xx meta.keywords="unix, y2k, date testing"
 .MT 4
 .TL
 AT&T Labs Research warp command
+.AF "AT&T Labs Research - Florham Park NJ"
+.AU "Glenn Fowler <gsf@research.att.com>"
 .H 1 Description
 .BR warp (1)
 executes a dynamically linked command in a different time frame.

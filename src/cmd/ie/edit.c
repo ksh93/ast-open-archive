@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1984-2000 AT&T Corp.                *
+*                Copyright (c) 1984-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,7 +21,6 @@
 *                                                                  *
 *                David Korn <dgk@research.att.com>                 *
 *                           Pat Sullivan                           *
-*                                                                  *
 *******************************************************************/
 /*
  *  edit.c - common routines for vi and emacs one line editors in shell
@@ -47,7 +46,7 @@
 #   define SIG_NORESTART	1
 #   define _sobuf	ed_errbuf
     extern char ed_errbuf[];
-    const char e_version[] = "\n@(#)edit library (AT&T Labs Research) 1988-11-16 i\0\n";
+    const char e_version[] = "\n@(#)$Id: edit library (AT&T Labs Research) 1988-11-16 i $\0\n";
 #endif	/* KSHELL */
 #include	"history.h"
 #include	"edit.h"

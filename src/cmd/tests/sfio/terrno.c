@@ -31,6 +31,7 @@ MAIN()
 	Sfio_t*	fr;
 	int	fds[2];
 	int	lseek_errno;
+	int	rv;
 
 	if(!(fw = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
 		terror("Can't create temp file %s to write", tstfile(0));
@@ -41,27 +42,29 @@ MAIN()
 	if(sfgetc(fr) >= 0 || !sfeof(fr))
 		terror("Should have seen eof");
 
-	if(sfwrite(fr, "a", 1) == 1)
-		terror("sfwrite should have failed on a read stream");
+	errno = 0;
+	if((rv = sfwrite(fr, "a", 1)) == 1)
+		terror("sfwrite returns %d, expecting 1", rv);
 	if(errno != EBADF)
-		terror("Wrong errno %d after sfwrite, expecting %d", errno, EBADF);
+		twarn("Wrong errno %d after sfwrite(%d), expecting %d",errno,rv,EBADF);
 
 	/* on some system (eg, apple), lseek does not set errno for this case */
 	errno = 0;
-	lseek(fw->file, (off_t)(-1), SEEK_SET);
+	lseek(fw->file, (off_t)(-2), SEEK_SET);
 	lseek_errno = errno;
 	lseek(fw->file, (off_t)0, SEEK_SET);
 	errno = 0;
 
-	sfseek(fw, (Sfoff_t)(-1), SEEK_SET);
+	if(sfseek(fw, (Sfoff_t)(-2), SEEK_SET) != (Sfoff_t)(-1) )
+		terror("sfseek should have failed");
 	if(errno != lseek_errno)
-		terror("Wrong errno %d after sfseek, expecting %d", errno, lseek_errno);
+		twarn("Wrong errno %d after sfseek, expecting %d", errno, lseek_errno);
 
 	errno = 0;
 	if(sfseek(fw, (Sfoff_t)0, SEEK_SET|SEEK_CUR|SEEK_END) >= 0)
 		terror("sfseek should not have succeeded");
 	if(errno != EINVAL)
-		terror("Wrong errno %d after sfseek, expecting %d", errno, EINVAL);
+		twarn("Wrong errno %d after sfseek, expecting %d", errno, EINVAL);
 
 	if(pipe(fds) < 0)
 		terror("Can't create pipes");
@@ -73,14 +76,14 @@ MAIN()
 	if(sfseek(fw, (Sfoff_t)0, SEEK_SET) >= 0)
 		terror("sfseek should have failed on a pipe");
 	if(errno != ESPIPE)
-		terror("Wrong errno %d after sfseek, expecting %d", ESPIPE);
+		twarn("Wrong errno %d after sfseek, expecting %d", ESPIPE);
 
 	close(sffileno(fw));
 	errno = 0;
 	if(sfseek(fw, (Sfoff_t)0, SEEK_END) >= 0)
 		terror("sfseek should have failed on a closed file descriptor");
 	if(errno != EBADF)
-		terror("Wrong errno %d after sfseek, expecting %d", EBADF);
+		twarn("Wrong errno %d after sfseek, expecting %d", EBADF);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

@@ -32,4 +32,4 @@ tar :: tar.sh
 
 :TEST: testpax.sh pax
 
-:: mode.dat y2k.dat
+:: link.dat mode.dat y2k.dat

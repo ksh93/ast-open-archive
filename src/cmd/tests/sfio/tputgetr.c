@@ -60,5 +60,5 @@ MAIN()
 	if(sfvalue(fp) != sfsize(fp))
 		terror("Wrong size\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

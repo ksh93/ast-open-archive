@@ -15,3 +15,5 @@ mamake :: mamake.c LICENSE=since=1999,author=gsf
 ratz :: ratz.c
 
 release :: release.c LICENSE=since=1999,author=gsf
+
+:TEST: proto

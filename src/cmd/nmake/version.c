@@ -49,7 +49,7 @@ char*			initstatic =
 "\
 MAKEARGS = Nmakeargs:nmakeargs:Makeargs:makeargs\n\
 MAKEFILES = Nmakefile:nmakefile:Makefile:makefile\n\
-MAKEPP = $(MAKELIB:C,/[^/]*$,,)/cpp\n\
+MAKEPP = $(MAKELIB:D:B=cpp)\n\
 MAKEPPFLAGS = -I- $(PPFLAGS) -D:'map \"/#<(comment|rules)>/\"' -D-P\n\
 MAKERULES = makerules\n\
 MAKERULESPATH = $(LOCALRULESPATH):$(MAKELOCALPATH):$(PATH:/:/ /G:D:B=lib/make:@/ /:/G):$(MAKELIB):$(INSTALLROOT|HOME)/lib/make:/usr/local/lib/make:/usr/lib/make\n\

@@ -487,5 +487,5 @@ MAIN()
 	if(strcmp(buf1,"1345 1234 11145401322 322 3e+02 -0.01 0.01 1e-05 1 -1    |") )
 		terror("Precision not set to zero as required after a dot");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

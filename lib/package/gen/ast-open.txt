@@ -59,12 +59,40 @@ Source Package Installation Instructions:
       and users can access the binaries by
 		bin/package use DIRECTORY
       or by exporting the environment variable definitions listed by
-		bin/package debug use DIRECTORY
+		bin/package environment use DIRECTORY
 
 
 All recorded changes follow.
 
 :::::::: ksh93 ::::::::
+
+01-02-05  --- Release ksh93k+  ---
+01-02-05  The sequence \<newline> inside $'...' was not incrementing
+	  the line count and this has been fixed.
+01-02-05  Modified expansion of "${@-}" so that if no arguments are set
+	  it results in null string rather than nothing.
+01-02-02  memory leak problem with local variables in functions fixed.
+01-01-25  allow arithmetic expressions with float%int and treat them
+	  as ((int)float)%int rather than as an error. 
+01-01-19  read -n1 was not working and has been fixed.
+01-01-17  ksh now handes the case in which a here document in command
+	  substitution $() is terminated by the trailing ).  Previously,
+	  a new-line was needed at the end of the delimiter word. 
+01-01-02  A bug in which a KEYBD trap would cause a multi-line token
+	  to be processed incorrectly has been fixed.
+00-12-10  Arithmetic integer constants can now have L and U suffices. 
+00-12-10  A bug in the processing of arithmetic expressions with compound
+	  variables when the -n option is on has been fixed.
+00-12-08  A bug in M-f and M-b from emacs mode has been fixed.  This
+	  bug only occurs when ksh93 is compiled without MULTIBYTE enabled.
+00-11-29  A bug in which jobs -p would yield 0 for background
+	  jobs run in a script has been fixed.
+00-11-21  A bug in integer arrays in which the number of elements is
+	  incorrect when the ++ operator is applied to a non-existing
+	  element has been fixed.  For example, integer x; ((x[3]++)).
+00-11-20  A timing bug in which the shell could reset the terminal
+	  group to the wrong value in the case that the a new process
+	  changes the terminal group during startup has been fixed.
 
 00-10-27  --- Release ksh93k  ---
 00-10-27  Using tab for completion now works only when applied
@@ -576,6 +604,9 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+01-02-02 file.c: fix duplicate -s map in addlink()
+00-12-20 bio.c: include <sys/ioctl.h> for systems that miss _IOW() etc.
+00-10-31 format.c: handle rpm 4.0 and newer
 00-09-20 copy.c: always allocate state.tmp.lst!
 00-08-31 change paths in delta archive: -rf i -z - -s e -wf o -z - [almost]
 00-08-11 copy.c: drop memalign() call for _std_malloc==1 in libast
@@ -777,6 +808,25 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+01-01-31 htmlrefs: fix nul char bug in <!--INTERNAL--> filter
+01-01-01 mm2html: fix incorrect \h'... #local refs
+	 mm2html: append <!--LABELS-->...<!--/LABELS--> for second pass
+	 mm2html: add .xx [no]index to inhibit or restart index labels
+	 mm2html: add .xx noFOO, .xx [no]index
+	 mm2html: .xx begin|end before <BODY> gets copied to <HEAD>
+	 mm2html: identification trailer aligned right
+	 htmlrefs: <!--INTERNAL--> in index.html <HEAD> skips file/dir
+00-12-14 mm2html: fix tbl colspan
+00-12-12 mm2html: ignore bgcolor for table with no box
+00-12-07 download: .tar.gz => .tgz
+	 htmlrefs: add --delete
+00-12-05 mm2html: add .PM
+	 mm2html: <id@id.id...> => mailto:
+00-11-27 mm2html: --frame is now 1 level instead of 2; no *-body and *-head
+	 mm2html: add .IS ... .IE indentation
+	 mm2html: .LR foo (1) generates man link
+	 htmlrefs: add https support
+00-10-31 htmlrefs: remove if internal filter leaves <= 1 line
 00-05-25 mm2html: add viewgraph outline and navigation
 00-05-11 mm2html: add .vG viewgraph macros
 00-03-04 htmlrefs: add <LINK rel=dynamic>
@@ -804,16 +854,22 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+01-02-06 proto.tst: add (finally)
 99-11-19 add --license, --shell, --copy, --verbose
 99-08-11 long options
 
 :::::::: bzip ::::::::
 
+01-01-01 bzip2.c: include bzlib.h first
 99-01-01 package for ast
 
 :::::::: tests ::::::::
 
+01-01-31 sfio: uniform test exit codes
+01-01-01 opt.tst: add enumerated option argument values
+00-12-11 date.dat: add a few more crontab(1) forms
 00-10-31 date.dat: add date(1) and touch(1) forms
+	 sfio: kpv updates to handle mac os X
 00-10-17 sfio/thole.c: move large buffer from stack to global
 00-10-03 testy2k.dat: `Feb 29 01:02' => `Feb 29  2000'
 00-04-01 Makefile: add ../../lib/libast to .SOURCE for features/sfio
@@ -831,6 +887,9 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+01-01-01 dir_3d.h: real readdir must be struct dirent, not dirent64
+00-12-14 3d.sh: fix -c
+00-10-31 ast.c add pathtemp.c
 00-10-19 init.c: initialize _3d_2d
 00-07-17 fix fchown to call MSG_fchown (not MSG_fchown); fixes vim dump!
 00-02-14 3d command long options (finally)
@@ -923,6 +982,7 @@ All recorded changes follow.
 
 :::::::: coshell ::::::::
 
+00-12-14 shell is per host attribute
 00-02-01 --- release 2.2 ---
 99-06-24 cosh: change exit to return
 99-06-24 --- release 2.1 ---
@@ -1001,6 +1061,7 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+01-02-05 cpp.tst: add (finally)
 96-01-31 --- release 2.0 ---
 92-04-01 update for new libpp
 92-04-01 --- release 1.1 ---
@@ -1022,6 +1083,7 @@ All recorded changes follow.
 
 :::::::: cs ::::::::
 
+01-01-01 vcs_src/*: drop old notices, fix signal handler prototype
 00-05-09 mbb: add (message bulletin board service)
 99-09-22 cs: update for CS_MNT_TAIL
 99-05-18 cs,css: long options
@@ -1039,15 +1101,40 @@ All recorded changes follow.
 
 :::::::: msgcc ::::::::
 
+01-01-31 ignore ls generation errors
 00-04-20 first release
 
 :::::::: nmake ::::::::
 
+01-02-02 makerules: bias package search to viewpath and make installroot
+	 makerules: *.req can be down the view
+01-01-01 expand: fix :D: to preserve leading / -- how long has this been wrong?
+	 makerules: fix .PACKAGE.INIT. for dir == /
+	 makerules: $(PACKAGE_PATH) is list of default package root dirs
+	 makerules: add recurse=list to list recursion order and exit
+	 makerules: _BLD_DLL==1 when building dll's
+	 makerules: link dll with static -l*
+	 makerules: check =l% bound dir in .REQUIRE.-l% PACKAGE_%_LIB
+	 expand: eliminate loops from :W=O:
+	 parse: add exit [code]
+	 bind: eliminate dups for 2d glob
+00-12-25 makerules: add header arg to :YYPREFIX:
+	 makerules: add :T=AF: for .ARCOPY
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+00-12-18 ppcc: check for old bash
+00-12-15 makerules: handle uwin $(CC.DLL) => -D_BLD_DLL change
+00-12-14 main: initialize version with fmtident()
+00-12-12 makerules: bias :PACKAGE: search for $(INSTALLROOT)
+	 make: use stat() instead of access() for better NFS behavior
+00-12-11 makerules: _BLD_DLL only for _DLL lib members
+00-12-03 debug.mk: add %.inc for -H include nesting
 00-10-31 option: --corrupt={accept|error|ignore}, --mismatch => --corrupt
 	 makerules: req file must be seen at of before the lib
 	 makerules: fix AWK and NAWK default definitions
 	 makerules: physical=1 => 2d iff in 3d
 	 pkg-tcl.mk: add CC.DLL, don't clobber TCLROOT
+	 makerules: define _PACKAGE_foo in .PACKAGE.INIT.
+	 makerules: add .VIEW to .MAMEDIT and .MAMACTION
 00-10-28 makerules: drop MAKEFILES filter on .SELECT. (why was it there?)
 00-10-26 make.c: fix .JOINT sync bug
 	 makerules: add $(PACKAGES expr) and :VARIANT: rhs expr
@@ -1625,6 +1712,7 @@ All recorded changes follow.
 
 :::::::: at ::::::::
 
+01-01-01 atd: add actual and expected info to atx log messages
 00-09-28 crontab: update USAGE
 00-06-16 atd,atx: use base 36 instead of 64 in job names (now just lower case)
 00-05-22 crontab: clarify crontab jobs w.r.t at(1)
@@ -1652,7 +1740,9 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
-00-04-01 uuencode: umask 022 fior consistent header comparisons
+00-12-04 look: add
+00-12-01 what: add RCS ident(1) $Id:
+00-04-01 uuencode: umask 022 for consistent header comparisons
 00-02-14 fmt: move to libcmd
 00-01-06 pr: fix empty field in multi-col output
 99-11-19 pr: -t == -T
@@ -1703,6 +1793,8 @@ All recorded changes follow.
 
 :::::::: cql ::::::::
 
+01-01-01 cql: add space.cql test
+00-12-12 cql: fix 0 pointer deref in commit()
 00-09-13 cql: fix state.active repeat lookups (still should avoid generate())
 99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
 99-10-01 cql: fix up array[n] format
@@ -3567,6 +3659,9 @@ End:
 
 :::::::: mailx ::::::::
 
+01-01-01 fix map bug that retained alias after expansion
+	 smtp: add domain to RCPT TO: if omitted
+00-11-27 add Date: and From: to smtp
 00-09-21 drop leading */ from user name
 00-05-09 add cd,pwd,${PWD},${OLDPWD} with ${CDPATH} check
 00-05-04 lex: flush stdout before prompt!
@@ -3669,6 +3764,7 @@ End:
 
 :::::::: pzip ::::::::
 
+01-02-02 pzip.tst: add -w window size test
 00-10-04 pin: add -T0x800 TSP v3 dump
 00-10-03 pin: add -T0x400 TSP v2 dump
 00-10-02 pin: fix -p bug that botched the input read
@@ -3771,6 +3867,7 @@ End:
 
 :::::::: sort ::::::::
 
+00-12-25 main.c: close input before final overwrite ops
 00-08-31 main.c: add -zcCHUNK to sort in chunks with merge disabled
 99-11-19 main.c: use rskeylist() for method usage
 99-11-11 main.c: unstable sort is the default for backwards compatibility
@@ -3796,6 +3893,15 @@ End:
 
 :::::::: std ::::::::
 
+01-01-31 ls: handle --sort=size
+01-01-01 ps: change (-x,--hex)=>(-X,--hex), add (-x,--detached)
+	 ls: really ignore --tabs, add --quote-style --scale, --thousands
+	 rm: -i and -f cancel each other
+00-12-13 df: change type default width to 10 for linux
+	 ps: fix --format '%(time)d'
+00-12-11 ps: fix --tree graph
+00-12-08 ps: no -e for pid args
+	 ps: add --heading
 00-10-31 date: mmddHHMMccyy doc and code fixes, test
 	 touch: ccyymmddHHMM doc and code fixes, --time=mtime common sense, test
 00-10-23 ps: -Tp pid gets pid and all children
@@ -3934,101 +4040,13 @@ End:
 
 :::::::: tksh ::::::::
 
-00-02-10  --- Release 7.6 ---
-00-02-10  Update README file
-00-02-09  Deleted unreferenced vars, dropped tcl 7.5 compatibility,
-	  added _PACKAGE_ast <tm.h> routines to tclUnixTime.c, added
-	  forward refs to the Tcl_LinkVar() Tcl_UnlinkVar() tk callbacks,
-	  changed Makefile library refs
-00-02-07  Modified shcompat.c and shcompat.h to handle
-          change to ksh93 where nvenv is now private.
-00-02-07  Included Tk4.2 in distribution to avoid
-          compatibility problems.  Modified Makefile.
-00-02-07  Using new packaging provided by gsf 
-97-06-24  src/tclIO.c proto tweaks [gsf]
-
-97-04-10  --- Release 7.6b1 ---
-97-04-09  tcl_open |command works
-97-04-09  Default interp mode is INTERP_TCL
-97-03-09  Combined tksh.c interp.c to init.c	
-97-03-09  Incorporated changes for Tcl 7.6
-97-03-09  waitevent sets interp type to tcl instead of having eval guess
-97-03-09  Inserted code to null terminate argv in InterpProc
-97-01-20  Integrated in tcl 7.5p1
-97-01-20  Integrated tclIO.c written on sfio
-97-01-20  using nmake makefile
-97-01-20  integrated changes for uwin
-96-09-04  Reorganization of directory
-96-09-04  Works with Tcl 7.5
-96-09-04  Doesn't work with Tcl 7.4, Tcl 7.4 (requires Tk4.0)
-96-09-04  Lots of new files, deleted files
-96-02-29  Tcl_RegExp*() changed to use posix regex
-96-02-29  Tcl_RegExp*() cache change to avoid copying
-96-02-29  Tcl_RegExpCompile arg 3 for case ignore match
-96-02-29  drop stdarg.h from :: src list
-96-02-29  drop malloc.h from tksh.h
-96-02-25  unset TK_LIBRARY in tk.ksh
-96-02-25  modifications to Makefile, config.sh and config.tcl:
-          make debug, make BASE=, removed debug option in interface
-96-02-25  setsub now creates a null subscript
-96-02-25  init.ksh sets argv0 & argv, uses discipline for env instead of trace
-96-02-25  bug in Tksh_ConvertList fixed (didn't check errors properly)
-96-02-25  Man page updated
-
-96-02-21  --- Release 1.0b2 ---
-96-02-21  New version of Tksh paper
-96-02-21  Man page updated
-96-02-21  ksh version of source accepts standard input ; uses sfio
-96-02-15  Tcl_EvalFile works with Tcl mode
-96-02-15  Result only printed if stdout is a string.
-96-02-13  Added sh_sigcheck to Tcl_TclEval, making it possible to stop an
-          infinite loop in a builtin.
-96-02-13  Traces turned off in subshell
-96-02-11  Added array data field in array discipline, used for array searches.
-          TkshMakeArray now called TkshArrayData, separate nv_makearray macro.
-	  Search ids allocated like tcl, using array data instead of hash table
-	  set.test would pass, except ordering of elements is different (5 fail)
-	  however, it meets specs.
-96-02-11  Cleaned up tksh.h a bit
-96-02-11  Added in .sh.result traced to interp->result
-96-02-11  Added builtin setlist
-96-02-08  Added Tcl_UpVar, Tcl_UpVar2 functions
-96-02-08  regexp.c used instead of shell patterns
-96-02-08  fixed bug in proc test (but now file crashes)
-96-02-08  changed behavior of "info commands" to strip off tcl_ so that
-	  info.test passes
-96-02-06  rewrote portions of var.c - now the code is a lot easier to follow.
-	  Set up to use the new NV_NODISC flag.  Two more trace tests pass.
-	  Note - only one unset disc is called after a function clears scope.
-96-02-06  Added pid command
-96-02-04  button.ksh invoke does not redirect stderr and stdout to /dev/null
-96-02-03  Moved TclOpen and TclRead from tk.c to tclunix.c
-96-02-03  File reorganization:
-	    New file varcmd.c which has commands associated with vars
-              (taken from tclcommand.c)
-	    tclcommand.c renamed commands.c, command.c renamed eval.c
-	    commands.c has tclinfo.c and tclsource.c
-96-02-03  Removed tcllist.c, tclstring.c and tclresult.c and put tclUtil.c
-	  into tcl directory (only a couple of changes necessary to tclUtil.c)
-96-02-03  Tcl_SetErrorCode.c remvoed from tclerr.c (in tclUtil.c)
-96-02-03  Makefile updated accordingly
-96-02-03  Fixed bug with bind : #! in bindscript was ignored
-96-02-02  Fixed up/down arrow key problem in tk library
-96-02-01  Removed printing of "after" for entry widgets
-96-02-01  Removed return in Tcl_UntraceVar (return void doesn't work for sgi)
-96-01-30  Added in checks to config.sh for -lsocket and -lnsl
-96-01-30  Added fixstrtod (used in libtk.a on Solaris)
-96-01-30  Moved "widget" to scripts directory and made symbolic link to it
-96-01-30  Created "tksh" directory for binaries
-96-01-29  Changed name of directory "kshmain" to "obsolete"
-96-01-29  Fixed ifdef 0 in tk.c
-96-01-29  tclinfo.c and interp.c use function TkshLibDir(), defined in tksh.c
-96-01-29  tksh_builtin_command sets sh.exitval to 1 on error
-
-96-01-25  --- Release 1.0b1 ---
+01-01-01  separate -ltksh from tksh main
 
 :::::::: tw ::::::::
 
+01-02-06 tw,find: move --local test fslocal()
+01-01-01 find: fix -newer -anewer -cnewer -perm
+00-11-14 updatedb: add --dir-format (it was already the default)
 00-08-11 tw: add --recursive
 00-05-23 cmdarg: fix -a strchr loop (thanks dr ek)
 00-05-01 find: add [f]printx and %[xX] -- or use tw
@@ -4095,7 +4113,42 @@ End:
 
 :::::::: libast ::::::::
 
+01-02-06 sfraise.c: add SF_FINAL check to avoid (posibly) freed disciplines
+01-01-01 features/common: fix uwin __DEFINE__
+	 sftable: initialize decimal and thousand
+	 magic.tab: add corel wordperfect document
+	 syslog: add LOG_LEVEL, add '\n' only if needed
+	 include/tm.h: #undef daylight for _WIN32
+	 sfio.h: add _SF_APPEND and _SF_CLOSE for native namespace incursion
+	 ast_std.h: add AST_LC_multibyte for MB_CUR_MAX>1
+	 setlocale: set AST_LC_multibyte
+	 strmatch: check AST_LC_multibyte
+	 features/limits.c: add _BITS_POSIX1_LIM_H guard for linux
+	 features/libpath.sh: fix for aix LIBPATH
+	 procopen,procclose: block SIGCHLD if PROC_FOREGROUND (e.g., system(3))
+	 optget.c: add enumerated option argument values
+	 optget.c: add <!--INTERNAL--> for private --html
+	 optget.c: fix memory leak that hit shell builtins hard
+	 sfio: drop sfread small chunk logic
+00-12-25 mnt.c: handle " and ' quoting for fstab
+	 sftmp.c: let pathtemp() open the fd O_EXCL
+00-12-15 conf.sh: add -v for verbose trace
+	 features/(limits|unistd).c: no FEATURE/types because of _POSIX_SOURCE
+	 features/time: add default for CLOCKS_PER_SEC
+	 features/lib: std_malloc now handles NeXT
+00-12-13 strton: recognize qualifier only if preceded by a digit
+	 features/lib: change return in vfork() test to exit() for linux sparc
+	 fmtquote: fix $'...' quote logic
+00-12-11 tmdate: fix cron format bug that mishandled months
+00-12-01 optget: handle $Id: ... $ in --?-version
+	 features/fcntl.c: fix _STDPP_ mmap munmap
+00-11-27 magic: drop dup sfclose() in load()
+	 optget: handle error_info.id==0
+00-11-22 features/stdio: add _FILEDEFED for sol9.sun4
+	 strton,stronll: handle [u|U][l|L][ll|LL] qualifiers
 00-10-31 tmdate: add TM_DATESTYLE and mmddHHMM[cc]yy
+	 astlicense.c: #include <hashkey.h> MAM workaround
+	 astlicense.c: check for non-empty CONTRIBUTORS
 00-10-26 features/stdio: add _FILE and __FILE for gnu
 	 misc/stk.c: fix stack pointer check off-by-one (dgk does it too!)
 00-10-23 syslog.h: sync with bsd values
@@ -4658,6 +4711,8 @@ End:
 
 :::::::: libcmd ::::::::
 
+01-01-23 cp: `cp foo' => `cp foo .' only for CONFORMANCE!=standard
+00-12-01 cut: multibyte support
 00-10-31 mkdir: handle races by checking EEXIST
 00-09-20 cp: copy argv to stack before modifying in place
 00-05-18 add setlocale(LC_ALL,"")
@@ -4798,6 +4853,7 @@ End:
 
 :::::::: librecsort ::::::::
 
+01-01-01 recsort.h: _RSHDR_H => _BLD_recsort; should have been done years ago
 00-08-31 rskey.c: fix code() buffer off by one (too far)
 00-03-17 rskey.c: consult RLIMIT_DATA for size limits
 00-01-25 rskey.c: win32.i386 optimizer generates bad code for key_n_code
@@ -4830,6 +4886,7 @@ End:
 
 :::::::: libbz ::::::::
 
+01-01-01 bzlib.h: add _PACKAGE_ast checks
 99-09-11 sfdcbzip: return >0 if discipline pushed
 99-07-17 sfdcbzip: don't free disc on SF_CLOSE
 99-03-17 split library from command, sfdcbzip.[ch]
@@ -4851,6 +4908,8 @@ End:
 
 :::::::: libcoshell ::::::::
 
+01-01-01 cokill: killjob => cokilljob, killshell => cokillshell
+00-12-18 coinit: CO_OSH ? "${!-$$}" : "${!:-$$}"
 00-10-25 codata: $ZSH_VERSION is not ksh
 00-02-14 procrun,system: system(3) returns wait() status (not shell status)
 99-11-19 co*: add CO_OSH for bsdi lack of times(1)
@@ -4859,6 +4918,8 @@ End:
 
 :::::::: libcs ::::::::
 
+01-01-01 cspoll: fix getmsg() flag arg
+	 csaddr: fix local host addr initialization
 00-06-01 csopen: handle dynamic ip assignment underfoot
 00-05-11 csopen: handle /dev/tcp/local/9876/FOO/other
 00-05-09 cssfd: CS_POLL_WRITE implies O_NONBLOCK
@@ -4925,6 +4986,18 @@ End:
 
 :::::::: libpp ::::::::
 
+01-02-06 fix readonly buffer write (cpp test 07:2873)
+01-02-04 fix -M* to properly handle .cxx .cpp .C input
+	 fix IN_BUFFER pop bug that did not reset the token pointer
+01-01-01 pp:headerexpand: space ok if no IN_MACRO
+	 ppcall: hide if IN_FILE|IN_MACRO|IN_EXPAND
+	 pplex: don't complain about ^L or ^Z as last char in file
+	 ppsearch: fix #include <.../foo.h> loop
+	 ppcontrol: manulally increment IN_RESCAN error_info.line
+00-12-25 add EXPOSE to expose hidden macros (for #import ...)
+	 probe.win32: add cc path *and* args to first line to avoid hash clash
+	 pp.probe: filter out invalid symbols for predefined macro scan, duh
+	 pp:headerexpand: limit expansion to IN_MACRO
 00-10-31 __STDC__==0 if HOSTED && _UWIN
 00-10-26 pplib.h: change SEEK_SET to O_RDONLY for aix
 00-10-17 pp.probe: __IMPORT__ => __STDPP__IMPORT__
@@ -5239,6 +5312,8 @@ End:
 
 :::::::: libcdb ::::::::
 
+01-01-01 cdbimage: drop span discipline that invalidated seeks
+	 cdbflat: check details in flatevent, fix CDB_SPACE
 00-02-14 cdbimage: fix record span bug that caused cql regression test failures
 99-10-01 add: cdbimage() CDB_IMAGE
 99-08-11 cdbopen: fix referenced checks
@@ -5265,6 +5340,10 @@ End:
 
 :::::::: libpz ::::::::
 
+01-02-02 delay buffer allocation until pzpartinit()
+	 pzpart: fix non-terminated string bug for url-style paths
+01-01-01 pzopen: open new stream instead of using sfstdin for sfdcgzip()
+00-12-11 pzpart(): add -X0 => prefix.skip => skip prefix on uncompress
 00-10-04 pzhead(): accept empty input for compression -- duh
 00-05-31 pzclose(): check for pz->io == 0
 00-02-14 PZ_DELAY|PZ_HANDLE|PZ_UNKNOWN for 'unknown format' after pzlib() done
@@ -5294,3 +5373,98 @@ End:
 98-10-01 2.0 format and interface -- Pzpart_t for multiple partitions
 98-09-09 1.3 format -- separate <run,off> <val> compression groups
 98-08-11 1.0 release
+
+:::::::: libtksh ::::::::
+
+00-02-10  --- Release 7.6 ---
+00-02-10  Update README file
+00-02-09  Deleted unreferenced vars, dropped tcl 7.5 compatibility,
+	  added _PACKAGE_ast <tm.h> routines to tclUnixTime.c, added
+	  forward refs to the Tcl_LinkVar() Tcl_UnlinkVar() tk callbacks,
+	  changed Makefile library refs
+00-02-07  Modified shcompat.c and shcompat.h to handle
+          change to ksh93 where nvenv is now private.
+00-02-07  Included Tk4.2 in distribution to avoid
+          compatibility problems.  Modified Makefile.
+00-02-07  Using new packaging provided by gsf 
+97-06-24  src/tclIO.c proto tweaks [gsf]
+
+97-04-10  --- Release 7.6b1 ---
+97-04-09  tcl_open |command works
+97-04-09  Default interp mode is INTERP_TCL
+97-03-09  Combined tksh.c interp.c to init.c	
+97-03-09  Incorporated changes for Tcl 7.6
+97-03-09  waitevent sets interp type to tcl instead of having eval guess
+97-03-09  Inserted code to null terminate argv in InterpProc
+97-01-20  Integrated in tcl 7.5p1
+97-01-20  Integrated tclIO.c written on sfio
+97-01-20  using nmake makefile
+97-01-20  integrated changes for uwin
+96-09-04  Reorganization of directory
+96-09-04  Works with Tcl 7.5
+96-09-04  Doesn't work with Tcl 7.4, Tcl 7.4 (requires Tk4.0)
+96-09-04  Lots of new files, deleted files
+96-02-29  Tcl_RegExp*() changed to use posix regex
+96-02-29  Tcl_RegExp*() cache change to avoid copying
+96-02-29  Tcl_RegExpCompile arg 3 for case ignore match
+96-02-29  drop stdarg.h from :: src list
+96-02-29  drop malloc.h from tksh.h
+96-02-25  unset TK_LIBRARY in tk.ksh
+96-02-25  modifications to Makefile, config.sh and config.tcl:
+          make debug, make BASE=, removed debug option in interface
+96-02-25  setsub now creates a null subscript
+96-02-25  init.ksh sets argv0 & argv, uses discipline for env instead of trace
+96-02-25  bug in Tksh_ConvertList fixed (didn't check errors properly)
+96-02-25  Man page updated
+
+96-02-21  --- Release 1.0b2 ---
+96-02-21  New version of Tksh paper
+96-02-21  Man page updated
+96-02-21  ksh version of source accepts standard input ; uses sfio
+96-02-15  Tcl_EvalFile works with Tcl mode
+96-02-15  Result only printed if stdout is a string.
+96-02-13  Added sh_sigcheck to Tcl_TclEval, making it possible to stop an
+          infinite loop in a builtin.
+96-02-13  Traces turned off in subshell
+96-02-11  Added array data field in array discipline, used for array searches.
+          TkshMakeArray now called TkshArrayData, separate nv_makearray macro.
+	  Search ids allocated like tcl, using array data instead of hash table
+	  set.test would pass, except ordering of elements is different (5 fail)
+	  however, it meets specs.
+96-02-11  Cleaned up tksh.h a bit
+96-02-11  Added in .sh.result traced to interp->result
+96-02-11  Added builtin setlist
+96-02-08  Added Tcl_UpVar, Tcl_UpVar2 functions
+96-02-08  regexp.c used instead of shell patterns
+96-02-08  fixed bug in proc test (but now file crashes)
+96-02-08  changed behavior of "info commands" to strip off tcl_ so that
+	  info.test passes
+96-02-06  rewrote portions of var.c - now the code is a lot easier to follow.
+	  Set up to use the new NV_NODISC flag.  Two more trace tests pass.
+	  Note - only one unset disc is called after a function clears scope.
+96-02-06  Added pid command
+96-02-04  button.ksh invoke does not redirect stderr and stdout to /dev/null
+96-02-03  Moved TclOpen and TclRead from tk.c to tclunix.c
+96-02-03  File reorganization:
+	    New file varcmd.c which has commands associated with vars
+              (taken from tclcommand.c)
+	    tclcommand.c renamed commands.c, command.c renamed eval.c
+	    commands.c has tclinfo.c and tclsource.c
+96-02-03  Removed tcllist.c, tclstring.c and tclresult.c and put tclUtil.c
+	  into tcl directory (only a couple of changes necessary to tclUtil.c)
+96-02-03  Tcl_SetErrorCode.c remvoed from tclerr.c (in tclUtil.c)
+96-02-03  Makefile updated accordingly
+96-02-03  Fixed bug with bind : #! in bindscript was ignored
+96-02-02  Fixed up/down arrow key problem in tk library
+96-02-01  Removed printing of "after" for entry widgets
+96-02-01  Removed return in Tcl_UntraceVar (return void doesn't work for sgi)
+96-01-30  Added in checks to config.sh for -lsocket and -lnsl
+96-01-30  Added fixstrtod (used in libtk.a on Solaris)
+96-01-30  Moved "widget" to scripts directory and made symbolic link to it
+96-01-30  Created "tksh" directory for binaries
+96-01-29  Changed name of directory "kshmain" to "obsolete"
+96-01-29  Fixed ifdef 0 in tk.c
+96-01-29  tclinfo.c and interp.c use function TkshLibDir(), defined in tksh.c
+96-01-29  tksh_builtin_command sets sh.exitval to 1 on error
+
+96-01-25  --- Release 1.0b1 ---

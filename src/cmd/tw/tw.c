@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -34,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)tw (AT&T Labs Research) 2000-11-08\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2001-02-06 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -74,6 +73,7 @@ USAGE_LICENSE
 "[i:ignore-errors?Ignore \acmd\a errors and inaccessible files and"
 "	directories.]"
 "[I:ignore-case?Ignore case in pathname comparisons.]"
+"[l:local?Do not descend into non-local filesystem directories.]"
 "[m:intermediate?Before visiting a selected file select and visit"
 "	intermediate directories leading to the file that have not already"
 "	been selected.]"
@@ -428,16 +428,21 @@ tw(register Ftw_t* ftw)
 		ftw->ignorecase = ftw->level ? ftw->parent->ignorecase : (state.icase || strchr(astconf("PATH_ATTRIBUTES", ftw->path, NiL), 'c')) ? STR_ICASE : 0;
 		break;
 	}
-	if (state.select == ALL || eval(state.select, ftw) && ftw->status != FTW_SKIP)
-		act(ftw, state.act);
- pop:
-	if (state.localmem && (lp = (Local_t*)ftw->local.pointer))
-	{
-		lp->next = state.local;
-		state.local = lp;
-	}
-	if ((state.ftwflags & (FTW_LIST|FTW_RECURSIVE)) == FTW_LIST)
+	if (state.localfs && !ftwlocal(ftw))
 		ftw->status = FTW_SKIP;
+	else
+	{
+		if (state.select == ALL || eval(state.select, ftw) && ftw->status != FTW_SKIP)
+			act(ftw, state.act);
+ pop:
+		if (state.localmem && (lp = (Local_t*)ftw->local.pointer))
+		{
+			lp->next = state.local;
+			state.local = lp;
+		}
+		if ((state.ftwflags & (FTW_LIST|FTW_RECURSIVE)) == FTW_LIST)
+			ftw->status = FTW_SKIP;
+	}
 	return 0;
 }
 
@@ -528,6 +533,9 @@ main(int argc, register char** argv)
 			continue;
 		case 'i':
 			state.ignore = 1;
+			continue;
+		case 'l':
+			state.localfs = 1;
 			continue;
 		case 'm':
 			state.intermediate = 1;

@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2000-12-08 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2001-01-31 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -422,6 +422,50 @@ rootdir(State_t* state, register String_t* r, register char* s, char* buf, size_
 }
 
 /*
+ * return next directory entry
+ */
+
+static FTSENT*
+scan(State_t* state, FTS* fts)
+{
+	FTSENT*	ent;
+	Sfio_t*	sp;
+	char*	s;
+	int	skip;
+
+	while (ent = fts_read(fts))
+	{
+		if (state->external && ent->fts_info == FTS_D)
+		{
+			sfsprintf(state->buf, sizeof(state->buf) - 1, "%s/%s", ent->fts_path, state->index.data);
+			if (sp = sfopen(NiL, state->buf, "r"))
+			{
+				skip = 0;
+				while (s = sfgetr(sp, '\n', 1))
+				{
+					if (strgrpmatch(s, internal, NiL, 0, 0))
+					{
+						skip = 1;
+						break;
+					}
+					else if (strgrpmatch(s, "</HEAD>", NiL, 0, STR_ICASE))
+						break;
+				}
+				sfclose(sp);
+				if (skip)
+				{
+					if (fts_set(NiL, ent, FTS_SKIP))
+						error(1, "%s: cannot skip", ent->fts_path);
+					continue;
+				}
+			}
+		}
+		break;
+	}
+	return ent;
+}
+
+/*
  * process refs in path
  */
 
@@ -534,7 +578,7 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 				*t = '/';
 			if (fts)
 			{
-				while (ent = fts_read(fts))
+				while (ent = scan(state, fts))
 					add(state, ent->fts_path + prefix, flags|secure, f->name, prefix, f);
 				if (fts_close(fts))
 					error(ERROR_SYSTEM|2, "%s: directory read error", p);
@@ -783,18 +827,26 @@ filter(register State_t* state, register Sfio_t* ip, Sfio_t* op)
 	register char*	s;
 	register size_t	n;
 	register size_t	lines = 0;
+	register int	head = 1;
 
 	for (;;)
 	{
-		if (!(s = sfgetr(ip, '\n', 0)))
+		if (!(s = sfgetr(ip, '\n', head)))
 			break;
 		if ((n = sfvalue(ip)) != sizeof(internal) || !strneq(s, internal, sizeof(internal) - 1))
 		{
-			sfwrite(op, s, n);
+			if (head)
+				sfputr(op, s, '\n');
+			else
+				sfwrite(op, s, n);
 			lines++;
+			if (head && strgrpmatch(s, "</HEAD>", NiL, 0, STR_ICASE))
+				head = 0;
 		}
 		else
 		{
+			if (head)
+				return 0;
 			while ((s = sfgetr(ip, '\n', 0)) && (sfvalue(ip) != sizeof(external) || !strneq(s, external, sizeof(external) - 1)));
 			if (!s)
 				break;
@@ -1063,7 +1115,7 @@ main(int argc, char** argv)
 		{
 			if (!(fts = fts_open((char**)state->copy.data, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
 				error(ERROR_SYSTEM|3, "%s: cannot search directory", state->copy.data);
-			while (ent = fts_read(fts))
+			while (ent = scan(state, fts))
 				if ((!(fp = dtmatch(state->files, ent->fts_path)) || !(fp->flags & COPIED)) && (!state->ignore.size || !strmatch(ent->fts_path, state->ignore.data)) && (!state->limit.size || strmatch(ent->fts_path, state->limit.data)))
 				{
 					if (state->verbose || !state->exec)
@@ -1093,7 +1145,7 @@ main(int argc, char** argv)
 		dirs[i] = 0;
 		if (!(fts = fts_open(dirs, FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
 			error(ERROR_SYSTEM|3, "%s: cannot search directory", state->root.data);
-		while (ent = fts_read(fts))
+		while (ent = scan(state, fts))
 			if (!dtmatch(state->files, ent->fts_path) && (!strmatch(ent->fts_name, state->keep.data) || state->ignore.size && strmatch(ent->fts_path, state->ignore.data)))
 			{
 				if (state->strict || !streq(ent->fts_name, state->index.data))

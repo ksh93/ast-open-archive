@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -29,7 +28,7 @@
  * AT&T Research
  */
 
-static const char id[] = "\n@(#)pcmp (AT&T Research) 1998-11-01\0\n";
+static const char id[] = "\n@(#)$Id: pcmp (AT&T Research) 1998-11-01 $\0\n";
 
 #include <ast.h>
 #include <ctype.h>

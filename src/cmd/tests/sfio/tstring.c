@@ -119,5 +119,5 @@ MAIN()
 	if(!sfeof(f))
 		terror("Didn't get eof\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

@@ -1,6 +1,6 @@
 # tests for the find utility
 
-KEEP data
+KEEP data mode
 
 mkdir data
 for i in aaa zzz
@@ -16,6 +16,11 @@ do	i=data/$i
 			done
 		done
 	done
+done
+mkdir mode
+for i in 0 1 2 3 4 5 6 7
+do	: > mode/$i$i$i
+	chmod $i$i$i mode/$i$i$i
 done
 
 TEST 01 'basics'
@@ -356,3 +361,113 @@ data/zzz/333/6/s.z
 data/zzz/333/7/q.c
 data/zzz/333/7/r.d
 data/zzz/333/7/s.z'
+
+TEST 04 'modes'
+	EXEC	mode -perm -000
+		OUTPUT - 'mode
+mode/000
+mode/111
+mode/222
+mode/333
+mode/444
+mode/555
+mode/666
+mode/777'
+	EXEC	mode -perm  000
+		OUTPUT - 'mode/000'
+	EXEC	mode -perm +000
+		OUTPUT -
+	EXEC	mode -perm -111
+		OUTPUT - 'mode
+mode/111
+mode/333
+mode/555
+mode/777'
+	EXEC	mode -perm  111
+		OUTPUT - 'mode/111'
+	EXEC	mode -perm +111
+		OUTPUT - 'mode
+mode/111
+mode/333
+mode/555
+mode/777'
+	EXEC	mode -perm -222
+		OUTPUT - 'mode/222
+mode/333
+mode/666
+mode/777'
+	EXEC	mode -perm  222
+		OUTPUT - 'mode/222'
+	EXEC	mode -perm +222
+		OUTPUT - 'mode
+mode/222
+mode/333
+mode/666
+mode/777'
+	EXEC	mode -perm -333
+		OUTPUT - 'mode/333
+mode/777'
+	EXEC	mode -perm  333
+		OUTPUT - 'mode/333'
+	EXEC	mode -perm +333
+		OUTPUT - 'mode
+mode/111
+mode/222
+mode/333
+mode/555
+mode/666
+mode/777'
+	EXEC	mode -perm -444
+		OUTPUT - 'mode
+mode/444
+mode/555
+mode/666
+mode/777'
+	EXEC	mode -perm  444
+		OUTPUT - 'mode/444'
+	EXEC	mode -perm +444
+		OUTPUT - 'mode
+mode/444
+mode/555
+mode/666
+mode/777'
+	EXEC	mode -perm -555
+		OUTPUT - 'mode
+mode/555
+mode/777'
+	EXEC	mode -perm  555
+		OUTPUT - 'mode/555'
+	EXEC	mode -perm +555
+		OUTPUT - 'mode
+mode/111
+mode/333
+mode/444
+mode/555
+mode/666
+mode/777'
+	EXEC	mode -perm -666
+		OUTPUT - 'mode/666
+mode/777'
+	EXEC	mode -perm  666
+		OUTPUT - 'mode/666'
+	EXEC	mode -perm +666
+		OUTPUT - 'mode
+mode/222
+mode/333
+mode/444
+mode/555
+mode/666
+mode/777'
+	EXEC	mode -perm -777
+		OUTPUT - 'mode/777'
+	EXEC	mode -perm  777
+		OUTPUT - 'mode/777'
+	EXEC	mode -perm +777
+		OUTPUT - 'mode
+mode/111
+mode/222
+mode/333
+mode/444
+mode/555
+mode/666
+mode/777'

@@ -62,6 +62,10 @@ extern Void_t*	sbrk _ARG_((int));
 extern int	getpid();
 #endif
 
+extern void	tsterror _ARG_((char*, ...));
+extern void	tstwarn _ARG_((char*, ...));
+extern void	tstsuccess _ARG_((char*, ...));
+
 _END_EXTERNS_
 
 static int		Tstline;
@@ -95,16 +99,20 @@ static char		Tstfile[16][256];
 #endif
 #endif /*MAIN*/
 
-#ifndef TSTRETURN
-#define TSTRETURN(v)	{ tstcleanup(); return(v); }
+#ifndef TSTEXIT
+#define TSTEXIT(v)	{ tstcleanup(); exit(v); }
 #endif
 
 static void tstcleanup()
-{	int	i;
-
+{
+#ifdef DEBUG
+	twarn("Temp files will not be removed");
+#else
+	int	i;
 	for(i = 0; i < sizeof(Tstfile)/sizeof(Tstfile[0]); ++i)
 		if(Tstfile[i][0])
 			unlink(Tstfile[i]);
+#endif
 }
 
 #if __STD_C

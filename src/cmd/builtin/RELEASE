@@ -1,4 +1,6 @@
-00-04-01 uuencode: umask 022 fior consistent header comparisons
+00-12-04 look: add
+00-12-01 what: add RCS ident(1) $Id:
+00-04-01 uuencode: umask 022 for consistent header comparisons
 00-02-14 fmt: move to libcmd
 00-01-06 pr: fix empty field in multi-col output
 99-11-19 pr: -t == -T

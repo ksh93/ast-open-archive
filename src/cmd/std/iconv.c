@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -29,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)iconv (AT&T Labs Research) 2000-05-09\n]"
+"[-?\n@(#)$Id: iconv (AT&T Labs Research) 2000-05-09 $\n]"
 USAGE_LICENSE
 "[+NAME?iconv - codeset conversion]"
 "[+DESCRIPTION?\biconv\b converts the encoding of characters in the \afile\a"

@@ -33,8 +33,6 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make proto
 make proto.o
@@ -262,4 +260,10 @@ exec - mv ${INSTALLROOT}/bin/release ${INSTALLROOT}/bin/release.old 2>/dev/null 
 done ${INSTALLROOT}/bin/release generated
 done install virtual
 make test
+make test.proto
+make proto.tst
+done proto.tst
+prev proto
+exec - regress  proto.tst proto
+done test.proto virtual
 done test dontcare virtual

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -41,6 +40,7 @@
 #include <debug.h>
 
 #include "cmdarg.h"
+#include "ftwlocal.h"
 
 #define ignorecase	fts_number
 
@@ -165,6 +165,7 @@ typedef struct				/* program state		*/
 	int		info;		/* ftw.info checked by user	*/
 	int		intermediate;	/* generate intermediate dirs	*/
 	Local_t*	local;		/* local struct free list	*/
+	int		localfs;	/* restrict to local fs mounts	*/
 	int		localmem;	/* ftw.local member count	*/
 	Magic_t*	magic;		/* magic tests			*/
 	Magicdisc_t	magicdisc;	/* magic discipline		*/

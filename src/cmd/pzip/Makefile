@@ -24,7 +24,7 @@ funzip :: funzip.c
 
 :: NOTES RELEASE PROMO.mm compare mkprt tabulate
 
-:WWW: pzip.mm pzip.gif pin pop pzip
+:WWW: pzip.mm pin pop pzip
 
 :MSGKEY: pzip
 	pzip -lline --keys 2>&1 || true

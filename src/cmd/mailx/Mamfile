@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.1 2001-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -40,291 +40,292 @@ make data.c
 make mailx.h implicit
 make local.h implicit
 make FEATURE/gethostname implicit
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${INSTALLROOT}/lib/libast.a}`
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -I/usr/common/ast/include ${mam_libast} : def gethostname
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def gethostname
 done FEATURE/gethostname dontcare generated
 make FEATURE/paths implicit
-exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -I/usr/common/ast/include ${mam_libast} : def paths
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def paths
 done FEATURE/paths dontcare generated
 done local.h
-make ${INSTALLROOT}/include/ast/stdio.h implicit
-make ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/getopt.h dontcare
-make ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_common.h dontcare
-done ${INSTALLROOT}/include/ast/stdio.h
-make ${INSTALLROOT}/include/ast/mime.h implicit
-make ${INSTALLROOT}/include/ast/ls.h implicit
-make ${INSTALLROOT}/include/ast/ast_mode.h implicit
-done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
-make ${INSTALLROOT}/include/ast/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+done ${PACKAGE_ast_INCLUDE}/stdio.h
+make ${PACKAGE_ast_INCLUDE}/mime.h implicit
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
-make ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_botch.h implicit
-done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
-make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
-done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
-make ${INSTALLROOT}/include/ast/re_comp.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/re_comp.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
-done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
-make ${INSTALLROOT}/include/ast/ast_types.h implicit
-done ${INSTALLROOT}/include/ast/ast_types.h dontcare
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/limits.h implicit
-done ${INSTALLROOT}/include/ast/limits.h dontcare
-make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
-done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_lib.h implicit
-done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_std.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ls.h dontcare
-make ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/sfio.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/mime.h
-make ${INSTALLROOT}/include/ast/cdt.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/cdt.h
-prev ${INSTALLROOT}/include/ast/limits.h implicit
-make ${INSTALLROOT}/include/ast/wait.h implicit
-make ${INSTALLROOT}/include/ast/ast_wait.h implicit
-done ${INSTALLROOT}/include/ast/ast_wait.h dontcare
-make ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_version.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_version.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/wait.h dontcare
-make ${INSTALLROOT}/include/ast/times.h implicit
-make ${INSTALLROOT}/include/ast/ast_time.h implicit
-done ${INSTALLROOT}/include/ast/ast_time.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/times.h dontcare
-make ${INSTALLROOT}/include/ast/sig.h implicit
-done ${INSTALLROOT}/include/ast/sig.h dontcare
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/error.h implicit
-make ${INSTALLROOT}/include/ast/option.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/option.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/error.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
+make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/mime.h
+make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/cdt.h
+prev ${PACKAGE_ast_INCLUDE}/limits.h implicit
+make ${PACKAGE_ast_INCLUDE}/wait.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/wait.h dontcare
+make ${PACKAGE_ast_INCLUDE}/times.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/times.h dontcare
+make ${PACKAGE_ast_INCLUDE}/sig.h implicit
+done ${PACKAGE_ast_INCLUDE}/sig.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/option.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/option.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/error.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done mailx.h
 done data.c
 prev data.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c data.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c data.c
 done data.o generated
 make cmd1.o
 make cmd1.c
 prev mailx.h implicit
 done cmd1.c
 prev cmd1.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmd1.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd1.c
 done cmd1.o generated
 make cmd2.o
 make cmd2.c
 prev mailx.h implicit
 done cmd2.c
 prev cmd2.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmd2.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd2.c
 done cmd2.o generated
 make cmd3.o
 make cmd3.c
 prev mailx.h implicit
 done cmd3.c
 prev cmd3.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c cmd3.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd3.c
 done cmd3.o generated
 make collect.o
 make collect.c
 prev mailx.h implicit
 done collect.c
 prev collect.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c collect.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c collect.c
 done collect.o generated
 make edit.o
 make edit.c
 prev mailx.h implicit
 done edit.c
 prev edit.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c edit.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c edit.c
 done edit.o generated
 make fio.o
 make fio.c
-make ${INSTALLROOT}/include/ast/fts.h implicit
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/fts.h
+make ${PACKAGE_ast_INCLUDE}/fts.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/fts.h
 prev mailx.h implicit
 done fio.c
 prev fio.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c fio.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c fio.c
 done fio.o generated
 make head.o
 make head.c
 prev mailx.h implicit
 done head.c
 prev head.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c head.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c head.c
 done head.o generated
 make local.o
 make local.c
-prev ${INSTALLROOT}/include/ast/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev mailx.h implicit
 done local.c
 prev local.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c local.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c local.c
 done local.o generated
 make lex.o
 make lex.c
 prev mailx.h implicit
 done lex.c
 prev lex.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c lex.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lex.c
 done lex.o generated
 make list.o
 make list.c
 prev mailx.h implicit
 done list.c
 prev list.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c list.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c list.c
 done list.o generated
 make main.o
 make main.c
 prev mailx.h implicit
 done main.c
 prev main.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c main.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c main.c
 done main.o generated
 make misc.o
 make misc.c
 prev mailx.h implicit
 done misc.c
 prev misc.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c misc.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c misc.c
 done misc.o generated
 make names.o
 make names.c
 prev mailx.h implicit
 done names.c
 prev names.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c names.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c names.c
 done names.o generated
 make proc.o
 make proc.c
 prev mailx.h implicit
 done proc.c
 prev proc.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c proc.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c proc.c
 done proc.o generated
 make quit.o
 make quit.c
 prev mailx.h implicit
 done quit.c
 prev quit.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c quit.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c quit.c
 done quit.o generated
 make send.o
 make send.c
 prev mailx.h implicit
 done send.c
 prev send.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c send.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c send.c
 done send.o generated
 make spam.o
 make spam.c
-make ${INSTALLROOT}/include/ast/tm.h implicit
-prev ${INSTALLROOT}/include/ast/times.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/tm.h dontcare
+make ${PACKAGE_ast_INCLUDE}/tm.h implicit
+prev ${PACKAGE_ast_INCLUDE}/times.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/tm.h dontcare
 prev mailx.h implicit
 done spam.c
 prev spam.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c spam.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c spam.c
 done spam.o generated
 make tty.o
 make tty.c
 prev mailx.h implicit
 done tty.c
 prev tty.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c tty.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tty.c
 done tty.o generated
 make vars.o
 make vars.c
 prev mailx.h implicit
 done vars.c
 prev vars.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c vars.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vars.c
 done vars.o generated
 make imap.o
 make imap.c
-make ${INSTALLROOT}/include/ast/vmalloc.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
-prev ${INSTALLROOT}/include/ast/tm.h implicit
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h dontcare
-make ${INSTALLROOT}/include/ast/css.h implicit
-make ${INSTALLROOT}/include/ast/cs.h implicit
-prev ${INSTALLROOT}/include/ast/times.h implicit
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-make ${INSTALLROOT}/include/ast/hashpart.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/hashpart.h dontcare
-make ${INSTALLROOT}/include/ast/ast_cs.h implicit
-done ${INSTALLROOT}/include/ast/ast_cs.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/cs.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/css.h dontcare
+make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfstr.h dontcare
+make ${PACKAGE_ast_INCLUDE}/css.h implicit
+make ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/times.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_cs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_cs.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/cs.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/css.h dontcare
 prev mailx.h implicit
 done imap.c
 prev imap.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c imap.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c imap.c
 done imap.o generated
 make smtp.o
 make smtp.c
-prev ${INSTALLROOT}/include/ast/css.h implicit
+prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
+prev ${PACKAGE_ast_INCLUDE}/css.h implicit
 prev mailx.h implicit
 done smtp.c
 prev smtp.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c smtp.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c smtp.c
 done smtp.o generated
-setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcs,${INSTALLROOT}/lib/libcs.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/cs 2>/dev/null || echo '' ${mam_cc_L+-lcs}${mam_cc_L-${INSTALLROOT}/lib/libcs.a}`
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o mailx data.o cmd1.o cmd2.o cmd3.o collect.o edit.o fio.o head.o local.o lex.o list.o main.o misc.o names.o proc.o quit.o send.o spam.o tty.o vars.o imap.o smtp.o ${mam_libcs} ${mam_libast}
+setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcs,${INSTALLROOT}/lib/libcs.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/cs 2>/dev/null || echo '' ${mam_cc_L+-lcs}${mam_cc_L-${PACKAGE_ast_LIB}/libcs.a}`
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o mailx data.o cmd1.o cmd2.o cmd3.o collect.o edit.o fio.o head.o local.o lex.o list.o main.o misc.o names.o proc.o quit.o send.o spam.o tty.o vars.o imap.o smtp.o ${mam_libcs} ${mam_libast}
 done mailx generated
 make ${INSTALLROOT}/bin
 exec - set -

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char expand_usage[] =
-"[-?@(#)expand (AT&T Labs Research) 1999-06-17\n]"
+"[-?@(#)$Id: expand (AT&T Labs Research) 1999-06-17 $\n]"
 USAGE_LICENSE
 "[+NAME?expand - convert tabs to spaces]"
 "[+DESCRIPTION?\bexpand\b writes the contents of each given file "
@@ -62,7 +61,7 @@ USAGE_LICENSE
 ;
 
 static const char unexpand_usage[] =
-"[-?@(#)unexpand (AT&T Labs Research) 1999-06-07\n]"
+"[-?@(#)$Id: unexpand (AT&T Labs Research) 1999-06-07 $\n]"
 USAGE_LICENSE
 "[+NAME?unexpand - convert spaces to tabs]"
 "[+DESCRIPTION?\bunexpand\b writes the contents of each given file "

@@ -76,7 +76,7 @@ MAIN()
         {       /* coprocess only */
                 while((s = sfgetr(sfstdin,'\n',0)) )
                         sfwrite(sfstdout,s,sfvalue(sfstdin));
-		exit(0);
+		TSTEXIT(0);
         }
 
 	if(!(f = sfpopen(NIL(Sfio_t*),sfprints("%s -p",argv[0]),"r+")) )
@@ -156,5 +156,5 @@ MAIN()
 	}
 	sfclose(f);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

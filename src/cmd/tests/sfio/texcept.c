@@ -178,5 +178,5 @@ MAIN()
 	if((o = lseek(i, (off_t)0, SEEK_CUR)) != 4)
 		terror("Wrong seek location %lld\n", (Sfoff_t)o);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

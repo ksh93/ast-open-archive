@@ -33,13 +33,6 @@ A recent
 is also included.
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="release change log">release change log</A></H3></CENTER></FONT></FONT>
-<!--LABELS-->
-<B><FONT font face="verdana,arial,helvetica,geneva,sans-serif">
-<TABLE bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center><TR>
-<TD align=left><A href="#INIT changes">INIT</A></TD>
-</TR></TABLE>
-</FONT></B>
-<!--/LABELS-->
 <PRE>
 
 All recorded changes follow.
@@ -47,6 +40,10 @@ All recorded changes follow.
 <P>
 <P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="INIT changes">INIT changes</A></H3></CENTER></FONT></FONT>
 
+01-02-06 Makefile: separate out cc,ld,ldd workarounds (so they will be packaged)
+01-02-02 package.sh: fix package use for $INSTALLROOT != */$HOSTTYPE
+	 package.sh: create intermediate recursion makefiles when needed
+	 package.sh: add $SECONDS to the DEBUG trace prompt
 01-01-01 ratz.c: #ifdef for uwin ncc
 	 iffe.sh,package.sh: check PACKAGE_PATH for local installations
 	 package.sh: add psrinfo for osf.alpha host cpu 
@@ -61,7 +58,7 @@ All recorded changes follow.
 	 package.sh: reorder host type logic for lame shells
 	 mamake.c: getcwd =&gt; getwd for NeXT -- how about posix==default guys
 	 iffe.sh: really gross workaround for NeXT -lposix stdout null's
-	 iffe.sh: handle cc -E that insist on compiling
+	 iffe.sh: handle cc -E that insists on compiling
 00-12-15 iffe.sh: ancient sh function call blows $*; call only when $# == 0
 	 *.sh: `getopts 2&gt;/dev/null` =&gt; `(getopts)2&gt;/dev/null` for ancient sh
 	 package.sh: fix LD_LIBRARY*_PATH initialization
@@ -267,9 +264,12 @@ All recorded changes follow.
 95-03-19 fix dialect executable test
 95-03-19 --- release 0.0 ---
 </PRE>
-<HR>
 <P>
-January 27, 2001
+<HR>
+<DIV align=right>
+<P>
+February 06, 2001
+</DIV>
 
 </TD></TR></TABLE>
 </BODY>

@@ -33,8 +33,6 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make ppsym
 make ppsym.o
@@ -613,7 +611,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/pp.h
 prev pp.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1986,author=gsf' pp.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/arch/sgi.mips3/lib/package/ast.lic '-o since=1986,author=gsf' pp.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/pp.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/pp.h
@@ -621,7 +619,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/pp.h generated
 make ${PACKAGE_ast_INCLUDE}/ppkey.h
 prev ppkey.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o since=1986,author=gsf' ppkey.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/arch/sgi.mips3/lib/package/ast.lic '-o since=1986,author=gsf' ppkey.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ppkey.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ppkey.h

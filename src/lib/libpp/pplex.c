@@ -503,6 +503,7 @@ ppcpp(void)
 #endif
 					POP();
 					bp = ip;
+					tp = op;
 					goto fsm_get;
 				}
 				c = EOF;

@@ -469,7 +469,8 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 #if ARCHIVE
 						if (!pp.member)
 #endif
-						close(fd);
+						if (fd > 0)
+							close(fd);
 						return 0;
 					}
 				}
@@ -566,7 +567,7 @@ ppsearch(char* file, int type, int flags)
 			{
 				if ((fd = ppsearch(fp->name + 4, type, flags)) < 0)
 					return -1;
-				if (flags & SEARCH_INCLUDE)
+				if (fd > 0)
 					close(fd);
 				s = error_info.file;
 				error_info.file = pp.include;

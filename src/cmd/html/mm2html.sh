@@ -37,6 +37,8 @@
 # .xx ref="URL\tMIME-TYPE"	head link hint
 # .xx begin=internal		begin internal text
 # .xx end=internal		end internal text
+# .xx index=0|1			stop|reset header index
+# .xx noFOO			.xx FOO=0
 #
 # .sn file			like .so but text copied to output
 
@@ -112,7 +114,7 @@ esac
 set -o noglob
 
 integer count fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4 row n s
-integer labels=0 reference=1
+integer labels=0 reference=1 ident=0
 typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
@@ -642,6 +644,7 @@ function getline
 
 function ident
 {
+	ident=1
 	case $frame in
 	'')	print -r -- "${html.magic.plain}" ;;
 	*)	print -r -- "${html.magic.frame}" ;;
@@ -800,13 +803,11 @@ function heading
 		done
 		(( count += head ))
 		print -nr -- "$beg<H$count$options>"
-		case $count in
-		[0123])	print -nr -- "<A name=\"$*\">$*</A>"
+		if	(( labels >= 0 && count < 4 ))
+		then	print -nr -- "<A name=\"$*\">$*</A>"
 			label[labels++]=$*
-			;;
-		*)	print -nr "$*"
-			;;
-		esac
+		else	print -nr "$*"
+		fi
 		print -r -- "</H$count>$end"
 		;;
 	esac
@@ -1590,7 +1591,10 @@ do	getline || {
 				0)	break ;;
 				esac
 				nam=${1%%=*}
-				val=${1#*=}
+				case $nam in
+				no?*)	nam=${nam#no} val=0 ;;
+				*)	val=${1#*=} ;;
+				esac
 				shift
 				case $nam in
 				begin|end)
@@ -1601,8 +1605,17 @@ do	getline || {
 					esac
 					shift
 					case $# in
-					0)	print -r -- "<!--${upper}-->" ;;
-					*)	print -r -- "<!--${upper} $@-->" ;;
+					0)	val="<!--${upper}-->" ;;
+					*)	val="<!--${upper} $@-->" ;;
+					esac
+					if	(( ident ))
+					then	print -r -- "$val"
+					else	meta="$meta$nl$val"
+					fi
+					;;
+				index)	case $val in
+					0)	labels=-1 ;;
+					*)	labels=0 ;;
 					esac
 					;;
 				label|link|ref)
@@ -1629,9 +1642,11 @@ do	getline || {
 						;;
 					esac
 					case $nam in
-					label)	nam=name
-						label[labels++]=$txt
-						print -r -- "<A $nam=\"$url\">$txt</A>"
+					label)	if	(( labels >= 0 ))
+						then	nam=name
+							label[labels++]=$txt
+							print -r -- "<A $nam=\"$url\">$txt</A>"
+						fi
 						;;
 					link)	nam=href
 						tar=
@@ -1662,7 +1677,7 @@ do	getline || {
 					;;
 				logo)	eval html.$nam.src='$'val
 					;;
-				logo*|title|[A-Z]*)
+				ident|logo*|title|[A-Z]*)
 					eval html.$nam='$'val
 					;;
 				*)	eval license.$nam='$'val
@@ -1769,59 +1784,49 @@ case $references in
 	print "</DL>"
 	;;
 esac
+print -r -- "<P>"
 print -r -- "<HR>"
+print -r -- "<DIV align=right>"
 case ${html.ident} in
 1)	case ${license.author} in
 	?*)	IFS=',+'
 		set -- ${license.author}
 		IFS=$ifs
-		n=0
-		h=0
+		sp=""
 		for a
-		do	((n++))
-			v=${contributor[$a]}
+		do	v=${contributor[$a]}
 			case $v in
 			?*)	a=$v ;;
 			esac
-			authors[n]=$a
 			IFS='<>'
 			set -- $a
 			IFS=$ifs
 			case $2 in
-			?*)	case $h in
-				0)	h=1
-					print -r "<P>Send comments and suggestions to "
-					;;
-				*)	print -r ", "
-					;;
-				esac
-				print -rn "<A href=\"mailto:$2?subject=$title\">"
+			?*)	print -rn "$sp<A href=\"mailto:$2?subject=$title\">"
+				sp=", "
 				set -- $1
-				print -rn $*
-				print -rn "</A>"
+				print -rn -- $*
+				print -r "</A>"
 				;;
 			esac
 		done
-		case $h in
-		1)	print -r "." ;;
-		esac
 		;;
 	*)	case ${html.MAILTO} in
-		?*)	print -r "<P>Send comments and suggestions to <A href=\"mailto:${html.MAILTO}?subject=$title\">${html.MAILTO}</A>." ;;
+		?*)	print -r "<A href=\"mailto:${html.MAILTO}?subject=$title\">${html.MAILTO}</A>" ;;
 		esac
 		;;
 	esac
-	sp="<P>"
-	for i in "${authors[@]}" "${license.organization}" "${license.corporation} ${license.company}" "${license.address}" "${license.location}" "${license.phone}"
+	for i in "${license.organization}" "${license.corporation} ${license.company}" "${license.address}" "${license.location}" "${license.phone}"
 	do	case $i in
 		''|' ')	;;
-		*)	print -r -- "$sp${i//\&/&amp\;}"; sp="<BR>" ;;
+		*)	print -r -- "<BR>${i//\&/&amp\;}" ;;
 		esac
 	done
 	;;
 esac
 print -r -- "<P>"
 print -r -- "${ds[Dt]}"
+print -r -- "</DIV>"
 case ${html.footing} in
 ?*)	html.toolbar=
 	hit=
@@ -1926,10 +1931,10 @@ q
 		print -r -- "<B><FONT font face=\"${ss}\">"
 		print -r -- "<TABLE bordercolor=white cellpadding=0 cellspacing=0 width=90% border=0 align=center><TR>"
 		for ((n = 0; n < labels; n++))
-		do	if (( labels > 8 && (n & 7) == 7 ))
+		do	print -r -- "<TD align=left><A href=\"#${label[n]}\">${label[n]}</A></TD>"
+			if (( (n + 1) < labels && (n & 7) == 7 ))
 			then	print -r -- "</TR><TR>"
 			fi
-			print -r -- "<TD align=left><A href=\"#${label[n]}\">${label[n]}</A></TD>"
 		done
 		print -r -- "</TR></TABLE>"
 		print -r -- "</FONT></B>"

@@ -33,8 +33,6 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make z
 make libz.a archive
@@ -387,7 +385,7 @@ exec - mv ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/d
 done ${PACKAGE_ast_INCLUDE}/zconf.h generated
 make ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
 prev sfdcgzip.h
-exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic '-o type=special' sfdcgzip.h > 1.${COTEMP}.x
+exec - proto -p -s -l /home/gsf/arch/sgi.mips3/lib/package/ast.lic '-o type=special' sfdcgzip.h > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcgzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcgzip.h

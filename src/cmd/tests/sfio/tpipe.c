@@ -133,5 +133,5 @@ MAIN()
 		alarm(0);
 	}
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

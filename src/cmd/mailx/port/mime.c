@@ -7,7 +7,7 @@
  * mime/mailcap support library
  */
 
-static const char id[] = "\n@(#)mime library (AT&T Research) 07/17/97\0\n";
+static const char id[] = "\n@(#)$Id: mime library (AT&T Research) 07/17/97 $\0\n";
 
 #if __OBSOLETE__ < 19990101
 #define mimehead	______mimehead

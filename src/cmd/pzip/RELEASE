@@ -1,3 +1,4 @@
+01-02-02 pzip.tst: add -w window size test
 00-10-04 pin: add -T0x800 TSP v3 dump
 00-10-03 pin: add -T0x400 TSP v2 dump
 00-10-02 pin: fix -p bug that botched the input read

@@ -1,3 +1,6 @@
+01-02-06 tw,find: move --local test fslocal()
+01-01-01 find: fix -newer -anewer -cnewer -perm
+00-11-14 updatedb: add --dir-format (it was already the default)
 00-08-11 tw: add --recursive
 00-05-23 cmdarg: fix -a strchr loop (thanks dr ek)
 00-05-01 find: add [f]printx and %[xX] -- or use tw

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -29,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)pz library 2.1 (AT&T Labs Research) 2000-10-04\n]"
+"[-1i?\n@(#)$Id: pz library 2.1 (AT&T Labs Research) 2001-02-02 $\n]"
 "[a:append]"
 "[x:crc]"
 "[d:debug]#[level]"
@@ -320,10 +319,30 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 			pz->mrow = roundof(pp->row, 1024);
 			n = ((pz->win / 8 / pz->mrow) + 8 ) * pz->mrow;
 			if (!(pz->val = vmnewof(pz->vm, 0, unsigned char, n, 0)) ||
-			    !(pz->flags & PZ_WRITE) && !(pz->wrk = vmnewof(pz->vm, pz->wrk, unsigned char, pz->mrow, 0)) ||
 			    !(pz->pat = vmnewof(pz->vm, pz->pat, unsigned char, pz->mrow, 0)))
 				return -1;
 		}
+	}
+	if (pz->win > pz->mwin)
+	{
+		if (pz->disc->errorf)
+			(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzpartinit: win=%I*u mwin=%I*u buf=%p", pz->path, sizeof(pz->win), pz->win, sizeof(pz->mwin), pz->mwin, pz->buf);
+		pz->mwin = roundof(pz->win, 32);
+		if (pz->buf)
+			vmfree(pz->vm, pz->buf);
+		n = pz->mwin;
+		if (pz->flags & PZ_WRITE)
+			n *= 2;
+		else
+			n += pz->mrow;
+		if (!(pz->buf = vmnewof(pz->vm, 0, unsigned char, n, 0)))
+		{
+			if (pz->disc->errorf)
+				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space [buf,wrk]");
+			pz->wrk = 0;
+			return -1;
+		}
+		pz->wrk = pz->buf + pz->mwin;
 	}
 
 	/*
@@ -523,6 +542,8 @@ pzoptions(register Pz_t* pz, register Pzpart_t* pp, char* options, int must)
 							}
 						}
 					}
+					else if (e > opt_info.arg)
+						pz->prefix.skip = 1;
 					break;
 				case 'P':
 					if (!opt_info.num)
@@ -671,9 +692,10 @@ pzpartition(register Pz_t* pz, const char* partition)
 
 		if ((e = strchr(s, '?')) || (e = strchr(s, '#')))
 		{
-			if (!(t = vmnewof(pz->vm, 0, char, e - s, 1)))
+			if (!(t = vmoldof(pz->vm, 0, char, e - s, 1)))
 				goto bad;
 			memcpy(t, s, e - s);
+			t[e - s] = 0;
 			s = t;
 			if (*e == '#' && !(pz->partname = vmstrdup(pz->vm, e + 1)) || *e == '?' && pzoptions(pz, NiL, e + 1, 0))
 				goto bad;

@@ -1,5 +1,11 @@
+01-01-31 htmlrefs: fix nul char bug in <!--INTERNAL--> filter
 01-01-01 mm2html: fix incorrect \h'... #local refs
 	 mm2html: append <!--LABELS-->...<!--/LABELS--> for second pass
+	 mm2html: add .xx [no]index to inhibit or restart index labels
+	 mm2html: add .xx noFOO, .xx [no]index
+	 mm2html: .xx begin|end before <BODY> gets copied to <HEAD>
+	 mm2html: identification trailer aligned right
+	 htmlrefs: <!--INTERNAL--> in index.html <HEAD> skips file/dir
 00-12-14 mm2html: fix tbl colspan
 00-12-12 mm2html: ignore bgcolor for table with no box
 00-12-07 download: .tar.gz => .tgz

@@ -11,6 +11,7 @@
 #if _PACKAGE_ast
 
 #include <css.h>
+#include <tm.h>
 
 #define SMTP_READY	220
 #define SMTP_OK		250
@@ -37,6 +38,7 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 	off_t		z;
 	Sfio_t*		sp;
 	Sfio_t*		rp;
+	char		buf[PATH_MAX];
 	char		svc[PATH_MAX];
 
 	/*
@@ -126,7 +128,9 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 
 	while (s = *argv++)
 	{
-		if (sfprintf(sp, "RCPT TO:<%s>\r\n", s) < 0)
+		if ((state.var.domain && !strchr(s, '@') ?
+		     sfprintf(sp, "RCPT TO:<%s@%s>\r\n", s, state.var.domain) :
+		     sfprintf(sp, "RCPT TO:<%s>\r\n", s)) < 0)
 			goto bad_send;
 		do
 		{
@@ -150,6 +154,11 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 		if (strtol(s, &e, 10) != SMTP_START)
 			goto bad_prot;
 	} while (*e == '-');
+	tmfmt(buf, sizeof(buf), "%+uDate: %a, %d %b %Y %H:%M:%S UT", NiL);
+	if (sfputr(sp, buf, '\n') < 0)
+		goto bad_send;
+	if (sfprintf(sp, "From: <%s@%s>\n", state.var.user, host) < 0)
+		goto bad_send;
 	while (s = sfgetr(fp, '\n', 1))
 	{
 		if (sfprintf(sp, "%s%s\r\n", *s == '.' ? "." : "", s) < 0)

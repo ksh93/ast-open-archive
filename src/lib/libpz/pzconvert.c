@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -32,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-1l?\n@(#)pzip conversion library (AT&T Labs Research) 1999-09-11\n]"
+"[-1l?\n@(#)$Id: pzip conversion library (AT&T Labs Research) 1999-09-11 $\n]"
 USAGE_LICENSE
 "[+LIBRARY?pzconvert - pzip conversion library]"
 "[+DESCRIPTION?The \bpzip\b convert discipline supports runtime record"

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -43,7 +42,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pin (AT&T Labs Research) 2000-10-04\n]"
+"[-?\n@(#)$Id: pin (AT&T Labs Research) 2000-10-04 $\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -184,6 +183,10 @@ static struct
 	int		window;
 	int		verbose;
 } state;
+
+#if __OBSOLETE__ < 20020101
+#include "../../lib/libast/string/fmtident.c"
+#endif
 
 /*
  * allocate an i-length vector of size_t
@@ -1438,8 +1441,7 @@ main(int argc, char** argv)
 	 */
 
 	sfprintf(sfstdout, "# pzip partition\n");
-	s = strchr(usage, '\n') + 5;
-	sfprintf(sfstdout, "# %-.*s\n", strchr(s, '\n') - s, s);
+	sfprintf(sfstdout, "# %s\n", fmtident(usage));
 	if (!(op & OP_reorder))
 		sfprintf(sfstdout, "# group coalescing limited to adjacent columns\n");
 	if (maxgrp)

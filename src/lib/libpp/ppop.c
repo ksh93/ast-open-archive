@@ -962,25 +962,37 @@ ppop(int op, ...)
 		}
 		if (pp.mode & FILEDEPS)
 		{
-			if (s = strrchr(error_info.file, '/')) s++;
-			else s = error_info.file;
-			if (!*s) s = "-";
+			if (s = strrchr(error_info.file, '/'))
+				s++;
+			else
+				s = error_info.file;
+			if (!*s)
+				s = "-";
 			s = strcpy(pp.tmpbuf, s);
-			if ((p = s + strlen(s)) > (s + 2) && *(p - 2) == '.' && *(p - 1) == 'c')
-				p--;
-			else
+			if ((t = p = strrchr(s, '.')) && (*++p == 'c' || *p == 'C'))
 			{
-				*p++ = '.';
-				*(p + 1) = 0;
+				if (c = *++p)
+					while (*++p == c);
+				if (*p)
+					t = 0;
+				else
+					t++;
 			}
-			if (pp.state & NOTEXT) pp.filedeps = sfstdout;
+			if (!t)
+			{
+				t = s + strlen(s);
+				*t++ = '.';
+			}
+			*(t + 1) = 0;
+			if (pp.state & NOTEXT)
+				pp.filedeps = sfstdout;
 			else
 			{
-				*p = 'd';
+				*t = 'd';
 				if (!(pp.filedeps = sfopen(NiL, s, "w")))
 					error(ERROR_SYSTEM|3, "%s: cannot create", s);
 			}
-			*p = 'o';
+			*t = 'o';
 			pp.column = sfprintf(pp.filedeps, "%s :", s);
 			if (*error_info.file)
 				pp.column += sfprintf(pp.filedeps, " %s", error_info.file);

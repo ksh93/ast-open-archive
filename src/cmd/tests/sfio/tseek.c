@@ -154,5 +154,5 @@ MAIN()
 	if(Bufcount != 10)
 		terror("Bad buffer filling count");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

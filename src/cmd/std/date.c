@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)date (AT&T Labs Research) 2000-10-31\n]"
+"[-?\n@(#)$Id: date (AT&T Labs Research) 2000-12-11 $\n]"
 USAGE_LICENSE
 "[+NAME?date - set/list/convert dates]"
 "[+DESCRIPTION?\bdate\b sets the current date and time (with appropriate"
@@ -53,6 +52,8 @@ USAGE_LICENSE
 "		[+MM?Minute, 00-59.]"
 "		[+SS?Seconds, 00-60.]"
 "}"
+"[+?If more than one \adate\a operand is specified the each operand sets"
+"	the reference date for subsequent operands.]"
 
 "[a:access-time|atime?List file argument access times.]"
 "[c:change-time|ctime?List file argument change times.]"
@@ -143,7 +144,7 @@ USAGE_LICENSE
 "[u:utc|gmt|zulu?Output dates in \acoordinated universal time\a (UTC).]"
 
 "\n"
-"\n[ +format | date | file ... ]\n"
+"\n[ +format | date ... | file ... ]\n"
 "\n"
 
 "[+SEE ALSO?\bls\b(1), \bfmtelapsed\b(3), \bstrftime\b(3), \bstrptime\b(3)]"
@@ -228,15 +229,14 @@ settime(time_t clock, int adjust, int network)
  */
 
 static time_t
-convert(register Fmt_t* f, char* s)
+convert(register Fmt_t* f, char* s, time_t now)
 {
 	char*	t;
 	char*	u;
-	time_t	now;
 
 	do
 	{
-		now = tmscan(s, &t, f->format, &u, NiL, 0L);
+		now = tmscan(s, &t, f->format, &u, now ? &now : (time_t*)0, 0L);
 		if (!*t && (!f->format || !*u))
 			break;
 	} while (f = f->next);
@@ -347,8 +347,8 @@ main(int argc, register char** argv)
 				argv--;
 				t = "now";
 			}
-			ts = convert(fmts, s);
-			te = convert(fmts, t);
+			ts = convert(fmts, s, 0);
+			te = convert(fmts, t, 0);
 			if (te > ts)
 				e += te - ts;
 			else
@@ -385,9 +385,12 @@ main(int argc, register char** argv)
 		}
 		if (s || (s = string))
 		{
-			if (argv[0] && (argv[1] || string))
+			if (argv[0] && string)
 				error(ERROR_USAGE|4, "%s", optusage(NiL));
-			now = convert(fmts, s);
+			now = convert(fmts, s, 0);
+			if (*argv)
+				while (s = *++argv)
+					now = convert(fmts, s, now);
 			clock = &now;
 		}
 		else

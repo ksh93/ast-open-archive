@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1989-2000 AT&T Corp.                #
+#                Copyright (c) 1989-2001 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -20,7 +20,6 @@
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
-#                                                                  #
 ####################################################################
 : gnu updatedb wrapper for tw
 
@@ -30,11 +29,11 @@ drop_default="/afs|/backup|/dev|/tmp|/usr/tmp|/var/tmp"
 keep_default="/home|/usr/local|/usr/common"
 
 COMMAND=updatedb
-case `getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt` in
+case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)updatedb (AT&T Labs Research) 1999-10-11
+@(#)updatedb (AT&T Labs Research) 2001-01-01
 ]
 '$USAGE_LICENSE$'
 [+NAME?updatedb - generate locate pathname database]
@@ -63,17 +62,21 @@ case `getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt` in
 [P:public?Omit files that are not publicly readable and directories that
 	are not publicly searchable.]
 [u:user|netuser?The user id used to search directories.]:[user]
-[g:gnu-format?Generate a gnu \blocate\b(1) compatible database.
-	The default \b--dir-format\b database marks directories for efficient
-	implementations of \bfind\b(1) and \btw\b(1).]
+[m:dir-format?Generate a database similar to \b--gnu-format\b, except that
+	directories are marked for efficient implementations of \bfind\b(1)
+	and \btw\b(1). This is the default database format.]
+[g:gnu-format?Generate a machine independent gnu \blocate\b(1) compatible
+	database.]
 [O:old-format?Generate a database compatible with the obsolete
 	\bfastfind\b(1). This format has a machine dependent encoding.]
-[D:depth?Limit the directory traversal depth to a \alevel\a.]#[level]
+[D:depth?Limit the directory traversal depth to \alevel\a.]#[level]
 [X!:crossdevice?Retain subdirectories that cross device boundaries.]
 [n:show?Show the underlying the \btw\b(1) command but do not execute.]
 [+FILES]{[+'${codes_default}$'?Default locate database on \b\$PATH\b.]}
 [+CAVEATS?If you run \bupdatedb\b as root then protected directory
-	contents may be visible to everyone via the database.]
+	contents may be visible to everyone via the database. Use the
+	\b--public\b option to limit the database to publically visible
+	files and directories.]
 [+SEE ALSO?\blocate\b(1), \bfastfind\b(1), \bfind\b(1), \bnis\b(1), \btw\b(1)]
 '
 	;;
@@ -136,6 +139,8 @@ do	case $OPT in
 				;;
 			esac
 		done
+		;;
+	m)	format="-"
 		;;
 	o)	output=$OPTARG
 		;;

@@ -1656,7 +1656,7 @@ OPTIONS
 		EXIT 2
 
 TEST 24 'detailed html'
-	usage=$'[-][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-1999 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][+NAME?\bdd\b - copy and convert file][10:if?Input file name (see \aintro\a(2)).]:[file\a (see \bstat\b(2))][11:conv?Conversion option \abegin[-end]]=value\a passed to \bmain\b().]:[conversion][+SEE ALSO?\bcp\b(1), \bpax\b(1), \btr\b(1), \bseek\b(2)]'
+	usage=$'[-][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-1999 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-proprietary.html][+NAME?\bdd\b - copy and convert file][10:if?Input file name (see \aintro\a(2)).]:[file\a (see \bstat\b(2))][11:conv?Conversion option \abegin[-end]]=value\a passed to \bmain\b().]:[conversion][+SEE ALSO?\bcp\b(1), \bpax\b(1), \btr\b(1), \bseek\b(2)]'
 	EXEC	test "$usage" --html
 		EXIT 2
 		OUTPUT - $'return=? option=- name=--html num=0'
@@ -1664,6 +1664,7 @@ TEST 24 'detailed html'
 <HTML>
 <HEAD>
 <META name="generator" content="optget (AT&T Labs Research) 2000-04-01">
+<!--INTERNAL-->
 <TITLE>test man document</TITLE>
 </HEAD>
 <BODY bgcolor=white>
@@ -1698,7 +1699,7 @@ TEST 24 'detailed html'
 <DT><A name="author"><B>author</B></A><DD>Glenn Fowler &lt;<A
 href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
 <DT><A name="copyright"><B>copyright</B></A><DD>Copyright &copy; 1989-1999 AT&amp;T Corp.
-<DT><A name="license"><B>license</B></A><DD><A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+<DT><A name="license"><B>license</B></A><DD><A href="http://www.research.att.com/sw/license/ast-proprietary.html">http://www.research.att.com/sw/license/ast-proprietary.html</A>
 </DL></DL>
 </BODY>
 </HTML>'
@@ -2674,3 +2675,75 @@ IMPLEMENTATION
 		OUTPUT - 'return=Q option=-Q name=-Q arg=shell num=-101'
 	EXEC ls "$usage" -Qs
 		OUTPUT - 'return=Q option=-Q name=-Q arg=s num=-101'
+
+TEST 37 'detailed key strings'
+	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'
+	EXEC ls "$usage" --man
+		EXIT 2
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - 'SYNOPSIS
+  ls [ options ]
+
+OPTIONS
+  -Q, --quote=style
+                  Quote names according to style:
+                    c|C   C "..." style.
+                    e|escape
+                          \ escape if necessary.
+                    A|always
+                          Always shell style.
+                    shell Shell quote if necessary.
+                    q|question|huh
+                          Replace unknown chars with ?.
+                  The default value is question.
+  -x, --exec|run[=action]
+                  Just do it. The option value may be omitted. The default
+                  value is default.
+
+IMPLEMENTATION
+  version         aha
+  catalog         SpamCo'
+	EXEC ls "$usage" --keys
+		OUTPUT - 'return=? option=- name=--keys num=0'
+		ERROR - '"catalog"
+"quote"
+"Quote names according to \007style\007:"
+"style:=question"
+"C \"...\" style."
+"escape"
+"\b\\\b escape if necessary."
+"always"
+"Always shell style."
+"shell"
+"Shell quote if necessary."
+"question|huh"
+"Replace unknown chars with ?."
+"exec|run"
+"Just do it."
+"action:=default"'
+	LC_ALL=debug LC_MESSAGES=debug LC_OPTIONS=debug EXEC ls "$usage" --man
+		OUTPUT - 'return=? option=- name=--man num=0'
+		ERROR - '(libast,3,372)
+  ls [ (libast,3,709) ]
+
+(libast,3,333)
+  -Q, --(debug,ls,SpamCo,"quote")|quote=(debug,ls,SpamCo,"style
+                  (debug,ls,SpamCo,"Quote names according to style:")
+                    (debug,ls,SpamCo,"C")
+                          (debug,ls,SpamCo,"C "..." style.")
+                    (debug,ls,SpamCo,"escape")
+                          (debug,ls,SpamCo,"\ escape if necessary.")
+                    (debug,ls,SpamCo,"always")
+                          (debug,ls,SpamCo,"Always shell style.")
+                    (debug,ls,SpamCo,"shell")
+                          (debug,ls,SpamCo,"Shell quote if necessary.")
+                    (debug,ls,SpamCo,"question|huh")
+                          (debug,ls,SpamCo,"Replace unknown chars with ?.")
+                  (debug,ls,SpamCo,"(libast,3,400) question.")
+  -x, --(debug,ls,SpamCo,"exec|run")|exec|run[=(debug,ls,SpamCo,"action]
+                  (debug,ls,SpamCo,"Just do it.") (libast,3,401) (libast,3,400)
+                  default.
+
+(libast,3,238)
+  (libast,3,812)  (debug,ls,SpamCo,"aha ")
+  (libast,3,499)  (debug,ls,SpamCo,"SpamCo")'

@@ -60,5 +60,5 @@ MAIN()
 	if(sfgetc(f) != '2')
 		terror("sfgetc3\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

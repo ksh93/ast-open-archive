@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-10-31
+info mam static 00000 1994-07-17 make (AT&T Research) 4.1 2001-01-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -37,75 +37,75 @@ make install
 make pack
 make pack.o
 make pack.c
-make ${INSTALLROOT}/include/ast/ls.h implicit
-make ${INSTALLROOT}/include/ast/ast_mode.h implicit
-done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
-make ${INSTALLROOT}/include/ast/ast_fs.h implicit
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
-make ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_botch.h implicit
-done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
-make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
-done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
-make ${INSTALLROOT}/include/ast/re_comp.h implicit
-make ${INSTALLROOT}/include/ast/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
+make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/re_comp.h dontcare
-make ${INSTALLROOT}/include/ast/getopt.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/getopt.h dontcare
-make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
-done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
-make ${INSTALLROOT}/include/ast/ast_types.h implicit
-done ${INSTALLROOT}/include/ast/ast_types.h dontcare
-make ${INSTALLROOT}/include/ast/stdio.h implicit
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_common.h dontcare
-done ${INSTALLROOT}/include/ast/stdio.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/limits.h implicit
-done ${INSTALLROOT}/include/ast/limits.h dontcare
-make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
-done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_lib.h implicit
-done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_std.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ls.h dontcare
-make ${INSTALLROOT}/include/ast/error.h implicit
-make ${INSTALLROOT}/include/ast/option.h implicit
-make ${INSTALLROOT}/include/ast/ast.h implicit
-make ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/sfio.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_version.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_version.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/option.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/error.h
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
+make ${PACKAGE_ast_INCLUDE}/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/option.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/option.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/error.h
 make huffman.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done huffman.h
 done pack.c
 prev pack.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c pack.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c pack.c
 done pack.o generated
 make libhuff.a archive
 make huff.req
@@ -138,74 +138,74 @@ exec - rm -f 1.${COTEMP}.*
 done huff.req generated
 make huffinit.o
 make huffinit.c
-prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev huffman.h implicit
 done huffinit.c
 prev huffinit.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c huffinit.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffinit.c
 done huffinit.o generated
 make huffgethdr.o
 make huffgethdr.c
-prev ${INSTALLROOT}/include/ast/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev huffman.h implicit
 done huffgethdr.c
 prev huffgethdr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c huffgethdr.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffgethdr.c
 done huffgethdr.o generated
 make huffputhdr.o
 make huffputhdr.c
 prev huffman.h implicit
 done huffputhdr.c
 prev huffputhdr.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c huffputhdr.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffputhdr.c
 done huffputhdr.o generated
 make huffencode.o
 make huffencode.c
 prev huffman.h implicit
 done huffencode.c
 prev huffencode.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c huffencode.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffencode.c
 done huffencode.o generated
 make huffdecode.o
 make huffdecode.c
 prev huffman.h implicit
 done huffdecode.c
 prev huffdecode.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -c huffdecode.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c huffdecode.c
 done huffdecode.o generated
 exec - ${AR} cr libhuff.a huffinit.o huffgethdr.o huffputhdr.o huffencode.o huffdecode.o
 exec - (ranlib libhuff.a) >/dev/null 2>&1 || true
 done libhuff.a generated
-setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${INSTALLROOT}/lib/libast.a}`
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o pack pack.o libhuff.a ${mam_libast}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o pack pack.o libhuff.a ${mam_libast}
 done pack generated
 make unpack
 make unpack.o
 make unpack.c
-make ${INSTALLROOT}/include/ast/sfstr.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/sfstr.h
-make ${INSTALLROOT}/include/ast/times.h implicit
-make ${INSTALLROOT}/include/ast/ast_time.h implicit
-done ${INSTALLROOT}/include/ast/ast_time.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/times.h
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-prev ${INSTALLROOT}/include/ast/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfstr.h
+make ${PACKAGE_ast_INCLUDE}/times.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/times.h
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev huffman.h implicit
 done unpack.c
 prev unpack.c
-exec - ${CC} ${CCFLAGS}  -I. -I${INSTALLROOT}/include/ast -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c unpack.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2001 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c unpack.c
 done unpack.o generated
 prev libhuff.a archive
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o unpack unpack.o libhuff.a ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o unpack unpack.o libhuff.a ${mam_libast}
 done unpack generated
 make pcat
 prev unpack.o
 prev libhuff.a archive
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}  -o pcat unpack.o libhuff.a ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o pcat unpack.o libhuff.a ${mam_libast}
 done pcat generated
 make huff
 prev libhuff.a archive
@@ -247,14 +247,14 @@ make ${INSTALLROOT}/bin/pcat
 prev pcat
 exec - mv ${INSTALLROOT}/bin/pcat ${INSTALLROOT}/bin/pcat.old 2>/dev/null || true; test '' = 'pcat' || { cp pcat ${INSTALLROOT}/bin/pcat  		    		    ;}
 done ${INSTALLROOT}/bin/pcat generated
-make ${INSTALLROOT}/lib
+make ${PACKAGE_ast_LIB}
 exec - set -
-exec - if	test ! -d ${INSTALLROOT}/lib
-exec - then	set -x && mkdir -p ${INSTALLROOT}/lib 2>/dev/null && set - ||
+exec - if	test ! -d ${PACKAGE_ast_LIB}
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -270,12 +270,12 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${INSTALLROOT}/lib generated
-make ${INSTALLROOT}/lib/libhuff.a archive
+done ${PACKAGE_ast_LIB} generated
+make ${PACKAGE_ast_LIB}/libhuff.a archive
 prev libhuff.a archive
-exec - mv ${INSTALLROOT}/lib/libhuff.a ${INSTALLROOT}/lib/libhuff.a.old 2>/dev/null || true; test '' = 'libhuff.a' || { cp libhuff.a ${INSTALLROOT}/lib/libhuff.a  		    		    ;}
-exec - (ranlib ${INSTALLROOT}/lib/libhuff.a) >/dev/null 2>&1 || true
-done ${INSTALLROOT}/lib/libhuff.a generated
+exec - mv ${PACKAGE_ast_LIB}/libhuff.a ${PACKAGE_ast_LIB}/libhuff.a.old 2>/dev/null || true; test '' = 'libhuff.a' || { cp libhuff.a ${PACKAGE_ast_LIB}/libhuff.a  		    		    ;}
+exec - (ranlib ${PACKAGE_ast_LIB}/libhuff.a) >/dev/null 2>&1 || true
+done ${PACKAGE_ast_LIB}/libhuff.a generated
 make ${INSTALLROOT}/man/man3
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man3
@@ -305,14 +305,14 @@ make huff.3
 done huff.3
 exec - mv ${INSTALLROOT}/man/man3/huff.3 ${INSTALLROOT}/man/man3/huff.3.old 2>/dev/null || true; test '' = 'huff.3' || { cp huff.3 ${INSTALLROOT}/man/man3/huff.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/huff.3 generated
-make ${INSTALLROOT}/lib/lib
+make ${PACKAGE_ast_LIB}/lib
 exec - set -
-exec - if	test ! -d ${INSTALLROOT}/lib/lib
-exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/lib 2>/dev/null && set - ||
+exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/lib/lib | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -328,11 +328,11 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${INSTALLROOT}/lib/lib generated
-make ${INSTALLROOT}/lib/lib/huff
+done ${PACKAGE_ast_LIB}/lib generated
+make ${PACKAGE_ast_LIB}/lib/huff
 prev huff.req
-exec - mv ${INSTALLROOT}/lib/lib/huff ${INSTALLROOT}/lib/lib/huff.old 2>/dev/null || true; test '' = 'huff.req' || { cp huff.req ${INSTALLROOT}/lib/lib/huff  		    		    ;}
-done ${INSTALLROOT}/lib/lib/huff generated
+exec - mv ${PACKAGE_ast_LIB}/lib/huff ${PACKAGE_ast_LIB}/lib/huff.old 2>/dev/null || true; test '' = 'huff.req' || { cp huff.req ${PACKAGE_ast_LIB}/lib/huff  		    		    ;}
+done ${PACKAGE_ast_LIB}/lib/huff generated
 done install virtual
 make test
 done test dontcare virtual

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-01-01 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2001-02-02 $"
 
 /*
  * handy attributes
@@ -64,6 +64,7 @@ rules
  * binding directory lists
  */
 
+PKGDIRS = $(LIBDIR) $(*.VIEW:X=$(VROOT)/$(LIBDIR:B:S)) $(MAKELIB:D)
 LCLDIRS = /usr/local/arch/$(_hosttype_):/usr/common:/usr/local
 OPTDIRS = $(INSTALLROOT)/opt:/usr/add-on:/usr/addon:/usr/contrib:$(LCLDIRS):/opt:/home
 STDDIRS = /:/usr
@@ -599,11 +600,13 @@ include "Scanrules.mk"
 		return $(T)
 	end
 	if ( T = "$(PACKAGE_$(B)_LIB)" )
-		T := $(T)/lib/$(B)
-		if ( T = "$(T:T=F)" )
-			return $(T:T=I)
+		if T == "$(%:T=F:P=D)"
+			T := $(T)/lib/$(B)
+			if ( T = "$(T:T=F)" )
+				return $(T:T=I)
+			end
+			return
 		end
-		return
 	end
 	if ! ( T = "$(%:/-l\(.*\)/\1.req/:T=F)" )
 		R := lib/$(B)
@@ -618,22 +621,22 @@ include "Scanrules.mk"
 			/* HUH-2000-06-20 print -um setv mam_lib$(B) $(.MAMACTION. $("`")${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,$(%),$(LIBDIR)/lib$(B).a,} $(T)$("`")) */
 			return ${mam_lib$(B)}
 		end
+		/* req must be seen at or before the lib */
+		DL := $(%:T=WF:P=D)
+		DR := $(T:P=D)
+		if DL != "$(DR)"
+			for D $(*.SOURCE.%.ARCHIVE)
+				if D == "$(DR)"
+					break
+				end
+				if D == "$(DL)"
+					return
+				end
+			end
+		end
 	elif "$(-mam:N=static*,port*)"
 		print -um setv mam_lib$(B) $(.MAMACTION. $("`")sed -e 's,$(%),$(%:/-l\(.*\)/lib\1$(CC.SUFFIX.ARCHIVE)),' $(T)$("`"))
 		return ${mam_lib$(B)}
-	end
-	/* req must be seen at or before the lib */
-	DL := $(%:T=WF:P=D)
-	DR := $(T:P=D)
-	if DL != "$(DR)"
-		for D $(*.SOURCE.%.ARCHIVE)
-			if D == "$(DR)"
-				break
-			end
-			if D == "$(DL)"
-				return
-			end
-		end
 	end
 	return $(T:T=I)
 
@@ -1950,11 +1953,12 @@ end
  * the canonicalized last package name is returned
  */
 
+.PACKAGE.GLOBAL. =
+.PACKAGE.LOCAL. =
+
 .PACKAGE.INIT. : .FUNCTION .PROBE.INIT
 	local T1 T3 T4 T5 T6 T7
 	local B D G H I L N P Q S T V W X Z IP LP LPL LPV
-	G := $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
-	G := $(G:T=F:U)
 	for T3 $(%)
 		I := $(PACKAGE_$(T3)_INCLUDE)
 		IP := $(.PACKAGE.$(T3).include)
@@ -1994,9 +1998,13 @@ end
 				end
 			end
 			if ! ( T1 = "$(PACKAGE_$(T3))" )
-				T4 := $(PACKAGE_PATH:/:/ /G) $(.PACKAGE.DIRS.) $(G) $(G:/:/ /G:C%$%/$(T3)%)
+				if ! .PACKAGE.GLOBAL.
+					.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
+					.PACKAGE.GLOBAL. := $(.PACKAGE.GLOBAL.:T=F:U)
+				end
+				T4 := $(PACKAGE_PATH:/:/ /G) $(.PACKAGE.DIRS.) $(.PACKAGE.GLOBAL.) $(.PACKAGE.GLOBAL.:/:/ /G:C%$%/$(T3)%)
 				if T3 == "*[!0-9]+([0-9])"
-					T4 += $(G:/:/ /G:C%$%/$(T3:C,[0-9]*$,,)%)
+					T4 += $(.PACKAGE.GLOBAL.:/:/ /G:C%$%/$(T3:C,[0-9]*$,,)%)
 				end
 				V =
 				if T5 = "$(PACKAGE_$(T3)_VERSION)"
@@ -2037,9 +2045,14 @@ end
 						T5 := $(T5:U)
 						for P lib ""
 							if ! V
-								X := $(LIBDIR)/$(P)$(T3)$(S)
-								if ( T1 = "$(X:P=X:O=1:D:D)" )
-									break 3
+								if ! .PACKAGE.LOCAL.
+									.PACKAGE.LOCAL. := $(PKGDIRS:T=F:P=A:U)
+								end
+								for X $(.PACKAGE.LOCAL.)
+									X := $(X)/$(P)$(T3)$(S)
+									if ( T1 = "$(X:P=X:O=1:D:D)" )
+										break 4
+									end
 								end
 							end
 							for LPV $(LPL)
@@ -2174,7 +2187,7 @@ PACKAGES : .SPECIAL .FUNCTION
 					$(N) := $(V)
 				end
 			end
-		elif T != "*:command"
+		elif T != "*:(command|force)"
 			if T == "*:*"
 				P := $(T:/:.*//)
 				T := $(T:/[^:]*//)

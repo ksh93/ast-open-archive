@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -29,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pzip (AT&T Labs Research) 1999-10-01\n]"
+"[-?\n@(#)$Id: pzip (AT&T Labs Research) 1999-10-01 $\n]"
 USAGE_LICENSE
 "[+NAME?pzip - fixed record partition compress/decompress]"
 "[+DESCRIPTION?\bpzip\b compresses and decompresses data files of fixed"
@@ -168,8 +167,10 @@ USAGE_LICENSE
 "	records rather than a single \apzdeflate\a() call for compression."
 "	Used for debugging and performance testing.]#[group]"
 "[X:prefix?Uncompressed data contains a prefix that is defined by \acount\a"
-"	and an optional \aterminator\a. This data is not \bpzip\b compressed."
-"	\aterminator\a may be one of:]:[count[*terminator]]]{"
+"	and an optional \aterminator\a. This data is preserved but is not"
+"	\bpzip\b compressed. If \acount\a is \b0\b on uncompress then the"
+"	header is not copied to the output. \aterminator\a may be one"
+"	of:]:[count[*terminator]]]{"
 "		[+\aomitted\a?\acount\a bytes.]"
 "		[+L?\acount\a \bnewline\b terminated records.]"
 "		[+'\achar\a'?\acount\a \achar\a terminated records.]"

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -32,7 +31,7 @@
  * and the time progression factor
  */
 
-static const char id[] = "\n@(#)warp (AT&T Labs Research) 1998-04-01\0\n";
+static const char id[] = "\n@(#)$Id: warp (AT&T Labs Research) 1998-04-01 $\0\n";
 
 #if defined(_SCO_C_DIALECT) || defined(_SCO_ELF) || defined(_SCO_XPG_VERS)
 #define _NO_STATIC	1
@@ -379,7 +378,7 @@ if (!e) { s = "warp: AHA: no env\n"; write(2, s, strlen(s)); }
 			}
 			if (state.trace)
 			{
-				write(2, id + 5, strlen(id + 5));
+				write(2, id + 10, strlen(id + 10));
 				write(2, " ", 1);
 				write(2, o, strlen(o));
 				write(2, "\n", 1);

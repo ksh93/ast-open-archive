@@ -47,7 +47,7 @@ BUILTINS :COMMAND: cmd.h
 		end
 	end
 
-:BUILTIN: mime od pr strings tr uudecode -luu uuencode -luu what who
+:BUILTIN: look mime od pr strings tr uudecode -luu uuencode -luu what who
 
 :INSTALL: $(BINDIR)/ln $(BINDIR)/mv
 

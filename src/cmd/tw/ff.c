@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,14 +20,13 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
  * ff -- fast find test harness
  */
 
-static const char id[] = "\n@(#)ff (AT&T Research) 1998-02-26\0\n";
+static const char id[] = "\n@(#)$Id: ff (AT&T Research) 1998-02-26 $\0\n";
 
 #include <ast.h>
 #include <error.h>

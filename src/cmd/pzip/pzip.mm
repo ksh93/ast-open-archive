@@ -1,10 +1,10 @@
-.xx title=pzip
-.xx logo=pzip.gif logotitle
 .xx meta.description="pzip compresses/decompresses fixed length record data"
 .xx meta.keywords="compression"
 .MT 4
 .TL
 AT&T Labs Research pzip command
+.AF "AT&T Labs Research - Florham Park NJ"
+.AU "Glenn Fowler <gsf@research.att.com>"
 .H 1 Abstract
 Fixed length record data, although easy to access, is often viewed
 as a waste of space.
@@ -90,6 +90,7 @@ and
 run on a 400MHz sgi mips processor.
 .PP
 .TS
+center allbox;
 c s s s s s
 cb cb cb cb cb cb
 cb n n n n n.

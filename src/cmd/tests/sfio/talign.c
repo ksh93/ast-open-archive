@@ -78,5 +78,5 @@ MAIN()
 	if(Read != 1024*sizeof(buf) )
 		terror("Count=%d Read=%d\n", Count, Read);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

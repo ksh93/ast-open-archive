@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1996-2000 AT&T Corp.                *
+*                Copyright (c) 1996-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -22,7 +22,6 @@
 *               Glenn Fowler <gsf@research.att.com>                *
 *                 Phong Vo <kpv@research.att.com>                  *
 *            Doug McIlroy <doug@research.bell-labs.com>            *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -42,7 +41,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)sort (AT&T Labs Research) 2000-08-31\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2000-12-25 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -1272,6 +1271,7 @@ main(int argc, char** argv)
 	if (sort.test & TEST_dump)
 		rskeydump(sort.key, sfstderr);
 	merge = sort.key->merge && sort.key->input[0] && sort.key->input[1] ? sort.key->input : (char**)0;
+	fp = 0;
 	if (sort.jobs)
 		jobs(&sort);
 	else if (sort.test & TEST_show)
@@ -1306,6 +1306,7 @@ main(int argc, char** argv)
 				merge = 0;
 				if (fp != sfstdin)
 					sfclose(fp);
+				fp = 0;
 				continue;
 			}
 			sort.files[sort.nfiles++] = fp;
@@ -1314,7 +1315,10 @@ main(int argc, char** argv)
 		{
 			input(&sort, fp, s);
 			if (fp != sfstdin && !sort.map)
+			{
 				sfclose(fp);
+				fp = 0;
+			}
 		}
 	}
 	if (sort.nfiles)
@@ -1333,6 +1337,8 @@ main(int argc, char** argv)
 			error(0, "%s write text", error_info.id);
 		if (rswrite(sort.rec, sort.op, RS_OTEXT))
 			error(ERROR_SYSTEM|2, "%s: write error", sort.key->output);
+		if (fp && fp != sfstdin)
+			sfclose(fp);
 	}
 	done(&sort);
 	exit(error_info.errors != 0);

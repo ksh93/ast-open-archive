@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -52,7 +51,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)find (AT&T Labs Research) 2000-05-01\n]"
+"[-1p1?@(#)$Id: find (AT&T Labs Research) 2001-02-06 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -104,6 +103,7 @@ static const char usage2[] =
 #include <sfstr.h>
 
 #include "cmdarg.h"
+#include "ftwlocal.h"
 
 #define ignorecase	fts_number
 
@@ -1144,20 +1144,7 @@ compile(char** argv, register struct Node* np)
 
 				if (stat(b, &st))
 					error(3, "%s: not found", b);
-				switch (argp->action)
-				{
-				case ANEWER:
-					np->action = NEWER;
-					np->first.l = st.st_atime;
-					break;
-				case CNEWER:
-					np->action = NEWER;
-					np->first.l = st.st_ctime;
-					break;
-				default:
-					np->first.l = st.st_mtime;
-					break;
-				}
+				np->first.l = st.st_mtime;
 				np->second.i = '+';
 			}
 			break;
@@ -1283,7 +1270,7 @@ execute(Ftw_t* ftw)
 			}
 			break;
 		case LOCAL:
-			u = ftw->statb.st_dev;
+			u = ftwlocal(ftw);
 			goto num;
 		case XTYPE:
 			val = ((walkflags & FTW_PHYSICAL) ? stat(PATH(ftw), &st) : lstat(PATH(ftw), &st)) ? 0 : st.st_mode;
@@ -1327,8 +1314,19 @@ execute(Ftw_t* ftw)
 			}
 			break;
 		case PERM:
-			u = modex(ftw->statb.st_mode);
-			val = (np->second.i == '-') ? ((u & np->first.u) == np->first.u) : (u == np->first.u);
+			u = modex(ftw->statb.st_mode) & 07777;
+			switch (np->second.i)
+			{
+			case '-':
+				val = (u & np->first.u) == np->first.u;
+				break;
+			case '+':
+				val = (u & np->first.u) != 0;
+				break;
+			default:
+				val = u == np->first.u;
+				break;
+			}
 			break;
 		case INUM:
 			u = ftw->statb.st_ino;
@@ -1343,6 +1341,15 @@ execute(Ftw_t* ftw)
 			u = ftw->statb.st_mtime;
 		tim:
 			val = u >= np->first.u && u <= np->second.u;
+			break;
+		case NEWER:
+			val = (unsigned long)ftw->statb.st_mtime > (unsigned long)np->first.u;
+			break;
+		case ANEWER:
+			val = (unsigned long)ftw->statb.st_atime > (unsigned long)np->first.u;
+			break;
+		case CNEWER:
+			val = (unsigned long)ftw->statb.st_ctime > (unsigned long)np->first.u;
 			break;
 		case SIZE:
 			u = ftw->statb.st_size;

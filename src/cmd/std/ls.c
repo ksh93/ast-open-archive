@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)ls (AT&T Labs Research) 2000-05-24\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2001-01-31 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -58,6 +57,7 @@ USAGE_LICENSE
 "[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
 "	override internal \b--format\b identifiers.]:[key[=value]]]"
+"[e:decimal-scale|thousands?Scale sizes to powers of 1000 { b K M G T }.]"
 "[E:block-size?Use \ablocksize\a blocks.]#[blocksize]"
 "[f:format?Append to the listing format string. \aformat\a follows"
 "	\bprintf\b(3) conventions, except that \bsfio\b(3) inline ids"
@@ -115,6 +115,7 @@ USAGE_LICENSE
 "[F:classify?Append a character for typing each entry.]"
 "[g?\b--long\b with no owner info.]"
 "[G:group?\b--long\b with no group info.]"
+"[h:scale|binary-scale|human-readable?Scale sizes to powers of 1024 { b K M G T }.]"
 "[i:inode?List the file serial number.]"
 "[I:ignore?Do not list implied entries matching shell \apattern\a.]:[pattern]"
 "[k:kilobytes?Use 1024 blocks instead of 512.]"
@@ -128,42 +129,51 @@ USAGE_LICENSE
 "[p:markdir?Append / to each directory name.]"
 "[q:hide-control-chars?Print ? instead of non graphic characters.]"
 "[Q:quote-name?Enclose all entry names in \"...\".]"
+"[J:quote-style|quoting-style?Quote entry names according to \astyle\a:]:[style:=question]{"
+"	[c:C?C \"...\" quote.]"
+"	[e:escape?\b\\\b escape if necessary.]"
+"	[l:literal?No quoting.]"
+"	[q:question?Replace unprintable characters with \b?\b.]"
+"	[s:shell?Shell $'...' quote if necessary.]"
+"	[S:shell-always?Shell $'...' every name.]"
+"}"
 "[r:reverse?Reverse order while sorting.]"
 "[R:recursive?List subdirectories recursively.]"
 "[s:size?Print size of each file, in blocks.]"
 "[S:bysize?Sort by file size.]"
 "[t:?Sort by modification time; list mtime with \b--long\b.]"
-"[T:tabsize?Ignored by this implementation.]"
+"[T:tabsize?Ignored by this implementation.]#[columns]"
 "[u:access?Sort by last access time; list atime with \b--long\b.]"
 "[U?Equivalent to \b--sort=none\b.]"
 "[V:colors|colours?\akey\a determines when color is used to distinguish"
-"	types:]:?[key]{"
-"		[+never?never use color (default)]"
-"		[+always?always use color]"
-"		[+tty|auto?use color when output is a tty]"
+"	types:]:?[key:=never]{"
+"		[n:never?Never use color.]"
+"		[a:always?Always use color.]"
+"		[t:tty|auto?Use color when output is a tty.]"
 "}"
 "[w:width?\ascreen-width\a is the current screen width.]#[screen-width]"
 "[W:time?Display \akey\a time instead of the modification time:]:[key]{"
-"	[+atime|access|use?access time]"
-"	[+ctime|status?status change time]"
-"	[+mtime|time?modify time]"
+"	[a:atime|access|use?access time]"
+"	[c:ctime|status?status change time]"
+"	[m:mtime|time?modify time]"
 "}"
 "[x:across?List entries by lines instead of by columns.]"
 "[X:extension?Sort alphabetically by entry extension.]"
 "[y:sort?Sort by \akey\a:]:?[key]{"
-"	[+atime|access|use?access time]"
-"	[+ctime|status?status change time]"
-"	[+extension?file name extension]"
-"	[+mtime|time?modify time]"
-"	[+name?file name]"
-"	[+none?don't sort]"
+"	[a:atime|access|use?Access time.]"
+"	[c:ctime|status?Status change time.]"
+"	[x:extension?File name extension.]"
+"	[m:mtime|time?Modify time.]"
+"	[f:name?File name.]"
+"	[n:none?Don't sort.]"
+"	[s:size|blocks?File size.]"
 "}"
 "[Y:layout?Listing layout \akey\a:]:[key]{"
-"	[+across|horizontal?multi-column across the page]"
-"	[+comma?comma separated names across the page]"
-"	[+long|verbose?long listing]"
-"	[+single-column?one column down the page]"
-"	[+multi-column|vertical?multi-column by column]"
+"	[a:across|horizontal?Multi-column across the page.]"
+"	[c:comma?Comma separated names across the page.]"
+"	[l:long|verbose?Long listing.]"
+"	[s:single-column?One column down the page.]"
+"	[m:multi-column|vertical?Multi-column by column.]"
 "}"
 "[z:numeric-time?List both full date and full time in numeric form.]"
 "[Z:full-time?List both full date and full time.]"
@@ -192,21 +202,21 @@ USAGE_LICENSE
 
 #define LS_ACROSS	(LS_USER<<0)	/* multi-column row order	*/
 #define LS_ALL		(LS_USER<<1)	/* list all			*/
-#define LS_COLUMNS	(LS_USER<<2)	/* multi-column column order	*/
-#define LS_COMMAS	(LS_USER<<3)	/* comma separated name list	*/
-#define LS_DIRECTORY	(LS_USER<<4)	/* list directories as files	*/
-#define LS_ESCAPE	(LS_USER<<5)	/* list directories as files	*/
-#define LS_EXTENSION	(LS_USER<<6)	/* sort by name extension	*/
-#define LS_LABEL	(LS_USER<<7)	/* label for all dirs		*/
-#define LS_MARKDIR	(LS_USER<<8)	/* marks dirs with /		*/
-#define LS_MOST		(LS_USER<<9)	/* list all but . and ..	*/
-#define LS_NOBACKUP	(LS_USER<<10)	/* omit *~ names		*/
-#define LS_NOSORT	(LS_USER<<11)	/* don't sort			*/
-#define LS_NOSTAT	(LS_USER<<12)	/* leaf FTW_NS ok		*/
-#define LS_PRINTABLE	(LS_USER<<13)	/* ? for non-printable chars	*/
-#define LS_QUOTE	(LS_USER<<14)	/* "..." file names		*/
-#define LS_RECURSIVE	(LS_USER<<15)	/* recursive directory descent	*/
-#define LS_REVERSE	(LS_USER<<16)	/* reverse sort order		*/
+#define LS_ALWAYS	(LS_USER<<2)	/* always quote			*/
+#define LS_COLUMNS	(LS_USER<<3)	/* multi-column column order	*/
+#define LS_COMMAS	(LS_USER<<4)	/* comma separated name list	*/
+#define LS_DIRECTORY	(LS_USER<<5)	/* list directories as files	*/
+#define LS_ESCAPE	(LS_USER<<6)	/* C escape unprintable chars	*/
+#define LS_EXTENSION	(LS_USER<<7)	/* sort by name extension	*/
+#define LS_LABEL	(LS_USER<<8)	/* label for all dirs		*/
+#define LS_MARKDIR	(LS_USER<<9)	/* marks dirs with /		*/
+#define LS_MOST		(LS_USER<<10)	/* list all but . and ..	*/
+#define LS_NOBACKUP	(LS_USER<<11)	/* omit *~ names		*/
+#define LS_NOSORT	(LS_USER<<12)	/* don't sort			*/
+#define LS_NOSTAT	(LS_USER<<13)	/* leaf FTW_NS ok		*/
+#define LS_PRINTABLE	(LS_USER<<14)	/* ? for non-printable chars	*/
+#define LS_QUOTE	(LS_USER<<15)	/* "..." file names		*/
+#define LS_RECURSIVE	(LS_USER<<16)	/* recursive directory descent	*/
 #define LS_SEPARATE	(LS_USER<<17)	/* dir header needs separator	*/
 #define LS_SHELL	(LS_USER<<18)	/* $'...' file names		*/
 #define LS_TIME		(LS_USER<<19)	/* sort by time			*/
@@ -288,6 +298,8 @@ typedef struct				/* program state		*/
 	unsigned long	directories;	/* directory count		*/
 	Count_t		total;		/* total counts			*/
 	int		comma;		/* LS_COMMAS ftw.level crossing	*/
+	int		reverse;	/* reverse the sort		*/
+	int		scale;		/* metric scale power		*/
 	int		width;		/* output width in chars	*/
 	char*		endflags;	/* trailing 0 in flags		*/
 	char*		format;		/* sfkeyprintf() format		*/
@@ -364,7 +376,7 @@ printable(register char* s)
 		if (!(state.lsflags & LS_QUOTE))
 			return fmtesc(s);
 		if (state.lsflags & LS_SHELL)
-			return fmtquote(s, "$'", "'", strlen(s), 0);
+			return fmtquote(s, "$'", "'", strlen(s), !!(state.lsflags & LS_ALWAYS));
 		return fmtquote(s, "\"", "\"", strlen(s), 1);
 	}
 	c = strlen(s) + 4;
@@ -384,6 +396,10 @@ printable(register char* s)
 	*t = 0;
 	return prdata;
 }
+
+#if __OBSOLETE__ < 20020101
+#include "../../lib/libast/string/fmtscale.c"
+#endif
 
 /*
  * sfkeyprintf() lookup
@@ -594,7 +610,14 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		break;
 	case KEY_size:
 		if (st)
+		{
 			n = st->st_size;
+			if (state.scale)
+			{
+				s = fmtscale(n, state.scale);
+				fp->fmt = 's';
+			}
+		}
 		break;
 	case KEY_total_blocks:
 		n = state.total.blocks;
@@ -859,7 +882,7 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 	}
 	else
 		n = strcoll(f1->name, f2->name);
-	if (state.sortflags & LS_REVERSE)
+	if (state.reverse)
 		n = -n;
 	return n;
 }
@@ -1067,6 +1090,9 @@ main(int argc, register char** argv)
 		case 'd':
 			state.lsflags |= LS_DIRECTORY;
 			break;
+		case 'e':
+			state.scale = 1000;
+			break;
 		case 'f':
 			if (!sfstrtell(fmt))
 				state.lsflags &= ~LS_COLUMNS;
@@ -1078,6 +1104,9 @@ main(int argc, register char** argv)
 				state.lsflags |= LS_LONG|LS_NOUSER;
 			else
 				state.lsflags |= LS_LONG|LS_NOGROUP;
+			break;
+		case 'h':
+			state.scale = 1024;
 			break;
 		case 'i':
 			state.lsflags |= LS_INUMBER;
@@ -1108,7 +1137,7 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_PRINTABLE;
 			break;
 		case 'r':
-			state.lsflags |= LS_REVERSE;
+			state.reverse = 1;
 			break;
 		case 's':
 			state.lsflags |= LS_BLOCKS;
@@ -1127,46 +1156,36 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_ACROSS|LS_COLUMNS;
 			break;
 		case 'y':
-			if (!(s = opt_info.arg))
+			if (!opt_info.arg)
 				state.sortflags = LS_NOSORT;
 			else
-			{
-				while (*s == '-')
-					s++;
-				switch (*s)
+				switch (opt_info.num)
 				{
 				case 'a':
 					state.sortflags = LS_TIME|LS_ATIME;
 					break;
-				case 'b':
-					state.sortflags = LS_BLOCKS;
-					break;
 				case 'c':
 					state.sortflags = LS_TIME|LS_CTIME;
 					break;
-				case 'e':
-				case 'X':
-					state.sortflags = LS_EXTENSION;
-					break;
 				case 'f':
-				case 0:
 					state.sortflags = 0;
 					break;
 				case 'm':
-				case 't':
 					state.sortflags = LS_TIME;
 					break;
 				case 'n':
-					state.sortflags = (*(s + 1) == 'o') ? LS_NOSORT : 0;
+					state.sortflags = LS_NOSORT;
 					break;
 				case 's':
-					state.sortflags = (*(s + 1) == 'i') ? LS_BLOCKS : (LS_TIME|LS_CTIME);
+					state.sortflags = LS_BLOCKS;
 					break;
-				default:
-					error(2, "%s: unknown %s key", opt_info.arg, opt_info.name);
+				case 't':
+					state.sortflags = LS_TIME;
+					break;
+				case 'x':
+					state.sortflags = LS_EXTENSION;
 					break;
 				}
-			}
 			break;
 		case 'z':
 			state.timefmt = "time=%K";
@@ -1217,6 +1236,30 @@ main(int argc, register char** argv)
 			break;
 		case 'I':
 			state.ignore = opt_info.arg;
+			break;
+		case 'J':
+			state.lsflags &= ~(LS_ALWAYS|LS_ESCAPE|LS_PRINTABLE|LS_QUOTE|LS_SHELL);
+			switch (opt_info.num)
+			{
+			case 'c':
+				state.lsflags |= LS_ESCAPE|LS_PRINTABLE|LS_QUOTE;
+				break;
+			case 'e':
+				state.lsflags |= LS_ESCAPE|LS_PRINTABLE;
+				break;
+			case 'l':
+				state.lsflags |= LS_ESCAPE|LS_PRINTABLE|LS_QUOTE|LS_SHELL;
+				break;
+			case 'q':
+				state.lsflags |= LS_PRINTABLE;
+				break;
+			case 's':
+				state.lsflags |= LS_ESCAPE|LS_PRINTABLE|LS_QUOTE|LS_SHELL;
+				break;
+			case 'S':
+				state.lsflags |= LS_ALWAYS|LS_ESCAPE|LS_PRINTABLE|LS_QUOTE|LS_SHELL;
+				break;
+			}
 			break;
 		case 'K':
 			state.lsflags |= LS_PRINTABLE|LS_SHELL|LS_QUOTE|LS_ESCAPE;
@@ -1269,23 +1312,14 @@ main(int argc, register char** argv)
 			}
 			break;
 		case 'W':
-			for (s = opt_info.arg; *s == '-'; s++);
-			switch (*s)
+			state.timeflags = 0;
+			switch (opt_info.num)
 			{
 			case 'a':
 				state.timeflags = LS_ATIME;
 				break;
 			case 'c':
-			case 's':
 				state.timeflags = LS_CTIME;
-				break;
-			case 'm':
-			case 't':
-			case 0:
-				state.timeflags = 0;
-				break;
-			default:
-				error(2, "%s: unknown %s key", opt_info.arg, opt_info.name);
 				break;
 			}
 			break;
@@ -1354,8 +1388,6 @@ main(int argc, register char** argv)
 		state.lsflags &= ~LS_RECURSIVE;
 	if (!state.sortflags)
 		state.sortflags = state.lsflags & ~LS_BLOCKS;
-	if (state.lsflags & LS_REVERSE)
-		state.sortflags |= LS_REVERSE;
 	if (!state.timeflags)
 		state.timeflags = state.lsflags;
 	if (state.lsflags & (LS_COLUMNS|LS_COMMAS))

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2000 AT&T Corp.                *
+*                Copyright (c) 1991-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -287,7 +286,7 @@ typedef struct File_s			/* open file state		*/
 	Dt_t*		overlay;	/* partition overlay table	*/
 	Dtdisc_t	overdisc;	/* overlay table discipline	*/
 	int		permanent;	/* # permanent fields		*/
-	struct Record*	record;		/* field schema			*/
+	struct Record_s*record;		/* field schema			*/
 	long		records;	/* number of records		*/
 	int		scanlimit;	/* partition scan limit		*/
 	long		sequence;	/* cache sequence number	*/
@@ -297,11 +296,20 @@ typedef struct File_s			/* open file state		*/
 	int		terminator;	/* record delimiter		*/
 	int		termset;	/* terminator explicitly set	*/
 	Update_t*	update;		/* field updates		*/
+	struct
+	{
+	struct Record_s*record;		/* main record			*/
+	Field_t*	field;		/* field data			*/
+	Expr_t*		prog;		/* expression handle		*/
+	int*		generate;	/* indexes to generate		*/
+	char*		data[2];	/* compiled data		*/
+	char*		pattern;	/* pivotal match pattern	*/
+	}		scan;		/* main scan state		*/
 } File_t;
 
-typedef struct List			/* cql list			*/
+typedef struct List_s			/* cql list			*/
 {
-	struct List*	next;		/* next in list			*/
+	struct List_s*	next;		/* next in list			*/
 	union
 	{
 	char*		string;		/* string element		*/
@@ -327,14 +335,14 @@ typedef struct				/* field representation format	*/
 typedef struct				/* record member		*/
 {
 	Exid_t*		symbol;		/* member symbol		*/
-	struct Record*	record;		/* if member is another schema	*/
+	struct Record_s*record;		/* if member is another schema	*/
 	short		access;		/* data access			*/
 	short		subfield;	/* subfield index		*/
 	short		index;		/* member is candidate index	*/
 	Format_t	format;		/* field representation format	*/
 } Member_t;
 
-typedef struct Record			/* schema record		*/
+typedef struct Record_s			/* schema record		*/
 {
 	int		fields;		/* number of fields (members)	*/
 	int		subfields;	/* total number of subfields	*/
@@ -385,7 +393,20 @@ typedef struct				/* program state		*/
 
 	int		active;		/* active connection		*/
 	int		again;		/* run main loop again		*/
-	Exid_t*		closure;	/* closure relation schema	*/
+	struct
+	{
+	Exid_t*		entity;
+	Exid_t*		relation;
+	Dt_t*		member;
+	struct File_s*	f;
+	Record_t*	r;
+	int		key;
+	int		parent;
+	int		child;
+	int		on;
+	int		selected;
+	Dtdisc_t	disc;
+	}		closure;	/* closure state		*/
 	unsigned long	date;		/* start time			*/
 	int		declaration;	/* parsing a declaration	*/
 	List_t*		edge;		/* edge parent,child decl	*/
@@ -427,7 +448,7 @@ extern int		hix_event(Hix_t*, int, void*, Hixdisc_t*);
 extern Expr_t*		init(Exid_t*);
 extern void		load(Expr_t*, File_t*, Exid_t*);
 extern int		optimize(Expr_t*, Exnode_t*);
-extern int		pivot(Hix_t*, Exnode_t*);
+extern int		pivot(File_t*, Exnode_t*);
 extern void		propagate(Record_t*);
 extern Field_t*		record(File_t*, char*, long, int, int, int);
 extern Extype_t		reference(Expr_t*, Exnode_t*, Exid_t*, Exref_t*, char*, int, Exdisc_t*);

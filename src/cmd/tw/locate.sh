@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1989-2000 AT&T Corp.                #
+#                Copyright (c) 1989-2001 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -20,12 +20,11 @@
 #                         Florham Park NJ                          #
 #                                                                  #
 #               Glenn Fowler <gsf@research.att.com>                #
-#                                                                  #
 ####################################################################
 : gnu locate wrapper for tw
 
 COMMAND=locate
-case `getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt` in
+case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?

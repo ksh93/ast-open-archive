@@ -53,5 +53,5 @@ MAIN()
 	if((f = sfopen(f,tstfile(0),"wx") ) )
 		terror("sfopen should not succeed here\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

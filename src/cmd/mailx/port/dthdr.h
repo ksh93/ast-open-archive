@@ -61,7 +61,7 @@ _BEGIN_EXTERNS_
 #if defined(extern)
 #undef extern
 #endif
-#if !_PACKAGE_ast && _DLL_BLD && defined(_WIN32)
+#if !_PACKAGE_ast && _BLD_DLL && defined(_WIN32)
 #define extern	 	__declspec(dllimport)
 #endif
 

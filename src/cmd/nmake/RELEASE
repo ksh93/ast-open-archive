@@ -1,9 +1,12 @@
+01-02-02 makerules: bias package search to viewpath and make installroot
+	 makerules: *.req can be down the view
 01-01-01 expand: fix :D: to preserve leading / -- how long has this been wrong?
 	 makerules: fix .PACKAGE.INIT. for dir == /
 	 makerules: $(PACKAGE_PATH) is list of default package root dirs
 	 makerules: add recurse=list to list recursion order and exit
 	 makerules: _BLD_DLL==1 when building dll's
 	 makerules: link dll with static -l*
+	 makerules: check =l% bound dir in .REQUIRE.-l% PACKAGE_%_LIB
 	 expand: eliminate loops from :W=O:
 	 parse: add exit [code]
 	 bind: eliminate dups for 2d glob

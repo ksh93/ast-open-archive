@@ -22,4 +22,4 @@ warp :: warp.sh
 
 date-www :: ../std/date.o +last
 
-:WWW: warp.mm warp.gif warp date-www testwarp-www
+:WWW: warp.mm warp date-www testwarp-www

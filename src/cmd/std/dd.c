@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)dd (AT&T Labs Research) 2000-06-10\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2000-06-10 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -40,7 +39,7 @@ USAGE_LICENSE
 "	physical io limitations. Options are of the form \aname=value\a"
 "	and may be specified with 0, 1, or 2 leading `-' characters.]"
 "[+?A \anumber\a argument may be a scaled number with optional trailing"
-" multipliers of the form `* \anumber\a', `X \anumber\a' or `X \anumber\a'."
+" multipliers of the form `* \anumber\a', `x \anumber\a' or `X \anumber\a'."
 " Scale suffixes may be one of:]{"
 "	[+b|B?512]"
 "	[+c|C?1]"

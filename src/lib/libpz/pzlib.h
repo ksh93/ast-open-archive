@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -86,9 +85,11 @@ typedef struct				/* split stream state		*/
 	Pzpart_t*	freepart;	/* free partition		*/ \
 	char*		partname;	/* specific part name		*/ \
 	size_t		mrow;		/* max row size			*/ \
+	size_t		mwin;		/* max window size		*/ \
 	struct								   \
 	{								   \
 	size_t		count;		/* prefix record count		*/ \
+	int		skip;		/* skip prefix on decompress	*/ \
 	int		terminator;	/* prefix record terminator	*/ \
 	char*		data;		/* prefix data			*/ \
 	}		prefix;		/* header prefix info		*/ \

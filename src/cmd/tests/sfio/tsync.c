@@ -209,5 +209,5 @@ MAIN()
 			terror("Bad read data");
 	}
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

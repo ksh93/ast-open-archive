@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1989-2000 AT&T Corp.                *
+*                Copyright (c) 1989-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -31,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)df (AT&T Labs Research) 2000-10-23\n]"
+"[-?\n@(#)$Id: df (AT&T Labs Research) 2000-12-13 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -253,7 +252,7 @@ static Key_t	keys[] =
 		"Type",
 		"Filesystem type.",
 		KEY_type,
-		6,
+		10,
 		3
 	},
 	{

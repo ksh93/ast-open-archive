@@ -6,6 +6,7 @@ dateformat='%(mtime:time=%Y-%m-%d/%H:%M:%S)s %(path)s'
 modeformat='%(mtime:time=%K)s %(mode)s %(size)u %(path)s'
 
 VIEW date y2k.dat
+VIEW link link.dat
 VIEW mode mode.dat
 
 TEST 01 'different date formats'
@@ -148,3 +149,15 @@ pax: warning: mode.dir/m4700: mode --S------ not set'
 	EXEC --listformat="$modeformat" -vf mode.pax
 		SAME OUTPUT keep.lst
 		ERROR - mode.pax $'volume 1 in cpio format\n19 files, 8 blocks'
+
+TEST 03 'file and link path substitution'
+	EXEC --nosummary -f $link
+		OUTPUT - $'bin/aaa
+bin/bbb -> bin/aaa
+bin/yyy
+bin/zzz == bin/yyy'
+	EXEC --nosummary -f $link -s ,^,usr/,
+		OUTPUT - $'usr/bin/aaa
+usr/bin/bbb -> usr/bin/aaa
+usr/bin/yyy
+usr/bin/zzz == usr/bin/yyy'

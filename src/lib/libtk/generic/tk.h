@@ -952,6 +952,10 @@ typedef int (Tk_SelectionProc) _ANSI_ARGS_((ClientData clientData,
  *--------------------------------------------------------------
  */
 
+#if _BLD_tk && defined(__EXPORT__)
+#define extern	__EXPORT__
+#endif
+
 EXTERN XColor *		Tk_3DBorderColor _ANSI_ARGS_((Tk_3DBorder border));
 EXTERN GC		Tk_3DBorderGC _ANSI_ARGS_((Tk_Window tkwin,
 			    Tk_3DBorder border, int which));
@@ -1401,6 +1405,8 @@ EXTERN int		Tk_WinfoCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));
 EXTERN int		Tk_WmCmd _ANSI_ARGS_((ClientData clientData,
 			    Tcl_Interp *interp, int argc, char **argv));
+
+#undef	extern
 
 #endif /* RESOURCE_INCLUDED */
 #endif /* _TK */

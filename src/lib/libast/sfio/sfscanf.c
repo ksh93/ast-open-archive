@@ -50,7 +50,7 @@ va_dcl
 	form = va_arg(args,char*);
 #endif
 
-	rv = sfvscanf(f,form,args);
+	rv = (f && form) ? sfvscanf(f,form,args) : -1;
 	va_end(args);
 	return rv;
 }
@@ -66,7 +66,7 @@ va_list	args;
 {
 	Sfio_t	f;
 
-	if(!s)
+	if(!s || !form)
 		return -1;
 
 	/* make a fake stream */
@@ -100,8 +100,7 @@ va_dcl
 	form = va_arg(args,char*);
 #endif
 
-	rv = sfvsscanf(s,form,args);
+	rv = (s && form) ? sfvsscanf(s,form,args) : -1;
 	va_end(args);
-
 	return rv;
 }

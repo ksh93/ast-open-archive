@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1991-2000 AT&T Corp.                *
+*                Copyright (c) 1991-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -285,12 +284,12 @@ optimize(Expr_t* p, Exnode_t* x)
 }
 
 /*
- * generate a hix RPN and/or expression on pivotal index equalities in x
- * zero returned if subexpression is not pivotal
+ * low level for pivot()
+ * *p set to candidate pivotal strmatch() pattern
  */
 
-int
-pivot(register Hix_t* hix, register Exnode_t* x)
+static int
+piv(register Hix_t* hix, register Exnode_t* x, char** p)
 {
 	register Exnode_t*	l;
 	register Exnode_t*	r;
@@ -302,9 +301,9 @@ pivot(register Hix_t* hix, register Exnode_t* x)
 	for (;;) switch (x->op)
 	{
 	case AND:
-		if (pivot(hix, x->data.operand.left))
+		if (piv(hix, x->data.operand.left, p))
 		{
-			if (pivot(hix, x->data.operand.right))
+			if (piv(hix, x->data.operand.right, p))
 			{
 				hixand(hix);
 				message((-6, "piv: and"));
@@ -316,7 +315,7 @@ pivot(register Hix_t* hix, register Exnode_t* x)
 	case OR:
 		n = hixpos(hix);
 		message((-6, "piv: ["));
-		if (pivot(hix, x->data.operand.left) && pivot(hix, x->data.operand.right))
+		if (piv(hix, x->data.operand.left, p) && piv(hix, x->data.operand.right, p))
 		{
 			hixor(hix);
 			message((-6, "piv: ] or"));
@@ -346,7 +345,10 @@ pivot(register Hix_t* hix, register Exnode_t* x)
 			message((-6, "piv: %d==0x%08x [%d]", GETFIELD(sym), hash, hash));
 		}
 		else if (strmatch(r->data.constant.value.string, MATCHPATTERN))
+		{
+			*p = r->data.constant.value.string;
 			return 0;
+		}
 		else
 		{
 			hash = strsum(r->data.constant.value.string, 0L);
@@ -389,6 +391,117 @@ pivot(register Hix_t* hix, register Exnode_t* x)
 	default:
 		return 0;
 	}
+}
+
+/*
+ * set *p to a pivotal strmatch() pattern in subexpression x
+ */
+
+static int
+pat(register Exnode_t* x, char** p)
+{
+	register Exnode_t*	l;
+	register Exnode_t*	r;
+	register Extype_t**	v;
+	Exid_t*			sym;
+
+	for (;;) switch (x->op)
+	{
+	case AND:
+		if (pat(x->data.operand.left, p))
+		{
+			pat(x->data.operand.right, p);
+			return 1;
+		}
+		x = x->data.operand.right;
+		break;
+	case OR:
+		if (pat(x->data.operand.left, p) && pat(x->data.operand.right, p))
+			return 1;
+		*p = 0;
+		return 0;
+	case EQ:
+		l = x->data.operand.left;
+		if (l->op != ID)
+		{
+			r = l;
+			l = x->data.operand.right;
+			if (l->op != ID)
+			{
+				*p = 0;
+				return 0;
+			}
+		}
+		else r = x->data.operand.right;
+		if (l->data.variable.reference || r->op != CONSTANT)
+		{
+			*p = 0;
+			return 0;
+		}
+		sym = l->data.variable.symbol;
+		if (!GETINDEX(sym))
+		{
+			*p = 0;
+			return 0;
+		}
+		if (r->type == STRING && strmatch(r->data.constant.value.string, MATCHPATTERN))
+			*p = r->data.constant.value.string;
+		return 1;
+	case SWITCH:
+		l = x->data.operand.left;
+		if (l->op != ID || l->data.variable.reference)
+		{
+			*p = 0;
+			return 0;
+		}
+		sym = l->data.variable.symbol;
+		if (!GETINDEX(sym))
+		{
+			*p = 0;
+			return 0;
+		}
+		x = x->data.operand.right;
+		if (x->data.operand.left)
+		{
+			*p = 0;
+			return 0;
+		}
+		x = x->data.operand.right;
+		v = x->data.select.constant;
+		while (*v)
+		{
+			if (l->type == STRING && strmatch((*v)->string, MATCHPATTERN))
+			{
+				*p = 0;
+				return 0;
+			}
+		}
+		return 1;
+	default:
+		*p = 0;
+		return 0;
+	}
+}
+
+/*
+ * generate a hix RPN and/or expression on pivotal index equalities in x
+ * zero returned if subexpression is not pivotal
+ */
+
+int
+pivot(File_t* f, Exnode_t* x)
+{
+	int	r;
+	char*	p;
+
+	p = 0;
+	r = piv(f->hix, x, &p);
+	if (!r && p && pat(x, &p))
+	{
+		message((-6, "piv: match pattern `%s'", p));
+		f->scan.pattern = p;
+	}
+	return r;
 }
 
 /*
@@ -556,7 +669,7 @@ reference(Expr_t* prog, Exnode_t* node, Exid_t* sym, Exref_t* ref, char* str, in
 		message((-6, "ini: sym=%s builtin=%d type=%d%s", sym->name, GETBUILTIN(sym), GETTYPE(sym), elt == EX_CALL ? " function" : ""));
 		return val;
 	}
-	if (ref && ref->symbol && (state.insert || ref->symbol == state.closure) && ref->symbol->local.pointer && ((Local_t*)ref->symbol->local.pointer)->record)
+	if (ref && ref->symbol && (state.insert || ref->symbol == state.closure.relation) && ref->symbol->local.pointer && ((Local_t*)ref->symbol->local.pointer)->record)
 		mem = ref->symbol;
 	else if (state.operand && sym->local.pointer && ((Local_t*)sym->local.pointer)->record)
 		mem = sym;

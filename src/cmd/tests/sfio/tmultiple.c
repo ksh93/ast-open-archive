@@ -50,7 +50,7 @@ MAIN()
 			if(!(s = sfgetr(f,'\n',1)) || strcmp(s,"Line3") != 0)
 				terror("Coprocess move did not get Line3\n");
 		}
-		exit(0);
+		TSTEXIT(0);
 	}
 
 	if(sfopen(sfstdout, tstfile(0), "w") != sfstdout )
@@ -97,5 +97,5 @@ MAIN()
 		terror("Did not get Line4 for head\n");
 #endif
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

@@ -255,5 +255,5 @@ do_inverted: /* get back to here when trying to make things fail */
 
 #endif
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

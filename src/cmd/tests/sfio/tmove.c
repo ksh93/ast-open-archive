@@ -76,5 +76,5 @@ MAIN()
 	if(sferror(sfstdout))
 		terror("Sfstdout is in error2\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

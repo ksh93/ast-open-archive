@@ -136,5 +136,5 @@ MAIN()
 	if((n = (int)sfmove(sfstdin,NIL(Sfio_t*),(Sfoff_t)SF_UNBOUND,'\n')) != 1)
 		terror("sfmove3 wrong number of lines %d\n",n);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

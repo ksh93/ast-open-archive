@@ -103,5 +103,5 @@ MAIN()
 		if(count[i] != N_RECORD)
 			terror("Bad count%d %d\n", i, count[i]);
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

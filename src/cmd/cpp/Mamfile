@@ -33,8 +33,6 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGE_ast_LIB}/package/ast.lic
-done ${PACKAGE_ast_LIB}/package/ast.lic
 make install
 make cpp
 make cpp.o
@@ -221,4 +219,10 @@ exec - ln ${PACKAGE_ast_LIB}/cpp ${PACKAGE_ast_LIB}/acpp
 done ${PACKAGE_ast_LIB}/acpp generated
 done install virtual
 make test
-done test dontcare
+make test.cpp
+make cpp.tst
+done cpp.tst
+prev cpp
+exec - regress  cpp.tst cpp
+done test.cpp virtual
+done test dontcare virtual

@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1995-2000 AT&T Corp.                *
+*                Copyright (c) 1995-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -29,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)ls (AT&T Labs Research) 1999-11-04\n]"
+"[-?\n@(#)$Id: testglob (AT&T Labs Research) 1999-11-04 $\n]"
 USAGE_LICENSE
 "[+NAME?testglob - test harness for \bglob\b(3)]"
 "[+DESCRIPTION?\btestglob\b is a test harness for the \bglob\b(3) library"

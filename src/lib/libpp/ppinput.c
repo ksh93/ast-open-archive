@@ -228,6 +228,23 @@ pppush(register int t, register char* s, register char* p, int n)
 			if (pp.member)
 				ppload(NiL);
 #endif
+			if (pp.mode & MARKC)
+			{
+				cur->flags |= IN_c;
+				pp.mode &= ~MARKC;
+				if (!(cur->prev->flags & IN_c))
+				{
+					debug((-7, "PUSH in=%s next=%s [%s]", ppinstr(pp.in), pptokchr(*pp.in->nextchr), pp.in->nextchr));
+					PUSH_BUFFER("C", "extern \"C\" {\n", 1);
+					return;
+				}
+			}
+			else if (cur->prev->flags & IN_c)
+			{
+				debug((-7, "PUSH in=%s next=%s [%s]", ppinstr(pp.in), pptokchr(*pp.in->nextchr), pp.in->nextchr));
+				PUSH_BUFFER("C", "extern \"C++\" {\n", 1);
+				return;
+			}
 			break;
 		case IN_BUFFER:
 			cur->buffer = p = strdup(p);
@@ -237,15 +254,6 @@ pppush(register int t, register char* s, register char* p, int n)
 			break;
 		}
 		cur->nextchr = p;
-		if (pp.mode & MARKC)
-		{
-			cur->flags |= IN_c;
-			pp.mode &= ~MARKC;
-			if (!(cur->prev->flags & IN_c))
-				PUSH_BUFFER("C", "extern \"C\" {\n", 1);
-		}
-		else if (cur->type == IN_FILE && (cur->prev->flags & IN_c))
-			PUSH_BUFFER("C", "extern \"C++\" {\n", 1);
 		break;
 #if DEBUG
 	default:

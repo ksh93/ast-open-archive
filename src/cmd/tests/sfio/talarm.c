@@ -94,5 +94,5 @@ MAIN()
 	if(!Except)
 		terror("Exception handler wasn't called2\n");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

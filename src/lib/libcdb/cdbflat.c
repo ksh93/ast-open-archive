@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1997-2000 AT&T Corp.                *
+*                Copyright (c) 1997-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -76,6 +75,9 @@ typedef struct
 
 static const Namval_t	details[] =
 {
+	"invalid",	CDB_INVALID,
+	"space",	CDB_SPACE,
+	"zero",		CDB_ZERO,
 	0,		0
 };
 
@@ -95,14 +97,26 @@ static int
 setdetail(void* h, const void* p, register int n, register const char* v)
 {
 	register Cdb_t*	cdb = (Cdb_t*)h;
+	register int	i;
 
-	if (p) switch (((Namval_t*)p)->value)
-	{
-	default:
-		if (cdb->disc->errorf)
-			(*cdb->disc->errorf)(cdb, cdb->disc, 1, "%s: %s: unknown %s format detail", cdb->path, ((Namval_t*)p)->name, cdb->meth.name);
-		break;
-	}
+	if (p)
+		switch (i = (int)((Namval_t*)p)->value)
+		{
+		case CDB_INVALID:
+		case CDB_SPACE:
+		case CDB_ZERO:
+			if (n)
+				cdb->options |= i;
+			else
+				cdb->options &= ~i;
+			break;
+		default:
+			if (cdb->disc->errorf)
+				(*cdb->disc->errorf)(cdb, cdb->disc, 1, "%s: %s: unknown %s format detail", cdb->path, ((Namval_t*)p)->name, cdb->meth.name);
+			break;
+		}
+	else if (cdb->disc->errorf)
+		(*cdb->disc->errorf)(cdb, cdb->disc, 1, "%s: %s: unknown %s format detail", cdb->path, v, cdb->meth.name);
 	return 0;
 }
 
@@ -177,24 +191,34 @@ flatrecognize(register Cdb_t* cdb)
 }
 
 /*
- * cache string values for a record that spans buffer boundaries
+ * cache the cdbimage() prefix and string values for a record that
+ * spans buffer boundaries
  */
 
 static int
-flatspan(Cdb_t* cdb, Vmalloc_t* vp, Cdbdata_t* odp, Cdbdata_t* oep)
+flatspan(Cdb_t* cdb, char* buf, char* end, Vmalloc_t* vp, Cdbdata_t* odp, Cdbdata_t* oep)
 {
 	register Cdbrecord_t*	rp;
 	register Cdbdata_t*	dp;
 	register Cdbdata_t*	ep;
 	register char*		s;
 
-	for (rp = cdb->record; rp; rp = rp->next)
+	rp = cdb->record;
+	if (buf)
+	{
+		rp->image.size = end - buf;
+		if (!(rp->image.data = vmoldof(vp, 0, char, rp->image.size, 0)))
+			return cdbnospace(cdb);
+		memcpy(rp->image.data, buf, rp->image.size);
+	}
+	for (; rp->next; rp = rp->next)
 		for (ep = (dp = rp->data) + rp->schema->strings; dp < ep; dp++)
 			if ((dp->flags & (CDB_STRING|CDB_CACHED)) == CDB_STRING)
 			{
 				if (!(s = vmoldof(vp, 0, char, dp->string.length, 1)))
 					return cdbnospace(cdb);
 				dp->string.base = (char*)memcpy(s, dp->string.base, dp->string.length);
+				dp->string.base[dp->string.length] = 0;
 				dp->flags |= CDB_CACHED|CDB_TERMINATED;
 			}
 	for (dp = odp, ep = oep; dp < ep; dp++)
@@ -203,6 +227,7 @@ flatspan(Cdb_t* cdb, Vmalloc_t* vp, Cdbdata_t* odp, Cdbdata_t* oep)
 			if (!(s = vmoldof(vp, 0, char, dp->string.length, 1)))
 				return cdbnospace(cdb);
 			dp->string.base = (char*)memcpy(s, dp->string.base, dp->string.length);
+			dp->string.base[dp->string.length] = 0;
 			dp->flags |= CDB_CACHED|CDB_TERMINATED;
 		}
 	return 0;
@@ -342,11 +367,11 @@ sfseek(cdb->io, rp->offset, SEEK_SET);
 
 			/*
 			 * the field spans a buffer boundary:
-			 * cache previous string fields and
+			 * cache previous prefix and string fields and
 			 * reserve the next buffer
 			 */
 
-			if (sp->strings && flatspan(cdb, vp, rp->data, dp) < 0)
+			if (flatspan(cdb, buf, end, vp, rp->data, dp) < 0)
 				return 0;
 			if (!(t = vmoldof(vp, 0, char, w, 1)))
 				goto nospace;
@@ -370,10 +395,13 @@ r = sfvalue(cdb->io);
 			memcpy(t + w, buf, c);
 			b = t;
 			w = fp->width;
-			b[w] = 0;
 			if (fp->flags & CDB_SPACE)
+			{
 				for (; isspace(*b); b++, w--);
-			dp->flags = CDB_CACHED|CDB_TERMINATED;
+				for (; w > 0 && isspace(b[w - 1]); w--);
+			}
+			b[w] = 0;
+			dp->flags = (fp->flags & CDB_STRING)|CDB_CACHED|CDB_TERMINATED;
 			dp->string.base = b;
 			dp->string.length = w;
 		}
@@ -385,7 +413,7 @@ r = sfvalue(cdb->io);
 		if (b >= e)
 		{
 			k = delimterm && *(s - 1) == q;
-			if (sp->strings && flatspan(cdb, vp, rp->data, dp) < 0)
+			if (flatspan(cdb, buf, end, vp, rp->data, dp) < 0)
 				return 0;
 			if (c = b - buf)
 			{
@@ -429,7 +457,7 @@ r = sfvalue(cdb->io);
 					 */
 
 					k = delimterm && *(s - 1) == q;
-					if (sp->strings && flatspan(cdb, vp, rp->data, dp) < 0)
+					if (flatspan(cdb, buf, end, vp, rp->data, dp) < 0)
 						return 0;
 					if (w = s - b)
 					{
@@ -493,10 +521,13 @@ r = sfvalue(cdb->io);
 						goto nospace;
 					memcpy(t + c, b, s - b);
 					b = t;
-					b[w] = 0;
 					if (fp->flags & CDB_SPACE)
+					{
 						for (; isspace(*b); b++, w--);
-					dp->flags = CDB_CACHED|CDB_TERMINATED;
+						for (; w > 0 && isspace(b[w - 1]); w--);
+					}
+					b[w] = 0;
+					dp->flags = (fp->flags & CDB_STRING)|CDB_CACHED|CDB_TERMINATED;
 					dp->string.base = b;
 					dp->string.length = w;
 					if (s < e)
@@ -543,7 +574,7 @@ r = sfvalue(cdb->io);
 					 */
 
 					k = delimterm && *(s - 1) == q;
-					if (sp->strings && flatspan(cdb, vp, rp->data, dp) < 0)
+					if (flatspan(cdb, buf, end, vp, rp->data, dp) < 0)
 						return 0;
 					if (w = s - b)
 					{
@@ -590,10 +621,13 @@ r = sfvalue(cdb->io);
 						goto nospace;
 					memcpy(t + c, b, s - b);
 					b = t;
-					b[w] = 0;
 					if (fp->flags & CDB_SPACE)
+					{
 						for (; isspace(*b); b++, w--);
-					dp->flags = CDB_CACHED|CDB_TERMINATED;
+						for (; w > 0 && isspace(b[w - 1]); w--);
+					}
+					b[w] = 0;
+					dp->flags = (fp->flags & CDB_STRING)|CDB_CACHED|CDB_TERMINATED;
 					dp->string.base = b;
 					dp->string.length = w;
 					break;
@@ -619,9 +653,12 @@ r = sfvalue(cdb->io);
 				else
 					dp->flags = CDB_CACHED|CDB_TERMINATED;
 				b = (char*)ccmapcpy(t, b, w, fp->code, CC_NATIVE);
-				b[w] = 0;
 				if (fp->flags & CDB_SPACE)
+				{
 					for (; isspace(*b); b++, w--);
+					for (; w > 0 && isspace(b[w - 1]); w--);
+				}
+				b[w] = 0;
 			}
 			if (dp->string.length = w)
 				dp->flags |= CDB_STRING;
@@ -739,7 +776,10 @@ r = sfvalue(cdb->io);
 				if (!dp->flags)
 				{
 					if (fp->flags & CDB_SPACE)
+					{
 						for (t = b + w; b < t && isspace(*b); b++, w--);
+						for (; w > 0 && isspace(b[w - 1]); w--);
+					}
 					if (!(dp->string.length = w))
 					{
 						dp->string.base = "";
@@ -992,7 +1032,7 @@ r = sfvalue(cdb->io);
 			{
 				if (s >= e)
 				{
-					if (sp->strings && flatspan(cdb, vp, rp->data, dp) < 0)
+					if (flatspan(cdb, buf, end, vp, rp->data, dp) < 0)
 						return 0;
 r = sfvalue(cdb->io);
 					if (!(s = sfreserve(cdb->io, e - buf, 0)))
@@ -1007,9 +1047,9 @@ r = sfvalue(cdb->io);
 		}
 		if (w > 0)
 		{
-			if (w >= r && sp->strings && flatspan(cdb, vp, rp->data, dp) < 0)
+			if (w >= r && flatspan(cdb, NiL, NiL, vp, rp->data, dp) < 0)
 				return 0;
-r = sfvalue(cdb->io);
+			r = sfvalue(cdb->io);
 			sfreserve(cdb->io, w, 0);
 			message((-9, "AHA %4d %5I*d %9I*d w    %9I*d t  %4I*d r", __LINE__, sizeof(cdb->count), cdb->count + 1, sizeof(w), w, sizeof(Sfoff_t), sftell(cdb->io), sizeof(r), r));
 		}
@@ -1149,9 +1189,12 @@ flatpureread(Cdb_t* cdb, Cdbkey_t* key)
 					dp->flags |= CDB_UNSIGNED|CDB_LONG|CDB_INTEGER;
 					break;
 				default:
-					*s = 0;
 					if (fp->flags & CDB_SPACE)
+					{
 						for (; *b && isspace(*b); b++);
+						for (; s > b && isspace(*(s - 1)); s--);
+					}
+					*s = 0;
 					dp->string.base = b;
 					dp->flags |= (dp->string.length = s - b) ? (CDB_STRING|CDB_TERMINATED) : CDB_TERMINATED;
 					break;
@@ -1233,9 +1276,12 @@ flatfixread(Cdb_t* cdb, Cdbkey_t* key)
 			if (!(t = vmoldof(vp, 0, char, w, 1)))
 				goto nospace;
 			b = (char*)ccmapcpy(t, b, w, fp->code, CC_NATIVE);
-			b[w] = 0;
 			if (fp->flags & CDB_SPACE)
+			{
 				for (; isspace(*b); b++, w--);
+				for (; w > 0 && isspace(b[w - 1]); w--);
+			}
+			b[w] = 0;
 			dp->flags = CDB_CACHED|CDB_TERMINATED;
 			dp->string.length = w;
 			dp->flags |= CDB_STRING;
@@ -1782,8 +1828,16 @@ flatevent(register Cdb_t* cdb, int op)
 	switch (op)
 	{
 	case CDB_METH:
-		if (cdb->disc->details && stropt(cdb->disc->details, details, sizeof(*details), setdetail, cdb) < 0)
-			return -1;
+		if (cdb->disc->details)
+		{
+			if (cdb->defopts)
+			{
+				cdb->defopts = 0;
+				cdb->options = 0;
+			}
+			if (stropt(cdb->disc->details, details, sizeof(*details), setdetail, cdb) < 0)
+				return -1;
+		}
 		break;
 	case CDB_INIT:
 		if (!(flat = vmnewof(cdb->vm, 0, Flat_t, 1, 0)))

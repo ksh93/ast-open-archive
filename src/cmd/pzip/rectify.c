@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -29,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)rectify (AT&T Labs Research) 1999-03-22\n]"
+"[-?\n@(#)$Id: rectify (AT&T Labs Research) 1999-03-22 $\n]"
 USAGE_LICENSE
 "[+NAME?rectify - induce fixed length record groups from data]"
 "[+DESCRIPTION?\brectify\b induces fixed length record groups from input data"

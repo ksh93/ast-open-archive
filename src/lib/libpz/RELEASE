@@ -1,3 +1,7 @@
+01-02-02 delay buffer allocation until pzpartinit()
+	 pzpart: fix non-terminated string bug for url-style paths
+01-01-01 pzopen: open new stream instead of using sfstdin for sfdcgzip()
+00-12-11 pzpart(): add -X0 => prefix.skip => skip prefix on uncompress
 00-10-04 pzhead(): accept empty input for compression -- duh
 00-05-31 pzclose(): check for pz->io == 0
 00-02-14 PZ_DELAY|PZ_HANDLE|PZ_UNKNOWN for 'unknown format' after pzlib() done

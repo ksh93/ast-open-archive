@@ -4,7 +4,7 @@ ast-open ast-base ast-ksh :PACKAGE: \
 		3d coshell cpp cs mam msgcc nmake probe ss \
 		libcoshell libcs libmam libpp \
 		at builtin cql diff ie mailx mam ncsl pack pzip \
-		re sort std tksh tw warp libcdb libpz libtk
+		re sort std tksh tw warp libcdb libpz libtksh libtk
 	The AT&T Labs Research ast-open package contains all of the ast open
 	source commands and libraries.
 

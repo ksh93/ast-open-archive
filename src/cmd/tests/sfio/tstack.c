@@ -214,5 +214,5 @@ MAIN()
 	if(strcmp(s, "1234abcd") != 0)
 		terror("sfgetr got wrong data");
 
-	TSTRETURN(0);
+	TSTEXIT(0);
 }

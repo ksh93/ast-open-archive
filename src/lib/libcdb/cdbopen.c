@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1997-2000 AT&T Corp.                *
+*                Copyright (c) 1997-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -51,7 +50,7 @@
  * example:	"{;}d3p2*3I4i321*i"
  */
 
-static const char id[] = "\n@(#)cdb library 2.2 (AT&T Research) 2000-02-14\0\n";
+static const char id[] = "\n@(#)$Id: cdb library 2.2 (AT&T Research) 2001-01-01 $\0\n";
 
 #include "cdblib.h"
 
@@ -240,6 +239,8 @@ cdbopen(register Cdb_t* cdb, register Cdbdisc_t* disc, Cdbmeth_t* meth, Sfio_t* 
 		cdb->major = CDB_MAJOR;
 		cdb->minor = CDB_MINOR;
 		cdb->flags = flags;
+		cdb->options = CDB_OPT_DEFAULT;
+		cdb->defopts = 1;
 	}
 
 	/*
@@ -563,7 +564,7 @@ cdbparse(register Cdb_t* cdb, const char* schema)
 	tail = 0;
 	comfix = 0;
 	code = CDB_CCODE;
-	options = CDB_OPT_DEFAULT;
+	options = cdb->options;
 	fp = 0;
 	m = 1;
 	w = 0;

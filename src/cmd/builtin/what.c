@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1992-2000 AT&T Corp.                *
+*                Copyright (c) 1992-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -21,7 +21,6 @@
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
 *                David Korn <dgk@research.att.com>                 *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 /*
@@ -35,13 +34,13 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)what (AT&T Labs Research) 1999-05-01\n]"
+"[-?\n@(#)$Id: what (AT&T Labs Research) 2000-12-01 $\n]"
 USAGE_LICENSE
 "[+NAME?what - display binary identification strings]"
 "[+DESCRIPTION?\bwhat\b searches the given files for all occurrences of"
-"	the pattern \b@(#)\b and writes a line to the standard output the text"
-"	that follows until the first occurrence of one of the following:"
-"	\b\" > \\ newline NUL\b.]"
+"	the pattern \b@(#)\b or \b$Id:\b and writes a line to the standard"
+"	output containing the text that follows until the first occurrence"
+"	of one of the following: \b\" > \\ $ newline NUL\b.]"
 
 "[s:first|single?Find only the first occurrence of the pattern in each file.]"
 
@@ -54,7 +53,7 @@ USAGE_LICENSE
 "	[+1?Otherwise.]"
 "	[+2?Option error.]"
 "}"
-"[+SEE ALSO?\bgrep\b(1), \bstrings\b(1)]"
+"[+SEE ALSO?\bident\b(1), \bgrep\b(1), \bstrings\b(1)]"
 ;
 
 #include <cmd.h>
@@ -119,26 +118,26 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 				switch (skip[buf[0]])
 				{
 				case HIT:
-					if (s[0] == '@' && s[1] == '(' && s[2] == '#')
+					if (buf[0] == ')' && s[0] == '@' && s[1] == '(' && s[2] == '#' || buf[0] == ':' && s[0] == '$' && s[1] == 'I' && s[2] == 'd')
 					{
 						index = 0;
-						b = s = buf + 1;
+						s = buf + 1;
 						goto hit;
 					}
 					break;
 				case 1:
-					if (s[1] == '@' && s[2] == '(' && buf[1] == ')')
+					if (buf[0] == ')' && s[1] == '@' && s[2] == '(' && buf[1] == '#' || buf[0] == ':' && s[1] == '$' && s[2] == 'I' && s[3] == 'd')
 					{
 						index = 1;
-						b = s = buf + 2;
+						s = buf + 2;
 						goto hit;
 					}
 					break;
 				case 2:
-					if (s[2] == '@' && buf[1] == '#' && buf[2] == ')')
+					if (buf[0] == ')' && s[2] == '@' && buf[1] == '(' && buf[2] == '#' || buf[0] == ':' && s[2] == '$' && s[3] == 'I' && s[3] == 'd')
 					{
 						index = 2;
-						b = s = buf + 3;
+						s = buf + 3;
 						goto hit;
 					}
 					break;
@@ -148,10 +147,22 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 			{
 				index -= HIT;
 				s = buf + index;
-				if (*--s == '#' && *--s == '(' && *--s == '@')
+				if (s[0] == ')' && s[-1] == '#' && s[-2] == '(' && s[-3] == '@' || s[0] == ':' && s[-1] == 'd' && s[-2] == 'I' && s[-3] == '$')
 				{
-					b = s += 4;
+					s++;
 				hit:
+					for (;;)
+					{
+						while (*s == ' ' || *s == '\t')
+							s++;
+						if (s[0] == '@' && s[1] == '(' && s[2] == '#' && s[3] == ')')
+							s += 4;
+						else if (s[0] == '$' && s[1] == 'I' && s[2] == 'd' && s[3] == ':')
+							s += 4;
+						else
+							break;
+					}
+					b = s;
 					t = "\t";
 					for (;;)
 					{
@@ -173,12 +184,17 @@ what(const char* file, Sfio_t* ip, Sfio_t* op)
 							case '\\':
 							case '\n':
 							list:
-								sfprintf(op, "%s%-.*s\n", t, s - b, b);
-								state.hit = 1;
-								if (state.single)
-									return;
-								if (!buf)
-									goto done;
+								if ((s - b) > 2 && *(s - 1) == '$' && *(s - 2) == ' ')
+									s -= 2;
+								if (s > b)
+								{
+									sfprintf(op, "%s%-.*s\n", t, s - b, b);
+									state.hit = 1;
+									if (state.single)
+										return;
+									if (!buf)
+										goto done;
+								}
 								break;
 							default:
 								s++;
@@ -211,10 +227,10 @@ b_what(int argc, char** argv, void* context)
 	state.hit = state.single = 0;
 	for (n = 0; n <= UCHAR_MAX; n++)
 		state.skip[n] = 4;
-	state.skip['@'] = 3;
-	state.skip['('] = 2;
-	state.skip['#'] = 1;
-	state.skip[')'] = HIT;
+	state.skip['@'] = state.skip['$'] = 3;
+	state.skip['('] = state.skip['I'] = 2;
+	state.skip['#'] = state.skip['d'] = 1;
+	state.skip[')'] = state.skip[':'] = HIT;
 	for (;;)
 	{
 		switch (optget(argv, usage))

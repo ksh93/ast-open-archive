@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1998-2000 AT&T Corp.                *
+*                Copyright (c) 1998-2001 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -20,7 +20,6 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                                                                  *
 *******************************************************************/
 #pragma prototyped
 
@@ -124,15 +123,17 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 		pz->flags = flags|PZ_MAINONLY;
 		pz->vm = vm;
 		pz->win = disc->window ? disc->window : PZ_WINDOW;
-		if (!(pz->buf = vmnewof(pz->vm, 0, unsigned char, pz->win, 0)) ||
-            (pz->flags & PZ_WRITE) && !(pz->wrk = vmnewof(pz->vm, 0, unsigned char, pz->win, 0)))
-			goto bad;
 		if (!path)
 		{
 			if (!isatty(sffileno(sfstdin)))
 			{
 				pz->path = "/dev/stdin";
-				pz->io = sfstdin;
+				if (!(pz->io = sfnew(NiL, NiL, SF_UNBOUND, sffileno(sfstdin), SF_READ)))
+				{
+					if (disc->errorf)
+						(*disc->errorf)(pz, disc, 2, "%s: cannot read", pz->path);
+					goto bad;
+				}
 			}
 			else if (!(pz->io = sfopen(NiL, pz->path = "/dev/null", "r")))
 			{
@@ -140,7 +141,8 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 					(*disc->errorf)(pz, disc, 2, "%s: cannot read", path);
 				goto bad;
 			}
-			pz->flags |= PZ_STREAM;
+			else
+				pz->flags |= PZ_STREAM;
 		}
 		else if (pz->flags & PZ_STREAM)
 		{
@@ -223,7 +225,7 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 	if (pz->disc->eventf && (*pz->disc->eventf)(pz, (flags & PZ_AGAIN) ? PZ_REOPEN : PZ_OPEN, NiL, 0, pz->disc) < 0)
 		goto bad;
 	if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzopen: flags=%08x", pz->path, pz->flags);
+			(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzopen: flags=%08x win=(%I*u:%I*u) row=(%I*u:%I*u) buf=%p wrk=%p", pz->path, pz->flags, sizeof(pz->win), pz->win, sizeof(pz->mwin), pz->mwin, sizeof(pz->row), pz->row, sizeof(pz->mrow), pz->mrow, pz->buf, pz->wrk);
 	return pz;
  bad:
  	pzclose(pz);
