@@ -25,8 +25,9 @@
 #
 # genshare [options]
 #
-# @(#)genshare (AT&T Research) 01/31/96
+# @(#)genshare (AT&T Research) 2002-10-02
 #
+
 dir=.
 rsh=rsh
 while	:
@@ -62,11 +63,11 @@ esac
 if	test ! -d $dir
 then	echo "$0: $dir: invalid directory" >&2; exit 1
 fi
-s="`df 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*:/!d' -e 's/:.*//' | sort -u`"
+s="`df 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*:/!d' -e 's/:.*//' -e '/^.$/d' | sort -u`"
 case $s in
 "")	s=`hostname 2>/dev/null || uname -n 2>/dev/null || cat /etc/whoami 2>/dev/null || echo local 2>/dev/null`
 	;;
-*)	p=`df $dir/. 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*:/!d' -e 's/:.*//'`
+*)	p=`df $dir/. 2>/dev/null | sed -e 's/^[^(]*(//' -e '/^[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_]*:/!d' -e 's/:.*//' -e '/^.$/d'`
 	case $p in
 	"")	p=`hostname 2>/dev/null || uname -n 2>/dev/null || cat /etc/whoami 2>/dev/null || echo local 2>/dev/null` ;;
 	esac

@@ -108,30 +108,6 @@
 
 /*---------------------------------------------*/
 /*--
-  Place a 1 beside your platform, and 0 elsewhere.
---*/
-
-/*--
-  Generic 32-bit Unix.
-  Also works on 64-bit Unix boxes.
---*/
-#define BZ_UNIX      1
-
-/*--
-  Win32, as seen by Jacob Navia's excellent
-  port of (Chris Fraser & David Hanson)'s excellent
-  lcc compiler.
---*/
-#define BZ_LCCWIN32  0
-
-#if defined(_WIN32) && !defined(_UWIN) && !defined(__CYGWIN__)
-#define BZ_LCCWIN32 1
-#define BZ_UNIX 0
-#endif
-
-
-/*---------------------------------------------*/
-/*--
   Some stuff for all platforms.
 --*/
 

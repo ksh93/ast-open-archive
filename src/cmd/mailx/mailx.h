@@ -20,6 +20,7 @@
 #include <sig.h>
 #include <times.h>
 #include <wait.h>
+#include <sfstr.h>
 
 #else /*_PACKAGE_ast*/
 
@@ -612,9 +613,12 @@ typedef struct {
 	struct {
 	char	pwd[2][PATHSIZE];	/* pwd and oldpwd paths */
 	char	mail[PATHSIZE];		/* Name of current file */
-	char	move[PATHSIZE];		/* Very tempory name buffer */
+	char	path[PATHSIZE];		/* Very temporary fixed path buffer */
 	char	prev[PATHSIZE];		/* Name of previous file */
-	char	temp[PATHSIZE];		/* Very tempory name buffer */
+	Sfio_t*	buf;			/* Very temporary name buffer */
+	Sfio_t*	move;			/* Very temporary name buffer */
+	Sfio_t*	part;			/* Very temporary name buffer */
+	Sfio_t*	temp;			/* Very temporary name buffer */
 	}	path;
 
 	struct {
@@ -669,7 +673,6 @@ typedef struct {
 	char	mesg[L_tmpnam];
 	char	more[L_tmpnam];
 	char	quit[L_tmpnam];
-	char	buf[LINESIZE];
 	char*	dir;
 	}	tmp;
 
@@ -846,7 +849,7 @@ extern void		free_command(int);
 extern int		from(struct msg*);
 extern int		get(char**);
 extern void		getargs(struct argvec*, char*);
-extern int		getfolder(char*);
+extern int		getfolder(char*, size_t);
 extern int		getmsglist(char*, unsigned long);
 extern char*		grab(struct msg*, unsigned long, char*);
 extern void		grabedit(struct header*, unsigned long);
@@ -884,11 +887,11 @@ extern int		more(struct msg*);
 extern void		msgflags(struct msg*, int, int);
 extern struct msg*	newmsg(off_t offset);
 extern int		next(struct msg*);
-extern char*		normalize(char*, char*, unsigned long);
+extern char*		normalize(char*, unsigned long, char*, size_t);
 extern void		note(int, const char*, ...);
 extern int		notyet(char*);
 extern int		null(int);
-extern void		parse(struct msg*, char*, struct headline*, char*);
+extern void		parse(struct msg*, char*, struct headline*, char*, size_t);
 extern FILE*		pipeopen(char*, char*);
 extern int		preserve(char*);
 extern int		puthead(FILE*, struct header*, int);
@@ -955,6 +958,7 @@ extern int		split(char*);
 extern void		sreset(void);
 extern int		start_command(char*, int, int, int, char*, char*, char*);
 extern char*		strlower(char*);
+extern char*		strncopy(char*, const char*, size_t);
 extern void		tempinit(void);
 extern int		top(struct msg*);
 extern void		touchmsg(struct msg*);

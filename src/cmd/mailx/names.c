@@ -274,7 +274,7 @@ mapuser(Dt_t* dt, void* object, void* context)
 				mapadd(wm, np, mp->name, np->flags & ~(GMAP|GMETOO));
 			return 0;
 		}
-		if (s = normalize(np->name, state.path.temp, GCOMPARE)) {
+		if (s = normalize(np->name, GCOMPARE, state.path.path, sizeof(state.path.path))) {
 			mapadd(wm, np, s, np->flags & ~GMAP);
 			return 0;
 		}
@@ -326,19 +326,21 @@ record(char* author, unsigned long flags)
 	register int	c;
 	register char*	ap;
 	register char*	rp;
+	register char*	ep;
 	register char*	tp;
 
-	rp = state.path.temp;
+	rp = state.path.path;
+	ep = rp + sizeof(state.path.path) - 1;
 	if ((flags & FOLLOWUP) && (ap = author)) {
 		if (tp = state.var.followup) {
-			if (state.var.outfolder && !strchr(METAFILE, *tp))
+			if (state.var.outfolder && !strchr(METAFILE, *tp) && rp < ep)
 				*rp++ = '+';
-			while (*rp = *tp++)
+			while ((*rp = *tp++) && rp < ep)
 				rp++;
-			if (*(rp - 1) != '/')
+			if (*(rp - 1) != '/' && rp < ep)
 				*rp++ = '/';
 		}
-		else if (state.var.outfolder)
+		else if (state.var.outfolder && rp < ep)
 			*rp++ = '+';
 		tp = rp;
 		ap = author;
@@ -352,19 +354,21 @@ record(char* author, unsigned long flags)
 				rp = tp;
 				continue;
 			default:
-				*rp++ = c;
+				if (rp < ep)
+					*rp++ = c;
 				continue;
 			}
 			break;
 		}
-		tp = state.path.temp;
+		tp = state.path.path;
 		*rp = 0;
 	}
 	else if (!(tp = state.var.log))
 		*rp = 0;
 	else if (state.var.outfolder && !strchr(METAFILE, *tp)) {
-		*rp++ = '+';
-		strcpy(rp, tp);
+		if (rp < ep)
+			*rp++ = '+';
+		strncopy(rp, tp, ep - rp);
 	}
 	return tp && *tp ? expand(tp, 1) : (char*)0;
 }

@@ -39,8 +39,8 @@ mailbox(const char* user, const char* mail)
 			return (char*)mail;
 		if (s = strrchr(mail, '/')) {
 			i = s - (char*)mail;
-			sprintf(state.path.temp, "%-.*s/.", i, mail);
-			if (!access(state.path.temp, F_OK))
+			sfprintf(state.path.temp, "%-.*s/.", i, mail);
+			if (!access(sfstruse(state.path.temp), F_OK))
 				n = i;
 		}
 	}
@@ -50,16 +50,16 @@ mailbox(const char* user, const char* mail)
 				i = 0;
 				break;
 			}
-			sprintf(state.path.temp, "%s/.", dir[i]);
-			if (!access(state.path.temp, F_OK))
+			sfprintf(state.path.temp, "%s/.", dir[i]);
+			if (!access(sfstruse(state.path.temp), F_OK))
 				break;
 		}
 		mail = dir[i];
 		if ((n = strlen(mail)) > 0 && mail[n - 1] == '/')
 			n--;
 	}
-	sprintf(state.path.temp, "%-.*s/%s", n, mail, user);
-	return savestr(state.path.temp);
+	sfprintf(state.path.temp, "%-.*s/%s", n, mail, user);
+	return savestr(sfstruse(state.path.temp));
 }
 
 /*

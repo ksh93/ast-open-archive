@@ -1,3 +1,5 @@
+02-10-02 state.c: (-Q0x01000000) $(>) use min(r->time,state(r)->time)
+	 misc.c: tmform() => fmttime(); %K default time format
 02-09-22 Makerules.mk: drop ${mam_cc_STATIC} for +l binding
 	 expand.c: fix mam $(FOO|BAR) => ${mam_cc_FOO-${mam_cc_BAR}} conversion
 02-09-11 make.probe,probe.win32: move to INIT src to share with mamprobe

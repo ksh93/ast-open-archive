@@ -130,13 +130,7 @@ msglist(Sfio_t* sp, register Msg_call_t* msg, int flags, unsigned long terse)
 			if (((unsigned long)msg->stamp) <= USHRT_MAX)
 				r += sfprintf(sp, " %lu", msg->stamp);
 			else
-			{
-				time_t	tm = msg->stamp;
-				char	buf[64];
-
-				tmform(buf, "%?%h %d %H:%M:%S %Y", &tm);
-				r += sfprintf(sp, " %s", buf);
-			}
+				r += sfprintf(sp, " %s", fmttime("%?%K", (time_t)msg->stamp));
 		}
 		r += sfprintf(sp, " ] ");
 	}

@@ -1,3 +1,4 @@
+02-10-01 mailx: fix ancient buffer overflows by comitting to ast -- bye bsd
 02-09-22 local.c: honor MAIL if its a regular file
 02-09-08 add spambody to catch mail filter warnings embedded in message bodies
 02-09-07 head.c: fix bug that retained mime boundary from previous message

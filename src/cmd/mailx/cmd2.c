@@ -171,6 +171,7 @@ save1(char* str, Dt_t** ignore, unsigned long flags)
 	register struct msg*	mp;
 	char*			file;
 	char*			disp;
+	char*			temp;
 	int			f;
 	FILE*			fp;
 	int			folder;
@@ -262,10 +263,11 @@ save1(char* str, Dt_t** ignore, unsigned long flags)
 		for (ip = state.msg.list; ip->m_index; ip++) {
 			mp = state.msg.list + ip->m_index - 1;
 			touchmsg(mp);
-			sprintf(state.path.temp, "%s/%d", file, mh.next);
-			if (fp = fileopen(state.path.temp, "MEw")) {
+			sfprintf(state.path.temp, "%s/%d", file, mh.next);
+			temp = sfstruse(state.path.temp);
+			if (fp = fileopen(temp, "MEw")) {
 				if (copy(mp, fp, ignore, NiL, 0) < 0)
-					note(SYSTEM, "%s", state.path.temp);
+					note(SYSTEM, "%s", temp);
 				fileclose(fp);
 				if (flags & MARK)
 					msgflags(mp, MSAVE, 0);
@@ -546,8 +548,8 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 	if (name == ap->name) {
 		cmd = 0;
 		if (state.var.attachments) {
-			sprintf(state.path.temp, "%s/%s", state.var.attachments, name);
-			name = expand(state.path.temp, 1);
+			sfprintf(state.path.temp, "%s/%s", state.var.attachments, name);
+			name = expand(sfstruse(state.path.temp), 1);
 		}
 		else
 			name = savestr(name);
@@ -560,31 +562,24 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 		else
 			s = ap->name;
 		if (!streq(name, ".")) {
-			sprintf(state.path.temp, "%s/%s", name, s);
-			s = state.path.temp;
+			sfprintf(state.path.temp, "%s/%s", name, s);
+			s = sfstruse(state.path.temp);
 		}
 		name = savestr(s);
 	}
 	if (!ap->code[0] && mimeview(state.part.mime, "encoding", name, ap->type, ap->opts))
-		strncpy(ap->code, ap->type, sizeof(ap->code) - 1);
+		strncopy(ap->code, ap->type, sizeof(ap->code));
 	if (ap->code[0] && !isdigit(ap->code[0])) {
-		s = strcopy(state.path.temp, "uudecode -h -x ");
-		s = strcopy(s, ap->code);
+		sfprintf(state.path.temp, "uudecode -h -x %s", ap->code);
 		if (!mimecmp("text", ap->type, NiL))
-			s = strcopy(s, " -t");
-		if (cmd) {
-			s = strcopy(s, " -o - | ");
-			s = strcopy(s, cmd);
-		}
-		else if (filestd(name, "w")) {
-			s = strcopy(s, " | ");
-			s = strcopy(s, state.var.pager);
-		}
-		else {
-			s = strcopy(s, " -o ");
-			s = strcopy(s, name);
-		}
-		s = state.path.temp;
+			sfprintf(state.path.temp, " -t");
+		if (cmd)
+			sfprintf(state.path.temp, " -o - | %s", cmd);
+		else if (filestd(name, "w"))
+			sfprintf(state.path.temp, " | %s", state.var.pager);
+		else
+			sfprintf(state.path.temp, " -o %s", name);
+		s = sfstruse(state.path.temp);
 		n = 1;
 	}
 	else if (cmd) {
@@ -761,7 +756,7 @@ split1(char* str, Dt_t** ignore, long num, char* dir, int verbose, int flag)
 	off_t			cc;
 	FILE*			fp;
 	char*			s;
-	char			buf[MAXPATHLEN];
+	char*			file;
 
 	s = dir;
 	if (!(dir = expand(dir, 1)) || !*dir || !isdir(dir)) {
@@ -772,18 +767,20 @@ split1(char* str, Dt_t** ignore, long num, char* dir, int verbose, int flag)
 		return 1;
 	for (ip = state.msg.list; ip->m_index; ip++) {
 		mp = state.msg.dot = state.msg.list + ip->m_index - 1;
-		sprintf(buf, "%s/%d", dir, num);
-		if (fp = fileopen(buf, "Ew")) {
+		sfprintf(state.path.buf, "%s/%d", dir, num);
+		file = sfstruse(state.path.buf);
+		if (fp = fileopen(file, "Ew")) {
 			if (copy(mp, fp, ignore, NiL, GMIME) < 0)
 				note(SYSTEM, "%s", dir);
 			else {
 				if (verbose)
-					note(PROMPT, "%s %ld %ld %ld", buf, num, (long)mp->m_lines, (long)mp->m_size);
+					note(PROMPT, "%s %ld %ld %ld", file, num, (long)mp->m_lines, (long)mp->m_size);
 				if (ap = state.part.in.head) {
 					do {
 						if (!(ap->flags & PART_body)) {
-							sprintf(buf, "%s/%d-%d", dir, num, ap->count);
-							if (!getatt(ap, buf, 0, &lc, &cc) && verbose)
+							sfprintf(state.path.buf, "%s/%d-%d", dir, num, ap->count);
+							file = sfstruse(state.path.buf);
+							if (!getatt(ap, file, 0, &lc, &cc) && verbose)
 								note(PROMPT, " %d-%d %s %s %ld %ld", num, ap->count, ap->name, ap->type, (long)lc, (long)cc);
 						}
 					} while (ap = ap->next);

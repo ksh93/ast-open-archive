@@ -47,7 +47,6 @@ typedef struct
 
 static char	buf[1024];
 static char	dat[1024];
-static char	tim[1024];
 
 static int
 acceptf(Css_t* css, Cssfd_t* fp, Csid_t* ip, char** av, Cssdisc_t* disc)
@@ -113,10 +112,7 @@ actionf(register Css_t* css, register Cssfd_t* fp, Cssdisc_t* disc)
 			break;
 		}
 		else
-		{
-			tmform(tim, *dat ? dat : "%I:%M:%S %p %Z", NiL);
-			n = sfsprintf(buf, sizeof(buf), "I [%s] server=%s version=%s %s=%s server.pid=%d pid=%d uid=%d gid=%d args=`%s'\n", tim, csname(css->state, 0), TST_VERSION, CS_HOST_LOCAL, csntoa(css->state, con->id.hid), getpid(), con->id.pid, con->id.uid, con->id.gid, con->args);
-		}
+			n = sfsprintf(buf, sizeof(buf), "I [%s] server=%s version=%s %s=%s server.pid=%d pid=%d uid=%d gid=%d args=`%s'\n", fmttime(*dat ? dat : "%K", time(NiL)), csname(css->state, 0), TST_VERSION, CS_HOST_LOCAL, csntoa(css->state, con->id.hid), getpid(), con->id.pid, con->id.uid, con->id.gid, con->args);
 		if (cswrite(css->state, fp->fd, buf, n) != n)
 			return -1;
 		return 1;

@@ -203,17 +203,7 @@ strtime(unsigned long t)
 	else if (t == OLDTIME)
 		return "really old";
 	else
-	{
-		time_t		tm = t;
-
-		static char	tms[3][64];
-		static int	tmx;
-
-		if (++tmx >= elementsof(tms))
-			tmx = 0;
-		tmform(tms[tmx], "%?%h %d %H:%M:%S %Y", &tm);
-		return tms[tmx];
-	}
+		return fmttime("%?%K", (time_t)t);
 }
 
 /*
@@ -353,11 +343,9 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		break;
 	case 't':
 	case 'T':
-		tm = strtol(s, NiL, 0);
-		if (txt)
-			tmform(value->s = tmpname, txt, tm == -1 ? (time_t*)0 : &tm);
-		else
-			value->s = strtime(tm);
+		if ((tm = strtol(s, NiL, 0)) == -1)
+			tm = CURTIME;
+		value->s = txt ? fmttime(txt, tm) : strtime(tm);
 		dp->fmt = 's';
 		dp->size = -1;
 		break;

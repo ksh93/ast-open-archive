@@ -48,7 +48,7 @@
 #if defined(__cplusplus)
 #define __INLINE__	inline
 #else
-#if defined(_WIN32)
+#if defined(_WIN32) || _WINIX
 #define __INLINE__	__inline
 #endif/*_WIN32*/
 #endif/*__cplusplus*/

@@ -25,9 +25,9 @@
 #
 # genlocal [options] [host ...]
 #
-# @(#)genlocal (AT&T Research) 2000-01-25
+# @(#)genlocal (AT&T Research) 2002-10-02
 #
-# NOTE: this only works for hosts the caller can reach by rsh/remsh
+# NOTE: this only works for hosts the caller can reach by rsh/ssh
 #
 
 case $RANDOM in
@@ -104,7 +104,7 @@ case $file in
 	fi
 	;;
 esac
-print -u2 "$0: warning: $rsh may hang on some hosts -- monitor the progress with the -v option or ps"
+print -u2 "$0: warning: $rsh may hang on some hosts -- monitor the progress with the -v option or ps $$"
 server=
 for host in $(egrep -v '^#' $file)
 do	case $server in
@@ -121,27 +121,27 @@ case $# in
 			ypcat hosts
 		} 2>/dev/null |
 		egrep "[^#].*[ 	]$hostname(\$|[. 	])" |
-		sed -e '1!d' -e 's/[0-9][0-9]*[ 	][ 	]*.*$//'
+		sed -e '1!d' -e 's/^[^ 	]*//' -e 's/[^.]*.//' -e 's/[ 	].*//'
 	)
 	set -- $(
 		{
 			print "$hostname"
 			egrep -v '^#' $file
 			ruptime | fgrep -v 'no hosts'
-			for i in /etc/resolv.conf /usr/etc/resolv.conf
-			do	if	test -f $i
-				then	echo "ls -t A $(sed -e '/^domain/!d' -e 's/.*[ ][ 	]*//' $i)" | nslookup | fgrep "$domain" | awk '{print $1}'
-					break
-				fi
-			done
 			{
+				for i in /etc/resolv.conf /usr/etc/resolv.conf
+				do	if	test -f $i
+					then	echo "ls -t A $(sed -e '/^domain/!d' -e 's/.*[ ][ 	]*//' $i)" | nslookup
+						break
+					fi
+				done
 				cat /etc/hosts
 				ypcat hosts
 			} |
-			fgrep "$domain" |
+			fgrep ".$domain" |
 			awk '{print $2}'
 		} 2>/dev/null |
-		sed -e 's/[. 	].*//' |
+		sed -e 's/[. 	].*//' -e '/^[a-zA-Z].*[a-zA-Z0-9]$/!d' |
 		sort -u
 	)
 	case $list in
@@ -167,15 +167,17 @@ do	case $host in
 	$hostname)
 		package host name type cpu rating
 		;;
-	*)	$rsh $host bin/package host name type cpu rating &
-		info=$!
-		{
-			sleep $timeout
-			kill -9 $info
-		} &
-		time=$!
-		wait $info
-		kill -9 $time
+	*)	if	ping -c 1 -w 4 $host >/dev/null 2>&1
+		then	$rsh $host bin/package host name type cpu rating &
+			info=$!
+			{
+				sleep $timeout
+				kill -9 $info
+			} &
+			time=$!
+			wait $info
+			kill -9 $time
+		fi
 		;;
 	esac 2>/dev/null
 done | while read host type cpu rating

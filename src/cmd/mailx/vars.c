@@ -139,8 +139,8 @@ varlist(int all)
 			}
 		}
 		else if (all) {
-			sprintf(state.path.temp, "no%s", vp->name);
-			printf("%16s\n", state.path.temp);
+			sfprintf(state.path.temp, "no%s", vp->name);
+			printf("%16s\n", sfstruse(state.path.temp));
 		}
 	return 0;
 }
@@ -229,7 +229,7 @@ varget(register const char* name)
 		name = (const char*)vp->help;
 	}
 	if (vp->flags & I) {
-		sprintf(state.number, "%ld", *((long*)vp->variable));
+		sfsprintf(state.number, sizeof(state.number), "%ld", *((long*)vp->variable));
 		return state.number;
 	}
 	return *vp->variable;
@@ -290,7 +290,7 @@ setheaders(struct var* vp, const char* value)
 
 	flags = GTO;
 	p = (char*)value;
-	while (b = wordnext(&p, state.path.temp))
+	while (b = wordnext(&p, state.path.path))
 		for (lp = state.hdrtab;; lp++) {
 			if (!(t = lp->name)) {
 				note(0, "\"%s %s\": unknown header field", vp->name, b);
@@ -462,8 +462,8 @@ void
 set_sendmail(struct var* vp, const char* value)
 {
 	if (value && !*value) {
-		sprintf(state.path.temp, "%s -oi", _PATH_SENDMAIL);
-		state.var.sendmail = varkeep(state.path.temp);
+		sfprintf(state.path.temp, "%s -oi", _PATH_SENDMAIL);
+		state.var.sendmail = varkeep(sfstruse(state.path.temp));
 	}
 }
 

@@ -199,3 +199,17 @@ strtold  "+NaN12-34abc.def" "" Inf OK
 
 strtod   "-NaN12-34abc.def" "" -Inf OK
 strtold  "-NaN12-34abc.def" "" -Inf OK'
+
+TEST 05 'simple, right?'
+	EXEC	1 12 1.2 1.2.3
+		OUTPUT - $'strtod   "1" "" 1.000000000000000e+00 OK
+strtold  "1" "" 1.0000000000000000000000000000000e+00 OK
+
+strtod   "12" "" 1.200000000000000e+01 OK
+strtold  "12" "" 1.2000000000000000000000000000000e+01 OK
+
+strtod   "1.2" "" 1.200000000000000e+00 OK
+strtold  "1.2" "" 1.2000000000000000000000000000000e+00 OK
+
+strtod   "1.2.3" ".3" 1.200000000000000e+00 OK
+strtold  "1.2.3" ".3" 1.2000000000000000000000000000000e+00 OK'

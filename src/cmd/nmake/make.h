@@ -57,7 +57,7 @@
 #define SALT		'#'		/* preprocessor control char	*/
 #define VIEWOFFSET	'0'		/* char offset for view==0	*/
 
-#if _WIN32
+#if _WINIX
 #define FILE_SPACE	'\001'		/* file name space		*/
 #else
 #define FILE_SPACE	'?'		/* file name space		*/

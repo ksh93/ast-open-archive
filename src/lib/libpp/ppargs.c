@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2002-03-11 $\n]"
+"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2002-10-01 $\n]"
 USAGE_LICENSE
 "[+NAME?cpp - C language preprocessor]"
 "[+DESCRIPTION?\bcpp\b is the preprocessor for all C language dialects. It is"
@@ -102,6 +102,11 @@ USAGE_LICENSE
 "		compatibility warnings disabled.]"
 "	[+-I-I\aheader\a, \bpp::ignore\b \aheader\a?Add \aheader\a to the"
 "		list of ignored headers.]"
+"	[+-I-M\afile\a?\afile\a contains a sequence of \aheader\a"
+"		[= \"\amap\a\" ]] lines, where \aheader\a is either <\aname\a>"
+"		or \"\aname\a\", and \"\amap\a\" is an explicit binding"
+"		for \aheader\a. \aheader\a is ignored if = \"\amap\a\" is"
+"		omitted.]"
 "	[+-I-R\afile\a?Include \afile\a but do not emit text or line syncs.]"
 "	[+-I-S\adirectory\a?]"
 "	[+-I-T\afile\a?Include \afile\a and emit text to the output file.]"
@@ -322,6 +327,9 @@ ppargs(char** argv, int last)
 					ppop(PP_HOSTDIR, s, n);
 					break;
 				case 'I':
+					ppop(PP_IGNORE, s);
+					break;
+				case 'M':
 					ppop(PP_IGNORELIST, s);
 					break;
 				case 'R':

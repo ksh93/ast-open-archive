@@ -98,16 +98,16 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 			state.part.in.multi = 1;
 		else if (!*ap->type || !strchr(ap->type, '/') || cp->index == CONTENT_type && (ap->flags & PART_disposition)) {
 			ap->flags &= ~PART_disposition;
-			if (size >= sizeof(ap->type))
-				size = sizeof(ap->type) - 1;
-			strncpy(ap->type, data, size);
+			if (size > sizeof(ap->type))
+				size = sizeof(ap->type);
+			strncopy(ap->type, data, size);
 			strlower(ap->type);
 			s = data + size;
 			if (!(e = strchr(s, '\n')))
 				e = s + strlen(s);
-			if ((size = (e - s)) >= sizeof(ap->opts))
-				size = sizeof(ap->opts) - 1;
-			strncpy(ap->opts, s, size);
+			if ((size = (e - s)) > sizeof(ap->opts))
+				size = sizeof(ap->opts);
+			strncopy(ap->opts, s, size);
 			ap->opts[size] = 0;
 			if (!mimecmp("text/plain", data, NiL) || !mimecmp("text/enriched", data, NiL))
 				ap->flags |= PART_text;
@@ -118,9 +118,9 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 		}
 		break;
 	case CONTENT_encoding:
-		if (size >= sizeof(ap->code))
-			size = sizeof(ap->code) - 1;
-		strncpy(ap->code, data, size);
+		if (size > sizeof(ap->code))
+			size = sizeof(ap->code);
+		strncopy(ap->code, data, size);
 		strlower(ap->code);
 		break;
 	case CONTENT_name:
@@ -128,9 +128,9 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 			break;
 		/*FALLTHROUGH*/
 	case CONTENT_filename:
-		if (size >= sizeof(ap->name))
-			size = sizeof(ap->name) - 1;
-		strncpy(ap->name, data, size);
+		if (size > sizeof(ap->name))
+			size = sizeof(ap->name);
+		strncopy(ap->name, data, size);
 		break;
 	}
 	return 0;
@@ -268,7 +268,7 @@ attach(register struct part* ap)
 	if (!(ap->flags & PART_body))
 		ap->count = ++state.part.in.count;
 	if (!ap->name[0])
-		sprintf(ap->name, "%d.att", ap->count);
+		sfsprintf(ap->name, sizeof(ap->name), "%d.att", ap->count);
 	else {
 		s = t = ap->name;
 		for (p = 0; c = *s++; p = c) {
@@ -630,12 +630,14 @@ static char*
 grabtype(struct parse* pp, register struct msg* mp, unsigned long type)
 {
 	register char*	s;
+	register char*	e;
 	register char*	t;
 	register FILE*	fp;
 	int		i;
 	int		first = 1;
 	char		namebuf[LINESIZE];
 
+	e = namebuf + sizeof(namebuf);
 	for (i = 0; i < elementsof(fields); i++)
 		if ((fields[i].type & type) &&
 		    (s = grabname(pp, mp, (char*)fields[i].name, type)) &&
@@ -678,11 +680,13 @@ grabtype(struct parse* pp, register struct msg* mp, unsigned long type)
 					s++;
 					if (first) {
 						first = 0;
-						s = strcopy(namebuf, s);
+						s = strncopy(namebuf, s, e - namebuf);
 					}
-					else
-						s = strcopy(strrchr(namebuf, '!') + 1, s);
-					strcpy(s, "!");
+					else if (t = strrchr(namebuf, '!')) {
+						t++;
+						s = strncopy(t, s, e - t);
+						strncopy(s, "!", e - s);
+					}
 					goto again;
 				}
 				s++;
@@ -706,7 +710,7 @@ grab(register struct msg* mp, unsigned long type, char* name)
 	if (!name)
 		s = grabtype(&pp, mp, type);
 	else if ((s = grabname(&pp, mp, name, type)) && (type & (GCOMPARE|GDISPLAY)))
-		s = normalize(s, NiL, type);
+		s = normalize(s, type, NiL, 0);
 	return s;
 }
 
@@ -754,37 +758,39 @@ wordnext(char** p, char* b)
  * structure.  Actually, it scans.
  */
 void
-parse(struct msg* mp, char* line, register struct headline* hl, char* pbuf)
+parse(struct msg* mp, char* line, register struct headline* hl, char* pbuf, size_t psize)
 {
 	register char*	s;
 	register char*	t;
+	register char*	e;
 	struct parse	pp;
 
 	hl->l_from = 0;
 	hl->l_info = 0;
 	hl->l_date = 0;
 	t = pbuf;
+	e = t + psize;
 	if (mp && state.folder == FMH && strncmp(line, "From ", 5)) {
 		hl->l_from = grabname(&pp, mp, "From", 0);
 		hl->l_date = grabname(&pp, mp, "Date", 0);
 	}
 	else if (wordnext(&line, pp.buf) && (s = wordnext(&line, pp.buf))) {
 		if (state.var.news) {
-			t = strcopy(hl->l_info = t, s);
+			t = strncopy(hl->l_info = t, s, e - t);
 			if (mp) {
 				hl->l_from = grabname(&pp, mp, "From", 0);
 				hl->l_date = grabname(&pp, mp, "Date", 0);
 			}
 		}
 		else {
-			t = strcopy(hl->l_from = t, s) + 1;
+			t = strncopy(hl->l_from = t, s, e - t - 1) + 1;
 			if (*(s = line)) {
 				if (s[0] == 't' && s[1] == 't' && s[2] == 'y') {
-					t = strcopy(hl->l_info = t, s);
+					t = strncopy(hl->l_info = t, s, e - t);
 					s = wordnext(&line, pp.buf);
 				}
 				if (*(s = line))
-					t = strcopy(hl->l_date = t, s);
+					t = strncopy(hl->l_date = t, s, e - t);
 			}
 		}
 	}
@@ -814,7 +820,7 @@ ishead(char* linebuf, int inhead)
 	if (*cp++ != 'F' || *cp++ != 'r' || *cp++ != 'o' || *cp++ != 'm' ||
 	    *cp++ != ' ')
 		return 0;
-	parse(NiL, linebuf, &hl, parbuf);
+	parse(NiL, linebuf, &hl, parbuf, sizeof(parbuf));
 	if (!hl.l_from || !hl.l_date || !isdate(hl.l_date)) {
 		note(DEBUG, "\"%s\": not a header: no from or date field", linebuf);
 		return 0;

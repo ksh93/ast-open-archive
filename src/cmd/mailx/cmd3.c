@@ -12,7 +12,7 @@
  * last issued command where possible.
  */
 static int
-bangexp(char* str)
+bangexp(char* str, size_t size)
 {
 	register char*	s;
 	register char*	t;
@@ -49,8 +49,8 @@ bangexp(char* str)
 	*t = 0;
 	if (changed)
 		note(0, "!%s", buf);
-	strcpy(str, buf);
-	strncpy(state.last.bang, buf, sizeof(state.last.bang) - 1);
+	strncopy(str, buf, size);
+	strncopy(state.last.bang, buf, sizeof(state.last.bang) - 1);
 	return 0;
 }
 
@@ -64,8 +64,8 @@ shell(char* str)
 	sig_t	saveint = signal(SIGINT, SIG_IGN);
 	char	cmd[LINESIZE];
 
-	strcpy(cmd, str);
-	if (bangexp(cmd) < 0)
+	strncopy(cmd, str, sizeof(cmd));
+	if (bangexp(cmd, sizeof(cmd)) < 0)
 		return 1;
 	if (*cmd)
 		run_command(state.var.shell, 0, -1, -1, "-c", cmd, NiL);
@@ -183,7 +183,10 @@ helpvar(FILE* fp, register const struct var* vp)
 	char*	help;
 
 	if (vp->flags & A)
-		sprintf(help = state.path.temp, T("Equivalent to %s."), vp->help);
+	{
+		sfprintf(state.path.temp, T("Equivalent to %s."), vp->help);
+		help = sfstruse(state.path.temp);
+	}
 	else
 		help = (char*)vp->help;
 	margin(fp, vp->name, help, 14, 2, 0, vp);
@@ -295,8 +298,8 @@ cd(char** arglist)
 	}
 	if (chdir(cp) < 0) {
 #if _PACKAGE_ast
-		if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.path.temp, state.var.cdpath, cp, NiL, 0)) {
-			cp = state.path.temp;
+		if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.path.path, state.var.cdpath, cp, NiL, 0)) {
+			cp = state.path.path;
 			show = 1;
 		}
 		else
@@ -311,7 +314,7 @@ cd(char** arglist)
 	state.var.oldpwd = state.var.pwd;
 	state.var.pwd = tp;
 	if (!getcwd(state.var.pwd, PATHSIZE))
-		strncpy(state.var.pwd, cp, PATHSIZE);
+		strncopy(state.var.pwd, cp, PATHSIZE);
 	if (show)
 		printf("%s\n", state.var.pwd);
 	return 0;
@@ -874,16 +877,13 @@ cmdif(char** argv)
 	state.cond = n ? state.mode : -state.mode;
 	return 0;
  bad:
-	s = strcopy(state.path.temp, s);
+	sfprintf(state.path.temp, "%s", s);
 	if (x) {
-		*s++ = ' ';
-		s = strcopy(s, x);
-		if (t) {
-			*s++ = ' ';
-			strcpy(s, t);
-		}
+		sfprintf(state.path.temp, " %s", x);
+		if (t)
+			sfprintf(state.path.temp, " %s", t);
 	}
-	note(0, "\"%s\": unknown %s condition", state.path.temp, state.cmd->c_name);
+	note(0, "\"%s\": unknown %s condition", sfstruse(state.path.temp), state.cmd->c_name);
 	return 1;
 }
 

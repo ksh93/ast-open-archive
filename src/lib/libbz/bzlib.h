@@ -101,6 +101,31 @@ typedef
 
 #if _PACKAGE_ast
 #include <ast_std.h>
+#else
+#if !defined(_WINIX) && (_UWIN || __CYGWIN__ || __EMX__)
+#define _WINIX		1
+#endif
+#endif
+
+/*---------------------------------------------*/
+/*--
+  Generic 32-bit Unix.
+  Also works on 64-bit Unix boxes.
+--*/
+#if !_WIN32 || _WINIX
+#define BZ_UNIX      1
+#endif
+
+/*--
+  Win32, as seen by Jacob Navia's excellent
+  port of (Chris Fraser & David Hanson)'s excellent
+  lcc compiler.
+--*/
+#if _WIN32 && !_WINIX
+#define BZ_LCCWIN32 1
+#define BZ_UNIX 0
+#else
+#define BZ_LCCWIN32  0
 #endif
 
 #include <stdio.h>
@@ -112,7 +137,7 @@ typedef
 
 #else
 
-#if defined(_WIN32) && !defined(_UWIN) && !defined(__CYGWIN__)
+#if _WIN32 && !_WINIX
 #   include <windows.h>
 #   ifdef small
       /* windows.h define small to char */

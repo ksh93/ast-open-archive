@@ -30,7 +30,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2002-09-24 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2002-09-30 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -459,6 +459,7 @@ main(int argc, char** argv)
 	Sflong_t		c;
 	Sflong_t		m;
 	Sflong_t		n;
+	Sflong_t		r;
 	Sflong_t		z;
 	struct stat		st;
 	Sfdisc_t		disc;
@@ -807,7 +808,10 @@ main(int argc, char** argv)
 		if (!state.in.special)
 			f &= ~NOERROR;
 		if (state.count.value.number)
+		{
 			z = state.count.value.number * c;
+			r = 0;
+		}
 		else
 			z = 0;
 		for (;;)
@@ -816,7 +820,7 @@ main(int argc, char** argv)
 			m = sfvalue(state.in.fp);
 			if (state.count.value.number)
 			{
-				if (!z)
+				if (!z || r++ >= state.count.value.number)
 					goto done;
 				if (m > z)
 				{

@@ -98,6 +98,8 @@ main(int argc, char** argv)
 	 */
 	memset(&head, 0, sizeof(head));
 	(op = &options)->next = 0;
+	if (!(state.path.buf = sfstropen()) || !(state.path.move = sfstropen()) || !(state.path.part = sfstropen()) || !(state.path.temp = sfstropen()))
+		note(FATAL, "out of space");
 	varinit();
 	/*
 	 * Now, determine how we are being used.

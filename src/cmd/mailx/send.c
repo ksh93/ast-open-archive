@@ -29,19 +29,14 @@ part(register struct parse* pp, FILE* op, const char* encoding, off_t size, char
 
 	ip = pp->fp;
 	if (*encoding && !isdigit(*encoding)) {
-		register char*	s;
 		register FILE*	tp;
 
 		if (!(tp = fileopen(state.tmp.more, "Ew")))
 			return -1;
 		filecopy(NiL, ip, NiL, tp, NiL, size, NiL, NiL, 0);
 		fileclose(tp);
-		s = strcopy(state.path.temp, "uudecode -h -t -o - -x ");
-		s = strcopy(s, encoding);
-		*s++ = ' ';
-		strcpy(s, state.tmp.more);
-		s = state.path.temp;
-		if (!(ip = pipeopen(s, "r")))
+		sfprintf(state.path.temp, "uudecode -h -t -o - -x %s %s", encoding, state.tmp.more);
+		if (!(ip = pipeopen(sfstruse(state.path.temp), "r")))
 			goto bad;
 	}
 	if (prefix) {

@@ -57,6 +57,8 @@ edstop(void)
 	register struct msg*	mp;
 	int			update;
 	char*			s;
+	char*			temp;
+	char*			move;
 	FILE*			obuf;
 	FILE*			ibuf;
 	FILE*			news;
@@ -93,21 +95,23 @@ edstop(void)
 		mh.dot = state.msg.dot - state.msg.list + 1;
 		for (mp = state.msg.list; mp < state.msg.list + state.msg.count; mp++) {
 			if ((mp->m_flag & update) && !(mp->m_flag & MNONE)) {
-				sprintf(state.path.temp, "%s/%d", state.path.mail, mp - state.msg.list + 1);
+				sfprintf(state.path.temp, "%s/%d", state.path.mail, mp - state.msg.list + 1);
+				temp = sfstruse(state.path.temp);
 				if (mp->m_flag & (MDELETE|MSAVE))
-					rm(state.path.temp);
+					rm(temp);
 				else {
-					sprintf(state.path.move, "%s/%d~", state.path.mail, mp - state.msg.list + 1);
-					if (obuf = fileopen(state.path.move, "Ew")) {
+					sfprintf(state.path.move, "%s/%d~", state.path.mail, mp - state.msg.list + 1);
+					move = sfstruse(state.path.move);
+					if (obuf = fileopen(move, "Ew")) {
 						if (copy(mp, obuf, NiL, NiL, 0) < 0) {
-							note(SYSTEM, "%s", state.path.temp);
-							rm(state.path.move);
+							note(SYSTEM, "%s", temp);
+							rm(move);
 							relsesigs();
 							reset(0);
 						}
-						rm(state.path.temp);
-						if (rename(state.path.move, state.path.temp))
-							note(SYSTEM, "%s", state.path.temp);
+						rm(temp);
+						if (rename(move, temp))
+							note(SYSTEM, "%s", temp);
 						fileclose(obuf);
 					}
 				}
@@ -120,14 +124,14 @@ edstop(void)
 	else {
 		ibuf = 0;
 		if (stat(state.path.mail, &st) >= 0 && st.st_size > state.mailsize) {
-			filetemp(state.path.temp, 'B', 0);
-			if (!(obuf = fileopen(state.path.temp, "Ew"))) {
+			filetemp(temp, 'B', 0);
+			if (!(obuf = fileopen(temp, "Ew"))) {
 				relsesigs();
 				reset(0);
 			}
 			if (!(ibuf = fileopen(state.path.mail, "Er"))) {
 				fileclose(obuf);
-				rm(state.path.temp);
+				rm(temp);
 				relsesigs();
 				reset(0);
 			}
@@ -135,12 +139,12 @@ edstop(void)
 			filecopy(NiL, ibuf, NiL, obuf, NiL, (off_t)0, NiL, NiL, 0);
 			fileclose(ibuf);
 			fileclose(obuf);
-			if (!(ibuf = fileopen(state.path.temp, "Er"))) {
-				rm(state.path.temp);
+			if (!(ibuf = fileopen(temp, "Er"))) {
+				rm(temp);
 				relsesigs();
 				reset(0);
 			}
-			rm(state.path.temp);
+			rm(temp);
 		}
 		if (!state.incorporating)
 			note(PROMPT, "\"%s\" ", state.path.mail);

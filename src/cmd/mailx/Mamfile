@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -115,6 +115,10 @@ prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/cdt.h
 prev ../../../include/ast/limits.h implicit
+make ../../../include/ast/sfstr.h implicit
+prev ../../../include/ast/sfio.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/sfstr.h dontcare
 make ../../../include/ast/wait.h implicit
 make ../../../include/ast/ast_wait.h implicit
 done ../../../include/ast/ast_wait.h dontcare
@@ -303,10 +307,7 @@ prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/ast_std.h implicit
 done ../../../include/ast/vmalloc.h dontcare
 prev ../../../include/ast/tm.h implicit
-make ../../../include/ast/sfstr.h implicit
-prev ../../../include/ast/sfio.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/sfstr.h dontcare
+prev ../../../include/ast/sfstr.h implicit
 make ../../../include/ast/css.h implicit
 make ../../../include/ast/cs.h implicit
 prev ../../../include/ast/times.h implicit

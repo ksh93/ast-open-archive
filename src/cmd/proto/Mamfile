@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -183,6 +183,10 @@ make alloc.h implicit
 done alloc.h dontcare virtual
 make windows.h implicit
 done windows.h dontcare virtual
+make ../../../include/ast/ast_windows.h implicit
+prev windows.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_windows.h dontcare
 make io.h implicit
 done io.h dontcare virtual
 make direct.h implicit

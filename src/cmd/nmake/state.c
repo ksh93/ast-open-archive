@@ -195,7 +195,8 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 
 /*
  * return a pointer to the state rule of var qualified by r
- * force causes the state rule to be created
+ * force>0 causes the state rule to be created
+ * force<0 prevents a state bind
  */
 
 struct rule*
@@ -276,10 +277,8 @@ staterule(int op, register struct rule* r, char* var, int force)
 	{
 		if ((r->dynamic & (D_member|D_membertoo)) && (rul = strrchr(r->name, '/')))
 			rul++;
-		else if (r->uname)
-			rul = r->uname;
 		else
-			rul = r->name;
+			rul = unbound(r);
 		sfprintf(internal.nam, "(%s)%s", var, rul);
 		nam = sfstruse(internal.nam);
 		if (s = getrule(nam))

@@ -1,3 +1,5 @@
+02-10-02 pss.c: move <ast_windows.h> to first #if __CYGWIN__
+02-09-30 dd.c: honor both count*bs *and* count
 02-09-24 dd.c: fix partial record computations and printf format
 02-09-11 pss.c: _WIN32 SF_ERROR <windows.h> workaround
 	 touch.c: drop TM_DATESTYLE (snarfed too much from date.c)

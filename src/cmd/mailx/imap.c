@@ -1666,9 +1666,9 @@ imap_setptr(char* name, int isedit)
 
 	if (streq(name, "@"))
 		name = "@inbox";
-	strcpy(state.path.prev, state.path.mail);
+	strncopy(state.path.prev, state.path.mail, sizeof(state.path.prev));
 	if (name != state.path.mail)
-		strcpy(state.path.mail, name);
+		strncopy(state.path.mail, name, sizeof(state.path.mail));
 	if (*name == '@')
 		name++;
 	else if (strneq(name, "imap://", 7))
@@ -2062,8 +2062,8 @@ imap_getatt(Msg_t* mp, register Imappart_t* pp, register char* name, unsigned lo
 	{
 		if (state.var.attachments && name == pp->name)
 		{
-			sprintf(state.path.temp, "%s/%s", state.var.attachments, name);
-			name = state.path.temp;
+			sfprintf(state.path.temp, "%s/%s", state.var.attachments, name);
+			name = sfstruse(state.path.temp);
 		}
 		if (!(name = expand(name, 1)))
 			return 1;
@@ -2072,26 +2072,16 @@ imap_getatt(Msg_t* mp, register Imappart_t* pp, register char* name, unsigned lo
 		pp->encoding = pp->type;
 	if (pp->encoding && !isdigit(pp->encoding[0]))
 	{
-		s = strcopy(state.path.temp, "uudecode -h -x ");
-		s = strcopy(s, pp->encoding);
+		sfprintf(state.path.temp, "uudecode -h -x %s", pp->encoding);
 		if (!mimecmp("text", pp->type, NiL))
-			s = strcopy(s, " -t");
+			sfprintf(state.path.temp, " -t");
 		if (cmd)
-		{
-			s = strcopy(s, " -o - | ");
-			s = strcopy(s, cmd);
-		}
+			sfprintf(state.path.temp, " -o - | %s", cmd);
 		else if (filestd(name, "w"))
-		{
-			s = strcopy(s, " | ");
-			s = strcopy(s, state.var.pager);
-		}
+			sfprintf(state.path.temp, " | %s", state.var.pager);
 		else
-		{
-			s = strcopy(s, " -o ");
-			s = strcopy(s, name);
-		}
-		s = state.path.temp;
+			sfprintf(state.path.temp, " -o %s", name);
+		s = sfstruse(state.path.temp);
 		n = 1;
 	}
 	else if (cmd)

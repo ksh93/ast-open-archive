@@ -16,7 +16,10 @@
 #ifndef _TKPORT
 #define _TKPORT
 
-#if !defined(_UWIN) && !defined(__CYGWIN__) && (defined(__WIN32__) || defined(_WIN32) || defined(WIN32))
+#if !defined(_WINIX) && (_UWIN || __CYGWIN__ || __EMX__)
+#define _WINIX		1
+#endif
+#if !_WINIX && (defined(__WIN32__) || defined(_WIN32) || defined(WIN32))
 #define	WIN_TCL		1
 #endif
 

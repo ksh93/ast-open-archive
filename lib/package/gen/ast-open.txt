@@ -75,7 +75,18 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-02-09-14  --- Release ksh93n  ---
+02-09-30  --- Release ksh93n  ---
+02-09-30  The maximum indexed array size was increased to 16Megs.
+02-09-30  A bug which could cause a core dump when changing attributes
+	  of associative array has been fixed.
+02-09-30  A bug in which exporting an array variable would not export the
+	  0-th element has been fixed.
+02-09-30  A bug in which an array assignment of the form a=($a ...) would unset
+	  'a' before the right hand side was evaluated has been fixed.
+02-09-27  A bug in which the error message for ${var?message} when var was
+	  null or unset did not contain the variable name var has been fixed.
+02-09-27  A bug in which closing file descripts 0 through 2 could
+	  cause a subsequent here document to fail has been fixed. 
 02-09-14  A bug in whence which occurs when the specified name contained
 	  a / has been fixed.
 02-09-14  A bug in the parser for strings of the form name$((expr))=value
@@ -1264,6 +1275,7 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+02-10-04 strtof.tst: add simple cases
 02-09-15 sfio/tscanf.c: add NaNS test
 02-09-05 opt.tst: add .fp 5 CW for *roff tests
 02-08-21 strelapsed.tst,strelapsed.c: add
@@ -1532,6 +1544,7 @@ All recorded changes follow.
 
 :::::::: cs ::::::::
 
+02-10-02 tst.c: tmform() => fmttime()
 01-01-01 vcs_src/*: drop old notices, fix signal handler prototype
 00-05-09 mbb: add (message bulletin board service)
 99-09-22 cs: update for CS_MNT_TAIL
@@ -1563,6 +1576,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+02-10-02 state.c: (-Q0x01000000) $(>) use min(r->time,state(r)->time)
+	 misc.c: tmform() => fmttime(); %K default time format
 02-09-22 Makerules.mk: drop ${mam_cc_STATIC} for +l binding
 	 expand.c: fix mam $(FOO|BAR) => ${mam_cc_FOO-${mam_cc_BAR}} conversion
 02-09-11 make.probe,probe.win32: move to INIT src to share with mamprobe
@@ -4305,6 +4320,7 @@ End:
 
 :::::::: mailx ::::::::
 
+02-10-01 mailx: fix ancient buffer overflows by comitting to ast -- bye bsd
 02-09-22 local.c: honor MAIL if its a regular file
 02-09-08 add spambody to catch mail filter warnings embedded in message bodies
 02-09-07 head.c: fix bug that retained mime boundary from previous message
@@ -4617,6 +4633,8 @@ End:
 
 :::::::: std ::::::::
 
+02-10-02 pss.c: move <ast_windows.h> to first #if __CYGWIN__
+02-09-30 dd.c: honor both count*bs *and* count
 02-09-24 dd.c: fix partial record computations and printf format
 02-09-11 pss.c: _WIN32 SF_ERROR <windows.h> workaround
 	 touch.c: drop TM_DATESTYLE (snarfed too much from date.c)
@@ -4894,6 +4912,13 @@ End:
 
 :::::::: libast ::::::::
 
+02-10-04 sfio/sfstrtof.h: S2F_static <0:export =0:private >0:static
+02-10-02 features/common: don't define _WIN32; define _WINIX => unix on windows
+	 features/tty: finally stomp the bsd _POSIX_VDISABLE redefinition
+	 misc/fastfind.c: add more specific findwrite() error messages
+	 comp/omitted.c: fix cygwin utime() to update st_ctime
+	 comp/strtol.c,strtoul.c: __CYGWIN__ static link workaround XXX
+	 string/fmtls.c,fmttime.c: tmform() => tmfmt()
 02-09-22 port/astconf.c: return values in fmtbuf() buffer instead of stack
 	 port/mnt.c: don't set MNT_REMOTE for win32 ?:\* paths
 	 sfio/sfvscanf.c: _sfdscan() is library global (not static)
@@ -5812,6 +5837,8 @@ End:
 
 :::::::: libcmd ::::::::
 
+02-10-02 date.c: tmform() => tmfmt()
+02-09-30 date.c,uname.c: change execv() calls to procrun(): exec|exit => bad
 02-09-06 wclib.c: fix 1 char-at-a-time miscount bug
 02-08-19 chgrp.c: convert to use <cdt.h>
 02-07-23 join.c: fix comm snarf typo
@@ -5948,6 +5975,7 @@ End:
 
 :::::::: libexpr ::::::::
 
+02-10-02 exeval.c: tmform() => fmttime(), static nmbuf[] => fmtbuf()
 02-09-11 expr.h: move exbuiltin[] to private exlib.h
 99-09-22 exparse.y,exeval.c: add for(ID[DYNAMIC])
 	 exparse.y: ref[i].ref
@@ -6075,6 +6103,8 @@ End:
 
 :::::::: libcs ::::::::
 
+02-10-02 features/lib,genlocal.sh: add ssh, pid to hang warning
+	 msglist.c: tmform() => fmttime()
 01-12-12 cssfd: CS_POLL_CLOSE now close()'s if not dropped -- double duh
 	 csstat: change down test to avoid unsigned long overflow
 01-10-31 cssend,csrecv: use msg_accrights over msg_control
@@ -6149,6 +6179,7 @@ End:
 
 :::::::: libpp ::::::::
 
+02-10-01 ppop.c,ppargs.c: -I-I => -I-M with proper docs; -I-I for PP_IGNORE
 02-09-21 pp.probe: add pp:nocatliteral test
 02-09-10 pp.tab: add pp:passthrough to match -D-P docs
 02-08-30 probe.win32: fix for borland cc -E

@@ -55,12 +55,12 @@ static const char lib[] = "std:pss";
 #include <vmalloc.h>
 
 #if __CYGWIN__
+
+#include <ast_windows.h>
+
 #undef	dev_t
 #define dev_t		int
-#endif
 
-#if _WIN32
-#undef	SF_ERROR
 #endif
 
 #include <pss.h>
@@ -78,7 +78,6 @@ typedef struct Tty_s			/* tty hash			*/
 
 #if __CYGWIN__
 
-#include <windows.h>
 #include <sys/cygwin.h>
 
 #ifndef PR_HZ

@@ -57,7 +57,7 @@
 #define DEBUGSOURCE(n,d,p)
 #endif
 
-#if _WIN32
+#if _WINIX
 
 /*
  * we have a system in which some directories preserve
@@ -158,7 +158,7 @@ inithash(void)
 {
 	table.ar	= hashalloc(NiL, HASH_name, "archives", 0);
 	table.bound	= hashalloc(table.ar, HASH_name, "bound-directories", 0);
-#if _WIN32
+#if _WINIX
 	table.file	= hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_compare, file_compare, HASH_hash, file_hash, HASH_name, "files", 0);
 	table.oldvalue	= hashalloc(NiL, HASH_name, "old-values", 0);
 	table.rule	= hashalloc(NiL, HASH_compare, rule_compare, HASH_hash, rule_hash, HASH_name, "atoms", 0);
@@ -228,7 +228,7 @@ unique(register struct rule* r)
 	d->time = r->time = st.st_mtime;
 	d->directory = S_ISDIR(st.st_mode) != 0;
 	putdir(0, d);
-#if _WIN32
+#if _WINIX
 	d->ignorecase = d->directory;
 #endif
 	return d;
@@ -279,7 +279,7 @@ addfile(struct dir* d, char* name, unsigned long date)
 	f->dir = d;
 	f->time = date;
 	putfile(0, f);
-#if _WIN32
+#if _WINIX
 	if (!d->archive && (s = strchr(name, '.')))
 	{
 		s++;
@@ -907,7 +907,7 @@ bindfile(register struct rule* r, char* name, int flags)
 		 * at this point name!=r->name is possible
 		 */
 
-#if _WIN32
+#if _WINIX
 		if (*name == '/' || isalpha(*name) && *(name + 1) == ':' && (*(name + 2) == '/' || *(name + 2) == '\\'))
 #else
 		if (*name == '/')

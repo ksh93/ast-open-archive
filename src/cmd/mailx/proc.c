@@ -157,17 +157,20 @@ filetemp(char* buf, int type, int fd)
 {
 	register char*	s;
 	register char*	b;
+	register char*	e;
 	FILE*		fp = 0;
 
 	if (!(b = buf)) {
 		if (fd <= 0)
 			return 0;
-		b = state.path.temp;
+		b = state.path.path;
 	}
-	s = strcopy(b, state.tmp.dir);
-	s = strcopy(s, "Mail");
-	*s++ = type;
-	strcpy(s, "XXXXXX");
+	e = b + PATHSIZE;
+	s = strncopy(b, state.tmp.dir, e - b);
+	s = strncopy(s, "Mail", e - s);
+	if (s < e)
+		*s++ = type;
+	strncopy(s, "XXXXXX", e - s);
 	if (fd) {
 		fd = mkstemp(b);
 		if (!buf)

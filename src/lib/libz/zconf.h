@@ -9,7 +9,11 @@
 #define _ZCONF_H
 
 #if _PACKAGE_ast
-#include <ast_common.h>	/* for __IMPORT__ and __EXPORT__ */
+#include <ast_common.h>	/* for { _WINIX __IMPORT__ __EXPORT__ } */
+#else
+#if !defined(_WINIX) && (_UWIN || __CYGWIN__ || __EMX__)
+#define _WINIX		1
+#endif
 #endif
 
 #if _BLD_z && defined(__EXPORT__)
@@ -59,10 +63,10 @@
 #  define voidp		z_voidp
 #endif
 
-#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && !defined(_UWIN) && !defined(__CYGWIN__)
+#if (defined(_WIN32) || defined(__WIN32__)) && !_WINIX
 #  define WIN32
 #endif
-#if defined(__GNUC__) || defined(WIN32) || defined(__386__) || defined(i386) || defined(_WIN32) || defined(_UWIN) || defined(__CYGWIN__)
+#if defined(__GNUC__) || defined(WIN32) || defined(__386__) || defined(i386) || defined(_WIN32) || _WINIX
 #  ifndef __32BIT__
 #    define __32BIT__
 #  endif

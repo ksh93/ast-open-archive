@@ -55,7 +55,6 @@ typedef struct
 
 static char	buf[1024];
 static char	dat[1024];
-static char	tim[1024];
 
 static void*
 svc_init(void* handle, int maxfd)
@@ -120,10 +119,7 @@ svc_read(void* handle, int fd)
 		break;
 	}
 	else
-	{
-		tmform(tim, *dat ? dat : "%I:%M:%S %p %Z", NiL);
-		n = sfsprintf(buf, sizeof(buf), "I [%s] server=%s version=%s %s=%s server.pid=%d pid=%d uid=%d gid=%d clone=%d args=`%s'\n", tim, csname(0), TST_VERSION, CS_HOST_LOCAL, csntoa(state->id[fd].id.hid), getpid(), state->id[fd].id.pid, state->id[fd].id.uid, state->id[fd].id.gid, state->id[fd].clone, state->id[fd].args);
-	}
+		n = sfsprintf(buf, sizeof(buf), "I [%s] server=%s version=%s %s=%s server.pid=%d pid=%d uid=%d gid=%d clone=%d args=`%s'\n", fmttime(*dat ? dat : "%K", time(NiL)), csname(0), TST_VERSION, CS_HOST_LOCAL, csntoa(state->id[fd].id.hid), getpid(), state->id[fd].id.pid, state->id[fd].id.uid, state->id[fd].id.gid, state->id[fd].clone, state->id[fd].args);
 	if (cswrite(fd, buf, n) != n) goto drop;
 	return 0;
  drop:

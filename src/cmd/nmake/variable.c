@@ -144,6 +144,7 @@ getval(register char* s, int op)
 	int			tokens;
 	int			pop;
 	int			sep;
+	unsigned long		e;
 	char**			ap;
 	char*			arg[16];
 
@@ -324,11 +325,12 @@ getval(register char* s, int op)
 					n = 0;
 				}
 				val = 0;
+				e = (c == '>' && !(state.questionable & 0x01000000) && (z = staterule(RULE, r, NiL, -1))) ? z->time : r->time;
 				for (p = r->prereqs; p; p = p->next)
 				{
 					if (p->rule != x && (c == '~' || !notfile(p->rule) &&
 					    (c != '>' || !(p->rule->dynamic & D_same) &&
-					     (!(r->property & P_archive) && (p->rule->time >= state.start || p->rule->time > r->time || !(z = staterule(RULE, p->rule, NiL, 0)) || !z->time) ||
+					     (!(r->property & P_archive) && (p->rule->time >= state.start || p->rule->time > e || !(z = staterule(RULE, p->rule, NiL, -1)) || !z->time || !(state.questionable & 0x01000000) && z->time > e) ||
 					      (r->property & P_archive) && !(p->rule->dynamic & D_member) && p->rule->time))))
 					{
 						t = state.localview ? localview(p->rule) : p->rule->name;

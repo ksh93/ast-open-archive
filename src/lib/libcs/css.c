@@ -61,7 +61,7 @@ static int	signals[] =		/* caught by interrupt()	*/
 static void
 interrupt(int sig)
 {
-#if defined(SIGCHLD) && !_WIN32
+#if defined(SIGCHLD) && !_WINIX
 	if (sig != SIGCHLD)
 #endif
 	signal(sig, interrupt);

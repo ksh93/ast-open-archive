@@ -26,10 +26,10 @@ printhead(int mesg, int who)
 	char			headline[LINESIZE];
 
 	mp = state.msg.list + mesg - 1;
-	readline(setinput(mp), headline, LINESIZE);
+	readline(setinput(mp), headline, sizeof(headline));
 	subjline = grab(mp, GSUB, NiL);
 	curind = state.msg.dot == mp && !state.var.justheaders ? '>' : ' ';
-	parse(mp, headline, &hl, pbuf);
+	parse(mp, headline, &hl, pbuf, sizeof(pbuf));
 	if (mp->m_flag & MBOX)
 		dispc = 'M';
 	else if (mp->m_flag & MPRESERVE)
@@ -330,7 +330,7 @@ top(struct msg* msgvec)
 		if (!lineb)
 			printf("\n");
 		for (lines = 0; lines < c && lines <= state.var.toplines; lines++) {
-			if (readline(ibuf, linebuf, LINESIZE) < 0)
+			if (readline(ibuf, linebuf, sizeof(linebuf)) < 0)
 				break;
 			puts(linebuf);
 			lineb = blankline(linebuf);
@@ -350,7 +350,7 @@ folders(void)
 
 	if (state.folder == FIMAP)
 		return imap_folders();
-	if (getfolder(dirname) < 0) {
+	if (getfolder(dirname, sizeof(dirname)) < 0) {
 		note(0, "No value set for \"%s\"", state.cmd->c_name);
 		return 1;
 	}
@@ -599,14 +599,10 @@ capability(register char** argv)
 					note(SYSTEM, "%s: mime load error", s);
 		}
 		else {
-			t = strcopy(state.tmp.buf, s);
-			*t++ = ';';
-			while (s = *argv++) {
-				*t++ = ' ';
-				t = strcopy(t, s);
-			}
-			*t = 0;
-			mimeset(state.part.mime, state.tmp.buf, MIME_REPLACE);
+			sfprintf(state.path.buf, "%s;", s);
+			while (s = *argv++)
+				sfprintf(state.path.buf, " %s", s);
+			mimeset(state.part.mime, sfstruse(state.path.buf), MIME_REPLACE);
 		}
 	}
 	return 0;

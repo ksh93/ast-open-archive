@@ -102,7 +102,7 @@ metainfo(int type, char* s1, char* s2, int force)
 	return r;
 }
 
-#if _WIN32
+#if _WINIX
 
 /*
  * yes, metarules are affected by the case insensitive filesystem botch

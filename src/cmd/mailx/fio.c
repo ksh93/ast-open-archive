@@ -191,8 +191,8 @@ mhgetcontext(register struct mhcontext* xp, const char* name, int next)
 	xp->dot = xp->next = 0;
 	i = strlen(name);
 	for (n = 0; n < elementsof(mh_context); n++) {
-		sprintf(state.path.temp, "%s/%s", name, mh_context[n]);
-		if (fp = fileopen(state.path.temp, "r")) {
+		sfprintf(state.path.temp, "%s/%s", name, mh_context[n]);
+		if (fp = fileopen(sfstruse(state.path.temp), "r")) {
 			while (s = fgets(buf, sizeof(buf), fp)) {
 				if (!strncasecmp(s, "mhcurmsg=", 9)) {
 					xp->dot = strtol(s + 9, &e, 10);
@@ -246,8 +246,8 @@ mhputcontext(register struct mhcontext* xp, const char* name)
 
 	if (xp->type == 1) {
 		if (xp->dot != xp->old.dot || xp->next != xp->old.next) {
-			sprintf(state.path.temp, "%s/%s", name, mh_context[xp->type - 1]);
-			if (fp = fileopen(state.path.temp, "Ew")) {
+			sfprintf(state.path.temp, "%s/%s", name, mh_context[xp->type - 1]);
+			if (fp = fileopen(sfstruse(state.path.temp), "Ew")) {
 				fprintf(fp, "MhCurmsg=%ld MhLastmsg=%ld\n", xp->dot, xp->next - 1);
 				fileclose(fp);
 			}
@@ -437,8 +437,8 @@ setinput(register struct msg* mp)
 			state.msg.active = mp;
 			if (state.msg.ap)
 				fileclose(state.msg.ap);
-			sprintf(state.path.temp, "%s/%d", state.path.mail, mp - state.msg.list + 1);
-			if (!(state.msg.ap = fileopen(state.path.temp, "EIr")) && !(state.msg.ap = fileopen("/dev/null", "EIr")))
+			sfprintf(state.path.temp, "%s/%d", state.path.mail, mp - state.msg.list + 1);
+			if (!(state.msg.ap = fileopen(sfstruse(state.path.temp), "EIr")) && !(state.msg.ap = fileopen("/dev/null", "EIr")))
 				note(PANIC|SYSTEM, "Empty file open");
 		}
 		fp = state.msg.ap;
@@ -551,19 +551,21 @@ expand(register char* name, int verify)
 			name = state.var.mbox;
 		break;
 	}
-	if (name[0] == '+' && getfolder(cmd) >= 0) {
-		sprintf(buf, "%s/%s", cmd, name + 1);
+	if (name[0] == '+' && getfolder(cmd, sizeof(cmd)) >= 0) {
+		sfsprintf(buf, sizeof(buf), "%s/%s", cmd, name + 1);
 		name = buf;
 	}
 	if (name[0] == '~' && (name[1] == '/' || name[1] == 0)) {
-		if (name == buf)
-			name = strcpy(cmd, name);
-		sprintf(buf, "%s%s", state.var.home, name + 1);
+		if (name == buf) {
+			strncopy(cmd, name, sizeof(cmd));
+			name = cmd;
+		}
+		sfsprintf(buf, sizeof(buf), "%s%s", state.var.home, name + 1);
 		name = buf;
 	}
 	if (!anyof(name, "~{[*?$`'\";<>"))
 		return savestr(name);
-	sprintf(cmd, "echo %s", name);
+	sfsprintf(cmd, sizeof(cmd), "echo %s", name);
 	name = cmd + 5;
 	if (!(fp = pipeopen(cmd, "r")))
 		return 0;
@@ -601,16 +603,16 @@ expand(register char* name, int verify)
  * Determine the current folder directory name.
  */
 int
-getfolder(char* name)
+getfolder(char* name, size_t size)
 {
 	char*	folder;
 
 	if (!(folder = state.var.folder))
 		return -1;
 	if (*folder == '/')
-		strcpy(name, folder);
+		strncopy(name, folder, size);
 	else
-		sprintf(name, "%s/%s", state.var.home, folder);
+		sfsprintf(name, size, "%s/%s", state.var.home, folder);
 	return 0;
 }
 
@@ -695,7 +697,7 @@ moreout(Sfio_t* fp, const void* buf, size_t n, Sfdisc_t* dp)
 					if ((m = strlen(state.more.tmp)) > 1 && state.more.tmp[m - 1] == '\n')
 						state.more.tmp[m - 1] = 0;
 					if (state.more.tmp[0])
-						strcpy(state.more.pattern, state.more.tmp);
+						strncopy(state.more.pattern, state.more.tmp, sizeof(state.more.pattern));
 				}
 			}
 			if (state.more.match = strlen(state.more.pattern)) {

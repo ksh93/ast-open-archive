@@ -168,8 +168,8 @@ deadletter(void)
 	register char*	s;
 
 	if ((s = expand(state.var.dead, 1)) && *s != '/') {
-		sprintf(state.path.temp, "~/%s", s);
-		s = expand(state.path.temp, 1);
+		sfprintf(state.path.temp, "~/%s", s);
+		s = expand(sfstruse(state.path.temp), 1);
 	}
 	return s;
 }
@@ -236,8 +236,7 @@ boundary(void)
 {
 	if (!state.part.out.multi) {
 		state.part.out.multi = 1;
-		sprintf(state.part.out.boundary, "=_=_=_=_=%s==%04X==%08X==", state.var.user, getpid(), time(NiL));
-		state.part.out.boundlen = strlen(state.part.out.boundary);
+		state.part.out.boundlen = sfsprintf(state.part.out.boundary, sizeof(state.part.out.boundary), "=_=_=_=_=%s==%04X==%08X==", state.var.user, getpid(), time(NiL));
 	}
 }
 
@@ -287,7 +286,6 @@ collect(struct header* hp, unsigned long flags)
 	long		tc;
 	char*		t;
 	char*		e;
-	char*		x;
 	FILE*		fp;
 	char*		av[2];
 	struct parse	pp;
@@ -450,7 +448,7 @@ collect(struct header* hp, unsigned long flags)
 			extract(hp, GCC|GMETOO, &pp.buf[2]);
 			break;
 		case 'd':
-			strcpy(pp.buf + 2, deadletter());
+			strncopy(pp.buf + 2, deadletter(), sizeof(pp.buf) - 2);
 			/* fall into . . . */
 		case 'g':
 		case 'r':
@@ -489,18 +487,15 @@ collect(struct header* hp, unsigned long flags)
 					rewind(fp);
 				else {
 					fileclose(fp);
-					x = state.path.temp;
 					if (t) {
 						if (e = mimeview(state.part.mime, "compose", state.tmp.mail, t, NiL)) {
-							x = strcopy(x, e);
-							*x++ = '<';
-							x = strcopy(x, s);
+							sfprintf(state.path.temp, "%s<%s", e, s);
 							if (state.part.disc.flags & MIME_PIPE) {
-								*x++ = '|';
+								sfprintf(state.path.temp, "|");
 								t = 0;
 							}
 							else {
-								*x++ = ';';
+								sfprintf(state.path.temp, ";");
 								t = state.tmp.mail;
 							}
 						}
@@ -509,17 +504,13 @@ collect(struct header* hp, unsigned long flags)
 					}
 					else
 						t = s;
-					x = strcopy(x, "uuencode -h -x ");
-					x = strcopy(x, (code & CODE_QP) ? "quoted-printable " : "base64 ");
+					sfprintf(state.path.temp, "uuencode -h -x %s", (code & CODE_QP) ? "quoted-printable " : "base64 ");
 					if (t)
-						x = strcopy(x, t);
-					*x++ = ' ';
-					x = strcopy(x, s);
-					if (t == state.tmp.mail) {
-						x = strcopy(x, "; rm -f ");
-						x = strcopy(x, state.tmp.mail);
-					}
-					if (!(fp = pipeopen(state.path.temp, "r")))
+						sfprintf(state.path.temp, "%s", t);
+					sfprintf(state.path.temp, " %s", s);
+					if (t == state.tmp.mail)
+						sfprintf(state.path.temp, "; rm -f %s", t);
+					if (!(fp = pipeopen(sfstruse(state.path.temp), "r")))
 						break;
 				}
 			}
@@ -694,7 +685,7 @@ collect(struct header* hp, unsigned long flags)
 			if (fp = fileopen(state.tmp.edit, "EMw+")) {
 				fprintf(fp, "This is a multipart message in MIME format.\n");
 				n = PART_INIT;
-				while (s = fgets(state.path.temp, sizeof(state.path.temp), state.collect.fp)) {
+				while (s = fgets(state.path.path, sizeof(state.path.path), state.collect.fp)) {
 					if (s[0] == '-' && s[1] == '-' && !strncmp(s + 2, state.part.out.boundary, state.part.out.boundlen)) {
 						if (n == PART_INIT)
 							putc('\n', fp);

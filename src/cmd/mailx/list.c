@@ -106,7 +106,7 @@ matchfield(char* str, int mesg)
 	if (!*str)
 		str = state.last.scan;
 	else
-		strncpy(state.last.scan, str, sizeof(state.last.scan) - 1);
+		strncopy(state.last.scan, str, sizeof(state.last.scan));
 	mp = state.msg.list + mesg - 1;
 	if (state.var.searchheaders && (s = strchr(str, ':'))) {
 		if (lower(str[0]) == 't' && lower(str[1]) == 'o' && str[2] == ':') {
@@ -724,7 +724,7 @@ scan(char** sp)
 	int			quotec;
 
 	if (state.regretp >= 0) {
-		strcpy(state.lexstring, state.string_stack[state.regretp]);
+		strncopy(state.lexstring, state.string_stack[state.regretp], sizeof(state.lexstring));
 		state.lexnumber = state.numberstack[state.regretp];
 		return state.regretstack[state.regretp--];
 	}

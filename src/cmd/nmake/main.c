@@ -154,6 +154,7 @@
  *	0x00200000 2000-09-08 0x00100000 implied if !P_implicit
  *	0x00400000 2001-02-14 allow P_archive to break job deadlock
  *	0x00800000 2001-10-05 disable early r->status=FAILED when errors!=0
+ *	0x01000000 2002-10-02 $(>) doesn't check min(rule.time,state.time)
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *
@@ -465,7 +466,7 @@ main(int argc, char** argv)
 		state.forceread = 1;
 		state.virtualdot = 0;
 	}
-#if _WIN32
+#if _WINIX
 	state.test ^= 0x00020000;
 #endif
 

@@ -44,7 +44,7 @@
 #define AT_STRICT	3
 #endif
 
-#if _WIN32
+#if _WINIX
 
 #undef	csstat
 #define csstat(s,h,p)	(memset(p,0,sizeof(*(p))),0)

@@ -39,9 +39,9 @@ settmp(const char* name, int dir)
 			fileclose(state.msg.op);
 			state.msg.op = 0;
 		}
-		strcpy(state.path.prev, state.path.mail);
+		strncopy(state.path.prev, state.path.mail, sizeof(state.path.prev));
 		if (name != state.path.mail)
-			strcpy(state.path.mail, name);
+			strncopy(state.path.mail, name, sizeof(state.path.mail));
 	}
 	if (!dir) {
 		if (!(state.msg.op = fileopen(state.tmp.mesg, "EIw")))
@@ -563,11 +563,11 @@ folderinfo(int msgcount)
 		}
 	}
 	name = state.path.mail;
-	if (getfolder(buf) >= 0) {
+	if (getfolder(buf, sizeof(buf)) >= 0) {
 		i = strlen(buf);
 		buf[i++] = '/';
 		if (!strncmp(state.path.mail, buf, i))
-			sprintf(name = buf, "+%s", state.path.mail + i);
+			sfsprintf(name = buf, sizeof(buf), "+%s", state.path.mail + i);
 	}
 	printf("\"%s\": %d message%s", name, m, m == 1 ? "" : "s");
 	if (msgcount > 0 && state.msg.count > msgcount)

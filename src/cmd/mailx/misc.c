@@ -257,9 +257,10 @@ localize(char* host)
  */
 
 char*
-normalize(char* addr, char* buf, unsigned long type)
+normalize(char* addr, unsigned long type, char* buf, size_t size)
 {
 	register char*	p;
+	register char*	e;
 	register int	n;
 	char*		uucp;
 	char*		arpa;
@@ -279,7 +280,8 @@ normalize(char* addr, char* buf, unsigned long type)
 			addr = p + 1;
 		if ((p = strchr(addr, '%')) || (p = strchr(addr, '@'))) {
 			if (buf) {
-				n = p - addr;
+				if ((n = p - addr) > size)
+					n = size;
 				addr = (char*)memcpy(buf, addr, n);
 				p = addr + n;
 			}
@@ -288,7 +290,7 @@ normalize(char* addr, char* buf, unsigned long type)
 		}
 	}
 	else {
-		user = strcpy(temp, addr);
+		strncopy(user = temp, addr, sizeof(temp));
 		uucp = arpa = inet = 0;
 		hadarpa = hadinet = 0;
 		if (p = strrchr(user, '!')) {
@@ -330,18 +332,19 @@ normalize(char* addr, char* buf, unsigned long type)
 			}
 		}
 		p = norm;
+		e = p + sizeof(norm);
 		if (uucp) {
-			p = strcopy(p, uucp);
-			p = strcopy(p, "!");
+			p = strncopy(p, uucp, e - p);
+			p = strncopy(p, "!", e - p);
 		}
-		p = strcopy(p, user);
+		p = strncopy(p, user, e - p);
 		if (arpa) {
-			p = strcopy(p, "%");
-			p = strcopy(p, arpa);
+			p = strncopy(p, "%", e - p);
+			p = strncopy(p, arpa, e - p);
 		}
 		if (inet) {
-			p = strcopy(p, "@");
-			p = strcopy(p, inet);
+			p = strncopy(p, "@", e - p);
+			p = strncopy(p, inet, e - p);
 		}
 		if (!streq(addr, norm))
 			return savestr(norm);
@@ -369,7 +372,7 @@ skin(char* name, unsigned long type)
 	if (type & (GMESSAGEID|GREFERENCES))
 		return savestr(name);
 	if (!strchr(name, '(') && !strchr(name, '<') && !strchr(name, ' '))
-		return normalize(name, NiL, type);
+		return normalize(name, type, NiL, 0);
 	gotlt = 0;
 	lastsp = 0;
 	bufend = buf;
@@ -451,7 +454,7 @@ skin(char* name, unsigned long type)
 		}
 	}
 	*cp2 = 0;
-	return normalize(buf, NiL, type|GSTACK);
+	return normalize(buf, type|GSTACK, NiL, 0);
 }
 
 /*
@@ -594,7 +597,7 @@ sreset(void)
 char*
 counts(int wide, off_t lines, off_t chars)
 {
-	sprintf(state.counts, wide ? "%5ld/%-7ld" : "%3ld/%-5ld", (long)lines, (long)chars);
+	sfsprintf(state.counts, sizeof(state.counts), wide ? "%5ld/%-7ld" : "%3ld/%-5ld", (long)lines, (long)chars);
 	return state.counts;
 }
 
@@ -641,4 +644,25 @@ msgflags(register struct msg* mp, int set, int clr)
 		if (set)
 			mp->m_flag |= set;
 	}
+}
+
+/*
+ * strncpy() with trailing nul, even if n==0
+ * pointer to the copied nul returned
+ */
+
+char*
+strncopy(register char* t, register const char* f, size_t n)
+{
+	register char*	e = t + n - 1;
+
+	do
+	{
+		if (t >= e)
+		{
+			*t = 0;
+			return t;
+		}
+	} while (*t++ = *f++);
+	return t - 1;
 }

@@ -138,9 +138,6 @@ format(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	int			to;
 	time_t			tm;
 
-	static char		nmbuf[64];
-	static char		tmbuf[64];
-
 	dp->flags |= SFFMT_VALUE;
 	if (fmt->args)
 	{
@@ -191,15 +188,13 @@ format(Sfio_t* sp, void* vp, Sffmt_t* dp)
 				if (fmt->value.string)
 				{
 					n = strlen(fmt->value.string);
-					if (n >= sizeof(nmbuf))
-						n = sizeof(nmbuf) - 1;
-					memcpy(nmbuf, fmt->value.string, n);
+					if (s = fmtbuf(n + 1))
+						memcpy(s, fmt->value.string, n + 1);
 					vmfree(fmt->expr->vm, fmt->value.string);
+					fmt->value.string = s;
 				}
-				else
-					n = 0;
-				nmbuf[n] = 0;
-				fmt->value.string = nmbuf;
+				if (!fmt->value.string)
+					fmt->value.string = "";
 			}
 		}
 	}
@@ -281,8 +276,9 @@ format(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		break;
 	case 't':
 	case 'T':
-		tm = *((Sflong_t*)vp);
-		tmform(*((char**)vp) = tmbuf, txt ? txt : "%?%l", tm == -1 ? (time_t*)0 : &tm);
+		if ((tm = *((Sflong_t*)vp)) == -1)
+			tm = time(NiL);
+		*((char**)vp) = fmttime(txt ? txt : "%?%K", tm);
 		dp->fmt = 's';
 		dp->size = -1;
 		break;

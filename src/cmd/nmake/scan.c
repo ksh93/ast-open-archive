@@ -1063,7 +1063,7 @@ scanmatch(struct list* p, register struct action* a, struct rule* r, char* b, ch
 				} while (o = strchr(o, ' '));
 				o = s;
 			}
-#if _WIN32
+#if _WINIX
 			if (isalpha(*s) && *(s + 1) == ':' && (*(s + 2) == '/' || *(s + 2) == '\\'))
 			{
 				*(s + 1) = *s;

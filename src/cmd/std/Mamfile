@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-10-02
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -374,14 +374,17 @@ make pss.o
 make pss.c
 make procinfo.h implicit
 done procinfo.h dontcare virtual
-make windows.h implicit
-done windows.h dontcare virtual
 make FEATURE/procfs implicit
 make features/procfs
 done features/procfs
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : run features/procfs
 done FEATURE/procfs generated
 prev pss.h implicit
+make ../../../include/ast/ast_windows.h implicit
+make windows.h implicit
+done windows.h dontcare virtual
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_windows.h dontcare
 make ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/ast_common.h implicit
 prev ../../../include/ast/ast_std.h implicit
