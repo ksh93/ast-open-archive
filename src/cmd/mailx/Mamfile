@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -207,6 +207,11 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c head.c
 done head.o generated
 make local.o
 make local.c
+make ../../../include/ast/tm.h implicit
+prev ../../../include/ast/times.h implicit
+prev ../../../include/ast/ast.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/tm.h dontcare
 prev ../../../include/ast/stdio.h implicit
 prev mailx.h implicit
 done local.c
@@ -271,11 +276,7 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c send.c
 done send.o generated
 make spam.o
 make spam.c
-make ../../../include/ast/tm.h implicit
-prev ../../../include/ast/times.h implicit
-prev ../../../include/ast/ast.h implicit
-prev ../../../include/ast/prototyped.h implicit
-done ../../../include/ast/tm.h dontcare
+prev ../../../include/ast/tm.h implicit
 prev mailx.h implicit
 done spam.c
 prev spam.c
@@ -340,59 +341,23 @@ done mailx generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/mailx
 prev mailx
-exec - mv ${INSTALLROOT}/bin/mailx ${INSTALLROOT}/bin/mailx.old 2>/dev/null || true; test '' = 'mailx' || { cp mailx ${INSTALLROOT}/bin/mailx  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mailx ${INSTALLROOT}/bin/mailx.old 2>/dev/null || true; test '' = 'mailx' || ${STDCMP} 2>/dev/null -s mailx ${INSTALLROOT}/bin/mailx || { ${STDCP} mailx ${INSTALLROOT}/bin/mailx  		    		    ;}
 done ../../../bin/mailx generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/mailx.1
 make mailx.1
 done mailx.1
-exec - mv ${INSTALLROOT}/man/man1/mailx.1 ${INSTALLROOT}/man/man1/mailx.1.old 2>/dev/null || true; test '' = 'mailx.1' || { cp mailx.1 ${INSTALLROOT}/man/man1/mailx.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/mailx.1 ${INSTALLROOT}/man/man1/mailx.1.old 2>/dev/null || true; test '' = 'mailx.1' || ${STDCMP} 2>/dev/null -s mailx.1 ${INSTALLROOT}/man/man1/mailx.1 || { ${STDCP} mailx.1 ${INSTALLROOT}/man/man1/mailx.1  		    		    ;}
 done ../../../man/man1/mailx.1 generated
 done install virtual
 make test

@@ -73,6 +73,8 @@
 #undef	atoi
 #undef	atol
 #undef	bind
+#undef	clrbit		/* netbsd has one in <sys/param.h> */
+#undef	setbit		/* netbsd has one in <sys/param.h> */
 
 #define bind		bindrule /* avoids possible socket clash */
 #define canon(x)	((state.context&&iscontextp(x,state.tmppchar))?(state.tmppchar+1):(state.mam.statix?mamcanon(x):pathcanon(x,0)))
@@ -106,6 +108,7 @@
 #define ropen(f,m)	((f)==internal.openfile?(internal.openfile=0,internal.openfd):open(f,m))
 #define rsfopen(f)	((f)==internal.openfile?(internal.openfile=0,sfnew(NiL,NiL,SF_UNBOUND,internal.openfd,SF_READ)):sfopen(NiL,f,"r"))
 #define setbit(v,b)	((v)|=(1L<<(b)))
+#define shquote		shellquote /* netbsd has one in <stdlib.h>! */
 #define timecmp(a,b)	((a)==(b)?0:cmptime(a,b))
 #define timeq(a,b)	!timecmp(a,b)
 #define timefix(t)      t-=(t<state.tolerance)?t:state.tolerance

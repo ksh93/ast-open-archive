@@ -14,6 +14,7 @@
  * SCCS: @(#) tclBasic.c 1.210 96/03/25 17:17:54
  */
 
+#include "tclInt.h"
 #include "tkshlib.h"
 #include "tclcmd.h"
 
@@ -174,10 +175,7 @@ Tcl_Interp *
 Tcl_CreateInterp()
 {
     register Interp *iPtr;
-#if 0
-    register CmdInfo *cmdInfoPtr;
     int i;
-#endif
 
     iPtr = (Interp *) ckalloc(sizeof(Interp));
     iPtr->result = iPtr->resultSpace;
@@ -192,13 +190,11 @@ Tcl_CreateInterp()
     iPtr->appendResult = NULL;
     iPtr->appendAvl = 0;
     iPtr->appendUsed = 0;
-#if 0
     for (i = 0; i < NUM_REGEXPS; i++) {
 	iPtr->patterns[i] = NULL;
 	iPtr->patLengths[i] = -1;
 	iPtr->regexps[i] = NULL;
     }
-#endif
     Tcl_InitHashTable(&iPtr->packageTable, TCL_STRING_KEYS);
     iPtr->packageUnknown = NULL;
     strcpy(iPtr->pdFormat, DEFAULT_PD_FORMAT);

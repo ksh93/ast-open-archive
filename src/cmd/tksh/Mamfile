@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_tk ${INSTALLROOT}
 setv PACKAGE_tk_INCLUDE ${PACKAGE_tk}/include
@@ -21,7 +21,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS "${mam_cc_OPTIMIZE}"
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -194,59 +194,23 @@ done tksh generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/tksh
 prev tksh
-exec - mv ${INSTALLROOT}/bin/tksh ${INSTALLROOT}/bin/tksh.old 2>/dev/null || true; test '' = 'tksh' || { cp tksh ${INSTALLROOT}/bin/tksh  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/tksh ${INSTALLROOT}/bin/tksh.old 2>/dev/null || true; test '' = 'tksh' || ${STDCMP} 2>/dev/null -s tksh ${INSTALLROOT}/bin/tksh || { ${STDCP} tksh ${INSTALLROOT}/bin/tksh  		    		    ;}
 done ../../../bin/tksh generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/tksh.1
 make tksh.1
 done tksh.1
-exec - mv ${INSTALLROOT}/man/man1/tksh.1 ${INSTALLROOT}/man/man1/tksh.1.old 2>/dev/null || true; test '' = 'tksh.1' || { cp tksh.1 ${INSTALLROOT}/man/man1/tksh.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/tksh.1 ${INSTALLROOT}/man/man1/tksh.1.old 2>/dev/null || true; test '' = 'tksh.1' || ${STDCMP} 2>/dev/null -s tksh.1 ${INSTALLROOT}/man/man1/tksh.1 || { ${STDCP} tksh.1 ${INSTALLROOT}/man/man1/tksh.1  		    		    ;}
 done ../../../man/man1/tksh.1 generated
 done install virtual
 make test

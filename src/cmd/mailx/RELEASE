@@ -1,3 +1,11 @@
+02-09-22 local.c: honor MAIL if its a regular file
+02-09-08 add spambody to catch mail filter warnings embedded in message bodies
+02-09-07 head.c: fix bug that retained mime boundary from previous message
+02-09-04 head.c: add call to isdate() to verify ishead() dates
+02-09-03 handle \r\n => \n on input
+02-08-28 vars.c: fix ${domain} initialization
+02-08-21 spam.c: test=0x0004 for X-Authentication-Warning
+	 send.c: disable interpolation "-- " signature test
 02-06-07 spam.c: delay lower priority tests until all headers seen
 02-05-31 imap.c: error messages to stderr -- duh
 02-03-17 spam.c: add spamtest=bitmask: 0x0001: content-type==text/html

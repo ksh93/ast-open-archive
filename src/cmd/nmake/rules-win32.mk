@@ -17,7 +17,7 @@ RCFLAGS = -x
 
 %.def : %.sym
 	{
-	echo LIBRARY $(.DLL.NAME. $(%:B) $($(%:B).VERSION):B:F=%(upper)S)
+	echo LIBRARY $(.DLL.NAME. $(%:B) $($(%:B).VERSION):B:F=%(upper)s)
 	echo
 	echo SECTIONS
 	echo .data READ WRITE

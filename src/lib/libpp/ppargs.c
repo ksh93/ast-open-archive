@@ -97,7 +97,7 @@ USAGE_LICENSE
 "	[+-I-D[\afile\a]]?Read the default \bprobe\b(1) definitions from"
 "		\afile\a, or ignore the default definitions if \afile\a"
 "		is omitted.]"
-"	[+-I-H\adirectory\a \bpp::hostdir\b \adirectory\a?Mark \adirectory\a"
+"	[+-I-H\adirectory\a, \bpp::hostdir\b \adirectory\a?Mark \adirectory\a"
 "		as a hosted directory. Headers from hosted directories have"
 "		compatibility warnings disabled.]"
 "	[+-I-I\aheader\a, \bpp::ignore\b \aheader\a?Add \aheader\a to the"

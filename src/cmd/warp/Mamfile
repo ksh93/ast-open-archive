@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O ${mam_cc_DLL}"
+setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -197,87 +197,33 @@ prev libwarp.a archive
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libwarp.a archive
 prev libwarp.a archive
-exec - mv ${PACKAGE_ast_LIB}/libwarp.a ${PACKAGE_ast_LIB}/libwarp.a.old 2>/dev/null || true; test '' = 'libwarp.a' || { cp libwarp.a ${PACKAGE_ast_LIB}/libwarp.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/libwarp.a ${PACKAGE_ast_LIB}/libwarp.a.old 2>/dev/null || true; test '' = 'libwarp.a' || ${STDCMP} 2>/dev/null -s libwarp.a ${PACKAGE_ast_LIB}/libwarp.a || { ${STDCP} libwarp.a ${PACKAGE_ast_LIB}/libwarp.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libwarp.a) >/dev/null 2>&1 || true
 done ../../../lib/libwarp.a generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/warp
 prev warp.req
-exec - mv ${PACKAGE_ast_LIB}/lib/warp ${PACKAGE_ast_LIB}/lib/warp.old 2>/dev/null || true; test '' = 'warp.req' || { cp warp.req ${PACKAGE_ast_LIB}/lib/warp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/warp ${PACKAGE_ast_LIB}/lib/warp.old 2>/dev/null || true; test '' = 'warp.req' || ${STDCMP} 2>/dev/null -s warp.req ${PACKAGE_ast_LIB}/lib/warp || { ${STDCP} warp.req ${PACKAGE_ast_LIB}/lib/warp  		    		    ;}
 done ../../../lib/lib/warp generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/warp
 prev warp
-exec - mv ${INSTALLROOT}/bin/warp ${INSTALLROOT}/bin/warp.old 2>/dev/null || true; test '' = 'warp' || { cp warp ${INSTALLROOT}/bin/warp  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/warp ${INSTALLROOT}/bin/warp.old 2>/dev/null || true; test '' = 'warp' || ${STDCMP} 2>/dev/null -s warp ${INSTALLROOT}/bin/warp || { ${STDCP} warp ${INSTALLROOT}/bin/warp  		    		    ;}
 done ../../../bin/warp generated
 done install virtual
 make test

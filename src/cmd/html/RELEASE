@@ -1,3 +1,6 @@
+02-08-30 mm2html: .AL with no args is equivalent to .NL
+02-08-26 mm2html: fix .VL mark indent logic
+02-08-19 mm2html: ignore .fp
 02-06-09 mm2html: expand mailto address pattern match
 02-05-31 mm2html: check .vG arg count before shift
 	 mm2html: \e => &#0092;

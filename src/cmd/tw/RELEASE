@@ -1,3 +1,4 @@
+02-07-17 updatedb.sh: add --local to skip non-local directories
 02-04-18 find: fix lookup() bug that dumped on unknown keys
 02-04-03 find: add FTW_DELAY logic, fix directory -empty
 	 tw: add FTW_DELAY logic

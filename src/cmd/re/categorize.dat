@@ -1,24 +1,42 @@
-NOTE	regex implementation categorization
+NOTE	regex implementation categorization 2002-08-11
 
-?E	(aba|a*b)(aba|a*b)	ababa	(0,5)(0,2)(2,5)				EXPECTED
-?E	(aba|a*b)(aba|a*b)	ababa	(0,4)(0,3)(3,4)				leftmost first
+?E	aa*			xaxaax	(1,2)					POSITION=leftmost
+;										POSITION=bug
 
-?E	(a*)(ab)*(b*)		abc	(0,2)(0,1)(?,?)(1,2)			right associative
-?E	(a*)(ab)*(b*)		abc	(0,2)(0,0)(0,2)(2,2)			left associative
+?E	(aba|a*b)(aba|a*b)	ababa	(0,5)(0,2)(2,5)				LENGTH=longest
+|E	(aba|a*b)(aba|a*b)	ababa	(0,4)(0,3)(3,4)				LENGTH=first
+;										LENGTH=bug
 
-?E	((a*)(ab)*)((b*)(a*))	aba	(0,3)(0,2)(0,0)(0,2)(2,3)(2,2)(2,3)	subexpression precedence
+?E	(a*)(ab)*(b*)		abc	(0,2)(0,1)(?,?)(1,2)			ASSOCIATIVITY=right
+|E	(a*)(ab)*(b*)		abc	(0,2)(0,0)(0,2)(2,2)			ASSOCIATIVITY=left
+;										ASSOCIATIVITY=bug
 
-?E	(aba|a*b)*		abab	(0,4)(3,4)				ordered repeat
+?E	((a*)(ab)*)((b*)(a*))	aba	(0,3)(0,2)(0,0)(0,2)(2,3)(2,2)(2,3)	SUBEXPRESSION=precedence
+|E	((a*)(ab)*)((b*)(a*))	aba	(0,3)(0,1)(0,1)(?,?)(1,3)(1,2)(2,3)	SUBEXPRESSION=grouping
+;										SUBEXPRESSION=bug
 
-?E	((x{2,4})*)(x)		xxxxxx	(0,6)(0,5)(3,5)(5,6)			EXPECTED
-?E	((x{2,4})*)(x)		xxxxxx	(0,6)(0,5)(2,5)(5,6)			subexpression repeat order INTERP
-?E	((x{2,4})*)(x)		xxxxxx	(0,6)(0,5)(0,4)(5,6)			subexpression repeat range BUG
+?E	(...?.?)*		xxxxxx	(0,6)(4,6)				REPEAT_LONGEST=first
+|E	(...?.?)*		xxxxxx	(0,6)(2,6)				REPEAT_LONGEST=last
+|E	(...?.?)*		xxxxxx	OK					REPEAT_LONGEST=unknown
+;										REPEAT_LONGEST=bug
+
+?E	(a*)*			a	(0,1)(0,1)				REPEAT_NULL=no
+|E	(a*)*			ax	(0,1)(0,1)				REPEAT_NULL=unknown
+|E	(a*)*			a	(0,1)(1,1)				REPEAT_NULL=yes
+;										REPEAT_NULL=bug
+
+?E	(a|ab)(bc|c)		abcabc	(0,3)(0,2)(2,3)				EXPECTED
+|E	(a|ab)(bc|c)		abcabc	(0,3)(0,1)(1,3)				BUG=alternation-order
+
+?E	(a*){2}			xxxxx	(0,0)(0,0)				EXPECTED
+|E	(a*){2}			xxxxx	(5,5)(5,5)				BUG=range-null
+;										BUG=repeat-match
 
 ?E	(aba|a*b)*		ababa	(0,5)(2,5)				EXPECTED
-?E	(aba|a*b)*		ababa	(0,5)(3,4)				subexpression repeat short BUG
+|E	(aba|a*b)*		ababa	(0,5)(3,4)				BUG=repeat-short
 
-?E	^(a(b)?)+$		aba	(0,3)(2,3)				EXPECTED
-?E	^(a(b)?)+$		aba	(0,3)(2,3)(1,2)				subexpression repeat artifact BUG
+?E	(a(b)?)+		aba	(0,3)(2,3)				EXPECTED
+|E	(a(b)?)+		aba	(0,3)(2,3)(1,2)				BUG=repeat-artifact
 
-?E	[ab]*([ab]*)		ab	(0,2)(2,2)				EXPECTED
-?E	[ab]*([ab]*)		ab	(0,2)(0,2)				subexpression preference BUG
+?E	.*(.*)			ab	(0,2)(2,2)				EXPECTED
+|E	.*(.*)			ab	(0,2)(0,2)				BUG=subexpression-first

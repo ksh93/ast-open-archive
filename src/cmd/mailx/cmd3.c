@@ -293,16 +293,19 @@ cd(char** arglist)
 		}
 		show = 1;
 	}
-#if _PACKAGE_ast
-	else if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.path.temp, state.var.cdpath, cp, NiL, 0))
-	{
-		cp = state.path.temp;
-		show = 1;
-	}
-#endif
 	if (chdir(cp) < 0) {
-		note(SYSTEM, "%s", cp);
-		return 1;
+#if _PACKAGE_ast
+		if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.path.temp, state.var.cdpath, cp, NiL, 0)) {
+			cp = state.path.temp;
+			show = 1;
+		}
+		else
+#endif
+			show = -1;
+		if (show < 0 || chdir(cp) < 0) {
+			note(SYSTEM, "%s", cp);
+			return 1;
+		}
 	}
 	tp = state.var.oldpwd;
 	state.var.oldpwd = state.var.pwd;

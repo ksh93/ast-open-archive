@@ -1,7 +1,7 @@
-The AT&T Labs Research ast-open package contains all of the ast open
-source commands and libraries.  This package is a superset of the
-following packages: ast-base ast-ksh; you won't need these if you
-download ast-open.
+The AT&T Software Technology ast-open package from AT&T Labs Research
+contains all of the ast open source commands and libraries.  This
+package is a superset of the following packages: ast-base ast-ksh; you
+won't need these if you download ast-open.
 
 Source Package Installation Instructions:
 
@@ -74,6 +74,37 @@ Source Package Installation Instructions:
 All recorded changes follow.
 
 :::::::: ksh93 ::::::::
+
+02-09-14  --- Release ksh93n  ---
+02-09-14  A bug in whence which occurs when the specified name contained
+	  a / has been fixed.
+02-09-14  A bug in the parser for strings of the form name$((expr))=value
+	  has been fixed.
+02-09-14  A for loop optimization bug in which the number of elements in
+	  an array was treated as an invariant has been fixed.
+02-09-09  A bug in which redirection or closing of a file descriptor between
+	  3 and 9 could cause a subsequent here document to fail has been
+	  fixed. 
+02-09-09  A bug in which a background job was not removed from the job list
+	  when a subshell completed has been fixed, for example (prog&). 
+02-09-03  A bug in which an assignment of the form name=(integer x=3)
+	  could be intepreted as an array assignment rather than a
+	  compound variable assignment has been fixed.
+02-08-19  A command completion bug which occured on file systems that
+	  are case insensitive has been fixed.
+02-08-19  A bug which could lead to an exception on some systems (for
+	  example FREEBSD) which occured when setting PATH has been fixed.
+02-08-11  A bug in arithmetic rounding in which a value input as a decimal
+	  string would output as a rounded version of the string has
+	  been fixed.
+02-08-11  A bug in which the last character could be deleted from shell
+	  traces and from whence when called from a multibyte locale
+	  has been fixed.
+02-08-01  A bug which could cause a core dump to occur when a shell script
+	  is executed while a coprocess is running that has closed the
+	  output pipe has been fixed.
+02-08-01  A bug in which command completion in multibyte mode could
+	  corrupt memory for long command lines has been fixed.
 
 02-06-17  --- Release ksh93n-  ---
 02-06-17  A bug in which user defined macros could cause a core dump in
@@ -914,6 +945,12 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+02-09-09 format.c: handle all 11 octal digits in cpio format size
+02-09-05 file.c: fix chmod() loop at exists=0011 on case ignorant filesystems
+02-08-19 pax: cmd line patterns applied before -i or -s path edits
+	 pax: add posix -c for --invert
+02-08-06 pax: change --meter to use * instead of non-portable inverse video
+02-07-17 pax: handle gnu tar largefile size extension
 02-06-26 pax: fix regsubexec() edited symlink text buffer clobber
 02-05-24 pax: update to use regsubcomp(),regsubexec()
 02-05-07 pax: use <ardir.h>,-lardir for library archives
@@ -1135,6 +1172,9 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+02-08-30 mm2html: .AL with no args is equivalent to .NL
+02-08-26 mm2html: fix .VL mark indent logic
+02-08-19 mm2html: ignore .fp
 02-06-09 mm2html: expand mailto address pattern match
 02-05-31 mm2html: check .vG arg count before shift
 	 mm2html: \e => &#0092;
@@ -1200,6 +1240,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+02-07-31 sear.sh: make sure output files has a suffix
 02-03-12 proto.c: add type=free
 02-01-07 proto.tst: add TEST 05 -- no fix yet
 01-12-12 sear.sh: fix rc ICON path \ escapes
@@ -1223,6 +1264,10 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+02-09-15 sfio/tscanf.c: add NaNS test
+02-09-05 opt.tst: add .fp 5 CW for *roff tests
+02-08-21 strelapsed.tst,strelapsed.c: add
+02-07-27 sfio/tpoll.c: fix for rw pipes
 02-06-26 opt.tst: fix debug locale message numbers
 02-05-16 date.dat: add '60+n min/sec ago' tests for n min/sec after the hour
 	 data.dat,datey2k.dat: update for %u addition to tmfmt()
@@ -1264,6 +1309,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+02-07-17 syscall3d.c: clean up user level intercept code
 02-06-25 open3d.c: fix bug that created 0 mode file with only O_RDWR
 02-06-14 ast_3d.h,cs.c: move fmttime() macro override to cs.c
 02-06-06 dir3d.c: fix rewinddir() bug that did not decrement intercepted count
@@ -1517,6 +1563,21 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+02-09-22 Makerules.mk: drop ${mam_cc_STATIC} for +l binding
+	 expand.c: fix mam $(FOO|BAR) => ${mam_cc_FOO-${mam_cc_BAR}} conversion
+02-09-11 make.probe,probe.win32: move to INIT src to share with mamprobe
+	 Makerules.mk: add a few more mam_cc_* refs (mamprobe mostly complete)
+	 Makerules.mk: don't install .a only on .dll+.lib systems
+	 Makerules.mk: add :PACKAGE: :ignore=dir:, PACKAGE_IGNORE
+	 Makerules.mk: .PACKAGE.INIT. always initializes .PACKAGE.GLOBAL.
+	 Makerules.mk: add STDCMP to MAM install action
+02-09-07 Makerules.mk: disable lib REQUIRE closure if from CC.REQUIRE.*
+02-09-05 Makerules.mk: drop .NO.STATIC foo.a => foo-static.a rename
+02-09-01 Makerules.mk: add RMRECURSEFLAGS=-r
+	 Makerules.mk: assume mkdir -p (handled by INIT install)
+02-08-30 make.c: modified .JOINT siblings now trigger action
+02-08-06 make.h: { setbit shquote } macro rename to appease netbsd -- barf
+02-07-17 make.c,parse.c: allow keepgoing to be set by .QUERY
 02-06-11 Makerules.mk: :F=%(...)S: => :F=%(...)s:
 	 misc.c: %S %C obsolete warning
 	 variable.c: fix $(!) that improperly skipped !rule.scan && PREREQS.scan
@@ -2239,6 +2300,8 @@ All recorded changes follow.
 
 :::::::: probe ::::::::
 
+02-09-21 probe.c: handle strlen(base) != BASE_MAX
+02-09-11 probe.c: add more override docs
 02-01-30 probe.c: add probe.ini check to match libast/pathprobe()
 01-12-03 probe.c: return HOME relative path if readonly/non-suid fs
 00-08-11 probe: fix non-suid generation check
@@ -2290,6 +2353,13 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+02-09-11 dlls.c: add --base & --path
+02-09-05 pr.data: eliminate case ignorant file name clashes (for mac os X)
+02-08-30 dlls.c: exit 1 if no matching dll found
+02-08-28 od.c: check and report write errors -- ouch
+	 dlls.c: add --info
+02-08-23 dlls.c: add
+02-08-19 chown.tst: add chow regression tests
 02-04-15 look.c: add look.tst, fix hang
 02-03-24 uudecode,uuencode: sfopen "rt" for \r\n -- puke
 02-01-24 look.c: drop <strings.h> ref
@@ -2308,7 +2378,7 @@ All recorded changes follow.
 00-02-14 fmt: move to libcmd
 00-01-06 pr: fix empty field in multi-col output
 99-11-19 pr: -t == -T
-99-10-01 strings: att --long-strings
+99-10-01 strings: add --long-strings
 99-08-11 mime,strings: fix usage[]
 99-06-25 who: fix printing of data strings with no \0
 99-06-20 who: fix -i
@@ -2355,6 +2425,7 @@ All recorded changes follow.
 
 :::::::: cql ::::::::
 
+02-09-06 cql: fix field update when old string value is NiL
 02-06-27 cql: fix file details 0 dereference when no file name
 02-05-20 cql: update to use regsubcomp(),regsubexec()
 01-07-17 cql: call dllerror() on dllfind() error
@@ -4234,6 +4305,14 @@ End:
 
 :::::::: mailx ::::::::
 
+02-09-22 local.c: honor MAIL if its a regular file
+02-09-08 add spambody to catch mail filter warnings embedded in message bodies
+02-09-07 head.c: fix bug that retained mime boundary from previous message
+02-09-04 head.c: add call to isdate() to verify ishead() dates
+02-09-03 handle \r\n => \n on input
+02-08-28 vars.c: fix ${domain} initialization
+02-08-21 spam.c: test=0x0004 for X-Authentication-Warning
+	 send.c: disable interpolation "-- " signature test
 02-06-07 spam.c: delay lower priority tests until all headers seen
 02-05-31 imap.c: error messages to stderr -- duh
 02-03-17 spam.c: add spamtest=bitmask: 0x0001: content-type==text/html
@@ -4390,6 +4469,10 @@ End:
 
 :::::::: re ::::::::
 
+02-08-12 testregex.dat,locale.dat: add REG_MINIMAL tests for mb bug
+02-08-07 *.dat: recognize anchors in BRE subexpressions
+02-07-17 testregex.c: fix basic re support test
+02-07-15 locale.dat: add S and K tests for testfnmatch
 02-06-20 testregex.c: handle invalid (?,*) and (*,?) in match[]
 02-06-11 ed.c: fix global EOF test
 02-06-10 testregex.c: add -x to inhibit REG_NOSUB
@@ -4534,6 +4617,13 @@ End:
 
 :::::::: std ::::::::
 
+02-09-24 dd.c: fix partial record computations and printf format
+02-09-11 pss.c: _WIN32 SF_ERROR <windows.h> workaround
+	 touch.c: drop TM_DATESTYLE (snarfed too much from date.c)
+02-09-09 ls.c: really ignore -T<n>
+02-08-13 touch.tst: fix 10 digit ambiguity test
+02-08-05 ls.c: add %(perm)[os]
+02-07-31 file.c: add -[cdiM] and swap (old ast) -m and -M semantics for posix
 02-06-25 ps.c: handle %s vs. %d --format inconsistencies
 02-02-14 touch.c: explicit epoch dates (0) are different from now (also 0)
 	 locale.c: don't output on unknown keyword
@@ -4719,11 +4809,13 @@ End:
 
 :::::::: tksh ::::::::
 
+02-08-27 tkMain.c: wait loop recode to avoid WNOHANG cascade
 02-02-14 Makefile: shell:static because dll is -g => fix this situation
 01-01-01 separate -ltksh from tksh main
 
 :::::::: tw ::::::::
 
+02-07-17 updatedb.sh: add --local to skip non-local directories
 02-04-18 find: fix lookup() bug that dumped on unknown keys
 02-04-03 find: add FTW_DELAY logic, fix directory -empty
 	 tw: add FTW_DELAY logic
@@ -4802,6 +4894,68 @@ End:
 
 :::::::: libast ::::::::
 
+02-09-22 port/astconf.c: return values in fmtbuf() buffer instead of stack
+	 port/mnt.c: don't set MNT_REMOTE for win32 ?:\* paths
+	 sfio/sfvscanf.c: _sfdscan() is library global (not static)
+02-09-21 path/pathkey.c: add tool arg for mamake compatible hash
+	 features/fcntl.c: handle iffe _hdr_lcl_* => _lcl_* change
+02-09-15 comp/conf.sh: fix enum vs. macro test
+	 cdt: kpv sync
+02-09-11 ast.h,features/common: move _WIN32 macro init to features/common
+	 features/common: enable __EXTERN__ and __DEFINE__ for _WIN32&!_UWIN
+	 features/float: add -lm to _ast_*_nan_init tests
+	 vmalloc: kpv sync with vmresizef => vmgetmem
+	 features/iconv: must have both <iconv.h> and iconv_open()!
+	 features/vmalloc: alloca test must compile *and* link
+	 sfio/sfvscanf.c,sfstrtof.h: add flag arg to char get, fix NaN loop
+02-09-10 vmalloc/vmhdr.h: enable getpagesize() and sbrk() prototypes
+	 features/fcntl.c: enable mmap64() prototype
+	 include/ast_windows.h: windows.h wrapper with ast namespace workarounds
+02-09-07 misc/mime.c: fix quoted value parse bug that ate the whole line
+02-09-05 features/vmalloc: add free() to _std_malloc test
+	 include/ast.h: NoF(x) now defines _DATA_x for !_BLD_DLL too
+	 tm/tmlocale.c: { C POSIX en } == unix dadgummit
+02-08-29 path/pathfind.c: initialize Dir_t.next=0
+02-08-28 uwin/rint.c: update
+	 features/libpath.sh: "bin" is now the default value
+02-08-22 vmtrace.h: add for debugging
+02-08-20 misc/magic.c: convert to use <cdt.h>
+	 vmalloc/vmresizef.c: add for generic discipline resizef default
+	 string/strelapsed.c: allow long time component names
+02-08-19 misc/optget.c: add `.fp 5 CW' to --nroff output
+	 string/(fmtfs|fmtuid|fmtgid|strgid|struid).c: convert to use <cdt.h>
+	 include/dt.h,cdt/dtnew.c: add for dtopen() in specific vm region
+02-08-13 comp/omitted.c: fix bzero logic for e.g. unixware.i386
+	 include/ast.h: add fmtbase->fmtbasell; swap in 2003-09-01
+02-08-12 regex/regnexec.c: fix REG_MINIMAL REX_DOT mb bug
+02-08-08 features/iconv: <ast_common.h> instead of <sys/types.h> <ast_common.h>
+02-08-07 regex/regcomp.c: recognize anchors in BRE subexpressions
+02-08-06 comp/iconv.c: handle win32 cpNNNN == windows-NNNN aliases
+02-08-05 cdt/*: sync with kpv src
+02-08-02 features/iconv: include sys/types.h for ast_types.h
+02-08-01 misc/magic.c: magic file "." names the default
+	 misc/magic.c: handle addr type (from irix string)
+	 features/lib: move malloc tests to features/vmalloc
+	 features/vmalloc: snarf tests from features/lib
+	 vmalloc/*: sync with kpv src
+	 comp/libc.c: dropped -- __libc_* intercepts moved to vmalloc/malloc.c
+02-07-30 features/lib: handle __libc_malloc() in _std_malloc test
+	 vmalloc/malloc.c: add gnu pvalloc()
+	 features/vmalloc: fix alloca check
+02-07-29 features/limits.c: handle netbsd guards
+02-07-27 sfio/sfpoll.c: handle rw pipes
+02-07-25 features/iconv: include ast_types.h for size_t in ast_iconv.h
+02-07-18 apply LARGEFILE64 header prototype clash patches
+	 misc/optget.c: __EXTERN__ _opt_info_ instead of opt_info
+02-07-17 ast_std.h: memzero() now defaults to memset() instead of bzero()
+02-07-16 ast_std.h: add ast.env_serial
+	 misc/setenviron.c: increment ast.env_serial
+	 include/tm.h: tmset() now calls tminit() directly
+	 tm/tminit.c: check ast.env_serial for env change
+	 tm/tmfix.c: speed up for large values of tm_mday
+02-07-15 comp/fnmatch.c: fix memory leak caused by missing regfree()
+	 comp/strstr.c: fix broken interpretation and implementation
+	 comp/iconv.c: intercept (but no-op) null to and from buffer pointers
 02-06-27 ast_std.h: map _sysconf => _ast_sysconf for sun
 02-06-26 cdt,sfio,vmalloc: kpv sync -- is this ever easy?
 02-06-24 sfio: kpv sync, vfwscanf(),fputw() fix (wcslen(x)*sizeof(wchar_t)!!)
@@ -5651,12 +5805,16 @@ End:
 
 :::::::: libardir ::::::::
 
+02-08-09 ardir.c: ardiropen() fails if !S_ISREG unless ARDIR_FORCE
 02-06-11 ar-port.c: handle 4.4BSD `#1/size' long names
 02-06-06 #ifndef EILSEQ => EINVAL
 02-05-07 first release
 
 :::::::: libcmd ::::::::
 
+02-09-06 wclib.c: fix 1 char-at-a-time miscount bug
+02-08-19 chgrp.c: convert to use <cdt.h>
+02-07-23 join.c: fix comm snarf typo
 02-04-05 date.c: add %u
 02-01-24 stty.c: ifdef a few more macros for uts (yes, its still running)
 01-12-14 date.c: clarify %z doc
@@ -5762,6 +5920,11 @@ End:
 
 :::::::: libdll ::::::::
 
+02-08-30 dllfind.c: fix a bug that returned uninitialized value on not found
+02-08-28 dllscan.c: handle and display bin as a sibling dir
+02-07-31 dllscan.c: add dllsopen,dllsread,dllsclose
+	 dllfind.c: use dllsopen,dllsread,dllsclose
+02-07-26 dllfind.c: add dllinfo()
 02-06-27 dllnext.c: define _GNU_SOURCE to enable RTLD_NEXT
 02-03-17 dllfind.c: fix dll prefix search (for cygwin)
 02-01-11 features/dll: include <dlfcn.h> only if _hdr_dlfcn&&_lib_dlopen
@@ -5785,6 +5948,7 @@ End:
 
 :::::::: libexpr ::::::::
 
+02-09-11 expr.h: move exbuiltin[] to private exlib.h
 99-09-22 exparse.y,exeval.c: add for(ID[DYNAMIC])
 	 exparse.y: ref[i].ref
 98-12-25 excc: fmtesq() to handle \"
@@ -5869,6 +6033,9 @@ End:
 
 :::::::: libz ::::::::
 
+02-09-11 zlib.h: move 64 bit counts to internal_state
+02-08-05 add z_off64_t, gzseek64() etc. to preserve old binary interface
+	 work around 2^32 file size limitations
 02-06-11 add uSize == unsigned _ast_intmax_t; fix header size check
 02-05-22 zconf.h: fix __32BIT__ logic
 02-03-11 infblock.c: apply double free patch
@@ -5982,6 +6149,10 @@ End:
 
 :::::::: libpp ::::::::
 
+02-09-21 pp.probe: add pp:nocatliteral test
+02-09-10 pp.tab: add pp:passthrough to match -D-P docs
+02-08-30 probe.win32: fix for borland cc -E
+02-08-22 ppexpr.c: add __SOURCE__ and #match(string,pattern)
 02-06-25 ppproto.c: fix pragma search bug that stopped after 8 comment lines
 02-06-11 ppsearch.c: fix ... next include search to skip *all* intermediates
 02-05-28 probe.win32: updates for { mingw }
@@ -6431,6 +6602,8 @@ End:
 
 :::::::: libtksh ::::::::
 
+02-08-27  tcl/tclNotify.c: XXX add sh_sigcheck() call -- to be cleaned up
+02-08-22  enable regex cache initialization
 02-06-25  include/nvextra.h: use an addaptable cheat for the namval offset
 02-03-17  update ksh private assoc array offsets -- should be a function call
 02-01-30  compensate for uts.390 lack of header guards for { select.h time.h }

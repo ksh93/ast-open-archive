@@ -9,7 +9,7 @@
 
 LICENSE = since=1999,author=gsf
 
-:TEST: astconf opt strtoi strtof
+:TEST: astconf opt strelapsed strtoi strtof
 
 date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat
 	for i in $(*:N=*.dat)

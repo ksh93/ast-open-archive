@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -580,381 +580,147 @@ done vcs.svc generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/cs
 prev cs
-exec - mv ${INSTALLROOT}/bin/cs ${INSTALLROOT}/bin/cs.old 2>/dev/null || true; test '' = 'cs' || { cp cs ${INSTALLROOT}/bin/cs  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/cs ${INSTALLROOT}/bin/cs.old 2>/dev/null || true; test '' = 'cs' || ${STDCMP} 2>/dev/null -s cs ${INSTALLROOT}/bin/cs || { ${STDCP} cs ${INSTALLROOT}/bin/cs  		    		    ;}
 done ../../../bin/cs generated
 make ../../../bin/css
 prev css
-exec - mv ${INSTALLROOT}/bin/css ${INSTALLROOT}/bin/css.old 2>/dev/null || true; test '' = 'css' || { cp css ${INSTALLROOT}/bin/css  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/css ${INSTALLROOT}/bin/css.old 2>/dev/null || true; test '' = 'css' || ${STDCMP} 2>/dev/null -s css ${INSTALLROOT}/bin/css || { ${STDCP} css ${INSTALLROOT}/bin/css  		    		    ;}
 done ../../../bin/css generated
 make ../../../lib/cs
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 		    		   
 exec - fi
 done ../../../lib/cs generated
 make ../../../lib/cs/tcp/cat
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/cat
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/cat 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/cat | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/cat 		    		   
 exec - fi
 done ../../../lib/cs/tcp/cat generated
 make ../../../lib/cs/tcp/cat/cat.svc
 prev cat.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc.old 2>/dev/null || true; test '' = 'cat.svc' || { cp cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc.old 2>/dev/null || true; test '' = 'cat.svc' || ${STDCMP} 2>/dev/null -s cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc || { ${STDCP} cat.svc ${PACKAGE_ast_LIB}/cs/tcp/cat/cat.svc  		    		    ;}
 done ../../../lib/cs/tcp/cat/cat.svc generated
 make ../../../lib/cs/tcp/dbm
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/dbm
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/dbm 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/dbm | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/dbm 		    		   
 exec - fi
 done ../../../lib/cs/tcp/dbm generated
 make ../../../lib/cs/tcp/dbm/dbm.svc
 prev dbm.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc.old 2>/dev/null || true; test '' = 'dbm.svc' || { cp dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc.old 2>/dev/null || true; test '' = 'dbm.svc' || ${STDCMP} 2>/dev/null -s dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc || { ${STDCP} dbm.svc ${PACKAGE_ast_LIB}/cs/tcp/dbm/dbm.svc  		    		    ;}
 done ../../../lib/cs/tcp/dbm/dbm.svc generated
 make ../../../lib/cs/tcp/fs_env
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/fs_env
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/fs_env 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/fs_env | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/fs_env 		    		   
 exec - fi
 done ../../../lib/cs/tcp/fs_env generated
 make ../../../lib/cs/tcp/fs_env/fs_env.svc
 prev fs_env.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc.old 2>/dev/null || true; test '' = 'fs_env.svc' || { cp fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc.old 2>/dev/null || true; test '' = 'fs_env.svc' || ${STDCMP} 2>/dev/null -s fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc || { ${STDCP} fs_env.svc ${PACKAGE_ast_LIB}/cs/tcp/fs_env/fs_env.svc  		    		    ;}
 done ../../../lib/cs/tcp/fs_env/fs_env.svc generated
 make ../../../lib/cs/tcp/mbb
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/mbb
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/mbb 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/mbb | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/mbb 		    		   
 exec - fi
 done ../../../lib/cs/tcp/mbb generated
 make ../../../lib/cs/tcp/mbb/mbb.svc
 prev mbb.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc.old 2>/dev/null || true; test '' = 'mbb.svc' || { cp mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc.old 2>/dev/null || true; test '' = 'mbb.svc' || ${STDCMP} 2>/dev/null -s mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc || { ${STDCP} mbb.svc ${PACKAGE_ast_LIB}/cs/tcp/mbb/mbb.svc  		    		    ;}
 done ../../../lib/cs/tcp/mbb/mbb.svc generated
 make ../../../lib/cs/fdp/nam
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/fdp/nam
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/fdp/nam 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/fdp/nam | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/fdp/nam 		    		   
 exec - fi
 done ../../../lib/cs/fdp/nam generated
 make ../../../lib/cs/fdp/nam/nam.svc
 prev nam.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc.old 2>/dev/null || true; test '' = 'nam.svc' || { cp nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc.old 2>/dev/null || true; test '' = 'nam.svc' || ${STDCMP} 2>/dev/null -s nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc || { ${STDCP} nam.svc ${PACKAGE_ast_LIB}/cs/fdp/nam/nam.svc  		    		    ;}
 done ../../../lib/cs/fdp/nam/nam.svc generated
 make ../../../lib/cs/udp/pid
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/udp/pid
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/udp/pid 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/udp/pid | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/udp/pid 		    		   
 exec - fi
 done ../../../lib/cs/udp/pid generated
 make ../../../lib/cs/udp/pid/pid.svc
 prev pid.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc.old 2>/dev/null || true; test '' = 'pid.svc' || { cp pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc.old 2>/dev/null || true; test '' = 'pid.svc' || ${STDCMP} 2>/dev/null -s pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc || { ${STDCP} pid.svc ${PACKAGE_ast_LIB}/cs/udp/pid/pid.svc  		    		    ;}
 done ../../../lib/cs/udp/pid/pid.svc generated
 make ../../../lib/cs/tcp/rsh
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/rsh
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/rsh 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/rsh | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/rsh 		    		   
 exec - fi
 done ../../../lib/cs/tcp/rsh generated
 make ../../../lib/cs/tcp/rsh/rsh.svc
 prev rsh.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc.old 2>/dev/null || true; test '' = 'rsh.svc' || { cp rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc.old 2>/dev/null || true; test '' = 'rsh.svc' || ${STDCMP} 2>/dev/null -s rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc || { ${STDCP} rsh.svc ${PACKAGE_ast_LIB}/cs/tcp/rsh/rsh.svc  		    		    ;}
 done ../../../lib/cs/tcp/rsh/rsh.svc generated
 make ../../../lib/cs/tcp/tst-old
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/tst-old
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/tst-old 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/tst-old | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/tst-old 		    		   
 exec - fi
 done ../../../lib/cs/tcp/tst-old generated
 make ../../../lib/cs/tcp/tst-old/tst-old.svc
 prev tst-old.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc.old 2>/dev/null || true; test '' = 'tst-old.svc' || { cp tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc.old 2>/dev/null || true; test '' = 'tst-old.svc' || ${STDCMP} 2>/dev/null -s tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc || { ${STDCP} tst-old.svc ${PACKAGE_ast_LIB}/cs/tcp/tst-old/tst-old.svc  		    		    ;}
 done ../../../lib/cs/tcp/tst-old/tst-old.svc generated
 make ../../../lib/cs/tcp/tst
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/tst
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/tst 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/tst | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/tst 		    		   
 exec - fi
 done ../../../lib/cs/tcp/tst generated
 make ../../../lib/cs/tcp/tst/tst.svc
 prev tst.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc.old 2>/dev/null || true; test '' = 'tst.svc' || { cp tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc.old 2>/dev/null || true; test '' = 'tst.svc' || ${STDCMP} 2>/dev/null -s tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc || { ${STDCP} tst.svc ${PACKAGE_ast_LIB}/cs/tcp/tst/tst.svc  		    		    ;}
 done ../../../lib/cs/tcp/tst/tst.svc generated
 make ../../../lib/cs/tcp/6263
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/6263
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/6263 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/6263 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/6263 		    		   
 exec - fi
 done ../../../lib/cs/tcp/6263 generated
 make ../../../lib/cs/tcp/6263/6263.svc
 prev 6263.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc.old 2>/dev/null || true; test '' = '6263.svc' || { cp 6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc.old 2>/dev/null || true; test '' = '6263.svc' || ${STDCMP} 2>/dev/null -s 6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc || { ${STDCP} 6263.svc ${PACKAGE_ast_LIB}/cs/tcp/6263/6263.svc  		    		    ;}
 done ../../../lib/cs/tcp/6263/6263.svc generated
 make ../../../bin/imount
 prev imount
-exec - mv ${INSTALLROOT}/bin/imount ${INSTALLROOT}/bin/imount.old 2>/dev/null || true; test '' = 'imount' || { cp imount ${INSTALLROOT}/bin/imount  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/imount ${INSTALLROOT}/bin/imount.old 2>/dev/null || true; test '' = 'imount' || ${STDCMP} 2>/dev/null -s imount ${INSTALLROOT}/bin/imount || { ${STDCP} imount ${INSTALLROOT}/bin/imount  		    		    ;}
 done ../../../bin/imount generated
 make ../../../lib/cs/tcp/vcs
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/vcs
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/vcs 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/vcs | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/vcs 		    		   
 exec - fi
 done ../../../lib/cs/tcp/vcs generated
 make ../../../lib/cs/tcp/vcs/vcs.svc
 prev vcs.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc.old 2>/dev/null || true; test '' = 'vcs.svc' || { cp vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc.old 2>/dev/null || true; test '' = 'vcs.svc' || ${STDCMP} 2>/dev/null -s vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc || { ${STDCP} vcs.svc ${PACKAGE_ast_LIB}/cs/tcp/vcs/vcs.svc  		    		    ;}
 done ../../../lib/cs/tcp/vcs/vcs.svc generated
 done install virtual
 make test

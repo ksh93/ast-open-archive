@@ -1,4 +1,4 @@
-: forced-assoc : left-assoc:pass-all right-assoc:pass-all : 2002-04-29
+NOTE	left-assoc:pass-all right-assoc:pass-all : 2002-04-29
 
 E	(a|ab)(c|bcd)		abcd	(0,4)(0,1)(1,4)
 E	(a|ab)(bcd|c)		abcd	(0,4)(0,1)(1,4)

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -225,124 +225,52 @@ prev libhuff.a archive
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/pack
 prev pack
-exec - mv ${INSTALLROOT}/bin/pack ${INSTALLROOT}/bin/pack.old 2>/dev/null || true; test '' = 'pack' || { cp pack ${INSTALLROOT}/bin/pack  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/pack ${INSTALLROOT}/bin/pack.old 2>/dev/null || true; test '' = 'pack' || ${STDCMP} 2>/dev/null -s pack ${INSTALLROOT}/bin/pack || { ${STDCP} pack ${INSTALLROOT}/bin/pack  		    		    ;}
 done ../../../bin/pack generated
 make ../../../bin/unpack
 prev unpack
-exec - mv ${INSTALLROOT}/bin/unpack ${INSTALLROOT}/bin/unpack.old 2>/dev/null || true; test '' = 'unpack' || { cp unpack ${INSTALLROOT}/bin/unpack  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/unpack ${INSTALLROOT}/bin/unpack.old 2>/dev/null || true; test '' = 'unpack' || ${STDCMP} 2>/dev/null -s unpack ${INSTALLROOT}/bin/unpack || { ${STDCP} unpack ${INSTALLROOT}/bin/unpack  		    		    ;}
 done ../../../bin/unpack generated
 make ../../../bin/pcat
 prev pcat
-exec - mv ${INSTALLROOT}/bin/pcat ${INSTALLROOT}/bin/pcat.old 2>/dev/null || true; test '' = 'pcat' || { cp pcat ${INSTALLROOT}/bin/pcat  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/pcat ${INSTALLROOT}/bin/pcat.old 2>/dev/null || true; test '' = 'pcat' || ${STDCMP} 2>/dev/null -s pcat ${INSTALLROOT}/bin/pcat || { ${STDCP} pcat ${INSTALLROOT}/bin/pcat  		    		    ;}
 done ../../../bin/pcat generated
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libhuff.a archive
 prev libhuff.a archive
-exec - mv ${PACKAGE_ast_LIB}/libhuff.a ${PACKAGE_ast_LIB}/libhuff.a.old 2>/dev/null || true; test '' = 'libhuff.a' || { cp libhuff.a ${PACKAGE_ast_LIB}/libhuff.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/libhuff.a ${PACKAGE_ast_LIB}/libhuff.a.old 2>/dev/null || true; test '' = 'libhuff.a' || ${STDCMP} 2>/dev/null -s libhuff.a ${PACKAGE_ast_LIB}/libhuff.a || { ${STDCP} libhuff.a ${PACKAGE_ast_LIB}/libhuff.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libhuff.a) >/dev/null 2>&1 || true
 done ../../../lib/libhuff.a generated
 make ../../../man/man3
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man3
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man3 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 		    		   
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/huff.3
 make huff.3
 done huff.3
-exec - mv ${INSTALLROOT}/man/man3/huff.3 ${INSTALLROOT}/man/man3/huff.3.old 2>/dev/null || true; test '' = 'huff.3' || { cp huff.3 ${INSTALLROOT}/man/man3/huff.3  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man3/huff.3 ${INSTALLROOT}/man/man3/huff.3.old 2>/dev/null || true; test '' = 'huff.3' || ${STDCMP} 2>/dev/null -s huff.3 ${INSTALLROOT}/man/man3/huff.3 || { ${STDCP} huff.3 ${INSTALLROOT}/man/man3/huff.3  		    		    ;}
 done ../../../man/man3/huff.3 generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/huff
 prev huff.req
-exec - mv ${PACKAGE_ast_LIB}/lib/huff ${PACKAGE_ast_LIB}/lib/huff.old 2>/dev/null || true; test '' = 'huff.req' || { cp huff.req ${PACKAGE_ast_LIB}/lib/huff  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/huff ${PACKAGE_ast_LIB}/lib/huff.old 2>/dev/null || true; test '' = 'huff.req' || ${STDCMP} 2>/dev/null -s huff.req ${PACKAGE_ast_LIB}/lib/huff || { ${STDCP} huff.req ${PACKAGE_ast_LIB}/lib/huff  		    		    ;}
 done ../../../lib/lib/huff generated
 done install virtual
 make test

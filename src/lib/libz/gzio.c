@@ -15,7 +15,11 @@
 
 #include "zutil.h"
 
+#ifdef ZINTERNAL_STATE
+struct internal_state {ZINTERNAL_STATE;};
+#else
 struct internal_state {int dummy;}; /* for buggy compilers */
+#endif
 
 #ifndef Z_BUFSIZE
 #  ifdef MAXSEG_64K
@@ -57,7 +61,7 @@ typedef struct gz_stream {
     int      nocrc;   /* 1 to skip 'r' crc checks */
     int      noclose; /* 1 to skip destroy fclose */
     int      verified;/* 2-byte magic read and verified ('v') */
-    uSize    previous_out; /* previous total_out for concatenated .gz files */
+    uSIZE    previous_OUT; /* previous total_OUT for concatenated .gz files */
 #endif
     char     mode;    /* 'w' or 'r' */
     long     startpos; /* start of compressed data in file (header skipped) */
@@ -112,7 +116,7 @@ local gzFile gz_open (path, mode, fp)
 #if _PACKAGE_ast
     s->fatal = 0;
     s->nocrc = 0;
-    s->previous_out = 0;
+    s->previous_OUT = 0;
     s->verified = 0;
 #endif
     s->msg = NULL;
@@ -452,6 +456,10 @@ int ZEXPORT gzread (file, buf, len)
 	    len -= s->stream.avail_out;
 	    s->stream.total_in  += (uLong)len;
 	    s->stream.total_out += (uLong)len;
+#ifdef ZINTERNAL_STATE
+	    s->stream.total_IN  += (uLong)len;
+	    s->stream.total_OUT += (uLong)len;
+#endif
             if (len == 0) s->z_eof = 1;
 	    return (int)len;
 	}
@@ -486,7 +494,7 @@ int ZEXPORT gzread (file, buf, len)
 #endif
 		s->z_err = Z_DATA_ERROR;
 	    else {
-#if _PACKAGE_ast
+#ifdef ZINTERNAL_STATE
 		uLong z;
 	        z = getLong(s);
 #else
@@ -500,20 +508,28 @@ int ZEXPORT gzread (file, buf, len)
 		if (s->z_err == Z_OK) {
 		    uSize total_in = s->stream.total_in;
 		    uSize total_out = s->stream.total_out;
+#ifdef ZINTERNAL_STATE
+		    uSIZE ototal_IN = s->stream.total_IN;
+		    uSIZE ototal_OUT = s->stream.total_OUT;
+#endif
 
 		    inflateReset(&(s->stream));
 		    s->stream.total_in = total_in;
 		    s->stream.total_out = total_out;
+#ifdef ZINTERNAL_STATE
+		    s->stream.total_IN = ototal_IN;
+		    s->stream.total_OUT = ototal_OUT;
+#endif
 #if _PACKAGE_ast
-		    s->previous_out = s->stream.total_out;
+		    s->previous_OUT = s->stream.total_OUT;
 	            if (!s->nocrc)
 #endif
 		    s->crc = crc32(0L, Z_NULL, 0);
 		}
-#if _PACKAGE_ast
+#ifdef ZINTERNAL_STATE
 		/* uLong size is stored in the header, but we can still
 		   do a modulo 32 check */
-		else if (z != ((s->stream.total_out - s->previous_out) & 0xffffffff))
+		else if (z != ((s->stream.total_OUT - s->previous_OUT) & 0xffffffff))
 		    s->z_err = Z_DATA_ERROR;
 #endif
 		else
@@ -749,132 +765,6 @@ int ZEXPORT gzflush (file, flush)
 
 #endif /* NO_DEFLATE */
 
-int ZEXPORT gzcrc (file, set)
-     gzFile file;
-     int set;
-{
-#if _PACKAGE_ast
-    gz_stream *s = (gz_stream*)file;
-    int crc = !s->nocrc;
-
-    s->nocrc = !set;
-    return crc;
-#else
-    return 0;
-#endif
-}
-
-z_off_t ZEXPORT gzsync (file, offset)
-     gzFile file;
-     z_off_t offset;
-{
-    gz_stream *s = (gz_stream*)file;
-
-    if (s == NULL || s->z_err == Z_ERRNO || s->z_err == Z_DATA_ERROR || s->fatal)
-	return -1;
-    if (s->mode == 'w') {
-    	if (do_flush (file, Z_FULL_FLUSH))
-	    return -1;
-    	if (fflush(s->file)) {
-	    s->fatal = 1;
-	    return s->z_err = Z_ERRNO;
-	}
-    }
-    else if (gzrewind(file) < 0)
-        return -1;
-    if (s->z_err != Z_OK && s->z_err != Z_STREAM_END)
-	return -1;
-    if (offset == (z_off_t)(-1))
-    	return ftell(s->file);
-    return fseek(s->file, offset, SEEK_SET);
-}
-
-/* ===========================================================================
-      Sets the starting position for the next gzread or gzwrite on the given
-   compressed file. The offset represents a number of bytes in the
-      gzseek returns the resulting offset location as measured in bytes from
-   the beginning of the uncompressed stream, or -1 in case of error.
-      SEEK_END is not implemented, returns error.
-      In this version of the library, gzseek can be extremely slow.
-*/
-z_off_t ZEXPORT gzseek (file, offset, whence)
-    gzFile file;
-    z_off_t offset;
-    int whence;
-{
-    gz_stream *s = (gz_stream*)file;
-
-    if (s == NULL || whence == SEEK_END ||
-	s->z_err == Z_ERRNO || s->z_err == Z_DATA_ERROR) {
-	return -1L;
-    }
-    
-    if (s->mode == 'w') {
-#ifdef NO_DEFLATE
-	return -1L;
-#else
-	if (whence == SEEK_SET) {
-	    offset -= s->stream.total_in;
-	}
-	if (offset < 0) return -1L;
-
-	/* At this point, offset is the number of zero bytes to write. */
-	if (s->inbuf == Z_NULL) {
-	    s->inbuf = (Byte*)ALLOC(Z_BUFSIZE); /* for seeking */
-	    zmemzero(s->inbuf, Z_BUFSIZE);
-	}
-	while (offset > 0)  {
-	    uInt size = Z_BUFSIZE;
-	    if (offset < Z_BUFSIZE) size = (uInt)offset;
-
-	    size = gzwrite(file, s->inbuf, size);
-	    if (size == 0) return -1L;
-
-	    offset -= size;
-	}
-	return (z_off_t)s->stream.total_in;
-#endif
-    }
-    /* Rest of function is for reading only */
-
-    /* compute absolute position */
-    if (whence == SEEK_CUR) {
-	offset += s->stream.total_out;
-    }
-    if (offset < 0) return -1L;
-
-    if (s->transparent) {
-	/* map to fseek */
-	s->stream.avail_in = 0;
-	s->stream.next_in = s->inbuf;
-        if (fseek(s->file, offset, SEEK_SET) < 0) return -1L;
-
-	s->stream.total_in = s->stream.total_out = (uSize)offset;
-	return offset;
-    }
-
-    /* For a negative seek, rewind and use positive seek */
-    if ((uSize)offset >= s->stream.total_out) {
-	offset -= s->stream.total_out;
-    } else if (gzrewind(file) < 0) {
-	return -1L;
-    }
-    /* offset is now the number of bytes to skip. */
-
-    if (offset != 0 && s->outbuf == Z_NULL) {
-	s->outbuf = (Byte*)ALLOC(Z_BUFSIZE);
-    }
-    while (offset > 0)  {
-	int size = Z_BUFSIZE;
-	if (offset < Z_BUFSIZE) size = (int)offset;
-
-	size = gzread(file, s->outbuf, (uInt)size);
-	if (size <= 0) return -1L;
-	offset -= size;
-    }
-    return (z_off_t)s->stream.total_out;
-}
-
 /* ===========================================================================
      Rewinds input file. 
 */
@@ -900,16 +790,185 @@ int ZEXPORT gzrewind (file)
     return fseek(s->file, s->startpos, SEEK_SET);
 }
 
+int ZEXPORT gzcrc (file, set)
+     gzFile file;
+     int set;
+{
+#if _PACKAGE_ast
+    gz_stream *s = (gz_stream*)file;
+    int crc = !s->nocrc;
+
+    s->nocrc = !set;
+    return crc;
+#else
+    return 0;
+#endif
+}
+
+#ifdef z_off64_t
+#define z_OFF_t		z_off64_t
+#define	gzseek		gzseek64
+#define	gzsync		gzsync64
+#define	gztell		gztell64
+#undef	fseek
+#define fseek		fseek64
+#undef	ftell
+#define ftell		ftell64
+#else
+#define z_OFF_t		z_off_t
+#endif
+
+z_OFF_t ZEXPORT gzsync (file, offset)
+     gzFile file;
+     z_OFF_t offset;
+{
+    gz_stream *s = (gz_stream*)file;
+
+    if (s == NULL || s->z_err == Z_ERRNO || s->z_err == Z_DATA_ERROR || s->fatal)
+	return (z_OFF_t)-1;
+    if (s->mode == 'w') {
+    	if (do_flush (file, Z_FULL_FLUSH))
+	    return (z_OFF_t)-1;
+    	if (fflush(s->file)) {
+	    s->fatal = 1;
+	    s->z_err = Z_ERRNO;
+	    return (z_OFF_t)-1;
+	}
+    }
+    else if (gzrewind(file) < 0)
+        return (z_OFF_t)-1;
+    if (s->z_err != Z_OK && s->z_err != Z_STREAM_END)
+	return (z_OFF_t)-1;
+    if (offset == (z_OFF_t)(-1))
+    	return ftell(s->file);
+    return fseek(s->file, offset, SEEK_SET);
+}
+
+/* ===========================================================================
+      Sets the starting position for the next gzread or gzwrite on the given
+   compressed file. The offset represents a number of bytes in the
+      gzseek returns the resulting offset location as measured in bytes from
+   the beginning of the uncompressed stream, or -1 in case of error.
+      SEEK_END is not implemented, returns error.
+      In this version of the library, gzseek can be extremely slow.
+*/
+z_OFF_t ZEXPORT gzseek (file, offset, whence)
+    gzFile file;
+    z_OFF_t offset;
+    int whence;
+{
+    gz_stream *s = (gz_stream*)file;
+
+    if (s == NULL || whence == SEEK_END ||
+	s->z_err == Z_ERRNO || s->z_err == Z_DATA_ERROR) {
+	return (z_OFF_t)-1;
+    }
+    
+    if (s->mode == 'w') {
+#ifdef NO_DEFLATE
+	return (z_OFF_t)-1;
+#else
+	if (whence == SEEK_SET) {
+	    offset -= s->stream.total_IN;
+	}
+	if (offset < 0) return (z_OFF_t)-1;
+
+	/* At this point, offset is the number of zero bytes to write. */
+	if (s->inbuf == Z_NULL) {
+	    s->inbuf = (Byte*)ALLOC(Z_BUFSIZE); /* for seeking */
+	    zmemzero(s->inbuf, Z_BUFSIZE);
+	}
+	while (offset > 0)  {
+	    uInt size = Z_BUFSIZE;
+	    if (offset < Z_BUFSIZE) size = (uInt)offset;
+
+	    size = gzwrite(file, s->inbuf, size);
+	    if (size == 0) return (z_OFF_t)-1;
+
+	    offset -= size;
+	}
+	return (z_OFF_t)s->stream.total_IN;
+#endif
+    }
+    /* Rest of function is for reading only */
+
+    /* compute absolute position */
+    if (whence == SEEK_CUR) {
+	offset += s->stream.total_OUT;
+    }
+    if (offset < 0) return (z_OFF_t)-1;
+
+    if (s->transparent) {
+	/* map to fseek */
+	s->stream.avail_in = 0;
+	s->stream.next_in = s->inbuf;
+        if (fseek(s->file, offset, SEEK_SET) < 0) return -1L;
+
+	s->stream.total_IN = s->stream.total_OUT = (uSize)offset;
+	return offset;
+    }
+
+    /* For a negative seek, rewind and use positive seek */
+    if ((uSize)offset >= s->stream.total_OUT) {
+	offset -= s->stream.total_OUT;
+    } else if (gzrewind(file) < 0) {
+	return (z_OFF_t)-1;
+    }
+    /* offset is now the number of bytes to skip. */
+
+    if (offset != 0 && s->outbuf == Z_NULL) {
+	s->outbuf = (Byte*)ALLOC(Z_BUFSIZE);
+    }
+    while (offset > 0)  {
+	int size = Z_BUFSIZE;
+	if (offset < Z_BUFSIZE) size = (int)offset;
+
+	size = gzread(file, s->outbuf, (uInt)size);
+	if (size <= 0) return (z_OFF_t)-1;
+	offset -= size;
+    }
+    return (z_OFF_t)s->stream.total_OUT;
+}
+
 /* ===========================================================================
      Returns the starting position for the next gzread or gzwrite on the
    given compressed file. This position represents a number of bytes in the
    uncompressed data stream.
 */
+z_OFF_t ZEXPORT gztell (file)
+    gzFile file;
+{
+    return gzseek(file, (z_OFF_t)0, SEEK_CUR);
+}
+
+#ifdef z_off64_t
+
+#undef	gzsync
+z_off_t ZEXPORT gzsync (file, offset)
+     gzFile file;
+     z_off_t offset;
+{
+	return (z_off_t)gzsync64(file, (z_OFF_t)offset);
+}
+
+#undef	gzseek
+z_off_t ZEXPORT gzseek (file, offset, whence)
+    gzFile file;
+    z_off_t offset;
+    int whence;
+{
+	return (z_off_t)gzseek64(file, (z_OFF_t)offset, whence);
+}
+
+#undef	gztell
 z_off_t ZEXPORT gztell (file)
     gzFile file;
 {
-    return gzseek(file, 0L, SEEK_CUR);
+    return (z_off_t)gzseek64(file, (z_OFF_t)0, SEEK_CUR);
 }
+
+
+#endif
 
 /* ===========================================================================
      Returns 1 when EOF has previously been detected reading the given
@@ -978,8 +1037,8 @@ int ZEXPORT gzclose (file)
         if (err != Z_OK) return destroy((gz_stream*)file);
 
         putLong (s->file, s->crc);
-	/* but for backwards compatibility this would be uSize */
-        putLong (s->file, s->stream.total_in & 0xffffffff);
+	/* but for backwards compatibility this would be uSIZE */
+        putLong (s->file, (uLong)(s->stream.total_IN & 0xffffffff));
 #endif
     }
     return destroy((gz_stream*)file);

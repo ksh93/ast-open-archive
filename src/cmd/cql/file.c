@@ -1236,13 +1236,14 @@ update(File_t* f, Field_t* field, int index, char* value)
 {
 	register Update_t*	p;
 	register char***	u;
+	char*			o;
 
-	if (!streq((field + index)->f_string, value))
+	if (!(o = (field + index)->f_string) || !streq(o, value))
 	{
 		if (!(p = search(&f->update, f->hix ? f->hix->offset : 0, f->record->subfields)))
 			return -1;
 		u = p->value + index;
-		if (!*u && !(*u = newof(0, char*, 2, 0)) || !(*(*u + 1) = strdup((field + index)->f_string)))
+		if (!*u && !(*u = newof(0, char*, 2, 0)) || o && !(*(*u + 1) = strdup(o)))
 			return -1;
 		if (!(**u = newof(**u, char, strlen(value), 1)))
 			return -1;

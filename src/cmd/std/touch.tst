@@ -33,7 +33,7 @@ TEST 02 'times'
 	EXEC 0102030405 b
 		OUTPUT -
 	PROG ls -f "%(mtime:time=%K)s %(path)s" b
-		OUTPUT - $'2005-01-02+03:04:00 b'
+		OUTPUT - $'2001-02-03+04:05:00 b'
 	EXEC -t 0102030405 b
 		OUTPUT -
 	PROG ls -f "%(mtime:time=%K)s %(path)s" b
@@ -41,7 +41,7 @@ TEST 02 'times'
 	EXEC 0203040501 b
 		OUTPUT -
 	PROG ls -f "%(mtime:time=%K)s %(path)s" b
-		OUTPUT - $'2001-02-03+04:05:00 b'
+		OUTPUT - $'2002-03-04+05:01:00 b'
 	EXEC -t 0203040501 b
 		OUTPUT -
 	PROG ls -f "%(mtime:time=%K)s %(path)s" b

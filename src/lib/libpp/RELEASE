@@ -1,3 +1,7 @@
+02-09-21 pp.probe: add pp:nocatliteral test
+02-09-10 pp.tab: add pp:passthrough to match -D-P docs
+02-08-30 probe.win32: fix for borland cc -E
+02-08-22 ppexpr.c: add __SOURCE__ and #match(string,pattern)
 02-06-25 ppproto.c: fix pragma search bug that stopped after 8 comment lines
 02-06-11 ppsearch.c: fix ... next include search to skip *all* intermediates
 02-05-28 probe.win32: updates for { mingw }

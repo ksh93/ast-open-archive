@@ -1,4 +1,4 @@
-: null subexpression matches : 2002-06-06
+NOTE	null subexpression matches : 2002-06-06
 
 E	(a*)*		a		(0,1)(0,1)
 E	SAME		x		(0,0)(0,0)

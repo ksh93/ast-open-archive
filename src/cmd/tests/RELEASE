@@ -1,3 +1,7 @@
+02-09-15 sfio/tscanf.c: add NaNS test
+02-09-05 opt.tst: add .fp 5 CW for *roff tests
+02-08-21 strelapsed.tst,strelapsed.c: add
+02-07-27 sfio/tpoll.c: fix for rw pipes
 02-06-26 opt.tst: fix debug locale message numbers
 02-05-16 date.dat: add '60+n min/sec ago' tests for n min/sec after the hour
 	 data.dat,datey2k.dat: update for %u addition to tmfmt()

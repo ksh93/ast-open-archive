@@ -35,7 +35,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: sear (AT&T Labs Research) 2002-04-15 $
+@(#)$Id: sear (AT&T Labs Research) 2002-07-31 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?sear - generate a win32 ratz self extracting archive]
@@ -93,6 +93,7 @@ do	case $OPT in
 	m)	opt=${opt}m
 		;;
 	o)	out=$OPTARG
+		[[ ${out##*/} != *.?* ]] && out=${out%.}.exe
 		;;
 	r)	src=$OPTARG
 		;;

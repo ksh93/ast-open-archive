@@ -141,7 +141,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 		if (!state.ordered)
 			return 0;
 	}
-	if (!match(f->name) || state.verify && f->type != X_IFDIR && !verify(ap, f, NiL))
+	if (!match(f->path) || state.verify && f->type != X_IFDIR && !verify(ap, f, NiL))
 		return 0;
 	ap->selected++;
 	if (!linked)
@@ -612,15 +612,19 @@ listentry(register File_t* f)
 				i = (p / (100 / METER_parts));
 				j = n + METER_parts + 2;
 				if (!state.meter.last)
-					state.meter.last = j;
-				if ((k = state.meter.last - j + 1) < 0)
+					state.meter.last = j + 5;
+				if ((k = state.meter.last - j - 5) < 0)
 					k = 0;
-				state.meter.last = j;
-				sfsprintf(bar, sizeof(bar), "%*s%2d%%%*s", METER_parts / 2 - 3, "", p, METER_parts - (METER_parts / 2 - 3), "");
-				sfprintf(sfstderr, " %c[7m%-.*s%c[0m%s%s%*s", CC_esc, i, bar, CC_esc, bar + i, s, k, "\r");
+				n = 0;
+				while (n < i)
+					bar[n++] = '*';
+				while (n < elementsof(bar) - 1)
+					bar[n++] = ' ';
+				bar[n] = 0;
+				state.meter.last = sfprintf(sfstderr, "%02d%% |%s| %s%*s", p, bar, s, k, "\r");
 			}
 			else
-				sfprintf(sfstderr, "%d%% %s\n", p, s);
+				sfprintf(sfstderr, "%02d%% %s\n", p, s);
 			sfsync(sfstderr);
 			if (state.test & 1) sleep(1);
 		}

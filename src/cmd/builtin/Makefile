@@ -61,7 +61,9 @@ BUILTINS :COMMAND: cmd.h
 ":BUILTIN:" : .MAKE .OPERATOR
 	local T P
 	for T $(>)
-		if T == "[-+]l*"
+		if T == "*=*"
+			$(P).o : $(T)
+		elif T == "[-+]l*"
 			$(P) : $(T)
 		else
 			eval
@@ -71,8 +73,9 @@ BUILTINS :COMMAND: cmd.h
 		end
 	end
 
-:BUILTIN: look mime od pr strings tr uudecode -luu uuencode -luu what who
+:BUILTIN: dlls LICENSE=since=2002,author=gsf -ldll look mime od pr strings \
+		tr uudecode -luu uuencode -luu what who
 
 :: PROMO.mm RELEASE
 
-:TEST: cut date expr join look od paste tail tr uuencode
+:TEST: chown cut date expr join look od paste tail tr uuencode

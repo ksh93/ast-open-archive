@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_tcl ${INSTALLROOT}
 setv PACKAGE_tcl_INCLUDE ${PACKAGE_tcl}/include
@@ -15,7 +15,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS "${mam_cc_OPTIMIZE}"
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -781,82 +781,28 @@ prev libtk.a archive
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libtk.a archive
 prev libtk.a archive
-exec - mv ${PACKAGE_ast_LIB}/libtk.a ${PACKAGE_ast_LIB}/libtk.a.old 2>/dev/null || true; test '' = 'libtk.a' || { cp libtk.a ${PACKAGE_ast_LIB}/libtk.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/libtk.a ${PACKAGE_ast_LIB}/libtk.a.old 2>/dev/null || true; test '' = 'libtk.a' || ${STDCMP} 2>/dev/null -s libtk.a ${PACKAGE_ast_LIB}/libtk.a || { ${STDCP} libtk.a ${PACKAGE_ast_LIB}/libtk.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libtk.a) >/dev/null 2>&1 || true
 done ../../../lib/libtk.a generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/tk
 prev tk.req
-exec - mv ${PACKAGE_ast_LIB}/lib/tk ${PACKAGE_ast_LIB}/lib/tk.old 2>/dev/null || true; test '' = 'tk.req' || { cp tk.req ${PACKAGE_ast_LIB}/lib/tk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/tk ${PACKAGE_ast_LIB}/lib/tk.old 2>/dev/null || true; test '' = 'tk.req' || ${STDCMP} 2>/dev/null -s tk.req ${PACKAGE_ast_LIB}/lib/tk || { ${STDCP} tk.req ${PACKAGE_ast_LIB}/lib/tk  		    		    ;}
 done ../../../lib/lib/tk generated
 make ../../../include/tcl
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/include/tcl
-exec - then	set -x && mkdir -p ${INSTALLROOT}/include/tcl 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/include/tcl | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/include/tcl 		    		   
 exec - fi
 done ../../../include/tcl generated
 make ../../../include/tcl/tk.h
@@ -870,499 +816,445 @@ done ../../../include/tcl/tk.h generated
 make ../../../lib/tk4.2
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tk4.2 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2 		    		   
 exec - fi
 done ../../../lib/tk4.2 generated
 make ../../../lib/tk4.2/bgerror.tcl
 make library/bgerror.tcl
 done library/bgerror.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl.old 2>/dev/null || true; test '' = 'library/bgerror.tcl' || { cp library/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl.old 2>/dev/null || true; test '' = 'library/bgerror.tcl' || ${STDCMP} 2>/dev/null -s library/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl || { ${STDCP} library/bgerror.tcl ${PACKAGE_ast_LIB}/tk4.2/bgerror.tcl  		    		    ;}
 done ../../../lib/tk4.2/bgerror.tcl generated
 make ../../../lib/tk4.2/button.tcl
 make library/button.tcl
 done library/button.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl.old 2>/dev/null || true; test '' = 'library/button.tcl' || { cp library/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl.old 2>/dev/null || true; test '' = 'library/button.tcl' || ${STDCMP} 2>/dev/null -s library/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl || { ${STDCP} library/button.tcl ${PACKAGE_ast_LIB}/tk4.2/button.tcl  		    		    ;}
 done ../../../lib/tk4.2/button.tcl generated
 make ../../../lib/tk4.2/clrpick.tcl
 make library/clrpick.tcl
 done library/clrpick.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/clrpick.tcl' || { cp library/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl || { ${STDCP} library/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/clrpick.tcl  		    		    ;}
 done ../../../lib/tk4.2/clrpick.tcl generated
 make ../../../lib/tk4.2/comdlg.tcl
 make library/comdlg.tcl
 done library/comdlg.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl.old 2>/dev/null || true; test '' = 'library/comdlg.tcl' || { cp library/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl.old 2>/dev/null || true; test '' = 'library/comdlg.tcl' || ${STDCMP} 2>/dev/null -s library/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl || { ${STDCP} library/comdlg.tcl ${PACKAGE_ast_LIB}/tk4.2/comdlg.tcl  		    		    ;}
 done ../../../lib/tk4.2/comdlg.tcl generated
 make ../../../lib/tk4.2/console.tcl
 make library/console.tcl
 done library/console.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl.old 2>/dev/null || true; test '' = 'library/console.tcl' || { cp library/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl.old 2>/dev/null || true; test '' = 'library/console.tcl' || ${STDCMP} 2>/dev/null -s library/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl || { ${STDCP} library/console.tcl ${PACKAGE_ast_LIB}/tk4.2/console.tcl  		    		    ;}
 done ../../../lib/tk4.2/console.tcl generated
 make ../../../lib/tk4.2/dialog.tcl
 make library/dialog.tcl
 done library/dialog.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl.old 2>/dev/null || true; test '' = 'library/dialog.tcl' || { cp library/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl.old 2>/dev/null || true; test '' = 'library/dialog.tcl' || ${STDCMP} 2>/dev/null -s library/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl || { ${STDCP} library/dialog.tcl ${PACKAGE_ast_LIB}/tk4.2/dialog.tcl  		    		    ;}
 done ../../../lib/tk4.2/dialog.tcl generated
 make ../../../lib/tk4.2/entry.tcl
 make library/entry.tcl
 done library/entry.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl.old 2>/dev/null || true; test '' = 'library/entry.tcl' || { cp library/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl.old 2>/dev/null || true; test '' = 'library/entry.tcl' || ${STDCMP} 2>/dev/null -s library/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl || { ${STDCP} library/entry.tcl ${PACKAGE_ast_LIB}/tk4.2/entry.tcl  		    		    ;}
 done ../../../lib/tk4.2/entry.tcl generated
 make ../../../lib/tk4.2/focus.tcl
 make library/focus.tcl
 done library/focus.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl.old 2>/dev/null || true; test '' = 'library/focus.tcl' || { cp library/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl.old 2>/dev/null || true; test '' = 'library/focus.tcl' || ${STDCMP} 2>/dev/null -s library/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl || { ${STDCP} library/focus.tcl ${PACKAGE_ast_LIB}/tk4.2/focus.tcl  		    		    ;}
 done ../../../lib/tk4.2/focus.tcl generated
 make ../../../lib/tk4.2/folder.gif
 make library/folder.gif
 done library/folder.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif.old 2>/dev/null || true; test '' = 'library/folder.gif' || { cp library/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif.old 2>/dev/null || true; test '' = 'library/folder.gif' || ${STDCMP} 2>/dev/null -s library/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif || { ${STDCP} library/folder.gif ${PACKAGE_ast_LIB}/tk4.2/folder.gif  		    		    ;}
 done ../../../lib/tk4.2/folder.gif generated
 make ../../../lib/tk4.2/license.terms
 make library/license.terms
 done library/license.terms
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms.old 2>/dev/null || true; test '' = 'library/license.terms' || { cp library/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms.old 2>/dev/null || true; test '' = 'library/license.terms' || ${STDCMP} 2>/dev/null -s library/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms || { ${STDCP} library/license.terms ${PACKAGE_ast_LIB}/tk4.2/license.terms  		    		    ;}
 done ../../../lib/tk4.2/license.terms generated
 make ../../../lib/tk4.2/listbox.tcl
 make library/listbox.tcl
 done library/listbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl.old 2>/dev/null || true; test '' = 'library/listbox.tcl' || { cp library/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl.old 2>/dev/null || true; test '' = 'library/listbox.tcl' || ${STDCMP} 2>/dev/null -s library/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl || { ${STDCP} library/listbox.tcl ${PACKAGE_ast_LIB}/tk4.2/listbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/listbox.tcl generated
 make ../../../lib/tk4.2/menu.tcl
 make library/menu.tcl
 done library/menu.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl.old 2>/dev/null || true; test '' = 'library/menu.tcl' || { cp library/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl.old 2>/dev/null || true; test '' = 'library/menu.tcl' || ${STDCMP} 2>/dev/null -s library/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl || { ${STDCP} library/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/menu.tcl  		    		    ;}
 done ../../../lib/tk4.2/menu.tcl generated
 make ../../../lib/tk4.2/msgbox.tcl
 make library/msgbox.tcl
 done library/msgbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/msgbox.tcl' || { cp library/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl || { ${STDCP} library/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/msgbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/msgbox.tcl generated
 make ../../../lib/tk4.2/obsolete.tcl
 make library/obsolete.tcl
 done library/obsolete.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl.old 2>/dev/null || true; test '' = 'library/obsolete.tcl' || { cp library/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl.old 2>/dev/null || true; test '' = 'library/obsolete.tcl' || ${STDCMP} 2>/dev/null -s library/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl || { ${STDCP} library/obsolete.tcl ${PACKAGE_ast_LIB}/tk4.2/obsolete.tcl  		    		    ;}
 done ../../../lib/tk4.2/obsolete.tcl generated
 make ../../../lib/tk4.2/optMenu.tcl
 make library/optMenu.tcl
 done library/optMenu.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl.old 2>/dev/null || true; test '' = 'library/optMenu.tcl' || { cp library/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl.old 2>/dev/null || true; test '' = 'library/optMenu.tcl' || ${STDCMP} 2>/dev/null -s library/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl || { ${STDCP} library/optMenu.tcl ${PACKAGE_ast_LIB}/tk4.2/optMenu.tcl  		    		    ;}
 done ../../../lib/tk4.2/optMenu.tcl generated
 make ../../../lib/tk4.2/palette.tcl
 make library/palette.tcl
 done library/palette.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl.old 2>/dev/null || true; test '' = 'library/palette.tcl' || { cp library/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl.old 2>/dev/null || true; test '' = 'library/palette.tcl' || ${STDCMP} 2>/dev/null -s library/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl || { ${STDCP} library/palette.tcl ${PACKAGE_ast_LIB}/tk4.2/palette.tcl  		    		    ;}
 done ../../../lib/tk4.2/palette.tcl generated
 make ../../../lib/tk4.2/prolog.ps
 make library/prolog.ps
 done library/prolog.ps
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps.old 2>/dev/null || true; test '' = 'library/prolog.ps' || { cp library/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps.old 2>/dev/null || true; test '' = 'library/prolog.ps' || ${STDCMP} 2>/dev/null -s library/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps || { ${STDCP} library/prolog.ps ${PACKAGE_ast_LIB}/tk4.2/prolog.ps  		    		    ;}
 done ../../../lib/tk4.2/prolog.ps generated
 make ../../../lib/tk4.2/scale.tcl
 make library/scale.tcl
 done library/scale.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl.old 2>/dev/null || true; test '' = 'library/scale.tcl' || { cp library/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl.old 2>/dev/null || true; test '' = 'library/scale.tcl' || ${STDCMP} 2>/dev/null -s library/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl || { ${STDCP} library/scale.tcl ${PACKAGE_ast_LIB}/tk4.2/scale.tcl  		    		    ;}
 done ../../../lib/tk4.2/scale.tcl generated
 make ../../../lib/tk4.2/scrlbar.tcl
 make library/scrlbar.tcl
 done library/scrlbar.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl.old 2>/dev/null || true; test '' = 'library/scrlbar.tcl' || { cp library/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl.old 2>/dev/null || true; test '' = 'library/scrlbar.tcl' || ${STDCMP} 2>/dev/null -s library/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl || { ${STDCP} library/scrlbar.tcl ${PACKAGE_ast_LIB}/tk4.2/scrlbar.tcl  		    		    ;}
 done ../../../lib/tk4.2/scrlbar.tcl generated
 make ../../../lib/tk4.2/tclIndex
 make library/tclIndex
 done library/tclIndex
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex.old 2>/dev/null || true; test '' = 'library/tclIndex' || { cp library/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex.old 2>/dev/null || true; test '' = 'library/tclIndex' || ${STDCMP} 2>/dev/null -s library/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex || { ${STDCP} library/tclIndex ${PACKAGE_ast_LIB}/tk4.2/tclIndex  		    		    ;}
 done ../../../lib/tk4.2/tclIndex generated
 make ../../../lib/tk4.2/tearoff.tcl
 make library/tearoff.tcl
 done library/tearoff.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl.old 2>/dev/null || true; test '' = 'library/tearoff.tcl' || { cp library/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl.old 2>/dev/null || true; test '' = 'library/tearoff.tcl' || ${STDCMP} 2>/dev/null -s library/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl || { ${STDCP} library/tearoff.tcl ${PACKAGE_ast_LIB}/tk4.2/tearoff.tcl  		    		    ;}
 done ../../../lib/tk4.2/tearoff.tcl generated
 make ../../../lib/tk4.2/text.tcl
 make library/text.tcl
 done library/text.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl.old 2>/dev/null || true; test '' = 'library/text.tcl' || { cp library/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl.old 2>/dev/null || true; test '' = 'library/text.tcl' || ${STDCMP} 2>/dev/null -s library/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl || { ${STDCP} library/text.tcl ${PACKAGE_ast_LIB}/tk4.2/text.tcl  		    		    ;}
 done ../../../lib/tk4.2/text.tcl generated
 make ../../../lib/tk4.2/textfile.gif
 make library/textfile.gif
 done library/textfile.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif.old 2>/dev/null || true; test '' = 'library/textfile.gif' || { cp library/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif.old 2>/dev/null || true; test '' = 'library/textfile.gif' || ${STDCMP} 2>/dev/null -s library/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif || { ${STDCP} library/textfile.gif ${PACKAGE_ast_LIB}/tk4.2/textfile.gif  		    		    ;}
 done ../../../lib/tk4.2/textfile.gif generated
 make ../../../lib/tk4.2/tk.tcl
 make library/tk.tcl
 done library/tk.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl.old 2>/dev/null || true; test '' = 'library/tk.tcl' || { cp library/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl.old 2>/dev/null || true; test '' = 'library/tk.tcl' || ${STDCMP} 2>/dev/null -s library/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl || { ${STDCP} library/tk.tcl ${PACKAGE_ast_LIB}/tk4.2/tk.tcl  		    		    ;}
 done ../../../lib/tk4.2/tk.tcl generated
 make ../../../lib/tk4.2/tkfbox.tcl
 make library/tkfbox.tcl
 done library/tkfbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl.old 2>/dev/null || true; test '' = 'library/tkfbox.tcl' || { cp library/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl.old 2>/dev/null || true; test '' = 'library/tkfbox.tcl' || ${STDCMP} 2>/dev/null -s library/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl || { ${STDCP} library/tkfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/tkfbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/tkfbox.tcl generated
 make ../../../lib/tk4.2/updir.xbm
 make library/updir.xbm
 done library/updir.xbm
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm.old 2>/dev/null || true; test '' = 'library/updir.xbm' || { cp library/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm.old 2>/dev/null || true; test '' = 'library/updir.xbm' || ${STDCMP} 2>/dev/null -s library/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm || { ${STDCP} library/updir.xbm ${PACKAGE_ast_LIB}/tk4.2/updir.xbm  		    		    ;}
 done ../../../lib/tk4.2/updir.xbm generated
 make ../../../lib/tk4.2/xmfbox.tcl
 make library/xmfbox.tcl
 done library/xmfbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl.old 2>/dev/null || true; test '' = 'library/xmfbox.tcl' || { cp library/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl.old 2>/dev/null || true; test '' = 'library/xmfbox.tcl' || ${STDCMP} 2>/dev/null -s library/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl || { ${STDCP} library/xmfbox.tcl ${PACKAGE_ast_LIB}/tk4.2/xmfbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/xmfbox.tcl generated
 make ../../../lib/tk4.2/demos
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2/demos
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tk4.2/demos | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos 		    		   
 exec - fi
 done ../../../lib/tk4.2/demos generated
 make ../../../lib/tk4.2/demos/README
 make library/demos/README
 done library/demos/README
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README.old 2>/dev/null || true; test '' = 'library/demos/README' || { cp library/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README.old 2>/dev/null || true; test '' = 'library/demos/README' || ${STDCMP} 2>/dev/null -s library/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README || { ${STDCP} library/demos/README ${PACKAGE_ast_LIB}/tk4.2/demos/README  		    		    ;}
 done ../../../lib/tk4.2/demos/README generated
 make ../../../lib/tk4.2/demos/arrow.tcl
 make library/demos/arrow.tcl
 done library/demos/arrow.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl.old 2>/dev/null || true; test '' = 'library/demos/arrow.tcl' || { cp library/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl.old 2>/dev/null || true; test '' = 'library/demos/arrow.tcl' || ${STDCMP} 2>/dev/null -s library/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl || { ${STDCP} library/demos/arrow.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/arrow.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/arrow.tcl generated
 make ../../../lib/tk4.2/demos/bind.tcl
 make library/demos/bind.tcl
 done library/demos/bind.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl.old 2>/dev/null || true; test '' = 'library/demos/bind.tcl' || { cp library/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl.old 2>/dev/null || true; test '' = 'library/demos/bind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl || { ${STDCP} library/demos/bind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bind.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/bind.tcl generated
 make ../../../lib/tk4.2/demos/bitmap.tcl
 make library/demos/bitmap.tcl
 done library/demos/bitmap.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl.old 2>/dev/null || true; test '' = 'library/demos/bitmap.tcl' || { cp library/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl.old 2>/dev/null || true; test '' = 'library/demos/bitmap.tcl' || ${STDCMP} 2>/dev/null -s library/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl || { ${STDCP} library/demos/bitmap.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/bitmap.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/bitmap.tcl generated
 make ../../../lib/tk4.2/demos/browse
 make library/demos/browse
 done library/demos/browse
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse.old 2>/dev/null || true; test '' = 'library/demos/browse' || { cp library/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse.old 2>/dev/null || true; test '' = 'library/demos/browse' || ${STDCMP} 2>/dev/null -s library/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse || { ${STDCP} library/demos/browse ${PACKAGE_ast_LIB}/tk4.2/demos/browse  		    		    ;}
 done ../../../lib/tk4.2/demos/browse generated
 make ../../../lib/tk4.2/demos/button.tcl
 make library/demos/button.tcl
 done library/demos/button.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl.old 2>/dev/null || true; test '' = 'library/demos/button.tcl' || { cp library/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl.old 2>/dev/null || true; test '' = 'library/demos/button.tcl' || ${STDCMP} 2>/dev/null -s library/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl || { ${STDCP} library/demos/button.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/button.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/button.tcl generated
 make ../../../lib/tk4.2/demos/check.tcl
 make library/demos/check.tcl
 done library/demos/check.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl.old 2>/dev/null || true; test '' = 'library/demos/check.tcl' || { cp library/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl.old 2>/dev/null || true; test '' = 'library/demos/check.tcl' || ${STDCMP} 2>/dev/null -s library/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl || { ${STDCP} library/demos/check.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/check.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/check.tcl generated
 make ../../../lib/tk4.2/demos/clrpick.tcl
 make library/demos/clrpick.tcl
 done library/demos/clrpick.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/demos/clrpick.tcl' || { cp library/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl.old 2>/dev/null || true; test '' = 'library/demos/clrpick.tcl' || ${STDCMP} 2>/dev/null -s library/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl || { ${STDCP} library/demos/clrpick.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/clrpick.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/clrpick.tcl generated
 make ../../../lib/tk4.2/demos/colors.tcl
 make library/demos/colors.tcl
 done library/demos/colors.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl.old 2>/dev/null || true; test '' = 'library/demos/colors.tcl' || { cp library/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl.old 2>/dev/null || true; test '' = 'library/demos/colors.tcl' || ${STDCMP} 2>/dev/null -s library/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl || { ${STDCP} library/demos/colors.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/colors.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/colors.tcl generated
 make ../../../lib/tk4.2/demos/cscroll.tcl
 make library/demos/cscroll.tcl
 done library/demos/cscroll.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl.old 2>/dev/null || true; test '' = 'library/demos/cscroll.tcl' || { cp library/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl.old 2>/dev/null || true; test '' = 'library/demos/cscroll.tcl' || ${STDCMP} 2>/dev/null -s library/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl || { ${STDCP} library/demos/cscroll.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/cscroll.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/cscroll.tcl generated
 make ../../../lib/tk4.2/demos/ctext.tcl
 make library/demos/ctext.tcl
 done library/demos/ctext.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl.old 2>/dev/null || true; test '' = 'library/demos/ctext.tcl' || { cp library/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl.old 2>/dev/null || true; test '' = 'library/demos/ctext.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl || { ${STDCP} library/demos/ctext.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ctext.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/ctext.tcl generated
 make ../../../lib/tk4.2/demos/dialog1.tcl
 make library/demos/dialog1.tcl
 done library/demos/dialog1.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog1.tcl' || { cp library/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl || { ${STDCP} library/demos/dialog1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog1.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/dialog1.tcl generated
 make ../../../lib/tk4.2/demos/dialog2.tcl
 make library/demos/dialog2.tcl
 done library/demos/dialog2.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog2.tcl' || { cp library/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl.old 2>/dev/null || true; test '' = 'library/demos/dialog2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl || { ${STDCP} library/demos/dialog2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/dialog2.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/dialog2.tcl generated
 make ../../../lib/tk4.2/demos/entry1.tcl
 make library/demos/entry1.tcl
 done library/demos/entry1.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry1.tcl' || { cp library/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl || { ${STDCP} library/demos/entry1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry1.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/entry1.tcl generated
 make ../../../lib/tk4.2/demos/entry2.tcl
 make library/demos/entry2.tcl
 done library/demos/entry2.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry2.tcl' || { cp library/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl.old 2>/dev/null || true; test '' = 'library/demos/entry2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl || { ${STDCP} library/demos/entry2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/entry2.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/entry2.tcl generated
 make ../../../lib/tk4.2/demos/filebox.tcl
 make library/demos/filebox.tcl
 done library/demos/filebox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl.old 2>/dev/null || true; test '' = 'library/demos/filebox.tcl' || { cp library/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl.old 2>/dev/null || true; test '' = 'library/demos/filebox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl || { ${STDCP} library/demos/filebox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/filebox.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/filebox.tcl generated
 make ../../../lib/tk4.2/demos/floor.tcl
 make library/demos/floor.tcl
 done library/demos/floor.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl.old 2>/dev/null || true; test '' = 'library/demos/floor.tcl' || { cp library/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl.old 2>/dev/null || true; test '' = 'library/demos/floor.tcl' || ${STDCMP} 2>/dev/null -s library/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl || { ${STDCP} library/demos/floor.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/floor.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/floor.tcl generated
 make ../../../lib/tk4.2/demos/form.tcl
 make library/demos/form.tcl
 done library/demos/form.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl.old 2>/dev/null || true; test '' = 'library/demos/form.tcl' || { cp library/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl.old 2>/dev/null || true; test '' = 'library/demos/form.tcl' || ${STDCMP} 2>/dev/null -s library/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl || { ${STDCP} library/demos/form.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/form.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/form.tcl generated
 make ../../../lib/tk4.2/demos/hello
 make library/demos/hello
 done library/demos/hello
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello.old 2>/dev/null || true; test '' = 'library/demos/hello' || { cp library/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello.old 2>/dev/null || true; test '' = 'library/demos/hello' || ${STDCMP} 2>/dev/null -s library/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello || { ${STDCP} library/demos/hello ${PACKAGE_ast_LIB}/tk4.2/demos/hello  		    		    ;}
 done ../../../lib/tk4.2/demos/hello generated
 make ../../../lib/tk4.2/demos/hscale.tcl
 make library/demos/hscale.tcl
 done library/demos/hscale.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/hscale.tcl' || { cp library/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/hscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl || { ${STDCP} library/demos/hscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/hscale.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/hscale.tcl generated
 make ../../../lib/tk4.2/demos/icon.tcl
 make library/demos/icon.tcl
 done library/demos/icon.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl.old 2>/dev/null || true; test '' = 'library/demos/icon.tcl' || { cp library/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl.old 2>/dev/null || true; test '' = 'library/demos/icon.tcl' || ${STDCMP} 2>/dev/null -s library/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl || { ${STDCP} library/demos/icon.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/icon.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/icon.tcl generated
 make ../../../lib/tk4.2/demos/image1.tcl
 make library/demos/image1.tcl
 done library/demos/image1.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl.old 2>/dev/null || true; test '' = 'library/demos/image1.tcl' || { cp library/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl.old 2>/dev/null || true; test '' = 'library/demos/image1.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl || { ${STDCP} library/demos/image1.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image1.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/image1.tcl generated
 make ../../../lib/tk4.2/demos/image2.tcl
 make library/demos/image2.tcl
 done library/demos/image2.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl.old 2>/dev/null || true; test '' = 'library/demos/image2.tcl' || { cp library/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl.old 2>/dev/null || true; test '' = 'library/demos/image2.tcl' || ${STDCMP} 2>/dev/null -s library/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl || { ${STDCP} library/demos/image2.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/image2.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/image2.tcl generated
 make ../../../lib/tk4.2/demos/items.tcl
 make library/demos/items.tcl
 done library/demos/items.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl.old 2>/dev/null || true; test '' = 'library/demos/items.tcl' || { cp library/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl.old 2>/dev/null || true; test '' = 'library/demos/items.tcl' || ${STDCMP} 2>/dev/null -s library/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl || { ${STDCP} library/demos/items.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/items.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/items.tcl generated
 make ../../../lib/tk4.2/demos/ixset
 make library/demos/ixset
 done library/demos/ixset
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset.old 2>/dev/null || true; test '' = 'library/demos/ixset' || { cp library/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset.old 2>/dev/null || true; test '' = 'library/demos/ixset' || ${STDCMP} 2>/dev/null -s library/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset || { ${STDCP} library/demos/ixset ${PACKAGE_ast_LIB}/tk4.2/demos/ixset  		    		    ;}
 done ../../../lib/tk4.2/demos/ixset generated
 make ../../../lib/tk4.2/demos/label.tcl
 make library/demos/label.tcl
 done library/demos/label.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl.old 2>/dev/null || true; test '' = 'library/demos/label.tcl' || { cp library/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl.old 2>/dev/null || true; test '' = 'library/demos/label.tcl' || ${STDCMP} 2>/dev/null -s library/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl || { ${STDCP} library/demos/label.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/label.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/label.tcl generated
 make ../../../lib/tk4.2/demos/license.terms
 make library/demos/license.terms
 done library/demos/license.terms
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms.old 2>/dev/null || true; test '' = 'library/demos/license.terms' || { cp library/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms.old 2>/dev/null || true; test '' = 'library/demos/license.terms' || ${STDCMP} 2>/dev/null -s library/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms || { ${STDCP} library/demos/license.terms ${PACKAGE_ast_LIB}/tk4.2/demos/license.terms  		    		    ;}
 done ../../../lib/tk4.2/demos/license.terms generated
 make ../../../lib/tk4.2/demos/menu.tcl
 make library/demos/menu.tcl
 done library/demos/menu.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl.old 2>/dev/null || true; test '' = 'library/demos/menu.tcl' || { cp library/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl.old 2>/dev/null || true; test '' = 'library/demos/menu.tcl' || ${STDCMP} 2>/dev/null -s library/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl || { ${STDCP} library/demos/menu.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/menu.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/menu.tcl generated
 make ../../../lib/tk4.2/demos/msgbox.tcl
 make library/demos/msgbox.tcl
 done library/demos/msgbox.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/demos/msgbox.tcl' || { cp library/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl.old 2>/dev/null || true; test '' = 'library/demos/msgbox.tcl' || ${STDCMP} 2>/dev/null -s library/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl || { ${STDCP} library/demos/msgbox.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/msgbox.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/msgbox.tcl generated
 make ../../../lib/tk4.2/demos/plot.tcl
 make library/demos/plot.tcl
 done library/demos/plot.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl.old 2>/dev/null || true; test '' = 'library/demos/plot.tcl' || { cp library/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl.old 2>/dev/null || true; test '' = 'library/demos/plot.tcl' || ${STDCMP} 2>/dev/null -s library/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl || { ${STDCP} library/demos/plot.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/plot.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/plot.tcl generated
 make ../../../lib/tk4.2/demos/puzzle.tcl
 make library/demos/puzzle.tcl
 done library/demos/puzzle.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl.old 2>/dev/null || true; test '' = 'library/demos/puzzle.tcl' || { cp library/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl.old 2>/dev/null || true; test '' = 'library/demos/puzzle.tcl' || ${STDCMP} 2>/dev/null -s library/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl || { ${STDCP} library/demos/puzzle.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/puzzle.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/puzzle.tcl generated
 make ../../../lib/tk4.2/demos/radio.tcl
 make library/demos/radio.tcl
 done library/demos/radio.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl.old 2>/dev/null || true; test '' = 'library/demos/radio.tcl' || { cp library/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl.old 2>/dev/null || true; test '' = 'library/demos/radio.tcl' || ${STDCMP} 2>/dev/null -s library/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl || { ${STDCP} library/demos/radio.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/radio.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/radio.tcl generated
 make ../../../lib/tk4.2/demos/rmt
 make library/demos/rmt
 done library/demos/rmt
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt.old 2>/dev/null || true; test '' = 'library/demos/rmt' || { cp library/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt.old 2>/dev/null || true; test '' = 'library/demos/rmt' || ${STDCMP} 2>/dev/null -s library/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt || { ${STDCP} library/demos/rmt ${PACKAGE_ast_LIB}/tk4.2/demos/rmt  		    		    ;}
 done ../../../lib/tk4.2/demos/rmt generated
 make ../../../lib/tk4.2/demos/rolodex
 make library/demos/rolodex
 done library/demos/rolodex
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex.old 2>/dev/null || true; test '' = 'library/demos/rolodex' || { cp library/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex.old 2>/dev/null || true; test '' = 'library/demos/rolodex' || ${STDCMP} 2>/dev/null -s library/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex || { ${STDCP} library/demos/rolodex ${PACKAGE_ast_LIB}/tk4.2/demos/rolodex  		    		    ;}
 done ../../../lib/tk4.2/demos/rolodex generated
 make ../../../lib/tk4.2/demos/ruler.tcl
 make library/demos/ruler.tcl
 done library/demos/ruler.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl.old 2>/dev/null || true; test '' = 'library/demos/ruler.tcl' || { cp library/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl.old 2>/dev/null || true; test '' = 'library/demos/ruler.tcl' || ${STDCMP} 2>/dev/null -s library/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl || { ${STDCP} library/demos/ruler.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/ruler.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/ruler.tcl generated
 make ../../../lib/tk4.2/demos/sayings.tcl
 make library/demos/sayings.tcl
 done library/demos/sayings.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl.old 2>/dev/null || true; test '' = 'library/demos/sayings.tcl' || { cp library/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl.old 2>/dev/null || true; test '' = 'library/demos/sayings.tcl' || ${STDCMP} 2>/dev/null -s library/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl || { ${STDCP} library/demos/sayings.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/sayings.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/sayings.tcl generated
 make ../../../lib/tk4.2/demos/search.tcl
 make library/demos/search.tcl
 done library/demos/search.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl.old 2>/dev/null || true; test '' = 'library/demos/search.tcl' || { cp library/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl.old 2>/dev/null || true; test '' = 'library/demos/search.tcl' || ${STDCMP} 2>/dev/null -s library/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl || { ${STDCP} library/demos/search.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/search.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/search.tcl generated
 make ../../../lib/tk4.2/demos/square
 make library/demos/square
 done library/demos/square
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square.old 2>/dev/null || true; test '' = 'library/demos/square' || { cp library/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square.old 2>/dev/null || true; test '' = 'library/demos/square' || ${STDCMP} 2>/dev/null -s library/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square || { ${STDCP} library/demos/square ${PACKAGE_ast_LIB}/tk4.2/demos/square  		    		    ;}
 done ../../../lib/tk4.2/demos/square generated
 make ../../../lib/tk4.2/demos/states.tcl
 make library/demos/states.tcl
 done library/demos/states.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl.old 2>/dev/null || true; test '' = 'library/demos/states.tcl' || { cp library/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl.old 2>/dev/null || true; test '' = 'library/demos/states.tcl' || ${STDCMP} 2>/dev/null -s library/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl || { ${STDCP} library/demos/states.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/states.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/states.tcl generated
 make ../../../lib/tk4.2/demos/style.tcl
 make library/demos/style.tcl
 done library/demos/style.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl.old 2>/dev/null || true; test '' = 'library/demos/style.tcl' || { cp library/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl.old 2>/dev/null || true; test '' = 'library/demos/style.tcl' || ${STDCMP} 2>/dev/null -s library/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl || { ${STDCP} library/demos/style.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/style.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/style.tcl generated
 make ../../../lib/tk4.2/demos/tclIndex
 make library/demos/tclIndex
 done library/demos/tclIndex
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex.old 2>/dev/null || true; test '' = 'library/demos/tclIndex' || { cp library/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex.old 2>/dev/null || true; test '' = 'library/demos/tclIndex' || ${STDCMP} 2>/dev/null -s library/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex || { ${STDCP} library/demos/tclIndex ${PACKAGE_ast_LIB}/tk4.2/demos/tclIndex  		    		    ;}
 done ../../../lib/tk4.2/demos/tclIndex generated
 make ../../../lib/tk4.2/demos/tcolor
 make library/demos/tcolor
 done library/demos/tcolor
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor.old 2>/dev/null || true; test '' = 'library/demos/tcolor' || { cp library/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor.old 2>/dev/null || true; test '' = 'library/demos/tcolor' || ${STDCMP} 2>/dev/null -s library/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor || { ${STDCP} library/demos/tcolor ${PACKAGE_ast_LIB}/tk4.2/demos/tcolor  		    		    ;}
 done ../../../lib/tk4.2/demos/tcolor generated
 make ../../../lib/tk4.2/demos/text.tcl
 make library/demos/text.tcl
 done library/demos/text.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl.old 2>/dev/null || true; test '' = 'library/demos/text.tcl' || { cp library/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl.old 2>/dev/null || true; test '' = 'library/demos/text.tcl' || ${STDCMP} 2>/dev/null -s library/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl || { ${STDCP} library/demos/text.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/text.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/text.tcl generated
 make ../../../lib/tk4.2/demos/timer
 make library/demos/timer
 done library/demos/timer
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer.old 2>/dev/null || true; test '' = 'library/demos/timer' || { cp library/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer.old 2>/dev/null || true; test '' = 'library/demos/timer' || ${STDCMP} 2>/dev/null -s library/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer || { ${STDCP} library/demos/timer ${PACKAGE_ast_LIB}/tk4.2/demos/timer  		    		    ;}
 done ../../../lib/tk4.2/demos/timer generated
 make ../../../lib/tk4.2/demos/twind.tcl
 make library/demos/twind.tcl
 done library/demos/twind.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl.old 2>/dev/null || true; test '' = 'library/demos/twind.tcl' || { cp library/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl.old 2>/dev/null || true; test '' = 'library/demos/twind.tcl' || ${STDCMP} 2>/dev/null -s library/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl || { ${STDCP} library/demos/twind.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/twind.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/twind.tcl generated
 make ../../../lib/tk4.2/demos/vscale.tcl
 make library/demos/vscale.tcl
 done library/demos/vscale.tcl
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/vscale.tcl' || { cp library/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl.old 2>/dev/null || true; test '' = 'library/demos/vscale.tcl' || ${STDCMP} 2>/dev/null -s library/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl || { ${STDCP} library/demos/vscale.tcl ${PACKAGE_ast_LIB}/tk4.2/demos/vscale.tcl  		    		    ;}
 done ../../../lib/tk4.2/demos/vscale.tcl generated
 make ../../../lib/tk4.2/demos/widget
 make library/demos/widget
 done library/demos/widget
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget.old 2>/dev/null || true; test '' = 'library/demos/widget' || { cp library/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget.old 2>/dev/null || true; test '' = 'library/demos/widget' || ${STDCMP} 2>/dev/null -s library/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget || { ${STDCP} library/demos/widget ${PACKAGE_ast_LIB}/tk4.2/demos/widget  		    		    ;}
 done ../../../lib/tk4.2/demos/widget generated
 make ../../../lib/tk4.2/demos/images
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/tk4.2/demos/images
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos/images 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tk4.2/demos/images | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tk4.2/demos/images 		    		   
 exec - fi
 done ../../../lib/tk4.2/demos/images generated
 make ../../../lib/tk4.2/demos/images/earth.gif
 make library/demos/images/earth.gif
 done library/demos/images/earth.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earth.gif' || { cp library/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earth.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif || { ${STDCP} library/demos/images/earth.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earth.gif  		    		    ;}
 done ../../../lib/tk4.2/demos/images/earth.gif generated
 make ../../../lib/tk4.2/demos/images/earthris.gif
 make library/demos/images/earthris.gif
 done library/demos/images/earthris.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earthris.gif' || { cp library/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif.old 2>/dev/null || true; test '' = 'library/demos/images/earthris.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif || { ${STDCP} library/demos/images/earthris.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/earthris.gif  		    		    ;}
 done ../../../lib/tk4.2/demos/images/earthris.gif generated
 make ../../../lib/tk4.2/demos/images/face.bmp
 make library/demos/images/face.bmp
 done library/demos/images/face.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/face.bmp' || { cp library/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/face.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp || { ${STDCP} library/demos/images/face.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/face.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/face.bmp generated
 make ../../../lib/tk4.2/demos/images/flagdown.bmp
 make library/demos/images/flagdown.bmp
 done library/demos/images/flagdown.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagdown.bmp' || { cp library/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagdown.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp || { ${STDCP} library/demos/images/flagdown.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagdown.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/flagdown.bmp generated
 make ../../../lib/tk4.2/demos/images/flagup.bmp
 make library/demos/images/flagup.bmp
 done library/demos/images/flagup.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagup.bmp' || { cp library/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/flagup.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp || { ${STDCP} library/demos/images/flagup.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/flagup.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/flagup.bmp generated
 make ../../../lib/tk4.2/demos/images/gray25.bmp
 make library/demos/images/gray25.bmp
 done library/demos/images/gray25.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/gray25.bmp' || { cp library/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/gray25.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp || { ${STDCP} library/demos/images/gray25.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/gray25.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/gray25.bmp generated
 make ../../../lib/tk4.2/demos/images/letters.bmp
 make library/demos/images/letters.bmp
 done library/demos/images/letters.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/letters.bmp' || { cp library/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/letters.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp || { ${STDCP} library/demos/images/letters.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/letters.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/letters.bmp generated
 make ../../../lib/tk4.2/demos/images/noletter.bmp
 make library/demos/images/noletter.bmp
 done library/demos/images/noletter.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/noletter.bmp' || { cp library/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/noletter.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp || { ${STDCP} library/demos/images/noletter.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/noletter.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/noletter.bmp generated
 make ../../../lib/tk4.2/demos/images/pattern.bmp
 make library/demos/images/pattern.bmp
 done library/demos/images/pattern.bmp
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/pattern.bmp' || { cp library/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp.old 2>/dev/null || true; test '' = 'library/demos/images/pattern.bmp' || ${STDCMP} 2>/dev/null -s library/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp || { ${STDCP} library/demos/images/pattern.bmp ${PACKAGE_ast_LIB}/tk4.2/demos/images/pattern.bmp  		    		    ;}
 done ../../../lib/tk4.2/demos/images/pattern.bmp generated
 make ../../../lib/tk4.2/demos/images/tcllogo.gif
 make library/demos/images/tcllogo.gif
 done library/demos/images/tcllogo.gif
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif.old 2>/dev/null || true; test '' = 'library/demos/images/tcllogo.gif' || { cp library/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif.old 2>/dev/null || true; test '' = 'library/demos/images/tcllogo.gif' || ${STDCMP} 2>/dev/null -s library/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif || { ${STDCP} library/demos/images/tcllogo.gif ${PACKAGE_ast_LIB}/tk4.2/demos/images/tcllogo.gif  		    		    ;}
 done ../../../lib/tk4.2/demos/images/tcllogo.gif generated
 make ../../../lib/tk4.2/demos/images/teapot.ppm
 make library/demos/images/teapot.ppm
 done library/demos/images/teapot.ppm
-exec - mv ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm.old 2>/dev/null || true; test '' = 'library/demos/images/teapot.ppm' || { cp library/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm.old 2>/dev/null || true; test '' = 'library/demos/images/teapot.ppm' || ${STDCMP} 2>/dev/null -s library/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm || { ${STDCP} library/demos/images/teapot.ppm ${PACKAGE_ast_LIB}/tk4.2/demos/images/teapot.ppm  		    		    ;}
 done ../../../lib/tk4.2/demos/images/teapot.ppm generated
 done install virtual
 make test

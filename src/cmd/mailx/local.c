@@ -9,6 +9,10 @@
 
 #include <pwd.h>
 
+#if _PACKAGE_ast
+#include <tm.h>
+#endif
+
 /*
  * Locate the user's mailbox file (ie, the place where new, unread
  * mail is queued).
@@ -19,6 +23,7 @@ mailbox(const char* user, const char* mail)
 	register char*		s;
 	register int		i;
 	int			n = 0;
+	struct stat		st;
 
 	static const char*	dir[] = {
 		_PATH_MAILDIR,
@@ -27,7 +32,7 @@ mailbox(const char* user, const char* mail)
 		"/usr/mail"
 	};
 
-	if (!user || !*user)
+	if (!user || !*user || !stat(mail, &st) && S_ISREG(st.st_mode))
 		return (char*)mail;
 	if (mail) {
 		if (imap_name(mail))
@@ -174,6 +179,19 @@ setscreensize(void)
 	state.screenheight = state.realscreenheight;
 	if (!state.screenwidth)
 		state.screenwidth = 80;
+}
+
+/*
+ * check if date is valid with no trailing junk
+ */
+
+int
+isdate(char* s)
+{
+	char*	t;
+
+	(void)tmdate(s, &t, NiL);
+	return *t == 0 && strmatch(s, "*[a-zA-Z]*[0-9]:[0-9]*");
 }
 
 #else /*_PACKAGE_ast*/
@@ -771,6 +789,16 @@ touch(const char* file, time_t atime, time_t mtime, int force)
 	tv[1].tv_sec = mtime;
 	tv[0].tv_usec = tv[1].tv_usec = 0;
 	return utimes(file, tv);
+}
+
+/*
+ * check if date is valid with no trailing junk
+ */
+
+int
+isdate(const char* s)
+{
+	return 1;
 }
 
 #endif /*_PACKAGE_ast*/

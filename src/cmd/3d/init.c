@@ -44,9 +44,9 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2002-06-25 $\0\n"
+"] (AT&T Research) 2002-07-17 $\0\n"
 #else
-"\n@(#)$Id: 3d (AT&T Research) 2002-06-25 $\0\n"
+"\n@(#)$Id: 3d (AT&T Research) 2002-07-17 $\0\n"
 #endif
 ;
 
@@ -488,6 +488,57 @@ set_safe(Fs_t* fs, const char* arg, int argsize, const char* op, int opsize)
 {
 	NoP(fs);
 	return(mapset(&state.vsafe, arg, argsize, op, opsize));
+}
+
+static int
+get_intercept(Fs_t* fs, register char* buf, const char* op, int flags)
+{
+	register int	n;
+
+	if (op)
+		return -1;
+	state.visit.prefix = fs->special;
+	state.visit.prelen = fs->specialsize + 4;
+	n = iterate(&state.vintercept, mapget, buf, flags);
+	state.visit.prelen = 0;
+	state.visit.prefix = 0;
+	return n;
+}
+
+typedef int (*Init_f)(int, const char*, int);
+
+static int
+set_intercept(Fs_t* fs, const char* arg, int argsize, const char* op, int opsize)
+{
+	void*			dll;
+	Init_f			init;
+	char			buf[PATH_MAX + 1];
+
+	static const char	sym[] = "_3d_init";
+
+	NoP(fs);
+	if (!*arg || mapset(&state.vintercept, arg, argsize, op, opsize))
+		return -1;
+	if (argsize)
+	{
+		if (argsize > PATH_MAX)
+			return -1;
+		strncpy(buf, arg, argsize);
+		buf[argsize] = 0;
+		arg = (const char*)buf;
+	}
+	if (!(dll = dlopen(arg, RTLD_LAZY)))
+	{
+		error(2, "%s: %s", arg, dlerror());
+		return -1;
+	}
+	if (!(init = (Init_f)dlsym(dll, sym)))
+	{
+		error(2, "%s: %s: initialization function not found", arg, sym);
+		dlclose(dll);
+		return -1;
+	}
+	return (*init)(0, op, opsize);
 }
 
 #if FS
@@ -938,6 +989,7 @@ dump(const char* op, const char* oe)
 				if (fs->flags & FS_NAME) bprintf(&b, e, " name");
 				if (!(fs->flags & FS_ON)) bprintf(&b, e, " off");
 				if (fs->flags & FS_OPEN) bprintf(&b, e, " open=%d", fs->fd);
+				if (fs->flags & FS_RAW) bprintf(&b, e, " raw");
 				if (fs->flags & FS_RECEIVE) bprintf(&b, e, " receive");
 				if (fs->flags & FS_REFERENCED) bprintf(&b, e, " referenced");
 				if (fs->flags & FS_REGULAR) bprintf(&b, e, " regular");
@@ -1162,16 +1214,6 @@ set_option(Fs_t* fs, const char* arg, int argsize, const char* op, int opsize)
 		}
 		state.trace.call = ~0;
 		break;
-	case HASHKEY6('i','n','t','e','r','c'):
-		{
-			typedef int (*Init_f)(int);
-			void*		dll;
-			Init_f		init;
-
-			if ((dll = dlopen(oe, RTLD_LAZY)) && (init = (Init_f)dlsym(dll, "_3d_init")))
-				(*init)(0);
-		}
-		break;
 	case HASHKEY6('l','i','c','e','n','s'):
 		if ((char*)op >= state.table.buf && (char*)oe < state.table.buf + sizeof(state.table.buf))
 		{
@@ -1386,6 +1428,8 @@ State_t	state =
 	FSINIT("fd",	0,		0,		FS_FS|FS_NAME,
 		HASHKEY2('f','d')),
 #endif
+	FSINIT("intercept",	get_intercept,	set_intercept,	FS_RAW,
+		HASHKEY6('i','n','t','e','r','c')),
 
 	/* NOTE: add internal mounts here */
 
@@ -1491,7 +1535,7 @@ intercept(Intercept_f call, unsigned long mask)
 #define var_path	"PATH="
 
 int
-init(int force)
+init(int force, const char* opt, int opsize)
 {
 	register char**	ep = environ;
 	register char*	cp;

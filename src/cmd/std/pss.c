@@ -59,6 +59,10 @@ static const char lib[] = "std:pss";
 #define dev_t		int
 #endif
 
+#if _WIN32
+#undef	SF_ERROR
+#endif
+
 #include <pss.h>
 
 #include "FEATURE/procfs"
@@ -77,8 +81,12 @@ typedef struct Tty_s			/* tty hash			*/
 #include <windows.h>
 #include <sys/cygwin.h>
 
+#ifndef PR_HZ
 #define PR_HZ			100
+#endif
+#ifndef PRNODEV
 #define PRNODEV			((dev_t)(-1))
+#endif
 
 #define PR_TTYMAP(d)		minor(d)
 

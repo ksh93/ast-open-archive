@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1985-2002 AT&T Corp.                *
+*                Copyright (c) 1999-2002 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -19,8 +19,40 @@
 *                         Florham Park NJ                          *
 *                                                                  *
 *               Glenn Fowler <gsf@research.att.com>                *
-*                David Korn <dgk@research.att.com>                 *
-*                 Phong Vo <kpv@research.att.com>                  *
 *                                                                  *
 *******************************************************************/
-void bad(}
+#pragma prototyped
+
+/*
+ * AT&T Labs Research
+ *
+ * test harness for strelapsed
+ */
+
+#include <ast.h>
+
+main(int argc, char** argv)
+{
+	char*		s;
+	char*		e;
+	unsigned long	t;
+	int		n;
+
+	while (s = *++argv)
+	{
+		n = (int)strtol(s, &e, 0);
+		if (*e)
+		{
+			sfprintf(sfstderr, "%s: number expected", s);
+			break;
+		}
+		if (!(s = *++argv))
+		{
+			sfprintf(sfstderr, "elapsed time expression expected");
+			break;
+		}
+		t = strelapsed(s, &e, n);
+		sfprintf(sfstdout, "strelapsed   \"%s\" \"%s\" %lu %d\n", s, e, t, n);
+	}
+	return 0;
+}

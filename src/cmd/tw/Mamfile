@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -357,75 +357,39 @@ done updatedb generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/tw
 prev tw
-exec - mv ${INSTALLROOT}/bin/tw ${INSTALLROOT}/bin/tw.old 2>/dev/null || true; test '' = 'tw' || { cp tw ${INSTALLROOT}/bin/tw  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/tw ${INSTALLROOT}/bin/tw.old 2>/dev/null || true; test '' = 'tw' || ${STDCMP} 2>/dev/null -s tw ${INSTALLROOT}/bin/tw || { ${STDCP} tw ${INSTALLROOT}/bin/tw  		    		    ;}
 done ../../../bin/tw generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/tw.1
 make tw.1
 done tw.1
-exec - mv ${INSTALLROOT}/man/man1/tw.1 ${INSTALLROOT}/man/man1/tw.1.old 2>/dev/null || true; test '' = 'tw.1' || { cp tw.1 ${INSTALLROOT}/man/man1/tw.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/tw.1 ${INSTALLROOT}/man/man1/tw.1.old 2>/dev/null || true; test '' = 'tw.1' || ${STDCMP} 2>/dev/null -s tw.1 ${INSTALLROOT}/man/man1/tw.1 || { ${STDCP} tw.1 ${INSTALLROOT}/man/man1/tw.1  		    		    ;}
 done ../../../man/man1/tw.1 generated
 make ../../../bin/find
 prev find
-exec - mv ${INSTALLROOT}/bin/find ${INSTALLROOT}/bin/find.old 2>/dev/null || true; test '' = 'find' || { cp find ${INSTALLROOT}/bin/find  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/find ${INSTALLROOT}/bin/find.old 2>/dev/null || true; test '' = 'find' || ${STDCMP} 2>/dev/null -s find ${INSTALLROOT}/bin/find || { ${STDCP} find ${INSTALLROOT}/bin/find  		    		    ;}
 done ../../../bin/find generated
 make ../../../bin/xargs
 prev xargs
-exec - mv ${INSTALLROOT}/bin/xargs ${INSTALLROOT}/bin/xargs.old 2>/dev/null || true; test '' = 'xargs' || { cp xargs ${INSTALLROOT}/bin/xargs  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/xargs ${INSTALLROOT}/bin/xargs.old 2>/dev/null || true; test '' = 'xargs' || ${STDCMP} 2>/dev/null -s xargs ${INSTALLROOT}/bin/xargs || { ${STDCP} xargs ${INSTALLROOT}/bin/xargs  		    		    ;}
 done ../../../bin/xargs generated
 make ../../../bin/locate
 prev locate
-exec - mv ${INSTALLROOT}/bin/locate ${INSTALLROOT}/bin/locate.old 2>/dev/null || true; test '' = 'locate' || { cp locate ${INSTALLROOT}/bin/locate  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/locate ${INSTALLROOT}/bin/locate.old 2>/dev/null || true; test '' = 'locate' || ${STDCMP} 2>/dev/null -s locate ${INSTALLROOT}/bin/locate || { ${STDCP} locate ${INSTALLROOT}/bin/locate  		    		    ;}
 done ../../../bin/locate generated
 make ../../../bin/updatedb
 prev updatedb
-exec - mv ${INSTALLROOT}/bin/updatedb ${INSTALLROOT}/bin/updatedb.old 2>/dev/null || true; test '' = 'updatedb' || { cp updatedb ${INSTALLROOT}/bin/updatedb  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/updatedb ${INSTALLROOT}/bin/updatedb.old 2>/dev/null || true; test '' = 'updatedb' || ${STDCMP} 2>/dev/null -s updatedb ${INSTALLROOT}/bin/updatedb || { ${STDCP} updatedb ${INSTALLROOT}/bin/updatedb  		    		    ;}
 done ../../../bin/updatedb generated
 done install virtual
 make test

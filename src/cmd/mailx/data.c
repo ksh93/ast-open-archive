@@ -6,7 +6,7 @@
 
 #include "mailx.h"
 
-static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2002-05-31 $\0\n";
+static const char	id[] = "\n@(#)$Id: mailx (AT&T/BSD) 9.9 2002-09-22 $\0\n";
 
 static const char	terms[] = "\n\
 @(#)Copyright (c) 1980, 1993, 1996, 2002\n\
@@ -353,7 +353,7 @@ static const struct var	vartab[] =
 	X("Pipe messages longer than this through ${PAGER}."),
 "debug",	&state.var.debug,		0,	0,0,
 	X("Enable verbose debugging diagnostics and do not deliver messages."),
-"domain",	&state.var.domain,		0,	0,0,
+"domain",	&state.var.domain,		N,	0,0,
 	X("The local mail address domain."),
 "dot",		&state.var.dot,			0,	0,0,
 	X("Make . on a line by itself equivalent to EOF on mail input."),
@@ -455,6 +455,8 @@ static const struct var	vartab[] =
 	X("The SMTP server host name. Used by the duplicate command and sendmail=\"smtp://\"."),
 "spam",		&state.var.spam,		0,	0,0,
 	X("Mark candidate spam messages X. All spam matching patterns are case-insensitive ksh(1) patterns."),
+"spambody",	&state.var.spambody,		N,	0,set_spambody,
+	X("`|' separated message body spam strings that must match exactly at the beginning of a message body text line."),
 "spamdelay",	(char**)&state.var.spamdelay,	I,	"3600",0,
 	X("Maximum seconds delay between hops."),
 "spamfrom",	&state.var.spamfrom,		N,	"-,delete,ignore,remove,unsubscribe",set_list,

@@ -11,5 +11,6 @@ ast-open :PACKAGE: \
 :INDEX: ksh, pax, nmake, sfio, and ast open source commands and libraries
 
 :DESCRIPTION:
-	The AT&T Labs Research ast-open package contains all of the ast open
-	source commands and libraries.
+	The AT&T Software Technology ast-open package from AT&T Labs
+	Research contains all of the ast open source commands and
+	libraries.

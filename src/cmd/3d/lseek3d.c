@@ -57,6 +57,8 @@ off64_t
 lseek64(int fd, off64_t off, int op)
 {
 	off64_t		r;
+	int		n;
+	int		m;
 
 	static Seek64_f	seekf;
 #if FS
@@ -68,14 +70,27 @@ lseek64(int fd, off64_t off, int op)
 #endif
 	if (!seekf)
 		seekf = (Seek64_f)sysfunc(SYS3D_lseek64);
-	if ((r = (*seekf)(fd, off, op)) == -1)
-		return -1;
+	for (m = state.trap.size - 1; m >= 0; m--)
+		if (MSG_MASK(MSG_seek) & state.trap.intercept[m].mask)
+			break;
+	if (m >= 0)
+	{
+		n = state.trap.size;
+		state.trap.size = m;
+		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], MSG_seek, SYS3D_lseek64, (void*)fd, (void*)&off, (void*)op, NiL, NiL, NiL) ? -1 : off;
+		state.trap.size = n;
+	}
+	else
+		r = (*seekf)(fd, off, op);
 #if FS
-	if (mp)
-		fscall(mp, MSG_seek, r, fd, off, op);
-	for (mp = state.global; mp; mp = mp->global)
-		if (fssys(mp, MSG_seek))
+	if (r != (off64_t)(-1))
+	{
+		if (mp)
 			fscall(mp, MSG_seek, r, fd, off, op);
+		for (mp = state.global; mp; mp = mp->global)
+			if (fssys(mp, MSG_seek))
+				fscall(mp, MSG_seek, r, fd, off, op);
+	}
 #endif
 	return r;
 }

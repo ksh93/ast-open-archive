@@ -46,8 +46,8 @@ varinit(void)
 	 * Get the local domain name.
 	 */
 
-	if ((s = strchr(state.var.hostname, '.')))
-		state.var.domain = varkeep(s + 1);
+	if ((s = strchr(state.var.hostname, '.')) && *++s)
+		state.var.domain = varkeep(s);
 	else
 		for (i = 0; i < sizeof(domains) / sizeof(domains[0]); i++) {
 			s = (char*)domains[i];
@@ -72,8 +72,11 @@ varinit(void)
 								t--;
 							if (*t)
 								*t = 0;
-							state.var.domain = varkeep(s);
-							break;
+							if (*s)
+							{
+								state.var.domain = varkeep(s);
+								break;
+							}
 						}
 					}
 					fileclose(fp);
@@ -473,6 +476,51 @@ set_shell(struct var* vp, const char* value)
 {
 	if (!value || !*value)
 		state.var.shell = varkeep(pathshell());
+}
+
+/*
+ * Trap spambody variable assignment.
+ */
+
+void
+set_spambody(struct var* vp, const char* value)
+{
+	register char*			s;
+	register char*			t;
+	register int			n;
+	register struct linematch*	mp;
+	register struct match*		xp;
+
+	if (!(mp = state.bodymatch)) {
+		if (!(mp = newof(0, struct linematch, 1, 0)))
+			note(PANIC, "Out of space");
+		state.bodymatch = mp;
+	}
+	s = (char*)value;
+	for (;;) {
+		if (t = strchr(s, '|'))
+			n = t - s;
+		else
+			n = strlen(s);
+		if (n) {
+			if (mp->minline < n)
+				mp->minline = n;
+			if (!(xp = newof(0, struct match, 1, n)))
+				note(PANIC, "Out of space");
+			memcpy(xp->string, s, n);
+			xp->length = n;
+			mp->beg[xp->beg = s[0]] = 1;
+			mp->mid[xp->mid = s[n/2]] = 1;
+			mp->end[xp->end = s[n-1]] = 1;
+			if (mp->last)
+				mp->last = mp->last->next = xp;
+			else
+				mp->match = mp->last = xp;
+		}
+		if (!t)
+			break;
+		s = t + 1;
+	}
 }
 
 /*

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -248,68 +248,32 @@ done cdb generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/cql
 prev cql
-exec - mv ${INSTALLROOT}/bin/cql ${INSTALLROOT}/bin/cql.old 2>/dev/null || true; test '' = 'cql' || { cp cql ${INSTALLROOT}/bin/cql  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/cql ${INSTALLROOT}/bin/cql.old 2>/dev/null || true; test '' = 'cql' || ${STDCMP} 2>/dev/null -s cql ${INSTALLROOT}/bin/cql || { ${STDCP} cql ${INSTALLROOT}/bin/cql  		    		    ;}
 done ../../../bin/cql generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/cql.1
 make cql.1
 done cql.1
-exec - mv ${INSTALLROOT}/man/man1/cql.1 ${INSTALLROOT}/man/man1/cql.1.old 2>/dev/null || true; test '' = 'cql.1' || { cp cql.1 ${INSTALLROOT}/man/man1/cql.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/cql.1 ${INSTALLROOT}/man/man1/cql.1.old 2>/dev/null || true; test '' = 'cql.1' || ${STDCMP} 2>/dev/null -s cql.1 ${INSTALLROOT}/man/man1/cql.1 || { ${STDCP} cql.1 ${INSTALLROOT}/man/man1/cql.1  		    		    ;}
 done ../../../man/man1/cql.1 generated
 make ../../../bin/cdb
 prev cdb
-exec - mv ${INSTALLROOT}/bin/cdb ${INSTALLROOT}/bin/cdb.old 2>/dev/null || true; test '' = 'cdb' || { cp cdb ${INSTALLROOT}/bin/cdb  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/cdb ${INSTALLROOT}/bin/cdb.old 2>/dev/null || true; test '' = 'cdb' || ${STDCMP} 2>/dev/null -s cdb ${INSTALLROOT}/bin/cdb || { ${STDCP} cdb ${INSTALLROOT}/bin/cdb  		    		    ;}
 done ../../../bin/cdb generated
 make ../../../man/man1/cdb.1
 make cdb.1
 done cdb.1
-exec - mv ${INSTALLROOT}/man/man1/cdb.1 ${INSTALLROOT}/man/man1/cdb.1.old 2>/dev/null || true; test '' = 'cdb.1' || { cp cdb.1 ${INSTALLROOT}/man/man1/cdb.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/cdb.1 ${INSTALLROOT}/man/man1/cdb.1.old 2>/dev/null || true; test '' = 'cdb.1' || ${STDCMP} 2>/dev/null -s cdb.1 ${INSTALLROOT}/man/man1/cdb.1 || { ${STDCP} cdb.1 ${INSTALLROOT}/man/man1/cdb.1  		    		    ;}
 done ../../../man/man1/cdb.1 generated
 done install virtual
 make test

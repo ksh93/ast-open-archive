@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Labs Research) 2002-06-26 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Labs Research) 2002-09-09 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -52,7 +52,8 @@ USAGE_LICENSE
 "	pathnames appearing on the standard input are copied.]"
 "[+?\bpax -r\b reads files from the standard input that is assumed to be"
 "	the result of a previous \bpax -w\b command.  Only files with names"
-"	that match any of the \apattern\a arguments are selected.  A"
+"	that match any of the \apattern\a arguments are selected.  Matching"
+"	is done before any \b-i\b or \b-s\b options are applied.  A"
 "	\apattern\a is given in the name-generating notation of \bsh\b(1),"
 "	except that the \b/\b character is also matched.  The default if no"
 "	\apattern\a is given is \b*\b which selects all files.  The selected"
@@ -516,7 +517,7 @@ Option_t		options[] =
 },
 {
 	"invert",
-	0,
+	'c',
 	OPT_invert,
 	"Invert pattern match sense. The !(...) construct is more general.",
 },

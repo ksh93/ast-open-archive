@@ -699,15 +699,15 @@ collect(struct header* hp, unsigned long flags)
 						if (n == PART_INIT)
 							putc('\n', fp);
 						t = s + state.part.out.boundlen + 2;
-						if (*t == '\n')
+						if (*t == '\n' || *t == '\r' && *(t + 1) == '\n')
 							n = PART_DATA;
-						else if (*t++ == '-' && *t++ == '-' && *t == '\n') {
+						else if (*t++ == '-' && *t++ == '-' && (*t == '\n' || *t == '\r' && *(t + 1) == '\n')) {
 							n = PART_INIT;
 							continue;
 						}
 					}
 					else if (n == PART_INIT) {
-						if (*s == '\n')
+						if (*s == '\n' || *s == '\r' && *(s + 1) == '\n')
 							continue;
 						n = PART_MAIN;
 						part(fp, NiL, NiL, 0);

@@ -46,7 +46,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cql (AT&T Labs Research) 2002-06-27 $\n]"
+"[-?\n@(#)$Id: cql (AT&T Labs Research) 2002-09-06 $\n]"
 USAGE_LICENSE
 "[+NAME?cql - C query language]"
 "[+DESCRIPTION?\bcql\b applies C style expressions to flat database files."

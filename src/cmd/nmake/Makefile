@@ -44,31 +44,6 @@ convert :: convert.c
 
 maketest :: maketest.sh
 
-C $(ID) :PROBE: make.probe probe.ini
-
-probe.ini : (CC.HOSTTYPE) probe.win32
-	t=$(CC.HOSTTYPE)
-	ifs=$IFS
-	IFS=.
-	set x $t
-	IFS=$ifs
-	t=$2
-	set x $(*)
-	while	:
-	do	shift
-		case $# in
-		0)	break ;;
-		esac
-		case $1 in
-		*probe.$t)
-			break
-		esac
-	done
-	case $1 in
-	?*)	cmp -s $1 $(<) || cp $1 $(<) ;;
-	*)	: > $(<)
-	esac
-
 Makeinstall.mk : $$(-mam:N=static*:??$$(cctype:@P=P=C,pp)?)
 	{
 		echo '/* : : generated from $(cctype) assertions : : */'

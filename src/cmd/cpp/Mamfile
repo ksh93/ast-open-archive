@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -145,87 +145,33 @@ done acpp generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/cpp
 prev cpp
-exec - mv ${INSTALLROOT}/bin/cpp ${INSTALLROOT}/bin/cpp.old 2>/dev/null || true; test '' = 'cpp' || { cp cpp ${INSTALLROOT}/bin/cpp  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/cpp ${INSTALLROOT}/bin/cpp.old 2>/dev/null || true; test '' = 'cpp' || ${STDCMP} 2>/dev/null -s cpp ${INSTALLROOT}/bin/cpp || { ${STDCP} cpp ${INSTALLROOT}/bin/cpp  		    		    ;}
 done ../../../bin/cpp generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/cpp.1
 make cpp.1
 done cpp.1
-exec - mv ${INSTALLROOT}/man/man1/cpp.1 ${INSTALLROOT}/man/man1/cpp.1.old 2>/dev/null || true; test '' = 'cpp.1' || { cp cpp.1 ${INSTALLROOT}/man/man1/cpp.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/cpp.1 ${INSTALLROOT}/man/man1/cpp.1.old 2>/dev/null || true; test '' = 'cpp.1' || ${STDCMP} 2>/dev/null -s cpp.1 ${INSTALLROOT}/man/man1/cpp.1 || { ${STDCP} cpp.1 ${INSTALLROOT}/man/man1/cpp.1  		    		    ;}
 done ../../../man/man1/cpp.1 generated
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/cpp
 prev cpp
-exec - mv ${PACKAGE_ast_LIB}/cpp ${PACKAGE_ast_LIB}/cpp.old 2>/dev/null || true; test '' = 'cpp' || { cp cpp ${PACKAGE_ast_LIB}/cpp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cpp ${PACKAGE_ast_LIB}/cpp.old 2>/dev/null || true; test '' = 'cpp' || ${STDCMP} 2>/dev/null -s cpp ${PACKAGE_ast_LIB}/cpp || { ${STDCP} cpp ${PACKAGE_ast_LIB}/cpp  		    		    ;}
 done ../../../lib/cpp generated
 make ../../../lib/acpp
 prev ../../../lib/cpp

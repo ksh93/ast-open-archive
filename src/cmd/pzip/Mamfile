@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
@@ -234,46 +234,28 @@ done funzip generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/pzip
 prev pzip
-exec - mv ${INSTALLROOT}/bin/pzip ${INSTALLROOT}/bin/pzip.old 2>/dev/null || true; test '' = 'pzip' || { cp pzip ${INSTALLROOT}/bin/pzip  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/pzip ${INSTALLROOT}/bin/pzip.old 2>/dev/null || true; test '' = 'pzip' || ${STDCMP} 2>/dev/null -s pzip ${INSTALLROOT}/bin/pzip || { ${STDCP} pzip ${INSTALLROOT}/bin/pzip  		    		    ;}
 done ../../../bin/pzip generated
 make ../../../bin/pop
 prev pop
-exec - mv ${INSTALLROOT}/bin/pop ${INSTALLROOT}/bin/pop.old 2>/dev/null || true; test '' = 'pop' || { cp pop ${INSTALLROOT}/bin/pop  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/pop ${INSTALLROOT}/bin/pop.old 2>/dev/null || true; test '' = 'pop' || ${STDCMP} 2>/dev/null -s pop ${INSTALLROOT}/bin/pop || { ${STDCP} pop ${INSTALLROOT}/bin/pop  		    		    ;}
 done ../../../bin/pop generated
 make ../../../bin/pin
 prev pin
-exec - mv ${INSTALLROOT}/bin/pin ${INSTALLROOT}/bin/pin.old 2>/dev/null || true; test '' = 'pin' || { cp pin ${INSTALLROOT}/bin/pin  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/pin ${INSTALLROOT}/bin/pin.old 2>/dev/null || true; test '' = 'pin' || ${STDCMP} 2>/dev/null -s pin ${INSTALLROOT}/bin/pin || { ${STDCP} pin ${INSTALLROOT}/bin/pin  		    		    ;}
 done ../../../bin/pin generated
 make ../../../bin/rectify
 prev rectify
-exec - mv ${INSTALLROOT}/bin/rectify ${INSTALLROOT}/bin/rectify.old 2>/dev/null || true; test '' = 'rectify' || { cp rectify ${INSTALLROOT}/bin/rectify  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/rectify ${INSTALLROOT}/bin/rectify.old 2>/dev/null || true; test '' = 'rectify' || ${STDCMP} 2>/dev/null -s rectify ${INSTALLROOT}/bin/rectify || { ${STDCP} rectify ${INSTALLROOT}/bin/rectify  		    		    ;}
 done ../../../bin/rectify generated
 make ../../../bin/funzip
 prev funzip
-exec - mv ${INSTALLROOT}/bin/funzip ${INSTALLROOT}/bin/funzip.old 2>/dev/null || true; test '' = 'funzip' || { cp funzip ${INSTALLROOT}/bin/funzip  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/funzip ${INSTALLROOT}/bin/funzip.old 2>/dev/null || true; test '' = 'funzip' || ${STDCMP} 2>/dev/null -s funzip ${INSTALLROOT}/bin/funzip || { ${STDCP} funzip ${INSTALLROOT}/bin/funzip  		    		    ;}
 done ../../../bin/funzip generated
 done install virtual
 make test

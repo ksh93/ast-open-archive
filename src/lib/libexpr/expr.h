@@ -260,17 +260,6 @@ struct Excc_s				/* excc() state			*/
 #if _BLD_expr && defined(__EXPORT__)
 #define extern		__EXPORT__
 #endif
-#if !_BLD_expr && defined(__IMPORT__)
-#define extern		__IMPORT__
-#endif
-
-extern Exid_t		exbuiltin[];
-
-#undef	extern
-
-#if _BLD_expr && defined(__EXPORT__)
-#define extern		__EXPORT__
-#endif
 
 extern Exnode_t*	excast(Expr_t*, Exnode_t*, int, Exnode_t*, int);
 extern int		excc(Excc_t*, const char*, Exid_t*, int);

@@ -64,7 +64,11 @@ struct inflate_blocks_state {
 /* defines for inflate input/output */
 /*   update pointers and return */
 #define UPDBITS {s->bitb=b;s->bitk=k;}
+#ifdef ZINTERNAL_STATE
+#define UPDIN {z->avail_in=n;z->total_in+=p-z->next_in;z->total_IN+=p-z->next_in;z->next_in=p;}
+#else
 #define UPDIN {z->avail_in=n;z->total_in+=p-z->next_in;z->next_in=p;}
+#endif
 #define UPDOUT {s->write=q;}
 #define UPDATE {UPDBITS UPDIN UPDOUT}
 #define LEAVE {UPDATE return inflate_flush(s,z,r);}
@@ -93,6 +97,10 @@ extern int inflate_flush OF((
     z_streamp ,
     int));
 
-struct internal_state      {int dummy;}; /* for buggy compilers */
+#ifdef ZINTERNAL_STATE
+struct internal_state {ZINTERNAL_STATE;};
+#else
+struct internal_state {int dummy;}; /* for buggy compilers */
+#endif
 
 #endif

@@ -1,3 +1,18 @@
+02-09-22 Makerules.mk: drop ${mam_cc_STATIC} for +l binding
+	 expand.c: fix mam $(FOO|BAR) => ${mam_cc_FOO-${mam_cc_BAR}} conversion
+02-09-11 make.probe,probe.win32: move to INIT src to share with mamprobe
+	 Makerules.mk: add a few more mam_cc_* refs (mamprobe mostly complete)
+	 Makerules.mk: don't install .a only on .dll+.lib systems
+	 Makerules.mk: add :PACKAGE: :ignore=dir:, PACKAGE_IGNORE
+	 Makerules.mk: .PACKAGE.INIT. always initializes .PACKAGE.GLOBAL.
+	 Makerules.mk: add STDCMP to MAM install action
+02-09-07 Makerules.mk: disable lib REQUIRE closure if from CC.REQUIRE.*
+02-09-05 Makerules.mk: drop .NO.STATIC foo.a => foo-static.a rename
+02-09-01 Makerules.mk: add RMRECURSEFLAGS=-r
+	 Makerules.mk: assume mkdir -p (handled by INIT install)
+02-08-30 make.c: modified .JOINT siblings now trigger action
+02-08-06 make.h: { setbit shquote } macro rename to appease netbsd -- barf
+02-07-17 make.c,parse.c: allow keepgoing to be set by .QUERY
 02-06-11 Makerules.mk: :F=%(...)S: => :F=%(...)s:
 	 misc.c: %S %C obsolete warning
 	 variable.c: fix $(!) that improperly skipped !rule.scan && PREREQS.scan

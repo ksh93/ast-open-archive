@@ -1,3 +1,10 @@
+02-09-24 dd.c: fix partial record computations and printf format
+02-09-11 pss.c: _WIN32 SF_ERROR <windows.h> workaround
+	 touch.c: drop TM_DATESTYLE (snarfed too much from date.c)
+02-09-09 ls.c: really ignore -T<n>
+02-08-13 touch.tst: fix 10 digit ambiguity test
+02-08-05 ls.c: add %(perm)[os]
+02-07-31 file.c: add -[cdiM] and swap (old ast) -m and -M semantics for posix
 02-06-25 ps.c: handle %s vs. %d --format inconsistencies
 02-02-14 touch.c: explicit epoch dates (0) are different from now (also 0)
 	 locale.c: don't output on unknown keyword

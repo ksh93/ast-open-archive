@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -262,50 +262,32 @@ done msgget generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/msgadmin
 prev msgadmin
-exec - mv ${INSTALLROOT}/bin/msgadmin ${INSTALLROOT}/bin/msgadmin.old 2>/dev/null || true; test '' = 'msgadmin' || { cp msgadmin ${INSTALLROOT}/bin/msgadmin  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/msgadmin ${INSTALLROOT}/bin/msgadmin.old 2>/dev/null || true; test '' = 'msgadmin' || ${STDCMP} 2>/dev/null -s msgadmin ${INSTALLROOT}/bin/msgadmin || { ${STDCP} msgadmin ${INSTALLROOT}/bin/msgadmin  		    		    ;}
 done ../../../bin/msgadmin generated
 make ../../../bin/msgcpp
 prev msgcpp
-exec - mv ${INSTALLROOT}/bin/msgcpp ${INSTALLROOT}/bin/msgcpp.old 2>/dev/null || true; test '' = 'msgcpp' || { cp msgcpp ${INSTALLROOT}/bin/msgcpp  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/msgcpp ${INSTALLROOT}/bin/msgcpp.old 2>/dev/null || true; test '' = 'msgcpp' || ${STDCMP} 2>/dev/null -s msgcpp ${INSTALLROOT}/bin/msgcpp || { ${STDCP} msgcpp ${INSTALLROOT}/bin/msgcpp  		    		    ;}
 done ../../../bin/msgcpp generated
 make ../../../bin/msgcc
 prev msgcc
-exec - mv ${INSTALLROOT}/bin/msgcc ${INSTALLROOT}/bin/msgcc.old 2>/dev/null || true; test '' = 'msgcc' || { cp msgcc ${INSTALLROOT}/bin/msgcc  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/msgcc ${INSTALLROOT}/bin/msgcc.old 2>/dev/null || true; test '' = 'msgcc' || ${STDCMP} 2>/dev/null -s msgcc ${INSTALLROOT}/bin/msgcc || { ${STDCP} msgcc ${INSTALLROOT}/bin/msgcc  		    		    ;}
 done ../../../bin/msgcc generated
 make ../../../bin/msgcvt
 prev msgcvt
-exec - mv ${INSTALLROOT}/bin/msgcvt ${INSTALLROOT}/bin/msgcvt.old 2>/dev/null || true; test '' = 'msgcvt' || { cp msgcvt ${INSTALLROOT}/bin/msgcvt  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/msgcvt ${INSTALLROOT}/bin/msgcvt.old 2>/dev/null || true; test '' = 'msgcvt' || ${STDCMP} 2>/dev/null -s msgcvt ${INSTALLROOT}/bin/msgcvt || { ${STDCP} msgcvt ${INSTALLROOT}/bin/msgcvt  		    		    ;}
 done ../../../bin/msgcvt generated
 make ../../../bin/msggen
 prev msggen
-exec - mv ${INSTALLROOT}/bin/msggen ${INSTALLROOT}/bin/msggen.old 2>/dev/null || true; test '' = 'msggen' || { cp msggen ${INSTALLROOT}/bin/msggen  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/msggen ${INSTALLROOT}/bin/msggen.old 2>/dev/null || true; test '' = 'msggen' || ${STDCMP} 2>/dev/null -s msggen ${INSTALLROOT}/bin/msggen || { ${STDCP} msggen ${INSTALLROOT}/bin/msggen  		    		    ;}
 done ../../../bin/msggen generated
 make ../../../bin/msgget
 prev msgget
-exec - mv ${INSTALLROOT}/bin/msgget ${INSTALLROOT}/bin/msgget.old 2>/dev/null || true; test '' = 'msgget' || { cp msgget ${INSTALLROOT}/bin/msgget  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/msgget ${INSTALLROOT}/bin/msgget.old 2>/dev/null || true; test '' = 'msgget' || ${STDCMP} 2>/dev/null -s msgget ${INSTALLROOT}/bin/msgget || { ${STDCP} msgget ${INSTALLROOT}/bin/msgget  		    		    ;}
 done ../../../bin/msgget generated
 done install virtual
 make test

@@ -142,7 +142,7 @@ typedef struct Fs
 	unsigned long	ack;
 	unsigned long	call;
 	unsigned long	terse;
-	char		special[7];
+	char		special[10];
 	char		attr[ATTR_MAX];
 	struct stat	st;
 	char*		match;
@@ -275,6 +275,7 @@ typedef struct
 #define FS_map		5
 #define FS_safe		6
 #define FS_fd		7
+#define FS_intercept	8
 
 #define FS_ACTIVE	(1<<0)
 #define FS_BOUND	(1<<1)
@@ -295,19 +296,20 @@ typedef struct
 #define FS_NAME		(1L<<16)
 #define FS_ON		(1L<<17)
 #define FS_OPEN		(1L<<18)
-#define FS_RECEIVE	(1L<<19)
-#define FS_REFERENCED	(1L<<20)
-#define FS_REGULAR	(1L<<21)
-#define FS_UNIQUE	(1L<<22)
-#define FS_VALIDATED	(1L<<23)
-#define FS_WRITE	(1L<<24)
+#define FS_RAW		(1L<<19)
+#define FS_RECEIVE	(1L<<20)
+#define FS_REFERENCED	(1L<<21)
+#define FS_REGULAR	(1L<<22)
+#define FS_UNIQUE	(1L<<23)
+#define FS_VALIDATED	(1L<<24)
+#define FS_WRITE	(1L<<25)
 
-#define FS_LOCAL	(1L<<25)
+#define FS_LOCAL	(1L<<26)
 
 #define cancel(p)	(*(p)>=RESERVED_FD?(state.file[*(p)].reserved=0,CLOSE(*(p)),*(p)=0):(-1))
 #define fsfd(p)		((((p)->flags&(FS_ERROR|FS_ON|FS_OPEN))==(FS_ON|FS_OPEN))?(p)->fd:((((p)->flags&(FS_BOUND|FS_ERROR|FS_INIT|FS_ON))==(FS_BOUND|FS_ON))?fsinit(p,-1):-1))
 #define fson(p)		(((p)->flags&(FS_BOUND|FS_ERROR|FS_ON))==(FS_BOUND|FS_ON))
-#define initialize()	do { if (!state.pid) init(0); else if (state.control.note) control(); } while(0)
+#define initialize()	do { if (!state.pid) init(0,0,0); else if (state.control.note) control(); } while(0)
 #define monitored()	((state.path.monitor&&!state.path.mount)?state.path.monitor:(Mount_t*)0)
 #define mounted()	((state.path.monitor&&state.path.mount)?state.path.monitor:(Mount_t*)0)
 #if _hdr_alloca
@@ -474,6 +476,7 @@ typedef struct
 	Table_t		vmount;
 	Table_t		vpath;
 	Table_t		vsafe;
+	Table_t		vintercept;
 	File_t		file[OPEN_MAX];
 	Visit_t		visit;
 	Path_t		path;
@@ -509,7 +512,7 @@ extern int		fs3d_open(const char*, int, mode_t);
 extern void		fsdrop(Fs_t*, int);
 extern int		fsinit(Fs_t*, int);
 extern unsigned long	getkey(const char*, const char*, int);
-extern int		init(int);
+extern int		init(int, const char*, int);
 extern int		instance(char*, char*, struct stat*, int);
 extern int		iterate(Table_t*, int(*)(Map_t*, char*, int), char*, int);
 extern int		keep(const char*, size_t, int);

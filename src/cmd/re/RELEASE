@@ -1,3 +1,7 @@
+02-08-12 testregex.dat,locale.dat: add REG_MINIMAL tests for mb bug
+02-08-07 *.dat: recognize anchors in BRE subexpressions
+02-07-17 testregex.c: fix basic re support test
+02-07-15 locale.dat: add S and K tests for testfnmatch
 02-06-20 testregex.c: handle invalid (?,*) and (*,?) in match[]
 02-06-11 ed.c: fix global EOF test
 02-06-10 testregex.c: add -x to inhibit REG_NOSUB

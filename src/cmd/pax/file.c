@@ -595,8 +595,7 @@ openout(register Archive_t* ap, register File_t* f)
 					exists |= 0100;
 					goto again;
 				}
-				if (!(perm & S_IWUSR))
-					exists |= 0200;
+				exists |= 0200;
 			}
 			else if (!(exists & 0070))
 			{
@@ -740,9 +739,9 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	}
 	if (ap->delta)
 		ap->delta->hdr = ap->delta->hdrbuf;
-	f->path = savepath(&pathbuffer, name, ftw->pathlen);
 	name = savepath(&namebuffer, name, ftw->pathlen);
 	pathcanon(name, 0);
+	f->path = savepath(&pathbuffer, name, ftw->pathlen);
 	f->name = map(name);
 	if (state.files && state.operation == (IN|OUT) && dirprefix(state.destination, name))
 		return 0;

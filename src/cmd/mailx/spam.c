@@ -308,6 +308,11 @@ spammed(register struct msg* mp)
 						note(0, "spam: advertisement header");
 					return 1;
 				}
+				else if (!strcasecmp(t, "Authentication-Warning")) {
+					if (TRACING('x'))
+						note(0, "spam: authentication warning");
+					test |= 0x0004;
+				}
 			}
 			else if (*t == 'C' || *t == 'c') {
 				if (!strcasecmp(t, "Content-Type")) {
@@ -344,6 +349,11 @@ spammed(register struct msg* mp)
 						note(0, "spam: message-id `%s'", t);
 					if (!*t)
 						return 1;
+				}
+				else if (!strcasecmp(t, "Mime-Autoconverted")) {
+					if (TRACING('x'))
+						note(0, "spam: mime autoconverted");
+					test |= 0x0008;
 				}
 			}
 			else if (*t == 'R' || *t == 'r') {
@@ -418,7 +428,7 @@ spammed(register struct msg* mp)
 			}
 		}
 		if (TRACING('x'))
-			note(0, "spam: proper=%d ok=%d no=%d", proper, ok, no);
+			note(0, "spam: proper=%d ok=%d no=%d test=0x%04x", proper, ok, no, test);
 		if (proper)
 			return 0;
 		if (test & state.var.spamtest)

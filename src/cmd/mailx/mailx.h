@@ -404,6 +404,24 @@ struct dict {
 	Dt_t*		next;		/* Next STACK dict */
 };
 
+struct match {
+	struct match*	next;		/* enxt in list */
+	int		length;		/* string length */
+	int		beg;		/* begin character match */
+	int		mid;		/* mid character match */
+	int		end;		/* end character match */
+	char		string[1];	/* match string */
+};
+
+struct linematch {
+	int		minline;	/* minimum line size */
+	unsigned char	beg[256];	/* begin character match */
+	unsigned char	mid[256];	/* mid character match */
+	unsigned char	end[256];	/* end character match */
+	struct match*	match;		/* exact match list */
+	struct match*	last;		/* last match list item */
+};
+
 /*
  * dictsearch() flag values
  */
@@ -540,6 +558,7 @@ typedef struct {
 	struct child*	children;	/* Child list */
 	struct cmd*	cmd;		/* Current command table entry */
 	struct file*	files;		/* fileopen() list */
+	struct linematch* bodymatch;	/* compiled state.var.spambody */
 	struct stat	openstat;	/* fileopen stat */
 	Dt_t* 		ignore;		/* Ignored fields */
 	Dt_t*		saveignore;	/* Ignored fields on save to folder */
@@ -732,6 +751,7 @@ typedef struct {
 	char*	signature;
 	char*	smtp;
 	char*	spam;
+	char*	spambody;
 	long	spamdelay;
 	char*	spamfrom;
 	char*	spamfromok;
@@ -842,6 +862,7 @@ extern int		incorporate(void);
 extern int		incfile(void);
 extern int		isall(const char*);
 extern char*		iscmd(char*);
+extern int		isdate(char*);
 extern int		isdir(char*);
 extern int		ishead(char*, int);
 extern int		isreg(char*);
@@ -915,6 +936,7 @@ extern void		set_pwd(struct var*, const char*);
 extern void		set_screen(struct var*, const char*);
 extern void		set_sendmail(struct var*, const char*);
 extern void		set_shell(struct var*, const char*);
+extern void		set_spambody(struct var*, const char*);
 extern void		set_toplines(struct var*, const char*);
 extern void		set_trace(struct var*, const char*);
 extern void		set_user(struct var*, const char*);

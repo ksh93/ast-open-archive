@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -357,7 +357,7 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2002-06-11 \$\0\n"\" -c version.c
+exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 4.2 2002-09-22 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -405,116 +405,44 @@ done ppcc generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/nmake
 prev nmake
-exec - mv ${INSTALLROOT}/bin/nmake ${INSTALLROOT}/bin/nmake.old 2>/dev/null || true; test '' = 'nmake' || { cp nmake ${INSTALLROOT}/bin/nmake  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/nmake ${INSTALLROOT}/bin/nmake.old 2>/dev/null || true; test '' = 'nmake' || ${STDCMP} 2>/dev/null -s nmake ${INSTALLROOT}/bin/nmake || { ${STDCP} nmake ${INSTALLROOT}/bin/nmake  		    		    ;}
 done ../../../bin/nmake generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/nmake.1
 make nmake.1
 done nmake.1
-exec - mv ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; test '' = 'nmake.1' || { cp nmake.1 ${INSTALLROOT}/man/man1/nmake.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; test '' = 'nmake.1' || ${STDCMP} 2>/dev/null -s nmake.1 ${INSTALLROOT}/man/man1/nmake.1 || { ${STDCP} nmake.1 ${INSTALLROOT}/man/man1/nmake.1  		    		    ;}
 done ../../../man/man1/nmake.1 generated
 make ../../../man/man1/makerules.1
 make makerules.1
 done makerules.1
-exec - mv ${INSTALLROOT}/man/man1/makerules.1 ${INSTALLROOT}/man/man1/makerules.1.old 2>/dev/null || true; test '' = 'makerules.1' || { cp makerules.1 ${INSTALLROOT}/man/man1/makerules.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/makerules.1 ${INSTALLROOT}/man/man1/makerules.1.old 2>/dev/null || true; test '' = 'makerules.1' || ${STDCMP} 2>/dev/null -s makerules.1 ${INSTALLROOT}/man/man1/makerules.1 || { ${STDCP} makerules.1 ${INSTALLROOT}/man/man1/makerules.1  		    		    ;}
 done ../../../man/man1/makerules.1 generated
 make ../../../man/man8
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man8
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man8 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man8 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man8 		    		   
 exec - fi
 done ../../../man/man8 generated
 make ../../../man/man8/nmake.8
 make nmake.8
 done nmake.8
-exec - mv ${INSTALLROOT}/man/man8/nmake.8 ${INSTALLROOT}/man/man8/nmake.8.old 2>/dev/null || true; test '' = 'nmake.8' || { cp nmake.8 ${INSTALLROOT}/man/man8/nmake.8  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man8/nmake.8 ${INSTALLROOT}/man/man8/nmake.8.old 2>/dev/null || true; test '' = 'nmake.8' || ${STDCMP} 2>/dev/null -s nmake.8 ${INSTALLROOT}/man/man8/nmake.8 || { ${STDCP} nmake.8 ${INSTALLROOT}/man/man8/nmake.8  		    		    ;}
 done ../../../man/man8/nmake.8 generated
 make ../../../lib/make
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/make
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/make 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/make | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/make 		    		   
 exec - fi
 done ../../../lib/make generated
 make ../../../lib/make/Makeinstall.mk
@@ -578,194 +506,79 @@ exec - 	do	eval echo \$n = \$$n
 exec - 	done
 exec - } > Makeinstall.mk
 done Makeinstall.mk generated
-exec - mv ${PACKAGE_ast_LIB}/make/Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk.old 2>/dev/null || true; test '' = 'Makeinstall.mk' || { cp Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk.old 2>/dev/null || true; test '' = 'Makeinstall.mk' || ${STDCMP} 2>/dev/null -s Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk || { ${STDCP} Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk  		    		    ;}
 done ../../../lib/make/Makeinstall.mk generated
 make ../../../lib/make/Makerules.mk
 make Makerules.mk
 make Localrules.mk implicit
 done Localrules.mk dontcare virtual
-make rules-${_hosttype_=`package`}.mk implicit
-done rules-${_hosttype_=`package`}.mk dontcare virtual
+make rules-${mam_cc_HOSTTYPE}.mk implicit
+done rules-${mam_cc_HOSTTYPE}.mk dontcare virtual
 prev Makeinstall.mk implicit
 make msgcat.mk implicit
 done msgcat.mk dontcare
 make Scanrules.mk implicit
 done Scanrules.mk dontcare
 done Makerules.mk
-exec - mv ${PACKAGE_ast_LIB}/make/Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk.old 2>/dev/null || true; test '' = 'Makerules.mk' || { cp Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk.old 2>/dev/null || true; test '' = 'Makerules.mk' || ${STDCMP} 2>/dev/null -s Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk || { ${STDCP} Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk  		    		    ;}
 done ../../../lib/make/Makerules.mk generated
 make ../../../lib/make/Scanrules.mk
 prev Scanrules.mk
-exec - mv ${PACKAGE_ast_LIB}/make/Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk.old 2>/dev/null || true; test '' = 'Scanrules.mk' || { cp Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk.old 2>/dev/null || true; test '' = 'Scanrules.mk' || ${STDCMP} 2>/dev/null -s Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk || { ${STDCP} Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk  		    		    ;}
 done ../../../lib/make/Scanrules.mk generated
 make ../../../lib/make/S.mk
 make S.mk
 done S.mk
-exec - mv ${PACKAGE_ast_LIB}/make/S.mk ${PACKAGE_ast_LIB}/make/S.mk.old 2>/dev/null || true; test '' = 'S.mk' || { cp S.mk ${PACKAGE_ast_LIB}/make/S.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/S.mk ${PACKAGE_ast_LIB}/make/S.mk.old 2>/dev/null || true; test '' = 'S.mk' || ${STDCMP} 2>/dev/null -s S.mk ${PACKAGE_ast_LIB}/make/S.mk || { ${STDCP} S.mk ${PACKAGE_ast_LIB}/make/S.mk  		    		    ;}
 done ../../../lib/make/S.mk generated
 make ../../../lib/make/SYSTEM.mk
 make SYSTEM.mk
 done SYSTEM.mk
-exec - mv ${PACKAGE_ast_LIB}/make/SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk.old 2>/dev/null || true; test '' = 'SYSTEM.mk' || { cp SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk.old 2>/dev/null || true; test '' = 'SYSTEM.mk' || ${STDCMP} 2>/dev/null -s SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk || { ${STDCP} SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk  		    		    ;}
 done ../../../lib/make/SYSTEM.mk generated
 make ../../../lib/make/TABLE.mk
 make TABLE.mk
 done TABLE.mk
-exec - mv ${PACKAGE_ast_LIB}/make/TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk.old 2>/dev/null || true; test '' = 'TABLE.mk' || { cp TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk.old 2>/dev/null || true; test '' = 'TABLE.mk' || ${STDCMP} 2>/dev/null -s TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk || { ${STDCP} TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk  		    		    ;}
 done ../../../lib/make/TABLE.mk generated
 make ../../../lib/make/debug.mk
 make debug.mk
 done debug.mk
-exec - mv ${PACKAGE_ast_LIB}/make/debug.mk ${PACKAGE_ast_LIB}/make/debug.mk.old 2>/dev/null || true; test '' = 'debug.mk' || { cp debug.mk ${PACKAGE_ast_LIB}/make/debug.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/debug.mk ${PACKAGE_ast_LIB}/make/debug.mk.old 2>/dev/null || true; test '' = 'debug.mk' || ${STDCMP} 2>/dev/null -s debug.mk ${PACKAGE_ast_LIB}/make/debug.mk || { ${STDCP} debug.mk ${PACKAGE_ast_LIB}/make/debug.mk  		    		    ;}
 done ../../../lib/make/debug.mk generated
 make ../../../lib/make/mkservice.mk
 make mkservice.mk
 done mkservice.mk
-exec - mv ${PACKAGE_ast_LIB}/make/mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk.old 2>/dev/null || true; test '' = 'mkservice.mk' || { cp mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk.old 2>/dev/null || true; test '' = 'mkservice.mk' || ${STDCMP} 2>/dev/null -s mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk || { ${STDCP} mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk  		    		    ;}
 done ../../../lib/make/mkservice.mk generated
 make ../../../lib/make/yacc.mk
 make yacc.mk
 done yacc.mk
-exec - mv ${PACKAGE_ast_LIB}/make/yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk.old 2>/dev/null || true; test '' = 'yacc.mk' || { cp yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk.old 2>/dev/null || true; test '' = 'yacc.mk' || ${STDCMP} 2>/dev/null -s yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk || { ${STDCP} yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk  		    		    ;}
 done ../../../lib/make/yacc.mk generated
 make ../../../lib/make/pkg-tcl.mk
 make pkg-tcl.mk
 done pkg-tcl.mk
-exec - mv ${PACKAGE_ast_LIB}/make/pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk.old 2>/dev/null || true; test '' = 'pkg-tcl.mk' || { cp pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk.old 2>/dev/null || true; test '' = 'pkg-tcl.mk' || ${STDCMP} 2>/dev/null -s pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk || { ${STDCP} pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk  		    		    ;}
 done ../../../lib/make/pkg-tcl.mk generated
 make ../../../lib/make/pkg-X11.mk
 make pkg-X11.mk
 done pkg-X11.mk
-exec - mv ${PACKAGE_ast_LIB}/make/pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk.old 2>/dev/null || true; test '' = 'pkg-X11.mk' || { cp pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk.old 2>/dev/null || true; test '' = 'pkg-X11.mk' || ${STDCMP} 2>/dev/null -s pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk || { ${STDCP} pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk  		    		    ;}
 done ../../../lib/make/pkg-X11.mk generated
 make ../../../lib/make/rules-win32.mk
 make rules-win32.mk
 done rules-win32.mk
-exec - mv ${PACKAGE_ast_LIB}/make/rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk.old 2>/dev/null || true; test '' = 'rules-win32.mk' || { cp rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk.old 2>/dev/null || true; test '' = 'rules-win32.mk' || ${STDCMP} 2>/dev/null -s rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk || { ${STDCP} rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk  		    		    ;}
 done ../../../lib/make/rules-win32.mk generated
 make ../../../lib/make/ppcc
 prev ppcc
-exec - mv ${PACKAGE_ast_LIB}/make/ppcc ${PACKAGE_ast_LIB}/make/ppcc.old 2>/dev/null || true; test '' = 'ppcc' || { cp ppcc ${PACKAGE_ast_LIB}/make/ppcc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/ppcc ${PACKAGE_ast_LIB}/make/ppcc.old 2>/dev/null || true; test '' = 'ppcc' || ${STDCMP} 2>/dev/null -s ppcc ${PACKAGE_ast_LIB}/make/ppcc || { ${STDCP} ppcc ${PACKAGE_ast_LIB}/make/ppcc  		    		    ;}
 done ../../../lib/make/ppcc generated
-make ../../../lib/probe/C/make
-exec - set -
-exec - if	test ! -d ${PACKAGE_ast_LIB}/probe/C/make
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/probe/C/make 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/probe/C/make | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
-exec - fi
-done ../../../lib/probe/C/make generated
-make ../../../lib/probe/C/make/probe
-make probe
-make probe.sh
-make ../../../lib/probe/C/probe
-done ../../../lib/probe/C/probe
-make make.probe
-done make.probe
-exec - cat ${PACKAGE_ast_LIB}/probe/C/probe make.probe > probe.sh
-done probe.sh generated
-exec - case static,port:$OPTIND:$RANDOM in
-exec - ?*:*:*|*::*|*:*:$RANDOM)
-exec - 	;;
-exec - *)	if	ENV= x= $SHELL -nc ': ${list[level]}  !(pattern)' 2>/dev/null
-exec - 	then	ENV= $SHELL -n probe.sh
-exec - 	fi
-exec - 	;;
-exec - esac
-exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case '' in
-exec - 	"")	cp probe.sh probe
-exec - 		;;
-exec - 	*)	{
-exec - 		i=`(read x; echo $x) < probe.sh`
-exec - 		case $i in
-exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
-exec - 		esac
-exec - 		echo 
-exec - 		cat probe.sh
-exec - 		} > probe
-exec - 		;;
-exec - 	esac
-exec - 	;;
-exec - *)	{
-exec - 	echo '${mam_cc_SHELLMAGIC}'
-exec - 	case '' in
-exec - 	?*)	echo  ;;
-exec - 	esac
-exec - 	cat probe.sh
-exec - 	} > probe
-exec - 	;;
-exec - esac
-exec - chmod u+w,+x probe
-done probe generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe ${PACKAGE_ast_LIB}/probe/C/make/probe.old 2>/dev/null || true; test '' = 'probe' || { cp probe ${PACKAGE_ast_LIB}/probe/C/make/probe  		    		    ;}
-done ../../../lib/probe/C/make/probe generated
-make ../../../lib/probe/C/make/probe.ini
-make probe.ini
-make probe.win32
-done probe.win32
-exec - t=${_hosttype_=`package`}
-exec - ifs=$IFS
-exec - IFS=.
-exec - set x $t
-exec - IFS=$ifs
-exec - t=$2
-exec - set x probe.win32
-exec - while	:
-exec - do	shift
-exec - 	case $# in
-exec - 	0)	break ;;
-exec - 	esac
-exec - 	case $1 in
-exec - 	*probe.$t)
-exec - 		break
-exec - 	esac
-exec - done
-exec - case $1 in
-exec - ?*)	cmp -s $1 probe.ini || cp $1 probe.ini ;;
-exec - *)	: > probe.ini
-exec - esac
-done probe.ini generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini.old 2>/dev/null || true; test '' = 'probe.ini' || { cp probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini  		    		    ;}
-done ../../../lib/probe/C/make/probe.ini generated
 make ${INSTALLROOT}/lib/make
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/lib/make
-exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/make 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/lib/make | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/lib/make 		    		   
 exec - fi
 done ${INSTALLROOT}/lib/make virtual
 make ${INSTALLROOT}/lib/make/makerules.mo
@@ -773,7 +586,7 @@ make Makerules.mo
 prev Makerules.mk
 exec - ${MAKE} $MAKEFLAGS --base --compile --file=Makerules.mk
 done Makerules.mo generated
-exec - mv ${INSTALLROOT}/lib/make/makerules.mo ${INSTALLROOT}/lib/make/makerules.mo.old 2>/dev/null || true; test '' = 'Makerules.mo' || { cp Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/lib/make/makerules.mo ${INSTALLROOT}/lib/make/makerules.mo.old 2>/dev/null || true; test '' = 'Makerules.mo' || ${STDCMP} 2>/dev/null -s Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo || { ${STDCP} Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo  		    		    ;}
 done ${INSTALLROOT}/lib/make/makerules.mo virtual
 done install virtual
 make test

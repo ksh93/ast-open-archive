@@ -85,6 +85,7 @@ content(Mime_t* mp, void* entry, char* data, size_t size, Mimedisc_t* disc)
 			memcpy(bp->data, data, size);
 			bp->next = state.part.in.boundary;
 			state.part.in.boundary = bp;
+			note(DEBUG, "content boundary=`%s'", bp->data);
 		}
 		break;
 	case CONTENT_disposition:
@@ -167,8 +168,13 @@ mime(int op)
 int
 headset(register struct parse* pp, struct msg* mp, FILE* fp, struct header* hp, Dt_t** ignore, unsigned long flags)
 {
-	int	r;
+	int		r;
+	struct bound*	bp;
 
+	while (bp = state.part.in.boundary) {
+		state.part.in.boundary = bp->next;
+		free(bp);
+	}
 	pp->fp = mp ? setinput(mp) : fp;
 	pp->mp = mp;
 	if ((flags & GMIME) && !mime(0))
@@ -296,6 +302,8 @@ static char*
 headline(register struct parse* pp)
 {
 	register char*	s;
+	register char*	e;
+	register int	c;
 	register int	n;
 
 	if (pp->mp && pp->count <= 0 || (pp->flags & GDONE) || !fgets(pp->buf, sizeof(pp->buf), pp->fp)) {
@@ -304,21 +312,33 @@ headline(register struct parse* pp)
 			pp->hp->h_clear = 0;
 		return 0;
 	}
-	pp->count -= (pp->length = strlen(pp->buf));
-	if (*pp->buf != '\n') {
-		while ((!pp->mp || pp->count > 0) && (n = fgetc(pp->fp)) != EOF) {
-			ungetc(n, pp->fp);
-			if (n == '\n' || !isspace(n) || pp->length >= sizeof(pp->buf))
+	pp->length = n = strlen(pp->buf);
+	s = pp->buf + n;
+	e = pp->buf + sizeof(pp->buf) - 1;
+	pp->count -= n;
+	if (*pp->buf != '\n' || *pp->buf != '\r' && *(pp->buf + 1) != '\n') {
+		while ((!pp->mp || pp->count > 0) && (c = fgetc(pp->fp)) != EOF) {
+			if (c == '\r' || c == '\n' || !isspace(c)) {
+				ungetc(c, pp->fp);
 				break;
-			s = pp->buf + pp->length;
-			*(s - 1) = ' ';
-			if (!fgets(s, sizeof(pp->buf) - (s - pp->buf), pp->fp))
-				break;
-			n = strlen(s);
+			}
+			if (s < e) {
+				*(s - 1) = ' ';
+				*s++ = ' ';
+			}
+			n = 1;
+			while ((c = fgetc(pp->fp)) != EOF) {
+				n++;
+				if (s < e)
+					*s++ = c;
+				if (c == '\n')
+					break;
+			}
 			pp->count -= n;
 			pp->length += n;
 		}
 	}
+	*s = 0;
 	return pp->buf;
 }
 
@@ -411,7 +431,7 @@ headget(register struct parse* pp)
 		/*
 		 * A blank line separates the headers from the body.
 		 */
-		if ((n = *s) == '\n') {
+		if ((n = *s) == '\n' || n == '\r' && (n = *(s + 1)) == '\n') {
 			if (state.var.headerbotch && pp->fp != stdin && (body = ftell(pp->fp)) > 0) {
 				/*
 				 * If the next batch of lines up to
@@ -427,7 +447,7 @@ headget(register struct parse* pp)
 				for (;;) {
 					if (!(s = fgets(pp->buf, sizeof(pp->buf), pp->fp)))
 						goto done;
-					if ((n = *s) == '\n') {
+					if ((n = *s) == '\n' || n == '\r' && (n = *(s + 1)) == '\n') {
 						if (!separator)
 							break;
 						text = ftell(pp->fp);
@@ -461,7 +481,7 @@ headget(register struct parse* pp)
 					}
 					else if (isprint(n)) {
 						while (*++s == n);
-						if (*s != '\n')
+						if (*s != '\n' && (*s != '\r' || *(s + 1) != '\n'))
 							goto done;
 						if (separator)
 							text = ftell(pp->fp);
@@ -486,7 +506,7 @@ headget(register struct parse* pp)
 		if (!isalnum(n) && isprint(n)) {
 			t = s;
 			while (*++t == n);
-			if (*t == '\n') {
+			if (*t == '\n' || *t == '\r' && *(t + 1) == '\n') {
 				if (n == '-' && (t - s) > 2) {
 					/*
 					 * Edit rule treated like a blank line.
@@ -795,7 +815,7 @@ ishead(char* linebuf, int inhead)
 	    *cp++ != ' ')
 		return 0;
 	parse(NiL, linebuf, &hl, parbuf);
-	if (!hl.l_from || !hl.l_date) {
+	if (!hl.l_from || !hl.l_date || !isdate(hl.l_date)) {
 		note(DEBUG, "\"%s\": not a header: no from or date field", linebuf);
 		return 0;
 	}

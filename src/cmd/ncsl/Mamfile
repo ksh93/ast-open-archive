@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -121,30 +121,12 @@ done ncsl generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/ncsl
 prev ncsl
-exec - mv ${INSTALLROOT}/bin/ncsl ${INSTALLROOT}/bin/ncsl.old 2>/dev/null || true; test '' = 'ncsl' || { cp ncsl ${INSTALLROOT}/bin/ncsl  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ncsl ${INSTALLROOT}/bin/ncsl.old 2>/dev/null || true; test '' = 'ncsl' || ${STDCMP} 2>/dev/null -s ncsl ${INSTALLROOT}/bin/ncsl || { ${STDCP} ncsl ${INSTALLROOT}/bin/ncsl  		    		    ;}
 done ../../../bin/ncsl generated
 done install virtual
 make test

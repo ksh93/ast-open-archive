@@ -28,6 +28,10 @@ inflate_mode;
 /* inflate private state */
 struct internal_state {
 
+#ifdef ZINTERNAL_STATE
+  ZINTERNAL_STATE;
+#endif
+
   /* mode */
   inflate_mode  mode;   /* current inflate mode */
 
@@ -56,6 +60,9 @@ z_streamp z;
   if (z == Z_NULL || z->state == Z_NULL)
     return Z_STREAM_ERROR;
   z->total_in = z->total_out = 0;
+#ifdef ZINTERNAL_STATE
+  z->total_IN = z->total_OUT = 0;
+#endif
   z->msg = Z_NULL;
   z->state->mode = z->state->nowrap ? BLOCKS : METHOD;
   inflate_blocks_reset(z->state->blocks, z, Z_NULL);
@@ -145,7 +152,11 @@ int stream_size;
 
 
 #define NEEDBYTE {if(z->avail_in==0)return r;r=f;}
+#ifdef ZINTERNAL_STATE
+#define NEXTBYTE (z->avail_in--,z->total_in++,z->total_IN++,*z->next_in++)
+#else
 #define NEXTBYTE (z->avail_in--,z->total_in++,*z->next_in++)
+#endif
 
 int ZEXPORT inflate(z, f)
 z_streamp z;
@@ -306,6 +317,9 @@ z_streamp z;
   Bytef *p;     /* pointer to bytes */
   uInt m;       /* number of marker bytes found in a row */
   uSize r, w;   /* temporaries to save total_in and total_out */
+#ifdef ZINTERNAL_STATE
+  uSize R, W;   /* temporaries to save total_IN and total_OUT */
+#endif
 
   /* set up */
   if (z == Z_NULL || z->state == Z_NULL)
@@ -335,6 +349,9 @@ z_streamp z;
 
   /* restore */
   z->total_in += p - z->next_in;
+#ifdef ZINTERNAL_STATE
+  z->total_IN += p - z->next_in;
+#endif
   z->next_in = p;
   z->avail_in = n;
   z->state->sub.marker = m;
@@ -343,8 +360,14 @@ z_streamp z;
   if (m != 4)
     return Z_DATA_ERROR;
   r = z->total_in;  w = z->total_out;
+#ifdef ZINTERNAL_STATE
+  R = z->total_IN;  W = z->total_OUT;
+#endif
   inflateReset(z);
   z->total_in = r;  z->total_out = w;
+#ifdef ZINTERNAL_STATE
+  z->total_IN = R;  z->total_OUT = W;
+#endif
   z->state->mode = BLOCKS;
   return Z_OK;
 }

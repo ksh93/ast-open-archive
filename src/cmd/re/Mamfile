@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -221,30 +221,12 @@ done sed generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/ed
 prev ed
-exec - mv ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/ed.old 2>/dev/null || true; test '' = 'ed' || { cp ed ${INSTALLROOT}/bin/ed  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/ed.old 2>/dev/null || true; test '' = 'ed' || ${STDCMP} 2>/dev/null -s ed ${INSTALLROOT}/bin/ed || { ${STDCP} ed ${INSTALLROOT}/bin/ed  		    		    ;}
 done ../../../bin/ed generated
 make ../../../bin/red
 prev ../../../bin/ed
@@ -255,7 +237,7 @@ exec - ln ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/red
 done ../../../bin/red generated
 make ../../../bin/grep
 prev grep
-exec - mv ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/grep.old 2>/dev/null || true; test '' = 'grep' || { cp grep ${INSTALLROOT}/bin/grep  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/grep.old 2>/dev/null || true; test '' = 'grep' || ${STDCMP} 2>/dev/null -s grep ${INSTALLROOT}/bin/grep || { ${STDCP} grep ${INSTALLROOT}/bin/grep  		    		    ;}
 done ../../../bin/grep generated
 make ../../../bin/egrep
 prev ../../../bin/grep
@@ -273,7 +255,7 @@ exec - ln ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/fgrep
 done ../../../bin/fgrep generated
 make ../../../bin/sed
 prev sed
-exec - mv ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; test '' = 'sed' || { cp sed ${INSTALLROOT}/bin/sed  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; test '' = 'sed' || ${STDCMP} 2>/dev/null -s sed ${INSTALLROOT}/bin/sed || { ${STDCP} sed ${INSTALLROOT}/bin/sed  		    		    ;}
 done ../../../bin/sed generated
 done install virtual
 make test
@@ -441,7 +423,13 @@ make cut.dat
 done cut.dat
 make libtre.dat
 done libtre.dat
-exec - for i in testregex.dat locale.dat testmatch.dat testsub.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat austin.dat xopen.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat cut.dat libtre.dat
+make repetition.dat
+done repetition.dat
+make rightassoc.dat
+done rightassoc.dat
+make forcedassoc.dat
+done forcedassoc.dat
+exec - for i in testregex.dat locale.dat testmatch.dat testsub.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat austin.dat xopen.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat cut.dat libtre.dat repetition.dat rightassoc.dat forcedassoc.dat
 exec - do	testregex -c < $i
 exec - done
 done test.regex virtual

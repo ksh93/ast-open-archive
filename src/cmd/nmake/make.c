@@ -283,7 +283,6 @@ maketop(register struct rule* r, int p, char* arg)
 {
 	unsigned long	t;
 	unsigned long	o;
-	int		k;
 
 	if ((p & (P_force|P_repeat)) == (P_force|P_repeat) && (r->property & (P_functional|P_make)) == P_make)
 	{
@@ -299,16 +298,10 @@ maketop(register struct rule* r, int p, char* arg)
 	o = r->property & p;
 	r->property |= p;
 	if (p & P_ignore)
-	{
-		k = state.keepgoing;
-		state.keepgoing = 1;
-	}
-	else
-		k = 1;
+		state.keepgoing |= 2;
 	make(r, &t, arg, 0);
 	complete(r, r->prereqs, NiL, 0);
-	if (!k)
-		state.keepgoing = 0;
+	state.keepgoing &= 1;
 	r->property &= ~p;
 	r->property |= o;
 }
@@ -554,6 +547,15 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 			if ((r1 = p->rule) != r)
 			{
 				bind(r1);
+				if (r1->status == NOTYET)
+				{
+					r0 = staterule(RULE, r1, NiL, 1);
+					if (!timeq(r1->time, r0->time) || !r0->event)
+					{
+						reason((1, "%s joint sibling %s is out of date", r->name, r1->name));
+						staterule(RULE, r, NiL, 1)->time = 0;
+					}
+				}
 				fp = newof(0, struct frame, 1, 0);
 				fp->target = r1;
 				fp->parent = state.frame;

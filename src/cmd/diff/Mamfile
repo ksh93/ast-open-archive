@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -250,38 +250,20 @@ done sdiff generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/diff
 prev diff
-exec - mv ${INSTALLROOT}/bin/diff ${INSTALLROOT}/bin/diff.old 2>/dev/null || true; test '' = 'diff' || { cp diff ${INSTALLROOT}/bin/diff  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/diff ${INSTALLROOT}/bin/diff.old 2>/dev/null || true; test '' = 'diff' || ${STDCMP} 2>/dev/null -s diff ${INSTALLROOT}/bin/diff || { ${STDCP} diff ${INSTALLROOT}/bin/diff  		    		    ;}
 done ../../../bin/diff generated
 make ../../../bin/diff3
 prev diff3
-exec - mv ${INSTALLROOT}/bin/diff3 ${INSTALLROOT}/bin/diff3.old 2>/dev/null || true; test '' = 'diff3' || { cp diff3 ${INSTALLROOT}/bin/diff3  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/diff3 ${INSTALLROOT}/bin/diff3.old 2>/dev/null || true; test '' = 'diff3' || ${STDCMP} 2>/dev/null -s diff3 ${INSTALLROOT}/bin/diff3 || { ${STDCP} diff3 ${INSTALLROOT}/bin/diff3  		    		    ;}
 done ../../../bin/diff3 generated
 make ../../../bin/sdiff
 prev sdiff
-exec - mv ${INSTALLROOT}/bin/sdiff ${INSTALLROOT}/bin/sdiff.old 2>/dev/null || true; test '' = 'sdiff' || { cp sdiff ${INSTALLROOT}/bin/sdiff  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/sdiff ${INSTALLROOT}/bin/sdiff.old 2>/dev/null || true; test '' = 'sdiff' || ${STDCMP} 2>/dev/null -s sdiff ${INSTALLROOT}/bin/sdiff || { ${STDCP} sdiff ${INSTALLROOT}/bin/sdiff  		    		    ;}
 done ../../../bin/sdiff generated
 done install virtual
 make test

@@ -1,4 +1,4 @@
-: right-assoc : left-assoc:fail-all right-assoc:pass-all : 2002-04-29
+NOTE	left-assoc:pass-none right-assoc:pass-all : 2002-04-29
 
 E	(a|ab)(c|bcd)(d*)	abcd	(0,4)(0,2)(2,3)(3,4)
 E	(a|ab)(bcd|c)(d*)	abcd	(0,4)(0,2)(2,3)(3,4)

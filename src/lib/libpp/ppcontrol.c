@@ -1935,6 +1935,9 @@ ppcontrol(void)
 			case X_OPSPACE:
 				ppfsm(FSM_OPSPACE, i0 ? p4 : (char*)0);
 				break;
+			case X_PASSTHROUGH:
+				ppop(PP_PASSTHROUGH, i0);
+				break;
 			case X_PEDANTIC:
 				ppop(PP_PEDANTIC, i0);
 				break;

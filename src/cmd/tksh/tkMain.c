@@ -533,14 +533,6 @@ static void bindsetup(Tcl_Interp *interp)
 		Tksh_SetCommandType(interp, "bind", INTERP_CURRENT);
 	}
 }
-static int doProcWait;
-static int b_tkwaitevents(int argc, char **argv, void *data)
-{
-	int state, result;
-	result = Tcl_GetBoolean((Tcl_Interp *) data, argv[1], &state);
-	doProcWait = state;
-	return (result == TCL_OK) ? 0 : 1;
-}
 static int b_tkloop(int argc, char **argv, void *data)
 {
 	Tcl_Interp *interp = (Tcl_Interp *) data;
@@ -565,7 +557,6 @@ int Tksh_Init(interp)
 #endif
     bindsetup(interp);
     sh_addbuiltin("tkloop", b_tkloop, (void *) interp);
-    sh_addbuiltin("tkwaitevent", b_tkwaitevents, (void *) interp);
     return TCL_OK;
 }
 
@@ -623,16 +614,8 @@ Tksh_AppInit(interp)
     return TCL_OK;
 }
 #include <signal.h>
+static int gotIntr;
 extern int Tcl_NumEventsFound(void);
-static int waitstatus, waitlevel, checkpid;
-static void (*oldSigHandler)(int);
-static void newSigHandler(int sig)
-{
-	checkpid = 0;
-	waitstatus ++;
-	if (oldSigHandler)
-		oldSigHandler(SIGCHLD);
-}
 static void SigEventSetup(ClientData clientData, int flags)
 {
 }
@@ -647,7 +630,7 @@ static void SigEventCheck(ClientData clientData, int flags)
 	{
 		evPtr = (Tcl_Event *) malloc(sizeof(Tcl_Event));
 		evPtr->proc = SigEventProcess;
-		waitstatus ++;
+		gotIntr = 1;;
 		Tcl_QueueEvent(evPtr, TCL_QUEUE_TAIL);
 	}
 }
@@ -665,69 +648,39 @@ static void fileReady(ClientData clientData, int mask)
 #include <wait.h>
 int tksh_waitevent(int fd, long tmout, int rw)
 {
-	int tFlag = 0, result = 1, oldStat;
+	int tFlag = 0, result = 1;
 	Tcl_TimerToken token;
 	Tcl_File file = NULL;
+	gotIntr = 0;
 
-	if (fd < 0)
+	if (fd >= 0)
 	{
-		if (! doProcWait)
-			return 1;
-		if (oldSigHandler)
-			signal(SIGCHLD, newSigHandler);
-		else
-			oldSigHandler = signal(SIGCHLD, newSigHandler);
-		checkpid = 0;
-	}
-	else
-	{
-		if ((fd != 0) && (! doProcWait))
-			return 1;
 		file = Tcl_GetFile((ClientData)fd ,TCL_UNIX_FD);
 		Tcl_CreateFileHandler(file, TCL_READABLE, fileReady, &file);
 	}
 
-        if (tmout)
+        if (tmout> 0)
                 token = Tcl_CreateTimerHandler((int)tmout,TmoutProc,&(tFlag));
 
-	waitlevel ++;
-	oldStat = waitstatus;
-
 	Tksh_BeginBlock(interp, INTERP_TCL);	/* Best Guess */
-	 while ((!tFlag) && ((fd<0)||file) && result && (waitstatus==oldStat))
+	while ((!gotIntr) && (!tFlag) && ((fd<0)||file) && result && (fd>=0 || !sh_waitsafe()))
 		result = Tcl_DoOneEvent(0);
 	Tksh_EndBlock(interp);
 
-	if (waitstatus != oldStat)
-		result = 0;
-	/* waitstatus = oldStat; */
-	errno = result ? 0 : EINTR;
-	result = result ? 1 : -1;
+	if (gotIntr)
+	{
+		result = -1;
+		errno = EINTR;
+	} else
+	{
+		result = 1;
+	}
 
-        if (tmout)
+        if (tmout > 0)
                 Tcl_DeleteTimerHandler(token);
 	if (file)
 		Tcl_CreateFileHandler(file, 0, fileReady, (ClientData) 0);
-	if (fd < 0)
-	{
-		if (checkpid)
-		{
-			switch (waitpid((pid_t)-1, &tFlag, WNOHANG))
-			{
-				case 0: result = -1;
-					sfprintf (sfstderr, "HANGING 0\n");
-					break;
-				case -1:result = 0;
-					sfprintf (sfstderr, "HANGING -1\n");
-					break;
-				default: panic("Wait returned pid\n");
-			}
-		}
-		checkpid = 1;
-	}
 
-	/* sfprintf(stderr, "<%d,%d>\n", result, waitlevel); */
-	waitlevel --;
 	return result;
 }
 #if 0

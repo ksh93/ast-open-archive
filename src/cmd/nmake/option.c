@@ -155,7 +155,7 @@ static struct option	options[] =	/* option table			*/
 		" used for makefile conversion]"
 		"[+----?0 or more comma separated subtypes ----]"
 		"[+port?used by the base rules to generate portable"
-		" makefiles; some paths are parameterized]"
+		" makefiles; some paths are parameterized; on by default]"
 	"}",
 "never",	OPT_never,	(char*)&state.never,		0,0,
 	"Don't execute any shell actions. \b--noexec\b executes \b.ALWAYS\b"

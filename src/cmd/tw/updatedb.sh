@@ -33,7 +33,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $COMMAND"
 	USAGE=$'
 [-?
-@(#)$Id: updatedb (AT&T Labs Research) 2001-01-01 $
+@(#)$Id: updatedb (AT&T Labs Research) 2002-07-17 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?updatedb - generate locate pathname database]
@@ -53,6 +53,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 	\b--nocrossdevice\b. If any of the paths are symbolic links then they
 	are followed. If the first \adir\a is \b+\b then the default list
 	is appended.]:["dir1 dir2 ...":='${keep_default//\|/\ }$']
+[l:local?Do not descend into non-local filesystem directories.]
 [r:netpaths?Network directories to include in the database. Currently
 	equivalent to \b--localpaths\b.]:["dir1 dir2 ..."]
 [p:prunepaths|drop?Directories to exclude from the database. If the first \adir\a
@@ -81,7 +82,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 '
 	;;
 *)	ARGV0=""
-	USAGE="aignOPXd:['dir1 dir2 ...']k:['dir1 dir2 ...']o:[dbfile]p:['dir1 dir2 ...']r:['dir1 dir2 ...']u:[user]D:[level]"
+	USAGE="aiglnOPXd:['dir1 dir2 ...']k:['dir1 dir2 ...']o:[dbfile]p:['dir1 dir2 ...']r:['dir1 dir2 ...']u:[user]D:[level]"
 	;;
 esac
 
@@ -139,6 +140,8 @@ do	case $OPT in
 				;;
 			esac
 		done
+		;;
+	l)	options="$options -l"
 		;;
 	m)	format="-"
 		;;

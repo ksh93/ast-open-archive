@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -12,7 +12,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O"
+setv CCFLAGS "${mam_cc_OPTIMIZE}"
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -538,6 +538,7 @@ make basic.o
 make src/basic.c
 prev include/tclcmd.h implicit
 prev include/tkshlib.h implicit
+prev include/tclInt.h implicit
 done src/basic.c
 prev src/basic.c
 exec - ${CC} ${CCFLAGS}  -I. -Iinclude -I${PACKAGE_ast_INCLUDE} -D_BLD_tcl -DLIB_DIR=\""lib/tksh7.6"\" -D_PACKAGE_ast -c src/basic.c
@@ -585,82 +586,28 @@ prev libtcl.a archive
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libtcl.a archive
 prev libtcl.a archive
-exec - mv ${PACKAGE_ast_LIB}/libtcl.a ${PACKAGE_ast_LIB}/libtcl.a.old 2>/dev/null || true; test '' = 'libtcl.a' || { cp libtcl.a ${PACKAGE_ast_LIB}/libtcl.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/libtcl.a ${PACKAGE_ast_LIB}/libtcl.a.old 2>/dev/null || true; test '' = 'libtcl.a' || ${STDCMP} 2>/dev/null -s libtcl.a ${PACKAGE_ast_LIB}/libtcl.a || { ${STDCP} libtcl.a ${PACKAGE_ast_LIB}/libtcl.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libtcl.a) >/dev/null 2>&1 || true
 done ../../../lib/libtcl.a generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/tcl
 prev tcl.req
-exec - mv ${PACKAGE_ast_LIB}/lib/tcl ${PACKAGE_ast_LIB}/lib/tcl.old 2>/dev/null || true; test '' = 'tcl.req' || { cp tcl.req ${PACKAGE_ast_LIB}/lib/tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/tcl ${PACKAGE_ast_LIB}/lib/tcl.old 2>/dev/null || true; test '' = 'tcl.req' || ${STDCMP} 2>/dev/null -s tcl.req ${PACKAGE_ast_LIB}/lib/tcl || { ${STDCP} tcl.req ${PACKAGE_ast_LIB}/lib/tcl  		    		    ;}
 done ../../../lib/lib/tcl generated
 make ../../../include/tcl
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/include/tcl
-exec - then	set -x && mkdir -p ${INSTALLROOT}/include/tcl 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/include/tcl | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/include/tcl 		    		   
 exec - fi
 done ../../../include/tcl generated
 make ../../../include/tcl/tksh.h
@@ -682,56 +629,38 @@ done ../../../include/tcl/tcl.h generated
 make ../../../lib/tksh7.6
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/tksh7.6
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tksh7.6 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/tksh7.6 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/tksh7.6 		    		   
 exec - fi
 done ../../../lib/tksh7.6 generated
 make ../../../lib/tksh7.6/init.ksh
 make lib/tksh7.6/init.ksh
 done lib/tksh7.6/init.ksh
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.ksh' || { cp lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.ksh' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh || { ${STDCP} lib/tksh7.6/init.ksh ${PACKAGE_ast_LIB}/tksh7.6/init.ksh  		    		    ;}
 done ../../../lib/tksh7.6/init.ksh generated
 make ../../../lib/tksh7.6/init.tcl
 make lib/tksh7.6/init.tcl
 done lib/tksh7.6/init.tcl
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.tcl' || { cp lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/init.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl || { ${STDCP} lib/tksh7.6/init.tcl ${PACKAGE_ast_LIB}/tksh7.6/init.tcl  		    		    ;}
 done ../../../lib/tksh7.6/init.tcl generated
 make ../../../lib/tksh7.6/ldAout.tcl
 make lib/tksh7.6/ldAout.tcl
 done lib/tksh7.6/ldAout.tcl
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/ldAout.tcl' || { cp lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/ldAout.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl || { ${STDCP} lib/tksh7.6/ldAout.tcl ${PACKAGE_ast_LIB}/tksh7.6/ldAout.tcl  		    		    ;}
 done ../../../lib/tksh7.6/ldAout.tcl generated
 make ../../../lib/tksh7.6/license.terms
 make lib/tksh7.6/license.terms
 done lib/tksh7.6/license.terms
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms.old 2>/dev/null || true; test '' = 'lib/tksh7.6/license.terms' || { cp lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms.old 2>/dev/null || true; test '' = 'lib/tksh7.6/license.terms' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms || { ${STDCP} lib/tksh7.6/license.terms ${PACKAGE_ast_LIB}/tksh7.6/license.terms  		    		    ;}
 done ../../../lib/tksh7.6/license.terms generated
 make ../../../lib/tksh7.6/parray.tcl
 make lib/tksh7.6/parray.tcl
 done lib/tksh7.6/parray.tcl
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/parray.tcl' || { cp lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl.old 2>/dev/null || true; test '' = 'lib/tksh7.6/parray.tcl' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl || { ${STDCP} lib/tksh7.6/parray.tcl ${PACKAGE_ast_LIB}/tksh7.6/parray.tcl  		    		    ;}
 done ../../../lib/tksh7.6/parray.tcl generated
 make ../../../lib/tksh7.6/tclIndex
 make lib/tksh7.6/tclIndex
 done lib/tksh7.6/tclIndex
-exec - mv ${PACKAGE_ast_LIB}/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex.old 2>/dev/null || true; test '' = 'lib/tksh7.6/tclIndex' || { cp lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex.old 2>/dev/null || true; test '' = 'lib/tksh7.6/tclIndex' || ${STDCMP} 2>/dev/null -s lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex || { ${STDCP} lib/tksh7.6/tclIndex ${PACKAGE_ast_LIB}/tksh7.6/tclIndex  		    		    ;}
 done ../../../lib/tksh7.6/tclIndex generated
 done install virtual
 make test

@@ -1,3 +1,5 @@
+02-08-27  tcl/tclNotify.c: XXX add sh_sigcheck() call -- to be cleaned up
+02-08-22  enable regex cache initialization
 02-06-25  include/nvextra.h: use an addaptable cheat for the namval offset
 02-03-17  update ksh private assoc array offsets -- should be a function call
 02-01-30  compensate for uts.390 lack of header guards for { select.h time.h }

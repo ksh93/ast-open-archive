@@ -43,7 +43,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2002-06-09'
+version='mm2html (AT&T Labs Research) 2002-08-30'
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
@@ -1120,6 +1120,10 @@ do	getline || {
 			print -r -- "<DL COMPACT>"
 			case $op in
 			.AL)	case $1 in
+				'')	type[++lists]=.al
+					list[lists]=OL
+					print -r -- "<OL>"
+					;;
 				[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ])
 					type[++lists]=.al
 					list[lists]=OL
@@ -1128,6 +1132,13 @@ do	getline || {
 				esac
 				;;
 			.[IR]S)	print -r -- "<DT><DD>"
+				;;
+			.VL)	case $1 in
+				?*)	type[++lists]=.al
+					list[lists]=DL
+					print -r -- "<DL COMPACT>"
+					;;
+				esac
 				;;
 			esac
 			;;
@@ -1876,6 +1887,8 @@ do	getline || {
 				esac
 				;;
 			esac
+			;;
+		.fp)	: ignore $op
 			;;
 		.hc)	: ignore $op
 			;;

@@ -350,6 +350,9 @@ int ZEXPORT deflateReset (strm)
         strm->zalloc == Z_NULL || strm->zfree == Z_NULL) return Z_STREAM_ERROR;
 
     strm->total_in = strm->total_out = 0;
+#ifdef ZINTERNAL_STATE
+    strm->total_IN = strm->total_OUT = 0;
+#endif
     strm->msg = Z_NULL; /* use zfree if we ever allocate msg dynamically */
     strm->data_type = Z_UNKNOWN;
 
@@ -389,7 +392,7 @@ int ZEXPORT deflateParams(strm, level, strategy)
     }
     func = configuration_table[s->level].func;
 
-    if (func != configuration_table[level].func && strm->total_in != 0) {
+    if (func != configuration_table[level].func && strm->total_IN != 0) {
 	/* Flush the last buffer: */
 	err = deflate(strm, Z_PARTIAL_FLUSH);
     }
@@ -435,6 +438,9 @@ local void flush_pending(strm)
     strm->next_out  += len;
     strm->state->pending_out  += len;
     strm->total_out += len;
+#ifdef ZINTERNAL_STATE
+    strm->total_OUT += len;
+#endif
     strm->avail_out  -= len;
     strm->state->pending -= len;
     if (strm->state->pending == 0) {
@@ -687,6 +693,9 @@ local int read_buf(strm, buf, size)
     zmemcpy(buf, strm->next_in, len);
     strm->next_in  += len;
     strm->total_in += len;
+#ifdef ZINTERNAL_STATE
+    strm->total_IN += len;
+#endif
 
     return (int)len;
 }

@@ -1,3 +1,9 @@
+02-09-09 format.c: handle all 11 octal digits in cpio format size
+02-09-05 file.c: fix chmod() loop at exists=0011 on case ignorant filesystems
+02-08-19 pax: cmd line patterns applied before -i or -s path edits
+	 pax: add posix -c for --invert
+02-08-06 pax: change --meter to use * instead of non-portable inverse video
+02-07-17 pax: handle gnu tar largefile size extension
 02-06-26 pax: fix regsubexec() edited symlink text buffer clobber
 02-05-24 pax: update to use regsubcomp(),regsubexec()
 02-05-07 pax: use <ardir.h>,-lardir for library archives

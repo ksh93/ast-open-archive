@@ -18,7 +18,7 @@ E	[abcd	NULL	EBRACK
 E$	[\\B]	B	(0,1)
 E$x	[\\B]	B	(0,1)
 E	[z-a]	NULL	ERANGE
-E	^*	NULL	BADRPT
+Eu	^*	NULL	(0,0)
 E	(abc	NULL	EPAREN
 E	(?# abc	NULL	EPAREN
 E	(?z)abc	NULL	BADRPT

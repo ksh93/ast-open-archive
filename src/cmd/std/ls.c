@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2002-01-28 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Labs Research) 2002-09-09 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -92,6 +92,7 @@ USAGE_LICENSE
 "		[+name?entry name]"
 "		[+nlink?hard link count]"
 "		[+path?file path from original root dir]"
+"		[+perm?access permissions]"
 "		[+size?file size in bytes]"
 "		[+summary?listing summary info]"
 "		[+total.blocks?running total block count]"
@@ -106,6 +107,7 @@ USAGE_LICENSE
 "			pattern \bp\b\ai\a, or the empty string if there is no"
 "			match.]"
 "		[+mode?The integral value as a \bfmtmode\b(3) string.]"
+"		[+perm?The integral value as a \bfmtperm\b(3) string.]"
 "		[+time[=\aformat\a]]?The integral value as a \bstrftime\b(3)"
 "			string. For example,"
 "			\b--format=\"%8(mtime)u %(ctime:time=%H:%M:%S)s\"\b"
@@ -255,13 +257,14 @@ USAGE_LICENSE
 #define KEY_name		21
 #define KEY_nlink		22
 #define KEY_path		23
-#define KEY_size		24
-#define KEY_summary		25
-#define KEY_total_blocks	26
-#define KEY_total_bytes		27
-#define KEY_total_files		28
-#define KEY_trailer		29
-#define KEY_uid			30
+#define KEY_perm		24
+#define KEY_size		25
+#define KEY_summary		26
+#define KEY_total_blocks	27
+#define KEY_total_bytes		28
+#define KEY_total_files		29
+#define KEY_trailer		30
+#define KEY_uid			31
 
 #define BLOCKS(st)	((state.blocksize==LS_BLOCKSIZE)?iblocks(st):(iblocks(st)*LS_BLOCKSIZE+state.blocksize-1)/state.blocksize)
 #define PRINTABLE(s)	((state.lsflags&LS_PRINTABLE)?printable(s):(s))
@@ -344,6 +347,7 @@ static Key_t	keys[] =
 	{ "name",		KEY_name		},
 	{ "nlink",		KEY_nlink		},
 	{ "path",		KEY_path		},
+	{ "perm",		KEY_perm		},
 	{ "size",		KEY_size		},
 	{ "summary",		KEY_summary		},
 	{ "total.blocks",	KEY_total_blocks	},
@@ -430,6 +434,7 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 
 	static Sfio_t*		mp;
 	static const char	fmt_mode[] = "mode";
+	static const char	fmt_perm[] = "perm";
 
 	if (lp = (List_t*)handle)
 	{
@@ -621,6 +626,12 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		if (ftw)
 			s = ftw->path ? PRINTABLE(ftw->path) : PRINTABLE(ftw->name);
 		break;
+	case KEY_perm:
+		if (st)
+			n = st->st_mode & S_IPERM;
+		if (!arg)
+			arg = fmt_perm;
+		break;
 	case KEY_size:
 		if (st)
 		{
@@ -673,6 +684,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	{
 		if (strneq(arg, fmt_mode, 4))
 			*ps = fmtmode(n, 1);
+		else if (strneq(arg, fmt_perm, 4))
+			*ps = fmtperm(n & S_IPERM);
 		else if (strneq(arg, state.timefmt, 4))
 			*ps = fmttime((*(arg + 4) == '=' ? arg : state.timefmt) + 5, (time_t)n);
 	}
@@ -1324,6 +1337,9 @@ main(int argc, register char** argv)
 			break;
 		case 'S':
 			state.sortflags |= LS_BLOCKS;
+			break;
+		case 'T':
+			/* ignored */
 			break;
 		case 'U':
 			state.sortflags = LS_NOSORT;

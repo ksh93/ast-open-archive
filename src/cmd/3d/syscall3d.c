@@ -87,12 +87,14 @@ buffer(char** buf, char* end, register char* s, int n)
 	register char*	se;
 	register int	c;
 
-	if (n < 0) bprintf(buf, end, " %p", s);
+	if (n < 0)
+		bprintf(buf, end, " %p", s);
 	else
 	{
 		b = *buf;
 		be = end;
-		if (be - b > MAXBUF) be = b + MAXBUF;
+		if (be - b > MAXBUF)
+			be = b + MAXBUF;
 		be -= 5;
 		be = be;
 		se = s + n;
@@ -142,13 +144,16 @@ buffer(char** buf, char* end, register char* s, int n)
 						}
 						continue;
 					}
-					if (b < be) *b++ = c;
+					if (b < be)
+						*b++ = c;
 				}
-				else if (c < 0177) *b++ = c;
+				else if (c < 0177)
+					*b++ = c;
 				else if (c == 0177)
 				{
 					*b++ = '^';
-					if (b >= be) break;
+					if (b >= be)
+						break;
 					*b++ = '?';
 				}
 				else if (b < be - 4)
@@ -167,7 +172,8 @@ buffer(char** buf, char* end, register char* s, int n)
 				*b++ = '.';
 				*b++ = '.';
 			}
-			else if (b < be) *b++ = '"';
+			else if (b < be)
+				*b++ = '"';
 		}
 		*buf = b;
 	}
@@ -207,6 +213,7 @@ void
 calldump(char** b, char* e)
 {
 	register Systrace_t*	cp;
+	register int		m;
 
 	bprintf(b, e, "\nsystem calls total=%d nosys=%p exit=%p\n\n", elementsof(sys_trace), nosys,
 #if _no_exit_exit
@@ -216,14 +223,20 @@ calldump(char** b, char* e)
 #endif
 		);
 	for (cp = sys_trace; cp < &sys_trace[elementsof(sys_trace)]; cp++)
-		bprintf(b, e, "  %03d%s %03d %12s %p\n", cp - sys_trace, (cp - sys_trace) == cp->index ? " " : "*", cp->call, cp->name, cp->func);
+	{
+		bprintf(b, e, "  %03d%s %03d %12s", cp - sys_trace, (cp - sys_trace) == cp->index ? " " : "*", cp->call, cp->name);
+		for (m = state.trap.size - 1; m >= 0; m--)
+			if (MSG_MASK(cp->call) & state.trap.intercept[m].mask)
+				bprintf(b, e, " %p[%d]", state.trap.intercept[m].call, m);
+		bprintf(b, e, " %p\n", cp->func);
+	}
 }
 
 #if _no_exit_exit
 static int
 oksys(void)
 {
-	return(0);
+	return 0;
 }
 
 void
@@ -302,7 +315,8 @@ syscall3d(int call, ...)
 	case 1: arg[1].pointer = a1;
 	}
 #endif
-	if (state.kernel || state.trace.pid <= 1 || (on = fsfd(&state.fs[FS_option])) <= 0 || !(MSG_MASK(cp->call) & (state.trace.call & ~MSG_MASK(error_info.trace ? 0 : MSG_nop)))) on = 0;
+	if (state.kernel || state.trace.pid <= 1 || (on = fsfd(&state.fs[FS_option])) <= 0 || !(MSG_MASK(cp->call) & (state.trace.call & ~MSG_MASK(error_info.trace ? 0 : MSG_nop))))
+		on = 0;
 	else
 	{
 		state.kernel++;
@@ -315,7 +329,8 @@ syscall3d(int call, ...)
 			a = A_INPUT;
 			if (call == SYS3D_write)
 			{
-				if ((m = arg[1].number) == on) a = 0;
+				if ((m = arg[1].number) == on)
+					a = 0;
 				else if (m == 1 || m == 2)
 				{
 					struct stat	st;
@@ -347,14 +362,17 @@ syscall3d(int call, ...)
 					bprintf(&b, e, " 0%o", ap->number);
 					break;
 				case A_STRING:
-					if (t = ap->string) buffer(&b, e, t, strlen(t));
-					else bprintf(&b, e, " (null)");
+					if (t = ap->string)
+						buffer(&b, e, t, strlen(t));
+					else
+						bprintf(&b, e, " (null)");
 					break;
 				case A_VECTOR:
 					bprintf(&b, e, " [");
 					for (p = ap->vector; *p && p < ap->vector + 8; p++)
 						buffer(&b, e, *p, strlen(*p));
-					if (*p) bprintf(&b, e, "...");
+					if (*p)
+						bprintf(&b, e, "...");
 					bprintf(&b, e, " ]");
 					break;
 				default:
@@ -362,7 +380,8 @@ syscall3d(int call, ...)
 					break;
 				}
 			}
-			if (!a) *b++ = '\n';
+			if (!a)
+				*b++ = '\n';
 			else if (MSG_MASK(cp->call) & C_EXIT)
 			{
 				bprintf(&b, e, " ) = ?\n");
@@ -386,11 +405,15 @@ syscall3d(int call, ...)
 						if (MSG_MASK(sys_trace[n].call) & C_IO)
 						{
 							bprintf(&b, e, "   %5d %-10s", sys_trace[n].count, sys_trace[n].name);
-							if (sys_trace[n].megs) bprintf(&b, e, "%5lu.%dm", sys_trace[n].megs, (sys_trace[n].units * 10) >> 20);
-							else bprintf(&b, e, "%5lu.%dk", sys_trace[n].units >> 10, ((sys_trace[n].units & ((1<<10)-1)) * 10) >> 10);
+							if (sys_trace[n].megs)
+								bprintf(&b, e, "%5lu.%dm", sys_trace[n].megs, (sys_trace[n].units * 10) >> 20);
+							else
+								bprintf(&b, e, "%5lu.%dk", sys_trace[n].units >> 10, ((sys_trace[n].units & ((1<<10)-1)) * 10) >> 10);
 						}
-						else bprintf(&b, e, "   %5d %s", sys_trace[n].count, sys_trace[n].name);
-						if (b < e) *b++ = '\n';
+						else
+							bprintf(&b, e, "   %5d %s", sys_trace[n].count, sys_trace[n].name);
+						if (b < e)
+							*b++ = '\n';
 					}
 				*b++ = '\n';
 				n = errno;
@@ -405,7 +428,12 @@ syscall3d(int call, ...)
 		if (MSG_MASK(cp->call) & state.trap.intercept[m].mask)
 			break;
 	if (m >= 0)
+	{
+		n = state.trap.size;
+		state.trap.size = m;
 		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], cp->call, call, arg[1].pointer, arg[2].pointer, arg[3].pointer, arg[4].pointer, arg[5].pointer, arg[6].pointer);
+		state.trap.size = n;
+	}
 	else
 	{
 #if _dynamic_syscall || _static_syscall
@@ -474,13 +502,15 @@ syscall3d(int call, ...)
 		}
 	}
 #if !_mangle_syscall
-	if (r > 0 && (MSG_MASK(cp->call) & C_ZERO)) r = 0;
+	if (r > 0 && (MSG_MASK(cp->call) & C_ZERO))
+		r = 0;
 #endif
 	if (on && state.kernel <= 1)
 	{
 		if (!state.trace.count)
 		{
-			if ((m = MAXLIN - (b - buf)) < 0) m = 0;
+			if ((m = MAXLIN - (b - buf)) < 0)
+				m = 0;
 			b = buf;
 			for (; ac <= cp->args; ac++)
 			{
@@ -563,7 +593,8 @@ syscall3d(int call, ...)
 					bprintf(&b, e, " %p", ap->pointer);
 					break;
 				case A_STRING:
-					if (r == -1) goto pointer;
+					if (r == -1)
+						goto pointer;
 					buffer(&b, e, ap->string, strlen(ap->string));
 					break;
 				default:
@@ -572,7 +603,8 @@ syscall3d(int call, ...)
 				}
 			}
 			bprintf(&b, e, "%s) = %d", a ? " " : "\t", r);
-			if (r == -1) bprintf(&b, e, " [%s]", strerror(errno));
+			if (r == -1)
+				bprintf(&b, e, " [%s]", strerror(errno));
 			n = errno;
 			t = buf;
 			while ((b - t) >= m)
@@ -586,14 +618,16 @@ syscall3d(int call, ...)
 				x = w = t + m;
 				z = t + m / 2;
 				while (x > z && *x != ' ') x--;
-				if (x <= z) x = w;
+				if (x <= z)
+					x = w;
 				c1 = *x;
 				*x++ = '\n';
 				c2 = *x;
 				*x++ = '\t';
 				write(on, t, x - t);
 				*--x = c2;
-				if ((*--x = c1) == ' ') x++;
+				if ((*--x = c1) == ' ')
+					x++;
 				t = x;
 				m = MAXLIN - 8;
 			}
@@ -608,7 +642,7 @@ syscall3d(int call, ...)
 		}
 		state.kernel--;
 	}
-	return(r);
+	return r;
 }
 
 #else

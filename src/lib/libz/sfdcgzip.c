@@ -9,6 +9,13 @@
 #include <zlib.h>
 #include <sfdcgzip.h>
 
+#ifdef z_off64_t
+#undef	z_off_t
+#define z_off_t		z_off64_t
+#undef	gzsync
+#define gzsync		gzsync64
+#endif
+
 typedef struct
 {
 	Sfdisc_t	disc;		/* sfio discipline		*/

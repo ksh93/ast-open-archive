@@ -32,7 +32,7 @@ case `(getopts '[-][123:xyz]' opt --xyz; echo 0$opt) 2>/dev/null` in
 0123)	ARGV0="-a $__command__"
 	USAGE=$'
 [-?
-@(#)$Id: msgcc (AT&T Labs Research) 2002-03-11 $
+@(#)$Id: msgcc (AT&T Labs Research) 2002-09-15 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?msgcc - C language message catalog compiler]
@@ -183,17 +183,19 @@ if	[[ $__OUT__ && $__compile__ ]]
 then	__objv__[0]=$__OUT__
 fi
 
-for (( __i__=0; __i__<=__files__; __i__++ ))
-do	if	[[ ${__srcv__[__i__]} ]]
-	then	if	(( __sources__ > 1 ))
-		then	print "${__srcv__[__i__]}:"
+if	(( __sources__ ))
+then	for (( __i__=0; __i__<=__files__; __i__++ ))
+	do	if	[[ ${__srcv__[__i__]} ]]
+		then	if	(( __sources__ > 1 ))
+			then	print "${__srcv__[__i__]}:"
+			fi
+			if	[[ $__preprocess__ ]]
+			then	msgcpp "${__argv__[@]}" "${__srcv__[__i__]}"
+			else	msgcpp "${__argv__[@]}" "${__srcv__[__i__]}" > "${__objv__[__i__]}"
+			fi
 		fi
-		if	[[ $__preprocess__ ]]
-		then	msgcpp "${__argv__[@]}" "${__srcv__[__i__]}"
-		else	msgcpp "${__argv__[@]}" "${__srcv__[__i__]}" > "${__objv__[__i__]}"
-		fi
-	fi
-done
+	done
+fi
 
 # combine the .mso and .msg files
 

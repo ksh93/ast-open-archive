@@ -153,7 +153,7 @@ fs3d(register int op)
 	register int	po;
 	register int	n;
 
-	if ((n = FS3D_op(op)) == FS3D_OP_INIT || !state.pid) init(1);
+	if ((n = FS3D_op(op)) == FS3D_OP_INIT || !state.pid) init(1, 0, 0);
 	if (!state.in_2d) po = FS3D_ON;
 	else if (state.limit) po = FS3D_LIMIT(state.limit);
 	else po = FS3D_OFF;

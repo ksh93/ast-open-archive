@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -222,144 +222,54 @@ done coshell.svc generated
 make ../../../lib/cs
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 		    		   
 exec - fi
 done ../../../lib/cs generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/coshell
 prev coshell.svc
 setv preserve -Dpreserve
-exec - mv ${INSTALLROOT}/bin/coshell ${INSTALLROOT}/bin/coshell.old 2>/dev/null || true; test '' = 'coshell.svc' || { cp coshell.svc ${INSTALLROOT}/bin/coshell  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/coshell ${INSTALLROOT}/bin/coshell.old 2>/dev/null || true; test '' = 'coshell.svc' || ${STDCMP} 2>/dev/null -s coshell.svc ${INSTALLROOT}/bin/coshell || { ${STDCP} coshell.svc ${INSTALLROOT}/bin/coshell  		    		    ;}
 done ../../../bin/coshell generated
 make ../../../lib/cs/fdp/coshell
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/fdp/coshell
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/fdp/coshell 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/fdp/coshell | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/fdp/coshell 		    		   
 exec - fi
 done ../../../lib/cs/fdp/coshell generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/coshell.1
 make coshell.1
 done coshell.1
-exec - mv ${INSTALLROOT}/man/man1/coshell.1 ${INSTALLROOT}/man/man1/coshell.1.old 2>/dev/null || true; test '' = 'coshell.1' || { cp coshell.1 ${INSTALLROOT}/man/man1/coshell.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/coshell.1 ${INSTALLROOT}/man/man1/coshell.1.old 2>/dev/null || true; test '' = 'coshell.1' || ${STDCMP} 2>/dev/null -s coshell.1 ${INSTALLROOT}/man/man1/coshell.1 || { ${STDCP} coshell.1 ${INSTALLROOT}/man/man1/coshell.1  		    		    ;}
 done ../../../man/man1/coshell.1 generated
 make ../../../fun
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/fun
-exec - then	set -x && mkdir -p ${INSTALLROOT}/fun 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/fun | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/fun 		    		   
 exec - fi
 done ../../../fun generated
 make ../../../fun/cosh
 make cosh
 done cosh
 setv mode -Dmode="+x"
-exec - mv ${INSTALLROOT}/fun/cosh ${INSTALLROOT}/fun/cosh.old 2>/dev/null || true; test '' = 'cosh' || { cp cosh ${INSTALLROOT}/fun/cosh  		    		   && chmod ugo+x ${INSTALLROOT}/fun/cosh ;}
+exec - ${STDMV} ${INSTALLROOT}/fun/cosh ${INSTALLROOT}/fun/cosh.old 2>/dev/null || true; test '' = 'cosh' || ${STDCMP} 2>/dev/null -s cosh ${INSTALLROOT}/fun/cosh || { ${STDCP} cosh ${INSTALLROOT}/fun/cosh  		    		   && chmod ugo+x ${INSTALLROOT}/fun/cosh ;}
 done ../../../fun/cosh generated
 make ../../../fun/title
 make title
 done title
 setv mode -Dmode="+x"
-exec - mv ${INSTALLROOT}/fun/title ${INSTALLROOT}/fun/title.old 2>/dev/null || true; test '' = 'title' || { cp title ${INSTALLROOT}/fun/title  		    		   && chmod ugo+x ${INSTALLROOT}/fun/title ;}
+exec - ${STDMV} ${INSTALLROOT}/fun/title ${INSTALLROOT}/fun/title.old 2>/dev/null || true; test '' = 'title' || ${STDCMP} 2>/dev/null -s title ${INSTALLROOT}/fun/title || { ${STDCP} title ${INSTALLROOT}/fun/title  		    		   && chmod ugo+x ${INSTALLROOT}/fun/title ;}
 done ../../../fun/title generated
 done install virtual
 make test

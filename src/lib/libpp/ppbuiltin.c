@@ -213,6 +213,12 @@ ppbuiltin(void)
 		case V_PATH:
 			p = pp.path;
 			break;
+		case V_SOURCE:
+			p = error_info.file;
+			for (in = pp.in; in->prev; in = in->prev)
+				if (in->prev->type == IN_FILE && in->file)
+					p = in->file;
+			break;
 		case V_STDC:
 			p = pp.valbuf;
 			p[0] = ((pp.state & (COMPATIBILITY|TRANSITION)) || (pp.mode & (HOSTED|HOSTEDTRANSITION)) == (HOSTED|HOSTEDTRANSITION)) ? '0' : '1';

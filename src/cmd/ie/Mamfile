@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O ${mam_cc_DLL}"
+setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -267,87 +267,33 @@ done ie generated
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libedit.a archive
 prev libedit.a archive
-exec - mv ${PACKAGE_ast_LIB}/libedit.a ${PACKAGE_ast_LIB}/libedit.a.old 2>/dev/null || true; test '' = 'libedit.a' || { cp libedit.a ${PACKAGE_ast_LIB}/libedit.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/libedit.a ${PACKAGE_ast_LIB}/libedit.a.old 2>/dev/null || true; test '' = 'libedit.a' || ${STDCMP} 2>/dev/null -s libedit.a ${PACKAGE_ast_LIB}/libedit.a || { ${STDCP} libedit.a ${PACKAGE_ast_LIB}/libedit.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libedit.a) >/dev/null 2>&1 || true
 done ../../../lib/libedit.a generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/edit
 prev edit.req
-exec - mv ${PACKAGE_ast_LIB}/lib/edit ${PACKAGE_ast_LIB}/lib/edit.old 2>/dev/null || true; test '' = 'edit.req' || { cp edit.req ${PACKAGE_ast_LIB}/lib/edit  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/edit ${PACKAGE_ast_LIB}/lib/edit.old 2>/dev/null || true; test '' = 'edit.req' || ${STDCMP} 2>/dev/null -s edit.req ${PACKAGE_ast_LIB}/lib/edit || { ${STDCP} edit.req ${PACKAGE_ast_LIB}/lib/edit  		    		    ;}
 done ../../../lib/lib/edit generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/ie
 prev ie
-exec - mv ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; test '' = 'ie' || { cp ie ${INSTALLROOT}/bin/ie  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; test '' = 'ie' || ${STDCMP} 2>/dev/null -s ie ${INSTALLROOT}/bin/ie || { ${STDCP} ie ${INSTALLROOT}/bin/ie  		    		    ;}
 done ../../../bin/ie generated
 done install virtual
 make test

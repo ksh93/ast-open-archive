@@ -23,21 +23,14 @@
 *******************************************************************/
 #include	"FEATURE/sfio"
 
-#define _next	next
-#define _endw	endw
-#define _endr	endr
-#define _endb	endb
-#define _push	push
-#define _flags	flags
-#define _file	file
-#define _data	data
-#define _size	size
-#define _val	val
-
 #if _SFIO_H_ONLY
 #include	<sfio.h>
 #else
 #include	<sfio_t.h>
+#endif
+
+#if _hdr_unistd
+#include	<unistd.h>
 #endif
 
 #include	<errno.h>

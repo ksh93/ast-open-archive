@@ -2889,7 +2889,6 @@ void
 interpreter(char* msg)
 {
 	int		level;
-	int		keepgoing;
 	void		(*errexit)(int);
 	struct frame	frame;
 	struct label	resume;
@@ -2904,8 +2903,7 @@ interpreter(char* msg)
 	frame.parent = state.frame;
 	frame.previous = frame.target->active;
 	state.frame = frame.target->active = &frame;
-	keepgoing = state.keepgoing;
-	state.keepgoing = 1;
+	state.keepgoing |= 2;
 	resume = state.resume;
 	if (setjmp(state.resume.label))
 	{
@@ -2919,7 +2917,7 @@ interpreter(char* msg)
 	parse(sfstdin, NiL, "query", 0);
 	state.interpreter--;
 	state.resume = resume;
-	state.keepgoing = keepgoing;
+	state.keepgoing &= 1;
 	frame.target->active = frame.previous;
 	state.frame = frame.parent;
 	sfclrlock(sfstdin);

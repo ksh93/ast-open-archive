@@ -241,10 +241,26 @@ typedef unsigned char  Byte;  /* 8 bits */
 typedef unsigned int   uInt;  /* 16 bits or more */
 typedef unsigned long  uLong; /* 32 bits or more */
 #if _PACKAGE_ast
-typedef unsigned _ast_intmax_t	uSize; /* largest integer */
-#else
-typedef z_off_t                 uSize; /* largest integer */
+#undef	z_off_t
+#define z_off_t		_ast_int4_t
+#ifdef _ast_int8_t
+#define z_off64_t	_ast_int8_t
+#define uSize64		unsigned _ast_int8_t
+#define uSIZE		uSize64
+#define ZINTERNAL_STATE	uSIZE total_in, total_out
+#define total_IN	state->total_in
+#define total_OUT	state->total_out
 #endif
+#endif
+#ifndef uSIZE
+#define uSIZE		uSize
+#endif
+#ifndef total_IN
+#define total_IN	total_in
+#define total_OUT	total_out
+#endif
+
+typedef z_off_t         uSize; /* largest integer */
 
 #ifdef SMALL_MEDIUM
    /* Borland C/C++ and some old MSC versions ignore FAR inside typedef */

@@ -680,7 +680,7 @@ getargs(register struct argvec* vp, register char* s)
 						continue;
 					c = ' ';
 				}
-				else if (c == '\n' && !*s)
+				else if (c == '\n' && !*s || c == '\r' && *s == '\n' && !*(s + 1))
 					continue;
 			}
 			if (t < &buf[sizeof(buf) - 2])

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -109,7 +109,7 @@ setv _BLD_pp -U_BLD_pp
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsym.c
 done ppsym.o generated
 bind -last
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ppsym ppsym.o ${mam_cc_static} ${mam_libast} ${mam_cc_dynamic} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ppsym ppsym.o ${mam_libast} ${mam_libast}
 done ppsym generated
 make pp
 make libpp.a archive
@@ -127,7 +127,7 @@ exec - do	case $i in
 exec - 	"pp"|pp)
 exec - 		;;
 exec - 	*)	if	test ! -f ${INSTALLROOT}/lib/lib$i.a
-exec - 		then	case `{ ${CC} ${CCFLAGS}    -L${PACKAGE_ast_LIB} ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
+exec - 		then	case `{ ${CC} ${CCFLAGS}     ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 			*$x*)	case `{ ${CC} ${CCFLAGS}    ${LDFLAGS}  -o 1.${COTEMP}.x 1.${COTEMP}.o  -l$i 2>&1 || echo '' $x ;} | sed -e 's/[][()+@?]/#/g' || :` in
 exec - 				*$x*) continue ;;
 exec - 				esac
@@ -306,6 +306,7 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pperror.
 done pperror.o generated
 make ppexpr.o
 make ppexpr.c
+prev ../../../include/ast/regex.h implicit
 prev pplib.h implicit
 done ppexpr.c
 prev ppexpr.c
@@ -538,111 +539,39 @@ prev libpp.a archive
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libpp.a archive
 prev libpp.a archive
-exec - mv ${PACKAGE_ast_LIB}/libpp.a ${PACKAGE_ast_LIB}/libpp.a.old 2>/dev/null || true; test '' = 'libpp.a' || { cp libpp.a ${PACKAGE_ast_LIB}/libpp.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/libpp.a ${PACKAGE_ast_LIB}/libpp.a.old 2>/dev/null || true; test '' = 'libpp.a' || ${STDCMP} 2>/dev/null -s libpp.a ${PACKAGE_ast_LIB}/libpp.a || { ${STDCP} libpp.a ${PACKAGE_ast_LIB}/libpp.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libpp.a) >/dev/null 2>&1 || true
 done ../../../lib/libpp.a generated
 make ../../../man/man3
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man3
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man3 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 		    		   
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/pp.3
 make pp.3
 done pp.3
-exec - mv ${INSTALLROOT}/man/man3/pp.3 ${INSTALLROOT}/man/man3/pp.3.old 2>/dev/null || true; test '' = 'pp.3' || { cp pp.3 ${INSTALLROOT}/man/man3/pp.3  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man3/pp.3 ${INSTALLROOT}/man/man3/pp.3.old 2>/dev/null || true; test '' = 'pp.3' || ${STDCMP} 2>/dev/null -s pp.3 ${INSTALLROOT}/man/man3/pp.3 || { ${STDCP} pp.3 ${INSTALLROOT}/man/man3/pp.3  		    		    ;}
 done ../../../man/man3/pp.3 generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/pp
 prev pp.req
-exec - mv ${PACKAGE_ast_LIB}/lib/pp ${PACKAGE_ast_LIB}/lib/pp.old 2>/dev/null || true; test '' = 'pp.req' || { cp pp.req ${PACKAGE_ast_LIB}/lib/pp  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/pp ${PACKAGE_ast_LIB}/lib/pp.old 2>/dev/null || true; test '' = 'pp.req' || ${STDCMP} 2>/dev/null -s pp.req ${PACKAGE_ast_LIB}/lib/pp || { ${STDCP} pp.req ${PACKAGE_ast_LIB}/lib/pp  		    		    ;}
 done ../../../lib/lib/pp generated
 make ../../../include/ast
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_INCLUDE} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
 exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/pp.h
@@ -697,7 +626,7 @@ exec - ${CC} -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > pp.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done pp.yacc generated
-exec - mv ${PACKAGE_ast_INCLUDE}/pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc.old 2>/dev/null || true; test '' = 'pp.yacc' || { cp pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_INCLUDE}/pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc.old 2>/dev/null || true; test '' = 'pp.yacc' || ${STDCMP} 2>/dev/null -s pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc || { ${STDCP} pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc  		    		    ;}
 done ../../../include/ast/pp.yacc generated
 make ../../../include/ast/ppkey.yacc
 make ppkey.yacc
@@ -736,30 +665,12 @@ exec - ${CC} -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > ppkey.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done ppkey.yacc generated
-exec - mv ${PACKAGE_ast_INCLUDE}/ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc.old 2>/dev/null || true; test '' = 'ppkey.yacc' || { cp ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_INCLUDE}/ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc.old 2>/dev/null || true; test '' = 'ppkey.yacc' || ${STDCMP} 2>/dev/null -s ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc || { ${STDCP} ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc  		    		    ;}
 done ../../../include/ast/ppkey.yacc generated
 make ../../../lib/probe/C/pp
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/probe/C/pp
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/probe/C/pp 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/probe/C/pp | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/probe/C/pp 		    		   
 exec - fi
 done ../../../lib/probe/C/pp generated
 make ../../../lib/probe/C/pp/probe
@@ -805,27 +716,27 @@ exec - 	;;
 exec - esac
 exec - chmod u+w,+x probe
 done probe generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/probe ${PACKAGE_ast_LIB}/probe/C/pp/probe.old 2>/dev/null || true; test '' = 'probe' || { cp probe ${PACKAGE_ast_LIB}/probe/C/pp/probe  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/probe/C/pp/probe ${PACKAGE_ast_LIB}/probe/C/pp/probe.old 2>/dev/null || true; test '' = 'probe' || ${STDCMP} 2>/dev/null -s probe ${PACKAGE_ast_LIB}/probe/C/pp/probe || { ${STDCP} probe ${PACKAGE_ast_LIB}/probe/C/pp/probe  		    		    ;}
 done ../../../lib/probe/C/pp/probe generated
 make ../../../lib/probe/C/pp/pp.def
 make pp.def
 done pp.def
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def.old 2>/dev/null || true; test '' = 'pp.def' || { cp pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/probe/C/pp/pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def.old 2>/dev/null || true; test '' = 'pp.def' || ${STDCMP} 2>/dev/null -s pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def || { ${STDCP} pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def  		    		    ;}
 done ../../../lib/probe/C/pp/pp.def generated
 make ../../../lib/probe/C/pp/pp.key
 make pp.key
 done pp.key
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key.old 2>/dev/null || true; test '' = 'pp.key' || { cp pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/probe/C/pp/pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key.old 2>/dev/null || true; test '' = 'pp.key' || ${STDCMP} 2>/dev/null -s pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key || { ${STDCP} pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key  		    		    ;}
 done ../../../lib/probe/C/pp/pp.key generated
 make ../../../lib/probe/C/pp/ppsym
 prev ppsym
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym.old 2>/dev/null || true; test '' = 'ppsym' || { cp ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/probe/C/pp/ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym.old 2>/dev/null || true; test '' = 'ppsym' || ${STDCMP} 2>/dev/null -s ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym || { ${STDCP} ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym  		    		    ;}
 done ../../../lib/probe/C/pp/ppsym generated
 make ../../../lib/probe/C/pp/probe.ini
 make probe.ini
 make probe.win32
 done probe.win32
-exec - t=${_hosttype_=`package`}
+exec - t=${mam_cc_HOSTTYPE}
 exec - ifs=$IFS
 exec - IFS=.
 exec - set x $t
@@ -847,7 +758,7 @@ exec - ?*)	cmp -s $1 probe.ini || cp $1 probe.ini ;;
 exec - *)	: > probe.ini
 exec - esac
 done probe.ini generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini.old 2>/dev/null || true; test '' = 'probe.ini' || { cp probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini.old 2>/dev/null || true; test '' = 'probe.ini' || ${STDCMP} 2>/dev/null -s probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini || { ${STDCP} probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini  		    		    ;}
 done ../../../lib/probe/C/pp/probe.ini generated
 done install virtual
 make test

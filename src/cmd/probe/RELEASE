@@ -1,3 +1,5 @@
+02-09-21 probe.c: handle strlen(base) != BASE_MAX
+02-09-11 probe.c: add more override docs
 02-01-30 probe.c: add probe.ini check to match libast/pathprobe()
 01-12-03 probe.c: return HOME relative path if readonly/non-suid fs
 00-08-11 probe: fix non-suid generation check

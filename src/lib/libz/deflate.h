@@ -80,6 +80,9 @@ typedef uInt IPos;
  */
 
 typedef struct internal_state {
+#ifdef ZINTERNAL_STATE
+    ZINTERNAL_STATE;
+#endif
     z_streamp strm;      /* pointer back to this zlib stream */
     int   status;        /* as the name implies */
     Bytef *pending_buf;  /* output still pending */

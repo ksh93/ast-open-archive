@@ -3645,6 +3645,31 @@ expandvars(register Sfio_t* xp, register char* s, char* ed, int del, int nvars)
 			}
 			else v = getval(v, aux);
 		}
+		if (state.mam.statix && nvars > 1 && strmatch(v, "${mam_*}") && (!ed || !*ed))
+		{
+			if (!cvt)
+				cvt = sfstropen();
+			exp = 0;
+			for (;;)
+			{
+				if (nvars > 1 && strmatch(v, "${mam_*}"))
+				{
+					sfwrite(cvt, v, strlen(v) - 1);
+					sfputc(cvt, '-');
+					exp++;
+				}
+				else
+					sfputr(cvt, v, -1);
+				if (--nvars <= 0)
+					break;
+				while (*s++);
+				v = getval(s, aux);
+			}
+			while (exp--)
+				sfputc(cvt, '}');
+			sfputr(xp, sfstruse(cvt), -1);
+			break;
+		}
 		if (*v || --nvars <= 0)
 		{
 			if (ed)

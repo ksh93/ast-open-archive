@@ -55,7 +55,7 @@ mapget(Map_t* map, char* buf, int flags)
 	case T_MOUNT:
 		mp = (Mount_t*)map->val;
 		if (state.visit.fs && state.visit.fs != mp->fs)
-			return(0);
+			return 0;
 		v = mp->fs->special;
 		z = mp->fs->specialsize;
 		break;
@@ -86,7 +86,8 @@ mapget(Map_t* map, char* buf, int flags)
 			{
 				p = strcopy(p, state.visit.prefix);
 				*p++ = '/';
-				if (*v == '/') *p++ = '#';
+				if (*v == '/')
+					*p++ = '#';
 			}
 		}
 		strncpy(p, v, z);
@@ -104,12 +105,13 @@ mapget(Map_t* map, char* buf, int flags)
 		*p++ = ' ';
 		n = p - buf;
 	}
-	else n += z + state.visit.prelen
+	else
+		n += z + state.visit.prelen
 #if FS
 		+ (mp ? ((mp->channel ? 16 : 0) + (mp->physical ? (mp->physicalsize ? mp->physicalsize : strlen(mp->physical)) : 0) + getattr(mp->attr, NiL)) : 0)
 #endif
 		+ 6;
-	return(n);
+	return n;
 }
 
 /*
@@ -131,15 +133,17 @@ mapdump(Table_t* tab, char* buf, int flags)
 	{
 		if (state.kernel)
 		{
-			if (p) *p = 0;
-			return(1);
+			if (p)
+				*p = 0;
+			return 1;
 		}
 		if (p)
 		{
 			n = sfsprintf(p, 0, "%s", TABLE_PREFIX);
 			p += n;
 		}
-		else n = sizeof(TABLE_PREFIX) - 1;
+		else
+			n = sizeof(TABLE_PREFIX) - 1;
 		sum += n;
 	}
 	if (!tab)
@@ -148,28 +152,33 @@ mapdump(Table_t* tab, char* buf, int flags)
 			if (fs->get)
 			{
 				n = (*fs->get)(fs, p, NiL, flags);
-				if (p) p += n;
+				if (p)
+					p += n;
 				sum += n;
 			}
 	}
 	else
 	{
 		n = iterate(tab, mapget, p, flags);
-		if (p) p += n;
+		if (p)
+			p += n;
 		sum += n;
 	}
 	if (p)
 	{
 		if (p > buf)
 		{
-			if (!(flags & (MAP_EXEC|MAP_INIT))) p--;
-			else if ((p - buf) == (sizeof(TABLE_PREFIX) - 1)) p = buf;
-			else *(p - 1) = '\n';
+			if (!(flags & MAP_INIT))
+				p--;
+			else if ((p - buf) == (sizeof(TABLE_PREFIX) - 1))
+				p = buf;
+			else
+				*(p - 1) = '\n';
 		}
 		*p = 0;
 		sum = p - buf;
 	}
-	return(sum);
+	return sum;
 }
 
 #if LICENSED
@@ -194,7 +203,8 @@ licensed(register Fs_t* fs)
 					*state.license = LICENSE_NONE;
 				else if (!pc.feature)
 					*state.license = LICENSE_ALL;
-				else sfsprintf(state.license, sizeof(state.license), "%c%s%c", LICENSE_SEP, pc.feature, LICENSE_SEP);
+				else
+					sfsprintf(state.license, sizeof(state.license), "%c%s%c", LICENSE_SEP, pc.feature, LICENSE_SEP);
 				message((-2, "license: feature=%s", state.license));
 			}
 			if (*state.license == LICENSE_ALL)
@@ -212,9 +222,9 @@ licensed(register Fs_t* fs)
 				error(2, "%s service not licensed", fs->special);
 		}
 		if (!(fs->flags & FS_LICENSED))
-			return(0);
+			return 0;
 	}
-	return(1);
+	return 1;
 }
 
 #else
@@ -241,9 +251,9 @@ getattr(const char* attr, char* buf)
 		while (c = *b++ = *a++)
 			if (c == ' ')
 				*(b - 1) = '/';
-		return(b - buf - 1);
+		return b - buf - 1;
 	}
-	return(strlen(a));
+	return strlen(a);
 }
 
 /*
@@ -269,7 +279,7 @@ setattr(char* attr, const char* op, register const char* oe)
 		for (;;)
 		{
 			if (s >= oe || *s == '/')
-				return(op);
+				return op;
 			if (*s++ == '=')
 			{
 				v = s - 1;
@@ -292,9 +302,11 @@ setattr(char* attr, const char* op, register const char* oe)
 									a--;
 								*a = 0;
 							}
-							else while (*a++ = *++x);
+							else
+								while (*a++ = *++x);
 						}
-						else k = 0;
+						else
+							k = 0;
 						break;
 					}
 					if (!(a = strchr(a, ' ')))
@@ -308,12 +320,12 @@ setattr(char* attr, const char* op, register const char* oe)
 					a[m] = 0;
 				}
 				if (s++ >= oe)
-					return(0);
+					return 0;
 				op = s;
 			}
 		}
 	}
-	return(op);
+	return op;
 }
 
 #endif
@@ -328,6 +340,7 @@ special(register const char* op, int opsize, const char* arg, int argsize)
 	register const char*	oe;
 	register Fs_t*		fs;
 	const char*		ov;
+	const char*		org;
 	Map_t*			map;
 	int			arglen;
 	unsigned long		x;
@@ -335,31 +348,39 @@ special(register const char* op, int opsize, const char* arg, int argsize)
 	register Mount_t*	mp;
 #endif
 
-	if (!(arglen = argsize)) arglen = strlen(arg);
+	if (!(arglen = argsize))
+		arglen = strlen(arg);
 	oe = op + (opsize ? opsize : strlen(op));
 	if (!(x = getkey(op, oe, 0)))
 	{
 		if (arglen)
 		{
 			errno = ENODEV;
-			return(-1);
+			return -1;
 		}
 		for (fs = state.fs; fs < state.fs + elementsof(state.fs); fs++)
 			if (fs->set)
 				(*fs->set)(fs, state.null, 0, state.null, 0);
-		return(0);
+		return 0;
 	}
 	if (state.key.invert)
 	{
 		errno = ENODEV;
-		return(-1);
+		return -1;
+	}
+	org = arg;
+	if (!argsize && *arg)
+	{
+		if (!pathreal(arg, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL))
+			return -1;
+		arg = (const char*)state.path.name;
 	}
 	ov = (char*)state.key.next;
 	for (fs = state.fs; fs < state.fs + elementsof(state.fs); fs++)
 		if (!x || x == fs->key)
 	{
 		if (!licensed(fs))
-			return(0);
+			return 0;
 #if FS
 		if (fs->flags & FS_FS)
 		{
@@ -369,13 +390,13 @@ special(register const char* op, int opsize, const char* arg, int argsize)
 				if (mp->fs != fs)
 				{
 					errno = EEXIST;
-					return(-1);
+					return -1;
 				}
 				message((-2, "mount: old fs=%s map=%-*s arg=%-*s op=%-*s", fs->special, map->keysize, map->key, arglen, arg, ov ? (oe - ov) : 6, ov));
 				if (setattr(mp->attr, ov, oe))
 				{
 					errno = EEXIST;
-					return(-1);
+					return -1;
 				}
 			}
 			else if (op < oe)
@@ -385,8 +406,9 @@ special(register const char* op, int opsize, const char* arg, int argsize)
 					for (mp = state.mount;; mp++)
 					{
 						if (mp >= state.mount + elementsof(state.mount))
-							return(-1);
-						if (!mp->fs) break;
+							return -1;
+						if (!mp->fs)
+							break;
 					}
 					if (map = search(&state.vmount, arg, arglen, (char*)mp, argsize ? T_MOUNT : (T_MOUNT|T_ALLOCATE)))
 					{
@@ -402,7 +424,8 @@ special(register const char* op, int opsize, const char* arg, int argsize)
 							if ((oe - ov) > 8 && strneq(ov, "channel=", 8))
 							{
 								mp->channel = strtol(ov + 8, (char**)&ov, 0);
-								if (++ov >= oe) ov = 0;
+								if (++ov >= oe)
+									ov = 0;
 							}
 							if (ov = setattr(mp->attr, ov, oe))
 							{
@@ -423,7 +446,7 @@ special(register const char* op, int opsize, const char* arg, int argsize)
 				else if (setattr(fs->attr, ov, oe))
 				{
 					errno = EEXIST;
-					return(-1);
+					return -1;
 				}
 			}
 		}
@@ -433,25 +456,26 @@ special(register const char* op, int opsize, const char* arg, int argsize)
 		{
 			if (ov)
 			{
-				if ((*fs->set)(fs, arg, argsize, ov, oe - ov))
-					return(-1);
+				if ((*fs->set)(fs, (fs->flags & FS_RAW) ? org : arg, argsize, ov, oe - ov))
+					return -1;
 			}
 			else if (arglen)
 			{
-				if ((*fs->set)(fs, arg, argsize, state.null, 0))
-					return(-1);
+				if ((*fs->set)(fs, (fs->flags & FS_RAW) ? org : arg, argsize, state.null, 0))
+					return -1;
 			}
 			else if ((*fs->set)(fs, state.null, 0, state.null, 0))
-				return(-1);
+				return -1;
 		}
-		if (op < oe) break;
+		if (op < oe)
+			break;
 	}
 	if (op < oe && fs >= state.fs + elementsof(state.fs))
 	{
 		errno = ENODEV;
-		return(-1);
+		return -1;
 	}
-	return(0);
+	return 0;
 }
 
 /*
@@ -466,12 +490,13 @@ mapset(Table_t* tab, const char* from, int fromsize, register const char* to, in
 {
 	register Map_t*	old;
 	register int	n;
+	int		x;
 	char		buf[PATH_MAX + 1];
 
 	if (state.safe && !(state.test & 0100))
 	{
 		errno = EPERM;
-		return(-1);
+		return -1;
 	}
 	if (!fromsize && (!from || !from[0] || from[0] == '-' && !from[1]) || fromsize == 1 && from[0] == '-')
 	{
@@ -487,21 +512,16 @@ mapset(Table_t* tab, const char* from, int fromsize, register const char* to, in
 	if ((!tosize || tosize >= 2) && to[0] == '/' && to[1] == '#')
 	{
 		to += 2;
-		if (tosize) tosize -= 2;
-		if (!fromsize && *from)
-		{
-			if (!pathreal(from, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL))
-				return(-1);
-			from = state.path.name;
-		}
-		return(special(to, tosize, from, fromsize));
+		if (tosize)
+			tosize -= 2;
+		return special(to, tosize, from, fromsize);
 	}
 	if (!*from)
 	{
 		if (!*to)
 			while (tab->table->key)
 				search(tab, tab->table->key, tab->table->keysize, NiL, T_DELETE);
-		return(0);
+		return 0;
 	}
 	if (fromsize)
 	{
@@ -512,32 +532,45 @@ mapset(Table_t* tab, const char* from, int fromsize, register const char* to, in
 			 * so we have to believe from and to here
 			 */
 
-			return(search(tab, from, fromsize, to, tosize) ? 0 : -1);
+			return search(tab, from, fromsize, to, tosize) ? 0 : -1;
 		}
 		n = *(from + fromsize);
 		*((char*)from + fromsize) = 0;
 	}
 	if (!licensed(&state.fs[tab == &state.vpath ? FS_view : tab == &state.vmap ? FS_map : FS_safe]))
-		return(0);
-	if (!pathreal(from, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL))
-		return(-1);
-	if (fromsize) *((char*)from + fromsize) = n;
-	n = strlen(state.path.name);
-	old = search(tab, state.path.name, n, NiL, *to ? 0 : T_DELETE);
+		return 0;
+	if (x = tab != &state.vintercept)
+	{
+		if (!pathreal(from, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL))
+			return -1;
+		if (fromsize)
+		{
+			*((char*)from + fromsize) = n;
+			fromsize = 0;
+		}
+		from = (const char*)state.path.name;
+	}
+	if (!fromsize)
+		fromsize = strlen(from);
+	old = search(tab, from, fromsize, NiL, *to ? 0 : T_DELETE);
 	if (!*to)
 	{
-		search(&state.vmount, state.path.name, n, NiL, T_DELETE);
-		return(0);
+		search(&state.vmount, from, fromsize, NiL, T_DELETE);
+		return 0;
 	}
 	if (tab == &state.vmap)
 	{
 		if (old)
 		{
-			if (!(old->valsize & T_SIZE)) free(old->val);
-			if ((old->valsize = tosize) & T_SIZE) old->val = (char*)to;
-			else old->val = strcpy(newof(0, char, strlen(to), 1), to);
+			if (!(old->valsize & T_SIZE))
+				free(old->val);
+			if ((old->valsize = tosize) & T_SIZE)
+				old->val = (char*)to;
+			else
+				old->val = strcpy(newof(0, char, strlen(to), 1), to);
 		}
-		else search(tab, state.path.name, n, to, tosize|T_ALLOCATE);
+		else
+			search(tab, from, fromsize, to, tosize|T_ALLOCATE);
 	}
 	else if (old)
 	{
@@ -545,27 +578,32 @@ mapset(Table_t* tab, const char* from, int fromsize, register const char* to, in
 		 * ok if previous mapping matched
 		 */
 
-		if (!(to = pathreal(to, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL)))
-			return(-1);
+		if (x && !(to = pathreal(to, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL)))
+			return -1;
 		if ((n = T_VALSIZE(old)) == (tosize ? tosize : strlen(to)) && strneq(old->val, to, n))
-			return(0);
+			return 0;
 
 		/*
 		 * already have different mapping
 		 */
 
 		errno = EEXIST;
-		return(-1);
+		return -1;
 	}
 	else
 	{
-		strncpy(buf, state.path.name, PATH_MAX);
-		if (!pathreal(to, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL))
-			return(-1);
-		if (tab == &state.vsafe || !streq(buf, state.path.name))
-			search(tab, buf, n, state.path.name, T_ALLOCATE);
+		strncpy(buf, from, PATH_MAX);
+		buf[PATH_MAX] = 0;
+		if (x)
+		{
+			if (!pathreal(to, P_PATHONLY|P_ABSOLUTE|P_NOSLASH, NiL))
+				return -1;
+			to = (const char*)state.path.name;
+		}
+		if (tab == &state.vsafe || !streq(buf, to))
+			search(tab, buf, fromsize, to, T_ALLOCATE);
 	}
-	return(0);
+	return 0;
 }
 
 /*
@@ -583,44 +621,54 @@ mapinit(const char* buf, int readonly)
 	int		tosize;
 
 #if DEBUG_TABLE
-	if (!error_info.trace) error_info.trace = -3;
+	if (!error_info.trace)
+		error_info.trace = -3;
 	message((-1, "TABLE `%s'", bp));
 #endif
 	if (strneq(bp, TABLE_PREFIX, sizeof(TABLE_PREFIX) - 1))
 		bp += sizeof(TABLE_PREFIX) - 1;
 #if DEBUG_TABLE
-	if (bp != buf) message((-1, "TABLE `%s'", bp));
+	if (bp != buf)
+		message((-1, "TABLE `%s'", bp));
 #endif
-	if (!readonly) fromsize = tosize = 0;
+	if (!readonly)
+		fromsize = tosize = 0;
 	while (*bp)
 	{
 		for (from = bp; *bp && *bp != ' '; bp++);
 		if (readonly)
 		{
 			fromsize = bp - from;
-			if (*bp) bp++;
+			if (*bp)
+				bp++;
 		}
-		else if (*bp) *bp++ = 0;
+		else if (*bp)
+			*bp++ = 0;
 		for (to = bp; *bp && *bp != ' ' && *bp != '\n'; bp++);
-		if (readonly) tosize = bp - to;
-		else if (*bp) *bp++ = 0;
+		if (readonly)
+			tosize = bp - to;
+		else if (*bp)
+			*bp++ = 0;
 #if DEBUG_TABLE
 		if (mapset(&state.vpath, from, fromsize, to, tosize))
 		{
-			if (readonly) message((-1, "TABLE %-*s -> %-*s FAILED", fromsize, from, tosize, to));
-			else message((-1, "TABLE %s -> %s FAILED", from, to));
-			return(-1);
+			if (readonly)
+				message((-1, "TABLE %-*s -> %-*s FAILED", fromsize, from, tosize, to));
+			else
+				message((-1, "TABLE %s -> %s FAILED", from, to));
+			return -1;
 		}
 		if (state.table.version != TABLE_VERSION)
 		{
 			message((-1, "TABLE state.table.version=%d != TABLE_VERSION=%d", state.table.version, TABLE_VERSION));
-			return(-1);
+			return -1;
 		}
 #else
 		if (mapset(&state.vpath, from, fromsize, to, tosize) || state.table.version != TABLE_VERSION)
-			return(-1);
+			return -1;
 #endif
-		if (*bp) bp++;
+		if (*bp)
+			bp++;
 	}
-	return(0);
+	return 0;
 }

@@ -34,6 +34,8 @@
 
 #include <tm.h>
 
+#define TAR_LARGENUM	0200
+
 #if __hppa__ || __hppa || hppa
 
 /*
@@ -916,7 +918,7 @@ getheader(register Archive_t* ap, register File_t* f)
 		long	nlink;
 		long	rdev;
 		long	mtime;
-		long	size;
+	_ast_intmax_t	size;
 		long	dev_major;
 		long	dev_minor;
 		long	rdev_major;
@@ -1186,7 +1188,7 @@ getheader(register Archive_t* ap, register File_t* f)
 		case CPIO:
 			if (bread(ap, state.tmp.buffer, (off_t)0, (off_t)CPIO_HEADER, 0) <= 0) break;
 			state.tmp.buffer[CPIO_HEADER] = 0;
-			if (state.tmp.buffer[0] == '0' && sfsscanf(state.tmp.buffer, "%6o%6lo%6lo%6lo%6lo%6lo%6lo%6lo%11lo%6o%11lo",
+			if (state.tmp.buffer[0] == '0' && sfsscanf(state.tmp.buffer, "%6o%6lo%6lo%6lo%6lo%6lo%6lo%6lo%11lo%6o%11I*o",
 				&f->magic,
 				&lst.dev,
 				&lst.ino,
@@ -1197,7 +1199,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				&lst.rdev,
 				&lst.mtime,
 				&f->namesize,
-				&lst.size) == 11 && f->magic == CPIO_MAGIC)
+				sizeof(lst.size), &lst.size) == 11 && f->magic == CPIO_MAGIC)
 			{
 				f->st->st_dev = lst.dev;
 				f->st->st_ino = lst.ino;
@@ -1227,8 +1229,6 @@ getheader(register Archive_t* ap, register File_t* f)
 			f->st->st_uid = num;
 			if (sfsscanf(tar_header.gid, "%7lo", &num) != 1) goto notar;
 			f->st->st_gid = num;
-			if (sfsscanf(tar_header.size, "%11lo", &num) != 1) goto notar;
-			f->st->st_size = num;
 			if (sfsscanf(tar_header.mtime, "%11lo", &num) != 1) goto notar;
 			f->st->st_mtime = num;
 			if (sfsscanf(tar_header.chksum, "%7lo", &num) != 1) goto notar;
@@ -1237,13 +1237,32 @@ getheader(register Archive_t* ap, register File_t* f)
 				if (ap->entry == 1) goto notar;
 				error(state.keepgoing ? 1 : 3, "%s format checksum error (%ld != %ld)", format[ap->format].name, num, sum);
 			}
+			if (sfsscanf(tar_header.size, "%11lo", &num) == 1)
+				f->st->st_size = num;
+			else if (((unsigned char*)tar_header.size)[0] != TAR_LARGENUM)
+				goto notar;
+			else
+			{
+				/*
+				 * gnu tar largefile extension
+				 */
+
+				n = 0;
+				for (i = 1; i <= 11; i++)
+				{
+					n <<= 8;
+					n |= ((unsigned char*)tar_header.size)[i];
+				}
+				f->st->st_size = n;
+			}
 			if (ap->format != TAR)
 			{
 				if (!streq(tar_header.magic, TMAGIC))
 				{
-					if (strneq(tar_header.magic, TMAGIC, TMAGLEN - 1))
-						error(1, "%s: %s format botched -- %s format assumed", ap->name, format[ap->format].name, format[TAR].name);
-					else if (ap->entry > 1) goto notar;
+					if (strneq(tar_header.magic, TMAGIC, TMAGLEN - 1) && streq(tar_header.magic + TMAGLEN, "  "))
+						/* old gnu tar */;
+					else if (ap->entry > 1)
+						goto notar;
 					ap->format = TAR;
 				}
 				else if (!strneq(tar_header.version, TVERSION, sizeof(tar_header.version)))
@@ -1339,7 +1358,7 @@ getheader(register Archive_t* ap, register File_t* f)
 		case ASCHK:
 			if (bread(ap, state.tmp.buffer, (off_t)0, (off_t)ASC_HEADER, 0) <= 0) break;
 			state.tmp.buffer[ASC_HEADER] = 0;
-			if (state.tmp.buffer[0] == '0' && sfsscanf(state.tmp.buffer, "%6o%8lx%8lx%8lx%8lx%8lx%8lx%8lx%8lx%8lx%8lx%8lx%8x%8lx",
+			if (state.tmp.buffer[0] == '0' && sfsscanf(state.tmp.buffer, "%6o%8lx%8lx%8lx%8lx%8lx%8lx%8I*x%8lx%8lx%8lx%8lx%8x%8lx",
 				&f->magic,
 				&lst.ino,
 				&lst.mode,
@@ -1347,7 +1366,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				&lst.gid,
 				&lst.nlink,
 				&lst.mtime,
-				&lst.size,
+				sizeof(lst.size), &lst.size,
 				&lst.dev_major,
 				&lst.dev_minor,
 				&lst.rdev_major,
@@ -2533,8 +2552,8 @@ getheader(register Archive_t* ap, register File_t* f)
 		f->name = strcpy(ap->path.header, f->name);
 	for (i = strlen(f->name); i > 2 && *(f->name + i - 1) == '/'; i--);
 	*(f->name + i) = 0;
-	f->path = strcpy(ap->path.name, f->name);
 	pathcanon(f->name, 0);
+	f->path = strcpy(ap->path.name, f->name);
 	f->name = map(f->name);
 	f->namesize = strlen(f->name) + 1;
 	if (f->linkname)
@@ -2950,7 +2969,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			if (CPIO_TRUNCATE(f->st->st_uid) != f->st->st_uid)
 				error(1, "%s: uid number truncated", f->name);
 		}
-		sfsprintf(state.tmp.buffer, state.tmp.buffersize, "%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.11lo%0.6o%0.11lo",
+		sfsprintf(state.tmp.buffer, state.tmp.buffersize, "%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.11lo%0.6o%0.11I*o",
 			(long)CPIO_TRUNCATE(CPIO_MAGIC),
 			(long)CPIO_TRUNCATE(f->st->st_dev),
 			(long)CPIO_TRUNCATE(f->st->st_ino),
@@ -2961,7 +2980,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			(long)CPIO_TRUNCATE(idevice(f->st)),
 			(long)f->st->st_mtime,
 			(long)f->namesize,
-			(long)(f->st->st_size + (f->type == X_IFLNK ? f->linknamesize : 0)));
+			sizeof(_ast_intmax_t), (_ast_intmax_t)(f->st->st_size + (f->type == X_IFLNK ? f->linknamesize : 0)));
 		bwrite(ap, state.tmp.buffer, CPIO_HEADER);
 #if CPIO_EXTENDED
 		putxops(ap, f);
@@ -3082,7 +3101,18 @@ putheader(register Archive_t* ap, register File_t* f)
 		sfsprintf(tar_header.mode, sizeof(tar_header.mode), "%0*o ", sizeof(tar_header.mode) - 2, f->st->st_mode & X_IPERM);
 		sfsprintf(tar_header.uid, sizeof(tar_header.uid), "%0*o ", sizeof(tar_header.uid) - 2, f->st->st_uid);
 		sfsprintf(tar_header.gid, sizeof(tar_header.gid), "%0*o ", sizeof(tar_header.gid) - 2, f->st->st_gid);
-		sfsprintf(tar_header.size, sizeof(tar_header.size), "%0*lo ", sizeof(tar_header.size) - 1, (long)f->st->st_size);
+		if (f->st->st_size > (unsigned long)037777777777)
+		{
+			tar_header.size[0] = TAR_LARGENUM;
+			n = f->st->st_size;
+			for (c = 11; c > 0; c--)
+			{
+				tar_header.size[c] = n & 0377;
+				n >>= 8;
+			}
+		}
+		else
+			sfsprintf(tar_header.size, sizeof(tar_header.size), "%0*lo ", sizeof(tar_header.size) - 1, (long)f->st->st_size);
 		sfsprintf(tar_header.mtime, sizeof(tar_header.mtime), "%0*lo ", sizeof(tar_header.mtime) - 2, f->st->st_mtime);
 		if (ap->format != TAR)
 		{

@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: file (AT&T Labs Research) 1999-04-28 $\n]"
+"[-?\n@(#)$Id: file (AT&T Labs Research) 2002-07-31 $\n]"
 USAGE_LICENSE
 "[+NAME?file - determine file type]"
 "[+DESCRIPTION?\bfile\b tests and attempts to classify each \afile\a argument."
@@ -47,20 +47,29 @@ USAGE_LICENSE
 "	applications. Failed matches usually result in the less informative"
 "	\bascii text\b or \bbinary data\b.]"
 
-"[f:files|file-list?\afile\a contains list of file names, one per line, that"
-"	are classified.]:[file]"
-"[l:list?The loaded \amagic\a files are listed before the first file is"
-"	classified.]"
-"[m:magic?\afile\a is loaded as a \amagic\a file. The file \b-\b names the"
-"	default system \amagic\a file. More than one \b--magic\b option"
-"	may be specified; the precedence is from left to right.]:[file]"
-"[M:mime?List the \bmime\b(1) classification for each \afile\a. Although the"
+"[c:mime?List the \bmime\b(1) classification for each \afile\a. Although the"
 "	default descriptions are fairly consistent, use \b--mime\b for"
 "	precise classification matching.]"
+"[d:default-magic?Equivalent to \b--magic=-\b.]"
+"[f:files|file-list?\afile\a contains list of file names, one per line, that"
+"	are classified.]:[file]"
+"[i:ignore-magic?Equivalent to \b--magic=/dev/null\b.]"
+"[l:list?The loaded \amagic\a files are listed and then \bfile\b exits.]"
+"[M:magic?\afile\a is loaded as a \amagic\a file. More than one \b--magic\b"
+"	option may be specified; the precedence is from left to right. The"
+"	first \b--magic\b option causes the default system \amagic\a file to"
+"	be ignored; the file \b-\b may then be specified to explicitly"
+"	load the default system \amagic\a file. To ignore all magic files"
+"	specify the file \b/dev/null\b and no others.]:[file]"
+"[m:append-magic?\afile\a is loaded as a \amagic\a file. Equivalent to the"
+"	\b--magic\b option, except that the default system \amagic\a file is"
+"	still loaded last. If \b--magic\b is also specified then the default"
+"	system \amagic\a is only loaded if explicity specified.]:[file]"
 "[p:pattern|match?Only files with descriptions matching the \bsh\b(1)"
 "	match \apattern\a are listed.]:[pattern]"
 "[L:logical|dereference?Follow symbolic links.]"
 "[P|h:physical?Don't follow symbolic links.]"
+"[w:warn?Enable magic file parse warning messages.]"
 
 "\n"
 "\n[ file ... ]\n"
@@ -171,16 +180,31 @@ main(int argc, register char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'c':
+			disc.flags |= MAGIC_MIME;
+			continue;
+		case 'd':
+			if (magicload(mp, NiL, 0))
+				error(3, "cannot load default magic file");
+			disc.flags |= MAGIC_LOAD;
+			continue;
 		case 'f':
 			if (streq(opt_info.arg, "-") || streq(opt_info.arg, "/dev/stdin") || streq(opt_info.arg, "/dev/fd/0"))
 				list = sfstdin;
 			else if (!(list = sfopen(NiL, opt_info.arg, "r")))
 				error(3, "cannot open %s", opt_info.arg);
 			continue;
+		case 'i':
+			disc.flags |= MAGIC_LOAD;
+			continue;
 		case 'l':
 			disc.flags |= MAGIC_LIST|MAGIC_VERBOSE;
 			continue;
 		case 'm':
+			if (magicload(mp, opt_info.arg, 0))
+				error(3, "%s: cannot load magic file", opt_info.arg);
+			continue;
+		case 'M':
 			if (magicload(mp, opt_info.arg, 0))
 				error(3, "%s: cannot load magic file", opt_info.arg);
 			disc.flags |= MAGIC_LOAD;
@@ -191,12 +215,12 @@ main(int argc, register char** argv)
 		case 'L':
 			disc.flags &= ~MAGIC_PHYSICAL;
 			continue;
-		case 'M':
-			disc.flags |= MAGIC_MIME;
-			continue;
 		case 'P':
 		case 'h':
 			disc.flags |= MAGIC_PHYSICAL;
+			continue;
+		case 'w':
+			disc.flags |= MAGIC_VERBOSE;
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);

@@ -208,5 +208,8 @@ MAIN()
 	if (strcmp(s, "3 46036 46036 985781544"))
 		terror("Base 36 scan failed");
 
+	if(sfsscanf("NaNS", "%g", &f) != 1)
+		terror("Scanning NaN failed");
+
 	TSTEXIT(0);
 }

@@ -155,6 +155,7 @@ typedef struct				/* ex global state		*/
 	Switch_t*	swstate;	/* switch parse state		*/
 } Exstate_t;
 
+extern Exid_t		exbuiltin[];
 extern const char*	exversion;
 extern Exstate_t	expr;
 

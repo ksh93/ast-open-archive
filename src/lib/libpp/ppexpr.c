@@ -31,6 +31,8 @@
 
 #include "pplib.h"
 
+#include <regex.h>
+
 #define lex(c)		((((c)=peektoken)>=0?(peektoken=(-1)):((c)=pplex())),(c))
 #define unlex(c)	(peektoken=(c))
 
@@ -100,19 +102,20 @@ exists(int op, char* pred, register char* args)
  done:
 	while (pplex());
 	pp.state = state;
-	return(c);
+	return c;
 }
 
 /*
- * strcmp predicate evaluation
+ * strcmp/match predicate evaluation
  */
 
 static int
-compare(char* pred, char* args)
+compare(char* pred, char* args, int match)
 {
 	register int	c;
 	char*		pptoken;
 	long		state;
+	regex_t		re;
 	char		tmp[MAXTOKEN + 1];
 
 	state = (pp.state & ~DISABLE);
@@ -120,15 +123,30 @@ compare(char* pred, char* args)
 	pp.state |= PASSEOF;
 	pptoken = pp.token;
 	pp.token = tmp;
-	if (!pplex() || (pp.token = pptoken, pplex() != ',') || !pplex() || (c = strcmp(tmp, pp.token), pplex()))
+	if (!pplex())
+		goto bad;
+	pp.token = pptoken;
+	if (pplex() != ',' || !pplex())
+		goto bad;
+	if (!match)
+		c = strcmp(tmp, pp.token);
+	else if ((c = regcomp(&re, pp.token, REG_AUGMENTED|REG_LENIENT|REG_NULL)) || (c = regexec(&re, tmp, NiL, 0, 0)) && c != REG_NOMATCH)
+		regfatal(&re, 3, c);
+	else
 	{
-		pp.token = pptoken;
-		error(2, "%s: 2 arguments expected", pred);
-		c = 0;
-		while (pplex());
+		c = !c;
+		regfree(&re);
 	}
+	if ((pp.state & PASSEOF) && pplex())
+		goto bad;
 	pp.state = state;
-	return(c);
+	return c;
+ bad:
+	pp.token = pptoken;
+	error(2, "%s: 2 arguments expected", pred);
+	while (pplex());
+	pp.state = state;
+	return 0;
 }
 
 /*
@@ -156,6 +174,7 @@ predicate(int warn)
 	case X_DEFINED:
 	case X_EXISTS:
 	case X_INCLUDED:
+	case X_MATCH:
 	case X_NOTICED:
 	case X_OPTION:
 	case X_SIZEOF:
@@ -163,7 +182,7 @@ predicate(int warn)
 		break;
 	default:
 		if (pp.macref) pprefmac(pp.token, REF_IF);
-		return(0);
+		return 0;
 	}
 	strcpy(pred, pp.token);
 	pp.state |= DISABLE;
@@ -181,7 +200,7 @@ predicate(int warn)
 		if (index && !(pp.state & STRICT))
 			error(1, "%s: predicate argument expected", pred);
 		if (pp.macref) pprefmac(pred, REF_IF);
-		return(0);
+		return 0;
 	}
 	args = pp.args;
 
@@ -197,13 +216,13 @@ predicate(int warn)
 		break;
 	default:
 		error(1, "%s(%s): non-standard predicate test", pred, args);
-		return(0);
+		return 0;
 	}
 	switch (index)
 	{
 	case X_DEFINED:
 		if (type != T_ID) error(1, "%s: identifier argument expected", pred);
-		else if ((sym = pprefmac(args, REF_IF)) && sym->macro) return(1);
+		else if ((sym = pprefmac(args, REF_IF)) && sym->macro) return 1;
 		else if (args[0] == '_' && args[1] == '_' && !strncmp(args, "__STDPP__", 9))
 		{
 			if (pp.hosted == 1 && pp.in->prev->type == IN_FILE)
@@ -211,38 +230,39 @@ predicate(int warn)
 				pp.mode |= HOSTED;
 				pp.flags |= PP_hosted;
 			}
-			return(*(args + 9) ? (int)hashref(pp.strtab, args + 9) : 1);
+			return *(args + 9) ? (int)hashref(pp.strtab, args + 9) : 1;
 		}
 		break;
 	case X_EXISTS:
 	case X_INCLUDED:
-		return(exists(index, pred, args));
+		return exists(index, pred, args);
+	case X_MATCH:
+	case X_STRCMP:
+		return compare(pred, args, index == X_MATCH);
 	case X_NOTICED:
 		if (type != T_ID) error(1, "%s: identifier argument expected", pred);
-		else if (((sym = pprefmac(args, REF_IF)) || (sym = ppsymref(pp.symtab, args))) && (sym->flags & SYM_NOTICED)) return(1);
+		else if (((sym = pprefmac(args, REF_IF)) || (sym = ppsymref(pp.symtab, args))) && (sym->flags & SYM_NOTICED)) return 1;
 		break;
 	case X_OPTION:
-		return(ppoption(args));
+		return ppoption(args);
 	case X_SIZEOF:
 		error(2, "%s invalid in #%s expressions", pred, dirname(IF));
 		break;
-	case X_STRCMP:
-		return(compare(pred, args));
 	default:
 		if (warn && !(pp.mode & HOSTED) && (sym = ppsymref(pp.symtab, pred)) && (sym->flags & SYM_PREDICATE))
 			error(1, "use #%s(%s) to disambiguate", pred, args);
 		if (p = (struct pplist*)hashget(pp.prdtab, pred))
 		{
-			if (!*args) return(1);
+			if (!*args) return 1;
 			while (p)
 			{
-				if (streq(p->value, args)) return(1);
+				if (streq(p->value, args)) return 1;
 				p = p->next;
 			}
 		}
 		break;
 	}
-	return(0);
+	return 0;
 }
 
 /*   
@@ -270,7 +290,7 @@ subexpr(register int precedence, int* pun)
 	case '\n':
 		unlex(c);
 		if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "more tokens expected";
-		return(0);
+		return 0;
 	case '-':
 		n = -subexpr(13, &un);
 		break;
@@ -301,7 +321,7 @@ subexpr(register int precedence, int* pun)
 			if (!precedence)
 			{
 				if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "too many )'s";
-				return(0);
+				return 0;
 			}
 			goto done;
 		case '(':
@@ -310,13 +330,13 @@ subexpr(register int precedence, int* pun)
 			{
 				unlex(c);
 				if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "closing ) expected";
-				return(0);
+				return 0;
 			}
 		gotoperand:
 			if (operand)
 			{
 				if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "operator expected";
-				return(0);
+				return 0;
 			}
 			operand = 1;
 			un <<= 1;
@@ -343,7 +363,7 @@ subexpr(register int precedence, int* pun)
 				{
 					unlex(c);
 					if (!errmsg && !(pp.mode & INACTIVE)) errmsg = ": expected for ? operator";
-					return(0);
+					return 0;
 				}
 				if (n)
 				{
@@ -491,7 +511,7 @@ subexpr(register int precedence, int* pun)
 			else if (x == 0)
 			{
 				if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "divide by zero";
-				return(0);
+				return 0;
 			}
 			else if (c == '/') n /= x;
 			else n %= x;
@@ -503,7 +523,7 @@ subexpr(register int precedence, int* pun)
 			if (c != T_ID)
 			{
 				if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "# must precede a predicate identifier";
-				return(0);
+				return 0;
 			}
 			n = predicate(0);
 			goto gotoperand;
@@ -543,9 +563,9 @@ subexpr(register int precedence, int* pun)
 			goto gotoperand;
 		default:
 			if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "invalid token";
-			return(0);
+			return 0;
 		}
-		if (errmsg) return(0);
+		if (errmsg) return 0;
 		if (!operand) goto nooperand;
 	}
  done:
@@ -554,10 +574,10 @@ subexpr(register int precedence, int* pun)
 	{
 	nooperand:
 		if (!errmsg && !(pp.mode & INACTIVE)) errmsg = "operand expected";
-		return(0);
+		return 0;
 	}
 	if (un) *pun |= 01;
-	return(n);
+	return n;
 }
 
 /*
@@ -591,7 +611,7 @@ ppexpr(int* pun)
 	pp.state |= ppstate;
 	if (*pun) debug((-4, "ppexpr() = %luU", n));
 	else debug((-4, "ppexpr() = %ld", n));
-	return(n);
+	return n;
 }
 
 /*
@@ -604,75 +624,75 @@ ppoption(char* s)
 	switch ((int)hashget(pp.strtab, s))
 	{
 	case X_ALLMULTIPLE:
-		return(pp.mode & ALLMULTIPLE);
+		return pp.mode & ALLMULTIPLE;
 	case X_BUILTIN:
-		return(pp.mode & BUILTIN);
+		return pp.mode & BUILTIN;
 	case X_CATLITERAL:
-		return(pp.mode & CATLITERAL);
+		return pp.mode & CATLITERAL;
 	case X_COMPATIBILITY:
-		return(pp.state & COMPATIBILITY);
+		return pp.state & COMPATIBILITY;
 	case X_DEBUG:
-		return(-error_info.trace);
+		return -error_info.trace;
 	case X_ELSEIF:
-		return(pp.option & ELSEIF);
+		return pp.option & ELSEIF;
 	case X_FINAL:
-		return(pp.option & FINAL);
+		return pp.option & FINAL;
 	case X_HOSTDIR:
-		return(pp.mode & HOSTED);
+		return pp.mode & HOSTED;
 	case X_HOSTED:
-		return(pp.flags & PP_hosted);
+		return pp.flags & PP_hosted;
 	case X_INITIAL:
-		return(pp.option & INITIAL);
+		return pp.option & INITIAL;
 	case X_KEYARGS:
-		return(pp.option & KEYARGS);
+		return pp.option & KEYARGS;
 	case X_LINEBASE:
-		return(pp.flags & PP_linebase);
+		return pp.flags & PP_linebase;
 	case X_LINEFILE:
-		return(pp.flags & PP_linefile);
+		return pp.flags & PP_linefile;
 	case X_LINETYPE:
-		return(pp.flags & PP_linetype);
+		return pp.flags & PP_linetype;
 	case X_PLUSCOMMENT:
-		return(pp.option & PLUSCOMMENT);
+		return pp.option & PLUSCOMMENT;
 	case X_PLUSPLUS:
-		return(pp.option & PLUSPLUS);
+		return pp.option & PLUSPLUS;
 	case X_PLUSSPLICE:
-		return(pp.option & PLUSSPLICE);
+		return pp.option & PLUSSPLICE;
 	case X_PRAGMAEXPAND:
-		return(pp.option & PRAGMAEXPAND);
+		return pp.option & PRAGMAEXPAND;
 	case X_PREDEFINED:
-		return(pp.option & PREDEFINED);
+		return pp.option & PREDEFINED;
 	case X_PREFIX:
-		return(pp.option & PREFIX);
+		return pp.option & PREFIX;
 	case X_PROTOTYPED:
-		return(pp.option & PROTOTYPED);
+		return pp.option & PROTOTYPED;
 	case X_READONLY:
-		return(pp.mode & READONLY);
+		return pp.mode & READONLY;
 	case X_REGUARD:
-		return(pp.option & REGUARD);
+		return pp.option & REGUARD;
 	case X_SPACEOUT:
-		return(pp.state & SPACEOUT);
+		return pp.state & SPACEOUT;
 	case X_SPLICECAT:
-		return(pp.option & SPLICECAT);
+		return pp.option & SPLICECAT;
 	case X_SPLICESPACE:
-		return(pp.option & SPLICESPACE);
+		return pp.option & SPLICESPACE;
 	case X_STRICT:
-		return(pp.state & STRICT);
+		return pp.state & STRICT;
 	case X_STRINGSPAN:
-		return(pp.option & STRINGSPAN);
+		return pp.option & STRINGSPAN;
 	case X_STRINGSPLIT:
-		return(pp.option & STRINGSPLIT);
+		return pp.option & STRINGSPLIT;
 	case X_TEST:
-		return(pp.test);
+		return pp.test;
 	case X_TEXT:
-		return(!(pp.state & NOTEXT));
+		return !(pp.state & NOTEXT);
 	case X_TRANSITION:
-		return(pp.state & TRANSITION);
+		return pp.state & TRANSITION;
 	case X_TRUNCATE:
-		return(pp.truncate);
+		return pp.truncate;
 	case X_WARN:
-		return(pp.state & WARN);
+		return pp.state & WARN;
 	default:
 		if (pp.state & WARN) error(1, "%s: unknown option name", s);
-		return(0);
+		return 0;
 	}
 }

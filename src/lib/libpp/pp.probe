@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2001-11-22
+# @(#)pp.probe (AT&T Research) 2002-09-21
 #
 # C probe for libpp
 #
@@ -37,6 +37,14 @@ int ok;
 #else
 (
 #endif' > basefile.$src
+cat > catlit1.i <<'!'
+char test[] = "te"
+"st";
+!
+cat > catlit2.i <<'!'
+char test[] = "te\
+st";
+!
 echo '#define g(a,b) a ## b
 volatile int a;
 const int g(x,y)=1;
@@ -194,6 +202,7 @@ import=
 include_next=
 lineid=
 linetype=
+nocatliteral=
 opspace=
 pluscom=
 plusplus=
@@ -218,6 +227,15 @@ if	$cc -E defincl.$src
 then	case "`$cc -E defincl.$src | grep -c 'defincl'`" in
 	0)	defincl=1 ;;
 	esac
+fi
+
+if	$cc -c catlit1.i 2>e
+then	if	$cc -c catlit2.i 2>f
+	then	if	test `wc -c < f` -gt `wc -c < e`
+		then	nocatliteral=1
+		fi
+	else	nocatliteral=1
+	fi
 fi
 
 $cc -c dollar.$src && dollar=1
@@ -881,6 +899,9 @@ case $plusplus in
 esac
 case $reserved in
 ?*)	echo "#pragma pp:reserved" $reserved ;;
+esac
+case $nocatliteral in
+?*)	echo "#pragma pp:nocatliteral" ;;
 esac
 case $opspace in
 ?*)	echo "#pragma pp:opspace" ;;

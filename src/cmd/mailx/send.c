@@ -53,15 +53,17 @@ part(register struct parse* pp, FILE* op, const char* encoding, off_t size, char
 				break;
 			}
 			size -= n = strlen(pp->buf);
-			if (pp->buf[0] == '\n') {
+			if (pp->buf[0] == '\n' || pp->buf[0] == '\r' && pp->buf[1] == '\n') {
 				if (!skip)
 					line++;
 				continue;
 			}
 			else
 				skip = 0;
+#if 0
 			if ((flags & GREFERENCES) && pp->buf[0] == '-' && pp->buf[1] == '-' && isspace(pp->buf[2]))
 				break;
+#endif
 			if (line) {
 				line = 0;
 				fputc('\n', op);

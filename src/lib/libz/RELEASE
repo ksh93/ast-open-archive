@@ -1,3 +1,6 @@
+02-09-11 zlib.h: move 64 bit counts to internal_state
+02-08-05 add z_off64_t, gzseek64() etc. to preserve old binary interface
+	 work around 2^32 file size limitations
 02-06-11 add uSize == unsigned _ast_intmax_t; fix header size check
 02-05-22 zconf.h: fix __32BIT__ logic
 02-03-11 infblock.c: apply double free patch

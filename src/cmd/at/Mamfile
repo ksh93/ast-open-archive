@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -173,7 +173,7 @@ done atx.c
 prev atx.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c atx.c
 done atx.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o atx atx.o ${mam_cc_static} ${mam_libast} ${mam_cc_dynamic} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o atx atx.o ${mam_libast} ${mam_libast}
 done atx generated
 make at.svc
 make atd.o
@@ -210,7 +210,7 @@ done atd.c
 prev atd.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c atd.c
 done atd.o generated
-exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o at.svc atd.o ${mam_libcs} ${mam_cc_static} ${mam_libast} ${mam_cc_dynamic} ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o at.svc atd.o ${mam_libcs} ${mam_libast} ${mam_libcs} ${mam_libast}
 done at.svc generated
 make ast_crontab
 make crontab.sh
@@ -252,30 +252,12 @@ done ast_crontab generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/ast_at
 prev ast_at
-exec - mv ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_at.old 2>/dev/null || true; test '' = 'ast_at' || { cp ast_at ${INSTALLROOT}/bin/ast_at  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_at.old 2>/dev/null || true; test '' = 'ast_at' || ${STDCMP} 2>/dev/null -s ast_at ${INSTALLROOT}/bin/ast_at || { ${STDCP} ast_at ${INSTALLROOT}/bin/ast_at  		    		    ;}
 done ../../../bin/ast_at generated
 make ../../../bin/ast_batch
 prev ../../../bin/ast_at
@@ -288,88 +270,34 @@ make ../../../lib/at/jobs
 setv mode -Dmode="u=rwx,go=x"
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/at/jobs
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/at/jobs 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/at/jobs | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   && chmod u=rwx,go=x ${PACKAGE_ast_LIB}/at/jobs
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/at/jobs 		    		   && chmod u=rwx,go=x ${PACKAGE_ast_LIB}/at/jobs
 exec - fi
 done ../../../lib/at/jobs generated
 make ../../../lib/at/jobs/atx
 prev atx
 setv mode -Dmode="u=rx,go=x"
-exec - mv ${PACKAGE_ast_LIB}/at/jobs/atx ${PACKAGE_ast_LIB}/at/jobs/atx.old 2>/dev/null || true; test '' = 'atx' || { cp atx ${PACKAGE_ast_LIB}/at/jobs/atx  		    		   && chmod u=rx,go=x ${PACKAGE_ast_LIB}/at/jobs/atx ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/at/jobs/atx ${PACKAGE_ast_LIB}/at/jobs/atx.old 2>/dev/null || true; test '' = 'atx' || ${STDCMP} 2>/dev/null -s atx ${PACKAGE_ast_LIB}/at/jobs/atx || { ${STDCP} atx ${PACKAGE_ast_LIB}/at/jobs/atx  		    		   && chmod u=rx,go=x ${PACKAGE_ast_LIB}/at/jobs/atx ;}
 done ../../../lib/at/jobs/atx generated
 make ../../../lib/cs
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 		    		   
 exec - fi
 done ../../../lib/cs generated
 make ../../../lib/cs/tcp/at
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs/tcp/at
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/at 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs/tcp/at | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs/tcp/at 		    		   
 exec - fi
 done ../../../lib/cs/tcp/at generated
 make ../../../lib/cs/tcp/at/at.svc
 prev at.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc.old 2>/dev/null || true; test '' = 'at.svc' || { cp at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc.old 2>/dev/null || true; test '' = 'at.svc' || ${STDCMP} 2>/dev/null -s at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc || { ${STDCP} at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc  		    		    ;}
 done ../../../lib/cs/tcp/at/at.svc generated
 make ../../../bin/ast_crontab
 prev ast_crontab
-exec - mv ${INSTALLROOT}/bin/ast_crontab ${INSTALLROOT}/bin/ast_crontab.old 2>/dev/null || true; test '' = 'ast_crontab' || { cp ast_crontab ${INSTALLROOT}/bin/ast_crontab  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ast_crontab ${INSTALLROOT}/bin/ast_crontab.old 2>/dev/null || true; test '' = 'ast_crontab' || ${STDCMP} 2>/dev/null -s ast_crontab ${INSTALLROOT}/bin/ast_crontab || { ${STDCP} ast_crontab ${INSTALLROOT}/bin/ast_crontab  		    		    ;}
 done ../../../bin/ast_crontab generated
 done install virtual
 make test

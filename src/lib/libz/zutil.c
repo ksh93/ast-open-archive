@@ -7,7 +7,11 @@
 
 #include "zutil.h"
 
-struct internal_state      {int dummy;}; /* for buggy compilers */
+#ifdef ZINTERNAL_STATE
+struct internal_state {ZINTERNAL_STATE;};
+#else
+struct internal_state {int dummy;}; /* for buggy compilers */
+#endif
 
 #ifndef STDC
 extern void exit OF((int));

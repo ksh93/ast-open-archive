@@ -1342,7 +1342,6 @@ TclGetListIndex(interp, string, indexPtr)
     return TCL_OK;
 }
 
-#if 1
 /*
  *----------------------------------------------------------------------
  *
@@ -1558,7 +1557,6 @@ Tcl_RegExpMatch(interp, string, pattern)
     }
     return Tcl_RegExpExec(interp, re, string, string);
 }
-#endif
 
 /*
  *----------------------------------------------------------------------

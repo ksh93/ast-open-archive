@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -339,106 +339,52 @@ done rpm2cpio generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/pax
 prev pax
-exec - mv ${INSTALLROOT}/bin/pax ${INSTALLROOT}/bin/pax.old 2>/dev/null || true; test '' = 'pax' || { cp pax ${INSTALLROOT}/bin/pax  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/pax ${INSTALLROOT}/bin/pax.old 2>/dev/null || true; test '' = 'pax' || ${STDCMP} 2>/dev/null -s pax ${INSTALLROOT}/bin/pax || { ${STDCP} pax ${INSTALLROOT}/bin/pax  		    		    ;}
 done ../../../bin/pax generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/pax.1
 make pax.1
 done pax.1
-exec - mv ${INSTALLROOT}/man/man1/pax.1 ${INSTALLROOT}/man/man1/pax.1.old 2>/dev/null || true; test '' = 'pax.1' || { cp pax.1 ${INSTALLROOT}/man/man1/pax.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/pax.1 ${INSTALLROOT}/man/man1/pax.1.old 2>/dev/null || true; test '' = 'pax.1' || ${STDCMP} 2>/dev/null -s pax.1 ${INSTALLROOT}/man/man1/pax.1 || { ${STDCP} pax.1 ${INSTALLROOT}/man/man1/pax.1  		    		    ;}
 done ../../../man/man1/pax.1 generated
 make ../../../bin/nocom
 prev nocom
-exec - mv ${INSTALLROOT}/bin/nocom ${INSTALLROOT}/bin/nocom.old 2>/dev/null || true; test '' = 'nocom' || { cp nocom ${INSTALLROOT}/bin/nocom  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/nocom ${INSTALLROOT}/bin/nocom.old 2>/dev/null || true; test '' = 'nocom' || ${STDCMP} 2>/dev/null -s nocom ${INSTALLROOT}/bin/nocom || { ${STDCP} nocom ${INSTALLROOT}/bin/nocom  		    		    ;}
 done ../../../bin/nocom generated
 make ../../../lib/pax
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/pax
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/pax 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/pax | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/pax 		    		   
 exec - fi
 done ../../../lib/pax generated
 make ../../../lib/pax/cia.fmt
 make cia.fmt
 done cia.fmt
-exec - mv ${PACKAGE_ast_LIB}/pax/cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt.old 2>/dev/null || true; test '' = 'cia.fmt' || { cp cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/pax/cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt.old 2>/dev/null || true; test '' = 'cia.fmt' || ${STDCMP} 2>/dev/null -s cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt || { ${STDCP} cia.fmt ${PACKAGE_ast_LIB}/pax/cia.fmt  		    		    ;}
 done ../../../lib/pax/cia.fmt generated
 make ../../../lib/pax/ppar.fmt
 make ppar.fmt
 done ppar.fmt
-exec - mv ${PACKAGE_ast_LIB}/pax/ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt.old 2>/dev/null || true; test '' = 'ppar.fmt' || { cp ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/pax/ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt.old 2>/dev/null || true; test '' = 'ppar.fmt' || ${STDCMP} 2>/dev/null -s ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt || { ${STDCP} ppar.fmt ${PACKAGE_ast_LIB}/pax/ppar.fmt  		    		    ;}
 done ../../../lib/pax/ppar.fmt generated
 make ../../../man/man1/bax.1
 make bax.1
 done bax.1
-exec - mv ${INSTALLROOT}/man/man1/bax.1 ${INSTALLROOT}/man/man1/bax.1.old 2>/dev/null || true; test '' = 'bax.1' || { cp bax.1 ${INSTALLROOT}/man/man1/bax.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/bax.1 ${INSTALLROOT}/man/man1/bax.1.old 2>/dev/null || true; test '' = 'bax.1' || ${STDCMP} 2>/dev/null -s bax.1 ${INSTALLROOT}/man/man1/bax.1 || { ${STDCP} bax.1 ${INSTALLROOT}/man/man1/bax.1  		    		    ;}
 done ../../../man/man1/bax.1 generated
 make ../../../bin/rpm2cpio
 prev rpm2cpio
-exec - mv ${INSTALLROOT}/bin/rpm2cpio ${INSTALLROOT}/bin/rpm2cpio.old 2>/dev/null || true; test '' = 'rpm2cpio' || { cp rpm2cpio ${INSTALLROOT}/bin/rpm2cpio  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/rpm2cpio ${INSTALLROOT}/bin/rpm2cpio.old 2>/dev/null || true; test '' = 'rpm2cpio' || ${STDCMP} 2>/dev/null -s rpm2cpio ${INSTALLROOT}/bin/rpm2cpio || { ${STDCP} rpm2cpio ${INSTALLROOT}/bin/rpm2cpio  		    		    ;}
 done ../../../bin/rpm2cpio generated
 done install virtual
 make test

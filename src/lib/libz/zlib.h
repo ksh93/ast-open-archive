@@ -840,8 +840,17 @@ ZEXTERN const char * ZEXPORT gzerror OF((gzFile file, int *errnum));
    to get the exact error code.
 */
 
-                        /* checksum functions */
+                        /* 64 bit file offset functions */
+#ifdef z_off64_t
 
+ZEXTERN z_off64_t ZEXPORT  gzsync64 OF((gzFile file, z_off64_t offset));
+ZEXTERN z_off64_t ZEXPORT  gzseek64 OF((gzFile file,
+				      z_off64_t offset, int whence));
+ZEXTERN z_off64_t ZEXPORT  gztell64 OF((gzFile file));
+
+#endif
+
+                        /* checksum functions */
 /*
      These functions are not related to compression but are exported
    anyway because they might be useful in applications using the
@@ -909,7 +918,11 @@ ZEXTERN int ZEXPORT inflateInit2_ OF((z_streamp strm, int  windowBits,
 
 
 #if !defined(_Z_UTIL_H) && !defined(NO_DUMMY_DECL)
-    struct internal_state {int dummy;}; /* hack for buggy compilers */
+#if defined(ZINTERNAL_STATE)
+struct internal_state {ZINTERNAL_STATE;};
+#else
+struct internal_state {int dummy;}; /* for buggy compilers */
+#endif
 #endif
 
 ZEXTERN const char   * ZEXPORT zError           OF((int err));

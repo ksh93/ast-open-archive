@@ -41,6 +41,8 @@ truncate643d(const char* path, off64_t size)
 {
 	register char*	sp;
 	register int	r;
+	int		n;
+	int		m;
 	static Real_f	realf;
 #if FS
 	Mount_t*	mp;
@@ -53,8 +55,18 @@ truncate643d(const char* path, off64_t size)
 		return -1;
 	if (!realf)
 		realf = (Real_f)sysfunc(SYS3D_truncate64);
-	r = (*realf)(sp, size);
-		return -1;
+	for (m = state.trap.size - 1; m >= 0; m--)
+		if (MSG_MASK(MSG_truncate) & state.trap.intercept[m].mask)
+			break;
+	if (m >= 0)
+	{
+		n = state.trap.size;
+		state.trap.size = m;
+		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], MSG_truncate, SYS3D_truncate64, (void*)sp, (void*)&size, NiL, NiL, NiL, NiL);
+		state.trap.size = n;
+	}
+	else
+		r = (*realf)(sp, size);
 #if FS
 	if (!r)
 	{

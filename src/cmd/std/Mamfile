@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -156,6 +156,7 @@ done ../../../include/ast/sig.h
 prev ../../../include/ast/ls.h implicit
 make ../../../include/ast/iconv.h implicit
 make ../../../include/ast/ast_iconv.h implicit
+prev ../../../include/ast/ast_common.h implicit
 done ../../../include/ast/ast_iconv.h
 done ../../../include/ast/iconv.h
 prev ../../../include/ast/error.h implicit
@@ -546,78 +547,60 @@ done expand generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/banner
 prev banner
-exec - mv ${INSTALLROOT}/bin/banner ${INSTALLROOT}/bin/banner.old 2>/dev/null || true; test '' = 'banner' || { cp banner ${INSTALLROOT}/bin/banner  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/banner ${INSTALLROOT}/bin/banner.old 2>/dev/null || true; test '' = 'banner' || ${STDCMP} 2>/dev/null -s banner ${INSTALLROOT}/bin/banner || { ${STDCP} banner ${INSTALLROOT}/bin/banner  		    		    ;}
 done ../../../bin/banner generated
 make ../../../bin/dd
 prev dd
-exec - mv ${INSTALLROOT}/bin/dd ${INSTALLROOT}/bin/dd.old 2>/dev/null || true; test '' = 'dd' || { cp dd ${INSTALLROOT}/bin/dd  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/dd ${INSTALLROOT}/bin/dd.old 2>/dev/null || true; test '' = 'dd' || ${STDCMP} 2>/dev/null -s dd ${INSTALLROOT}/bin/dd || { ${STDCP} dd ${INSTALLROOT}/bin/dd  		    		    ;}
 done ../../../bin/dd generated
 make ../../../bin/df
 prev df
-exec - mv ${INSTALLROOT}/bin/df ${INSTALLROOT}/bin/df.old 2>/dev/null || true; test '' = 'df' || { cp df ${INSTALLROOT}/bin/df  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/df ${INSTALLROOT}/bin/df.old 2>/dev/null || true; test '' = 'df' || ${STDCMP} 2>/dev/null -s df ${INSTALLROOT}/bin/df || { ${STDCP} df ${INSTALLROOT}/bin/df  		    		    ;}
 done ../../../bin/df generated
 make ../../../bin/du
 prev du
-exec - mv ${INSTALLROOT}/bin/du ${INSTALLROOT}/bin/du.old 2>/dev/null || true; test '' = 'du' || { cp du ${INSTALLROOT}/bin/du  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/du ${INSTALLROOT}/bin/du.old 2>/dev/null || true; test '' = 'du' || ${STDCMP} 2>/dev/null -s du ${INSTALLROOT}/bin/du || { ${STDCP} du ${INSTALLROOT}/bin/du  		    		    ;}
 done ../../../bin/du generated
 make ../../../bin/file
 prev file
-exec - mv ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; test '' = 'file' || { cp file ${INSTALLROOT}/bin/file  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; test '' = 'file' || ${STDCMP} 2>/dev/null -s file ${INSTALLROOT}/bin/file || { ${STDCP} file ${INSTALLROOT}/bin/file  		    		    ;}
 done ../../../bin/file generated
 make ../../../bin/iconv
 prev iconv
-exec - mv ${INSTALLROOT}/bin/iconv ${INSTALLROOT}/bin/iconv.old 2>/dev/null || true; test '' = 'iconv' || { cp iconv ${INSTALLROOT}/bin/iconv  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/iconv ${INSTALLROOT}/bin/iconv.old 2>/dev/null || true; test '' = 'iconv' || ${STDCMP} 2>/dev/null -s iconv ${INSTALLROOT}/bin/iconv || { ${STDCP} iconv ${INSTALLROOT}/bin/iconv  		    		    ;}
 done ../../../bin/iconv generated
 make ../../../bin/locale
 prev locale
-exec - mv ${INSTALLROOT}/bin/locale ${INSTALLROOT}/bin/locale.old 2>/dev/null || true; test '' = 'locale' || { cp locale ${INSTALLROOT}/bin/locale  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/locale ${INSTALLROOT}/bin/locale.old 2>/dev/null || true; test '' = 'locale' || ${STDCMP} 2>/dev/null -s locale ${INSTALLROOT}/bin/locale || { ${STDCP} locale ${INSTALLROOT}/bin/locale  		    		    ;}
 done ../../../bin/locale generated
 make ../../../bin/ls
 prev ls
-exec - mv ${INSTALLROOT}/bin/ls ${INSTALLROOT}/bin/ls.old 2>/dev/null || true; test '' = 'ls' || { cp ls ${INSTALLROOT}/bin/ls  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ls ${INSTALLROOT}/bin/ls.old 2>/dev/null || true; test '' = 'ls' || ${STDCMP} 2>/dev/null -s ls ${INSTALLROOT}/bin/ls || { ${STDCP} ls ${INSTALLROOT}/bin/ls  		    		    ;}
 done ../../../bin/ls generated
 make ../../../bin/mesg
 prev mesg
-exec - mv ${INSTALLROOT}/bin/mesg ${INSTALLROOT}/bin/mesg.old 2>/dev/null || true; test '' = 'mesg' || { cp mesg ${INSTALLROOT}/bin/mesg  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mesg ${INSTALLROOT}/bin/mesg.old 2>/dev/null || true; test '' = 'mesg' || ${STDCMP} 2>/dev/null -s mesg ${INSTALLROOT}/bin/mesg || { ${STDCP} mesg ${INSTALLROOT}/bin/mesg  		    		    ;}
 done ../../../bin/mesg generated
 make ../../../bin/ast_mount
 prev ast_mount
-exec - mv ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; test '' = 'ast_mount' || { cp ast_mount ${INSTALLROOT}/bin/ast_mount  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; test '' = 'ast_mount' || ${STDCMP} 2>/dev/null -s ast_mount ${INSTALLROOT}/bin/ast_mount || { ${STDCP} ast_mount ${INSTALLROOT}/bin/ast_mount  		    		    ;}
 done ../../../bin/ast_mount generated
 make ../../../bin/ast_ps
 prev ast_ps
-exec - mv ${INSTALLROOT}/bin/ast_ps ${INSTALLROOT}/bin/ast_ps.old 2>/dev/null || true; test '' = 'ast_ps' || { cp ast_ps ${INSTALLROOT}/bin/ast_ps  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/ast_ps ${INSTALLROOT}/bin/ast_ps.old 2>/dev/null || true; test '' = 'ast_ps' || ${STDCMP} 2>/dev/null -s ast_ps ${INSTALLROOT}/bin/ast_ps || { ${STDCP} ast_ps ${INSTALLROOT}/bin/ast_ps  		    		    ;}
 done ../../../bin/ast_ps generated
 make ../../../bin/shar
 prev shar
-exec - mv ${INSTALLROOT}/bin/shar ${INSTALLROOT}/bin/shar.old 2>/dev/null || true; test '' = 'shar' || { cp shar ${INSTALLROOT}/bin/shar  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/shar ${INSTALLROOT}/bin/shar.old 2>/dev/null || true; test '' = 'shar' || ${STDCMP} 2>/dev/null -s shar ${INSTALLROOT}/bin/shar || { ${STDCP} shar ${INSTALLROOT}/bin/shar  		    		    ;}
 done ../../../bin/shar generated
 make ../../../bin/split
 prev split
-exec - mv ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/split.old 2>/dev/null || true; test '' = 'split' || { cp split ${INSTALLROOT}/bin/split  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/split.old 2>/dev/null || true; test '' = 'split' || ${STDCMP} 2>/dev/null -s split ${INSTALLROOT}/bin/split || { ${STDCP} split ${INSTALLROOT}/bin/split  		    		    ;}
 done ../../../bin/split generated
 make ../../../bin/csplit
 prev ../../../bin/split
@@ -628,7 +611,7 @@ exec - ln ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/csplit
 done ../../../bin/csplit generated
 make ../../../bin/sum
 prev sum
-exec - mv ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/sum.old 2>/dev/null || true; test '' = 'sum' || { cp sum ${INSTALLROOT}/bin/sum  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/sum.old 2>/dev/null || true; test '' = 'sum' || ${STDCMP} 2>/dev/null -s sum ${INSTALLROOT}/bin/sum || { ${STDCP} sum ${INSTALLROOT}/bin/sum  		    		    ;}
 done ../../../bin/sum generated
 make ../../../bin/cksum
 prev ../../../bin/sum
@@ -646,15 +629,15 @@ exec - ln ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/md5sum
 done ../../../bin/md5sum generated
 make ../../../bin/touch
 prev touch
-exec - mv ${INSTALLROOT}/bin/touch ${INSTALLROOT}/bin/touch.old 2>/dev/null || true; test '' = 'touch' || { cp touch ${INSTALLROOT}/bin/touch  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/touch ${INSTALLROOT}/bin/touch.old 2>/dev/null || true; test '' = 'touch' || ${STDCMP} 2>/dev/null -s touch ${INSTALLROOT}/bin/touch || { ${STDCP} touch ${INSTALLROOT}/bin/touch  		    		    ;}
 done ../../../bin/touch generated
 make ../../../bin/tsort
 prev tsort
-exec - mv ${INSTALLROOT}/bin/tsort ${INSTALLROOT}/bin/tsort.old 2>/dev/null || true; test '' = 'tsort' || { cp tsort ${INSTALLROOT}/bin/tsort  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/tsort ${INSTALLROOT}/bin/tsort.old 2>/dev/null || true; test '' = 'tsort' || ${STDCMP} 2>/dev/null -s tsort ${INSTALLROOT}/bin/tsort || { ${STDCP} tsort ${INSTALLROOT}/bin/tsort  		    		    ;}
 done ../../../bin/tsort generated
 make ../../../bin/unexpand
 prev unexpand
-exec - mv ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/unexpand.old 2>/dev/null || true; test '' = 'unexpand' || { cp unexpand ${INSTALLROOT}/bin/unexpand  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/unexpand.old 2>/dev/null || true; test '' = 'unexpand' || ${STDCMP} 2>/dev/null -s unexpand ${INSTALLROOT}/bin/unexpand || { ${STDCP} unexpand ${INSTALLROOT}/bin/unexpand  		    		    ;}
 done ../../../bin/unexpand generated
 make ../../../bin/expand
 prev ../../../bin/unexpand

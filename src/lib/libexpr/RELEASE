@@ -1,3 +1,4 @@
+02-09-11 expr.h: move exbuiltin[] to private exlib.h
 99-09-22 exparse.y,exeval.c: add for(ID[DYNAMIC])
 	 exparse.y: ref[i].ref
 98-12-25 excc: fmtesq() to handle \"

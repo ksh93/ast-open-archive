@@ -46,7 +46,8 @@ regex :TEST: testregex.c testregex.dat locale.dat testmatch.dat testsub.dat \
 		minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat \
 		austin.dat xopen.dat \
 		pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat \
-		cut.dat libtre.dat
+		cut.dat libtre.dat \
+		repetition.dat rightassoc.dat forcedassoc.dat
 	for i in $(*:O>1)
 	do	$(*:O=1) $(TESTREFLAGS) < $i
 	done
@@ -54,7 +55,8 @@ regex :TEST: testregex.c testregex.dat locale.dat testmatch.dat testsub.dat \
 test.re : test.glob - test.fnmatch - test.match - test.regex
 
 :: testregex.mm basic.dat categorize.dat nullsubexpr-A.dat \
-	leftassoc.dat rightassoc.dat forcedassoc.dat unknownassoc.dat
+	leftassoc.dat rightassoc.dat forcedassoc.dat unknownassoc.dat \
+	repetition.dat
 
 testregex.tgz : README.re Makefile.re \
 		testfnmatch.c testglob.c testregex.c \

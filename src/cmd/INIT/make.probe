@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2002-03-29
+# @(#)make.probe (AT&T Research) 2002-09-11
 #
 # C probe for make
 #
@@ -105,6 +105,7 @@ lddynamic=
 ldrunpath=
 ldscript=
 ldstatic=
+Lflag=
 lib_dll=
 lib_all=
 lib_undef=
@@ -809,6 +810,21 @@ case $PIC in
 '')	PIC=$pic ;;
 esac
 
+case $hosttype in
+win32.*|cygwin.*|os2.*)
+	Lflag=1
+	;;
+*)	if	$cc -c doti.$src
+	then	if	$cc -L. doti.$obj -lc >/dev/null
+		then	case $pic in
+			'')	;;
+			*)	Lflag=1 ;;
+			esac
+		fi
+	fi
+	;;
+esac
+
 case $lib_dll in
 option)	case $hosttype in
 	linux.*)	dll_libraries=-lc ;;
@@ -1242,6 +1258,9 @@ case $toucho in
 esac
 case $iminus in
 ?*)	dialect="$dialect -I-" ;;
+esac
+case $Lflag in
+?*)	dialect="$dialect -L" ;;
 esac
 
 ppcmd='$(CPP)'

@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 2002-05-28
+# @(#)probe.win32 (AT&T Labs Research) 2002-08-30
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -187,11 +187,11 @@ case $version:$include in
 	{
 	cat <<'!'
 #ifdef unix
-char* str_unix = "#define unix" unix
-char* str___unix__ = "#define __unix__" 1
+char* str_unix = "#define unix" unix ;
+char* str___unix__ = "#define __unix__" 1 ;
 #else
 #ifdef __unix__
-char* str___unix__ = "#define __unix__" __unix__
+char* str___unix__ = "#define __unix__" __unix__ ;
 #endif
 #endif
 !
@@ -269,12 +269,12 @@ __stdcall
 	echo "#define	q(x)	s(x)"
 	for i in $premac
 	do	echo "#ifdef $i"
-		echo "char* str_$i = \"#define $i\" q($i)"
+		echo "char* str_$i = \"#define $i\" q(:$i:);"
 		echo "#endif"
 	done
 	} > easy.c
 	$cc -E easy.c > easy.out 2> easy.err
-	sed     -e '/=/!d' -e 's,[^"]*,echo ,' easy.out > easy.sh
+	sed     -e '/=/!d' -e 's,[^"]*,echo ,' -e 's/":/"/' -e 's/:"/"/' easy.out > easy.sh
 	. ./easy.sh >&3
 	cat >&3 <<!
 #pragma pp:nopredefined

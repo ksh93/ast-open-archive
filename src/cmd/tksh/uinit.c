@@ -36,7 +36,12 @@ static void tksh_userinit(int subshell)
 	int len = strlen(av[0]);
 	char *args[2];
 
-	if (subshell)
+	if (subshell < 0)
+	{
+		sh_trap("tkloop", 0);
+		return;
+	}
+	else if (subshell > 0)
 	{
 		TkshSubShell();
 		return;

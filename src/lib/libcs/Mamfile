@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -9,7 +9,7 @@ setv ARFLAGS cr
 setv AS as
 setv ASFLAGS
 setv CC cc
-setv CCFLAGS "-O "
+setv CCFLAGS "${mam_cc_OPTIMIZE} ${mam_cc_DLL}"
 setv COTEMP $$
 setv CPIO cpio
 setv CPIOFLAGS
@@ -445,7 +445,7 @@ make csvar.c
 prev cslib.h implicit
 done csvar.c
 prev csvar.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DTRUST=\""${INSTALLROOT}:${INSTALLROOT}/opt/ast:/usr/add-on/ast:/usr/addon/ast:/usr/contrib/ast:/usr/local/arch/${_hosttype_=`package`}/ast:/usr/common/ast:/usr/local/ast:/opt/ast:/home/ast:/usr/local/arch/${_hosttype_=`package`}:/usr/common:/usr/local:/:/usr"\" -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csvar.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DTRUST=\""${INSTALLROOT}:${INSTALLROOT}/opt/ast:/usr/add-on/ast:/usr/addon/ast:/usr/contrib/ast:/usr/local/arch/${mam_cc_HOSTTYPE}/ast:/usr/common/ast:/usr/local/ast:/opt/ast:/home/ast:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/common:/usr/local:/:/usr"\" -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csvar.c
 done csvar.o generated
 make cswrite.o
 make cswrite.c
@@ -645,111 +645,39 @@ done genshare generated
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/libcs.a archive
 prev libcs.a archive
-exec - mv ${PACKAGE_ast_LIB}/libcs.a ${PACKAGE_ast_LIB}/libcs.a.old 2>/dev/null || true; test '' = 'libcs.a' || { cp libcs.a ${PACKAGE_ast_LIB}/libcs.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/libcs.a ${PACKAGE_ast_LIB}/libcs.a.old 2>/dev/null || true; test '' = 'libcs.a' || ${STDCMP} 2>/dev/null -s libcs.a ${PACKAGE_ast_LIB}/libcs.a || { ${STDCP} libcs.a ${PACKAGE_ast_LIB}/libcs.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libcs.a) >/dev/null 2>&1 || true
 done ../../../lib/libcs.a generated
 make ../../../man/man3
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man3
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man3 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 		    		   
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/cs.3
 make cs.3
 done cs.3
-exec - mv ${INSTALLROOT}/man/man3/cs.3 ${INSTALLROOT}/man/man3/cs.3.old 2>/dev/null || true; test '' = 'cs.3' || { cp cs.3 ${INSTALLROOT}/man/man3/cs.3  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man3/cs.3 ${INSTALLROOT}/man/man3/cs.3.old 2>/dev/null || true; test '' = 'cs.3' || ${STDCMP} 2>/dev/null -s cs.3 ${INSTALLROOT}/man/man3/cs.3 || { ${STDCP} cs.3 ${INSTALLROOT}/man/man3/cs.3  		    		    ;}
 done ../../../man/man3/cs.3 generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/cs
 prev cs.req
-exec - mv ${PACKAGE_ast_LIB}/lib/cs ${PACKAGE_ast_LIB}/lib/cs.old 2>/dev/null || true; test '' = 'cs.req' || { cp cs.req ${PACKAGE_ast_LIB}/lib/cs  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/cs ${PACKAGE_ast_LIB}/lib/cs.old 2>/dev/null || true; test '' = 'cs.req' || ${STDCMP} 2>/dev/null -s cs.req ${PACKAGE_ast_LIB}/lib/cs || { ${STDCP} cs.req ${PACKAGE_ast_LIB}/lib/cs  		    		    ;}
 done ../../../lib/lib/cs generated
 make ../../../include/ast
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_INCLUDE} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
 exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/cs.h
@@ -795,150 +723,60 @@ done ../../../include/ast/cs_lib.h generated
 make ../../../lib/cs
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/cs
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/cs | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/cs 		    		   
 exec - fi
 done ../../../lib/cs generated
 make ../../../lib/cs/genlocal
 prev genlocal
-exec - mv ${PACKAGE_ast_LIB}/cs/genlocal ${PACKAGE_ast_LIB}/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || { cp genlocal ${PACKAGE_ast_LIB}/cs/genlocal  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/genlocal ${PACKAGE_ast_LIB}/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${PACKAGE_ast_LIB}/cs/genlocal || { ${STDCP} genlocal ${PACKAGE_ast_LIB}/cs/genlocal  		    		    ;}
 done ../../../lib/cs/genlocal generated
 make ../../../lib/cs/genshare
 prev genshare
-exec - mv ${PACKAGE_ast_LIB}/cs/genshare ${PACKAGE_ast_LIB}/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || { cp genshare ${PACKAGE_ast_LIB}/cs/genshare  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/cs/genshare ${PACKAGE_ast_LIB}/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${PACKAGE_ast_LIB}/cs/genshare || { ${STDCP} genshare ${PACKAGE_ast_LIB}/cs/genshare  		    		    ;}
 done ../../../lib/cs/genshare generated
 make ../../../share/lib/cs
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/share/lib/cs
-exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/cs 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/share/lib/cs | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/cs 		    		   
 exec - fi
 done ../../../share/lib/cs generated
 make ../../../share/lib/cs/local.ast
 make local.ast
 done local.ast
-exec - mv ${INSTALLROOT}/share/lib/cs/local.ast ${INSTALLROOT}/share/lib/cs/local.ast.old 2>/dev/null || true; test '' = 'local.ast' || { cp local.ast ${INSTALLROOT}/share/lib/cs/local.ast  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/share/lib/cs/local.ast ${INSTALLROOT}/share/lib/cs/local.ast.old 2>/dev/null || true; test '' = 'local.ast' || ${STDCMP} 2>/dev/null -s local.ast ${INSTALLROOT}/share/lib/cs/local.ast || { ${STDCP} local.ast ${INSTALLROOT}/share/lib/cs/local.ast  		    		    ;}
 done ../../../share/lib/cs/local.ast generated
 make ../../../share/lib/cs/genlocal
 prev genlocal
-exec - mv ${INSTALLROOT}/share/lib/cs/genlocal ${INSTALLROOT}/share/lib/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || { cp genlocal ${INSTALLROOT}/share/lib/cs/genlocal  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/share/lib/cs/genlocal ${INSTALLROOT}/share/lib/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || ${STDCMP} 2>/dev/null -s genlocal ${INSTALLROOT}/share/lib/cs/genlocal || { ${STDCP} genlocal ${INSTALLROOT}/share/lib/cs/genlocal  		    		    ;}
 done ../../../share/lib/cs/genlocal generated
 make ../../../share/lib/cs/genshare
 prev genshare
-exec - mv ${INSTALLROOT}/share/lib/cs/genshare ${INSTALLROOT}/share/lib/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || { cp genshare ${INSTALLROOT}/share/lib/cs/genshare  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/share/lib/cs/genshare ${INSTALLROOT}/share/lib/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || ${STDCMP} 2>/dev/null -s genshare ${INSTALLROOT}/share/lib/cs/genshare || { ${STDCP} genshare ${INSTALLROOT}/share/lib/cs/genshare  		    		    ;}
 done ../../../share/lib/cs/genshare generated
 make ../../../share/lib/cs/tcp
 setv mode -Dmode="+rwxt"
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/share/lib/cs/tcp
-exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/cs/tcp 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/share/lib/cs/tcp | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   && chmod ugo+rwxt ${INSTALLROOT}/share/lib/cs/tcp
+exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/cs/tcp 		    		   && chmod ugo+rwxt ${INSTALLROOT}/share/lib/cs/tcp
 exec - fi
 done ../../../share/lib/cs/tcp generated
 make ../../../share/lib/cs/udp
 setv mode -Dmode="+rwxt"
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/share/lib/cs/udp
-exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/cs/udp 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/share/lib/cs/udp | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   && chmod ugo+rwxt ${INSTALLROOT}/share/lib/cs/udp
+exec - then	set -x && mkdir -p ${INSTALLROOT}/share/lib/cs/udp 		    		   && chmod ugo+rwxt ${INSTALLROOT}/share/lib/cs/udp
 exec - fi
 done ../../../share/lib/cs/udp generated
 make ../../../lib/make
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/make
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/make 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/make | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/make 		    		   
 exec - fi
 done ../../../lib/make generated
 make ../../../lib/make/SERVICE.mk
 make SERVICE.mk
 done SERVICE.mk
-exec - mv ${PACKAGE_ast_LIB}/make/SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk.old 2>/dev/null || true; test '' = 'SERVICE.mk' || { cp SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/make/SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk.old 2>/dev/null || true; test '' = 'SERVICE.mk' || ${STDCMP} 2>/dev/null -s SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk || { ${STDCP} SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk  		    		    ;}
 done ../../../lib/make/SERVICE.mk generated
 make ../../../lib/cs/share
 make share

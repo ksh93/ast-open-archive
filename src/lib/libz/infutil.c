@@ -41,6 +41,9 @@ int r;
   /* update counters */
   z->avail_out -= n;
   z->total_out += n;
+#ifdef ZINTERNAL_STATE
+  z->total_OUT += n;
+#endif
 
   /* update check information */
   if (s->checkfn != Z_NULL)
@@ -67,6 +70,9 @@ int r;
     /* update counters */
     z->avail_out -= n;
     z->total_out += n;
+#ifdef ZINTERNAL_STATE
+    z->total_OUT += n;
+#endif
 
     /* update check information */
     if (s->checkfn != Z_NULL)

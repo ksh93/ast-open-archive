@@ -57,7 +57,7 @@ do	case $opt in
 		*)	case $opt in
 			h)	options="$options -L" ;;
 			l)	;;
-			m)	r_ok="" options="$options -$opt" ;;
+			m)	r_ok="" options="$options -pam" ;;
 			esac
 			;;
 		esac

@@ -48,6 +48,7 @@ setptr(register FILE* ibuf, off_t offset)
 	register int		prevcount;
 	register char*		cp;
 	register char*		cp2;
+	struct match*		xp;
 	int			maybe;
 	int			inhead;
 	off_t			roff;
@@ -75,15 +76,29 @@ setptr(register FILE* ibuf, off_t offset)
 	count = 0;
 	while (fgets(cp = buf, LINESIZE, ibuf)) {
 		prevcount = count;
-		if ((count = strlen(cp)) == 0 && (zoff = ftell(ibuf)) > roff) {
+		count = strlen(cp);
+		if (count == 0 && (zoff = ftell(ibuf)) > roff) {
 			for (cp2 = cp + (zoff - roff); cp < cp2 && *cp == 0; cp++);
 			if (cp > buf)
 				note(WARNING, "%d nuls at offset %lld", cp - buf, (Sflong_t)roff);
 			count = cp2 - cp;
 		}
+		else if (count >= 2 && cp[count - 1] == '\n' && cp[count - 2] == '\r') {
+			cp[count - 2] = '\n';
+			count--;
+		}
 		if (fwrite(cp, 1, count, state.msg.op) != count)
 			note(FATAL|SYSTEM, "Temporary file");
 		cp[count - 1] = 0;
+		if (state.bodymatch && !inhead && mp && !(mp->m_flag & MSCAN) && count >= state.bodymatch->minline && state.bodymatch->beg[cp[0]] && state.bodymatch->mid[cp[state.bodymatch->minline/2]] && state.bodymatch->end[cp[state.bodymatch->minline-1]])
+			for (xp = state.bodymatch->match; xp; xp = xp->next)
+				if (count >= xp->length && cp[0] == xp->beg && cp[xp->length/2] == xp->mid && cp[xp->length-1] == xp->end && !memcmp(cp, xp->string, xp->length))
+				{
+					if (TRACING('x'))
+						note(0, "spam: body match `%s'", xp->string);
+					msgflags(mp, MSCAN|MSPAM, 0);
+					break;
+				}
 		if (maybe && ishead(cp, inhead || prevcount != 1)) {
 			mp = newmsg(offset);
 			inhead = 1;
@@ -389,8 +404,11 @@ readline(FILE* ibuf, char* buf, int size)
 	if (!fgets(buf, size, ibuf))
 		return -1;
 	n = strlen(buf);
-	if (n > 0 && buf[n - 1] == '\n')
+	if (n > 0 && buf[n - 1] == '\n') {
 		buf[--n] = 0;
+		if (n > 0 && buf[n - 1] == '\r')
+			buf[--n] = 0;
+	}
 	return n;
 }
 
@@ -430,7 +448,7 @@ setinput(register struct msg* mp)
 		note(PANIC|SYSTEM, "Temporary file seek");
 	if (!(mp->m_flag & MSCAN)) {
 		msgflags(mp, MSCAN, 0);
-		if (state.var.spam) {
+		if (state.var.spam && !(mp->m_flag & MSPAM)) {
 			if (spammed(mp))
 				msgflags(mp, MSPAM, 0);
 			if (fseek(fp, offset, SEEK_SET) < 0)

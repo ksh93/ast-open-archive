@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -309,88 +309,52 @@ done mamstate generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/mamdag
 prev mamdag
-exec - mv ${INSTALLROOT}/bin/mamdag ${INSTALLROOT}/bin/mamdag.old 2>/dev/null || true; test '' = 'mamdag' || { cp mamdag ${INSTALLROOT}/bin/mamdag  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mamdag ${INSTALLROOT}/bin/mamdag.old 2>/dev/null || true; test '' = 'mamdag' || ${STDCMP} 2>/dev/null -s mamdag ${INSTALLROOT}/bin/mamdag || { ${STDCP} mamdag ${INSTALLROOT}/bin/mamdag  		    		    ;}
 done ../../../bin/mamdag generated
 make ../../../bin/mamdot
 prev mamdot
-exec - mv ${INSTALLROOT}/bin/mamdot ${INSTALLROOT}/bin/mamdot.old 2>/dev/null || true; test '' = 'mamdot' || { cp mamdot ${INSTALLROOT}/bin/mamdot  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mamdot ${INSTALLROOT}/bin/mamdot.old 2>/dev/null || true; test '' = 'mamdot' || ${STDCMP} 2>/dev/null -s mamdot ${INSTALLROOT}/bin/mamdot || { ${STDCP} mamdot ${INSTALLROOT}/bin/mamdot  		    		    ;}
 done ../../../bin/mamdot generated
 make ../../../bin/mamexec
 prev mamexec
-exec - mv ${INSTALLROOT}/bin/mamexec ${INSTALLROOT}/bin/mamexec.old 2>/dev/null || true; test '' = 'mamexec' || { cp mamexec ${INSTALLROOT}/bin/mamexec  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mamexec ${INSTALLROOT}/bin/mamexec.old 2>/dev/null || true; test '' = 'mamexec' || ${STDCMP} 2>/dev/null -s mamexec ${INSTALLROOT}/bin/mamexec || { ${STDCP} mamexec ${INSTALLROOT}/bin/mamexec  		    		    ;}
 done ../../../bin/mamexec generated
 make ../../../bin/mamnew
 prev mamnew
-exec - mv ${INSTALLROOT}/bin/mamnew ${INSTALLROOT}/bin/mamnew.old 2>/dev/null || true; test '' = 'mamnew' || { cp mamnew ${INSTALLROOT}/bin/mamnew  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mamnew ${INSTALLROOT}/bin/mamnew.old 2>/dev/null || true; test '' = 'mamnew' || ${STDCMP} 2>/dev/null -s mamnew ${INSTALLROOT}/bin/mamnew || { ${STDCP} mamnew ${INSTALLROOT}/bin/mamnew  		    		    ;}
 done ../../../bin/mamnew generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/mamnew.1
 make mamnew.1
 done mamnew.1
-exec - mv ${INSTALLROOT}/man/man1/mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1.old 2>/dev/null || true; test '' = 'mamnew.1' || { cp mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1.old 2>/dev/null || true; test '' = 'mamnew.1' || ${STDCMP} 2>/dev/null -s mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1 || { ${STDCP} mamnew.1 ${INSTALLROOT}/man/man1/mamnew.1  		    		    ;}
 done ../../../man/man1/mamnew.1 generated
 make ../../../bin/mamold
 prev mamold
-exec - mv ${INSTALLROOT}/bin/mamold ${INSTALLROOT}/bin/mamold.old 2>/dev/null || true; test '' = 'mamold' || { cp mamold ${INSTALLROOT}/bin/mamold  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mamold ${INSTALLROOT}/bin/mamold.old 2>/dev/null || true; test '' = 'mamold' || ${STDCMP} 2>/dev/null -s mamold ${INSTALLROOT}/bin/mamold || { ${STDCP} mamold ${INSTALLROOT}/bin/mamold  		    		    ;}
 done ../../../bin/mamold generated
 make ../../../man/man1/mamold.1
 make mamold.1
 done mamold.1
-exec - mv ${INSTALLROOT}/man/man1/mamold.1 ${INSTALLROOT}/man/man1/mamold.1.old 2>/dev/null || true; test '' = 'mamold.1' || { cp mamold.1 ${INSTALLROOT}/man/man1/mamold.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/mamold.1 ${INSTALLROOT}/man/man1/mamold.1.old 2>/dev/null || true; test '' = 'mamold.1' || ${STDCMP} 2>/dev/null -s mamold.1 ${INSTALLROOT}/man/man1/mamold.1 || { ${STDCP} mamold.1 ${INSTALLROOT}/man/man1/mamold.1  		    		    ;}
 done ../../../man/man1/mamold.1 generated
 make ../../../bin/mamsh
 prev mamsh
-exec - mv ${INSTALLROOT}/bin/mamsh ${INSTALLROOT}/bin/mamsh.old 2>/dev/null || true; test '' = 'mamsh' || { cp mamsh ${INSTALLROOT}/bin/mamsh  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mamsh ${INSTALLROOT}/bin/mamsh.old 2>/dev/null || true; test '' = 'mamsh' || ${STDCMP} 2>/dev/null -s mamsh ${INSTALLROOT}/bin/mamsh || { ${STDCP} mamsh ${INSTALLROOT}/bin/mamsh  		    		    ;}
 done ../../../bin/mamsh generated
 make ../../../bin/mamstate
 prev mamstate
-exec - mv ${INSTALLROOT}/bin/mamstate ${INSTALLROOT}/bin/mamstate.old 2>/dev/null || true; test '' = 'mamstate' || { cp mamstate ${INSTALLROOT}/bin/mamstate  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/mamstate ${INSTALLROOT}/bin/mamstate.old 2>/dev/null || true; test '' = 'mamstate' || ${STDCMP} 2>/dev/null -s mamstate ${INSTALLROOT}/bin/mamstate || { ${STDCP} mamstate ${INSTALLROOT}/bin/mamstate  		    		    ;}
 done ../../../bin/mamstate generated
 done install virtual
 make test

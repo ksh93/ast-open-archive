@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -153,59 +153,23 @@ done sort generated
 make ../../../bin
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/bin
-exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/bin | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/bin 		    		   
 exec - fi
 done ../../../bin generated
 make ../../../bin/sort
 prev sort
-exec - mv ${INSTALLROOT}/bin/sort ${INSTALLROOT}/bin/sort.old 2>/dev/null || true; test '' = 'sort' || { cp sort ${INSTALLROOT}/bin/sort  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/bin/sort ${INSTALLROOT}/bin/sort.old 2>/dev/null || true; test '' = 'sort' || ${STDCMP} 2>/dev/null -s sort ${INSTALLROOT}/bin/sort || { ${STDCP} sort ${INSTALLROOT}/bin/sort  		    		    ;}
 done ../../../bin/sort generated
 make ../../../man/man1
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man1
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man1 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man1 		    		   
 exec - fi
 done ../../../man/man1 generated
 make ../../../man/man1/sort.1
 make sort.1
 done sort.1
-exec - mv ${INSTALLROOT}/man/man1/sort.1 ${INSTALLROOT}/man/man1/sort.1.old 2>/dev/null || true; test '' = 'sort.1' || { cp sort.1 ${INSTALLROOT}/man/man1/sort.1  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man1/sort.1 ${INSTALLROOT}/man/man1/sort.1.old 2>/dev/null || true; test '' = 'sort.1' || ${STDCMP} 2>/dev/null -s sort.1 ${INSTALLROOT}/man/man1/sort.1 || { ${STDCP} sort.1 ${INSTALLROOT}/man/man1/sort.1  		    		    ;}
 done ../../../man/man1/sort.1 generated
 done install virtual
 make test

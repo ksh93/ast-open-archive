@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Labs Research) 1999-03-17 $\n]"
+"[-?\n@(#)$Id: od (AT&T Labs Research) 2002-08-28 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files"
@@ -532,8 +532,10 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 	{
 		if (*state.base)
 		{
-			if (fp == state.form) sfprintf(op, state.base, base);
-			else sfprintf(op, "%-*.*s ", BASE_WIDTH, BASE_WIDTH, "");
+			if (fp == state.form)
+				sfprintf(op, state.base, base);
+			else
+				sfprintf(op, "%-*.*s ", BASE_WIDTH, BASE_WIDTH, "");
 		}
 		u = bp;
 		for (;;)
@@ -553,41 +555,44 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 #endif
 					if (fp->size.internal == sizeof(double))
 						sfsprintf(f, sizeof(buf), fp->form, mem.m_double);
-					else sfsprintf(f, sizeof(buf), fp->form, mem.m_float);
+					else
+						sfsprintf(f, sizeof(buf), fp->form, mem.m_float);
 				}
 				else
 				{
 					x = swapget(state.swap, u, fp->size.external);
-					if (fp->us) switch (fp->size.internal)
-					{
-					case 1:
-						sfsprintf(f, sizeof(buf), fp->form, (unsigned int_1)x);
-						break;
-					case 2:
-						sfsprintf(f, sizeof(buf), fp->form, (unsigned int_2)x);
-						break;
-					case 4:
-						sfsprintf(f, sizeof(buf), fp->form, (unsigned int_4)x);
-						break;
-					default:
-						sfsprintf(f, sizeof(buf), fp->form, (unsigned int_max)x);
-						break;
-					}
-					else switch (fp->size.internal)
-					{
-					case 1:
-						sfsprintf(f, sizeof(buf), fp->form, (int_1)x);
-						break;
-					case 2:
-						sfsprintf(f, sizeof(buf), fp->form, (int_2)x);
-						break;
-					case 4:
-						sfsprintf(f, sizeof(buf), fp->form, (int_4)x);
-						break;
-					default:
-						sfsprintf(f, sizeof(buf), fp->form, (int_max)x);
-						break;
-					}
+					if (fp->us)
+						switch (fp->size.internal)
+						{
+						case 1:
+							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_1)x);
+							break;
+						case 2:
+							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_2)x);
+							break;
+						case 4:
+							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_4)x);
+							break;
+						default:
+							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_max)x);
+							break;
+						}
+					else
+						switch (fp->size.internal)
+						{
+						case 1:
+							sfsprintf(f, sizeof(buf), fp->form, (int_1)x);
+							break;
+						case 2:
+							sfsprintf(f, sizeof(buf), fp->form, (int_2)x);
+							break;
+						case 4:
+							sfsprintf(f, sizeof(buf), fp->form, (int_4)x);
+							break;
+						default:
+							sfsprintf(f, sizeof(buf), fp->form, (int_max)x);
+							break;
+						}
 				}
 			}
 			sfprintf(op, "%*s", state.width * fp->size.external / state.size, f);
@@ -612,12 +617,16 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 				sfputc(op, '\n');
 				break;
 			}
+			if (sferror(op))
+				return -1;
 		}
+		if (sferror(op))
+			return -1;
 	}
 	return 0;
 }
 
-static void
+static int
 od(char** files)
 {
 	register char*	s;
@@ -633,7 +642,7 @@ od(char** files)
 	static char	buf[LINE_LENGTH * sizeof(int_max)];
 
 	if (!(ip = init(&files)))
-		return;
+		return 0;
 	for (;;)
 	{
 		if (s = state.peek.data)
@@ -694,7 +703,8 @@ od(char** files)
 				while (m--)
 					*split++ = 0;
 			}
-			block(sfstdout, buf, buf + r, state.offset);
+			if (block(sfstdout, buf, buf + r, state.offset))
+				goto bad;
 			split = 0;
 			if (!state.verbose)
 				memcpy(state.dup.data = state.dup.buf, buf, state.dup.size = r);
@@ -735,7 +745,8 @@ od(char** files)
 			{
 				do
 				{
-					block(sfstdout, s, s + state.block, state.offset);
+					if (block(sfstdout, s, s + state.block, state.offset))
+						goto bad;
 					state.dup.data = s;
 					state.dup.size = state.block;
 					state.offset += state.block;
@@ -753,6 +764,11 @@ od(char** files)
 			}
 		}
 	}
+	return 0;
+ bad:
+	if (ip != sfstdin)
+		sfclose(ip);
+	return -1;
 }
 
 int
@@ -1018,5 +1034,7 @@ b_od(int argc, char** argv, void* context)
 		*(state.base + strlen(state.base) - 1) = '\n';
 		sfprintf(sfstdout, state.base, (int_max)state.offset);
 	}
+	if (sfsync(sfstdout))
+		error(ERROR_SYSTEM|2, "write error");
 	return error_info.errors;
 }

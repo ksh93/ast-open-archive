@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2002-06-26 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2002-07-17 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -73,6 +73,8 @@ static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2002-06-26 $\0\n"
 #define TEST_SUB		0x00000200
 #define TEST_UNSPECIFIED	0x00000400
 #define TEST_VERIFY		0x00000800
+#define TEST_AND		0x00001000
+#define TEST_OR			0x00002000
 
 #define TEST_DELIMIT		0x00010000
 #define TEST_OK			0x00020000
@@ -91,7 +93,7 @@ static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2002-06-26 $\0\n"
 #define TEST_CATCH		0x10000000
 #define TEST_VERBOSE		0x20000000
 
-#define TEST_GLOBAL		(TEST_ACTUAL|TEST_BASELINE|TEST_CATCH|TEST_FAIL|TEST_IGNORE_ERROR|TEST_IGNORE_OVER|TEST_IGNORE_POSITION|TEST_PASS|TEST_SUMMARY|TEST_VERBOSE)
+#define TEST_GLOBAL		(TEST_ACTUAL|TEST_AND|TEST_BASELINE|TEST_CATCH|TEST_FAIL|TEST_IGNORE_ERROR|TEST_IGNORE_OVER|TEST_IGNORE_POSITION|TEST_OR|TEST_PASS|TEST_SUMMARY|TEST_VERBOSE)
 
 #ifdef REG_DISCIPLINE
 
@@ -172,6 +174,7 @@ T("OPTIONS\n");
 T("  -c	catch signals and non-terminating calls\n");
 T("  -e	ignore error return mismatches\n");
 T("  -h	list help on standard error\n");
+T("  -n	do not repeat successful tests with regnexec()\n");
 T("  -o	ignore match[] overrun errors\n");
 T("  -p	ignore negative position mismatches\n");
 T("  -s	use stack instead of malloc\n");
@@ -233,6 +236,9 @@ T("\n");
 T("    C		set LC_COLLATE and LC_CTYPE to locale in field 2\n");
 T("\n");
 T("    ?test ...	output field 5 if passed and != EXPECTED, silent otherwise\n");
+T("    &test ...	output field 5 if current and previous passed\n");
+T("    |test ...	output field 5 if current passed and previous failed\n");
+T("    ; ...	output field 2 if previous failed\n");
 T("    {test ...	skip if failed until }\n");
 T("    }		end of skip\n");
 T("\n");
@@ -304,10 +310,7 @@ H("</HTML>\n");
 
 static const char* unsupported[] =
 {
-
-#if REG_TEST_DEFAULT & (REG_AUGMENTED|REG_EXTENDED|REG_SHELL)
 	"BASIC",
-#endif
 #ifndef REG_EXTENDED
 	"EXTENDED",
 #endif
@@ -523,8 +526,10 @@ static struct
 	int		extracted;
 	int		ignored;
 	int		lineno;
+	int		passed;
 	int		signals;
 	int		unspecified;
+	int		verify;
 	int		warnings;
 	char*		stack;
 	char*		which;
@@ -837,7 +842,7 @@ matchcheck(int nmatch, regmatch_t* match, char* ans, char* re, char* s, int len,
 	int	n;
 
 	if (streq(ans, "OK"))
-		return test & (TEST_BASELINE|TEST_PASS);
+		return test & (TEST_BASELINE|TEST_PASS|TEST_VERIFY);
 	for (i = 0, p = ans; i < nmatch && *p; i++)
 	{
 		if (*p == '{')
@@ -1000,7 +1005,7 @@ note(unsigned long level, char* msg, unsigned long skip, unsigned long test)
 		printf("NOTE\t");
 		if (msg)
 			printf("%s: ", msg);
-		printf("skipping lines %d\n", state.lineno);
+		printf("skipping lines %d", state.lineno);
 	}
 	return skip | level;
 }
@@ -1017,24 +1022,11 @@ extract(int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* ac
 		state.extracted = 1;
 		if (test & TEST_OK)
 		{
+			state.passed++;
 			if ((test & TEST_VERIFY) && !(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
 			{
-				if (!msg || strcmp(msg, "EXPECTED"))
-				{
-					printf("NOTE\t");
-					if (msg)
-					{
-						for (s = msg; *s; s++)
-						{
-							if (*s == ' ' && *(s + 1) == ':')
-								break;
-							putchar(*s);
-						}
-						putchar('\n');
-					}
-					else
-						printf("test %d passed\n", state.lineno);
-				}
+				if (msg && strcmp(msg, "EXPECTED"))
+					printf("NOTE\t%s\n", msg);
 				return skip;
 			}
 			test &= ~(TEST_PASS|TEST_QUERY);
@@ -1056,6 +1048,7 @@ extract(int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* ac
 		}
 		if (test & (TEST_PASS|TEST_SUMMARY))
 			return skip;
+		test &= ~TEST_DELIMIT;
 		printf("%s%s", spec, TABS(*tabs++));
 		if ((test & (TEST_BASELINE|TEST_SAME)) == (TEST_BASELINE|TEST_SAME))
 			printf("SAME");
@@ -1077,20 +1070,7 @@ extract(int* tabs, char* spec, char* re, char* s, char* ans, char* msg, char* ac
 	else if (test & TEST_QUERY)
 		skip = note(level, msg, skip, test);
 	else if (test & TEST_VERIFY)
-	{
 		state.extracted = 1;
-		if (msg)
-		{
-			for (s = msg; *s; s++)
-				if (*s == ' ' && *(s + 1) == ':' && *(s + 2) == ' ')
-				{
-					s += 3;
-					break;
-				}
-			if (*s)
-				printf("NOTE\t%s\n", s);
-		}
-	}
 	return skip;
 }
 
@@ -1156,6 +1136,7 @@ main(int argc, char** argv)
 
 	int		locale = 0;
 	int		nonosub = REG_NOSUB == 0;
+	int		nonexec = 0;
 	int		testno = 0;
 
 	unsigned long	level = 1;
@@ -1188,6 +1169,9 @@ main(int argc, char** argv)
 			case '-':
 				help(p[1] == 'h');
 				return 2;
+			case 'n':
+				nonexec = 1;
+				continue;
 			case 'o':
 				test |= TEST_IGNORE_OVER;
 				continue;
@@ -1249,27 +1233,36 @@ main(int argc, char** argv)
 		if (p)
 			printf(", argument(s) ignored");
 		printf("\n");
-#ifdef REG_TEST_VERSION
-		s = REG_TEST_VERSION;
-#else
 #ifdef REG_VERSIONID
 		if (regerror(REG_VERSIONID, NiL, pat, sizeof(pat)) > 0)
 			s = pat;
 		else
 #endif
+#ifdef REG_TEST_VERSION
+		s = REG_TEST_VERSION;
+#else
 		s = "regex";
 #endif
 		printf("NOTE\t%s\n", s);
 		if (elementsof(unsupported) > 1)
 		{
-			printf("NOTE\tunsupported:");
-			got = ' ';
-			for (i = 0; i < elementsof(unsupported) - 1; i++)
+#if (REG_TEST_DEFAULT & (REG_AUGMENTED|REG_EXTENDED|REG_SHELL)) || !defined(REG_EXTENDED)
+			i = 0;
+#else
+			i = REG_EXTENDED != 0;
+#endif
+			for (got = 0; i < elementsof(unsupported) - 1; i++)
 			{
-				printf("%c%s", got, unsupported[i]);
-				got = ',';
+				if (!got)
+				{
+					got = 1;
+					printf("NOTE\tunsupported: %s", unsupported[i]);
+				}
+				else
+					printf(",%s", unsupported[i]);
 			}
-			printf("\n");
+			if (got)
+				printf("\n");
 		}
 	}
 #ifdef REG_DISCIPLINE
@@ -1513,6 +1506,20 @@ main(int argc, char** argv)
 
 			case '?':
 				test |= TEST_VERIFY;
+				test &= ~(TEST_AND|TEST_OR);
+				state.verify = state.passed;
+				continue;
+			case '&':
+				test |= TEST_VERIFY|TEST_AND;
+				test &= ~TEST_OR;
+				continue;
+			case '|':
+				test |= TEST_VERIFY|TEST_OR;
+				test &= ~TEST_AND;
+				continue;
+			case ';':
+				test |= TEST_OR;
+				test &= ~TEST_AND;
 				continue;
 
 			case '{':
@@ -1533,7 +1540,7 @@ main(int argc, char** argv)
 					bad("invalid {...} nesting\n", NiL, NiL, 0, 0);
 				if ((skip & level) && !(skip & (level>>1)))
 				{
-					if (!(test & TEST_BASELINE|TEST_SUMMARY))
+					if (!(test & (TEST_BASELINE|TEST_SUMMARY)))
 					{
 						if (test & (TEST_ACTUAL|TEST_FAIL))
 							printf("}\n");
@@ -1580,6 +1587,24 @@ main(int argc, char** argv)
 			}
 			continue;
 		}
+		if (test & TEST_OR)
+		{
+			if (!(test & TEST_VERIFY))
+			{
+				test &= ~TEST_OR;
+				if (state.passed == state.verify && i > 1)
+					printf("NOTE\t%s\n", field[1]);
+				continue;
+			}
+			else if (state.passed > state.verify)
+				continue;
+		}
+		else if (test & TEST_AND)
+		{
+			if (state.passed == state.verify)
+				continue;
+			state.passed = state.verify;
+		}
 		if (i < 4)
 			bad("too few fields\n", NiL, NiL, 0, test);
 		while (i < elementsof(field))
@@ -1624,8 +1649,12 @@ main(int argc, char** argv)
 
 		if (state.extracted || (skip & level))
 			continue;
-#if !(REG_TEST_DEFAULT & (REG_AUGMENTED|REG_EXTENDED|REG_SHELL)) && defined(REG_EXTENDED) && REG_EXTENDED != 0
+#if !(REG_TEST_DEFAULT & (REG_AUGMENTED|REG_EXTENDED|REG_SHELL))
+#ifdef REG_EXTENDED
+		if (REG_EXTENDED != 0 && (test & TEST_BRE))
+#else
 		if (test & TEST_BRE)
+#endif
 		{
 			test &= ~TEST_BRE;
 			flags = cflags;
@@ -1973,7 +2002,7 @@ main(int argc, char** argv)
 		else if (matchcheck(nmatch, match, ans, re, s, nstr, flags, test))
 		{
 #if _REG_nexec
-			if (nexec < 0)
+			if (nexec < 0 && !nonexec)
 			{
 				nexec = nstr >= 0 ? nstr : strlen(s);
 				s[nexec] = '\n';
@@ -1981,7 +2010,7 @@ main(int argc, char** argv)
 				goto execute;
 			}
 #endif
-			if (!(test & TEST_SUB) && !nonosub)
+			if (!(test & (TEST_SUB|TEST_VERIFY)) && !nonosub)
 			{
 				if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, skip, level, test))
 					continue;

@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: touch (AT&T Labs Research) 2002-02-14 $\n]"
+"[-?\n@(#)$Id: touch (AT&T Labs Research) 2002-09-11 $\n]"
 USAGE_LICENSE
 "[+NAME?touch - change file access and modification times]"
 "[+DESCRIPTION?\btouch\b changes the modification time, access time or both"
@@ -45,9 +45,9 @@ USAGE_LICENSE
 "	\aHHMM.SS\a, \addHHMM.SS\a, \ammddHHMM.SS\a, \ammddHHMMyy.SS\a or"
 "	\ayymmddHHMM.SS\a, or \ammddHHMMccyy.SS\a or \accyymmddHHMM.SS\a."
 "	Conflicting standards and practice allow a leading or trailing"
-"	2 or 4 digit year for the 10 and 12 digit forms; the X/Open trailing"
-"	form is used to disambiguate. Avoid the 10 digit form to avoid"
-"	confusion. The digit fields are:]{"
+"	2 or 4 digit year for the 10 and 12 digit forms; the X/Open leading"
+"	form is used to disambiguate (\bdate\b(1) uses the trailing form.)"
+"	Avoid the 10 digit form to avoid confusion. The digit fields are:]{"
 "		[+cc?Century - 1, 19-20.]"
 "		[+yy?Year in century, 00-99.]"
 "		[+mm?Month, 01-12.]"
@@ -186,7 +186,6 @@ main(int argc, register char** argv)
 			for (file = *argv; *file >= '0' && *file <= '9'; file++);
 			if (((n = (file - *argv)) == 4 || n == 6 || n == 8 || n == 10 || n == 12) && (!*file || *file == '.' && *(file + 1) >= '0' && *(file + 1) <= '9' && *(file + 2) >= '0' && *(file + 2) <= '9' && !*(file + 3)))
 			{
-				tm_info.flags |= TM_DATESTYLE;
 				date = tmdate(file = *argv++, &e, NiL);
 				if (*e)
 					error(3, "%s: invalid date specification", file);

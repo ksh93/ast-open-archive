@@ -30,7 +30,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2000-06-27 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2002-09-24 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -401,10 +401,10 @@ fini(int code)
 		sfclose(state.out.fp);
 	if (!state.silent.value.number)
 	{
-		sfprintf(sfstderr, "%lu+%lu records in\n", state.in.complete, state.in.partial);
-		sfprintf(sfstderr, "%lu+%lu records out\n", state.out.complete, state.out.partial + (state.out.remains > 0));
+		sfprintf(sfstderr, "%I*u+%I*u records in\n", sizeof(Sfulong_t), (Sfulong_t)state.in.complete, sizeof(Sfulong_t), (Sfulong_t)(state.in.partial + (state.in.remains > 0)));
+		sfprintf(sfstderr, "%I*u+%I*u records out\n", sizeof(Sfulong_t), (Sfulong_t)state.out.complete, sizeof(Sfulong_t), (Sfulong_t)(state.out.partial + (state.out.remains > 0)));
 		if (state.in.truncated)
-			sfprintf(sfstderr, "%lu truncated record%s\n", state.in.truncated, state.in.truncated == 1 ? "" : "s");
+			sfprintf(sfstderr, "%I*u truncated record%s\n", sizeof(Sfulong_t), (Sfulong_t)state.in.truncated, state.in.truncated == 1 ? "" : "s");
 	}
 	exit(code);
 }
@@ -424,8 +424,9 @@ output(Sfio_t* sp, const Void_t* buf, size_t n, Sfdisc_t* disc)
 
 	if ((r = sfwr(sp, buf, n, disc)) > 0)
 	{
-		state.out.complete += r / state.obs.value.number;
-		if (x = r % state.obs.value.number)
+		x = r / state.obs.value.number;
+		state.out.complete += x;
+		if (x = r - x * state.obs.value.number)
 		{
 			if (state.out.special)
 				state.out.partial++;
@@ -846,7 +847,7 @@ main(int argc, char** argv)
 					n = m;
 					if (state.in.special)
 						state.in.partial++;
-					else if ((state.in.remains += n % c) >= c)
+					else if ((state.in.remains += n) >= c)
 					{
 						state.in.remains -= c;
 						state.in.complete++;

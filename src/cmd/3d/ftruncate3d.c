@@ -40,6 +40,9 @@ int
 ftruncate64(int fd, off64_t size)
 {
 	static Real_f	realf;
+	int		r;
+	int		n;
+	int		m;
 #if FS
 	Mount_t*	mp;
 
@@ -49,16 +52,29 @@ ftruncate64(int fd, off64_t size)
 #endif
 	if (!realf)
 		realf = (Real_f)sysfunc(SYS3D_ftruncate64);
-	if ((*realf)(fd, size))
-		return -1;
+	for (m = state.trap.size - 1; m >= 0; m--)
+		if (MSG_MASK(MSG_truncate) & state.trap.intercept[m].mask)
+			break;
+	if (m >= 0)
+	{
+		n = state.trap.size;
+		state.trap.size = m;
+		r = (*state.trap.intercept[m].call)(&state.trap.intercept[m], MSG_truncate, SYS3D_ftruncate64, (void*)fd, (void*)&size, NiL, NiL, NiL, NiL);
+		state.trap.size = n;
+	}
+	else
+		r = (*realf)(fd, size);
 #if FS
-	if (mp)
-		fscall(mp, MSG_ftruncate, 0, fd, size);
-	for (mp = state.global; mp; mp = mp->global)
-		if (fssys(mp, MSG_ftruncate))
+	if (!r)
+	{
+		if (mp)
 			fscall(mp, MSG_ftruncate, 0, fd, size);
+		for (mp = state.global; mp; mp = mp->global)
+			if (fssys(mp, MSG_ftruncate))
+				fscall(mp, MSG_ftruncate, 0, fd, size);
+	}
 #endif
-	return 0;
+	return r;
 }
 
 #endif

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-06-11
+info mam static 00000 1994-07-17 make (AT&T Research) 4.2 2002-09-22
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -281,111 +281,39 @@ prev librecsort.a archive
 make ../../../lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB} 		    		   
 exec - fi
 done ../../../lib generated
 make ../../../lib/librecsort.a archive
 prev librecsort.a archive
-exec - mv ${PACKAGE_ast_LIB}/librecsort.a ${PACKAGE_ast_LIB}/librecsort.a.old 2>/dev/null || true; test '' = 'librecsort.a' || { cp librecsort.a ${PACKAGE_ast_LIB}/librecsort.a  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/librecsort.a ${PACKAGE_ast_LIB}/librecsort.a.old 2>/dev/null || true; test '' = 'librecsort.a' || ${STDCMP} 2>/dev/null -s librecsort.a ${PACKAGE_ast_LIB}/librecsort.a || { ${STDCP} librecsort.a ${PACKAGE_ast_LIB}/librecsort.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/librecsort.a) >/dev/null 2>&1 || true
 done ../../../lib/librecsort.a generated
 make ../../../man/man3
 exec - set -
 exec - if	test ! -d ${INSTALLROOT}/man/man3
-exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${INSTALLROOT}/man/man3 | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${INSTALLROOT}/man/man3 		    		   
 exec - fi
 done ../../../man/man3 generated
 make ../../../man/man3/recsort.3
 make recsort.3
 done recsort.3
-exec - mv ${INSTALLROOT}/man/man3/recsort.3 ${INSTALLROOT}/man/man3/recsort.3.old 2>/dev/null || true; test '' = 'recsort.3' || { cp recsort.3 ${INSTALLROOT}/man/man3/recsort.3  		    		    ;}
+exec - ${STDMV} ${INSTALLROOT}/man/man3/recsort.3 ${INSTALLROOT}/man/man3/recsort.3.old 2>/dev/null || true; test '' = 'recsort.3' || ${STDCMP} 2>/dev/null -s recsort.3 ${INSTALLROOT}/man/man3/recsort.3 || { ${STDCP} recsort.3 ${INSTALLROOT}/man/man3/recsort.3  		    		    ;}
 done ../../../man/man3/recsort.3 generated
 make ../../../lib/lib
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_LIB}/lib
-exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_LIB}/lib | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_LIB}/lib 		    		   
 exec - fi
 done ../../../lib/lib generated
 make ../../../lib/lib/recsort
 prev recsort.req
-exec - mv ${PACKAGE_ast_LIB}/lib/recsort ${PACKAGE_ast_LIB}/lib/recsort.old 2>/dev/null || true; test '' = 'recsort.req' || { cp recsort.req ${PACKAGE_ast_LIB}/lib/recsort  		    		    ;}
+exec - ${STDMV} ${PACKAGE_ast_LIB}/lib/recsort ${PACKAGE_ast_LIB}/lib/recsort.old 2>/dev/null || true; test '' = 'recsort.req' || ${STDCMP} 2>/dev/null -s recsort.req ${PACKAGE_ast_LIB}/lib/recsort || { ${STDCP} recsort.req ${PACKAGE_ast_LIB}/lib/recsort  		    		    ;}
 done ../../../lib/lib/recsort generated
 make ../../../include/ast
 exec - set -
 exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 2>/dev/null && set - ||
-exec - 	{
-exec - 		test -d ./-p && rm -Rf ./-p
-exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_INCLUDE} | sed -e 's%\\(.\\)/%\\1 %g'`
-exec - 		do	case $p in
-exec - 			"")	p=$d ;;
-exec - 			*)	p=$p/$d ;;
-exec - 			esac
-exec - 			case $d in
-exec - 			.|..)	;;
-exec - 			*)	if	test ! -d $p
-exec - 				then	rm -f $p
-exec - 					set -x && mkdir $p && set -
-exec - 				fi
-exec - 				;;
-exec - 			esac
-exec - 		done
-exec - 	} && set -x 		    		   
+exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 		    		   
 exec - fi
 done ../../../include/ast generated
 make ../../../include/ast/recsort.h

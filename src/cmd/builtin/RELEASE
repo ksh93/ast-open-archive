@@ -1,3 +1,10 @@
+02-09-11 dlls.c: add --base & --path
+02-09-05 pr.data: eliminate case ignorant file name clashes (for mac os X)
+02-08-30 dlls.c: exit 1 if no matching dll found
+02-08-28 od.c: check and report write errors -- ouch
+	 dlls.c: add --info
+02-08-23 dlls.c: add
+02-08-19 chown.tst: add chow regression tests
 02-04-15 look.c: add look.tst, fix hang
 02-03-24 uudecode,uuencode: sfopen "rt" for \r\n -- puke
 02-01-24 look.c: drop <strings.h> ref
@@ -16,7 +23,7 @@
 00-02-14 fmt: move to libcmd
 00-01-06 pr: fix empty field in multi-col output
 99-11-19 pr: -t == -T
-99-10-01 strings: att --long-strings
+99-10-01 strings: add --long-strings
 99-08-11 mime,strings: fix usage[]
 99-06-25 who: fix printing of data strings with no \0
 99-06-20 who: fix -i
