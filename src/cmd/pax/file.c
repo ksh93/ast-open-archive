@@ -989,6 +989,7 @@ addlink(register Archive_t* ap, register File_t* f)
 				}
 			}
 		}
+		f->linkname = map(f->linkname);
 		if (streq(f->name, f->linkname))
 		{
 			error(2, "%s: hard link loops to self", f->name);

@@ -1,3 +1,4 @@
+00-02-14 pppopen(): general comments with "bme" (begin middle end) string
 00-01-11 pp.probe: hosttype now in C.probe
 99-11-19 is[a-z]*( => ppis[a-z]*(
 	 ppproto: "..." [A-Z_]+ "..." ignores [A-Z_]+ if PROTOMAIN

@@ -1,3 +1,4 @@
+00-02-29 handle multiline SMTP responses
 99-07-17 fix imap reply via imap_setinput() omission
 	 @x.y.z in spam list matches x.y.z domain suffix
 	 tone down hostmatch(), check unknown in Received:

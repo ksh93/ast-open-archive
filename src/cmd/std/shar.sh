@@ -44,8 +44,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 [-?
 @(#)shar (AT&T Labs Research) 1999-04-20\n
 ]
-	[-author?David Korn <dgk@research.att.com>]
-	[-license?http://www.research.att.com/sw/tools/reuse]
+'$USAGE_LICENSE$'
 	[+NAME? shar - create a shell archive]
 	[+DESCRIPTION?\bshar\b reads one or more input files and creates a
 		shell script which when executed will restore the contents

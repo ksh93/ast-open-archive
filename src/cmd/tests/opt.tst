@@ -720,30 +720,30 @@ getopts (AT&T Research) 1999-02-02'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META NAME="generator" CONTENT="optget (AT&T Labs Research) 1999-08-11">
+<META name="generator" content="optget (AT&T Labs Research) 1999-08-11">
 <TITLE>getopts man document</TITLE>
 </HEAD>
-<BODY bgcolor=\'#ffffff\'>
-<H4><TABLE WIDTH=100%><TR><TH ALIGN=LEFT>&nbsp;getopts&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH ALIGN=CENTER><A HREF="" TITLE="Index">USER COMMANDS</A><TH ALIGN=RIGHT>getopts&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;getopts&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>getopts&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL COMPACT>
-<DT><H4><A NAME="NAME">NAME</A></H4>
-<DL COMPACT>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
 <DT>getopts - parse utility options
 <P>
 </DL>
-<DT><H4><A NAME="SYNOPSIS">SYNOPSIS</A></H4>
-<DL COMPACT>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
 <DT><B>getopts</B> &#0091; <I>options</I> &#0093; opstring name &#0091;args...&#0093;
 <P>
 </DL>
-<DT><H4><A NAME="OPTIONS">OPTIONS</A></H4>
-<DL COMPACT>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
 <DT>-<B>a</B> <I>name</I><DD>Use <I>name</I> instead of the command name in
 usage messages.
 </DL>
-<DT><H4><A NAME="DESCRIPTION">DESCRIPTION</A></H4>
-<DL COMPACT>
+<DT><H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
+<DL compact>
 <DT>The <B>getopts</B> utility can be used to retrieve options and arguments
 from a list of arguments give by <I>args</I> or the positional parameters if <I>args
 </I> is omitted. It can also generate usage messages and a man page for the
@@ -766,9 +766,9 @@ should be emboldened when displayed. Text between two \\a (bell) characters
 indicates that the text should be emphasised or italicised when displayed.
 <P>
 <DT>There are four types of groups:
-<DL COMPACT>
-<DL COMPACT>
-<DT><A NAME="1."><B>1.</B></A><DD>An option specifiation of the form <I>option
+<DL compact>
+<DL compact>
+<DT><A name="1."><B>1.</B></A><DD>An option specifiation of the form <I>option
 </I>:<I>longname</I>. In this case the first field is the option character. If
 there is no option character, then a two digit number should be specified that
 corresponds to the long options. This negative of this number will be returned
@@ -777,15 +777,15 @@ longname is matched with <B>--</B><I>longname</I>. A * in the <I>longname</I>
 field indicates that only characters up that point need to match provided any
 additional characters match the option. The &#0091; and &#0093; can be omitted for options
 that don\'t have longnames or descriptive text.
-<DT><A NAME="2."><B>2.</B></A><DD>A string option argument specification.
+<DT><A name="2."><B>2.</B></A><DD>A string option argument specification.
 Options that take arguments can be followed by : or # and an option group
 specification. An option group specification consists of a name for the option
 argument as field 1. The remaining fields are a typename and zero or more of
 the special attribute words <B>listof</B>, <B>oneof</B>, and <B>ignorecase</B>.
 The option specification can be followed by a list of option value descriptions
 enclosed in parenthesis.
-<DT><A NAME="3."><B>3.</B></A><DD>A option value description.
-<DT><A NAME="4."><B>4.</B></A><DD>A argument specification. A list of valid
+<DT><A name="3."><B>3.</B></A><DD>A option value description.
+<DT><A name="4."><B>4.</B></A><DD>A argument specification. A list of valid
 option argument values can be specified by enclosing them inside a {...}
 following the option argument specification. Each of the permitted values can
 be specified with a &#0091;...&#0093; containing the value followed by a description.
@@ -807,13 +807,13 @@ character, <B>OPTARG</B> will be unset, and an error message will be written to
 standard error when errors are encountered.
 <P>
 <DT>The end of options occurs when:
-<DL COMPACT>
-<DL COMPACT>
-<DT><A NAME="1."><B>1.</B></A><DD>The special argument <B>--</B>.
-<DT><A NAME="2."><B>2.</B></A><DD>An argument that does not beging with a <B>-
+<DL compact>
+<DL compact>
+<DT><A name="1."><B>1.</B></A><DD>The special argument <B>--</B>.
+<DT><A name="2."><B>2.</B></A><DD>An argument that does not beging with a <B>-
 </B>.
-<DT><A NAME="3."><B>3.</B></A><DD>A help argument is specified.
-<DT><A NAME="4."><B>4.</B></A><DD>An error is encountered.
+<DT><A name="3."><B>3.</B></A><DD>A help argument is specified.
+<DT><A name="4."><B>4.</B></A><DD>An error is encountered.
 <P>
 </DL>
 </DL>
@@ -822,14 +822,14 @@ be used.
 <P>
 <DT><B>getopts</B> can also be used to generate help messages containing
 command usage and detailed descriptions. Specify <I>args</I> as:
-<DL COMPACT>
-<DL COMPACT>
-<DT><A NAME="-?"><B>-?</B></A><DD>To generate a usage synopsis.
-<DT><A NAME="--??"><B>--??</B></A><DD>To generate a verbose usage message.
-<DT><A NAME="--??man"><B>--??man</B></A><DD>To generate a formatted man page.
-<DT><A NAME="--??api"><B>--??api</B></A><DD>To generate an easy to parse usage
+<DL compact>
+<DL compact>
+<DT><A name="-?"><B>-?</B></A><DD>To generate a usage synopsis.
+<DT><A name="--??"><B>--??</B></A><DD>To generate a verbose usage message.
+<DT><A name="--??man"><B>--??man</B></A><DD>To generate a formatted man page.
+<DT><A name="--??api"><B>--??api</B></A><DD>To generate an easy to parse usage
 message.
-<DT><A NAME="--??html"><B>--??html</B></A><DD>To generate a man page in <B>html
+<DT><A name="--??html"><B>--??html</B></A><DD>To generate a man page in <B>html
 </B> format.
 <P>
 </DL>
@@ -838,15 +838,15 @@ message.
 non-zero return value and the variable <B>OPTIND</B> is set to the index of the
 first non-option argument.
 </DL>
-<DT><H4><A NAME="EXIT STATUS">EXIT STATUS</A></H4>
-<DL COMPACT>
-<DT><A NAME="0"><B>0</B></A><DD>An option specified was found.
-<DT><A NAME="1"><B>1</B></A><DD>An end of options was encountered.
-<DT><A NAME="2"><B>2</B></A><DD>A usage or information message was generated.
+<DT><H4><A name="EXIT STATUS">EXIT STATUS</A></H4>
+<DL compact>
+<DT><A name="0"><B>0</B></A><DD>An option specified was found.
+<DT><A name="1"><B>1</B></A><DD>An end of options was encountered.
+<DT><A name="2"><B>2</B></A><DD>A usage or information message was generated.
 </DL>
-<DT><H4><A NAME="IMPLEMENTATION">IMPLEMENTATION</A></H4>
-<DL COMPACT>
-<DT><A NAME="version"><B>version</B></A><DD>getopts (AT&amp;T Research)
+<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DL compact>
+<DT><A name="version"><B>version</B></A><DD>getopts (AT&amp;T Research)
 1999-02-02
 </DL></DL>
 </BODY>
@@ -1138,38 +1138,38 @@ TEST 16 'detailed man'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META NAME="generator" CONTENT="optget (AT&T Labs Research) 1999-08-11">
+<META name="generator" content="optget (AT&T Labs Research) 1999-08-11">
 <TITLE>cmd man document</TITLE>
 </HEAD>
-<BODY bgcolor=\'#ffffff\'>
-<H4><TABLE WIDTH=100%><TR><TH ALIGN=LEFT>&nbsp;cmd&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH ALIGN=CENTER><A HREF="" TITLE="Index">USER COMMANDS</A><TH ALIGN=RIGHT>cmd&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;cmd&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>cmd&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL COMPACT>
-<DT><H4><A NAME="NAME">NAME</A></H4>
-<DL COMPACT>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
 <DT>ah
 <P>
 </DL>
-<DT><H4><A NAME="SYNOPSIS">SYNOPSIS</A></H4>
-<DL COMPACT>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
 <DT><B>cmd</B> &#0091; <I>options</I> &#0093;
 </DL>
-<DT><H4><A NAME="DESCRIPTION">DESCRIPTION</A></H4>
-<DL COMPACT>
+<DT><H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
+<DL compact>
 <DT><I>bla</I> does bla and bla. The blas are:
-<DL COMPACT>
-<DL COMPACT>
-<DT><A NAME="aha"><I>aha</I></A><DD>bla bla aha
-<DT><A NAME="bwaha">bwaha</A><DD>not bold
-<DT><A NAME="bold"><B>bold</B></A><DD>yes it is
+<DL compact>
+<DL compact>
+<DT><A name="aha"><I>aha</I></A><DD>bla bla aha
+<DT><A name="bwaha">bwaha</A><DD>not bold
+<DT><A name="bold"><B>bold</B></A><DD>yes it is
 <P>
 </DL>
 </DL>
 <DT>Next paragraph
-<DL COMPACT>
-<DL COMPACT>
-<DT><A NAME="aaa"><B>aaa</B></A><DD>aaa
-<DT><A NAME="bbb"><B>bbb</B></A><DD>bbb
+<DL compact>
+<DL compact>
+<DT><A name="aaa"><B>aaa</B></A><DD>aaa
+<DT><A name="bbb"><B>bbb</B></A><DD>bbb
 </DL>
 </DL>
 </DL></DL>
@@ -1425,42 +1425,42 @@ TEST 24 'detailed html'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META NAME="generator" CONTENT="optget (AT&T Labs Research) 1999-08-11">
+<META name="generator" content="optget (AT&T Labs Research) 1999-08-11">
 <TITLE>test man document</TITLE>
 </HEAD>
-<BODY bgcolor=\'#ffffff\'>
-<H4><TABLE WIDTH=100%><TR><TH ALIGN=LEFT>&nbsp;test&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH ALIGN=CENTER><A HREF="" TITLE="Index">USER COMMANDS</A><TH ALIGN=RIGHT>test&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;test&nbsp;(&nbsp;1&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER COMMANDS</A><TH align=right>test&nbsp;(&nbsp;1&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL COMPACT>
-<DT><H4><A NAME="NAME">NAME</A></H4>
-<DL COMPACT>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
 <DT><B>dd</B> - copy and convert file
 <P>
 </DL>
-<DT><H4><A NAME="SYNOPSIS">SYNOPSIS</A></H4>
-<DL COMPACT>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
 <DT><B>test</B> &#0091; <I>options</I> &#0093;
 <P>
 </DL>
-<DT><H4><A NAME="OPTIONS">OPTIONS</A></H4>
-<DL COMPACT>
-<DT>--<B>if</B>=<I>file</I> (see <NOBR><A HREF="../man2/stat.html"><B>stat</B></A>(2))</NOBR>
-<DD>Input file name (see <NOBR><A HREF="../man2/intro.html"><I>intro</I></A>(2)).</NOBR>
+<DT><H4><A name="OPTIONS">OPTIONS</A></H4>
+<DL compact>
+<DT>--<B>if</B>=<I>file</I> (see <NOBR><A href="../man2/stat.html"><B>stat</B></A>(2))</NOBR>
+<DD>Input file name (see <NOBR><A href="../man2/intro.html"><I>intro</I></A>(2)).</NOBR>
 <DT>--<B>conv</B>=<I>conversion</I><DD>Conversion option <I>begin&#0091;-end&#0093;=value
 </I> passed to <B>main</B>().
 </DL>
-<DT><H4><A NAME="SEE ALSO">SEE ALSO</A></H4>
-<DL COMPACT>
-<DT><NOBR><A HREF="../man1/cp.html"><B>cp</B></A>(1),</NOBR> <NOBR><A HREF="../man1/pax.html"><B>pax</B></A>(1),</NOBR>
-<NOBR><A HREF="../man1/tr.html"><B>tr</B></A>(1),</NOBR> <NOBR><A HREF="../man2/seek.html"><B>seek</B></A>(2)</NOBR>
+<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DL compact>
+<DT><NOBR><A href="../man1/cp.html"><B>cp</B></A>(1),</NOBR> <NOBR><A href="../man1/pax.html"><B>pax</B></A>(1),</NOBR>
+<NOBR><A href="../man1/tr.html"><B>tr</B></A>(1),</NOBR> <NOBR><A href="../man2/seek.html"><B>seek</B></A>(2)</NOBR>
 </DL>
-<DT><H4><A NAME="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
 
-<DL COMPACT>
-<DT><A NAME="author"><B>author</B></A><DD>Glenn Fowler
-&lt;gsf@research.att.com&gt;
-<DT><A NAME="copyright"><B>copyright</B></A><DD>Copyright &copy; 1989-1999 AT&amp;T Corp.
-<DT><A NAME="license"><B>license</B></A><DD><A HREF="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+<DL compact>
+<DT><A name="author"><B>author</B></A><DD>Glenn Fowler &lt;<A
+href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
+<DT><A name="copyright"><B>copyright</B></A><DD>Copyright &copy; 1989-1999 AT&amp;T Corp.
+<DT><A name="license"><B>license</B></A><DD><A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
 </DL></DL>
 </BODY>
 </HTML>'
@@ -1626,46 +1626,46 @@ TEST 30 'library interfaces'
 		ERROR - $'<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <HTML>
 <HEAD>
-<META NAME="generator" CONTENT="optget (AT&T Labs Research) 1999-08-11">
+<META name="generator" content="optget (AT&T Labs Research) 1999-08-11">
 <TITLE>sum man document</TITLE>
 </HEAD>
-<BODY bgcolor=\'#ffffff\'>
-<H4><TABLE WIDTH=100%><TR><TH ALIGN=LEFT>&nbsp;sum&nbsp;(&nbsp;3&nbsp;)&nbsp;<TH ALIGN=CENTER><A HREF="" TITLE="Index">USER LIBRARY</A><TH ALIGN=RIGHT>sum&nbsp;(&nbsp;3&nbsp;)</TR></TABLE></H4>
+<BODY bgcolor=white>
+<H4><TABLE width=100%><TR><TH align=left>&nbsp;sum&nbsp;(&nbsp;3&nbsp;)&nbsp;<TH align=center><A href="" title="Index">USER LIBRARY</A><TH align=right>sum&nbsp;(&nbsp;3&nbsp;)</TR></TABLE></H4>
 <HR>
-<DL COMPACT>
-<DT><H4><A NAME="NAME">NAME</A></H4>
-<DL COMPACT>
+<DL compact>
+<DT><H4><A name="NAME">NAME</A></H4>
+<DL compact>
 <DT>sum - checksum library
 <P>
 </DL>
-<DT><H4><A NAME="SYNOPSIS">SYNOPSIS</A></H4>
-<DL COMPACT>
+<DT><H4><A name="SYNOPSIS">SYNOPSIS</A></H4>
+<DL compact>
 <DT>#include &lt;sum.h&gt;
 </DL>
-<DT><H4><A NAME="DESCRIPTION">DESCRIPTION</A></H4>
-<DL COMPACT>
+<DT><H4><A name="DESCRIPTION">DESCRIPTION</A></H4>
+<DL compact>
 <DT><B>sum</B> is a checksum library.
 <P>
 </DL>
-<DT><H4><A NAME="FUNCTIONS">FUNCTIONS</A></H4>
-<DL COMPACT>
+<DT><H4><A name="FUNCTIONS">FUNCTIONS</A></H4>
+<DL compact>
 <DT>Sum_t* <B>sumopen</B>(const char* <I>method</I>)<DD>Open a sum handle for
 <I>method</I>.
 <DT>int <B>sumclose</B>(Sum_t* <I>sum</I>)<DD>Close a sum handle <I>sum</I>
 previously returned by <B>sumopen</B>.
 </DL>
-<DT><H4><A NAME="SEE ALSO">SEE ALSO</A></H4>
-<DL COMPACT>
-<DT><NOBR><A HREF="../man1/cksum.html"><B>cksum</B></A>(1)</NOBR>
+<DT><H4><A name="SEE ALSO">SEE ALSO</A></H4>
+<DL compact>
+<DT><NOBR><A href="../man1/cksum.html"><B>cksum</B></A>(1)</NOBR>
 </DL>
-<DT><H4><A NAME="IMPLEMENTATION">IMPLEMENTATION</A></H4>
-<DL COMPACT>
-<DT><A NAME="version"><B>version</B></A><DD>sum (AT&amp;T Labs Research)
+<DT><H4><A name="IMPLEMENTATION">IMPLEMENTATION</A></H4>
+<DL compact>
+<DT><A name="version"><B>version</B></A><DD>sum (AT&amp;T Labs Research)
 1999-12-11
-<DT><A NAME="author"><B>author</B></A><DD>Glenn Fowler
-&lt;gsf@research.att.com&gt;
-<DT><A NAME="copyright"><B>copyright</B></A><DD>Copyright &copy; 1995-1999 AT&amp;T Corp.
-<DT><A NAME="license"><B>license</B></A><DD><A HREF="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+<DT><A name="author"><B>author</B></A><DD>Glenn Fowler &lt;<A
+href="mailto:gsf@research.att.com">gsf@research.att.com</A>&gt;
+<DT><A name="copyright"><B>copyright</B></A><DD>Copyright &copy; 1995-1999 AT&amp;T Corp.
+<DT><A name="license"><B>license</B></A><DD><A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
 </DL></DL>
 </BODY>
 </HTML>'

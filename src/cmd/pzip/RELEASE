@@ -1,3 +1,4 @@
+00-02-11 pin: always have state.map, even with no freq filter
 99-11-03 pin: alb optimize()+solution() update (quadratic loop)
 99-09-25 pzip: change --split to --split[=pattern]
 99-09-11 pzip: change --split=dir to --split

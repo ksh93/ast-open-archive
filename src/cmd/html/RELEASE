@@ -1,4 +1,8 @@
-00-02-03 mm2html: fix -o nohtml.logo
+00-02-14 htmlrefs: add .htaccess and <LINK> checks
+	 mm2html: add .xx ref=...
+	 mm2html: use "..." tag attribute quote instead of '...'
+	 mm2html: .BL => <UL> square circle disc
+00-02-03 mm2html: fix -o nohtml.ident
 00-01-20 mm2html: fix -o quoted arg parse
 	 htmlrefs: add --perlwarn for embedded perl constructs
 99-08-11 mm2html,troff2html: add .xx begin=x end=x

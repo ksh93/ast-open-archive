@@ -69,7 +69,8 @@ spanexcept(Sfio_t* f, int type, void* data, Sfdisc_t* disc)
 			else
 			{
 				memcpy(span->data, f->data + f->size - span->size, span->size);
-				message((-11, "AHA KEEP %6I*d %9I*d c  %9I*d s  %9I*d t  %9I*d o", sizeof(span->cdb->count), span->cdb->count, sizeof(ssize_t), *(ssize_t*)data, sizeof(span->size), span->size, sizeof(Sfoff_t), sftell(f), sizeof(span->cdb->record->offset), span->cdb->record->offset));
+				message((-11, "AHA KEEP %d %6I*d %9I*d c  %9I*d s  %9I*d t  %9I*d o", sffileno(f), sizeof(span->cdb->count), span->cdb->count, sizeof(ssize_t), *(ssize_t*)data, sizeof(span->size), span->size, sizeof(Sfoff_t), sftell(f), sizeof(span->cdb->record->offset), span->cdb->record->offset));
+				sfsk(f, sftell(f), SEEK_SET, disc);
 			}
 		}
 		break;
@@ -93,7 +94,7 @@ spanread(Sfio_t* f, void* buf, size_t n, Sfdisc_t* disc)
 		if (m > n)
 			m = n;
 		memcpy(buf, span->data + span->peek, m);
-		message((-11, "AHA PEEK %6I*d %9I*d n  %9I*d m  %9I*d o `%-.64s'", sizeof(span->cdb->count), span->cdb->count, sizeof(n), n, sizeof(m), m, sizeof(span->peek), span->peek, buf));
+		message((-11, "AHA PEEK %d %6I*d %9I*d n  %9I*d m  %9I*d o %9I*d z `%-.64s'", sffileno(f), sizeof(span->cdb->count), span->cdb->count, sizeof(n), n, sizeof(m), m, sizeof(span->peek), span->peek, sizeof(span->size), span->size, buf));
 		if ((span->peek += m) >= span->size)
 			span->peek = 0;
 		return m;

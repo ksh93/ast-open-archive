@@ -62,6 +62,7 @@ CC.ARFLAGS =
 CC.DEBUG = -g
 CC.DIALECT = ANSI DYNAMIC
 CC.DLL = -D_DLL
+CC.DLLBIG = -D_DLL
 CC.DYNAMIC =
 CC.HOSTTYPE = `package CC=$cc`
 CC.LD = /usr/bin/ld

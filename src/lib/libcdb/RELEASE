@@ -1,3 +1,4 @@
+00-02-14 cdbimage: fix record span bug that caused cql regression test failures
 99-10-01 add: cdbimage() CDB_IMAGE
 99-08-11 cdbopen: fix referenced checks
 	 cdbflat: add test for fixed length records with terminator

@@ -8,7 +8,7 @@
 
 :PACKAGE: ast
 
-LICENSE = since=1990,author=gsf+dgk+ekrell
+LICENSE = since=1989,author=gsf+dgk+ekrell
 
 ID = 3d
 VERSION = 4.0
@@ -83,6 +83,6 @@ NAME3D = lib_3d.h std_3d.h vcs_3d.h
 -ldll :lib:
 
 3d :TEST: 3d.tst
-	$(BINDIR)/3d $(*)
+	$(BINDIR)/3d $(SHELL) $(REGRESS) $(REGRESSFLAGS) $(*)
 
 :: sys.tab

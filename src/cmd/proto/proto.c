@@ -37,7 +37,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)proto (AT&T Labs Research) 2000-01-11\n]"
+"[-?\n@(#)proto (AT&T Labs Research) 2000-02-14\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -47,6 +47,10 @@ USAGE_LICENSE
 "	written to the standard output unless the \b--replace\b option is"
 "	specified, in which case \afile\a is modified in-place.]"
 
+"[c:comment?\ab[m[e]]]]\a are the beginning, middle, and end comment"
+"	characters. If \ae\a is omitted then it defaults to \ab\a. If \am\a is"
+"	omitted then it defaults to \ab\a. Use \"\b/*\b\" for C comments,"
+"	\"\b#\b\" for shell, and \"\b(*)\b\" for pascal.]:[bme:=\"/*\"]"
 "[d:disable?Disable prototype conversion but still emit the identification"
 "	comment.]"
 "[e:externs?All \bextern\b references are for \apackage\a. Some systems"
@@ -83,6 +87,7 @@ USAGE_LICENSE
 "			[+copyleft|gpl?The GNU Public License.]"
 "			[+usage?License specific \boptget\b(3) usage strings.]"
 "			[+special|none?Special license text already in source.]"
+"			[+verbose?Include the disclaimer notice if any.]"
 "		}"
 "		[+author?A \b,\b separated list of \aname\a <\aemail\a> pairs.]"
 "		[+corporation?They own it all, e.g., \bAT&T\b.]"
@@ -90,6 +95,7 @@ USAGE_LICENSE
 "		[+organization?Within the company, e.g., \bNetwork Services"
 "			Research Department\b.]"
 "		[+location?Company location.]"
+"		[+notice?Disclaimer notice text with embedded newlines.]"
 "		[+package?The generic software package name, e.g., \bast\b.]"
 "		[+since?The year the software was first released.]"
 "		[+url?The URL of the detailed license text, e.g.,"
@@ -110,7 +116,7 @@ USAGE_LICENSE
 "	making intermediate directories as necessary.]:[directory]"
 "[L:list?Input file names are read one per line from \afile\a.]:[file]"
 "[P|+:plusplus?Convert \bextern()\b to \bextern(...)\b.]"
-"[S:shell?Display the license notice using shell \b#\b style comments.]"
+"[S:shell?Equivalent to \b--comment=\"#\".]"
 
 "\n"
 "\nfile ...\n"
@@ -187,7 +193,7 @@ USAGE_LICENSE
 #define S_IXOTH		0001
 #endif
 
-#ifndef _WIN32
+#if !_WIN32
 #define remove(x)	unlink(x)
 #define rename(x,y)	((link(x,y)||remove(x))?-1:0)
 #endif
@@ -228,7 +234,7 @@ extern int	mkdir(const char*, int);
 #endif
 
 static int
-proto(char* file, char* license, char* options, char* package, char* copy, int flags)
+proto(char* file, char* license, char* options, char* package, char* copy, char* comment, int flags)
 {
 	char*		b;
 	char*		e;
@@ -239,7 +245,7 @@ proto(char* file, char* license, char* options, char* package, char* copy, int f
 
 	if (file && access(file, 4))
 		proto_error(NiL, 2, file, "not found");
-	else if (b = pppopen(file, 0, license, options, package, flags))
+	else if (b = pppopen(file, 0, license, options, package, comment, flags))
 	{
 		if (!file)
 			fd = 1;
@@ -334,6 +340,7 @@ main(int argc, char** argv)
 	int		n;
 	char*		op;
 	char*		oe;
+	char*		comment = 0;
 	char*		copy = 0;
 	char*		list = 0;
 	char*		license = 0;
@@ -352,6 +359,13 @@ main(int argc, char** argv)
 			switch (*++file)
 			{
 			case 0:
+				break;
+			case 'c':
+				if (!*(comment = ++file) && !(comment = *++argv))
+				{
+					file = "??";
+					continue;
+				}
 				break;
 			case 'd':
 				flags |= PROTO_DISABLE;
@@ -440,7 +454,7 @@ main(int argc, char** argv)
 				flags |= PROTO_PLUSPLUS;
 				continue;
 			case 'S':
-				flags |= PROTO_SHARP;
+				comment = "#";
 				continue;
 			default:
 				proto_error(NiL, 2, file, "unknown option");
@@ -459,6 +473,9 @@ main(int argc, char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'c':
+			comment = opt_info.arg;
+			continue;
 		case 'd':
 			flags |= PROTO_DISABLE;
 			continue;
@@ -524,7 +541,7 @@ main(int argc, char** argv)
 			flags |= PROTO_PLUSPLUS;
 			continue;
 		case 'S':
-			flags |= PROTO_SHARP;
+			comment = "#";
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -552,15 +569,15 @@ main(int argc, char** argv)
 			if (b > buf)
 			{
 				*b = 0;
-				flags = proto(buf, license, options, package, copy, flags);
+				flags = proto(buf, license, options, package, copy, comment, flags);
 			}
 		} while (n > 0);
 		if (fd > 0)
 			close(fd);
 	}
 	if (file)
-		do flags = proto(file, license, options, package, copy, flags); while (file = *++argv);
+		do flags = proto(file, license, options, package, copy, comment, flags); while (file = *++argv);
 	else if (!list)
-		flags = proto(file, license, options, package, copy, flags);
+		flags = proto(file, license, options, package, copy, comment, flags);
 	return errors ? 1 : (flags & PROTO_ERROR) ? 2 : 0;
 }

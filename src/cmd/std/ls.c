@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)ls (AT&T Labs Research) 1999-11-19\n]"
+"[-?\n@(#)ls (AT&T Labs Research) 2000-02-07\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -48,8 +48,8 @@ USAGE_LICENSE
 "		[+physical?Don't follow symbolic links.]"
 "}"
 
-"[a:all?List entries starting with .]"
-"[A:almost-all?List all entries but . and ..]"
+"[a:all?List entries starting with \b.\b; turns off \b--almost-all\b.]"
+"[A:almost-all?List all entries but \b.\b and \b..\b; turns off \b--all\b.]"
 "[b:escape?Print escapes for nongraphic characters.]"
 "[B:ignore-backups?Do not list entries ending with ~.]"
 "[c:ctime?Sort by change time; list ctime with \b--long\b.]"
@@ -1167,6 +1167,7 @@ main(int argc, register char** argv)
 			break;
 		case 'A':
 			state.lsflags |= LS_MOST;
+			state.lsflags &= ~LS_ALL;
 			break;
 		case 'B':
 			state.lsflags |= LS_NOBACKUP;

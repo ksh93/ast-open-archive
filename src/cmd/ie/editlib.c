@@ -41,9 +41,9 @@
 #endif
 #ifdef TIOCLBIC
 #   undef TIOCLBIC
-#   ifdef _sys_ioctl_
+#   ifdef _sys_ioctl
 #	include	<sys/ioctl.h>
-#   endif /* _sys_ioctl_ */
+#   endif /* _sys_ioctl */
 #endif /* TIOCLBIC */
 
 #undef	read
@@ -156,7 +156,7 @@ size_t n;
 	{
 		if (!dll && !(dll = dllnext(RTLD_LAZY)))
 			goto bad;
-		if (!(readfn = (Read_f)dlsym(dll, "read")))
+		if (!(readfn = (Read_f)dlsym(dll, "_read")) && !(readfn = (Read_f)dlsym(dll, "read")))
 			goto bad;
 	}
 	r = (*readfn)(fd, buf, n);
@@ -362,29 +362,6 @@ char *name,*message;
 	p_str(message,'\n');
 	exit(2);
 }
-
-
-#ifndef F_DUPFD
-#   define F_DUPFD	0
-static int fcntl(f1,type,arg)
-register int arg;
-{
-	struct stat statbuf;
-	if(type==F_DUPFD)
-	{
-		register int fd;
-		/* find first non-open file */
-		while(arg < NFILE &&  (fstat(arg,&statbuf)>=0))
-			arg++;
-		if(arg >= NFILE)
-			return(-1);
-		fd = dup2(f1, arg);
-		return(fd);
-	   }
-	else 
-		return(0);
-}
-#endif	/* F_DUPFD */
 
 /*
  * print a prompt

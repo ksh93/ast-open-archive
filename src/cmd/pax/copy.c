@@ -1021,7 +1021,10 @@ void
 copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 {
 	register char*	s;
+	register char*	t;
+	register char*	v;
 	register int	c;
+	unsigned long	flags;
 
 	if (ap)
 	{
@@ -1040,9 +1043,9 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 				state.peekfile = 0;
 			else if (!(s = sfgetr(sfstdin, '\n', 1)))
 				break;
+			flags = state.ftwflags;
 			if (state.filter.line)
 			{
-				state.filter.line = 1;
 				if (!(c = *s++))
 					continue;
 				state.filter.options = s;
@@ -1063,9 +1066,46 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 					if (s = skip(s, c))
 						*s = 0;
 				}
+				s = state.filter.options;
+				for (;;)
+				{
+					if (t = strchr(s, ','))
+						*t = 0;
+					if (v = strchr(s, '='))
+					{
+						*v = 0;
+						c = strtol(v + 1, NiL, 0);
+					}
+					else
+						c = 1;
+					if (s[0] == 'n' && s[1] == 'o')
+					{
+						s += 2;
+						c = !c;
+					}
+					if (streq(s, "logical") || streq(s, "physical"))
+					{
+						if (s[0] == 'p')
+							c = !c;
+						if (c)
+							flags &= ~(FTW_META|FTW_PHYSICAL);
+						else
+						{
+							flags &= ~(FTW_META);
+							flags |= FTW_PHYSICAL;
+						}
+					}
+					if (v)
+						*v = '=';
+					if (!t)
+						break;
+					*t++ = ',';
+					s = t;
+				}
 				s = state.filter.path;
+				state.filter.line = *state.filter.name ? 2 : 1;
 			}
-			if (*s && ftwalk(s, copyfile, state.ftwflags, NiL))
+			if (*s && ftwalk(s, copyfile, flags, NiL))
 			{
 				error(2, "%s: not completely copied", s);
 				break;

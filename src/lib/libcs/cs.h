@@ -246,6 +246,7 @@ extern __PUBLIC_DATA__ Cs_t		cs;
 #define csauth		_cs_auth
 #define csbind		_cs_bind
 #define csclone		_cs_clone
+#define cschallenge	_cs_challenge
 #define csdaemon	_cs_daemon
 #define csfd		_cs_fd
 #define csfrom		_cs_from
@@ -280,6 +281,7 @@ extern Cs_t*		csalloc(Csdisc_t*);
 extern char*		csattr(Cs_t*, const char*, const char*);
 extern int		csauth(Cs_t*, int, const char*, const char*);
 extern int		csbind(Cs_t*, const char*, unsigned long, unsigned long, unsigned long);
+extern int		cschallenge(Cs_t*, const char* path, unsigned long*, unsigned long*);
 extern unsigned long	csclone(Cs_t*, int);
 extern int		csdaemon(Cs_t*, int);
 extern int		csfd(Cs_t*, int, int);

@@ -1,7 +1,7 @@
 /***************************************************************
 *                                                              *
 *           This software is part of the ast package           *
-*              Copyright (c) 1990-2000 AT&T Corp.              *
+*              Copyright (c) 1989-2000 AT&T Corp.              *
 *      and it may only be used by you under license from       *
 *                     AT&T Corp. ("AT&T")                      *
 *       A copy of the Source Code Agreement is available       *
@@ -60,9 +60,12 @@ int fstat(fd, st) int fd; struct stat* st;
 #if FS
 	Mount_t*	mp;
 
-	if (!fscall(NiL, MSG_fstat, 0, fd, st))
-		return state.ret;
-	mp = monitored();
+	if (!state.kernel)
+	{
+		if (!fscall(NiL, MSG_fstat, 0, fd, st))
+			return state.ret;
+		mp = monitored();
+	}
 #endif
 #ifdef _3D_STAT_VER
 	if (FXSTAT(_3d_ver, fd, st))
@@ -71,6 +74,8 @@ int fstat(fd, st) int fd; struct stat* st;
 	if (FSTAT(fd, st))
 		return -1;
 #endif
+	if (state.kernel)
+		return 0;
 #if FS
 	if (mp)
 		fscall(mp, MSG_fstat, 0, fd, st);
@@ -99,12 +104,17 @@ fstat643d(int fd, struct stat64* st)
 #if FS
 	Mount_t*	mp;
 
-	if (!fscall(NiL, MSG_fstat, 0, fd, &ss))
-		return state.ret;
-	mp = monitored();
+	if (!state.kernel)
+	{
+		if (!fscall(NiL, MSG_fstat, 0, fd, &ss))
+			return state.ret;
+		mp = monitored();
+	}
 #endif
 	if (FSTAT64(fd, st))
 		return -1;
+	if (state.kernel)
+		return 0;
 #if FS
 	if (mp)
 		fscall(mp, MSG_fstat, 0, fd, st);

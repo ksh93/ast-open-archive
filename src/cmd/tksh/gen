@@ -1,8 +1,9 @@
-if [[ $2 == "" ]]
+if [[ $2 != "" ]]
 then
 	for d in $(tw -Pd ${1-lib} -e "(type == DIR)")
 	do
-		printf '$(LIBDIR)%s:INSTALLDIR:' "${d#lib}"
+		typeset firstdir=${d%/*}
+		printf '$(LIBDIR)%s%s:INSTALLDIR:' "$2" "${d#$firstdir}"
 		for f in $d/*
 		do	[[ -f $f ]] && printf ' \\\n\t%s' "$f"
 		done

@@ -29,7 +29,7 @@ TEST 01 'pin'
 	DO	DATA tst.dat
 	PROG pin -v tst.dat
 		OUTPUT - $'# pzip partition
-# pin (AT&T Labs Research) 1999-11-03
+# pin (AT&T Labs Research) 2000-02-11
 # row 6 window 4194300 compression level 6
 
 6	# high frequency 1

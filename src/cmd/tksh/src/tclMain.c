@@ -12,10 +12,9 @@ Tcl_Main(argc, argv, appInitProc)
 					 * initialization but before starting
 					 * to execute commands. */
 {
-    char buffer[1000], *cmd, *args, *fileName;
-    int code, gotPartial, tty, length;
-    int exitCode = 0;
-    Tcl_Channel inChannel, outChannel, errChannel;
+    char buffer[1000], *args, *fileName;
+    int code, tty;
+    Tcl_Channel errChannel;
 
     Tcl_FindExecutable(argv[0]);
     interp = Tcl_CreateInterp();
@@ -87,7 +86,6 @@ Tcl_Main(argc, argv, appInitProc)
 			Tcl_GetVar(interp, "errorInfo", TCL_GLOBAL_ONLY), -1);
 		Tcl_Write(errChannel, "\n", 1);
 	    }
-	    exitCode = 1;
 	}
 	goto done;
     }

@@ -36,7 +36,7 @@ scripts that use components that have been implemented in Tcl
 .P
 .I tksh
 was developed by
-\h'0*\w"http://www.cs.princeton.edu/~jlk"'Jeff Korn\h'0'
+\h'0*\w"http://www.research.att.com/~jlk"'Jeff Korn\h'0'
 and is distributed by
 \h'0*\w"mailto:advsoft@research.att.com"'advsoft@research.att.com\h'0'.
 For the latest information vist the

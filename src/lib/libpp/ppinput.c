@@ -173,7 +173,7 @@ pppush(register int t, register char* s, register char* p, int n)
 				cur->flags |= IN_regular;
 			errno = 0;
 #if PROTOTYPE
-			if (!(pp.test & TEST_noproto) && ((pp.state & COMPATIBILITY) || (pp.option & PLUSPLUS)) && (cur->buffer = pppopen(NiL, cur->fd, NiL, NiL, NiL, (PROTO_HEADER|PROTO_RETAIN)|((pp.option & PROTOTYPED) ? PROTO_FORCE : PROTO_PASS)|((pp.mode & MARKC) ? PROTO_PLUSPLUS : 0))))
+			if (!(pp.test & TEST_noproto) && ((pp.state & COMPATIBILITY) || (pp.option & PLUSPLUS)) && (cur->buffer = pppopen(NiL, cur->fd, NiL, NiL, NiL, NiL, (PROTO_HEADER|PROTO_RETAIN)|((pp.option & PROTOTYPED) ? PROTO_FORCE : PROTO_PASS)|((pp.mode & MARKC) ? PROTO_PLUSPLUS : 0))))
 			{
 				*(p = cur->buffer - 1) = 0;
 				cur->buffer -= PPBAKSIZ;

@@ -40,7 +40,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pin (AT&T Labs Research) 1999-11-03\n]"
+"[-?\n@(#)pin (AT&T Labs Research) 2000-02-11\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -314,7 +314,7 @@ dumppart(Sfio_t* sp, const char* label, register Part_t* pp)
 
 	sfprintf(sp, "reorder %s %5u %5u :", label, pp->rate, pp->size);
 	for (i = 0; i < pp->elements; i++)
-		sfprintf(sp, " %3u", state.map ? state.map[pp->member[i]] : pp->member[i]);
+		sfprintf(sp, " %3u", state.map[pp->member[i]]);
 	sfprintf(sp, "\n");
 }
 
@@ -578,11 +578,11 @@ reorder(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot
 			siz[i][i] = field(buf, dat, i, i, row, tot);
 			if (sp)
 			{
-				sfprintf(sp, "p %d %d %I*u\n", state.map ? state.map[i] : i, state.map ? state.map[i] : i, sizeof(siz[i][i]), siz[i][i]);
+				sfprintf(sp, "p %d %d %I*u\n", state.map[i], state.map[i], sizeof(siz[i][i]), siz[i][i]);
 				error_info.line++;
 			}
 			if (state.verbose)
-				sfprintf(sfstderr, "reorder pairs for %d [%d]\n", i, state.map ? state.map[i] : i);
+				sfprintf(sfstderr, "reorder pairs for %d [%d]\n", i, state.map[i]);
 			for (j = 0; j < i; j++)
 			{
 				z = pair(buf, dat, i, j, row, tot);
@@ -609,7 +609,7 @@ reorder(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot
 					cp++;
 					if (sp)
 					{
-						sfprintf(sp, "p %d %d %I*u\n", state.map ? state.map[ii] : ii, state.map ? state.map[jj] : jj, sizeof(z), z);
+						sfprintf(sp, "p %d %d %I*u\n", state.map[ii], state.map[jj], sizeof(z), z);
 						error_info.line++;
 					}
 				}
@@ -663,7 +663,7 @@ reorder(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot
 					np->elements = ii;
 					cst[tp->member[j]] = tp->size - part(buf, dat, np, row, tot);
 					if (state.test & 0x0020)
-						sfprintf(sfstderr, "reorder cost %6u %u\n", state.map ? state.map[tp->member[j]] : tp->member[j], cst[tp->member[j]]);
+						sfprintf(sfstderr, "reorder cost %6u %u\n", state.map[tp->member[j]], cst[tp->member[j]]);
 				}
 		for (tp = cur; tp < cp; tp++)
 		{
@@ -774,13 +774,10 @@ reorder(unsigned char* buf, unsigned char* dat, int* lab, size_t row, size_t tot
 	 * permute state.map and dat according to the new order
 	 */
 
-	if (state.map)
-	{
-		for (i = 0; i < row; i++)
-			hit[i] = state.map[i];
-		for (i = 0; i < row; i++)
-			state.map[i] = hit[cst[i]];
-	}
+	for (i = 0; i < row; i++)
+		hit[i] = state.map[i];
+	for (i = 0; i < row; i++)
+		state.map[i] = hit[cst[i]];
 	for (end = dat + tot; dat < end; dat += row)
 	{
 		memcpy(buf, dat, row);
@@ -971,6 +968,13 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 		*bufp = dat;
 		*datp = buf;
 	}
+	else
+	{
+		if (!(state.map = newof(0, size_t, row, 0)))
+			error(ERROR_SYSTEM|3, "out of space [map]");
+		for (i = 0; i < row; i++)
+			state.map[i] = i;
+	}
 	return row;
 }
 
@@ -1098,12 +1102,12 @@ list(Sfio_t* sp, int* lab, size_t row)
 		}
 		else
 			sfprintf(sp, " ");
-		for (j = i + 1; j < row && lab[j] == g && (!state.map || state.map[j] == (state.map[j - 1] + 1)); j++);
-		sfprintf(sp, "%d", state.map ? state.map[i] : i);
+		for (j = i + 1; j < row && lab[j] == g && state.map[j] == (state.map[j - 1] + 1); j++);
+		sfprintf(sp, "%d", state.map[i]);
 		if ((j - i) > 1)
 		{
 			i = j - 1;
-			sfprintf(sp, "-%d", state.map ? state.map[i] : i);
+			sfprintf(sp, "-%d", state.map[i]);
 		}
 	}
 	sfprintf(sp, "\n");

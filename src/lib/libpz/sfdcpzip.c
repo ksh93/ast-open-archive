@@ -126,7 +126,15 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 {
 	Sfio_t*		io;
 	Sfpzip_t*	pz;
+	Pz_t*		oz;
 
+	if (flags & PZ_HANDLE)
+	{
+		oz = (Pz_t*)sp;
+		sp = oz->io;
+	}
+	else
+		oz = 0;
 	if (sp->flags & SF_WRITE)
 	{
 		if (flags & PZ_STAT)
@@ -171,13 +179,19 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 		return -1;
 	}
 	pz->disc.version = PZ_VERSION;
+	flags &= ~(PZ_READ|PZ_WRITE|PZ_STAT|PZ_STREAM|PZ_INTERNAL);
+	flags |= PZ_STREAM|((sp->flags & SF_READ) ? PZ_READ : PZ_WRITE);
+	if (oz && (oz->flags & PZ_WRITE))
+		flags |= PZ_DELAY;
 	if (disc)
 	{
 		pz->disc.errorf = disc->errorf;
 		pz->disc.window = disc->window;
 		pz->disc.options = disc->options;
+		if (disc->splitf)
+			flags |= PZ_ACCEPT;
 	}
-	if (!(pz->pz = pzopen(&pz->disc, (char*)io, ((sp->flags & SF_READ) ? PZ_READ : PZ_WRITE)|PZ_STREAM|(flags & ~(PZ_READ|PZ_WRITE|PZ_STAT|PZ_STREAM|PZ_INTERNAL)))))
+	if (!(pz->pz = pzopen(&pz->disc, (char*)io, flags)))
 	{
 		io->file = -1;
 		sfclose(io);
@@ -203,5 +217,7 @@ sfdcpzip(Sfio_t* sp, Pzdisc_t* disc, const char* path, unsigned long flags)
 		free(pz);
 		return -1;
 	}
+	if (oz)
+		oz->flags |= pz->pz->flags & PZ_INTERNAL;
 	return 1;
 }

@@ -1,3 +1,5 @@
+00-02-07 ls: -a and -A now mutually exclusive
+	 shar: add $USAGE_LICENSE
 00-01-25 touch: add invalid st_mtime value CAVEAT
 	 ls.tst: limit max st_mtime to 0x7fffffe to avoid stat(2) EOVERFLOW
 00-01-11 tsort: fix

@@ -1,7 +1,7 @@
 /***************************************************************
 *                                                              *
 *           This software is part of the ast package           *
-*              Copyright (c) 1990-2000 AT&T Corp.              *
+*              Copyright (c) 1989-2000 AT&T Corp.              *
 *      and it may only be used by you under license from       *
 *                     AT&T Corp. ("AT&T")                      *
 *       A copy of the Source Code Agreement is available       *
@@ -53,6 +53,7 @@
 #define _cs_attr	_3d_cs_attr
 #define _cs_auth	_3d_cs_auth
 #define _cs_bind	_3d_cs_bind
+#define _cs_challenge	_3d_cs_challenge
 #define _cs_clone	_3d_cs_clone
 #define _cs_daemon	_3d_cs_daemon
 #define _cs_fd		_3d_cs_fd

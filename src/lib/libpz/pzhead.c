@@ -58,7 +58,7 @@ pzheadread(register Pz_t* pz)
 	else
 		i = n = 0;
 	if (pz->disc->errorf)
-		(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzheadread: i=%02x n=%02x%s", pz->path, i, n, s ? "" : " (nil)");
+		(*pz->disc->errorf)(pz, pz->disc, -1, "%s: pzheadread: f=%08x i=%02x n=%02x%s", pz->path, pz->flags, i, n, s ? "" : " (nil)");
 	if (i != PZ_MAGIC_1 || n != PZ_MAGIC_2)
 	{
 		sfread(pz->io, s, 0);
@@ -102,19 +102,24 @@ pzheadread(register Pz_t* pz)
 				pz->flags &= ~PZ_ROWONLY;
 			}
 		}
-		if (n > 0)
+		if (n <= 0)
 		{
-			if (!(pp = vmnewof(pz->vm, 0, Pzpart_t, 1, 0)))
+			if (!(pz->flags & PZ_DELAY))
+			{
+				if (pz->disc->errorf)
+					(*pz->disc->errorf)(pz, pz->disc, 2, "%s: unknown input format", pz->path);
 				return -1;
-			pz->major = PZ_MAJOR;
-			pz->minor = PZ_MINOR;
-			pp->name = "";
-			pp->row = n;
-			return pzpartinit(pz, pp, NiL);
+			}
+			pz->flags |= PZ_UNKNOWN;
+			n = 1;
 		}
-		if (pz->disc->errorf)
-			(*pz->disc->errorf)(pz, pz->disc, 2, "%s: unknown input format", pz->path);
-		return -1;
+		if (!(pp = vmnewof(pz->vm, 0, Pzpart_t, 1, 0)))
+			return -1;
+		pz->major = PZ_MAJOR;
+		pz->minor = PZ_MINOR;
+		pp->name = "";
+		pp->row = n;
+		return pzpartinit(pz, pp, NiL);
 	}
 	sfread(pz->io, s, 2);
 	pz->flags &= ~PZ_FORCE;

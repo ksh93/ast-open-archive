@@ -28,9 +28,15 @@
 #include "tcl.h"
 #undef panic
 
+#if _BLD_tcl && defined(__EXPORT__)
+#define extern		__EXPORT__
+#endif
+
 EXTERN void		panic _ANSI_ARGS_((char *format, char *arg1,
 			    char *arg2, char *arg3, char *arg4, char *arg5,
 			    char *arg6, char *arg7, char *arg8));
+
+#undef	extern
 
 /*
  * The panicProc variable contains a pointer to an application

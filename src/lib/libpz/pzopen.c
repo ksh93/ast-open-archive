@@ -157,7 +157,7 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 			sfsetbuf(pz->io, (void*)pz->io, SF_UNBOUND);
 		if (pz->flags & PZ_DIO)
 			sfdcdio(pz->io, 0);
-		if (!(pz->flags & PZ_POP) && (!(pz->flags & PZ_WRITE) && sfdcgzip(pz->io, (pz->flags & PZ_CRC) ? 0 : SFGZ_NOCRC) > 0 || (pz->flags & PZ_WRITE) && sfdcpzip(pz->io, disc, pz->path, pz->flags|PZ_FORCE|PZ_PUSHED) > 0))
+		if (!(pz->flags & PZ_POP) && (!(pz->flags & PZ_WRITE) && sfdcgzip(pz->io, (pz->flags & PZ_CRC) ? 0 : SFGZ_NOCRC) > 0 || (pz->flags & PZ_WRITE) && sfdcpzip((Sfio_t*)pz, disc, pz->path, pz->flags|PZ_FORCE|PZ_PUSHED|PZ_HANDLE) > 0))
 			pz->flags |= PZ_POP;
 		else
 			pz->flags &= ~PZ_CRC;
@@ -191,6 +191,12 @@ pzopen(Pzdisc_t* disc, const char* path, unsigned long flags)
 		}
 		if (pz->options && pzoptions(pz, pz->part, pz->options, 1) < 0)
 			goto bad;
+		if ((pz->flags & PZ_UNKNOWN) && !pz->disc->readf && !pz->disc->splitf)
+		{
+			if (pz->disc->errorf)
+				(*pz->disc->errorf)(pz, pz->disc, 2, "%s: unknown input format", pz->path);
+			goto bad;
+		}
 	}
 
 	/*

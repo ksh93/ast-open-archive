@@ -1,3 +1,4 @@
+00-02-14 cschallenge(): add stat() to verify touch()
 00-02-03 features/lib: add sys/types.h to htons etc. header refs
 00-01-25 genlocal: use package instead of hostinfo
 99-10-07 csbind: NODELAY for CS_ADDR_NOW only

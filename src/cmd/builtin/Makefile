@@ -46,7 +46,7 @@ BUILTINS :COMMAND: cmd.h
 		end
 	end
 
-:BUILTIN: mime od pr strings tr uudecode -luu uuencode -luu what who
+:BUILTIN: fmt mime od pr strings tr uudecode -luu uuencode -luu what who
 
 :INSTALL: $(BINDIR)/ln $(BINDIR)/mv
 
@@ -54,6 +54,6 @@ $(BINDIR)/ln :LINK: cp
 
 $(BINDIR)/mv :LINK: cp
 
-:: RELEASE od.tst
+:: PROMO.mm RELEASE
 
 :TEST: cut expr join od paste tail tr uuencode

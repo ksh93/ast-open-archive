@@ -74,7 +74,7 @@
 #define in_raw		editb.e_addnl
 
 
-#ifdef _sgtty_
+#ifdef _hdr_sgtty
 #   ifdef TIOCGETP
 	static int l_mask;
 	static struct tchars l_ttychars;
@@ -84,15 +84,16 @@
 #	define T_CHARS	2
 #	define L_MASK	1
 #   endif /* TIOCGETP */
-#endif /* _sgtty_ */
+#endif /* _hdr_sgtty */
 
 #ifndef IODELAY
 #   undef _SELECT5_
 #endif /* IODELAY */
 #ifdef _SELECT5_
-#   ifndef included_sys_time_
+#   ifndef included_sys_time
+#       define included_sys_time	1
 #	include	<sys/time.h>
-#   endif /* included_sys_time_ */
+#   endif /* included_sys_time */
 	static int delay;
 #   ifndef KSHELL
     	    int tty_speeds[] = {0, 50, 75, 110, 134, 150, 200, 300,
@@ -443,13 +444,13 @@ register int fd;
  *	return the window size
  */
 
-#ifdef _sys_stream_
+#ifdef _sys_stream
 #   include	<sys/stream.h>
-#endif /* _sys_ptem_ */
-#ifdef _sys_ptem_
+#endif /* _sys_stream */
+#ifdef _sys_ptem
 #   include	<sys/ptem.h>
-#endif /* _sys_stream_ */
-#ifdef _sys_jioctl_
+#endif /* _sys_ptem */
+#ifdef _sys_jioctl
 #   include	<sys/jioctl.h>
 #   define winsize	jwinsize
 #   define ws_col	bytesx
@@ -457,7 +458,7 @@ register int fd;
 #	undef TIOCGWINSZ
 #   endif /* TIOCGWINSZ */
 #   define TIOCGWINSZ	JWINSIZE
-#endif /* _sys_jioctl_ */
+#endif /* _sys_jioctl */
 
 int ed_window()
 {

@@ -27,7 +27,12 @@
 # AT&T Research
 
 command=crontab
-cron="at -qc"
+prefix=${0##*/}
+case $prefix in
+*_*)	prefix=${prefix%%_*}_ ;;
+*)	prefix= ;;
+esac
+cron="${prefix}at -qc"
 file=$HOME/.$command
 replace=
 temp=${TMPDIR:-/tmp}/cron$$
@@ -35,7 +40,7 @@ op=
 
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	usage=$'[-?
-@(#)crontab (AT&T Labs Research) 1999-05-09
+@(#)crontab (AT&T Labs Research) 2000-02-14
 ]
 '$USAGE_LICENSE$'
 [+NAME?crontab - schedule periodic background work]
@@ -100,7 +105,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	specified as an element or list, then any day matching either the
 	month and day of month or the day of week, will be matched.]
 [+?The sixth field of a line in a crontab entry is a string that will
-	be executed by sh at the specified times.  A percent sign character
+	be executed by \bsh\b at the specified times.  A percent sign character
 	in this field will be translated to a newline character. Any
 	character preceded by a backslash (including the %) causes that
 	character to be treated literally. Only the first line (up to a "%"

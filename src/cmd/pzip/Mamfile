@@ -1,10 +1,10 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
 setv PACKAGE_pz_LIB ${PACKAGE_pz}/lib
-setv PACKAGE_ast ../../..
-setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include
+setv PACKAGE_ast ${INSTALLROOT}
+setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
 setv PACKAGEROOT ../../../../..
 setv AR ar
@@ -52,11 +52,13 @@ done ${PACKAGE_pz_INCLUDE}/ast/ast_botch.h dontcare
 make ${PACKAGE_pz_INCLUDE}/ast/ast_unistd.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/ast_unistd.h dontcare
 make ${PACKAGE_pz_INCLUDE}/ast/re_comp.h implicit
+make ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 make ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_pz_INCLUDE}/ast/prototyped.h dontcare
 done ${PACKAGE_pz_INCLUDE}/ast/re_comp.h dontcare
 make ${PACKAGE_pz_INCLUDE}/ast/getopt.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/getopt.h dontcare
 make ${PACKAGE_pz_INCLUDE}/ast/ast_fcntl.h implicit
 make ${PACKAGE_pz_INCLUDE}/ast/ls.h implicit
@@ -67,7 +69,7 @@ make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ${PACKAGE_pz_INCLUDE}/ast/ast_fs.h dontcare
 prev ${PACKAGE_pz_INCLUDE}/ast/ast_std.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/ls.h dontcare
 prev ${PACKAGE_pz_INCLUDE}/ast/ast_fs.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/ast_fcntl.h dontcare
@@ -86,10 +88,10 @@ prev ${PACKAGE_pz_INCLUDE}/ast/getopt.h implicit
 make ${PACKAGE_pz_INCLUDE}/ast/ast_lib.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/ast_lib.h dontcare
 prev ${PACKAGE_pz_INCLUDE}/ast/ast_common.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/ast_std.h dontcare
 done ${PACKAGE_pz_INCLUDE}/ast/sfio.h dontcare
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/sfstr.h
 make ${PACKAGE_pz_INCLUDE}/ast/sfdcbzip.h implicit
 make ${PACKAGE_pz_INCLUDE}/ast/sfdisc.h implicit
@@ -97,13 +99,13 @@ make ${PACKAGE_pz_INCLUDE}/ast/ast.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/sfio.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/ast_std.h implicit
 make ${PACKAGE_pz_INCLUDE}/ast/ast_version.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/ast_version.h dontcare
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/ast.h dontcare
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/sfdisc.h dontcare
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/sfdcbzip.h
 make ${PACKAGE_pz_INCLUDE}/ast/pzip.h implicit
 make ${PACKAGE_pz_INCLUDE}/ast/vmalloc.h implicit
@@ -112,23 +114,23 @@ prev ${PACKAGE_pz_INCLUDE}/ast/ast_std.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/vmalloc.h dontcare
 make ${PACKAGE_pz_INCLUDE}/ast/sfdcgzip.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/sfdisc.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/sfdcgzip.h dontcare
 make ${PACKAGE_pz_INCLUDE}/ast/option.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/ast.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/option.h dontcare
 make ${PACKAGE_pz_INCLUDE}/ast/cdt.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/ast_common.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/ast_std.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/cdt.h dontcare
 prev ${PACKAGE_pz_INCLUDE}/ast/ast.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/pzip.h
 make ${PACKAGE_pz_INCLUDE}/ast/error.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/option.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/ast.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/error.h
 prev ${PACKAGE_pz_INCLUDE}/ast/ast.h implicit
 done pzip.c
@@ -150,7 +152,7 @@ make pop.o
 make pop.c
 make ${PACKAGE_pz_INCLUDE}/ast/tok.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/ast.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/tok.h
 prev ${PACKAGE_pz_INCLUDE}/ast/sfstr.h implicit
 prev ${PACKAGE_pz_INCLUDE}/ast/pzip.h implicit
@@ -171,7 +173,7 @@ make ${PACKAGE_pz_INCLUDE}/ast/bzlib.h implicit
 make windows.h implicit
 done windows.h dontcare virtual
 prev ${PACKAGE_pz_INCLUDE}/ast/stdio.h implicit
-prev ${PACKAGE_pz_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_pz_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_pz_INCLUDE}/ast/bzlib.h
 make ${PACKAGE_pz_INCLUDE}/ast/zlib.h implicit
 make ${PACKAGE_pz_INCLUDE}/ast/zconf.h implicit

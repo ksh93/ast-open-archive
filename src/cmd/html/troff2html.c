@@ -95,8 +95,8 @@ USAGE_LICENSE
 "		at the top of the document.]"
 "	[+mailto=address?Sets the email \aaddress\a to send comments and"
 "		suggestions.]"
-"	[+meta.name?Emits the \bhtml\b tag \b<META NAME=\b\aname\a"
-"		\bCONTENT=\b\acontent\a\b>\b.]"
+"	[+meta.name?Emits the \bhtml\b tag \b<META name=\b\"\aname\a\""
+"		\bcontent=\b\"\acontent\a\"\b>\b.]"
 "	[+package=text?\atext\a is prepended to the \bhtml\b document title.]"
 "	[+set=+-register?Traces each \bset\b for the named number"
 "		\aregister\a. \b-\b turns tracing off.]"
@@ -3645,7 +3645,7 @@ setopt(void* a, const void* x, register int n, const char* v)
 	{
 		if (strneq(v, "meta.", 5))
 		{
-			sfprintf(state.tmp, "<META NAME=\"%s\" CONTENT=\"%s\">", v + 5, v + n);
+			sfprintf(state.tmp, "<META name=\"%s\" content=\"%s\">", v + 5, v + n);
 			code_n(OP_RAW, sfstruse(state.tmp));
 		}
 		else
@@ -4837,7 +4837,7 @@ tag(Sfio_t* op, int index, register int flags, int att, char* att_str, int att_n
 				sfprintf(sfstderr, "stack contents:\n");
 				sp = state.tag_top;
 				while (--sp >= state.tag_stack)
-					sfprintf(sfstderr, "\t<%s%s%s>\n", (*sp & OP_END) ? "/" : "", tag_name[OP(*sp)], (*sp & OP_LABEL) ? " LABEL=1" : "");
+					sfprintf(sfstderr, "\t<%s%s%s>\n", (*sp & OP_END) ? "/" : "", tag_name[OP(*sp)], (*sp & OP_LABEL) ? " label=1" : "");
 				return;
 			}
 			n = *--sp;
@@ -4905,18 +4905,18 @@ tag(Sfio_t* op, int index, register int flags, int att, char* att_str, int att_n
 			if (ARG_ATTR(flags))
 			{
 				if ((n = ARG_ALIGN(flags)) >= 0)
-					sfprintf(op, " ALIGN=%s", opt_align[n]);
+					sfprintf(op, " align=%s", opt_align[n]);
 				if (flags & ARG_compact)
 					sfputr(op, " COMPACT", -1);
 				if (flags & ARG_wide)
-					sfputr(op, " WIDTH=100%", -1);
+					sfputr(op, " width=100%", -1);
 			}
 			if (index == OP_body)
 			{
 				if (state.background)
-					sfprintf(op, " BACKGROUND=\"%s\"", state.background);
+					sfprintf(op, " background=\"%s\"", state.background);
 				if (state.logo)
-					sfprintf(op, ">\n<CENTER><IMG SRC=\"%s\"></CENTER", state.logo);
+					sfprintf(op, ">\n<CENTER><IMG src=\"%s\"></CENTER", state.logo);
 			}
 			sfputc(op, '>');
 			if (flags & LINE)
@@ -5022,7 +5022,7 @@ html(register unsigned char* s, Sfio_t* op)
 	tag(op, OP_html, STACK|LINE, 0, NiL, 0);
 	tag(op, OP_head, STACK|LINE, 0, NiL, 0);
 	t = (unsigned char*)strchr(usage, '\n') + 5;
-	sfprintf(op, "<META NAME=\"generator\" CONTENT=\"%-.*s", strchr((char*)t, '\n') - (char*)t, t);
+	sfprintf(op, "<META name=\"generator\" content=\"%-.*s", strchr((char*)t, '\n') - (char*)t, t);
 	for (x = state.macros; x; x = x->next)
 		sfprintf(op, " -m%s", x->name);
 	sfputr(op, "\">\n", -1);
@@ -5581,7 +5581,7 @@ html(register unsigned char* s, Sfio_t* op)
 					sfprintf(state.tmp, "(%d)", OP(m));
 					v = (unsigned char*)sfstruse(state.tmp);
 				}
-				error(2, "internal error: <%s%s%s %d> ignored", (m & OP_END) ? "/" : "", v, (m & OP_LABEL) ? " LABEL" : "", c);
+				error(2, "internal error: <%s%s%s %d> ignored", (m & OP_END) ? "/" : "", v, (m & OP_LABEL) ? " label=" : "", c);
 				break;
 			compact:
 				if (col)
@@ -5692,7 +5692,7 @@ html(register unsigned char* s, Sfio_t* op)
 						u = t;
 					v = (unsigned char*)"#";
 				}
-				sfprintf(op, "<A HREF=\"%s%s\">%s</A>", v, t, u);
+				sfprintf(op, "<A href=\"%s%s\">%s</A>", v, t, u);
 				break;
 			case LABEL(OP_link):
 				DATA();
@@ -5700,7 +5700,7 @@ html(register unsigned char* s, Sfio_t* op)
 					*u++ = 0;
 				else
 					u = v;
-				sfprintf(op, "<A NAME=\"%s\">%s</A>", v, u);
+				sfprintf(op, "<A name=\"%s\">%s</A>", v, u);
 				break;
 			case OP_RAW:
 				DATA();
@@ -5854,7 +5854,7 @@ html(register unsigned char* s, Sfio_t* op)
 	if (col)
 		sfputc(op, '\n');
 	if (state.mailto)
-		sfprintf(op, "<P>Send comments and suggestions to <A HREF=\"mailto:%s?subject=%s\">%s</A>.\n", state.mailto, state.mailto, sfstrbase(subject));
+		sfprintf(op, "<P>Send comments and suggestions to <A href=\"mailto:%s?subject=%s\">%s</A>.\n", state.mailto, state.mailto, sfstrbase(subject));
 	if (state.author || state.corporation || state.company || state.location)
 	{
 		t = (unsigned char*)"<P>";

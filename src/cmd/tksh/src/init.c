@@ -48,7 +48,7 @@ static int initFirstInterp;
  * defined by Makefile.
  */
      
-static char pkgPath[200] = TCL_PACKAGE_PATH;
+static char pkgPath[PATH_MAX];
 
 void TclSetupEnv(Tcl_Interp *interp)
 {
@@ -57,6 +57,12 @@ void TclSetupEnv(Tcl_Interp *interp)
 
 void TclPlatformInit(Tcl_Interp *interp)
 {
+	char*	p;
+	char*	s;
+
+	p = strncpy(pkgPath, TkshLibDir(), sizeof(pkgPath) - 1);
+	if (s = strrchr(p, '/'))
+		*s = 0;
 	Tcl_SetVar(interp, "tcl_pkgPath", pkgPath, TCL_GLOBAL_ONLY);
 	Tcl_SetVar2(interp,"tcl_platform", "platform", "unix", TCL_GLOBAL_ONLY);
 	Tcl_SetVar2(interp,"tcl_platform", "os", "", TCL_GLOBAL_ONLY);
@@ -73,11 +79,7 @@ void TkshCreateInterp(Tcl_Interp *interp, void *data)
 	int i;
 
 	buf[0]='t'; buf[1]='c'; buf[2]='l'; buf[3]='_'; buf[4]=0;
-#ifdef TKSH_V75
-	((Interp *) interp)->interpType = INTERP_CURRENT;
-#else
 	((Interp *) interp)->interpType = INTERP_TCL;
-#endif
 
 	if (initFirstInterp)
 		return;
@@ -133,7 +135,7 @@ static char initScript[] =
 	       . $tcl_library/init.ksh\n\
        else \n\
        msg=\"can't find $tcl_library/init.ksh; perhaps you\"\n\
-       msg=\"$msg need to\ninstall Tksh or set your TKSH_LIBRARY\"\n\
+       msg=\"$msg need to\ninstall Tksh or set your LIB_DIR\"\n\
        msg=\"$msg environment variable?\"\n\
        tcl_error \"$msg\" 2> /dev/null\n\
        unset tksh_version\n\
@@ -160,7 +162,6 @@ static char initScript[] =
 
 int Tcl_Init(Tcl_Interp *interp)
 {
-	int x;
 	Interp *iPtr = (Interp *) interp;
 	dprintf(("Using TKSH, compiled %s %s\n", __DATE__, __TIME__));
 #ifdef DEBUG
@@ -172,7 +173,7 @@ int Tcl_Init(Tcl_Interp *interp)
 	Tksh_SetCommandType(interp, "tcl_vwait", INTERP_TCL);
 	iPtr->interpType=INTERP_CURRENT;
 
-	x = Tksh_Eval(interp, initScript, 0);
+	Tksh_Eval(interp, initScript, 0);
 	Tcl_ResetResult(interp);	/* Shouln't have to do this... */
 	if (Tcl_GetVar2(interp, "tksh_version", NULL, TCL_GLOBAL_ONLY))
 		return TCL_OK;
@@ -194,13 +195,17 @@ int Tcl_Init(Tcl_Interp *interp)
 
 char *TkshLibDir(void)
 {
-	char*	libDir;
-	char	buf[PATH_MAX];
+	char		buf[PATH_MAX];
 
-	if ((!(libDir = getenv(LIB_DIR_ENV)) || !*libDir) &&
-	    (!(libDir = pathpath(buf, LIB_DIR, "", PATH_EXECUTE|PATH_READ)) ||
-	     !(libDir = strdup(buf))))
-		libDir = TKSH_LIBRARY;
+	static char*	libDir;
+
+	if (!libDir && !(libDir = getenv(LIB_DIR_ENV)) || !*libDir)
+	{
+		if (!(libDir = pathpath(buf, LIB_DIR, "", PATH_EXECUTE|PATH_READ)))
+			sfsprintf(buf, sizeof(buf), "/usr/local/%s", LIB_DIR);
+		if (!(libDir = strdup(buf)))
+			libDir = TKSH_LIBRARY;
+	}
 	return libDir;
 }
 
@@ -290,4 +295,17 @@ Tcl_SourceRCFile(interp)
 	}
         Tcl_DStringFree(&temp);
     }
+}
+
+/*
+ * this forces a few tcl routines to be linked before -ltk has a chance
+ * to say it needs them
+ *
+ * NOTE: don't call this
+ */
+
+void _tcl_force_link(void)
+{
+	Tcl_LinkVar(0, 0, 0, 0);
+	Tcl_UnlinkVar(0, 0);
 }

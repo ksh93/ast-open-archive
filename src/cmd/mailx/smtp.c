@@ -64,10 +64,13 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 	 * verify
 	 */
 
-	if (!(s = sfgetr(rp, '\n', 1)))
-		goto bad_recv;
-	if (strtol(s, &e, 10) != SMTP_READY)
-		goto bad_prot;
+	do
+	{
+		if (!(s = sfgetr(rp, '\n', 1)))
+			goto bad_recv;
+		if (strtol(s, &e, 10) != SMTP_READY)
+			goto bad_prot;
+	} while (*e == '-');
 
 	/*
 	 * identify
@@ -77,10 +80,13 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 		s = state.var.user;
 	if (sfprintf(sp, "HELO %s\r\n", s) < 0)
 		goto bad_send;
-	if (!(s = sfgetr(rp, '\n', 1)))
-		goto bad_recv;
-	if (strtol(s, &e, 10) != SMTP_OK)
-		goto bad_prot;
+	do
+	{
+		if (!(s = sfgetr(rp, '\n', 1)))
+			goto bad_recv;
+		if (strtol(s, &e, 10) != SMTP_OK)
+			goto bad_prot;
+	} while (*e == SMTP_OK);
 
 	/*
 	 * from
@@ -104,10 +110,13 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 	}
 	if (sfprintf(sp, "MAIL FROM:<%*.*s>\r\n", n, n, s) < 0)
 		goto bad_send;
-	if (!(s = sfgetr(rp, '\n', 1)))
-		goto bad_recv;
-	if (strtol(s, &e, 10) != SMTP_OK)
-		goto bad_prot;
+	do
+	{
+		if (!(s = sfgetr(rp, '\n', 1)))
+			goto bad_recv;
+		if (strtol(s, &e, 10) != SMTP_OK)
+			goto bad_prot;
+	} while (*e == '-');
 
 	/*
 	 * to
@@ -117,10 +126,13 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 	{
 		if (sfprintf(sp, "RCPT TO:<%s>\r\n", s) < 0)
 			goto bad_send;
-		if (!(s = sfgetr(rp, '\n', 1)))
-			goto bad_recv;
-		if (strtol(s, &e, 10) != SMTP_OK)
-			goto bad_prot;
+		do
+		{
+			if (!(s = sfgetr(rp, '\n', 1)))
+				goto bad_recv;
+			if (strtol(s, &e, 10) != SMTP_OK)
+				goto bad_prot;
+		} while (*e == '-');
 	}
 
 	/*
@@ -129,10 +141,13 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 
 	if (sfprintf(sp, "DATA\r\n") < 0)
 		goto bad_send;
-	if (!(s = sfgetr(rp, '\n', 1)))
-		goto bad_recv;
-	if (strtol(s, &e, 10) != SMTP_START)
-		goto bad_prot;
+	do
+	{
+		if (!(s = sfgetr(rp, '\n', 1)))
+			goto bad_recv;
+		if (strtol(s, &e, 10) != SMTP_START)
+			goto bad_prot;
+	} while (*e == '-');
 	while (s = sfgetr(fp, '\n', 1))
 	{
 		if (sfprintf(sp, "%s%s\r\n", *s == '.' ? "." : "", s) < 0)
@@ -142,10 +157,13 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 	}
 	if (sfprintf(sp, ".\r\n") < 0)
 		goto bad_send;
-	if (!(s = sfgetr(rp, '\n', 1)))
-		goto bad_recv;
-	if (strtol(s, &e, 10) != SMTP_OK)
-		goto bad_prot;
+	do
+	{
+		if (!(s = sfgetr(rp, '\n', 1)))
+			goto bad_recv;
+		if (strtol(s, &e, 10) != SMTP_OK)
+			goto bad_prot;
+	} while (*e == '-');
 
 	/*
 	 * quit
@@ -153,10 +171,13 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 
 	if (sfprintf(sp, "QUIT\r\n") < 0)
 		goto bad_send;
-	if (!(s = sfgetr(rp, '\n', 1)))
-		goto bad_recv;
-	if (strtol(s, &e, 10) != SMTP_CLOSE)
-		goto bad_prot;
+	do
+	{
+		if (!(s = sfgetr(rp, '\n', 1)))
+			goto bad_recv;
+		if (strtol(s, &e, 10) != SMTP_CLOSE)
+			goto bad_prot;
+	} while (*e == '-');
 	r = 0;
 	goto done;
  bad_mesg:

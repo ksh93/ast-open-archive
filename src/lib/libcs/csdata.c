@@ -30,7 +30,7 @@
  * cs library data
  */
 
-static const char id_cs[] = "\n@(#)libcs (AT&T Research) 1999-10-07\0\n";
+static const char id_cs[] = "\n@(#)libcs (AT&T Research) 2000-02-14\0\n";
 
 #include "cslib.h"
 

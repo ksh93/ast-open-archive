@@ -1,3 +1,4 @@
+00-02-14 PZ_DELAY|PZ_HANDLE|PZ_UNKNOWN for 'unknown format' after pzlib() done
 00-01-26 pzlib: dlsym() for NAME and _NAME (some don't map `_' automatically)
 99-08-11 discipline cleanup
 	 pzdeflate: last record incomplete is an error

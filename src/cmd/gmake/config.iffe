@@ -1,0 +1,67 @@
+set	config
+
+run{
+	echo '#define PACKAGE	"make"'
+	echo '#define VERSION	"3.76.1-mam"'
+}end
+
+hdr	alloca,dirent,fcntl,float,limits,mach.mach,memory,ndir,nlist,stdarg
+hdr	stdlib,string,unistd
+
+sys	dir,ndir,param,timeb,wait
+
+lib	dup2,fnmatch,getcwd,getgroups,getloadavg,getmntent,memmove,mktemp,mmap
+lib	psignal,pstat_getdynamic,setegid,seteuid,setlinebuf,setregid,setreuid
+lib	strcoll,strftime,strerror,strsignal,vprintf,wait3,waitpid
+lib	alloca alloca.h
+lib	sigsetmask signal.h
+lib	vfork = fork
+
+dat	sys_siglist,_sys_siglist
+npt	sys_siglist,_sys_siglist signal.h
+
+key	const =
+
+typ	long.double
+
+mem	nlist.n_un nlist.h
+mem	stat.st_blksize,stat.st_blocks,stat.st_rdev sys/stat.h
+
+tst	note{ signal handler return type }end compile{
+		#include <sys/types.h>
+		#include <signal.h>
+		#undef signal
+		extern void (*signal())();
+	}end yes{	
+		#define RETSIGTYPE void
+	}end no{
+		#define RETSIGTYPE int
+	}end
+
+run{
+	for i in /usr/sccs/get get
+	do	if	test -f $i
+		then	break
+		fi
+	done
+	echo "#define SCCS_GET	\"$i\""
+	case $HAVE_FLOAT_H$HAVE_STDARG_H$HAVE_STDLIB_H$HAVE_STRING_H in
+	1111)	echo '#define STDC_HEADERS 1' ;;
+	esac
+	case $HAVE_N_UN_IN_NLIST in
+	1)	echo '#define NLIST_NAME_UNION	1' ;;
+	esac
+	case $HAVE_NLIST_H in
+	1)	echo '#define NLIST_STRUCT	1' ;;
+	esac
+	case $HAVE_ST_BLKSIZE_IN_STAT in
+	1)	echo '#define HAVE_ST_BLKSIZE	1' ;;
+	esac
+	case $HAVE_ST_BLOCKS_IN_STAT in
+	1)	echo '#define HAVE_ST_BLOCKS	1' ;;
+	esac
+	case $HAVE_ST_RDEV_IN_STAT in
+	1)	echo '#define HAVE_ST_RDEV	1' ;;
+	esac
+	echo '#include "mam.h"'
+}end

@@ -178,7 +178,6 @@ Tcl_CreateInterp()
     register CmdInfo *cmdInfoPtr;
     int i;
 #endif
-    Tcl_Channel chan;
 
     iPtr = (Interp *) ckalloc(sizeof(Interp));
     iPtr->result = iPtr->resultSpace;
@@ -235,25 +234,6 @@ Tcl_CreateInterp()
 
     Tcl_PkgProvide((Tcl_Interp *) iPtr, "Tcl", TCL_VERSION);
 
-#ifdef TKSH_V75
-    /*
-     * Add the standard channels.
-     */
-
-    chan = Tcl_GetStdChannel(TCL_STDIN);
-    if (chan != (Tcl_Channel) NULL) {
-        Tcl_RegisterChannel((Tcl_Interp *) iPtr, chan);
-    }
-    chan = Tcl_GetStdChannel(TCL_STDOUT);
-    if (chan != (Tcl_Channel) NULL) {
-        Tcl_RegisterChannel((Tcl_Interp *) iPtr, chan);
-    }
-    chan = Tcl_GetStdChannel(TCL_STDERR);
-    if (chan != (Tcl_Channel) NULL) {
-        Tcl_RegisterChannel((Tcl_Interp *) iPtr, chan);
-    }
-#endif
-    
     return (Tcl_Interp *) iPtr;
 }
 

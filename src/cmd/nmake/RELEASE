@@ -1,4 +1,17 @@
-00-02-01 --- release 4.0 ---
+00-02-14 --- release 4.0 ---
+00-02-10 Makerules: add CC.DLLBIG, :PACKAGE_INIT:
+	 Makerules: add .ARCHIVE.OMIT. to .ARCLEAN.LIST.
+	 Makerules: adjust :PACKAGE: search for X11 => X
+	 Makerules: add .COMMON.SAVE to .LIST.PACKAGE.* source actions
+	 Makerules: fix setv PACKAGE dirs
+	 Makerules: add $(PACKAGE_LOCAL) and package_local=arch cmd prefix
+	 Makerules: apply %.X>% for `f :: b.X'
+	 state.c: add local skew test for touch(3) { utime(2) or utimes(2) }
+	 make.c: don't apply metarule if lhs has dir and metarule doesn't
+00-02-08 believe if state.believe>0 and  view level >= (state.believe-1)
+	 pkg-X11.mk: add PACKAGE_X11_VERSION=6 for X11R6 installations
+	 pkg-X11.mk: add -ldnet_stub for osf.alpha
+	 Makerules: fix .REQUIRE.-l%
 00-01-31 Makerules: add $(CC.SUFFIX.LD) in .SHARED.REF.lib
 00-01-25 Makerules: add _MAKE_PROBE_WORKAROUND_ for broken cc -G like sco.i386
 00-01-11 Makerules,probe.win32: -Bwhole-archive + -Bstatic -- whew!

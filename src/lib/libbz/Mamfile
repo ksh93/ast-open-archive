@@ -1,7 +1,7 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
-setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include
+setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
 setv PACKAGEROOT ../../../../..
 setv AR ar
@@ -71,91 +71,93 @@ make bzlib_private.h implicit
 make bzlib.h implicit
 make windows.h implicit
 done windows.h dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/ast/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/ast/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/ast/stdio.h dontcare
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 done bzlib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/re_comp.h implicit
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
+make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/re_comp.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_types.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
+make ${PACKAGE_ast_INCLUDE}/limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_std.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done bzlib_private.h
 done blocksort.c
 prev blocksort.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
 done blocksort.o generated
 make huffman.o
 make huffman.c
 prev bzlib_private.h implicit
 done huffman.c
 prev huffman.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c huffman.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c huffman.c
 done huffman.o generated
 make crctable.o
 make crctable.c
 prev bzlib_private.h implicit
 done crctable.c
 prev crctable.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c crctable.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c crctable.c
 done crctable.o generated
 make randtable.o
 make randtable.c
 prev bzlib_private.h implicit
 done randtable.c
 prev randtable.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c randtable.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c randtable.c
 done randtable.o generated
 make compress.o
 make compress.c
 prev bzlib_private.h implicit
 done compress.c
 prev compress.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c compress.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c compress.c
 done compress.o generated
 make decompress.o
 make decompress.c
 prev bzlib_private.h implicit
 done decompress.c
 prev decompress.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c decompress.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c decompress.c
 done decompress.o generated
 make bzlib.o
 make bzlib.c
@@ -164,34 +166,34 @@ done io.h dontcare virtual
 prev bzlib_private.h implicit
 done bzlib.c
 prev bzlib.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c bzlib.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c bzlib.c
 done bzlib.o generated
 make sfdcbzip.o
 make sfdcbzip.c
 make sfdcbzip.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/sfdisc.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/sfio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast_version.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_version.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/sfdisc.h dontcare
+done ${PACKAGE_ast_INCLUDE}/sfdisc.h dontcare
 done sfdcbzip.h
 prev bzlib.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/sfio_t.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/sfio.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/sfio_t.h
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done sfdcbzip.c
 prev sfdcbzip.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c sfdcbzip.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c sfdcbzip.c
 done sfdcbzip.o generated
 exec - ${AR} cr libbz.a blocksort.o huffman.o crctable.o randtable.o compress.o decompress.o bzlib.o sfdcbzip.o
 exec - (ranlib libbz.a) >/dev/null 2>&1 || true
@@ -255,14 +257,14 @@ make ${PACKAGE_ast_LIB}/lib/bz
 prev bz.req
 exec - mv ${PACKAGE_ast_LIB}/lib/bz ${PACKAGE_ast_LIB}/lib/bz.old 2>/dev/null || true; cp bz.req ${PACKAGE_ast_LIB}/lib/bz
 done ${PACKAGE_ast_LIB}/lib/bz generated
-make ${PACKAGE_ast_INCLUDE}/ast
+make ${PACKAGE_ast_INCLUDE}
 exec - set -
-exec - if	test ! -d ${PACKAGE_ast_INCLUDE}/ast
-exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE}/ast 2>/dev/null && set - ||
+exec - if	test ! -d ${PACKAGE_ast_INCLUDE}
+exec - then	set -x && mkdir -p ${PACKAGE_ast_INCLUDE} 2>/dev/null && set - ||
 exec - 	{
 exec - 		test -d ./-p && rm -rf ./-p
 exec - 		p=
-exec - 		for d in `echo ${PACKAGE_ast_INCLUDE}/ast | sed -e 's%\\(.\\)/%\\1 %g'`
+exec - 		for d in `echo ${PACKAGE_ast_INCLUDE} | sed -e 's%\\(.\\)/%\\1 %g'`
 exec - 		do	case $p in
 exec - 			"")	p=$d ;;
 exec - 			*)	p=$p/$d ;;
@@ -278,23 +280,23 @@ exec - 			esac
 exec - 		done
 exec - 	} && set -x 		    		   
 exec - fi
-done ${PACKAGE_ast_INCLUDE}/ast generated
-make ${PACKAGE_ast_INCLUDE}/ast/sfdcbzip.h
+done ${PACKAGE_ast_INCLUDE} generated
+make ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
 prev sfdcbzip.h
 exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic -o type='special' sfdcbzip.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ast/sfdcbzip.h 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcbzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ast/sfdcbzip.h
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
 exec - fi
-done ${PACKAGE_ast_INCLUDE}/ast/sfdcbzip.h generated
-make ${PACKAGE_ast_INCLUDE}/ast/bzlib.h
+done ${PACKAGE_ast_INCLUDE}/sfdcbzip.h generated
+make ${PACKAGE_ast_INCLUDE}/bzlib.h
 prev bzlib.h
 exec - proto -p -s -l ${PACKAGE_ast_LIB}/package/ast.lic -o type='special' bzlib.h > 1.${COTEMP}.x
-exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ast/bzlib.h 1.${COTEMP}.x
+exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/bzlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
-exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ast/bzlib.h
+exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/bzlib.h
 exec - fi
-done ${PACKAGE_ast_INCLUDE}/ast/bzlib.h generated
+done ${PACKAGE_ast_INCLUDE}/bzlib.h generated
 done install virtual
 make test
 done test dontcare virtual

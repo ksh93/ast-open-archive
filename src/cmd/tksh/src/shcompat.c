@@ -351,7 +351,11 @@ Namval_t *nv_move(Namval_t *src, Namval_t *dst)
 	*dst = *src;
 	src->nvfun = NULL;
 	src->nvalue = 0;
+#ifdef _COMPAT_SH_PRIVATE
+	src->nvprivate = NULL;
+#else
 	src->nvenv = 0;
+#endif
 	src->nvflag = 0;
 	
 	nv_unset(src);	/* XX probably not necc */

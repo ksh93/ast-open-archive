@@ -261,9 +261,10 @@ flatrecread(Cdb_t* cdb, Cdbkey_t* key)
 	for (;;)
 	{
 		rp->offset = sftell(cdb->io);
+sfseek(cdb->io, rp->offset, SEEK_SET);
 		if (!(buf = (char*)sfreserve(cdb->io, 0, 0)))
 			goto eof;
-		message((-9, "AHA %4d %5I*d %9I*d o    %9I*d t", __LINE__, sizeof(cdb->count), cdb->count + 1, sizeof(rp->offset), rp->offset, sizeof(Sfoff_t), sftell(cdb->io)));
+		message((-10, "AHA %4d %5I*d %9I*d o    %9I*d t", __LINE__, sizeof(cdb->count), cdb->count + 1, sizeof(rp->offset), rp->offset, sizeof(Sfoff_t), sftell(cdb->io)));
 		end = buf + (r = sfvalue(cdb->io));
 		b = s = buf;
 		e = end;
@@ -994,7 +995,7 @@ r = sfvalue(cdb->io);
 					if (sp->strings && flatspan(cdb, vp, rp->data, dp) < 0)
 						return 0;
 r = sfvalue(cdb->io);
-					if (!sfreserve(cdb->io, e - buf, 0))
+					if (!(s = sfreserve(cdb->io, e - buf, 0)))
 						goto eof;
 					message((-9, "AHA %4d %5I*d %9I*d c    %9I*d t %4d r", __LINE__, sizeof(cdb->count), cdb->count + 1, sizeof(e - buf), e - buf, sizeof(Sfoff_t), sftell(cdb->io), (int)r));
 					if (!(buf = (char*)sfreserve(cdb->io, 0, 0)))

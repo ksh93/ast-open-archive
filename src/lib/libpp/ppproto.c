@@ -34,7 +34,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)proto (AT&T Research) 1999-11-19\0\n";
+static const char id[] = "\n@(#)proto (AT&T Research) 2000-02-14\0\n";
 
 #if PROTOMAIN
 
@@ -1957,7 +1957,7 @@ pppclose(char* iob)
  */
 
 char*
-pppopen(char* file, int fd, char* notice, char* options, char* package, int flags)
+pppopen(char* file, int fd, char* notice, char* options, char* package, char* comment, int flags)
 {
 	register struct proto*	proto;
 	register char*		iob;
@@ -2023,13 +2023,16 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, int flag
 	proto->op = proto->ob = iob;
 	proto->ip = proto->ib = iob + proto->oz + n;
 	if (m) proto->options |= REGULAR;
-	if (flags & PROTO_SHARP)
-		proto->cc[0] = proto->cc[1] = proto->cc[2] = '#';
-	else
+	if (!comment || !comment[0])
+		comment = "/*";
+	proto->cc[0] = comment[0];
+	if (comment[1])
 	{
-		proto->cc[0] = proto->cc[2] = '/';
-		proto->cc[1] = '*';
+		proto->cc[1] = comment[1];
+		proto->cc[2] = comment[2] ? comment[2] : comment[0];
 	}
+	else
+		proto->cc[1] = proto->cc[2] = comment[0];
 
 	/*
 	 * read the first chunk

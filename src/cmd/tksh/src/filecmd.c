@@ -738,14 +738,12 @@ int Tksh_CreatePipeline(Tcl_Interp *interp, int argc, char *argv[],
 	        Tcl_DStringAppend(buffer, argv[i], -1);
 	    }
 	} else if (argv[i][0] == '>') {
-	    int atOk = 1;
 	    char *rtype;
 	    if (argv[i][1] == 0)
 		Tcl_DStringAppend(buffer, " >|", -1);
 	    else {
 		if (argv[i][1] == '>') {
 			p = argv[i] + 2;
-			atOk = 0;
 			rtype = " >>";
 		} else {
 			p = argv[i] + 1;

@@ -140,7 +140,7 @@ stateview(int op, char* name, register struct rule* s, register struct rule* r, 
 		{
 			if (pv) *pv = v;
 			if (s && (op == RULE && (s->event >= v->event && s->event || !v->time && (v->property & P_force)) || op == PREREQS && s->time >= v->time)) return s;
-			if (v->time == r->time || accept || r->view == view || (r->property & (P_state|P_use|P_virtual)) || state.believe && view >= state.believe)
+			if (v->time == r->time || accept || r->view == view || (r->property & (P_state|P_use|P_virtual)) || state.believe && view >= (state.believe - 1))
 			{
 				if (r->property & P_state)
 				{
@@ -875,24 +875,32 @@ statetime(register struct rule* r, int sync)
 	int			a;
 	int			n;
 	int			zerostate = 0;
+	unsigned long		t;
 	struct rule*		x;
 	struct stat		st;
+	struct stat		ln;
 
-	if (r->property & P_state) return r->time;
+	if (r->property & P_state)
+		return r->time;
 	s = 0;
-	if (state.interrupt && r->status != EXISTS) zerostate = 1;
-	else if (r->status == FAILED) st.st_mtime = 0;
-	else if (r->property & P_virtual) r->time = st.st_mtime = CURTIME;
+	if (state.interrupt && r->status != EXISTS)
+		zerostate = 1;
+	else if (r->status == FAILED)
+		st.st_mtime = 0;
+	else if (r->property & P_virtual)
+		r->time = st.st_mtime = CURTIME;
 	else if (checkcurrent(r, &st))
 	{
-		if (r->property & P_dontcare) st.st_mtime = 0;
+		if (r->property & P_dontcare)
+			st.st_mtime = 0;
 		else
 		{
 			st.st_mtime = CURTIME;
 			zerostate = 1;
 		}
 	}
-	else if (sync < 0) return r->time;
+	else if (sync < 0)
+		return r->time;
 	else if ((s = staterule(RULE, r, NiL, 1)) && s->time == st.st_mtime)
 	{
 		if (state.exec && !state.touch)
@@ -913,13 +921,16 @@ statetime(register struct rule* r, int sync)
 	else if ((r->dynamic & D_triggered) && state.exec)
 	{
 		static int	localsync;
+		static int	localtest;
+		static long	localskew;
 
 		/*
 		 * r is built since its time changed after its action triggered
 		 */
 
 		s->dynamic |= D_built;
-		if (x = staterule(PREREQS, r, NiL, 0)) x->property |= P_force;
+		if (x = staterule(PREREQS, r, NiL, 0))
+			x->property |= P_force;
 
 		/*
 		 * check for file system and local system time consistency
@@ -930,12 +941,11 @@ statetime(register struct rule* r, int sync)
 		{
 
 #if DEBUG
-			if (state.test & 0x00000100) error(2, "%s: r[%s] s[%s] f[%s]", r->name, strtime(r->time), strtime(s->time), strtime(st.st_mtime));
+			if (state.test & 0x00000100)
+				error(2, "%s: r[%s] s[%s] f[%s]", r->name, strtime(r->time), strtime(s->time), strtime(st.st_mtime));
 #endif
 			if (!localsync && !state.override && r->time && r->time != OLDTIME && !(r->property & P_force) && st.st_mtime == st.st_ctime)
 			{
-				struct stat	ln;
-
 				if (((n = (r->time - (unsigned long)st.st_mtime - 1)) >= 0 || (n = (CURTIME - (unsigned long)st.st_mtime + 2)) <= 0) && (lstat(r->name, &ln) || !S_ISLNK(ln.st_mode)))
 				{
 					/*
@@ -943,14 +953,13 @@ statetime(register struct rule* r, int sync)
 					 */
 
 					a = (n > 0) ? n : -n;
-					if (a > 1) error(1, "%s file system time %s local time by at least %s", r->name, n > 0 ? "lags" : "leads", fmtelapsed(a, 1));
+					if (a > 1)
+						error(1, "%s file system time %s local time by at least %s", r->name, n > 0 ? "lags" : "leads", fmtelapsed(a, 1));
 					localsync = a > state.tolerance ? 1 : -1;
 				}
 			}
 			if (localsync > 0)
 			{
-				unsigned long	t;
-
 				/*
 				 * NOTE: time stamp syncs work on the assumption that
 				 *	 all source files have an mtime that is older
@@ -958,13 +967,52 @@ statetime(register struct rule* r, int sync)
 				 *	 only built files are sync'd
 				 */
 
-				t = CURTIME;
-				if (!touch(r->name, (time_t)0, t, 0)) st.st_mtime = t;
-				else error(1, "%s not sync'd to local time", r->name);
+				n = 0;
+				for (;;)
+				{
+					t = CURTIME + localskew;
+					if (touch(r->name, (time_t)0, t, 0))
+					{
+						error(ERROR_SYSTEM|1, "%s not sync'd to local time", r->name);
+						break;
+					}
+					if (n || localtest || localskew)
+					{
+						st.st_mtime = t;
+						break;
+					}
+
+					/*
+					 * some systems try to fix up the local
+					 * remote skew in the utime() call
+					 * >> this never works <<
+					 * members of the club include
+					 *	netbsd.i386
+					 */
+
+					if (stat(r->name, &st))
+					{
+						error(ERROR_SYSTEM|1, "%s not found", r->name);
+						break;
+					}
+					if (st.st_mtime == t)
+					{
+						localtest = 1;
+						break;
+					}
+					if (!localtest)
+					{
+						localtest = 1;
+						error(1, "the utime(2) or utimes(2) system call is botched for the filesystem containing %s -- the state may be out of sync", r->name);
+					}
+					localskew = t - st.st_mtime;
+					n = 0;
+				}
 			}
 		}
 	}
-	if (!s) s = staterule(RULE, r, NiL, 1);
+	if (!s)
+		s = staterule(RULE, r, NiL, 1);
 	if (sync)
 	{
 		s->dynamic |= D_built;
@@ -972,7 +1020,8 @@ statetime(register struct rule* r, int sync)
 		s->action = r->action;
 		if (s->prereqs != r->prereqs)
 		{
-			if ((r->property & (P_joint|P_target)) != (P_joint|P_target)) freelist(s->prereqs);
+			if ((r->property & (P_joint|P_target)) != (P_joint|P_target))
+				freelist(s->prereqs);
 			s->prereqs = r->prereqs;
 		}
 	}

@@ -1121,7 +1121,7 @@ bindfile(register struct rule* r, char* name, int flags)
 				if (tm == NOTIME)
 				{
 					x = 0;
-					if (state.believe && d->view >= state.believe)
+					if (state.believe && d->view >= (state.believe - 1))
 					{
 						if (!r) r = makerule(name);
 						r->view = d->view;

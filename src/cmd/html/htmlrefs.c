@@ -29,14 +29,34 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)htmlrefs (AT&T Labs Research) 2000-01-27\n]"
+"[-?\n@(#)htmlrefs (AT&T Labs Research) 2000-02-14\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
 "	local closure of the input \bhtml\b \afile\as. If \afile\a is not"
-"	specified then the top level default user file is read (see"
-"	\b--user\b, \b--root\b and \b--index\b.) The \bhtml\b parse is"
-"	rudimentary; don't use \bhtmlrefs\b to detect valid \bhtml\b files.]"
+"	specified then the top level default user file is read. The \bhtml\b"
+"	parse is rudimentary; don't use \bhtmlrefs\b to detect valid \bhtml\b"
+"	files.]"
+"[+?The top level references are determined in this order (the \b--index\b,"
+"	\b--root\b and \b--user\b options influence the order):]{"
+"	[+$HOME/index.html?Pseudo index containing"
+"		\b<LINK href=\b\adir\a \brel=\b\atype\a\b>\b references to"
+"		top level directories. \atype\a may be one of:]{"
+"		[+document-root?The document root directory containing URL"
+"			target documents. Exactly one \bdocument-root\b must"
+"			be specified.]"
+"		[+program-root?The program root directory containing CGI"
+"			support programs and scripts. This type is optional."
+"			If specified then the program root directory should"
+"			contain a pseudo index for its references.]"
+"		[+data-root?The data root directory containing CGI"
+"			support data. This type is optional. If specified then"
+"			the data root directory should contain a pseudo index"
+"			for its references.]"
+"	}"
+"	[+$HOME/wwwfiles/index.html?]"
+"	[+$HOME/public_html/index.html?]"
+"}"
 "[a:all?List all references whether they exist or not.]"
 "[c:copy?Copy the selected references to \adirectory\a which must already"
 "	exist. If \b--external\b is also specified then lines between"
@@ -56,6 +76,8 @@ USAGE_LICENSE
 "	references.]:[name:=index.html]"
 "[h:hosts?Check only references matching the \bksh\b(1) pattern"
 "	\bhttp://\b\apattern\a\b/\b.]:[pattern]"
+"[k:keep?\apattern\a is used to match file base names that are always"
+"	considered referenced.]:[pattern:=.htaccess]"
 "[m:missing?List missing local file references.]"
 "[n!:exec?Enable file modification operations. \b--noexec\b lists the"
 "	operations but does not do them.]"
@@ -65,7 +87,7 @@ USAGE_LICENSE
 "	interactions (why didn't they use tags like everyone else?)"
 "	\bmm2html\b(1) and \boptget\b(3) do the translation by default.]"
 "[r:root?The local \adirectory\a for \b--user\b"
-"	references.]:[directory:=~\auser\a/(\bpublic_html\b|\bwwwfiles\b)]"
+"	references.]:[directory:=~\auser\a]"
 "[s:strict?By default unreferenced \b--index\b files and the containing"
 "	directory are considered referenced; \b--strict\b considers"
 "	unreferenced \b--index\b files unreferenced.]"
@@ -99,18 +121,21 @@ USAGE_LICENSE
 #include <ctype.h>
 #include <error.h>
 #include <fts.h>
+#include <glob.h>
 #include <pwd.h>
 
 #define INDEX			"index.html"
+#define KEEP			".htaccess"
 
-#define COPIED			0x01
-#define DIRECTORY		0x02
-#define EXTERNAL		0x04
-#define FILTER			0x08
-#define INTERNAL		0x10
-#define MISSING			0x20
-#define SCANNED			0x40
-#define VERBOSE			0x80
+#define CHECKED			0x001
+#define COPIED			0x002
+#define DIRECTORY		0x004
+#define EXTERNAL		0x008
+#define FILTER			0x010
+#define INTERNAL		0x020
+#define MISSING			0x040
+#define SCANNED			0x080
+#define VERBOSE			0x100
 
 #define HIT			(-1)
 #define MISS			(-2)
@@ -159,8 +184,11 @@ typedef struct State_s
 	int		warn;
 
 	String_t	copy;
+	String_t	documentroot;
 	String_t	index;
+	String_t	keep;
 	String_t	hosts;
+	String_t	ignore;
 	String_t	root;
 	String_t	user;
 
@@ -172,10 +200,36 @@ static const char	internal[] = "<!--INTERNAL-->";
 static const char	external[] = "<!--/INTERNAL-->";
 
 /*
- * add reference path s
+ * check for glob(dir/name)
  */
 
 static void
+check(register State_t* state, const char* dir, const char* name, unsigned int flags)
+{
+	register File_t*	dp;
+	register char*		s;
+	register char**		p;
+	glob_t			gl;
+
+	memset(&gl, 0, sizeof(gl));
+	sfsprintf(state->dir, sizeof(state->dir) - 1, "%s/(%s)", dir, name);
+	if (!glob(state->dir, GLOB_DISC|GLOB_NOCHECK|GLOB_STACK, 0, &gl))
+		for (p = gl.gl_pathv; s = *p++;)
+			if (!dtmatch(state->files, s) && !access(s, 0))
+			{
+				if (!(dp = newof(0, File_t, 1, strlen(s))))
+					error(ERROR_SYSTEM|3, "out of space [file]");
+				strcpy(dp->name, s);
+				dtinsert(state->files, dp);
+				dp->flags |= flags;
+			}
+}
+
+/*
+ * add reference path s
+ */
+
+static char*
 add(register State_t* state, register char* s, unsigned int flags, const char* path, int prefix, File_t* ref)
 {
 	register char*		t;
@@ -192,12 +246,12 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 			if (t = strchr(s, ':'))
 			{
 				if (!strneq(s, "http://", t - s + 3))
-					return;
+					return 0;
 				s = t + 3;
 				if (t = strchr(s, '/'))
 					*t = 0;
 				if (!strmatch(s, state->hosts.data))
-					return;
+					return 0;
 				if (t)
 					*(s = t) = '/';
 				else
@@ -208,9 +262,14 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 				if (ref)
 				{
 					if (!state->user.size || *(s + 1) != '~' || !strneq(s + 2, state->user.data, state->user.size) || *(s + 2 + state->user.size) != '/')
-						return;
+						return 0;
 					s += 2 + state->user.size;
-					if (state->root.size)
+					if (state->documentroot.size)
+					{
+						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s", state->documentroot.data, s);
+						pathcanon(s = state->buf, 0);
+					}
+					else if (state->root.size)
 					{
 						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s", state->root.data, s);
 						pathcanon(s = state->buf, 0);
@@ -264,17 +323,12 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 				strcpy(dp->name, s);
 				dtinsert(state->files, dp);
 				dp->flags |= DIRECTORY|flags;
-				if (!state->strict && !(flags & COPIED))
+				if (!(flags & COPIED))
 				{
-					sfsprintf(state->dir, sizeof(state->dir) - 1, "%s/%s", s, state->index.data);
-					if (!dtmatch(state->files, state->dir) && !access(state->dir, 0))
-					{
-						if (!(dp = newof(0, File_t, 1, strlen(state->dir))))
-							error(ERROR_SYSTEM|3, "out of space [file]");
-						strcpy(dp->name, state->dir);
-						dtinsert(state->files, dp);
-						dp->flags |= flags;
-					}
+					if (!state->strict)
+						check(state, s, state->index.data, flags);
+					if (state->keep.size)
+						check(state, s, state->keep.data, flags);
 				}
 				u = strrchr(s, '/');
 				*t = '/';
@@ -293,6 +347,7 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 			fp->refs = lp;
 		}
 	}
+	return fp->name;
 }
 
 /*
@@ -305,7 +360,10 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 	register int	c;
 	register int	q;
 	register int	r;
+	register int	a;
 	register char*	s;
+	char*		p;
+	char*		t;
 	int		perlwarn;
 	int		prefix;
 	unsigned int	flags;
@@ -342,10 +400,11 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 				break;
 			}
 			q = 0;
-			if (flags != INTERNAL && s == (buf + 1) && (buf[0] == 'A' || buf[0] == 'a'))
+			if (flags != INTERNAL && (s == (buf + 1) && (buf[0] == 'A' || buf[0] == 'a') || s == (buf + 4) && (buf[0] == 'L' || buf[0] == 'l') && (buf[1] == 'I' || buf[1] == 'i') && (buf[2] == 'N' || buf[2] == 'n') && (buf[3] == 'K' || buf[3] == 'k')))
 			{
 				s = buf;
-				r = 0;
+				r = a = 0;
+				p = 0;
 				for (;;)
 				{
 					switch (c = sfgetc(ip))
@@ -369,13 +428,56 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 						{
 							if (r == HIT)
 							{
-								*s = 0;
-								s = buf;
-								add(state, s, flags, path, prefix, ref);
+								/*UNDENT...*/
+
+		*s = 0;
+		s = buf;
+		if (!a)
+			p = add(state, s, flags, path, prefix, ref);
+		else if (p)
+		{
+			if (!strcasecmp(s, "document-root"))
+			{
+				if (t = strrchr(p, '/'))
+					*t = 0;
+				if (*p == '/')
+					c = strlen(p);
+				else
+				{
+					c = sfsprintf(buf, sizeof(buf), "%s/%s", state->root.data, p);
+					p = buf;
+				}
+				if (!(state->documentroot.data = strdup(p)))
+					error(ERROR_SYSTEM|3, "out of space [documentroot]");
+				state->documentroot.size = c;
+				if (t)
+					*t = '/';
+			}
+			else if (!strcasecmp(s, "ignore"))
+			{
+				if (state->copy.size)
+				{
+					s = state->copy.data;
+					p += state->root.size;
+				}
+				else
+					s = "";
+				if (t = strrchr(p, '/'))
+					*t = 0;
+				c = state->ignore.size + strlen(s) + strlen(p) + 6;
+				if (!(state->ignore.data = newof(state->ignore.data, char, c, 0)))
+					error(ERROR_SYSTEM|3, "out of space [ignore]");
+				state->ignore.size += sfsprintf(state->ignore.data + state->ignore.size, c, "%s%s%s?(/*)", state->ignore.size ? "|" : "", s, p);
+				if (t)
+					*t = '/';
+			}
+		}
+
+								/*...INDENT*/
 							}
 							if (c == '>')
 								break;
-							r = 0;
+							r = a = 0;
 						}
 						else if (r == HIT)
 							STUFF(s, buf, c);
@@ -397,14 +499,21 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 						if (r == HIT)
 							STUFF(s, buf, c);
 						else if (!q)
-							r = (r == 1) ? 2 : MISS;
+						{
+							if (r == 0)
+							{
+								a = 10;
+								r = a + 1;
+							}
+							r = (r == (a + 1)) ? (a + 2) : MISS;
+						}
 						continue;
 					case 'E':
 					case 'e':
 						if (r == HIT)
 							STUFF(s, buf, c);
 						else if (!q)
-							r = (r == 2) ? 3 : MISS;
+							r = (r == (a + 2)) ? (a + 3) : MISS;
 						continue;
 					case 'F':
 					case 'f':
@@ -413,11 +522,18 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 						else if (!q)
 							r = (r == 3) ? 4 : MISS;
 						continue;
+					case 'L':
+					case 'l':
+						if (r == HIT)
+							STUFF(s, buf, c);
+						else if (!q)
+							r = (r == (a + 3)) ? (a + 4) : MISS;
+						continue;
 					case '=':
 						if (r == HIT)
 							STUFF(s, buf, c);
 						else if (!q)
-							r = (r == 4) ? HIT : MISS;
+							r = (r == (a + 4)) ? HIT : MISS;
 						continue;
 					default:
 						if (r == HIT)
@@ -624,7 +740,7 @@ main(int argc, char** argv)
 	struct stat		st;
 	struct stat		ts;
 
-	static const char*	www[] = { 0, "public_html", "wwwfiles" };
+	static const char*	www[] = { 0, 0, "wwwfiles", "public_html" };
 
 	NoP(argc);
 	error_info.id = "htmlrefs";
@@ -655,11 +771,14 @@ main(int argc, char** argv)
 		case 'F':
 			state->force = opt_info.num;
 			continue;
+		case 'h':
+			state->hosts.size = strlen(state->hosts.data = opt_info.arg);
+			continue;
 		case 'i':
 			state->index.size = strlen(state->index.data = opt_info.arg);
 			continue;
-		case 'h':
-			state->hosts.size = strlen(state->hosts.data = opt_info.arg);
+		case 'k':
+			state->keep.size = strlen(state->keep.data = opt_info.arg);
 			continue;
 		case 'm':
 			state->missing = opt_info.num ? MISSING : 0;
@@ -701,30 +820,34 @@ main(int argc, char** argv)
 		error(ERROR_SYSTEM|3, "%s: not a directory", state->copy.data);
 	if (!state->index.size)
 		state->index.size = strlen(state->index.data = INDEX);
+	if (!state->keep.size)
+		state->keep.size = strlen(state->keep.data = KEEP);
 	if (!state->user.size)
 		state->user.size = strlen(state->user.data = fmtuid(geteuid()));
 	if (!state->root.size || *state->root.data != '/')
 	{
+		www[0] = (const char*)state->index.data;
 		if (state->root.size)
-			www[i = 0] = (const char*)state->root.data;
-		else if (!(pwd = getpwnam(state->user.data)))
+			www[1] = (const char*)state->root.data;
+		if (!(pwd = getpwnam(state->user.data)))
 			error(3, "%s: unknown user", state->user.data);
-		else
-		{
-			s = pwd->pw_dir;
-			i = 1;
-		}
-		for (; i < elementsof(www); i++)
-		{
-			n = sfsprintf(state->buf, sizeof(state->buf) - 1, "%s/%s", s, www[i]);
-			if (!access(state->buf, F_OK))
+		s = pwd->pw_dir;
+		for (i = 0; i < elementsof(www); i++)
+			if (www[i])
 			{
-				if (!(state->root.data = strdup(state->buf)))
-					error(ERROR_SYSTEM|3, "out of space [root]");
-				state->root.size = n;
-				break;
+				n = sfsprintf(state->buf, sizeof(state->buf) - 1, "%s/%s", s, www[i]);
+				if (!access(state->buf, F_OK))
+				{
+					if (i == 0)
+						n = strlen(s);
+					else
+						s = state->buf;
+					if (!(state->root.data = strdup(s)))
+						error(ERROR_SYSTEM|3, "out of space [root]");
+					state->root.size = n;
+					break;
+				}
 			}
-		}
 	}
 	while (s = *argv++)
 		add(state, s, EXTERNAL|VERBOSE, NiL, 0, NiL);
@@ -758,14 +881,18 @@ main(int argc, char** argv)
 	{
 		p = state->buf;
 		for (fp = (File_t*)dtfirst(state->files); fp; fp = (File_t*)dtnext(state->files, fp))
-			if (!(fp->flags & (COPIED|MISSING)))
+			if (!(fp->flags & (CHECKED|COPIED|MISSING)))
 			{
+				fp->flags |= CHECKED;
 				sfsprintf(p, sizeof(state->buf) - 1, "%s%s", state->copy.data, fp->name + state->root.size);
 				add(state, p, COPIED, NiL, 0, NiL);
 				if (stat(fp->name, &st))
 					error(ERROR_SYSTEM|3, "%s: cannot stat", fp->name);
 				if (stat(p, &ts))
+				{
 					ts.st_mtime = 0;
+					ts.st_mode = 0;
+				}
 				if (!state->exec)
 				{
 					if (fp->flags & DIRECTORY)
@@ -817,6 +944,8 @@ main(int argc, char** argv)
 						if (sfclose(op))
 							error(ERROR_SYSTEM|2, "%s: write error", p);
 						sfclose(ip);
+						if ((st.st_mode &= S_IPERM) != (ts.st_mode &= S_IPERM) && chmod(p, st.st_mode))
+							error(ERROR_SYSTEM|2, "%s: cannot set mode", p);
 						if (touch(p, st.st_mtime, st.st_mtime, 0))
 							error(ERROR_SYSTEM|2, "%s: cannot set times", p);
 					}
@@ -827,7 +956,7 @@ main(int argc, char** argv)
 			if (!(fts = fts_open((char**)state->copy.data, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
 				error(ERROR_SYSTEM|3, "%s: cannot search directory", state->copy.data);
 			while (ent = fts_read(fts))
-				if (!(fp = dtmatch(state->files, ent->fts_path)) || !(fp->flags & COPIED))
+				if ((!(fp = dtmatch(state->files, ent->fts_path)) || !(fp->flags & COPIED)) && (!state->ignore.size || !strmatch(ent->fts_path, state->ignore.data)))
 				{
 					if (state->verbose || !state->exec)
 						sfprintf(sfstdout, " %s %s\n", (ent->fts_info & FTS_D) ? "rmdir" : "   rm", ent->fts_path);
@@ -844,7 +973,7 @@ main(int argc, char** argv)
 		if (!(fts = fts_open((char**)state->root.data, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPREORDER, order)))
 			error(ERROR_SYSTEM|3, "%s: cannot search directory", state->root.data);
 		while (ent = fts_read(fts))
-			if (!dtmatch(state->files, ent->fts_path))
+			if (!dtmatch(state->files, ent->fts_path) && (!strmatch(ent->fts_name, state->keep.data) || state->ignore.size && strmatch(ent->fts_path, state->ignore.data)))
 			{
 				if (state->strict || !streq(ent->fts_name, state->index.data))
 					sfprintf(sfstdout, "%s\n", fmtquote(ent->fts_path, "\"", "\"", ent->fts_pathlen, 0));

@@ -38,7 +38,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pax (AT&T Labs Research) 2000-01-04\n]"
+"[-?\n@(#)pax (AT&T Labs Research) 2000-02-14\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -419,7 +419,12 @@ Option_t		options[] =
 	where:",
 	"command",
 	"[+X?A delimiter character that does not appear outside quotes.]\
-	[+options?\b,\b separated \aname=value\a options, currently ignored.]\
+	[+options?\b,\b separated [\bno\b]]\aname\a[=\avalue\a]] options:]{\
+		[+logical?Override the command line \b--logical\b and\
+			\b--physical\b options for this file.]\
+		[+physical?Override the command line \b--logical\b and\
+			\b--physical\b options for this file.]\
+	}\
 	[+command?A shell command that reads the physical file and writes\
 		the filtered contents to the standard output. If \acommand\a\
 		is empty then the file contents are copied unchanged.]\

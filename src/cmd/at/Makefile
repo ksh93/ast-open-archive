@@ -8,9 +8,9 @@ if CC.HOSTTYPE == "win32*"
 AT_STRICT == 1
 end
 
-at :: RELEASE at.h at.c -lcoshell -lcs
+$(PACKAGE_LOCAL)at :: PROMO.mm RELEASE at.h at.c -lcoshell -lcs
 
-batch :LINK: at
+$(PACKAGE_LOCAL)batch :LINK: $(PACKAGE_LOCAL)at
 
 $(LIBDIR)/at/jobs :INSTALLDIR: mode=u=rwx,go=x
 
@@ -20,4 +20,4 @@ atx :: atx.c +last
 
 at :SERVICE: atd.c -lcs +last
 
-crontab :: crontab.sh
+$(PACKAGE_LOCAL)crontab :: crontab.sh

@@ -95,7 +95,6 @@
 #define PROTO_PASS		(1<<8)	/* pass blocks if no magic	*/
 #define PROTO_PLUSPLUS		(1<<9)	/* extern () -> extern (...)	*/
 #define PROTO_RETAIN		(1<<10)	/* defines retained after close	*/
-#define PROTO_SHARP		(1<<11)	/* # styles comments		*/
 #define PROTO_TEST		(1<<12)	/* enable test code		*/
 
 #define PROTO_USER		(1<<13)	/* first user flag		*/
@@ -750,7 +749,7 @@ extern int		ppoption(char*);
 extern char*		ppoptionstr(long);
 extern void		pppclose(char*);
 extern int		pppdrop(char*);
-extern char*		pppopen(char*, int, char*, char*, char*, int);
+extern char*		pppopen(char*, int, char*, char*, char*, char*, int);
 extern int		pppread(char*);
 extern int		pppredargs(void);
 extern void		pppush(int, char*, char*, int);

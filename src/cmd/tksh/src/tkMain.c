@@ -99,7 +99,10 @@ Tksh_TkMain(argc, argv, appInitProc)
     char buf[20];
     int code;
     size_t length;
-    Tcl_Channel inChannel, outChannel, errChannel, chan;
+#if 0
+    Tcl_Channel inChannel, outChannel;
+#endif
+    Tcl_Channel errChannel, chan;
 
     Tcl_FindExecutable(argv[0]);
     interp = Tcl_CreateInterp();
@@ -528,6 +531,7 @@ static int b_tkloop(int argc, char **argv, void *data)
 int Tksh_Init(interp)
     Tcl_Interp *interp;         /* Interpreter to initialize. */
 {
+#if 0
     static char initCmd[] =
         "if [[ -f $tk_library/tk.ksh ]] ; then \n\
                 .  $tk_library/tk.ksh\n\
@@ -537,53 +541,30 @@ int Tksh_Init(interp)
             msg=\"$msg environment variable?\"\n\
             print -u2 $msg\n\
         fi\n";
+#endif
     bindsetup(interp);
     sh_addbuiltin("tkloop", b_tkloop, (void *) interp);
     sh_addbuiltin("tkwaitevent", b_tkwaitevents, (void *) interp);
-#ifdef TKSH_V75
-    return Tksh_Eval(interp, initCmd, 0);
-#else
-	return TCL_OK;
-#endif
+    return TCL_OK;
 }
 
 static int
 Tksh_AppInit(interp)
     Tcl_Interp *interp;		/* Interpreter for application. */
 {
-#ifdef TKSH_V75
-    ((Interp *) interp)->interpType = INTERP_TCL;
-#endif
     if (Tcl_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-#ifdef TKSH_V75
-    ((Interp *) interp)->interpType = INTERP_TCL;
-#else
     Tksh_BeginBlock(interp, INTERP_TCL);
-#endif
 		/* Should be current, but Tk_Init evals a script. */
     if (Tk_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-#ifdef TKSH_V75
-    ((Interp *) interp)->interpType = INTERP_CURRENT;
-#endif
     if (Tksh_Init(interp) == TCL_ERROR) {
 	return TCL_ERROR;
     }
-#ifdef TKSH_V75
-    ((Interp *) interp)->interpType = INTERP_CURRENT;
-	{
-		Tcl_CmdInfo bindInfo;
-		if (Tcl_GetCommandInfo(interp, "button", & bindInfo))
-			Tcl_CreateCommand(interp, "button", bindInfo.proc,
-				bindInfo.clientData, bindInfo.deleteProc);
-	}
-#else
     Tksh_SetCommandType(interp, "button", INTERP_CURRENT);  /* Why do this? */
     Tksh_EndBlock(interp);
-#endif
     Tcl_StaticPackage(interp, "Tk", Tk_Init, (Tcl_PackageInitProc *) NULL);
 #ifdef TK_TEST
     if (Tktest_Init(interp) == TCL_ERROR) {

@@ -170,11 +170,8 @@ csauth(register Cs_t* state, int fd, const char* path, const char* arg)
 			messagef((state->id, NiL, -1, "auth: `%s': challenge syntax error", num));
 			goto sorry;
 		}
-		if (touch(tmp, (time_t)t1, (time_t)t2, 0))
-		{
-			messagef((state->id, NiL, -1, "auth: %s: challenge touch error", tmp));
+		if (cschallenge(state, tmp, &t1, &t2))
 			goto sorry;
-		}
 		if (chmod(tmp, S_ISUID|S_ISGID|S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))
 		{
 			messagef((state->id, NiL, -1, "auth: %s: challenge chmod error", tmp));
@@ -224,8 +221,40 @@ csauth(register Cs_t* state, int fd, const char* path, const char* arg)
 	return -1;
 }
 
+/*
+ * set up the challenge {v1,v2} on path
+ */
+
+int
+cschallenge(Cs_t* state, const char* path, unsigned long* v1, unsigned long* v2)
+{
+	struct stat	st;
+
+	if (touch(path, (time_t)(v1 ? *v1 : cs.time), (time_t)(v2 ? *v2 : cs.time), 0))
+	{
+		messagef((state->id, NiL, -1, "auth: %s: challenge touch error", path));
+		return -1;
+	}
+	if (stat(path, &st))
+	{
+		messagef((state->id, NiL, -1, "auth: %s: challenge stat error", path));
+		return -1;
+	}
+	if (v1)
+		*v1 = st.st_atime;
+	if (v2)
+		*v2 = st.st_mtime;
+	return 0;
+}
+
 int
 _cs_auth(int fd, const char* path, const char* arg)
 {
 	return csauth(&cs, fd, path, arg);
+}
+
+int
+_cs_challenge(const char* path, unsigned long* v1, unsigned long* v2)
+{
+	return cschallenge(&cs, path, v1, v2);
 }

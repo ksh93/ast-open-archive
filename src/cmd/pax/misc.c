@@ -296,8 +296,11 @@ map(register char* name)
 	static Sfio_t*	sp[4];
 	static int	index = 0;
 
-	if (state.filter.line > 0 && *state.filter.name)
+	if (state.filter.line > 1)
+	{
+		state.filter.line = 1;
 		name = state.filter.name;
+	}
 	index ^= 2;
 	from = to = name;
 	for (mp = state.maps; mp; mp = mp->next)

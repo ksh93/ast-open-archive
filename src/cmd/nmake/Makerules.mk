@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)Makerules (AT&T Research) 2000-02-02"
+.ID. = "@(#)Makerules (AT&T Research) 2000-02-14"
 
 /*
  * handy attributes
@@ -124,6 +124,7 @@ link =
 nativepp =
 official_out = OFFICIAL
 output = $(PWD:M=.*[0-9]\.[0-9]:?$$(PWD:B:S:/-*\([0-9]\.[0-9]\)/-\1)?$$(VERSION:Y%$$(PWD:B:S)-$$(VERSION)%$$(PWD:B)%)?)
+package_local = win32.*
 physical =
 prefixinclude = 1
 preserve = $(CC.SUFFIX.SHARED:?lib*$(CC.SUFFIX.SHARED).*??)
@@ -283,6 +284,7 @@ NM = $(CC.NM)
 NMEDIT = $(CC.NMEDIT) -e '/^$(CC.SYMPREFIX)_STUB_/d' -e '/$(CC.SYMPREFIX)_already_defined$/d'
 NMFLAGS = $(CC.NMFLAGS)
 PACKAGE =
+PACKAGE_LOCAL = $(CC.HOSTTYPE:N=$(package_local:/^0$/*/):??$(.PACKAGE.:O=1)_?)
 PAX = pax
 PPCC = $(MAKELIB)/ppcc
 PPCCFLAGS =
@@ -576,18 +578,18 @@ include "Scanrules.mk"
 	if "$(-mam:N=static*)" && "$(%)" != "-l+([a-zA-Z0-9_])"
 		return
 	end
+	if ( T = "$(CC.REQUIRE.$(B))" )
+		if "$(-mam:N=static*)"
+			return
+		end
+		return $(T)
+	end
 	if ( T = "$(PACKAGE_$(B)_LIB)" )
 		T := $(T)/lib/$(B)
 		if ( T = "$(T:T=F)" )
 			return $(T:T=I)
 		end
 		return
-	end
-	if ( T = "$(CC.REQUIRE.$(B))" )
-		if "$(-mam:N=static*)"
-			return
-		end
-		return $(T)
 	end
 	if ! ( T = "$(%:/-l\(.*\)/\1.req/:T=F)" )
 		R := lib/$(B)
@@ -638,10 +640,10 @@ include "Scanrules.mk"
  */
 
 .LD.KEEP. = $(CC.SUFFIX.LD) $(ldscript)
-.ARCHIVE.OMIT. = $(CC.LD.STATIC) $(CC.LD.DYNAMIC) $(.LD.KEEP.)
+.ARCHIVE.OMIT. = $(CC.LD.STATIC)|$(CC.LD.DYNAMIC)$(.LD.KEEP.:/^/|*/:/ //G)
 
 .ARCHIVE.o : .USE .ARCHIVE (AR) (ARFLAGS) .ARPREVIOUS .ARUPDATE .ARCLEAN
-	$(^:?$$(CP) $$(^) $$(<)$$("\n")??)$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(>:N!=$(.ARCHIVE.OMIT.:/^/|*/:/ //G):K=$(AR) $(ARFLAGS) $(<))
+	$(^:?$$(CP) $$(^) $$(<)$$("\n")??)$(.ARPREVIOUS.$(<:B:S):@?$(IGNORE) $$(AR) d $$(<) $$(.ARPREVIOUS.$$(<:B:S))$$("\n")??)$(>:N!=$(.ARCHIVE.OMIT.):K=$(AR) $(ARFLAGS) $(<))
 
 .ARPREVIOUS : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
 	eval
@@ -654,7 +656,7 @@ include "Scanrules.mk"
 .ARCLEAN.LIST. : .FUNCTION
 	local I V
 	if ! .AR.RETAIN
-		for I $(***:T=F:T=G:P=L:A!=.ARCHIVE|.TERMINAL:$(arclean))
+		for I $(***:T=F:T=G:P=L:A!=.ARCHIVE|.TERMINAL:N!=$(.ARCHIVE.OMIT.):$(arclean))
 			if ! "$(~$(I):A=.FORCE:A!=.IGNORE)"
 				V += $(I)
 			end
@@ -906,7 +908,7 @@ DAGGERFLAGS =
 
 .DO.INSTALL.OPT. = $(~:N=user=*:@C,.*,\&\& { $(CHOWN) & $(<) || true ;},:@C, user=, ,G) \
 		   $(~:N=group=*:@C,.*,\&\& { $(CHGRP) & $(<) || true ;},:@C, group=, ,G) \
-		   $(~:N=mode=*:@C,.*,\&\& $(CHMOD) & $(<),:@C, mode=, ,G)
+		   $(~:N=mode=*:@C,.*,\&\& $(CHMOD) & $(<),:@C, mode=\([-+]\), ugo\1,G:@C, mode=, ,G)
 
 .DO.INSTALL.OLD. : .FUNCTION
 	if "$(preserve)" == "1" || "$(preserve:N=*/*:?$$(%:N=$$(preserve))?$$(%:B:S:N=$$(preserve))?)"
@@ -1193,7 +1195,7 @@ end
 				end
 				if T2 != "$(<)?($(CC.SUFFIX.COMMAND))"
 					if STATIC
-						$(T2) : .SPECIAL CC.DLL= CC.PIC=
+						$(T2) : .SPECIAL CC.DLL= CC.DLLBIG= CC.PIC=
 						if CC.SUFFIX.SHARED == ".lib"
 							TS += $(T2)
 							continue
@@ -1246,6 +1248,16 @@ end
 			eval
 				$$(T0) :
 					$(@:V)
+			end
+		end
+		if "$(<:N=*_*)" && ! "$(@$(<):V)" && ( T1 = "$(*$(<):@N=$(<:/.*_//).*)" )
+			T1 := $(T1:S)
+			T2 := %$(T1)>%
+			if "$(@$(T2))"
+				eval
+				$$(<) :
+					$(@$(T2):V:/$$(>)/$$(*:N=*$(T1):O=1)/G)
+				end
 			end
 		end
 		if ! ( T1 = "$(.INSTALL.$(<:B:S):V)" )
@@ -1329,12 +1341,20 @@ end
 
 ":DLL:" : .MAKE .OPERATOR
 	.DLL.LIST. += $$(.LIBRARY.LIST.)
-	.ALL : .DLL
+	if "$(>)" == "BIG"
+		.ALL : .DLLBIG
+	else
+		.ALL : .DLL
+	end
 
-.DLL : .MAKE
+.DLL .DLLBIG : .MAKE
 	local DIR
 	if .DLL.LIST. && ! "$(-mam:N=static*,port*)" && ! "$(.SHARED.ON.)" && ( CC.SUFFIX.DYNAMIC || CC.SUFFIX.SHARED )
-		DIR := cc-g,$(CC.DLL)
+		if "$(<)" == ".DLLBIG"
+			DIR := cc-g,$(CC.DLLBIG)
+		else
+			DIR := cc-g,$(CC.DLL)
+		end
 		if ! "$(DIR:T=F)"
 			{ test -d $(DIR) || $(MKDIR) $(DIR) }
 		end
@@ -1597,6 +1617,9 @@ end
 		if T == "DLL"
 			.DLL.LIST. += $(B)
 			.ALL : .DLL
+		elif T == "DLLBIG"
+			.DLL.LIST. += $(B)
+			.ALL : .DLLBIG
 		end
 	end
 
@@ -1624,7 +1647,7 @@ end
 .SHARED.FLAGS. = : $(CCFLAGS) :
 
 .SHARED.ON. : .FUNCTION
-	if ! "$(static)" && ! "$(CC.LIB.DLL:N=broken)" && "$(CC.DLL)" && ! "$(-mam:N=static*,port*)" && ( "$(.SHARED.FLAGS.:@N=* $(CC.DLL) *)" || "$(.SHARED.FLAGS.:V:@N=* $\(CC.DLL\) *)" )
+	if ! "$(static)" && ! "$(CC.LIB.DLL:N=broken)" && "$(CC.DLL)" && ! "$(-mam:N=static*,port*)" && ( "$(.SHARED.FLAGS.:@N=* ($(CC.DLL)|$(CC.DLLBIG)) *)" || "$(.SHARED.FLAGS.:V:@N=* ($\(CC.DLL\)|$\(CC.DLLBIG\)) *)" )
 		return 1
 	end
 
@@ -1914,7 +1937,9 @@ end
 				end
 			end
 			.PACKAGE.$(P).library := $(library)
-			PACKAGE_$(P)_VERSION := $(V)
+			if "$(V)"
+				PACKAGE_$(P)_VERSION := $(V)
+			end
 			I := $(insert)
 			for N $(T:/:/ /G)
 				if N == "no*"
@@ -1966,6 +1991,32 @@ end
 				.PACKAGE.build += $(P)
 			end
 		end
+	end
+
+/*
+ * :PACKAGE_INIT: foo.c bar.c ...
+ *
+ *	rhs built and copied to $(BINDIR) if not already there
+ *	rhs appear in $(BINDIR) for .LIST.PACKAGE.BINARY
+ *	for source that compiles either standalone or with richer libraries
+ */
+
+":PACKAGE_INIT:" : .MAKE .OPERATOR /* drop after release 2000-02-14 */
+	local I B
+	.LIST.PACKAGE.BINARY : .LIST.PACKAGE.INIT
+	.LIST.PACKAGE.INIT : .MAKE
+		local I
+		for I $(*)
+			print ;;;$(I:T=F:P=A);$(BINDIR)/$(I:B)
+		end
+	for I $(>)
+		B := $(I:B)
+		$(BINDIR) :INSTALLDIR: $(B)
+			if	test ! -f $(<)
+			then	cp $(*) $(<)
+			fi
+		$(B) :: $(I)
+		.LIST.PACKAGE.INIT : $(B)
 	end
 
 /*
@@ -2112,6 +2163,9 @@ end
 			CC.PIC := $(CC.DLL)
 		else
 			CC.DLL := $(CC.PIC)
+		end
+		if ! CC.DLLBIG
+			CC.DLLBIG := $(CC.DLL)
 		end
 		if ! CC.HOSTTYPE
 			CC.HOSTTYPE := $(_hosttype_)
@@ -2318,15 +2372,19 @@ end
 		CC.STDLIB := $(T1:X=$$(CC.STDLIB:C@^/@@))
 	end
 	if T1 = "$(.PACKAGE.build:A!=.TARGET)"
-		local B D I L N Q S V W X Y Z
+		local B D G H I L N Q S T V W X Y Z
 		LDLIBRARIES += $$(.PACKAGE.LIBRARIES. $(T1))
 		T2 =
+		G := $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
 		for T3 $(T1)
 			I := $(PACKAGE_$(T3)_INCLUDE)
 			L := $(PACKAGE_$(T3)_LIB)
 			if ( !I || !L )
 				if ! ( T1 = "$(PACKAGE_$(T3))" )
-					T4 := $(PACKAGE:/:/ /G) $(Y) $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G) $(OPTDIRS:/:/ /G:C%$%/$(T3)%)
+					T4 := $(PACKAGE:/:/ /G) $(Y) $(G) $(G:/:/ /G:C%$%/$(T3)%)
+					if T3 == "*[!0-9]+([0-9])"
+						T4 += $(G:/:/ /G:C%$%/$(T3:C,[0-9]*$,,)%)
+					end
 					V =
 					if T5 = "$(PACKAGE_$(T3)_VERSION)"
 						N := $(T3)-$(T5) $(T3)$(T5) $(T3)R$(T5) $(T3)r$(T5)
@@ -2353,6 +2411,9 @@ end
 					end
 					T1 =
 					N += $(T3)
+					if T3 == "*[!0-9]+([0-9])"
+						N += $(T3:C,[0-9]*$,,)
+					end
 					for S $(CC.SUFFIX.SHARED) $(CC.SUFFIX.ARCHIVE)
 						for D $(N) /
 							T5 := $(T4:N=*/$(D):D) $(T4)
@@ -2395,6 +2456,10 @@ end
 					Y += $(T1)
 					if !I
 						I := $(T1)/include
+						H := $(I)/$(T3)/.
+						if "$(H:P=X)"
+							I := $(I)/$(T3)
+						end
 						eval
 						PACKAGE_$(T3)_INCLUDE = $(I)
 						end
@@ -2410,12 +2475,18 @@ end
 			T2 += $(T3)
 			T4 =
 			if "$(-mam:N=static*)"
-				if "$(INCLUDEDIR:B:N=$(T3))" || "$(INCLUDEDIR:D:N=$(INSTALLROOT))"
+				if "$(INCLUDEDIR:D:N=$(INSTALLROOT))" || "$(INCLUDEDIR:D:D:N=$(INSTALLROOT))"
 					T4 += P
 				end
-				if I && "$(I:D)" == "$(L:D)"
-					print -um setv PACKAGE_$(T3) $(T4:N=P:?${INSTALLROOT}?$(I:D)?)
-					print -um setv PACKAGE_$(T3)_INCLUDE ${PACKAGE_$(T3)}/$(I:B:S)
+				if I && ( "$(I:D)" == "$(L:D)" || "$(I:D:D)" == "$(L:D)" )
+					if "$(I:D)" == "$(L:D)"
+						H := $(I:D)
+					else
+						H := $(I:D:D)
+					end
+					T := $(I:C,^$(H)/,,)
+					print -um setv PACKAGE_$(T3) $(T4:N=P:?${INSTALLROOT}?$(H)?)
+					print -um setv PACKAGE_$(T3)_INCLUDE ${PACKAGE_$(T3)}/$(T)
 					print -um setv PACKAGE_$(T3)_LIB ${PACKAGE_$(T3)}/$(L:B:S)
 					T4 += I L
 				end
@@ -2423,9 +2494,16 @@ end
 			if I
 				if ! "$(CC.STDINCLUDE:N=$(I))"
 					.SOURCE.h : $(I)
+					if "$(I:B)" == "$(T3)" && ! "$(CC.STDINCLUDE:N=$(I:D))"
+						.SOURCE.h : $(I:D)
+					end
 				elif "$(-mam:N=static*)"
 					.SOURCE.h : $(I)
 					CC.STDINCLUDE := $(CC.STDINCLUDE:N!=$(I))
+					if "$(I:B)" == "$(T3)"
+						.SOURCE.h : $(I:D)
+						CC.STDINCLUDE := $(CC.STDINCLUDE:N!=$(I:D))
+					end
 				end
 				if "$(-mam:N=static*)"
 					.MAMPACKAGE. += PACKAGE_$(T3)_INCLUDE
@@ -2942,24 +3020,26 @@ end
 .LIST.INSTALL : .ONOBJECT .MAKE
 	print $(.INSTALL.LIST.:$(INSTALLROOT:N=.:?T=F?N=$(INSTALLROOT)/*:C%$(INSTALLROOT)/%%):C% %$("\n")%G)
 
-.LIST.MANIFEST : .MAKE
+.LIST.MANIFEST : .COMMON.SAVE .MAKE
 	print $(.MANIFEST.:/ /$("\n")/G)
 
-.LIST.PACKAGE.LOCAL : .MAKE
+.LIST.PACKAGE.LOCAL : .COMMON.SAVE .MAKE
 	print $(.MANIFEST.:P=A:/^/;;;/:/ /$("\n")/G)
 
 .LIST.PACKAGE.BINARY : .MAKE
 	.UNION : .CLEAR $(.INSTALL.LIST.:N=$(INSTALLROOT)/*:T=F:P=A)
 	print $(*.UNION:/^/;;;/:/ /$("\n")/G)
 
-.LIST.PACKAGE.SOURCE : .MAKE
+.LIST.PACKAGE.SOURCE : .COMMON.SAVE .MAKE
 	local I
 	PROTOEDIT = P=A
 	for I $(.MANIFEST.:P=A)
 		if I == "*.[chly]"
 			print ^^$(PROTO) $(PROTOFLAGS) -dp $(I)^$(I)
 		elif I == "*.sh"
-			print ^^$(PROTO) $(PROTOFLAGS) -dpS $(I)^$(I)
+			print ^^$(PROTO) $(PROTOFLAGS) -dp -c'#' $(I)^$(I)
+		elif I == "*.sml"
+			print ^^$(PROTO) $(PROTOFLAGS) -dp -c'(*)' $(I)^$(I)
 		else
 			print ^^^$(I)
 		end
@@ -3056,6 +3136,7 @@ end
 	if "$(-mam:N=*,port*)"
 		CC.DIALECT =
 		CC.DLL = ${mam_cc_DLL}
+		CC.DLLBIG = ${mam_cc_DLLBIG}
 		CC.DYNAMIC =
 		CC.HOSTTYPE = $(_hosttype_)
 		CC.SHARED =

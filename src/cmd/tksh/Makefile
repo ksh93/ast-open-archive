@@ -1,49 +1,42 @@
+:PACKAGE: ast tk X11
+
 ID			=	tksh
 LICENSE			=	type=special
 
-CCFLAGS			=	-O $(CC.DLL)
+CCFLAGS			=	-O
 
 TCL_VERSION		=	7.6
 TK_VERSION		=	4.2
 
 LIB_DIR			==	"lib/$(ID)$(TCL_VERSION)"
 TKSH_LIBRARY    	==      "$(LIBDIR)/$(ID)$(TCL_VERSION)"
-TCL_PACKAGE_PATH	==      "$(LIBDIR)"
-TKSH_V75		==	$(TCL_VERSION:N=7.5:?1)
 
 nvenv			==	nvprivate[0]
+_BLD_tcl		==	1
 
-:PACKAGE: ast tk:version=$(TK_VERSION):noinclude X11
+if CC.HOSTTYPE == "win32.*"
+CCFLAGS			=	-O $(CC.DLLBIG)
+end
 
 .SOURCE : src tcl
 .SOURCE.h : include
 
-/*
- * Files that are different for 7.5 and 7.6
- */
+$(ID) :: uinit.c tkMain.c -ltksh
 
-FILES_version =
-FILES_version += $(TCL_VERSION:N=7.5:?tclUnixChan75.c?tclUnixChan.c?)
-FILES_version += $(TCL_VERSION:N=7.5:?tclIOUtil75.c?tclIOUtil.c?)
-
-/*
- * Rules
- */
-
-$(ID) ::	uinit.c tkMain.c +ltksh -ltk +lshell
-
-$(ID) $(TCL_VERSION) $(CC.HOSTTYPE:N=mvs.*:??DLL?) :LIBRARY: \
+$(ID) $(TCL_VERSION) :LIBRARY: \
 	float.h nvextra.h shcompat.h tclInt.h \
-	tclPort.h tclcmd.h tclcmd7.5.h tk.h tksh.h tksh7.5.h \
+	tclPort.h tclcmd.h tksh.h \
 	panic.c regexp.c tclHash.c tclGet.c tclAsync.c tclLink.c tclExpr.c \
 	tclCmdAH.c tclCmdMZ.c tclCmdIL.c tclParse.c tclGlob.c tclUtil.c \
 	tclEvent.c tclPreserve.c tclNotify.c tclClock.c tclDate.c tclInterp.c \
 	tclUnixFile.c tclUnixTime.c tclLoad.c tclLoadDl.c tclPkg.c \
 	tclPosixStr.c tclFHandle.c tclIOCmd.c tclUnixNotfy.c init.c debug.c \
 	var.c eval.c list.c shcompat.c tcleval.c tclproc.c commands.c \
-	varcmd.c tclMain.c basic.c filecmd.c tclIO.c $(FILES_version)
+	varcmd.c tclMain.c basic.c filecmd.c tclIO.c \
+	tclUnixChan.c tclIOUtil.c \
+	$(CC.HOSTTYPE:N=win32.*:?-lshell?+lshell?) -ltk
 
-::	TODO tcl/README tcl/license.terms gen tksh.mk widget \
+::	tcl/README tcl/license.terms gen tksh.mk widget \
 	README RELEASE PROMO.mm tksh.1 scripts/mailfile scripts/watchdir
 
 $(LIBDIR)/$(ID)$(TCL_VERSION):INSTALLDIR: \

@@ -793,8 +793,10 @@ PipeCloseProc(instanceData, interp)
     Tcl_Interp *interp;		/* For error reporting. */
 {
     PipeState *pipePtr;
+#if 0
     FileState *fsPtr;
     Tcl_Channel errChan;
+#endif
     int fd, errorCode, result;
 
     errorCode = 0;

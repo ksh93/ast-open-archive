@@ -29,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)pz library 2.1 (AT&T Labs Research) 1999-10-01\n]"
+"[-1i?\n@(#)pz library 2.1 (AT&T Labs Research) 2000-02-14\n]"
 "[a:append]"
 "[x:crc]"
 "[d:debug]#[level]"

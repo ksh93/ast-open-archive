@@ -28,9 +28,9 @@
  * terminal interface
  */
 
-#ifndef _terminal_
-#define _terminal_	1
-#ifdef _termios_
+#ifndef _TERMINAL_H
+#define _TERMINAL_H	1
+#ifdef _hdr_termios
 #   include	<termios.h>
 #   ifdef __sgi	/* special hack to eliminate ^M problem */
 #	ifndef ECHOCTL
@@ -41,13 +41,16 @@
 #	endif /* CNSUSP */
 #   endif /* __sgi */
 #else
-#   ifdef _sys_termios_
+#   ifdef _sys_termios
 #	include	<sys/termios.h>
-#	define _termios_
-#   endif /* _sys_termios_ */
-#endif /* _termios_ */
-
-#ifdef _termios_
+#	define _hdr_termios
+#   endif /* _sys_termios */
+#endif /* _hdr_termios */
+#if !defined(TCSETS) && !defined(TCSANOW)
+#undef	_hdr_termios
+#undef	_sys_termios
+#endif
+#ifdef _hdr_termios
 #   ifndef TCSANOW
 #	define TCSANOW		TCSETS
 #	define TCSADRAIN	TCSETSW
@@ -61,55 +64,59 @@
 #	define TCSAFLUSH	TCSADFLUSH
 #   endif
 #   undef TIOCGETC
-#   undef _termio_
-#   undef _sys_termio_
-#   undef _sgtty_
-#   undef _sys_ioctl_
-#   undef _sys_bsdtty_
+#   undef _hdr_termio
+#   undef _sys_termio
+#   undef _hdr_sgtty
+#   undef _sys_ioctl
+#   undef _sys_bsdtty
 #else
 #   undef OLDTERMIO
-#endif /* _termios_ */
+#endif /* _hdr_termios */
 
-#ifdef _termio_
+#ifdef _hdr_termio
 #   include	<termio.h>
 #else
-#   ifdef _sys_termio_
+#   ifdef _sys_termio
 #	include	<sys/termio.h>
-#   define _termio_ 1
-#   endif /* _sys_termio_ */
-#endif /* _termio_ */
-#ifdef _termio_
+#   define _hdr_termio 1
+#   endif /* _sys_termio */
+#endif /* _hdr_termio */
+#if !defined(VEOL2) || !defined(TCGETA)
+#undef	_hdr_termio
+#undef	_sys_termio
+#endif
+#ifdef _hdr_termio
 #   define termios termio
-#   undef _sgtty_
+#   undef _hdr_sgtty
 #   undef TIOCGETC
-#   undef _sys_ioctl_
+#   undef _sys_ioctl
 #   define tcgetattr(fd,tty)		ioctl(fd, TCGETA, tty)
 #   define tcsetattr(fd,action,tty)	ioctl(fd, action, tty)
-#endif /* _termio_ */
+#endif /* _hdr_termio */
 
-#ifdef _sys_bsdtty_
+#ifdef _sys_bsdtty
 #   include	<sys/bsdtty.h>
-#endif /* _sys_bsdtty_ */
+#endif /* _sys_bsdtty */
 
-#ifdef _sgtty_
+#ifdef _hdr_sgtty
 #   include	<sgtty.h>
-#   ifdef _sys_nttyio_
+#   ifdef _sys_nttyio
 #	ifndef LPENDIN
 #	    include	<sys/nttyio.h>
 #	endif /* LPENDIN */
-#   endif /* _sys_nttyio_ */
+#   endif /* _sys_nttyio */
 #   define termios sgttyb
-#   undef _sys_ioctl_
+#   undef _sys_ioctl
 #   ifdef TIOCSETN
 #	undef TCSETAW
 #   endif /* TIOCSETN */
 #   ifdef _SELECT_
-#	ifndef included_sys_time_
-#	    ifdef _sys_Time_
+#	ifndef included_sys_time
+#	    ifdef _sys_time
 #		include	<sys/time.h>
-#	    endif /* _sys_Time_ */
-#	    define included_sys_time_
-#	endif /* included_sys_time_ */
+#	    endif /* _sys_time */
+#	    define included_sys_time
+#	endif /* included_sys_time */
 	extern const int tty_speeds[];
 #   endif /* _SELECT_ */
 #   ifdef TIOCGETP
@@ -119,7 +126,7 @@
 #	define tcgetattr(fd,tty)	gtty(fd, tty)
 #	define tcsetattr(fd,action,tty)	stty(fd, tty)
 #   endif /* TIOCGETP */
-#endif /* _sgtty_ */
+#endif /* _hdr_sgtty */
 
 #ifndef TCSANOW
 #   ifdef TCSETAW
@@ -139,11 +146,11 @@
 #	endif /* TIOCSETN */
 #   endif /* TCSETAW */
 #endif /* TCSANOW */
-#endif /* _terminal_ */
+#endif /* _TERMINAL_H */
 
-#ifndef _termios_
+#ifndef _hdr_termios
 #   define cfgetospeed(tp)	((tp)->c_cflag & CBAUD)
-#endif /* _termios_ */
+#endif /* _hdr_termios */
 /* set ECHOCTL if driver can echo control charaters as ^c */
 #ifdef LCTLECH
 #   ifndef ECHOCTL
@@ -166,11 +173,11 @@
 #   endif /* !VEOL2 */
 #endif /* !ECHOCTL */
 
-#ifdef _sys_filio_
+#ifdef _sys_filio
 #   ifndef FIONREAD
 #	include	<sys/filio.h>
 #   endif /* FIONREAD */
-#endif /* _sys_filio_ */
+#endif /* _sys_filio */
 /* set FIORDCHK if you can check for characters in input queue */
 #ifdef FIONREAD
 #   ifndef FIORDCHK

@@ -14,7 +14,7 @@ static int inEval;
 
 static int tksh_command(int argc, char *argv[], void *data)
 {
-	int result, commandType, oldListMode, oldInterpType;
+	int result, commandType, oldInterpType;
 	TkshCommandData *commandData = (TkshCommandData *) data;
 	Interp *interp = (Interp *) commandData->interp;
 

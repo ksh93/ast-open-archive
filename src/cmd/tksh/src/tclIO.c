@@ -12,10 +12,6 @@
  * SCCS: @(#) tclIO.c 1.211 96/04/18 09:59:06
  */
 
-#ifndef TKSH_V75
-#define NEWTCL
-#endif
-
 #include	<ast.h>
 #include	<sfio.h>
 
@@ -172,10 +168,6 @@ typedef struct Channel {
                                  * because it happened in the background. The
                                  * value is the POSIX error code. */
     ClientData instanceData;	/* Instance specific data. */
-#ifndef NEWTCL
-    Tcl_File inFile;		/* File to use for input, or NULL. */
-    Tcl_File outFile;		/* File to use for output, or NULL. */
-#endif
     Tcl_ChannelType *typePtr;	/* Pointer to channel type structure. */
     int refCount;		/* How many interpreters hold references to
                                  * this IO channel? */
@@ -362,10 +354,8 @@ static void		ChannelHandlerSetupProc _ANSI_ARGS_((
 			    ClientData clientData, int flags));
 static void		ChannelEventScriptInvoker _ANSI_ARGS_((
 			    ClientData clientData, int flags));
-#ifdef NEWTCL
 static void		CheckForStdChannelsBeingClosed _ANSI_ARGS_((
 			    Tcl_Channel chan));
-#endif
 static void             CleanupChannelHandlers _ANSI_ARGS_((
 			    Tcl_Interp *interp, Channel *chanPtr));
 static int		CloseChannel _ANSI_ARGS_((Tcl_Interp *interp,
@@ -405,12 +395,8 @@ static int		ScanBufferForEOL _ANSI_ARGS_((Channel *chanPtr,
 #endif
 static int		ScanInputForEOL _ANSI_ARGS_((Channel *chanPtr,
 		            int *bytesQueuedPtr));
-#ifdef NEWTCL
 static void		WaitForChannel _ANSI_ARGS_((Channel *chanPtr,
 			    int mask, int timeOut));
-#else
-#define WaitForChannel TclWaitForFile
-#endif
 #if 1
 
 static int sfBufferSize(f)
@@ -439,9 +425,6 @@ static sfsizeret_t sfReadFile(f, buf, size, disc)
 	chanPtr->flags &= (~CHANNEL_BLOCKED);
 	
         nRead = (chanPtr->typePtr->inputProc) (chanPtr->instanceData,
-#ifndef NEWTCL
-                chanPtr->inFile,
-#endif
 		buf, size, &result);
         while (nRead < 0) {
 	    if ((result == EWOULDBLOCK) || (result == EAGAIN)) {
@@ -453,9 +436,6 @@ static sfsizeret_t sfReadFile(f, buf, size, disc)
 		} else {
 		    WaitForChannel((Channel*)inFile, TCL_READABLE, -1);
 		    nRead= (chanPtr->typePtr->inputProc) (chanPtr->instanceData,
-#ifndef NEWTCL
-			chanPtr->inFile,
-#endif
 			buf, size, &result);
 		}
 	    }
@@ -507,9 +487,6 @@ static int sfWriteTmp(chanPtr)
 		l = sfslen();
 
 		written =  (chanPtr->typePtr->outputProc)(chanPtr->instanceData,
-#ifndef NEWTCL
-			chanPtr->outFile,
-#endif
 			(void *) b, l, &errorCode);
 
 		if (written >= 0)
@@ -526,7 +503,6 @@ static int sfWriteTmp(chanPtr)
 		{
 			outFile = Tcl_GetChannelFile((Tcl_Channel) chanPtr,
 				TCL_WRITABLE);
-#ifdef NEWTCL
 			if (outFile == (Tcl_File) NULL) {
 				WaitForChannel(chanPtr, TCL_WRITABLE, -1);
 			} else if (chanPtr->flags & CHANNEL_NONBLOCKING) {
@@ -535,18 +511,14 @@ static int sfWriteTmp(chanPtr)
 				   FlushEventProc, (ClientData) chanPtr);
 				}
 			}
-#else
-			if (!(chanPtr->flags & BG_FLUSH_SCHEDULED))
-				Tcl_CreateFileHandler(outFile, TCL_WRITABLE,
-				FlushEventProc, (ClientData) chanPtr);
-#endif
 			chanPtr->flags |= BG_FLUSH_SCHEDULED;
 			errorCode = 0;
 			sfseek(asyncFile, 0, 2);
 			return 1;
 		}
-		return -1;
+		break;
 	}
+	return -1;
 }
 
 static int sfWriteFile(f, buf, size, disc)
@@ -561,7 +533,7 @@ static int sfWriteFile(f, buf, size, disc)
 	Tcl_File outFile;
 
 	outFile = Tcl_GetChannelFile((Tcl_Channel) chanPtr, TCL_WRITABLE);
-	if ((!outFile) || (size < 0))
+	if (!outFile)
 		return -1;
 
 	while (1)
@@ -571,9 +543,6 @@ static int sfWriteFile(f, buf, size, disc)
 		{
 			written = (chanPtr->typePtr->outputProc)
 				(chanPtr->instanceData,
-#ifndef NEWTCL
-				outFile,
-#endif
 				(void *) buf, size, &errorCode);
 
 			if (written >= 0)
@@ -627,7 +596,7 @@ static ssize_t sfWriteTrans(f, vbuf, size, disc)
 	Channel *chanPtr = chanDisc->chanPtr;
 	char *buf = (char *) vbuf;
 	static char transBuf[4096];
-	int i, result; char *p, *start = buf;
+	int result; char *p, *start = buf;
 	int crsent = 0;
 
         switch (chanPtr->outputTranslation) {
@@ -788,9 +757,6 @@ static sfoffsett_t sfSeekFile(f, offset, mode, disc)
 		return -1;
 	}
         curPos = (chanPtr->typePtr->seekProc) (chanPtr->instanceData,
-#ifndef NEWTCL
-                chanPtr->inFile, chanPtr->outFile,
-#endif
 		(long) offset, mode, &result);
         if (curPos == -1) {
             Tcl_SetErrno(result);
@@ -863,7 +829,6 @@ Tcl_Channel
 TclFindFileChannel(inFile, outFile, fileUsedPtr)
     Tcl_File inFile, outFile;		/* Channel has these Tcl_Files. */
     int *fileUsedPtr;
-#ifdef NEWTCL
 {
     Channel *chanPtr;
     Tcl_File chanIn, chanOut;
@@ -891,30 +856,6 @@ TclFindFileChannel(inFile, outFile, fileUsedPtr)
     }
     return (Tcl_Channel) NULL;
 }
-#else /*NEWTCL*/
-{
-    Channel *chanPtr;
-    Tcl_File chanIn, chanOut;
-    
-    *fileUsedPtr = 0;
-    for (chanPtr = firstChanPtr;
-             chanPtr != (Channel *) NULL;
-             chanPtr = chanPtr->nextChanPtr) {
-        if ((chanPtr->inFile == inFile) && (chanPtr->outFile == outFile)) {
-            return (Tcl_Channel) chanPtr;
-        }
-        if ((inFile != (Tcl_File) NULL) && (chanPtr->inFile == inFile)) {
-            *fileUsedPtr = 1;
-            return (Tcl_Channel) NULL;
-        }
-        if ((outFile != (Tcl_File) NULL) && (chanPtr->outFile == outFile)) {
-            *fileUsedPtr = 1;
-            return (Tcl_Channel) NULL;
-        }
-    }
-    return (Tcl_Channel) NULL;
-}
-#endif
 
 /*
  *----------------------------------------------------------------------
@@ -1060,7 +1001,6 @@ Tcl_GetStdChannel(type)
 		stdinChannel = TclGetDefaultStdChannel(TCL_STDIN);
 		stdinInitialized = 1;
 
-#ifdef NEWTCL
                 /*
                  * Artificially bump the refcount to ensure that the channel
                  * is only closed on exit.
@@ -1074,7 +1014,6 @@ Tcl_GetStdChannel(type)
                     (void) Tcl_RegisterChannel((Tcl_Interp *) NULL,
                             stdinChannel);
                 }
-#endif
 	    }
 	    channel = stdinChannel;
 	    break;
@@ -1083,7 +1022,6 @@ Tcl_GetStdChannel(type)
 		stdoutChannel = TclGetDefaultStdChannel(TCL_STDOUT);
 		stdoutInitialized = 1;
 
-#ifdef NEWTCL
                 /*
                  * Artificially bump the refcount to ensure that the channel
                  * is only closed on exit.
@@ -1097,7 +1035,6 @@ Tcl_GetStdChannel(type)
                     (void) Tcl_RegisterChannel((Tcl_Interp *) NULL,
                             stdoutChannel);
                 }
-#endif
 	    }
 	    channel = stdoutChannel;
 	    break;
@@ -1106,7 +1043,6 @@ Tcl_GetStdChannel(type)
 		stderrChannel = TclGetDefaultStdChannel(TCL_STDERR);
 		stderrInitialized = 1;
 
-#ifdef NEWTCL
                 /*
                  * Artificially bump the refcount to ensure that the channel
                  * is only closed on exit.
@@ -1120,7 +1056,6 @@ Tcl_GetStdChannel(type)
                     (void) Tcl_RegisterChannel((Tcl_Interp *) NULL,
                             stderrChannel);
                 }
-#endif
 	    }
 	    channel = stderrChannel;
 	    break;
@@ -1255,7 +1190,6 @@ CloseChannelsOnExit(clientData)
         (void) Tcl_SetChannelOption(NULL, (Tcl_Channel) chanPtr,
                 "-blocking", "on");
     
-#ifdef NEWTCL
         if ((chanPtr == (Channel *) stdinChannel) ||
                 (chanPtr == (Channel *) stdoutChannel) ||
                 (chanPtr == (Channel *) stderrChannel)) {
@@ -1267,7 +1201,6 @@ CloseChannelsOnExit(clientData)
 
             chanPtr->refCount--;
         }
-#endif
         if (chanPtr->refCount <= 0) {
 
 	    /*
@@ -1291,21 +1224,7 @@ CloseChannelsOnExit(clientData)
              */
 
             (chanPtr->typePtr->closeProc) (chanPtr->instanceData,
-#ifdef NEWTCL
 		    (Tcl_Interp *) NULL);
-#else
-                    (Tcl_Interp *) NULL, chanPtr->inFile, chanPtr->outFile);
-
-            /*
-             * Finally, we clean up the fields in the channel data structure
-             * since all of them have been deleted already. We mark the
-             * channel with CHANNEL_DEAD to prevent any further IO operations
-             * on it.
-             */
-
-            chanPtr->inFile = (Tcl_File) NULL;
-            chanPtr->outFile = (Tcl_File) NULL;
-#endif
             chanPtr->instanceData = (ClientData) NULL;
             chanPtr->flags |= CHANNEL_DEAD;
         }
@@ -1578,9 +1497,7 @@ Tcl_UnregisterChannel(interp, chan)
      * closed, below. Also set the static pointer to NULL for the channel.
      */
 
-#ifdef NEWTCL
     CheckForStdChannelsBeingClosed(chan);
-#endif
 
     /*
      * If the refCount reached zero, close the actual channel.
@@ -1750,7 +1667,6 @@ Tcl_GetChannel(interp, chanName, modePtr)
  *----------------------------------------------------------------------
  */
 
-#ifdef NEWTCL
 Tcl_Channel
 Tcl_CreateChannel(typePtr, chanName, instanceData, mask)
     Tcl_ChannelType *typePtr;	/* The channel type record. */
@@ -1758,15 +1674,6 @@ Tcl_CreateChannel(typePtr, chanName, instanceData, mask)
     ClientData instanceData;	/* Instance specific data. */
     int mask;			/* TCL_READABLE & TCL_WRITABLE to indicate
                                  * if the channel is readable, writable. */
-#else
-Tcl_Channel
-Tcl_CreateChannel(typePtr, chanName, inFile, outFile, instanceData)
-    Tcl_ChannelType *typePtr;	/* The channel type record. */
-    char *chanName;		/* Name of channel to record. */
-    Tcl_File inFile;		/* File to use for input, or NULL. */
-    Tcl_File outFile;		/* File to use for output, or NULL. */
-    ClientData instanceData;	/* Instance specific data. */
-#endif
 {
     Channel *chanPtr;		/* The channel structure newly created. */
 
@@ -1779,17 +1686,7 @@ Tcl_CreateChannel(typePtr, chanName, inFile, outFile, instanceData)
         panic("Tcl_CreateChannel: NULL channel name");
     }
 
-#ifdef NEWTCL
     chanPtr->flags = mask;
-#else
-    chanPtr->flags = 0;
-    if (inFile != (Tcl_File) NULL) {
-        chanPtr->flags |= TCL_READABLE;
-    }
-    if (outFile != (Tcl_File) NULL) {
-        chanPtr->flags |= TCL_WRITABLE;
-    }
-#endif
 
     /*
      * Set the channel up initially in AUTO input translation mode to
@@ -1805,10 +1702,6 @@ Tcl_CreateChannel(typePtr, chanName, inFile, outFile, instanceData)
 
     chanPtr->unreportedError = 0;
     chanPtr->instanceData = instanceData;
-#ifndef NEWTCL
-    chanPtr->inFile = inFile;
-    chanPtr->outFile = outFile;
-#endif
     chanPtr->typePtr = typePtr;
     chanPtr->refCount = 0;
     chanPtr->closeCbPtr = (CloseCallback *) NULL;
@@ -1856,7 +1749,6 @@ Tcl_CreateChannel(typePtr, chanName, inFile, outFile, instanceData)
     }
 #else
 #define DISC_FD 66
-#ifdef NEWTCL
     if ((stdinChannel == NULL) && (stdinInitialized == 1)) {
 	Tcl_SetStdChannel((Tcl_Channel)chanPtr, TCL_STDIN);
         Tcl_RegisterChannel((Tcl_Interp *) NULL, (Tcl_Channel) chanPtr);
@@ -1867,15 +1759,6 @@ Tcl_CreateChannel(typePtr, chanName, inFile, outFile, instanceData)
 	Tcl_SetStdChannel((Tcl_Channel)chanPtr, TCL_STDERR);
         Tcl_RegisterChannel((Tcl_Interp *) NULL, (Tcl_Channel) chanPtr);
     } 
-#else
-    if (Tcl_GetStdChannel(TCL_STDIN) == NULL) {
-	Tcl_SetStdChannel((Tcl_Channel)chanPtr, TCL_STDIN);
-    } else if (Tcl_GetStdChannel(TCL_STDOUT) == NULL) {
-	Tcl_SetStdChannel((Tcl_Channel)chanPtr, TCL_STDOUT);
-    } else if (Tcl_GetStdChannel(TCL_STDERR) == NULL) {
-	Tcl_SetStdChannel((Tcl_Channel)chanPtr, TCL_STDERR);
-    }
-#endif
     chanPtr->sfPtr = sfnew(NULL, NULL, 0,
 	DISC_FD, SFIO_FLAGS | SF_WRITE | SF_READ);
     memset((void*) (& chanPtr->sfDisc), 0, sizeof(ChannelDisc));
@@ -2040,18 +1923,7 @@ Tcl_GetChannelFile(chan, direction)
     Channel *chanPtr;		/* The actual channel. */
 
     chanPtr = (Channel *) chan;
-#ifdef NEWTCL
     return (chanPtr->typePtr->getFileProc) (chanPtr->instanceData, direction);
-#else
-    switch (direction) {
-        case TCL_WRITABLE:
-            return chanPtr->outFile;
-        case TCL_READABLE:
-            return chanPtr->inFile;
-        default:
-            return NULL;
-    }
-#endif
 }
 
 /*
@@ -2221,11 +2093,11 @@ FlushChannel(interp, chanPtr, calledFromAsyncFlush)
 #if 0
     ChannelBuffer *bufPtr;		/* Iterates over buffered output
                                          * queue. */
-#endif
     int toWrite;			/* Amount of output data in current
                                          * buffer available to be written. */
     int written;			/* Amount of output data actually
                                          * written in current round. */
+#endif
     int errorCode;			/* Stores POSIX error codes from
                                          * channel driver operations. */
 
@@ -2471,23 +2343,9 @@ CloseChannel(interp, chanPtr, errorCode)
                                          * all channels - used to splice a
                                          * channel out of the list on close. */
     
-#ifdef NEWTCL
     if (chanPtr == NULL) {
         return 0;
     }
-#else
-    /*
-     * Remove the channel from the standard channel table.
-     */
-    
-    if (Tcl_GetStdChannel(TCL_STDIN) == (Tcl_Channel) chanPtr) {
-	Tcl_SetStdChannel(NULL, TCL_STDIN);
-    } else if (Tcl_GetStdChannel(TCL_STDOUT) == (Tcl_Channel) chanPtr) {
-	Tcl_SetStdChannel(NULL, TCL_STDOUT);
-    } else if (Tcl_GetStdChannel(TCL_STDERR) == (Tcl_Channel) chanPtr) {
-	Tcl_SetStdChannel(NULL, TCL_STDERR);
-    } 
-#endif
 #if 0
     /*
      * No more input can be consumed so discard any leftover input.
@@ -2519,23 +2377,12 @@ CloseChannel(interp, chanPtr, errorCode)
      * output device.
      */
 
-#ifdef NEWTCL
     if ((chanPtr->outEofChar != 0) && (chanPtr->flags & TCL_WRITABLE)) {
-#else
-    if ((chanPtr->outEofChar != 0) && (chanPtr->outFile != NULL)) {
-#endif
         int dummy;
         char c;
 
         c = (char) chanPtr->outEofChar;
-#ifdef NEWTCL
 	(chanPtr->typePtr->outputProc) (chanPtr->instanceData, &c, 1, &dummy);
-#else
-        if (!(chanPtr->flags & CHANNEL_DEAD)) {
-            (chanPtr->typePtr->outputProc) (chanPtr->instanceData,
-                    chanPtr->outFile, &c, 1, &dummy);
-        }
-#endif
     }
 #if 1
     	if ((chanPtr->sfPtr == sfstdin) || (chanPtr->sfPtr == sfstdout) ||
@@ -2579,14 +2426,7 @@ CloseChannel(interp, chanPtr, errorCode)
      * OK, close the channel itself.
      */
         
-#ifdef NEWTCL
     result = (chanPtr->typePtr->closeProc) (chanPtr->instanceData, interp);
-#else
-    if (!(chanPtr->flags & CHANNEL_DEAD)) {
-        result = (chanPtr->typePtr->closeProc) (chanPtr->instanceData, interp,
-                chanPtr->inFile, chanPtr->outFile);
-    }
-#endif
     if (chanPtr->channelName != (char *) NULL) {
         ckfree(chanPtr->channelName);
     }
@@ -2651,7 +2491,6 @@ Tcl_Close(interp, chan)
     int result;				/* Of calling FlushChannel. */
 
     chanPtr = (Channel *) chan;
-#ifdef NEWTCL
     /*
      * Perform special handling for standard channels being closed. If the
      * refCount is now 1 it means that the last reference to the standard
@@ -2661,7 +2500,6 @@ Tcl_Close(interp, chan)
      */
 
     CheckForStdChannelsBeingClosed(chan);
-#endif
     if (chanPtr->refCount > 0) {
         panic("called Tcl_Close on channel with refCount > 0");
     }
@@ -2813,7 +2651,6 @@ Tcl_Write(chan, srcPtr, slen)
     Channel *chanPtr;			/* The actual channel. */
 #if 0
     ChannelBuffer *outBufPtr;		/* Current output buffer. */
-#endif
     int foundNewline;			/* Did we find a newline in output? */
     char *dPtr, *sPtr;			/* Search variables for newline. */
     int crsent;				/* In CRLF eol translation mode,
@@ -2829,6 +2666,7 @@ Tcl_Write(chan, srcPtr, slen)
     int srcCopied;			/* How many bytes were copied from
                                          * the source string? */
     char *destPtr;			/* Where in line to copy to? */
+#endif
 
     chanPtr = (Channel *) chan;
 
@@ -2978,8 +2816,7 @@ Tcl_Write(chan, srcPtr, slen)
     return totalDestCopied;
 #else
 	chanSetFlags(chanPtr);
-	totalDestCopied = sfwrite(chanPtr->sfPtr, srcPtr, slen);
-	return totalDestCopied;
+	return sfwrite(chanPtr->sfPtr, srcPtr, slen);
 #endif
 }
 
@@ -3744,9 +3581,11 @@ Tcl_Read(chan, bufPtr, toRead)
     Channel *chanPtr;		/* The real IO channel. */
     int copied;			/* How many characters were copied into
                                  * the result string? */
+#if 0
     int copiedNow;		/* How many characters were copied from
                                  * the current input buffer? */
     int result;			/* Of calling GetInput. */
+#endif
     
     chanPtr = (Channel *) chan;
 
@@ -3848,8 +3687,10 @@ Tcl_Gets(chan, lineRead)
     int offset;			/* Offset from start of DString at
                                  * which to append the line just read. */
     int copiedTotal;		/* Accumulates total length of input copied. */
+#if 0
     int copiedNow;		/* How many bytes were copied from the
                                  * current input buffer? */
+#endif
     int lineLen;		/* Length of line read, including the
                                  * translated newline. If this is zero
                                  * and neither EOF nor BLOCKED is set,
@@ -4002,13 +3843,13 @@ Tcl_Seek(chan, offset, mode)
 #if 0
     ChannelBuffer *bufPtr;	/* Iterates over queued input
                                  * and output buffers. */
-#endif
     int inputBuffered, outputBuffered;
-    int result;			/* Of device driver operations. */
-    int curPos;			/* Position on the device. */
     int wasAsync;		/* Was the channel nonblocking before the
                                  * seek operation? If so, must restore to
                                  * nonblocking mode after the seek. */
+#endif
+    int result;			/* Of device driver operations. */
+    int curPos;			/* Position on the device. */
 
     chanPtr = (Channel *) chan;
 
@@ -4186,9 +4027,6 @@ Tcl_Seek(chan, offset, mode)
 			Tcl_SetErrno(EINVAL);
 		else {
 		   curPos = (chanPtr->typePtr->seekProc) (chanPtr->instanceData,
-#ifndef NEWTCL
-			chanPtr->inFile, chanPtr->outFile,
-#endif
 			(long) offset, mode, &result);
 	           if (curPos == -1)
 			Tcl_SetErrno(result);
@@ -4225,9 +4063,9 @@ Tcl_Tell(chan)
 #if 0
     ChannelBuffer *bufPtr;		/* Iterates over queued input
                                          * and output buffers. */
-#endif
     int inputBuffered, outputBuffered;
     int result;				/* Of calling device driver. */
+#endif
     int curPos;				/* Position on device. */
 
     chanPtr = (Channel *) chan;
@@ -4410,8 +4248,8 @@ Tcl_InputBuffered(chan)
     Tcl_Channel chan;			/* The channel to query. */
 {
     Channel *chanPtr;
-    int bytesBuffered;
 #if 0
+    int bytesBuffered;
     ChannelBuffer *bufPtr;
 #endif
 
@@ -4752,9 +4590,6 @@ Tcl_SetChannelOption(interp, chan, optionName, newValue)
         result = 0;
         if (chanPtr->typePtr->blockModeProc != NULL) {
             result = (chanPtr->typePtr->blockModeProc) (chanPtr->instanceData,
-#ifndef NEWTCL
-                    chanPtr->inFile, chanPtr->outFile,
-#endif
 		    newMode);
         }
         if (result != 0) {
@@ -5085,7 +4920,6 @@ CleanupChannelHandlers(interp, chanPtr)
     }
 }
 
-#ifdef NEWTCL
 /*
  *----------------------------------------------------------------------
  *
@@ -5175,7 +5009,6 @@ WaitForChannel(chanPtr, mask, timeout)
 	}
     }
 }
-#endif
 
 /*
  *----------------------------------------------------------------------
@@ -5255,7 +5088,6 @@ ChannelHandlerSetupProc(clientData, flags)
 		sfInBuffer(chanPtr->sfPtr, 0)) {
 #endif
                 Tcl_SetMaxBlockTime(&dontBlock);
-#ifdef NEWTCL
             } else if (chanPtr->flags & TCL_READABLE) {
                 (chanPtr->typePtr->watchChannelProc) (chanPtr->instanceData,
                         TCL_READABLE);
@@ -5271,25 +5103,6 @@ ChannelHandlerSetupProc(clientData, flags)
             (chanPtr->typePtr->watchChannelProc) (chanPtr->instanceData,
                     TCL_EXCEPTION);
         }
-#else
-            } else if (chanPtr->inFile != (Tcl_File) NULL) {
-                Tcl_WatchFile(chanPtr->inFile, TCL_READABLE);
-            }
-        }
-        if (chanPtr->interestMask & TCL_WRITABLE) {
-            if (chanPtr->outFile != (Tcl_File) NULL) {
-                Tcl_WatchFile(chanPtr->outFile, TCL_WRITABLE);
-            }
-        }
-        if (chanPtr->interestMask & TCL_EXCEPTION) {
-            if (chanPtr->inFile != (Tcl_File) NULL) {
-                Tcl_WatchFile(chanPtr->inFile, TCL_EXCEPTION);
-            }
-            if (chanPtr->outFile != (Tcl_File) NULL) {
-                Tcl_WatchFile(chanPtr->outFile, TCL_EXCEPTION);
-            }
-        }
-#endif
     }
 }
 
@@ -5366,15 +5179,9 @@ ChannelHandlerCheckProc(clientData, flags)
 		sfInBuffer(chanPtr->sfPtr, 0)) {
 #endif
                 readyMask |= TCL_READABLE;
-#ifdef NEWTCL
             } else {
                 readyMask |= (chanPtr->typePtr->channelReadyProc)
                     (chanPtr->instanceData, TCL_READABLE);
-#else
-            } else if (chanPtr->inFile != (Tcl_File) NULL) {
-                readyMask |=
-                    Tcl_FileReady(chanPtr->inFile, TCL_READABLE);
-#endif
             }
         }
 
@@ -5395,15 +5202,9 @@ ChannelHandlerCheckProc(clientData, flags)
 #else
 	if (     (! sfInBuffer(chanPtr->sfPtr, 1)) &&	/* XXXXXX */
 #endif
-#ifdef NEWTCL
 		    (chanPtr->flags & TCL_WRITABLE)) {
                 readyMask |= (chanPtr->typePtr->channelReadyProc)
                     (chanPtr->instanceData, TCL_WRITABLE);
-#else
-                    (chanPtr->outFile != (Tcl_File) NULL)) {
-                readyMask |=
-                    Tcl_FileReady(chanPtr->outFile, TCL_WRITABLE);
-#endif
             }
         }
 
@@ -5412,19 +5213,8 @@ ChannelHandlerCheckProc(clientData, flags)
          */
 
         if (chanPtr->interestMask & TCL_EXCEPTION) {
-#ifdef NEWTCL
 	    readyMask |= (chanPtr->typePtr->channelReadyProc)
                 (chanPtr->instanceData, TCL_EXCEPTION);
-#else
-            if (chanPtr->inFile != (Tcl_File) NULL) {
-                readyMask |=
-                    Tcl_FileReady(chanPtr->inFile, TCL_EXCEPTION);
-            }
-            if (chanPtr->outFile != (Tcl_File) NULL) {
-                readyMask |=
-                    Tcl_FileReady(chanPtr->outFile, TCL_EXCEPTION);
-            }
-#endif
         }
         
         /*
@@ -6075,8 +5865,8 @@ TclTestChannelCmd(clientData, interp, argc, argv)
     Channel *chanPtr;		/* The actual channel. */
     Tcl_Channel chan;		/* The opaque type. */
     size_t len;			/* Length of subcommand string. */
-    int IOQueued;		/* How much IO is queued inside channel? */
 #if 0
+    int IOQueued;		/* How much IO is queued inside channel? */
     ChannelBuffer *bufPtr;	/* For iterating over queued IO. */
 #endif
     char buf[128];		/* For sprintf. */

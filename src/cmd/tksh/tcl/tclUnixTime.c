@@ -12,6 +12,53 @@
  * SCCS: @(#) tclUnixTime.c 1.11 96/07/23 16:17:21
  */
 
+#if _PACKAGE_ast
+
+#include <ast.h>
+#include <tm.h>
+
+#include "tcl.h"
+
+/*
+ * see function comments below for details
+ */
+
+unsigned long
+TclpGetSeconds()
+{
+	return time(NiL);
+}
+
+unsigned long
+TclpGetClicks()
+{
+	struct timeval	tv;
+
+	tmtimeofday(&tv);
+	return 1000000 * tv.tv_sec + tv.tv_usec;
+}
+
+int
+TclpGetTimeZone(now)
+unsigned long	now;
+{
+	tmset(tm_info.zone);
+	return tm_info.zone->west;
+}
+
+void
+TclpGetTime(tp)
+Tcl_Time*	tp;
+{
+	struct timeval	tv;
+
+	tmtimeofday(&tv);
+	tp->sec = tv.tv_sec;
+	tp->usec = tv.tv_usec;
+}
+
+#else /* _PACKAGE_ast */
+
 #include "tclInt.h"
 #include "tclPort.h"
 
@@ -215,3 +262,5 @@ TclpGetTime(timePtr)
     timePtr->sec = tv.tv_sec;
     timePtr->usec = tv.tv_usec;
 }
+
+#endif /* _PACKAGE_ast */

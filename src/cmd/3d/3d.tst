@@ -1,6 +1,6 @@
 : 3d regression tests
 #
-# 3d.tst (AT&T Research) 02/29/96
+# 3d.tst (AT&T Research) 2000-02-29
 #
 # the first section defines the test harness
 # the next section defines individual test functions
@@ -12,22 +12,21 @@
 	exit 1
 }
 
-integer errors=0 seconds=0 tests=0
+integer seconds=0
+
+COMMAND=3d
 
 ACTIVE=
 FILE=
 FORMAT="%Y-%m-%d+%H:%M:%S"
 GROUP=
 INIT=
-NAME=${0##*/}
-NAME=${NAME%%.*}
 NEW="new-and-improved"
 NUKE=
 OLD="original"
-OWD=$PWD
+pwd=$PWD
 PREFIX=
 STAMP="2005-07-17+04:05:06"
-TMP=/tmp/3d.$$
 VIRTUAL=
 
 for i
@@ -39,22 +38,21 @@ done
 case $ACTIVE in
 "")	ACTIVE="*" ;;
 esac
-trap "(( errors++ ))" ERR
-trap "DONE" 0 1 2
-mkdir $TMP || exit
-cd $TMP
+trap "(( ERRORS++ ))" ERR
+trap "CLEANUP 0" 0
+tmp=/tmp/$$.3d
+mkdir $tmp || exit
+cd $tmp
 mkdir bottom
-
-alias INIT='ACTIVE && DATA $* || return'
 
 function TEST
 {
 	case $INIT in
 	"")	INIT=1
-		print "TEST	$NAME"
+		print "TEST	$COMMAND"
 		;;
 	esac
-	cd $TMP
+	cd $tmp
 	case $NUKE in
 	?*)	rm -rf $NUKE; NUKE= ;;
 	esac
@@ -71,20 +69,11 @@ function ACTIVE
 	[[ $GROUP == @($ACTIVE) ]]
 }
 
-function DONE
-{
-	trap - 0 1 2
-	cd $OWD
-	rm -rf $TMP
-	print "TEST	$NAME, $tests tests, $errors errors"
-	exit
-}
-
 function FAIL # file message
 {
 	print -u2 "	FAIL $@"
 	rm -rf $1
-	(( errors++ ))
+	(( ERRORS++ ))
 }
 
 function PREFIX
@@ -102,8 +91,8 @@ function VIRTUAL
 	ACTIVE || return
 	case $VIRTUAL in
 	?*)	pwd=$PWD
-		cd $TMP
-		rm -rf $TMP/$VIRTUAL
+		cd $tmp
+		rm -rf $tmp/$VIRTUAL
 		cd $pwd
 		;;
 	esac
@@ -113,7 +102,7 @@ function VIRTUAL
 function CD
 {
 	ACTIVE || return
-	cd $TMP/$1
+	cd $tmp/$1
 }
 
 function VPATH
@@ -155,26 +144,26 @@ function DATA
 	1)	;;
 	*)	return 1 ;;
 	esac
-	(( tests++ ))
+	(( TESTS++ ))
 	path=$1
 	case $PREFIX in
 	"")	FILE=$path ;;
 	*)	FILE=$PREFIX/$path ;;
 	esac
 	file=bottom/$path
-	if	[[ ! -f $TMP/$file ]]
+	if	[[ ! -f $tmp/$file ]]
 	then	case $remove in
-		0)	if	[[ $path == */* && ! -d $TMP/${file%/*} ]]
-			then	mkdir -p $TMP/${file%/*} || FAIL $TMP/${file%/*} DATA mkdir
+		0)	if	[[ $path == */* && ! -d $tmp/${file%/*} ]]
+			then	mkdir -p $tmp/${file%/*} || FAIL $tmp/${file%/*} DATA mkdir
 			fi
-			print $OLD > $TMP/$file
+			print $OLD > $tmp/$file
 			mode=${file%???}
 			mode=${file#$mode}
-			chmod $mode $TMP/$file || FAIL $TMP/$file DATA chmod
+			chmod $mode $tmp/$file || FAIL $tmp/$file DATA chmod
 			;;
 		esac
 	else	case $remove in
-		1)	rm -f $TMP/$file ;;
+		1)	rm -f $tmp/$file ;;
 		esac
 	fi
 	return 0
@@ -186,7 +175,7 @@ function DATA
 
 function APPEND
 {
-	INIT
+	ACTIVE && DATA $* || return
 	print "$NEW" >> $FILE || FAIL $FILE write error
 	if	[[ $(<$FILE) != "$OLD"$'\n'"$NEW" ]]
 	then	FAIL $FILE unchanged by $0
@@ -197,7 +186,7 @@ function APPEND
 
 function MODE
 {
-	INIT
+	ACTIVE && DATA $* || return
 	chmod 000 $FILE || FAIL $FILE chmod error
 	if	[[ -f $FILE/... && ! -r $FILE/... ]]
 	then	FAIL $FILE/... changed by $0
@@ -208,7 +197,7 @@ function MODE
 
 function REMOVE
 {
-	INIT
+	ACTIVE && DATA $* || return
 	rm $FILE || FAIL $FILE rm error
 	if	[[ ! -f $FILE/... ]]
 	then	FAIL $FILE/... changed by $0
@@ -224,13 +213,13 @@ function REMOVE
 
 function TOUCH
 {
-	INIT
-	touch -r $FILE -t "$seconds seconds hence" $TMP/reference || FAIL $TMP/reference touch error
+	ACTIVE && DATA $* || return
+	touch -r $FILE -t "$seconds seconds hence" $tmp/reference || FAIL $tmp/reference touch error
 	(( seconds++ ))
 	touch -t "$seconds seconds hence" $FILE || FAIL $FILE touch error
-	if	[[ $FILE/... -nt $TMP/reference ]]
+	if	[[ $FILE/... -nt $tmp/reference ]]
 	then	FAIL $FILE/... changed by $0
-	elif	[[ ! $FILE -nt $TMP/reference ]]
+	elif	[[ ! $FILE -nt $tmp/reference ]]
 	then	FAIL $FILE unchanged by $0
 	fi
 	touch -t $STAMP $FILE
@@ -241,7 +230,7 @@ function TOUCH
 
 function UPDATE
 {
-	INIT
+	ACTIVE && DATA $* || return
 	print "$NEW" 1<> $FILE || FAIL $FILE write error
 	if	[[ $(<$FILE) != "$NEW" ]]
 	then	FAIL $FILE unchanged by $0
@@ -252,7 +241,7 @@ function UPDATE
 
 function WRITE
 {
-	INIT
+	ACTIVE && DATA $* || return
 	print "$NEW" > $FILE || FAIL $FILE write error
 	if	[[ $(<$FILE) != "$NEW" ]]
 	then	FAIL $FILE unchanged by $0
@@ -263,7 +252,7 @@ function WRITE
 
 function RUN
 {
-	INIT
+	ACTIVE && DATA $* || return
 	WRITE	w666
 	WRITE	w600
 	TOUCH	t777

@@ -1,7 +1,7 @@
 /***************************************************************
 *                                                              *
 *           This software is part of the ast package           *
-*              Copyright (c) 1990-2000 AT&T Corp.              *
+*              Copyright (c) 1989-2000 AT&T Corp.              *
 *      and it may only be used by you under license from       *
 *                     AT&T Corp. ("AT&T")                      *
 *       A copy of the Source Code Agreement is available       *
@@ -35,6 +35,8 @@
 #include "3d.h"
 
 #if SYSTRACE3D
+
+#define SYSCALL		syscall3d
 
 #include "dir_3d.h"
 
@@ -316,7 +318,7 @@ syscall3d(int call, ...)
 					struct stat	st;
 
 					n = errno;
-					if (!FSTAT(m, &st) && st.st_ino == state.fs[FS_option].st.st_ino && st.st_dev == state.fs[FS_option].st.st_dev)
+					if (!fstat(m, &st) && st.st_ino == state.fs[FS_option].st.st_ino && st.st_dev == state.fs[FS_option].st.st_dev)
 						a = 0;
 					errno = n;
 				}

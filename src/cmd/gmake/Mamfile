@@ -1,10 +1,10 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_coshell ${INSTALLROOT}
 setv PACKAGE_coshell_INCLUDE ${PACKAGE_coshell}/include
 setv PACKAGE_coshell_LIB ${PACKAGE_coshell}/lib
 setv PACKAGE_ast ${INSTALLROOT}
-setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include
+setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
 setv PACKAGEROOT ../../../../..
 setv AR ar
@@ -77,22 +77,21 @@ prev ${PACKAGE_coshell_INCLUDE}/ast/limits.h implicit
 make signame.h implicit
 done signame.h dontcare
 make ${PACKAGE_coshell_INCLUDE}/ast/re_comp.h implicit
+make ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 make ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h dontcare
 done ${PACKAGE_coshell_INCLUDE}/ast/re_comp.h dontcare
 prev getopt.h implicit
 prev ${PACKAGE_coshell_INCLUDE}/ast/stdio.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 make config.h implicit
-make config.status
-make configure
-done configure
-make config.h.in
-done config.h.in
-exec - CC='${CC}' CFLAGS='${CCFLAGS}   ' CONFIG_SHELL=${SHELL} ${SHELL} configure
-done config.status generated
-exec - ${SHELL} config.status
+make config.iffe
+done config.iffe
+setv mam_libcoshell ${mam_cc_L+-lcoshell}${mam_cc_L-${PACKAGE_coshell_LIB}/libcoshell.a}
+setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_coshell_LIB}/libast.a}
+exec - iffe -o config.h -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_coshell_LIB}} -I${PACKAGE_coshell_INCLUDE}/ast -I${PACKAGE_coshell_INCLUDE} ${mam_libcoshell} ${mam_libast} ${mam_libast} : run config.iffe
 make mam.h implicit
 prev ${PACKAGE_coshell_INCLUDE}/ast/stdio.h implicit
 make ${PACKAGE_coshell_INCLUDE}/ast/ast_std.h implicit
@@ -107,7 +106,7 @@ done ${PACKAGE_coshell_INCLUDE}/ast/ast_mode.h dontcare
 make ${PACKAGE_coshell_INCLUDE}/ast/ast_fs.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/ast_fs.h dontcare
 prev ${PACKAGE_coshell_INCLUDE}/ast/ast_std.h implicit
-prev ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/ls.h dontcare
 prev ${PACKAGE_coshell_INCLUDE}/ast/ast_fs.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/ast_fcntl.h dontcare
@@ -120,9 +119,9 @@ prev getopt.h implicit
 make ${PACKAGE_coshell_INCLUDE}/ast/ast_lib.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/ast_lib.h dontcare
 prev ${PACKAGE_coshell_INCLUDE}/ast/ast_common.h implicit
-prev ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/ast_std.h dontcare
-done mam.h
+done mam.h dontcare
 done config.h generated
 done make.h
 done commands.c
@@ -165,7 +164,7 @@ done job.o generated
 make dir.o
 make dir.c
 make ${PACKAGE_coshell_INCLUDE}/ast/glob.h implicit
-prev ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/glob.h
 prev pathstuff.h implicit
 make vmsdir.h implicit
@@ -174,7 +173,7 @@ make ndir.h implicit
 done ndir.h dontcare virtual
 make ${PACKAGE_coshell_INCLUDE}/ast/dirent.h implicit
 prev ${PACKAGE_coshell_INCLUDE}/ast/ast_std.h implicit
-prev ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/dirent.h dontcare
 prev make.h implicit
 done dir.c
@@ -383,15 +382,15 @@ make ${PACKAGE_coshell_INCLUDE}/ast/sfio.h implicit
 prev ${PACKAGE_coshell_INCLUDE}/ast/ast_common.h implicit
 prev ${PACKAGE_coshell_INCLUDE}/ast/ast_std.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/sfio.h dontcare
-prev ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/coshell.h
 make ${PACKAGE_coshell_INCLUDE}/ast/ast.h implicit
 prev ${PACKAGE_coshell_INCLUDE}/ast/sfio.h implicit
 prev ${PACKAGE_coshell_INCLUDE}/ast/ast_std.h implicit
 make ${PACKAGE_coshell_INCLUDE}/ast/ast_version.h implicit
-prev ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/ast_version.h dontcare
-prev ${PACKAGE_coshell_INCLUDE}/prototyped.h implicit
+prev ${PACKAGE_coshell_INCLUDE}/ast/prototyped.h implicit
 done ${PACKAGE_coshell_INCLUDE}/ast/ast.h
 done remote-cosh.c
 prev remote-cosh.c
@@ -444,8 +443,6 @@ done ${mam_libkstat} dontcare virtual
 make ${mam_libkvm}
 done ${mam_libkvm} dontcare virtual
 setv mam_libelf `(set -; cd /tmp; echo 'main(){return(0);}' > x.${!-$$}.c; ${CC} ${CCFLAGS}    -o x.${!-$$}.x x.${!-$$}.c -lelf >/dev/null 2>&1 && echo ' -lelf'; rm -f x.${!-$$}.[cox])`
-setv mam_libcoshell ${mam_cc_L+-lcoshell}${mam_cc_L-${PACKAGE_coshell_LIB}/libcoshell.a}
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_coshell_LIB}/libast.a}
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.} ${mam_cc_L+-L${PACKAGE_coshell_LIB}}  -o gmake commands.o job.o dir.o file.o misc.o main.o read.o remake.o rule.o implicit.o default.o variable.o expand.o function.o vpath.o version.o ar.o arscan.o signame.o remote-cosh.o getopt.o getopt1.o getloadavg.o ${mam_libelf} ${mam_libcoshell} ${mam_libast} ${mam_libast}
 done gmake generated
 make ${INSTALLROOT}/bin

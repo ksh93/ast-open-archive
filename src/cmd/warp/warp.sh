@@ -110,7 +110,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 date [ command [ arg ... ] ]
 
 [+ENVIRONMENT?\bwarp\b is implemented by three components: the \bwarp\b script,
-	located on \b$PATH\b; the warp dll (shared library), located either
+	located on \b$PATH\b; the \bwarp\b dll (shared library), located either
 	on \b$PATH\b or in one of the \b../lib\b* directories on \b$PATH\b,
 	depending on local compilation system conventions; and the \bast\b
 	\bdate\b(1) command, located on \b$PATH\b, that supports conversion

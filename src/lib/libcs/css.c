@@ -285,16 +285,17 @@ cssopen(const char* path, Cssdisc_t* disc)
 			TOSS(css->conkey);
 			*css->control = CS_MNT_AUTH;
 			remove(css->mount);
+			css->newkey = css->conkey & KEYMASK;
 			if (close(open(css->mount, O_WRONLY|O_CREAT|O_TRUNC, st.st_mode & (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) ||
 			    chmod(css->mount, st.st_mode & (S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) ||
-			    touch(css->mount, (time_t)cs.time, (time_t)css->conkey & KEYMASK, 0))
+			    cschallenge(css->state, css->mount, NiL, &css->newkey))
 			{
 				if (css->disc->errorf)
 					(*css->disc->errorf)(css, css->disc, 3, "%s: cannot create service authentication file", css->mount);
 				goto bad;
 			}
 			chown(css->mount, -1, css->gid);
-			css->oldkey = css->newkey = css->conkey & KEYMASK;
+			css->oldkey = css->newkey;
 			for (n = 0; n < (css->newkey & 0xff); n++)
 				css->conkey = CSTOSS(css->conkey, n);
 			css->challenge = (st.st_mode & S_IXOTH) ? 2 : 0;
@@ -634,7 +635,7 @@ csspoll(unsigned long ms, unsigned long flags)
 						do TOSS(css->newkey); while (n--);
 						css->newkey &= KEYMASK;
 						*css->control = CS_MNT_AUTH;
-						if (touch(css->mount, (time_t)cs.time, (time_t)css->newkey, 0))
+						if (cschallenge(css->state, css->mount, NiL, &css->newkey))
 							css->newkey = css->oldkey;
 					}
 				for (pp = state.fdpoll; pp < state.fdpoll + state.fdpolling;)

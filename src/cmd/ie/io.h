@@ -35,16 +35,16 @@
 
 #include	"sh_config.h"
 #include	<sys/stat.h>
-#ifdef _unistd_
+#ifdef _hdr_unistd
 #   include	<unistd.h>
-#endif /* _unistd_ */
-#ifdef _fcntl_
+#endif /* _hdr_unistd */
+#ifdef _hdr_fcntl
 #   include	<fcntl.h>
-#endif /* _fcntl_ */
+#endif /* _hdr_fcntl */
 #ifndef	O_CREAT
-#   ifdef _sys_file_
+#   ifdef _sys_file
 #	include	<sys/file.h>
-#   endif /* _sys_file_ */
+#   endif /* _sys_file */
 #endif	/* O_CREAT */
 
 #ifndef S_ISDIR

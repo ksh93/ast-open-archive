@@ -754,7 +754,9 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 			error(PANIC, "%s: active=0", r->name);
 		}
 #endif
-		if (r2 = metaget(r, r->active->prereqs, stem, &r4))
+		if ((r2 = metaget(r, r->active->prereqs, stem, &r4)) && !(state.test & 0x00100000) && strchr(unbound(r), '/') && !strchr(r4->name, '/'))
+			r2 = 0;
+		if (r2)
 		{
 			r1 = r4;
 			if (state.mam.out && !mam)

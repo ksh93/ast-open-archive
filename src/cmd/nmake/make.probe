@@ -25,6 +25,7 @@ probe_nm="nm"
 probe_nmflags="'' -p -B"
 probe_optimize="-O"
 probe_pic="-Kpic -KPIC -fpic -pic +z '-G 0' -D_DLL_BLD -Wc,exportall"
+probe_PIC="-Kpic -KPIC -fpic -fPIC -pic -PIC +z +Z"
 probe_readonly="-R -Krodata -xMerge -Wa,-r"
 probe_shared="'' -G -b -c -shared -Wl,dll"
 probe_shared_nostart="-nostartfiles"
@@ -275,6 +276,26 @@ then	e=`wc -l e`
 				break
 				;;
 			esac
+			;;
+		esac
+	done
+	PIC=$pic
+	eval set x x $probe_PIC
+	while	:
+	do	shift
+		shift
+		case $# in
+		0|1)	break ;;
+		esac
+		case $pic in
+		$1)	rm -f pic.$obj pic.$exe
+			$cc $2 -c pic.$src 2>e && test -f pic.$obj || break
+			$cc $2 -o pic.$exe pic.$obj && test -f pic.$exe || {
+				rm -f pic.$exe
+				$cc -o pic.$exe pic.$obj && test -f pic.$exe && break
+			}
+			PIC=$2
+			break
 			;;
 		esac
 	done
@@ -1100,6 +1121,7 @@ echo CC.ARFLAGS = $arflags
 echo CC.DEBUG = $debug
 echo CC.DIALECT = $dialect
 echo CC.DLL = $pic
+echo CC.DLLBIG = $PIC
 echo CC.DYNAMIC = $dynamic
 case $hosttype in
 ?*)	echo CC.HOSTTYPE = $hosttype ;;

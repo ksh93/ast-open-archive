@@ -1,7 +1,7 @@
 /***************************************************************
 *                                                              *
 *           This software is part of the ast package           *
-*              Copyright (c) 1990-2000 AT&T Corp.              *
+*              Copyright (c) 1989-2000 AT&T Corp.              *
 *      and it may only be used by you under license from       *
 *                     AT&T Corp. ("AT&T")                      *
 *       A copy of the Source Code Agreement is available       *
@@ -38,6 +38,7 @@
 #define NoN(x)
 
 #include "csdata.c"
+#include "csauth.c"
 #include "csbind.c"
 #include "cslocal.c"
 #include "csname.c"

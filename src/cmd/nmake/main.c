@@ -148,6 +148,7 @@
  *	0x00020000 1998-11-11 don't force require_p make() recheck
  *	0x00040000 1999-09-07 generate() intermediates only if (sep & LT)
  *	0x00080000 1999-11-19 disable touch steady state loop
+ *	0x00100000 2000-02-14 apply metarule even if dir on unbound lhs
  *
  * state.test registry (conditionally compiled with DEBUG!=0)
  *

@@ -58,8 +58,11 @@
 #ifndef FIORDCHK
 #   define NTICKS	5		/* number of ticks for typeahead */
 #   ifndef KSHELL
-#	ifdef _sys_times_
-#	include	<sys/times.h>
+#	ifdef _sys_times
+#		ifndef included_sys_times
+#			define included_sys_times	1
+#			include	<sys/times.h>
+#		endif
 #	else
   	   struct tms
 	   {

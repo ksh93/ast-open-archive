@@ -135,13 +135,16 @@ typedef struct
 #define PZ_SPLIT_HEADER		0x0002	/* split header already written	*/
 #define PZ_SPLIT_INFLATE	0x0004	/* split inflate enabled	*/
 
+#define PZ_DELAY	0x01000000	/* delay unknown error		*/
+#define PZ_HANDLE	0x02000000	/* sfdcpzip() sp arg is Pz_t	*/
+#define PZ_UNKNOWN	0x04000000	/* unknown input row size	*/
 #define PZ_MAINONLY	0x08000000	/* mainpart only in header	*/
 #define PZ_ROWONLY	0x10000000	/* grab row size from prt file	*/
 #define PZ_AGAIN	0x20000000	/* path arg is Pz_t		*/
 #define PZ_POP		0x40000000	/* pop pz->io on pzclose()	*/
 #define PZ_ERROR	0x80000000	/* make pzclose() return error	*/
 
-#define PZ_INTERNAL	(PZ_MAINONLY|PZ_ROWONLY|PZ_AGAIN|PZ_POP|PZ_ERROR)
+#define PZ_INTERNAL	(PZ_HANDLE|PZ_UNKNOWN|PZ_MAINONLY|PZ_ROWONLY|PZ_AGAIN|PZ_POP|PZ_ERROR)
 
 #define PZ_HDR_ARR(x)	((x)>=0x41&&(x)<=0x5a)	/* header array op	*/
 #define PZ_HDR_BUF(x)	((x)>=0x61&&(x)<=0x7a)	/* header buffer op	*/

@@ -1,3 +1,5 @@
+00-02-14 pax: fix hard link read that didn't apply -s edit
+	 pax: logical|physical filter options
 00-01-04 pax: fix rpm embedded archive hard seek
 	 pax: --filter implies --nodescend
 	 pax: add --meter

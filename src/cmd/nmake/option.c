@@ -72,7 +72,11 @@ static struct option	options[] =	/* option table			*/
 "base",		OPT_base,	(char*)&state.base,		0,0,
 	"Compile base or global rules.", 0,
 "believe",	OPT_believe,	(char*)&state.believe,		0,0,
-	"Believe the state from this level.", "level",
+	"Believe the state file time of files lower than view level"
+	" \alevel-1\a. The file system time will be checked for files with"
+	" no state or files in views equal to or higher than \alevel-1\a."
+	" \alevel=0\a causes the file system time to be checked for"
+	" files on all view levels. The top view is level 0.", "level:=0",
 "byname",	OPT_byname,	0,				0,0,
 	"(obsolete) Set options by name.", "name[=value]]",
 "compile",	OPT_compile,	(char*)&state.compileonly,	0,0,
@@ -176,7 +180,8 @@ static struct option	options[] =	/* option table			*/
 	"Current assignments and assertions will be marked readonly.", 0,
 "readstate",	OPT_readstate,	(char*)&state.readstate,	0,0,
 	"Ignore state files lower than view level \alevel\a. \alevel=0\a"
-	" accepts state files on all view levels.", "level:=0",
+	" accepts state files on all view levels. The top view is level 0.",
+	"level:=0",
 "reread",	OPT_reread,	(char*)&state.reread,		0,0,
 	"Ignore any previously generated \b.mo\b files and re-read all"
 	" input makefiles.", 0,

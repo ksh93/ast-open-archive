@@ -8,6 +8,9 @@
 # if SH_VERSION >= 19961101
 # define KSH93F
 # endif
+# if SH_VERSION >= 19990801
+# define _COMPAT_SH_PRIVATE
+# endif
 #endif
 
 #define NIL(t)		((t)0)

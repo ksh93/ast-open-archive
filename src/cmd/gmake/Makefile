@@ -23,12 +23,7 @@ gmake :: gmake.1 \
 
 -lkstat -lkvm -lelf : .DONTCARE
 
-config.h : config.status
-	$(SHELL) $(*)
-
-config.status : configure config.h.in
-	CC=$(CC:@Q) CFLAGS=$(CCFLAGS:@Q) CONFIG_SHELL=$(SHELL) $(SHELL) $(*:O=1)
-
 :: remote-cosh.c remote-cstms.c remote-stub.c alloca.c
 :: COPYING ChangeLog NEWS README
+:: configure config.h.in
 :: remote.patch mam.patch

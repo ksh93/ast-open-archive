@@ -4,6 +4,13 @@
 #include <times.h>
 #include <sys/param.h>
 
+#ifndef S_ISLNK
+#define S_ISLNK(m)	0
+#endif
+#ifndef S_ISSOCK
+#define S_ISSOCK(m)	0
+#endif
+
 #ifndef MAXPATHLEN
 #   ifdef PATH_MAX
 #       define MAXPATHLEN PATH_MAX

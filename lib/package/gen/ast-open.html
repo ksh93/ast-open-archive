@@ -1,32 +1,264 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META NAME="generator" CONTENT=" @(#)mm2html (AT&T Labs Research) 2000-02-03 ">
-<META NAME='description' CONTENT='ast-open source package'>
-<META NAME='keywords' CONTENT='software, source, package'>
+<META name="generator" content="mm2html (AT&T Labs Research) 2000-02-14">
+<META name="description" content="ast-open source package">
+<META name="keywords" content="software, source, package">
 <TITLE> ast-open source package </TITLE>
 </HEAD>
-<BODY  marginheight=0 leftmargin=0 topmargin=0 marginwidth=0 bgcolor='#ffffff' vlink='#949494' link='#339999' >
-<TABLE BORDER=0 WIDTH=640><TR><TD VALIGN=top ALIGN=left>
-<P><HR><P>
+<BODY  marginheight=0 leftmargin=0 topmargin=0 marginwidth=0 bgcolor=white vlink=teal link=slateblue >
+<TABLE border=0 width=640><TR><TD valign=top align=left>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ast-open source package">ast-open source package</A></H3></CENTER></FONT></FONT>
 The AT&amp;T Labs Research ast-open package contains all of the ast open
 source commands and libraries.
-It contains the following components:
+Components in this package:
 <PRE>
-    libast	builtin	    libz	gmake	    ncsl	librecsort
-    libcs	libbz	    libpz	html	    <A HREF="#nmake">nmake</A>	<A HREF="#sort">sort</A>
-    libdll	bzip	    libvdelta	ie	    pack	ss
-    <A HREF="#3d">3d</A>		<A HREF="#coshell">coshell</A>	    libcdb	<A HREF="#ksh93">ksh93</A>	    libsum	std
-    libcoshell	probe	    cql		m4	    <A HREF="#pax">pax</A>		<A HREF="#tksh">tksh</A>
-    at		libpp	    libodelta	mailx	    <A HREF="#proto">proto</A>	<A HREF="#tw">tw</A>
-    libcmd	cpp	    cs		libmam	    <A HREF="#pzip">pzip</A>	<A HREF="#warp">warp</A>
-    libuu	libexpr	    diff	mam	    re		tests
+    libast	html	    libuu	cs	    libpz	<A href="#pzip">pzip</A>
+    libcmd	probe	    libz	gmake	    libcdb	re
+    libdll	libpp	    tests	libmam	    cql		<A href="#sort">sort</A>
+    <A href="#ksh93">ksh93</A>	<A href="#proto">proto</A>	    libcs	mam	    diff	<A href="#std">std</A>
+    libodelta	libbz	    <A href="#3d">3d</A>		<A href="#nmake">nmake</A>	    <A href="#ie">ie</A>		libtk
+    libvdelta	bzip	    libcoshell	ss	    mailx	<A href="#tksh">tksh</A>
+    libsum	libexpr	    <A href="#coshell">coshell</A>	<A href="#at">at</A>	    ncsl	<A href="#tw">tw</A>
+    <A href="#pax">pax</A>		librecsort  cpp		<A href="#builtin">builtin</A>	    pack	<A href="#warp">warp</A>
 </PRE>
 <P>
+This package is a superset of the following package: ast-base; you won't need this if you download ast-open.
+The software is covered by this license:
+<UL type=square>
+<LI>
+<A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+</UL>
 A recent
-<A HREF="#release change log">release change log</A>
+<A href="#release change log">release change log</A>
 is also included.
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='3d'>3d</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ksh93">ksh93</A></H3></CENTER></FONT></FONT>
+KSH-93 is the most recent version of the KornShell Language
+described in
+"The KornShell Command and Programming Language,"
+by Morris Bolsky and David Korn of AT&amp;T Bell Laboratories, ISBN 0-13-182700-6.
+The KornShell is a shell programming language,
+which is upward compatible with "sh" (the Bourne Shell),
+and is intended to conform to the IEEE P1003.2/ISO 9945.2 Shell and
+Utilities standard.
+KSH-93 provides an enhanced programming environment in
+addition to the major command-entry features of the BSD
+shell "csh".  With KSH-93, medium-sized programming tasks can be
+performed at shell-level without a significant loss in performance.
+In addition, "sh" scripts can be run on KSH-93 without modification.
+<P>
+The code should conform to the IEEE POSIX 1003.1 standard and to the
+proposed ANSI-C standard so that it should be portable to all
+such systems.  Like the previous version, KSH-88,
+it is designed to accept eight bit character sets
+transparently, thereby making it internationally compatible.
+It can support multi-byte characters sets with some characteristics
+of the character set given at run time.
+<P>
+KSH-93 provides the following features, many of which were also inherent
+in KSH-88:
+<UL type=square>
+<LI>
+Enhanced Command Re-entry Capability:  The KSH-93 history
+function records commands entered at any shell level and stores
+them, up to a user-specified limit, even after you log off.
+This allows you to re-enter long commands with a few keystrokes
+- even those commands you entered yesterday.
+The history file allows for eight bit characters in
+commands and supports essentially unlimited size histories.
+<LI>
+In-line Editing: In "sh", the only way to fix mistyped
+commands is to backspace or retype the line. KSH-93 allows you
+to edit a command line using a choice of EMACS-TC or "vi"
+functions.
+You can use the in-line editors to complete filenames as
+you type them.
+You may also use this editing feature when entering
+command lines from your history file.
+A user can capture keystrokes and rebind keys to customize the
+editing interface.
+<LI>
+Extended I/O Capabilities:  KSH-93 provides several I/O
+capabilities not available in "sh", including the ability to:
+<UL type=square>
+<LI>
+specify a file descriptor for input and output
+<LI>
+start up and run co-processes
+<LI>
+produce a prompt at the terminal before a read
+<LI>
+easily format and interpret responses to a menu
+<LI>
+echo lines exactly as output without escape processing
+<LI>
+format output using printf formats.
+<LI>
+read and echo lines ending in "<NULL>\<NULL>".
+</UL>
+<LI>
+Improved performance: KSH-93 executes many scripts faster
+than the System V Bourne shell. A major reason for this is
+that many of the standard utilities are built-in.
+To reduce the time to initiate a command, KSH-93 allows
+commands to be added as built-ins at run time
+on systems that support dynamic loading such as System V Release 4.
+<LI>
+Arithmetic: KSH-93 allows you to do integer arithmetic in any
+base from two to sixty-four.  You can also do double
+precision floating point arithmetic.
+Almost the complete set of C language operators are available
+with the same syntax and precedence.
+Arithmetic expressions can be used to as an argument expansion 
+or as a separate command.
+In addition there is an arithmetic for command that works
+like the for statement in C.
+<LI>
+Arrays: KSH-93 supports both indexed and associative arrays.
+The subscript for an indexed array is an arithmetic expression,
+whereas, the subscript for an associative array is a string.
+<LI>
+Shell Functions and Aliases: Two mechanisms - functions and
+aliases - can be used to assign a user-selected identifier to
+an existing command or shell script.
+Functions allow local variables and provide scoping
+for exception handling.
+Functions can be searched for and loaded on first reference the
+way scripts are.
+<LI>
+Substring Capabilities:  KSH-93 allows you to create a
+substring of any given string either by specifying the starting
+offset and length, or by stripping off leading
+or trailing substrings during parameter substitution.
+You can also specify attributes, such as upper and lower case,
+field width, and justification to shell variables.
+<LI>
+More pattern matching capabilities:  KSH-93 allows you to specify
+extended regular expressions for file and string matches.
+<LI>
+KSH-93 uses a hierarchal name space for variables.
+Compound variables can be defined and variables can
+be passed by reference.  In addition, each variable
+can have one or more disciplines associated with
+it to intercept assignments and references.
+<LI>
+Improved debugging:  KSH-93 can generate line numbers on execution
+traces.  Also, I/O redirections are now traced.
+There is a DEBUG trap that gets evaluated after each command
+so that errors can be localized.
+<LI>
+Job Control: On systems that support job control, including
+System V Release 4, KSH-93
+provides a job-control mechanism almost identical to that of
+the BSD "csh", version 4.1.
+This feature allows you
+to stop and restart programs, and to move programs between the
+foreground and the background.
+<LI>
+Added security:
+KSH-93 can execute scripts which do not have read permission
+and scripts which have the setuid and/or setgid set when
+invoked by name, rather than as an argument to the shell.
+It is possible to log or control the execution of setuid and/or
+setgid scripts.
+The noclobber option prevents you from accidentally erasing
+a file by redirecting to an existing file.
+<LI>
+KSH-93 can be extended by adding built-in commands at run time.
+In addition, KSH-93 can be used as a library that can
+be embedded into an application to allow scripting.
+</UL>
+Documentation for KSH-93 consists of an "Introduction to KSH-93",
+"Compatibility with the Bourne Shell" and a manual page and a
+README file.  In addition, the "New KornShell Command and Programming
+Language," book is available from Prentice Hall.
+
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pax">pax</A></H3></CENTER></FONT></FONT>
+<STRONG>pax</STRONG>
+is a POSIX 1003.2 conformant replacement for
+<STRONG>tar</STRONG>
+and
+<STRONG>cpio</STRONG>
+that handles most UNIX archive and tape formats.
+<STRONG>pax</STRONG>
+uses the
+<EM>vdelta</EM>
+algorithm to construct efficient delta archives that contain bytewise
+changes from a given base archive. 
+<STRONG>gzip</STRONG>
+and
+<STRONG>compress</STRONG>
+archives are also handled on input and output.
+<P>
+To create a
+<EM>vdelta</EM>
+compressed base archive:
+<PRE>
+     tw | pax -w -f base -z -
+</PRE>
+To create a delta archive on the base above (record file changes only):
+<PRE>
+     tw | pax -w -f delta -z base
+</PRE>
+To read the delta archive:
+<PRE>
+     pax -r -f delta -z base
+</PRE>
+To create a delta archive from linux-1.2.0 to linux-1.2.5:
+<PRE>
+     pax -rf linux-1.2.5.tar.gz -wf 0-5.pax.gz -x gzip -z linux-1.2.0.tar.gz
+</PRE>
+To create the linux-1.2.5 archive:
+<PRE>
+     pax -rf 0-5.pax.gz -z linux-1.2.0.tar.gz -wf linux-1.2.5.tar.gz -x tar -x gzip
+</PRE>
+The
+<STRONG>bax</STRONG>
+script, shipped with
+<STRONG>pax</STRONG>,
+combines
+<STRONG>tw</STRONG>
+and
+<STRONG>pax</STRONG>
+for handy backup control.
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="proto">proto</A></H3></CENTER></FONT></FONT>
+<STRONG>proto</STRONG>
+converts ANSI C prototype constructs to constructs compatible
+with K&amp;R C, ANSI C, and C++.
+Only files with the line
+<PRE>
+     #pragma prototyped
+</PRE>
+in the first 64 lines are processed; other files are silently ignored.
+This is how
+<STRONG>advsoft</STRONG>
+source is first shipped to foreign architectures.
+Once
+<STRONG>advsoft</STRONG>
+is bootstrapped the
+non-<STRONG>proto</STRONG>
+source can be built using the
+<STRONG>advsoft</STRONG>
+tools.
+<P>
+<STRONG>proto</STRONG>
+also converts in the other direction by providing
+<EM>extern</EM>
+prototypes for a collection of K&amp;R source files and by converting
+K&amp;R source files in place.
+K&amp;R to ANSI is not 100%, but is a good starting point for manual conversion.
+<P>
+<STRONG>proto</STRONG>
+is token based (no C grammar); this allows it to convert 
+before C preprocessing, and also allows
+<STRONG>proto</STRONG>
+to be inserted into
+the standalone
+<STRONG>cpp</STRONG>.
+This is how
+<STRONG>nmake</STRONG>
+compiles ANSI C source with K&amp;R compilers.
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="3d">3d</A></H3></CENTER></FONT></FONT>
 <STRONG>3d</STRONG>
 is the historical name for
 <EM>n</EM><STRONG>DFS</STRONG><EM>,</EM>
@@ -132,7 +364,7 @@ Try this for any host:
 <PRE>
      cat /dev/tcp/hostname/inet.daytime
 </PRE>
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='coshell'>coshell</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="coshell">coshell</A></H3></CENTER></FONT></FONT>
 <STRONG>coshell</STRONG>
 executes blocks of shell commands on lightly loaded hosts in the local network.
 There is one
@@ -202,148 +434,7 @@ status:
 generates static host information and
 <STRONG>ss</STRONG>
 lists the dynamic status of hosts on the local network.
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='ksh93'>ksh93</A></H3></CENTER></FONT></FONT>
-KSH-93 is the most recent version of the KornShell Language
-described in
-"The KornShell Command and Programming Language,"
-by Morris Bolsky and David Korn of AT&amp;T Bell Laboratories, ISBN 0-13-182700-6.
-The KornShell is a shell programming language,
-which is upward compatible with "sh" (the Bourne Shell),
-and is intended to conform to the IEEE P1003.2/ISO 9945.2 Shell and
-Utilities standard.
-KSH-93 provides an enhanced programming environment in
-addition to the major command-entry features of the BSD
-shell "csh".  With KSH-93, medium-sized programming tasks can be
-performed at shell-level without a significant loss in performance.
-In addition, "sh" scripts can be run on KSH-93 without modification.
-<P>
-The code should conform to the IEEE POSIX 1003.1 standard and to the
-proposed ANSI-C standard so that it should be portable to all
-such systems.  Like the previous version, KSH-88,
-it is designed to accept eight bit character sets
-transparently, thereby making it internationally compatible.
-It can support multi-byte characters sets with some characteristics
-of the character set given at run time.
-<P>
-KSH-93 provides the following features, many of which were also inherent
-in KSH-88:
-<UL>
-<LI>
-Enhanced Command Re-entry Capability:  The KSH-93 history
-function records commands entered at any shell level and stores
-them, up to a user-specified limit, even after you log off.
-This allows you to re-enter long commands with a few keystrokes
-- even those commands you entered yesterday.
-The history file allows for eight bit characters in
-commands and supports essentially unlimited size histories.
-<LI>
-In-line Editing: In "sh", the only way to fix mistyped
-commands is to backspace or retype the line. KSH-93 allows you
-to edit a command line using a choice of EMACS-TC or "vi"
-functions.
-You can use the in-line editors to complete filenames as
-you type them.
-You may also use this editing feature when entering
-command lines from your history file.
-A user can capture keystrokes and rebind keys to customize the
-editing interface.
-<LI>
-Extended I/O Capabilities:  KSH-93 provides several I/O
-capabilities not available in "sh", including the ability to:
-<UL>
-<LI>
-specify a file descriptor for input and output
-<LI>
-start up and run co-processes
-<LI>
-produce a prompt at the terminal before a read
-<LI>
-easily format and interpret responses to a menu
-<LI>
-echo lines exactly as output without escape processing
-<LI>
-format output using printf formats.
-<LI>
-read and echo lines ending in "<NULL>\<NULL>".
-</UL>
-<LI>
-Improved performance: KSH-93 executes many scripts faster
-than the System V Bourne shell. A major reason for this is
-that many of the standard utilities are built-in.
-To reduce the time to initiate a command, KSH-93 allows
-commands to be added as built-ins at run time
-on systems that support dynamic loading such as System V Release 4.
-<LI>
-Arithmetic: KSH-93 allows you to do integer arithmetic in any
-base from two to sixty-four.  You can also do double
-precision floating point arithmetic.
-Almost the complete set of C language operators are available
-with the same syntax and precedence.
-Arithmetic expressions can be used to as an argument expansion 
-or as a separate command.
-In addition there is an arithmetic for command that works
-like the for statement in C.
-<LI>
-Arrays: KSH-93 supports both indexed and associative arrays.
-The subscript for an indexed array is an arithmetic expression,
-whereas, the subscript for an associative array is a string.
-<LI>
-Shell Functions and Aliases: Two mechanisms - functions and
-aliases - can be used to assign a user-selected identifier to
-an existing command or shell script.
-Functions allow local variables and provide scoping
-for exception handling.
-Functions can be searched for and loaded on first reference the
-way scripts are.
-<LI>
-Substring Capabilities:  KSH-93 allows you to create a
-substring of any given string either by specifying the starting
-offset and length, or by stripping off leading
-or trailing substrings during parameter substitution.
-You can also specify attributes, such as upper and lower case,
-field width, and justification to shell variables.
-<LI>
-More pattern matching capabilities:  KSH-93 allows you to specify
-extended regular expressions for file and string matches.
-<LI>
-KSH-93 uses a hierarchal name space for variables.
-Compound variables can be defined and variables can
-be passed by reference.  In addition, each variable
-can have one or more disciplines associated with
-it to intercept assignments and references.
-<LI>
-Improved debugging:  KSH-93 can generate line numbers on execution
-traces.  Also, I/O redirections are now traced.
-There is a DEBUG trap that gets evaluated after each command
-so that errors can be localized.
-<LI>
-Job Control: On systems that support job control, including
-System V Release 4, KSH-93
-provides a job-control mechanism almost identical to that of
-the BSD "csh", version 4.1.
-This feature allows you
-to stop and restart programs, and to move programs between the
-foreground and the background.
-<LI>
-Added security:
-KSH-93 can execute scripts which do not have read permission
-and scripts which have the setuid and/or setgid set when
-invoked by name, rather than as an argument to the shell.
-It is possible to log or control the execution of setuid and/or
-setgid scripts.
-The noclobber option prevents you from accidentally erasing
-a file by redirecting to an existing file.
-<LI>
-KSH-93 can be extended by adding built-in commands at run time.
-In addition, KSH-93 can be used as a library that can
-be embedded into an application to allow scripting.
-</UL>
-Documentation for KSH-93 consists of an "Introduction to KSH-93",
-"Compatibility with the Bourne Shell" and a manual page and a
-README file.  In addition, the "New KornShell Command and Programming
-Language," book is available from Prentice Hall.
-
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='nmake'>nmake</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="nmake">nmake</A></H3></CENTER></FONT></FONT>
 <STRONG>nmake</STRONG>
 is the AT&amp;T
 <STRONG>nmake</STRONG>,
@@ -357,7 +448,7 @@ with an important difference:
 maintains state that records
 information for future runs.
 The state includes:
-<UL>
+<UL type=square>
 <LI>
 file modification times
 <LI>
@@ -420,92 +511,57 @@ attributes are automatically scanned for implicit prerequisites),
 and there is no cheating (because all time stamp changes
 are detected, not just
 <EM>newer-than</EM>).
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='pax'>pax</A></H3></CENTER></FONT></FONT>
-<STRONG>pax</STRONG>
-is a POSIX 1003.2 conformant replacement for
-<STRONG>tar</STRONG>
-and
-<STRONG>cpio</STRONG>
-that handles most UNIX archive and tape formats.
-<STRONG>pax</STRONG>
-uses the
-<EM>vdelta</EM>
-algorithm to construct efficient delta archives that contain bytewise
-changes from a given base archive. 
-<STRONG>gzip</STRONG>
-and
-<STRONG>compress</STRONG>
-archives are also handled on input and output.
-<P>
-To create a
-<EM>vdelta</EM>
-compressed base archive:
-<PRE>
-     tw | pax -w -f base -z -
-</PRE>
-To create a delta archive on the base above (record file changes only):
-<PRE>
-     tw | pax -w -f delta -z base
-</PRE>
-To read the delta archive:
-<PRE>
-     pax -r -f delta -z base
-</PRE>
-To create a delta archive from linux-1.2.0 to linux-1.2.5:
-<PRE>
-     pax -rf linux-1.2.5.tar.gz -wf 0-5.pax.gz -x gzip -z linux-1.2.0.tar.gz
-</PRE>
-To create the linux-1.2.5 archive:
-<PRE>
-     pax -rf 0-5.pax.gz -z linux-1.2.0.tar.gz -wf linux-1.2.5.tar.gz -x tar -x gzip
-</PRE>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="std">std</A></H3></CENTER></FONT></FONT>
 The
-<STRONG>bax</STRONG>
-script, shipped with
-<STRONG>pax</STRONG>,
-combines
-<STRONG>tw</STRONG>
+<STRONG>ast</STRONG>
+<STRONG>at</STRONG>
+command is a re-implementations of
+<NOBR><A href="/~gsf/man/man1/at.html"><STRONG>at</STRONG></A>(1)</NOBR>
 and
-<STRONG>pax</STRONG>
-for handy backup control.
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='proto'>proto</A></H3></CENTER></FONT></FONT>
-<STRONG>proto</STRONG>
-converts ANSI C prototype constructs to constructs compatible
-with K&amp;R C, ANSI C, and C++.
-Only files with the line
-<PRE>
-     #pragma prototyped
-</PRE>
-in the first 64 lines are processed; other files are silently ignored.
-This is how
-<STRONG>advsoft</STRONG>
-source is first shipped to foreign architectures.
-Once
-<STRONG>advsoft</STRONG>
-is bootstrapped the
-non-<STRONG>proto</STRONG>
-source can be built using the
-<STRONG>advsoft</STRONG>
-tools.
+<NOBR><A href="/~gsf/man/man1/crontab.html"><STRONG>crontab</STRONG></A>(1),</NOBR>
+including a
+<NOBR><A href="/~gsf/man/man1/cs.html"><STRONG>cs</STRONG></A>(1)</NOBR>
+service \bat.svc\b for the \bat\b and \bcron\b daemons.
+On most systems the
+<STRONG>at</STRONG>
+and
+<STRONG>crontab</STRONG>
+commands are installed as
+<STRONG>ast_at</STRONG>
+and
+<STRONG>ast_crontab</STRONG>
+because the \bat\b service executor \b$INSTALLROOT/lib/at/jobs/atx\b must be
+installed setuid \broot\b so the daemon can operate multi-user
+(enabling \broot\b privelege is always a manual operation with
+<NOBR><A href="/~gsf/man/man1/package.html"><STRONG>package</STRONG></A>(1)</NOBR>
+packages.)
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="builtin">builtin</A></H3></CENTER></FONT></FONT>
+The
+<STRONG>ast</STRONG>
+<STRONG>builtin</STRONG>
+commands are stand-alone implementations of the section
+<STRONG>1</STRONG>
+command in
+<NOBR><A href="/~gsf/man/man3/libcmd.html"><STRONG>libcmd</STRONG></A>(3).</NOBR>
+See the
+<NOBR><A href="/~gsf/man/man1/ksh.html"><STRONG>ksh</STRONG></A>(1)</NOBR>
+<STRONG>builtin</STRONG>(1)
+command for information on loading command DLLs at runtime.
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="ie">ie</A></H3></CENTER></FONT></FONT>
+<STRONG>ie</STRONG>
+executes a dynamically linked command with the
+<NOBR><A href="/~gsf/man/man1/ksh.html"><STRONG>ksh</STRONG></A>(1)</NOBR>
+input line edit discipline pushed on the standard input.
+All child processes will also have input line editing enabled.
 <P>
-<STRONG>proto</STRONG>
-also converts in the other direction by providing
-<EM>extern</EM>
-prototypes for a collection of K&amp;R source files and by converting
-K&amp;R source files in place.
-K&amp;R to ANSI is not 100%, but is a good starting point for manual conversion.
-<P>
-<STRONG>proto</STRONG>
-is token based (no C grammar); this allows it to convert 
-before C preprocessing, and also allows
-<STRONG>proto</STRONG>
-to be inserted into
-the standalone
-<STRONG>cpp</STRONG>.
-This is how
-<STRONG>nmake</STRONG>
-compiles ANSI C source with K&amp;R compilers.
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='pzip'>pzip</A></H3></CENTER></FONT></FONT>
+<STRONG>ie</STRONG>
+intercepts the
+<NOBR><A href="/~gsf/man/man3/read.html"><STRONG>read</STRONG></A>(3)</NOBR>
+system call by preloading a DLL (shared library) at runtime,
+so it only works on architectures that support DLL preload.
+Statically-linked, set-uid or set-gid commands will not work with
+<STRONG>ie</STRONG>.
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="pzip">pzip</A></H3></CENTER></FONT></FONT>
 Fixed length record data is often viewed as a waste of space,
 too sparse for production use.
 Much effort is then put into optimizing
@@ -520,7 +576,7 @@ compression space improvements of 2 to 10 times and decompression speed
 improvements of 2 to 3 times over
 <STRONG>gzip</STRONG>
 for a large class of data.
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='sort'>sort</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="sort">sort</A></H3></CENTER></FONT></FONT>
 <STRONG>sort</STRONG>
 is a POSIX 1003.2 conformant implementation based on
 <STRONG>-lrecsort</STRONG>
@@ -530,7 +586,25 @@ The
 discipline/method interface allows
 <STRONG>sort</STRONG>
 to double as a test harness for different sort algorithms.
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='tksh'>tksh</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="std">std</A></H3></CENTER></FONT></FONT>
+The
+<STRONG>ast</STRONG>
+<STRONG>std</STRONG>
+commands are re-implementations of some of the standard section
+<STRONG>1</STRONG>
+commands.
+On most systems the
+<STRONG>mount</STRONG>
+and
+<STRONG>ps</STRONG>
+commands are installed as
+<STRONG>ast_mount</STRONG>
+and
+<STRONG>ast_ps</STRONG>
+because the author either could not keep up with option proliferation or
+the commands must be installed with sufficient privelege to operate
+multi-user.
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tksh">tksh</A></H3></CENTER></FONT></FONT>
 <EM>tksh</EM>
 is an implementation of the Tcl C library
 written on top of the library for the new KornShell
@@ -568,13 +642,13 @@ scripts that use components that have been implemented in Tcl
 <P>
 <EM>tksh</EM>
 was developed by
-<A HREF="http://www.cs.princeton.edu/~jlk" TARGET=_top>Jeff Korn</A>
+<A href="http://www.research.att.com/~jlk" target=_top>Jeff Korn</A>
 and is distributed by
-<A HREF="mailto:advsoft@research.att.com" TARGET=_top>advsoft@research.att.com</A>.
+<A href="mailto:advsoft@research.att.com" target=_top>advsoft@research.att.com</A>.
 For the latest information vist the
 <EM>tksh</EM>
-<A HREF="http://www.cs.princeton.edu/~jlk/tksh" TARGET=_top>home page</A>.
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='tw'>tw</A></H3></CENTER></FONT></FONT>
+<A href="http://www.cs.princeton.edu/~jlk/tksh" target=_top>home page</A>.
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="tw">tw</A></H3></CENTER></FONT></FONT>
 <STRONG>tw</STRONG>
 is a combination of
 <STRONG>find</STRONG>
@@ -654,7 +728,7 @@ The magic file also contains MIME types:
 </PRE>
 lists all executable programs
 (<EM>a.out</EM>'s).
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='warp'>warp</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="warp">warp</A></H3></CENTER></FONT></FONT>
 <STRONG>warp</STRONG>
 executes a dynamically linked command in a different time frame.
 It intercepts time related system calls and modifies the times seen by
@@ -663,7 +737,7 @@ the command using the formula:
      time' = time + warp + (time - base) * (factor - 1)
 </PRE>
 where:
-<UL>
+<UL type=square>
 <LI>
 <EM>time'</EM>
 The logical system time seen by the command process.
@@ -785,54 +859,9 @@ is omitted.
      2000-03-19/18:58
 </PRE>
 <PRE>
-<P><HR><FONT face=courier><FONT color='#FF2000'><CENTER><H3><A NAME='Release Change Log'>Release Change Log</A></H3></CENTER></FONT></FONT>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="release change log">release change log</A></H3></CENTER></FONT></FONT>
 
-Changes since 1999-08-01 follow.
-
-<H4>at</H4>
-
-00-01-22 --- release 1.2 ---
-00-01-22 crontab: fix getopts check
-99-10-11 at,atd: fix job dictionary bugs
-99-08-11 at: fix usage for at+batch
-	 at.h: add AT_STRICT
-
-<H4>builtin</H4>
-
-00-01-06 pr: fix empty field in multi-col output
-99-11-19 pr: -t == -T
-99-10-01 strings: att --long-strings
-99-08-11 mime,strings: fix usage&#0091;&#0093;
-
-<H4>coshell</H4>
-
-00-02-01 --- release 2.2 ---
-
-<H4>cql</H4>
-
-99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
-99-10-01 cql: fix up array&#0091;n&#0093; format
-99-09-22 cql: for (member&#0091;index&#0093;) support
-99-08-11 cql: all assignment in end() -- handy to check maps
-
-<H4>cs</H4>
-
-99-09-22 cs: update for CS_MNT_TAIL
-
-<H4>html</H4>
-
-00-02-03 mm2html: fix -o nohtml.logo
-00-01-20 mm2html: fix -o quoted arg parse
-	 htmlrefs: add --perlwarn for embedded perl constructs
-99-08-11 mm2html,troff2html: add .xx begin=x end=x
-	 mm2html: handle simple .TS ... .TE; room for improvement
-	 mm2html: fix &lt;TABLE&gt;&lt;TR&gt;...&lt;/TR&gt;&lt;/TABLE&gt; nesting
-	 mm2html: add SEE ALSO hot links
-	 mm2html: hot link man name not (section)
-
-<H4>ie</H4>
-
-99-11-19 Makefile: fix sh_config.h for 2d -- eventually should use iffe
+Changes since 1999-10-01 or the last release follow.
 
 <H4>ksh93</H4>
 
@@ -854,13 +883,65 @@ Changes since 1999-08-01 follow.
 	  to printf was not working has been fixed.
 
 
-<H4>ncsl</H4>
+<H4>pax</H4>
 
-99-09-01 add usage&#0091;&#0093;
+00-02-14 pax: fix hard link read that didn't apply -s edit
+	 pax: logical|physical filter options
+00-01-04 pax: fix rpm embedded archive hard seek
+	 pax: --filter implies --nodescend
+	 pax: add --meter
+	 pax: handle ms PORTAR '' =&gt; '/' path separator
+99-11-19 pax: try `ratz -c' if `gunzip' not found
+99-11-11 add --checksum, --install, --local, --preserve=s
+99-11-04 fix zip for archives with EXTLOC headers
+	 don't generate //* file names
+99-10-31 pax: add tgz == tar:gzip, --filter=-
+
+<H4>html</H4>
+
+00-02-14 htmlrefs: add .htaccess and &lt;LINK&gt; checks
+	 mm2html: add .xx ref=...
+	 mm2html: use "..." tag attribute quote instead of '...'
+	 mm2html: .BL =&gt; &lt;UL&gt; square circle disc
+00-02-03 mm2html: fix -o nohtml.ident
+00-01-20 mm2html: fix -o quoted arg parse
+	 htmlrefs: add --perlwarn for embedded perl constructs
+
+<H4>proto</H4>
+
+99-11-19 add --license, --shell, --copy, --verbose
+
+<H4>tests</H4>
+
+00-02-14 opt.tst: fix for "..." attribute quote
+	 datey2k.dat: oops: %l fails for old (2000-02-29) NOW
+00-01-10 opt.tst: fix USAGE_LICENSE
+99-10-22 date: test all % formats
+
+<H4>3d</H4>
+
+00-02-14 3d command long options (finally)
+
+<H4>coshell</H4>
+
+00-02-01 --- release 2.2 ---
 
 <H4>nmake</H4>
 
-00-02-01 --- release 4.0 ---
+00-02-14 --- release 4.0 ---
+00-02-10 Makerules: add CC.DLLBIG, :PACKAGE_INIT:
+	 Makerules: add .ARCHIVE.OMIT. to .ARCLEAN.LIST.
+	 Makerules: adjust :PACKAGE: search for X11 =&gt; X
+	 Makerules: add .COMMON.SAVE to .LIST.PACKAGE.* source actions
+	 Makerules: fix setv PACKAGE dirs
+	 Makerules: add $(PACKAGE_LOCAL) and package_local=arch cmd prefix
+	 Makerules: apply %.X&gt;% for `f :: b.X'
+	 state.c: add local skew test for touch(3) { utime(2) or utimes(2) }
+	 make.c: don't apply metarule if lhs has dir and metarule doesn't
+00-02-08 believe if state.believe&gt;0 and  view level &gt;= (state.believe-1)
+	 pkg-X11.mk: add PACKAGE_X11_VERSION=6 for X11R6 installations
+	 pkg-X11.mk: add -ldnet_stub for osf.alpha
+	 Makerules: fix .REQUIRE.-l%
 00-01-31 Makerules: add $(CC.SUFFIX.LD) in .SHARED.REF.lib
 00-01-25 Makerules: add _MAKE_PROBE_WORKAROUND_ for broken cc -G like sco.i386
 00-01-11 Makerules,probe.win32: -Bwhole-archive + -Bstatic -- whew!
@@ -902,51 +983,56 @@ Changes since 1999-08-01 follow.
 99-10-01 Makerules: add %.iffe
 	 make.c: handle metarule .ACCEPT
 
-<H4>pax</H4>
-
-00-01-04 pax: fix rpm embedded archive hard seek
-	 pax: --filter implies --nodescend
-	 pax: add --meter
-	 pax: handle ms PORTAR '' =&gt; '/' path separator
-99-11-19 pax: try `ratz -c' if `gunzip' not found
-99-11-11 add --checksum, --install, --local, --preserve=s
-99-11-04 fix zip for archives with EXTLOC headers
-	 don't generate //* file names
-99-10-31 pax: add tgz == tar:gzip, --filter=-
-99-08-11 bio: fix end of medium handling
-
 <H4>probe</H4>
 
 00-01-11 probe: fix -t with writable info
-99-09-01 probe: add --override
 
-<H4>proto</H4>
+<H4>at</H4>
 
-99-11-19 add --license, --shell, --copy, --verbose
-99-08-11 long options
+00-01-22 --- release 1.2 ---
+00-01-22 crontab: fix getopts check
+99-10-11 at,atd: fix job dictionary bugs
+
+<H4>builtin</H4>
+
+00-02-14 fmt: add
+00-01-06 pr: fix empty field in multi-col output
+99-11-19 pr: -t == -T
+99-10-01 strings: att --long-strings
+
+<H4>cql</H4>
+
+99-11-19 cql: fix cdbimage() logic and "-" workaround in main()
+99-10-01 cql: fix up array&#0091;n&#0093; format
+
+<H4>ie</H4>
+
+00-02-14 ie: ie.sh script replaces ie fun
+	 ie: convert configure/* =&gt; features(ielib|options.sh)
+99-11-19 Makefile: fix sh_config.h for 2d -- eventually should use iffe
+
+<H4>mailx</H4>
+
+00-02-29 handle multiline SMTP responses
 
 <H4>pzip</H4>
 
+00-02-11 pin: always have state.map, even with no freq filter
 99-11-03 pin: alb optimize()+solution() update (quadratic loop)
-99-09-25 pzip: change --split to --split&#0091;=pattern&#0093;
-99-09-11 pzip: change --split=dir to --split
-99-08-11 pzip: add --append, --split=dir
-	 pzip: fix SEE ALSO
 
 <H4>re</H4>
 
 99-12-12 sed: delay peek for .==$
-99-08-11 grep: don't complain about EISDIR read error
-	 ed: usage to stderr
 
 <H4>sort</H4>
 
 99-11-19 main.c: use rskeylist() for method usage
 99-11-11 main.c: unstable sort is the default for backwards compatibility
-99-08-11 main.c: fix usage&#0091;&#0093;
 
 <H4>std</H4>
 
+00-02-07 ls: -a and -A now mutually exclusive
+	 shar: add $USAGE_LICENSE
 00-01-25 touch: add invalid st_mtime value CAVEAT
 	 ls.tst: limit max st_mtime to 0x7fffffe to avoid stat(2) EOVERFLOW
 00-01-11 tsort: fix
@@ -956,29 +1042,45 @@ Changes since 1999-08-01 follow.
 99-11-18 ls: -H + cmd link non-dir symlink =&gt; lstat() (H == hairbrained)
 99-10-31 sum: change --check, add --header --permissions for verifcation
 99-10-22 date: fix %C %k %y doc
-99-08-11 ps: netbsd + unixware fixes
-	 ls: fix SEE ALSO
+
+<H4>tksh</H4>
+
+00-02-10  --- Release 7.6 ---
+00-02-10  Update README file
+00-02-09  Deleted unreferenced vars, dropped tcl 7.5 compatibility,
+	  added _PACKAGE_ast &lt;tm.h&gt; routines to tclUnixTime.c, added
+	  forward refs to the Tcl_LinkVar() Tcl_UnlinkVar() tk callbacks,
+	  changed Makefile library refs
+00-02-07  Modified shcompat.c and shcompat.h to handle
+          change to ksh93 where nvenv is now private.
+00-02-07  Included Tk4.2 in distribution to avoid
+          compatibility problems.  Modified Makefile.
+00-02-07  Using new packaging provided by gsf 
 
 <H4>tw</H4>
 
 99-10-11 tw: tighten up --generate exit codes
 	 updatedb: add a few options
-99-08-11 find: fix -size
-	 find: undef NOGROUP NOUSER -- (net)bsd stomps again
 
 <H4>warp</H4>
 
 99-11-19 warp: fix _RLD_LIST for sgi.mips4-n32
 
-<H4>tests</H4>
-
-00-01-10 opt.tst: fix USAGE_LICENSE
-99-10-22 date: test all % formats
-99-08-11 sfio: fix 3 tests for uwin
-	 sfio: tscanf for netbsd
-
 <H4>libast</H4>
 
+00-02-14 pathtmp: fix pid cache bug that sometimes repeated after ~10 attempts
+	 optget: "..." attribute quote
+	 pathfind: eliminate *: prefix in lib, not type
+	 proc: PROC_FOREGROUND for system(3) semantics (wait status return)
+	 pathtmp: fix mktemp() logic
+	 fts: fix FTS_NOSEEDOTDIR bug that botched ./* in top list
+	 include/ast/prototyped.h includes include/prototyped.h
+	 pathpath: fix strdup(0) bug
+	 optget: --html &lt;foo@bar&gt; =&gt; ...mailto:foo@bar...
+	 sscanf: fix sfsscanf =&gt; sfvsscanf typo
+	 magic.tab: strengthen tar recognition
+00-02-08 conf.sh: fix ifdef for systems that think sysconf(FOO) is const
+00-02-04 glob: fix globlist_t.gl_flags
 00-02-02 vm*: add NoF() for data only files
 00-01-27 fts: fix top level .==.. statp bug (thanks to dr. ek)
 00-01-25 conf.tab: fix LFS*_*LAGS typo
@@ -1003,55 +1105,43 @@ Changes since 1999-08-01 follow.
 	 pathpath: path==0 means malloc space
 99-10-22 tmfmt: %C=2-digit-century, %k=date(1), %y=2-digit-year-in-century
 99-10-18 fastfind: expanded default db lookup
-99-08-11 magic: fix off by one registry malloc
-	 features/fs: add __RENAME checks for stat familiy (netbsd)
-	 features/fs: major()/minor() fixes for s5
-	 features/libpath.sh: netbsd fix -- ld.so not in std places
-	 misc/fastfind: fix codes path generation bug
-	 optget: beef up --?* description, fix &lt;TR&gt;...&lt;/TR&gt; nesting
-	 pathprobe: check for override (writable key file) first
-	 features/time: int tmtimeofday(struct timeval*);
-	 optget: fix opt_info.num, even if opt_info.arg!=0
-	 fts: FTS_PHYSICAL =&gt; FTS_SEEDOTDIR, add FTS_CHOP
-	 fastfind: init dir tab with logical and physical name
-	 glob: add gnu GLOB_ALTDIRFUNC
-
-<H4>libcdb</H4>
-
-99-10-01 add: cdbimage() CDB_IMAGE
-99-08-11 cdbopen: fix referenced checks
-	 cdbflat: add test for fixed length records with terminator
-	 cdbpzip: pass details to pzip discipline
 
 <H4>libcmd</H4>
 
+00-02-14 chmod: --ignore-umask to ignore umask(2) in symbolic expressions
+	 chmod,chgrp,cp: use FTS_NOSEEDOTDIR for correct path construction
+	 cat: fix -n (was ignored, wow)
 00-01-27 getconf: add "-a" and "-v spec" for sol7.* compatibility
-99-09-09 join: fix -j1 vs. -j 1, add --ignorecase
-
-<H4>libcoshell</H4>
-
-1999-11-19 co*: add CO_OSH for bsdi lack of times(1)
-	   coexec: CO_IGNORE for all but real ksh
-
-<H4>libcs</H4>
-
-00-02-03 features/lib: add sys/types.h to htons etc. header refs
-00-01-25 genlocal: use package instead of hostinfo
-99-10-07 csbind: NODELAY for CS_ADDR_NOW only
-99-09-22 cs*: add CS_MNT_TAIL for multi-char mount files
-	 css: _UWIN workaround for st_ino verification
 
 <H4>libdll</H4>
 
 00-01-26 dlllook: add -- dlsym() with `_' weak prefix fallback
 
-<H4>libexpr</H4>
+<H4>librecsort</H4>
 
-99-09-22 exparse.y,exeval.c: add for(ID&#0091;DYNAMIC&#0093;)
-	 exparse.y: ref&#0091;i&#0093;.ref
+00-01-25 rskey.c: win32.i386 optimizer generates bad code for key_n_code
+99-11-19 rskeylist.c: add usage
+
+<H4>libz</H4>
+
+99-11-19 gzio: add missing _PACKAGE_ast
+
+<H4>libcoshell</H4>
+
+00-02-14 procrun,system: system(3) returns wait() status (not shell status)
+99-11-19 co*: add CO_OSH for bsdi lack of times(1)
+	 coexec: CO_IGNORE for all but real ksh
+
+<H4>libcs</H4>
+
+00-02-14 cschallenge(): add stat() to verify touch()
+00-02-03 features/lib: add sys/types.h to htons etc. header refs
+00-01-25 genlocal: use package instead of hostinfo
+99-10-07 csbind: NODELAY for CS_ADDR_NOW only
 
 <H4>libpp</H4>
 
+00-02-14 pppopen(): general comments with "bme" (begin middle end) string
 00-01-11 pp.probe: hosttype now in C.probe
 99-11-19 is&#0091;a-z&#0093;*( =&gt; ppis&#0091;a-z&#0093;*(
 	 ppproto: "..." &#0091;A-Z_&#0093;+ "..." ignores &#0091;A-Z_&#0093;+ if PROTOMAIN
@@ -1061,38 +1151,19 @@ Changes since 1999-08-01 follow.
 99-10-01 add pp:stringsplit for "...\\n..." =&gt; "..."..."
 	 add pp:lineid to match PP_LINEID
 
-<H4>librecsort</H4>
+<H4>libcdb</H4>
 
-00-01-25 rskey.c: win32.i386 optimizer generates bad code for key_n_code
-99-11-19 rskeylist.c: add usage
-
-<H4>libbz</H4>
-
-99-09-11 sfdcbzip: return &gt;0 if discipline pushed
-
-<H4>libz</H4>
-
-99-11-19 gzio: add missing _PACKAGE_ast
-99-09-11 sfdcgzip,sfdclzw: return 1 if discipline pushed
-99-08-11 gzio: fix gzread() z_err to keep Z_STREAM_END after check_header()
+00-02-14 cdbimage: fix record span bug that caused cql regression test failures
+99-10-01 add: cdbimage() CDB_IMAGE
 
 <H4>libpz</H4>
 
+00-02-14 PZ_DELAY|PZ_HANDLE|PZ_UNKNOWN for 'unknown format' after pzlib() done
 00-01-26 pzlib: dlsym() for NAME and _NAME (some don't map `_' automatically)
-99-08-11 discipline cleanup
-	 pzdeflate: last record incomplete is an error
-	 pzline: add
-	 pzpart: add partition#name partition?name=value,...
-	 pzclose: add scaled bps to PZ_SUMMARY
-	 pzfixed: use size if available and do 2 col freq check
-	 pzfixed: add optional pz for tracing
-	 pzip.h: add PZ_REGRESS, Pz_t.test, drop PZ_TEST*
-	 *: details =&gt; options, use optstr() with usage for PZ_OPTION
-	 pzpart: fix off-by one max col check
 </PRE>
 <HR>
 <P>
-February 03, 2000
+March 02, 2000
 
 </TD></TR></TABLE>
 </BODY>

@@ -35,17 +35,19 @@
 # .xx label="LABEL"		local link label request
 # .xx link="URL\tHOT-TEXT"	link goto with url request
 # .xx link="HOT-TEXT"		link goto request
+# .xx ref="URL\tMIME-TYPE"	head link hint
 # .xx begin=internal		begin internal text
 # .xx end=internal		end internal text
 #
 # .sn file			like .so but text copied to output
 
 command=mm2html
+version='mm2html (AT&T Labs Research) 2000-02-14'
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)mm2html (AT&T Labs Research) 2000-02-03
+@(#)'$version$'
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -86,8 +88,8 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 		at the top of the document.]
 	[+mailto=address?Sets the email \aaddress\a to send comments and
 		suggestions.]
-	[+meta.name?Emits the \bhtml\b tag \b<META NAME=\b\aname\a
-		\bCONTENT=\b\acontent\a\b>\b.]
+	[+meta.name?Emits the \bhtml\b tag \b<META name=\b\aname\a
+		\bcontent=\b\acontent\a\b>\b.]
 	[+package=text?\atext\a is prepended to the \bhtml\b document title.]
 	[+title=text?Sets the document title.]
 }
@@ -101,12 +103,9 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	immediately followed by a parenthesized number.]
 [+SEE ALSO?\btroff2html\b(1), \bhtml2rtf\b(1)]
 '
-	stamp=${USAGE#????}
-	stamp=${stamp%%']'*}
 	;;
 *)	ARGV0=""
 	USAGE='i:[file] [ file ... ]'
-	stamp='mm2html (AT&T Labs Research) 1999-08-11'
 	;;
 esac
 
@@ -124,6 +123,7 @@ license=(
 	author=
 )
 html=(
+	ident=1
 	logo=(
 		src=
 	)
@@ -147,6 +147,13 @@ html=(
 	FRAME=(
 		marginwidth=0
 		marginheight=0
+	)
+	home=(
+		href=
+	)
+	magic=(
+		plain='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">'
+		frame='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN" "http://www.w3.org/TR/REC-html40/frameset.dtd">'
 	)
 )
 
@@ -478,7 +485,7 @@ function getline
 				shift
 				case $op in
 				.[BI]R)	case $#:$2 in
-					2':('[0-9]')'*([,.]))
+					2':('[0-9]')'*([,.?!:;]))
 						x=${2#'('*')'}
 						y=${2%$x}
 						n=$y
@@ -487,8 +494,8 @@ function getline
 						*)	font1=EM ;;
 						esac
 						case $macros in
-						man)	set -A text -- "<NOBR><A HREF=\"../man$n/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
-						*)	set -A text -- "<NOBR><A HREF=\"${html.man:=../man}/man$n/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
+						man)	set -A text -- "<NOBR><A href=\"../man$n/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
+						*)	set -A text -- "<NOBR><A href=\"${html.man:=../man}/man$n/$1.html\"><$font1>$1</$font1></A>$y$x</NOBR>" ;;
 						esac
 						break
 						;;
@@ -614,12 +621,12 @@ function getline
 function ident
 {
 	case $frame in
-	'')	print -r -- '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">' ;;
-	*)	print -r -- '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN" "http://www.w3.org/TR/REC-html40/frameset.dtd">' ;;
+	'')	print -r -- "${html.magic.plain}" ;;
+	*)	print -r -- "${html.magic.frame}" ;;
 	esac
 	print -r -- "<HTML>"
 	print -r -- "<HEAD>"
-	print -r -- '<META NAME="generator" CONTENT="'$stamp'">'
+	print -r -- "<META name=\"generator\" content=\"$version\">"
 }
 
 if	[[ $frame != '' ]]
@@ -659,16 +666,16 @@ sed	\
 	-e 's%\\u\([^\\]*\)\\d%<SUP>\1</SUP>%g' \
 	-e 's%\\v\(.\)-\([^\\]*\)\1\(.*\)\\v\1+*\2\1%<SUB>\3</SUB>%g' \
 	-e 's%\\v\(.\)+*\([^\\]*\)\1\(.*\)\\v\1-\2\1%<SUP>\3</SUP>%g' \
-	-e 's%\\h'\''0\*\\w"\([^:/"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A HREF="#\1">\2</A>%g' \
-	-e 's%\\h'\''0\*\\w"\([a-z]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A HREF="\1" TARGET=_top>\2</A>%g' \
-	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A HREF="\1" TARGET=_top>\2</A>%g' \
-	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A HREF="\1" TARGET=_parent>\2</A>%g' \
-	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%<A HREF="#\1">\1</A>%g' \
-	-e 's%\\h'\''0\*1'\''\([a-z]*:[^'\'']*\)\\h'\''0'\''%<A HREF="\1" TARGET=_top>\1</A>%g' \
-	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%<A HREF="\1" TARGET=_top>\1</A>%g' \
-	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%<A HREF="\1" TARGET=_parent>\1</A>%g' \
-	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A NAME="\1">\2</A>%g' \
-	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%<A NAME="\1">\1</A>%g' \
+	-e 's%\\h'\''0\*\\w"\([^:/"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="#\1">\2</A>%g' \
+	-e 's%\\h'\''0\*\\w"\([a-z]*:[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
+	-e 's%\\h'\''0\*\\w"\(/[^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\2</A>%g' \
+	-e 's%\\h'\''0\*\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_parent>\2</A>%g' \
+	-e 's%\\h'\''0\*1'\''\([^:/'\'']*\)\\h'\''0'\''%<A href="#\1">\1</A>%g' \
+	-e 's%\\h'\''0\*1'\''\([a-z]*:[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
+	-e 's%\\h'\''0\*1'\''\(/[^'\'']*\)\\h'\''0'\''%<A href="\1" target=_top>\1</A>%g' \
+	-e 's%\\h'\''0\*1'\''\([^'\'']*\)\\h'\''0'\''%<A href="\1" target=_parent>\1</A>%g' \
+	-e 's%\\h'\''0/\\w"\([^"]*\)"'\''\([^'\'']*\)\\h'\''0'\''%<A name="\1">\2</A>%g' \
+	-e 's%\\h'\''0/1'\''\([^'\'']*\)\\h'\''0'\''%<A name="\1">\1</A>%g' \
 	-e 's%\\s+\(.\)\([^\\]*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
 	-e 's%\\s+\(.\)\([^\\]*\)\\s0%<FONT SIZE=+\1>\2</FONT>%g' \
 	-e 's%\\s-\(.\)\([^\\]*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
@@ -696,8 +703,8 @@ sed	\
 	-e 's%</X>%</TT>%g' \
 	-e 's%<CW>%<TT>%g' \
 	-e 's%</CW>%</TT>%g' \
-	-e 's%<EM>\([^<]*\)</EM>(\([0-9]\))%<NOBR><A HREF="../man\2/\1.html"><EM>\1</EM></A>\2</NOBR>%g' \
-	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0-9]\))%<NOBR><A HREF="../man\2/\1.html"><STRONG>\1</STRONG></A>\2</NOBR>%g' \
+	-e 's%<EM>\([^<]*\)</EM>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><EM>\1</EM></A>\2</NOBR>%g' \
+	-e 's%<STRONG>\([^<]*\)</STRONG>(\([0-9]\))%<NOBR><A href="../man\2/\1.html"><STRONG>\1</STRONG></A>\2</NOBR>%g' \
 	-e 's%\\s+\(.\)\(.*\)\\s-\1%<FONT SIZE=+\1>\2</FONT>%g' \
 	-e 's%\\s-\(.\)\(.*\)\\s+\1%<FONT SIZE=-\1>\2</FONT>%g' \
 	-e 's%\\c%<JOIN>%g' \
@@ -723,7 +730,7 @@ do	case $1 in
 				[0-9a-zA-Z])
 					type[++lists]=.al
 					list[lists]=OL
-					print -r -- "<OL TYPE='$1'>"
+					print -r -- "<OL type=\"$1\">"
 					;;
 				esac
 				;;
@@ -850,7 +857,7 @@ do	case $1 in
 					(( count += head ))
 					print -nr -- "$beg<H$count$options>"
 					case $count in
-					[0123])	print -nr -- "<A NAME='$*'>$*</A>"
+					[0123])	print -nr -- "<A name=\"$*\">$*</A>"
 						label[labels++]=$*
 						;;
 					*)	print -nr "$*"
@@ -866,15 +873,20 @@ do	case $1 in
 			;;
 		.AU)	mm.author="${mm.author}:$1:$7"
 			;;
-		.BL)	type[++lists]=.AL
+		.BL)	case ${lists[@]} in
+			*UL*UL*)i=disc ;;
+			*UL*)	i=circle ;;
+			*)	i=square ;;
+			esac
+			type[++lists]=.AL
 			list[lists]=UL
-			print -r -- "<UL>"
+			print -r -- "<UL type=$i>"
 			;;
 		.BP)	i=${*%.*}.gif
 			case $frame in
 			?*)	test -f $frame-$i && i=$frame-$i ;;
 			esac
-			print -r -- "<CENTER><IMG src='$i'></CENTER>"
+			print -r -- "<CENTER><IMG src=\"$i\"></CENTER>"
 			;;
 		.DE|.fi)print -r -- "</PRE>"
 			;;
@@ -1029,7 +1041,7 @@ do	case $1 in
 			title=${title#' '}
 			print -r -- "<TITLE>" $title "</TITLE>"
 			case ${license.author} in
-			?*)	print -r -- "<META NAME='author' CONTENT='${license.author}'>" ;;
+			?*)	print -r -- "<META name=\"author\" content=\"${license.author}\">" ;;
 			esac
 			print -r -- "</HEAD>"
 			case ${html.heading} in
@@ -1065,14 +1077,14 @@ $(cat $hit)
 				;;
 			*)	print -r -- "<BODY" ${html.BODY/'('@(*)')'/\1} ">"
 				case ${html.width} in
-				?*)	print -r -- "<TABLE BORDER=0 WIDTH=${html.width}><TR><TD VALIGN=top ALIGN=left>"
+				?*)	print -r -- "<TABLE border=0 width=${html.width}><TR><TD valign=top align=left>"
 					trailer="$trailer
 </TD></TR></TABLE>"
 					;;
 				esac
 				case $frame in
-				'')	case ${html.logo} in
-					?*)	case ${html.home.href} in
+				'')	case ${html.ident}:${html.logo} in
+					1:?*)	case ${html.home.href} in
 						?*)	html.home.href=${html.home.href%/*.html}/
 							print -r -- "<A" ${html.home/'('@(*)')'/\1} "><IMG" ${html.logo/'('@(*)')'/\1} "></A>"
 							;;
@@ -1116,7 +1128,7 @@ $(cat $hit)
 				L*)	sec="LOCAL COMMANDS" ;;
 				*)	sec="SECTION $2" ;;
 				esac
-				print -r -- "<H3><TABLE WIDTH=100%><TR><TH ALIGN=LEFT>$1($2)<TH ALIGN=CENTER><A HREF=\"\" TITLE-\"Command Index\">$sec</A><TH ALIGN=RIGHT>$1($2)</TR></TABLE></H3>"
+				print -r -- "<H3><TABLE width=100%><TR><TH align=left>$1($2)<TH align=center><A href=\"\" TITLE-\"Command Index\">$sec</A><TH align=right>$1($2)</TR></TABLE></H3>"
 				print -r -- "<HR>"
 				;;
 			.TL)	getline || break
@@ -1166,7 +1178,7 @@ $(cat $hit)
 							;;
 						1)	print -rn -- "<TH>"
 							;;
-						*)	print -rn -- "<TH COLSPAN=$s>"
+						*)	print -rn -- "<TH colspan=$s>"
 							;;
 						esac
 						print -rn -- "$1</TH>"
@@ -1182,7 +1194,7 @@ $(cat $hit)
 				then	case $s in
 					1)	print -rn -- "<TH>"
 						;;
-					*)	print -rn -- "<TH COLSPAN=$s>"
+					*)	print -rn -- "<TH colspan=$s>"
 						;;
 					esac
 					print -rn -- "$1</TH>"
@@ -1218,7 +1230,7 @@ $(cat $hit)
 						case $i in
 						*i*)	beg="$beg<EM>" end="</EM>$end" ;;
 						esac
-						print -rn -- "<TD ALIGN=$pos>$beg$1$end</TD>"
+						print -rn -- "<TD align=$pos>$beg$1$end</TD>"
 						case $# in
 						0|1)	break ;;
 						esac
@@ -1355,7 +1367,7 @@ $(cat $hit)
 					*)	print -r -- "<!--${upper} $@-->" ;;
 					esac
 					;;
-				label|link)
+				label|link|ref)
 					case $val in
 					*'	'*)
 						url=${val%%'	'*}
@@ -1373,25 +1385,34 @@ $(cat $hit)
 					*[:/.]*)	pfx= ;;
 					*)		pfx='#' ;;
 					esac
-					tar=
-					case $nam in
-					label)	nam=NAME
-						pfx=
-						label[labels++]=$txt
+					case $url in
+					*'${html.'*'}'*)
+						eval url=\"$url\"
 						;;
-					link)	nam=HREF
+					esac
+					case $nam in
+					label)	nam=name
+						label[labels++]=$txt
+						print -r -- "<A $nam=\"$url\">$txt</A>"
+						;;
+					link)	nam=href
 						case $frame in
 						?*)	case $url in
-							*([a-z]):*|/*) tar=" TARGET=_top" ;;
-							*)		tar=" TARGET=_parent" ;;
+							*([a-z]):*|/*) tar=" target=_top" ;;
+							*)		tar=" target=_parent" ;;
 							esac
 							;;
 						esac
+						print -r -- "<A $nam=\"$pfx$url\"$tar>$txt</A>"
+						;;
+					ref)	case $txt in
+						$url)	print -r -- "<LINK href=\"$url\">" ;;
+						*)	print -r -- "<LINK href=\"$url\" type=\"$txt\">" ;;
+						esac
 						;;
 					esac
-					print -r -- "<A $nam=\"$pfx$url\"$tar>$txt</A>"
 					;;
-				meta.*)	print -r -- "<META NAME='${nam#*.}' CONTENT='$val'>"
+				meta.*)	print -r -- "<META name=\"${nam#*.}\" content=\"$val\">"
 					;;
 				logo)	eval html.$nam.src='$'val
 					;;
@@ -1448,53 +1469,56 @@ while	(( lists > 0 ))
 do	print -r -- "</${list[lists--]}>"
 done
 print -r -- "<HR>"
-case ${license.author} in
-?*)	IFS=',+'
-	set -- ${license.author}
-	IFS=$ifs
-	n=0
-	h=0
-	for a
-	do	((n++))
-		v=${contributor[$a]}
-		case $v in
-		?*)	a=$v ;;
-		esac
-		authors[n]=$a
-		IFS='<>'
-		set -- $a
+case ${html.ident} in
+1)	case ${license.author} in
+	?*)	IFS=',+'
+		set -- ${license.author}
 		IFS=$ifs
-		case $2 in
-		?*)	case $h in
-			0)	h=1
-				print -r "<P>Send comments and suggestions to "
-				;;
-			*)	print -r ", "
+		n=0
+		h=0
+		for a
+		do	((n++))
+			v=${contributor[$a]}
+			case $v in
+			?*)	a=$v ;;
+			esac
+			authors[n]=$a
+			IFS='<>'
+			set -- $a
+			IFS=$ifs
+			case $2 in
+			?*)	case $h in
+				0)	h=1
+					print -r "<P>Send comments and suggestions to "
+					;;
+				*)	print -r ", "
+					;;
+				esac
+				print -rn "<A href=\"mailto:$2?subject=$title\">"
+				set -- $1
+				print -rn $*
+				print -rn "</A>"
 				;;
 			esac
-			print -rn "<A HREF=\"mailto:$2?subject=$title\">"
-			set -- $1
-			print -rn $*
-			print -rn "</A>"
-			;;
+		done
+		case $h in
+		1)	print -r "." ;;
+		esac
+		;;
+	*)	case ${html.MAILTO} in
+		?*)	print -r "<P>Send comments and suggestions to <A href=\"mailto:${html.MAILTO}?subject=$title\">${html.MAILTO}</A>." ;;
+		esac
+		;;
+	esac
+	sp="<P>"
+	for i in "${authors[@]}" "${license.organization}" "${license.corporation} ${license.company}" "${license.address}" "${license.location}" "${license.phone}"
+	do	case $i in
+		''|' ')	;;
+		*)	print -r -- "$sp$i"; sp="<BR>" ;;
 		esac
 	done
-	case $h in
-	1)	print -r "." ;;
-	esac
-	;;
-*)	case ${html.MAILTO} in
-	?*)	print -r "<P>Send comments and suggestions to <A HREF=\"mailto:${html.MAILTO}?subject=$title\">${html.MAILTO}</A>." ;;
-	esac
 	;;
 esac
-sp="<P>"
-for i in "${authors[@]}" "${license.organization}" "${license.corporation} ${license.company}" "${license.address}" "${license.location}" "${license.phone}"
-do	case $i in
-	''|' ')	;;
-	*)	print -r -- "$sp$i"; sp="<BR>" ;;
-	esac
-done
 print -r -- "<P>"
 print -r -- "${ds[Dt]}"
 case ${html.footing} in
@@ -1559,20 +1583,20 @@ trailer="$trailer
 print -r -- "$trailer"
 case $frame in
 ?*)	exec >> $frame-head.html || exit
-	case ${html.logo} in
-	?*)	case ${html.home.href} in
+	case ${html.ident}:${html.logo} in
+	1:?*)	case ${html.home.href} in
 		?*)	print -r -- "<A" ${html.home/'('@(*)')'/\1} " target=_parent><IMG" ${html.logo/'('@(*)')'/\1} "></A>" ;;
 		*)	print -r -- "<IMG" ${html.logo/'('@(*)')'/\1} ">" ;;
 		esac
 		;;
 	esac
 	case ${html.labels} in
-	?*)	print -r -- "<CENTER><FONT SIZE=-1>"
-		print -r -- "   <A HREF=\"javascript:parent.history.go(-1)\" TITLE=\"Previous frame\">Back</A>"
+	?*)	print -r -- "<CENTER><FONT size=-1>"
+		print -r -- "   <A href=\"javascript:parent.history.go(-1)\" title=\"Previous frame\">Back</A>"
 		case $labels in
 		0|1)	;;
 		*)	for ((n = 0; n < labels; n++))
-			do	print -r -- " | <A HREF=\"$frame-body.html#${label[n]}\" TARGET=\"${frame}_body\">${label[n]}</A>"
+			do	print -r -- " | <A href=\"$frame-body.html#${label[n]}\" target=\"${frame}_body\">${label[n]}</A>"
 			done
 			;;
 		esac
@@ -1585,8 +1609,8 @@ case $frame in
 	print -r -- "<TITLE>$title -- frame index</TITLE>
 </HEAD>
 <FRAMESET" ${html.FRAMESET/'('@(*)')'/\1} ">
-	<FRAME src='$frame-head.html' name='${frame}_head' scrolling=no" ${html.FRAME/'('@(*)')'/\1} ">
-	<FRAME src='$frame-body.html' name='${frame}_body' scrolling=auto" ${html.FRAME/'('@(*)')'/\1} ">
+	<FRAME src=\"$frame-head.html\" name=\"${frame}_head\" scrolling=no" ${html.FRAME/'('@(*)')'/\1} ">
+	<FRAME src=\"$frame-body.html\" name=\"${frame}_body\" scrolling=auto" ${html.FRAME/'('@(*)')'/\1} ">
 </FRAMESET>
 </HTML>"
 	case $index in

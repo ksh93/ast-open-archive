@@ -1,7 +1,7 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-01
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
-setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include
+setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
 setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
 setv PACKAGEROOT ../../../../..
 setv AR ar
@@ -45,29 +45,31 @@ make io.h implicit
 done io.h dontcare virtual
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/ast/re_comp.h implicit
+make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/ast/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
+done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast/bzlib.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/bzlib.h implicit
 make windows.h implicit
 done windows.h dontcare virtual
-make ${PACKAGE_ast_INCLUDE}/ast/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast/ast_common.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/ast_common.h dontcare
-done ${PACKAGE_ast_INCLUDE}/ast/stdio.h dontcare
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast/bzlib.h
-prev ${PACKAGE_ast_INCLUDE}/ast/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast/stdio.h implicit
+done ${PACKAGE_ast_INCLUDE}/bzlib.h
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 done bzip2.c
 prev bzip2.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}/ast -I${PACKAGE_ast_INCLUDE}  -c bzip2.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  -c bzip2.c
 done bzip2.o generated
 setv mam_libbz ${mam_cc_L+-lbz}${mam_cc_L-${PACKAGE_ast_LIB}/libbz.a}
 setv mam_libbz `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lbz,${INSTALLROOT}/lib/libbz.a,} ${PACKAGE_ast_LIB}/lib/bz`

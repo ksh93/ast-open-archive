@@ -304,6 +304,7 @@ deflate(Pz_t* pz, Sfio_t* op)
 	Pzindex_t	index;
 	Sfulong_t	extra;
 	char		num[16];
+	Sfulong_t	debug_offset = 0;
 
 	file = error_info.file;
 	line = error_info.line;

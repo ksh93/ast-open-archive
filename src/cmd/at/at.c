@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)at (AT&T Labs Research) 1999-10-11\n]"
+"[-?\n@(#)at (AT&T Labs Research) 2000-02-14\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - run commands at specified time(s)]"
 "[+DESCRIPTION?\b\f?\f\b is the command interface to the \bat\b daemon."
@@ -160,10 +160,10 @@ main(int argc, char** argv)
 
 	static char		que[2];
 
-	if (s = strrchr(*argv, '/'))
-		s++;
-	else
+	if (!(s = strrchr(*argv, '/')))
 		s = *argv;
+	else if (t = strchr(++s, '_'))
+		s = t + 1;
 	if (*s == 'b')
 	{
 		error_info.id = "batch";

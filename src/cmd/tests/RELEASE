@@ -1,3 +1,5 @@
+00-02-14 opt.tst: fix for "..." attribute quote
+	 datey2k.dat: oops: %l fails for old (2000-02-29) NOW
 00-01-10 opt.tst: fix USAGE_LICENSE
 99-10-22 date: test all % formats
 99-08-11 sfio: fix 3 tests for uwin

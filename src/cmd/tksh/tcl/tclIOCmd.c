@@ -1057,7 +1057,6 @@ Tcl_OpenCmd(notUsed, interp, argc, argv)
     if (!pipeline) {
         chan = Tcl_OpenFileChannel(interp, argv[1], modeString, prot);
     } else {
-#ifndef TKSH_V75
 	int mode, seekFlag, cmdArgc;
 	char **cmdArgv;
 
@@ -1087,7 +1086,6 @@ Tcl_OpenCmd(notUsed, interp, argc, argv)
 	    chan = Tcl_OpenCommandChannel(interp, cmdArgc, cmdArgv, flags);
 	}
         ckfree((char *) cmdArgv);
-#endif
     }
     if (chan == (Tcl_Channel) NULL) {
         return TCL_ERROR;

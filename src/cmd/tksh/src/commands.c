@@ -187,10 +187,6 @@ int b_TkshInfoCmd(argc, argv, data)
 		{
 			if (*argv[2] == 't')
 				iPtr->interpType = INTERP_TCL;
-#ifdef TKSH_V75
-			else if (*argv[2] == 'e')
-				iPtr->interpType = INTERP_CURRENT;
-#endif
 			else
 				iPtr->interpType = INTERP_KSH;
 			return 0;
@@ -486,14 +482,16 @@ Tksh_InfoCmd(dummy, interp, argc, argv)
 	iPtr->result = "1";
 	return TCL_OK;
     } else if ((c == 'g') && (strncmp(argv[1], "globals", length) == 0)) {
+#ifdef TCL_CODE
 	char *name;
+#endif
 
 	if (argc > 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],
 		    " globals ?pattern?\"", (char *) NULL);
 	    return TCL_ERROR;
 	}
-#ifdef TCL_CODE			/* Need Searh global list */
+#ifdef TCL_CODE			/* Need to Search global list */
 	for (hPtr = Tcl_FirstHashEntry(&iPtr->globalTable, &search);
 		hPtr != NULL; hPtr = Tcl_NextHashEntry(&search)) {
 	    varPtr = (Var *) Tcl_GetHashValue(hPtr);
@@ -628,7 +626,9 @@ Tksh_InfoCmd(dummy, interp, argc, argv)
         return TclGetLoadedPackages(interp, argv[2]);
     } else if ((c == 'l') && (strncmp(argv[1], "locals", length) == 0)
 	    && (length >= 3)) {
+#ifdef TCL_CODE
 	char *name;
+#endif
 
 	if (argc > 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"", argv[0],

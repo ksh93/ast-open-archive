@@ -391,7 +391,7 @@ Tcl_TclEval(interp, cmd)
 		else
 			dprintfArgs("Tcl_Eval (Tcl direct)", argc, argv);
 		result = (*((ShellProc_t) nv->nvalue))(argc, argv,
-			(void *) nv->nvfun);
+			nv->nvfun ? (void*)nv->nvfun : (void*)&sh);
 		if (f)
 		{
 			sfstack(sfstdout, NIL(Sfio_t *));
