@@ -142,7 +142,8 @@ esac
 
 : find the warp dll root dir
 
-ifs=$IFS
+ifs=${IFS-'
+	 '}
 IFS=:
 set -A path $PATH
 IFS=$ifs

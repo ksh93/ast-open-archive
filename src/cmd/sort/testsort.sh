@@ -44,7 +44,8 @@ SORT=$1
 shift
 SORT_ARGS="$@"
 path=`pwd`:/usr/5bin:/bin:/usr/bin:$PATH
-ifs=$IFS
+ifs=${IFS-'
+	 '}
 IFS=":"
 set $path
 IFS=$ifs

@@ -215,7 +215,8 @@ trace=
 SHELL=
 version=
 case $VPATH in
-*:*)	ifs=$IFS
+*:*)	ifs=${IFS-'
+	 '}
 	IFS=:
 	o=
 	for a in $VPATH

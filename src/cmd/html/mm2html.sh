@@ -174,7 +174,8 @@ framebody=
 framelink=
 framerefs=
 hp=
-ifs=$IFS
+ifs=${IFS-'
+	'}
 inch="     "
 indent=
 indent_prev=
@@ -928,8 +929,7 @@ TD { font-family:${ss}; font-size:$((vg_ps-1))pt; }
 			then	hit=${html.heading}
 			elif	[[ -f $HOME/${html.heading} ]]
 			then	hit=$HOME/${html.heading}
-			else	ifs=$IFS
-				IFS=:
+			else	IFS=:
 				set "" $HOME $PATH
 				IFS=$ifs
 				for i
@@ -1574,7 +1574,6 @@ do	getline || {
 			;;
 		.TS)	# undent ...
 
-	ifs=$IFS
 	case $1 in
 	H)	tbl_tmp=/tmp/m2h$$tbl
 		(( tbl_fd=3 ))
@@ -2157,8 +2156,7 @@ case ${html.footing} in
 	then	hit=${html.footing}
 	elif	[[ -f $HOME/${html.footing} ]]
 	then	hit=$HOME/${html.footing}
-	else	ifs=$IFS
-		IFS=:
+	else	IFS=:
 		set "" $HOME $PATH
 		IFS=$ifs
 		for i
@@ -2185,8 +2183,7 @@ case ${html.toolbar} in
 	then	hit=${html.toolbar}
 	elif	[[ -f $HOME/${html.toolbar} ]]
 	then	hit=$HOME/${html.toolbar}
-	else	ifs=$IFS
-		IFS=:
+	else	IFS=:
 		set "" $HOME $PATH
 		IFS=$ifs
 		for i

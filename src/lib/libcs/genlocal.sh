@@ -75,7 +75,8 @@ case $1 in
 '-?')	print -u2 "Usage: $0 [-hnv] [-f share-file] [-r rsh-path] [-t timeout] [host ...]"; exit 1 ;;
 esac
 case $file in
-"")	ifs=$IFS
+"")	ifs=${IFS-'
+	 '}
 	IFS=:
 	set "" $PATH "--" "$@"
 	IFS=$ifs

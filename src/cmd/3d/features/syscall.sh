@@ -295,7 +295,8 @@ do	case $i in
 done
 exec <$input
 ifi=0
-ifs=$IFS
+ifs=${IFS-'
+	 '}
 while	:
 do	IFS="	"
 	read line || break

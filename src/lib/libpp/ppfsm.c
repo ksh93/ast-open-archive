@@ -930,6 +930,8 @@ refill(register int c)
 #endif
 	pp.in->nextchr[c] = 0;
 	debug((-7, "refill(\"%s\") = %d = \"%-.*s%s\"", error_info.file, c, (c > 32 ? 32 : c), pp.in->nextchr, c > 32 ? "..." : ""));
+	if (pp.test & 0x0080)
+		sfprintf(sfstderr, "===== refill(\"%s\") = %d =====\n%s\n===== eob(\"%s\") =====\n", error_info.file, c, pp.in->nextchr, error_info.file);
 }
 
 #endif

@@ -34,7 +34,8 @@ customize=../lib/${command}/init
 root= arch_name= arch_keep= big_size= big_magic_keep=
 name_skip= path_skip= reg_magic_skip= src_name= src_magic_skip=
 
-ifs=$IFS
+ifs=${IFS-'
+	 '}
 IFS=:
 path=$PATH
 IFS=$ifs

@@ -1,3 +1,4 @@
+05-02-01 ie.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 04-07-26 ie.sh: update runtime docs
 04-07-23 Makefile: link with static ast libraries
 04-02-29 history.c: use pathtemp() instead of mktemp()

@@ -9,6 +9,7 @@
 	 Scanrules.mk: assert .LCL.INCLUDE before .PREFIX.INCLUDE :T=G: bind
 	 msgcat.mk: fix _PACKAGE_ID
 	 bind.c: disable bindalias() for unbound files -- doh
+	 misc.c: fix { %C %S } core dump (after a warning!)
 	 parse.c: drop CON_scan for over all rules; $(...) does it
 	 parse.c: drop { .ASSERT .ASSIGN } lists, add { .ASSERT. .ASSIGN. }
 	 state.c: ignore file timestamp subsecond truncation -- willya fix ext3

@@ -2508,6 +2508,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-02-01 mm2html.sh: IFS may be unset!
 05-01-11 mm2html.sh: add --top
 04-12-22 mm2html.sh: fix .xx link unverified rm
 04-08-01 htmlrefs.c: symlink only if different mtime
@@ -2703,6 +2704,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-02-01 3d.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 05-01-01 sys.tab,utimets3d.c: add utimets() intercept
 04-12-15 pathreal.c: "..." should fail if no lower view -- doh
 04-10-01 features/syslib: _exit test now uses SIGKILL (openbsd abort() hangs)
@@ -3024,6 +3026,7 @@ All recorded changes follow.
 	 Scanrules.mk: assert .LCL.INCLUDE before .PREFIX.INCLUDE :T=G: bind
 	 msgcat.mk: fix _PACKAGE_ID
 	 bind.c: disable bindalias() for unbound files -- doh
+	 misc.c: fix { %C %S } core dump (after a warning!)
 	 parse.c: drop CON_scan for over all rules; $(...) does it
 	 parse.c: drop { .ASSERT .ASSIGN } lists, add { .ASSERT. .ASSIGN. }
 	 state.c: ignore file timestamp subsecond truncation -- willya fix ext3
@@ -4359,6 +4362,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ie changes">ie changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-02-01 ie.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 04-07-26 ie.sh: update runtime docs
 04-07-23 Makefile: link with static ast libraries
 04-02-29 history.c: use pathtemp() instead of mktemp()
@@ -5114,6 +5118,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="warp changes">warp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-02-01 warp.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 05-01-01 warp.c,feature/lib: add utimes() intercept with struct timespec
 04-12-09 warp.sh: %s instead of %#, add clock_gettime() intercepts
 04-07-26 warp.sh: update runtime docs
@@ -7543,7 +7548,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>January 31, 2005</TD>
+<TD align=right>February 02, 2005</TD>
 </TR>
 </TABLE>
 <P>

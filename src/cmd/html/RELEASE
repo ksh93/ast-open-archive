@@ -1,3 +1,4 @@
+05-02-01 mm2html.sh: IFS may be unset!
 05-01-11 mm2html.sh: add --top
 04-12-22 mm2html.sh: fix .xx link unverified rm
 04-08-01 htmlrefs.c: symlink only if different mtime

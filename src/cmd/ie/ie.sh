@@ -109,7 +109,8 @@ esac
 
 : find the dll root dir
 
-ifs=$IFS
+ifs=${IFS-'
+	 '}
 IFS=:
 set -A path $PATH
 IFS=$ifs

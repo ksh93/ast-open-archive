@@ -324,7 +324,8 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	switch (dp->fmt)
 	{
 	case 'C':
-		error(1, "%%%c: obsolete: use %%c format", dp->fmt);
+		error(1, "%%%c: obsolete: use the %%c format", dp->fmt);
+		dp->fmt = 'c';
 		/*FALLTHROUGH*/
 	case 'c':
 		value->c = *s;
@@ -357,7 +358,8 @@ printext(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		value->p = (char**)strtol(s, NiL, 0);
 		break;
 	case 'S':
-		error(1, "%%%c: obsolete: use %%s format", dp->fmt);
+		error(1, "%%%c: obsolete: use the %%s format", dp->fmt);
+		dp->fmt = 's';
 		/*FALLTHROUGH*/
 	case 's':
 		value->s = s;

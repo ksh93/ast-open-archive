@@ -1,3 +1,4 @@
+05-02-01 3d.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 05-01-01 sys.tab,utimets3d.c: add utimets() intercept
 04-12-15 pathreal.c: "..." should fail if no lower view -- doh
 04-10-01 features/syslib: _exit test now uses SIGKILL (openbsd abort() hangs)
