@@ -3656,9 +3656,69 @@ AV* PL_Irsfp_filters = (( AV*)((void*)0));'
 
 TEST 20 'transition splice'
 	EXEC -I-D -D:transition -P
-	INPUT - $'#pragma prototyped
+		INPUT - $'#pragma prototyped
 int a = val>0?vau:0;
 int b = val>0?val:0;'
-	OUTPUT - $'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+		OUTPUT - $'\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
 int a = val>0?vau:0;
 int b = val>0?val:0;'
+
+TEST 21 '#if expressions'
+	EXEC -I-D 
+		INPUT - $'#define ENV_SEP \':\'
+#define IS_ENV_SEP(ch) ((ch) == ENV_SEP)
+#if \':\' == ENV_SEP
+ok
+#else
+bad
+#endif
+#if (\':\') == ENV_SEP
+ok
+#else
+bad
+#endif
+#if (\':\' == ENV_SEP)
+ok
+#else
+bad
+#endif
+#if ((\':\') == ENV_SEP)
+ok
+#else
+bad
+#endif
+#if IS_ENV_SEP(\':\')
+ok
+#else
+bad
+#endif
+#if IS_ENV_SEP(\';\')
+bad
+#else
+ok
+#endif'
+		OUTPUT - $'# 1 ""\n\n\n\nok\n\n\n\n\nok\n\n\n\n\nok\n\n\n\n\nok\n\n\n\n\nok\n\n\n\n\n\n\nok\n'
+	EXEC -I-D
+		INPUT - $'#if 0x10 == 020
+__LINE__
+#endif
+#if 0x10 == 16
+__LINE__
+#endif'
+		OUTPUT - $'# 1 ""\n\n2\n\n\n5\n'
+
+TEST 22 '-D-d'
+	EXEC -I-D -D-d
+		INPUT - $'#define A B
+#define C D \\
+	E \\
+	F
+A
+C'
+		OUTPUT - $'# 1 ""
+#define A B
+#define C D E F
+
+
+B
+D E F'

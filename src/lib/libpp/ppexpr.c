@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1986-2002 AT&T Corp.                *
+*                Copyright (c) 1986-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -531,7 +531,10 @@ subexpr(register int precedence, int* pun)
 			n = predicate(1);
 			goto gotoperand;
 		case T_CHARCONST:
-			n = chrtoi(pp.token);
+			c = *(pp.toknxt - 1);
+			*(pp.toknxt - 1) = 0;
+			n = chrtoi(pp.token + 1);
+			*(pp.toknxt - 1) = c;
 			if (n & ~((1<<CHAR_BIT)-1))
 			{
 				if (!(pp.mode & HOSTED))
@@ -593,8 +596,8 @@ ppexpr(int* pun)
 	long	ppstate;
 
 	ppstate = (pp.state & (CONDITIONAL|DISABLE|NOSPACE|STRIP));
-	pp.state &= ~DISABLE;
-	pp.state |= CONDITIONAL|NOSPACE|STRIP;
+	pp.state &= ~(DISABLE|STRIP);
+	pp.state |= CONDITIONAL|NOSPACE;
 	opeektoken = peektoken;
 	peektoken = -1;
 	*pun = 0;
@@ -607,7 +610,7 @@ ppexpr(int* pun)
 		n = 0;
 	}
 	peektoken = opeektoken;
-	pp.state &= ~(CONDITIONAL|NOSPACE|STRIP);
+	pp.state &= ~(CONDITIONAL|NOSPACE);
 	pp.state |= ppstate;
 	if (*pun) debug((-4, "ppexpr() = %luU", n));
 	else debug((-4, "ppexpr() = %ld", n));

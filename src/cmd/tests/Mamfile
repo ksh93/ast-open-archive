@@ -94,7 +94,6 @@ make ../../lib/libast/ast_map.h implicit
 done ../../lib/libast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../lib/libast/ast_stdio.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 prev ../../lib/libast/ast_common.h implicit

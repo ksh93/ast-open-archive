@@ -6,11 +6,18 @@ DEBUG == 1
 
 pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	pax.h options.h zip.h \
-	bio.c convert.c copy.c pax.c \
-	delta.c file.c format.c misc.c tv.c \
-	-lardir -lodelta -lvdelta -lsum
+	bio.c convert.c copy.c pax.c options.c \
+	delta.c file.c format.c misc.c paxlib.c tv.c \
+	pax-ar.c pax-bzip.c pax-cab.c pax-calib.c pax-compress.c \
+	pax-cpio.c pax-delta.c pax-delta_88.c pax-gzip.c \
+	pax-ignore.c pax-mime.c pax-patch.c pax-pds.c \
+	pax-rpm.c pax-slt.c pax-tar.c pax-tnef.c pax-vdb.c \
+	pax-saveset.c pax-zip.c \
+	-lardir -lodelta -lvdelta -lsum -ldll
 
 "win32*" :NOOPTIMIZE: delta.c
+
+$(INCLUDEDIR) :INSTALLPROTO: paxlib.h
 
 nocom :: nocom.c
 
@@ -40,4 +47,7 @@ tar :: tar.sh
 	data/star-long-2.dat \
 	data/star-long-2.lst \
 	data/star-test.dat \
-	data/y2k.dat
+	data/y2k.dat \
+	data/base.pax data/base-1.pax data/base-2.pax \
+	data/delta.pax data/delta-1.pax data/delta-2.pax data/delta-3.pax \
+	data/delta-4.pax data/delta-5.pax data/delta-6.pax data/delta-7.pax

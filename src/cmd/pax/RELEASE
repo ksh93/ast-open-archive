@@ -1,7 +1,22 @@
+03-12-05 pax-zip.c: fix EXT header logic
+03-12-01 rename OPT_delta_size to OPT_uncompressed: !=0 => compressed
+	 list compression % in delta op field
+03-11-25 paxlib.h: add external format dll interface
+03-11-20 pax-calib.c: add file suffix heuristics
+03-11-19 pax-calib.c: convert ibm -INC [edit comment] to COPY [REPLACING]
+         pax-calib.c: handle line size > 80
+03-11-11 pax-pds.c: add mvs pds listing
+03-11-06 regression tests finally pass after Format_t method switch
+03-10-31 Format_t converted to true method
+03-10-20 initial readonly ca-librarian support
+03-10-01 add pax delta format -- groundwork for vcdiff deltas
+03-09-23 pax.tst: change test file names for same ascii/ebcdic sort
+	 pax.c: extended header values with length need no quoting
 03-09-11 default output format now ustar -- should eventually be pax
 	 format rename: tar=>oldtar, ustar=>ustar|tar
 	 add --testdate=date regression test hook
 	 add --uid=id --gid=id
+	 ascii vs. ebcdic cleanup
 03-09-10 private static cleanup
 03-09-09 xopen sync and { pax ustar } format fixes, <tv.h> interface
 03-06-21 format.c: add ccode conversion check to putheader()

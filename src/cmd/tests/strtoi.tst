@@ -392,3 +392,96 @@ strtoul  "11#B" "#B" 0 OK
 strtoll  "11#B" "#B" 0 OK
 strtonll "11#B" "#B" 0 OK 10
 strtoull "11#B" "#B" 0 OK'
+
+TEST 05 'multiplier suffixes'
+	EXEC 1b 1k 1m 1g 1t 1. 1.2 1.23 1.234 1.k 1.2k 1.23k 1.234k
+		OUTPUT - $'strtol   "1b" "b" 1 OK
+strton   "1b" "" 512 OK 0
+strtoul  "1b" "b" 1 OK
+strtoll  "1b" "b" 1 OK
+strtonll "1b" "" 512 OK 0
+strtoull "1b" "b" 1 OK
+
+strtol   "1k" "k" 1 OK
+strton   "1k" "" 1024 OK 0
+strtoul  "1k" "k" 1 OK
+strtoll  "1k" "k" 1 OK
+strtonll "1k" "" 1024 OK 0
+strtoull "1k" "k" 1 OK
+
+strtol   "1m" "m" 1 OK
+strton   "1m" "" 1048576 OK 0
+strtoul  "1m" "m" 1 OK
+strtoll  "1m" "m" 1 OK
+strtonll "1m" "" 1048576 OK 0
+strtoull "1m" "m" 1 OK
+
+strtol   "1g" "g" 1 OK
+strton   "1g" "" 1073741824 OK 0
+strtoul  "1g" "g" 1 OK
+strtoll  "1g" "g" 1 OK
+strtonll "1g" "" 1073741824 OK 0
+strtoull "1g" "g" 1 OK
+
+strtol   "1t" "t" 1 OK
+strton   "1t" "" 2147483647 ERANGE 0
+strtoul  "1t" "t" 1 OK
+strtoll  "1t" "t" 1 OK
+strtonll "1t" "" 1099511627776 OK 0
+strtoull "1t" "t" 1 OK
+
+strtol   "1." "." 1 OK
+strton   "1." "." 1 OK 0
+strtoul  "1." "." 1 OK
+strtoll  "1." "." 1 OK
+strtonll "1." "." 1 OK 0
+strtoull "1." "." 1 OK
+
+strtol   "1.2" ".2" 1 OK
+strton   "1.2" "" 120 OK 0
+strtoul  "1.2" ".2" 1 OK
+strtoll  "1.2" ".2" 1 OK
+strtonll "1.2" "" 120 OK 0
+strtoull "1.2" ".2" 1 OK
+
+strtol   "1.23" ".23" 1 OK
+strton   "1.23" "" 123 OK 0
+strtoul  "1.23" ".23" 1 OK
+strtoll  "1.23" ".23" 1 OK
+strtonll "1.23" "" 123 OK 0
+strtoull "1.23" ".23" 1 OK
+
+strtol   "1.234" ".234" 1 OK
+strton   "1.234" "" 123 OK 0
+strtoul  "1.234" ".234" 1 OK
+strtoll  "1.234" ".234" 1 OK
+strtonll "1.234" "" 123 OK 0
+strtoull "1.234" ".234" 1 OK
+
+strtol   "1.k" ".k" 1 OK
+strton   "1.k" ".k" 1 OK 0
+strtoul  "1.k" ".k" 1 OK
+strtoll  "1.k" ".k" 1 OK
+strtonll "1.k" ".k" 1 OK 0
+strtoull "1.k" ".k" 1 OK
+
+strtol   "1.2k" ".2k" 1 OK
+strton   "1.2k" "k" 120 OK 0
+strtoul  "1.2k" ".2k" 1 OK
+strtoll  "1.2k" ".2k" 1 OK
+strtonll "1.2k" "k" 120 OK 0
+strtoull "1.2k" ".2k" 1 OK
+
+strtol   "1.23k" ".23k" 1 OK
+strton   "1.23k" "k" 123 OK 0
+strtoul  "1.23k" ".23k" 1 OK
+strtoll  "1.23k" ".23k" 1 OK
+strtonll "1.23k" "k" 123 OK 0
+strtoull "1.23k" ".23k" 1 OK
+
+strtol   "1.234k" ".234k" 1 OK
+strton   "1.234k" "k" 123 OK 0
+strtoul  "1.234k" ".234k" 1 OK
+strtoll  "1.234k" ".234k" 1 OK
+strtonll "1.234k" "k" 123 OK 0
+strtoull "1.234k" ".234k" 1 OK'

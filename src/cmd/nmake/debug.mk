@@ -1,7 +1,7 @@
 /*
  * interactive debug support
  *
- * @(#)debug (AT&T Research) 2003-06-11
+ * @(#)debug (AT&T Research) 2003-11-24
  *
  * *.i from *.c
  */
@@ -15,29 +15,15 @@ CCISCOPE =  $(~$(<:B:S=.o):N=*=*:Q)
 	end
 	return $(CC.DIALECT:N=-dD)
 
-%.i : %.c .ALWAYS $$(CCISCOPE)
-	$(CC) $(CCIFLAGS) -E $(.CCDEFINITIONS.) $(>) > $(<)
+for .S. $(.SUFFIX.c) $(.SUFFIX.C)
 
-%.i : %.C .ALWAYS $$(CCISCOPE)
-	$(CC) $(CCIFLAGS) -E $(.CCDEFINITIONS.) $(>) > $(<)
+	%.i : %$(.S.) .ALWAYS $$(CCISCOPE)
+		$(CC) $(CCIFLAGS) -E $(.CCDEFINITIONS.) $(>) > $(<)
 
-%.i : %.cc .ALWAYS $$(CCISCOPE)
-	$(CC) $(CCIFLAGS) -E $(.CCDEFINITIONS.) $(>) > $(<)
+	%.inc : %$(.S.) .ALWAYS $$(CCISCOPE)
+		$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
 
-%.inc : %.c .ALWAYS $$(CCISCOPE)
-	$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
+	%.s : %$(.S.) .ALWAYS $$(CCISCOPE)
+		$(CC) $(CCIFLAGS) -S $(>) > $(<)
 
-%.inc : %.C .ALWAYS $$(CCISCOPE)
-	$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
-
-%.inc : %.cc .ALWAYS $$(CCISCOPE)
-	$(CPP) $(CCIFLAGS) -H $(>) > /dev/null 2> $(<)
-
-%.s : %.c .ALWAYS $$(CCISCOPE)
-	$(CC) $(CCIFLAGS) -S $(>) > $(<)
-
-%.s : %.C .ALWAYS $$(CCISCOPE)
-	$(CC) $(CCIFLAGS) -S $(>) > $(<)
-
-%.s : %.cc .ALWAYS $$(CCISCOPE)
-	$(CC) $(CCIFLAGS) -S $(>) > $(<)
+end

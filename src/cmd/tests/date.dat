@@ -23,7 +23,7 @@ Feb 10:30		%b %H:%S		Sun Feb  1 10:00:30 EST 1987
 00 96061		%H %y%j			Fri Mar  1 00:00:00 EST 1996
 
 #
-# export DATEMSK=testdate.msk for the following
+# export DATEMSK=date.msk for the following
 #
 
 10/1/87 4 PM				NIL	Thu Oct  1 16:00:00 EDT 1987

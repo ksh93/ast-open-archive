@@ -1,3 +1,4 @@
+03-11-12 ppexpr.c: fix premature #if expression token strip
 03-06-21 ppproto.c: fix T_INVALID ? splice bug that did 0?val => 0?vaL
 03-06-10 ppargs.c: add -D-d and -D-m
 	 ppargs.c: add gnu options { -dD -dM -imacros -include -lang-* -lint }

@@ -75,7 +75,7 @@ register Sfio_t*	sp;
 	sfprintf(sp, "\tmethod=%s\n", kp->meth->name);
 	sfprintf(sp, "\tinsize=%ld outsize=%ld\n", kp->insize, kp->outsize);
 	sfprintf(sp, "\talignsize=%ld procsize=%ld recsize=%ld\n", kp->alignsize, kp->procsize, kp->recsize);
-	sfprintf(sp, "\tmerge=%d reverse=%d stable=%d uniq=%d verbose=%d\n", kp->merge, !!(kp->type & RS_REVERSE), !(kp->type & RS_DATA), !!(kp->type & RS_UNIQ), kp->verbose);
+	sfprintf(sp, "\tmerge=%d reverse=%d stable=%d uniq=%d ignore=%d verbose=%d\n", kp->merge, !!(kp->type & RS_REVERSE), !(kp->type & RS_DATA), !!(kp->type & RS_UNIQ), !!(kp->type & RS_IGNORE), kp->verbose);
 	sfprintf(sp, "\ttab='%c' keys=%s maxfield=%d", kp->tab ? kp->tab : ' ', kp->coded ? "coded" : "", kp->field.maxfield);
 	if (kp->fixed)
 		sfprintf(sp, " fixed=%d", kp->fixed);

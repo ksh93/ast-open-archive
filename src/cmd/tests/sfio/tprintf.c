@@ -88,6 +88,14 @@ Sffmt_t*	fe;
 		((Value_t*)val)->l = 0x04050607;
 		((Value_t*)val)->c = 0;
 	}
+	else if(fe->fmt == 'Y')
+	{	fe->fmt = 'c';
+		fe->size = -1;
+		fe->base = ':';
+		fe->flags &= ~SFFMT_LONG;
+		fe->flags |= SFFMT_VALUE;
+		((Value_t*)val)->s = "abc";
+	}
 	return 0;
 }
 
@@ -351,6 +359,12 @@ MAIN()
 	if(buf2[0]!=1||buf2[1]!=0||buf2[2]!=2||buf2[3]!=0||buf2[4]!=3)
 		terror("%%Z <1,0,2,0,3> != <%o,%o,%o,%o,%o>\n",
 			buf2[0], buf2[1], buf2[2], buf2[3], buf2[4]);
+
+	fe.form = NIL(char*);
+	fe.extf = nulprint;
+	sfsprintf(buf2,sizeof(buf2),"%!%Y",&fe);
+	if(strcmp(buf2,"a:b:c"))
+		terror("%%Y a:b:c != %s\n", buf2);
 
 	sfsprintf(buf1,sizeof(buf1),"%d %d %d %d",1,2,3,4);
 	stkprint(buf2,sizeof(buf2),"%d %d",1,2);

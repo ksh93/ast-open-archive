@@ -32,7 +32,6 @@
 #include "make.h"
 
 #include <sig.h>
-#include <vmalloc.h>
 
 #undef	trap
 

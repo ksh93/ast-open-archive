@@ -75,7 +75,6 @@ make ../../../include/ast/ast_map.h implicit
 done ../../../include/ast/ast_map.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -340,7 +339,6 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D
 done state.o generated
 make trap.o
 make trap.c
-prev ../../../include/ast/vmalloc.h implicit
 prev ../../../include/ast/sig.h implicit
 prev make.h implicit
 done trap.c

@@ -29,6 +29,9 @@
  * pax common definitions
  */
 
+#ifndef _PAX_H
+#define _PAX_H		1
+
 #include <ast.h>
 #include <ls.h>
 #include <sig.h>
@@ -42,14 +45,19 @@
 #include <times.h>
 #include <swap.h>
 #include <align.h>
-#include <modex.h>
 #include <sfstr.h>
 #include <debug.h>
 #include <stdarg.h>
 #include <int.h>
 #include <sum.h>
-#include <ardir.h>
 #include <tv.h>
+#include <fnv.h>
+
+#define header	Tarheader_s
+#include <tar.h>
+#undef	header
+
+typedef struct Tarheader_s Tarheader_t;
 
 #include "FEATURE/local"
 
@@ -91,389 +99,6 @@
 #define NOW		time(NiL)
 
 /*
- * info per archive format
- *
- * NOTES:
- *
- *	format indices must agree with format[] table below
- *
- *	the *_NAMESIZE maximum file name lengths include the trailing \0
- *
- *	PATH_MAX must be >= max(*_NAMESIZE)
- */
-
-#define ALAR		0
-#define ALAR_NAME	"ansi"
-#define ALAR_MATCH	0
-#define ALAR_DESC	"ANSI standard label tape; for tape devices only"
-#define ALAR_REGULAR	4
-#define ALAR_SPECIAL	ALAR_REGULAR
-#define ALAR_LABEL	2048
-#define ALAR_HEADER	80
-#define ALAR_VARHDR	9
-#define ALAR_NAMESIZE	17
-#define ALAR_RECSIZE	(BLOCKSIZE>>2)
-#define ALAR_RECFORMAT	'D'
-#define ALAR_ALIGN	0
-#define ALAR_FLAGS	IN|OUT
-#define ALAR_ID		"SLT"
-
-#define BINARY		1
-#define BINARY_NAME	"binary"
-#define BINARY_MATCH	"binary-cpio"
-#define BINARY_DESC	"cpio binary with symlinks"
-#define BINARY_REGULAR	DEFBUFFER
-#define BINARY_SPECIAL	DEFBLOCKS
-#define BINARY_HEADER	26
-#define BINARY_NAMESIZE	256
-#define BINARY_ALIGN	2
-#define BINARY_FLAGS	IN|OUT
-
-typedef struct Hdr_binary_s		/* binary header		*/
-{
-	short		magic;
-	unsigned short	dev;
-	unsigned short	ino;
-	unsigned short	mode;
-	unsigned short	uid;
-	unsigned short	gid;
-	short		links;
-	unsigned short	rdev;
-	unsigned short	mtime[2];
-	short		namesize;
-	unsigned short	size[2];
-} Hdr_binary_t;
-
-#define CPIO		2
-#define CPIO_NAME	"cpio"
-#define CPIO_MATCH	0
-#define CPIO_DESC	"cpio character with symlinks"
-#define CPIO_REGULAR	DEFBUFFER
-#define CPIO_SPECIAL	DEFBLOCKS
-#define CPIO_HEADER	76
-#define CPIO_MAGIC	070707
-#define CPIO_EXTENDED	1
-#define CPIO_TRAILER	"TRAILER!!!"
-#define CPIO_TRUNCATE(x) ((x)&0177777)
-#define CPIO_NAMESIZE	256
-#define CPIO_ALIGN	0
-#define CPIO_FLAGS	IN|OUT
-
-#define IBMAR		3
-#define IBMAR_NAME	"ibm"
-#define IBMAR_MATCH	0
-#define IBMAR_DESC	"EBCDIC standard label tape; for tape devices only"
-#define IBMAR_REGULAR	ALAR_REGULAR
-#define IBMAR_SPECIAL	ALAR_SPECIAL
-#define IBMAR_ALIGN	ALAR_ALIGN
-#define IBMAR_FLAGS	IN|OUT
-
-/*
- * NOTE: since USTAR is an extension of TAR they share the same header
- */
-
-#define TAR		4
-#define TAR_NAME	"oldtar"
-#define TAR_MATCH	0
-#define TAR_DESC	"pre-POSIX tar with symlinks"
-#define TAR_REGULAR	DEFBUFFER
-#define TAR_SPECIAL	DEFBLOCKS
-#define TAR_HEADER	TBLOCK
-#define TAR_NAMESIZE	100
-#define TAR_SUMASK	((1L<<(sizeof(tar_header.chksum)-1)*3)-1)
-#define TAR_ALIGN	BLOCKSIZE
-#define TAR_FLAGS	IN|OUT
-
-#define header		tar_header_info
-#define hblock		tar_header_block
-#include <tar.h>
-#undef header
-#undef hblock
-
-typedef union tar_header_block Hdr_tar_t;
-typedef struct tar_header_info Tar_t;
-
-#define USTAR		5
-#define USTAR_NAME	TMAGIC
-#define USTAR_MATCH	"tar"
-#define USTAR_DESC	"POSIX 1003.1-1988 tar"
-#define USTAR_REGULAR	TAR_REGULAR
-#define USTAR_SPECIAL	TAR_SPECIAL
-#define USTAR_HEADER	TAR_HEADER
-#define USTAR_ALIGN	TAR_ALIGN
-#define USTAR_FLAGS	IN|OUT
-
-#define tar_header	tar_header_block.dbuf
-#define tar_block	tar_header_block.dummy
-
-/*
- * s5r4 expanded cpio(5) char format
- * pax won't even bother with the binary counterpart
- */
-
-#define ASC		6
-#define ASC_NAME	"asc"
-#define ASC_MATCH	0
-#define ASC_DESC	"s5r4 extended cpio character"
-#define ASC_REGULAR	CPIO_REGULAR
-#define ASC_SPECIAL	CPIO_SPECIAL
-#define ASC_HEADER	110
-#define ASC_MAGIC	070701
-#define ASC_NAMESIZE	1024
-#define ASC_ALIGN	4
-#define ASC_FLAGS	IN|OUT
-
-/*
- * s5r4 expanded cpio(5) char format with checksum
- * (misnamed ``crc'' -- the check is a simple sum of the header)
- * pax won't even bother with the binary counterpart
- */
-
-#define ASCHK		7
-#define ASCHK_NAME	"aschk"
-#define ASCHK_MATCH	0
-#define ASCHK_DESC	"s5r4 extended cpio character with checksum"
-#define ASCHK_REGULAR	ASC_REGULAR
-#define ASCHK_SPECIAL	ASC_SPECIAL
-#define ASCHK_MAGIC	070702
-#define ASCHK_ALIGN	ASC_ALIGN
-#define ASCHK_FLAGS	IN|OUT
-
-/*
- * backup saveset format
- */
-
-#define SAVESET		8
-#define SAVESET_NAME	"vmsbackup"
-#define SAVESET_MATCH	0
-#define SAVESET_DESC	"VMS backup savset; for tape devices only"
-#define SAVESET_REGULAR	0
-#define SAVESET_SPECIAL	0
-#define SAVESET_ALIGN	0
-#define SAVESET_FLAGS	IN
-#define SAVESET_ID	"DECVMS"
-#define SAVESET_IMPL	"BACKUP"
-
-#define BLKHDR_SIZE	256
-#define BLKHDR_hdrsiz	0
-#define BLKHDR_blksiz	40
-
-#define FILHDR_SIZE	4
-#define FILHDR_MAGIC	257
-#define FILHDR_namelen	128
-#define FILHDR_size	0
-#define FILHDR_type	2
-#define FILHDR_data	4
-
-#define FILATT_blocks	10
-#define FILATT_frag	12
-#define FILATT_recatt	1
-#define FILATT_recfmt	0
-#define FILATT_reclen	2
-#define FILATT_recvfc	15
-
-#define RECHDR_SIZE	16
-#define RECHDR_size	0
-#define RECHDR_type	2
-
-#define REC_file	3
-#define REC_vbn		4
-
-/*
- * the POSIX IEEE Std 1003.1-2001 interchange format
- */
-
-#define PAX		9
-#define PAX_NAME	"pax"
-#define PAX_MATCH	0
-#define PAX_DESC	"POSIX 1003.1-2001 extended ustar"
-#define PAX_REGULAR	TAR_REGULAR
-#define PAX_SPECIAL	TAR_SPECIAL
-#define PAX_HEADER	TAR_HEADER
-#define PAX_ALIGN	TAR_ALIGN
-#define PAX_FLAGS	IN|OUT
-
-/*
- * object archive/library
- */
-
-#define AR		10
-#define AR_NAME		"library"
-#define AR_MATCH	"ar"
-#define AR_DESC		"object library archive"
-#define AR_REGULAR	0
-#define AR_SPECIAL	0
-#define AR_ALIGN	2
-#define AR_FLAGS	IN
-
-/*
- * cql virtual directory archive
- */
-
-#include <vdb.h>
-
-#define VDB		11
-#define VDB_NAME	VDB_MAGIC
-#define VDB_MATCH	0
-#define VDB_DESC	"virtual database"
-#define VDB_REGULAR	DEFBUFFER
-#define VDB_SPECIAL	DEFBLOCKS
-#define VDB_ALIGN	0
-#define VDB_FLAGS	IN|OUT
-
-/*
- * zip archive
- */
-
-#define ZIP		12
-#define ZIP_NAME	"zip"
-#define ZIP_MATCH	0
-#define ZIP_DESC	"zip 2.1 / PKZIP 2.04g archive"
-#define ZIP_REGULAR	DEFBUFFER
-#define ZIP_SPECIAL	DEFBLOCKS
-#define ZIP_ALIGN	0
-#define ZIP_FLAGS	IN
-
-#include "zip.h"
-
-/*
- * ms cabinet file
- */
-
-#define CAB		13
-#define CAB_NAME	"cab"
-#define CAB_MATCH	"cabinet"
-#define CAB_DESC	"MS cabinet file"
-#define CAB_REGULAR	DEFBUFFER
-#define CAB_SPECIAL	DEFBLOCKS
-#define CAB_ALIGN	0
-#define CAB_FLAGS	IN
-
-#include "cab.h"
-
-typedef struct Cab_s
-{
-	char*		format;
-	Cabheader_t	header;
-	Cabopt_t	optional;
-	Cabchunk_t*	chunk;
-	Cabfile_t*	file;
-	struct
-	{
-	unsigned int	header;
-	unsigned int	chunk;
-	unsigned int	block;
-	}		reserved;
-	int		index;
-} Cab_t;
-
-/*
- * redhat rpm file
- */
-
-#define RPM		14
-#define RPM_NAME	"rpm"
-#define RPM_MATCH	0
-#define RPM_DESC	"Redhat rpm package encapsulated cpio"
-#define RPM_REGULAR	DEFBUFFER
-#define RPM_SPECIAL	DEFBLOCKS
-#define RPM_ALIGN	0
-#define RPM_FLAGS	IN
-
-#include "rpm.h"
-
-/*
- * mime multipart
- */
-
-#define MIME		15
-#define MIME_NAME	"mime"
-#define MIME_MATCH	0
-#define MIME_DESC	"encapsulated mime"
-#define MIME_MAGIC	"--"
-#define MIME_REGULAR	DEFBUFFER
-#define MIME_SPECIAL	DEFBLOCKS
-#define MIME_ALIGN	0
-#define MIME_FLAGS	IN
-
-/*
- * ms outlook tnef -- how about zip + text name=value attributes?
- */
-
-#define TNEF		16
-#define TNEF_NAME	"tnef"
-#define TNEF_MATCH	"outlook"
-#define TNEF_DESC	"MS outlook transport neutral encapsulation format"
-#define TNEF_MAGIC	0x223e9f78
-#define TNEF_REGULAR	DEFBUFFER
-#define TNEF_SPECIAL	DEFBLOCKS
-#define TNEF_ALIGN	0
-#define TNEF_FLAGS	IN
-
-typedef struct Tnef_s
-{
-	char*		format;
-	off_t		offset;
-} Tnef_t;
-
-/*
- * compression pseudo formats -- COMPRESS is first
- */
-
-#define COMPRESS		17
-#define COMPRESS_NAME		"compress"
-#define COMPRESS_MATCH		0
-#define COMPRESS_DESC		"Lempel-Ziv compression"
-#define COMPRESS_ALGORITHM	0
-#define COMPRESS_UNDO		{"zcat"}
-#define COMPRESS_MAGIC		0x1f9d0000
-#define COMPRESS_MAGIC_MASK	0xffff0000
-
-#define GZIP			18
-#define GZIP_NAME		"gzip"
-#define GZIP_MATCH		0
-#define GZIP_DESC		"gzip compression"
-#define GZIP_ALGORITHM		"-9"
-#define GZIP_UNDO		{"gunzip"},{"ratz","-c"}
-#define GZIP_MAGIC		0x1f8b0000
-#define GZIP_MAGIC_MASK		0xffff0000
-
-#define BZIP			19
-#define BZIP_NAME		"bzip2"
-#define BZIP_MATCH		0
-#define BZIP_DESC		"bzip compression"
-#define BZIP_ALGORITHM		0
-#define BZIP_UNDO		{"bunzip2"}
-#define BZIP_MAGIC		0x425a6800
-#define BZIP_MAGIC_MASK		0xffffff00
-
-/*
- * delta pseudo formats -- DELTA is first
- */
-
-#define DELTA			20
-#define DELTA_NAME		"delta"
-#define DELTA_MATCH		0
-#define DELTA_DESC		"vdelta difference/compression"
-#define DELTA_ALGORITHM		"94"
-
-#define DELTA_88		21
-#define DELTA_88_NAME		"delta88"
-#define DELTA_88_MATCH		0
-#define DELTA_88_DESC		"delta88 difference/compression"
-#define DELTA_88_ALGORITHM	"88"
-
-#define DELTA_IGNORE		22
-#define DELTA_IGNORE_NAME	"ignore"
-#define DELTA_IGNORE_MATCH	0
-#define DELTA_IGNORE_DESC	"ignore delta headers"
-
-#define DELTA_PATCH		23
-#define DELTA_PATCH_NAME	"patch"
-#define DELTA_PATCH_MATCH	0
-#define DELTA_PATCH_DESC	"delta using standard archive formats"
-
-/*
  * format generic definitions
  */
 
@@ -489,11 +114,30 @@ typedef struct Tnef_s
 #define HDR_uid		(1<<9)
 #define HDR_uname	(1<<10)
 
-#define IN_DEFAULT	CPIO		/* first getheader() state	*/
-#define OUT_DEFAULT	USTAR		/* default output format	*/
+#define FMT_COMPRESS	"gzip"		/* default compress format	*/
+#define FMT_DEFAULT	"pax"		/* default output format	*/
+#define FMT_DELTA	"delta"		/* default delta output format	*/
+#define FMT_IGNORE	"ignore"	/* delta ignore output format	*/
+#define FMT_PATCH	"patch"		/* delta patch output format	*/
+#define FMT_ZIP		"gzip"		/* default DELTA_zip format	*/
 
-#define IN		(1<<0)		/* copy in			*/
-#define OUT		(1<<1)		/* copy out			*/
+#define IN		PAX_IN		/* copy in			*/
+#define OUT		PAX_OUT		/* copy out			*/
+#define ARCHIVE		PAX_ARCHIVE	/* archive format		*/
+#define COMPRESS	PAX_COMPRESS	/* compress format		*/
+#define DELTA		PAX_DELTA	/* delta format			*/
+#define DLL		PAX_DLL		/* format from dll		*/
+#define DOS		PAX_DOS		/* may contain dos names	*/
+#define PSEUDO		PAX_PSEUDO	/* pseudo delta format		*/
+#define COMPRESSED	PAX_COMPRESSED	/* format already compressed	*/
+#define CONV		PAX_CONV	/* format handles ccode conv	*/
+#define DELTAINFO	PAX_DELTAINFO	/* format handles delta info	*/
+#define KEEPSIZE	PAX_KEEPSIZE	/* retain non REG st_size	*/
+#define LINKTYPE	PAX_LINKTYPE	/* File_t.linktype supported	*/
+#define NOHARDLINKS	PAX_NOHARDLINKS	/* hard links not supported	*/
+#define SLASHDIR	PAX_SLASHDIR	/* trailing slash => directory	*/
+#define STANDARD	PAX_STANDARD	/* the standard format		*/
+#define SUM		PAX_SUM		/* inline member checksum	*/
 
 #define SETIDS		(1<<0)		/* set explicit uid and gid	*/
 
@@ -502,6 +146,11 @@ typedef struct Tnef_s
 #define INFO_ORDERED	'O'		/* delta on ordered base	*/
 
 #define IDLEN		(sizeof(ID)-1)	/* strlen(ID)			*/
+
+#define DELTA_94	1
+#define DELTA_88	2
+#define DELTA_IGNORE	3
+#define DELTA_PATCH	4
 
 #define TYPE_COMPRESS	'C'		/* compress encoding type	*/
 #define TYPE_DELTA	'D'		/* delta encoding type		*/
@@ -551,43 +200,59 @@ typedef struct Tnef_s
 #define INVALID_translate	2	/* translate and/or truncate	*/
 #define INVALID_UTF8		3	/* convert to UTF8		*/
 
-#define NOLINK		0		/* not a link			*/
-#define HARDLINK	'1'		/* hard link to previous entry	*/
-#define SOFTLINK	'2'		/* soft link to previous entry	*/
+#define NOLINK		PAX_NOLINK	/* not a link			*/
+#define HARDLINK	PAX_HARDLINK	/* hard link to previous entry	*/
+#define SOFTLINK	PAX_SOFTLINK	/* soft link to previous entry	*/
 
 #define BLOCKSIZE	512		/* block size			*/
 #define IOALIGN		ALIGN_BOUND1	/* io buffer alignment		*/
 #define MINBLOCK	1		/* smallest block size		*/
-#define DEFBLOCKS	20		/* default blocking		*/
-#define DEFBUFFER	16		/* default io buffer blocking	*/
+#define DEFBLOCKS	PAX_DEFBLOCKS	/* default blocking		*/
+#define DEFBUFFER	PAX_DEFBUFFER	/* default io buffer blocking	*/
 #define MAXBLOCKS	40		/* largest zero fill blocking	*/
 #define FILBLOCKS	1024		/* file to file blocking	*/
-#define MAXUNREAD	BLOCKSIZE	/* max bunread() count		*/
+#define MAXUNREAD	(8*BLOCKSIZE)	/* max bunread() count		*/
+#define MINID		80		/* min ident buffer size	*/
+#define MAXID		BLOCKSIZE	/* max ident buffer size	*/
 #define RESETABLE	(-1)		/* default option can be reset	*/
 
-typedef struct Bio_s			/* buffered io info		*/
-{
-	char*		next;		/* next char pointer		*/
-	char*		last;		/* last char+1 pointer		*/
-	char*		buffer;		/* io buffer			*/
-	off_t		buffersize;	/* buffer size			*/
-	off_t		count;		/* char transfer count		*/
-	off_t		offset;		/* volume offset		*/
-	off_t		size;		/* total size if seekable	*/
-	int		fd;		/* file descriptor		*/
-	int		skip;		/* volume skip			*/
-	int		keep;		/* volume keep after skip	*/
-	int		mode;		/* open() O_* mode		*/
-	unsigned int	all:1;		/* read all volumes		*/
-	unsigned int	blocked:1;	/* blocked device io		*/
-	unsigned int	blok:1;		/* BLOK io file			*/
-	unsigned int	blokeof:1;	/* BLOK io eof			*/
-	unsigned int	blokflag:1;	/* io file BLOK flag		*/
-	unsigned int	empty:1;	/* last read was empty		*/
-	unsigned int	eof:1;		/* hit EOF			*/
-	unsigned int	seekable:1;	/* seekable			*/
+/*
+ * events are miscellanous callouts that work around format warts
+ */
+
+#define EVENT_BUG_19951031	0x00000001
+#define EVENT_DELTA_EXTEND	0x00000002
+#define EVENT_SKIP_JUNK		0x00000004
+
+typedef int (*Link_f)(const char*, const char*);
+typedef int (*Stat_f)(const char*, struct stat*);
+
+struct Archive_s; typedef struct Archive_s Archive_t;
+struct File_s; typedef struct File_s File_t;
+struct Format_s; typedef struct Format_s Format_t;
+struct List_s; typedef struct List_s List_t;
+struct Map_s; typedef struct Map_s Map_t;
+struct Member_s; typedef struct Member_s Member_t;
+
+#define _PAX_IO_PRIVATE_ \
+	char*		next;		/* next char pointer		*/ \
+	char*		last;		/* last char+1 pointer		*/ \
+	char*		buffer;		/* io buffer			*/ \
+	off_t		count;		/* char transfer count		*/ \
+	off_t		expand;		/* add to count at end		*/ \
+	off_t		offset;		/* volume offset		*/ \
+	off_t		size;		/* total size if seekable	*/ \
+	int		skip;		/* volume skip			*/ \
+	int		keep;		/* volume keep after skip	*/ \
+	int		mode;		/* open() O_* mode		*/ \
+	unsigned int	all:1;		/* read all volumes		*/ \
+	unsigned int	blocked:1;	/* blocked device io		*/ \
+	unsigned int	blok:1;		/* BLOK io file			*/ \
+	unsigned int	blokeof:1;	/* BLOK io eof			*/ \
+	unsigned int	blokflag:1;	/* io file BLOK flag		*/ \
+	unsigned int	empty:1;	/* last read was empty		*/ \
+	unsigned int	seekable:1;	/* seekable			*/ \
 	unsigned int	unblocked:1;	/* set unblocked device io	*/
-} Bio_t;
 
 typedef struct Buffer_s			/* pseudo fd buffer		*/
 {
@@ -610,88 +275,82 @@ typedef struct Link_s			/* link info			*/
 	Fileid_t	id;		/* generated link file id	*/
 } Link_t;
 
-typedef struct File_s			/* common internal file info	*/
-{
-	struct Archive_s*ap;		/* !=0 if from buffer		*/
-	off_t		datasize;	/* non-reg has data anyway	*/
-	struct
-	{
-	int		op;		/* op				*/
-	struct Member_s*base;		/* base file pointer		*/
-	off_t		size;		/* target file size		*/
-	}		delta;		/* delta info			*/
-	int		extended;	/* extended header file		*/
-	int		fd;		/* >=0 read fd			*/
-	char*		id;		/* archive file id		*/
-	char*		intermediate;	/* intermediate output name	*/
-	char*		linkpath;	/* link to this path		*/
-	int		linkpathsize;	/* linkname size with null byte	*/
-	int		magic;		/* header magic number		*/
-	char*		name;		/* archive file name		*/
-	int		namesize;	/* name size with null byte	*/
-	char*		path;		/* local file name for reading	*/
-	int		perm;		/* original st_mode perm	*/
-	struct stat*	st;		/* stat() info from ftwalk()	*/
-	int		type;		/* st_mode type			*/
-	Link_t*		link;		/* hard link state		*/
-	int		linktype;	/* NOLINK, HARDLINK, SOFTLINK	*/
-	char*		uidname;	/* user id name			*/
-	char*		gidname;	/* group id name		*/
-	struct
-	{
-	char*		partial;	/* partial record buffer	*/
-	int		blocks;		/* io block count		*/
-	int		format;		/* format			*/
-	int		section;	/* file section number		*/
-	}		record;		/* record format info		*/
-	long		checksum;	/* checksum			*/
-	unsigned int	chmod:1;	/* must restore mode		*/
-	unsigned int	longlink:1;	/* f->linkpath too long		*/
-	unsigned int	longname:1;	/* f->name too long		*/
-	unsigned int	ordered:1;	/* ordered fileout() override	*/
-	unsigned int	ro:1;		/* readonly { . .. ... - }	*/
+#define _PAX_FILE_PRIVATE_ \
+	Archive_t*	ap;		/* !=0 if from buffer		*/ \
+	unsigned long	checksum;	/* data checksum		*/ \
+	off_t		datasize;	/* non-reg has data anyway	*/ \
+	struct \
+	{ \
+	int		op;		/* op				*/ \
+	unsigned long	checksum;	/* data checksum		*/ \
+	unsigned long	index;		/* index			*/ \
+	Member_t*	base;		/* base file pointer		*/ \
+	}		delta;		/* delta info			*/ \
+	int		extended;	/* extended header file		*/ \
+	int		fd;		/* >=0 read fd			*/ \
+	char*		id;		/* archive file id		*/ \
+	char*		intermediate;	/* intermediate output name	*/ \
+	int		linkpathsize;	/* linkname size with null byte	*/ \
+	int		magic;		/* header magic number		*/ \
+	int		namesize;	/* name size with null byte	*/ \
+	int		perm;		/* original st_mode perm	*/ \
+	int		type;		/* st_mode type			*/ \
+	Link_t*		link;		/* hard link state		*/ \
+	char*		uidname;	/* user id name			*/ \
+	char*		gidname;	/* group id name		*/ \
+	struct \
+	{ \
+	char*		partial;	/* partial record buffer	*/ \
+	int		blocks;		/* io block count		*/ \
+	int		format;		/* format			*/ \
+	int		section;	/* file section number		*/ \
+	}		record;		/* record format info		*/ \
+	unsigned int	chmod:1;	/* must restore mode		*/ \
+	unsigned int	longlink:1;	/* f->linkpath too long		*/ \
+	unsigned int	longname:1;	/* f->name too long		*/ \
+	unsigned int	ordered:1;	/* ordered fileout() override	*/ \
+	unsigned int	ro:1;		/* readonly { . .. ... - }	*/ \
 	unsigned int	skip:1;		/* skip this entry		*/
-} File_t;
 
-typedef struct Member_s			/* cached member info		*/
+struct Member_s				/* cached member info		*/
 {
 	File_t*		info;		/* deltapass() file info	*/
 	Tv_t		atime;		/* access time			*/
 	Tv_t		mtime;		/* modify time			*/
 	off_t		offset;		/* data offset			*/
 	off_t		size;		/* data size			*/
-	off_t		expand;		/* expanded size		*/
+	off_t		uncompressed;	/* uncompressed size		*/
 	short		dev;		/* dev				*/
 	short		ino;		/* ino				*/
 	short		mode;		/* mode				*/
 	unsigned int	mark:1;		/* visit mark			*/
-} Member_t;
+};
 
-typedef struct Format_s			/* format info			*/
+typedef unsigned _ast_int4_t Magic_t;
+
+typedef struct Compress_format_s	/* compress format data		*/
 {
-	char*		name;		/* name				*/
-	char*		match;		/* name strgrpmatch pattern	*/
-	char*		desc;		/* description			*/
-	unsigned long	regular;	/* default regular blocking	*/
-	unsigned long	special;	/* default special blocking	*/
-	int		align;		/* trailer alignment		*/
-	int		flags;		/* io info			*/
-	char*		algorithm;	/* compress algorithm name/flag	*/
+	char*		variant;	/* variant qualifier/flag	*/
 	char*		undo[2];	/* compress undo name and arg	*/
 	char*		undotoo[2];	/* alternate undo		*/
-} Format_t;
+} Compress_format_t;
 
-typedef struct List_s			/* generic list			*/
+typedef struct Delta_format_s		/* delta format data		*/
 {
-	struct List_s*	next;		/* next in list			*/
+	char*		variant;	/* variant qualifier/flag	*/
+} Delta_format_t;
+
+struct List_s				/* generic list			*/
+{
+	List_t*		next;		/* next in list			*/
 	void*		item;		/* list item pointer		*/
-} List_t;
+};
 
-typedef struct Map_s			/* file name map list		*/
+struct Map_s				/* file name map list		*/
 {
-	struct Map_s*	next;		/* next in list			*/
+	Map_t*		next;		/* next in list			*/
 	regex_t		re;		/* compiled match re		*/
-} Map_t;
+};
 
 typedef struct Post_s			/* post processing restoration	*/
 {
@@ -710,332 +369,262 @@ typedef union Integral_u		/* byte|half swap probe		*/
 	unsigned int_1	c[4];
 } Integral_t;
 
-typedef struct Delta_s			/* delta archive info		*/
-{
-	struct Archive_s*base;		/* base archive			*/
-	int		epilogue;	/* epilogue hit			*/
-	int		index;		/* member index			*/
-	int		format;		/* 0,DELTA,DELTA_IGNORE,DELTA_PATCH */
-	char*		hdr;		/* header pointer		*/
-	char		hdrbuf[64];	/* header buffer		*/
-	Hash_table_t*	tab;		/* entry table			*/
-	int		trailer;	/* optional trailer size	*/
-	int		version;	/* encoding type version	*/
-} Delta_t;
-
 typedef struct Convert_s		/* char code conversion		*/
 {
 	int		on;		/* do the conversion		*/
-#if 0
-	int		from;		/* convert from this char code	*/
-	int		to;		/* convert to this char code	*/
-#endif
 	unsigned char*	f2t;		/* from=>to map			*/
 	unsigned char*	t2f;		/* to=>from map			*/
 	unsigned char*	f2a;		/* from=>CC_ASCII map		*/
 	unsigned char*	t2a;		/* to=>CC_ASCII map		*/
 } Convert_t;
 
-typedef struct Value_s			/* string and/or number value	*/
+typedef struct Delta_s			/* delta archive info		*/
 {
-	char*		string;		/* string value			*/
-	_ast_int4_t	number;		/* numeric value		*/
-	_ast_int4_t	fraction;	/* fractional part		*/
-	size_t		size;		/* max string size		*/
-} Value_t;
+	Archive_t*	base;		/* base archive			*/
+	unsigned long	checksum;	/* expected base checksum	*/
+	int		compress;	/* delta source is /dev/null	*/
+	int		epilogue;	/* epilogue hit			*/
+	int		index;		/* member index			*/
+	Format_t*	format;		/* delta format			*/
+	char*		hdr;		/* header pointer		*/
+	char		hdrbuf[64];	/* header buffer		*/
+	int		ordered;	/* members ordered by file name	*/
+	off_t		size;		/* expected base size		*/
+	Hash_table_t*	tab;		/* entry table			*/
+	int		trailer;	/* optional trailer size	*/
+	char*		version;	/* optional delta version	*/
+} Delta_t;
 
-typedef struct Archive_s		/* archive info			*/
-{
-	Ardir_t*	ardir;		/* ardir(3) handle		*/
-	Ardirent_t*	ardirent;	/* ardir(3) current entry	*/
-	unsigned long	checksum;	/* running checksum		*/
-	int		compress;	/* compression index		*/
-	Convert_t	convert[SECTION_MAX];/* data/header conversion	*/
-	void*		data;		/* format specific data		*/
-	Delta_t*	delta;		/* delta info			*/
-	int		entries;	/* total number of entries	*/
-	int		entry;		/* current entry index		*/
-	int		errors;		/* intermediate error count	*/
-	int		expected;	/* expected format		*/
-	File_t		file;		/* current member file info	*/
-	int		format;		/* format			*/
-	struct
-	{
-	char		id[ALAR_NAMESIZE+1]; /* name id			*/
-	char		volume[64];	/* volume id			*/
-	char		format[7];	/* format id			*/
-	char		implementation[8];/* implementation id		*/
-	char		owner[15];	/* owner id			*/
-	char		standards[20];	/* standards id			*/
-	}		id;		/* id strings (including '\0')	*/
-	Bio_t*		io;		/* current buffered io		*/
-	struct
-	{
-	int		done;		/* label read done		*/
-	char		last[5];	/* last label			*/
-	int		section;	/* inside section		*/
-	int		sequence;	/* sequence number		*/
-	}		label;		/* putlabels() state		*/
-	int		locked;		/* newio() recursion lock	*/
-	Bio_t		mio;		/* main buffered io		*/
-	unsigned long	memsum;		/* checksum			*/
-	char*		name;		/* io pathname			*/
-	char*		names;		/* PORTAR long name directory	*/
-	off_t		offset;		/* relative byte offset		*/
-	struct
-	{
-	unsigned long	checksum;	/* old running checksum		*/
-	unsigned long	memsum;		/* old checksum			*/
-	int		warned;		/* old checksum warning		*/
-	}		old;
-	char*		package;	/* package id			*/
-	struct
-	{
-	Value_t		copy;		/* copy() path buffer		*/
-	Value_t		head;		/* header path name		*/
-	Value_t		link;		/* link text			*/
-	Value_t		name;		/* real path name		*/
-	Value_t		path;		/* access path			*/
-	Value_t		peek;		/* peek file			*/
-	Value_t		prev;		/* previous entry order check	*/
-	Value_t		zip;		/* zip header name		*/
-	char		temp[PATH_MAX];	/* temp intermediate name	*/
-	}		path;
-	struct Archive_s*parent;	/* parent (delta) for base	*/
-	int		part;		/* media change count		*/
-	int		peek;		/* already peeked at file entry */
-	File_t*		record;		/* record output file		*/
-	int		raw;		/* don't convert sections	*/
-	int		section;	/* current archive section	*/
-	size_t		selected;	/* number of selected members	*/
-	off_t		size;		/* size				*/
-	off_t		skip;		/* base archive skip offset	*/
-	struct stat	st;		/* memver stat			*/
-	int		sum;		/* collect running checksum	*/
-	int		swap;		/* swap operation		*/
-	int		swapio;		/* io swap operation		*/
-	Hash_table_t*	tab;		/* entries to verify		*/
-	struct
-	{
-	Tar_t*		last;		/* last n headers		*/
-	int		lastindex;	/* last[] index			*/
-	int		lastsize;	/* elementsof(last[])		*/
-	}		tar;		/* tar specifics		*/
-	Bio_t		tio;		/* temporary buffered io	*/
-	struct
-	{
-	Sfio_t*		ext;		/* extend() temporary		*/
-	Sfio_t*		hdr;		/* headname() temporary		*/
-	Sfio_t*		key;		/* extend() temporary		*/
-	}		tmp;		/* temporary stuff		*/
-	off_t		total;		/* newio() total io check	*/
-	int		verified;	/* number of verified entries	*/
-	int		volume;		/* volume number		*/
+#define _PAX_ARCHIVE_PRIVATE_ \
+	unsigned long	checksum;	/* running checksum		*/ \
+	int		checkdelta;	/* getprologue delta check	*/ \
+	Format_t*	compress;	/* compression format		*/ \
+	Convert_t	convert[SECTION_MAX];/* data/header conversion	*/ \
+	Delta_t*	delta;		/* delta info			*/ \
+	int		entries;	/* total number of entries	*/ \
+	int		entry;		/* current entry index		*/ \
+	int		errors;		/* intermediate error count	*/ \
+	Format_t*	expected;	/* expected format		*/ \
+	File_t		file;		/* current member file info	*/ \
+	File_t*		info;		/* last deltabase() member	*/  \
+	int		locked;		/* newio() recursion lock	*/ \
+	Bio_t		mio;		/* main buffered io		*/ \
+	unsigned long	memsum;		/* member checksum		*/ \
+	off_t		offset;		/* relative byte offset		*/ \
+	int		ordered;	/* archive members ordered	*/ \
+	struct \
+	{ \
+	unsigned long	checksum;	/* old running checksum		*/ \
+	unsigned long	memsum;		/* old checksum			*/ \
+	int		warned;		/* old checksum warning		*/ \
+	}		old; \
+	char*		package;	/* package id			*/ \
+	Archive_t*	parent;	/* parent (delta) for base	*/ \
+	int		part;		/* media change count		*/ \
+	struct				/* stash() values		*/ \
+	{ \
+	Paxvalue_t	copy;		/* copy() path buffer		*/ \
+	Paxvalue_t	name;		/* real path name		*/ \
+	Paxvalue_t	path;		/* access path			*/ \
+	Paxvalue_t	peek;		/* peek file			*/ \
+	Paxvalue_t	prev;		/* previous entry order check	*/ \
+	char		temp[PATH_MAX];	/* temp intermediate name	*/ \
+	}		path; \
+	int		peek;		/* already peeked at file entry */ \
+	File_t*		record;		/* record output file		*/ \
+	int		raw;		/* don't convert sections	*/ \
+	int		section;	/* current archive section	*/ \
+	size_t		selected;	/* number of selected members	*/ \
+	off_t		size;		/* size				*/ \
+	off_t		skip;		/* base archive skip offset	*/ \
+	struct stat	st;		/* memver stat			*/ \
+	int		sum;		/* collect running checksum	*/ \
+	int		swap;		/* swap operation		*/ \
+	int		swapio;		/* io swap operation		*/ \
+	Hash_table_t*	tab;		/* verification table		*/ \
+	Bio_t		tio;		/* temporary buffered io	*/ \
+	struct \
+	{ \
+	Sfio_t*		extended;	/* extend() temporary		*/ \
+	Sfio_t*		global;		/* extend() temporary		*/ \
+	Sfio_t*		hdr;		/* headname() temporary		*/ \
+	Sfio_t*		key;		/* extend() temporary		*/ \
+	}		tmp;		/* temporary stuff		*/ \
+	off_t		total;		/* newio() total io check	*/ \
+	char*		type;		/* archive type			*/ \
+	off_t		uncompressed;	/* uncompressed size estimate	*/ \
+	int		verified;	/* number of verified entries	*/ \
+	int		volume;		/* volume number		*/ \
 	int		warnlinkhead;	/* invalid hard link header	*/
-} Archive_t;
 
-typedef struct State_s			/* program state		*/
-{
-	int		acctime;	/* reset file access times	*/
-	int		append;		/* append -- must be 0 or 1 !!!	*/
-	Bio_t		backup;		/* backup() position		*/
-	long		blocksize;	/* explicit buffer size		*/
-	Buffer_t	buffer[BUFFER_FD_MAX-BUFFER_FD_MIN+1];/* fd buf	*/
-	long		buffersize;	/* io buffer size		*/
-	struct
-	{
-	char*		name;		/* archive member name		*/
-	char*		path;		/* local file path		*/
-	Sfio_t*		sp;		/* tmp stream			*/
-	Sum_t*		sum;		/* method handle		*/
-	}		checksum;	/* --checksum state		*/
-	int		chmod;		/* must preserve mode		*/
-	int		clobber;	/* overwrite output files	*/
-	int		complete;	/* files completely in volume	*/
-	int		current;	/* current file[] index		*/
-	struct
-	{
-	int		bufferindex;	/* delta buffer index		*/
-	int		buffersize;	/* delta buffer size		*/
-	}		delta;		/* delta info			*/
-	int		delta2delta;	/* -rz- -wz- : retain delta info*/
-	int		descend;	/* dir names self+descendents	*/
-	char*		destination;	/* pass mode destination dir	*/
-	dev_t		dev;		/* . device number		*/
-	unsigned short	devcnt;		/* dev assignment count		*/
-	int		drop;		/* drop a `.' for each file	*/
-	int		dropcount;	/* current line drop count	*/
-	int		exact;		/* exact archive read		*/
-	char**		files;		/* alternate file name list	*/
-	struct
-	{
-	char**		argv;		/* filter command argv		*/
-	char**		patharg;	/* filter file arg in argv	*/
-	char*		options;	/* line mode options		*/
-	char*		command;	/* line mode command		*/
-	char*		path;		/* line mode physical path	*/
-	char*		name;		/* line mode logical path	*/
-	int		line;		/* line mode			*/
-	}		filter;		/* file output filter state	*/
-	int		flags;		/* flags			*/
-	int		ftwflags;	/* ftwalk() flags		*/
-	int		format;		/* default output format	*/
-	int		gid;		/* current group id		*/
-	struct
-	{
-	char*		comment;	/* comment text			*/
-	int		invalid;	/* invalid path INVALID_ action	*/
-	int		linkdata;	/* data with each hard link	*/
-	char*		listformat;	/* verbose listing format	*/
-	char*		global;		/* global header name format	*/
-	char*		extended;	/* extended name format		*/
-	}		header;		/* header specific options	*/
-	off_t		hole;		/* one past last hole		*/
-	struct
-	{
-	char		volume[64];	/* volume id			*/
-	}		id;		/* id strings (including '\0')	*/
-	Archive_t*	in;		/* input archive info		*/
-	unsigned short	inocnt;		/* ino assignment count		*/
-	struct
-	{
-	char*		name;		/* archive member name		*/
-	char*		path;		/* local file path		*/
-	Sfio_t*		sp;		/* tmp stream			*/
-	}		install;	/* --install state		*/
-	int		intermediate;	/* intermediate ouput - rename	*/
-	int		interrupt;	/* this signal caused exit	*/
-	int		keepgoing;	/* keep going on error		*/
-					/* use when possible for -rw	*/
-	int		(*linkf)(const char*, const char*);
-	Hash_table_t*	linktab;	/* hard link table		*/
-	int		list;		/* full file trace		*/
-	char*		listformat;	/* verbose listing format	*/
-	int		local;		/* reject files/links outside .	*/
-	struct
-	{
-	unsigned char*	a2n;		/* CC_ASCII=>CC_NATIVE		*/
-	unsigned char*	e2n;		/* CC_EBCDIC=>CC_NATIVE		*/
-	unsigned char*	n2e;		/* CC_NATIVE=>CC_EBCDIC		*/
-	}		map;		/* ccode maps			*/
-	Map_t*		maps;		/* file name maps		*/
-	int		matchsense;	/* pattern match sense		*/
-	off_t		maxout;		/* max volume/part output count	*/
-	struct
-	{
-	off_t		size;		/* total size			*/
-	int		fancy;		/* fancy display		*/
-	int		last;		/* length of last display path	*/
-	int		on;		/* meter progress		*/
-	int		width;		/* display line width		*/
-	}		meter;		/* meter state			*/
-	int		mkdir;		/* make intermediate dirs	*/
-	struct
-	{
-	char*		magic;		/* separator magic		*/
-	size_t		length;		/* separator magic length	*/
-	size_t		fill;		/* last member filler size	*/
-	}		mime;
-	int		modemask;	/* & with mode for chmod()	*/
-	int		modtime;	/* retain mtime			*/
-	int		newer;		/* append only if newer		*/
-	int		operation;	/* IN|OUT operation mode	*/
-	Hash_table_t*	options;	/* option table			*/
-	int		ordered;	/* sorted base and file list	*/
-	int		owner;		/* set owner info		*/
-	Archive_t*	out;		/* output archive info		*/
-	int		pass;		/* archive to archive		*/
-	char**		patterns;	/* name match patterns		*/
-	char*		peekfile;	/* stdin file list peek		*/
-	long		pid;		/* main pid			*/
-	char		pwd[PATH_MAX];	/* full path of .		*/
-	int		pwdlen;		/* pwd length sans null		*/
-	List_t*		proc;		/* procopen() list for finish	*/
-	struct
-	{
-	int		charset;	/* convert record charset	*/
-	int		delimiter;	/* directory delimiter		*/
-	File_t*		file;		/* current output file		*/
-	int		format;		/* record format		*/
-	char*		header;		/* file header			*/
-	int		headerlen;	/* file header length		*/
-	int		line;		/* convert records<->lines	*/
-	int		pad;		/* pad output record blocks	*/
-	char*		pattern;	/* format match pattern		*/
-	int		offset;		/* data buffer offset		*/
-	long		size;		/* io size			*/
-	char*		trailer;	/* file trailer			*/
-	int		trailerlen;	/* file trailer length		*/
-	}		record;		/* record info			*/
-	Hash_table_t*	restore;	/* post proc restoration table	*/
-	Sfio_t*		rtty;		/* tty file read pointer	*/
-#if SAVESET
-	struct
-	{
-	char*		block;		/* current block		*/
-	long		blocksize;	/* max block size		*/
-	char*		bp;		/* block pointer		*/
-	int		recatt;		/* record attributes		*/
-	int		recfmt;		/* record format		*/
-	int		reclen;		/* record length		*/
-	int		recvfc;		/* record fixed control length	*/
-	int		lastsize;	/* size of last record		*/
-	time_t		time;		/* backup time			*/
-	}		saveset;	/* backup saveset state		*/
-#endif
-	size_t		selected;	/* total of selected members	*/
-	int		setgid;		/* set file gid to this value	*/
-	int		setuid;		/* set file uid to this value	*/
-					/* -L=pathstat() -P=lstat()	*/
-	int		(*statf)(const char*, struct stat*);
-	int		strict;		/* strict standard conformance	*/
-	int		summary;	/* output summary info		*/
-	int		test;		/* debug test bits		*/
-	unsigned long	testdate;	/* listformat test date		*/
-	struct
-	{
-	char*		buffer;		/* temporary buffer		*/
-	long		buffersize;	/* temporary buffer size	*/
-	char*		file;		/* tmp file name		*/
-	Sfio_t*		fmt;		/* temporary format stream	*/
-	Sfio_t*		lst;		/* temporary list stream	*/
-	Sfio_t*		mac;		/* temporary print macro stream	*/
-	Sfio_t*		str;		/* temporary string stream	*/
-	}		tmp;		/* temporary stuff		*/
-	int		uid;		/* current user id		*/
-	int		update;		/* copy file only if newer	*/
-	char*		usage;		/* optget() usage string	*/
-	struct
-	{
-	unsigned char	delimiter;	/* header delimiter		*/
-	unsigned char	variant;	/* variant header delimiters	*/
-	Sfio_t*		directory;	/* directory trailer stream	*/
-	struct stat	st;		/* member stat prototype	*/
-	struct
-	{
-	char*		base;		/* header buffer base		*/
-	char*		next;		/* next header			*/
-	off_t		size;		/* total size			*/
-	}		header;
-	}		vdb;
-	int		verbose;	/* trace files when acted upon	*/
-	int		verify;		/* verify action on file	*/
-	int		warnmkdir;	/* --mkdir hint issued		*/
-	int		warnlinknum;	/* too many hard links		*/
-	Sfio_t*		wtty;		/* tty file write pointer	*/
+#define _PAX_PRIVATE_ \
+	int		acctime;	/* reset file access times	*/ \
+	int		append;		/* append -- must be 0 or 1 !!!	*/ \
+	Bio_t		backup;		/* backup() position		*/ \
+	long		blocksize;	/* explicit buffer size		*/ \
+	Buffer_t	buffer[BUFFER_FD_MAX-BUFFER_FD_MIN+1];/* fd buf	*/ \
+	struct \
+	{ \
+	char*		name;		/* archive member name		*/ \
+	char*		path;		/* local file path		*/ \
+	Sfio_t*		sp;		/* tmp stream			*/ \
+	Sum_t*		sum;		/* method handle		*/ \
+	}		checksum;	/* --checksum state		*/ \
+	int		chmod;		/* must preserve mode		*/ \
+	int		clobber;	/* overwrite output files	*/ \
+	int		complete;	/* files completely in volume	*/ \
+	int		current;	/* current file[] index		*/ \
+	struct \
+	{ \
+	int		bufferindex;	/* delta buffer index		*/ \
+	int		buffersize;	/* delta buffer size		*/ \
+	}		delta;		/* delta info			*/ \
+	int		delta2delta;	/* -rz- -wz- : retain delta info*/ \
+	int		descend;	/* dir names self+descendents	*/ \
+	char*		destination;	/* pass mode destination dir	*/ \
+	dev_t		dev;		/* . device number		*/ \
+	unsigned short	devcnt;		/* dev assignment count		*/ \
+	int		drop;		/* drop a `.' for each file	*/ \
+	int		dropcount;	/* current line drop count	*/ \
+	int		exact;		/* exact archive read		*/ \
+	char**		files;		/* alternate file name list	*/ \
+	struct \
+	{ \
+	char**		argv;		/* filter command argv		*/ \
+	char**		patharg;	/* filter file arg in argv	*/ \
+	char*		options;	/* line mode options		*/ \
+	char*		command;	/* line mode command		*/ \
+	char*		path;		/* line mode physical path	*/ \
+	char*		name;		/* line mode logical path	*/ \
+	int		line;		/* line mode			*/ \
+	}		filter;		/* file output filter state	*/ \
+	int		ftwflags;	/* ftwalk() flags		*/ \
+	Format_t*	format;		/* default output format	*/ \
+	struct \
+	{ \
+	char*		comment;	/* comment text			*/ \
+	int		invalid;	/* invalid path INVALID_ action	*/ \
+	int		linkdata;	/* data with each hard link	*/ \
+	char*		listformat;	/* verbose listing format	*/ \
+	char*		global;		/* global header name format	*/ \
+	char*		extended;	/* extended name format		*/ \
+	}		header;		/* header specific options	*/ \
+	off_t		hole;		/* one past last hole		*/ \
+	Archive_t*	in;		/* input archive info		*/ \
+	unsigned short	inocnt;		/* ino assignment count		*/ \
+	struct \
+	{ \
+	char*		name;		/* archive member name		*/ \
+	char*		path;		/* local file path		*/ \
+	Sfio_t*		sp;		/* tmp stream			*/ \
+	}		install;	/* --install state		*/ \
+	int		intermediate;	/* intermediate ouput - rename	*/ \
+	int		interrupt;	/* this signal caused exit	*/ \
+	Link_f		linkf;		/* -L=pathsetlink() -P=link()	*/ \
+	Hash_table_t*	linktab;	/* hard link table		*/ \
+	char*		listformat;	/* verbose listing format	*/ \
+	int		local;		/* reject files/links outside .	*/ \
+	struct \
+	{ \
+	unsigned char*	a2n;		/* CC_ASCII=>CC_NATIVE		*/ \
+	unsigned char*	e2n;		/* CC_EBCDIC=>CC_NATIVE		*/ \
+	unsigned char*	n2e;		/* CC_NATIVE=>CC_EBCDIC		*/ \
+	}		map;		/* ccode maps			*/ \
+	Map_t*		maps;		/* file name maps		*/ \
+	int		matchsense;	/* pattern match sense		*/ \
+	off_t		maxout;		/* max volume/part output count	*/ \
+	struct \
+	{ \
+	off_t		size;		/* total size			*/ \
+	int		fancy;		/* fancy display		*/ \
+	int		last;		/* length of last display path	*/ \
+	int		on;		/* meter progress		*/ \
+	int		width;		/* display line width		*/ \
+	}		meter;		/* meter state			*/ \
+	int		mkdir;		/* make intermediate dirs	*/ \
+	struct \
+	{ \
+	char*		magic;		/* separator magic		*/ \
+	size_t		length;		/* separator magic length	*/ \
+	size_t		fill;		/* last member filler size	*/ \
+	}		mime; \
+	int		modtime;	/* retain mtime			*/ \
+	int		newer;		/* append only if newer		*/ \
+	int		operation;	/* IN|OUT operation mode	*/ \
+	Hash_table_t*	options;	/* option table			*/ \
+	int		ordered;	/* sorted base and file list	*/ \
+	int		owner;		/* set owner info		*/ \
+	Archive_t*	out;		/* output archive info		*/ \
+	int		pass;		/* archive to archive		*/ \
+	char**		patterns;	/* name match patterns		*/ \
+	char*		peekfile;	/* stdin file list peek		*/ \
+	char		pwd[PATH_MAX];	/* full path of .		*/ \
+	int		pwdlen;		/* pwd length sans null		*/ \
+	List_t*		proc;		/* procopen() list for finish	*/ \
+	struct \
+	{ \
+	int		charset;	/* convert record charset	*/ \
+	int		delimiter;	/* directory delimiter		*/ \
+	File_t*		file;		/* current output file		*/ \
+	int		format;		/* record format		*/ \
+	char*		header;		/* file header			*/ \
+	int		headerlen;	/* file header length		*/ \
+	int		line;		/* convert records<->lines	*/ \
+	int		pad;		/* pad output record blocks	*/ \
+	char*		pattern;	/* format match pattern		*/ \
+	int		offset;		/* data buffer offset		*/ \
+	long		size;		/* io size			*/ \
+	char*		trailer;	/* file trailer			*/ \
+	int		trailerlen;	/* file trailer length		*/ \
+	}		record;		/* record info			*/ \
+	Hash_table_t*	restore;	/* post proc restoration table	*/ \
+	Sfio_t*		rtty;		/* tty file read pointer	*/ \
+	int		scanned;	/* scanned for format libs	*/ \
+	size_t		selected;	/* total of selected members	*/ \
+	int		setgid;		/* set file gid to this value	*/ \
+	int		setuid;		/* set file uid to this value	*/ \
+	Stat_f		statf;		/* -L=pathstat() -P=lstat()	*/ \
+	unsigned long	testdate;	/* listformat test date		*/ \
+	struct \
+	{ \
+	char*		buffer;		/* temporary buffer		*/ \
+	long		buffersize;	/* temporary buffer size	*/ \
+	char*		delta;		/* tmp delta file name		*/ \
+	char*		file;		/* tmp file name		*/ \
+	Sfio_t*		fmt;		/* temporary format stream	*/ \
+	Sfio_t*		lst;		/* temporary list stream	*/ \
+	Sfio_t*		mac;		/* temporary print macro stream	*/ \
+	Sfio_t*		str;		/* temporary string stream	*/ \
+	}		tmp;		/* temporary stuff		*/ \
+	int		update;		/* copy file only if newer	*/ \
+	char*		usage;		/* optget() usage string	*/ \
+	char		volume[64];	/* volume id			*/ \
+	int		warnmkdir;	/* --mkdir hint issued		*/ \
+	int		warnlinknum;	/* too many hard links		*/ \
+	Sfio_t*		wtty;		/* tty file write pointer	*/ \
 	int		yesno;		/* interactive answer is yes/no	*/
-} State_t;
+
+#define Pax_t		State_t
+#define Pax_s		State_s
+#define Paxarchive_t	Archive_t
+#define Paxarchive_s	Archive_s
+#define Paxfile_t	File_t
+#define Paxfile_s	File_s
+#define Paxformat_t	Format_t
+#define Paxformat_s	Format_s
+#define Paxio_t		Bio_t
+#define Paxio_s		Bio_s
+#define Paxvalue_t	Value_t
+#define Paxvalue_s	Value_s
+
+#include "paxlib.h"
+#include "options.h"
 
 extern char*			definput;
 extern char*			defoutput;
 extern char*			eomprompt;
-extern Format_t			format[];
+extern Format_t*		formats;
 extern State_t			state;
-
-extern char			alar_header[ALAR_LABEL];
-extern Hdr_binary_t		binary_header;
-extern Hdr_tar_t		tar_header_block;
-extern char			zip_header[ZIP_HEADER];
 
 extern int		addlink(Archive_t*, File_t*);
 extern void		append(Archive_t*);
@@ -1046,15 +635,16 @@ extern void		bflushin(Archive_t*, int);
 extern void		bflushout(Archive_t*);
 extern char*		bget(Archive_t*, off_t, off_t*);
 extern void		binit(Archive_t*);
-extern void		bput(Archive_t*, int);
+extern void		bput(Archive_t*, off_t);
 extern off_t		bread(Archive_t*, void*, off_t, off_t, int);
 extern void		brestore(Archive_t*);
 extern off_t		bseek(Archive_t*, off_t, int, int);
 extern int		bskip(Archive_t*);
 extern void		bunread(Archive_t*, void*, int);
-extern void		bwrite(Archive_t*, void*, int);
+extern void		bwrite(Archive_t*, void*, off_t);
 extern int		closeout(Archive_t*, File_t*, int);
 extern int		cmpftw(Ftw_t*, Ftw_t*);
+extern void		complete(Archive_t*, File_t*, size_t);
 extern void		convert(Archive_t*, int, int, int);
 extern void		copy(Archive_t*, int(*)(Ftw_t*));
 extern void		copyin(Archive_t*);
@@ -1063,9 +653,11 @@ extern int		copyout(Ftw_t*);
 extern long		cpio_long(unsigned short*);
 extern void		cpio_short(unsigned short*, long);
 extern void		deltabase(Archive_t*);
+extern int		deltacheck(Archive_t*, File_t*);
 extern void		deltadelete(Archive_t*);
 extern void		deltaout(Archive_t*, Archive_t*, File_t*);
 extern void		deltapass(Archive_t*, Archive_t*);
+extern void		deltaset(Archive_t*, char*);
 extern void		deltaverify(Archive_t*);
 extern int		dirprefix(char*, char*);
 extern void		filein(Archive_t*, File_t*);
@@ -1078,18 +670,14 @@ extern void		getdeltaheader(Archive_t*, File_t*);
 extern void		getdeltatrailer(Archive_t*, File_t*);
 extern void		getepilogue(Archive_t*);
 extern int		getfile(Archive_t*, File_t*, Ftw_t*);
-extern int		getformat(char*);
+extern Format_t*	getformat(char*, int);
 extern int		getheader(Archive_t*, File_t*);
 extern void		getidnames(File_t*);
-extern int		getlabel(Archive_t*, File_t*);
-extern long		getlabnum(char*, int, int, int);
-extern char*		getlabstr(char*, int, int, char*);
 extern int		getprologue(Archive_t*);
-extern int		getsaveset(Archive_t*, File_t*, int);
 extern void		gettrailer(Archive_t*, File_t*);
 extern ssize_t		holewrite(int, void*, size_t);
 extern Archive_t*	initarchive(const char*, int);
-extern void		initdelta(Archive_t*);
+extern void		initdelta(Archive_t*, Format_t*);
 extern void		initfile(Archive_t*, File_t*, struct stat*, char*, int);
 extern char**		initmatch(char**);
 extern void		interactive(void);
@@ -1098,31 +686,39 @@ extern int		listprintf(Sfio_t*, Archive_t*, File_t*, const char*);
 extern char*		map(char*);
 extern int		match(char*);
 extern void		newio(Archive_t*, int, int);
+extern Format_t*	nextformat(Format_t*);
 extern void		nospace(void);
 extern unsigned long	omemsum(const void*, int, unsigned long);
 extern int		openin(Archive_t*, File_t*);
 extern int		openout(Archive_t*, File_t*);
 extern int		paxdelta(Archive_t*, Archive_t*, File_t*, int, ...);
-extern int		portable(const char*);
+extern void		paxinit(Pax_t*, const char*);
+extern int		portable(Archive_t*, const char*);
 extern int		prune(Archive_t*, File_t*, struct stat*);
 extern void		putdeltaheader(Archive_t*, File_t*);
 extern void		putdeltatrailer(Archive_t*, File_t*);
 extern void		putepilogue(Archive_t*);
-extern void		putheader(Archive_t*, File_t*);
-extern void		putlabels(Archive_t*, File_t*, char*);
+extern int		putheader(Archive_t*, File_t*);
+extern void		putinfo(Archive_t*, char*, unsigned long, unsigned long);
+extern void		putkey(Archive_t*, Sfio_t*, Option_t*, const char*, Sfulong_t);
 extern void		putprologue(Archive_t*);
 extern void		puttrailer(Archive_t*, File_t*);
 extern char*		release(void);
 extern int		restore(const char*, char*, void*);
-extern char*		stash(Value_t*, const char*, size_t);
+extern void		seekable(Archive_t*);
 extern int		selectfile(Archive_t*, File_t*);
 extern void		setdeltaheader(Archive_t*, File_t*);
 extern void		setfile(Archive_t*, File_t*);
 extern void		setidnames(File_t*);
+extern void		setinfo(Archive_t*, File_t*);
 extern void		setoptions(char*, char**, char*, Archive_t*, int);
 extern void		settime(const char*, Tv_t*, Tv_t*, Tv_t*);
+extern char*		stash(Value_t*, const char*, size_t);
 extern char*		strlower(char*);
 extern char*		strupper(char*);
-extern long		tar_checksum(Archive_t*, int, long);
+extern void		undoable(Archive_t*, Format_t*);
+extern void		undos(File_t*);
 extern int		validout(Archive_t*, File_t*);
 extern int		verify(Archive_t*, File_t*, char*);
+
+#endif

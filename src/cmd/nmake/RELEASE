@@ -1,3 +1,6 @@
+03-11-25 Makerules.mk: CC=c++ not found => search for any existing c++ compiler
+03-11-19 Scanrules.mk: default cobol include suffix is .CPY (or .cpy)
+03-09-29 Makerules.mk: fix $(PACKAGES) logic inversion typo (:VARIANT: bug)
 03-09-22 Makerules.mk: don;t clobber $(CATALOG).msg
 03-09-19 Makerules.mk: fix %.sh USAGE_LICENSE quoting
 	 expand.c: fix :T=E: quoting

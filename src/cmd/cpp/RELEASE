@@ -1,3 +1,5 @@
+03-11-25 cpp.tst: add -D-d test
+03-11-12 cpp.tst: add #if expression tests
 03-06-21 cpp.tst: add T_INVALID ? splice bug test
 03-05-19 cpp.tst: add stray SKIPMACRO test
 03-05-18 cpp.tst: add SYS_FUNCTION ungetchr() bug fix test

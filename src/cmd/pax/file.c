@@ -77,7 +77,7 @@ filter(register Archive_t* ap, register File_t* f)
 	}
 	if (remove(state.tmp.file))
 		error(1, "%s: cannot remove filter temporary %s", f->path, state.tmp.file);
-	if (ap->format == ASCHK)
+	if (ap->format->checksum)
 		f->checksum = 0;
 	f->st->st_size = 0;
 	if (streq(*state.filter.argv, "nocomment"))
@@ -92,10 +92,13 @@ filter(register Archive_t* ap, register File_t* f)
 		if (ip)
 		{
 			sfclose(ip);
-			if (op) sfclose(op);
-			else error(2, "%s: cannot redirect filter", f->path);
+			if (op)
+				sfclose(op);
+			else
+				error(2, "%s: cannot redirect filter", f->path);
 		}
-		else error(2, "%s: cannot read", f->path);
+		else
+			error(2, "%s: cannot read", f->path);
 		if (errors != error_info.errors)
 		{
 			close(rfd);
@@ -124,8 +127,8 @@ filter(register Archive_t* ap, register File_t* f)
 				error(2, "%s: filter write error", f->path);
 				break;
 			}
-			if (ap->format == ASCHK)
-				f->checksum = asc_checksum(state.tmp.buffer, n, f->checksum);
+			if (ap->format->checksum)
+				f->checksum = (*ap->format->checksum)(&state, ap, f, state.tmp.buffer, n, f->checksum);
 			f->st->st_size += n;
 		}
 		holedone(wfd);
@@ -155,19 +158,19 @@ openin(register Archive_t* ap, register File_t* f)
 		rfd = filter(ap, f);
 	else if ((rfd = open(f->st->st_size ? f->path : "/dev/null", O_RDONLY|O_BINARY)) < 0)
 		error(ERROR_SYSTEM|2, "%s: cannot read", f->path);
-	else if (ap->format == ASCHK)
+	else if (ap->format->checksum)
 	{
 		f->checksum = 0;
 		if (lseek(rfd, (off_t)0, SEEK_SET) != 0)
-			error(ERROR_SYSTEM|1, "%s: %s checksum seek error", f->path, format[ap->format].name);
+			error(ERROR_SYSTEM|1, "%s: %s checksum seek error", f->path, ap->format->name);
 		else
 		{
 			while ((n = read(rfd, state.tmp.buffer, state.buffersize)) > 0)
-				f->checksum = asc_checksum(state.tmp.buffer, n, f->checksum);
+				f->checksum = (*ap->format->checksum)(&state, ap, f, state.tmp.buffer, n, f->checksum);
 			if (n < 0)
-				error(ERROR_SYSTEM|2, "%s: %s checksum read error", f->path, format[ap->format].name);
+				error(ERROR_SYSTEM|2, "%s: %s checksum read error", f->path, ap->format->name);
 			if (lseek(rfd, (off_t)0, SEEK_SET) != 0)
-				error(ERROR_SYSTEM|1, "%s: %s checksum seek error", f->path, format[ap->format].name);
+				error(ERROR_SYSTEM|1, "%s: %s checksum seek error", f->path, ap->format->name);
 		}
 	}
 	if (rfd < 0)
@@ -310,7 +313,8 @@ openout(register Archive_t* ap, register File_t* f)
 					nospace();
 				do
 				{
-					if (e = strchr(s, ':')) *e++ = 0;
+					if (e = strchr(s, ':'))
+						*e++ = 0;
 					if (!(vp = newof(0, View_t, 1, 0)))
 						nospace();
 					vp->root = s;
@@ -324,8 +328,10 @@ openout(register Archive_t* ap, register File_t* f)
 						vp->dev = st.st_dev;
 						vp->ino = st.st_ino;
 					}
-					if (view) tp = tp->next = vp;
-					else view = tp = vp;
+					if (view)
+						tp = tp->next = vp;
+					else
+						view = tp = vp;
 				} while (s = e);
 				s = state.pwd;
 				e = 0;
@@ -347,15 +353,19 @@ openout(register Archive_t* ap, register File_t* f)
 							}
 							goto found;
 						}
-					if (e) *e = '/';
-					else e = s + strlen(s);
+					if (e)
+						*e = '/';
+					else
+						e = s + strlen(s);
 					while (e > s && *--e != '/');
-					if (e <= s) break;
+					if (e <= s)
+						break;
 					*e = 0;
 				}
 			}
 		found:
-			if (!offset) offset = ".";
+			if (!offset)
+				offset = ".";
 		}
 		st.st_mode = 0;
 		st.st_mtime = 0;
@@ -370,20 +380,25 @@ openout(register Archive_t* ap, register File_t* f)
 	}
 	if (f->delta.op == DELTA_delete)
 	{
-		if (exists) switch (X_ITYPE(st.st_mode))
-		{
-		case X_IFDIR:
-			if (!f->ro)
+		if (exists)
+			switch (X_ITYPE(st.st_mode))
 			{
-				if (rmdir(f->name)) error(ERROR_SYSTEM|2, "%s: cannot remove directory", f->name);
-				else listentry(f);
+			case X_IFDIR:
+				if (!f->ro)
+				{
+					if (rmdir(f->name))
+						error(ERROR_SYSTEM|2, "%s: cannot remove directory", f->name);
+					else
+						listentry(f);
+				}
+				break;
+			default:
+				if (remove(f->name))
+					error(ERROR_SYSTEM|2, "%s: cannot remove file", f->name);
+				else
+					listentry(f);
+				break;
 			}
-			break;
-		default:
-			if (remove(f->name)) error(ERROR_SYSTEM|2, "%s: cannot remove file", f->name);
-			else listentry(f);
-			break;
-		}
 		return -1;
 	}
 	if (state.operation == (IN|OUT))
@@ -419,7 +434,7 @@ openout(register Archive_t* ap, register File_t* f)
 	switch (f->type)
 	{
 	case X_IFDIR:
-		if (ap->format != ZIP)
+		if (!(ap->format->flags & KEEPSIZE))
 			f->st->st_size = 0;
 		if (f->ro)
 			return -1;
@@ -477,12 +492,44 @@ openout(register Archive_t* ap, register File_t* f)
 		setfile(ap, f);
 		listentry(f);
 		return -1;
+	case X_IFSOCK:
+		IDEVICE(f->st, 0);
+		/*FALLTHROUGH*/
+	case X_IFBLK:
+	case X_IFCHR:
+	case X_IFIFO:
+		if (!(ap->format->flags & KEEPSIZE))
+			f->st->st_size = 0;
+		break;
 	}
 	if (!addlink(ap, f))
 		return -1;
 	switch (f->type)
 	{
 	case X_IFIFO:
+		if (exists && remove(f->name))
+		{
+			error(ERROR_SYSTEM|2, "cannot remove current %s", f->name);
+			return -1;
+		}
+		if (mkfifo(f->name, f->st->st_mode & S_IPERM))
+		{
+			if (errno == EPERM)
+			{
+			nofifo:
+				error(ERROR_SYSTEM|2, "%s: cannot create fifo file", f->name);
+				return -1;
+			}
+			if (!exists && missdir(ap, f))
+			{
+				error(ERROR_SYSTEM|2, "%s: cannot create intermediate directories", f->name);
+				return -1;
+			}
+			if (exists || mkfifo(f->name, f->st->st_mode & S_IPERM))
+				goto nofifo;
+		}
+		setfile(ap, f);
+		return -2;
 	case X_IFSOCK:
 		IDEVICE(f->st, 0);
 		/*FALLTHROUGH*/
@@ -493,12 +540,11 @@ openout(register Archive_t* ap, register File_t* f)
 			error(ERROR_SYSTEM|2, "cannot remove current %s", f->name);
 			return -1;
 		}
-		if (ap->format != ZIP)
-			f->st->st_size = 0;
 		if (mknod(f->name, f->st->st_mode, idevice(f->st)))
 		{
 			if (errno == EPERM)
 			{
+			nospecial:
 				error(ERROR_SYSTEM|2, "%s: cannot create %s special file", f->name, (f->type == X_IFBLK) ? "block" : "character");
 				return -1;
 			}
@@ -508,10 +554,7 @@ openout(register Archive_t* ap, register File_t* f)
 				return -1;
 			}
 			if (exists || mknod(f->name, f->st->st_mode, idevice(f->st)))
-			{
-				error(ERROR_SYSTEM|2, "%s: cannot mknod", f->name);
-				return -1;
-			}
+				goto nospecial;
 		}
 		setfile(ap, f);
 		return -2;
@@ -728,7 +771,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	if ((f->type = X_ITYPE(f->st->st_mode)) == X_IFLNK)
 	{
 		f->linkpathsize = f->st->st_size + 1;
-		f->linkpath = stash(&ap->path.link, NiL, f->linkpathsize);
+		f->linkpath = stash(&ap->stash.link, NiL, f->linkpathsize);
 		if (pathgetlink(f->path, f->linkpath, f->linkpathsize) != f->st->st_size)
 		{
 			error(2, "%s: cannot read symbolic link", f->path);
@@ -777,57 +820,25 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 int
 validout(register Archive_t* ap, register File_t* f)
 {
-	register char*	s;
-
 	if (f->ro)
 		return 0;
 	switch (f->type)
 	{
-	case X_IFCHR:
 	case X_IFBLK:
+	case X_IFCHR:
 		f->st->st_size = 0;
 		break;
 	case X_IFREG:
 		IDEVICE(f->st, 0);
 		break;
 	case X_IFDIR:
+	case X_IFIFO:
 	case X_IFLNK:
 		f->st->st_size = 0;
 		IDEVICE(f->st, 0);
 		break;
 	}
-	switch (ap->format)
-	{
-	case ALAR:
-	case IBMAR:
-	case SAVESET:
-		if (f->type != X_IFREG)
-		{
-			error(2, "%s: only regular files copied in %s format", f->path, format[ap->format].name);
-			return 0;
-		}
-		if (s = strrchr(f->name, '/'))
-		{
-			s++;
-			error(1, "%s: file name stripped to %s", f->name, s);
-		}
-		else s = f->name;
-		if (strlen(s) > sizeof(ap->id.id) - 1)
-		{
-			error(2, "%s: file name too long", f->name);
-			return 0;
-		}
-		f->id = strupper(strcpy(ap->id.id, s));
-		break;
-	case BINARY:
-		if (f->namesize > (BINARY_NAMESIZE + 1))
-		{
-			error(2, "%s: file name too long", f->name);
-			return 0;
-		}
-		break;
-	}
-	return 1;
+	return ap->format->validate ? ((*ap->format->validate)(&state, ap, f) > 0) : 1;
 }
 
 /*
@@ -880,38 +891,25 @@ addlink(register Archive_t* ap, register File_t* f)
 		}
 	if (f->type == X_IFDIR)
 		return 0;
-	switch (ap->format)
+	if (ap->format->flags & NOHARDLINKS)
 	{
-	case ALAR:
-	case IBMAR:
-	case SAVESET:
 		if (state.operation == IN || f->st->st_nlink <= 1)
 			return 1;
-		break;
-	case PAX:
-	case TAR:
-	case USTAR:
-		if (state.operation == IN)
-		{
-			if (f->linktype == NOLINK)
-				return 1;
-			f->linkpath = map(f->linkpath);
-			goto linked;
-		}
-		/*FALLTHROUGH*/
-	default:
-		if (f->st->st_nlink <= 1)
-			return 1;
-		break;
 	}
+	else if ((ap->format->flags & LINKTYPE) && state.operation == IN)
+	{
+		if (f->linktype == NOLINK)
+			return 1;
+		f->linkpath = map(f->linkpath);
+		goto linked;
+	}
+	else if (f->st->st_nlink <= 1)
+		return 1;
 	if (p = (Link_t*)hashget(state.linktab, (char*)&id))
 	{
-		switch (ap->format)
+		if (ap->format->flags & NOHARDLINKS)
 		{
-		case ALAR:
-		case IBMAR:
-		case SAVESET:
-			error(1, "%s: hard link information lost in %s format", f->name, format[ap->format].name);
+			error(1, "%s: hard link information lost in %s format", f->name, ap->format->name);
 			return 1;
 		}
 		f->st->st_dev = p->id.dev;
@@ -923,27 +921,8 @@ addlink(register Archive_t* ap, register File_t* f)
 			return 0;
 	linked:
 		message((-1, "addlink(%s,%s)", f->name, f->linkpath));
-
-		/*
-		 * compensate for a pre 951031 pax bug
-		 * that added linknamesize to st_size
-		 */
-
-		if (ap->format == CPIO && f->st->st_size == f->linkpathsize && bread(ap, state.tmp.buffer, (off_t)0, n = f->st->st_size + 6, 0) > 0)
-		{
-			bunread(ap, state.tmp.buffer, n);
-			state.tmp.buffer[6] = 0;
-			state.tmp.buffer[n] = 0;
-			if (strtol(state.tmp.buffer, NiL, 8) == CPIO_MAGIC && strtol(state.tmp.buffer + f->st->st_size, NiL, 8) != CPIO_MAGIC)
-			{
-				f->st->st_size = 0;
-				if (!ap->warnlinkhead)
-				{
-					ap->warnlinkhead = 1;
-					error(1, "%s: compensating for invalid %s header hard link sizes", ap->name, format[ap->format].name);
-				}
-			}
-		}
+		if (ap->format->event && (ap->format->events & EVENT_BUG_19951031))
+			(*ap->format->event)(&state, ap, f, NiL, EVENT_BUG_19951031);
 		if (streq(f->name, f->linkpath))
 		{
 			error(2, "%s: hard link loops to self", f->name);
@@ -1007,8 +986,10 @@ addlink(register Archive_t* ap, register File_t* f)
 void
 getidnames(register File_t* f)
 {
-	if (!f->uidname) f->uidname = fmtuid(f->st->st_uid);
-	if (!f->gidname) f->gidname = fmtgid(f->st->st_gid);
+	if (!f->uidname)
+		f->uidname = fmtuid(f->st->st_uid);
+	if (!f->gidname)
+		f->gidname = fmtgid(f->st->st_gid);
 }
 
 /*
@@ -1057,7 +1038,7 @@ initarchive(const char* name, int mode)
 		nospace();
 	initfile(ap, &ap->file, &ap->st, NiL, 0);
 	ap->name = (char*)name;
-	ap->expected = ap->format = -1;
+	ap->expected = ap->format = 0;
 	ap->section = 0;
 	ap->sum = -1;
 	ap->mio.mode = ap->tio.mode = mode;
@@ -1075,7 +1056,8 @@ getarchive(int op)
 	Archive_t**	app;
 
 	app = (op & OUT) ? &state.out : &state.in;
-	if (!*app) *app = initarchive(NiL, (op & OUT) ? (O_CREAT|O_TRUNC|O_WRONLY) : O_RDONLY);
+	if (!*app)
+		*app = initarchive(NiL, (op & OUT) ? (O_CREAT|O_TRUNC|O_WRONLY) : O_RDONLY);
 	return *app;
 }
 
@@ -1261,7 +1243,7 @@ holewrite(int fd, void* buf, size_t siz)
 	static char	hole[HOLE_MIN];
 
 #if DEBUG
-	if (state.test & 0100)
+	if (state.test & 0000100)
 		b = t;
 	else
 #endif
@@ -1304,4 +1286,46 @@ holewrite(int fd, void* buf, size_t siz)
 		n += i;
 	}
 	return n;
+}
+
+/*
+ * make a seekable copy of ap->io input
+ */
+
+void
+seekable(Archive_t* ap)
+{
+	off_t		m;
+	off_t		z;
+	char*		s;
+	int		rfd;
+	int		wfd;
+
+	if ((wfd = open(state.tmp.file, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
+		error(ERROR_SYSTEM|3, "%s: cannot create seekable temporary %s", ap->name, state.tmp.file);
+	if ((rfd = open(state.tmp.file, O_RDONLY|O_BINARY)) < 0)
+		error(ERROR_SYSTEM|3, "%s: cannot open seekable temporary %s", ap->name, state.tmp.file);
+	if (remove(state.tmp.file))
+		error(ERROR_SYSTEM|1, "%s: cannot remove seekable temporary %s", ap->name, state.tmp.file);
+	ap->io->seekable = 1;
+	z = 0;
+	s = ap->io->buffer + MAXUNREAD;
+	m = ap->io->last - s;
+	do
+	{
+		if (write(wfd, s, m) != m)
+			error(ERROR_SYSTEM|3, "%s: seekable temporary %s write error", ap->name, state.tmp.file);
+		z += m;
+	} while ((m = read(ap->io->fd, s, state.buffersize)) > 0);
+	close(wfd);
+	close(ap->io->fd);
+	ap->io->size = z;
+	z = ap->io->count;
+	ap->io->next = ap->io->last = s;
+	ap->io->offset = ap->io->count = 0;
+	if (ap->io->fd || (ap->io->fd = dup(rfd)) < 0)
+		ap->io->fd = rfd;
+	else
+		close(rfd);
+	bread(ap, NiL, z, z, 0);
 }

@@ -30,25 +30,77 @@
  */
 
 #include "pax.h"
-#include "options.h"
 
+#include <dlldefs.h>
 #include <sfdisc.h>
 
+static Format_t*
+scan(void)
+{
+	register Format_t*	fp;
+	Format_t*		lp;
+	Format_t*		rp;
+	Dllscan_t*		dls;
+	Dllent_t*		dle;
+	void*			dll;
+	Paxlib_f		init;
+
+	for (fp = formats; fp->next; fp = fp->next);
+	rp = fp;
+	if (dls = dllsopen(state.id, NiL, NiL))
+	{
+		while (dle = dllsread(dls))
+			if (dll = dlopen(dle->path, RTLD_LAZY))
+			{
+				if ((init = (Paxlib_f)dlsym(dll, "paxlib")) && (lp = (*init)(&state)))
+					fp = fp->next = lp;
+				else
+					dlclose(dll);
+			}
+			else
+				message((-1, "%s: %s", dle->path, dlerror()));
+		dllsclose(dls);
+	}
+	return rp->next;
+}
+
 /*
- * return format index given format name
+ * format list iterator
+ * fp=0 for first element
+ * dll format scan kicked in when static formats exhausted
  */
 
-int
-getformat(register char* name)
+Format_t*
+nextformat(Format_t* fp)
 {
-	register int	i;
+	if (!fp)
+		return formats;
+	if (!(fp = fp->next) && !state.scanned)
+	{
+		state.scanned = 1;
+		fp = scan();
+	}
+	return fp;
+}
+
+/*
+ * return format given name
+ */
+
+Format_t*
+getformat(register char* name, int must)
+{
+	register Format_t*	fp;
 
 	if (!name || !*name || streq(name, "-"))
-		return OUT_DEFAULT;
-	for (i = 0; format[i].name; i++)
-		if (!strcasecmp(name, format[i].name) || format[i].match && strgrpmatch(name, format[i].match, NiL, 0, STR_ICASE|STR_LEFT|STR_RIGHT))
-			return i;
-	return -1;
+		name = FMT_DEFAULT;
+	fp = 0;
+	while (fp = nextformat(fp))
+		if (!strcasecmp(name, fp->name) || fp->match && strgrpmatch(name, fp->match, NiL, 0, STR_ICASE|STR_LEFT|STR_RIGHT))
+			return fp;
+	if (must)
+		error(3, "%s: unknown format", name);
+	return 0;
 }
 
 /*
@@ -99,12 +151,13 @@ selectfile(register Archive_t* ap, register File_t* f)
 	register Member_t*	d;
 	int			linked = 0;
 
+	ap->info = 0;
 	if (f->skip || f->namesize <= 1 || f->linkpath && !*f->linkpath)
 		return 0;
 	if (state.ordered)
 	{
 		ordered(ap, ap->path.prev.string, f->name);
-		stash(&ap->path.prev, f->name, 0);
+		stash(&ap->path.prev, f->name, 0); /*HERE*/
 	}
 	if (f->record.format && state.record.pattern)
 	{
@@ -128,7 +181,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 		tvgetstat(f->st, &d->atime, &d->mtime, NiL);
 		d->offset = ap->io->offset + ap->io->count;
 		d->size = f->st->st_size;
-		d->expand = f->delta.size;
+		d->uncompressed = f->uncompressed;
 		if (!(d->info = (File_t*)memdup(f, sizeof(File_t))) || !(d->info->st = (struct stat*)memdup(f->st, sizeof(struct stat))))
 			nospace();
 		d->info->name = d->info->path = hashput(ap->parent->delta->tab, f->name, d);
@@ -139,6 +192,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 		if (d->info->gidname)
 			d->info->gidname = strdup(d->info->gidname);
 		d->info->delta.base = d;
+		ap->info = d->info;
 		if (!state.ordered)
 			return 0;
 	}
@@ -159,23 +213,25 @@ selectfile(register Archive_t* ap, register File_t* f)
 			tvgetstat(f->st, &d->atime, &d->mtime, NiL);
 			d->offset = ap->io->offset + ap->io->count;
 			d->size = f->st->st_size;
-			d->expand = f->delta.size;
+			d->uncompressed = f->uncompressed;
 			hashput(ap->tab, f->path, d);
 		}
 	}
-	if (state.ordered && ap->delta && ap->delta->format != COMPRESS && (bp = ap->delta->base))
+	if (state.ordered && ap->delta && !(ap->delta->format->flags & COMPRESS) && (bp = ap->delta->base))
 	{
 		register int	n;
 		register int	m;
 
 		for (;;)
 		{
-			if (bp->peek) bp->peek = 0;
+			if (bp->peek)
+				bp->peek = 0;
 			else
 			{
 				if (bp->skip && bp->skip == bp->io->offset + bp->io->count)
 					fileskip(bp, &bp->file);
-				if (!getheader(bp, &bp->file)) break;
+				if (!getheader(bp, &bp->file))
+					break;
 				bp->skip = bp->io->offset + bp->io->count;
 			}
 			ordered(bp, bp->path.prev.string, bp->file.name);
@@ -185,7 +241,8 @@ selectfile(register Archive_t* ap, register File_t* f)
 				break;
 			}
 			n = selectfile(bp, &bp->file);
-			if (!m) break;
+			if (!m)
+				break;
 			if (n && !state.list)
 			{
 				if (ap->io->mode != O_RDONLY)
@@ -208,12 +265,16 @@ selectfile(register Archive_t* ap, register File_t* f)
 						{
 							if (!streq(f->name, ".") && !streq(f->name, ".."))
 							{
-								if (rmdir(f->name)) error(ERROR_SYSTEM|2, "%s: cannot remove directory", f->name);
-								else listentry(f);
+								if (rmdir(f->name))
+									error(ERROR_SYSTEM|2, "%s: cannot remove directory", f->name);
+								else
+									listentry(f);
 							}
 						}
-						else if (remove(f->name)) error(ERROR_SYSTEM|2, "%s: cannot remove file", f->name);
-						else listentry(f);
+						else if (remove(f->name))
+							error(ERROR_SYSTEM|2, "%s: cannot remove file", f->name);
+						else
+							listentry(f);
 					}
 				}
 			}
@@ -268,13 +329,38 @@ verify(Archive_t* ap, register File_t* f, register char* prompt)
 	case 0:
 		return 0;
 	case '.':
-		if (!*(name + 1)) break;
+		if (!*(name + 1))
+			break;
 		/*FALLTHROUGH*/
 	default:
 		f->namesize = pathcanon(f->name = name, 0) - name + 1;
 		break;
 	}
 	return 1;
+}
+
+/*
+ * no dos in our pathnames
+ */
+
+void
+undos(File_t* f)
+{
+	register char*	s;
+
+	if (strchr(f->name, '\\'))
+	{
+		s = f->name;
+		if (s[1] == ':' && isalpha(s[0]))
+		{
+			if (*(s += 2) == '\\' || *s == '/')
+				s++;
+			f->name = s;
+		}
+		for (; *s; s++)
+			if (*s == '\\')
+				*s = '/';
+	}
 }
 
 /*
@@ -349,8 +435,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 	List_handle_t*		gp = (List_handle_t*)handle;
 	register File_t*	f = gp->file;
 	register struct stat*	st = f->st;
-	register char*		s = 0;
-	register Sflong_t	n = 0;
+	char*			s = 0;
+	Sflong_t		n = 0;
 	int			type = 0;
 	int			k;
 	char*			t;
@@ -391,60 +477,42 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 			case OPT_charset:
 				s = "ASCII";
 				break;
-			case OPT_chksum:
-			case OPT_magic:
-			case OPT_typeflag:
-			case OPT_version:
-				if (!gp->archive || gp->archive->format != PAX && gp->archive->format != TAR && gp->archive->format != USTAR)
-					return 0;
-				switch (op->index)
-				{
-				case OPT_chksum:
-					s = tar_header.chksum;
-					break;
-				case OPT_magic:
-					s = tar_header.magic;
-					break;
-				case OPT_typeflag:
-					n = tar_header.typeflag;
-					break;
-				case OPT_version:
-					s = tar_header.version;
-					break;
-				}
-				break;
 			case OPT_ctime:
 				n = st->st_ctime;
 				type = TYPE_time;
 				break;
-			case OPT_delta:
-				switch (f->delta.op)
-				{
-				case 0:
-				case DELTA_pass:
-				case DELTA_zip:
-					return 0;
-				case DELTA_create:
-					s = "create";
-					break;
-				case DELTA_delete:
-					s = "delete";
-					break;
-				case DELTA_update:
-					s = "update";
-					break;
-				case DELTA_verify:
-					s = "verify";
-					break;
-				default:
-					sfsprintf(s = fmtbuf(8), 8, "[op=%c]", f->delta.op);
-					break;
-				}
+			case OPT_delta_op:
+				if (f->uncompressed && (k = (st->st_size * 100) / f->uncompressed) < 100)
+					sfsprintf(s = fmtbuf(32), 32, "%c%02d.%1d%%", f->delta.op ? f->delta.op : 'c', k, (int)((st->st_size * 1000) / f->uncompressed) % 10);
+				else
+					switch (f->delta.op)
+					{
+					case 0:
+					case DELTA_pass:
+					case DELTA_zip:
+						return 0;
+					case DELTA_create:
+						s = "create";
+						break;
+					case DELTA_delete:
+						s = "delete";
+						break;
+					case DELTA_update:
+						s = "update";
+						break;
+					case DELTA_verify:
+						s = "verify";
+						break;
+					default:
+						sfsprintf(s = fmtbuf(8), 8, "[op=%c]", f->delta.op);
+						break;
+					}
 				break;
 			case OPT_device:
 				if (f->type == X_IFBLK || f->type == X_IFCHR)
 					s = fmtdev(st);
-				else return 0;
+				else
+					return 0;
 				break;
 			case OPT_devmajor:
 				n = major(st->st_dev);
@@ -520,7 +588,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 					s = "$";
 				else if (st->st_mode & (X_IXUSR|X_IXGRP|X_IXOTH))
 					s = "*";
-				else return 0;
+				else
+					return 0;
 				break;
 			case OPT_mode:
 				n = st->st_mode;
@@ -557,8 +626,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 			case OPT_size:
 				if (f->linktype == SOFTLINK)
 					n = f->linkpathsize - 1;
-				else if (f->delta.size != -1)
-					n = (Sfulong_t)f->delta.size;
+				else if (f->uncompressed)
+					n = f->uncompressed;
 				else
 					n = (Sfulong_t)st->st_size;
 				break;
@@ -588,6 +657,13 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 					n = st->st_uid;
 				break;
 			default:
+				if (gp->archive && gp->archive->format->lookup)
+				{
+					if ((k = (*gp->archive->format->lookup)(&state, gp->archive, f, op->index, &s, &n)) < 0)
+						return 0;
+					else if (k > 0)
+						break;
+				}
 				if (!(op->flags & OPT_SET) || !(s = op->perm.string))
 					return 0;
 				break;
@@ -771,7 +847,8 @@ listentry(register File_t* f)
 			else
 				sfprintf(sfstderr, "%02d%% %s\n", p, s);
 			sfsync(sfstderr);
-			if (state.test & 1) sleep(1);
+			if (state.test & 0000200)
+				sleep(1);
 		}
 		else if (state.drop)
 		{
@@ -817,7 +894,8 @@ match(register char* s)
 	register char*	t;
 	int		n;
 
-	if (!(p = state.patterns)) return state.matchsense;
+	if (!(p = state.patterns))
+		return state.matchsense;
 	if (state.exact)
 	{
 		n = 0;
@@ -831,13 +909,13 @@ match(register char* s)
 				}
 				n = 1;
 			}
-		if (!n) finish(0);
+		if (!n)
+			finish(0);
 	}
-	else while (t = *p++)
-	{
-		if (state.descend && dirprefix(t, s) || strmatch(s, t))
-			return state.matchsense;
-	}
+	else
+		while (t = *p++)
+			if (state.descend && dirprefix(t, s) || strmatch(s, t))
+				return state.matchsense;
 	return !state.matchsense;
 }
 
@@ -859,24 +937,9 @@ dirprefix(register char* p, register char* s)
 }
 
 /*
- * return 1 if s is a portable string
- */
-
-int
-portable(const char* s)
-{
-	register unsigned char*	u = (unsigned char*)s;
-	register int		c;
-
-	while (c = *u++)
-		if (c > 0177)
-			return 0;
-	return 1;
-}
-
-/*
- * Value_t stash
- * trailing '\0' ensured
+ * allocate and copy a tmp string
+ *	a!=0	for lifetime of a
+ *	f!=0	for lifetime of f
  */
 
 char*
@@ -911,4 +974,51 @@ void
 nospace(void)
 {
 	error(ERROR_SYSTEM|3, "out of space");
+}
+
+/*
+ * if current file cannot fit completely in current archive
+ * then bump it to another volume
+ */
+
+void
+complete(Archive_t* ap, register File_t* f, size_t header)
+{
+	off_t	n;
+
+	n = header + f->st->st_size;
+	if (ap->io->count + n > state.maxout)
+	{
+		if (n > state.maxout)
+			error(1, "%s: too large to fit in one volume", f->name);
+		else
+		{
+			state.complete = 0;
+			putepilogue(ap);
+			newio(ap, 0, 0);
+			putprologue(ap);
+			state.complete = 1;
+		}
+	}
+}
+
+/*
+ * verify that compress undo command exists
+ * alternate undotoo checked if undo not found
+ */
+
+void
+undoable(Archive_t* ap, Format_t* fp)
+{
+	register Compress_format_t*	cp = (Compress_format_t*)fp->data;
+	char				buf[PATH_MAX];
+
+	if (!pathpath(buf, cp->undo[0], NiL, PATH_EXECUTE))
+	{
+		if (!cp->undotoo[0] || !pathpath(buf, cp->undotoo[0], NiL, PATH_EXECUTE))
+			error(3, "%s: %s: command required to read compressed archive", ap->name, cp->undo[0]);
+		cp->undo[0] = cp->undotoo[0];
+		cp->undotoo[0] = 0;
+		cp->undo[1] = cp->undotoo[1];
+	}
 }

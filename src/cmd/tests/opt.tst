@@ -1296,7 +1296,7 @@ OPTIONS
 [z:base?Delta base archive name. - ignores base on input, compresses on output.]:[archive]
 [b:blocksize?Input/output block size. The default is format specific.]#[size]
 [102:blok?Input/output BLOK format for tapes on file.]:?[i|o]
-[103:charset?Header data character set name.]:[name]
+[103:charset|codeset?Header data character set name.]:[name]
 
 [ file ... ]
 
@@ -1309,11 +1309,13 @@ OPTIONS
 return=z option=-z name=base arg=aaa zzz num=1
 return=-103 option=-103 name=charset arg=us num=1'
 		ERROR -
-	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us,block+=077777777777'
+	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us\ ascii,block+=077777777777'
 		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
 return=z option=-z name=base arg=aaa,zzz num=1
-return=-103 option=-103 name=charset arg:=us num=1
+return=-103 option=-103 name=charset arg:=us ascii num=1
 return=b option=-b name=blocksize arg+=077777777777 num=8589934591LL'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n23 block+=077777777777\n'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n23 block+=077777777777'
 	EXEC	- pax "$usage" '14 foo'
 		EXIT 1
 		OUTPUT - $'return=: option= name=14 num=0 str=14 foo\nreturn=: option= name=foo num=0 str=14 foo'
@@ -3402,6 +3404,12 @@ return=C option=-C name=--c arg=(null) num=1
 return=A option=-A name=--axx arg=(null) num=1
 return=B option=-B name=--bxx arg=(null) num=1
 return=C option=-C name=--cxx arg=(null) num=1'
+
+	(
+		export LC_ALL=en_US
+		EXEC wild "$usage" -A -B -C --a --b --c --axx --bxx --cxx
+	)
+
 	usage=$'[-][z:zzz]:[style]{[A:a*][B:b*][C:c*]}'
 	EXEC wild "$usage" -z A -z B -z C -z a -z b -z c -z axx -z bxx -z cxx
 		OUTPUT - $'return=z option=-z name=-z arg=A num=65

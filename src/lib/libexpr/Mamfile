@@ -148,7 +148,6 @@ done ../../../include/ast/ast_limits.h dontcare
 done ../../../include/ast/limits.h dontcare
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit

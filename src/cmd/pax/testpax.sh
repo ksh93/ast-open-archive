@@ -1,7 +1,7 @@
 ####################################################################
 #                                                                  #
 #             This software is part of the ast package             #
-#                Copyright (c) 1987-2002 AT&T Corp.                #
+#                Copyright (c) 1987-2003 AT&T Corp.                #
 #        and it may only be used by you under license from         #
 #                       AT&T Corp. ("AT&T")                        #
 #         A copy of the Source Code Agreement is available         #
@@ -28,7 +28,7 @@
 #	+		execution trace
 #	tar-path	tar the old and new archives
 #
-# @(#)testpax (AT&T Labs Research) 1999-02-14
+# @(#)testpax (AT&T Labs Research) 2003-10-01
 
 integer errors=0 tests=0
 typeset -Z TEST=00
@@ -45,7 +45,7 @@ do	case $1 in
 done
 case $1 in
 *tar)	tar=$1; shift; formats="tar.tar" ;;
-*)	tar=''; formats="cpio.pax tar.tar tar:gzip.tgz" ;;
+*)	tar=''; formats="pax.pax pax:gzip.pgz cpio.cpio tar.tar tar:gzip.tgz" ;;
 esac
 case $1 in
 -*|'')	set pax "$@" ;;
@@ -217,8 +217,8 @@ do	suf=${format##*.}
 	"$@" -rf ../o || status=1
 	"$@" -wf ../n . || status=1
 	cd ..
-	"$@" -vf o 2>/dev/null | sed -e '/^l/s/ ... [0-9][0-9] [0-9][0-9]:[0-9][0-9] / /' > oo || status=1
-	"$@" -vf n 2>/dev/null | sed -e '/^l/s/ ... [0-9][0-9] [0-9][0-9]:[0-9][0-9] / /' > nn || status=1
+	"$@" -vf o 2>/dev/null | sed -e '/^l/s/ ... [ 0-9][0-9] [0-9][0-9]:[0-9][0-9] / /' > oo || status=1
+	"$@" -vf n 2>/dev/null | sed -e '/^l/s/ ... [ 0-9][0-9] [0-9][0-9]:[0-9][0-9] / /' > nn || status=1
 	diff oo nn
 	case $status$? in
 	00)	result= ;;

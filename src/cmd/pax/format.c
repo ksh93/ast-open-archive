@@ -29,185 +29,83 @@
  * pax archive format support
  */
 
-#include "pax.h"
-#include "options.h"
+#include "format.h"
 
 #include <tm.h>
 
-#define TAR_LARGENUM	0200
-
-#if __hppa__ || __hppa || hppa
-
-/*
- * the inline macros are apparently too much for the hp optimizer
- * (the calls in putprologue() make the difference)
- */
-
-static int
-delta_lo(long x)
-{
-	return DELTA_LO(x);
-}
-
-#undef	DELTA_LO
-#define DELTA_LO	delta_lo
-
-static int
-delta_hi(long x)
-{
-	return DELTA_HI(x);
-}
-
-#undef	DELTA_HI
-#define DELTA_HI	delta_hi
-
-#endif
-
-/*
- * check for ASCII or EBCDIC ALAR prologue in alar_header
- */
-
-static int
-isalar(Archive_t* ap, register char* hdr)
-{
-	char		buf[4];
-
-	if (ap->expected >= 0 && ap->expected != ALAR && ap->expected != IBMAR)
-		return 0;
-	memcpy(buf, hdr, 4);
-	ccmapstr(state.map.a2n, buf, 4);
-	if ((ap->expected < 0 || ap->expected == ALAR) && strneq(hdr, "VOL1", 4))
-	{
-		ap->format = ALAR;
-		ccmapstr(state.map.a2n, hdr, ALAR_HEADER);
-		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_ASCII);
-		if (!ap->convert[0].on)
-			convert(ap, SECTION_DATA, CC_NATIVE, CC_ASCII);
-	}
-	else if (ap->expected < 0 || ap->expected == IBMAR)
-	{
-		memcpy(buf, hdr, 4);
-		ccmapstr(state.map.e2n, buf, 4);
-		if (!strneq(buf, "VOL1", 4))
-			return 0;
-		ccmapstr(state.map.e2n, hdr, ALAR_HEADER);
-		ap->format = IBMAR;
-		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_EBCDIC1);
-		if (!ap->convert[0].on)
-			convert(ap, SECTION_DATA, CC_NATIVE, CC_EBCDIC1);
-	}
-	getlabstr(hdr, 5, 6, state.id.volume);
-	getlabstr(hdr, 25, 6, ap->id.format);
-	getlabstr(hdr, 31, 7, ap->id.implementation);
-	getlabstr(hdr, 38, 14, ap->id.owner);
-	ap->io->blocked = !bcount(ap);
-	return 1;
-}
-
-/*
- * verify that compress undo command exists
- * alternate undotoo checked if undo not found
- */
-
-static void
-undoable(Archive_t* ap, Format_t* fp)
-{
-	if (!pathpath(tar_block, fp->undo[0], NiL, PATH_EXECUTE))
-	{
-		if (!fp->undotoo[0] || !pathpath(tar_block, fp->undotoo[0], NiL, PATH_EXECUTE))
-			error(3, "%s: %s: command required to read compressed archive", ap->name, fp->undo[0]);
-		fp->undo[0] = fp->undotoo[0];
-		fp->undotoo[0] = 0;
-		fp->undo[1] = fp->undotoo[1];
-	}
-}
+Format_t*		formats = pax_first_format;
 
 /*
  * read archive prologue before files are copied
+ * compression and input archive formats are identified here
  */
 
 int
 getprologue(register Archive_t* ap)
 {
-	int		n;
+	register Format_t*	fp;
+	register File_t*	f = &ap->file;
+	off_t			skipped;
+	int			n;
+	unsigned char		buf[MAXUNREAD];
 
-	if (state.id.volume && ap->io->mode != O_RDONLY)
+	if (ap->io->eof || state.volume && ap->io->mode != O_RDONLY)
 		return 0;
-	state.id.volume[0] = 0;
-	ap->format = -1;
+	state.volume[0] = 0;
+	ap->entry = 0;
+	ap->format = 0;
 	ap->swapio = 0;
 	ap->io->offset += ap->io->count;
 	ap->io->count = 0;
 	ap->section = SECTION_CONTROL;
 	convert(ap, SECTION_CONTROL, CC_NATIVE, CC_NATIVE);
-	if (bread(ap, alar_header, (off_t)ALAR_HEADER, (off_t)ALAR_HEADER, 0) <= 0)
-	{
-		if (!bcount(ap))
-			return 0;
-	}
-	else if (!isalar(ap, alar_header))
-	{
-		if ((ap->expected < 0 || ap->expected == AR) && (ap->ardir = ardiropen(ap->name, NiL, 0)))
+	ap->sum++;
+	f->name = 0;
+	f->record.format = 0;
+	f->skip = 0;
+	ap->checkdelta = !ap->delta || !(ap->delta->format->flags & PSEUDO);
+	f->delta.base = 0;
+	f->uncompressed = 0;
+	f->delta.checksum = 0;
+	f->delta.index = 0;
+	if (ap->io->mode != O_RDONLY)
+		bsave(ap);
 
-		{
-			format[ap->format = AR].name = (char*)ap->ardir->meth->description;
-			if (ap->expected >= 0)
-				ap->expected = ap->format;
-		}
-		else if (!ap->compress)
-		{
-			unsigned long	m;
+	/*
+	 * first check if input is compressed
+	 */
 
-			m = ((*((unsigned char*)alar_header+0))<<24)|
-			    ((*((unsigned char*)alar_header+1))<<16)|
-			    ((*((unsigned char*)alar_header+2))<<8)|
-			     (*((unsigned char*)alar_header+3));
-			for (n = COMPRESS; n < DELTA; n++)
-				if (format[n].special == (m & format[n].regular))
-				{
-					ap->compress = n;
-					break;
-				}
-			bunread(ap, alar_header, ALAR_HEADER);
-			if (ap->compress)
+	if ((n = bread(ap, (char*)buf, (off_t)0, (off_t)sizeof(buf), 0)) <= MINID && !bcount(ap))
+		return 0;
+	bunread(ap, buf, n);
+	message((-2, "identify format"));
+	if (ap->volume <= 0 && !ap->compress)
+	{
+		fp = 0;
+		while (fp = nextformat(fp))
+			if ((fp->flags & COMPRESS) && (*fp->getprologue)(&state, fp, ap, f, buf, sizeof(buf)) > 0)
 			{
-				Proc_t*	proc;
-				long	ops[3];
-				char*	cmd[3];
-				off_t	pos;
-				char	buf[4];
+				Compress_format_t*	cp;
+				Proc_t*			proc;
+				long			ops[3];
+				char*			cmd[3];
 
+				message((-1, "%s compression", fp->name));
+				ap->compress = fp;
+				cp = (Compress_format_t*)fp->data;
 				if (bseek(ap, (off_t)0, SEEK_SET, 1))
-					error(3, "%s: %s input must be seekable", ap->name, format[ap->compress].name);
-				undoable(ap, &format[ap->compress]);
-				if (state.meter.on && ap == state.in)
-					switch (ap->compress)
-					{
-					case COMPRESS:
-						state.meter.size *= 3;
-						break;
-					case GZIP:
-						if ((pos = lseek(ap->io->fd, (off_t)0, SEEK_CUR)) < 0 || lseek(ap->io->fd, (off_t)-4, SEEK_END) <= 0 || read(ap->io->fd, buf, 4) != 4)
-							state.meter.size *= 6;
-						else
-							state.meter.size = ((unsigned char)buf[0]) |
-					      				   ((unsigned char)buf[1] << 8) |
-					        			   ((unsigned char)buf[2] << 16) |
-					        			   ((unsigned char)buf[3] << 24);
-						lseek(ap->io->fd, pos, SEEK_SET);
-						break;
-					case BZIP:
-						state.meter.size *= 7;
-						break;
-					}
-				cmd[0] = format[ap->compress].undo[0];
-				cmd[1] = format[ap->compress].undo[1];
+					error(3, "%s: %s input must be seekable", ap->name, ap->compress->name);
+				undoable(ap, ap->compress);
+				if (state.meter.on && ap == state.in && ap->uncompressed)
+					state.meter.size = ap->uncompressed;
+				cmd[0] = cp->undo[0];
+				cmd[1] = cp->undo[1];
 				cmd[2] = 0;
 				ops[0] = PROC_FD_DUP(ap->io->fd, 0, PROC_FD_PARENT|PROC_FD_CHILD);
 				if (ap->parent && !state.ordered)
 				{
 					if ((n = open(state.tmp.file, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
-						error(ERROR_SYSTEM|3, "%s: cannot create %s base temporary file %s", ap->name, format[ap->compress].undo[0], state.tmp.file);
+						error(ERROR_SYSTEM|3, "%s: cannot create %s base temporary file %s", ap->name, cp->undo[0], state.tmp.file);
 					ops[1] = PROC_FD_DUP(n, 1, PROC_FD_PARENT|PROC_FD_CHILD);
 					ops[2] = 0;
 					proc = procopen(*cmd, cmd, NiL, ops, 0);
@@ -218,15 +116,15 @@ getprologue(register Archive_t* ap)
 					proc = procopen(*cmd, cmd, NiL, ops, PROC_READ);
 				}
 				if (!proc)
-					error(3, "%s: cannot execute %s filter", ap->name, format[ap->compress].undo[0]);
+					error(3, "%s: cannot execute %s filter", ap->name, cp->undo[0]);
 				if (ap->parent && !state.ordered)
 				{
 					if (n = procclose(proc))
-						error(3, "%s: %s filter exit code %d", ap->name, format[ap->compress].undo[0], n);
+						error(3, "%s: %s filter exit code %d", ap->name, cp->undo[0], n);
 					if ((ap->io->fd = open(state.tmp.file, O_RDONLY|O_BINARY)) < 0)
-						error(ERROR_SYSTEM|3, "%s: cannot read %s base temporary file %s", ap->name, format[ap->compress].undo[0], state.tmp.file);
+						error(ERROR_SYSTEM|3, "%s: cannot read %s base temporary file %s", ap->name, cp->undo[0], state.tmp.file);
 					if (remove(state.tmp.file))
-						error(ERROR_SYSTEM|1, "%s: cannot remove %s base temporary file %s", ap->name, format[ap->compress].undo[0], state.tmp.file);
+						error(ERROR_SYSTEM|1, "%s: cannot remove %s base temporary file %s", ap->name, cp->undo[0], state.tmp.file);
 				}
 				else
 				{
@@ -239,14 +137,105 @@ getprologue(register Archive_t* ap)
 					p->next = state.proc;
 					state.proc = p;
 				}
+				if ((n = bread(ap, (char*)buf, (off_t)0, (off_t)sizeof(buf), 0)) <= MINID && !bcount(ap))
+					return 0;
+				bunread(ap, buf, n);
+				break;
 			}
-		}
 	}
-	if (ap->volume++)
+
+	/*
+	 * now identify the format
+	 */
+
+	if (!(fp = ap->expected))
+	{
+		skipped = 0;
+		ap->entry = 1;
+		for (;;)
+		{
+			fp = 0;
+			while (fp = nextformat(fp))
+				if ((fp->flags & ARCHIVE) && fp->getprologue)
+				{
+					message((-2, "check %s", fp->name));
+					if ((n = (*fp->getprologue)(&state, fp, ap, f, buf, sizeof(buf))) < 0)
+						return 0;
+					if (n > 0)
+						break;
+					if (ap->data)
+					{
+						error(ERROR_PANIC|4, "%s: data!=0 on failed getprologue()", fp->name);
+						ap->data = 0;
+					}
+					ap->checksum = ap->old.checksum = ap->memsum = ap->old.memsum = 0;
+				}
+			if (fp)
+				break;
+			if (!state.keepgoing || ap->io->eof || bread(ap, buf, (off_t)0, (off_t)1, 0) < 1)
+			{
+				if (ap->expected)
+					error(3, "%s: unknown input format -- %s expected", ap->name, ap->expected->name);
+				if (ap->volume)
+				{
+					error(1, "%s: junk data after volume %d", ap->name, ap->volume);
+					return 0;
+				}
+				error(3, "%s: unknown input format", ap->name);
+			}
+			skipped++;
+		}
+		ap->entry = 0;
+		if (skipped)
+			error(1, "%s: %I*d byte%s skipped before identifying %s format archive", ap->name, sizeof(skipped), skipped, skipped == 1 ? "" : "s", fp->name);
+	}
+	else if (!(fp->flags & ARCHIVE) || !fp->getprologue  || (*fp->getprologue)(&state, fp, ap, f, buf, sizeof(buf)) < 0)
+		error(3, "%s: %s: archive format mismatch", ap->name, fp->name);
+	if (!ap->format)
+		ap->format = fp;
+	if (!ap->type)
+		ap->type = ap->format->name;
+	message((-1, "%s format", ap->type));
+	if ((state.operation & IN) && !state.list && !(ap->format->flags & IN))
+		error(3, "%s: %s read not implemented", ap->name, ap->type);
+	if ((state.operation & OUT) && !(ap->format->flags & OUT))
+		error(3, "%s: %s write not implemented", ap->name, ap->type);
+	ap->flags = state.operation | (ap->format->flags & ~(IN|OUT));
+	ap->sum--;
+	ap->volume++;
+	if (ap->peek && (ap->checkdelta || ap->delta) && deltacheck(ap, f))
+		ap->peek = 0;
+	if (state.summary && state.verbose && ap->volume > 0)
+	{
+		if (ap->io->blok)
+			sfprintf(sfstderr, "BLOK ");
+		if (ap->parent)
+			sfprintf(sfstderr, "%s base %s", ap->parent->name, ap->name);
+		else
+		{
+			sfprintf(sfstderr, "%s", ap->name);
+			if (ap->volume > 1)
+				sfprintf(sfstderr, " volume %d", ap->volume);
+		}
+		if (state.volume[0])
+			sfprintf(sfstderr, " label %s", state.volume);
+		sfprintf(sfstderr, " in");
+		if (ap->package)
+			sfprintf(sfstderr, " %s", ap->package);
+		if (ap->compress)
+			sfprintf(sfstderr, " %s", ap->compress->name);
+		if (ap->delta && ap->delta->format)
+			sfprintf(sfstderr, " %s", ap->delta->format->name);
+		sfprintf(sfstderr, " %s format", ap->type);
+		if (ap->swapio)
+			sfprintf(sfstderr, " %s swapped", "unix\0nuxi\0ixun\0xinu" + 5 * ap->swapio);
+		sfprintf(sfstderr, "\n");
+	}
+	if (ap->volume > 1)
 	{
 		if (ap->delta)
 		{
-			if (state.operation == (IN|OUT) || ap->delta->format != DELTA)
+			if (state.operation == (IN|OUT) || !(ap->delta->format->flags & DELTA))
 				error(3, "%s: %s archive cannot be multi-volume", ap->name, ap->parent ? "base" : "delta");
 			ap->delta = 0;
 		}
@@ -259,12 +248,6 @@ getprologue(register Archive_t* ap)
 		if (!(state.linktab = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_namesize, sizeof(Fileid_t), HASH_name, "links", 0)))
 			error(3, "cannot re-allocate hard link table");
 	}
-	ap->entry = 0;
-	if (ap->format < 0)
-	{
-		ap->format = ap->expected >= 0 ? ap->expected : IN_DEFAULT;
-		convert(ap, SECTION_CONTROL, CC_ASCII, CC_NATIVE);
-	}
 	return 1;
 }
 
@@ -272,14 +255,14 @@ getprologue(register Archive_t* ap)
  * set pseudo file header+trailer info
  */
 
-static void
+void
 setinfo(register Archive_t* ap, register File_t* f)
 {
 	long	n;
 
 	if (ap->delta)
 	{
-		if (ap->delta->format != DELTA_IGNORE && ap->entry > 1 && f->st->st_mtime)
+		if (ap->delta->format->variant != DELTA_IGNORE && ap->entry > 1 && f->st->st_mtime)
 		{
 			if ((n = f->st->st_mtime - ap->delta->index) < 0)
 				error(3, "%s: corrupt archive: %d extra file%s", ap->name, -n, n == -1 ? "" : "s");
@@ -294,19 +277,21 @@ setinfo(register Archive_t* ap, register File_t* f)
  * output pseudo file header+trailer
  */
 
-static void
+void
 putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long checksum)
 {
 	register File_t*	f = &ap->file;
 	Sfio_t*			np = 0;
+	Delta_format_t*		dp;
 
 	if (!file)
 	{
 		np = sfstropen();
-		if (!ap->delta || ap->delta->version == DELTA_88) sfprintf(np, "DELTA");
+		if (!ap->delta || ap->delta->format->variant == DELTA_88)
+			sfprintf(np, "DELTA");
 		else
 		{
-			sfprintf(np, "%c%s%c%c%c%s", INFO_SEP, ID, INFO_SEP, ap->delta->format == DELTA ? TYPE_DELTA : TYPE_COMPRESS, INFO_SEP, format[ap->delta->version ? ap->delta->version : DELTA].algorithm);
+			sfprintf(np, "%c%s%c%c%c%s", INFO_SEP, ID, INFO_SEP, ap->delta->compress ? TYPE_COMPRESS : TYPE_DELTA, INFO_SEP, (dp = (Delta_format_t*)ap->delta->format->data) ? dp->variant : "");
 			if (state.ordered)
 				sfprintf(np, "%c%c", INFO_SEP, INFO_ORDERED);
 		}
@@ -320,7 +305,8 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
 	f->st->st_gid = DELTA_HI(checksum);
 	putheader(ap, f);
 	puttrailer(ap, f);
-	if (np) sfstrclose(np);
+	if (np)
+		sfstrclose(np);
 }
 
 /*
@@ -331,70 +317,20 @@ void
 putprologue(register Archive_t* ap)
 {
 	ap->section = SECTION_CONTROL;
-	if (ap->delta && ap->delta->version == DELTA_88)
+	if (ap->delta && ap->delta->format->variant == DELTA_88)
 		ap->checksum = ap->old.checksum;
-	switch (ap->format)
+	if (!(ap->format->flags & CONV))
 	{
-	case IBMAR:
-		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_EBCDIC1);
-		if (!ap->convert[0].on)
-			convert(ap, SECTION_DATA, CC_NATIVE, CC_EBCDIC1);
-		break;
-	default:
 		convert(ap, SECTION_CONTROL, CC_NATIVE, CC_ASCII);
 		if (!ap->convert[0].on)
 			convert(ap, SECTION_DATA, CC_NATIVE, CC_NATIVE);
-		break;
 	}
-	switch (ap->format)
+	if ((!ap->format->putprologue || (*ap->format->putprologue)(&state, ap) >= 0) && !(ap->format->flags & DELTAINFO) && ap->delta && !(ap->delta->format->flags & PSEUDO))
 	{
-	case ALAR:
-	case IBMAR:
-#if DEBUG
-		if (ap->io->blok) ap->io->blocked = 1;
+		if (ap->delta->base)
+			putinfo(ap, NiL, ap->delta->base->size, ap->delta->base->checksum);
 		else
-#endif
-		ap->io->blocked = !ap->io->unblocked;
-		if (!ap->id.owner[0])
-		{
-			strncpy(ap->id.owner, fmtuid(getuid()), sizeof(ap->id.owner) - 1);
-			ap->id.owner[sizeof(ap->id.owner) - 1] = 0;
-		}
-		strupper(ap->id.owner);
-		if (!state.id.volume[0])
-		{
-			strncpy(state.id.volume, ap->id.owner, sizeof(state.id.volume) - 1);
-			state.id.volume[sizeof(state.id.volume) - 1] = 0;
-		}
-		strupper(state.id.volume);
-		strncpy(ap->id.format, ALAR_ID, sizeof(ap->id.format) - 1);
-		strncpy(ap->id.implementation, IMPLEMENTATION, sizeof(ap->id.implementation) - 1);
-		if (ap->format == IBMAR) sfsprintf(ap->id.standards, sizeof(ap->id.standards), "%-5.5s%-5.5s%-5.5s%-4.4s", "ATT", "1", "EBCDIC", "1979");
-		else sfsprintf(ap->id.standards, sizeof(ap->id.standards), "%-5.5s%-5.5s%-5.5s%-4.4s", "ISO", "646", "IRV", "1990");
-		sfsprintf(alar_header, sizeof(alar_header), "VOL1%-6.6s              %-6.6s%-7.7s%-14.14s                            4", state.id.volume, ap->id.format, ap->id.implementation, ap->id.owner);
-		bwrite(ap, alar_header, ALAR_HEADER);
-		sfsprintf(alar_header, sizeof(alar_header), "VOL2%-19.19s                                                         ", ap->id.standards);
-		bwrite(ap, alar_header, ALAR_HEADER);
-		if (ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA))
-		{
-			sfsprintf(alar_header, sizeof(alar_header), "UVL1 %-6.6s%c%-6.6s%010ld%010ld                                         ", ID, ap->delta->format == DELTA ? TYPE_DELTA : TYPE_COMPRESS, format[ap->delta->version ? ap->delta->version : DELTA].algorithm, state.operation == OUT ? (long)ap->size : (long)0, state.operation == OUT ? ap->checksum : 0L);
-			bwrite(ap, alar_header, ALAR_HEADER);
-		}
-		break;
-	case VDB:
-		state.vdb.directory = sfstropen();
-		sfprintf(state.vdb.directory, "%c%s%c%s\n", VDB_DELIMITER, VDB_MAGIC, VDB_DELIMITER, state.id.volume);
-		bwrite(ap, sfstrbase(state.vdb.directory), sfstrtell(state.vdb.directory));
-		sfstrset(state.vdb.directory, 0);
-		sfprintf(state.vdb.directory, "%s\n", VDB_DIRECTORY);
-		break;
-	default:
-		if (ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA))
-		{
-			if (ap->delta->base) putinfo(ap, NiL, ap->delta->base->size, ap->delta->base->checksum);
-			else putinfo(ap, NiL, 0, 0);
-		}
-		break;
+			putinfo(ap, NiL, 0, 0);
 	}
 }
 
@@ -408,43 +344,17 @@ getepilogue(register Archive_t* ap)
 	register char*	s;
 	register off_t	n;
 	register int	i;
-	long		sum;
+	char		buf[BLOCKSIZE];
 
 	ap->section = SECTION_CONTROL;
 	if (ap->delta && ap->delta->epilogue < 0)
 		error(3, "%s: corrupt archive: missing epilogue", ap->name);
-	if (ap->io->mode != O_RDONLY) backup(ap);
+	if (ap->io->mode != O_RDONLY)
+		backup(ap);
 	else
 	{
-		if (ap->names)
+		if (!ap->format->getepilogue || !(*ap->format->getepilogue)(&state, ap))
 		{
-			free(ap->names);
-			ap->names = 0;
-		}
-		switch (ap->format)
-		{
-		case ALAR:
-		case AR:
-		case IBMAR:
-#if SAVESET
-		case SAVESET:
-#endif
-			break;
-		case MIME:
-			if (state.mime.magic)
-			{
-				free(state.mime.magic);
-				state.mime.magic = 0;
-			}
-			break;
-		case VDB:
-			if (state.vdb.header.base)
-			{
-				free(state.vdb.header.base);
-				state.vdb.header.base = 0;
-			}
-			break;
-		default:
 			/*
 			 * check for more volumes
 			 * volumes begin on BLOCKSIZE boundaries
@@ -454,45 +364,44 @@ getepilogue(register Archive_t* ap)
 			if (ap->io->keep)
 			{
 				bskip(ap);
-				if (ap->io->eof) ap->io->keep = 0;
-				else if (ap->io->keep > 0) ap->io->keep--;
-				ap->format = IN_DEFAULT;
-				ap->swapio = 0;
-				message((-2, "go for next tape volume"));
-				return;
+				if (ap->io->eof)
+					ap->io->keep = 0;
+				else if (ap->io->keep > 0)
+					ap->io->keep--;
+				goto done;
 			}
 			i = MAXBLOCKS;
-			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, tar_block, (off_t)0, (off_t)n, 0) > 0)
+			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, buf, (off_t)0, (off_t)n, 0) > 0)
 				do
 				{
-					for (s = tar_block; s < tar_block + n && !*s; s++);
-					if (s < tar_block + n)
+					for (s = buf; s < buf + n && !*s; s++);
+					if (s < buf + n)
 					{
 						if (n == BLOCKSIZE)
 						{
-							if (ap->format == TAR || ap->format == USTAR)
+							if (ap->format->event && (ap->format->events & EVENT_SKIP_JUNK))
 							{
-								if (!isdigit(tar_header.chksum[0]) || !isdigit(tar_header.chksum[1]) || !isdigit(tar_header.chksum[2]) || !isdigit(tar_header.chksum[3]) || !isdigit(tar_header.chksum[4]) || !isdigit(tar_header.chksum[5]) || !isdigit(tar_header.chksum[6]) || sfsscanf(tar_header.chksum, "%7lo", &sum) != 1 || !tar_checksum(ap, -1, sum))
+								if ((*ap->format->event)(&state, ap, NiL, buf, EVENT_SKIP_JUNK) > 0)
 									continue;
 								if (i = MAXBLOCKS - i)
 									error(1, "%s: %d junk block%s after volume %d", ap->name, i, i == 1 ? "" : "s", ap->volume);
 							}
-							bunread(ap, tar_block, BLOCKSIZE);
-							ap->format = IN_DEFAULT;
-							ap->swapio = 0;
-							return;
+							bunread(ap, buf, BLOCKSIZE);
+							goto done;
 						}
 						if (ap->volume > 1)
 							error(1, "junk data after volume %d", ap->volume);
 						break;
 					}
 					n = BLOCKSIZE;
-				} while (i-- > 0 && bread(ap, tar_block, (off_t)0, n, 0) > 0);
+				} while (i-- > 0 && bread(ap, buf, (off_t)0, n, 0) > 0);
 			bflushin(ap, 1);
-			break;
 		}
-		ap->format = IN_DEFAULT;
+	done:
+		if (ap->format->done)
+			(*ap->format->done)(&state, ap);
 		ap->swapio = 0;
+		ap->format = 0;
 	}
 }
 
@@ -532,50 +441,15 @@ putepilogue(register Archive_t* ap)
 	if (ap->selected > state.selected)
 	{
 		state.selected = ap->selected;
-		if (ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA))
-			switch (ap->format)
-			{
-			case BINARY:
-			case CPIO:
-			case ASC:
-			case ASCHK:
-				break;
-			default:
-				putinfo(ap, NiL, ap->delta->index + 1, 0);
-				break;
-			}
-		boundary = ap->io->count;
-		switch (ap->format)
+		if (ap->delta && (ap->delta->format->flags & DELTA))
 		{
-		case ALAR:
-		case IBMAR:
-			bwrite(ap, alar_header, 0);
-			bwrite(ap, alar_header, 0);
-			break;
-		case BINARY:
-		case CPIO:
-		case ASC:
-		case ASCHK:
-			putinfo(ap, strcpy(tar_block, CPIO_TRAILER), ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA) ? ap->delta->index + 1 : 0, 0);
-			boundary = ap->io->unblocked ? BLOCKSIZE : state.blocksize;
-			break;
-		case PAX:
-		case TAR:
-		case USTAR:
-			memzero(tar_block, TAR_HEADER);
-			bwrite(ap, tar_block, TAR_HEADER);
-			bwrite(ap, tar_block, TAR_HEADER);
-			boundary = ap->io->unblocked ? BLOCKSIZE : state.blocksize;
-			break;
-		case VDB:
-			if (state.record.header)
-				bwrite(ap, state.record.header, state.record.headerlen);
-			sfprintf(state.vdb.directory, "%c%s%c%0*I*d%c%0*I*d\n", VDB_DELIMITER, VDB_DIRECTORY, VDB_DELIMITER, VDB_FIXED, sizeof(ap->io->offset), ap->io->offset + ap->io->count + sizeof(VDB_DIRECTORY), VDB_DELIMITER, VDB_FIXED, sizeof(Sfoff_t), sftell(state.vdb.directory) - sizeof(VDB_DIRECTORY) + VDB_LENGTH + 1);
-			bwrite(ap, sfstrbase(state.vdb.directory), sfstrtell(state.vdb.directory));
-			sfstrclose(state.vdb.directory);
-			boundary = ap->io->count;
-			break;
+			if (ap->format->event && (ap->format->events & EVENT_DELTA_EXTEND))
+				(*ap->format->event)(&state, ap, NiL, NiL, EVENT_DELTA_EXTEND);
+			else
+				putinfo(ap, NiL, ap->delta->index + 1, 0);
 		}
+		if (!ap->format->putepilogue || (boundary = (*ap->format->putepilogue)(&state, ap)) <= 0)
+			boundary = ap->io->count;
 		if (n = ((ap->io->count > boundary) ? roundof(ap->io->count, boundary) : boundary) - ap->io->count)
 		{
 			memzero(state.tmp.buffer, n);
@@ -589,128 +463,9 @@ putepilogue(register Archive_t* ap)
 		ap->io->count = ap->io->offset = 0;
 		ap->io->next = ap->io->buffer;
 	}
+	if (ap->format->done)
+		(*ap->format->done)(&state, ap);
 }
-
-#if CPIO_EXTENDED
-
-static char	opsbuf[PATH_MAX];	/* extended ops buffer		*/
-
-static char*	ops = opsbuf;		/* opsbuf output pointer	*/
-
-/*
- * get and execute extended ops from input
- */
-
-static void
-getxops(register Archive_t* ap, register File_t* f)
-{
-	register char*	p;
-	register char*	s;
-	register int	c;
-
-	if (f->namesize > (c = strlen(f->name) + 1)) for (p = f->name + c; c = *p++;)
-	{
-		for (s = p; *p; p++);
-		p++;
-		message((-2, "%s: %s: entry %d.%d op = %c%s", ap->name, f->name, ap->volume, ap->entry, c, s));
-		switch (c)
-		{
-		case 'd':
-			IDEVICE(f->st, strtol(s, NiL, 16));
-			break;
-		case 'g':
-			f->st->st_gid = strtol(s, NiL, 16);
-			break;
-		case 's':
-			f->st->st_size = strtoll(s, NiL, 16);
-			break;
-		case 'u':
-			f->st->st_uid = strtol(s, NiL, 16);
-			break;
-		case 'G':
-			f->gidname = s;
-			break;
-		case 'U':
-			f->uidname = s;
-			break;
-
-			/*
-			 * NOTE: ignore unknown ops for future extensions
-			 */
-		}
-	}
-}
-
-/*
- * set end of extended ops
- */
-
-static void
-setxops(Archive_t* ap, register File_t* f)
-{
-	register int	n;
-
-	NoP(ap);
-	if (n = ops - opsbuf)
-	{
-		n++;
-		*ops++ = 0;
-		if ((f->namesize += n) > CPIO_NAMESIZE) error(1, "%s: extended ops may crash older cpio programs", f->name);
-	}
-}
-
-/*
- * output filename and extended ops
- */
-
-static void
-putxops(Archive_t* ap, register File_t* f)
-{
-	register int	n;
-
-	n = ops - opsbuf;
-	bwrite(ap, f->name, f->namesize -= n);
-	if (n) bwrite(ap, ops = opsbuf, n);
-}
-
-
-/*
- * add extended op string
- */
-
-static void
-addxopstr(Archive_t* ap, int op, register char* s)
-{
-	register char*	p = ops;
-	register char*	e = opsbuf + sizeof(opsbuf) - 3;
-
-	NoP(ap);
-	if (p < e)
-	{
-		*p++ = op;
-		while (*s && p < e) *p++ = *s++;
-		*p++ = 0;
-		ops = p;
-	}
-#if DEBUG
-	if (*s) error(PANIC, "addxopstr('%c',\"%s\") overflow", op, s);
-#endif
-}
-
-/*
- * add extended op number
- */
-
-static void
-addxopnum(Archive_t* ap, int op, Sflong_t n)
-{
-	char	buf[33];
-
-	sfsprintf(buf, sizeof(buf), "%I*x", sizeof(n), n);
-	addxopstr(ap, op, buf);
-}
-
-#endif
 
 /*
  * get key [ug]id value
@@ -822,102 +577,6 @@ getkeytime(Archive_t* ap, File_t* f, int index)
 	}
 }
 
-#if 0
-/*
- * CAB data close function
- */
-
-static void
-cabclose(Archive_t* ap)
-{
-	register Cab_t*	cab;
-	register int	i;
-
-	if (cab = (Cab_t*)ap->data)
-	{
-		ap->data = 0;
-		if (cab->optional.prev.name)
-			free(cab->optional.prev.name);
-		if (cab->optional.prev.disk)
-			free(cab->optional.prev.disk);
-		if (cab->optional.next.name)
-			free(cab->optional.next.name);
-		if (cab->optional.next.disk)
-			free(cab->optional.next.disk);
-		for (i = 0; i < cab->files; i++)
-			if (cab->file[i].name)
-				free(cab->file[i].name);
-		free(cab);
-	}
-}
-#endif
-
-/*
- * make a seekable copy of ap->io input
- */
-
-static void
-seekable(Archive_t* ap)
-{
-	off_t		m;
-	off_t		z;
-	char*		s;
-	int		rfd;
-	int		wfd;
-
-	if ((wfd = open(state.tmp.file, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
-		error(ERROR_SYSTEM|3, "%s: cannot create seekable temporary %s", ap->name, state.tmp.file);
-	if ((rfd = open(state.tmp.file, O_RDONLY|O_BINARY)) < 0)
-		error(ERROR_SYSTEM|3, "%s: cannot open seekable temporary %s", ap->name, state.tmp.file);
-	if (remove(state.tmp.file))
-		error(ERROR_SYSTEM|1, "%s: cannot remove seekable temporary %s", ap->name, state.tmp.file);
-	ap->io->seekable = 1;
-	z = 0;
-	s = ap->io->buffer + MAXUNREAD;
-	m = ap->io->last - s;
-	do
-	{
-		if (write(wfd, s, m) != m)
-			error(ERROR_SYSTEM|3, "%s: seekable temporary %s write error", ap->name, state.tmp.file);
-		z += m;
-	} while ((m = read(ap->io->fd, s, state.buffersize)) > 0);
-	close(wfd);
-	close(ap->io->fd);
-	ap->io->size = z;
-	z = ap->io->count;
-	ap->io->next = ap->io->last = s;
-	ap->io->offset = ap->io->count = 0;
-	if (ap->io->fd || (ap->io->fd = dup(rfd)) < 0)
-		ap->io->fd = rfd;
-	else
-		close(rfd);
-	bread(ap, NiL, z, z, 0);
-}
-
-/*
- * no dos in our pathnames
- */
-
-static void
-undos(File_t* f)
-{
-	register char*	s;
-
-	if (strchr(f->name, '\\'))
-	{
-		s = f->name;
-		if (s[1] == ':' && isalpha(s[0]))
-		{
-			if (*(s += 2) == '\\' || *s == '/')
-				s++;
-			f->name = s;
-		}
-		for (; *s; s++)
-			if (*s == '\\')
-				*s = '/';
-	}
-}
-
 /*
  * read next archive entry header
  */
@@ -926,1599 +585,38 @@ int
 getheader(register Archive_t* ap, register File_t* f)
 {
 	register char*	s;
-	register int	i;
-	register off_t	n;
-	char*		t;
-	char*		v;
-	off_t		m;
-	struct tm	tm;
-	long		num;
-	off_t		z;
-	int		warned;
-	int		checkdelta;
-	int		lab;
-	int		type;
-	int		ordered;
-	int		loop;
-	int_2		magic;
-	Option_t*	op;
-	char		one;
-
-	struct
-	{
-		long	dev;
-		long	ino;
-		long	mode;
-		long	uid;
-		long	gid;
-		long	nlink;
-		long	rdev;
-		long	mtime;
-		off_t	size;
-		long	dev_major;
-		long	dev_minor;
-		long	rdev_major;
-		long	rdev_minor;
-		long	checksum;
-	}		lst;
 
 	ap->section = SECTION_CONTROL;
 	ap->sum++;
- volume:
-	warned = 0;
-	checkdelta = !ap->entry++ && (!ap->delta || ap->delta->format != DELTA_IGNORE && ap->delta->format != DELTA_PATCH);
-	type = 0;
-	if (ap->io->mode != O_RDONLY) bsave(ap);
+	ap->entry++;
+	if (ap->io->mode != O_RDONLY)
+		bsave(ap);
+	if (!ap->peek)
+	{
+		f->delta.base = 0;
+		f->delta.checksum = 0;
+		f->delta.index = 0;
+		f->uncompressed = 0;
+	}
  again:
-	ap->memsum = 0;
-	for (;;)
+	do
 	{
-		f->name = 0;
-		f->record.format = 0;
-		f->skip = 0;
-		message((-2, "%s:", format[ap->format].name));
-		switch (ap->format)
+		if (ap->peek)
+			ap->peek = 0;
+		else
 		{
-		case ALAR:
-		case IBMAR:
-			if (!(lab = getlabel(ap, f))) return 0;
-			f->st->st_dev = 0;
-			f->st->st_ino = 0;
-			f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
-			f->st->st_uid = state.uid;
-			f->st->st_gid = state.gid;
-			f->st->st_nlink = 1;
-			IDEVICE(f->st, 0);
-			f->st->st_size = 0;
-			f->linktype = NOLINK;
-			f->linkpath = 0;
-			f->uidname = 0;
-			f->gidname = 0;
-			type = 0;
-			do
-			{
-				if (checkdelta && strneq(alar_header, "UVL1", 4) && strneq(alar_header + 5, ID, IDLEN))
-				{
-					checkdelta = 0;
-					s = alar_header + 10;
-					f->st->st_mtime = getlabnum(alar_header, 14, 10, 10);
-					n = getlabnum(alar_header, 24, 10, 10);
-					f->st->st_uid = DELTA_LO(n);
-					f->st->st_gid = DELTA_HI(n);
-					if (t = strchr(s, ' ')) *t = 0;
-					goto deltaverify;
-				}
-				else if (strneq(alar_header, "HDR", 3))
-				{
-					if (getlabnum(alar_header, 4, 1, 10) != ++type) error(3, "%s format HDR label out of sequence", format[ap->format].name);
-					if (type == 1)
-					{
-						s = f->name = stash(&ap->path.head, NiL, ALAR_NAMESIZE + 3);
-						for (i = 4; i <= ALAR_NAMESIZE + 3; i++)
-						{
-							if (alar_header[i] == ' ')
-							{
-								if (i >= ALAR_NAMESIZE + 3 || alar_header[i + 1] == ' ') break;
-								*s++ = '.';
-							}
-							else *s++ = isupper(alar_header[i]) ? tolower(alar_header[i]) : alar_header[i];
-						}
-						if ((n = getlabnum(alar_header, 40, 2, 10)) > 0 && n < 99) sfsprintf(s, 3, ".%02d", n);
-						else *s = 0;
-						f->record.section = getlabnum(alar_header, 28, 4, 10);
-						getlabstr(alar_header, 5, ALAR_NAMESIZE, f->id = ap->id.id);
-						getlabstr(alar_header, 61, 6, ap->id.format);
-						getlabstr(alar_header, 67, 7, ap->id.implementation);
-#if SAVESET
-						if (streq(ap->id.format, SAVESET_ID) && streq(ap->id.implementation, SAVESET_IMPL))
-							ap->format = SAVESET;
-#endif
-						f->st->st_mtime = 0;
-						if (n = getlabnum(alar_header, 43, 2, 10))
-						{
-							if (alar_header[41] == '0') n += 100;
-							if ((i = getlabnum(alar_header, 45, 3, 10)) >= 0 && i <= 365)
-							{
-								f->st->st_mtime = i;
-								while (n-- > 70) f->st->st_mtime += ((n % 4) || n == 100) ? 365 : 366;
-								f->st->st_mtime *= 24L * 60L * 60L;
-								f->st->st_mtime += 12L * 60L * 60L;
-							}
-						}
-						if (!f->st->st_mtime)
-							f->st->st_mtime = NOW;
-					}
-					else if (type == 2)
-					{
-						switch (f->record.format = alar_header[4])
-						{
-						case 'D': /* decimal variable	*/
-						case 'F': /* fixed length	*/
-						case 'S': /* spanned		*/
-						case 'U': /* input block size	*/
-						case 'V': /* binary variable	*/
-							break;
-						default:
-							error(2, "%s record format %c not supported", format[ap->format].name, f->record.format);
-							f->skip = 1;
-						}
-						state.blocksize = getlabnum(alar_header, 6, 5, 10);
-						state.record.size = getlabnum(alar_header, 11, 5, 10);
-						if (!ap->io->blocked) f->st->st_size = getlabnum(alar_header, 16, 10, 10);
-						state.record.offset = getlabnum(alar_header, 51, 2, 10);
-					}
-				}
-				else if (!ap->io->blocked && strneq(alar_header, "VOL1", 4))
-				{
-					bunread(ap, alar_header, lab);
-					if (!(getprologue(ap))) return 0;
-					goto volume;
-				}
-			} while ((lab = getlabel(ap, f)));
-#if SAVESET
-			if (ap->format != SAVESET) goto found;
-			state.saveset.time = f->st->st_mtime;
-			if (state.blocksize > state.saveset.blocksize)
-			{
-				state.saveset.blocksize = state.blocksize;
-				if (state.saveset.block) free(state.saveset.block);
-				if (!(state.saveset.block = newof(0, char, state.saveset.blocksize, 0)))
-					error(3, "cannot allocate %s format buffer", format[ap->format].name);
-			}
-			state.saveset.bp = state.saveset.block + state.blocksize;
-			/*FALLTHROUGH*/
-		case SAVESET:
-			if (!getsaveset(ap, f, 1)) goto again;
-#endif
-			goto found;
-		case BINARY:
-			if (bread(ap, &binary_header, (off_t)BINARY_HEADER, (off_t)BINARY_HEADER, 0) <= 0) break;
-			if (ap->swap)
-			{
-				memcpy(state.tmp.buffer, &binary_header, BINARY_HEADER);
-				swapmem(ap->swap, &binary_header, &binary_header, BINARY_HEADER);
-			}
-			f->magic = binary_header.magic;
-			if (f->magic == CPIO_MAGIC)
-			{
-				f->namesize = binary_header.namesize;
-				f->st->st_dev = binary_header.dev;
-				f->st->st_ino = binary_header.ino;
-				f->st->st_mode = binary_header.mode;
-				f->st->st_uid = binary_header.uid;
-				f->st->st_gid = binary_header.gid;
-				f->st->st_nlink = binary_header.links;
-				IDEVICE(f->st, binary_header.rdev);
-				f->st->st_mtime = cpio_long(binary_header.mtime);
-				f->st->st_size = cpio_long(binary_header.size);
-			cpio_common:
-				f->linktype = NOLINK;
-				f->linkpath = 0;
-				f->uidname = 0;
-				f->gidname = 0;
-				switch (ap->format)
-				{
-				case BINARY:
-					i = BINARY_ALIGN;
-					n = BINARY_HEADER;
-					break;
-				case ASC:
-				case ASCHK:
-					i = ASC_ALIGN;
-					n = ASC_HEADER;
-					break;
-				default:
-					i = 0;
-					break;
-				}
-				if (i)
-				{
-					if (n = (n + f->namesize) % i) i -= n;
-					else i = 0;
-				}
-				f->name = stash(&ap->path.head, NiL, f->namesize + i);
-				bread(ap, f->name, (off_t)0, (off_t)(f->namesize + i), 1);
-				if (f->name[f->namesize - 1])
-				{
-					bunread(ap, &f->name[f->namesize - 1], 1);
-					f->name[f->namesize - 1] = 0;
-					error(state.keepgoing ? 1 : 3, "%s: entry %d.%d file name terminating null missing", ap->name, ap->volume, ap->entry);
-				}
-#if CPIO_EXTENDED
-				getxops(ap, f);
-#endif
-				if (streq(f->name, CPIO_TRAILER))
-				{
-					getdeltaheader(ap, f);
-					if (ap->delta)
-						setinfo(ap, f);
-					return 0;
-				}
-				switch (f->type = X_ITYPE(f->st->st_mode))
-				{
-				case X_IFBLK:
-				case X_IFCHR:
-				case X_IFDIR:
-				case X_IFIFO:
-				case X_IFLNK:
-				case X_IFREG:
-				case X_IFSOCK:
-					break;
-				default:
-					error(1, "%s: %s: unknown file type %07o -- regular file assumed", ap->name, f->name, f->type);
-					f->type = X_IFREG;
-					break;
-				}
-				f->st->st_mode &= X_IPERM;
-				f->st->st_mode |= f->type;
-				switch (f->type)
-				{
-				case X_IFLNK:
-					f->linkpath = stash(&ap->path.link, NiL, f->st->st_size);
-					f->linktype = SOFTLINK;
-					s = f->linkpath;
-					while (bread(ap, s, (off_t)1, (off_t)1, 1) > 0)
-					{
-						f->st->st_size--;
-						if (!*s++) break;
-						if (!f->st->st_size)
-						{
-							*s = 0;
-							break;
-						}
-					}
-					break;
-				default:
-					f->linktype = NOLINK;
-					break;
-				}
-				goto found;
-			}
-			bunread(ap, ap->swap ? state.tmp.buffer : (char*)&binary_header, BINARY_HEADER);
-			break;
-		case CPIO:
-			if (bread(ap, state.tmp.buffer, (off_t)0, (off_t)CPIO_HEADER, 0) <= 0) break;
-			state.tmp.buffer[CPIO_HEADER] = 0;
-			if (state.tmp.buffer[0] == '0' && sfsscanf(state.tmp.buffer, "%6o%6lo%6lo%6lo%6lo%6lo%6lo%6lo%11lo%6o%11I*o",
-				&f->magic,
-				&lst.dev,
-				&lst.ino,
-				&lst.mode,
-				&lst.uid,
-				&lst.gid,
-				&lst.nlink,
-				&lst.rdev,
-				&lst.mtime,
-				&f->namesize,
-				sizeof(lst.size), &lst.size) == 11 && f->magic == CPIO_MAGIC)
-			{
-				f->st->st_dev = lst.dev;
-				f->st->st_ino = lst.ino;
-				f->st->st_mode = lst.mode;
-				f->st->st_uid = lst.uid;
-				f->st->st_gid = lst.gid;
-				f->st->st_nlink = lst.nlink;
-				IDEVICE(f->st, lst.rdev);
-				f->st->st_mtime = lst.mtime;
-				f->st->st_size = lst.size;
-				goto cpio_common;
-			}
-			bunread(ap, state.tmp.buffer, CPIO_HEADER);
-			break;
-		case PAX:
-		case TAR:
-		case USTAR:
-			if (bread(ap, tar_block, (off_t)0, (off_t)TAR_HEADER, 0) <= 0) break;
-			if (!*tar_header.name)
-			{
-				if (ap->entry == 1) goto notar;
-				return 0;
-			}
-			if (sfsscanf(tar_header.mode, "%7lo", &num) != 1) goto notar;
-			f->st->st_mode = num;
-			if (sfsscanf(tar_header.uid, "%7lo", &num) != 1) goto notar;
-			f->st->st_uid = num;
-			if (sfsscanf(tar_header.gid, "%7lo", &num) != 1) goto notar;
-			f->st->st_gid = num;
-			if (sfsscanf(tar_header.mtime, "%11lo", &num) != 1) goto notar;
-			f->st->st_mtime = num;
-			if (sfsscanf(tar_header.chksum, "%7lo", &num) != 1) goto notar;
-			if (!tar_checksum(ap, 1, num) && ap->entry == 1)
-			{
-				if (!ap->swapio)
-				{
-					char	tmp[sizeof(tar_header.chksum) + 1];
-
-					tmp[sizeof(tar_header.chksum)] = 0;
-					for (i = 1; i < 4; i++)
-					{
-						memcpy(tmp, tar_header.chksum, sizeof(tar_header.chksum));
-						swapmem(i, tmp, tmp, sizeof(tar_header.chksum));
-						if (sfsscanf(tmp, "%7lo", &num) == 1 && tar_checksum(ap, 1, num))
-						{
-							ap->swapio = i;
-							bunread(ap, tar_block, TAR_HEADER);
-							goto again;
-						}
-					}
-				}
-				goto notar;
-			}
-			if (sfsscanf(tar_header.size, "%11I*o", sizeof(z), &z) == 1)
-				f->st->st_size = z;
-			else if (((unsigned char*)tar_header.size)[0] != TAR_LARGENUM)
-				goto notar;
-			else
-			{
-				/*
-				 * gnu tar largefile extension
-				 */
-
-				n = 0;
-				for (i = 1; i <= 11; i++)
-				{
-					n <<= 8;
-					n |= ((unsigned char*)tar_header.size)[i];
-				}
-				f->st->st_size = n;
-			}
-			if (ap->format != TAR)
-			{
-				if (!streq(tar_header.magic, TMAGIC))
-				{
-					if (strneq(tar_header.magic, TMAGIC, TMAGLEN - 1) && streq(tar_header.magic + TMAGLEN, "  "))
-						/* old gnu tar */;
-					else if (ap->entry > 1)
-						goto notar;
-					ap->format = TAR;
-				}
-				else if (!strneq(tar_header.version, TVERSION, sizeof(tar_header.version)))
-				{
-					error(1, "%s: %s format version %-.*s incompatible with implementation version %-.*s -- assuming %s", ap->name, format[ap->format].name, sizeof(tar_header.version), tar_header.version, sizeof(tar_header.version), TVERSION, format[TAR].name);
-					ap->format = TAR;
-				}
-			}
-			*(tar_header.name + sizeof(tar_header.name)) = 0;
-			if (ap->format != TAR && *tar_header.prefix)
-			{
-				f->name = stash(&ap->path.head, NiL, sizeof(tar_header.prefix) + sizeof(tar_header.name) + 2);
-				sfsprintf(f->name, sizeof(tar_header.prefix) + sizeof(tar_header.name) + 2, "%-.*s/%-.*s", sizeof(tar_header.prefix), tar_header.prefix, sizeof(tar_header.name), tar_header.name);
-			}
-			else
-				f->name = tar_header.name;
-			*(tar_header.linkname + sizeof(tar_header.name)) = 0;
-			f->linktype = NOLINK;
-			f->linkpath = 0;
-			f->st->st_nlink = 1;
-			switch (tar_header.typeflag)
-			{
-			case LNKTYPE:
-				f->linktype = HARDLINK;
-				f->st->st_mode |= X_IFREG;
-				f->st->st_nlink = 2;
-				if (!ap->delta)
-					f->st->st_size = 0;
-				f->linkpath = stash(&ap->path.link, tar_header.linkname, 0);
-				break;
-			case SYMTYPE:
-				f->linktype = SOFTLINK;
-				f->st->st_mode |= X_IFLNK;
-				f->linkpath = stash(&ap->path.link, tar_header.linkname, 0);
-				break;
-			case CHRTYPE:
-				f->st->st_mode |= X_IFCHR;
-			device:
-				if (sfsscanf(tar_header.devmajor, "%7lo", &num) != 1) goto notar;
-				i = num;
-				if (sfsscanf(tar_header.devminor, "%7lo", &num) != 1) goto notar;
-				IDEVICE(f->st, makedev(i, num));
-				break;
-			case BLKTYPE:
-				f->st->st_mode |= X_IFBLK;
-				goto device;
-			case DIRTYPE:
-				f->st->st_mode |= X_IFDIR;
-				break;
-			case FIFOTYPE:
-				f->st->st_mode |= X_IFIFO;
-				break;
-#ifdef SOKTYPE
-			case SOKTYPE:
-				f->st->st_mode |= X_IFSOCK;
-				break;
-#endif
-			case EXTTYPE:
-			case GLBTYPE:
-				ap->format = PAX;
-				if (f->st->st_size > 0)
-				{
-					if (s = bget(ap, f->st->st_size, NiL))
-					{
-						s[f->st->st_size - 1] = 0;
-						setoptions(s, NiL, state.usage, ap, tar_header.typeflag);
-					}
-					else
-						error(3, "invalid %s format '%c' extended header", format[ap->format].name, tar_header.typeflag);
-				}
-				gettrailer(ap, f);
-				goto again;
-
-			case LLNKTYPE:
-			case LREGTYPE:
-				if ((n = f->st->st_size) > 0)
-				{
-					if (!(s = bget(ap, n, NiL)))
-					{
-						error(2, "%s: invalid %s format long path header", ap->name, format[ap->format].name);
-						return 0;
-					}
-					op = &options[tar_header.typeflag == LLNKTYPE ? OPT_linkpath : OPT_path];
-					op->level = 6;
-					op->entry = ap->entry;
-					stash(&op->temp, s, (size_t)n);
-				}
-				gettrailer(ap, f);
-				goto again;
-
-			case VERTYPE:
-				error(1, "version file archive members not supported -- regular file assumed");
-				goto regular;
-
-			default:
-				error(1, "%s: %s: unknown %s format file type `%c' -- regular file assumed", ap->name, f->name, format[ap->format].name, tar_header.typeflag);
-				/*FALLTHROUGH*/
-			case REGTYPE:
-			case AREGTYPE:
-			case CONTTYPE:
-			regular:
-				f->st->st_mode |= X_IFREG;
-				break;
-			}
-			f->uidname = 0;
-			f->gidname = 0;
-			if (ap->format != TAR)
-			{
-				if (*tar_header.uname && (strtoll(tar_header.uname, &t, 0), *t))
-					f->uidname = tar_header.uname;
-				if (*tar_header.gname && (strtoll(tar_header.gname, &t, 0), *t))
-					f->gidname = tar_header.gname;
-			}
-			goto found;
-		notar:
-			bunread(ap, tar_block, TAR_HEADER);
-			break;
-		case ASC:
-		case ASCHK:
-			if (bread(ap, state.tmp.buffer, (off_t)0, (off_t)ASC_HEADER, 0) <= 0) break;
-			state.tmp.buffer[ASC_HEADER] = 0;
-			if (state.tmp.buffer[0] == '0' && sfsscanf(state.tmp.buffer, "%6o%8lx%8lx%8lx%8lx%8lx%8lx%8I*x%8lx%8lx%8lx%8lx%8x%8lx",
-				&f->magic,
-				&lst.ino,
-				&lst.mode,
-				&lst.uid,
-				&lst.gid,
-				&lst.nlink,
-				&lst.mtime,
-				sizeof(lst.size), &lst.size,
-				&lst.dev_major,
-				&lst.dev_minor,
-				&lst.rdev_major,
-				&lst.rdev_minor,
-				&f->namesize,
-				&lst.checksum) == 14 && (f->magic == ASC_MAGIC || f->magic == ASCHK_MAGIC))
-			{
-				if (f->magic == ASCHK_MAGIC) ap->format = ASCHK;
-				f->checksum = lst.checksum;
-				f->st->st_dev = makedev(lst.dev_major, lst.dev_minor);
-				f->st->st_ino = lst.ino;
-				f->st->st_mode = lst.mode;
-				f->st->st_uid = lst.uid;
-				f->st->st_gid = lst.gid;
-				f->st->st_nlink = lst.nlink;
-				IDEVICE(f->st, makedev(lst.rdev_major, lst.rdev_minor));
-				f->st->st_mtime = lst.mtime;
-				f->st->st_size = lst.size;
-				goto cpio_common;
-			}
-			bunread(ap, state.tmp.buffer, ASC_HEADER);
-			break;
-		case AR:
-			if (!(ap->ardirent = ardirnext(ap->ardir)))
-			{
-				ardirclose(ap->ardir);
-				ap->ardir = 0;
-				m = lseek(ap->io->fd, (off_t)0, SEEK_END);
-				if (m < 0 || bseek(ap, m, SEEK_SET, 0) != m)
-					break;
-				return 0;
-			}
-			f->name = ap->ardirent->name;
-			f->st->st_dev = 0;
-			f->st->st_ino = 0;
-			f->st->st_mode = X_IFREG|(ap->ardirent->mode&X_IPERM);
-			f->st->st_uid = ap->ardirent->uid;
-			f->st->st_gid = ap->ardirent->gid;
-			f->st->st_nlink = 1;
-			IDEVICE(f->st, 0);
-			f->st->st_mtime = ap->ardirent->mtime;
-			f->st->st_size = ap->ardirent->size;
-			f->linktype = NOLINK;
-			f->linkpath = 0;
-			f->uidname = 0;
-			f->gidname = 0;
-			goto found;
-		case VDB:
-			if (!state.vdb.header.base)
-			{
-				if (fstat(ap->io->fd, &state.vdb.st)) break;
-				state.vdb.st.st_mode = modex(state.vdb.st.st_mode);
-				s = tar_block;
-				n = sizeof(VDB_MAGIC) + sizeof(state.id.volume) + 1;
-				if (bread(ap, s, (off_t)0, n, 0) <= 0) break;
-				bunread(ap, s, n);
-				if (s[0] != VDB_DELIMITER || !strneq(s + 1, VDB_MAGIC, sizeof(VDB_MAGIC) - 1) || s[sizeof(VDB_MAGIC)] != VDB_DELIMITER) break;
-				if (s[sizeof(VDB_MAGIC) + 1] != '\n')
-				{
-					s[n] = 0;
-					if (t = strchr(s, '\n')) *t = 0;
-					strncpy(state.id.volume, s + sizeof(VDB_MAGIC) + 1, sizeof(state.id.volume) - 2);
-				}
-				if (lseek(ap->io->fd, (off_t)(-(VDB_LENGTH + 1)), SEEK_END) <= 0) break;
-				if (read(ap->io->fd, s, VDB_LENGTH + 1) != (VDB_LENGTH + 1)) break;
-				state.vdb.variant = *s++ != '\n';
-				if (!strneq(s, VDB_DIRECTORY, sizeof(VDB_DIRECTORY) - 1)) break;
-				state.vdb.delimiter = s[VDB_OFFSET - 1];
-				n = strtol(s + VDB_OFFSET, NiL, 10) - sizeof(VDB_DIRECTORY);
-				i = lseek(ap->io->fd, (off_t)0, SEEK_CUR) - n - VDB_LENGTH - state.vdb.variant;
-				if (!(state.vdb.header.base = newof(0, char, i, 1))) break;
-				if (lseek(ap->io->fd, n, SEEK_SET) != n) break;
-				if (read(ap->io->fd, state.vdb.header.base, i) != i) break;
-				*(state.vdb.header.base + i) = 0;
-				if (!strneq(state.vdb.header.base, VDB_DIRECTORY, sizeof(VDB_DIRECTORY) - 1)) break;
-				if (!(state.vdb.header.next = strchr(state.vdb.header.base, '\n'))) break;
-				state.vdb.header.next++;
-			}
-			t = state.vdb.header.next;
-			if (!(state.vdb.header.next = strchr(t, '\n'))) goto vdb_eof;
-			*state.vdb.header.next++ = 0;
-			message((-1, "VDB: next=`%s'", t));
-			if (state.vdb.variant) state.vdb.delimiter = *t++;
-			f->name = t;
-			if (!(t = strchr(t, state.vdb.delimiter))) goto vdb_eof;
-			*t++ = 0;
-			n = strtol(t, &t, 10);
-			if (*t++ != state.vdb.delimiter) goto vdb_eof;
-			if (lseek(ap->io->fd, n, SEEK_SET) != n) goto vdb_eof;
-			*f->st = state.vdb.st;
-			f->st->st_size = strtol(t, &t, 10);
-			if (*t++ == state.vdb.delimiter) do
-			{
-				if (s = strchr(t, state.vdb.delimiter))
-					*s++ = 0;
-				if (strneq(t, VDB_DATE, sizeof(VDB_DATE) - 1))
-					f->st->st_mtime = strtol(t + sizeof(VDB_DATE), NiL, 10);
-				else if (strneq(t, VDB_MODE, sizeof(VDB_MODE) - 1))
-					f->st->st_mode = (strtol(t + sizeof(VDB_MODE), NiL, 8) & X_IPERM) | X_IFREG;
-			} while (t = s);
-			f->st->st_dev = 0;
-			f->st->st_ino = 0;
-			f->st->st_nlink = 1;
-			IDEVICE(f->st, 0);
-			f->linktype = NOLINK;
-			f->linkpath = 0;
-			f->uidname = 0;
-			f->gidname = 0;
-			bflushin(ap, 0);
-			goto found;
-		case RPM:
-		{
-			Rpm_magic_t	magic;
-			Rpm_magic_t	verify;
-			Rpm_lead_t	lead;
-			Rpm_lead_old_t	lead_old;
-			Rpm_head_t	head;
-
-			if (bread(ap, &magic, (off_t)0, (off_t)sizeof(magic), 0) <= 0)
-				break;
-			if (magic.magic == RPM_MAGIC)
-				ap->swap = 0;
-			else if (magic.magic == RPM_CIGAM)
-				ap->swap = 3;
-			else
-			{
-				bunread(ap, &magic, sizeof(magic));
-				break;
-			}
-			if (magic.major == 1)
-			{
-				if (bread(ap, &lead_old, (off_t)sizeof(lead_old), (off_t)sizeof(lead_old), 0) <= 0)
-					break;
-				if (ap->swap)
-					swapmem(ap->swap, &lead_old, &lead_old, sizeof(lead_old));
-				if (bseek(ap, (off_t)lead_old.archoff, SEEK_SET, 0) != (off_t)lead_old.archoff)
-					error(3, "%s: %s embedded archive seek error", ap->name, format[ap->compress].name);
-			}
-			else if (magic.major)
-			{
-				if (bread(ap, &lead, (off_t)sizeof(lead), (off_t)sizeof(lead), 0) <= 0)
-					break;
-				memcpy(state.id.volume, lead.name, sizeof(state.id.volume) - 1);
-				if (s = strrchr(ap->name, '/'))
-					s++;
-				else
-					s = ap->name;
-				if (!memcmp(s, state.id.volume, strlen(state.id.volume)))
-					state.id.volume[0] = 0;
-				if (ap->swap & 1)
-					swapmem(ap->swap & 1, &lead, &lead, sizeof(lead));
-				switch (lead.sigtype)
-				{
-				case 0:
-					num = 0;
-					break;
-				case 1:
-					num = 256;
-					break;
-				case 5:
-					if (bread(ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
-					{
-						error(2, "%s: %s format header magic expected at offset %ld", ap->name, format[ap->format].name, ap->io->offset + ap->io->count);
-						return 0;
-					}
-					if (ap->swap)
-						swapmem(ap->swap, &verify, &verify, sizeof(verify));
-					if (verify.magic != RPM_HEAD_MAGIC)
-					{
-						error(2, "%s: invalid %s format signature header magic", ap->name, format[ap->format].name);
-						return 0;
-					}
-					if (bread(ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
-					{
-						error(2, "%s: %s format signature header expected", ap->name, format[ap->format].name);
-						return 0;
-					}
-					if (ap->swap)
-						swapmem(ap->swap, &head, &head, sizeof(head));
-					num = head.entries * sizeof(Rpm_entry_t) + head.datalen;
-					num += (8 - (num % 8)) % 8;
-					break;
-				default:
-					error(2, "%s: %s format version %d.%d signature type %d not supported", ap->name, format[ap->format].name, magic.major, magic.minor, lead.sigtype);
-					return 0;
-				}
-				if (num && bread(ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
-				{
-					error(2, "%s: %s format header %ld byte data block expected", ap->name, format[ap->format].name, num);
-					return 0;
-				}
-				if (magic.major >= 3)
-				{
-					if (bread(ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
-					{
-						error(2, "%s: %s format header magic expected", ap->name, format[ap->format].name);
-						return 0;
-					}
-					if (ap->swap)
-						swapmem(ap->swap, &verify, &verify, sizeof(verify));
-					if (verify.magic != RPM_HEAD_MAGIC)
-					{
-						error(2, "%s: invalid %s format header magic", ap->name, format[ap->format].name);
-						return 0;
-					}
-				}
-				if (bread(ap, &head, (off_t)sizeof(head), (off_t)sizeof(head), 0) <= 0)
-				{
-					error(2, "%s: %s format header expected", ap->name, format[ap->format].name);
-					return 0;
-				}
-				if (ap->swap)
-					swapmem(ap->swap, &head, &head, sizeof(head));
-				num = head.entries * sizeof(Rpm_entry_t) + head.datalen;
-				if (num && bread(ap, NiL, (off_t)num, (off_t)num, 0) <= 0)
-				{
-					error(2, "%s: %s format header %ld byte entry+data block expected", ap->name, format[ap->format].name, num);
-					return 0;
-				}
-			}
-			else
-			{
-				error(2, "%s: %s format version %d.%d not supported", ap->name, format[ap->format].name, magic.major, magic.minor);
-				return 0;
-			}
-			ap->entry = 0;
-			ap->format = -1;
-			ap->swap = 0;
-			ap->swapio = 0;
-			ap->volume--;
-			i = state.id.volume[0];
-			if (!getprologue(ap))
-			{
-				error(2, "%s: %s format embedded archive expected", ap->name, format[RPM].name);
-				return 0;
-			}
-			state.id.volume[0] = i;
-			sfsprintf(ap->id.id, sizeof(ap->id.id), "%s %d.%d", format[RPM].name, magic.major, magic.minor);
-			ap->package = ap->id.id;
-			goto volume;
-		}
-		case ZIP:
-			num = ZIP_LOC_HEADER;
-			if (bread(ap, zip_header, (off_t)num, (off_t)num, 0) <= 0)
-			{
-			zip_done:
-				if (ap->entries == ap->verified)
-					return 0;
-				error(2, "%s: %d out of %d verification entries omitted", ap->name, ap->entries - ap->verified, ap->entries);
-				break;
-			}
-			n = swapget(0, zip_header, 4);
-			if (n == ZIP_CEN_MAGIC)
-			{
-				bunread(ap, zip_header, num);
-				if (bread(ap, zip_header, (off_t)ZIP_CEN_HEADER, (off_t)ZIP_CEN_HEADER, 0) <= 0)
-				{
-					error(2, "%s: invalid %s format verification header", ap->name, format[ap->format].name);
-					return 0;
-				}
-				n = swapget(3, &zip_header[ZIP_CEN_NAM], 2);
-				s = stash(&ap->path.zip, NiL, n);
-				if (bread(ap, s, n, n, 0) <= 0)
-				{
-					error(2, "%s: invalid %s format verification header name [size=%I*u]", ap->name, format[ap->format].name, sizeof(n), n);
-					return 0;
-				}
-				if (s[n - 1] == '/')
-					n--;
-				s[n] = 0;
-				if ((n = swapget(3, &zip_header[ZIP_CEN_EXT], 2)) && bread(ap, NiL, n, n, 0) <= 0)
-				{
-					error(2, "%s: %s: invalid %s format verification header extended data [size=%I*u]", ap->name, s, format[ap->format].name, sizeof(n), n);
-					return 0;
-				}
-				if ((n = swapget(3, &zip_header[ZIP_CEN_COM], 2)) && bread(ap, NiL, n, n, 0) <= 0)
-				{
-					error(2, "%s: %s: invalid %s format verification header comment data [size=%I*u]", ap->name, s, format[ap->format].name, sizeof(n), n);
-					return 0;
-				}
-				ap->verified++;
-				if (ap->tab)
-				{
-					if (!hashget(ap->tab, s))
-					{
-						error(1, "%s: %s: file data not found", ap->name, s);
-						goto again;
-					}
-					n = ((unsigned long)swapget(3, &zip_header[ZIP_CEN_ATX], 4) >> 16) & 0xffff;
-					switch ((int)X_ITYPE(n))
-					{
-					case 0:
-					case X_IFREG:
-						break;
-					case X_IFDIR:
-						break;
-					case X_IFLNK:
-						error(1, "%s: %s: symbolic link copied as regular file", ap->name, s);
-						break;
-					default:
-						error(1, "%s: %s: unknown file type %07o -- regular file assumed (0x%08x)", ap->name, s, X_ITYPE(n), n);
-						break;
-					}
-				}
-				goto again;
-			}
-			if (n == ZIP_END_MAGIC)
-			{
-				bunread(ap, zip_header, num);
-				if (bread(ap, zip_header, (off_t)ZIP_END_HEADER, (off_t)ZIP_END_HEADER, 0) <= 0)
-				{
-					error(2, "%s: invalid %s format trailer", ap->name, format[ap->format].name);
-					return 0;
-				}
-				n = swapget(3, &zip_header[ZIP_END_COM], 2);
-				if (bread(ap, NiL, n, n, 0) <= 0)
-				{
-					error(2, "%s: invalid %s format trailer data", ap->name, format[ap->format].name);
-					return 0;
-				}
-				goto zip_done;
-			}
-			if (n != ZIP_LOC_MAGIC)
-			{
-				bunread(ap, zip_header, num);
-				break;
-			}
-			n = swapget(3, &zip_header[ZIP_LOC_NAM], 2);
-			f->name = stash(&ap->path.zip, NiL, n);
-			if (bread(ap, f->name, n, n, 0) <= 0)
-				break;
-			num += n;
-			f->st->st_mode = (n > 0 && f->name[n - 1] == '/') ? (X_IFDIR|X_IRUSR|X_IWUSR|X_IXUSR|X_IRGRP|X_IXGRP|X_IROTH|X_IXOTH) : (X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
-			f->name[n] = 0;
-			if ((n = swapget(3, &zip_header[ZIP_LOC_EXT], 2)) > 0)
-			{
-				if (bread(ap, NiL, n, n, 0) <= 0)
-					break;
-				num += n;
-			}
-			f->st->st_dev = 0;
-			f->st->st_ino = 0;
-			f->st->st_uid = state.uid;
-			f->st->st_gid = state.gid;
-			f->st->st_nlink = 1;
-			IDEVICE(f->st, 0);
-			n = swapget(3, &zip_header[ZIP_LOC_TIM], 4);
-			memset(&tm, 0, sizeof(tm));
-			tm.tm_year = ((n>>25)&0377) + 80;
-			tm.tm_mon = ((n>>21)&017) - 1;
-			tm.tm_mday = ((n>>16)&037);
-			tm.tm_hour = ((n>>11)&037);
-			tm.tm_min = ((n>>5)&077);
-			tm.tm_sec = ((n<<1)&037);
-			f->st->st_mtime = tmtime(&tm, TM_LOCALZONE);
-			f->linktype = NOLINK;
-			f->linkpath = 0;
-			f->uidname = 0;
-			f->gidname = 0;
-			checkdelta = 0;
-			f->st->st_size = swapget(3, &zip_header[ZIP_LOC_SIZ], 4);
-			f->delta.size = swapget(3, &zip_header[ZIP_LOC_LEN], 4);
-			n = swapget(3, &zip_header[ZIP_LOC_FLG], 2);
-			if (n & 8)
-			{
-				n = bseek(ap, (off_t)0, SEEK_CUR, 0) - num;
-				s = state.tmp.buffer;
-				i = ZIP_EXT_HEADER;
-				if (!f->st->st_size)
-				{
-					i--;
-					for (;;)
-					{
-						while (bread(ap, s, 1, 1, 1) > 0 && *s != 0x50);
-						if (bread(ap, s + 1, i, i, 1) <= 0)
-							error(3, "%s: invalid %s local extension header", ap->name, format[ap->format].name);
-						if (swapget(0, s, 4) == ZIP_EXT_MAGIC)
-							break;
-						bunread(ap, s + 1, i);
-					}
-				}
-				else if (bread(ap, NiL, f->st->st_size, f->st->st_size, 1) <= 0 || bread(ap, s, i, i, 1) <= 0)
-					error(3, "%s: invalid %s local extension header", ap->name, format[ap->format].name);
-				num += ZIP_EXT_HEADER;
-				f->delta.size = swapget(3, &s[ZIP_EXT_LEN], 4);
-				f->st->st_size = swapget(3, &s[ZIP_EXT_SIZ], 4) + num;
-				if ((n = bseek(ap, -(off_t)f->st->st_size, SEEK_CUR, 0)) < 0)
-					error(3, "%s: %s local extension header seek error", ap->name, format[ap->format].name);
-				f->delta.op = f->delta.size ? DELTA_zip : DELTA_pass;
-			}
-			else if (!f->st->st_size || swapget(3, &zip_header[ZIP_LOC_HOW], 2) == ZIP_COPY)
-			{
-				f->delta.op = DELTA_pass;
-				f->delta.size = -1;
-			}
-			else
-			{
-				f->delta.op = DELTA_zip;
-				f->st->st_size += num;
-				bunread(ap, zip_header, num);
-			}
-			if (!ap->entries)
-			{
-				if (!ap->tab && !(ap->tab = hashalloc(NiL, HASH_set, HASH_ALLOCATE, HASH_name, "entries", 0)))
-					error(1, "%s: cannot allocate verification hash table", ap->name);
-				undoable(ap, &format[GZIP]);
-			}
-			goto found;
-		case CAB:
-		{
-			register Cab_t*	cab;
-
-			if (!(cab = (Cab_t*)ap->data))
-			{
-				Cabheader_t	hdr;
-				int		k;
-				int_2		i2;
-				Sfio_t*		tp;
-
-				if (bread(ap, &hdr, (off_t)sizeof(hdr), (off_t)sizeof(hdr), 0) <= 0)
-					break;
-				if (memcmp(hdr.magic, CAB_MAGIC, sizeof(hdr.magic)))
-				{
-					bunread(ap, &hdr, sizeof(hdr));
-					break;
-				}
-				swapmem(SWAPOP(3), &hdr.hdrsum, &hdr.hdrsum, (char*)&hdr.version - (char*)&hdr.hdrsum);
-				swapmem(SWAPOP(1), &hdr.version, &hdr.version, (char*)(&hdr + 1) - (char*)&hdr.version);
-				if (hdr.version != CAB_VERSION)
-					error(3, "%s: %s format version %04x not supported", ap->name, format[CAB].name, hdr.version);
-				if (hdr.fileoff < sizeof(hdr))
-				{
-				cab_error:
-					error(3, "%s: %s format version %04x header corrupted", ap->name, format[CAB].name, hdr.version);
-					break;
-				}
-				if (!(cab = newof(0, Cab_t, 1, hdr.chunks * sizeof(Cabchunk_t) + hdr.files * sizeof(Cabfile_t))))
-					nospace();
-				cab->chunk = (Cabchunk_t*)(cab + 1);
-				cab->file = (Cabfile_t*)(cab->chunk + hdr.chunks);
-				ap->data = (void*)cab;
-				cab->header = hdr;
-				if (hdr.flags & CAB_FLAG_RESERVE)
-				{
-					s = state.tmp.buffer;
-					if (bread(ap, s, 2, 2, 2) < 0)
-						goto cab_error;
-					swapmem(SWAPOP(1), s, &i2, sizeof(i2));
-					cab->reserved.header = i2;
-					if (bread(ap, s, 1, 1, 1) < 0)
-						goto cab_error;
-					cab->reserved.chunk = *(unsigned char*)s;
-					if (bread(ap, s, 1, 1, 1) < 0)
-						goto cab_error;
-					cab->reserved.block = *(unsigned char*)s;
-					if (cab->reserved.header)
-						bread(ap, NiL, (off_t)cab->reserved.header, cab->reserved.header, 0);
-					message((-1, "cab reserved.header=%u reserved.chunk=%u reserved.block=%u", cab->reserved.header, cab->reserved.chunk, cab->reserved.block));
-				}
-				if (hdr.flags & CAB_FLAG_HASPREV)
-				{
-					s = state.tmp.buffer;
-					while (bread(ap, s, 1, 1, 1) > 0 && *s++);
-					*s = 0;
-					if (!(cab->optional.prev.name = strdup(state.tmp.buffer)))
-						nospace();
-					for (s = state.tmp.buffer; bread(ap, s, 1, 1, 1) > 0 && *s; s++)
-						if (*s == '\\')
-							*s = '/';
-					*s = 0;
-					if (!(cab->optional.prev.disk = strdup(state.tmp.buffer)))
-						nospace();
-					message((-1, "cab prev name=%s disk=%s", cab->optional.prev.name, cab->optional.prev.disk));
-				}
-				if (hdr.flags & CAB_FLAG_HASNEXT)
-				{
-					s = state.tmp.buffer;
-					while (bread(ap, s, 1, 1, 1) > 0 && *s++);
-					*s = 0;
-					if (!(cab->optional.next.name = strdup(state.tmp.buffer)))
-						nospace();
-					for (s = state.tmp.buffer; bread(ap, s, 1, 1, 1) > 0 && *s; s++)
-						if (*s == '\\')
-							*s = '/';
-					*s = 0;
-					if (!(cab->optional.next.disk = strdup(state.tmp.buffer)))
-						nospace();
-					message((-1, "cab next name=%s disk=%s", cab->optional.next.name, cab->optional.next.disk));
-				}
-				if (bread(ap, cab->chunk, (off_t)(hdr.chunks * sizeof(Cabchunk_t)), (off_t)(hdr.chunks * sizeof(Cabchunk_t)), 0) <= 0)
-					return 0;
-				message((-1, "cab %s header info:\n\thdrsum=%u\n\tsize=%u\n\tchunksum=%u\n\tfileoff=%u\n\tdatasum=%u\n\tversion=%04x\n\tchunks=%u\n\tfiles=%u\n\tflags=%06o\n\tid=%u\n\tnumber=%u", ap->name, hdr.hdrsum, hdr.size, hdr.chunksum, hdr.fileoff, hdr.datasum, hdr.version, hdr.chunks, hdr.files, hdr.flags, hdr.id, hdr.number));
-				if (!(tp = sfstropen()))
-					nospace();
-				k = 1 << CAB_TYPE_NONE;
-				for (i = 0; i < hdr.chunks; i++)
-				{
-					swapmem(SWAPOP(3), &cab->chunk[i].offset, &cab->chunk[i].offset, sizeof(cab->chunk[i].offset));
-					swapmem(SWAPOP(1), &cab->chunk[i].blocks, &cab->chunk[i].blocks, sizeof(cab->chunk[i].blocks));
-					swapmem(SWAPOP(1), &cab->chunk[i].compress, &cab->chunk[i].compress, sizeof(cab->chunk[i].compress));
-					if (!(k & (1 << (i2 = CAB_TYPE(cab->chunk[i].compress)))))
-					{
-						k |= (1 << i2);
-						if (sfstrtell(tp))
-							sfputc(tp, ' ');
-						switch (i2)
-						{
-						case CAB_TYPE_MSZIP:
-							sfputr(tp, "mszip", -1);
-							break;
-						case CAB_TYPE_QUANTUM:
-							sfputr(tp, "quantum", -1);
-							break;
-						case CAB_TYPE_LZX:
-							sfputr(tp, "lzx", -1);
-							break;
-						default:
-							sfprintf(tp, "COMPRESS=%d", i2);
-							break;
-						}
-						if (i2 = CAB_TYPE_LEVEL(cab->chunk[i].compress))
-							sfprintf(tp, "-%d", i2);
-						if (i2 = CAB_TYPE_WINDOW(cab->chunk[i].compress))
-							sfprintf(tp, ":%d", i2);
-					}
-					message((-1, "cab chunk %02d offset=%011u blocks=%02u compress=<%d,%d,%d>", i, cab->chunk[i].offset, cab->chunk[i].blocks, CAB_TYPE(cab->chunk[i].compress), CAB_TYPE_LEVEL(cab->chunk[i].compress), CAB_TYPE_WINDOW(cab->chunk[i].compress)));
-				}
-				s = sfstruse(tp);
-				if (*s && !(cab->format = strdup(s)))
-					nospace();
-				sfstrclose(tp);
-				for (i = 0; i < hdr.files; i++)
-				{
-					if (bread(ap, &cab->file[i], (off_t)sizeof(Cabentry_t), (off_t)sizeof(Cabentry_t), 1) <= 0)
-						goto cab_error;
-					swapmem(SWAPOP(3), &cab->file[i].entry.size, &cab->file[i].entry.size, (char*)&cab->file[i].entry.chunk - (char*)&cab->file[i].entry.size);
-					swapmem(SWAPOP(1), &cab->file[i].entry.chunk, &cab->file[i].entry.chunk, (char*)(&cab->file[i].entry + 1) - (char*)&cab->file[i].entry.chunk);
-					for (s = state.tmp.buffer; bread(ap, s, 1, 1, 1) > 0 && *s; s++)
-						if (*s == '\\')
-							*s = '/';
-					if (!(cab->file[i].name = strdup(state.tmp.buffer)))
-						nospace();
-					num = (cab->file[i].entry.date << 16) | cab->file[i].entry.time;
-					memset(&tm, 0, sizeof(tm));
-					tm.tm_year = ((num>>25)&0377) + 80;
-					tm.tm_mon = ((num>>21)&017) - 1;
-					tm.tm_mday = ((num>>16)&037);
-					tm.tm_hour = ((num>>11)&037);
-					tm.tm_min = ((num>>5)&077);
-					tm.tm_sec = ((num<<1)&037);
-					cab->file[i].date = tmtime(&tm, TM_LOCALZONE);
-					switch (cab->file[i].entry.chunk)
-					{
-					case CAB_FILE_CONT:
-					case CAB_FILE_BOTH:
-						cab->file[i].entry.chunk = 0;
-						cab->file[i].append = 1;
-						break;
-					case CAB_FILE_SPAN:
-						cab->file[i].entry.chunk = cab->header.chunks - 1;
-						break;
-					}
-					message((-1, "cab [%04d] size=%08u chunk=%02d offset=%08u %s %s%s", i, cab->file[i].entry.size, cab->file[i].entry.chunk, cab->file[i].entry.offset, fmttime("%l", cab->file[i].date), cab->file[i].name, cab->file[i].append ? " APPEND" : ""));
-				}
-				checkdelta = 0;
-			}
-			if ((i = cab->index++) >= cab->header.files)
-				return 0;
-			f->linkpath = 0;
-			f->name = cab->file[i].name;
-			f->st->st_dev = 0;
-			f->st->st_ino = 0;
-			f->st->st_mode = X_IFREG|X_IRUSR|X_IRGRP|X_IROTH;
-			if (!(cab->file[i].entry.attr & CAB_ATTR_READONLY))
-				f->st->st_mode |= X_IWUSR;
-			if ((cab->file[i].entry.attr & CAB_ATTR_EXECUTE) || strmatch(cab->file[i].name, "*.([Cc][Oo][Mm]|[Bb][Aa][Tt]|[Ee][Xx][Ee]|[BbCcKk][Ss][Hh]|[Pp][Ll]|[Ss][Hh])"))
-				f->st->st_mode |= X_IXUSR|X_IXGRP|X_IXOTH;
-			f->st->st_uid = state.uid;
-			f->st->st_gid = state.gid;
-			f->st->st_nlink = 1;
-			IDEVICE(f->st, 0);
-			f->st->st_mtime = f->st->st_ctime = f->st->st_atime = cab->file[i].date;
-			f->st->st_size = cab->file[i].entry.size;
-			goto found;
-		}
-		case MIME:
-			if (state.mime.fill)
-			{
-				bread(ap, NiL, (off_t)0, (off_t)state.mime.fill, 0);
-				state.mime.fill = 0;
-			}
-			if (!state.mime.magic)
-			{
-				s = tar_block;
-				if (bread(ap, s, (off_t)0, (off_t)TAR_HEADER, 0) <= 0)
-					break;
-				bunread(ap, s, TAR_HEADER);
-				if (s[0] != '-' || s[1] != '-' || !(t = (char*)memchr(s, '\n', TAR_HEADER - 2)) || (t - s + 8) >= TAR_HEADER || strncasecmp(t + 1, "Content", 7))
-					break;
-				n = t - s + 1;
-				if (t > s && *(t - 1) == '\r')
-					t--;
-				state.mime.length = t - s;
-				if (!(state.mime.magic = newof(0, char, state.mime.length, 1)))
-					nospace();
-				memcpy(state.mime.magic, s, state.mime.length);
-				message((-1, "mime magic `%s'", state.mime.magic));
-				bread(ap, NiL, (off_t)0, n, 0);
-			}
-			else if (bread(ap, s = state.tmp.buffer, state.mime.length + 2, state.mime.length + 2, 1) <= 0 || memcmp(s, state.mime.magic, state.mime.length))
-				error(3, "%s: corrupt %s format member header -- separator not found", ap->name, format[MIME].name);
-			else if (*(s += state.mime.length) == '-' && *(s + 1) == '-')
-			{
-				while (bread(ap, s, 1, 1, 1) > 0 && *s != '\n');
-				return 0;
-			}
-			else if (*s == '\n')
-				bunread(ap, s + 1, 1);
-			else if (*s != '\r' && *(s + 1) != '\n')
-				error(3, "%s: corrupt %s format member header -- separator line not found", ap->name, format[MIME].name);
 			f->name = 0;
-			for (;;)
+			f->record.format = 0;
+			f->skip = 0;
+			if ((*ap->format->getheader)(&state, ap, f) <= 0)
 			{
-				for (t = (s = state.tmp.buffer) + state.buffersize - 1; s < t; s++)
-					if (bread(ap, s, 1, 1, 1) <= 0)
-						error(3, "%s: unexpected %s format EOF", ap->name, format[MIME].name);
-					else if (*s == '\n')
-					{
-						if (s > state.tmp.buffer && *(s - 1) == '\r')
-							s--;
-						*s = 0;
-						break;
-					}
-				s = state.tmp.buffer;
-				if (!*s)
-					break;
-				if (strncasecmp(s, "content-", 8))
-					error(3, "%s: corrupt %s format member header", ap->name, format[MIME].name);
-				if (t = strchr(s, ':'))
-					s = t + 1;
-				while (isspace(*s))
-					s++;
-				for (;;)
-				{
-					for (t = s; *s && *s != ';' && *s != '='; s++);
-					if (!(n = s - t))
-						break;
-					if (*s == '=')
-					{
-						if (*++s == '"')
-							for (v = ++s; *s && *s != '"'; s++);
-						else
-							for (v = s; *s && *s != ';'; s++);
-					}
-					else
-						v = s;
-					m = s - v;
-					if (*s)
-						*s++ = 0;
-					for (; *s == ';' || isspace(*s); s++);
-					if (!f->name && n == 4 && !strncasecmp(t, "name", 4) || n == 8 && !strncasecmp(t, "filename", 8))
-					{
-						f->name = stash(&ap->path.head, v, m);
-						undos(f);
-					}
-				}
-			}
-			if (!f->name)
-			{
-				if (s = strrchr(ap->name, '/'))
-					s++;
-				else
-					s = ap->name;
-				f->name = stash(&ap->path.head, s, strlen(s) + 16);
-				sfsprintf(f->name, ap->path.head.size, "%s-%d", s, ap->entries + 1);
-			}
-			if (!ap->io->seekable)
-				seekable(ap);
-			bsave(ap);
-			f->st->st_size = 0;
-			loop = 0;
-			while (s = bget(ap, -1, &m))
-			{
-				if (m < state.mime.length)
-				{
-					if (loop++)
-						error(3, "%s: corrupt %s format member header [too short]", ap->name, format[MIME].name);
-					bseek(ap, -m, SEEK_CUR, 0);
-					bflushin(ap, 0);
-					continue;
-				}
-				v = s;
-				for (t = s + m - state.mime.length; s = memchr(s, '-', t - s); s++)
-					if (!memcmp(s, state.mime.magic, state.mime.length))
-					{
-						brestore(ap);
-						if (s > v && *(s - 1) == '\n')
-						{
-							state.mime.fill++;
-							if (s > (v + 1) && *(s - 2) == '\r')
-								state.mime.fill++;
-						}
-						f->st->st_size += (s - v) - state.mime.fill;
-						f->st->st_mtime = NOW;
-						f->st->st_mode = X_IFREG|X_IRUSR|X_IRGRP|X_IROTH;
-						f->st->st_uid = state.uid;
-						f->st->st_gid = state.gid;
-						f->st->st_dev = 0;
-						f->st->st_ino = 0;
-						f->st->st_nlink = 1;
-						IDEVICE(f->st, 0);
-						f->linktype = NOLINK;
-						f->linkpath = 0;
-						f->uidname = 0;
-						f->gidname = 0;
-						goto found;
-					}
-				bseek(ap, -(off_t)state.mime.length, SEEK_CUR, 0);
-				bflushin(ap, 0);
-				f->st->st_size += m;
-			}
-			break;
-		case TNEF:
-		{
-			Tnef_t*			tnef;
-			char*			s;
-			char*			e;
-			unsigned char*		x;
-			size_t			n;
-			size_t			m;
-			size_t			z;
-			unsigned _ast_int4_t	magic;
-			unsigned int		level;
-			unsigned int		type;
-			unsigned int		name;
-			unsigned int		checksum;
-			size_t			size;
-			size_t			part;
-			Tm_t			tm;
-
-			if (ap->entry == 1)
-			{
-				if (bread(ap, tar_block, (off_t)0, (off_t)6, 0) <= 0)
-					break;
-				magic = TNEF_MAGIC;
-				if ((ap->swap = swapop(&magic, tar_block, 4)) < 0)
-				{
-					bunread(ap, tar_block, 6);
-					break;
-				}
-			}
-			if (!(tnef = (Tnef_t*)ap->data))
-			{
-				if (!(tnef = newof(0, Tnef_t, 1, 0)))
-					nospace();
-				ap->data = (void*)tnef;
-			}
-			*(f->name = stash(&ap->path.head, NiL, PATH_MAX)) = 0;
-			f->st->st_dev = 0;
-			f->st->st_ino = 0;
-			f->st->st_mode = X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH;
-			f->st->st_uid = state.uid;
-			f->st->st_gid = state.gid;
-			f->st->st_nlink = 1;
-			IDEVICE(f->st, 0);
-			f->st->st_mtime = f->st->st_ctime = f->st->st_atime = NOW;
-			f->st->st_size = 0;
-			while (bread(ap, s = tar_block, (off_t)0, (off_t)9, 0) > 0)
-			{
-				level = swapget(ap->swap, s + 0, 1);
-				n = swapget(ap->swap, s + 1, 4);
-				type = n >> 16;
-				name = n & ((1<<16)-1);
-				n = 0;
-				size = swapget(ap->swap, s + 5, 4);
-				part = ap->io->buffersize;
-				if (size > part)
-				{
-					if (level == 2)
-					{
-						level = 0;
-						if (name == 0x800f)
-						{
-							f->st->st_size = size;
-							tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0);
-						}
-						else
-							error(1, "%s: %s format 0x%04x attribute ignored", ap->name, format[ap->format].name, name);
-					}
-					while (size > part)
-					{
-						size -= part;
-						if (!(s = bget(ap, part, NiL)))
-							error(3, "%s: %s format 0x%04x attribute data truncated -- %d expected", ap->name, format[ap->format].name, name, part);
-						x = (unsigned char*)s;
-						e = s + part;
-						while (x < (unsigned char*)e)
-							n += *x++;
-					}
-				}
-				if (!(s = bget(ap, size + 2, NiL)))
-					error(3, "%s: %s format 0x%04x attribute data truncated -- %d expected", ap->name, format[ap->format].name, name, size);
-				checksum = swapget(ap->swap, s + size, 2);
-				x = (unsigned char*)s;
-				e = s + size;
-				while (x < (unsigned char*)e)
-					n += *x++;
-				n &= ((1<<16)-1);
-				if (checksum != n)
-					error(3, "%s: %s format attribute data checksum error", ap->name, format[ap->format].name);
-message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name, ap->entry, level, name, size));
-				if (level == 2) switch (name)
-				{
-				case 0x800f: /* data */
-					f->st->st_size = size;
-					tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0) - size - 2;
-					break;
-				case 0x8010: /* title */
-					if (!f->name)
-						f->name = stash(&ap->path.head, s, size);
-					break;
-				case 0x8013: /* date */
-					if (type == 0x0003 && size >= 12)
-					{
-						tm.tm_year = swapget(ap->swap, s +  0, 2) - 1900;
-						tm.tm_mon  = swapget(ap->swap, s +  2, 2) - 1;
-						tm.tm_mday = swapget(ap->swap, s +  4, 2);
-						tm.tm_hour = swapget(ap->swap, s +  6, 2);
-						tm.tm_min  = swapget(ap->swap, s +  8, 2);
-						tm.tm_sec  = swapget(ap->swap, s + 10, 2);
-						f->st->st_mtime = tmtime(&tm, TM_LOCALZONE);
-					}
-					break;
-				case 0x9005: /* attachment */
-					if (size >= 4)
-					{
-						e = s + size - 4;
-						n = swapget(ap->swap, s, 4); s += 4;
-						while (n-- && s < e)
-						{
-							type = swapget(ap->swap, s, 2); s += 2;
-							name = swapget(ap->swap, s, 2); s += 2;
-							switch (type)
-							{
-							case 0x0002:
-							case 0x000b:
-								s += 2;
-								break;
-							case 0x0003:
-							case 0x0004:
-							case 0x0007:
-							case 0x000a:
-							case 0x000d:
-							case 0x0048:
-								s += 4;
-								break;
-							case 0x0005:
-							case 0x0006:
-							case 0x0014:
-							case 0x0040:
-								s += 8;
-								break;
-							case 0x001e:
-							case 0x001f:
-							case 0x0102:
-								m = swapget(ap->swap, s, 4); s += 4;
-								while (m--)
-								{
-									z = swapget(ap->swap, s, 4); s += 4;
-									z = roundof(z, 4);
-									if (name == 0x3707)
-										f->name = stash(&ap->path.head, s, z);
-									s += z;
-								}
-								break;
-							}
-						}
-					}
-					undos(f);
-					n = tnef->offset;
-					tnef->offset = bseek(ap, (off_t)0, SEEK_CUR, 0);
-					if (bseek(ap, n, SEEK_SET, 1) != n)
-						error(3, "%s: %s input must be seekable", ap->name, format[ap->format].name);
-					goto found;
-				}
-			}
-			if (ap->io->eof && ap->entry == 1)
-			{
-				error(1, "%s: no members in %s file", ap->name, format[ap->format].name);
+				ap->entry--;
 				return 0;
 			}
-			break;
 		}
-		vdb_eof:
-			bflushin(ap, 0);
-			ap->io->eof = 1;
-			ap->io->offset = 0;
-			ap->io->count = lseek(ap->io->fd, (off_t)0, SEEK_END);
-			return 0;
-		default:
-			error(PANIC, "%s: incomplete input format implementation", format[ap->format].name);
-			break;
-		}
-		if (ap->entry == 1)
-		{
-			if (ap->expected >= 0)
-			{
-				if (!state.keepgoing)
-					error(3, "%s: unknown input format -- %s expected", ap->name, format[ap->expected].name);
-				goto skip;
-			}
-			for (;;) switch (ap->format)
-			{
-			case BINARY:
-				ap->format = USTAR;
-				goto again;
-			case CPIO:
-				ap->format = BINARY;
-				ap->swap = 0;
-				if (bread(ap, &binary_header.magic, (off_t)0, (off_t)sizeof(binary_header.magic), 0) <= 0) break;
-				bunread(ap, &binary_header.magic, sizeof(binary_header.magic));
-				if (binary_header.magic == CPIO_MAGIC) goto again;
-				ap->swap++;
-				magic = binary_header.magic;
-				swapmem(ap->swap, &magic, &magic, sizeof(magic));
-				message((-1, "binary_header.magic=0%05o swap(BYTE)=0%05o", (unsigned short)binary_header.magic, (unsigned short)magic));
-				if (magic == CPIO_MAGIC)
-				{
-					message((-1, "swapping %s header bytes", format[ap->format].name));
-					goto again;
-				}
-				break;
-			case PAX:
-			case TAR:
-			case USTAR:
-				ap->format = ASC;
-				goto again;
-			case ASC:
-			case ASCHK:
-				ap->format = VDB;
-				goto again;
-			case VDB:
-				ap->format = RPM;
-				goto again;
-			case RPM:
-				ap->format = ZIP;
-				goto again;
-			case ZIP:
-				ap->format = CAB;
-				goto again;
-			case CAB:
-				ap->format = MIME;
-				goto again;
-			case MIME:
-				ap->format = TNEF;
-				goto again;
-			case TNEF:
-				if (ap->entries > 0 && ap->volume > 1)
-				{
-					if (--ap->volume > 1)
-						error(1, "junk data after volume %d", ap->volume);
-					finish(0);
-				}
-				if (!state.keepgoing)
-					error(3, "%s: unknown input format", ap->name);
-				ap->format = IN_DEFAULT;
-				ap->swapio = 0;
-				goto skip;
-			}
-		}
-	skip:
-		if (ap->io->eof) return 0;
-		i = 3;
-		if (state.keepgoing && bread(ap, &one, (off_t)0, (off_t)1, 0) > 0)
-		{
-			if (warned) continue;
-			warned = 1;
-			i = 1;
-		}
-		error(i, "%s: entry %d.%d is out of phase", ap->name, ap->volume, ap->entry);
-		if (ap->entry > 1) ap->entry++;
-	}
- found:
-	if (!f->name)
-		error(3, "%s: %s format entry %d.%d name not set", ap->name, format[ap->format].name, ap->volume, ap->entry);
-	if (checkdelta || ap->delta)
-	{
-		if (!f->st->st_size && !f->st->st_dev && !f->st->st_ino && !(f->st->st_mode & (X_IRWXU|X_IRWXG|X_IRWXO)) && strmatch(f->name, INFO_MATCH))
-		{
-			s = f->name;
-			if (checkdelta)
-			{
-				Archive_t*	bp;
-
-				checkdelta = 0;
-				ordered = 0;
-				i = 0;
-				n = 0;
-				if (*s++ == INFO_SEP)
-				{
-					if (strneq(s, ID, IDLEN) && (s = strchr(s, INFO_SEP)))
-					{
-					deltaverify:
-						ordered = 0;
-						switch (*++s)
-						{
-						case TYPE_COMPRESS:
-							n = COMPRESS;
-							break;
-						case TYPE_DELTA:
-							n = DELTA;
-							break;
-						default:
-							error(3, "type %c encoding not supported", *s);
-						}
-						if (*++s == INFO_SEP)
-						{
-							if (t = strchr(++s, INFO_SEP)) *t++ = 0;
-							for (i = DELTA; format[i].algorithm; i++)
-								if (streq(s, format[i].algorithm))
-									break;
-							if (!format[i].algorithm)
-								error(3, "delta version %s not supported", s);
-
-							/*
-							 * [<INFO_SEP>[<OP>]<VAL>]* may appear here
-							 */
-
-							while ((s = t) && *s != INFO_SEP)
-							{
-								if (t = strchr(s, INFO_SEP)) *t++ = 0;
-								switch (*s++)
-								{
-								case INFO_ORDERED:
-									ordered = 1;
-									break;
-								}
-							}
-						}
-					}
-					else
-					{
-						if (s = strchr(f->name + 3, INFO_SEP)) *s = 0;
-						error(1, "unknown %s header ignored", f->name + 3);
-						goto again;
-					}
-				}
-				else if (streq(f->name, "DELTA!!!"))
-				{
-					n = DELTA;
-					i = DELTA_88;
-				}
-				if (n)
-				{
-					if (n == DELTA && ap->parent)
-						error(3, "%s: %s: base archive cannot be a delta", ap->parent->name, ap->name);
-					initdelta(ap);
-					ap->delta->format = n;
-					ap->delta->version = i;
-					if (bp = ap->delta->base)
-					{
-						if (i == DELTA_88)
-							bp->checksum = bp->old.checksum;
-						message((-5, "checkdelta: %s size=%ld:%ld LO=%d:%d HI=%d:%d", format[ap->delta->version].name, f->st->st_mtime, bp->size, DELTA_LO(f->st->st_uid), DELTA_LO(bp->checksum), DELTA_LO(f->st->st_gid), DELTA_HI(bp->checksum)));
-						if (n == DELTA)
-						{
-							if (!ordered)
-							{
-								if (state.ordered)
-									error(3, "%s: delta archive not ordered", ap->name);
-								if (f->st->st_mtime != bp->size)
-									error(3, "%s: %s: base archive size mismatch", ap->name, bp->name);
-							}
-							if (DELTA_LO(f->st->st_uid) != DELTA_LO(bp->checksum) || DELTA_LO(f->st->st_gid) != DELTA_HI(bp->checksum))
-								error(1, "%s: %s: base archive checksum mismatch", ap->name, bp->name);
-						}
-					}
-					else if (n == DELTA)
-					{
-						error(state.list ? 1 : 3, "%s: base archive must be specified", ap->name);
-						deltabase(ap);
-						ap->delta->format = COMPRESS;
-					}
-					if (ap->sum <= 0)
-						ap->sum++;
-					goto again;
-				}
-				else error(1, "%s: %s: unknown control header treated as regular file", ap->name, f->name);
-			}
-			else if (*s++ == INFO_SEP && strneq(s, ID, IDLEN) && *(s + IDLEN) == INFO_SEP)
-			{
-				getdeltaheader(ap, f);
-				setinfo(ap, f);
-				goto again;
-			}
-		}
-		if (checkdelta && ap->delta)
-			ap->delta->format = DELTA_PATCH;
-	}
+		if (!f->name)
+			error(3, "%s: %s format entry %d.%d name not set", ap->name, ap->type, ap->volume, ap->entry);
+	} while ((ap->checkdelta || ap->delta) && deltacheck(ap, f));
 	ap->entries++;
 	getkeysize(ap, f, OPT_size, &f->st->st_size);
 	getkeytime(ap, f, OPT_atime);
@@ -2532,23 +630,22 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 	getkeyname(ap, f, OPT_uname, &f->uidname, &f->st->st_uid, state.uid);
 	if (!state.list)
 		setidnames(f);
-	if (f->name != ap->path.head.string)
-		f->name = stash(&ap->path.head, f->name, 0);
+	if (f->name != ap->stash.head.string)
+		f->name = stash(&ap->stash.head, f->name, 0);
+	if (ap->flags & DOS)
+		undos(f);
+	f->type = X_ITYPE(f->st->st_mode);
 	s = pathcanon(f->name, 0);
-	if (s > f->name + 1 && *(s - 1) == '/')
-		s--;
-	if ((f->type = X_ITYPE(f->st->st_mode)) == X_IFREG && *s == '/')
-		switch (ap->format)
+	if (s > f->name + 1 && *--s == '/')
+	{
+		*s = 0;
+		if ((ap->format->flags & SLASHDIR) && f->type == X_IFREG)
 		{
-		case PAX:
-		case TAR:
-		case USTAR:
 			f->st->st_mode &= ~X_IFREG;
 			f->st->st_mode |= (f->type = X_IFDIR);
 			f->datasize = f->st->st_size;
-			break;
 		}
-	*s = 0;
+	}
 	f->path = stash(&ap->path.name, f->name, 0);
 	f->name = map(f->name);
 	f->namesize = strlen(f->name) + 1;
@@ -2559,7 +656,8 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 			f->linkpath = map(f->linkpath);
 		f->linkpathsize = strlen(f->linkpath) + 1;
 	}
-	else f->linkpathsize = 0;
+	else
+		f->linkpathsize = 0;
 	f->perm = modei(f->st->st_mode);
 	f->ro = ropath(f->name);
 	getdeltaheader(ap, f);
@@ -2567,835 +665,83 @@ message((-1, "%s: entry=%d level=%d attr=%04x size=%d", format[ap->format].name,
 	if (error_info.trace)
 	{
 		s = &state.tmp.buffer[0];
-		if (f->record.format) sfsprintf(s, state.tmp.buffersize, " [%c,%d,%d]", f->record.format, state.blocksize, state.record.size);
-		else *s = 0;
-		message((-1, "archive=%s path=%s name=%s entry=%d.%d size=%I*u delta=%c%s", ap->name, f->path, f->name, ap->volume, ap->entry, sizeof(f->st->st_size), (Sfulong_t)f->st->st_size, f->delta.op ? f->delta.op : DELTA_nop, s));
+		if (f->record.format)
+			sfsprintf(s, state.tmp.buffersize, " [%c,%d,%d]", f->record.format, state.blocksize, state.record.size);
+		else
+			*s = 0;
+		message((-1, "archive=%s path=%s name=%s entry=%d.%d size=%I*u uncompressed=%I*u delta=%c%s", ap->name, f->path, f->name, ap->volume, ap->entry, sizeof(f->st->st_size), f->st->st_size, sizeof(f->uncompressed), f->uncompressed, f->delta.op ? f->delta.op : DELTA_nop, s));
 	}
 #endif
-	if (ap->entry == 1)
+	if (ap->sum > 0)
 	{
-		/*
-		 * some tar implementations write garbage after
-		 * the 2 null blocks that sometimes contain
-		 * valid headers that were previously output
-		 * but are still in the output buffer
-		 */
-
-		if (ap->tar.last && ap->volume > 1)
-			for (i = 0; i < ap->tar.lastsize; i++)
-				if (!memcmp((char*)(ap->tar.last + i), (char*)&tar_header, sizeof(tar_header)))
-				{
-					if (--ap->volume == 1)
-						error(1, "junk data after volume %d", ap->volume);
-					return 0;
-				}
-		if (ap->parent)
-		{
-			if (ap->io->blocked)
-				error(3, "%s: blocked base archives are not supported", ap->delta->base);
-			switch (ap->format)
-			{
-			case ALAR:
-			case IBMAR:
-#if SAVESET
-			case SAVESET:
-#endif
-				error(3, "%s: %s format base archives not supported", ap->delta->base, format[ap->format].name);
-			}
-		}
-		if (state.summary && state.verbose)
-		{
-			if (ap->io->blok)
-				sfprintf(sfstderr, "BLOK ");
-			if (ap->parent)
-				sfprintf(sfstderr, "%s base %s", ap->parent->name, ap->name);
-			else
-				sfprintf(sfstderr, "%s volume %d", ap->name, ap->volume);
-			if (state.id.volume[0])
-				sfprintf(sfstderr, " label %s", state.id.volume);
-			sfprintf(sfstderr, " in");
-			if (ap->data && (s = *(char**)ap->data))
-				sfprintf(sfstderr, " %s", s);
-			if (ap->package)
-				sfprintf(sfstderr, " %s", ap->package);
-			if (ap->compress)
-				sfprintf(sfstderr, " %s", format[ap->compress].name);
-			if (ap->delta && ap->delta->version)
-				sfprintf(sfstderr, " %s", format[ap->delta->version].name);
-			sfprintf(sfstderr, " %s format", format[ap->format].name);
-			if (ap->swapio)
-				sfprintf(sfstderr, " %s swapped", "unix\0nuxi\0ixun\0xinu" + 5 * ap->swapio);
-			if (error_info.trace)
-			{
-				if (*ap->id.format)
-					sfprintf(sfstderr, " %s", ap->id.format);
-				if (*ap->id.implementation)
-					sfprintf(sfstderr, " implementation %s", ap->id.implementation);
-			}
-			sfprintf(sfstderr, "\n");
-		}
+		if (ap->format->flags & SUM)
+			ap->memsum = FNV_INIT;
+		else if (!ap->delta || !ap->delta->trailer)
+			ap->memsum = 0;
+		ap->old.memsum = 0;
 	}
-	if (ap->format == PAX || ap->format == TAR || ap->format == USTAR)
-	{
-		if (!ap->tar.last)
-		{
-			ap->tar.lastsize = 16;
-			if (!(ap->tar.last = newof(0, Tar_t, ap->tar.lastsize, 0)))
-				nospace();
-		}
-		if (++ap->tar.lastindex >= ap->tar.lastsize)
-			ap->tar.lastindex = 0;
-		ap->tar.last[ap->tar.lastindex] = tar_header;
-	}
-	if (!ap->delta || !ap->delta->trailer)
-		ap->memsum = 0;
-	ap->old.memsum = 0;
 	ap->section = SECTION_DATA;
 	ap->convert[ap->section].on = ap->convert[ap->section].f2t != 0;
 	return 1;
 }
 
 /*
- * output extended header keyword assignment
- */
-
-static void
-putkey(Sfio_t* sp, Sfio_t* tp, Option_t* op, const char* value)
-{
-	register const char*	s;
-	register int		c;
-	register int		n;
-
-	sfputc(tp, ' ');
-	if (op->flags & OPT_VENDOR)
-		sfprintf(tp, "%s.", VENDOR);
-	sfprintf(tp, "%s=", op->name);
-	n = 0;
-	s = value;
-	for (;;)
-	{
-		switch (*s++)
-		{
-		case 0:
-			break;
-		case '"':
-			n |= 04;
-			continue;
-		case '\'':
-			n |= 02;
-			continue;
-		case '\\':
-		case ' ':
-		case '\t':
-		case '\n':
-			n |= 01;
-			continue;
-		default:
-			continue;
-		}
-		break;
-	}
-	s = value;
-	if (n)
-	{
-		n = (n & 06) == 04 ? '\'' : '"';
-		sfputc(tp, n);
-		while (c = *s++)
-		{
-			if (c == n || c == '\\')
-				sfputc(tp, '\\');
-			sfputc(tp, c);
-		}
-		sfputc(tp, n);
-		sfputc(tp, '\n');
-	}
-	else sfputr(tp, s, '\n');
-	n = sfstrtell(tp) + 1;
-	if (n >= 10000)
-		n += 4;
-	else if (n >= 1000)
-		n += 3;
-	else if (n >= 100)
-		n += 2;
-	else if (n >= 10)
-		n += 1;
-	sfprintf(sp, "%d%s", n, sfstruse(tp));
-}
-
-/*
- * check if tar file name may be split to fit in header
- * return
- *	<0	extension header required with error message for non-extension formats
- *	 0	no split needed
- *	>0	f->name offset to split
- */
-
-static int
-tar_longname(Archive_t* ap, File_t* f)
-{
-	register char*	s;
-	register char*	b;
-	register int	n;
-
-	if (!(n = f->namesize) || --n <= sizeof(tar_header.name))
-		return 0;
-	switch (ap->format)
-	{
-	case PAX:
-	case USTAR:
-		if (n > (sizeof(tar_header.prefix) + sizeof(tar_header.name) + 1))
-		{
-			if (ap->format != PAX && state.strict)
-				goto toolong;
-			f->longname = 1;
-			return -1;
-		}
-		s = f->name + n;
-		b = s - sizeof(tar_header.name) - 1;
-		while (--s >= b)
-			if (*s == '/' && (n = s - f->name) <= sizeof(tar_header.prefix))
-			{
-				if (!n)
-					break;
-				return s - f->name;
-			}
-		if (ap->format != PAX && state.strict)
-		{
-			error(2, "%s: file base name too long -- %d max", f->name, sizeof(tar_header.name));
-			f->skip = 1;
-		}
-		else
-			f->longname = 1;
-		return -1;
-	case TAR:
-	toolong:
-		error(2, "%s: file name too long -- %d max", f->name, sizeof(tar_header.prefix) + sizeof(tar_header.name) + !!strchr(f->name, '/'));
-		f->skip = 1;
-		return -1;
-	}
-	return 0;
-}
-
-/*
- * check if f->linkpath is too long
- * return
- *	<0	extension header required with error message for non-extension formats
- *	 0	it fits
- */
-
-static int
-tar_longlink(Archive_t* ap, File_t* f)
-{
-	if (f->linktype != NOLINK && strlen(f->linkpath) > sizeof(tar_header.linkname))
-	{
-		switch (ap->format)
-		{
-		case USTAR:
-			if (!state.strict)
-				break;
-			/*FALLTHROUGH*/
-		case TAR:
-			error(2, "%s: link name too long -- %d max", f->linkpath, sizeof(tar_header.linkname));
-			f->skip = 1;
-			return -1;
-		}
-		f->longlink = 1;
-		return -1;
-	}
-	return 0;
-}
-
-/*
- * generate extended header path name from fmt
- */
-
-static char*
-headname(Archive_t* ap, File_t* f, const char* fmt)
-{
-	char*	s;
-	char*	t;
-	size_t	n;
-
-	if (!ap->tmp.hdr && !(ap->tmp.hdr = sfstropen()))
-		nospace();
-	listprintf(ap->tmp.hdr, ap, f, fmt);
-	if (sfstrtell(ap->tmp.hdr) > sizeof(tar_header.name))
-	{
-		sfstrset(ap->tmp.hdr, 0);
-		s = f->name;
-		if (t = strrchr(s, '/'))
-			f->name = t + 1;
-		if ((n = strlen(f->name)) > sizeof(tar_header.name) / 2)
-			f->name = f->name + n - sizeof(tar_header.name) / 2;
-		listprintf(ap->tmp.hdr, ap, f, fmt);
-		f->name = s;
-	}
-	return sfstruse(ap->tmp.hdr);
-}
-
-/*
- * synthesize and extended tar header
- */
-
-static void
-synthesize(Archive_t* ap, File_t* f, char* name, int type, char* buf, size_t n)
-{
-	Buffer_t*	bp;
-	char*		base;
-	char*		next;
-	File_t		h;
-	struct stat	st;
-
-	initfile(ap, &h, &st, name, X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
-	h.extended = type;
-	h.st->st_gid = f->st->st_gid;
-	h.st->st_uid = f->st->st_uid;
-	h.st->st_mtime = NOW;
-	h.st->st_size = n;
-	h.fd = setbuffer(0);
-	bp = getbuffer(h.fd);
-	base = bp->base;
-	next = bp->next;
-	bp->base = bp->next = buf;
-	fileout(ap, &h);
-	bp->base = base;
-	bp->next = next;
-}
-
-/*
- * output an extended tar header
- */
-
-static int
-extend(Archive_t* ap, File_t* f, int type)
-{
-	unsigned long		n;
-	char*			s;
-	char*			fmt;
-	Hash_position_t*	pos;
-	Option_t*		op;
-	Value_t*		vp;
-	int			lev;
-	int			alt;
-	int			split;
-	Tv_t			tv;
-	char			num[64];
-
-	if (!ap->tmp.ext && (!(ap->tmp.ext = sfstropen()) || !(ap->tmp.key = sfstropen())))
-		nospace();
-	switch (type)
-	{
-	case EXTTYPE:
-		fmt = state.header.extended;
-		lev = alt = 7;
-		break;
-	case GLBTYPE:
-		fmt = state.header.global;
-		lev = 3;
-		alt = 0;
-		if (ap->entry == 1 && (pos = hashscan(state.options, 0)))
-		{
-			while (hashnext(pos))
-			{
-				op = (Option_t*)pos->bucket->value;
-				if ((op->flags & (OPT_GLOBAL|OPT_READONLY)) == OPT_GLOBAL && op->name == pos->bucket->name && (op->level == lev || op->level == alt) && (s = op->perm.string))
-					putkey(ap->tmp.ext, ap->tmp.key, op, s);
-			}
-			hashdone(pos);
-		}
-		break;
-	default:
-		return 0;
-	}
-	if (pos = hashscan(state.options, 0))
-	{
-		while (hashnext(pos))
-		{
-			op = (Option_t*)pos->bucket->value;
-			if ((op->flags & (OPT_HEADER|OPT_READONLY)) == OPT_HEADER && op->name == pos->bucket->name && (op->level == lev || op->level == alt))
-			{
-message((-5, "extend %s level=%d:%d:%d entry=%d:%d perm=(%s,%I*d) temp=(%s,%I*d)", op->name, op->level, lev, alt, op->entry, ap->entry, op->perm.string, sizeof(op->perm.number), op->perm.number, op->temp.string, sizeof(op->temp.number), op->temp.number));
-				vp = &op->perm;
-				s = vp->string;
-				switch (op->index)
-				{
-				case OPT_atime:
-				case OPT_ctime:
-				case OPT_mtime:
-					if (op->flags & OPT_SET)
-						s = vp->string;
-					else if (type != EXTTYPE)
-						continue;
-					else
-					{
-						switch (op->index)
-						{
-						case OPT_atime:
-							tvgetstat(f->st, &tv, NiL, NiL);
-							break;
-						case OPT_mtime:
-							tvgetstat(f->st, NiL, &tv, NiL);
-							break;
-						case OPT_ctime:
-							tvgetstat(f->st, NiL, NiL, &tv);
-							if (!tv.tv_nsec)
-								continue;
-							break;
-						}
-						sfsprintf(num, sizeof(num), "%lu.%09lu", tv.tv_sec, tv.tv_nsec);
-						for (s = num + strlen(num); *(s - 1) == '0'; s--);
-						if (*(s - 1) == '.')
-							*s++ = '0';
-						*s = 0;
-						s = num;
-					}
-					break;
-				case OPT_comment:
-					s = state.header.comment;
-					break;
-				case OPT_gid:
-					if (op->flags & OPT_SET)
-						f->st->st_gid = vp->number;
-					else if (type != EXTTYPE)
-						f->st->st_gid = state.gid;
-					if (f->st->st_gid <= 07777777)
-						continue;
-					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_gid), f->st->st_gid);
-					break;
-				case OPT_gname:
-					if (op->flags & OPT_SET)
-						f->gidname = s;
-					if (!f->gidname || strlen(f->gidname) < sizeof(tar_header.gname) && portable(f->gidname))
-						continue;
-					s = f->gidname;
-					break;
-				case OPT_size:
-					if (type == GLBTYPE)
-						continue;
-					if (f->st->st_size <= (off_t)077777777777)
-						continue;
-					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_size), f->st->st_size);
-					break;
-				case OPT_uid:
-					if (op->flags & OPT_SET)
-						f->st->st_uid = vp->number;
-					else if (type != EXTTYPE)
-						f->st->st_uid = state.uid;
-					if (f->st->st_uid <= 07777777)
-						continue;
-					sfsprintf(s = num, sizeof(num), "%I*u", sizeof(f->st->st_uid), f->st->st_uid);
-					break;
-				case OPT_uname:
-					if (op->flags & OPT_SET)
-						f->uidname = s;
-					if (!f->uidname || strlen(f->uidname) < sizeof(tar_header.uname) && portable(f->uidname))
-						continue;
-					s = f->uidname;
-					break;
-				default:
-					if (!s && (op->flags & OPT_SET))
-						sfsprintf(s = num, sizeof(num), "%ld", vp->number);
-					break;
-				}
-				if (s)
-					putkey(ap->tmp.ext, ap->tmp.key, op, s);
-			}
-		}
-		hashdone(pos);
-	}
-	if (type == EXTTYPE)
-	{
-		if ((split = tar_longname(ap, f)) < 0 || !portable(f->name))
-			putkey(ap->tmp.ext, ap->tmp.key, &options[OPT_path], f->name);
-		if (f->linkpath && (tar_longlink(ap, f) < 0 || !portable(f->linkpath)))
-			putkey(ap->tmp.ext, ap->tmp.key, &options[OPT_linkpath], f->linkpath);
-	}
-	else
-		split = 0;
-	if (n = sfstrtell(ap->tmp.ext))
-		synthesize(ap, f, headname(ap, f, fmt), type, sfstruse(ap->tmp.ext), n);
-	return split;
-}
-
-/*
  * write next archive entry header
  */
 
-void
+int
 putheader(register Archive_t* ap, register File_t* f)
 {
-	register off_t	n;
-	char*		s;
-	int		c;
-	int		q;
-	int		split;
+	register int	n;
 
-	if (f->extended)
-		split = 0;
-	else
+	if (!f->extended)
 	{
+		setdeltaheader(ap, f);
 		ap->entry++;
-		switch (ap->format)
-		{
-		case PAX:
-			if (ap->entry == 1)
-				extend(ap, f, GLBTYPE);
-			split = extend(ap, f, EXTTYPE);
-			break;
-		case USTAR:
-			if ((split = tar_longname(ap, f)) < 0)
-			{
-				if (state.strict)
-				{
-					ap->entry--;
-					return;
-				}
-				synthesize(ap, f, headname(ap, f, "@PaxPathText.%(sequence)s"), LREGTYPE, f->name, f->namesize);
-			}
-			if (tar_longlink(ap, f) < 0)
-			{
-				if (state.strict)
-				{
-					ap->entry--;
-					return;
-				}
-				synthesize(ap, f, headname(ap, f, "@PaxLinkText.%(sequence)s"), LLNKTYPE, f->linkpath, strlen(f->linkpath) + 1);
-			}
-			break;
-		case TAR:
-			if ((split = tar_longname(ap, f)) || tar_longlink(ap, f))
-			{
-				ap->entry--;
-				return;
-			}
-			break;
-		}
 	}
 	ap->section = SECTION_CONTROL;
-	setdeltaheader(ap, f);
-	if (state.install.sp)
+	if ((n = (*ap->format->putheader)(&state, ap, f)) < 0)
+		return -1;
+	if (!n)
 	{
-		c = 0;
-		if (f->st->st_gid != state.gid && ((f->st->st_mode & S_ISGID) || (f->st->st_mode & S_IRGRP) && !(f->st->st_mode & S_IROTH) || (f->st->st_mode & S_IXGRP) && !(f->st->st_mode & S_IXOTH)))
+		if (!ap->incomplete)
+			return 0;
+		ap->incomplete = 0;
+		if ((ap->io->count + f->st->st_size) > state.maxout)
 		{
-			sfprintf(state.install.sp, "chgrp %s %s\n", fmtgid(f->st->st_gid), f->name);
-			c = 1;
+			error(2, "%s: too large to fit in one volume", f->name);
+			return -1;
 		}
-		if (f->st->st_uid != state.uid && ((f->st->st_mode & S_ISUID) || (f->st->st_mode & S_IRUSR) && !(f->st->st_mode & (S_IRGRP|S_IROTH)) || (f->st->st_mode & S_IXUSR) && !(f->st->st_mode & (S_IXGRP|S_IXOTH))))
-		{
-			sfprintf(state.install.sp, "chown %s %s\n", fmtuid(f->st->st_uid), f->name);
-			c = 1;
-		}
-		if (c || (f->st->st_mode & (S_ISUID|S_ISGID)))
-			sfprintf(state.install.sp, "chmod %04o %s\n", modex(f->st->st_mode & S_IPERM), f->name);
-	}
-	if (state.complete)
-	{
-		off_t	c = f->st->st_size;
-
-		switch (ap->format)
-		{
-		case ALAR:
-		case IBMAR:
-			c += 4 * ALAR_HEADER;
-			break;
-		case ASC:
-		case ASCHK:
-			c += ASC_HEADER + f->namesize;
-			break;
-		case BINARY:
-			c += BINARY_HEADER + f->namesize;
-			c = roundof(c, 2);
-			break;
-		case CPIO:
-			c += CPIO_HEADER + f->namesize;
-			break;
-		case PAX:
-		case TAR:
-		case USTAR:
-			c += TAR_HEADER;
-			c = roundof(c, BLOCKSIZE);
-			break;
-		case VDB:
-			c += state.record.header ? state.record.headerlen : f->namesize;
-			break;
-		}
-		if (ap->io->count + c > state.maxout)
-		{
-			if (c > state.maxout) error(1, "%s: too large to fit in one volume", f->name);
-			else
-			{
-				state.complete = 0;
-				putepilogue(ap);
-				newio(ap, 0, 0);
-				putprologue(ap);
-				state.complete = 1;
-			}
-		}
-	}
-	switch (ap->format)
-	{
-	case ALAR:
-	case IBMAR:
-		putlabels(ap, f, "HDR");
-		break;
-	case BINARY:
-		binary_header.magic = CPIO_MAGIC;
-		binary_header.namesize = f->namesize;
-		cpio_short(binary_header.size, f->st->st_size + (f->type == X_IFLNK ? f->linkpathsize : 0));
-		binary_header.dev = f->st->st_dev;
-		binary_header.ino = f->st->st_ino;
-		binary_header.mode = f->st->st_mode;
-		binary_header.uid = f->st->st_uid;
-		binary_header.gid = f->st->st_gid;
-		binary_header.links = f->st->st_nlink;
-		binary_header.rdev = idevice(f->st);
-		if (binary_header.rdev != idevice(f->st)) error(1, "%s: special device numbers truncated", f->name);
-		cpio_short(binary_header.mtime, (long)f->st->st_mtime);
-		bwrite(ap, &binary_header, BINARY_HEADER);
-		bwrite(ap, f->name, f->namesize);
-		if (n = (BINARY_HEADER + f->namesize) % BINARY_ALIGN)
-			while (n++ < BINARY_ALIGN) bwrite(ap, "", 1);
-		if (f->type == X_IFLNK)
-		{
-		cpio_link:
-			if (streq(f->name, f->linkpath))
-				error(1, "%s: symbolic link loops to self", f->name);
-			bwrite(ap, f->linkpath, f->linkpathsize);
-			putdeltaheader(ap, f);
-		}
-		break;
-	case CPIO:
-#if CPIO_EXTENDED
-		if (!f->skip && !state.strict)
-		{
-			getidnames(f);
-			addxopstr(ap, 'U', f->uidname);
-			addxopstr(ap, 'G', f->gidname);
-			if (CPIO_TRUNCATE(idevice(f->st)) != idevice(f->st))
-				addxopnum(ap, 'd', (Sflong_t)idevice(f->st));
-#if NUMBER_EVEN_THOUGH_NAME
-			if (CPIO_TRUNCATE(f->st->st_gid) != f->st->st_gid)
-				addxopnum(ap, 'g', (Sflong_t)f->st->st_gid);
-			if (CPIO_TRUNCATE(f->st->st_uid) != f->st->st_uid)
-				addxopnum(ap, 'u', (Sflong_t)f->st->st_uid);
-#endif
-			if (f->st->st_size > 0x7fffffff)
-				addxopnum(ap, 's', (Sflong_t)f->st->st_size);
-			setxops(ap, f);
-		}
-		else
-#endif
-		{
-			if (CPIO_TRUNCATE(idevice(f->st)) != idevice(f->st))
-				error(1, "%s: special device number truncated", f->name);
-			if (CPIO_TRUNCATE(f->st->st_gid) != f->st->st_gid)
-				error(1, "%s: gid number truncated", f->name);
-			if (CPIO_TRUNCATE(f->st->st_uid) != f->st->st_uid)
-				error(1, "%s: uid number truncated", f->name);
-		}
-		sfsprintf(state.tmp.buffer, state.tmp.buffersize, "%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.11lo%0.6o%0.11I*o",
-			(long)CPIO_TRUNCATE(CPIO_MAGIC),
-			(long)CPIO_TRUNCATE(f->st->st_dev),
-			(long)CPIO_TRUNCATE(f->st->st_ino),
-			(long)CPIO_TRUNCATE(f->st->st_mode),
-			(long)CPIO_TRUNCATE(f->st->st_uid),
-			(long)CPIO_TRUNCATE(f->st->st_gid),
-			(long)CPIO_TRUNCATE(f->st->st_nlink),
-			(long)CPIO_TRUNCATE(idevice(f->st)),
-			(long)f->st->st_mtime,
-			(long)f->namesize,
-			sizeof(_ast_intmax_t), (_ast_intmax_t)(f->st->st_size + (f->type == X_IFLNK ? f->linkpathsize : 0)));
-		bwrite(ap, state.tmp.buffer, CPIO_HEADER);
-#if CPIO_EXTENDED
-		putxops(ap, f);
-#else
-		bwrite(ap, f->name, f->namesize);
-#endif
-		if (f->type == X_IFLNK) goto cpio_link;
-		break;
-	case ASC:
-		f->checksum = 0;
-		/*FALLTHROUGH*/
-	case ASCHK:
-		sfsprintf(state.tmp.buffer, state.tmp.buffersize, "%0.6lo%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx%0.8lx",
-			(long)(ap->format == ASC ? ASC_MAGIC : ASCHK_MAGIC),
-			(long)f->st->st_ino,
-			(long)f->st->st_mode,
-			(long)f->st->st_uid,
-			(long)f->st->st_gid,
-			(long)f->st->st_nlink,
-			(long)f->st->st_mtime,
-			(long)f->st->st_size + (long)f->linkpathsize,
-			(long)major(f->st->st_dev),
-			(long)minor(f->st->st_dev),
-			(long)major(idevice(f->st)),
-			(long)minor(idevice(f->st)),
-			(long)f->namesize,
-			f->checksum);
-		bwrite(ap, state.tmp.buffer, ASC_HEADER);
-		bwrite(ap, f->name, f->namesize);
-		if (n = (ASC_HEADER + f->namesize) % ASC_ALIGN)
-			while (n++ < ASC_ALIGN) bwrite(ap, "", 1);
-		if (f->type == X_IFLNK) goto cpio_link;
-		break;
-	case PAX:
-	case TAR:
-	case USTAR:
-		memzero(tar_block, TAR_HEADER);
-		if (f->longname)
-			s = headname(ap, f, "@PaxPathFile.%(sequence)s");
-		else
-		{
-			if (split)
-			{
-				memcpy(tar_header.prefix, f->name, split);
-				split++;
-			}
-			s = f->name + split;
-		}
-		sfsprintf(tar_header.name, sizeof(tar_header.name), "%s%s", s, f->type == X_IFDIR ? "/" : "");
-		q = 0;
-		if (f->extended)
-			tar_header.typeflag = f->extended;
-		else
-			switch (f->linktype)
-			{
-			case HARDLINK:
-				tar_header.typeflag = LNKTYPE;
-			linked:
-				sfsprintf(tar_header.linkname, sizeof(tar_header.linkname), "%s", f->longlink ? headname(ap, f, "@PaxLinkFile.%(sequence)s") : f->linkpath);
-				break;
-			case SOFTLINK:
-				tar_header.typeflag = SYMTYPE;
-				goto linked;
-			default:
-				switch (ap->format == TAR ? X_IFREG : f->type)
-				{
-				case X_IFCHR:
-					tar_header.typeflag = CHRTYPE;
-					q = 1;
-					break;
-				case X_IFBLK:
-					tar_header.typeflag = BLKTYPE;
-					q = 1;
-					break;
-				case X_IFDIR:
-					tar_header.typeflag = DIRTYPE;
-					break;
-				case X_IFIFO:
-					tar_header.typeflag = FIFOTYPE;
-					break;
-				case X_IFSOCK:
-					tar_header.typeflag = SOKTYPE;
-					q = 1;
-					break;
-				default:
-					if (!f->skip && !f->delta.op)
-						error(1, "%s: %s: unknown file type %07o -- regular file assumed", ap->name, f->name, f->type);
-					/*FALLTHROUGH*/
-				case X_IFREG:
-					tar_header.typeflag = REGTYPE;
-					break;
-				}
-				break;
-			}
-		sfsprintf(tar_header.devmajor, sizeof(tar_header.devmajor), "%0*o ", sizeof(tar_header.devmajor) - 1, q ? major(idevice(f->st)) : 0);
-		sfsprintf(tar_header.devminor, sizeof(tar_header.devminor), "%0*o ", sizeof(tar_header.devminor) - 1, q ? minor(idevice(f->st)) : 0);
-		sfsprintf(tar_header.mode, sizeof(tar_header.mode), "%0*o ", sizeof(tar_header.mode) - 1, f->st->st_mode & X_IPERM);
-		sfsprintf(tar_header.uid, sizeof(tar_header.uid), "%0*o ", sizeof(tar_header.uid) - 1, f->st->st_uid & (unsigned long)07777777);
-		sfsprintf(tar_header.gid, sizeof(tar_header.gid), "%0*o ", sizeof(tar_header.gid) - 1, f->st->st_gid & (unsigned long)07777777);
-		if (ap->format != PAX && f->st->st_size > (unsigned long)037777777777)
-		{
-			tar_header.size[0] = TAR_LARGENUM;
-			n = f->st->st_size;
-			for (c = 11; c > 0; c--)
-			{
-				tar_header.size[c] = n & 0377;
-				n >>= 8;
-			}
-		}
-		else
-			sfsprintf(tar_header.size, sizeof(tar_header.size), "%0*lo ", sizeof(tar_header.size) - 1, (long)f->st->st_size);
-		sfsprintf(tar_header.mtime, sizeof(tar_header.mtime), "%0*lo ", sizeof(tar_header.mtime) - 1, f->st->st_mtime & (unsigned long)037777777777);
-		if (ap->format != TAR)
-		{
-			strncpy(tar_header.magic, TMAGIC, sizeof(tar_header.magic));
-			strncpy(tar_header.version, TVERSION, sizeof(tar_header.version));
-			getidnames(f);
-			strcpy(tar_header.uname, f->uidname);
-			strcpy(tar_header.gname, f->gidname);
-		}
-		sfsprintf(tar_header.chksum, sizeof(tar_header.chksum), "%0*lo ", sizeof(tar_header.chksum) - 1, tar_checksum(ap, 0, 0));
-		bwrite(ap, tar_block, TAR_HEADER);
-		break;
-	case VDB:
-		if (state.record.header) bwrite(ap, state.record.header, state.record.headerlen);
-		else
-		{
-			f->name[f->namesize - 1] = '\n';
-			bwrite(ap, f->name, f->namesize);
-			f->name[f->namesize - 1] = 0;
-		}
-		if (!(c = state.record.delimiter))
-		{
-			c = VDB_DELIMITER;
-			if (f->fd >= 0)
-			{
-				n = read(f->fd, tar_block, TAR_HEADER);
-				if (n > 0) lseek(f->fd, -n, SEEK_CUR);
-			}
-#if 0
-			else if ((n = bread(ap, tar_block, (off_t)0, (off_t)TAR_HEADER, 1)) > 0)
-				bunread(ap, tar_block, n);
-#else
-			else
-				n = 0;
-#endif
-			if (n > 0)
-			{
-				int		dp;
-				int		ds;
-				int		mp = 0;
-				int		ms = 0;
-				unsigned char	hit[UCHAR_MAX + 1];
-
-				/*
-				 * to determine the delimiter, if any
-				 */
-
-				memzero(hit, sizeof(hit));
-				while (--n > 0)
-					hit[*((unsigned char*)tar_block + n)]++;
-				for (n = 0; n <= UCHAR_MAX; n++)
-					if (n == '_' || n == '/' || n == '.' || n == '\n' || n == '\\')
-						/* nop */;
-					else if (isspace(n))
-					{
-						if ((int)hit[n] > ms)
-						{
-							ms = hit[n];
-							ds = n;
-						}
-					}
-					else if ((int)hit[n] > mp && isprint(n) && !isalnum(n))
-					{
-						mp = hit[n];
-						dp = n;
-					}
-				if (mp) c = dp;
-				else if (ms) c = ds;
-			}
-		}
-		q = (c == '=') ? ':' : '=';
-		sfprintf(state.vdb.directory, "%c%s%c%I*u%c%I*u%c%s%c%I*u%c%s%c0%o\n", c, f->name, c, sizeof(ap->io->offset), ap->io->offset + ap->io->count, c, sizeof(f->st->st_size), f->st->st_size, c, VDB_DATE, q, sizeof(f->st->st_mtime), f->st->st_mtime, c, VDB_MODE, q, modex(f->st->st_mode & X_IPERM));
-		break;
+		state.complete = 0;
+		putepilogue(ap);
+		newio(ap, 0, 0);
+		putprologue(ap);
+		state.complete = 1;
+		if ((n = (*ap->format->putheader)(&state, ap, f)) <= 0)
+			return n;
 	}
 	putdeltaheader(ap, f);
 	if (state.checksum.sum)
 		suminit(state.checksum.sum);
 	ap->section = SECTION_DATA;
 	ap->convert[ap->section].on = ap->convert[ap->section].f2t != 0;
+	if (state.install.sp)
+	{
+		n = 0;
+		if (f->st->st_gid != state.gid && ((f->st->st_mode & S_ISGID) || (f->st->st_mode & S_IRGRP) && !(f->st->st_mode & S_IROTH) || (f->st->st_mode & S_IXGRP) && !(f->st->st_mode & S_IXOTH)))
+		{
+			sfprintf(state.install.sp, "chgrp %s %s\n", fmtgid(f->st->st_gid), f->name);
+			n = 1;
+		}
+		if (f->st->st_uid != state.uid && ((f->st->st_mode & S_ISUID) || (f->st->st_mode & S_IRUSR) && !(f->st->st_mode & (S_IRGRP|S_IROTH)) || (f->st->st_mode & S_IXUSR) && !(f->st->st_mode & (S_IXGRP|S_IXOTH))))
+		{
+			sfprintf(state.install.sp, "chown %s %s\n", fmtuid(f->st->st_uid), f->name);
+			n = 1;
+		}
+		if (n || (f->st->st_mode & (S_ISUID|S_ISGID)))
+			sfprintf(state.install.sp, "chmod %04o %s\n", modex(f->st->st_mode & S_IPERM), f->name);
+	}
+	return 1;
 }
 
 /*
@@ -3414,18 +760,16 @@ gettrailer(register Archive_t* ap, File_t* f)
 		ap->checksum ^= ap->memsum;
 		ap->old.checksum ^= ap->old.memsum;
 	}
-	switch (ap->format)
-	{
-	case TNEF:
-		if (bseek(ap, ((Tnef_t*)ap->data)->offset, SEEK_SET, 1) != ((Tnef_t*)ap->data)->offset)
-			error(3, "%s: %s format seek error", ap->name, format[ap->format].name);
-		break;
-	}
+	if (ap->format->gettrailer)
+		(*ap->format->gettrailer)(&state, ap, f);
 	getdeltatrailer(ap, f);
-	if ((n = format[ap->format].align) && (n = roundof(ap->io->count, n) - ap->io->count))
+	if ((n = ap->format->align) && (n = roundof(ap->io->count, n) - ap->io->count))
 		bread(ap, state.tmp.buffer, (off_t)0, n, 1);
-	ap->memsum = 0;
-	ap->old.memsum = 0;
+	if (!(ap->format->flags & SUM) && ap->sum >= 0)
+	{
+		ap->memsum = 0;
+		ap->old.memsum = 0;
+	}
 }
 
 /*
@@ -3461,201 +805,12 @@ puttrailer(register Archive_t* ap, register File_t* f)
 	}
 	ap->section = SECTION_CONTROL;
 	putdeltatrailer(ap, f);
-	switch (ap->format)
-	{
-	case ALAR:
-	case IBMAR:
-		putlabels(ap, f, "EOF");
-		break;
-	case VDB:
-		if (state.record.trailer)
-			bwrite(ap, state.record.trailer, state.record.trailerlen);
-		break;
-	}
-	if ((n = format[ap->format].align) && (n = roundof(ap->io->count, n) - ap->io->count))
+	if (ap->format->puttrailer)
+		(*ap->format->puttrailer)(&state, ap, f);
+	if ((n = ap->format->align) && (n = roundof(ap->io->count, n) - ap->io->count))
 	{
 		memzero(state.tmp.buffer, n);
 		bwrite(ap, state.tmp.buffer, n);
 	}
 	listentry(f);
 }
-
-/*
- * return length of next label
- * variable length labels have label number > 3 and Vnnnn at position 5
- * where nnnn is the decimal length of the entire label
- * nnnn may be < ALAR_HEADER but label block must be >= ALAR_HEADER
- * 0 returned at end of label group
- */
-
-int
-getlabel(register Archive_t* ap, register File_t* f)
-{
-	register int	c;
-	register int	n;
-
-	if (ap->label.done || (c = bread(ap, alar_header, (off_t)ALAR_HEADER, (off_t)ALAR_LABEL, 0)) < ALAR_HEADER) return *ap->label.last = ap->label.done = c = 0;
-	if (alar_header[4] == 'V' && ((n = getlabnum(alar_header, 4, 1, 10)) < 1 || n > 3) && (n = getlabnum(alar_header, 6, 4, 10)) != c)
-	{
-		if ((c = n - c) > 0)
-		{
-			if (ap->io->blocked || bread(ap, alar_header + ALAR_HEADER, (off_t)0, (off_t)c, 1) != c)
-			{
-				c = ALAR_HEADER;
-				error(2, "%s: %-*.*s: variable length label record too short", f->name, c, c, alar_header);
-			}
-			else c = n;
-		}
-		else if (n <= ALAR_VARHDR) c = ALAR_VARHDR;
-		else c = n;
-	}
-	if (!ap->io->blocked && !*ap->label.last && alar_header[3] == '2' && (strneq(alar_header, "HDR", 3) || strneq(alar_header, "EOF", 3) || strneq(alar_header, "EOV", 3)))
-		getlabstr(alar_header, 26, 4, ap->label.last);
-	if (*ap->label.last && strneq(alar_header, ap->label.last, 4)) ap->label.done = 1;
-	message((-4, "label: %-*.*s", c, c, alar_header));
-	return c;
-}
-
-/*
- * output file HDR/EOF/EOV labels
- */
-
-void
-putlabels(register Archive_t* ap, register File_t* f, char* type)
-{
-	struct tm*	tm;
-
-	switch (*type)
-	{
-	case 'E':
-		bwrite(ap, alar_header, 0);
-		break;
-	case 'H':
-		ap->label.sequence++;
-		break;
-	}
-	tm = gmtime(&f->st->st_mtime);
-	sfsprintf(alar_header, sizeof(alar_header), "%s1%-17.17s000001%04d%04d000100 %02d%03d 00000 %06d%-6.6sD%-7.7s       ", type, f->id, ap->label.section, ap->label.sequence, tm->tm_year, tm->tm_yday, f->record.blocks, ap->id.format, ap->id.implementation);
-	bwrite(ap, alar_header, ALAR_HEADER);
-	sfsprintf(alar_header, sizeof(alar_header), "%s2%c%05d%05d%010d%s%c                     00                            ", type, state.record.format, state.blocksize, state.record.size, f->st->st_size, type, '2');
-	bwrite(ap, alar_header, ALAR_HEADER);
-	bwrite(ap, alar_header, 0);
-	if (streq(type, "EOV"))
-	{
-		ap->label.section++;
-		ap->label.sequence = 0;
-	}
-	else
-		ap->label.section = 1;
-}
-
-#ifdef SAVESET
-
-/*
- * get next saveset record
- * if header!=0 then all records skipped until REC_file found
- * otherwise REC_vbn cause non-zero return
- * 0 returned for no record match
- */
-
-int
-getsaveset(register Archive_t* ap, register File_t* f, int header)
-{
-	register char*	p;
-	register char*	s;
-	char*		t;
-	int		i;
-	long		n;
-
-	for (;;)
-	{
-		state.saveset.bp += state.saveset.lastsize;
-		while (state.saveset.bp >= state.saveset.block + state.blocksize)
-		{
-			state.saveset.bp = state.saveset.block;
-			state.saveset.lastsize = 0;
-			if (bread(ap, state.saveset.bp, (off_t)0, (off_t)state.blocksize, 0) <= 0)
-			{
-				ap->format = ALAR;
-				if (header) gettrailer(ap, f);
-				return 0;
-			}
-			if (swapget(1, state.saveset.bp + BLKHDR_hdrsiz, 2) != BLKHDR_SIZE)
-				error(3, "invalid %s format block header", format[ap->format].name);
-			if (!(n = swapget(3, state.saveset.bp + BLKHDR_blksiz, 4)))
-				state.saveset.bp += state.blocksize;
-			else if (n != state.blocksize)
-				error(3, "invalid %s format blocksize=%ld", format[ap->format].name, n);
-			state.saveset.bp += BLKHDR_SIZE;
-		}
-		state.saveset.lastsize = swapget(1, state.saveset.bp + RECHDR_size, 2);
-		i = swapget(1, state.saveset.bp + RECHDR_type, 2);
-		state.saveset.bp += RECHDR_SIZE;
-		message((-2, "record: type=%d size=%d", i, state.saveset.lastsize));
-		if (i == REC_file)
-		{
-			if (header)
-			{
-				p = state.saveset.bp;
-				if (swapget(1, p, 2) != FILHDR_MAGIC)
-					error(3, "invalid %s format file header", format[ap->format].name);
-				p += 2;
-				i = swapget(1, p + FILHDR_size, 2);
-				if (p + FILHDR_data + i > state.saveset.block + state.blocksize)
-					error(3, "invalid %s format file attribute", format[ap->format].name);
-				t = f->name = stash(&ap->path.head, NiL, i);
-				n = 0;
-				for (s = p + FILHDR_data + 1; s < p + FILHDR_data + i; s++)
-				{
-					if (isupper(*s)) *t++ = tolower(*s);
-					else if (n)
-					{
-						if (*s == ';') break;
-						*t++ = *s;
-					}
-					else if (*s == ']')
-					{
-						n = 1;
-						*t++ = '/';
-					}
-					else if (*s == '.') *t++ = '/';
-					else *t++ = *s;
-				}
-				*t = 0;
-				for (i = 0; i < 5; i++)
-				{
-					s = p + FILHDR_size;
-					if ((p += FILHDR_SIZE + (long)swapget(1, s, 2)) > state.saveset.block + state.blocksize)
-						error(3, "invalid %s format file attribute", format[ap->format].name);
-				}
-				state.saveset.recatt = *(p + FILHDR_data + FILATT_recfmt);
-				state.saveset.recfmt = *(p + FILHDR_data + FILATT_recfmt);
-				state.saveset.reclen = swapget(1, p + FILHDR_data + FILATT_reclen, 2);
-				state.saveset.recvfc = swapget(1, p + FILHDR_data + FILATT_recvfc, 2);
-				f->st->st_size = (long)(swapget(1, p + FILHDR_data + FILATT_blocks, 2) - 1) * BLOCKSIZE + (long)swapget(1, p + FILHDR_data + FILATT_frag, 2);
-				for (; i < 15; i++)
-				{
-					s = p + FILHDR_size;
-					if ((p += FILHDR_SIZE + (long)swapget(1, s, 2)) > state.saveset.block + state.blocksize)
-						error(3, "invalid %s format file attribute", format[ap->format].name);
-				}
-
-				/*
-				 * pure guesswork based on 100 nsec epoch
-				 * 17-NOV-1858 00:00:00 GMT
-				 */
-
-				if ((n = swapget(3, p + FILHDR_data + 4, 4) - 7355000) < 0) n = 1;
-				else n = (n << 8) + *(p + FILHDR_data + 3);
-				f->st->st_mtime = (time_t)n;
-				return 1;
-			}
-			state.saveset.bp -= RECHDR_SIZE;
-			state.saveset.lastsize = 0;
-			return 0;
-		}
-		else if (i == REC_vbn && !header) return 1;
-	}
-}
-
-#endif

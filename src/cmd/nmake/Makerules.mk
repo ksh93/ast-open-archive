@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2003-09-22 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2003-11-25 $"
 
 /*
  * handy attributes
@@ -108,10 +108,14 @@ MAKESKIP = *-*
  */
 
 .SUFFIX.c = .c
+.SUFFIX.HEADER.c = .h
 .SUFFIX.C = .C .cc .cpp .cxx .c++
 .SUFFIX.cob = .cob .COB .cbl .CBL
+.SUFFIX.HEADER.cob = .cpy .CPY
 .SUFFIX.f = .f .F
 .SUFFIX.r = .r .R
+
+.COMMAND.CC = g++ CC c++ cxx
 
 /*
  * makerules control variables
@@ -413,7 +417,7 @@ include "Scanrules.mk"
 	elif "$(PWD:B)" == "cc-*"
 		N := $(PWD:D::B)
 	elif "$(PWD:D::B)" == "?*lib"
-		N := $(PWD:D::B:/lib$//)
+		N := $(PWD:D::B:/lib$//)$(PWD:B)
 	else
 		N := $(PWD:B)
 	end
@@ -2427,7 +2431,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	for P $(.PACKAGE.)
 		X := $(X:/\<$(P)\>/1/G)
 	end
-	return $(X:/\([A-Za-z_.][A-Za-z0-9_.]*\)/"$$(.PACKAGE.\1.found)"!="1"/G:@/"  *"/" \&\& "/G:E)
+	return $(X:/\([A-Za-z_.][A-Za-z0-9_.]*\)/"$$(.PACKAGE.\1.found)"=="1"/G:@/"  *"/" \&\& "/G:E)
 
 ":PACKAGE:" : .MAKE .OPERATOR
 	local A H I T N P V version insert=0 install=1 library=-l
@@ -2858,6 +2862,17 @@ PACKAGES : .SPECIAL .FUNCTION
 		return $($(<))
 
 .PROBE.INIT : .MAKE .VIRTUAL .FORCE
+	local I
+	if "$(.COMMAND.CC:N=$(CC))"
+		if ! "$(PATH:/:/ /G:X=$(CC):P=X)"
+			for I $(.COMMAND.CC:N!=$(CC))
+				if "$(PATH:/:/ /G:X=$(I):P=X)"
+					CC := $(I)
+					break
+				end
+			end
+		end
+	end
 	$(.PROBE.SPECIAL.) : -FUNCTIONAL
 	if "$(-base)"
 		cctype =

@@ -75,12 +75,6 @@ make windows.h implicit
 done windows.h dontcare virtual
 make ../../../include/ast/stdio.h implicit
 make ../../../include/ast/ast_stdio.h implicit
-make ../../../include/ast/ast_getopt.h implicit
-make ../../../include/ast/prototyped.h implicit
-make ../../../include/prototyped.h implicit
-done ../../../include/prototyped.h dontcare
-done ../../../include/ast/prototyped.h dontcare
-done ../../../include/ast/ast_getopt.h dontcare
 make ../../../include/ast/sfio_s.h implicit
 done ../../../include/ast/sfio_s.h dontcare
 make ../../../include/ast/ast_common.h implicit
@@ -93,10 +87,15 @@ done ../../../include/ast/ast_botch.h dontcare
 make ../../../include/ast/ast_unistd.h implicit
 done ../../../include/ast/ast_unistd.h dontcare
 make ../../../include/ast/re_comp.h implicit
-prev ../../../include/ast/prototyped.h implicit
+make ../../../include/ast/prototyped.h implicit
+make ../../../include/prototyped.h implicit
+done ../../../include/prototyped.h dontcare
+done ../../../include/ast/prototyped.h dontcare
 done ../../../include/ast/re_comp.h dontcare
 make ../../../include/ast/getopt.h implicit
-prev ../../../include/ast/ast_getopt.h implicit
+make ../../../include/ast/ast_getopt.h implicit
+prev ../../../include/ast/prototyped.h implicit
+done ../../../include/ast/ast_getopt.h dontcare
 prev ../../../include/ast/prototyped.h implicit
 done ../../../include/ast/getopt.h dontcare
 make ../../../include/ast/ast_fcntl.h implicit

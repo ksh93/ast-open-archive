@@ -126,137 +126,30 @@ cpio_short(register unsigned short* s, long n)
 }
 
 /*
- * compute tar_header checksum
+ * return 1 if s is a portable string
  */
 
-long
-tar_checksum(Archive_t* ap, int check, long sum)
+int
+portable(Archive_t* ap, const char* s)
 {
-	register unsigned char*		p;
-	register unsigned char*		e;
-	register unsigned char*		t;
-	register unsigned long		u;
-	register unsigned long		s;
-	register long			c;
-	register const unsigned char*	map;
-	unsigned char			tmp[sizeof(tar_header.chksum)];
+	register unsigned char*	u = (unsigned char*)s;
+	register unsigned char*	m;
+	register int		c;
 
-	p = (unsigned char*)tar_header.chksum;
-	e = p + sizeof(tar_header.chksum);
-	t = tmp;
-	while (p < e)
-	{
-		*t++ = *p;
-		*p++ = ' ';
-	}
-	u = 0;
-	s = 0;
-	p = (unsigned char*)tar_block;
-	e = p + TAR_HEADER;
 	if (!ap->convert[SECTION_CONTROL].on)
-		while (p < e)
-		{
-			c = *p++;
-			u += c;
-			if (check)
-			{
-				if (c & 0x80)
-					c |= (-1) << 8;
-				s += c;
-			}
-		}
+	{
+		while (c = *u++)
+			if (c > 0177)
+				return 0;
+	}
 	else
 	{
-		map = (state.operation & IN) ? ap->convert[SECTION_CONTROL].t2f : ap->convert[SECTION_CONTROL].f2t;
-		while (p < e)
-		{
-			c = map[*p++];
-			u += c;
-			if (check)
-			{
-				if (c & 0x80)
-					c |= (-1) << 8;
-				s += c;
-			}
-		}
+		m = ap->convert[SECTION_CONTROL].f2t;
+		while (c = m[*u++])
+			if (c > 0177)
+				return 0;
 	}
-	p = (unsigned char*)tar_header.chksum;
-	e = p + sizeof(tar_header.chksum);
-	t = tmp;
-	while (p < e)
-		*p++ = *t++;
-	u &= TAR_SUMASK;
-	if (check)
-	{
-		if ((sum &= TAR_SUMASK) == u)
-			return 1;
-		if (sum == (s &= TAR_SUMASK))
-		{
-			if (!ap->old.warned)
-			{
-				ap->old.warned = 1;
-				error(1, "%s: %s format archive generated with signed checksums", ap->name, format[ap->format].name);
-			}
-			return 1;
-		}
-		if (ap->entry > 1)
-			error(state.keepgoing ? 1 : 3, "%s: %s format checksum error (%ld != %ld or %ld)", ap->name, format[ap->format].name, sum, u, s);
-		return 0;
-	}
-	return u;
-}
-
-/*
- * compute running s5r4 file content checksum
- */
-
-long
-asc_checksum(char* ab, int n, register unsigned long sum)
-{
-	register unsigned char* b = (unsigned char*)ab;
-	register unsigned char*	e;
-
-	e = b + n;
-	while (b < e) sum += *b++;
-	return sum;
-}
-
-/*
- * get label header number
- */
-
-long
-getlabnum(register char* p, int byte, int width, int base)
-{
-	register char*	e;
-	register int	c;
-	long		n;
-
-	p += byte - 1;
-	c = *(e = p + width);
-	*e = 0;
-	n = strtol(p, NiL, base);
-	*e = c;
-	return n;
-}
-
-/*
- * get label header string
- */
-
-char*
-getlabstr(register char* p, int byte, int width, register char* s)
-{
-
-	register char*	e;
-	char*		v;
-
-	v = s;
-	p += byte - 1;
-	e = p + width;
-	while (p < e && (*s = *p++) != ' ') s++;
-	*s = 0;
-	return v;
+	return 1;
 }
 
 /*

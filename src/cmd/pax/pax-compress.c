@@ -1,7 +1,7 @@
 /*******************************************************************
 *                                                                  *
 *             This software is part of the ast package             *
-*                Copyright (c) 1987-2002 AT&T Corp.                *
+*                Copyright (c) 1987-2003 AT&T Corp.                *
 *        and it may only be used by you under license from         *
 *                       AT&T Corp. ("AT&T")                        *
 *         A copy of the Source Code Agreement is available         *
@@ -24,50 +24,39 @@
 #pragma prototyped
 
 /*
- * rpm interface definitions
+ * pax compress format
  */
 
-#define RPM_MAGIC	0xedabeedb
-#define RPM_CIGAM	0xdbeeabed
+#include "format.h"
 
-#define RPM_HEAD_MAGIC	0x8eade801
-
-typedef struct
+static int
+compress_getprologue(Pax_t* pax, Format_t* fp, Archive_t* ap, File_t* f, unsigned char* buf, size_t size)
 {
-	unsigned int_4	magic;
-	unsigned char	major;
-	unsigned char	minor;
-	int_2		type;
-} Rpm_magic_t;
+	if (size < 2 || buf[0] != 0x1f || buf[1] != 0x9d)
+		return 0;
+	ap->uncompressed = ap->io->size * 3;
+	return 1;
+}
 
-typedef struct
+static Compress_format_t	pax_compress_data =
 {
-	int_2		archnum;
-	char		name[66];
-	int_2		osnum;
-	int_2		sigtype;
-	char		pad[16];
-} Rpm_lead_t;
+	0,
+	{ 0 },
+	{ "zcat" },
+};
 
-typedef struct
+Format_t	pax_compress_format =
 {
-	int_2		archnum;
-	char		name[66];
-	unsigned int_4	specoff;
-	unsigned int_4	speclen;
-	unsigned int_4	archoff;
-} Rpm_lead_old_t;
-
-typedef struct
-{
-	unsigned int_4	entries;
-	unsigned int_4	datalen;
-} Rpm_head_t;
-
-typedef struct
-{
-	unsigned int_4	tag;
-	unsigned int_4	type;
-	unsigned int_4	offset;
-	unsigned int_4	size;
-} Rpm_entry_t;
+	"compress",
+	0,
+	"Lempel-Ziv compression",
+	0,
+	COMPRESS|IN|OUT,
+	0,
+	0,
+	0,
+	pax_compress_next,
+	&pax_compress_data,
+	0,
+	compress_getprologue,
+};

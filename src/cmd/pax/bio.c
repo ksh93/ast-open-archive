@@ -31,6 +31,8 @@
 
 #include "pax.h"
 
+#define show(s,n)		fmtquote(s,NiL,NiL,(n)>32?32:(n),0)
+
 #if _sys_mtio
 #include <ast_tty.h>
 #include <sys/mtio.h>
@@ -247,9 +249,15 @@ binit(register Archive_t* ap)
 	n = 2 * state.buffersize;
 	if (!(ap->io->mode & O_WRONLY))
 		n += MAXUNREAD;
-	else if (!(format[ap->format].flags & OUT))
-		error(3, "%s: archive format not supported on output" , format[ap->format].name);
-	if (!(ap->io->buffer = newof(0, char, n, 0)))
+	else if (!(ap->format->flags & OUT))
+		error(3, "%s: archive format not supported on output" , ap->format->name);
+	if (ap->io->buffer)
+	{
+		message((-1, "blocksize=%d buffersize=%d recordsize=%d", state.blocksize, state.buffersize, state.record.size));
+		if (!(state.tmp.buffer = newof(0, char, state.tmp.buffersize, 0)))
+			nospace();
+	}
+	if (!(ap->io->buffer = newof(ap->io->buffer, char, n, 0)))
 		error(3, "%s: cannot allocate buffer", ap->name);
 	ap->io->next = ap->io->last = ap->io->buffer;
 }
@@ -348,10 +356,36 @@ bfill(register Archive_t* ap, int must)
 			return -1;
 		}
 	}
-	message((-8, "read(%s,%d): %-.*s%s", ap->name, c, c > 32 ? 32 : c, ap->io->last, c > 32 ? "..." : ""));
+	message((-8, "read(%s,%d): %s", ap->name, c, show(ap->io->last, c)));
 	ap->io->eof = 0;
 	ap->io->last += c;
 	return 0;
+}
+
+/*
+ * sum and convert a bread()/bget() chunk
+ */
+
+static void
+chunk(register Archive_t* ap, char* t, char* f, register size_t n, char* o)
+{
+	ap->io->count += n;
+	if (ap->sum > 0)
+	{
+		if (ap->flags & SUM)
+			FNVSUM(ap->memsum, f, n);
+		else
+		{
+			ap->memsum = memsum(f, n, ap->memsum);
+			ap->old.memsum = omemsum(f, n, ap->old.memsum);
+		}
+	}
+	if (o)
+	{
+		if (t != f)
+			memcpy(t, f, n);
+		CONVERT(ap, t, n);
+	}
 }
 
 /*
@@ -362,22 +396,28 @@ bfill(register Archive_t* ap, int must)
  */
 
 off_t
-bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
+bread(register Archive_t* ap, void* ob, off_t n, off_t m, int must)
 {
-	register char*		b = (char*)ab;
+	register char*		s = (char*)ob;
+	register char*		e;
 	register ssize_t	c;
-	register char*		ob;
-	register off_t		k;
+	char*			b;
+	register off_t		z;
 
-	if (ap->io->eof) return -1;
-	if (m <= 0) return 0;
-	ob = b;
+	if (ap->io->eof)
+		return -1;
+	if (m <= 0)
+		m = n;
+	if (!s && ap->io->blocked)
+		s = state.tmp.buffer;
+	b = s;
+	e = s + m;
 	if (ap->io->blocked)
 	{
-		if (!b) b = state.tmp.buffer;
-		while ((c = read(ap->io->fd, b, m)) <= 0)
+		while ((c = read(ap->io->fd, s, e - s)) <= 0)
 		{
-			if (must) newio(ap, c, 0);
+			if (must)
+				newio(ap, c, 0);
 			else if (ap->io->empty)
 			{
 				ap->io->eof = 1;
@@ -385,100 +425,61 @@ bread(register Archive_t* ap, void* ab, register off_t n, off_t m, int must)
 			}
 			else
 			{
-				if (c < 0) ap->io->eof = 1;
+				if (c < 0)
+					ap->io->eof = 1;
 				else
-				{
 					ap->io->empty = 1;
-#if DEBUG
-					if (ob) message((-7, "bread(%s,%d@%I*d):", ap->name, c, sizeof(ap->io->count), ap->io->count));
-#endif
-				}
-				return c;
+				break;
 			}
 		}
 		ap->io->empty = 0;
-		if (must && c < n) return -1;
-		ap->io->count += c;
-		if (ap->sum > 0)
-		{
-			ap->memsum = memsum(b, c, ap->memsum);
-			ap->old.memsum = omemsum(b, c, ap->old.memsum);
-		}
-		CONVERT(ap, b, c);
-#if DEBUG
-		if (ob) message((-7, "bread(%s,%d@%I*d): %-.*s%s", ap->name, c, sizeof(ap->io->count), ap->io->count, c > 32 ? 32 : c, ob, c > 32 ? "..." : ""));
-#endif
-		return c;
+		chunk(ap, s, s, c, ob);
+		s += c;
 	}
 	else
-	{
-		if (n <= 0) n = m;
-		else m = n;
 		for (;;)
 		{
-			if (n > (c = ap->io->last - ap->io->next))
+			if ((c = ap->io->last - ap->io->next) < (e - s))
 			{
 				if (c > 0)
 				{
-					if (ap->sum > 0)
-					{
-						ap->memsum = memsum(ap->io->next, c, ap->memsum);
-						ap->old.memsum = omemsum(ap->io->next, c, ap->old.memsum);
-					}
 					if (ob)
-					{
-						memcpy(b, ap->io->next, c);
-						CONVERT(ap, b, c);
-					}
-					b += c;
-					n -= c;
-					ap->io->count += c;
+						memcpy(s, ap->io->next, c);
+					chunk(ap, s, ap->io->next, c, ob);
+					s += c;
 				}
 				ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
-				if (!ob && ap->sum <= 0 && ap->io->seekable && (k = n / BUFFERSIZE) && lseek(ap->io->fd, k *= BUFFERSIZE, SEEK_CUR) >= 0)
-				{
-					b += k;
-					n -= k;
-					ap->io->count += k;
-					message((-7, "bread(%s) skip(%I*d@%I*d)", ap->name, sizeof(k), k, sizeof(ap->io->count), ap->io->count));
-				}
+				if (!ob && ap->sum <= 0 && ap->io->seekable && (z = n / BUFFERSIZE) && lseek(ap->io->fd, z *= BUFFERSIZE, SEEK_CUR) >= 0)
+					s += z;
 				if (bfill(ap, must) < 0)
-				{
-					if (ob && (c = (b - ob)))
-					{
-						bunread(ap, ob, c);
-						return 0;
-					}
-					return -1;
-				}
+					break;
 			}
 			else
 			{
-				if (ap->sum > 0)
-				{
-					ap->memsum = memsum(ap->io->next, n, ap->memsum);
-					ap->old.memsum = omemsum(ap->io->next, n, ap->old.memsum);
-				}
-				if (ob)
-				{
-					memcpy(b, ap->io->next, n);
-					CONVERT(ap, b, n);
-				}
-				ap->io->next += n;
-				ap->io->count += n;
-#if DEBUG
-				if (ob)
-				{
-					n += b - ob;
-					message((-7, "bread(%s,%I*d@%I*d): %-.*s%s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, n > 32 ? 32 : (int)n, ob, n > 32 ? "..." : ""));
-				}
-				else
-					message((-7, "bread(%s) skip(%I*d@%I*d)", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count));
-#endif
-				return m;
+				c = e - s;
+				chunk(ap, s, ap->io->next, c, ob);
+				ap->io->next += c;
+				s += c;
+				break;
 			}
 		}
+	z = s - b;
+	if (z < n)
+	{
+		if (ob && z)
+		{
+			bunread(ap, b, z);
+			return 0;
+		}
+		return -1;
 	}
+#if DEBUG
+	if (ob)
+		message((-7, "bread(%s,%I*d@%I*d): %s", ap->name, sizeof(z), z, sizeof(ap->io->count), ap->io->count, show(b, z)));
+	else
+		message((-7, "bread(%s) skip(%I*d@%I*d)", ap->name, sizeof(z), z, sizeof(ap->io->count), ap->io->count));
+#endif
+	return z;
 }
 
 /*
@@ -499,32 +500,47 @@ bunread(register Archive_t* ap, void* ab, register int n)
 		memcpy(ap->io->next, b, n);
 		REVERT(ap, ap->io->next, n);
 	}
-	message((-7, "bunread(%s,%d@%I*d): %-.*s%s", ap->name, n, sizeof(ap->io->count), ap->io->count, n > 32 ? 32 : n, ap->io->next, n > 32 ? "..." : ""));
+	message((-7, "bunread(%s,%d@%I*d): %s", ap->name, n, sizeof(ap->io->count), ap->io->count, show(ap->io->next, n)));
 }
 
 /*
- * bread() n chars and return a pointer to the char buffer
+ * O_RDONLY bread() n chars and return a pointer to the char buffer
+ * O_WRONLY return output buffer pointer and available size
  */
 
 char*
 bget(register Archive_t* ap, register off_t n, off_t* p)
 {
 	register char*	s;
+	int		must;
 
-	if (n == -1)
+	if (ap->io->mode & O_WRONLY)
 	{
-		if (ap->io->eof || !ap->io->seekable)
-			return 0;
-		if (ap->io->last > ap->io->next)
-			n = ap->io->last - ap->io->next;
-		else if ((n = ap->io->size - (ap->io->offset + ap->io->count)) < 0)
-			return 0;
-		else if (n > ap->io->buffersize)
-			n = ap->io->buffersize;
+		*p = ap->io->last - ap->io->next;
+		return ap->io->next;
+	}
+	if (n < 0)
+	{
+		n = -n;
+		must = 0;
+	}
+	else
+	{
+		must = 1;
+		if (n == 0)
+		{
+			if (ap->io->eof || !ap->io->seekable)
+				return 0;
+			if (ap->io->last > ap->io->next)
+				n = ap->io->last - ap->io->next;
+			else if ((n = ap->io->size - (ap->io->offset + ap->io->count)) < 0)
+				return 0;
+			else if (n > ap->io->buffersize)
+				n = ap->io->buffersize;
+		}
 	}
 	if (p)
 		*p = n;
-	ap->io->count += n;
 	s = ap->io->next;
 	ap->io->next += n;
 	while (ap->io->next > ap->io->last)
@@ -574,16 +590,11 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 				s = b;
 			}
 		}
-		if (bfill(ap, 1) < 0)
+		if (bfill(ap, must) < 0)
 			return 0;
 	}
-	if (ap->sum > 0)
-	{
-		ap->memsum = memsum(s, n, ap->memsum);
-		ap->old.memsum = omemsum(s, n, ap->old.memsum);
-	}
-	CONVERT(ap, s, n);
-	message((-7, "bget(%s,%I*d@%I*d): %-.*s%s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, n > 32 ? 32 : (int)n, s, n > 32 ? "..." : ""));
+	chunk(ap, s, s, n, s);
+	message((-7, "bget(%s,%I*d@%I*d): %s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count, show(s, n)));
 	return s;
 }
 
@@ -612,17 +623,10 @@ backup(register Archive_t* ap)
 	struct mtop	mt;
 #endif
 
-	switch (ap->format)
+	if (ap->format->backup)
+		(*ap->format->backup)(&state, ap);
+	else
 	{
-	case ALAR:
-	case IBMAR:
-#ifdef MTIOCTOP
-		mt.mt_op = MTBSF;
-		mt.mt_count = 1;
-		if (!(ioctl(ap->io->fd, MTIOCTOP, &mt))) return;
-#endif
-		break;
-	default:
 		m = ap->io->next - (ap->io->buffer + MAXUNREAD);
 		if ((n = ap->io->count - m) > state.backup.count)
 		{
@@ -633,30 +637,35 @@ backup(register Archive_t* ap)
 #ifdef MTIOCTOP
 				mt.mt_op = MTBSR;
 				mt.mt_count = 2;
-				if (ioctl(ap->io->fd, MTIOCTOP, &mt)) break;
+				if (ioctl(ap->io->fd, MTIOCTOP, &mt))
+					goto bad;
 #else
-				break;
+				goto bad;
 #endif
 			}
-			if (read(ap->io->fd, ap->io->buffer + MAXUNREAD, m) != m) break;
+			if (read(ap->io->fd, ap->io->buffer + MAXUNREAD, m) != m)
+				goto bad;
 		}
-		else m = ap->io->last - (ap->io->buffer + MAXUNREAD);
+		else
+			m = ap->io->last - (ap->io->buffer + MAXUNREAD);
 		message((-1, "backup(%s): %ld", ap->name, m));
 		if ((m = lseek(ap->io->fd, -m, SEEK_CUR)) == -1)
 		{
 #ifdef MTIOCTOP
 			mt.mt_op = MTBSR;
 			mt.mt_count = 1;
-			if (ioctl(ap->io->fd, MTIOCTOP, &mt)) break;
+			if (ioctl(ap->io->fd, MTIOCTOP, &mt))
+				goto bad;
 #else
-			break;
+			goto bad;
 #endif
 		}
 		if (state.backup.next < state.backup.last)
 			bwrite(ap, ap->io->buffer + MAXUNREAD, state.backup.next - (state.backup.buffer + MAXUNREAD));
-		return;
 	}
-	error(3, "%s: cannot position %s archive for append", ap->name, format[ap->format].name);
+	return;
+ bad:
+	error(3, "%s: cannot position %s archive for append", ap->name, ap->format->name);
 }
 
 /*
@@ -685,31 +694,38 @@ bseek(register Archive_t* ap, off_t pos, int op, int hard)
 	off_t	l;
 	off_t	u;
 
+	message((-8, "bseek(%s,%I*d,%d,%d)", ap->name, sizeof(pos), pos, op, hard));
 	if (hard)
 	{
 		if (op != SEEK_SET)
 			return -1;
 	}
-	else if (op == SEEK_CUR)
+	else
 	{
-		l = ap->io->buffer - ap->io->next + MAXUNREAD;
+		l = ap->io->next - (ap->io->buffer + MAXUNREAD);
 		u = ap->io->last - ap->io->next;
-		if (pos >= l && pos <= u)
+		if (op == SEEK_CUR)
 		{
-			ap->io->next += pos;
-			return ap->io->count += pos;
+			if ((pos + ap->io->count) < 0)
+				return -1;
+			if (-pos <= l && pos <= u)
+			{
+				ap->io->next += pos;
+				return ap->io->count += pos;
+			}
+			pos += ap->io->count;
+			op = SEEK_SET;
 		}
-		pos += ap->io->count;
-		op = SEEK_SET;
-	}
-	else if (op != SEEK_SET)
-		return -1;
-	else if ((pos - ap->io->count) >= (ap->io->buffer - ap->io->next) && (pos - ap->io->count) <= (ap->io->last - ap->io->buffer))
-	{
-		ap->io->next += (pos - ap->io->count);
-		return ap->io->count = pos;
+		else if (op != SEEK_SET || pos < 0)
+			return -1;
+		else if (-pos <= (l + ap->io->count) && pos <= (u + ap->io->count))
+		{
+			ap->io->next += (pos - ap->io->count);
+			return ap->io->count = pos;
+		}
 	}
 	ap->io->next = ap->io->last = ap->io->buffer + MAXUNREAD;
+	message((-8, "lseek(%s,%I*d,%d)", ap->name, sizeof(pos), pos + ap->io->offset, op));
 	if ((pos = lseek(ap->io->fd, ap->io->offset + pos, op)) < 0)
 		return -1;
 	ap->io->empty = 0;
@@ -748,11 +764,11 @@ bflushout(register Archive_t* ap)
  */
 
 void
-bwrite(register Archive_t* ap, void* ab, register int n)
+bwrite(register Archive_t* ap, void* ab, register off_t n)
 {
 	register char*	b = (char*)ab;
-	register int	c;
-	int		an;
+	register long	c;
+	long		an;
 
 	if (!ap->raw)
 	{
@@ -774,8 +790,10 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 	if (ap->io->blocked)
 	{
 #if DEBUG
-		if (n > 0) message((-7, "bwrite(%s,%d@%ld): %-.*s...", ap->name, n, ap->io->count + n, n > 32 ? 32 : n, b));
-		else message((-7, "bwrite(%s,%d@%ld):", ap->name, n, ap->io->count + n));
+		if (n > 0)
+			message((-7, "bwrite(%s,%I*d@%I*d): %s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count + n, show(b, n)));
+		else
+			message((-7, "bwrite(%s,%I*d@%I*d):", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count + n));
 #endif
 		while ((c = write(ap->io->fd, b, n)) != n)
 		{
@@ -792,16 +810,21 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 #endif
 				error(3, "%s: cannot write tape EOF marks", ap->name);
 			}
-			if (c <= 0) newio(ap, c, n);
-			else if ((n -= c) > 0) b += c;
-			else break;
+			if (c <= 0)
+				newio(ap, c, n);
+			else if ((n -= c) > 0)
+				b += c;
+			else
+				break;
 		}
 	}
 	else
 	{
 #if DEBUG
-		if (n > 0) message((-7, "bwrite(%s,%d@%ld): %-.*s...", ap->name, n, ap->io->count + n, n > 32 ? 32 : n, b));
-		else message((-7, "bwrite(%s,%d@%ld):", ap->name, n, ap->io->count + n));
+		if (n > 0)
+			message((-7, "bwrite(%s,%I*d@%I*d): %s", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count + n, show(b, n)));
+		else
+			message((-7, "bwrite(%s,%I*d@%I*d):", ap->name, sizeof(n), n, sizeof(ap->io->count), ap->io->count + n));
 #endif
 		for (;;)
 		{
@@ -816,7 +839,8 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 				ap->io->next = ap->io->buffer;
 				while ((c = write(ap->io->fd, ap->io->next, state.blocksize)) != state.blocksize)
 				{
-					if (c <= 0) newio(ap, c, n);
+					if (c <= 0)
+						newio(ap, c, n);
 					else
 					{
 						memcpy(state.tmp.buffer, ap->io->buffer + c, state.blocksize - c);
@@ -825,7 +849,7 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 						break;
 					}
 				}
-				message((-8, "write(%s,%d): %-.32s...", ap->name, c, ap->io->buffer));
+				message((-8, "write(%s,%ld): %s", ap->name, c, show(ap->io->buffer, c)));
 			}
 			else
 			{
@@ -840,14 +864,15 @@ bwrite(register Archive_t* ap, void* ab, register int n)
 }
 
 /*
- * bwrite() n chars that have been placed in ap->io->next
+ * bwrite() n chars that have been placed in the
+ * buffer returned by a previous bget()
  */
 
 void
-bput(register Archive_t* ap, register int n)
+bput(register Archive_t* ap, register off_t n)
 {
 	ap->io->count += n;
-	message((-7, "bput(%s,%d@%ld): %-.*s%s", ap->name, n, ap->io->count, n > 32 ? 32 : n, ap->io->next, n > 32 ? "..." : ""));
+	message((-7, "bput(%s,%I*d@%ld): %s", ap->name, sizeof(n), n, ap->io->count, show(ap->io->next, n)));
 	CONVERT(ap, ap->io->next, n);
 	if (ap->sum > 0)
 		ap->memsum = memsum(ap->io->next, n, ap->memsum);
@@ -942,7 +967,6 @@ newio(register Archive_t* ap, int c, int n)
 	char*		file;
 	char*		io;
 	char*		t;
-	int		vol;
 	off_t		z;
 	struct stat	st;
 
@@ -952,7 +976,6 @@ newio(register Archive_t* ap, int c, int n)
 
 	if (!ap->part)
 		ap->part++;
-	vol = 0;
 	if (ap->io->mode != O_RDONLY)
 	{
 		rw = "write";
@@ -960,19 +983,8 @@ newio(register Archive_t* ap, int c, int n)
 		ap->io->offset += ap->io->count - n;
 		ap->io->count = n;
 		z = ap->io->offset + ap->io->count;
-		if (ap->io->blocked && state.record.file)
-			switch (ap->format)
-			{
-			case ALAR:
-			case IBMAR:
-				if (ap->locked)
-					return;
-				ap->locked = 1;
-				putlabels(ap, state.record.file, "EOV");
-				ap->locked = 0;
-				vol = 1;
-				break;
-			}
+		if (ap->format->putepilogue && (*ap->format->putepilogue)(&state, ap))
+			return;
 	}
 	else
 	{
@@ -1056,7 +1068,7 @@ newio(register Archive_t* ap, int c, int n)
 			goto nextpart;
 		error(ERROR_SYSTEM|1, "%s: cannot %s", ap->name, rw);
 	}
-	if (state.test & 040)
+	if (state.test & 0000040)
 		file = 0;
 	else if (file || ap->name == definput || ap->name == defoutput)
 	{
@@ -1152,11 +1164,6 @@ newio(register Archive_t* ap, int c, int n)
 	}
 	else
 		ap->part++;
-	if (vol && !ap->locked)
-	{
-		ap->locked = 1;
-		putprologue(ap);
-		putlabels(ap, state.record.file, "HDR");
-		ap->locked = 0;
-	}
+	if (ap->format->putprologue)
+		(*ap->format->putprologue)(&state, ap);
 }

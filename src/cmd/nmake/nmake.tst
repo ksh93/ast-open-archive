@@ -1,5 +1,19 @@
 # nmake regression tests
 
+function DATA
+{
+	typeset f i
+	for f
+	do	case $f in
+		L.dir)	mkdir L.dir
+			for i in 001 002 003 004
+			do	print $i > L.dir/$i
+			done
+			;;
+		esac
+	done
+}
+
 TEST 001 ':H: sort edit op'
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:H)'
 		OUTPUT - $'02 1 10 2 a a b c'
@@ -79,16 +93,17 @@ TEST 002 ':I: intersection edit op'
 		OUTPUT - $''
 
 TEST 003 ':L: glob list edit op'
-	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(".":L)'
-		OUTPUT - $'OUTPUT.ex ERROR OUTPUT INPUT ERROR.ex'
-	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(".":L>)'
-		OUTPUT - $'OUTPUT.ex'
-	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(".":L<)'
-		OUTPUT - $'ERROR'
-	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(".":L=)'
-		OUTPUT - $'OUTPUT.ex ERROR OUTPUT INPUT ERROR.ex'
-	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(".":L!)'
-		OUTPUT - $'./OUTPUT.ex ./ERROR ./OUTPUT ./INPUT ./ERROR.ex'
+	DO	DATA L.dir
+	EXEC	-n -f - . 'print -- $("L.dir":L)'
+		OUTPUT - $'001 002 003 004'
+	EXEC	-n -f - . 'print -- $("L.dir":L>)'
+		OUTPUT - $'004'
+	EXEC	-n -f - . 'print -- $("L.dir":L<)'
+		OUTPUT - $'001'
+	EXEC	-n -f - . 'print -- $("L.dir":L=)'
+		OUTPUT - $'001 002 003 004'
+	EXEC	-n -f - . 'print -- $("L.dir":L!)'
+		OUTPUT - $'L.dir/001 L.dir/002 L.dir/003 L.dir/004'
 
 TEST 004 ':N: file match edit op'
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:N)'
@@ -99,3 +114,48 @@ TEST 005 ':O: ordinal edit op'
 		OUTPUT - $'8'
 	EXEC	-n -f - . 'A = c 2 b 10 a 02 1 a' 'print -- $(A:O=)'
 		OUTPUT - $'8'
+
+TEST 006 ':Q: quoting'
+	EXEC	-n -f - . 'A = "a z"' 'print -- $(A:Q)'
+		OUTPUT - $'\\""a z"\\"'
+	EXEC	-n -f - . "A = 'a z'" 'print -- $(A:Q)'
+		OUTPUT - $'"\'a z\'"'
+	EXEC	-n -f - . 'A = a z' 'print -- $(A:Q)'
+		OUTPUT - $'a z'
+	EXEC	-n -f - . 'A = a\z' 'print -- $(A:Q)'
+		OUTPUT - $'\'a\\z\''
+	EXEC	-n -f - . 'A = a$z' 'print -- $(A:Q)'
+		OUTPUT - $'\'a\$z\''
+	EXEC	-n -f - . 'A = "a z"' 'print -- $(A:@Q)'
+		OUTPUT - $'\\""a z"\\"'
+	EXEC	-n -f - . "A = 'a z'" 'print -- $(A:@Q)'
+		OUTPUT - $'"\'a z\'"'
+	EXEC	-n -f - . 'A = a z' 'print -- $(A:@Q)'
+		OUTPUT - $'\'a z\''
+	EXEC	-n -f - . 'A = a\z' 'print -- $(A:@Q)'
+		OUTPUT - $'\'a\\z\''
+	EXEC	-n -f - . 'A = a$z' 'print -- $(A:@Q)'
+		OUTPUT - $'\'a\$z\''
+
+TEST 007 ':T=D: quoting'
+	EXEC	-n -f - . 'A == "a z"' 'print -- $("(A)":T=D)'
+		OUTPUT - -DA=$'\\""a z"\\"'
+	EXEC	-n -f - . "A == 'a z'" 'print -- $("(A)":T=D)'
+		OUTPUT - -DA=$'"\'a z\'"'
+	EXEC	-n -f - . 'A == a z' 'print -- $("(A)":T=D)'
+		OUTPUT - -DA=$'\'a z\''
+	EXEC	-n -f - . 'A == a\z' 'print -- $("(A)":T=D)'
+		OUTPUT - -DA=$'\'a\\z\''
+	EXEC	-n -f - . 'A == a$z' 'print -- $("(A)":T=D)'
+		OUTPUT - -DA=$'\'a\$z\''
+
+TEST 008 ':T=E: quoting'
+	EXEC	-n -f - . 'A == "a z"' 'print -- $("(A)":T=E)'
+		OUTPUT - A=$'"a z"'
+	EXEC	-n -f - . "A == 'a z'" 'print -- $("(A)":T=E)'
+		OUTPUT - A=$'\'a z\''
+	EXEC	-n -f - . 'A == a z' 'print -- $("(A)":T=E)'
+	EXEC	-n -f - . 'A == a\z' 'print -- $("(A)":T=E)'
+		OUTPUT - A=$'\'a\\z\''
+	EXEC	-n -f - . 'A == a$z' 'print -- $("(A)":T=E)'
+		OUTPUT - A=$'\'a\$z\''

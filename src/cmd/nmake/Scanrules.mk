@@ -8,7 +8,7 @@
  * .SOURCE.%.SCAN.<lang> should specify the binding dirs
  */
 
-.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2003-05-07 $"
+.SCANRULES.ID. = "@(#)$Id: Scanrules (AT&T Research) 2003-11-19 $"
 
 /*
  * $(.INCLUDE. <lang> [<flag>])
@@ -181,14 +181,21 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 .INCLUDE.cob : .FUNCTION
 	local F
 	F := $(%%:/ .*//:/\.$//)
+	if ! "$(F:S)"
+		if "$(<<:S)" == "*[[:lower:]]*"
+			F := $(F)$(.SUFFIX.HEADER.cob:O=1:F=%(lower)s)
+		else
+			F := $(F)$(.SUFFIX.HEADER.cob:O=1:F=%(upper)s)
+		end
+	end
 	$(F) : .SCAN.cob
-	if ! "$(F:T=F)" && ( ! "$(F:S)" || "$(F:S:N!=$(<<:S)|$(.SUFFIX.cob:/ /|/G))" )
+	if ! "$(F:T=F)" && ( ! "$(F:S)" || "$(F:S:N!=$(<<:S)|$(.SUFFIX.cob:/ /|/G)|$(.SUFFIX.HEADER.cob:/ /|/G))" )
 		F := $(F)$(<<:S)
 	end
 	return $(F)
 
 .COBOL.MAIN : .MAKE .VIRTUAL .FORCE .REPEAT .IGNORE
-	if COBOLMAIN
+	if COBOLMAIN && "$(<<<<:B:N=$(<<:B))"
 		$(<<:B:S=.c) : COBOLFLAGS+=$(COBOLMAIN)
 	end
 
@@ -199,8 +206,8 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 
 .SCAN.cob : .SCAN
 	I| \D COPY % |M$$(.INCLUDE.cob)|
-	I| \D \*( % )\*|M$$(.MAIN.cob)|
+	S|M.COBOL.MAIN|
 
 $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 
-.SOURCE.%.SCAN.cob : . $$(*.SOURCE.cob) $$(*.SOURCE)
+.SOURCE.%.SCAN.cob : . $$(*.SOURCE$$(.SUFFIX.HEADER.cob:O=1)) $$(*.SOURCE.cob) $$(*.SOURCE)
