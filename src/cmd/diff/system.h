@@ -187,11 +187,38 @@ void *memchr ();
 
 #include <ctype.h>
 #if _PACKAGE_ast
+
+#undef	error
+
+#define error		ast_error
+#define errorf		ast_errorf
+#define errorv		ast_errorv
+
+#include <error.h>
+
+#undef	error
+#undef	errorf
+#undef	errorv
+
+#define error		diff_error
+
+#define optarg		opt_info.arg
+#define optind		opt_info.index
+#define optnum		opt_info.num
+
+#define TRANSLATE(s)	errorx(0,0,0,s)
+
 #undef	ISPRINT
 #undef	ISSPACE
 #undef	ISUPPER
 #undef	ISDIGIT
+
+#else
+
+#define TRANSLATE(s)	(s)
+
 #endif
+
 /* CTYPE_DOMAIN (C) is nonzero if the unsigned char C can safely be given
    as an argument to <ctype.h> macros like `isspace'.  */
 #if STDC_HEADERS

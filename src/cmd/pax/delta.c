@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -267,8 +267,15 @@ deltabase(register Archive_t* ap)
 	binit(bp);
 	bp->parent = ap;
 	bp->sum++;
-	if ((bp->io.fd = open(bp->name, bp->io.mode|O_BINARY)) < 0 || fstat(bp->io.fd, &st))
+	if ((bp->io->fd = open(bp->name, bp->io->mode|O_BINARY)) < 0 || fstat(bp->io->fd, &st))
 		error(ERROR_SYSTEM|3, "%s: %s: cannot open base archive", ap->name, bp->name);
+	if (S_ISREG(st.st_mode) && st.st_size > 0)
+	{
+		bp->io->seekable = 1;
+		bp->io->size = st.st_size;
+	}
+	else
+		bp->io->seekable = 0;
 	if (st.st_size)
 	{
 		if (state.ordered)
@@ -276,14 +283,14 @@ deltabase(register Archive_t* ap)
 			if (!getprologue(bp))
 				error(3, "%s: %s: base archive is empty", ap->name, bp->name);
 			bp->sum--;
-			bp->checksum = memsum(bp->io.next, bcount(bp), 0L);
+			bp->checksum = memsum(bp->io->next, bcount(bp), 0L);
 		}
 		else
 		{
-			if (lseek(bp->io.fd, (off_t)0, SEEK_SET) != 0)
+			if (lseek(bp->io->fd, (off_t)0, SEEK_SET) != 0)
 				error(ERROR_SYSTEM|3, "%s: %s: base archive must be seekable", ap->name, bp->name);
 			copyin(bp);
-			bp->size = bp->io.offset + bp->io.count;
+			bp->size = bp->io->offset + bp->io->count;
 		}
 		if (ap->delta->format != DELTA_PATCH)
 			ap->delta->format = DELTA;
@@ -317,24 +324,24 @@ deltaverify(Archive_t* ap)
 				ap->entries++;
 				if (d->expand < 0)
 				{
-					if (!state.ordered && lseek(ap->delta->base->io.fd, d->offset, SEEK_SET) != d->offset)
+					if (!state.ordered && lseek(ap->delta->base->io->fd, d->offset, SEEK_SET) != d->offset)
 						error(ERROR_SYSTEM|3, "%s: base archive seek error", ap->delta->base->name);
 					holeinit(wfd);
 					for (c = d->info->st->st_size; c > 0; c -= n)
 					{
 						n = (c > state.buffersize) ? state.buffersize : c;
-						if ((n = state.ordered ? bread(ap, state.tmp.buffer, n, n, 1) : read(ap->delta->base->io.fd, state.tmp.buffer, n)) <= 0)
+						if ((n = state.ordered ? bread(ap, state.tmp.buffer, n, n, 1) : read(ap->delta->base->io->fd, state.tmp.buffer, n)) <= 0)
 						{
 							error(ERROR_SYSTEM|2, "%s: %s: read error", ap->delta->base->name, d->info->name);
 							break;
 						}
-						else ap->io.count += n;
+						else ap->io->count += n;
 						if (holewrite(wfd, state.tmp.buffer, n) != n)
 						{
 							error(ERROR_SYSTEM|2, "%s: write error", d->info->name);
 							break;
 						}
-						ap->io.count += n;
+						ap->io->count += n;
 					}
 					holedone(wfd);
 					closeout(ap, d->info, wfd);
@@ -342,7 +349,7 @@ deltaverify(Archive_t* ap)
 					listentry(d->info);
 				}
 				else if (state.ordered) paxdelta(NiL, ap, d->info, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ap->delta->base, d->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT|DELTA_LIST, wfd, 0);
-				else paxdelta(NiL, ap, d->info, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ap->delta->base->io.fd, d->offset, d->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT|DELTA_LIST, wfd, 0);
+				else paxdelta(NiL, ap, d->info, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ap->delta->base->io->fd, d->offset, d->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT|DELTA_LIST, wfd, 0);
 			}
 		}
 		hashdone(pos);
@@ -414,8 +421,8 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 						paxdelta(ip, op, f, DELTA_SRC|DELTA_FD|DELTA_SIZE|DELTA_FREE, dfd, d->expand, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_SIZE, f->fd, f->st->st_size, DELTA_DEL|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
 				}
 				else if (d->expand < 0)
-					paxdelta(ip, op, f, DELTA_SRC|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, op->delta->base->io.fd, d->offset, d->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_SIZE, f->fd, f->st->st_size, DELTA_DEL|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
-				else if (!paxdelta(ip, op, d->info, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, op->delta->base->io.fd, d->offset, d->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &dfd, 0))
+					paxdelta(ip, op, f, DELTA_SRC|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, op->delta->base->io->fd, d->offset, d->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_SIZE, f->fd, f->st->st_size, DELTA_DEL|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
+				else if (!paxdelta(ip, op, d->info, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, op->delta->base->io->fd, d->offset, d->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &dfd, 0))
 					paxdelta(ip, op, f, DELTA_SRC|DELTA_FD|DELTA_SIZE|DELTA_FREE, dfd, d->expand, DELTA_TAR|DELTA_FD|DELTA_SIZE|DELTA_FREE, f->fd, f->st->st_size, DELTA_DEL|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
 			}
 			else
@@ -470,7 +477,7 @@ deltacopy(Archive_t* ip, Archive_t* op, register File_t* f)
 		if (f->delta.base->expand >= 0)
 		{
 			if (state.ordered) paxdelta(ip, NiL, f->delta.base->info, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip->delta->base, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
-			else paxdelta(ip, NiL, f->delta.base->info, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ip->delta->base->io.fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
+			else paxdelta(ip, NiL, f->delta.base->info, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ip->delta->base->io->fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
 		}
 		else if (state.ordered)
 		{
@@ -478,7 +485,7 @@ deltacopy(Archive_t* ip, Archive_t* op, register File_t* f)
 			f->fd = -1;
 			f->ordered = 1;
 		}
-		else if ((f->fd = dup(ip->delta->base->io.fd)) < 0)
+		else if ((f->fd = dup(ip->delta->base->io->fd)) < 0)
 			error(ERROR_SYSTEM|3, "%s: cannot reopen", ip->delta->base->name);
 		else if (lseek(f->fd, f->delta.base->offset, SEEK_SET) < 0)
 			error(ERROR_SYSTEM|3, "%s: base archive seek error", ip->delta->base->name);
@@ -636,7 +643,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 				if (validout(op, f) && selectfile(op, f))
 				{
 					if (state.ordered) paxdelta(ip, op, f, DELTA_SRC|DELTA_BIO|DELTA_SIZE, ip->delta->base, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, 0);
-					else paxdelta(ip, op, f, DELTA_SRC|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ip->delta->base->io.fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, 0);
+					else paxdelta(ip, op, f, DELTA_SRC|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ip->delta->base->io->fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &f->fd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ip, f->st->st_size, 0);
 					if (op->delta && (op->delta->format == COMPRESS || op->delta->format == DELTA))
 					{
 						f->delta.op = DELTA_create;
@@ -921,7 +928,7 @@ if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I
 			if (mp) sfprintf(mp, " size=%I*d", sizeof(dp->vd.size), dp->vd.size);
 #endif
 		}
-		if ((op & (DELTA_BIO|DELTA_OUTPUT)) == DELTA_BIO && dp->vd.size <= state.buffersize && (dp->vd.data = bget(dp->bp, dp->vd.size)))
+		if ((op & (DELTA_BIO|DELTA_OUTPUT)) == DELTA_BIO && dp->vd.size <= state.buffersize && (dp->vd.data = bget(dp->bp, dp->vd.size, NiL)))
 		{
 			op &= ~(DELTA_BIO|DELTA_FREE);
 			op |= DELTA_BUFFER;
@@ -1116,7 +1123,7 @@ if (f->linktype) error(1, "AHA %s => %s %s linktype=%c delta.op=%c ro=%d size=%I
 		}
 		if (data[op].op & DELTA_COUNT)
 		{
-			ap->io.count += n;
+			ap->io->count += n;
 			if (data[op].op & DELTA_OUTPUT)
 				setfile(ap, f);
 		}

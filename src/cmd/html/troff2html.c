@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -53,7 +53,7 @@ USAGE_LICENSE
 "[i:identify?Reads identification options from \afile\a. Unknown options"
 "	are silently ignored. See the \b.xx\b request below for a description"
 "	of the options.]:[file]"
-"[I:include?Appends \adirectory\a to the the list of directories searched"
+"[I:include?Appends \adirectory\a to the list of directories searched"
 "	for \b--macros\b and \b.so\b request files.]:[directory]"
 "[m:macros?Locates and reads the macro package file \apackage\a. In order"
 "	to accomodate different \atroff\a installation styles the file search"

@@ -209,6 +209,44 @@ data/zzz/333/7/r.d'
 	EXEC	data \( -name '*.c' \|\| -name '*.d' \)
 	EXEC	data \( -name '*.c' -or -name '*.d' \)
 	EXEC	data \( -name '*.c' -or -name '*.d' \) -print
+	EXEC	data \( -name '*.c' -prune \) -or \( -name '*.d' -print \)
+		OUTPUT - $'data/aaa/111/4/r.d
+data/aaa/111/5/r.d
+data/aaa/111/6/r.d
+data/aaa/111/7/r.d
+data/aaa/222/4/r.d
+data/aaa/222/5/r.d
+data/aaa/222/6/r.d
+data/aaa/222/7/r.d
+data/aaa/333/4/r.d
+data/aaa/333/5/r.d
+data/aaa/333/6/r.d
+data/aaa/333/7/r.d
+data/zzz/111/4/r.d
+data/zzz/111/5/r.d
+data/zzz/111/6/r.d
+data/zzz/111/7/r.d
+data/zzz/222/4/r.d
+data/zzz/222/5/r.d
+data/zzz/222/6/r.d
+data/zzz/222/7/r.d
+data/zzz/333/4/r.d
+data/zzz/333/5/r.d
+data/zzz/333/6/r.d
+data/zzz/333/7/r.d'
+	EXEC	data \( -name 'zzz|*.c' -prune \) -or \( -name '*.d' -print \)
+		OUTPUT - $'data/aaa/111/4/r.d
+data/aaa/111/5/r.d
+data/aaa/111/6/r.d
+data/aaa/111/7/r.d
+data/aaa/222/4/r.d
+data/aaa/222/5/r.d
+data/aaa/222/6/r.d
+data/aaa/222/7/r.d
+data/aaa/333/4/r.d
+data/aaa/333/5/r.d
+data/aaa/333/6/r.d
+data/aaa/333/7/r.d'
 
 TEST 03 'types'
 	EXEC	data -type d

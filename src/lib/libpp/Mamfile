@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -98,7 +98,7 @@ done ppsym.c
 prev ppsym.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppsym.c
 done ppsym.o generated
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ppsym ppsym.o ${mam_cc_static} ${mam_libast} ${mam_cc_dynamic} ${mam_libast}
 done ppsym generated
 make pp
@@ -111,7 +111,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in pp ast
+exec - for i in pp  ast
 exec - do	case $i in
 exec - 	"pp"|pp)
 exec - 		;;
@@ -189,10 +189,14 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done pplib.h
 done ppargs.c
 prev ppargs.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c ppargs.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1986-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpp]"\" -c ppargs.c
 done ppargs.o generated
 make ppbuiltin.o
 make ppbuiltin.c
+make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfstr.h
 make ${PACKAGE_ast_INCLUDE}/times.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
@@ -209,7 +213,7 @@ make ppcall.c
 prev pplib.h implicit
 done ppcall.c
 prev ppcall.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcall.c
+exec - ${CC}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcall.c
 done ppcall.o generated
 make ppcomment.o
 make ppcomment.c
@@ -252,7 +256,7 @@ prev pplib.h implicit
 done pplex.c
 done ppcpp.c
 prev ppcpp.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcpp.c
+exec - ${CC}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppcpp.c
 done ppcpp.o generated
 make ppdata.o
 make ppdata.c
@@ -292,10 +296,7 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c ppincref
 done ppincref.o generated
 make ppinput.o
 make ppinput.c
-make ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfstr.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
 prev pplib.h implicit
 done ppinput.c
 prev ppinput.c
@@ -312,7 +313,7 @@ done ppkey.o generated
 make pplex.o
 prev pplex.c
 prev pplex.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pplex.c
+exec - ${CC}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c pplex.c
 done pplex.o generated
 make ppline.o
 make ppline.c
@@ -527,7 +528,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libpp.a archive
 prev libpp.a archive
-exec - mv ${PACKAGE_ast_LIB}/libpp.a ${PACKAGE_ast_LIB}/libpp.a.old 2>/dev/null || true; cp libpp.a ${PACKAGE_ast_LIB}/libpp.a
+exec - mv ${PACKAGE_ast_LIB}/libpp.a ${PACKAGE_ast_LIB}/libpp.a.old 2>/dev/null || true; test '' = 'libpp.a' || { cp libpp.a ${PACKAGE_ast_LIB}/libpp.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libpp.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libpp.a generated
 make ${INSTALLROOT}/man/man3
@@ -557,7 +558,7 @@ done ${INSTALLROOT}/man/man3 generated
 make ${INSTALLROOT}/man/man3/pp.3
 make pp.3
 done pp.3
-exec - mv ${INSTALLROOT}/man/man3/pp.3 ${INSTALLROOT}/man/man3/pp.3.old 2>/dev/null || true; cp pp.3 ${INSTALLROOT}/man/man3/pp.3
+exec - mv ${INSTALLROOT}/man/man3/pp.3 ${INSTALLROOT}/man/man3/pp.3.old 2>/dev/null || true; test '' = 'pp.3' || { cp pp.3 ${INSTALLROOT}/man/man3/pp.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/pp.3 generated
 make ${PACKAGE_ast_LIB}/lib
 exec - set -
@@ -585,7 +586,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/pp
 prev pp.req
-exec - mv ${PACKAGE_ast_LIB}/lib/pp ${PACKAGE_ast_LIB}/lib/pp.old 2>/dev/null || true; cp pp.req ${PACKAGE_ast_LIB}/lib/pp
+exec - mv ${PACKAGE_ast_LIB}/lib/pp ${PACKAGE_ast_LIB}/lib/pp.old 2>/dev/null || true; test '' = 'pp.req' || { cp pp.req ${PACKAGE_ast_LIB}/lib/pp  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/pp generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -
@@ -663,7 +664,7 @@ exec - cc -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > pp.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done pp.yacc generated
-exec - mv ${PACKAGE_ast_INCLUDE}/pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc.old 2>/dev/null || true; cp pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc
+exec - mv ${PACKAGE_ast_INCLUDE}/pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc.old 2>/dev/null || true; test '' = 'pp.yacc' || { cp pp.yacc ${PACKAGE_ast_INCLUDE}/pp.yacc  		    		    ;}
 done ${PACKAGE_ast_INCLUDE}/pp.yacc generated
 make ${PACKAGE_ast_INCLUDE}/ppkey.yacc
 make ppkey.yacc
@@ -702,7 +703,7 @@ exec - cc -o ${COTEMP}.exe 1.${COTEMP}.c
 exec - ./${COTEMP}.exe > ppkey.yacc
 exec - rm -f 1.${COTEMP}.c ${COTEMP}.exe
 done ppkey.yacc generated
-exec - mv ${PACKAGE_ast_INCLUDE}/ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc.old 2>/dev/null || true; cp ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc
+exec - mv ${PACKAGE_ast_INCLUDE}/ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc.old 2>/dev/null || true; test '' = 'ppkey.yacc' || { cp ppkey.yacc ${PACKAGE_ast_INCLUDE}/ppkey.yacc  		    		    ;}
 done ${PACKAGE_ast_INCLUDE}/ppkey.yacc generated
 make ${PACKAGE_ast_LIB}/probe/C/pp
 exec - set -
@@ -760,21 +761,21 @@ exec - 	;;
 exec - esac
 exec - chmod u+w,+x probe
 done probe generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/probe ${PACKAGE_ast_LIB}/probe/C/pp/probe.old 2>/dev/null || true; cp probe ${PACKAGE_ast_LIB}/probe/C/pp/probe
+exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/probe ${PACKAGE_ast_LIB}/probe/C/pp/probe.old 2>/dev/null || true; test '' = 'probe' || { cp probe ${PACKAGE_ast_LIB}/probe/C/pp/probe  		    		    ;}
 done ${PACKAGE_ast_LIB}/probe/C/pp/probe generated
 make ${PACKAGE_ast_LIB}/probe/C/pp/pp.def
 make pp.def
 done pp.def
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def.old 2>/dev/null || true; cp pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def
+exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def.old 2>/dev/null || true; test '' = 'pp.def' || { cp pp.def ${PACKAGE_ast_LIB}/probe/C/pp/pp.def  		    		    ;}
 done ${PACKAGE_ast_LIB}/probe/C/pp/pp.def generated
 make ${PACKAGE_ast_LIB}/probe/C/pp/pp.key
 make pp.key
 done pp.key
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key.old 2>/dev/null || true; cp pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key
+exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key.old 2>/dev/null || true; test '' = 'pp.key' || { cp pp.key ${PACKAGE_ast_LIB}/probe/C/pp/pp.key  		    		    ;}
 done ${PACKAGE_ast_LIB}/probe/C/pp/pp.key generated
 make ${PACKAGE_ast_LIB}/probe/C/pp/ppsym
 prev ppsym
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym.old 2>/dev/null || true; cp ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym
+exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym.old 2>/dev/null || true; test '' = 'ppsym' || { cp ppsym ${PACKAGE_ast_LIB}/probe/C/pp/ppsym  		    		    ;}
 done ${PACKAGE_ast_LIB}/probe/C/pp/ppsym generated
 make ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini
 make probe.ini
@@ -802,7 +803,7 @@ exec - ?*)	cmp -s $1 probe.ini || cp $1 probe.ini ;;
 exec - *)	: > probe.ini
 exec - esac
 done probe.ini generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini.old 2>/dev/null || true; cp probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini
+exec - mv ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini.old 2>/dev/null || true; test '' = 'probe.ini' || { cp probe.ini ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini  		    		    ;}
 done ${PACKAGE_ast_LIB}/probe/C/pp/probe.ini generated
 done install virtual
 make test

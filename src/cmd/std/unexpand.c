@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -46,7 +46,7 @@ USAGE_LICENSE
 "[t:tabs]:[tablist:=8?\atablist\a is a comma or space separated list "
 	"of positive integers that specifies the tab stops.  If only one "
 	"tab stop is specified, then tabs will be set at that many "
-	"column positions apart.  Otherwise, the the value in \atablist\a "
+	"column positions apart.  Otherwise, the value in \atablist\a "
 	"must be in ascending order and the tab stops will be set to "
 	"these positions.  In the event of \bexpand\b having to process "
 	"tab characters beyond the last specified tab stop, each tab "
@@ -81,7 +81,7 @@ USAGE_LICENSE
 "[t:tabs]:[tablist:=8?\atablist\a is a comma or space separated list "
 	"of positive integers that specifies the tab stops.  If only one "
 	"tab stop is specified, then tabs will be set at that many "
-	"column positions apart.  Otherwise, the the value in \atablist\a "
+	"column positions apart.  Otherwise, the value in \atablist\a "
 	"must be in ascending order and the tab stops will be set to "
 	"these positions.  This option implies the \b-a\b option.]"
 "\n"

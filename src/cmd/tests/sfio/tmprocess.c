@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -23,20 +23,9 @@
 *                                                              *
 ***************************************************************/
 #include	"sftest.h"
-#undef fork	/* make sure fork() is used, not vfork() */
 
-#if !_PACKAGE_ast
-
-_BEGIN_EXTERNS_
-extern int	fork _ARG_((void));
-extern int	getpid _ARG_((void));
-extern int	wait _ARG_((int*));
-_END_EXTERNS_
-
-#endif
-
-/* test to see if multiple writers to the same file create
-** a consistent set of records.
+/*	Test to see if multiple writers to the same file create
+**	a consistent set of records.
 */
 
 #define N_PROC	3
@@ -79,17 +68,16 @@ Sfdisc_t*	disc;
 
 static Sfdisc_t	Disc[N_PROC];
 
-main()
+MAIN()
 {
-	ssize_t	size[N_PROC][N_REC];
-	int	count[N_PROC];
-	char	record[N_PROC][128], *s;
-	int	i, r, n;
-	Sfio_t*	f;
-	Sfio_t*	fa[N_PROC];
-	char	buf[N_PROC][B_SIZE], b[N_PROC][128];
-	ulong	u;
-	char	path[128];
+	ssize_t		size[N_PROC][N_REC];
+	int		count[N_PROC];
+	char		record[N_PROC][128], *s;
+	int		i, r, n;
+	Sfio_t*		f;
+	Sfio_t*		fa[N_PROC];
+	char		buf[N_PROC][B_SIZE], b[N_PROC][128];
+	unsigned long	u;
 
 	/* create pseudo-random record sizes */
 	u = 1;
@@ -105,11 +93,10 @@ main()
 		record[i][r] = '0' + 2*i;
 
 	/* create file */
-	sfsprintf(path,sizeof(path),"/tmp/sf%o",getpid());
-	if(!(f = sfopen(NIL(Sfio_t*),path,"w+")) )
-		terror("Opening temporary file %s\n",path);
+	if(!(f = sfopen(NIL(Sfio_t*),tstfile(0),"w+")) )
+		terror("Opening temporary file %s\n", tstfile(0));
 	for(i = 0; i < N_PROC; ++i)
-	{	fa[i] = sfopen(NIL(Sfio_t*), path, "a");
+	{	fa[i] = sfopen(NIL(Sfio_t*), tstfile(0), "a");
 		sfsetbuf(fa[i], (Void_t*)buf[i], sizeof(buf[i]));
 		sfset(fa[i], SF_WHOLE, 1);
 		Disc[i].writef = inspect;
@@ -167,7 +154,5 @@ main()
 		if(count[i] != N_REC)
 			terror("Bad count%d %d\n", i, count[i]);
 
-	unlink(path);
-
-	return 0;
+	TSTRETURN(0);
 }

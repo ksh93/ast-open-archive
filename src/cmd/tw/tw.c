@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -96,7 +96,7 @@ USAGE_LICENSE
 "[G:generate?Generate a \aformat\a \blocate\b(1) database of the visited"
 "	files and directories. Exit status 1 means some files were not"
 "	accessible but the database was properly generated; exit status 2"
-"	means that  database was not generated. Format may be:]:[format]{"
+"	means that database was not generated. Format may be:]:[format]{"
 "		[+dir|-?machine independent with directory trailing /.]"
 "		[+old?old fast find]"
 "		[+gnu?gnu \blocate\b(1)]"
@@ -139,7 +139,9 @@ USAGE_LICENSE
 "			value is ignored.]"
 "		[+sort?A pseudo-function: the statement list is a , separated"
 "			list of identifiers used to sort the entries"
-"			of each directory.]"
+"			of each directory. If any identifier is preceded by"
+"			\b!\b then the sort order is reversed. If any"
+"			identifier is preceded by \b~\b then case is ignored.]"
 "}"
 "[+?\astatement-list\a is a C style \bexpr\b(3) expression that supports:"
 "	\bint\b \avar\a, ...; and \bfloat\b \avar\a, ...; declarations,"

@@ -1,7 +1,7 @@
 :PACKAGE: ast
 
 LICENSE		= since=1984,author='dgk+Pat Sullivan'
-CCFLAGS		= -O $(CC.DLL)
+CCFLAGS		= $(CC.OPTIMIZE) $(CC.DLL)
 VERSION		= 1.0
 
 ESH		== 1

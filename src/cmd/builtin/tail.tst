@@ -1,4 +1,4 @@
-# regression tests for the od utilitiy
+# regression tests for the tail utilitiy
 
 KEEP "*.dat"
 

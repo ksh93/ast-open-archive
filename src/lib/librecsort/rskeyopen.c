@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -31,7 +31,7 @@
 
 #include "rskeyhdr.h"
 
-static const char id[] = "\n@(#)rskey library (AT&T Research) 1996-12-25\0\n";
+static const char id[] = "\n@(#)rskey library (AT&T Research) 2000-03-17\0\n";
 
 static const char lib[] = "librecsort:rskey";
 

@@ -14,6 +14,7 @@
 #if _PACKAGE_ast
 
 #include <ast.h>
+#include <error.h>
 #include <getopt.h>
 #include <ls.h>
 #include <sig.h>
@@ -210,10 +211,8 @@ struct parse {
 #define P	(1<<11)		/* Autoprint dot after command */
 #define R	(1<<12)		/* Cannot call from collect, Readonly var */
 #define S	(1<<13)		/* Var cannot change while sourcing */
-#define T	(1<<14)		/* Is a transparent command */
-#define W	(1<<15)		/* Invalid for readonly */
-#define V	S		/* Used by help */
-#define X	T		/* Used by help */
+#define W	(1<<14)		/* Invalid for readonly */
+#define Z	(1<<15)		/* Is a transparent command */
 
 /*
  * Oft-used mask values
@@ -582,6 +581,7 @@ typedef struct {
 	}		msg;
 
 	struct {
+	char	pwd[2][PATHSIZE];	/* pwd and oldpwd paths */
 	char	mail[PATHSIZE];		/* Name of current file */
 	char	move[PATHSIZE];		/* Very tempory name buffer */
 	char	prev[PATHSIZE];		/* Name of previous file */
@@ -656,6 +656,7 @@ typedef struct {
 	char*	autoinc;
 	char*	autoprint;
 	char*	bang;
+	char*	cdpath;
 	char*	cmd;
 	char*	coprocess;
 	long	crt;
@@ -681,7 +682,7 @@ typedef struct {
 	char*	indentprefix;
 	char*	interactive;
 	char*	justcheck;
-	char*	justfrom;
+	long	justfrom;
 	char*	justheaders;
 	char*	keep;
 	char*	keepsave;
@@ -697,11 +698,13 @@ typedef struct {
 	char*	metoo;
 	char*	more;
 	char*	news;
+	char*	oldpwd;
 	char*	onehop;
 	char*	outfolder;
 	char*	page;
 	char*	pager;
 	char*	prompt;
+	char*	pwd;
 	char*	quiet;
 	char*	receive;
 	char*	rule;
@@ -857,6 +860,7 @@ extern FILE*		pipeopen(char*, char*);
 extern int		preserve(char*);
 extern int		puthead(FILE*, struct header*, int);
 extern int		putline(FILE*, char*);
+extern int		pwd(void);
 extern void		quit(void);
 extern int		readline(FILE*, char*, int);
 extern char*		record(char*, unsigned long);
@@ -895,6 +899,7 @@ extern void		set_mailcap(struct var*, const char*);
 extern void		set_more(struct var*, const char*);
 extern void		set_news(struct var*, const char*);
 extern void		set_notyet(struct var*, const char*);
+extern void		set_pwd(struct var*, const char*);
 extern void		set_screen(struct var*, const char*);
 extern void		set_sendmail(struct var*, const char*);
 extern void		set_shell(struct var*, const char*);
@@ -964,7 +969,15 @@ extern int		imap_save(struct msg*, char*);
 extern FILE*		imap_setinput(struct msg*);
 extern int		imap_setptr(char*, int);
 
-#if !_PACKAGE_ast
+#if _PACKAGE_ast
+
+#define T(s)		ERROR_translate(0,0,0,s)
+#define X(s)		ERROR_catalog(s)
+
+#else
+
+#define T(s)		(s)	/* Dynamic translation string */
+#define X(s)		(s)	/* Static translation string */
 
 #define imap_command(a)		(-1)
 #define imap_copy(a,b,c,d,e)	(-1)

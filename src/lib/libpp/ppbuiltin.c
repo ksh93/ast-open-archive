@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -33,6 +33,7 @@
 #include "pplib.h"
 
 #include <times.h>
+#include <sfstr.h>
 
 /*
  * process a #(...) builtin macro call
@@ -53,6 +54,7 @@ ppbuiltin(void)
 	struct ppinstk*		in;
 	struct pplist*		list;
 	struct ppsymbol*	sym;
+	Sfio_t*			sp;
 
 	number = pp.state;
 	pp.state |= DISABLE|FILEPOP|NOSPACE;
@@ -251,8 +253,33 @@ ppbuiltin(void)
 		case V_GETPRD:
 			p = (list = (struct pplist*)hashget(pp.prdtab, a)) ? list->value : "";
 			break;
+		case V__PRAGMA:
+			if ((c = pplex()) == '(')
+			{
+				number = pp.state;
+				pp.state |= NOSPACE|STRIP;
+				c = pplex();
+				pp.state = number;
+				if (c == T_STRING || c == T_WSTRING)
+				{
+					if (!(sp = sfstropen()))
+						error(3, "temporary buffer allocation error");
+					sfprintf(sp, "#%s %s\n", dirname(PRAGMA), pp.token);
+					a = sfstruse(sp);
+					if ((c = pplex()) == ')')
+					{
+						pp.state |= NEWLINE;
+						PUSH_BUFFER(p, a, 1);
+					}
+					sfstrclose(sp);
+				}
+			}
+			if (c != ')')
+				error(2, "%s: (\"...\") expected", p);
+			return;
 		default:
-			if (pp.builtin && (a = (*pp.builtin)(pp.valbuf, p, a))) p = a;
+			if (pp.builtin && (a = (*pp.builtin)(pp.valbuf, p, a)))
+				p = a;
 			break;
 		}
 		break;
@@ -265,27 +292,31 @@ ppbuiltin(void)
 		p = pp.valbuf + c;
 		for (;;)
 		{
-			if (p < pp.valbuf + MAXTOKEN - 2) switch (*p++ = *a++)
-			{
-			case 0:
-				break;
-			case MARK:
-				*p++ = MARK;
-				/*FALLTHROUGH*/
-			default:
-				continue;
-			}
+			if (p < pp.valbuf + MAXTOKEN - 2)
+				switch (*p++ = *a++)
+				{
+				case 0:
+					break;
+				case MARK:
+					*p++ = MARK;
+					/*FALLTHROUGH*/
+				default:
+					continue;
+				}
 			break;
 		}
 		p = pp.valbuf + c;
 	}
-	if (p == pp.valbuf) PUSH_STRING(p);
+	if (p == pp.valbuf)
+		PUSH_STRING(p);
 	else
 	{
-		if (p == pp.valbuf + 1) *pp.valbuf = '"';
+		if (p == pp.valbuf + 1)
+			*pp.valbuf = '"';
 		else
 		{
-			if (strlen(p) > MAXTOKEN - 2) error(1, "%-.16s: builtin value truncated", p);
+			if (strlen(p) > MAXTOKEN - 2)
+				error(1, "%-.16s: builtin value truncated", p);
 			sfsprintf(pp.valbuf, MAXTOKEN, "\"%-.*s", MAXTOKEN - 2, p);
 		}
 		PUSH_QUOTE(pp.valbuf, 1);

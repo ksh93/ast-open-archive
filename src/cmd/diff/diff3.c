@@ -204,20 +204,6 @@ static char const diff_program[] = DIFF_PROGRAM;
 
 #if _PACKAGE_ast
 
-#define error		ast_error
-#define errorf		ast_errorf
-#define errorv		ast_errorv
-
-#include <error.h>
-
-#undef	error
-#undef	errorf
-#undef	errorv
-
-#define optarg	opt_info.arg
-#define optind	opt_info.index
-#define optnum	opt_info.num
-
 static const char ast_usage[] =
 "[-?\n@(#)diff3 (GNU diffutils " VERSION ") " RELEASE "\n]"
 #ifdef USAGE_LICENSE
@@ -367,10 +353,10 @@ main (argc, argv)
 	  try_help ("Too many labels were given.  The limit is 3.");
 #if _PACKAGE_ast
 	  case '?':
-		errorf(0, 0, ERROR_USAGE|4, "%s", optarg);
+		errormsg(0, ERROR_USAGE|4, "%s", optarg);
 		break;
 	  case ':':
-		errorf(0, 0, 2, "%s", optarg);
+		errormsg(0, 2, "%s", optarg);
 		break;
 #else
 	default:
@@ -1840,7 +1826,7 @@ static void
 fatal (string)
      char const *string;
 {
-  fprintf (stderr, "%s: %s\n", program_name, string);
+  fprintf (stderr, "%s: %s\n", program_name, TRANSLATE(string));
   exit (2);
 }
 
@@ -1851,6 +1837,6 @@ perror_with_exit (string)
   int e = errno;
   fprintf (stderr, "%s: ", program_name);
   errno = e;
-  perror (string);
+  perror (TRANSLATE(string));
   exit (2);
 }

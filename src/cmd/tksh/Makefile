@@ -3,7 +3,7 @@
 ID			=	tksh
 LICENSE			=	type=special
 
-CCFLAGS			=	-O
+CCFLAGS			=	$(CC.OPTIMIZE)
 
 TCL_VERSION		=	7.6
 TK_VERSION		=	4.2
@@ -15,7 +15,7 @@ nvenv			==	nvprivate[0]
 _BLD_tcl		==	1
 
 if CC.HOSTTYPE == "win32.*"
-CCFLAGS			=	-O $(CC.DLLBIG)
+CCFLAGS			=	$(CC.OPTIMIZE) $(CC.DLLBIG)
 end
 
 .SOURCE : src tcl

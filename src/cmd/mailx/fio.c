@@ -612,6 +612,7 @@ moreout(Sfio_t* fp, const void* buf, size_t n, Sfdisc_t* dp)
 	register char*		s;
 	register char*		e;
 	register ssize_t	w;
+	register size_t		m;
 	register int		r;
 
 	if (!state.more.row)
@@ -665,8 +666,8 @@ moreout(Sfio_t* fp, const void* buf, size_t n, Sfdisc_t* dp)
 			if (r == '/') {
 				sfwr(fp, "/", 1, dp);
 				if (fgets(state.more.tmp, sizeof(state.more.tmp), stdin)) {
-					if ((n = strlen(state.more.tmp)) > 1 && state.more.tmp[n - 1] == '\n')
-						state.more.tmp[n - 1] = 0;
+					if ((m = strlen(state.more.tmp)) > 1 && state.more.tmp[m - 1] == '\n')
+						state.more.tmp[m - 1] = 0;
 					if (state.more.tmp[0])
 						strcpy(state.more.pattern, state.more.tmp);
 				}

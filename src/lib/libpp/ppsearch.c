@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -605,26 +605,33 @@ ppsearch(char* file, int type, int flags)
 		case 0:
 			if (s = strchr(file, '\\'))
 			{
-				if (ppisid(file[0]) && file[1] == ':' && file[2] == '\\')
-				{
-					file[1] = file[0];
-					file[0] = '/';
-					dospath = 1;
-				}
-				else dospath = 2;
 				do *s++ = '/'; while (s = strchr(s, '\\'));
 				pathcanon(file, 0);
+				dospath = 1;
+				goto again;
+			}
+			/*FALLTHROUGH*/
+		case 1:
+			if (ppisid(file[0]) && file[1] == ':' && file[2] == '/')
+			{
+				file[1] = file[0];
+				file[0] = '/';
+				pathcanon(file, 0);
+				dospath = 2;
 				goto again;
 			}
 			break;
-		case 1:
+		case 2:
 			file += 2;
 			goto again;
 		}
 		if ((flags & (SEARCH_INCLUDE|SEARCH_NEXT)) == SEARCH_INCLUDE)
 		{
 			if (!(pp.mode & GENDEPS))
-				error(2, "%s: cannot find include file", file);
+			{
+				if (!(pp.option & ALLPOSSIBLE) || pp.in->prev->prev)
+					error(2, "%s: cannot find include file", file);
+			}
 			else if (!(pp.mode & INIT))
 			{
 				if ((pp.column + strlen(file)) >= COLUMN_MAX)

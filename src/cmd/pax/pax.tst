@@ -1,5 +1,7 @@
 # regression tests for the pax utility
 
+export TZ=EST5EDT
+
 dateformat='%(mtime:time=%Y-%m-%d/%H:%M:%S)s %(path)s'
 modeformat='%(mtime:time=%K)s %(mode)s %(size)u %(path)s'
 
@@ -58,7 +60,7 @@ TEST 01 'different date formats'
 		ERROR -
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
-		ERROR - y2k.pax $'volume 1 in vdb format\n372 files, 60 blocks'
+		ERROR - y2k.pax $'volume 1 in vdb format\n372 files, 69 blocks'
 
 TEST 02 'different file modes'
 	o=

@@ -1,3 +1,6 @@
+00-05-23 cmdarg: fix -a strchr loop (thanks dr ek)
+00-05-01 find: add [f]printx and %[xX] -- or use tw
+00-03-12 find: fix multiple PRINT with -print imbeded in ( ) -o ( )
 99-10-11 tw: tighten up --generate exit codes
 	 updatedb: add a few options
 99-08-11 find: fix -size

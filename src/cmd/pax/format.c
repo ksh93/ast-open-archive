@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -99,7 +99,7 @@ isalar(Archive_t* ap, register char* hdr)
 	getlabstr(hdr, 25, 6, state.id.format);
 	getlabstr(hdr, 31, 7, state.id.implementation);
 	getlabstr(hdr, 38, 14, state.id.owner);
-	ap->io.blocked = !bcount(ap);
+	ap->io->blocked = !bcount(ap);
 	return 1;
 }
 
@@ -131,12 +131,12 @@ getprologue(register Archive_t* ap)
 	int		n;
 	off_t		size;
 
-	if (ap->volume && ap->io.mode != O_RDONLY)
+	if (ap->volume && ap->io->mode != O_RDONLY)
 		return 0;
 	state.id.volume[0] = 0;
 	ap->format = -1;
-	ap->io.offset += ap->io.count;
-	ap->io.count = 0;
+	ap->io->offset += ap->io->count;
+	ap->io->count = 0;
 	ap->section = SECTION_CONTROL;
 	convert(SECTION_CONTROL, CC_NATIVE, CC_NATIVE);
 	if (bread(ap, alar_header, (off_t)ALAR_HEADER, (off_t)ALAR_HEADER, 0) <= 0)
@@ -239,14 +239,14 @@ getprologue(register Archive_t* ap)
 						state.meter.size *= 3;
 						break;
 					case GZIP:
-						if ((pos = lseek(ap->io.fd, (off_t)0, SEEK_CUR)) < 0 || lseek(ap->io.fd, (off_t)-4, SEEK_END) <= 0 || read(ap->io.fd, buf, 4) != 4)
+						if ((pos = lseek(ap->io->fd, (off_t)0, SEEK_CUR)) < 0 || lseek(ap->io->fd, (off_t)-4, SEEK_END) <= 0 || read(ap->io->fd, buf, 4) != 4)
 							state.meter.size *= 6;
 						else
 							state.meter.size = ((unsigned char)buf[0]) |
 					      				   ((unsigned char)buf[1] << 8) |
 					        			   ((unsigned char)buf[2] << 16) |
 					        			   ((unsigned char)buf[3] << 24);
-						lseek(ap->io.fd, pos, SEEK_SET);
+						lseek(ap->io->fd, pos, SEEK_SET);
 						break;
 					case BZIP:
 						state.meter.size *= 7;
@@ -255,7 +255,7 @@ getprologue(register Archive_t* ap)
 				cmd[0] = format[ap->compress].undo[0];
 				cmd[1] = format[ap->compress].undo[1];
 				cmd[2] = 0;
-				ops[0] = PROC_FD_DUP(ap->io.fd, 0, PROC_FD_PARENT|PROC_FD_CHILD);
+				ops[0] = PROC_FD_DUP(ap->io->fd, 0, PROC_FD_PARENT|PROC_FD_CHILD);
 				if (ap->parent && !state.ordered)
 				{
 					if ((n = open(state.tmp.file, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
@@ -275,7 +275,7 @@ getprologue(register Archive_t* ap)
 				{
 					if (n = procclose(proc))
 						error(3, "%s: %s filter exit code %d", ap->name, format[ap->compress].undo[0], n);
-					if ((ap->io.fd = open(state.tmp.file, O_RDONLY|O_BINARY)) < 0)
+					if ((ap->io->fd = open(state.tmp.file, O_RDONLY|O_BINARY)) < 0)
 						error(ERROR_SYSTEM|3, "%s: cannot read %s base temporary file %s", ap->name, format[ap->compress].undo[0], state.tmp.file);
 					if (remove(state.tmp.file))
 						error(ERROR_SYSTEM|1, "%s: cannot remove %s base temporary file %s", ap->name, format[ap->compress].undo[0], state.tmp.file);
@@ -284,7 +284,7 @@ getprologue(register Archive_t* ap)
 				{
 					List_t*	p;
 
-					ap->io.fd = proc->rfd;
+					ap->io->fd = proc->rfd;
 					if (!(p = newof(0, List_t, 1, 0)))
 						error(3, "out of space [state.proc]");
 					p->item = (void*)proc;
@@ -403,10 +403,10 @@ putprologue(register Archive_t* ap)
 	case ALAR:
 	case IBMAR:
 #if DEBUG
-		if (ap->io.blok) ap->io.blocked = 1;
+		if (ap->io->blok) ap->io->blocked = 1;
 		else
 #endif
-		ap->io.blocked = !ap->io.unblocked;
+		ap->io->blocked = !ap->io->unblocked;
 		if (!state.id.owner[0])
 		{
 			strncpy(state.id.owner, fmtuid(getuid()), sizeof(state.id.owner) - 1);
@@ -464,7 +464,7 @@ getepilogue(register Archive_t* ap)
 	ap->section = SECTION_CONTROL;
 	if (ap->delta && ap->delta->epilogue < 0)
 		error(3, "%s: corrupt archive: missing epilogue", ap->name);
-	if (ap->io.mode != O_RDONLY) backup(ap);
+	if (ap->io->mode != O_RDONLY) backup(ap);
 	else
 	{
 		if (ap->names)
@@ -482,6 +482,13 @@ getepilogue(register Archive_t* ap)
 		case SAVESET:
 #endif
 			break;
+		case MIME:
+			if (state.mime.magic)
+			{
+				free(state.mime.magic);
+				state.mime.magic = 0;
+			}
+			break;
 		case VDB:
 			if (state.vdb.header.base)
 			{
@@ -496,17 +503,17 @@ getepilogue(register Archive_t* ap)
 			 * separated by up to MAXBLOCKS null byte filler
 			 */
 
-			if (ap->io.keep)
+			if (ap->io->keep)
 			{
 				bskip(ap);
-				if (ap->io.eof) ap->io.keep = 0;
-				else if (ap->io.keep > 0) ap->io.keep--;
+				if (ap->io->eof) ap->io->keep = 0;
+				else if (ap->io->keep > 0) ap->io->keep--;
 				ap->format = IN_DEFAULT;
 				message((-2, "go for next tape volume"));
 				return;
 			}
 			i = MAXBLOCKS;
-			if (!(n = roundof(ap->io.count, BLOCKSIZE) - ap->io.count) || bread(ap, state.tmp.buffer, (off_t)0, (off_t)n, 0) > 0) do
+			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, state.tmp.buffer, (off_t)0, (off_t)n, 0) > 0) do
 			{
 				if (*(s = state.tmp.buffer) && n == BLOCKSIZE)
 				{
@@ -523,7 +530,7 @@ getepilogue(register Archive_t* ap)
 				}
 				n = BLOCKSIZE;
 			} while (i-- > 0 && bread(ap, state.tmp.buffer, (off_t)0, n, 0) > 0);
-			bflushin(ap);
+			bflushin(ap, 1);
 			break;
 		}
 		ap->format = IN_DEFAULT;
@@ -578,7 +585,7 @@ putepilogue(register Archive_t* ap)
 				break;
 			}
 		selected = ap->selected;
-		boundary = ap->io.count;
+		boundary = ap->io->count;
 		switch (ap->format)
 		{
 		case ALAR:
@@ -591,7 +598,7 @@ putepilogue(register Archive_t* ap)
 		case ASC:
 		case ASCHK:
 			putinfo(ap, CPIO_TRAILER, ap->delta && (ap->delta->format == COMPRESS || ap->delta->format == DELTA) ? ap->delta->index + 1 : 0, 0);
-			boundary = ap->io.unblocked ? BLOCKSIZE : state.blocksize;
+			boundary = ap->io->unblocked ? BLOCKSIZE : state.blocksize;
 			break;
 		case PAX:
 		case TAR:
@@ -599,18 +606,18 @@ putepilogue(register Archive_t* ap)
 			memzero(tar_block, TAR_HEADER);
 			bwrite(ap, tar_block, TAR_HEADER);
 			bwrite(ap, tar_block, TAR_HEADER);
-			boundary = ap->io.unblocked ? BLOCKSIZE : state.blocksize;
+			boundary = ap->io->unblocked ? BLOCKSIZE : state.blocksize;
 			break;
 		case VDB:
 			if (state.record.header)
 				bwrite(ap, state.record.header, state.record.headerlen);
-			sfprintf(state.vdb.directory, "%c%s%c%0*I*d%c%0*I*d\n", VDB_DELIMITER, VDB_DIRECTORY, VDB_DELIMITER, VDB_FIXED, sizeof(ap->io.offset), ap->io.offset + ap->io.count + sizeof(VDB_DIRECTORY), VDB_DELIMITER, VDB_FIXED, sizeof(Sfoff_t), sftell(state.vdb.directory) - sizeof(VDB_DIRECTORY) + VDB_LENGTH + 1);
+			sfprintf(state.vdb.directory, "%c%s%c%0*I*d%c%0*I*d\n", VDB_DELIMITER, VDB_DIRECTORY, VDB_DELIMITER, VDB_FIXED, sizeof(ap->io->offset), ap->io->offset + ap->io->count + sizeof(VDB_DIRECTORY), VDB_DELIMITER, VDB_FIXED, sizeof(Sfoff_t), sftell(state.vdb.directory) - sizeof(VDB_DIRECTORY) + VDB_LENGTH + 1);
 			bwrite(ap, sfstrbase(state.vdb.directory), sfstrtell(state.vdb.directory));
 			sfstrclose(state.vdb.directory);
-			boundary = ap->io.count;
+			boundary = ap->io->count;
 			break;
 		}
-		if (n = ((ap->io.count > boundary) ? roundof(ap->io.count, boundary) : boundary) - ap->io.count)
+		if (n = ((ap->io->count > boundary) ? roundof(ap->io->count, boundary) : boundary) - ap->io->count)
 		{
 			memzero(state.tmp.buffer, n);
 			bwrite(ap, state.tmp.buffer, n);
@@ -620,8 +627,8 @@ putepilogue(register Archive_t* ap)
 	}
 	else
 	{
-		ap->io.count = ap->io.offset = 0;
-		ap->io.next = ap->io.buffer;
+		ap->io->count = ap->io->offset = 0;
+		ap->io->next = ap->io->buffer;
 	}
 }
 
@@ -823,7 +830,7 @@ getkeytime(Archive_t* ap, File_t* f, int index, time_t* tm)
 	NoP(f);
 	op = &options[index];
 	if (op->level >= 6)
-		*tm = time((time_t*)0);
+		*tm = NOW;
 	else if (op->level < 5)
 	{
 		if (op->entry == ap->entry || op->level >= 3)
@@ -864,6 +871,48 @@ cabclose(Archive_t* ap)
 #endif
 
 /*
+ * make a seekable copy of ap->io input
+ */
+
+static void
+seekable(Archive_t* ap)
+{
+	off_t		m;
+	off_t		z;
+	char*		s;
+	int		rfd;
+	int		wfd;
+
+	if ((wfd = open(state.tmp.file, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IRUSR)) < 0)
+		error(ERROR_SYSTEM|3, "%s: cannot create seekable temporary %s", ap->name, state.tmp.file);
+	if ((rfd = open(state.tmp.file, O_RDONLY|O_BINARY)) < 0)
+		error(ERROR_SYSTEM|3, "%s: cannot open seekable temporary %s", ap->name, state.tmp.file);
+	if (remove(state.tmp.file))
+		error(ERROR_SYSTEM|1, "%s: cannot remove seekable temporary %s", ap->name, state.tmp.file);
+	ap->io->seekable = 1;
+	z = 0;
+	s = ap->io->buffer + MAXUNREAD;
+	m = ap->io->last - s;
+	do
+	{
+		if (write(wfd, s, m) != m)
+			error(ERROR_SYSTEM|3, "%s: seekable temporary %s write error", ap->name, state.tmp.file);
+		z += m;
+	} while ((m = read(ap->io->fd, s, state.buffersize)) > 0);
+	close(wfd);
+	close(ap->io->fd);
+	ap->io->size = z;
+	z = ap->io->count;
+	ap->io->next = ap->io->last = s;
+	ap->io->offset = ap->io->count = 0;
+	if (ap->io->fd || (ap->io->fd = dup(rfd)) < 0)
+		ap->io->fd = rfd;
+	else
+		close(rfd);
+	bread(ap, NiL, z, z, 0);
+}
+
+/*
  * read next archive entry header
  */
 
@@ -874,6 +923,8 @@ getheader(register Archive_t* ap, register File_t* f)
 	register int	i;
 	register off_t	n;
 	char*		t;
+	char*		v;
+	off_t		m;
 	struct tm	tm;
 	long		num;
 	long		sum;
@@ -882,6 +933,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	int		lab;
 	int		type;
 	int		ordered;
+	int		loop;
 	int_2		magic;
 
 	struct
@@ -915,7 +967,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	warned = 0;
 	checkdelta = !ap->entry++ && (!ap->delta || ap->delta->format != DELTA_IGNORE && ap->delta->format != DELTA_PATCH);
 	type = 0;
-	if (ap->io.mode != O_RDONLY) bsave(ap);
+	if (ap->io->mode != O_RDONLY) bsave(ap);
  again:
 	ap->memsum = 0;
 	for (;;)
@@ -993,7 +1045,7 @@ getheader(register Archive_t* ap, register File_t* f)
 							}
 						}
 						if (!f->st->st_mtime)
-							f->st->st_mtime = time((time_t*)0);
+							f->st->st_mtime = NOW;
 					}
 					else if (type == 2)
 					{
@@ -1011,11 +1063,11 @@ getheader(register Archive_t* ap, register File_t* f)
 						}
 						state.blocksize = getlabnum(alar_header, 6, 5, 10);
 						state.record.size = getlabnum(alar_header, 11, 5, 10);
-						if (!ap->io.blocked) f->st->st_size = getlabnum(alar_header, 16, 10, 10);
+						if (!ap->io->blocked) f->st->st_size = getlabnum(alar_header, 16, 10, 10);
 						state.record.offset = getlabnum(alar_header, 51, 2, 10);
 					}
 				}
-				else if (!ap->io.blocked && strneq(alar_header, "VOL1", 4))
+				else if (!ap->io->blocked && strneq(alar_header, "VOL1", 4))
 				{
 					bunread(ap, alar_header, lab);
 					if (!(getprologue(ap))) return 0;
@@ -1279,7 +1331,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				ap->format = PAX;
 				if (f->st->st_size > 0)
 				{
-					if (s = bget(ap, f->st->st_size))
+					if (s = bget(ap, f->st->st_size, NiL))
 					{
 						s[f->st->st_size - 1] = 0;
 						setoptions(s, NiL, state.usage, ap);
@@ -1407,7 +1459,7 @@ getheader(register Archive_t* ap, register File_t* f)
 		case VDB:
 			if (!state.vdb.header.base)
 			{
-				if (fstat(ap->io.fd, &state.vdb.st)) break;
+				if (fstat(ap->io->fd, &state.vdb.st)) break;
 				state.vdb.st.st_mode = modex(state.vdb.st.st_mode);
 				s = tar_block;
 				n = sizeof(VDB_MAGIC) + sizeof(state.id.volume) + 1;
@@ -1420,16 +1472,16 @@ getheader(register Archive_t* ap, register File_t* f)
 					if (t = strchr(s, '\n')) *t = 0;
 					strncpy(state.id.volume, s + sizeof(VDB_MAGIC) + 1, sizeof(state.id.volume) - 2);
 				}
-				if (lseek(ap->io.fd, (off_t)(-(VDB_LENGTH + 1)), SEEK_END) <= 0) break;
-				if (read(ap->io.fd, s, VDB_LENGTH + 1) != (VDB_LENGTH + 1)) break;
+				if (lseek(ap->io->fd, (off_t)(-(VDB_LENGTH + 1)), SEEK_END) <= 0) break;
+				if (read(ap->io->fd, s, VDB_LENGTH + 1) != (VDB_LENGTH + 1)) break;
 				state.vdb.variant = *s++ != '\n';
 				if (!strneq(s, VDB_DIRECTORY, sizeof(VDB_DIRECTORY) - 1)) break;
 				state.vdb.delimiter = s[VDB_OFFSET - 1];
 				n = strtol(s + VDB_OFFSET, NiL, 10) - sizeof(VDB_DIRECTORY);
-				i = lseek(ap->io.fd, (off_t)0, SEEK_CUR) - n - VDB_LENGTH - state.vdb.variant;
+				i = lseek(ap->io->fd, (off_t)0, SEEK_CUR) - n - VDB_LENGTH - state.vdb.variant;
 				if (!(state.vdb.header.base = newof(0, char, i, 0))) break;
-				if (lseek(ap->io.fd, n, SEEK_SET) != n) break;
-				if (read(ap->io.fd, state.vdb.header.base, i) != i) break;
+				if (lseek(ap->io->fd, n, SEEK_SET) != n) break;
+				if (read(ap->io->fd, state.vdb.header.base, i) != i) break;
 				*(state.vdb.header.base + i) = 0;
 				if (!strneq(state.vdb.header.base, VDB_DIRECTORY, sizeof(VDB_DIRECTORY) - 1)) break;
 				if (!(state.vdb.header.next = strchr(state.vdb.header.base, '\n'))) break;
@@ -1445,7 +1497,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			*t++ = 0;
 			n = strtol(t, &t, 10);
 			if (*t++ != state.vdb.delimiter) goto vdb_eof;
-			if (lseek(ap->io.fd, n, SEEK_SET) != n) goto vdb_eof;
+			if (lseek(ap->io->fd, n, SEEK_SET) != n) goto vdb_eof;
 			*f->st = state.vdb.st;
 			f->st->st_size = strtol(t, &t, 10);
 			if (*t++ == state.vdb.delimiter) do
@@ -1465,9 +1517,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			f->linkname = 0;
 			f->uidname = 0;
 			f->gidname = 0;
-			ap->io.eof = 1;
-			bflushin(ap);
-			ap->io.eof = 0;
+			bflushin(ap, 0);
 			goto found;
 		case RPM:
 		{
@@ -1522,7 +1572,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				case 5:
 					if (bread(ap, &verify, (off_t)sizeof(verify), (off_t)sizeof(verify), 0) <= 0)
 					{
-						error(2, "%s: %s format header magic expected at offset %ld", ap->name, format[ap->format].name, ap->io.offset + ap->io.count);
+						error(2, "%s: %s format header magic expected at offset %ld", ap->name, format[ap->format].name, ap->io->offset + ap->io->count);
 						return 0;
 					}
 					if (ap->swap)
@@ -1606,7 +1656,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			zip_done:
 				if (ap->entries == ap->verified)
 					return 0;
-				error(2, "%s: %d out of %d verification entries omitted", ap->entries - ap->verified, ap->entries);
+				error(2, "%s: %d out of %d verification entries omitted", ap->name, ap->entries - ap->verified, ap->entries);
 				break;
 			}
 			n = swapget(0, zip_header, 4);
@@ -1954,10 +2004,162 @@ getheader(register Archive_t* ap, register File_t* f)
 			f->st->st_size = cab->file[i].entry.size;
 			goto found;
 		}
+		case MIME:
+			if (state.mime.fill)
+			{
+				bread(ap, NiL, (off_t)0, (off_t)state.mime.fill, 0);
+				state.mime.fill = 0;
+			}
+			if (!state.mime.magic)
+			{
+				s = tar_block;
+				if (bread(ap, s, (off_t)0, (off_t)TAR_HEADER, 0) <= 0)
+					break;
+				bunread(ap, s, TAR_HEADER);
+				if (s[0] != '-' || s[1] != '-' || !(t = (char*)memchr(s, '\n', TAR_HEADER - 2)) || (t - s + 8) >= TAR_HEADER || strncasecmp(t + 1, "Content", 7))
+					break;
+				n = t - s + 1;
+				if (t > s && *(t - 1) == '\r')
+					t--;
+				state.mime.length = t - s;
+				if (!(state.mime.magic = newof(0, char, state.mime.length, 1)))
+					error(ERROR_SYSTEM|3, "out of space [mime]");
+				memcpy(state.mime.magic, s, state.mime.length);
+				message((-1, "mime magic `%s'", state.mime.magic));
+				bread(ap, NiL, (off_t)0, n, 0);
+			}
+			else if (bread(ap, s = state.tmp.buffer, state.mime.length + 2, state.mime.length + 2, 1) <= 0 || memcmp(s, state.mime.magic, state.mime.length))
+				error(3, "%s: corrupt %s format member header -- separator not found", ap->name, format[MIME].name);
+			else if (*(s += state.mime.length) == '-' && *(s + 1) == '-')
+			{
+				while (bread(ap, s, 1, 1, 1) > 0 && *s != '\n');
+				return 0;
+			}
+			else if (*s == '\n')
+				bunread(ap, s + 1, 1);
+			else if (*s != '\r' && *(s + 1) != '\n')
+				error(3, "%s: corrupt %s format member header -- separator line not found", ap->name, format[MIME].name);
+			f->name = 0;
+			for (;;)
+			{
+				for (t = (s = state.tmp.buffer) + state.buffersize - 1; s < t; s++)
+					if (bread(ap, s, 1, 1, 1) <= 0)
+						error(3, "%s: unexpected %s format EOF", ap->name, format[MIME].name);
+					else if (*s == '\n')
+					{
+						if (s > state.tmp.buffer && *(s - 1) == '\r')
+							s--;
+						*s = 0;
+						break;
+					}
+				s = state.tmp.buffer;
+				if (!*s)
+					break;
+				if (strncasecmp(s, "content-", 8))
+					error(3, "%s: corrupt %s format member header", ap->name, format[MIME].name);
+				if (t = strchr(s, ':'))
+					s = t + 1;
+				while (isspace(*s))
+					s++;
+				for (;;)
+				{
+					for (t = s; *s && *s != ';' && *s != '='; s++);
+					if (!(n = s - t))
+						break;
+					if (*s == '=')
+					{
+						if (*++s == '"')
+							for (v = ++s; *s && *s != '"'; s++);
+						else
+							for (v = s; *s && *s != ';'; s++);
+					}
+					else
+						v = s;
+					m = s - v;
+					if (*s)
+						*s++ = 0;
+					for (; *s == ';' || isspace(*s); s++);
+					if (!f->name && n == 4 && !strncasecmp(t, "name", 4) || n == 8 && !strncasecmp(t, "filename", 8))
+					{
+						f->name = ap->path.header;
+						if (m > sizeof(ap->path.header))
+							error(3, "%s: %s format member %d name too long", ap->name, format[MIME].name, ap->entries + 1);
+						strcpy(f->name, v);
+						if (strchr(f->name, '\\'))
+						{
+							t = f->name;
+							if (t[1] == ':' && isalpha(t[0]))
+							{
+								if (*(t += 2) == '\\' || *t == '/')
+									t++;
+								f->name = t;
+							}
+							for (; *t; t++)
+								if (*t == '\\')
+									*t = '/';
+						}
+					}
+				}
+			}
+			if (!f->name)
+			{
+				if (s = strrchr(ap->name, '/'))
+					s++;
+				else
+					s = ap->name;
+				sfsprintf(f->name = ap->path.header, sizeof(ap->path.header), "%s-%d", s, ap->entries + 1);
+			}
+			if (!ap->io->seekable)
+				seekable(ap);
+			bsave(ap);
+			f->st->st_size = 0;
+			loop = 0;
+			while (s = bget(ap, -1, &m))
+			{
+				if (m < state.mime.length)
+				{
+					if (loop++)
+						error(3, "%s: corrupt %s format member header [too short]", ap->name, format[MIME].name);
+					bseek(ap, -m, SEEK_CUR, 0);
+					bflushin(ap, 0);
+					continue;
+				}
+				v = s;
+				for (t = s + m - state.mime.length; s = memchr(s, '-', t - s); s++)
+					if (!memcmp(s, state.mime.magic, state.mime.length))
+					{
+						brestore(ap);
+						if (s > v && *(s - 1) == '\n')
+						{
+							state.mime.fill++;
+							if (s > (v + 1) && *(s - 2) == '\r')
+								state.mime.fill++;
+						}
+						f->st->st_size += (s - v) - state.mime.fill;
+						f->st->st_mtime = NOW;
+						f->st->st_mode = X_IFREG|X_IRUSR|X_IRGRP|X_IROTH;
+						f->st->st_uid = state.uid;
+						f->st->st_gid = state.gid;
+						f->st->st_dev = 0;
+						f->st->st_ino = 0;
+						f->st->st_nlink = 1;
+						IDEVICE(f->st, 0);
+						f->linktype = NOLINK;
+						f->linkname = 0;
+						f->uidname = 0;
+						f->gidname = 0;
+						goto found;
+					}
+				bseek(ap, -(off_t)state.mime.length, SEEK_CUR, 0);
+				bflushin(ap, 0);
+				f->st->st_size += m;
+			}
+			break;
 		vdb_eof:
-			ap->io.eof = 0;
-			lseek(ap->io.fd, (off_t)0, SEEK_END);
-			bflushin(ap);
+			bflushin(ap, 0);
+			ap->io->eof = 1;
+			ap->io->offset = 0;
+			ap->io->count = lseek(ap->io->fd, (off_t)0, SEEK_END);
 			return 0;
 		default:
 			error(PANIC, "%s: incomplete input format implementation", format[ap->format].name);
@@ -2011,6 +2213,9 @@ getheader(register Archive_t* ap, register File_t* f)
 				ap->format = CAB;
 				goto again;
 			case CAB:
+				ap->format = MIME;
+				goto again;
+			case MIME:
 				if (ap->entries > 0 && ap->volume > 1)
 				{
 					if (--ap->volume > 1) error(1, "junk data after volume %d", ap->volume);
@@ -2023,7 +2228,7 @@ getheader(register Archive_t* ap, register File_t* f)
 			}
 		}
 	skip:
-		if (ap->io.eof) return 0;
+		if (ap->io->eof) return 0;
 		i = 3;
 		if (state.keepgoing && bread(ap, ap->path.header, (off_t)0, (off_t)1, 0) > 0)
 		{
@@ -2206,7 +2411,7 @@ getheader(register Archive_t* ap, register File_t* f)
 				}
 		if (ap->parent)
 		{
-			if (ap->io.blocked)
+			if (ap->io->blocked)
 				error(3, "%s: blocked base archives are not supported", ap->delta->base);
 			switch (ap->format)
 			{
@@ -2220,7 +2425,7 @@ getheader(register Archive_t* ap, register File_t* f)
 		}
 		if (state.summary && state.verbose)
 		{
-			if (ap->io.blok) sfprintf(sfstderr, "BLOK ");
+			if (ap->io->blok) sfprintf(sfstderr, "BLOK ");
 			if (ap->parent) sfprintf(sfstderr, "%s base %s", ap->parent->name, ap->name);
 			else sfprintf(sfstderr, "%s volume %d", ap->name, ap->volume);
 			if (state.id.volume[0])
@@ -2458,7 +2663,7 @@ putheader(register Archive_t* ap, register File_t* f)
 				h.extended = 1;
 				h.st->st_gid = f->st->st_gid;
 				h.st->st_uid = f->st->st_uid;
-				h.st->st_mtime = time((time_t*)0);
+				h.st->st_mtime = NOW;
 				h.st->st_size = n;
 				h.fd = setbuffer(0);
 				bp = getbuffer(h.fd);
@@ -2504,7 +2709,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			c += state.record.header ? state.record.headerlen : f->namesize;
 			break;
 		}
-		if (ap->io.count + c > state.maxout)
+		if (ap->io->count + c > state.maxout)
 		{
 			if (c > state.maxout) error(1, "%s: too large to fit in one volume", f->name);
 			else
@@ -2551,7 +2756,7 @@ putheader(register Archive_t* ap, register File_t* f)
 		break;
 	case CPIO:
 #if CPIO_EXTENDED
-		if (!f->skip)
+		if (!f->skip && !state.strict)
 		{
 			getidnames(f);
 			addxopstr(ap, 'U', f->uidname);
@@ -2568,11 +2773,16 @@ putheader(register Archive_t* ap, register File_t* f)
 				addxopnum(ap, 's', (Sflong_t)f->st->st_size);
 			setxops(ap, f);
 		}
-#else
-		if (CPIO_TRUNCATE(idevice(f->st)) != idevice(f->st)) error(1, "%s: special device number truncated", f->name);
-		if (CPIO_TRUNCATE(f->st->st_gid) != f->st->st_gid) error(1, "%s: gid number truncated", f->name);
-		if (CPIO_TRUNCATE(f->st->st_uid) != f->st->st_uid) error(1, "%s: uid number truncated", f->name);
+		else
 #endif
+		{
+			if (CPIO_TRUNCATE(idevice(f->st)) != idevice(f->st))
+				error(1, "%s: special device number truncated", f->name);
+			if (CPIO_TRUNCATE(f->st->st_gid) != f->st->st_gid)
+				error(1, "%s: gid number truncated", f->name);
+			if (CPIO_TRUNCATE(f->st->st_uid) != f->st->st_uid)
+				error(1, "%s: uid number truncated", f->name);
+		}
 		sfsprintf(state.tmp.buffer, state.tmp.buffersize, "%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.6lo%0.11lo%0.6o%0.11lo",
 			(long)CPIO_TRUNCATE(CPIO_MAGIC),
 			(long)CPIO_TRUNCATE(f->st->st_dev),
@@ -2624,12 +2834,20 @@ putheader(register Archive_t* ap, register File_t* f)
 		memzero(tar_block, TAR_HEADER);
 		s = f->name;
 		if (f->namesize > sizeof(tar_header.name) - (f->type == X_IFDIR))
+		{
+			if (f->namesize > sizeof(tar_header.prefix) + sizeof(tar_header.name) - (f->type == X_IFDIR))
+			{
+				error(2, "%s: file name too long -- %d max", f->name, sizeof(tar_header.prefix) + sizeof(tar_header.name) - (f->type == X_IFDIR));
+				f->skip = 1;
+				return;
+			}
 			for (;; s++)
 			{
 				if (!(s = strchr(s, '/')))
 				{
-					s = f->name;
-					break;
+					error(2, "%s: file base name too long -- %d max", f->name, sizeof(tar_header.name));
+					f->skip = 1;
+					return;
 				}
 				if ((f->namesize - (s - f->name)) <= sizeof(tar_header.name))
 				{
@@ -2639,54 +2857,66 @@ putheader(register Archive_t* ap, register File_t* f)
 					break;
 				}
 			}
+		}
 		sfsprintf(tar_header.name, sizeof(tar_header.name), "%s%s", s, f->type == X_IFDIR ? "/" : "");
-		if (f->extended) tar_header.typeflag = EXTTYPE;
-		else switch (f->linktype)
-		{
-		case HARDLINK:
-			tar_header.typeflag = LNKTYPE;
-		linked:
-			sfsprintf(tar_header.linkname, sizeof(tar_header.linkname), "%s", f->linkname);
-			break;
-		case SOFTLINK:
-			tar_header.typeflag = SYMTYPE;
-			goto linked;
-		default:
-			switch (ap->format == TAR ? X_IFREG : f->type)
+		q = 0;
+		if (f->extended)
+			tar_header.typeflag = EXTTYPE;
+		else
+			switch (f->linktype)
 			{
-			case X_IFCHR:
-				tar_header.typeflag = CHRTYPE;
-			special:
-				sfsprintf(tar_header.devmajor, sizeof(tar_header.devmajor), "%*o ", sizeof(tar_header.devmajor) - 2, major(idevice(f->st)));
-				sfsprintf(tar_header.devminor, sizeof(tar_header.devminor), "%*o ", sizeof(tar_header.devminor) - 2, minor(idevice(f->st)));
+			case HARDLINK:
+				tar_header.typeflag = LNKTYPE;
+			linked:
+				if (strlen(f->linkname) > sizeof(tar_header.linkname))
+				{
+					error(2, "%s: link name too long -- %d max", f->linkname, sizeof(tar_header.linkname));
+					f->skip = 1;
+					return;
+				}
+				sfsprintf(tar_header.linkname, sizeof(tar_header.linkname), "%s", f->linkname);
 				break;
-			case X_IFBLK:
-				tar_header.typeflag = BLKTYPE;
-				goto special;
-			case X_IFDIR:
-				tar_header.typeflag = DIRTYPE;
-				break;
-			case X_IFIFO:
-				tar_header.typeflag = FIFOTYPE;
-				break;
-			case X_IFSOCK:
-				tar_header.typeflag = SOKTYPE;
-				goto special;
+			case SOFTLINK:
+				tar_header.typeflag = SYMTYPE;
+				goto linked;
 			default:
-				if (!f->skip)
-					error(1, "%s: unknown file type 0%03o -- assuming regular file", f->name, f->type >> 12);
-				/*FALLTHROUGH*/
-			case X_IFREG:
-				tar_header.typeflag = REGTYPE;
+				switch (ap->format == TAR ? X_IFREG : f->type)
+				{
+				case X_IFCHR:
+					tar_header.typeflag = CHRTYPE;
+					q = 1;
+					break;
+				case X_IFBLK:
+					tar_header.typeflag = BLKTYPE;
+					q = 1;
+					break;
+				case X_IFDIR:
+					tar_header.typeflag = DIRTYPE;
+					break;
+				case X_IFIFO:
+					tar_header.typeflag = FIFOTYPE;
+					break;
+				case X_IFSOCK:
+					tar_header.typeflag = SOKTYPE;
+					q = 1;
+					break;
+				default:
+					if (!f->skip)
+						error(1, "%s: unknown file type 0%03o -- assuming regular file", f->name, f->type >> 12);
+					/*FALLTHROUGH*/
+				case X_IFREG:
+					tar_header.typeflag = REGTYPE;
+					break;
+				}
 				break;
 			}
-			break;
-		}
-		sfsprintf(tar_header.mode, sizeof(tar_header.mode), "%*o ", sizeof(tar_header.mode) - 2, f->st->st_mode & X_IPERM);
-		sfsprintf(tar_header.uid, sizeof(tar_header.uid), "%*o ", sizeof(tar_header.uid) - 2, f->st->st_uid);
-		sfsprintf(tar_header.gid, sizeof(tar_header.gid), "%*o ", sizeof(tar_header.gid) - 2, f->st->st_gid);
-		sfsprintf(tar_header.size, sizeof(tar_header.size), "%*lo ", sizeof(tar_header.size) - 1, (long)f->st->st_size);
-		sfsprintf(tar_header.mtime, sizeof(tar_header.mtime), "%*lo ", sizeof(tar_header.mtime) - 2, f->st->st_mtime);
+		sfsprintf(tar_header.devmajor, sizeof(tar_header.devmajor), "%0*o ", sizeof(tar_header.devmajor) - 2, q ? major(idevice(f->st)) : 0);
+		sfsprintf(tar_header.devminor, sizeof(tar_header.devminor), "%0*o ", sizeof(tar_header.devminor) - 2, q ? minor(idevice(f->st)) : 0);
+		sfsprintf(tar_header.mode, sizeof(tar_header.mode), "%0*o ", sizeof(tar_header.mode) - 2, f->st->st_mode & X_IPERM);
+		sfsprintf(tar_header.uid, sizeof(tar_header.uid), "%0*o ", sizeof(tar_header.uid) - 2, f->st->st_uid);
+		sfsprintf(tar_header.gid, sizeof(tar_header.gid), "%0*o ", sizeof(tar_header.gid) - 2, f->st->st_gid);
+		sfsprintf(tar_header.size, sizeof(tar_header.size), "%0*lo ", sizeof(tar_header.size) - 1, (long)f->st->st_size);
+		sfsprintf(tar_header.mtime, sizeof(tar_header.mtime), "%0*lo ", sizeof(tar_header.mtime) - 2, f->st->st_mtime);
 		if (ap->format != TAR)
 		{
 			strncpy(tar_header.magic, TMAGIC, sizeof(tar_header.magic));
@@ -2695,7 +2925,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			strcpy(tar_header.uname, f->uidname);
 			strcpy(tar_header.gname, f->gidname);
 		}
-		sfsprintf(tar_header.chksum, sizeof(tar_header.chksum), "%*lo ", sizeof(tar_header.chksum) - 1, tar_checksum());
+		sfsprintf(tar_header.chksum, sizeof(tar_header.chksum), "%0*lo ", sizeof(tar_header.chksum) - 1, tar_checksum());
 		bwrite(ap, tar_block, TAR_HEADER);
 		break;
 	case VDB:
@@ -2757,7 +2987,7 @@ putheader(register Archive_t* ap, register File_t* f)
 			}
 		}
 		q = (c == '=') ? ':' : '=';
-		sfprintf(state.vdb.directory, "%c%s%c%I*u%c%I*u%c%s%c%I*u%c%s%c0%o\n", c, f->name, c, sizeof(ap->io.offset), ap->io.offset + ap->io.count, c, sizeof(f->st->st_size), f->st->st_size, c, VDB_DATE, q, sizeof(f->st->st_mtime), f->st->st_mtime, c, VDB_MODE, q, modex(f->st->st_mode & X_IPERM));
+		sfprintf(state.vdb.directory, "%c%s%c%I*u%c%I*u%c%s%c%I*u%c%s%c0%o\n", c, f->name, c, sizeof(ap->io->offset), ap->io->offset + ap->io->count, c, sizeof(f->st->st_size), f->st->st_size, c, VDB_DATE, q, sizeof(f->st->st_mtime), f->st->st_mtime, c, VDB_MODE, q, modex(f->st->st_mode & X_IPERM));
 		break;
 	}
 	putdeltaheader(ap, f);
@@ -2783,7 +3013,7 @@ gettrailer(register Archive_t* ap, File_t* f)
 		ap->old.checksum ^= ap->old.memsum;
 	}
 	getdeltatrailer(ap, f);
-	if ((n = format[ap->format].align) && (n = roundof(ap->io.count, n) - ap->io.count))
+	if ((n = format[ap->format].align) && (n = roundof(ap->io->count, n) - ap->io->count))
 		bread(ap, state.tmp.buffer, (off_t)0, n, 1);
 	ap->memsum = 0;
 	ap->old.memsum = 0;
@@ -2833,7 +3063,7 @@ puttrailer(register Archive_t* ap, register File_t* f)
 			bwrite(ap, state.record.trailer, state.record.trailerlen);
 		break;
 	}
-	if ((n = format[ap->format].align) && (n = roundof(ap->io.count, n) - ap->io.count))
+	if ((n = format[ap->format].align) && (n = roundof(ap->io->count, n) - ap->io->count))
 	{
 		memzero(state.tmp.buffer, n);
 		bwrite(ap, state.tmp.buffer, n);
@@ -2863,7 +3093,7 @@ getlabel(register Archive_t* ap, register File_t* f)
 	{
 		if ((c = n - c) > 0)
 		{
-			if (ap->io.blocked || bread(ap, alar_header + ALAR_HEADER, (off_t)0, (off_t)c, 1) != c)
+			if (ap->io->blocked || bread(ap, alar_header + ALAR_HEADER, (off_t)0, (off_t)c, 1) != c)
 			{
 				c = ALAR_HEADER;
 				error(2, "%s: %-*.*s: variable length label record too short", f->name, c, c, alar_header);
@@ -2873,7 +3103,7 @@ getlabel(register Archive_t* ap, register File_t* f)
 		else if (n <= ALAR_VARHDR) c = ALAR_VARHDR;
 		else c = n;
 	}
-	if (!ap->io.blocked && !*last && alar_header[3] == '2' && (strneq(alar_header, "HDR", 3) || strneq(alar_header, "EOF", 3) || strneq(alar_header, "EOV", 3)))
+	if (!ap->io->blocked && !*last && alar_header[3] == '2' && (strneq(alar_header, "HDR", 3) || strneq(alar_header, "EOF", 3) || strneq(alar_header, "EOV", 3)))
 		getlabstr(alar_header, 26, 4, last);
 	if (*last && strneq(alar_header, last, 4)) done = 1;
 	message((-4, "label: %-*.*s", c, c, alar_header));

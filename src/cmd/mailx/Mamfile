@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -41,8 +41,11 @@ make data.o
 make data.c
 make mailx.h implicit
 make local.h implicit
+make FEATURE/gethostname implicit
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
+exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def gethostname
+done FEATURE/gethostname dontcare generated
 make FEATURE/paths implicit
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} : def paths
 done FEATURE/paths dontcare generated
 done local.h
@@ -127,6 +130,14 @@ make ${PACKAGE_ast_INCLUDE}/sig.h implicit
 done ${PACKAGE_ast_INCLUDE}/sig.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/option.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/option.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/error.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done mailx.h
 done data.c
@@ -314,8 +325,7 @@ done smtp.c
 prev smtp.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c smtp.c
 done smtp.o generated
-setv mam_libcs ${mam_cc_L+-lcs}${mam_cc_L-${PACKAGE_ast_LIB}/libcs.a}
-setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcs,${INSTALLROOT}/lib/libcs.a,} ${PACKAGE_ast_LIB}/lib/cs`
+setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcs,${INSTALLROOT}/lib/libcs.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/cs 2>/dev/null || echo '' ${mam_cc_L+-lcs}${mam_cc_L-${PACKAGE_ast_LIB}/libcs.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o mailx data.o cmd1.o cmd2.o cmd3.o collect.o edit.o fio.o head.o local.o lex.o list.o main.o misc.o names.o proc.o quit.o send.o spam.o tty.o vars.o imap.o smtp.o ${mam_libcs} ${mam_libast}
 done mailx generated
 make ${INSTALLROOT}/bin
@@ -344,7 +354,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/mailx
 prev mailx
-exec - mv ${INSTALLROOT}/bin/mailx ${INSTALLROOT}/bin/mailx.old 2>/dev/null || true; cp mailx ${INSTALLROOT}/bin/mailx
+exec - mv ${INSTALLROOT}/bin/mailx ${INSTALLROOT}/bin/mailx.old 2>/dev/null || true; test '' = 'mailx' || { cp mailx ${INSTALLROOT}/bin/mailx  		    		    ;}
 done ${INSTALLROOT}/bin/mailx generated
 make ${INSTALLROOT}/man/man1
 exec - set -
@@ -373,7 +383,7 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/mailx.1
 make mailx.1
 done mailx.1
-exec - mv ${INSTALLROOT}/man/man1/mailx.1 ${INSTALLROOT}/man/man1/mailx.1.old 2>/dev/null || true; cp mailx.1 ${INSTALLROOT}/man/man1/mailx.1
+exec - mv ${INSTALLROOT}/man/man1/mailx.1 ${INSTALLROOT}/man/man1/mailx.1.old 2>/dev/null || true; test '' = 'mailx.1' || { cp mailx.1 ${INSTALLROOT}/man/man1/mailx.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/mailx.1 generated
 done install virtual
 make test

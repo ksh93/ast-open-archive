@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -56,8 +56,8 @@
 
 #define PANIC		ERROR_PANIC|ERROR_SOURCE,__FILE__,__LINE__
 
-#define bcount(ap)	((ap)->io.last-(ap)->io.next)
-#define bsave(ap)	(state.backup=(ap)->io)
+#define bcount(ap)	((ap)->io->last-(ap)->io->next)
+#define bsave(ap)	(state.backup=(*(ap)->io))
 
 #define BUFFER_FD_MAX	(-2)
 #define BUFFER_FD_MIN	(-3)
@@ -88,6 +88,8 @@
 #define SECTION_KEEP(p)	(((p)->section)>>=SECTION_SHIFT,(p)->sum++)
 
 #define METER_parts	20
+
+#define NOW		time(NiL)
 
 /*
  * info per archive format
@@ -382,24 +384,36 @@ typedef struct
 #include "rpm.h"
 
 /*
+ * mime multipart
+ */
+
+#define MIME		16
+#define MIME_NAME	"mime"
+#define MIME_MAGIC	"--"
+#define MIME_REGULAR	DEFBUFFER
+#define MIME_SPECIAL	DEFBLOCKS
+#define MIME_ALIGN	0
+#define MIME_FLAGS	IN
+
+/*
  * compression pseudo formats -- COMPRESS is first
  */
 
-#define COMPRESS		16
+#define COMPRESS		17
 #define COMPRESS_NAME		"compress"
 #define COMPRESS_ALGORITHM	0
 #define COMPRESS_UNDO		{"zcat"}
 #define COMPRESS_MAGIC		0x1f9d0000
 #define COMPRESS_MAGIC_MASK	0xffff0000
 
-#define GZIP			17
+#define GZIP			18
 #define GZIP_NAME		"gzip"
 #define GZIP_ALGORITHM		"-9"
 #define GZIP_UNDO		{"gunzip"},{"ratz","-c"}
 #define GZIP_MAGIC		0x1f8b0000
 #define GZIP_MAGIC_MASK		0xffff0000
 
-#define BZIP			18
+#define BZIP			19
 #define BZIP_NAME		"bzip2"
 #define BZIP_ALGORITHM		0
 #define BZIP_UNDO		{"bunzip2"}
@@ -410,18 +424,18 @@ typedef struct
  * delta pseudo formats -- DELTA is first
  */
 
-#define DELTA			19
+#define DELTA			20
 #define DELTA_NAME		"delta"
 #define DELTA_ALGORITHM		"94"
 
-#define DELTA_88		20
+#define DELTA_88		21
 #define DELTA_88_NAME		"delta88"
 #define DELTA_88_ALGORITHM	"88"
 
-#define DELTA_IGNORE		21
+#define DELTA_IGNORE		22
 #define DELTA_IGNORE_NAME	"ignore"
 
-#define DELTA_PATCH		22
+#define DELTA_PATCH		23
 #define DELTA_PATCH_NAME	"patch"
 
 /*
@@ -507,6 +521,7 @@ typedef struct				/* buffered io info		*/
 	char*		buffer;		/* io buffer			*/
 	off_t		count;		/* char transfer count		*/
 	off_t		offset;		/* volume offset		*/
+	off_t		size;		/* total size if seekable	*/
 	int		fd;		/* file descriptor		*/
 	int		skip;		/* volume skip			*/
 	int		keep;		/* volume keep after skip	*/
@@ -518,7 +533,6 @@ typedef struct				/* buffered io info		*/
 	unsigned int	empty:1;	/* last read was empty		*/
 	unsigned int	eof:1;		/* hit EOF			*/
 	unsigned int	seekable:1;	/* seekable			*/
-	unsigned int	seekcheck:1;	/* checked if seekable		*/
 	unsigned int	unblocked:1;	/* set unblocked device io	*/
 } Bio_t;
 
@@ -662,7 +676,8 @@ typedef struct Archive			/* archive info			*/
 	int		expected;	/* expected format		*/
 	File_t		file;		/* current member file info	*/
 	int		format;		/* format			*/
-	Bio_t		io;		/* buffered io info		*/
+	Bio_t*		io;		/* current buffered io		*/
+	Bio_t		mio;		/* main buffered io		*/
 	unsigned long	memsum;		/* checksum			*/
 	char*		name;		/* io pathname			*/
 	char*		names;		/* PORTAR long name directory	*/
@@ -694,6 +709,7 @@ typedef struct Archive			/* archive info			*/
 	int		sum;		/* collect running checksum	*/
 	int		swap;		/* swap operation		*/
 	Hash_table_t*	tab;		/* entries to verify		*/
+	Bio_t		tio;		/* temporary buffered io	*/
 	int		verified;	/* number of verified entries	*/
 	int		volume;		/* volume number		*/
 } Archive_t;
@@ -793,6 +809,12 @@ typedef struct				/* program state		*/
 	int		width;		/* display line width		*/
 	}		meter;		/* meter state			*/
 	int		mkdir;		/* make intermediate dirs	*/
+	struct
+	{
+	char*		magic;		/* separator magic		*/
+	size_t		length;		/* separator magic length	*/
+	size_t		fill;		/* last member filler size	*/
+	}		mime;
 	int		modemask;	/* & with mode for chmod()	*/
 	int		modtime;	/* retain mtime			*/
 	int		newer;		/* append only if newer		*/
@@ -843,6 +865,7 @@ typedef struct				/* program state		*/
 	int		setuid;		/* set file uid to this value	*/
 					/* -L=pathstat() -P=lstat()	*/
 	int		(*statf)(const char*, struct stat*);
+	int		strict;		/* strict standard conformance	*/
 	int		summary;	/* output summary info		*/
 	int		test;		/* debug test bits		*/
 	struct
@@ -865,6 +888,7 @@ typedef struct				/* program state		*/
 	{
 	char*		base;		/* header buffer base		*/
 	char*		next;		/* next header			*/
+	off_t		size;		/* total size			*/
 	}		header;
 	}		vdb;
 	int		verbose;	/* trace files when acted upon	*/
@@ -890,12 +914,13 @@ extern void		append(Archive_t*);
 extern long		asc_checksum(char*, int, unsigned long);
 extern void		backup(Archive_t*);
 extern long		bblock(int);
-extern void		bflushin(Archive_t*);
+extern void		bflushin(Archive_t*, int);
 extern void		bflushout(Archive_t*);
-extern char*		bget(Archive_t*, int);
+extern char*		bget(Archive_t*, off_t, off_t*);
 extern void		binit(Archive_t*);
 extern void		bput(Archive_t*, int);
 extern off_t		bread(Archive_t*, void*, off_t, off_t, int);
+extern void		brestore(Archive_t*);
 extern off_t		bseek(Archive_t*, off_t, int, int);
 extern int		bskip(Archive_t*);
 extern void		bunread(Archive_t*, void*, int);

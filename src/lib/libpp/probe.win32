@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Labs Research) 1999-07-17
+# @(#)probe.win32 (AT&T Labs Research) 2000-05-16
 #
 # win32 specific pp C probe initialization
 # ms vc is easy on uwin
@@ -121,7 +121,10 @@ echo "#define __unix__" __unix__
 #define #universe(att)
 #define #dialect(ansi)
 
-#pragma pp:reserved _asm=GROUP __asm=GROUP const enum fortran _fortran __inline signed void volatile cdecl _cdecl far _far huge _huge near _near pascal _pascal _based=GROUP _except _export _fastcall _finally _leave _stdcall _syscall _try
+#pragma pp:reserved __asm=GROUP __based=GROUP __cdecl __declspec=GROUP __except __export __far __fastcall __finally __huge __inline __int16 __int32 __int64 __int8 __leave __near __novtordisp __pascal __restrict __stdcall __syscall __try __unaligned __wchar_t
+#pragma pp:reserved _asm=GROUP _based=GROUP _cdecl _declspec=GROUP _except _export _far _fastcall _finally _fortran _huge _int16 _int32 _int64 _int8 _leave _near _pascal _stdcall _syscall _try
+#pragma pp:reserved cdecl const enum far fortran huge near pascal signed void volatile
+
 #pragma pp:pluscomment
 #pragma pp:id "$"${standard}
 #pragma pp:nocatliteral

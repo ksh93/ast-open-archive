@@ -20,6 +20,8 @@
 #		z  sized records
 #
 
+export TZ=EST5EDT
+
 VIEW data
 
 KEEP "*.d*"

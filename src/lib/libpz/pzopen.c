@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -273,7 +273,7 @@ pzclose(register Pz_t* pz)
 			if (!(e = ((unsigned long)now.tv_sec - (unsigned long)pz->start.tv_sec) * 100 + ((long)now.tv_usec - (long)pz->start.tv_usec) / 10000))
 				e = 1;
 		}
-		sfprintf(pz->tmp, "total %s rate %.2f time %s bpr %.2f bps %s size %I*u/%I*u windows %I*u"
+		sfprintf(pz->tmp, _("total %s rate %.2f time %s bpr %.2f bps %s size %I*u/%I*u windows %I*u")
 			, pz->path
 			, (double)((Sflong_t)pz->count.uncompressed) / (double)((Sflong_t)pz->count.compressed)
 			, fmtelapsed(e, 100)
@@ -287,42 +287,42 @@ pzclose(register Pz_t* pz)
 			, pz->count.windows
 				);
 		if (pz->count.sections)
-			sfprintf(pz->tmp, " sections %I*u"
+			sfprintf(pz->tmp, _(" sections %I*u")
 				, sizeof(pz->count.sections)
 				, pz->count.sections
 					);
-		sfprintf(pz->tmp, " records %I*u"
+		sfprintf(pz->tmp, _(" records %I*u")
 			, sizeof(pz->count.records)
 			, pz->count.records
 				);
 		if (pz->count.modules)
-			sfprintf(pz->tmp, " modules %I*u"
+			sfprintf(pz->tmp, _(" modules %I*u")
 				, sizeof(pz->count.modules)
 				, pz->count.modules
 					);
 		if (pz->count.converted)
-			sfprintf(pz->tmp, " converted %I*u"
+			sfprintf(pz->tmp, _(" converted %I*u")
 				, sizeof(pz->count.converted)
 				, pz->count.converted
 					);
 		if (pz->count.repaired)
-			sfprintf(pz->tmp, " repaired %I*u"
+			sfprintf(pz->tmp, _(" repaired %I*u")
 				, sizeof(pz->count.repaired)
 				, pz->count.repaired
 					);
 		if (pz->count.truncated)
-			sfprintf(pz->tmp, " truncated %I*u"
+			sfprintf(pz->tmp, _(" truncated %I*u")
 				, sizeof(pz->count.truncated)
 				, pz->count.truncated
 					);
 		if (pz->count.dropped)
-			sfprintf(pz->tmp, " dropped %I*u"
+			sfprintf(pz->tmp, _(" dropped %I*u")
 				, sizeof(pz->count.dropped)
 				, pz->count.dropped
 					);
 		(*pz->disc->errorf)(pz, pz->disc, 0, "%s", sfstruse(pz->tmp));
 	}
-	if (pz->oip)
+	if (pz->oip && pz->io)
 	{
 		if (pz->disc->eventf)
 			r = (*pz->disc->eventf)(pz, PZ_CLOSE, NiL, 0, pz->disc);

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -46,7 +46,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in z ast
+exec - for i in z  ast
 exec - do	case $i in
 exec - 	"z"|z)
 exec - 		;;
@@ -321,7 +321,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libz.a archive
 prev libz.a archive
-exec - mv ${PACKAGE_ast_LIB}/libz.a ${PACKAGE_ast_LIB}/libz.a.old 2>/dev/null || true; cp libz.a ${PACKAGE_ast_LIB}/libz.a
+exec - mv ${PACKAGE_ast_LIB}/libz.a ${PACKAGE_ast_LIB}/libz.a.old 2>/dev/null || true; test '' = 'libz.a' || { cp libz.a ${PACKAGE_ast_LIB}/libz.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libz.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libz.a generated
 make ${PACKAGE_ast_LIB}/lib
@@ -350,7 +350,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/z
 prev z.req
-exec - mv ${PACKAGE_ast_LIB}/lib/z ${PACKAGE_ast_LIB}/lib/z.old 2>/dev/null || true; cp z.req ${PACKAGE_ast_LIB}/lib/z
+exec - mv ${PACKAGE_ast_LIB}/lib/z ${PACKAGE_ast_LIB}/lib/z.old 2>/dev/null || true; test '' = 'z.req' || { cp z.req ${PACKAGE_ast_LIB}/lib/z  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/z generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -
@@ -378,11 +378,11 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/zlib.h
 prev zlib.h
-exec - mv ${PACKAGE_ast_INCLUDE}/zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h.old 2>/dev/null || true; cp zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h
+exec - mv ${PACKAGE_ast_INCLUDE}/zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h.old 2>/dev/null || true; test '' = 'zlib.h' || { cp zlib.h ${PACKAGE_ast_INCLUDE}/zlib.h  		    		    ;}
 done ${PACKAGE_ast_INCLUDE}/zlib.h generated
 make ${PACKAGE_ast_INCLUDE}/zconf.h
 prev zconf.h
-exec - mv ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/dev/null || true; cp zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h
+exec - mv ${PACKAGE_ast_INCLUDE}/zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h.old 2>/dev/null || true; test '' = 'zconf.h' || { cp zconf.h ${PACKAGE_ast_INCLUDE}/zconf.h  		    		    ;}
 done ${PACKAGE_ast_INCLUDE}/zconf.h generated
 make ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
 prev sfdcgzip.h
@@ -405,7 +405,7 @@ exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_z -c example.c
 done example.o generated
 prev libz.a archive
 setv mam_libz `sed -e 's,-lz,libz.a,' z.req`
-setv mam_libz ${mam_cc_L+-lz}${mam_cc_L-libz.a}
+setv mam_libz `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lz,${INSTALLROOT}/lib/libz.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/z 2>/dev/null || echo '' ${mam_cc_L+-lz}${mam_cc_L-libz.a}`
 make ${mam_libast}
 done ${mam_libast} dontcare virtual
 exec - ${CC} ${CCFLAGS} ${LDFLAGS}   -o example example.o ${mam_libz}

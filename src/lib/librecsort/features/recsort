@@ -1,3 +1,6 @@
+sys	resource
+lib	getrlimit
+
 tst - output{
 	main()
 	{	int	charbits;

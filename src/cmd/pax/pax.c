@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -38,7 +38,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pax (AT&T Labs Research) 2000-02-14\n]"
+"[-?\n@(#)pax (AT&T Labs Research) 2000-06-01\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -160,6 +160,7 @@ Format_t		format[] =
 {ZIP_NAME,	ZIP_REGULAR,	ZIP_SPECIAL,	ZIP_ALIGN,	ZIP_FLAGS},
 {CAB_NAME,	CAB_REGULAR,	CAB_SPECIAL,	CAB_ALIGN,	CAB_FLAGS},
 {RPM_NAME,	RPM_REGULAR,	RPM_SPECIAL,	RPM_ALIGN,	RPM_FLAGS},
+{MIME_NAME,	MIME_REGULAR,	MIME_SPECIAL,	MIME_ALIGN,	MIME_FLAGS},
 
 {COMPRESS_NAME, COMPRESS_MAGIC_MASK, COMPRESS_MAGIC, 0,0, COMPRESS_ALGORITHM, COMPRESS_UNDO},
 {GZIP_NAME,     GZIP_MAGIC_MASK, GZIP_MAGIC,         0,0, GZIP_ALGORITHM,     GZIP_UNDO},
@@ -448,6 +449,7 @@ Option_t		options[] =
 	[+cab?MS cabinet file. For list only.]\
 	[+cpio?cpio character with symlinks.]\
 	[+ibmar?EBCDIC standard label tape. For tape devices only.]\
+	[+mime?encapsulated mime. For read only.]\
 	[+pax?POSIX 1003.2b-1995 extended ustar.]\
 	[+portarch?s5r2 portable object library. For read only.]\
 	[+randarch?BSD ranlib object library. For read only.]\
@@ -1203,14 +1205,14 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			else state.blocksize = DEFBLOCKS * BLOCKSIZE;
 			break;
 		case OPT_blok:
-			if (!*v) getarchive(IN)->io.blok = getarchive(OUT)->io.blok = n;
+			if (!*v) getarchive(IN)->io->blok = getarchive(OUT)->io->blok = n;
 			else while (*v) switch (*v++)
 			{
 			case 'i':
-				getarchive(IN)->io.blok = 1;
+				getarchive(IN)->io->blok = 1;
 				break;
 			case 'o':
-				getarchive(OUT)->io.blok = 1;
+				getarchive(OUT)->io->blok = 1;
 				break;
 			default:
 				error(3, "%s: [io] expected", op->name);
@@ -1603,13 +1605,13 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 				{
 				case 'k':
 					if (!(n = strtol(e, &e, 0))) n = -1;
-					ap->io.keep = n;
-					ap->io.mode = O_RDWR;
+					ap->io->keep = n;
+					ap->io->mode = O_RDWR;
 					continue;
 				case 's':
 					if (!(n = strtol(e, &e, 0))) n = -1;
-					ap->io.skip = n;
-					ap->io.mode = O_RDWR;
+					ap->io->skip = n;
+					ap->io->mode = O_RDWR;
 					continue;
 				}
 				e--;
@@ -1626,14 +1628,14 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			else state.test = 0;
 			break;
 		case OPT_unblocked:
-			if (!*v) getarchive(IN)->io.unblocked = getarchive(OUT)->io.unblocked = n;
+			if (!*v) getarchive(IN)->io->unblocked = getarchive(OUT)->io->unblocked = n;
 			else while (*v) switch (*v++)
 			{
 			case 'i':
-				getarchive(IN)->io.unblocked = 1;
+				getarchive(IN)->io->unblocked = 1;
 				break;
 			case 'o':
-				getarchive(OUT)->io.unblocked = 1;
+				getarchive(OUT)->io->unblocked = 1;
 				break;
 			default:
 				error(3, "%s: [io] expected", op->name);
@@ -1656,7 +1658,7 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap)
 			{
 				state.out = state.in;
 				state.in = 0;
-				state.out->io.mode = O_CREAT|O_TRUNC|O_WRONLY;
+				state.out->io->mode = O_CREAT|O_TRUNC|O_WRONLY;
 			}
 			break;
 		case OPT_yes:
@@ -1755,6 +1757,7 @@ main(int argc, char** argv)
 	hashset(state.options, HASH_ALLOCATE);
 	state.record.charset = 1;
 	state.record.line = 1;
+	state.strict = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
 	state.summary = 1;
 	if (!(state.tmp.file = pathtmp(NiL, NiL, error_info.id, NiL)))
 		error(3, "out of space [tmp]");
@@ -1877,26 +1880,26 @@ main(int argc, char** argv)
 				state.append = 1;
 		}
 		if (state.append)
-			ap->io.mode = O_CREAT|O_RDWR;
-		ap->io.fd = 1;
+			ap->io->mode = O_CREAT|O_RDWR;
+		ap->io->fd = 1;
 		if (!ap->name || streq(ap->name, "-"))
 			ap->name = defoutput;
 		else
 		{
 			close(1);
-			if (open(ap->name, ap->io.mode|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 1)
+			if (open(ap->name, ap->io->mode|O_BINARY, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH) != 1)
 				error(ERROR_SYSTEM|3, "%s: cannot write", ap->name);
 		}
 		if (!state.blocksize)
 		{
-			if (fstat(ap->io.fd, &st))
+			if (fstat(ap->io->fd, &st))
 				error(ERROR_SYSTEM|3, "%s: cannot stat", ap->name);
 			st.st_mode = modex(st.st_mode);
 			if (state.test & 040) st.st_mode = X_IFCHR;
 			if (X_ITYPE(st.st_mode) == X_IFREG)
 			{
 				state.blocksize = format[ap->format].regular;
-				ap->io.unblocked = 1;
+				ap->io->unblocked = 1;
 			}
 			else state.blocksize = format[ap->format].special;
 			state.buffersize = state.blocksize *= BLOCKSIZE;
@@ -1948,10 +1951,15 @@ main(int argc, char** argv)
 		else
 		{
 			close(0);
-			if (open(ap->name, ap->io.mode|O_BINARY))
+			if (open(ap->name, ap->io->mode|O_BINARY))
 				error(ERROR_SYSTEM|3, "%s: cannot read", ap->name);
 		}
-		if (state.meter.on && (fstat(0, &st) || !(state.meter.size = st.st_size)))
+		if (!fstat(ap->io->fd, &st) && S_ISREG(st.st_mode) && st.st_size > 0)
+		{
+			ap->io->seekable = 1;
+			ap->io->size = st.st_size;
+		}
+		if (state.meter.on && !(state.meter.size = ap->io->size))
 			state.meter.on = 0;
 	}
 	if (!blocksize && (blocksize = bblock(!state.in)))
@@ -1981,9 +1989,6 @@ main(int argc, char** argv)
 		{
 			error(1, "append ignored for archive read");
 			state.append = 0;
-		}
-		if (state.meter.on)
-		{
 		}
 	}
 	if (ap = state.out)
@@ -2180,7 +2185,8 @@ finish(int code)
 	if (state.summary)
 	{
 		ap = getarchive(state.operation);
-		n = ap->io.count + ap->io.offset;
+		n = ap->io->count + ap->io->offset;
+		message((-1, "%s totals entries=%d count=%I*d offset=%I*d BLOCKSIZE=%I*d n=%I*d blocks=%I*d", ap->name, ap->entries, sizeof(ap->io->count), ap->io->count, sizeof(ap->io->offset), ap->io->offset, sizeof(BLOCKSIZE), BLOCKSIZE, sizeof(n), n, sizeof(n), (n + BLOCKSIZE - 1) / BLOCKSIZE));
 		if (ap->entries)
 		{
 			if (ap->volume > 1)

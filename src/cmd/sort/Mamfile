@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -134,13 +134,11 @@ done ${PACKAGE_ast_INCLUDE}/error.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done main.c
 prev main.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c main.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?sort]"\" -c main.c
 done main.o generated
-setv mam_librecsort ${mam_cc_L+-lrecsort}${mam_cc_L-${PACKAGE_ast_LIB}/librecsort.a}
-setv mam_librecsort `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lrecsort,${INSTALLROOT}/lib/librecsort.a,} ${PACKAGE_ast_LIB}/lib/recsort`
-setv mam_libz ${mam_cc_L+-lz}${mam_cc_L-${PACKAGE_ast_LIB}/libz.a}
-setv mam_libz `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lz,${INSTALLROOT}/lib/libz.a,} ${PACKAGE_ast_LIB}/lib/z`
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_librecsort `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lrecsort,${INSTALLROOT}/lib/librecsort.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/recsort 2>/dev/null || echo '' ${mam_cc_L+-lrecsort}${mam_cc_L-${PACKAGE_ast_LIB}/librecsort.a}`
+setv mam_libz `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lz,${INSTALLROOT}/lib/libz.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/z 2>/dev/null || echo '' ${mam_cc_L+-lz}${mam_cc_L-${PACKAGE_ast_LIB}/libz.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o sort main.o ${mam_librecsort} ${mam_libz} ${mam_libast}
 done sort generated
 make ${INSTALLROOT}/bin
@@ -169,7 +167,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/sort
 prev sort
-exec - mv ${INSTALLROOT}/bin/sort ${INSTALLROOT}/bin/sort.old 2>/dev/null || true; cp sort ${INSTALLROOT}/bin/sort
+exec - mv ${INSTALLROOT}/bin/sort ${INSTALLROOT}/bin/sort.old 2>/dev/null || true; test '' = 'sort' || { cp sort ${INSTALLROOT}/bin/sort  		    		    ;}
 done ${INSTALLROOT}/bin/sort generated
 make ${INSTALLROOT}/man/man1
 exec - set -
@@ -198,7 +196,7 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/sort.1
 make sort.1
 done sort.1
-exec - mv ${INSTALLROOT}/man/man1/sort.1 ${INSTALLROOT}/man/man1/sort.1.old 2>/dev/null || true; cp sort.1 ${INSTALLROOT}/man/man1/sort.1
+exec - mv ${INSTALLROOT}/man/man1/sort.1 ${INSTALLROOT}/man/man1/sort.1.old 2>/dev/null || true; test '' = 'sort.1' || { cp sort.1 ${INSTALLROOT}/man/man1/sort.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/sort.1 generated
 done install virtual
 make test

@@ -10,7 +10,7 @@ ID = cs
 
 DEBUG == 1
 
-CCFLAGS = -O $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
 
 TRUST == "$(INSTALLROOT):$(OPTDIRS:/:/ /G:C%$%/$(.PACKAGE.:O=1)%:/ /:/G):$(USRDIRS)"
 

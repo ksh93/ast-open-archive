@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)date (AT&T Labs Research) 1999-10-22\n]"
+"[-?\n@(#)date (AT&T Labs Research) 2000-03-17\n]"
 USAGE_LICENSE
 "[+NAME?date - set/list/convert dates]"
 "[+DESCRIPTION?\bdate\b sets the current date and time (with appropriate"
@@ -44,6 +44,11 @@ USAGE_LICENSE
 "	clock.]:[date]"
 "[e:epoch?Output the date in seconds since the epoch."
 "	Equivalent to \b--format=%#\b.]"
+"[E:elapsed?Interpret pairs of arguments as start and stop dates, sum the"
+"	differences between all pairs, and list the result as a"
+"	\bfmtelapsed\b(3) elapsed time on the standard output. If there are"
+"	an odd number of arguments then the last time argument is differenced"
+"	with the current time.]"
 "[f:format?Output the date according to the \bstrftime\b(3) \aformat\a."
 "	For backwards compatibility, a first argument of the form"
 "	\b+\b\aformat\a is equivalent to \b-f\b format."
@@ -124,7 +129,7 @@ USAGE_LICENSE
 "\n"
 "\n[ +format | date | file ... ]\n"
 "\n"
-"[+SEE ALSO?\bls\b(1), \bstrftime\b(3), \bstrptime\b(3)]"
+"[+SEE ALSO?\bls\b(1), \bfmtelapsed\b(3), \bstrftime\b(3), \bstrptime\b(3)]"
 ;
 
 #include <ast.h>
@@ -201,6 +206,28 @@ settime(time_t clock, int adjust, int network)
 	return -1;
 }
 
+/*
+ * convert s to time_t with error checking
+ */
+
+static time_t
+convert(register Fmt_t* f, char* s)
+{
+	char*	t;
+	char*	u;
+	time_t	now;
+
+	do
+	{
+		now = tmscan(s, &t, f->format, &u, NiL, 0L);
+		if (!*t && (!f->format || !*u))
+			break;
+	} while (f = f->next);
+	if (!f || *t)
+		error(3, "%s: invalid date specification", f ? t : s);
+	return now;
+}
+
 int
 main(int argc, register char** argv)
 {
@@ -208,8 +235,10 @@ main(int argc, register char** argv)
 	register char*	s;
 	register Fmt_t*	f;
 	char*		t;
-	char*		u;
 	time_t		now;
+	unsigned long	ts;
+	unsigned long	te;
+	unsigned long	e;
 	char		buf[128];
 	Fmt_t*		fmts;
 	Fmt_t		fmt[5];
@@ -219,6 +248,7 @@ main(int argc, register char** argv)
 	time_t*		filetime = 0;	/* use this st_ time field	*/
 	char*		format = 0;	/* tmform() format		*/
 	char*		string = 0;	/* date string			*/
+	int		elapsed = 0;	/* args are start/stop pairs	*/
 	int		increment = 0;	/* incrementally adjust time	*/
 	int		network = 0;	/* don't set network time	*/
 	int		show = 0;	/* show date and don't set	*/
@@ -253,6 +283,9 @@ main(int argc, register char** argv)
 			continue;
 		case 'e':
 			format = "%#";
+			continue;
+		case 'E':
+			elapsed = 1;
 			continue;
 		case 'f':
 			format = opt_info.arg;
@@ -294,7 +327,26 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (filetime)
+	if (elapsed)
+	{
+		e = 0;
+		while (s = *argv++)
+		{
+			if (!(t = *argv++))
+			{
+				argv--;
+				t = "now";
+			}
+			ts = convert(fmts, s);
+			te = convert(fmts, t);
+			if (te > ts)
+				e += te - ts;
+			else
+				e += ts - te;
+		}
+		sfputr(sfstdout, fmtelapsed(e, 1), '\n');
+	}
+	else if (filetime)
 	{
 		if (!argv[0])
 			error(ERROR_USAGE|4, "%s", optusage(NiL));
@@ -325,14 +377,7 @@ main(int argc, register char** argv)
 		{
 			if (argv[0] && (argv[1] || string))
 				error(ERROR_USAGE|4, "%s", optusage(NiL));
-			for (f = fmts; f; f = f->next)
-			{
-				now = tmscan(s, &t, f->format, &u, NiL, 0L);
-				if (!*t && (!f->format || !*u))
-					break;
-			}
-			if (*t)
-				error(3, "%s: invalid date specification", t);
+			now = convert(fmts, s);
 			clock = &now;
 		}
 		else

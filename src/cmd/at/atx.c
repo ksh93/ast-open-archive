@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -33,7 +33,7 @@
  *	$PWD/AT_EXEC_FILE $SHELL <job>
  */
 
-static const char id[] = "\n@(#)atx (AT&T Research) 1998-07-17\0\n";
+static const char id[] = "\n@(#)atx (AT&T Research) 2000-06-16\0\n";
 
 #include "at.h"
 
@@ -58,7 +58,7 @@ main(int argc, char** argv)
 	    ++n && lstat(AT_EXEC_FILE, &xs) ||
 	    ++n && !AT_EXEC_OK(&ds, &xs) ||
 
-	    ++n && sfsscanf(argv[2], "%..64lu.%..64lu.%..64lu", &uid, &gid, &tid) != 3)
+	    ++n && sfsscanf(argv[2], "%..36lu.%..36lu.%..36lu", &uid, &gid, &tid) != 3)
 		error(3, "%s: command garbled [%d]", argc >= 3 ? argv[2] : (char*)0, n);
 	if (setuid(uid))
 		error(3, "%s: user denied", argv[2]);

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -249,7 +249,7 @@ done ${PACKAGE_ast_INCLUDE}/int.h
 prev pzlib.h implicit
 done pzconvert.c
 prev pzconvert.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c pzconvert.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzconvert.c
 done pzconvert.o generated
 make sfdcpzip.o
 make sfdcpzip.c
@@ -298,7 +298,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev pzip.h implicit
 done pzline.c
 prev pzline.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c pzline.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?libpz]"\" -c pzline.c
 done pzline.o generated
 exec - ${AR} cr libpzline.a pzline.o
 exec - (ranlib libpzline.a) >/dev/null 2>&1 || true
@@ -331,7 +331,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libpz.a archive
 prev libpz.a archive
-exec - mv ${PACKAGE_ast_LIB}/libpz.a ${PACKAGE_ast_LIB}/libpz.a.old 2>/dev/null || true; cp libpz.a ${PACKAGE_ast_LIB}/libpz.a
+exec - mv ${PACKAGE_ast_LIB}/libpz.a ${PACKAGE_ast_LIB}/libpz.a.old 2>/dev/null || true; test '' = 'libpz.a' || { cp libpz.a ${PACKAGE_ast_LIB}/libpz.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libpz.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libpz.a generated
 make ${INSTALLROOT}/man/man3
@@ -361,7 +361,7 @@ done ${INSTALLROOT}/man/man3 generated
 make ${INSTALLROOT}/man/man3/pzip.3
 make pzip.3
 done pzip.3
-exec - mv ${INSTALLROOT}/man/man3/pzip.3 ${INSTALLROOT}/man/man3/pzip.3.old 2>/dev/null || true; cp pzip.3 ${INSTALLROOT}/man/man3/pzip.3
+exec - mv ${INSTALLROOT}/man/man3/pzip.3 ${INSTALLROOT}/man/man3/pzip.3.old 2>/dev/null || true; test '' = 'pzip.3' || { cp pzip.3 ${INSTALLROOT}/man/man3/pzip.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/pzip.3 generated
 make ${PACKAGE_ast_LIB}/lib
 exec - set -
@@ -389,16 +389,16 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/pz
 prev pz.req
-exec - mv ${PACKAGE_ast_LIB}/lib/pz ${PACKAGE_ast_LIB}/lib/pz.old 2>/dev/null || true; cp pz.req ${PACKAGE_ast_LIB}/lib/pz
+exec - mv ${PACKAGE_ast_LIB}/lib/pz ${PACKAGE_ast_LIB}/lib/pz.old 2>/dev/null || true; test '' = 'pz.req' || { cp pz.req ${PACKAGE_ast_LIB}/lib/pz  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/pz generated
 make ${PACKAGE_ast_LIB}/libpzline.a archive
 prev libpzline.a archive
-exec - mv ${PACKAGE_ast_LIB}/libpzline.a ${PACKAGE_ast_LIB}/libpzline.a.old 2>/dev/null || true; cp libpzline.a ${PACKAGE_ast_LIB}/libpzline.a
+exec - mv ${PACKAGE_ast_LIB}/libpzline.a ${PACKAGE_ast_LIB}/libpzline.a.old 2>/dev/null || true; test '' = 'libpzline.a' || { cp libpzline.a ${PACKAGE_ast_LIB}/libpzline.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libpzline.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libpzline.a generated
 make ${PACKAGE_ast_LIB}/lib/pzline
 prev pzline.req
-exec - mv ${PACKAGE_ast_LIB}/lib/pzline ${PACKAGE_ast_LIB}/lib/pzline.old 2>/dev/null || true; cp pzline.req ${PACKAGE_ast_LIB}/lib/pzline
+exec - mv ${PACKAGE_ast_LIB}/lib/pzline ${PACKAGE_ast_LIB}/lib/pzline.old 2>/dev/null || true; test '' = 'pzline.req' || { cp pzline.req ${PACKAGE_ast_LIB}/lib/pzline  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/pzline generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -

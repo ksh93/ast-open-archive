@@ -2,7 +2,7 @@
 
 LICENSE = since=1998,author=gsf
 
-CCFLAGS = -O $(CC.DLL)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 VERSION = 1.0
 

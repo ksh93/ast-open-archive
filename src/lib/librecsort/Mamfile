@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -46,7 +46,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in recsort ast
+exec - for i in recsort  ast
 exec - do	case $i in
 exec - 	"recsort"|recsort)
 exec - 		;;
@@ -122,7 +122,7 @@ make FEATURE/recsort implicit
 make features/recsort
 done features/recsort
 prev recsort.req
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/recsort
 done FEATURE/recsort dontcare generated
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
@@ -288,7 +288,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/librecsort.a archive
 prev librecsort.a archive
-exec - mv ${PACKAGE_ast_LIB}/librecsort.a ${PACKAGE_ast_LIB}/librecsort.a.old 2>/dev/null || true; cp librecsort.a ${PACKAGE_ast_LIB}/librecsort.a
+exec - mv ${PACKAGE_ast_LIB}/librecsort.a ${PACKAGE_ast_LIB}/librecsort.a.old 2>/dev/null || true; test '' = 'librecsort.a' || { cp librecsort.a ${PACKAGE_ast_LIB}/librecsort.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/librecsort.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/librecsort.a generated
 make ${INSTALLROOT}/man/man3
@@ -318,7 +318,7 @@ done ${INSTALLROOT}/man/man3 generated
 make ${INSTALLROOT}/man/man3/recsort.3
 make recsort.3
 done recsort.3
-exec - mv ${INSTALLROOT}/man/man3/recsort.3 ${INSTALLROOT}/man/man3/recsort.3.old 2>/dev/null || true; cp recsort.3 ${INSTALLROOT}/man/man3/recsort.3
+exec - mv ${INSTALLROOT}/man/man3/recsort.3 ${INSTALLROOT}/man/man3/recsort.3.old 2>/dev/null || true; test '' = 'recsort.3' || { cp recsort.3 ${INSTALLROOT}/man/man3/recsort.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/recsort.3 generated
 make ${PACKAGE_ast_LIB}/lib
 exec - set -
@@ -346,7 +346,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/recsort
 prev recsort.req
-exec - mv ${PACKAGE_ast_LIB}/lib/recsort ${PACKAGE_ast_LIB}/lib/recsort.old 2>/dev/null || true; cp recsort.req ${PACKAGE_ast_LIB}/lib/recsort
+exec - mv ${PACKAGE_ast_LIB}/lib/recsort ${PACKAGE_ast_LIB}/lib/recsort.old 2>/dev/null || true; test '' = 'recsort.req' || { cp recsort.req ${PACKAGE_ast_LIB}/lib/recsort  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/recsort generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -

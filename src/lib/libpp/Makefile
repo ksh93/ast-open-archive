@@ -12,7 +12,7 @@ DEBUG ==
 
 IDNAME = "$(ID)"
 
-$(ID) 2.0 :LIBRARY: BUGS FEATURES RELEASE HISTORY pp.3 \
+$(ID) 2.0 :LIBRARY: BUGS NOTES RELEASE HISTORY pp.3 \
 		pp.h ppfsm.h ppkey.h pplib.h pp.tab \
 		ppargs.c ppbuiltin.c ppcall.c ppcomment.c \
 		ppcontext.c ppcontrol.c ppcpp.c ppdata.c \
@@ -22,6 +22,14 @@ $(ID) 2.0 :LIBRARY: BUGS FEATURES RELEASE HISTORY pp.3 \
 
 if CC.HOSTTYPE == "hp.pa" || "$(-mam)" == "static*"
 ppfsm.o : .CC.NOOPTIMIZE
+end
+
+if CC.HOSTTYPE == "osf.alpha" || "$(-mam)" == "static*"
+ppcall.o : .CC.NOOPTIMIZE
+end
+
+if CC.HOSTTYPE == "sol*.i386" || "$(-mam)" == "static*"
+ppcpp.o pplex.o : .CC.NOOPTIMIZE
 end
 
 ppdef.h : gentab pp.tab

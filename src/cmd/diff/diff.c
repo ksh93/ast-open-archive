@@ -172,24 +172,6 @@ add_exclude_file (name)
 
 #if _PACKAGE_ast
 
-#undef	error
-
-#define error		ast_error
-#define errorf		ast_errorf
-#define errorv		ast_errorv
-
-#include <error.h>
-
-#undef	error
-#undef	errorf
-#undef	errorv
-
-#define error		diff_error
-
-#define optarg	opt_info.arg
-#define optind	opt_info.index
-#define optnum	opt_info.num
-
 static const char ast_usage[] =
 "[-?\n@(#)diff (GNU diffutils " VERSION ") " RELEASE "\n]"
 #ifdef USAGE_LICENSE
@@ -716,10 +698,10 @@ main (argc, argv)
 
 #if _PACKAGE_ast
 	  case '?':
-		errorf(0, 0, ERROR_USAGE|4, "%s", optarg);
+		errormsg(0, ERROR_USAGE|4, "%s", optarg);
 		break;
 	  case ':':
-		errorf(0, 0, 2, "%s", optarg);
+		errormsg(0, 2, "%s", optarg);
 		break;
 #else
 	default:

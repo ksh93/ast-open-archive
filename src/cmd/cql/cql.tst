@@ -1,5 +1,7 @@
 # regression tests for the cql utility
 
+export TZ=EST5EDT
+
 VIEW data
 
 KEEP "*.[cd]*"

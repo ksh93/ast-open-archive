@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -156,16 +156,21 @@
 #define HEX1		(TOKEN+21)
 #define HEX2		(TOKEN+22)
 #define HEX3		(TOKEN+23)
-#define DBL1		(TOKEN+24)
-#define DBL2		(TOKEN+25)
-#define DBL3		(TOKEN+26)
-#define DBL4		(TOKEN+27)
-#define DBL5		(TOKEN+28)
-#define DOT1		(TOKEN+29)
-#define HDR1		(TOKEN+30)
-#define BIN1		(TOKEN+31)
+#define HEX4		(TOKEN+24)
+#define HEX5		(TOKEN+25)
+#define HEX6		(TOKEN+26)
+#define HEX7		(TOKEN+27)
+#define HEX8		(TOKEN+28)
+#define DBL1		(TOKEN+29)
+#define DBL2		(TOKEN+30)
+#define DBL3		(TOKEN+31)
+#define DBL4		(TOKEN+32)
+#define DBL5		(TOKEN+33)
+#define DOT1		(TOKEN+34)
+#define HDR1		(TOKEN+35)
+#define BIN1		(TOKEN+36)
 
-#define TERMINAL	(TOKEN+32)
+#define TERMINAL	(TOKEN+37)
 
 #endif
 

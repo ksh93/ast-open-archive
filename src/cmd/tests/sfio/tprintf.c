@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -23,8 +23,6 @@
 *                                                              *
 ***************************************************************/
 #include	"sftest.h"
-
-static char	Buf[128];
 
 typedef struct _coord_
 {	int	x;
@@ -110,11 +108,11 @@ Sffmt_t*	fe;
 	case 'b' :
 		fe->fmt = 'd';
 		return 0;
-	case 'z' : /* test return value of extension function */
+	case 'y' : /* test return value of extension function */
 		fe->size = 10;
 		fe->fmt = 's';
 		return 0;
-	case 'Z' : /* terminate format processing */
+	case 'Y' : /* terminate format processing */
 	default :
 		return -1;
 	}
@@ -200,7 +198,7 @@ va_dcl
 	va_end(args);
 }
 
-main()
+MAIN()
 {
 	char	buf1[1024], buf2[1024], *list[4], *s;
 	double	x=0.0051;
@@ -209,8 +207,7 @@ main()
 	Sffmt_t	fe;
 	Sfio_t*	f;
 
-	f = sfopen(NIL(Sfio_t*), sftfile(0), "w+");
-	unlink(sftfile(0));
+	f = sfopen(NIL(Sfio_t*), tstfile(0), "w+");
 	sfsetbuf(f,buf1,10);
 	sfprintf(f,"%40s\n","0123456789");
 	sfsprintf(buf2,sizeof(buf2),"%40s","0123456789");
@@ -251,7 +248,7 @@ main()
 	fe.extf = abprint;
 	fe.eventf = NIL(Sffmtevent_f);
 	sfsprintf(buf1,sizeof(buf1),"%%sX%%d%..4u %..4d9876543210",-1,-1);
-	sfsprintf(buf2,sizeof(buf2),"%!%%sX%%d%..4a %..4b%z%Zxxx",
+	sfsprintf(buf2,sizeof(buf2),"%!%%sX%%d%..4a %..4b%y%Yxxx",
 			&fe, -1, -1, "9876543210yyyy" );
 	if(strcmp(buf1,buf2) != 0)
 		terror("%%!: Extension function failed1\n");
@@ -436,7 +433,7 @@ main()
 	}
 #endif
 
-	i = (int)(~(~((uint)0) >> 1));
+	i = (int)(~(~((unsigned int)0) >> 1));
 	s = sfprints("%d",i);
 	j = atoi(s);
 	if(i != j)
@@ -470,5 +467,26 @@ main()
 	if(strcmp(buf1,buf2) != 0)
 		terror("Justification is wrong\n");
 
-	return 0;
+	/* testing x/open compliant with respect to precision */
+	sfsprintf(buf1, sizeof(buf1),
+		"%.d %.hi %.lo %.f %.e %.g %.g %.g %.g %.g %.s %.d %.hi %.lo|",
+		1345,
+		1234,
+		1234567890,
+		321.7654321,
+		321.7654321,
+		-0.01,
+		0.01,
+		1e-5,
+		1.4,
+		-1.4,
+		"test-string",
+		0,
+		0,
+		0L);
+
+	if(strcmp(buf1,"1345 1234 11145401322 322 3e+02 -0.01 0.01 1e-05 1 -1    |") )
+		terror("Precision not set to zero as required after a dot");
+
+	TSTRETURN(0);
 }

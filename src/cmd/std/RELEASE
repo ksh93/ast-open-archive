@@ -1,3 +1,13 @@
+00-06-10 dd: add swap=op
+00-05-24 ls: fix --kilobytes, add --block-size
+00-05-11 df,ls,ps: unknown format id is fatal error
+00-05-02 dd: use iconv() for from=x to=y conversions
+00-04-01 ls.tst: export TZ=EST5EDT; new tests should be UCT
+00-03-17 rm: add PATH_ATTRIBUTES 'l' check (no hard links to directories)
+	 date: --elapsed accepts odd arg count
+	 catmerge: add
+00-03-09 df: add --format
+	 date: add --elapsed
 00-02-07 ls: -a and -A now mutually exclusive
 	 shar: add $USAGE_LICENSE
 00-01-25 touch: add invalid st_mtime value CAVEAT

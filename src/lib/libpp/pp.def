@@ -1,7 +1,7 @@
 #
 # list of known old cpp predefined symbols
 #
-# @(#)pp.def (gsf@research.att.com) 1998-08-11
+# @(#)pp.def (gsf@research.att.com) 2000-05-09
 #
 # symbols will be tested for the common `_' permutations
 # qualifiers may be combinations of
@@ -120,6 +120,10 @@ SIZE_TYPE
 SMALL		:architecture:
 SMALL_M
 STD_INCLUDE_DIR
+STDC_VERSION
+STDC_IEC_559
+STDC_IEC_559_COMPLEX
+STDC_ISO_10646
 SVR3
 SVR4
 SVR4_SOURCE	:source:

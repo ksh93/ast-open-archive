@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -162,7 +162,7 @@ csauth(register Cs_t* state, int fd, const char* path, const char* arg)
 				goto sorry;
 			}
 			s = b + sfsprintf(b, sizeof(tmp) - (b - tmp), "%03d", auth);
-			if ((stat(tmp, &st) || t1 <= (unsigned long)st.st_ctime && !remove(tmp)) && !close(open(tmp, O_CREAT|O_TRUNC, S_ISUID|S_ISGID|S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) break;
+			if ((stat(tmp, &st) || t1 <= (unsigned long)st.st_ctime && !remove(tmp)) && !close(open(tmp, O_CREAT|O_TRUNC, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH))) break;
 		}
 		key = tmp;
 		if (tokscan(num, NiL, "%lu %lu", &t1, &t2) != 2)

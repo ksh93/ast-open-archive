@@ -1,8 +1,8 @@
 #
 # Glenn Fowler
-# AT&T Bell Laboratories
+# AT&T Research
 #
-# @(#)pp.tab (gsf@research.att.com) 1999-10-01
+# @(#)pp.tab (AT&T Labs Research) 2000-04-01
 #
 # C preprocessor tables and states
 #
@@ -32,6 +32,7 @@
 %keywords "static struct ppkeyword options" prefix=X_ index=optindex
 
 	allmultiple
+	allpossible
 	builtin
 	catliteral
 	cdir
@@ -158,6 +159,7 @@
 
 %flags # options : uncoupled, low frequency
 
+	ALLPOSSIBLE		# ignore top level conditionals
 	ELSEIF			# #else if|ifdef|ifndef ok
 	FINAL			# final hosted macro value
 	HEADEREXPAND		# expanded < does not quote #include macros
@@ -184,6 +186,7 @@
 
 %keywords "static struct ppkeyword variables" prefix=V_ index=optindex
 
+	_Pragma
 	+ARGC
 	+BASE
 	DATE

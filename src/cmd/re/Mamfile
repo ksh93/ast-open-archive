@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -119,9 +119,9 @@ done ${PACKAGE_ast_INCLUDE}/error.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ed.c
 prev ed.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c ed.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c ed.c
 done ed.o generated
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ed ed.o ${mam_libast}
 done ed generated
 make red
@@ -141,7 +141,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done grep.c
 prev grep.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c grep.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -c grep.c
 done grep.o generated
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o grep grep.o ${mam_libast}
@@ -171,7 +171,7 @@ done sed.h
 done sed0.c
 prev sed0.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -D_PACKAGE_ast -c sed0.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?re]"\" -D_PACKAGE_ast -c sed0.c
 done sed0.o generated
 make sed1.o
 make sed1.c
@@ -233,7 +233,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/ed
 prev ed
-exec - mv ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/ed.old 2>/dev/null || true; cp ed ${INSTALLROOT}/bin/ed
+exec - mv ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/ed.old 2>/dev/null || true; test '' = 'ed' || { cp ed ${INSTALLROOT}/bin/ed  		    		    ;}
 done ${INSTALLROOT}/bin/ed generated
 make ${INSTALLROOT}/bin/red
 prev ${INSTALLROOT}/bin/ed
@@ -244,7 +244,7 @@ exec - ln ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/red
 done ${INSTALLROOT}/bin/red generated
 make ${INSTALLROOT}/bin/grep
 prev grep
-exec - mv ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/grep.old 2>/dev/null || true; cp grep ${INSTALLROOT}/bin/grep
+exec - mv ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/grep.old 2>/dev/null || true; test '' = 'grep' || { cp grep ${INSTALLROOT}/bin/grep  		    		    ;}
 done ${INSTALLROOT}/bin/grep generated
 make ${INSTALLROOT}/bin/egrep
 prev ${INSTALLROOT}/bin/grep
@@ -262,7 +262,7 @@ exec - ln ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/fgrep
 done ${INSTALLROOT}/bin/fgrep generated
 make ${INSTALLROOT}/bin/sed
 prev sed
-exec - mv ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; cp sed ${INSTALLROOT}/bin/sed
+exec - mv ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; test '' = 'sed' || { cp sed ${INSTALLROOT}/bin/sed  		    		    ;}
 done ${INSTALLROOT}/bin/sed generated
 done install virtual
 make test

@@ -240,6 +240,7 @@ commands(void)
 		 * Print the prompt, if needed.  Clear out
 		 * string space, and flush the output.
 		 */
+		fflush(stdout);
 		moretop();
 		if (!state.sourcing && state.var.interactive) {
 			if (state.var.autoinc && incfile() > 0)
@@ -250,7 +251,6 @@ commands(void)
 			else if (state.var.prompt)
 				note(PROMPT, "%s", state.var.prompt);
 		}
-		fflush(stdout);
 		sreset();
 		/*
 		 * Read a line of commands from the current input
@@ -496,7 +496,7 @@ execute(char* linebuf, int contxt)
 			(state.msg.list + 1)->m_index = 0;
 			type(state.msg.list);
 		}
-	if (!state.sourcing && !(com->c_argtype & T))
+	if (!state.sourcing && !(com->c_argtype & Z))
 		state.sawcom = 1;
 	return 0;
 }
@@ -550,9 +550,9 @@ folderinfo(int msgcount)
 				d++;
 			else if (mp->m_flag & MSAVE)
 				s++;
-			else if (!(mp->m_flag & MREAD))
+			else if (!(mp->m_flag & (MREAD|MNEW)))
 				u++;
-			else if (mp->m_flag & MNEW)
+			else if ((mp->m_flag & (MREAD|MNEW)) == MNEW)
 				n++;
 		}
 	}
@@ -560,7 +560,7 @@ folderinfo(int msgcount)
 	if (getfolder(buf) >= 0) {
 		i = strlen(buf);
 		buf[i++] = '/';
-			if (!strncmp(state.path.mail, buf, i))
+		if (!strncmp(state.path.mail, buf, i))
 			sprintf(name = buf, "+%s", state.path.mail + i);
 	}
 	printf("\"%s\": %d message%s", name, m, m == 1 ? "" : "s");

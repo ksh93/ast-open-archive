@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -378,7 +378,7 @@ csopen(register Cs_t* state, const char* apath, int op)
 	int		auth = 1;
 	int		mode;
 	unsigned long	addr;
-	unsigned long	port;
+	unsigned long	port = 0;
 	struct stat	st;
 	gid_t		groups[NGROUPS_MAX + 1];
 	char		buf[PATH_MAX];
@@ -401,6 +401,18 @@ csopen(register Cs_t* state, const char* apath, int op)
 	opath = path;
 	if (pathgetlink(path, buf, sizeof(buf)) <= 0)
 		strcpy(buf, path);
+	else if ((state->flags & CS_ADDR_LOCAL) && (s = strrchr(buf, '/')))
+	{
+		/*
+		 * dynamic ip assignment can change the addr
+		 * underfoot in some implementations so we
+		 * double check the local ip here
+		 */
+
+		strcpy(tmp, buf);
+		if (tokscan(tmp, NiL, "/dev/%s/%s/%s", &type, NiL, &serv) == 3)
+			sfsprintf(buf, sizeof(buf), "/dev/%s/%s/%s", type, csntoa(state, 0), serv);
+	}
 	path = buf;
 	pathcanon(path, 0);
 	errno = ENOENT;
@@ -688,16 +700,20 @@ csopen(register Cs_t* state, const char* apath, int op)
 				else if (port == CS_PORT_RESERVED || port == CS_PORT_NORMAL)
 					goto bad;
 				if (nfd >= 0)
-					close(nfd);
-				state->control = 0;
-				if ((fd = csbind(state, type, addr, port, 0L)) < 0)
-					return -1;
-				if (mode != (S_IRWXU|S_IRWXG|S_IRWXO) && csauth(state, fd, NiL, NiL))
 				{
-					close(fd);
-					return -1;
+					close(nfd);
+					nfd = -1;
 				}
-				return fd;
+				state->control = 0;
+				if ((fd = csbind(state, type, addr, port, 0L)) >= 0)
+				{
+					if (mode != (S_IRWXU|S_IRWXG|S_IRWXO) && csauth(state, fd, NiL, NiL))
+					{
+						close(fd);
+						return -1;
+					}
+					return fd;
+				}
 			}
 		}
 	}
@@ -1130,7 +1146,13 @@ csopen(register Cs_t* state, const char* apath, int op)
 				}
 			}
 			close(fd);
-			if ((fd = csbind(state, type, 0L, geteuid() ? CS_NORMAL : CS_RESERVED, 0L)) >= 0)
+			if (!port && (n = strtol(serv, &t, 0)) && t > serv && !*t)
+				port = n;
+			else if (geteuid())
+				port = CS_NORMAL;
+			else
+				port = CS_RESERVED;
+			if ((fd = csbind(state, type, 0L, port, 0L)) >= 0)
 			{
 				*state->control = CS_MNT_STREAM;
 				remove(path);

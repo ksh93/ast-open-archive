@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -378,10 +378,12 @@ static struct fsminit	fsminit[] =
 
 	/* saw 0 [xX], hex constant */
 	{	HEX1,	{ C_XXX },		BACK(T_HEXADECIMAL),	},
-	{	HEX1,	{ C_LET, '.' },		BAD1,			},
+	{	HEX1,	{ C_LET },		BAD1,			},
 	{	HEX1,	{ C_HEX },		HEX1,			},
 	{	HEX1,	{ 'e', 'E' },		HEX3,			},
 	{	HEX1,	{ 'l', 'L', 'u', 'U' },	QUAL(HEX2),		},
+	{	HEX1,	{ '.' },		HEX4,			},
+	{	HEX1,	{ 'p', 'P' },		HEX5,			},
 
 	/* hex constant qualifier */
 	{	HEX2,	{ C_XXX },		BACK(T_HEXADECIMAL),	},
@@ -394,6 +396,35 @@ static struct fsminit	fsminit[] =
 	{	HEX3,	{ C_HEX },		HEX1,			},
 	{	HEX3,	{ 'e', 'E' },		HEX3,			},
 	{	HEX3,	{ 'l', 'L', 'u', 'U' },	QUAL(HEX2),		},
+
+	/* hex dbl fraction */
+	{	HEX4,	{ C_XXX },		BACK(T_HEXDOUBLE),	},
+	{	HEX4,	{ C_LET, '.' },		BAD1,			},
+	{	HEX4,	{ C_HEX },		HEX4,			},
+	{	HEX4,	{ 'p', 'P' },		HEX5,			},
+	{	HEX4,	{ 'f', 'F', 'l', 'L' },	QUAL(HEX8),		},
+
+	/* optional hex dbl exponent sign */
+	{	HEX5,	{ C_XXX },		BACK(T_INVALID),	},
+	{	HEX5,	{ C_LET, '.' },		BAD1,			},
+	{	HEX5,	{ '+', '-' },		HEX6,			},
+	{	HEX5,	{ C_DEC },		HEX7,			},
+
+	/* mandatory hex dbl exponent first digit */
+	{	HEX6,	{ C_XXX },		BACK(T_INVALID),	},
+	{	HEX6,	{ C_LET, '.' },		BAD1,			},
+	{	HEX6,	{ C_DEC },		HEX7,			},
+
+	/* hex dbl exponent digits */
+	{	HEX7,	{ C_XXX },		BACK(T_HEXDOUBLE),	},
+	{	HEX7,	{ C_LET, '.' },		BAD1,			},
+	{	HEX7,	{ C_DEC },		HEX7,			},
+	{	HEX7,	{ 'f', 'F', 'l', 'L' },	QUAL(HEX8),		},
+
+	/* hex dbl constant qualifier */
+	{	HEX8,	{ C_XXX },		BACK(T_HEXDOUBLE),	},
+	{	HEX8,	{ C_LET, '.' },		BAD1,			},
+	{	HEX8,	{ 'f', 'F', 'l', 'L' },	QUAL(HEX8),		},
 
 	/* saw <dec>, dec constant */
 	{	DEC1,	{ C_XXX },		BACK(T_DECIMAL),	},

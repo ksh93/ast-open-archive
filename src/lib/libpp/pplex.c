@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -726,7 +726,8 @@ ppcpp(void)
 		{
 			if (pp.in->type != IN_BUFFER)
 			{
-				error(1, "%s: invalid character ignored", pptokchr(c));
+				if (!(pp.option & ALLPOSSIBLE))
+					error(1, "%s: invalid character ignored", pptokchr(c));
 				goto fsm_top;
 			}
 			PUTCHR(c);
@@ -917,7 +918,8 @@ ppcpp(void)
 			pp.token = pp.catbuf;
 			*pp.token++ = 0;
 			ppstate = (st & STRIP);
-			if (DOSTRIP()) ppstate |= ADD|QUOTE;
+			if (DOSTRIP())
+				ppstate |= ADD|QUOTE;
 			st |= JOINING;
 			st &= ~(NEWLINE|STRIP);
 
@@ -944,7 +946,8 @@ ppcpp(void)
 #if !CPP
 					qual = N_WIDE;
 #endif
-					if (ppstate & ADD) ppstate &= ~ADD;
+					if (ppstate & ADD)
+						ppstate &= ~ADD;
 					else if (m == n)
 						op--;
 					else
@@ -956,7 +959,8 @@ ppcpp(void)
 					STRCOPY(op, pp.token + 2, s);
 					continue;
 				case T_STRING:
-					if (ppstate & ADD) ppstate &= ~ADD;
+					if (ppstate & ADD)
+						ppstate &= ~ADD;
 					else if (m == n)
 						op--;
 					else
@@ -2122,7 +2126,8 @@ ppcpp(void)
 					if (n == '\r')
 					{
 						GET(c, n, tp, xp);
-						if (n != '\n' && n != EOB) BACKIN();
+						if (n != '\n' && n != EOB)
+							BACKIN();
 					}
 					if (n == '\n')
 					{
@@ -2176,6 +2181,13 @@ ppcpp(void)
 						bp = ip;
 						goto fsm_get;
 					}
+					else if ((n == 'u' || n == 'U') && !INQUOTE(rp))
+					{
+						PUTCHR(c);
+						PUTCHR(n);
+						bp = ip;
+						goto fsm_get;
+					}
 #if COMPATIBLE
 					else if ((st & (COMPATIBILITY|TRANSITION)) == COMPATIBILITY && (n == '"' || n == '\'') && !INQUOTE(rp))
 					{
@@ -2185,7 +2197,8 @@ ppcpp(void)
 						goto fsm_get;
 					}
 #endif
-					else if (n != EOB) BACKIN();
+					else if (n != EOB)
+						BACKIN();
 				}
 				break;
 			case '\r':
@@ -2205,8 +2218,10 @@ ppcpp(void)
 					if (n != EOB) BACKIN();
 				}
 				break;
+				error(1, "AHA splice %c", c);
 			}
-			if ((state &= ~SPLICE) >= TERMINAL) goto fsm_terminal;
+			if ((state &= ~SPLICE) >= TERMINAL)
+				goto fsm_terminal;
 			PUTCHR(c);
 			goto fsm_begin;
 		}

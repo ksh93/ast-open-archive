@@ -101,15 +101,17 @@ sendsmtp(Sfio_t* fp, char* host, char** argv, off_t original)
 		if (!(n = t - s))
 			goto bad_mesg;
 		z = sfvalue(fp);
+		if (sfprintf(sp, "MAIL FROM:<%*.*s>\r\n", n, n, s) < 0)
+			goto bad_send;
 	}
 	else
 	{
-		s = state.var.user;
-		n = strlen(s);
 		z = 0;
+		if ((state.var.domain ?
+		     sfprintf(sp, "MAIL FROM:<%s@%s>\r\n", state.var.user, state.var.domain) :
+		     sfprintf(sp, "MAIL FROM:<%s>\r\n", state.var.user)) < 0)
+			goto bad_send;
 	}
-	if (sfprintf(sp, "MAIL FROM:<%*.*s>\r\n", n, n, s) < 0)
-		goto bad_send;
 	do
 	{
 		if (!(s = sfgetr(rp, '\n', 1)))

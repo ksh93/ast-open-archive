@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -46,7 +46,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in vdelta ast
+exec - for i in vdelta  ast
 exec - do	case $i in
 exec - 	"vdelta"|vdelta)
 exec - 		;;
@@ -204,7 +204,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libvdelta.a archive
 prev libvdelta.a archive
-exec - mv ${PACKAGE_ast_LIB}/libvdelta.a ${PACKAGE_ast_LIB}/libvdelta.a.old 2>/dev/null || true; cp libvdelta.a ${PACKAGE_ast_LIB}/libvdelta.a
+exec - mv ${PACKAGE_ast_LIB}/libvdelta.a ${PACKAGE_ast_LIB}/libvdelta.a.old 2>/dev/null || true; test '' = 'libvdelta.a' || { cp libvdelta.a ${PACKAGE_ast_LIB}/libvdelta.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libvdelta.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libvdelta.a generated
 make ${INSTALLROOT}/man/man3
@@ -234,7 +234,7 @@ done ${INSTALLROOT}/man/man3 generated
 make ${INSTALLROOT}/man/man3/vdelta.3
 make vdelta.3
 done vdelta.3
-exec - mv ${INSTALLROOT}/man/man3/vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3.old 2>/dev/null || true; cp vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3
+exec - mv ${INSTALLROOT}/man/man3/vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3.old 2>/dev/null || true; test '' = 'vdelta.3' || { cp vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/vdelta.3 generated
 make ${PACKAGE_ast_LIB}/lib
 exec - set -
@@ -262,7 +262,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/vdelta
 prev vdelta.req
-exec - mv ${PACKAGE_ast_LIB}/lib/vdelta ${PACKAGE_ast_LIB}/lib/vdelta.old 2>/dev/null || true; cp vdelta.req ${PACKAGE_ast_LIB}/lib/vdelta
+exec - mv ${PACKAGE_ast_LIB}/lib/vdelta ${PACKAGE_ast_LIB}/lib/vdelta.old 2>/dev/null || true; test '' = 'vdelta.req' || { cp vdelta.req ${PACKAGE_ast_LIB}/lib/vdelta  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/vdelta generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -
@@ -290,7 +290,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/vdelta.h
 prev vdelta.h
-exec - mv ${PACKAGE_ast_INCLUDE}/vdelta.h ${PACKAGE_ast_INCLUDE}/vdelta.h.old 2>/dev/null || true; cp vdelta.h ${PACKAGE_ast_INCLUDE}/vdelta.h
+exec - mv ${PACKAGE_ast_INCLUDE}/vdelta.h ${PACKAGE_ast_INCLUDE}/vdelta.h.old 2>/dev/null || true; test '' = 'vdelta.h' || { cp vdelta.h ${PACKAGE_ast_INCLUDE}/vdelta.h  		    		    ;}
 done ${PACKAGE_ast_INCLUDE}/vdelta.h generated
 done install virtual
 make test

@@ -119,8 +119,9 @@ tst	run{
 			&(p)->pr_sigcatch, \
 			&(p)->pr_wchan
 	
-	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime)*HZ)
-	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime)*HZ)
+	#define PR_HZ		HZ
+	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))
+	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))
 	#define PR_START(p)	((p)->pr_start)
 !
 		elif	test -r /proc/curproc/status
@@ -220,6 +221,7 @@ tst	run{
 			(p)->pr_tty = ((p)->pr_tty_major == -1 || (p)->pr_tty_minor == -1) ? PRNODEV : ((p)->pr_tty_major << 8) | (p)->pr_tty_minor; \
 			}
 	
+	#define PR_HZ		1
 	#define PR_TIME(p)	(((p)->pr_utime+(p)->pr_stime))
 	#define PR_CTIME(p)	(((p)->pr_cutime+(p)->pr_cstime))
 	#define PR_START(p)	((p)->pr_start)
@@ -254,6 +256,7 @@ tst	run{
 	
 	#define _PS_scan_binary	1
 	
+	#define PR_HZ		1
 	#define PR_TIME(p)	((p)->pr_time.tv_sec)
 	#define PR_CTIME(p)	PR_TIME(p)
 	#define PR_START(p)	((p)->pr_start.tv_sec)
@@ -276,6 +279,7 @@ tst	run{
 	#define _PS_path_str	"$dir/%s"
 	#define _PS_status	0
 
+	#define PR_HZ		1
 	#define PR_START(p)	((p)->pr_start.tv_sec)
 	#if _mem_pr_lttydev_prpsinfo && !defined(pr_ttydev)
 	#define PR_TIME(p)	((p)->pr_time)

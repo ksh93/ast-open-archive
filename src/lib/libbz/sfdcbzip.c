@@ -65,7 +65,7 @@ sfbzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	case SF_WRITE:
 		return *((ssize_t*)val) < 0 ? -1 : 0;
 	case SF_SYNC:
-		return bzflush(bz->bz);
+		return val ? 0 : bzflush(bz->bz);
 	case SFBZ_HANDLE:
 		return (*((Bz_t**)val) = bz->bz) ? 1 : -1;
 	case SFBZ_GETPOS:

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -44,12 +44,28 @@ Sfdisc_t* disc;
 
 static Sfdisc_t Wdisc = {NIL(Sfread_f), NIL(Sfwrite_f), NIL(Sfseek_f), except};
 
-main()
+MAIN()
 {
 	int	fd[2];
 	Sfio_t	*r, *w;
 	char*	s;
 	void(*	handler)_ARG_((int));
+
+#define N_STR	10
+	if(argc > 1) /* to act as a coprocess that read/write ten lines */
+	{	int	i, n, rv;
+
+		n = atoi(argv[1]);
+		for(i = 0; i < n; ++i)
+		{	if(!(s = sfgetr(sfstdin,'\n',1)) )
+				terror("Failed to read from stdin");
+			if((rv = sfputr(sfstdout, s, '\n')) != sfvalue(sfstdin))
+				terror("Failed to write rv=%d stdin=%d",
+					rv, sfvalue(sfstdin));
+		}
+		sfsync(sfstdout);
+		exit(0);
+	}
 
 	signal(SIGPIPE,SIG_IGN);
 
@@ -86,8 +102,8 @@ main()
 		terror("Write exception did not get raised\n");
 
 	signal(SIGPIPE,SIG_DFL);
-	if((w = sfpopen(NIL(Sfio_t*), "head -10", "w+")) )
-	{	int		i;
+	if((w = sfpopen(NIL(Sfio_t*), sfprints("%s %d", argv[0], N_STR), "w+")) )
+	{	int	i;
 
 		if((handler = signal(SIGPIPE,SIG_IGN)) == SIG_DFL ||
 		   handler == SIG_IGN)
@@ -97,7 +113,7 @@ main()
 		Write_error = 0;
 		sfdisc(w,&Wdisc);
 
-		for(i = 0; i < 100; ++i)
+		for(i = 0; i < N_STR*10; ++i)
 			if(sfputr(w, "abc",'\n') != 4)
 				terror("Writing to coprocess1\n");
 
@@ -108,7 +124,7 @@ main()
 		if (i != sffileno(w))
 			close(sffileno(w));
 
-		for(i = 0; i < 10; ++i)
+		for(i = 0; i < N_STR; ++i)
 			if(!(s = sfgetr(w,'\n',1)) || strcmp(s,"abc") != 0)
 				terror("Reading coprocess [%s]\n", s);
 		if((s = sfgetr(w,'\n',1)) )
@@ -131,9 +147,9 @@ main()
 		terror("SIGPIPE handler should have been SIG_DFL\n");
 
 	/* test for stdio signal handling behavior */
-	if((w = sfpopen((Sfio_t*)(-1), "head -10", "w+")) )
-		if((handler = signal(SIGPIPE,SIG_DFL)) != SIG_DFL)
-			terror("SIGPIPE handler should have been SIG_DFL\n");
+	w = sfpopen((Sfio_t*)(-1), sfprints("%s %d 2>/dev/null",argv[0],N_STR), "w+");
+	if(w && (handler = signal(SIGPIPE,SIG_DFL)) != SIG_DFL)
+		terror("SIGPIPE handler should have been SIG_DFL\n");
 
-	return 0;
+	TSTRETURN(0);
 }

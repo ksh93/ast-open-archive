@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -37,6 +37,10 @@
 
 #define OPEN_MIN	20
 #define PATH_MIN	32
+
+#if !defined(O_NONBLOCK) && defined(FNDELAY)
+#define O_NONBLOCK	FNDELAY
+#endif
 
 static Common_t		state;
 
@@ -197,7 +201,7 @@ cssopen(const char* path, Cssdisc_t* disc)
 	}
 	else
 	{
-		sfsprintf(css->service, PATH_MIN, "/dev/fdp/local/%s", s);
+		sfsprintf(css->service, PATH_MIN, "/dev/fdp/local/%s", path);
 		path = (char*)cspath(css->state, 0, 0);
 		type = strmatch(path, "/dev/??p/*/*") ? path[5] : 'f';
 		css->perm = S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;
@@ -431,6 +435,7 @@ cssfd(register Css_t* css, register int fd, unsigned long op)
 	register int		n;
 	register int		nfd;
 	register int		cmd;
+	int			flags;
 #if DEBUG
 	int			ofd = fd;
 	unsigned long		oop = op;
@@ -486,6 +491,7 @@ cssfd(register Css_t* css, register int fd, unsigned long op)
 				ip->actionf = css->disc->actionf;
 				ip->data = 0;
 				ip->events = op;
+				ip->set = 0;
 				css->fdpolling++;
 				if (ip->events & CS_POLL_BEFORE)
 					state.fdbefore++;
@@ -514,13 +520,29 @@ cssfd(register Css_t* css, register int fd, unsigned long op)
 							css->fdlistening--;
 						if (ip->events & CS_POLL_USER)
 							css->fduser--;
-						ip->events = op;
+						state.fdpoll[n].events = ip->events = op;
 						if (ip->events & CS_POLL_BEFORE)
 							state.fdbefore++;
 						if (ip->events & CS_POLL_CONNECT)
 							css->fdlistening++;
 						if (ip->events & CS_POLL_USER)
 							css->fduser++;
+						if (op & CS_POLL_WRITE)
+						{
+#ifdef O_NONBLOCK
+							if (!(ip->set & CS_POLL_WRITE))
+							{
+								ip->set |= CS_POLL_WRITE;
+								if ((flags = fcntl(fd, F_GETFL, 0)) >= 0)
+								{
+									flags |= O_NONBLOCK;
+									fcntl(fd, F_SETFL, flags);
+									messagef((state.main->id, NiL, -4, "cssfd: %d O_NONBLOCK", fd));
+								}
+							}
+#endif
+							messagef((state.main->id, NiL, -4, "cssfd: %d CS_POLL_WRITE", fd));
+						}
 					}
 					break;
 				case CS_POLL_DUP:

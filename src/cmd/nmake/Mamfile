@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -360,11 +360,10 @@ make version.o
 make version.c
 done version.c
 prev version.c
-exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)make (AT&T Research) 4.0 2000-02-14\0\n"\" -c version.c
+exec - ${CC} ${CCFLAGS}   -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)make (AT&T Research) 4.0 2000-06-01\0\n"\" -c version.c
 done version.o generated
-setv mam_libcoshell ${mam_cc_L+-lcoshell}${mam_cc_L-${PACKAGE_ast_LIB}/libcoshell.a}
-setv mam_libcoshell `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcoshell,${INSTALLROOT}/lib/libcoshell.a,} ${PACKAGE_ast_LIB}/lib/coshell`
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libcoshell `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcoshell,${INSTALLROOT}/lib/libcoshell.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/coshell 2>/dev/null || echo '' ${mam_cc_L+-lcoshell}${mam_cc_L-${PACKAGE_ast_LIB}/libcoshell.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o ${mam_libcoshell} ${mam_libast}
 done nmake generated
 make ppcc
@@ -420,7 +419,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/nmake
 prev nmake
-exec - mv ${INSTALLROOT}/bin/nmake ${INSTALLROOT}/bin/nmake.old 2>/dev/null || true; cp nmake ${INSTALLROOT}/bin/nmake
+exec - mv ${INSTALLROOT}/bin/nmake ${INSTALLROOT}/bin/nmake.old 2>/dev/null || true; test '' = 'nmake' || { cp nmake ${INSTALLROOT}/bin/nmake  		    		    ;}
 done ${INSTALLROOT}/bin/nmake generated
 make ${INSTALLROOT}/man/man1
 exec - set -
@@ -449,12 +448,12 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/nmake.1
 make nmake.1
 done nmake.1
-exec - mv ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; cp nmake.1 ${INSTALLROOT}/man/man1/nmake.1
+exec - mv ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; test '' = 'nmake.1' || { cp nmake.1 ${INSTALLROOT}/man/man1/nmake.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/nmake.1 generated
 make ${INSTALLROOT}/man/man1/makerules.1
 make makerules.1
 done makerules.1
-exec - mv ${INSTALLROOT}/man/man1/makerules.1 ${INSTALLROOT}/man/man1/makerules.1.old 2>/dev/null || true; cp makerules.1 ${INSTALLROOT}/man/man1/makerules.1
+exec - mv ${INSTALLROOT}/man/man1/makerules.1 ${INSTALLROOT}/man/man1/makerules.1.old 2>/dev/null || true; test '' = 'makerules.1' || { cp makerules.1 ${INSTALLROOT}/man/man1/makerules.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/makerules.1 generated
 make ${INSTALLROOT}/man/man8
 exec - set -
@@ -483,7 +482,7 @@ done ${INSTALLROOT}/man/man8 generated
 make ${INSTALLROOT}/man/man8/nmake.8
 make nmake.8
 done nmake.8
-exec - mv ${INSTALLROOT}/man/man8/nmake.8 ${INSTALLROOT}/man/man8/nmake.8.old 2>/dev/null || true; cp nmake.8 ${INSTALLROOT}/man/man8/nmake.8
+exec - mv ${INSTALLROOT}/man/man8/nmake.8 ${INSTALLROOT}/man/man8/nmake.8.old 2>/dev/null || true; test '' = 'nmake.8' || { cp nmake.8 ${INSTALLROOT}/man/man8/nmake.8  		    		    ;}
 done ${INSTALLROOT}/man/man8/nmake.8 generated
 make ${PACKAGE_ast_LIB}/make
 exec - set -
@@ -537,7 +536,7 @@ exec - 	do	eval echo \$n = \$$n
 exec - 	done
 exec - } > Makeinstall.mk
 done Makeinstall.mk generated
-exec - mv ${PACKAGE_ast_LIB}/make/Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk.old 2>/dev/null || true; cp Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk
+exec - mv ${PACKAGE_ast_LIB}/make/Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk.old 2>/dev/null || true; test '' = 'Makeinstall.mk' || { cp Makeinstall.mk ${PACKAGE_ast_LIB}/make/Makeinstall.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/Makeinstall.mk generated
 make ${PACKAGE_ast_LIB}/make/Makerules.mk
 make Makerules.mk
@@ -546,63 +545,65 @@ done Localrules.mk dontcare virtual
 make rules-${_hosttype_=`package`}.mk implicit
 done rules-${_hosttype_=`package`}.mk dontcare virtual
 prev Makeinstall.mk implicit
+make msgcat.mk implicit
+done msgcat.mk dontcare
 make Scanrules.mk implicit
 done Scanrules.mk dontcare
 done Makerules.mk
-exec - mv ${PACKAGE_ast_LIB}/make/Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk.old 2>/dev/null || true; cp Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk
+exec - mv ${PACKAGE_ast_LIB}/make/Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk.old 2>/dev/null || true; test '' = 'Makerules.mk' || { cp Makerules.mk ${PACKAGE_ast_LIB}/make/Makerules.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/Makerules.mk generated
 make ${PACKAGE_ast_LIB}/make/Scanrules.mk
 prev Scanrules.mk
-exec - mv ${PACKAGE_ast_LIB}/make/Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk.old 2>/dev/null || true; cp Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk
+exec - mv ${PACKAGE_ast_LIB}/make/Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk.old 2>/dev/null || true; test '' = 'Scanrules.mk' || { cp Scanrules.mk ${PACKAGE_ast_LIB}/make/Scanrules.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/Scanrules.mk generated
 make ${PACKAGE_ast_LIB}/make/S.mk
 make S.mk
 done S.mk
-exec - mv ${PACKAGE_ast_LIB}/make/S.mk ${PACKAGE_ast_LIB}/make/S.mk.old 2>/dev/null || true; cp S.mk ${PACKAGE_ast_LIB}/make/S.mk
+exec - mv ${PACKAGE_ast_LIB}/make/S.mk ${PACKAGE_ast_LIB}/make/S.mk.old 2>/dev/null || true; test '' = 'S.mk' || { cp S.mk ${PACKAGE_ast_LIB}/make/S.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/S.mk generated
 make ${PACKAGE_ast_LIB}/make/SYSTEM.mk
 make SYSTEM.mk
 done SYSTEM.mk
-exec - mv ${PACKAGE_ast_LIB}/make/SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk.old 2>/dev/null || true; cp SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk
+exec - mv ${PACKAGE_ast_LIB}/make/SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk.old 2>/dev/null || true; test '' = 'SYSTEM.mk' || { cp SYSTEM.mk ${PACKAGE_ast_LIB}/make/SYSTEM.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/SYSTEM.mk generated
 make ${PACKAGE_ast_LIB}/make/TABLE.mk
 make TABLE.mk
 done TABLE.mk
-exec - mv ${PACKAGE_ast_LIB}/make/TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk.old 2>/dev/null || true; cp TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk
+exec - mv ${PACKAGE_ast_LIB}/make/TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk.old 2>/dev/null || true; test '' = 'TABLE.mk' || { cp TABLE.mk ${PACKAGE_ast_LIB}/make/TABLE.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/TABLE.mk generated
 make ${PACKAGE_ast_LIB}/make/debug.mk
 make debug.mk
 done debug.mk
-exec - mv ${PACKAGE_ast_LIB}/make/debug.mk ${PACKAGE_ast_LIB}/make/debug.mk.old 2>/dev/null || true; cp debug.mk ${PACKAGE_ast_LIB}/make/debug.mk
+exec - mv ${PACKAGE_ast_LIB}/make/debug.mk ${PACKAGE_ast_LIB}/make/debug.mk.old 2>/dev/null || true; test '' = 'debug.mk' || { cp debug.mk ${PACKAGE_ast_LIB}/make/debug.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/debug.mk generated
 make ${PACKAGE_ast_LIB}/make/mkservice.mk
 make mkservice.mk
 done mkservice.mk
-exec - mv ${PACKAGE_ast_LIB}/make/mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk.old 2>/dev/null || true; cp mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk
+exec - mv ${PACKAGE_ast_LIB}/make/mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk.old 2>/dev/null || true; test '' = 'mkservice.mk' || { cp mkservice.mk ${PACKAGE_ast_LIB}/make/mkservice.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/mkservice.mk generated
 make ${PACKAGE_ast_LIB}/make/yacc.mk
 make yacc.mk
 done yacc.mk
-exec - mv ${PACKAGE_ast_LIB}/make/yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk.old 2>/dev/null || true; cp yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk
+exec - mv ${PACKAGE_ast_LIB}/make/yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk.old 2>/dev/null || true; test '' = 'yacc.mk' || { cp yacc.mk ${PACKAGE_ast_LIB}/make/yacc.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/yacc.mk generated
 make ${PACKAGE_ast_LIB}/make/pkg-tcl.mk
 make pkg-tcl.mk
 done pkg-tcl.mk
-exec - mv ${PACKAGE_ast_LIB}/make/pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk.old 2>/dev/null || true; cp pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk
+exec - mv ${PACKAGE_ast_LIB}/make/pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk.old 2>/dev/null || true; test '' = 'pkg-tcl.mk' || { cp pkg-tcl.mk ${PACKAGE_ast_LIB}/make/pkg-tcl.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/pkg-tcl.mk generated
 make ${PACKAGE_ast_LIB}/make/pkg-X11.mk
 make pkg-X11.mk
 done pkg-X11.mk
-exec - mv ${PACKAGE_ast_LIB}/make/pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk.old 2>/dev/null || true; cp pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk
+exec - mv ${PACKAGE_ast_LIB}/make/pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk.old 2>/dev/null || true; test '' = 'pkg-X11.mk' || { cp pkg-X11.mk ${PACKAGE_ast_LIB}/make/pkg-X11.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/pkg-X11.mk generated
 make ${PACKAGE_ast_LIB}/make/rules-win32.mk
 make rules-win32.mk
 done rules-win32.mk
-exec - mv ${PACKAGE_ast_LIB}/make/rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk.old 2>/dev/null || true; cp rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk
+exec - mv ${PACKAGE_ast_LIB}/make/rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk.old 2>/dev/null || true; test '' = 'rules-win32.mk' || { cp rules-win32.mk ${PACKAGE_ast_LIB}/make/rules-win32.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/rules-win32.mk generated
 make ${PACKAGE_ast_LIB}/make/ppcc
 prev ppcc
-exec - mv ${PACKAGE_ast_LIB}/make/ppcc ${PACKAGE_ast_LIB}/make/ppcc.old 2>/dev/null || true; cp ppcc ${PACKAGE_ast_LIB}/make/ppcc
+exec - mv ${PACKAGE_ast_LIB}/make/ppcc ${PACKAGE_ast_LIB}/make/ppcc.old 2>/dev/null || true; test '' = 'ppcc' || { cp ppcc ${PACKAGE_ast_LIB}/make/ppcc  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/ppcc generated
 make ${PACKAGE_ast_LIB}/probe/C/make
 exec - set -
@@ -660,7 +661,7 @@ exec - 	;;
 exec - esac
 exec - chmod u+w,+x probe
 done probe generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe ${PACKAGE_ast_LIB}/probe/C/make/probe.old 2>/dev/null || true; cp probe ${PACKAGE_ast_LIB}/probe/C/make/probe
+exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe ${PACKAGE_ast_LIB}/probe/C/make/probe.old 2>/dev/null || true; test '' = 'probe' || { cp probe ${PACKAGE_ast_LIB}/probe/C/make/probe  		    		    ;}
 done ${PACKAGE_ast_LIB}/probe/C/make/probe generated
 make ${PACKAGE_ast_LIB}/probe/C/make/probe.ini
 make probe.ini
@@ -688,7 +689,7 @@ exec - ?*)	cmp -s $1 probe.ini || cp $1 probe.ini ;;
 exec - *)	: > probe.ini
 exec - esac
 done probe.ini generated
-exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini.old 2>/dev/null || true; cp probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini
+exec - mv ${PACKAGE_ast_LIB}/probe/C/make/probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini.old 2>/dev/null || true; test '' = 'probe.ini' || { cp probe.ini ${PACKAGE_ast_LIB}/probe/C/make/probe.ini  		    		    ;}
 done ${PACKAGE_ast_LIB}/probe/C/make/probe.ini generated
 make ${INSTALLROOT}/lib/make
 exec - set -
@@ -719,7 +720,7 @@ make Makerules.mo
 prev Makerules.mk
 exec - ${MAKE} $MAKEFLAGS --base --compile --file=Makerules.mk
 done Makerules.mo generated
-exec - mv ${INSTALLROOT}/lib/make/makerules.mo ${INSTALLROOT}/lib/make/makerules.mo.old 2>/dev/null || true; cp Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo
+exec - mv ${INSTALLROOT}/lib/make/makerules.mo ${INSTALLROOT}/lib/make/makerules.mo.old 2>/dev/null || true; test '' = 'Makerules.mo' || { cp Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo  		    		    ;}
 done ${INSTALLROOT}/lib/make/makerules.mo virtual
 done install virtual
 make test

@@ -1,0 +1,104 @@
+The INIT package is required by all other packages. It contains the
+package command, support scripts, and utilities.
+
+Source Package Installation Instructions:
+
+  (1) Do not install packages as root/super-user. Although some components may
+      have setuid executables, few must be owned by root. These are best
+      changed manually when the security implications are understood.
+  (2) Choose a package root directory and cd to it. This will be a local work
+      area for all packages. See (9) for installing packages for public use.
+  (3) Create the subdirectory lib/package/tgz and download all package archives
+      into that directory. The package(1) command maintains the contents of this
+      directory and deletes old archives as new ones are read in. Package
+      delta archives require the most recent base, so manually removing files
+      in this directory may invalidate future deltas.
+  (4) If the bin/package command does not exist then manually read the INIT source package:
+		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.0000.tgz | tar xvf -
+      If your system does not have tar(1) or gunzip(1) then download the ratz
+      source package, compile it, and manually read the INIT source package:
+		mkdir bin
+		cp lib/package/tgz/ratz.YYYY-MM-DD.0000.c lib/package/tgz/ratz.c
+		cc -o bin/ratz lib/package/tgz/ratz.c
+		bin/ratz -lv < lib/package/tgz/INIT.YYYY-MM-DD.0000.tgz
+  (5) Read all unread package archive(s):
+		bin/package read
+      Both source and binary packages will be read by this step.
+  (6) Build and install; all generated files are placed under arch/$HOSTTYPE
+      ($INSTALLROOT), where $HOSTTYPE is defined by the output of
+      bin/package (with no arguments.) name=value arguments are supported; CC
+      and CCFLAGS are likely candidates. The output is written to the terminal
+      and captured in $INSTALLROOT/lib/package/gen/make.out:
+		bin/package make
+  (7) List make results and interesting errors from (6):
+		bin/package results
+      Run the regression tests:
+		bin/package test
+      List test results and errors:
+		bin/package results test
+  (8) When (6) or (7) complete run:
+		bin/package use
+      to get an interactive $SHELL that sets up the environment for using
+      package binaries:
+	  $HOSTTYPE	 the current host type
+	  $PACKAGEROOT	 the root directory for all packages ($P)
+	  $INSTALLROOT	 the installation root for the current host type ($A)
+	  $PATH		 $INSTALLROOT/bin:$PACKAGEROOT/bin prepended
+	  $VPATH	 a two level view; all building done in $INSTALLROOT
+          DLL-MAGIC	 environment magic for locating package shared libraries
+      From this shell you can run nmake in any directory under
+      $INSTALLROOT/src and rebuild just that part. If $INSTALLROOT/bin/nmake
+      does not exist then the script $PACKAGEROOT/bin/nmake runs mamake
+      on Mamfile. nmake is open source - download ast-open or ast-make to
+      simplify future builds or to make new or delta packages.
+  (9) Once you are satisfied with a package its binaries can be installed in
+      a public area by:
+		bin/package install PACKAGE DIRECTORY
+      and users can access the binaries by
+		bin/package use DIRECTORY
+      or by exporting the environment variable definitions listed by
+		bin/package show use DIRECTORY
+
+
+Changes since 2000-02-01 or the last release follow.
+
+:::::::: INIT ::::::::
+
+00-06-14 mamprobe: fix win32.* probe
+	 mamake: fix bug that used lower view path for generation
+	 package: don't clobber $PACKAGEROOT/bin/nmake
+00-06-01 C+probe: fix stdinclude *again*
+	 package: fix write delta source to use default pax format
+	 package: add disambiguating bias for sgi.mips3 over sgi.mips4
+	 package.mk: fix for directory content packages lib ast-locale
+00-05-01 iffe: fix invalid _LIB_ macro identifier 
+00-04-11 C+probe: uniq stdinclude and stdlib, fix usrinclude
+00-04-01 regress: fix explicit OUTPUT bug that didn't compare with expected
+00-03-17 package: all archives are .tgz for binary download
+	 package: $(PACKAGEROOT)/LICENSES/* in source and binary archives
+	 package: implement install and verify actions
+	 iffe: add exp, pth file dir ..., fix lib - -lfoo, fix lib - - -la -lb
+	 iffe: -L* must affect LD_LIBRARY* hacks for .exe tests -- yuk
+	 package.mk: add *.pkg :INDEX:
+00-03-07 package: add admin action
+00-03-06 makefile: install optional make probe override script C+make+probe.lcl
+00-02-14 --- release 1.0 ---
+	 ratz: treat "foo/" as a dir, not a regular file
+	 package: clarify source and binary installation instructions
+	 package: fix so binary packages can install without cc
+	 package: "ratz" now a non-archive package (the only one) for bootstrap
+	 package: handle VPATH=a:b arg
+	 package.mk: "ratz" package adjustments
+	 Makefile: use :PACKAGE_INIT: to support binary INIT packages
+	 WWW.mk: add :WWWALL:
+	 C.probe: fix .so check that let .dll slip through
+	 iffe: fix config sh var assignment for HAVE_member_IN_struct
+	 iffe: fix config sh var assignment for symbol_DECLARED
+	 package: delay PATH export until dll hack exports complete
+	 package: don't forget binary package $(INSTALLROOT)/lib(32|64)
+	 package: add delta change log for source packages
+00-02-10 mamprobe: add mam_cc_DLLBIG
+	 package: fix spelling typos
+	 package: add html help output
+	 package.mk: beef up source and binary help => html
+00-02-08 package: mkdir man/man[138] in the new arch to cover MAM bug

@@ -2,7 +2,7 @@
 
 LICENSE = since=1997,author=gsf
 
-CCFLAGS = -O $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
 
 cdb 2.2 :LIBRARY: NOTES RELEASE cdb.3 cdb.h cdbmethod.h cdblib.h \
 	cdbopen.c cdbread.c cdbwrite.c cdbseek.c cdbmove.c \

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)df (AT&T Labs Research) 1999-06-11\n]"
+"[-?\n@(#)df (AT&T Labs Research) 2000-05-11\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -40,6 +40,24 @@ USAGE_LICENSE
 
 "[b:blockbytes?Measure disk usage in 512 byte blocks. This is the default"
 "	if \bgetconf CONFORMANCE\b is \bstandard\b.]"
+"[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
+"	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
+"	override internal \b--format\b identifiers.]:[key[=value]]]"
+"[f:format?Append to the listing format string. The \bls\b(1), \bpax\b(1) and"
+"	\bps\b(1) commands also have \b--format\b options in this same style."
+"	\aformat\a follows \bprintf\b(3) conventions, except that \bsfio\b(3)"
+"	inline ids are used instead of arguments:"
+"	%[#-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
+"	If \b#\b is specified then the internal width and percision are used."
+"	If \abase\a is non-zero and \b--posix\b is not on then the field values"
+"	are wrapped when they exceed the field width. If \achar\a is \bs\b then""	the string form of the item is listed, otherwise the corresponding"
+"	numeric form is listed. If \achar\a is \bq\b then the string form of"
+"	the item is $'...' quoted if it contains space or non-printing"
+"	characters. If \awidth\a is omitted then the default width"
+"	is assumed. \asubformat\a overrides the default formatting for \aid\a."
+"	Supported \aid\as and \asubformat\as are:]:[format]{\fformats\f}"
+"[g:gigabytes?Measure disk usage in 1024M byte blocks.]"
+"[h!:header|heading?Display a heading line.]"
 "[i:inodes?Display inode usage instead of block usage. There is at least one"
 "	inode for each active file and directory on a filesystem.]"
 "[k:kilobytes?Measure disk usage in 1024 byte blocks.]"
@@ -48,8 +66,8 @@ USAGE_LICENSE
 "[m:megabytes?Measure disk usage in 1024K byte blocks. This is the default"
 "	if \bgetconf CONFORMANCE\b is not \bstandard\b.]"
 "[n:native-block?Measure disk usage in the native filesystem block size."
-"	This size may vary between filesystems, so i is displayed in the"
-"	\bSiz\b column.]"
+"	This size may vary between filesystems; it is displayed by the"
+"	\bsize\b format identifier.]"
 "[O:options?Display the \bmount\b(1) options.]"
 "[P:portable?Display each filesystem on one line. By default output is"
 "	folded for readability. Also implies \b--blockbytes\b.]"
@@ -70,18 +88,189 @@ USAGE_LICENSE
 "		[+lofs?loopback file system for submounts]"
 "}"
 "[v:verbose?Report all filesystem query errors.]"
-"[f|q|t?Ignored by this implementation.]"
+"[q|t?Ignored by this implementation.]"
 
 "\n"
 "\n[ file ... ]\n"
 "\n"
-"[+SEE ALSO?\bgetconf\b(1), \bmount\b(1), \bmount\b(2)]"
+"[+EXAMPLES?The default \b--format\b is"
+" \"%#..1(filesystem)s %#(type)s %#(blocks)s %#(used)s %#(available)s  %#(capacity)s  %(mounted)s\"]"
+"[+SEE ALSO?\bgetconf\b(1), \bmount\b(1), \bls\b(1), \bpax\b(1), \bps\b(1),"
+"	\bmount\b(2)]"
 ;
 
 #include <ast.h>
 #include <error.h>
+#include <cdt.h>
 #include <ls.h>
 #include <mnt.h>
+#include <sfdisc.h>
+#include <sfstr.h>
+
+typedef struct				/* df entry			*/
+{
+	Mnt_t*		mnt;		/* mnt info			*/
+	struct statvfs	vfs;		/* statvfs() info		*/
+	unsigned long	avail;
+	unsigned long	tavail;
+	unsigned long	total;
+	unsigned long	ttotal;
+	unsigned long	used;
+	unsigned long	tused;
+	unsigned long	itotal;
+	unsigned long	iavail;
+	unsigned long	iused;
+	int		percent;
+	int		fraction;
+	int		ipercent;
+} Df_t;
+
+typedef struct				/* sfkeyprintf() keys		*/
+{
+	char*		name;		/* key name			*/
+	char*		heading;	/* key heading			*/
+	char*		description;	/* key description		*/
+	short		index;		/* key index			*/
+	short		width;		/* default width		*/
+	short		abbrev;		/* abbreviation width		*/
+	short		disable;	/* macro being expanded		*/
+	char*		macro;		/* macro definition		*/
+	Dtlink_t	hashed;		/* hash link			*/
+} Key_t;
+
+#define KEY_environ		(-1)
+
+#define KEY_available		1
+#define KEY_blocks		2
+#define KEY_capacity		3
+#define KEY_filesystem		4
+#define KEY_iavailable		5
+#define KEY_icapacity		6
+#define KEY_inodes		7
+#define KEY_iused		8
+#define KEY_mounted		9
+#define KEY_native		10
+#define KEY_options		11
+#define KEY_type		12
+#define KEY_used		13
+
+static Key_t	keys[] =
+{
+
+	{
+		0
+	},
+	{
+		"available",
+		"Available",
+		"Unused block count.",
+		KEY_available,
+		0,
+		5
+	},
+	{
+		"blocks",
+		0,
+		"Total block count.",
+		KEY_blocks,
+		0,
+		0
+	},
+	{
+		"capacity",
+		"Capacity",
+		"Percent of total blocks used.",
+		KEY_capacity,
+		4,
+		3
+	},
+	{
+		"filesystem",
+		"Filesystem",
+		"Filesystem special device name.",
+		KEY_filesystem,
+		-19,
+		0
+	},
+	{
+		"iavailable",
+		"Iavailable",
+		"Unused inode count.",
+		KEY_iavailable,
+		7,
+		6
+	},
+	{
+		"icapacity",
+		"Icapacity",
+		"Percent of total inodes used.",
+		KEY_icapacity,
+		4,
+		4
+	},
+	{
+		"inodes",
+		"Inodes",
+		"Total inode count.",
+		KEY_inodes,
+		7,
+		3
+	},
+	{
+		"iused",
+		"Iused",
+		"Used inode count.",
+		KEY_iused,
+		7,
+		3
+	},
+	{
+		"mounted",
+		"Mounted on",
+		"Mounted on path.",
+		KEY_mounted,
+		-19,
+		5
+	},
+	{
+		"size",
+		"Size",
+		"Native block size.",
+		KEY_native,
+		4,
+		3
+	},
+	{
+		"options",
+		"Options",
+		"\bmount\b(1) options.",
+		KEY_options,
+		-29,
+		3
+	},
+	{
+		"type",
+		"Type",
+		"Filesystem type.",
+		KEY_type,
+		6,
+		3
+	},
+	{
+		"used",
+		"Used",
+		"Used block count.",
+		KEY_used,
+		0,
+		3
+	},
+
+};
+
+static const char	fmt_def[] = "%#..1(filesystem)s %#(type)s %#(blocks)s %#(used)s %#(available)s  %#(capacity)s  %(mounted)s";
+static const char	fmt_ino[] = "%#..1(filesystem)s %#(type)s %#(blocks)s %#(available)s %#(capacity)s %#(inodes)s %#(iavailable)s %#(icapacity)s %(mounted)s";
+static const char	fmt_opt[] = "%#..1(filesystem)s %#(type)s  %#(options)s %(mounted)s";
+static const char	fmt_std[] = "%#..1(filesystem)s %#(blocks)s %#(used)s %#(available)s %8(capacity)s %(mounted)s";
 
 /*
  * man page and header comments notwithstanding
@@ -122,80 +311,242 @@ extern void	sync(void);
 static struct
 {
 	int		block;		/* block unit			*/
-	int		inode;		/* report free inodes too	*/
 	int		local;		/* local mounts only		*/
-	int		options;	/* list mount options		*/
 	int		posix;		/* posix format			*/
 	int		sync;		/* sync() first			*/
 	int		verbose;	/* verbose message level {-1,1}	*/
-	char*		sep;		/* size separation		*/
 	char*		type;		/* type pattern			*/
+	Sfio_t*		mac;		/* temporary macro stream	*/
+	Sfio_t*		tmp;		/* really temporary stream	*/
+	Dt_t*		keys;		/* format key table		*/
+	char		buf[1024];	/* format item buffer		*/
 } state;
 
-static void
-title(void)
+/*
+ * optget() info discipline function
+ */
+
+static int
+optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 {
-	state.sep = state.block == 1024 * 1024 ? "" : "  ";
-	sfprintf(sfstdout, "Filesystem   ");
-	if (state.options)
-	{
-		state.posix = 0;
-		sfprintf(sfstdout, "       Type  Options                      ");
-	}
-	else
-	{
-		if (!state.posix)
-			sfprintf(sfstdout, "       Type");
-		if (!state.block)
-			sfprintf(sfstdout, " Siz");
-		if (state.posix)
-			sfprintf(sfstdout, " %7d-blocks", state.block);
-		else
-			sfprintf(sfstdout, " %s", state.block == 1024 * 1024 ? "Mbytes" : state.block == 1024 ? "  Kbytes" : "  Blocks");
-		if (!state.inode)
-			sfprintf(sfstdout, "%s   Used", state.sep);
-		if (state.posix)
-			sfprintf(sfstdout, " Available Capacity");
-		else
-			sfprintf(sfstdout, "%s  Avail  Cap", state.sep);
-		if (state.inode)
-			sfprintf(sfstdout, " Inodes Iavail Icap");
-	}
-	sfprintf(sfstdout, "  Mounted on\n");
+	register int	i;
+
+	if (streq(s, "formats"))
+		for (i = 1; i < elementsof(keys); i++)
+		{
+			sfprintf(sp, "[+%s?%s The title string ", keys[i].name, keys[i].description);
+			if (keys[i].heading)
+				sfprintf(sp, "is \b%s\b ", keys[i].heading, keys[i].width);
+			sfprintf(sp, "and the default width ");
+			if (keys[i].width)
+				sfprintf(sp, "is %d.]", keys[i].width);
+			else
+				sfprintf(sp, "%s determined by the \b-b\b, \b-g\b, \b-k\b, \b-m\b and \b-n\b options.]", keys[i].heading ? "is" : "are");
+		}
+	return 0;
 }
 
+/*
+ * append format string to fmt
+ */
+
 static void
+append(Sfio_t* fmt, const char* format)
+{
+	if (sfstrtell(fmt))
+		sfputc(fmt, ' ');
+	sfputr(fmt, format, -1);
+}
+
+/*
+ * scale <m,w,p> into op
+ */
+
+static char*
 scale(int m, unsigned long w, unsigned long p)
 {
-	if (state.block != 1024 * 1024)
-		sfprintf(sfstdout, " %8lu", w);
+	if (state.block < 1024 * 1024)
+		sfsprintf(state.buf, sizeof(state.buf), "%lu", w);
 	else if (!m || !w && !p || w > 9)
-		sfprintf(sfstdout, " %6lu", w);
+		sfsprintf(state.buf, sizeof(state.buf), "%lu", w);
 	else
-		sfprintf(sfstdout, " %4lu.%lu", w, p);
+		sfsprintf(state.buf, sizeof(state.buf), "%lu.%lu", w, p);
+	return state.buf;
 }
 
-static void
-entry(Mnt_t* mnt, struct statvfs* vfs, const char* name, const char* type, const char* mounted, int flags)
-{
-	unsigned long	a;
-	unsigned long	ta;
-	unsigned long	t;
-	unsigned long	tt;
-	unsigned long	u;
-	unsigned long	tu;
-	unsigned long	b;
-	char*		x;
-	int		p;
-	int		s;
-	int		m;
+/*
+ * sfkeyprintf() lookup
+ * handle==0 for heading
+ */
 
-	if ((!state.type || strmatch(type, state.type)) && (!state.local || !(flags & MNT_REMOTE)))
+static int
+key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn)
+{
+	register Df_t*		df = (Df_t*)handle;
+	register char*		s = 0;
+	register Sflong_t	n = 0;
+	register Key_t*		kp;
+	char*			t;
+
+	if (!(kp = (Key_t*)dtmatch(state.keys, fp->t_str)))
 	{
-		if (REALITY(vfs->f_blocks) == 0)
+		if (*fp->t_str != '$')
 		{
-			a = t = u = 0;
-			p = 0;
+			error(3, "%s: unknown format key", fp->t_str);
+			return 0;
+		}
+		if (!(kp = newof(0, Key_t, 1, strlen(fp->t_str) + 1)))
+			error(3, "out of space [key]");
+		kp->name = strcpy((char*)(kp + 1), fp->t_str);
+		kp->macro = getenv(fp->t_str + 1);
+		kp->index = KEY_environ;
+		kp->disable = 1;
+		dtinsert(state.keys, kp);
+	}
+	if (kp->macro && !kp->disable)
+	{
+		kp->disable = 1;
+		sfkeyprintf(state.mac, handle, kp->macro, key, NiL);
+		*ps = sfstruse(state.mac);
+		kp->disable = 0;
+	}
+	else if (!df)
+	{
+		if (fp->base >= 0)
+			fp->base = -1;
+		s = kp->heading;
+		if (fp->flags & SFFMT_ALTER)
+		{
+			if (!kp->width)
+				kp->width = keys[KEY_blocks].width;
+			if ((fp->width = kp->width) < 0)
+			{
+				fp->width = -fp->width;
+				fp->flags |= SFFMT_LEFT;
+			}
+			fp->precis = fp->width;
+		}
+		if (fp->width > 0 && fp->width < strlen(kp->heading))
+		{
+			if (fp->width < kp->abbrev)
+			{
+				fp->width = kp->abbrev;
+				if (fp->precis >= 0 && fp->precis < fp->width)
+					fp->precis = fp->width;
+			}
+			if (t = newof(0, char, kp->abbrev, 1))
+				s = kp->heading = (char*)memcpy(t, kp->heading, kp->abbrev);
+		}
+		kp->width = fp->width;
+		if (fp->flags & SFFMT_LEFT)
+			kp->width = -kp->width;
+		fp->fmt = 's';
+		*ps = s;
+	}
+	else
+	{
+		if ((fp->flags & SFFMT_ALTER) && (fp->width = kp->width) < 0)
+		{
+			fp->width = -fp->width;
+			fp->flags |= SFFMT_LEFT;
+		}
+		switch (kp->index)
+		{
+		case KEY_available:
+			s = (df->total || df->ttotal) ? scale(df->fraction, df->avail, df->tavail) : "-";
+			break;
+		case KEY_blocks:
+			s = (df->total || df->ttotal) ? scale(df->fraction, df->total, df->ttotal) : "-";
+			break;
+		case KEY_capacity:
+			s = (df->total || df->ttotal) ? (sfsprintf(state.buf, sizeof(state.buf), "%3d%%", df->percent), state.buf) : "-";
+			break;
+		case KEY_environ:
+			if (!(s = kp->macro))
+				return 0;
+			break;
+		case KEY_filesystem:
+			s = df->mnt->fs;
+			break;
+		case KEY_iavailable:
+			if (df->total || df->ttotal)
+				n = df->iavail;
+			else
+				s = "-";
+			break;
+		case KEY_icapacity:
+			s = (df->total || df->ttotal) ? (sfsprintf(state.buf, sizeof(state.buf), "%3d%%", df->ipercent), state.buf) : "-";
+			break;
+		case KEY_inodes:
+			if (df->total || df->ttotal)
+				n = df->itotal;
+			else
+				s = "-";
+			break;
+		case KEY_iused:
+			if (df->total || df->ttotal)
+				n = df->iused;
+			else
+				s = "-";
+			break;
+		case KEY_mounted:
+			s = df->mnt->dir;
+			break;
+		case KEY_native:
+			if (df->vfs.f_bsize >= 1024)
+				sfsprintf(state.buf, sizeof(state.buf), "%3dk", df->vfs.f_bsize / 1024);
+			else
+				sfsprintf(state.buf, sizeof(state.buf), "%4d", df->vfs.f_bsize);
+			s = state.buf;
+			break;
+		case KEY_options:
+			if (!(s = df->mnt->options))
+				s = "";
+			break;
+		case KEY_type:
+			s = df->mnt->type;
+			break;
+		case KEY_used:
+			s = (df->total || df->ttotal) ? scale(df->fraction, df->used, df->tused) : "-";
+			break;
+		default:
+			return 0;
+		}
+		if (s)
+		{
+			if (fp->base >= 0)
+			{
+				fp->base = -1;
+				if (!state.posix && strlen(s) >= fp->width)
+				{
+					sfprintf(state.tmp, "%s%-*.*s", s, fp->width + 1, fp->width + 1, "\n");
+					s = sfstruse(state.tmp);
+				}
+			}
+			*ps = s;
+		}
+		else
+			*pn = n;
+	}
+	return 1;
+}
+
+/*
+ * list one entry
+ */
+
+static void
+entry(Df_t* df, const char* format)
+{
+	unsigned long	b;
+	int		s;
+
+	if ((!state.type || strmatch(df->mnt->type, state.type)) && (!state.local || !(df->mnt->flags & MNT_REMOTE)))
+	{
+		if (REALITY(df->vfs.f_blocks) == 0)
+		{
+			df->total = df->avail = df->used = 0;
+			df->percent = 0;
 		}
 		else
 		{
@@ -205,101 +556,46 @@ entry(Mnt_t* mnt, struct statvfs* vfs, const char* name, const char* type, const
 			 *	 denote error
 			 */
 
-			t = vfs->f_blocks;
-			u = ((long)vfs->f_blocks <= (long)vfs->f_bfree) ? 0 : (vfs->f_blocks - vfs->f_bfree);
-			a = ((long)vfs->f_bavail < 0) ? 0 : vfs->f_bavail;
-			p = (tt = u + a) ? (unsigned long)(((double)u / (double)tt + 0.005) * 100.0) : 0;
+			df->total = df->vfs.f_blocks;
+			df->used = ((long)df->vfs.f_blocks <= (long)df->vfs.f_bfree) ? 0 : (df->vfs.f_blocks - df->vfs.f_bfree);
+			df->avail = ((long)df->vfs.f_bavail < 0) ? 0 : df->vfs.f_bavail;
+			df->percent = (df->ttotal = df->avail + df->used) ? (unsigned long)(((double)df->used / (double)df->ttotal + 0.005) * 100.0) : 0;
 		}
-		m = 0;
-		ta = tt = tu = 0;
+		df->fraction = 0;
+		df->ttotal = df->tavail = df->tused = 0;
 		if (state.block)
 		{
-			b = F_FRSIZE(vfs);
+			b = F_FRSIZE(&df->vfs);
 			if (b > state.block)
 			{
 				s = b / state.block;
-				a *= s;
-				t *= s;
-				u *= s;
+				df->total *= s;
+				df->avail *= s;
+				df->used *= s;
 			}
 			else if (b < state.block)
 			{
 				s = state.block / b;
-				if (m = s / 10)
+				if (df->fraction = s / 10)
 				{
-					ta = (a / m) % 10;
-					tt = (t / m) % 10;
-					tu = (u / m) % 10;
+					df->ttotal = (df->total / df->fraction) % 10;
+					df->tavail = (df->avail / df->fraction) % 10;
+					df->tused = (df->used / df->fraction) % 10;
 				}
-				a /= s;
-				t /= s;
-				u /= s;
+				df->total /= s;
+				df->avail /= s;
+				df->used /= s;
 			}
 		}
-		x = "";
-		if (state.posix)
-			sfprintf(sfstdout, "%-19s%s", name, state.block == 1024 * 1024 ? "  " : "");
+		df->itotal = REALITY(df->vfs.f_files);
+		df->iavail = REALITY(df->vfs.f_ffree);
+		if (df->itotal < df->iavail)
+			df->iused = 0;
 		else
-		{
-			if ((s = 24 - strlen(name) - strlen(type)) <= 0)
-			{
-				if (state.posix) s = 1;
-				else
-				{
-					x = "\n";
-					s = 25 - strlen(type);
-				}
-			}
-			sfprintf(sfstdout, "%s%-*.*s%s", name, s, s, x, type);
-		}
-		if (state.options)
-			sfprintf(sfstdout, "  %-28s", mnt && mnt->options ? mnt->options : "");
-		else
-		{
-			if (!state.block)
-			{
-				if (vfs->f_bsize >= 1024)
-					sfprintf(sfstdout, "%3dk", vfs->f_bsize / 1024);
-				else
-					sfprintf(sfstdout, "%4d", vfs->f_bsize);
-			}
-			if (t || tt)
-			{
-				scale(m, t, tt);
-				if (!state.inode)
-					scale(m, u, tu);
-				if (state.posix)
-					sfprintf(sfstdout, " %s", state.block == 1024 * 1024 ? "  " : "");
-				scale(m, a, ta);
-				sfprintf(sfstdout, " %s%3d%%", state.posix ? "    " : "", p);
-			}
-			else if (state.inode)
-			{
-				if (state.posix)
-					sfprintf(sfstdout, "      %s-      %s-         -", state.sep, state.sep);
-				else
-					sfprintf(sfstdout, "      %s-      %s-    -", state.sep, state.sep);
-			}
-			else if (state.posix)
-				sfprintf(sfstdout, "      %s-      %s-       %s-        -", state.sep, state.sep, state.sep);
-			else
-				sfprintf(sfstdout, "      %s-      %s-      %s-    -", state.sep, state.sep, state.sep);
-			if (state.inode)
-			{
-				t = REALITY(vfs->f_files);
-				a = REALITY(vfs->f_ffree);
-				if (t < a)
-					u = 0;
-				else
-					u = t - a;
-				a = REALITY(vfs->f_favail);
-				p = (tt = u + a) ? (unsigned long)(((double)u / (double)tt + 0.005) * 100.0) : 0;
-				if (t) sfprintf(sfstdout, " %6lu %6lu %3d%%", t, a, p);
-				else
-					sfprintf(sfstdout, "      -      -    -");
-			}
-		}
-		sfprintf(sfstdout, "  %s\n", mounted);
+			df->iused = df->itotal - df->iavail;
+		df->iavail = REALITY(df->vfs.f_favail);
+		df->ipercent = (s = df->iused + df->iavail) ? (unsigned long)(((double)df->iused / (double)s + 0.005) * 100.0) : 0;
+		sfkeyprintf(sfstdout, df, format, key, NiL);
 	}
 }
 
@@ -307,21 +603,59 @@ int
 main(int argc, register char** argv)
 {
 	register int	n;
-	register char*	dir;
 	int		rem;
+	int		head;
 	dev_t		dirdev;
 	dev_t		mntdev;
-	dev_t*		dev = 0;
+	dev_t*		dev;
 	void*		mp;
-	Mnt_t*		mnt;
+	Sfio_t*		fmt;
+	Key_t*		kp;
+	char*		s;
+	char*		format;
 	struct stat	st;
 	struct statvfs	vfs;
+	Dtdisc_t	keydisc;
+	Optdisc_t	optdisc;
+	Mnt_t		mnt;
+	Df_t		df;
 
 	error_info.id = "df";
 	state.block = -1;
 	state.posix = -1;
 	state.sync = 1;
 	state.verbose = -1;
+	dev = 0;
+	head = 1;
+
+	/*
+	 * set up the disciplines
+	 */
+
+	memset(&optdisc, 0, sizeof(optdisc));
+	optdisc.version = OPT_VERSION;
+	optdisc.infof = optinfo;
+	opt_info.disc = &optdisc;
+	memset(&keydisc, 0, sizeof(keydisc));
+	keydisc.key = offsetof(Key_t, name);
+	keydisc.size = -1;
+	keydisc.link = offsetof(Key_t, hashed);
+
+	/*
+	 * initialize the tables and string streams
+	 */
+
+	if (!(fmt = sfstropen()) || !(state.mac = sfstropen()) || !(state.tmp = sfstropen()))
+		error(3, "out of space [fmt]");
+	if (!(state.keys = dtopen(&keydisc, Dthash)))
+		error(3, "out of space [dict]");
+	for (n = 1; n < elementsof(keys); n++)
+		dtinsert(state.keys, keys + n);
+
+	/*
+	 * grab the options
+	 */
+
 	for (;;)
 	{
 		switch (optget(argv, usage))
@@ -329,11 +663,40 @@ main(int argc, register char** argv)
 		case 'b':
 			state.block = 512;
 			continue;
+		case 'D':
+			if (s = strchr(opt_info.arg, '='))
+				*s++ = 0;
+			if (*opt_info.arg == 'n' && *(opt_info.arg + 1) == 'o')
+			{
+				opt_info.arg += 2;
+				s = 0;
+			}
+			if (!(kp = (Key_t*)dtmatch(state.keys, opt_info.arg)))
+			{
+				if (!s)
+					continue;
+				if (!(kp = newof(0, Key_t, 1, strlen(opt_info.arg) + 1)))
+					error(ERROR_SYSTEM|3, "out of space [macro]");
+				kp->name = strcpy((char*)(kp + 1), opt_info.arg);
+				dtinsert(state.keys, kp);
+			}
+			if (kp->macro = s)
+				stresc(s);
+			continue;
+		case 'f':
+			append(fmt, opt_info.arg);
+			continue;
 		case 'F':
 			state.type = opt_info.arg;
 			continue;
+		case 'g':
+			state.block = 1024 * 1024 * 1024;
+			continue;
+		case 'h':
+			head = opt_info.num;
+			continue;
 		case 'i':
-			state.inode = 1;
+			append(fmt, fmt_ino);
 			continue;
 		case 'k':
 			state.block = 1024;
@@ -348,19 +711,21 @@ main(int argc, register char** argv)
 			state.block = 0;
 			continue;
 		case 'O':
-			state.options = 1;
+			append(fmt, fmt_opt);
 			continue;
 		case 'P':
+			append(fmt, fmt_std);
 			state.posix = 1;
+			continue;
+		case 'q':
 			continue;
 		case 's':
 			state.sync = opt_info.num;
 			continue;
+		case 't':
+			continue;
 		case 'v':
 			state.verbose = ERROR_SYSTEM|1;
-			continue;
-		case 'f':
-			/* ignore or obsolete */
 			continue;
 		case '?':
 			error(ERROR_USAGE|4, "%s", opt_info.arg);
@@ -375,10 +740,49 @@ main(int argc, register char** argv)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
 	argc -= opt_info.index;
 	argv += opt_info.index;
+	if (!sfstrtell(fmt))
+		append(fmt, fmt_def);
+	sfputc(fmt, '\n');
+	format = sfstruse(fmt);
+	stresc(format);
 	if (state.posix < 0)
 		state.posix = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");
 	if (state.block < 0)
 		state.block = state.posix ? 512 : 1024 * 1024;
+	s = 0;
+	if (state.block <= 512)
+	{
+		n = 10;
+		if (!state.block)
+			s = "blocks";
+	}
+	else if (state.block <= 1024)
+	{
+		n = 8;
+		if (state.block == 1024)
+			s = "Kbytes";
+	}
+	else if (state.block <= 1024 * 1024)
+	{
+		n = 6;
+		if (state.block == 1024 * 1024)
+			s = "Mbytes";
+	}
+	else if (state.block <= 1024 * 1024 * 1024)
+	{
+		n = 6;
+		if (state.block == 1024 * 1024 * 1024)
+			s = "Gbytes";
+	}
+	if (!s)
+	{
+		sfprintf(state.mac, "%d-blocks", state.block);
+		if (!(s = strdup(sfstruse(state.mac))))
+			error(ERROR_SYSTEM|3, "out of space [heading]");
+		n = strlen(s);
+	}
+	keys[KEY_blocks].width = n;
+	keys[KEY_blocks].heading = s;
 #if _lib_sync
 	if (state.sync)
 		sync();
@@ -386,17 +790,22 @@ main(int argc, register char** argv)
 	if (!(mp = mntopen(NiL, "r")))
 	{
 		error(ERROR_SYSTEM|(argc > 0 ? 1 : 3), "cannot access mount table");
-		state.options = 0;
-		title();
-		while (dir = *argv++)
-			if (statvfs(dir, &vfs))
-				error(ERROR_SYSTEM|2, "%s: cannot stat filesystem", dir);
+		sfkeyprintf(head ? sfstdout : state.tmp, NiL, format, key, NiL);
+		sfstrset(state.tmp, 0);
+		df.mnt = &mnt;
+		mnt.dir = UNKNOWN;
+		mnt.type = 0;
+		mnt.flags = 0;
+		while (mnt.fs = *argv++)
+			if (statvfs(mnt.fs, &df.vfs))
+				error(ERROR_SYSTEM|2, "%s: cannot stat filesystem", mnt.fs);
 			else
-				entry(NiL, &vfs, dir, F_BASETYPE(&vfs, dir), UNKNOWN, 0);
+				entry(&df, format);
 	}
 	else
 	{
-		title();
+		sfkeyprintf(head ? sfstdout : state.tmp, NiL, format, key, NiL);
+		sfstrset(state.tmp, 0);
 		if (rem = argc)
 		{
 			if (!(dev = newof(0, dev_t, argc, 0)))
@@ -415,17 +824,16 @@ main(int argc, register char** argv)
 #endif
 					st.st_dev;
 		}
-		while ((!argc || rem) && (mnt = mntread(mp)))
+		while ((!argc || rem) && (df.mnt = mntread(mp)))
 		{
-			dir = mnt->dir;
-			if (stat(dir, &st))
+			if (stat(df.mnt->dir, &st))
 			{
 				if (errno != ENOENT && errno != ENOTDIR)
-					error(state.verbose, "%s: cannot stat", dir);
+					error(state.verbose, "%s: cannot stat", df.mnt->dir);
 				continue;
 			}
 			dirdev = st.st_dev;
-			mntdev = stat(mnt->fs, &st) ? dirdev : st.st_dev;
+			mntdev = stat(df.mnt->fs, &st) ? dirdev : st.st_dev;
 			if (argc)
 			{
 				for (n = 0; n < argc; n++)
@@ -438,10 +846,10 @@ main(int argc, register char** argv)
 				if (n >= argc)
 					continue;
 			}
-			if (statvfs(dir, &vfs) && statvfs(mnt->fs, &vfs))
-				error(ERROR_SYSTEM|2, "%s: cannot stat filesystem", dir);
+			if (statvfs(df.mnt->dir, &df.vfs) && statvfs(df.mnt->fs, &df.vfs))
+				error(ERROR_SYSTEM|2, "%s: cannot stat filesystem", df.mnt->dir);
 			else
-				entry(mnt, &vfs, mnt->fs, mnt->type, dir, mnt->flags);
+				entry(&df, format);
 			if (argc > 0)
 			{
 				while (++n < argc)
@@ -456,14 +864,22 @@ main(int argc, register char** argv)
 		}
 		mntclose(mp);
 		if (argc > 0)
+		{
+			df.mnt = &mnt;
+			mnt.fs = 0;
+			mnt.flags = 0;
 			for (n = 0; n < argc; n++)
-				if (dir = argv[n])
+				if (mnt.dir = argv[n])
 				{
-					if (statvfs(dir, &vfs))
-						error(ERROR_SYSTEM|2, "%s: mount point not found", dir);
+					if (statvfs(mnt.dir, &vfs))
+						error(ERROR_SYSTEM|2, "%s: mount point not found", mnt.dir);
 					else
-						entry(NiL, &vfs, dir, F_BASETYPE(&vfs, dir), UNKNOWN, 0);
+						entry(&df, format);
 				}
+		}
 	}
-	exit(0);
+	return error_info.errors != 0;
 }
+#if __OBSOLETE__ < 20010101
+#include "../../lib/libast/disc/sfkeyprintf.c"
+#endif

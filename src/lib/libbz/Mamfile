@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -46,7 +46,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in bz ast
+exec - for i in bz  ast
 exec - do	case $i in
 exec - 	"bz"|bz)
 exec - 		;;
@@ -226,7 +226,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libbz.a archive
 prev libbz.a archive
-exec - mv ${PACKAGE_ast_LIB}/libbz.a ${PACKAGE_ast_LIB}/libbz.a.old 2>/dev/null || true; cp libbz.a ${PACKAGE_ast_LIB}/libbz.a
+exec - mv ${PACKAGE_ast_LIB}/libbz.a ${PACKAGE_ast_LIB}/libbz.a.old 2>/dev/null || true; test '' = 'libbz.a' || { cp libbz.a ${PACKAGE_ast_LIB}/libbz.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libbz.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libbz.a generated
 make ${PACKAGE_ast_LIB}/lib
@@ -255,7 +255,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/bz
 prev bz.req
-exec - mv ${PACKAGE_ast_LIB}/lib/bz ${PACKAGE_ast_LIB}/lib/bz.old 2>/dev/null || true; cp bz.req ${PACKAGE_ast_LIB}/lib/bz
+exec - mv ${PACKAGE_ast_LIB}/lib/bz ${PACKAGE_ast_LIB}/lib/bz.old 2>/dev/null || true; test '' = 'bz.req' || { cp bz.req ${PACKAGE_ast_LIB}/lib/bz  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/bz generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -

@@ -1,3 +1,21 @@
+00-06-20 makerules: mam_lib_* always checks lib/lib/* file
+00-06-19 makerules: generate dll in lib.so/libNN.dll
+00-06-01 main,state: a few _UWIN tweaks for W98 FAT
+00-05-31 shquote: fix for `foo == bar'
+00-05-26 option: fix scanargs() bug that skipped some targets before options
+00-05-22 makerules: drop .ORIGINAL.ALL
+00-05-11 makerules: add :PACKAGE: { a b } to pick first of a b (thanks Dr. ek)
+00-05-01 makerules: add $(STDCAT) initialization
+00-04-01 makerules: add skeleton=1 to mkdir virtual directories in 2d
+	 makerules: add CATALOG and ERROR_CATALOG
+00-03-17 make.probe: fix CC.NMEDIT to grab only external text symbols
+	 makerules: add :NOOPTIMIZE:
+	 makerules: allow N.Ntag :LIBRARY: versions (and dll.custom)
+	 makerules: insert $(*FLAGS_DEFAULT) on *FLAGS
+	 makerules: don't omit -L*/local/* even if in CC.STDLIB
+	 parse.c: `unknown operator' now a warning
+00-03-07 pkg-X11.mk: add -lXaw candidate required libraries
+00-03-06 add probe.lcl check
 00-02-14 --- release 4.0 ---
 00-02-10 Makerules: add CC.DLLBIG, :PACKAGE_INIT:
 	 Makerules: add .ARCHIVE.OMIT. to .ARCLEAN.LIST.

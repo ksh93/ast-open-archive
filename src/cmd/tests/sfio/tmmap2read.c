@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -45,7 +45,7 @@ void* mmap()
 	return (void*)(-1);
 }
 
-main()
+MAIN()
 {
 	Sfio_t*	f;
 	char	buf[1024], buf2[1024], *data;
@@ -58,7 +58,7 @@ main()
 	Success = 0;
 
 	/* our real work */
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0),"w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
 		terror("Can't open to write\n");
 
 	for(n = 0; n < sizeof(buf); ++n)
@@ -67,7 +67,7 @@ main()
 	for(n = 0; n < 10; ++n)
 		sfwrite(f,buf,sizeof(buf));
 
-	if(!(f = sfopen(f, sftfile(0),"r")) )
+	if(!(f = sfopen(f, tstfile(0),"r")) )
 		terror("Can't open to read\n");
 
 	for(n = 0; n < 10; ++n)
@@ -77,6 +77,5 @@ main()
 			terror("Get wrong data\n");
 	}
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

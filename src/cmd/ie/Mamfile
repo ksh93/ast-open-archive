@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -94,9 +94,8 @@ make FEATURE/ielib implicit
 make features/ielib
 done features/ielib
 prev edit.req
-setv mam_libdll ${mam_cc_L+-ldll}${mam_cc_L-${PACKAGE_ast_LIB}/libdll.a}
-setv mam_libdll `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-ldll,${INSTALLROOT}/lib/libdll.a,} ${PACKAGE_ast_LIB}/lib/dll`
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libdll `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-ldll,${INSTALLROOT}/lib/libdll.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/dll 2>/dev/null || echo '' ${mam_cc_L+-ldll}${mam_cc_L-${PACKAGE_ast_LIB}/libdll.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/ielib
 done FEATURE/ielib dontcare generated
 make FEATURE/options implicit
@@ -105,7 +104,6 @@ make OPTIONS implicit
 done OPTIONS
 done features/options.sh
 prev edit.req
-setv mam_libdll `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-ldll,${INSTALLROOT}/lib/libdll.a,} ${PACKAGE_ast_LIB}/lib/dll`
 exec - iffe -v -c '${CC} ${CCFLAGS}   -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast} : run features/options.sh OPTIONS
 done FEATURE/options dontcare generated
 done sh_config.h
@@ -230,7 +228,7 @@ exec - 	then	ENV= $SHELL -n ie.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"' in
+exec - case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"' in
 exec - "")	cp ie.sh ie
 exec - 	;;
 exec - *)	{
@@ -238,7 +236,7 @@ exec - 	i=`(read x; echo $x) < ie.sh`
 exec - 	case $i in
 exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"
+exec - 	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Pat Sullivan][-copyright?Copyright (c) 1984-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?ie]"\"
 exec - 	cat ie.sh
 exec - 	} > ie
 exec - 	;;
@@ -271,7 +269,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libedit.a archive
 prev libedit.a archive
-exec - mv ${PACKAGE_ast_LIB}/libedit.a ${PACKAGE_ast_LIB}/libedit.a.old 2>/dev/null || true; cp libedit.a ${PACKAGE_ast_LIB}/libedit.a
+exec - mv ${PACKAGE_ast_LIB}/libedit.a ${PACKAGE_ast_LIB}/libedit.a.old 2>/dev/null || true; test '' = 'libedit.a' || { cp libedit.a ${PACKAGE_ast_LIB}/libedit.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libedit.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libedit.a generated
 make ${PACKAGE_ast_LIB}/lib
@@ -300,7 +298,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/edit
 prev edit.req
-exec - mv ${PACKAGE_ast_LIB}/lib/edit ${PACKAGE_ast_LIB}/lib/edit.old 2>/dev/null || true; cp edit.req ${PACKAGE_ast_LIB}/lib/edit
+exec - mv ${PACKAGE_ast_LIB}/lib/edit ${PACKAGE_ast_LIB}/lib/edit.old 2>/dev/null || true; test '' = 'edit.req' || { cp edit.req ${PACKAGE_ast_LIB}/lib/edit  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/edit generated
 make ${INSTALLROOT}/bin
 exec - set -
@@ -328,7 +326,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/ie
 prev ie
-exec - mv ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; cp ie ${INSTALLROOT}/bin/ie
+exec - mv ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; test '' = 'ie' || { cp ie ${INSTALLROOT}/bin/ie  		    		    ;}
 done ${INSTALLROOT}/bin/ie generated
 done install virtual
 make test

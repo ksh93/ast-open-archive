@@ -1,0 +1,81 @@
+<META name="description" content="INIT package">
+<META name="keywords" content="software, package">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META name="generator" content="mm2html (AT&T Labs Research) 2000-05-25">
+<TITLE> INIT package </TITLE>
+</HEAD>
+<BODY  marginheight=0 leftmargin=0 topmargin=0 marginwidth=0 bgcolor=white vlink=teal link=slateblue >
+<TABLE border=0 width=640><TR><TD valign=top align=left>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="INIT package">INIT package</A></H3></CENTER></FONT></FONT>
+The INIT package is required by all other packages. It contains
+the package command, support scripts, and utilities.
+Components in this package:
+<PRE>
+    INIT
+</PRE>
+<P>
+The software is covered by these licenses:
+<UL type=square>
+<LI>
+<A href="http://www.research.att.com/sw/license/ast-open.html">http://www.research.att.com/sw/license/ast-open.html</A>
+<LI>
+<A href="http://www.gnu.org/copyleft/gpl.html">http://www.gnu.org/copyleft/gpl.html</A>
+</UL>
+A recent
+<A href="#release change log">release change log</A>
+is also included.
+<PRE>
+<P><HR><FONT face=courier><FONT color=red><CENTER><H3><A name="release change log">release change log</A></H3></CENTER></FONT></FONT>
+
+Changes since 2000-02-01 or the last release follow.
+
+<H4>INIT</H4>
+
+00-06-14 mamprobe: fix win32.* probe
+	 mamake: fix bug that used lower view path for generation
+	 package: don't clobber $PACKAGEROOT/bin/nmake
+00-06-01 C+probe: fix stdinclude *again*
+	 package: fix write delta source to use default pax format
+	 package: add disambiguating bias for sgi.mips3 over sgi.mips4
+	 package.mk: fix for directory content packages lib ast-locale
+00-05-01 iffe: fix invalid _LIB_ macro identifier 
+00-04-11 C+probe: uniq stdinclude and stdlib, fix usrinclude
+00-04-01 regress: fix explicit OUTPUT bug that didn't compare with expected
+00-03-17 package: all archives are .tgz for binary download
+	 package: $(PACKAGEROOT)/LICENSES/* in source and binary archives
+	 package: implement install and verify actions
+	 iffe: add exp, pth file dir ..., fix lib - -lfoo, fix lib - - -la -lb
+	 iffe: -L* must affect LD_LIBRARY* hacks for .exe tests -- yuk
+	 package.mk: add *.pkg :INDEX:
+00-03-07 package: add admin action
+00-03-06 makefile: install optional make probe override script C+make+probe.lcl
+00-02-14 --- release 1.0 ---
+	 ratz: treat "foo/" as a dir, not a regular file
+	 package: clarify source and binary installation instructions
+	 package: fix so binary packages can install without cc
+	 package: "ratz" now a non-archive package (the only one) for bootstrap
+	 package: handle VPATH=a:b arg
+	 package.mk: "ratz" package adjustments
+	 Makefile: use :PACKAGE_INIT: to support binary INIT packages
+	 WWW.mk: add :WWWALL:
+	 C.probe: fix .so check that let .dll slip through
+	 iffe: fix config sh var assignment for HAVE_member_IN_struct
+	 iffe: fix config sh var assignment for symbol_DECLARED
+	 package: delay PATH export until dll hack exports complete
+	 package: don't forget binary package $(INSTALLROOT)/lib(32|64)
+	 package: add delta change log for source packages
+00-02-10 mamprobe: add mam_cc_DLLBIG
+	 package: fix spelling typos
+	 package: add html help output
+	 package.mk: beef up source and binary help =&gt; html
+00-02-08 package: mkdir man/man&#0091;138&#0093; in the new arch to cover MAM bug
+</PRE>
+<HR>
+<P>
+June 22, 2000
+
+</TD></TR></TABLE>
+</BODY>
+</HTML>

@@ -87,6 +87,10 @@ main(int argc, char** argv)
 	struct list	options;
 	struct list*	op;
 
+#if _PACKAGE_ast
+	error_info.id = "mailx";
+#endif
+
 	/*
 	 * Set up a reasonable environment.
 	 * Figure out whether we are being run interactively,
@@ -105,7 +109,7 @@ main(int argc, char** argv)
 	ef = 0;
 	opterr = 0;
 	for (;;) {
-		switch (getopt(argc, argv, "AFHINPST:b:c:defino:s:tu:v")) {
+		switch (getopt(argc, argv, "AFHINPQ:ST:b:c:defino:s:tu:v")) {
 		case EOF:
 			break;
 		case 'A':
@@ -140,11 +144,18 @@ main(int argc, char** argv)
 			 */
 			op = setopt(op, "coprocess", NiL);
 			continue;
+		case 'Q':
+			/*
+			 * List all n most recent status and senders and exit.
+			 */
+			op = setopt(op, "justfrom", optarg);
+			state.var.quiet = state.on;
+			continue;
 		case 'S':
 			/*
 			 * List all status and senders and exit.
 			 */
-			op = setopt(op, "justfrom", NiL);
+			op = setopt(op, "justfrom", "-1");
 			state.var.quiet = state.on;
 			continue;
 		case 'T':

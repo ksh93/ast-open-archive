@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,7 +24,7 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	Sfio_t*	f;
 
@@ -49,7 +49,7 @@ main()
 	if(sfeof(f))
 		terror("Shouldn't be eof any more\n");
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0), "w+")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
 		terror("Can't open stream2\n");
 	if(sfeof(f) || sferror(f))
 		terror("Can't be eof or error yet2\n");
@@ -74,13 +74,13 @@ main()
 	if(sfeof(f))
 		terror("Shouldn't be eof any more2\n");
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0),"w+")) )
-		terror("Reopening %s\n", sftfile(0));
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
+		terror("Reopening %s\n", tstfile(0));
 	sfwrite(f,"1234567890",10);
 	sfseek(f,(Sfoff_t)0,0);
 
-	if(sfopen(sfstdout, sftfile(1), "w") != sfstdout)
-		terror("Opening %s\n", sftfile(1));
+	if(sfopen(sfstdout, tstfile(1), "w") != sfstdout)
+		terror("Opening %s\n", tstfile(1));
 
 	if(sfmove(f,sfstdout,(Sfoff_t)(-1),-1) != 10)
 		terror("sfmove failed\n");
@@ -89,6 +89,5 @@ main()
 	if(sferror(sfstdout))
 		terror("sfstdout should not be in error\n");
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

@@ -10,6 +10,10 @@ pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	delta.c file.c format.c misc.c \
 	-lodelta -lvdelta -lsum
 
+if CC.HOSTTYPE == "win32*" || "$(-mam)" == "static*"
+delta.o : .CC.NOOPTIMIZE
+end
+
 nocom :: nocom.c
 
 $(LIBDIR)/pax :INSTALLDIR: cia.fmt ppar.fmt

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -41,7 +41,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)sort (AT&T Labs Research) 1999-11-19\n]"
+"[-?\n@(#)sort (AT&T Labs Research) 2000-03-17\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -124,7 +124,7 @@ USAGE_LICENSE
 "[y:size?Equivalent to \b-zi\b\asize\a.]:[size]"
 "[X:test?Enables implementation defined test code. Some or all of these"
 "	may be disabled.]:[test]{"
-"		[+dump?List detailed information on the option setting.]"
+"		[+dump?List detailed information on the option settings.]"
 "		[+keys?List the canonical key for each record.]"
 "		[+read?Force input file read by disabling memory mapping.]"
 "		[+show?Show setup infomation and exit before sorting.]"
@@ -159,8 +159,8 @@ USAGE_LICENSE
 "	lists the available methods. rasp (radix+splay-tree) is the"
 "	default and current all-around best.]"
 "[+?Single-letter options may be combined into a single string,"
-"	such as \b-cnrt:\b. The option combination \b-di\b and the combina-"
-"	tion of \b-n\b with any of \b-diM\b are improper. Posix argument"
+"	such as \b-cnrt:\b. The option combination \b-di\b and the combination"
+"	of \b-n\b with any of \b-diM\b are improper. Posix argument"
 "	conventions are supported.]"
 "[+?Options \b-g\b, \b-j\b, \b-M\b, \b-s\b, \b-S\b, \b-T\b, and \b-z\b"
 "	are not in the Posix or X/Open standards.]"
@@ -544,7 +544,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		sp->total = is.st_size;
 		if (!S_ISREG(is.st_mode))
 			sp->test |= TEST_read;
-		else if (sp->total < x)
+		else if (x > sp->total)
 			x = sp->total;
 	}
 	else
@@ -966,7 +966,7 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 					sfsetbuf(ip, NiL, z = 2 * sp->end);
 					sp->buf = (char*)sfreserve(ip, m, 1);
 					n = sfvalue(ip);
-					if (sp->verbose)
+					if (sp->verbose && n)
 						error(0, "%s buffer boundary expand to %I*d", error_info.id, sizeof(n), n);
 				}
 				if (!sp->buf && n > 0 && !(sp->buf = sfreserve(ip, n, 1)))

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -48,14 +48,14 @@ int		fd;
 	}
 }
 
-main()
+MAIN()
 {
 	Sfio_t*	f;
 	int	fd;
 
 	sfnotify(notify);
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0), "w")) && Type != SF_NEW)
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) && Type != SF_NEW)
 		terror("Notify did not announce SF_NEW event\n");
 	fd = sffileno(f);
 	close(fd+5);
@@ -70,6 +70,5 @@ main()
 	if(sfgetc(sfstdout) >= 0 || Type != SF_READ)
 		terror("Notify did not announce SF_READ event\n");
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -71,9 +71,8 @@ done bzip2.c
 prev bzip2.c
 exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE}  -c bzip2.c
 done bzip2.o generated
-setv mam_libbz ${mam_cc_L+-lbz}${mam_cc_L-${PACKAGE_ast_LIB}/libbz.a}
-setv mam_libbz `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lbz,${INSTALLROOT}/lib/libbz.a,} ${PACKAGE_ast_LIB}/lib/bz`
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libbz `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lbz,${INSTALLROOT}/lib/libbz.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/bz 2>/dev/null || echo '' ${mam_cc_L+-lbz}${mam_cc_L-${PACKAGE_ast_LIB}/libbz.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o bzip2 bzip2.o ${mam_libbz} ${mam_libast}
 done bzip2 generated
 make bzip
@@ -109,7 +108,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/bzip2
 prev bzip2
-exec - mv ${INSTALLROOT}/bin/bzip2 ${INSTALLROOT}/bin/bzip2.old 2>/dev/null || true; cp bzip2 ${INSTALLROOT}/bin/bzip2
+exec - mv ${INSTALLROOT}/bin/bzip2 ${INSTALLROOT}/bin/bzip2.old 2>/dev/null || true; test '' = 'bzip2' || { cp bzip2 ${INSTALLROOT}/bin/bzip2  		    		    ;}
 done ${INSTALLROOT}/bin/bzip2 generated
 make ${INSTALLROOT}/man/man1
 exec - set -
@@ -138,7 +137,7 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/bzip2.1
 make bzip2.1
 done bzip2.1
-exec - mv ${INSTALLROOT}/man/man1/bzip2.1 ${INSTALLROOT}/man/man1/bzip2.1.old 2>/dev/null || true; cp bzip2.1 ${INSTALLROOT}/man/man1/bzip2.1
+exec - mv ${INSTALLROOT}/man/man1/bzip2.1 ${INSTALLROOT}/man/man1/bzip2.1.old 2>/dev/null || true; test '' = 'bzip2.1' || { cp bzip2.1 ${INSTALLROOT}/man/man1/bzip2.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/bzip2.1 generated
 make ${INSTALLROOT}/bin/bzip
 prev ${INSTALLROOT}/bin/bzip2

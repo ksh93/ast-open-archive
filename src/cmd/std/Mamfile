@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -121,9 +121,9 @@ done ${PACKAGE_ast_INCLUDE}/cmd.h
 done banner.c
 prev banner.c
 setv LICENSE -DLICENSE="since=1989,author=dgk"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c banner.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c banner.c
 done banner.o generated
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 setv LICENSE -DLICENSE="since=1989,author=dgk"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o banner banner.o ${mam_libast}
 done banner generated
@@ -151,7 +151,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done date.c
 prev date.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c date.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c date.c
 done date.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o date date.o ${mam_libast}
 done date generated
@@ -171,27 +171,49 @@ done ${PACKAGE_ast_INCLUDE}/sfstr.h
 make ${PACKAGE_ast_INCLUDE}/sig.h implicit
 done ${PACKAGE_ast_INCLUDE}/sig.h
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/iconv.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done ${PACKAGE_ast_INCLUDE}/iconv.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done dd.c
 prev dd.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c dd.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c dd.c
 done dd.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o dd dd.o ${mam_libast}
 done dd generated
 make df
 make df.o
 make df.c
+make ../../lib/libast/disc/sfkeyprintf.c implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfdisc.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done ../../lib/libast/disc/sfkeyprintf.c dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
 make ${PACKAGE_ast_INCLUDE}/mnt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/mnt.h
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/cdt.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done df.c
 prev df.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c df.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c df.c
 done df.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o df df.o ${mam_libast}
 done df generated
@@ -216,7 +238,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done du.c
 prev du.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c du.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c du.c
 done du.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o du du.o ${mam_libast}
 done du generated
@@ -232,26 +254,36 @@ done ${PACKAGE_ast_INCLUDE}/magic.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done file.c
 prev file.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c file.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c file.c
 done file.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o file file.o ${mam_libast}
 done file generated
+make iconv
+make iconv.o
+make iconv.c
+prev ${PACKAGE_ast_INCLUDE}/iconv.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done iconv.c
+prev iconv.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c iconv.c
+done iconv.o generated
+exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o iconv iconv.o ${mam_libast}
+done iconv generated
 make ls
 make ls.o
 make ls.c
+prev ../../lib/libast/disc/sfkeyprintf.c implicit
 prev ${PACKAGE_ast_INCLUDE}/hash.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfdisc.h
+prev ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ftwalk.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ls.c
 prev ls.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c ls.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ls.c
 done ls.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ls ls.o ${mam_libast}
 done ls generated
@@ -263,7 +295,7 @@ prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done mesg.c
 prev mesg.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c mesg.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mesg.c
 done mesg.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o mesg mesg.o ${mam_libast}
@@ -280,16 +312,13 @@ prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/mnt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/cdt.h
+prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done mount.c
 prev mount.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c mount.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c mount.c
 done mount.o generated
 setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ast_mount mount.o ${mam_libast}
@@ -297,6 +326,7 @@ done ast_mount generated
 make ast_ps
 make ps.o
 make ps.c
+prev ../../lib/libast/disc/sfkeyprintf.c implicit
 make FEATURE/procfs implicit
 make features/procfs
 done features/procfs
@@ -304,6 +334,7 @@ exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_
 done FEATURE/procfs generated
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfstr.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfdisc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/int.h implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -323,7 +354,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ps.c
 prev ps.c
 setv LICENSE -DLICENSE="since=1998,author=gsf"
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c ps.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c ps.c
 done ps.o generated
 setv LICENSE -DLICENSE="since=1998,author=gsf"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ast_ps ps.o ${mam_libast}
@@ -341,7 +372,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done rm.c
 prev rm.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c rm.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c rm.c
 done rm.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o rm rm.o ${mam_libast}
 done rm generated
@@ -358,7 +389,7 @@ exec - 	then	ENV= $SHELL -n shar.sh
 exec - 	fi
 exec - 	;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"' in
+exec - case 'USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\"' in
 exec - "")	cp shar.sh shar
 exec - 	;;
 exec - *)	{
@@ -366,7 +397,7 @@ exec - 	i=`(read x; echo $x) < shar.sh`
 exec - 	case $i in
 exec - 	'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo $i ;;
 exec - 	esac
-exec - 	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"
+exec - 	echo USAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1999-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\"
 exec - 	cat shar.sh
 exec - 	} > shar
 exec - 	;;
@@ -376,15 +407,12 @@ done shar generated
 make split
 make split.o
 make split.c
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/regex.h
+prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done split.c
 prev split.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c split.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c split.c
 done split.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o split split.o ${mam_libast}
@@ -416,10 +444,9 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/sum.h
 done sum.c
 prev sum.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c sum.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c sum.c
 done sum.o generated
-setv mam_libsum ${mam_cc_L+-lsum}${mam_cc_L-${PACKAGE_ast_LIB}/libsum.a}
-setv mam_libsum `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lsum,${INSTALLROOT}/lib/libsum.a,} ${PACKAGE_ast_LIB}/lib/sum`
+setv mam_libsum `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lsum,${INSTALLROOT}/lib/libsum.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/sum 2>/dev/null || echo '' ${mam_cc_L+-lsum}${mam_cc_L-${PACKAGE_ast_LIB}/libsum.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o sum sum.o ${mam_libsum} ${mam_libast}
 done sum generated
 make cksum
@@ -445,7 +472,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done touch.c
 prev touch.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c touch.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c touch.c
 done touch.o generated
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o touch touch.o ${mam_libast}
 done touch generated
@@ -458,7 +485,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done tsort.c
 prev tsort.c
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c tsort.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c tsort.c
 done tsort.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk+gsf"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o tsort tsort.o ${mam_libast}
@@ -470,7 +497,7 @@ prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done unexpand.c
 prev unexpand.c
 setv LICENSE -DLICENSE="since=1995,author=dgk"
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c unexpand.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1995-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?std]"\" -c unexpand.c
 done unexpand.o generated
 setv LICENSE -DLICENSE="since=1995,author=dgk"
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o unexpand unexpand.o ${mam_libast}
@@ -508,11 +535,11 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/banner
 prev banner
-exec - mv ${INSTALLROOT}/bin/banner ${INSTALLROOT}/bin/banner.old 2>/dev/null || true; cp banner ${INSTALLROOT}/bin/banner
+exec - mv ${INSTALLROOT}/bin/banner ${INSTALLROOT}/bin/banner.old 2>/dev/null || true; test '' = 'banner' || { cp banner ${INSTALLROOT}/bin/banner  		    		    ;}
 done ${INSTALLROOT}/bin/banner generated
 make ${INSTALLROOT}/bin/date
 prev date
-exec - mv ${INSTALLROOT}/bin/date ${INSTALLROOT}/bin/date.old 2>/dev/null || true; cp date ${INSTALLROOT}/bin/date
+exec - mv ${INSTALLROOT}/bin/date ${INSTALLROOT}/bin/date.old 2>/dev/null || true; test '' = 'date' || { cp date ${INSTALLROOT}/bin/date  		    		    ;}
 done ${INSTALLROOT}/bin/date generated
 make ${INSTALLROOT}/man/man1
 exec - set -
@@ -541,61 +568,65 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/date.1
 make date.1
 done date.1
-exec - mv ${INSTALLROOT}/man/man1/date.1 ${INSTALLROOT}/man/man1/date.1.old 2>/dev/null || true; cp date.1 ${INSTALLROOT}/man/man1/date.1
+exec - mv ${INSTALLROOT}/man/man1/date.1 ${INSTALLROOT}/man/man1/date.1.old 2>/dev/null || true; test '' = 'date.1' || { cp date.1 ${INSTALLROOT}/man/man1/date.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/date.1 generated
 make ${INSTALLROOT}/bin/dd
 prev dd
-exec - mv ${INSTALLROOT}/bin/dd ${INSTALLROOT}/bin/dd.old 2>/dev/null || true; cp dd ${INSTALLROOT}/bin/dd
+exec - mv ${INSTALLROOT}/bin/dd ${INSTALLROOT}/bin/dd.old 2>/dev/null || true; test '' = 'dd' || { cp dd ${INSTALLROOT}/bin/dd  		    		    ;}
 done ${INSTALLROOT}/bin/dd generated
 make ${INSTALLROOT}/bin/df
 prev df
-exec - mv ${INSTALLROOT}/bin/df ${INSTALLROOT}/bin/df.old 2>/dev/null || true; cp df ${INSTALLROOT}/bin/df
+exec - mv ${INSTALLROOT}/bin/df ${INSTALLROOT}/bin/df.old 2>/dev/null || true; test '' = 'df' || { cp df ${INSTALLROOT}/bin/df  		    		    ;}
 done ${INSTALLROOT}/bin/df generated
 make ${INSTALLROOT}/bin/du
 prev du
-exec - mv ${INSTALLROOT}/bin/du ${INSTALLROOT}/bin/du.old 2>/dev/null || true; cp du ${INSTALLROOT}/bin/du
+exec - mv ${INSTALLROOT}/bin/du ${INSTALLROOT}/bin/du.old 2>/dev/null || true; test '' = 'du' || { cp du ${INSTALLROOT}/bin/du  		    		    ;}
 done ${INSTALLROOT}/bin/du generated
 make ${INSTALLROOT}/bin/file
 prev file
-exec - mv ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; cp file ${INSTALLROOT}/bin/file
+exec - mv ${INSTALLROOT}/bin/file ${INSTALLROOT}/bin/file.old 2>/dev/null || true; test '' = 'file' || { cp file ${INSTALLROOT}/bin/file  		    		    ;}
 done ${INSTALLROOT}/bin/file generated
+make ${INSTALLROOT}/bin/iconv
+prev iconv
+exec - mv ${INSTALLROOT}/bin/iconv ${INSTALLROOT}/bin/iconv.old 2>/dev/null || true; test '' = 'iconv' || { cp iconv ${INSTALLROOT}/bin/iconv  		    		    ;}
+done ${INSTALLROOT}/bin/iconv generated
 make ${INSTALLROOT}/bin/ls
 prev ls
-exec - mv ${INSTALLROOT}/bin/ls ${INSTALLROOT}/bin/ls.old 2>/dev/null || true; cp ls ${INSTALLROOT}/bin/ls
+exec - mv ${INSTALLROOT}/bin/ls ${INSTALLROOT}/bin/ls.old 2>/dev/null || true; test '' = 'ls' || { cp ls ${INSTALLROOT}/bin/ls  		    		    ;}
 done ${INSTALLROOT}/bin/ls generated
 make ${INSTALLROOT}/bin/mesg
 prev mesg
-exec - mv ${INSTALLROOT}/bin/mesg ${INSTALLROOT}/bin/mesg.old 2>/dev/null || true; cp mesg ${INSTALLROOT}/bin/mesg
+exec - mv ${INSTALLROOT}/bin/mesg ${INSTALLROOT}/bin/mesg.old 2>/dev/null || true; test '' = 'mesg' || { cp mesg ${INSTALLROOT}/bin/mesg  		    		    ;}
 done ${INSTALLROOT}/bin/mesg generated
 make ${INSTALLROOT}/bin/ast_mount
 prev ast_mount
-exec - mv ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; cp ast_mount ${INSTALLROOT}/bin/ast_mount
+exec - mv ${INSTALLROOT}/bin/ast_mount ${INSTALLROOT}/bin/ast_mount.old 2>/dev/null || true; test '' = 'ast_mount' || { cp ast_mount ${INSTALLROOT}/bin/ast_mount  		    		    ;}
 done ${INSTALLROOT}/bin/ast_mount generated
 make ${INSTALLROOT}/man/man1/mount.1
 make mount.1
 done mount.1
-exec - mv ${INSTALLROOT}/man/man1/mount.1 ${INSTALLROOT}/man/man1/mount.1.old 2>/dev/null || true; cp mount.1 ${INSTALLROOT}/man/man1/mount.1
+exec - mv ${INSTALLROOT}/man/man1/mount.1 ${INSTALLROOT}/man/man1/mount.1.old 2>/dev/null || true; test '' = 'mount.1' || { cp mount.1 ${INSTALLROOT}/man/man1/mount.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/mount.1 generated
 make ${INSTALLROOT}/bin/ast_ps
 prev ast_ps
-exec - mv ${INSTALLROOT}/bin/ast_ps ${INSTALLROOT}/bin/ast_ps.old 2>/dev/null || true; cp ast_ps ${INSTALLROOT}/bin/ast_ps
+exec - mv ${INSTALLROOT}/bin/ast_ps ${INSTALLROOT}/bin/ast_ps.old 2>/dev/null || true; test '' = 'ast_ps' || { cp ast_ps ${INSTALLROOT}/bin/ast_ps  		    		    ;}
 done ${INSTALLROOT}/bin/ast_ps generated
 make ${INSTALLROOT}/man/man1/ps.1
 make ps.1
 done ps.1
-exec - mv ${INSTALLROOT}/man/man1/ps.1 ${INSTALLROOT}/man/man1/ps.1.old 2>/dev/null || true; cp ps.1 ${INSTALLROOT}/man/man1/ps.1
+exec - mv ${INSTALLROOT}/man/man1/ps.1 ${INSTALLROOT}/man/man1/ps.1.old 2>/dev/null || true; test '' = 'ps.1' || { cp ps.1 ${INSTALLROOT}/man/man1/ps.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/ps.1 generated
 make ${INSTALLROOT}/bin/rm
 prev rm
-exec - mv ${INSTALLROOT}/bin/rm ${INSTALLROOT}/bin/rm.old 2>/dev/null || true; cp rm ${INSTALLROOT}/bin/rm
+exec - mv ${INSTALLROOT}/bin/rm ${INSTALLROOT}/bin/rm.old 2>/dev/null || true; test '' = 'rm' || { cp rm ${INSTALLROOT}/bin/rm  		    		    ;}
 done ${INSTALLROOT}/bin/rm generated
 make ${INSTALLROOT}/bin/shar
 prev shar
-exec - mv ${INSTALLROOT}/bin/shar ${INSTALLROOT}/bin/shar.old 2>/dev/null || true; cp shar ${INSTALLROOT}/bin/shar
+exec - mv ${INSTALLROOT}/bin/shar ${INSTALLROOT}/bin/shar.old 2>/dev/null || true; test '' = 'shar' || { cp shar ${INSTALLROOT}/bin/shar  		    		    ;}
 done ${INSTALLROOT}/bin/shar generated
 make ${INSTALLROOT}/bin/split
 prev split
-exec - mv ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/split.old 2>/dev/null || true; cp split ${INSTALLROOT}/bin/split
+exec - mv ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/split.old 2>/dev/null || true; test '' = 'split' || { cp split ${INSTALLROOT}/bin/split  		    		    ;}
 done ${INSTALLROOT}/bin/split generated
 make ${INSTALLROOT}/bin/csplit
 prev ${INSTALLROOT}/bin/split
@@ -606,7 +637,7 @@ exec - ln ${INSTALLROOT}/bin/split ${INSTALLROOT}/bin/csplit
 done ${INSTALLROOT}/bin/csplit generated
 make ${INSTALLROOT}/bin/sum
 prev sum
-exec - mv ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/sum.old 2>/dev/null || true; cp sum ${INSTALLROOT}/bin/sum
+exec - mv ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/sum.old 2>/dev/null || true; test '' = 'sum' || { cp sum ${INSTALLROOT}/bin/sum  		    		    ;}
 done ${INSTALLROOT}/bin/sum generated
 make ${INSTALLROOT}/bin/cksum
 prev ${INSTALLROOT}/bin/sum
@@ -624,15 +655,15 @@ exec - ln ${INSTALLROOT}/bin/sum ${INSTALLROOT}/bin/md5sum
 done ${INSTALLROOT}/bin/md5sum generated
 make ${INSTALLROOT}/bin/touch
 prev touch
-exec - mv ${INSTALLROOT}/bin/touch ${INSTALLROOT}/bin/touch.old 2>/dev/null || true; cp touch ${INSTALLROOT}/bin/touch
+exec - mv ${INSTALLROOT}/bin/touch ${INSTALLROOT}/bin/touch.old 2>/dev/null || true; test '' = 'touch' || { cp touch ${INSTALLROOT}/bin/touch  		    		    ;}
 done ${INSTALLROOT}/bin/touch generated
 make ${INSTALLROOT}/bin/tsort
 prev tsort
-exec - mv ${INSTALLROOT}/bin/tsort ${INSTALLROOT}/bin/tsort.old 2>/dev/null || true; cp tsort ${INSTALLROOT}/bin/tsort
+exec - mv ${INSTALLROOT}/bin/tsort ${INSTALLROOT}/bin/tsort.old 2>/dev/null || true; test '' = 'tsort' || { cp tsort ${INSTALLROOT}/bin/tsort  		    		    ;}
 done ${INSTALLROOT}/bin/tsort generated
 make ${INSTALLROOT}/bin/unexpand
 prev unexpand
-exec - mv ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/unexpand.old 2>/dev/null || true; cp unexpand ${INSTALLROOT}/bin/unexpand
+exec - mv ${INSTALLROOT}/bin/unexpand ${INSTALLROOT}/bin/unexpand.old 2>/dev/null || true; test '' = 'unexpand' || { cp unexpand ${INSTALLROOT}/bin/unexpand  		    		    ;}
 done ${INSTALLROOT}/bin/unexpand generated
 make ${INSTALLROOT}/bin/expand
 prev ${INSTALLROOT}/bin/unexpand

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -745,6 +745,7 @@ main(int argc, char** argv)
 			register char*	s;
 			register int	i;
 			register int	m;
+			int		done = 0;
 			int		sdf[2];
 			Cs_poll_t	fds[2];
 
@@ -773,8 +774,14 @@ main(int argc, char** argv)
 					{
 						if ((n = read(fds[i].fd, buf, sizeof(buf) - 1)) < 0)
 							error(ERROR_SYSTEM|3, "/dev/fd/%d: read error", fds[i].fd);
-						if (!n && (!raw || i))
-							return 0;
+						if (!n)
+						{
+							done |= 1<<i;
+							if (done && (1<<(!i)))
+								return 0;
+							fds[i].events = 0;
+							continue;
+						}
 						if (!i)
 						{
 #if _hdr_termios

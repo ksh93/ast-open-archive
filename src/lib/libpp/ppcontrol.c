@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -180,7 +180,8 @@ macsym(int tok)
 	if ((sym->flags & SYM_FINAL) && (pp.mode & HOSTED)) return(0);
 	if (sym->flags & (SYM_ACTIVE|SYM_READONLY))
 	{
-		error(2, "%s: macro is %s", sym->name, (sym->flags & SYM_READONLY) ? "readonly" : "active");
+		if (!(pp.option & ALLPOSSIBLE))
+			error(2, "%s: macro is %s", sym->name, (sym->flags & SYM_READONLY) ? "readonly" : "active");
 		return(0);
 	}
 	if (!sym->macro) sym->macro = newof(0, struct ppmacro, 1, 0);
@@ -292,6 +293,7 @@ ppcontrol(void)
 	struct edit*			edit;
 	struct map*			map;
 	struct ppfile*			fp;
+	int				o;
 	int				directive;
 	long				restore;
 
@@ -355,6 +357,8 @@ ppcontrol(void)
 		{
 		case ELIF:
 		else_if:
+			if ((pp.option & ALLPOSSIBLE) && !pp.in->prev->prev)
+				goto eatdirective;
 			if (pp.control <= pp.in->control)
 			{
 				error(2, "no matching #%s for #%s", dirname(IF), dirname(ELIF));
@@ -387,6 +391,8 @@ ppcontrol(void)
 			c = (pp.state & NEWLINE) ? '\n' : ' ';
 			goto eatdirective;
 		case ELSE:
+			if ((pp.option & ALLPOSSIBLE) && !pp.in->prev->prev)
+				goto eatdirective;
 			if ((pp.option & ELSEIF) && (c = pplex()) == T_ID && ((n = (int)hashref(pp.dirtab, pp.token)) == IF || n == IFDEF || n == IFNDEF))
 			{
 				error(1, "#%s %s is non-standard -- use #%s", dirname(directive), dirname(n), dirname(ELIF));
@@ -410,6 +416,8 @@ ppcontrol(void)
 			}
 			goto enddirective;
 		case ENDIF:
+			if ((pp.option & ALLPOSSIBLE) && !pp.in->prev->prev)
+				goto eatdirective;
 			if (pp.control <= pp.in->control) error(2, "no matching #%s for #%s", dirname(IF), dirname(ENDIF));
 			else if (--pp.control == pp.in->control && pp.in->symbol)
 			{
@@ -424,6 +432,8 @@ ppcontrol(void)
 		case IF:
 		case IFDEF:
 		case IFNDEF:
+			if ((pp.option & ALLPOSSIBLE) && !pp.in->prev->prev)
+				goto eatdirective;
 			pushcontrol();
 			SETIFBLOCK(pp.control);
 			if (*pp.control & SKIP)
@@ -613,6 +623,7 @@ ppcontrol(void)
 		error(1, "%s: unknown directive", pptokstr(pp.valbuf, 0));
 		*p0 = i0;
 	}
+ pass:
 	if (!(*pp.control & SKIP) && pp.pragma && !(pp.state & NOTEXT) && (directive == PRAGMA || !(pp.mode & INIT)))
 	{
 		*p0 = 0;
@@ -674,6 +685,7 @@ ppcontrol(void)
 			if (!(sym = macsym(c))) goto eatdirective;
 			if (pp.truncate) ppfsm(FSM_MACRO, pp.token);
 			mac = sym->macro;
+			if ((pp.option & ALLPOSSIBLE) && !pp.in->prev->prev && mac->value) goto eatdirective;
 			old = *mac;
 			i0 = sym->flags;
 			sym->flags &= ~(SYM_BUILTIN|SYM_EMPTY|SYM_FINAL|SYM_FUNCTION|SYM_INIT|SYM_INITIAL|SYM_MULTILINE|SYM_NOEXPAND|SYM_PREDEFINED|SYM_REDEFINE|SYM_VARIADIC);
@@ -813,10 +825,16 @@ ppcontrol(void)
 						{
 							if (c == T_VARIADIC)
 							{
-								if ((pp.state & WARN) && !(pp.mode & (HOSTED|RELAX)))
-									error(1, "%s: non-standard variadic macro", pp.token);
 								sym->flags |= SYM_VARIADIC;
 								c = pplex();
+								if (mac->arity < MAXFORMALS)
+								{
+									formargs[mac->arity++] = p;
+									s = "__VA_ARGS__";
+									STRAPP(p, pp.token, s);
+								}
+								else
+									error(2, "%s: formal argument %s ignored", sym->name, pp.token);
 							}
 #if COMPATIBLE
 							else if (c == ')' && (pp.state & COMPATIBILITY))
@@ -882,6 +900,21 @@ ppcontrol(void)
 			i2 = i3 = 0;
 			n3 = pp.state;
 #endif
+			if ((pp.option & PLUSPLUS) && (pp.state & (COMPATIBILITY|TRANSITION)) != COMPATIBILITY)
+				switch (c)
+				{
+				case '+':
+				case '-':
+				case '&':
+				case '|':
+				case '<':
+				case '>':
+				case ':':
+				case '=':
+					*p++ = ' ';
+					break;
+				}
+			o = 0;
 			for (;;)
 			{
 				switch (c)
@@ -902,6 +935,7 @@ ppcontrol(void)
 							*p++ = (n1 || var.type == TOK_TOKCAT) ? 'C' : 'A';
 							*p++ = c + ARGOFFSET;
 							var.type = TOK_FORMAL|TOK_ID;
+							c = '>';
 							goto checkvalue;
 						}
 					if (var.type == TOK_BUILTIN) switch ((int)hashget(pp.strtab, pp.token))
@@ -1017,7 +1051,7 @@ ppcontrol(void)
 #if COMPATIBLE
 					/*UNDENT*/
 
-	if (((pp.state & (COMPATIBILITY|TRANSITION)) || c == T_CHARCONST && !(pp.state & STRICT)) && (sym->flags & SYM_FUNCTION))
+	if ((sym->flags & SYM_FUNCTION) && (pp.state & (COMPATIBILITY|TRANSITION)))
 	{
 		char*	v;
 
@@ -1114,6 +1148,7 @@ ppcontrol(void)
 				}
 				STRCOPY(p, pp.token, s);
 			checkvalue:
+				o = c;
 				if (p > &mac->value[n - MAXTOKEN] && (s = newof(mac->value, char, n += MAXTOKEN, 0)) != mac->value)
 				{
 					c = p - mac->value;
@@ -1127,6 +1162,20 @@ ppcontrol(void)
 			}
 		gotdefinition:
 			while (p > mac->value && *(p - 1) == ' ') p--;
+			if (p > mac->value && (pp.option & PLUSPLUS) && (pp.state & (COMPATIBILITY|TRANSITION)) != COMPATIBILITY)
+				switch (o)
+				{
+				case '+':
+				case '-':
+				case '&':
+				case '|':
+				case '<':
+				case '>':
+				case ':':
+				case '=':
+					*p++ = ' ';
+					break;
+				}
 			*p = 0;
 #if MACKEYARGS
 			if (!mac->arity) /* ok */;
@@ -1465,9 +1514,11 @@ ppcontrol(void)
 			break;
 		case PRAGMA:
 			/*
-			 * #pragma [pass:] [no]option [arg ...]
+			 * #pragma [STDC] [pass:] [no]option [arg ...]
 			 *
-			 * pragma args are not expanded
+			 * pragma args are expanded
+			 *
+			 * if STDC is present then it is silently passed on
 			 *
 			 * if pass is pp.pass then the option is used
 			 * and verified but is not passed on
@@ -1499,10 +1550,9 @@ ppcontrol(void)
 				c = 0;
 				goto eatdirective;
 			}
-			if ((pp.state & WARN) && !(pp.mode & (HOSTED|RELAX)))
-				error(1, "#%s: non-standard directive", dirname(PRAGMA));
 			p1 = ++p;
-			while (ppisid(*p)) p++;
+			while (ppisid(*p))
+				p++;
 			if (p == p1)
 			{
 				p5 = p;
@@ -1523,7 +1573,8 @@ ppcontrol(void)
 			{
 				p2 = p++;
 				p3 = p;
-				while (ppisid(*p)) p++;
+				while (ppisid(*p))
+					p++;
 				if (p == p3)
 				{
 					p4 = p1;
@@ -1531,11 +1582,17 @@ ppcontrol(void)
 					p2 = 0;
 					p1 = 0;
 				}
-				else p4 = p;
+				else
+					p4 = p;
 				p5 = *p4 ? p4 + (*p4 == ' ') : 0;
 			}
+			if (!p1 && p3 && (p4 - p3) == 4 && strneq(p3, "STDC", 4))
+				goto pass;
+			if ((pp.state & WARN) && !(pp.mode & (HOSTED|RELAX)))
+				error(1, "#%s: non-standard directive", dirname(PRAGMA));
 			i0 = !p3 || *p3 != 'n' || *(p3 + 1) != 'o';
-			if (!p3) goto checkmap;
+			if (!p3)
+				goto checkmap;
 			if (p1)
 			{
 				*p2 = 0;
@@ -1579,6 +1636,9 @@ ppcontrol(void)
 			{
 			case X_ALLMULTIPLE:
 				ppop(PP_MULTIPLE, i0);
+				break;
+			case X_ALLPOSSIBLE:
+				setoption(ALLPOSSIBLE, i0);
 				break;
 			case X_BUILTIN:
 				setmode(BUILTIN, i0);
@@ -2031,7 +2091,8 @@ ppcontrol(void)
 				goto eatdirective;
 			if (sym->flags & (SYM_ACTIVE|SYM_READONLY))
 			{
-				error(2, "%s: macro is %s", sym->name, (sym->flags & SYM_READONLY) ? "readonly" : "active");
+				if (!(pp.option & ALLPOSSIBLE))
+					error(2, "%s: macro is %s", sym->name, (sym->flags & SYM_READONLY) ? "readonly" : "active");
 				goto eatdirective;
 			}
 			if ((c = pplex()) != T_ID)
@@ -2044,7 +2105,8 @@ ppcontrol(void)
 			{
 				if (var.symbol->flags & (SYM_ACTIVE|SYM_READONLY))
 				{
-					error(2, "%s: macro is %s", var.symbol->name, (var.symbol->flags & SYM_READONLY) ? "readonly" : "active");
+					if (!(pp.option & ALLPOSSIBLE))
+						error(2, "%s: macro is %s", var.symbol->name, (var.symbol->flags & SYM_READONLY) ? "readonly" : "active");
 					goto eatdirective;
 				}
 				if (!(pp.mode & HOSTED) || !(var.symbol->flags & SYM_INITIAL))
@@ -2071,7 +2133,8 @@ ppcontrol(void)
 				{
 					if (sym->flags & (SYM_ACTIVE|SYM_READONLY))
 					{
-						error(2, "%s: macro is %s", sym->name, (sym->flags & SYM_READONLY) ? "readonly" : "active");
+						if (!(pp.option & ALLPOSSIBLE))
+							error(2, "%s: macro is %s", sym->name, (sym->flags & SYM_READONLY) ? "readonly" : "active");
 						goto eatdirective;
 					}
 					if (mac->formals) free(mac->formals);

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -141,7 +141,7 @@ Sfdisc_t Ldisc = {lower, (Sfwrite_f)0, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0}
 Sfdisc_t Odisc = {once, (Sfwrite_f)0, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0};
 Sfdisc_t Edisc = {(Sfread_f)0, external, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0};
 
-main()
+MAIN()
 {
 	Sfio_t	*f, *fs;
 	char	*l, *u, *s;
@@ -161,7 +161,7 @@ main()
 	strcpy(u, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	n = strlen(l);
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0),"w+")))
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w+")))
 		terror("Creating temp file\n");
 	if((r = sfwrite(f,l,n)) != n)
 		terror("Writing data %d\n",r);
@@ -185,7 +185,7 @@ main()
 		terror("Input2=%s, Expect=%s\n",s,l);
 	}
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0), "w+")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
 		terror("Opening file\n");
 	sfdisc(f,&Wdisc);
 	if(sfputr(f,low,'\n') < 0)
@@ -198,7 +198,7 @@ main()
 		terror("Bad data\n");
 
 	/* read-once discipline */
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0),"r")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
 		terror("Opening file\n");
 	sfdisc(f,&Odisc);
 	if(!(s = sfreserve(f,SF_UNBOUND,1)) )
@@ -221,7 +221,7 @@ main()
 	if(sfvalue(f) != 3)
 		terror("Wrong reserved length3\n");
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0),"w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"w")) )
 		terror("Opening file to write\n");
 	sfdisc(f,&Edisc);
 	if(sfwrite(f, "one", 3) != 3)
@@ -231,7 +231,5 @@ main()
 	if(strcmp(External,"onetwo") != 0)
 		terror("Bad call of sfwr\n");
 
-	sftcleanup();
-
-	return 0;
+	TSTRETURN(0);
 }

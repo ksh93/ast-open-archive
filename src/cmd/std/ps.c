@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -32,8 +32,8 @@
  * if no /proc then we punt to /bin/ps -- and you better match their args!
  */
 
-static const char usage_1[] =
-"[-?\n@(#)ps (AT&T Labs Research) 1999-12-25\n]"
+static const char usage[] =
+"[-?\n@(#)ps (AT&T Labs Research) 2000-05-11\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -45,32 +45,46 @@ USAGE_LICENSE
 "	arguments accept either space or comma separators.]"
 
 "[a:interactive?List all processes associated with terminals.]"
-"[c:class?Equivalent to \b--format=\"pid class pri tty time command\"\b.]"
+"[c:class?Equivalent to \b--fields=\"pid class pri tty time command\"\b.]"
 "[d:no-session?List all processes except session leaders.]"
-"[D:default?Equivalent to \b--format=\"pid tty time command\"\b. This is the"
-"	format when \b--format\b is not specified.]"
+"[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
+"	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
+"	override internal \b--format\b identifiers.]:[key[=value]]]"
 "[e|A:all?List all processes.]"
-"[f:full?Equivalent to \b--format=\"user pid ppid start tty time args\"\b.]"
+"[f:full?Equivalent to \b--fields=\"user pid ppid start tty time args\"\b.]"
+"[F:format?Append to the listing format string (if \b--format\b is specified"
+"	then \b--fields\b and all options that modify \b--fields\b are"
+"	ignored.) The \bdf\b(1), \bls\b(1) and \bpax\b(1) commands also have"
+"	\b--format\b options in this same style. \aformat\a follows"
+"	\bprintf\b(3) conventions, except that \bsfio\b(3) inline ids are used"
+"	instead of arguments:"
+"	%[#-+]][\awidth\a[.\aprecis\a[.\abase\a]]]]]](\aid\a[:\asubformat\a]])\achar\a."
+"	If \b#\b is specified then the internal width and percision are used."
+"	If \achar\a is \bs\b then the string form of the item is listed,"
+"	otherwise the corresponding numeric form is listed. If \achar\a is"
+"	\bq\b then the string form of the item is $'...' quoted if it contains"
+"	space or non-printing characters. If \awidth\a is omitted then the"
+"	default width is assumed. \asubformat\a overrides the default"
+"	formatting for \aid\a. Supported \aid\as and \asubformat\as"
+"	are:]:[format]{\fformats\f}"
 "[g:pgrps|process-groups?List processes with group leaders in the \apgrp\a"
 "	list.]:[pgrp...]"
 "[G:groups?List processes with real group id names or numbers in the \agroup\a"
 "	list.]:[group...]"
-"[j:jobs?Equivalent to \b--format=\"pid pgrp sid tty time command\"\b.]"
-"[l:long?Equivalent to \b--format=\"flags state user pid ppid pri nice"
+"[j:jobs?Equivalent to \b--fields=\"pid pgrp sid tty time command\"\b.]"
+"[l:long?Equivalent to \b--fields=\"flags state user pid ppid pri nice"
 "	size rss wchan tty time command\"\b.]"
 "[n:namelist?Specifies an alternate system namelist \afile\a. Ignored by"
 "	this implementation.]"
-"[o:format?List information according to \aformat\a. Multiple \b--format\b"
-"	options may be specified; the resulting format is a left-right ordered"
-"	list with duplicate entries deleted from the right. The default"
-"	width can be overriden by appending \a+width\a to \akey\a, and the"
-"	default \alabel\a can be overridden by appending \a=label\a to"
-"	\akey\a. The keys, labels and widths are:]:"
-"	[key[+width]][=label]]...]{"
-;
-
-static const char usage_2[] =
-"}"
+"[N:default?Equivalent to \b--fields=\"pid tty time command\"\b. This is the"
+"	format when \b--fields\b is not specified.]"
+"[o:fields?(\b--format\b is more general.) List information according to"
+"	\aformat\a. Multiple \b--fields\b options may be specified; the"
+"	resulting format is a left-right ordered list with duplicate entries"
+"	deleted from the right. The default width can be overriden by"
+"	appending \a+width\a to \akey\a, and the default \alabel\a can be"
+"	overridden by appending \a=label\a to \akey\a. The keys, labels and"
+"	widths are listed under \b--format\b.]:[key[+width]][=label]]...]"
 "[p:pids?List processes in the \apid\a list.]:[pid...]"
 "[s:sessions?List processes with session leaders in the \asid\a list.]:[sid...]"
 "[t:terminals|ttys?List processes with controlling terminals in the \atty\a"
@@ -86,7 +100,8 @@ static const char usage_2[] =
 "\n[ pid ... ]\n"
 "\n"
 
-"[+SEE ALSO?kill(1), nice(1), sh(1), top(1)]"
+"[+SEE ALSO?\bdf\b(1), \bkill\b(1), \bls\b(1), \bnice\b(1), \bpax\b(1),"
+"	\bps\b(1), \bsh\b(1), \btop\b(1)]"
 ;
 
 #include <ast.h>
@@ -97,6 +112,7 @@ static const char usage_2[] =
 #include <error.h>
 #include <int.h>
 #include <ls.h>
+#include <sfdisc.h>
 #include <sfstr.h>
 #include <tm.h>
 
@@ -108,6 +124,7 @@ static const char usage_2[] =
 #define st_rdev			st_dev
 #endif
 
+#define KEY_environ		(-1)
 #define KEY_alias		0
 
 #define KEY_addr		1
@@ -138,7 +155,7 @@ static const char usage_2[] =
 #define KEY_user		26
 #define KEY_wchan		27
 
-typedef struct Key			/* format key			*/
+typedef struct Key_s			/* format key			*/
 {
 	char*		name;		/* key name			*/
 	char*		head;		/* heading name			*/
@@ -147,15 +164,16 @@ typedef struct Key			/* format key			*/
 	short		width;		/* field width			*/
 	unsigned long	maxval;		/* max value if !=0		*/
 	unsigned char	hex;		/* optional hex output		*/
-	unsigned char	left;		/* left adjusted		*/
 	unsigned char	missing;	/* missing in system		*/
 	unsigned char	already;	/* already specified		*/
 	short		cancel;		/* cancel this if specified	*/
 	short		prec;		/* field precision		*/
+	short		disable;	/* macro being expanded		*/
 	unsigned char	skip;		/* skip this			*/
+	char*		macro;		/* macro value			*/
 	const char*	sep;		/* next field separator		*/
 	Dtlink_t	hashed;		/* hash link			*/
-	struct Key*	next;		/* format link			*/
+	struct Key_s*	next;		/* format link			*/
 } Key_t;
 
 typedef struct				/* generic id table entry	*/
@@ -165,16 +183,17 @@ typedef struct				/* generic id table entry	*/
 	char		name[1];	/* id name			*/
 } Id_t;
 
-typedef struct Ps			/* process state		*/
+typedef struct Ps_s			/* process state		*/
 {
 	Dtlink_t	hashed;		/* pid hash link		*/
 	Dtlink_t	sorted;		/* sorted link			*/
 	struct prpsinfo	ps;		/* ps info			*/
-	struct Ps*	children;	/* child list			*/
-	struct Ps*	lastchild;	/* end of children		*/
-	struct Ps*	sibling;	/* sibling list			*/
-	struct Ps*	root;		/* (partial) root list		*/
+	struct Ps_s*	children;	/* child list			*/
+	struct Ps_s*	lastchild;	/* end of children		*/
+	struct Ps_s*	sibling;	/* sibling list			*/
+	struct Ps_s*	root;		/* (partial) root list		*/
 	char*		user;		/* user name			*/
+	int		level;		/* process tree level		*/
 	int		shown;		/* list state			*/
 } Ps_t;
 
@@ -195,8 +214,9 @@ typedef struct				/* program state		*/
 #endif
 	dev_t		ttydev;		/* controlling tty		*/
 	uid_t		caller;		/* caller effective uid		*/
-	Key_t*		format;		/* format list			*/
-	Key_t*		lastformat;	/* end of format list		*/
+	Key_t*		fields;		/* format field list		*/
+	char*		format;		/* sfkeyprintf() format		*/
+	Key_t*		lastfield;	/* end of format list		*/
 	Dt_t*		keys;		/* format keys			*/
 	Dt_t*		bypid;		/* procs by pid			*/
 	Dt_t*		byorder;	/* procs by pid			*/
@@ -206,6 +226,7 @@ typedef struct				/* program state		*/
 	Sfio_t*		mac;		/* temporary string stream	*/
 	Sfio_t*		nul;		/* temporary string stream	*/
 	Sfio_t*		tmp;		/* temporary string stream	*/
+	Sfio_t*		wrk;		/* temporary string stream	*/
 	char		branch[1024];	/* process tree branch		*/
 	char		buf[1024];	/* work buffer			*/
 } State_t;
@@ -236,114 +257,116 @@ typedef struct				/* program state		*/
 
 static Key_t	keys[] =
 {
-	{ 0 },
+	{
+		0
+	},
 	{
 		"addr",
 		"ADDR",
-		"physical address",
+		"Physical address.",
 		KEY_addr,
 		8
 	},
 	{
 		"args",
 		"COMMAND",
-		"command path with arguments",
+		"Command path with arguments.",
 		KEY_args,
-		12, 0,
-		0,1,0,0,
+		-12, 0,
+		0,0,0,
 		KEY_command
 	},
 	{
 		"class",
 		"CLS",
-		"scheduling class",
+		"Scheduling class.",
 		KEY_class,
 		3, 0,
-		0,0,!_mem_pr_clname_prpsinfo
+		0,!_mem_pr_clname_prpsinfo
 	},
 	{
 		"command",
 		"COMMAND",
-		"command file base name",
+		"Command file base name.",
 		KEY_command,
-		12, 0,
-		0,1,0,0,
+		-12, 0,
+		0,0,0,
 		KEY_args
 	},
 	{
 		"cpu",
 		"%CPU",
-		"cpu percent usage",
+		"Cpu percent usage.",
 		KEY_cpu,
 		4
 	},
 	{
 		"etime",
 		"ELAPSED",
-		"elapsed time since start",
+		"Elapsed time since start.",
 		KEY_etime,
 		7
 	},
 	{
 		"flags",
 		"F",
-		"state flags",
+		"State flags.",
 		KEY_flags,
 		2
 	},
 	{
 		"gid",
 		"GROUP",
-		"numeric group id",
+		"Numeric group id.",
 		KEY_gid,
 		8, 0,
-		0,0,0,0,
+		0,0,0,
 		KEY_group
 	},
 	{
 		"group",
 		"GROUP",
-		"group id name",
+		"Group id name.",
 		KEY_group,
 		8, 0,
-		0,0,0,0,
+		0,0,0,
 		KEY_gid
 	},
 	{
 		"nice",
 		"NI",
-		"adjusted scheduling priority",
+		"Adjusted scheduling priority.",
 		KEY_nice,
 		4
 	},
 	{
 		"ntpid",
 		"NTPID",
-		"nt process id",
+		"NT process id.",
 		KEY_ntpid,
 		5, 0,
-		1,0,!_mem_pr_ntpid_prpsinfo
+		1,!_mem_pr_ntpid_prpsinfo
 	},
 	{
 		"pgrp",
 		"PGRP",
-		"process group id",
+		"Process group id.",
 		KEY_pgrp,
 		5, PID_MAX,
-		1,0,0,0
+		1,0,0
 	},
 	{
 		"pid",
 		"PID",
-		"process id",
+		"Process id.",
 		KEY_pid,
 		5, PID_MAX,
-		1,0,0,0
+		1,0,0
 	},
 	{
 		"ppid",
 		"PPID",
-		"parent process id",
+		"Parent process id.",
 		KEY_ppid,
 		5, PID_MAX,
 		1
@@ -351,29 +374,29 @@ static Key_t	keys[] =
 	{
 		"pri",
 		"PRI",
-		"scheduling priority",
+		"Scheduling priority.",
 		KEY_pri,
 		3
 	},
 	{
 		"refcount",
 		"REFS",
-		"nt reference count",
+		"NT reference count.",
 		KEY_refcount,
 		4, 0,
-		1,0,!_mem_pr_refcount_prpsinfo
+		1,!_mem_pr_refcount_prpsinfo
 	},
 	{
 		"rss",
 		"RSS",
-		"resident page set size in kilobytes",
+		"Resident page set size in kilobytes.",
 		KEY_rss,
 		5
 	},
 	{
 		"sid",
 		"SID",
-		"session id",
+		"Session id.",
 		KEY_sid,
 		5, PID_MAX,
 		1
@@ -381,69 +404,68 @@ static Key_t	keys[] =
 	{
 		"size",
 		"SIZE",
-		"virtual memory size in kilobytes",
+		"Virtual memory size in kilobytes.",
 		KEY_size,
 		6
 	},
 	{
 		"start",
 		"START",
-		"start time",
+		"Start time.",
 		KEY_start,
 		8
 	},
 	{
 		"state",
 		"S",
-		"basic state",
+		"Basic state.",
 		KEY_state,
 		1
 	},
 	{
 		"tgrp",
 		"TGRP",
-		"terminal group id",
+		"Terminal group id.",
 		KEY_tgrp,
 		5, PID_MAX,
-		1,0,!_mem_pr_tgrp_prpsinfo
+		1,!_mem_pr_tgrp_prpsinfo
 	},
 	{
 		"time",
 		"TIME",
-		"usr+sys time",
+		"usr+sys time.",
 		KEY_time,
 		6
 	},
 	{
 		"tty",
 		"TT",
-		"controlling terminal base name",
+		"Controlling terminal base name.",
 		KEY_tty,
-		7, 0,
-		0,1
+		-7,
 	},
 	{
 		"uid",
 		"USER",
-		"numeric user id",
+		"Numeric user id.",
 		KEY_uid,
 		8, 0,
-		0,0,0,0,
+		0,0,0,
 		KEY_user
 	},
 	{
 		"user",
 		"USER",
-		"user id name",
+		"User id name.",
 		KEY_user,
 		8, 0,
-		0,0,0,0,
+		0,0,0,
 		KEY_uid
 	},
 	{
 		"wchan",
 		"WCHAN",
-		"wait address",
+		"Wait address.",
 		KEY_wchan,
 		8
 	},
@@ -464,6 +486,27 @@ static const char	newline[] = "\n";
 static const char	space[] = " ";
 
 static State_t		state;
+
+/*
+ * optget() info discipline function
+ */
+
+static int
+optinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
+{
+	register int	i;
+
+	if (streq(s, "formats"))
+		for (i = 1; i < elementsof(keys); i++)
+		{
+			sfprintf(sp, "[+%s?", keys[i].name);
+			if (keys[i].head)
+				sfprintf(sp, "%s The title string is \b%s\b and the default width is %d.]", keys[i].desc, keys[i].head, keys[i].width);
+			else
+				sfprintf(sp, "Equivalent to \b%s\b.]", keys[keys[i].index].name);
+		}
+	return 0;
+}
 
 /*
  * initialize the ttyid hash
@@ -607,11 +650,275 @@ ttybase(dev_t dev)
 }
 
 /*
+ * sfkeyprintf() lookup
+ * handle==0 for heading
+ */
+
+static int
+key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn)
+{
+	register Ps_t*		pp = (Ps_t*)handle;
+	register char*		s = 0;
+	register Sflong_t	n = 0;
+	register Key_t*		kp;
+	register int		i;
+	int			j;
+	unsigned long		u;
+
+	static char		sbuf[2];
+
+	if (!(kp = (Key_t*)dtmatch(state.keys, fp->t_str)))
+	{
+		if (*fp->t_str != '$')
+		{
+			error(3, "%s: unknown format key", fp->t_str);
+			return 0;
+		}
+		if (!(kp = newof(0, Key_t, 1, strlen(fp->t_str) + 1)))
+			error(3, "out of space [key]");
+		kp->name = strcpy((char*)(kp + 1), fp->t_str);
+		kp->macro = getenv(fp->t_str + 1);
+		kp->index = KEY_environ;
+		kp->disable = 1;
+		dtinsert(state.keys, kp);
+	}
+	if (kp->macro && !kp->disable)
+	{
+		kp->disable = 1;
+		sfkeyprintf(state.mac, handle, kp->macro, key, NiL);
+		s = sfstruse(state.mac);
+		kp->disable = 0;
+	}
+	else if (!pp)
+	{
+		if (fp->flags & SFFMT_ALTER)
+		{
+			if (kp->maxval)
+			{
+				for (i = 1; kp->maxval /= 10; i++);
+				if (kp->width < 0)
+				{
+					i = -i;
+					if (kp->width > i)
+						kp->width = i;
+				}
+				else if (kp->width < i)
+					kp->width = i;
+			}
+			if ((fp->width = kp->width) < 0)
+			{
+				fp->width = -fp->width;
+				fp->flags |= SFFMT_LEFT;
+			}
+			fp->precis = fp->width;
+		}
+		kp->width = fp->width;
+		if (fp->flags & SFFMT_LEFT)
+			kp->width = -kp->width;
+		fp->fmt = 's';
+		*ps = kp->head;
+	}
+	else
+	{
+		if ((fp->flags & SFFMT_ALTER) && (fp->width = kp->width) < 0)
+		{
+			fp->width = -fp->width;
+			fp->flags |= SFFMT_LEFT;
+		}
+		switch (kp->index)
+		{
+		case KEY_addr:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			n = (long)pp->ps.pr_addr;
+			goto hex;
+#if _mem_pr_clname_prpsinfo
+		case KEY_class:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			s = pp->ps.pr_clname;
+			break;
+#endif
+		case KEY_args:
+#if _mem_pr_psargs_prpsinfo
+			s = PR_ZOMBIE(&pp->ps) ? "<defunct>" : pp->ps.pr_psargs;
+			goto branch;
+#endif
+#ifdef _PS_args
+			sfprintf(state.tmp, _PS_path_num, pp->ps.pr_pid, _PS_args);
+			if ((i = open(sfstruse(state.tmp), O_RDONLY)) >= 0)
+			{
+				n = read(i, state.tmp->data, state.tmp->size - 1);
+				close(i);
+				if (n > 0)
+				{
+					s = state.tmp->data;
+					for (i = 0; i < n; i++)
+						if (!s[i])
+							s[i] = ' ';
+					s[i] = 0;
+					goto branch;
+				}
+			}
+#endif
+		case KEY_command:
+			s = PR_ZOMBIE(&pp->ps) ? "<defunct>" : pp->ps.pr_fname;
+#if _mem_pr_psargs_prpsinfo || defined(_PS_args)
+		branch:
+#endif
+			if (s[0] == '(' && s[i = strlen(s) - 1] == ')')
+			{
+				s[i] = 0;
+				s++;
+			}
+			if ((j = pp->level) > 0)
+			{
+				for (i = 0, j--; i < j; i++)
+					sfputr(state.wrk, state.branch[i] ? " |  " : "    ", -1);
+				sfputr(state.wrk, " \\_ ", -1);
+				sfputr(state.wrk, s, -1);
+				s = sfstruse(state.wrk);
+			}
+			break;
+		case KEY_cpu:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			n = pp->ps.pr_cpu;
+			goto percent;
+		case KEY_etime:
+			s = fmtelapsed(state.now - (unsigned long)PR_START(&pp->ps), 1);
+			break;
+		case KEY_flags:
+			n = pp->ps.pr_flag & 0xff;
+			goto hex;
+		case KEY_gid:
+			n = pp->ps.pr_gid;
+			goto number;
+		case KEY_group:
+			s = fmtgid(pp->ps.pr_gid);
+			break;
+		case KEY_nice:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			n = pp->ps.pr_nice;
+			goto number;
+#if _mem_pr_ntpid_prpsinfo
+		case KEY_ntpid:
+			n = pp->ps.pr_ntpid;
+			goto hex;
+#endif
+		case KEY_pgrp:
+			n = pp->ps.pr_pgrp;
+			goto number;
+		case KEY_pid:
+			n = pp->ps.pr_pid;
+			goto number;
+		case KEY_ppid:
+			n = pp->ps.pr_ppid;
+			break;
+		case KEY_pri:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			n = pp->ps.pr_pri;
+			goto number;
+#if _mem_pr_refcount_prpsinfo
+		case KEY_refcount:
+			n = pp->ps.pr_refcount;
+			goto number;
+#endif
+		case KEY_rss:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			n = pp->ps.pr_rssize;
+			goto number;
+		case KEY_sid:
+			n = pp->ps.pr_sid;
+			goto number;
+		case KEY_size:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			n = pp->ps.pr_size;
+			goto number;
+		case KEY_start:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			u = PR_START(&pp->ps);
+			s = fmttime((state.now - u) >= (24 * 60 * 60) ? "%y-%m-%d" : "%H:%M:%S", u);
+			break;
+		case KEY_state:
+			*(s = sbuf) = pp->ps.pr_sname;
+			*(s + 1) = 0;
+			break;
+#if _mem_pr_tgrp_prpsinfo
+		case KEY_tgrp:
+			n = pp->ps.pr_tgrp;
+			goto number;
+#endif
+		case KEY_time:
+			s = fmtelapsed(PR_TIME(&pp->ps), PR_HZ);
+			break;
+		case KEY_tty:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			s = ttybase(pp->ps.pr_ttydev);
+			if ((i = strlen(s) - kp->prec) > 0)
+			{
+				if (s[0] == 'p' && s[1] == 't')
+				{
+					if (s[2] == 'y')
+						s += 3;
+					else
+						s += 2;
+				}
+				else if (s[0] == 't' && s[1] == 't' && s[2] == 'y')
+					s += 3;
+				else
+					s += i;
+			}
+			break;
+		case KEY_uid:
+			n = pp->ps.pr_uid;
+			goto number;
+		case KEY_user:
+			s = pp->user;
+			break;
+		case KEY_wchan:
+			if (PR_ZOMBIE(&pp->ps))
+				goto zombie;
+			n = (long)pp->ps.pr_wchan;
+			goto hex;
+		default:
+			return 0;
+		zombie:
+			s = "";
+			break;
+		percent:
+			sfprintf(state.tmp, "%%%ld", n);
+			s = sfstruse(state.tmp);
+			break;
+		number:
+			if (!state.hex || !kp->hex)
+				break;
+		hex:
+			fp->fmt = 'x';
+			if (!kp->hex)
+				fp->flags |= SFFMT_ZERO;
+			break;
+		}
+		if (s)
+			*ps = s;
+		else
+			*pn = n;
+	}
+	return 1;
+}
+
+/*
  * ps a single proc
  */
 
 static void
-ps(Ps_t* pp, int level)
+ps(Ps_t* pp)
 {
 	register Key_t*			kp;
 	register struct prpsinfo*	pr;
@@ -619,11 +926,17 @@ ps(Ps_t* pp, int level)
 	register int			i;
 	register long			n;
 	unsigned long			u;
+	int				j;
 	char				sbuf[2];
 
 	pp->shown = 1;
+	if (state.format)
+	{
+		sfkeyprintf(sfstdout, pp, state.format, key, NiL);
+		return;
+	}
 	pr = &pp->ps;
-	for (kp = state.format; kp; kp = kp->next)
+	for (kp = state.fields; kp; kp = kp->next)
 	{
 		switch (kp->index)
 		{
@@ -671,10 +984,9 @@ ps(Ps_t* pp, int level)
 				s[i] = 0;
 				s++;
 			}
-			if (level > 0)
+			if ((j = pp->level) > 0)
 			{
-				level--;
-				for (i = 0; i < level; i++)
+				for (i = 0, j--; i < j; i++)
 					sfputr(sfstdout, state.branch[i] ? " |  " : "    ", -1);
 				sfputr(sfstdout, " \\_ ", -1);
 			}
@@ -754,7 +1066,7 @@ ps(Ps_t* pp, int level)
 			goto number;
 #endif
 		case KEY_time:
-			s = fmtelapsed(PR_TIME(pr), 1);
+			s = fmtelapsed(PR_TIME(pr), PR_HZ);
 			goto string;
 		case KEY_tty:
 			if (PR_ZOMBIE(pr))
@@ -820,7 +1132,8 @@ ps(Ps_t* pp, int level)
 static void
 kids(register Ps_t* pp, int level)
 {
-	ps(pp, level);
+	pp->level = level;
+	ps(pp);
 	if (level > 0)
 		state.branch[level - 1] = pp->sibling != 0;
 	if (level < elementsof(state.branch) - 1)
@@ -830,7 +1143,7 @@ kids(register Ps_t* pp, int level)
 }
 
 /*
- * ps() the select procs
+ * ps() the selected procs
  */
 
 static void
@@ -847,36 +1160,40 @@ list(void)
 	 * output the header
 	 */
 
-	while (state.format->skip)
-		state.format = state.format->next;
-	kp = state.format;
-	while (kp->next)
+	if (state.fields)
 	{
-		if (!kp->next->skip)
-			kp = kp->next;
-		else if (!(kp->next = kp->next->next))
+		while (state.fields->skip)
+			state.fields = state.fields->next;
+		kp = state.fields;
+		while (kp->next)
 		{
-			state.lastformat = kp;
-			break;
+			if (!kp->next->skip)
+				kp = kp->next;
+			else if (!(kp->next = kp->next->next))
+			{
+				state.lastfield = kp;
+				break;
+			}
 		}
+		n = 0;
+		for (kp = state.fields; kp; kp = kp->next)
+		{
+			if ((kp->prec = kp->width) < 0)
+				kp->prec = -kp->prec;
+			if (*kp->head)
+				n = 1;
+		}
+		kp = state.lastfield;
+		if (kp->width < 0)
+			kp->width = 0;
+		if (kp->index == KEY_args)
+			kp->prec = 80;
+		if (n)
+			for (kp = state.fields; kp; kp = kp->next)
+				sfprintf(sfstdout, "%*s%s", kp->width, kp->head, kp->sep);
 	}
-	n = 0;
-	for (kp = state.format; kp; kp = kp->next)
-	{
-		kp->prec = kp->width;
-		if (kp->left)
-			kp->width = -kp->width;
-		if (*kp->head)
-			n = 1;
-	}
-	kp = state.lastformat;
-	if (kp->width < 0)
-		kp->width = 0;
-	if (kp->index == KEY_args)
-		kp->prec = 80;
-	if (n)
-		for (kp = state.format; kp; kp = kp->next)
-			sfprintf(sfstdout, "%*s%s", kp->width, kp->head, kp->sep);
+	else
+		sfkeyprintf(sfstdout, NiL, state.format, key, NiL);
 	if (state.tree)
 	{
 		/*
@@ -909,7 +1226,8 @@ list(void)
 			if (!pp->shown)
 			{
 				pp->shown = 1;
-				ps(pp, 0);
+				pp->level = 0;
+				ps(pp);
 			}
 	}
 }
@@ -1015,11 +1333,7 @@ addpid(register char* s, int verbose)
 						sfclose(fp);
 					}
 				}
-				pr->pr_start = state.boot + pr->pr_start / 100;
-				pr->pr_utime /= 100;
-				pr->pr_cutime /= 100;
-				pr->pr_stime /= 100;
-				pr->pr_cstime /= 100;
+				pr->pr_start = state.boot + pr->pr_start / PR_HZ;
 #endif
 			}
 #else
@@ -1148,7 +1462,7 @@ addid(register char* s, int index, int (*getid)(const char*))
 }
 
 /*
- * add the format key in s into state.format
+ * add the format key in s into state.fields
  */
 
 static void
@@ -1229,10 +1543,10 @@ addkey(const char* k)
 		if (!kp->already)
 		{
 			kp->already = keys[kp->cancel].already = keys[kp->cancel].skip = 1;
-			if (state.lastformat)
-				state.lastformat = state.lastformat->next = kp;
+			if (state.lastfield)
+				state.lastfield = state.lastfield->next = kp;
 			else
-				state.format = state.lastformat = kp;
+				state.fields = state.lastfield = kp;
 			kp->sep = space;
 			if (kp->maxval)
 			{
@@ -1249,13 +1563,14 @@ main(int argc, register char** argv)
 {
 	register int	n;
 	register char*	s;
-	char*		usage;
 	DIR*		dir;
 	struct dirent*	ent;
-	Sfio_t*		sp;
+	Sfio_t*		fmt;
+	Key_t*		kp;
 	Dtdisc_t	kd;
 	Dtdisc_t	pd;
 	Dtdisc_t	sd;
+	Optdisc_t	od;
 	struct stat	st;
 
 	NoP(argc);
@@ -1263,13 +1578,17 @@ main(int argc, register char** argv)
 	setlocale(LC_ALL, "");
 	state.now = time((time_t*)0);
 	state.caller = geteuid();
-	if (!(sp = sfstropen()) || !(state.tmp = sfstropen()))
+	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()) || !(state.wrk = sfstropen()))
 		error(3, "out of space [tmp]");
 
 	/*
-	 * set up the cdt disciplines
+	 * set up the disciplines
 	 */
 
+	memset(&od, 0, sizeof(od));
+	od.version = OPT_VERSION;
+	od.infof = optinfo;
+	opt_info.disc = &od;
 	memset(&kd, 0, sizeof(kd));
 	kd.key = offsetof(Key_t, name);
 	kd.size = -1;
@@ -1285,22 +1604,13 @@ main(int argc, register char** argv)
 	sd.comparf = order;
 
 	/*
-	 * initialize the usage and format key table
+	 * initialize the format key table
 	 */
 
-	sfputr(sp, usage_1, -1);
 	if (!(state.keys = dtopen(&kd, Dthash)) || !(state.bypid = dtopen(&pd, Dthash)) || !(state.byorder = dtopen(&sd, Dttree)))
 		error(3, "out of space [dict]");
 	for (n = 1; n < elementsof(keys); n++)
-	{
 		dtinsert(state.keys, keys + n);
-		if (keys[n].head)
-			sfprintf(sp, "[+%s %s %d?%s]", keys[n].name, keys[n].head, keys[n].width, keys[n].desc);
-		else
-			sfprintf(sp, "[+%s %s %d?equivalent to %s]", keys[n].name, keys[keys[n].index].head, keys[keys[n].index].width, keys[keys[n].index].name);
-	}
-	sfputr(sp, usage_2, -1);
-	usage = sfstruse(sp);
 
 	/*
 	 * grab the options
@@ -1359,10 +1669,35 @@ main(int argc, register char** argv)
 			state.hex = !state.hex;
 			continue;
 		case 'D':
-			addkey(default_format);
+			if (s = strchr(opt_info.arg, '='))
+				*s++ = 0;
+			if (*opt_info.arg == 'n' && *(opt_info.arg + 1) == 'o')
+			{
+				opt_info.arg += 2;
+				s = 0;
+			}
+			if (!(kp = (Key_t*)dtmatch(state.keys, opt_info.arg)))
+			{
+				if (!s)
+					continue;
+				if (!(kp = newof(0, Key_t, 1, strlen(opt_info.arg) + 1)))
+					error(ERROR_SYSTEM|3, "out of space [macro]");
+				kp->name = strcpy((char*)(kp + 1), opt_info.arg);
+				dtinsert(state.keys, kp);
+			}
+			if (kp->macro = s)
+				stresc(s);
+			continue;
+		case 'F':
+			if (sfstrtell(fmt))
+				sfputc(fmt, ' ');
+			sfputr(fmt, opt_info.arg, -1);
 			continue;
 		case 'G':
 			addid(opt_info.arg, KEY_group, strgid);
+			continue;
+		case 'N':
+			addkey(default_format);
 			continue;
 		case 'T':
 			state.tree = 1;
@@ -1379,8 +1714,18 @@ main(int argc, register char** argv)
 	argv += opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
-	if (!state.format)
-		addkey(default_format);
+	if (sfstrtell(fmt))
+	{
+		sfputc(fmt, '\n');
+		state.format = sfstruse(fmt);
+	}
+	else
+	{
+		sfclose(fmt);
+		fmt = 0;
+		if (!state.fields)
+			addkey(default_format);
+	}
 
 	/*
 	 * add each proc by name
@@ -1413,10 +1758,14 @@ main(int argc, register char** argv)
 	 * list the procs
 	 */
 
-	state.lastformat->sep = newline;
+	if (state.fields)
+		state.lastfield->sep = newline;
 	list();
-	exit(error_info.errors != 0);
+	return error_info.errors != 0;
 }
+#if __OBSOLETE__ < 20010101
+#include "../../lib/libast/disc/sfkeyprintf.c"
+#endif
 
 #else
 

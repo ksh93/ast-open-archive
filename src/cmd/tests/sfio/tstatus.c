@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,7 +24,7 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	Sfio_t*	ip;
 	Sfio_t*	op;
@@ -32,7 +32,7 @@ main()
 
 	if(!(ip = sfopen((Sfio_t*)0, "/dev/null", "r")))
 		terror("/dev/null read open\n");
-	if(!(op = sfopen((Sfio_t*)0, sftfile(0), "w")))
+	if(!(op = sfopen((Sfio_t*)0, tstfile(0), "w")))
 		terror("Write open\n");
 
 	n = (int)sfmove(ip, op, SF_UNBOUND, -1);
@@ -54,7 +54,5 @@ main()
 	if(sfclose(op))
 		terror("sfclose(op)\n");
 
-	sftcleanup();
-
-	return 0;
+	TSTRETURN(0);
 }

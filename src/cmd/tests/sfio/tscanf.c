@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,11 +24,29 @@
 ***************************************************************/
 #include	"sftest.h"
 
-#ifndef MAXDOUBLE
-#define MAXDOUBLE	DBL_MAX
+#if _hdr_values
+#include	<values.h>
 #endif
 
-main()
+#if _hdr_math
+#include	<math.h>
+#endif
+
+#if _hdr_float
+#include	<float.h>
+#endif
+
+#if defined(MAXDOUBLE)
+#define	MAXD	MAXDOUBLE
+#endif
+#if !defined(MAXD) && defined(DBL_MAX)
+#define MAXD	DBL_MAX
+#endif
+#if !defined(MAXD)
+#define MAXD	(double)(~((unsigned long)0))
+#endif
+
+MAIN()
 {
 	char	str[8], c[4], cl[8];
 	int	i, j, k, n;
@@ -131,7 +149,7 @@ main()
 		terror("Bad return values: f=%.4f d=%.4lf\n",f,d);
 
 	/* test for scanning max double value */
-	s = sfprints("%.14le",MAXDOUBLE);
+	s = sfprints("%.14le",MAXD);
 	if(!s || s[0] < '0' || s[0] > '9')
 		terror("sfprints failed\n");
 	for(i = 0; s[i]; ++i)
@@ -140,7 +158,7 @@ main()
 	if(s[i-1] > '0' && s[i-1] <= '9')
 		s[i-1] -= 1;
 	sfsscanf(s,"%le",&d);
-	if(d > MAXDOUBLE || d < MAXDOUBLE/2)
+	if(d > MAXD || d < MAXD/2)
 		terror("sfscanf of MAXDOUBLE failed\n");
 
 	if(!(sf = sftmp(8*1024)) )
@@ -170,5 +188,18 @@ main()
 	if(sfsscanf("2#1001","%#i%c",&i,c) != 2 || i != 2 || c[0] != '#')
 		terror("Bad %%#i scanning\n");
 
-	return 0;
+	n = -1;
+	if(sfsscanf("12345","%d%n",&k,&n) != 1 || k != 12345 || n != 5)
+		terror("Bad scanning results");
+	n = -1;
+	if(sfsscanf("12345","%d %n",&k,&n) != 1 || k != 12345 || n != 5)
+		terror("Bad scanning results");
+	n = -1;
+	if(sfsscanf("12345 ","%d%n",&k,&n) != 1 || k != 12345 || n != 5)
+		terror("Bad scanning results");
+	n = -1;
+	if(sfsscanf("12345 ","%d %n",&k,&n) != 1 || k != 12345 || n != 6)
+		terror("Bad scanning results");
+
+	TSTRETURN(0);
 }

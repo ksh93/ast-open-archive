@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -27,7 +27,7 @@
  * Glenn Fowler
  * AT&T Research
  *
- * atd -- the other side of at -- must run as root
+ * at.svc -- the other side of at -- must run as root
  *
  * the at control dir hierarchy, all files owned by root
  *
@@ -40,7 +40,7 @@
  * <time> is the earliest absolute time the job can be run
  */
 
-static const char id[] = "\n@(#)atd (AT&T Research) 1999-10-11\0\n";
+static const char id[] = "\n@(#)at.svc (AT&T Research) 2000-06-16\0\n";
 
 #include "at.h"
 
@@ -57,14 +57,14 @@ static const char id[] = "\n@(#)atd (AT&T Research) 1999-10-11\0\n";
 #endif
 
 #define HOG		(NPROC*10)
-#define LOAD		500
+#define LOAD		0
 #define MSMAX		(LONG_MAX/1000)
 #define NAME		22
 #define NICE		2
 #define NPROC		10
 #define PERUSER		(NPROC/2)
 #define SMAX		ULONG_MAX
-#define WAIT		60
+#define WAIT		0
 
 typedef struct
 {
@@ -102,6 +102,7 @@ typedef struct
 	int		wait;
 	int		pending;
 	int		running;
+	int		specific;
 	unsigned long	total;
 	char		name[1];
 } Queue_t;
@@ -312,9 +313,10 @@ queue(register State_t* state, register char* s)
 		if (!que->owner && !(que->owner = dtopen(&state->table.owner.discipline, Dthash)))
 			error(ERROR_SYSTEM|3, "out of space [queue %s owner hash]", que->name);
 		que->allow = -1;
+		que->specific = 0;
 		while ((s = t) && *s)
 		{
-			n = strton(s, &t, NiL, 0);
+			n = strtol(s, &t, 10);
 			if (t == s)
 				n = 1;
 			switch (*t++)
@@ -344,6 +346,7 @@ queue(register State_t* state, register char* s)
 			case ' ':
 			case '\t':
 				que->allow = *(t - 2) == '+';
+				que->specific = 1;
 				dtwalk(que->owner, allow, que);
 				s = t;
 				for (;;)
@@ -359,11 +362,14 @@ queue(register State_t* state, register char* s)
 					if (!*t)
 						break;
 					usr = user(state, t, 0);
-					if (!(own = newof(0, Owner_t, 1, 0)))
-						error(ERROR_SYSTEM|3, "out of space [queue owner]");
+					if (!(own = (Owner_t*)dtmatch(que->owner, &usr)))
+					{
+						if (!(own = newof(0, Owner_t, 1, 0)))
+							error(ERROR_SYSTEM|3, "out of space [queue owner]");
+						own->user = usr;
+						dtinsert(que->owner, own);
+					}
 					own->allow = que->allow;
-					own->user = usr;
-					dtinsert(que->owner, own);
 				}
 				t = 0;
 				break;
@@ -373,7 +379,7 @@ queue(register State_t* state, register char* s)
 }
 
 /*
- * update state from the queue file
+ * update state from the queue, allow and deny files
  */
 
 static void
@@ -381,13 +387,19 @@ update(register State_t* state)
 {
 	register char*		s;
 	register Sfio_t*	sp;
-	Queue_t*		que;
+	register Queue_t*	que;
+	User_t*			usr;
+	Owner_t*		own;
+	int			permit;
+	char*			file;
+	char*			path;
 	struct stat		st;
 
-	static const char	file[] = AT_QUEUE_FILE;
-
-	if (sp = sfopen(NiL, file, "r"))
+	sfprintf(state->tmp, "%s/%s/%s", state->pwd, state->pwd, AT_QUEUE_FILE);
+	pathcanon(path = sfstruse(state->tmp), 0);
+	if (sp = sfopen(NiL, path, "r"))
 	{
+		error(0, "scan %s queue list", path);
 		if (fstat(sffileno(sp), &st) || st.st_mtime != state->update)
 		{
 			state->update = st.st_mtime;
@@ -396,9 +408,67 @@ update(register State_t* state)
 			while (s = sfgetr(sp, '\n', 1))
 				queue(state, s);
 			if (!state->queue && !(state->queue = que))
-				error(ERROR_SYSTEM|3, "%s: no queues", file);
+				error(ERROR_SYSTEM|3, "%s: no queues", path);
 		}
 		sfclose(sp);
+	}
+
+	/*
+	 * apply the global allow/deny files to queues
+	 * with no specific allow/deny overrides
+	 */
+
+	for (que = (Queue_t*)dtfirst(state->table.queue.handle); que && que->specific; que = (Queue_t*)dtnext(state->table.queue.handle, que));
+	if (que && !stat(file = AT_CRON_DIR, &st) && S_ISDIR(st.st_mode))
+	{
+		sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_ALLOW_FILE);
+		pathcanon(path = sfstruse(state->tmp), 0);
+		if (sp = sfopen(NiL, path, "r"))
+			permit = 1;
+		else
+		{
+			permit = 0;
+			sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_DENY_FILE);
+			pathcanon(path = sfstruse(state->tmp), 0);
+			sp = sfopen(NiL, path, "r");
+		}
+
+		/*
+		 * reset the queue and associated user access
+		 */
+
+		for (que = (Queue_t*)dtfirst(state->table.queue.handle); que; que = (Queue_t*)dtnext(state->table.queue.handle, que))
+			if (!que->specific)
+			{
+				que->allow = permit;
+				dtwalk(que->owner, allow, que);
+			}
+
+		/*
+		 * scan and update the access
+		 */
+
+		if (sp)
+		{
+			error(0, "scan %s access list", path);
+			while (s = sfgetr(sp, '\n', 1))
+			{
+				usr = user(state, s, 0);
+				for (que = (Queue_t*)dtfirst(state->table.queue.handle); que; que = (Queue_t*)dtnext(state->table.queue.handle, que))
+					if (!que->specific)
+					{
+						if (!(own = (Owner_t*)dtmatch(que->owner, &usr)))
+						{
+							if (!(own = newof(0, Owner_t, 1, 0)))
+								error(ERROR_SYSTEM|3, "out of space [queue owner]");
+							own->user = usr;
+							dtinsert(que->owner, own);
+						}
+						own->allow = que->allow;
+					}
+			}
+			sfclose(sp);
+		}
 	}
 }
 
@@ -674,7 +744,7 @@ listqueue(Dt_t* dt, void* object, void* handle)
 	s = sfstruse(state->tmp);
 	if (!s[2])
 		*s = 0;
-	error(ERROR_OUTPUT|0, con->fd, "%-3s %5lu %3d %3d %3d %3d %3d %2d.%02d %s%s", que->name, que->total, que->pending, que->running, que->nproc, que->peruser, que->nice, que->load / 100, que->load % 100, fmtelapsed(que->wait, 1), s);
+	error(ERROR_OUTPUT|0, con->fd, "%-3s %5lu %3d %3d %3d %3d %3d %2d.%02d %5.5s%s", que->name, que->total, que->pending, que->running, que->nproc, que->peruser, que->nice, que->load / 100, que->load % 100, fmtelapsed(que->wait, 1), s);
 	return 0;
 }
 
@@ -772,6 +842,7 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 		message((error_info.trace, "%s", id + 5));
 		break;
 	case AT_INFO:
+		error(ERROR_OUTPUT|0, con->fd, "at service daemon pid %ld user %s", state->con[0].id.pid, fmtuid(state->admin[0]));
 		error(ERROR_OUTPUT|0, con->fd, "QUE TOTAL SUB RUN MAX USR PRI  LOAD  WAIT ACCESS");
 		visit.state = state;
 		visit.con = con;
@@ -808,7 +879,7 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 		if (data)
 			sfsprintf(job->name, sizeof(job->name), "%s", data);
 		else
-			sfsprintf(job->name, sizeof(job->name), "%..64lu.%..64lu.%..64lu", con->id.uid, con->id.gid, state->sequence++);
+			sfsprintf(job->name, sizeof(job->name), "%..36lu.%..36lu.%..36lu", con->id.uid, con->id.gid, state->sequence++);
 		s = (char*)memcpy(job->data, t, s - t);
 		job->start = cs.time;
 		job->shell = s;
@@ -860,44 +931,66 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 			job->start = tmdate(job->repeat, NiL, NiL);
 		if (!state->init && !*(t = job->label))
 		{
-			for (t = b + skip; *t; t++)
-				if (isalnum(*t))
-				{
-					u = t;
-					while (isalnum(*++t));
-					c = t - u;
-					if (c == 3 && strneq(u, "for", 3) || c == 2 && strneq(u, "if", 2) || c == 5 && strneq(u, "while", 5))
-						continue;
-					break;
-				}
 			m = 0;
-			x = -1;
-			while (c = *t++)
+			t = b + skip;
+			if (*t == ':')
 			{
-				if (isalnum(c))
+				while (isspace(*++t));
+				if (u = strchr(t, ';'))
 				{
-					if (x)
-					{
-						if (x > 0)
-						{
-							w = sfstrtell(state->tmp);
-							if (++m >= sizeof(job->label))
-								break;
-							sfputc(state->tmp, '.');
-						}
-						x = 0;
-					}
-					if (++m >= sizeof(job->label))
-						break;
-					sfputc(state->tmp, c);
+					while (u > t && isspace(*(u - 1)))
+						u--;
+					m = u - t;
 				}
-				else if (!x)
-					x = 1;
 			}
-			if (m >= sizeof(job->label))
-				sfstrset(state->tmp, w);
-			t = sfstruse(state->tmp);
-			strcpy(job->label, t);
+			if (m)
+			{
+				if (m >= sizeof(job->label))
+					m = sizeof(job->label) - 1;
+				memcpy(job->label, t, m);
+				job->label[m] = 0;
+			}
+			else
+			{
+				for (t = b + skip; *t; t++)
+					if (isalnum(*t))
+					{
+						u = t;
+						while (isalnum(*++t));
+						c = t - u;
+						if (c == 3 && strneq(u, "for", 3) || c == 2 && strneq(u, "if", 2) || c == 5 && strneq(u, "while", 5))
+							continue;
+						break;
+					}
+				m = 0;
+				x = -1;
+				while (c = *t++)
+				{
+					if (isalnum(c))
+					{
+						if (x)
+						{
+							if (x > 0)
+							{
+								w = sfstrtell(state->tmp);
+								if (++m >= sizeof(job->label))
+									break;
+								sfputc(state->tmp, '.');
+							}
+							x = 0;
+						}
+						if (++m >= sizeof(job->label))
+							break;
+						sfputc(state->tmp, c);
+					}
+					else if (!x)
+						x = 1;
+				}
+				if (m >= sizeof(job->label))
+					sfstrset(state->tmp, w);
+				t = sfstruse(state->tmp);
+				strcpy(job->label, t);
+			}
 		}
 		submit(state, job);
 		if (!state->init)
@@ -969,8 +1062,8 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 					break;
 				case AT_STATUS:
 					if (!m++)
-						error(ERROR_OUTPUT|0, con->fd, "JOB            LABEL        PID QUE  USER     START                REPEAT");
-					error(ERROR_OUTPUT|0, con->fd, "%-14s %-*s%5d %-3s  %-8.8s %s  %s", job->name, sizeof(job->label), job->label, job->pid, job->queue->name, job->owner->user->name, fmttime(AT_TIME_FORMAT, job->start), job->period);
+						error(ERROR_OUTPUT|0, con->fd, "JOB               LABEL        PID Q USER     START               REPEAT");
+					error(ERROR_OUTPUT|0, con->fd, "%-17s %-*s%5d %-1s %-8.8s %s %s", job->name, sizeof(job->label), job->label, job->pid, job->queue->name, job->owner->user->name, fmttime(AT_TIME_FORMAT, job->start), job->period);
 					break;
 				case AT_REMOVE:
 					if (con->id.uid == job->id.uid || !con->id.uid)
@@ -1057,6 +1150,57 @@ order(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 	return r1;
 }
 
+static unsigned long	rollover;	/* XXX stampwrite() has no discipline	*/
+
+/*
+ * commit to the log file
+ * if its too big then rename to .old and start fresh
+ */
+
+static void
+commit(void)
+{
+	int		rolled;
+	int		fd;
+	time_t		t;
+	unsigned long	now;
+	struct stat	st;
+	char		buf[PATH_MAX];
+	Tm_t*		tm;
+
+	now = NOW;
+	if (!rollover)
+	{
+		t = stat(AT_LOG_FILE, &st) ? now : st.st_mtime;
+		tm = tmmake(&t);
+		tm->tm_mon++;
+		tm->tm_mday = 1;
+		tm->tm_hour = 0;
+		tm->tm_min = 0;
+		tm->tm_sec = 0;
+		rollover = tmtime(tm, TM_LOCALZONE);
+	}
+	if (now >= rollover)
+	{
+		rolled = 1;
+		error(0, "log file rollover");
+		sfsprintf(buf, sizeof(buf), "%s.old", AT_LOG_FILE);
+		remove(buf);
+		if (rename(AT_LOG_FILE, buf))
+			error(ERROR_SYSTEM|AT_STRICT, "%s: cannot rename log file to %s", AT_LOG_FILE, buf);
+		t = rollover;
+		tm = tmmake(&t);
+		tm->tm_mon++;
+		rollover = tmtime(tm, TM_LOCALZONE);
+	}
+	else
+		rolled = 0;
+	if ((fd = open(AT_LOG_FILE, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0 || fd != 2 && (dup2(fd, 2) != 2 || close(fd)))
+		error(ERROR_SYSTEM|AT_STRICT, "%s: cannot append to log file", AT_LOG_FILE);
+	if (rolled)
+		error(0, "log file rollover");
+}
+
 /*
  * prepend current date-time to buffer on fd==2
  * and drop the initial command label if any
@@ -1065,14 +1209,24 @@ order(Dt_t* dt, void* a, void* b, Dtdisc_t* disc)
 static ssize_t
 stampwrite(int fd, const void* buf, size_t n)
 {
-	register char*	s;
-	register int	i;
+	register char*		s;
+	register int		i;
+	register ssize_t	r;
+	register ssize_t	z;
+	unsigned long		now;
 
-	if (fd == 2 && (s = fmttime(AT_TIME_FORMAT, NOW)))
+	r = 0;
+	now = NOW;
+	if (now >= rollover)
+		commit();
+	if (fd == 2 && (s = fmttime(AT_TIME_FORMAT, now)))
 	{
 		i = strlen(s);
 		s[i++] = ' ';
-		write(fd, s, i);
+		if ((z = write(fd, s, i)) < 0)
+			r = -1;
+		else
+			r += z;
 		for (s = (char*)buf; s < ((char*)buf + n - 1) && !isspace(*s); s++)
 			if (*s == ':')
 			{
@@ -1082,7 +1236,11 @@ stampwrite(int fd, const void* buf, size_t n)
 				break;
 			}
 	}
-	return write(fd, buf, n);
+	if ((z = write(fd, buf, n)) < 0)
+		r = -1;
+	else if (r >= 0)
+		r += z;
+	return r;
 }
 
 /*
@@ -1159,6 +1317,19 @@ init(const char* path)
 		i = 20;
 	if (!(state = newof(0, State_t, 1, (i - 1) * sizeof(Connection_t))))
 		error(ERROR_SYSTEM|3, "out of space [state]");
+	state->bufsiz = 4 * PATH_MAX;
+	if (!(state->buf = newof(0, char, state->bufsiz, 0)))
+		error(ERROR_SYSTEM|3, "out of space [buf]");
+	if (!(state->tmp = sfstropen()))
+		error(ERROR_SYSTEM|3, "out of space [tmp]");
+	ap = state->admin;
+	*ap++ = state->con[0].id.uid = geteuid();
+	*ap++ = 0;
+	s = state->buf;
+	if (!pathpath(s, AT_JOB_DIR, "", PATH_ABSOLUTE|PATH_EXECUTE) || lstat(s, &ds) || !AT_DIR_OK(&ds))
+		error(ERROR_SYSTEM|3, "%s: job directory not found", AT_JOB_DIR);
+	if (ds.st_uid != state->admin[0])
+		error(ERROR_SYSTEM|3, "%s: job directory uid %d != effective uid %d", s, ds.st_uid, state->admin[0]);
 	state->disc.version = CSS_VERSION;
 	state->disc.flags = CSS_DAEMON|CSS_ERROR|CSS_INTERRUPT|CSS_WAKEUP;
 	state->disc.errorf = (Csserror_f)errorf;
@@ -1167,29 +1338,18 @@ init(const char* path)
 	state->disc.exceptf = exception;
 	if (!(state->css = cssopen(path, &state->disc)))
 		return -1;
-	ap = state->admin;
-	*ap++ = state->con[0].id.uid = geteuid();
-	*ap++ = 0;
 	state->con[0].id.gid = getegid();
 	state->con[0].id.pid = getpid();
 	state->con[0].id.hid = csaddr(state->css->state, NiL);
 	state->con[0].fd = 2;
 	state->init = 1;
-	state->bufsiz = 4 * PATH_MAX;
-	if (!(state->buf = newof(0, char, state->bufsiz, 0)))
-		error(ERROR_SYSTEM|3, "out of space [buf]");
-	if (!(state->tmp = sfstropen()))
-		error(ERROR_SYSTEM|3, "out of space [tmp]");
-	s = state->buf;
-	if (!pathpath(s, AT_JOB_DIR, "", PATH_ABSOLUTE|PATH_EXECUTE) || lstat(s, &ds) || !AT_DIR_OK(&ds))
-		error(ERROR_SYSTEM|3, "%s: job directory not found", AT_JOB_DIR);
 	b = s + strlen(s);
 	*b++ = '/';
 	sfsprintf(b, state->bufsiz - (b - s), "%s", csname(state->css->state, 0L));
 	if (lstat(s, &hs) && (mkdir(s, AT_DIR_MODE) || chmod(s, AT_DIR_MODE) || lstat(s, &hs)))
 		error(ERROR_SYSTEM|3, "%s: cannot create job host directory", s);
-	if (!AT_DIR_OK(&hs) || chdir(s))
-		error(ERROR_SYSTEM|3, "%s: invalid job host directory %s", s, fmtmode(hs.st_mode, 0));
+	if (!AT_DIR_OK(&hs) || ds.st_uid != hs.st_uid || chdir(s))
+		error(ERROR_SYSTEM|3, "%s: invalid job host directory %s [dir.uid=%d host.uid=%d]", s, fmtmode(hs.st_mode, 0), ds.st_uid, hs.st_uid);
 	if (!(state->pwd = strdup(s)))
 		error(ERROR_SYSTEM|3, "out of space [pwd]");
 	if (hs.st_uid != state->admin[0])
@@ -1204,10 +1364,10 @@ init(const char* path)
 		error(3, "%s: invalid #%d", s, __LINE__);
 	if (!(xs.st_mode&S_ISUID) && geteuid() != 0 && geteuid() != xs.st_uid)
 		error(3, "%s: invalid #%d", s, __LINE__);
-	#if 0
+#if 0
 	if (!AT_EXEC_OK(&ds, &xs))
 		error(3, "%s: invalid [ mode=%04o uid=%d euid=%d t1=%04o t2=%04o==%04o ]", s, xs.st_mode, xs.st_uid, geteuid(), S_ISREG(xs.st_mode), xs.st_mode&(S_IXUSR|S_IXGRP|S_IWOTH|S_IXOTH), (S_IXUSR|S_IXGRP|S_IXOTH));
-	#endif
+#endif
 	*ap++ = ds.st_uid;
 	*ap = xs.st_uid;
 	limited = (xs.st_mode & S_ISUID) ? (unsigned long)xs.st_uid : state->admin[0];
@@ -1237,26 +1397,56 @@ init(const char* path)
 		error(ERROR_SYSTEM|3, "out of space [user table]");
 	for (i = 0; i < elementsof(queuedefs); i++)
 		queue(state, strcpy(state->buf, queuedefs[i]));
-	update(state);
-
-	/*
-	 * commit to the at log file
-	 */
-
-	if ((i = open(AT_LOG_FILE, O_CREAT|O_WRONLY|O_APPEND, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH)) < 0 || i != 2 && (dup2(i, 2) != 2 || close(i)))
-		error(ERROR_SYSTEM|AT_STRICT, "%s: cannot append to log file", AT_LOG_FILE);
+	commit();
 	error(0, "daemon restart pid %ld user %s", state->con[0].id.pid, fmtuid(state->admin[0]));
 	if (limited)
 		error(0, "service limited to user %s", fmtuid(limited));
+
+	/*
+	 * update the queue definitions
+	 */
+
+	update(state);
+
+	/*
+	 * resubmit old jobs
+	 */
+
 	if (dir = opendir("."))
 	{
 		while (ent = readdir(dir))
-			if (sfsscanf(s = ent->d_name, "%..64lu.%..64lu.%..64lu", &state->con[0].id.uid, &state->con[0].id.gid, &cs.time) != 3 || lstat(s, &js) || !AT_OLD_OK(&ds, &js))
+			if (lstat(s = ent->d_name, &js))
 			{
-				if (S_ISREG(ds.st_mode))
-					remove(s);
+				error(0, "cannot stat old job %s", s);
+				remove(s);
 			}
-			else if (sp = sfopen(NiL, s, "r"))
+			else if (!S_ISREG(js.st_mode))
+			{
+				if (!streq(s, ".") && !streq(s, ".."))
+				{
+					error(0, "invalid old job %s type %s rejected", s, fmtmode(js.st_mode, 0));
+					if (S_ISDIR(js.st_mode))
+						rmdir(s);
+					else
+						remove(s);
+				}
+			}
+			else if (sfsscanf(s, "%..36lu.%..36lu.%..36lu", &state->con[0].id.uid, &state->con[0].id.gid, &cs.time) != 3)
+			{
+				error(0, "invalid old job %s name rejected", s);
+				remove(s);
+			}
+			else if (!AT_OLD_OK(&hs, &js))
+			{
+				error(0, "invalid old job %s mode %s rejected [dir.uid=%d job.uid=%d]", s, fmtmode(js.st_mode, 0), hs.st_uid, js.st_uid);
+				remove(s);
+			}
+			else if (!(sp = sfopen(NiL, s, "r")))
+			{
+				error(0, "cannot read old job %s", s);
+				remove(s);
+			}
+			else
 			{
 				if (b = (char*)sfreserve(sp, SF_UNBOUND, 1))
 					command(state, state->con, b, sfvalue(sp), s);
@@ -1277,7 +1467,7 @@ main(int argc, char** argv)
 {
 	NoP(argc);
 	NoP(argv);
-	error_info.id = "atd";
+	error_info.id = "at.svc";
 	error_info.write = stampwrite;
 	if (!init(argv[1]))
 		csspoll(CS_NEVER, 0);

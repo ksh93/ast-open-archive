@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -1223,6 +1223,7 @@ scanargs(int argc, char** argv, int* argf)
 	}
 	sfprintf(up, usage2, version);
 	usage = sfstruse(up);
+	args = 0;
 	done = 0;
  again:
 	while (i = optget(argv, usage))
@@ -1249,7 +1250,6 @@ scanargs(int argc, char** argv, int* argf)
 	}
 	if (!done && streq(argv[opt_info.index - 1], "--"))
 		done = 1;
-	args = argc;
 	for (i = opt_info.index; i < argc; i++)
 	{
 		s = argv[i];
@@ -1278,7 +1278,7 @@ scanargs(int argc, char** argv, int* argf)
 					else
 					{
 						argf[i] |= ARG_SCRIPT;
-						if (args >= argc)
+						if (!args)
 							args = i;
 					}
 					break;
@@ -1286,13 +1286,13 @@ scanargs(int argc, char** argv, int* argf)
 			if (!*s)
 			{
 				argf[i] |= ARG_TARGET;
-				if (args >= argc)
+				if (!args)
 					args = i;
 			}
 		}
 	}
 	sfstrclose(up);
-	return args;
+	return args ? args : argc;
 }
 
 /*

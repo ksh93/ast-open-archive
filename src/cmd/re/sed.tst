@@ -259,7 +259,7 @@ TEST 26 'multiple w files, multiple inputs, OUTPUT1 empty'
 	EXEC -f script -n
 		INPUT - $'1\n2\n3\n4\n5\n6\n7\n8\n9'
 		INPUT script $'9,$d\nw out9\n8,$d\nw out8\n7,$d\nw out7\n6,$d\nw out6\n5,$d\nw out5\n4,$d\nw out4\n3,$d\nw out3\n2,$d\nw out2\n1,$d\nw out1'
-		OUTPUT out1 $''
+		OUTPUT -n out1
 		OUTPUT out2 $'1'
 		OUTPUT out3 $'1\n2'
 		OUTPUT out4 $'1\n2\n3'

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -107,7 +107,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done huffman.h
 done pack.c
 prev pack.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c pack.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c pack.c
 done pack.o generated
 make libhuff.a archive
 make huff.req
@@ -118,7 +118,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in huff ast
+exec - for i in huff  ast
 exec - do	case $i in
 exec - 	"huff"|huff)
 exec - 		;;
@@ -177,7 +177,7 @@ done huffdecode.o generated
 exec - ${AR} cr libhuff.a huffinit.o huffgethdr.o huffputhdr.o huffencode.o huffdecode.o
 exec - (ranlib libhuff.a) >/dev/null 2>&1 || true
 done libhuff.a generated
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o pack pack.o libhuff.a ${mam_libast}
 done pack generated
 make unpack
@@ -198,7 +198,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev huffman.h implicit
 done unpack.c
 prev unpack.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c unpack.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1993-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?pack]"\" -c unpack.c
 done unpack.o generated
 prev libhuff.a archive
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o unpack unpack.o libhuff.a ${mam_libast}
@@ -238,15 +238,15 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/pack
 prev pack
-exec - mv ${INSTALLROOT}/bin/pack ${INSTALLROOT}/bin/pack.old 2>/dev/null || true; cp pack ${INSTALLROOT}/bin/pack
+exec - mv ${INSTALLROOT}/bin/pack ${INSTALLROOT}/bin/pack.old 2>/dev/null || true; test '' = 'pack' || { cp pack ${INSTALLROOT}/bin/pack  		    		    ;}
 done ${INSTALLROOT}/bin/pack generated
 make ${INSTALLROOT}/bin/unpack
 prev unpack
-exec - mv ${INSTALLROOT}/bin/unpack ${INSTALLROOT}/bin/unpack.old 2>/dev/null || true; cp unpack ${INSTALLROOT}/bin/unpack
+exec - mv ${INSTALLROOT}/bin/unpack ${INSTALLROOT}/bin/unpack.old 2>/dev/null || true; test '' = 'unpack' || { cp unpack ${INSTALLROOT}/bin/unpack  		    		    ;}
 done ${INSTALLROOT}/bin/unpack generated
 make ${INSTALLROOT}/bin/pcat
 prev pcat
-exec - mv ${INSTALLROOT}/bin/pcat ${INSTALLROOT}/bin/pcat.old 2>/dev/null || true; cp pcat ${INSTALLROOT}/bin/pcat
+exec - mv ${INSTALLROOT}/bin/pcat ${INSTALLROOT}/bin/pcat.old 2>/dev/null || true; test '' = 'pcat' || { cp pcat ${INSTALLROOT}/bin/pcat  		    		    ;}
 done ${INSTALLROOT}/bin/pcat generated
 make ${PACKAGE_ast_LIB}
 exec - set -
@@ -274,7 +274,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libhuff.a archive
 prev libhuff.a archive
-exec - mv ${PACKAGE_ast_LIB}/libhuff.a ${PACKAGE_ast_LIB}/libhuff.a.old 2>/dev/null || true; cp libhuff.a ${PACKAGE_ast_LIB}/libhuff.a
+exec - mv ${PACKAGE_ast_LIB}/libhuff.a ${PACKAGE_ast_LIB}/libhuff.a.old 2>/dev/null || true; test '' = 'libhuff.a' || { cp libhuff.a ${PACKAGE_ast_LIB}/libhuff.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libhuff.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libhuff.a generated
 make ${INSTALLROOT}/man/man3
@@ -304,7 +304,7 @@ done ${INSTALLROOT}/man/man3 generated
 make ${INSTALLROOT}/man/man3/huff.3
 make huff.3
 done huff.3
-exec - mv ${INSTALLROOT}/man/man3/huff.3 ${INSTALLROOT}/man/man3/huff.3.old 2>/dev/null || true; cp huff.3 ${INSTALLROOT}/man/man3/huff.3
+exec - mv ${INSTALLROOT}/man/man3/huff.3 ${INSTALLROOT}/man/man3/huff.3.old 2>/dev/null || true; test '' = 'huff.3' || { cp huff.3 ${INSTALLROOT}/man/man3/huff.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/huff.3 generated
 make ${PACKAGE_ast_LIB}/lib
 exec - set -
@@ -332,7 +332,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/huff
 prev huff.req
-exec - mv ${PACKAGE_ast_LIB}/lib/huff ${PACKAGE_ast_LIB}/lib/huff.old 2>/dev/null || true; cp huff.req ${PACKAGE_ast_LIB}/lib/huff
+exec - mv ${PACKAGE_ast_LIB}/lib/huff ${PACKAGE_ast_LIB}/lib/huff.old 2>/dev/null || true; test '' = 'huff.req' || { cp huff.req ${PACKAGE_ast_LIB}/lib/huff  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/huff generated
 done install virtual
 make test

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -1381,7 +1381,7 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 		else
 		{
 			v->property = sfgetu(sp);
-#if !HUH19931001 /* drop this in 1995 */
+#if !_HUH_1993_10_01 /* drop this eventually */
 			v->property &= ~V_free;
 #endif
 

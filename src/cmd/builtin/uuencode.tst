@@ -1,5 +1,7 @@
 # regression tests for the uuencode/uudecode utilitiy
 
+umask 022
+
 KEEP "*.dat"
 
 function DATA

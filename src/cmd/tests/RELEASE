@@ -1,3 +1,5 @@
+00-04-01 Makefile: add ../../lib/libast to .SOURCE for features/sfio
+00-03-07 opt.tst: add printf +1 bug fix test
 00-02-14 opt.tst: fix for "..." attribute quote
 	 datey2k.dat: oops: %l fails for old (2000-02-29) NOW
 00-01-10 opt.tst: fix USAGE_LICENSE

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -296,7 +296,7 @@ fileout(register Archive_t* ap, register File_t* f)
 		{
 		case ALAR:
 		case IBMAR:
-			if (ap->io.blocked)
+			if (ap->io->blocked)
 			{
 				if (f->st->st_size > 0)
 				{
@@ -326,7 +326,7 @@ fileout(register Archive_t* ap, register File_t* f)
 									n = read(f->fd, state.tmp.buffer, m);
 								else if (bp = getbuffer(f->fd))
 								{
-									memcpy(ap->io.next, bp->next, m);
+									memcpy(ap->io->next, bp->next, m);
 									bp->next += m;
 								}
 								else if (bread(f->ap, state.tmp.buffer, (off_t)0, (off_t)m, 1) <= 0)
@@ -382,7 +382,7 @@ fileout(register Archive_t* ap, register File_t* f)
 				{
 					if (f->fd >= 0)
 					{
-						if ((n = read(f->fd, ap->io.next, m)) < 0 && errno == EIO)
+						if ((n = read(f->fd, ap->io->next, m)) < 0 && errno == EIO)
 						{
 							static char*	buf;
 
@@ -393,15 +393,15 @@ fileout(register Archive_t* ap, register File_t* f)
 									error(ERROR_SYSTEM|3, "out of space [realign buffer]");
 							}
 							if ((n = read(f->fd, buf, m)) > 0)
-								memcpy(ap->io.next, buf, n);
+								memcpy(ap->io->next, buf, n);
 						}
 					}
 					else if (bp = getbuffer(f->fd))
 					{
-						memcpy(ap->io.next, bp->next, m);
+						memcpy(ap->io->next, bp->next, m);
 						bp->next += m;
 					}
-					else if (bread(f->ap, ap->io.next, (off_t)0, (off_t)n, 1) <= 0)
+					else if (bread(f->ap, ap->io->next, (off_t)0, (off_t)n, 1) <= 0)
 						n = -1;
 				}
 				if (n <= 0)
@@ -410,7 +410,7 @@ fileout(register Archive_t* ap, register File_t* f)
 						error(ERROR_SYSTEM|2, "%s: read error", f->path);
 					else
 						error(2, "%s: file size changed", f->path);
-					memzero(ap->io.next, state.buffersize);
+					memzero(ap->io->next, state.buffersize);
 					err = 1;
 				}
 				else
@@ -449,12 +449,12 @@ recordin(register Archive_t* ap, register File_t* f, int wfd)
 	if (wfd < 0) wfp = 0;
 	else if (!(wfp = sfnew(NiL, NiL, SF_UNBOUND, wfd, SF_WRITE)))
 		error(1, "%s: cannot write", f->name);
-	ap->io.empty = 0;
+	ap->io->empty = 0;
 	nl = state.record.line;
 	size = 0;
 	for (;;)
 	{
-		if (ap->io.blocked) n = bread(ap, state.tmp.buffer, (off_t)0, (off_t)state.buffersize, 0);
+		if (ap->io->blocked) n = bread(ap, state.tmp.buffer, (off_t)0, (off_t)state.buffersize, 0);
 		else if ((m = f->st->st_size - size) <= 0) n = 0;
 		else if (wfp) 
 		{
@@ -754,8 +754,8 @@ filein(register Archive_t* ap, register File_t* f)
 				paxdelta(NiL, ap, f, DELTA_SRC|DELTA_FD|DELTA_SIZE|DELTA_FREE, dfd, f->delta.base->expand, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT, wfd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ap, c, 0);
 		}
 		else if (f->delta.base->expand < 0)
-			paxdelta(NiL, ap, f, DELTA_SRC|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ap->delta->base->io.fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT, wfd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ap, c, 0);
-		else if (!paxdelta(NiL, ap, f, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ap->delta->base->io.fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &dfd, 0))
+			paxdelta(NiL, ap, f, DELTA_SRC|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ap->delta->base->io->fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT, wfd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ap, c, 0);
+		else if (!paxdelta(NiL, ap, f, DELTA_DEL|DELTA_FD|DELTA_OFFSET|DELTA_SIZE, ap->delta->base->io->fd, f->delta.base->offset, f->delta.base->size, DELTA_TAR|DELTA_TEMP|DELTA_OUTPUT, &dfd, 0))
 			paxdelta(NiL, ap, f, DELTA_SRC|DELTA_FD|DELTA_SIZE|DELTA_FREE, dfd, f->delta.base->expand, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_OUTPUT|DELTA_COUNT, wfd, DELTA_DEL|DELTA_BIO|DELTA_SIZE, ap, c, 0);
 		break;
 	case DELTA_verify:
@@ -783,7 +783,7 @@ filein(register Archive_t* ap, register File_t* f)
 			for (c = f->st->st_size; c > 0; c -= n)
 			{
 				n = (c > state.buffersize) ? state.buffersize : c;
-				if (!(s = bget(ap, n)))
+				if (!(s = bget(ap, n, NiL)))
 				{
 					error(ERROR_SYSTEM|2, "%s: read error", f->name);
 					break;
@@ -858,7 +858,7 @@ filein(register Archive_t* ap, register File_t* f)
 				for (c = f->st->st_size; c > 0; c -= n)
 				{
 					n = (c > state.buffersize) ? state.buffersize : c;
-					if (!(s = bget(ap, n)))
+					if (!(s = bget(ap, n, NiL)))
 					{
 						error(ERROR_SYSTEM|2, "%s: read error", f->name);
 						break;
@@ -955,7 +955,7 @@ copyinout(Ftw_t* ftw)
 						error(ERROR_SYSTEM|2, "%s: write error", f->name);
 						break;
 					}
-					state.out->io.count += n;
+					state.out->io->count += n;
 				}
 				holedone(wfd);
 				closeout(state.out, f, wfd);

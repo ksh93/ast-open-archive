@@ -1,3 +1,6 @@
+00-06-01 csopen: handle dynamic ip assignment underfoot
+00-05-11 csopen: handle /dev/tcp/local/9876/FOO/other
+00-05-09 cssfd: CS_POLL_WRITE implies O_NONBLOCK
 00-02-14 cschallenge(): add stat() to verify touch()
 00-02-03 features/lib: add sys/types.h to htons etc. header refs
 00-01-25 genlocal: use package instead of hostinfo

@@ -24,7 +24,10 @@ static const struct lab fields[] = {
 	"status",		GSTATUS,
 	"received",		0,
 	"return-path",		0,
+	"importance",		0,
+	"in-reply-to",		0,
 	"message-id",		0,
+	"priority",		0,
 	"x-",			0,
 };
 
@@ -442,11 +445,15 @@ headget(register struct parse* pp)
 							} while (*s++ != ':');
 							if (!i) {
 								n = s - t - 1;
-								i = -1;
-								do {
-									if (++i >= elementsof(fields))
-										goto done;
-								} while (strncasecmp(fields[i].name, t, n));
+								if (n > 2 && (t[0] == 'X' || t[0] == 'x') && t[1] == '-')
+									i = 1;
+								else {
+									i = -1;
+									do {
+										if (++i >= elementsof(fields))
+											goto done;
+									} while (strncasecmp(fields[i].name, t, n));
+								}
 							}
 						}
 						separator = 0;

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -169,7 +169,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cql.h
 done cql.c
 prev cql.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c cql.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cql.c
 done cql.o generated
 make decl.o
 make decl.c
@@ -218,13 +218,10 @@ done hix.c
 prev hix.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c hix.c
 done hix.o generated
-setv mam_libcdb ${mam_cc_L+-lcdb}${mam_cc_L-${PACKAGE_ast_LIB}/libcdb.a}
-setv mam_libcdb `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcdb,${INSTALLROOT}/lib/libcdb.a,} ${PACKAGE_ast_LIB}/lib/cdb`
-setv mam_libdll ${mam_cc_L+-ldll}${mam_cc_L-${PACKAGE_ast_LIB}/libdll.a}
-setv mam_libdll `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-ldll,${INSTALLROOT}/lib/libdll.a,} ${PACKAGE_ast_LIB}/lib/dll`
-setv mam_libexpr ${mam_cc_L+-lexpr}${mam_cc_L-${PACKAGE_ast_LIB}/libexpr.a}
-setv mam_libexpr `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lexpr,${INSTALLROOT}/lib/libexpr.a,} ${PACKAGE_ast_LIB}/lib/expr`
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libcdb `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcdb,${INSTALLROOT}/lib/libcdb.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/cdb 2>/dev/null || echo '' ${mam_cc_L+-lcdb}${mam_cc_L-${PACKAGE_ast_LIB}/libcdb.a}`
+setv mam_libdll `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-ldll,${INSTALLROOT}/lib/libdll.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/dll 2>/dev/null || echo '' ${mam_cc_L+-ldll}${mam_cc_L-${PACKAGE_ast_LIB}/libdll.a}`
+setv mam_libexpr `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lexpr,${INSTALLROOT}/lib/libexpr.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/expr 2>/dev/null || echo '' ${mam_cc_L+-lexpr}${mam_cc_L-${PACKAGE_ast_LIB}/libexpr.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o cql cql.o decl.o expr.o file.o hix.o ${mam_libcdb} ${mam_libdll} ${mam_libexpr} ${mam_libast}
 done cql generated
 make cdb
@@ -235,10 +232,8 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cdb.h implicit
 done cdb.c
 prev cdb.c
-exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c cdb.c
+exec - ${CC} ${CCFLAGS}  -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?cql]"\" -c cdb.c
 done cdb.o generated
-setv mam_libcdb `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcdb,${INSTALLROOT}/lib/libcdb.a,} ${PACKAGE_ast_LIB}/lib/cdb`
-setv mam_libdll `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-ldll,${INSTALLROOT}/lib/libdll.a,} ${PACKAGE_ast_LIB}/lib/dll`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o cdb cdb.o ${mam_libcdb} ${mam_libdll} ${mam_libast}
 done cdb generated
 make ${INSTALLROOT}/bin
@@ -267,7 +262,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/cql
 prev cql
-exec - mv ${INSTALLROOT}/bin/cql ${INSTALLROOT}/bin/cql.old 2>/dev/null || true; cp cql ${INSTALLROOT}/bin/cql
+exec - mv ${INSTALLROOT}/bin/cql ${INSTALLROOT}/bin/cql.old 2>/dev/null || true; test '' = 'cql' || { cp cql ${INSTALLROOT}/bin/cql  		    		    ;}
 done ${INSTALLROOT}/bin/cql generated
 make ${INSTALLROOT}/man/man1
 exec - set -
@@ -296,16 +291,16 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/cql.1
 make cql.1
 done cql.1
-exec - mv ${INSTALLROOT}/man/man1/cql.1 ${INSTALLROOT}/man/man1/cql.1.old 2>/dev/null || true; cp cql.1 ${INSTALLROOT}/man/man1/cql.1
+exec - mv ${INSTALLROOT}/man/man1/cql.1 ${INSTALLROOT}/man/man1/cql.1.old 2>/dev/null || true; test '' = 'cql.1' || { cp cql.1 ${INSTALLROOT}/man/man1/cql.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/cql.1 generated
 make ${INSTALLROOT}/bin/cdb
 prev cdb
-exec - mv ${INSTALLROOT}/bin/cdb ${INSTALLROOT}/bin/cdb.old 2>/dev/null || true; cp cdb ${INSTALLROOT}/bin/cdb
+exec - mv ${INSTALLROOT}/bin/cdb ${INSTALLROOT}/bin/cdb.old 2>/dev/null || true; test '' = 'cdb' || { cp cdb ${INSTALLROOT}/bin/cdb  		    		    ;}
 done ${INSTALLROOT}/bin/cdb generated
 make ${INSTALLROOT}/man/man1/cdb.1
 make cdb.1
 done cdb.1
-exec - mv ${INSTALLROOT}/man/man1/cdb.1 ${INSTALLROOT}/man/man1/cdb.1.old 2>/dev/null || true; cp cdb.1 ${INSTALLROOT}/man/man1/cdb.1
+exec - mv ${INSTALLROOT}/man/man1/cdb.1 ${INSTALLROOT}/man/man1/cdb.1.old 2>/dev/null || true; test '' = 'cdb.1' || { cp cdb.1 ${INSTALLROOT}/man/man1/cdb.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/cdb.1 generated
 done install virtual
 make test

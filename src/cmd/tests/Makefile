@@ -16,15 +16,15 @@ date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat
 	do	DATEMSK=$(*:N=*.msk:/ /:/G) TZ=EST5EDT $(*:O=1) $(TESTDATEFLAGS) < $i
 	done
 
-.SOURCE : sfio ../../lib/libast/sfio
+.SOURCE : sfio ../../lib/libast/sfio ../../lib/libast
 
 sfio :TEST: testsfio sftest.h +last \
-	talarm.c talign.c tappend.c tclose.c tdisc.c texcept.c tflags.c \
-	tgetr.c thole.c tleak.c tlongdouble.c tmmap2read.c \
-	tmode.c tmove.c tmprocess.c tmultiple.c tmwrite.c \
+	talarm.c talign.c tappend.c tatexit.c tclose.c tdisc.c terrno.c \
+	texcept.c tflags.c tgetr.c thole.c tleak.c tlongdouble.c tmmap2read.c \
+	tmode.c tmove.c tmprocess.c tmtsafe.c tmultiple.c tmwrite.c \
 	tnoseek.c tnotify.c topen.c tpipe.c tpipemove.c \
 	tpkrd.c tpoll.c tpool.c tpopen.c tpopenrw.c tprintf.c \
-	tpublic.c tputgetc.c tputgetd.c tputgetl.c tputgetr.c \
+	tpublic.c tputgetc.c tputgetd.c tputgetl.c tputgetm.c tputgetr.c \
 	tputgetu.c trcrv.c treserve.c tscanf.c tseek.c \
 	tsetbuf.c tsetfd.c tshare.c tsize.c tstack.c tstatus.c \
 	tstdio.c tstkpk.c tstring.c tswap.c tsync.c ttell.c ttmp.c \

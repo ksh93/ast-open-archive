@@ -12,8 +12,9 @@ LICENSE = since=1989,author=gsf+dgk+ekrell
 
 ID = 3d
 VERSION = 4.0
+CATALOG = 3d
 
-CCFLAGS = -O $(CC.DLL)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 TMP = 3.$(tmp)
 
 DEBUG == 1

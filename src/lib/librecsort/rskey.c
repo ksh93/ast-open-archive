@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -34,6 +34,25 @@
  */
 
 #include "rskeyhdr.h"
+
+#if _sys_resource && _lib_getrlimit
+
+#include <sys/resource.h>
+
+static size_t
+datasize(void)
+{
+	struct rlimit	rlim;
+
+	getrlimit(RLIMIT_DATA, &rlim);
+	return rlim.rlim_cur;
+}
+
+#else
+
+#define datasize()	(size_t)(128*1024*1024)
+
+#endif
 
 /*
  * Canonicalize the number string pointed to by dp, of length
@@ -709,6 +728,7 @@ register Rskey_t*	kp;
 	register long		n;
 	register Field_t*	fp;
 	long			m;
+	size_t			z;
 
 	static char*		in[] = { "-", 0 };
 
@@ -830,6 +850,18 @@ register Rskey_t*	kp;
 			kp->disc.keylen = -1;
 		kp->disc.data = '\n';
 	}
+
+	/*
+	 * limit the sizes
+	 */
+
+	z = datasize() / 3;
+	if (kp->nproc > 1)
+		z /= 2;
+	if (kp->insize > z)
+		kp->insize = z;
+	if (kp->outsize > z)
+		kp->outsize = z;
 
 	/*
 	 * reconcile the sizes

@@ -37,12 +37,12 @@ note(register int flags, const char* fmt, ...)
 	if (flags & IDENTIFY)
 		fprintf(fp, "mail: ");
 	if (flags & PANIC)
-		fprintf(fp, "panic: ");
+		fprintf(fp, T("panic: "));
 	else if (flags & WARNING)
-		fprintf(fp, "warning: ");
+		fprintf(fp, T("warning: "));
 	else if (flags & DEBUG)
-		fprintf(fp, "debug: ");
-	vfprintf(fp, fmt, ap);
+		fprintf(fp, T("debug: "));
+	vfprintf(fp, T(fmt), ap);
 	va_end(ap);
 	if (flags & SYSTEM)
 		fprintf(fp, ": %s", strerror(errno));

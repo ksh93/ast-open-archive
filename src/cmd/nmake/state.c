@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -449,8 +449,10 @@ badlock(char* file, int view, unsigned long date)
 	 * probably a bad lock if too old
 	 */
 
-	if ((d = (CURTIME - date)) > 24 * 60 * 60) error(1, "%s is probably an invalid lock file", file);
-	else error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(d, 1));
+	if ((d = (CURTIME - date)) > 24 * 60 * 60)
+		error(1, "%s is probably an invalid lock file", file);
+	else
+		error(1, "another make has been running on %s in %s for the past %s", state.makefile, state.view[view].path, fmtelapsed(d, 1));
 	error(3, "use -%c to override", OPT(OPT_ignorelock));
 }
 
@@ -473,6 +475,8 @@ badlock(char* file, int view, unsigned long date)
  *	   systems
  */
 
+#define LOCKTIME(p,m)	((unsigned long)((m)?(p)->st_mtime:(p)->st_ctime))
+
 void
 lockstate(register char* file)
 {
@@ -481,6 +485,7 @@ lockstate(register char* file)
 
 	static char*		lockfile;
 	static unsigned long	locktime;
+	static int		lockmtime;
 
 	if (file)
 	{
@@ -496,7 +501,7 @@ lockstate(register char* file)
 			{
 				edit(internal.nam, file, state.view[fd].path, KEEP, KEEP);
 				if (!stat(sfstruse(internal.nam), &st) && st.st_uid != uid)
-					badlock(sfstrbase(internal.nam), fd, st.st_ctime);
+					badlock(sfstrbase(internal.nam), fd, LOCKTIME(&st, lockmtime));
 			}
 		}
 		locktime = 0;
@@ -509,20 +514,21 @@ lockstate(register char* file)
 			if (stat(file, &st) < 0)
 				error(3, "cannot create lock file %s", file);
 			if (!state.ignorelock)
-				badlock(file, 0, st.st_ctime);
+				badlock(file, 0, LOCKTIME(&st, lockmtime));
 			if (remove(file) < 0)
 				error(3, "cannot remove lock file %s", file);
 		}
 		if (fstat(fd, &st) < 0)
 			error(3, "cannot stat lock file %s", file);
 		close(fd);
-		locktime = st.st_ctime;
+		lockmtime = st.st_atime < st.st_mtime || st.st_ctime < st.st_mtime;
+		locktime = LOCKTIME(&st, lockmtime);
 	}
 	else if (lockfile)
 	{
 		if (locktime)
 		{
-			if (stat(lockfile, &st) < 0 || st.st_ctime != locktime)
+			if (stat(lockfile, &st) < 0 || LOCKTIME(&st, lockmtime) != locktime)
 			{
 				if (state.writestate)
 					error(1, "the state file lock on %s has been overridden", state.makefile);
@@ -530,7 +536,8 @@ lockstate(register char* file)
 			else if (remove(lockfile) < 0)
 				error(1, "cannot remove lock file %s", lockfile);
 		}
-		else remove(lockfile);
+		else
+			remove(lockfile);
 		lockfile = 0;
 	}
 }

@@ -18,12 +18,8 @@
 	I| \% include "%"|A.LCL.INCLUDE|
 
 .ATTRIBUTE.%.yy : .SCAN.yy
-.ATTRIBUTE.%.Y : .SCAN.yy
 
 %.y : %.yy
-	$(.YACC.INCLUDE.) $(>) > $(<)
-
-%.y : %.Y
 	$(.YACC.INCLUDE.) $(>) > $(<)
 
 .YACC.INCLUDE. : .FUNCTION
@@ -34,3 +30,12 @@
 		end
 	end
 	return $(V:@?$$(SED) $$(V)?cat?)
+
+if CC.HOSTTYPE != "win32.*"
+
+.ATTRIBUTE.%.Y : .SCAN.yy
+
+%.y : %.Y
+	$(.YACC.INCLUDE.) $(>) > $(<)
+
+end

@@ -15,9 +15,10 @@ STANDALONE ==
 
 LINKS = ln mv
 
-CMP = $(STDCMP) 2>/dev/null
-CP = $(STDCP)
-LN = $(STDLN)
+CAT = $(STDCAT|"cat")
+CMP = $(STDCMP|"cmp") 2>/dev/null
+CP = $(STDCP|"cp")
+LN = $(STDLN|"ln")
 
 BUILTINS :COMMAND: cmd.h
 	$(SED) -e '/^extern[ 	].*[ 	]b_/!d' -e 's/.*[ 	]b_\([a-z]*\).*/\1/' $(LINKS:C,.*,-e '/^&$/d',) $(*)
@@ -29,7 +30,7 @@ BUILTINS :COMMAND: cmd.h
 	:ALL: $(BUILTINS)
 	$(BINDIR) :INSTALLDIR: $(BUILTINS)
 	$(BUILTINS) : $(&$("%.c":T=SM%)) BUILTIN=b_$$(<:B) builtin.c -lcmd $(*$("%.c":T=SM%))
-		cat $(*:N=*builtin.c) > $(<).c
+		$(CAT) $(*:N=*builtin.c) > $(<).c
 		$(@$("%.c":T=SM%):/.*builtin.c$/$(<).c/)
 		$(RM) $(RMFLAGS) $(<).c
 
@@ -46,7 +47,7 @@ BUILTINS :COMMAND: cmd.h
 		end
 	end
 
-:BUILTIN: fmt mime od pr strings tr uudecode -luu uuencode -luu what who
+:BUILTIN: mime od pr strings tr uudecode -luu uuencode -luu what who
 
 :INSTALL: $(BINDIR)/ln $(BINDIR)/mv
 

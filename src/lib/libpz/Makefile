@@ -2,7 +2,7 @@
 
 LICENSE = since=1998,author=gsf
 
-CCFLAGS = -O $(CC.DLL)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 pz 1.0 :LIBRARY: RELEASE pzip.3 pzip.h pzlib.h \
 	pzopen.c pzhead.c pzpart.c \

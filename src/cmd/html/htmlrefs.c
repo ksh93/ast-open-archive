@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -29,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)htmlrefs (AT&T Labs Research) 2000-02-14\n]"
+"[-?\n@(#)htmlrefs (AT&T Labs Research) 2000-03-04\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -53,6 +53,8 @@ USAGE_LICENSE
 "			support data. This type is optional. If specified then"
 "			the data root directory should contain a pseudo index"
 "			for its references.]"
+"		[+dynamic?All files under \adir\a are considered referenced.]"
+"		[+ignore?\adir\a is a \bksh\b(1) pattern of paths to ignore.]"
 "	}"
 "	[+$HOME/wwwfiles/index.html?]"
 "	[+$HOME/public_html/index.html?]"
@@ -98,7 +100,7 @@ USAGE_LICENSE
 "[x:unreferenced?If \b--copy\b is also specified then remove files and"
 "	directories in the \b--copy\b \adirectory\a that have not been copied."
 "	Otherwise list unreferenced files in the \b--root\b directory."
-"	A directory containing no referenced files but does contain an"
+"	A directory that contains no referenced files but does contain an"
 "	\b--index\b file is considered referenced (along with the \b--index\b"
 "	file) unless \b--strict\b is enabled.]"
 
@@ -229,7 +231,7 @@ check(register State_t* state, const char* dir, const char* name, unsigned int f
  * add reference path s
  */
 
-static char*
+static File_t*
 add(register State_t* state, register char* s, unsigned int flags, const char* path, int prefix, File_t* ref)
 {
 	register char*		t;
@@ -261,9 +263,14 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 			{
 				if (ref)
 				{
-					if (!state->user.size || *(s + 1) != '~' || !strneq(s + 2, state->user.data, state->user.size) || *(s + 2 + state->user.size) != '/')
+					if (*(s + 1) != '~')
 						return 0;
-					s += 2 + state->user.size;
+					if (*(s + 2) == '/')
+						s += 2;
+					else if (!state->user.size || !strneq(s + 2, state->user.data, state->user.size) || *(s + 2 + state->user.size) != '/')
+						return 0;
+					else
+						s += 2 + state->user.size;
 					if (state->documentroot.size)
 					{
 						sfsprintf(state->buf, sizeof(state->buf) - 1, "%s%s", state->documentroot.data, s);
@@ -347,7 +354,17 @@ add(register State_t* state, register char* s, unsigned int flags, const char* p
 			fp->refs = lp;
 		}
 	}
-	return fp->name;
+	return fp;
+}
+
+/*
+ * order directory stream by name
+ */
+
+static int
+order(FTSENT* const* a, FTSENT* const* b)
+{
+	return strcmp((*a)->fts_name, (*b)->fts_name);
 }
 
 /*
@@ -364,6 +381,8 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 	register char*	s;
 	char*		p;
 	char*		t;
+	File_t*		f;
+	int		m;
 	int		perlwarn;
 	int		prefix;
 	unsigned int	flags;
@@ -404,7 +423,7 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 			{
 				s = buf;
 				r = a = 0;
-				p = 0;
+				f = 0;
 				for (;;)
 				{
 					switch (c = sfgetc(ip))
@@ -430,48 +449,65 @@ refs(register State_t* state, const char* path, register Sfio_t* ip, File_t* ref
 							{
 								/*UNDENT...*/
 
-		*s = 0;
-		s = buf;
-		if (!a)
-			p = add(state, s, flags, path, prefix, ref);
-		else if (p)
+	*s = 0;
+	s = buf;
+	if (!a)
+		f = add(state, s, flags, path, prefix, ref);
+	else if (f)
+	{
+		p = f->name;
+		if (!strcasecmp(s, "document-root"))
 		{
-			if (!strcasecmp(s, "document-root"))
+			if (t = strrchr(p, '/'))
+				*t = 0;
+			if (*p == '/')
+				m = strlen(p);
+			else
 			{
-				if (t = strrchr(p, '/'))
-					*t = 0;
-				if (*p == '/')
-					c = strlen(p);
-				else
-				{
-					c = sfsprintf(buf, sizeof(buf), "%s/%s", state->root.data, p);
-					p = buf;
-				}
-				if (!(state->documentroot.data = strdup(p)))
-					error(ERROR_SYSTEM|3, "out of space [documentroot]");
-				state->documentroot.size = c;
-				if (t)
-					*t = '/';
+				m = sfsprintf(buf, sizeof(buf), "%s/%s", state->root.data, p);
+				p = buf;
 			}
-			else if (!strcasecmp(s, "ignore"))
-			{
-				if (state->copy.size)
-				{
-					s = state->copy.data;
-					p += state->root.size;
-				}
-				else
-					s = "";
-				if (t = strrchr(p, '/'))
-					*t = 0;
-				c = state->ignore.size + strlen(s) + strlen(p) + 6;
-				if (!(state->ignore.data = newof(state->ignore.data, char, c, 0)))
-					error(ERROR_SYSTEM|3, "out of space [ignore]");
-				state->ignore.size += sfsprintf(state->ignore.data + state->ignore.size, c, "%s%s%s?(/*)", state->ignore.size ? "|" : "", s, p);
-				if (t)
-					*t = '/';
-			}
+			if (!(state->documentroot.data = strdup(p)))
+				error(ERROR_SYSTEM|3, "out of space [documentroot]");
+			state->documentroot.size = m;
+			if (t)
+				*t = '/';
 		}
+		else if (!strcasecmp(s, "dynamic"))
+		{
+			FTS*	fts;
+			FTSENT*	ent;
+
+			if (t = strrchr(p, '/'))
+				*t = 0;
+			if (!(fts = fts_open((char**)p, FTS_ONEPATH|FTS_META|FTS_PHYSICAL|FTS_NOPOSTORDER, order)))
+				error(ERROR_SYSTEM|3, "%s: cannot search directory", p);
+			if (t)
+				*t = '/';
+			while (ent = fts_read(fts))
+				add(state, ent->fts_path + prefix, flags, f->name, prefix, f);
+			if (fts_close(fts))
+				error(ERROR_SYSTEM|3, "%s: directory read error", p);
+		}
+		else if (!strcasecmp(s, "ignore"))
+		{
+			if (state->copy.size)
+			{
+				s = state->copy.data;
+				p += state->root.size;
+			}
+			else
+				s = "";
+			if (t = strrchr(p, '/'))
+				*t = 0;
+			m = state->ignore.size + strlen(s) + strlen(p) + 6;
+			if (!(state->ignore.data = newof(state->ignore.data, char, m, 0)))
+				error(ERROR_SYSTEM|3, "out of space [path pattern]");
+			state->ignore.size += sfsprintf(state->ignore.data + state->ignore.size, m, "%s%s%s?(/*)", state->ignore.size ? "|" : "", s, p);
+			if (t)
+				*t = '/';
+		}
+	}
 
 								/*...INDENT*/
 							}
@@ -713,16 +749,6 @@ filter(register State_t* state, register Sfio_t* ip, Sfio_t* op)
 	return 0;
 }
 
-/*
- * order directory stream by name
- */
-
-static int
-order(FTSENT* const* a, FTSENT* const* b)
-{
-	return strcmp((*a)->fts_name, (*b)->fts_name);
-}
-
 main(int argc, char** argv)
 {
 	register char*		s;
@@ -860,6 +886,7 @@ main(int argc, char** argv)
 	{
 		state->more = 0;
 		for (fp = (File_t*)dtfirst(state->files); fp; fp = (File_t*)dtnext(state->files, fp))
+		{
 			if (!(fp->flags & SCANNED))
 			{
 				fp->flags |= SCANNED;
@@ -876,6 +903,7 @@ main(int argc, char** argv)
 				if (ip != sfstdin)
 					sfclose(ip);
 			}
+		}
 	}
 	if (state->copy.size)
 	{
@@ -963,7 +991,8 @@ main(int argc, char** argv)
 					if (state->exec && ((ent->fts_info & FTS_D) ? rmdir : remove)(ent->fts_path))
 						error(ERROR_SYSTEM|2, "%s: cannot remove", ent->fts_path);
 				}
-			fts_close(fts);
+			if (fts_close(fts))
+				error(ERROR_SYSTEM|3, "%s: directory read error", state->copy.data);
 		}
 	}
 	else if (state->unreferenced)
@@ -984,7 +1013,8 @@ main(int argc, char** argv)
 					*s = '/';
 				}
 			}
-		fts_close(fts);
+		if (fts_close(fts))
+			error(ERROR_SYSTEM|3, "%s: directory read error", state->root.data);
 	}
 	else
 	{

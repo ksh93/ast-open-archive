@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -39,7 +39,7 @@ ppmacref(struct ppsymbol* sym, char* file, int line, int type, unsigned long sum
 
 	NoP(file);
 	NoP(line);
-	p = (pp.state & DIRECTIVE) ? pp.outp : pp.addp;
+	p = (pp.state & (DIRECTIVE|JOINING)) == DIRECTIVE ? pp.outp : pp.addp;
 	p += sfsprintf(p, MAXTOKEN, "\n#%s %d", pp.lineid, error_info.line);
 	p += sfsprintf(p, MAXTOKEN, "\n#%s %s:%s %s %d", dirname(PRAGMA), pp.pass, keyname(X_MACREF), sym->name, type);
 	if (type > 0)
@@ -48,7 +48,7 @@ ppmacref(struct ppsymbol* sym, char* file, int line, int type, unsigned long sum
 			sum = strsum(sym->macro->value, (long)sym->macro->arity);
 		p += sfsprintf(p, MAXTOKEN, " %lu", sum);
 	}
-	if (pp.state & DIRECTIVE)
+	if ((pp.state & (DIRECTIVE|JOINING)) == DIRECTIVE)
 	{
 		pp.outp = p;
 		ppcheckout();

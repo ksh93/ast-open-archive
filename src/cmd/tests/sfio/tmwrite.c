@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -23,7 +23,6 @@
 *                                                              *
 ***************************************************************/
 #include	"sftest.h"
-#undef fork
 
 /* see if multiple writers do create a consistent set of records. */
 
@@ -38,7 +37,7 @@ static long vrandom()
 	return (hash = hash*0xbadbeef + 0xdeadbeef)&LOWBITS;
 }
 
-main()
+MAIN()
 {
 	ssize_t	size[N_WRITER][N_RECORD];
 	int	count[N_WRITER];
@@ -58,11 +57,11 @@ main()
 		record[i][r] = '0'+i;
 
 	/* create file */
-	fr = sfopen(NIL(Sfio_t*),sftfile(0),"w+");
+	fr = sfopen(NIL(Sfio_t*),tstfile(0),"w+");
 
 	/* create records */
 	for(i = 0; i < N_WRITER; ++i)
-	{	fw[i] = sfopen(NIL(Sfio_t*),sftfile(0),"a");
+	{	fw[i] = sfopen(NIL(Sfio_t*),tstfile(0),"a");
 		count[i] = 0;
 	}
 
@@ -105,6 +104,5 @@ main()
 		if(count[i] != N_RECORD)
 			terror("Bad count%d %d\n", i, count[i]);
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

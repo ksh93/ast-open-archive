@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -31,7 +31,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)dd (AT&T Labs Research) 1999-06-01\n]"
+"[-1p0?\n@(#)dd (AT&T Labs Research) 2000-06-10\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -54,13 +54,14 @@ USAGE_LICENSE
 ;
 
 static const char usage2[] =
-"[+SEE ALSO?\bcp\b(1), \bpax\b(1), \btr\b(1), \bseek\b(2)]"
+"[+SEE ALSO?\bcp\b(1), \biconv\b(1), \bpax\b(1), \btr\b(1), \bseek\b(2)]"
 ;
 
 #include <ast.h>
 #include <ctype.h>
 #include <ccode.h>
 #include <error.h>
+#include <iconv.h>
 #include <ls.h>
 #include <sig.h>
 #include <sfstr.h>
@@ -88,7 +89,7 @@ static const char usage2[] =
 #define O2A		(1<<13)
 #define OSPECIAL	(1<<14)
 #define SILENT		(1L<<15)
-#define SWAB		(1L<<16)
+#define SWAP		(1L<<16)
 #define SYNC		(1L<<17)
 #define UCASE		(1L<<18)
 #define UNBLOCK		(1L<<19)
@@ -146,6 +147,7 @@ typedef struct
 	Operand_t	oseek;
 	Operand_t	silent;
 	Operand_t	skip;
+	Operand_t	swap;
 	Operand_t	to;
 
 	Operand_t	a2e;
@@ -175,6 +177,8 @@ typedef struct
 	Io_t		out;
 	char*		buffer;
 	int		pad;
+	iconv_t		cvt;
+	Sfio_t*		tmp;
 } State_t;
 
 static State_t		state =
@@ -250,6 +254,12 @@ static State_t		state =
 		NUMBER,
 		"Skip \anumber\a blocks before reading.  Seek is used if"
 		" possible, otherwise the blocks are read and discarded.",
+	},
+	{
+		"swap",
+		NUMBER,
+		"Swap bytes acording to the inclusive or of: 1-byte,"
+		" 2-short, 4-long, 8-quad, etc.",
 	},
 	{
 		"to",
@@ -350,7 +360,7 @@ static State_t		state =
 	},
 	{
 		"swab",
-		SWAB,
+		SWAP,
 		"swap byte pairs",
 	},
 	{
@@ -441,6 +451,9 @@ main(int argc, char** argv)
 	char*			usage;
 	char*			e;
 	int			i;
+	char*			cb;
+	size_t			cc;
+	size_t			ce;
 	Sfio_t*			sp;
 	Sflong_t		c;
 	Sflong_t		m;
@@ -451,8 +464,7 @@ main(int argc, char** argv)
 
 	setlocale(LC_ALL, "");
 	error_info.id = "dd";
-	state.from.value.number = CC_NATIVE;
-	state.to.value.number = CC_NATIVE;
+	state.from.value.string = state.to.value.string = "";
 	if (!(sp = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space [usage]");
 	sfputr(sp, usage1, '\n');
@@ -479,15 +491,38 @@ main(int argc, char** argv)
 				}
 				else if (op->type == CODE)
 				{
+					register iconv_list_t*	ic;
+
+					sfputc(sp, ']');
+					sfputc(sp, '{');
+					for (ic = iconv_list(NiL); ic; ic = iconv_list(ic))
+					{
+						sfputc(sp, '[');
+						sfputc(sp, '+');
+						sfputc(sp, '\b');
+						s = (char*)ic->match;
+						if (*s == '(')
+							s++;
+						while (i = *s++)
+						{
+							if (i == ')' && !*s)
+								break;
+							if (i == '?' || i == ']')
+								sfputc(sp, i);
+							sfputc(sp, i);
+						}
+						sfputc(sp, '?');
+						s = (char*)ic->desc;
+						while (i = *s++)
+						{
+							if (i == ']')
+								sfputc(sp, i);
+							sfputc(sp, i);
+						}
+						sfputc(sp, ']');
+						sfputc(sp, '\n');
+					}
 					i = '}';
-
-					/*
-					 * NOTE: ast should provide a way
-					 *	 to walk through the names
-					 *	 and descriptions
-					 */
-
-					sfprintf(sp, "]{\n[+a|ascii|iso646|iso8859*?standard ascii]\n[+e|ebcdic*1?prevalent ebcdic]\n[+i|ebcdic2|ibm?ibm ebcdic][+o|ebcdic3|cp1047|ibm1047|mvs|openedition?mvs ebcdic]\n[+n|native|local?local default]\n");
 				}
 			}
 			else
@@ -516,8 +551,8 @@ main(int argc, char** argv)
 		switch (op->type)
 		{
 		case CODE:
-			if ((op->value.number = ccmapid(v)) < 0)
-				error(3, "%s: unknown character code set", v);
+		case STRING:
+			op->value.string = v;
 			break;
 		case CONV:
 			do
@@ -562,9 +597,6 @@ main(int argc, char** argv)
 			if (*v)
 				error(3, "%s: %s: invalid numeric expression", op->name, opt_info.arg);
 			break;
-		case STRING:
-			op->value.string = v;
-			break;
 		}
 	}
 	if (error_info.errors)
@@ -575,40 +607,49 @@ main(int argc, char** argv)
 	case 0:
 		break;
 	case A2E:
-		state.from.value.number = CC_ASCII;
-		state.to.value.number = CC_EBCDIC1;
+		state.from.value.string = "ascii";
+		state.to.value.string = "ebcdic-1";
 		break;
 	case A2I:
-		state.from.value.number = CC_ASCII;
-		state.to.value.number = CC_EBCDIC2;
+		state.from.value.string = "ascii";
+		state.to.value.string = "ebcdic-2";
 		break;
 	case A2N:
-		state.from.value.number = CC_ASCII;
-		state.to.value.number = CC_NATIVE;
+		state.from.value.string = "ascii";
+		state.to.value.string = "";
 		break;
 	case A2O:
-		state.from.value.number = CC_ASCII;
-		state.to.value.number = CC_EBCDIC3;
+		state.from.value.string = "ascii";
+		state.to.value.string = "ebcdic-3";
 		break;
 	case E2A:
-		state.from.value.number = CC_EBCDIC1;
-		state.to.value.number = CC_ASCII;
+		state.from.value.string = "ebcdic-1";
+		state.to.value.string = "ascii";
 		break;
 	case I2A:
-		state.from.value.number = CC_EBCDIC2;
-		state.to.value.number = CC_ASCII;
+		state.from.value.string = "ebcdic-2";
+		state.to.value.string = "ascii";
 		break;
 	case N2A:
-		state.from.value.number = CC_NATIVE;
-		state.to.value.number = CC_ASCII;
+		state.from.value.string = "";
+		state.to.value.string = "ascii";
 		break;
 	case O2A:
-		state.from.value.number = CC_EBCDIC3;
-		state.to.value.number = CC_ASCII;
+		state.from.value.string = "ebcdic-3";
+		state.to.value.string = "ascii";
 		break;
 	default:
 		error(3, "only one of %s={%s,%s,%s} may be specified", state.conv.name, state.ascii.value.string, state.ebcdic.value.string, state.ibm.value.string);
 	}
+	if (streq(state.from.value.string, state.to.value.string))
+		state.cvt = (iconv_t)(-1);
+	else  if ((state.cvt = iconv_open(state.to.value.string, state.from.value.string)) != (iconv_t)(-1))
+	{
+		if (!(state.tmp = sfstropen()))
+			error(ERROR_SYSTEM|3, "out of space [conversion stream]");
+	}
+	else if (*state.from.value.string && *state.to.value.string)
+		error(3, "cannot convert from %s to %s", state.from.value.string, state.to.value.string);
 	if ((state.conv.value.number & (BLOCK|UNBLOCK)) == (BLOCK|UNBLOCK))
 		error(3, "only one of %s=%s and %s=%s may be specified", state.conv.name, state.block.value.string, state.conv.name, state.unblock.value.string);
 	if ((state.conv.value.number & (SYNC|UNBLOCK)) == (SYNC|UNBLOCK))
@@ -616,6 +657,10 @@ main(int argc, char** argv)
 		state.conv.value.number &= ~SYNC;
 		error(1, "%s=%s ignored for %s=%s", state.conv.name, state.sync.value.string, state.conv.name, state.unblock.value.string);
 	}
+	if (state.conv.value.number & SWAP)
+		state.swap.value.number = 1;
+	else if (state.swap.value.number)
+		state.conv.value.number |= SWAP;
 	if (state.oseek.value.number && (state.conv.value.number & NOTRUNC))
 	{
 		state.oseek.value.number = 0;
@@ -812,8 +857,23 @@ main(int argc, char** argv)
 						n = c;
 					}
 				}
-				if (f & SWAB)
-					swapmem(1, s, s, c);
+				if (f & SWAP)
+					swapmem(state.swap.value.number, s, s, c);
+				if (state.cvt != (iconv_t)(-1))
+				{
+					cb = s;
+					cc = n;
+					ce = 0;
+					n = iconv_write(state.cvt, state.tmp, &cb, &cc, &ce);
+					s = sfstruse(state.tmp);
+					if (ce && !state.silent.value.number)
+					{
+						if (ce == 1)
+							error(ERROR_SYSTEM|2, "%s: %d conversion error", state.ofn.value.string, ce);
+						else
+							error(ERROR_SYSTEM|2, "%s: %d conversion errors", state.ofn.value.string, ce);
+					}
+				}
 				ccmaps(s, c, state.from.value.number, state.to.value.number);
 				switch (f & (LCASE|UCASE))
 				{

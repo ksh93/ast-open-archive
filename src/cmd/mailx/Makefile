@@ -17,3 +17,5 @@ mailx :: README RELEASE mailx.1 \
 	port/dtrenew.c port/dtrestore.c port/dtsize.c port/dtstat.c \
 	port/dtstkq.c port/dtstrhash.c port/dttree.c port/dtview.c \
 	port/dtwalk.c port/mime.c port/mimetype.c
+
+:MSGFUN: note _ast_printf

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -33,7 +33,7 @@ static const char split_usage[] =
 "[-?\n@(#)split (AT&T Labs Research) 1996-06-11\n]"
 USAGE_LICENSE
 "[+NAME?split - split files into pieces]"
-"[+DESCRIPTION?\bsplit\f\b reads an input file and writes one or more"
+"[+DESCRIPTION?\bsplit\b reads an input file and writes one or more"
 "	output files so that \bcat\b(1) on these files will produce"
 "	the input file. The default size for each piece is 1000 lines." 
 "	The suffix consists of \asuffix_len\a lower case characters"
@@ -75,7 +75,7 @@ static const char csplit_usage[] =
 "[-?\n@(#)csplit (AT&T Labs Research) 1996-06-11\n]"
 USAGE_LICENSE
 "[+NAME?csplit - split a file into sections determined by context lines]"
-"[+DESCRIPTION?\bcsplit\f\b creates zero or more output files containing"
+"[+DESCRIPTION?\bcsplit\b creates zero or more output files containing"
 "	sections of the given input \afile\a, or the standard input if the"
 "	name \b-\b is given. By default, \bcsplit\b prints the number of"
 "	bytes written to each output file after it has been created.]"

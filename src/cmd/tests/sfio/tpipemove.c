@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,7 +24,7 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	int	fd[2];
 	Sfio_t	*fr, *fw;
@@ -39,9 +39,9 @@ main()
 		terror("Can't open pipe streams\n");
 	sfset(fr,SF_SHARE,1);
 
-	if(sfopen(sfstdout,sftfile(0),"w") != sfstdout)
+	if(sfopen(sfstdout,tstfile(0),"w") != sfstdout)
 		terror("Can't open for write\n");
-	if(sfopen(sfstdin,sftfile(0),"r") != sfstdin)
+	if(sfopen(sfstdin,tstfile(0),"r") != sfstdin)
 		terror("Can't open for read\n");
 
 	for(n = 0; n < 100; ++n)
@@ -59,6 +59,5 @@ main()
 			terror("Wrong data\n");
 	}
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

@@ -86,7 +86,7 @@ margin(FILE* fp, const char* name, register const char* s, int indent, int sep, 
 	register int		c;
 	register int		n;
 	register int		q;
-	const char*		av[5];
+	const char*		av[8];
 
 	if (sep) {
 		fprintf(fp, "%*s", n = indent, name);
@@ -100,17 +100,19 @@ margin(FILE* fp, const char* name, register const char* s, int indent, int sep, 
 		n = strlen(name) + 1;
 	}
 	ap = av;
-	*ap++ = s;
+	*ap++ = T(s);
 	if (vp && (s = vp->initialize)) {
+		*ap++ = " ";
 		if (*s) {
-			*ap++ = " The default value is \"";
+			*ap++ = T("The default value is");
+			*ap++ = " \"";
 			*ap++ = s;
 			*ap++ = "\".";
 		}
 		else if (vp->set)
-			*ap++ = " The default value is computed at runtime.";
+			*ap++ = T("The default value is computed at runtime.");
 		else
-			*ap++ = " On by default.";
+			*ap++ = T("On by default.");
 	}
 	*ap = 0;
 	ap = av;
@@ -181,7 +183,7 @@ helpvar(FILE* fp, register const struct var* vp)
 	char*	help;
 
 	if (vp->flags & A)
-		sprintf(help = state.path.temp, "Equivalent to %s.", vp->help);
+		sprintf(help = state.path.temp, T("Equivalent to %s."), vp->help);
 	else
 		help = (char*)vp->help;
 	margin(fp, vp->name, help, 14, 2, 0, vp);
@@ -199,6 +201,7 @@ help(char** argv)
 	register char*			s;
 	register char*			a;
 	register char*			t;
+	register char*			l;
 	char*				r;
 	int				all;
 	int				cat;
@@ -211,19 +214,21 @@ help(char** argv)
 		fp = stdout;
 	s = *argv++;
 	a = s ? *argv : (char*)0;
-	t = "commands";
+	l = "commands";
+	t = T(l);
 	r = "--------";
 	all = isall(s);
 	cat = 0;
-	if (all || !s || streq(s, t) && ++cat) {
+	if (all || !s || (streq(s, l) || streq(s, t)) && ++cat) {
 		fprintf(fp, "%s\n%s\n%s\n", r, t, r);
 		for (cp = state.cmdtab; cp < &state.cmdtab[state.cmdnum]; cp++)
 			helpcmd(fp, cp);
 	}
 	if (all || s) {
-		t = "variables";
+		l = "variables";
+		t = T(l);
 		r = "---------";
-		if (all && !(cp = 0)|| (cp = (const struct cmd*)strpsearch(state.cmdtab, state.cmdnum, sizeof(struct cmd), s, NiL)) || streq(s, t) && ++cat) {
+		if (all && !(cp = 0)|| (cp = (const struct cmd*)strpsearch(state.cmdtab, state.cmdnum, sizeof(struct cmd), s, NiL)) || (streq(s, l) || streq(s, t)) && ++cat) {
 			if (!cp || a && cp->c_func == (Cmd_f)set) {
 				if (!cp && !cat || !a || isall(a)) {
 					fprintf(fp, "%s\n%s\n%s\n", r, t, r);
@@ -244,11 +249,12 @@ help(char** argv)
 					a = s;
 				s = state.var.escape;
 			}
-			t = "escape";
+			l = "escape";
+			t = T(l);
 			r = "---------------";
-			if (all || *s == *state.var.escape || (streq(s, t) || streq(s, "tilde")) && ++cat) {
+			if (all || *s == *state.var.escape || (streq(s, t) || streq(s, l) || streq(s, "tilde")) && ++cat) {
 				if (!a) {
-					fprintf(fp, "%s\n%s commands\n%s\n", r, t, r);
+					fprintf(fp, "%s\n%s %s\n%s\n", r, t, T("commands"), r);
 					for (ep = state.esctab; ep < &state.esctab[state.escnum]; ep++)
 						helpesc(fp, ep);
 				}
@@ -272,16 +278,49 @@ int
 cd(char** arglist)
 {
 	char*	cp;
+	char*	tp;
+	int	show = 0;
 
 	if (!*arglist)
 		cp = state.var.home;
 	else
 		if (!(cp = expand(*arglist, 1)))
 			return 1;
+	if (cp[0] == '-' && cp[1] == 0) {
+		if (!(cp = state.var.oldpwd)) {
+			note(0, "No previous working directory");
+			return 1;
+		}
+		show = 1;
+	}
+#if _PACKAGE_ast
+	else if (state.var.cdpath && (cp[0] != '.' || cp[1] != 0 && cp[1] != '/' && (cp[1] != '.' || cp[2] != 0 && cp[2] != '/')) && pathaccess(state.path.temp, state.var.cdpath, cp, NiL, 0))
+	{
+		cp = state.path.temp;
+		show = 1;
+	}
+#endif
 	if (chdir(cp) < 0) {
 		note(SYSTEM, "%s", cp);
 		return 1;
 	}
+	tp = state.var.oldpwd;
+	state.var.oldpwd = state.var.pwd;
+	state.var.pwd = tp;
+	if (!getcwd(state.var.pwd, PATHSIZE))
+		strncpy(state.var.pwd, cp, PATHSIZE);
+	if (show)
+		printf("%s\n", state.var.pwd);
+	return 0;
+}
+
+/*
+ * Print the full path of the current working directory.
+ */
+int
+pwd(void)
+{
+	printf("%s\n", state.var.pwd);
 	return 0;
 }
 

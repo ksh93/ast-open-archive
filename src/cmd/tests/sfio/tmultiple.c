@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -28,13 +28,7 @@
 /*	Test multiple processes reading/writing from same file
 **	descriptor.
 */
-#if __STD_C
-main(int argc, char** argv)
-#else
-main(argc,argv)
-int	argc;
-char**	argv;
-#endif
+MAIN()
 {
 	char*	s;
 
@@ -60,7 +54,7 @@ char**	argv;
 		exit(0);
 	}
 
-	if(sfopen(sfstdout, sftfile(0), "w") != sfstdout )
+	if(sfopen(sfstdout, tstfile(0), "w") != sfstdout )
 		terror("Opening file\n");
 	if(sfputr(sfstdout,"Line1",'\n') < 0 ||
 	   sfputr(sfstdout,"Line2",'\n') < 0 ||
@@ -70,7 +64,7 @@ char**	argv;
 	sfopen(sfstdout,"/dev/null","w");
 
 	/* testing coprocess calling sfgetr */
-	if(sfopen(sfstdin, sftfile(0),"r") != sfstdin)
+	if(sfopen(sfstdin, tstfile(0),"r") != sfstdin)
 		terror("Opening to read\n");
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line1") != 0)
 		terror("Did not get Line1 for sfgetr\n");
@@ -81,7 +75,7 @@ char**	argv;
 		terror("Did not get Line4 for sfgetr\n");
 
 	/* testing coprocess calling sfmove */
-	if(sfopen(sfstdin, sftfile(0), "r") != sfstdin)
+	if(sfopen(sfstdin, tstfile(0), "r") != sfstdin)
 		terror("Opening to read\n");
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line1") != 0)
 		terror("Did not get Line1 for sfmove\n");
@@ -93,17 +87,16 @@ char**	argv;
 
 	/* testing the head program */
 #ifdef HEAD
-	if(sfopen(sfstdin, sftfile(0), "r") != sfstdin)
+	if(sfopen(sfstdin, tstfile(0), "r") != sfstdin)
 		terror("Opening to read\n");
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line1") != 0)
 		terror("Did not get Line1 for head\n");
 	sfsync(sfstdin);
-	system("/usr/addon/ast/bin/head -2 > /dev/null");
+	system("head -2 > /dev/null"); /* for testing the head program */
 	sfseek(sfstdin,(Sfoff_t)lseek(sffileno(sfstdin),0L,1),0);
 	if(!(s = sfgetr(sfstdin,'\n',1)) || strcmp(s,"Line4") != 0)
 		terror("Did not get Line4 for head\n");
 #endif
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

@@ -15,12 +15,14 @@ void
 varinit(void)
 {
 	register const struct var*	vp;
+	register int			c;
 	register char*			s;
 	register char*			t;
 	register FILE*			fp;
+	int				i;
 	char				buf[LINESIZE];
 
-	static const char		resconf[] = _PATH_RESCONF;
+	static const char*		domains[] = { _PATH_RESCONF };
 
 	setscreensize();
 	for (vp = state.vartab; vp->name; vp++) {
@@ -34,33 +36,44 @@ varinit(void)
 	 * Get the local domain name.
 	 */
 
-	s = (char*)resconf;
-	do {
-		if (fp = fileopen(s, "r")) {
-			while (s = fgets(buf, sizeof(buf), fp)) {
-				while (isspace(*s))
-					s++;
-				if (*s++ == 'd' && *s++ == 'o' &&
-				    *s++ == 'm' && *s++ == 'a' &&
-				    *s++ == 'i' && *s++ == 'n' &&
-				    isspace(*s)) {
+#if _lib_gethostname
+	if (!gethostname(buf, sizeof(buf)) && (s = strchr(buf, '.')))
+		state.var.domain = varkeep(s + 1);
+	else
+#endif
+	for (i = 0; i < sizeof(domains) / sizeof(domains[0]); i++) {
+		s = (char*)domains[i];
+		do {
+			if (fp = fileopen(s, "r")) {
+				while (s = fgets(buf, sizeof(buf), fp)) {
 					while (isspace(*s))
 						s++;
-					t = s;
-					while (*t && !isspace(*t))
-						t++;
-					while (t > s && *(t - 1) == '.')
-						t--;
-					if (*t)
-						*t = 0;
-					state.var.domain = varkeep(s);
-					break;
+					if (((c = *s++) == 'd' || c == 'D') &&
+					    ((c = *s++) == 'o' || c == 'O') &&
+					    ((c = *s++) == 'm' || c == 'M') &&
+					    ((c = *s++) == 'a' || c == 'A') &&
+					    ((c = *s++) == 'i' || c == 'M') &&
+					    ((c = *s++) == 'n' || c == 'N') &&
+					    (isspace(c = *s++) || c == ':' || c == '=')) {
+						while (isspace(*s))
+							s++;
+						t = s;
+						while (*t && !isspace(*t))
+							t++;
+						while (t > s && *(t - 1) == '.')
+							t--;
+						if (*t)
+							*t = 0;
+						state.var.domain = varkeep(s);
+						break;
+					}
 				}
+				fileclose(fp);
+				i = sizeof(domains) / sizeof(domains[0]);
+				break;
 			}
-			fileclose(fp);
-			break;
-		}
-	} while (s = strchr(s + 1, '/'));
+		} while (!i && (s = strchr(s + 1, '/')));
+	}
 
 	/*
 	 * Interactive.
@@ -353,7 +366,7 @@ void
 set_justfrom(struct var* vp, const char* value)
 {
 	if (value) {
-		state.var.justheaders = state.var.justfrom;
+		state.var.justheaders = state.var.justfrom ? "" : (char*)0;
 		state.var.interactive = 0;
 		state.var.screen = 0;
 	}
@@ -402,6 +415,21 @@ set_news(struct var* vp, const char* value)
 {
 	if (value && *value && close(open(state.var.news, O_WRONLY|O_CREAT|O_TRUNC, MAILMODE)))
 		note(FATAL|SYSTEM, "\"%s\"", state.var.news);
+}
+
+/*
+ * Trap screen variable assignment.
+ */
+
+void
+set_pwd(struct var* vp, const char* value)
+{
+	if (value && !*value) {
+		if (!getcwd(state.path.pwd[0], sizeof(state.path.pwd[0])))
+			strcpy(state.path.pwd[0], ".");
+		state.var.pwd = state.path.pwd[0];
+		state.var.oldpwd = state.path.pwd[1];
+	}
 }
 
 /*

@@ -1,3 +1,9 @@
+00-06-01 pax: fix mime format size by dropping last \r\n
+00-05-26 pax: astconf("CONFORMANCE",0,0)=="standard" inhibits some extensions
+	 pax: check USTAR file and link name lengths
+00-04-01 pax.tst: export TZ=EST5EDT; new tests should be UCT
+00-03-11 pax: add encapsulated mime format read
+	 pax: fix vdb block count
 00-02-14 pax: fix hard link read that didn't apply -s edit
 	 pax: logical|physical filter options
 00-01-04 pax: fix rpm embedded archive hard seek

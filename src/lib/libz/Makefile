@@ -9,7 +9,7 @@ LICENSE = type=special
 ID = z
 VERSION = 1.0
 
-CCFLAGS = -O $(CC.DLL)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 $(ID) $(VERSION) :LIBRARY: zlib.h zconf.h zutil.h \
 	deflate.h infblock.h infcodes.h inffast.h \

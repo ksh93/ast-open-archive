@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)rm (AT&T Labs Research) 1999-06-23\n]"
+"[-?\n@(#)rm (AT&T Labs Research) 2000-03-17\n]"
 USAGE_LICENSE
 "[+NAME?rm - remove files]"
 "[+DESCRIPTION?\brm\b removes the named \afile\a arguments. By default it"
@@ -40,7 +40,7 @@ USAGE_LICENSE
 "	given, \brm\b prompts the user for whether to remove the file."
 "	An affirmative response (\by\b or \bY\b) removes the file, a quit"
 "	response (\bq\b or \bQ\b) causes \brm\b to exit immediately, and"
-"	and all other responses skip the current file.]"
+"	all other responses skip the current file.]"
 
 "[c|F:clear|clobber?Clear the contents of each file before removing by"
 "	writing a 0 filled buffer the same size as the file, executing"
@@ -55,7 +55,7 @@ USAGE_LICENSE
 "[i:interactive|prompt?Prompt whether to remove each file."
 "	An affirmative response (\by\b or \bY\b) removes the file, a quit"
 "	response (\bq\b or \bQ\b) causes \brm\b to exit immediately, and"
-"	and all other responses skip the current file.]"
+"	all other responses skip the current file.]"
 "[r|R:recursive?Remove the contents of directories recursively.]"
 "[v:verbose?Print the name of each file before removing it.]"
 
@@ -158,15 +158,13 @@ rm(register Ftw_t* ftw)
 					n = ftw->pathlen;
 				}
 				memcpy(path + n, "/..", 4);
-				if (stat(path, &st))
-					v = 0;
-				else if (st.st_nlink <= 2)
-					v = 1;
-				else
-					v = st.st_ino == ftw->parent->statb.st_ino && st.st_dev == ftw->parent->statb.st_dev;
+				v = !stat(path, &st);
 				path[n] = 0;
+				if (v)
+					v = st.st_nlink <= 2 || st.st_ino == ftw->parent->statb.st_ino && st.st_dev == ftw->parent->statb.st_dev || strchr(astconf("PATH_ATTRIBUTES", path, NiL), 'l');
 			}
-			else v = 1;
+			else
+				v = 1;
 			if (v)
 			{
 				if (state.interactive && astquery(2, "remove directory %s? ", ftw->path) > 0)
@@ -266,7 +264,8 @@ rm(register Ftw_t* ftw)
 						break;
 					}
 			}
-			else close(n);
+			else
+				close(n);
 		}
 #if _lib_fsync
 		if (state.clobber && S_ISREG(ftw->statb.st_mode) && ftw->statb.st_size > 0)

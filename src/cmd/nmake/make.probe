@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)make.probe (AT&T Research) 2000-01-11
+# @(#)make.probe (AT&T Research) 2000-03-17
 #
 # C probe for make
 #
@@ -69,6 +69,8 @@ echo '#define g(a,b) a ## b
 volatile int a;
 const int g(x,y)=1;
 extern int c(int);' > stdc.$src
+echo 'extern int f(); main() { return f(); }' > sovmain.$src
+echo 'int f() { return 0; }' > sovlib.$src
 echo 'template <class T> void f(T){}
 int main(){f(1);return 0;}' > toucho.$src
 echo '#if defined(__STDC__) || defined(__cplusplus)
@@ -107,6 +109,7 @@ repository=
 require=
 shared=
 shared_registry=
+soversion=
 stdc=
 strict=
 symprefix=
@@ -393,7 +396,7 @@ then	eval set x $probe_nmflags
 		case $# in
 		0)	break ;;
 		esac
-		case `$nm $1 pic.$obj | grep -c '[0-9][ 	][ 	]*[TDBC][ 	][ 	]*[_A-Za-z]'` in
+		case `$nm $1 pic.$obj | grep -c '[0-9][ 	][ 	]*T[ 	][ 	]*[_A-Za-z]'` in
 		0)	;;
 		*)	nmflags=$1
 			break
@@ -408,7 +411,7 @@ then	eval set x $probe_nmflags
 			;;
 		esac
 		;;
-	*)	nmedit="-e '/[ 	][TDBC][ 	][ 	]*[_A-Za-z]/!d' -e 's/.*[ 	][TDBC][ 	][ 	]*//'"
+	*)	nmedit="-e '/[ 	]T[ 	][ 	]*[_A-Za-z]/!d' -e 's/.*[ 	]T[ 	][ 	]*//'"
 		;;
 	esac
 fi
@@ -556,6 +559,7 @@ case $pic:$so:$dynamic:$static in
 						fi
 					done
 				fi
+				lib_dll=symbol
 				;;
 			esac
 			;;
@@ -628,6 +632,17 @@ case $pic:$so:$dynamic:$static in
 					break
 				fi
 			done
+		fi
+		rm -f libxxx$so
+		if	$cc -c sovmain.$src &&
+			$cc $pic -c sovlib.c &&
+			$ld $shared -o libxxx$so sovlib.$obj &&
+			$cc -o sovmain.$exe -L. sovmain.$obj -lxxx
+		then	rm -f sovmain.$exe
+			mv libxxx$so libxxx$so.5.6
+			if	$cc -o sovmain.$exe -L. sovmain.$obj -lxxx
+			then	soversion=1
+			fi
 		fi
 		;;
 	esac
@@ -1027,7 +1042,7 @@ esac
 case $so:$dynamic:$static in
 ::)	;;
 *)	dialect="$dialect DYNAMIC"
-	case $sov in
+	case $soversion in
 	?*)	dialect="$dialect VERSION" ;;
 	esac
 	;;
@@ -1109,62 +1124,121 @@ case $ldscript in
 esac
 
 #
-# the payoff
+# set up for local override
 #
+
+CC_CC=$cc
+CC_ALTPP_FLAGS=$ppopt
+CC_ALTPP_ENV=$ppenv
+CC_ARFLAGS=$arflags
+CC_DEBUG=$debug
+CC_DIALECT=$dialect
+CC_DLL=$pic
+CC_DLLBIG=$PIC
+CC_DYNAMIC=$dynamic
+case $hosttype in
+?*)	CC_HOSTTYPE=$hosttype ;;
+*)	CC_HOSTTYPE=unknown ;;
+esac
+CC_LD=$ld
+CC_LD_DYNAMIC=$lddynamic
+CC_LD_RUNPATH=$ldrunpath
+CC_LD_STATIC=$ldstatic
+CC_LIB_DLL=$lib_dll
+CC_LIB_ALL=$lib_all
+CC_LIB_UNDEF=$lib_undef
+CC_MAKE_OPTIONS=$makeoptions
+CC_NM=$nm
+CC_NMEDIT=$nmedit
+CC_NMFLAGS=$nmflags
+CC_OPTIMIZE=$optimize
+CC_READONLY=$readonly
+CC_REPOSITORY=$repository
+CC_REQUIRE=$require
+CC_SHARED=$shared
+CC_SHARED_REGISTRY=$shared_registry
+CC_SHARED_REGISTRY_PATH=$probe_shared_registry_path
+CC_STATIC=$static
+CC_STDINCLUDE=$stdinclude
+CC_STDLIB=$stdlib
+CC_STRICT=$strict
+CC_SUFFIX_ARCHIVE=.$lib
+CC_SUFFIX_COMMAND=$suffix_command
+CC_SUFFIX_DYNAMIC=$sd
+CC_SUFFIX_LD=$ldscript
+CC_SUFFIX_OBJECT=.$obj
+CC_SUFFIX_SHARED=$so
+CC_SUFFIX_SOURCE=.$src
+CC_SUFFIX_STATIC=$sa
+CC_SYMPREFIX=$symprefix
+CC_WARN=$warn
+CC_ATTRIBUTES=$ATTRIBUTES
 
 exec >&3
 
-echo CC.CC = $cc
-echo CC.ALTPP.FLAGS = $ppopt
-echo CC.ALTPP.ENV = $ppenv
-echo CC.ARFLAGS = $arflags
-echo CC.DEBUG = $debug
-echo CC.DIALECT = $dialect
-echo CC.DLL = $pic
-echo CC.DLLBIG = $PIC
-echo CC.DYNAMIC = $dynamic
-case $hosttype in
-?*)	echo CC.HOSTTYPE = $hosttype ;;
-*)	echo CC.HOSTTYPE = unknown ;;
+echo CC.CC = $CC_CC
+
+#
+# check for local override
+# all CC_* but CC_CC may be modified
+# additional CC.* may be printed on stdout
+#
+
+if	test -f "$dir/probe.lcl"
+then	. "$dir/probe.lcl"
+fi
+
+#
+# the payoff
+#
+
+echo CC.ALTPP.FLAGS = $CC_ALTPP_FLAGS
+echo CC.ALTPP.ENV = $CC_ALTPP_ENV
+echo CC.ARFLAGS = $CC_ARFLAGS
+echo CC.DEBUG = $CC_DEBUG
+echo CC.DIALECT = $CC_DIALECT
+echo CC.DLL = $CC_DLL
+echo CC.DLLBIG = $CC_DLLBIG
+echo CC.DYNAMIC = $CC_DYNAMIC
+echo CC.HOSTTYPE = $CC_HOSTTYPE
+echo CC.LD = $CC_LD
+echo CC.LD.DYNAMIC = $CC_LD_DYNAMIC
+echo CC.LD.RUNPATH = $CC_LD_RUNPATH
+echo CC.LD.STATIC = $CC_LD_STATIC
+echo CC.LIB.DLL = $CC_LIB_DLL
+echo CC.LIB.ALL = $CC_LIB_ALL
+echo CC.LIB.UNDEF = $CC_LIB_UNDEF
+echo CC.MAKE.OPTIONS = $CC_MAKE_OPTIONS
+echo CC.NM = $CC_NM
+case $CC_NMEDIT in
+?*)	CC_NMEDIT=" $CC_NMEDIT" ;;
 esac
-echo CC.LD = $ld
-echo CC.LD.DYNAMIC = $lddynamic
-echo CC.LD.RUNPATH = $ldrunpath
-echo CC.LD.STATIC = $ldstatic
-echo CC.LIB.DLL = $lib_dll
-echo CC.LIB.ALL = $lib_all
-echo CC.LIB.UNDEF = $lib_undef
-echo CC.MAKE.OPTIONS = $makeoptions
-echo CC.NM = $nm
-case $nmedit in
-?*)	nmedit=" $nmedit" ;;
-esac
-echo CC.NMEDIT ="$nmedit"
-echo CC.NMFLAGS = $nmflags
-echo CC.OPTIMIZE = $optimize
-echo CC.READONLY = $readonly
-echo CC.REPOSITORY = $repository
-for f in $require
+echo CC.NMEDIT ="$CC_NMEDIT"
+echo CC.NMFLAGS = $CC_NMFLAGS
+echo CC.OPTIMIZE = $CC_OPTIMIZE
+echo CC.READONLY = $CC_READONLY
+echo CC.REPOSITORY = $CC_REPOSITORY
+for f in $CC_REQUIRE
 do	echo CC.REQUIRE.$f =`cat req.$f`
 done
-echo CC.SHARED = $shared
-echo CC.SHARED.REGISTRY = $shared_registry
-echo CC.SHARED.REGISTRY.PATH = $probe_shared_registry_path
-echo CC.STATIC = $static
-echo CC.STDINCLUDE = $stdinclude
-echo CC.STDLIB = $stdlib
-echo CC.STRICT = $strict
-echo CC.SUFFIX.ARCHIVE = .$lib
-echo CC.SUFFIX.COMMAND = $suffix_command
-echo CC.SUFFIX.DYNAMIC = $sd
-echo CC.SUFFIX.LD = $ldscript
-echo CC.SUFFIX.OBJECT = .$obj
-echo CC.SUFFIX.SHARED = $so
-echo CC.SUFFIX.SOURCE = .$src
-echo CC.SUFFIX.STATIC = $sa
-echo CC.SYMPREFIX = $symprefix
-echo CC.WARN = $warn
+echo CC.SHARED = $CC_SHARED
+echo CC.SHARED.REGISTRY = $CC_SHARED_REGISTRY
+echo CC.SHARED.REGISTRY.PATH = $CC_SHARED_REGISTRY_PATH
+echo CC.STATIC = $CC_STATIC
+echo CC.STDINCLUDE = $CC_STDINCLUDE
+echo CC.STDLIB = $CC_STDLIB
+echo CC.STRICT = $CC_STRICT
+echo CC.SUFFIX.ARCHIVE = $CC_SUFFIX_ARCHIVE
+echo CC.SUFFIX.COMMAND = $CC_SUFFIX_COMMAND
+echo CC.SUFFIX.DYNAMIC = $CC_SUFFIX_DYNAMIC
+echo CC.SUFFIX.LD = $CC_SUFFIX_LD
+echo CC.SUFFIX.OBJECT = $CC_SUFFIX_OBJECT
+echo CC.SUFFIX.SHARED = $CC_SUFFIX_SHARED
+echo CC.SUFFIX.SOURCE = $CC_SUFFIX_SOURCE
+echo CC.SUFFIX.STATIC = $CC_SUFFIX_STATIC
+echo CC.SYMPREFIX = $CC_SYMPREFIX
+echo CC.WARN = $CC_WARN
 
-for i in $ATTRIBUTES
+for i in $CC_ATTRIBUTES
 do	eval echo CC.$i = \$$i
 done

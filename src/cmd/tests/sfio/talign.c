@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -45,14 +45,14 @@ Sfdisc_t*	disc;
 
 Sfdisc_t	Disc = {readf, (Sfwrite_f)0, (Sfseek_f)0, (Sfexcept_f)0, (Sfdisc_t*)0};
 
-main()
+MAIN()
 {
 	Sfio_t*	f;
 	int	i;
 	char*	s;
 	char	buf[1024], rbuf[128*1024];
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0), "w")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
 		terror("Opening to write\n");
 
 	for(i = 0; i < sizeof(buf); ++i)
@@ -63,7 +63,7 @@ main()
 			terror("Write error\n");
 	sfclose(f);
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0), "r")) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
 		terror("Opening to read\n");
 	sfsetbuf(f,rbuf,sizeof(rbuf));
 
@@ -79,7 +79,5 @@ main()
 	if(Read != 1024*sizeof(buf) )
 		terror("Count=%d Read=%d\n", Count, Read);
 
-	sftcleanup();
-
-	return 0;
+	TSTRETURN(0);
 }

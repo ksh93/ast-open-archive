@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -661,7 +661,7 @@ execute(register struct joblist* job)
 			}
 		}
 		t = sfstruse(tmp);
-#if !HUH19920229 /* i386 and ftx m68k dump without this statement -- help */
+#if !_HUH_1992_02_29 /* i386 and ftx m68k dump without this statement -- help */
 		message((-99, "execute: %s: t=0x%08x &t=0x%08x", job->target->name, t, &t));
 #endif
 		if (state.mam.out)
@@ -1021,7 +1021,7 @@ block(int check)
 		job = (struct joblist*)cojob->local;
 		if (cojob->status)
 		{
-			error(2, "*** %s code %d making %s%s", EXITED_TERM(cojob->status) ? "termination" : "exit", EXIT_CODE(cojob->status), job->target->name, (job->flags & CO_IGNORE) ? " ignored" : null);
+			error(2, "*** %s code %d making %s%s", ERROR_translate(NiL, NiL, NiL, EXITED_TERM(cojob->status) ? "termination" : "exit"), EXIT_CODE(cojob->status), job->target->name, (job->flags & CO_IGNORE) ? ERROR_translate(NiL, NiL, NiL, " ignored") : null);
 			if (!(job->flags & CO_IGNORE))
 			{
 				job->flags |= CO_ERRORS;

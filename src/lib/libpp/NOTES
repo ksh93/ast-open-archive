@@ -1,4 +1,4 @@
-New C preprocessor features.
+C preprocessor features:
 
 (1)	The preprocessor is centered around the libpp.a  library.  This
 	library provides a tokenizing implementation of the preprocessing
@@ -19,7 +19,7 @@ New C preprocessor features.
 	added to relieve the conflicts introduced by predefined #define
 	macros (e.g., unix, vax, u3b, ...).  This is the same feature
 	present in the extended Reiser cpp that has been included in the
-	nmake distribution for the past two years.
+	nmake distribution. (NOTE: #assert is a failed experiment)
 
 (4)	The implementation is sensitive to the incompatible differences
 	between the Reiser cpp (used by AT&T and BSD compilers) and the new
@@ -45,4 +45,39 @@ New C preprocessor features.
 	advantage of local extensions without invalidating the
 	conformance of the C language implementation.
 
-ADD -I- #multiple
+C9X additions:
+
+(1)	#pragma STDC ...
+		special forms always accecpted
+
+(2)	_Pragma unary operator for pragmas via macro expansion
+		_Pragma(string-literal)
+			#pragma a b c
+			_Pragma("a b c")
+
+(3)	keywords
+		restrict inline _Bool _Complex _Imaginary
+
+(4)	macros
+		__STDC_VERSION__ 		199901L
+		__STDC_IEC_559__		1 or undef
+		__STDC_IEC_559_COMPLEX__	1 or udef
+		__STDC_ISO_10646__		yyyymmL
+
+(5)	empty arguments allowed in function-like macros
+
+(6)	variable arguments via ...
+		__VA_ARGS__ in replacement list only, expands to var args
+		only var args is ok (shall only appear in ...)
+
+(7)	hex floating constant with binary exponents
+		xxxxxx[pP]dddd
+
+(8)	// style comments
+
+(9)	universal characters, even in identifiers!
+		\uxxxx \Uxxxxxxxx
+
+(10)	LL ll ULL ull suffix for long long literals
+
+(11)	<stdarg.h> has va_copy()

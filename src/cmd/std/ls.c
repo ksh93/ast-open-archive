@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)ls (AT&T Labs Research) 2000-02-07\n]"
+"[-?\n@(#)ls (AT&T Labs Research) 2000-05-24\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -55,8 +55,10 @@ USAGE_LICENSE
 "[c:ctime?Sort by change time; list ctime with \b--long\b.]"
 "[C:multi-column?List entries by columns.]"
 "[d:directory?List directory entries instead of contents.]"
-"[D:define?Define \akey\a with optional \avalue\a. \akey\a may be a"
-"	\b--format\b specification.]:[key[=value]]]"
+"[D:define?Define \akey\a with optional \avalue\a. \avalue\a will be expanded"
+"	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
+"	override internal \b--format\b identifiers.]:[key[=value]]]"
+"[E:block-size?Use \ablocksize\a blocks.]#[blocksize]"
 "[f:format?Append to the listing format string. \aformat\a follows"
 "	\bprintf\b(3) conventions, except that \bsfio\b(3) inline ids"
 "	are used instead of arguments:"
@@ -157,7 +159,7 @@ USAGE_LICENSE
 "	[+none?don't sort]"
 "}"
 "[Y:layout?Listing layout \akey\a:]:[key]{"
-"	[+across|horizontal?multi-column accros the page]"
+"	[+across|horizontal?multi-column across the page]"
 "	[+comma?comma separated names across the page]"
 "	[+long|verbose?long listing]"
 "	[+single-column?one column down the page]"
@@ -249,6 +251,7 @@ USAGE_LICENSE
 #define KEY_trailer		29
 #define KEY_uid			30
 
+#define BLOCKS(st)	((state.blocksize==LS_BLOCKSIZE)?iblocks(st):(iblocks(st)*LS_BLOCKSIZE+state.blocksize-1)/state.blocksize)
 #define PRINTABLE(s)	((state.lsflags&LS_PRINTABLE)?printable(s):(s))
 
 typedef struct				/* dir/total counts		*/
@@ -387,7 +390,7 @@ printable(register char* s)
  */
 
 static int
-key(void* handle, register const char* name, const char* arg, int cc, char** ps, Sflong_t* pn)
+key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn)
 {
 	register Ftw_t*		ftw;
 	register struct stat*	st;
@@ -409,14 +412,17 @@ key(void* handle, register const char* name, const char* arg, int cc, char** ps,
 		ftw = 0;
 		st = 0;
 	}
-	if (!(kp = (Key_t*)hashget(state.keys, name)))
+	if (!(kp = (Key_t*)hashget(state.keys, fp->t_str)))
 	{
-		if (*name != '$')
+		if (*fp->t_str != '$')
+		{
+			error(3, "%s: unknown format key", fp->t_str);
 			return 0;
+		}
 		if (!(kp = newof(0, Key_t, 1, 0)))
 			error(3, "out of space [key]");
 		kp->name = hashput(state.keys, 0, kp);
-		kp->macro = getenv(name + 1);
+		kp->macro = getenv(fp->t_str + 1);
 		kp->index = KEY_environ;
 		kp->disable = 1;
 	}
@@ -439,7 +445,7 @@ key(void* handle, register const char* name, const char* arg, int cc, char** ps,
 		break;
 	case KEY_blocks:
 		if (st)
-			n = iblocks(st);
+			n = BLOCKS(st);
 		break;
 	case KEY_ctime:
 		if (st)
@@ -492,7 +498,7 @@ key(void* handle, register const char* name, const char* arg, int cc, char** ps,
 	case KEY_gid:
 		if (st)
 		{
-			if (cc == 's')
+			if (fp->fmt == 's')
 				s = fmtgid(st->st_gid);
 			else
 				n = st->st_gid;
@@ -602,7 +608,7 @@ key(void* handle, register const char* name, const char* arg, int cc, char** ps,
 	case KEY_uid:
 		if (st)
 		{
-			if (cc == 's')
+			if (fp->fmt == 's')
 				s = fmtuid(st->st_uid);
 			else
 				n = st->st_uid;
@@ -613,7 +619,7 @@ key(void* handle, register const char* name, const char* arg, int cc, char** ps,
 	}
 	if (s)
 		*ps = s;
-	else if (cc == 's' && arg)
+	else if (fp->fmt == 's' && arg)
 	{
 		if (strneq(arg, fmt_mode, 4))
 			*ps = fmtmode(n, 1);
@@ -910,7 +916,7 @@ dir(register Ftw_t* ftw)
 			}
 			else
 			{
-				list.count.blocks += iblocks(&p->statb);
+				list.count.blocks += BLOCKS(&p->statb);
 				list.count.octets += p->statb.st_size;
 			}
 			list.count.files++;
@@ -1198,6 +1204,11 @@ main(int argc, register char** argv)
 					state.lsflags |= LS_STAT;
 			}
 			break;
+		case 'E':
+			if (opt_info.num <= 0)
+				error(3, "%ld: invalid block size", opt_info.num);
+			state.blocksize = opt_info.num;
+			break;
 		case 'F':
 			state.lsflags |= LS_MARK;
 			break;
@@ -1227,7 +1238,10 @@ main(int argc, register char** argv)
 			state.lsflags |= LS_RECURSIVE;
 			break;
 		case 'S':
-			state.lsflags |= LS_BLOCKS;
+			state.sortflags |= LS_BLOCKS;
+			break;
+		case 'U':
+			state.sortflags = LS_NOSORT;
 			break;
 		case 'V':
 			if (!(s = opt_info.arg))
@@ -1339,7 +1353,7 @@ main(int argc, register char** argv)
 	if (state.lsflags & LS_DIRECTORY)
 		state.lsflags &= ~LS_RECURSIVE;
 	if (!state.sortflags)
-		state.sortflags = state.lsflags;
+		state.sortflags = state.lsflags & ~LS_BLOCKS;
 	if (state.lsflags & LS_REVERSE)
 		state.sortflags |= LS_REVERSE;
 	if (!state.timeflags)
@@ -1412,3 +1426,6 @@ main(int argc, register char** argv)
 		sfkeyprintf(sfstdout, NiL, keys[KEY_summary].macro, key, NiL);
 	exit(error_info.errors != 0);
 }
+#if __OBSOLETE__ < 20010101
+#include "../../lib/libast/disc/sfkeyprintf.c"
+#endif

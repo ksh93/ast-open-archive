@@ -3,7 +3,6 @@
 is the AT&T
 .BR nmake ,
 first released in 1985.
-The latest version is research 3.5.
 .B nmake
 is a modern variant of the traditional Feldman
 .B make

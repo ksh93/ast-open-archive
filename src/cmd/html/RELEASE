@@ -1,3 +1,6 @@
+00-05-25 mm2html: add viewgraph outline and navigation
+00-05-11 mm2html: add .vG viewgraph macros
+00-03-04 htmlrefs: add <LINK rel=dynamic>
 00-02-14 htmlrefs: add .htaccess and <LINK> checks
 	 mm2html: add .xx ref=...
 	 mm2html: use "..." tag attribute quote instead of '...'

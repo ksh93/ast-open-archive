@@ -1035,7 +1035,7 @@ imapsync(register Imap_t* imap)
 	while (state.msg.count < imap->mailbox.exists)
 	{
 		mp = newmsg(0);
-		if (state.msg.count < imap->mailbox.unseen)
+		if (state.msg.count < imap->mailbox.unseen || !imap->mailbox.unseen)
 			mp->m_flag = MUSED|MREAD;
 	}
 	if (imap->mailbox.unseen < 0)

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -74,7 +74,7 @@ make FEATURE/syslib implicit
 make features/syslib
 done features/syslib
 prev 3d.req
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/syslib
 done FEATURE/syslib dontcare generated
 make FEATURE/syscall implicit
@@ -524,22 +524,6 @@ exec - ${CC} ${CCFLAGS}  -I. -I../../lib/libast/dir -I../../lib/libcs -I${PACKAG
 done cs.o generated
 make license.o
 make license.c
-make ../license/service.c implicit
-make ../license/license.h implicit
-make ../license/substitute.c implicit
-done ../license/substitute.c dontcare
-make ../license/signature.c implicit
-prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../license/signature.c dontcare
-prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
-prev ${PACKAGE_ast_INCLUDE}/tok.h implicit
-prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
-prev ${PACKAGE_ast_INCLUDE}/error.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ../license/license.h dontcare
-done ../license/service.c dontcare
 make ../../lib/libast/string/tokscan.c implicit
 prev ${PACKAGE_ast_INCLUDE}/tok.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -1090,7 +1074,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/lib3d.a archive
 prev lib3d.a archive
-exec - mv ${PACKAGE_ast_LIB}/lib3d.a ${PACKAGE_ast_LIB}/lib3d.a.old 2>/dev/null || true; cp lib3d.a ${PACKAGE_ast_LIB}/lib3d.a
+exec - mv ${PACKAGE_ast_LIB}/lib3d.a ${PACKAGE_ast_LIB}/lib3d.a.old 2>/dev/null || true; test '' = 'lib3d.a' || { cp lib3d.a ${PACKAGE_ast_LIB}/lib3d.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/lib3d.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/lib3d.a generated
 make ${PACKAGE_ast_LIB}/lib
@@ -1119,7 +1103,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/3d
 prev 3d.req
-exec - mv ${PACKAGE_ast_LIB}/lib/3d ${PACKAGE_ast_LIB}/lib/3d.old 2>/dev/null || true; cp 3d.req ${PACKAGE_ast_LIB}/lib/3d
+exec - mv ${PACKAGE_ast_LIB}/lib/3d ${PACKAGE_ast_LIB}/lib/3d.old 2>/dev/null || true; test '' = '3d.req' || { cp 3d.req ${PACKAGE_ast_LIB}/lib/3d  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/3d generated
 make ${INSTALLROOT}/bin
 exec - set -
@@ -1147,7 +1131,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/3d
 prev 3d
-exec - mv ${INSTALLROOT}/bin/3d ${INSTALLROOT}/bin/3d.old 2>/dev/null || true; cp 3d ${INSTALLROOT}/bin/3d
+exec - mv ${INSTALLROOT}/bin/3d ${INSTALLROOT}/bin/3d.old 2>/dev/null || true; test '' = '3d' || { cp 3d ${INSTALLROOT}/bin/3d  		    		    ;}
 done ${INSTALLROOT}/bin/3d generated
 make ${INSTALLROOT}/man/man1
 exec - set -
@@ -1176,20 +1160,20 @@ done ${INSTALLROOT}/man/man1 generated
 make ${INSTALLROOT}/man/man1/2d.1
 make 2d.1
 done 2d.1
-exec - mv ${INSTALLROOT}/man/man1/2d.1 ${INSTALLROOT}/man/man1/2d.1.old 2>/dev/null || true; cp 2d.1 ${INSTALLROOT}/man/man1/2d.1
+exec - mv ${INSTALLROOT}/man/man1/2d.1 ${INSTALLROOT}/man/man1/2d.1.old 2>/dev/null || true; test '' = '2d.1' || { cp 2d.1 ${INSTALLROOT}/man/man1/2d.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/2d.1 generated
 make ${INSTALLROOT}/man/man1/3d.1
 make 3d.1
 done 3d.1
-exec - mv ${INSTALLROOT}/man/man1/3d.1 ${INSTALLROOT}/man/man1/3d.1.old 2>/dev/null || true; cp 3d.1 ${INSTALLROOT}/man/man1/3d.1
+exec - mv ${INSTALLROOT}/man/man1/3d.1 ${INSTALLROOT}/man/man1/3d.1.old 2>/dev/null || true; test '' = '3d.1' || { cp 3d.1 ${INSTALLROOT}/man/man1/3d.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/3d.1 generated
 make ${INSTALLROOT}/bin/opaque
 prev opaque
-exec - mv ${INSTALLROOT}/bin/opaque ${INSTALLROOT}/bin/opaque.old 2>/dev/null || true; cp opaque ${INSTALLROOT}/bin/opaque
+exec - mv ${INSTALLROOT}/bin/opaque ${INSTALLROOT}/bin/opaque.old 2>/dev/null || true; test '' = 'opaque' || { cp opaque ${INSTALLROOT}/bin/opaque  		    		    ;}
 done ${INSTALLROOT}/bin/opaque generated
 make ${INSTALLROOT}/bin/vex
 prev vex
-exec - mv ${INSTALLROOT}/bin/vex ${INSTALLROOT}/bin/vex.old 2>/dev/null || true; cp vex ${INSTALLROOT}/bin/vex
+exec - mv ${INSTALLROOT}/bin/vex ${INSTALLROOT}/bin/vex.old 2>/dev/null || true; test '' = 'vex' || { cp vex ${INSTALLROOT}/bin/vex  		    		    ;}
 done ${INSTALLROOT}/bin/vex generated
 make ${INSTALLROOT}/fun
 exec - set -
@@ -1219,7 +1203,7 @@ make ${INSTALLROOT}/fun/_2d
 make _2d
 done _2d
 setv mode -Dmode="+x"
-exec - mv ${INSTALLROOT}/fun/_2d ${INSTALLROOT}/fun/_2d.old 2>/dev/null || true; cp _2d ${INSTALLROOT}/fun/_2d  		    		   && chmod ugo+x ${INSTALLROOT}/fun/_2d
+exec - mv ${INSTALLROOT}/fun/_2d ${INSTALLROOT}/fun/_2d.old 2>/dev/null || true; test '' = '_2d' || { cp _2d ${INSTALLROOT}/fun/_2d  		    		   && chmod ugo+x ${INSTALLROOT}/fun/_2d ;}
 done ${INSTALLROOT}/fun/_2d generated
 done install virtual
 make test

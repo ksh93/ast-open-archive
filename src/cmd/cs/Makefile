@@ -14,6 +14,8 @@ dbm tcp :SERVICE: dbm.c -ldbm
 
 fs_env tcp :SERVICE: fs_env.c
 
+mbb tcp :SERVICE: mbb.c
+
 nam fdp :SERVICE: nam.c
 
 pid udp :SERVICE: pid.c
@@ -23,6 +25,8 @@ rsh tcp :SERVICE: rsh.c
 tst-old tcp :SERVICE: CCFLAGS=-g tst-old.c
 
 tst tcp :SERVICE: CCFLAGS=-g tst.c
+
+6263 tcp :SERVICE: 6263.c
 
 .SOURCE : vcs_src
 

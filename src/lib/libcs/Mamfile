@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -87,10 +87,10 @@ make FEATURE/lib
 make features/lib
 done features/lib
 prev cs.req
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - iffe -v -c '${CC} ${CCFLAGS}    ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/lib
 done FEATURE/lib generated
-exec - cmp 2>/dev/null -s FEATURE/lib cs_lib.h || { rm -f cs_lib.h; cp FEATURE/lib cs_lib.h; }
+exec - cmp 2>/dev/null -s FEATURE/lib cs_lib.h || { rm -f cs_lib.h; silent test -d . || mkdir .; cp FEATURE/lib cs_lib.h; }
 done cs_lib.h dontcare generated
 make ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_tty.h dontcare
@@ -176,7 +176,7 @@ done features/cs.c
 prev cs.req
 exec - iffe -v -c '${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast ${LDFLAGS} '  ref ${mam_cc_L+-L${PACKAGE_ast_LIB}} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast} : run features/cs.c
 done FEATURE/cs generated
-exec - cmp 2>/dev/null -s FEATURE/cs ast_cs.h || { rm -f ast_cs.h; cp FEATURE/cs ast_cs.h; }
+exec - cmp 2>/dev/null -s FEATURE/cs ast_cs.h || { rm -f ast_cs.h; silent test -d . || mkdir .; cp FEATURE/cs ast_cs.h; }
 done ast_cs.h dontcare generated
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cs.h dontcare
@@ -635,7 +635,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libcs.a archive
 prev libcs.a archive
-exec - mv ${PACKAGE_ast_LIB}/libcs.a ${PACKAGE_ast_LIB}/libcs.a.old 2>/dev/null || true; cp libcs.a ${PACKAGE_ast_LIB}/libcs.a
+exec - mv ${PACKAGE_ast_LIB}/libcs.a ${PACKAGE_ast_LIB}/libcs.a.old 2>/dev/null || true; test '' = 'libcs.a' || { cp libcs.a ${PACKAGE_ast_LIB}/libcs.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libcs.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libcs.a generated
 make ${INSTALLROOT}/man/man3
@@ -665,7 +665,7 @@ done ${INSTALLROOT}/man/man3 generated
 make ${INSTALLROOT}/man/man3/cs.3
 make cs.3
 done cs.3
-exec - mv ${INSTALLROOT}/man/man3/cs.3 ${INSTALLROOT}/man/man3/cs.3.old 2>/dev/null || true; cp cs.3 ${INSTALLROOT}/man/man3/cs.3
+exec - mv ${INSTALLROOT}/man/man3/cs.3 ${INSTALLROOT}/man/man3/cs.3.old 2>/dev/null || true; test '' = 'cs.3' || { cp cs.3 ${INSTALLROOT}/man/man3/cs.3  		    		    ;}
 done ${INSTALLROOT}/man/man3/cs.3 generated
 make ${PACKAGE_ast_LIB}/lib
 exec - set -
@@ -693,7 +693,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/cs
 prev cs.req
-exec - mv ${PACKAGE_ast_LIB}/lib/cs ${PACKAGE_ast_LIB}/lib/cs.old 2>/dev/null || true; cp cs.req ${PACKAGE_ast_LIB}/lib/cs
+exec - mv ${PACKAGE_ast_LIB}/lib/cs ${PACKAGE_ast_LIB}/lib/cs.old 2>/dev/null || true; test '' = 'cs.req' || { cp cs.req ${PACKAGE_ast_LIB}/lib/cs  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/cs generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -
@@ -785,11 +785,11 @@ exec - fi
 done ${PACKAGE_ast_LIB}/cs generated
 make ${PACKAGE_ast_LIB}/cs/genlocal
 prev genlocal
-exec - mv ${PACKAGE_ast_LIB}/cs/genlocal ${PACKAGE_ast_LIB}/cs/genlocal.old 2>/dev/null || true; cp genlocal ${PACKAGE_ast_LIB}/cs/genlocal
+exec - mv ${PACKAGE_ast_LIB}/cs/genlocal ${PACKAGE_ast_LIB}/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || { cp genlocal ${PACKAGE_ast_LIB}/cs/genlocal  		    		    ;}
 done ${PACKAGE_ast_LIB}/cs/genlocal generated
 make ${PACKAGE_ast_LIB}/cs/genshare
 prev genshare
-exec - mv ${PACKAGE_ast_LIB}/cs/genshare ${PACKAGE_ast_LIB}/cs/genshare.old 2>/dev/null || true; cp genshare ${PACKAGE_ast_LIB}/cs/genshare
+exec - mv ${PACKAGE_ast_LIB}/cs/genshare ${PACKAGE_ast_LIB}/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || { cp genshare ${PACKAGE_ast_LIB}/cs/genshare  		    		    ;}
 done ${PACKAGE_ast_LIB}/cs/genshare generated
 make ${INSTALLROOT}/share/lib/cs
 exec - set -
@@ -818,15 +818,15 @@ done ${INSTALLROOT}/share/lib/cs generated
 make ${INSTALLROOT}/share/lib/cs/local.ast
 make local.ast
 done local.ast
-exec - mv ${INSTALLROOT}/share/lib/cs/local.ast ${INSTALLROOT}/share/lib/cs/local.ast.old 2>/dev/null || true; cp local.ast ${INSTALLROOT}/share/lib/cs/local.ast
+exec - mv ${INSTALLROOT}/share/lib/cs/local.ast ${INSTALLROOT}/share/lib/cs/local.ast.old 2>/dev/null || true; test '' = 'local.ast' || { cp local.ast ${INSTALLROOT}/share/lib/cs/local.ast  		    		    ;}
 done ${INSTALLROOT}/share/lib/cs/local.ast generated
 make ${INSTALLROOT}/share/lib/cs/genlocal
 prev genlocal
-exec - mv ${INSTALLROOT}/share/lib/cs/genlocal ${INSTALLROOT}/share/lib/cs/genlocal.old 2>/dev/null || true; cp genlocal ${INSTALLROOT}/share/lib/cs/genlocal
+exec - mv ${INSTALLROOT}/share/lib/cs/genlocal ${INSTALLROOT}/share/lib/cs/genlocal.old 2>/dev/null || true; test '' = 'genlocal' || { cp genlocal ${INSTALLROOT}/share/lib/cs/genlocal  		    		    ;}
 done ${INSTALLROOT}/share/lib/cs/genlocal generated
 make ${INSTALLROOT}/share/lib/cs/genshare
 prev genshare
-exec - mv ${INSTALLROOT}/share/lib/cs/genshare ${INSTALLROOT}/share/lib/cs/genshare.old 2>/dev/null || true; cp genshare ${INSTALLROOT}/share/lib/cs/genshare
+exec - mv ${INSTALLROOT}/share/lib/cs/genshare ${INSTALLROOT}/share/lib/cs/genshare.old 2>/dev/null || true; test '' = 'genshare' || { cp genshare ${INSTALLROOT}/share/lib/cs/genshare  		    		    ;}
 done ${INSTALLROOT}/share/lib/cs/genshare generated
 make ${INSTALLROOT}/share/lib/cs/tcp
 setv mode -Dmode="+rwxt"
@@ -905,7 +905,7 @@ done ${PACKAGE_ast_LIB}/make generated
 make ${PACKAGE_ast_LIB}/make/SERVICE.mk
 make SERVICE.mk
 done SERVICE.mk
-exec - mv ${PACKAGE_ast_LIB}/make/SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk.old 2>/dev/null || true; cp SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk
+exec - mv ${PACKAGE_ast_LIB}/make/SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk.old 2>/dev/null || true; test '' = 'SERVICE.mk' || { cp SERVICE.mk ${PACKAGE_ast_LIB}/make/SERVICE.mk  		    		    ;}
 done ${PACKAGE_ast_LIB}/make/SERVICE.mk generated
 make ${PACKAGE_ast_LIB}/cs/share
 make share

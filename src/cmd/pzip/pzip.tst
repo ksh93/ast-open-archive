@@ -29,8 +29,8 @@ TEST 01 'pin'
 	DO	DATA tst.dat
 	PROG pin -v tst.dat
 		OUTPUT - $'# pzip partition
-# pin (AT&T Labs Research) 2000-02-11
-# row 6 window 4194300 compression level 6
+# pin (AT&T Labs Research) 2000-06-01
+# row 6 window 60000 compression level 6
 
 6	# high frequency 1
 
@@ -38,7 +38,7 @@ TEST 01 'pin'
 		ERROR - $'row size 6
 filter top 10% high frequency columns
 filter done -- 10000 rows
-1 high frequency column
+1 high frequency column out of 6
 reorder pairs for 0 [4]
 reorder part 3
 reorder done

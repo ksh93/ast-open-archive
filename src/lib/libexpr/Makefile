@@ -6,7 +6,7 @@
 
 LICENSE = since=1989,author=kpv
 
-CCFLAGS = -O $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
 
 /* NOTE: -o mam bug in -I for exparse.c if exparse.y not first */
 

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -486,11 +486,11 @@ trcopy(Tr_t* tr, Sfio_t* ip, Sfio_t* op, ssize_t ncopy)
 	}
 	if (inbuff && (c = inp - inbuff) > 0)
 		sfread(ip, inbuff, c);
-	if (outbuff && (c = outp - outbuff) > 0)
+	if (outbuff && (c = outp - outbuff) >= 0)
 		sfwrite(op, outbuff, c);
-	if (sfsync(op) || sferror(op))
+	if (sfsync(op) && (c = 1) || sferror(op) && (c = 2))
 	{
-		error(ERROR_SYSTEM|2, "write error");
+		error(ERROR_SYSTEM|2, "write error [%d]", c);
 		return -1;
 	}
 	return nwrite;
@@ -502,7 +502,7 @@ b_tr(int argc, char** argv, void* context)
 	register int	flags = 0;
 	Tr_t*		tr;
 
-	cmdinit(argv, context);
+	cmdinit(argv, context, ERROR_CATALOG);
 	flags = 0;
 	for (;;)
 	{

@@ -80,29 +80,37 @@ headers(struct msg* msgvec)
 	register struct msg*	mp;
 	int			m;
 
-	n = msgvec->m_index;
-	if ((m = state.var.screen) <= 0 && (m = state.msg.count) <= 0)
-		m = 1;
-	if (n != 0)
-		state.scroll = (n - 1) / m;
-	if (state.scroll < 0)
-		state.scroll = 0;
-	mp = state.msg.list + state.scroll * m;
-	if (mp >= state.msg.list + state.msg.count)
-		mp = state.msg.list + state.msg.count - m;
-	if (mp < state.msg.list)
+	if (state.var.justfrom) {
+		flag = 1;
 		mp = state.msg.list;
-	flag = 0;
-	mesg = mp - state.msg.list;
-	if (state.msg.dot != state.msg.list + n - 1)
-		state.msg.dot = mp;
-	for (; mp < state.msg.list + state.msg.count; mp++) {
+		if (state.var.justfrom > 0 && state.var.justfrom < state.msg.count)
+			mp += state.msg.count - state.var.justfrom;
+		m = state.msg.count + 1;
+	}
+	else {
+		flag = 0;
+		n = msgvec->m_index;
+		if ((m = state.var.screen) <= 0 && (m = state.msg.count) <= 0)
+			m = 1;
+		if (n != 0)
+			state.scroll = (n - 1) / m;
+		if (state.scroll < 0)
+			state.scroll = 0;
+		mp = state.msg.list + state.scroll * m;
+		if (mp >= state.msg.list + state.msg.count)
+			mp = state.msg.list + state.msg.count - m;
+		if (mp < state.msg.list)
+			mp = state.msg.list;
+		if (state.msg.dot != state.msg.list + n - 1)
+			state.msg.dot = mp;
+	}
+	for (mesg = mp - state.msg.list; mp < state.msg.list + state.msg.count; mp++) {
 		mesg++;
 		if (mp->m_flag & (MDELETE|MNONE))
 			continue;
-		if (flag++ >= m)
-			break;
 		CALL(printhead)(mesg, !!state.var.justfrom);
+		if (++flag >= m)
+			break;
 	}
 	if (!flag) {
 		note(0, "No more mail");

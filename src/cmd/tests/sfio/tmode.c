@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,25 +24,32 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	Sfio_t	*f;
 
-	if(!(f = sfopen((Sfio_t*)0,sftfile(0),"w")))
+	if(argc > 1)
+	{	if(sfopen(sfstdin,argv[1],"r") != sfstdin)
+			terror("Can't reopen stdin");
+		sfmove(sfstdin,sfstdout,(Sfoff_t)(-1),-1);
+		return 0;
+	}
+
+	if(!(f = sfopen((Sfio_t*)0,tstfile(0),"w")))
 		terror("Opening to write\n");
 	if(sfputc(f,'a') != 'a')
 		terror("sfputc\n");
 	if(sfgetc(f) >= 0)
 		terror("sfgetc\n");
 	
-	if(!(f = sfopen(f,sftfile(0),"r")))
+	if(!(f = sfopen(f,tstfile(0),"r")))
 		terror("Opening to read\n");
 	if(sfgetc(f) != 'a')
 		terror("sfgetc2\n");
 	if(sfputc(f,'b') >= 0)
 		terror("sfputc2\n");
 
-	if(!(f = sfopen(f,sftfile(0),"r+")))
+	if(!(f = sfopen(f,tstfile(0),"r+")))
 		terror("Opening to read/write\n");
 
 	if(sfgetc(f) != 'a')
@@ -52,7 +59,7 @@ main()
 	if(sfclose(f) < 0)
 		terror("sfclose\n");
 
-	if(!(f = sfpopen(NIL(Sfio_t*),sfprints("cat %s",sftfile(0)),"r")))
+	if(!(f = sfpopen(NIL(Sfio_t*),sfprints("%s %s", argv[0], tstfile(0)),"r")))
 		terror("sfpopen\n");
 	if(sfgetc(f) != 'a')
 		terror("sfgetc4\n");
@@ -61,7 +68,7 @@ main()
 	if(sfgetc(f) >= 0)
 		terror("sfgetc6\n");
 
-	if(!(f = sfopen(f,sftfile(0),"w")) )
+	if(!(f = sfopen(f,tstfile(0),"w")) )
 		terror("sfopen\n");
 	if(sfputc(f,'a') != 'a')
 		terror("sfputc1\n");
@@ -71,7 +78,7 @@ main()
 	if(sfclose(f) < 0)
 		terror("sfclose\n");
 
-	if(!(f = sfopen(NIL(Sfio_t*),sftfile(0),"a+")) )
+	if(!(f = sfopen(NIL(Sfio_t*),tstfile(0),"a+")) )
 		terror("sfopen2\n");
 	sfset(f,SF_READ,0);
 	if(!sfreserve(f,0,-1) )
@@ -79,6 +86,5 @@ main()
 	if(sfvalue(f) <= 0)
 		terror("There is no buffer?\n");
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

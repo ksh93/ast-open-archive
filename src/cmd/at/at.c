@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -31,7 +31,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)at (AT&T Labs Research) 2000-02-14\n]"
+"[-?\n@(#)at (AT&T Labs Research) 2000-05-09\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - run commands at specified time(s)]"
 "[+DESCRIPTION?\b\f?\f\b is the command interface to the \bat\b daemon."
@@ -42,9 +42,11 @@ USAGE_LICENSE
 "	are interpreted as the start time. If \atime\a is not specified then"
 "	the command is scheduled to be executed immediately, subject to the"
 "	queue constraints.]"
-"[+?The command to be executed is read from the standard input. The command"
-"	job id is written to the standard output after the command has been"
-"	successfully submitted to the daemon.]"
+"[+?If \b--time\b is specified then the first non-option argument is the"
+"	command to be executed, otherwise the command to be executed is read"
+"	from the standard input. The command job id is written to the standard"
+"	output after the command has been successfully submitted to the"
+"	daemon.]"
 
 "[a:access?Check queue access and exit.]"
 "[f:file?\afile\a is a script to be run at the specified time.]:[file]"
@@ -73,19 +75,29 @@ USAGE_LICENSE
 "[D:debug?Enable \bat\b daemon debug tracing to \afile\a at debug level"
 "	\alevel\a. Higher levels produce more output. Requires sufficient"
 "	privilege.]:[[level]][file]]]"
-"[L:log?Write the log file path name on the standard output and exit.]"
+"[L:log?Write the log file path name on the standard output and exit. The log"
+"	file is renamed with a \b.old\b suffix at the beginning of each month"
+"	and a new log file started.]"
 "[Q:quit?Terminate the \bat\b daemon. Requires sufficient privilege.]"
 "[U:update?Causes the \bat\b daemon to do a schedule update and re-read"
 "	the queue definition file if it has changed from the last time"
 "	it was read. If \aqueuedef\a is specified then it is interpreted as"
 "	a queue definition file line. See \bQUEUE DEFINITIONS\b below."
 "	Requires sufficient privilege.]:?[queuedef]"
-"[+QUEUE DEFINITIONS?The queue definition file defines queue attributes,"
+"[+QUEUE DEFINITIONS?(\aNOTE\a: the \bnroff\b(1) style syntax is taken from"
+"	\bX/Open\b). The queue definition file defines queue attributes,"
 "	one queue per line. Lines starting with \b#\b are comments. The format"
 "	of a definition line is: \aname\a.[\anumber\a\battribute\b]]..., where"
 "	\aname\a is a single letter queue name and \anumber\a applies to the"
 "	following single character \battribute\b. If \anumber\a is omitted"
-"	then it defaults to \b1\b. The attributes are:]{"
+"	then it defaults to \b1\b. The default queues are: \ba.4j1n2u\b,"
+"	\bb.2j2n90w2u\b, \bc.h8j2u60w\b. Per-queue user access may be"
+"	specified by appending a space separated user names after the queue"
+"	attributes. If the first list element is \b+\b then the list"
+"	specifies users allowed to use the queue; othewise it specifies users"
+"	denied access to the queue. If no user list is specified then queue"
+"	access is controlled by the global files described in"
+"	\bQUEUE ACCESS\b below. The attributes are:]{"
 "		[+h?The job environment is initialized to contain at least the"
 "			\bHOME\b, \bLOGNAME\b, \bUSER\b, \bPATH\b and"
 "			\bSHELL\b of the submitting user. The jobs are also"
@@ -99,7 +111,20 @@ USAGE_LICENSE
 "		[+u?The per-user running job limit is set to \anumber\a.]"
 "		[+w?At least \anumber\a seconds will elapse before the"
 "			next job from the queue is run.]"
-"}"
+"	}"
+"[+QUEUE ACCESS?The user \broot\b may submit jobs to all queues. If a queue"
+"	definition does not specify a user access list then the queue access"
+"	is controlled by the default access files in this order:]{"
+"		[+(1)?If the directory \b/usr/lib/cron\b does not exist then"
+"			job access is granted to all users.]"
+"		[+(2)?If the file \b/usr/lib/cron/at.allow\b exists then"
+"			access is granted only to user names listed in this"
+"			file, one name per line.]"
+"		[+(3)?If the file \b/usr/lib/cron/at.deny\b exists then"
+"			access is denied to user names listed in this file,"
+"			one name per line.]"
+"		[+(4)?Otherwise access is denied to all users but \broot\b.]"
+"	}"
 
 "\n"
 "\n[ job ... | time ... ]\n"
@@ -107,8 +132,9 @@ USAGE_LICENSE
 
 "[+FILES]{"
 "	[+/usr/lib/at/queuedefs?The default queue definition file.]"
+"	[+/usr/lib/cron/at.(allow|deny)?The default queue access files.]"
 "}"
-"[+SEE ALSO?\bat\b(1), \bbatch\b(1), \bcrontab\b(1), \bnice\b(1), \bsh\b(1)]"
+"[+SEE ALSO?\bbatch\b(1), \bcrontab\b(1), \bnice\b(1), \bsh\b(1)]"
 ;
 
 #include "at.h"

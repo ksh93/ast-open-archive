@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -40,7 +40,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)pin (AT&T Labs Research) 2000-02-11\n]"
+"[-?\n@(#)pin (AT&T Labs Research) 2000-06-01\n]"
 USAGE_LICENSE
 "[+NAME?pin - induce a pzip partition on fixed record data]"
 "[+DESCRIPTION?\bpin\b induces a \bpzip\b(1) column partition on data files"
@@ -828,17 +828,18 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 		{
 			pp = pz->part;
 			high = pp->nmap;
-			if (!(state.map = newof(0, size_t, high, 0)))
+			if (!(state.map = newof(state.map, size_t, high, 0)))
 				error(ERROR_SYSTEM|3, "out of space [map]");
 			memcpy(state.map, pp->map, high * sizeof(state.map[0]));
 			pzclose(pz);
 		}
 		else
 		{
-			if (!(state.map = newof(0, size_t, row, 0)))
+			if (!(state.map = oldof(state.map, size_t, row, 0)))
 				error(ERROR_SYSTEM|3, "out of space [map]");
-			if (!(state.stats = newof(0, Stats_t, row, 0)))
+			if (!(state.stats = oldof(state.stats, Stats_t, row, 0)))
 				error(ERROR_SYSTEM|3, "out of space [stats]");
+			memset(state.stats, 0, row * sizeof(state.stats[0]));
 			if (state.cache && (sp = sfopen(NiL, state.cachefile, "r")))
 			{
 				int		column;
@@ -937,7 +938,7 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 						break;
 				high = j;
 				if (state.verbose)
-					sfprintf(sfstderr, "%d high frequency column%s\n", high, high == 1 ? "" : "s");
+					sfprintf(sfstderr, "%d high frequency column%s out of %d\n", high, high == 1 ? "" : "s", row);
 			}
 
 			/*
@@ -949,7 +950,7 @@ filter(Sfio_t* ip, unsigned char** bufp, unsigned char** datp, Pz_t* pz, size_t 
 			for (j = 0; j < high; j++)
 				state.map[j] = state.stats[j].column;
 			state.pairs = row;
-			if (!(state.pam = newof(0, size_t, row, 0)))
+			if (!(state.pam = newof(state.pam, size_t, row, 0)))
 				error(ERROR_SYSTEM|3, "out of space [pam]");
 			for (j = 0; j < row; j++)
 				state.pam[j] = row;
@@ -1124,6 +1125,7 @@ main(int argc, char** argv)
 	size_t		rows;
 	size_t		tot;
 	size_t		rec;
+	size_t		win;
 	int*		lab;
 	Sfio_t*		ip;
 	Sfio_t*		dp;
@@ -1226,9 +1228,14 @@ main(int argc, char** argv)
 		error(ERROR_SYSTEM|3, "out of space");
 	sfclose(dp);
 	if (op & OP_size)
+	{
 		row = 0;
+		dat = 0;
+		buf = 0;
+	}
 	for (;;)
 	{
+		ip = 0;
 		if (pz = pzopen(&disc, state.input, 0))
 		{
 			state.test = pz->test;
@@ -1255,7 +1262,7 @@ main(int argc, char** argv)
 				else if (m > 0 && (row < m || row > m && (row % m)))
 					error(1, "row size %I*d may be invalid -- try %I*u next time", sizeof(row), row, sizeof(m), m);
 				ip = pz->io;
-				pz->flags |= PZ_STREAM;
+				pz->io = 0;
 				pzclose(pz);
 				pz = 0;
 			}
@@ -1264,16 +1271,31 @@ main(int argc, char** argv)
 			return 1;
 		if (!(op & OP_size))
 			break;
+		if (rec = row)
+		{
+			win = (state.window / row) * row;
+			if (!(dat = newof(dat, unsigned char, win, 0)))
+				error(ERROR_SYSTEM|3, "out of space [dat]");
+			if (!(buf = newof(buf, unsigned char, win, 0)))
+				error(ERROR_SYSTEM|3, "out of space [buf]");
+			if ((m = sfread(ip, dat, win)) < 0)
+				m = 0;
+			rows = m / row;
+			if (filter(ip, &buf, &dat, pz, high, percent, row, row * rows) == row)
+				row = 0;
+		}
 		if (!n)
 		{
 			sfprintf(sfstdout, "%I*u\n", sizeof(row), row);
 			return 0;
 		}
 		sfprintf(sfstdout, "%8I*u %s\n", sizeof(row), row, state.input);
-		if (!(state.input = *argv++))
-			return 0;
 		if (pz)
 			pzclose(pz);
+		else if (ip)
+			sfclose(ip);
+		if (!(state.input = *argv++))
+			return 0;
 		row = 0;
 	}
 	if (!(rec = row))
@@ -1282,14 +1304,13 @@ main(int argc, char** argv)
 		error(3, "-h col-count must be <= -r row-size");
 	state.window = (state.window / row) * row;
 	if (!(dat = newof(0, unsigned char, state.window, 0)))
-		error(ERROR_SYSTEM|3, "out of space [buf]");
+		error(ERROR_SYSTEM|3, "out of space [dat]");
 	if (!(buf = newof(0, unsigned char, state.window, 0)))
 		error(ERROR_SYSTEM|3, "out of space [buf]");
 	if ((n = sfread(ip, dat, state.window)) <= 0)
 		error(3, "input empty");
 	rows = n / row;
-	if (n != rows * row)
-		error(3, "n=%I*d is not a multiple of row=%I*d", sizeof(n), n, sizeof(row), row);
+	state.window = rows * row;
 
 	/*
 	 * set up the cache file

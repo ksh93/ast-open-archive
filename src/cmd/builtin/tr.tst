@@ -22,28 +22,22 @@ function DATA
 			done
 			;;
 		nul.dat)
-			print -- '[a\000b\ac\014d\015e\016f\n\000x\015]'
+			print -- '[a\000b\007c\014d\015e\016f\n\000x\015]'
 			;;
 		nul1.dat)
-			print -- '[a\000b\ac\014de\016f\n\000x]'
+			print -- '[a\000b\007c\014de\016f\n\000x]'
 			;;
 		nul2.dat)
-			print -- '[ab\ac\014de\016f\nx]'
+			print -- '[ab\007c\014de\016f\nx]'
 			;;
 		nul3.dat)
-			print -- '[a\nb\ac\fd\ne\016f\n\nx\n]'
+			print -- '[a\nb\007c\fd\ne\016f\n\nx\n]'
 			;;
 		nul4.dat)
-			print -- '[a\nb\nc\nd\ne\nf\n\nx\n]'
+			print -- '[a\nb\nc\nd\ne\016f\n\nx\n]'
 			;;
 		nul5.dat)
-			print -- '[a\nb\nc\nd\ne\nf\nx\n]'
-			;;
-		nul6.dat)
 			print -- '\0bc123'
-			;;
-		nul9.dat)
-			print -- '[a\000bcdef\n\000x]'
 			;;
 		upper.dat)
 			for a in '[' A B C D E F G H I J K L M N O P Q R S T U V W X Y Z ']'
@@ -52,7 +46,7 @@ function DATA
 			;;
 		zero.dat)
 			for ((n = 0; n < 256; n++))
-			do	print -f "\\0"
+			do	print -f '\0'
 			done
 			;;
 		esac > $f
@@ -88,7 +82,7 @@ TEST 02 'case conversion'
 	EXEC	'[:lower:]' '[:upper:]'
 	EXEC	'[[:lower:]]' '[[:upper:]]'
 	EXEC	ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz
-		OUTPUT SAME lower.dat
+		SAME OUTPUT lower.dat
 	EXEC	A-Z a-z
 	EXEC	'[A-Z]' '[a-z]'
 	EXEC	'[:upper:]' '[:lower:]'
@@ -101,25 +95,25 @@ TEST 02 'case conversion'
 	EXEC	'[[:upper:]]' '[[:lower:]]'
 
 TEST 03 'NUL combinations'
-	DO	DATA zero.dat nul.dat nul1.dat nul2.dat
+	DO	DATA zero.dat nul.dat nul1.dat nul2.dat nul3.dat nul4.dat
 	EXEC	-d '\000'
-		INPUT zero.dat
+		SAME INPUT zero.dat
 		OUTPUT -
 	EXEC	-d '[\015]'
-		INPUT nul.dat
-		OUTPUT SAME nul1.dat
+		SAME INPUT nul.dat
+		SAME OUTPUT nul1.dat
 	EXEC	-d '[\015\000]'
-		OUTPUT SAME nul2.dat
+		SAME OUTPUT nul2.dat
 	EXEC	-d '[\000\015]'
 	EXEC	'[\015\000]' '[\n]'
-		OUTPUT SAME nul3.dat
+		SAME OUTPUT nul3.dat
 	EXEC	'[\000\015]' '[\n]'
 	EXEC	'\000-\015' '\n'
-		OUTPUT SAME nul4.dat
+		SAME OUTPUT nul4.dat
 	EXEC	'[\000-\015]' '[\n]'
 	EXEC	'[\000-\015]' '\n'
 	EXEC	'\000-\015' '[\n]'
-		OUTPUT SAME nul4.dat
+		SAME OUTPUT nul4.dat
 	EXEC	'[\000-\015]' '[\n]'
 
 TEST 04 'squeeze'
@@ -296,10 +290,10 @@ TEST 11	'from ross'
 		OUTPUT - $'.ZGzg..G'
 
 TEST 12	'gnu complains about these'
-	DO	DATA nul6.dat
+	DO	DATA nul5.dat
 	EXEC	'a' ''
 		INPUT - $'abc123'
-		SAME OUTPUT nul6.dat
+		SAME OUTPUT nul5.dat
 	EXEC	-cs '[:upper:]' 'X[Y*]'
 		OUTPUT -n - $'Y'
 	EXEC	-cs '[:cntrl:]' 'X[Y*]'

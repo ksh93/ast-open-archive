@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -91,6 +91,10 @@
 #ifndef AT_JOB_DIR
 #define AT_JOB_DIR	"lib/at/jobs"
 #endif
+
+#define AT_CRON_DIR	"../../../cron"
+#define AT_ALLOW_FILE	"at.allow"
+#define AT_DENY_FILE	"at.deny"
 
 #define AT_EXEC_FILE	"../atx"
 #define AT_QUEUE_FILE	"../../queues"

@@ -101,6 +101,14 @@ pzip	17,549,599	19.5	2m26.95s	1m53.72s	0m03.58s
 gunzip	\^	\^	0m29.82s	0m28.63s	0m00.67s
 punzip	\^	\^	0m10.52s	0m09.81s	0m00.43s
 .TE
+.xx begin=internal
+.PP
+Although you can download the source and binaries for your own evaluation,
+you can also send data to the
+.xx link="http://pzip.research.att.com/survey/	survey"
+site, which will determine if the data is suitable for
+.BR pzip .
+.xx end=internal
 .H 1 Examples
 Generate a partition, letting
 .B pin

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -767,17 +767,20 @@ ppop(int op, ...)
 					if (*pp.firstop->value == '#') sfprintf(sp, "#%s %s\n", dirname(DEFINE), pp.firstop->value);
 					else
 					{
-						if (s = strchr(pp.firstop->value, '=')) *s = ' ';
-						sfprintf(sp, "#%s %s%s\n", dirname(DEFINE), pp.firstop->value, s ? "" : " 1");
-						if (s) *s = '=';
+						if (s = strchr(pp.firstop->value, '='))
+							sfprintf(sp, "#%s %-.*s %s\n", dirname(DEFINE), s - pp.firstop->value, pp.firstop->value, s + 1);
+						else
+							sfprintf(sp, "#%s %s 1\n", dirname(DEFINE), pp.firstop->value);
 					}
 					break;
 				case PP_DIRECTIVE:
 					sfprintf(sp, "#%s\n", pp.firstop->value);
 					break;
 				case PP_OPTION:
-					if (s = strchr(pp.firstop->value, '=')) *s = ' ';
-					sfprintf(sp, "#%s %s:%s\n", dirname(PRAGMA), pp.pass, pp.firstop->value);
+					if (s = strchr(pp.firstop->value, '='))
+						sfprintf(sp, "#%s %s:%-.*s %s\n", dirname(PRAGMA), pp.pass, s - pp.firstop->value, pp.firstop->value, s + 1);
+					else
+						sfprintf(sp, "#%s %s:%s\n", dirname(PRAGMA), pp.pass, pp.firstop->value);
 					break;
 				case PP_READ:
 					sfprintf(sp, "#%s \"%s\"\n", dirname(INCLUDE), pp.firstop->value);
@@ -861,10 +864,11 @@ ppop(int op, ...)
 				, keyname(V_DIRECTIVE)
 				);
 			for (kp = variables; s = kp->name; kp++)
-			{
 				if (ppisid(*s) || *s++ == '+')
-					sfprintf(sp, "#%s __%s__ #(%s)\n" , dirname(DEFINE), s, s);
-			}
+				{
+					t = *s == '_' ? "" : "__";
+					sfprintf(sp, "#%s %s%s%s #(%s)\n" , dirname(DEFINE), t, s, t, s);
+				}
 			sfprintf(sp,
 "\
 #%s %s:no%s\n\
@@ -1147,6 +1151,10 @@ ppop(int op, ...)
 	case PP_RESERVED:
 		if ((pp.state & COMPILE) && (p = va_arg(ap, char*)))
 		{
+			if (!(sp = sfstropen()))
+				error(3, "temporary buffer allocation error");
+			sfputr(sp, p, -1);
+			p = sfstruse(sp);
 			if (s = strchr(p, '=')) *s++ = 0;
 			else s = p;
 			while (*s == '_') s++;
@@ -1167,6 +1175,7 @@ ppop(int op, ...)
 				key->lex = op;
 				if (pp.test & 0x0400) error(1, "reserved#2 `%s' %d", p, op);
 			}
+			sfstrclose(sp);
 		}
 		break;
 	case PP_SPACEOUT:

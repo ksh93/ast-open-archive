@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -92,7 +92,7 @@
 #define C_SPLICE	(1<<2)
 
 #define ppisdig(c)	((pptype)[c]&C_DIG)
-#define ppisid(c)		((pptype)[c]&C_ID)
+#define ppisid(c)	((pptype)[c]&C_ID)
 #define ppisidig(c)	((pptype)[c]&(C_ID|C_DIG))
 #define ppismac(c)	((pptype)[c]&(C_ID|C_DIG|C_SPLICE))
 #define ppissplice(c)	((pptype)[c]&C_SPLICE)
@@ -272,6 +272,8 @@
 #define T_HEXADECIMAL_L		(N_NUMBER|N_HEXADECIMAL|N_LONG)
 #define T_HEXADECIMAL_U		(N_NUMBER|N_HEXADECIMAL|N_UNSIGNED)
 #define T_HEXADECIMAL_UL	(N_NUMBER|N_HEXADECIMAL|N_UNSIGNED|N_LONG)
+#define T_HEXDOUBLE		(N_NUMBER|N_HEXADECIMAL|N_REAL)
+#define T_HEXDOUBLE_L		(N_NUMBER|N_HEXADECIMAL|N_REAL|N_LONG)
 
 /*
  * identifier and invalid token

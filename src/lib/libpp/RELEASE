@@ -1,3 +1,11 @@
+00-06-01 pplex: fix "\\U" and "\\u"
+00-05-22 ppsearch: fix uwin #include <C:/foo/bar.h>
+00-05-16 probe.win32: update reserved word list
+00-05-09 ppcontrol: fix C++ macro >+> invalid fuse
+	 ppcontrol: 'macro' expansion only for COMPATIBILITY | TRANSITION
+	 c9x: up to date with proposed standard
+00-04-01 pp.tab: add allpossible and ALLPOSSIBLE
+	 ppmacref: fix ref inside literal catenation
 00-02-14 pppopen(): general comments with "bme" (begin middle end) string
 00-01-11 pp.probe: hosttype now in C.probe
 99-11-19 is[a-z]*( => ppis[a-z]*(

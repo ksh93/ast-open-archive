@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -47,12 +47,12 @@ USAGE_LICENSE
 "[t:text?The input file is a text file that requires \\n => \\r\\n translation"
 "	on encoding.]"
 "[x:method?Specifies the encoding \amethod\a. Some encoding methods self"
-"	identify and for those the \b--metod\b is optional.]:[method]{"
-"	[+posix|uuencode?]"
-"	[+ucb|bsd?]"
-"	[+mime|base64?]"
-"	[+quoted-printable|qp?]"
-"	[+binhex|mac-binhex?]"
+"	identify and for those \b--method\b is optional.]:[method]{"
+"	[+posix|uuencode]"
+"	[+ucb|bsd]"
+"	[+mime|base64]"
+"	[+quoted-printable|qp]"
+"	[+binhex|mac-binhex]"
 "}"
 "[m?Equivalent to \b--method=mime\b.]"
 "[q?Equivalent to \b--method=quoted-printable\b.]"

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -32,7 +32,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)strings (AT&T Labs Research) 1999-10-01\n]"
+"[-?\n@(#)strings (AT&T Labs Research) 2000-04-01\n]"
 USAGE_LICENSE
 "[+NAME?strings - find and display printable strings in files]"
 "[+DESCRIPTION?\bstrings\b searches for printable strings in regular files"
@@ -67,7 +67,11 @@ USAGE_LICENSE
 #include <cmd.h>
 #include <ctype.h>
 
-#define WIDTH	4
+#define MULTIBYTE	0x01		/* must be 1			*/
+#define MULTILINE	0x02
+
+#define WIDTH		4
+
 #define	special(c)	(isspace(c) || (c) == '\a' || (c) == '\b')
 
 static int
@@ -100,19 +104,20 @@ mapchar(register int c)
 }
 
 static int
-outstring(Sfio_t* out, char* cp, int nbytes, int mbyte, int lflag)
+outstring(Sfio_t* out, char* cp, int nbytes, register int flags)
 {
-	register int	c,d;
+	register int	c;
+	register int	d;
 	register int	n = nbytes;
 
 	while (n-- > 0)
 	{
 		c = *cp;
-		if (mbyte)
+		if (flags & MULTIBYTE)
 			cp += 2;
 		else
 			cp++;
-		if (lflag && (d = mapchar(c)))
+		if ((flags & MULTILINE) && (d = mapchar(c)))
 		{
 			sfputc(out, '\\');
 			nbytes++;
@@ -125,7 +130,7 @@ outstring(Sfio_t* out, char* cp, int nbytes, int mbyte, int lflag)
 }
 
 static int
-strings(Sfio_t* in, Sfio_t* out, register int width, char* format, int mbyte, int lflag)
+strings(Sfio_t* in, Sfio_t* out, register int width, char* format, register int flags)
 {
 	register int		n = 0;
 	register int		c;
@@ -140,15 +145,15 @@ strings(Sfio_t* in, Sfio_t* out, register int width, char* format, int mbyte, in
 	if (format)
 	{
 		c = strlen(format) - 1;
-		if (mbyte)
+		if (flags & MULTIBYTE)
 			sfsprintf(fmt, sizeof(fmt), "%%%.*sI*%c", c, format, format[c]);
 		else
 			sfsprintf(fmt, sizeof(fmt), "%%%.*sI*%c %%.*s\n", c, format, format[c]);
 		if ((offset = sfseek(in, (off_t)0, SEEK_CUR)) < 0)
 			offset = 0;
-		offset -= 1;
+		offset--;
 	}
-	sep = lflag ? 0 : '\n';
+	sep = (flags & MULTILINE) ? 0 : '\n';
 	while ((inp = (unsigned char*)sfgetr(in, sep, 0)) || (inp = (unsigned char*)sfgetr(in, sep, -1)))
 	{
 		c = sfvalue(in);
@@ -156,23 +161,23 @@ strings(Sfio_t* in, Sfio_t* out, register int width, char* format, int mbyte, in
 		offset += c;
 		for (;;)
 		{
-			if (inp >= inend || !(c = *inp++) || !isprint(c) && (!lflag || !special(c)))
+			if (inp >= inend || !(c = *inp++) || !isprint(c) && (!(flags & MULTILINE) || !special(c)))
 			{
 				if (n >= width && !state)
 				{
 					if (format)
 					{
-						if (mbyte || lflag)
+						if (flags & (MULTIBYTE|MULTILINE))
 						{
 							if (sfprintf(out, fmt, sizeof(offset), offset - (inend - inp) - n) < 0)
 								return 0;
-							n = outstring(out, (char*)inp - (1+mbyte) * n - 1, n, mbyte,lflag);
+							n = outstring(out, (char*)inp - ((flags & MULTIBYTE) + 1) * n - 1, n, flags);
 						}
 						else
 							n = sfprintf(out, fmt, sizeof(offset), offset - (inend - inp) - n, n, inp - n - 1);
 					}
-					else if (mbyte || lflag)
-						n = outstring(out, (char*)inp - (1+mbyte) * n - 1, n, mbyte,lflag);
+					else if (flags & (MULTIBYTE|MULTILINE))
+						n = outstring(out, (char*)inp - ((flags & MULTIBYTE) + 1) * n - 1, n, flags);
 					else
 						n = sfprintf(out, "%.*s\n", n, inp - n - 1);
 					if (n < 0)
@@ -189,7 +194,7 @@ strings(Sfio_t* in, Sfio_t* out, register int width, char* format, int mbyte, in
 				n = 0;
 			else
 			{
-				if (mbyte)
+				if (flags & MULTIBYTE)
 					state = 1;
 				n++;
 			}
@@ -203,14 +208,13 @@ b_strings(int argc, char** argv, void* context)
 {
 	register int		n;
 	register int		width = WIDTH;
-	register int		mbyte = 0;
+	register int		flags = 0;
 	register Sfio_t*	fp;
 	register char*		cp;
 	register char*		format = 0;
-	register int		lflag = 0;
 
 	NoP(argc);
-	cmdinit(argv, context);
+	cmdinit(argv, context, ERROR_CATALOG);
 	if (argv[1] && streq(argv[1], "-"))
 		argv++;
 	for (;;)
@@ -221,10 +225,10 @@ b_strings(int argc, char** argv, void* context)
 			/* ignore this */
 			continue;
 		case 'l':
-			lflag = 1;
+			flags |= MULTILINE;
 			continue;
 		case 'm':
-			mbyte = 1;
+			flags |= MULTIBYTE;
 			continue;
 		case 'n':
 			if ((width =  opt_info.num) <= 0)
@@ -264,7 +268,7 @@ b_strings(int argc, char** argv, void* context)
 			error_info.errors = 1;
 			continue;
 		}
-		if (!strings(fp, sfstdout, width, format, mbyte, lflag))
+		if (!strings(fp, sfstdout, width, format, flags))
 		{
 			error(ERROR_system(0), "%s: failed", cp);
 			error_info.errors = 1;

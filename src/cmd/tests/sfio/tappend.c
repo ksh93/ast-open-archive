@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,7 +24,7 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	Sfio_t	*f1, *f2;
 	char*	s;
@@ -32,12 +32,12 @@ main()
 	char	buf[1024];
 	int	r, w;
 
-	if(!(f1 = sfopen(NIL(Sfio_t*), sftfile(0), "w")) )
+	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0), "w")) )
 		terror("Can't open f1\n");
-	if(!(f1 = sfopen(f1, sftfile(0), "a+")) )
+	if(!(f1 = sfopen(f1, tstfile(0), "a+")) )
 		terror("Can't open f1\n");
 
-	if(!(f2 = sfopen(NIL(Sfio_t*), sftfile(0), "a+")) )
+	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "a+")) )
 		terror("Can't open f2\n");
 
 	if(sfwrite(f1,"012345678\n",10) != 10 || sfsync(f1) < 0)
@@ -77,13 +77,13 @@ main()
 	if(strcmp(s,"012345678") != 0)
 		terror("Bad input3\n");
 
-	if(!(f1 = sfopen(f1, sftfile(0), "w")) )
+	if(!(f1 = sfopen(f1, tstfile(0), "w")) )
 		terror("Can't open file to write\n");
 	for(r = 0; r < 1024; ++r)
 		buf[r] = 'a';
 	if((w = sfwrite(f1,buf,1024)) != 1024)
 		terror("writing w=%d\n", w);
-	if(!(f1 = sfopen(f1, sftfile(0), "a")) )
+	if(!(f1 = sfopen(f1, tstfile(0), "a")) )
 		terror("Can't open file to append\n");
 	sfseek(f1,(Sfoff_t)0,0);
 	if((w = sfwrite(f1,buf,64)) != 64)
@@ -91,7 +91,5 @@ main()
 	if((r = (int)sftell(f1)) != (1024+64) )
 		terror("seek position wrong s=%d\n", r);
 
-	sftcleanup();
-
-	return 0;
+	TSTRETURN(0);
 }

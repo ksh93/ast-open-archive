@@ -20,3 +20,6 @@ sdiff::	sdiff.c \
 	diff.info diff.info-1 diff.info-2 diff.info-3 diff.info-4 \
 	diff.texi texinfo.tex \
 	Makefile.in config.hin
+
+:MSGFUN: fatal message \
+	perror_fatal perror_with_exit perror_with_name pfatal_with_name

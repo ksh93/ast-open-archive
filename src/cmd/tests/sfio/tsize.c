@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,14 +24,14 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	Sfio_t	*f, *f2;
 	char*	s;
 	int	i, n;
 	char	buf[16*1024];
 
-	if(!(f = sfopen(NIL(Sfio_t*), sftfile(0), "w+") ) )
+	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0), "w+") ) )
 		terror("Can't open file\n");
 
 	if(sfnputc(f,'a',1000) != 1000)
@@ -100,13 +100,13 @@ main()
 	if(sfsize(f) != 10)
 		terror("String size is wrong9\n");
 
-	if(!(f = sfopen(f, sftfile(0),"w") ) )
+	if(!(f = sfopen(f, tstfile(0),"w") ) )
 		terror("Reopening file1\n");
 	for(i = 0; i < 10000; ++i)
 		if(sfputc(f,'0'+(i%10)) != '0'+(i%10) )
 			terror("sfputc failed\n");
 
-	if(!(f = sfopen(f, sftfile(0),"r+") ) )
+	if(!(f = sfopen(f, tstfile(0),"r+") ) )
 		terror("Reopening file2\n");
 	if(sfsize(f) != 10000)
 		terror("Bad size of file1\n");
@@ -153,6 +153,5 @@ main()
 	if(strcmp(buf, "012345678") != 0)
 		terror("Get wrong data\n");
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

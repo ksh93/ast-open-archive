@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -142,13 +142,11 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done at.h
 done at.c
 prev at.c
-exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\" -c at.c
+exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\" -c at.c
 done at.o generated
-setv mam_libcoshell ${mam_cc_L+-lcoshell}${mam_cc_L-${PACKAGE_ast_LIB}/libcoshell.a}
-setv mam_libcoshell `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcoshell,${INSTALLROOT}/lib/libcoshell.a,} ${PACKAGE_ast_LIB}/lib/coshell`
-setv mam_libcs ${mam_cc_L+-lcs}${mam_cc_L-${PACKAGE_ast_LIB}/libcs.a}
-setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcs,${INSTALLROOT}/lib/libcs.a,} ${PACKAGE_ast_LIB}/lib/cs`
-setv mam_libast ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}
+setv mam_libcoshell `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcoshell,${INSTALLROOT}/lib/libcoshell.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/coshell 2>/dev/null || echo '' ${mam_cc_L+-lcoshell}${mam_cc_L-${PACKAGE_ast_LIB}/libcoshell.a}`
+setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-lcs,${INSTALLROOT}/lib/libcs.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/cs 2>/dev/null || echo '' ${mam_cc_L+-lcs}${mam_cc_L-${PACKAGE_ast_LIB}/libcs.a}`
+setv mam_libast `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${mam_cc_L--es,-last,${INSTALLROOT}/lib/libast.a,} ${INSTALLROOT}/lib/lib/ast 2>/dev/null || echo '' ${mam_cc_L+-last}${mam_cc_L-${PACKAGE_ast_LIB}/libast.a}`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o ast_at at.o ${mam_libcoshell} ${mam_libcs} ${mam_libast}
 done ast_at generated
 make ast_batch
@@ -202,8 +200,6 @@ done atd.c
 prev atd.c
 exec - ${CC} ${CCFLAGS}  -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c atd.c
 done atd.o generated
-setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcs,${INSTALLROOT}/lib/libcs.a,} ${PACKAGE_ast_LIB}/lib/cs`
-setv mam_libcs `${mam_cc_L+cat} ${mam_cc_L-sed} ${mam_cc_L-s,-lcs,${INSTALLROOT}/lib/libcs.a,} ${PACKAGE_ast_LIB}/lib/cs`
 exec - ${CC} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${PACKAGE_ast_LIB}}  -o at.svc atd.o ${mam_libcs} ${mam_cc_static} ${mam_libast} ${mam_cc_dynamic} ${mam_libcs} ${mam_libast}
 done at.svc generated
 make ast_crontab
@@ -217,7 +213,7 @@ exec - then ENV= $SHELL -n crontab.sh
 exec - fi
 exec - ;;
 exec - esac
-exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"' in
+exec - case 'USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"' in
 exec - "") cp crontab.sh ast_crontab
 exec - ;;
 exec - *) {
@@ -225,7 +221,7 @@ exec - i=`(read x; echo $x) < crontab.sh`
 exec - case $i in
 exec - '#!'*|*'||'*|':'*|'":"'*|"':'"*) echo $i ;;
 exec - esac
-exec - echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html]"\"
+exec - echo USAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2000 AT&T Corp.][-license?http://www.research.att.com/sw/license/ast-open.html][--catalog?at]"\"
 exec - cat crontab.sh
 exec - } > ast_crontab
 exec - ;;
@@ -258,7 +254,7 @@ exec - fi
 done ${INSTALLROOT}/bin generated
 make ${INSTALLROOT}/bin/ast_at
 prev ast_at
-exec - mv ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_at.old 2>/dev/null || true; cp ast_at ${INSTALLROOT}/bin/ast_at
+exec - mv ${INSTALLROOT}/bin/ast_at ${INSTALLROOT}/bin/ast_at.old 2>/dev/null || true; test '' = 'ast_at' || { cp ast_at ${INSTALLROOT}/bin/ast_at  		    		    ;}
 done ${INSTALLROOT}/bin/ast_at generated
 make ${INSTALLROOT}/bin/ast_batch
 prev ${INSTALLROOT}/bin/ast_at
@@ -295,7 +291,7 @@ done ${PACKAGE_ast_LIB}/at/jobs generated
 make ${PACKAGE_ast_LIB}/at/jobs/atx
 prev atx
 setv mode -Dmode="u=rx,go=x"
-exec - mv ${PACKAGE_ast_LIB}/at/jobs/atx ${PACKAGE_ast_LIB}/at/jobs/atx.old 2>/dev/null || true; cp atx ${PACKAGE_ast_LIB}/at/jobs/atx  		    		   && chmod u=rx,go=x ${PACKAGE_ast_LIB}/at/jobs/atx
+exec - mv ${PACKAGE_ast_LIB}/at/jobs/atx ${PACKAGE_ast_LIB}/at/jobs/atx.old 2>/dev/null || true; test '' = 'atx' || { cp atx ${PACKAGE_ast_LIB}/at/jobs/atx  		    		   && chmod u=rx,go=x ${PACKAGE_ast_LIB}/at/jobs/atx ;}
 done ${PACKAGE_ast_LIB}/at/jobs/atx generated
 make ${PACKAGE_ast_LIB}/cs
 exec - set -
@@ -348,11 +344,11 @@ done ${PACKAGE_ast_LIB}/cs/tcp/at generated
 make ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc
 prev at.svc
 setv preserve -Dpreserve
-exec - mv ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc.old 2>/dev/null || true; cp at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc
+exec - mv ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc.old 2>/dev/null || true; test '' = 'at.svc' || { cp at.svc ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc  		    		    ;}
 done ${PACKAGE_ast_LIB}/cs/tcp/at/at.svc generated
 make ${INSTALLROOT}/bin/ast_crontab
 prev ast_crontab
-exec - mv ${INSTALLROOT}/bin/ast_crontab ${INSTALLROOT}/bin/ast_crontab.old 2>/dev/null || true; cp ast_crontab ${INSTALLROOT}/bin/ast_crontab
+exec - mv ${INSTALLROOT}/bin/ast_crontab ${INSTALLROOT}/bin/ast_crontab.old 2>/dev/null || true; test '' = 'ast_crontab' || { cp ast_crontab ${INSTALLROOT}/bin/ast_crontab  		    		    ;}
 done ${INSTALLROOT}/bin/ast_crontab generated
 done install virtual
 make test

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -111,7 +111,7 @@ sfdcspan(Sfio_t* f, Cdb_t* cdb)
 {
 	register Span_t*	span;
 
-	if (!(span = (Span_t*)newof(0, Span_t, 1, f->size)))
+	if (!(span = (Span_t*)newof(0, Span_t, 1, f->endb - f->data)))
 		return -1;
 	span->disc.readf = spanread;
 	span->disc.exceptf = spanexcept;

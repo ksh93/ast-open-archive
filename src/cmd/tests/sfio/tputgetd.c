@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,13 +24,13 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	double	f, v;
 	int	i;
 	Sfio_t	*fp;
 
-	if(!(fp = sfopen(NIL(Sfio_t*), sftfile(0), "w+")) )
+	if(!(fp = sfopen(NIL(Sfio_t*), tstfile(0), "w+")) )
 		terror("Can't open temp file\n");
 
 	for(f = 1e-10; f < 1e-10 + 1.; f += .001)
@@ -42,6 +42,5 @@ main()
 		if((v = sfgetd(fp)) != f)
 			terror("Element=%d Input=%f, Expect=%f\n",i,v,f);
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

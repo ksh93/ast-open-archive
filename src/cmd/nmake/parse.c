@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -1585,7 +1585,10 @@ statement(Sfio_t* sp, char** lhs, struct rule** opr, char** rhs, char** act)
 							op = readfile(sfstruse(tmp), COMP_INCLUDE|COMP_DONTCARE, NiL);
 							sfstrclose(tmp);
 							if (!op || !(*opr = getrule(s - 1)) || !((*opr)->property & P_operator))
-								error(3, "operator %s not defined", s - 1);
+							{
+								*opr = internal.op;
+								error(1, "operator %s not defined", s - 1);
+							}
 						}
 						*t = c;
 						op = OP_ASSERT|OP_ACTION|OP_EXPAND;

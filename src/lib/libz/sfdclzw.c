@@ -487,7 +487,7 @@ lzw_except(Sfio_t* f, int op, void* val, Sfdisc_t* dp)
 	case SF_WRITE:
 		return *((ssize_t*)val) < 0 ? -1 : 0;
 	case SF_SYNC:
-		return lzw_sync(zs, f, -1, dp) == -1 ? -1 : 0;
+		return val ? 0 : lzw_sync(zs, f, -1, dp) == -1 ? -1 : 0;
 	case SFGZ_HANDLE:
 		return (*((LZW_t**)val) = zs) ? 1 : -1;
 	case SFGZ_GETPOS:

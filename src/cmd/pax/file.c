@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -608,7 +608,7 @@ openout(register Archive_t* ap, register File_t* f)
 			}
 			else
 			{
-				error(ERROR_SYSTEM|2, "%s: cannot create%s%s", f->name, (exists & 0100) ? ERROR_translate(0, ", cannot enable user write") : "", (exists & 0010) ? ERROR_translate(0, ", cannot remove") : "");
+				error(ERROR_SYSTEM|2, "%s: cannot create%s%s", f->name, (exists & 0100) ? ERROR_translate(0, 0, 0, ", cannot enable user write") : "", (exists & 0010) ? ERROR_translate(0, 0, 0, ", cannot remove") : "");
 				return -1;
 			}
 		}
@@ -1104,7 +1104,8 @@ initarchive(const char* name, int mode)
 	ap->expected = ap->format = -1;
 	ap->section = 0;
 	ap->sum = -1;
-	ap->io.mode = mode;
+	ap->mio.mode = ap->tio.mode = mode;
+	ap->io = &ap->mio;
 	return ap;
 }
 

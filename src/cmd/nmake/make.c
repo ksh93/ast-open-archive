@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -1104,7 +1104,7 @@ make(register struct rule* r, unsigned long* ttarget, char* arg, long flags)
 			{
 				if (r0->prereqs != r->prereqs)
 				{
-#if HUH19920930 /* this test is insufficient */
+#if _HUH_1992_09_30 /* this test is insufficient */
 					if ((r->property & (P_joint|P_target)) != (P_joint|P_target))
 						freelist(r0->prereqs);
 #endif

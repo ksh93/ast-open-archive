@@ -63,7 +63,7 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	case SF_WRITE:
 		return *((ssize_t*)val) < 0 ? -1 : 0;
 	case SF_SYNC:
-		return gzsync(gz->gz, (z_off_t)(-1)) == -1 ? -1 : 0;
+		return val ? 0 : gzsync(gz->gz, (z_off_t)(-1)) == -1 ? -1 : 0;
 	case SFGZ_HANDLE:
 		return (*((Gz_t**)val) = gz->gz) ? 1 : -1;
 	case SFGZ_GETPOS:
@@ -117,7 +117,6 @@ sfdcgzip(Sfio_t* sp, int flags)
 	char*		m;
 	Sfgzip_t*	gz;
 	char		mode[10];
-int phony = 0;
 
 	if (sp->flags & SF_READ)
 	{
@@ -163,7 +162,6 @@ int phony = 0;
 	*m++ = 'b';
 	if (flags & SFGZ_NOCRC)
 		*m++ = 'n';
-if ((sp->flags & SF_READ) && getenv("SFGZ_phony")) { phony = 1; } else
 	*m++ = 'o';
 	if ((flags &= 0xf) > 0 && flags <= 9)
 		*m++ = '0' + flags;
@@ -189,7 +187,6 @@ if ((sp->flags & SF_READ) && getenv("SFGZ_phony")) { phony = 1; } else
 #else
 	sfsetbuf(sp, NiL, SF_BUFSIZE);
 #endif
-if (phony) sp->file = open("/dev/null", 0);
 	if (!(sp->flags & SF_READ))
 		sfset(sp, SF_IOCHECK, 1);
 	return 1;

@@ -195,22 +195,7 @@ local gzFile gz_open (path, mode, fp)
          */
     } else {
 #if _PACKAGE_ast
-#if 0
-{
-	char*	v;
-	long	n;
-
-	if ((v = getenv("SFGZ_gzio_bufsize")) || (v = getenv("SFGZ_bufsize")))
-	{
-		if ((n = strtol(v, NiL, 0)) > 0)
-			sfsetbuf(s->file, (char*)0, n);
-	}
-	else
-		sfsetbuf(s->file, (void*)s->file, SF_UNBOUND);
-}
-#else
 	sfsetbuf(s->file, (void*)s->file, SF_UNBOUND);
-#endif
 #endif
 	check_header(s); /* skip the .gz header */
 	s->startpos = (ftell(s->file) - s->stream.avail_in);

@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -2287,6 +2287,10 @@ shquote(register Sfio_t* xp, char* s)
 		case '\t':
 		case '\\':
 			q |= 4;
+#if _HUH_2000_06_01
+			if (!b)
+				b = t - 1;
+#endif
 			continue;
 		case '\'':
 			q |= 1;
@@ -2300,8 +2304,8 @@ shquote(register Sfio_t* xp, char* s)
 				break;
 			continue;
 		case '=':
-			if (!b)
-				b = t;
+			if (!b && *(b = t) == '=')
+				b++;
 			continue;
 		default:
 			continue;
@@ -3192,7 +3196,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 				break;
 			case 'O':
 				if (cntlim < 0)
-					sfstrset(xp, beg);
+					sfstrset(xp, arg = beg);
 				else
 					switch (sep)
 					{

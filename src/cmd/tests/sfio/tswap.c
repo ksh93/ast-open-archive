@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -24,13 +24,13 @@
 ***************************************************************/
 #include	"sftest.h"
 
-main()
+MAIN()
 {
 	Sfio_t*	f1;
 	Sfio_t* f2;
 	char*	s;
 
-	if(!(f1 = sfopen(NIL(Sfio_t*), sftfile(0),"w+")) )
+	if(!(f1 = sfopen(NIL(Sfio_t*), tstfile(0),"w+")) )
 		terror("Can't open file\n");
 	if(sfwrite(f1,"0123456789\n",11) != 11)
 		terror("Can't write to file\n");
@@ -49,12 +49,11 @@ main()
 	if(!sfstack(sfstdout,f1) )
 		terror("Failed stacking f1\n");
 
-	if(!(f2 = sfopen(NIL(Sfio_t*), sftfile(0), "r")) )
+	if(!(f2 = sfopen(NIL(Sfio_t*), tstfile(0), "r")) )
 		terror("Can't open for read\n");
 
 	if(sfswap(f1,f2) != NIL(Sfio_t*) )
 		terror("sfswap should have failed\n");
 
-	sftcleanup();
-	return 0;
+	TSTRETURN(0);
 }

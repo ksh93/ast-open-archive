@@ -54,7 +54,7 @@ perror_with_name (text)
   int e = errno;
   fprintf (stderr, "%s: ", program_name);
   errno = e;
-  perror (text);
+  perror (TRANSLATE(text));
 }
 
 /* Use when a system call returns non-zero status and that is fatal.  */
@@ -67,7 +67,7 @@ pfatal_with_name (text)
   print_message_queue ();
   fprintf (stderr, "%s: ", program_name);
   errno = e;
-  perror (text);
+  perror (TRANSLATE(text));
   exit (2);
 }
 
@@ -79,7 +79,7 @@ error (format, arg, arg1)
      char const *format, *arg, *arg1;
 {
   fprintf (stderr, "%s: ", program_name);
-  fprintf (stderr, format, arg, arg1);
+  fprintf (stderr, TRANSLATE(format), arg, arg1);
   fprintf (stderr, "\n");
 }
 
@@ -90,7 +90,7 @@ fatal (m)
      char const *m;
 {
   print_message_queue ();
-  error ("%s", m, 0);
+  error ("%s", TRANSLATE(m), 0);
   exit (2);
 }
 
@@ -101,7 +101,7 @@ void
 message (format, arg1, arg2)
      char const *format, *arg1, *arg2;
 {
-  message5 (format, arg1, arg2, 0, 0);
+  message5 (TRANSLATE(format), arg1, arg2, 0, 0);
 }
 
 void

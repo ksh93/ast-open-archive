@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-02-14
+info mam static 00000 1994-07-17 make (AT&T Research) 4.0 2000-06-01
 setv INSTALLROOT ../../..
 setv PACKAGE_ast ${INSTALLROOT}
 setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
@@ -46,7 +46,7 @@ exec - {
 exec - case "" in
 exec - *?)	echo " " ;;
 exec - esac
-exec - for i in uu ast
+exec - for i in uu  ast
 exec - do	case $i in
 exec - 	"uu"|uu)
 exec - 		;;
@@ -181,7 +181,7 @@ exec - fi
 done ${PACKAGE_ast_LIB} generated
 make ${PACKAGE_ast_LIB}/libuu.a archive
 prev libuu.a archive
-exec - mv ${PACKAGE_ast_LIB}/libuu.a ${PACKAGE_ast_LIB}/libuu.a.old 2>/dev/null || true; cp libuu.a ${PACKAGE_ast_LIB}/libuu.a
+exec - mv ${PACKAGE_ast_LIB}/libuu.a ${PACKAGE_ast_LIB}/libuu.a.old 2>/dev/null || true; test '' = 'libuu.a' || { cp libuu.a ${PACKAGE_ast_LIB}/libuu.a  		    		    ;}
 exec - (ranlib ${PACKAGE_ast_LIB}/libuu.a) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_LIB}/libuu.a generated
 make ${PACKAGE_ast_LIB}/lib
@@ -210,7 +210,7 @@ exec - fi
 done ${PACKAGE_ast_LIB}/lib generated
 make ${PACKAGE_ast_LIB}/lib/uu
 prev uu.req
-exec - mv ${PACKAGE_ast_LIB}/lib/uu ${PACKAGE_ast_LIB}/lib/uu.old 2>/dev/null || true; cp uu.req ${PACKAGE_ast_LIB}/lib/uu
+exec - mv ${PACKAGE_ast_LIB}/lib/uu ${PACKAGE_ast_LIB}/lib/uu.old 2>/dev/null || true; test '' = 'uu.req' || { cp uu.req ${PACKAGE_ast_LIB}/lib/uu  		    		    ;}
 done ${PACKAGE_ast_LIB}/lib/uu generated
 make ${PACKAGE_ast_INCLUDE}
 exec - set -

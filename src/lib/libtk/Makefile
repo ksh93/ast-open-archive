@@ -1,7 +1,7 @@
 :PACKAGE: ast X11
 
 ID			=	tk
-CCFLAGS			=	-O
+CCFLAGS			=	$(CC.OPTIMIZE)
 TK_VERSION		=	4.2
 TCL_VERSION		= 	7.6
 

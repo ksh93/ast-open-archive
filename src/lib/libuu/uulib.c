@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -30,7 +30,7 @@
  * uuencode/uudecode methods
  */
 
-static char id[] = "\n@(#)uulib (AT&T Research) 1998-12-25\0\n";
+static char id[] = "\n@(#)uulib (AT&T Research) 2000-03-06\0\n";
 
 static const char lib[] = "libuu:uu";
 
@@ -64,6 +64,32 @@ static const Option_t	options[] =
 {
 	"text",		UU_TEXT,
 };
+
+/*
+ * initialize the uu map from dp
+ */
+
+static unsigned char*
+uu_map(register Uudata_t* dp, char* map)
+{
+	register int		c;
+	register char*		p;
+	register unsigned char*	m;
+	int			x;
+
+	x = (dp->flags & UU_LENGTH) ? 0 : UU_IGN;
+	p = map;
+	memset(p, x, UCHAR_MAX + 2);
+	if (x)
+	{
+		p++;
+		p[dp->pad] = UU_PAD;
+		p[EOF] = UU_END;
+	}
+	for (m = (unsigned char*)dp->map; c = *m; m++)
+		p[c] =  m - (unsigned char*)dp->map;
+	return (unsigned char*)p;
+}
 
 /*
  * grab uu header from input
@@ -273,17 +299,20 @@ uu_decode(register Uu_t* uu)
 	if (uu->path && (uu->flags & UU_CLOSEOUT) && (dp->flags & uu->flags & UU_HEADER) && chmod(uu->path, uu->mode) && uu->disc->errorf)
 		(*uu->disc->errorf)(uu, uu->disc, ERROR_SYSTEM|2, "%s: cannot change mode to %s", uu->path, fmtperm(uu->mode));
 	text = !!(uu->flags & UU_TEXT);
+	m = uu_map(dp, map);
 	if (dp->flags & UU_LENGTH)
 	{
-		memset(s = map, 0, sizeof(map));
-		for (m = (unsigned char*)dp->map; c = *m; m++)
-			s[c] =  m - (unsigned char*)dp->map;
-		m = (unsigned char*)s;
 		t = (char*)dp->end;
 		tl = strlen(t) + 1;
-		while (((s = sfgetr(uu->ip, '\n', 0)) || (s = sfgetr(uu->ip, '\n', -1))) && (sfvalue(uu->ip) != tl || !strneq(s, t, tl - 1)))
+		while (((s = sfgetr(uu->ip, '\n', 0)) || (s = sfgetr(uu->ip, '\n', -1))) && ((n = sfvalue(uu->ip)) != tl || !strneq(s, t, tl - 1)))
 			if (c = m[*((unsigned char*)s++)])
 			{
+				if (c > sizeof(buf))
+				{
+					if (uu->disc->errorf)
+						(*uu->disc->errorf)(uu, uu->disc, 2, "input is not %s encoded", uu->meth.name);
+					return -1;
+				}
 				p = buf;
 				e = s + (c + UUIN - 1) / UUIN * UUOUT;
 				while (s < e)
@@ -321,12 +350,6 @@ uu_decode(register Uu_t* uu)
 	}
 	else
 	{
-		memset(s = map, UU_IGN, sizeof(map));
-		for (s++, m = (unsigned char*)dp->map; c = *m; m++)
-			s[c] =  m - (unsigned char*)dp->map;
-		s[dp->pad] = UU_PAD;
-		s[EOF] = UU_END;
-		m = (unsigned char*)s;
 		for (;;)
 		{
 			while ((c = m[sfgetc(uu->ip)]) >= 64)
@@ -337,7 +360,7 @@ uu_decode(register Uu_t* uu)
 				if (c != UU_IGN)
 				{
 					if (uu->disc->errorf)
-						(*uu->disc->errorf)(uu, uu->disc, 1, "%c: extra input character ignored", s[n]);
+						(*uu->disc->errorf)(uu, uu->disc, 1, "%c: extra input character ignored", c);
 					goto pad;
 				}
 			n = (n << 6) | c;
@@ -412,7 +435,7 @@ qp_encode(register Uu_t* uu)
 	register char*		b;
 	register char*		x;
 	register int		c;
-	char			buf[UULINE];
+	char			buf[UULINE + 1];
 
 	b = buf;
 	x = b + UULINE - 4;
@@ -1403,8 +1426,12 @@ ssize_t
 uudecode(register Uu_t* uu, Sfio_t* ip, Sfio_t* op, size_t n, const char* path)
 {
 	register char*	s;
+	unsigned char*	m;
+	int		c;
 	int		headerpath;
 	Uudata_t*	data;
+	const Uumeth_t*	mp;
+	char		map[UCHAR_MAX + 2];
 
 	if (!uu->meth.decodef)
 	{
@@ -1420,14 +1447,33 @@ uudecode(register Uu_t* uu, Sfio_t* ip, Sfio_t* op, size_t n, const char* path)
 		free(uu->path);
 	uu->path = (char*)path;
 	uu->flags = uu->disc->flags;
-	if (((uu->flags & UU_HEADER) || (data = (Uudata_t*)uu->meth.data) && (data->flags & UU_HEADERMUST)) && uu->meth.headerf)
+	data = (Uudata_t*)uu->meth.data;
+	if (((uu->flags & UU_HEADER) || data && (data->flags & UU_HEADERMUST)) && uu->meth.headerf)
 	{
 		if ((*uu->meth.headerf)(uu))
 			return -1;
 		headerpath = 1;
 	}
 	else
+	{
 		headerpath = 0;
+		if (data && (data->flags & UU_DEFAULT) && (c = sfgetc(uu->ip)) != EOF)
+		{
+			sfungetc(uu->ip, c);
+			for (mp = methods; ((Uudata_t*)mp->data)->flags & UU_LENGTH; mp++)
+			{
+				m = uu_map((Uudata_t*)mp->data, map);
+				if (m[c] > 0 && m[c] < (UUIN * UUCHUNK + 1))
+					break;
+			}
+			if (mp > methods)
+			{
+				uu->meth = *mp;
+				if (uu->disc->errorf)
+					(*uu->disc->errorf)(uu, uu->disc, 1, "assuming %s encoding", mp->name);
+			}
+		}
+	}
 	if (!uu->op)
 	{
 		if (!uu->path && headerpath)

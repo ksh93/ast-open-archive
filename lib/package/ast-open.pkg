@@ -1,9 +1,11 @@
-ast-open ast-base :PACKAGE: \
+ast-open ast-base ast-ksh :PACKAGE: \
 		ksh93 pax html proto bzip libast libcmd libdll libexpr \
 		libodelta librecsort libuu libvdelta libbz libz tests \
-		3d coshell cpp cs gmake mam nmake probe ss \
+		3d coshell cpp cs gmake mam msgcc nmake probe ss \
 		libcoshell libcs libmam libpp \
 		at builtin cql diff ie mailx mam ncsl pack pzip \
 		re sort std tksh tw warp libcdb libpz libtk
 	The AT&T Labs Research ast-open package contains all of the ast open
 	source commands and libraries.
+
+:INDEX: ksh, pax, nmake, sfio, and ast open source commands and libraries

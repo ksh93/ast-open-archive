@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -69,7 +69,7 @@ USAGE_LICENSE
 "[p:interactive|prompt?Prompt to determine if each command should execute."
 "	A \by\b or \bY\b recsponse executes, otherwise the command is skipped."
 "	Implies \b--verbose\b.]"
-"[N:null?The file name list is NUL terminated; there is no other special"
+"[N|0:null?The file name list is NUL terminated; there is no other special"
 "	treatment of the list.]"
 "[s:size|max-chars?Use at most \achars\a characters per command. The default"
 "	is as large as possible.]#[chars]"

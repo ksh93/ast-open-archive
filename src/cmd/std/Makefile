@@ -20,6 +20,8 @@ du :: du.c
 
 file :: file.c
 
+iconv :: iconv.c
+
 ls :: ls.c
 
 mesg :: mesg.c LICENSE=since=1995,author=dgk

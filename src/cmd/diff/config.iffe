@@ -1,4 +1,5 @@
 set	config
+
 hdr	dirent,fcntl,limits,ndir,time,unistd,vfork
 hdr	float,stdarg,stdlib,string
 key	const =
@@ -27,19 +28,13 @@ tst	CLOSEDIR_VOID note{ closedir() is a void function }end nocompile{
 		}
 	}end
 
-cat{
-	#if _PACKAGE_ast
-	#include <ast_std.h>
-	#endif
-}end
+exp	STDC_HEADERS	HAVE_FLOAT_H&HAVE_STDARG_H&HAVE_STDLIB_H&HAVE_STRING_H
+exp	HAVE_ST_BLKSIZE	HAVE_ST_BLKSIZE_IN_STAT
 
 run{
-	case $HAVE_FLOAT_H$HAVE_STDARG_H$HAVE_STDLIB_H$HAVE_STRING_H in
-	1111)	echo "#define STDC_HEADERS 1" ;;
-	esac
-	case $HAVE_ST_BLKSIZE_IN_STAT in
-	1)	echo "#define HAVE_ST_BLKSIZE	1" ;;
-	esac
+	echo "#if _PACKAGE_ast"
+	echo "#include <ast_std.h>"
+	echo "#endif"
 	case $HAVE_VFORK_H in
 	1)	echo "#include <vfork.h>" ;;
 	esac

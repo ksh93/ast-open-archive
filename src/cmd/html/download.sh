@@ -9,9 +9,9 @@
 #                                                              #
 #     http://www.research.att.com/sw/license/ast-open.html     #
 #                                                              #
-#     If you received this software without first entering     #
-#       into a license with AT&T, you have an infringing       #
-#           copy and cannot use it without violating           #
+#      If you have copied this software without agreeing       #
+#      to the terms of the license you are infringing on       #
+#         the license and copyright and are violating          #
 #             AT&T's intellectual property rights.             #
 #                                                              #
 #               This software was created by the               #
@@ -29,7 +29,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)download (AT&T Labs Research) 1999-08-11
+@(#)download (AT&T Labs Research) 2000-06-01
 ]
 '$USAGE_LICENSE$'
 [+NAME?download - generate web site download instructions for an mm document]
@@ -73,8 +73,13 @@ print -r -- ".H 1 Download"
 print -r -- "Check the"
 print -r -- ".xx link=\"../faq.html	FAQ\""
 print -r -- "for information on binary installations."
+print -r -- "Source and binary packages for"
 print -r -- ".B ${item}"
-print -r -- "is currently available for these system architectures:"
+print -r -- "are available at the"
+print -r -- ".xx link=\"/sw/download/	package\""
+print -r -- "download site; evaluation binaries containing only"
+print -r -- ".B ${item}"
+print -r -- "are also available for these system architectures:"
 print -r -- ".BL"
 for type
 do	print -r -- ".LI"

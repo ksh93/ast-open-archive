@@ -2,7 +2,7 @@
 
 LICENSE = type=special
 
-CCFLAGS = -O $(CC.DLL)
+CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
 bz 2.0 :LIBRARY: bzlib.h bzlib_private.h sfdcbzip.h \
 	blocksort.c huffman.c crctable.c randtable.c compress.c \

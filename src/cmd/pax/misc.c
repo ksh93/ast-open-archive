@@ -9,9 +9,9 @@
 *                                                              *
 *     http://www.research.att.com/sw/license/ast-open.html     *
 *                                                              *
-*     If you received this software without first entering     *
-*       into a license with AT&T, you have an infringing       *
-*           copy and cannot use it without violating           *
+*      If you have copied this software without agreeing       *
+*      to the terms of the license you are infringing on       *
+*         the license and copyright and are violating          *
 *             AT&T's intellectual property rights.             *
 *                                                              *
 *               This software was created by the               *
@@ -126,7 +126,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 		d->ino = f->st->st_ino;
 		d->mode = f->st->st_mode;
 		d->mtime = f->st->st_mtime;
-		d->offset = ap->io.offset + ap->io.count;
+		d->offset = ap->io->offset + ap->io->count;
 		d->size = f->st->st_size;
 		d->expand = f->delta.size;
 		if (!(d->info = (File_t*)memdup(f, sizeof(File_t))) || !(d->info->st = (struct stat*)memdup(f->st, sizeof(struct stat))))
@@ -157,7 +157,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 			d->ino = f->st->st_ino;
 			d->mode = f->st->st_mode;
 			d->mtime = f->st->st_mtime;
-			d->offset = ap->io.offset + ap->io.count;
+			d->offset = ap->io->offset + ap->io->count;
 			d->size = f->st->st_size;
 			d->expand = f->delta.size;
 			hashput(ap->tab, f->path, d);
@@ -173,10 +173,10 @@ selectfile(register Archive_t* ap, register File_t* f)
 			if (bp->peek) bp->peek = 0;
 			else
 			{
-				if (bp->skip && bp->skip == bp->io.offset + bp->io.count)
+				if (bp->skip && bp->skip == bp->io->offset + bp->io->count)
 					fileskip(bp, &bp->file);
 				if (!getheader(bp, &bp->file)) break;
-				bp->skip = bp->io.offset + bp->io.count;
+				bp->skip = bp->io->offset + bp->io->count;
 			}
 			ordered(bp, bp->path.prev, bp->file.name);
 			if ((m = pathcmp(bp->file.name, f->name)) > 0)
@@ -188,7 +188,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 			if (!m) break;
 			if (n && !state.list)
 			{
-				if (ap->io.mode != O_RDONLY)
+				if (ap->io->mode != O_RDONLY)
 				{
 					File_t	tmp;
 
@@ -345,7 +345,7 @@ typedef struct
  */
 
 static int
-listlookup(void* handle, register const char* name, const char* arg, int cc, char** ps, Sflong_t* pn)
+listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflong_t* pn)
 {
 	List_handle_t*		gp = (List_handle_t*)handle;
 	register File_t*	f = gp->file;
@@ -361,14 +361,14 @@ listlookup(void* handle, register const char* name, const char* arg, int cc, cha
 	static char		buf[PATH_MAX];
 	static char		huh[8];
 
-	if (!(op = (Option_t*)hashget(state.options, name)))
+	if (!(op = (Option_t*)hashget(state.options, fmt->t_str)))
 	{
-		if (*name != '$')
+		if (*fmt->t_str != '$')
 			return 0;
 		if (!(op = newof(0, Option_t, 1, 0)))
 			error(3, "out of space [option]");
 		op->name = hashput(state.options, 0, op);
-		op->macro = getenv(name + 1);
+		op->macro = getenv(fmt->t_str + 1);
 		op->index = OPT_environ;
 		op->flags |= OPT_DISABLE;
 	}
@@ -460,10 +460,10 @@ listlookup(void* handle, register const char* name, const char* arg, int cc, cha
 	case OPT_gname:
 		if (f->gidname)
 		{
-			if (cc == 's') s = f->gidname;
+			if (fmt->fmt == 's') s = f->gidname;
 			else n = strgid(f->gidname);
 		}
-		else if (cc == 's') s = fmtgid(st->st_gid);
+		else if (fmt->fmt == 's') s = fmtgid(st->st_gid);
 		else n = st->st_gid;
 		break;
 	case OPT_ino:
@@ -535,17 +535,17 @@ listlookup(void* handle, register const char* name, const char* arg, int cc, cha
 	case OPT_uname:
 		if (f->uidname)
 		{
-			if (cc == 's') s = f->uidname;
+			if (fmt->fmt == 's') s = f->uidname;
 			else n = strgid(f->uidname);
 		}
-		else if (cc == 's') s = fmtuid(st->st_uid);
+		else if (fmt->fmt == 's') s = fmtuid(st->st_uid);
 		else n = st->st_uid;
 		break;
 	default:
 		return 0;
 	}
 	if (s) *ps = s;
-	else if (cc == 's' && arg)
+	else if (fmt->fmt == 's' && arg)
 	{
 		if (strneq(arg, fmt_mode, 4))
 			*ps = fmtmode(n, 1);
@@ -590,7 +590,7 @@ listentry(register File_t* f)
 	{
 		if (state.meter.on)
 		{
-			p = (state.in->io.count * 100) / state.meter.size;
+			p = (state.in->io->count * 100) / state.meter.size;
 			n = listprintf(state.tmp.str, state.in, f, state.listformat);
 			s = sfstruse(state.tmp.str);
 			if (state.meter.fancy)
@@ -715,3 +715,8 @@ portable(const char* s)
 			return 0;
 	return 1;
 }
+#if __OBSOLETE__ < 20010101
+#define Value_t		Sfkey_value_t
+#undef	REG_SUB_STOP
+#include "../../lib/libast/disc/sfkeyprintf.c"
+#endif

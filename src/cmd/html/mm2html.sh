@@ -9,9 +9,9 @@
 #                                                              #
 #     http://www.research.att.com/sw/license/ast-open.html     #
 #                                                              #
-#     If you received this software without first entering     #
-#       into a license with AT&T, you have an infringing       #
-#           copy and cannot use it without violating           #
+#      If you have copied this software without agreeing       #
+#      to the terms of the license you are infringing on       #
+#         the license and copyright and are violating          #
 #             AT&T's intellectual property rights.             #
 #                                                              #
 #               This software was created by the               #
@@ -42,7 +42,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2000-02-14'
+version='mm2html (AT&T Labs Research) 2000-05-25'
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
@@ -61,6 +61,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	[+\aname\a\b-head.html?The static frame head.]
 	[+\aname\a\b-body.html?The scrolling frame body.]
 }
+[g:global-index?Generate a standalone \bindex.html\b for framed HTML.]
 [h:html?Read html options from \afile\a. Unknown options
 	are silently ignored. See the \b.xx\b request below for a description
 	of the options. The file pathname may be followed by URL style
@@ -113,11 +114,12 @@ set -o noglob
 
 integer count fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4 row n s
 integer labels=0
+typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
-typeset -x -A ds map nr
+typeset -x -A ds map nr outline
 typeset cond frame label list prev text trailer type
-typeset license html meta mm index authors
+typeset license html meta mm index authors vg header
 
 license=(
 	author=
@@ -154,6 +156,10 @@ html=(
 	magic=(
 		plain='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">'
 		frame='<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Frameset//EN" "http://www.w3.org/TR/REC-html40/frameset.dtd">'
+	)
+	index=(
+		left=
+		top=
 	)
 )
 
@@ -214,6 +220,8 @@ while	getopts $ARGV0 "$USAGE" OPT
 do	case $OPT in
 	f)	frame=$OPTARG
 		;;
+	g)	index=global
+		;;
 	h)	case $OPTARG in
 		*\?*)	. ${OPTARG%%\?*} || exit 1
 			eval "html=( ${OPTARG#*\?} )"
@@ -232,7 +240,7 @@ do	case $OPT in
 		;;
 	o)	options "$OPTARG"
 		;;
-	x)	index=1
+	x)	index=local
 		;;
 	*)	echo "Usage: $command [-x] [-f name] [-h file[?name=value;...]]
 	       [-l file[?name=value;...]] [-o [no]name=value] [ file ... ]" >&2
@@ -243,7 +251,7 @@ done
 shift OPTIND-1
 case $# in
 1)	file=$1
-	if	test ! -f "$file"
+	if	[[ ! -f $file ]]
 	then	print -u2 $command: $file: cannot read
 		exit 1
 	fi
@@ -256,10 +264,10 @@ esac
 HTMLPATH=
 for i in $HOME ${PATH//:/ }
 do	d=${i%/bin}/lib/html
-	if	test -d $d
-	then	if	test -w $d -o -x $i/$command
+	if	[[ -d $d ]]
+	then	if	[[ -w $d || -x $i/$command ]]
 		then	HTMLPATH=$HTMLPATH:$d
-			if	test -x $i/$command
+			if	[[ -x $i/$command ]]
 			then	break
 			fi
 		fi
@@ -629,10 +637,104 @@ function ident
 	print -r -- "<META name=\"generator\" content=\"$version\">"
 }
 
+function title
+{
+	ident
+	case $header in
+	?*)	print -r -- "$header" ;;
+	esac
+	print -r -- "<TITLE>" $* "</TITLE>"
+	case ${license.author} in
+	?*)	print -r -- "<META name=\"author\" content=\"${license.author}\">" ;;
+	esac
+	case $vg in
+	?*)	print -r -- "<SCRIPT language='javascript' src='../lib/slide.js'></SCRIPT>"
+		case $pages in
+		?*)	print -r -- "<SCRIPT language='javascript'>last_slide=$pages</SCRIPT>" ;;
+		esac
+		print -r -- "<STYLE>
+#notes {
+	position:relative;
+	text-align:center;
+	visibility:hidden;
+	background:#bbbbbb;
+}
+#tutorial {
+	position:relative;
+	text-align:center;
+	visibility:hidden;
+	background:papayawhip;
+}
+</STYLE>
+</HEAD>"
+		return
+		;;
+	esac
+	print -r -- "</HEAD>"
+	case ${html.heading} in
+	?*)	case ${html.heading} in
+		?*)	html.toolbar=
+			hit=
+			if	[[ -f ${html.heading} ]]
+			then	hit=${html.heading}
+			elif	[[ -f $HOME/${html.heading} ]]
+			then	hit=$HOME/${html.heading}
+			else	ifs=$IFS
+				IFS=:
+				set "" $HOME $PATH
+				IFS=$ifs
+				for i
+				do	if	[[ -f ${i%/bin}/lib/${html.heading} ]]
+					then	hit=${i%/bin}/lib/${html.heading}
+						break
+					fi
+				done
+			fi
+			case $hit in
+			"")	print -u2 "$command: ${html.heading}: cannot read"
+				code=1
+				;;
+			*)	eval "cat <<!
+$(cat $hit)
+!"
+				;;
+			esac
+			;;
+		esac
+		;;
+	*)	print -r -- "<BODY" ${html.BODY/'('@(*)')'/\1} ">"
+		case ${html.width} in
+		?*)	print -r -- "<TABLE border=0 width=${html.width}><TR><TD valign=top align=left>"
+			trailer="$trailer
+</TD></TR></TABLE>"
+			;;
+		esac
+		case $frame in
+		'')	logo=${html.logo/'('@(*)')'/\1}
+			case ${html.ident}:${logo} in
+			*:*"src=''"*|*:)
+				;;
+			1:?*)	case ${html.home.href} in
+				?*)	html.home.href=${html.home.href%/*.html}/
+					print -r -- "<A" ${html.home/'('@(*)')'/\1} "><IMG" ${logo} "></A>"
+					;;
+				*)	print -r -- "<IMG" ${logo} ">"
+					;;
+				esac
+				;;
+			esac
+			;;
+		esac
+		;;
+	esac
+	trailer="$trailer
+</BODY>"
+}
+
 if	[[ $frame != '' ]]
-then	exec > $frame-body.html || exit
+then	framebody=$frame-body.html
+	exec > $framebody || exit
 fi
-ident
 document="$@"
 
 sed	\
@@ -652,6 +754,7 @@ sed	\
 	-e 's%\\\^%\&nbsp;%g' \
 	-e 's%\\ %\&nbsp;%g' \
 	-e 's%\\(+-%\&#177;%g' \
+	-e 's%\\(-%=%g' \
 	-e 's%\\(ap%~%g' \
 	-e 's%\\(bu%\&#183;%g' \
 	-e 's%\\(bv%|%g' \
@@ -710,8 +813,12 @@ sed	\
 	-e 's%\\c%<JOIN>%g' \
 	-e 's%\\e%<NULL>\\<NULL>%g' \
 	-e '/^\..*".*\\/s%\\%\\\\%g' \
-"$@" | while	getline
-do	case $1 in
+"$@" | while	:
+do	getline || {
+		[[ $title != '' ]] && break
+		set -- .TL
+	}
+	case $1 in
 	.)	: comment
 		;;
 	.*)	op=$1
@@ -789,9 +896,9 @@ do	case $1 in
 				esac
 				print -r -- "<CENTER>"
 				while	(( count-- > 0 )) && read -r data
-				do	print -r -- "$data"
+				do	print -r -- "$data<BR>"
 				done
-				print -r -- "</CENTER>"
+				print -r -- "</PRE></CENTER>"
 				;;
 			*)	case $op in
 				.SH|.SS)macros=man
@@ -873,7 +980,12 @@ do	case $1 in
 			;;
 		.AU)	mm.author="${mm.author}:$1:$7"
 			;;
-		.BL)	case ${lists[@]} in
+		.BL|.bL|.sL)
+			i=
+			for ((n = 1; n <= lists; n++))
+			do	i=$i${list[n]}
+			done
+			case $i in
 			*UL*UL*)i=disc ;;
 			*UL*)	i=circle ;;
 			*)	i=square ;;
@@ -882,15 +994,21 @@ do	case $1 in
 			list[lists]=UL
 			print -r -- "<UL type=$i>"
 			;;
-		.BP)	i=${*%.*}.gif
+		.BP)	i=${1%.*}.gif
 			case $frame in
-			?*)	test -f $frame-$i && i=$frame-$i ;;
+			?*)	[[ -f $frame-$i ]] && i=$frame-$i ;;
 			esac
 			print -r -- "<CENTER><IMG src=\"$i\"></CENTER>"
+			if [[ ! -f $1 ]]
+			then	print -u2 "$command: $1: data file not found"
+			elif [[ $1 -nt $i ]]
+			then	ps2gif $1 $i
+			fi
 			;;
-		.DE|.fi)print -r -- "</PRE>"
+		.DE|.dE|.fi)
+			print -r -- "</PRE>"
 			;;
-		.DF|.DS|.nf)
+		.DF|.DS|.dS|.nf)
 			print -r -- "<PRE>"
 			;;
 		.DT)	case $macros in
@@ -898,10 +1016,10 @@ do	case $1 in
 			*)	print -r -- "${ds[Dt]}" ;;
 			esac
 			;;
-		.EE)	print -r -- "</PRE>"
+		.EE|.eE)print -r -- "</PRE>"
 			indent=${indent#$inch}
 			;;
-		.EX)	print -r -- "<PRE>"
+		.EX|.eX)print -r -- "<PRE>"
 			indent=$inch$indent
 			;;
 		.FE)	print -r -- '&nbsp;]&nbsp'
@@ -940,7 +1058,7 @@ do	case $1 in
 			;;
 		.HY)	: ignore $op
 			;;
-		.IP|.LI|.TF|.TP)
+		.IP|.LI|.TF|.TP|.bI|.sI)
 			case $op in
 			.IP|.LP|.TF|.TP)OP=$op
 				case ${type[lists]} in
@@ -973,13 +1091,17 @@ do	case $1 in
 				esac
 				print -r -- "<DT>$*<DD>"
 				;;
-			*)	print -r -- "<LI>$*"
+			*)	case $op in
+				.bI|.sI)print -r -- "<P>" ;;
+				esac
+				print -r -- "<LI>$*"
 				;;
 			esac
 			;;
 		.IX)	: ignore $op
 			;;
-		.LE|.RE)case ${type[@]} in
+		.LE|.RE|.bE|.sE)
+			case ${type[@]} in
 			*.[Aa][Ll]*)
 				while	(( lists > 0 ))
 				do	print -r -- "</${list[lists]}>"
@@ -1038,70 +1160,10 @@ do	case $1 in
 				title="$package $title"
 				;;
 			esac
-			title=${title#' '}
-			print -r -- "<TITLE>" $title "</TITLE>"
-			case ${license.author} in
-			?*)	print -r -- "<META name=\"author\" content=\"${license.author}\">" ;;
-			esac
-			print -r -- "</HEAD>"
-			case ${html.heading} in
-			?*)	case ${html.heading} in
-				?*)	html.toolbar=
-					hit=
-					if	test -f ${html.heading}
-					then	hit=${html.heading}
-					elif	test -f $HOME/${html.heading}
-					then	hit=$HOME/${html.heading}
-					else	ifs=$IFS
-						IFS=:
-						set "" $HOME $PATH
-						IFS=$ifs
-						for i
-						do	if	test -f ${i%/bin}/lib/${html.heading}
-							then	hit=${i%/bin}/lib/${html.heading}
-								break
-							fi
-						done
-					fi
-					case $hit in
-					"")	print -u2 "$command: ${html.heading}: cannot read"
-						code=1
-						;;
-					*)	eval "cat <<!
-$(cat $hit)
-!"
-						;;
-					esac
-					;;
-				esac
-				;;
-			*)	print -r -- "<BODY" ${html.BODY/'('@(*)')'/\1} ">"
-				case ${html.width} in
-				?*)	print -r -- "<TABLE border=0 width=${html.width}><TR><TD valign=top align=left>"
-					trailer="$trailer
-</TD></TR></TABLE>"
-					;;
-				esac
-				case $frame in
-				'')	case ${html.ident}:${html.logo} in
-					1:?*)	case ${html.home.href} in
-						?*)	html.home.href=${html.home.href%/*.html}/
-							print -r -- "<A" ${html.home/'('@(*)')'/\1} "><IMG" ${html.logo/'('@(*)')'/\1} "></A>"
-							;;
-						*)	print -r -- "<IMG" ${html.logo/'('@(*)')'/\1} ">"
-							;;
-						esac
-						;;
-					esac
-					;;
-				esac
-				;;
-			esac
+			title $title
 			case $frame in
-			?*)	cat $frame-body.html > $frame-head.html || exit ;;
+			?*)	title $title > $frame-head.html || exit ;;
 			esac
-			trailer="$trailer
-</BODY>"
 			case $op in
 			.TH)	case $2 in
 				1*)	sec="USER COMMANDS " ;;
@@ -1270,7 +1332,13 @@ $(cat $hit)
 			shift
 			ds[$op]=$*
 			;;
-		.ft)	case $1 in
+		.f[tBILPR])
+			case $op in
+			.f[BILPR])
+				set -- ${op#.f}
+				;;
+			esac
+			case $1 in
 			5|TT)	font=TT
 				print -n -r -- "<$font>"
 				;;
@@ -1301,6 +1369,12 @@ $(cat $hit)
 			shift
 			nr[$op]=$*
 			;;
+		.ps|.pS)case $1 in
+			[-+][0-9])
+				print -r -- "<FONT SIZE=$1>"
+				;;
+			esac
+			;;
 		.sh)	case $HTMLPATH in
 			'')	;;
 			*)	(( fd = so + soff ))
@@ -1316,12 +1390,12 @@ $(cat $hit)
 				;;
 			esac
 			;;
-		.sn)	if	test ! -f "$1"
+		.sn)	if	[[ ! -f $1 ]]
 			then	warning "$1: $op cannot read"
 			else	cat "$1"
 			fi
 			;;
-		.so)	if	test ! -f "$1"
+		.so)	if	[[ ! -f $1 ]]
 			then	warning "$1: $op cannot read"
 			else	(( fd = so + soff ))
 				eval exec $fd'< $1'
@@ -1403,7 +1477,11 @@ $(cat $hit)
 							esac
 							;;
 						esac
-						print -r -- "<A $nam=\"$pfx$url\"$tar>$txt</A>"
+						if	[[ $frame != '' && $title == '' ]]
+						then	rm $framebody
+							framebody=$url
+						else	print -r -- "<A $nam=\"$pfx$url\"$tar>$txt</A>"
+						fi
 						;;
 					ref)	case $txt in
 						$url)	print -r -- "<LINK href=\"$url\">" ;;
@@ -1423,6 +1501,52 @@ $(cat $hit)
 					;;
 				esac
 			done
+			;;
+		.vG)	vg=$1
+			set +o noglob
+			rm -f [0-9][0-9].html index.html outline.html
+			set -o noglob
+			exec > $page.html
+			outline[$page]=$2
+			header='<BASEFONT face="geneva,arial,helvetica" size=5>'
+			title "${2//\<*([!>])\>/}"
+			print "<BODY bgcolor='#ffffff'>"
+			print "<CENTER>"
+			print "<BR><BR><H1><FONT color=red>$2</FONT></H1><BR><BR>"
+			shift 2
+			for name
+			do	print -- "<BR>$name"
+			done
+			print "</CENTER>"
+			print "<P>"
+			;;
+		.vH)	print -r -- "<CENTER>
+<BR><BR>
+<H1><FONT color=red> $1 </FONT></H1>
+<BR><BR>
+</CENTER>"
+			;;
+		.vP)	while	(( lists > 0 ))
+			do	print -r -- "</${list[lists--]}>"
+			done
+			print -r -- "${trailer}
+</HTML>"
+			((page++))
+			exec > $page.html
+			outline[$page]=$1
+			trailer=
+			title "${1//\<*([!>])\>/}"
+			print "<BODY bgcolor='#ffffff'>"
+			print "<CENTER>"
+			print "<BR><BR><H1><FONT color=red>$1</FONT></H1>"
+			print "</CENTER>"
+			print "<P>"
+			;;
+		.nS)	print -r -- "<DIV id='notes'>"
+			;;
+		.tS)	print -r -- "<DIV id='tutorial'>"
+			;;
+		.nE|.tE)print -r -- "</DIV>"
 			;;
 		*)	warning "$op: unknown op"
 			;;
@@ -1524,16 +1648,16 @@ print -r -- "${ds[Dt]}"
 case ${html.footing} in
 ?*)	html.toolbar=
 	hit=
-	if	test -f ${html.footing}
+	if	[[ -f ${html.footing} ]]
 	then	hit=${html.footing}
-	elif	test -f $HOME/${html.footing}
+	elif	[[ -f $HOME/${html.footing} ]]
 	then	hit=$HOME/${html.footing}
 	else	ifs=$IFS
 		IFS=:
 		set "" $HOME $PATH
 		IFS=$ifs
 		for i
-		do	if	test -f ${i%/bin}/lib/${html.footing}
+		do	if	[[ -f ${i%/bin}/lib/${html.footing} ]]
 			then	hit=${i%/bin}/lib/${html.footing}
 				break
 			fi
@@ -1552,16 +1676,16 @@ $(cat $hit)
 esac
 case ${html.toolbar} in
 ?*)	hit=
-	if	test -f ${html.toolbar}
+	if	[[ -f ${html.toolbar} ]]
 	then	hit=${html.toolbar}
-	elif	test -f $HOME/${html.toolbar}
+	elif	[[ -f $HOME/${html.toolbar} ]]
 	then	hit=$HOME/${html.toolbar}
 	else	ifs=$IFS
 		IFS=:
 		set "" $HOME $PATH
 		IFS=$ifs
 		for i
-		do	if	test -f ${i%/bin}/lib/${html.toolbar}
+		do	if	[[ -f ${i%/bin}/lib/${html.toolbar} ]]
 			then	hit=${i%/bin}/lib/${html.toolbar}
 				break
 			fi
@@ -1590,8 +1714,9 @@ case $frame in
 		esac
 		;;
 	esac
-	case ${html.labels} in
-	?*)	print -r -- "<CENTER><FONT size=-1>"
+	if	[[ $framebody == *-body.html && ${html.labels} != '' ]]
+	then
+		print -r -- "<CENTER><FONT size=-1>"
 		print -r -- "   <A href=\"javascript:parent.history.go(-1)\" title=\"Previous frame\">Back</A>"
 		case $labels in
 		0|1)	;;
@@ -1601,23 +1726,25 @@ case $frame in
 			;;
 		esac
 		print -r -- "<FONT></CENTER>"
-		;;
-	esac
+	fi
 	print -r -- "$trailer"
 	exec > $frame.html || exit
 	ident
-	print -r -- "<TITLE>$title -- frame index</TITLE>
+	print -r -- "<TITLE>$title</TITLE>
 </HEAD>
 <FRAMESET" ${html.FRAMESET/'('@(*)')'/\1} ">
 	<FRAME src=\"$frame-head.html\" name=\"${frame}_head\" scrolling=no" ${html.FRAME/'('@(*)')'/\1} ">
-	<FRAME src=\"$frame-body.html\" name=\"${frame}_body\" scrolling=auto" ${html.FRAME/'('@(*)')'/\1} ">
+	<FRAME src=\"$framebody\" name=\"${frame}_body\" scrolling=auto" ${html.FRAME/'('@(*)')'/\1} ">
 </FRAMESET>
 </HTML>"
 	case $index in
-	?*)	exec > $frame-index.html || exit
+	?*)	case $index in
+		local)	exec > $frame-index.html || exit ;;
+		global)	exec > index.html || exit ;;
+		esac
 		unset html.FRAMESET.rows html.FRAMESET.cols html.FRAME.src
 		ident
-		print -r -- "<TITLE>$title -- standalone frame index</TITLE>
+		print -r -- "<TITLE>$title</TITLE>
 </HEAD>
 <FRAMESET" ${html.FRAMESET/'('@(*)')'/\1} ${html.index.top.FRAMESET/'('@(*)')'/\1} ">
 	<FRAME" ${html.FRAME/'('@(*)')'/\1} ${html.index.top.FRAME/'('@(*)')'/\1} "scrolling=no>
@@ -1629,5 +1756,33 @@ case $frame in
 </HTML>"
 		;;
 	esac
+esac
+case $vg in
+?*)	frame=$vg
+	trailer=
+	pages=${page#0}
+	exec > index.html
+	title "${outline[01]//\<*([!>])\>/}"
+	print -r -- "<FRAMESET marginheight=0 marginwidth=0 cols='135,*,66' border=0 noresize onload='goto_slide(1)'>
+  <FRAME src=../lib/prev.html name='prev' noresize scrolling=no marginwidth=0 marginheight=0>
+  <FRAME src=../lib/start.html name='slide' noresize scrolling=auto marginwidth=0 marginheight=0>
+  <FRAME src=../lib/next.html name='next' noresize scrolling=no marginwidth=0 marginheight=0>
+</FRAMESET>
+</HTML>"
+	exec > outline.html
+	title "${title} outline"
+	print -r -- "<BODY  bgcolor='#ffffff'>
+<CENTER>
+<BR><BR><H1><FONT color=red>outline</FONT></H1>
+<P>
+<TABLE cellspacing=1 cellpadding=1 border=1 class=box>"
+	for ((page=1; page <= pages; page++))
+	do	print "<TR><TD><A href='javascript:goto_slide(${page#0})'><CENTER>${outline[$page]}</CENTER></A></TD></TR>"
+	done
+	print "</TABLE>
+</CENTER>
+</BODY>
+</HTML>"
+	;;
 esac
 exit $code
