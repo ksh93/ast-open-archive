@@ -2937,6 +2937,22 @@ OPTIONS
 		OUTPUT - $'return=? option=-? name=--?ar_clean num=0'
 	EXEC make "$usage" --?arclean
 		OUTPUT - $'return=? option=-? name=--?arclean num=0'
+	usage=$'[-][a:ArchiveClean]'
+	EXEC make "$usage" --?ArchiveClean --?AC --?Arc --?ArC --?ArClean --?ArcClean
+		OUTPUT - $'return=? option=-? name=--?ArchiveClean num=0'
+		ERROR - $'Usage: make [ options ]
+OPTIONS
+  -a, --ArchiveClean'
+	EXEC make "$usage" --?AC
+		OUTPUT - $'return=? option=-? name=--?AC num=0'
+	EXEC make "$usage" --?Arc
+		OUTPUT - $'return=? option=-? name=--?Arc num=0'
+	EXEC make "$usage" --?ArC
+		OUTPUT - $'return=? option=-? name=--?ArC num=0'
+	EXEC make "$usage" --?ArClean
+		OUTPUT - $'return=? option=-? name=--?ArClean num=0'
+	EXEC make "$usage" --?ArcClean
+		OUTPUT - $'return=? option=-? name=--?ArcClean num=0'
 
 TEST 50 'the underscored long and short of it'
 	usage=$'[-][a:archive_clean][b:archive_clobber]'
@@ -3115,6 +3131,15 @@ OPTIONS
 		OUTPUT - $'return=? option=-? name=--?pre_fix_inc_lude num=0'
 	EXEC make "$usage" --?pre_fix-inc_lude
 		OUTPUT - $'return=? option=-? name=--?pre_fix-inc_lude num=0'
+
+TEST 54 'boolean option with numeric value'
+	usage=$'[-][103:reread]'
+	EXEC make "$usage" --reread --noreread --reread=0 --reread=1 --reread=2
+		OUTPUT - $'return=-103 option=-103 name=--reread arg=(null) num=1
+return=-103 option=-103 name=--reread arg=(null) num=0
+return=-103 option=-103 name=--reread arg=(null) num=0
+return=-103 option=-103 name=--reread arg=(null) num=1
+return=-103 option=-103 name=--reread arg=2 num=2'
 
 # skip non-astsa (standalone ast) tests
 

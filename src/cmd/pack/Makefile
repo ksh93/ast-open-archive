@@ -13,3 +13,5 @@ huff 1.0 :LIBRARY: huff.3 huffman.h \
 		huffencode.c huffdecode.c
 
 :TEST: pack
+
+:: RELEASE

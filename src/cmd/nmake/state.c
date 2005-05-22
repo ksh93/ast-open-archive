@@ -463,7 +463,7 @@ varstate(register Rule_t* r, int force)
 	else
 		t = 0;
 	if (!(v = getvar(s)) && force)
-		v = setvar(s, null, 0);
+		v = setvar(s, null, V_auxiliary);
 	if (t)
 		*t = ')';
 	return v;
@@ -843,6 +843,7 @@ bindstate(register Rule_t* r, register char* val)
 	if (r->property & P_statevar)
 	{
 		register Var_t*		v;
+		char*			e;
 		Sfio_t*			tmp = 0;
 
 		/*
@@ -863,6 +864,12 @@ bindstate(register Rule_t* r, register char* val)
 		}
 		else if ((r->property & P_parameter) && r->statedata)
 			val = r->statedata;
+		else if (*(r->name + 1) == '-')
+		{
+			*(e = r->name + strlen(r->name) - 1) = 0;
+			val = getval(r->name + 1, 0);
+			*e = ')';
+		}
 		else
 			val = null;
 		if (!r->time && state.maxview && (state.view[0].flags & BIND_LOADED))
@@ -981,7 +988,7 @@ statetime(register Rule_t* r, int sync)
 	if (r->property & P_state)
 	{
 		if ((r->dynamic & D_triggered) && state.exec)
-			r->time = CURTIME;
+			r->time = ((r->property & P_statevar) && r->status == FAILED) ? (Time_t)0 : CURTIME;
 		return r->time;
 	}
 	s = 0;

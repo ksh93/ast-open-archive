@@ -1042,16 +1042,17 @@ compref(Rule_t* r, int type)
 		if (r)
 		{
 			/*
-			 * COMP_NSEC for backwards compatibility
+			 * COMP_NSEC for subsecond granularity
+			 * and bind checks
 			 * ignored by old implementations
 			 */
 
 			sfputu(object.pp, COMP_NSEC);
 			sfputu(object.pp, tmxnsec(r->time));
-			putstring(object.pp, null, 0);
+			putstring(object.pp, r->name, 0);
 			sfputu(object.pp, type);
 			sfputu(object.pp, tmxsec(r->time));
-			putstring(object.pp, r->name, 0);
+			putstring(object.pp, unbound(r), 0);
 		}
 		else
 		{
@@ -1114,6 +1115,34 @@ atomize(const char* s, char* v, void* h)
 	for (p = r->prereqs; p; p = p->next)
 		if (isoldrule(p->rule))
 			p->rule = getoldrule(p->rule);
+	return 0;
+}
+
+/*
+ * repair prereq list corruption
+ */
+
+static int
+repair(const char* s, char* v, void* h)
+{
+	register Rule_t*	r = (Rule_t*)v;
+	register List_t*	p;
+	register List_t*	q;
+
+	NoP(s);
+	NoP(h);
+	p = 0;
+	q = r->prereqs;
+	while (q)
+		if (q->rule)
+		{
+			p = q;
+			q = q->next;
+		}
+		else if (p)
+			p->next = q = q->next;
+		else
+			r->prereqs = q = q->next;
 	return 0;
 }
 
@@ -1203,6 +1232,7 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 	register List_t*	p;
 	char*			s;
 	char*			u;
+	char*			sn;
 	long			n;
 	Sfoff_t			off;
 	Time_t			t;
@@ -1212,6 +1242,7 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 	int			ok = 1;
 	long			old = 0;
 	Rule_t*			x;
+	Stat_t			st;
 
 	loadinit();
 	if ((s = sfreserve(sp, 0, 0)) && (n = sfvalue(sp)) >= 0)
@@ -1237,6 +1268,7 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 
 	state.init++;
 	lowres = 1;
+	sn = 0;
 	tn = 0;
 	while (n = sfgetu(sp))
 	{
@@ -1245,10 +1277,9 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 			break;
 		if (n & (COMP_BASE|COMP_FILE|COMP_GLOBAL|COMP_INCLUDE))
 		{
-			if (!(x = bindfile(NiL, s, BIND_MAKEFILE|BIND_RULE)))
-				t = 0;
-			else
+			if (x = bindfile(NiL, s, BIND_MAKEFILE|BIND_RULE))
 			{
+				s = x->name;
 				t = x->time;
 
 				/*
@@ -1260,6 +1291,10 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 				if (!(x->dynamic & D_regular))
 					x->dynamic &= ~D_bound;
 			}
+			else
+				t = 0;
+			if (!t && sn && !stat(sn, &st))
+				t = tmxgetmtime(&st);
 			if (!t)
 			{
 				if (n & COMP_DONTCARE)
@@ -1270,7 +1305,6 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 			if (tn && t == tmxsns(tm, 0))
 				tn = 0;
 			tm = (lowres && tm == tmxsec(t)) ? t : tmxsns(tm, tn);
-			tn = 0;
 
 			/*
 			 * check prerequisite file time with previous
@@ -1279,9 +1313,14 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 			debug((-4, "%s%s%s%s%sprerequisite %s [%s] state [%s]", (n & COMP_DONTCARE) ? "optional " : null, (n & COMP_BASE) ? "base " : null, (n & COMP_FILE) ? "-f " : null, (n & COMP_GLOBAL) ? "-g " : null, (n & COMP_INCLUDE) ? "include " : null, s, timestr(t), timestr(tm)));
 			if (t != tm)
 			{
-				error(state.exec || state.mam.out ? -1 : 1, "%s: out of date with %s", r->name, s);
+				if (sn && !streq(sn, x->name))
+					error(state.exec || state.mam.out ? -1 : 1, "%s: binding changed to %s from %s", s, x->name, sn);
+				else
+					error(state.exec || state.mam.out ? -1 : 1, "%s: out of date with %s", r->name, s);
 				break;
 			}
+			sn = 0;
+			tn = 0;
 
 			/*
 			 * check that explicit prerequisite still specified
@@ -1316,6 +1355,11 @@ loadable(register Sfio_t* sp, register Rule_t* r, int source)
 		}
 		else if (n & COMP_NSEC)
 		{
+			if (*s)
+			{
+				sfputr(internal.met, s, -1);
+				sn = sfstruse(internal.met);
+			}
 			tn = tm;
 			lowres = 0;
 		}
@@ -2143,13 +2187,14 @@ load(register Sfio_t* sp, const char* objfile, int ucheck)
 			{
 				if (strcmp(ident, corrupt) < 0 && (((lists - (xd - d)) * 100) / lists) >= 90)
 				{
-					error(1, "%s: pre-%s make object corruption repaired", objfile, corrupt);
-					corrupt = 0;
 					while (d < xd)
 					{
 						(d - 1)->next = 0;
 						d++;
 					}
+					hashwalk(table.rule, 0, repair, NiL);
+					error(1, "%s: pre-%s make object corruption repaired", objfile, corrupt);
+					corrupt = 0;
 				}
 				break;
 			}

@@ -22,7 +22,7 @@
 #include "sed.h"
 
 static const char usage[] =
-"[-?\n@(#)$Id: sed (AT&T Labs Research) 2003-05-29 $\n]"
+"[-?\n@(#)$Id: sed (AT&T Labs Research) 2005-04-03 $\n]"
 USAGE_LICENSE
 "[+NAME?sed - stream editor]"
 "[+DESCRIPTION?\bsed\b is a stream editor that reads one or more text files,"

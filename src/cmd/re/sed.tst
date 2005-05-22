@@ -4,8 +4,16 @@ function DATA
 {
 	for f
 	do	test -f $f && continue
-		echo $f > $f
-		chmod $f $f
+		case $f in
+		[0-7][0-7][0-7])
+			echo $f > $f
+			chmod $f $f
+			;;
+		nul.in) print '\0AAAfooZZZ' > $f
+			;;
+		nul.out)print '\0AAAbarZZZ' > $f
+			;;
+		esac
 	done
 }
 
@@ -453,3 +461,8 @@ TEST 31 'file access'
 	EXEC 's/./x/' 000 644
 		OUTPUT - $'x44'
 	EXEC 's/./x/' 644 000
+
+TEST 32 'embedded \0'
+	DATA nul.in nul.out
+	EXEC 's/foo/bar/' nul.in
+		SAME OUTPUT nul.out

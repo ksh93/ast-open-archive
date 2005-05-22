@@ -209,14 +209,6 @@ typedef struct Tarheader_s Tarheader_t;
 #define MAXID		BLOCKSIZE	/* max ident buffer size	*/
 #define RESETABLE	(-1)		/* default option can be reset	*/
 
-/*
- * events are miscellanous callouts that work around format warts
- */
-
-#define EVENT_BUG_19951031	0x00000001
-#define EVENT_DELTA_EXTEND	0x00000002
-#define EVENT_SKIP_JUNK		0x00000004
-
 typedef int (*Link_f)(const char*, const char*);
 typedef int (*Stat_f)(const char*, struct stat*);
 

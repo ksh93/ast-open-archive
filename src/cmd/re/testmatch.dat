@@ -1,4 +1,4 @@
-: strmatch and strgrpmatch tests 2004-02-13
+: strmatch and strgrpmatch tests 2005-03-30
 
 # shell patterns
 
@@ -39,7 +39,7 @@ S	t*s*t		texxeract		NOMATCH
 S	t?st		tst			NOMATCH
 S	test?		test			NOMATCH
 S	s[!e]t		set			NOMATCH
-S	s[^e]t		set			(0,3)
+S	s[^e]t		set			NOMATCH
 S	[a-]*		atest			(0,5)
 S	[a-fh-z]	jack			(0,1)
 S	?*?*?t*?	test			NOMATCH
@@ -48,6 +48,8 @@ S	*\		test			NOMATCH
 S	*?*?t?		test			NOMATCH
 S	t?		t			NOMATCH
 S	??*t		step			NOMATCH
+S	\[*		[abc			(0,4)
+S	[*		[abc			NOMATCH
 
 # ignore case
 
@@ -138,6 +140,8 @@ K	!(a)			a		(0,0)(0,0)
 K	xy!(*xy*)xy		xy.xx.yy.xy.xy	(0,11)(2,9)
 K	a\!			aa!a		(1,3)
 K	!(x)*(a)		NULL		(0,0)(0,0)(0,0)
+K	\[*			[abc		(0,4)
+K	[*			[abc		NOMATCH
 
 # augmented shell character classes
 

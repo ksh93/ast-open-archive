@@ -248,10 +248,7 @@ PDQRS'
 	EXEC	-R% fixed_6 fixed%6
 	EXEC	-R6 fixed_6 fixed%6
 	EXEC	-R% fixed_6
-		OUTPUT - $'BCDEF
-CD
-AB
-PDQRS'
+		OUTPUT - $'AB\nBCDEF\nCD\nPDQRS'
 	EXEC	-R% var
 		INPUT -f var $'%c\x08%c%c-ZZZZZZZ%c\x04%c%c-AAA%c\x05%c%c-QQQQ'
 		OUTPUT -f - $'%c\x08%c%c-ZZZZZZZ%c\x04%c%c-AAA%c\x05%c%c-QQQQ'
@@ -265,7 +262,7 @@ UVWXYZ'
 		ERROR - $'sort: warning: incomplete record length=1'
 	EXEC	-R% fixed%6 fixed%7
 		OUTPUT -
-		ERROR - $'sort: fixed%7: file fixed record length mismatch -- 6 expected'
+		ERROR - $'sort: fixed%7: record format inconsistent with fixed%6'
 		EXIT 1
 	EXEC	-R% flat
 		INPUT flat $'-ZZZZZZZ\n-AAA\n-QQQQQ\n-CCCCCCCCCCCCCCCC'

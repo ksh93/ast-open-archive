@@ -180,3 +180,40 @@ OPTIONS
   --clobber       (base) The install action removes targets instead of renaming
                   to target.old.'
 		EXIT 2
+
+TEST 09 '+= vs space'
+
+	EXEC	-n
+		INPUT Makefile $'all : .MAKE
+	a = a
+	b =
+	c = c
+	A =
+	A += $(a)
+	B =
+	B += $(a)
+	B += $(b)
+	C =
+	C += $(a)
+	C += $(b)
+	C += $(c)
+	D =
+	D += $(a)
+	D += $(c)
+	E =
+	E += $(b)
+	E += $(c)
+	F =
+	F += $(c)
+	G =
+	G += $(b)
+	for x A B C D E F G
+		print $(x):$($(x)):
+	end'
+		OUTPUT - $'A:a:
+B:a:
+C:a c:
+D:a c:
+E:c:
+F:c:
+G::'

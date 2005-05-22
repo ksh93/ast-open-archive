@@ -24,7 +24,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testfmt (AT&T Research) 2001-05-23 $\0\n";
+static const char id[] = "\n@(#)$Id: testfmt (AT&T Research) 2005-05-20 $\0\n";
 
 #include <ast.h>
 #include <ctype.h>
@@ -91,6 +91,7 @@ static struct
 	int		lineno;
 	int		signals;
 	int		warnings;
+	char*		file;
 	jmp_buf		gotcha;
 } state;
 
@@ -158,6 +159,8 @@ quote(char* s, int expand)
 static void
 report(char* comment, char* fun, char* re, char* msg, int expand)
 {
+	if (state.file)
+		sfprintf(sfstdout, "%s:", state.file);
 	sfprintf(sfstdout, "%d:", state.lineno);
 	if (fun)
 		sfprintf(sfstdout, " %s", fun);
@@ -306,6 +309,9 @@ main(int argc, char** argv)
 	int		type;
 	int		invert;
 	int		i;
+	int		subunitlen;
+	int		testno;
+	Sfio_t*		fp;
 	char*		p;
 	char*		spec;
 	char*		re;
@@ -313,16 +319,19 @@ main(int argc, char** argv)
 	char*		ans;
 	char*		msg;
 	char*		fun;
+	char*		subunit;
+	char*		version;
 	char*		field[5];
 	char		unit[64];
 
 	int		catch = 0;
-	int		testno = 0;
 	int		verbose = 0;
 
-	sfprintf(sfstdout, "TEST\t%s", s = fmtident(id));
+	static char*	filter[] = { "-", 0 };
+
+	version = fmtident(id);
 	p = unit;
-	while (p < &unit[sizeof(unit)-1] && (*p = *s++) && !isspace(*p))
+	while (p < &unit[sizeof(unit)-1] && (*p = *version++) && !isspace(*p))
 		p++;
 	*p = 0;
 	while ((p = *++argv) && *p == '-')
@@ -334,169 +343,223 @@ main(int argc, char** argv)
 				break;
 			case 'c':
 				catch = 1;
-				sfprintf(sfstdout, ", catch");
 				continue;
 			case 'h':
 			case '?':
 			case '-':
-				sfprintf(sfstdout, ", help\n\n");
 				help();
 				return 2;
 			case 'v':
 				verbose = 1;
-				sfprintf(sfstdout, ", verbose");
 				continue;
 			default:
-				sfprintf(sfstdout, ", invalid option %c", *p);
-				continue;
+				sfprintf(sfstderr, "%s: -%c: invalid option", unit, *p);
+				return 1;
 			}
 			break;
 		}
-	if (p)
-		sfprintf(sfstdout, ", argument(s) ignored");
-	sfprintf(sfstdout, "\n");
 	if (catch)
 	{
 		signal(SIGALRM, gotcha);
 		signal(SIGBUS, gotcha);
 		signal(SIGSEGV, gotcha);
 	}
-	while (p = sfgetr(sfstdin, '\n', 1))
+	if (!*argv)
+		argv = filter;
+	while (state.file = *argv++)
 	{
-		state.lineno++;
-
-	/* parse: */
-
-		if (*p == 0 || *p == '#')
-			continue;
-		if (*p == ':')
+		if (streq(state.file, "-") || streq(state.file, "/dev/stdin") || streq(state.file, "/dev/fd/0"))
 		{
-			while (*++p == ' ');
-			sfprintf(sfstdout, "NOTE	%s\n", p);
-			continue;
+			state.file = 0;
+			fp = sfstdin;
 		}
-		i = 0;
-		field[i++] = p;
-		for (;;)
+		else if (!(fp = sfopen(NiL, state.file, "r")))
 		{
-			switch (*p++)
+			sfprintf(sfstderr, "%s: %s: cannot read\n", unit, state.file);
+			return 2;
+		}
+		sfprintf(sfstdout, "TEST\t%s ", unit);
+		if (s = state.file)
+		{
+			subunit = p = 0;
+			for (;;)
 			{
-			case 0:
-				p--;
-				goto checkfield;
-			case '\t':
-				*(p - 1) = 0;
-			checkfield:
-				s = field[i - 1];
-				if (streq(s, "NIL"))
-					field[i - 1] = 0;
-				else if (streq(s, "NULL"))
-					*s = 0;
-				while (*p == '\t')
-					p++;
-				if (!*p)
+				switch (*s++)
+				{
+				case 0:
 					break;
-				if (i >= elementsof(field))
-					bad("too many fields\n", NiL, NiL, 0);
-				field[i++] = p;
-				/*FALLTHROUGH*/
-			default:
-				continue;
-			}
-			break;
-		}
-		if (!(spec = field[0]))
-			bad("NIL spec\n", NiL, NiL, 0);
-
-	/* interpret: */
-
-		expand = invert = type = 0;
-		for (p = spec; *p; p++)
-		{
-			switch (*p)
-			{
-			case 'E':
-				type = ERE;
-				continue;
-			case 'K':
-				type = KRE;
-				continue;
-
-			case 'i':
-				invert = 1;
-				continue;
-
-			case '$':
-				expand = 1;
-				continue;
-
-			default:
-				bad("bad spec\n", spec, NiL, 0);
+				case '/':
+					subunit = s;
+					continue;
+				case '.':
+					p = s - 1;
+					continue;
+				default:
+					continue;
+				}
 				break;
-
 			}
-			break;
-		}
-		if (i < 3)
-			bad("too few fields\n", NiL, NiL, 0);
-		while (i < elementsof(field))
-			field[i++] = 0;
-		if ((re = field[1]) && expand)
-			escape(re);
-		if ((ans = field[2]) && expand)
-			escape(s);
-		msg = field[3];
-		sfsync(sfstdout);
-
-		for (;;)
-		{
-			if (type == ERE)
-			{
-				fun = "fmtmatch";
-				call = fmtmatch;
-			}
-			else if (type == KRE)
-			{
-				fun = "fmtre";
-				call = fmtre;
-			}
+			if (!subunit)
+				subunit = state.file;
+			if (p < subunit)
+				p = s - 1;
+			subunitlen = p - subunit;
+			if (subunitlen == strlen(unit) && !memcmp(subunit, unit, subunitlen))
+				subunit = 0;
 			else
-				break;
-			testno++;
-			if (verbose)
-				sfprintf(sfstdout, "test %-3d %s \"%s\" \"%s\"\n", state.lineno, fun, re, ans ? ans : "NIL");
-			if (!catch)
-				s = (*call)(re);
-			else if (setjmp(state.gotcha))
-				s = "SIGNAL";
-			else
-			{
-				alarm(LOOPED);
-				s = (*call)(re);
-				alarm(0);
-			}
-			if (!s && ans || s && !ans || s && ans && !streq(s, ans))
-			{
-				report("failed: ", fun, re, msg, expand);
-				quote(ans, expand);
-				sfprintf(sfstdout, " expected, ");
-				quote(s, expand);
-				sfprintf(sfstdout, " returned\n");
-			}
-			if (!invert)
-				break;
-			invert = 0;
-			s = ans;
-			ans = re;
-			re = s;
-			type = (type == ERE) ? KRE : ERE;
+				sfprintf(sfstdout, "%-.*s ", subunitlen, subunit);
 		}
+		else
+			subunit = 0;
+		sfprintf(sfstdout, "%s", version);
+		if (catch)
+			sfprintf(sfstdout, ", catch");
+		if (verbose)
+			sfprintf(sfstdout, ", verbose");
+		sfprintf(sfstdout, "\n");
+		testno = state.errors = state.lineno = state.signals = state.warnings = 0;
+		while (p = sfgetr(fp, '\n', 1))
+		{
+			state.lineno++;
+
+		/* parse: */
+
+			if (*p == 0 || *p == '#')
+				continue;
+			if (*p == ':')
+			{
+				while (*++p == ' ');
+				sfprintf(sfstdout, "NOTE	%s\n", p);
+				continue;
+			}
+			i = 0;
+			field[i++] = p;
+			for (;;)
+			{
+				switch (*p++)
+				{
+				case 0:
+					p--;
+					goto checkfield;
+				case '\t':
+					*(p - 1) = 0;
+				checkfield:
+					s = field[i - 1];
+					if (streq(s, "NIL"))
+						field[i - 1] = 0;
+					else if (streq(s, "NULL"))
+						*s = 0;
+					while (*p == '\t')
+						p++;
+					if (!*p)
+						break;
+					if (i >= elementsof(field))
+						bad("too many fields\n", NiL, NiL, 0);
+					field[i++] = p;
+					/*FALLTHROUGH*/
+				default:
+					continue;
+				}
+				break;
+			}
+			if (!(spec = field[0]))
+				bad("NIL spec\n", NiL, NiL, 0);
+
+		/* interpret: */
+
+			expand = invert = type = 0;
+			for (p = spec; *p; p++)
+			{
+				switch (*p)
+				{
+				case 'E':
+					type = ERE;
+					continue;
+				case 'K':
+					type = KRE;
+					continue;
+
+				case 'i':
+					invert = 1;
+					continue;
+
+				case '$':
+					expand = 1;
+					continue;
+
+				default:
+					bad("bad spec\n", spec, NiL, 0);
+					break;
+
+				}
+				break;
+			}
+			if (i < 3)
+				bad("too few fields\n", NiL, NiL, 0);
+			while (i < elementsof(field))
+				field[i++] = 0;
+			if ((re = field[1]) && expand)
+				escape(re);
+			if ((ans = field[2]) && expand)
+				escape(s);
+			msg = field[3];
+			sfsync(sfstdout);
+
+			for (;;)
+			{
+				if (type == ERE)
+				{
+					fun = "fmtmatch";
+					call = fmtmatch;
+				}
+				else if (type == KRE)
+				{
+					fun = "fmtre";
+					call = fmtre;
+				}
+				else
+					break;
+				testno++;
+				if (verbose)
+					sfprintf(sfstdout, "test %-3d %s \"%s\" \"%s\"\n", state.lineno, fun, re, ans ? ans : "NIL");
+				if (!catch)
+					s = (*call)(re);
+				else if (setjmp(state.gotcha))
+					s = "SIGNAL";
+				else
+				{
+					alarm(LOOPED);
+					s = (*call)(re);
+					alarm(0);
+				}
+				if (!s && ans || s && !ans || s && ans && !streq(s, ans))
+				{
+					report("failed: ", fun, re, msg, expand);
+					quote(ans, expand);
+					sfprintf(sfstdout, " expected, ");
+					quote(s, expand);
+					sfprintf(sfstdout, " returned\n");
+				}
+				if (!invert)
+					break;
+				invert = 0;
+				s = ans;
+				ans = re;
+				re = s;
+				type = (type == ERE) ? KRE : ERE;
+			}
+		}
+		sfprintf(sfstdout, "TEST\t%s", unit);
+		if (subunit)
+			sfprintf(sfstdout, " %-.*s", subunitlen, subunit);
+		sfprintf(sfstdout, ", %d test%s", testno, testno == 1 ? "" : "s");
+		if (state.warnings)
+			sfprintf(sfstdout, ", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
+		if (state.signals)
+			sfprintf(sfstdout, ", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
+		sfprintf(sfstdout, ", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
+		if (fp != sfstdin)
+			sfclose(fp);
 	}
-	sfprintf(sfstdout, "TEST\t%s, %d test%s", unit, testno, testno == 1 ? "" : "s");
-	if (state.warnings)
-		sfprintf(sfstdout, ", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
-	if (state.signals)
-		sfprintf(sfstdout, ", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
-	sfprintf(sfstdout, ", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
 	return 0;
 }

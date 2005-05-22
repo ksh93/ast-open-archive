@@ -902,11 +902,11 @@ tar_event(Pax_t* pax, Archive_t* ap, File_t* f, void* data, unsigned long event)
 
 	switch (event)
 	{
-	case EVENT_DELTA_EXTEND:
+	case PAX_EVENT_DELTA_EXTEND:
 		putkey(ap, ap->tmp.global, &options[OPT_delta_index], NiL, ap->delta->index + 1);
 		extend(ap, NiL, GLBTYPE);
 		return 1;
-	case EVENT_SKIP_JUNK:
+	case PAX_EVENT_SKIP_JUNK:
 		hdr = (Tarheader_t*)data;
 		if (!isdigit(hdr->chksum[0]) || !isdigit(hdr->chksum[1]) || !isdigit(hdr->chksum[2]) || !isdigit(hdr->chksum[3]) || !isdigit(hdr->chksum[4]) || !isdigit(hdr->chksum[5]) || !isdigit(hdr->chksum[6]) || sfsscanf(hdr->chksum, "%7lo", &sum) != 1 || !tar_checksum(ap, -1, sum))
 			return 1;
@@ -981,7 +981,7 @@ Format_t	pax_tar_format =
 	0,
 	0,
 	tar_event,
-	EVENT_SKIP_JUNK
+	PAX_EVENT_SKIP_JUNK
 };
 
 Format_t	pax_pax_format =
@@ -1012,7 +1012,7 @@ Format_t	pax_pax_format =
 	0,
 	0,
 	tar_event,
-	EVENT_DELTA_EXTEND
+	PAX_EVENT_DELTA_EXTEND
 };
 
 Format_t	pax_ustar_format =
@@ -1043,7 +1043,7 @@ Format_t	pax_ustar_format =
 	0,
 	0,
 	tar_event,
-	EVENT_SKIP_JUNK
+	PAX_EVENT_SKIP_JUNK
 };
 
 PAXLIB(&pax_ustar_format)

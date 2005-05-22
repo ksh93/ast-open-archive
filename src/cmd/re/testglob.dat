@@ -48,6 +48,8 @@ S	*/			OK		a[b/ ab/ ab?(cd|/
 Sn	*/			OK		a[b/ ab/ ab?(cd|/
 S	*/cd			OK		ab/cd
 Sn	*/cd			OK		ab/cd
+S	*/??			OK		ab/cd ab/pp
+Sn	*/??			OK		ab/cd ab/pp
 S	*/xx			NOMATCH
 Sn	*/xx			OK		*/xx
 S	s/\\/0*			NOMATCH

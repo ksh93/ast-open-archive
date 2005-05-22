@@ -10,7 +10,7 @@
 static const char	id[] = STAMP;
 
 static const char	terms[] = "\n\
-@(#)Copyright (c) 1980, 1993, 1996 - 2004\n\
+@(#)Copyright (c) 1980, 1993, 1996 - 2005\n\
 \tThe Regents of the University of California. All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
@@ -362,7 +362,7 @@ static const struct var	vartab[] =
 	X("Place this list of headers in files to be edited by ~e and ~v."),
 "escape",	&state.var.escape,		N,	"~",0,
 	X("The command escape character. Null means no command escapes."),
-"fixedheaders",	&state.var.fixedheaders,	0,	0,0,
+"fixedheaders",	&state.var.fixedheaders,	L,	0,0,
 	X("Add these header lines to outgoing messages."),
 "flipr",	&state.var.flipr,		0,	0,0,
 	X("Reverse the meanings of the reply and Reply commands."),

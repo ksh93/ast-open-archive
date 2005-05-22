@@ -1,3 +1,4 @@
+05-03-28 main.c: add -r address; add L variable attribute
 05-02-17 head.c: CONTENT_type PART_text trumps CONTENT_encoding binary
 05-02-08 local.h: blankline=>allblanks (lynxos libc symbol hijack)
 04-08-17 head.c: handle Content-Type: message

@@ -168,9 +168,13 @@ $(.SUFFIX.r:/^/.ATTRIBUTE.%/) : .SCAN.r
 .ATTRIBUTE.features/%.sh : .SCAN.exec.sh
 
 .INCLUDE.SUFFIX. : .FUNCTION
-	local F L S T
+	local F L Q S T
 	L := $(%:O=1)
 	F := $(%%:/ .*//:/\.$//:/'\(.*\)'/\1/)
+	Q := $("\"")
+	if F == "$(Q)*$(Q)"
+		F := $(F:/^$(Q)//:/$(Q)$//)
+	end
 	if ! "$(F:S)"
 		for S $(.SUFFIX.HEADER.$(L)) $(<<:S)
 			T := $(F)$(S)

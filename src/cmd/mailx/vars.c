@@ -220,6 +220,9 @@ int
 varset(register const char* name, register const char* value)
 {
 	register struct var*	vp;
+	char*			s;
+	int			n;
+	int			m;
 
 	note(DEBUG, "set name=%s value=%s", name, value);
 	if (name[0] == '-') {
@@ -260,16 +263,28 @@ varset(register const char* name, register const char* value)
 			*((long*)vp->variable) = strtol(value, NiL, 0);
 	}
 	else {
-		if (*vp->variable && *vp->variable != state.on && *vp->variable != (char*)vp->initialize)
-			free(*vp->variable);
 		if (value && (*value || !(vp->flags & N))) {
-			if (value != (char*)vp->initialize)
+			if ((vp->flags & L) && *value && *vp->variable && **vp->variable) {
+				if (state.cmdline)
+					return 0;
+				m = strlen(*vp->variable);
+				n = m + strlen(value) + 2;
+				if (!(s = newof(0, char, n, 0)))
+					note(PANIC, "Out of space");
+				memcpy(s, *vp->variable, m);
+				s[m] = '\n';
+				strcpy(s + m + 1, value);
+				value = (const char*)s;
+			}
+			else if (value != (char*)vp->initialize)
 				value = varkeep(value);
 		}
 		else if (vp->flags & D)
 			value = vp->initialize;
 		else
 			value = 0;
+		if (*vp->variable && *vp->variable != state.on && *vp->variable != (char*)vp->initialize)
+			free(*vp->variable);
 		*vp->variable = (char*)value;
 	}
 	if (vp->set)

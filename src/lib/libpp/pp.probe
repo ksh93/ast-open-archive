@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2004-04-01
+# @(#)pp.probe (AT&T Research) 2005-03-29
 #
 # C probe for libpp
 #
@@ -358,10 +358,21 @@ $cc -S ident.$src && grep "$id" ident.s && ident=1
 
 { $cc -E -Iinc0 -Iinc1 inc_next.$src | grep INCLUDE_NEXT ;} && include_next=1
 
-if	$cc -c lineid1.i
-then	$cc -c lineid2.i || lineid=line
-else	$cc -c lineid3.c || lineid=line
+if	$cc -c lineid1.i 2>b
+then	$cc -c lineid2.i 2>e
+	c=$?
+else	$cc -c lineid3.c 2>e
+	c=$?
 fi
+case $c in
+0)	case `wc -l < b` in
+	`wc -l < e`)	;;
+	*)		lineid=line ;;
+	esac
+	;;
+*)	lineid=line
+	;;
+esac
 
 if	$cc -E linetype.$src | grep '^[ 	]*#[ 	]*[0123456789]*[ 	]*".*"[ 	]*[12]' > linetype
 then	if	grep '^[ 	]*#[ 	]*[0123456789]*[ 	]*".*"[ 	]*[12][ 	][ 	]*3' linetype

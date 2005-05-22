@@ -275,9 +275,9 @@ static const char usage2[] =
 "	is printed, if it causes \bnmake\b to exit, and if it affects"
 "	the \bnmake\b exit status. The levels are:]{"
 "		[+<0?Debug message, enabled when the absolute value of"
-"			\alevel\a is less than or equal to the \b--debug\b"
-"			level. Debug diagnostics are prefixed by"
-"			\bdebug\b\alevel\a\b:\b.]"
+"			\alevel\a is greater than or equal to the"
+"			\b--debug\b level. Debug diagnostics are prefixed"
+"			by \bdebug\b\alevel\a\b:\b.]"
 "		[+1?Warning message, disabled by \b--silent\b. Warning"
 "			diagnostics are prefixed by \bwarning\a\b:\b]"
 "		[+2?Non-fatal error message. Processing continues after"
@@ -592,17 +592,35 @@ mamwrite(Sfio_t* fp, const void* buf, size_t n, Sfdisc_t* dp)
 /*
  * make sure the current time is > the start time
  * to differentiate strtime() "recent" vs. "current"
+ * if the clock or filesystem doesn't support subsecond
+ * granularity then we sleep until the next integral
+ * second ticks off
+ *
+ * the filesystem checks assume that file time stamp
+ * subseconds==0 rarely happens by chance -- the penalty
+ * for a wrong guess is slightly slower but still correct
+ * regression tests
+ *
+ * this also assumes that regression tests run faster than
+ * the disk inode flush frequency on systems where the
+ * cache time resolution is higher than the disk
  */
 
 static void
 regressinit(void)
 {
+	Stat_t	st;
 	Time_t	t;
+	int	i;
 
-	while (state.start == (t = CURTIME))
-		tmsleep(0L, 100000000L);
-	state.start = t;
 	error_info.version = 0;
+	t = CURTIME;
+	if (i = tmxnsec(t) && !stat(".", &st) && !tmxnsec(tmxgetatime(&st)) && !tmxnsec(tmxgetmtime(&st)))
+		state.start = tmxsns(tmxsec(t)+1, 0);
+	while (state.start >= (t = CURTIME))
+		tmsleep(0L, 100000000L);
+	if (!i)
+		state.start = t;
 }
 
 /*
@@ -1819,7 +1837,8 @@ punt(int old)
 	Oplist_t*		x;
 	Sfio_t*			vec;
 
-	if (state.reread > 1) error(PANIC, "makefile prerequisites cause unbounded make exec recursion");
+	if (state.reread > 1)
+		error(PANIC, "makefile prerequisites cause unbounded make exec recursion");
 	vec = sfstropen();
 	if (old)
 	{
@@ -1833,31 +1852,43 @@ punt(int old)
 		 * options with same flag and meaning
 		 */
 
-		if (error_info.trace < -3) sfputc(internal.tmp, 'd');
-		if (state.ignore) sfputc(internal.tmp, 'i');
-		if (state.keepgoing) sfputc(internal.tmp, 'k');
-		if (!state.mam.options && !state.exec) sfputc(internal.tmp, 'n');
-		if (state.silent) sfputc(internal.tmp, 's');
-		if (state.touch) sfputc(internal.tmp, 't');
+		if (error_info.trace < -3)
+			sfputc(internal.tmp, 'd');
+		if (state.ignore)
+			sfputc(internal.tmp, 'i');
+		if (state.keepgoing)
+			sfputc(internal.tmp, 'k');
+		if (!state.mam.options && !state.exec)
+			sfputc(internal.tmp, 'n');
+		if (state.silent)
+			sfputc(internal.tmp, 's');
+		if (state.touch)
+			sfputc(internal.tmp, 't');
 
 		/*
 		 * options with different flag but same meaning
 		 */
 
-		if (state.vardump) sfputc(internal.tmp, 'p');
-		if (!state.mam.options && state.force) sfputc(internal.tmp, 'u');
+		if (state.vardump)
+			sfputc(internal.tmp, 'p');
+		if (!state.mam.options && state.force)
+			sfputc(internal.tmp, 'u');
 
 		/*
 		 * options with different flag and meaning
 		 * the external.old meaning prevails
 		 */
 
-		if (state.base) sfputc(internal.tmp, 'b');
-		if (state.explain) sfputc(internal.tmp, 'e');
-		if (state.ruledump) sfputc(internal.tmp, 'r');
+		if (state.base)
+			sfputc(internal.tmp, 'b');
+		if (state.explain)
+			sfputc(internal.tmp, 'e');
+		if (state.ruledump)
+			sfputc(internal.tmp, 'r');
 		putptr(vec, getval(external.old, VAL_PRIMARY));
 		s = sfstruse(internal.tmp);
-		if (s[1]) putptr(vec, strdup(s));
+		if (s[1])
+			putptr(vec, strdup(s));
 
 		/*
 		 * mam arguments -- assume oldmake knows mam
@@ -1866,9 +1897,12 @@ punt(int old)
 		if (state.mam.options)
 		{
 			sfputc(internal.tmp, '-');
-			if (state.never) sfputc(internal.tmp, 'N');
-			else if (!state.exec) sfputc(internal.tmp, 'n');
-			if (state.force) sfputc(internal.tmp, 'F');
+			if (state.never)
+				sfputc(internal.tmp, 'N');
+			else if (!state.exec)
+				sfputc(internal.tmp, 'n');
+			if (state.force)
+				sfputc(internal.tmp, 'F');
 			sfputc(internal.tmp, 'M');
 			sfputr(internal.tmp, state.mam.options, -1);
 			putptr(vec, strdup(sfstruse(internal.tmp)));
@@ -1914,7 +1948,8 @@ punt(int old)
 #endif
 			putptr(vec, 0);
 			av = (char**)sfstrbase(vec);
-			while (*av) sfprintf(sfstderr, "%s ", *av++);
+			while (*av)
+				sfprintf(sfstderr, "%s ", *av++);
 			sfprintf(sfstderr, "\n");
 		}
 	}
@@ -1939,7 +1974,8 @@ punt(int old)
 
 	sfsync(sfstdout);
 	sfsync(sfstderr);
-	if (internal.openfile) close(internal.openfd);
+	if (internal.openfile)
+		close(internal.openfd);
 
 	/*
 	 * start fresh

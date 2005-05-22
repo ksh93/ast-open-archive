@@ -51,7 +51,8 @@ extern Format_t			PAX_DEBUG_FORMAT;
 #define pax_vmsbackup_next	(&pax_ar_format)
 #define pax_ar_next		(&pax_vdb_format)
 #define pax_vdb_next		(&pax_rpm_format)
-#define pax_rpm_next		(&pax_mime_format)
+#define pax_rpm_next		(&pax_flash_format)
+#define pax_flash_next		(&pax_mime_format)
 #define pax_mime_next		(&pax_tnef_format)
 #define pax_tnef_next		(&pax_pds_format)
 #define pax_pds_next		(&pax_compress_format)
@@ -72,6 +73,7 @@ extern Format_t			pax_compress_format;
 extern Format_t			pax_cpio_format;
 extern Format_t			pax_delta_88_format;
 extern Format_t			pax_delta_format;
+extern Format_t			pax_flash_format;
 extern Format_t			pax_gzip_format;
 extern Format_t			pax_ibm_format;
 extern Format_t			pax_ignore_format;

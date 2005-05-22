@@ -26,6 +26,15 @@ function DATA
 			;;
 		abc.dat)print $'abc'
 			;;
+		big.dat)integer i
+			echo 'This is a test.' > t
+			for ((i = 0; i < 5; i++))
+			do	cat t t > u
+				cat u u > t
+			done
+			cat t
+			rm t u
+			;;
 		esac > $f
 		chmod u=rw,go=r $f
 	done
@@ -210,7 +219,7 @@ opqrstuvwxyz{|}~=7F=80=81=82=83=84=85=86=87=88=89=8A=8B=8C=8D=8E=8F=90=91=
 		SAME OUTPUT chars.dat
 
 TEST 04 '-r'
-	DO	DATA chars.dat
+	DO	DATA chars.dat big.dat
 
 	EXEC	'>sum-md5>uu-posix'
 		SAME INPUT chars.dat
@@ -267,3 +276,11 @@ opqrstuvwxyz{|}~=7F=80=81=82=83=84=85=86=87=88=89=8A=8B=8C=8D=8E=8F=90=91=
 	EXEC	-r '>sum-md5>qp'
 		SAME INPUT test.dat
 		SAME OUTPUT chars.dat
+
+	EXEC	'>uu-base64'
+		SAME INPUT big.dat
+		MOVE OUTPUT test.dat
+		ERROR -
+	EXEC	-r '>uu-base64'
+		SAME INPUT test.dat
+		SAME OUTPUT big.dat

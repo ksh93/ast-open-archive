@@ -1,12 +1,11 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
-setv INSTALLROOT ${INSTALLROOT}
-setv PACKAGE_ast ${INSTALLROOT}
-setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
-setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-05-11
+setv INSTALLROOT ../../..
+setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
+setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
 setv PACKAGE_cmd ${INSTALLROOT}
 setv PACKAGE_cmd_INCLUDE ${PACKAGE_cmd}/include
 setv PACKAGE_cmd_LIB ${PACKAGE_cmd}/lib
-setv PACKAGEROOT ${PACKAGEROOT}
+setv PACKAGEROOT ../../../../..
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -41,111 +40,116 @@ setv YACCFLAGS -d
 make ${PACKAGEROOT}/lib/package/ast.lic
 done ${PACKAGEROOT}/lib/package/ast.lic
 make .INIT
-make ${INSTALLROOT}/include/ast/cmd.h
-make ${INSTALLROOT}/include/ast/dlldefs.h implicit
-done ${INSTALLROOT}/include/ast/dlldefs.h dontcare
-make ${INSTALLROOT}/include/ast/stak.h implicit
-make ${INSTALLROOT}/include/ast/stk.h implicit
-make ${INSTALLROOT}/include/ast/sfio.h implicit
-make ${INSTALLROOT}/include/ast/sfio_s.h implicit
-done ${INSTALLROOT}/include/ast/sfio_s.h dontcare
-make ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_common.h dontcare
-make ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_botch.h implicit
-done ${INSTALLROOT}/include/ast/ast_botch.h dontcare
-make ${INSTALLROOT}/include/ast/ast_unistd.h implicit
-done ${INSTALLROOT}/include/ast/ast_unistd.h dontcare
-make ${INSTALLROOT}/include/ast/re_comp.h implicit
-make ${INSTALLROOT}/include/ast/prototyped.h implicit
+make ${PACKAGE_ast_INCLUDE}/cmdlist.h
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
 done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/prototyped.h dontcare
-done ${INSTALLROOT}/include/ast/re_comp.h dontcare
-make ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_getopt.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_getopt.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/getopt.h dontcare
-make ${INSTALLROOT}/include/ast/ast_fcntl.h implicit
-make ${INSTALLROOT}/include/ast/ls.h implicit
-make ${INSTALLROOT}/include/ast/ast_mode.h implicit
-done ${INSTALLROOT}/include/ast/ast_mode.h dontcare
-make ${INSTALLROOT}/include/ast/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${INSTALLROOT}/include/ast/ast_fs.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ls.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_fs.h implicit
-done ${INSTALLROOT}/include/ast/ast_fcntl.h dontcare
-make ${INSTALLROOT}/include/ast/ast_types.h implicit
-done ${INSTALLROOT}/include/ast/ast_types.h dontcare
-make ${INSTALLROOT}/include/ast/ast_map.h implicit
-done ${INSTALLROOT}/include/ast/ast_map.h dontcare
-make ${INSTALLROOT}/include/ast/stdio.h implicit
-make ${INSTALLROOT}/include/ast/ast_stdio.h implicit
-prev ${INSTALLROOT}/include/ast/sfio_s.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_stdio.h dontcare
-done ${INSTALLROOT}/include/ast/stdio.h dontcare
-prev ${INSTALLROOT}/include/ast/getopt.h implicit
-make ${INSTALLROOT}/include/ast/limits.h implicit
-make ${INSTALLROOT}/include/ast/ast_limits.h implicit
-done ${INSTALLROOT}/include/ast/ast_limits.h dontcare
-done ${INSTALLROOT}/include/ast/limits.h dontcare
-make ${INSTALLROOT}/include/ast/ast_hdr.h implicit
-done ${INSTALLROOT}/include/ast/ast_hdr.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_getopt.h implicit
-make ${INSTALLROOT}/include/ast/ast_lib.h implicit
-done ${INSTALLROOT}/include/ast/ast_lib.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_std.h dontcare
-done ${INSTALLROOT}/include/ast/sfio.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/stk.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/stak.h dontcare
-make ${INSTALLROOT}/include/ast/error.h implicit
-make ${INSTALLROOT}/include/ast/option.h implicit
-make ${INSTALLROOT}/include/ast/ast.h implicit
-make ${INSTALLROOT}/include/ast/vmalloc.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-done ${INSTALLROOT}/include/ast/vmalloc.h dontcare
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/ast_std.h implicit
-make ${INSTALLROOT}/include/ast/ast_version.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast_version.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ast.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/option.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/error.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/cmd.h
-exec - sed -e '/^extern[ 	].*[ 	]b_/!d' -e 's/.*[ 	]b_\([a-z]*\).*/\1/' -e '/^ln$/d' -e '/^mv$/d' ${INSTALLROOT}/include/ast/cmd.h
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/cmdlist.h
+exec - sed -e '/^CMDLIST(.*)$/!d' -e 's/CMDLIST(\(.*\))/\1/' -e '/^ln$/d' -e '/^mv$/d' ${PACKAGE_ast_INCLUDE}/cmdlist.h
 bind -lcmd
 done .INIT dontcare virtual
 make install
 make dlls
 make dlls.o
 make dlls.c
-prev ${INSTALLROOT}/include/ast/dlldefs.h implicit
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
+done ${PACKAGE_ast_INCLUDE}/dlldefs.h
+make ${PACKAGE_ast_INCLUDE}/cmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
+make ${PACKAGE_ast_INCLUDE}/cmdext.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/cmdext.h dontcare
+make ${PACKAGE_ast_INCLUDE}/stak.h implicit
+make ${PACKAGE_ast_INCLUDE}/stk.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
+make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+make error?--?old?ethernet?address?at?wrong?offset implicit
+done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
+done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/limits.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
+done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
+done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/stk.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/stak.h dontcare
+make ${PACKAGE_ast_INCLUDE}/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/option.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_version.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/option.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/error.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/cmd.h
 done dlls.c
 meta dlls.o %.c>%.o dlls.c dlls
 prev dlls.c
 setv STANDALONE -DSTANDALONE="b_dlls"
 setv LICENSE -DLICENSE="since=2002,author=gsf"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_dlls -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c dlls.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_dlls -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2002-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c dlls.c
 done dlls.o generated
 bind -ldll
 bind -last
@@ -155,12 +159,12 @@ done dlls generated
 make look
 make look.o
 make look.c
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done look.c
 meta look.o %.c>%.o look.c look
 prev look.c
 setv STANDALONE -DSTANDALONE="b_look"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_look -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c look.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_look -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c look.c
 done look.o generated
 setv STANDALONE -DSTANDALONE="b_look"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o look look.o ${mam_libast} ${mam_libcmd}
@@ -168,17 +172,17 @@ done look generated
 make mime
 make mime.o
 make mime.c
-make ${INSTALLROOT}/include/ast/mime.h implicit
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-prev ${INSTALLROOT}/include/ast/sfio.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/mime.h
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+make ${PACKAGE_ast_INCLUDE}/mime.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/mime.h
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done mime.c
 meta mime.o %.c>%.o mime.c mime
 prev mime.c
 setv STANDALONE -DSTANDALONE="b_mime"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_mime -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c mime.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_mime -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c mime.c
 done mime.o generated
 setv STANDALONE -DSTANDALONE="b_mime"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mime mime.o ${mam_libast} ${mam_libcmd}
@@ -186,17 +190,17 @@ done mime generated
 make nl
 make nl.o
 make nl.c
-make ${INSTALLROOT}/include/ast/regex.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/regex.h
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/regex.h
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done nl.c
 meta nl.o %.c>%.o nl.c nl
 prev nl.c
 setv STANDALONE -DSTANDALONE="b_nl"
 setv LICENSE -DLICENSE="since=2003,author=dgk"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DSTANDALONE=b_nl -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c nl.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_nl -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c nl.c
 done nl.o generated
 setv STANDALONE -DSTANDALONE="b_nl"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o nl nl.o ${mam_libast} ${mam_libcmd}
@@ -204,12 +208,12 @@ done nl generated
 make asa
 make asa.o
 make asa.c
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done asa.c
 meta asa.o %.c>%.o asa.c asa
 prev asa.c
 setv STANDALONE -DSTANDALONE="b_asa"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DSTANDALONE=b_asa -D_PACKAGE_ast -c asa.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_asa -D_PACKAGE_ast -c asa.c
 done asa.o generated
 setv STANDALONE -DSTANDALONE="b_asa"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o asa asa.o ${mam_libast} ${mam_libcmd}
@@ -217,33 +221,33 @@ done asa generated
 make od
 make od.o
 make od.c
-make ${INSTALLROOT}/include/ast/iconv.h implicit
-make ${INSTALLROOT}/include/ast/ast_iconv.h implicit
-make ${INSTALLROOT}/include/ast/ccode.h implicit
-make ${INSTALLROOT}/include/ast/ast_ccode.h implicit
-done ${INSTALLROOT}/include/ast/ast_ccode.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/ccode.h dontcare
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/ast_iconv.h
-done ${INSTALLROOT}/include/ast/iconv.h
-prev ${INSTALLROOT}/include/ast/ccode.h implicit
-make ${INSTALLROOT}/include/ast/swap.h implicit
-make ${INSTALLROOT}/include/ast/int.h implicit
-prev ${INSTALLROOT}/include/ast/ast_common.h implicit
-done ${INSTALLROOT}/include/ast/int.h dontcare
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/swap.h
-make ${INSTALLROOT}/include/ast/sig.h implicit
-done ${INSTALLROOT}/include/ast/sig.h
-prev ${INSTALLROOT}/include/ast/int.h implicit
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+make ${PACKAGE_ast_INCLUDE}/iconv.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_iconv.h implicit
+make ${PACKAGE_ast_INCLUDE}/ccode.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_ccode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ccode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_iconv.h
+done ${PACKAGE_ast_INCLUDE}/iconv.h
+prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
+make ${PACKAGE_ast_INCLUDE}/swap.h implicit
+make ${PACKAGE_ast_INCLUDE}/int.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/int.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/swap.h
+make ${PACKAGE_ast_INCLUDE}/sig.h implicit
+done ${PACKAGE_ast_INCLUDE}/sig.h
+prev ${PACKAGE_ast_INCLUDE}/int.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done od.c
 meta od.o %.c>%.o od.c od
 prev od.c
 setv STANDALONE -DSTANDALONE="b_od"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_od -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c od.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_od -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c od.c
 done od.o generated
 setv STANDALONE -DSTANDALONE="b_od"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o od od.o ${mam_libast} ${mam_libcmd}
@@ -251,24 +255,24 @@ done od generated
 make pr
 make pr.o
 make pr.c
-make ${INSTALLROOT}/include/ast/tm.h implicit
-make ${INSTALLROOT}/include/ast/times.h implicit
-make ${INSTALLROOT}/include/ast/ast_time.h implicit
-done ${INSTALLROOT}/include/ast/ast_time.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/times.h dontcare
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/tm.h
-prev ${INSTALLROOT}/include/ast/ls.h implicit
-prev ${INSTALLROOT}/include/ast/ccode.h implicit
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+make ${PACKAGE_ast_INCLUDE}/tm.h implicit
+make ${PACKAGE_ast_INCLUDE}/times.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/times.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/tm.h
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ccode.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done pr.c
 meta pr.o %.c>%.o pr.c pr
 prev pr.c
 setv STANDALONE -DSTANDALONE="b_pr"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_pr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c pr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_pr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c pr.c
 done pr.o generated
 setv STANDALONE -DSTANDALONE="b_pr"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o pr pr.o ${mam_libast} ${mam_libcmd}
@@ -276,12 +280,12 @@ done pr generated
 make strings
 make strings.o
 make strings.c
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done strings.c
 meta strings.o %.c>%.o strings.c strings
 prev strings.c
 setv STANDALONE -DSTANDALONE="b_strings"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_strings -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c strings.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_strings -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c strings.c
 done strings.o generated
 setv STANDALONE -DSTANDALONE="b_strings"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o strings strings.o ${mam_libast} ${mam_libcmd}
@@ -289,14 +293,14 @@ done strings generated
 make tr
 make tr.o
 make tr.c
-prev ${INSTALLROOT}/include/ast/regex.h implicit
-prev ${INSTALLROOT}/include/ast/error.h implicit
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done tr.c
 meta tr.o %.c>%.o tr.c tr
 prev tr.c
 setv STANDALONE -DSTANDALONE="b_tr"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_tr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c tr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_tr -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c tr.c
 done tr.o generated
 setv STANDALONE -DSTANDALONE="b_tr"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o tr tr.o ${mam_libast} ${mam_libcmd}
@@ -304,18 +308,18 @@ done tr generated
 make uudecode
 make uudecode.o
 make uudecode.c
-prev ${INSTALLROOT}/include/ast/option.h implicit
-prev ${INSTALLROOT}/include/ast/error.h implicit
-make ${INSTALLROOT}/include/ast/uu.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
-prev ${INSTALLROOT}/include/ast/prototyped.h implicit
-done ${INSTALLROOT}/include/ast/uu.h
-prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/option.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+make ${PACKAGE_ast_INCLUDE}/uu.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/uu.h
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done uudecode.c
 meta uudecode.o %.c>%.o uudecode.c uudecode
 prev uudecode.c
 setv STANDALONE -DSTANDALONE="b_uudecode"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DSTANDALONE=b_uudecode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c uudecode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uudecode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c uudecode.c
 done uudecode.o generated
 bind -luu
 setv STANDALONE -DSTANDALONE="b_uudecode"
@@ -324,15 +328,15 @@ done uudecode generated
 make uuencode
 make uuencode.o
 make uuencode.c
-prev ${INSTALLROOT}/include/ast/option.h implicit
-prev ${INSTALLROOT}/include/ast/error.h implicit
-prev ${INSTALLROOT}/include/ast/uu.h implicit
-prev ${INSTALLROOT}/include/ast/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/option.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/uu.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done uuencode.c
 meta uuencode.o %.c>%.o uuencode.c uuencode
 prev uuencode.c
 setv STANDALONE -DSTANDALONE="b_uuencode"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DSTANDALONE=b_uuencode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c uuencode.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DSTANDALONE=b_uuencode -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c uuencode.c
 done uuencode.o generated
 setv STANDALONE -DSTANDALONE="b_uuencode"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o uuencode uuencode.o ${mam_libuu} ${mam_libast} ${mam_libcmd}
@@ -340,12 +344,12 @@ done uuencode generated
 make what
 make what.o
 make what.c
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done what.c
 meta what.o %.c>%.o what.c what
 prev what.c
 setv STANDALONE -DSTANDALONE="b_what"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_what -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c what.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_what -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c what.c
 done what.o generated
 setv STANDALONE -DSTANDALONE="b_what"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o what what.o ${mam_libast} ${mam_libcmd}
@@ -357,14 +361,14 @@ make FEATURE/utmp implicit
 meta FEATURE/utmp features/%>FEATURE/% features/utmp utmp
 make features/utmp
 done features/utmp
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include ${mam_libast} ${mam_libcmd} : run features/utmp
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libcmd} : run features/utmp
 done FEATURE/utmp generated
-prev ${INSTALLROOT}/include/ast/cmd.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done who.c
 meta who.o %.c>%.o who.c who
 prev who.c
 setv STANDALONE -DSTANDALONE="b_who"
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${INSTALLROOT}/include/ast -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_who -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c who.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DERROR_CATALOG=\""builtin"\" -DSTANDALONE=b_who -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 1992-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?builtin]"\" -c who.c
 done who.o generated
 setv STANDALONE -DSTANDALONE="b_who"
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o who who.o ${mam_libast} ${mam_libcmd}

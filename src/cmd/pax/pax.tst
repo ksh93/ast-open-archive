@@ -6,6 +6,8 @@ umask 0
 
 chmod 755 .
 
+formats='binary-cpio cpio asc aschk pax oldtar tar'
+
 dateformat='%(mtime:time=%Y-%m-%d/%H:%M:%S)s %(path)s'
 modeformat='%(mtime:time=%K)s %(mode)s %(mode:case:-*:%(size)u:*:0)s %(path)s'
 testformat='%(mtime:time=%K)s %(mode)s %(mode:case:-*:%(size)u:*:0)8s %(path)s%(linkop:case:?*: %(linkop)s %(linkpath)s)s'
@@ -19,6 +21,18 @@ function DATA
 	for i
 	do	test -f $i ||
 		case $i in
+		b1)	print $'0123456789' > $i
+			touch -t 2000-01-02+03:04:05 $i
+			chmod 644 $i
+			;;
+		b2)	print $'ab' > $i
+			touch -t 2005-04-03+02:01:00 $i
+			chmod 644 $i
+			;;
+		a1)	print $'append' > $i
+			touch -t 2005-06-07+08:09:10 $i
+			chmod 644 $i
+			;;
 		t.c1)	print $'method=md5
 permissions
 168805c362787f61c79f9a52d6ee8fc0 0644 - - t.r
@@ -840,7 +854,41 @@ TEST 14 '--filter and --action'
 	EXEC --nosummary -rf t.pax CHECKSUM
 	PROG diff CHECKSUM t.c4
 
-TEST 15 'skip over >2Gb member'
+TEST 15 'append among friends'
+
+	DO DATA b1 b2 a1
+
+	for b in $formats
+	do
+		for a in $formats
+		do
+
+	EXEC --nosummary -wvf x -x $b b1
+		OUTPUT -
+		ERROR - $'b1'
+
+	EXEC --nosummary -awvf x -x $a a1
+		ERROR - $'a1'
+
+	EXEC --nosummary --listformat="$dateformat" -vf x
+		OUTPUT - $'2000-01-02/03:04:05 b1\n2005-06-07/08:09:10 a1'
+		ERROR -
+
+	EXEC --nosummary -wvf x -x $b b1 b2
+		OUTPUT -
+		ERROR - $'b1\nb2'
+
+	EXEC --nosummary -awvf x -x $a a1
+		ERROR - $'a1'
+
+	EXEC --nosummary --listformat="$dateformat" -vf x
+		OUTPUT - $'2000-01-02/03:04:05 b1\n2005-04-03/01:01:00 b2\n2005-06-07/08:09:10 a1'
+		ERROR -
+
+		done
+	done
+
+TEST 16 'skip over >2Gb member'
 
 	EXEC --nosummary --listformat="$testformat" -vf $data/bigskip.pax
 		OUTPUT - $'2004-08-06+11:08:56 -rw-r--r-- 2814840497 begin

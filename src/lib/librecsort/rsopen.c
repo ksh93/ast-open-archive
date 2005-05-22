@@ -25,7 +25,7 @@
 **	Written by Kiem-Phong Vo (07/08/96)
 */
 
-static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2004-10-31 $\0\n";
+static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2005-05-15 $\0\n";
 
 #if __STD_C
 Rs_t* rsopen(Rsdisc_t* disc, Rsmethod_t* meth, ssize_t c_max, int type)

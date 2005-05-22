@@ -4502,3 +4502,10 @@ TEST 31 'convoluted function-like macros'
 #define C2(x,y)	(x,(y,NIL))
 A(2,(a,b))'
 		OUTPUT - $'# 1 ""\n\n\n\n( a,( b,NIL))'
+
+TEST 32 'catliteral vs stringize'
+
+	EXEC -I-D
+		INPUT - $'#define F(s)	"a" "b" #s
+F(c);'
+		OUTPUT - $'# 1 ""\n\n"abc";'

@@ -173,7 +173,7 @@ nametype(const char* name, char** e)
 
 /*
  * map name s to rule r
- * previous mappings must be recociled with the prereq lists
+ * previous mappings must be reconciled with the prereq lists
  */
 
 char*

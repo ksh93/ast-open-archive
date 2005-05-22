@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2005-03-19 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2005-05-22 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -1519,7 +1519,7 @@ main(int argc, char** argv)
 				state.append = 1;
 		}
 		if (state.append)
-			ap->io->mode = O_CREAT|O_RDWR;
+			ap->io->mode = O_WRONLY|O_APPEND|O_CREAT;
 		ap->io->fd = 1;
 		if (!ap->name || streq(ap->name, "-"))
 			ap->name = defoutput;

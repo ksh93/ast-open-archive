@@ -22,8 +22,8 @@ CP = $(STDCP|"cp")
 LN = $(STDLN|"ln")
 RM = $(STDRM|"rm")
 
-BUILTINS :COMMAND: cmd.h
-	$(SED) -e '/^extern[ 	].*[ 	]b_/!d' -e 's/.*[ 	]b_\([a-z]*\).*/\1/' $(LINKS:N!=*[:]:C,.*,-e '/^&$/d',) $(*)
+BUILTINS :COMMAND: cmdlist.h
+	$(SED) -e '/^CMDLIST(.*)$/!d' -e 's/CMDLIST(\(.*\))/\1/' $(LINKS:N!=*[:]:C,.*,-e '/^&$/d',) $(*)
 
 .INIT : .builtin
 

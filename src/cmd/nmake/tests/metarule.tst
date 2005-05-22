@@ -98,7 +98,32 @@ all : xlate crs'
 + cp crs.sh crs
 + chmod 0700 crs'
 
-TEST 05 'optional auxiliaries'
+TEST 05 'optional joint prerequisites'
+
+	EXEC	-n
+		INPUT Makefile $'%.c %.h : %.g
+	: order : $(<) :
+	cat $(>) > $(<:O=1)
+cmd :: g.g'
+		INPUT g.g $'int main(){return 0;}'
+		OUTPUT - $'+ : order : g.c g.h :
++ cat g.g > g.c
++ cc -O   -c g.c
++ cc  -O   -o cmd g.o'
+
+	EXEC	--
+		OUTPUT -
+		ERROR - $'+ : order : g.c g.h :
++ cat g.g
++ 1> g.c
++ cc -O -c g.c
++ cc -O -o cmd g.o'
+
+	EXEC	--
+		ERROR -
+
+	EXEC	clobber
+		ERROR - $'+ ignore rm -f -r cmd g.c g.o Makefile.mo Makefile.ms'
 
 	EXEC	-n
 		INPUT Makefile $'%.c %.h : %.g
@@ -115,6 +140,7 @@ main(){return g();}'
 + test -f g.h || echo "extern int g();" > g.h
 + cc -O   -c g.c
 + cc  -O   -o cmd a.o g.o'
+		ERROR -
 
 	EXEC	-n
 		INPUT a.c $'#include "g.h"
@@ -464,15 +490,15 @@ cmd :: a.cbl i.cbl t.cob x.cbl y.cbl t.cob'
 4567 * COPY b.cbl.
         COPY z.cbl.'
 		INPUT z.cbl
-		OUTPUT - $'+ cobc -static -std=mvs -C   a.cbl
+		OUTPUT - $'+ cobc -static  -C  a.cbl
 + cc -O   -c a.c
-+ cobc -static -std=mvs -C   i.cbl
++ cobc -static  -C  i.cbl
 + cc -O   -c i.c
-+ cobc -static -std=mvs -C   t.cob
++ cobc -static  -C  t.cob
 + cc -O   -c t.c
-+ cobc -static -std=mvs -C -I. -Icobinc  x.cbl
++ cobc -static  -C -I. -Icobinc x.cbl
 + cc -O   -c x.c
-+ cobc -static -std=mvs -C -I.  y.cbl
++ cobc -static  -C -I. y.cbl
 + cc -O   -c y.c
 + cc  -O    -o cmd a.o i.o t.o x.o y.o'
 
@@ -738,3 +764,30 @@ make: *** exit code 1 making yy.c
 
 	EXEC	DISABLE_YY= DISABLE_LL=
 		ERROR -
+
+TEST 23 'assertion order sensitivity'
+
+	EXEC	-n
+		INPUT Makefile $'a% : b%
+	: generate $(*) > $(<)
+b% : c%
+	: generate $(*) > $(<)
+b%-x : c%
+	: generate $(*) > $(<)
+
+all : at at-x'
+		INPUT ct
+		OUTPUT - $'+ : generate ct > bt
++ : generate bt > at
++ : generate ct > bt-x
++ : generate bt-x > at-x'
+
+	EXEC	-n
+		INPUT Makefile $'b%-x : c%
+	: generate $(*) > $(<)
+b% : c%
+	: generate $(*) > $(<)
+a% : b%
+	: generate $(*) > $(<)
+
+all : at at-x'

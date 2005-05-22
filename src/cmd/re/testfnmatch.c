@@ -17,14 +17,13 @@
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                                                                      *
 ***********************************************************************/
-#pragma prototyped
 
 /*
  * fnmatch(3) test harness
  * see testfnmatch --help for a description of the input format
  */
 
-static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2003-10-17 $\0\n";
+static const char id[] = "\n@(#)$Id: testfnmatch (AT&T Research) 2005-05-20 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -141,7 +140,9 @@ H("  glibc contributors (fnmatch tests)\n");
 #define LOOPED		2
 #define NOTEST		(~0)
 
-static const char* unsupported[] = {
+static const char* unsupported[] =
+{
+	0,
 #ifndef FNM_ICASE
 	"ICASE",
 #endif
@@ -154,7 +155,6 @@ static const char* unsupported[] = {
 #ifndef FNM_PERIOD
 	"PERIOD",
 #endif
-	0
 };
 
 #ifndef FNM_ICASE
@@ -176,17 +176,12 @@ static const char* unsupported[] = {
 static struct
 {
 	int		errors;
-	struct
-	{
-	int		count;
-	int		error;
-	int		position;
-	}		ignore;
 	int		lineno;
 	int		ret;
 	int		signals;
 	int		unspecified;
 	int		warnings;
+	char*		file;
 	char*		which;
 	jmp_buf		gotcha;
 } state;
@@ -255,16 +250,21 @@ quote(char* s, int expand)
 static void
 report(char* comment, char* re, char* s, char* msg, int unspecified, int expand)
 {
+	if (state.file)
+		printf("%s:", state.file);
 	printf("%d:", state.lineno);
-	if (re) {
+	if (re)
+	{
 		printf(" ");
 		quote(re, expand);
-		if (s) {
+		if (s)
+		{
 			printf(" versus ");
 			quote(s, expand);
 		}
 	}
-	if (unspecified) {
+	if (unspecified)
+	{
 		state.unspecified++;
 		printf(" unspecified behavior");
 	}
@@ -278,7 +278,8 @@ report(char* comment, char* re, char* s, char* msg, int unspecified, int expand)
 static int
 note(int level, int skip, char* msg)
 {
-	if (!skip) {
+	if (!skip)
+	{
 		printf("NOTE\t");
 		if (msg)
 			printf("%s: ", msg);
@@ -413,7 +414,8 @@ sigunblock(int s)
 	sigset_t	mask;
 
 	sigemptyset(&mask);
-	if (s) {
+	if (s)
+	{
 		sigaddset(&mask, s);
 		op = SIG_UNBLOCK;
 	}
@@ -438,7 +440,7 @@ gotcha(int sig)
 }
 
 static char*
-getline(void)
+getline(FILE* fp)
 {
 	static char	buf[32 * 1024];
 
@@ -448,7 +450,7 @@ getline(void)
 
 	for (;;)
 	{
-		if (!(b = fgets(s, e - s, stdin)))
+		if (!(b = fgets(s, e - s, fp)))
 			return 0;
 		state.lineno++;
 		s += strlen(s) - 1;
@@ -477,376 +479,452 @@ main(int argc, char** argv)
 	int		eret;
 	int		i;
 	int		j;
-	int		got;
+	int		subunitlen;
+	int		level = 1;
+	int		locale = 0;
+	int		skip = 0;
+	int		testno = 0;
+	FILE*		fp;
 	char*		p;
 	char*		spec;
 	char*		re;
 	char*		s;
 	char*		ans;
 	char*		msg;
+	char*		subunit;
+	char*		version;
 	char*		field[6];
 	char		unit[64];
 
 	int		catch = 0;
-	int		level = 1;
-	int		locale = 0;
-	int		skip = 0;
-	int		testno = 0;
 	int		verbose = 0;
 
-	printf("TEST\t%s", s = fmtident(id));
+	static char*	filter[] = { "-", 0 };
+
+	version = fmtident(id);
 	p = unit;
-	while (p < &unit[sizeof(unit)-1] && (*p = *s++) && !isspace(*p))
+	while (p < &unit[sizeof(unit)-1] && (*p = *version++) && !isspace(*p))
 		p++;
 	*p = 0;
 	while ((p = *++argv) && *p == '-')
-		for (;;) {
-			switch (*++p) {
-
+		for (;;)
+		{
+			switch (*++p)
+			{
 			case 0:
 				break;
 			case 'c':
 				catch = 1;
-				printf(", catch");
 				continue;
 			case 'h':
 			case '?':
 			case '-':
-				printf(", help\n\n");
 				help();
 				return 2;
 			case 'v':
 				verbose = 1;
-				printf(", verbose");
 				continue;
 			default:
-				printf(", invalid option %c", *p);
-				continue;
+				fprintf(stderr, "%s: -%c: invalid option", unit, *p);
+				return 1;
 			}
 			break;
 		}
-	if (p)
-		printf(", argument(s) ignored");
-	printf("\n");
-	if (elementsof(unsupported) > 1) {
-		printf("NOTE\tunsupported:");
-		got = ' ';
-		for (i = 0; i < elementsof(unsupported) - 1; i++) {
-			printf("%c%s", got, unsupported[i]);
-			got = ',';
-		}
-		printf("\n");
-	}
-	if (catch) {
+	if (catch)
+	{
 		signal(SIGALRM, gotcha);
 		signal(SIGBUS, gotcha);
 		signal(SIGSEGV, gotcha);
 	}
-	while (p = getline()) {
-
-	/* parse: */
-
-		if (*p == 0 || *p == '#')
-			continue;
-		if (*p == ':') {
-			while (*++p == ' ');
-			printf("NOTE	%s\n", p);
-			continue;
+	if (!*argv)
+		argv = filter;
+	while (state.file = *argv++)
+	{
+		if (streq(state.file, "-") || streq(state.file, "/dev/stdin") || streq(state.file, "/dev/fd/0"))
+		{
+			state.file = 0;
+			fp = stdin;
 		}
-		i = 0;
-		field[i++] = p;
-		for (;;) {
-			switch (*p++) {
-
-			case 0:
-				p--;
-				goto checkfield;
-			case '\t':
-				*(p - 1) = 0;
-			checkfield:
-				s = field[i - 1];
-				if (streq(s, "NIL"))
-					field[i - 1] = 0;
-				else if (streq(s, "NULL"))
-					*s = 0;
-				while (*p == '\t')
-					p++;
-				if (!*p)
+		else if (!(fp = fopen(state.file, "r")))
+		{
+			fprintf(stderr, "%s: %s: cannot read\n", unit, state.file);
+			return 2;
+		}
+		printf("TEST\t%s ", unit);
+		if (s = state.file)
+		{
+			subunit = p = 0;
+			for (;;)
+			{
+				switch (*s++)
+				{
+				case 0:
 					break;
-				if (i >= elementsof(field))
-					bad("too many fields\n", NiL, NiL, 0);
-				field[i++] = p;
-				/*FALLTHROUGH*/
-			default:
+				case '/':
+					subunit = s;
+					continue;
+				case '.':
+					p = s - 1;
+					continue;
+				default:
+					continue;
+				}
+				break;
+			}
+			if (!subunit)
+				subunit = state.file;
+			if (p < subunit)
+				p = s - 1;
+			subunitlen = p - subunit;
+			if (subunitlen == strlen(unit) && !memcmp(subunit, unit, subunitlen))
+				subunit = 0;
+			else
+				printf("%-.*s ", subunitlen, subunit);
+		}
+		else
+			subunit = 0;
+		printf("%s", version);
+		if (catch)
+			printf(", catch");
+		if (verbose)
+			printf(", verbose");
+		for (i = 1; i < elementsof(unsupported); i++)
+			printf(", no%s", unsupported[i]);
+		printf("\n");
+		level = 1;
+		locale = skip = testno = 0;
+		state.signals = state.unspecified = state.warnings = 0;
+		while (p = getline(fp))
+		{
+
+		/* parse: */
+
+			if (*p == 0 || *p == '#')
+				continue;
+			if (*p == ':')
+			{
+				while (*++p == ' ');
+				printf("NOTE	%s\n", p);
 				continue;
 			}
-			break;
-		}
-		if (!(spec = field[0]))
-			bad("NIL spec\n", NiL, NiL, 0);
+			i = 0;
+			field[i++] = p;
+			for (;;)
+			{
+				switch (*p++)
+				{
+				case 0:
+					p--;
+					goto checkfield;
+				case '\t':
+					*(p - 1) = 0;
+				checkfield:
+					s = field[i - 1];
+					if (streq(s, "NIL"))
+						field[i - 1] = 0;
+					else if (streq(s, "NULL"))
+						*s = 0;
+					while (*p == '\t')
+						p++;
+					if (!*p)
+						break;
+					if (i >= elementsof(field))
+						bad("too many fields\n", NiL, NiL, 0);
+					field[i++] = p;
+					/*FALLTHROUGH*/
+				default:
+					continue;
+				}
+				break;
+			}
+			if (!(spec = field[0]))
+				bad("NIL spec\n", NiL, NiL, 0);
 
-	/* interpret: */
+		/* interpret: */
 
-		cflags = 0;
-		eflags = 0;
+			cflags = 0;
+			eflags = 0;
 #if 0
 #if FNM_PATHNAME != NOTEST
-		eflags |= FNM_PATHNAME;
+			eflags |= FNM_PATHNAME;
 #endif
 #if FNM_PERIOD != NOTEST
-		eflags |= FNM_PERIOD;
+			eflags |= FNM_PERIOD;
 #endif
 #endif
-		expand = query = unspecified = kre = sre = 0;
-		for (p = spec; *p; p++) {
-			if (isdigit(*p)) {
-				strtol(p, &p, 10);
-				p--;
-				continue;
-			}
-			switch (*p) {
-
-			case 'A':
-				continue;
-			case 'B':
-				continue;
-			case 'C':
-				if (!query && !(skip & level))
-					bad("locale must be nested\n", NiL, NiL, 0);
-				query = 0;
-				if (locale)
-					bad("locale nesting not supported\n", NiL, NiL, 0);
-				if (i != 2)
-					bad("locale field expected\n", NiL, NiL, 0);
-				if (!(skip & level)) {
+			expand = query = unspecified = kre = sre = 0;
+			for (p = spec; *p; p++)
+			{
+				if (isdigit(*p))
+				{
+					strtol(p, &p, 10);
+					p--;
+					continue;
+				}
+				switch (*p)
+				{
+				case 'A':
+					continue;
+				case 'B':
+					continue;
+				case 'C':
+					if (!query && !(skip & level))
+						bad("locale must be nested\n", NiL, NiL, 0);
+					query = 0;
+					if (locale)
+						bad("locale nesting not supported\n", NiL, NiL, 0);
+					if (i != 2)
+						bad("locale field expected\n", NiL, NiL, 0);
+					if (!(skip & level))
+					{
 #if defined(LC_COLLATE) && defined(LC_CTYPE)
-					s = field[1];
-					if (!s || streq(s, "POSIX"))
-						s = "C";
-					if (!(ans = setlocale(LC_COLLATE, s)) || streq(ans, "C") || streq(ans, "POSIX") || !(ans = setlocale(LC_CTYPE, s)) || streq(ans, "C") || streq(ans, "POSIX"))
-						skip = note(level, skip, s);
-					else {
-						printf("NOTE	\"%s\" locale\n", s);
-						locale = level;
-					}
+						s = field[1];
+						if (!s || streq(s, "POSIX"))
+							s = "C";
+						if (!(ans = setlocale(LC_COLLATE, s)) || streq(ans, "C") || streq(ans, "POSIX") || !(ans = setlocale(LC_CTYPE, s)) || streq(ans, "C") || streq(ans, "POSIX"))
+							skip = note(level, skip, s);
+						else
+						{
+							printf("NOTE	\"%s\" locale\n", s);
+							locale = level;
+						}
 #else
-					skip = note(level, skip, "locales not supported");
+						skip = note(level, skip, "locales not supported");
 #endif
-				}
-				cflags = NOTEST;
-				continue;
-			case 'E':
-				continue;
-			case 'K':
-				kre = 1;
-				continue;
-			case 'L':
-				continue;
-			case 'S':
-				sre = 1;
-				continue;
-
-			case 'a':
-				continue;
-			case 'b':
-				cflags = NOTEST;
-				continue;
-			case 'd':
-				eflags |= FNM_PERIOD;
-				continue;
-			case 'e':
-				cflags = NOTEST;
-				continue;
-			case 'f':
-				continue;
-			case 'g':
-				eflags |= FNM_LEADING_DIR;
-				continue;
-			case 'h':
-				cflags = NOTEST;
-				continue;
-			case 'i':
-				eflags |= FNM_ICASE;
-				continue;
-			case 'j':
-				cflags = NOTEST;
-				continue;
-			case 'k':
-				cflags = NOTEST;
-				continue;
-			case 'l':
-				eflags = NOTEST;
-				continue;
-			case 'm':
-				eflags = NOTEST;
-				continue;
-			case 'n':
-				cflags = NOTEST;
-				continue;
-			case 'o':
-				cflags = NOTEST;
-				continue;
-			case 'p':
-				eflags |= FNM_PATHNAME;
-				continue;
-			case 'r':
-				eflags = NOTEST;
-				continue;
-			case 's':
-				eflags |= FNM_NOESCAPE;
-				continue;
-			case 'u':
-				unspecified = 1;
-				continue;
-			case 'x':
-				cflags = NOTEST;
-				continue;
-			case 'y':
-				eflags = NOTEST;
-				continue;
-			case 'z':
-				cflags = NOTEST;
-				continue;
-
-			case '$':
-				expand = 1;
-				continue;
-			case '/':
-				cflags = NOTEST;
-				continue;
-
-			case '{':
-				level <<= 1;
-				if (skip & (level >> 1)) {
-					skip |= level;
+					}
 					cflags = NOTEST;
+					continue;
+				case 'E':
+					continue;
+				case 'K':
+					kre = 1;
+					continue;
+				case 'L':
+					continue;
+				case 'S':
+					sre = 1;
+					continue;
+
+				case 'a':
+					continue;
+				case 'b':
+					cflags = NOTEST;
+					continue;
+				case 'd':
+					eflags |= FNM_PERIOD;
+					continue;
+				case 'e':
+					cflags = NOTEST;
+					continue;
+				case 'f':
+					continue;
+				case 'g':
+					eflags |= FNM_LEADING_DIR;
+					continue;
+				case 'h':
+					cflags = NOTEST;
+					continue;
+				case 'i':
+					eflags |= FNM_ICASE;
+					continue;
+				case 'j':
+					cflags = NOTEST;
+					continue;
+				case 'k':
+					cflags = NOTEST;
+					continue;
+				case 'l':
+					eflags = NOTEST;
+					continue;
+				case 'm':
+					eflags = NOTEST;
+					continue;
+				case 'n':
+					cflags = NOTEST;
+					continue;
+				case 'o':
+					cflags = NOTEST;
+					continue;
+				case 'p':
+					eflags |= FNM_PATHNAME;
+					continue;
+				case 'r':
+					eflags = NOTEST;
+					continue;
+				case 's':
+					eflags |= FNM_NOESCAPE;
+					continue;
+				case 'u':
+					unspecified = 1;
+					continue;
+				case 'x':
+					cflags = NOTEST;
+					continue;
+				case 'y':
+					eflags = NOTEST;
+					continue;
+				case 'z':
+					cflags = NOTEST;
+					continue;
+
+				case '$':
+					expand = 1;
+					continue;
+				case '/':
+					cflags = NOTEST;
+					continue;
+
+				case '{':
+					level <<= 1;
+					if (skip & (level >> 1))
+					{
+						skip |= level;
+						cflags = NOTEST;
+					}
+					else
+					{
+						skip &= ~level;
+						query = 1;
+					}
+					continue;
+				case '}':
+					if (level == 1)
+						bad("invalid {...} nesting\n", NiL, NiL, 0);
+					else
+					{
+						if ((skip & level) && !(skip & (level>>1)))
+							printf("-%d\n", state.lineno);
+#if defined(LC_COLLATE) && defined(LC_CTYPE)
+						else if (locale & level)
+						{
+							locale = 0;
+							if (!(skip & level))
+							{
+								s = "C";
+								setlocale(LC_COLLATE, s);
+								setlocale(LC_CTYPE, s);
+								printf("NOTE	\"%s\" locale\n", s);
+							}
+						}
+#endif
+						level >>= 1;
+					}
+					cflags = NOTEST;
+					continue;
+
+				default:
+					bad("bad spec\n", spec, NiL, 0);
+					break;
+
 				}
-				else {
-					skip &= ~level;
-					query = 1;
-				}
+				break;
+			}
+			if ((cflags|eflags) == NOTEST || !sre && !kre)
 				continue;
-			case '}':
-				if (level == 1)
-					bad("invalid {...} nesting\n", NiL, NiL, 0);
+			if (i < 4)
+				bad("too few fields\n", NiL, NiL, 0);
+			while (i < elementsof(field))
+				field[i++] = 0;
+			if ((re = field[1]) && expand)
+				escape(re);
+			if ((s = field[2]) && expand)
+				escape(s);
+			if (!(ans = field[3]))
+				bad("NIL answer\n", NiL, NiL, 0);
+			if (*ans == '(')
+			{
+				i = strtol(ans + 1, &p, 10);
+				j = strtol(p + 1, &p, 10);
+				if (*p == ')')
+				{
+					s[j] = 0;
+					s += i;
+				}
+			}
+			msg = field[4];
+			fflush(stdout);
+
+		compile:
+
+			if (skip)
+				continue;
+			if (sre)
+			{
+				state.which = "SRE";
+				sre = 0;
+			}
+#ifdef FNM_AUGMENTED
+			else if (kre)
+			{
+				state.which = "KRE";
+				eflags |= FNM_AUGMENTED;
+				kre = 0;
+			}
+#endif
+			else
+				continue;
+			if (!query && verbose)
+				printf("test %-3d %s \"%s\" \"%s\"\n", state.lineno, state.which, re, s);
+			if (skip)
+				continue;
+			if (!query)
+				testno++;
+			if (catch)
+			{
+				if (setjmp(state.gotcha))
+					eret = state.ret;
 				else
 				{
-					if ((skip & level) && !(skip & (level>>1)))
-						printf("-%d\n", state.lineno);
-#if defined(LC_COLLATE) && defined(LC_CTYPE)
-					else if (locale & level) {
-						locale = 0;
-						if (!(skip & level)) {
-							s = "C";
-							setlocale(LC_COLLATE, s);
-							setlocale(LC_CTYPE, s);
-							printf("NOTE	\"%s\" locale\n", s);
-						}
-					}
-#endif
-					level >>= 1;
+					alarm(LOOPED);
+					eret = fnmatch(re, s, eflags);
+					alarm(0);
 				}
-				cflags = NOTEST;
-				continue;
-
-			default:
-				bad("bad spec\n", spec, NiL, 0);
-				break;
-
 			}
-			break;
-		}
-		if ((cflags|eflags) == NOTEST || !sre && !kre)
-			continue;
-		if (i < 4)
-			bad("too few fields\n", NiL, NiL, 0);
-		while (i < elementsof(field))
-			field[i++] = 0;
-		if ((re = field[1]) && expand)
-			escape(re);
-		if ((s = field[2]) && expand)
-			escape(s);
-		if (!(ans = field[3]))
-			bad("NIL answer\n", NiL, NiL, 0);
-		if (*ans == '(') {
-			i = strtol(ans + 1, &p, 10);
-			j = strtol(p + 1, &p, 10);
-			if (*p == ')') {
-				s[j] = 0;
-				s += i;
-			}
-		}
-		msg = field[4];
-		fflush(stdout);
-
-	compile:
-
-		if (skip)
-			continue;
-		if (sre) {
-			state.which = "SRE";
-			sre = 0;
-		}
-#ifdef FNM_AUGMENTED
-		else if (kre) {
-			state.which = "KRE";
-			eflags |= FNM_AUGMENTED;
-			kre = 0;
-		}
-#endif
-		else
-			continue;
-		if (!query && verbose)
-			printf("test %-3d %s \"%s\" \"%s\"\n", state.lineno, state.which, re, s);
-		if (skip)
-			continue;
-		if (!query)
-			testno++;
-		if (catch) {
-			if (setjmp(state.gotcha))
-				eret = state.ret;
-			else {
-				alarm(LOOPED);
+			else
 				eret = fnmatch(re, s, eflags);
-				alarm(0);
+			if (eret)
+			{
+				if (!streq(ans, "NOMATCH") && *ans != 'E')
+				{
+					if (query)
+						skip = note(level, skip, msg);
+					else
+					{
+						report("failed: ", re, s, msg, unspecified, expand);
+						if (eret == FNM_NOMATCH)
+							printf("OK expected, NOMATCH returned");
+						else
+							printf("OK expected, error %d returned", eret);
+						printf("\n");
+					}
+				}
 			}
-		}
-		else
-			eret = fnmatch(re, s, eflags);
-		if (eret) {
-			if (!streq(ans, "NOMATCH") && *ans != 'E') {
+			else if (streq(ans, "NOMATCH") || *ans == 'E')
+			{
 				if (query)
 					skip = note(level, skip, msg);
-				else {
+				else
+				{
 					report("failed: ", re, s, msg, unspecified, expand);
-					if (eret == FNM_NOMATCH)
-						printf("OK expected, NOMATCH returned");
-					else
-						printf("OK expected, error %d returned", eret);
+					printf("%s expected, OK returned", ans);
 					printf("\n");
 				}
 			}
+			goto compile;
 		}
-		else if (streq(ans, "NOMATCH") || *ans == 'E') {
-			if (query)
-				skip = note(level, skip, msg);
-			else {
-				report("failed: ", re, s, msg, unspecified, expand);
-				printf("%s expected, OK returned", ans);
-				printf("\n");
-			}
-		}
-		goto compile;
+		printf("TEST\t%s", unit);
+		if (subunit)
+			printf(" %-.*s", subunitlen, subunit);
+		printf(", %d test%s", testno, testno == 1 ? "" : "s");
+		if (state.warnings)
+			printf(", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
+		if (state.unspecified)
+			printf(", %d unspecified difference%s", state.unspecified, state.unspecified == 1 ? "" : "s");
+		if (state.signals)
+			printf(", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
+		printf(", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
+		if (fp != stdin)
+			fclose(fp);
 	}
-	printf("TEST\t%s, %d test%s", unit, testno, testno == 1 ? "" : "s");
-	if (state.ignore.count)
-		printf(", %d ignored mismatche%s", state.ignore.count, state.ignore.count == 1 ? "" : "s");
-	if (state.warnings)
-		printf(", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
-	if (state.unspecified)
-		printf(", %d unspecified difference%s", state.unspecified, state.unspecified == 1 ? "" : "s");
-	if (state.signals)
-		printf(", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
-	printf(", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
 	return 0;
 }

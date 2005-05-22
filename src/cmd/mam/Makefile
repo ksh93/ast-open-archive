@@ -22,4 +22,4 @@ mamstate :: mamstate.c
 
 mamtst :: mamtst.c -lmam
 
-:: mamold.sh shmam.awk
+:: RELEASE mamold.sh shmam.awk

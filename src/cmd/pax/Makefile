@@ -9,8 +9,8 @@ pax :: RELEASE HISTORY PROMO.mm pax.1 pax.1.posix \
 	bio.c convert.c copy.c pax.c options.c \
 	delta.c file.c format.c misc.c paxlib.c \
 	pax-ar.c pax-bzip.c pax-compress.c \
-	pax-cpio.c pax-delta.c pax-delta_88.c pax-gzip.c \
-	pax-ignore.c pax-mime.c pax-patch.c pax-pds.c \
+	pax-cpio.c pax-delta.c pax-delta_88.c pax-flash.c \
+	pax-gzip.c pax-ignore.c pax-mime.c pax-patch.c pax-pds.c \
 	pax-rpm.c pax-slt.c pax-tar.c pax-tnef.c pax-vdb.c \
 	pax-saveset.c $(PAX.DEBUG.FORMAT) \
 	-lardir -lodelta -lvdelta -lcodex -lsum -ldll

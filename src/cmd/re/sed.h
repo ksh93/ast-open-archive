@@ -40,7 +40,7 @@ typedef struct {
 extern void	compile(Text*, Text*);
 extern void	execute(Text*, Text*);
 extern int	recomp(Text*, Text*, int);
-extern int	reexec(regex_t*, char*, size_t, regmatch_t*, int);
+extern int	reexec(regex_t*, char*, size_t, size_t, regmatch_t*, int);
 extern int	match(unsigned char*, Text*, int);
 extern int	substitute(regex_t*, Text*);
 extern regex_t*	readdr(int);

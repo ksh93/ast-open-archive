@@ -23,12 +23,19 @@
 #define NIL(t)	((t)0)
 #endif
 
-#ifndef va_start
 #if __STD_C
 #include	<stdarg.h>
 #else
 #include	<varargs.h>
 #endif
+#if _hdr_stdlib
+#include	<stdlib.h>
+#endif
+#if _hdr_unistd
+#include	<unistd.h>
+#endif
+#if _hdr_string
+#include	<string.h>
 #endif
 
 _BEGIN_EXTERNS_
@@ -38,7 +45,7 @@ extern int	sprintf _ARG_((char*, const char*, ...));
 extern int	vsprintf _ARG_((char*, const char*, va_list));
 #endif
 
-#if !__STDC__ && !_hdr_stdlib
+#if !__STD_C && !_hdr_stdlib
 extern int	atexit _ARG_((void (*)(void)));
 extern void	exit _ARG_((int));
 extern size_t	strlen _ARG_((const char*));
@@ -103,9 +110,9 @@ static char		Tstfile[16][256];
 
 #ifndef MAIN
 #if __STD_C
-#define MAIN()		main(int argc, char** argv)
+#define MAIN()		int main(int argc, char** argv)
 #else
-#define MAIN()		main(argc, argv) int argc; char** argv;
+#define MAIN()		int main(argc, argv) int argc; char** argv;
 #endif
 #endif /*MAIN*/
 

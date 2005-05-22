@@ -1210,8 +1210,8 @@ E$h	(abc)\\100z	abc\x40z	(0,5)(0,3)
 E$	abc\\71	abc\071	ESUBREG
 E$h	abc\\71	abc\071	(0,4)
 E$	abc\\81	abc\081	ESUBREG
-E$h	abc\\81	abc\081	ESUBREG
-E$h	SAME	abc\0\x38\x31	ESUBREG
+E$h	abc\\81	abc\081	NOMATCH
+E$h	SAME	abc\0\x38\x31	NOMATCH
 E$	abc\\091	abc\091	BADESC
 E$x	abc\\091	abc\091	(0,6)
 E$x	SAME	abc\0\x39\x31	(0,6)

@@ -224,15 +224,15 @@ TEST 09 '.VIRTUAL state'
 	EXEC
 		INPUT Makefile $'.MAIN : .FOO
 .FOO : .VIRTUAL a b
-	echo AHA $(>)
+	echo HIT $(>)
 a  b :
 	echo $(<) > $(<)'
-		OUTPUT - $'AHA a b'
+		OUTPUT - $'HIT a b'
 		ERROR - $'+ echo a
 + 1> a
 + echo b
 + 1> b
-+ echo AHA a b'
++ echo HIT a b'
 
 	EXEC
 		OUTPUT -
@@ -489,3 +489,94 @@ a.%.done : RECS.%.A.N RECS.%.A.C
 		INPUT RECS.2.A.N
 		OUTPUT - $'+ touch a.1.done
 + touch a.2.done'
+
+TEST 19 'assignment intercepts'
+
+	EXEC	-n
+		INPUT Makefile $'O1 = o1
+.ASSIGN.% : ":TEST_ASSIGN:"
+":TEST_ASSIGN:" : .MAKE .OPERATOR
+	print <$(<:V)> <$(%:V)> <$(>:V)>
+I1 = i1 $(O1)
+I2 := i2 $(O1)
+I3 = i3 $(O1)
+I3 += aa $(O1)
+I4 &= i4 $(O1)
+.ASSIGN.% : .DELETE ":TEST_ASSIGN:"
+N1 = n1 $(O1)
+N2 := n2 $(O1)
+N3 = n3 $(O1)
+N3 += bb $(O1)
+N4 &= n4 $(O1)
+all :'
+	OUTPUT - $'<I1> <=> <i1 $(O1)>
+<I2> <=> <i2 o1>
+<I3> <=> <i3 $(O1)>
+<I3> <+=> <aa o1>
+<I4> <&=> <i4 o1>'
+
+TEST 20 'assignment intercepts'
+
+	EXEC	-n
+		INPUT Makefile $'O1 = o1
+.ASSIGN.% : ":TEST_ASSIGN:"
+":TEST_ASSIGN:" : .MAKE .OPERATOR
+	eval
+		TEST.$(<) $(%) $(>:V)
+	end
+I1 = i1 $(O1)
+I2 := i2 $(O1)
+I3 = i3 $(O1)
+I3 += aa $(O1)
+I4 &= i4 $(O1)
+.ASSIGN.% : .DELETE ":TEST_ASSIGN:"
+N1 = n1 $(O1)
+N2 := n2 $(O1)
+N3 = n3 $(O1)
+N3 += bb $(O1)
+N4 &= n4 $(O1)
+all : .MAKE
+	local V I P
+	for V I N
+		for I 1 2 3 4
+			for P "" TEST.
+				print :$(P)$(V)$(I):$($(P)$(V)$(I)):
+			end
+		end
+	end'
+	OUTPUT - $':I1::
+:TEST.I1:i1 o1:
+:I2::
+:TEST.I2:i2 o1:
+:I3::
+:TEST.I3:i3 o1 aa o1:
+:I4::
+:TEST.I4:i4 o1:
+:N1:n1 o1:
+:TEST.N1::
+:N2:n2 o1:
+:TEST.N2::
+:N3:n3 o1 bb o1:
+:TEST.N3::
+:N4:n4 o1:
+:TEST.N4::'
+
+TEST 21 'assertion intercepts'
+
+	EXEC	-n
+		INPUT Makefile $'.ASSERT..TEST% : ":TEST_ASSERT:"
+":TEST_ASSERT:" : .MAKE .OPERATOR
+	print <$(<)> <$(>:V)> <$(@:V)>
+.NOTEST : n0
+.TEST : i1
+.TEST.I2 : i2
+.TEST.I3 :INSTALL: i3
+	a3
+.ASSERT..SOURCE% : .DELETE ":TEST_ASSERT:"
+.NOTEST : i1
+.NOTEST.I2 : i2
+.NOTEST.I3 :INSTALL: i3
+all :'
+	OUTPUT - $'<.TEST> <i1> <>
+<.TEST.I2> <i2> <>
+<.TEST.I3> <.SPECIAL .SCAN.IGNORE .DO.INSTALL.DIR..  i3> <a3>'

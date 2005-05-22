@@ -678,7 +678,7 @@ execute(register Joblist_t* job)
 		if (!state.coshell)
 		{
 			if (internal.openfile)
-				fcntl(internal.openfd, F_SETFD, 0);
+				fcntl(internal.openfd, F_SETFD, FD_CLOEXEC);
 			sp = sfstropen();
 			sfprintf(sp, "label=%s", idname);
 			flags = CO_ANY;
@@ -835,7 +835,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 	Rule_t*			jammed;
 	Rule_t*			waiting;
 
-	if (clear && jobs.triggered && (a = staterule(RULE, jobs.triggered, NiL, 0)) && (a->property & P_force))
+	if (clear && jobs.triggered && (((a = jobs.triggered)->property & P_state) || (a = staterule(RULE, a, NiL, 0))) && (a->property & P_force))
 	{
 		a->time = 0;
 		state.savestate = 1;

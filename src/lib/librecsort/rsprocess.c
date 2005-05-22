@@ -168,11 +168,12 @@ ssize_t	s_data;		/* data size		*/
 					break;
 				datalen = d;
 			}
-			else if (d < 0) /* 4 byte ibm BE length descriptor */
-			{	if(s_loop < 4)
+#if _PACKAGE_ast
+			else if (d & 0xffffff00) /* Recfmt_t record descriptor */
+			{	if ((datalen = reclen(d, data, s_loop)) <= 0 || datalen > s_loop)
 					break;
-				datalen = ((data[0]<<16)|(data[1]));
 			}
+#endif
 			else /* records separated by some separator	*/
 			{	if(!(endd = (uchar*)memchr(data,(int)d,s_loop)) )
 					break;

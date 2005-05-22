@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2003-11-17 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2005-04-22 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -46,6 +46,8 @@ USAGE_LICENSE
 "	arguments accept either space or comma separators.]"
 
 "[a:interactive?List all processes associated with terminals.]"
+"[B!:branch?Print tree branch prefixes for \bcommand\b and \bargs\b."
+"	Implied by \b--children\b, \b--parents\b, and \b--tree\b.]"
 "[c:class?Equivalent to \b--fields=" FIELDS_c "\b.]"
 "[C:children?Display the process tree hierarchy, including the children"
 "	of all selected processes, in the \bCOMMAND\b field list.]"
@@ -54,6 +56,7 @@ USAGE_LICENSE
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
 "	override internal \b--format\b identifiers.]:[key[=value]]]"
 "[e|A:all?List all processes.]"
+"[E:escape?Escape non-printing characters in \bcommand\b and \bargs\b.]"
 "[f:full?Equivalent to \b--fields=" FIELDS_f "\b.]"
 "[F:format?Append to the listing format string (if \b--format\b is specified"
 "	then \b--fields\b and all options that modify \b--fields\b are"
@@ -207,6 +210,7 @@ typedef struct Ps_s			/* process state		*/
 typedef struct State_s			/* program state		*/
 {
 	int		children;	/* recursively list all children*/
+	int		escape;		/* escape { command args }	*/
 	int		heading;	/* output heading		*/
 	int		parents;	/* recursively list all parents	*/
 	int		tree;		/* list proc tree		*/
@@ -657,6 +661,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				sfputr(state.wrk, s, -1);
 				s = sfstruse(state.wrk);
 			}
+			if (state.escape)
+				s = fmtesc(s);
 			break;
 		case KEY_cpu:
 			if (pp->ps->state == PSS_ZOMBIE)
@@ -855,6 +861,8 @@ ps(Ps_t* pp)
 					sfputr(sfstdout, state.branch[i] ? " |  " : "    ", -1);
 				sfputr(sfstdout, " \\_ ", -1);
 			}
+			if (state.escape)
+				s = fmtesc(s);
 			goto string;
 		case KEY_cpu:
 			if (pr->state == PSS_ZOMBIE)
@@ -1483,9 +1491,19 @@ main(int argc, register char** argv)
 	if (!(state.pss = pssopen(&state.pssdisc)) || !state.pss->meth->fields)
 	{
 		s = "/bin/ps";
-		error(1, "falling back to %s", s);
-		execv(s, argv);
-		exit(EXIT_NOTFOUND);
+		if (!streq(argv[0], s) && !eaccess(s, X_OK))
+		{
+			argv[0] = s;
+			error(1, "falling back to %s", s);
+			execv(s, argv);
+			exit(EXIT_NOTFOUND);
+		}
+		if (!state.pss)
+		{
+			state.pssdisc.flags |= PSS_VERBOSE;
+			pssopen(&state.pssdisc);
+		}
+		error(3, "process status access error");
 	}
 
 	/*
@@ -1501,6 +1519,7 @@ main(int argc, register char** argv)
 	 * grab the options
 	 */
 
+	n = 0;
 	for (;;)
 	{
 		switch (optget(argv, usage))
@@ -1543,7 +1562,7 @@ main(int argc, register char** argv)
 			continue;
 		case 'r':
 		case 'R':
-			state.children = 1;
+			state.children = opt_info.num;
 			continue;
 		case 's':
 			addid(opt_info.arg, KEY_sid, NiL);
@@ -1560,8 +1579,11 @@ main(int argc, register char** argv)
 		case 'x':
 			state.pssdisc.flags |= PSS_DETACHED;
 			continue;
+		case 'B':
+			n = !opt_info.num;
+			continue;
 		case 'C':
-			state.tree = state.children = 1;
+			state.tree = state.children = opt_info.num;
 			continue;
 		case 'D':
 			if (s = strchr(opt_info.arg, '='))
@@ -1583,6 +1605,9 @@ main(int argc, register char** argv)
 			if (kp->macro = s)
 				stresc(s);
 			continue;
+		case 'E':
+			state.escape = opt_info.num;
+			continue;
 		case 'F':
 			if (sfstrtell(fmt))
 				sfputc(fmt, ' ');
@@ -1598,10 +1623,10 @@ main(int argc, register char** argv)
 			addkey(fields_default, 1);
 			continue;
 		case 'P':
-			state.tree = state.parents = 1;
+			state.tree = state.parents = opt_info.num;
 			continue;
 		case 'T':
-			state.tree = state.parents = state.children = 1;
+			state.tree = state.parents = state.children = opt_info.num;
 			continue;
 		case 'X':
 			state.hex = !state.hex;
@@ -1619,6 +1644,8 @@ main(int argc, register char** argv)
 	argc -= opt_info.index;
 	if (error_info.errors)
 		error(ERROR_USAGE|4, "%s", optusage(NiL));
+	if (n)
+		state.tree = 0;
 	if (sfstrtell(fmt))
 	{
 		sfputc(fmt, '\n');

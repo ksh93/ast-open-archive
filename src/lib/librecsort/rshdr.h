@@ -23,6 +23,7 @@
 
 #if _PACKAGE_ast
 #include	<ast.h>
+#include	<recfmt.h>
 #endif
 
 #include	<vmalloc.h>

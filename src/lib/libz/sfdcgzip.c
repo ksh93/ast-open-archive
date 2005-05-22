@@ -36,6 +36,9 @@
 
 /*
  * sfio gzip discipline
+ *
+ * handles { gzip compress vczip } on input
+ * handles { gzip compress } on output
  */
 
 #include <sfio_t.h>
@@ -69,7 +72,7 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 	int			r;
 
 	NoP(sp);
-#if 1
+#if 0
 	{
 		static char	aha[] = "AHA sfdcgzip event 0\n";
 		static int	init;
@@ -148,11 +151,11 @@ sfgzwrite(Sfio_t* fp, const Void_t* buf, size_t size, Sfdisc_t* dp)
  * create and push the sfio gzip discipline
  *
  * (flags&SFGZ_VERIFY) return
- *	>0	is a gzip/compress file
- *	 0	not a gzip/compress file
+ *	>0	is a { g:gzip c:compress v:vczip } file
+ *	 0	not a { gzip compress vczip } file
  *	<0	error
  * otherwise return
- *	>0	discipline pushed (gzip or lzw)
+ *	>0	discipline pushed { g:gzip c:compress v:vczip }
  *	 0	discipline not needed
  *	<0	error
  */
@@ -170,36 +173,54 @@ sfdcgzip(Sfio_t* sp, int flags)
 	{
 		register unsigned char*	s;
 		register int		n;
+		register int		r;
 
 		/*
-		 * peek the first 2 bytes to verify the magic
+		 * peek the first 4 bytes to verify the magic
 		 *
-		 *	0x1f8b	sfdcgzip	gzip	
-		 *	0x1f9d	sfdclzw		compress
+		 *	0x1f8b....	sfdcgzip	gzip	
+		 *	0x1f9d....	sfdclzw		compress
+		 *	0xd6c3c4d8	sfpopen		vzunzip
 		 */
 		
 		if (!(n = sfset(sp, 0, 0) & SF_SHARE))
 			sfset(sp, SF_SHARE, 1);
-		s = (unsigned char*)sfreserve(sp, 2, 1);
+		s = (unsigned char*)sfreserve(sp, 4, 1);
 		if (!n)
 			sfset(sp, SF_SHARE, 0);
 		if (!s)
 			return -1;
-		if (s[0] != 0x1f)
-			n = -1;
-		else if (s[1] == 0x8b)
-			n = 0;
-		else if (s[1] == 0x9d)
-			n = 1;
-		else
-			n = -1;
+		n = 0;
+		if (s[0] == 0x1f)
+		{
+			if (s[1] == 0x8b)
+				n = 'g';
+			else if (s[1] == 0x9d)
+				n = 'c';
+		}
+		else if (s[0] == 0xd6 && s[1] == 0xc3 && s[2] == 0xc4 && s[3] == 0xd8)
+			n = 'v';
 		sfread(sp, s, 0);
-		if (n < 0)
+		if (!n)
 			return 0;
 		if (flags & SFGZ_VERIFY)
-			return n >= 0;
-		if (n > 0)
-			return sfdclzw(sp, flags);
+			return n != 0;
+		switch (n)
+		{
+		case 'c':
+			return (r = sfdclzw(sp, flags)) > 0 ? 'c' : r;
+		case 'v':
+			r = 0;
+			n = dup(0);
+			close(0);
+			if (dup(sffileno(sp)) || !sfpopen(sp, "vcunzip", "r"))
+				r = -1;
+			close(0);
+			if (n > 0 && dup(n))
+				r = -1;
+			close(n);
+			return r > 0 ? 'v' : r;
+		}
 	}
 	else if (flags & SFGZ_VERIFY)
 		return -1;
@@ -243,7 +264,7 @@ sfdcgzip(Sfio_t* sp, int flags)
 #endif
 	if (!rd)
 		sfset(sp, SF_IOCHECK, 1);
-	return 1;
+	return 'g';
 }
 
 #if __OBSOLETE__ < 19990717

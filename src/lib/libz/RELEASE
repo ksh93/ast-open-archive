@@ -1,3 +1,4 @@
+05-05-11 sfdcgzip.c: change return value to [cgv], add vcunzip read check
 04-02-14 sfdcgzip.c,sfdclzw.c: add SFDCNEXT()/SFDCPREV() calls
 03-05-13 sfdcgzip.c,sfdclzw.c: add SF_DBUFFER exception, SF_SHARE+sfreserve()
 03-03-13 gzio.c: eliminate fixed gzprintf() buffer size via sfio string stream

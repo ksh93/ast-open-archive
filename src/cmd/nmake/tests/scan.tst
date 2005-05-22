@@ -306,8 +306,8 @@ c.x
 #endimport
 z.x'
 		OUTPUT - $'info mam static 00000
-setv INSTALLROOT ${INSTALLROOT}
-setv PACKAGEROOT ${PACKAGEROOT}
+setv INSTALLROOT ../../../..
+setv PACKAGEROOT ../../../../../..
 setv AR ar
 setv ARFLAGS cr
 setv AS as

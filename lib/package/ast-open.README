@@ -89,7 +89,29 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-05-03-03  --- Release ksh93q+  ---
+05-05-23  --- Release ksh93q+  ---
+05-05-23  An extension to shell patterns that allows matching of nested
+	  groups while skipping over quoted strings has been added.
+05-05-18  A bug in which the line number for errors was not correct for
+          functions loaded from FPATH has been fixed.
+05-04-18  A bug in which the exit status $? is not set when a trap triggered
+	  by the [[...]] command is executed has been fixed.
+05-04-08  Redirection operators can be directly preceded with {varname}
+	  with no intervening space, where varname is a variable name which
+	  allows the shell to select a file descriptor > 10 and store it
+	  into varname.
+05-04-08  SHOPT_CMDLIB_BLTIN=1 now includes <cmdlist.h> generated table.
+05-04-07  [[ -o ?option ]] is true if "option" is a supported option.
+05-04-05  A bug in handling file completion with spaces in the names
+          has been fixed.
+05-03-25  The SIGWINCH signal is caught by default to keeps the LINES and
+	  COLUMNS variables in sync with the actual window size.
+05-03-25  Building ksh with SHOPT_REMOTE=1 causes ksh to set --rc if stdin is
+	  a socket (presumably part of a remote shell invocation.)
+05-03-25  Building ksh with SHOPT_SYSRC=1 causes interactive ksh to source
+	  /etc/ksh.kshrc (if it exists) before sourcing the $ENV file.
+05-03-25  {first..last[..incr][%fmt]} sequences added to brace expansions
+	  when braceexpand is enabled.
 05-03-03  A bug where a SIGCHLD interrupt could cause a fifo open to fail has
 	  been fixed.
 05-02-25  A bug in which a builtin command run in the background could
@@ -1304,6 +1326,8 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+05-05-22 pax: fix --append for the formats that can handle it
+05-05-18 pax-flash.c: add solaris flash embedded archive format read
 05-03-19 options.c: -l == --link (not --local) per posix
 05-02-08 misc.c: fix interaction between delta and --meter
 05-02-07 delta.c,pax.h: don't output delta when src==tar -- duh
@@ -1679,6 +1703,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+05-05-11 since.sh: add
 04-10-24 sear.sh: note in docs that ratz options apply to sear .exe's
 04-10-22 proto.tst: add array arg prototype tests
 04-10-01 proto.c: add CPL docs
@@ -1713,6 +1738,8 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+05-04-30 sfio: tgetr: add sfmaxr() tests
+05-04-20 cdt: snarf cdt tests from kpv
 05-01-04 date.c: add ``FMT time format answer''
 04-10-31 date.dat: add { hours days weeks months } ago tests
 04-10-27 opt.tst: TESTs 9? for astsa (stanadalone ast)
@@ -2001,6 +2028,7 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+05-04-11 cpp.tst: add '"a" #s' catliteral + stringize
 04-10-01 cpp.tst: adjust for hidden line patch
 04-08-11 cpp.tst: adjust for ppproto.c patch
 03-12-12 cpp.tst: add empty macro actual tests
@@ -2075,7 +2103,33 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+05-05-18 Makerules.mk: fix --static-link typo
+	 Makerules.mk: disable .MAMACTION "setv FOO ${FOO}"
+	 Makerules.mk: add (CC.SHARED.LIBS.*) to capture -l* bind changes
+05-05-11 Makerules.mk: fix --nolib-type to work for referenced libs too
+05-05-05 Scanrules.mk: handle cobol COPY "book" optional quotes
+05-05-01 Makerules.mk: drop -D* from COBOLFLAGS
+	 Makerules.mk: :PACKAGE: :dynamic => :notype
+05-04-26 Makerules.mk: add COBOLDIALECT
+05-04-20 Makerules.mk: add :P=A: to .LIST.PACKAGE.BINARY VROOT logic
+	 Makerules.mk: fix PACKAGE_%_LIB logic to handle /usr/%/lib64 etc.
+	 version.c: fix OLDMAKE to search $(PATH) for { gmake make }
+05-04-15 option.c: fix regress state.start for hi res clock lo res filesystem
+	 state.c: failed statevar action must set statevar time to 0
+	 Makerules.mk: change manifest edit op :P=F: => :P=F:T=FR:
+05-04-14 Makerules.mk: drop /usr/common from LCLDIRS, /home from OPTDIRS
+05-04-11 command.c: set internal.openfd FD_CLOEX before coopen()
+05-04-08 parse.c: revisit space indentation [syntax:10]
+         object.c: pre-2005-03-01 corruption repair drops 0 prereq list items
+05-04-03 variable.c: fix += vs space inconsistencies [assign:09]
+	 Makerules.mk: restore $(PACKAGE_LOCAL) -- used in user makefiles
+05-03-31 Makerules.mk: add --lib-type
+	 object.c: move bound object prereq name to COMP_NSEC
+	 parse.c: fix assertion/assignment intercept $(%) to be operator name
 05-03-19 Makerules.mk: %.sh chmod only if not already writeable&executable
+	 Makerules.mk: mam ${-debug-symbols...} defaults to ${CCFLAGS.FORCE}
+	 make.c: fix optional joint metarule prereq state check
+	 metarule.c: fix closure ordering bug (metarule:23)
 	 object.c: don't mark (P_joint|P_target) garbage
 	 object.c: fix makefile prereq subsecond truncation time check
 	 object.c: fix makefile .SOURCE.mk prereq change bug (diagnostics:14)
@@ -3443,6 +3497,7 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+05-03-28 main.c: add -r address; add L variable attribute
 05-02-17 head.c: CONTENT_type PART_text trumps CONTENT_encoding binary
 05-02-08 local.h: blankline=>allblanks (lynxos libc symbol hijack)
 04-08-17 head.c: handle Content-Type: message
@@ -3640,6 +3695,9 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+05-05-20 test(fmt|fnmatch|match|regex): handle file args for rt(1)
+05-04-03 sed: change regexec() => regnexec() to handle embedded '\0'
+05-03-30 testmatch.dat,testregex.dat: add '[*' REG_SHELL pattern tests
 04-06-08 ed.c: fix move() bug that botched pointers across append()
 04-05-24 testregex.dat: add more backreference tests
 04-05-11 testregex.c: matchprint() now lists (?,?) up to nsub
@@ -3775,6 +3833,8 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+05-05-17 main.c: delay -l* => rslib() until all options parsed
+05-05-11 main.c: fix -R* parse, preserve output zip/record attributes
 04-12-01 main.c: fix -zI bug that only worked for 1 input file (sort#26)
 04-09-28 main.c: fix ERROR_USAGE logic
 04-08-11 main.c: add #intermediates to -Xdump, limit intermediates to 64
@@ -3823,6 +3883,9 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+05-04-22 ps.c: add --branch --escape
+05-04-06 df.c: fix -k F_FRSIZE() to always return > 0
+05-03-29 ps.c: check /bin/ps punt recursion when ast_ps is /bin/ps
 05-03-11 features/procfs: cygwin tweaks
 05-03-10 ls.c: fix -s arithmetic and column output
 05-02-14 sum.tst: add SHA { 256 384 512 } tests
@@ -4181,6 +4244,24 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+05-05-23 regex: REX_NEST (?[D.][E.][L.][Q.][oc]...)
+05-05-21 regex: state.fold[] is now locale specific -- doh
+05-05-19 regex: add REX_NEST (?%\\()<>[]""...) %(...) nested match
+05-05-15 recfmt.h: add recstr() reclen() fmtrec()
+05-05-13 optget.c: allow boolean options to take numeric values
+05-05-12 recfmt.c: add to recfmt.h, adjust Recfmt_t encodings
+05-04-30 sfio: add sfmaxr(), default 64K
+05-04-22 comp/omitted.c: fix magic() logic for files < 512 bytes
+05-04-20 cdt: snarf update from kpv; void* Dt_t.user added
+	 misc/error.c: library => ERROR_LIBRARY
+05-04-19 regex/regcomp.c: handle REG_SHELL [^...] == [!...]
+05-04-11 tm/tmxscan.c: handle yyy.mm.dd[-+.]hh.mm.ss.nnnnnn
+05-04-07 regex/regnexec.c: fix out of bounds boundary check -- ouch
+	 features/align.c: add jmp_buf to the alignment mix (ia64)
+	 vmalloc/vmhdr.h: add jmp_buf to the alignment mix (ia64)
+05-03-31 misc/optget.c: fix option { - _ } separator matching
+05-03-30 misc/glob.c: eliminate superfluous GLOB_NOMATCH stat() calls
+05-03-24 port/astwinsize.c: include <sys/ioctl.h> if possible
 05-03-23 string/ccmap.c: add ebcdic-m mvs cobol table
 05-03-11 comp/omitted.c: handle utime[s](const,const)
 	 comp/conf.tab: fix linux PID_MAX probe
@@ -5444,6 +5525,11 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+05-05-17 cat.c,head.c: disable EPIPE error messages
+05-04-14 chgrp.c: -f means all non-syntax error messages
+05-04-11 fds.c: add from old internal open(1)
+05-04-09 cmdext.h,cmdlist.h: generate from source -- about time
+05-03-24 features/symlink: verify { lchmod lchown } implementations
 05-03-07 date.c: add --listzones to list the time zone table
 05-02-14 chmod.c: add --reference=file
 05-01-11 cat.c: restore output stream to binary mode on exit
@@ -5647,6 +5733,7 @@ All recorded changes follow.
 
 :::::::: libexpr ::::::::
 
+05-04-20 exeval.c: fix sscanf() runtime argument check logic
 05-01-11 Makefile: fix exop.h generation to handle spurious #define's
 04-12-14 exeval.c: handle printf "%% %x"
 04-04-15 exeval.c: handle scanf %s -- forgot that regression test!
@@ -5694,6 +5781,7 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+05-05-15 handle disc->data Recfmt_t
 04-10-31 rsmerge.c: fix EOF detection
 04-10-15 rs-copy.c: add
 04-10-11 recsort.h: change int count to Sfulong_t count
@@ -5781,6 +5869,7 @@ All recorded changes follow.
 
 :::::::: libz ::::::::
 
+05-05-11 sfdcgzip.c: change return value to [cgv], add vcunzip read check
 04-02-14 sfdcgzip.c,sfdclzw.c: add SFDCNEXT()/SFDCPREV() calls
 03-05-13 sfdcgzip.c,sfdclzw.c: add SF_DBUFFER exception, SF_SHARE+sfreserve()
 03-03-13 gzio.c: eliminate fixed gzprintf() buffer size via sfio string stream
@@ -5811,6 +5900,9 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+05-04-19 cowait.c: beef up invalid message tests and diagnostics
+05-04-11 drop fixed CO_MSGFD for $_coshell_msgfd
+05-04-07 coexec.c: fix !_lib_fork&&_map_spawnve close-on-exec redirection
 04-09-22 cowait.c: remove CO_SERIALIZE temporaries after listing -- duh
 04-09-01 co*: add CO_SERIALIZE
 04-07-22 system.c: access() => eaccess()
@@ -5915,6 +6007,8 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+05-04-11 pplex.c: fix '"a" #s' catliteral + stringize bug
+05-03-29 pp.probe: check $? and stderr messages for pp:lineid
 05-02-20 probe.win32: handle /platformsdk mount
 05-01-11 ppargs.c: fix -I-S docs
 	 ppinput.c: ppproto() only for COMPATIBILITY or PLUSPLUS

@@ -716,11 +716,11 @@ TEST 13 'self-documentation'
             [--archive-clean=edit-ops] [--archive-output=file] [--cctype=type]
             [--clean-ignore=pattern] [--clobber[=pattern]] [--compare]
             [--debug-symbols] [--force-shared] [--instrument=command]
-            [--ld-script=suffix] [--link=pattern] [--native-pp=level]
-            [--official-output=file] [--prefix-include] [--preserve[=pattern]]
-            [--profile] [--recurse=action] [--recurse-enter=text]
-            [--recurse-leave=text] [--select=edit-ops] [--separate-include]
-            [--static-link] [--strip-symbols] [--threads]
+            [--ld-script=suffix] [--lib-type] [--link=pattern]
+            [--native-pp=level] [--official-output=file] [--prefix-include]
+            [--preserve[=pattern]] [--profile] [--recurse=action]
+            [--recurse-enter=text] [--recurse-leave=text] [--select=edit-ops]
+            [--separate-include] [--static-link] [--strip-symbols] [--threads]
             [--variants[=pattern]] [--view-verify=level] [--virtual]
             [ script ... ] [ target ... ]'
 
@@ -777,7 +777,7 @@ include "bar.mk"'
 	EXEC	--noexec
 		INPUT bar/bar.mk $'all : BAR'
 		OUTPUT - $'+ : all : foo BAR :'
-		ERROR - $'make: warning: Makefile.mo: out of date with bar/bar.mk
+		ERROR - $'make: warning: bar.mk: binding changed to bar.mk from bar/bar.mk
 make: warning: Makefile.mo: recompiling'
 
 	EXEC	--exec
@@ -826,19 +826,17 @@ make: warning: Makefile.mo: recompiling'
 
 	EXEC	--noexec
 		OUTPUT - $'+ : all : FOO BAR :'
-		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk was specified last time
+		ERROR - $'make: warning: Makefile.mo: global file global.mk was specified last time
 make: warning: Makefile.mo: recompiling'
 
 	EXEC	--noexec --include=gbl --global=global.mk
 		INPUT global.mk $'all : global'
 		OUTPUT - $'+ : all : global FOO BAR :'
-		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk option order changed
+		ERROR - $'make: warning: global.mk: binding changed to global.mk from gbl/global.mk
 make: warning: Makefile.mo: recompiling'
 
 	EXEC	--noexec
 		OUTPUT - $'+ : all : FOO BAR :'
-		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk was specified last time
-make: warning: Makefile.mo: recompiling'
 
 	EXEC	--exec --include=gbl --file=global.mk --compile
 		OUTPUT -
@@ -846,7 +844,7 @@ make: warning: Makefile.mo: recompiling'
 
 	EXEC	--noexec --global=global.mo
 		OUTPUT - $'+ : all : global FOO BAR :'
-		ERROR - $'make: warning: Makefile.mo: global file gbl/global.mk option order changed
+		ERROR - $'make: warning: global.mk: binding changed to global.mk from gbl/global.mk
 make: warning: Makefile.mo: recompiling'
 
 	EXEC	--exec --global=global.mo

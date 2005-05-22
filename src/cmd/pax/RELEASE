@@ -1,3 +1,5 @@
+05-05-22 pax: fix --append for the formats that can handle it
+05-05-18 pax-flash.c: add solaris flash embedded archive format read
 05-03-19 options.c: -l == --link (not --local) per posix
 05-02-08 misc.c: fix interaction between delta and --meter
 05-02-07 delta.c,pax.h: don't output delta when src==tar -- duh

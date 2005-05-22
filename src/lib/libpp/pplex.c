@@ -1030,7 +1030,7 @@ ppcpp(void)
 						*(op - 1) = '\\';
 						*op++ = '\n';
 					}
-					STRCOPY(op, pp.token + 2, s);
+					STRCOPY(op, pp.token + 2 + (*pp.token == ' '), s);
 					continue;
 				case T_STRING:
 					if (ppstate & ADD)
@@ -1043,7 +1043,7 @@ ppcpp(void)
 						*(op - 1) = '\\';
 						*op++ = '\n';
 					}
-					STRCOPY(op, pp.token + 1, s);
+					STRCOPY(op, pp.token + 1 + (*pp.token == ' '), s);
 					continue;
 				case 0:
 					m = error_info.line ? (error_info.line - 1) : 0;
@@ -2010,7 +2010,7 @@ ppcpp(void)
 						PUSH_QUOTE(pp.macp->arg[c - ARGOFFSET], pp.macp->line);
 						CACHEIN();
 						bp = ip - 1;
-						if (st & (COLLECTING|EOF2NL)) rp = fsm[START];
+						if (st & (COLLECTING|EOF2NL|JOINING)) rp = fsm[START];
 						if (state = rp[c = '"']) goto fsm_next;
 						goto fsm_get;
 					case 'S':

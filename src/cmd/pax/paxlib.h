@@ -63,6 +63,10 @@
 #define PAX_HARDLINK	'1'		/* hard link to previous entry	*/
 #define PAX_SOFTLINK	'2'		/* soft link to previous entry	*/
 
+#define PAX_EVENT_BUG_19951031	0x00000001 /* old write bug workaround	*/
+#define PAX_EVENT_DELTA_EXTEND	0x00000002 /* add delta entension info	*/
+#define PAX_EVENT_SKIP_JUNK	0x00000004 /* junk header test		*/
+
 struct Pax_s; typedef struct Pax_s Pax_t;
 #ifndef Paxarchive_t
 struct Paxarchive_s; typedef struct Paxarchive_s Paxarchive_t;

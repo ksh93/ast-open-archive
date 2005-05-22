@@ -17,36 +17,78 @@
 *                 Glenn Fowler <gsf@research.att.com>                  *
 *                                                                      *
 ***********************************************************************/
-#include	"sftest.h"
+#include	"dttest.h"
 
-MAIN()
+static int Pevent;
+static int Event;
+static int Hinit;
+
+#if __STD_C
+static int event(Dt_t* dt, int type, Void_t* obj, Dtdisc_t* disc)
+#else
+static int event(dt, type, obj, disc)
+Dt_t*	dt;
+int	type;
+Void_t* obj;
+Dtdisc_t* disc;
+#endif
 {
-	char		buf[1024], *s;
-	Sfio_t*	f;
+	Pevent = Event;
+	Event = type;
 
-	f = sfnew(NIL(Sfio_t*),NIL(Void_t*),(size_t)SF_UNBOUND,-1,SF_WRITE|SF_STRING);
-	sfsetbuf(sfstdout,buf,sizeof(buf));
-	sfsetbuf(sfstderr,buf,sizeof(buf));
-	sfset(sfstdout,SF_SHARE,0);
-	sfset(sfstderr,SF_SHARE,0);
+	if(type == DT_HASHSIZE)
+	{	Hinit += 1;
+		if(*(int*)obj == 0)
+		{	*(int*)obj = 8;
+			return 1;
+		}
+		else if(*(int*)obj != 8)
+			terror("Wrong hash table size");
+		else
+		{	*(int*)obj = -1;
+			return 1;
+		}
+	}
 
-	if(!sfpool(sfstdout,f,SF_SHARE) || !sfpool(sfstderr,f,SF_SHARE) )
-		terror("Pooling\n");
+	return 0;
+}
 
-	if(sfputr(sfstdout,"01234",-1) != 5)
-		terror("Writing to stderr\n");
-	if(sfputr(sfstderr,"56789",-1) != 5)
-		terror("Writing to stdout\n");
+Dtdisc_t Disc =
+	{ 0, sizeof(int), -1,
+	  newint, NIL(Dtfree_f), compare, hashint,
+	  NIL(Dtmemory_f), event
+	};
 
-	if(sfputc(f,'\0') < 0)
-		terror("Writing to string stream\n");
+main()
+{
+	Dt_t		*dt;
+	int		k;
 
-	sfseek(f,(Sfoff_t)0,0);
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) )
-		terror("Peeking\n");
-	sfwrite(f,s,0);
-	if(strcmp(s,"0123456789") != 0)
-		terror("Data is wrong\n");
+	if(!(dt = dtopen(&Disc,Dtset)) )
+		terror("Opening Dtset");
+	if(Pevent != DT_OPEN && Event != DT_ENDOPEN)
+		terror("No open event");
 
-	TSTEXIT(0);
+	dtmethod(dt,Dtoset);
+	if(Event != DT_METH)
+		terror("No meth event");
+
+	dtdisc(dt,&Disc,0);
+	if(Event != DT_DISC)
+		terror("No disc event");
+
+	dtclose(dt);
+	if(Pevent != DT_CLOSE && Event != DT_ENDCLOSE)
+		terror("No close event");
+
+	if(!(dt = dtopen(&Disc,Dtset)) )
+		terror("Opening Dtset");
+
+	Pevent = Event = 0;
+	for(k = 1; k <= 100; ++k)
+		dtinsert(dt, k);
+	if(Hinit != 2)
+		terror("Wrong number of hash table events");
+
+	return 0;
 }

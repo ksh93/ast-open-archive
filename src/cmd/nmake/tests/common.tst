@@ -145,9 +145,9 @@ all : [not found] target unbound
 TEST 06 ':: with .o lhs'
 
 	EXEC	-n
-		INPUT Makefile $'if AHA
+		INPUT Makefile $'if HIT
 .OBJECT.o : .USE .COMMAND
-	: AHA -o $(<) $(*)
+	: HIT -o $(<) $(*)
 end
 o.o :: a.c z.c'
 		INPUT a.c
@@ -156,10 +156,10 @@ o.o :: a.c z.c'
 + cc -O   -c z.c
 + ld -r  -o o.o a.o z.o'
 
-	EXEC	-n AHA=1
+	EXEC	-n HIT=1
 		OUTPUT - $'+ cc -O   -c a.c
 + cc -O   -c z.c
-+ : AHA -o o.o a.o z.o'
++ : HIT -o o.o a.o z.o'
 
 TEST 07 'install with link on'
 
@@ -346,7 +346,6 @@ stdio.h : .SCAN.IGNORE'
 		OUTPUT - $';;;'$TWD$'/cmd/c/Makefile;cmd/c/Makefile
 ;;;'$TWD$'/cmd/c/c.c;cmd/c/c.c
 ;;;'$TWD$'/cmd/tcl/Makefile;cmd/tcl/Makefile
-;;;'$TWD$'/cmd/tcl/bar;cmd/tcl/bar
 ;;;'$TWD$'/cmd/tcl/bar/a;cmd/tcl/bar/a
 ;;;'$TWD$'/cmd/tcl/bar/b;cmd/tcl/bar/b
 ;;;'$TWD$'/cmd/tcl/bar/c;cmd/tcl/bar/c

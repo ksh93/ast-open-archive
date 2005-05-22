@@ -416,6 +416,12 @@ i=3 a="abc" p="pdq" x="xyz"'
 			printf("i=%d n=%d f=%g\n", i, n, f);'
 		INPUT - '123 3.45e6'
 
+	EXEC 	-n -e '	int n,i,j,k;
+			char* s = "1";
+			n = sscanf(s,"%d %d %d", &i, &j, &k);
+			printf("n=%d i=%d j=%d k=%d\n", n, i, j, k);'
+		OUTPUT - $'n=1 i=1 j=0 k=0'
+
 	EXEC 	-n -e '	int i,n;
 			float f;
 			char* s = "123 3.45e6";

@@ -60,7 +60,7 @@ int
 sel1(int addr, Text *data)
 {
 	if(addr & REGADR)
-		return reexec(readdr(addr),(char*)data->s,0,0,0) == 0;
+		return reexec(readdr(addr), (char*)data->s, data->w - data->s, 0, 0, 0) == 0;
 	if(addr == recno)
 		return 1;
 	if(addr == DOLLAR)

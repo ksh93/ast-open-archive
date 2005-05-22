@@ -18,6 +18,8 @@ release :: release.c LICENSE=since=1999,author=gsf
 
 sear :: sear.sh LICENSE=since=2001,author=dgk+gsf
 
+changes :: changes.sh LICENSE=since=2005,author=gsf
+
 $(LIBDIR)/sear :INSTALLDIR: ratz.c sear.ico
 
 :TEST: proto

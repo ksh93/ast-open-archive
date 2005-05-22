@@ -32,7 +32,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2004-05-31 $\0\n";
+static const char id[] = "\n@(#)$Id: testregex (AT&T Research) 2005-05-20 $\0\n";
 
 #if _PACKAGE_ast
 #include <ast.h>
@@ -540,6 +540,7 @@ static struct
 	int		unspecified;
 	int		verify;
 	int		warnings;
+	char*		file;
 	char*		stack;
 	char*		which;
 	jmp_buf		gotcha;
@@ -619,6 +620,8 @@ quote(char* s, int len, unsigned long test)
 static void
 report(char* comment, char* fun, char* re, char* s, int len, char* msg, int flags, unsigned long test)
 {
+	if (state.file)
+		printf("%s:", state.file);
 	printf("%d:", state.lineno);
 	if (re)
 	{
@@ -654,7 +657,7 @@ report(char* comment, char* fun, char* re, char* s, int len, char* msg, int flag
 }
 
 static void
-error(regex_t* preg, int code, int lineno)
+error(regex_t* preg, int code)
 {
 	char*	msg;
 	char	buf[256];
@@ -982,7 +985,7 @@ gotcha(int sig)
 }
 
 static char*
-getline(void)
+getline(FILE* fp)
 {
 	static char	buf[32 * 1024];
 
@@ -992,7 +995,7 @@ getline(void)
 
 	for (;;)
 	{
-		if (!(b = fgets(s, e - s, stdin)))
+		if (!(b = fgets(s, e - s, fp)))
 			return 0;
 		state.lineno++;
 		s += strlen(s);
@@ -1104,7 +1107,7 @@ catchfree(regex_t* preg, int flags, int* tabs, char* spec, char* re, char* s, ch
 	else
 	{
 		report("failed", "regfree", re, NiL, -1, msg, flags, test);
-		error(preg, eret, state.lineno);
+		error(preg, eret);
 	}
 	return eret;
 }
@@ -1125,6 +1128,11 @@ main(int argc, char** argv)
 	int		j;
 	int		expected;
 	int		got;
+	int		locale;
+	int		subunitlen;
+	int		testno;
+	unsigned long	level;
+	unsigned long	skip;
 	char*		p;
 	char*		line;
 	char*		spec;
@@ -1134,8 +1142,11 @@ main(int argc, char** argv)
 	char*		msg;
 	char*		fun;
 	char*		ppat;
+	char*		subunit;
+	char*		version;
 	char*		field[6];
 	char*		delim[6];
+	FILE*		fp;
 	int		tabs[6];
 	char		unit[64];
 	regmatch_t	match[100];
@@ -1143,19 +1154,17 @@ main(int argc, char** argv)
 
 	static char	pat[32 * 1024];
 
-	int		locale = 0;
 	int		nonosub = REG_NOSUB == 0;
 	int		nonexec = 0;
-	int		testno = 0;
 
-	unsigned long	level = 1;
-	unsigned long	skip = 0;
 	unsigned long	test = 0;
+
+	static char*	filter[] = { "-", 0 };
 
 	state.NOMATCH.rm_so = state.NOMATCH.rm_eo = -2;
 	p = unit;
-	s = (char*)id + 10;
-	while (p < &unit[sizeof(unit)-1] && (*p = *s++) && !isspace(*p))
+	version = (char*)id + 10;
+	while (p < &unit[sizeof(unit)-1] && (*p = *version++) && !isspace(*p))
 		p++;
 	*p = 0;
 	while ((p = *++argv) && *p == '-')
@@ -1222,729 +1231,804 @@ main(int argc, char** argv)
 			}
 			break;
 		}
-	if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
+	if (!*argv)
+		argv = filter;
+	locale = 0;
+	while (state.file = *argv++)
 	{
-		printf("TEST\t");
-		for (s = (char*)id + 10; *s && (*s != ' ' || *(s + 1) != '$'); s++)
-			putchar(*s);
-		if (test & TEST_CATCH)
-			printf(", catch");
-		if (test & TEST_IGNORE_ERROR)
-			printf(", ignore error code mismatches");
-		if (test & TEST_IGNORE_POSITION)
-			printf(", ignore negative position mismatches");
+		if (streq(state.file, "-") || streq(state.file, "/dev/stdin") || streq(state.file, "/dev/fd/0"))
+		{
+			state.file = 0;
+			fp = stdin;
+		}
+		else if (!(fp = fopen(state.file, "r")))
+		{
+			fprintf(stderr, "%s: %s: cannot read\n", unit, state.file);
+			return 2;
+		}
+		testno = state.errors = state.ignored = state.lineno = state.passed =
+		state.signals = state.unspecified = state.warnings = 0;
+		skip = 0;
+		level = 1;
+		if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
+		{
+			printf("TEST\t%s ", unit);
+			if (s = state.file)
+			{
+				subunit = p = 0;
+				for (;;)
+				{
+					switch (*s++)
+					{
+					case 0:
+						break;
+					case '/':
+						subunit = s;
+						continue;
+					case '.':
+						p = s - 1;
+						continue;
+					default:
+						continue;
+					}
+					break;
+				}
+				if (!subunit)
+					subunit = state.file;
+				if (p < subunit)
+					p = s - 1;
+				subunitlen = p - subunit;
+				printf("%-.*s ", subunitlen, subunit);
+			}
+			else
+				subunit = 0;
+			for (s = version; *s && (*s != ' ' || *(s + 1) != '$'); s++)
+				putchar(*s);
+			if (test & TEST_CATCH)
+				printf(", catch");
+			if (test & TEST_IGNORE_ERROR)
+				printf(", ignore error code mismatches");
+			if (test & TEST_IGNORE_POSITION)
+				printf(", ignore negative position mismatches");
 #ifdef REG_DISCIPLINE
-		if (state.stack)
-			printf(", stack");
+			if (state.stack)
+				printf(", stack");
 #endif
-		if (test & TEST_VERBOSE)
-			printf(", verbose");
-		if (p)
-			printf(", argument(s) ignored");
-		printf("\n");
+			if (test & TEST_VERBOSE)
+				printf(", verbose");
+			printf("\n");
 #ifdef REG_VERSIONID
-		if (regerror(REG_VERSIONID, NiL, pat, sizeof(pat)) > 0)
-			s = pat;
-		else
+			if (regerror(REG_VERSIONID, NiL, pat, sizeof(pat)) > 0)
+				s = pat;
+			else
 #endif
 #ifdef REG_TEST_VERSION
-		s = REG_TEST_VERSION;
+			s = REG_TEST_VERSION;
 #else
-		s = "regex";
+			s = "regex";
 #endif
-		printf("NOTE\t%s\n", s);
-		if (elementsof(unsupported) > 1)
-		{
-#if (REG_TEST_DEFAULT & (REG_AUGMENTED|REG_EXTENDED|REG_SHELL)) || !defined(REG_EXTENDED)
-			i = 0;
-#else
-			i = REG_EXTENDED != 0;
-#endif
-			for (got = 0; i < elementsof(unsupported) - 1; i++)
+			printf("NOTE\t%s\n", s);
+			if (elementsof(unsupported) > 1)
 			{
-				if (!got)
-				{
-					got = 1;
-					printf("NOTE\tunsupported: %s", unsupported[i]);
-				}
-				else
-					printf(",%s", unsupported[i]);
-			}
-			if (got)
-				printf("\n");
-		}
-	}
-#ifdef REG_DISCIPLINE
-	state.disc.disc.re_version = REG_VERSION;
-	state.disc.disc.re_compf = compf;
-	state.disc.disc.re_execf = execf;
-	if (!(state.disc.sp = sfstropen()))
-		bad("out of space [discipline string stream]\n", NiL, NiL, 0, 0);
-	preg.re_disc = &state.disc.disc;
+#if (REG_TEST_DEFAULT & (REG_AUGMENTED|REG_EXTENDED|REG_SHELL)) || !defined(REG_EXTENDED)
+				i = 0;
+#else
+				i = REG_EXTENDED != 0;
 #endif
-	if (test & TEST_CATCH)
-	{
-		signal(SIGALRM, gotcha);
-		signal(SIGBUS, gotcha);
-		signal(SIGSEGV, gotcha);
-	}
-	while (p = getline())
-	{
-
-	/* parse: */
-
-		line = p;
-		if (*p == ':' && !isspace(*(p + 1)))
+				for (got = 0; i < elementsof(unsupported) - 1; i++)
+				{
+					if (!got)
+					{
+						got = 1;
+						printf("NOTE\tunsupported: %s", unsupported[i]);
+					}
+					else
+						printf(",%s", unsupported[i]);
+				}
+				if (got)
+					printf("\n");
+			}
+		}
+#ifdef REG_DISCIPLINE
+		state.disc.disc.re_version = REG_VERSION;
+		state.disc.disc.re_compf = compf;
+		state.disc.disc.re_execf = execf;
+		if (!(state.disc.sp = sfstropen()))
+			bad("out of space [discipline string stream]\n", NiL, NiL, 0, 0);
+		preg.re_disc = &state.disc.disc;
+#endif
+		if (test & TEST_CATCH)
 		{
-			while (*++p && *p != ':');
-			if (!*p++)
+			signal(SIGALRM, gotcha);
+			signal(SIGBUS, gotcha);
+			signal(SIGSEGV, gotcha);
+		}
+		while (p = getline(fp))
+		{
+
+		/* parse: */
+
+			line = p;
+			if (*p == ':' && !isspace(*(p + 1)))
+			{
+				while (*++p && *p != ':');
+				if (!*p++)
+				{
+					if (test & TEST_BASELINE)
+						printf("%s\n", line);
+					continue;
+				}
+			}
+			while (isspace(*p))
+				p++;
+			if (*p == 0 || *p == '#' || *p == 'T')
 			{
 				if (test & TEST_BASELINE)
 					printf("%s\n", line);
 				continue;
 			}
-		}
-		while (isspace(*p))
-			p++;
-		if (*p == 0 || *p == '#' || *p == 'T')
-		{
-			if (test & TEST_BASELINE)
-				printf("%s\n", line);
-			continue;
-		}
-		if (*p == ':' || *p == 'N')
-		{
-			if (test & TEST_BASELINE)
-				printf("%s\n", line);
-			else if (!(test & (TEST_ACTUAL|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
+			if (*p == ':' || *p == 'N')
 			{
-				while (*++p && !isspace(*p));
-				while (isspace(*p))
-					p++;
-				printf("NOTE	%s\n", p);
-			}
-			continue;
-		}
-		j = 0;
-		i = 0;
-		field[i++] = p;
-		for (;;)
-		{
-			switch (*p++)
-			{
-			case 0:
-				p--;
-				j = 0;
-				goto checkfield;
-			case '\t':
-				*(delim[i] = p - 1) = 0;
-				j = 1;
-			checkfield:
-				s = field[i - 1];
-				if (streq(s, "NIL"))
-					field[i - 1] = 0;
-				else if (streq(s, "NULL"))
-					*s = 0;
-				while (*p == '\t')
+				if (test & TEST_BASELINE)
+					printf("%s\n", line);
+				else if (!(test & (TEST_ACTUAL|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
 				{
-					p++;
-					j++;
+					while (*++p && !isspace(*p));
+					while (isspace(*p))
+						p++;
+					printf("NOTE	%s\n", p);
 				}
-				tabs[i - 1] = j;
-				if (!*p)
-					break;
-				if (i >= elementsof(field))
-					bad("too many fields\n", NiL, NiL, 0, 0);
-				field[i++] = p;
-				/*FALLTHROUGH*/
-			default:
 				continue;
 			}
-			break;
-		}
-		if (!(spec = field[0]))
-			bad("NIL spec\n", NiL, NiL, 0, 0);
-
-	/* interpret: */
-
-		cflags = REG_TEST_DEFAULT;
-		eflags = REG_EXEC_DEFAULT;
-		test &= TEST_GLOBAL;
-		state.extracted = 0;
-		nmatch = 20;
-		nsub = -1;
-		for (p = spec; *p; p++)
-		{
-			if (isdigit(*p))
+			j = 0;
+			i = 0;
+			field[i++] = p;
+			for (;;)
 			{
-				nmatch = strtol(p, &p, 10);
-				if (nmatch >= elementsof(match))
-					bad("nmatch must be < 100\n", NiL, NiL, 0, 0);
-				p--;
-				continue;
-			}
-			switch (*p)
-			{
-			case 'A':
-				test |= TEST_ARE;
-				continue;
-			case 'B':
-				test |= TEST_BRE;
-				continue;
-			case 'C':
-				if (!(test & TEST_QUERY) && !(skip & level))
-					bad("locale must be nested\n", NiL, NiL, 0, 0);
-				test &= ~TEST_QUERY;
-				if (locale)
-					bad("locale nesting not supported\n", NiL, NiL, 0, 0);
-				if (i != 2)
-					bad("locale field expected\n", NiL, NiL, 0, 0);
-				if (!(skip & level))
+				switch (*p++)
 				{
-#if defined(LC_COLLATE) && defined(LC_CTYPE)
-					s = field[1];
-					if (!s || streq(s, "POSIX"))
-						s = "C";
-					if (!(ans = setlocale(LC_COLLATE, s)) || streq(ans, "C") || streq(ans, "POSIX") || !(ans = setlocale(LC_CTYPE, s)) || streq(ans, "C") || streq(ans, "POSIX"))
-						skip = note(level, s, skip, test);
-					else
+				case 0:
+					p--;
+					j = 0;
+					goto checkfield;
+				case '\t':
+					*(delim[i] = p - 1) = 0;
+					j = 1;
+				checkfield:
+					s = field[i - 1];
+					if (streq(s, "NIL"))
+						field[i - 1] = 0;
+					else if (streq(s, "NULL"))
+						*s = 0;
+					while (*p == '\t')
 					{
-						if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
-							printf("NOTE	\"%s\" locale\n", s);
-						locale = level;
+						p++;
+						j++;
 					}
-#else
-					skip = note(level, skip, test, "locales not supported");
-#endif
+					tabs[i - 1] = j;
+					if (!*p)
+						break;
+					if (i >= elementsof(field))
+						bad("too many fields\n", NiL, NiL, 0, 0);
+					field[i++] = p;
+					/*FALLTHROUGH*/
+				default:
+					continue;
 				}
-				cflags = NOTEST;
-				continue;
-			case 'E':
-				test |= TEST_ERE;
-				continue;
-			case 'K':
-				test |= TEST_KRE;
-				continue;
-			case 'L':
-				test |= TEST_LRE;
-				continue;
-			case 'S':
-				test |= TEST_SRE;
-				continue;
+				break;
+			}
+			if (!(spec = field[0]))
+				bad("NIL spec\n", NiL, NiL, 0, 0);
 
-			case 'a':
-				cflags |= REG_LEFT|REG_RIGHT;
-				continue;
-			case 'b':
-				eflags |= REG_NOTBOL;
-				continue;
-			case 'c':
-				cflags |= REG_COMMENT;
-				continue;
-			case 'd':
-				cflags |= REG_SHELL_DOT;
-				continue;
-			case 'e':
-				eflags |= REG_NOTEOL;
-				continue;
-			case 'f':
-				cflags |= REG_MULTIPLE;
-				continue;
-			case 'g':
-				cflags |= NOTEST;
-				continue;
-			case 'h':
-				cflags |= REG_MULTIREF;
-				continue;
-			case 'i':
-				cflags |= REG_ICASE;
-				continue;
-			case 'j':
-				cflags |= REG_SPAN;
-				continue;
-			case 'k':
-				cflags |= REG_ESCAPE;
-				continue;
-			case 'l':
-				cflags |= REG_LEFT;
-				continue;
-			case 'm':
-				cflags |= REG_MINIMAL;
-				continue;
-			case 'n':
-				cflags |= REG_NEWLINE;
-				continue;
-			case 'o':
-				cflags |= REG_SHELL_GROUP;
-				continue;
-			case 'p':
-				cflags |= REG_SHELL_PATH;
-				continue;
-			case 'q':
-				cflags |= REG_DELIMITED;
-				continue;
-			case 'r':
-				cflags |= REG_RIGHT;
-				continue;
-			case 's':
-				cflags |= REG_SHELL_ESCAPED;
-				continue;
-			case 't':
-				cflags |= REG_MUSTDELIM;
-				continue;
-			case 'u':
-				test |= TEST_UNSPECIFIED;
-				continue;
-			case 'w':
-				cflags |= REG_NOSUB;
-				continue;
-			case 'x':
-				if (REG_LENIENT)
-					cflags |= REG_LENIENT;
-				else
-					test |= TEST_LENIENT;
-				continue;
-			case 'y':
-				eflags |= REG_LEFT;
-				continue;
-			case 'z':
-				cflags |= REG_NULL;
-				continue;
+		/* interpret: */
 
-			case '$':
-				test |= TEST_EXPAND;
-				continue;
-
-			case '/':
-				test |= TEST_SUB;
-				continue;
-
-			case '?':
-				test |= TEST_VERIFY;
-				test &= ~(TEST_AND|TEST_OR);
-				state.verify = state.passed;
-				continue;
-			case '&':
-				test |= TEST_VERIFY|TEST_AND;
-				test &= ~TEST_OR;
-				continue;
-			case '|':
-				test |= TEST_VERIFY|TEST_OR;
-				test &= ~TEST_AND;
-				continue;
-			case ';':
-				test |= TEST_OR;
-				test &= ~TEST_AND;
-				continue;
-
-			case '{':
-				level <<= 1;
-				if (skip & (level >> 1))
+			cflags = REG_TEST_DEFAULT;
+			eflags = REG_EXEC_DEFAULT;
+			test &= TEST_GLOBAL;
+			state.extracted = 0;
+			nmatch = 20;
+			nsub = -1;
+			for (p = spec; *p; p++)
+			{
+				if (isdigit(*p))
 				{
-					skip |= level;
-					cflags = NOTEST;
+					nmatch = strtol(p, &p, 10);
+					if (nmatch >= elementsof(match))
+						bad("nmatch must be < 100\n", NiL, NiL, 0, 0);
+					p--;
+					continue;
 				}
-				else
+				switch (*p)
 				{
-					skip &= ~level;
-					test |= TEST_QUERY;
-				}
-				continue;
-			case '}':
-				if (level == 1)
-					bad("invalid {...} nesting\n", NiL, NiL, 0, 0);
-				if ((skip & level) && !(skip & (level>>1)))
-				{
-					if (!(test & (TEST_BASELINE|TEST_SUMMARY)))
-					{
-						if (test & (TEST_ACTUAL|TEST_FAIL))
-							printf("}\n");
-						else if (!(test & TEST_PASS))
-							printf("-%d\n", state.lineno);
-					}
-				}
-#if defined(LC_COLLATE) && defined(LC_CTYPE)
-				else if (locale & level)
-				{
-					locale = 0;
+				case 'A':
+					test |= TEST_ARE;
+					continue;
+				case 'B':
+					test |= TEST_BRE;
+					continue;
+				case 'C':
+					if (!(test & TEST_QUERY) && !(skip & level))
+						bad("locale must be nested\n", NiL, NiL, 0, 0);
+					test &= ~TEST_QUERY;
+					if (locale)
+						bad("locale nesting not supported\n", NiL, NiL, 0, 0);
+					if (i != 2)
+						bad("locale field expected\n", NiL, NiL, 0, 0);
 					if (!(skip & level))
 					{
-						s = "C";
-						setlocale(LC_COLLATE, s);
-						setlocale(LC_CTYPE, s);
-						if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
-							printf("NOTE	\"%s\" locale\n", s);
-						else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_PASS))
+#if defined(LC_COLLATE) && defined(LC_CTYPE)
+						s = field[1];
+						if (!s || streq(s, "POSIX"))
+							s = "C";
+						if (!(ans = setlocale(LC_COLLATE, s)) || streq(ans, "C") || streq(ans, "POSIX") || !(ans = setlocale(LC_CTYPE, s)) || streq(ans, "C") || streq(ans, "POSIX"))
+							skip = note(level, s, skip, test);
+						else
+						{
+							if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
+								printf("NOTE	\"%s\" locale\n", s);
+							locale = level;
+						}
+#else
+						skip = note(level, skip, test, "locales not supported");
+#endif
+					}
+					cflags = NOTEST;
+					continue;
+				case 'E':
+					test |= TEST_ERE;
+					continue;
+				case 'K':
+					test |= TEST_KRE;
+					continue;
+				case 'L':
+					test |= TEST_LRE;
+					continue;
+				case 'S':
+					test |= TEST_SRE;
+					continue;
+
+				case 'a':
+					cflags |= REG_LEFT|REG_RIGHT;
+					continue;
+				case 'b':
+					eflags |= REG_NOTBOL;
+					continue;
+				case 'c':
+					cflags |= REG_COMMENT;
+					continue;
+				case 'd':
+					cflags |= REG_SHELL_DOT;
+					continue;
+				case 'e':
+					eflags |= REG_NOTEOL;
+					continue;
+				case 'f':
+					cflags |= REG_MULTIPLE;
+					continue;
+				case 'g':
+					cflags |= NOTEST;
+					continue;
+				case 'h':
+					cflags |= REG_MULTIREF;
+					continue;
+				case 'i':
+					cflags |= REG_ICASE;
+					continue;
+				case 'j':
+					cflags |= REG_SPAN;
+					continue;
+				case 'k':
+					cflags |= REG_ESCAPE;
+					continue;
+				case 'l':
+					cflags |= REG_LEFT;
+					continue;
+				case 'm':
+					cflags |= REG_MINIMAL;
+					continue;
+				case 'n':
+					cflags |= REG_NEWLINE;
+					continue;
+				case 'o':
+					cflags |= REG_SHELL_GROUP;
+					continue;
+				case 'p':
+					cflags |= REG_SHELL_PATH;
+					continue;
+				case 'q':
+					cflags |= REG_DELIMITED;
+					continue;
+				case 'r':
+					cflags |= REG_RIGHT;
+					continue;
+				case 's':
+					cflags |= REG_SHELL_ESCAPED;
+					continue;
+				case 't':
+					cflags |= REG_MUSTDELIM;
+					continue;
+				case 'u':
+					test |= TEST_UNSPECIFIED;
+					continue;
+				case 'w':
+					cflags |= REG_NOSUB;
+					continue;
+				case 'x':
+					if (REG_LENIENT)
+						cflags |= REG_LENIENT;
+					else
+						test |= TEST_LENIENT;
+					continue;
+				case 'y':
+					eflags |= REG_LEFT;
+					continue;
+				case 'z':
+					cflags |= REG_NULL;
+					continue;
+
+				case '$':
+					test |= TEST_EXPAND;
+					continue;
+
+				case '/':
+					test |= TEST_SUB;
+					continue;
+
+				case '?':
+					test |= TEST_VERIFY;
+					test &= ~(TEST_AND|TEST_OR);
+					state.verify = state.passed;
+					continue;
+				case '&':
+					test |= TEST_VERIFY|TEST_AND;
+					test &= ~TEST_OR;
+					continue;
+				case '|':
+					test |= TEST_VERIFY|TEST_OR;
+					test &= ~TEST_AND;
+					continue;
+				case ';':
+					test |= TEST_OR;
+					test &= ~TEST_AND;
+					continue;
+
+				case '{':
+					level <<= 1;
+					if (skip & (level >> 1))
+					{
+						skip |= level;
+						cflags = NOTEST;
+					}
+					else
+					{
+						skip &= ~level;
+						test |= TEST_QUERY;
+					}
+					continue;
+				case '}':
+					if (level == 1)
+						bad("invalid {...} nesting\n", NiL, NiL, 0, 0);
+					if ((skip & level) && !(skip & (level>>1)))
+					{
+						if (!(test & (TEST_BASELINE|TEST_SUMMARY)))
+						{
+							if (test & (TEST_ACTUAL|TEST_FAIL))
+								printf("}\n");
+							else if (!(test & TEST_PASS))
+								printf("-%d\n", state.lineno);
+						}
+					}
+#if defined(LC_COLLATE) && defined(LC_CTYPE)
+					else if (locale & level)
+					{
+						locale = 0;
+						if (!(skip & level))
+						{
+							s = "C";
+							setlocale(LC_COLLATE, s);
+							setlocale(LC_CTYPE, s);
+							if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_SUMMARY)))
+								printf("NOTE	\"%s\" locale\n", s);
+							else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_PASS))
+								printf("}\n");
+						}
+						else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL))
 							printf("}\n");
 					}
-					else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL))
-						printf("}\n");
-				}
 #endif
-				level >>= 1;
-				cflags = NOTEST;
-				continue;
+					level >>= 1;
+					cflags = NOTEST;
+					continue;
 
-			default:
-				bad("bad spec\n", spec, NiL, 0, test);
+				default:
+					bad("bad spec\n", spec, NiL, 0, test);
+					break;
+
+				}
 				break;
-
 			}
-			break;
-		}
-		if ((cflags|eflags) == NOTEST || (skip & level) && (test & TEST_BASELINE))
-		{
-			if (test & TEST_BASELINE)
+			if ((cflags|eflags) == NOTEST || (skip & level) && (test & TEST_BASELINE))
 			{
-				while (i > 1)
-					*delim[--i] = '\t';
-				printf("%s\n", line);
-			}
-			continue;
-		}
-		if (test & TEST_OR)
-		{
-			if (!(test & TEST_VERIFY))
-			{
-				test &= ~TEST_OR;
-				if (state.passed == state.verify && i > 1)
-					printf("NOTE\t%s\n", field[1]);
+				if (test & TEST_BASELINE)
+				{
+					while (i > 1)
+						*delim[--i] = '\t';
+					printf("%s\n", line);
+				}
 				continue;
 			}
-			else if (state.passed > state.verify)
-				continue;
-		}
-		else if (test & TEST_AND)
-		{
-			if (state.passed == state.verify)
-				continue;
-			state.passed = state.verify;
-		}
-		if (i < 4)
-			bad("too few fields\n", NiL, NiL, 0, test);
-		while (i < elementsof(field))
-			field[i++] = 0;
-		if (re = field[1])
-		{
-			if (streq(re, "SAME"))
+			if (test & TEST_OR)
 			{
-				re = ppat;
-				test |= TEST_SAME;
+				if (!(test & TEST_VERIFY))
+				{
+					test &= ~TEST_OR;
+					if (state.passed == state.verify && i > 1)
+						printf("NOTE\t%s\n", field[1]);
+					continue;
+				}
+				else if (state.passed > state.verify)
+					continue;
+			}
+			else if (test & TEST_AND)
+			{
+				if (state.passed == state.verify)
+					continue;
+				state.passed = state.verify;
+			}
+			if (i < 4)
+				bad("too few fields\n", NiL, NiL, 0, test);
+			while (i < elementsof(field))
+				field[i++] = 0;
+			if (re = field[1])
+			{
+				if (streq(re, "SAME"))
+				{
+					re = ppat;
+					test |= TEST_SAME;
+				}
+				else
+				{
+					if (test & TEST_EXPAND)
+						escape(re);
+					strcpy(ppat = pat, re);
+				}
 			}
 			else
+				ppat = 0;
+			nstr = -1;
+			if ((s = field[2]) && (test & TEST_EXPAND))
 			{
-				if (test & TEST_EXPAND)
-					escape(re);
-				strcpy(ppat = pat, re);
-			}
-		}
-		else
-			ppat = 0;
-		nstr = -1;
-		if ((s = field[2]) && (test & TEST_EXPAND))
-		{
-			nstr = escape(s);
+				nstr = escape(s);
 #if _REG_nexec
-			if (nstr != strlen(s))
-				nexec = nstr;
+				if (nstr != strlen(s))
+					nexec = nstr;
 #endif
-		}
-		if (!(ans = field[3]))
-			bad("NIL answer\n", NiL, NiL, 0, test);
-		msg = field[4];
-		fflush(stdout);
-		if (test & TEST_SUB)
+			}
+			if (!(ans = field[3]))
+				bad("NIL answer\n", NiL, NiL, 0, test);
+			msg = field[4];
+			fflush(stdout);
+			if (test & TEST_SUB)
 #if _REG_subcomp
-			cflags |= REG_DELIMITED;
+				cflags |= REG_DELIMITED;
 #else
-			continue;
+				continue;
 #endif
 
-	compile:
+		compile:
 
-		if (state.extracted || (skip & level))
-			continue;
+			if (state.extracted || (skip & level))
+				continue;
 #if !(REG_TEST_DEFAULT & (REG_AUGMENTED|REG_EXTENDED|REG_SHELL))
 #ifdef REG_EXTENDED
-		if (REG_EXTENDED != 0 && (test & TEST_BRE))
+			if (REG_EXTENDED != 0 && (test & TEST_BRE))
 #else
-		if (test & TEST_BRE)
+			if (test & TEST_BRE)
 #endif
-		{
-			test &= ~TEST_BRE;
-			flags = cflags;
-			state.which = "BRE";
-		}
-		else
+			{
+				test &= ~TEST_BRE;
+				flags = cflags;
+				state.which = "BRE";
+			}
+			else
 #endif
 #ifdef REG_EXTENDED
-		if (test & TEST_ERE)
-		{
-			test &= ~TEST_ERE;
-			flags = cflags | REG_EXTENDED;
-			state.which = "ERE";
-		}
-		else
+			if (test & TEST_ERE)
+			{
+				test &= ~TEST_ERE;
+				flags = cflags | REG_EXTENDED;
+				state.which = "ERE";
+			}
+			else
 #endif
 #ifdef REG_AUGMENTED
-		if (test & TEST_ARE)
-		{
-			test &= ~TEST_ARE;
-			flags = cflags | REG_AUGMENTED;
-			state.which = "ARE";
-		}
-		else
+			if (test & TEST_ARE)
+			{
+				test &= ~TEST_ARE;
+				flags = cflags | REG_AUGMENTED;
+				state.which = "ARE";
+			}
+			else
 #endif
 #ifdef REG_LITERAL
-		if (test & TEST_LRE)
-		{
-			test &= ~TEST_LRE;
-			flags = cflags | REG_LITERAL;
-			state.which = "LRE";
-		}
-		else
+			if (test & TEST_LRE)
+			{
+				test &= ~TEST_LRE;
+				flags = cflags | REG_LITERAL;
+				state.which = "LRE";
+			}
+			else
 #endif
 #ifdef REG_SHELL
-		if (test & TEST_SRE)
-		{
-			test &= ~TEST_SRE;
-			flags = cflags | REG_SHELL;
-			state.which = "SRE";
-		}
-		else
+			if (test & TEST_SRE)
+			{
+				test &= ~TEST_SRE;
+				flags = cflags | REG_SHELL;
+				state.which = "SRE";
+			}
+			else
 #ifdef REG_AUGMENTED
-		if (test & TEST_KRE)
-		{
-			test &= ~TEST_KRE;
-			flags = cflags | REG_SHELL | REG_AUGMENTED;
-			state.which = "KRE";
-		}
-		else
+			if (test & TEST_KRE)
+			{
+				test &= ~TEST_KRE;
+				flags = cflags | REG_SHELL | REG_AUGMENTED;
+				state.which = "KRE";
+			}
+			else
 #endif
 #endif
-		{
-			if (test & (TEST_BASELINE|TEST_PASS|TEST_VERIFY))
-				extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test|TEST_OK);
-			continue;
-		}
-		if ((test & (TEST_QUERY|TEST_VERBOSE|TEST_VERIFY)) == TEST_VERBOSE)
-		{
-			printf("test %-3d %s ", state.lineno, state.which);
-			quote(re, -1, test|TEST_DELIMIT);
-			printf(" ");
-			quote(s, nstr, test|TEST_DELIMIT);
-			printf("\n");
-		}
+			{
+				if (test & (TEST_BASELINE|TEST_PASS|TEST_VERIFY))
+					extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test|TEST_OK);
+				continue;
+			}
+			if ((test & (TEST_QUERY|TEST_VERBOSE|TEST_VERIFY)) == TEST_VERBOSE)
+			{
+				printf("test %-3d %s ", state.lineno, state.which);
+				quote(re, -1, test|TEST_DELIMIT);
+				printf(" ");
+				quote(s, nstr, test|TEST_DELIMIT);
+				printf("\n");
+			}
 
-	nosub:
-		fun = "regcomp";
+		nosub:
+			fun = "regcomp";
 #if _REG_nexec
-		if (nstr >= 0 && nstr != strlen(s))
-			nexec = nstr;
+			if (nstr >= 0 && nstr != strlen(s))
+				nexec = nstr;
 
-		else
+			else
 #endif
-			nexec = -1;
-		if (state.extracted || (skip & level))
-			continue;
-		if (!(test & TEST_QUERY))
-			testno++;
+				nexec = -1;
+			if (state.extracted || (skip & level))
+				continue;
+			if (!(test & TEST_QUERY))
+				testno++;
 #ifdef REG_DISCIPLINE
-		if (state.stack)
-			stkset(stkstd, state.stack, 0);
-		flags |= REG_DISCIPLINE;
-		state.disc.ordinal = 0;
-		sfstrseek(state.disc.sp, 0, SEEK_SET);
+			if (state.stack)
+				stkset(stkstd, state.stack, 0);
+			flags |= REG_DISCIPLINE;
+			state.disc.ordinal = 0;
+			sfstrseek(state.disc.sp, 0, SEEK_SET);
 #endif
-		if (!(test & TEST_CATCH))
-			cret = regcomp(&preg, re, flags);
-		else if (!(cret = setjmp(state.gotcha)))
-		{
-			alarm(HUNG);
-			cret = regcomp(&preg, re, flags);
-			alarm(0);
-		}
-#if _REG_subcomp
-		if (!cret && (test & TEST_SUB))
-		{
-			fun = "regsubcomp";
-			p = re + preg.re_npat;
 			if (!(test & TEST_CATCH))
-				cret = regsubcomp(&preg, p, NiL, 0, 0);
+				cret = regcomp(&preg, re, flags);
 			else if (!(cret = setjmp(state.gotcha)))
 			{
 				alarm(HUNG);
-				cret = regsubcomp(&preg, p, NiL, 0, 0);
+				cret = regcomp(&preg, re, flags);
 				alarm(0);
 			}
-			if (!cret && *(p += preg.re_npat) && !(preg.re_sub->re_flags & REG_SUB_LAST))
+#if _REG_subcomp
+			if (!cret && (test & TEST_SUB))
 			{
-				if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
-					continue;
-				cret = REG_EFLAGS;
+				fun = "regsubcomp";
+				p = re + preg.re_npat;
+				if (!(test & TEST_CATCH))
+					cret = regsubcomp(&preg, p, NiL, 0, 0);
+				else if (!(cret = setjmp(state.gotcha)))
+				{
+					alarm(HUNG);
+					cret = regsubcomp(&preg, p, NiL, 0, 0);
+					alarm(0);
+				}
+				if (!cret && *(p += preg.re_npat) && !(preg.re_sub->re_flags & REG_SUB_LAST))
+				{
+					if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
+						continue;
+					cret = REG_EFLAGS;
+				}
 			}
-		}
 #endif
-		if (!cret)
-		{
-			if (!(flags & REG_NOSUB) && nsub < 0 && *ans == '(')
+			if (!cret)
 			{
-				for (p = ans; *p; p++)
-					if (*p == '(')
-						nsub++;
-					else if (*p == '{')
-						nsub--;
-				if (nsub >= 0)
+				if (!(flags & REG_NOSUB) && nsub < 0 && *ans == '(')
 				{
-					if (test & TEST_IGNORE_OVER)
+					for (p = ans; *p; p++)
+						if (*p == '(')
+							nsub++;
+						else if (*p == '{')
+							nsub--;
+					if (nsub >= 0)
 					{
-						if (nmatch > nsub)
-							nmatch = nsub + 1;
-					}
-					else if (nsub != preg.re_nsub)
-					{
-						if (nsub > preg.re_nsub)
+						if (test & TEST_IGNORE_OVER)
 						{
-							if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-								skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
-							else
-							{
-								report("re_nsub incorrect", fun, re, NiL, -1, msg, flags, test);
-								printf("at least %d expected, %d returned\n", nsub, preg.re_nsub);
-								state.errors++;
-							}
+							if (nmatch > nsub)
+								nmatch = nsub + 1;
 						}
-						else
-							nsub = preg.re_nsub;
+						else if (nsub != preg.re_nsub)
+						{
+							if (nsub > preg.re_nsub)
+							{
+								if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+									skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
+								else
+								{
+									report("re_nsub incorrect", fun, re, NiL, -1, msg, flags, test);
+									printf("at least %d expected, %d returned\n", nsub, preg.re_nsub);
+									state.errors++;
+								}
+							}
+							else
+								nsub = preg.re_nsub;
+						}
 					}
 				}
-			}
-			if (!(test & TEST_SUB) && *ans && *ans != '(' && !streq(ans, "OK") && !streq(ans, "NOMATCH"))
-			{
-				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
-				else if (!(test & TEST_LENIENT))
+				if (!(test & TEST_SUB) && *ans && *ans != '(' && !streq(ans, "OK") && !streq(ans, "NOMATCH"))
 				{
-					report("failed", fun, re, NiL, -1, msg, flags, test);
-					printf("%s expected, OK returned\n", ans);
-				}
-				catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
-				continue;
-			}
-		}
-		else
-		{
-			if (test & TEST_LENIENT)
-				/* we'll let it go this time */;
-			else if (!*ans || ans[0]=='(' || cret == REG_BADPAT && streq(ans, "NOMATCH"))
-			{
-				got = 0;
-				for (i = 1; i < elementsof(codes); i++)
-					if (cret==codes[i].code)
-						got = i;
-				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
-				else
-				{
-					report("failed", fun, re, NiL, -1, msg, flags, test);
-					printf("%s returned: ", codes[got].name);
-					error(&preg, cret, state.lineno);
+					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+						skip = extract(tabs, line, re, s, ans, msg, "OK", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
+					else if (!(test & TEST_LENIENT))
+					{
+						report("failed", fun, re, NiL, -1, msg, flags, test);
+						printf("%s expected, OK returned\n", ans);
+					}
+					catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
+					continue;
 				}
 			}
 			else
 			{
-				expected = got = 0;
-				for (i = 1; i < elementsof(codes); i++)
+				if (test & TEST_LENIENT)
+					/* we'll let it go this time */;
+				else if (!*ans || ans[0]=='(' || cret == REG_BADPAT && streq(ans, "NOMATCH"))
 				{
-					if (streq(ans, codes[i].name))
-						expected = i;
-					if (cret==codes[i].code)
-						got = i;
-				}
-				if (!expected)
-				{
+					got = 0;
+					for (i = 1; i < elementsof(codes); i++)
+						if (cret==codes[i].code)
+							got = i;
 					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
 						skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
 					else
 					{
-						report("failed: invalid error code", NiL, re, NiL, -1, msg, flags, test);
-						printf("%s expected, %s returned\n", ans, codes[got].name);
+						report("failed", fun, re, NiL, -1, msg, flags, test);
+						printf("%s returned: ", codes[got].name);
+						error(&preg, cret);
 					}
 				}
-				else if (cret != codes[expected].code && cret != REG_BADPAT)
+				else
 				{
-					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-						skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
-					else if (test & TEST_IGNORE_ERROR)
-						state.ignored++;
-					else
+					expected = got = 0;
+					for (i = 1; i < elementsof(codes); i++)
 					{
-						report("should fail and did", fun, re, NiL, -1, msg, flags, test);
-						printf("%s expected, %s returned: ", ans, codes[got].name);
-						state.errors--;
-						state.warnings++;
-						error(&preg, cret, state.lineno);
+						if (streq(ans, codes[i].name))
+							expected = i;
+						if (cret==codes[i].code)
+							got = i;
+					}
+					if (!expected)
+					{
+						if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+							skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
+						else
+						{
+							report("failed: invalid error code", NiL, re, NiL, -1, msg, flags, test);
+							printf("%s expected, %s returned\n", ans, codes[got].name);
+						}
+					}
+					else if (cret != codes[expected].code && cret != REG_BADPAT)
+					{
+						if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+							skip = extract(tabs, line, re, s, ans, msg, codes[got].name, NiL, 0, 0, skip, level, test|TEST_DELIMIT);
+						else if (test & TEST_IGNORE_ERROR)
+							state.ignored++;
+						else
+						{
+							report("should fail and did", fun, re, NiL, -1, msg, flags, test);
+							printf("%s expected, %s returned: ", ans, codes[got].name);
+							state.errors--;
+							state.warnings++;
+							error(&preg, cret);
+						}
 					}
 				}
+				goto compile;
 			}
-			goto compile;
-		}
 
 #if _REG_nexec
-	execute:
-		if (nexec >= 0)
-			fun = "regnexec";
-		else
+		execute:
+			if (nexec >= 0)
+				fun = "regnexec";
+			else
 #endif
-			fun = "regexec";
-		
-		for (i = 0; i < elementsof(match); i++)
-			match[i] = state.NOMATCH;
+				fun = "regexec";
+			
+			for (i = 0; i < elementsof(match); i++)
+				match[i] = state.NOMATCH;
 
 #if _REG_nexec
-		if (nexec >= 0)
-		{
-			eret = regnexec(&preg, s, nexec, nmatch, match, eflags);
-			s[nexec] = 0;
-		}
-		else
-#endif
-		{
-			if (!(test & TEST_CATCH))
-				eret = regexec(&preg, s, nmatch, match, eflags);
-			else if (!(eret = setjmp(state.gotcha)))
+			if (nexec >= 0)
 			{
-				alarm(HUNG);
-				eret = regexec(&preg, s, nmatch, match, eflags);
-				alarm(0);
+				eret = regnexec(&preg, s, nexec, nmatch, match, eflags);
+				s[nexec] = 0;
 			}
-		}
+			else
+#endif
+			{
+				if (!(test & TEST_CATCH))
+					eret = regexec(&preg, s, nmatch, match, eflags);
+				else if (!(eret = setjmp(state.gotcha)))
+				{
+					alarm(HUNG);
+					eret = regexec(&preg, s, nmatch, match, eflags);
+					alarm(0);
+				}
+			}
 #if _REG_subcomp
-		if ((test & TEST_SUB) && !eret)
-		{
-			fun = "regsubexec";
-			if (!(test & TEST_CATCH))
-				eret = regsubexec(&preg, s, nmatch, match);
-			else if (!(eret = setjmp(state.gotcha)))
+			if ((test & TEST_SUB) && !eret)
 			{
-				alarm(HUNG);
-				eret = regsubexec(&preg, s, nmatch, match);
-				alarm(0);
+				fun = "regsubexec";
+				if (!(test & TEST_CATCH))
+					eret = regsubexec(&preg, s, nmatch, match);
+				else if (!(eret = setjmp(state.gotcha)))
+				{
+					alarm(HUNG);
+					eret = regsubexec(&preg, s, nmatch, match);
+					alarm(0);
+				}
 			}
-		}
 #endif
-		if (flags & REG_NOSUB)
-		{
-			if (eret)
+			if (flags & REG_NOSUB)
+			{
+				if (eret)
+				{
+					if (eret != REG_NOMATCH || !streq(ans, "NOMATCH"))
+					{
+						if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+							skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
+						else
+						{
+							report("REG_NOSUB failed", fun, re, s, nstr, msg, flags, test);
+							error(&preg, eret);
+						}
+					}
+				}
+				else if (streq(ans, "NOMATCH"))
+				{
+					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+						skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_DELIMIT);
+					else
+					{
+						report("should fail and didn't", fun, re, s, nstr, msg, flags, test);
+						error(&preg, eret);
+					}
+				}
+			}
+			else if (eret)
 			{
 				if (eret != REG_NOMATCH || !streq(ans, "NOMATCH"))
 				{
 					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-						skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, 0, skip, level, test|TEST_DELIMIT);
+						skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, nsub, skip, level, test|TEST_DELIMIT);
 					else
 					{
-						report("REG_NOSUB failed", fun, re, s, nstr, msg, flags, test);
-						error(&preg, eret, state.lineno);
+						report("failed", fun, re, s, nstr, msg, flags, test);
+						if (eret != REG_NOMATCH)
+							error(&preg, eret);
+						else if (*ans)
+							printf("expected: %s\n", ans);
+						else
+							printf("\n");
 					}
 				}
 			}
@@ -1955,106 +2039,83 @@ main(int argc, char** argv)
 				else
 				{
 					report("should fail and didn't", fun, re, s, nstr, msg, flags, test);
-					error(&preg, eret, state.lineno);
-				}
-			}
-		}
-		else if (eret)
-		{
-			if (eret != REG_NOMATCH || !streq(ans, "NOMATCH"))
-			{
-				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, "NOMATCH", NiL, 0, nsub, skip, level, test|TEST_DELIMIT);
-				else
-				{
-					report("failed", fun, re, s, nstr, msg, flags, test);
-					if (eret != REG_NOMATCH)
-						error(&preg, eret, state.lineno);
-					else if (*ans)
-						printf("expected: %s\n", ans);
-					else
-						printf("\n");
-				}
-			}
-		}
-		else if (streq(ans, "NOMATCH"))
-		{
-			if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-				skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_DELIMIT);
-			else
-			{
-				report("should fail and didn't", fun, re, s, nstr, msg, flags, test);
-				matchprint(match, nmatch, nsub, NiL, test);
-			}
-		}
-#if _REG_subcomp
-		else if (test & TEST_SUB)
-		{
-			p = preg.re_sub->re_buf;
-			if (strcmp(p, ans))
-			{
-				report("failed", fun, re, s, nstr, msg, flags, test);
-				quote(ans, -1, test|TEST_DELIMIT);
-				printf(" expected, ");
-				quote(p, -1, test|TEST_DELIMIT);
-				printf(" returned\n");
-			}
-		}
-#endif
-		else if (!*ans)
-		{
-			if (match[0].rm_so != state.NOMATCH.rm_so)
-			{
-				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-					skip = extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
-				else
-				{
-					report("failed: no match but match array assigned", NiL, re, s, nstr, msg, flags, test);
 					matchprint(match, nmatch, nsub, NiL, test);
 				}
 			}
-		}
-		else if (matchcheck(match, nmatch, nsub, ans, re, s, nstr, flags, test))
-		{
-#if _REG_nexec
-			if (nexec < 0 && !nonexec)
+#if _REG_subcomp
+			else if (test & TEST_SUB)
 			{
-				nexec = nstr >= 0 ? nstr : strlen(s);
-				s[nexec] = '\n';
-				testno++;
-				goto execute;
+				p = preg.re_sub->re_buf;
+				if (strcmp(p, ans))
+				{
+					report("failed", fun, re, s, nstr, msg, flags, test);
+					quote(ans, -1, test|TEST_DELIMIT);
+					printf(" expected, ");
+					quote(p, -1, test|TEST_DELIMIT);
+					printf(" returned\n");
+				}
 			}
 #endif
-			if (!(test & (TEST_SUB|TEST_VERIFY)) && !nonosub)
+			else if (!*ans)
 			{
-				if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
-					continue;
-				flags |= REG_NOSUB;
-				goto nosub;
+				if (match[0].rm_so != state.NOMATCH.rm_so)
+				{
+					if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+						skip = extract(tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test);
+					else
+					{
+						report("failed: no match but match array assigned", NiL, re, s, nstr, msg, flags, test);
+						matchprint(match, nmatch, nsub, NiL, test);
+					}
+				}
 			}
-			if (test & (TEST_BASELINE|TEST_PASS|TEST_VERIFY))
-				skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_OK);
+			else if (matchcheck(match, nmatch, nsub, ans, re, s, nstr, flags, test))
+			{
+#if _REG_nexec
+				if (nexec < 0 && !nonexec)
+				{
+					nexec = nstr >= 0 ? nstr : strlen(s);
+					s[nexec] = '\n';
+					testno++;
+					goto execute;
+				}
+#endif
+				if (!(test & (TEST_SUB|TEST_VERIFY)) && !nonosub)
+				{
+					if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
+						continue;
+					flags |= REG_NOSUB;
+					goto nosub;
+				}
+				if (test & (TEST_BASELINE|TEST_PASS|TEST_VERIFY))
+					skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_OK);
+			}
+			else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
+				skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_DELIMIT);
+			if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
+				continue;
+			goto compile;
 		}
-		else if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))
-			skip = extract(tabs, line, re, s, ans, msg, NiL, match, nmatch, nsub, skip, level, test|TEST_DELIMIT);
-		if (catchfree(&preg, flags, tabs, line, re, s, ans, msg, NiL, NiL, 0, 0, skip, level, test))
-			continue;
-		goto compile;
-	}
-	if (test & TEST_SUMMARY)
-		printf("tests=%-4d errors=%-4d warnings=%-2d ignored=%-2d unspecified=%-2d signals=%d\n", testno, state.errors, state.warnings, state.ignored, state.unspecified, state.signals);
-	else if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS)))
-	{
-		printf("TEST\t%s, %d test%s", unit, testno, testno == 1 ? "" : "s");
-		if (state.ignored)
-			printf(", %d ignored mismatche%s", state.ignored, state.ignored == 1 ? "" : "s");
-		if (state.warnings)
-			printf(", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
-		if (state.unspecified)
-			printf(", %d unspecified difference%s", state.unspecified, state.unspecified == 1 ? "" : "s");
-		if (state.signals)
-			printf(", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
-		printf(", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
+		if (test & TEST_SUMMARY)
+			printf("tests=%-4d errors=%-4d warnings=%-2d ignored=%-2d unspecified=%-2d signals=%d\n", testno, state.errors, state.warnings, state.ignored, state.unspecified, state.signals);
+		else if (!(test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS)))
+		{
+			printf("TEST\t%s", unit);
+			if (subunit)
+				printf(" %-.*s", subunitlen, subunit);
+			printf(", %d test%s", testno, testno == 1 ? "" : "s");
+			if (state.ignored)
+				printf(", %d ignored mismatche%s", state.ignored, state.ignored == 1 ? "" : "s");
+			if (state.warnings)
+				printf(", %d warning%s", state.warnings, state.warnings == 1 ? "" : "s");
+			if (state.unspecified)
+				printf(", %d unspecified difference%s", state.unspecified, state.unspecified == 1 ? "" : "s");
+			if (state.signals)
+				printf(", %d signal%s", state.signals, state.signals == 1 ? "" : "s");
+			printf(", %d error%s\n", state.errors, state.errors == 1 ? "" : "s");
+		}
+		if (fp != stdin)
+			fclose(fp);
 	}
 	return 0;
 }

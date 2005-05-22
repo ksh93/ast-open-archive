@@ -1,3 +1,5 @@
+05-04-30 sfio: tgetr: add sfmaxr() tests
+05-04-20 cdt: snarf cdt tests from kpv
 05-01-04 date.c: add ``FMT time format answer''
 04-10-31 date.dat: add { hours days weeks months } ago tests
 04-10-27 opt.tst: TESTs 9? for astsa (stanadalone ast)

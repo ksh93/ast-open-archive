@@ -546,7 +546,8 @@ bget(register Archive_t* ap, register off_t n, off_t* p)
 
 	if (ap->io->mode != O_RDONLY)
 	{
-		*p = ap->io->last - ap->io->next;
+		if (p)
+			*p = ap->io->last - ap->io->next;
 		return ap->io->next;
 	}
 	if (n < 0)

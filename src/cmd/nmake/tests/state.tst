@@ -108,8 +108,8 @@ y :
 z :
 	true > $(<)'
 		OUTPUT - $'info mam static 00000
-setv INSTALLROOT ${INSTALLROOT}
-setv PACKAGEROOT ${PACKAGEROOT}
+setv INSTALLROOT ../../../..
+setv PACKAGEROOT ../../../../../..
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -296,3 +296,131 @@ so : si
 
 	EXEC	--silent
 		OUTPUT -
+
+TEST 07 'virtual targets with errors'
+
+	EXEC	ERROR=0
+		INPUT Makefile $'set keepgoing
+:ALL: V0
+V0 : V1 V2 V3
+V1 V2 V3 : .VIRTUAL (ERROR)
+	case "$(<)" in
+	*$(ERROR)*)	false ;;
+	*)		: "$(<)" ok ;;
+	esac'
+		ERROR - $'+ : V1 ok
++ : V2 ok
++ : V3 ok'
+
+	EXEC	ERROR=0
+		ERROR -
+
+	EXEC	ERROR=1
+		ERROR - $'+ false
+make: *** exit code 1 making V1
++ : V2 ok
++ : V3 ok
+make: *** 1 action failed'
+		EXIT 1
+
+	EXEC	ERROR=1
+		ERROR - $'+ false
+make: *** exit code 1 making V1
+make: *** 1 action failed'
+
+	EXEC	ERROR=2
+		ERROR - $'+ : V1 ok
++ false
+make: *** exit code 1 making V2
++ : V3 ok
+make: *** 1 action failed'
+
+	EXEC	ERROR=2
+		ERROR - $'+ false
+make: *** exit code 1 making V2
+make: *** 1 action failed'
+
+	EXEC	ERROR=3
+		ERROR - $'+ : V1 ok
++ : V2 ok
++ false
+make: *** exit code 1 making V3
+make: *** 1 action failed'
+
+	EXEC	ERROR=3
+		ERROR - $'+ false
+make: *** exit code 1 making V3
+make: *** 1 action failed'
+
+	EXEC	ERROR=0
+		ERROR - $'+ : V1 ok
++ : V2 ok
++ : V3 ok'
+		EXIT 0
+
+	EXEC	ERROR=0
+		ERROR -
+
+TEST 08 'statevar targets with errors'
+
+	EXEC	ERROR=0
+		INPUT Makefile $'set keepgoing
+:ALL: (S0)
+(S0) : (S1) (S2) (S3)
+(S1) (S2) (S3) : (ERROR)
+	case "$(<)" in
+	*$(ERROR)*)	false ;;
+	*)		: "$(<)" ok ;;
+	esac'
+		ERROR - $'+ : \'(S1)\' ok
++ : \'(S2)\' ok
++ : \'(S3)\' ok'
+
+	EXEC	ERROR=0
+		ERROR -
+
+	EXEC	ERROR=1
+		ERROR - $'+ false
+make: *** exit code 1 making (S1)
++ : \'(S2)\' ok
++ : \'(S3)\' ok
+make: *** 1 action failed'
+		EXIT 1
+
+	EXEC	ERROR=1
+		ERROR - $'+ false
+make: *** exit code 1 making (S1)
+make: *** 1 action failed'
+
+	EXEC	ERROR=2
+		ERROR - $'+ : \'(S1)\' ok
++ false
+make: *** exit code 1 making (S2)
++ : \'(S3)\' ok
+make: *** 1 action failed'
+
+	EXEC	ERROR=2
+		ERROR - $'+ false
+make: *** exit code 1 making (S2)
+make: *** 1 action failed'
+
+	EXEC	ERROR=3
+		ERROR - $'+ : \'(S1)\' ok
++ : \'(S2)\' ok
++ false
+make: *** exit code 1 making (S3)
+make: *** 1 action failed'
+
+	EXEC	ERROR=3
+		ERROR - $'+ false
+make: *** exit code 1 making (S3)
+make: *** 1 action failed'
+
+	EXEC	ERROR=0
+		ERROR - $'+ : \'(S1)\' ok
++ : \'(S2)\' ok
++ : \'(S3)\' ok'
+		EXIT 0
+
+	EXEC	ERROR=0
+		ERROR -

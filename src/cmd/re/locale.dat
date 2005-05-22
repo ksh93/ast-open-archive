@@ -1,5 +1,26 @@
 : X/Open regex locale tests 2002-08-12
 
+# regex private persistent locale data exercizes
+
+Ei	Ei	Ei	(0,2)
+Ei	Ei	ei	(0,2)
+Ei	ei	Ei	(0,2)
+Ei	ei	ei	(0,2)
+
+{C	es_ES
+Ei	Éi	Éi	(0,2)
+Ei	Éi	éi	(0,2)
+Ei	éi	Éi	(0,2)
+Ei	éi	éi	(0,2)
+}
+
+{C	de_DE
+Ei	Éi	Éi	(0,2)
+Ei	Éi	éi	(0,2)
+Ei	éi	Éi	(0,2)
+Ei	éi	éi	(0,2)
+}
+
 # debug mutibyte locale
 
 {C	debug

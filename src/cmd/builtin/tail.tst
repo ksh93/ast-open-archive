@@ -30,21 +30,31 @@ TEST 01 'basic'
 	EXEC	10.dat
 		OUTPUT - $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
 	EXEC	+0 10.dat
+	EXEC	-n +0 10.dat
 	EXEC	+1 10.dat
+	EXEC	-n +1 10.dat
 	EXEC	+2 10.dat
 		OUTPUT - $'2\n3\n4\n5\n6\n7\n8\n9\n10'
+	EXEC	-n +2 10.dat
 	EXEC	-9 10.dat
+	EXEC	-n -9 10.dat
 	EXEC	-1 10.dat
 		OUTPUT - $'10'
+	EXEC	-n -1 10.dat
 	EXEC	+10 10.dat
+	EXEC	-n +10 10.dat
 	EXEC	100.dat
 		OUTPUT - $'91\n92\n93\n94\n95\n96\n97\n98\n99\n100'
 	EXEC	-1 100.dat
 		OUTPUT - $'100'
+	EXEC	-n -1 100.dat
 	EXEC	+100 100.dat
+	EXEC	-n +100 100.dat
 	EXEC	-2 100.dat
 		OUTPUT - $'99\n100'
+	EXEC	-n -2 100.dat
 	EXEC	+99 100.dat
+	EXEC	-n +99 100.dat
 	EXEC	-c 6 100.dat
 		OUTPUT - $'9\n100'
 	EXEC	-6c 100.dat

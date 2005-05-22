@@ -104,37 +104,38 @@ getxops(register Archive_t* ap, register File_t* f)
 	register char*	s;
 	register int	c;
 
-	if (f->namesize > (c = strlen(f->name) + 1)) for (p = f->name + c; c = *p++;)
-	{
-		for (s = p; *p; p++);
-		p++;
-		message((-2, "%s: %s: entry %d.%d op = %c%s", ap->name, f->name, ap->volume, ap->entry, c, s));
-		switch (c)
+	if (f->namesize > (c = strlen(f->name) + 1))
+		for (p = f->name + c; c = *p++;)
 		{
-		case 'd':
-			IDEVICE(f->st, strtol(s, NiL, 16));
-			break;
-		case 'g':
-			f->st->st_gid = strtol(s, NiL, 16);
-			break;
-		case 's':
-			f->st->st_size = strtoll(s, NiL, 16);
-			break;
-		case 'u':
-			f->st->st_uid = strtol(s, NiL, 16);
-			break;
-		case 'G':
-			f->gidname = s;
-			break;
-		case 'U':
-			f->uidname = s;
-			break;
+			for (s = p; *p; p++);
+			p++;
+			message((-2, "%s: %s: entry %d.%d op = %c%s", ap->name, f->name, ap->volume, ap->entry, c, s));
+			switch (c)
+			{
+			case 'd':
+				IDEVICE(f->st, strtol(s, NiL, 16));
+				break;
+			case 'g':
+				f->st->st_gid = strtol(s, NiL, 16);
+				break;
+			case 's':
+				f->st->st_size = strtoll(s, NiL, 16);
+				break;
+			case 'u':
+				f->st->st_uid = strtol(s, NiL, 16);
+				break;
+			case 'G':
+				f->gidname = s;
+				break;
+			case 'U':
+				f->uidname = s;
+				break;
 
-			/*
-			 * NOTE: ignore unknown ops for future extensions
-			 */
+				/*
+				 * NOTE: ignore unknown ops for future extensions
+				 */
+			}
 		}
-	}
 }
 
 /*
@@ -450,7 +451,7 @@ cpio_event(Pax_t* pax, Archive_t* ap, File_t* f, void* data, unsigned long event
 
 	switch (event)
 	{
-	case EVENT_BUG_19951031:
+	case PAX_EVENT_BUG_19951031:
 		/*
 		 * compensate for a pre 19951031 pax bug
 		 * that added linknamesize to st_size
@@ -472,7 +473,7 @@ cpio_event(Pax_t* pax, Archive_t* ap, File_t* f, void* data, unsigned long event
 			}
 		}
 		return 1;
-	case EVENT_DELTA_EXTEND:
+	case PAX_EVENT_DELTA_EXTEND:
 		return 1;
 	}
 	return 0;
@@ -553,7 +554,8 @@ asc_putheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	paxwrite(pax, ap, state.tmp.buffer, ASC_HEADER);
 	paxwrite(pax, ap, f->name, f->namesize);
 	if (n = (ASC_HEADER + f->namesize) % ASC_ALIGN)
-		while (n++ < ASC_ALIGN) paxwrite(pax, ap, "", 1);
+		while (n++ < ASC_ALIGN)
+			paxwrite(pax, ap, "", 1);
 	return 1;
 }
 
@@ -733,7 +735,8 @@ binary_putheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 	paxwrite(pax, ap, &hdr, BINARY_HEADER);
 	paxwrite(pax, ap, f->name, f->namesize);
 	if (n = (BINARY_HEADER + f->namesize) % BINARY_ALIGN)
-		while (n++ < BINARY_ALIGN) paxwrite(pax, ap, "", 1);
+		while (n++ < BINARY_ALIGN)
+			paxwrite(pax, ap, "", 1);
 	if (f->type == X_IFLNK)
 	{
 		if (streq(f->name, f->linkpath))
@@ -868,7 +871,7 @@ Format_t	pax_cpio_format =
 	0,
 	0,
 	cpio_event,
-	EVENT_BUG_19951031|EVENT_DELTA_EXTEND
+	PAX_EVENT_BUG_19951031|PAX_EVENT_DELTA_EXTEND
 };
 
 PAXLIB(&pax_cpio_format)

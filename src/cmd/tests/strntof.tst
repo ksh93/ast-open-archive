@@ -218,32 +218,32 @@ strntold  "+in0" "+in0" 0.0000000000000000000000000000000e+00 OK
 strntod   "-in0" "-in0" 0.000000000000000e+00 OK
 strntold  "-in0" "-in0" 0.0000000000000000000000000000000e+00 OK'
 	EXEC	3 NaN 4 +NaN 4 -NaN
-		OUTPUT - $'strntod   "NaN" "" Inf OK
-strntold  "NaN" "" Inf OK
+		OUTPUT - $'strntod   "NaN" "" NaN OK
+strntold  "NaN" "" NaN OK
 
-strntod   "+NaN" "" Inf OK
-strntold  "+NaN" "" Inf OK
+strntod   "+NaN" "" NaN OK
+strntold  "+NaN" "" NaN OK
 
-strntod   "-NaN" "" -Inf OK
-strntold  "-NaN" "" -Inf OK'
+strntod   "-NaN" "" NaN OK
+strntold  "-NaN" "" NaN OK'
 	EXEC	15 NaN12-34abc.def 16 +NaN12-34abc.def 16 -NaN12-34abc.def
-		OUTPUT - $'strntod   "NaN12-34abc.def" "" Inf OK
-strntold  "NaN12-34abc.def" "" Inf OK
+		OUTPUT - $'strntod   "NaN12-34abc.def" "" NaN OK
+strntold  "NaN12-34abc.def" "" NaN OK
 
-strntod   "+NaN12-34abc.def" "" Inf OK
-strntold  "+NaN12-34abc.def" "" Inf OK
+strntod   "+NaN12-34abc.def" "" NaN OK
+strntold  "+NaN12-34abc.def" "" NaN OK
 
-strntod   "-NaN12-34abc.def" "" -Inf OK
-strntold  "-NaN12-34abc.def" "" -Inf OK'
+strntod   "-NaN12-34abc.def" "" NaN OK
+strntold  "-NaN12-34abc.def" "" NaN OK'
 	EXEC	3 NaN12-34abc.def 4 +NaN12-34abc.def 4 -NaN12-34abc.def
-		OUTPUT - $'strntod   "NaN12-34abc.def" "12-34abc.def" Inf OK
-strntold  "NaN12-34abc.def" "12-34abc.def" Inf OK
+		OUTPUT - $'strntod   "NaN12-34abc.def" "12-34abc.def" NaN OK
+strntold  "NaN12-34abc.def" "12-34abc.def" NaN OK
 
-strntod   "+NaN12-34abc.def" "12-34abc.def" Inf OK
-strntold  "+NaN12-34abc.def" "12-34abc.def" Inf OK
+strntod   "+NaN12-34abc.def" "12-34abc.def" NaN OK
+strntold  "+NaN12-34abc.def" "12-34abc.def" NaN OK
 
-strntod   "-NaN12-34abc.def" "12-34abc.def" -Inf OK
-strntold  "-NaN12-34abc.def" "12-34abc.def" -Inf OK'
+strntod   "-NaN12-34abc.def" "12-34abc.def" NaN OK
+strntold  "-NaN12-34abc.def" "12-34abc.def" NaN OK'
 
 TEST 05 'simple, right?'
 	EXEC	1 1 2 12 3 1.2 5 1.2.3

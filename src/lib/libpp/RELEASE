@@ -1,3 +1,5 @@
+05-04-11 pplex.c: fix '"a" #s' catliteral + stringize bug
+05-03-29 pp.probe: check $? and stderr messages for pp:lineid
 05-02-20 probe.win32: handle /platformsdk mount
 05-01-11 ppargs.c: fix -I-S docs
 	 ppinput.c: ppproto() only for COMPATIBILITY or PLUSPLUS

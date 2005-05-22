@@ -1,3 +1,6 @@
+05-05-20 test(fmt|fnmatch|match|regex): handle file args for rt(1)
+05-04-03 sed: change regexec() => regnexec() to handle embedded '\0'
+05-03-30 testmatch.dat,testregex.dat: add '[*' REG_SHELL pattern tests
 04-06-08 ed.c: fix move() bug that botched pointers across append()
 04-05-24 testregex.dat: add more backreference tests
 04-05-11 testregex.c: matchprint() now lists (?,?) up to nsub

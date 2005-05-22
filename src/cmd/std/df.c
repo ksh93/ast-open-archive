@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: df (AT&T Labs Research) 2004-02-11 $\n]"
+"[-?\n@(#)$Id: df (AT&T Labs Research) 2005-04-06 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -279,9 +279,9 @@ static const char	fmt_std[] = "%#..1(filesystem)s %#(blocks)s %#(used)s %#(avail
 #define F_FRSIZE(v)	(512)
 #else
 #if _mem_f_frsize_statvfs
-#define F_FRSIZE(v)	((v)->f_frsize?(v)->f_frsize:(v)->f_bsize)
+#define F_FRSIZE(v)	((v)->f_frsize?(v)->f_frsize:(v)->f_bsize?(v)->f_bsize:1024)
 #else
-#define F_FRSIZE(v)	((v)->f_bsize)
+#define F_FRSIZE(v)	((v)->f_bsize?(v)->f_bsize:1024)
 #endif
 #endif
 

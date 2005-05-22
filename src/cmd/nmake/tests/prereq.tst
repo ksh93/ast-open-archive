@@ -77,7 +77,7 @@ bind .MAM.INIT 0.0
 make .FIND.
 bind .FIND. 0.0
 done .FIND. virtual
-setv PACKAGEROOT ${PACKAGEROOT}
+setv PACKAGEROOT $HOME
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -205,7 +205,7 @@ bind .MAM.INIT 0.0
 make .FIND.
 bind .FIND. 0.0
 done .FIND. virtual
-setv PACKAGEROOT ${PACKAGEROOT}
+setv PACKAGEROOT $HOME
 setv AR ar
 setv ARFLAGS cr
 setv AS as
@@ -425,7 +425,7 @@ t1 : t1.c getDep
 	: Making $(<)
 t2 : t2.c getDep 
 	: Making $(<)
-.DONE : .MAKE $(AHA)
+.DONE : .MAKE $(HIT)
 	print .DONE Targets = $(Targets)'
 		INPUT t1.c
 		OUTPUT - $'+ : Making t1
@@ -506,7 +506,7 @@ bar :: bar.c
 + if	silent test ! -d bin
 + then	mkdir -p bin 		    		   
 + fi
-+ : bar.o .COMMAND.o \'(CCLD)\' \'(CCLDFLAGS)\' :'
++ : bar.o .COMMAND.o \'(CC.SHARED.LIBS.bar)\' \'(CCLD)\' \'(CCLDFLAGS)\' :'
 
 TEST 11 ':LIBRARY: with version variants'
 
@@ -693,7 +693,7 @@ TEST 12 '-l prereq libs'
 		INPUT foo.req $' -lfoo -lbar'
 		INPUT bar.req $' -lbar -lfoo'
 		OUTPUT - $'+ cc -O   -c baz.c
-+ cc  -O   -o baz baz.o libbar.a libfoo.a'
++ cc  -O   -o baz baz.o libfoo.a libbar.a'
 
 TEST 13 'nested : scope'
 

@@ -65,10 +65,10 @@ reerror(regex_t* re, int code)
 }
 
 int
-reexec(regex_t* re, char* s, size_t nmatch, regmatch_t* match, int flags)
+reexec(regex_t* re, char* s, size_t n, size_t nmatch, regmatch_t* match, int flags)
 {
 	int code;
-	if((code = regexec(re, s, nmatch, match, flags)) && code != REG_NOMATCH)
+	if((code = regnexec(re, s, n, nmatch, match, flags)) && code != REG_NOMATCH)
 		reerror(re, code);
 	return code;
 }
@@ -78,7 +78,7 @@ substitute(regex_t *re, Text *data)
 {
 	int n;
 	regmatch_t matches[10];
-	if(reexec(re, (char*)data->s, elementsof(matches), matches, 0))
+	if(reexec(re, (char*)data->s, data->w - data->s, elementsof(matches), matches, 0))
 		return 0;
 	if(n = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {
 		reerror(re, n);

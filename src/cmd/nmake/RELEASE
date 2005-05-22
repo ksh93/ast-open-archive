@@ -1,4 +1,30 @@
+05-05-18 Makerules.mk: fix --static-link typo
+	 Makerules.mk: disable .MAMACTION "setv FOO ${FOO}"
+	 Makerules.mk: add (CC.SHARED.LIBS.*) to capture -l* bind changes
+05-05-11 Makerules.mk: fix --nolib-type to work for referenced libs too
+05-05-05 Scanrules.mk: handle cobol COPY "book" optional quotes
+05-05-01 Makerules.mk: drop -D* from COBOLFLAGS
+	 Makerules.mk: :PACKAGE: :dynamic => :notype
+05-04-26 Makerules.mk: add COBOLDIALECT
+05-04-20 Makerules.mk: add :P=A: to .LIST.PACKAGE.BINARY VROOT logic
+	 Makerules.mk: fix PACKAGE_%_LIB logic to handle /usr/%/lib64 etc.
+	 version.c: fix OLDMAKE to search $(PATH) for { gmake make }
+05-04-15 option.c: fix regress state.start for hi res clock lo res filesystem
+	 state.c: failed statevar action must set statevar time to 0
+	 Makerules.mk: change manifest edit op :P=F: => :P=F:T=FR:
+05-04-14 Makerules.mk: drop /usr/common from LCLDIRS, /home from OPTDIRS
+05-04-11 command.c: set internal.openfd FD_CLOEX before coopen()
+05-04-08 parse.c: revisit space indentation [syntax:10]
+         object.c: pre-2005-03-01 corruption repair drops 0 prereq list items
+05-04-03 variable.c: fix += vs space inconsistencies [assign:09]
+	 Makerules.mk: restore $(PACKAGE_LOCAL) -- used in user makefiles
+05-03-31 Makerules.mk: add --lib-type
+	 object.c: move bound object prereq name to COMP_NSEC
+	 parse.c: fix assertion/assignment intercept $(%) to be operator name
 05-03-19 Makerules.mk: %.sh chmod only if not already writeable&executable
+	 Makerules.mk: mam ${-debug-symbols...} defaults to ${CCFLAGS.FORCE}
+	 make.c: fix optional joint metarule prereq state check
+	 metarule.c: fix closure ordering bug (metarule:23)
 	 object.c: don't mark (P_joint|P_target) garbage
 	 object.c: fix makefile prereq subsecond truncation time check
 	 object.c: fix makefile .SOURCE.mk prereq change bug (diagnostics:14)

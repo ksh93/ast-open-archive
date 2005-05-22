@@ -343,6 +343,7 @@ getepilogue(register Archive_t* ap)
 	register char*	s;
 	register off_t	n;
 	register int	i;
+	unsigned int	z;
 	char		buf[BLOCKSIZE];
 
 	ap->section = SECTION_CONTROL;
@@ -369,18 +370,22 @@ getepilogue(register Archive_t* ap)
 					ap->io->keep--;
 				goto done;
 			}
+			z = 0;
 			i = MAXBLOCKS;
 			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, buf, (off_t)0, (off_t)n, 0) > 0)
 				do
 				{
 					for (s = buf; s < buf + n && !*s; s++);
+					z += s - buf;
+					if (z >= BLOCKSIZE)
+						goto done;
 					if (s < buf + n)
 					{
 						if (n == BLOCKSIZE)
 						{
-							if (ap->format->event && (ap->format->events & EVENT_SKIP_JUNK))
+							if (ap->format->event && (ap->format->events & PAX_EVENT_SKIP_JUNK))
 							{
-								if ((*ap->format->event)(&state, ap, NiL, buf, EVENT_SKIP_JUNK) > 0)
+								if ((*ap->format->event)(&state, ap, NiL, buf, PAX_EVENT_SKIP_JUNK) > 0)
 									continue;
 								if (i = MAXBLOCKS - i)
 									error(1, "%s: %d junk block%s after volume %d", ap->name, i, i == 1 ? "" : "s", ap->volume);
@@ -441,8 +446,8 @@ putepilogue(register Archive_t* ap)
 		state.selected = ap->selected;
 		if (ap->delta && (ap->delta->format->flags & DELTA))
 		{
-			if (ap->format->event && (ap->format->events & EVENT_DELTA_EXTEND))
-				(*ap->format->event)(&state, ap, NiL, NiL, EVENT_DELTA_EXTEND);
+			if (ap->format->event && (ap->format->events & PAX_EVENT_DELTA_EXTEND))
+				(*ap->format->event)(&state, ap, NiL, NiL, PAX_EVENT_DELTA_EXTEND);
 			else
 				putinfo(ap, NiL, ap->delta->index + 1, 0);
 		}

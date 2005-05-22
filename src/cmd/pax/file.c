@@ -937,8 +937,8 @@ addlink(register Archive_t* ap, register File_t* f)
 			return 0;
 	linked:
 		message((-1, "addlink(%s,%s)", f->name, f->linkpath));
-		if (ap->format->event && (ap->format->events & EVENT_BUG_19951031))
-			(*ap->format->event)(&state, ap, f, NiL, EVENT_BUG_19951031);
+		if (ap->format->event && (ap->format->events & PAX_EVENT_BUG_19951031))
+			(*ap->format->event)(&state, ap, f, NiL, PAX_EVENT_BUG_19951031);
 		if (streq(f->name, f->linkpath))
 		{
 			error(2, "%s: hard link loops to self", f->name);
@@ -1073,7 +1073,7 @@ getarchive(int op)
 
 	app = (op & OUT) ? &state.out : &state.in;
 	if (!*app)
-		*app = initarchive(NiL, (op & OUT) ? (O_CREAT|O_TRUNC|O_WRONLY) : O_RDONLY);
+		*app = initarchive(NiL, (op & OUT) ? (state.append ? (O_WRONLY|O_APPEND|O_CREAT) : (O_CREAT|O_TRUNC|O_WRONLY)) : O_RDONLY);
 	return *app;
 }
 

@@ -349,3 +349,66 @@ done b'
 		OUTPUT - $'init a'
 		ERROR - $'make: *** exit code 1 making a'
 		EXIT 1
+
+TEST 10 'space indentation'
+
+	EXEC	-n
+		INPUT Makefile $'T1 = t1
+	T2 = t2
+   T3 = t3
+all :
+	echo 1 -- tab
+        echo 2 -- 8 spaces
+         echo 3 -- 9 spaces
+        echo 4 -- 8 spaces
+       echo 5 -- 7 spaces
+ echo 6 -- 1 space
+	echo 7 -- another tab
+		echo 8 -- 1 extra tab
+	echo 9 -- last tab
+
+	echo 11 T1=$(T1)
+	echo 12 T2=$(T2)
+	echo 13 T3=$(T3)'
+		OUTPUT - $'+ echo 1 -- tab
++ echo 2 -- 8 spaces
++ echo 3 -- 9 spaces
++ echo 4 -- 8 spaces
++ echo 5 -- 7 spaces
++ echo 6 -- 1 space
++ echo 7 -- another tab
++ 	echo 8 -- 1 extra tab
++ echo 9 -- last tab
++ 
++ echo 11 T1=t1
++ echo 12 T2=t2
++ echo 13 T3=t3'
+		ERROR - $'make: "Makefile", line 3: warning: <space> indentation may be non-portable'
+
+	EXEC	-n
+		INPUT Makefile $'   all : one two three four
+  one :
+   : 1.1 :
+ two :
+  : 2.1 :
+   : 2.2 :
+ three :
+   : 3.1 :
+
+    : 3.3 :
+four :
+ : 4.1 :
+   : 4.2 :
+    
+    : 4.4 :'
+		OUTPUT - $'+ : 1.1 :
++ : 2.1 :
++ : 2.2 :
++ : 3.1 :
++ 
++ : 3.3 :
++ : 4.1 :
++ : 4.2 :
++ 
++ : 4.4 :'
+		ERROR - $'make: "Makefile", line 1: warning: <space> indentation may be non-portable'

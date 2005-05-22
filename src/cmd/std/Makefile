@@ -26,7 +26,7 @@ mesg :: mesg.c LICENSE=since=1995,author=dgk
 
 $(PACKAGE_LOCAL)mount :: mount.c LICENSE=since=1998,author=gsf $(CC.HOSTTYPE:N=sun4:?+last??)
 
-$(PACKAGE_LOCAL)ps :: ps.c pss.c pss-null.c LICENSE=since=1998,author=gsf \
+ps :: ps.c pss.c pss-null.c LICENSE=since=1998,author=gsf \
 	pss-procfs.c pss-getprocs.c pss-cygwin.c pss-kvm.c pss-pstat.c \
 	pss-ps.c pss-info.c $(CC.HOSTTYPE:N=(sol|unixware).*:??-lkvm?)
 

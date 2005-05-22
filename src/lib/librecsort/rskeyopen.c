@@ -26,7 +26,7 @@
 
 #include "rskeyhdr.h"
 
-static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2004-08-11 $\0\n";
+static const char id[] = "\n@(#)$Id: rskey library (AT&T Research) 2005-05-15 $\0\n";
 
 static const char lib[] = "librecsort:rskey";
 

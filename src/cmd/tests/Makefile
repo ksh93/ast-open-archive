@@ -13,6 +13,17 @@ LICENSE = since=1999,author=gsf
 
 base64 :TEST: base64.c
 
+.SOURCE : cdt
+.SOURCE.h : ../../lib/libast/cdt
+
+cdt :TEST: testcdt dttest.h +last \
+	cdt/tbags.c cdt/tevent.c cdt/tobag.c cdt/tqueue.c cdt/trenew.c \
+	cdt/tsearch.c cdt/tshare.c cdt/tstack.c cdt/tview.c
+		set +x; $(*:O=1) $(TESTCDTFLAGS) $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
+
+test.dt : testcdt dttest.h +last $$(*.ARGS:D:B:S=.c) .CLEARARGS
+	$(*:O=1) -v $(*:O>1) $(CC) $(CCFLAGS) $(LDFLAGS)
+
 date :TEST: date.c date.msk date.dat datey1k.dat datey2k.dat week.dat
 	for i in $(*:N=*.dat)
 	do	DATEMSK=$(*:N=*.msk:/ /:/G) TZ=EST5EDT $(*:O=1) $(TESTDATEFLAGS) < $i

@@ -27,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cpp (AT&T Labs Research) 2005-01-11 $\n]"
+"[-?\n@(#)$Id: cpp (AT&T Research) 2005-04-11 $\n]"
 USAGE_LICENSE
 "[+NAME?cpp - C language preprocessor]"
 "[+DESCRIPTION?\bcpp\b is the preprocessor for all C language dialects. It is"

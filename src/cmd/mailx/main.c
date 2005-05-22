@@ -129,9 +129,10 @@ USAGE_LICENSE
 "[n!:master?Read commands from \b/etc/mailx.rc\b on receive mode startup.]"
 "[o:set?Set \aname\a=\avalue\a options. The interactive mail command"
 "	\bhelp set all\b lists details for each option.]:[name=value]"
+"[r:address?Set the reply to header address to \aaddress\a.]:[address]"
 "[s:subject?The non-interactive send mode subject text.]:[text]"
 "[t:sendheaders?Check for headers in send mode message text.]"
-"[u:user?Pretend to be this user. For debugging.]"
+"[u:user?Pretend to be this \buser\b in send mode. For debugging.]:[user]"
 "[v:verbose?Enable implementation specific send mode verbose trace.]"
 "\n"
 "\n[ address ... ]\n"
@@ -147,7 +148,7 @@ USAGE_LICENSE
 
 #else
 
-static const char usage[] = "AFHINPQ:ST:b:c:defino:s:tu:v";
+static const char usage[] = "AFHINPQ:ST:b:c:defino:r:s:tu:v";
 
 #endif
 
@@ -230,6 +231,9 @@ main(int argc, char** argv)
 	struct header	head;
 	struct list	options;
 	struct list*	op;
+#if _PACKAGE_ast
+	int		fatal = 0;
+#endif
 
 #if _PACKAGE_ast
 	error_info.id = "mailx";
@@ -376,6 +380,24 @@ main(int argc, char** argv)
 			 */
 			op = setopt(op, optarg, NiL);
 			continue;
+		case 'r':
+			/*
+			 * Set replyto.
+			 */
+			{
+				char*			s;
+				int			n;
+
+				static const char	h[] = "fixedheaders=Reply-To:\" \"";
+
+				n = strlen(optarg);
+				if (!(s = newof(0, char, n + sizeof(h) + 1, 0)))
+					note(PANIC, "Out of space");
+				memcpy(s, h, sizeof(h) - 1);
+				memcpy(s + sizeof(h) - 1, optarg, n);
+				op = setopt(op, s, NiL);
+			}
+			continue;
 		case 's':
 			/*
 			 * Give a subject field for sending from
@@ -409,6 +431,7 @@ main(int argc, char** argv)
 			break;
 		case ':':
 			error(2, "%s", opt_info.arg);
+			fatal = 1;
 			break;
 #else
 		case '?':
@@ -420,6 +443,10 @@ Usage: mail [-o [no]name[=value]] [-s subject] [-c cc] [-b bcc] to ...\n\
 		}
 		break;
 	}
+#if _PACKAGE_ast
+	if (fatal)
+		error(ERROR_USAGE|4, "%s", optusage(NiL));
+#endif
 	for (i = optind; (argv[i]) && (*argv[i] != '-'); i++)
 		extract(&head, GTO|GMETOO, argv[i]);
 	if (argv[i])

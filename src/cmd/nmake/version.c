@@ -49,7 +49,7 @@ MAKEPP = $(MAKERULESPATH:/:/ /G:D:X=cpp:P=X:O=1)\n\
 MAKEPPFLAGS = -I- $(PPFLAGS) -D:'map \"/#<(comment|rules)>/\"' -D-P\n\
 MAKERULES = makerules\n\
 MAKERULESPATH = $(LOCALRULESPATH):$(MAKELOCALPATH):$(PATH:/:/ /G:D:B=lib/make:@/ /:/G):$(MAKELIB):$(INSTALLROOT|HOME)/lib/make:/usr/local/lib/make:/usr/lib/make\n\
-OLDMAKE = /bin/make\n\
+OLDMAKE = $(PATH:/:/ /G:X=gmake make:P=X)\n\
 PPFLAGS = $(*.SOURCE.mk:/^/-I/) $(-:N=-[DU]*)\n\
 - : .MAKE .NULL .VIRTUAL .FORCE .REPEAT .FOREGROUND .IGNORE .MULTIPLE\n\
 .ORDER : nmake\n\

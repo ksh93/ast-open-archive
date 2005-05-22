@@ -2633,7 +2633,18 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 			sfputr(xp, r->name, -1);
 		return;
 	case 'U':
-		sfputr(xp, (r->property & P_staterule) ? rulestate(r, 1)->name : (r->property & P_statevar) ? varstate(r, 1)->name : r->name, -1);
+		if (r->property & P_staterule)
+		{
+			if (r = rulestate(r, 1))
+				sfputr(xp, r->name, -1);
+		}
+		else if (r->property & P_statevar)
+		{
+			if (v = varstate(r, 0))
+				sfputr(xp, v->name, -1);
+		}
+		else
+			sfputr(xp, r->name, -1);
 		return;
 	case 'Y':
 		mimetype(xp, r->name);

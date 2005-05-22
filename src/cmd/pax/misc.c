@@ -164,7 +164,7 @@ selectfile(register Archive_t* ap, register File_t* f)
 		if (!strmatch(fmt, state.record.pattern))
 			return 0;
 	}
-	if (state.append || ap->parent)
+	if (ap->parent)
 	{
 		linked = 1;
 		addlink(ap, f);

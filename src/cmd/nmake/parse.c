@@ -936,7 +936,7 @@ getline(Sfio_t* sp, int lead, int term)
 			if (*s == '\t')
 			{
 				s++;
-				indent += state.tabstops;
+				indent += state.tabstops - indent % state.tabstops;
 			}
 			else if (*s == ' ')
 			{
@@ -950,13 +950,11 @@ getline(Sfio_t* sp, int lead, int term)
 					error(1, "<space> indentation may be non-portable");
 					warned = 1;
 				}
-				while (*s == ' ' && indent < pp->indent + state.tabstops)
+				while (*s == ' ')
 				{
 					s++;
 					indent++;
 				}
-				if (indent % state.tabstops)
-					indent += state.tabstops - indent % state.tabstops;
 			}
 			else
 				break;
@@ -1942,8 +1940,10 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 	}
 	if (internal.assert_p->prereqs && (opr = associate(internal.assert_p, NiL, lhs, NiL)) && opr->prereqs && (opr = opr->prereqs->rule) && (opr->property & P_operator) && !opr->uname)
 	{
-		opr->uname = lhs;
+		s = opr->uname = opr->name;
+		opr->name = lhs;
 		apply(opr, lhs, rhs, act, CO_ALWAYS|CO_LOCAL|CO_URGENT);
+		opr->name = s;
 		opr->uname = 0;
 		return;
 	}
@@ -2591,8 +2591,10 @@ assignment(char* lhs, int op, char* rhs)
 
 	if (internal.assign_p->prereqs && (r = associate(internal.assign_p, NiL, lhs, NiL)) && r->prereqs && (r = r->prereqs->rule) && (r->property & P_operator) && !r->uname)
 	{
-		r->uname = (op & OP_APPEND) ? "+=" : (op & OP_AUXILIARY) ? "&=" : (op & OP_STATE) ? "==" : "=";
+		s = r->uname = r->name;
+		r->name = (op & OP_APPEND) ? "+=" : (op & OP_AUXILIARY) ? "&=" : (op & OP_STATE) ? "==" : "=";
 		apply(r, lhs, rhs, NiL, CO_ALWAYS|CO_LOCAL|CO_URGENT);
+		r->name = s;
 		r->uname = 0;
 		return;
 	}

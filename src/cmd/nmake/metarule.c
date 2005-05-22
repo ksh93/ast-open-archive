@@ -268,7 +268,9 @@ metaclose(Rule_t* in, Rule_t* out, int c)
 	if (!c && !(state.questionable & 0x00000100))
 		return;
 	for (q = internal.metarule->prereqs; q; q = q->next)
+	{
 		if (metamatch(stem, out->name, q->rule->name) && (x = metainfo('O', q->rule->name, NiL, 0)))
+		{
 			for (p = x->prereqs; p; p = p->next)
 			{
 				metaexpand(internal.met, stem, p->rule->name);
@@ -292,6 +294,28 @@ metaclose(Rule_t* in, Rule_t* out, int c)
 					x->dynamic &= ~D_compiled;
 				}
 			}
+		}
+		if (c != PREREQ_DELETE && metamatch(stem, q->rule->name, in->name) && !streq(stem, "%") && (x = metainfo('I', q->rule->name, NiL, 0)))
+		{
+			metaexpand(internal.met, stem, out->name);
+			if (!streq(stem, q->rule->name))
+			{
+				z = makerule(sfstruse(internal.met));
+				for (p = x->prereqs; p; p = p->next)
+				{
+					x = metarule(p->rule->name, z->name, 1);
+					if (!(x->mark & M_metarule))
+					{
+						x->mark |= M_metarule;
+						metaclose(p->rule, z, 0);
+						x->mark &= ~M_metarule;
+					}
+					x->uname = in->name;
+					x->dynamic &= ~D_compiled;
+				}
+			}
+		}
+	}
 	if (c != PREREQ_DELETE && (z = metainfo('I', in->name, NiL, 0)))
 		for (q = z->prereqs; q; q = q->next)
 			if ((z = q->rule) != out)

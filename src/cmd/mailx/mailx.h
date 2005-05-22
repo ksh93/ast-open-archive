@@ -217,8 +217,8 @@ typedef int (*Cmd_f)(void*);
 struct cmd {
 	const char*	c_name;		/* Name of command */
 	Cmd_f		c_func;		/* Implementor of the command */
-	unsigned short	c_argtype;	/* Type of arglist (see below) */
-	unsigned short	c_msgflag;	/* Required flags of messages */
+	unsigned long	c_argtype;	/* Type of arglist (see below) */
+	unsigned long	c_msgflag;	/* Required flags of messages */
 	size_t		c_msgmask;	/* Relevant flags of messages */
 	const char*	c_help;		/* Command help text */
 };
@@ -280,13 +280,14 @@ struct parse {
 #define D	(1<<6)		/* Var unset default to initial value */
 #define E	(1<<7)		/* Var init from environ */
 #define I	(1<<8)		/* Interactive command, Var is integer */
-#define M	(1<<9)		/* Valid from send mode */
-#define N	(1<<10)		/* Var null value means off */
-#define P	(1<<11)		/* Autoprint dot after command */
-#define R	(1<<12)		/* Cannot call from collect, Readonly var */
-#define S	(1<<13)		/* Var cannot change while sourcing */
-#define W	(1<<14)		/* Invalid for readonly */
-#define Z	(1<<15)		/* Is a transparent command */
+#define L	(1<<9)		/* Append line values */
+#define M	(1<<10)		/* Valid from send mode */
+#define N	(1<<11)		/* Var null value means off */
+#define P	(1<<12)		/* Autoprint dot after command */
+#define R	(1<<13)		/* Cannot call from collect, Readonly var */
+#define S	(1<<14)		/* Var cannot change while sourcing */
+#define W	(1<<15)		/* Invalid for readonly */
+#define Z	(1L<<16)	/* Is a transparent command */
 
 /*
  * Oft-used mask values

@@ -578,7 +578,11 @@ setvar(char* s, char* v, int flags)
 		return 0;
 	}
 	if (!(isid = !!(n & NAME_identifier)) && !(n & (NAME_variable|NAME_intvar)) && !istype(*s, C_VARIABLE1|C_ID1|C_ID2) && *s != '(')
+	{
+		if (flags & V_auxiliary)
+			return 0;
 		error(2, "%s: invalid variable name", s);
+	}
 
 	/*
 	 * check for a previous definition
@@ -635,8 +639,13 @@ setvar(char* s, char* v, int flags)
 					p->property |= V_frozen;
 				if (p->value && *p->value)
 				{
-					sfprintf(internal.nam, "%s %s", p->value, v);
-					t = sfstruse(internal.nam);
+					if (*v)
+					{
+						sfprintf(internal.nam, "%s %s", p->value, v);
+						t = sfstruse(internal.nam);
+					}
+					else
+						t = p->value;
 				}
 			}
 			resetvar(p, t, n);
@@ -682,10 +691,15 @@ setvar(char* s, char* v, int flags)
 			{
 				if (state.reading && !state.global && isid)
 					p->property |= V_frozen;
-				if (s)
+				if (s && *s)
 				{
-					sfprintf(internal.nam, "%s %s", s, v);
-					t = sfstruse(internal.nam);
+					if (*v)
+					{
+						sfprintf(internal.nam, "%s %s", s, v);
+						t = sfstruse(internal.nam);
+					}
+					else
+						t = s;
 				}
 			}
 			putold(p->name, strdup(t));

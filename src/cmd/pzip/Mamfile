@@ -1,12 +1,11 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-03-19
-setv INSTALLROOT ${INSTALLROOT}
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-05-11
+setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include
 setv PACKAGE_pz_LIB ${PACKAGE_pz}/lib
-setv PACKAGE_ast ${INSTALLROOT}
-setv PACKAGE_ast_INCLUDE ${PACKAGE_ast}/include/ast
-setv PACKAGE_ast_LIB ${PACKAGE_ast}/lib
-setv PACKAGEROOT ${PACKAGEROOT}
+setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
+setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
+setv PACKAGEROOT ../../../../..
 setv AR ar
 setv ARFLAGS cr
 setv AS as
