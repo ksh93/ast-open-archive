@@ -2635,12 +2635,12 @@ token(Sfio_t* xp, char* s, register char* p, int sep)
 	case 'U':
 		if (r->property & P_staterule)
 		{
-			if (r = rulestate(r, 1))
+			if (r = rulestate(r, *ops != 'Q'))
 				sfputr(xp, r->name, -1);
 		}
 		else if (r->property & P_statevar)
 		{
-			if (v = varstate(r, 0))
+			if (v = varstate(r, *ops != 'Q'))
 				sfputr(xp, v->name, -1);
 		}
 		else

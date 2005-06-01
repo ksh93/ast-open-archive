@@ -134,7 +134,7 @@ static Namval_t *TkshOpenVar(Tcl_Interp *interp, char **name1, char **name2,
 		}
 	}
 
-        if (! (namval = nv_open(part1, tree, nvflags | NV_NOASSIGN)) )
+        if (! (namval = nv_open(part1, tree, nvflags | NV_NOASSIGN )) )
 	{
 		if (flags & TCL_LEAVE_ERR_MSG)
 			VarErrMsg(interp, part1, part2, msg, noSuchVar);

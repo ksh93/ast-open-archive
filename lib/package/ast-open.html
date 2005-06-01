@@ -2262,6 +2262,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-05-28 pax: improve "junk data after volume" checks
 05-05-22 pax: fix --append for the formats that can handle it
 05-05-18 pax-flash.c: add solaris flash embedded archive format read
 05-03-19 options.c: -l == --link (not --local) per posix
@@ -3072,6 +3073,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-05-25 Makerules.mk: use $(CC.INCLUDE.LOCAL) instead of -I- CC.DIALECT
 05-05-18 Makerules.mk: fix --static-link typo
 	 Makerules.mk: disable .MAMACTION "setv FOO ${FOO}"
 	 Makerules.mk: add (CC.SHARED.LIBS.*) to capture -l* bind changes
@@ -4700,7 +4702,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-06-06 reg.dat: transcribe from tcl 8.3 Spencer reg.test
 05-05-20 test(fmt|fnmatch|match|regex): handle file args for rt(1)
+	 nested.dat: add
 05-04-03 sed: change regexec() =&gt; regnexec() to handle embedded '&nbsp;'
 05-03-30 testmatch.dat,testregex.dat: add '&#0091;*' REG_SHELL pattern tests
 04-06-08 ed.c: fix move() bug that botched pointers across append()
@@ -4841,6 +4845,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sort changes">sort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-05-31 main.c: mv rslib() before key-&gt;input&#0091;&#0093; record format processing
 05-05-17 main.c: delay -l* =&gt; rslib() until all options parsed
 05-05-11 main.c: fix -R* parse, preserve output zip/record attributes
 04-12-01 main.c: fix -zI bug that only worked for 1 input file (sort#26)
@@ -5267,7 +5272,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-05-05-23 regex: REX_NEST (?&#0091;D.&#0093;&#0091;E.&#0093;&#0091;L.&#0093;&#0091;Q.&#0093;&#0091;oc&#0093;...)
+05-06-02 features/*,Makefile: drop vestigel iffeio.h bootstrap workaround
+05-05-31 string/fmtbuf.c: unlock (spin) before each return -- doh
+05-05-30 sfio/sfpkrd.c: work around macos 10.4 recv(MSG_PEEK) bug
+05-05-27 regex: add REX_NEST (?%&#0091;S.&#0093;&#0091;T.&#0093;&#0091;OT&#0093;)
+	 magic.tab: ammend bsd db magic
+05-05-23 regex: REX_NEST (?%&#0091;D.&#0093;&#0091;E.&#0093;&#0091;L.&#0093;&#0091;Q.&#0093;&#0091;oc&#0093;...)
 05-05-21 regex: state.fold&#0091;&#0093; is now locale specific -- doh
 05-05-19 regex: add REX_NEST (?%lt;&gt;&#0091;&#0093;""...) %(...) nested match
 05-05-15 recfmt.h: add recstr() reclen() fmtrec()
@@ -7734,7 +7744,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>May 24, 2005</TD>
+<TD align=right>June 06, 2005</TD>
 </TR>
 </TABLE>
 <P>

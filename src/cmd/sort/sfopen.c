@@ -149,7 +149,7 @@ sfopen(Sfio_t* f, const char* path, const char* mode)
 				}
 				break;
 			}
-			if (n)
+			if (n > 1 || n == 1 && !access(path, R_OK))
 				do
 				{
 					if ((!x->arg[0] || strmatch(error_info.id, x->arg[0])) &&

@@ -55,6 +55,8 @@
 #define PAX_STANDARD	(1L<<15)	/* the standard format		*/
 #define PAX_SUM		(1L<<16)	/* inline member checksum	*/
 
+#define PAX_FORMAT	(1L<<24)	/* first format specific flag	*/
+
 #define PAX_BLOCK	512		/* io block size		*/
 #define PAX_DEFBLOCKS	20		/* default blocking		*/
 #define PAX_DEFBUFFER	16		/* default io buffer blocking	*/
@@ -123,7 +125,7 @@ struct Paxformat_s			/* format info			*/
 	char*		match;		/* name strgrpmatch pattern	*/
 	char*		desc;		/* description			*/
 	int		variant;	/* variant index		*/
-	int		flags;		/* io info			*/
+	_ast_int4_t	flags;		/* flags			*/
 	unsigned long	regular;	/* default regular blocking	*/
 	unsigned long	special;	/* default special blocking	*/
 	int		align;		/* trailer alignment		*/
@@ -153,7 +155,7 @@ struct Paxarchive_s			/* archive info			*/
 	char*		name;		/* archive name			*/
 	void*		data;		/* format specific data		*/
 	Paxformat_t*	format;		/* format			*/
-	int		flags;		/* format flags			*/
+	_ast_int4_t	flags;		/* format flags			*/
 	int		incomplete;	/* file requires new volume	*/
 	int		volume;		/* volume number		*/
 	size_t		entries;	/* total number of entries	*/
@@ -177,7 +179,7 @@ struct Pax_s				/* global state			*/
 {
 	const char*	id;		/* interface id			*/
 	const char*	passphrase;	/* encryption passphrase	*/
-	int		flags;		/* flags			*/
+	_ast_int4_t	flags;		/* flags			*/
 	int		gid;		/* current group id		*/
 	int		keepgoing;	/* keep going on error		*/
 	int		list;		/* full file trace		*/

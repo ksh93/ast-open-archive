@@ -1,3 +1,4 @@
+05-05-31 main.c: mv rslib() before key->input[] record format processing
 05-05-17 main.c: delay -l* => rslib() until all options parsed
 05-05-11 main.c: fix -R* parse, preserve output zip/record attributes
 04-12-01 main.c: fix -zI bug that only worked for 1 input file (sort#26)

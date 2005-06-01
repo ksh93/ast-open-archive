@@ -84,7 +84,7 @@ typedef struct Localstat_s
 
 typedef struct Cpio_s
 {
-	int	pad;
+	int	trailer;
 #if CPIO_EXTENDED
 	char	opsbuf[PATH_MAX];	/* extended ops buffer		*/
 	char*	ops;			/* opsbuf output pointer	*/
@@ -215,11 +215,35 @@ addxopnum(Archive_t* ap, int op, Sflong_t n)
 #endif
 
 static int
+init(Archive_t* ap)
+{
+	register Cpio_t*	cpio;
+
+	if (ap->data)
+	{
+		cpio = (Cpio_t*)ap->data;
+		memset(cpio, 0, sizeof(*cpio));
+	}
+	else
+	{
+		if (!(cpio = newof(0, Cpio_t, 1, 0)))
+			nospace();
+		ap->data = cpio;
+	}
+#if CPIO_EXTENDED
+	cpio->ops = cpio->opsbuf;
+#endif
+	return 1;
+}
+
+static int
 cpio_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, unsigned char* buf, size_t size)
 {
 	int		magic;
 
-	return size >= CPIO_HEADER && buf[0] == '0' && sfsscanf((char*)buf, "%6o", &magic) == 1 && magic == CPIO_MAGIC;
+	if (size >= CPIO_HEADER && buf[0] == '0' && sfsscanf((char*)buf, "%6o", &magic) == 1 && magic == CPIO_MAGIC)
+		return init(ap);
+	return 0;
 }
 
 static int
@@ -266,6 +290,7 @@ cpio_common(Pax_t* pax, register Archive_t* ap, register File_t* f, int align, i
 #endif
 	if (streq(f->name, CPIO_TRAILER))
 	{
+		((Cpio_t*)ap->data)->trailer++;
 		getdeltaheader(ap, f);
 		if (ap->delta)
 			setinfo(ap, f);
@@ -361,17 +386,22 @@ cpio_getheader(Pax_t* pax, Archive_t* ap, register File_t* f)
 }
 
 static int
+cpio_getepilogue(Pax_t* pax, register Archive_t* ap)
+{
+	register Cpio_t*	cpio = (Cpio_t*)ap->data;
+
+	if (!cpio->trailer)
+	{
+		error(2, "%s: %s format corrupt -- epilogue (%s) not found", ap->name, ap->format->name, CPIO_TRAILER);
+		return -1;
+	}
+	return 0;
+}
+
+static int
 cpio_putprologue(Pax_t* pax, Archive_t* ap)
 {
-#if CPIO_EXTENDED
-	register Cpio_t*	cpio;
-
-	if (!(cpio = newof(0, Cpio_t, 1, 0)))
-		nospace();
-	cpio->ops = cpio->opsbuf;
-	ap->data = cpio;
-#endif
-	return 1;
+	return init(ap);
 }
 
 static int
@@ -484,7 +514,9 @@ asc_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, uns
 {
 	unsigned int		magic;
 
-	return size >= ASC_HEADER && buf[0] == '0' && sfsscanf((char*)buf, "%6o", &magic) == 1 && magic == ASC_MAGIC;
+	if (size >= ASC_HEADER && buf[0] == '0' && sfsscanf((char*)buf, "%6o", &magic) == 1 && magic == ASC_MAGIC)
+		return init(ap);
+	return 0;
 }
 
 static int
@@ -564,7 +596,9 @@ aschk_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, u
 {
 	unsigned int		magic;
 
-	return size >= ASC_HEADER && buf[0] == '0' && sfsscanf((char*)buf, "%6o", &magic) == 1 && magic == ASCHK_MAGIC;
+	if (size >= ASC_HEADER && buf[0] == '0' && sfsscanf((char*)buf, "%6o", &magic) == 1 && magic == ASCHK_MAGIC)
+		return init(ap);
+	return 0;
 }
 
 static int
@@ -675,7 +709,7 @@ binary_getprologue(Pax_t* pax, Format_t* fp, register Archive_t* ap, File_t* f, 
 	if (size >= BINARY_HEADER && (swap = swapop(&magic, buf, 2)) >= 0)
 	{
 		ap->swap = swap;
-		return 1;
+		return init(ap);
 	}
 	return 0;
 }
@@ -775,7 +809,7 @@ Format_t	pax_asc_format =
 	asc_getheader,
 	0,
 	0,
-	0,
+	cpio_getepilogue,
 	cpio_putprologue,
 	asc_putheader,
 	0,
@@ -803,7 +837,7 @@ Format_t	pax_aschk_format =
 	aschk_getheader,
 	0,
 	0,
-	0,
+	cpio_getepilogue,
 	cpio_putprologue,
 	asc_putheader,
 	0,
@@ -831,7 +865,7 @@ Format_t	pax_binary_format =
 	binary_getheader,
 	0,
 	0,
-	0,
+	cpio_getepilogue,
 	cpio_putprologue,
 	binary_putheader,
 	0,
@@ -860,7 +894,7 @@ Format_t	pax_cpio_format =
 	cpio_getheader,
 	0,
 	0,
-	0,
+	cpio_getepilogue,
 	cpio_putprologue,
 	cpio_putheader,
 	0,

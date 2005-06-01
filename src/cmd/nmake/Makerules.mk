@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-05-18 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-05-25 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -50,14 +50,14 @@ set option=';lib-type;b;-;Bind library references to \b--debug-symbols\b or \b--
 set option=';link;s;-;Hard link \binstall\b action targets matching \apattern\a instead of copying.;pattern'
 set option=';native-pp;n;-;Force the use of the native C preprocessor and print a \alevel\a diagnostic message noting the override.;level'
 set option=';official-output;s;-;The \bdiff\b(1) log file name for the \bofficial\b action. If \afile\a is a relative path name then it is written in the next view level.;file:=OFFICIAL'
-set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b-I-\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
+set option=';prefix-include;b;-;Override the C preprocessor prefix include option. \b--noprefix-include\b may be needed for some compilers that misbehave when \b$(CC.INCLUDE.LOCAL)\b is set and \b#include "..."\b assumes the subdirectory of the including file. The default value is based on the \bprobe\b(1) information.'
 set option=';preserve;sv;-;Move existing \binstall\b action targets matching \apattern\a to the \bETXTBSY\b subdirectory of the install target.;pattern:!*'
 set option=';profile;b;-;Compile and link with \bprof\b(1) instrumentation options enabled.'
 set option=';recurse;s;-;Set the recursive \b:MAKE:\b \aaction\a:;[action:=1]{[+combine?Combine all recursive makefiles into one rooted at the current directory. \b::\b, \b:PACKAGE:\b, \b.SOURCE\b*, and \bLDLIBRARIES\b are intercepted to adjust relative directory and library references. Complex makefile hierarchies may not be amenable to combination.][+list?List the recursion directories, one per line, on the standard output and exit. A \b-\b prerequisite separates groups that may be made concurrently.][+prereqs?List the recursion directory dependencies as a makefile on the standard output and exit.][+\anumber\a?Set the directory recursion concurrency level to \anumber\a.]}'
 set option=';recurse-enter;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon entering a recursive \b:MAKE:\b directory.;text'
 set option=';recurse-leave;s;-;\atext\a prependeded to the \adirectory\a\b:\b message printed on the standard error upon leaving a recursive \b:MAKE:\b directory. If \b--recurse-leave\b is not specified then no message is printed upon leaving \b:MAKE:\b directories.;text'
 set option=';select;s;-;A catenation of edit operators that selects terminal source files.;edit-ops'
-set option=';separate-include;b;-;Allow \b-I-\b to be used with compilers that support it. On by default. If \b--noseparate-include\b is set then \b-I-\b will not be used, even if the current compiler supports it.'
+set option=';separate-include;b;-;Allow \b$(CC.INCLUDE.LOCAL)\b to be used with compilers that support it. On by default. If \b--noseparate-include\b is set then \b$(CC.INCLUDE.LOCAL)\b will not be used, even if the current compiler supports it.'
 set option=';static-link;b;-;Compile and link with a preference for static libraries.'
 set option=';strip-symbols;b;-;Strip link-time static symbols from executables.'
 set option=';threads;b;-;Compile and link with thread options enabled. Not implemented yet.'
@@ -3783,8 +3783,11 @@ PACKAGES : .SPECIAL .FUNCTION
 		end
 		T3 += $$(.PTR.OPTIONS.)
 	end
+	if ! "$(CC.INCLUDE.LOCAL)" && "$(CC.DIALECT:N=-I-)" /* pre 2005-05-25 courtesy */
+		CC.INCLUDE.LOCAL = -I-
+	end
 	if "$(-separate-include)"
-		CC.SEPARATEINCLUDE := $(CC.DIALECT:N=-I-)
+		CC.SEPARATEINCLUDE := $(CC.INCLUDE.LOCAL)
 	end
 	if ! "$(-nativepp)"
 		if ! "$(-separate-include)" && "$(-?separate-include)"
@@ -3827,7 +3830,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	elif ! "$(-?prefix-include)" && ! "$(CC.SEPARATEINCLUDE)"
 		set prefix-include:=1
 	end
-	if ! "$(-?prefix-include)" && "$(CCFLAGS:N=-I-)"
+	if ! "$(-?prefix-include)" && "$(CCFLAGS:N=$(CC.INCLUDE.LOCAL)|-I-)"
 		set prefix-include:=1
 	end
 	if "$(-prefix-include)" || ! "$(-separate-include)" || "$(-nativepp)" && ! "$(CC.SEPARATEINCLUDE)"
@@ -3839,7 +3842,7 @@ PACKAGES : .SPECIAL .FUNCTION
 		if ! "$(-?prefix-include)"
 			set prefix-include:=0
 		end
-		T3 += $$(*:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(!$$$$(*):A=.LCL.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/) -I- $$$(!$$$(*):A=.STD.INCLUDE:A=.LCL.INCLUDE:@+-I.) $$$(*.SOURCE.%.STD.INCLUDE:I=$$$$(!$$$$(*):A=.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&:T=D)
+		T3 += $$(*:A=.SCAN.c:@?$$$(*.SOURCE.%.LCL.INCLUDE:I=$$$$(!$$$$(*):A=.LCL.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/) $(CC.INCLUDE.LOCAL:--I-) $$$(!$$$(*):A=.STD.INCLUDE:A=.LCL.INCLUDE:@+-I.) $$$(*.SOURCE.%.STD.INCLUDE:I=$$$$(!$$$$(*):A=.STD.INCLUDE:P=D):$(.CC.NOSTDINCLUDE.):/^/-I/)??) $$(&:T=D)
 	end
 	if "$(CC.DIALECT:N=TOUCHO)"
 		.TOUCHO : .MAKE .VIRTUAL .FORCE .REPEAT .AFTER .FOREGROUND

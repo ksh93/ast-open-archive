@@ -429,12 +429,14 @@ make cut.dat
 done cut.dat
 make libtre.dat
 done libtre.dat
+make reg.dat
+done reg.dat
 make repetition.dat
 done repetition.dat
 make rightassoc.dat
 done rightassoc.dat
 make forcedassoc.dat
 done forcedassoc.dat
-exec - testregex -c testregex.dat locale.dat testmatch.dat testsub.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat nested.dat austin.dat xopen.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat cut.dat libtre.dat repetition.dat rightassoc.dat forcedassoc.dat
+exec - testregex -c testregex.dat locale.dat testmatch.dat testsub.dat rxposix.dat zero.dat regex++.dat iso8859-1.dat perl.dat minimal.dat escape.dat group.dat nullsubexpr.dat subexpr.dat nested.dat austin.dat xopen.dat pcre-1.dat pcre-2.dat pcre-3.dat pcre-4.dat pcre-5.dat cut.dat libtre.dat reg.dat repetition.dat rightassoc.dat forcedassoc.dat
 done test.regex virtual
 done test dontcare virtual

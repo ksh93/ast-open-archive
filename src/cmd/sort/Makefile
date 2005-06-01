@@ -9,7 +9,7 @@ sort :: README RELEASE PROMO.mm sort.1 main.c sfopen.c \
 
 gen :: LICENSE=since=1998,author=gsf gen.c
 
-rec :: LICENSE=since=2005,author=gsf rec.c
+rec :: LICENSE=since=2005,author=gsf rec.c sfopen.c
 
 :TEST: sort
 

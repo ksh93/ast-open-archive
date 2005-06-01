@@ -812,7 +812,7 @@ getfile(register Archive_t* ap, register File_t* f, register Ftw_t* ftw)
 	{
 		if (!addlink(ap, f) && !state.header.linkdata)
 			f->st->st_size = 0;
-		message((-3, "getfile(%s): dev'=%d ino'=%d", f->name, f->st->st_dev, f->st->st_ino));
+		message((-4, "getfile(%s): dev'=%d ino'=%d", f->name, f->st->st_dev, f->st->st_ino));
 	}
 	ap->entries++;
 	f->delta.op = 0;

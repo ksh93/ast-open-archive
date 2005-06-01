@@ -1,3 +1,4 @@
+05-05-25 Makerules.mk: use $(CC.INCLUDE.LOCAL) instead of -I- CC.DIALECT
 05-05-18 Makerules.mk: fix --static-link typo
 	 Makerules.mk: disable .MAMACTION "setv FOO ${FOO}"
 	 Makerules.mk: add (CC.SHARED.LIBS.*) to capture -l* bind changes

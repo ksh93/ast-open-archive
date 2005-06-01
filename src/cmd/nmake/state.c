@@ -463,7 +463,7 @@ varstate(register Rule_t* r, int force)
 	else
 		t = 0;
 	if (!(v = getvar(s)) && force)
-		v = setvar(s, null, V_auxiliary);
+		v = setvar(s, null, force < 0 ? V_auxiliary : 0);
 	if (t)
 		*t = ')';
 	return v;

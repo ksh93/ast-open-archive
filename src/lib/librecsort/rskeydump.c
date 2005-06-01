@@ -78,7 +78,7 @@ register Sfio_t*	sp;
 	if (kp->nproc > 1)
 		sfprintf(sp, " nproc=%d", kp->nproc);
 	sfprintf(sp, "\n");
-	sfprintf(sp, "\trecsort format %s data%s %d key%s %d\n", fmtrec(kp->disc->data), (kp->disc->type & RS_DSAMELEN) ? " DSAMELEN" : "", kp->disc->data, (kp->disc->type & RS_KSAMELEN) ? " KSAMELEN" : "", kp->disc->keylen);
+	sfprintf(sp, "\trecsort format %s data%s 0x%08x key%s %d\n", fmtrec(kp->disc->data), (kp->disc->type & RS_DSAMELEN) ? " DSAMELEN" : "", kp->disc->data, (kp->disc->type & RS_KSAMELEN) ? " KSAMELEN" : "", kp->disc->keylen);
 	for (fp = &kp->field.global; fp; fp = fp->next)
 		dump(kp, sp, fp, "field");
 	for (fp = kp->accumulate.head; fp; fp = fp->next)

@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2005-05-17 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2005-06-03 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -586,6 +586,23 @@ parse(register Sort_t* sp, char** argv)
 		*v = 0;
 	}
 	key->input = argv;
+
+	/*
+	 * disciplines have the opportunity to modify key info
+	 */
+
+	while (lib = firstlib)
+	{
+		if (rslib(key, lib->name))
+			return 1;
+		firstlib = firstlib->next;
+		free(lib);
+	}
+
+	/*
+	 * record format chicanery
+	 */
+
 	if (RECTYPE(f) == REC_method && REC_M_INDEX(f) == REC_M_path)
 		for (n = 0, i = -1; p = key->input[n]; n++)
 			if (s = strrchr(p, '%'))
@@ -625,18 +642,6 @@ parse(register Sort_t* sp, char** argv)
 		key->disc->data = f;
 	if (sp->verbose)
 		error(0, "%s %s record format", error_info.id, fmtrec(f));
-
-	/*
-	 * disciplines have the opportunity to modify key info
-	 */
-
-	while (lib = firstlib)
-	{
-		if (rslib(key, lib->name))
-			return 1;
-		firstlib = firstlib->next;
-		free(lib);
-	}
 	return error_info.errors != 0;
 }
 
@@ -983,6 +988,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		rskeyclose(key);
 		return -1;
 	}
+	if (sp->rec->meth->type == RS_MTCOPY)
+		sp->chunk = 1;
 	return 0;
 }
 
@@ -1033,7 +1040,7 @@ flush(register Sort_t* sp, register size_t r)
 		if (rswrite(sp->rec, sp->op, RS_OTEXT))
 			error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 	}
-	else if (sp->rec->meth != Rsverify)
+	else if (sp->rec->meth->type != RS_MTVERIFY)
 	{
 		/*
 		 * write to an intermediate file and rewind for rsmerge

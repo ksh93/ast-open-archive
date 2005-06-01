@@ -560,10 +560,13 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 					metaexpand(internal.met, b, q->rule->name);
 					t = sfstruse(internal.met);
 					s = getrule(t);
-					if (!isstatevar(t))
+					if (isstatevar(t))
 					{
-						s = bindfile(s, t, BIND_RULE);
-
+				 		if (s && (s = bindstate(s, NiL)))
+							goto unconstrained;
+					}
+					else if (s = bindfile(s, t, BIND_RULE))
+					{
 						/*
 						 * use s if it exists
 						 */
@@ -578,8 +581,6 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 						if (metaget(s, NiL, stem, NiL))
 							goto unconstrained;
 					}
-				 	else if (s && (s = bindstate(s, NiL)))
-						goto unconstrained;
 				}
 		}
 	}

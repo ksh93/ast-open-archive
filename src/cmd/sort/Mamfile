@@ -168,6 +168,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sfopen.c
 meta sfopen.o %.c>%.o sfopen.c sfopen
 prev sfopen.c
+setv LICENSE -DLICENSE="since=2005,author=gsf"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sfopen.c
 done sfopen.o generated
 bind -lrecsort

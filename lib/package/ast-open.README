@@ -1326,6 +1326,7 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+05-05-28 pax: improve "junk data after volume" checks
 05-05-22 pax: fix --append for the formats that can handle it
 05-05-18 pax-flash.c: add solaris flash embedded archive format read
 05-03-19 options.c: -l == --link (not --local) per posix
@@ -2103,6 +2104,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+05-05-25 Makerules.mk: use $(CC.INCLUDE.LOCAL) instead of -I- CC.DIALECT
 05-05-18 Makerules.mk: fix --static-link typo
 	 Makerules.mk: disable .MAMACTION "setv FOO ${FOO}"
 	 Makerules.mk: add (CC.SHARED.LIBS.*) to capture -l* bind changes
@@ -3695,7 +3697,9 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+05-06-06 reg.dat: transcribe from tcl 8.3 Spencer reg.test
 05-05-20 test(fmt|fnmatch|match|regex): handle file args for rt(1)
+	 nested.dat: add
 05-04-03 sed: change regexec() => regnexec() to handle embedded '\0'
 05-03-30 testmatch.dat,testregex.dat: add '[*' REG_SHELL pattern tests
 04-06-08 ed.c: fix move() bug that botched pointers across append()
@@ -3833,6 +3837,7 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+05-05-31 main.c: mv rslib() before key->input[] record format processing
 05-05-17 main.c: delay -l* => rslib() until all options parsed
 05-05-11 main.c: fix -R* parse, preserve output zip/record attributes
 04-12-01 main.c: fix -zI bug that only worked for 1 input file (sort#26)
@@ -4244,7 +4249,12 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
-05-05-23 regex: REX_NEST (?[D.][E.][L.][Q.][oc]...)
+05-06-02 features/*,Makefile: drop vestigel iffeio.h bootstrap workaround
+05-05-31 string/fmtbuf.c: unlock (spin) before each return -- doh
+05-05-30 sfio/sfpkrd.c: work around macos 10.4 recv(MSG_PEEK) bug
+05-05-27 regex: add REX_NEST (?%[S.][T.][OT])
+	 magic.tab: ammend bsd db magic
+05-05-23 regex: REX_NEST (?%[D.][E.][L.][Q.][oc]...)
 05-05-21 regex: state.fold[] is now locale specific -- doh
 05-05-19 regex: add REX_NEST (?%\\()<>[]""...) %(...) nested match
 05-05-15 recfmt.h: add recstr() reclen() fmtrec()

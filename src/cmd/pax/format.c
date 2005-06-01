@@ -44,6 +44,7 @@ getprologue(register Archive_t* ap)
 	unsigned char		buf[MAXUNREAD];
 	unsigned char		cvt[MAXUNREAD];
 
+	message((-6, "getprologue() volume=%d eof=%d", ap->volume, ap->io->eof));
 	if (ap->io->eof || state.volume && (ap->io->mode & O_ACCMODE) != O_RDONLY)
 		return 0;
 	state.volume[0] = 0;
@@ -71,7 +72,11 @@ getprologue(register Archive_t* ap)
 	 */
 
 	if ((n = bread(ap, (char*)buf, (off_t)0, (off_t)sizeof(buf), 0)) <= MINID && !bcount(ap))
+	{
+		if (n && ap->volume <= 0)
+			goto unknown;
 		return 0;
+	}
 	bunread(ap, buf, n);
 	if (CC_NATIVE != CC_ASCII)
 		ccmapm(cvt, buf, sizeof(cvt), CC_ASCII, CC_NATIVE);
@@ -173,6 +178,7 @@ getprologue(register Archive_t* ap)
 			convert(ap, SECTION_CONTROL, CC_NATIVE, CC_NATIVE);
 			if (!state.keepgoing || ap->io->eof || bread(ap, buf, (off_t)0, (off_t)1, 0) < 1)
 			{
+			unknown:
 				if (ap->expected)
 					error(3, "%s: unknown input format -- %s expected", ap->name, ap->expected->name);
 				if (ap->volume)
@@ -315,6 +321,7 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
 void
 putprologue(register Archive_t* ap)
 {
+	message((-6, "putprologue()"));
 	ap->section = SECTION_CONTROL;
 	if (ap->delta && ap->delta->format->variant == DELTA_88)
 		ap->checksum = ap->old.checksum;
@@ -344,8 +351,10 @@ getepilogue(register Archive_t* ap)
 	register off_t	n;
 	register int	i;
 	unsigned int	z;
+	int		x;
 	char		buf[BLOCKSIZE];
 
+	message((-6, "getepilogue()"));
 	ap->section = SECTION_CONTROL;
 	if (ap->delta && ap->delta->epilogue < 0)
 		error(3, "%s: corrupt archive: missing epilogue", ap->name);
@@ -370,6 +379,7 @@ getepilogue(register Archive_t* ap)
 					ap->io->keep--;
 				goto done;
 			}
+			x = 0;
 			z = 0;
 			i = MAXBLOCKS;
 			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, buf, (off_t)0, (off_t)n, 0) > 0)
@@ -378,12 +388,12 @@ getepilogue(register Archive_t* ap)
 					for (s = buf; s < buf + n && !*s; s++);
 					z += s - buf;
 					if (z >= BLOCKSIZE)
-						goto done;
+						x = 1;
 					if (s < buf + n)
 					{
 						if (n == BLOCKSIZE)
 						{
-							if (ap->format->event && (ap->format->events & PAX_EVENT_SKIP_JUNK))
+							if (!x && ap->format->event && (ap->format->events & PAX_EVENT_SKIP_JUNK))
 							{
 								if ((*ap->format->event)(&state, ap, NiL, buf, PAX_EVENT_SKIP_JUNK) > 0)
 									continue;
@@ -399,7 +409,7 @@ getepilogue(register Archive_t* ap)
 					}
 					n = BLOCKSIZE;
 				} while (i-- > 0 && bread(ap, buf, (off_t)0, n, 0) > 0);
-			bflushin(ap, 1);
+			bflushin(ap, 0);
 		}
 	done:
 		if (ap->format->done)
@@ -418,6 +428,7 @@ putepilogue(register Archive_t* ap)
 	register ssize_t	n;
 	register off_t		boundary;
 
+	message((-6, "putepilogue()"));
 	if (state.install.path)
 	{
 		if (sfclose(state.install.sp))
@@ -590,6 +601,7 @@ getheader(register Archive_t* ap, register File_t* f)
 	register char*	s;
 	long		i;
 
+	message((-6, "getheader()"));
 	ap->section = SECTION_CONTROL;
 	ap->sum++;
 	ap->entry++;
@@ -702,6 +714,7 @@ putheader(register Archive_t* ap, register File_t* f)
 {
 	register int	n;
 
+	message((-6, "putheader()"));
 	if (!f->extended)
 	{
 		setdeltaheader(ap, f);
@@ -761,6 +774,7 @@ gettrailer(register Archive_t* ap, File_t* f)
 {
 	register off_t	n;
 
+	message((-6, "gettrailer()"));
 	NoP(f);
 	ap->section = SECTION_CONTROL;
 	if (ap->sum-- > 0)
@@ -789,6 +803,7 @@ puttrailer(register Archive_t* ap, register File_t* f)
 {
 	register int	n;
 
+	message((-6, "puttrailer()"));
 	if (state.checksum.sum && !f->extended)
 	{
 		sumdone(state.checksum.sum);

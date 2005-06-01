@@ -1,4 +1,6 @@
+05-06-06 reg.dat: transcribe from tcl 8.3 Spencer reg.test
 05-05-20 test(fmt|fnmatch|match|regex): handle file args for rt(1)
+	 nested.dat: add
 05-04-03 sed: change regexec() => regnexec() to handle embedded '\0'
 05-03-30 testmatch.dat,testregex.dat: add '[*' REG_SHELL pattern tests
 04-06-08 ed.c: fix move() bug that botched pointers across append()

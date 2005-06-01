@@ -568,7 +568,7 @@ immediate(register Rule_t* r)
 		getimmediate(r, &prereqs, &action);
 		a = r == internal.retain ? V_retain : V_scan;
 		for (p = prereqs; p; p = p->next)
-			if (v = varstate(p->rule, 1))
+			if (v = varstate(p->rule, -1))
 			{
 				if (a == V_scan)
 					setvar(v->name, v->value, V_scan);
