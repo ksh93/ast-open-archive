@@ -367,7 +367,7 @@ getepilogue(register Archive_t* ap)
 			/*
 			 * check for more volumes
 			 * volumes begin on BLOCKSIZE boundaries
-			 * separated by up to MAXBLOCKS null byte filler
+			 * separated by null byte filler
 			 */
 
 			if (ap->io->keep)
@@ -381,7 +381,7 @@ getepilogue(register Archive_t* ap)
 			}
 			x = 0;
 			z = 0;
-			i = MAXBLOCKS;
+			i = 0;
 			if (!(n = roundof(ap->io->count, BLOCKSIZE) - ap->io->count) || bread(ap, buf, (off_t)0, (off_t)n, 0) > 0)
 				do
 				{
@@ -397,7 +397,7 @@ getepilogue(register Archive_t* ap)
 							{
 								if ((*ap->format->event)(&state, ap, NiL, buf, PAX_EVENT_SKIP_JUNK) > 0)
 									continue;
-								if (i = MAXBLOCKS - i)
+								if (i)
 									error(1, "%s: %d junk block%s after volume %d", ap->name, i, i == 1 ? "" : "s", ap->volume);
 							}
 							bunread(ap, buf, BLOCKSIZE);
@@ -408,7 +408,8 @@ getepilogue(register Archive_t* ap)
 						break;
 					}
 					n = BLOCKSIZE;
-				} while (i-- > 0 && bread(ap, buf, (off_t)0, n, 0) > 0);
+					i++;
+				} while (bread(ap, buf, (off_t)0, n, 0) > 0);
 			bflushin(ap, 0);
 		}
 	done:

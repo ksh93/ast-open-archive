@@ -118,16 +118,22 @@ struct _rs_s
 };
 
 /* events */
-#define RS_CLOSE	000001		/* sort context is being closed	*/
-#define RS_DISC		000002		/* discipline is being changed	*/
-#define RS_METHOD	000004		/* method is being changed	*/
-#define RS_OPEN		001000		/* rsopen() is being called	*/
-#define RS_POP		000010		/* discipline is being popped	*/
-#define RS_PUSH		000020		/* discipline is being pushed	*/
-#define RS_READ		000200		/* called for each read record	*/
-#define RS_SUMMARY	000040		/* RS_UNIQ summary		*/
-#define RS_VERIFY	000100		/* objects out of order		*/
-#define RS_WRITE	000400		/* called for each write record	*/
+#define RS_CLOSE	0000001		/* sort context is being closed	*/
+#define RS_DISC		0000002		/* discipline is being changed	*/
+#define RS_METHOD	0000004		/* method is being changed	*/
+#define RS_OPEN		0001000		/* rsopen() is being called	*/
+#define RS_POP		0000010		/* discipline is being popped	*/
+#define RS_PUSH		0000020		/* discipline is being pushed	*/
+#define RS_READ		0000200		/* called for each read record	*/
+#define RS_SUMMARY	0000040		/* RS_UNIQ summary		*/
+#define RS_VERIFY	0000100		/* objects out of order		*/
+#define RS_WRITE	0000400		/* called for each write record	*/
+#define RS_FILE_WRITE	0002000		/* rsfilewrite() callout	*/
+#define RS_FILE_READ	0004000		/* rsfileread() callout		*/
+#define RS_FILE_CLOSE	0010000		/* rsfileclose() callout	*/
+#define RS_TEMP_WRITE	0020000		/* rstempwrite() callout	*/
+#define RS_TEMP_READ	0040000		/* rstempread() callout		*/
+#define RS_TEMP_CLOSE	0100000		/* rstempclose() callout	*/
 
 /* { RS_READ RS_SUMMARY RS_WRITE } event returns */
 #define RS_TERMINATE	(-1)		/* terminate the sort		*/
@@ -148,7 +154,7 @@ struct _rs_s
 /* discipline data */
 #define RS_KSAMELEN	000010		/* key has fixed length		*/
 #define RS_DSAMELEN	000020		/* data has fixed length	*/
-#define RS_TYPES	010077
+#define RS_TYPES	010377
 
 /* input/output control */
 #define RS_ITEXT	000100		/* input is plain text		*/
@@ -190,11 +196,14 @@ _BEGIN_EXTERNS_	/* public functions */
 #define extern	__EXPORT__
 #endif
 
+extern Rs_t*		rsnew _ARG_((Rsdisc_t*));
+extern int		rsinit _ARG_((Rs_t*, Rsmethod_t*, ssize_t, int));
+
 extern Rs_t*		rsopen _ARG_((Rsdisc_t*, Rsmethod_t*, ssize_t, int));
 extern int		rsclear _ARG_((Rs_t*));
 extern int		rsclose _ARG_((Rs_t*));
 extern ssize_t		rsprocess _ARG_((Rs_t*, Void_t*, ssize_t));
-extern int		rslib _ARG_((Rskey_t*, const char*));
+extern int		rslib _ARG_((Rs_t*, Rskey_t*, const char*));
 extern Rsobj_t*		rslist _ARG_((Rs_t*));
 extern int		rswrite _ARG_((Rs_t*, Sfio_t*, int));
 extern int		rsmerge _ARG_((Rs_t*, Sfio_t*, Sfio_t**, int, int));
@@ -209,6 +218,14 @@ extern int		rskeylist _ARG_((Rskey_t*, Sfio_t*, int));
 extern void		rskeydump _ARG_((Rskey_t*, Sfio_t*));
 extern int		rskeyinit _ARG_((Rskey_t*));
 extern int		rskeyclose _ARG_((Rskey_t*));
+
+extern int		rsfilewrite _ARG_((Rs_t*, Sfio_t*, const char*));
+extern int		rsfileread _ARG_((Rs_t*, Sfio_t*, const char*));
+extern int		rsfileclose _ARG_((Rs_t*, Sfio_t*));
+
+extern Sfio_t*		rstempwrite _ARG_((Rs_t*, Sfio_t*));
+extern int		rstempread _ARG_((Rs_t*, Sfio_t*));
+extern int		rstempclose _ARG_((Rs_t*, Sfio_t*));
 
 #undef extern
 _END_EXTERNS_

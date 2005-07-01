@@ -528,7 +528,7 @@ badre(regex_t* re, int code)
 		error(3, "%s: %.*s", buf, t-synl, synl);
 	}
 	else
-		error(3, "bad regular expression: %.*s", t-synl, synl);
+		error(3, "invalid regular expression: %.*s", t-synl, synl);
 }
 
 #if DEBUG

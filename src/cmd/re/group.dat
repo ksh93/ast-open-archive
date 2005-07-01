@@ -37,3 +37,14 @@ E	((a)|(b))(?(3)a|b)	aa		NOMATCH
 E	SAME			ab		(0,2)(0,1)(0,1)
 E	SAME			ba		(0,2)(0,1)(?,?)(0,1)
 E	SAME			bb		NOMATCH
+
+Bi	^g.*style$		Grep-Style		(0,10)
+Ei	^g.*style$		Grep-Style		(0,10)
+E	(?+i)^e.*style$		Egrep-Style		(0,11)
+K	~(i)k*style		Ksh-Style		(0,9)
+K	~(Bi)grep-style		Grep-Style		(0,10)
+K	~(Bi)grep-style$	Grep-Style		(0,10)
+K	~(Bi)^grep-style$	Grep-Style		(0,10)
+K	~(Bi)g.*style$		Grep-Style		(0,10)
+K	~(Bi)^g.*style$		Grep-Style		(0,10)
+K	~(Ei)^e.*style$		Egrep-Style		(0,11)

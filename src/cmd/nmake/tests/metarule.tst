@@ -27,14 +27,14 @@ TEST 02 'chain'
 	EXEC
 		INPUT Makefile $'% : %.z .TERMINAL
 	: convert $(>) > $(<)
-%.y : %
+%.q : %
 	: convert $(>) > $(<)
-all : m.x.y'
+all : m.x.q'
 		INPUT m.x.z
 		ERROR - $'+ : convert m.x.z
 + 1> m.x
 + : convert m.x
-+ 1> m.x.y'
++ 1> m.x.q'
 
 	EXEC
 		ERROR -
@@ -472,7 +472,8 @@ main() { return YACC; }'
 TEST 15 'cobol'
 
 	EXEC	-n
-		INPUT Makefile $'.SOURCE.cob : cobinc
+		INPUT Makefile $':PACKAGE: cobol
+.SOURCE.cob : cobinc
 cmd :: a.cbl i.cbl t.cob x.cbl y.cbl t.cob'
 		INPUT a.cbl $'COMMENT
 	EXEC SQL foo.'
@@ -490,15 +491,15 @@ cmd :: a.cbl i.cbl t.cob x.cbl y.cbl t.cob'
 4567 * COPY b.cbl.
         COPY z.cbl.'
 		INPUT z.cbl
-		OUTPUT - $'+ cobc -static  -C  a.cbl
+		OUTPUT - $'+ cobc -static  -C -O  a.cbl
 + cc -O   -c a.c
-+ cobc -static  -C  i.cbl
++ cobc -static  -C -O  i.cbl
 + cc -O   -c i.c
-+ cobc -static  -C  t.cob
++ cobc -static  -C -O  t.cob
 + cc -O   -c t.c
-+ cobc -static  -C -I. -Icobinc x.cbl
++ cobc -static  -C -O -I. -Icobinc x.cbl
 + cc -O   -c x.c
-+ cobc -static  -C -I. y.cbl
++ cobc -static  -C -O -I. y.cbl
 + cc -O   -c y.c
 + cc  -O    -o cmd a.o i.o t.o x.o y.o'
 

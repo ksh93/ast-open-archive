@@ -30,6 +30,10 @@ TEST 01 'install with --compare and --clobber'
 	DO	touch t.sh
 
 	EXEC	--regress install compare=0 # obsolete compatibility
+		ERROR - $'make: warning: compare=0: obsolete: use --nocompare
++ cp t.sh t
++ mv -f bin/t bin/t.old
++ ignore cp t bin/t'
 
 	DO	touch t.sh
 
@@ -41,6 +45,10 @@ TEST 01 'install with --compare and --clobber'
 	DO	touch t.sh
 
 	EXEC	--regress install compare=0 clobber=1 # obsolete compatibility
+		ERROR - $'make: warning: clobber=1 compare=0: obsolete: use --clobber --nocompare
++ cp t.sh t
++ rm -f bin/t
++ ignore cp t bin/t'
 
 TEST 02 'install+clean+clobber' && {
 
@@ -299,6 +307,7 @@ aha :LIBRARY: aha.c'
 + fi'
 
 	EXEC	-n install link="*" # obsolete compatibility
+		ERROR - $'make: warning: link=*: obsolete: use --link=*'
 
 TEST 08 'instrumented compilation'
 
@@ -321,6 +330,7 @@ lib :LIBRARY: lib.c'
 + ar cr liblib-tra.a lib.o
 + rm -f lib.o
 + TRANSMORGRIFY_HOME='$PWD$'/bin transmorgrify cc  -O   -o cmd cmd.o liblib-tra.a'
+		ERROR - $'make: warning: instrument=transmorgrify: obsolete: use --instrument=transmorgrify'
 
 TEST 09 ':MAKE: + pax source manifest'
 
@@ -822,6 +832,7 @@ t :LIBRARY: a.c'
 + 		}
 + 	fi
 + fi'
+		ERROR - $'make: warning: link=t: obsolete: use --link=t'
 
 TEST 16 'install + link=*'
 

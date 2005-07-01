@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-05-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_pz ${INSTALLROOT}
 setv PACKAGE_pz_INCLUDE ${PACKAGE_pz}/include

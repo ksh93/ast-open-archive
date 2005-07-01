@@ -1,3 +1,4 @@
+05-06-07 format.c: fix inter volume fill logic
 05-05-28 pax: improve "junk data after volume" checks
 05-05-22 pax: fix --append for the formats that can handle it
 05-05-18 pax-flash.c: add solaris flash embedded archive format read

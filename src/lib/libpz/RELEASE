@@ -1,3 +1,6 @@
+05-07-17 pzinflate.c: use sferror() instead of sfsync() -- doh
+	 pzsplit.c: drop SF_WRITE sfreserve() to keep writes aligned
+05-06-30 pzsplit.c: work around sfreserve() write failure via sfwrite()
 04-04-08 add pznospace()
 04-02-29 pzip.h,pzline.c: fix pz_init() prototype
 03-11-04 pzpart.c: use PZ_HEAD to avoid multiple PZ_UPDATE, fix wrk overflow

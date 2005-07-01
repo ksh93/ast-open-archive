@@ -146,8 +146,8 @@ setptr(register FILE* ibuf, off_t offset)
 		count = strlen(cp);
 		if (count == 0 && (zoff = ftell(ibuf)) > roff) {
 			for (cp2 = cp + (zoff - roff); cp < cp2 && *cp == 0; cp++);
-			if (cp > buf)
-				note(WARNING, "%d nuls at offset %lld", cp - buf, (Sflong_t)roff);
+			if (count = cp - buf)
+				note(WARNING, "%d nul%s at offset %lld", count, count == 1 ? "" : "s", (Sflong_t)roff);
 			count = cp2 - cp;
 		}
 		else if (count >= 2 && cp[count - 1] == '\n' && cp[count - 2] == '\r') {

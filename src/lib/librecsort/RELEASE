@@ -1,3 +1,8 @@
+05-06-30 rsmerge.c: handle all RS_TEXT record formats
+05-06-28 add rsnew()+rsinit() to split rsopen() for rsfile*()
+05-06-27 rstemp.c: add temp file support and RS_TEMP_* events
+	 rsfile.c: add input/output file open RS_FILE_* events
+05-06-11 rskey*.c: initialize disc->data via REC_*_TYPE macros -- doh
 05-05-15 handle disc->data Recfmt_t
 04-10-31 rsmerge.c: fix EOF detection
 04-10-15 rs-copy.c: add

@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2005-06-03 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Labs Research) 2005-06-30 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -144,6 +144,7 @@ USAGE_LICENSE
 "	to tune performance. Type is a single character and may be one"
 "	of:]:[type[size]]]{"
 "		[+a?Buffer alignment.]"
+"		[+b?Input reserve buffer size.]"
 "		[+c?Input chunk size; sort chunks of this size and disable merge.]"
 "		[+i?Input buffer size.]"
 "		[+m?Maximum number of intermediate merge files.]"
@@ -265,6 +266,7 @@ typedef struct
 	size_t		cur;		/* input buffer index		*/
 	size_t		hit;		/* input buffer index overflow	*/
 	size_t		end;		/* max input buffer index	*/
+	size_t		bufsize;	/* input reserve buffer size	*/
 	off_t		total;		/* total size of single file	*/
 	unsigned long	test;		/* test bit mask		*/
 	int		child;		/* in child process		*/
@@ -327,17 +329,27 @@ fileopen(register Sort_t* sp, const char* path)
 
 	if (fp = sp->opened)
 		sp->opened = 0;
-	else if (pathstdin(path))
+	else
 	{
-		if (sp->hadstdin)
-			error(3, "%s: can only read once", path);
-		sp->hadstdin = 1;
-		fp = sfstdin;
+		if (pathstdin(path))
+		{
+			if (sp->hadstdin)
+				error(3, "%s: can only read once", path);
+			sp->hadstdin = 1;
+			fp = sfstdin;
+		}
+		else if (!(fp = sfopen(NiL, path, "r")))
+			error(ERROR_SYSTEM|3, "%s: cannot open", path);
+		if (rsfileread(sp->rec, fp, path))
+		{
+			if (fp != sfstdin)
+				sfclose(fp);
+			return 0;
+		}
+		sfset(fp, SF_SHARE, 0);
+		if (sp->zip & SF_READ)
+			sfdcgzip(fp, 0);
 	}
-	else if (!(fp = sfopen(NiL, path, "r")))
-		error(ERROR_SYSTEM|3, "%s: cannot open", path);
-	if (sp->zip & SF_READ)
-		sfdcgzip(fp, 0);
 	return fp;
 }
 
@@ -369,7 +381,6 @@ parse(register Sort_t* sp, char** argv)
 	Lib_t*			lastlib = 0;
 	Lib_t*			lib;
 	Recfmt_t		r;
-	Recfmt_t		f = REC_D_TYPE('\n');
 	int			obsolescent = 1;
 	char			opt[16];
 	Optdisc_t		optdisc;
@@ -458,6 +469,9 @@ parse(register Sort_t* sp, char** argv)
 			case 'a':
 				key->alignsize = z;
 				break;
+			case 'b':
+				sp->bufsize = z;
+				break;
 			case 'c':
 				sp->chunk = 1;
 				key->alignsize = key->insize = z;
@@ -503,7 +517,7 @@ parse(register Sort_t* sp, char** argv)
 			rskeylist(key, sfstdout, 0);
 			exit(0);
 		case 'R':
-			f = recstr(opt_info.arg, &e);
+			key->disc->data = recstr(opt_info.arg, &e);
 			if (*e)
 			{
 				error(2, "%s: invalid record format", opt_info.arg);
@@ -593,7 +607,7 @@ parse(register Sort_t* sp, char** argv)
 
 	while (lib = firstlib)
 	{
-		if (rslib(key, lib->name))
+		if (rslib(sp->rec, key, lib->name))
 			return 1;
 		firstlib = firstlib->next;
 		free(lib);
@@ -603,23 +617,23 @@ parse(register Sort_t* sp, char** argv)
 	 * record format chicanery
 	 */
 
-	if (RECTYPE(f) == REC_method && REC_M_INDEX(f) == REC_M_path)
+	if (RECTYPE(key->disc->data) == REC_method && REC_M_INDEX(key->disc->data) == REC_M_path)
 		for (n = 0, i = -1; p = key->input[n]; n++)
 			if (s = strrchr(p, '%'))
 			{
 				r = recstr(s + 1, &e);
 				if (!*e || *e == '.' && e > (s + 1))
 				{
-					if (r != f && i >= 0)
+					if (r != key->disc->data && i >= 0 && (RECTYPE(r) != REC_variable || RECTYPE(key->disc->data) != REC_variable || REC_V_ATTRIBUTES(r) != REC_V_ATTRIBUTES(key->disc->data)))
 					{
-						error(2, "%s: record format inconsistent with %s", p, key->input[i]);
+						error(2, "%s: format %s inconsistent with %s format %s", p, fmtrec(r, 0), key->input[i], fmtrec(key->disc->data, 0));
 						return 1;
 					}
-					f = r;
+					key->disc->data = r;
 					i = n;
 				}
 			}
-	if (RECTYPE(f) == REC_method && ((n = REC_M_INDEX(f)) == REC_M_path || n == REC_M_data))
+	if (RECTYPE(key->disc->data) == REC_method && ((n = REC_M_INDEX(key->disc->data)) == REC_M_path || n == REC_M_data))
 	{
 		if ((sp->opened = fileopen(sp, key->input[0])) && (s = sfreserve(sp->opened, SF_UNBOUND, 1)))
 		{
@@ -628,20 +642,18 @@ parse(register Sort_t* sp, char** argv)
 			z = sfvalue(sp->opened);
 			if (fstat(sffileno(sp->opened), &st) || st.st_size < z)
 				st.st_size = 0;
-			f = recfmt(s, z, st.st_size);
+			key->disc->data = recfmt(s, z, st.st_size);
 			sfread(sp->opened, s, 0);
 		}
 		else
-			f = REC_N_TYPE();
-		if (f == REC_N_TYPE())
+			key->disc->data = REC_N_TYPE();
+		if (key->disc->data == REC_N_TYPE())
 			error(3, "record format cannot be determined from data sample");
 	}
-	if (RECTYPE(f) == REC_fixed)
-		key->fixed = REC_F_SIZE(f);
-	else
-		key->disc->data = f;
+	if (RECTYPE(key->disc->data) == REC_fixed)
+		key->fixed = REC_F_SIZE(key->disc->data);
 	if (sp->verbose)
-		error(0, "%s %s record format", error_info.id, fmtrec(f));
+		error(0, "%s %s record format", error_info.id, fmtrec(key->disc->data, 0));
 	return error_info.errors != 0;
 }
 
@@ -696,7 +708,7 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	dp->version = RSKEY_VERSION;
 	dp->flags = 0;
 	dp->errorf = errorf;
-	if (!(sp->key = key = rskeyopen(dp)))
+	if (!(sp->key = key = rskeyopen(dp)) || !(sp->rec = rsnew(key->disc)))
 		return -1;
 	z = key->insize = 2 * INMAX;
 #if 0
@@ -725,7 +737,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		x = INMIN;
 	if (sp->single = !key->input[1])
 	{
-		sp->opened = fileopen(sp, key->input[0]);
+		if (!(sp->opened = fileopen(sp, key->input[0])))
+			error(ERROR_SYSTEM|3, "%s: cannot open", key->input[0]);
 		if (fstat(sffileno(sp->opened), &is))
 			error(ERROR_SYSTEM|3, "%s: cannot stat", key->input[0]);
 		sp->total = is.st_size;
@@ -915,6 +928,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 					jp->intermediates = i;
 					offset += size;
 				}
+				if (rsfileclose(sp->rec, ip))
+					return -1;
 				sfclose(ip);
 				key->procsize = (key->procsize > chunk) ? chunk : chunk / ((chunk + key->procsize - 1) / key->procsize);
 			}
@@ -957,7 +972,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 								s = key->output;
 								*t = 0;
 							}
-							else s = ".";
+							else
+								s = ".";
 							if (sp->overwrite = pathtemp(NiL, 0, s, error_info.id, &n))
 								sp->op = sfnew(sfstdout, NiL, SF_UNBOUND, n, SF_WRITE);
 							if (t) *t = '/';
@@ -973,6 +989,8 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 		if (!sp->overwrite && !(sp->op = sfopen(sfstdout, key->output, "w")))
 			error(ERROR_SYSTEM|3, "%s: cannot write", key->output);
 	}
+	if (rsfilewrite(sp->rec, sp->op, key->output))
+		return -1;
 	if (key->outsize > 0)
 		sfsetbuf(sp->op, NiL, key->outsize);
 	if (sp->zip & SF_WRITE)
@@ -982,9 +1000,9 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 	 * finally ready for recsort now
 	 */
 
-	if (!(sp->rec = rsopen(key->disc, key->meth, key->procsize, key->type)))
+	if (rsinit(sp->rec, key->meth, key->procsize, key->type))
 	{
-		error(ERROR_SYSTEM|2, "internal error");
+		error(ERROR_SYSTEM|2, "sort library initialization error");
 		rskeyclose(key);
 		return -1;
 	}
@@ -1004,7 +1022,7 @@ clear(register Sort_t* sp, Sfio_t* fp)
 
 	for (i = fp ? sp->mfiles : 0; i < sp->nfiles; i++)
 	{
-		sfclose(sp->files[i]);
+		rstempclose(sp->rec, sp->files[i]);
 		sp->files[i] = 0;
 	}
 	if (!(sp->files[sp->mfiles++] = fp))
@@ -1023,7 +1041,7 @@ clear(register Sort_t* sp, Sfio_t* fp)
  * updated r is returned
  */
 
-static size_t
+static ssize_t
 flush(register Sort_t* sp, register size_t r)
 {
 	register Sfio_t*	fp;
@@ -1038,7 +1056,11 @@ flush(register Sort_t* sp, register size_t r)
 		 */
 
 		if (rswrite(sp->rec, sp->op, RS_OTEXT))
-			error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
+		{
+			if (!error_info.errors)
+				error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
+			return -1;
+		}
 	}
 	else if (sp->rec->meth->type != RS_MTVERIFY)
 	{
@@ -1048,7 +1070,7 @@ flush(register Sort_t* sp, register size_t r)
 
 		if (!(fp = sp->files[sp->nfiles]))
 		{
-			if (sp->child || !(fp = sftmp(0)))
+			if (sp->child || !(fp = rstempwrite(sp->rec, (Sfio_t*)0)))
 				error(ERROR_SYSTEM|3, "cannot create intermediate sort file %d", sp->nfiles);
 			sp->files[sp->nfiles] = fp;
 		}
@@ -1056,9 +1078,15 @@ flush(register Sort_t* sp, register size_t r)
 		if (sp->verbose)
 			error(0, "%s write intermediate", error_info.id);
 		if (rswrite(sp->rec, fp, 0))
-			error(ERROR_SYSTEM|3, "intermediate sort file write error");
-		if (sfseek(fp, (off_t)0, SEEK_SET))
-			error(ERROR_SYSTEM|3, "intermediate sort file seek error");
+		{
+			error(ERROR_SYSTEM|2, "intermediate sort file write error");
+			return -1;
+		}
+		if (rstempread(sp->rec, fp))
+		{
+			error(ERROR_SYSTEM|2, "intermediate sort file rewind error");
+			return -1;
+		}
 
 		/*
 		 * multi-stage merge when open file limit exceeded
@@ -1066,14 +1094,20 @@ flush(register Sort_t* sp, register size_t r)
 
 		if (sp->nfiles >= sp->xfiles)
 		{
-			if (sp->child || !(fp = sftmp(0)))
+			if (sp->child || !(fp = rstempwrite(sp->rec, (Sfio_t*)0)))
 				error(ERROR_SYSTEM|3, "cannot create intermediate merge file");
 			if (sp->verbose)
 				error(0, "%s merge multi-stage intermediate", error_info.id);
 			if (rsmerge(sp->rec, fp, sp->files + sp->mfiles, sp->nfiles - sp->mfiles, 0))
-				error(ERROR_SYSTEM|3, "intermediate merge file write error");
-			if (sfseek(fp, (off_t)0, SEEK_SET))
-				error(ERROR_SYSTEM|3, "intermediate merge file seek error");
+			{
+				error(ERROR_SYSTEM|2, "intermediate merge file write error");
+				return -1;
+			}
+			if (rstempread(sp->rec, fp))
+			{
+				error(ERROR_SYSTEM|2, "intermediate merge file rewind error");
+				return -1;
+			}
 			clear(sp, fp);
 		}
 	}
@@ -1112,13 +1146,13 @@ flush(register Sort_t* sp, register size_t r)
  * input the records for file ip
  */
 
-static void
+static int
 input(register Sort_t* sp, Sfio_t* ip, const char* name)
 {
 	register ssize_t	n;
 	register ssize_t	p;
 	register ssize_t	m;
-	register size_t		r;
+	register ssize_t	r;
 	size_t			z;
 	char*			b;
 	int			c;
@@ -1130,10 +1164,11 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 	 */
 
 	error_info.file = ip == sfstdin ? (char*)0 : (char*)name;
-	sfset(ip, SF_SHARE, 0);
 	m = -1;
 	z = 0;
-	if (sfsize(ip) > SF_BUFSIZE)
+	if (sp->bufsize)
+		sfsetbuf(ip, NiL, sp->bufsize);
+	else if (sfsize(ip) > SF_BUFSIZE)
 	{
 		if (sp->map)
 			sfsetbuf(ip, NiL, z = sp->end);
@@ -1148,7 +1183,8 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 		{
 			if (sp->single && !sp->nfiles && sp->total == (sp->map ? 0 : p))
 				break;
-			r = flush(sp, r);
+			if ((r = flush(sp, r)) < 0)
+				return -1;
 		}
 		if (!sp->map)
 		{
@@ -1226,7 +1262,8 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 				m = -(n - p + 1);
 				if (((sp->total -= p) / 3) < (sp->end / 2) && sp->total > sp->end)
 				{
-					r = flush(sp, r);
+					if ((r = flush(sp, r)) < 0)
+						return -1;
 					sfsetbuf(ip, NiL, sp->total);
 				}
 			}
@@ -1272,6 +1309,7 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 			r += p;
 	}
 	error_info.file = 0;
+	return 0;
 }
 
 /*
@@ -1355,7 +1393,7 @@ jobs(register Sort_t* sp)
 	f = 0;
 	for (jp = sp->jobs; jp < xp; jp++)
 		for (i = 0; i < jp->intermediates; i++)
-			if (!(sp->files[f++] = sftmp(0)))
+			if (!(sp->files[f++] = rstempwrite(sp->rec, (Sfio_t*)0)))
 				error(ERROR_SYSTEM|3, "cannot create intermediate file %d", i);
 	part.disc.readf = partread;
 	part.disc.writef = 0;
@@ -1385,9 +1423,10 @@ jobs(register Sort_t* sp)
 				sp->files[i++] = 0;
 			if (sp->verbose)
 				error(0, "%s pos %12lld : len %10lld : buf %10lld : num %2d", error_info.id, (Sflong_t)jp->offset, (Sflong_t)jp->size, (Sflong_t)jp->chunk, jp->intermediates);
-			input(sp, ip, file);
-			exit(0);
+			exit(input(sp, ip, file) < 0);
 		}
+		if (rsfileclose(sp->rec, ip))
+			exit(1);
 		sfclose(ip);
 		j += jp->intermediates;
 	}
@@ -1421,7 +1460,7 @@ done(register Sort_t* sp)
 {
 	if (rsclose(sp->rec))
 		error(2, "sort error");
-	if ((sp->op == sfstdout && !(sp->zip & SF_WRITE)) ? sfsync(sp->op) : sfclose(sp->op))
+	if (((sp->op == sfstdout && !(sp->zip & SF_WRITE)) && sfsync(sp->op) || rsfileclose(sp->rec, sp->op)) && !error_info.errors)
 		error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 	if (sp->map > 2)
 		vmfree(Vmheap, sp->buf);
@@ -1444,7 +1483,7 @@ done(register Sort_t* sp)
 			{
 				if (op = sfopen(NiL, sp->key->output, "w"))
 				{
-					if (sfmove(ip, op, SF_UNBOUND, -1) < 0 || sfclose(op) || !sfeof(ip))
+					if ((sfmove(ip, op, SF_UNBOUND, -1) < 0 || sfclose(op) || !sfeof(ip)) && !error_info.errors)
 						error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 					sfclose(op);
 				}
@@ -1453,7 +1492,8 @@ done(register Sort_t* sp)
 				sfclose(ip);
 				remove(sp->overwrite);
 			}
-			else error(ERROR_SYSTEM|2, "%s: cannot read", sp->overwrite);
+			else
+				error(ERROR_SYSTEM|2, "%s: cannot read", sp->overwrite);
 			sp->preserve = 0;
 		}
 		else if (remove(sp->key->output) || rename(sp->overwrite, sp->key->output))
@@ -1486,11 +1526,10 @@ main(int argc, char** argv)
 		while (s = *sort.key->input++)
 		{
 			fp = fileopen(&sort, s);
-			if ((sfmove(fp, sfstdout, SF_UNBOUND, -1) < 0 || !sfeof(fp)))
+			if (sfmove(fp, sfstdout, SF_UNBOUND, -1) < 0 || !sfeof(fp))
 				error(ERROR_SYSTEM|2, "%s: read error", s);
-			if (sferror(sfstdout))
+			if (sferror(sfstdout) || rsfileclose(sort.rec, fp))
 				break;
-			sfclose(fp);
 		}
 	}
 	else
@@ -1519,14 +1558,12 @@ main(int argc, char** argv)
 					}
 					sort.files[sort.nfiles++] = fp;
 				}
-				else
+				else if (input(&sort, fp, s) < 0)
+					break;
+				else if (fp != sfstdin && !sort.map)
 				{
-					input(&sort, fp, s);
-					if (fp != sfstdin && !sort.map)
-					{
-						sfclose(fp);
-						fp = 0;
-					}
+					sfclose(fp);
+					fp = 0;
 				}
 			}
 		if (sort.nfiles)
@@ -1543,7 +1580,7 @@ main(int argc, char** argv)
 		{
 			if (sort.verbose)
 				error(0, "%s write text", error_info.id);
-			if (rswrite(sort.rec, sort.op, RS_OTEXT))
+			if (rswrite(sort.rec, sort.op, RS_OTEXT) && !error_info.errors)
 				error(ERROR_SYSTEM|2, "%s: write error", sort.key->output);
 			if (fp && fp != sfstdin)
 				sfclose(fp);

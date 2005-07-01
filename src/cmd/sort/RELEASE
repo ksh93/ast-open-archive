@@ -1,3 +1,7 @@
+05-06-30 main.c: add -zbBUFSIZE for regression testing
+05-06-27 main.c: convert sftmp() etc. to rstmp*()
+05-06-24 sfopen.c: allow multiple io intercepts per program
+05-06-11 main.c: fix duplicate sfdcgzip() bug that corrupted input
 05-05-31 main.c: mv rslib() before key->input[] record format processing
 05-05-17 main.c: delay -l* => rslib() until all options parsed
 05-05-11 main.c: fix -R* parse, preserve output zip/record attributes

@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2005-04-22 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2005-06-16 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -204,6 +204,7 @@ typedef struct Ps_s			/* process state		*/
 	char*		user;		/* user name			*/
 	Pss_id_t	pid;		/* pid				*/
 	int		level;		/* process tree level		*/
+	int		seen;		/* already seen on chain	*/
 	int		shown;		/* list state			*/
 } Ps_t;
 
@@ -1047,11 +1048,12 @@ list(void)
 				}
 		if (state.children)
 			for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))
-				if (!(pp->ps->pss & (PSS_EXPLICIT|PSS_MATCHED|PSS_PARENT)))
+				if (!(pp->ps->pss & (PSS_EXPLICIT|PSS_MATCHED|PSS_PARENT)) && !pp->seen)
 				{
 					xp = pp;
 					do
 					{
+						xp->seen = 1;
 						if (xp->ps->pss & (PSS_ANCESTOR|PSS_EXPLICIT|PSS_MATCHED))
 						{
 							xp->ps->pss |= PSS_ANCESTOR;
@@ -1062,7 +1064,7 @@ list(void)
 							} while ((xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->ps->pss);
 							break;
 						}
-					} while (xp->ps->ppid != xp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)));
+					} while (xp->ps->ppid != xp->ps->pid && (xp = (Ps_t*)dtmatch(state.bypid, &xp->ps->ppid)) && !xp->seen);
 				}
 		rp = zp = 0;
 		for (pp = (Ps_t*)dtfirst(state.byorder); pp; pp = (Ps_t*)dtnext(state.byorder, pp))

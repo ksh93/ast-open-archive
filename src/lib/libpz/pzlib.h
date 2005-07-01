@@ -154,6 +154,7 @@ typedef struct
 #define PZ_SPLIT_DEFLATE	0x0001	/* split deflate enabled	*/
 #define PZ_SPLIT_HEADER		0x0002	/* split header already written	*/
 #define PZ_SPLIT_INFLATE	0x0004	/* split inflate enabled	*/
+#define PZ_SPLIT_PART		0x0008	/* currently splitting a part	*/
 
 #define PZ_DELAY	0x01000000	/* delay unknown error		*/
 #define PZ_HANDLE	0x02000000	/* sfdcpzip() sp arg is Pz_t	*/

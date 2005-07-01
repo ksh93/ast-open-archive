@@ -198,9 +198,9 @@ TEST 02 'large sizes'
 	EXEC -w24x80 -C f*
 		OUTPUT - $'f  ff  fff  ffff  fffff  ffffff  fffffff  ffffffff  fffffffff  ffffffffff'
 
-	EXEC -w24x80 -C -sk f*
-		OUTPUT - $'    1 f       1 fff       1 fffff       1 fffffff       1 fffffffff
-    1 ff      1 ffff      1 ffffff      1 ffffffff      1 ffffffffff'
+	EXEC -w24x80 -C --testsize=1 -sk f*
+		OUTPUT - $'    0 f       0 fff       0 fffff       0 fffffff       1 fffffffff
+    0 ff      0 ffff      0 ffffff      0 ffffffff      1 ffffffffff'
 
 	EXEC --testsize=32 -sk f*
 		OUTPUT - $'8388608 f

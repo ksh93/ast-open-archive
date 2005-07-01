@@ -886,6 +886,7 @@ int		obsolete;
 				return -1;
 			}
 			kp->fixed = n;
+			kp->disc->data = REC_F_TYPE(n);
 			return 0;
 		}
 	}
@@ -906,6 +907,7 @@ int		obsolete;
 				return -1;
 			}
 			kp->fixed = n;
+			kp->disc->data = REC_F_TYPE(n);
 		}
 		if (!*++s)
 			return 0;

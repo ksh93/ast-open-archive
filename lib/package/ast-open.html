@@ -1022,7 +1022,18 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-05-05-23  --- Release ksh93q+  ---
+05-06-24  --- Release ksh93r-  ---
+05-06-24  A race condition which could cause the exit status to get lost
+	  on some fast systems has been fixed.
+05-06-21  A bug in which nested patterns of the form {m,n}(pat) would cause
+	  syntax errors has been fixed.
+05-06-21  A bug in the macro expander has been fixed which could cause a
+          syntax error for an expansion of the form ${x-$(...)} when
+	  x is set and the command subsitution contained certain strings.
+05-06-08  On systems for which echo does not do System V style &nbsp;expansions,
+	  the -e option was added to enable these expansion.
+05-06-08  A bug in which ${var op pattern} to not work when inside an
+	  arithmetic expression has been fixed.
 05-05-23  An extension to shell patterns that allows matching of nested
 	  groups while skipping over quoted strings has been added.
 05-05-18  A bug in which the line number for errors was not correct for
@@ -2262,6 +2273,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-06-07 format.c: fix inter volume fill logic
 05-05-28 pax: improve "junk data after volume" checks
 05-05-22 pax: fix --append for the formats that can handle it
 05-05-18 pax-flash.c: add solaris flash embedded archive format read
@@ -3073,6 +3085,18 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-07-17 Makerules.mk: move cobol specifics to pkg-cobol.mk
+	 Makerules.mk: add CCSPECIALIZE $(CC.OPTIMIZE) override
+	 Makerules.mk: add include - + pkg-default.mk
+	 Makerules.mk: add $(-mam) test for .MAM.INIT in .mo
+	 Makerules.mk: --mam=static set noreadstate reread strictview
+	 Makerules.mk: handle package named by root dir: :PACKAGE: /a/b/name
+	 pkg-cobol.mk: generic cobol package setup
+	 pkg-cobol-cobc.mk: open source cobol package setup
+	 pkg-cobol-mfcobc.mk: microfocus cobol package setup
+	 options.h: OPT_reread is boolean, not numeric
+	 rule.c: add .FREEZE state.freeze
+	 tests/recurse.tst: add
 05-05-25 Makerules.mk: use $(CC.INCLUDE.LOCAL) instead of -I- CC.DIALECT
 05-05-18 Makerules.mk: fix --static-link typo
 	 Makerules.mk: disable .MAMACTION "setv FOO ${FOO}"
@@ -4237,6 +4261,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="at changes">at changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-06-29 crontab.sh: fix (...) =&gt; @(...) syntax error
 02-02-14 atd: add strdup(argv&#0091;1&#0093;) to workaround argv&#0091;1&#0093;=&gt;0 mystery
 01-06-18 crontab: clarify the command&lt;=&gt;job relationship
 01-03-28 atd: fix log file rollover infinite loop
@@ -4845,6 +4870,10 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="sort changes">sort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-06-30 main.c: add -zbBUFSIZE for regression testing
+05-06-27 main.c: convert sftmp() etc. to rstmp*()
+05-06-24 sfopen.c: allow multiple io intercepts per program
+05-06-11 main.c: fix duplicate sfdcgzip() bug that corrupted input
 05-05-31 main.c: mv rslib() before key-&gt;input&#0091;&#0093; record format processing
 05-05-17 main.c: delay -l* =&gt; rslib() until all options parsed
 05-05-11 main.c: fix -R* parse, preserve output zip/record attributes
@@ -4899,6 +4928,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-07-25 touch.c: eith =&gt; either
+05-07-17 dd.c: fix ccode conversion diagnostic
+05-06-16 ps.c: fix parent chain lookup infinit loop
+05-06-14 ls.c: fix divide by 0 in col()
+05-06-11 ls.c: sharpen the optimal row/col search
+	 ls.tst: normalize 02 test sizes
 05-04-22 ps.c: add --branch --escape
 05-04-06 df.c: fix -k F_FRSIZE() to always return &gt; 0
 05-03-29 ps.c: check /bin/ps punt recursion when ast_ps is /bin/ps
@@ -5152,6 +5187,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tksh changes">tksh changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-06-14 uinit.c: trap "tkloop" only if it is defined
 04-03-31 uinit.c: unalias ksh "source" to uncover tcl builtin by same name
 03-01-02 Makefile: dynamic -lshell on CC.HOSTTYPE=*win*
 02-08-27 tkMain.c: wait loop recode to avoid WNOHANG cascade
@@ -5163,6 +5199,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-06-13 tw.c: sort:path == sort:name, handle ,-separated keys
 05-03-07 xargs.c: fix -i to treat each line as an arg
 05-02-23 tw.c: add --error-exit=code to exit if cmd exit &gt;= code
 	 find.c: ignore cmd errors
@@ -5272,6 +5309,13 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-07-21 port/astconf.c: retain most recent synthesized lookup
+05-07-20 sfio/sfsetbuf.c: default file io size now 64K on all systems
+05-07-17 ccmap*: add microfocus cobol EBCDIC_U
+05-06-29 regex/regcomp.c: fix the A &amp; B inline flag logic
+05-06-15 include/recfmt.h: add fs format flag to fmtrec()
+05-06-14 error.c: add ERROR_OPTIONS { break count match }
+05-06-07 features/stdio: drop FEATURE/limits to fix bootstrap circular dep
 05-06-02 features/*,Makefile: drop vestigel iffeio.h bootstrap workaround
 05-05-31 string/fmtbuf.c: unlock (spin) before each return -- doh
 05-05-30 sfio/sfpkrd.c: work around macos 10.4 recv(MSG_PEEK) bug
@@ -6829,6 +6873,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="librecsort changes">librecsort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-06-30 rsmerge.c: handle all RS_TEXT record formats
+05-06-28 add rsnew()+rsinit() to split rsopen() for rsfile*()
+05-06-27 rstemp.c: add temp file support and RS_TEMP_* events
+	 rsfile.c: add input/output file open RS_FILE_* events
+05-06-11 rskey*.c: initialize disc-&gt;data via REC_*_TYPE macros -- doh
 05-05-15 handle disc-&gt;data Recfmt_t
 04-10-31 rsmerge.c: fix EOF detection
 04-10-15 rs-copy.c: add
@@ -7562,6 +7611,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpz changes">libpz changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-07-17 pzinflate.c: use sferror() instead of sfsync() -- doh
+	 pzsplit.c: drop SF_WRITE sfreserve() to keep writes aligned
+05-06-30 pzsplit.c: work around sfreserve() write failure via sfwrite()
 04-04-08 add pznospace()
 04-02-29 pzip.h,pzline.c: fix pz_init() prototype
 03-11-04 pzpart.c: use PZ_HEAD to avoid multiple PZ_UPDATE, fix wrk overflow
@@ -7744,7 +7796,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>June 06, 2005</TD>
+<TD align=right>July 29, 2005</TD>
 </TR>
 </TABLE>
 <P>

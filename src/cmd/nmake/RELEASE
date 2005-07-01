@@ -1,3 +1,15 @@
+05-07-17 Makerules.mk: move cobol specifics to pkg-cobol.mk
+	 Makerules.mk: add CCSPECIALIZE $(CC.OPTIMIZE) override
+	 Makerules.mk: add include - + pkg-default.mk
+	 Makerules.mk: add $(-mam) test for .MAM.INIT in .mo
+	 Makerules.mk: --mam=static set noreadstate reread strictview
+	 Makerules.mk: handle package named by root dir: :PACKAGE: /a/b/name
+	 pkg-cobol.mk: generic cobol package setup
+	 pkg-cobol-cobc.mk: open source cobol package setup
+	 pkg-cobol-mfcobc.mk: microfocus cobol package setup
+	 options.h: OPT_reread is boolean, not numeric
+	 rule.c: add .FREEZE state.freeze
+	 tests/recurse.tst: add
 05-05-25 Makerules.mk: use $(CC.INCLUDE.LOCAL) instead of -I- CC.DIALECT
 05-05-18 Makerules.mk: fix --static-link typo
 	 Makerules.mk: disable .MAMACTION "setv FOO ${FOO}"

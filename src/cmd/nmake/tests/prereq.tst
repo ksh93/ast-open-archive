@@ -174,7 +174,7 @@ exec  : compile into make object
 done Makefile.ms
 info finish regression'
 
-	EXEC	--mam=regress
+	EXEC	-n --mam=regress
 		OUTPUT - $'info mam regress 00000
 info start regression
 make Makefile
@@ -184,10 +184,10 @@ bind makerules.mo 0.3
 done makerules.mo
 done Makefile
 make .OPTION.COMPATIBILITY
-bind .OPTION.COMPATIBILITY 0.0
+bind .OPTION.COMPATIBILITY 0.3
 done .OPTION.COMPATIBILITY virtual
 make .PROBE.INIT
-bind .PROBE.INIT 0.0
+bind .PROBE.INIT 0.3
 make .OPTION.COMPATIBILITY
 bind .OPTION.COMPATIBILITY 0.4
 done .OPTION.COMPATIBILITY virtual
@@ -201,9 +201,9 @@ make .FLAGSINIT
 bind .FLAGSINIT 0.0
 done .FLAGSINIT virtual
 make .MAM.INIT
-bind .MAM.INIT 0.0
+bind .MAM.INIT 0.3
 make .FIND.
-bind .FIND. 0.0
+bind .FIND. 0.3
 done .FIND. virtual
 setv PACKAGEROOT $HOME
 setv AR ar
@@ -241,14 +241,14 @@ make .FIND.
 bind .FIND. 0.4
 done .FIND. virtual
 make .CATALOG.NAME.
-bind .CATALOG.NAME. 0.0
+bind .CATALOG.NAME. 0.3
 done .CATALOG.NAME. virtual
 make .CATALOG.NAME.
 bind .CATALOG.NAME. 0.4
 done .CATALOG.NAME. virtual
 bind (USAGE_LICENSE) "[--catalog?prereq]"
 make (USAGE_LICENSE) state
-bind "[--catalog?prereq]" 0.4 (USAGE_LICENSE)
+bind "[--catalog?prereq]" 0.3 (USAGE_LICENSE)
 done (USAGE_LICENSE)
 done .MAM.INIT virtual
 make myinit
@@ -262,37 +262,129 @@ meta bar.h %.G>%.h uhdr/bar.G bar
 make uhdr/bar.G
 bind bar.G 0.3 uhdr/bar.G
 make .SCAN.c
-bind .SCAN.c 0.0
+bind .SCAN.c 0.3
 done .SCAN.c virtual
-make .PREFIX.INCLUDE.
-bind .PREFIX.INCLUDE. 0.0
-done .PREFIX.INCLUDE. virtual
 make foo.h implicit
 bind foo.h 0.3
 meta foo.h %.G>%.h uhdr/foo.G foo
 make uhdr/foo.G
 bind foo.G 0.3 uhdr/foo.G
 done uhdr/foo.G
-init foo.h 0.4
-exec - cp uhdr/foo.G foo.h
-code - 0 0.4 0.4
-make .PREFIX.INCLUDE.
-bind .PREFIX.INCLUDE. 0.4
-done .PREFIX.INCLUDE. virtual
-info warning "mymain", line 2: warning: mymain : bar.h : uhdr/bar.G : foo.h : bar.h: implicit reference before action completed
 make bar.h implicit
-bind bar.h 0.4
-done bar.h
+bind bar.h 0.3
+done bar.h generated
 done foo.h generated
 done uhdr/bar.G
-init bar.h 0.4
-exec - cp uhdr/bar.G bar.h
-code - 0 0.4 0.4
-make .PREFIX.INCLUDE.
-bind .PREFIX.INCLUDE. 0.4
-done .PREFIX.INCLUDE. virtual
 make foo.h implicit
-bind foo.h 0.4
+bind foo.h 0.3
+done foo.h generated
+done bar.h generated
+done mymain generated
+info finish regression'
+
+	EXEC	--mam=regress
+		OUTPUT - $'info mam regress 00000
+info start regression
+make Makefile
+bind Makefile 0.3
+make makerules.mo
+bind makerules.mo 0.3
+done makerules.mo
+done Makefile
+make .OPTION.COMPATIBILITY
+bind .OPTION.COMPATIBILITY 0.3
+done .OPTION.COMPATIBILITY virtual
+make .PROBE.INIT
+bind .PROBE.INIT 0.3
+make .OPTION.COMPATIBILITY
+bind .OPTION.COMPATIBILITY 0.4
+done .OPTION.COMPATIBILITY virtual
+make cc.probe
+bind cc.probe 0.3
+done cc.probe dontcare
+done .PROBE.INIT virtual
+setv INSTALLROOT $HOME
+bind (IFFEFLAGS) -v -c \'cc -O \'
+make .FLAGSINIT
+bind .FLAGSINIT 0.0
+done .FLAGSINIT virtual
+make .MAM.INIT
+bind .MAM.INIT 0.3
+make .FIND.
+bind .FIND. 0.3
+done .FIND. virtual
+setv PACKAGEROOT $HOME
+setv AR ar
+setv ARFLAGS cr
+setv AS as
+setv ASFLAGS
+setv CC cc
+setv mam_cc_FLAGS
+setv CCFLAGS ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${mam_cc_OPTIMIZE}?}
+setv CCLDFLAGS  ${-strip-symbols?1?${mam_cc_LD_STRIP}??}
+setv COTEMP $$
+setv CPIO cpio
+setv CPIOFLAGS
+setv CPP "${CC} -E"
+setv F77 f77
+setv HOSTCC ${CC}
+setv IGNORE
+setv LD ld
+setv LDFLAGS
+setv LEX lex
+setv LEXFLAGS
+setv LPR lpr
+setv LPRFLAGS
+setv M4FLAGS
+setv NMAKE nmake
+setv NMAKEFLAGS
+setv PR pr
+setv PRFLAGS
+setv SHELL /bin/sh
+setv SILENT
+setv TAR tar
+setv YACC yacc
+setv YACCFLAGS -d
+make .FIND.
+bind .FIND. 0.4
+done .FIND. virtual
+make .CATALOG.NAME.
+bind .CATALOG.NAME. 0.3
+done .CATALOG.NAME. virtual
+make .CATALOG.NAME.
+bind .CATALOG.NAME. 0.4
+done .CATALOG.NAME. virtual
+bind (USAGE_LICENSE) "[--catalog?prereq]"
+make (USAGE_LICENSE) state
+bind "[--catalog?prereq]" 0.3 (USAGE_LICENSE)
+done (USAGE_LICENSE)
+done .MAM.INIT virtual
+make myinit
+bind myinit 0.0
+done myinit generated
+make mymain
+bind mymain 0.0
+make bar.h
+bind bar.h 0.3
+meta bar.h %.G>%.h uhdr/bar.G bar
+make uhdr/bar.G
+bind bar.G 0.3 uhdr/bar.G
+make .SCAN.c
+bind .SCAN.c 0.3
+done .SCAN.c virtual
+make foo.h implicit
+bind foo.h 0.3
+meta foo.h %.G>%.h uhdr/foo.G foo
+make uhdr/foo.G
+bind foo.G 0.3 uhdr/foo.G
+done uhdr/foo.G
+make bar.h implicit
+bind bar.h 0.3
+done bar.h generated
+done foo.h generated
+done uhdr/bar.G
+make foo.h implicit
+bind foo.h 0.3
 done foo.h generated
 done bar.h generated
 done mymain generated

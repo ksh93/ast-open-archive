@@ -727,9 +727,11 @@ TEST 11 'rules obsolete "name=value" compatibility'
 
 	EXEC	-n clobber=0
 		OUTPUT - $'+ :  : 0 :'
+		ERROR - $'make: warning: clobber=0: obsolete: use --noclobber'
 
 	EXEC	-n --clobber
 		OUTPUT - $'+ : * :  :'
+		ERROR -
 
 	EXEC	-n --clobber=1
 
@@ -756,9 +758,11 @@ TEST 11 'rules obsolete "name=value" compatibility'
 
 	EXEC	-n clobber=0
 		OUTPUT - $'+ :  : 0 :'
+		ERROR - $'make: warning: clobber=0: obsolete: use --noclobber'
 
 	EXEC	-n --clobber
 		OUTPUT - $'+ : * :  :'
+		ERROR -
 
 	EXEC	-n --clobber=1
 
@@ -771,21 +775,25 @@ TEST 11 'rules obsolete "name=value" compatibility'
 		INPUT Makefile $'clobber = 0
 all :\n\t: $(-clobber) : $(clobber) :'
 		OUTPUT - $'+ :  : 0 :'
+		ERROR - $'make: warning: clobber=0: obsolete: use --noclobber'
 
 	EXEC	-n
 		INPUT Makefile $'set noclobber
 all :\n\t: $(-clobber) : $(clobber) :'
 		OUTPUT - $'+ :  :  :'
+		ERROR -
 
 	EXEC	-n
 		INPUT Makefile $'clobber = 1
 all :\n\t: $(-clobber) : $(clobber) :'
 		OUTPUT - $'+ : * : 1 :'
+		ERROR - $'make: warning: clobber=1: obsolete: use --clobber'
 
 	EXEC	-n
 		INPUT Makefile $'set clobber
 all :\n\t: $(-clobber) : $(clobber) :'
 		OUTPUT - $'+ : * :  :'
+		ERROR -
 
 TEST 12 '--serialize'
 

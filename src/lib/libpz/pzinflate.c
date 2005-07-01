@@ -141,99 +141,107 @@ pzinflate(register Pz_t* pz, Sfio_t* op)
 		}
 		pz->prefix.count = 0;
 	}
-	if (pz->split.flags & PZ_SPLIT_INFLATE)
-		return pzsinflate(pz, op);
-
-	/*
-	 * inflate each file
-	 */
-
-	do
+	if ((pz->split.flags & (PZ_SPLIT_INFLATE|PZ_SPLIT_PART)) == PZ_SPLIT_INFLATE)
+		i = pzsinflate(pz, op);
+	else
 	{
 		/*
-		 * inflate each window
+		 * inflate each file
 		 */
 
-		pp = pz->part;
-		pat = pz->pat;
-		while (m = sfgetu(pz->io))
+		do
 		{
 			/*
-			 * hi frequency data in pz->buf
+			 * inflate each window
 			 */
 
-			if (pp->nmap)
+			pp = pz->part;
+			pat = pz->pat;
+			while (m = sfgetu(pz->io))
 			{
-				if (m > pz->win || (m % pp->nmap) || sfread(pz->io, pz->buf, m) != m)
+				/*
+				 * hi frequency data in pz->buf
+				 */
+
+				if (pp->nmap)
+				{
+					if (m > pz->win || (m % pp->nmap) || sfread(pz->io, pz->buf, m) != m)
+					{
+						if (pz->disc->errorf)
+							(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: data corrupted", pz->path);
+						return -1;
+					}
+					n = m / pp->nmap;
+					m = 0;
+					j = 0;
+					k = 0;
+					for (i = 0; i < pp->nmap; i++)
+					{
+						if (i > 0 && pp->lab[i] == pp->lab[i - 1])
+							j++;
+						else
+							j = m;
+						if (!pp->value || pp->value[i] < 0)
+							pp->mix[k++] = pz->buf + j;
+						m += n;
+					}
+				}
+				else if (m != 1)
 				{
 					if (pz->disc->errorf)
 						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: data corrupted", pz->path);
 					return -1;
 				}
-				n = m / pp->nmap;
-				m = 0;
-				j = 0;
-				k = 0;
-				for (i = 0; i < pp->nmap; i++)
+
+				/*
+				 * lo frequency
+				 */
+
+				m = sfgetu(pz->io);
+				if (m < pp->row || sfread(pz->io, pat, pp->row) != pp->row)
 				{
-					if (i > 0 && pp->lab[i] == pp->lab[i - 1])
-						j++;
-					else
-						j = m;
-					if (!pp->value || pp->value[i] < 0)
-						pp->mix[k++] = pz->buf + j;
-					m += n;
+					if (pz->disc->errorf)
+						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: data corrupted", pz->path);
+					return -1;
 				}
+				m -= pp->row;
+				if (sfread(pz->io, pz->nxt = pz->val, m) != m)
+				{
+					if (pz->disc->errorf)
+						(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: data corrupted", pz->path);
+					return -1;
+				}
+
+				/*
+				 * restore lo+hi on op
+				 */
+
+				if (restore(pz, pp, pz->io, op, pat, pz->wrk, pp->row, k, pp->map, pp->mix, pp->inc))
+					return -1;
 			}
-			else if (m != 1)
+			if (!(pz->flags & PZ_SECTION))
+			{
+				if ((k = sfgetc(pz->io)) == PZ_MARK_PART)
+				{
+					if ((m = sfgetu(pz->io)) && !sferror(pz->io) && !sfeof(pz->io) && (pat = (unsigned char*)sfreserve(pz->io, m, 0)))
+						sfwrite(op, pat, m);
+				}
+				else if (k != EOF)
+					sfungetc(pz->io, k);
+			}
+			if (sferror(op))
 			{
 				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: data corrupted", pz->path);
+					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "write error");
 				return -1;
 			}
-
-			/*
-			 * lo frequency
-			 */
-
-			m = sfgetu(pz->io);
-			if (m < pp->row || sfread(pz->io, pat, pp->row) != pp->row)
-			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: data corrupted", pz->path);
-				return -1;
-			}
-			m -= pp->row;
-			if (sfread(pz->io, pz->nxt = pz->val, m) != m)
-			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%s: data corrupted", pz->path);
-				return -1;
-			}
-
-			/*
-			 * restore lo+hi on op
-			 */
-
-			if (restore(pz, pp, pz->io, op, pat, pz->wrk, pp->row, k, pp->map, pp->mix, pp->inc))
-				return -1;
-		}
-		if (!(pz->flags & PZ_SECTION))
-		{
-			if ((k = sfgetc(pz->io)) == PZ_MARK_PART)
-			{
-				if ((m = sfgetu(pz->io)) && !sferror(pz->io) && !sfeof(pz->io) && (pat = (unsigned char*)sfreserve(pz->io, m, 0)))
-					sfwrite(op, pat, m);
-			}
-			else if (k != EOF)
-				sfungetc(pz->io, k);
-		}
-		if (sfsync(op))
-		{
-			if (pz->disc->errorf)
-				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "write error");
-			return -1;
-		}
-	} while ((i = !(pz->flags & PZ_SECTION)) && (i = pzfile(pz)) > 0);
+		} while ((i = !(pz->flags & PZ_SECTION)) && (i = pzfile(pz)) > 0);
+	}
+	if (i >= 0 && !(pz->split.flags & PZ_SPLIT_PART) && sfsync(op))
+	{
+		if (pz->disc->errorf)
+			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "write error");
+		return -1;
+	}
 	return i;
 }

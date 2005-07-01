@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-05-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-07-17
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -378,7 +378,7 @@ make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.0 2005-05-11 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.0 2005-07-17 \$\0\n"\" -c version.c
 done version.o generated
 bind -lcoshell
 bind -lardir
@@ -586,6 +586,21 @@ make pkg-freetype.mk
 done pkg-freetype.mk
 exec - test '' = 'pkg-freetype.mk' || ${STDCMP} 2>/dev/null -s pkg-freetype.mk ${INSTALLROOT}/lib/make/pkg-freetype.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-freetype.mk ${INSTALLROOT}/lib/make/pkg-freetype.mk.old 2>/dev/null || true; ${STDCP} pkg-freetype.mk ${INSTALLROOT}/lib/make/pkg-freetype.mk  		    		    ;}
 done ${INSTALLROOT}/lib/make/pkg-freetype.mk generated
+make ${INSTALLROOT}/lib/make/pkg-cobol.mk
+make pkg-cobol.mk
+done pkg-cobol.mk
+exec - test '' = 'pkg-cobol.mk' || ${STDCMP} 2>/dev/null -s pkg-cobol.mk ${INSTALLROOT}/lib/make/pkg-cobol.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-cobol.mk ${INSTALLROOT}/lib/make/pkg-cobol.mk.old 2>/dev/null || true; ${STDCP} pkg-cobol.mk ${INSTALLROOT}/lib/make/pkg-cobol.mk  		    		    ;}
+done ${INSTALLROOT}/lib/make/pkg-cobol.mk generated
+make ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk
+make pkg-cobol-cobc.mk
+done pkg-cobol-cobc.mk
+exec - test '' = 'pkg-cobol-cobc.mk' || ${STDCMP} 2>/dev/null -s pkg-cobol-cobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk.old 2>/dev/null || true; ${STDCP} pkg-cobol-cobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk  		    		    ;}
+done ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk generated
+make ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk
+make pkg-cobol-mfcobc.mk
+done pkg-cobol-mfcobc.mk
+exec - test '' = 'pkg-cobol-mfcobc.mk' || ${STDCMP} 2>/dev/null -s pkg-cobol-mfcobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk.old 2>/dev/null || true; ${STDCP} pkg-cobol-mfcobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk  		    		    ;}
+done ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk generated
 make ${INSTALLROOT}/lib/make/ppcc
 prev ppcc
 exec - test '' = 'ppcc' || ${STDCMP} 2>/dev/null -s ppcc ${INSTALLROOT}/lib/make/ppcc || { ${STDMV} ${INSTALLROOT}/lib/make/ppcc ${INSTALLROOT}/lib/make/ppcc.old 2>/dev/null || true; ${STDCP} ppcc ${INSTALLROOT}/lib/make/ppcc  		    		    ;}
@@ -711,6 +726,11 @@ prev tests/test.def implicit
 done tests/quoting.tst
 exec - regress  tests/quoting.tst
 done test.quoting virtual
+make test.recurse
+make tests/recurse.tst
+done tests/recurse.tst
+exec - regress  tests/recurse.tst
+done test.recurse virtual
 make test.scan
 make tests/scan.tst
 prev tests/cc.def implicit

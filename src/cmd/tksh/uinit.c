@@ -39,7 +39,8 @@ static void tksh_userinit(int subshell)
 	}
 	if (subshell < 0)
 	{
-		sh_trap("tkloop", 0);
+		if(nv_open("tkloop",sh.fun_tree,NV_NOADD))
+			sh_trap("tkloop", 0);
 		return;
 	}
 	else if (subshell > 0)

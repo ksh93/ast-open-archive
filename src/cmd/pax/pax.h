@@ -202,7 +202,6 @@ typedef struct Tarheader_s Tarheader_t;
 #define MINBLOCK	1		/* smallest block size		*/
 #define DEFBLOCKS	PAX_DEFBLOCKS	/* default blocking		*/
 #define DEFBUFFER	PAX_DEFBUFFER	/* default io buffer blocking	*/
-#define MAXBLOCKS	40		/* largest zero fill blocking	*/
 #define FILBLOCKS	1024		/* file to file blocking	*/
 #define MAXUNREAD	(8*BLOCKSIZE)	/* max bunread() count		*/
 #define MINID		80		/* min ident buffer size	*/

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-05-25 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-07-17 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -244,8 +244,6 @@ LICENSECLASS = $(LICENSEINFO:P=W=$(LICENSE),query=${type}.${class})
 .SUFFIX.c = .c
 .SUFFIX.HEADER.c = .h
 .SUFFIX.C = .C .cc .cpp .cxx .c++
-.SUFFIX.cob = .cob .COB .cbl .CBL
-.SUFFIX.HEADER.cob = .cpy .CPY
 .SUFFIX.f = .f .F
 .SUFFIX.r = .r .R
 
@@ -355,15 +353,12 @@ CC = cc
 CCFLAGS = $(CC.OPTIMIZE)
 CCLD = $(CC)
 CCLDFLAGS =
+CCSPECIALIZE =
 CHGRP = chgrp
 CHMOD = chmod
 CHOWN = chown
 CMP = cmp
 CMPFLAGS = -s
-COBOL = cobc
-COBOLDIALECT =
-COBOLFLAGS = -static $(COBOLDIALECT) -C
-COBOLLIBRARIES = -lcob
 CP = cp
 CPIO = cpio
 CPP = $(MAKEPP)
@@ -1085,16 +1080,6 @@ end
 for .S. $(.SUFFIX.c) $(.SUFFIX.C)
 	%.o : %$(.S.) (CC) (CCFLAGS)
 		$(CC) $(CCFLAGS) -c $(>)
-end
-
-.COBOL.INIT : .MAKE .VIRTUAL .FORCE .IGNORE
-	$(COBOLLIBRARIES) : .DONTCARE
-	LDFLAGS += $$(!:A=.SCAN.cob:@?$$(CC.EXPORT.DYNAMIC)??)
-	LDLIBRARIES += $$(!:A=.SCAN.cob:@?$$(COBOLLIBRARIES)??)
-
-for .S. $(.SUFFIX.cob)
-	%.c %.c.h : %$(.S.) (COBOL) (COBOLDIALECT) (COBOLFLAGS) .COBOL.INIT
-		$(COBOL) $(COBOLFLAGS) $(>)
 end
 
 for .S. $(.SUFFIX.f) $(.SUFFIX.r)
@@ -2618,7 +2603,7 @@ end
 		if ! LP
 			LP = lib
 		end
-		if ( I && L || "$(.PACKAGE.$(P).rules)" != "|-" && ( "$(I:T=F)" || "$(L:T=F)" ) )
+		if ( I && L || "$(.PACKAGE.$(P).rules)" != "-" && ( "$(I:T=F)" || "$(L:T=F)" ) )
 			FOUND = 1
 		else
 			if ! "$(CC.REQUIRE.$(P))"
@@ -2640,21 +2625,35 @@ end
 					FOUND = 1
 				end
 			end
-			if ( !I && !L )
+			T2 := $(PACKAGE_$(P))
+			if T2
+				if !I
+					T1 = $(T2)/$(IP)
+					if "$(T1:P=X)"
+						I := $(T1)
+						PACKAGE_billing_INCLUDE := $(I)
+					end
+				end
+				if !L
+					T1 = $(T2)/$(LP)
+					if "$(T1:P=X)"
+						L := $(T1)
+						PACKAGE_billing_LIB := $(L)
+					end
+				end
+			elif !I && !L
 				T1 = $(INSTALLROOT)/$(IP)/$(P)
 				if "$(T1:P=X)"
 					for K SHARED ARCHIVE
 						T1 = $(INSTALLROOT)/$(LP)/$(CC.PREFIX.$(K))$(P)$(CC.SUFFIX.$(K))
 						if "$(T1:P=X)"
-							eval
-							PACKAGE_$(P) = $(INSTALLROOT)
-							end
+							T2 := $(INSTALLROOT)
+							PACKAGE_$(P) := $(T2)
 							break
 						end
 					end
 				end
 			end
-			T2 := $(PACKAGE_$(P))
 			if !L || !I && !T2
 				T4 := $(PACKAGE_PATH:/:/ /G) $(.PACKAGE.DIRS.) $(.PACKAGE.GLOBAL.) $(.PACKAGE.GLOBAL.:/:/ /G:C%$%/$(P)%)
 				if P == "*[!0-9]+([0-9])"
@@ -2939,6 +2938,13 @@ PACKAGES : .SPECIAL .FUNCTION
 				P := $(T)
 				T :=
 			end
+			if P == "/*"
+				V := $(P)
+				P := $(P:B)
+				if ! PACKAGE_$(P)
+					PACKAGE_$(P) := $(V)
+				end
+			end
 			if "$(_PACKAGE_$(P))" == "0"
 				continue
 			end
@@ -2946,7 +2952,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			V := $(version)
 			while 1
 				if H = "$(I:T=F)"
-					.PACKAGE.$(P).rules := $(N)
+					.PACKAGE.$(P).rules := $(H)
 					break
 				elif "$(PACKAGE_$(P))$(PACKAGE_$(P)_INCLUDE)$(PACKAGE_$(P)_LIB)"
 					break
@@ -3038,6 +3044,8 @@ PACKAGES : .SPECIAL .FUNCTION
 						.PACKAGE.$(P).include := -
 						.PACKAGE.$(P).lib := -
 						.PACKAGE.$(P).library :=
+					elif V
+						.PACKAGE.$(P) := $(V)
 					end
 				elif N == "type"
 					if V
@@ -3435,6 +3443,9 @@ PACKAGES : .SPECIAL .FUNCTION
 	if ! CC.SUFFIX.OBJECT
 		CC.SUFFIX.OBJECT = .o
 	end
+	if CCSPECIALIZE
+		CC.OPTIMIZE := $(CCSPECIALIZE)
+	end
 	.ATTRIBUTE.%$(CC.SUFFIX.OBJECT) : .OBJECT
 	if CC.SHARED.REGISTRY
 		CC.SHARED += $$(.CC.SHARED.REGISTRY.)
@@ -3501,6 +3512,7 @@ PACKAGES : .SPECIAL .FUNCTION
 			end
 		end
 	end
+	include - + pkg-default.mk
 
 .FLAGSINIT : .VIRTUAL
 
@@ -3875,7 +3887,6 @@ PACKAGES : .SPECIAL .FUNCTION
 			$(LDSHARED) $(CC.SHARED) -o $(<) $(*$(**):N!=*$(CC.SUFFIX.ARCHIVE))
 		.ATTRIBUTE.%.a : -ARCHIVE
 	end
-	COBOLFLAGS &= $$(.INCLUDE. cob -I)
 	IFFEFLAGS += -c '$$(IFFECC) $$(IFFECCFLAGS) $$(IFFELDFLAGS)' $$(-mam:N=(regress|static)*:??-S '$$(CC.STATIC)')
 	if "$(-cross)" || "$(CC.EXECTYPE)" && "$(CC.HOSTTYPE)" != "$(CC.EXECTYPE)"
 		set cross
@@ -4535,8 +4546,8 @@ end
  */
 
 .MAM.LOAD : .MAKE .VIRTUAL .FORCE
-	set noreadstate reread strictview
 	if "$(-mam:N=static*)"
+		set noreadstate reread strictview
 		set readonly
 		INSTALLROOT = $(.MAMROOT.)
 		PACKAGEROOT = $(.MAMROOT.)/../..
@@ -4554,6 +4565,9 @@ end
 
 .MAM.INIT : .MAKE .VIRTUAL .FORCE .AFTER
 	local T
+	if ! "$(-mam)"
+		return
+	end
 	LICENSEFILES := $(LICENSEINFO)
 	if "$(-mam:N=*,port*)"
 		CC.DEBUG = ${mam_cc_DEBUG}

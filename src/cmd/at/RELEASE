@@ -1,3 +1,4 @@
+05-06-29 crontab.sh: fix (...) => @(...) syntax error
 02-02-14 atd: add strdup(argv[1]) to workaround argv[1]=>0 mystery
 01-06-18 crontab: clarify the command<=>job relationship
 01-03-28 atd: fix log file rollover infinite loop

@@ -708,6 +708,13 @@ immediate(register Rule_t* r)
 		getimmediate(r, &prereqs, &action);
 		complete(NiL, prereqs, NiL, 0);
 	}
+	else if (r == internal.freeze)
+	{
+		getimmediate(r, &prereqs, &action);
+		for (p = prereqs; p; p = p->next)
+			if (v = getvar(p->rule->name))
+				v->property |= V_frozen;
+	}
 	else if ((r->property & P_attribute) && !r->attribute)
 		return;
 	else if (!state.op && state.reading && state.compileonly)
@@ -1440,6 +1447,7 @@ initrule(void)
 	INIT(empty,		"",		0);
 	INIT(error,		".ERROR",	0);
 	INIT(exported,		".EXPORT",	P_attribute|P_immediate);
+	INIT(freeze,		".FREEZE",	P_immediate);
 	INIT(globalfiles,	".GLOBALFILES",	P_internal|P_readonly);
 	INIT(include,		".INCLUDE",	P_immediate);
 	INIT(insert,		".INSERT",	P_attribute);

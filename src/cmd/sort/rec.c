@@ -104,7 +104,7 @@ main(int argc, char** argv)
 		sp = sfstdin;
 	else if (!(sp = sfopen(NiL, path, "r")))
 		error(ERROR_SYSTEM|3, "%s: cannot open", path);
-	sfprintf(sfstdout, "%s", fmtrec(f));
+	sfprintf(sfstdout, "%s", fmtrec(f, 0));
 	if (*e)
 		sfprintf(sfstdout, " [%s]", e);
 	if (sp && RECTYPE(f) == REC_method)
@@ -129,7 +129,7 @@ main(int argc, char** argv)
 			f = REC_N_TYPE();
 			break;
 		}
-		sfprintf(sfstdout, " => %s", fmtrec(f));
+		sfprintf(sfstdout, " => %s", fmtrec(f, 0));
 		if (*e)
 			sfprintf(sfstdout, " [%s]", e);
 	}

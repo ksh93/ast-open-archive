@@ -34,7 +34,7 @@ USAGE_LICENSE
     "both of each \afile\a. The modification time is the \ast_mtime\a member "
     "of the \bstat\b(2) information and the access time is the \ast_atime\a "
     "member. On most systems the file status change time is always set to "
-    "the current time when eith the access or modification times are "
+    "the current time when either the access or modification times are "
     "changed.]"
 "[+?If neither the \b--reference\b nor the \b--time\b options are "
     "specified then the time used will be the \adate\a operand or the "

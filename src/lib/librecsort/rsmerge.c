@@ -166,11 +166,20 @@ Merge_t*	mg;
 		else for(s = RS_RESERVE, o = 0, last = 0;;) /* make sure we have at least 1 record */
 		{	MGRESERVE(mg,rsrv,endrsrv,cur,s, goto last_chunk);
 			x = endrsrv-cur;
+#if _PACKAGE_ast
+			if (rsc & ~0xff) /* Recfmt_t record descriptor */
+			{	if ((datalen = reclen(rsc, cur, x)) < 0)
+					return -1;
+				if (datalen <= x)
+					break;
+			}
+			else
+#endif
 			if((t = (uchar*)memchr(cur,rsc,x)) )
 			{	datalen = (t-cur)+1;
 				break;
 			}
-			else if(MGISEOF(mg))
+			if(MGISEOF(mg))
 				return -1;
 			else if(o == x)
 			{	datalen = x;
@@ -288,9 +297,18 @@ Merge_t*	mg;
 					goto done;
 			}
 			else
-			{	if(!(t = (uchar*)memchr(cur,rsc,endrsrv-cur)) )
+			{	
+#if _PACKAGE_ast
+				if (rsc & ~0xff) /* Recfmt_t record descriptor */
+				{	if ((datalen = reclen(rsc, cur, endrsrv-cur)) < 0 || datalen > (endrsrv-cur))
+						goto done;
+				}
+				else
+#endif
+				if(!(t = (uchar*)memchr(cur,rsc,endrsrv-cur)) )
 					goto done;
-				datalen = (t-cur)+1;
+				else
+					datalen = (t-cur)+1;
 			}
 		}
 		else

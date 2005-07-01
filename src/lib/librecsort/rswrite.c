@@ -112,6 +112,7 @@ int	type;	/* RS_TEXT 		*/
 	}
 
 	head = (rs->type&RS_DSAMELEN) ? 0 : sizeof(ssize_t);
+	type |= rs->type&RS_TEXT;
 
 	if(type&RS_TEXT) /* write in plain text */
 	{	u = (rs->events & RS_WRITE) != 0;

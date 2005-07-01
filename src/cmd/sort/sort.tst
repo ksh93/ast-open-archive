@@ -262,7 +262,7 @@ UVWXYZ'
 		ERROR - $'sort: warning: incomplete record length=1'
 	EXEC	-R% fixed%6 fixed%7
 		OUTPUT -
-		ERROR - $'sort: fixed%7: record format inconsistent with fixed%6'
+		ERROR - $'sort: fixed%7: format f7 inconsistent with fixed%6 format f6'
 		EXIT 1
 	EXEC	-R% flat
 		INPUT flat $'-ZZZZZZZ\n-AAA\n-QQQQQ\n-CCCCCCCCCCCCCCCC'

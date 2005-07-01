@@ -198,7 +198,7 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 			if ((dp->pz->flags & PZ_DUMP) && dp->pz->disc->errorf)
 				(*dp->pz->disc->errorf)(dp->pz, dp->pz->disc, 0, "%8d %12s %2d %4d %4I*u %12I*u%s", ip->seq, ip->name, !!ip->part, ip->use, sizeof(ip->row), ip->row, sizeof(n), n, ip->windows == 1 ? "  NEW" : "");
 		}
-	if (sfsync(op))
+	if (sferror(op))
 	{
 		if (dp->pz->disc->errorf)
 			(*dp->pz->disc->errorf)(dp->pz, dp->pz->disc, ERROR_SYSTEM|2, "partition table write error");
@@ -235,7 +235,7 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 		if (n = sfstrtell(ip->sp))
 		{
 			sfstrseek(ip->sp, 0, SEEK_SET);
-			if (sfwrite(op, sfstrbase(ip->sp), n) != n || sfsync(op))
+			if (sfwrite(op, sfstrbase(ip->sp), n) != n || sferror(op))
 			{
 				error_info.file = ip->name;
 				error_info.line = n;
@@ -267,7 +267,7 @@ flush(Deflate_t* dp, size_t w, Sfio_t* op)
 	 * done with this window
 	 */
 
-	if (sfsync(op))
+	if (sferror(op))
 	{
 		if (dp->pz->disc->errorf)
 			(*dp->pz->disc->errorf)(dp->pz, dp->pz->disc, ERROR_SYSTEM|2, "write error");
@@ -338,7 +338,7 @@ deflate(Pz_t* pz, Sfio_t* op)
 
 	if (pzheadwrite(def.pz, op))
 		goto bad;
-	if (sfsync(op))
+	if (sferror(op))
 	{
 		if (pz->disc->errorf)
 			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "magic write error");
@@ -442,7 +442,7 @@ deflate(Pz_t* pz, Sfio_t* op)
 	 */
 
 	sfputu(op, 0);
-	if (sfsync(op))
+	if (sferror(op))
 	{
 		if (pz->disc->errorf)
 			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "write error");
@@ -639,22 +639,17 @@ inflate(Pz_t* pz, Sfio_t* op)
 					n = (n << SF_UBITS) | (i & (SF_MORE - 1));
 				n = (n << SF_UBITS) | i;
 			}
-#if 1
-			if (!(s = (char*)sfreserve(op, n, 0)))
-			{
-				if (pz->disc->errorf)
-					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "cannot reserve %I*u byte output buffer", sizeof(n), n);
-				goto bad;
-			}
-			memcpy(s, p, n);
-#else
+#if 0
+			if (s = (char*)sfreserve(op, n, 0)) /* NOTE: investigate how reserve can fail but write work */
+				memcpy(s, p, n);
+			else
+#endif
 			if (sfwrite(op, p, n) != n)
 			{
 				if (pz->disc->errorf)
 					(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "%I*u byte write error", sizeof(n), n);
 				goto bad;
 			}
-#endif
 			ip->bp = (char*)p + n;
 		}
 	}
@@ -664,7 +659,7 @@ inflate(Pz_t* pz, Sfio_t* op)
 			(*pz->disc->errorf)(pz, pz->disc, 2, "%s: input corrupted [EOF expected at %I*u]", pz->path, sftell(pz->io));
 		goto bad;
 	}
-	if (sfsync(op))
+	if (sferror(op))
 	{
 		if (pz->disc->errorf)
 			(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "write error");
@@ -693,9 +688,9 @@ pzsdeflate(Pz_t* pz, Sfio_t* op)
 {
 	int		r;
 
-	pz->split.flags &= ~PZ_SPLIT_DEFLATE;
+	pz->split.flags |= PZ_SPLIT_PART;
 	r = deflate(pz, op);
-	pz->split.flags |= PZ_SPLIT_DEFLATE;
+	pz->split.flags &= ~PZ_SPLIT_PART;
 	return r;
 }
 
@@ -704,9 +699,9 @@ pzsinflate(Pz_t* pz, Sfio_t* op)
 {
 	int	r;
 
-	pz->split.flags &= ~PZ_SPLIT_INFLATE;
+	pz->split.flags |= PZ_SPLIT_PART;
 	r = inflate(pz, op);
-	pz->split.flags |= PZ_SPLIT_INFLATE;
+	pz->split.flags &= ~PZ_SPLIT_PART;
 	return r;
 }
 

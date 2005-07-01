@@ -26,7 +26,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2003-10-12 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2005-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -625,7 +625,7 @@ main(int argc, char** argv)
 	if (streq(state.from.value.string, state.to.value.string))
 		state.cvt = (iconv_t)(-1);
 	else  if ((state.cvt = iconv_open(state.to.value.string, state.from.value.string)) == (iconv_t)(-1))
-		error(3, "cannot convert from %s to %s", state.from.value.string, state.to.value.string);
+		error(3, "cannot convert from %s to %s", *state.from.value.string ? state.from.value.string : ccmapname(CC_NATIVE), *state.to.value.string ? state.to.value.string : ccmapname(CC_NATIVE));
 	else if (state.cvt == (iconv_t)(0)) /* ast iconv identity */
 		state.cvt = (iconv_t)(-1);
 	else if (!(state.tmp = sfstropen()))

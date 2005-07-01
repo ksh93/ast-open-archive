@@ -169,7 +169,7 @@ ssize_t	s_data;		/* data size		*/
 				datalen = d;
 			}
 #if _PACKAGE_ast
-			else if (d & 0xffffff00) /* Recfmt_t record descriptor */
+			else if (d & ~0xff) /* Recfmt_t record descriptor */
 			{	if ((datalen = reclen(d, data, s_loop)) <= 0 || datalen > s_loop)
 					break;
 			}
@@ -245,9 +245,10 @@ ssize_t	s_data;		/* data size		*/
 					return -1;
 				else
 				{	rs->count += 1;
-					p_loop += datalen;
 					if (n == RS_INSERT)
+					{	p_loop += datalen;
 						goto insert;
+					}
 				}
 			}
 			else if((*insertf)(rs,r) < 0)

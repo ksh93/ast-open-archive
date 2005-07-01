@@ -29,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tw (AT&T Labs Research) 2005-02-23 $\n]"
+"[-?\n@(#)$Id: tw (AT&T Labs Research) 2005-06-13 $\n]"
 USAGE_LICENSE
 "[+NAME?tw - file tree walk]"
 "[+DESCRIPTION?\btw\b recursively descends the file tree rooted at the"
@@ -459,22 +459,63 @@ tw(register Ftw_t* ftw)
 static int
 order(register Ftw_t* f1, register Ftw_t* f2)
 {
-	register int	v;
-	long		n1;
-	long		n2;
+	register Exnode_t*	x;
+	register Exnode_t*	y;
+	register int		v;
+	long			n1;
+	long			n2;
+	int			icase;
+	int			reverse;
 
-	if (state.sortkey->index == F_name)
-		v = state.icase ? strcasecmp(f1->name, f2->name) : strcoll(f1->name, f2->name);
-	else
+	v = 0;
+	icase = state.icase;
+	reverse = state.reverse;
+	x = state.sortkey;
+	y = 0;
+	for (;;)
 	{
-		n1 = getnum(state.sortkey, f1);
-		n2 = getnum(state.sortkey, f2);
-		if (n1 < n2)
-			v = -1;
-		else if (n1 > n2)
-			v = 1;
-		else
-			v = 0;
+		switch (x->op)
+		{
+		case '~':
+			icase = !icase;
+			x = x->data.operand.left;
+			continue;
+		case '!':
+			reverse = !reverse;
+			x = x->data.operand.left;
+			continue;
+		case ',':
+			y = x->data.operand.right;
+			x = x->data.operand.left;
+			continue;
+		case S2B:
+			x = x->data.operand.left;
+			continue;
+		case ID:
+			x->data.variable.symbol;
+			if (x->data.variable.symbol->index == F_name || x->data.variable.symbol->index == F_path)
+				v = icase ? strcasecmp(f1->name, f2->name) : strcoll(f1->name, f2->name);
+			else
+			{
+				n1 = getnum(x->data.variable.symbol, f1);
+				n2 = getnum(x->data.variable.symbol, f2);
+				if (n1 < n2)
+					v = -1;
+				else if (n1 > n2)
+					v = 1;
+				else
+					v = 0;
+			}
+			if (v)
+				break;
+			if (!(x = y))
+				break;
+			y = 0;
+			icase = state.icase;
+			reverse = state.reverse;
+			continue;
+		}
+		break;
 	}
 	if (state.reverse)
 		v = -v;
@@ -499,6 +540,7 @@ main(int argc, register char** argv)
 	Dir_t*		firstdir;
 	Dir_t*		lastdir;
 	Exnode_t*	x;
+	Exnode_t*	y;
 	Finddisc_t	disc;
 
 	setlocale(LC_ALL, "");
@@ -645,28 +687,32 @@ main(int argc, register char** argv)
 			state.action = x;
 		if (x = exexpr(state.program, "sort", NiL, 0))
 		{
+			state.sortkey = x;
+			y = 0;
 			for (;;)
 			{
 				switch (x->op)
 				{
+				case ',':
+					y = x->data.operand.right;
+					/*FALLTHROUGH*/
 				case '~':
-					state.icase = 1;
-					x = x->data.operand.left;
-					continue;
+				case S2B:
 				case '!':
-					state.reverse = 1;
 					x = x->data.operand.left;
 					continue;
+				case ID:
+					if (!(x = y))
+						break;
+					y = 0;
+					continue;
+				default:
+					error(3, "invalid sort identifier");
+					break;
 				}
 				break;
 			}
-			if (x->op == S2B)
-				x = x->data.operand.left;
-			if (x->op != ID)
-				error(3, "invalid sort identifier");
-			state.sortkey = x->data.variable.symbol;
 			state.sort = order;
-			message((-1, "sortkey = %s", state.sortkey->name));
 		}
 		if (*argv && (*argv)[0] == '-' && (*argv)[1] == 0)
 		{
@@ -709,7 +755,9 @@ main(int argc, register char** argv)
 			state.sort = order;
 			if (!state.program)
 				compile("1");
-			state.sortkey = (Exid_t*)dtmatch(state.program->symbols, "name");
+			if (!(state.sortkey = newof(0, Exnode_t, 1, 0)) || !(state.sortkey->data.variable.symbol = (Exid_t*)dtmatch(state.program->symbols, "name")))
+				error(ERROR_SYSTEM|3, "out of space");
+			state.sortkey->op = ID;
 			s = p = 0;
 			for (dp = (firstdir == lastdir) ? firstdir : firstdir->next; dp; dp = dp->next)
 			{

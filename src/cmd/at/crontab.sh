@@ -36,7 +36,7 @@ op=
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	usage=$'
 [-?
-@(#)$Id: crontab (AT&T Labs Research) 2000-09-28 $
+@(#)$Id: crontab (AT&T Labs Research) 2005-06-29 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?crontab - schedule periodic background work]
@@ -216,10 +216,10 @@ do	set '' $line
 	time="$1 $2 $3 $4 $5"
 	shift 5
 	exec=${*//\\(?)/\1}
-	exec=${exec//([!])%/\1
+	exec=${exec//@([!])%/\1
 }
 	exec=${exec//^A/\\}
-	exec=${exec//(
+	exec=${exec//@(
 *)/\<\<\\
 \1
 }

@@ -173,7 +173,7 @@ typedef struct				/* program state		*/
 	Exnode_t*	select;		/* select expression		*/
 	int		separator;	/* xargs list separator		*/
 	int		(*sort)(Ftw_t*, Ftw_t*); 	/* sorter	*/
-	Exid_t*		sortkey;	/* sort identifier symbol	*/
+	Exnode_t*	sortkey;	/* sort key list		*/
 	Dt_t*		vistab;		/* visit hash table		*/
 	int		visitmem;	/* visit member count		*/
 } State_t;

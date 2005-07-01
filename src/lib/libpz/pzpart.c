@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.4 (AT&T Labs Research) 2004-04-04 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.4 (AT&T Labs Research) 2005-07-17 $\n]"
 "[a:append]"
 "[c:comment]:[text]"
 "[x:crc]"

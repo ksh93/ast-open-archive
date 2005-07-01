@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Labs Research) 2005-03-10 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2005-06-14 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -880,7 +880,9 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 			int			j;
 			int			k;
 			int			l;
+			int			m;
 			int			o;
+			int			q;
 			int			r;
 			int			w;
 			int			z;
@@ -912,9 +914,9 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 			o = 0;
 			if ((state.lsflags & LS_ACROSS) && n > 1)
 			{
-				for (;;)
+				c = (i - 1) / n + 1;
+				do
 				{
-					c = (i - 1) / n + 1;
 					w = -AFTER;
 					for (j = 0; j < c; j++)
 					{
@@ -926,10 +928,7 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 					}
 					if (w <= state.width)
 						o = n;
-					if (n == 1)
-						break;
-					n--;
-				}
+				} while (c < state.width / 2 && (n = (i + c) / (c + 1)) && ++c);
 				n = o ? o : 1;
 				c = (i - 1) / n + 1;
 				k = 0;
@@ -937,9 +936,9 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 				{
 					siz[k] = 0;
 					for (l = 0, r = j; l < n && r < i; r += c, l++)
-						if (siz[k] < (x[r]->namelen + a))
-							siz[k] = x[r]->namelen + a;
-					siz[k] += BETWEEN;
+						if (siz[k] < x[r]->namelen)
+							siz[k] = x[r]->namelen;
+					siz[k] += a + BETWEEN;
 					k++;
 				}
 				for (j = 0; j <= i; j += c)
@@ -950,33 +949,44 @@ col(register List_t* lp, register Ftw_t* ftw, int length)
 			{
 				o = 0;
 				if (n > 1)
-					for (;;)
+				{
+					if (!(q = i / n))
+						q = 1;
+					for (c = q; (c - q) < 2 && c <= state.width / (BETWEEN + 1); ++c)
 					{
-						w = -AFTER;
-						j = 0;
-						while (j < i)
+						n = m = (i + c - 1) / c;
+						if ((r = i - m * c) > state.height)
+							n -= (r + c - 1) / c;
+						for (; n <= m; n++)
 						{
-							z = 0;
-							for (l = 0; l < n && j < i; j++, l++)
-								if (z < (x[j]->namelen + a))
-									z = x[j]->namelen + a;
-							w += z + BETWEEN;
+							w = -AFTER;
+							j = 0;
+							while (j < i)
+							{
+								z = 0;
+								for (l = 0; l < n && j < i; j++, l++)
+									if (z < x[j]->namelen)
+										z = x[j]->namelen;
+								w += z + a + BETWEEN;
+							}
+							if (w <= state.width)
+							{
+								q = c;
+								o = n;
+								break;
+							}
 						}
-						if (w <= state.width && (!state.height || (n - l) < state.height))
-							o = n;
-						if (n == 1)
-							break;
-						n--;
 					}
+				}
 				n = o ? o : 1;
 				j = k = 0;
 				while (j < i)
 				{
 					siz[k] = 0;
 					for (l = 0; l < n && j < i; j++, l++)
-						if (siz[k] < (x[j]->namelen + a))
-							siz[k] = x[j]->namelen + a;
-					siz[k] += BETWEEN;
+						if (siz[k] < x[j]->namelen)
+							siz[k] = x[j]->namelen;
+					siz[k] += a + BETWEEN;
 					k++;
 				}
 				for (j = 0; j < n; j++)

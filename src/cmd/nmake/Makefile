@@ -13,7 +13,8 @@ RULES = Makerules.mk $(ALTRULES)
 RULESFILES = Scanrules.mk S.mk SYSTEM.mk TABLE.mk \
 		debug.mk mkservice.mk yacc.mk \
 		rules-win32.mk \
-		pkg-tcl.mk pkg-X11.mk pkg-freetype.mk
+		pkg-tcl.mk pkg-X11.mk pkg-freetype.mk \
+		pkg-cobol.mk pkg-cobol-cobc.mk pkg-cobol-mfcobc.mk
 RULESDIR = $(LIBDIR)/$(ID)
 
 IDNAME == "$(ID)"
@@ -49,7 +50,7 @@ convert :: convert.c
 
 :TEST: -- assert assign attribute automatic baserules common diagnostics \
 	edit immediate implicit internal interrupt metarule option panic \
-	prereq quoting scan shell state statement syntax view
+	prereq quoting recurse scan shell state statement syntax view
 
 Makeinstall.mk : $$(-mam:N=static*:??$$(-cctype|cctype:@P=P=C,pp)?)
 	{

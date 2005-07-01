@@ -532,6 +532,7 @@ typedef struct Internal_s		/* internal rule and list info	*/
 	Rule_t*		force;		/* .FORCE rule pointer		*/
 	Rule_t*		foreground;	/* .FOREGROUND rule pointer	*/
 	Rule_t*		functional;	/* .FUNCTIONAL rule pointer	*/
+	Rule_t*		freeze;		/* .FREEZE rule pointer		*/
 	Rule_t*		ignore;		/* .IGNORE rule pointer		*/
 	Rule_t*		immediate;	/* .IMMEDIATE rule pointer	*/
 	Rule_t*		implicit;	/* .IMPLICIT rule pointer	*/

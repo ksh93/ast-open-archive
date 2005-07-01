@@ -72,6 +72,7 @@ USAGE_LICENSE
 "	On some systems this can double the execution wall time."
 "	Most data corruption errors are still caught even with \bnocrc\b.]"
 "[d:dump?Enable detailed tracing.]"
+"[B:bufsize?Set the output buffer size to \asize\a -- for debugging.]#[size]"
 "[D:debug?Set the debug trace level to \alevel\a. Higher levels produce"
 "	more output.]#[level]"
 "[O:dio?Push the \bsfdcdio\b(3) direct io discipline on the input streams."
@@ -200,6 +201,7 @@ main(int argc, char** argv)
 	char*		s;
 
 	Method_f	method = 0;
+	ssize_t		bufsize = 0;
 	int		push = 0;
 	int		testwrite = 0;
 	unsigned long	flags = PZ_READ|PZ_FORCE;
@@ -266,6 +268,9 @@ main(int argc, char** argv)
 			continue;
 		case 'z':
 			method = sfdclzw;
+			continue;
+		case 'B':
+			bufsize = opt_info.num;
 			continue;
 		case 'D':
 			error_info.trace = -opt_info.num;
@@ -335,6 +340,11 @@ main(int argc, char** argv)
 		flags |= PZ_NOGZIP;
 		if ((*method)((flags & PZ_WRITE) ? sfstdout : sfstdin, 0) < 0)
 			error(3, "compression method discipline push error");
+	}
+	if (bufsize)
+	{
+		sfset(sfstdout, SF_SHARE|SF_LINE, 0);
+		sfsetbuf(sfstdout, NiL, bufsize);
 	}
 	if (pz = pzopen(&disc, *argv, flags))
 	{

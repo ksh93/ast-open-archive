@@ -1,3 +1,9 @@
+05-07-25 touch.c: eith => either
+05-07-17 dd.c: fix ccode conversion diagnostic
+05-06-16 ps.c: fix parent chain lookup infinit loop
+05-06-14 ls.c: fix divide by 0 in col()
+05-06-11 ls.c: sharpen the optimal row/col search
+	 ls.tst: normalize 02 test sizes
 05-04-22 ps.c: add --branch --escape
 05-04-06 df.c: fix -k F_FRSIZE() to always return > 0
 05-03-29 ps.c: check /bin/ps punt recursion when ast_ps is /bin/ps

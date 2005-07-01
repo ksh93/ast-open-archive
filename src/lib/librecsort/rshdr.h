@@ -37,6 +37,7 @@
 #define RS_RESERVE	(128*1024)	/* for I/O reservation		*/
 
 #define _RS_PRIVATE_ \
+	Vmdisc_t	vmdisc;		/* vmalloc discipline		*/ \
 	unsigned long	events;		/* active events		*/ \
 	Void_t*		methdata;	/* private method data		*/ \
 	Vmalloc_t*	vm;		/* region to allocate temp data	*/ \
