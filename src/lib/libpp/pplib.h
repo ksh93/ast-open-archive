@@ -723,14 +723,22 @@ struct ppsymkey				/* pun for SYM_KEYWORD lex val	*/
 
 #define newof(p,t,n,x)	((p)?(t*)realloc((char*)(p),sizeof(t)*(n)+(x)):(t*)calloc(1,sizeof(t)*(n)+(x)))
 
-#define size_t		int
+#define _PP_DELAY_	#
+
+_PP_DELAY_ ifdef __STDC__
+
+_PP_DELAY_ include <stdlib.h>
+_PP_DELAY_ include <unistd.h>
+_PP_DELAY_ include <time.h>
+
+_PP_DELAY_ else
+
+_PP_DELAY_ define size_t		int
 
 extern void*		realloc(void*, size_t);
 extern void*		calloc(size_t, size_t);
 extern char*		ctime(time_t*);
 extern void		free(void*);
-
-#define _PP_DELAY_	#
 
 _PP_DELAY_ ifndef O_RDONLY
 
@@ -744,6 +752,8 @@ extern int		read(int, void*, int);
 extern time_t		time(time_t*);
 extern int		unlink(const char*);
 extern int		write(int, const void*, int);
+
+_PP_DELAY_ endif
 
 _PP_DELAY_ endif
 

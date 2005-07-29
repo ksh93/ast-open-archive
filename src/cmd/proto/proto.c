@@ -155,6 +155,7 @@ USAGE_LICENSE
 
 /*DELAY_CONTROL*/
 
+#ifndef __STDC__
 #ifndef creat
 #define creat		_huh_creat
 #endif
@@ -169,6 +170,7 @@ USAGE_LICENSE
 #define mkdir		_huh_mkdir
 #endif
 #endif
+#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -177,10 +179,12 @@ USAGE_LICENSE
 #include <time.h>
 #endif
 
+#ifndef __STDC__
 #undef	access
 #undef	ctime
 #undef	creat
 #undef	mkdir
+#endif
 
 #ifndef O_RDONLY
 #define O_RDONLY	0
@@ -214,9 +218,17 @@ USAGE_LICENSE
 #define S_IXOTH		0001
 #endif
 
+#ifndef __STDC__
 #if !_WIN32 && !_WINIX
 #define remove(x)	unlink(x)
 #define rename(x,y)	((link(x,y)||remove(x))?-1:0)
+#endif
+
+#if PROTO_STANDALONE
+extern int	access(const char*, int);
+extern int	mkdir(const char*, int);
+#endif
+
 #endif
 
 /*NODELAY_CONTROL*/
@@ -256,11 +268,6 @@ replace(const char* newfile, const char* oldfile, int preserve)
 #define PROTO_ERROR	(PROTO_USER<<0)
 #define PROTO_REPLACE	(PROTO_USER<<1)
 #define PROTO_VERBOSE	(PROTO_USER<<2)
-
-#if PROTO_STANDALONE
-extern int	access(const char*, int);
-extern int	mkdir(const char*, int);
-#endif
 
 static int
 proto(char* file, char* license, char* options, char* package, char* copy, char* comment, int flags)
