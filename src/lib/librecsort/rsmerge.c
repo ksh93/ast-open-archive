@@ -550,14 +550,21 @@ ssize_t		n;
 	reg uchar	*d, *cur, *mgcur;
 	reg uchar	*rsrv, *endrsrv, *mgrsrv, *mgendrsrv;
 	int		ret = -1;
+	int		notify, c;
+	Rsobj_t		obj, out;
+
+#if 0
+	static const char* event[] = { "TERMINATE", "ACCEPT", "INSERT", "DELETE", "DONE", "[5]", "[6]", "[7]" };
+#endif
 
 	mgflush(rs);
 
 	rsrv = rs->rsrv; endrsrv = rs->endrsrv; cur = rs->cur;
 	mgrsrv = mg->rsrv; mgendrsrv = mg->endrsrv; mgcur = mg->cur;
+	notify = (rs->events & RS_WRITE) && (rs->type & RS_OTEXT);
 
 	/* easy case, just copy everything over, let Sfio worry about it */
-	if(n < 0 && ((rs->type&RS_ITEXT) || !(rs->type&RS_OTEXT)) )
+	if(n < 0 && ((rs->type&RS_ITEXT) || !(rs->type&RS_OTEXT)) && !notify )
 	{	if(rsrv)
 		{	sfwrite(rs->f, rsrv, cur-rsrv);
 			rs->rsrv = NIL(uchar*);
@@ -583,18 +590,47 @@ ssize_t		n;
 			n_obj = -n_obj;
 
 		if(rs->type&RS_DSAMELEN)
-		{	len = n_obj*rs->disc->data;
-			for(;;)
-			{	if((r = mgendrsrv-mgcur) > 0)
-					w = len > r ? r : len;
-				else
-				{	w = len > RS_RESERVE ? RS_RESERVE : len;
-					MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,w,break);
+		{	len = rs->disc->data;
+			if(notify)
+			{	for(; n_obj > 0; --n_obj)
+				{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,break);
+					RSRESERVE(rs,rsrv,endrsrv,cur,len, goto done);
+					obj.data = mgcur;
+					mgcur += len;
+					obj.datalen = len;
+					do
+					{	for (;;)
+						{	out.data = cur;
+							out.datalen = w = endrsrv - cur;
+							if ((c = rsnotify(rs, RS_WRITE, &obj, &out, rs->disc)) < 0)
+								goto done;
+							if (c == RS_DELETE)
+							{	out.datalen = 0;
+								break;
+							}
+							if (w >= out.datalen)
+								break;
+							RSRESERVE(rs,rsrv,endrsrv,cur,out.datalen, goto done);
+						}
+						cur += out.datalen;
+					} while (c == RS_INSERT);
 				}
-				RSRESERVE(rs,rsrv,endrsrv,cur,w, goto done);
-				MEMCPY(cur,mgcur,w);
-				if((len -= w) == 0)
-					break;
+			}
+			else
+			{
+				len *= n_obj;
+				for(;;)
+				{	if((r = mgendrsrv-mgcur) > 0)
+						w = len > r ? r : len;
+					else
+					{	w = len > RS_RESERVE ? RS_RESERVE : len;
+						MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,w,break);
+					}
+					RSRESERVE(rs,rsrv,endrsrv,cur,w, goto done);
+					MEMCPY(cur,mgcur,w);
+					if((len -= w) == 0)
+						break;
+				}
 			}
 			n_obj = 0;
 		}
@@ -604,7 +640,30 @@ ssize_t		n;
 				d = (uchar*)(&len); MEMCPY(d,mgcur,sizeof(ssize_t));
 				MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,break);
 				RSRESERVE(rs,rsrv,endrsrv,cur,len, goto done);
-				MEMCPY(cur,mgcur,len);
+				if(notify)
+				{
+					obj.data = mgcur;
+					mgcur += len;
+					obj.datalen = len;
+					do
+					{	for (;;)
+						{	out.data = cur;
+							out.datalen = w = endrsrv - cur;
+							if ((c = rsnotify(rs, RS_WRITE, &obj, &out, rs->disc)) < 0)
+								goto done;
+							if (c == RS_DELETE)
+							{	out.datalen = 0;
+								break;
+							}
+							if (w >= out.datalen)
+								break;
+							RSRESERVE(rs,rsrv,endrsrv,cur,out.datalen, goto done);
+						}
+						cur += out.datalen;
+					} while (c == RS_INSERT);
+				}
+				else
+					MEMCPY(cur,mgcur,len);
 			}
 		}
 		else

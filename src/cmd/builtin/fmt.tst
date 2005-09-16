@@ -1535,7 +1535,73 @@ TEST 05 '--optget vs. "...\n..."'
 
 	EXEC	--optget -w76
 		INPUT - $'"\\n\\n[ file ... ]\\n\\n"'
-		OUTPUT - $'    "\\n\\n"\n"[ file ... ]"\n    "\\n\\n"'
+		OUTPUT - $'    "\n "\n"[ file ... ]"\n    "\n "'
 
 	EXEC	--optget -w76
 		INPUT - $'"\\n"\n"\\n[ file ... ]\\n"\n"\\n"'
+		OUTPUT - $'"[ file ... ]"'
+
+TEST 06 '--optget vs. --usage'
+
+	EXEC	--optget -w76
+		INPUT - $'[-?\\n@(#)$Id: id (AT&T Labs Research) 2004-06-11 $\\n]
+[-author?Glenn Fowler <gsf@research.att.com>]
+[-author?David Korn <dgk@research.att.com>]
+[-copyright?Copyright (c) 1992-2005 AT&T Corp.]
+[-license?http://www.opensource.org/licenses/cpl1.0.txt]
+[--catalog?libcmd]
+[+NAME?id - return user identity]
+[+DESCRIPTION?If no \auser\a operand is specified \bid\b writes user
+and group IDs and the corresponding user and group names of the invoking
+process to standard output.  If the effective and real IDs do not match,
+both are written.  Any supplementary groups the current process belongs
+to will also be written.]
+[+?If a \auser\a operand is specified and the process has permission,
+the user and group IDs and any supplementary group IDs of the selected
+user will be written to standard output.]
+[+?If any options are specified, then only a portion of the information
+is written.]
+[n:name?Write the name instead of the numeric ID.]
+[r:real?Writes real ID instead of the effective ID.]
+[[a?This option is ignored.]
+[g:group?Writes only the group ID.]
+[u:user?Writes only the user ID.]
+[G:groups?Writes only the supplementary group IDs.]
+[s:fair-share?Writes fair share scheduler IDs and groups on systems that support fair share scheduling.]
+
+[user]
+
+[+EXIT STATUS?]{[+0?Successful completion.][+>0?An error occurred.]}[+SEE ALSO?\blogname\b(1), \bwho\b(1), \bgetgroups\b(2)]'
+		OUTPUT - $'[-?\\n@(#)$Id: id (AT&T Labs Research) 2004-06-11 $
+    ]
+[-author?Glenn Fowler <gsf@research.att.com>]
+[-author?David Korn <dgk@research.att.com>]
+[-copyright?Copyright (c) 1992-2005 AT&T Corp.]
+[-license?http://www.opensource.org/licenses/cpl1.0.txt]
+[--catalog?libcmd]
+[+NAME?id - return user identity]
+[+DESCRIPTION?If no \\auser\\a operand is specified \\bid\\b writes user and
+    group IDs and the corresponding user and group names of the invoking
+    process to standard output. If the effective and real IDs do not match,
+    both are written. Any supplementary groups the current process belongs to
+    will also be written.]
+[+?If a \\auser\\a operand is specified and the process has permission, the
+    user and group IDs and any supplementary group IDs of the selected user
+    will be written to standard output.]
+[+?If any options are specified, then only a portion of the information is
+    written.]
+[n:name?Write the name instead of the numeric ID.]
+[r:real?Writes real ID instead of the effective ID.]
+[[a?This option is ignored.]
+[g:group?Writes only the group ID.]
+[u:user?Writes only the user ID.]
+[G:groups?Writes only the supplementary group IDs.]
+[s:fair-share?Writes fair share scheduler IDs and groups on systems that
+    support fair share scheduling.]
+[user]
+[+EXIT STATUS?]
+    {
+        [+0?Successful completion.]
+        [+>0?An error occurred.]
+    }
+[+SEE ALSO?\blogname\b(1), \\bwho\\b(1), \\bgetgroups\\b(2)]'

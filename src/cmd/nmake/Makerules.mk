@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-07-17 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-08-11 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -489,7 +489,7 @@ end
  * special symbols
  */
 
-.BUILT. = $(...:T=XU:T=F:P=L:N!=/*$(.INSTALL.LIST.:@/ /|/G:/^./|&/)$(VROOT:?|$(VROOT)/*??)$(-global:@/:/|/G:/^./|&/)|$(CATALOG).msg:T=G)
+.BUILT. = $(...:T=XU:A!=.TERMINAL:T=F:P=L:N!=/*$(.INSTALL.LIST.:@/ /|/G:/^./|&/)$(VROOT:?|$(VROOT)/*??)$(-global:@/:/|/G:/^./|&/)|$(CATALOG).msg:T=G)
 .CLOBBER. = $(".":L=*.([it]i|l[hn])) core
 .FILES. = $(LICENSEFILE)
 .MANIFEST.FILES. = $(*.COMMON.SAVE:T=F) $(.SELECT.:A!=.ARCHIVE|.COMMAND|.OBJECT)
@@ -2574,10 +2574,10 @@ end
 		if "$(_PACKAGE_$(P))" == "0"
 			continue
 		end
-		if "$(PACKAGE_$(P)_found)" == "1"
-			.PACKAGE.$(P).found := 1
+		if "$(PACKAGE_$(P)_found)" != ""
+			.PACKAGE.$(P).found := $(PACKAGE_$(P)_found)
 		end
-		if "$(.PACKAGE.$(P).found)" == "1"
+		if "$(.PACKAGE.$(P).found)" != ""
 			continue
 		end
 		FOUND = 0

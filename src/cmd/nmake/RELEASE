@@ -1,3 +1,6 @@
+05-08-11 rule.c,state.c,tests/attribute.tst: fix .RETAIN
+05-08-08 Makerules.mk: add :A!=.TERMINAL: to .BUILT. -- doh
+	 tests/recurse.tst: add test for .BUILT. vs .TERMINAL
 05-07-17 Makerules.mk: move cobol specifics to pkg-cobol.mk
 	 Makerules.mk: add CCSPECIALIZE $(CC.OPTIMIZE) override
 	 Makerules.mk: add include - + pkg-default.mk

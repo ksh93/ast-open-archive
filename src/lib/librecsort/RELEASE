@@ -1,3 +1,4 @@
+05-08-22 rsmerge.c: fix RS_WRITE callouts
 05-06-30 rsmerge.c: handle all RS_TEXT record formats
 05-06-28 add rsnew()+rsinit() to split rsopen() for rsfile*()
 05-06-27 rstemp.c: add temp file support and RS_TEMP_* events

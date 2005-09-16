@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Labs Research) 2003-08-25 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Labs Research) 2005-08-18 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -63,12 +63,15 @@ USAGE_LICENSE
 "[L:files-without-matches?Only print file names with no matches.]"
 "[b:highlight?Highlight matches using the ansi terminal bold sequence.]"
 "[v:invert-match|revert-match?Invert the \apattern\a match sense.]"
+"[m:label?All patterns must be of the form \alabel\a:\apattern\a. Match and"
+"	count output will be prefixed by the corresponding \alabel\a:.]"
 "[O:lenient?Enable lenient \apattern\a interpretation. This is the default.]"
 "[x:line-match|line-regexp?Force \apatterns\a to match complete lines.]"
 "[n:number|line-number?Prefix each matched line with its line number.]"
 "[q:quiet|silent?Do not print matching lines.]"
 "[S:strict?Enable strict \apattern\a interpretation with diagnostics.]"
 "[s:suppress|no-messages?Suppress error and warning messages.]"
+"[t:total?Only print a single matching line count for all files.]"
 "[T:test?Enable implementation specific tests.]:"
 "		[test]"
 "[w:word-match|word-regexp?Force \apatterns\a to match complete words.]"
@@ -114,23 +117,22 @@ USAGE_LICENSE
  * whether the match is full length)
  */
 
-typedef struct Item			/* list item			*/
+typedef struct Item_s			/* list item - sue me for waste	*/
 {
-	struct Item*	next;		/* next in list			*/
-	union
-	{
-	regex_t		re;		/* re value - sue me for waste	*/
-	char*		string;		/* string value			*/
-	}		value;
+	struct Item_s*	next;		/* next in list			*/
+	regex_t		re;		/* compiled re			*/
+	Sfulong_t	hits;		/* labeled pattern matches	*/
+	Sfulong_t	total;		/* total hits			*/
+	char		string[1];	/* string value			*/
 } Item_t;
 
-typedef struct				/* generic list			*/
+typedef struct List_s			/* generic list			*/
 {
 	Item_t*		head;		/* list head			*/
 	Item_t*		tail;		/* list tail			*/
 } List_t;
 
-static struct				/* program state		*/
+static struct State_s			/* program state		*/
 {
 	struct
 	{
@@ -147,12 +149,16 @@ static struct				/* program state		*/
 	regmatch_t*	pos;		/* match position pointer	*/
 	int		posnum;		/* number of match positions	*/
 
-	int		hits;		/* if any patterns hit		*/
+	int		any;		/* if any pattern hit		*/
 	int		list;		/* list files with hits		*/
 	int		notfound;	/* some input file not found	*/
 	int		options;	/* regex options		*/
 
+	Sfulong_t	hits;		/* total matched pattern count	*/
+
+	unsigned char	byline;		/* multiple pattern line by line*/
 	unsigned char	count;		/* count number of hits		*/
+	unsigned char	label;		/* all patterns labeled		*/
 	unsigned char	match;		/* match sense			*/
 	unsigned char	query;		/* return status but no output	*/
 	unsigned char	number;		/* line numbers			*/
@@ -164,12 +170,25 @@ static struct				/* program state		*/
 static void
 addre(List_t* p, char* s)
 {
-	int	result;
+	int	c;
+	char*	b;
 	Item_t*	x;
 	Sfio_t*	t;
 
-	if (!(x = newof(0, Item_t, 1, 0)))
-		error(ERROR_SYSTEM|3, "out of space (pattern `%s')", s);
+	b = s;
+	if (state.label)
+	{
+		if (!(s = strchr(s, ':')))
+			error(3, "%s: label:pattern expected", b);
+		c = s - b;
+		s++;
+	}
+	else
+		c = 0;
+	if (!(x = newof(0, Item_t, 1, c)))
+		error(ERROR_SYSTEM|3, "out of space (pattern `%s')", b);
+	if (c)
+		memcpy(x->string, b, c);
 	if (state.words)
 	{
 		if (!(t = sfstropen()))
@@ -185,14 +204,22 @@ addre(List_t* p, char* s)
 	}
 	else
 		t = 0;
-	if (result = regcomp(&x->value.re, s, state.options|REG_MULTIPLE))
-		regfatal(&x->value.re, 3, result);
+	if (c = regcomp(&x->re, s, state.options|REG_MULTIPLE))
+		regfatal(&x->re, 3, c);
 	if (t)
 		sfstrclose(t);
 	if (!p->head)
+	{
 		p->head = p->tail = x;
-	else if (regcomb(&p->tail->value.re, &x->value.re))
+		if (state.number || !regrecord(&x->re))
+			state.byline = 1;
+	}
+	else if (state.label || regcomb(&p->tail->re, &x->re))
+	{
 		p->tail = p->tail->next = x;
+		if (!state.byline && (state.number || !state.label || !regrecord(&x->re)))
+			state.byline = 1;
+	}
 	else
 		free(x);
 }
@@ -202,9 +229,9 @@ addstring(List_t* p, char* s)
 {
 	Item_t*	x;
 
-	if (!(x = newof(0, Item_t, 1, 0)))
+	if (!(x = newof(0, Item_t, 1, strlen(s))))
 		error(ERROR_SYSTEM|3, "out of space (string `%s')", s);
-	x->value.string = s;
+	strcpy(x->string, s);
 	if (p->head)
 		p->tail->next = x;
 	else
@@ -224,10 +251,10 @@ compile(void)
 	Sfio_t*	f;
 
 	for (x = state.pattern.head; x; x = x->next)
-		addre(&state.re, x->value.string);
+		addre(&state.re, x->string);
 	for (x = state.file.head; x; x = x->next)
 	{
-		s = x->value.string;
+		s = x->string;
 		if (!(f = sfopen(NiL, s, "r")))
 			error(ERROR_SYSTEM|4, "%s: cannot open", s);
 		else
@@ -285,15 +312,17 @@ highlight(Sfio_t* sp, const char* s, int n, int so, int eo)
 static int
 record(void* handle, const char* s, size_t len)
 {
-	unsigned long*	hits = (unsigned long*)handle;
+	Item_t*		item = (Item_t*)handle;
 
-	(*hits)++;
+	item->hits++;
 	if (state.query || state.list)
 		return -1;
 	if (!state.count)
 	{
 		if (state.prefix)
 			sfprintf(sfstdout, "%s:", error_info.file);
+		if (state.label)
+			sfprintf(sfstdout, "%s:", item->string);
 		if (state.pos)
 			highlight(sfstdout, s, len + 1, state.pos[0].rm_so, state.pos[0].rm_eo);
 		else
@@ -311,7 +340,8 @@ execute(Sfio_t* input, char* name)
 	size_t		len;
 	int		result;
 	int		line;
-	unsigned long	hits = 0;
+
+	Sfulong_t	hits = 0;
 	
 	if (state.buffer.noshare)
 		sfset(input, SF_SHARE, 0);
@@ -323,7 +353,7 @@ execute(Sfio_t* input, char* name)
 	error_info.file = name;
 	line = error_info.line;
 	error_info.line = 0;
-	if (state.number || state.re.head->next || !regrecord(&state.re.head->value.re))
+	if (state.byline)
 	{
 		for (;;)
 		{
@@ -347,12 +377,30 @@ execute(Sfio_t* input, char* name)
 			x = state.re.head;
 			do
 			{
-				if (!(result = regnexec(&x->value.re, s, len, state.posnum, state.pos, 0)))
-					break;
-				if (result != REG_NOMATCH)
-					regfatal(&x->value.re, 3, result);
+				if (!(result = regnexec(&x->re, s, len, state.posnum, state.pos, 0)))
+				{
+					if (!state.label)
+						break;
+					x->hits++;
+					if (state.query || state.list)
+						goto done;
+					if (!state.count)
+					{
+						if (state.prefix)
+							sfprintf(sfstdout, "%s:", name);
+						if (state.number)
+							sfprintf(sfstdout, "%d:", error_info.line);
+						sfprintf(sfstdout, "%s:", x->string);
+						if (state.pos)
+							highlight(sfstdout, s, len + 1, state.pos[0].rm_so, state.pos[0].rm_eo);
+						else
+							sfwrite(sfstdout, s, len + 1);
+					}
+				}
+				else if (result != REG_NOMATCH)
+					regfatal(&x->re, 3, result);
 			} while (x = x->next);
-			if ((x != 0) == state.match)
+			if (!state.label && (x != 0) == state.match)
 			{
 				hits++;
 				if (state.query || state.list)
@@ -375,8 +423,7 @@ execute(Sfio_t* input, char* name)
 	{
 		register char*	e;
 		register char*	t;
-		char*		x;
-		regex_t*	re = &state.re.head->value.re;
+		char*		r;
 
 		static char*	span = 0;
 		static size_t	spansize = 0;
@@ -412,7 +459,7 @@ execute(Sfio_t* input, char* name)
 						e = s + len;
 					else
 					{
-						x = s + len;
+						r = s + len;
 						len = (e - s) + t - span;
 						len = roundof(len, SF_BUFSIZE);
 						if (spansize < len)
@@ -427,15 +474,19 @@ execute(Sfio_t* input, char* name)
 						memcpy(t, s, len);
 						t += len;
 						s += len + 1;
-						e = x;
+						e = r;
 						break;
 					}
 				}
 				*t = '\n';
-				if ((result = regrexec(re, span, t - span, state.posnum, state.pos, state.options, '\n', (void*)&hits, record)) < 0)
-					break;
-				if (result && result != REG_NOMATCH)
-					regfatal(re, 3, result);
+				x = state.re.head;
+				do
+				{
+					if ((result = regrexec(&x->re, span, t - span, state.posnum, state.pos, state.options, '\n', (void*)x, record)) < 0)
+						goto done;
+					if (result && result != REG_NOMATCH)
+						regfatal(&x->re, 3, result);
+				} while (x = x->next);
 				if (!s)
 					break;
 			}
@@ -455,10 +506,14 @@ execute(Sfio_t* input, char* name)
 			while (t > s)
 				if (*--t == '\n')
 				{
-					if ((result = regrexec(re, s, t - s, state.posnum, state.pos, state.options, '\n', (void*)&hits, record)) < 0)
-						goto done;
-					if (result && result != REG_NOMATCH)
-						regfatal(re, 3, result);
+					x = state.re.head;
+					do
+					{
+						if ((result = regrexec(&x->re, s, t - s, state.posnum, state.pos, state.options, '\n', (void*)x, record)) < 0)
+							goto done;
+						if (result && result != REG_NOMATCH)
+							regfatal(&x->re, 3, result);
+					} while (x = x->next);
 					s = t + 1;
 					break;
 				}
@@ -467,28 +522,79 @@ execute(Sfio_t* input, char* name)
  done:
 	error_info.file = file;
 	error_info.line = line;
-	if (hits && state.list >= 0)
-		state.hits = 1;
-	if (!state.query)
+	if (state.byline && !state.label)
 	{
-		if (!state.list)
+		if (hits && state.list >= 0)
+			state.any = 1;
+		if (!state.query)
 		{
-			if (state.count)
+			if (!state.list)
 			{
-				if (state.prefix)
-					sfprintf(sfstdout, "%s:", name);
-				sfprintf(sfstdout, "%d\n", hits);
+				if (state.count)
+				{
+					if (state.count & 2)
+						state.hits += hits;
+					else
+					{
+						if (state.prefix)
+							sfprintf(sfstdout, "%s:", name);
+						sfprintf(sfstdout, "%I*u\n", sizeof(hits), hits);
+					}
+				}
+			}
+			else if ((hits != 0) == (state.list > 0))
+			{
+				if (state.list < 0)
+					state.any = 1;
+				sfprintf(sfstdout, "%s\n", name);
 			}
 		}
-		else if ((hits != 0) == (state.list > 0))
+	}
+	else
+	{
+		x = state.re.head;
+		do
 		{
-			if (state.list < 0)
-				state.hits = 1;
-			sfprintf(sfstdout, "%s\n", name);
-		}
+			if (x->hits && state.list >= 0)
+			{
+				state.any = 1;
+				if (state.query)
+					break;
+			}
+			if (!state.query)
+			{
+				if (!state.list)
+				{
+					if (state.count)
+					{
+						if (state.count & 2)
+							x->total += x->hits;
+						else
+						{
+							if (state.prefix)
+								sfprintf(sfstdout, "%s:", name);
+							if (state.label)
+								sfprintf(sfstdout, "%s:", x->string);
+							sfprintf(sfstdout, "%I*u\n", sizeof(x->hits), x->hits);
+						}
+					}
+				}
+				else if ((x->hits != 0) == (state.list > 0))
+				{
+					if (state.list < 0)
+						state.any = 1;
+					if (state.label)
+						sfprintf(sfstdout, "%s:%s\n", name, x->string);
+					else
+						sfprintf(sfstdout, "%s\n", name);
+				}
+			}
+			x->hits = 0;
+		} while (x = x->next);
 	}
 }
 
+int
 main(int argc, char** argv)
 {
 	int	c;
@@ -597,7 +703,7 @@ main(int argc, char** argv)
 			state.options &= ~(REG_FIRST|REG_NOSUB);
 			break;
 		case 'c':
-			state.count = 1;
+			state.count |= 1;
 			break;
 		case 'e':
 			addstring(&state.pattern, opt_info.arg);
@@ -614,6 +720,9 @@ main(int argc, char** argv)
 		case 'l':
 			state.list = opt_info.num;
 			break;
+		case 'm':
+			state.label = 1;
+			break;
 		case 'n':
 			state.number = 1;
 			break;
@@ -622,6 +731,9 @@ main(int argc, char** argv)
 			break;
 		case 's':
 			state.suppress = opt_info.num;
+			break;
+		case 't':
+			state.count |= 2;
 			break;
 		case 'v':
 			if (state.match = !opt_info.num)
@@ -684,7 +796,7 @@ main(int argc, char** argv)
 			{
 				execute(f, s);
 				sfclose(f);
-				if (state.query && state.hits)
+				if (state.query && state.any)
 					break;
 			}
 			else
@@ -695,5 +807,20 @@ main(int argc, char** argv)
 			}
 		}
 	}
-	return (state.notfound && !state.query) ? 2 : !state.hits;
+	if ((state.count & 2) && !state.query && !state.list)
+	{
+		if (state.label)
+		{
+			Item_t*		x;
+
+			x = state.re.head;
+			do
+			{
+				sfprintf(sfstdout, "%s:%I*u\n", x->string, sizeof(x->total), x->total);
+			} while (x = x->next);
+		}
+		else
+			sfprintf(sfstdout, "%I*u\n", sizeof(state.hits), state.hits);
+	}
+	return (state.notfound && !state.query) ? 2 : !state.any;
 }

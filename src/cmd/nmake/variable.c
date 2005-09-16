@@ -579,7 +579,7 @@ setvar(char* s, char* v, int flags)
 	}
 	if (!(isid = !!(n & NAME_identifier)) && !(n & (NAME_variable|NAME_intvar)) && !istype(*s, C_VARIABLE1|C_ID1|C_ID2) && *s != '(')
 	{
-		if (flags & V_auxiliary)
+		if (flags & V_retain)
 			return 0;
 		error(2, "%s: invalid variable name", s);
 	}

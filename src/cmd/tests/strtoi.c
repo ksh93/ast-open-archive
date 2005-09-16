@@ -42,8 +42,11 @@ main(int argc, char** argv)
 	unsigned long		l;
 	unsigned _ast_intmax_t	ll;
 	char			b;
+	int			m;
+	int			decimal;
 	int			sep = 0;
 
+	decimal = *localeconv()->decimal_point;
 	while (s = *++argv)
 	{
 		if (strneq(s, "LC_ALL=", 7))
@@ -53,12 +56,14 @@ main(int argc, char** argv)
 				sfprintf(sfstdout, "%s failed\n", s);
 				return 0;
 			}
+			decimal = *localeconv()->decimal_point;
 			continue;
 		}
 		if (sep)
 			sfprintf(sfstdout, "\n");
 		else
 			sep = 1;
+		m = strchr(s, decimal) ? 100 : 0;
 
 		errno = 0;
 		l = strtol(s, &p, 0);
@@ -66,7 +71,7 @@ main(int argc, char** argv)
 
 		errno = 0;
 		b = 0;
-		l = strton(s, &p, &b, 0);
+		l = strton(s, &p, &b, m);
 		sfprintf(sfstdout, "strton   \"%s\" \"%s\" %I*d %s %d\n", s, p, sizeof(l), l, errno == 0 ? "OK" : errno == ERANGE ? "ERANGE" : errno == EINVAL ? "EINVAL" : "ERROR", b);
 
 		errno = 0;
@@ -79,7 +84,7 @@ main(int argc, char** argv)
 
 		errno = 0;
 		b = 0;
-		ll = strtonll(s, &p, &b, 0);
+		ll = strtonll(s, &p, &b, m);
 		sfprintf(sfstdout, "strtonll \"%s\" \"%s\" %I*d %s %d\n", s, p, sizeof(ll), ll, errno == 0 ? "OK" : errno == ERANGE ? "ERANGE" : errno == EINVAL ? "EINVAL" : "ERROR", b);
 
 		errno = 0;

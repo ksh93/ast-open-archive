@@ -626,7 +626,7 @@ parse(register Sort_t* sp, char** argv)
 				{
 					if (r != key->disc->data && i >= 0 && (RECTYPE(r) != REC_variable || RECTYPE(key->disc->data) != REC_variable || REC_V_ATTRIBUTES(r) != REC_V_ATTRIBUTES(key->disc->data)))
 					{
-						error(2, "%s: format %s inconsistent with %s format %s", p, fmtrec(r, 0), key->input[i], fmtrec(key->disc->data, 0));
+						error(2, "%s: format %s incompatible with %s format %s", p, fmtrec(r, 0), key->input[i], fmtrec(key->disc->data, 0));
 						return 1;
 					}
 					key->disc->data = r;

@@ -1,6 +1,7 @@
 # regression tests for the ast integral strto*() routines
 
 TEST 01 'base 10'
+
 	EXEC	32767 -32767 32768 -32768 32769 -32769
 		OUTPUT - $'strtol   "32767" "" 32767 OK
 strton   "32767" "" 32767 OK 0
@@ -43,6 +44,7 @@ strtoul  "-32769" "" 4294934527 OK
 strtoll  "-32769" "" -32769 OK
 strtonll "-32769" "" -32769 OK 0
 strtoull "-32769" "" 18446744073709518847 OK'
+
 	EXEC	65535 -65535 65536 -65536 65537 -65537
 		OUTPUT - $'strtol   "65535" "" 65535 OK
 strton   "65535" "" 65535 OK 0
@@ -85,6 +87,7 @@ strtoul  "-65537" "" 4294901759 OK
 strtoll  "-65537" "" -65537 OK
 strtonll "-65537" "" -65537 OK 0
 strtoull "-65537" "" 18446744073709486079 OK'
+
 	EXEC	2147483647 -2147483647 2147483648 -2147483648 2147483649 -2147483649
 		OUTPUT - $'strtol   "2147483647" "" 2147483647 OK
 strton   "2147483647" "" 2147483647 OK 0
@@ -127,6 +130,7 @@ strtoul  "-2147483649" "" 2147483647 OK
 strtoll  "-2147483649" "" -2147483649 OK
 strtonll "-2147483649" "" -2147483649 OK 0
 strtoull "-2147483649" "" 18446744071562067967 OK'
+
 	EXEC	4294967295 -4294967295 4294967296 -4294967296 4294967297 -4294967297
 		OUTPUT - $'strtol   "4294967295" "" 2147483647 ERANGE
 strton   "4294967295" "" 2147483647 ERANGE 0
@@ -169,6 +173,7 @@ strtoul  "-4294967297" "" 4294967295 ERANGE
 strtoll  "-4294967297" "" -4294967297 OK
 strtonll "-4294967297" "" -4294967297 OK 0
 strtoull "-4294967297" "" 18446744069414584319 OK'
+
 	EXEC	9223372036854775807 -9223372036854775807 9223372036854775808 -9223372036854775808 9223372036854775809 -9223372036854775809
 		OUTPUT - $'strtol   "9223372036854775807" "" 2147483647 ERANGE
 strton   "9223372036854775807" "" 2147483647 ERANGE 0
@@ -211,6 +216,7 @@ strtoul  "-9223372036854775809" "" 4294967295 ERANGE
 strtoll  "-9223372036854775809" "" -9223372036854775808 ERANGE
 strtonll "-9223372036854775809" "" -9223372036854775808 ERANGE 0
 strtoull "-9223372036854775809" "" 9223372036854775807 OK'
+
 	EXEC	18446744073709551615 -18446744073709551615 18446744073709551616 -18446744073709551616 18446744073709551617 -18446744073709551617
 		OUTPUT - $'strtol   "18446744073709551615" "" 2147483647 ERANGE
 strton   "18446744073709551615" "" 2147483647 ERANGE 0
@@ -255,6 +261,7 @@ strtonll "-18446744073709551617" "" -9223372036854775808 ERANGE 0
 strtoull "-18446744073709551617" "" 18446744073709551615 ERANGE'
 
 TEST 02 'hex'
+
 	EXEC	0xffffffff0 0xfffffffff 0x17fffffff
 		OUTPUT - $'strtol   "0xffffffff0" "" 2147483647 ERANGE
 strton   "0xffffffff0" "" 2147483647 ERANGE 16
@@ -278,6 +285,7 @@ strtonll "0x17fffffff" "" 6442450943 OK 16
 strtoull "0x17fffffff" "" 6442450943 OK'
 
 TEST 03 'thousands separator'
+
 	EXEC	LC_ALL=debug 12345678 12.345.678 12.345678 12.345.67 1.234 123.456
 		OUTPUT - $'strtol   "12345678" "" 12345678 OK
 strton   "12345678" "" 12345678 OK 0
@@ -322,6 +330,7 @@ strtonll "123.456" "" 123456 OK 0
 strtoull "123.456" "" 123456 OK'
 
 TEST 04 'malformations'
+
 	EXEC - + 0x -0x +0x 11# -11# +11# 11#A 11#B
 		OUTPUT - $'strtol   "-" "-" 0 OK
 strton   "-" "-" 0 OK 10
@@ -394,6 +403,7 @@ strtonll "11#B" "#B" 0 OK 10
 strtoull "11#B" "#B" 0 OK'
 
 TEST 05 'multiplier suffixes'
+
 	EXEC 1b 1k 1m 1g 1t 1. 1.2 1.23 1.234 1.k 1.2k 1.23k 1.234k
 		OUTPUT - $'strtol   "1b" "b" 1 OK
 strton   "1b" "" 512 OK 0
@@ -431,10 +441,10 @@ strtonll "1t" "" 1099511627776 OK 0
 strtoull "1t" "t" 1 OK
 
 strtol   "1." "." 1 OK
-strton   "1." "." 1 OK 0
+strton   "1." "" 100 OK 0
 strtoul  "1." "." 1 OK
 strtoll  "1." "." 1 OK
-strtonll "1." "." 1 OK 0
+strtonll "1." "" 100 OK 0
 strtoull "1." "." 1 OK
 
 strtol   "1.2" ".2" 1 OK
@@ -459,10 +469,10 @@ strtonll "1.234" "" 123 OK 0
 strtoull "1.234" ".234" 1 OK
 
 strtol   "1.k" ".k" 1 OK
-strton   "1.k" ".k" 1 OK 0
+strton   "1.k" "k" 100 OK 0
 strtoul  "1.k" ".k" 1 OK
 strtoll  "1.k" ".k" 1 OK
-strtonll "1.k" ".k" 1 OK 0
+strtonll "1.k" "k" 100 OK 0
 strtoull "1.k" ".k" 1 OK
 
 strtol   "1.2k" ".2k" 1 OK

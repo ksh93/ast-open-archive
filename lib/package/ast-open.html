@@ -1022,7 +1022,23 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-05-06-24  --- Release ksh93r-  ---
+05-09-05  --- Release ksh93r-  ---
+05-09-05  A bug in which a history command that invoked a history
+	  command could go into an infinite loop has been fixed.
+05-08-31  In the case that IFS contains to adjacent new-lines so that
+	  new-line is not treated as a space delimiter, only a single
+	  new-line is deleted at the end of a command substitution.
+05-08-19  When a tilde substitution expands to the / directory and is
+	  followed by a /, it is replaced by the empty string.
+05-08-16  A bug in which n&lt;&amp;m did not synchronize m has been fixed.
+05-08-16  A bug in which process substitution  ( &lt;() and &gt;() ) was not
+	  working within for and while loops has been fixed.
+05-07-24  A bug in which the pattern ~(E)(foo|bar) was treated as a syntax
+	  error has been fixed.
+05-07-24  A bug in completion with &lt;n&gt;=, where n was the one of the
+	  previous selection choices has been fixed.
+05-07-21  A bug with multibyte input when no edit mode was specified which
+	  caused the input line to shift left/right has been fixed.
 05-06-24  A race condition which could cause the exit status to get lost
 	  on some fast systems has been fixed.
 05-06-21  A bug in which nested patterns of the form {m,n}(pat) would cause
@@ -3086,6 +3102,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-08-11 rule.c,state.c,tests/attribute.tst: fix .RETAIN
+05-08-08 Makerules.mk: add :A!=.TERMINAL: to .BUILT. -- doh
+	 tests/recurse.tst: add test for .BUILT. vs .TERMINAL
 05-07-17 Makerules.mk: move cobol specifics to pkg-cobol.mk
 	 Makerules.mk: add CCSPECIALIZE $(CC.OPTIMIZE) override
 	 Makerules.mk: add include - + pkg-default.mk
@@ -4298,6 +4317,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-08-07 tr.c: fix a-b- and a-b-c
 05-03-07 od.c: handle -t ...z for --printable
 04-10-01 fmt.tst: update for --optget
 04-09-30 od.c: -v does not accept an offset operand
@@ -4728,6 +4748,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="re changes">re changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-08-18 grep.c: add --label, -m and --total, -t
 05-06-06 reg.dat: transcribe from tcl 8.3 Spencer reg.test
 05-05-20 test(fmt|fnmatch|match|regex): handle file args for rt(1)
 	 nested.dat: add
@@ -5310,6 +5331,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-09-12 misc/optget.c: reset opt_info.offset on error
+	 string/strtoi.h: strton() '.' multiplier only if m&gt;1
+	 string/fmtesc.c: add unadvertized FMT_PARM for FMT_SHELL
+05-09-09 string/fmtesc.c: fix FMT_SHELL logic w.r.t. &#0091;$`&#0093;
+05-08-11 string/strerror.c: fix { sys_errlist sys_nerr } prototypes
+05-08-03 sfio: snarf sfvaprints sfaprints
 05-07-21 port/astconf.c: retain most recent synthesized lookup
 05-07-20 sfio/sfsetbuf.c: default file io size now 64K on all systems
 05-07-17 ccmap*: add microfocus cobol EBCDIC_U
@@ -6609,6 +6636,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-08-11 fmt.c: fix -o to handle raw --usage strings
 05-05-17 cat.c,head.c: disable EPIPE error messages
 05-04-14 chgrp.c: -f means all non-syntax error messages
 05-04-11 fds.c: add from old internal open(1)
@@ -6874,6 +6902,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="librecsort changes">librecsort changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+05-08-22 rsmerge.c: fix RS_WRITE callouts
 05-06-30 rsmerge.c: handle all RS_TEXT record formats
 05-06-28 add rsnew()+rsinit() to split rsopen() for rsfile*()
 05-06-27 rstemp.c: add temp file support and RS_TEMP_* events
@@ -7798,7 +7827,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>July 31, 2005</TD>
+<TD align=right>September 14, 2005</TD>
 </TR>
 </TABLE>
 <P>

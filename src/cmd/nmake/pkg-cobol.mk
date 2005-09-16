@@ -27,6 +27,9 @@ $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 
 .PKG.COBOL.INIT : .MAKE .VIRTUAL .FORCE .AFTER
 	local F
+	if ! "$(PATH:/:/ /G:X=$(COBOL):P=X)"
+		error 3 $(COBOL): cobol compiler not found -- required to build $(.RWD.:-$(PWD:B))
+	end
 	F = pkg-cobol-$(COBOL:B:S=.mk)
 	if ( F = "$(F:T=F)" )
 		include + $(F)

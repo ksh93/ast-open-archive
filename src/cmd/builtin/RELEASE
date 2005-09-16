@@ -1,3 +1,4 @@
+05-08-07 tr.c: fix a-b- and a-b-c
 05-03-07 od.c: handle -t ...z for --printable
 04-10-01 fmt.tst: update for --optget
 04-09-30 od.c: -v does not accept an offset operand

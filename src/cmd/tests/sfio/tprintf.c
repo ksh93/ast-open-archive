@@ -600,5 +600,10 @@ MAIN()
 	if (strcmp(buf1, "NaN Inf -Inf") != 0)
 		terror("double NaN Inf error: %s", buf1);
 
+	/* test the sfaprints() function */
+	if(sfaprints(&s, "%d", 123) != 4 || strcmp(s, "123") != 0)
+		terror("sfaprints() failed");
+	free(s);
+
 	TSTEXIT(0);
 }

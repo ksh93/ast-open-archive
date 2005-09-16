@@ -273,6 +273,15 @@ TEST 10	'ranges and classes'
 	EXEC	'a\-z' 'A-Z'
 		INPUT - $'abc-z'
 		OUTPUT - $'AbcBC'
+	EXEC	0-4 _
+		INPUT - $'a1-q2589z'
+		OUTPUT - $'a_-q_589z'
+	EXEC	0-4- _
+		INPUT - $'a1-q2589z'
+		OUTPUT - $'a__q_589z'
+	EXEC	0-4-9 _
+		INPUT - $'a1-q2589z'
+		OUTPUT - $'a__q_58_z'
 
 TEST 11	'from ross'
 	EXEC	-cs '[:upper:][:digit:]' '[Z*]'

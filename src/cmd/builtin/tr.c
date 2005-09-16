@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Labs Research) 2004-04-14 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Labs Research) 2005-08-07 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"
@@ -118,6 +118,7 @@ typedef struct
 	regclass_t	isit;
 	unsigned char*	base;
 	unsigned char*	next;
+	unsigned char*	hold;
 } Tr_t;
 
 static const char*	typename[] = { "source", "destination" };
@@ -160,6 +161,7 @@ nextchar(register Tr_t* tr)
 			if (!tr->isit || (*tr->isit)(tr->prev))
 				return (!tr->type || !tr->convert) ? tr->prev : tr->convert == 'l' ? tolower(tr->prev) : toupper(tr->prev);
 		tr->last = -1;
+		tr->hold = tr->next + 1;
 	}
 	switch (c = *tr->next++)
 	{
@@ -265,7 +267,7 @@ nextchar(register Tr_t* tr)
 		}
 		break;
 	case '-':
-		if (tr->prev >= 0)
+		if (tr->prev >= 0 && tr->next != tr->hold)
 		{
 			c = tr->prev;
 			tr->last = nextchar(tr);

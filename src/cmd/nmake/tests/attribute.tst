@@ -580,3 +580,21 @@ all :'
 	OUTPUT - $'<.TEST> <i1> <>
 <.TEST.I2> <i2> <>
 <.TEST.I3> <.SPECIAL .SCAN.IGNORE .DO.INSTALL.DIR..  i3> <a3>'
+
+TEST 22 '.RETAIN'
+
+	EXEC
+		INPUT Makefile $'
+retain AAA .BBB .CCC.
+
+.set : .MAKE .VIRTUAL
+	AAA = aaa
+	.BBB = bbb
+	.CCC. = ccc
+
+all : .set
+	: $(AAA) : $(.BBB) : $(.CCC.) :
+'
+		ERROR - $'+ : aaa : bbb : ccc :'
+
+	EXEC

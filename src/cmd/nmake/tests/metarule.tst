@@ -472,7 +472,8 @@ main() { return YACC; }'
 TEST 15 'cobol'
 
 	EXEC	-n
-		INPUT Makefile $':PACKAGE: cobol
+		INPUT Makefile $'CC.REQUIRE.cob = -
+:PACKAGE: cobol
 .SOURCE.cob : cobinc
 cmd :: a.cbl i.cbl t.cob x.cbl y.cbl t.cob'
 		INPUT a.cbl $'COMMENT

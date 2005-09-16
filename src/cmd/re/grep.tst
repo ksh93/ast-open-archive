@@ -3771,6 +3771,82 @@ mconv(int *o, int f1, int f2)
 	switch(n->t){
 !
 			;;
+		g7.dat)	cat <<'!'
+#pragma prototyped
+
+#include "sed.h" /* define sed stuff */
+
+Text retemp;	/* holds a rewritten regex, without delimiter */
+
+int
+recomp(Text *rebuf, Text *t, int sub)
+{
+	static int lastre;
+	int code;
+	int c;
+	int n;
+	if(!(c = *t->w) || c == '\n' || !(n = *(t->w + 1)) || n == '\n')
+		syntax("unterminated regular expression");
+	else if (c != n) {
+		assure(rebuf, sizeof(regex_t));
+		if (code = regcomp((regex_t*)rebuf->w,(char*)t->w,reflags|REG_DELIMITED|REG_MUSTDELIM|((reflags&REG_LENIENT)?0:REG_ESCAPE)))
+			badre((regex_t*)rebuf->w,code);
+		lastre = rebuf->w - rebuf->s;
+		t->w += ((regex_t*)rebuf->w)->re_npat;
+		rebuf->w += sizeof(regex_t);
+	} else if(rebuf->w == rebuf->s)
+		syntax("no previous regular expression");
+	else {
+		if (sub) {
+			assure(rebuf, sizeof(regex_t));
+			if (code = regdup(readdr(lastre), (regex_t*)rebuf->w))
+				badre((regex_t*)rebuf->w,code);
+			lastre = rebuf->w - rebuf->s;
+			rebuf->w += sizeof(regex_t);
+		}
+		t->w += 2;
+	}
+	return lastre;
+}
+
+void
+reerror(regex_t* re, int code)
+{
+	if(code && code != REG_NOMATCH) {
+		char buf[UCHAR_MAX+1];
+		regerror(code, re, buf, sizeof(buf));
+		error(3, "regular expression execution error: %s", buf);
+	}
+}
+
+int
+reexec(regex_t* re, char* s, size_t n, size_t nmatch, regmatch_t* match, int flags)
+{
+	int code;
+	if((code = regnexec(re, s, n, nmatch, match, flags)) && code != REG_NOMATCH)
+		reerror(re, code);
+	return code;
+}
+
+int
+substitute(regex_t *re, Text *data)
+{
+	int n;
+	regmatch_t matches[10];
+	if(reexec(re, (char*)data->s, data->w - data->s, elementsof(matches), matches, 0))
+		return 0;
+	if(n = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {
+		reerror(re, n);
+		return 0;
+	}
+	n = re->re_sub->re_len;
+	assure(data, n+1);
+	memcpy(data->s, re->re_sub->re_buf, n+1);
+	data->w = data->s + n;
+	return 1;
+}
+!
+			;;
 		pat.dat)for ((i = 900; i <= 1000; i++))
 			do	print $i
 			done
@@ -3791,6 +3867,7 @@ mconv(int *o, int f1, int f2)
 }
 
 TEST 01 '-q, -v combinations'
+
 	EXEC	-q . /dev/null
 		OUTPUT -
 		EXIT '[12]'
@@ -3801,6 +3878,7 @@ TEST 01 '-q, -v combinations'
 		EXIT 0
 
 TEST 02 'BRE, ERE, -x, -v, -e sanity'
+
 	DO	DATA big.dat
 	EXEC	'^10*$' big.dat
 		OUTPUT - $'1\n10\n100\n1000\n10000'
@@ -3838,6 +3916,7 @@ TEST 02 'BRE, ERE, -x, -v, -e sanity'
 	EXEC	-E -e $'(abc)|(def)\\2'
 
 TEST 03 'data chars except \0 \n'
+
 	DO	DATA chars.dat
 	EXEC	-c . chars.dat
 		OUTPUT - 254
@@ -3853,6 +3932,7 @@ TEST 03 'data chars except \0 \n'
 	EXEC	-E -c -x '' chars.dat
 
 TEST 04 'char class on data chars except \0 \n'
+
 	DO	DATA chars.dat
 	EXEC	-c '[[:alnum:]]' chars.dat
 		OUTPUT - 62
@@ -3884,6 +3964,7 @@ TEST 04 'char class on data chars except \0 \n'
 	EXEC	-c -i '[[:upper:]]' chars.dat
 
 TEST 05 '-f, -F, big pattern'
+
 	DO	DATA big.dat pat.dat
 	DO	{ cp big.dat INPUT ;}
 	EXEC	-c -f pat.dat
@@ -3904,6 +3985,7 @@ TEST 05 '-f, -F, big pattern'
 	EXEC	-v -c -x -E -f pat.dat
 
 TEST 06 '-f, -F, big pattern'
+
 	DO	DATA big.dat
 	EXEC	-n '\(.\)\(.\)\2\1' big.dat
 		IGNORE	OUTPUT
@@ -3929,6 +4011,7 @@ TEST 06 '-f, -F, big pattern'
 		OUTPUT -
 
 TEST 07 '-h, -H'
+
 	DO	DATA x.dat xyz.dat
 	EXEC	z x.dat xyz.dat
 		OUTPUT - $'xyz.dat:z'
@@ -3938,6 +4021,7 @@ TEST 07 '-h, -H'
 		OUTPUT - $'xyz.dat:z'
 
 TEST 08 'exit status, -s, -q, -e, -c, -l combinations'
+
 	IGNORE	OUTPUT ERROR
 	DO	DATA x.dat AB.dat BC.dat
 	DO	for opt in -e -c -l
@@ -3987,6 +4071,7 @@ TEST 08 'exit status, -s, -q, -e, -c, -l combinations'
 	EXEC	-L B AB.dat BC.dat
 
 TEST 09 'file not found'
+
 	DIAGNOSTICS
 	DO	DATA x.dat y.dat
 	EXEC	y nope.dat
@@ -4000,6 +4085,7 @@ TEST 09 'file not found'
 		EXIT 2
 
 TEST 10 'simple gre tests from Andrew Hume'
+
 	EXEC	-q $'a'
 		INPUT - $'a'
 		OUTPUT -
@@ -4422,6 +4508,7 @@ TEST 10 'simple gre tests from Andrew Hume'
 		INPUT - $'abc'
 
 TEST 11 'complex gre tests from Andrew Hume'
+
 	DO DATA g1.dat g4.dat g5.dat g6.pat g6.dat g8.dat g12.dat
 	EXEC -xF $'defg\nabcd'
 		INPUT - $'x\nabcd\nabcde\neabcd\ndefg\nxdefg\ndefgx\nabcd defg'
@@ -4520,9 +4607,1725 @@ NBRFILES=`ls -f $pubdir/jbk | fgrep -vi -x \'.
 		INPUT - $'at\nhematic'
 
 TEST 12 'alternating BM tests'
+
 	EXEC	-F $':::1:::0:\n:::1:1:0:'
 		INPUT - ':::0:::1:::1:::0:'
 		SAME OUTPUT INPUT
 	EXEC	-F $':::1:::0:\n:::1:1:1:'
 	EXEC	-E $':::1:::0:|:::1:1:0:'
 	EXEC	-E $':::1:::0:|:::1:1:1:'
+
+TEST 13 '-c, -h, -t combinations'
+
+	DO	DATA x.dat xyz.dat
+	EXEC	x x.dat xyz.dat
+		OUTPUT - $'x.dat:x\nxyz.dat:x'
+	EXEC	-c x x.dat xyz.dat
+		OUTPUT - $'x.dat:1\nxyz.dat:1'
+	EXEC	-ch x x.dat xyz.dat
+		OUTPUT - $'1\n1'
+	EXEC	-ct x x.dat xyz.dat
+		OUTPUT - $'2'
+	EXEC	-cht x x.dat xyz.dat
+		OUTPUT - $'2'
+	EXEC	-h x x.dat xyz.dat
+		OUTPUT - $'x\nx'
+	EXEC	-ht x x.dat xyz.dat
+		OUTPUT - $'2'
+	EXEC	-t x x.dat xyz.dat
+		OUTPUT - $'2'
+
+TEST 14 '-m with -c, -h, -n, -t combinations'
+
+	DO	DATA g6.dat g7.dat
+	EXEC	-m -e open:{ -e close:} g6.dat g7.dat
+		OUTPUT - $'g6.dat:open:{
+g6.dat:open:	if(p==0){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(p==0){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(proc->prbuf==0){
+g6.dat:close:	}
+g6.dat:open:	if(n+proc->nprbuf+1>proc->maxprbuf){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:long call0[]={	/* plain function, 0 arguments */
+g6.dat:close:};
+g6.dat:open:long call1[]={	/* plain function, 1 argument */
+g6.dat:close:};
+g6.dat:open:long call2[]={	/* plain function, 2 arguments */
+g6.dat:close:};
+g6.dat:open:long call3[]={	/* plain function, 3 arguments */
+g6.dat:close:};
+g6.dat:open:long call4[]={	/* plain function, 4 arguments */
+g6.dat:close:};
+g6.dat:open:long call5[]={	/* plain function, 5 arguments */
+g6.dat:close:};
+g6.dat:open:long call2_0[]={/* two-step function, 0 arguments */
+g6.dat:close:};
+g6.dat:open:struct{
+g6.dat:open:}bltin[]={
+g6.dat:close:}bltin[]={
+g6.dat:open:	0,	{0,	0,	0},	0,	0,
+g6.dat:close:	0,	{0,	0,	0},	0,	0,
+g6.dat:close:};
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(type==Sstruct){
+g6.dat:close:	}else
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(cflag){
+g6.dat:close:	}
+g6.dat:open:	if(errmark()){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g6.dat:open:		if(n->l->t==NCall && !bflag){
+g6.dat:close:		}
+g6.dat:open:		switch(n->o.t){
+g6.dat:close:		}
+g6.dat:open:		switch(n->o.i){
+g6.dat:open:			if(eqtype(etypeof(n->l), &arychartype)){
+g6.dat:close:			}
+g6.dat:open:			if(isptrtype(etypeof(n->l))){
+g6.dat:close:			}else
+g6.dat:open:			if(retain && n->l->t==NID && isinttype(etypeof(n->l))){
+g6.dat:close:			}
+g6.dat:close:		}
+g6.dat:open:		switch(typeof(n)->o.t){
+g6.dat:open:			if(n->o.s->val->isauto){
+g6.dat:open:			}else{
+g6.dat:close:			}else{
+g6.dat:close:			}
+g6.dat:open:			if(n->o.s->val->isauto){
+g6.dat:open:			}else{
+g6.dat:close:			}else{
+g6.dat:close:			}
+g6.dat:close:		}
+g6.dat:open:		if(nscope==1){
+g6.dat:close:		}else
+g6.dat:open:	case NSmash:{
+g6.dat:open:		if(vr->type->o.t==TType){
+g6.dat:close:		}
+g6.dat:open:		if(isptrtype(vl->type)){
+g6.dat:open:			if(vl->isauto){
+g6.dat:open:			}else{
+g6.dat:close:			}else{
+g6.dat:close:			}
+g6.dat:close:		}
+g6.dat:open:		if(vl->isauto){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:open:		if(retain){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(isstr){
+g6.dat:open:	}else{
+g6.dat:close:	}else{
+g6.dat:close:	}
+g6.dat:open:	if(a->t!=NID){
+g6.dat:open:	}else if(a->o.s->val->isauto){
+g6.dat:close:	}else if(a->o.s->val->isauto){
+g6.dat:open:	}else{
+g6.dat:close:	}else{
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g6.dat:open:		switch(typeof(n)->o.t){
+g6.dat:open:			if(n->o.s->val->isauto){
+g6.dat:close:			}
+g6.dat:open:			if(n->o.s->val->isauto){
+g6.dat:close:			}
+g6.dat:open:			if(n->o.s->val->isauto){
+g6.dat:close:			}
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g6.dat:open:		if(n->o.s->val->isauto){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(n->r==0){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(n->o.i){	/* enter loop at top, so jump to body */
+g6.dat:close:	}
+g6.dat:open:	if(n->r->r){		/* jump to condition */
+g6.dat:close:	}
+g6.dat:open:	if(n->r->r){
+g6.dat:close:	}else
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	else{
+g6.dat:open:		sprint(buf, "prog(){call on line %d}", n->line);
+g6.dat:close:		sprint(buf, "prog(){call on line %d}", n->line);
+g6.dat:close:	}
+g6.dat:open:	switch(callinst){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(n->t==NList){
+g6.dat:close:	}
+g6.dat:open:	if(n->t==NArraycom){
+g6.dat:close:	}else if(etypeoft(n)->o.t==TArray)
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(n->t==NList){
+g6.dat:close:	}
+g6.dat:open:	if(c->o.t==\'=\'){
+g6.dat:close:	}
+g6.dat:open:	if(c->o.t==SND){
+g6.dat:close:	}
+g6.dat:open:	else if(c->t==NArraycom){
+g6.dat:close:	}else
+g6.dat:open:	if(c->t==NArraycom){	/* save array index */
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(s->t==NList){
+g6.dat:close:	}
+g6.dat:open:	else{
+g6.dat:open:		if(isptr){	/* string */
+g6.dat:open:		}else{
+g6.dat:close:		}else{
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(isptrtype(s->val->type)){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(n->t==NExprlist){
+g6.dat:close:	}
+g6.dat:open:	switch(t->o.t){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(errmark()){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(returnloc){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(types->t==NList){
+g6.dat:close:	}
+g6.dat:open:	if(isptrtype(types)){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(t->o.t){
+g6.dat:open:		else{
+g6.dat:close:		}
+g6.dat:open:		if(v==0){
+g6.dat:close:		}
+g6.dat:open:		if(t->r->o.t==TChar){
+g6.dat:close:		}else
+g6.dat:open:		if(v==0){
+g6.dat:close:		}
+g6.dat:open:		if(v==0){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(t->o.t){
+g6.dat:open:		if(isptrtype(t)){
+g6.dat:open:		}else if(t->o.t==TInt || t->o.t==TUnit){
+g6.dat:close:		}else if(t->o.t==TInt || t->o.t==TUnit){
+g6.dat:close:		}else if(t->o.t==TChar)
+g6.dat:open:	case TStruct:{
+g6.dat:close:	}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(t->t==NList){
+g6.dat:close:	}
+g6.dat:open:	for(i=length(t); --i>=0; ){
+g6.dat:open:		if(*pos==BPW){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(l<-2 || l>10){
+g6.dat:close:	};
+g6.dat:open:	switch((int)l){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g6.dat:open:		switch(n->o.i){
+g6.dat:close:		}
+g6.dat:open:		if(isconst(n->o.n)){
+g6.dat:open:			if(topofstack()){
+g6.dat:open:			}else{
+g6.dat:close:			}else{
+g6.dat:close:			}
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g6.dat:open:		switch(n->o.i){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(t->o.t){
+g6.dat:open:		if(t->r->o.t==TChar){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(proc->pc==0){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(n->t==NList){
+g6.dat:close:	}
+g6.dat:open:	if(n->t==NDeclsc){
+g6.dat:close:	}
+g6.dat:open:	if(n->r==0){
+g6.dat:close:	}
+g6.dat:open:	if(dotypchk){
+g6.dat:open:		if(n->o.n){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:open:	if(docomp && n->o.n){
+g6.dat:close:	}else
+g6.dat:open:	if(n->o.n && docomp && nscope==0){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(id->t==NList){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open: * 	rec {
+g6.dat:close: * 	};
+g6.dat:open: *	rec type T: struct of { t:T; };
+g6.dat:close: *	rec type T: struct of { t:T; };
+g6.dat:open:{
+g6.dat:open:	if(n->t==NDeclsc){
+g6.dat:close:	}
+g6.dat:open:	if(n->r==0){
+g6.dat:open:	}else if(n->r->o.t==TType){
+g6.dat:close:	}else if(n->r->o.t==TType){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(n->t==NDeclsc){
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open: *	prog(a:int){
+g6.dat:open: *		begin prog(b:int){ f(a, b); }(b);
+g6.dat:close: *		begin prog(b:int){ f(a, b); }(b);
+g6.dat:close: *	}
+g6.dat:open: *	prog(a:int){
+g6.dat:open: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
+g6.dat:close: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
+g6.dat:close: *	}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	if(!alreadyformal(n, begf)){
+g6.dat:close:	}		
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g6.dat:open:		if(0<n->o.s->val->scope && n->o.s->val->scope<fscope){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:close:}
+g6.dat:open:prbuf(){
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	else{
+g6.dat:open:		switch(t){
+g6.dat:close:		}
+g6.dat:close:	}
+g6.dat:close:}
+g6.dat:open:{
+g6.dat:open:	switch(n->t){
+g7.dat:open:{
+g7.dat:open:	else if (c != n) {
+g7.dat:close:	} else if(rebuf->w == rebuf->s)
+g7.dat:open:	else {
+g7.dat:open:		if (sub) {
+g7.dat:close:		}
+g7.dat:close:	}
+g7.dat:close:}
+g7.dat:open:{
+g7.dat:open:	if(code && code != REG_NOMATCH) {
+g7.dat:close:	}
+g7.dat:close:}
+g7.dat:open:{
+g7.dat:close:}
+g7.dat:open:{
+g7.dat:open:	if(n = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {
+g7.dat:close:	}
+g7.dat:close:}'
+	EXEC	-m -e include:include -e define:define g6.dat g7.dat
+		OUTPUT - $'g6.dat:include:#include "alloc.h"
+g6.dat:include:#include <libc.h>
+g6.dat:include:#include "alloc.h"
+g6.dat:include:#include "word.h"
+g6.dat:include:#include "store.h"
+g6.dat:include:#include "comm.h"
+g6.dat:include:#include <libc.h>
+g6.dat:include:#include "node.h"
+g6.dat:include:#include "symbol.h"
+g6.dat:include:#include "alloc.h"
+g6.dat:include:#include "word.h"
+g6.dat:include:#include "store.h"
+g6.dat:include:#include "comm.h"
+g6.dat:include:#include "inst.h"
+g6.dat:include:#include <libc.h>
+g6.dat:include:#include "lib.h"
+g6.dat:include:#include "lib.h"
+g6.dat:include:#include "node.h"
+g6.dat:include:#include "symbol.h"
+g6.dat:include:#include "alloc.h"
+g6.dat:include:#include "ydefs.h"
+g6.dat:include:#include "word.h"
+g6.dat:include:#include "store.h"
+g6.dat:include:#include "comm.h"
+g6.dat:include:#include "inst.h"
+g6.dat:include:#include "errjmp.h"
+g6.dat:include:#include <libc.h>
+g6.dat:include:#include "alloc.h"
+g6.dat:include:#include "node.h"
+g6.dat:include:#include "symbol.h"
+g6.dat:include:#include "ydefs.h"
+g6.dat:include:#include "word.h"
+g6.dat:include:#include "store.h"
+g6.dat:include:#include <libc.h>
+g6.dat:include:#include "alloc.h"
+g6.dat:include:#include "word.h"
+g6.dat:include:#include "store.h"
+g6.dat:include:#include "comm.h"
+g6.dat:include:#include <libc.h>
+g6.dat:include:	nargs+=2;	/* includes result and sym; add pc, fp */
+g6.dat:include:#include "node.h"
+g6.dat:include:#include "symbol.h"
+g6.dat:include:#include "alloc.h"
+g6.dat:include:#include "ydefs.h"
+g6.dat:include:#include "word.h"
+g6.dat:include:#include "store.h"
+g6.dat:include:#include <libc.h>
+g6.dat:include:#include "nodenames.h"
+g6.dat:include:#include "typenames.h"
+g6.dat:include:#include "errjmp.h"
+g6.dat:include:#include "node.h"
+g6.dat:include:#include "symbol.h"
+g6.dat:include:#include "ydefs.h"
+g6.dat:include:#include <libc.h>
+g6.dat:define:#define	FNS
+g6.dat:define:#define	C	0x40000000
+g6.dat:define:#define	I	0x20000000
+g6.dat:define:#define	F	0x10000000
+g6.dat:define:#define	M(x)	((x)&~(C|I|F))
+g7.dat:include:#include "sed.h" /* define sed stuff */
+g7.dat:define:#include "sed.h" /* define sed stuff */'
+	EXEC	-n -m -e open:{ -e close:} g6.dat g7.dat
+		OUTPUT - $'g6.dat:6:open:{
+g6.dat:9:open:	if(p==0){
+g6.dat:12:close:	}
+g6.dat:14:close:}
+g6.dat:17:open:{
+g6.dat:19:open:	if(p==0){
+g6.dat:22:close:	}
+g6.dat:24:close:}
+g6.dat:36:open:{
+g6.dat:39:close:}
+g6.dat:42:open:{
+g6.dat:45:close:}
+g6.dat:48:open:{
+g6.dat:51:close:}
+g6.dat:54:open:{
+g6.dat:57:close:}
+g6.dat:60:open:{
+g6.dat:63:close:}
+g6.dat:66:open:{
+g6.dat:69:close:}
+g6.dat:72:open:{
+g6.dat:75:close:}
+g6.dat:78:open:{
+g6.dat:81:close:}
+g6.dat:84:open:{
+g6.dat:87:close:}
+g6.dat:90:open:{
+g6.dat:93:close:}
+g6.dat:96:open:{
+g6.dat:99:close:}
+g6.dat:102:open:{
+g6.dat:105:close:}
+g6.dat:108:open:{
+g6.dat:111:close:}
+g6.dat:114:open:{
+g6.dat:117:close:}
+g6.dat:123:open:{
+g6.dat:127:close:}
+g6.dat:130:open:{
+g6.dat:134:close:}
+g6.dat:137:open:{
+g6.dat:141:close:}
+g6.dat:144:open:{
+g6.dat:148:close:}
+g6.dat:151:open:{
+g6.dat:155:close:}
+g6.dat:158:open:{
+g6.dat:162:close:}
+g6.dat:165:open:{
+g6.dat:169:close:}
+g6.dat:172:open:{
+g6.dat:176:close:}
+g6.dat:179:open:{
+g6.dat:189:close:}
+g6.dat:192:open:{
+g6.dat:198:close:}
+g6.dat:201:open:{
+g6.dat:207:close:}
+g6.dat:210:open:{
+g6.dat:214:close:}
+g6.dat:217:open:{
+g6.dat:221:close:}
+g6.dat:224:open:{
+g6.dat:228:close:}
+g6.dat:231:open:{
+g6.dat:235:close:}
+g6.dat:238:open:{
+g6.dat:242:close:}
+g6.dat:245:open:{
+g6.dat:251:close:}
+g6.dat:258:open:{
+g6.dat:261:close:}
+g6.dat:264:open:{
+g6.dat:267:close:}
+g6.dat:270:open:{
+g6.dat:273:close:}
+g6.dat:276:open:{
+g6.dat:281:close:}
+g6.dat:284:open:{
+g6.dat:289:close:}
+g6.dat:296:open:{
+g6.dat:307:close:}
+g6.dat:314:open:{
+g6.dat:317:close:}
+g6.dat:320:open:{
+g6.dat:323:close:}
+g6.dat:326:open:{
+g6.dat:329:close:}
+g6.dat:332:open:{
+g6.dat:335:close:}
+g6.dat:338:open:{
+g6.dat:341:close:}
+g6.dat:346:open:{
+g6.dat:350:open:	if(proc->prbuf==0){
+g6.dat:354:close:	}
+g6.dat:355:open:	if(n+proc->nprbuf+1>proc->maxprbuf){
+g6.dat:358:close:	}
+g6.dat:361:close:}
+g6.dat:367:open:{
+g6.dat:370:close:}
+g6.dat:373:open:{
+g6.dat:377:close:}
+g6.dat:380:open:{
+g6.dat:384:close:}
+g6.dat:387:open:{
+g6.dat:392:close:}
+g6.dat:411:open:long call0[]={	/* plain function, 0 arguments */
+g6.dat:413:close:};
+g6.dat:414:open:long call1[]={	/* plain function, 1 argument */
+g6.dat:416:close:};
+g6.dat:417:open:long call2[]={	/* plain function, 2 arguments */
+g6.dat:419:close:};
+g6.dat:420:open:long call3[]={	/* plain function, 3 arguments */
+g6.dat:422:close:};
+g6.dat:423:open:long call4[]={	/* plain function, 4 arguments */
+g6.dat:425:close:};
+g6.dat:426:open:long call5[]={	/* plain function, 5 arguments */
+g6.dat:428:close:};
+g6.dat:429:open:long call2_0[]={/* two-step function, 0 arguments */
+g6.dat:431:close:};
+g6.dat:433:open:struct{
+g6.dat:438:open:}bltin[]={
+g6.dat:438:close:}bltin[]={
+g6.dat:440:open:	0,	{0,	0,	0},	0,	0,
+g6.dat:440:close:	0,	{0,	0,	0},	0,	0,
+g6.dat:441:close:};
+g6.dat:444:open:{
+g6.dat:451:close:}
+g6.dat:455:open:{
+g6.dat:484:close:}
+g6.dat:488:open:{
+g6.dat:495:open:	if(type==Sstruct){
+g6.dat:498:close:	}else
+g6.dat:502:close:}
+g6.dat:525:open:{
+g6.dat:529:open:	if(cflag){
+g6.dat:533:close:	}
+g6.dat:535:open:	if(errmark()){
+g6.dat:540:close:	}
+g6.dat:545:close:}
+g6.dat:548:open:{
+g6.dat:552:open:	switch(n->t){
+g6.dat:559:open:		if(n->l->t==NCall && !bflag){
+g6.dat:562:close:		}
+g6.dat:567:open:		switch(n->o.t){
+g6.dat:584:close:		}
+g6.dat:601:open:		switch(n->o.i){
+g6.dat:607:open:			if(eqtype(etypeof(n->l), &arychartype)){
+g6.dat:610:close:			}
+g6.dat:704:open:			if(isptrtype(etypeof(n->l))){
+g6.dat:707:close:			}else
+g6.dat:711:open:			if(retain && n->l->t==NID && isinttype(etypeof(n->l))){
+g6.dat:714:close:			}
+g6.dat:741:close:		}
+g6.dat:753:open:		switch(typeof(n)->o.t){
+g6.dat:756:open:			if(n->o.s->val->isauto){
+g6.dat:759:open:			}else{
+g6.dat:759:close:			}else{
+g6.dat:762:close:			}
+g6.dat:768:open:			if(n->o.s->val->isauto){
+g6.dat:771:open:			}else{
+g6.dat:771:close:			}else{
+g6.dat:774:close:			}
+g6.dat:784:close:		}
+g6.dat:813:open:		if(nscope==1){
+g6.dat:821:close:		}else
+g6.dat:829:open:	case NSmash:{
+g6.dat:833:open:		if(vr->type->o.t==TType){
+g6.dat:837:close:		}
+g6.dat:842:open:		if(isptrtype(vl->type)){
+g6.dat:843:open:			if(vl->isauto){
+g6.dat:846:open:			}else{
+g6.dat:846:close:			}else{
+g6.dat:849:close:			}
+g6.dat:851:close:		}
+g6.dat:852:open:		if(vl->isauto){
+g6.dat:856:close:		}
+g6.dat:860:close:	}
+g6.dat:862:open:		if(retain){
+g6.dat:871:close:		}
+g6.dat:888:close:	}
+g6.dat:891:close:}
+g6.dat:894:open:{
+g6.dat:896:open:	if(isstr){
+g6.dat:900:open:	}else{
+g6.dat:900:close:	}else{
+g6.dat:905:close:	}
+g6.dat:906:open:	if(a->t!=NID){
+g6.dat:910:open:	}else if(a->o.s->val->isauto){
+g6.dat:910:close:	}else if(a->o.s->val->isauto){
+g6.dat:914:open:	}else{
+g6.dat:914:close:	}else{
+g6.dat:918:close:	}
+g6.dat:919:close:}
+g6.dat:922:open:{
+g6.dat:923:open:	switch(n->t){
+g6.dat:925:open:		switch(typeof(n)->o.t){
+g6.dat:927:open:			if(n->o.s->val->isauto){
+g6.dat:931:close:			}
+g6.dat:937:open:			if(n->o.s->val->isauto){
+g6.dat:941:close:			}
+g6.dat:949:open:			if(n->o.s->val->isauto){
+g6.dat:953:close:			}
+g6.dat:961:close:		}
+g6.dat:973:close:	}
+g6.dat:974:close:}
+g6.dat:980:open:{
+g6.dat:981:open:	switch(n->t){
+g6.dat:983:open:		if(n->o.s->val->isauto){
+g6.dat:987:close:		}
+g6.dat:1002:close:	}
+g6.dat:1003:close:}
+g6.dat:1006:open:{
+g6.dat:1013:open:	if(n->r==0){
+g6.dat:1016:close:	}
+g6.dat:1024:close:}
+g6.dat:1027:open:{
+g6.dat:1043:close:}
+g6.dat:1046:open:{
+g6.dat:1048:open:	if(n->o.i){	/* enter loop at top, so jump to body */
+g6.dat:1052:close:	}
+g6.dat:1054:open:	if(n->r->r){		/* jump to condition */
+g6.dat:1058:close:	}
+g6.dat:1064:open:	if(n->r->r){
+g6.dat:1068:close:	}else
+g6.dat:1071:close:}
+g6.dat:1074:open:{
+g6.dat:1093:close:}
+g6.dat:1096:open:{
+g6.dat:1113:open:	else{
+g6.dat:1116:open:		sprint(buf, "prog(){call on line %d}", n->line);
+g6.dat:1116:close:		sprint(buf, "prog(){call on line %d}", n->line);
+g6.dat:1120:close:	}
+g6.dat:1122:open:	switch(callinst){
+g6.dat:1140:close:	}
+g6.dat:1142:close:}
+g6.dat:1145:open:{
+g6.dat:1162:close:}
+g6.dat:1165:open:{
+g6.dat:1167:open:	if(n->t==NList){
+g6.dat:1171:close:	}
+g6.dat:1181:open:	if(n->t==NArraycom){
+g6.dat:1184:close:	}else if(etypeoft(n)->o.t==TArray)
+g6.dat:1188:close:}
+g6.dat:1191:open:{
+g6.dat:1193:open:	if(n->t==NList){
+g6.dat:1198:close:	}
+g6.dat:1207:open:	if(c->o.t==\'=\'){
+g6.dat:1210:close:	}
+g6.dat:1211:open:	if(c->o.t==SND){
+g6.dat:1217:close:	}
+g6.dat:1224:open:	else if(c->t==NArraycom){
+g6.dat:1229:close:	}else
+g6.dat:1231:open:	if(c->t==NArraycom){	/* save array index */
+g6.dat:1236:close:	}
+g6.dat:1242:close:}
+g6.dat:1245:open:{
+g6.dat:1261:close:}
+g6.dat:1264:open:{
+g6.dat:1267:open:	if(s->t==NList){
+g6.dat:1271:close:	}
+g6.dat:1278:open:	else{
+g6.dat:1280:open:		if(isptr){	/* string */
+g6.dat:1285:open:		}else{
+g6.dat:1285:close:		}else{
+g6.dat:1288:close:		}
+g6.dat:1293:close:	}
+g6.dat:1303:close:}
+g6.dat:1306:open:{
+g6.dat:1313:close:}
+g6.dat:1316:open:{
+g6.dat:1319:open:	if(isptrtype(s->val->type)){
+g6.dat:1322:close:	}
+g6.dat:1323:close:}
+g6.dat:1326:open:{
+g6.dat:1330:open:	if(n->t==NExprlist){
+g6.dat:1334:close:	}
+g6.dat:1336:open:	switch(t->o.t){
+g6.dat:1354:close:	}
+g6.dat:1355:close:}
+g6.dat:1358:open:{
+g6.dat:1373:open:	if(errmark()){
+g6.dat:1379:close:	}
+g6.dat:1404:close:}
+g6.dat:1407:open:{
+g6.dat:1408:open:	if(returnloc){
+g6.dat:1412:close:	}
+g6.dat:1420:close:}
+g6.dat:1423:open:{
+g6.dat:1426:open:	if(types->t==NList){
+g6.dat:1429:close:	}
+g6.dat:1433:open:	if(isptrtype(types)){
+g6.dat:1436:close:	}
+g6.dat:1438:close:}
+g6.dat:1441:open:{
+g6.dat:1444:close:}
+g6.dat:1447:open:{
+g6.dat:1448:open:	switch(t->o.t){
+g6.dat:1463:open:		else{
+g6.dat:1466:close:		}
+g6.dat:1469:open:		if(v==0){
+g6.dat:1473:close:		}
+g6.dat:1488:open:		if(t->r->o.t==TChar){
+g6.dat:1493:close:		}else
+g6.dat:1497:open:		if(v==0){
+g6.dat:1502:close:		}
+g6.dat:1506:open:		if(v==0){
+g6.dat:1509:close:		}
+g6.dat:1519:close:	}
+g6.dat:1520:close:}
+g6.dat:1523:open:{
+g6.dat:1524:open:	switch(t->o.t){
+g6.dat:1529:open:		if(isptrtype(t)){
+g6.dat:1532:open:		}else if(t->o.t==TInt || t->o.t==TUnit){
+g6.dat:1532:close:		}else if(t->o.t==TInt || t->o.t==TUnit){
+g6.dat:1535:close:		}else if(t->o.t==TChar)
+g6.dat:1540:open:	case TStruct:{
+g6.dat:1550:close:	}
+g6.dat:1555:close:	}
+g6.dat:1557:close:}
+g6.dat:1560:open:{
+g6.dat:1562:open:	if(t->t==NList){
+g6.dat:1566:close:	}
+g6.dat:1569:open:	for(i=length(t); --i>=0; ){
+g6.dat:1570:open:		if(*pos==BPW){
+g6.dat:1574:close:		}
+g6.dat:1578:close:	}
+g6.dat:1579:close:}
+g6.dat:1582:open:{
+g6.dat:1583:open:	if(l<-2 || l>10){
+g6.dat:1587:close:	};
+g6.dat:1588:open:	switch((int)l){
+g6.dat:1630:close:	}
+g6.dat:1631:close:}
+g6.dat:1634:open:{
+g6.dat:1637:open:	switch(n->t){
+g6.dat:1651:close:	}
+g6.dat:1653:close:}
+g6.dat:1667:open:{
+g6.dat:1672:open:	switch(n->t){
+g6.dat:1700:open:		switch(n->o.i){
+g6.dat:1742:close:		}
+g6.dat:1759:open:		if(isconst(n->o.n)){
+g6.dat:1763:open:			if(topofstack()){
+g6.dat:1766:open:			}else{
+g6.dat:1766:close:			}else{
+g6.dat:1769:close:			}
+g6.dat:1772:close:		}
+g6.dat:1821:close:	}
+g6.dat:1825:close:}
+g6.dat:1828:open:{
+g6.dat:1831:open:	switch(n->t){
+g6.dat:1837:open:		switch(n->o.i){
+g6.dat:1870:close:		}
+g6.dat:1895:close:	}
+g6.dat:1898:close:}
+g6.dat:1902:open:{
+g6.dat:1907:open:	switch(t->o.t){
+g6.dat:1917:open:		if(t->r->o.t==TChar){
+g6.dat:1927:close:		}
+g6.dat:1929:close:	}
+g6.dat:1931:close:}
+g6.dat:1945:open:{
+g6.dat:1950:close:}
+g6.dat:1953:open:{
+g6.dat:1959:close:}
+g6.dat:1962:open:{
+g6.dat:1968:close:}
+g6.dat:1971:open:{
+g6.dat:1974:close:}
+g6.dat:1993:open:{
+g6.dat:2000:open:	if(proc->pc==0){
+g6.dat:2005:close:	}
+g6.dat:2007:close:}
+g6.dat:2010:open:{
+g6.dat:2034:close:}
+g6.dat:2037:open:{
+g6.dat:2047:close:}
+g6.dat:2050:open:{
+g6.dat:2060:close:}
+g6.dat:2072:open:{
+g6.dat:2076:open:	if(n->t==NList){
+g6.dat:2080:close:	}
+g6.dat:2081:open:	if(n->t==NDeclsc){
+g6.dat:2084:close:	}
+g6.dat:2087:open:	if(n->r==0){
+g6.dat:2093:close:	}
+g6.dat:2094:open:	if(dotypchk){
+g6.dat:2096:open:		if(n->o.n){
+g6.dat:2111:close:		}
+g6.dat:2112:close:	}
+g6.dat:2113:open:	if(docomp && n->o.n){
+g6.dat:2118:close:	}else
+g6.dat:2121:open:	if(n->o.n && docomp && nscope==0){
+g6.dat:2125:close:	}
+g6.dat:2126:close:}
+g6.dat:2130:open:{
+g6.dat:2131:open:	if(id->t==NList){
+g6.dat:2135:close:	}
+g6.dat:2146:close:}
+g6.dat:2150:open: * 	rec {
+g6.dat:2153:close: * 	};
+g6.dat:2164:open: *	rec type T: struct of { t:T; };
+g6.dat:2164:close: *	rec type T: struct of { t:T; };
+g6.dat:2171:open:{
+g6.dat:2173:open:	if(n->t==NDeclsc){
+g6.dat:2176:close:	}
+g6.dat:2177:open:	if(n->r==0){
+g6.dat:2182:open:	}else if(n->r->o.t==TType){
+g6.dat:2182:close:	}else if(n->r->o.t==TType){
+g6.dat:2186:close:	}
+g6.dat:2190:close:}
+g6.dat:2194:open:{
+g6.dat:2197:open:	if(n->t==NDeclsc){
+g6.dat:2200:close:	}
+g6.dat:2207:close:}
+g6.dat:2211:open:{
+g6.dat:2222:close:}
+g6.dat:2226:open:{
+g6.dat:2230:close:}
+g6.dat:2233:open:{
+g6.dat:2243:close:}
+g6.dat:2249:open: *	prog(a:int){
+g6.dat:2250:open: *		begin prog(b:int){ f(a, b); }(b);
+g6.dat:2250:close: *		begin prog(b:int){ f(a, b); }(b);
+g6.dat:2251:close: *	}
+g6.dat:2255:open: *	prog(a:int){
+g6.dat:2256:open: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
+g6.dat:2256:close: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
+g6.dat:2257:close: *	}
+g6.dat:2267:open:{
+g6.dat:2276:close:}
+g6.dat:2279:open:{
+g6.dat:2290:close:}
+g6.dat:2293:open:{
+g6.dat:2295:open:	if(!alreadyformal(n, begf)){
+g6.dat:2306:close:	}		
+g6.dat:2307:close:}
+g6.dat:2310:open:{
+g6.dat:2316:close:}
+g6.dat:2319:open:{
+g6.dat:2322:open:	switch(n->t){
+g6.dat:2346:open:		if(0<n->o.s->val->scope && n->o.s->val->scope<fscope){
+g6.dat:2350:close:		}
+g6.dat:2397:close:	}
+g6.dat:2400:close:}
+g6.dat:2411:open:{
+g6.dat:2418:close:}
+g6.dat:2421:open:{
+g6.dat:2428:close:}
+g6.dat:2431:open:{
+g6.dat:2438:close:}
+g6.dat:2441:open:{
+g6.dat:2446:close:}
+g6.dat:2449:open:{
+g6.dat:2455:close:}
+g6.dat:2458:open:{
+g6.dat:2465:close:}
+g6.dat:2468:open:{
+g6.dat:2474:close:}
+g6.dat:2477:open:{
+g6.dat:2483:close:}
+g6.dat:2486:open:{
+g6.dat:2492:close:}
+g6.dat:2498:open:prbuf(){
+g6.dat:2502:close:}
+g6.dat:2505:open:{
+g6.dat:2511:open:	else{
+g6.dat:2512:open:		switch(t){
+g6.dat:2561:close:		}
+g6.dat:2563:close:	}
+g6.dat:2566:close:}
+g6.dat:2569:open:{
+g6.dat:2572:open:	switch(n->t){
+g7.dat:9:open:{
+g7.dat:16:open:	else if (c != n) {
+g7.dat:23:close:	} else if(rebuf->w == rebuf->s)
+g7.dat:25:open:	else {
+g7.dat:26:open:		if (sub) {
+g7.dat:32:close:		}
+g7.dat:34:close:	}
+g7.dat:36:close:}
+g7.dat:40:open:{
+g7.dat:41:open:	if(code && code != REG_NOMATCH) {
+g7.dat:45:close:	}
+g7.dat:46:close:}
+g7.dat:50:open:{
+g7.dat:55:close:}
+g7.dat:59:open:{
+g7.dat:64:open:	if(n = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {
+g7.dat:67:close:	}
+g7.dat:73:close:}'
+	EXEC	-n -m -e include:include -e define:define g6.dat g7.dat
+		OUTPUT - $'g6.dat:1:include:#include "alloc.h"
+g6.dat:2:include:#include <libc.h>
+g6.dat:25:include:#include "alloc.h"
+g6.dat:26:include:#include "word.h"
+g6.dat:27:include:#include "store.h"
+g6.dat:28:include:#include "comm.h"
+g6.dat:29:include:#include <libc.h>
+g6.dat:393:include:#include "node.h"
+g6.dat:394:include:#include "symbol.h"
+g6.dat:395:include:#include "alloc.h"
+g6.dat:396:include:#include "word.h"
+g6.dat:397:include:#include "store.h"
+g6.dat:398:include:#include "comm.h"
+g6.dat:399:include:#include "inst.h"
+g6.dat:400:include:#include <libc.h>
+g6.dat:402:define:#define	FNS
+g6.dat:403:include:#include "lib.h"
+g6.dat:406:define:#define	C	0x40000000
+g6.dat:407:define:#define	I	0x20000000
+g6.dat:408:define:#define	F	0x10000000
+g6.dat:409:define:#define	M(x)	((x)&~(C|I|F))
+g6.dat:439:include:#include "lib.h"
+g6.dat:503:include:#include "node.h"
+g6.dat:504:include:#include "symbol.h"
+g6.dat:505:include:#include "alloc.h"
+g6.dat:506:include:#include "ydefs.h"
+g6.dat:507:include:#include "word.h"
+g6.dat:508:include:#include "store.h"
+g6.dat:509:include:#include "comm.h"
+g6.dat:510:include:#include "inst.h"
+g6.dat:511:include:#include "errjmp.h"
+g6.dat:512:include:#include <libc.h>
+g6.dat:1654:include:#include "alloc.h"
+g6.dat:1655:include:#include "node.h"
+g6.dat:1656:include:#include "symbol.h"
+g6.dat:1657:include:#include "ydefs.h"
+g6.dat:1658:include:#include "word.h"
+g6.dat:1659:include:#include "store.h"
+g6.dat:1660:include:#include <libc.h>
+g6.dat:1932:include:#include "alloc.h"
+g6.dat:1933:include:#include "word.h"
+g6.dat:1934:include:#include "store.h"
+g6.dat:1935:include:#include "comm.h"
+g6.dat:1936:include:#include <libc.h>
+g6.dat:2016:include:	nargs+=2;	/* includes result and sym; add pc, fp */
+g6.dat:2061:include:#include "node.h"
+g6.dat:2062:include:#include "symbol.h"
+g6.dat:2063:include:#include "alloc.h"
+g6.dat:2064:include:#include "ydefs.h"
+g6.dat:2065:include:#include "word.h"
+g6.dat:2066:include:#include "store.h"
+g6.dat:2067:include:#include <libc.h>
+g6.dat:2402:include:#include "nodenames.h"
+g6.dat:2403:include:#include "typenames.h"
+g6.dat:2404:include:#include "errjmp.h"
+g6.dat:2405:include:#include "node.h"
+g6.dat:2406:include:#include "symbol.h"
+g6.dat:2407:include:#include "ydefs.h"
+g6.dat:2408:include:#include <libc.h>
+g7.dat:3:include:#include "sed.h" /* define sed stuff */
+g7.dat:3:define:#include "sed.h" /* define sed stuff */'
+	EXEC	-c -m -e open:{ -e close:} g6.dat g7.dat
+		OUTPUT - $'g6.dat:open:238
+g6.dat:close:236
+g7.dat:open:9
+g7.dat:close:9'
+	EXEC	-c -m -e include:include -e define:define g6.dat g7.dat
+		OUTPUT - $'g6.dat:include:54
+g6.dat:define:5
+g7.dat:include:1
+g7.dat:define:1'
+	EXEC	-h -m -e open:{ -e close:} g6.dat g7.dat
+		OUTPUT - $'open:{
+open:	if(p==0){
+close:	}
+close:}
+open:{
+open:	if(p==0){
+close:	}
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+open:	if(proc->prbuf==0){
+close:	}
+open:	if(n+proc->nprbuf+1>proc->maxprbuf){
+close:	}
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:long call0[]={	/* plain function, 0 arguments */
+close:};
+open:long call1[]={	/* plain function, 1 argument */
+close:};
+open:long call2[]={	/* plain function, 2 arguments */
+close:};
+open:long call3[]={	/* plain function, 3 arguments */
+close:};
+open:long call4[]={	/* plain function, 4 arguments */
+close:};
+open:long call5[]={	/* plain function, 5 arguments */
+close:};
+open:long call2_0[]={/* two-step function, 0 arguments */
+close:};
+open:struct{
+open:}bltin[]={
+close:}bltin[]={
+open:	0,	{0,	0,	0},	0,	0,
+close:	0,	{0,	0,	0},	0,	0,
+close:};
+open:{
+close:}
+open:{
+close:}
+open:{
+open:	if(type==Sstruct){
+close:	}else
+close:}
+open:{
+open:	if(cflag){
+close:	}
+open:	if(errmark()){
+close:	}
+close:}
+open:{
+open:	switch(n->t){
+open:		if(n->l->t==NCall && !bflag){
+close:		}
+open:		switch(n->o.t){
+close:		}
+open:		switch(n->o.i){
+open:			if(eqtype(etypeof(n->l), &arychartype)){
+close:			}
+open:			if(isptrtype(etypeof(n->l))){
+close:			}else
+open:			if(retain && n->l->t==NID && isinttype(etypeof(n->l))){
+close:			}
+close:		}
+open:		switch(typeof(n)->o.t){
+open:			if(n->o.s->val->isauto){
+open:			}else{
+close:			}else{
+close:			}
+open:			if(n->o.s->val->isauto){
+open:			}else{
+close:			}else{
+close:			}
+close:		}
+open:		if(nscope==1){
+close:		}else
+open:	case NSmash:{
+open:		if(vr->type->o.t==TType){
+close:		}
+open:		if(isptrtype(vl->type)){
+open:			if(vl->isauto){
+open:			}else{
+close:			}else{
+close:			}
+close:		}
+open:		if(vl->isauto){
+close:		}
+close:	}
+open:		if(retain){
+close:		}
+close:	}
+close:}
+open:{
+open:	if(isstr){
+open:	}else{
+close:	}else{
+close:	}
+open:	if(a->t!=NID){
+open:	}else if(a->o.s->val->isauto){
+close:	}else if(a->o.s->val->isauto){
+open:	}else{
+close:	}else{
+close:	}
+close:}
+open:{
+open:	switch(n->t){
+open:		switch(typeof(n)->o.t){
+open:			if(n->o.s->val->isauto){
+close:			}
+open:			if(n->o.s->val->isauto){
+close:			}
+open:			if(n->o.s->val->isauto){
+close:			}
+close:		}
+close:	}
+close:}
+open:{
+open:	switch(n->t){
+open:		if(n->o.s->val->isauto){
+close:		}
+close:	}
+close:}
+open:{
+open:	if(n->r==0){
+close:	}
+close:}
+open:{
+close:}
+open:{
+open:	if(n->o.i){	/* enter loop at top, so jump to body */
+close:	}
+open:	if(n->r->r){		/* jump to condition */
+close:	}
+open:	if(n->r->r){
+close:	}else
+close:}
+open:{
+close:}
+open:{
+open:	else{
+open:		sprint(buf, "prog(){call on line %d}", n->line);
+close:		sprint(buf, "prog(){call on line %d}", n->line);
+close:	}
+open:	switch(callinst){
+close:	}
+close:}
+open:{
+close:}
+open:{
+open:	if(n->t==NList){
+close:	}
+open:	if(n->t==NArraycom){
+close:	}else if(etypeoft(n)->o.t==TArray)
+close:}
+open:{
+open:	if(n->t==NList){
+close:	}
+open:	if(c->o.t==\'=\'){
+close:	}
+open:	if(c->o.t==SND){
+close:	}
+open:	else if(c->t==NArraycom){
+close:	}else
+open:	if(c->t==NArraycom){	/* save array index */
+close:	}
+close:}
+open:{
+close:}
+open:{
+open:	if(s->t==NList){
+close:	}
+open:	else{
+open:		if(isptr){	/* string */
+open:		}else{
+close:		}else{
+close:		}
+close:	}
+close:}
+open:{
+close:}
+open:{
+open:	if(isptrtype(s->val->type)){
+close:	}
+close:}
+open:{
+open:	if(n->t==NExprlist){
+close:	}
+open:	switch(t->o.t){
+close:	}
+close:}
+open:{
+open:	if(errmark()){
+close:	}
+close:}
+open:{
+open:	if(returnloc){
+close:	}
+close:}
+open:{
+open:	if(types->t==NList){
+close:	}
+open:	if(isptrtype(types)){
+close:	}
+close:}
+open:{
+close:}
+open:{
+open:	switch(t->o.t){
+open:		else{
+close:		}
+open:		if(v==0){
+close:		}
+open:		if(t->r->o.t==TChar){
+close:		}else
+open:		if(v==0){
+close:		}
+open:		if(v==0){
+close:		}
+close:	}
+close:}
+open:{
+open:	switch(t->o.t){
+open:		if(isptrtype(t)){
+open:		}else if(t->o.t==TInt || t->o.t==TUnit){
+close:		}else if(t->o.t==TInt || t->o.t==TUnit){
+close:		}else if(t->o.t==TChar)
+open:	case TStruct:{
+close:	}
+close:	}
+close:}
+open:{
+open:	if(t->t==NList){
+close:	}
+open:	for(i=length(t); --i>=0; ){
+open:		if(*pos==BPW){
+close:		}
+close:	}
+close:}
+open:{
+open:	if(l<-2 || l>10){
+close:	};
+open:	switch((int)l){
+close:	}
+close:}
+open:{
+open:	switch(n->t){
+close:	}
+close:}
+open:{
+open:	switch(n->t){
+open:		switch(n->o.i){
+close:		}
+open:		if(isconst(n->o.n)){
+open:			if(topofstack()){
+open:			}else{
+close:			}else{
+close:			}
+close:		}
+close:	}
+close:}
+open:{
+open:	switch(n->t){
+open:		switch(n->o.i){
+close:		}
+close:	}
+close:}
+open:{
+open:	switch(t->o.t){
+open:		if(t->r->o.t==TChar){
+close:		}
+close:	}
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+open:	if(proc->pc==0){
+close:	}
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+open:	if(n->t==NList){
+close:	}
+open:	if(n->t==NDeclsc){
+close:	}
+open:	if(n->r==0){
+close:	}
+open:	if(dotypchk){
+open:		if(n->o.n){
+close:		}
+close:	}
+open:	if(docomp && n->o.n){
+close:	}else
+open:	if(n->o.n && docomp && nscope==0){
+close:	}
+close:}
+open:{
+open:	if(id->t==NList){
+close:	}
+close:}
+open: * 	rec {
+close: * 	};
+open: *	rec type T: struct of { t:T; };
+close: *	rec type T: struct of { t:T; };
+open:{
+open:	if(n->t==NDeclsc){
+close:	}
+open:	if(n->r==0){
+open:	}else if(n->r->o.t==TType){
+close:	}else if(n->r->o.t==TType){
+close:	}
+close:}
+open:{
+open:	if(n->t==NDeclsc){
+close:	}
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open: *	prog(a:int){
+open: *		begin prog(b:int){ f(a, b); }(b);
+close: *		begin prog(b:int){ f(a, b); }(b);
+close: *	}
+open: *	prog(a:int){
+open: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
+close: *		begin prog(b:int, a:int){ f(a, b); }(b, a);
+close: *	}
+open:{
+close:}
+open:{
+close:}
+open:{
+open:	if(!alreadyformal(n, begf)){
+close:	}		
+close:}
+open:{
+close:}
+open:{
+open:	switch(n->t){
+open:		if(0<n->o.s->val->scope && n->o.s->val->scope<fscope){
+close:		}
+close:	}
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:{
+close:}
+open:prbuf(){
+close:}
+open:{
+open:	else{
+open:		switch(t){
+close:		}
+close:	}
+close:}
+open:{
+open:	switch(n->t){
+open:{
+open:	else if (c != n) {
+close:	} else if(rebuf->w == rebuf->s)
+open:	else {
+open:		if (sub) {
+close:		}
+close:	}
+close:}
+open:{
+open:	if(code && code != REG_NOMATCH) {
+close:	}
+close:}
+open:{
+close:}
+open:{
+open:	if(n = regsubexec(re, (char*)data->s, elementsof(matches), matches)) {
+close:	}
+close:}'
+	EXEC	-h -m -e include:include -e define:define g6.dat g7.dat
+		OUTPUT - $'include:#include "alloc.h"
+include:#include <libc.h>
+include:#include "alloc.h"
+include:#include "word.h"
+include:#include "store.h"
+include:#include "comm.h"
+include:#include <libc.h>
+include:#include "node.h"
+include:#include "symbol.h"
+include:#include "alloc.h"
+include:#include "word.h"
+include:#include "store.h"
+include:#include "comm.h"
+include:#include "inst.h"
+include:#include <libc.h>
+include:#include "lib.h"
+include:#include "lib.h"
+include:#include "node.h"
+include:#include "symbol.h"
+include:#include "alloc.h"
+include:#include "ydefs.h"
+include:#include "word.h"
+include:#include "store.h"
+include:#include "comm.h"
+include:#include "inst.h"
+include:#include "errjmp.h"
+include:#include <libc.h>
+include:#include "alloc.h"
+include:#include "node.h"
+include:#include "symbol.h"
+include:#include "ydefs.h"
+include:#include "word.h"
+include:#include "store.h"
+include:#include <libc.h>
+include:#include "alloc.h"
+include:#include "word.h"
+include:#include "store.h"
+include:#include "comm.h"
+include:#include <libc.h>
+include:	nargs+=2;	/* includes result and sym; add pc, fp */
+include:#include "node.h"
+include:#include "symbol.h"
+include:#include "alloc.h"
+include:#include "ydefs.h"
+include:#include "word.h"
+include:#include "store.h"
+include:#include <libc.h>
+include:#include "nodenames.h"
+include:#include "typenames.h"
+include:#include "errjmp.h"
+include:#include "node.h"
+include:#include "symbol.h"
+include:#include "ydefs.h"
+include:#include <libc.h>
+define:#define	FNS
+define:#define	C	0x40000000
+define:#define	I	0x20000000
+define:#define	F	0x10000000
+define:#define	M(x)	((x)&~(C|I|F))
+include:#include "sed.h" /* define sed stuff */
+define:#include "sed.h" /* define sed stuff */'
+	EXEC	-c -h -m -e open:{ -e close:} g6.dat g7.dat
+		OUTPUT - $'open:238
+close:236
+open:9
+close:9'
+	EXEC	-c -h -m -e include:include -e define:define g6.dat g7.dat
+		OUTPUT - $'include:54
+define:5
+include:1
+define:1'
+	EXEC	-t -m -e open:{ -e close:} g6.dat g7.dat
+		OUTPUT - $'open:247
+close:245'
+	EXEC	-t -m -e include:include -e define:define g6.dat g7.dat
+		OUTPUT - $'include:55
+define:6'
