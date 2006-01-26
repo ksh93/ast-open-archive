@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*                  Copyright (c) 1984-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -169,6 +169,12 @@ getval(register char* s, int op)
 		switch (var = *s)
 		{
 
+#if __OBSOLETE__ < 20090101
+		case '+':	/* 20051122 restore for backwards compatibility -- shoulda thunk it */
+#if __OBSOLETE__ > 20070101
+			error(1, "$(%s): obsolete -- use $(-...)", var);
+#endif
+#endif
 		case '-':	/* option settings suitable for command line */
 			/*
 			 * -name	option value if set

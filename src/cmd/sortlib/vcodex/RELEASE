@@ -1,0 +1,4 @@
+05-11-09 fix mixed input compression logic
+05-08-23 use sfdcvcodex() instead of vcsfio()
+	 delay RS_WRITE_FILE until first encoded input if possible
+05-06-30 first release

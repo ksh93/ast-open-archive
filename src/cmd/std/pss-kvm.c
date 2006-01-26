@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*                  Copyright (c) 1989-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -187,7 +187,11 @@ kvm_full(register Pss_t* pss, register Pssent_t* pe)
 #endif
 	pe->refcount = state->px->e_xccount;
 	pe->rss = state->px->e_xrssize;
+#if _mem_e_xsize_eproc
+	pe->size = state->px->e_xsize;
+#else
 	pe->size = state->px->e_vm.vm_tsize + state->px->e_vm.vm_dsize + state->px->e_vm.vm_ssize;
+#endif
 #if _mem_p_starttime_extern_proc
 	pe->start = state->pr->p_starttime.tv_sec;
 #endif
@@ -198,7 +202,7 @@ kvm_full(register Pss_t* pss, register Pssent_t* pe)
 static Pssmeth_t kvm_method =
 {
 	"kvm",
-	"[-version?@(#)$Id: pss kvm (AT&T Labs Research) 2003-02-01 $\n]"
+	"[-version?@(#)$Id: pss kvm (AT&T Labs Research) 2006-01-11 $\n]"
 	"[-author?Glenn Fowler <gsf@research.att.com>]",
 	PSS_all,
 	kvm_init,

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-01-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -353,7 +353,7 @@ prev rshdr.h implicit
 done rstemp.c
 meta rstemp.o %.c>%.o rstemp.c rstemp
 prev rstemp.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_recsort -D_PACKAGE_ast -c rstemp.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_recsort -c rstemp.c
 done rstemp.o generated
 exec - ${AR} cr librecsort.a rsclear.o rsclose.o rsdisc.o rsnotify.o rslist.o rslib.o rsmerge.o rsmethod.o rsopen.o rsprocess.o rswrite.o rs-radix.o rs-rasp.o rs-splay.o rs-verify.o rs-copy.o rskeyopen.o rskey.o rskeymeth.o rskeydump.o rsfile.o rstemp.o
 exec - (ranlib librecsort.a) >/dev/null 2>&1 || true

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -114,7 +114,7 @@ int	type;	/* RS_TEXT 		*/
 	head = (rs->type&RS_DSAMELEN) ? 0 : sizeof(ssize_t);
 	type |= rs->type&RS_TEXT;
 
-	if(type&RS_TEXT) /* write in plain text */
+	if(type&RS_OTEXT) /* write in plain text */
 	{	u = (rs->events & RS_WRITE) != 0;
 		if((rs->type&RS_UNIQ) && (rs->events & RS_SUMMARY))
 		{	for(; r; r = r->right)

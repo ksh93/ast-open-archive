@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2005 AT&T Corp.                  *
+*                  Copyright (c) 1992-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Labs Research) 2005-03-07 $\n]"
+"[-?\n@(#)$Id: od (AT&T Labs Research) 2005-12-06 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files"
@@ -687,7 +687,8 @@ od(char** files)
 	unsigned long	m;
 	unsigned long	r;
 
-	static char	buf[LINE_LENGTH * sizeof(int_max)];
+	static char*	buf;
+	size_t		bufsize;
 
 	if (!(ip = init(&files)))
 		return 0;
@@ -730,6 +731,15 @@ od(char** files)
 			if (s)
 			{
 				m = state.block - (split - buf);
+				r = (m > n) ? m : n;
+				if (bufsize < (r += (split - buf)))
+				{
+					bufsize = roundof(r, 1024);
+					r = split - buf;
+					if (!(buf = newof(buf, char, bufsize, 0)))
+						error(ERROR_SYSTEM|3, "out of space");
+					split = buf + r;
+				}
 				if (m > n)
 				{
 					memcpy(split, s, n);
@@ -807,6 +817,14 @@ od(char** files)
 			}
 			if (n = x - s)
 			{
+				if (bufsize < 2 * n)
+				{
+					if ((bufsize = 2 * n) < LINE_LENGTH * sizeof(int_max))
+						bufsize = LINE_LENGTH * sizeof(int_max);
+					bufsize = roundof(bufsize, 1024);
+					if (!(buf = newof(buf, char, bufsize, 0)))
+						error(ERROR_SYSTEM|3, "out of space");
+				}
 				memcpy(buf, s, n);
 				split = buf + n;
 			}

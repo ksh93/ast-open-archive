@@ -10,6 +10,8 @@ COBOLDIALECT =
 COBOLFLAGS = $(COBOLDIALECT)
 COBOLLIBRARIES =
 
+COBOL.PLUGIN.LIBRARIES =
+
 freeze COBOL
 
 .SUFFIX.cob = .cob .COB .cbl .CBL
@@ -35,3 +37,6 @@ $(.SUFFIX.cob:/^/.ATTRIBUTE.%/) : .SCAN.cob
 		include + $(F)
 	end
 	COBOLFLAGS &= $(COBOLFLAGS:VA:V) $$(.INCLUDE. cob -I)
+	if "$(-debug-symbols)" && ! "$(COBOLFLAGS:N=$(CC.DEBUG)|-g)"
+		COBOLFLAGS := $(COBOLFLAGS:V:N!=$(CC.OPTIMIZE)|-O*)
+	end

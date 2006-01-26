@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1996-2005 AT&T Corp.                  #
+#                  Copyright (c) 1996-2006 AT&T Corp.                  #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                            by AT&T Corp.                             #
@@ -43,7 +43,7 @@ esac
 SORT=$1
 shift
 SORT_ARGS="$@"
-path=`pwd`:/usr/5bin:/bin:/usr/bin:$PATH
+path=`pwd`:$PATH:/usr/5bin:/bin:/usr/bin
 ifs=${IFS-'
 	 '}
 IFS=":"
@@ -70,26 +70,36 @@ do	case $dir in
 	esac
 	case $SUM in
 	*/*)	;;
-	*)	test -x $dir/$SUM && SUM=$dir/$SUM ;;
-	esac
-done
-ab=`echo ab | $SUM 2>/dev/null`
-ba=`echo ba | $SUM 2>/dev/null`
-case $ab in
-$ba)	;;
-*)	for old in -o '-o 2' -s -xatt
-	do	ab=`echo ab | $SUM $old 2>/dev/null`
-		case $ab in
-		?*)	ba=`echo ba | $SUM $old 2>/dev/null`
+	*)	if	test -x $dir/$SUM
+		then	AB='abc
+pdq
+xyz'
+			BA='xyz
+pdq
+abc'
+			ab=`echo "$AB" | $SUM 2>/dev/null`
+			ba=`echo "$BA" | $SUM 2>/dev/null`
 			case $ab in
-			$ba)	SUM="$SUM $old"
-				break
+			$ba)	SUM=$dir/$SUM
+				;;
+			*)	for old in -o '-o 2' -s -xatt
+				do	ab=`echo "$AB" | $dir/$SUM $old 2>/dev/null`
+					case $ab in
+					?*)	ba=`echo "$BA" | $dir/$SUM $old 2>/dev/null`
+						case $ab in
+						$ba)	SUM="$dir/$SUM $old"
+							break
+							;;
+						esac
+						;;
+					esac
+				done
 				;;
 			esac
-			;;
-		esac
-	done
-esac
+		fi
+		;;
+	esac
+done
 case $NAWK in
 */*)	AWK=$NAWK ;;
 esac

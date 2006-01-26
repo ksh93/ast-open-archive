@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -25,7 +25,7 @@
 **	Written by Kiem-Phong Vo (07/08/96)
 */
 
-static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2005-06-28 $\0\n";
+static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2005-10-18 $\0\n";
 
 #if __STD_C
 Rs_t* rsnew(Rsdisc_t* disc)
@@ -73,7 +73,7 @@ int		type;	/* sort controls			*/
 
 	rs->meth = meth;
 	rs->c_max = c_max;
-	rs->type = type;
+	rs->type = rs->disc->type | (type&RS_TYPES);
 
 	rs->events = 0;
 	for (disc = rs->disc; disc; disc = disc->disc)

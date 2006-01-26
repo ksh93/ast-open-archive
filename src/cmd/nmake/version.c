@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*                  Copyright (c) 1984-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -55,23 +55,26 @@ PPFLAGS = $(*.SOURCE.mk:/^/-I/) $(-:N=-[DU]*)\n\
 .ORDER : nmake\n\
 ";
 
-
 char*			initdynamic =
 "\
 .SOURCE.mk : . $(-file:/:/ /:D) $(-:N=-I[!-]*:/-I//) $(MAKERULESPATH:/:/ /G:T=F)\n\
-VROOT := $(\".\":T=F:P=L*)\n\
-if ( VOFFSET = \"$(VROOT:O=2)\" ) && ! \"$(VPATH)\"\n\
-	MAKEPATH := $(VPATH:/:.*//:T=F)\n\
-	VROOT := $(VROOT:O=1)\n\
-	while \"$(VROOT)\" != \"|.|$(MAKEPATH)\" && \"$(VROOT:B:S)\" == \"$(VOFFSET:B:S)\"\n\
-		VROOT := $(VROOT:D)\n\
-		VOFFSET := $(VOFFSET:D)\n\
+if ! \"$(VPATH)\" && \"$(*.VIEW:O=2)\"\n\
+	VOFFSET :=\n\
+	for VROOT $(\".\":T=F:P=L*)\n\
+		if \"$(VOFFSET:B:S)\" == \"$(VROOT:B:S)\"\n\
+			while VOFFSET != \"/\" && \"$(VOFFSET:B:S)\" == \"$(VROOT:B:S)\"\n\
+				VOFFSET := $(VOFFSET:D)\n\
+				VROOT := $(VROOT:D)\n\
+			end\n\
+			VOFFSET := $(VOFFSET:P=R)\n\
+			VROOT := $(PWD:P=R=$(VROOT))\n\
+			break\n\
+		end\n\
+		VOFFSET := $(VROOT)\n\
 	end\n\
-	VOFFSET := $(VROOT:P=R)\n\
-	VROOT := $(PWD:P=R=$(VROOT))\n\
 else\n\
 	VOFFSET := $(VPATH:/:/ /G:O=1:P=R)\n\
 	VROOT := $(PWD:P=R=$(VPATH:/:/ /G:O=1))\n\
 end\n\
-MAKEPATH := $(*.VIEW:N!=.:@/ /:/G)\n\
+MAKEPATH := $(*.VIEW:N!=.|$(PWD):@/ /:/G)\n\
 ";

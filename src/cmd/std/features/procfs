@@ -6,7 +6,7 @@ lib	getprocs
 lib	kvm_open,kvm_getprocs kvm.h sys/time.h sys/param.h sys/proc.h sys/sysctl.h -lkvm
 lib	pstat_getproc sys/param.h sys/pstat.h
 
-mem	extern_proc.p_pid,extern_proc.p_starttime sys/time.h sys/param.h sys/proc.h sys/sysctl.h -lkvm
+mem	extern_proc.p_pid,extern_proc.p_starttime,eproc.e_xsize sys/time.h sys/param.h sys/proc.h sys/sysctl.h -lkvm
 mem	procsinfo64.pi_pri procinfo.h
 mem	prpsinfo.pr_clname,prpsinfo.pr_cstime,prpsinfo.pr_cstime.tv_sec,prpsinfo.pr_ctime,prpsinfo.pr_cutime,prpsinfo.pr_gid,prpsinfo.pr_lttydev,prpsinfo.pr_ntpid,prpsinfo.pr_pgid,prpsinfo.pr_pgrp,prpsinfo.pr_psargs,prpsinfo.pr_refcount,prpsinfo.pr_rssize,prpsinfo.pr_sid,prpsinfo.pr_sonproc,prpsinfo.pr_start,prpsinfo.pr_start.tv_sec,prpsinfo.pr_starttime,prpsinfo.pr_starttime.tv_sec,prpsinfo.pr_stime,prpsinfo.pr_tgrp,prpsinfo.pr_time,prpsinfo.pr_time.tv_sec,prpsinfo.pr_utime,prpsinfo.pr_zomb,prpsinfo.pr_pctcpu,prpsinfo.pr_cpu,prpsinfo.pr_lwp.pr_pctcpu,prpsinfo.pr_lwp.pr_cpu -D_STRUCTURED_PROC -Dprpsinfo=psinfo  sys/types.h sys/procfs.h
 

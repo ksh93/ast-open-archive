@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*                  Copyright (c) 1984-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -38,10 +38,11 @@
 #define SORT_posix	0x0000
 #define SORT_collate	0x0002
 #define SORT_numeric	0x0004
-#define SORT_version	0x0006
+#define SORT_prefix	0x0006
+#define SORT_version	0x0008
 
 #define SORT_invert	0x0001
-#define SORT_MASK	0x0007
+#define SORT_MASK	0x000f
 
 #define SORT_first	((SORT_MASK+1)<<0)
 #define SORT_force	((SORT_MASK+1)<<1)
@@ -116,6 +117,36 @@ inumcmp(const char* a, const char* b)
 }
 
 /*
+ * directory prefix strcmp(3) -- longest first!
+ */
+
+static int
+pfxcmp(register const char* a, register const char* b)
+{
+	while (*a == *b)
+	{
+		if (!*a++)
+			return 0;
+		b++;
+	}
+	if (*a == 0 && *b == '/')
+		return 1;
+	if (*a == '/' && *b == 0)
+		return -1;
+	return (a < b) ? -1 : 1;
+}
+
+/*
+ * inverted pfxcmp(3)
+ */
+
+static int
+ipfxcmp(const char* a, const char* b)
+{
+	return pfxcmp(b, a);
+}
+
+/*
  * version strcmp(3) -- latest first!
  */
 
@@ -182,6 +213,8 @@ static Cmp_f		sort_cmp[] =
 	istrcoll,
 	numcmp,
 	inumcmp,
+	pfxcmp,
+	ipfxcmp,
 	vercmp,
 	ivercmp,
 };
@@ -195,6 +228,8 @@ sortcmpf(int flags)
 {
 	Cmp_f	f;
 
+	if ((flags &= SORT_MASK) >= elementsof(sort_cmp))
+		flags &= SORT_invert;
 	if (!(f = sort_cmp[flags & SORT_MASK]))
 		f = strcoll;
 	return f;
@@ -3885,11 +3920,17 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 						continue;
 					case 'I':
 					case 'i':
+					case 'R':
+					case 'r':
 						n |= SORT_invert;
 						continue;
 					case 'N':
 					case 'n':
 						n |= SORT_numeric;
+						continue;
+					case 'P':
+					case 'p':
+						n |= SORT_prefix;
 						continue;
 					case 'U':
 					case 'u':

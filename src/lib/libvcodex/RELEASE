@@ -1,0 +1,16 @@
+06-01-24 move private builtin methods to private plugins
+06-01-16 Nmakefile: add PRIVATE for non-cpl methods
+06-01-13 vcgetmeth.c: fix "foo.arg" parse error
+05-10-25 vcsfio.c: fix header peek logic
+05-09-28 Vchuff/vchhdr.h: add type case to ARRAYMAKE()
+05-09-22 vcsfio.c: vczip command support functions for the masses
+05-09-16 vcodex.h,vcsfio.c: add vcsfcomp() stub for vczip getmethods()
+05-09-15 snarf from kpv, remerge _PACKAGE_ast
+05-08-23 vcodex.h,vcsfio.c: add sfdcvcodex() (1:pushed,0:not-needed,-1:error)
+05-08-22 vcsfio.c: peek initial header => no consumption on error
+05-06-30 vcsfio.c: change vcsfmeth() to return Vcsfmeth_t* and size
+05-06-29 vcodex.h: _PACKAGE_ast => <sfio.h>
+	 fix !__STD_C for ancient sun4
+	 change ident to char* (from unsigned char*) for pedantic cc
+	 Vcdelta/vcdtblinit.c: init { _Vcdtbl _Vcdindex } to avoid dyn common
+05-06-28 snarf from kpv

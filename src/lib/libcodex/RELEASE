@@ -1,3 +1,4 @@
+05-09-25 add '^' equivalent to '|'
 04-02-14 codex.c: SFDCNEXT() and SFDCPREV() now provided by <sfio_t.h>
 04-01-11 codex.c: top level composition parse, handle CODEX_INVERT
 04-01-10 codex.c: use CODEX_FLUSH to disable SF_SYNC before initf

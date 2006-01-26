@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2005 AT&T Corp.                  *
+*                  Copyright (c) 2003-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -35,13 +35,13 @@ codexcmp(register const char* s, register const char* t)
 	{
 		if (!*s)
 		{
-			if (!*t || *t == '-' || *t == '+')
+			if (!*t || *t == '-' || *t == '+' || *t == '<' || *t == '>' || *t == '|' || *t == '^')
 				return 0;
 			break;
 		}
 		if (!*t)
 		{
-			if (*s == '-' || *s == '+')
+			if (*s == '-' || *s == '+' || *s == '<' || *s == '>' || *s == '|' || *s == '^')
 				return 0;
 			break;
 		}

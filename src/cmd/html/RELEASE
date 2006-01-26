@@ -1,3 +1,5 @@
+05-10-15 mm2html.sh: add BP name=value parameters
+05-10-10 mm2html.sh: add .CE, .BP *.@(gif|png) ... => <IMG...>
 05-02-22 htmlrefs.c: rel=internal ignored if --external
 05-02-14 mm2html.sh: add .xx linkframe="" for no target=_top
 05-02-01 mm2html.sh: IFS may be unset!

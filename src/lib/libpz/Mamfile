@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-01-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -279,7 +279,7 @@ prev pzlib.h implicit
 done pzconvert.c
 meta pzconvert.o %.c>%.o pzconvert.c pzconvert
 prev pzconvert.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpz]"\" -c pzconvert.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_pz -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2006 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpz]"\" -c pzconvert.c
 done pzconvert.o generated
 make sfdcpzip.o
 make sfdcpzip.c
@@ -311,7 +311,7 @@ prev pzip.h implicit
 done pzline.c
 meta pzline.o %.c>%.o pzline.c pzline
 prev pzline.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpz]"\" -c pzline.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_pz -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1998-2006 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?libpz]"\" -c pzline.c
 done pzline.o generated
 exec - ${AR} cr libpzline.a pzline.o
 exec - (ranlib libpzline.a) >/dev/null 2>&1 || true

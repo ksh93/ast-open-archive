@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -149,12 +149,12 @@ struct _rs_s
 #define RS_REVERSE	000002		/* reverse sort order		*/
 #define RS_DATA		000004		/* sort by key, then by data	*/
 #define RS_IGNORE	000040		/* rswrite() will be ignored	*/
-#define RS_CAT		010000		/* just catenate input files	*/
+#define RS_CAT		040000		/* just catenate input files	*/
 
 /* discipline data */
 #define RS_KSAMELEN	000010		/* key has fixed length		*/
 #define RS_DSAMELEN	000020		/* data has fixed length	*/
-#define RS_TYPES	010377
+#define RS_TYPES	040377
 
 /* input/output control */
 #define RS_ITEXT	000100		/* input is plain text		*/

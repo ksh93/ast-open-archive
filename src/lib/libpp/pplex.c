@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*                  Copyright (c) 1986-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -234,11 +234,12 @@ ppcpp(void)
 	{
 		ip = bp;
 #if CPP
-		if (op == tp && (st & (ADD|HIDDEN)))
+		if (op == tp && (st & (ADD|HIDDEN)) && !(st & PASSTHROUGH))
 			switch (TERM(state))
 			{
 			case S_SHARP:
 				break;
+			case S_CHRB:
 			case S_NL:
 				if (*ip == '\n')
 					break;
@@ -404,6 +405,12 @@ ppcpp(void)
 		qual = comwarn = comdelim = 0;
 		BACKOUT();
 		if (c == '\n') goto fsm_newline;
+		if ((st & PASSTHROUGH) && ((st & (HIDDEN|NEWLINE)) || *ip == '\n'))
+		{
+			if (*ip == '\n')
+				ip++;
+			goto fsm_newline;
+		}
 #if COMPATIBLE
 		if ((st & (COMPATIBILITY|TRANSITION)) == COMPATIBILITY) st &= ~NEWLINE;
 #endif

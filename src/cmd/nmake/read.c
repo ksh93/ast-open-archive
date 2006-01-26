@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*                  Copyright (c) 1984-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -422,6 +422,7 @@ readfile(register char* file, int type, char* filter)
 {
 	register Rule_t*	r;
 	Sfio_t*			rfp;
+	Stat_t			st;
 
 	if (streq(file, "-") && (file = "/dev/null") || isdynamic(file))
 	{
@@ -435,7 +436,7 @@ readfile(register char* file, int type, char* filter)
 	state.init++;
 	r = bindfile(NiL, file, BIND_MAKEFILE|BIND_RULE);
 	state.init--;
-	if (r && r->time)
+	if (r && (r->time || strneq(r->name, "/dev/", 5) && !rstat(r->name, &st, 0)))
 	{
 		compref(r, type);
 		r->dynamic |= D_scanned;

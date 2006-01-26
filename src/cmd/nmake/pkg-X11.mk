@@ -3,7 +3,7 @@
  */
 
 PACKAGE_X11_DIRS = \
-	/usr/X11 $("/usr/X11([Rr][0-9]*([-.0-9]))":P=G:H>) \
+	/usr/X11 $("/usr/X11([Rr][0-9]*([-.0-9]))":P=G:H=R) \
 	/usr/openwin
 PACKAGE_X11_VERSION = 6
 

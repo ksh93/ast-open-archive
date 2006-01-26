@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*                  Copyright (c) 1990-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -175,7 +175,9 @@ USAGE_LICENSE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#if !PROTO_STANDALONE
+#if PROTO_STANDALONE
+#include <stdio.h>
+#else
 #include <time.h>
 #endif
 

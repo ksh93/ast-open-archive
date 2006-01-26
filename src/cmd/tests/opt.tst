@@ -3722,22 +3722,44 @@ VZCYRZRAGNGVBA
 	EXEC -+ xlate "$usage" --?-auth
 		OUTPUT - $'id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="author"
-id=xlate catalog=libast text="author"
-id=xlate catalog=libast text="Col. Hyde"
 id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-return=? option=-? name=--?-auth num=0
-id=(null) catalog=libast text="Usage"'
-		ERROR - $'  nhgube          Pby. Ulqr'
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
+id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="unknown option"
+return=: option=-? name=--?-auth num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: -auth: haxabja bcgvba'
+		EXIT 1
 	EXEC -+ xlate "$usage" --?-nhgu
 		OUTPUT - $'id=xlate catalog=libast text="version"
 id=xlate catalog=libast text="author"
-id=xlate catalog=libast text="author"
-id=xlate catalog=libast text="Col. Hyde"
 id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-return=? option=-? name=--?-nhgu num=0
-id=(null) catalog=libast text="Usage"'
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
+id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="unknown option"
+return=: option=-? name=--?-nhgu num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: -nhgu: haxabja bcgvba'
 	EXEC -+ xlate "$usage" --zna
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
@@ -3794,6 +3816,7 @@ FLABCFVF
 VZCYRZRAGNGVBA
   irefvba         kyngr 1.0 
   nhgube          Pby. Ulqr'
+		EXIT 2
 	EXEC -+ xlate "$usage" --??zna
 		OUTPUT - $'id=(null) catalog=libast text="about"
 id=(null) catalog=libast text="api"
@@ -3826,79 +3849,139 @@ id=(null) catalog=libast text="Usage"'
 	EXEC -+ xlate "$usage" --?again
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=xlate catalog=libast text="OPTIONS"
-id=xlate catalog=libast text="again|back"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
-return=? option=-? name=--?again num=0
-id=(null) catalog=libast text="Usage"'
-		ERROR - $'Hfntr: xlate [ bcgvbaf ]
-BCGVBAF
-  -b, --ntnva|onpx|again|back'
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="unknown option"
+return=: option=-? name=--?again num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: --?again: haxabja bcgvba'
+		EXIT 1
 	EXEC -+ xlate "$usage" --?ntnva
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=xlate catalog=libast text="OPTIONS"
-id=xlate catalog=libast text="again|back"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
-return=? option=-? name=--?ntnva num=0
-id=(null) catalog=libast text="Usage"'
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="unknown option"
+return=: option=-? name=--?ntnva num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: --?ntnva: haxabja bcgvba'
 	EXEC -+ xlate "$usage" --?back
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=xlate catalog=libast text="OPTIONS"
-id=xlate catalog=libast text="again|back"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
-return=? option=-? name=--?back num=0
-id=(null) catalog=libast text="Usage"'
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="unknown option"
+return=: option=-? name=--?back num=0
+id=xlate catalog=libast text="%s"'
+	 	ERROR - $'xlate: --?back: haxabja bcgvba'
 	EXEC -+ xlate "$usage" --?onpx
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
-id=xlate catalog=libast text="OPTIONS"
-id=xlate catalog=libast text="again|back"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
 id=(null) catalog=libast text="options"
-return=? option=-? name=--?onpx num=0
-id=(null) catalog=libast text="Usage"'
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="unknown option"
+return=: option=-? name=--?onpx num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: --?onpx: haxabja bcgvba'
 	EXEC -+ xlate "$usage" --?+EXAMPLES
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
-id=xlate catalog=libast text="Examples."
-id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="bar"
-id=xlate catalog=libast text="Bar foo."
-id=xlate catalog=libast text="More e.g."
-id=xlate catalog=libast text="AHA"
-return=? option=-? name=--?+EXAMPLES num=0
-id=(null) catalog=libast text="Usage"'
-		ERROR - $'  EXAMPLES        Rknzcyrf.
-                    foo   Sbb one.
-                    one   One sbb.
-                  Zber r.t.
-                    aha   NUN'
+id=xlate catalog=libast text=""
+id=(null) catalog=libast text="?More e.g.]{[+aha?AHA]}"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
+id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="section not found"
+return=: option=-? name=--?+EXAMPLES num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: --?+EXAMPLES: frpgvba abg sbhaq'
 	EXEC -+ xlate "$usage" --?+EX
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
-id=xlate catalog=libast text="Examples."
-id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="bar"
-id=xlate catalog=libast text="Bar foo."
-id=xlate catalog=libast text="More e.g."
-id=xlate catalog=libast text="AHA"
-return=? option=-? name=--?+EX num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text=""
+id=(null) catalog=libast text="?More e.g.]{[+aha?AHA]}"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
+id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="section not found"
+return=: option=-? name=--?+EX num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: --?+EX: frpgvba abg sbhaq'
 	EXEC -+ xlate "$usage" --?+RKNZCYRF
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
 id=xlate catalog=libast text="again|back"
 id=xlate catalog=libast text="EXAMPLES"
-id=xlate catalog=libast text="Examples."
-id=xlate catalog=libast text="Foo bar."
-id=xlate catalog=libast text="bar"
-id=xlate catalog=libast text="Bar foo."
-id=xlate catalog=libast text="More e.g."
-id=xlate catalog=libast text="AHA"
-return=? option=-? name=--?+RKNZCYRF num=0
-id=(null) catalog=libast text="Usage"'
+id=xlate catalog=libast text=""
+id=(null) catalog=libast text="?More e.g.]{[+aha?AHA]}"
+id=(null) catalog=libast text="about"
+id=(null) catalog=libast text="api"
+id=(null) catalog=libast text="help"
+id=(null) catalog=libast text="html"
+id=(null) catalog=libast text="keys"
+id=(null) catalog=libast text="long"
+id=(null) catalog=libast text="man"
+id=(null) catalog=libast text="nroff"
+id=(null) catalog=libast text="options"
+id=(null) catalog=libast text="short"
+id=(null) catalog=libast text="usage"
+id=(null) catalog=libast text="section not found"
+return=: option=-? name=--?+RKNZCYRF num=0
+id=xlate catalog=libast text="%s"'
+		ERROR - $'xlate: --?+RKNZCYRF: frpgvba abg sbhaq'
 	usage=$'[-?\n@(#)xlate 1.0\n][-author?Col. Hyde][a:algorithm?\fone\f]:[method]{[+?\fthree\f]}[b:again|back?\ftwo\f]'
 	EXEC -+ xlate "$usage" --keys
 		OUTPUT - $'id=xlate catalog=libast text="algorithm"
@@ -3921,6 +4004,7 @@ id=(null) catalog=libast text="Usage"'
 "\\fthree\\f"
 "again|back"
 "\\ftwo\\f"'
+		EXIT 2
 
 TEST 99 'detailed key strings' # this test must be last
 	usage=$'[-?\naha\n][-catalog?SpamCo][Q:quote?Quote names according to \astyle\a:]:[style:=question]{\n\t[c:C?C "..." style.]\t[e:escape?\b\\\b escape if necessary.]\t[A:always?Always shell style.]\t[101:shell?Shell quote if necessary.]\t[q:question|huh?Replace unknown chars with ?.]\n}[x:exec|run?Just do it.]:?[action:=default]'

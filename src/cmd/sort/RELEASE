@@ -1,3 +1,5 @@
+06-01-21 testsort.sh: fix pure sum command search logic
+05-11-01 rec.c: add --count
 05-06-30 main.c: add -zbBUFSIZE for regression testing
 05-06-27 main.c: convert sftmp() etc. to rstmp*()
 05-06-24 sfopen.c: allow multiple io intercepts per program

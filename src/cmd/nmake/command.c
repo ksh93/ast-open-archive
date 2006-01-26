@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*                  Copyright (c) 1984-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -995,6 +995,27 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 					if (error_info.trace || state.explain)
 						error(state.explain ? 0 : -1, "breaking possible job deadlock at %s", jammed->name);
 					for (job = jobs.firstjob; job; job = job->next)
+#if __ppc__ && __GNUC__ >= 4 && !_HUH_2006_01_11 /* gcc ppc code generation bug */
+#ifndef __GNUC_MINOR__
+#define __GNUC_MINOR__ 0
+#endif
+#ifndef __GNUC_PATCHLEVEL__
+#define __GNUC_PATCHLEVEL__ 1
+#endif
+
+						if (!job)
+						{
+							static int	warned = 0;
+
+							if (!warned)
+							{
+								warned = 1;
+								error(state.mam.regress || state.regress ? -1 : 1, "gcc %d.%d.%d ppc code generation bug workaround -- pass this on to the vendor", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+							}
+							break;
+						}
+						else
+#endif
 						if (job->target == jammed && job->status != RUNNING)
 						{
 							jammed = 0;

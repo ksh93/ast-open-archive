@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -129,30 +129,26 @@ ssize_t	s_data;		/* data size		*/
 					return -1;
 				r->data = data;
 				r->datalen = datalen;
-				r->key = data+key;
-				r->keylen = keylen;
 
 				if(rs->events & RS_READ)
 				{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
 						return -1;
 					if(n == RS_DELETE)
-						RSFREE(rs, r);
-					else if(r->data != data && (!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen))))
-						return -1;
-					else if((*insertf)(rs,r) < 0)
-						return -1;
-					else
-					{	rs->count += 1;
-						if (n == RS_INSERT)
-						{	p_loop += datalen;
-							continue;
-						}
+					{	RSFREE(rs, r);
+						goto delete_key;
 					}
+					if(r->data != data && (!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen))))
+						return -1;
 				}
-				else if((*insertf)(rs,r) < 0)
+
+				r->key = r->data+key;
+				r->keylen = keylen;
+
+				if((*insertf)(rs,r) < 0)
 					return -1;
-				else
-					rs->count += 1;
+				rs->count += 1;
+
+			delete_key:
 				data += datalen;
 				s_loop -= datalen;
 				p_loop += datalen;
@@ -180,21 +176,31 @@ ssize_t	s_data;		/* data size		*/
 				datalen = (endd - data) + 1;
 			}
 
-		insert:
 			if(!RSALLOC(rs,r))
 				return -1;
 
 			r->data = data;
 			r->datalen = datalen;
 
+			if(rs->events & RS_READ)
+			{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
+					return -1;
+				if(n == RS_DELETE)
+				{	RSFREE(rs, r);
+					goto delete_raw;
+				}
+				if(r->data != data && (!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen))))
+					return -1;
+			}
+
 			if(!defkeyf) /* key is part of data */
-			{	r->key = data+key;
+			{	r->key = r->data+key;
 				if((r->keylen = keylen) <= 0)
-					r->keylen += datalen - key;
+					r->keylen += r->datalen - key;
 			}
 			else /* key must be constructed separately */
 			{	/* make sure there is enough space */
-				if(s_key < (k = key*datalen) )
+				if(s_key < (k = key*r->datalen) )
 				{	if(k < RS_RESERVE &&
 					   rs->meth->type != RS_MTVERIFY)
 						k = RS_RESERVE;
@@ -217,7 +223,7 @@ ssize_t	s_data;		/* data size		*/
 					}
 				}
 
-				k = (*defkeyf)(rs,data,datalen,c_key,s_key,rs->disc);
+				k = (*defkeyf)(rs,r->data,r->datalen,c_key,s_key,rs->disc);
 				if(k < 0)
 					return -1;
 				r->key = c_key;
@@ -234,27 +240,11 @@ ssize_t	s_data;		/* data size		*/
 				}
 			}
 
-			if(rs->events & RS_READ)
-			{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
-					return -1;
-				if(n == RS_DELETE)
-					RSFREE(rs, r);
-				else if(r->data != data && (!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen))))
-					return -1;
-				else if((*insertf)(rs,r) < 0)
-					return -1;
-				else
-				{	rs->count += 1;
-					if (n == RS_INSERT)
-					{	p_loop += datalen;
-						goto insert;
-					}
-				}
-			}
-			else if((*insertf)(rs,r) < 0)
+			if((*insertf)(rs,r) < 0)
 				return -1;
-			else
-				rs->count += 1;
+			rs->count += 1;
+
+		delete_raw:
 			p_loop += datalen;
 			data += datalen;
 		} while ((s_loop -= datalen) > 0);

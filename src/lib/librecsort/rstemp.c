@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -34,7 +34,23 @@ Sfio_t*	sp;
 {
 	Sfio_t*		op = sp;
 
-	if ((sp || (sp = sftmp(0))) && (rs->events & RS_TEMP_WRITE) && rsnotify(rs, RS_TEMP_WRITE, sp, (Void_t*)0, rs->disc) < 0)
+	if (!sp)
+	{
+#if _PACKAGE_ast
+		char	path[PATH_MAX];
+		int	fd;
+
+		if (!pathtemp(path, sizeof(path), NiL, "sf", &fd))
+			return 0;
+		remove(path);
+		if (!(sp = sfnew(NiL, NiL, SF_UNBOUND, fd, SF_READ|SF_WRITE)))
+			return 0;
+#else
+		if (!(sp = sftmp(0)))
+			return 0;
+#endif
+	}
+	if ((rs->events & RS_TEMP_WRITE) && rsnotify(rs, RS_TEMP_WRITE, sp, (Void_t*)0, rs->disc) < 0)
 	{
 		if (!op)
 			sfclose(sp);
@@ -57,6 +73,8 @@ Sfio_t*	sp;
 {
 	int	n;
 
+	if (sfsync(sp))
+		return -1;
 	if (rs->events & RS_TEMP_READ)
 	{
 		if ((n = rsnotify(rs, RS_TEMP_READ, sp, (Void_t*)0, rs->disc)) < 0)
@@ -64,6 +82,7 @@ Sfio_t*	sp;
 		if (n)
 			return 0;
 	}
+	sfset(sp, SF_READ, 1);
 	return sfseek(sp, (Sfoff_t)0, SEEK_SET) ? -1 : 0;
 }
 

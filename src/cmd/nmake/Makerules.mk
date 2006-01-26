@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2005-08-11 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-01-25 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -579,7 +579,10 @@ include "Scanrules.mk"
 
 +ldl : .VIRTUAL
 
--ldl -lm : .DONTCARE
+for .S. dl m /* dynamic unless explicitly overridden */
+	-l$(.S.) : .DONTCARE
+	.PACKAGE.$(.S.).library := -l
+end
 
 .NO.LIB.TYPE = 0
 
@@ -674,7 +677,7 @@ include "Scanrules.mk"
 		end
 	end
 	if "$(CC.DIALECT:N=DYNAMIC)" && ( "$(CCLDFLAGS:N=$(CC.DYNAMIC))" || ! "$(CCLDFLAGS:N=$(CC.STATIC))" )
-		if CC.SUFFIX.DYNAMIC && CC.SUFFIX.SHARED
+		if CC.SUFFIX.DYNAMIC && CC.SUFFIX.SHARED && ! "$(.PLUGIN.$(B))"
 			T := $(*$(B):N=*$(CC.SUFFIX.DYNAMIC))
 			if "$(CC.PREFIX.DYNAMIC)" != "$(CC.PREFIX.SHARED)"
 				if CC.PREFIX.DYNAMIC
@@ -1096,7 +1099,7 @@ end
 %.c %.h : %.y .YACC.SEMAPHORE (YACC) (YACCFLAGS)
 	if	silent $(YACC) --version >/dev/null 2>&1
 	then	$(YACC) $(YACCFLAGS) -o$(<:N=*.c) $(YACCFIX.$(%):?-p$(YACCFIX.$(%))??) $(>)
-	else	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/yy/s//$(YACCFIX.$(%))/g$("\n")g/YY/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
+	else	$(YACC) $(YACCFLAGS) $(>)$(YACCFIX.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")g/yytoken/s//yy_token/g$("\n")g/[yY][yY]/s//<<<<&>>>>/g$("\n")g/<<<<yy>>>>/s//$(YACCFIX.$(%))/g$("\n")g/<<<<YY>>>>/s//$(YACCFIX.$(%):F=%(invert)s)/g$("\n")w$("\n")q$("\n")!??)$(YACCHDR.$(%):?$("\n")$(STDED) $(STDEDFLAGS) y.tab.c <<!$("\n")1i$("\n")#include "$(YACCHDR.$(%))"$("\n").$("\n")w$("\n")q$("\n")!??)
 		$(MV) y.tab.c $(%).c
 		if	$(SILENT) test -s y.tab.h
 		then	$(STDED) $(STDEDFLAGS) y.tab.h <<'!'
@@ -1990,6 +1993,8 @@ end
 	end
 	L := $(.LIB.NAME. $(P)$(B) $(<:O=2))
 	$(L) : .ARCHIVE$(CC.SUFFIX.OBJECT)
+	.PLUGIN.$(B) := $(P)
+	.RETAIN : .PLUGIN.$(B)
 	if P
 		if ! A
 			:INSTALLDIR: $(L)
@@ -2004,9 +2009,11 @@ end
 		.CC.DLL.DIR.$(X) := $(LIBDIR)/$(P)
 		.INSTALL.$(X) := .
 	end
-	eval
-	$(L) :: $(>:V:N!=[-+][lL]*)
-		$(@:V)
+	if "$(>:G=%$(CC.SUFFIX.OBJECT):O=1)"
+		eval
+		$(L) :: $(>:V:N!=[-+][lL]*)
+			$(@:V)
+		end
 	end
 	.INSTALL : .DLL.CHECK.$(B)
 	.DLL.CHECK.$(B) : .DLL.CHECK
@@ -2240,7 +2247,11 @@ end
 		L := $(CC.PREFIX.SHARED)$(Y:B)$(CC.SUFFIX.SHARED)
 		S := $(CC.PREFIX.SHARED)$(B:B)$(CC.SUFFIX.SHARED)
 		Z := $(%:O>3:N=+l*)
-		X := $(Y) $(Z:/+l//)
+		X :=
+		if ! "$(.PLUGIN.$(Y))"
+			X += $(Y)
+		end
+		X += $(Z:/+l//)
 		Z += $(%:O>3:/.l//:N!=$(X:/ /|/):/^/-l/)
 		$(Z) : .DONTCARE
 		A := $(%:O=1)
@@ -2631,14 +2642,12 @@ end
 					T1 = $(T2)/$(IP)
 					if "$(T1:P=X)"
 						I := $(T1)
-						PACKAGE_billing_INCLUDE := $(I)
 					end
 				end
 				if !L
 					T1 = $(T2)/$(LP)
 					if "$(T1:P=X)"
 						L := $(T1)
-						PACKAGE_billing_LIB := $(L)
 					end
 				end
 			elif !I && !L
@@ -2689,7 +2698,7 @@ end
 				end
 				LPL := $(CC.STDLIB:B) $(LP)
 				LPL := $(LPL:U)
-				T4 := $(T4:N!=//*:T=F:U)
+				T4 := $(T4:N!=//*:T=F:H=P:U)
 				T7 := $(T4:X=$(IP)/$(P):N!=//*:T=F:D:D)
 				T1 =
 				for K SHARED ARCHIVE
@@ -2772,6 +2781,15 @@ end
 					end
 					if ! "$(.PACKAGE.stdlib:N=$(L))"
 						.SOURCE.a : $(L)
+					end
+				end
+				if ! "$(PACKAGE_$(P)_INCLUDE)" && "$(PACKAGE_$(P)_LIB)"
+					I := $(PACKAGE_$(P)_LIB:D)/$(IP)
+					H := $(I)/.
+					if "$(H:P=X)"
+						eval
+						PACKAGE_$(P)_INCLUDE = $(I)
+						end
 					end
 				end
 				eval
@@ -3064,6 +3082,8 @@ PACKAGES : .SPECIAL .FUNCTION
 				elif N == "plugin"
 					A = 1
 					.PACKAGE.$(N) := $(P)
+				else
+					.PACKAGE.$(P).option.$(N) := $(V)
 				end
 			end
 			if ! A
@@ -3375,7 +3395,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	$(.PROBE.SPECIAL.) : .FUNCTION
 		$(.PROBE.SPECIAL.) : -FUNCTIONAL
 		make .PROBE.INIT
-		return $($(<))
+		return "$($(<))"
 
 .PROBE.INIT : .MAKE .VIRTUAL .FORCE .OPTION.COMPATIBILITY
 	local I J K
@@ -4372,8 +4392,8 @@ end
 
 .LIST.PACKAGE.DIRS. = $(VROOT:T=F:P=L*) $(INSTALLROOT) $(PACKAGEROOT)
 
-.LIST.PACKAGE.BINARY.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:C%\(.*\)/arch/$(CC.HOSTTYPE)$%\1%:H!>:C,.*,C%^&/%%,:C, ,:,G)
-.LIST.PACKAGE.SOURCE.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:H!>:C,.*,C%^&/%%,:C, ,:,G)
+.LIST.PACKAGE.BINARY.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:C%\(.*\)/arch/$(CC.HOSTTYPE)$%\1%:C%\(.*\)/arch$%\1%:H=RU:C,.*,C%^&/%%,:C, ,:,G)
+.LIST.PACKAGE.SOURCE.EDIT. = $(.LIST.PACKAGE.DIRS.:T=F:P=A:H=RU:C,.*,C%^&/%%,:C, ,:,G)
 
 .LIST.PACKAGE.LICENSE : .ONOBJECT .MAKE
 	local I E

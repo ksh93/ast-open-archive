@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2005 AT&T Corp.                  *
+*                  Copyright (c) 2003-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -790,7 +790,7 @@ codex(Sfio_t* ip, Sfio_t* op, const char* name, Codexnum_t flags, Codexdisc_t* d
 			f = decode;
 		else if (c == '>')
 			f = encode;
-		else if (c == '|')
+		else if (c == '|' || c == '^')
 			f = 0;
 		else
 			continue;

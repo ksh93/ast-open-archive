@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*                  Copyright (c) 1987-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -182,12 +182,66 @@ filein(register Archive_t* ap, register File_t* f)
 	int		dfd;
 	int		wfd;
 	long		checksum;
+	Filter_t*	fp;
+	Proc_t*		pp;
 	struct stat	st;
 
 	if (f->skip)
 		goto skip;
 	else if (state.list)
 	{
+		if (fp = filter(ap, f))
+		{
+			for (n = 0; s = fp->argv[n]; n++)
+			{
+				while (*s)
+					if (*s++ == '%' && *s == '(')
+						break;
+				if (*s)
+				{
+					s = fp->argv[n];
+					listprintf(state.tmp.str, ap, f, s);
+					fp->argv[n] = sfstruse(state.tmp.str);
+					break;
+				}
+			}
+			pp = procopen(*fp->argv, fp->argv, NiL, NiL, PROC_WRITE);
+			if (s)
+				fp->argv[n] = s;
+			if (!pp)
+			{
+				error(2, "%s: %s: cannot execute filter %s", ap->name, f->path, *fp->argv);
+				goto skip;
+			}
+			if (!ap->format->getdata || !(*ap->format->getdata)(&state, ap, f, pp->wfd))
+			{
+				checksum = 0;
+				for (c = f->st->st_size; c > 0; c -= n)
+				{
+					n = (c > state.buffersize) ? state.buffersize : c;
+					if (!(s = bget(ap, n, NiL)))
+					{
+						error(ERROR_SYSTEM|2, "%s: read error", f->name);
+						break;
+					}
+					if (write(pp->wfd, s, n) != n)
+					{
+						error(ERROR_SYSTEM|2, "%s: write error", f->name);
+						break;
+					}
+					if (ap->format->checksum)
+						checksum = (*ap->format->checksum)(&state, ap, f, s, n, checksum);
+				}
+			}
+			if (ap->format->checksum && checksum != f->checksum)
+				error(1, "%s: %s checksum error (0x%08x != 0x%08x)", f->name, ap->format->name, checksum, f->checksum);
+			/*
+			 * explicitly ignore exit status
+			 */
+
+			procclose(pp);
+			return;
+		}
 		listentry(f);
 		goto skip;
 	}

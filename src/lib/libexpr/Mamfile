@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-01-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -79,8 +79,9 @@ exec - then	${YACC} ${YACCFLAGS} -oexparse.c -pex exparse.y
 exec - else	${YACC} ${YACCFLAGS} exparse.y
 exec - ${STDED} ${STDEDFLAGS} y.tab.c <<!
 exec - g/yytoken/s//yy_token/g
-exec - g/yy/s//ex/g
-exec - g/YY/s//EX/g
+exec - g/[yY][yY]/s//<<<<&>>>>/g
+exec - g/<<<<yy>>>>/s//ex/g
+exec - g/<<<<YY>>>>/s//EX/g
 exec - w
 exec - q
 exec - !

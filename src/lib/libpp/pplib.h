@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*                  Copyright (c) 1986-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -730,6 +730,7 @@ _PP_DELAY_ ifdef __STDC__
 _PP_DELAY_ include <stdlib.h>
 _PP_DELAY_ include <unistd.h>
 _PP_DELAY_ include <time.h>
+_PP_DELAY_ include <string.h>
 
 _PP_DELAY_ else
 

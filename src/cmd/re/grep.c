@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*                  Copyright (c) 1995-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Labs Research) 2005-08-18 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Labs Research) 2005-12-14 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -68,6 +68,8 @@ USAGE_LICENSE
 "[O:lenient?Enable lenient \apattern\a interpretation. This is the default.]"
 "[x:line-match|line-regexp?Force \apatterns\a to match complete lines.]"
 "[n:number|line-number?Prefix each matched line with its line number.]"
+"[N:name?Set the standard input file name prefix to"
+"	\aname\a.]:[name:=empty]"
 "[q:quiet|silent?Do not print matching lines.]"
 "[S:strict?Enable strict \apattern\a interpretation with diagnostics.]"
 "[s:suppress|no-messages?Suppress error and warning messages.]"
@@ -599,11 +601,13 @@ main(int argc, char** argv)
 {
 	int	c;
 	char*	s;
+	char*	h;
 	Sfio_t*	f;
 
 	NoP(argc);
 	state.match = 1;
 	state.options = REG_FIRST|REG_NOSUB|REG_NULL;
+	h = 0;
 	if (strcmp(astconf("CONFORMANCE", NiL, NiL), "standard"))
 		state.options |= REG_LENIENT;
 	if (s = strrchr(argv[0], '/'))
@@ -654,6 +658,9 @@ main(int argc, char** argv)
 			break;
 		case 'L':
 			state.list = -opt_info.num;
+			break;
+		case 'N':
+			h = opt_info.arg;
 			break;
 		case 'O':
 			state.options |= REG_LENIENT;
@@ -781,8 +788,8 @@ main(int argc, char** argv)
 	compile();
 	if (!argv[0])
 	{
-		state.prefix = 0;
-		execute(sfstdin, NiL);
+		state.prefix = h ? 1 : 0;
+		execute(sfstdin, h);
 	}
 	else
 	{

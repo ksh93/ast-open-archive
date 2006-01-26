@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*                  Copyright (c) 1989-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2005-06-14 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2006-01-03 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -130,7 +130,7 @@ USAGE_LICENSE
 "[l:long|verbose?Use a long listing format.]"
 "[m:commas|comma-list?List names as comma separated list.]"
 "[n:numeric-uid-gid?List numeric user and group ids instead of names.]"
-"[N:literal?Print raw entry names (don't treat e.g. control characters specially).]"
+"[N:literal|show-controls-chars?Print raw entry names (don't treat e.g. control characters specially).]"
 "[o:owner?\b--long\b with no group info.]"
 "[O?\b--long\b with no owner info.]"
 "[p:markdir?Append / to each directory name.]"
@@ -1228,6 +1228,9 @@ ls(register Ftw_t* ftw)
 	return 0;
 }
 
+#define set(f)	(opt_info.num?(state.lsflags|=(f)):(state.lsflags&=~(f)))
+#define clr(f)	(opt_info.num?(state.lsflags&=~(f)):(state.lsflags|=(f)))
+
 int
 main(int argc, register char** argv)
 {
@@ -1278,17 +1281,17 @@ main(int argc, register char** argv)
 		switch (n)
 		{
 		case 'a':
-			state.lsflags |= LS_ALL;
+			set(LS_ALL);
 			break;
 		case 'b':
-			state.lsflags |= LS_PRINTABLE|LS_ESCAPE;
+			set(LS_PRINTABLE|LS_ESCAPE);
 			break;
 		case 'c':
 			state.lsflags &= ~LS_ATIME;
 			state.lsflags |= LS_CTIME;
 			break;
 		case 'd':
-			state.lsflags |= LS_DIRECTORY;
+			set(LS_DIRECTORY);
 			break;
 		case 'e':
 			state.lsflags |= LS_LONG;
@@ -1311,19 +1314,19 @@ main(int argc, register char** argv)
 			state.scale = 1024;
 			break;
 		case 'i':
-			state.lsflags |= LS_INUMBER;
+			set(LS_INUMBER);
 			break;
 		case 'k':
 			state.blocksize = 1024;
 			break;
 		case 'l':
-			state.lsflags |= LS_LONG;
+			set(LS_LONG);
 			break;
 		case 'm':
-			state.lsflags |= LS_COMMAS;
+			set(LS_COMMAS);
 			break;
 		case 'n':
-			state.lsflags |= LS_NUMBER;
+			set(LS_NUMBER);
 			break;
 		case 'o':
 		case 'G':
@@ -1333,19 +1336,19 @@ main(int argc, register char** argv)
 				state.lsflags |= LS_LONG|LS_NOUSER;
 			break;
 		case 'p':
-			state.lsflags |= LS_MARKDIR;
+			set(LS_MARKDIR);
 			break;
 		case 'q':
-			state.lsflags |= LS_PRINTABLE;
+			set(LS_PRINTABLE);
 			break;
 		case 'r':
-			state.reverse = 1;
+			state.reverse = !!opt_info.num;
 			break;
 		case 's':
-			state.lsflags |= LS_BLOCKS;
+			set(LS_BLOCKS);
 			break;
 		case 't':
-			state.lsflags |= LS_TIME;
+			set(LS_TIME);
 			break;
 		case 'u':
 			state.lsflags &= ~LS_CTIME;
@@ -1362,7 +1365,7 @@ main(int argc, register char** argv)
 				error(2, "%s: invalid screen width specification at `%s'", opt_info.arg, e);
 			break;
 		case 'x':
-			state.lsflags |= LS_ACROSS|LS_COLUMNS;
+			set(LS_ACROSS|LS_COLUMNS);
 			break;
 		case 'y':
 			if (!opt_info.arg)
@@ -1440,10 +1443,10 @@ main(int argc, register char** argv)
 			state.lsflags &= ~LS_ALL;
 			break;
 		case 'B':
-			state.lsflags |= LS_NOBACKUP;
+			set(LS_NOBACKUP);
 			break;
 		case 'C':
-			state.lsflags |= LS_COLUMNS;
+			set(LS_COLUMNS);
 			break;
 		case 'D':
 			if (s = strchr(opt_info.arg, '='))
@@ -1473,7 +1476,7 @@ main(int argc, register char** argv)
 			state.timefmt = TIME_FULL_ISO;
 			break;
 		case 'F':
-			state.lsflags |= LS_MARK;
+			set(LS_MARK);
 			break;
 		case 'H':
 			state.ftwflags |= FTW_META|FTW_PHYSICAL;
@@ -1505,23 +1508,23 @@ main(int argc, register char** argv)
 			}
 			break;
 		case 'K':
-			state.lsflags |= LS_PRINTABLE|LS_SHELL|LS_QUOTE|LS_ESCAPE;
+			set(LS_PRINTABLE|LS_SHELL|LS_QUOTE|LS_ESCAPE);
 			break;
 		case 'L':
 			state.ftwflags &= ~(FTW_META|FTW_PHYSICAL|FTW_SEEDOTDIR);
 			break;
 		case 'N':
-			state.lsflags &= ~LS_PRINTABLE;
+			clr(LS_PRINTABLE);
 			break;
 		case 'P':
 			state.ftwflags &= ~FTW_META;
 			state.ftwflags |= FTW_PHYSICAL;
 			break;
 		case 'Q':
-			state.lsflags |= LS_PRINTABLE|LS_QUOTE;
+			set(LS_PRINTABLE|LS_QUOTE);
 			break;
 		case 'R':
-			state.lsflags |= LS_RECURSIVE;
+			set(LS_RECURSIVE);
 			break;
 		case 'S':
 			state.sortflags |= LS_BLOCKS;
@@ -1561,7 +1564,7 @@ main(int argc, register char** argv)
 			}
 			break;
 		case 'X':
-			state.lsflags |= LS_EXTENSION;
+			set(LS_EXTENSION);
 			break;
 		case 'Y':
 			switch (opt_info.num)
@@ -1590,7 +1593,7 @@ main(int argc, register char** argv)
 			sfputr(fmt, opt_info.arg, ' ');
 			break;
 		case '1':
-			state.lsflags &= ~(LS_COLUMNS|LS_PRINTABLE);
+			clr(LS_COLUMNS|LS_PRINTABLE);
 			break;
 		case -101:
 			if (opt_info.num <= 0)

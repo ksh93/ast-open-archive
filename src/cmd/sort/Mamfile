@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.0 2005-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-01-21
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -159,7 +159,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2005 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sort]"\" -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1996-2006 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sort]"\" -c main.c
 done main.o generated
 make sfopen.o
 make sfopen.c

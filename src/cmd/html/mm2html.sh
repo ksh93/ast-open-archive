@@ -1,7 +1,7 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1996-2005 AT&T Corp.                  #
+#                  Copyright (c) 1996-2006 AT&T Corp.                  #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
 #                            by AT&T Corp.                             #
@@ -41,13 +41,13 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2005-02-14' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2005-10-15' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: mm2html (AT&T Labs Research) 2005-02-14 $
+@(#)$Id: mm2html (AT&T Labs Research) 2005-10-15 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?mm2html - convert mm/man subset to html]
@@ -55,7 +55,8 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 	converts input \bmm\b(1) or \bman\b(1) documents to an \bhtml\b
 	document on the standard output. If \afile\a is omitted then the
 	standard input is read. \btroff2html\b(1) is similar but does a full
-	\btroff\b(1) parse.]
+	\btroff\b(1) parse. \adir\a operands and directory components of
+	\afile\a operands are added to the included file search list.]
 [f:frame?Generate framed HTML files in:]:[name]{
 	[+\aname\a\b.html?The main body.]
 	[+\aname\a\b-index.html?The frame index (if \b--index\b specified).]
@@ -78,7 +79,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 [x:index?Generate a standalone \aname\a\b-index.html\b for framed HTML where
 	\aname\a is specified by \b--frame\b.]
 
-[ file ... ]
+[ [ dir | file ] ... ]
 
 [+EXTENSIONS?\b.xx\b \aname\a[=\avalue\a]] is a special \bmm2html\b
 	request that handles program tracing, \bhtml\b extensions and \atroff\a
@@ -113,14 +114,14 @@ esac
 
 set -o noglob
 
-integer count row n s
+integer count row n s ndirs=0 nfiles=0
 integer fd=0 head=2 line=0 lists=0 nest=0 peek=0 pp=0 so=0 soff=4
-integer labels=0 reference=1 ident=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
+integer labels=0 reference=1 ident=0 ce=0 nf=0 augment=0 tbl_ns=0 tbl_no=1 tbl_fd=1
 typeset -Z2 page=01
 typeset -u upper
 typeset -x -l OP
 typeset -x -A ds map nr outline
-typeset cond fg frame label list prev text trailer type
+typeset cond dirs files fg frame label list prev text trailer type
 typeset license html meta nl mm index authors vg header references ss
 typeset mm_AF mm_AF_cur mm_AF_old mm_AU
 
@@ -584,13 +585,8 @@ function getline
 				esac
 				;;
 			.so)	x=${text[1]}
-				for d in . $document
-				do	case $d in
-					.)	d= ;;
-					*/*)	d=${d%/*}/ ;;
-					*)	continue ;;
-					esac
-					if	[[ -f "$d$x" ]]
+				for d in "${dirs[@]}"
+				do	if	[[ -f "$d$x" ]]
 					then	(( fd = so + soff ))
 						tmp=/tmp/m2h$$
 						getfiles "$d$x" > $tmp
@@ -1048,7 +1044,7 @@ function heading
 
 function tbl_attributes
 {
-	typeset u x
+	typeset d f i u x
 	typeset -F0 w
 	case $1 in
 	[aAcC]*)a="$a align=center" ;;
@@ -1086,9 +1082,20 @@ if	[[ $frame != '' ]]
 then	framebody=$frame.html
 	exec > $framebody || exit
 fi
-document="$@"
 
-getfiles "$@" |
+dirs[++ndirs]=""
+for i
+do	if [[ -d $i ]]
+	then	dirs[++ndirs]=$i/
+	else	files[++nfiles]=$i
+		if [[ $i == */* ]]
+		then	dirs[++ndirs]=${i%/*}/
+		fi
+	fi
+done
+document="${files[@]}"
+
+getfiles "${files[@]}" |
 while	:
 do	getline || {
 		[[ $title != '' ]] && break
@@ -1150,10 +1157,14 @@ do	getline || {
 				;;
 			esac
 			;;
-		.AS|.H|.HU|.SH|.SS|.ce)
+		.AS|.H|.HU|.SH|.SS|.ce|.CE)
 			if ((nf))
 			then	nf=0
 				print -r -- "</PRE>"
+			fi
+			if ((ce))
+			then	ce=0
+				print -r -- "</CENTER>"
 			fi
 			case $hp in
 			?*)	indent=${indent#$hp}
@@ -1245,9 +1256,10 @@ do	getline || {
 				do	print -r -- "$data<BR>"
 				done
 				print -r -- "</CENTER>"
-				if ((nf))
-				then	nf=0
-					print -r -- "</PRE>"
+				;;
+			.CE)	if [[ $1 != 0 ]]
+				then	ce=1
+					print -r -- "<CENTER>"
 				fi
 				;;
 			.S[HS])	macros=man
@@ -1307,27 +1319,60 @@ do	getline || {
 			list[lists]=UL
 			print -r -- "<UL type=$i>"
 			;;
-		.BP)	i=${1%.*}.gif
-			case $frame in
-			?*)	[[ -f $frame-$i ]] && i=$frame-$i ;;
-			esac
-			print -r -- "<CENTER><IMG src=\"$i\"></CENTER>"
-			f=
-			for d in . $document
-			do	case $d in
-				.)	d= ;;
-				*/*)	d=${d%/*}/ ;;
-				*)	continue ;;
-				esac
-				if	[[ -f "$d$1" ]]
-				then	f=$d$1
-					break
-				fi
+		.BP)	unset parm
+			while	[[ $1 == *=* ]]
+			do	eval parm="( ${1%%=*}='${1#*=}' )"
+				shift
 			done
-			if [[ ! $f ]]
-			then	print -u2 "$command: $1: data file not found"
-			elif [[ $f -nt $i ]]
-			then	ps2gif $f $i
+			unset oparm
+			oparm=$parm
+			i=$1
+			if	[[ $i == *.@(gif|png) ]]
+			then	for i
+				do	f=
+					for d in "${dirs[@]}"
+					do	if [[ -f "$d$i" ]]
+						then	f=$d$i
+							break
+						fi
+					done
+					if [[ ! $f ]]
+					then	print -u2 "$command: warning: $i: data file not found"
+					fi
+					if	[[ ! ${oparm.alt} ]]
+					then	u=${i##*/}
+						u=${i%.*}
+						parm=( alt=$u )
+					fi
+					if	[[ ! ${oparm.title} ]]
+					then	u=${i##*/}
+						u=${i%.*}
+						if	[[ ${parm.category} ]]
+						then	u="${parm.category} $u"
+						elif	[[ ${oparm.category} ]]
+						then	u="${oparm.category} $u"
+						fi
+						parm=( title=$u )
+					fi
+					print -r -- "<IMG src=\"$i\"" ${parm/'('@(*)')'/\1}">"
+				done
+			else	i=${i%.*}.gif
+				case $frame in
+				?*)	[[ -f $frame-$i ]] && i=$frame-$i ;;
+				esac
+				f=
+				for d in "${dirs[@]}"
+				do	if	[[ -f "$d$1" ]]
+					then	f=$d$1
+						break
+					fi
+				done
+				if [[ ! $f ]]
+				then	print -u2 "$command: $1: data file not found"
+				elif [[ $f -nt $i ]]
+				then	ps2gif $f $i
+				fi
+				print -r -- "<CENTER><IMG src=\"$i\"></CENTER>"
 			fi
 			;;
 		.CT)	: ignore $op
@@ -1969,13 +2014,8 @@ do	getline || {
 				;;
 			esac
 			;;
-		.sn)	for d in . $document
-			do	case $d in
-				.)	d= ;;
-				*/*)	d=${d%/*}/ ;;
-				*)	continue ;;
-				esac
-				if	[[ -f "$d$1" ]]
+		.sn)	for d in "${dirs[@]}"
+			do	if	[[ -f "$d$1" ]]
 				then	cat "$d$1"
 					continue 2
 				fi

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -188,16 +188,16 @@ USAGE_LICENSE
 "	option \b-s\b, lines with all keys equal are ordered with all"
 "	bytes significant. \b-S\b turns off \b-s\b, the last occurrence,"
 "	left-to-right, takes affect.]"
-"[+?Sorting is done by a method determined by the \b-x\b option. \b-l\b"
+"[+?Sorting is done by a method determined by the \b-x\b option. \b-L\b"
 "	lists the available methods. rasp (radix+splay-tree) is the"
 "	default and current all-around best.]"
 "[+?Single-letter options may be combined into a single string,"
 "	such as \b-cnrt:\b. The option combination \b-di\b and the combination"
 "	of \b-n\b with any of \b-diM\b are improper. Posix argument"
 "	conventions are supported.]"
-"[+?Options \b-C\b, \b-g\b, \b-j\b, \b-M\b, \b-p\b, \b-s\b, \b-S\b, \b-T\b,"
-"	\b-Z\b, and \b-z\b are not in the Posix or X/Open standards.]"
-
+"[+?Options \b-b\b, \b-c\b, \b-d\b, \b-f\b, \b-i\b, \b-k\b, \b-m\b,"
+"	\b-n\b, \b-o\b, \b-r\b, \b-t\b, and \b-u\b are in the Posix"
+"	and/or X/Open standards.]"
 
 "[+DIAGNOSTICS?\asort\a comments and exits with non-zero status for various"
 "	trouble conditions and for disorder discovered under option \b-c\b.]"
@@ -1460,7 +1460,7 @@ done(register Sort_t* sp)
 {
 	if (rsclose(sp->rec))
 		error(2, "sort error");
-	if (((sp->op == sfstdout && !(sp->zip & SF_WRITE)) && sfsync(sp->op) || rsfileclose(sp->rec, sp->op)) && !error_info.errors)
+	if ((sp->op == sfstdout && !(sp->zip & SF_WRITE) && sfsync(sp->op) || rsfileclose(sp->rec, sp->op)) && !error_info.errors)
 		error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 	if (sp->map > 2)
 		vmfree(Vmheap, sp->buf);
@@ -1568,12 +1568,12 @@ main(int argc, char** argv)
 			}
 		if (sort.nfiles)
 		{
-			if (sort.cur)
-				flush(&sort, sort.cur);
+			if (sort.cur && flush(&sort, sort.cur) < 0)
+				return 1;
 			if (sort.verbose)
 				error(0, "%s merge text", error_info.id);
 			if (rsmerge(sort.rec, sort.op, sort.files, sort.nfiles, merge ? RS_TEXT : RS_OTEXT))
-				error(ERROR_SYSTEM|2, "merge error");
+				error(ERROR_SYSTEM|3, "merge error");
 			clear(&sort, NiL);
 		}
 		else
@@ -1581,7 +1581,7 @@ main(int argc, char** argv)
 			if (sort.verbose)
 				error(0, "%s write text", error_info.id);
 			if (rswrite(sort.rec, sort.op, RS_OTEXT) && !error_info.errors)
-				error(ERROR_SYSTEM|2, "%s: write error", sort.key->output);
+				error(ERROR_SYSTEM|3, "%s: write error", sort.key->output);
 			if (fp && fp != sfstdin)
 				sfclose(fp);
 		}

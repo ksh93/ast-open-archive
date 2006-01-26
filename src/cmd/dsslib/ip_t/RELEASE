@@ -1,0 +1,15 @@
+06-01-24 bgp.h: bring over from dsslib/bgp.h
+05-03-08 lib.c: add for dssstatic()
+03-05-21 itlie.h: fix aspath_t external
+03-04-15 itlie.h: fix external() bug that did not re-initialize the separator
+03-02-18 itlie.h: change details to format char and separator string
+03-02-11 ire.c: Vmbest => Vmlast
+03-02-07 ip_t.c: add Cxformat_t.print width hints
+03-01-28 ip_t.c: update for Cxtype_t.Cxmember_t
+03-01-24 ip_t.c: move { as_t aspath_t cluster_t community_t } from bgp
+03-01-20 ip_t.c: fix match message
+03-01-16 ip_t.c: convert to Cxmatch_t
+03-01-15 ip_t.c: prefix matching via =~ and !~ only
+02-12-17 propagate -ldss changes
+02-11-27 ip_t.c: fix Cxunsigned_t/Cxinteger_t casts for lame long double cc
+02-11-22 ip_t.c: don't assume the "bgp" method -- duh

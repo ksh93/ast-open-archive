@@ -1,3 +1,23 @@
+06-01-25 Makerules.mk: { -ldl -lm } dynamic unless explicitly overridden
+06-01-21 --- release 5.1 ---
+	 Makerules.mk: fix list.package.binary INSTALLROOT edit
+	 command.c: add gcc 4.*.* ppc code generation bug workaround
+	 read.c: handle /dev/* mtime==0
+	 version.c: fix { VROOT VOFFSET } initialization
+06-01-08 pkg-cobol-*.mk: handle --debug-symbols
+05-12-25 Makerules.mk: fix :LIBRARY: plugin bind for exe/dll
+05-11-22 variable.c: restore $(+...)==$(-...) until 2009
+05-11-07 Makerules.mk: fix :YYPREFIX: to handle YY in new prefix
+05-11-04 Makerules.mk: PACKAGE_p_LIB => PACKAGE_p_INCLUDE
+05-11-03 expand.c: add :H=P: directory prefix sort
+05-11-01 pkg-cobol-*.mk: add :VARARGS:
+05-10-14 pkg-cobol*.mk: add COBOL.PLUGIN.LIBRARIES for mfcobc plugins
+05-10-12 Makerules.mk: handle "foo :LIBRARY: -lfoo" to gen dll from lib
+	 tests/cc.def: add test version of pkg-cobol.mk
+05-10-11 Makerules.mk: :PACKAGE: foo:bar => .PACKAGE.foo.option.bar:=1
+ 	 pkg-cobol-mfcobc.mk: add special char extern demangle
+ 	 pkg-cobol-mfcobc.mk: :PACKAGE: cobol:always => .COBOL.INIT
+05-09-15 Makerules.mk: quote .PROBE.SPECIAL return to disable time arith
 05-08-11 rule.c,state.c,tests/attribute.tst: fix .RETAIN
 05-08-08 Makerules.mk: add :A!=.TERMINAL: to .BUILT. -- doh
 	 tests/recurse.tst: add test for .BUILT. vs .TERMINAL

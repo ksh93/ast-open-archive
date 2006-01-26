@@ -4509,3 +4509,96 @@ TEST 32 'catliteral vs stringize'
 		INPUT - $'#define F(s)	"a" "b" #s
 F(c);'
 		OUTPUT - $'# 1 ""\n\n"abc";'
+
+TEST 33 'passthrough vs comment threat'
+
+	EXEC -I-D
+		INPUT - $'#ifdef UseInstalled
+        IMAKE_CMD = $(IMAKE) -DUseInstalled -I$(IRULESRC) $(IMAKE_DEFINES) \\
+                $(IMAKE_WARNINGS)
+#else
+         IRULESRC = $(CONFIGSRC)/cf
+        IMAKE_CMD = $(IMAKE) -I$(IRULESRC) $(IMAKE_DEFINES) $(IMAKE_WARNINGS)
+#endif'
+		OUTPUT - $'# 1 ""
+
+         IRULESRC = $(CONFIGSRC)
+
+
+/cf
+        IMAKE_CMD = $(IMAKE) -I$(IRULESRC) $(IMAKE_DEFINES) $(IMAKE_WARNINGS)'
+
+	EXEC -D-P -D-L
+		OUTPUT - $'#line 1 ""
+
+         IRULESRC = $(CONFIGSRC)/cf
+        IMAKE_CMD = $(IMAKE) -I$(IRULESRC) $(IMAKE_DEFINES) $(IMAKE_WARNINGS)
+
+
+'
+
+TEST 34 'more passthrough ala rpcgen'
+
+	EXEC -D-P -D-L
+		INPUT - $'/* comment */
+%#include <line/two>
+int line = 3;'
+		OUTPUT - $'#line 1 ""
+
+%#include <line/two>
+int line = 3;'
+
+	EXEC -D-P -D-L -C
+		OUTPUT - $'#line 1 ""
+/* comment */
+%#include <line/two>
+int line = 3;'
+
+	EXEC -D-P -D-L
+		INPUT - $'/*
+ * hidden
+ */
+%#include <line/four>
+int line = 5;'
+		OUTPUT - $'#line 1 ""
+ 
+
+
+%#include <line/four>
+int line = 5;'
+
+	EXEC -D-P -D-L -C
+		OUTPUT - $'#line 1 ""
+/*
+ * hidden
+ */
+%#include <line/four>
+int line = 5;'
+
+	EXEC -D-P -D-L
+		INPUT - $'#ifndef YADAYADA
+%#include <sys/seinfeld.h>
+%#ifndef lint
+%/*static char sccsid[] = "george";*/
+%/*static char sccsid[] = "elaine";*/
+%__RCSID("kramer");
+%#endif /* not lint */
+#endif'
+		OUTPUT - $'#line 1 ""
+%#include <sys/seinfeld.h>
+
+%#ifndef lint
+%
+%
+%__RCSID("kramer");
+%#endif '
+
+	EXEC -D-P -D-L -C
+		OUTPUT - $'#line 1 ""
+%#include <sys/seinfeld.h>
+
+%#ifndef lint
+%/*static char sccsid[] = "george";*/
+%/*static char sccsid[] = "elaine";*/
+%__RCSID("kramer");
+%#endif /* not lint */'

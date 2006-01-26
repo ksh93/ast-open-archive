@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*                  Copyright (c) 1984-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -299,7 +299,7 @@ staterule(int op, register Rule_t* r, char* var, int force)
 				r = makerule(sfstrbase(internal.nam));
 			}
 		}
-		if (force < 0)
+		if (nobind)
 			return r;
 		break;
 #if DEBUG

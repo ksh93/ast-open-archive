@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: rec (AT&T Research) 2005-05-15 $\n]"
+"[-?\n@(#)$Id: rec (AT&T Research) 2005-11-01 $\n]"
 USAGE_LICENSE
 "[+NAME?rec - <recfmt.h> test harness]"
 "[+DESCRIPTION?\brec\b is a <recfmt.h> test harness. It converts the "
@@ -35,6 +35,7 @@ USAGE_LICENSE
     "\afile\a operand is specified then a line containing the number of "
     "records and the sum of all record lengths is printed. If \afile\a is "
     "\b-\b then the standard input is read.]"
+"[c:count?COunt the number of records.]"
 "[l:length?List the length of each record.]"
 "[r:reserve?List underlying sfreserve() sizes and offsets.]"
 
@@ -70,6 +71,7 @@ main(int argc, char** argv)
 	Sfio_t*		sp;
 	struct stat	st;
 
+	int		count = 0;
 	int		length = 0;
 	int		reserve = 0;
 
@@ -79,6 +81,9 @@ main(int argc, char** argv)
 	{
 		switch (optget(argv, usage))
 		{
+		case 'c':
+			count = !!opt_info.num;
+			continue;
 		case 'l':
 			length = !!opt_info.num;
 			continue;
@@ -134,7 +139,7 @@ main(int argc, char** argv)
 			sfprintf(sfstdout, " [%s]", e);
 	}
 	sfprintf(sfstdout, "\n");
-	if (sp)
+	if (sp && (count || length))
 	{
 		r = 0;
 		t = 0;
@@ -202,7 +207,8 @@ main(int argc, char** argv)
 				e = s;
 			}
 		}
-		sfprintf(sfstdout, "%I*d %I*d\n", sizeof(r), r, sizeof(t), t);
+		if (count)
+			sfprintf(sfstdout, "%I*d %I*d\n", sizeof(r), r, sizeof(t), t);
 	}
 	return 0;
 }

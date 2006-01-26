@@ -1,0 +1,36 @@
+:PACKAGE: ast
+
+CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
+
+LICENSE = since=2003,author=kpv
+
+.SOURCE : Vcdelta Vchuff Vcmisc Vctable Vcwindow
+
+vcodex 1.1 :LIBRARY: vcodex.3 \
+	/* common */ \
+	vchdr.h vcbcktsort.c vcclose.c vccontext.c vcdisc.c \
+	vcextract.c vcgetmeth.c vcio.c vclog.c vcopen.c \
+	vcparse.c vcperiod.c vcqsort.c vcsetbuf.c vcsfxsort.c \
+	/* sfio */ \
+	vcsfio.c vcsfcomp.c \
+	/* Vcdelta */ \
+	vcdcache.c vcdelta.c vcdtable.c vcdtblinit.c \
+	/* Vchuff */ \
+        vchbits.c vchcode.c vchsize.c vchtrie.c \
+        vchuffgroup.c vchuffman.c vchuffpart.c \
+	/* Vcmisc */ \
+	vcbwt.c vcmap.c vcmtf.c vcrle.c \
+	/* Vctable */ \
+	vctranspose.c \
+	/* Vcwindow */ \
+        vcwhdr.h vcwclose.c vcwdecode.c vcwfile.c vcwgetmeth.c \
+        vcwmirror.c vcwngram.c vcwopen.c vcwprefix.c vcwvote.c \
+	-ldll
+
+vclib.h : vchdr.h
+	$(SED) -e 's/hdr/lib/g' -e 's/HDR/LIB/g' $(*) > $(<)
+
+$(INCLUDEDIR) :INSTALLPROTO: vcodex.h vcsfio.h vclib.h
+
+:: RELEASE Makefile Vcdelta/Makefile Vchuff/Makefile \
+	Vcmisc/Makefile Vctable/Makefile Vcwindow/Makefile

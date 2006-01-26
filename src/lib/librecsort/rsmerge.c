@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*                  Copyright (c) 1996-2006 AT&T Corp.                  *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
 *                            by AT&T Corp.                             *
@@ -65,7 +65,7 @@ typedef struct _merge_s
 	    rsrv = endrsrv = cur = NIL(uchar*); \
 	    rr = r <= RS_RESERVE ? RS_RESERVE : ((r/1024)+1)*1024; \
 	    if(!(rsrv = (uchar*)sfreserve(mg->f,rr,1)) ) \
-	    { if((rr = sfvalue(mg->f)) < r) rr = r; \
+	    { if((rr = sfvalue(mg->f)) < r) { if (rr <= 0) { MGSETEOF(mg); action;} rr = r;} \
 	      if(!(rsrv = (uchar*)sfreserve(mg->f,rr,1)) ) { MGSETEOF(mg); action;} \
 	    } \
 	    endrsrv = (cur = rsrv) + rr; \
@@ -73,6 +73,7 @@ typedef struct _merge_s
 	}
 
 #define RSRESERVE(rs,rsrv,endrsrv,cur,w,action) \
+	do \
 	{ reg ssize_t rw; \
 	  if((endrsrv-cur) < w) \
 	  { if(rsrv && sfwrite(rs->f,rsrv,cur-rsrv) != cur-rsrv) { action;} \
@@ -84,7 +85,7 @@ typedef struct _merge_s
 	    } \
 	    endrsrv = (cur = rsrv) + rw; \
 	  } \
-	}
+	} while (0)
 
 #define RSSYNC(rs) \
 	{ if(rs->rsrv) \
@@ -106,13 +107,13 @@ reg Rs_t*	rs;
 
 	if((r = rs->sorted) )
 	{	r->left->right = NIL(Rsobj_t*);
-		if(!(rs->type&RS_TEXT) )	/* need to write the count */
+		if(!(rs->type&RS_OTEXT) )	/* need to write the count */
 		{	for(n = 1, r = r->right; r; r = r->right)
 				n += 1;
 			rs->sorted->order = -n;
 		}
 
-		if(RSWRITE(rs,rs->f,rs->type&RS_TEXT) < 0)
+		if(RSWRITE(rs,rs->f,rs->type&RS_OTEXT) < 0)
 			return -1;
 
 		rs->sorted = NIL(Rsobj_t*);
@@ -133,7 +134,7 @@ Merge_t*	mg;
 	ssize_t		datalen, rsc;
 	reg Rsobj_t	*obj, *endobj;
 	reg uchar	*t, *cur, *rsrv, *endrsrv;
-	reg int		n, type = rs->type, last;
+	reg int		n, type = rs->type;
 	reg ssize_t	key = rs->disc->key;
 	reg ssize_t	keylen = rs->disc->keylen;
 	reg Rsdefkey_f	defkeyf = rs->disc->defkeyf;
@@ -163,7 +164,7 @@ Merge_t*	mg;
 	{	if(type&RS_DSAMELEN)
 		{	MGRESERVE(mg,rsrv,endrsrv,cur,datalen, return -1);
 		}
-		else for(s = RS_RESERVE, o = 0, last = 0;;) /* make sure we have at least 1 record */
+		else for(s = RS_RESERVE, o = 0;;) /* make sure we have at least 1 record */
 		{	MGRESERVE(mg,rsrv,endrsrv,cur,s, goto last_chunk);
 			x = endrsrv-cur;
 #if _PACKAGE_ast
@@ -191,9 +192,8 @@ Merge_t*	mg;
 				continue;
 			}
 		last_chunk:
-			if(last || (s = sfvalue(mg->f)) <= 0)
+			if((s = sfvalue(mg->f)) <= 0)
 				return -1;
-			last = 0;
 			MGCLREOF(mg);
 		}
 	}
@@ -355,13 +355,13 @@ Merge_t*	mg;
 
 	ret = mgflush(rs);
 
-	if(rs->disc->defkeyf && mg->vm)
-		vmclose(mg->vm);
-
 	if(mg->rsrv)
 		sfread(mg->f,mg->rsrv,mg->cur-mg->rsrv);
 
 	sfset(mg->f,(mg->flags&(SF_WRITE|SF_SHARE|SF_PUBLIC)),1);
+
+	if(rs->disc->defkeyf && mg->vm)
+		vmclose(mg->vm);
 
 	vmfree(Vmheap,mg);
 
@@ -550,7 +550,7 @@ ssize_t		n;
 	reg uchar	*d, *cur, *mgcur;
 	reg uchar	*rsrv, *endrsrv, *mgrsrv, *mgendrsrv;
 	int		ret = -1;
-	int		notify, c;
+	int		notify, c, rsc;
 	Rsobj_t		obj, out;
 
 #if 0
@@ -561,10 +561,11 @@ ssize_t		n;
 
 	rsrv = rs->rsrv; endrsrv = rs->endrsrv; cur = rs->cur;
 	mgrsrv = mg->rsrv; mgendrsrv = mg->endrsrv; mgcur = mg->cur;
-	notify = (rs->events & RS_WRITE) && (rs->type & RS_OTEXT);
+	notify = (rs->events & RS_WRITE);
+	rsc = rs->disc->data;
 
 	/* easy case, just copy everything over, let Sfio worry about it */
-	if(n < 0 && ((rs->type&RS_ITEXT) || !(rs->type&RS_OTEXT)) && !notify )
+	if(n < 0 && (rs->type&RS_ITEXT) && !notify)
 	{	if(rsrv)
 		{	sfwrite(rs->f, rsrv, cur-rsrv);
 			rs->rsrv = NIL(uchar*);
@@ -578,11 +579,17 @@ ssize_t		n;
 
 	for(n_obj = n < 0 ? 0 : n;; )
 	{	if(n_obj == 0)
-		{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,sizeof(ssize_t),break);
-			d = (uchar*)(&n_obj); MEMCPY(d,mgcur,sizeof(ssize_t));
-			if(n_obj == 0)
-			{	MGSETEOF(mg);
+		{	if(MGISEOF(mg))
 				break;
+			if(rs->type&RS_ITEXT)
+				n_obj = 1;
+			else
+			{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,sizeof(ssize_t),break);
+				d = (uchar*)(&n_obj); MEMCPY(d,mgcur,sizeof(ssize_t));
+				if(n_obj == 0)
+				{	MGSETEOF(mg);
+					break;
+				}
 			}
 		}
 
@@ -634,10 +641,49 @@ ssize_t		n;
 			}
 			n_obj = 0;
 		}
-		else if(rs->type&RS_TEXT)
+		else if(rs->type&RS_ITEXT)
 		{	for(; n_obj > 0; --n_obj)
-			{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,sizeof(ssize_t),break);
-				d = (uchar*)(&len); MEMCPY(d,mgcur,sizeof(ssize_t));
+			{	uchar	*t;
+				ssize_t	s, o, x;
+				for(s = RS_RESERVE, o = 0;;) /* make sure we have at least 1 record */
+				{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,goto last_chunk);
+					x = mgendrsrv-mgcur;
+#if _PACKAGE_ast
+					if (rsc & ~0xff) /* Recfmt_t record descriptor */
+					{	if ((len = reclen(rsc, mgcur, x)) < 0)
+							goto done;
+						if (len <= x)
+							break;
+					}
+					else
+#endif
+					if((t = (uchar*)memchr(mgcur,rsc,x)) )
+					{	len = (t-cur)+1;
+						break;
+					}
+					else if(o == x)
+					{	len = x;
+						break;
+					}
+					else
+					{	o = x;
+						s += RS_RESERVE;
+						continue;
+					}
+				last_chunk:
+					if((s = sfvalue(mg->f)) <= 0)
+					{	if(!s)
+							ret = 0;
+						MGSETEOF(mg);
+						goto done;
+					}
+					MGCLREOF(mg);
+				}
+				if(len <= 0)
+				{	ret = 0;
+					MGSETEOF(mg);
+					goto done;
+				}
 				MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,break);
 				RSRESERVE(rs,rsrv,endrsrv,cur,len, goto done);
 				if(notify)
@@ -673,9 +719,13 @@ ssize_t		n;
 				d = (uchar*)(&len); MEMCPY(d,mgcur,sizeof(ssize_t));
 				MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,break);
 
-				w = len + sizeof(ssize_t);
-				RSRESERVE(rs,rsrv,endrsrv,cur,w, goto done);
-				d = (uchar*)(&len); MEMCPY(cur,d,sizeof(ssize_t));
+				if(rs->type&RS_OTEXT)
+					RSRESERVE(rs,rsrv,endrsrv,cur,len, goto done);
+				else
+				{	w = len + sizeof(ssize_t);
+					RSRESERVE(rs,rsrv,endrsrv,cur,w, goto done);
+					d = (uchar*)(&len); MEMCPY(cur,d,sizeof(ssize_t));
+				}
 				MEMCPY(cur,mgcur,len);
 			}
 		}
@@ -795,7 +845,7 @@ Rs_t*		rs;	/* sorting context		*/
 Sfio_t*		f;	/* output stream		*/
 Sfio_t**	files;	/* streams to be merged		*/
 int		n;	/* number of such streams	*/
-int		type;	/* RS_IPRINT|RS_OPRINT		*/
+int		type;	/* RS_ITEXT|RS_OTEXT		*/
 #endif
 {
 	reg Rsobj_t	*obj, *o, *t, *endobj;
@@ -965,7 +1015,7 @@ int		type;	/* RS_IPRINT|RS_OPRINT		*/
 			if (mgmove(rs,mg,-1) < 0)
 				return mgerror(rs,list,n_list);
 			if (mgclose(rs,mg) < 0)
-				return mgerror(rs,list,n_list-1);
+				return mgerror(rs,list,n_list);
 		}
 	}
 

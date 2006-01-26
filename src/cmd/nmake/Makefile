@@ -21,6 +21,8 @@ IDNAME == "$(ID)"
 PATHCHECK == "$(ID)"
 STAMP == "\n@(#)\$Id: $(ID) ($(OWNER)) $(VERSION:?$$(VERSION) ??)$(RELEASE:?$$(RELEASE) ??)$(DATE) \$\0\n"
 
+__OBSOLETE__ == $("6 months ago":@F=%(%Y0101)T)
+
 nmake :: Version.mk nmake.1 \
 	$(RULES) $(RULESFILES) \
 	make.h expand.h options.h \

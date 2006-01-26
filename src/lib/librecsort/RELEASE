@@ -1,3 +1,8 @@
+05-12-01 -lsync event callout bug fixes -- finally working?
+05-11-28 rswrite.c: honor RS_OTEXT
+05-11-09 rsmerge.c: fix RS_ITEXT+notify logic
+05-10-18 rsprocess.c: RS_READ callouts finally in the right place
+05-10-12 rstemp.c: keep temp write SF_WRITE and temp read SF_READ
 05-08-22 rsmerge.c: fix RS_WRITE callouts
 05-06-30 rsmerge.c: handle all RS_TEXT record formats
 05-06-28 add rsnew()+rsinit() to split rsopen() for rsfile*()
