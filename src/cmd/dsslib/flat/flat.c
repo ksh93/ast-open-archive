@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -826,7 +826,7 @@ flatread(register Dssfile_t* file, register Dssrecord_t* record, Dssdisc_t* disc
 				 * only string fields are checked
 				 */
 
-				if (s = (char*)sfreserve(file->io, flat->fixed, 1))
+				if (s = (char*)sfreserve(file->io, flat->fixed, SF_LOCKR))
 				{
 					if ((j = sfvalue(file->io)) > flat->fixed)
 						j = flat->fixed + 1;

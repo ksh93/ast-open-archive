@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2006 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -635,7 +635,7 @@ parse(register Sort_t* sp, char** argv)
 			}
 	if (RECTYPE(key->disc->data) == REC_method && ((n = REC_M_INDEX(key->disc->data)) == REC_M_path || n == REC_M_data))
 	{
-		if ((sp->opened = fileopen(sp, key->input[0])) && (s = sfreserve(sp->opened, SF_UNBOUND, 1)))
+		if ((sp->opened = fileopen(sp, key->input[0])) && (s = sfreserve(sp->opened, SF_UNBOUND, SF_LOCKR)))
 		{
 			struct stat	st;
 
@@ -1199,19 +1199,19 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 		}
 		else
 		{
-			sp->buf = (char*)sfreserve(ip, m, 1);
+			sp->buf = (char*)sfreserve(ip, m, SF_LOCKR);
 			n = sfvalue(ip);
 			if (!sp->buf)
 			{
 				if (m < 0 && n < -m && z == sp->end)
 				{
 					sfsetbuf(ip, NiL, z = 2 * sp->end);
-					sp->buf = (char*)sfreserve(ip, m, 1);
+					sp->buf = (char*)sfreserve(ip, m, SF_LOCKR);
 					n = sfvalue(ip);
 					if (sp->verbose && n)
 						error(0, "%s buffer boundary expand to %I*d", error_info.id, sizeof(n), n);
 				}
-				if (!sp->buf && n > 0 && !(sp->buf = sfreserve(ip, n, 1)))
+				if (!sp->buf && n > 0 && !(sp->buf = sfreserve(ip, n, SF_LOCKR)))
 					n = -1;
 			}
 		}

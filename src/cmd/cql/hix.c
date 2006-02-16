@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1991-2005 AT&T Corp.                  *
+*           Copyright (c) 1991-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -571,7 +571,7 @@ ioputnum(register Index_t* x, Number_t l)
 	}
 	for (i = 0;;)
 	{
-		if (!(x->buf = sfreserve(x->vio->sp, SF_UNBOUND, 1)))
+		if (!(x->buf = sfreserve(x->vio->sp, SF_UNBOUND, SF_LOCKR)))
 		{
 			error(1, "ioputnum#%d io=%p", __LINE__, x->vio->sp);
 			return -1;

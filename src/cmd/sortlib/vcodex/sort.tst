@@ -28,6 +28,9 @@ TEST 01 'basics'
 
 	DO	DATA rev
 
+	EXEC -o rev.out rev.dat
+		SAME rev.out rev.sorted
+
 	EXEC -lvcodex,notemporary,nooutput -o rev.out rev.qz
 		SAME rev.out rev.sorted
 
@@ -39,10 +42,32 @@ TEST 01 'basics'
 	EXEC -lvcodex,notemporary,nooutput -o rev.out rev.tmp
 		SAME rev.out rev.sorted
 
-	EXEC -v -za16k -zb16k -zi128k -lvcodex,verbose,regress -o rev.out rev.qz
+	EXEC -v -za16k -zb16k -zi128k -lvcodex,nooutput,verbose,regress -o rev.out rev.qz
+		SAME rev.out rev.sorted
 		ERROR - $'sort d record format
 sort vcodex decode rev.qz
-sort vcodex encode rev.out
+sort process 16384 -> 16380
+sort vcodex encode temporary-2
+sort write intermediate
+sort vcodex decode temporary-3
+sort process 15364 -> 15360
+sort vcodex encode temporary-4
+sort write intermediate
+sort vcodex decode temporary-5
+sort process 15364 -> 15360
+sort vcodex encode temporary-6
+sort write intermediate
+sort vcodex decode temporary-7
+sort process 12900 -> 12900
+sort vcodex encode temporary-8
+sort write intermediate
+sort vcodex decode temporary-9
+sort merge text'
+
+	EXEC -v -za16k -zb16k -zi128k -lvcodex,nooutput,verbose,regress,temporary=rle^huffman -o rev.out rev.qz
+		SAME rev.out rev.sorted
+		ERROR - $'sort d record format
+sort vcodex decode rev.qz
 sort process 16384 -> 16380
 sort vcodex encode temporary-2
 sort write intermediate

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -79,7 +79,7 @@ MAIN()
 		terror("Opening file\n");
 
 	sfsetbuf(sfstdout,NIL(char*),0);
-	if(!(s = sfreserve(sfstdout,0,1)) )
+	if(!(s = sfreserve(sfstdout,0,SF_LOCKR)) )
 		terror("Could not lock stdout\n");
 	if(sfputc(sfstdout,'1') >= 0)
 		terror("stdout wasn't locked\n");
@@ -93,7 +93,7 @@ MAIN()
 
 	n = 0;
 	for(i = 0; i < 33; ++i)
-	{	if(!(s = sfreserve(sfstdout,sizeof(buf),1)) )
+	{	if(!(s = sfreserve(sfstdout,sizeof(buf),SF_LOCKR)) )
 			terror("Can't reserve write buffer\n");
 
 		memcpy(s,buf,sizeof(buf));
@@ -167,9 +167,9 @@ MAIN()
 			if(*s++ != ('0' + (k+i)%10))
 				terror("Wrong data2 i=%d k=%d\n",i,k);
 	}
-	if(!(s = sfreserve(sfstdin,16*sizeof(bigbuf),1)) )
+	if(!(s = sfreserve(sfstdin,16*sizeof(bigbuf),SF_LOCKR)) )
 	{	sfsetbuf(sfstdin,NIL(Void_t*),16*sizeof(bigbuf));
-		if(!(s = sfreserve(sfstdin,16*sizeof(bigbuf),1)) )
+		if(!(s = sfreserve(sfstdin,16*sizeof(bigbuf),SF_LOCKR)) )
 			terror("sfreserve failed2\n");
 	}
 
@@ -224,7 +224,7 @@ MAIN()
 	if(!(s = sfgetr(sfstdin,'\n',1) ) ||
 	   strcmp(s,"abcdefghijklmnopqrstuvwxyz") != 0)
 		terror("Get wrong string\n");
-	if((s = sfreserve(sfstdin,16,1)) )
+	if((s = sfreserve(sfstdin,16,SF_LOCKR)) )
 		terror("There should not be enough data for this\n");
 	if(!(s = sfreserve(sfstdin,10,0)) )
 		terror("Fail to reserve remainder of stream\n");
@@ -266,14 +266,14 @@ MAIN()
 		terror("Writing to file\n");
 	sfsetbuf(f,buf,100);
 	sfseek(f,(Sfoff_t)0,0);
-	if(!(s = sfreserve(f,-1,1)) )
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
 		terror("sfreserve failed at bottom1\n");
 	if(sfvalue(f) != 100)
 		terror("Expecting1 100 bytes, get only %d\n",sfvalue(f));
 	if(strncmp(s,bigbuf,100) != 0)
 		terror("Wrong data at bottom\n");
 	sfread(f,s,95);
-	if(!(s = sfreserve(f,6,1)) )
+	if(!(s = sfreserve(f,6,SF_LOCKR)) )
 		terror("sfreserve failed at bottom2\n");
 	if(sfvalue(f) != 100)
 		terror("Expecting2 100 bytes, get only %d\n",sfvalue(f));
@@ -281,7 +281,7 @@ MAIN()
 		terror("Wrong data at bottom2\n");
 	sfread(f,s,5);
 	for(i = 1; i < 10; ++i)
-	{	if(!(s = sfreserve(f,-96,1)) )
+	{	if(!(s = sfreserve(f,-96,SF_LOCKR)) )
 			terror("sfreserve failed at bottom loop\n");
 		if(sfvalue(f) != 100)
 			terror("Expecting3 100 bytes, get only %d\n",sfvalue(f));
@@ -296,20 +296,20 @@ MAIN()
 	sfseek(f,(Sfoff_t)0,0);
 	sfset(f,SF_WRITE,0);
 	sfsetbuf(f,NIL(Void_t*),4096);
-	if(!(s = sfreserve(f,-1,1)) )
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
 		terror("sfreserve failed 11\n");
 	if((n = sfvalue(f)) < 4096)
 		terror("sfvalue is wrong\n");
 	if(sfread(f,s,n-16) != n-16)
 		terror("sfread failed\n");
-	if(!(s = sfreserve(f,-7,1)) )
+	if(!(s = sfreserve(f,-7,SF_LOCKR)) )
 		terror("sfreserve failed 12\n");
 	if(sfvalue(f) < 16 )
 		terror("hmm\n");
 
 	if(!(f = sfopen(0, "", "sr")) )
 		terror("can't open a read string stream");
-	if(!(s = sfreserve(f, 0, 1)) )
+	if(!(s = sfreserve(f, 0, SF_LOCKR)) )
 		terror("can't lock an empty string stream");
 	if(sfread(f,s,0) != 0)
 		terror("can't unlock");
@@ -318,7 +318,7 @@ MAIN()
 
 	if(!(f = sfopen(0, "", "sw")) )
 		terror("can't open a write string stream");
-	if(!(s = sfreserve(f, 0, 1)) )
+	if(!(s = sfreserve(f, 0, SF_LOCKR)) )
 		terror("can't lock an empty string stream");
 	if(sfwrite(f,s,0) != 0)
 		terror("can't unlock");

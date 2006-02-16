@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -83,24 +83,24 @@ MAIN()
 
 	sfputr(f,"1234",'\n');	/* write a string into it */
 	sfseek(f,(Sfoff_t)0,0);		/* get back so we can read the string */
-	s = sfreserve(f,-1,0);
+	s = sfreserve(f,SF_UNBOUND,0);
 	if(sfvalue(f) != 5)
 		terror("Get n=%d, expect n=5\n", sfvalue(f));
 
 	sfseek(f,(Sfoff_t)10,1);	/* seek to extend buffer */
-	if(s = sfreserve(f,-1,0))
+	if(s = sfreserve(f,SF_UNBOUND,0))
 		terror("Get n=%d, expect n=0\n", sfvalue(f));
 
 	sfset(f,SF_READ,0);	/* turn off read mode so stream is write only */
 
 	sfseek(f,(Sfoff_t)(-10),1);	/* back 10 places to get space to write */
-	if(!(s = sfreserve(f,-1,1)) || sfwrite(f,s,0) != 0)
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || sfwrite(f,s,0) != 0)
 		terror("Get n=%d, expect n > 0\n", sfvalue(f));
 	strcpy(s,"5678\n");
 
 	sfset(f,SF_READ,1);
 	sfseek(f,(Sfoff_t)0,0);		/* read 1234\n5678\n */
-	if(!(s = sfreserve(f,-1,1)) || sfread(f,s,0) != 0)
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || sfread(f,s,0) != 0)
 		terror("Get n=%d, expect n > 0\n", sfvalue(f));
 	if(strncmp(s,"1234\n5678\n",10) != 0)
 		terror("Get wrong string\n");
@@ -146,7 +146,7 @@ MAIN()
 	sfdisc(f,SF_POPDISC);
 	if(sfsize(f) != 10)
 		terror("Wrong size\n");
-	s = sfreserve(f,-1,0);
+	s = sfreserve(f,SF_UNBOUND,0);
 	if(sfvalue(f) != 10 || strncmp(s,"1234567890",10) != 0)
 		terror("did not create correct real file\n");
 

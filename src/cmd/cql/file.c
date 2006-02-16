@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1991-2005 AT&T Corp.                  *
+*           Copyright (c) 1991-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -339,7 +339,7 @@ cdb_fs_index(Cdb_t* cdb, register Cdbkey_t* kp, Cdbdisc_t* disc)
 	if ((kv = kp->kv) >= (ke = kp->val + kp->num))
 		return -1;
 	ip = cdb->io;
-	while (s = (unsigned char*)sfreserve(ip, SF_UNBOUND, l = 1))
+	while (s = (unsigned char*)sfreserve(ip, SF_UNBOUND, l = SF_LOCKR))
 	{
 		b = s;
 		n = sfvalue(ip);
@@ -428,7 +428,7 @@ cdb_f_index(Cdb_t* cdb, Cdbkey_t* kp, Cdbdisc_t* disc)
 
 	k = kp->fixed;
 	ip = cdb->io;
-	while (s = (unsigned char*)sfreserve(ip, SF_UNBOUND, l = 1))
+	while (s = (unsigned char*)sfreserve(ip, SF_UNBOUND, l = SF_LOCKR))
 	{
 		b = s;
 		n = sfvalue(ip);

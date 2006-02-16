@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-01-25 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-01-31 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -941,7 +941,7 @@ end
 			H =
 			for L $(R)
 				S := $(L:/-l/+l/)
-				if "$(S:A=.VIRTUAL)"
+				if "$(S:A=.VIRTUAL)" || "$(.PACKAGE.LIBRARY. $(L:/[-+]l//))" == "-l"
 					H += $(L)
 				else
 					H += $(S)
@@ -960,7 +960,7 @@ end
 	if "$(-all-static)"
 		for B $(L)
 			S := $(B:/-l/+l/)
-			if "$(S:A=.VIRTUAL)"
+			if "$(S:A=.VIRTUAL)" || "$(.PACKAGE.LIBRARY. $(B:/[-+]l//))" == "-l"
 				A += $(B)
 			else
 				A += $(S)
@@ -2898,7 +2898,8 @@ PACKAGES : .SPECIAL .FUNCTION
 					else
 						N =
 					end
-				elif N == "dynamic"
+				end
+				if N == "dynamic"
 					library := -l
 					.NO.LIB.TYPE = 1
 				elif N == "license"

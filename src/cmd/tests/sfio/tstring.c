@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -65,12 +65,12 @@ MAIN()
 		terror("Opening string for r/w\n");
 	sfset(f,SF_READ,0);
 	sfseek(f,(Sfoff_t)0,0);
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) || (n = sfvalue(f)) <= 0 ||
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || (n = sfvalue(f)) <= 0 ||
 	   sfwrite(f,s,0) != 0)
 		terror("Buffer size should be positive\n");
 	sfseek(f,(Sfoff_t)(n+8192),0);
 	sfseek(f,(Sfoff_t)0,0);
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) || sfvalue(f) != (n+8192) ||
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || sfvalue(f) != (n+8192) ||
 	   sfwrite(f,s,0) != 0)
 		terror("Bad buffer size\n");
 
@@ -92,7 +92,7 @@ MAIN()
                 sfputc(f,'a');
 	}
 	sfseek(f,(Sfoff_t)0,0);
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) || sfvalue(f) != n+1024 ||
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || sfvalue(f) != n+1024 ||
 	   sfwrite(f,s,0) != 0)
 		terror("Wrong buffer size\n");
 	while(n-- > 0)

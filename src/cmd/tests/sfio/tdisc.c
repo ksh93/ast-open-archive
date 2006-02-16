@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -200,7 +200,7 @@ MAIN()
 	if(!(f = sfopen(NIL(Sfio_t*), tstfile(0),"r")) )
 		terror("Opening file\n");
 	sfdisc(f,&Odisc);
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) )
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
 		terror("Sfreserve failed1\n");
 	if(sfvalue(f) != 6)
 		terror("Wrong reserved length1\n");
@@ -209,13 +209,13 @@ MAIN()
 	if(!(fs = sfopen(NIL(Sfio_t*),"abcdef","s")) )
 		terror("String open failed\n");
 	sfstack(f,fs);
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) )
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
 		terror("Sfreserve failed2\n");
 	if(sfvalue(f) != 6)
 		terror("Wrong reserved length2\n");
 	sfread(f,s,6);
 
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) )
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) )
 		terror("sfreserve failed 3\n");
 	if(sfvalue(f) != 3)
 		terror("Wrong reserved length3\n");

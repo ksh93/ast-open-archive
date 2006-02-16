@@ -1,3 +1,5 @@
+06-02-14 dss.h: always __EXPORT__ dss_lib()
+06-02-02 dssopt.c,dss-print.h: add \fprint\f default print format
 05-09-14 dssopen.c: prevent libraries dict double queue insert
 05-05-09 cx.h: add CX_QUOTEALL
 05-03-08 dss.h: add dssstatic() for static Dsslib_t loading

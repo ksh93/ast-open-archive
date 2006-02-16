@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -64,7 +64,7 @@ MAIN()
 	{	i = (int)(vrandom()%N_WRITER);
 		if(count[i] < N_RECORD)
 		{	r = size[i][count[i]];
-			if(!(s = sfreserve(fw[i],r,1)) || sfvalue(fw[i]) < r )
+			if(!(s = sfreserve(fw[i],r,SF_LOCKR)) || sfvalue(fw[i]) < r )
 				terror("sfreserve fails in process %d\n", i);
 			memcpy(s,record[i],r-1);
 			s[r-1] = '\n';

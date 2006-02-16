@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2006 AT&T Corp.                  *
+*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -265,7 +265,7 @@ compile(void)
 			error_info.file = s;
 			line = error_info.line;
 			error_info.line = 0;
-			while (s = (char*)sfreserve(f, SF_UNBOUND, 1))
+			while (s = (char*)sfreserve(f, SF_UNBOUND, SF_LOCKR))
 			{
 				if (!(n = sfvalue(f)))
 					break;

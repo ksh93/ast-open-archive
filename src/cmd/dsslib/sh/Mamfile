@@ -166,7 +166,7 @@ done ${PACKAGE_ast_INCLUDE}/shell.h
 done dsstype.c
 meta dsstype.o %.c>%.o dsstype.c dsstype
 prev dsstype.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_dsstype -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2006 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dsssh]"\" -D_PACKAGE_ast -c dsstype.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_dsstype -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dsssh]"\" -D_PACKAGE_ast -c dsstype.c
 done dsstype.o generated
 exec - ${AR} cr libkshdsstype.a dsstype.o
 exec - (ranlib libkshdsstype.a) >/dev/null 2>&1 || true

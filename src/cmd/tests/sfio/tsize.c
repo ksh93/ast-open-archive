@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -73,7 +73,7 @@ MAIN()
 	if(sfsize(f) != 20)
 		terror("String size is wrong4\n");
 	sfseek(f,(Sfoff_t)0,0);
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) && sfvalue(f) != 20)
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) && sfvalue(f) != 20)
 		terror("String size is wrong5\n");
 	sfread(f,s,5);
 	if(sfsize(f) != 20)

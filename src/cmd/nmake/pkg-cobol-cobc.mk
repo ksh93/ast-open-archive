@@ -2,7 +2,7 @@
  * open source cobol package setup
  */
 
-COBOLFLAGS = -static $(COBOLDIALECT) -C $(-debug-symbols|"$(CCFLAGS:N=$(CC.DEBUG)|-g)":?$(CC.DEBUG)?$(CC.OPTIMIZE)?)
+COBOLFLAGS = -static $(COBOLDIALECT) -C $(-debug-symbols|"$(CCFLAGS:N=$(CC.DEBUG)|-g)":??$(CC.OPTIMIZE)?)
 COBOLLIBRARIES = -lcob
 
 .COBOL.INIT : .MAKE .VIRTUAL .FORCE .IGNORE

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -95,17 +95,23 @@ E00(int index, Rsobj_t* rp, Rsobj_t* dp, void** data)
 	return state->status;
 }
 
-int E11(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(11, rp, dp, state); }
-int E14(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(14, rp, dp, state); }
-int E15(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(15, rp, dp, state); }
-int E16(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(16, rp, dp, state); }
-int E17(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(17, rp, dp, state); }
-int E21(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(21, rp, dp, state); }
-int E25(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(25, rp, dp, state); }
-int E27(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(27, rp, dp, state); }
-int E31(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(31, rp, dp, state); }
-int E32(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(32, rp, dp, state); }
-int E35(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(35, rp, dp, state); }
-int E37(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(37, rp, dp, state); }
-int E38(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(38, rp, dp, state); }
-int E39(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(39, rp, dp, state); }
+#ifdef __EXPORT__
+#define extern	extern __EXPORT__
+#endif
+
+extern int E11(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(11, rp, dp, state); }
+extern int E14(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(14, rp, dp, state); }
+extern int E15(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(15, rp, dp, state); }
+extern int E16(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(16, rp, dp, state); }
+extern int E17(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(17, rp, dp, state); }
+extern int E21(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(21, rp, dp, state); }
+extern int E25(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(25, rp, dp, state); }
+extern int E27(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(27, rp, dp, state); }
+extern int E31(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(31, rp, dp, state); }
+extern int E32(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(32, rp, dp, state); }
+extern int E35(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(35, rp, dp, state); }
+extern int E37(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(37, rp, dp, state); }
+extern int E38(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(38, rp, dp, state); }
+extern int E39(Rsobj_t* rp, Rsobj_t* dp, void** state) { return E00(39, rp, dp, state); }
+
+#undef	extern

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2006 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -64,9 +64,9 @@ typedef struct _merge_s
 	  { if(rsrv && sfread(mg->f,rsrv,cur-rsrv) != cur-rsrv) { MGSETEOF(mg); action;} \
 	    rsrv = endrsrv = cur = NIL(uchar*); \
 	    rr = r <= RS_RESERVE ? RS_RESERVE : ((r/1024)+1)*1024; \
-	    if(!(rsrv = (uchar*)sfreserve(mg->f,rr,1)) ) \
+	    if(!(rsrv = (uchar*)sfreserve(mg->f,rr,SF_LOCKR)) ) \
 	    { if((rr = sfvalue(mg->f)) < r) { if (rr <= 0) { MGSETEOF(mg); action;} rr = r;} \
-	      if(!(rsrv = (uchar*)sfreserve(mg->f,rr,1)) ) { MGSETEOF(mg); action;} \
+	      if(!(rsrv = (uchar*)sfreserve(mg->f,rr,SF_LOCKR)) ) { MGSETEOF(mg); action;} \
 	    } \
 	    endrsrv = (cur = rsrv) + rr; \
 	  } \
@@ -79,9 +79,9 @@ typedef struct _merge_s
 	  { if(rsrv && sfwrite(rs->f,rsrv,cur-rsrv) != cur-rsrv) { action;} \
 	    rsrv = endrsrv = cur = NIL(uchar*); \
 	    rw = w <= RS_RESERVE ? RS_RESERVE : ((w/1024)+1)*1024; \
-	    if(!(rsrv = (uchar*)sfreserve(rs->f,rw,1)) ) \
+	    if(!(rsrv = (uchar*)sfreserve(rs->f,rw,SF_LOCKR)) ) \
 	    { if((rw = sfvalue(rs->f)) < w) rw = w; \
-	      if(!(rsrv = (uchar*)sfreserve(rs->f,rw,1)) ) { action;} \
+	      if(!(rsrv = (uchar*)sfreserve(rs->f,rw,SF_LOCKR)) ) { action;} \
 	    } \
 	    endrsrv = (cur = rsrv) + rw; \
 	  } \

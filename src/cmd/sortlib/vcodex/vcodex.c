@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2005-2006 AT&T Corp.                  *
+*           Copyright (c) 2005-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -188,6 +188,7 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 			}
 			if (state->verbose)
 				error(0, "sort vcodex encode temporary-%d", tempid(state, data));
+			return 1;
 		}
 		break;
 	case RS_TEMP_READ:
@@ -195,12 +196,11 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 		{
 			if (!state->temporary.size)
 				state->temporary = state->input;
-			if (sfsync((Sfio_t*)data) || !sfdisc((Sfio_t*)data, SF_POPDISC) || sfseek((Sfio_t*)data, (Sfoff_t)0, SEEK_SET))
+			if (!sfdisc((Sfio_t*)data, SF_POPDISC) || sfseek((Sfio_t*)data, (Sfoff_t)0, SEEK_SET))
 			{
 				error(2, "temporary-%d: cannot rewind temporary data", tempid(state, data));
 				return -1;
 			}
-			sfset((Sfio_t*)data, SF_READ, 1);
 			if ((i = sfdcvcodex((Sfio_t*)data, NiL, 0, VC_DECODE)) < 0)
 			{
 				error(2, "temporary-%d: cannot push vcodex decode discipline", tempid(state, data));

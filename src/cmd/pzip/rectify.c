@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -388,7 +388,7 @@ describe(register Sfio_t* dp, char* desc, register Sfio_t* fp, char* file, int v
 			count = number(&s);
 			do
 			{
-				if (!(p = sfreserve(fp, state.typelen, 1)))
+				if (!(p = sfreserve(fp, state.typelen, SF_LOCKR)))
 					break;
 				switch (state.typelen)
 				{
@@ -412,7 +412,7 @@ describe(register Sfio_t* dp, char* desc, register Sfio_t* fp, char* file, int v
 					context = 0;
 				}
 				size = state.type[state.typelast].size;
-				if (!(p = sfreserve(fp, size, state.type[state.typelast].unit != 0)))
+				if (!(p = sfreserve(fp, size, state.type[state.typelast].unit ? SF_LOCKR : 0)))
 					error(ERROR_SYSTEM|3, "cannot read %ld bytes at %I*d", size, sizeof(offset), offset);
 				if (state.type[state.typelast].unit)
 				{

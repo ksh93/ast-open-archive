@@ -145,7 +145,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done sync.c
 meta sync.o %.c>%.o sync.c sync
 prev sync.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2006 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortsync]"\" -c sync.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2003-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortsync]"\" -c sync.c
 done sync.o generated
 make ss.o
 make ss.c

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2006 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -175,6 +175,15 @@ struct _rs_s
 #define rscount(rs)	((rs)->count)	/* count # of rsprocess() objs	*/
 
 _BEGIN_EXTERNS_	/* public data */
+
+#if defined(__EXPORT__)
+#define extern		__EXPORT__
+#endif
+
+extern Rsdisc_t*	rs_disc _ARG_((Rskey_t*, const char*));
+
+#undef	extern
+
 #if _BLD_recsort && defined(__EXPORT__)
 #define extern		extern __EXPORT__
 #endif

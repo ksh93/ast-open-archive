@@ -233,8 +233,13 @@ exec - if	silent test ! -d ${INSTALLROOT}/lib/dss
 exec - then	mkdir -p ${INSTALLROOT}/lib/dss
 exec - fi
 done ${INSTALLROOT}/lib/dss generated
-make ${INSTALLROOT}/lib/dss/netflow-map.dss
+make ${INSTALLROOT}/lib/dss/netflow-cflow.dss
 prev ${INSTALLROOT}/lib/dss
+make data/netflow-cflow.dss
+done data/netflow-cflow.dss
+exec - test '' = 'data/netflow-cflow.dss' || ${STDCMP} 2>/dev/null -s data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss.old 2>/dev/null || true; ${STDCP} data/netflow-cflow.dss ${INSTALLROOT}/lib/dss/netflow-cflow.dss  		    		    ;}
+done ${INSTALLROOT}/lib/dss/netflow-cflow.dss generated
+make ${INSTALLROOT}/lib/dss/netflow-map.dss
 make data/netflow-map.dss
 done data/netflow-map.dss
 exec - test '' = 'data/netflow-map.dss' || ${STDCMP} 2>/dev/null -s data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss || { ${STDMV} ${INSTALLROOT}/lib/dss/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss.old 2>/dev/null || true; ${STDCP} data/netflow-map.dss ${INSTALLROOT}/lib/dss/netflow-map.dss  		    		    ;}

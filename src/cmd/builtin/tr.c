@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2005 AT&T Corp.                  *
+*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -433,7 +433,7 @@ trcopy(Tr_t* tr, Sfio_t* ip, Sfio_t* op, ssize_t ncopy)
 
 	while (nwrite != ncopy)
 	{
-		if (!(inbuff = (unsigned char*)sfreserve(ip, SF_UNBOUND, 1)))
+		if (!(inbuff = (unsigned char*)sfreserve(ip, SF_UNBOUND, SF_LOCKR)))
 		{
 			if (sfvalue(ip))
 			{
@@ -468,7 +468,7 @@ trcopy(Tr_t* tr, Sfio_t* ip, Sfio_t* op, ssize_t ncopy)
 				 * get write buffer space
 				 */
 
-				if (!(outbuff = (unsigned char*)sfreserve(op, (ncopy < 0) ? -1 : (ncopy - nwrite), 1)))
+				if (!(outbuff = (unsigned char*)sfreserve(op, (ncopy < 0) ? SF_UNBOUND : (ncopy - nwrite), SF_LOCKR)))
 					break;
 				outend = (outp = outbuff) + sfvalue(op);
 			}

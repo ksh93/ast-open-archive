@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -703,11 +703,17 @@ _END_EXTERNS_
 #endif
 
 #ifndef VCLIB
+
 #ifdef __STDC__
+#if defined(__EXPORT__)
+#define VCLIB(m)	extern __EXPORT__ Vcmethod_t* vcodex_lib(const char* path) { return &_##m; }
+#else
 #define VCLIB(m)	extern Vcmethod_t* vcodex_lib(const char* path) { return &_##m; }
+#endif
 #else
 #define VCLIB(m)	extern Vcmethod_t* vcodex_lib(path) char* path; { return &_/**/m; }
 #endif
+
 #endif
 
 #endif /*_VCODEX_H*/

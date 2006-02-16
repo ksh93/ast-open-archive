@@ -1,3 +1,4 @@
+06-01-30 od.c: add -tb binary character format
 05-12-06 od.c: handle od() static split buffer overflow
 05-08-07 tr.c: fix a-b- and a-b-c
 05-03-07 od.c: handle -t ...z for --printable

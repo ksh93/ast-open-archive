@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -2077,11 +2077,11 @@ sswrite(Ss_t* ss, Ssfile_t* fp, const char* buf, size_t size)
 			return -1;
 		}
 		z = (r < SS_RESERVE) ? SS_RESERVE : roundof(z, SS_BLOCK);
-		if (!(gp->beg = (unsigned char*)sfreserve(gp->io, z, 1)))
+		if (!(gp->beg = (unsigned char*)sfreserve(gp->io, z, SF_LOCKR)))
 		{
 			if ((z = sfvalue(gp->io)) < r)
 				z = r;
-			if (!(gp->beg = (unsigned char*)sfreserve(gp->io, z, 1)))
+			if (!(gp->beg = (unsigned char*)sfreserve(gp->io, z, SF_LOCKR)))
 			{
 				if (ss->disc->errorf)
 					(*ss->disc->errorf)(NiL, ss->disc, ERROR_SYSTEM|1, "%s: write buffer error", gp->name);

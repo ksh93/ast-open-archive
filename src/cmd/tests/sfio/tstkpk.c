@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -39,7 +39,7 @@ MAIN()
 
 	if(write(fd[1],"ab",2) != 2)
 		terror("Writing ab to pipe\n");
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) || sfvalue(f) != 2)
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || sfvalue(f) != 2)
 		terror("Peeking size1 = %d but should be 2\n", sfvalue(f));
 	sfread(f,s,0);
 	if(strncmp(s,"ab",2) != 0)

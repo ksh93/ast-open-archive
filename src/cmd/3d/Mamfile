@@ -1111,7 +1111,7 @@ exec - 	fi
 exec - 	;;
 exec - esac
 exec - case '${mam_cc_SHELLMAGIC}' in
-exec - "")	case 366 in
+exec - "")	case 379 in
 exec - 	0)	cp 3d.sh 3d
 exec - 		;;
 exec - 	*)	{
@@ -1120,7 +1120,7 @@ exec - 		case $i in
 exec - 		'#!'*|*'||'*|':'*|'":"'*|"':'"*)	echo "$i" ;;
 exec - 		esac
 exec - 		cat - 3d.sh <<'!'
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2006 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
 exec - !
 exec - 		} > 3d
 exec - 		;;
@@ -1128,7 +1128,7 @@ exec - 	esac
 exec - 	;;
 exec - *)	cat - 3d.sh > 3d <<'!'
 exec - ${mam_cc_SHELLMAGIC}
-exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2006 AT&T Corp.][-license?http://www.opensource.org/licenses/cpl1.0.txt]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
+exec - USAGE_LICENSE="[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Eduardo Krell <ekrell@adexus.cl>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt]" IDNAME="3d" VCS=1 FS=1 DEBUG=1 _BLD_cs=1 _BLD_ast=1 _PACKAGE_ast=1 _BLD_dll=1 DEBUG_TABLE=0 PATHCHECK="3d" _BLD_3d=1
 exec - !
 exec - 	;;
 exec - esac

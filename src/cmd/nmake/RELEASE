@@ -1,3 +1,5 @@
+06-02-08 pkg-cobol-cobc.mk: drop -g from COBOLFLAGS
+06-01-31 Makerules.mk: fix :PACKAGE: P:static to honor .PACKAGE.P.library
 06-01-25 Makerules.mk: { -ldl -lm } dynamic unless explicitly overridden
 06-01-21 --- release 5.1 ---
 	 Makerules.mk: fix list.package.binary INSTALLROOT edit

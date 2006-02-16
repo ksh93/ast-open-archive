@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1993-2005 AT&T Corp.                  *
+*           Copyright (c) 1993-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -80,7 +80,7 @@ Sfoff_t huffdecode(register Huff_t *hp,Sfio_t *input,Sfio_t *output,int size)
 		lastid = hp->id;
 	}
 	/* set up output buffers for faster access */
-	if(!(outp=outbuff=(unsigned char*)sfreserve(output,SF_UNBOUND,1)))
+	if(!(outp=outbuff=(unsigned char*)sfreserve(output,SF_UNBOUND,SF_LOCKR)))
 		return(sfvalue(output));
 	n = sfvalue(output);
 	if(size>=0)
@@ -145,7 +145,7 @@ Sfoff_t huffdecode(register Huff_t *hp,Sfio_t *input,Sfio_t *output,int size)
 					sfread(infile, inbuff,inp-inbuff);
 					return(hp->outsize-insize);
 				}
-				if(!(outp=outbuff=(unsigned char*)sfreserve(output,SF_UNBOUND,1)))
+				if(!(outp=outbuff=(unsigned char*)sfreserve(output,SF_UNBOUND,SF_LOCKR)))
 					return(-1);
 				n = sfvalue(output);
 				if(size>0)

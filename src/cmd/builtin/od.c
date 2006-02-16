@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2006 AT&T Corp.                  *
+*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Labs Research) 2005-12-06 $\n]"
+"[-?\n@(#)$Id: od (AT&T Labs Research) 2006-01-30 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files"
@@ -268,6 +268,15 @@ aform(int c)
 }
 
 static char*
+bform(int c)
+{
+	static char	buf[9];
+
+	sfsprintf(buf, sizeof(buf), "%08..2u", c);
+	return buf;
+}
+
+static char*
 cform(int c)
 {
 	register char*	s;
@@ -312,6 +321,10 @@ static const Type_t	type[] =
 {
 	"named character (ASCII 3-characters)",
 	'a',	0,	aform,	csize,	 3,  0,  0,  0,  0
+},
+{
+	"binary character",
+	'b',	0,	bform,	csize,	 8, 0,  0,  0,  0
 },
 {
 	"ASCII character or backslash escape",

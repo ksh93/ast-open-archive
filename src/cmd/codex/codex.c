@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2005 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -215,7 +215,7 @@ main(int argc, register char** argv)
 			ip = 0;
 			continue;
 		case 'i':
-			if (!(buf = sfreserve(ip, CODEX_IDENT, 1)) && !(buf = sfreserve(ip, sfvalue(ip), 1)))
+			if (!(buf = sfreserve(ip, CODEX_IDENT, SF_LOCKR)) && !(buf = sfreserve(ip, sfvalue(ip), SF_LOCKR)))
 				error(ERROR_SYSTEM|3, "read error");
 			if (codexid(buf, sfvalue(ip), ident, sizeof(ident)))
 				sfprintf(op, "%s\n", ident);

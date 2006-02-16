@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -227,6 +227,13 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 		/* name */
 		sfprintf(sp, "%s", state->cx->header ? state->cx->header->name : "unknown-name");
 		return 0;
+	case 'p':
+		/* default print format */
+		if (state->meth && state->meth->print)
+			sfprintf(sp, "\"%s\"", state->meth->print);
+		else
+			sfprintf(sp, "undefined");
+		return 0;
 	case 't':
 		/* type */
 		sfputc(sp, '{');
@@ -300,6 +307,15 @@ dssoptinfo(Opt_t* op, Sfio_t* sp, const char* s, Optdisc_t* dp)
 			if (optout(sp, vp->name, vp->type->name, vp->format.map ? vp->format.map->name : (char*)0, vp->description, NiL))
 				return -1;
 		}
+		break;
+	case 'p':
+		/* default print format */
+		if (!dtsize(state->meth->formats))
+			sfprintf(sp, "[+NOTE::?The \b%s\b method defines no formats.]", state->meth->name);
+		else
+			for (format = (Dssformat_t*)dtfirst(state->meth->formats); format; format = (Dssformat_t*)dtnext(state->meth->formats, format))
+				if (optout(sp, format->name, NiL, NiL, format->description, NiL))
+					return -1;
 		break;
 	}
 	if (sfstrtell(sp) == pos)

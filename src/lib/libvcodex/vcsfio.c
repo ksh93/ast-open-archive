@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -43,9 +43,6 @@ typedef struct _sfdc_s
 	unsigned int	flags;	/* states of the handle		*/
 	int		save;	/* cannot free this yet		*/
 
-	char*		peekbuf;/* sfreserve() peek buffer	*/
-	Vcchar_t*	peek;	/* endb @ last peek		*/
-
 	Sfoff_t		pos;	/* current stream position	*/
 	Vcwindow_t*	vcw;	/* to match delta-comp windows 	*/
 	Vcdisc_t	vcdc;	/* to specify source string	*/
@@ -79,6 +76,7 @@ typedef struct _sfdc_s
 typedef struct _map_s
 {	int		mtid;
 	Vcmethod_t*	meth;
+	char*		name;
 } Map_t;
 
 #if __STD_C
@@ -105,8 +103,11 @@ ssize_t		cdsz;
 		Map[k].mtid = 5;	Map[k++].meth = Vcrle;
 		Map[k].mtid = 6;	Map[k++].meth = Vcmtf;
 		Map[k].mtid = 7;	Map[k++].meth = Vctranspose;
+		Map[k].mtid = 8;	Map[k++].name = "table";
 		Map[k].mtid = 9;	Map[k++].meth = Vchuffpart;
 		Map[k].mtid = 50;	Map[k++].meth = Vcmap;
+		Map[k].mtid = 100;	Map[k++].name = "ama";
+		Map[k].mtid = 101;	Map[k++].name = "ss7";
 		Map[k].mtid = -1;	Map[k++].meth = NIL(Vcmethod_t*);
 	}
 
@@ -117,11 +118,22 @@ ssize_t		cdsz;
 			return -1; /* not enough space - bad! */
 
 		id = vciogetc(&io);
-		for(k = 0; Map[k].mtid >= 0; ++k)
+		for(k = 0;; k++)
+		{
+			if(Map[k].mtid < 0)
+				return dtsz; /* default to new type */
 			if(Map[k].mtid == id)
+			{
+				if(Map[k].name)
+				{	/* implemented as a plugin */
+					Map[k].meth = vcgetmeth(Map[k].name, NIL(char*), NIL(char**));
+					Map[k].name = 0;
+				}
+				if(!Map[k].meth)
+					return -1; /* plugin not found */
 				break;
-		if(Map[k].mtid < 0)
-			return dtsz; /* default to new type */
+			}
+		}
 		mt[n].meth = Map[k].meth;
 		if(vciomore(&io) <= 0)
 			return dtsz;
@@ -286,13 +298,12 @@ ssize_t	size;
 }
 
 #if __STD_C
-static ssize_t fillbuf(Sfdc_t* sfdc, Sfio_t* f, int peek, Sfdisc_t* disc)
+static ssize_t fillbuf(Sfdc_t* sfdc, Sfio_t* f, Sfdisc_t* disc)
 #else
-static ssize_t fillbuf(sfdc, f, peek, disc)
+static ssize_t fillbuf(sfdc, f, disc)
 Sfdc_t*		sfdc;
 Sfio_t*		f;
 Sfdisc_t*	disc;
-int		peek;
 #endif
 {
 	ssize_t	sz, n;
@@ -306,29 +317,9 @@ int		peek;
 		sfdc->endb = (sfdc->code = sfdc->base) + sz;
 	}
 
-	if(sfdc->peekbuf)
-	{	sfread(f, sfdc->peekbuf, 0);
-		sfdc->peekbuf = 0;
-	}
-	if(!peek)
-	{	for(; sz < sfdc->bssz; sz += n, sfdc->endb += n)
-			if((n = sfrd(f, sfdc->endb, sfdc->bssz-sz, disc)) <= 0 )
-				break;
-	}
-	else if((n = sfdc->bssz - sz) > 0)
-	{
-		if(!(sfdc->peekbuf = sfreserve(f, n, SF_LOCKR)))
-		{	if((n = sfvalue(f)) <= 0)
-				return sz;
-			sfdc->bssz = n + sz;
-			if(!(sfdc->peekbuf = sfreserve(f, n, SF_LOCKR)))
-				return sz;
-		}
-		memcpy(sfdc->endb, sfdc->peekbuf, n);
-		sfdc->peek = sfdc->endb;
-		sfdc->endb += n;
-		sz = sfdc->bssz;
-	}
+	for(; sz < sfdc->bssz; sz += n, sfdc->endb += n)
+		if((n = sfrd(f, sfdc->endb, sfdc->bssz-sz, disc)) <= 0 )
+			break;
 
 	return sz;
 }
@@ -348,6 +339,15 @@ int		peek;
 	Vcodex_t	*vc;
 	Vcio_t		io;
 
+	if(peek)
+	{	/* peek and verify header magic -- ignore if no magic */
+		if (!(code = sfreserve(f, 4, SF_LOCKR)))
+			return 0;
+		memcpy(cdbuf, code, 4);
+		sfread(f, code, 0);
+		if(cdbuf[0]!=VC_HEADER0 || cdbuf[1]!=VC_HEADER1 || cdbuf[2]!=VC_HEADER2 || cdbuf[3]!=VC_HEADER3 && cdbuf[3]!=0)
+			return 0;
+	}
 	for(loop = 0;; ++loop)
 	{	
 		/* buffer was too small for header data */
@@ -358,7 +358,7 @@ int		peek;
 		/* read header data as necessary */
 		sz = sfdc->endb - sfdc->code;
 		if(loop > 0 || sz <= 0)
-		{	if(fillbuf(sfdc,f,1,sfdc->vc ? &sfdc->disc : NIL(Sfdisc_t*)) <= 0 )
+		{	if(fillbuf(sfdc, f, sfdc->vc ? &sfdc->disc : NIL(Sfdisc_t*)) <= 0 )
 				return loop ? -1 : 0;
 			if((sz = sfdc->endb - sfdc->code) <= 0 )
 				return loop ? -1 : 0;
@@ -569,7 +569,7 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 		else /* need to decode a new batch of data */
 		{
 			if((d = (sfdc->endb - sfdc->code)) < 2*sizeof(size_t))
-			{	if(fillbuf(sfdc, f, 0, disc) <= 0 )
+			{	if(fillbuf(sfdc, f, disc) <= 0 )
 					break;
 				d = sfdc->endb - sfdc->code;
 			}
@@ -620,7 +620,7 @@ Sfdisc_t*	disc;	/* discipline structure		*/
 				if((m = d+VCSF_SLACK) > sfdc->bssz &&
 				   makebuf(sfdc, m) < 0 )
 					RETURN(-1);
-				if(fillbuf(sfdc, f, 0, disc) <= 0)
+				if(fillbuf(sfdc, f, disc) <= 0)
 					RETURN(-1);
 				if((m = sfdc->endb - sfdc->code) < d )
 					RETURN(-1);
@@ -909,7 +909,8 @@ Vcsfio_t**	handle; /* Vcsfio_t* return		*/
 #if _SFIO_H == 1
 	sfdc->disc.readf   = vcsfdcread;
 	sfdc->disc.writef  = vcsfdcwrite;
-	sfdc->disc.seekf   = vcsfdcseek;
+	if(!handle)
+		sfdc->disc.seekf   = vcsfdcseek;
 	sfdc->disc.exceptf = vcsfdcexcept;
 #endif
 
@@ -984,10 +985,6 @@ Vcsfio_t**	handle; /* Vcsfio_t* return		*/
 		{	status = k;
 			goto error;
 		}
-		if(sfdc->peekbuf)
-		{	sfread(f, sfdc->peekbuf, sfdc->endb - sfdc->peek);
-			sfdc->peekbuf = 0;
-		}
 	}
 
 	/* the discipline was successfully created, now apply it to f */
@@ -1010,10 +1007,7 @@ error:
 	{	if((sfdc->flags&VC_ENCODE) && sfdc->data)
 			free(sfdc->data);
 		if(sfdc->base)
-		{	if(sfdc->peekbuf)
-				sfread(f, sfdc->peekbuf, 0);
 			free(sfdc->base);
-		}
 		if(sfdc->encoding)
 			free(sfdc->encoding);
 		free(sfdc);

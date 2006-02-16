@@ -2177,6 +2177,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+06-02-08 pkg-cobol-cobc.mk: drop -g from COBOLFLAGS
+06-01-31 Makerules.mk: fix :PACKAGE: P:static to honor .PACKAGE.P.library
 06-01-25 Makerules.mk: { -ldl -lm } dynamic unless explicitly overridden
 06-01-21 --- release 5.1 ---
 	 Makerules.mk: fix list.package.binary INSTALLROOT edit
@@ -3400,6 +3402,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+06-01-30 od.c: add -tb binary character format
 05-12-06 od.c: handle od() static split buffer overflow
 05-08-07 tr.c: fix a-b- and a-b-c
 05-03-07 od.c: handle -t ...z for --printable
@@ -4597,6 +4600,10 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+06-02-14 comp/iconv.c: fix uwin iconv_list() /reg/ generator
+06-02-10 port/astconf.c: relax standard prefix filter
+06-02-08 sfrd.c,sfsync.c: lock logic bug fix
+06-02-01 port/astlicense.c: add { parent incorporation }
 06-01-26 port/astconf.c: fix { LIBPREFIX LIBSUFFIX } length
 06-01-06 features/lib: change _UNIV_DEFAULT probe to use cross{...}
 06-01-04 misc/stk.c: fix n**2 realloc behavior
@@ -5905,6 +5912,9 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+06-02-14 tail.c: fix -f bug that lost fast stream data
+06-02-11 getconf.c: exit 1 if name invalid -- duh
+06-01-28 cp.c,rm.c: fix astquery() 'q' to return and not exit()
 05-08-11 fmt.c: fix -o to handle raw --usage strings
 05-05-17 cat.c,head.c: disable EPIPE error messages
 05-04-14 chgrp.c: -f means all non-syntax error messages
@@ -6164,6 +6174,8 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+06-02-14 recsort.h: always __EXPORT__ rs_disc()
+06-02-09 rstemp.c: sfset(SF_READ|SF_WRITE) not needed
 05-12-01 -lsync event callout bug fixes -- finally working?
 05-11-28 rswrite.c: honor RS_OTEXT
 05-11-09 rsmerge.c: fix RS_ITEXT+notify logic
@@ -6880,6 +6892,8 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+06-02-14 dss.h: always __EXPORT__ dss_lib()
+06-02-02 dssopt.c,dss-print.h: add \fprint\f default print format
 05-09-14 dssopen.c: prevent libraries dict double queue insert
 05-05-09 cx.h: add CX_QUOTEALL
 05-03-08 dss.h: add dssstatic() for static Dsslib_t loading
@@ -7232,6 +7246,8 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+06-02-14 vcodex.h: add __EXPORT__ to plugin declaration
+06-02-08 vcsfio.c: simply magic logic by just peeking 4 byte magic
 06-01-24 move private builtin methods to private plugins
 06-01-16 Nmakefile: add PRIVATE for non-cpl methods
 06-01-13 vcgetmeth.c: fix "foo.arg" parse error

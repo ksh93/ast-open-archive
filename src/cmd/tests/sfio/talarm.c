@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -87,7 +87,7 @@ MAIN()
 	Except = 0;
 	signal(SIGALRM,alrmhandler);
 	alarm(2);
-	if(sfreserve(sfstdin,1,1))
+	if(sfreserve(sfstdin,1,SF_LOCKR))
 		terror("Unexpected data\n");
 	if(strcmp(Buf,HANDLER) != 0)
 		terror("Handler wasn't called\n");

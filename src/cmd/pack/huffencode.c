@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1993-2005 AT&T Corp.                  *
+*           Copyright (c) 1993-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -81,7 +81,7 @@ Sfoff_t huffencode(register Huff_t *hp,Sfio_t *infile,Sfio_t *outfile,int size)
 	buffer = hp->buffer;
 	left = hp->left;
 	hp->outsize = 0;
-	if(!(outp=outbuff=(unsigned char*)sfreserve(fp,SF_UNBOUND,1)))
+	if(!(outp=outbuff=(unsigned char*)sfreserve(fp,SF_UNBOUND,SF_LOCKR)))
 		return(-1);
 	outend = outp + sfvalue(fp);
 	do
@@ -132,7 +132,7 @@ static int putbuff(register Sfio_t *fp,register unsigned char *outp)
 	register int n = outp - outbuff;
 	if(sfwrite(fp,outbuff,n)< 0)
 		return(-1);
-	if(!(outbuff=(unsigned char*)sfreserve(fp,SF_UNBOUND,1)))
+	if(!(outbuff=(unsigned char*)sfreserve(fp,SF_UNBOUND,SF_LOCKR)))
 		return(-1);
 	outend = outbuff+(n=sfvalue(fp));
 	return(n);

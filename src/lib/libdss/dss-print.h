@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -43,6 +43,7 @@ USAGE_LICENSE
 "	fields, or a field separator for array fields. The \bdf\b(1),"
 "	\bls\b(1) and \bpax\b(1) commands have \b--format\b options in this"
 "	same style.]"
+"[+?The default print format is \fprint\f.]"
 "\n"
 "\n[ format ]\n"
 "\n";

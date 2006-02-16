@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2006 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -118,7 +118,7 @@ main(int argc, char** argv)
 		switch (REC_M_INDEX(f))
 		{
 		case REC_M_data:
-			if (s = sfreserve(sp, SF_UNBOUND, 1))
+			if (s = sfreserve(sp, SF_UNBOUND, SF_LOCKR))
 			{
 				z = sfvalue(sp);
 				if (fstat(sffileno(sp), &st) || st.st_size < z)
@@ -152,7 +152,7 @@ main(int argc, char** argv)
 				if (b)
 					sfread(sp, b, s - b);
 				o = sftell(sp);
-				if (!(b = sfreserve(sp, m, 1)))
+				if (!(b = sfreserve(sp, m, SF_LOCKR)))
 					break;
 				m = SF_UNBOUND;
 				s = b;

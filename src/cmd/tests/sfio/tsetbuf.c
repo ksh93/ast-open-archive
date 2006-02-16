@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -62,7 +62,7 @@ MAIN()
 	if(!(f = sfnew((Sfio_t*)0,buf,sizeof(buf),fd,SF_WRITE)))
 		terror("Making stream\n");
 
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) || s != buf)
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || s != buf)
 		terror("sfreserve1 returns the wrong pointer\n");
 	sfwrite(f,s,0);
 
@@ -84,7 +84,7 @@ MAIN()
 					i, fd, fd+NEXTFD);
 	}
 
-	if(!(s = sfreserve(f,SF_UNBOUND,1)) || s != buf)
+	if(!(s = sfreserve(f,SF_UNBOUND,SF_LOCKR)) || s != buf)
 		terror("sfreserve2 returns the wrong pointer\n");
 	sfwrite(f,s,0);
 
@@ -93,7 +93,7 @@ MAIN()
 
 	sfsetbuf(f,buf,sizeof(buf));
 
-	if(sfreserve(f,SF_UNBOUND,1) != buf || sfvalue(f) != sizeof(buf) )
+	if(sfreserve(f,SF_UNBOUND,SF_LOCKR) != buf || sfvalue(f) != sizeof(buf) )
 		terror("sfreserve3 returns the wrong value\n");
 	sfwrite(f,s,0);
 

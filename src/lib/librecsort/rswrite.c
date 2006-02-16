@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2006 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -56,9 +56,9 @@
 	  if((endrsrv-cur) < w) \
 	  { if(rsrv && sfwrite(f,rsrv,cur-rsrv) != cur-rsrv) return -1; \
 	    rw = w < RS_RESERVE ? RS_RESERVE : ((w/1024)+1)*1024; \
-	    if(!(rsrv = (uchar*)sfreserve(f,rw,1)) ) \
+	    if(!(rsrv = (uchar*)sfreserve(f,rw,SF_LOCKR)) ) \
 	    { if((rw = sfvalue(f)) < w) rw = w; \
-	      if(!(rsrv = (uchar*)sfreserve(f,rw,1)) ) return -1; \
+	      if(!(rsrv = (uchar*)sfreserve(f,rw,SF_LOCKR)) ) return -1; \
 	    } \
 	    endrsrv = (cur = rsrv) + rw; \
 	  } \

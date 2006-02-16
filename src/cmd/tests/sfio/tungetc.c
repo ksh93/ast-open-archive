@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -36,12 +36,12 @@ MAIN()
 		if(sfungetc(f,n+'0') != n+'0')
 			terror("Ungetc\n");
 
-	if(!(s = sfreserve(f,-1,0)) || sfvalue(f) != 10)
+	if(!(s = sfreserve(f,SF_UNBOUND,0)) || sfvalue(f) != 10)
 		terror("Peek stream1\n");
 	if(strncmp(s,str,10) != 0)
 		terror("Bad data1\n");
 
-	if(!(s = sfreserve(f,-1,0)) || sfvalue(f) != (ssize_t)strlen(alpha))
+	if(!(s = sfreserve(f,SF_UNBOUND,0)) || sfvalue(f) != (ssize_t)strlen(alpha))
 		terror("Peek stream2\n");
 	if(strncmp(s,alpha,strlen(alpha)) != 0)
 		terror("Bad data2\n");
@@ -53,7 +53,7 @@ MAIN()
 	if(sfgetc(f) != '0')
 		terror("Sfgetc\n");
 	sfseek(f,(Sfoff_t)0,0);
-	if(!(s = sfreserve(f,-1,0)) || sfvalue(f) != (ssize_t)strlen(alpha))
+	if(!(s = sfreserve(f,SF_UNBOUND,0)) || sfvalue(f) != (ssize_t)strlen(alpha))
 		terror("Peek stream3\n");
 	if(strncmp(s,alpha,strlen(alpha)) != 0)
 		terror("Bad data2\n");

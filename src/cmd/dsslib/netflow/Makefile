@@ -10,11 +10,11 @@ netflow 1.0 plugin=dss :LIBRARY: netflow.c \
 
 $(INCLUDEDIR) :INSTALLPROTO: netflow.h
 
-$(LIBDIR)/dss :INSTALLDIR: data/netflow-map.dss data/netflow-sample.dss data/ip.map
+$(LIBDIR)/dss :INSTALLDIR: data/netflow-cflow.dss data/netflow-map.dss \
+	data/netflow-sample.dss data/ip.map
 
 $(LIBDIR)/pz :INSTALLDIR: dss-netflow.prt
 
 :TEST: dss
 
-:: RELEASE data/netflow-5.dat data/netflow-txt.dat \
-	data/netflow-map.dss data/ip.map
+:: RELEASE data/netflow-5.dat data/netflow-txt.dat

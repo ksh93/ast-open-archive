@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -134,12 +134,12 @@ MAIN()
 		terror("sfputc to f1\n");
 	if(sfseek(f1,(Sfoff_t)0,0) != 0)
 		terror("sfseek failed on f1\n");
-	if(!(s = sfreserve(f1,3,1)) || sfvalue(f1) != 3)
+	if(!(s = sfreserve(f1,3,SF_LOCKR)) || sfvalue(f1) != 3)
 		terror("sfreserve failed on f1\n");
 	if(memcmp(s,"xyz",3) != 0)
 		terror("Wrong data\n");
 
-	if((os = sfreserve(f2,-1,0)) )
+	if((os = sfreserve(f2,SF_UNBOUND,0)) )
 		terror("sfreserve should have failed on f2\n");
 
 	if(sfpool(NIL(Sfio_t*),f2,0) != f1)
@@ -165,7 +165,7 @@ MAIN()
 		terror("sfpool should fail pooling read+write streams\n");
 	if(sfseek(f1,(Sfoff_t)0,0) != (Sfoff_t)0)
 		terror("sfseek failed\n");
-	if(!(s = sfreserve(f1,3,1)) || memcmp(s,"abc",3) != 0)
+	if(!(s = sfreserve(f1,3,SF_LOCKR)) || memcmp(s,"abc",3) != 0)
 		terror("Can't get data from f1\n");
 
 	TSTEXIT(0);
