@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -331,7 +331,7 @@ save1(char* str, Dt_t** ignore, unsigned long flags)
 			mp = state.msg.list + ip->m_index - 1;
 			touchmsg(mp);
 			sfprintf(state.path.temp, "%s/%d", file, mh.next);
-			temp = sfstruse(state.path.temp);
+			temp = struse(state.path.temp);
 			if (fp = fileopen(temp, "MEw")) {
 				if (copy(mp, fp, ignore, NiL, 0) < 0)
 					note(SYSTEM, "%s", temp);
@@ -616,7 +616,7 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 		cmd = 0;
 		if (state.var.attachments) {
 			sfprintf(state.path.temp, "%s/%s", state.var.attachments, name);
-			name = expand(sfstruse(state.path.temp), 1);
+			name = expand(struse(state.path.temp), 1);
 		}
 		else
 			name = savestr(name);
@@ -630,7 +630,7 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 			s = ap->name;
 		if (!streq(name, ".")) {
 			sfprintf(state.path.temp, "%s/%s", name, s);
-			s = sfstruse(state.path.temp);
+			s = struse(state.path.temp);
 		}
 		name = savestr(s);
 	}
@@ -649,7 +649,7 @@ getatt(register struct part* ap, register char* name, unsigned long flags, off_t
 			sfprintf(state.path.temp, " -o ", name);
 			shquote(state.path.temp, name);
 		}
-		s = sfstruse(state.path.temp);
+		s = struse(state.path.temp);
 		n = 1;
 	}
 	else if (cmd) {
@@ -838,7 +838,7 @@ split1(char* str, Dt_t** ignore, long num, char* dir, int verbose, int flag)
 	for (ip = state.msg.list; ip->m_index; ip++) {
 		mp = state.msg.dot = state.msg.list + ip->m_index - 1;
 		sfprintf(state.path.buf, "%s/%d", dir, num);
-		file = sfstruse(state.path.buf);
+		file = struse(state.path.buf);
 		if (fp = fileopen(file, "Ew")) {
 			if (copy(mp, fp, ignore, NiL, GMIME) < 0)
 				note(SYSTEM, "%s", dir);
@@ -849,7 +849,7 @@ split1(char* str, Dt_t** ignore, long num, char* dir, int verbose, int flag)
 					do {
 						if (!(ap->flags & PART_body)) {
 							sfprintf(state.path.buf, "%s/%d-%d", dir, num, ap->count);
-							file = sfstruse(state.path.buf);
+							file = struse(state.path.buf);
 							if (!getatt(ap, file, 0, &lc, &cc) && verbose)
 								note(PROMPT, " %d-%d %s %s %ld %ld", num, ap->count, ap->name, ap->type, (long)lc, (long)cc);
 						}

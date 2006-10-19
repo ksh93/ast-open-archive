@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -68,7 +68,7 @@ int im_umount(argc, argv)
 	while(argc > 0)
 	{
 		s = *argv;
-		sprintf(buf, "m %s -\n", s);
+		sfsprintf(buf, sizeof(buf), "m %s -\n", s);
 		if (vcs_write(buf) > 0 &&  vcs_read(reply, 1024) > 0)
 		{
 			if (strncmp(reply, "I 0 ok 0", 8) == 0)

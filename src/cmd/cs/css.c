@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,13 +20,13 @@
 #pragma prototyped
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  *
  * css - multiplex multiple clients on one filter server
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: css (AT&T Labs Research) 1998-05-01 $\n]"
+"[-?\n@(#)$Id: css (AT&T Research) 1998-05-01 $\n]"
 USAGE_LICENSE
 "[+NAME?css - multiplex multiple clients on one connect stream server]"
 "[+DESCRIPTION?\bcss\b multiplexes multiple clients on one filter server."
@@ -141,7 +141,9 @@ actionf(register Css_t* css, register Cssfd_t* fp, Cssdisc_t* disc)
 			else
 			{
 				n = sfprintf(state->tmp, "%-.*s%d %s", t - s, s, fp->fd, t);
-				if (cswrite(css->state, state->proc->wfd, sfstruse(state->tmp), n) != n)
+				if (!(s = sfstruse(state->tmp)))
+					return -1;
+				if (cswrite(css->state, state->proc->wfd, s, n) != n)
 					return -1;
 			}
 		}

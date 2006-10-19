@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -22,11 +22,11 @@
  * opaque method
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss opaque method (AT&T Labs Research) 2002-11-22 $\n]"
+"[-1lp0?\n@(#)$Id: dss opaque method (AT&T Research) 2002-11-22 $\n]"
 USAGE_LICENSE
 "[+NAME?opaque - dss opaque method]"
 "[+DESCRIPTION?The \bdss\b opaque method handles anonymous fixed record data.]"

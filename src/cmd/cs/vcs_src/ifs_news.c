@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -41,7 +41,7 @@ char	*cmd, *arg;
 
     if( cmd == NULL )
 	return -1;
-    sprintf( buf, arg ? "%s %s\r\n" : "%s\r\n", cmd, arg );
+    sfsprintf( buf, sizeof(buf), arg ? "%s %s\r\n" : "%s\r\n", cmd, arg );
     NetWrite( nFile, buf, strlen(buf) );
     debug_logit( buf );
     return 0;
@@ -57,7 +57,6 @@ char    *buf;
 int     bsize;
 {
     char        tmpbuf[ STRLEN ];
-    char        token[4];
 
     if( buf == NULL ) {
 	buf = tmpbuf;
@@ -116,7 +115,7 @@ struct server_info *srv;
     }
 
     /* 215 Newsgroups in form "group high low flags". */
-    sprintf( destfile, "%s/._dir", srv->lpath );
+    sfsprintf( destfile, sizeof(destfile), "%s/._dir", srv->lpath );
     MakePath( destfile );
     return NewsXferFile( nFile, destfile );
 }
@@ -156,7 +155,7 @@ char	*lpath;
     if( lpath == NULL )
 	return 0;
 
-    sprintf( buf, "%d-%d", (int)strtol( arg[2], (char**)0, 0 ), (int)strtol( arg[3], (char**)0, 0 ) );
+    sfsprintf( buf, sizeof(buf), "%d-%d", (int)strtol( arg[2], (char**)0, 0 ), (int)strtol( arg[3], (char**)0, 0 ) );
     NewsCommand( nFile, "XOVER", buf );
     if( NewsReply( nFile, NULL, 0 ) != 224 ) {
 	logit( "<news>: xover error\n" );
@@ -165,7 +164,7 @@ char	*lpath;
     }
     
     /* 224 data follows */
-    sprintf( buf, "%s/._dir", lpath );
+    sfsprintf( buf, sizeof(buf), "%s/._dir", lpath );
     MakePath( buf );
     if( NewsXferFile( nFile, buf ) == -1 ) {
 	return -1;
@@ -193,7 +192,6 @@ char	*article;
 {
     struct mount_item	*mitem = srv->mitem;
     NetFile	*nFile = mitem->nFile;
-    char	destfile[ STRLEN ];
 
     if( NewsEnterGroup( srv, group, NULL ) == -1 )
 	return -1;

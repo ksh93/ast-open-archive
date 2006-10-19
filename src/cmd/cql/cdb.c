@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1991-2005 AT&T Corp.                  *
+*           Copyright (c) 1991-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -27,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cdb (AT&T Labs Research) 1999-05-01 $\n]"
+"[-?\n@(#)$Id: cdb (AT&T Research) 1999-05-01 $\n]"
 USAGE_LICENSE
 "[+NAME?cdb - display cql data files]"
 "[+DESCRIPTION?\bcdb\b displays \bcql\b(1) and \bcdb\b(3) data files."
@@ -409,7 +409,11 @@ main(int argc, char** argv)
 						if (output.map)
 						{
 							sfprintf(idb->tmp, "data from %s map=%s", idb->path, output.map);
-							output.disc.comment = sfstruse(idb->tmp);
+							if (!(output.disc.comment = sfstruse(idb->tmp)))
+							{
+								error(ERROR_SYSTEM|2, "out of space");
+								break;
+							}
 						}
 						else
 							output.disc.comment = idb->comment;

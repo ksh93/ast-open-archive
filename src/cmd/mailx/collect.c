@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -236,7 +236,7 @@ deadletter(void)
 
 	if ((s = expand(state.var.dead, 1)) && *s != '/') {
 		sfprintf(state.path.temp, "~/%s", s);
-		s = expand(sfstruse(state.path.temp), 1);
+		s = expand(struse(state.path.temp), 1);
 	}
 	return s;
 }
@@ -581,7 +581,7 @@ collect(struct header* hp, unsigned long flags)
 						sfprintf(state.path.temp, "; rm -f ");
 						shquote(state.path.temp, t);
 					}
-					if (!(fp = pipeopen(sfstruse(state.path.temp), "r")))
+					if (!(fp = pipeopen(struse(state.path.temp), "r")))
 						break;
 				}
 			}

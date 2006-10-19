@@ -1,3 +1,12 @@
+06-10-11 add sfstropen()/sfstruse() error checks
+06-09-19 command.c,cotest.c: sysconf() => astconf()
+06-08-15 shell.c: unset CO_ENV_SHELL
+06-08-11 main.c: handle CO_ENV_MSGFD msgfd != 3
+06-08-11 COSHELL.mk: handle connect=*
+06-08-04 shell.c: handle CO_APPEND for job out|err
+06-06-21 event.c: add --older, --newer, REQ_all
+06-06-18 event.c: add event name pattern match/glob
+06-06-11 event.c,COSHELL.mk: add
 03-03-04 add state.remote=CS_REMOTE_SHELL
 01-12-12 resolve SETSHELL local vs. global conflict -- its both
 	 ignore attr now really ignores host -- duh

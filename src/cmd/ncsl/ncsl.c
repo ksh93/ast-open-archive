@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1994-2005 AT&T Corp.                  *
+*           Copyright (c) 1994-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -29,7 +29,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ncsl (AT&T Labs Research) 1996-10-11 $\n]"
+"[-?\n@(#)$Id: ncsl (AT&T Research) 1996-10-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ncsl - list the number of non-comment source lines for each C file]"
 "[+DESCRIPTION?\bncsl\b lists the number of non-comment source lines for"

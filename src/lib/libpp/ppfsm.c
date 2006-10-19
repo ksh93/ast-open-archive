@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -100,14 +100,14 @@ static struct fsminit	fsminit[] =
 	{	PROTO,	{ C_LET },		NID,			},
 	{	PROTO,	{ 'L' },		LIT,			},
 	{	PROTO,	{ 'd', 'e', 'f', 'i' },	RES1,			},
-	{	PROTO,	{ 'r', 't', 'v', 'w' },	RES1,			},
-	{	PROTO,	{ 'N' },		RES1,			},
+	{	PROTO,	{ 'r', 's', 't', 'v' },	RES1,			},
+	{	PROTO,	{ 'w', 'N' },		RES1,			},
 	{	PROTO,	{ '"', '\'' },		S_LITBEG,		},
 	{	PROTO,	{ '/' },		COM1,			},
 	{	PROTO,	{ '\n' },		S_NL,			},
 	{	PROTO,	{ ' ','\t','\f','\v' },	WS1,			},
 
-/* proto {do,else,extern,for,if,inline,return,typedef,va_start,void,while,NoN} */
+/* proto {do,else,extern,for,if,inline,return,static,typedef,va_start,void,while,NoN} */
 	{	RES1,	{ C_XXX },		S_MACRO,		},
 	{	RES1,	{ C_LET, C_DEC },	NID,			},
 	{	RES1,	{ 'a' },		RES1a,			},
@@ -117,6 +117,7 @@ static struct fsminit	fsminit[] =
 	{	RES1,	{ 'l' },		RES1l,			},
 	{	RES1,	{ 'n' },		RES1n,			},
 	{	RES1,	{ 'o' },		RES1o,			},
+	{	RES1,	{ 't' },		RES1t,			},
 	{	RES1,	{ 'x' },		RES1x,			},
 	{	RES1,	{ 'y' },		RES1y,			},
 
@@ -154,6 +155,11 @@ static struct fsminit	fsminit[] =
 	{	RES1o,	{ C_XXX },		S_RESERVED,		},
 	{	RES1o,	{ C_LET, C_DEC },	NID,			},
 	{	RES1o,	{ 'r','i','d','N' },	RES1o,			},
+
+	/* proto reserved {static} */
+	{	RES1t,	{ C_XXX },		S_RESERVED,		},
+	{	RES1t,	{ C_LET, C_DEC },	NID,			},
+	{	RES1t,	{ 'a','t','i','c' },	RES1t,			},
 
 	/* proto reserved {extern} */
 	{	RES1x,	{ C_XXX },		S_RESERVED,		},
@@ -571,6 +577,7 @@ ppfsm(int op, register char* s)
 	register short*			rp;
 	register struct fsminit*	fp;
 #if !PROTOMAIN
+	char*				t;
 	int				x;
 #endif
 
@@ -715,29 +722,25 @@ ppfsm(int op, register char* s)
 		trigraph['!'] = '|';
 		trigraph['>'] = '}';
 		trigraph['-'] = '~';
-		/*FALLTHROUGH*/
-#else
-		break;
 #endif
+		break;
 
 #if !PROTOMAIN
 
 	case FSM_PLUSPLUS:
 		if (pp.option & PLUSPLUS)
 		{
-			char*	x;
-
 			fsm[COLON1][':'] = ~KEEP(T_SCOPE);
 			fsm[DOT1]['*'] = ~KEEP(T_DOTREF);
 			fsm[MINUS1]['>'] = ARROW1;
 			fsm[COM1]['/'] = COM5;
-			x = "%<:";
+			t = "%<:";
 			for (i = 0; i < TERMINAL; i++)
 			{
 				rp = fsm[i];
 				if (!INCOMMENT(rp) && !INQUOTE(rp))
 				{
-					s = x;
+					s = t;
 					while (c = *s++)
 					{
 						if (rp[c] > 0) rp[c] = ~rp[c];
@@ -746,7 +749,7 @@ ppfsm(int op, register char* s)
 					}
 				}
 			}
-			s = x;
+			s = t;
 			while (c = *s++) setsplice(c);
 		}
 		else
@@ -759,13 +762,16 @@ ppfsm(int op, register char* s)
 		break;
 
 #if COMPATIBLE
+
 	case FSM_COMPATIBILITY:
-		if (s)
+		if (pp.state & COMPATIBILITY)
 		{
 			fsm[HEX1]['e'] = HEX1;
 			fsm[HEX1]['E'] = HEX1;
 			fsm[QNUM]['e'] = QNUM;
 			fsm[QNUM]['E'] = QNUM;
+			fsm[QNUM]['u'] = ~QUAL(QNUM);
+			fsm[QNUM]['U'] = ~QUAL(QNUM);
 		}
 		else
 		{
@@ -773,8 +779,11 @@ ppfsm(int op, register char* s)
 			fsm[HEX1]['E'] = HEX3;
 			fsm[QNUM]['e'] = QEXP;
 			fsm[QNUM]['E'] = QEXP;
+			fsm[QNUM]['u'] = QNUM;
+			fsm[QNUM]['U'] = QNUM;
 		}
 		break;
+
 #endif
 
 	case FSM_QUOTADD:

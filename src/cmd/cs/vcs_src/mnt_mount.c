@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,7 +25,36 @@
  [mount-point prot:/[user[:pass]@]host[:port][/remote-path]]"
 
 char*	getpass();
-char*	checkfs();
+
+/*
+ *	prot:/user:pass@host:port/remote-path
+ */
+
+char* checkfs(data, buf, size)
+	char*	data;
+	char*	buf;
+	int	size;
+{
+	register char*	s;
+	register char*	t;
+	char	psbuf[1024];
+	char*	pass;
+
+	if (!(s = strchr(data, '-')) || s[1] != '@') {
+		strcpy(buf, data);
+		return(buf);
+	}
+	t = strchr( s, '/' );
+	if( t )  *t = '\0';
+	sfsprintf( psbuf, sizeof(psbuf), "passwd (%s): ", data );
+	if( t )  *t = '/';
+	pass = getpass(psbuf);
+	*s = '\0';
+	sfsprintf( buf, size, "%s%s%s", data, pass, s+1 );
+	*s = '-';
+	return( buf );
+}
+
 
 int im_mount_help(s)
 	char*	s;
@@ -93,7 +122,7 @@ int im_mount(argc, argv)
 			return (1);
 		}
 		mpoint = argv[0];
-		if ((mfs = checkfs(argv[1], buf)) == NULL)
+		if ((mfs = checkfs(argv[1], buf, sizeof(buf))) == NULL)
 		{
 			printf("ERROR: %s\n", USAGE);
 			return (1);
@@ -130,7 +159,7 @@ int im_mount(argc, argv)
 		mfs = s;
 		for (s; *s && !isspace(*s); s++);
 		*s = '\0';
-		if ((mfs = checkfs(mfs, mfsbuf)) == NULL)
+		if ((mfs = checkfs(mfs, mfsbuf, sizeof(mfsbuf))) == NULL)
 		{
 			printf("ERROR: %s\n", USAGE);
 			continue;
@@ -145,35 +174,6 @@ int im_mount(argc, argv)
 }
 	
 
-/*
- *	prot:/user:pass@host:port/remote-path
- */
-
-char* checkfs(data, buf)
-	char*	data;
-	char*	buf;
-{
-	register char*	s;
-	register char*	t;
-	char	psbuf[1024];
-	char*	pass;
-
-	if (!(s = strchr(data, '-')) || s[1] != '@') {
-		strcpy(buf, data);
-		return(buf);
-	}
-	t = strchr( s, '/' );
-	if( t )  *t = '\0';
-	sprintf( psbuf, "passwd (%s): ", data );
-	if( t )  *t = '/';
-	pass = getpass(psbuf);
-	*s = '\0';
-	sprintf( buf, "%s%s%s", data, pass, s+1 );
-	*s = '-';
-	return( buf );
-}
-
-
 callmount(fd, mpoint, mfs, reply)
 	int	fd;
 	char*	mpoint;
@@ -181,14 +181,13 @@ callmount(fd, mpoint, mfs, reply)
 	char*	reply;
 {
 	char	buf[1024];
-	int	n;
 
 	memset(buf, 0, sizeof(buf));
 
 	if (mfs == NULL)
-		sprintf(buf, "m - %s\n", mpoint);
+		sfsprintf(buf, sizeof(buf), "m - %s\n", mpoint);
 	else
-		sprintf(buf, "m %s %s\n", mfs, mpoint);
+		sfsprintf(buf, sizeof(buf), "m %s %s\n", mfs, mpoint);
 	if (vcs_write(buf) <= 0 || vcs_read(reply, 1024) <= 0)
 		return (-1);
 	if (strstr(reply, "ok ") != NULL)

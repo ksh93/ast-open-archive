@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -35,9 +35,22 @@
  *	     bits, but that would be one big physical directory
  */
 
+#define _std_strtol	1
+
+#define getdirentries	______getdirentries
+#define sbrk		______sbrk
+
 #include <ast_std.h>
 
+#undef	getdirentries
+#undef	sbrk
+
 #include "dir_3d.h"
+
+#undef	strtol
+#undef	strtoul
+#undef	strtoll
+#undef	strtoull
 
 static int	intercepted;
 

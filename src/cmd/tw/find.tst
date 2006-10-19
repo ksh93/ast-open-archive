@@ -1,5 +1,7 @@
 # tests for the find utility
 
+UMASK 0
+
 function DATA
 {
 	typeset f i j k
@@ -437,11 +439,30 @@ mode/111
 mode/333
 mode/555
 mode/777'
-	EXEC	mode -sort -name -perm -222
-		OUTPUT - 'mode/222
+	EXEC	mode -sort -name -perm -200
+		OUTPUT - 'mode
+mode/222
 mode/333
 mode/666
 mode/777'
+	EXEC	mode -sort -name -perm  200
+		OUTPUT -
+	EXEC	mode -sort -name -perm +200
+		OUTPUT - 'mode
+mode/222
+mode/333
+mode/666
+mode/777'
+	EXEC	mode -sort -name -perm -220
+	EXEC	mode -sort -name -perm  220
+		OUTPUT -
+	EXEC	mode -sort -name -perm +220
+		OUTPUT - 'mode
+mode/222
+mode/333
+mode/666
+mode/777'
+	EXEC	mode -sort -name -perm -222
 	EXEC	mode -sort -name -perm  222
 		OUTPUT - 'mode/222'
 	EXEC	mode -sort -name -perm +222
@@ -451,7 +472,8 @@ mode/333
 mode/666
 mode/777'
 	EXEC	mode -sort -name -perm -333
-		OUTPUT - 'mode/333
+		OUTPUT - 'mode
+mode/333
 mode/777'
 	EXEC	mode -sort -name -perm  333
 		OUTPUT - 'mode/333'
@@ -492,7 +514,8 @@ mode/555
 mode/666
 mode/777'
 	EXEC	mode -sort -name -perm -666
-		OUTPUT - 'mode/666
+		OUTPUT - 'mode
+mode/666
 mode/777'
 	EXEC	mode -sort -name -perm  666
 		OUTPUT - 'mode/666'
@@ -505,9 +528,9 @@ mode/555
 mode/666
 mode/777'
 	EXEC	mode -sort -name -perm -777
-		OUTPUT - 'mode/777'
+		OUTPUT - 'mode
+mode/777'
 	EXEC	mode -sort -name -perm  777
-		OUTPUT - 'mode/777'
 	EXEC	mode -sort -name -perm +777
 		OUTPUT - 'mode
 mode/111

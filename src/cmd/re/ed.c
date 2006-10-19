@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -23,7 +23,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: ed (AT&T Labs Research) 2004-06-08 $\n]"
+"[-?\n@(#)$Id: ed (AT&T Research) 2004-06-08 $\n]"
 USAGE_LICENSE
 "[+NAME?ed - edit text]"
 "[+DESCRIPTION?\bed\b is a line-oriented text editor that has two modes:"
@@ -325,7 +325,9 @@ splice(void)
 				break;
 			}
 		}
-		ed.input = sfstruse(ed.spl) + (ed.input - ed.spbeg);
+		if (!(s = sfstruse(ed.spl)))
+			error(ERROR_SYSTEM|3, "out of space");
+		ed.input = s + (ed.input - ed.spbeg);
 	}
 }
 
@@ -419,7 +421,9 @@ getrec(register Sfio_t* sp, register int delimiter, register int flags)
 	}
 	if (flags & REC_TERMINATE)
 		sfputc(sp, c);
-	return sfstruse(sp);
+	if (!(glob = sfstruse(sp)))
+		error(ERROR_SYSTEM|3, "out of space");
+	return glob;
 }
 
 static void
@@ -886,7 +890,9 @@ exfile(void)
 			sfprintf(ed.buffer.line, "%snewline appended to last line", sep);
 			ed.warn_newline = 0;
 		}
-		error(1, "%s", sfstruse(ed.buffer.line));
+		if (!(sep = sfstruse(ed.buffer.line)))
+			error(ERROR_SYSTEM|3, "out of space");
+		error(1, "%s", sep);
 	}
 	error_info.file = 0;
 }
@@ -952,7 +958,8 @@ handle(void)
 		if (!(ed.iop = sfopen(NiL, b, "w")) && !ed.restricted && (s = getenv("HOME"))) {
 			sfstrseek(ed.buffer.line, 0, SEEK_SET);
 			sfprintf(ed.buffer.line, "%s/%s", s, b);
-			b = sfstruse(ed.buffer.line);;
+			if (!(b = sfstruse(ed.buffer.line)))
+				error(ERROR_SYSTEM|3, "out of space");
 			ed.iop = sfopen(NiL, b, "w");
 		}
 		umask(mask);
@@ -1174,7 +1181,8 @@ shell(void)
 		ed.bytes = 0;
 		ed.lines = 0;
 		sfprintf(ed.buffer.line, " < %s", ed.tmpfile);
-		s = sfstruse(ed.buffer.line);
+		if (!(s = sfstruse(ed.buffer.line)))
+			error(ERROR_SYSTEM|3, "out of space");
 		if (!(ed.iop = sfpopen(NiL, s + 1, "r")))
 			error(ERROR_SYSTEM|2, "%s: cannot execute shell command", s);
 		error_info.file = s;
@@ -1184,7 +1192,9 @@ shell(void)
 		remove(ed.tmpfile);
 	}
 	else {
-		s = sfstruse(ed.buffer.line) + 1;
+		if (!(s = sfstruse(ed.buffer.line)))
+			error(ERROR_SYSTEM|3, "out of space");
+		s++;
 		if (f)
 			putrec(s);
 		if (!(ed.iop = sfpopen(NiL, s, "")))
@@ -1363,13 +1373,16 @@ static void
 join(void)
 {
 	register Line_t*	a1;
+	char*			s;
 
 	nonzero();
 	sfstrseek(ed.buffer.work, 0, SEEK_SET);
 	for (a1 = ed.addr1; a1 <= ed.addr2;)
 		sfputr(ed.buffer.work, lineget((a1++)->offset), -1);
 	a1 = ed.dot = ed.addr1;
-	replace(a1, sfstruse(ed.buffer.work));
+	if (!(s = sfstruse(ed.buffer.work)))
+		error(ERROR_SYSTEM|3, "out of space");
+	replace(a1, s);
 	if (a1 < ed.addr2)
 		rdelete(a1 + 1, ed.addr2);
 }
@@ -1817,7 +1830,8 @@ main(int argc, char** argv)
 		if (*(argv + 1))
 			error(ERROR_USAGE|4, "%s", optusage(NiL));
 		sfprintf(ed.buffer.global, "e %s", *argv);
-		ed.global = sfstruse(ed.buffer.global);
+		if (!(ed.global = sfstruse(ed.buffer.global)))
+			error(ERROR_SYSTEM|3, "out of space");
 	}
 	edit();
 	sfdcslow(sfstdin);

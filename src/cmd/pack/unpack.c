@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1993-2005 AT&T Corp.                  *
+*           Copyright (c) 1993-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,12 +25,12 @@
  * unpack files that have been Huffman encoded
  *
  *   David Korn
- *   AT&T Labs
+ *   AT&T Research
  *
  */
 
 static const char usage_head[] =
-"[-?@(#)$Id: unpack (AT&T Labs Research) 2003-04-28 $\n]"
+"[-?@(#)$Id: unpack (AT&T Research) 2003-04-28 $\n]"
 USAGE_LICENSE
 ;
 
@@ -121,7 +121,8 @@ main(int argc, char *argv[])
 	        sfputr(iop, usage_tail, -1);
 		sfputr(iop, unpack_see_also, -1);
 	}
-	usage = sfstruse(iop);
+	if (!(usage = sfstruse(iop)))
+		error(ERROR_SYSTEM|3, "out of space");
 	
 	while(n = optget(argv,usage)) switch(n)
 	{

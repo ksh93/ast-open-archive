@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1997-2005 AT&T Corp.                  *
+*           Copyright (c) 1997-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -108,7 +108,8 @@ cdbmapopen(Cdb_t* cdb, register const char* s, Cdbmapmeth_t* meth)
 					}
 					break;
 				}
-				b = sfstruse(cdb->tmp);
+				if (!(b = sfstruse(cdb->tmp)))
+					goto nospace;
 				if (e = strchr(b, ':'))
 					*e++ = 0;
 				if (!(meth = cdbgetmap(b)))

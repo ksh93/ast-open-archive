@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.probe (AT&T Research) 2005-03-29
+# @(#)pp.probe (AT&T Research) 2006-09-05
 #
 # C probe for libpp
 #
@@ -172,6 +172,16 @@ echo "#include <inc_next.h>" > inc_next.$src
 mkdir inc0 inc1
 echo "#include_next <inc_next.h>" > inc0/inc_next.h
 echo 'char s[] = "INCLUDE_NEXT";' > inc1/inc_next.h
+echo '# 1 "linefile.i"
+
+# 1 "linefile.i"
+
+int i;' > linefile1.i
+echo '# 1 "linefile.i"
+
+# 1
+
+int i;' > linefile2.i
 echo "int i = 0;" > lineid1.i
 echo '# 1 "t.c"
 int i = 0;' > lineid2.i
@@ -298,6 +308,7 @@ hostedtransition=
 ident=
 import=
 include_next=
+linefile=
 lineid=
 linetype=
 nocatliteral=
@@ -357,6 +368,14 @@ $cc -S ident.$src && grep "$id" ident.s && ident=1
 { $cc -E import.$src | grep aaa ;} && import=1
 
 { $cc -E -Iinc0 -Iinc1 inc_next.$src | grep INCLUDE_NEXT ;} && include_next=1
+
+if	$cc -c linefile1.i
+then	$cc -c linefile2.i
+	case $? in
+	0)	;;
+	*)	linefile=1 ;;
+	esac
+fi
 
 if	$cc -c lineid1.i 2>b
 then	$cc -c lineid2.i 2>e
@@ -578,7 +597,10 @@ exec >&3
 case "$compatibility:$transition:$dollar" in
 ::)	strict=1 ;;
 esac
-echo "/* $cc"
+case $version_stamp in
+?*)	echo "/* $version_stamp" ;;
+*)	echo "/* $cc" ;;
+esac
 echo "*/"
 case $plusplus:$stdc in
 1:?*)	preval="$preval = __STDC__ $stdc ="
@@ -1116,6 +1138,9 @@ case $plusplus in
 esac
 case $mapinclude in
 ?*)	echo "#pragma pp:mapinclude hosted$mapinclude" ;;
+esac
+case $linefile in
+?*)	echo "#pragma pp:linefile" ;;
 esac
 case $lineid in
 ?*)	echo "#pragma pp:lineid line" ;;

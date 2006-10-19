@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -22,7 +22,7 @@
  * data stream scan
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 #include <ast.h>
@@ -31,7 +31,7 @@
 #include <error.h>
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss (AT&T Labs Research) 2003-03-27 $\n]"
+"[-?\n@(#)$Id: dss (AT&T Research) 2003-03-27 $\n]"
 USAGE_LICENSE
 "[+NAME?dss - scan a data stream and apply a select expression to each record]"
 "[+DESCRIPTION?\bdss\b scans a record-oriented data stream, applies a"
@@ -239,7 +239,9 @@ main(int argc, char** argv)
 			while (file = *argv++)
 				if (lib = dsslib(file, DSS_VERBOSE, &disc))
 					dssoptlib(tmp, lib, &disc);
-		error(ERROR_USAGE|4, "%s", opthelp(sfstruse(tmp), "?"));
+		if (!(file = sfstruse(tmp)))
+			error(ERROR_SYSTEM|3, "out of space");
+		error(ERROR_USAGE|4, "%s", opthelp(file, "?"));
 		sfclose(tmp);
 		return error_info.errors != 0;
 	}

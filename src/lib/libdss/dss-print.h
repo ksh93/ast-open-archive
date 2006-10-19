@@ -24,7 +24,7 @@
  */
 
 static const char print_usage[] =
-"[-1l?\n@(#)$Id: dss print query (AT&T Labs Research) 2003-02-19 $\n]"
+"[-1l?\n@(#)$Id: dss print query (AT&T Research) 2003-02-19 $\n]"
 USAGE_LICENSE
 "[+NAME?\findex\f]"
 "[+DESCRIPTION?The \bdss\b \bprint\b query formats and prints the"

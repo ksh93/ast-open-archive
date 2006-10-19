@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -159,7 +159,7 @@ pppush(register int t, register char* s, register char* p, int n)
 				cur->flags |= IN_regular;
 			errno = 0;
 #if PROTOTYPE
-			if (!(pp.option & NOPROTO) && !(pp.test & TEST_noproto) && ((pp.state & (COMPATIBILITY|TRANSITION)) == COMPATIBILITY || (pp.option & PLUSPLUS)) && (cur->buffer = pppopen(NiL, cur->fd, NiL, NiL, NiL, NiL, (PROTO_HEADER|PROTO_RETAIN)|((pp.option & PROTOTYPED) ? PROTO_FORCE : PROTO_PASS)|((pp.mode & MARKC) ? PROTO_PLUSPLUS : 0))))
+			if (!(pp.option & NOPROTO) && !(pp.test & TEST_noproto) && ((pp.state & (COMPATIBILITY|TRANSITION)) == COMPATIBILITY || (pp.option & PLUSPLUS) || (pp.mode & EXTERNALIZE)) && (cur->buffer = pppopen(NiL, cur->fd, NiL, NiL, NiL, NiL, (PROTO_HEADER|PROTO_RETAIN)|(((pp.mode & EXTERNALIZE) || (pp.option & PROTOTYPED)) ? PROTO_FORCE : PROTO_PASS)|((pp.mode & EXTERNALIZE) ? PROTO_EXTERNALIZE : 0)|((pp.mode & MARKC) ? PROTO_PLUSPLUS : 0))))
 			{
 				*(p = cur->buffer - 1) = 0;
 				cur->buffer -= PPBAKSIZ;

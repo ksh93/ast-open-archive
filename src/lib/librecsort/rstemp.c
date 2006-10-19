@@ -50,6 +50,8 @@ Sfio_t*	sp;
 			return 0;
 #endif
 	}
+	else
+		sfresize(sp, 0);
 	if ((rs->events & RS_TEMP_WRITE) && rsnotify(rs, RS_TEMP_WRITE, sp, (Void_t*)0, rs->disc) < 0)
 	{
 		if (!op)

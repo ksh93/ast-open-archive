@@ -1,3 +1,9 @@
+06-09-05 pp.probe: add version stamp comment
+06-06-29 pp.probe: gcc pp:linefile probe (otherwise it can dump!)
+06-06-28 ppproto.c: fix inappropriate __PARAM__ insertion
+06-05-09 pp.tab,ppcontrol.c,ppproto.c: add externalize
+	 ppfsm.c: handle compatibility ul numeric qualifiers
+06-02-28 probe.win32: add wchar_t probe
 06-01-11 pplex.c: fix rpcgen pp:passthrough header splice bug
 05-12-16 pplex.c: fix imake pp:passthrough comment splice bug
 05-09-16 pplib.h: add <string.h> for standalone proto

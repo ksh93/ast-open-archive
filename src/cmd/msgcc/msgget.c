@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2000-2005 AT&T Corp.                  *
+*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,11 +20,11 @@
 #pragma prototyped
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: msgget (AT&T Labs Research) 2001-04-21 $\n]"
+"[-?\n@(#)$Id: msgget (AT&T Research) 2001-04-21 $\n]"
 USAGE_LICENSE
 "[+NAME?msgget - get a message from a message catalog]"
 "[+DESCRIPTION?\bmsgget\b gets the message corresponding to the parameters."

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Labs Research) 2005-02-23 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2006-09-27 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -144,6 +144,7 @@ enum Command
 #define File		(1<<5)
 #define Re		(1<<6)
 #define Stat		(1<<7)
+#define Unit		(1<<8)
 
 struct Args
 {
@@ -391,7 +392,7 @@ const struct Args commands[] =
 	"Reverse the \b-sort\b sense.",
 "silent",	SILENT,		Unary,		0,	0,	0,
 	"Do not warn about inaccessible directories or symbolic link loops.",
-"size",		SIZE,		Num|Stat,	0,	"number[bcgkm]]", 0,
+"size",		SIZE,		Num|Stat|Unit,	0,	"number[bcgkm]]", 0,
 	"File size is \anumber\a units (b: 512 byte blocks, c: characters"
 	" g: 1024*1024*1024 blocks, k: 1024 blocks, m: 1024*1024 blocks.)"
 	" Sizes are rounded to the next unit.",
@@ -646,7 +647,8 @@ print(Sfio_t* sp, void* vp, Sffmt_t* dp)
 		dp->fmt = 's';
 		quotex(tmp, ftw->path, -1);
 		dp->size = sfstrtell(tmp);
-		value->s = sfstruse(tmp);
+		if (!(value->s = sfstruse(tmp)))
+			error(ERROR_SYSTEM|3, "out of space");
 		break;
 	case 'X':
 		dp->fmt = 's';
@@ -658,7 +660,8 @@ print(Sfio_t* sp, void* vp, Sffmt_t* dp)
 			s++;
 		quotex(tmp, s, -1);
 		dp->size = sfstrtell(tmp);
-		value->s = sfstruse(tmp);
+		if (!(value->s = sfstruse(tmp)))
+			error(ERROR_SYSTEM|3, "out of space");
 		break;
 	case 'Y':
 		if (s)
@@ -873,7 +876,7 @@ compile(char** argv, register struct Node* np)
 			if (!(argp->type & Unary))
 			{
 				b = opt_info.arg;
-				switch (argp->type & ~Stat)
+				switch (argp->type & ~(Stat|Unit))
 				{
 				case File:
 					if (streq(b, "/dev/stdout") || streq(b, "/dev/fd/1"))
@@ -888,29 +891,30 @@ compile(char** argv, register struct Node* np)
 						b++;
 					}
 					np->first.u = strtoul(b, &e, 0);
-					switch (*e++)
-					{
-					default:
-						e--;
-						/*FALLTHROUGH*/
-					case 'b':
-						np->third.u = 512;
-						break;
-					case 'c':
-						break;
-					case 'g':
-						np->third.u = 1024 * 1024 * 1024;
-						break;
-					case 'k':
-						np->third.u = 1024;
-						break;
-					case 'm':
-						np->third.u = 1024 * 1024;
-						break;
-					case 'w':
-						np->third.u = 2;
-						break;
-					}
+					if (argp->type & Unit)
+						switch (*e++)
+						{
+						default:
+							e--;
+							/*FALLTHROUGH*/
+						case 'b':
+							np->third.u = 512;
+							break;
+						case 'c':
+							break;
+						case 'g':
+							np->third.u = 1024 * 1024 * 1024;
+							break;
+						case 'k':
+							np->third.u = 1024;
+							break;
+						case 'm':
+							np->third.u = 1024 * 1024;
+							break;
+						case 'w':
+							np->third.u = 2;
+							break;
+						}
 					if (*e)
 						error(1, "%s: invalid character%s after number", e, *(e + 1) ? "s" : "");
 					break;
@@ -1088,7 +1092,9 @@ compile(char** argv, register struct Node* np)
 				regfatal(np->second.re, 3, i);
 			break;
 		case PERM:
-			np->first.l = strperm(b, &e, 0);
+			if (*b == '-' || *b == '+')
+				np->second.l = *b++;
+			np->first.l = strperm(b, &e, -1);
 			if (*e)
 				error(3, "%s: invalid permission expression", e);
 			break;
@@ -1619,7 +1625,8 @@ main(int argc, char** argv)
 		sfputc(sp, '\n');
 	}
 	sfputr(sp, usage2, -1);
-	usage = sfstruse(sp);
+	if (!(usage = sfstruse(sp)))
+		error(ERROR_SYSTEM|3, "out of space");
 	day = now = (unsigned long)time(NiL);
 	output = sfstdout;
 	if (!(topnode = newof(0, struct Node, argc + 1, 0)))

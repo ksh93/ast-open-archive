@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: xargs (AT&T Labs Research) 2005-03-07 $\n]"
+"[-?\n@(#)$Id: xargs (AT&T Research) 2005-03-07 $\n]"
 USAGE_LICENSE
 "[+NAME?xargs - construct arg list and execute command]"
 "[+DESCRIPTION?\bxargs\b constructs a command line consisting of the"
@@ -273,7 +273,8 @@ main(int argc, register char** argv)
 				error_info.line++;
 			arg:
 				c = sfstrtell(sp);
-				s = sfstruse(sp);
+				if (!(s = sfstruse(sp)))
+					error(ERROR_SYSTEM|3, "out of space");
 				if (eof && streq(s, eof))
 					break;
 				if (c || insert)

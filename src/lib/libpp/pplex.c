@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2006 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -824,25 +824,40 @@ ppcpp(void)
 	case S_QUAL:
 		if ((state = NEXT(state)) != LIT1)
 		{
-			PUTCHR(c);
 			rp = fsm[state];
 			bp = ip;
 #if CPP
 			qual = 1;
+#if COMPATIBLE
+			if (!(st & COMPATIBILITY) || c != 'u' && c != 'U')
+#endif
+				PUTCHR(c);
 #else
 			switch (c)
 			{
 			case 'f':
 			case 'F':
 				qual |= N_FLOAT;
+#if COMPATIBLE
+				if (!(st & COMPATIBILITY))
+#endif
+				PUTCHR(c);
 				break;
 			case 'l':
 			case 'L':
 				qual |= N_LONG;
+				PUTCHR(c);
 				break;
 			case 'u':
 			case 'U':
 				qual |= N_UNSIGNED;
+#if COMPATIBLE
+				if (!(st & COMPATIBILITY))
+#endif
+				PUTCHR(c);
+				break;
+			default:
+				PUTCHR(c);
 				break;
 			}
 #endif

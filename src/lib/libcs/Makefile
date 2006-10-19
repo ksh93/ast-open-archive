@@ -19,7 +19,7 @@ HEADERS = cs.h css.h msg.h ast_cs.h cs_lib.h
 $(ID) 3.0 :LIBRARY: RELEASE cs.3 \
 	$(HEADERS) cslib.h csslib.h \
 	csalloc.c csfree.c \
-	csaddr.c csattr.c csauth.c csbind.c cscontrol.c \
+	csaddr.c csattr.c csauth.c csbind.c csclient.c cscontrol.c \
 	csdaemon.c csdata.c csfrom.c csfull.c csinfo.c cslocal.c \
 	csname.c csnote.c csntoa.c csopen.c cspath.c cspeek.c \
 	csping.c cspipe.c cspoll.c csport.c csread.c csrecv.c \

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -109,16 +109,16 @@ struct whod
 #define utmp		utmpx
 #define ut_name		ut_user
 
-#ifdef	UTMPX_FILE
+#if	!defined(UTMP_FILE) && defined(UTMPX_FILE)
 #define UTMP_FILE	UTMPX_FILE
 #endif
-#ifdef	UTMPX_PATH
+#if	!defined(UTMP_PATH) && defined(UTMPX_PATH)
 #define UTMP_PATH	UTMPX_PATH
 #endif
-#ifdef	UTMPX_PATHNAME
+#if	!defined(UTMP_PATHNAME) && defined(UTMPX_PATHNAME)
 #define UTMP_PATHNAME	UTMPX_PATHNAME
 #endif	
-#ifdef	_PATH_UTMPX
+#if	!defined(_PATH_UTMP) && defined(_PATH_UTMPX)
 #define _PATH_UTMP	_PATH_UTMPX
 #endif     
 

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -366,7 +366,7 @@ mimeload(Mime_t* mp, const char* file, unsigned long flags)
 				s += n - 1;
 			}
 			sfwrite(mp->buf, s, e - s);
-			s = sfstruse(mp->buf);
+			s = struse(mp->buf);
 		}
 		if (fp = tokline(s, SF_READ, NiL))
 		{
@@ -559,7 +559,7 @@ expand(Mime_t* mp, register char* s, const char* name, const char* type, const c
 		}
 		break;
 	}
-	return sfstruse(mp->buf);
+	return struse(mp->buf);
 }
 
 /*

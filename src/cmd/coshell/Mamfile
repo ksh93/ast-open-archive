@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-01-21
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -53,53 +53,41 @@ done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_unistd.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_unistd.h dontcare
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 make error?--?old?ethernet?address?at?wrong?offset implicit
 done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_types.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_types.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
+make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/limits.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
-done ${PACKAGE_ast_INCLUDE}/limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_hdr.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_hdr.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -154,7 +142,13 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/coshell.h
 make ${PACKAGE_ast_INCLUDE}/cs.h implicit
 prev ${PACKAGE_ast_INCLUDE}/times.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
 make ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
@@ -170,7 +164,7 @@ done service.h
 done main.c
 meta main.o %.c>%.o main.c main
 prev main.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DPATHCHECK=CO_ID -DDEBUG -D_PACKAGE_ast -c main.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DPATHCHECK=CO_ID -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?coshell]"\" -DDEBUG -D_PACKAGE_ast -c main.c
 done main.o generated
 make job.o
 make job.c
@@ -231,6 +225,49 @@ bind -lcs
 bind -last
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o coshell.svc main.o job.o schedule.o shell.o command.o misc.o init.o ${mam_libcoshell} ${mam_libcs} ${mam_libast}
 done coshell.svc generated
+make event.svc
+make event.o
+make event.c
+make FEATURE/ndbm implicit
+meta FEATURE/ndbm features/%>FEATURE/% features/ndbm ndbm
+make features/ndbm
+done features/ndbm
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/ndbm
+done FEATURE/ndbm generated
+prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
+prev ${PACKAGE_ast_INCLUDE}/tok.h implicit
+make ${PACKAGE_ast_INCLUDE}/swap.h implicit
+make ${PACKAGE_ast_INCLUDE}/int.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/int.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/swap.h
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/regex.h
+prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
+prev ${PACKAGE_ast_INCLUDE}/namval.h implicit
+prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/debug.h implicit
+make ${PACKAGE_ast_INCLUDE}/css.h implicit
+prev ${PACKAGE_ast_INCLUDE}/cs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/css.h
+make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+done ${PACKAGE_ast_INCLUDE}/cdt.h
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+done event.c
+meta event.o %.c>%.o event.c event
+prev event.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1990-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?coshell]"\" -c event.c
+done event.o generated
+make ${mam_libdbm} archive
+done ${mam_libdbm} dontcare virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o event.svc event.o ${mam_libcs} ${mam_libcs} ${mam_libast}
+done event.svc generated
 make ${INSTALLROOT}/lib/cs
 exec - if	silent test ! -d ${INSTALLROOT}/lib/cs
 exec - then	mkdir -p ${INSTALLROOT}/lib/cs
@@ -263,6 +300,16 @@ make coshell.1
 done coshell.1
 exec - test '' = 'coshell.1' || ${STDCMP} 2>/dev/null -s coshell.1 ${INSTALLROOT}/man/man1/coshell.1 || { ${STDMV} ${INSTALLROOT}/man/man1/coshell.1 ${INSTALLROOT}/man/man1/coshell.1.old 2>/dev/null || true; ${STDCP} coshell.1 ${INSTALLROOT}/man/man1/coshell.1  		    		    ;}
 done ${INSTALLROOT}/man/man1/coshell.1 generated
+make ${INSTALLROOT}/bin/event
+prev event.svc
+setv preserve -Dpreserve
+exec - test '' = 'event.svc' || ${STDCMP} 2>/dev/null -s event.svc ${INSTALLROOT}/bin/event || { ${STDMV} ${INSTALLROOT}/bin/event ${INSTALLROOT}/bin/event.old 2>/dev/null || true; ${STDCP} event.svc ${INSTALLROOT}/bin/event  		    		    ;}
+done ${INSTALLROOT}/bin/event generated
+make ${INSTALLROOT}/lib/cs/tcp/event
+exec - if	silent test ! -d ${INSTALLROOT}/lib/cs/tcp/event
+exec - then	mkdir -p ${INSTALLROOT}/lib/cs/tcp/event
+exec - fi
+done ${INSTALLROOT}/lib/cs/tcp/event generated
 make ${INSTALLROOT}/fun
 exec - if	silent test ! -d ${INSTALLROOT}/fun
 exec - then	mkdir -p ${INSTALLROOT}/fun
@@ -281,6 +328,17 @@ done title
 setv mode -Dmode="+x"
 exec - test '' = 'title' || ${STDCMP} 2>/dev/null -s title ${INSTALLROOT}/fun/title || { ${STDMV} ${INSTALLROOT}/fun/title ${INSTALLROOT}/fun/title.old 2>/dev/null || true; ${STDCP} title ${INSTALLROOT}/fun/title  		    		   && chmod ugo+x ${INSTALLROOT}/fun/title ;}
 done ${INSTALLROOT}/fun/title generated
+make ${INSTALLROOT}/lib/make
+exec - if	silent test ! -d ${INSTALLROOT}/lib/make
+exec - then	mkdir -p ${INSTALLROOT}/lib/make
+exec - fi
+done ${INSTALLROOT}/lib/make generated
+make ${INSTALLROOT}/lib/make/COSHELL.mk
+prev ${INSTALLROOT}/lib/make
+make COSHELL.mk
+done COSHELL.mk
+exec - test '' = 'COSHELL.mk' || ${STDCMP} 2>/dev/null -s COSHELL.mk ${INSTALLROOT}/lib/make/COSHELL.mk || { ${STDMV} ${INSTALLROOT}/lib/make/COSHELL.mk ${INSTALLROOT}/lib/make/COSHELL.mk.old 2>/dev/null || true; ${STDCP} COSHELL.mk ${INSTALLROOT}/lib/make/COSHELL.mk  		    		    ;}
+done ${INSTALLROOT}/lib/make/COSHELL.mk generated
 done install virtual
 make test
 done test dontcare virtual

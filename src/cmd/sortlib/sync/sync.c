@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dfsort (AT&T Research) 2005-09-12 $\n]"
+"[-1lp0?\n@(#)$Id: dfsort (AT&T Research) 2006-08-01 $\n]"
 USAGE_LICENSE
 "[+NAME?sync - IBM dfsort discipline]"
 "[+DESCRIPTION?The \bsync\b \bsort\b(1) discipline applies an IBM \bDFSORT\b"
@@ -269,12 +269,19 @@ dfsort(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 	return c;
 }
 
+typedef struct Suf_s
+{
+	char*		base;
+	char*		suff;
+} Suf_t;
+
 static int
 checkmark(Ss_t* ss, char** v, Ssdisc_t* ssdisc)
 {
 	char**		b;
 	char*		s;
 	char*		t;
+	char*		z;
 	size_t		i;
 	size_t		j;
 	size_t		k;
@@ -282,11 +289,12 @@ checkmark(Ss_t* ss, char** v, Ssdisc_t* ssdisc)
 	size_t		n;
 	DIR*		dp;
 	struct dirent*	ep;
+	Suf_t*		sp;
 
 	for (b = v; *b; b++);
 	if (n = b - v)
 	{
-		if (!(b = newof(0, char*, n, 0)))
+		if (!(sp = newof(0, Suf_t, n, 0)))
 			goto bad;
 		for (i = 0; i < n; i++)
 		{
@@ -295,55 +303,65 @@ checkmark(Ss_t* ss, char** v, Ssdisc_t* ssdisc)
 			else
 				s = v[i];
 			if (!strchr(s, '%'))
-				b[i] = s;
+			{
+				sp[i].base = s;
+				sp[i].suff = strrchr(s, '.');
+			}
 		}
 		i = 0;
 		for (;;)
 		{
-			while (i < n && !b[i])
+			while (i < n && !sp[i].base)
 				i++;
 			if (i >= n)
 				break;
-			if (b[i] == v[i])
+			if (sp[i].base == v[i])
 				dp = opendir(".");
-			else if (b[i] == v[i] + 1)
+			else if (sp[i].base == v[i] + 1)
 				dp = opendir("/");
 			else
 			{
-				*(b[i] - 1) = 0;
+				*(sp[i].base - 1) = 0;
 				dp = opendir(v[i]);
-				*(b[i] - 1) = '/';
+				*(sp[i].base - 1) = '/';
 			}
-			k = b[i] - v[i];
+			k = sp[i].base - v[i];
 			if (dp)
 				while (ep = readdir(dp))
 					if (s = strchr(ep->d_name, '%'))
 					{
 						m = s - ep->d_name;
+						z = strrchr(s, '.');
 						for (j = i; j < n; j++)
-							if (b[j] && (b[j] - v[j]) == k && (!k || !memcmp(v[i], v[j], k)) && !memcmp(ep->d_name, b[j], m) && !*(b[j] + m))
+						{
+							if (sp[j].base && (sp[j].base - v[j]) == k && (!k || !memcmp(v[i], v[j], k)) && !memcmp(ep->d_name, sp[j].base, m) && (!sp[j].suff || (sp[j].suff - sp[j].base) < m || z && !strcmp(z, sp[j].suff)))
 							{
-								if (!(t = sfprints("%s%s", v[j], s)) || !(t = strdup(t)))
+								if (v[j] == sp[j].base)
+									t = ep->d_name;
+								else
+									t = sfprints("%-.*s%s", sp[j].base - v[j], v[j], ep->d_name);
+								if (!(t = strdup(t)))
 								{
 									closedir(dp);
 									goto bad;
 								}
 								v[j] = t;
-								b[j] = 0;
+								sp[j].base = 0;
 							}
+						}
 					}
 			for (j = i; j < n; j++)
-				if (b[j] && (b[j] - v[j]) == k && (!k || !memcmp(v[i], v[j], k)))
-					b[j] = 0;
+				if (sp[j].base && (sp[j].base - v[j]) == k && (!k || !memcmp(v[i], v[j], k)))
+					sp[j].base = 0;
 			if (dp)
 				closedir(dp);
 		}
-		free(b);
+		free(sp);
 	}
 	return 0;
  bad:
-	if (b)
-		free(b);
+	if (sp)
+		free(sp);
 	if (ssdisc->errorf)
 		(*ssdisc->errorf)(NiL, ssdisc, 2, "out of space");
 	return -1;
@@ -570,8 +588,6 @@ rs_disc(Rskey_t* key, const char* options)
 		events |= RS_READ;
 	if (ss->file->out || n && !ss->copy || ss->writeexit || ss->file->format != ss->format)
 		events |= RS_WRITE;
-	if (ss->doneexit)
-		events |= RS_POP;
 	if (list)
 	{
 		sslist(ss, sfstdout);

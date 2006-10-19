@@ -1,3 +1,4 @@
+06-10-11 add sfstruse() error checks
 02-03-11 msgcc: fix merge replacement threshhold logic
 	 msggen: convert { \a \b \f \n \r \v } back to C escapes
 	 msgcpp: set pp:modern

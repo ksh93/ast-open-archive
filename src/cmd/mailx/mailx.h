@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -560,6 +560,13 @@ struct linematch {
 #define reset(x)	longjmp(state.jump.sr, x)
 
 /*
+ * <unistd.h> etc encroachment
+ * we asked for extentions -- and now pay for it ...
+ */
+
+#define undelete	mail_undelete
+
+/*
  * The pointers for the string allocation routines,
  * there are NSPACE independent areas.
  * The first holds STRINGSIZE bytes, the next
@@ -1031,6 +1038,7 @@ extern void		sreset(void);
 extern int		start_command(char*, int, int, int, char*, char*, char*);
 extern char*		strlower(char*);
 extern char*		strncopy(char*, const char*, size_t);
+extern char*		struse(Sfio_t*);
 extern void		tempinit(void);
 extern int		top(struct msg*);
 extern void		touchmsg(struct msg*);

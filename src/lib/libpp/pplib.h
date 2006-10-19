@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2006 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -81,15 +81,16 @@
 
 #define PROTO_CLASSIC		(1<<0)	/* classic to prototyped	*/
 #define PROTO_DISABLE		(1<<1)	/* disable conversion		*/
-#define PROTO_FORCE		(1<<2)	/* force even if no magic	*/
-#define PROTO_HEADER		(1<<3)	/* header defines too		*/
-#define PROTO_INCLUDE		(1<<4)	/* <prototyped.h> instead	*/
-#define PROTO_INITIALIZED	(1<<5)	/* internal initialization	*/
-#define PROTO_LINESYNC		(1<<6)	/* force standalone line syncs	*/
-#define PROTO_NOPRAGMA		(1<<7)	/* delete pragma prototyped	*/
-#define PROTO_PASS		(1<<8)	/* pass blocks if no magic	*/
-#define PROTO_PLUSPLUS		(1<<9)	/* extern () -> extern (...)	*/
-#define PROTO_RETAIN		(1<<10)	/* defines retained after close	*/
+#define PROTO_EXTERNALIZE	(1<<2)	/* static fun() => extern fun()	*/
+#define PROTO_FORCE		(1<<3)	/* force even if no magic	*/
+#define PROTO_HEADER		(1<<4)	/* header defines too		*/
+#define PROTO_INCLUDE		(1<<5)	/* <prototyped.h> instead	*/
+#define PROTO_INITIALIZED	(1<<6)	/* internal initialization	*/
+#define PROTO_LINESYNC		(1<<7)	/* force standalone line syncs	*/
+#define PROTO_NOPRAGMA		(1<<8)	/* delete pragma prototyped	*/
+#define PROTO_PASS		(1<<9)	/* pass blocks if no magic	*/
+#define PROTO_PLUSPLUS		(1<<10)	/* extern () -> extern (...)	*/
+#define PROTO_RETAIN		(1<<11)	/* defines retained after close	*/
 #define PROTO_TEST		(1<<12)	/* enable test code		*/
 
 #define PROTO_USER		(1<<13)	/* first user flag		*/

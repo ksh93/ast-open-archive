@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -438,7 +438,8 @@ ppop(int op, ...)
 	case PP_COMPATIBILITY:
 		set(&pp.state, COMPATIBILITY, va_arg(ap, int));
 #if COMPATIBLE
-		ppfsm(FSM_COMPATIBILITY, (pp.state & COMPATIBILITY) ? pp.pass : (char*)0);
+		if (pp.initialized)
+			ppfsm(FSM_COMPATIBILITY, NiL);
 #else
 		if (pp.state & COMPATIBILITY)
 			error(3, "preprocessor not compiled with compatibility dialect enabled [COMPATIBLE]");
@@ -1029,6 +1030,9 @@ ppop(int op, ...)
 			}
 			if (pp.standalone)
 				pp.state |= STANDALONE;
+#if COMPATIBLE
+			ppfsm(FSM_COMPATIBILITY, NiL);
+#endif
 			ppfsm(FSM_PLUSPLUS, NiL);
 			pp.initialized = 1;
 			if (pp.reset.on)

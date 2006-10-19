@@ -225,6 +225,9 @@ TEST 24 'fixed records'
 	EXEC	-R6 fixed%6.dat
 		INPUT fixed%6.dat $'PDQRS\nBCDEF\nCD\nAB'
 	EXEC	-R% fixed%6.dat
+	EXEC	-R% fixed%6.dat -o test.out
+		OUTPUT test%6.out $'BCDEF\nCD\nAB\nPDQRS'
+		OUTPUT -
 	EXEC	fixed%6 fixed%7
 		INPUT fixed%7 $'UVWXYZ'
 		OUTPUT - $'AB
@@ -250,9 +253,15 @@ PDQRS'
 	EXEC	-R% fixed_6
 		OUTPUT - $'AB\nBCDEF\nCD\nPDQRS'
 	EXEC	-R% var
-		INPUT -f var $'%c\x08%c%c-ZZZZZZZ%c\x04%c%c-AAA%c\x05%c%c-QQQQ'
-		OUTPUT -f - $'%c\x08%c%c-ZZZZZZZ%c\x04%c%c-AAA%c\x05%c%c-QQQQ'
+		INPUT -f var $'%c\x0c%c%c-ZZZZZZZ%c\x08%c%c-AAA%c\x09%c%c-QQQQ'
+		OUTPUT -f - $'%c\x08%c%c-AAA%c\x09%c%c-QQQQ%c\x0c%c%c-ZZZZZZZ'
 	EXEC	-R- var
+	EXEC	-R% var -o test.out
+		OUTPUT -f test%v32767.out $'%c\x08%c%c-AAA%c\x09%c%c-QQQQ%c\x0c%c%c-ZZZZZZZ'
+		OUTPUT -
+	EXEC	-R% var%v123.dat -o test.out
+		INPUT -f var%v123.dat $'%c\x0c%c%c-ZZZZZZZ%c\x08%c%c-AAA%c\x09%c%c-QQQQ'
+		OUTPUT -f test%v123.out $'%c\x08%c%c-AAA%c\x09%c%c-QQQQ%c\x0c%c%c-ZZZZZZZ'
 	EXEC	-R6 fixed%6 fixed%7
 		OUTPUT -n - $'BCDEF
 CD
@@ -266,7 +275,7 @@ UVWXYZ'
 		EXIT 1
 	EXEC	-R% flat
 		INPUT flat $'-ZZZZZZZ\n-AAA\n-QQQQQ\n-CCCCCCCCCCCCCCCC'
-		ERROR - $'sort: record format cannot be determined from data sample'
+		ERROR - $'sort: flat: record format cannot be determined from data sample'
 		EXIT 1
 
 TEST 25 'fixed records and fields'

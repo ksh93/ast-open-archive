@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char stats_usage[] =
-"[-1?\n@(#)$Id: dss stats query (AT&T Labs Research) 2003-05-05 $\n]"
+"[-1?\n@(#)$Id: dss stats query (AT&T Research) 2003-05-05 $\n]"
 USAGE_LICENSE
 "[+LIBRARY?\findex\f]"
 "[+DESCRIPTION?The stats query lists the sum, average, unbiased standard"

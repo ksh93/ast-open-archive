@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2005 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -235,7 +235,7 @@ Codexmeth_t	codex_iconv =
 	" destination codesets. One option specifies the decode source or"
 	" encode destination codeset; the implied second codeset defaults"
 	" to \bnative\b.",
-	"[+(version)?codex-iconv (AT&T Labs Research) 2000-05-09]"
+	"[+(version)?codex-iconv (AT&T Research) 2000-05-09]"
 	"[+(author)?Glenn Fowler <gsf@research.att.com>]",
 	CODEX_DECODE|CODEX_ENCODE|CODEX_ICONV,
 	cc_options,

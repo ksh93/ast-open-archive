@@ -1,3 +1,4 @@
 hdr	paths,termios,termio,sgtty
 sys	termios,termio,ioctl,bsdtty,nttyio,filio
-lib	ftruncate,gethostname,tcgetattr,tcgetpgrp termios.h
+lib	tcgetattr,tcgetpgrp termios.h
+lib	ftruncate,gethostname

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1997-2005 AT&T Corp.                  *
+*           Copyright (c) 1997-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -110,13 +110,14 @@ integer2string(Cdbmap_t* map, register Cdbconvert_t* cvt)
 {
 	register char*	s;
 	register int	n;
+	char*		t;
 
 	if (!(cvt->input.data->flags & CDB_INTEGER))
 		return cdbempty(map->odb, cvt->output.data, cvt->output.format, 1);
 	n = cvt->output.data->string.length = (cvt->input.format->flags & CDB_UNSIGNED) ? sfprintf(map->odb->tmp, "%..*lu", cvt->input.format->base, cvt->input.data->number.uinteger) : sfprintf(map->odb->tmp, "%..*ld", cvt->input.format->base, cvt->input.data->number.integer);
-	if (!(s = vmoldof(map->odb->record->vm, 0, char, n, 1)))
+	if (!(s = vmoldof(map->odb->record->vm, 0, char, n, 1)) || !(t = sfstruse(map->odb->tmp)))
 		return cdbnospace(map->odb);
-	cvt->output.data->string.base = (char*)memcpy(s, sfstruse(map->odb->tmp), n + 1);
+	cvt->output.data->string.base = (char*)memcpy(s, t, n + 1);
 	cvt->output.data->flags = CDB_STRING;
 	return 0;
 }
@@ -150,13 +151,14 @@ floating2string(Cdbmap_t* map, register Cdbconvert_t* cvt)
 {
 	register char*	s;
 	register int	n;
+	char*		t;
 
 	if (!(cvt->input.data->flags & CDB_FLOATING))
 		return cdbempty(map->odb, cvt->output.data, cvt->output.format, 1);
 	n = cvt->output.data->string.length = sfprintf(map->odb->tmp, "%g", cvt->input.data->number.floating);
-	if (!(s = vmoldof(map->odb->record->vm, 0, char, n, 1)))
+	if (!(s = vmoldof(map->odb->record->vm, 0, char, n, 1)) || !(t = sfstruse(map->odb->tmp)))
 		return cdbnospace(map->odb);
-	cvt->output.data->string.base = (char*)memcpy(s, sfstruse(map->odb->tmp), n + 1);
+	cvt->output.data->string.base = (char*)memcpy(s, t, n + 1);
 	cvt->output.data->flags = CDB_STRING;
 	return 0;
 }

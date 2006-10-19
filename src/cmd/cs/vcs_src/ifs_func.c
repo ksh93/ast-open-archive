@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -69,7 +69,7 @@ int	len;
     char	fname[ STRLEN ];
 
     if( FileNum == 0 ) {		/* create a security file */
-	sprintf( fname, "/tmp/ifsdata.%d", getpid() );
+	sfsprintf( fname, sizeof(fname), "/tmp/ifsdata.%d", getpid() );
 	if( (FileNum = open( fname, O_RDWR|O_CREAT|O_TRUNC, 0600 )) < 0 )
 	    return -1;
 #ifndef DEBUG
@@ -170,7 +170,7 @@ int	bsize;
 	    strcmp( ent->key, key ) == 0 ) {
 	    if( ent->len > bsize )
 		return -1;
-	    SecurityDataAccess( ent->data, buffer, ent->len );
+	    SecurityDataAccess( integralof(ent->data), buffer, ent->len );
 	    return ent->len;
 	}
 	ent = ent->next;
@@ -276,11 +276,12 @@ int	bsize;
  *name: GetUserFile
  */
 char *
-GetUserFile( buf, fname )
-char	*buf;
+GetUserFile( fname, buf, size )
 char	*fname;
+char	*buf;
+int	size;
 {
-    sprintf( buf, "/tmp/ifs.%s", fmtuid(getuid()) );
+    sfsprintf( buf, size, "/tmp/ifs.%s", fmtuid(getuid()) );
     mkdir( buf, S_IRWXU|S_IRWXG|S_IROTH|S_IXOTH );
     strcat( buf, "/" );
     strcat( buf, fname );
@@ -300,7 +301,7 @@ char	*msg;
     if( flog == 0 ) {
 	char	logfile[ 256 ];
 
-	GetUserFile( logfile, "vcs.log" );
+	GetUserFile( "vcs.log", logfile, sizeof(logfile) );
 	flog = open( logfile, O_WRONLY|O_APPEND, 0600 );
     }
     if( flog > 0 ) {

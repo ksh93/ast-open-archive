@@ -24,14 +24,17 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortvcodex (AT&T Research) 2005-11-09 $\n]"
+"[-1lp0?\n@(#)$Id: sortvcodex (AT&T Research) 2006-05-23 $\n]"
 USAGE_LICENSE
 "[+NAME?sortvcodex - sort io vcodex discipline library]"
 "[+DESCRIPTION?The \bsortvcodex\b \bsort\b(1) discipline encodes and/or "
     "decodes input, output and temporary file data. By default temporary and "
     "output encoding is the same as the encoding used on the first encoded "
     "input file. Output encoding is only applied to the standard output or "
-    "to files with a path suffix containing 'z'.]"
+    "to files with a path suffix containing 'z'. If encoding is applied to "
+    "a regular output file and the output file path does not have a suffix "
+    "containing 'z' and the input path has a suffix containing 'z' then the "
+    "output path is renamed by appending the input path suffix.]"
 "[i:input?Decode the input files using \amethod\a. \b--noinput\b "
     "disables input encoding.]:[method]"
 "[o:output?Encode the output file using \amethod\a. \b--nooutput\b "
@@ -48,6 +51,7 @@ USAGE_LICENSE
 
 #include <ast.h>
 #include <error.h>
+#include <ls.h>
 #include <recsort.h>
 #include <vcsfio.h>
 
@@ -65,6 +69,7 @@ typedef struct Encoding_s
 {
 	Vcsfmeth_t*	list;
 	ssize_t		size;
+	char		suffix[16];
 } Encoding_t;
 
 typedef struct State_s
@@ -80,18 +85,22 @@ typedef struct State_s
 } State_t;
 
 #define tempid(s,f)	((s)->regress?(++(s)->regress):sffileno((Sfio_t*)(f)))
+#define ZIPSUFFIX(p,s)	((s = strrchr(p, '.')) && strchr(s, 'z') && !strchr(s, '/'))
 
 static int
 zipit(const char* path)
 {
 	char*	s;
 
-	return !path || (s = strrchr(path, '.')) && strchr(s, 'z') && !strchr(s, '/');
+	return !path || ZIPSUFFIX(path, s);
 }
 
 static int
 encode(State_t* state, Sfio_t* sp, const char* path)
 {
+	char*		p;
+	struct stat	st;
+
 	if (!vcsfmeth(sp, NiL))
 	{
 		if (!state->output.size)
@@ -100,6 +109,14 @@ encode(State_t* state, Sfio_t* sp, const char* path)
 		{
 			error(2, "%s: cannot push vcodex encode discipline", path);
 			return -1;
+		}
+		if (!ZIPSUFFIX(path, p) && *state->input.suffix && !stat(path, &st) && S_ISREG(st.st_mode))
+		{
+			p = sfprints("%s%s", path, state->input.suffix);
+			if (rename(path, p))
+				error(ERROR_SYSTEM|1, "%s: cannot rename to %s", path, p);
+			else
+				path = (const char*)p;
 		}
 		if (state->verbose)
 			error(0, "sort vcodex encode %s", path);
@@ -111,6 +128,7 @@ static int
 vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 {
 	int		i;
+	char*		s;
 	Delay_t*	delay;
 	State_t*	state = (State_t*)disc;
 
@@ -168,11 +186,13 @@ vcodex(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 							if (!i && state->input.size > 0 && !sfseek(delay->sp, (Sfoff_t)0, SEEK_CUR))
 								i = encode(state, delay->sp, delay->name);
 							state->delay = delay->next;
-							free(state->delay);
+							free(delay);
 						}
 						return i;
 					}
 				}
+				if (!*state->input.suffix && ZIPSUFFIX(arg, s))
+					strncopy(state->input.suffix, s, sizeof(state->input.suffix));
 			}
 		}
 		break;

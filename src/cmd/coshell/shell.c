@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -61,24 +61,32 @@ shellopen(register Coshell_t* sp, int fd)
 
 	if (!sp)
 	{
-		if (fd >= 0) error(ERROR_OUTPUT|2, fd, "host not found");
+		if (fd >= 0)
+			error(ERROR_OUTPUT|2, fd, "host not found");
 	}
-	else if (sp->fd || sp == &state.wait) return(0);
+	else if (sp->fd || sp == &state.wait)
+		return 0;
 	else
 	{
 		update(sp);
 		if (sp->stat.up < 0)
 		{
-			if (fd >= 0) error(ERROR_OUTPUT|2, fd, "%s: host is down", sp->name);
-			return(-1);
+			if (fd >= 0)
+				error(ERROR_OUTPUT|2, fd, "%s: host is down", sp->name);
+			return -1;
 		}
-		xp = sfstropen();
-		vp = sfstropen();
+		if (!(xp = sfstropen()) || !(vp = sfstropen()))
+		{
+			if (xp)
+				vp = 0;
+			goto nospace;
+		}
 		sfprintf(xp, sp->shell[0] ? sp->shell : state.sh, sp->type);
-		sh = sfstruse(xp);
+		if (!(sh = sfstruse(xp)))
+			goto nospace;
 		if (sp == state.shell)
 		{
-			sfprintf(vp, "%s=%s %s=%s %s=%s COINIT='%s' %s /dev/fd/4 >/dev/null 2>&1 3<%s 4<&3 5>&- 6>&- 7>&- 8>&- 9>&- &", CO_ENV_HOST, sp->name, CO_ENV_TYPE, sp->type, CO_ENV_SHELL, opt_info.argv[0], (sp->flags & SETRATING) ? "rating=0;" : "", sh, state.mesg);
+			sfprintf(vp, "%s=%s %s=%s %s='%s %s' COINIT='%s' %s /dev/fd/4 >/dev/null 2>&1 3<%s 4<&3 5>&- 6>&- 7>&- 8>&- 9>&- &", CO_ENV_HOST, sp->name, CO_ENV_TYPE, sp->type, CO_ENV_SHELL, opt_info.argv[0], state.service, (sp->flags & SETRATING) ? "rating=0;" : "", sh, state.mesg);
 			av[0] = "sh";
 			av[1] = "-c";
 		}
@@ -88,22 +96,28 @@ shellopen(register Coshell_t* sp, int fd)
 			av[0] = sh = state.remote;
 			av[1] = sp->name;
 		}
-		av[2] = sfstruse(vp);
+		if (!(av[2] = sfstruse(vp)))
+			goto nospace;
 		av[3] = 0;
 		message((-2, "%s %s \"%s\"", sh, av[1], av[2]));
 		if (!(proc = procopen(sh, av, NiL, NiL, 0)))
 		{
-			if (fd >= 0) error(ERROR_OUTPUT|2, fd, "%s: cannot exec shell", sh);
-			return(-1);
+			if (fd >= 0)
+				error(ERROR_OUTPUT|2, fd, "%s: cannot exec shell", sh);
+			sfstrclose(xp);
+			sfstrclose(vp);
+			return -1;
 		}
 		message((-1, "%s: open shell pid=%d", sp->name, proc->pid));
 		sp->flags &= ~DEF;
 		sp->fd = -proc->pid;
 		sp->start = cs.time;
-		if (sp->update > cs.time + UPDATE) sp->update = cs.time + UPDATE;
+		if (sp->update > cs.time + UPDATE)
+			sp->update = cs.time + UPDATE;
 		if (sp->mode & SHELL_OVERRIDE)
 		{
-			if (!sp->override) state.override++;
+			if (!sp->override)
+				state.override++;
 			sp->override = cs.time + (sp->home ? HOME : OVERRIDE);
 		}
 		state.shellwait++;
@@ -111,9 +125,17 @@ shellopen(register Coshell_t* sp, int fd)
 		procfree(proc);
 		sfstrclose(xp);
 		sfstrclose(vp);
-		return(0);
+		return 0;
 	}
-	return(-1);
+	return -1;
+ nospace:
+	if (fd >= 0)
+		error(ERROR_OUTPUT|2, fd, "out of space");
+	if (xp)
+		sfstrclose(xp);
+	if (vp)
+		sfstrclose(vp);
+	return -1;
 }
 
 /*
@@ -194,6 +216,7 @@ shellexec(Cojob_t* jp, char* msg, int fd)
 	char*			att;
 	char*			env;
 	char*			end;
+	char*			red;
 	Coattr_t		attr;
 
 	attr.set = attr.global.set = 0;
@@ -288,6 +311,7 @@ shellexec(Cojob_t* jp, char* msg, int fd)
 	}
 	jp->pid = START;
 	jp->ref = 1;
+	red = (flags & CO_APPEND) ? ">>" : ">";
 	sfprintf(state.string, "{\ntrap 'set %s$?; trap \"\" 0; print -u3 x %d $1 $(times); 3>&-; exit $1' 0 HUP INT QUIT TERM%s\n",
 		(flags & CO_SILENT) ? "" : "+x ",
 		jp - state.job,
@@ -313,7 +337,7 @@ shellexec(Cojob_t* jp, char* msg, int fd)
 	}
 	sfprintf(state.string, "%s\ntypeset -i%d ___=${!:-$$}\nexport %s=%..*u${___#%d#}\neval '%s", env ? env : "", TEMPBASE, CO_ENV_TEMP, TEMPBASE, sp->addr, TEMPBASE, (flags & CO_SILENT) ? "" : "set -x\n");
 	if (act) quote(state.string, act);
-	sfprintf(state.string, "\n'\n} </dev/null >");
+	sfprintf(state.string, "\n'\n} </dev/null %s", red);
 
 	/*
 	 * NOTE: state.pump could be replaced by remote /dev/tty*
@@ -321,12 +345,16 @@ shellexec(Cojob_t* jp, char* msg, int fd)
 
 	if (!out && !(out = con[fd].info.user.pump)) out = state.pump;
 	else if (*out != '/' && *out != '&') sfprintf(state.string, "%s/", pwd);
-	sfprintf(state.string, "%s 2>", out);
+	sfprintf(state.string, "%s 2%s", out, red);
 	if (!err && !(err = con[fd].info.user.pump)) err = state.pump;
 	else if (*err != '/' && *err != '&') sfprintf(state.string, "%s/", pwd);
 	sfprintf(state.string, "%s &\nprint -u3 j %d $!\n", err, jp - state.job);
 	n = sfstrtell(state.string);
-	s = sfstruse(state.string);
+	if (!(s = sfstruse(state.string)))
+	{
+		error(ERROR_OUTPUT|2, con[fd].info.user.fds[2], "out of space");
+		goto nojob;
+	}
 	message((-5, "job: %s", s));
 	if (cswrite(sp->fd, s, n) != n)
 	{

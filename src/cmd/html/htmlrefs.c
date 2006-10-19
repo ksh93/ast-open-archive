@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,11 +20,11 @@
 #pragma prototyped
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: htmlrefs (AT&T Labs Research) 2005-02-22 $\n]"
+"[-?\n@(#)$Id: htmlrefs (AT&T Research) 2006-05-01 $\n]"
 USAGE_LICENSE
 "[+NAME?htmlrefs - list html url references]"
 "[+DESCRIPTION?\bhtmlrefs\b lists url references from the"
@@ -97,7 +97,8 @@ USAGE_LICENSE
 "	directory are considered referenced; \b--strict\b considers"
 "	unreferenced \b--index\b files unreferenced.]"
 "[S:symlink?Instruct \b--copy\b to \bsymlink\b(2) files that do not contain"
-"	\b<!--INTERNAL-->\b ... \b<!--/INTERNAL-->\b.]"
+"	\b<!--INTERNAL-->\b ... \b<!--/INTERNAL-->\b or are not in"
+"	\b/cgi-bin/\b.]"
 "[u:user?\b~\b\aname\a translates to the \b--root\b"
 "	directory.]:[name:=caller-uid]"
 "[v:verbose?List files as they are copied (see \b--copy\b.)]"
@@ -136,14 +137,15 @@ USAGE_LICENSE
 
 #define CHECKED			0x001
 #define COPIED			0x002
-#define DIRECTORY		0x004
-#define EXTERNAL		0x008
-#define FILTER			0x010
-#define INTERNAL		0x020
-#define MISSING			0x040
-#define SCANNED			0x080
-#define SECURE			0x100
-#define VERBOSE			0x200
+#define COPY			0x004
+#define DIRECTORY		0x008
+#define EXTERNAL		0x010
+#define FILTER			0x020
+#define INTERNAL		0x040
+#define MISSING			0x080
+#define SCANNED			0x100
+#define SECURE			0x200
+#define VERBOSE			0x400
 
 #define HIT			(-1)
 #define MISS			(-2)
@@ -1047,6 +1049,8 @@ main(int argc, char** argv)
 					ts.st_mtime = 0;
 					ts.st_mode = 0;
 				}
+				if (strmatch(p, "*/cgi-bin/*|*.cgi"))
+					fp->flags |= COPY;
 				if (!state->exec)
 				{
 					if (fp->flags & DIRECTORY)
@@ -1058,7 +1062,7 @@ main(int argc, char** argv)
 					{
 						if (fp->flags & FILTER)
 							sfprintf(sfstdout, "filter %s\n", p);
-						else if (state->symlink)
+						else if (state->symlink && !(fp->flags & COPY))
 							sfprintf(sfstdout, "  link %s\n", p);
 						else
 							sfprintf(sfstdout, "  copy %s\n", p);
@@ -1074,7 +1078,7 @@ main(int argc, char** argv)
 							error(ERROR_SYSTEM|2, "%s: cannot create directory", p);
 					}
 				}
-				else if (state->symlink && !(fp->flags & FILTER))
+				else if (state->symlink && !(fp->flags & (COPY|FILTER)))
 				{
 					if (st.st_mtime != ts.st_mtime)
 					{

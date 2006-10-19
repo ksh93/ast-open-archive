@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -52,6 +52,7 @@ _END_EXTERNS_
 #define ulong		unsigned long
 
 /* default window size - Chosen to suit malloc() even on 16-bit machines. */
+#undef	MAXINT
 #define MAXINT		((int)(((uint)~0) >> 1))
 #define MAXWINDOW	((int)(((uint)~0) >> 2))
 #define DFLTWINDOW	(MAXWINDOW <= (1<<14) ? (1<<14) : (1<<16) )

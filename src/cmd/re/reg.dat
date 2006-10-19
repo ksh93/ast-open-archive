@@ -458,8 +458,8 @@ E$	(?m)a.b		a\nb		NOMATCH
 E$	(?m)^b		a\nb		(2,3)
 E$	(?n)a.b		a\nb		BADRPT
 E$	(?n)^b		a\nb		BADRPT
-E$	(?p)a.b		a\nb		BADRPT
-E$	(?p)^b		a\nb		BADRPT
+E$	(?p)a.b		a\nb		(0,3)
+E$	(?p)^b		a\nb		NOMATCH
 E	(?q)a+b		a+b		BADRPT
 En$	(?s)a.b		a\nb		(0,3)
 Ex$	(?t)a b		a b		BADRPT

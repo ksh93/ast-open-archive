@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -31,7 +31,6 @@ rscs_out(int argc, char** argv, char* ret, int* n)
 	rfile_t			rf;
 	version_t		vs;
 	attr_t			attr;
-	struct stat		stbuf;
 	tag_t			tag;
 	rdirent_t*		list;
 	register struct stat*	st;

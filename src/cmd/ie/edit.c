@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -42,7 +42,7 @@
 #   define SIG_NORESTART	1
 #   define _sobuf	ed_errbuf
     extern char ed_errbuf[];
-    const char e_version[] = "\n@(#)$Id: edit library (AT&T Labs Research) 1988-11-16 i $\0\n";
+    const char e_version[] = "\n@(#)$Id: edit library (AT&T Research) 1988-11-16 i $\0\n";
 #endif	/* KSHELL */
 #include	"history.h"
 #include	"edit.h"
@@ -968,7 +968,9 @@ ed_getchar()
 #endif /* KSHELL */
 		nchar = 1;
 	/* Set 'i' to indicate read failed, in case intr set */
+#ifdef MULTIBYTE
 retry:
+#endif /* MULTIBYTE */
 	i = -1;
 	errno = 0;
 	editb.e_inmacro = 0;

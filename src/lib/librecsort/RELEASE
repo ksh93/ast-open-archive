@@ -1,3 +1,8 @@
+06-07-17 rsprocess.c: re-key after RS_READ calout
+06-06-29 rsprocess.c: set obj key,keylen before RS_READ
+06-05-10 rsmerge.c: (car) caught 2 more missing RS_WRITE callouts!
+06-04-20 rsmerge.c: no RS_WRITE events for intermediate merge -- doh
+06-04-19 finally fixed multi-level merge v record format bugs
 06-02-14 recsort.h: always __EXPORT__ rs_disc()
 06-02-09 rstemp.c: sfset(SF_READ|SF_WRITE) not needed
 05-12-01 -lsync event callout bug fixes -- finally working?

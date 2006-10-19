@@ -91,7 +91,7 @@ TEST 01 'basics'
 	EXEC --nosummary -x pax -wvf t.pax -o 'uid:=010000000 gid:=07777777' aha
 
 	EXEC --nosummary -vf t.pax --listformat='%(uid)d %(gid)d %(path)s'
-		OUTPUT - $'2097152 2097151 aha'
+		OUTPUT - $'10000000 7777777 aha'
 		ERROR -
 
 	EXEC --nosummary -x pax -wvf t.pax -o 'uname=bozo gname=bigtop' aha
@@ -107,7 +107,7 @@ TEST 01 'basics'
 		ERROR - $'aha'
 
 	EXEC --nosummary -vf t.pax --listformat='%(uname)s/%(uid)d %(gname)s/%(gid)d %(path)s'
-		OUTPUT - $'bozo/2097152 bigtop/2097151 aha'
+		OUTPUT - $'bozo/10000000 bigtop/7777777 aha'
 		ERROR -
 
 TEST 02 'archive format conversion'
@@ -590,9 +590,7 @@ TEST 08 'all in one test (ustar-all-quicktest.tar from the star tests)'
 	EXEC --nosummary -rvf $data/star-test.dat
 		INPUT -
 		OUTPUT -
-		ERROR - $'pax: warning: 0-type-old-file: mode --------T not set
-0-type-old-file
-pax: warning: 0-type-regular-file: mode --------T not set
+		ERROR - $'0-type-old-file
 0-type-regular-file
 1-type-hardlink == 0-type-regular-file
 2-type-symlink -> file
@@ -615,9 +613,9 @@ pax: 4-type-bdev-s: cannot create block special file
 
 	PROG tw -L -e sort:name -e "name=='[a-z0-9]*'" ls -d --testdate=2003-08-11+12:34:56 --format="$testformat"
 		OUTPUT - $'2002-06-18+19:40:48 -rw-r--r--        0 0-jörg-signed
-1994-06-15+16:31:04 -rw-r--r--     1024 0-type-old-file
-1994-06-15+16:31:16 -rw-r--r--     1024 0-type-regular-file
-1994-06-15+16:31:16 -rw-r--r--     1024 1-type-hardlink
+1994-06-15+16:31:04 -rw-r--r-T     1024 0-type-old-file
+1994-06-15+16:31:16 -rw-r--r-T     1024 0-type-regular-file
+1994-06-15+16:31:16 -rw-r--r-T     1024 1-type-hardlink
 2003-08-11+12:34:56 drwxrwxrwx        0 12345678901234
 2003-08-11+12:34:56 drwxrwxrwx        0 12345678901234/12345678901234
 2003-08-11+12:34:56 drwxrwxrwx        0 12345678901234/12345678901234/12345678901234
@@ -742,26 +740,26 @@ TEST 10 'tar format details'
 
 	EXEC --nosummary -x pax --uid:=01234567 --gid:=01234567 -wf t.pax aha
 
-	PROG dd silent=1 from=ascii bs=1 skip=1132 count=16 if=t.pax
-		OUTPUT -n - $'1234567 1234567 '
+	EXEC --nosummary --listformat='%(uid)d %(gid)d' --file=t.pax
+		OUTPUT - $'1234567 1234567'
 
 	EXEC --nosummary -x pax --uid:=0123456 --gid:=0123456 -wf t.pax aha
 		OUTPUT -
 
-	PROG dd silent=1 from=ascii bs=1 skip=1132 count=16 if=t.pax
-		OUTPUT -n - $'0123456 0123456 '
+	EXEC --nosummary --listformat='%(uid)d %(gid)d' --file=t.pax
+		OUTPUT - $'123456 123456'
 
 	EXEC --nosummary -x pax --uid:=012345 --gid:=012345 -wf t.pax aha
 		OUTPUT -
 
-	PROG dd silent=1 from=ascii bs=1 skip=1132 count=16 if=t.pax
-		OUTPUT -n - $'0012345 0012345 '
+	EXEC --nosummary --listformat='%(uid)d %(gid)d' --file=t.pax
+		OUTPUT - $'12345 12345'
 
 	EXEC --nosummary -x pax --uid:=01234 --gid:=01234 -wf t.pax aha
 		OUTPUT -
 
-	PROG dd silent=1 from=ascii bs=1 skip=1132 count=16 if=t.pax
-		OUTPUT -n - $'0001234 0001234 '
+	EXEC --nosummary --listformat='%(uid)d %(gid)d' --file=t.pax
+		OUTPUT - $'1234 1234'
 
 TEST 11 'pax delta format'
 

@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-01-31 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-09-28 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -385,6 +385,7 @@ IFFEFLAGS = -v
 IFFECC = $(CC)
 IFFECCFLAGS = $(CCFLAGS)
 IFFELDFLAGS = $(LDFLAGS)
+IFFEREFS =
 IGNORE = ignore
 LD = $(CC.LD)
 LDFLAGS =
@@ -1153,7 +1154,7 @@ cc-% : "" .ALWAYS .LOCAL .FORCE .RECURSE.SEMAPHORE
 	if	test -d $(<:V:Q)
 	then	$(-silent:Y%%echo $(-errorid:C%$%/%)$(<:V:Q): >&2%)
 		cd $(<:V:Q)
-		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:V:N!=MAKEPATH=*) $(.RECURSE.ARGS.:N!=.CC-*:/^\.INSTALL$/.CC-INSTALL/) $(%:Y;$$(INSTRUMENT_$$(%:/,.*//):@?--instrument=$$(%:/,.*//)?$$(%:V:/$$(%:V:N=*~*:Y!~!,!)/ /G:@/-W\(.\) /-W\1,/G:N!=[!-+]*=*:@/^./CCFLAGS=-&/:@Q) $$(%:V:/$$(%:V:N=*~*:Y!~!,!)/ /G:@/-W\(.\) /-W\1,/G:N=[!-+]*=*)?);;) $(.VARIANT.$(<))
+		$(MAKE) --file=$(MAKEFILE) --keepgoing $(-) --errorid=$(<:V:Q) .ATTRIBUTE.$(IFFEGENDIR)/%:.ACCEPT MAKEPATH=..:$(MAKEPATH) $(=:V:N!=MAKEPATH=*) $(.RECURSE.ARGS.:N!=.CC-*:/^\.INSTALL$/.CC-INSTALL/) $(%:Y;$$(INSTRUMENT_$$(%:/,.*//):@?--instrument=$$(%:/,.*//)?$$(%:V:/,/ /G:/~/,/G:N!=[!-+]*=*:@/^./CCFLAGS=-&/:@Q) $$(%:V:/,/ /G:/~/,/G:N=[!-+]*=*)?);;) $(.VARIANT.$(<))
 	fi
 
 /*
@@ -1191,9 +1192,9 @@ $(IFFEGENDIR)/% : "" .SCAN.c (IFFE) (IFFEFLAGS)
 	T := $(T:/^/-I/) $(T:D:U:/^/-I/) $(*.R.:N!=$(<:T=M:@/ /|/G))
 	if T
 		if "$(-mam:N=static*,port*)"
-			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=${mam_lib+([a-zA-Z0-9_])}:P=D):$(.CC.NOSTDLIB.):/.*/${mam_cc_L+-L&}/) $(T) :
+			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=${mam_lib+([a-zA-Z0-9_])}:P=D):$(.CC.NOSTDLIB.):/.*/${mam_cc_L+-L&}/) $(T) $(IFFEREFS) :
 		else
-			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=-l*:P=D):$(.CC.NOSTDLIB.):P=A:/^/-L/) $(T) :
+			return ref $(*.SOURCE.%.ARCHIVE:I=$$(T:N=-l*:P=D):$(.CC.NOSTDLIB.):P=A:/^/-L/) $(T) $(IFFEREFS) :
 		end
 	end
 
@@ -1532,6 +1533,8 @@ end
 					if CC.SUFFIX.DYNAMIC == ".dll"
 						continue
 					end
+				elif T1 == "+l*" && "$(<:A=.COMMAND)"
+					.PACKAGE.$(T1:/+l//).library.$(<:B) := +l
 				end
 				TP += $(T1:V)
 			elif T2 = "$(T1:G=$(T0))"
@@ -1742,7 +1745,7 @@ end
 		else
 			OPT += $(CC.DLL)
 		end
-		DIR := cc$(OPT:/ /,/G)
+		DIR := cc$(OPT:/,/~/G:/ /,/G)
 		.VARIANT.$(DIR) := VARIANT=DLL
 		.ALL : .DLL.$(DIR)
 		.DLL.$(DIR) : .RECURSE.DLL
@@ -1955,7 +1958,7 @@ end
 
 ":JOINT:" : .MAKE .OPERATOR
 	eval
-	$$(<) : .JOINT $$(>)
+	$$(<:V) : .JOINT $$(>:V)
 		$(@:V)
 	end
 
@@ -2251,8 +2254,8 @@ end
 		if ! "$(.PLUGIN.$(Y))"
 			X += $(Y)
 		end
-		X += $(Z:/+l//)
-		Z += $(%:O>3:/.l//:N!=$(X:/ /|/):/^/-l/)
+		X += $(Z:/^+l//)
+		Z += $(%:O>3:/^[-+]l//:N!=*=*|$(X:/ /|/):/^/-l/)
 		$(Z) : .DONTCARE
 		A := $(%:O=1)
 		if CC.DLL.DIR == "$\(BINDIR)"
@@ -2696,7 +2699,12 @@ end
 				if P == "*[!0-9]+([0-9])"
 					N += $(P:C,[0-9]*$,,)
 				end
-				LPL := $(CC.STDLIB:B) $(LP)
+				if CC.HOSTTYPE == "*64" && ! "$(CC.STDLIB:B:N=*64)"
+					T1 = lib64
+				else
+					T1 =
+				end
+				LPL := $(CC.STDLIB:B) $(T1) $(LP)
 				LPL := $(LPL:U)
 				T4 := $(T4:N!=//*:T=F:H=P:U)
 				T7 := $(T4:X=$(IP)/$(P):N!=//*:T=F:D:D)

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -104,7 +104,7 @@ mkdir3d(const char* path, mode_t mode)
 				*cp = r;
 				if (!sp) return(-1);
 				if (sp == state.dot) sp = state.pwd;
-				if (r = MKDIR(sp, mode)) return(r);
+				if (r = MKDIR(sp, r ? (mode|S_IWUSR|S_IXUSR) : mode)) return(r);
 #if FS
 				if (fsmonitored(state.path.name) && !LSTAT(state.path.name, &state.path.st))
 					fscall(state.path.monitor, MSG_mkdir, 0, state.path.name, state.path.st.st_mode);

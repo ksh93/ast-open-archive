@@ -1,3 +1,7 @@
+06-09-28 3d.sh: used getconf LIBPATH|LIBPREFIX|LIBSUFFIX -- how novel
+06-09-26 3d.h,dir3d.c,dll3d.c: fix strtou*l*l maps for __int64 vs. long long
+06-09-18 strmatch.c,touch.c: add private obsolete api copies
+06-08-27 mkdir3d.c: foloow mkdir -p mode rules for missing intermediates
 05-02-01 3d.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 05-01-01 sys.tab,utimets3d.c: add utimets() intercept
 04-12-15 pathreal.c: "..." should fail if no lower view -- doh

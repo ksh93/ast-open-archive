@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -189,7 +189,7 @@ cygwin_ttymap(Pss_t* pss, Pss_dev_t dev)
 static Pssmeth_t cygwin_method =
 {
 	"cygwin",
-	"[-version?@(#)$Id: pss cygwin (AT&T Labs Research) 2003-02-01 $\n]"
+	"[-version?@(#)$Id: pss cygwin (AT&T Research) 2003-02-01 $\n]"
 	"[-author?Glenn Fowler <gsf@research.att.com>]",
 	PSS_all,
 	cygwin_init,

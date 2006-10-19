@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1997-2005 AT&T Corp.                  *
+*           Copyright (c) 1997-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1383,11 +1383,14 @@ validate_sf(Cdb_t* cdb, register Cdbformat_t* fp, Cdbtype_t* type)
 static int
 internal_date(Cdb_t* cdb, Cdbformat_t* fp, Cdbdata_t* dp, const char* b, size_t n, Cdbtype_t* type)
 {
+	char*	s;
 	char*	e;
 	char*	f;
 
 	sfwrite(cdb->tmp, b, n);
-	dp->number.integer = tmscan(sfstruse(cdb->tmp), &e, fp->details ? fp->details : "", &f, NiL, 0L);
+	if (!(s = sfstruse(cdb->tmp)))
+		return -1;
+	dp->number.integer = tmscan(s, &e, fp->details ? fp->details : "", &f, NiL, 0L);
 	SETINTEGER(dp, fp, *e != 0 || *f != 0);
 	return n;
 }

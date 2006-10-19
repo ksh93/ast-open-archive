@@ -1,3 +1,5 @@
+06-10-11 add sfstruse() error checks
+06-05-03 htmlrefs.c: add COPY to avoid e.g. cgi symlinks
 05-10-15 mm2html.sh: add BP name=value parameters
 05-10-10 mm2html.sh: add .CE, .BP *.@(gif|png) ... => <IMG...>
 05-02-22 htmlrefs.c: rel=internal ignored if --external

@@ -1,3 +1,4 @@
+06-10-11 add sfstruse() error checks
 03-02-06 dss.c: convert main loop to dssrun()
 03-01-23 dss.c: update stamp to reflect library version 20030123
 03-01-15 dss.c: fix match docs for Cxmatch_t

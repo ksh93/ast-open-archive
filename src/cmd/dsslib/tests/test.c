@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -27,7 +27,7 @@ typedef struct State_s
 } State_t;
 
 static const char even_usage[] =
-"[-1?\n@(#)$Id: dss even test query (AT&T Labs Research) 2003-09-22 $\n]"
+"[-1?\n@(#)$Id: dss even test query (AT&T Research) 2003-09-22 $\n]"
 USAGE_LICENSE
 "[+LIBRARY?\findex\f]"
 "[+DESCRIPTION?The \beven\b test query selects even ordinal records.]"
@@ -106,7 +106,7 @@ even_end(Cx_t* cx, Cxexpr_t* expr, void* data, Cxdisc_t* disc)
 }
 
 static const char odd_usage[] =
-"[-1?\n@(#)$Id: dss odd test query (AT&T Labs Research) 2003-09-22 $\n]"
+"[-1?\n@(#)$Id: dss odd test query (AT&T Research) 2003-09-22 $\n]"
 USAGE_LICENSE
 "[+LIBRARY?\findex\f]"
 "[+DESCRIPTION?The \bodd\b test query selects odd ordinal records.]"

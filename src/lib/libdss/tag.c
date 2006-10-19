@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -114,6 +114,8 @@ struct Include_s
 char*
 tagcontext(Tag_t* tag, Tagframe_t* fp)
 {
+	char*	s;
+
 	if (!fp)
 		return "";
 	if (!tag->tmp && !(tag->tmp = sfstropen()))
@@ -128,7 +130,9 @@ tagcontext(Tag_t* tag, Tagframe_t* fp)
 	{
 		sfprintf(tag->tmp, "<%s>", fp->tag->name);
 	} while (fp = fp->next);
-	return sfstruse(tag->tmp);
+	if (!(s = sfstruse(tag->tmp)))
+		s = "out of space";
+	return s;
 }
 
 /*
@@ -454,7 +458,8 @@ tagparse(Tag_t* tag, Tagframe_t* fp, Tags_t* tags, Tagdisc_t* disc)
 			{
 				if (fp && fp->tag->datf && (back = sfstrtell(tag->op)))
 				{
-					s = sfstruse(tag->op);
+					if (!(s = sfstruse(tag->op)))
+						goto nospace;
 					u = s + keep_last;
 					for (t = s + back; t > u && isspace(*(t - 1)); t--);
 					*t = 0;
@@ -489,7 +494,8 @@ tagparse(Tag_t* tag, Tagframe_t* fp, Tags_t* tags, Tagdisc_t* disc)
 			if (item == '<' && !(quote & STRING))
 			{
 				item = 0;
-				s = sfstruse(tag->op);
+				if (!(s = sfstruse(tag->op)))
+					goto nospace;
 				if (quote & COMMENT)
 					quote ^= COMMENT;
 				else if (*s == '/')
@@ -724,6 +730,10 @@ tagparse(Tag_t* tag, Tagframe_t* fp, Tags_t* tags, Tagdisc_t* disc)
 		return -1;
 	}
 	return 0;
+ nospace:
+	if (disc->errorf)
+		(*disc->errorf)(tag, disc, 2, "out of space");
+	return -1;
 }
 
 /*

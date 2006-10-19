@@ -1,3 +1,9 @@
+06-07-17 main.c: RS_POP before checking output
+06-07-17 main.c: handle empty file for record format data sample
+06-05-09 main.c: add path to record format determination message
+	 main.c: fix -o path to inherit -R% format from input
+	 sort.tst: fix -R% v format test
+06-04-19 main.c: fix minor merge file list bug
 06-01-21 testsort.sh: fix pure sum command search logic
 05-11-01 rec.c: add --count
 05-06-30 main.c: add -zbBUFSIZE for regression testing

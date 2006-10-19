@@ -1,3 +1,7 @@
+06-10-11 ss.c: add sfstruse() error checks
+06-08-01 sync.c: handle %size.suffix mapping with multiple .'s
+06-07-17 ss.c: fix RS_POP event to unlock output sfreserve's
+06-05-22 sync.c,sort.tst: fix %size.suffix mapping
 05-10-19 sort.tst: add { INREC OUTREC E15 } tests
 05-09-12 ss.c: don't add V header to data that already has it
 	 ss.c: fix [n]{ABCX}['...'] field spec parse

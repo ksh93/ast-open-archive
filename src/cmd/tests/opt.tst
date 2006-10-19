@@ -1061,18 +1061,72 @@ return=-103 option=-103 name=charset arg=us num=1'
 	EXEC	- pax "$usage" '-a -zaaa'
 		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
 return=z option=-z name=-z arg=aaa num=1'
+
+	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us\ ascii,block+=77777777777'
+		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
+return=z option=-z name=base arg=aaa,zzz num=1
+return=-103 option=-103 name=charset arg:=us ascii num=1
+return=b option=-b name=blocksize arg+=77777777777 num=77777777777'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n22 block+=77777777777\n'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n22 block+=77777777777'
+	EXEC	- pax "$usage" '--app,--base=aaa\,zzz,--ch:=us\ ascii,--block+=77777777777'
+	EXEC	- pax "$usage" '-a,-zaaa,-b77777777777'
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=z option=-z name=-z arg=aaa num=1
+return=b option=-b name=-b arg=77777777777 num=77777777777'
+
 	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us\ ascii,block+=077777777777'
 		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
 return=z option=-z name=base arg=aaa,zzz num=1
 return=-103 option=-103 name=charset arg:=us ascii num=1
-return=b option=-b name=blocksize arg+=077777777777 num=8589934591'
+return=b option=-b name=blocksize arg+=077777777777 num=77777777777'
 	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n23 block+=077777777777\n'
 	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n23 block+=077777777777'
 	EXEC	- pax "$usage" '--app,--base=aaa\,zzz,--ch:=us\ ascii,--block+=077777777777'
 	EXEC	- pax "$usage" '-a,-zaaa,-b077777777777'
 		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
 return=z option=-z name=-z arg=aaa num=1
-return=b option=-b name=-b arg=077777777777 num=8589934591'
+return=b option=-b name=-b arg=077777777777 num=77777777777'
+
+	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us\ ascii,block+=8#77777777777'
+		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
+return=z option=-z name=base arg=aaa,zzz num=1
+return=-103 option=-103 name=charset arg:=us ascii num=1
+return=b option=-b name=blocksize arg+=8#77777777777 num=8589934591'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n24 block+=8#77777777777\n'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n24 block+=8#77777777777'
+	EXEC	- pax "$usage" '--app,--base=aaa\,zzz,--ch:=us\ ascii,--block+=8#77777777777'
+	EXEC	- pax "$usage" '-a,-zaaa,-b8#77777777777'
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=z option=-z name=-z arg=aaa num=1
+return=b option=-b name=-b arg=8#77777777777 num=8589934591'
+
+	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us\ ascii,block+=0x77777777777'
+		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
+return=z option=-z name=base arg=aaa,zzz num=1
+return=-103 option=-103 name=charset arg:=us ascii num=1
+return=b option=-b name=blocksize arg+=0x77777777777 num=8209686820727'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n24 block+=0x77777777777\n'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n24 block+=0x77777777777'
+	EXEC	- pax "$usage" '--app,--base=aaa\,zzz,--ch:=us\ ascii,--block+=0x77777777777'
+	EXEC	- pax "$usage" '-a,-zaaa,-b0x77777777777'
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=z option=-z name=-z arg=aaa num=1
+return=b option=-b name=-b arg=0x77777777777 num=8209686820727'
+
+	EXEC	- pax "$usage" 'app,base=aaa\,zzz,ch:=us\ ascii,block+=16#77777777777'
+		OUTPUT - $'return=a option=-a name=append arg=(null) num=1
+return=z option=-z name=base arg=aaa,zzz num=1
+return=-103 option=-103 name=charset arg:=us ascii num=1
+return=b option=-b name=blocksize arg+=16#77777777777 num=8209686820727'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n25 block+=16#77777777777\n'
+	EXEC	- pax "$usage" $'6 app\n16 base=aaa,zzz\n21 charset:=us ascii\n25 block+=16#77777777777'
+	EXEC	- pax "$usage" '--app,--base=aaa\,zzz,--ch:=us\ ascii,--block+=16#77777777777'
+	EXEC	- pax "$usage" '-a,-zaaa,-b16#77777777777'
+		OUTPUT - $'return=a option=-a name=-a arg=(null) num=1
+return=z option=-z name=-z arg=aaa num=1
+return=b option=-b name=-b arg=16#77777777777 num=8209686820727'
+
 	EXEC	- pax "$usage" '14 foo'
 		EXIT 1
 		OUTPUT - $'return=: option= name=14 num=0 str=14 foo\nreturn=: option= name=foo num=0 str=14 foo'
@@ -3140,6 +3194,23 @@ return=-103 option=-103 name=--reread arg=(null) num=0
 return=-103 option=-103 name=--reread arg=(null) num=0
 return=-103 option=-103 name=--reread arg=(null) num=1
 return=-103 option=-103 name=--reread arg=2 num=2'
+
+TEST 55 'solaris old format long option name compatibility'
+	usage=$'f:(file)(input-file)g(global)o:(output)(output-file)'
+	EXEC oksh "$usage" --usage
+		OUTPUT - $'return=? option=- name=--usage num=0'
+		ERROR - $'[-][f:file|input-file]:[string][g:global][o:output|output-file]:[string]'
+		EXIT 2
+	EXEC oksh "$usage" -f in -g -o out
+		OUTPUT - $'return=f option=-f name=-f arg=in num=1
+return=g option=-g name=-g arg=(null) num=1
+return=o option=-o name=-o arg=out num=1'
+		ERROR -
+		EXIT 0
+	EXEC oksh "$usage" --file=in --glob --out=out
+		OUTPUT - $'return=f option=-f name=--file arg=in num=1
+return=g option=-g name=--global arg=(null) num=1
+return=o option=-o name=--output arg=out num=1'
 
 # skip non-astsa (standalone ast) tests
 

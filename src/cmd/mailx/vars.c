@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -207,7 +207,7 @@ varlist(int all)
 		}
 		else if (all) {
 			sfprintf(state.path.temp, "no%s", vp->name);
-			printf("%16s\n", sfstruse(state.path.temp));
+			printf("%16s\n", struse(state.path.temp));
 		}
 	return 0;
 }
@@ -549,7 +549,7 @@ set_sendmail(struct var* vp, const char* value)
 {
 	if (value && !*value) {
 		sfprintf(state.path.temp, "%s -oi", _PATH_SENDMAIL);
-		state.var.sendmail = varkeep(sfstruse(state.path.temp));
+		state.var.sendmail = varkeep(struse(state.path.temp));
 	}
 }
 

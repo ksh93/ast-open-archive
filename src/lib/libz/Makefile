@@ -7,16 +7,14 @@
 LICENSE = zlib,since=1995,author="Jean-loup Gailly,Mark Adler"
 
 ID = z
-VERSION = 1.0
+VERSION = 1.2
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
 
-$(ID) $(VERSION) :LIBRARY: zlib.h zconf.h zutil.h \
-	deflate.h infblock.h infcodes.h inffast.h \
-	inffixed.h inftrees.h infutil.h trees.h \
-	adler32.c compress.c crc32.c gzio.c uncompr.c deflate.c \
-	trees.c zutil.c inflate.c infblock.c inftrees.c infcodes.c \
-	infutil.c inffast.c \
+$(ID) $(VERSION) :LIBRARY: zlib.3 zlib.h zconf.h zutil.h \
+	crc32.h deflate.h inffast.h inffixed.h inflate.h inftrees.h trees.h \
+	adler32.c compress.c crc32.c deflate.c gzio.c infback.c inffast.c \
+	inflate.c inftrees.c trees.c uncompr.c zutil.c \
 	sfdcgzip.c sfdclzw.c
 
 $(INCLUDEDIR) :INSTALLDIR: zlib.h zconf.h
@@ -31,9 +29,12 @@ example :: example.c -lz
 
 minigzip :: minigzip.c -lz
 
-test : example example.out minigzip minigzip.out
-	( $(*:N=*example); echo $? ) > test.tmp
-	cmp -s test.tmp $(*:N=*example.out) || echo example test failed
-	( echo hello world | $(*:N=*minigzip) | $(*:N=*minigzip) -d; echo $? ) > test.tmp
-	cmp -s test.tmp $(*:N=*minigzip.out) || echo minigzip test failed
-	rm -f foo.gz test.tmp
+test : example minigzip
+	$(*:N=*example) > /dev/null || echo libz example test FAILED
+	case `echo 'hello, hello!' | $(*:N=*minigzip) | $(*:N=*minigzip) -d; echo $?` in
+	'hello, hello!$("\n")0')
+		;;
+	*)	echo libz minigzip test FAILED
+		;;
+	esac
+	rm -f foo.gz

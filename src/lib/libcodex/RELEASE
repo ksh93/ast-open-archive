@@ -1,3 +1,4 @@
+06-08-23 code-uu.c: fix remainder output *and* input bugs
 05-09-25 add '^' equivalent to '|'
 04-02-14 codex.c: SFDCNEXT() and SFDCPREV() now provided by <sfio_t.h>
 04-01-11 codex.c: top level composition parse, handle CODEX_INVERT

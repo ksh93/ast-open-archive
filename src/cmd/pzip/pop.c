@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pop (AT&T Labs Research) 2003-04-05 $\n]"
+"[-?\n@(#)$Id: pop (AT&T Research) 2003-04-05 $\n]"
 USAGE_LICENSE
 "[+NAME?pop - operate on partioned fixed row and column data]"
 "[+DESCRIPTION?\bpop\b operates on partitioned fixed row and column data files."

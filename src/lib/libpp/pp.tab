@@ -2,7 +2,7 @@
 # Glenn Fowler
 # AT&T Research
 #
-# @(#)pp.tab (AT&T Labs Research) 2004-08-30
+# @(#)pp.tab (AT&T Labs Research) 2006-05-09
 #
 # C preprocessor tables and states
 #
@@ -41,6 +41,7 @@
 	compatibility
 	debug
 	elseif
+	externalize
 	final
 	hide
 	headerexpand
@@ -157,6 +158,7 @@
 	CATLITERAL		# concatenate adjacent "..."
 	DUMP			# do a checkpoint dump
 	EXPOSE			# expose hidden macros
+	EXTERNALIZE		# set PROTO_EXTERNALIZE
 	FILEDEPS		# output file dependencies
 	GENDEPS			# missings FILEDEPS are generated
 	HEADERDEPS		# <...> too for FILEDEPS

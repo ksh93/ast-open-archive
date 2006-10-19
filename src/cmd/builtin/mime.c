@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2005 AT&T Corp.                  *
+*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: mime (AT&T Labs Research) 1999-08-11 $\n]"
+"[-?\n@(#)$Id: mime (AT&T Research) 1999-08-11 $\n]"
 USAGE_LICENSE
 "[+NAME?mime - list mime capabilities]"
 "[+DESCRIPTION?\bmime\b matches and/or lists mime capability entries. With"
@@ -104,7 +104,8 @@ b_mime(int argc, char** argv, void* context)
 	{
 		for (argc = 3; s = argv[argc]; argc++)
 			sfputr(sp, s, ';');
-		s = sfstruse(sp);
+		if (!(s = sfstruse(sp)))
+			error(ERROR_exit(1), "out of space");
 		if (!(s = mimeview(mp, argv[0], argv[1], argv[2], s)))
 		{
 			if (silent)

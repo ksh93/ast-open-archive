@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  * see help() for details
  */
 
-static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2002-10-28 $\0\n";
+static const char id[] = "\n@(#)$Id: testglob (AT&T Research) 2006-07-28 $\0\n";
 
 #if _PACKAGE_ast
 
@@ -505,6 +505,7 @@ main(int argc, char** argv)
 	int		got;
 	int		ok;
 	int		nmodes;
+	int		extra;
 	char*		spec;
 	char*		pat;
 	char*		p;
@@ -615,6 +616,7 @@ main(int argc, char** argv)
 	work[cwd] = path;
 	work[cwd + 1] = 0;
 	ok = 0;
+	extra = 0;
 	while (p = buf = getline()) {
 
 	/* parse: */
@@ -791,6 +793,12 @@ main(int argc, char** argv)
 				unspecified = 1;
 				continue;
 
+			case 'x':
+#if GLOB_VERSION >= 20060717L
+				extra = 15;
+#endif
+				continue;
+
 			case '{':
 				level <<= 1;
 				if (skip & (level >> 1)) {
@@ -895,6 +903,10 @@ main(int argc, char** argv)
 			}
 			else
 				gl.gl_fignore = 0;
+#if GLOB_VERSION >= 20060717L
+			if (gl.gl_extra = extra)
+				flags |= GLOB_DISC;
+#endif
 #endif
 			if (!query)
 				testno++;
@@ -941,7 +953,7 @@ main(int argc, char** argv)
 					for (gi = gl.gl_list; gi; gi = gi->gl_next) {
 						if (n >= (elementsof(av) - 1))
 							break;
-						av[n++] = gi->gl_path;
+						av[n++] = gi->gl_path + extra;
 					}
 					av[n] = 0;
 					v = av;

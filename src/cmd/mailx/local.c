@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -107,7 +107,7 @@ mailbox(const char* user, const char* mail)
 		if (s = strrchr(mail, '/')) {
 			i = s - (char*)mail;
 			sfprintf(state.path.temp, "%-.*s/.", i, mail);
-			if (!access(sfstruse(state.path.temp), F_OK))
+			if (!access(struse(state.path.temp), F_OK))
 				n = i;
 		}
 	}
@@ -118,7 +118,7 @@ mailbox(const char* user, const char* mail)
 				break;
 			}
 			sfprintf(state.path.temp, "%s/.", dir[i]);
-			if (!access(sfstruse(state.path.temp), F_OK))
+			if (!access(struse(state.path.temp), F_OK))
 				break;
 		}
 		mail = dir[i];
@@ -126,7 +126,7 @@ mailbox(const char* user, const char* mail)
 			n--;
 	}
 	sfprintf(state.path.temp, "%-.*s/%s", n, mail, user);
-	return savestr(sfstruse(state.path.temp));
+	return savestr(struse(state.path.temp));
 }
 
 /*

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2005 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -88,9 +88,6 @@ pdpopen(Ardir_t* ar, char* buf, size_t n)
 	state->offset = MAGIC_SIZE;
 	ar->truncate = 14;
 	return 0;
- nope:
-	pdpclose(ar);
-	return -1;
 }
 
 /*

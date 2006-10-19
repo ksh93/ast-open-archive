@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -408,13 +408,13 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 					if (tevent < t)
 						tevent = t;
 				}
-				else if (r2->property & P_after)
+				else if ((r2->property & (P_after|P_use)) == P_after)
 				{
 					r1->dynamic |= D_hasafter;
 					if ((r2->property & (P_make|P_foreground)) == (P_make|P_foreground))
 						r1->dynamic |= D_hasmake;
 				}
-				else if (r2->property & P_before)
+				else if ((r2->property & (P_before|P_use)) == P_before)
 					r1->dynamic |= D_hasbefore;
 				else if (r2->semaphore)
 					r1->dynamic |= D_hassemaphore;
@@ -717,13 +717,13 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 			if (tevent < t)
 				tevent = t;
 		}
-		else if (r1->property & P_after)
+		else if ((r1->property & (P_after|P_use)) == P_after)
 		{
 			r->dynamic |= D_hasafter;
 			if ((r1->property & (P_make|P_foreground)) == (P_make|P_foreground))
 				r->dynamic |= D_hasmake;
 		}
-		else if (r1->property & P_before)
+		else if ((r1->property & (P_before|P_use)) == P_before)
 			r->dynamic |= D_hasbefore;
 		else if (r1->semaphore)
 			r->dynamic |= D_hassemaphore;
@@ -855,6 +855,16 @@ make(register Rule_t* r, Time_t* ttarget, char* arg, Flags_t flags)
 					tevent = t;
 				if (r->time < t || (r2->dynamic & D_same))
 					r->must++;
+				if (r1->property & P_after)
+				{
+					r2->property |= P_after;
+					r->dynamic |= D_hasafter;
+				}
+				if (r1->property & P_before)
+				{
+					r2->property |= P_before;
+					r->dynamic |= D_hasbefore;
+				}
 
 				/*
 				 * check joint metarule targets

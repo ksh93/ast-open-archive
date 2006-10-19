@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -160,7 +160,10 @@ tar_checksum(Archive_t* ap, int check, unsigned long sum)
 		}
 		if (ap->entry > 1)
 		{
-			error(state.keepgoing ? 1 : 3, "%s: %s format checksum error (%ld != %ld or %ld)", ap->name, ap->format->name, sum, u, s);
+			if (s != u)
+				error(state.keepgoing ? 1 : 3, "%s: %s format checksum error (%ld != %ld or %ld)", ap->name, ap->format->name, sum, u, s);
+			else
+				error(state.keepgoing ? 1 : 3, "%s: %s format checksum error (%ld != %ld)", ap->name, ap->format->name, sum, u);
 			return state.keepgoing;
 		}
 		return 0;
@@ -276,7 +279,9 @@ headname(Archive_t* ap, File_t* f, const char* fmt)
 		listprintf(ap->tmp.hdr, ap, f, fmt);
 		f->name = s;
 	}
-	return sfstruse(ap->tmp.hdr);
+	if (!(s = sfstruse(ap->tmp.hdr)))
+		nospace();
+	return s;
 }
 
 /*
@@ -468,7 +473,11 @@ extend(Archive_t* ap, File_t* f, int type)
 	else
 		split = 0;
 	if (n = sfstrtell(sp))
-		synthesize(ap, f, headname(ap, f, fmt), type, sfstruse(sp), n);
+	{
+		if (!(s = sfstruse(sp)))
+			nospace();
+		synthesize(ap, f, headname(ap, f, fmt), type, s, n);
+	}
 	return split;
 }
 

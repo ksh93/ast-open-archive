@@ -9,7 +9,7 @@
  *		then supply #define REG_foo REG_foo for each enum REG_foo
  *
  *	Glenn Fowler <gsf@research.att.com>
- *	AT&T Labs Research
+ *	AT&T Research
  *
  * PLEASE: publish your tests so everyone can benefit
  *
@@ -862,7 +862,8 @@ matchcheck(regmatch_t* match, int nmatch, int nsub, char* ans, char* re, char* s
 #ifdef REG_DISCIPLINE
 			char*	x;
 
-			x = sfstruse(state.disc.sp);
+			if (!(x = sfstruse(state.disc.sp)))
+				bad("out of space [discipline string]\n", NiL, NiL, 0, 0);
 			if (strcmp(p, x))
 			{
 				if (test & (TEST_ACTUAL|TEST_BASELINE|TEST_FAIL|TEST_PASS|TEST_QUERY|TEST_SUMMARY|TEST_VERIFY))

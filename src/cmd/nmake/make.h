@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -414,6 +414,13 @@
 #define VAL_FILE	(1<<2)		/* !notfile(r)			*/
 #define VAL_PRIMARY	(1<<3)		/* primary value		*/
 #define VAL_UNBOUND	(1<<4)		/* unbound name			*/
+
+/*
+ * dumpjob() flags
+ */
+
+#define JOB_blocked	1		/* blocked jobs with prereqs	*/
+#define JOB_status	2		/* job status list		*/
 
 typedef struct dirent Dirent_t;
 typedef struct stat Stat_t;
@@ -936,7 +943,7 @@ extern void		dirscan(Rule_t*);
 extern void		drop(void);
 extern void		dump(Sfio_t*, int);
 extern void		dumpaction(Sfio_t*, const char*, char*, const char*);
-extern void		dumpjobs(int);
+extern void		dumpjobs(int, int);
 extern void		dumpregress(Sfio_t*, const char*, const char*, char*);
 extern void		dumprule(Sfio_t*, Rule_t*);
 extern void		dumpvar(Sfio_t*, Var_t*);

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1997-2005 AT&T Corp.                  *
+*           Copyright (c) 1997-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -860,9 +860,9 @@ r = sfvalue(cdb->io);
 						sfsprintf(fmt, sizeof(fmt), "%%.%ds", dp->string.length);
 					c = sfprintf(cdb->tmp, fmt, dp->string.base);
 				cache:
-					if (!(t = vmoldof(vp, 0, char, c, 1)))
+					if (!(t = vmoldof(vp, 0, char, c, 1)) || !(x = sfstruse(cdb->tmp)))
 						goto nospace;
-					(dp+1)->string.base = (char*)memcpy(t, sfstruse(cdb->tmp), ((dp+1)->string.length = c) + 1);
+					(dp+1)->string.base = (char*)memcpy(t, x, ((dp+1)->string.length = c) + 1);
 					(dp+1)->flags |= CDB_STRING|CDB_CACHED|CDB_TERMINATED;
 					break;
 				default:
@@ -1509,7 +1509,8 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 							else
 							{
 								n = sfprintf(cdb->tmp, buf, dp->number.floating);
-								s = sfstruse(cdb->tmp);
+								if (!(s = sfstruse(cdb->tmp)))
+									return -1;
 								ccmaps(s, n, CC_NATIVE, fp->code);
 								sfwrite(op, s, n);
 							}
@@ -1543,7 +1544,8 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 								else
 								{
 									n = sfprintf(cdb->tmp, buf, dp->number.linteger);
-									s = sfstruse(cdb->tmp);
+									if (!(s = sfstruse(cdb->tmp)))
+										return -1;
 									ccmaps(s, n, CC_NATIVE, fp->code);
 									sfwrite(op, s, n);
 								}
@@ -1555,7 +1557,8 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 								else
 								{
 									n = sfprintf(cdb->tmp, buf, dp->number.integer);
-									s = sfstruse(cdb->tmp);
+									if (!(s = sfstruse(cdb->tmp)))
+										return -1;
 									ccmaps(s, n, CC_NATIVE, fp->code);
 									sfwrite(op, s, n);
 								}
@@ -1614,7 +1617,8 @@ flatrecwrite(register Cdb_t* cdb, Cdbkey_t* key, Cdbrecord_t* rp)
 			{
 			case 'v':
 				n = sftell(op);
-				s = sfstruse(op);
+				if (!(s = sfstruse(op)))
+					return -1;
 				op = io;
 				if (pp < (fp - 1))
 				{

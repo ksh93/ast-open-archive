@@ -26,5 +26,5 @@ Hashtab_t *nv_globalscope()
 
 int sh_openmax()
 {
-	return sysconf(_SC_OPEN_MAX);
+	return (int)strtol(astconf("OPEN_MAX", NiL, NiL), NiL, 0);
 }

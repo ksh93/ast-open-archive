@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: df (AT&T Labs Research) 2005-04-06 $\n]"
+"[-?\n@(#)$Id: df (AT&T Research) 2005-04-06 $\n]"
 USAGE_LICENSE
 "[+NAME?df - summarize disk free space]"
 "[+DESCRIPTION?\bdf\b displays the available disk space for the filesystem"
@@ -416,7 +416,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	{
 		kp->disable = 1;
 		sfkeyprintf(state.mac, handle, kp->macro, key, NiL);
-		*ps = sfstruse(state.mac);
+		if (!(*ps = sfstruse(state.mac)))
+			error(ERROR_SYSTEM|3, "out of space");
 		kp->disable = 0;
 	}
 	else if (!df)
@@ -532,7 +533,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 				if (!state.posix && strlen(s) >= fp->width)
 				{
 					sfprintf(state.tmp, "%s%-*.*s", s, fp->width + 1, fp->width + 1, "\n");
-					s = sfstruse(state.tmp);
+					if (!(s = sfstruse(state.tmp)))
+						error(ERROR_SYSTEM|3, "out of space");
 				}
 			}
 			*ps = s;
@@ -795,7 +797,8 @@ main(int argc, register char** argv)
 	if (!sfstrtell(fmt))
 		append(fmt, state.posix > 0 ? fmt_std : fmt_def);
 	sfputc(fmt, '\n');
-	format = sfstruse(fmt);
+	if (!(format = sfstruse(fmt)))
+		error(ERROR_SYSTEM|3, "out of space");
 	stresc(format);
 	if (state.posix < 0)
 		state.posix = !strcmp(astconf("CONFORMANCE", NiL, NiL), "standard");

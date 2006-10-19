@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -96,6 +96,7 @@ jobcheck(Coshell_t* only)
 {
 	register Cojob_t*	jp;
 	register Coshell_t*	sp;
+	char*			s;
 
 	for (jp = state.job; jp <= state.jobmax; jp++)
 		if (jp->pid && ((sp = jp->shell) == only || !only))
@@ -123,7 +124,10 @@ jobcheck(Coshell_t* only)
 
 								error(ERROR_OUTPUT|2, state.con[jp->fd].info.user.fds[2], "%s: job=%d pid=%d %s", sp->name, jp - state.job, jp->pid, state.migrate);
 								n = sfprintf(state.string, "job=%d; pid=%d; host=%s; type=%s; %s\n", jp - state.job, jp->pid, sp->name, sp->type, state.migrate);
-								cswrite(jp->shell->fd, sfstruse(state.string), n);
+								if (s = sfstruse(state.string))
+									cswrite(jp->shell->fd, s, n);
+								else
+									error(ERROR_OUTPUT|2, state.con[jp->fd].info.user.fds[2], "out of space");
 								jp->sig = SIGKILL;
 								jobdone(jp);
 							}

@@ -37,7 +37,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sort (AT&T Labs Research) 2005-06-30 $\n]"
+"[-?\n@(#)$Id: sort (AT&T Research) 2006-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?sort - sort and/or merge files]"
 "[+DESCRIPTION?\bsort\b sorts lines of all the \afiles\a together and"
@@ -79,9 +79,12 @@ USAGE_LICENSE
 "			\bb\b optionally specifies a 4 byte IBM block"
 "			length descriptor.]"
 "		[+%?If the record format is not otherwise specified, and the"
-"			first input file name ends with \b%\b\aformat\a"
-"			or \b%\b\aformat\a\b.\b* then the record format is set"
-"			to \aformat\a.]"
+"			any input file name, from left to right, ends with"
+"			\b%\b\aformat\a or \b%\b\aformat\a\b.\b* then the"
+"			record format is set to \aformat\a.  In addition, the"
+"			\b-o\b path, if specified and if it does not contain"
+"			\b%\b and if it names a regular file, is renamed to"
+"			contain the input \b%\b\aformat\a.]"
 "		[+-?The first block of the first input file is sampled to check"
 "			for \bv\b variable length and \bf\b fixed length format"
 "			records. \bsort\b exits with an error diagnostic if"
@@ -208,6 +211,7 @@ USAGE_LICENSE
 "	directory as the input, at which point the input is renamed.]"
 ;
 
+#include <sfio_t.h>
 #include <ast.h>
 #include <error.h>
 #include <ctype.h>
@@ -377,6 +381,7 @@ parse(register Sort_t* sp, char** argv)
 	char**			v;
 	size_t			z;
 	int			i;
+	int			map;
 	Lib_t*			firstlib = 0;
 	Lib_t*			lastlib = 0;
 	Lib_t*			lib;
@@ -384,6 +389,7 @@ parse(register Sort_t* sp, char** argv)
 	int			obsolescent = 1;
 	char			opt[16];
 	Optdisc_t		optdisc;
+	struct stat		st;
 
 	optinit(&optdisc, optinfo);
 	for (;;)
@@ -617,7 +623,7 @@ parse(register Sort_t* sp, char** argv)
 	 * record format chicanery
 	 */
 
-	if (RECTYPE(key->disc->data) == REC_method && REC_M_INDEX(key->disc->data) == REC_M_path)
+	if (map = RECTYPE(key->disc->data) == REC_method && REC_M_INDEX(key->disc->data) == REC_M_path)
 		for (n = 0, i = -1; p = key->input[n]; n++)
 			if (s = strrchr(p, '%'))
 			{
@@ -646,12 +652,35 @@ parse(register Sort_t* sp, char** argv)
 			sfread(sp->opened, s, 0);
 		}
 		else
+		{
+			z = sp->opened ? sfvalue(sp->opened) : -1;
 			key->disc->data = REC_N_TYPE();
-		if (key->disc->data == REC_N_TYPE())
-			error(3, "record format cannot be determined from data sample");
+		}
+		if (z && key->disc->data == REC_N_TYPE())
+			error(3, "%s: record format cannot be determined from data sample", key->input[0]);
 	}
 	if (RECTYPE(key->disc->data) == REC_fixed)
 		key->fixed = REC_F_SIZE(key->disc->data);
+	if (map && key->output && key->disc->data != REC_N_TYPE() && (stat(key->output, &st) || S_ISREG(st.st_mode)))
+	{
+		if (p = strrchr(key->output, '/'))
+			s = p + 1;
+		else
+			s = key->output;
+		if (!strchr(s, '%'))
+		{
+			p = key->output;
+			if (!(e = strrchr(s, '.')))
+				e = s + strlen(s);
+			if (RECTYPE(key->disc->data) == REC_variable && !REC_V_SIZE(key->disc->data))
+				key->disc->data |= ((1<<15)-1);
+			if (!(s = strdup(sfprints("%-*.*s%%%s%s", e - p, e - p, p, fmtrec(key->disc->data, 1), e))))
+				error(ERROR_SYSTEM|3, "out of space");
+			key->output = s;
+			if (sp->verbose)
+				error(0, "%s rename output %s => %s", error_info.id, p, s);
+		}
+	}
 	if (sp->verbose)
 		error(0, "%s %s record format", error_info.id, fmtrec(key->disc->data, 0));
 	return error_info.errors != 0;
@@ -741,10 +770,12 @@ init(register Sort_t* sp, Rskeydisc_t* dp, char** argv)
 			error(ERROR_SYSTEM|3, "%s: cannot open", key->input[0]);
 		if (fstat(sffileno(sp->opened), &is))
 			error(ERROR_SYSTEM|3, "%s: cannot stat", key->input[0]);
-		sp->total = is.st_size;
-		if (!S_ISREG(is.st_mode))
+		if (!S_ISREG(is.st_mode) || sp->opened->disc) /* XXX: need sfio call to test if any disc pushed */
+		{
+			sp->total = 0;
 			sp->test |= TEST_read;
-		else if (x > sp->total)
+		}
+		else if (x > (sp->total = is.st_size))
 			x = sp->total;
 	}
 	else
@@ -1025,14 +1056,15 @@ clear(register Sort_t* sp, Sfio_t* fp)
 		rstempclose(sp->rec, sp->files[i]);
 		sp->files[i] = 0;
 	}
-	if (!(sp->files[sp->mfiles++] = fp))
-		sp->nfiles = 0;
-	else
+	if (fp)
 	{
+		sp->files[sp->mfiles++] = fp;
 		sp->nfiles = sp->mfiles;
 		if (sp->mfiles >= (sp->xfiles - 1))
 			sp->mfiles = 0;
 	}
+	else
+		sp->nfiles = sp->mfiles = 0;
 }
 
 /*
@@ -1187,16 +1219,7 @@ input(register Sort_t* sp, Sfio_t* ip, const char* name)
 				return -1;
 		}
 		if (!sp->map)
-		{
-			if (sfeof(ip))
-				n = 0;
-			else
-			{
-				if (sp->verbose)
-					error(0, "%s read beg=%lld cur=%lld end=%lld n=%lld", error_info.id, (Sflong_t)r, (Sflong_t)sp->cur, (Sflong_t)sp->end, (Sflong_t)(sp->end - sp->cur));
-				n = sfread(ip, sp->buf + sp->cur, sp->end - sp->cur);
-			}
-		}
+			n = sfeof(ip) ? 0 : sfread(ip, sp->buf + sp->cur, sp->end - sp->cur);
 		else
 		{
 			sp->buf = (char*)sfreserve(ip, m, SF_LOCKR);
@@ -1458,10 +1481,11 @@ jobs(register Sort_t* sp)
 static void
 done(register Sort_t* sp)
 {
+	while (rsdisc(sp->rec, NiL, RS_POP));
+	if ((sfsync(sp->op) || sp->op != sfstdout && rsfileclose(sp->rec, sp->op)) && !error_info.errors)
+		error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 	if (rsclose(sp->rec))
 		error(2, "sort error");
-	if ((sp->op == sfstdout && !(sp->zip & SF_WRITE) && sfsync(sp->op) || rsfileclose(sp->rec, sp->op)) && !error_info.errors)
-		error(ERROR_SYSTEM|2, "%s: write error", sp->key->output);
 	if (sp->map > 2)
 		vmfree(Vmheap, sp->buf);
 

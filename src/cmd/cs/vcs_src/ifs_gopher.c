@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -81,7 +81,7 @@ char	*tmpfile;
 {
     char	buf[ STRLEN ];
 
-    sprintf( buf, "0%s\r\n", srv->rpath );
+    sfsprintf( buf, sizeof(buf), "0%s\r\n", srv->rpath );
     if( GopherXfer( srv, buf, tmpfile ) == -1 )
 	return -1;
     MakePath( srv->lpath );
@@ -96,10 +96,10 @@ char	*tmpfile;
 {
     char	buf[ STRLEN ];
 
-    sprintf( buf, "1%s\r\n", srv->rpath );
+    sfsprintf( buf, sizeof(buf), "1%s\r\n", srv->rpath );
     if( GopherXfer( srv, buf, tmpfile ) == -1 )
 	return -1;
-    sprintf( buf, "%s/._dir", srv->lpath );
+    sfsprintf( buf, sizeof(buf), "%s/._dir", srv->lpath );
     MakePath( buf );
     chdir( srv->lpath );
     rename( tmpfile, "._dir" );

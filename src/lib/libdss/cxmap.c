@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -22,7 +22,7 @@
  * C expression library value map support
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 #include "cxlib.h"
@@ -253,9 +253,10 @@ cxnum2str(Cx_t* cx, Cxformat_t* format, Cxunsigned_t num, char** p)
 		del = '|';
 	if (!num2str(cx, format->map, cx->tp, num, del))
 		return -1;
-	s = sfstruse(cx->tp) + 1;
+	if (!(s = sfstruse(cx->tp)))
+		return -1;
 	if (p)
-		*p = s;
+		*p = s + 1;
 	return 0;
 }
 
@@ -306,7 +307,8 @@ cxstr2num(Cx_t* cx, Cxformat_t* format, const char* str, size_t siz, Cxunsigned_
 	dt = format->map->str2num;
 	n = 0;
 	sfwrite(cx->tp, str, siz);
-	s = sfstruse(cx->tp);
+	if (!(s = sfstruse(cx->tp)))
+		return -1;
 	while (*s)
 	{
 		for (b = s; *s && *s != del && *s != '|' && *s != '+'; s++);

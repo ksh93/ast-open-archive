@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -81,7 +81,7 @@ mkmount(register Cs_t* state, int mode, int uid, int gid, char* endserv, char* e
 		*endserv = '/';
 		if (mkdir(state->mount, mode))
 			return -1;
-		if (mode != (S_IRWXU|S_IRWXG|S_IRWXO) && (uid >= 0 || gid >= 0) && chown(state->mount, uid, gid) || chmod(state->mount, mode))
+		if (mode != (S_IRWXU|S_IRWXG|S_IRWXO) && (uid >= 0 || gid >= 0 && (mode |= S_ISGID)) && (chown(state->mount, uid, gid) || chmod(state->mount, mode)))
 		{
 			rmdir(state->mount);
 			return -1;
@@ -343,6 +343,242 @@ agent(register Cs_t* state, const char* host, const char* user, const char* path
 		procclose(proc);
 	errno = EACCES;
 	return -1;
+}
+
+/*
+ * csattach() helper
+ */
+
+static int
+doattach(register Cs_t* state, const char* path, int op, int mode, char* user, char* opath, char* tmp, char* serv, char*b)
+{
+	register int	n;
+	int		fd;
+	char*		s;
+
+#if CS_LIB_STREAM || CS_LIB_V10
+
+	int		fds[2];
+	struct stat	st;
+
+	if (op & CS_OPEN_CREATE)
+	{
+		n = errno;
+		if (chmod(path, mode))
+		{
+			remove(path);
+			if ((fd = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode)) < 0)
+			{
+				messagef((state->id, NiL, -1, "open: %s: %s: creat %o error", state->path, path, mode));
+				return -1;
+			}
+			close(fd);
+			chmod(path, mode);
+		}
+		errno = n;
+		if (pipe(fds))
+		{
+			messagef((state->id, NiL, -1, "open: %s: pipe error", state->path, path));
+			return -1;
+		}
+
+#if CS_LIB_V10
+
+		if ((n = ioctl(fds[1], FIOPUSHLD, &conn_ld)) || fmount(3, fds[1], path, 0))
+
+#else
+
+		if ((n = ioctl(fds[1], I_PUSH, "connld")) || fattach(fds[1], path))
+
+#endif
+
+		{
+			messagef((state->id, NiL, -1, "open: %s: %s: %s error", state->path, path, n ? "connld" : "fattach"));
+			close(fds[0]);
+			close(fds[1]);
+			errno = ENXIO;
+			return -1;
+		}
+		close(fds[1]);
+		fd = fds[0];
+	}
+	else
+		for (;;)
+		{
+			if ((fd = open(path, O_RDWR)) >= 0)
+			{
+				if (!fstat(fd, &st) && !S_ISREG(st.st_mode))
+					break;
+				close(fd);
+				remove(path);
+			}
+			else if ((op & CS_OPEN_TEST) || errno == EACCES)
+			{
+				messagef((state->id, NiL, -1, "open: %s: %s: open error", state->path, path));
+				return -1;
+			}
+			if (initiate(state, user, opath, tmp, serv))
+			{
+				messagef((state->id, NiL, -1, "open: %s: %s: service initiate error", state->path, path));
+				return -1;
+			}
+			op = CS_OPEN_TEST;
+		}
+
+#else
+
+#if CS_LIB_SOCKET_UN
+
+	int			pid;
+	int			namlen;
+	char			c;
+	struct sockaddr_un	nam;
+
+	messagef((state->id, NiL, -8, "AHA:%s:%d state.path=`%s' state.mount=`%s' path=`%s' opath=`%s' user=`%s' serv=`%s'", __FILE__, __LINE__, state->path, state->mount, path, opath, user, serv));
+	nam.sun_family = AF_UNIX;
+	strcpy(nam.sun_path, path);
+	namlen = sizeof(nam.sun_family) + strlen(path) + 1;
+	for (n = 0;; n++)
+	{
+		if (n >= 10)
+		{
+			errno = ENXIO;
+		badcon:
+			close(fd);
+			return -1;
+		}
+		if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+		{
+			messagef((state->id, NiL, -1, "open: %s: %s: AF_UNIX socket error", state->path, path));
+			return -1;
+		}
+		if (!connect(fd, (struct sockaddr*)&nam, namlen))
+		{
+			if (op & CS_OPEN_CREATE)
+			{
+				errno = EEXIST;
+				goto badcon;
+			}
+#if CS_LIB_SOCKET_RIGHTS
+			if (read(fd, &c, 1) == 1 && !cssend(state, fd, NiL, 0))
+				break;
+#else
+			break;
+#endif
+		}
+		else
+		{
+			messagef((state->id, NiL, -1, "open: %s: %s: connect error", state->path, path));
+			if (errno == EACCES)
+				goto badcon;
+			else if (errno == EADDRNOTAVAIL || errno == ECONNREFUSED)
+			{
+				c = 0;
+				for (;;)
+				{
+					*b = CS_MNT_PROCESS;
+					pid = pathgetlink(path, state->temp, sizeof(state->temp));
+					*b = CS_MNT_STREAM;
+					if (pid > 0 || ++c >= 5)
+						break;
+					sleep(1);
+				}
+				if (pid > 0 && (s = strrchr(state->temp, '/')) && (pid = strtol(s + 1, NiL, 0)) > 0)
+				{
+					if (!kill(pid, 0) || errno != ESRCH)
+					{
+						if (op & CS_OPEN_CREATE)
+						{
+							errno = EEXIST;
+							goto badcon;
+						}
+						close(fd);
+						if (n)
+							sleep(1);
+						continue;
+					}
+					*b = CS_MNT_PROCESS;
+					remove(path);
+					*b = CS_MNT_STREAM;
+				}
+			}
+		}
+		close(fd);
+		errno = ENOENT;
+		if (op & CS_OPEN_CREATE)
+		{
+			if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
+			{
+				messagef((state->id, NiL, -1, "open: %s: %s: AF_UNIX socket error", state->path, path));
+				return -1;
+			}
+			if (!bind(fd, (struct sockaddr*)&nam, namlen))
+			{
+				chmod(path, mode);
+				if (listen(fd, 32))
+				{
+					messagef((state->id, NiL, -1, "open: %s: %s: listen error", state->path, path));
+					n = errno;
+					remove(path);
+					errno = n;
+					goto badcon;
+				}
+				break;
+			}
+			else
+				messagef((state->id, NiL, -1, "open: %s: %s: bind error", state->path, path));
+			if (errno != EADDRINUSE || n && remove(path) && errno != ENOENT)
+				goto badcon;
+			close(fd);
+		}
+		else if (op & CS_OPEN_TEST)
+			return -1;
+		else if (!n && initiate(state, user, opath, tmp, serv))
+		{
+			messagef((state->id, NiL, -1, "open: %s: %s: service initiate error", state->path, path));
+			return -1;
+		}
+		else
+			sleep(2);
+	}
+
+#else
+
+	errno = (op & CS_OPEN_CREATE) ? ENXIO : ENOENT;
+	messagef((state->id, NiL, -1, "open: %s: %s: not supported", state->path, path));
+	fd = -1;
+
+#endif
+
+#endif
+
+#if CS_LIB_SOCKET_UN || CS_LIB_STREAM || CS_LIB_V10
+
+	touch(path, (time_t)0, (time_t)0, 0);
+	strcpy(state->path, path);
+
+#endif
+
+	return fd;
+}
+
+/*
+ * return connect stream to fdp path
+ * if (op & CS_) then path is created
+ * and server connect stream is returned
+ * otherwise client connect stream returned
+ */
+
+int
+csattach(register Cs_t* state, const char* path, int op, int mode)
+{
+	return doattach(state, path, op, 0, 0, 0, 0, 0, 0);
+}
+
+int
+_cs_attach(const char* path, int op, int mode)
+{
+	return csattach(&cs, path, op, mode);
 }
 
 /*
@@ -894,207 +1130,8 @@ csopen(register Cs_t* state, const char* apath, int op)
 		 * {fdp}
 		 */
 
-
-#if CS_LIB_STREAM || CS_LIB_V10
-
-		int	fds[2];
-
-		if (op & CS_OPEN_CREATE)
-		{
-			n = errno;
-			if (chmod(path, mode))
-			{
-				remove(path);
-				if ((fd = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode)) < 0)
-				{
-					messagef((state->id, NiL, -1, "open: %s: %s: creat %o error", state->path, path, mode));
-					return -1;
-				}
-				close(fd);
-				chmod(path, mode);
-			}
-			errno = n;
-			if (pipe(fds))
-			{
-				messagef((state->id, NiL, -1, "open: %s: pipe error", state->path, path));
-				return -1;
-			}
-
-#if CS_LIB_V10
-
-			if ((n = ioctl(fds[1], FIOPUSHLD, &conn_ld)) || fmount(3, fds[1], path, 0))
-
-#else
-
-			if ((n = ioctl(fds[1], I_PUSH, "connld")) || fattach(fds[1], path))
-
-#endif
-
-			{
-				messagef((state->id, NiL, -1, "open: %s: %s: %s error", state->path, path, n ? "connld" : "fattach"));
-				close(fds[0]);
-				close(fds[1]);
-				errno = ENXIO;
-				return -1;
-			}
-			close(fds[1]);
-			fd = fds[0];
-		}
-		else for (;;)
-		{
-			if ((fd = open(path, O_RDWR)) >= 0)
-			{
-				if (!fstat(fd, &st) && !S_ISREG(st.st_mode))
-					break;
-				close(fd);
-				remove(path);
-			}
-			else if ((op & CS_OPEN_TEST) || errno == EACCES)
-			{
-				messagef((state->id, NiL, -1, "open: %s: %s: open error", state->path, path));
-				return -1;
-			}
-			if (initiate(state, user, opath, tmp, serv))
-			{
-				messagef((state->id, NiL, -1, "open: %s: %s: service initiate error", state->path, path));
-				return -1;
-			}
-			op = CS_OPEN_TEST;
-		}
-
-#else
-
-#if CS_LIB_SOCKET_UN
-
-		int			pid;
-		int			namlen;
-		char			c;
-		struct sockaddr_un	nam;
-
-		nam.sun_family = AF_UNIX;
-		strcpy(nam.sun_path, path);
-		namlen = sizeof(nam.sun_family) + strlen(path) + 1;
-		for (n = 0;; n++)
-		{
-			if (n >= 10)
-			{
-				errno = ENXIO;
-			badcon:
-				close(fd);
-				return -1;
-			}
-			if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
-			{
-				messagef((state->id, NiL, -1, "open: %s: %s: AF_UNIX socket error", state->path, path));
-				return -1;
-			}
-			if (!connect(fd, (struct sockaddr*)&nam, namlen))
-			{
-				if (op & CS_OPEN_CREATE)
-				{
-					errno = EEXIST;
-					goto badcon;
-				}
-#if CS_LIB_SOCKET_RIGHTS
-				if (read(fd, &c, 1) == 1 && !cssend(state, fd, NiL, 0))
-					break;
-#else
-				break;
-#endif
-			}
-			else
-			{
-				messagef((state->id, NiL, -1, "open: %s: %s: connect error", state->path, path));
-				if (errno == EACCES)
-					goto badcon;
-				else if (errno == EADDRNOTAVAIL || errno == ECONNREFUSED)
-				{
-					c = 0;
-					for (;;)
-					{
-						*b = CS_MNT_PROCESS;
-						pid = pathgetlink(path, state->temp, sizeof(state->temp));
-						*b = CS_MNT_STREAM;
-						if (pid > 0 || ++c >= 5)
-							break;
-						sleep(1);
-					}
-					if (pid > 0 && (s = strrchr(state->temp, '/')) && (pid = strtol(s + 1, NiL, 0)) > 0)
-					{
-						if (!kill(pid, 0) || errno != ESRCH)
-						{
-							if (op & CS_OPEN_CREATE)
-							{
-								errno = EEXIST;
-								goto badcon;
-							}
-							close(fd);
-							if (n)
-								sleep(1);
-							continue;
-						}
-						*b = CS_MNT_PROCESS;
-						remove(path);
-						*b = CS_MNT_STREAM;
-					}
-				}
-			}
-			close(fd);
-			errno = ENOENT;
-			if (op & CS_OPEN_CREATE)
-			{
-				if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0)
-				{
-					messagef((state->id, NiL, -1, "open: %s: %s: AF_UNIX socket error", state->path, path));
-					return -1;
-				}
-				if (!bind(fd, (struct sockaddr*)&nam, namlen))
-				{
-					chmod(path, mode);
-					if (listen(fd, 32))
-					{
-						messagef((state->id, NiL, -1, "open: %s: %s: listen error", state->path, path));
-						n = errno;
-						remove(path);
-						errno = n;
-						goto badcon;
-					}
-					break;
-				}
-				else
-					messagef((state->id, NiL, -1, "open: %s: %s: bind error", state->path, path));
-				if (errno != EADDRINUSE || n && remove(path) && errno != ENOENT)
-					goto badcon;
-				close(fd);
-			}
-			else if (op & CS_OPEN_TEST)
-				return -1;
-			else if (!n && initiate(state, user, opath, tmp, serv))
-			{
-				messagef((state->id, NiL, -1, "open: %s: %s: service initiate error", state->path, path));
-				return -1;
-			}
-			else
-				sleep(2);
-		}
-
-#else
-
-		errno = (op & CS_OPEN_CREATE) ? ENXIO : ENOENT;
-		messagef((state->id, NiL, -1, "open: %s: %s: not supported", state->path, path));
-		return -1;
-
-#endif
-
-#endif
-
-#if CS_LIB_SOCKET_UN || CS_LIB_STREAM || CS_LIB_V10
-
-		strcpy(state->path, path);
-		touch(path, (time_t)0, (time_t)0, 0);
-
-#endif
-
+		if ((fd = doattach(state, path, op, mode, user, opath, tmp, serv, b)) < 0)
+			return -1;
 	}
 	else
 	{

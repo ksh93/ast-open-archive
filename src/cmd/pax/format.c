@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -291,7 +291,8 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
 
 	if (!file)
 	{
-		np = sfstropen();
+		if (!(np = sfstropen()))
+			nospace();
 		if (!ap->delta || ap->delta->format->variant == DELTA_88)
 			sfprintf(np, "DELTA");
 		else
@@ -301,7 +302,8 @@ putinfo(register Archive_t* ap, char* file, unsigned long mtime, unsigned long c
 				sfprintf(np, "%c%c", INFO_SEP, INFO_ORDERED);
 		}
 		sfprintf(np, "%c%c%c", INFO_SEP, INFO_SEP, INFO_SEP);
-		file = sfstruse(np);
+		if (!(file = sfstruse(np)))
+			nospace();
 	}
 	initfile(ap, f, f->st, file, X_IFREG);
 	f->skip = 1;
@@ -615,7 +617,6 @@ getheader(register Archive_t* ap, register File_t* f)
 		f->delta.index = 0;
 		f->uncompressed = 0;
 	}
- again:
 	do
 	{
 		if (ap->peek)
@@ -803,6 +804,7 @@ void
 puttrailer(register Archive_t* ap, register File_t* f)
 {
 	register int	n;
+	char*		s;
 
 	message((-6, "puttrailer()"));
 	if (state.checksum.sum && !f->extended)
@@ -813,7 +815,7 @@ puttrailer(register Archive_t* ap, register File_t* f)
 			if (!f->link->checksum)
 			{
 				sumprint(state.checksum.sum, state.tmp.str, 0);
-				if (!(f->link->checksum = strdup(sfstruse(state.tmp.str))))
+				if (!(s = sfstruse(state.tmp.str)) || !(f->link->checksum = strdup(s)))
 					nospace();
 			}
 			sfputr(state.checksum.sp, f->link->checksum, -1);

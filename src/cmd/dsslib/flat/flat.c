@@ -3114,7 +3114,12 @@ flatmeth(const char* name, const char* options, const char* schema, Dssdisc_t* d
 			goto drop;
 		sfputc(sp, '}');
 		sfputc(sp, '\n');
-		us = sfstruse(sp);
+		if (!(us = sfstruse(sp)))
+		{
+			if (disc->errorf)
+				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
+			goto drop;
+		}
 		for (;;)
 		{
 			switch (optstr(options, us))

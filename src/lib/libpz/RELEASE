@@ -1,3 +1,5 @@
+06-10-11 add sfstruse() error checks
+06-03-22 pzopen.c: change "input stream close error" to "data corrupted"
 05-07-17 pzinflate.c: use sferror() instead of sfsync() -- doh
 	 pzsplit.c: drop SF_WRITE sfreserve() to keep writes aligned
 05-06-30 pzsplit.c: work around sfreserve() write failure via sfwrite()

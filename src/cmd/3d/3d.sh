@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1989-2005 AT&T Corp.                  #
+#           Copyright (c) 1989-2006 AT&T Knowledge Ventures            #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                      by AT&T Knowledge Ventures                      #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -32,7 +32,7 @@ case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
 	USAGE=$'
 [-?
-@(#)$Id: 3d (AT&T Labs Research) 2003-06-04 $
+@(#)$Id: 3d (AT&T Labs Research) 2006-10-01 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?3d - execute a command with nDFS filesystem services enabled]
@@ -271,9 +271,19 @@ esac
 default=$version
 case $version in
 /*)	;;
-*)	for x in $dir/lib/lib3d.s[lo]$version
+*)	if	getconf LIBPREFIX >/dev/null 2>&1
+	then	d=$(getconf LIBPATH)
+		d=${d##*,}
+		d=${d%%:*}
+		p=$(getconf LIBPREFIX)
+		s=$(getconf LIBSUFFIX)
+	else	d=lib
+		p=lib
+		s='.s[lo]'
+	fi
+	for x in $dir/$d/${p}3d${s}$version $dir/$d/${p}3d${version//./}${s}
 	do	case $x in
-		*/lib3d.s[lo]*[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)
+		*/${p}3d${s}*[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*|*/${p}3d$*[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*${s})
 			;;
 		*)	version=$x
 			break

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -806,6 +806,8 @@ attributes(register char* s, register Coattr_t* p, Coattr_t* d)
 					p->global.set |= SETSCHEDULE;
 					p->global.schedule = savestring(&save, v, n);
 				}
+				continue;
+			case HASHKEY6('s','e','r','v','i','c'):
 				continue;
 			case HASHKEY5('s','h','e','l','l'):
 				if (p->set & SETNAME)

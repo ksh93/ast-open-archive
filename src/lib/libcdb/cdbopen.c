@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1997-2005 AT&T Corp.                  *
+*           Copyright (c) 1997-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -338,7 +338,9 @@ cdbopen(register Cdb_t* cdb, register Cdbdisc_t* disc, Cdbmeth_t* meth, Sfio_t* 
 		if (sfstrtell(cdb->txt))
 		{
 			sfputr(cdb->txt, meth->name, -1);
-			cdb->meth.name = (const char*)vmstrdup(cdb->vm, sfstruse(cdb->txt));
+			if (!(s = sfstruse(cdb->txt)))
+				goto nospace;
+			cdb->meth.name = (const char*)vmstrdup(cdb->vm, s);
 		}
 	}
 	else if (i < 0)
@@ -373,7 +375,8 @@ cdbopen(register Cdb_t* cdb, register Cdbdisc_t* disc, Cdbmeth_t* meth, Sfio_t* 
 			if (cdb->label)
 				sfprintf(cdb->tmp, "%s ", cdb->label);
 			sfprintf(cdb->tmp, "data from %s", cdb->path);
-			s = sfstruse(cdb->tmp);
+			if (!(s = sfstruse(cdb->tmp)))
+				goto nospace;
 		}
 		if (!(cdb->comment = vmstrdup(cdb->vm, s)))
 			goto nospace;
@@ -517,7 +520,8 @@ cdbparse(register Cdb_t* cdb, const char* schema)
 	}
 	else
 		sfputr(cdb->cvt, schema, 0);
-	schema = (const char*)sfstruse(cdb->cvt);
+	if (!(schema = (const char*)sfstruse(cdb->cvt)))
+		goto nospace;
 
 	/*
 	 * if we were here already then cdb->schema is the canonical
@@ -711,7 +715,7 @@ cdbparse(register Cdb_t* cdb, const char* schema)
 					if (!*t)
 					{
 						sfprintf(cdb->tmp, "PART_%d", partition + 1);
-						if (!(t = vmstrdup(cdb->vm, sfstruse(cdb->tmp))))
+						if (!(e = sfstruse(cdb->tmp)) || !(t = vmstrdup(cdb->vm, e)))
 							goto nospace;
 					}
 					sp->name = (const char*)t;

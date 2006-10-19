@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2000-2005 AT&T Corp.                  *
+*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: msgcpp (AT&T Labs Research) 2002-03-11 $\n]"
+"[-?\n@(#)$Id: msgcpp (AT&T Research) 2002-03-11 $\n]"
 USAGE_LICENSE
 "[+NAME?msgcpp - C language message catalog preprocessor]"
 "[+DESCRIPTION?\bmsgcpp\b is a C language message catalog preprocessor."
@@ -271,7 +271,9 @@ main(int argc, char** argv)
 				{
 					sfprintf(sfstdout, "def %s \"%s\"\n", s, pp.token);
 					sfprintf(tmp, "#define %s \"%s\"\n", s, pp.token);
-					ppinput(sfstruse(tmp), "string", 0);
+					if (!(s = sfstruse(tmp)))
+						error(ERROR_SYSTEM|3, "out of space");
+					ppinput(s, "string", 0);
 				}
 				else
 					goto again;

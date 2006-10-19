@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -29,7 +29,7 @@
  * PROTOMAIN is coded for minimal library support
  */
 
-static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2004-10-22 $\0\n";
+static const char id[] = "\n@(#)$Id: proto (AT&T Research) 2006-06-28 $\0\n";
 
 #if PROTOMAIN
 
@@ -77,6 +77,7 @@ struct proto				/* proto buffer state		*/
 	int		oz;		/* output buffer size		*/
 	char*		ob;		/* output buffer base		*/
 	char*		op;		/* output buffer pointer	*/
+	char*		ox;		/* output buffer externalize	*/
 
 	char		cc[3];		/* beg mid end comment char	*/
 	char		pushback[4];	/* pushback area for caller	*/
@@ -104,56 +105,58 @@ struct proto				/* proto buffer state		*/
 #define ERROR		(1L<<4)
 #undef	EXTERN
 #define EXTERN		(1L<<5)
+#undef	EXTERNALIZE
+#define EXTERNALIZE	(1L<<6)
 #undef	IDID
-#define IDID		(1L<<6)
+#define IDID		(1L<<7)
 #undef	INDIRECT
-#define INDIRECT	(1L<<7)
+#define INDIRECT	(1L<<8)
 #undef	INIT
-#define INIT		(1L<<8)
+#define INIT		(1L<<9)
 #undef	INIT_DEFINE
-#define INIT_DEFINE	(1L<<9)
+#define INIT_DEFINE	(1L<<10)
 #undef	INIT_INCLUDE
-#define INIT_INCLUDE	(1L<<10)
+#define INIT_INCLUDE	(1L<<11)
 #undef	JUNK
-#define JUNK		(1L<<11)
+#define JUNK		(1L<<12)
 #undef	LINESYNC
-#define LINESYNC	(1L<<12)
+#define LINESYNC	(1L<<13)
 #undef	MANGLE
-#define MANGLE		(1L<<13)
+#define MANGLE		(1L<<14)
 #undef	MATCH
-#define MATCH		(1L<<14)
+#define MATCH		(1L<<15)
 #undef	MORE
-#define MORE		(1L<<15)
+#define MORE		(1L<<16)
 #undef	OTHER
-#define OTHER		(1L<<16)
+#define OTHER		(1L<<17)
 #undef	PASS
-#define PASS		(1L<<17)
+#define PASS		(1L<<18)
 #undef	PLUSONLY
-#define PLUSONLY	(1L<<18)
+#define PLUSONLY	(1L<<19)
 #undef	PLUSPLUS
-#define PLUSPLUS	(1L<<19)
+#define PLUSPLUS	(1L<<20)
 #undef	RECURSIVE
-#define RECURSIVE	(1L<<20)
+#define RECURSIVE	(1L<<21)
 #undef	SHARP
-#define SHARP		(1L<<21)
+#define SHARP		(1L<<22)
 #undef	SKIP
-#define SKIP		(1L<<22)
+#define SKIP		(1L<<23)
 #undef	SLIDE
-#define SLIDE		(1L<<23)
+#define SLIDE		(1L<<24)
 #undef	TOKENS
-#define TOKENS		(1L<<24)
+#define TOKENS		(1L<<25)
 #undef	TYPEDEF
-#define TYPEDEF		(1L<<25)
+#define TYPEDEF		(1L<<26)
 #undef	VARIADIC
-#define VARIADIC	(1L<<26)
+#define VARIADIC	(1L<<27)
 #undef	VARIADIC2
-#define VARIADIC2	(1L<<27)
+#define VARIADIC2	(1L<<28)
 #undef	YACC
-#define YACC		(1L<<28)
+#define YACC		(1L<<29)
 #undef	YACCSPLIT
-#define YACCSPLIT	(1L<<29)
+#define YACCSPLIT	(1L<<30)
 #undef	YACC2
-#define YACC2		(1L<<30)
+#define YACC2		(1L<<31)
 
 #undef	GLOBAL
 #define GLOBAL		(MORE)
@@ -486,6 +489,52 @@ init(struct proto* proto, char* op, int flags)
 #define UNPUTCHR()	(op--)
 
 /*
+ * advance to the next non-space character
+ */
+
+static char*
+nns(register char* s)
+{
+	while (*s == ' ' || *s == '\t' || *s == '\n')
+		s++;
+	return s;
+}
+
+#define DIR_if	01
+#define DIR_el	02
+#define DIR_en	03
+#define DIR	03
+
+/*
+ * update directive mask
+ */
+
+static int
+directive(register char* s, int dir)
+{
+	switch (*(s = nns(s)))
+	{
+	case 'e':
+	case 'i':
+		dir <<= 2;
+		switch (*++s)
+		{
+		case 'f':
+			dir |= DIR_if;
+			break;
+		case 'l':
+			dir |= DIR_el;
+			break;
+		case 'n':
+			dir |= DIR_en;
+			break;
+		}
+		break;
+	}
+	return dir;
+}
+
+/*
  * the tokenizer
  * top level calls loop until EOB
  * recursive calls just return the next token
@@ -511,6 +560,7 @@ lex(register struct proto* proto, register long flags)
 	int			line;
 	int			quot;
 	int			brack;
+	int			sub;
 	int			x;
 	int			vc;
 
@@ -520,6 +570,7 @@ lex(register struct proto* proto, register long flags)
 	char*			aie = 0;
 	char*			func = 0;
 	int			call = 0;
+	int			dir = 0;
 	int			group = 0;
 	int			last = 0;
 	int			paren = 0;
@@ -943,6 +994,13 @@ lex(register struct proto* proto, register long flags)
 				goto fsm_id;
 			}
 			break;
+		case RESERVED('s', 'c', 6):
+			if ((proto->options & EXTERNALIZE) && !strncmp(proto->tp, "static", 6))
+			{
+				proto->ox = op - 6;
+				flags |= EXTERNALIZE;
+			}
+			break;
 		case RESERVED('t', 'f', 7):
 			if (!(flags & RECURSIVE) && !strncmp(proto->tp, "typedef", 7))
 			{
@@ -1057,9 +1115,11 @@ lex(register struct proto* proto, register long flags)
 						im = ip - 1;
 						om = op - 1;
 					}
+					sub = 0;
 				}
 				else if (paren == 2 && !aim)
 				{
+					sub++;
 					if (last == '(')
 					{
 						flags &= ~MATCH;
@@ -1073,11 +1133,20 @@ lex(register struct proto* proto, register long flags)
 					else if ((flags & (MATCH|TOKENS)) == MATCH)
 					{
 						for (m = ip - 2; m > im && (*m == ' ' || *m == '\t'); m--);
+						if (m != im && sub == 1)
+						{
+							m = im + (*nns(ip) == '*');
+						}
 						if (m == im)
 						{
 							flags &= ~MATCH;
 							om = 0;
 						}
+					}
+					else if ((flags & MATCH) && sub == 1 && *nns(ip) != '*')
+					{
+						flags &= ~MATCH;
+						om = 0;
 					}
 				}
 				flags &= ~TOKENS;
@@ -1117,10 +1186,9 @@ lex(register struct proto* proto, register long flags)
 			}
 			break;
 		case '#':
-			if (proto->brace == 0 && paren == 0 && last != '=' && (flags & (CLASSIC|DECLARE|DIRECTIVE|MATCH|PLUSONLY|SKIP|TOKENS)) == (MATCH|TOKENS) && *ip == 'e')
-			{
+			dir = directive(ip, dir);
+			if (proto->brace == 0 && paren == 0 && last != '=' && (flags & (CLASSIC|DECLARE|DIRECTIVE|MATCH|PLUSONLY|SKIP|TOKENS)) == (MATCH|TOKENS) && ((dir & DIR) != DIR_en || ((dir>>2) & DIR) != DIR_if))
 				flags |= DIRECTIVE;
-			}
 			else if (!(flags & (DECLARE|DIRECTIVE)))
 			{
 				flags |= DIRECTIVE;
@@ -1241,7 +1309,8 @@ if !defined(va_start)\n\
 				}
 				break;
 			}
-			else break;
+			else
+				break;
 			/*FALLTHROUGH*/
 		case '{':
 			if (proto->brace++ == 0 && paren == 0)
@@ -1534,6 +1603,7 @@ if !defined(va_start)\n\
 						op = proto->op;
 						PUTCHR(')');
 					}
+					if (flags & EXTERNALIZE) memcpy(proto->ox, "extern", 6);
 					op = linesync(proto, op, proto->line = line);
 					if (flags & DIRECTIVE)
 					{
@@ -1690,6 +1760,7 @@ if !defined(va_start)\n\
 							op = memcopy(op, im, ie - im);
 							PUTCHR(')');
 						}
+						if (flags & EXTERNALIZE) memcpy(proto->ox, "extern", 6);
 						PUTCHR(c);
 					}
 					flags &= ~(MATCH|VARIADIC|VARIADIC2);
@@ -1703,7 +1774,7 @@ if !defined(va_start)\n\
 				else if (flags & (OTHER|SKIP)) call = 0;
 				if (c == ';')
 				{
-					flags &= ~(MANGLE|TOKENS|TYPEDEF);
+					flags &= ~(EXTERNALIZE|MANGLE|TOKENS|TYPEDEF);
 					call = 0;
 					if (flags & SLIDE)
 					{
@@ -2228,6 +2299,7 @@ pppopen(char* file, int fd, char* notice, char* options, char* package, char* co
  magic:
 	if (flags & PROTO_PLUSPLUS) proto->flags |= PLUSPLUS;
 	if (flags & PROTO_TEST) proto->test = 1;
+	if (flags & PROTO_EXTERNALIZE) proto->options |= EXTERNALIZE;
 #if PROTOMAIN
 	if (flags & PROTO_CLASSIC) pragma = -pragma;
 	if (flags & PROTO_DISABLE) pragma = 0;

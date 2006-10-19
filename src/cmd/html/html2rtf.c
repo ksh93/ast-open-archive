@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,13 +20,13 @@
 #pragma prototyped
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  *
  * html to rtf filter
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: html2rtf (AT&T Labs Research) 1999-01-01 $\n]"
+"[-?\n@(#)$Id: html2rtf (AT&T Research) 1999-01-01 $\n]"
 USAGE_LICENSE
 "[+NAME?html2rtf - html to rtf filter]"
 "[+DESCRIPTION?\bhtml2rtf\b converts input \bhtml\b documents to an \bRTF\b"
@@ -943,7 +943,8 @@ process(char* file, register Sfio_t* ip, register Sfio_t* op)
 			if (item == '<' && !(quote & STRING))
 			{
 				item = 0;
-				s = sfstruse(op);
+				if (!(s = sfstruse(op)))
+					error(ERROR_SYSTEM|3, "out of space");
 				op = state.out;
 				if (*s == '!')
 				{
@@ -1089,7 +1090,8 @@ process(char* file, register Sfio_t* ip, register Sfio_t* op)
 			if (item == '&')
 			{
 				item = 0;
-				s = sfstruse(op);
+				if (!(s = sfstruse(op)))
+					error(ERROR_SYSTEM|3, "out of space");
 				op = state.out;
 				if (*s == '#')
 				{
@@ -1267,7 +1269,8 @@ project(char* file)
 				sfputr(state.tmp, s, '\n');
 			}
 			sfclose(fp);
-			s = sfstruse(state.tmp);
+			if (!(s = sfstruse(state.tmp)))
+				error(ERROR_SYSTEM|3, "out of space");
 		}
 		else
 			s = "\
@@ -1577,7 +1580,8 @@ main(int argc, char** argv)
 				else
 					c = strlen(t);
 				sfprintf(state.tmp, "%-.*s.rtf", c, t);
-				u = sfstruse(state.tmp);
+				if (!(u = sfstruse(state.tmp)))
+					error(ERROR_SYSTEM|3, "out of space");
 				if (!(op = sfopen(NiL, u, "w")))
 				{
 					error(ERROR_SYSTEM|2, "%s: cannot write", u);
@@ -1587,7 +1591,8 @@ main(int argc, char** argv)
 				hashput(state.files, u, state.files);
 				while (c = *t++)
 					sfputc(state.tmp, isalnum(c) ? c : '.');
-				state.prefix = strdup(sfstruse(state.tmp));
+				if (!(state.prefix = strdup(sfstruse(state.tmp))))
+					error(ERROR_SYSTEM|3, "out of space");
 			}
 			else
 			{

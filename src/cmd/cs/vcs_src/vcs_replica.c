@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -46,6 +46,7 @@ int replica_creat(path, sf)
 	register DIR*		dir;
 	register struct dirent*	rca;
 	register char*		s;
+	register char*		e;
 	Sfio_t*			fd;
 	int			cnt = 0;
 	struct stat		st;
@@ -53,6 +54,7 @@ int replica_creat(path, sf)
 	if (((rd = getrdir(path, dirbuf)) == NULL) || (dir = opendir(rd)) == NULL)
 		return (-1);
 
+	e = rd + sizeof(dirbuf);
 	for(s = rd; *s; s++);
 
 	if ((rf = strrchr(path, '/')))
@@ -73,11 +75,11 @@ int replica_creat(path, sf)
 		/*
 		 * skip regular file 
 		 */
-		sprintf(s, "/%s", rca->d_name);
+		sfsprintf(s, e - s, "/%s", rca->d_name);
 		if (stat(dirbuf, &st) || !S_ISDIR(st.st_mode))
 			continue;
 
-		sprintf(s, "/%s/%s", rca->d_name, rf);
+		sfsprintf(s, e - s, "/%s/%s", rca->d_name, rf);
 		if ((fd = sfopen(NULL, dirbuf, "w")))
 		{
 			sfseek(sf, 0L, 0);
@@ -108,6 +110,7 @@ int replica(path, df, tp)
 	register DIR*		dir;
 	register struct dirent*	rca;
 	register char*		s;
+	register char*		e;
 	Sfio_t*			fd;
 	int			cnt = 0;
 	struct stat		st;
@@ -116,6 +119,7 @@ int replica(path, df, tp)
 	if (((rd = getrdir(path, dirbuf)) == NULL) || (dir = opendir(rd)) == NULL)
 		return (-1);
 
+	e = rd + sizeof(dirbuf) - 1;
 	for(s = rd; *s; s++);
 
 	if ((rf = strrchr(path, '/')))
@@ -136,10 +140,10 @@ int replica(path, df, tp)
 		/*
 		 * skip regular file 
 		 */
-		sprintf(s, "/%s", rca->d_name);
+		sfsprintf(s, e - s, "/%s", rca->d_name);
 		if (stat(dirbuf, &st) || !S_ISDIR(st.st_mode))
 			continue;
-		sprintf(s, "/%s/%s.%d", rca->d_name, rf, cs.time);
+		sfsprintf(s, e - s, "/%s/%s.%d", rca->d_name, rf, cs.time);
 		if ((fd = sfopen(NULL, dirbuf, "a")))
 		{
 			sfwrite(fd,(char *)tp,tp->length); 

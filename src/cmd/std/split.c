@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,7 +25,7 @@
  */
 
 static const char split_usage[] =
-"[-?\n@(#)$Id: split (AT&T Labs Research) 2004-01-22 $\n]"
+"[-?\n@(#)$Id: split (AT&T Research) 2006-09-19 $\n]"
 USAGE_LICENSE
 "[+NAME?split - split files into pieces]"
 "[+DESCRIPTION?\bsplit\b reads an input file and writes one or more"
@@ -69,7 +69,7 @@ USAGE_LICENSE
 ;
 
 static const char csplit_usage[] =
-"[-?\n@(#)$Id: csplit (AT&T Labs Research) 2003-08-21 $\n]"
+"[-?\n@(#)$Id: csplit (AT&T Research) 2003-08-21 $\n]"
 USAGE_LICENSE
 "[+NAME?csplit - split a file into sections determined by context lines]"
 "[+DESCRIPTION?\bcsplit\b creates zero or more output files containing"
@@ -275,7 +275,7 @@ setfname(const char* prefix, char* format, int suflen, int low, int high)
 			if (len > flen)
 			{
 				*(cp - 1) = 0;
-				flen = pathconf(fp->fname, _PC_NAME_MAX);
+				flen = (int)strtol(astconf("NAME_MAX", fp->fname, NiL), NiL, 0);
 				*(cp - 1) = '/';
 			}
 		}
@@ -283,7 +283,7 @@ setfname(const char* prefix, char* format, int suflen, int low, int high)
 		{
 			cp = fp->fname;
 			if (len > flen)
-				flen = pathconf(".", _PC_NAME_MAX);
+				flen = (int)strtol(astconf("NAME_MAX", ".", NiL), NiL, 0);
 		}
 		if (len > flen)
 			error(ERROR_exit(1), "%s: filename too long", prefix);

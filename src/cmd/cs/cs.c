@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cs (AT&T Labs Research) 1999-09-22 $\n]"
+"[-?\n@(#)$Id: cs (AT&T Research) 2006-06-11 $\n]"
 USAGE_LICENSE
 "[+NAME?cs - connect stream control]"
 "[+DESCRIPTION?\bcs\b displays, initiates, and terminates connect stream"
@@ -62,6 +62,7 @@ USAGE_LICENSE
 "[p:process?List the active connect stream process ids on the standard output.]"
 "[q:query?Open an interactive connection to the connect stream if a service"
 "	is already running; fail otherwise.]"
+"[r:raw?Raw mode \b--interactive\b connection.]"
 "[s:iservice?List details for each active connect stream service on the"
 "	standard output. The output format is similar to an \bls\b(1)"
 "	\b--long\b listing, except the size field is the \btcp\b or \budp\b"
@@ -123,14 +124,6 @@ USAGE_LICENSE
 #include <tok.h>
 #include <debug.h>
 
-#include "FEATURE/termios"
-#if !_lib_tcgetattr || !_lib_tcsetattr
-#undef	_hdr_termios
-#endif
-#if _hdr_termios
-#include <termios.h>
-#endif
-
 #define LIST		(1<<0)
 #define LIST_MOUNT	(1<<1)
 #define LIST_PROCESS	(1<<2)
@@ -143,10 +136,6 @@ static struct
 {
 	int		list;		/* list flags			*/
 	char*		local;		/* csname(0)			*/
-#if _hdr_termios
-	struct termios	new_term;	/* raw term for -r		*/
-	struct termios	old_term;	/* original term for -r		*/
-#endif
 } state;
 
 /*
@@ -235,7 +224,8 @@ list(register Ftw_t* ftw)
 			if (!sp && !(sp = sfstropen()))
 				error(ERROR_SYSTEM|3, "out of space");
 			sfprintf(sp, "%s/X%s", ftw->path, CS_MNT_TAIL);
-			p = sfstruse(sp);
+			if (!(p = sfstruse(sp)))
+				error(ERROR_SYSTEM|3, "out of space");
 			s = p + ftw->pathlen + 1;
 			*s = CS_MNT_PROCESS;
 			if (pathgetlink(p, proc_buf + PROC_OFF, sizeof(proc_buf) - PROC_OFF) <= 0)
@@ -388,14 +378,6 @@ msgcat(register Sfio_t* sp, register int flags, unsigned long call, unsigned lon
 	}
 }
 
-#if _hdr_termios
-static void
-restore(void)
-{
-	tcsetattr(0, TCSANOW, &state.old_term);
-}
-#endif
-
 int
 main(int argc, char** argv)
 {
@@ -406,7 +388,7 @@ main(int argc, char** argv)
 	int		initiate = CS_OPEN_READ;
 	int		interactive = 0;
 	int		msg = 0;
-	int		raw = 0;
+	int		clientflags = 0;
 	int		remote = 0;
 	int		translate = 0;
 	unsigned long	call = ~0;
@@ -445,11 +427,7 @@ main(int argc, char** argv)
 			hostenv = 1;
 			continue;
 		case 'r':
-#if _hdr_termios
-			raw = 1;
-#else
-			error(1, "raw mode not supported");
-#endif
+			clientflags = CS_CLIENT_RAW;
 			/*FALLTHROUGH*/
 		case 'i':
 			interactive = 1;
@@ -735,76 +713,7 @@ main(int argc, char** argv)
 			}
 		}
 		else if (interactive)
-		{
-			register char*	s;
-			register int	i;
-			register int	m;
-			int		done = 0;
-			int		sdf[2];
-			Cs_poll_t	fds[2];
-
-#if _hdr_termios
-			if (raw)
-			{
-				tcgetattr(0, &state.old_term);
-				atexit(restore);
-				state.new_term = state.old_term;
-				state.new_term.c_iflag &= ~(BRKINT|IGNPAR|PARMRK|INLCR|IGNCR|ICRNL);
-				state.new_term.c_lflag &= ~(ECHO|ECHOK|ICANON|ISIG);
-				state.new_term.c_cc[VTIME] = 0;
-				state.new_term.c_cc[VMIN] = 1;
-				tcsetattr(0, TCSANOW, &state.new_term);
-			}
-#endif
-			sdf[0] = fd;
-			sdf[1] = 1;
-			fds[0].fd = 0;
-			fds[0].events = CS_POLL_READ;
-			fds[1].fd = fd;
-			fds[1].events = CS_POLL_READ;
-			while (cspoll(fds, elementsof(fds), CS_NEVER) > 0)
-				for (i = 0; i < elementsof(fds); i++)
-					if (fds[i].status & CS_POLL_READ)
-					{
-						if ((n = read(fds[i].fd, buf, sizeof(buf) - 1)) < 0)
-							error(ERROR_SYSTEM|3, "/dev/fd/%d: read error", fds[i].fd);
-						if (!n)
-						{
-							done |= 1<<i;
-							if (done && (1<<(!i)))
-								return 0;
-							fds[i].events = 0;
-							continue;
-						}
-						if (!i)
-						{
-#if _hdr_termios
-							buf[n] = 0;
-							if ((s = strchr(buf, 035)))
-							{
-								if ((m = s - buf) > 0 && write(sdf[i], buf, m) != m)
-									error(ERROR_SYSTEM|3, "/dev/fd/%d: write error", sdf[i]);
-								tcsetattr(0, TCSANOW, &state.old_term);
-								write(1, "\nCS> ", 5);
-								if ((n = read(fds[i].fd, buf, sizeof(buf) - 1)) <= 0)
-								{
-									write(1, "\n", 1);
-									return 0;
-								}
-								buf[n - 1] = 0;
-								if (*s == 'q' || *s == 'Q')
-									return 0;
-								tcsetattr(0, TCSANOW, &state.new_term);
-								if (*s)
-									error(1, "%s: unknown command", s);
-								continue;
-							}
-#endif
-						}
-						if (write(sdf[i], buf, n) != n)
-							error(ERROR_SYSTEM|3, "/dev/fd/%d: write error", sdf[i]);
-					}
-		}
+			return csclient(fd, path, "cs> ", NiL, clientflags) || error_info.errors;
 		else
 		{
 			if (*argv)

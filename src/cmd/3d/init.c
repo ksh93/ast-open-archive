@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -40,9 +40,9 @@ static const char id[] =
 #if VCS
 	"vcs "
 #endif
-"] (AT&T Research) 2005-01-01 $\0\n"
+"] (AT&T Research) 2006-08-27 $\0\n"
 #else
-"\n@(#)$Id: 3d (AT&T Research) 2005-01-01 $\0\n"
+"\n@(#)$Id: 3d (AT&T Research) 2008-08-27 $\0\n"
 #endif
 ;
 

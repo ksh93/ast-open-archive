@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,7 +20,7 @@
 #pragma prototyped
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  *
  * troff to html filter
  *
@@ -30,7 +30,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: troff2html (AT&T Labs Research) 2004-04-26 $\n]"
+"[-?\n@(#)$Id: troff2html (AT&T Research) 2004-04-26 $\n]"
 USAGE_LICENSE
 "[+NAME?troff2html - convert troff/groff input to html]"
 "[+DESCRIPTION?\btroff2html\b converts \btroff\b(1) (or \bgroff\b(1),"
@@ -222,6 +222,20 @@ USAGE_LICENSE
 #define UNGET_MAX	(SF_BUFSIZE/8)
 
 State_t			state;
+
+/*
+ * sfstruse(sp) with fatal error check
+ */
+
+static char*
+use(Sfio_t* sp)
+{
+	char*	s;
+
+	if (!(s = sfstruse(sp)))
+		error(ERROR_SYSTEM|3, "out of space");
+	return s;
+}
 
 /*
  * push input file/string
@@ -693,8 +707,8 @@ test(register char* s, char** e, int* f)
 		if (t)
 		{
 			expand(state.arg, s);
-			sfputr(state.tmp, sfstruse(state.arg), 0);
-			s = sfstruse(state.tmp);
+			sfputr(state.tmp, use(state.arg), 0);
+			s = use(state.tmp);
 		}
 	}
 	v = cond(s, &q);
@@ -878,7 +892,7 @@ popout(void)
 	if (state.out == state.nul)
 		s = 0;
 	else
-		s = sfstruse(state.out);
+		s = use(state.out);
 	iop("stdout", 1)->sp = state.out = *--state.out_top;
 	return s;
 }
@@ -985,7 +999,7 @@ set(Tag_t* mp, char* value, int append)
 	{
 		sfputr(state.tmp, mp->body, -1);
 		sfputr(state.tmp, value, -1);
-		value = sfstruse(state.tmp);
+		value = use(state.tmp);
 	}
 	n = strlen(value) + 1;
 	if (mp->size < n)
@@ -1106,7 +1120,7 @@ find(char* name, char** found, int verbose)
 	if (verbose >= 0 && (sp = sfopen(NiL, name, "r")))
 	{
 		sfprintf(state.tmp, "/%s", name);
-		path = sfstruse(state.tmp);
+		path = use(state.tmp);
 		goto hit;
 	}
 	if (*name != '/')
@@ -1114,7 +1128,7 @@ find(char* name, char** found, int verbose)
 		if (*name == '.' && (x = getenv("HOME")))
 		{
 			sfprintf(state.tmp, "/%s/%s", x, name);
-			path = sfstruse(state.tmp);
+			path = use(state.tmp);
 			if (sp = sfopen(NiL, path + 1, "r"))
 				goto hit;
 		}
@@ -1123,19 +1137,19 @@ find(char* name, char** found, int verbose)
 			if (verbose >= 0)
 			{
 				sfprintf(state.tmp, "/%s/%s", dp->name, name);
-				path = sfstruse(state.tmp);
+				path = use(state.tmp);
 				if (sp = sfopen(NiL, path + 1, "r"))
 					goto hit;
 			}
 			sfprintf(state.tmp, "/%s/tmac.%s", dp->name, name);
-			path = sfstruse(state.tmp);
+			path = use(state.tmp);
 			if (sp = sfopen(NiL, path + 1, "r"))
 				goto hit;
 		}
 		for (i = 0; i < elementsof(pathdirs); i++)
 		{
 			sfprintf(state.tmp, pathdirs[i], name);
-			path = sfstruse(state.tmp);
+			path = use(state.tmp);
 			if (pathpath(buf + 1, path, "", PATH_REGULAR|PATH_READ) && (sp = sfopen(NiL, buf + 1, "r")))
 			{
 				*(path = buf) = '/';
@@ -1162,7 +1176,7 @@ find(char* name, char** found, int verbose)
 					while (*s)
 					{
 						sfprintf(state.tmp, "lib/html/%s%s", s, x);
-						path = sfstruse(state.tmp);
+						path = use(state.tmp);
 						if (pathpath(buf + 1, path, "", PATH_REGULAR|PATH_READ) && (sp = sfopen(NiL, buf + 1, "r")))
 						{
 							*(path = buf) = '/';
@@ -1347,7 +1361,7 @@ trigger(Trap_t** xp)
 			free(pp);
 		} while (ip);
 		*xp = 0;
-		pushin(xp == &state.fini ? "[*EOF*]" : "[*TRAP*]", 1, NiL, sfstruse(state.req), NiL);
+		pushin(xp == &state.fini ? "[*EOF*]" : "[*TRAP*]", 1, NiL, use(state.req), NiL);
 	}
 }
 
@@ -2889,8 +2903,8 @@ troff_ie(Tag_t* tp, Arg_t* ap)
 				if (state.test & 0x100)
 					error(2, "EXPAND +++ `%s'", s);
 				expand(state.arg, s);
-				sfputr(ap->sp, sfstruse(state.arg), 0);
-				s = sfstruse(ap->sp);
+				sfputr(ap->sp, use(state.arg), 0);
+				s = use(ap->sp);
 				if (state.test & 0x100)
 					error(2, "EXPAND --- `%s'", s);
 			}
@@ -3530,14 +3544,14 @@ setopt(void* a, const void* x, register int n, const char* v)
 		{
 		case OPT_begin:
 			sfprintf(state.tmp, "<!-- %s -->", v + n);
-			code_n(OP_RAW, sfstruse(state.tmp));
+			code_n(OP_RAW, use(state.tmp));
 			break;
 		case OPT_debug:
 			error_info.trace = n ? -expression((char*)v, NiL, 'u') : 0;
 			break;
 		case OPT_end:
 			sfprintf(state.tmp, "<!-- /%s -->", v + n);
-			code_n(OP_RAW, sfstruse(state.tmp));
+			code_n(OP_RAW, use(state.tmp));
 			break;
 		case OPT_footnote:
 			if (!state.out)
@@ -3575,9 +3589,9 @@ setopt(void* a, const void* x, register int n, const char* v)
 						}
 					sfprintf(state.tmp, "FN%ld\t%-.*s", m, t - s, s);
 					sfstrseek(state.out, s - b, SEEK_SET);
-					code_n(OP_link, sfstruse(state.tmp));
+					code_n(OP_link, use(state.tmp));
 					sfprintf(state.tmp, "FN%ld", m);
-					code_n(OP_fn, sfstruse(state.tmp));
+					code_n(OP_fn, use(state.tmp));
 				}
 				else
 					code_1(END(OP_fn));
@@ -3640,7 +3654,7 @@ setopt(void* a, const void* x, register int n, const char* v)
 			else if (n)
 			{
 				sfprintf(state.tmp, "%s\t", v);
-				code_n(LABEL(OP_link), sfstruse(state.tmp));
+				code_n(LABEL(OP_link), use(state.tmp));
 			}
 			break;
 		case OPT_link:
@@ -3669,7 +3683,7 @@ setopt(void* a, const void* x, register int n, const char* v)
 		if (strneq(v, "meta.", 5))
 		{
 			sfprintf(state.tmp, "<META name=\"%s\" content=\"%s\">", v + 5, v + n);
-			code_n(OP_RAW, sfstruse(state.tmp));
+			code_n(OP_RAW, use(state.tmp));
 		}
 		else
 			error(1, "%s: unknown option", v);
@@ -3881,7 +3895,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 						sfprintf(state.tmp, " [UNKNOWN]");
 					for (n = 1; n <= state.tag->argc; n++)
 						sfprintf(state.tmp, " `%s'", state.tag->argv[n]);
-					error(-4, "%s:%d: %s", error_info.file, error_info.line, sfstruse(state.tmp));
+					error(-4, "%s:%d: %s", error_info.file, error_info.line, use(state.tmp));
 				}
 				if (tp)
 				{
@@ -3908,7 +3922,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 						if (error_info.trace >= 0)
 							error(1, "%s: unknown request", state.tag->argv[0]);
 						sfprintf(state.tmp, "UNKNOWN REQUEST %s", join(state.tag, 0));
-						code_n(OP_comment, sfstruse(state.tmp));
+						code_n(OP_comment, use(state.tmp));
 						break;
 					}
 					error_info.line++;
@@ -4111,7 +4125,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 						{
 							while ((c = nextchar()) != EOF && c != '\'')
 								sfputc(state.tmp, c);
-							code_n(m == '+' ? OP_link : LABEL(OP_link), sfstruse(state.tmp));
+							code_n(m == '+' ? OP_link : LABEL(OP_link), use(state.tmp));
 							continue;
 						}
 						UNGETC(n);
@@ -4143,7 +4157,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 								break;
 							}
 						size_eval:
-							n = expression(sfstruse(state.tmp), NiL, 'p');
+							n = expression(use(state.tmp), NiL, 'p');
 						}
 						else
 							n = isdigit(c) ? (c - '0') : 0;
@@ -4194,7 +4208,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 					{
 						while ((m = nextchar()) != n)
 							sfputc(state.arg, m);
-						s = sfstruse(state.arg);
+						s = use(state.arg);
 						switch (c)
 						{
 						case 'h':
@@ -4231,12 +4245,12 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 						case 'v':
 							c = expression(s, NiL, 0) >= 0 ? 'd' : 'u';
 							sfprintf(state.arg, "%c%c", state.ec, c);
-							pushin(NiL, 0, NiL, sfstruse(state.arg), NiL);
+							pushin(NiL, 0, NiL, use(state.arg), NiL);
 							break;
 						case 'w':
 							n = convert(strlen(s), 1, 'n');
 							sfprintf(state.arg, "%d", n);
-							pushin(NiL, 0, NiL, sfstruse(state.arg), NiL);
+							pushin(NiL, 0, NiL, use(state.arg), NiL);
 							break;
 						}
 					}
@@ -4260,7 +4274,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 							while ((c = nextchar()) != EOF && c != ']')
 								sfputc(state.tmp, c);
 						arg_eval:
-							c = expression(sfstruse(state.tmp), NiL, 0);
+							c = expression(use(state.tmp), NiL, 0);
 							if (c >= 0 && c <= state.mac->argc)
 								pushin(NiL, -argc, NiL, state.mac->argv[c], NiL);
 						}
@@ -4270,7 +4284,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 								sfprintf(state.tmp, "\"%s\" ", state.mac->argv[c]);
 							if (c == state.mac->argc)
 								sfprintf(state.tmp, "\"%s\"", state.mac->argv[c]);
-							pushin(NiL, -argc, NiL, sfstruse(state.tmp), NiL);
+							pushin(NiL, -argc, NiL, use(state.tmp), NiL);
 						}
 						else if (c < '0' || c > '9')
 						{
@@ -4278,7 +4292,7 @@ process(char* file, Sfio_t* ip, Sfio_t* op)
 								sfputr(state.tmp, state.mac->argv[c], ' ');
 							if (c == state.mac->argc)
 								sfputr(state.tmp, state.mac->argv[c], -1);
-							pushin(NiL, -argc, NiL, sfstruse(state.tmp), NiL);
+							pushin(NiL, -argc, NiL, use(state.tmp), NiL);
 						}
 						else if ((c -= '0') <= state.mac->argc)
 							pushin(NiL, -argc, NiL, state.mac->argv[c], NiL);
@@ -5076,7 +5090,7 @@ html(register unsigned char* s, Sfio_t* op)
 		if (state.macros)
 			sfprintf(subject, " m%s document", state.macros->name);
 	}
-	sfputr(op, sfstruse(subject), -1);
+	sfputr(op, use(subject), -1);
 	tag(op, END(OP_title), STACK|LINE, 0, NiL, 0);
 	if (state.author)
 		sfprintf(op, "<AUTHOR>%s</AUTHOR>\n", state.author);
@@ -5374,7 +5388,7 @@ html(register unsigned char* s, Sfio_t* op)
 				{
 					label = 0;
 					n = sfstrtell(state.tmp);
-					v = (unsigned char*)sfstruse(state.tmp);
+					v = (unsigned char*)use(state.tmp);
 					while (--n > 0 && (isspace(v[n]) || v[n] == '.'));
 					v[n + 1] = 0;
 					if (isdigit(*v))
@@ -5484,7 +5498,7 @@ html(register unsigned char* s, Sfio_t* op)
 						break;
 					}
 					n = sfstrtell(state.tmp);
-					if (!*(t = (unsigned char*)sfstruse(state.tmp)))
+					if (!*(t = (unsigned char*)use(state.tmp)))
 						hot = 0;
 					if (hot)
 					{
@@ -5609,7 +5623,7 @@ html(register unsigned char* s, Sfio_t* op)
 				if (!(v = (unsigned char*)tag_name[OP(m)]))
 				{
 					sfprintf(state.tmp, "(%d)", OP(m));
-					v = (unsigned char*)sfstruse(state.tmp);
+					v = (unsigned char*)use(state.tmp);
 				}
 				error(2, "internal error: <%s%s%s %d> ignored", (m & OP_END) ? "/" : "", v, (m & OP_LABEL) ? " label=" : "", c);
 				break;
@@ -6030,10 +6044,10 @@ main(int argc, char** argv)
 				error(2, "%s", opt_info.arg);
 				continue;
 			}
-			if (v = strchr(argv[opt_info.index - 1], '='))
-				v = sfprints("%s=%s", opt_info.name + 2, fmtquote(v + 1, "\"", "\"", strlen(v + 1), FMT_ALWAYS));
-			else
+			if (!(v = strchr(argv[opt_info.index - 1], '=')))
 				v = opt_info.name + 2;
+			else if (!(v = sfprints("%s=%s", opt_info.name + 2, fmtquote(v + 1, "\"", "\"", strlen(v + 1), FMT_ALWAYS))))
+				error(ERROR_SYSTEM|3, "out of space");
 			stropt(v, options, sizeof(*options), setopt, options);
 			continue;
 		}
@@ -6048,7 +6062,7 @@ main(int argc, char** argv)
 		error(ERROR_SYSTEM|3, "out of space [output]");
 	if (script)
 	{
-		pushin("script", 1, NiL, sfstruse(script), NiL);
+		pushin("script", 1, NiL, use(script), NiL);
 		process(NiL, NiL, op);
 		sfstrclose(script);
 	}
@@ -6077,7 +6091,7 @@ main(int argc, char** argv)
 		code_1(OP_hr);
 		trigger(&state.fini);
 		process(NiL, NiL, op);
-		html((unsigned char*)sfstruse(op), sfstdout);
+		html((unsigned char*)use(op), sfstdout);
 	}
 	exit(error_info.errors != 0);
 }

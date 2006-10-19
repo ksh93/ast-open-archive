@@ -1,6 +1,6 @@
 # regression tests for the uuencode/uudecode utilitiy
 
-umask 022
+UMASK 022
 
 KEEP "*.dat"
 

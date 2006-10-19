@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2006 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -53,7 +53,7 @@ static char*	statusname[] =
 	"AFTER", "BEFORE", "BLOCKED", "INTERMEDIATE", "READY", "RUNNING",
 };
 
-#define jobstatus()	do { if (state.test & 0x00001000) dumpjobs(2); else if (error_info.trace <= CMDTRACE) dumpjobs(CMDTRACE); } while (0)
+#define jobstatus()	do { if (state.test & 0x00001000) dumpjobs(2, JOB_status); else if (error_info.trace <= CMDTRACE) dumpjobs(CMDTRACE, JOB_status); } while (0)
 
 #else
 
@@ -567,7 +567,8 @@ restore(register Joblist_t* job, Sfio_t* buf, Sfio_t* att)
 	}
 	else
 		state.context = 0;
-	expand(buf, job->action);
+	if (job->action)
+		expand(buf, job->action);
 	if (state.context)
 	{
 		s = sfstruse(buf);
@@ -646,6 +647,7 @@ execute(register Joblist_t* job)
 		commit(job, job->target->name);
 	if ((state.mam.dynamic || state.mam.regress) && state.user && !(job->target->property & (P_after|P_before|P_dontcare|P_make|P_state|P_virtual)))
 		sfprintf(state.mam.out, "%sinit %s %s\n", state.mam.label, mamname(job->target), timefmt(NiL, CURTIME));
+	t = sfstruse(tmp);
 	if (!(job->flags & CO_ALWAYS))
 	{
 		if (state.touch)
@@ -664,8 +666,8 @@ execute(register Joblist_t* job)
 							accept(p->rule);
 			}
 		}
-		else if (!state.silent || state.mam.regress)
-			dumpaction(state.mam.out ? state.mam.out : sfstdout, NiL, sfstruse(tmp), NiL);
+		else if (*t && (!state.silent || state.mam.regress))
+			dumpaction(state.mam.out ? state.mam.out : sfstdout, NiL, t, NiL);
 		done(job, 0, NiL);
 	}
 	else
@@ -681,12 +683,13 @@ execute(register Joblist_t* job)
 				fcntl(internal.openfd, F_SETFD, FD_CLOEXEC);
 			sp = sfstropen();
 			sfprintf(sp, "label=%s", idname);
+			expand(sp, " $(" CO_ENV_OPTIONS ")");
 			flags = CO_ANY;
 			if (state.cross)
 				flags |= CO_CROSS;
 			if (state.serialize && state.jobs > 1)
 				flags |= CO_SERIALIZE;
-			if (!(state.coshell = coopen(NiL, flags, sfstruse(sp))))
+			if (!(state.coshell = coopen(getval(CO_ENV_SHELL, VAL_PRIMARY), flags, sfstruse(sp))))
 				error(ERROR_SYSTEM|3, "coshell open error");
 			sfstrclose(sp);
 		}
@@ -708,7 +711,6 @@ execute(register Joblist_t* job)
 				state.tmpfile = tmp;
 			}
 		}
-		t = sfstruse(tmp);
 #if !_HUH_1992_02_29 /* i386 and ftx m68k dump without this statement -- help */
 		message((-99, "execute: %s: t=0x%08x &t=0x%08x", job->target->name, t, &t));
 #endif
@@ -841,7 +843,6 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 		state.savestate = 1;
 	}
  another:
-	job->cojob = 0;
 	jobstatus();
 	if (job->status == INTERMEDIATE)
 		state.intermediate--;
@@ -871,7 +872,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 				if (a->status == MAKING && !a->semaphore)
 				{
 					job->status = AFTER;
-					return !state.coshell || state.coshell->outstanding < state.jobs;
+					return !state.coshell || cojobs(state.coshell) < state.jobs;
 				}
 			}
 		}
@@ -959,7 +960,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 				else if ((job->status = n) == READY)
 				{
 				unjam:
-					if (clear || !job->context || cancel(job->target, job->prereqs))
+					if (clear || cancel(job->target, job->prereqs))
 						goto another;
 					if ((job->target->dynamic & D_intermediate) && job->target->must == 1)
 					{
@@ -977,8 +978,16 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 							goto another;
 						}
 					}
-					else if (!state.coshell || state.coshell->outstanding < state.jobs)
+					else if (!state.coshell || cojobs(state.coshell) < state.jobs)
 						execute(job);
+				}
+				break;
+			case RUNNING:
+				if (clear && job->cojob && (job->cojob->flags & CO_SERVICE))
+				{
+					job->status = FAILED;
+					job->flags |= CO_ERRORS;
+					cokill(state.coshell, job->cojob, 0);
 				}
 				break;
 			}
@@ -995,7 +1004,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 					if (error_info.trace || state.explain)
 						error(state.explain ? 0 : -1, "breaking possible job deadlock at %s", jammed->name);
 					for (job = jobs.firstjob; job; job = job->next)
-#if __ppc__ && __GNUC__ >= 4 && !_HUH_2006_01_11 /* gcc ppc code generation bug */
+#if __GNUC__ >= 4 && !_HUH_2006_01_11 /* gcc code generation bug -- first hit on macos -- not sure if for all gcc 4.* */
 #ifndef __GNUC_MINOR__
 #define __GNUC_MINOR__ 0
 #endif
@@ -1010,7 +1019,7 @@ done(register Joblist_t* job, int clear, Cojob_t* cojob)
 							if (!warned)
 							{
 								warned = 1;
-								error(state.mam.regress || state.regress ? -1 : 1, "gcc %d.%d.%d ppc code generation bug workaround -- pass this on to the vendor", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+								error(state.mam.regress || state.regress ? -1 : 1, "gcc %d.%d.%d code generation bug workaround -- pass this on to the vendor", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
 							}
 							break;
 						}
@@ -1046,7 +1055,7 @@ block(int check)
 	int			clear = 0;
 	int			resume = 0;
 
-	if (!state.coshell || state.coshell->outstanding <= 0)
+	if (!state.coshell || !copending(state.coshell))
 	{
 		if (jobs.intermediate)
 		{
@@ -1092,7 +1101,8 @@ block(int check)
 	for (;;)
 	{
 		state.waiting = 1;
-		cojob = cowait(state.coshell, check ? (Cojob_t*)state.coshell : (Cojob_t*)0);
+		if ((cojob = cowait(state.coshell, check ? (Cojob_t*)state.coshell : (Cojob_t*)0)) && (job = (Joblist_t*)cojob->local))
+			job->cojob = 0;
 		if (trap())
 		{
 			if (state.interpreter)
@@ -1107,7 +1117,6 @@ block(int check)
 				return 0;
 			break;
 		}
-		job = (Joblist_t*)cojob->local;
 		if (r = getrule(external.jobdone))
 		{
 			if (!jobs.tmp)
@@ -1149,7 +1158,7 @@ block(int check)
 		longjmp(state.resume.label, 1);
 	if (!state.finish)
 	{
-		if (state.coshell->outstanding <= 0)
+		if (!copending(state.coshell))
 		{
 			if (clear)
 				finish(1);
@@ -1331,8 +1340,8 @@ trigger(register Rule_t* r, Rule_t* a, char* action, Flags_t flags)
 		 * the make thread blocks when too many jobs are outstanding
 		 */
 
-		n = (flags & CO_FOREGROUND) ? 0 : state.jobs;
-		while ((state.coshell->outstanding >= n || state.coshell->outstanding > state.coshell->running) && block(0));
+		n = (flags & CO_FOREGROUND) ? 0 : (state.jobs - 1);
+		while ((cozombie(state.coshell) || cojobs(state.coshell) > n) && block(0));
 	}
 	prereqs = r->prereqs;
 	if (r->active && r->active->primary)
@@ -1586,9 +1595,11 @@ resolve(char* file, int fd, int mode)
  */
 
 void
-dumpjobs(int level)
+dumpjobs(int level, int op)
 {
 	register Joblist_t*	job;
+	register List_t*	p;
+	register Rule_t*	a;
 	int			indent;
 	int			line;
 
@@ -1598,21 +1609,48 @@ dumpjobs(int level)
 		error_info.indent = 0;
 		line = error_info.line;
 		error_info.line = 0;
-		error(level, "JOB  STATUS       TARGET  tot=%d out=%d run=%d", state.coshell->total, state.coshell->outstanding, state.coshell->running);
-		for (job = jobs.firstjob; job; job = job->next)
+		switch (op)
 		{
-			if (job->cojob)
-				sfsprintf(tmpname, MAXNAME, "[%d]%s", job->cojob->id, job->cojob->id > 9 ? null : " ");
-			else
-				sfsprintf(tmpname, MAXNAME, "[-] ");
-			error(level, "%s %-13s%s\t%s%s%s"
-				, tmpname
-				, job->status == RUNNING && !job->cojob ? "DONE" : statusname[job->status & STATUS]
-				, job->target->name
-				, (job->target->must > ((unsigned int)(job->target->dynamic & D_intermediate) != 0)) ? " [must]" : null
-				, job->context ? null : " [popped]"
-				, (job->target->mark & M_waiting) ? " [waiting]" : null
-				);
+		case JOB_blocked:
+			for (job = jobs.firstjob; job; job = job->next)
+				if (job->status == BLOCKED)
+				{
+					sfprintf(sfstderr, "%8s %s :", statusname[job->status & STATUS], job->target->name);
+					for (p = job->prereqs; p; p = p->next)
+					{
+						if ((a = p->rule)->dynamic & D_alias)
+							a = makerule(a->name);
+						if ((a->property & P_after) && job->status != BEFORE && job->status != AFTER)
+							continue;
+						if (a->status == MAKING)
+							sfprintf(sfstderr, " %s", a->name);
+					}
+					sfprintf(sfstderr, "\n");
+				}
+				else if (job->status == READY)
+					sfprintf(sfstderr, "%8s %s\n", statusname[job->status & STATUS], job->target->name);
+			break;
+		case JOB_status:
+			sfprintf(sfstderr, "JOB  STATUS       TARGET  tot=%d pend=%d done=%d\n", state.coshell->total, copending(state.coshell), cozombie(state.coshell));
+			for (job = jobs.firstjob; job; job = job->next)
+			{
+				if (job->cojob)
+					sfsprintf(tmpname, MAXNAME, "[%d]%s", job->cojob->id, job->cojob->id > 99 ? null : job->cojob->id > 9 ? " " : "  ");
+				else
+					sfsprintf(tmpname, MAXNAME, "[-]  ");
+				sfprintf(sfstderr, "%s %-13s%s\t%s%s%s\n"
+					, tmpname
+					, job->status == RUNNING && !job->cojob ? "DONE" : statusname[job->status & STATUS]
+					, job->target->name
+					, (job->target->must > ((unsigned int)(job->target->dynamic & D_intermediate) != 0)) ? " [must]" : null
+					, job->context ? null : " [popped]"
+					, (job->target->mark & M_waiting) ? " [waiting]" : null
+					);
+			}
+			break;
+		default:
+			error(1, "%d: unknown op index", op);
+			break;
 		}
 		error_info.indent = indent;
 		error_info.line = line;

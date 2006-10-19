@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -145,7 +145,9 @@ setptr(register FILE* ibuf, off_t offset)
 		prevcount = count;
 		count = strlen(cp);
 		if (count == 0 && (zoff = ftell(ibuf)) > roff) {
-			for (cp2 = cp + (zoff - roff); cp < cp2 && *cp == 0; cp++);
+			if ((count = zoff - roff) > LINESIZE)
+				count = LINESIZE;
+			for (cp2 = cp + count; cp < cp2 && *cp == 0; cp++);
 			if (count = cp - buf)
 				note(WARNING, "%d nul%s at offset %lld", count, count == 1 ? "" : "s", (Sflong_t)roff);
 			count = cp2 - cp;
@@ -259,7 +261,7 @@ mhgetcontext(register struct mhcontext* xp, const char* name, int next)
 	i = strlen(name);
 	for (n = 0; n < elementsof(mh_context); n++) {
 		sfprintf(state.path.temp, "%s/%s", name, mh_context[n]);
-		if (fp = fileopen(sfstruse(state.path.temp), "r")) {
+		if (fp = fileopen(struse(state.path.temp), "r")) {
 			while (s = fgets(buf, sizeof(buf), fp)) {
 				if (!strncasecmp(s, "mhcurmsg=", 9)) {
 					xp->dot = strtol(s + 9, &e, 10);
@@ -314,7 +316,7 @@ mhputcontext(register struct mhcontext* xp, const char* name)
 	if (xp->type == 1) {
 		if (xp->dot != xp->old.dot || xp->next != xp->old.next) {
 			sfprintf(state.path.temp, "%s/%s", name, mh_context[xp->type - 1]);
-			if (fp = fileopen(sfstruse(state.path.temp), "Ew")) {
+			if (fp = fileopen(struse(state.path.temp), "Ew")) {
 				fprintf(fp, "MhCurmsg=%ld MhLastmsg=%ld\n", xp->dot, xp->next - 1);
 				fileclose(fp);
 			}
@@ -505,7 +507,7 @@ setinput(register struct msg* mp)
 			if (state.msg.ap)
 				fileclose(state.msg.ap);
 			sfprintf(state.path.temp, "%s/%d", state.path.mail, mp - state.msg.list + 1);
-			if (!(state.msg.ap = fileopen(sfstruse(state.path.temp), "EIr")) && !(state.msg.ap = fileopen("/dev/null", "EIr")))
+			if (!(state.msg.ap = fileopen(struse(state.path.temp), "EIr")) && !(state.msg.ap = fileopen("/dev/null", "EIr")))
 				note(PANIC|SYSTEM, "Empty file open");
 		}
 		fp = state.msg.ap;

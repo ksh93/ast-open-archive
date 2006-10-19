@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,7 +20,7 @@
 #pragma prototyped
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  *
  * pax option definitions
  */
@@ -63,97 +63,98 @@
 #define OPT_delta_method	23
 #define OPT_delta_op		24
 #define OPT_delta_ordered	25
-#define OPT_delta_version	26
-#define OPT_descend		27
-#define OPT_device		28
-#define OPT_devmajor		29
-#define OPT_devminor		30
-#define OPT_dir			31
-#define OPT_dots		32
-#define OPT_edit		33
-#define OPT_entry		34
-#define OPT_eom			35
-#define OPT_exact		36
-#define OPT_extended_name	37
-#define OPT_file		38
-#define OPT_filter		39
-#define OPT_forceconvert	40
-#define OPT_format		41
-#define OPT_from		42
-#define OPT_gid			43
-#define OPT_global_name		44
-#define OPT_gname		45
-#define OPT_header		46
-#define OPT_ignore		47
-#define OPT_ino			48
-#define OPT_install		49
-#define OPT_intermediate	50
-#define OPT_invalid		51
-#define OPT_invert		52
-#define OPT_keepgoing		53
-#define OPT_label		54
-#define OPT_link		55
-#define OPT_linkdata		56
-#define OPT_linkop		57
-#define OPT_linkpath		58
-#define OPT_listformat		59
-#define OPT_listmacro		60
-#define OPT_local		61
-#define OPT_logical		62
-#define OPT_magic		63
-#define OPT_mark		64
-#define OPT_maxout		65
-#define OPT_metaphysical	66
-#define OPT_meter		67
-#define OPT_mkdir		68
-#define OPT_mode		69
-#define OPT_mtime		70
-#define OPT_name		71
-#define OPT_nlink		72
-#define OPT_options		73
-#define OPT_ordered		74
-#define OPT_owner		75
-#define OPT_passphrase		76
-#define OPT_path		77
-#define OPT_physical		78
-#define OPT_pid			79
-#define OPT_preserve		80
-#define OPT_read		81
-#define OPT_record_charset	82
-#define OPT_record_delimiter	83
-#define OPT_record_format	84
-#define OPT_record_header	85
-#define OPT_record_line		86
-#define OPT_record_match	87
-#define OPT_record_pad		88
-#define OPT_record_size		89
-#define OPT_record_trailer	90
-#define OPT_release		91
-#define OPT_reset_atime		92
-#define OPT_sequence		93
-#define OPT_size		94
-#define OPT_strict		95
-#define OPT_summary		96
-#define OPT_symlink		97
-#define OPT_sync		98
-#define OPT_tape		99
-#define OPT_test		100
-#define OPT_testdate		101
-#define OPT_times		102
-#define OPT_tmp			103
-#define OPT_to			104
-#define OPT_typeflag		105
-#define OPT_uid			106
-#define OPT_uname		107
-#define OPT_unblocked		108
-#define OPT_uncompressed	109
-#define OPT_update		110
-#define OPT_verbose		111
-#define OPT_verify		112
-#define OPT_version		113
-#define OPT_warn		114
-#define OPT_write		115
-#define OPT_yes			116
+#define OPT_delta_update	26
+#define OPT_delta_version	27
+#define OPT_descend		28
+#define OPT_device		29
+#define OPT_devmajor		30
+#define OPT_devminor		31
+#define OPT_dir			32
+#define OPT_dots		33
+#define OPT_edit		34
+#define OPT_entry		35
+#define OPT_eom			36
+#define OPT_exact		37
+#define OPT_extended_name	38
+#define OPT_file		39
+#define OPT_filter		40
+#define OPT_forceconvert	41
+#define OPT_format		42
+#define OPT_from		43
+#define OPT_gid			44
+#define OPT_global_name		45
+#define OPT_gname		46
+#define OPT_header		47
+#define OPT_ignore		48
+#define OPT_ino			49
+#define OPT_install		50
+#define OPT_intermediate	51
+#define OPT_invalid		52
+#define OPT_invert		53
+#define OPT_keepgoing		54
+#define OPT_label		55
+#define OPT_link		56
+#define OPT_linkdata		57
+#define OPT_linkop		58
+#define OPT_linkpath		59
+#define OPT_listformat		60
+#define OPT_listmacro		61
+#define OPT_local		62
+#define OPT_logical		63
+#define OPT_magic		64
+#define OPT_mark		65
+#define OPT_maxout		66
+#define OPT_metaphysical	67
+#define OPT_meter		68
+#define OPT_mkdir		69
+#define OPT_mode		70
+#define OPT_mtime		71
+#define OPT_name		72
+#define OPT_nlink		73
+#define OPT_options		74
+#define OPT_ordered		75
+#define OPT_owner		76
+#define OPT_passphrase		77
+#define OPT_path		78
+#define OPT_physical		79
+#define OPT_pid			80
+#define OPT_preserve		81
+#define OPT_read		82
+#define OPT_record_charset	83
+#define OPT_record_delimiter	84
+#define OPT_record_format	85
+#define OPT_record_header	86
+#define OPT_record_line		87
+#define OPT_record_match	88
+#define OPT_record_pad		89
+#define OPT_record_size		90
+#define OPT_record_trailer	91
+#define OPT_release		92
+#define OPT_reset_atime		93
+#define OPT_sequence		94
+#define OPT_size		95
+#define OPT_strict		96
+#define OPT_summary		97
+#define OPT_symlink		98
+#define OPT_sync		99
+#define OPT_tape		100
+#define OPT_test		101
+#define OPT_testdate		102
+#define OPT_times		103
+#define OPT_tmp			104
+#define OPT_to			105
+#define OPT_typeflag		106
+#define OPT_uid			107
+#define OPT_uname		108
+#define OPT_unblocked		109
+#define OPT_uncompressed	110
+#define OPT_update		111
+#define OPT_verbose		112
+#define OPT_verify		113
+#define OPT_version		114
+#define OPT_warn		115
+#define OPT_write		116
+#define OPT_yes			117
 
 typedef struct Option_s
 {

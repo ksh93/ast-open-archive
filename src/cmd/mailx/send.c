@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -103,7 +103,7 @@ part(register struct parse* pp, FILE* op, const char* encoding, off_t size, char
 		filecopy(NiL, ip, NiL, tp, NiL, size, NiL, NiL, 0);
 		fileclose(tp);
 		sfprintf(state.path.temp, "uudecode -h -t -o - -x %s %s", encoding, state.tmp.more);
-		if (!(ip = pipeopen(sfstruse(state.path.temp), "r")))
+		if (!(ip = pipeopen(struse(state.path.temp), "r")))
 			goto bad;
 	}
 	if (prefix) {

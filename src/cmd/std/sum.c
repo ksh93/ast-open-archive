@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: sum (AT&T Labs Research) 2003-12-17 $\n]"
+"[-?\n@(#)$Id: sum (AT&T Research) 2003-12-17 $\n]"
 USAGE_LICENSE
 "[+NAME?cksum,md5sum,sum - print file checksum and block count]"
 "[+DESCRIPTION?\bsum\b lists the checksum, and for most methods the block"
@@ -77,8 +77,11 @@ USAGE_LICENSE
 "[s:silent|status?No output for \b--check\b; 0 exit status means all sums"
 "	matched, non-0 means at least one sum failed to match. Ignored for"
 "	\b--permissions\b.]"
-"[t:total?Only the total checksum and block count of all files is listed."
-"	\b--all\b \b--total\b lists each checksum and the total.]"
+"[t:total?List only the total checksum and block count of all files."
+"	\b--all\b \b--total\b lists each checksum and the total. The"
+"	total checksum and block count may be different from the checksum"
+"	and block count of the catenation of all files due to partial"
+"	blocks that may occur when the files are treated separately.]"
 "[T:text?Read files in text mode (i.e., treat \b\\r\\n\b as \b\\n\b).]"
 "[w!:warn?Warn about invalid \b--check\b lines.]"
 "[x:method|algorithm?Specifies the checksum \amethod\a to"
@@ -293,7 +296,8 @@ verify(register char* s, char* check, Sfio_t* rp)
 		if (sp = openfile(file, "rb"))
 		{
 			pr(rp, sp, file, -1, NiL, NiL);
-			t = sfstruse(rp);
+			if (!(t = sfstruse(rp)))
+				error(ERROR_SYSTEM|3, "out of space");
 			if (!streq(s, t))
 			{
 				if (state.silent)

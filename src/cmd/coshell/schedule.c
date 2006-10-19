@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -152,7 +152,8 @@ search(int op, char* name, register Coattr_t* a, Coattr_t* d)
 				if ((state.scheduler.fd = csopen(name, 0)) < 0 && *name != '/')
 				{
 					sfprintf(state.string, "/dev/tcp/share/%s/trust", name);
-					name = sfstruse(state.string);
+					if (!(name = sfstruse(state.string)))
+						error(3, "out of space");
 					state.scheduler.fd = csopen(name, 0);
 				}
 				if (state.scheduler.fd > 0) state.scheduler.name = dupstring(state.scheduler.name, name);

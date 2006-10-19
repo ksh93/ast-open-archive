@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -163,12 +163,12 @@ edstop(void)
 		for (mp = state.msg.list; mp < state.msg.list + state.msg.count; mp++) {
 			if ((mp->m_flag & update) && !(mp->m_flag & MNONE)) {
 				sfprintf(state.path.temp, "%s/%d", state.path.mail, mp - state.msg.list + 1);
-				temp = sfstruse(state.path.temp);
+				temp = struse(state.path.temp);
 				if (mp->m_flag & (MDELETE|MSAVE))
 					rm(temp);
 				else {
 					sfprintf(state.path.move, "%s/%d~", state.path.mail, mp - state.msg.list + 1);
-					move = sfstruse(state.path.move);
+					move = struse(state.path.move);
 					if (obuf = fileopen(move, "Ew")) {
 						if (copy(mp, obuf, NiL, NiL, 0) < 0) {
 							note(SYSTEM, "%s", temp);

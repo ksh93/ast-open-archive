@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2006 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -455,6 +455,76 @@ uniq(Sfio_t* xp, char* v, char* w, int sep)
 	}
 	hashfree(tab);
 	tokclose(tok);
+}
+
+/*
+ * mark r and recursively all prerequisites with m
+ * prereqs already marked with m are also marked with c
+ * if c!=0 then c marked prereqs listed in xp
+ * otherwise m marked prereqs listed in xp
+ * xp==0 removes marks
+ */
+
+static int
+mark(Sfio_t* xp, Rule_t* r, int m, int c)
+{
+	register List_t*	p;
+
+	if (xp)
+	{
+		if (r->mark & c)
+		{
+			sfputr(xp, r->name, ' ');
+			return 1;
+		}
+		if (!(r->mark & m))
+		{
+			r->mark |= m|c;
+			for (p = r->prereqs; p; p = p->next)
+				if (mark(xp, p->rule, m, c))
+				{
+					sfputr(xp, r->name, ' ');
+					return 1;
+				}
+			if (c)
+				r->mark &= ~c;
+			else
+				sfputr(xp, r->name, ' ');
+		}
+	}
+	else if (r->mark & m)
+	{
+		r->mark &= ~(m|c);
+		for (p = r->prereqs; p; p = p->next)
+			mark(xp, p->rule, m, c);
+	}
+	return 0;
+}
+
+/*
+ * expand closure of v into xp
+ */
+
+static void
+closure(Sfio_t* xp, char* v, char* w)
+{
+	register char*		s;
+	char*			tok;
+	long			pos;
+	int			cycle;
+
+	cycle = (w && (*w == 'C' || *w == 'c')) ? M_scan : 0;
+	pos = sfstrtell(xp);
+	tok = tokopen(v, 1);
+	while (s = tokread(tok))
+		mark(xp, makerule(s), M_mark, cycle);
+	tokclose(tok);
+	tok = tokopen(v, 1);
+	while (s = tokread(tok))
+		mark(NiL, makerule(s), M_mark, cycle);
+	tokclose(tok);
+	if (sfstrtell(xp) > pos)
+		sfstrseek(xp, -1, SEEK_CUR);
 }
 
 /*
@@ -3205,7 +3275,7 @@ expandall(register Sfio_t* xp, register unsigned long all)
  * =, !, !=, <>, <, <=, > and >= may separate an op from its value
  *
  * A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
- * A B C D E F G H I J K L M N O P Q R S T U V W X Y
+ * A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
  */
 
 static void
@@ -3732,6 +3802,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		case 'U':
 		case 'W':
 		case 'X':
+		case 'Z':
 		case '-':
 		case '+':
 		case '~':
@@ -3805,6 +3876,7 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 		case 'K':
 		case 'L':
 		case 'W':
+		case 'Z':
 			ctx = 0;
 			/*FALLTHROUGH*/
 		case 'M':
@@ -3881,6 +3953,9 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					error(1, "unknown edit operator `W=%c'", op);
 					break;
 				}
+				continue;
+			case 'Z':
+				closure(xp, x, val);
 				continue;
 			}
 			break;

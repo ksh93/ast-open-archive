@@ -13,7 +13,7 @@ CCFLAGS = $(CC.OPTIMIZE) $(CC.SUFFIX.DYNAMIC:@?$(CC.DLL)??)
 expr 2.0 :LIBRARY: RELEASE expr.h exlib.h exgram.h exparse.y \
 		excc.c excontext.c exdata.c exeval.c exexpr.c \
 		exerror.c exopen.c exrewind.c extoken.c extype.c \
-		exzero.c
+		exnospace.c exstash.c exzero.c
 
 "*.i386" :NOOPTIMIZE: exeval.c
 

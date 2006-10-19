@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -23,7 +23,7 @@
  * bcd and ibm hacked from Griff Smith's ttu library
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 static const char id[] = "\n@(#)$Id: dss numeric type library (AT&T Research) 2005-01-01 $\0\n";

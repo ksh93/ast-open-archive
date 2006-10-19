@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2006 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -34,7 +34,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: pax (AT&T Research) 2005-12-14 $\n]"
+"[-?\n@(#)$Id: pax (AT&T Research) 2006-09-12 $\n]"
 USAGE_LICENSE
 "[+NAME?pax - read, write, and list file archives]"
 "[+DESCRIPTION?The pax command reads, writes, and lists archive files in"
@@ -645,6 +645,9 @@ setoptions(char* line, char** argv, char* usage, Archive_t* ap, int type)
 			if (ap && ap->delta)
 				ap->delta->ordered = opt_info.number;
 			break;
+		case OPT_delta_update:
+			state.delta.update = y;
+			break;
 		case OPT_delta_version:
 			break;
 		case OPT_descend:
@@ -1179,8 +1182,14 @@ ignore(void)
 	char*			ext;
 	int			lev;
 
-	all = sfstrtell(opt.ignore_all) ? sfstruse(opt.ignore_all) : (char*)0;
-	ext = sfstrtell(opt.ignore_ext) ? sfstruse(opt.ignore_ext) : (char*)0;
+	if (!sfstrtell(opt.ignore_all))
+		all = 0;
+	else if (!(all = sfstruse(opt.ignore_all)))
+		nospace();
+	if (!sfstrtell(opt.ignore_ext))
+		ext = 0;
+	else if (!(ext = sfstruse(opt.ignore_ext)))
+		nospace();
 	if ((all || ext) && (pos = hashscan(state.options, 0)))
 	{
 		while (hashnext(pos))
@@ -1453,7 +1462,8 @@ main(int argc, char** argv)
 			sfputc(state.tmp.str, '\n');
 		}
 	sfputr(state.tmp.str, usage2, -1);
-	state.usage = sfstruse(state.tmp.str);
+	if (!(state.usage = sfstruse(state.tmp.str)))
+		nospace();
 	opt.arg0 = argv[0];
 	setoptions(NiL, argv, state.usage, NiL, 0);
 	argv += opt_info.index;

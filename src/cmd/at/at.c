@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: at (AT&T Labs Research) 2000-05-09 $\n]"
+"[-?\n@(#)$Id: at (AT&T Research) 2000-05-09 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - run commands at specified time(s)]"
 "[+DESCRIPTION?\b\f?\f\b is the command interface to the \bat\b daemon."
@@ -342,7 +342,9 @@ main(int argc, char** argv)
 					if (n != ' ')
 						sfputc(tp, ' ');
 				}
-			s = sfstruse(tp) + 3;
+			if (!(s = sfstruse(tp)))
+				error(ERROR_SYSTEM|3, "out of space");
+			s += 3;
 			if (strneq(s, "cron ", n = 5) || strneq(s, "each ", n = 5) || strneq(s, "every ", n = 6) || strneq(s, "repeat ", n = 7))
 			{
 				every = s + n;
@@ -420,7 +422,8 @@ main(int argc, char** argv)
 		sfputc(sp, '\n');
 	}
 	n = sfstrtell(sp);
-	s = sfstruse(sp);
+	if (!(s = sfstruse(sp)))
+		error(ERROR_SYSTEM|3, "out of space");
 	sfsprintf(s, 7, "#%05d\n", n - 7);
 	s[6] = '\n';
 	if (op & EXEC)

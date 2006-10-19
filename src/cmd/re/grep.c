@@ -20,7 +20,7 @@
 #pragma prototyped
 
 static const char usage[] =
-"[-?\n@(#)$Id: grep (AT&T Labs Research) 2005-12-14 $\n]"
+"[-?\n@(#)$Id: grep (AT&T Research) 2006-06-14 $\n]"
 USAGE_LICENSE
 "[+NAME?grep - search lines in files for matching patterns]"
 "[+DESCRIPTION?The \bgrep\b commands search the named input files"
@@ -202,7 +202,8 @@ addre(List_t* p, char* s)
 		if (!(state.options & REG_AUGMENTED))
 			sfputc(t, '\\');
 		sfputc(t, '>');
-		s = sfstruse(t);
+		if (!(s = sfstruse(t)))
+			error(ERROR_SYSTEM|3, "out of space");
 	}
 	else
 		t = 0;
@@ -570,7 +571,10 @@ execute(Sfio_t* input, char* name)
 					if (state.count)
 					{
 						if (state.count & 2)
+						{
 							x->total += x->hits;
+							state.hits += x->hits;
+						}
 						else
 						{
 							if (state.prefix)

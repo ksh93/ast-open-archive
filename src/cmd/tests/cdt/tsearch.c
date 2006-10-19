@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -53,8 +53,27 @@ main()
 		terror("Insert 6");
 	if((int)dtinsert(dt,7) != 7)
 		terror("Insert 7,2");
+
+	if((int)dtmost(dt, 5) != 4)
+		terror("Should have found 4");
+	if(dtfound(dt) )
+		terror("Should not have found 5");
+	if((int)dtleast(dt, 5) != 6)
+		terror("Should have found 6");
+	if(dtfound(dt) )
+		terror("Should not have found 5");
+
 	if((int)dtinsert(dt,5) != 5)
 		terror("Insert 5");
+
+	if((int)dtmost(dt, 5) != 5)
+		terror("Should have found 5");
+	if(!dtfound(dt) )
+		terror("Should have found 5");
+	if((int)dtleast(dt, 3) != 3)
+		terror("Should have found 3");
+	if(!dtfound(dt) )
+		terror("Should have found 3");
 
 	for(i = 1; i <= 7; ++i)
 		if((int)dtsearch(dt,i) != i)

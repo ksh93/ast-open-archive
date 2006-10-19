@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -29,7 +29,6 @@
 #define _CSLIB_H
 
 #define CS_INTERFACE	2		/* thread safe Cs_t* 1st arg	*/
-#define CS_NAMESIZE	64		/* misc name size		*/
 
 #define CS_AUTH_MASK	(S_ISUID|S_ISGID|S_IRWXU|S_IRWXG|S_IRWXO)
 #define CS_AUTH_MODE	(S_ISUID|S_ISGID|S_IRUSR)
@@ -50,11 +49,11 @@ typedef struct Server_s Server_t;
 	int		nostream;	/* cspeek() state		*/ \
 	int		nosocket;	/* cspeek() state		*/ \
 	Server_t*	server;		/* csserve() state		*/ \
-	char		full[4 * CS_NAMESIZE]; /* csname() full buffer	*/ \
-	char		name[CS_NAMESIZE]; /* csname() short buffer	*/ \
+	char		full[4 * CS_NAME_MAX]; /* csname() full buffer	*/ \
+	char		name[CS_NAME_MAX]; /* csname() short buffer	*/ \
 	char		ntoa[16];	/* csntoa() buffer		*/ \
 	char		path[PATH_MAX];	/* lib work buffer		*/ \
-	char		temp[256];	/* lib work buffer		*/
+	char		temp[CS_NAME_MAX];/* lib work buffer		*/
 
 #include <cs.h>
 #include <debug.h>
@@ -193,8 +192,6 @@ struct csfdhdr				/* send/recv fd data header	*/
 
 #define CS_PROC_FD_TST	"/proc/self/fd/."
 #define CS_PROC_FD_FMT	"/proc/%lu/fd/%u"
-
-#define CS_NAMESIZE	64		/* misc name size		*/
 
 #define CS_KEY_SEND	0
 #define CS_KEY_CLONE	1

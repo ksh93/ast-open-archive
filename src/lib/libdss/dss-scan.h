@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  */
 
 static const char scan_usage[] =
-"[-1l?\n@(#)$Id: dss scan query (AT&T Labs Research) 2003-02-06 $\n]"
+"[-1l?\n@(#)$Id: dss scan query (AT&T Research) 2003-02-06 $\n]"
 USAGE_LICENSE
 "[+NAME?\findex\f]"
 "[+DESCRIPTION?The \bdss\b \bscan\b query reads records from each input"

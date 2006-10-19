@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -78,7 +78,7 @@ int	fdmax;
     (void) memset( CST, 0, sizeof(State_t) );
     CST->uptime = cs.time;
     CST->who = getuid();
-    sprintf( pid, "%d", getpid() );
+    sfsprintf( pid, sizeof(pid), "%d", getpid() );
     GetUserFile( pidfile, "vcs.pid" );
     unlink( pidfile );
     symlink( pid, pidfile );
@@ -118,15 +118,15 @@ int	sig;
 }
 
 static int
-version_info( buf, uid, own, uptm )
+version_info( buf, size, uid, own, uptm )
 char	*buf;
+int	size;
 int	uid;
 int	own;
 time_t	uptm;
 {
-    sprintf( buf, "I Hi! %s, vcs[%d] by %s@%s at %s [%s]\n",
+    return sfsprintf( buf, size, "I Hi! %s, vcs[%d] by %s@%s at %s [%s]\n",
 		fmtuid(uid), getpid(), fmtuid(own), csname(0), fmttime(NiL, uptm), id + 10 );
-    return 0;
 }
 
 static int
@@ -215,8 +215,7 @@ int	fd;
 		n = IfsReal(ret, n, uid, argc, argv);
 		break;
 	    case 'v':
-		version_info( ret, uid, CST->who, CST->uptime );
-		n = strlen( ret );
+		n = version_info( ret, sizeof(ret), uid, CST->who, CST->uptime );
 		break;
 	    case 'u':
 		n = IfsUserDef( ret, n, uid, argc, argv );

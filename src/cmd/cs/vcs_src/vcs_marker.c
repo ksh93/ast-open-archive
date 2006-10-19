@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -49,7 +49,7 @@ int rs_marker(rp, from, to, st, expire, force)
 		return (-1);
 	}
 
-	sprintf(buf, "%s%c%s", to, CHRMARKER, (tp ? tp->version : NULL));
+	sfsprintf(buf, sizeof(buf), "%s%c%s", to, CHRMARKER, (tp ? tp->version : NULL));
 	
 	if (!force && (dump = getmarker(dir, buf)))
 	{
@@ -162,10 +162,5 @@ int markermatch(marker, s)
 	int		i;
 
 	for (i = 1, t = marker; *t && *t != CHRMARKER; t++, i++);
-
-	if (!*t)
-		return (0);
-
-	if (strncmp(marker, s, i) == 0 && s[i] == '\0')
-		return (1);
+	return *t && strncmp(marker, s, i) == 0 && s[i] == '\0';
 }

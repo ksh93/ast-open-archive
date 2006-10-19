@@ -132,6 +132,7 @@
 #if BZ_UNIX
 #   if _PACKAGE_ast
 #	include <ast.h>
+#	include <ls.h>
 #   else
 #	include <sys/types.h>
 #	include <unistd.h>

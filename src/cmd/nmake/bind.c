@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -649,7 +649,7 @@ bindalias(register Rule_t* r, register Rule_t* x, char* path, Rule_t* d)
 		if (x == r || (x->dynamic & D_alias))
 			return r;
 	}
-	if (!((r->dynamic|x->dynamic)&D_bound) && !d)
+	if (!((r->dynamic|x->dynamic)&D_bound) && !d && !strchr(x->name, '/'))
 	{
 		debug((-5, "%s alias %s delayed until one or the other is bound", x->name, r->name));
 		return x;

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -185,7 +185,7 @@ command(int fd, char** ap)
 #endif
 	if (state.indirect.con)
 	{
-		if (!(svc.pass = newof(0, int, sysconf(_SC_OPEN_MAX), 0)))
+		if (!(svc.pass = newof(0, int, (int)strtol(astconf("OPEN_MAX", NiL, NiL), NiL, 0), 0)))
 			error(3, "out of space [pass]");
 		svc.pass[state.indirect.err] = 2;
 		svc.pass[state.indirect.out] = 1;
@@ -345,7 +345,7 @@ ffmtmode(int fd, int must)
 	char*		p;
 	struct stat	st;
 
-	if (fstat(fd, &st)) return(must ? 0 : "**ERROR** ");
+	if (fstat(fd, &st)) return(must ? (char*)0 : (char*)"**ERROR** ");
 	p = fmtmode(st.st_mode ? st.st_mode : (S_IRUSR|S_IWUSR), 0);
 	if (!st.st_mode)
 #ifdef S_ISSOCK
@@ -497,7 +497,7 @@ server(int fd, int op, int sub, int arg, char* dat)
 		 */
 
 		sfprintf(state.string, "\n");
-		sfprintf(state.string, "   version  %-.*s\n", strlen(version) - 1, version);
+		sfprintf(state.string, "   version  %s\n", state.version);
 		sfprintf(state.string, "      mesg  %s\n", state.mesg);
 		if (state.identify)
 			sfprintf(state.string, "  identify  %s\n", fmtesc(state.identify));
@@ -800,7 +800,7 @@ server(int fd, int op, int sub, int arg, char* dat)
 			}
 		break;
 	case 'v':
-		sfprintf(state.string, "%-.*s\n", strlen(version) - 1, version);
+		sfprintf(state.string, "%s\n", state.version);
 		break;
 	case 'Q':
 		exit(arg);

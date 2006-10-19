@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1995-2005 AT&T Corp.                  *
+*           Copyright (c) 1995-2006 AT&T Knowledge Ventures            *
 *                                                                      *
 * This software is provided 'as-is', without any express or implied    *
 * warranty. In no event will the authors be held liable for any        *
@@ -56,7 +56,7 @@
 typedef struct
 {
 	Sfdisc_t	disc;		/* sfio discipline		*/
-	Gz_t*		gz;		/* gz handle			*/
+	gzFile*		gz;		/* gz handle			*/
 } Sfgzip_t;
 
 /*
@@ -114,7 +114,7 @@ sfgzexcept(Sfio_t* sp, int op, void* val, Sfdisc_t* dp)
 			sp->_flags |= SF_ERROR;
 		return 0;
 	case SFGZ_HANDLE:
-		return (*((Gz_t**)val) = gz->gz) ? 1 : -1;
+		return (*((gzFile**)val) = gz->gz) ? 1 : -1;
 	case SFGZ_GETPOS:
 		return (*((Sfoff_t*)val) = gzsync(gz->gz, (z_off_t)(-1))) < 0 ? -1 : 0;
 	case SFGZ_SETPOS:

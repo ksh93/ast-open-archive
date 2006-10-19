@@ -1,6 +1,6 @@
 /* deflate.h -- internal compression state
- * Copyright (C) 1995-1998 Jean-loup Gailly
- * For conditions of distribution and use, see copyright notice in zlib.h 
+ * Copyright (C) 1995-2004 Jean-loup Gailly
+ * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
 /* WARNING: this file should *not* be used by applications. It is
@@ -10,10 +10,18 @@
 
 /* @(#) $Id$ */
 
-#ifndef _DEFLATE_H
-#define _DEFLATE_H
+#ifndef DEFLATE_H
+#define DEFLATE_H
 
 #include "zutil.h"
+
+/* define NO_GZIP when compiling if you want to disable gzip header and
+   trailer creation by deflate().  NO_GZIP would be used to avoid linking in
+   the crc code when it is not needed.  For shared libraries, gzip encoding
+   should be left enabled. */
+#ifndef NO_GZIP
+#  define GZIP
+#endif
 
 /* ===========================================================================
  * Internal compression state.
@@ -41,6 +49,10 @@
 /* All codes must not exceed MAX_BITS bits */
 
 #define INIT_STATE    42
+#define EXTRA_STATE   69
+#define NAME_STATE    73
+#define COMMENT_STATE 91
+#define HCRC_STATE   103
 #define BUSY_STATE   113
 #define FINISH_STATE 666
 /* Stream status */
@@ -73,24 +85,22 @@ typedef struct tree_desc_s {
 
 typedef ush Pos;
 typedef Pos FAR Posf;
-typedef uInt IPos;
+typedef unsigned IPos;
 
 /* A Pos is an index in the character window. We use short instead of int to
  * save space in the various tables. IPos is used only for parameter passing.
  */
 
 typedef struct internal_state {
-#ifdef ZINTERNAL_STATE
-    ZINTERNAL_STATE;
-#endif
     z_streamp strm;      /* pointer back to this zlib stream */
     int   status;        /* as the name implies */
     Bytef *pending_buf;  /* output still pending */
     ulg   pending_buf_size; /* size of pending_buf */
     Bytef *pending_out;  /* next pending byte to output to the stream */
-    int   pending;       /* nb of bytes in the pending buffer */
-    int   noheader;      /* suppress zlib header and adler32 */
-    Byte  data_type;     /* UNKNOWN, BINARY or ASCII */
+    uInt   pending;      /* nb of bytes in the pending buffer */
+    int   wrap;          /* bit 0 true for zlib, bit 1 true for gzip */
+    gz_headerp  gzhead;  /* gzip header information to write */
+    uInt   gzindex;      /* where in extra, name, or comment */
     Byte  method;        /* STORED (for zip only) or DEFLATED */
     int   last_flush;    /* value of flush param for previous deflate call */
 
@@ -270,9 +280,9 @@ typedef struct internal_state {
 
         /* in trees.c */
 void _tr_init         OF((deflate_state *s));
-int  _tr_tally        OF((deflate_state *s, uInt dist, uInt lc));
+int  _tr_tally        OF((deflate_state *s, unsigned dist, unsigned lc));
 void _tr_flush_block  OF((deflate_state *s, charf *buf, ulg stored_len,
-			  int eof));
+                          int eof));
 void _tr_align        OF((deflate_state *s));
 void _tr_stored_block OF((deflate_state *s, charf *buf, ulg stored_len,
                           int eof));
@@ -315,7 +325,7 @@ void _tr_stored_block OF((deflate_state *s, charf *buf, ulg stored_len,
 #else
 # define _tr_tally_lit(s, c, flush) flush = _tr_tally(s, 0, c)
 # define _tr_tally_dist(s, distance, length, flush) \
-              flush = _tr_tally(s, distance, length) 
+              flush = _tr_tally(s, distance, length)
 #endif
 
-#endif
+#endif /* DEFLATE_H */

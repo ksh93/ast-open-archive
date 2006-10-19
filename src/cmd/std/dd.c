@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char usage1[] =
-"[-1p0?\n@(#)$Id: dd (AT&T Labs Research) 2005-07-17 $\n]"
+"[-1p0?\n@(#)$Id: dd (AT&T Research) 2005-07-17 $\n]"
 USAGE_LICENSE
 "[+NAME?dd - convert and copy a file]"
 "[+DESCRIPTION?\bdd\b copies an input file to an output file with optional"
@@ -513,7 +513,8 @@ main(int argc, char** argv)
 		sfputc(sp, '\n');
 	}
 	sfputr(sp, usage2, '\n');
-	usage = sfstruse(sp);
+	if (!(usage = sfstruse(sp)))
+		error(ERROR_SYSTEM|3, "out of space");
 	if (signal(SIGINT, SIG_IGN) != SIG_IGN)
 		signal(SIGINT, interrupt);
 	while (f = optget(argv, usage))
@@ -831,7 +832,8 @@ main(int argc, char** argv)
 					cc = n;
 					ce = 0;
 					n = iconv_write(state.cvt, state.tmp, &cb, &cc, &ce);
-					s = sfstruse(state.tmp);
+					if (!(s = sfstruse(state.tmp)))
+						error(ERROR_SYSTEM|3, "out of space");
 					if (ce && !state.silent.value.number)
 					{
 						if (ce == 1)
@@ -868,7 +870,6 @@ main(int argc, char** argv)
 				b += n;
 			}
 		}
-	done:
 		if (sfsync(state.out.fp))
 			error(ERROR_SYSTEM|3, "%s: write error", state.ofn.value.string);
 	}

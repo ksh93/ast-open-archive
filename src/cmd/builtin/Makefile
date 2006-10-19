@@ -15,6 +15,7 @@ DYNAMIC ==
 STANDALONE ==
 
 LINKS = cp: ln mv
+NOBIN = getconf
 
 CAT = $(STDCAT|"cat")
 CMP = $(STDCMP|"cmp") 2>/dev/null
@@ -23,12 +24,15 @@ LN = $(STDLN|"ln")
 RM = $(STDRM|"rm")
 
 BUILTINS :COMMAND: cmdlist.h
-	$(SED) -e '/^CMDLIST(.*)$/!d' -e 's/CMDLIST(\(.*\))/\1/' $(LINKS:N!=*[:]:C,.*,-e '/^&$/d',) $(*)
+	$(SED) -e '/^CMDLIST(.*)$/!d' -e 's/CMDLIST(\(.*\))/\1/' $(NOBIN:C,.*,-e '/^&$/d',) $(LINKS:N!=*[:]:C,.*,-e '/^&$/d',) $(*)
 
 .INIT : .builtin
 
 .builtin : .MAKE .VIRTUAL .FORCE
 	local T I
+	if T = "$(NOBIN:D=$(BINDIR):B:S:T=F)"
+		{ $(RM) $(RMFLAGS) $(T) }
+	end
 	:ALL: $(BUILTINS)
 	T = -lcmd
 	if "$(PACKAGE_OPTIMIZE:N=space)" && "$(T:T=F)" == "-lcmd"
@@ -74,9 +78,11 @@ BUILTINS :COMMAND: cmdlist.h
 	end
 
 :BUILTIN: dlls LICENSE=since=2002,author=gsf -ldll look mime \
+		pty LICENSE=since=2001,author=dgk \
 		nl LICENSE=since=2003,author=dgk asa od pr \
 		strings tr uudecode -luu uuencode -luu what who
 
 :: PROMO.mm RELEASE
 
-:TEST: asa chown cut date expr fmt join look nl od paste tail tr uuencode
+:TEST: asa chmod chown cut date expr fmt head join look mkdir nl \
+		nl od paste tail tr uniq uuencode wc

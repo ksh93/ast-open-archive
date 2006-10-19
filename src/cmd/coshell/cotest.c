@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -48,7 +48,7 @@ init(void)
 	message((-1, "init"));
 	state.toss = state.start = cs.time;
 	for (n = 0; n < 10; n++) TOSS;
-	state.fdtotal = sysconf(_SC_OPEN_MAX);
+	state.fdtotal = (int)strtol(astconf("OPEN_MAX", NiL, NiL), NiL, 0);
 	if (!(state.con = newof(0, Connection_t, state.fdtotal, 0)))
 		error(3, "out of space [con]");
 	state.con[0].type = POLL;

@@ -91,7 +91,7 @@ Codexmeth_t	codex_sum =
 	"sum",
 	"checksum filter. The checksum value returned by \bcodexdata\b(3) is"
 	" written to the standard error.",
-	"[+(version)?codex-sum (AT&T Labs Research) 2003-12-16]"
+	"[+(version)?codex-sum (AT&T Research) 2003-12-16]"
 	"[+(author)?Glenn Fowler <gsf@research.att.com>]",
 	CODEX_DECODE|CODEX_ENCODE|CODEX_SUM,
 	sum_options,

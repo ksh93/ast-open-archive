@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1125,7 +1125,9 @@ newio(register Archive_t* ap, int c, int n)
 				sfprintf(cp, "%s %s %d", eomprompt + 1, rw, ap->part + 1);
 				if (ap->name)
 					sfprintf(cp, " %s", ap->name);
-				s = (pp = sfpopen(pp, sfstruse(cp), "r")) ? sfgetr(pp, '\n', 1) : (char*)0;
+				if (!(s = sfstruse(cp)))
+					nospace();
+				s = (pp = sfpopen(pp, s, "r")) ? sfgetr(pp, '\n', 1) : (char*)0;
 			}
 			else
 			{

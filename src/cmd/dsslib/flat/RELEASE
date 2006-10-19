@@ -1,3 +1,4 @@
+06-10-11 flat.c: add sfstruse() error checks
 05-09-16 flat.c: fix <QUOTEALL> q=-1 vs. \xff data bug
 05-05-09 flat.c: literal quote is "" inside "..." for quote+noescape
 	 flat.c: add <QUOTEALL>

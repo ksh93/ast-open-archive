@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -724,6 +724,26 @@ grabtype(struct parse* pp, register struct msg* mp, unsigned long type)
 		    yankword(s, namebuf)) {
 			if ((type & GNEWS) && (t = strchr(s, ',')))
 				*t = 0;
+			if (type & (GNEWS|GSUB))
+				for (e = s, i = 0; *e; e++)
+					if (isspace(*e))
+					{
+						if (i || *e != ' ')
+						{
+							t = e;
+							while (i = *e++)
+							{
+								if (isspace(i))
+									for (i = ' '; isspace(*e); e++);
+								*t++ = i;
+							}
+							*t = 0;
+							break;
+						}
+						i = 1;
+					}
+					else
+						i = 0;
 			return s;
 		}
 #if 0

@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortsum (AT&T Labs Research) 2006-01-15 $\n]"
+"[-1lp0?\n@(#)$Id: sortsum (AT&T Research) 2006-01-15 $\n]"
 USAGE_LICENSE
 "[+NAME?sortsum - sort uniq summary discipline]"
 "[+DESCRIPTION?The \bsortsum\b \bsort\b(1) discipline applies "

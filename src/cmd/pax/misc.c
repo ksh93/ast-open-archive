@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -464,7 +464,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 			if (!(state.tmp.mac && !(state.tmp.mac = sfstropen())))
 				nospace();
 			sfkeyprintf(state.tmp.mac, handle, op->macro, listlookup, NiL);
-			s = sfstruse(state.tmp.mac);
+			if (!(s = sfstruse(state.tmp.mac)))
+				nospace();
 			op->flags &= ~OPT_DISABLE;
 		}
 		else
@@ -525,7 +526,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 				if (s = strrchr(f->name, '/'))
 				{
 					sfwrite(state.tmp.fmt, f->name, s - f->name);
-					s = sfstruse(state.tmp.fmt);
+					if (!(s = sfstruse(state.tmp.fmt)))
+						nospace();
 				}
 				else
 					s = ".";
@@ -637,7 +639,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 				if (s = strrchr(state.tmp.file, '/'))
 				{
 					sfwrite(state.tmp.fmt, state.tmp.file, s - state.tmp.file);
-					s = sfstruse(state.tmp.fmt);
+					if (!(s = sfstruse(state.tmp.fmt)))
+						nospace();
 				}
 				else
 					s = ".";
@@ -682,7 +685,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 			if (e = strrchr(s, '/'))
 			{
 				sfwrite(state.tmp.fmt, s, e - s);
-				s = sfstruse(state.tmp.fmt);
+				if (!(s = sfstruse(state.tmp.fmt)))
+					nospace();
 			}
 			else
 				s = ".";
@@ -722,7 +726,8 @@ listlookup(void* handle, register Sffmt_t* fmt, const char* arg, char** ps, Sflo
 			if (!op)
 				s = f->name;
 			sfprintf(state.tmp.fmt, "%s %s %s", s, f->linktype == HARDLINK ? "==" : "->", f->linkpath);
-			s = sfstruse(state.tmp.fmt);
+			if (!(s = sfstruse(state.tmp.fmt)))
+				nospace();
 			break;
 		}
 		/*FALLTHROUGH*/
@@ -834,7 +839,8 @@ listentry(register File_t* f)
 			if ((p = ((state.in->io->count >> n) * 100) / (state.meter.size >> n)) > 100)
 				p = 100;
 			n = listprintf(state.meter.tmp, state.in, f, state.listformat);
-			s = sfstruse(state.meter.tmp);
+			if (!(s = sfstruse(state.meter.tmp)))
+				nospace();
 			if (state.meter.fancy)
 			{
 				if (n > (state.meter.width - METER_parts - 1))

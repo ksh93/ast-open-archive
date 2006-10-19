@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -174,7 +174,6 @@ int lookup_tag_time(tbl, total, to, domain, first)
 	int			first;
 {
 	register int		i;
-	int			cnt = 0;
 	int			r;
 
 	r = -1;
@@ -414,7 +413,7 @@ int pattern2time(pattern, to)
 	}
 	if (flag)
 	{
-		if ((sscanf(s, "%d/%d/%d", &mon, &dd, &yy)) != 3)
+		if ((sfsscanf(s, "%d/%d/%d", &mon, &dd, &yy)) != 3)
 			return (-1);
 		if (mon <= 12)
 			strcpy(month, MONTH[--mon]);
@@ -427,12 +426,12 @@ int pattern2time(pattern, to)
 			return (-1);
 	}
 	else if (
-	   (LINIT(), sscanf(s, "%s %d %d %d:%d:%d", month, &dd, &yy, &hh, &mm, &ss) != 6) &&
-           (LINIT(), sscanf(s, "%s %d %d:%d:%d", month, &dd, &hh, &mm, &ss) != 5) &&
-	   (LINIT(), sscanf(s, "%s %d %d %d:%d", month, &dd, &yy, &hh, &mm) != 5) &&
-	   (LINIT(), sscanf(s, "%s %d %d:%d", month, &dd, &hh, &mm) != 4) &&
-	   (LINIT(), sscanf(s, "%s %d %d", month, &dd, &yy) != 3) &&
-	   (LINIT(), sscanf(s, "%s %d", month, &dd) != 2))
+	   (LINIT(), sfsscanf(s, "%s %d %d %d:%d:%d", month, &dd, &yy, &hh, &mm, &ss) != 6) &&
+           (LINIT(), sfsscanf(s, "%s %d %d:%d:%d", month, &dd, &hh, &mm, &ss) != 5) &&
+	   (LINIT(), sfsscanf(s, "%s %d %d %d:%d", month, &dd, &yy, &hh, &mm) != 5) &&
+	   (LINIT(), sfsscanf(s, "%s %d %d:%d", month, &dd, &hh, &mm) != 4) &&
+	   (LINIT(), sfsscanf(s, "%s %d %d", month, &dd, &yy) != 3) &&
+	   (LINIT(), sfsscanf(s, "%s %d", month, &dd) != 2))
 	{
 		message((5, "can't scan --")); 
 		return (-1);
@@ -441,9 +440,9 @@ int pattern2time(pattern, to)
 
 
 	if (yy)
-		sprintf(tbuf, "%s %d %d %d:%d:%d", month, dd, yy, hh, mm, ss);
+		sfsprintf(tbuf, sizeof(tbuf), "%s %d %d %d:%d:%d", month, dd, yy, hh, mm, ss);
 	else
-		sprintf(tbuf, "%s %d %d:%d:%d", month, dd, hh, mm, ss);
+		sfsprintf(tbuf, sizeof(tbuf), "%s %d %d:%d:%d", month, dd, hh, mm, ss);
 
 	message((3, "tbuf [from] %s", tbuf)); 
 	*to = tmdate(tbuf, (char **) 0, (time_t *) 0);
@@ -472,7 +471,7 @@ tag_t* gettagbyname(list, name, mode, level)
 {
 	register rdirent_t*	ep;
 
-	if (level > MAXLINK)
+	if (level > MAXLINKS)
 		return (NULL);
 
 	

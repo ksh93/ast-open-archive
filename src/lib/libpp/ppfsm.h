@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -31,7 +31,7 @@
 #define BITSTATE	16		/* bitsof(state)		*/
 #define BITNONTERM	7		/* bitsof(non-terminal-state)	*/
 #define BITTERM		7		/* bitsof(terminal-state)	*/
-#define NMAC		20		/* number of MAC states		*/
+#define NMAC		19		/* number of MAC states		*/
 
 #define SPLICE		(1<<BITTERM)
 
@@ -44,6 +44,7 @@
 #define BACK(tok)	CODE(tok,S_TOKB)
 #define KEEP(tok)	CODE(tok,S_TOK)
 
+#undef	MAX
 #define MAX		255
 
 #undef	EOB
@@ -61,7 +62,7 @@
 
 #define IDSTATE(x)	(((x)>=0&&INQMACRO(fsm[x]))?QID:(x))
 
-#define INCOMMENT(p)	((p)>=fsm[COM2]&&(p)<=fsm[COM4]||INCOMMENTXX(p))
+#define INCOMMENT(p)	((p)>=fsm[COM2]&&(p)<=fsm[COM7])
 #define INCOMMENTXX(p)	((p)>=fsm[COM5]&&(p)<=fsm[COM7])
 #define INQMACRO(p)	((p)>=fsm[MAC0]&&(p)<=fsm[LIT0])
 #define INTMACRO(p)	((p)>=fsm[NID]&&(p)<=fsm[LIT])
@@ -82,28 +83,29 @@
 #define RES1l		(PROTO+6)
 #define RES1n		(PROTO+7)
 #define RES1o		(PROTO+8)
-#define RES1x		(PROTO+9)
-#define RES1y		(PROTO+10)
-#define COM1		(PROTO+11)
-#define COM2		(PROTO+12)
-#define COM3		(PROTO+13)
-#define COM4		(PROTO+14)
-#define COM5		(PROTO+15)
-#define COM6		(PROTO+16)
-#define COM7		(PROTO+17)
-#define NID		(PROTO+18)
-#define LIT		(PROTO+19)
-#define LIT1		(PROTO+20)
-#define LIT2		(PROTO+21)
-#define BAD1		(PROTO+22)
-#define BAD2		(PROTO+23)
-#define DOT		(PROTO+24)
-#define DOT2		(PROTO+25)
-#define WS1		(PROTO+26)
+#define RES1t		(PROTO+9)
+#define RES1x		(PROTO+10)
+#define RES1y		(PROTO+11)
+#define COM1		(PROTO+12)
+#define COM2		(PROTO+13)
+#define COM3		(PROTO+14)
+#define COM4		(PROTO+15)
+#define COM5		(PROTO+16)
+#define COM6		(PROTO+17)
+#define COM7		(PROTO+18)
+#define NID		(PROTO+19)
+#define LIT		(PROTO+20)
+#define LIT1		(PROTO+21)
+#define LIT2		(PROTO+22)
+#define BAD1		(PROTO+23)
+#define BAD2		(PROTO+24)
+#define DOT		(PROTO+25)
+#define DOT2		(PROTO+26)
+#define WS1		(PROTO+27)
 
 #if PROTOMAIN
 
-#define TERMINAL	(PROTO+27)	/* PROTOMAIN */
+#define TERMINAL	(PROTO+28)	/* PROTOMAIN */
 
 #else
 
@@ -111,7 +113,7 @@
  * quick non-terminal states
  */
 
-#define QUICK		(PROTO+27)
+#define QUICK		(PROTO+28)
 #define QTOK		(QUICK+1)
 #define QNUM		(QUICK+2)
 #define QEXP		(QUICK+3)

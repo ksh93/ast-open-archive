@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -91,6 +91,8 @@ struct server_info {
 extern int	cserrno;
 extern char	csusrmsg[ STRLEN ];
 extern int	IfsAbortFlag;
+
+extern void*	MallocZero();
 
 extern NetFile*	NetConnect();
 extern int	NetClose();

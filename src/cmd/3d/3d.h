@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -36,15 +36,24 @@
 
 #undef	_BLD_DEBUG
 
+#define _std_strtol	1
+
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
 __STDPP__directive pragma pp:hide ftruncate mount readlink sbrk truncate utimes __utimes
 #else
+#undef	ftruncate
 #define ftruncate	______ftruncate
+#undef	mount
 #define mount		______mount
+#undef	readlink
 #define readlink	______readlink
+#undef	sbrk
 #define sbrk		______sbrk
+#undef	truncate
 #define truncate	______truncate
+#undef	utimes
 #define utimes		______utimes
+#undef	__utimes
 #define __utimes	________utimes
 #endif
 
@@ -110,6 +119,10 @@ struct stat64;
 #undef	fcntl
 #undef	open
 #undef	stat
+#undef	strtol
+#undef	strtoul
+#undef	strtoll
+#undef	strtoull
 
 #define MSG_read3d	(MSG_read|MSG_EXT(MSG_ARG_number,4))
 #define MSG_write3d	(MSG_write|MSG_EXT(MSG_ARG_number,4))

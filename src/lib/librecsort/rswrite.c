@@ -111,8 +111,11 @@ int	type;	/* RS_TEXT 		*/
 		sfset(f,(SF_READ|SF_SHARE|SF_PUBLIC),0);
 	}
 
-	head = (rs->type&RS_DSAMELEN) ? 0 : sizeof(ssize_t);
-	type |= rs->type&RS_TEXT;
+#if _PACKAGE_ast
+	head = (rs->type&RS_DSAMELEN) ? -1 : (rs->disc->data & ~0xff) ? 0 : sizeof(ssize_t);
+#else
+	head = (rs->type&RS_DSAMELEN) ? -1 : sizeof(ssize_t);
+#endif
 
 	if(type&RS_OTEXT) /* write in plain text */
 	{	u = (rs->events & RS_WRITE) != 0;
@@ -142,7 +145,7 @@ int	type;	/* RS_TEXT 		*/
 			}
 		}
 		else if(local || (rs->type&RS_UNIQ) )
-		{	if(head)
+		{	if(head>=0)
 			{	for(; r; r = r->right)
 				{	w = r->datalen;
 					RESERVE(rs,f,rsrv,endrsrv,cur,w);
@@ -164,7 +167,7 @@ int	type;	/* RS_TEXT 		*/
 			}
 		}
 		else
-		{	if(head)
+		{	if(head>=0)
 			{	for(; r; r = r->right)
 				{	w = r->datalen;
 					RESERVE(rs,f,rsrv,endrsrv,cur,w);
@@ -235,18 +238,19 @@ int	type;	/* RS_TEXT 		*/
 						r = &usr;
 					}
 				}
-				w = (n = r->datalen) + head;
+				w = (n = r->datalen) + (head>0?head:0);
 				RESERVE(rs,f,rsrv,endrsrv,cur,w);
-				if(head)
+				if(head>0)
 					WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
 				WRITE(rs,cur,r->data,n,d);
 			}
 		}
-		else if(head)
+		else if(head>=0)
 		{	for(; r; r = r->right)
 			{	w = (n = r->datalen) + head;
 				RESERVE(rs,f,rsrv,endrsrv,cur,w);
-				WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
+				if(head)
+					WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
 				WRITE(rs,cur,r->data,n,d);
 			}
 		}
@@ -271,10 +275,10 @@ int	type;	/* RS_TEXT 		*/
 				n = -w;
 			}
 
-			w = r->datalen + head + sizeof(ssize_t);
+			w = r->datalen + (head>0?head:0) + sizeof(ssize_t);
 			RESERVE(rs,f,rsrv,endrsrv,cur,w);
 			WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
-			if(head)
+			if(head>0)
 				WRITE(rs,cur,(uchar*)(&r->datalen),sizeof(ssize_t),d);
 			WRITE(rs,cur,r->data,r->datalen,d);
 
@@ -284,11 +288,12 @@ int	type;	/* RS_TEXT 		*/
 				break;
 			else	r = e;
 
-			if(head)
+			if(head>=0)
 			{	for(; o != e; o = o->right)
-				{	w = (n = o->datalen) + sizeof(ssize_t);
+				{	w = (n = o->datalen) + head;
 					RESERVE(rs,f,rsrv,endrsrv,cur,w);
-					WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
+					if(head)
+						WRITE(rs,cur,(uchar*)(&n),sizeof(ssize_t),d);
 					WRITE(rs,cur,o->data,n,d);
 				}
 			}

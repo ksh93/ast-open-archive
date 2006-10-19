@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2005 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -126,17 +126,20 @@ flush(register State_t* state)
 		b = (state->c1 << 16) | (state->c2 << 8) | c3;
 		*state->bp++ = state->data->map[b >> 18];
 		*state->bp++ = state->data->map[(b >> 12) & 077];
-		*state->bp++ = state->data->pad ? state->data->pad : state->data->map[(b >> 6) & 077];
+		*state->bp++ = x == 3 && state->data->pad ? state->data->pad : state->data->map[(b >> 6) & 077];
 		*state->bp++ = state->data->pad ? state->data->pad : state->data->map[b & 077];
 		state->c1 = state->c2 = -1;
 	}
-	if ((state->bl - state->bp) < UUOUT * UUCHUNK)
+	if ((state->bl - state->bp) < UUOUT * UUCHUNK || state->bp > state->buf + !!state->bb)
 	{
 		if (state->bb)
 			*state->bb = state->data->map[((state->bp - state->bb - x) / UUOUT) * UUIN + 1];
-		*state->bp++ = '\n';
+		if (*(state->bp - 1) != '\n')
+			*state->bp++ = '\n';
+		x = state->bp - state->buf;
+		state->bp = state->buf;
 		state->bl = state->bp + UUOUT * UUCHUNK;
-		if (sfwr(state->codex->sp, state->buf, state->bp - state->buf, &state->codex->sfdisc) != (state->bp - state->buf))
+		if (sfwr(state->codex->sp, state->buf, x, &state->codex->sfdisc) != x)
 			return EOF;
 	}
 	return 0;
@@ -323,8 +326,8 @@ uu_read(Sfio_t* sp, void* buf, size_t n, Sfdisc_t* disc)
 					}
 					else
 					{
-						*s++ = n >> 10;
-						*s++ = n >> 2;
+						*s++ = b >> 10;
+						*s++ = b >> 2;
 					}
 					goto done;
 				}
@@ -382,6 +385,8 @@ uu_write(Sfio_t* sp, const void* buf, size_t n, Sfdisc_t* disc)
 				c1 = '\n';
 				goto get_2;
 			}
+			if (s >= e)
+				break;
 			c1 = *s++;
 			if (state->text && c1 == '\n')
 			{
@@ -453,7 +458,7 @@ Codexmeth_t	codex_uu =
 	"[+base64|mime?MIME base64 encoding.]"
 	"[+bsd|ucb?BSD \buuencode\b(1).]"
 	"[+text?Encode \\n => \\r\\n, decode \\r\\n => \\n.]"
-	"[+(version)?codex-uu (AT&T Labs Research) 1998-11-11]"
+	"[+(version)?codex-uu (AT&T Research) 1998-11-11]"
 	"[+(author)?Glenn Fowler <gsf@research.att.com>]",
 	CODEX_DECODE|CODEX_ENCODE|CODEX_UU,
 	0,

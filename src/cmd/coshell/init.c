@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,10 +24,6 @@
  *
  * remote coshell initialization script
  */
-
-static const char id[] = "\n@(#)$Id: coshell (AT&T Research) 2003-03-04 $\0\n";
-
-const char*	version = id + 10;
 
 const char	corinit[] = "\
 print -u3 n 0 $HOSTNAME $$\n\

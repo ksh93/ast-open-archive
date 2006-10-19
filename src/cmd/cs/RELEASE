@@ -1,3 +1,5 @@
+06-10-11 add sfstropen()/sfstruse() error checks
+06-06-11 cs.c: switch to csclient()
 02-10-02 tst.c: tmform() => fmttime()
 01-01-01 vcs_src/*: drop old notices, fix signal handler prototype
 00-05-09 mbb: add (message bulletin board service)

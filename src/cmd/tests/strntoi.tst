@@ -1,6 +1,36 @@
 # regression tests for the ast integral strnto*() routines
 
 TEST 01 'base 10'
+	EXEC	1 01 2 -01 2 +01 2 001 3 -001 3 +001
+		OUTPUT - $'strntol   "01" "1" 0 OK
+strntoul  "01" "1" 0 OK
+strntoll  "01" "1" 0 OK
+strntoull "01" "1" 0 OK
+
+strntol   "-01" "1" 0 OK
+strntoul  "-01" "1" 0 OK
+strntoll  "-01" "1" 0 OK
+strntoull "-01" "1" 0 OK
+
+strntol   "+01" "1" 0 OK
+strntoul  "+01" "1" 0 OK
+strntoll  "+01" "1" 0 OK
+strntoull "+01" "1" 0 OK
+
+strntol   "001" "1" 0 OK
+strntoul  "001" "1" 0 OK
+strntoll  "001" "1" 0 OK
+strntoull "001" "1" 0 OK
+
+strntol   "-001" "1" 0 OK
+strntoul  "-001" "1" 0 OK
+strntoll  "-001" "1" 0 OK
+strntoull "-001" "1" 0 OK
+
+strntol   "+001" "1" 0 OK
+strntoul  "+001" "1" 0 OK
+strntoll  "+001" "1" 0 OK
+strntoull "+001" "1" 0 OK'
 	EXEC	5 32767123 6 -32767123 5 32768123 6 -32768123 5 32769123 6 -32769123
 		OUTPUT - $'strntol   "32767123" "123" 32767 OK
 strntoul  "32767123" "123" 32767 OK

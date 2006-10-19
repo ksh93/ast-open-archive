@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -157,10 +157,10 @@ struct mount_item *mi;
     int		n;
 
     logit( "mount_item: ++++++++++++++++++++\n" );
-    sprintf( buf, "\tlpath: %s\n\trpath: %s\n\tmode: %d, timeout: %s\n\t",
+    sfsprintf( buf, sizeof(buf), "\tlpath: %s\n\trpath: %s\n\tmode: %d, timeout: %s\n\t",
 			mi->lpath, mi->rpath, mi->mode, mi->timeout );
     logit( buf );
-    ag_make_remote( mi, mi->rpath, buf );
+    ag_make_remote( mi, mi->rpath, buf, sizeof(buf) );
     logit( buf );
     logit( "\nmount_item: --------------------\n" );
 }
@@ -231,7 +231,7 @@ char	*option;
     mi->host = strdup( host );
 
     /* parse the timeout value */
-    sprintf( mi->timeout, "/%d", option ? (int)strtol(option, (char**)0, 0) : 86400 );
+    sfsprintf( mi->timeout, sizeof(mi->timeout), "/%d", option ? (int)strtol(option, (char**)0, 0) : 86400 );
 
     /* Insert the mount infomation to the mount list */
     mi->next = ml->mitem;
@@ -383,28 +383,27 @@ char	*lpath, *rpath;
 	}
 	mi = mi->next;
     }
-    sprintf( pathbuf, "%s/._dir", lpath );
+    sfsprintf( pathbuf, sizeof(pathbuf), "%s/._dir", lpath );
     if( (n = open( pathbuf, O_RDWR|O_CREAT, 0644 )) > 0 )
 	close( n );
     return NULL;
 }
 
 int
-ag_make_remote( mi, rpath, buf )
+ag_make_remote( mi, rpath, buf, size )
 struct mount_item	*mi;
 char	*rpath, *buf;
+int	size;
 {
-    sprintf( buf, "%s://", mi->proto ? mi->proto : "-" );
-    buf += strlen( buf );
-    if( mi->user ) {
-	sprintf( buf, mi->pass ? "%s:*@" : "%s@", mi->user );
-	buf += strlen( buf );
-    }
-    sprintf( buf, mi->port ? "%s:%d" : "%s", mi->host, mi->port );
-    buf += strlen( buf );
+    char*	end = buf + size;
+
+    buf += sfsprintf( buf, end - buf, "%s://", mi->proto ? mi->proto : "-" );
+    if( mi->user )
+	buf += sfsprintf( buf, end - buf, mi->pass ? "%s:*@" : "%s@", mi->user );
+    buf += sfsprintf( buf, end - buf, mi->port ? "%s:%d" : "%s", mi->host, mi->port );
     if( rpath ) {
 	if( *rpath == '~' )  *buf++ = '/';
-	sprintf( buf, "%s", rpath );
+	sfsprintf( buf, end - buf, "%s", rpath );
     }
     return 0;
 }
@@ -437,7 +436,7 @@ char	*lpath;
 	if( item == NULL ) {
 	    sfsprintf( csusrmsg, n, "1 unknown %s", lpath );
 	} else {
-	    ag_make_remote( item, item->rpath, buf );
+	    ag_make_remote( item, item->rpath, buf, sizeof(buf) );
 	    sfsprintf( csusrmsg, n, "0 %s %s", buf, item->lpath );
 	}
     } else {
@@ -445,7 +444,7 @@ char	*lpath;
 	if( item == NULL ) {
 	    sfsprintf( csusrmsg, n, "1 unknown %s", lpath );
 	} else {
-	    ag_make_remote( item, rpath, buf );
+	    ag_make_remote( item, rpath, buf, sizeof(buf) );
 	    sfsprintf( csusrmsg, n, "0 %s %s", buf, lpath );
 	}
     }
@@ -461,7 +460,6 @@ char	*proxy;
 {
     struct mount_list	*ml;
     struct mount_item	*mitem;
-    char	*proto;
 
     IfsAbortFlag = 0;
     if( argc < 2 ) {
@@ -481,7 +479,6 @@ char	*proxy;
     if( mitem->proto[0] == 'p' ) {	/* using proxy to connect socket */
 	srv->flags |= IFS_PROXY;
     }
-    proto = mitem->proto;
     if( (srv->agent = AgentSearch( mitem->proto )) == NULL ) {
 	strncpy( csusrmsg, mitem->proto, sizeof( csusrmsg ) );
 	cserrno = E_PROTOCOL;
@@ -499,7 +496,7 @@ char	*proxy;
 	char	buf[ STRLEN ];
 
 	MountItemDump( mitem );
-	ag_make_remote( mitem, srv->rpath, remote );
+	ag_make_remote( mitem, srv->rpath, remote, sizeof(remote) );
 	sfsprintf( buf, STRLEN, "   %s (fd=%d)\n", remote, srv->mitem->mode );
 	logit( buf );
     }
@@ -605,7 +602,7 @@ char	*argv[];
 	option = (argc < 4 ? NULL : argv[3]);
 	if( (mi = AgentMount( ml, argv[1], argv[2], option )) == NULL )
 	    return csputmsg( ret, retsize, -1 );
-	ag_make_remote( mi, mi->rpath, remote );
+	ag_make_remote( mi, mi->rpath, remote, sizeof(remote) );
 	sfsprintf( csusrmsg, n, "0 mount %s %s", remote, argv[2] );
     }
     return csputmsg( ret, retsize, 0 );

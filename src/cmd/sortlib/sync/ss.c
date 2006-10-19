@@ -1779,6 +1779,8 @@ ssopen(const char* file, Ssdisc_t* disc)
 char*
 sskey(Ss_t* ss, Ssfield_t* dp)
 {
+	char*	s;
+
 	if (dp)
 	{
 		sfprintf(ss->key, ".%u.%u", dp->offset + 1, dp->size);
@@ -1810,7 +1812,9 @@ sskey(Ss_t* ss, Ssfield_t* dp)
 		sfprintf(ss->key, ".%u", ss->size);
 	else
 		return 0;
-	return sfstruse(ss->key);
+	if (!(s = sfstruse(ss->key)) && ss->disc->errorf)
+		(*ss->disc->errorf)(NiL, ss->disc, ERROR_SYSTEM|2, "out of space");
+	return s;
 }
 
 static const char*	opname[] =
@@ -2654,7 +2658,7 @@ ssclose(Ss_t* ss)
 		if (gp = fp->group)
 			do
 			{
-				if (gp->io && ((z = gp->cur - gp->beg) && sfwrite(gp->io, gp->beg, z) != z || ((fp == ss->file || gp->io == sfstdout) ? sfsync(gp->io) : sfclose(gp->io))))
+				if (gp->io && ((z = gp->cur - gp->beg) >= 0 && sfwrite(gp->io, gp->beg, z) != z || ((fp == ss->file || gp->io == sfstdout) ? sfsync(gp->io) : sfclose(gp->io))))
 				{
 					if (ss->disc->errorf)
 						(*ss->disc->errorf)(NiL, ss->disc, ERROR_SYSTEM|2, "%s: write error", gp->name);

@@ -35,7 +35,7 @@
  * <time> is the earliest absolute time the job can be run
  */
 
-static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2001-03-28 $\0\n";
+static const char id[] = "\n@(#)$Id: at.svc (AT&T Research) 2006-09-19 $\0\n";
 
 #include "at.h"
 
@@ -391,7 +391,9 @@ update(register State_t* state)
 	struct stat		st;
 
 	sfprintf(state->tmp, "%s/%s/%s", state->pwd, state->pwd, AT_QUEUE_FILE);
-	pathcanon(path = sfstruse(state->tmp), 0);
+	if (!(path = sfstruse(state->tmp)))
+		error(ERROR_SYSTEM|3, "out of space");
+	pathcanon(path, 0);
 	if (sp = sfopen(NiL, path, "r"))
 	{
 		error(0, "scan %s queue list", path);
@@ -417,14 +419,18 @@ update(register State_t* state)
 	if (que && !stat(file = AT_CRON_DIR, &st) && S_ISDIR(st.st_mode))
 	{
 		sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_ALLOW_FILE);
-		pathcanon(path = sfstruse(state->tmp), 0);
+		if (!(path = sfstruse(state->tmp)))
+			error(ERROR_SYSTEM|3, "out of space");
+		pathcanon(path, 0);
 		if (sp = sfopen(NiL, path, "r"))
 			permit = 1;
 		else
 		{
 			permit = 0;
 			sfprintf(state->tmp, "%s/%s/%s", state->pwd, file, AT_DENY_FILE);
-			pathcanon(path = sfstruse(state->tmp), 0);
+			if (!(path = sfstruse(state->tmp)))
+				error(ERROR_SYSTEM|3, "out of space");
+			pathcanon(path, 0);
 			sp = sfopen(NiL, path, "r");
 		}
 
@@ -737,7 +743,8 @@ listqueue(Dt_t* dt, void* object, void* handle)
 	visit.queue = que;
 	visit.state = state;
 	dtwalk(que->owner, listowner, &visit);
-	s = sfstruse(state->tmp);
+	if (!(s = sfstruse(state->tmp)))
+		error(ERROR_SYSTEM|3, "out of space");
 	if (!s[2])
 		*s = 0;
 	error(ERROR_OUTPUT|0, con->fd, "%-3s %5lu %3d %3d %3d %3d %3d %2d.%02d %5.5s%s", que->name, que->total, que->pending, que->running, que->nproc, que->peruser, que->nice, que->load / 100, que->load % 100, fmtelapsed(que->wait, 1), s);
@@ -984,7 +991,8 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 				}
 				if (m >= sizeof(job->label))
 					sfstrseek(state->tmp, w, SEEK_SET);
-				t = sfstruse(state->tmp);
+				if (!(t = sfstruse(state->tmp)))
+					error(ERROR_SYSTEM|3, "out of space");
 				strcpy(job->label, t);
 			}
 		}
@@ -1080,7 +1088,9 @@ command(register State_t* state, Connection_t* con, register char* s, int n, cha
 		break;
 	case AT_LOG:
 		sfprintf(state->tmp, "%s/%s", state->pwd, AT_LOG_FILE);
-		pathcanon(s = sfstruse(state->tmp), 0);
+		if (!(s = sfstruse(state->tmp)))
+			error(ERROR_SYSTEM|3, "out of space");
+		pathcanon(s, 0);
 		error(ERROR_OUTPUT|0, con->fd, "%s", s);
 		break;
 	case AT_QUIT:
@@ -1221,9 +1231,12 @@ stampwrite(int fd, const void* buf, size_t n)
 	unsigned long		now;
 
 	r = 0;
-	now = NOW;
-	if (now >= rollover)
-		commit();
+	if (rollover)
+	{
+		now = NOW;
+		if (now >= rollover)
+			commit();
+	}
 	if (fd == 2 && (s = fmttime(AT_TIME_FORMAT, now)))
 	{
 		i = strlen(s);
@@ -1318,7 +1331,7 @@ init(const char* path)
 	struct stat		xs;
 
 	umask(~(S_IWGRP|S_IWOTH));
-	if ((i = sysconf(_SC_OPEN_MAX)) < 20)
+	if ((i = (int)strtol(astconf("OPEN_MAX", NiL, NiL), NiL, 0)) < 20)
 		i = 20;
 	if (!(state = newof(0, State_t, 1, (i - 1) * sizeof(Connection_t))))
 		error(ERROR_SYSTEM|3, "out of space [state]");

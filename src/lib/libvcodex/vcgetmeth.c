@@ -26,6 +26,7 @@
 
 #if _PACKAGE_ast
 #include <dlldefs.h>
+#include <ccode.h>
 #endif
 
 static Vcmethod_t*	methods = VCFIRST;
@@ -80,6 +81,7 @@ char**	next;
 	Dllscan_t	*dls;
 	Dllent_t	*dle;
 	Void_t		*dll;
+	unsigned char	*map;
 	char		path[PATH_MAX];
 	char		buf[256];
 #endif
@@ -133,6 +135,18 @@ char**	next;
 	{	for (p = methods; p; p = p->link)
 			if (strcmp(ident, p->ident) == 0)
 				return p;
+#if _PACKAGE_ast
+		if (map = ccmap(CC_ASCII, CC_NATIVE))
+		{
+			m = buf;
+			for(s = (char*)ident; m < &buf[sizeof(buf)-1]; s++)
+				*m++ = map[*s];
+			*m = 0;
+			ident = buf;
+		}
+		if (dll = dllplug(id, ident, NIL(char*), RTLD_LAZY, path, sizeof(path)))
+			return plugin(dll, path);
+#endif
 	}
 
 	return NIL(Vcmethod_t*);

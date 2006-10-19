@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -699,7 +699,7 @@ capability(register char** argv)
 			sfprintf(state.path.buf, "%s;", s);
 			while (s = *argv++)
 				sfprintf(state.path.buf, " %s", s);
-			mimeset(state.part.mime, sfstruse(state.path.buf), MIME_REPLACE);
+			mimeset(state.part.mime, struse(state.path.buf), MIME_REPLACE);
 		}
 	}
 	return 0;

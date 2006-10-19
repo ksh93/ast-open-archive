@@ -199,8 +199,8 @@ TEST 03 'ebcdic'
 
 	EXEC -R12 -lsync,control=$data/e.ss,out1=e.out,out2=s.out $data/e.dat
 		OUTPUT -n - $'\x81\x81\x81\x40\xf0\xf0\xf1\x40\xa7\xa7\xa7\x15\x82\x82\x82\x40\xf0\xf0\xf3\x40\xa7\xa7\xa7\x15\x83\x83\x83\x40\xf0\xf0\xf5\x40\xa7\xa7\xa7\x15'
-		OUTPUT e.out
-		OUTPUT -n s.out $'\xf0\xf0\xf1\x15\xf0\xf0\xf3\x15\xf0\xf0\xf5\x15'
+		OUTPUT e%4.out
+		OUTPUT -n s%4.out $'\xf0\xf0\xf1\x15\xf0\xf0\xf3\x15\xf0\xf0\xf5\x15'
 
 	EXEC -lsync"
 			lrecl=12
@@ -209,30 +209,30 @@ TEST 03 'ebcdic'
 			out1=e.1.out
 			out2=s.1.out
 		" $data/e.dat
-		SAME e.1.out e.out
-		SAME s.1.out s.out
+		SAME e.1%4.out e%4.out
+		SAME s.1%4.out s%4.out
 
 	EXEC -lsync"
 			control=$data/x.ss
 			out1=e.2.out
 			out2=s.2.out
 		" $data/e.dat
-		SAME e.2.out e.out
-		SAME s.2.out s.out
+		SAME e.2%4.out e%4.out
+		SAME s.2%4.out s%4.out
 
 	EXEC -lsync,control=$data/f.ss,out-int=e.3.out $data/e.dat
-		SAME e.3.out e.out
+		SAME e.3%4.out e%4.out
 
 	EXEC -R12 -lsync,control=$data/e.ss,out1=e.4.out,out2=s.4.out -o e1.out $data/e.dat
 		OUTPUT -
-		OUTPUT -n e1.out $'\x81\x81\x81\x40\xf0\xf0\xf1\x40\xa7\xa7\xa7\x15\x82\x82\x82\x40\xf0\xf0\xf3\x40\xa7\xa7\xa7\x15\x83\x83\x83\x40\xf0\xf0\xf5\x40\xa7\xa7\xa7\x15'
-		OUTPUT e.out
-		SAME e.4.out e.out
-		SAME s.4.out s.out
+		OUTPUT -n e1%12.out $'\x81\x81\x81\x40\xf0\xf0\xf1\x40\xa7\xa7\xa7\x15\x82\x82\x82\x40\xf0\xf0\xf3\x40\xa7\xa7\xa7\x15\x83\x83\x83\x40\xf0\xf0\xf5\x40\xa7\xa7\xa7\x15'
+		OUTPUT e%4.out
+		SAME e.4%4.out e%4.out
+		SAME s.4%4.out s%4.out
 
 	EXEC -R12 -lsync,control=$data/e.ss,out1=e.5.out,out2=s.5.out -o /dev/null $data/e.dat
-		SAME e.5.out e.out
-		SAME s.5.out s.out
+		SAME e.5%4.out e%4.out
+		SAME s.5%4.out s%4.out
 
 	EXEC -lsync,control=$data/g.ss $data/e.dat
 
@@ -250,8 +250,8 @@ TEST 04 'ebcdic with marked input'
 	EXEC -R% -lsync"
 			code=ebcdic-o
 			control=$data/e.ss
-			out1=e.1%4.out
-			out2=s.1%4.out
+			out1=e.1.out
+			out2=s.1.out
 		" $data/e%12.dat
 		SAME e.1%4.out e%4.out
 		SAME s.1%4.out s%4.out
@@ -265,6 +265,9 @@ TEST 04 'ebcdic with marked input'
 		SAME s.2%4.out s%4.out
 
 	EXEC -R% -lsync,control=$data/f.ss,out-int=e.3.out $data/e%12.dat
+		SAME e.3%4.out e%4.out
+
+	EXEC -R% -lsync,control=$data/f.ss,out-int=e.3.out $data/e.f.dat
 		SAME e.3%4.out e%4.out
 
 	EXEC -R% -lsync,control=$data/e.ss,out1=e.4%4.out,out2=s.4%4.out -o e1%12.out $data/e%12.dat
@@ -374,7 +377,7 @@ state
 	alignsize=8192 procsize=16384 recsize=0
 	merge=0 reverse=0 stable=1 uniq=0 ignore=1 verbose=0
 	tab=\' \' keys= maxfield=0
-	recsort format d data 0x0000000a key -1
+	record format d data 0x0000000a key -1
 field[0]
 	begin field = 0
 	 begin char = 0
@@ -568,3 +571,21 @@ TEST 15 'duplicate key diagnostic'
 
 	EXEC -u -lsync,control=empty.ss,duplicates c d b a
 		OUTPUT - $'aa\nbb\ncc\ndd\nww\nyy'
+
+TEST 16 'base name size/suffix mapping'
+
+	EXEC -lsync,control=empty.ss a b.b c.c.c
+		INPUT empty.ss
+		INPUT a%123.foo $'a123foo'
+		INPUT b%123.0z $'b0z'
+		INPUT b.b%123.1z $'b1z'
+		INPUT c%123.0z $'c0z'
+		INPUT c.c%123.1z $'c1z'
+		INPUT c.c.c%123.2z $'c2z'
+		OUTPUT - $'a123foo\nb1z\nc2z'
+
+	EXEC -lsync,control=empty.ss a e.e
+		INPUT e.e%789.1z $'b1z'
+		OUTPUT -
+		ERROR - $'sort: e.e%789.1z: format f789 incompatible with a%123.foo format f123'
+		EXIT 1

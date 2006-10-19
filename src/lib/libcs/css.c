@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -21,7 +21,7 @@
                   
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  *
  * connect stream server support
  */
@@ -31,7 +31,6 @@
 #include <dirent.h>
 
 #define OPEN_MIN	20
-#define PATH_MIN	32
 
 #if !defined(O_NONBLOCK) && defined(FNDELAY)
 #define O_NONBLOCK	FNDELAY
@@ -136,7 +135,7 @@ cssopen(const char* path, Cssdisc_t* disc)
 	if (!state.servers)
 	{
 		csprotect(&cs);
-		if ((n = sysconf(_SC_OPEN_MAX)) < OPEN_MIN)
+		if ((n = (int)strtol(astconf("OPEN_MAX", NiL, NiL), NiL, 0)) < OPEN_MIN)
 			n = OPEN_MIN;
 		if (!(s = newof(0, char, n * (sizeof(Cssfd_t) + sizeof(Cspoll_t) + sizeof(Auth_t)), 0)))
 			return 0;
@@ -154,16 +153,17 @@ cssopen(const char* path, Cssdisc_t* disc)
 		state.servers = state.main = css;
 		atexit(done);
 	}
-	if (!path || (n = strlen(path) + 1) < 2 * PATH_MIN)
-		n = 2 * PATH_MIN;
+	if (!path || (n = strlen(path) + 2) < 2 * CS_NAME_MAX)
+		n = 2 * CS_NAME_MAX;
 	if (!(css = newof(0, Css_t, 1, n)))
 		return 0;
+	n = n / 2 + 1;
 	css->next = state.servers;
 	state.servers = css;
 	if (!(css->state = csalloc(NiL)))
 		goto bad;
 	css->service = (char*)(css + 1);
-	css->path = css->service + PATH_MIN;
+	css->path = css->service + n;
 	css->id = state.main->id;
 	css->disc = disc;
 	css->fdmax = state.fdmax;
@@ -179,7 +179,7 @@ cssopen(const char* path, Cssdisc_t* disc)
 		type = *s;
 		if (s = strchr(t, '/'))
 			*s = 0;
-		strncpy(css->service, t, PATH_MIN - 1);
+		strncpy(css->service, t, n);
 		errno = EBADF;
 		if ((css->fd = csopen(css->state, path, CS_OPEN_CREATE)) < 0)
 		{
@@ -196,7 +196,7 @@ cssopen(const char* path, Cssdisc_t* disc)
 	}
 	else
 	{
-		sfsprintf(css->service, PATH_MIN, "/dev/fdp/local/%s", path);
+		sfsprintf(css->service, n, "/dev/fdp/local/%s", path);
 		path = (char*)cspath(css->state, 0, 0);
 		type = strmatch(path, "/dev/??p/*/*") ? path[5] : 'f';
 		css->perm = S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH;

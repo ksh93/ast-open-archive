@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-1i?\n@(#)$Id: pz library 2.4 (AT&T Labs Research) 2005-07-17 $\n]"
+"[-1i?\n@(#)$Id: pz library 2.4 (AT&T Research) 2005-07-17 $\n]"
 "[a:append]"
 "[c:comment]:[text]"
 "[x:crc]"
@@ -301,7 +301,7 @@ pzpartinit(Pz_t* pz, Pzpart_t* pp, const char* name)
 					n = strlen(name);
 				sfprintf(pz->tmp, "%.*s", n, name);
 			}
-			if (!(pp->name = vmstrdup(pz->vm, sfstruse(pz->tmp))))
+			if (!(s = sfstruse(pz->tmp)) || !(pp->name = vmstrdup(pz->vm, s)))
 				return -1;
 		}
 		if (!pp->nmap)

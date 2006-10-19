@@ -1,5 +1,5 @@
 :
-# @(#)probe.win32 (AT&T Research) 2005-02-20
+# @(#)probe.win32 (AT&T Research) 2006-02-28
 #
 # win32 specific pp C probe initialization
 # wrapped cc's are easy on uwin
@@ -338,6 +338,19 @@ __stdcall
 	$cc -E easy.c > easy.out 2>&1
 	sed     -e '/=/!d' -e 's,[^"]*,echo ,' -e 's/":/"/' -e 's/:"/"/' easy.out > easy.sh
 	. ./easy.sh >&3
+	if	[[ $cc == *CC ]]
+	then	src=cpp
+	else	src=c
+	fi
+	print 'typedef char wchar_t;' > easy.$src
+	if	! $cc -c easy.$src >/dev/null 2>&1
+	then	print -u3 '#define _WCHAR_T_DEFINED 1'
+		print -u3 '#define _NATIVE_WCHAR_T_DEFINED 1'
+		if	[[ ! $reserved ]]
+		then	reserved="#pragma pp:reserved"
+		fi
+		reserved="$reserved wchar_t"
+	fi
 	cat >&3 <<!
 #pragma pp:nopredefined
 

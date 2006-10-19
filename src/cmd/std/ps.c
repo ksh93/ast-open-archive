@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Labs Research) 2005-06-16 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2006-05-23 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -104,6 +104,7 @@ USAGE_LICENSE
 "[u|U:users?List processes with real user id names or numbers in the \auser\a"
 "	list.]:[user...]"
 "[v:verbose?List verbose error messages for inaccessible processes.]"
+"[w:wide?Ignored by this implementation.]"
 "[x:detached?List all processes not associated with terminals.]"
 "[X:hex?List numeric entries in hexadecimal notation.]"
 
@@ -589,7 +590,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 	{
 		kp->disable = 1;
 		sfkeyprintf(state.mac, handle, kp->macro, key, NiL);
-		s = sfstruse(state.mac);
+		if (!(s = sfstruse(state.mac)))
+			error(ERROR_SYSTEM|3, "out of space");
 		kp->disable = 0;
 	}
 	else if (!pp)
@@ -660,7 +662,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 					sfputr(state.wrk, state.branch[i] ? " |  " : "    ", -1);
 				sfputr(state.wrk, " \\_ ", -1);
 				sfputr(state.wrk, s, -1);
-				s = sfstruse(state.wrk);
+				if (!(s = sfstruse(state.wrk)))
+					error(ERROR_SYSTEM|3, "out of space");
 			}
 			if (state.escape)
 				s = fmtesc(s);
@@ -792,7 +795,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			break;
 		percent:
 			sfprintf(state.tmp, "%%%I*d", sizeof(n), n);
-			s = sfstruse(state.tmp);
+			if (!(s = sfstruse(state.tmp)))
+				error(ERROR_SYSTEM|3, "out of space");
 			break;
 		number:
 			if (state.hex)
@@ -976,7 +980,8 @@ ps(Ps_t* pp)
 		goto string;
 	percent:
 		sfprintf(state.tmp, "%%%ld", n);
-		s = sfstruse(state.tmp);
+		if (!(s = sfstruse(state.tmp)))
+			error(ERROR_SYSTEM|3, "out of space");
 		goto string;
 	number:
 		if (!state.hex || !kp->hex)
@@ -1578,6 +1583,9 @@ main(int argc, register char** argv)
 		case 'v':
 			state.pssdisc.flags |= PSS_VERBOSE;
 			continue;
+		case 'w':
+			/* ignored by this implementation */
+			continue;
 		case 'x':
 			state.pssdisc.flags |= PSS_DETACHED;
 			continue;
@@ -1651,7 +1659,8 @@ main(int argc, register char** argv)
 	if (sfstrtell(fmt))
 	{
 		sfputc(fmt, '\n');
-		state.format = sfstruse(fmt);
+		if (!(state.format = sfstruse(fmt)))
+			error(ERROR_SYSTEM|3, "out of space");
 	}
 	else
 	{

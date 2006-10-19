@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1991-2005 AT&T Corp.                  *
+*           Copyright (c) 1991-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1016,7 +1016,8 @@ value(Expr_t* prog, Exnode_t* node, Exid_t* sym, Exref_t* ref, void* env, int el
 					if (!f->image && !(f->image = sfstropen()))
 						error(3, "out of space [image]");
 					image(f, f->image, -1);
-					val.string = sfstruse(f->image);
+					if (!(val.string = sfstruse(f->image)))
+						error(3, "out of space [image]");
 				}
 				else
 					val.string = "";
@@ -1573,23 +1574,35 @@ g2record(Sfio_t* fp, Sfio_t* ap, Sfio_t* vp, Expr_t* prog, Record_t* rec, const 
 Exnode_t*
 g2print(Expr_t* prog, Record_t* rec)
 {
-	Sfio_t*	ap;
-	Sfio_t*	fp;
-	Sfio_t*	vp;
+	char*		s;
+	Sfio_t*		ap;
+	Sfio_t*		fp;
+	Sfio_t*		vp;
+	Exnode_t*	r;
 
 	exexpr(prog, "action", NiL, DELETE);
-	ap = sfstropen();
-	fp = sfstropen();
-	vp = sfstropen();
+	r = 0;
+	fp = vp = 0;
+	if (!(ap = sfstropen()) || !(fp = sfstropen()) || !(vp = sfstropen()))
+		goto bad;
 	sfputr(fp, "action:printf(", '"');
 	sfputr(vp, rec->symbol->name, 0);
 	g2record(fp, ap, vp, prog, rec, rec->symbol->name, 0);
 	sfputc(fp, '"');
-	sfputr(fp, sfstruse(ap), ')');
+	if (!(s = sfstruse(ap)))
+		goto bad;
+	sfputr(fp, s, ')');
 	sfputc(fp, ';');
-	excomp(prog, NiL, 0, sfstruse(fp), NiL);
-	sfstrclose(vp);
-	sfstrclose(fp);
-	sfstrclose(ap);
-	return exexpr(prog, "action", NiL, 0);
+	if (!(s = sfstruse(fp)))
+		goto bad;
+	excomp(prog, NiL, 0, s, NiL);
+	r = exexpr(prog, "action", NiL, 0);
+ bad:
+	if (vp)
+		sfstrclose(vp);
+	if (fp)
+		sfstrclose(fp);
+	if (ap)
+		sfstrclose(ap);
+	return r;
 }

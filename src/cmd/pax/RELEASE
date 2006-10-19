@@ -1,3 +1,7 @@
+06-10-11 add sfstropen()/sfstruse() error checks
+06-09-27 pax.tst: fix uid etc. tests to use --listformat -- duh
+06-09-12 delta.c: delta for any X_IPERM st_mode changes
+06-06-07 pax: add -U --delta.update to update only delta members
 05-12-14 pax: fix --filter to work for --read and expand command %(...)
 05-06-07 format.c: fix inter volume fill logic
 05-05-28 pax: improve "junk data after volume" checks

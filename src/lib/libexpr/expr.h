@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -279,10 +279,12 @@ extern Extype_t		exeval(Expr_t*, Exnode_t*, void*);
 extern Exnode_t*	exexpr(Expr_t*, const char*, Exid_t*, int);
 extern void		exfreenode(Expr_t*, Exnode_t*);
 extern Exnode_t*	exnewnode(Expr_t*, int, int, int, Exnode_t*, Exnode_t*);
+extern char*		exnospace(void);
 extern Expr_t*		exopen(Exdisc_t*);
 extern int		expop(Expr_t*);
 extern int		expush(Expr_t*, const char*, int, const char*, Sfio_t*);
 extern int		exrewind(Expr_t*);
+extern char*		exstash(Sfio_t*, Vmalloc_t*);
 extern void		exstatement(Expr_t*);
 extern int		extoken(Expr_t*);
 extern char*		extype(int);

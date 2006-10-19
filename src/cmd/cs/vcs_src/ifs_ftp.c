@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -50,7 +50,7 @@ time_t	ftime;
     int		len;
 
     len = strlen( fname );
-    sprintf( flogname, "._log.%d", ftime );
+    sfsprintf( flogname, sizeof(flogname), "._log.%d", ftime );
     if( (flog = fopen( flogname, "w" )) == NULL ) {
 	return -1;
     }
@@ -226,7 +226,7 @@ char	*cmd, *arg;
 
     if( cmd == NULL )
 	return -1;
-    sprintf( buf, arg ? "%s %s\r\n" : "%s\r\n", cmd, arg );
+    sfsprintf( buf, sizeof(buf), arg ? "%s %s\r\n" : "%s\r\n", cmd, arg );
     NetWrite( nFile, buf, strlen(buf) );
 #ifdef DEBUG
     if( strcmp( cmd, "PASS" ) == 0 )
@@ -315,7 +315,7 @@ NetFile	*nFile;
 	cserrno = E_CONNECT;
 	return NULL;
     }
-    sprintf( host, "%s.%s.%s.%s", arg[0], arg[1], arg[2], arg[3] );
+    sfsprintf( host, sizeof(host), "%s.%s.%s.%s", arg[0], arg[1], arg[2], arg[3] );
     port = (int)strtol( arg[4], (char**)0, 0 ) * 256 + (int)strtol( arg[5], (char**)0, 0 );
     return NetConnect( srv, host, port );
 }
@@ -412,7 +412,7 @@ char	*tmpfile;
     if( FtpXfer( srv, "LIST", NULL, tmpfile ) == -1 )
 	return -1;
     if( chdir( lpath ) == -1 ) {
-	sprintf( buf, "%s/._dir", lpath );
+	sfsprintf( buf, sizeof(buf), "%s/._dir", lpath );
 	MakePath( buf );
 	chdir( lpath );
     }
@@ -438,7 +438,7 @@ struct server_info *srv;
 
     if( nFile != NULL ) {
 	if( FtpTalk( nFile, "NOOP", NULL ) == 200 ) {
-	    sprintf( csusrmsg, "use fd:%d", nFile->socket );
+	    sfsprintf( csusrmsg, sizeof(csusrmsg), "use fd:%d", nFile->socket );
 	    return 0;
 	}
     }
@@ -472,7 +472,7 @@ struct server_info *srv;
 	return -1;
     }
     mitem->nFile = nFile;
-    sprintf( csusrmsg, "use fd: %d", nFile->socket );
+    sfsprintf( csusrmsg, sizeof(csusrmsg), "use fd: %d", nFile->socket );
     return 0;
 }
 
@@ -491,7 +491,7 @@ struct server_info *srv;
 	logit( "<ftp>: disconnect\n" );
 	NetClose( nFile );
 	mitem->nFile = NULL;
-	sprintf( csusrmsg, "closefd= %d", nFile->socket );
+	sfsprintf( csusrmsg, sizeof(csusrmsg), "closefd= %d", nFile->socket );
     }
     return 0;
 }

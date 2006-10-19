@@ -19136,7 +19136,9 @@ showmatch __PARAM__((regmatch_t* p), (p)) __OTORP__(regmatch_t* p;)
 }
 
 static int
-better(Env_t* env, Pos_t* os, Pos_t* ns, Pos_t* oend, Pos_t* nend, int level)
+better __PARAM__((Env_t* env, Pos_t* os, Pos_t* ns, Pos_t* oend, Pos_t* nend, int level), (env, os, ns, oend, nend, level)) __OTORP__(Env_t* env; Pos_t* os; Pos_t* ns; Pos_t* oend; Pos_t* nend; int level;)
+#line 239
+
 #define better	_better
 {
 	int	i;
@@ -19909,3 +19911,63 @@ TEST 16 'array arg prototypes'
 	t5	e;
 	return 0;
 }'
+
+TEST 17 'externalize'
+
+	EXEC -nh
+		INPUT - $'#pragma prototyped
+static int fun(int);
+static int beg;
+static int fun(int arg) { return !arg; }
+static int end;'
+		OUTPUT - $'                  \nstatic int fun __PROTO__((int));
+static int beg;
+static int fun __PARAM__((int arg), (arg)) __OTORP__(int arg;)
+#line 4
+{ return !arg; }
+static int end;'
+
+	EXEC -nhx
+		OUTPUT - $'                  \nextern int fun __PROTO__((int));
+static int beg;
+extern int fun __PARAM__((int arg), (arg)) __OTORP__(int arg;)
+#line 4
+{ return !arg; }
+static int end;'
+
+	EXEC -nh
+		INPUT - $'#pragma prototyped
+#define __NTH(p)	__attribute__(nothrow) p
+static __inline double
+__NTH (atof (__const char *__nptr))
+{
+  return strtod (__nptr, (char **) NULL);
+}'
+		OUTPUT - $'                  
+#define __NTH(p)	__attribute__(nothrow) p
+static __inline double
+__NTH (atof (__const char *__nptr))
+{
+  return strtod (__nptr, (char **) NULL);
+}'
+
+	EXEC -nhx
+
+	EXEC -nh
+		INPUT - $'#pragma prototyped
+
+__BEGIN_NAMESPACE_STD
+typedef __clock_t clock_t;
+__END_NAMESPACE_STD
+#if defined __USE_XOPEN || defined __USE_POSIX || defined __USE_MISC
+__USING_NAMESPACE_STD(clock_t)
+#endif'
+		OUTPUT - $'                  \n
+__BEGIN_NAMESPACE_STD
+typedef __clock_t clock_t;
+__END_NAMESPACE_STD
+#if defined __USE_XOPEN || defined __USE_POSIX || defined __USE_MISC
+__USING_NAMESPACE_STD(clock_t)
+#endif'
+
+	EXEC -nhx

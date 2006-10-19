@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -33,7 +33,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: probe (AT&T Labs Research) 2002-10-30 $\n]"
+"[-?\n@(#)$Id: probe (AT&T Research) 2006-09-05 $\n]"
 USAGE_LICENSE
 "[+NAME?probe - generate/install/display language processor probe information]"
 "[+DESCRIPTION?\bprobe\b generates, installs and displays on the standard"
@@ -83,6 +83,8 @@ USAGE_LICENSE
 "[a:attributes?List probe attribute definitions.]"
 "[d:delete?Delete the current information. Information can only be deleted by"
 "	the generating user.]"
+"[f:force?Force information generation even if it is out of date. Only probe"
+"	information files with write mode disabled can be regenerated.]"
 "[g:generate?Generate the probe information if it is out of date. Only probe"
 "	information files with write mode disabled can be regenerated.]"
 "[k:key?List the probe key path name on the standard output.]"
@@ -142,14 +144,15 @@ USAGE_LICENSE
 
 #define ATTRIBUTES	(1<<0)
 #define DELETE		(1<<1)
-#define GENERATE	(1<<2)
-#define KEY		(1<<3)
-#define LIST		(1<<4)
-#define OVERRIDE	(1<<5)
-#define SILENT		(1<<6)
-#define TEST		(1<<7)
-#define TRACE		(1<<8)
-#define VERIFY		(1<<9)
+#define FORCE		(1<<2)
+#define GENERATE	(1<<3)
+#define KEY		(1<<4)
+#define LIST		(1<<5)
+#define OVERRIDE	(1<<6)
+#define SILENT		(1<<7)
+#define TEST		(1<<8)
+#define TRACE		(1<<9)
+#define VERIFY		(1<<10)
 
 static char*	tmp;
 
@@ -314,6 +317,9 @@ main(int argc, char** argv)
 		case 'd':
 			options |= DELETE;
 			continue;
+		case 'f':
+			options |= FORCE;
+			continue;
 		case 'g':
 			options |= GENERATE;
 			continue;
@@ -452,7 +458,7 @@ main(int argc, char** argv)
 	}
 	else
 	{
-		if (!(options & TEST) && ps.st_mode && (ptime <= (unsigned long)ps.st_mtime || ptime <= (unsigned long)ps.st_ctime || (ps.st_mode & S_IWUSR)))
+		if (!(options & (FORCE|TEST)) && ps.st_mode && (ptime <= (unsigned long)ps.st_mtime || ptime <= (unsigned long)ps.st_ctime || (ps.st_mode & S_IWUSR)))
 		{
 			if (ptime <= (unsigned long)ps.st_mtime || ptime <= (unsigned long)ps.st_ctime)
 			{
@@ -462,7 +468,7 @@ main(int argc, char** argv)
 			else if (!(options & OVERRIDE) && (ps.st_mode & S_IWUSR))
 				error(0, "%s probe information for %s language processor %s must be manually regenerated", tool, language, processor);
 		}
-		else if ((options & (GENERATE|TEST)) || !(options & ~(GENERATE|SILENT|TRACE)))
+		else if ((options & (FORCE|GENERATE|TEST)) || !(options & ~(FORCE|GENERATE|SILENT|TRACE)))
 		{
 			/*
 			 * recursion check using environment sentinel

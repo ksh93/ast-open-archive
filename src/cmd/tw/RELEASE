@@ -1,3 +1,7 @@
+06-10-11 add sfstropen()/sfstruse() error checks
+06-09-27 find.c: peel off leading [-+] from all -perm
+06-07-17 find.tst: fix -perm tests
+06-05-25 find.c: fix inum (and all but size) default units
 05-06-13 tw.c: sort:path == sort:name, handle ,-separated keys
 05-03-07 xargs.c: fix -i to treat each line as an arg
 05-02-23 tw.c: add --error-exit=code to exit if cmd exit >= code

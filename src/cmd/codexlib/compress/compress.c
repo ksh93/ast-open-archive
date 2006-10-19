@@ -5,7 +5,7 @@
  *
  * compress/zcat discipline snarfed from BSD zopen by
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  * 1999-06-23
  */
 

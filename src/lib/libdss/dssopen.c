@@ -22,11 +22,11 @@
  * dss open/close/library/method implementation
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dss library (AT&T Labs Research) 2006-02-02 $\n]"
+"[-?\n@(#)$Id: dss library (AT&T Research) 2006-02-02 $\n]"
 USAGE_LICENSE
 "[+NAME?\findex\f]"
 "[+DESCRIPTION?The \bdss\b default method schema is a pure XML (tags only)"
@@ -204,7 +204,11 @@ dssmethf(const char* name, const char* options, const char* schema, Dssdisc_t* d
 		}
 		sfputc(up, '}');
 		sfputc(up, '\n');
-		us = sfstruse(up);
+		if (!(us = sfstruse(up)))
+		{
+			sfclose(up);
+			return 0;
+		}
 		for (;;)
 		{
 			switch (optstr(options, us))

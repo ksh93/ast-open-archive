@@ -1,3 +1,19 @@
+06-09-28 Makerules.mk: add $(IFFEREFS)
+06-09-15 Makerules.mk: fix .SHARED.DEF.* scope prereq logic
+06-09-01 Makefile: no -O for command.c on darwin (probably gcc 4.0's fault)
+06-08-15 command.c: handle no action but .AFTER|.BEFORE prereqs 
+06-08-11 Makerules.mk: .PACKAGE.INIT now checks lin64 for HOSTTYPE==*64
+06-08-11 command.c: pass $(COSHELL) to coopen()
+06-08-07 command.c,parse.c: add 'query - blocked' for blocked jobs
+06-08-02 command.c: cokill(state.coshell,0,0) to kill event jobs
+06-07-31 metarule.c: handle dynamic metarule rhs
+06-07-27 command.c: clear job->cojobs to prevent concurrent use
+06-07-17 Makerules.mk: cc-...~... => cc-...,...
+06-06-21 expand.c: add :Z[=C]: for closure and cycle detection
+06-06-11 command.c: update to use copending() cojobs() cozombie()
+06-05-09 command.c: pass CO_ENV_OPTIONS to coopen()
+06-03-29 Makerules.mk: fix +l* explicit binding override
+06-03-08 Makerules.mk: fix :JOINT: rhs double eval
 06-02-08 pkg-cobol-cobc.mk: drop -g from COBOLFLAGS
 06-01-31 Makerules.mk: fix :PACKAGE: P:static to honor .PACKAGE.P.library
 06-01-25 Makerules.mk: { -ldl -lm } dynamic unless explicitly overridden

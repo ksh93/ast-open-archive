@@ -1,3 +1,7 @@
+06-10-11 add sfstruse() error checks
+06-10-11 ls.c: header/trailer must honor state.scale too
+06-09-19 split.c: pathconf() => astconf()
+06-05-23 ps.c: add but ignore -w, --wide
 06-01-11 pss-kvm.c: handle struct eproc.e_xsize
 06-01-03 ls.c: add --show-control-characters, handle --no*
 05-07-25 touch.c: eith => either

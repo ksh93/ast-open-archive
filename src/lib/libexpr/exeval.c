@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2006 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -91,7 +91,7 @@ getdyn(Expr_t* ex, register Exnode_t* expr, void* env, Exassoc_t** assoc)
 		if (!(b = (Exassoc_t*)dtmatch((Dt_t*)expr->data.variable.symbol->local.pointer, v.string)))
 		{
 			if (!(b = newof(0, Exassoc_t, 1, strlen(v.string))))
-				exerror("out of space [assoc]");
+				exnospace();
 			strcpy(b->name, v.string);
 			dtinsert((Dt_t*)expr->data.variable.symbol->local.pointer, b);
 		}
@@ -213,10 +213,13 @@ prformat(Sfio_t* sp, void* vp, Sffmt_t* dp)
 	}
 	if (dp->n_str > 0)
 	{
-		if (!fmt->tmp)
-			fmt->tmp = sfstropen();
-		sfprintf(fmt->tmp, "%.*s", dp->n_str, dp->t_str);
-		txt = sfstruse(fmt->tmp);
+		if (!fmt->tmp || !(fmt->tmp = sfstropen()))
+			txt = exnospace();
+		else
+		{
+			sfprintf(fmt->tmp, "%.*s", dp->n_str, dp->t_str);
+			txt = exstash(fmt->tmp, NiL);
+		}
 	}
 	else
 		txt = 0;
@@ -441,7 +444,7 @@ static char*
 str_add(Expr_t* ex, register char* l, register char* r)
 {
 	sfprintf(ex->tmp, "%s%s", l, r);
-	return vmstrdup(ex->ve, sfstruse(ex->tmp));
+	return exstash(ex->tmp, ex->ve);
 }
 
 /*
@@ -460,7 +463,7 @@ str_ior(Expr_t* ex, register char* l, register char* r)
 	while (c = *r++)
 		if (!strchr(l, c) && !strchr(r, c))
 			sfputc(ex->tmp, c);
-	return vmstrdup(ex->ve, sfstruse(ex->tmp));
+	return exstash(ex->tmp, ex->ve);
 }
 
 /*
@@ -475,7 +478,7 @@ str_and(Expr_t* ex, register char* l, register char* r)
 	while (c = *l++)
 		if (strchr(r, c) && !strchr(l, c))
 			sfputc(ex->tmp, c);
-	return vmstrdup(ex->ve, sfstruse(ex->tmp));
+	return exstash(ex->tmp, ex->ve);
 }
 
 /*
@@ -494,7 +497,7 @@ str_xor(Expr_t* ex, register char* l, register char* r)
 	while (c = *r++)
 		if (!strchr(l, c) && !strchr(r, c))
 			sfputc(ex->tmp, c);
-	return vmstrdup(ex->ve, sfstruse(ex->tmp));
+	return exstash(ex->tmp, ex->ve);
 }
 
 /*
@@ -509,7 +512,7 @@ str_mod(Expr_t* ex, register char* l, register char* r)
 	while (c = *l++)
 		if (!strchr(r, c) && !strchr(l, c))
 			sfputc(ex->tmp, c);
-	return vmstrdup(ex->ve, sfstruse(ex->tmp));
+	return exstash(ex->tmp, ex->ve);
 }
 
 /*
@@ -524,7 +527,7 @@ str_mpy(Expr_t* ex, register char* l, register char* r)
 
 	while ((lc = *l++) && (rc = *r++))
 		sfputc(ex->tmp, lc == rc ? lc : ' ');
-	return vmstrdup(ex->ve, sfstruse(ex->tmp));
+	return exstash(ex->tmp, ex->ve);
 }
 
 /*
@@ -800,7 +803,7 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 		return v;
 	case SPRINTF:
 		print(ex, expr, env, ex->tmp);
-		v.string = vmstrdup(ex->ve, sfstruse(ex->tmp));
+		v.string = exstash(ex->tmp, ex->ve);
 		return v;
 	case '=':
 		v = eval(ex, expr->data.operand.right, env);
@@ -982,7 +985,7 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 			if (expr->data.operand.left->op != DYNAMIC && expr->data.operand.left->op != ID)
 			{
 				sfprintf(ex->tmp, "%g", v.floating);
-				tmp.data.constant.value.string = vmstrdup(ex->ve, sfstruse(ex->tmp));
+				tmp.data.constant.value.string = exstash(ex->tmp, ex->ve);
 			}
 			else if ((*ex->disc->convertf)(ex, &tmp, STRING, expr->data.operand.right ? expr->data.operand.right->data.variable.symbol : (Exid_t*)0, 0, ex->disc))
 				exerror("%s: cannot convert value to string", expr->data.operand.left->data.variable.symbol->name);
@@ -1126,7 +1129,7 @@ eval(Expr_t* ex, register Exnode_t* expr, void* env)
 					sfprintf(ex->tmp, "%I*u", sizeof(v.integer), v.integer);
 				else
 					sfprintf(ex->tmp, "%I*d", sizeof(v.integer), v.integer);
-				tmp.data.constant.value.string = vmstrdup(ex->ve, sfstruse(ex->tmp));
+				tmp.data.constant.value.string = exstash(ex->tmp, ex->ve);
 			}
 			else if ((*ex->disc->convertf)(ex, &tmp, STRING, expr->data.operand.right ? expr->data.operand.right->data.variable.symbol : (Exid_t*)0, 0, ex->disc))
 				exerror("%s: cannot convert value to string", expr->data.operand.left->data.variable.symbol->name);

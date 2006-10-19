@@ -1,3 +1,9 @@
+06-10-11 add sfstruse() error checks
+06-08-25 uniq.rt: add initial regression tests
+06-08-23 mkdir.tst: add -p final dir mode tests
+06-07-20 pty.c: add
+06-06-25 chmod.rt,mkdir.rt: add initial regression tests
+06-06-24 dlls.c: add --containing
 06-01-30 od.c: add -tb binary character format
 05-12-06 od.c: handle od() static split buffer overflow
 05-08-07 tr.c: fix a-b- and a-b-c

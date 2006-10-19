@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -474,7 +474,7 @@ extoken(register Expr_t* ex)
 			sfputc(ex->tmp, c);
 		}
 		ex->input->nesting--;
-		s = sfstruse(ex->tmp);
+		s = exstash(ex->tmp, NiL);
 		if (q == '"' || (ex->disc->flags & EX_CHARSTRING))
 		{
 			if (!(exlval.string = vmstrdup(ex->vm, s)))
@@ -527,7 +527,7 @@ extoken(register Expr_t* ex)
 			}
 			if (c == '#')
 			{
-				s = sfstruse(ex->tmp);
+				s = exstash(ex->tmp, NiL);
 				b = strtol(s, NiL, 10);
 				do
 				{
@@ -561,7 +561,7 @@ extoken(register Expr_t* ex)
 				}
 			}
 		}
-		s = sfstruse(ex->tmp);
+		s = exstash(ex->tmp, NiL);
 		if (q == FLOATING)
 			exlval.floating = strtod(s, &e);
 		else
@@ -595,12 +595,12 @@ extoken(register Expr_t* ex)
 			while (isalnum(c = lex(ex)) || c == '_' || c == '$')
 				sfputc(ex->tmp, c);
 			exunlex(ex, c);
-			s = sfstruse(ex->tmp);
+			s = exstash(ex->tmp, NiL);
 			if (!(exlval.id = (Exid_t*)dtmatch(ex->symbols, s)))
 			{
 				if (!(exlval.id = newof(0, Exid_t, 1, strlen(s) - EX_NAMELEN + 1)))
 				{
-					exerror("out of space");
+					exnospace();
 					goto eof;
 				}
 				strcpy(exlval.id->name, s);
@@ -815,7 +815,7 @@ extoken(register Expr_t* ex)
 		}
 		break;
 	}
-	(*ex->disc->reff)(ex, NiL, exlval.id, NiL, sfstruse(ex->tmp), 0, ex->disc);
+	(*ex->disc->reff)(ex, NiL, exlval.id, NiL, exstash(ex->tmp, NiL), 0, ex->disc);
 
 					/*..INDENT*/
 				}

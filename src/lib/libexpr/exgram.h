@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -203,14 +203,14 @@ excast(Expr_t* p, register Exnode_t* x, register int type, register Exnode_t* xr
 			break;
 		case F2S:
 			sfprintf(p->tmp, "%g", x->data.constant.value.floating);
-			x->data.constant.value.string = vmstrdup(p->vm, sfstruse(p->tmp));
+			x->data.constant.value.string = exstash(p->tmp, p->vm);
 			break;
 		case I2F:
 			x->data.constant.value.floating = x->data.constant.value.integer;
 			break;
 		case I2S:
 			sfprintf(p->tmp, "%I*d", sizeof(x->data.constant.value.integer), x->data.constant.value.integer);
-			x->data.constant.value.string = vmstrdup(p->vm, sfstruse(p->tmp));
+			x->data.constant.value.string = exstash(p->tmp, p->vm);
 			break;
 		case S2F:
 			x->data.constant.value.integer = strtod(x->data.constant.value.string, &e);
@@ -317,7 +317,7 @@ qualify(register Exref_t* ref, register Exid_t* sym)
 	while (ref->next)
 		ref = ref->next;
 	sfprintf(expr.program->tmp, "%s.%s", ref->symbol->name, sym->name);
-	s = sfstruse(expr.program->tmp);
+	s = exstash(expr.program->tmp, NiL);
 	if (!(x = (Exid_t*)dtmatch(expr.program->symbols, s)))
 	{
 		if (x = newof(0, Exid_t, 1, strlen(s) - EX_NAMELEN + 1))
@@ -328,7 +328,7 @@ qualify(register Exref_t* ref, register Exid_t* sym)
 		}
 		else
 		{
-			exerror("out of space [qualify]");
+			exnospace();
 			x = sym;
 		}
 	}
@@ -562,7 +562,7 @@ preprint(register Exnode_t* args)
 			}
 			args = args->data.operand.right;
 		}
-		x->format = vmstrdup(expr.program->vm, sfstruse(expr.program->tmp));
+		x->format = exstash(expr.program->tmp, expr.program->vm);
 		if (!*s)
 			break;
 		f = s;
@@ -587,7 +587,7 @@ expush(Expr_t* p, const char* name, int line, const char* sp, Sfio_t* fp)
 
 	if (!(in = newof(0, Exinput_t, 1, 0)))
 	{
-		exerror("out of space [push]");
+		exnospace();
 		return -1;
 	}
 	if (!p->input)

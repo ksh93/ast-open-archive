@@ -39,10 +39,10 @@ TEST 01 'basics'
 
 	EXEC -lvcodex -o rev.tmp rev.qz
 
-	EXEC -lvcodex,notemporary,nooutput -o rev.out rev.tmp
+	EXEC -lvcodex,notemporary,nooutput -o rev.out rev.tmp.qz
 		SAME rev.out rev.sorted
 
-	EXEC -v -za16k -zb16k -zi128k -lvcodex,nooutput,verbose,regress -o rev.out rev.qz
+	EXEC -v -za16k -zb16k -zi16k -lvcodex,nooutput,verbose,regress -o rev.out rev.qz
 		SAME rev.out rev.sorted
 		ERROR - $'sort d record format
 sort vcodex decode rev.qz
@@ -50,21 +50,25 @@ sort process 16384 -> 16380
 sort vcodex encode temporary-2
 sort write intermediate
 sort vcodex decode temporary-3
-sort process 15364 -> 15360
+sort process 8196 -> 8196
 sort vcodex encode temporary-4
 sort write intermediate
 sort vcodex decode temporary-5
-sort process 15364 -> 15360
+sort process 16384 -> 16380
 sort vcodex encode temporary-6
 sort write intermediate
 sort vcodex decode temporary-7
-sort process 12900 -> 12900
+sort process 8196 -> 8196
 sort vcodex encode temporary-8
 sort write intermediate
 sort vcodex decode temporary-9
+sort process 10848 -> 10848
+sort vcodex encode temporary-10
+sort write intermediate
+sort vcodex decode temporary-11
 sort merge text'
 
-	EXEC -v -za16k -zb16k -zi128k -lvcodex,nooutput,verbose,regress,temporary=rle^huffman -o rev.out rev.qz
+	EXEC -v -za16k -zb16k -zi16k -lvcodex,nooutput,verbose,regress,temporary=rle^huffman -o rev.out rev.qz
 		SAME rev.out rev.sorted
 		ERROR - $'sort d record format
 sort vcodex decode rev.qz
@@ -72,16 +76,20 @@ sort process 16384 -> 16380
 sort vcodex encode temporary-2
 sort write intermediate
 sort vcodex decode temporary-3
-sort process 15364 -> 15360
+sort process 8196 -> 8196
 sort vcodex encode temporary-4
 sort write intermediate
 sort vcodex decode temporary-5
-sort process 15364 -> 15360
+sort process 16384 -> 16380
 sort vcodex encode temporary-6
 sort write intermediate
 sort vcodex decode temporary-7
-sort process 12900 -> 12900
+sort process 8196 -> 8196
 sort vcodex encode temporary-8
 sort write intermediate
 sort vcodex decode temporary-9
+sort process 10848 -> 10848
+sort vcodex encode temporary-10
+sort write intermediate
+sort vcodex decode temporary-11
 sort merge text'

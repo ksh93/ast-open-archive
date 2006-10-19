@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2006 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -129,6 +129,8 @@ ssize_t	s_data;		/* data size		*/
 					return -1;
 				r->data = data;
 				r->datalen = datalen;
+				r->key = r->data+key;
+				r->keylen = keylen;
 
 				if(rs->events & RS_READ)
 				{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
@@ -137,13 +139,12 @@ ssize_t	s_data;		/* data size		*/
 					{	RSFREE(rs, r);
 						goto delete_key;
 					}
-					if(r->data != data && (!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen))))
-						return -1;
+					if(r->data != data)
+					{	if(!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen)))
+							return -1;
+						r->key = r->data+key;
+					}
 				}
-
-				r->key = r->data+key;
-				r->keylen = keylen;
-
 				if((*insertf)(rs,r) < 0)
 					return -1;
 				rs->count += 1;
@@ -166,7 +167,7 @@ ssize_t	s_data;		/* data size		*/
 			}
 #if _PACKAGE_ast
 			else if (d & ~0xff) /* Recfmt_t record descriptor */
-			{	if ((datalen = reclen(d, data, s_loop)) <= 0 || datalen > s_loop)
+			{	if ((datalen = reclen(d, data, s_loop)) <= 0 || s_loop < datalen)
 					break;
 			}
 #endif
@@ -182,62 +183,68 @@ ssize_t	s_data;		/* data size		*/
 			r->data = data;
 			r->datalen = datalen;
 
-			if(rs->events & RS_READ)
-			{	if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
-					return -1;
-				if(n == RS_DELETE)
-				{	RSFREE(rs, r);
-					goto delete_raw;
+			for (;;)
+			{	if(!defkeyf) /* key is part of data */
+				{	r->key = r->data+key;
+					if((r->keylen = keylen) <= 0)
+						r->keylen += r->datalen - key;
 				}
-				if(r->data != data && (!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen))))
-					return -1;
-			}
+				else /* key must be constructed separately */
+				{	/* make sure there is enough space */
+					if(s_key < (k = key*r->datalen) )
+					{	if(k < RS_RESERVE &&
+						   rs->meth->type != RS_MTVERIFY)
+							k = RS_RESERVE;
 
-			if(!defkeyf) /* key is part of data */
-			{	r->key = r->data+key;
-				if((r->keylen = keylen) <= 0)
-					r->keylen += r->datalen - key;
-			}
-			else /* key must be constructed separately */
-			{	/* make sure there is enough space */
-				if(s_key < (k = key*r->datalen) )
-				{	if(k < RS_RESERVE &&
-					   rs->meth->type != RS_MTVERIFY)
-						k = RS_RESERVE;
-
-					if(m_key) /* try to extend key space in place */
-					{	int	n = (c_key-m_key)+s_key+k;
-						if(vmresize(rs->vm,m_key,n,0) )
-							s_key += k;
-						else /* fix current segment */
-						{	vmresize(rs->vm,m_key,
-								 (c_key-m_key),0);
-							m_key = NIL(uchar*);
+						if(m_key) /* try to extend key space in place */
+						{	int	n = (c_key-m_key)+s_key+k;
+							if(vmresize(rs->vm,m_key,n,0) )
+								s_key += k;
+							else /* fix current segment */
+							{	vmresize(rs->vm,m_key,
+									 (c_key-m_key),0);
+								m_key = NIL(uchar*);
+							}
+						}
+						if(!m_key)
+						{	if(!(m_key = (uchar*)vmalloc(rs->vm,k)) )
+								return -1;
+							c_key = m_key;
+							s_key = k;
 						}
 					}
-					if(!m_key)
-					{	if(!(m_key = (uchar*)vmalloc(rs->vm,k)) )
-							return -1;
-						c_key = m_key;
-						s_key = k;
+
+					k = (*defkeyf)(rs,r->data,r->datalen,c_key,s_key,rs->disc);
+					if(k < 0)
+						return -1;
+					r->key = c_key;
+					r->keylen = k;
+					error(-1, "AHA rsprocess key len=%d %03o %03o %03o %03o", k, r->key[0], r->key[1], r->key[2], r->key[3]);
+
+					if(rs->meth->type == RS_MTVERIFY)
+					{	/* each key is allocated separately */
+						s_key = 0;
+						m_key = c_key = NIL(uchar*);
+					}
+					else
+					{	c_key += k;
+						s_key -= k;
 					}
 				}
-
-				k = (*defkeyf)(rs,r->data,r->datalen,c_key,s_key,rs->disc);
-				if(k < 0)
+				if(r->data != data || !(rs->events & RS_READ))
+					break;
+				if((n = rsnotify(rs,RS_READ,r,(Void_t*)0,rs->disc))<0)
 					return -1;
-				r->key = c_key;
-				r->keylen = k;
-
-				if(rs->meth->type == RS_MTVERIFY)
-				{	/* each key is allocated separately */
-					s_key = 0;
-					m_key = c_key = NIL(uchar*);
+				if(n == RS_DELETE)
+				{	if(defkeyf && c_key)
+					{	c_key -= k;
+						s_key += k;
+					}
+					RSFREE(rs, r);
+					goto delete_raw;
 				}
-				else
-				{	c_key += k;
-					s_key -= k;
-				}
+				if (!(endd = (uchar*)vmalloc(rs->vm,r->datalen)) || !(r->data = (uchar*)memcpy(endd, r->data, r->datalen)))
+					return -1;
 			}
 
 			if((*insertf)(rs,r) < 0)

@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -70,7 +70,7 @@
  * IMAP4rev1 client
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 #include "mailx.h"
@@ -187,6 +187,7 @@ typedef struct
 	Sfio_t*		rp;		/* IMAP service recv stream	*/
 	Sfio_t*		sp;		/* IMAP service send stream	*/
 	Sfio_t*		tp;		/* tmp string stream		*/
+	Vmdisc_t	vmdisc;		/* vmopen() discipline		*/
 	Vmalloc_t*	gm;		/* IMAP global store		*/
 	Vmalloc_t*	vm;		/* IMAP mailbox store		*/
 	int		auth;		/* IMAP_AUTH_* methods		*/
@@ -471,7 +472,7 @@ imapflagnames(register Sfio_t* sp, register const Imaplex_t* tab, int n, registe
 		}
 	if (!sep)
 		sfputc(sp, '0');
-	return sfstruse(sp);
+	return struse(sp);
 }
 
 /*
@@ -752,7 +753,7 @@ imapop(register Imap_t* imap)
 
 	if (op->vm)
 		vmclear(op->vm);
-	else if (!(op->vm = vmopen(Vmdcheap, Vmlast, 0)))
+	else if (!(op->vm = vmopen(&imap->vmdisc, Vmlast, 0)))
 		note(FATAL|SYSTEM, "Out of space [imap vm]");
 
 	/*
@@ -877,7 +878,7 @@ imap_ENVELOPE(register Imap_t* imap, register Imaparg_t* vp, Msg_t* mp)
 	if (s && *s)
 	{
 		sfprintf(imap->tp, "%s@%s", ip->from, s);
-		ip->from = sfstruse(imap->tp);
+		ip->from = struse(imap->tp);
 	}
 	ip->from = vmstrdup(imap->vm, ip->from);
 }
@@ -917,7 +918,7 @@ imap_BODYSTRUCTURE(register Imap_t* imap, register Imaparg_t* ap, register Msg_t
 		sfputr(imap->tp, "multipart", -1);
 		if (ap && ap->type == IMAP_string)
 			sfprintf(imap->tp, "/%s", strlower(ap->value.string));
-		pp->type = vmstrdup(imap->vm, sfstruse(imap->tp));
+		pp->type = vmstrdup(imap->vm, struse(imap->tp));
 		pp->id = "";
 	}
 	else
@@ -926,7 +927,7 @@ imap_BODYSTRUCTURE(register Imap_t* imap, register Imaparg_t* ap, register Msg_t
 		sfprintf(imap->tp, "%d", *id);
 		while (++id <= bp->id)
 			sfprintf(imap->tp, ".%d", *id);
-		pp->id = vmstrdup(imap->vm, sfstruse(imap->tp));
+		pp->id = vmstrdup(imap->vm, struse(imap->tp));
 		if (s = ap->value.string)
 		{
 			s = strlower(s);
@@ -940,7 +941,7 @@ imap_BODYSTRUCTURE(register Imap_t* imap, register Imaparg_t* ap, register Msg_t
 		}
 		if ((ap = ap->next) && (s = ap->value.string))
 			sfprintf(imap->tp, "/%s", strlower(s));
-		pp->type = vmstrdup(imap->vm, sfstruse(imap->tp));
+		pp->type = vmstrdup(imap->vm, struse(imap->tp));
 		if (!ap || !(ap = ap->next))
 			return;
 		if (vp = ap->value.list.head)
@@ -1005,7 +1006,7 @@ imap_BODYSTRUCTURE(register Imap_t* imap, register Imaparg_t* ap, register Msg_t
 			if (!pp->name)
 			{
 				sfprintf(imap->tp, "%d.att", ((Imapmsg_t*)mp->m_info)->attachments + 1);
-				pp->name = vmstrdup(imap->vm, sfstruse(imap->tp));
+				pp->name = vmstrdup(imap->vm, struse(imap->tp));
 			}
 			break;
 		}
@@ -1374,7 +1375,7 @@ imapvsend(register Imap_t* imap, int retain, const char* fmt, va_list ap)
 
 	sfprintf(imap->np, "%d ", i);
 	sfvprintf(imap->np, fmt, ap);
-	s = sfstruse(imap->np);
+	s = struse(imap->np);
 	q = 0;
 	for (;;)
 	{
@@ -1421,7 +1422,7 @@ imapvsend(register Imap_t* imap, int retain, const char* fmt, va_list ap)
 		}
 		break;
 	}
-	s = sfstruse(imap->tp);
+	s = struse(imap->tp);
 	if (TRACING('s'))
 		note(ERROR, "imap: send %s", s);
 	if (sfprintf(imap->sp, "%s\r\n", s) < 0 || sfsync(imap->sp) < 0)
@@ -1573,7 +1574,7 @@ imapconnect(register Imap_t* imap)
 					sfprintf(imap->tp, "LOGIN ANONYMOUS %s", state.var.user);
 					if (state.var.domain)
 						sfprintf(imap->tp, "@%s", state.var.domain);
-					meth = sfstruse(imap->tp);
+					meth = struse(imap->tp);
 				}
 				else
 					meth = "AUTHENTICATE XFILE";
@@ -1589,7 +1590,7 @@ imapconnect(register Imap_t* imap)
 	 */
 
 	sfprintf(imap->tp, "/dev/tcp/%s/inet.imap", imap->host);
-	svc = sfstruse(imap->tp);
+	svc = struse(imap->tp);
 	if ((fd = csopen(&cs, svc, 0)) < 0)
 	{
 		note(ERROR|SYSTEM, "imap: %s: cannot connect to service", svc);
@@ -1651,6 +1652,30 @@ imapconnect(register Imap_t* imap)
 }
 
 /*
+ * print message and fail on VM_BADADDR,VM_NOMEM
+ */
+
+static int
+vmexcept(Vmalloc_t* region, int type, void* obj, Vmdisc_t* disc)
+{
+	Vmstat_t	st;
+
+	switch (type)
+	{
+	case VM_BADADDR:
+		note(ERROR, "imap: invalid pointer %p passed to free or realloc", obj);
+		imap_exit(1);
+		return -1;
+	case VM_NOMEM:
+		vmstat(region, &st);
+		note(ERROR, "imap: storage allocator out of space on %lu byte request ( region %lu segments %lu busy %lu:%lu:%lu free %lu:%lu:%lu )", (size_t)obj, st.extent, st.n_seg, st.n_busy, st.s_busy, st.m_busy, st.n_free, st.s_free, st.m_free);
+		imap_exit(1);
+		return -1;
+	}
+	return 0;
+}
+
+/*
  * initialize the IMAP service state
  */
 
@@ -1664,7 +1689,9 @@ imapinit(void)
 		note(ERROR|SYSTEM, "Out of space [imap]");
 		return 0;
 	}
-	if (!(imap->gm = vmopen(Vmdcheap, Vmlast, 0)) || !(imap->vm = vmopen(Vmdcheap, Vmlast, 0)))
+	imap->vmdisc = *Vmdcheap;
+	imap->vmdisc.exceptf = vmexcept;
+	if (!(imap->gm = vmopen(&imap->vmdisc, Vmlast, 0)) || !(imap->vm = vmopen(&imap->vmdisc, Vmlast, 0)))
 	{
 		note(ERROR|SYSTEM, "Out of space [imap state vm]");
 		if (imap->gm)
@@ -1749,7 +1776,7 @@ imap_setptr(char* name, int isedit)
 	else if (strneq(name, "imap://", 7))
 	{
 		sfprintf(imap->tp, "%s", name + 7);
-		s = sfstruse(imap->tp);
+		s = struse(imap->tp);
 		if (!(t = strchr(s, '/')))
 		{
 			note(ERROR, "imap: %s: user name expected", name);
@@ -2042,7 +2069,7 @@ imap_copy(register struct msg* mp, Sfio_t* op, Dt_t** ignore, char* prefix, unsi
 	else
 		sfprintf(imap->tp, "] BODY[TEXT]");
 	sfprintf(imap->tp, ")");
-	if (imapexec(IMAP, sfstruse(imap->tp)))
+	if (imapexec(IMAP, struse(imap->tp)))
 		note(FATAL, "imap: %d: cannot fetch message info", i);
 	imap->copy.fp = sfstdout;
 	imap->copy.prefix = 0;
@@ -2139,7 +2166,7 @@ imap_getatt(Msg_t* mp, register Imappart_t* pp, register char* name, unsigned lo
 		if (state.var.attachments && name == pp->name)
 		{
 			sfprintf(state.path.temp, "%s/%s", state.var.attachments, name);
-			name = sfstruse(state.path.temp);
+			name = struse(state.path.temp);
 		}
 		if (!(name = expand(name, 1)))
 			return 1;
@@ -2160,7 +2187,7 @@ imap_getatt(Msg_t* mp, register Imappart_t* pp, register char* name, unsigned lo
 			sfprintf(state.path.temp, " -o ", name);
 			shquote(state.path.temp, name);
 		}
-		s = sfstruse(state.path.temp);
+		s = struse(state.path.temp);
 		n = 1;
 	}
 	else if (cmd)
@@ -2409,7 +2436,7 @@ imap_flags(register Imap_t* imap, Msg_t* mp, register int flags, char* op)
 	if (c == ' ')
 	{
 		sfprintf(imap->tp, ")");
-		if (!imapsend(imap, 0, "%s", sfstruse(imap->tp)))
+		if (!imapsend(imap, 0, "%s", struse(imap->tp)))
 			note(ERROR, "%d: message flags not updated", mp - state.msg.list + 1);
 	}
 	else

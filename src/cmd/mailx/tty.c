@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -126,9 +126,8 @@
 #	define cfgetospeed(tp)		((tp)->c_cflag & CBAUD)
 #   endif /* _lib_tcgetattr */
 #   undef TIOCGETC
-#   ifdef SHOPT_OLDTERMIO  /* use both termios and termio */
+#   if SHOPT_OLDTERMIO  /* use both termios and termio */
 #	ifdef _hdr_termio
-#	    undef	ESCAPE
 #	    include	<termio.h>
 #	else
 #	    ifdef _sys_termio

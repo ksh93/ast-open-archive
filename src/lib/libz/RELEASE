@@ -1,3 +1,5 @@
+05-07-25 __MVS__ tweaks
+05-03-21 snarf and merge zlib 1.2.3, drop gzseek64() gztell64()
 05-05-11 sfdcgzip.c: change return value to [cgv], add vcunzip read check
 04-02-14 sfdcgzip.c,sfdclzw.c: add SFDCNEXT()/SFDCPREV() calls
 03-05-13 sfdcgzip.c,sfdclzw.c: add SF_DBUFFER exception, SF_SHARE+sfreserve()

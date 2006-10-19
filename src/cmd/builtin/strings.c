@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2005 AT&T Corp.                  *
+*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -27,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: strings (AT&T Labs Research) 2000-04-01 $\n]"
+"[-?\n@(#)$Id: strings (AT&T Research) 2000-04-01 $\n]"
 USAGE_LICENSE
 "[+NAME?strings - find and display printable strings in files]"
 "[+DESCRIPTION?\bstrings\b searches for printable strings in regular files"

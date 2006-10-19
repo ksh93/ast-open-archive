@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -252,7 +252,7 @@ helpvar(FILE* fp, register const struct var* vp)
 	if (vp->flags & A)
 	{
 		sfprintf(state.path.temp, T("Equivalent to %s."), vp->help);
-		help = sfstruse(state.path.temp);
+		help = struse(state.path.temp);
 	}
 	else
 		help = (char*)vp->help;
@@ -950,7 +950,7 @@ cmdif(char** argv)
 		if (t)
 			sfprintf(state.path.temp, " %s", t);
 	}
-	note(0, "\"%s\": unknown %s condition", sfstruse(state.path.temp), state.cmd->c_name);
+	note(0, "\"%s\": unknown %s condition", struse(state.path.temp), state.cmd->c_name);
 	return 1;
 }
 

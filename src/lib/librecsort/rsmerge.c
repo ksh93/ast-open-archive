@@ -108,12 +108,12 @@ reg Rs_t*	rs;
 	if((r = rs->sorted) )
 	{	r->left->right = NIL(Rsobj_t*);
 		if(!(rs->type&RS_OTEXT) )	/* need to write the count */
-		{	for(n = 1, r = r->right; r; r = r->right)
-				n += 1;
-			rs->sorted->order = -n;
+		{	for(n = -1, r = r->right; r; r = r->right)
+				n -= 1;
+			rs->sorted->order = n;
 		}
 
-		if(RSWRITE(rs,rs->f,rs->type&RS_OTEXT) < 0)
+		if(RSWRITE(rs,rs->f,rs->type&RS_TEXT) < 0)
 			return -1;
 
 		rs->sorted = NIL(Rsobj_t*);
@@ -210,7 +210,14 @@ Merge_t*	mg;
 		/* define length of next record */
 		if(!(type&RS_DSAMELEN) )
 		{	MGRESERVE(mg,rsrv,endrsrv,cur,sizeof(ssize_t), return -1);
-			t = (uchar*)(&datalen); MEMCPY(t,cur,sizeof(ssize_t));
+#if _PACKAGE_ast
+			if (rsc & ~0xff) /* Recfmt_t record descriptor */
+				datalen = reclen(rsc, cur, sizeof(ssize_t));
+			else
+#endif
+			{	t = (uchar*)(&datalen);
+				MEMCPY(t,cur,sizeof(ssize_t));
+			}
 			if(datalen < 0)
 			{	MGSETEOF(mg);
 				return -1;
@@ -322,13 +329,24 @@ Merge_t*	mg;
 			else
 			{	if(cur+sizeof(ssize_t) > endrsrv)
 					goto done;
-				t = (uchar*)(&datalen); MEMCPY(t,cur,sizeof(ssize_t));
+#if _PACKAGE_ast
+				if (rsc & ~0xff) /* Recfmt_t record descriptor */
+					datalen = reclen(rsc, cur, sizeof(ssize_t));
+				else
+#endif
+				{	t = (uchar*)(&datalen);
+					MEMCPY(t,cur,sizeof(ssize_t));
+				}
 				if(datalen < 0)
 				{	MGSETEOF(mg);
 					return -1;
 				}
 				if((cur+datalen) > endrsrv)
-				{	cur -= sizeof(ssize_t);
+				{	
+#if _PACKAGE_ast
+					if (!(rsc & ~0xff))
+#endif
+					cur -= sizeof(ssize_t);
 					goto done;
 				}
 			}
@@ -561,7 +579,7 @@ ssize_t		n;
 
 	rsrv = rs->rsrv; endrsrv = rs->endrsrv; cur = rs->cur;
 	mgrsrv = mg->rsrv; mgendrsrv = mg->endrsrv; mgcur = mg->cur;
-	notify = (rs->events & RS_WRITE);
+	notify = (rs->events & RS_WRITE) && (rs->type & RS_OTEXT);
 	rsc = rs->disc->data;
 
 	/* easy case, just copy everything over, let Sfio worry about it */
@@ -590,6 +608,10 @@ ssize_t		n;
 				{	MGSETEOF(mg);
 					break;
 				}
+			}
+			if(!(rs->type&RS_OTEXT))
+			{	RSRESERVE(rs,rsrv,endrsrv,cur,sizeof(ssize_t),goto done);
+				d = (uchar*)(&n_obj); MEMCPY(cur,d,sizeof(ssize_t));
 			}
 		}
 
@@ -646,7 +668,7 @@ ssize_t		n;
 			{	uchar	*t;
 				ssize_t	s, o, x;
 				for(s = RS_RESERVE, o = 0;;) /* make sure we have at least 1 record */
-				{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,goto last_chunk);
+				{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,s,goto last_chunk);
 					x = mgendrsrv-mgcur;
 #if _PACKAGE_ast
 					if (rsc & ~0xff) /* Recfmt_t record descriptor */
@@ -712,10 +734,45 @@ ssize_t		n;
 					MEMCPY(cur,mgcur,len);
 			}
 		}
+#if _PACKAGE_ast
+		else if (rsc & ~0xff)
+		{	for(; n_obj > 0; --n_obj)
+			{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,sizeof(ssize_t),break);
+				if ((len = reclen(rsc, mgcur, sizeof(ssize_t))) < 0)
+				{	MGSETEOF(mg);
+					goto done;
+				}
+				MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,break);
+				RSRESERVE(rs,rsrv,endrsrv,cur,len, goto done);
+				if (notify)
+				{	obj.data = mgcur;
+					mgcur += len;
+					obj.datalen = len;
+					do
+					{	for (;;)
+						{	out.data = cur;
+							out.datalen = w = endrsrv - cur;
+							if ((c = rsnotify(rs, RS_WRITE, &obj, &out, rs->disc)) < 0)
+								goto done;
+							if (c == RS_DELETE)
+							{	out.datalen = 0;
+								break;
+							}
+							if (w >= out.datalen)
+								break;
+							RSRESERVE(rs,rsrv,endrsrv,cur,out.datalen, goto done);
+						}
+						cur += out.datalen;
+					} while (c == RS_INSERT);
+				}
+				else
+					MEMCPY(cur,mgcur,len);
+			}
+		}
+#endif
 		else
 		{	for(; n_obj > 0; --n_obj)
-			{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,
-					  sizeof(ssize_t),break);
+			{	MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,sizeof(ssize_t),break);
 				d = (uchar*)(&len); MEMCPY(d,mgcur,sizeof(ssize_t));
 				MGRESERVE(mg,mgrsrv,mgendrsrv,mgcur,len,break);
 
@@ -726,7 +783,30 @@ ssize_t		n;
 					RSRESERVE(rs,rsrv,endrsrv,cur,w, goto done);
 					d = (uchar*)(&len); MEMCPY(cur,d,sizeof(ssize_t));
 				}
-				MEMCPY(cur,mgcur,len);
+
+				if (notify)
+				{	obj.data = mgcur;
+					mgcur += len;
+					obj.datalen = len;
+					do
+					{	for (;;)
+						{	out.data = cur;
+							out.datalen = w = endrsrv - cur;
+							if ((c = rsnotify(rs, RS_WRITE, &obj, &out, rs->disc)) < 0)
+								goto done;
+							if (c == RS_DELETE)
+							{	out.datalen = 0;
+								break;
+							}
+							if (w >= out.datalen)
+								break;
+							RSRESERVE(rs,rsrv,endrsrv,cur,out.datalen, goto done);
+						}
+						cur += out.datalen;
+					} while (c == RS_INSERT);
+				}
+				else
+					MEMCPY(cur,mgcur,len);
 			}
 		}
 
@@ -872,7 +952,7 @@ int		type;	/* RS_ITEXT|RS_OTEXT		*/
 
 	rs->f = f;
 	rs->rsrv = rs->endrsrv = rs->cur = NIL(uchar*);
-	rs->type |= type&RS_TEXT;
+	rs->type = (rs->type&~RS_TEXT) | (type&RS_TEXT);
 
 	/* construct a list of streams sorted in reverse order */
 	for(n_list = 0, k = 0; k < n; ++k)

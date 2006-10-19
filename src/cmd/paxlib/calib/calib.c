@@ -675,7 +675,6 @@ calib_getdata(Pax_t* pax, register Paxarchive_t* ap, register Paxfile_t* f, int 
 				}
 			}
 		}
-	hit:
 		if (!wfp)
 			break;
 		if (--ar->nblocks <= 0)

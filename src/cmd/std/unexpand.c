@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -26,7 +26,7 @@
  */
 
 static const char expand_usage[] =
-"[-?@(#)$Id: expand (AT&T Labs Research) 1999-06-17 $\n]"
+"[-?@(#)$Id: expand (AT&T Research) 1999-06-17 $\n]"
 USAGE_LICENSE
 "[+NAME?expand - convert tabs to spaces]"
 "[+DESCRIPTION?\bexpand\b writes the contents of each given file "
@@ -57,7 +57,7 @@ USAGE_LICENSE
 ;
 
 static const char unexpand_usage[] =
-"[-?@(#)$Id: unexpand (AT&T Labs Research) 1999-06-07 $\n]"
+"[-?@(#)$Id: unexpand (AT&T Research) 1999-06-07 $\n]"
 USAGE_LICENSE
 "[+NAME?unexpand - convert spaces to tabs]"
 "[+DESCRIPTION?\bunexpand\b writes the contents of each given file "

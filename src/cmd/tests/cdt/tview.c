@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1999-2005 AT&T Corp.                  *
+*           Copyright (c) 1999-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -46,25 +46,27 @@ main()
 	Dt_t		*dt1, *dt2;
 	int		i;
 
-	if(!(dt1 = dtopen(&Disc,Dtset)) )
-		terror("Opening Dtset");
-	if(!(dt2 = dtopen(&Disc,Dtorder)) )
-		terror("Opening Dtorder");
+	if(!(dt1 = dtopen(&Disc,Dtoset)) )
+		terror("Opening Dtoset");
+	if(!(dt2 = dtopen(&Disc,Dtoset)) )
+		terror("Opening Dtoset");
 
 	dtinsert(dt1,1);
 	dtinsert(dt1,3);
 	dtinsert(dt1,5);
+	dtinsert(dt1,2);
 
 	dtinsert(dt2,2);
 	dtinsert(dt2,4);
 	dtinsert(dt2,6);
+	dtinsert(dt2,3);
 
-	if((int)dtsearch(dt1,2) != 0)
-		terror("Can't find 2 here!");
+	if((int)dtsearch(dt1,4) != 0)
+		terror("Finding 4 here?");
 
 	dtview(dt1,dt2);
-	if((int)dtsearch(dt1,2) != 2)
-		terror("Should find 2 here!");
+	if((int)dtsearch(dt1,4) != 4)
+		terror("Should find 4 here!");
 
 	dtwalk(dt1,visit,NIL(Void_t*));
 	if(Count != 6)
@@ -91,12 +93,10 @@ main()
 	   dt2: 2 4 6 3
 	*/
 	Count = 0;
+	dtmethod(dt1,Dtset);
 	dtmethod(dt2,Dtset);
-	dtinsert(dt2,3);
 	for(i = (int)dtfirst(dt1); i; i = (int)dtnext(dt1,i))
-	{	dtsearch(dt1,4);
 		Count++;
-	}
 	if(Count != 6)
 		terror("Walk wrong length4");
 

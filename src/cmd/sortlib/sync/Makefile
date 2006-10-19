@@ -14,7 +14,7 @@ $(INCLUDEDIR) :INSTALLDIR: ssexit.h
 
 :: RELEASE NOTES \
 	data/c.dat data/c.ss \
-	data/e.dat data/e%12.dat data/e.ss \
+	data/e.dat data/e%12.dat data/e.f%12.dat data/e.ss \
 	data/f.ss \
 	data/g.ss \
 	data/h.ss \

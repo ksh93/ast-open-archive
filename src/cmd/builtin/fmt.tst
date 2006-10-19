@@ -1544,7 +1544,7 @@ TEST 05 '--optget vs. "...\n..."'
 TEST 06 '--optget vs. --usage'
 
 	EXEC	--optget -w76
-		INPUT - $'[-?\\n@(#)$Id: id (AT&T Labs Research) 2004-06-11 $\\n]
+		INPUT - $'[-?\\n@(#)$Id: id (AT&T Research) 2004-06-11 $\\n]
 [-author?Glenn Fowler <gsf@research.att.com>]
 [-author?David Korn <dgk@research.att.com>]
 [-copyright?Copyright (c) 1992-2005 AT&T Corp.]
@@ -1572,7 +1572,7 @@ is written.]
 [user]
 
 [+EXIT STATUS?]{[+0?Successful completion.][+>0?An error occurred.]}[+SEE ALSO?\blogname\b(1), \bwho\b(1), \bgetgroups\b(2)]'
-		OUTPUT - $'[-?\\n@(#)$Id: id (AT&T Labs Research) 2004-06-11 $
+		OUTPUT - $'[-?\\n@(#)$Id: id (AT&T Research) 2004-06-11 $
     ]
 [-author?Glenn Fowler <gsf@research.att.com>]
 [-author?David Korn <dgk@research.att.com>]

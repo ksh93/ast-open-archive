@@ -31,6 +31,7 @@ nmake :: Version.mk nmake.1 \
 	rule.c scan.c state.c trap.c variable.c version.c \
 	-lcoshell -lardir
 
+"darwin.*" :NOOPTIMIZE: command.c
 "win32*" :NOOPTIMIZE: expand.c object.c parse.c
 
 $(RULESDIR) :INSTALLDIR: Makeinstall.mk $(RULES) $(RULESFILES) ppcc

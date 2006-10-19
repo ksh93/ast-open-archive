@@ -2,6 +2,49 @@
 
 TEST 01 'base 10'
 
+	EXEC	0 -0 +0 00 -00 +00
+		OUTPUT - $'strtol   "0" "" 0 OK
+strton   "0" "" 0 OK 0
+strtoul  "0" "" 0 OK
+strtoll  "0" "" 0 OK
+strtonll "0" "" 0 OK 0
+strtoull "0" "" 0 OK
+
+strtol   "-0" "" 0 OK
+strton   "-0" "" 0 OK 0
+strtoul  "-0" "" 0 OK
+strtoll  "-0" "" 0 OK
+strtonll "-0" "" 0 OK 0
+strtoull "-0" "" 0 OK
+
+strtol   "+0" "" 0 OK
+strton   "+0" "" 0 OK 0
+strtoul  "+0" "" 0 OK
+strtoll  "+0" "" 0 OK
+strtonll "+0" "" 0 OK 0
+strtoull "+0" "" 0 OK
+
+strtol   "00" "" 0 OK
+strton   "00" "" 0 OK 8
+strtoul  "00" "" 0 OK
+strtoll  "00" "" 0 OK
+strtonll "00" "" 0 OK 8
+strtoull "00" "" 0 OK
+
+strtol   "-00" "" 0 OK
+strton   "-00" "" 0 OK 8
+strtoul  "-00" "" 0 OK
+strtoll  "-00" "" 0 OK
+strtonll "-00" "" 0 OK 8
+strtoull "-00" "" 0 OK
+
+strtol   "+00" "" 0 OK
+strton   "+00" "" 0 OK 8
+strtoul  "+00" "" 0 OK
+strtoll  "+00" "" 0 OK
+strtonll "+00" "" 0 OK 8
+strtoull "+00" "" 0 OK'
+
 	EXEC	32767 -32767 32768 -32768 32769 -32769
 		OUTPUT - $'strtol   "32767" "" 32767 OK
 strton   "32767" "" 32767 OK 0
@@ -404,7 +447,7 @@ strtoull "11#B" "#B" 0 OK'
 
 TEST 05 'multiplier suffixes'
 
-	EXEC 1b 1k 1m 1g 1t 1. 1.2 1.23 1.234 1.k 1.2k 1.23k 1.234k
+	EXEC 1b 1k 1m 1g 1t 1p 1e 1. 1.2 1.23 1.234 1.k 1.2k 1.23k 1.234k
 		OUTPUT - $'strtol   "1b" "b" 1 OK
 strton   "1b" "" 512 OK 0
 strtoul  "1b" "b" 1 OK
@@ -439,6 +482,20 @@ strtoul  "1t" "t" 1 OK
 strtoll  "1t" "t" 1 OK
 strtonll "1t" "" 1099511627776 OK 0
 strtoull "1t" "t" 1 OK
+
+strtol   "1p" "p" 1 OK
+strton   "1p" "" 2147483647 ERANGE 0
+strtoul  "1p" "p" 1 OK
+strtoll  "1p" "p" 1 OK
+strtonll "1p" "" 1125899906842624 OK 0
+strtoull "1p" "p" 1 OK
+
+strtol   "1e" "e" 1 OK
+strton   "1e" "" 2147483647 ERANGE 0
+strtoul  "1e" "e" 1 OK
+strtoll  "1e" "e" 1 OK
+strtonll "1e" "" 1152921504606846976 OK 0
+strtoull "1e" "e" 1 OK
 
 strtol   "1." "." 1 OK
 strton   "1." "" 100 OK 0

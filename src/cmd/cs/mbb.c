@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -20,11 +20,11 @@
 #pragma prototyped
 /*
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: mbb (AT&T Labs Research) 2000-05-09 $\n]"
+"[-?\n@(#)$Id: mbb (AT&T Research) 2000-05-09 $\n]"
 USAGE_LICENSE
 "[+NAME?mbb - message bulletin board server]"
 "[+DESCRIPTION?\bmbb\b is a message bulletin board server. Each \bmbb\b"
@@ -217,7 +217,8 @@ post(Css_t* css, Cssdisc_t* disc, Connection_t* from, register Connection_t* to,
 	va_end(ap);
 	sfputc(state->tmp, '\n');
 	n = sfstrtell(state->tmp);
-	s = sfstruse(state->tmp);
+	if (!(s = sfstruse(state->tmp)))
+		error(ERROR_SYSTEM|3, "out of space");
 	m = CHAN_MASK(channel);
 	state->logged = 0;
 	if (!to)

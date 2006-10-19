@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2006 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -31,7 +31,7 @@
 #define TIME_LOCALE	"%c"
 
 static const char usage[] =
-"[-?\n@(#)$Id: ls (AT&T Research) 2006-01-03 $\n]"
+"[-?\n@(#)$Id: ls (AT&T Research) 2006-10-11 $\n]"
 USAGE_LICENSE
 "[+NAME?ls - list files and/or directories]"
 "[+DESCRIPTION?For each directory argument \bls\b lists the contents; for each"
@@ -122,7 +122,7 @@ USAGE_LICENSE
 "[F:classify?Append a character for typing each entry. Turns on \b--physical\b.]"
 "[g:group?\b--long\b with no owner info.]"
 "[G?\b--long\b with no group info.]"
-"[h:scale|binary-scale|human-readable?Scale sizes to powers of 1024 { b K M G T }.]"
+"[h:scale|binary-scale|human-readable?Scale sizes to powers of 1024 { Kb Mb Gb Tb Pb Xb }.]"
 "[i:inode?List the file serial number.]"
 "[I:ignore?Do not list implied entries matching shell \apattern\a.]:[pattern]"
 "[k:kilobytes?Use 1024 blocks instead of 512.]"
@@ -201,7 +201,7 @@ USAGE_LICENSE
 "[P:physical?Don't follow symbolic links. The default is determined by"
 "	\bgetconf PATH_RESOLVE\b.]"
 "[101:block-size?Use \ablocksize\a blocks.]#[blocksize]"
-"[102:decimal-scale|thousands?Scale sizes to powers of 1000 { b K M G T }.]"
+"[102:decimal-scale|thousands?Scale sizes to powers of 1000 { K M G T P X }.]"
 "[103:dump?Print the generated \b--format\b string on the standard output"
 "	and exit.]"
 "[104:testdate?\b--format\b time values newer than \adate\a will be printed"
@@ -500,7 +500,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		if (!mp && !(mp = sfstropen()))
 			error(3, "out of space");
 		sfkeyprintf(mp, handle, kp->macro, key, NiL);
-		s = sfstruse(mp);
+		if (!(s = sfstruse(mp)))
+			error(3, "out of space");
 		kp->disable = 0;
 	}
 	else switch (kp->index)
@@ -542,12 +543,21 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			n = (S_ISBLK(st->st_mode) || S_ISCHR(st->st_mode)) ? minor(idevice(st)) : minor(st->st_dev);
 		break;
 	case KEY_dir_blocks:
-		if (lp)
-			n = lp->count.blocks;
-		break;
+		if (!state.scale)
+		{
+			if (lp)
+				n = lp->count.blocks;
+			break;
+		}
+		/*FALLTHROUGH*/
 	case KEY_dir_bytes:
 		if (lp)
 			n = lp->count.bytes;
+		if (state.scale)
+		{
+			s = fmtscale(n, state.scale);
+			fp->fmt = 's';
+		}
 		break;
 	case KEY_dir_count:
 		if (ftw != state.top)
@@ -602,7 +612,8 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 			else
 			{
 				sfprintf(state.tmp, "%s/%s", lp->dirnam + streq(lp->dirnam, "/"), ftw->name);
-				dirnam = sfstruse(state.tmp);
+				if (!(dirnam = sfstruse(state.tmp)))
+					error(3, "out of space");
 			}
 			c = pathgetlink(dirnam, txtdata, txtsize);
 			if (c > 0)
@@ -691,10 +702,19 @@ key(void* handle, register Sffmt_t* fp, const char* arg, char** ps, Sflong_t* pn
 		}
 		break;
 	case KEY_total_blocks:
-		n = state.total.blocks;
-		break;
+		if (!state.scale)
+		{
+			n = state.total.blocks;
+			break;
+		}
+		/*FALLTHROUGH*/
 	case KEY_total_bytes:
 		n = state.total.bytes;
+		if (state.scale)
+		{
+			s = fmtscale(n, state.scale);
+			fp->fmt = 's';
+		}
 		break;
 	case KEY_total_files:
 		n = state.total.files;
@@ -1691,7 +1711,8 @@ main(int argc, register char** argv)
 	}
 	else
 		sfstrseek(fmt, -1, SEEK_CUR);
-	state.format = sfstruse(fmt);
+	if (!(state.format = sfstruse(fmt)))
+		error(3, "out of space");
 	if (dump)
 	{
 		sfprintf(sfstdout, "%s\n", state.format);

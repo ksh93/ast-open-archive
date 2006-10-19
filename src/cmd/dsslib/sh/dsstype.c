@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2003-2006 AT&T Corp.                  *
+*           Copyright (c) 2003-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -172,7 +172,7 @@ static Namval_t *typenode(const char *name, int flag)
 		/* create reference variable name to NV_CLASS.dss.name */
 		Shell_t *shp = sh_getinterp();
 		sfputc(stkstd,0);
-		sfprintf(stkstd,NV_CLASS"dss.%s",name);
+		sfprintf(stkstd,NV_CLASS".dss.%s",name);
 		sfputc(stkstd,0);
 		rp = nv_open(name, shp->var_tree, NV_IDENT);
 		nv_unset(rp);
@@ -637,7 +637,7 @@ static Namval_t *add_discipline(struct type *tp, const char *name, int (*fun)(in
 	Namval_t *mp;
 	int offset = stktell(stkstd);
 	sfputc(stkstd,0);
-	sfprintf(stkstd,NV_CLASS"dss.%s.%s",tp->type->name,name);
+	sfprintf(stkstd,NV_CLASS".dss.%s.%s",tp->type->name,name);
 	sfputc(stkstd,0);
 	mp =  sh_addbuiltin(stkptr(stkstd,offset+1),fun,(void*)tp);
 	stkseek(stkstd,offset);
@@ -805,7 +805,7 @@ static const Namdisc_t type_disc =
 };
 
 static const char sh_opttype[] =
-"[-1c?\n@(#)$Id: type (AT&T Labs Research) 2005-04-22 $\n]"
+"[-1c?\n@(#)$Id: type (AT&T Research) 2005-04-22 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - set the type of variables to \b\f?\f\b]"
 "[+DESCRIPTION?\b\f?\f\b sets type on each of the variables specified "
@@ -969,10 +969,11 @@ static Namval_t *create_dss(Namval_t *np,const char *name,int flag,Namfun_t *fp)
 
 static char *name_dss(Namval_t *np, Namfun_t *fp)
 {
-	int	len = sizeof(NV_CLASS)+strlen(np->nvname) ;
+	int	len = sizeof(NV_CLASS)+strlen(np->nvname)+1 ;
 	char	*name = getbuf(len);
 	memcpy(name,NV_CLASS,sizeof(NV_CLASS)-1);
-	strcpy(&name[sizeof(NV_CLASS)-1],np->nvname);
+	name[sizeof(NV_CLASS)-1] = '.';
+	strcpy(&name[sizeof(NV_CLASS)],np->nvname);
 	return(name);
 }
 
@@ -991,7 +992,7 @@ static const Namdisc_t dss_disc =
 static const char *discnames[] = { "list", "load", 0 };
 
 static const char optlist[] =
-"[-1c?\n@(#)$Id: dss.list (AT&T Labs Research) 2003-01-10 $\n]"
+"[-1c?\n@(#)$Id: dss.list (AT&T Research) 2003-01-10 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - list the known dss entities]"
 "[+DESCRIPTION?\b\f?\f\b causes each of the specified dss entities "
@@ -1011,7 +1012,7 @@ USAGE_LICENSE
         "[+0?Successful completion.]"
         "[+>0?An error occurred.]"
 "}"
-"[+SEE ALSO?\b"NV_CLASS"dss.load\b(1)]"
+"[+SEE ALSO?\b"NV_CLASS".dss.load\b(1)]"
 ;
 
 #define fval(x)		(1L<<(x)-'a')
@@ -1071,7 +1072,7 @@ static int listdss(int argc, char *argv[], void *data)
 }
 
 static const char optload[] =
-"[-1c?\n@(#)$Id: dss.load (AT&T Labs Research) 2003-01-10 $\n]"
+"[-1c?\n@(#)$Id: dss.load (AT&T Research) 2003-01-10 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - load a dss format library]"
 "[+DESCRIPTION?\b\f?\f\b causes each of the specified dss libraries \alib\a "
@@ -1084,7 +1085,7 @@ USAGE_LICENSE
         "[+0?Successful completion.]"
         "[+>0?An error occurred.]"
 "}"
-"[+SEE ALSO?\b"NV_CLASS"dss.list\b(1)]"
+"[+SEE ALSO?\b"NV_CLASS".dss.list\b(1)]"
 ;
 
 static int loadlib(int argc, char *argv[], void *data)
@@ -1137,7 +1138,7 @@ static Cxvalue_t *getvalue(Namval_t *np, Namfun_t *fp, Cxoperand_t *valp)
 }
 
 static const char optmatch[] =
-"[-1c?\n@(#)$Id: dss.match (AT&T Labs Research) 2003-01-15 $\n]"
+"[-1c?\n@(#)$Id: dss.match (AT&T Research) 2003-01-15 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - match a dss type variable to a pattern]"
 "[+DESCRIPTION?\b\f?\f\b causes the value of the variable whose name "
@@ -1240,7 +1241,7 @@ exec:
 }
 
 static const char optformat[] =
-"[-1c?\n@(#)$Id: dss.format (AT&T Labs Research) 2003-01-17 $\n]"
+"[-1c?\n@(#)$Id: dss.format (AT&T Research) 2003-01-17 $\n]"
 USAGE_LICENSE
 "[+NAME?\f?\f - specify a format string for a dss type]"
 "[+DESCRIPTION?\b\f?\f\b will set the format string to \aformat\a for the "
@@ -1350,17 +1351,17 @@ void init_dss(int flag)
 	Shell_t *shp = sh_getinterp();
 	Namval_t *np,*rp;
 	Namfun_t *nfp = newof(NiL,Namfun_t,1,0);
-	char tmp[sizeof(NV_CLASS)+16];
+	char tmp[sizeof(NV_CLASS)+17];
 	dssinit(&Dssdisc,0);
-	sfsprintf(tmp, sizeof(tmp), "%sdss", NV_CLASS);
+	sfsprintf(tmp, sizeof(tmp), "%s.dss", NV_CLASS);
 	np = nv_open(tmp, shp->var_tree, NV_VARNAME);
 	typedict = nv_dict(np);
 	nfp->disc = &dss_disc;
 	nv_disc(np,nfp,NV_FIRST);
-	nv_adddisc(np,discnames);
-	sfsprintf(tmp, sizeof(tmp), "%sdss.load", NV_CLASS);
+	nv_adddisc(np,discnames,0);
+	sfsprintf(tmp, sizeof(tmp), "%s.dss.load", NV_CLASS);
 	sh_addbuiltin(tmp, loadlib, &Dssdisc); 
-	sfsprintf(tmp, sizeof(tmp), "%sdss.list", NV_CLASS);
+	sfsprintf(tmp, sizeof(tmp), "%s.dss.list", NV_CLASS);
 	sh_addbuiltin(tmp, listdss, &Dssdisc); 
 	/* create reference variable dss to NV_CLASS.dss */
 	rp = nv_open("dss", shp->var_tree, NV_IDENT);

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2000-2006 AT&T Corp.                  *
+*           Copyright (c) 2000-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -30,7 +30,7 @@
  * macros undefined after include
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 #include <ctype.h>
@@ -130,7 +130,12 @@ ITLEXTERNAL(Cx_t* cx, Cxtype_t* type, int tuple, int group, const char* details,
 		if (g < (j + 1))
 			sfputc(sp, '}');
 		i = sfstrtell(sp);
-		s = sfstruse(sp);
+		if (!(s = sfstruse(sp)))
+		{
+			if (disc->errorf)
+				(*disc->errorf)(NiL, disc, ERROR_SYSTEM|2, "out of space");
+			return -1;
+		}
 		if (j = strlen(sep))
 		{
 			s += j;

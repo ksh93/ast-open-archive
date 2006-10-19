@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -81,6 +81,7 @@
 #define CS_SVC_SUFFIX	".svc"		/* service daemon suffix	*/
 
 #define CS_MNT_MAX	14		/* max mount file name length	*/
+#define CS_NAME_MAX	256		/* misc name max length		*/
 
 #define CS_MNT_TAIL	"-cs.mnt"	/* mount file name tail		*/
 
@@ -144,6 +145,9 @@
 #define CS_PIPE_BLOCKED	(1<<9)		/* SIGPIPE blocked		*/
 #define CS_TEST		(1<<10)		/* enable test			*/
 
+#define CS_CLIENT_ARGV	(1<<0)		/* just process argv		*/
+#define CS_CLIENT_RAW	(1<<1)		/* tty raw mode input		*/
+
 typedef struct
 {
 	unsigned long	addr[3];	/* address cookie		*/
@@ -191,10 +195,10 @@ struct Cs_s				/* thread state			*/
 	char*		control;	/* CS_MNT_* in cs.mount		*/
 	char*		cs;		/* service connect stream	*/
 	char		type[8];	/* csopen() stream type		*/
-	char		qual[32];	/* csopen() qualifier		*/
-	char		host[256];	/* csaddr() real host		*/
+	char		qual[CS_NAME_MAX];/* csopen() qualifier		*/
+	char		host[CS_NAME_MAX];/* csaddr() real host		*/
 	char		mount[PATH_MAX];/* current mount path		*/
-	char		user[64];	/* csaddr() user		*/
+	char		user[CS_NAME_MAX];/* csaddr() user		*/
 
 #ifdef _CS_PRIVATE_
 	_CS_PRIVATE_
@@ -232,9 +236,11 @@ extern Cs_t		cs;
 #define CSSTAT		Csstat_t
 
 #define csaddr		_cs_addr
+#define csattach	_cs_attach
 #define csattr		_cs_attr
 #define csauth		_cs_auth
 #define csbind		_cs_bind
+#define csclient	_cs_client
 #define csclone		_cs_clone
 #define cschallenge	_cs_challenge
 #define csdaemon	_cs_daemon
@@ -268,10 +274,12 @@ extern Cs_t		cs;
 
 extern unsigned long	csaddr(Cs_t*, const char*);
 extern Cs_t*		csalloc(Csdisc_t*);
+extern int		csattach(Cs_t*, const char*, int, int);
 extern char*		csattr(Cs_t*, const char*, const char*);
 extern int		csauth(Cs_t*, int, const char*, const char*);
 extern int		csbind(Cs_t*, const char*, unsigned long, unsigned long, unsigned long);
-extern int		cschallenge(Cs_t*, const char* path, unsigned long*, unsigned long*);
+extern int		cschallenge(Cs_t*, const char*, unsigned long*, unsigned long*);
+extern int		csclient(Cs_t*, int, const char*, const char*, char**, unsigned int);
 extern unsigned long	csclone(Cs_t*, int);
 extern int		csdaemon(Cs_t*, int);
 extern int		csfd(Cs_t*, int, int);
@@ -306,9 +314,11 @@ extern ssize_t		cswrite(Cs_t*, int, const void*, size_t);
 #if CS_INTERFACE <= 1 || defined(_CS_PRIVATE_)
 
 extern unsigned long	_cs_addr(const char*);
+extern int		_cs_attach(const char*, int, int);
 extern char*		_cs_attr(const char*, const char*);
 extern int		_cs_auth(int, const char*, const char*);
 extern int		_cs_bind(const char*, unsigned long, unsigned long, unsigned long);
+extern int		_cs_client(int, const char*, const char*, char**, unsigned int);
 extern unsigned long	_cs_clone(int);
 extern int		_cs_daemon(int);
 extern int		_cs_fd(int, int);

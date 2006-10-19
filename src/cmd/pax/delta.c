@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -366,7 +366,7 @@ deltaverify(Archive_t* ap)
 	register off_t		n;
 	Hash_position_t*	pos;
 
-	if (!state.list && ap->delta && (pos = hashscan(ap->delta->tab, 0)))
+	if (!state.delta.update && !state.list && ap->delta && (pos = hashscan(ap->delta->tab, 0)))
 	{
 		message((-2, "verify untouched base files"));
 		while (hashnext(pos))
@@ -454,7 +454,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 		d->mark = 1;
 	if (op->delta && op->delta->format->variant == DELTA_94)
 	{
-		if (f->type == X_IFREG && f->linktype == NOLINK && (!d || f->st->st_mtime != d->mtime.tv_sec))
+		if (f->type == X_IFREG && f->linktype == NOLINK && (!d || f->st->st_mtime != d->mtime.tv_sec || (f->st->st_mode & X_IPERM) != (d->mode & X_IPERM)))
 		{
 			if (f->ordered)
 			{

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1991-2005 AT&T Corp.                  *
+*           Copyright (c) 1991-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -42,7 +42,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: cql (AT&T Labs Research) 2002-09-06 $\n]"
+"[-?\n@(#)$Id: cql (AT&T Research) 2002-09-06 $\n]"
 USAGE_LICENSE
 "[+NAME?cql - C query language]"
 "[+DESCRIPTION?\bcql\b applies C style expressions to flat database files."
@@ -649,7 +649,7 @@ main(int argc, char** argv)
 			ap = av;
 			*ap++ = "sort";
 			sfprintf(sp, "-t%c", f->delimiter);
-			if (!(*ap++ = strdup(sfstruse(sp))))
+			if (!(s = sfstruse(sp)) || !(*ap++ = strdup(s)))
 				error(3, "out of space [sort]");
 			for (p = state.sort; p; p = p->next)
 			{
@@ -661,10 +661,10 @@ main(int argc, char** argv)
 				}
 				else i = GETFIELD(p->value.symbol);
 				sfprintf(sp, "+%d", i);
-				if (!(*ap++ = strdup(sfstruse(sp))))
+				if (!(s = sfstruse(sp)) || !(*ap++ = strdup(s)))
 					error(3, "out of space [sort]");
 				sfprintf(sp, "-%d%s", i + 1, p->value.symbol->type == STRING ? "" : "n");
-				if (!(*ap++ = strdup(sfstruse(sp))))
+				if (!(s = sfstruse(sp)) || !(*ap++ = strdup(s)))
 					error(3, "out of space [sort]");
 			}
 			*ap = 0;
@@ -676,10 +676,14 @@ main(int argc, char** argv)
 			sfprintf(sp, "%s: printf(%d, '%%s", state.loop[ACTION].name, io);
 			while (n-- > f->record->fields)
 				sfprintf(sp, "%c%%s", f->delimiter);
-			sfprintf(sp, "%s);", sfstruse(xp));
+			if (!(s = sfstruse(xp)))
+				error(3, "out of space");
+			sfprintf(sp, "%s);", s);
 			exexpr(prog, state.loop[END].name, NiL, DELETE);
 			exexpr(prog, state.loop[ACTION].name, NiL, DELETE);
-			excomp(prog, NiL, 0, sfstruse(sp), NiL);
+			if (!(s = sfstruse(sp)))
+				error(3, "out of space");
+			excomp(prog, NiL, 0, s, NiL);
 			sfstrclose(xp);
 			sfstrclose(sp);
 			g2 = 0;
@@ -771,7 +775,8 @@ main(int argc, char** argv)
 				for (n = 0; n < elementsof(state.loop); n++)
 				{
 					sfprintf(sp, "%s_%s", error_info.id, state.loop[n].name);
-					name = sfstruse(sp);
+					if (!(name = sfstruse(sp)))
+						error(3, "out of space");
 					if ((x = exexpr(prog, state.loop[n].name, NiL, 0)) && !(x->compiled.integer = (Compiled_f)dlllook(dll, name)))
 						error(3, "%s: %s function not found", buf, name);
 				}

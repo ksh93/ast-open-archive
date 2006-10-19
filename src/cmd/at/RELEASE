@@ -1,3 +1,6 @@
+06-10-11 add sfstruse() error checks
+06-09-19 atd.c: sysconf() => astconf()
+06-05-17 crontab.sh: handle empty or nonexistent crontab
 05-06-29 crontab.sh: fix (...) => @(...) syntax error
 02-02-14 atd: add strdup(argv[1]) to workaround argv[1]=>0 mystery
 01-06-18 crontab: clarify the command<=>job relationship

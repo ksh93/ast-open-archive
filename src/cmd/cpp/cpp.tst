@@ -4602,3 +4602,68 @@ int line = 5;'
 %/*static char sccsid[] = "elaine";*/
 %__RCSID("kramer");
 %#endif /* not lint */'
+
+TEST 35 'externalize'
+
+	EXEC -I-D
+		INPUT - $'#pragma prototyped
+static int fun(int);
+static int beg;
+static int fun(int arg) { return !arg; }
+static int end;'
+		OUTPUT - $'# 1 ""
+
+static int fun(int);
+static int beg;
+static int fun(int arg) { return !arg; }
+static int end;'
+
+	EXEC -I-D -D:externalize
+		OUTPUT - $'# 1 ""
+
+# 2
+extern int fun (int);
+static int beg;
+extern int fun (int arg) 
+# 4
+{ return !arg; }
+static int end;'
+
+	EXEC -I-D -D:compatibility -D:externalize
+		OUTPUT - $'# 1 ""
+
+# 2
+extern int fun ();
+static int beg;
+extern int fun (arg) int arg;
+# 4
+{ return !arg; }
+static int end;'
+
+TEST 36 'UL qualifier compatibility'
+
+	EXEC -I-D
+		INPUT - $'#define UL 1234UL
+int i = 1234;
+unsigned int j = 1234U;
+unsigned int k = 1234L;
+unsigned int l = 1234UL;
+unsigned int m = UL;'
+		OUTPUT - $'# 1 ""
+
+int i = 1234;
+unsigned int j = 1234U;
+unsigned int k = 1234L;
+unsigned int l = 1234UL;
+unsigned int m = 1234UL;'
+
+	EXEC -I-D -D-C
+		OUTPUT - $'# 1 ""
+
+int i = 1234;
+unsigned int j = 1234;
+unsigned int k = 1234L;
+unsigned int l = 1234L;
+unsigned int m = 1234L;'
+
+	EXEC -I-D -D:compatibility

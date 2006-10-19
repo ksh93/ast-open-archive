@@ -1,3 +1,9 @@
+06-09-19 css.c: sysconf() => astconf()
+06-08-15 csclient.c: fix prompt logic
+06-08-14 csopen.c: fix group=name logic
+06-08-04 csclient.c: fix CS_CLIENT_ARGV
+06-06-11 csclient.c: add
+06-05-31 csopen.c,cs.h: add csattach() for non-/dev/fdp/ streams
 05-02-04 Makefile: drop -lnetinet (for lynxos)
 04-07-22 csopen.c,cssend.c,csauth.c,cslocal.c: access() => eaccess()
 04-07-19 cslocal.c: call spawnveg() for standalone 3d

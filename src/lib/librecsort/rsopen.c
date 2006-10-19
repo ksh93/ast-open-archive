@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2006 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,7 +25,7 @@
 **	Written by Kiem-Phong Vo (07/08/96)
 */
 
-static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2005-10-18 $\0\n";
+static const char id[] = "\n@(#)$Id: recsort library (AT&T Research) 2006-07-17 $\0\n";
 
 #if __STD_C
 Rs_t* rsnew(Rsdisc_t* disc)

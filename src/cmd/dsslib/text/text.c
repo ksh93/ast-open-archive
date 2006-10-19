@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 2002-2006 AT&T Corp.                  *
+*           Copyright (c) 2002-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -22,11 +22,11 @@
  * text method
  *
  * Glenn Fowler
- * AT&T Labs Research
+ * AT&T Research
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: dss text method (AT&T Labs Research) 2002-12-17 $\n]"
+"[-1lp0?\n@(#)$Id: dss text method (AT&T Research) 2002-12-17 $\n]"
 USAGE_LICENSE
 "[+NAME?text - dss text method schema description]"
 "[+DESCRIPTION?The \bdss\b text method describes newline-terminated"

@@ -714,7 +714,7 @@ static ssize_t explode_nolit4(State_t* state, char *buff, size_t size)
 	    DUMPBITS(state, t->b);
 	    d = w - d - t->v.n;       /* construct offset */
 	    NEEDBITS(state, (ulg)bl);    /* get coded length */
-	    t = t = tl + IGETBITS(state, bl);
+	    t = tl + IGETBITS(state, bl);
 	    e = t->e;
 	    while(e > 16)
 	    {

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -27,7 +27,7 @@
  */
 
 static const char usage[] =
-"[-1l?\n@(#)$Id: pzip conversion library (AT&T Labs Research) 1999-09-11 $\n]"
+"[-1l?\n@(#)$Id: pzip conversion library (AT&T Research) 1999-09-11 $\n]"
 USAGE_LICENSE
 "[+LIBRARY?pzconvert - pzip conversion library]"
 "[+DESCRIPTION?The \bpzip\b convert discipline supports runtime record"

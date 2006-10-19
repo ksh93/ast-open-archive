@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -25,7 +25,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: mesg (AT&T Labs Research) 1999-04-28 $\n]"
+"[-?\n@(#)$Id: mesg (AT&T Research) 1999-04-28 $\n]"
 USAGE_LICENSE
 "[+NAME?mesg - permit or deny messages to the terminal]"
 "[+DESCRIPTION?\bmesg\b controls whether other users are allowed to send"

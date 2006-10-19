@@ -15,6 +15,7 @@ VERSION = 4.0
 CATALOG = 3d
 
 CCFLAGS = $(CC.OPTIMIZE) $(CC.DLL)
+IFFEREFS = -L$(LIBDIR) -last
 TMP = 3.$(tmp)
 
 DEBUG == 1

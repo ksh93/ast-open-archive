@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1996-2005 AT&T Corp.                  *
+*           Copyright (c) 1996-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -78,7 +78,7 @@ register Sfio_t*	sp;
 	if (kp->nproc > 1)
 		sfprintf(sp, " nproc=%d", kp->nproc);
 	sfprintf(sp, "\n");
-	sfprintf(sp, "\trecsort format %s data%s 0x%08x key%s %d\n", fmtrec(kp->disc->data, 0), (kp->disc->type & RS_DSAMELEN) ? " DSAMELEN" : "", kp->disc->data, (kp->disc->type & RS_KSAMELEN) ? " KSAMELEN" : "", kp->disc->keylen);
+	sfprintf(sp, "\trecord format %s data%s 0x%08x key%s %d\n", fmtrec(kp->disc->data, 0), (kp->disc->type & RS_DSAMELEN) ? " DSAMELEN" : "", kp->disc->data, (kp->disc->type & RS_KSAMELEN) ? " KSAMELEN" : "", kp->disc->keylen);
 	for (fp = &kp->field.global; fp; fp = fp->next)
 		dump(kp, sp, fp, "field");
 	for (fp = kp->accumulate.head; fp; fp = fp->next)

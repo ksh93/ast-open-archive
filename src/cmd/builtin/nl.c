@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2005 AT&T Corp.                  *
+*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -28,7 +28,7 @@
 
 
 static const char usage[] =
-"[-?\n@(#)$Id: nl (AT&T Labs Research) 2003-03-24 $\n]"
+"[-?\n@(#)$Id: nl (AT&T Research) 2003-03-24 $\n]"
 USAGE_LICENSE
 "[+NAME? nl - line numbering filter ]"
 "[+DESCRIPTION?\bnl\b reads lines from the file \afile\a or from standard "

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -1961,7 +1961,17 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 		else if (*s == '-' && !*(s + 1))
 			while (s = getarg(&rhs, NiL))
 		{
-			if (streq(s, "buckets"))
+			if (streq(s, "blocked"))
+			{
+#if DEBUG
+				c = 1;
+				error(0, null);
+				dumpjobs(2, JOB_blocked);
+#else
+				error(2, "%s: implemented in DEBUG==1 version", s);
+#endif
+			}
+			else if (streq(s, "buckets"))
 			{
 				c = 0;
 				hashdump(NiL, HASH_BUCKET);
@@ -1976,7 +1986,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 #if DEBUG
 				c = 1;
 				error(0, null);
-				dumpjobs(2);
+				dumpjobs(2, JOB_status);
 #else
 				error(2, "%s: implemented in DEBUG==1 version", s);
 #endif
@@ -2032,7 +2042,7 @@ assertion(char* lhs, Rule_t* opr, char* rhs, char* act, int op)
 				}
 			}
 			else
-				error(1, "%s: options are {buckets,hash,jobs,view}", s);
+				error(1, "%s: options are {blocked,buckets,hash,jobs,nametype,rules,stack,variables,view}", s);
 		}
 		else
 			while (s)

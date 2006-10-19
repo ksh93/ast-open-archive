@@ -890,7 +890,7 @@ static int push(f, meth, nmeth, flags, handle)
 Sfio_t*		f;	/* stream to be conditioned	*/
 Vcsfmeth_t*	meth;	/* list of methods to use	*/
 ssize_t		nmeth;
-unsigned int	flags;	/* VCD_[ENCODE|DECODE] ...	*/
+unsigned int	flags;	/* VC_[ENCODE|DECODE] ...	*/
 Vcsfio_t**	handle; /* Vcsfio_t* return		*/
 #endif
 {
@@ -1025,7 +1025,7 @@ Vcsfio_t* vcsfio(f, meth, nmeth, flags)
 Sfio_t*		f;	/* stream to be conditioned	*/
 Vcsfmeth_t*	meth;	/* list of methods to use	*/
 ssize_t		nmeth;
-unsigned int	flags;	/* VCD_[ENCODE|DECODE] ...	*/
+unsigned int	flags;	/* VC_[ENCODE|DECODE] ...	*/
 #endif
 {
 	Vcsfio_t*	handle;
@@ -1041,7 +1041,7 @@ int sfdcvcodex(f, meth, nmeth, flags)
 Sfio_t*		f;	/* stream to be conditioned	*/
 Vcsfmeth_t*	meth;	/* list of methods to use	*/
 ssize_t		nmeth;
-unsigned int	flags;	/* VCD_[ENCODE|DECODE] ...	*/
+unsigned int	flags;	/* VC_[ENCODE|DECODE] ...	*/
 #endif
 {
 	return push(f, meth, nmeth, flags, NIL(Vcsfio_t**));

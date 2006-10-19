@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -107,7 +107,7 @@ char	*tmpfile;
 {
     struct mount_item	*mitem = srv->mitem;
     NetFile	*nFile;
-    FILE	*fp, *fout;
+    FILE	*fout;
     char	buf[ STRLEN ], *ptr;
     char	line[ STRLEN ];
     int		port, len, ans = -1;
@@ -123,16 +123,16 @@ char	*tmpfile;
 	logit( "<http>: connect error\n" );
 	return -1;
     }
-    sprintf( buf, "GET %s HTTP/1.0\n", rpath );
+    sfsprintf( buf, sizeof(buf), "GET %s HTTP/1.0\n", rpath );
     NetWrite( nFile, buf, strlen(buf) );
     logit( buf );
 
+#if 0 /* -------- ignore this feature -------- */
     /* If-Modified-Since: <Last-Modified> */
-    /* -------- ignore this feature --------
     if( (fp = fopen( linkfile, "r" )) != NULL ) {
 	while( fgets( line, sizeof(line), fp ) != NULL && line[0] != '\n' ) {
 	    if( strncasecmp( line, "Last-Modified: ", 15 ) == 0 ) {
-		sprintf( buf, "If-Modified-Since: %s", line+15 );
+		sfsprintf( buf, sizeof(buf), "If-Modified-Since: %s", line+15 );
 		NetWrite( nFile, buf, strlen(buf) );
 		debug_logit( buf );
 		break;
@@ -140,11 +140,11 @@ char	*tmpfile;
 	}
 	fclose( fp );
     }
-      -------- ignore this feature -------- */
+#endif
 
     /* Cookie: <cookie-value> */
     if( DataEntryQuery( srv->lpath, "cookie", line, sizeof(line) ) > 0 ) {
-	sprintf( buf, "Cookie: %s\n", line );
+	sfsprintf( buf, sizeof(buf), "Cookie: %s\n", line );
 	NetWrite( nFile, buf, strlen(buf) );
 	debug_logit( buf );
     }
@@ -182,8 +182,8 @@ char	*tmpfile;
     char	*lpath = srv->lpath;
     int		ans;
 
-    sprintf( rpath, "%s/", srv->rpath );
-    sprintf( linkfile, "%s/._dir", lpath );
+    sfsprintf( rpath, sizeof(rpath), "%s/", srv->rpath );
+    sfsprintf( linkfile, sizeof(linkfile), "%s/._dir", lpath );
     ans = HttpXfer( srv, rpath, linkfile, tmpfile );
     if( ans < 300 ) {		/* 2xx Successful, 1xx Informational */
 	if( chdir( lpath ) ) {
@@ -214,7 +214,7 @@ char	*tmpfile;
     if( (ptr = strrchr( lpath, '/' )) == NULL )
 	return -1;
     *ptr = '\0';
-    sprintf( linkfile, "%s/._dir.%s", lpath, ptr+1 );
+    sfsprintf( linkfile, sizeof(linkfile), "%s/._dir.%s", lpath, ptr+1 );
     *ptr = '/';
 
     ans = HttpXfer( srv, srv->rpath, linkfile, tmpfile );
@@ -277,27 +277,27 @@ char	*argv[];
     char	*fpath, *key, *data;
 
     if( argc < 2 ) {
-	sprintf( csusrmsg, "1 Usage: userdef local-path key (-|data)" );
+	sfsprintf( csusrmsg, sizeof(csusrmsg), "1 Usage: userdef local-path key (-|data)" );
 	return 0;
     }
     fpath = argv[0];
     key = argv[1];
     if( argc < 3 ) {		/* query data */
 	if( DataEntryQuery( fpath, key, buf, sizeof(buf) ) >= 0 ) {
-	    sprintf( csusrmsg, "0 %s %s %s", fpath, key, buf );
+	    sfsprintf( csusrmsg, sizeof(csusrmsg), "0 %s %s %s", fpath, key, buf );
 	} else {
-	    sprintf( csusrmsg, "1 %s %s not-found", fpath, key );
+	    sfsprintf( csusrmsg, sizeof(csusrmsg), "1 %s %s not-found", fpath, key );
 	}
     } else if( *argv[2] == '-' ) {	/* delete header */
 	if( DataEntryDelete( fpath, key ) == 0 ) {
-	    sprintf( csusrmsg, "0 %s %s deleted", fpath, key );
+	    sfsprintf( csusrmsg, sizeof(csusrmsg), "0 %s %s deleted", fpath, key );
 	} else {
-	    sprintf( csusrmsg, "1 %s %s not-found", fpath, key );
+	    sfsprintf( csusrmsg, sizeof(csusrmsg), "1 %s %s not-found", fpath, key );
 	}
     } else {
 	data = argv[2];
 	DataEntryInsert( fpath, key, data, strlen(data)+1 );
-	sprintf( csusrmsg, "0 %s %s inserted", fpath, key );
+	sfsprintf( csusrmsg, sizeof(csusrmsg), "0 %s %s inserted", fpath, key );
     }
     return 0;
 }

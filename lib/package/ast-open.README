@@ -74,6 +74,9 @@ Source Package Installation Instructions -- Plan B:
   (4) If the bin/package script does not exist then manually read the INIT
       source package:
 		gunzip < lib/package/tgz/INIT.YYYY-MM-DD.tgz | tar xvf -
+      Note that some browsers automatically unzip downloaded without warning.
+      If the gunzip fails try:
+		tar xvf - lib/package/tgz/INIT.YYYY-MM-DD.tgz
       If your system does not have tar(1) or gunzip(1) then download the ratz
       source package, compile it, and manually read the INIT
       source package:
@@ -88,6 +91,97 @@ Source Package Installation Instructions -- Plan B:
 All recorded changes follow.
 
 :::::::: ksh93 ::::::::
+
+06-10-12  --- Release ksh93s-  ---
+06-10-12  A bug when skipping over `...` with ${x:=`...`} when x is set
+	  has been fixed.
+06-10-11  A bug in process floating constants produced by the %a format
+	  of printf has been fixed.
+06-10-06  A bug in which IFS was not being restored correctly in some
+	  cases after a subshell has been fixed.
+06-10-06  A bug in which pipefail was not detecting some failures in
+	  pipelines with 3 or more states has been fixed.
+06-10-03  A bug in the processing of >(...) with builtins which could
+	  cause the builtin to hang has been fixed.
+06-10-03  A bug in the for loop optimizer which causes >(...) process
+	  substitution to be ignored has been fixed.
+06-09-97  The -a option was added to typeset for indexed arrays.  This
+	  is only needed when using the ([subscript]=value ...) form.
+06-08-16  As a new feature, a leading ~(N) on a pattern has no effect 
+	  except when used for file expansion.  In this case if not
+	  matches are found, the pattern is replaced by nothing rathern
+	  than itself.
+06-08-11  A bug in the expansion of ${.sh.match[i]:${#.shmatch[i]}} has
+	  been fixed.
+06-08-10  The read builtin options -n and -N have been modified to treat
+          the size as characters rather than bytes unless storing into a
+	  binary (typeset -B) variable.
+06-07-27  When the here document operator << is followed directly by a #
+	  rather than a -, the first line of the here-document determines
+	  how much whitespace is removed for each line.
+06-07-26  A bug in the C-shell history (enabled with set -H) in which the
+	  history event !$ was not processed has been fixed.
+06-07-21  A bug on some systems in which assigning PATH on a command line
+	  would not take effect has been fixed.
+06-07-20  Add ksh93 and rksh93 as allowable names for ksh binaries.
+06-07-20  Removed the SHOPT_OO compilation option which was only partially
+	  implemented.
+06-07-20  The ability to use egrep, grep, and fgrep expressions within
+	  shell patterns has been documented.
+06-07-17  A bug with arithmetic command expressions for locales in which
+	  the comma is a thousands separator has been fixed. 
+06-07-13  The default HISTSIZE was increased from 128 to 512.
+06-07-13  A multibyte problem with locales that use shift codes has been fixed.
+06-06-23  A number of bug fixes for command, file, and variable completion
+	  have been mode.
+06-06-20  Floating point division by zero now yields the constant Inf or -Inf
+	  and floating functions with invalid arguments yield NaN. 
+06-06-20  The floating point constants Inf and NaN can be used in arithmetic
+	  expressions.
+06-06-20  The functions isinf(), isnan(), tanhl() have been added for
+	  arithmetic expressions.
+06-06-13  Internal change to use ordering for variables instead of hashing
+	  to speed up prefix matching.
+06-06-13  A window between fork/exec in which a signal could get lost
+	  and cause a peogram to hang has been eliminated
+06-06-13  A bug in edit completion with quoted strings has been fixed.
+06-06-07  The restricted options can now be enabled by set as well as on
+	  the command line.  Once set, it can not be disabled.
+06-06-04  Modified built-in binding so that for systems for which /bin
+          and /usr/bin are the same, a builtin bound to /bin will get
+	  selected when either /bin or /usr/bin is scanned.
+06-06-04  Added literal-next character processing for emacs/gmacs mode. 
+	  This change is not compatible with earlier versions of ksh93
+          and ksh88 when the stty lnext is control-v.  The sequence
+	  escape-control-v will display the shell version.
+06-05-31  Modified emacs and vi mode so that entering a TAB after a partial
+	  TAB conpletion, generates a listing of possible completions.
+	  After the second TAB, a number followed by a TAB will perform
+	  the completion with the corresponding item.
+06-05-19  Modified arithmetic so that conversions to strings default to
+	  the maximum number of precision digits.
+06-05-16  Bug fixes for multibyte locales. 
+06-05-10  The =~ operator was added to [[...]] and  [[ string ~= ERE ]]
+	  is equivalent to [[ string == ~(E)ERE ]].
+06-04-25  A bug in the vi edit mode which could cause the shell to core dump
+	  when switching from emacs mode.
+06-04-17  A bug in which using LANG or LC_ in assignment lists with builtins
+	  did not restore the localed correctly has been fixed.
+06-04-04  A bug in which discipline functions could not be added to variables
+	  whose names started with .sh has been fixed.
+06-03-28  The -s option to typeset was added to modify -i to indicate short
+	  integers.
+06-03-28  A bug in which variables assignment lists before functions
+	  defined with function name were not passed on the functions
+	  invoked by this function has been fixed. 
+06-03-28  A bug in which name references defined within a function defined
+	  with function  name could not be used with compound variables has
+	  been fixed.
+06-03-27  A bug in which read <&p (print >&p) would cause the coprocess input
+	  (output) pipe to close before reading from (after writing to)
+          it has been fixed.
+06-02-28  A bug in which stopping a job created with the hist builtin command
+	  would create a job that could not be restarted has been fixed.  
 
 06-01-24  --- Release ksh93r  ---
 06-01-24  A bug in which running commands with standard output closed would
@@ -1390,6 +1484,10 @@ All recorded changes follow.
 
 :::::::: pax ::::::::
 
+06-10-11 add sfstropen()/sfstruse() error checks
+06-09-27 pax.tst: fix uid etc. tests to use --listformat -- duh
+06-09-12 delta.c: delta for any X_IPERM st_mode changes
+06-06-07 pax: add -U --delta.update to update only delta members
 05-12-14 pax: fix --filter to work for --read and expand command %(...)
 05-06-07 format.c: fix inter volume fill logic
 05-05-28 pax: improve "junk data after volume" checks
@@ -1687,6 +1785,8 @@ All recorded changes follow.
 
 :::::::: html ::::::::
 
+06-10-11 add sfstruse() error checks
+06-05-03 htmlrefs.c: add COPY to avoid e.g. cgi symlinks
 05-10-15 mm2html.sh: add BP name=value parameters
 05-10-10 mm2html.sh: add .CE, .BP *.@(gif|png) ... => <IMG...>
 05-02-22 htmlrefs.c: rel=internal ignored if --external
@@ -1772,6 +1872,9 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+06-06-28 proto.tst: add more externalize tests
+06-05-09 proto.c: add --externalize, -x
+06-05-09 proto.tst: add -x tests
 05-12-25 ratz.c: fix sear CreateDirectory(tmp) permissions
 05-09-16 proto.c: add <stdio.h> for standalone rename() prototype
 05-07-31 proto.c: finally trust __STDC__ headers
@@ -1810,6 +1913,8 @@ All recorded changes follow.
 
 :::::::: tests ::::::::
 
+06-09-14 datey2k.dat: yield to the gentlemen from congress
+06-08-25 opt.tst: update for leading 0 numeric option arg strip
 05-04-30 sfio: tgetr: add sfmaxr() tests
 05-04-20 cdt: snarf cdt tests from kpv
 05-01-04 date.c: add ``FMT time format answer''
@@ -1881,6 +1986,10 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+06-09-28 3d.sh: used getconf LIBPATH|LIBPREFIX|LIBSUFFIX -- how novel
+06-09-26 3d.h,dir3d.c,dll3d.c: fix strtou*l*l maps for __int64 vs. long long
+06-09-18 strmatch.c,touch.c: add private obsolete api copies
+06-08-27 mkdir3d.c: foloow mkdir -p mode rules for missing intermediates
 05-02-01 3d.sh: IFS may be unset and { ash bsh } don't on startup -- wow
 05-01-01 sys.tab,utimets3d.c: add utimets() intercept
 04-12-15 pathreal.c: "..." should fail if no lower view -- doh
@@ -2016,6 +2125,15 @@ All recorded changes follow.
 
 :::::::: coshell ::::::::
 
+06-10-11 add sfstropen()/sfstruse() error checks
+06-09-19 command.c,cotest.c: sysconf() => astconf()
+06-08-15 shell.c: unset CO_ENV_SHELL
+06-08-11 main.c: handle CO_ENV_MSGFD msgfd != 3
+06-08-11 COSHELL.mk: handle connect=*
+06-08-04 shell.c: handle CO_APPEND for job out|err
+06-06-21 event.c: add --older, --newer, REQ_all
+06-06-18 event.c: add event name pattern match/glob
+06-06-11 event.c,COSHELL.mk: add
 03-03-04 add state.remote=CS_REMOTE_SHELL
 01-12-12 resolve SETSHELL local vs. global conflict -- its both
 	 ignore attr now really ignores host -- duh
@@ -2100,6 +2218,8 @@ All recorded changes follow.
 
 :::::::: cpp ::::::::
 
+06-05-09 cpp.tst: add pp:externalize tests
+	 cpp.tst: add compatibility ul numeric qualifier tests
 06-01-11 cpp.tst: update pp:passthrough tests
 05-12-16 cpp.tst: add imake pp:passthrough comment splice test
 05-04-11 cpp.tst: add '"a" #s' catliteral + stringize
@@ -2141,6 +2261,8 @@ All recorded changes follow.
 
 :::::::: cs ::::::::
 
+06-10-11 add sfstropen()/sfstruse() error checks
+06-06-11 cs.c: switch to csclient()
 02-10-02 tst.c: tmform() => fmttime()
 01-01-01 vcs_src/*: drop old notices, fix signal handler prototype
 00-05-09 mbb: add (message bulletin board service)
@@ -2164,6 +2286,7 @@ All recorded changes follow.
 
 :::::::: msgcc ::::::::
 
+06-10-11 add sfstruse() error checks
 02-03-11 msgcc: fix merge replacement threshhold logic
 	 msggen: convert { \a \b \f \n \r \v } back to C escapes
 	 msgcpp: set pp:modern
@@ -2177,6 +2300,22 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+06-09-28 Makerules.mk: add $(IFFEREFS)
+06-09-15 Makerules.mk: fix .SHARED.DEF.* scope prereq logic
+06-09-01 Makefile: no -O for command.c on darwin (probably gcc 4.0's fault)
+06-08-15 command.c: handle no action but .AFTER|.BEFORE prereqs 
+06-08-11 Makerules.mk: .PACKAGE.INIT now checks lin64 for HOSTTYPE==*64
+06-08-11 command.c: pass $(COSHELL) to coopen()
+06-08-07 command.c,parse.c: add 'query - blocked' for blocked jobs
+06-08-02 command.c: cokill(state.coshell,0,0) to kill event jobs
+06-07-31 metarule.c: handle dynamic metarule rhs
+06-07-27 command.c: clear job->cojobs to prevent concurrent use
+06-07-17 Makerules.mk: cc-...~... => cc-...,...
+06-06-21 expand.c: add :Z[=C]: for closure and cycle detection
+06-06-11 command.c: update to use copending() cojobs() cozombie()
+06-05-09 command.c: pass CO_ENV_OPTIONS to coopen()
+06-03-29 Makerules.mk: fix +l* explicit binding override
+06-03-08 Makerules.mk: fix :JOINT: rhs double eval
 06-02-08 pkg-cobol-cobc.mk: drop -g from COBOLFLAGS
 06-01-31 Makerules.mk: fix :PACKAGE: P:static to honor .PACKAGE.P.library
 06-01-25 Makerules.mk: { -ldl -lm } dynamic unless explicitly overridden
@@ -3345,6 +3484,7 @@ All recorded changes follow.
 
 :::::::: probe ::::::::
 
+06-09-05 probe.c: add -f, --force
 02-10-30 probe.c: reset proc->rfd after sfnew() to avoid close() error
 02-09-21 probe.c: handle strlen(base) != BASE_MAX
 02-09-11 probe.c: add more override docs
@@ -3369,6 +3509,9 @@ All recorded changes follow.
 
 :::::::: at ::::::::
 
+06-10-11 add sfstruse() error checks
+06-09-19 atd.c: sysconf() => astconf()
+06-05-17 crontab.sh: handle empty or nonexistent crontab
 05-06-29 crontab.sh: fix (...) => @(...) syntax error
 02-02-14 atd: add strdup(argv[1]) to workaround argv[1]=>0 mystery
 01-06-18 crontab: clarify the command<=>job relationship
@@ -3402,6 +3545,12 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+06-10-11 add sfstruse() error checks
+06-08-25 uniq.rt: add initial regression tests
+06-08-23 mkdir.tst: add -p final dir mode tests
+06-07-20 pty.c: add
+06-06-25 chmod.rt,mkdir.rt: add initial regression tests
+06-06-24 dlls.c: add --containing
 06-01-30 od.c: add -tb binary character format
 05-12-06 od.c: handle od() static split buffer overflow
 05-08-07 tr.c: fix a-b- and a-b-c
@@ -3498,6 +3647,7 @@ All recorded changes follow.
 
 :::::::: codex ::::::::
 
+06-08-23 codex.tst: add uu boundary and text tests
 04-01-11 doc update
 04-01-01 add --passphrase
 03-12-18 add to ast -- still working on relationship with { -lvcodex -lz -lbz }
@@ -3600,6 +3750,7 @@ All recorded changes follow.
 
 :::::::: dss ::::::::
 
+06-10-11 add sfstruse() error checks
 03-02-06 dss.c: convert main loop to dssrun()
 03-01-23 dss.c: update stamp to reflect library version 20030123
 03-01-15 dss.c: fix match docs for Cxmatch_t
@@ -3650,6 +3801,7 @@ All recorded changes follow.
 
 :::::::: dibbler ::::::::
 
+06-10-11 dibbler.c: add sfstruse() error checks
 04-02-29 dibbler_sum.c: fix cxlocation() record arg
 03-02-11 dibbler_re.c: Vmbest => Vmlast
 03-01-28 dibbler.c: update for Cxtype_t.Cxmember_t
@@ -3664,6 +3816,7 @@ All recorded changes follow.
 
 :::::::: flat ::::::::
 
+06-10-11 flat.c: add sfstruse() error checks
 05-09-16 flat.c: fix <QUOTEALL> q=-1 vs. \xff data bug
 05-05-09 flat.c: literal quote is "" inside "..." for quote+noescape
 	 flat.c: add <QUOTEALL>
@@ -3705,6 +3858,7 @@ All recorded changes follow.
 
 :::::::: ip_t ::::::::
 
+06-10-11 itlie.h: add sfstruse() error checks
 06-01-24 bgp.h: bring over from dsslib/bgp.h
 05-03-08 lib.c: add for dssstatic()
 03-05-21 itlie.h: fix aspath_t external
@@ -3825,6 +3979,10 @@ All recorded changes follow.
 
 :::::::: mailx ::::::::
 
+06-10-11 data.c: ARG_MAX => private ARGMAX
+06-10-11 add sfstropen()/sfstruse() error checks
+06-06-24 fio.c: fix nul count scan bug
+06-04-17 head.c,spam.c: catch and normalize inventive subject spaces
 05-03-28 main.c: add -r address; add L variable attribute
 05-02-17 head.c: CONTENT_type PART_text trumps CONTENT_encoding binary
 05-02-08 local.h: blankline=>allblanks (lynxos libc symbol hijack)
@@ -4023,6 +4181,11 @@ All recorded changes follow.
 
 :::::::: re ::::::::
 
+06-10-11 add sfstruse() error checks
+06-08-16 testglob.dat,noop.dat: add KRE ~(N) tests
+06-07-28 testglob.(c|dat): add gl_extra tests
+06-07-17 reg.dat: handle (?p) (pedandic RE checks)
+06-07-17 zero.dat: update inline option tests
 05-12-14 grep.c: add --name=name (-N) for stdin file label
 05-08-18 grep.c: add --label, -m and --total, -t
 05-06-06 reg.dat: transcribe from tcl 8.3 Spencer reg.test
@@ -4165,6 +4328,12 @@ All recorded changes follow.
 
 :::::::: sort ::::::::
 
+06-07-17 main.c: RS_POP before checking output
+06-07-17 main.c: handle empty file for record format data sample
+06-05-09 main.c: add path to record format determination message
+	 main.c: fix -o path to inherit -R% format from input
+	 sort.tst: fix -R% v format test
+06-04-19 main.c: fix minor merge file list bug
 06-01-21 testsort.sh: fix pure sum command search logic
 05-11-01 rec.c: add --count
 05-06-30 main.c: add -zbBUFSIZE for regression testing
@@ -4222,6 +4391,10 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+06-10-11 add sfstruse() error checks
+06-10-11 ls.c: header/trailer must honor state.scale too
+06-09-19 split.c: pathconf() => astconf()
+06-05-23 ps.c: add but ignore -w, --wide
 06-01-11 pss-kvm.c: handle struct eproc.e_xsize
 06-01-03 ls.c: add --show-control-characters, handle --no*
 05-07-25 touch.c: eith => either
@@ -4489,6 +4662,10 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+06-10-11 add sfstropen()/sfstruse() error checks
+06-09-27 find.c: peel off leading [-+] from all -perm
+06-07-17 find.tst: fix -perm tests
+06-05-25 find.c: fix inum (and all but size) default units
 05-06-13 tw.c: sort:path == sort:name, handle ,-separated keys
 05-03-07 xargs.c: fix -i to treat each line as an arg
 05-02-23 tw.c: add --error-exit=code to exit if cmd exit >= code
@@ -4600,6 +4777,68 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+06-10-19 sfio/sfvprintf.c: %W.P.Bmd => fmtscale() using string W.P
+06-10-18 string/fmtscale.c: 1000: n[.]nn(kMGTPE), 1024: n[.]nn(KMGTPE)i
+06-10-11 ast_std.h: now implies <sys/stat.h> (did on most before anyway)
+06-10-11 strtoi.h: ignore sign for 0, validate scale shift
+06-10-11 strdup.c,vmstrdup.c: handle 0 arg
+06-10-11 add sfstruse()/sfstropen() error checks
+06-10-10 misc/procopen.c: envv==environ => don't modify environ
+06-10-10 misc/procclose.c: return valid exit(1) status
+06-10-06 port/astconf.c,comp/conf.sh,comp/conf.tab: play nice with getconf(1)
+06-10-01 comp/conf.tab: SHELL default checks { _CS_PATH } X { ksh ksh93 sh }
+06-10-01 comp/conf.sh: export CONF_getconf to shell actions
+06-10-01 comp/putenv.c: always enable setenv() for procopen()
+06-10-01 misc/procopen.c: use pathshell() or astconf("SHELL",0,0) if PARANOID
+06-10-01 path/pathshell.c: localize the shell path patterns and accept ksh93
+06-09-28 Makefile: avoid ast <stdio.h> vix iffe -X ast -- doh
+06-09-27 regex/regdecomp.c: add
+06-09-26 regex/regcomp.c: handle KRE ~(...)<invalid-kre>
+06-09-25 reorganize to avoid native header intercepts
+06-09-15 uwin/crypt.c: _UWIN only!
+06-09-14 Makefile: tweak the ast_common.h bootstrap again (finally?)
+06-09-14 misc/optget.c: noncommercial => OPT_proprietary
+06-09-12 string/strelapsed.c: fix multi-char qualifier parse
+06-09-12 string/strtoi.h: drop [cClLqQwW] multipliers
+06-09-11 misc/optget.c: add numeric arg validity check
+06-09-07 misc/optget.c,tm/tmfix.c: fix uninitialzed var refs
+06-09-05 path/pathprobe.c: add version header verification
+06-08-01 Makefile: handle iffe vs FEATURE/common vs ast_common.h
+06-08-31 Makefile: add ast_map.h to the bootstrap list
+06-08-30 misc/glob.c: fix ~(E)re bug that stripped ~(E) before regcomp
+06-08-30 include/ast.h: add { integralof(x) pointerof(x) }
+06-08-27 string/strelapsed.c: fix off-by-one (too little) parse bug
+06-08-25 misc/optget.c: 0*<n>.* numeric option args => <n>.*
+06-08-22 misc/glob.c: handle ~(...) pattern options
+06-08-16 string/strelapsed.c: fix off-by-one (too far) parse bug
+06-08-16 regex/regcomp.c: accept but ignore ~(N)
+06-08-14 features/libpath.sh: add solaris LD_LIBRARY_PATH_64 check
+06-08-05 sfio/sfpool.c: pool SF_READ|SF_WRITE loop fix
+06-08-02 misc/fts.c: fix FTS_NOSTAT optimization to check for ..
+06-07-28 include/glob.h: add gl_extra for user globlist_t expansion
+06-07-27 features/common: #include "ast_map.h"
+06-07-26 comp/fnmatch.[ch]: allow <ast_map.h> to map fnmatch()
+06-07-22 cdt: snarf from kpv
+06-07-17 string/strperm.c: perm==-1 skips umask(1)
+06-07-17 sfio/sfvprintf.c: handle format invalid mb seq
+06-07-17 regex/regcomp.c: inline REG_SHELL => anchored, otherwise not
+06-07-17 regex/regcomp.c: inline B|G:basic E:REG_EXTENDED F|L:REG_LITERAL
+06-07-17 regex/regcomp.c: inline l:REG_LEFT r:REG_RIGHT
+06-07-17 regex/regcomp.c: inline a:REG_LEFT|REG_RIGHT p:~REG_LENIENT
+06-07-17 string/chresc.c: add \Uxxxxxxxx
+06-07-17 sfio/sfstrtof.h: ignore thousands sep after decimal
+06-07-17 string/tokline.c: splice() => spliceline() for bsd
+06-06-27 features/float,sfio/sfcvt.c: fix Nan logic
+06-06-27 port/astmath.c: fix long double isnan() test
+06-06-27 features/map.c: _map_libc for std => _ast_std
+06-06-25 string/strperm.c: handle posix = w.r.t. umask
+06-06-19 port/mnt.c,features/fs: handle netbsd getmntent api change
+06-06-18 regex/regstat.c: add REG_LITERAL check
+06-06-11 cdt/dtview.c: update from kpv
+06-05-31 sfio/sfhdr.h: fix _SFOPEN() typo
+06-05-09 comp/conf.sh: add native getconf -a names to the mix
+06-04-28 misc/optget.c: add solaris long option name compatibility
+06-03-09 string/strmatch.c: add REG_ADVANCE => REG_* flags
 06-02-14 comp/iconv.c: fix uwin iconv_list() /reg/ generator
 06-02-10 port/astconf.c: relax standard prefix filter
 06-02-08 sfrd.c,sfsync.c: lock logic bug fix
@@ -5912,6 +6151,29 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+06-10-18 tail.c: fix invalid suffix infinite loop
+06-10-11 chgrp.c,cp.c: add sfstruse() error checks
+06-10-10 tee.c: add --linebuffer, -l
+06-10-06 getconf.c: preserve native getconf(1) known variable behavior
+06-10-04 sync.c: add (thanks to Roland Mainz)
+06-10-04 getconf.c: add -v specification => run native getconf(1)
+06-09-28 stty.c: static setmode() => set() for darwin.i386
+06-09-27 head.c: handle -1c => -c1
+06-09-19 pathchk.c: pathconf() => astconf()
+06-09-11 tail.c: handle compatibility corner cases
+06-09-08 date.c: add output write error diagnostic
+06-09-04 tail.c: fix initial position for -n0, no args => no -f
+06-08-28 uniq.c: add -D,--all-repeated
+06-08-25 wc.c,wclib.c: add -L,--longest-line,WC_LONGEST
+06-08-24 wc.c,wclib.c: implement -m and WC_MBYTE
+06-08-24 rmdir.c: -sp applies to every message, add gnu -e
+06-08-23 rmdir.c: add solaris --suppress, -s
+06-08-23 mkdir.c: don't add 0300 to -p final dir mode
+06-07-17 cut.c: handle last line with no newline
+06-07-17 cut.c: --output-delimiter == --line-delimiter
+06-06-25 chmod.c: mask -c output with S_IPERM
+06-05-09 uname.c: add -o; change -a to match linux
+06-05-03 date.c: add --last -L to list last of multiple time args
 06-02-14 tail.c: fix -f bug that lost fast stream data
 06-02-11 getconf.c: exit 1 if name invalid -- duh
 06-01-28 cp.c,rm.c: fix astquery() 'q' to return and not exit()
@@ -6083,6 +6345,7 @@ All recorded changes follow.
 
 :::::::: libdll ::::::::
 
+06-10-11 dllscan.c: check sfstruse() return values -- doh
 06-01-25 dllplug.c: add errorf() library message for dlopen() error
 05-02-14 dllscan.c: "" || "-" => NiL
 04-10-01 dllfind.c: drop ksh "builtin" workaround
@@ -6125,6 +6388,7 @@ All recorded changes follow.
 
 :::::::: libexpr ::::::::
 
+06-10-11 add exstash() and exnospace() for sfstruse()/vmstrdup() errs
 05-10-25 exeval.c: fix I2F unsigned cast
 05-04-20 exeval.c: fix sscanf() runtime argument check logic
 05-01-11 Makefile: fix exop.h generation to handle spurious #define's
@@ -6174,6 +6438,11 @@ All recorded changes follow.
 
 :::::::: librecsort ::::::::
 
+06-07-17 rsprocess.c: re-key after RS_READ calout
+06-06-29 rsprocess.c: set obj key,keylen before RS_READ
+06-05-10 rsmerge.c: (car) caught 2 more missing RS_WRITE callouts!
+06-04-20 rsmerge.c: no RS_WRITE events for intermediate merge -- doh
+06-04-19 finally fixed multi-level merge v record format bugs
 06-02-14 recsort.h: always __EXPORT__ rs_disc()
 06-02-09 rstemp.c: sfset(SF_READ|SF_WRITE) not needed
 05-12-01 -lsync event callout bug fixes -- finally working?
@@ -6275,6 +6544,8 @@ All recorded changes follow.
 
 :::::::: libz ::::::::
 
+05-07-25 __MVS__ tweaks
+05-03-21 snarf and merge zlib 1.2.3, drop gzseek64() gztell64()
 05-05-11 sfdcgzip.c: change return value to [cgv], add vcunzip read check
 04-02-14 sfdcgzip.c,sfdclzw.c: add SFDCNEXT()/SFDCPREV() calls
 03-05-13 sfdcgzip.c,sfdclzw.c: add SF_DBUFFER exception, SF_SHARE+sfreserve()
@@ -6306,6 +6577,14 @@ All recorded changes follow.
 
 :::::::: libcoshell ::::::::
 
+06-08-22 coshell.h: procrun => coprocrun, system => cosystem
+06-08-09 coshell.h: export CO_ENV_MSGFD for COSHELL=coshell
+06-08-02 coexec.c: Cojob_t.flags&CO_SERVICE for service requests
+06-08-02 cokill.c: cokill() signal==0 => kill CO_SERVICE jobs
+06-07-27 coexec.c: drop server cowait() that bypassed caller
+06-06-21 coexec.c: add non-block cowait() to drain responses
+06-06-11 fix service intercept cleanup
+06-05-24 add service=name:init lightweight service intercepts
 05-04-19 cowait.c: beef up invalid message tests and diagnostics
 05-04-11 drop fixed CO_MSGFD for $_coshell_msgfd
 05-04-07 coexec.c: fix !_lib_fork&&_map_spawnve close-on-exec redirection
@@ -6331,6 +6610,12 @@ All recorded changes follow.
 
 :::::::: libcs ::::::::
 
+06-09-19 css.c: sysconf() => astconf()
+06-08-15 csclient.c: fix prompt logic
+06-08-14 csopen.c: fix group=name logic
+06-08-04 csclient.c: fix CS_CLIENT_ARGV
+06-06-11 csclient.c: add
+06-05-31 csopen.c,cs.h: add csattach() for non-/dev/fdp/ streams
 05-02-04 Makefile: drop -lnetinet (for lynxos)
 04-07-22 csopen.c,cssend.c,csauth.c,cslocal.c: access() => eaccess()
 04-07-19 cslocal.c: call spawnveg() for standalone 3d
@@ -6413,6 +6698,12 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+06-09-05 pp.probe: add version stamp comment
+06-06-29 pp.probe: gcc pp:linefile probe (otherwise it can dump!)
+06-06-28 ppproto.c: fix inappropriate __PARAM__ insertion
+06-05-09 pp.tab,ppcontrol.c,ppproto.c: add externalize
+	 ppfsm.c: handle compatibility ul numeric qualifiers
+06-02-28 probe.win32: add wchar_t probe
 06-01-11 pplex.c: fix rpcgen pp:passthrough header splice bug
 05-12-16 pplex.c: fix imake pp:passthrough comment splice bug
 05-09-16 pplib.h: add <string.h> for standalone proto
@@ -6840,6 +7131,7 @@ All recorded changes follow.
 
 :::::::: libcodex ::::::::
 
+06-08-23 code-uu.c: fix remainder output *and* input bugs
 05-09-25 add '^' equivalent to '|'
 04-02-14 codex.c: SFDCNEXT() and SFDCPREV() now provided by <sfio_t.h>
 04-01-11 codex.c: top level composition parse, handle CODEX_INVERT
@@ -6858,6 +7150,7 @@ All recorded changes follow.
 
 :::::::: libcdb ::::::::
 
+06-10-11 add sfstruse()/sfstropen() error checks
 04-10-31 cdbcdb.c: fix CDB_OPEN vs. cdbhdrread() sfdisc() buffer flush bug
 04-02-29 cdb.h: fix data symbol __EXPORT__ logic
 02-02-14 Makefiles: add explicit -lz -ldll references
@@ -6892,6 +7185,7 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+06-10-11 add sfstruse() error checks
 06-02-14 dss.h: always __EXPORT__ dss_lib()
 06-02-02 dssopt.c,dss-print.h: add \fprint\f default print format
 05-09-14 dssopen.c: prevent libraries dict double queue insert
@@ -7068,6 +7362,8 @@ All recorded changes follow.
 
 :::::::: libpz ::::::::
 
+06-10-11 add sfstruse() error checks
+06-03-22 pzopen.c: change "input stream close error" to "data corrupted"
 05-07-17 pzinflate.c: use sferror() instead of sfsync() -- doh
 	 pzsplit.c: drop SF_WRITE sfreserve() to keep writes aligned
 05-06-30 pzsplit.c: work around sfreserve() write failure via sfwrite()
@@ -7140,6 +7436,7 @@ All recorded changes follow.
 
 :::::::: libtksh ::::::::
 
+06-09-19  src/shcompat.c: sysconf() => astconf()
 04-07-19  tcl/tclIOUtil.c: treat { O_RDONLY O_WRONLY O_RDWR } as values
 03-06-13  include/tclInt.h: disable #undef sprintf that masked its prototype
 03-04-05  src/var.c: fix off by 1 malloc() call -- for once not gsf's fault!!
@@ -7246,6 +7543,7 @@ All recorded changes follow.
 
 :::::::: libvcodex ::::::::
 
+06-07-26 vcgetmeth.c,vcextract.c: handle CC_NATIVE!=CC_ASCII
 06-02-14 vcodex.h: add __EXPORT__ to plugin declaration
 06-02-08 vcsfio.c: simply magic logic by just peeking 4 byte magic
 06-01-24 move private builtin methods to private plugins

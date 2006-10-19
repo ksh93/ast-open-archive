@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -260,6 +260,15 @@ Option_t		options[] =
 	0,
 	0,
 	OPT_GLOBAL|OPT_READONLY|OPT_VENDOR,
+},
+{
+	"delta.update",
+	'U',
+	OPT_delta_update,
+	"Only update files in the delta -- do not update files in the base that are not in the delta.",
+	0,
+	0,
+	OPT_GLOBAL|OPT_VENDOR,
 },
 {
 	"delta.version",

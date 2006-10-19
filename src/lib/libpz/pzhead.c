@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1998-2005 AT&T Corp.                  *
+*           Copyright (c) 1998-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -176,7 +176,12 @@ pzheadwrite(Pz_t* pz, Sfio_t* op)
 	if (pz->det && (m = sfstrtell(pz->det)))
 	{
 		sfputc(op, PZ_HDR_options);
-		s = sfstruse(pz->det);
+		if (!(s = sfstruse(pz->det)))
+		{
+			if (pz->disc->errorf)
+				(*pz->disc->errorf)(pz, pz->disc, ERROR_SYSTEM|2, "out of space");
+			return -1;
+		}
 		m++;
 		sfputu(op, m);
 		sfwrite(op, s, m);

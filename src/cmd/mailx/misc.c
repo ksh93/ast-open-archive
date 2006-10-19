@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -567,6 +567,19 @@ strlower(register char* s)
 	while (c = *s)
 		*s++ = isupper(c) ? tolower(c) : c;
 	return b;
+}
+
+/*
+ * 0 terminate tmp string stream, rewind, and return beginning of string
+ */
+char*
+struse(Sfio_t* sp)
+{
+	char*	s;
+
+	if (!(s = sfstruse(sp)))
+		note(FATAL, "out of space");
+	return s;
 }
 
 /*

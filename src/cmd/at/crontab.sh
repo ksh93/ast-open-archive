@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1996-2005 AT&T Corp.                  #
+#           Copyright (c) 1996-2006 AT&T Knowledge Ventures            #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                      by AT&T Knowledge Ventures                      #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -36,7 +36,7 @@ op=
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	usage=$'
 [-?
-@(#)$Id: crontab (AT&T Labs Research) 2005-06-29 $
+@(#)$Id: crontab (AT&T Labs Research) 2006-05-17 $
 ]
 '$USAGE_LICENSE$'
 [+NAME?crontab - schedule periodic background work]
@@ -173,7 +173,9 @@ edit)	trap "rm -f '$temp'" 0 1 2 3 15
 	fi > "$temp"
 	${VISUAL:-${EDITOR:-vi}} "$temp"
 	;;
-list)	cat "$file"
+list)	if	test -f "$file"
+	then	cat "$file"
+	fi
 	exit
 	;;
 remove)	$cron -r
@@ -183,6 +185,7 @@ remove)	$cron -r
 replace)trap "rm -f '$temp'" 0 1 2 3 15
 	case $replace in
 	-)	temp=$file ;;
+	"")	cat > "$temp" ;;
 	*)	cat "$replace" > "$temp" ;;
 	esac
 	test -s "$temp"

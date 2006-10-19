@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -186,10 +186,10 @@ action		:	LABEL ':' {
 				expr.procedure = $1->value = exnewnode(expr.program, PROCEDURE, 1, $1->type, NiL, NiL);
 				expr.procedure->type = INTEGER;
 				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-					exerror("out of space [frame discipline]");
+					exnospace();
 				disc->key = offsetof(Exid_t, name);
 				if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
-					exerror("out of space [frame table]");
+					exnospace();
 				expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
 			} statement_list
 		{
@@ -335,7 +335,7 @@ switch_list	:	/* empty */
 			{
 				if (!(sw = newof(0, Switch_t, 1, 0)))
 				{
-					exerror("out of space [switch]");
+					exnospace();
 					sw = &swstate;
 				}
 				sw->prev = expr.swstate;
@@ -350,7 +350,7 @@ switch_list	:	/* empty */
 			n = 8;
 			if (!(sw->base = newof(0, Extype_t*, n, 0)))
 			{
-				exerror("out of space [case]");
+				exnospace();
 				n = 0;
 			}
 			sw->cur = sw->base;
@@ -455,7 +455,7 @@ dcl_item	:	reference NAME {expr.id=$2;} array initialize
 					Dtdisc_t*	disc;
 
 					if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-						exerror("out of space [associative array]");
+						exnospace();
 					disc->key = offsetof(Exassoc_t, name);
 					if (!($2->local.pointer = (char*)dtopen(disc, Dtoset)))
 						exerror("%s: cannot initialize associative array", $2->name);
@@ -1037,10 +1037,10 @@ initialize	:	assign
 					exerror("no nested function definitions");
 				expr.procedure = exnewnode(expr.program, PROCEDURE, 1, expr.declare, NiL, NiL);
 				if (!(disc = newof(0, Dtdisc_t, 1, 0)))
-					exerror("out of space [frame discipline]");
+					exnospace();
 				disc->key = offsetof(Exid_t, name);
 				if (!(expr.procedure->data.procedure.frame = dtopen(disc, Dtset)) || !dtview(expr.procedure->data.procedure.frame, expr.program->symbols))
-					exerror("out of space [frame table]");
+					exnospace();
 				expr.program->symbols = expr.program->frame = expr.procedure->data.procedure.frame;
 				expr.program->formals = 1;
 			} formals {

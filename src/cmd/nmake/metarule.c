@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -417,9 +417,18 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 								sfprintf(tmp, "%-.*s", b - x, x);
 								metaexpand(tmp, stem, q->rule->name);
 								t = sfstruse(tmp);
+								if (m->dynamic & D_dynamic)
+								{
+									if (!buf)
+										buf = sfstropen();
+									expand(buf, t);
+									t = sfstruse(buf);
+								}
 								if ((s = bindfile(NiL, t, 0)) && s->status != UPDATE && (s->time || (s->property & P_target)) || !(state.questionable & 0x08000000) && m->action && !*m->action && (s = makerule(t)))
 								{
 									sfstrclose(tmp);
+									if (buf)
+										sfstrclose(buf);
 									goto primary;
 								}
 								if (!(x = strchr(x, '/')))
@@ -431,11 +440,20 @@ metaget(Rule_t* r, List_t* prereqs, char* stem, Rule_t** meta)
 						{
 							metaexpand(tmp, stem, q->rule->name);
 							t = sfstruse(tmp);
+							if (m->dynamic & D_dynamic)
+							{
+								if (!buf)
+									buf = sfstropen();
+								expand(buf, t);
+								t = sfstruse(buf);
+							}
 							if (isstatevar(t) && (s = getrule(t)) && (s = bindstate(s, NiL)))
 								goto primary;
 							if ((s = bindfile(NiL, t, 0)) && s->status != UPDATE && (s->time || (s->property & P_target)) || !(state.questionable & 0x08000000) && m->action && !*m->action && (s = makerule(t)))
 							{
 								sfstrclose(tmp);
+								if (buf)
+									sfstrclose(buf);
 								goto primary;
 							}
 						}

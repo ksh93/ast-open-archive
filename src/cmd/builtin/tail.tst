@@ -25,7 +25,7 @@ function DATA
 	done
 }
 
-TEST 01 'basic'
+TEST 01 'explicit file operands'
 	DO	DATA 10.dat 100.dat
 	EXEC	10.dat
 		OUTPUT - $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
@@ -98,3 +98,196 @@ TEST 03 'timeouts'
 	EXEC	-h -f -t 2 a.dat b.dat
 		OUTPUT - $'a\nb'
 		ERROR - $'tail: warning: a.dat: 2.00s timeout\ntail: warning: b.dat: 2.00s timeout'
+
+SET pipe-input
+
+TEST 04 'standard input'
+	DO	DATA 10.dat 100.dat
+	EXEC
+		SAME INPUT 10.dat
+		OUTPUT - $'1\n2\n3\n4\n5\n6\n7\n8\n9\n10'
+	EXEC	-
+	EXEC	+0
+	EXEC	-n +0
+	EXEC	+1
+	EXEC	-n +1
+	EXEC	+2
+		OUTPUT - $'2\n3\n4\n5\n6\n7\n8\n9\n10'
+	EXEC	-n +2
+	EXEC	-9
+	EXEC	-n -9
+	EXEC	-1
+		OUTPUT - $'10'
+	EXEC	-n -1
+	EXEC	+10
+	EXEC	-n +10
+	EXEC	--
+		SAME INPUT 100.dat
+		OUTPUT - $'91\n92\n93\n94\n95\n96\n97\n98\n99\n100'
+	EXEC	-
+	EXEC	-1
+		OUTPUT - $'100'
+	EXEC	-n -1
+	EXEC	+100
+	EXEC	-n +100
+	EXEC	-2
+		OUTPUT - $'99\n100'
+	EXEC	-n -2
+	EXEC	+99
+	EXEC	-n +99
+	EXEC	-c 6
+		OUTPUT - $'9\n100'
+	EXEC	-6c
+	EXEC	-c +287
+	EXEC	+287c
+
+# the remainder converted from the gnu tail Test.pm
+
+TEST 05	chars
+
+	EXEC	+2c
+		INPUT -n - $'abcd'
+		OUTPUT -n - $'bcd'
+
+TEST 06	obs-c
+
+	EXEC	+8c
+		INPUT -n - $'abcd'
+		OUTPUT - 
+
+	EXEC	-1c
+		INPUT -n - $'abcd'
+		OUTPUT -n - $'d'
+
+	EXEC	-9c
+		INPUT -n - $'abcd'
+		OUTPUT -n - $'abcd'
+
+	EXEC	-12c
+		INPUT -n - $'xyyyyyyyyyyyyz'
+		OUTPUT -n - $'yyyyyyyyyyyz'
+
+	EXEC	-1l
+		INPUT - $'x'
+		OUTPUT - $'x'
+
+TEST 07	obs-l
+
+	EXEC	-1l
+		INPUT - $'x\ny'
+		OUTPUT - $'y'
+
+	EXEC	+1l
+		INPUT - $'x\ny'
+		OUTPUT - $'x\ny'
+
+	EXEC	+2l
+		INPUT - $'x\ny'
+		OUTPUT - $'y'
+
+	EXEC	-1
+		INPUT - $'x'
+		OUTPUT - $'x'
+
+TEST 08	obs
+
+	EXEC	-1
+		INPUT - $'x\ny'
+		OUTPUT - $'y'
+
+	EXEC	+1
+		INPUT - $'x\ny'
+		OUTPUT - $'x\ny'
+
+	EXEC	+2
+		INPUT - $'x\ny'
+		OUTPUT - $'y'
+
+	EXEC	+c
+		INPUT - $'xyyyyyyyyyyz'
+		OUTPUT - $'yyz'
+
+	EXEC	-c
+		OUTPUT - $'yyyyyyyyz'
+
+	EXEC	+c
+		INPUT -n - $'xyyyyyyyyyyz'
+		OUTPUT -n - $'yyz'
+
+	EXEC	-c
+		OUTPUT -n - $'yyyyyyyyyz'
+
+TEST 09	obsx
+
+	EXEC	+l
+		INPUT -n - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+		OUTPUT -n - $'y\ny\nz'
+
+	EXEC	-l
+		INPUT - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+		OUTPUT - $'y\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+
+TEST 10	empty
+
+	EXEC	-
+
+	EXEC	-c
+
+TEST 11 err
+
+	EXEC	+cl
+		ERROR - $'tail: -c: l: invalid numeric argument -- unknown suffix
+Usage: tail [-fhLqrsv] [-n lines] [-c[chars]] [-t timeout] [file ...]'
+		EXIT 2
+
+	EXEC	-cl
+
+	EXEC	+2cz
+		ERROR - $'tail: z: invalid suffix
+Usage: tail [-fhLqrsv] [-n lines] [-c[chars]] [-t timeout] [file ...]'
+
+	EXEC	-2cX
+		ERROR - $'tail: X: invalid suffix
+Usage: tail [-fhLqrsv] [-n lines] [-c[chars]] [-t timeout] [file ...]'
+
+	EXEC	-c99999999999999999999
+		ERROR - $'tail: -c: 99999999999999999999: invalid numeric argument -- out of range
+Usage: tail [-fhLqrsv] [-n lines] [-c[chars]] [-t timeout] [file ...]'
+
+TEST 12	minus
+
+	EXEC	-
+		INPUT - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+		OUTPUT - $'y\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+
+	EXEC	-n 10
+
+TEST 13	n
+
+	EXEC	-n -10
+		INPUT - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+		OUTPUT - $'y\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+
+	EXEC	-n +10
+		INPUT - $'x\ny\ny\ny\ny\ny\ny\ny\ny\ny\ny\nz'
+		OUTPUT - $'y\ny\nz'
+
+	EXEC	-n +0
+		INPUT - $'y\ny\ny\ny\ny'
+		OUTPUT - $'y\ny\ny\ny\ny'
+
+	EXEC	-n +1
+		INPUT - $'y\ny\ny\ny\ny'
+		OUTPUT - $'y\ny\ny\ny\ny'
+
+	EXEC	-n -0
+		INPUT - $'y\ny\ny\ny\ny'
+		OUTPUT - 
+
+	EXEC	-n -1
+		INPUT - $'y\ny\ny\ny\ny'
+		OUTPUT - $'y'
+
+	EXEC	-n  0
+		INPUT - $'y\ny\ny\ny\ny'
+		OUTPUT - 

@@ -1,3 +1,6 @@
+06-06-28 proto.tst: add more externalize tests
+06-05-09 proto.c: add --externalize, -x
+06-05-09 proto.tst: add -x tests
 05-12-25 ratz.c: fix sear CreateDirectory(tmp) permissions
 05-09-16 proto.c: add <stdio.h> for standalone rename() prototype
 05-07-31 proto.c: finally trust __STDC__ headers

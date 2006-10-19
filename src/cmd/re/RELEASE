@@ -1,3 +1,8 @@
+06-10-11 add sfstruse() error checks
+06-08-16 testglob.dat,noop.dat: add KRE ~(N) tests
+06-07-28 testglob.(c|dat): add gl_extra tests
+06-07-17 reg.dat: handle (?p) (pedandic RE checks)
+06-07-17 zero.dat: update inline option tests
 05-12-14 grep.c: add --name=name (-N) for stdin file label
 05-08-18 grep.c: add --label, -m and --total, -t
 05-06-06 reg.dat: transcribe from tcl 8.3 Spencer reg.test

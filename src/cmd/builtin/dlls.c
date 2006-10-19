@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2005 AT&T Corp.                  *
+*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: dlls (AT&T Labs Research) 2005-02-14 $\n]"
+"[-?\n@(#)$Id: dlls (AT&T Research) 2006-06-24 $\n]"
 USAGE_LICENSE
 "[+NAME?dlls - list dlls and shared libraries on $PATH]"
 "[+DESCRIPTION?\bdlls\b lists the base name and full path, one per line, of"
@@ -46,6 +46,8 @@ USAGE_LICENSE
 "	library. The address or lookup error is listed for each library"
 "	and \asymbol\a.]"
 "[b:base?List the \adll\a or \ashared library\a base names.]"
+"[c:containing?Only list libraries containing at least one of the \asymbol\a"
+"	operands.]"
 "[i:info?List native dll naming and location information.]"
 "[p:path?List the \adll\a or \ashared library\a path names.]"
 
@@ -59,9 +61,10 @@ USAGE_LICENSE
 #include <cmd.h>
 #include <dlldefs.h>
 
-#define LIST_BASE	01
-#define LIST_INFO	02
-#define LIST_PATH	04
+#define LIST_BASE	0x1
+#define LIST_INFO	0x2
+#define LIST_ONLY	0x4
+#define LIST_PATH	0x8
 
 int
 b_dlls(int argc, char** argv, void* context)
@@ -69,6 +72,7 @@ b_dlls(int argc, char** argv, void* context)
 	int		i;
 	int		r;
 	int		flags;
+	int		only;
 	char**		syms;
 	char*		arg[3];
 	void*		dll;
@@ -80,6 +84,7 @@ b_dlls(int argc, char** argv, void* context)
 	NoP(argc);
 	cmdinit(argv, context, ERROR_CATALOG, 0);
 	flags = 0;
+	only = 0;
 	for (;;)
 	{
 		switch (optget(argv, usage))
@@ -88,6 +93,9 @@ b_dlls(int argc, char** argv, void* context)
 			break;
 		case 'b':
 			flags |= LIST_BASE;
+			continue;
+		case 'c':
+			only = 1;
 			continue;
 		case 'i':
 			flags |= LIST_INFO;
@@ -137,6 +145,8 @@ b_dlls(int argc, char** argv, void* context)
 		for (i = 0; i < elementsof(arg); i++)
 			if (arg[i] = *argv)
 				argv++;
+		if (only && !*argv)
+			error(ERROR_usage(2), "%s", optusage(NiL));
 		r = 1;
 		for (;;)
 		{
@@ -145,34 +155,63 @@ b_dlls(int argc, char** argv, void* context)
 				while (dle = dllsread(dls))
 				{
 					r = 0;
-					switch (flags)
+					if (!only)
 					{
-					case LIST_BASE:
-						sfprintf(sfstdout, "%s\n", dle->name);
-						break;
-					case LIST_PATH:
-						sfprintf(sfstdout, "%s\n", dle->path);
-						break;
-					default:
-						sfprintf(sfstdout, "%14s %s\n", dle->name, dle->path);
-						break;
-					}
-					if (*(syms = argv))
-					{
-						if (dll = dlopen(dle->path, RTLD_LAZY))
+						switch (flags)
 						{
-							do
-							{
-								sfprintf(sfstdout, "               %14s ", *syms);
-								if (sym = dlllook(dll, *syms))
-									sfprintf(sfstdout, "%p\n", sym);
-								else
-									sfprintf(sfstdout, "%s\n", dlerror());
-							} while (*++syms);
-							dlclose(dll);
+						case LIST_BASE:
+							sfprintf(sfstdout, "%s\n", dle->name);
+							break;
+						case LIST_PATH:
+							sfprintf(sfstdout, "%s\n", dle->path);
+							break;
+						default:
+							sfprintf(sfstdout, "%14s %s\n", dle->name, dle->path);
+							break;
 						}
-						else
-							sfprintf(sfstdout, "               %s\n", dlerror());
+						if (*(syms = argv))
+						{
+							if (dll = dlopen(dle->path, RTLD_LAZY))
+							{
+								do
+								{
+									sfprintf(sfstdout, "               %14s ", *syms);
+									if (sym = dlllook(dll, *syms))
+										sfprintf(sfstdout, "%p\n", sym);
+									else
+										sfprintf(sfstdout, "%s\n", dlerror());
+								} while (*++syms);
+								dlclose(dll);
+							}
+							else
+								sfprintf(sfstdout, "               %s\n", dlerror());
+						}
+					}
+					else if (dll = dlopen(dle->path, RTLD_LAZY))
+					{
+						i = 1;
+						for (syms = argv; *syms; syms++)
+							if (sym = dlllook(dll, *syms))
+							{
+								if (i)
+								{
+									i = 0;
+									switch (flags)
+									{
+									case LIST_BASE:
+										sfprintf(sfstdout, "%s\n", dle->name);
+										break;
+									case LIST_PATH:
+										sfprintf(sfstdout, "%s\n", dle->path);
+										break;
+									default:
+										sfprintf(sfstdout, "%14s %s\n", dle->name, dle->path);
+										break;
+									}
+								}
+								sfprintf(sfstdout, "               %14s %p\n", *syms, sym);
+							}
+						dlclose(dll);
 					}
 				}
 				dllsclose(dls);

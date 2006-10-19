@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2006 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -201,7 +201,8 @@ filein(register Archive_t* ap, register File_t* f)
 				{
 					s = fp->argv[n];
 					listprintf(state.tmp.str, ap, f, s);
-					fp->argv[n] = sfstruse(state.tmp.str);
+					if (!(fp->argv[n] = sfstruse(state.tmp.str)))
+						nospace();
 					break;
 				}
 			}
@@ -480,7 +481,8 @@ copy(register Archive_t* ap, register int (*copyfile)(Ftw_t*))
 			else
 				c = sfvalue(sfstdin) - 1;
 			sfwrite(state.tmp.lst, s, c);
-			s = sfstruse(state.tmp.lst);
+			if (!(s = sfstruse(state.tmp.lst)))
+				nospace();
 			flags = state.ftwflags;
 			if (state.filter.line)
 			{

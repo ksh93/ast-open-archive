@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: tr (AT&T Labs Research) 2005-08-07 $\n]"
+"[-?\n@(#)$Id: tr (AT&T Research) 2005-08-07 $\n]"
 USAGE_LICENSE
 "[+NAME?tr - translate, squeeze, and/or delete characters]"
 "[+DESCRIPTION?\btr\b copies the standard input to the standard output"

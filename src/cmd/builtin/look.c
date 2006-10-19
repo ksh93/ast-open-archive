@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1992-2005 AT&T Corp.                  *
+*           Copyright (c) 1992-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -30,7 +30,7 @@
 #endif
 
 static const char usage[] =
-"[-?@(#)$Id: look (AT&T Labs Research) 2002-04-15 $\n]"
+"[-?@(#)$Id: look (AT&T Research) 2002-04-15 $\n]"
 USAGE_LICENSE
 "[+NAME?look - displays lines beginning with a given prefix]"
 "[+DESCRIPTION?\blook\b displays all lines in the sorted \afile\a arguments"

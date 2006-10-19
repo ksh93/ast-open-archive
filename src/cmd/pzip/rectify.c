@@ -24,7 +24,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: rectify (AT&T Labs Research) 1999-03-22 $\n]"
+"[-?\n@(#)$Id: rectify (AT&T Research) 1999-03-22 $\n]"
 USAGE_LICENSE
 "[+NAME?rectify - induce fixed length record groups from data]"
 "[+DESCRIPTION?\brectify\b induces fixed length record groups from input data"

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1987-2005 AT&T Corp.                  *
+*           Copyright (c) 1987-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -479,6 +479,7 @@ struct Filter_s
 	{ \
 	int		bufferindex;	/* delta buffer index		*/ \
 	int		buffersize;	/* delta buffer size		*/ \
+	int		update;		/* update only delta members	*/ \
 	}		delta;		/* delta info			*/ \
 	int		delta2delta;	/* -rz- -wz- : retain delta info*/ \
 	int		descend;	/* dir names self+descendents	*/ \

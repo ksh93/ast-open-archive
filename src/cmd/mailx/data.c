@@ -10,7 +10,7 @@
 static const char	id[] = STAMP;
 
 static const char	terms[] = "\n\
-@(#)Copyright (c) 1980, 1993, 1996 - 2005\n\
+@(#)Copyright (c) 1980, 1993, 1996 - 2006\n\
 \tThe Regents of the University of California. All rights reserved.\n\
 \n\
 Redistribution and use in source and binary forms, with or without\n\
@@ -44,6 +44,7 @@ SUCH DAMAGE.\n\
  */
 
 #define CMD(x)		(Cmd_f)x
+#define ARGMAX		1024
 
 static const struct cmd	cmdtab[] =
 {
@@ -56,7 +57,7 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ]\nReply to the first message, sending the message to the sender of each selected message. The reply is recorded in a file name derived from the sender of the first message."),
 "Fr[om]",	CMD(From),		MSGLIST,	0,	MMNORM,
 	X("[ message ]\nList the status and sender for the selected messages."),
-"G[et]",	CMD(Get),		M|RAWLIST,	0,	ARG_MAX,
+"G[et]",	CMD(Get),		M|RAWLIST,	0,	ARGMAX,
 	X("[ attachment [ file ... ] ]\nEquivalent to get except the ${MAILCAP} command is not executed."),
 "J[oin]",	CMD(Join),		R|I|MSGLIST,	0,	MMNDEL,
 	X("[ message ...]\nEquivalent to the command sequence Reply ~m ~v."),
@@ -78,9 +79,9 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ] start directory\nSplit the messages into files numbered from start in the named directory, marking the messages SAVE. All headers are ignored. Attachments are named n-m. A line containing <path> <n> <lines> <chars> is listed for each message. Optional attachment information is appended to each line: <n>-<m> <name> <type> <lines> <chars>."),
 "T[ype]",	CMD(Type),		MSGLIST,	0,	MMNDEL,
 	X("[ message ... ]\nEquivalent to Print [ message ... ]"),
-"a[lias]",	CMD(alias),		M|Z|RAWLIST,	0,	ARG_MAX,
+"a[lias]",	CMD(alias),		M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ name [ value ] | < file ]\nDeclare an address alias value for name. If value is omitted then the alias for name is listed. If name is omitted then all aliases are listed. < file reads sendmail aliases from file."),
-"alt[ernates]",	CMD(alternates),	M|Z|RAWLIST,	0,	ARG_MAX,
+"alt[ernates]",	CMD(alternates),	M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ name ... ]\nDeclare a list of alternate names for the current user. The names are translated to aliases of the current user login name. If name is omitted then the alternate names are listed."),
 "b[last]",	CMD(blast),		MSGLIST,	0,	MMNDEL,
 	X("[ message ... ]\nList the selected messages as name=value pairs suitable for input to the shell."),
@@ -92,7 +93,7 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ] [ file ]\nCopy the selected messages to file without marking the messages SAVE. If file is omitted then ${MBOX} is used."),
 "d[elete]",	CMD(cmddelete),	W|P|MSGLIST,	0,	MMNDEL,
 	X("[ message ... ]\nMark the the selected messages to be DELETE from the mailbox. If ${autoprint} is set then the next unREAD message will be listed."),
-"di[scard]",	CMD(ignore),		M|Z|RAWLIST,	0,	ARG_MAX,
+"di[scard]",	CMD(ignore),		M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ header ...]\nEquivalent to ignore [ header ]."),
 "dot",		CMD(dot),		Z|NOLIST,	0,	0,
 	X("\nList the current message number. Equivalent to `.'."),
@@ -102,7 +103,7 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ]\nEquivalent to dp."),
 "du[plicate]",	CMD(duplicate),		M|STRLIST,	0,	0,
 	X("[ message ... ] address ...\nDuplicate the selected messages to address ... without marking the messages SAVE. The original sender information is preserved. The messages are transferred via SMTP using the ${smtp} host."),
-"ec[ho]",	CMD(echo),		M|Z|RAWLIST,	0,	ARG_MAX,
+"ec[ho]",	CMD(echo),		M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ arg ... ]\nThe arguments are listed after mail and shell file name expansion."),
 "e[dit]",	CMD(editor),		I|MSGLIST,	0,	MMNORM,
 	X("[ message ... ]\nPlace each selected message in a temporary file and invoke ${EDITOR} on the file. The mailbox is not affected."),
@@ -122,19 +123,19 @@ static const struct cmd	cmdtab[] =
 	X("[ message ]\nReply to message, recording the reply on a file name derived from the sender of the message."),
 "f[rom]",	CMD(from),		MSGLIST,	0,	MMNORM,
 	X("[ message ]\nList the header summary for the selected messages."),
-"g[et]",	CMD(get),		M|RAWLIST,	0,	ARG_MAX,
+"g[et]",	CMD(get),		M|RAWLIST,	0,	ARGMAX,
 	X("[ attachment [ file ... ] ]\nCopy the attachments in the attachment number list from the current message into file. If file is omitted then the file name from the message attachment line is used. If the content type matches an entry in ${MAILCAP} then the corresponding command is executed. If all arguments are omitted then list the attachment summary for the current message. Valid only after a print or type command has been issued on the current message. A file name of - lists the contents on the standard output. A directory file argument copies the attachment to that directory."),
-"gr[oup]",	CMD(alias),		M|RAWLIST,	0,	ARG_MAX,
+"gr[oup]",	CMD(alias),		M|RAWLIST,	0,	ARGMAX,
 	X("[ name [ value ] ]\nEquivalent to alias [ name [ value ] ]."),
 "h[eaders]",	CMD(headers),		Z|MSGLIST,	0,	MMNDEL,
 	X("[ message ]\nList a page of header summaries that includes the selected message. ${screen} determines the numbers of summaries per page."),
-"hel[p]",	CMD(help),		M|Z|RAWLIST,	0,	ARG_MAX,
+"hel[p]",	CMD(help),		M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ all | command | ~ [ command ] | set [ all | variable ] ]\nList help information for all or selected commands or variables. Equivalent to `?'."),
 "ho[ld]",	CMD(preserve),	W|MSGLIST,	0,	MMNDEL,
 	X("[ message ... ]\nEquivalent to preserve [ message ... ]"),
 "i[f]",		CMD(cmdif),		C|M|RAWLIST,	1,	3,
 	X("[ [!] variable | [ d | f ] path | \"a\" [!][=|~] \"b\"\nConditional command execution to be combined with else and endif. r is equivalent to receive and s is equivalent to !receive. d path is true if path is a directory, f path is true if path is a regular file. [!]= is for string [in]equality and [!]~ is for fnmatch(\"b\",\"a\",0)."),
-"ig[nore]",	CMD(ignore),		M|RAWLIST,	0,	ARG_MAX,
+"ig[nore]",	CMD(ignore),		M|RAWLIST,	0,	ARGMAX,
 	X("[ name ...]\nAdd the name arguments to the list of header field names to be suppressed by the copy, print, and save commands. If name is omitted then the ignored header field names are listed. If both retain and ignore are given then the ignore command is ignored."),
 "im[ap]",	CMD(imap_command),		STRLIST,	0,	0,
 	X("[ command ... | dump [ fl[ags] | f[older] | m[essage] | q[ueue] | s[tate] ] ]\nSend command to the IMAP server with message response tracing enabled for the duration of the command, or dump portions of the internal IMAP client state."),
@@ -158,7 +159,7 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ] [no|un]mark[,...]\nSet or clear marks on the selected messages. The marks are: delete, dot (>), mbox (M), new (N), preserve (P), save (*), spam (X), touch, unread (U). Multiple marks may be separated by , or |. If mark is omitted then spam is assumed."),
 "mb[ox]",	CMD(mboxit),		W|STRLIST,	0,	0,
 	X("[ message ... ]\nAppend the selected messages to ${MBOX} on normal exit."),
-"mi[me]",	CMD(capability),	M|Z|RAWLIST,	0,	ARG_MAX,
+"mi[me]",	CMD(capability),	M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ pattern [;] [ command ] | < file ]\nDeclare a command to be executed by the get command for attachments whose content type matches pattern. If pattern does not contain `/' then it is treated as `pattern/*'; `/*' is the only recognized metacharacter sequence. If command is omitted and `;' is not the command for pattern is deleted, otherwise if `;' is omitted the command for pattern is listed. If command is omitted then all capabilities matching pattern are listed. < file reads mailcap entries from file. Default capabilities are initialized from ${MAILCAP}. `#' is the comment character and `\\' escapes the special meaning of `;', `\\', and <newline>. `%s' in command expands to the attachment file name, `%t' expands to the content type, `%{name}' expands to the value of the name option in the content type header. If `%s' is omitted then attachment is piped to command."),
 "mk[dir]",	CMD(cmdmkdir),		M|Z|RAWLIST,	1,	1,
 	X("directory\nCreate a new folder directory."),
@@ -190,7 +191,7 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ]\nEquivalent to Reply, except ${flipr} is ignored."),
 "r[espond]",	CMD(reply),		I|R|MSGLIST,	0,	MMNDEL,
 	X("[ message ... ]\nEquivalent to reply [ message ... ]."),
-"ret[ain]",	CMD(retain),		M|Z|RAWLIST,	0,	ARG_MAX,
+"ret[ain]",	CMD(retain),		M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ name ...]\nAdd the name arguments to the list of header field names to be retained by the copy, print, and save commands. Header names not on the retained list are suppressed. If name is omitted then the retained header field names are listed. If both retain and ignore are given then the ignore command is ignored."),
 "rm[dir]",	CMD(cmdrmdir),		M|Z|RAWLIST,	1,	1,
 	X("directory\nRemove an empty folder directory."),
@@ -198,11 +199,11 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ]\nEquivalent to replyall."),
 "s[ave]",	CMD(save),		STRLIST,	0,	0,
 	X("[ message ... ] [ file ]\nCopy the selected messages to file, marking the messages SAVE. If file is omitted then ${MBOX} is used."),
-"savei[gnore]",	CMD(saveignore),	M|Z|RAWLIST,	0,	ARG_MAX,
+"savei[gnore]",	CMD(saveignore),	M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ name ... ]\nSimilar to ignore [ name ... ] but only has affect on the save command."),
-"saver[etain]",	CMD(saveretain),	M|Z|RAWLIST,	0,	ARG_MAX,
+"saver[etain]",	CMD(saveretain),	M|Z|RAWLIST,	0,	ARGMAX,
 	X("[ name ... ]\nSimilar to retain [ name ... ] but only has affect on the save command."),
-"se[t]",	CMD(set),		M|Z|RAWLIST,	0,	ARG_MAX,
+"se[t]",	CMD(set),		M|Z|RAWLIST,	0,	ARGMAX,
 	X("[no]name[=value] ...\nAssign value to the variable name. If =value is omitted then the name is turned on. noname unsets the value of name. Some unset variables revert to their default values. With no arguments all set variables are listed. set all lists all set and unset variables."),
 "sh[ell]",	CMD(shell),		I|Z|STRLIST,	0,	0,
 	X("\nInvoke an interactive ${SHELL}."),
@@ -218,15 +219,15 @@ static const struct cmd	cmdtab[] =
 	X("[ message ... ]\nTouch the selected messages by placing unDELETE and unSAVE messages in ${MBOX} on normal exit."),
 "t[ype]",	CMD(type),		MSGLIST,	0,	MMNDEL,
 	X("[ message ... ]\nEquivalent to print [ message ... ]"),
-"una[lias]",	CMD(unalias),		M|Z|RAWLIST,	1,	ARG_MAX,
+"una[lias]",	CMD(unalias),		M|Z|RAWLIST,	1,	ARGMAX,
 	X("[ name ... ]\nDelete the aliases for the name arguments."),
 "u[ndelete]",	CMD(undelete),	P|MSGLIST,	MDELETE,MMNDEL,
 	X("[ message ... ]\nRestore the selected messages by removing the DELETE mark. If no messages are specified then the most recent DELETE message is restored. If ${autoprint} is on then the last restored message is listed."),
-"ung[roup]",	CMD(unalias),		M|Z|RAWLIST,	1,	ARG_MAX,
+"ung[roup]",	CMD(unalias),		M|Z|RAWLIST,	1,	ARGMAX,
 	X("[ name ... ]\nEquivalent to unalias [ name ... ]."),
 "unr[ead]",	CMD(unread),		STRLIST,	0,	0,
 	X("[ message ... ]\nRemove the READ mark from the selected messages. If no messages are specified then the most recent DELETE message is restored."),
-"uns[et]",	CMD(unset),		M|Z|RAWLIST,	0,	ARG_MAX,
+"uns[et]",	CMD(unset),		M|Z|RAWLIST,	0,	ARGMAX,
 	X("name ...\nEquivalent to set noname no... With no arguments all unset variables are listed. unset all lists all set and unset variables."),
 "ve[rsion]",	CMD(version),		M|Z|NOLIST,	0,	0,
 	X("\nList the current program version."),

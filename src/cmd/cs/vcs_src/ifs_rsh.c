@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2005 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -51,11 +51,11 @@ struct server_info *srv;
     if( *rpath == '\0' || DashD( lpath ) ) {
 	if( *rpath == '\0' ) rpath = "/";
 	if( userid == NULL || *userid == '\0' ) {
-	    sprintf( cmd, "rsh %s", hostid );
+	    sfsprintf( cmd, sizeof(cmd), "rsh %s", hostid );
 	} else {
-	    sprintf( cmd, "rsh -l %s %s", userid, hostid );
+	    sfsprintf( cmd, sizeof(cmd), "rsh -l %s %s", userid, hostid );
 	}
-	sprintf( buf, "%s /bin/ls -alL %s", cmd, rpath );
+	sfsprintf( buf, sizeof(buf), "%s /bin/ls -alL %s", cmd, rpath );
 	logit( buf );
 	logit( "\n" );
 	if( (fp = popen( buf, "rw" )) == NULL )
@@ -69,7 +69,7 @@ struct server_info *srv;
 	    write( fd, buf, strlen(buf) );
 	close( fd );
 	fclose( fp );
-	sprintf( buf, "%s/._dir", lpath );
+	sfsprintf( buf, sizeof(buf), "%s/._dir", lpath );
 	MakePath( buf );
 	chdir( lpath );
 	ftp_makedents( tmpfile );
@@ -77,12 +77,12 @@ struct server_info *srv;
 	symlink( mitem->timeout, "._cache_time" );
     } else {
 	if( userid == NULL || *userid == '\0' ) {
-	    sprintf( cmd, "%s", hostid );
+	    sfsprintf( cmd, sizeof(cmd), "%s", hostid );
 	} else { 
-	    sprintf( cmd, "%s@%s", userid, hostid );
+	    sfsprintf( cmd, sizeof(cmd), "%s@%s", userid, hostid );
 	}
 	MakeTmpFile( lpath, tmpfile, sizeof(tmpfile) );
-	sprintf( buf, "rcp %s:%s %s", cmd, rpath, tmpfile );
+	sfsprintf( buf, sizeof(buf), "rcp %s:%s %s", cmd, rpath, tmpfile );
 	logit( buf );
 	logit( "\n" );
 	if( (fp = popen( buf, "rw" )) == NULL )

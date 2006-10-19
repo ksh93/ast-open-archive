@@ -1,6 +1,6 @@
 # regression tests for codex(1) and codex(3)
 
-umask 022
+UMASK 022
 
 KEEP "*.dat"
 
@@ -18,6 +18,7 @@ function DATA
 			do	print -f "\\${o#8#}"
 			done
 			;;
+		0.dat)	;;
 		1.dat)	print -f $'\001'
 			;;
 		2.dat)	print -f $'\001\002'
@@ -284,3 +285,22 @@ opqrstuvwxyz{|}~=7F=80=81=82=83=84=85=86=87=88=89=8A=8B=8C=8D=8E=8F=90=91=
 	EXEC	-r '>uu-base64'
 		SAME INPUT test.dat
 		SAME OUTPUT big.dat
+
+TEST 05 'uu boundaries'
+	DO	DATA 0.dat 1.dat 2.dat 3.dat abc.dat
+
+	for u in posix mime bsd
+	do	for t in '' -text
+		do	for f in 0 1 2 3 abc
+			do
+
+	EXEC	-e uu-$u$t
+		INPUT $f.dat
+		MOVE OUTPUT test.dat
+	EXEC	-d uu-$u$t
+		SAME INPUT test.dat
+		SAME OUTPUT $f.dat
+
+	done
+	done
+	done

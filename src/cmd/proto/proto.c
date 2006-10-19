@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1990-2006 AT&T Corp.                  *
+*           Copyright (c) 1990-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -32,7 +32,7 @@
 #if !PROTO_STANDALONE
 
 static const char usage[] =
-"[-?\n@(#)$Id: proto (AT&T Labs Research) 2004-10-22 $\n]"
+"[-?\n@(#)$Id: proto (AT&T Research) 2006-05-09 $\n]"
 USAGE_LICENSE
 "[+NAME?proto - make prototyped C source compatible with K&R, ANSI and C++]"
 "[+DESCRIPTION?\bproto\b converts ANSI C prototype constructs in \afile\a"
@@ -102,7 +102,7 @@ USAGE_LICENSE
 "			[+special?Nonstandard license text and notices.]"
 "		}"
 "		[+corporation?They own it all, e.g., \bAT&T\b.]"
-"		[+company?Within the corporation, e.g., \bLabs Research\b.]"
+"		[+company?Within the corporation, e.g., \bResearch\b.]"
 "		[+location?Company location.]"
 "		[+organization?Within the company, e.g., \bNetwork Services"
 "			Research Department\b.]"
@@ -132,6 +132,8 @@ USAGE_LICENSE
 "	equivalent inline.]"
 "[t:test?Enable test code. Use at your own risk.]"
 "[v:verbose?List each file as it is processed.]"
+"[x:externalize?Convert \bstatic\b function attributes to \bextern\b.  Used"
+"	for analysis programs that only instrument \bextern\b functions.]"
 "[z:zap?Disable conversion and remove \b#pragma prototyped\b.]"
 "[C:copy?Convert each input \afile\a to \adirectory\a/\afile\a,"
 "	making intermediate directories as necessary.]:[directory]"
@@ -537,6 +539,9 @@ main(int argc, char** argv)
 			case 'v':
 				flags |= PROTO_VERBOSE;
 				continue;
+			case 'x':
+				flags |= PROTO_EXTERNALIZE;
+				continue;
 			case 'z':
 				flags |= PROTO_DISABLE|PROTO_NOPRAGMA;
 				continue;
@@ -632,6 +637,9 @@ main(int argc, char** argv)
 			continue;
 		case 'v':
 			flags |= PROTO_VERBOSE;
+			continue;
+		case 'x':
+			flags |= PROTO_EXTERNALIZE;
 			continue;
 		case 'z':
 			flags |= PROTO_DISABLE|PROTO_NOPRAGMA;

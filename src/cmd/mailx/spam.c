@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -681,7 +681,14 @@ spammed(register struct msg* mp)
 				}
 				else if (!strcasecmp(t, "Subject"))
 				{
-					if (state.var.spamsub)
+					s = pp.data;
+					while (n = *s++)
+						if (n != ' ' && n != '\t' && isspace(n))
+						{
+							test |= SPAM_subject_spam;
+							break;
+						}
+					if (!(test & SPAM_subject_spam) && state.var.spamsub)
 					{
 						if (wordmatch(strlower(pp.data), state.var.spamsub))
 							test |= SPAM_subject_spam;
