@@ -1048,7 +1048,9 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-06-10-23  --- Release ksh93s-  ---
+06-10-24  --- Release ksh93s-  ---
+06-10-24  The value of $! is now set to the process id of a job put
+	  into the background with the bg command as required by POSIX.
 06-10-23  A bug in which the value of $! was affected by a background
 	  job started from a subshell has been fixed.
 06-10-23  A bug in ${var:offset:len} in multibyte locales has been fixed.
@@ -5883,8 +5885,13 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-10-26 sfio/sfvprintf.c: %md =&gt; fmtscale(1000), %mi =&gt; fmtscale(1024)
+06-10-26 features/map.c: _map_libc cleanup
+06-10-26 features/fcntl: add to the circle of trust
+06-10-26 features/sys: add &lt;sys/socket.h&gt; socklen_t
+06-10-26 include/regex.h: handle include before &lt;ast_map.h&gt;
+06-10-25 astconf "SHELL" =&gt; "SH" to avoid _POSIX_SHELL conflict
 06-10-25 comp/conf.*: drop no-op duplicate conftab.c entries
-06-10-19 sfio/sfvprintf.c: %W.P.Bmd =&gt; fmtscale() using string W.P
 06-10-18 string/fmtscale.c: 1000: n&#0091;.&#0093;nn(kMGTPE), 1024: n&#0091;.&#0093;nn(KMGTPE)i
 06-10-11 ast_std.h: now implies &lt;sys/stat.h&gt; (did on most before anyway)
 06-10-11 strtoi.h: ignore sign for 0, validate scale shift
@@ -7264,6 +7271,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-10-26 fds.c: handle sctp
 06-10-18 tail.c: fix invalid suffix infinite loop
 06-10-11 chgrp.c,cp.c: add sfstruse() error checks
 06-10-10 tee.c: add --linebuffer, -l
@@ -8733,7 +8741,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>October 25, 2006</TD>
+<TD align=right>October 26, 2006</TD>
 </TR>
 </TABLE>
 <P>

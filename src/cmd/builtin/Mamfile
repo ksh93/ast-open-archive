@@ -70,6 +70,10 @@ make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
@@ -209,10 +213,7 @@ done pty generated
 make nl
 make nl.o
 make nl.c
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/regex.h
+prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cmd.h implicit
 done nl.c
 meta nl.o %.c>%.o nl.c nl

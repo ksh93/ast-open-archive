@@ -88,8 +88,14 @@ done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
 make windows.h implicit
 done windows.h dontcare virtual
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
@@ -113,9 +119,7 @@ prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done zconf.h dontcare

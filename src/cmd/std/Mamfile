@@ -50,6 +50,13 @@ make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
@@ -62,10 +69,7 @@ done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
 make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
@@ -266,10 +270,7 @@ make features/locales
 done features/locales
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : run features/locales
 done FEATURE/locales generated
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/regex.h
+prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/tm.h implicit
 make ${PACKAGE_ast_INCLUDE}/times.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit

@@ -119,6 +119,10 @@ make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
@@ -341,6 +345,12 @@ make ../../lib/libast/comp/spawnveg.c implicit
 make ${PACKAGE_ast_INCLUDE}/ast_vfork.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_vfork.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
+make ${PACKAGE_ast_INCLUDE}/wait.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/wait.h dontcare
 make process.h implicit
 done process.h dontcare virtual
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -354,12 +364,7 @@ done ../../lib/libast/path/pathshell.c
 make ../../lib/libast/comp/waitpid.c implicit
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
-make ${PACKAGE_ast_INCLUDE}/wait.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/wait.h
+prev ${PACKAGE_ast_INCLUDE}/wait.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ../../lib/libast/comp/waitpid.c
 make ../../lib/libast/misc/sigcrit.c implicit
