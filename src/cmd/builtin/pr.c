@@ -543,13 +543,13 @@ static int prcol(register Pr_t *pp)
 static ssize_t
 c_read(Sfio_t* fp, void* buf, size_t n, Sfdisc_t* dp)
 {
-	register Pr_t*	pp = (Pr_t*)dp;
-	register char*	s = (char*)buf;
-	register char*	e = s + n;
-	register int	c;
-	ssize_t		z;
+	register Pr_t*		pp = (Pr_t*)dp;
+	register char*		s = (char*)buf;
+	register char*		e = s + n;
+	register int		c;
+	ssize_t			z;
 
-	static char	hat[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
+	static const char	hat[] = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_";
 
 	if (pp->control.cur >= pp->control.end)
 	{
@@ -653,7 +653,7 @@ b_pr(int argc, char **argv, void* context)
 	register Sfio_t *fp;
 	struct stat statb;
 
-	cmdinit(argv, context, ERROR_CATALOG, 0);
+	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	pp = prinit();
 	for (;;)
 	{
@@ -911,5 +911,7 @@ b_pr(int argc, char **argv, void* context)
 		pp->nopen = n;
 		prcol(pp);
 	}
+	if (pp->control.buf)
+		free(pp->control.buf);
 	return error_info.errors != 0;
 }

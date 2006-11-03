@@ -879,7 +879,7 @@ done ${INSTALLROOT}/include/tcl generated
 make ${INSTALLROOT}/include/tcl/tk.h
 prev ${INSTALLROOT}/include/tcl
 prev generic/tk.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic   generic/tk.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic   generic/tk.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${INSTALLROOT}/include/tcl/tk.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${INSTALLROOT}/include/tcl/tk.h

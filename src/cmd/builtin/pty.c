@@ -277,8 +277,8 @@ int b_pty(int argc, char *argv[], void *context)
 {
 	int master,slave,flags=PROC_SESSION;
 	Proc_t *proc;
-	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG, 0);
+
+	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	for (;;)
 	{
 		switch (optget(argv, usage))

@@ -120,7 +120,7 @@ TEST 02 'archive format conversion'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x asc
 		OUTPUT -
-		ERROR -
+		ERROR - '116 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
@@ -128,7 +128,7 @@ TEST 02 'archive format conversion'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x aschk
 		OUTPUT -
-		ERROR -
+		ERROR - '116 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
@@ -136,7 +136,7 @@ TEST 02 'archive format conversion'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x binary
 		OUTPUT -
-		ERROR -
+		ERROR - '54 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
@@ -144,7 +144,7 @@ TEST 02 'archive format conversion'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x cpio
 		OUTPUT -
-		ERROR -
+		ERROR - '99 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
@@ -152,7 +152,7 @@ TEST 02 'archive format conversion'
 
 	EXEC --comment=force-pax -rf $data/y2k.dat -wf y2k.pax -x pax
 		OUTPUT -
-		ERROR -
+		ERROR - '401 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
@@ -160,7 +160,7 @@ TEST 02 'archive format conversion'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x oldtar
 		OUTPUT -
-		ERROR -
+		ERROR - '399 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
@@ -168,7 +168,7 @@ TEST 02 'archive format conversion'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x ustar
 		OUTPUT -
-		ERROR -
+		ERROR - '399 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat
@@ -176,7 +176,7 @@ TEST 02 'archive format conversion'
 
 	EXEC -rf $data/y2k.dat -wf y2k.pax -x vdb
 		OUTPUT -
-		ERROR -
+		ERROR - '69 blocks'
 
 	EXEC --listformat="$dateformat" -vf y2k.pax
 		SAME OUTPUT list.dat

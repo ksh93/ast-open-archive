@@ -28,7 +28,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: od (AT&T Research) 2006-01-30 $\n]"
+"[-?\n@(#)$Id: od (AT&T Research) 2006-10-31 $\n]"
 USAGE_LICENSE
 "[+NAME?od - dump files in octal or other formats]"
 "[+DESCRIPTION?\bod\b dumps the contents of the input files"
@@ -114,6 +114,7 @@ USAGE_LICENSE
 #include <ccode.h>
 #include <ctype.h>
 #include <iconv.h>
+#include <vmalloc.h>
 
 #define NEW		(1<<0)
 #define OLD		(1<<1)
@@ -135,7 +136,9 @@ USAGE_LICENSE
 #define double_max	double
 #endif
 
-typedef char* (*Format_f)(int);
+struct State_s; typedef struct State_s State_t;
+
+typedef char* (*Format_f)(State_t*, int, char*, size_t);
 
 typedef struct Size_s
 {
@@ -174,18 +177,19 @@ typedef struct Format_s
 	short		us;
 } Format_t;
 
-static struct State_s
+struct State_s
 {
 	int		addr;
 	char		base[8];
 	int		block;
-	char		buf[256];
 	struct
 	{
 	char*		base;
 	size_t		size;
 	int		noshare;
 	}		buffer;
+	char*		buf;
+	size_t		bufsize;
 	size_t		count;
 	struct
 	{
@@ -213,7 +217,8 @@ static struct State_s
 	size_t		total;
 	int		verbose;
 	int		width;
-} state;
+	Vmalloc_t*	vm;
+};
 
 static const Size_t	csize[] =
 {
@@ -250,15 +255,14 @@ static const Size_t	fsize[] =
 };
 
 static char*
-aform(int c)
+aform(State_t* state, int c, char* buf, size_t siz)
 {
 	static const char	anames[] = "nulsohstxetxeoteqnackbel bs ht nl vt ff cr so sidledc1dc2dc3dc4naksynetbcan emsubesc fs gs rs us sp";
-	static char		buf[4];
 
 	if ((c &= 0177) == 0177)
 		return "del";
 	if (c <= 040)
-		sfsprintf(buf, sizeof(buf), "%3.3s", anames + 3 * c);
+		sfsprintf(buf, siz, "%3.3s", anames + 3 * c);
 	else
 	{
 		buf[0] = c;
@@ -268,20 +272,16 @@ aform(int c)
 }
 
 static char*
-bform(int c)
+bform(State_t* state, int c, char* buf, size_t siz)
 {
-	static char	buf[9];
-
-	sfsprintf(buf, sizeof(buf), "%08..2u", c);
+	sfsprintf(buf, siz, "%08..2u", c);
 	return buf;
 }
 
 static char*
-cform(int c)
+cform(State_t* state, int c, char* buf, size_t siz)
 {
 	register char*	s;
-
-	static char	buf[2];
 
 	switch (buf[0] = c)
 	{
@@ -290,6 +290,7 @@ cform(int c)
 	case '\\':
 		return "\\";
 	}
+	buf[1] = 0;
 	s = fmtesc(buf);
 	if (*s == '\\' && !isalpha(*(s + 1)))
 		s++;
@@ -297,19 +298,18 @@ cform(int c)
 }
 
 static char*
-mform(int c)
+mform(State_t* state, int c, char* buf, size_t siz)
 {
 	register char*	s;
 
-	static char	buf[2];
-
-	switch (buf[0] = ccmapchr(state.map, c))
+	switch (buf[0] = ccmapchr(state->map, c))
 	{
 	case 0:
 		return "00";
 	case '\\':
 		return "\\";
 	}
+	buf[1] = 0;
 	s = fmtesc(buf);
 	if (*s == '\\' && isdigit(*(s + 1)))
 		sfsprintf(s, 4, "%02lx", strtol(s + 1, NiL, 8));
@@ -365,7 +365,7 @@ static const Type_t	type[] =
  */
 
 static void
-format(register char* t)
+format(State_t* state, register char* t)
 {
 	register int		c;
 	register const Type_t*	tp;
@@ -385,7 +385,7 @@ format(register char* t)
 		while (c != tp->name)
 			if (++tp >= &type[elementsof(type)])
 			{
-				error(3, "%c: invalid type name", c);
+				error(2, "%c: invalid type name", c);
 				return;
 			}
 		if (!(zp = tp->size) && !tp->fun)
@@ -393,7 +393,7 @@ format(register char* t)
 			switch (tp->width[0])
 			{
 			case 1:
-				state.printable = 1;
+				state->printable = 1;
 				break;
 			}
 			continue;
@@ -415,9 +415,9 @@ format(register char* t)
 			if (!zp->name)
 			{
 				if (c)
-					error(3, "%c: invalid size for type %c", c, tp->name);
+					error(2, "%c: invalid size for type %c", c, tp->name);
 				else if (!(zp = xp) || tp->size == fsize)
-					error(3, "%d: invalid size for type %c", n, tp->name);
+					error(2, "%d: invalid size for type %c", n, tp->name);
 				break;
 			}
 			if (n)
@@ -442,20 +442,22 @@ format(register char* t)
 			else zp++;
 		}
 		i = zp - tp->size;
-		if (!(fp = newof(0, Format_t, 1, 0)))
+		if (!(fp = vmnewof(state->vm, 0, Format_t, 1, 0)))
 		{
-			error(ERROR_system(1), "out of space [format]");
+			error(ERROR_system(1), "out of space");
 			return;
 		}
-		if (state.last) state.last = state.last->next = fp;
-		else state.form = state.last = fp;
+		if (state->last)
+			state->last = state->last->next = fp;
+		else
+			state->form = state->last = fp;
 		fp->type = tp;
 		fp->fp = tp->size == fsize;
 		fp->us = tp->name != 'd';
 		fp->size.internal = zp->size;
 		fp->size.external = n ? n : zp->size;
-		if (fp->size.external > state.size)
-			state.size = fp->size.external;
+		if (fp->size.external > state->size)
+			state->size = fp->size.external;
 		fp->width = tp->width[i = WIDTHINDEX(fp->size.internal)];
 		if (n > 1 && (n & (n - 1)))
 		{
@@ -482,7 +484,7 @@ format(register char* t)
 }
 
 static Sfio_t*
-init(char*** p)
+init(State_t* state, char*** p)
 {
 	Sfio_t*	ip;
 	int_max	offset;
@@ -490,60 +492,60 @@ init(char*** p)
 	for (;;)
 	{
 		if (**p)
-			state.file = *((*p)++);
-		else if (state.file)
+			state->file = *((*p)++);
+		else if (state->file)
 			return 0;
-		if (!state.file || streq(state.file, "-"))
+		if (!state->file || streq(state->file, "-"))
 		{
-			state.file = "/dev/stdin";
+			state->file = "/dev/stdin";
 			ip = sfstdin;
 		}
-		else if (!(ip = sfopen(NiL, state.file, "r")))
+		else if (!(ip = sfopen(NiL, state->file, "r")))
 		{
-			error(ERROR_system(0), "%s: cannot open", state.file);
+			error(ERROR_system(0), "%s: cannot open", state->file);
 			error_info.errors = 1;
 			continue;
 		}
-		if (state.buffer.noshare)
+		if (state->buffer.noshare)
 			sfset(ip, SF_SHARE, 0);
-		if (state.buffer.size)
-			sfsetbuf(ip, state.buffer.base, state.buffer.size);
-		if (state.skip)
+		if (state->buffer.size)
+			sfsetbuf(ip, state->buffer.base, state->buffer.size);
+		if (state->skip)
 		{
 			if ((offset = sfseek(ip, (off_t)0, SEEK_END)) > 0)
 			{
-				if (offset <= state.skip)
+				if (offset <= state->skip)
 				{
-					state.skip -= offset;
-					state.offset += offset;
+					state->skip -= offset;
+					state->offset += offset;
 					goto next;
 				}
-				if (sfseek(ip, state.skip, SEEK_SET) != state.skip)
+				if (sfseek(ip, state->skip, SEEK_SET) != state->skip)
 				{
-					error(ERROR_system(2), "%s: seek error", state.file);
+					error(ERROR_system(2), "%s: seek error", state->file);
 					goto next;
 				}
-				state.offset += state.skip;
-				state.skip = 0;
+				state->offset += state->skip;
+				state->skip = 0;
 			}
 			else
 			{
 				for (;;)
 				{
-					if (!(state.peek.data = sfreserve(ip, SF_UNBOUND, 0)))
+					if (!(state->peek.data = sfreserve(ip, SF_UNBOUND, 0)))
 					{
 						if (sfvalue(ip))
-							error(ERROR_system(2), "%s: read error", state.file);
+							error(ERROR_system(2), "%s: read error", state->file);
 						goto next;
 					}
-					state.peek.size = sfvalue(ip);
-					if (state.peek.size < state.skip)
-						state.skip -= state.peek.size;
+					state->peek.size = sfvalue(ip);
+					if (state->peek.size < state->skip)
+						state->skip -= state->peek.size;
 					else
 					{
-						state.peek.data += state.skip;
-						state.peek.size -= state.skip;
-						state.skip = 0;
+						state->peek.data += state->skip;
+						state->peek.size -= state->skip;
+						state->skip = 0;
 						break;
 					}
 				}
@@ -557,16 +559,14 @@ init(char*** p)
 }
 
 static int
-block(Sfio_t* op, char* bp, char* ep, int_max base)
+block(State_t* state, Sfio_t* op, char* bp, char* ep, int_max base, char* buf, size_t siz)
 {
 	register Format_t*	fp;
 	register unsigned char*	u;
 	register char*		f;
 	unsigned long		n;
 	int_max			x;
-
-	static char		buf[256];
-	static union
+	union
 	{
 	char			m_char[sizeof(int_max) + sizeof(double_max)];
 	float			m_float;
@@ -576,25 +576,25 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 #endif
 	}			mem;
 
-	if (!state.verbose)
+	if (!state->verbose)
 	{
-		if (state.dup.size == (n = ep - bp) && !memcmp(state.dup.data, bp, n))
+		if (state->dup.size == (n = ep - bp) && !memcmp(state->dup.data, bp, n))
 		{
-			if (!state.dup.mark)
+			if (!state->dup.mark)
 			{
-				state.dup.mark = 1;
+				state->dup.mark = 1;
 				sfprintf(op, "*\n");
 			}
 			return 0;
 		}
-		state.dup.mark = 0;
+		state->dup.mark = 0;
 	}
-	for (fp = state.form; fp; fp = fp->next)
+	for (fp = state->form; fp; fp = fp->next)
 	{
-		if (*state.base)
+		if (*state->base)
 		{
-			if (fp == state.form)
-				sfprintf(op, state.base, base);
+			if (fp == state->form)
+				sfprintf(op, state->base, base);
 			else
 				sfprintf(op, "%-*.*s ", BASE_WIDTH, BASE_WIDTH, "");
 		}
@@ -602,75 +602,75 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 		for (;;)
 		{
 			if (fp->fun)
-				f = (*fp->fun)(*u);
+				f = (*fp->fun)(state, *u, buf, siz);
 			else
 			{
 				f = buf;
 				if (fp->fp)
 				{
-					swapmem(state.swap ^ int_swap, u, mem.m_char, fp->size.internal);
+					swapmem(state->swap ^ int_swap, u, mem.m_char, fp->size.internal);
 #if _typ_long_double
 					if (fp->size.internal == sizeof(long double))
-						sfsprintf(f, sizeof(buf), fp->form, mem.m_long_double);
+						sfsprintf(f, siz, fp->form, mem.m_long_double);
 					else
 #endif
 					if (fp->size.internal == sizeof(double))
-						sfsprintf(f, sizeof(buf), fp->form, mem.m_double);
+						sfsprintf(f, siz, fp->form, mem.m_double);
 					else
-						sfsprintf(f, sizeof(buf), fp->form, mem.m_float);
+						sfsprintf(f, siz, fp->form, mem.m_float);
 				}
 				else
 				{
-					x = swapget(state.swap, u, fp->size.external);
+					x = swapget(state->swap, u, fp->size.external);
 					if (fp->us)
 						switch (fp->size.internal)
 						{
 						case 1:
-							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_1)x);
+							sfsprintf(f, siz, fp->form, (unsigned int_1)x);
 							break;
 						case 2:
-							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_2)x);
+							sfsprintf(f, siz, fp->form, (unsigned int_2)x);
 							break;
 						case 4:
-							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_4)x);
+							sfsprintf(f, siz, fp->form, (unsigned int_4)x);
 							break;
 						default:
-							sfsprintf(f, sizeof(buf), fp->form, (unsigned int_max)x);
+							sfsprintf(f, siz, fp->form, (unsigned int_max)x);
 							break;
 						}
 					else
 						switch (fp->size.internal)
 						{
 						case 1:
-							sfsprintf(f, sizeof(buf), fp->form, (int_1)x);
+							sfsprintf(f, siz, fp->form, (int_1)x);
 							break;
 						case 2:
-							sfsprintf(f, sizeof(buf), fp->form, (int_2)x);
+							sfsprintf(f, siz, fp->form, (int_2)x);
 							break;
 						case 4:
-							sfsprintf(f, sizeof(buf), fp->form, (int_4)x);
+							sfsprintf(f, siz, fp->form, (int_4)x);
 							break;
 						default:
-							sfsprintf(f, sizeof(buf), fp->form, (int_max)x);
+							sfsprintf(f, siz, fp->form, (int_max)x);
 							break;
 						}
 				}
 			}
-			sfprintf(op, "%*s", state.width * fp->size.external / state.size, f);
+			sfprintf(op, "%*s", state->width * fp->size.external / state->size, f);
 			if ((u += fp->size.external) < (unsigned char*)ep)
 				sfputc(op, ' ');
 			else
 			{
-				if (state.printable && fp == state.form)
+				if (state->printable && fp == state->form)
 				{
 					register int	c;
 
-					if (c = (state.block - (ep - bp)) / state.size * (state.width + 1))
+					if (c = (state->block - (ep - bp)) / state->size * (state->width + 1))
 						sfprintf(op, "%*s", c, "");
 					sfputc(op, ' ');
 					for (u = (unsigned char*)bp; u < (unsigned char*)ep;)
 					{
-						if ((c = ccmapchr(state.map, *u++)) < 040 || c >= 0177)
+						if ((c = ccmapchr(state->map, *u++)) < 040 || c >= 0177)
 							c = '.';
 						sfputc(op, c);
 					}
@@ -688,7 +688,7 @@ block(Sfio_t* op, char* bp, char* ep, int_max base)
 }
 
 static int
-od(char** files)
+od(State_t* state, char** files)
 {
 	register char*	s;
 	register char*	e;
@@ -699,18 +699,16 @@ od(char** files)
 	unsigned long	n;
 	unsigned long	m;
 	unsigned long	r;
+	char		tmp[256];
 
-	static char*	buf;
-	size_t		bufsize;
-
-	if (!(ip = init(&files)))
+	if (!(ip = init(state, &files)))
 		return 0;
 	for (;;)
 	{
-		if (s = state.peek.data)
+		if (s = state->peek.data)
 		{
-			state.peek.data = 0;
-			n = state.peek.size;
+			state->peek.data = 0;
+			n = state->peek.size;
 		}
 		else for (;;)
 		{
@@ -719,39 +717,42 @@ od(char** files)
 			if (s)
 				break;
 			if (n)
-				error(ERROR_system(2), "%s: read error", state.file);
+				error(ERROR_system(2), "%s: read error", state->file);
 			if (ip != sfstdin)
 				sfclose(ip);
-			if (!(ip = init(&files)))
+			if (!(ip = init(state, &files)))
 			{
 				s = 0;
 				n = 0;
 				break;
 			}
 		}
-		if (state.count)
+		if (state->count)
 		{
-			if (state.total >= state.count)
+			if (state->total >= state->count)
 			{
 				s = 0;
 				n = 0;
 			}
-			else if ((state.total += n) > state.count)
-				n -= state.total - state.count;
+			else if ((state->total += n) > state->count)
+				n -= state->total - state->count;
 		}
 		if (split)
 		{
 			if (s)
 			{
-				m = state.block - (split - buf);
+				m = state->block - (split - state->buf);
 				r = (m > n) ? m : n;
-				if (bufsize < (r += (split - buf)))
+				if (state->bufsize < (r += (split - state->buf)))
 				{
-					bufsize = roundof(r, 1024);
-					r = split - buf;
-					if (!(buf = newof(buf, char, bufsize, 0)))
-						error(ERROR_SYSTEM|3, "out of space");
-					split = buf + r;
+					state->bufsize = roundof(r, 1024);
+					r = split - state->buf;
+					if (!(state->buf = vmnewof(state->vm, state->buf, char, state->bufsize, 0)))
+					{
+						error(ERROR_SYSTEM|2, "out of space");
+						goto bad;
+					}
+					split = state->buf + r;
 				}
 				if (m > n)
 				{
@@ -767,36 +768,36 @@ od(char** files)
 					n -= m;
 				}
 			}
-			r = split - buf;
-			if (m = (split - buf) % state.size)
+			r = split - state->buf;
+			if (m = (split - state->buf) % state->size)
 			{
-				m = state.size - m;
+				m = state->size - m;
 				while (m--)
 					*split++ = 0;
 			}
-			if (block(sfstdout, buf, buf + r, state.offset))
+			if (block(state, sfstdout, state->buf, state->buf + r, state->offset, tmp, sizeof(tmp)))
 				goto bad;
 			split = 0;
-			if (!state.verbose)
-				memcpy(state.dup.data = state.dup.buf, buf, state.dup.size = r);
-			state.offset += r;
+			if (!state->verbose)
+				memcpy(state->dup.data = state->dup.buf, state->buf, state->dup.size = r);
+			state->offset += r;
 			if (s && !n)
 				continue;
 		}
 		if (!s)
 			break;
 		x = s + n;
-		if (state.strings)
+		if (state->strings)
 		{
-			state.offset += n;
+			state->offset += n;
 			n = 0;
 			for (;;)
 			{
 				if (s >= x || (c = *s++) == 0 || c == '\n' || !isprint(c))
 				{
-					if (n >= state.strings)
+					if (n >= state->strings)
 					{
-						if (*state.base && sfprintf(sfstdout, state.base, state.offset - (x - s) - n - 1) < 0)
+						if (*state->base && sfprintf(sfstdout, state->base, state->offset - (x - s) - n - 1) < 0)
 							break;
 						if (sfprintf(sfstdout, "%.*s\n", n, s - n - 1) < 0)
 							break;
@@ -811,35 +812,38 @@ od(char** files)
 		}
 		else
 		{
-			e = s + (n / state.block) * state.block;
+			e = s + (n / state->block) * state->block;
 			if (s < e)
 			{
 				do
 				{
-					if (block(sfstdout, s, s + state.block, state.offset))
+					if (block(state, sfstdout, s, s + state->block, state->offset, tmp, sizeof(tmp)))
 						goto bad;
-					state.dup.data = s;
-					state.dup.size = state.block;
-					state.offset += state.block;
-				} while ((s += state.block) < e);
-				if (!state.verbose)
+					state->dup.data = s;
+					state->dup.size = state->block;
+					state->offset += state->block;
+				} while ((s += state->block) < e);
+				if (!state->verbose)
 				{
-					memcpy(state.dup.buf, state.dup.data, state.dup.size = state.block);
-					state.dup.data = state.dup.buf;
+					memcpy(state->dup.buf, state->dup.data, state->dup.size = state->block);
+					state->dup.data = state->dup.buf;
 				}
 			}
 			if (n = x - s)
 			{
-				if (bufsize < 2 * n)
+				if (state->bufsize < 2 * n)
 				{
-					if ((bufsize = 2 * n) < LINE_LENGTH * sizeof(int_max))
-						bufsize = LINE_LENGTH * sizeof(int_max);
-					bufsize = roundof(bufsize, 1024);
-					if (!(buf = newof(buf, char, bufsize, 0)))
-						error(ERROR_SYSTEM|3, "out of space");
+					if ((state->bufsize = 2 * n) < LINE_LENGTH * sizeof(int_max))
+						state->bufsize = LINE_LENGTH * sizeof(int_max);
+					state->bufsize = roundof(state->bufsize, 1024);
+					if (!(state->buf = vmnewof(state->vm, state->buf, char, state->bufsize, 0)))
+					{
+						error(ERROR_SYSTEM|2, "out of space");
+						goto bad;
+					}
 				}
-				memcpy(buf, s, n);
-				split = buf + n;
+				memcpy(state->buf, s, n);
+				split = state->buf + n;
 			}
 		}
 	}
@@ -907,11 +911,16 @@ b_od(int argc, char** argv, void* context)
 	int			per;
 	char			buf[4];
 	Optdisc_t		optdisc;
+	State_t			state;
 
-	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG, 0);
-	optinit(&optdisc, optinfo);
+	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	memset(&state, 0, sizeof(state));
+	if (!(state.vm = vmopen(Vmdcheap, Vmlast, 0)))
+	{
+		error(ERROR_SYSTEM|2, "out of space");
+		return 1;
+	}
+	optinit(&optdisc, optinfo);
 	per = 0;
 	state.swap = int_swap;
 	state.map = ccmap(CC_ASCII, CC_ASCII);
@@ -941,8 +950,9 @@ b_od(int argc, char** argv, void* context)
 			continue;
 		case 'm':
 			if ((n = ccmapid(opt_info.arg)) < 0)
-				error(3, "%s: unknown character code set", opt_info.arg);
-			state.map = ccmap(n, CC_NATIVE);
+				error(2, "%s: unknown character code set", opt_info.arg);
+			else
+				state.map = ccmap(n, CC_NATIVE);
 			continue;
 		case 'N':
 			state.count = opt_info.num;
@@ -952,7 +962,7 @@ b_od(int argc, char** argv, void* context)
 			state.printable = 1;
 			continue;
 		case 't':
-			format(opt_info.arg);
+			format(&state, opt_info.arg);
 			state.style |= NEW;
 			continue;
 		case 'T':
@@ -963,16 +973,19 @@ b_od(int argc, char** argv, void* context)
 			case 'm':
 				n = *s++;
 				state.buffer.size = strton(s, &e, NiL, 1);
-				if (n == 'b' && !(state.buffer.base = newof(0, char, state.buffer.size, 0)))
-					error(ERROR_SYSTEM|3, "out of space [test buffer]");
+				if (n == 'b' && !(state.buffer.base = vmnewof(state.vm, 0, char, state.buffer.size, 0)))
+				{
+					error(ERROR_SYSTEM|2, "out of space");
+					goto done;
+				}
 				if (*e)
-					error(3, "%s: invalid characters after test", e);
+					error(2, "%s: invalid characters after test", e);
 				break;
 			case 'n':
 				state.buffer.noshare = 1;
 				break;
 			default:
-				error(3, "%s: unknown test", s);
+				error(2, "%s: unknown test", s);
 				break;
 			}
 			continue;
@@ -1054,7 +1067,7 @@ b_od(int argc, char** argv, void* context)
 				break;
 			}
 			*s = 0;
-			format(buf);
+			format(&state, buf);
 			state.style |= OLD;
 			continue;
 
@@ -1092,13 +1105,15 @@ b_od(int argc, char** argv, void* context)
 		sfsprintf(state.base, sizeof(state.base), "%%0%d%s%c ", BASE_WIDTH, QUAL, n);
 		break;
 	default:
-		error(3, "%c: invalid addr-base type", n);
+		error(2, "%c: invalid addr-base type", n);
 		break;
 	}
 	if (!state.form)
-		format("o2");
+		format(&state, "o2");
 	else if (state.strings)
-		error(3, "--strings must be the only format type");
+		error(2, "--strings must be the only format type");
+	if (error_info.errors)
+		goto done;
 	for (fp = state.form; fp; fp = fp->next)
 		if ((n = (state.size / fp->size.external) * (fp->width + 1) - 1) > state.width)
 			state.width = n;
@@ -1158,12 +1173,15 @@ b_od(int argc, char** argv, void* context)
 #ifdef SIGFPE
 	signal(SIGFPE, SIG_IGN);
 #endif
-	od(argv);
+	od(&state, argv);
 #ifdef SIGFPE
 	signal(SIGFPE, SIG_DFL);
 #endif
 	if (state.skip)
-		error(3, "cannot skip past available data");
+	{
+		error(2, "cannot skip past available data");
+		goto done;
+	}
 	if (*state.base && !state.strings)
 	{
 		*(state.base + strlen(state.base) - 1) = '\n';
@@ -1171,5 +1189,7 @@ b_od(int argc, char** argv, void* context)
 	}
 	if (sfsync(sfstdout) && errno != EPIPE)
 		error(ERROR_SYSTEM|2, "write error");
-	return error_info.errors;
+ done:
+	vmclose(state.vm);
+	return error_info.errors != 0;
 }

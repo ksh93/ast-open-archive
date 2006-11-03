@@ -393,7 +393,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/bgp.h
 prev ${PACKAGE_ast_INCLUDE}
 prev bgp.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  bgp.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  bgp.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/bgp.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/bgp.h
@@ -401,7 +401,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/bgp.h generated
 make ${PACKAGE_ast_INCLUDE}/pt.h
 prev pt.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  pt.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2000,author=gsf'  pt.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/pt.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/pt.h

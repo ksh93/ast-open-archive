@@ -448,7 +448,9 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 {
 	register Member_t*	d;
 	int			dfd;
+	int			skip;
 
+	skip = !!ip;
 	f->delta.same = 0;
 	if (d = op->delta && op->delta->tab && f->name ? (Member_t*)hashget(op->delta->tab, f->name) : (Member_t*)0)
 		d->mark = 1;
@@ -486,13 +488,17 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 				message((-2, "delta: create: file=%s", f->name));
 				paxdelta(ip, op, f, DELTA_TAR|DELTA_FD|DELTA_FREE|DELTA_SIZE, f->fd, f->st->st_size, DELTA_DEL|DELTA_TEMP|DELTA_OUTPUT, &f->fd, 0);
 			}
+			skip = 0;
 		}
 		else
 		{
 			f->delta.op = (d && (f->type == X_IFREG || f->type == X_IFDIR)) ? DELTA_update : DELTA_create;
 			message((-2, "delta: %s: file=%s", f->delta.op == DELTA_update ? "update" : "create", f->name));
-			if (ip)
+			if (skip)
+			{
+				skip = 0;
 				fileskip(ip, f);
+			}
 			f->st->st_size = 0;
 			if (f->delta.op == DELTA_update && f->type != X_IFREG && f->st->st_mode == d->mode)
 				f->st->st_mtime = d->mtime.tv_sec;
@@ -513,7 +519,7 @@ deltaout(Archive_t* ip, Archive_t* op, register File_t* f)
 	}
 	else if (f->fd >= 0)
 		close(f->fd);
-	else if (ip)
+	else if (skip)
 		fileskip(ip, f);
 }
 
@@ -568,7 +574,6 @@ deltadelete(register Archive_t* ap)
 				d = (Member_t*)pos->bucket->value;
 				if (!d->mark && (!d->info || !d->info->ro))
 				{
-					ap->entries++;
 					ap->selected++;
 					initfile(ap, f, f->st, pos->bucket->name, X_IFREG|X_IRUSR|X_IWUSR|X_IRGRP|X_IROTH);
 					f->delta.op = DELTA_delete;
@@ -783,7 +788,6 @@ deltapass(Archive_t* ip, Archive_t* op)
 				if (!d->mark && selectfile(op, d->info))
 				{
 					d->mark = 1;
-					op->entries++;
 					if (d->info->linktype == HARDLINK)
 					{
 						if (!(h = (Member_t*)hashget(ip->delta->tab, d->info->linkpath)))
@@ -803,6 +807,7 @@ deltapass(Archive_t* ip, Archive_t* op)
 	deltadelete(op);
 	putepilogue(op);
 	op->volume = 0;
+	op->selected = op->entries;
 }
 
 /*

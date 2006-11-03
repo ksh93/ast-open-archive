@@ -10,9 +10,9 @@ LICENSE = since=1992,author=gsf+dgk
 
 :: cmdlib.h builtin.c
 
-BUILTIN ==
-DYNAMIC ==
-STANDALONE ==
+CMD_BUILTIN ==
+CMD_DYNAMIC ==
+CMD_STANDALONE ==
 
 LINKS = cp: ln mv
 NOBIN = getconf
@@ -37,7 +37,7 @@ BUILTINS :COMMAND: cmdlist.h
 	T = -lcmd
 	if "$(PACKAGE_OPTIMIZE:N=space)" && "$(T:T=F)" == "-lcmd"
 		T := $(BUILTINS:O=1)
-		$(T) :: BUILTIN=1 DYNAMIC=1 builtin.c -lcmd -ldll
+		$(T) :: CMD_BUILTIN=1 CMD_DYNAMIC=1 builtin.c -lcmd -ldll
 		for I $(BUILTINS:O>1)
 			$(I) :LINK: $(T)
 		end
@@ -48,7 +48,7 @@ BUILTINS :COMMAND: cmdlist.h
 		end
 	else
 		$(BINDIR) :INSTALLDIR: $(BUILTINS)
-		$(BUILTINS) : .COMMAND $(&$("%.c":T=SM%)) BUILTIN=b_$$(<:B) builtin.c $(*$("%.c":T=SM%))
+		$(BUILTINS) : .COMMAND $(&$("%.c":T=SM%)) CMD_BUILTIN=b_$$(<:B) builtin.c $(*$("%.c":T=SM%))
 			$(CAT) $(*:N=*builtin.c) > $(<).c
 			$(RM) $(RMFLAGS) $(<)
 			$(@$("%.c":T=SM%):/.*builtin.c$/$(<).c/)
@@ -71,7 +71,7 @@ BUILTINS :COMMAND: cmdlist.h
 			$(P) : $(T)
 		else
 			eval
-			$(T) :: STANDALONE=b_$(T) $(T).c
+			$(T) :: CMD_STANDALONE=b_$(T) $(T).c
 			end
 			P := $(T)
 		end

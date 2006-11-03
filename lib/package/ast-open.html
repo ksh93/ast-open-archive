@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <HTML>
 <HEAD>
-<META name="generator" content="mm2html (AT&T Labs Research) 2005-10-15">
+<META name="generator" content="mm2html (AT&T Labs Research) 2006-10-31">
 <META name="description" content="ast-open package">
 <META name="keywords" content="software, package">
 <TITLE> ast-open package </TITLE>
@@ -1048,12 +1048,23 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-06-10-24  --- Release ksh93s-  ---
+06-10-30  --- Release ksh93s-  ---
+06-10-30  The redirections &lt;# pattern, and &lt;## pattern have been added.
+	  Both seek forward to the beginning of the next line that contains
+	  the pattern.  The &lt;## form copies the skipped portion to standard
+	  output.
+06-10-26  On systems that support stream control transport, the virtual file
+	  name /dev/sctp/host/port can now be used to establish connections.
+06-10-26  The printf modifier # when used with d produces units in thousands
+	  with a single letter suffix added.  The modifier # when used with
+	  the i specification provides units of 1024 with a two letter suffix.
 06-10-24  The value of $! is now set to the process id of a job put
 	  into the background with the bg command as required by POSIX.
 06-10-23  A bug in which the value of $! was affected by a background
 	  job started from a subshell has been fixed.
 06-10-23  A bug in ${var:offset:len} in multibyte locales has been fixed.
+06-10-15  The remaining math functions from C99 were added for any system
+	  that supports them.
 06-10-12  A bug when skipping over `...` with ${x:=`...`} when x is set
 	  has been fixed.
 06-10-11  A bug in process floating constants produced by the %a format
@@ -1066,11 +1077,16 @@ All recorded changes follow.
 	  cause the builtin to hang has been fixed.
 06-10-03  A bug in the for loop optimizer which causes &gt;(...) process
 	  substitution to be ignored has been fixed.
-06-09-97  The -a option was added to typeset for indexed arrays.  This
+06-09-17  The -a option was added to typeset for indexed arrays.  This
 	  is only needed when using the (&#0091;subscript&#0093;=value ...) form.
+06-09-06  The showme option was added.  Each simple command not beginning
+	  with a redirection and not occurring with in the while, until, if,
+	  select condition can be preceded by a semi-colon which will
+	  be ignored when showme is off.  When showme is on, any command
+	  preceded by a colon will be traced but not executed.
 06-08-16  As a new feature, a leading ~(N) on a pattern has no effect 
 	  except when used for file expansion.  In this case if not
-	  matches are found, the pattern is replaced by nothing rathern
+	  matches are found, the pattern is replaced by nothing rather
 	  than itself.
 06-08-11  A bug in the expansion of ${.sh.match&#0091;i&#0093;:${#.shmatch&#0091;i&#0093;}} has
 	  been fixed.
@@ -1104,7 +1120,7 @@ All recorded changes follow.
 06-06-13  Internal change to use ordering for variables instead of hashing
 	  to speed up prefix matching.
 06-06-13  A window between fork/exec in which a signal could get lost
-	  and cause a peogram to hang has been eliminated
+	  and cause a program to hang has been eliminated
 06-06-13  A bug in edit completion with quoted strings has been fixed.
 06-06-07  The restricted options can now be enabled by set as well as on
 	  the command line.  Once set, it can not be disabled.
@@ -1116,7 +1132,7 @@ All recorded changes follow.
           and ksh88 when the stty lnext is control-v.  The sequence
 	  escape-control-v will display the shell version.
 06-05-31  Modified emacs and vi mode so that entering a TAB after a partial
-	  TAB conpletion, generates a listing of possible completions.
+	  TAB completion, generates a listing of possible completions.
 	  After the second TAB, a number followed by a TAB will perform
 	  the completion with the corresponding item.
 06-05-19  Modified arithmetic so that conversions to strings default to
@@ -1159,7 +1175,7 @@ All recorded changes follow.
 05-12-07  The aliases for integer and float have been changed to use attributes
 	  -li and -lE to handle long long and long double types.
 05-12-07  The histexpand (-H) option has been added which allows C-shell
-	  style history expansios using the history character !.
+	  style history expansions using the history character !.
 05-12-07  The multiline option was added which changes that way the edit
 	  modes handle lines longer than the window width.  Instead of
 	  horizontal scrolling, multiple lines on the screen are used.
@@ -1309,7 +1325,7 @@ All recorded changes follow.
 	  an integral number of seconds, for example even -t 'sin(.5)'
 	  is now valid.
 04-06-16  Two small memory leak problems were fixed.
-04-06-15  A bug in ${var/pattern/"string"} which occured when string
+04-06-15  A bug in ${var/pattern/"string"} which occurred when string
 	  contained pattern matching characters has been fixed.
 04-05-08  printf $'%d produced an erroneous error message and has
 	  been fixed.
@@ -1365,7 +1381,7 @@ All recorded changes follow.
 03-12-05  On some systems, if the KEYBD trap is set, then commands that use
 	  the meta key were not processed until return was hit.  This
 	  has been fixed.
-03-12-05  A problem which occured when the login shell was not a group
+03-12-05  A problem which occurred when the login shell was not a group
 	  leader that could cause it to fail has been fixed.
 03-12-05  A problem in which a shell could core dump after receiving a signal
 	  that should cause it to terminate while it was in the process
@@ -1419,7 +1435,7 @@ All recorded changes follow.
 	  used inside ${...} has been fixed.
 03-07-15  An error in which expanding an indexed array inside a compound
 	  variable could cause a core dump has been fixed.
-03-07-15  A bug in which under on rare ocassions a job completion interrupt
+03-07-15  A bug in which under on rare occassions a job completion interrupt
 	  could cause to core dump has been fixed.
 03-06-26  A bug in which process substitution embedded within command
 	  substitution would generate a syntax error has been fixed.
@@ -2448,6 +2464,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="pax changes">pax changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-10-31 delta.c,format.c: fix ar=&gt;ar delta bug that skipped data twice
 06-10-11 add sfstropen()/sfstruse() error checks
 06-09-27 pax.tst: fix uid etc. tests to use --listformat -- duh
 06-09-12 delta.c: delta for any X_IPERM st_mode changes
@@ -2752,6 +2769,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="html changes">html changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-10-31 mm2html: fix tager=_top omission bug
 06-10-11 add sfstruse() error checks
 06-05-03 htmlrefs.c: add COPY to avoid e.g. cgi symlinks
 05-10-15 mm2html.sh: add BP name=value parameters
@@ -3297,6 +3315,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk
 06-09-28 Makerules.mk: add $(IFFEREFS)
 06-09-15 Makerules.mk: fix .SHARED.DEF.* scope prereq logic
 06-09-01 Makefile: no -O for command.c on darwin (probably gcc 4.0's fault)
@@ -4554,6 +4573,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="builtin changes">builtin changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-10-31 global edit to eliminate most non-const static data
 06-10-11 add sfstruse() error checks
 06-08-25 uniq.rt: add initial regression tests
 06-08-23 mkdir.tst: add -p final dir mode tests
@@ -5885,14 +5905,19 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-06-10-26 sfio/sfvprintf.c: %md =&gt; fmtscale(1000), %mi =&gt; fmtscale(1024)
+06-10-31 disc/sfdcseekable.c: add SFSK_DISCARD for seekable window control
+06-10-31 comp/spawnveg.c,features/lib: handle posix_spawn exit status 127
+06-10-30 features/lib: fix posix_spawn() fork() prototype conflicts
+06-10-30 string/fmtscale.c: fix 1024 rounding bugs
+06-10-27 disc/sfkeyprintf.c: handle 'i' (=='d') -- oops
+06-10-26 sfio/sfvprintf.c: %#d =&gt; fmtscale(1000), %#i =&gt; fmtscale(1024)
 06-10-26 features/map.c: _map_libc cleanup
 06-10-26 features/fcntl: add to the circle of trust
 06-10-26 features/sys: add &lt;sys/socket.h&gt; socklen_t
 06-10-26 include/regex.h: handle include before &lt;ast_map.h&gt;
 06-10-25 astconf "SHELL" =&gt; "SH" to avoid _POSIX_SHELL conflict
 06-10-25 comp/conf.*: drop no-op duplicate conftab.c entries
-06-10-18 string/fmtscale.c: 1000: n&#0091;.&#0093;nn(kMGTPE), 1024: n&#0091;.&#0093;nn(KMGTPE)i
+06-10-18 string/fmtscale.c: 1000: n&#0091;.&#0093;n&#0091;n&#0093;(kMGTPE), 1024: n&#0091;.&#0093;n&#0091;n&#0093;(KMGTPE)i
 06-10-11 ast_std.h: now implies &lt;sys/stat.h&gt; (did on most before anyway)
 06-10-11 strtoi.h: ignore sign for 0, validate scale shift
 06-10-11 strdup.c,vmstrdup.c: handle 0 arg
@@ -7271,6 +7296,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-10-31 global edit to eliminate most non-const static data0
+06-10-31 use &lt;cmd.h&gt; for all b_*() implementations; drop &lt;cmdlib.h&gt; 
+06-10-31 cmd.h: add CMD_ prefix to { BUILTIN DYNAMIC STANDALONE } 
+06-10-31 join.c: tone down /tmp usage vi SFSK_DISCARD
+06-10-31 cp.c,rm.c: update to &lt;fts.h&gt; to accomodate non-static data
+06-10-29 date.c: "...%H%..." =&gt; "...%H" "%..." to avoid SCCS conflict
 06-10-26 fds.c: handle sctp
 06-10-18 tail.c: fix invalid suffix infinite loop
 06-10-11 chgrp.c,cp.c: add sfstruse() error checks
@@ -8741,7 +8772,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>October 26, 2006</TD>
+<TD align=right>November 02, 2006</TD>
 </TR>
 </TABLE>
 <P>

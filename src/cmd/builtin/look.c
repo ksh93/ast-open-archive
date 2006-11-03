@@ -235,7 +235,7 @@ b_look(int argc, char** argv, void* context)
 
 	static const char*	dict[] = { DICT_FILE, "/usr/lib/dict/words" };
 
-	cmdinit(argv, context, ERROR_CATALOG, 0);
+	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	for (;;)
 	{
 		switch (optget(argv, usage))

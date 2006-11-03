@@ -371,7 +371,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/cx.h
 prev ${PACKAGE_ast_INCLUDE}
 prev cx.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  cx.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  cx.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cx.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cx.h
@@ -379,7 +379,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/cx.h generated
 make ${PACKAGE_ast_INCLUDE}/cxlib.h
 prev cxlib.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  cxlib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  cxlib.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cxlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cxlib.h
@@ -387,7 +387,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/cxlib.h generated
 make ${PACKAGE_ast_INCLUDE}/dss.h
 prev dss.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  dss.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  dss.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/dss.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/dss.h
@@ -395,7 +395,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/dss.h generated
 make ${PACKAGE_ast_INCLUDE}/dsslib.h
 prev dsslib.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  dsslib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  dsslib.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/dsslib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/dsslib.h
@@ -403,7 +403,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/dsslib.h generated
 make ${PACKAGE_ast_INCLUDE}/tag.h
 prev tag.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  tag.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf'  tag.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/tag.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/tag.h

@@ -1,3 +1,4 @@
+06-10-31 mm2html: fix tager=_top omission bug
 06-10-11 add sfstruse() error checks
 06-05-03 htmlrefs.c: add COPY to avoid e.g. cgi symlinks
 05-10-15 mm2html.sh: add BP name=value parameters

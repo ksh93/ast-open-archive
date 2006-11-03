@@ -232,8 +232,7 @@ b_what(int argc, char** argv, void* context)
 	register char*		s;
 	register Sfio_t*	sp;
 
-	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG, 0);
+	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	state.hit = state.single = 0;
 	for (n = 0; n <= UCHAR_MAX; n++)
 		state.skip[n] = 4;

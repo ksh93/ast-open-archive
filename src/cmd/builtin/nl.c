@@ -105,7 +105,7 @@ typedef struct _nl_
 	int	pflag;
 } Nl_t;
 
-static char letter_a, letter_t, letter_n;
+static const char letter_a, letter_t, letter_n;
 #define TYPE_ALL	((void*)(&letter_a))
 #define TYPE_NONE	((void*)(&letter_n))
 #define TYPE_TEXT	((void*)(&letter_t))
@@ -205,6 +205,9 @@ int b_nl(int argc, char *argv[], void *context)
 	Sfio_t		*in=sfstdin;
 	Nl_t		nl;
 	regex_t		re[3];
+
+	cmdinit(argc,argv,(void*)0,(const char*)0, 0);
+
 	nl.width =  6;
 	nl.startnum = 1;
 	nl.blines = 1;
@@ -218,7 +221,6 @@ int b_nl(int argc, char *argv[], void *context)
 	nl.sep = "\t";
 	nl.pflag = 0;
 
-	cmdinit(argv,(void*)0,(const char*)0, 0);
 	while (n = optget(argv, usage)) switch (n)
 	{
 	    case 'p':

@@ -265,8 +265,8 @@ int b_who(int argc, char *argv[], void *context)
 {
 	register int n, flags=0;
 	Sfio_t *sp;
-	error_info.id = argv[0];
-	cmdinit(argv,context, ERROR_CATALOG, 0);
+
+	cmdinit(argc, argv,context, ERROR_CATALOG, 0);
 	while (n = optget(argv, usage)) switch (n)
 	{
 	    case 'm':

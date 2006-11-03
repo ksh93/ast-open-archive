@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 1996-2006 AT&T Corp.                  #
+#           Copyright (c) 1996-2006 AT&T Knowledge Ventures            #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                      by AT&T Knowledge Ventures                      #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -41,7 +41,7 @@
 # .sn file			like .so but text copied to output
 
 command=mm2html
-version='mm2html (AT&T Labs Research) 2005-10-15' # NOTE: repeated in USAGE
+version='mm2html (AT&T Labs Research) 2006-10-31' # NOTE: repeated in USAGE
 LC_NUMERIC=C
 case $(getopts '[-][123:xyz]' opt --xyz 2>/dev/null; echo 0$opt) in
 0123)	ARGV0="-a $command"
@@ -668,8 +668,7 @@ function getline
 								print -r -- "<A $nam=\"$url\">$txt</A>"
 							fi
 							;;
-						link*)	nam=href
-							tar=
+						link*)	tar=
 							case $nam in
 							link)	case $frame$top$vg in
 								?*)	case $url in
@@ -681,6 +680,7 @@ function getline
 								esac
 								;;
 							esac
+							nam=href
 							if	[[ $frame != '' && $title == '' ]]
 							then	[[ -f $framebody ]] && rm $framebody
 								framelink=$pfx$url

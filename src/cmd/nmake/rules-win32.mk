@@ -5,6 +5,8 @@
 .INSTALL.libast.a = .
 .INSTALL.libast-g.a = .
 
+PROTOINSTALL = | $(SED) '/^#include <ast_/s,<,<ast/,'
+
 RC = rc
 RCFLAGS = -x
 

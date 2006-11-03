@@ -1,3 +1,4 @@
+06-10-31 delta.c,format.c: fix ar=>ar delta bug that skipped data twice
 06-10-11 add sfstropen()/sfstruse() error checks
 06-09-27 pax.tst: fix uid etc. tests to use --listformat -- duh
 06-09-12 delta.c: delta for any X_IPERM st_mode changes

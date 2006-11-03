@@ -541,7 +541,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/vcodex.h
 prev ${PACKAGE_ast_INCLUDE}
 prev vcodex.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcodex.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcodex.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcodex.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcodex.h
@@ -549,7 +549,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/vcodex.h generated
 make ${PACKAGE_ast_INCLUDE}/vcsfio.h
 prev vcsfio.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcsfio.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vcsfio.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vcsfio.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vcsfio.h
@@ -565,7 +565,7 @@ prev ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vclib.h generated
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vclib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2003,author=kpv'  vclib.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/vclib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/vclib.h

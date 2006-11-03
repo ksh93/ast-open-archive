@@ -721,6 +721,7 @@ putheader(register Archive_t* ap, register File_t* f)
 	{
 		setdeltaheader(ap, f);
 		ap->entry++;
+		ap->entries++;
 	}
 	ap->section = SECTION_CONTROL;
 	if ((n = (*ap->format->putheader)(&state, ap, f)) < 0)

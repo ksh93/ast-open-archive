@@ -748,7 +748,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/cs.h
 prev ${PACKAGE_ast_INCLUDE}
 prev cs.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  cs.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  cs.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cs.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cs.h
@@ -756,7 +756,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/cs.h generated
 make ${PACKAGE_ast_INCLUDE}/css.h
 prev css.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  css.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  css.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/css.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/css.h
@@ -764,7 +764,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/css.h generated
 make ${PACKAGE_ast_INCLUDE}/msg.h
 prev msg.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  msg.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  msg.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/msg.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/msg.h
@@ -772,7 +772,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/msg.h generated
 make ${PACKAGE_ast_INCLUDE}/ast_cs.h
 prev ast_cs.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  ast_cs.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  ast_cs.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ast_cs.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ast_cs.h
@@ -780,7 +780,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/ast_cs.h generated
 make ${PACKAGE_ast_INCLUDE}/cs_lib.h
 prev cs_lib.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  cs_lib.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=1990,author=gsf'  cs_lib.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/cs_lib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/cs_lib.h

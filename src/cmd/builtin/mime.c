@@ -61,8 +61,7 @@ b_mime(int argc, char** argv, void* context)
 	int		silent;
 	Mimedisc_t	disc;
 
-	NoP(argc);
-	cmdinit(argv, context, ERROR_CATALOG, 0);
+	cmdinit(argc, argv, context, ERROR_CATALOG, 0);
 	silent = 0;
 	for (;;)
 	{

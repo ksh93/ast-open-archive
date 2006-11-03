@@ -274,7 +274,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/ardir.h
 prev ${PACKAGE_ast_INCLUDE}
 prev ardir.h
-exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf+dgk'  ardir.h > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/lib/package/ast.lic '-o since=2002,author=gsf+dgk'  ardir.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/ardir.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/ardir.h

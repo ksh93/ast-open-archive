@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-09-28 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-10-31 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1945,7 +1945,7 @@ end
 	end
 	eval
 	$(T) $(A) $(>) (PROTO) (PROTOFLAGS)
-		$$(PROTO) -p $$(PROTOFLAGS) $(P) $$(*) > 1.$(tmp).x
+		$$(PROTO) -p $$(PROTOFLAGS) $(P) $$(*) $$(PROTOINSTALL) > 1.$(tmp).x
 		if	$$(CMP) $$(CMPFLAGS) $$(<) 1.$(tmp).x
 		then	$$(RM) $$(RMFLAGS) 1.$(tmp).x
 		else	$$(MV) 1.$(tmp).x $$(<)

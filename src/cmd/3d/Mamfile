@@ -345,14 +345,14 @@ make ../../lib/libast/comp/spawnveg.c implicit
 make ${PACKAGE_ast_INCLUDE}/ast_vfork.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_vfork.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
+make process.h implicit
+done process.h dontcare virtual
 make ${PACKAGE_ast_INCLUDE}/wait.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_wait.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_wait.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/wait.h dontcare
-make process.h implicit
-done process.h dontcare virtual
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 make spawn.h implicit
 done spawn.h dontcare virtual

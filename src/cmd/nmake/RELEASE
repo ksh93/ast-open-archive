@@ -1,3 +1,4 @@
+06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk
 06-09-28 Makerules.mk: add $(IFFEREFS)
 06-09-15 Makerules.mk: fix .SHARED.DEF.* scope prereq logic
 06-09-01 Makefile: no -O for command.c on darwin (probably gcc 4.0's fault)
