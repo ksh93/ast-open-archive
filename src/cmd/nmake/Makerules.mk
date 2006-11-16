@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-10-31 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-11-11 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2576,7 +2576,7 @@ end
 .PACKAGE.PROBE. =
 
 .PACKAGE.INIT. : .FUNCTION .PROBE.INIT
-	local T1 T2 T4 T5 T6 T7
+	local T1 T2 T3 T4 T5 T6 T7
 	local B D G H I K L N P Q T V W X Z IP LP LPL LPV PFX SFX FOUND
 	if ! .PACKAGE.GLOBAL.
 		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(INSTALLROOT:T=F:P=L=*) $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
@@ -2615,7 +2615,10 @@ end
 			LP =
 		end
 		if ! LP
-			LP = lib
+			if CC.HOSTTYPE == "*64" && "$(CC.STDLIB:B:N=*64)"
+				LP = lib64
+			end
+			LP += lib
 		end
 		if ( I && L || "$(.PACKAGE.$(P).rules)" != "-" && ( "$(I:T=F)" || "$(L:T=F)" ) )
 			FOUND = 1
@@ -2648,20 +2651,25 @@ end
 					end
 				end
 				if !L
-					T1 = $(T2)/$(LP)
-					if "$(T1:P=X)"
-						L := $(T1)
+					for T3 $(LP)
+						T1 = $(T2)/$(T3)
+						if "$(T1:P=X)"
+							L := $(T1)
+							break
+						end
 					end
 				end
 			elif !I && !L
 				T1 = $(INSTALLROOT)/$(IP)/$(P)
 				if "$(T1:P=X)"
 					for K SHARED ARCHIVE
-						T1 = $(INSTALLROOT)/$(LP)/$(CC.PREFIX.$(K))$(P)$(CC.SUFFIX.$(K))
-						if "$(T1:P=X)"
-							T2 := $(INSTALLROOT)
-							PACKAGE_$(P) := $(T2)
-							break
+						for T3 $(LP)
+							T1 = $(INSTALLROOT)/$(T3)/$(CC.PREFIX.$(K))$(P)$(CC.SUFFIX.$(K))
+							if "$(T1:P=X)"
+								T2 := $(INSTALLROOT)
+								PACKAGE_$(P) := $(T2)
+								break 2
+							end
 						end
 					end
 				end
@@ -2782,7 +2790,7 @@ end
 				end
 				if ! "$(PACKAGE_$(P)_LIB)" || !L && LP != "-"
 					if !L
-						L := $(T1)/$(LP)
+						L := $(T1)/$(LP:O=N)
 					end
 					eval
 					PACKAGE_$(P)_LIB = $(L)

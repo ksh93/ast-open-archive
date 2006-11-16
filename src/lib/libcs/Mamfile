@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make cs
 make libcs.a archive
@@ -70,61 +70,26 @@ done cs.req generated
 make csalloc.o
 make csalloc.c
 make cslib.h implicit
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+make ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
-done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
+done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
+done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 make cs_lib.h implicit
 make FEATURE/lib
-meta FEATURE/lib features/%>FEATURE/% features/lib lib
+meta FEATURE/lib features/%>FEATURE/% ${PACKAGEROOT}/src/lib/libcs/features/lib lib
 make features/lib
 done features/lib
 prev cs.req
+bind -ldl dontcare
 bind -last
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast}  : run features/lib
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast} ${mam_libast}  : run features/lib
 done FEATURE/lib generated
 exec - cmp 2>/dev/null -s FEATURE/lib cs_lib.h || { rm -f cs_lib.h; silent test -d . || mkdir .; cp FEATURE/lib cs_lib.h; }
 done cs_lib.h dontcare generated
@@ -134,10 +99,41 @@ make ${PACKAGE_ast_INCLUDE}/tok.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+make ${PACKAGE_ast_INCLUDE}/regex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
@@ -185,15 +181,13 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
 make ast_cs.h implicit
 make FEATURE/cs
-meta FEATURE/cs features/%.c>FEATURE/% features/cs.c cs
+meta FEATURE/cs features/%.c>FEATURE/% ${PACKAGEROOT}/src/lib/libcs/features/cs.c cs
 make features/cs.c
-make cell_sys_headers.h implicit
-done cell_sys_headers.h dontcare virtual
 prev FEATURE/lib implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done features/cs.c
 prev cs.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast}  : run features/cs.c
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast} ${mam_libast}  : run features/cs.c
 done FEATURE/cs generated
 exec - cmp 2>/dev/null -s FEATURE/cs ast_cs.h || { rm -f ast_cs.h; silent test -d . || mkdir .; cp FEATURE/cs ast_cs.h; }
 done ast_cs.h dontcare generated
@@ -201,25 +195,25 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cs.h dontcare
 done cslib.h
 done csalloc.c
-meta csalloc.o %.c>%.o csalloc.c csalloc
+meta csalloc.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csalloc.c csalloc
 prev csalloc.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csalloc.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csalloc.c
 done csalloc.o generated
 make csfree.o
 make csfree.c
 prev cslib.h implicit
 done csfree.c
-meta csfree.o %.c>%.o csfree.c csfree
+meta csfree.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csfree.c csfree
 prev csfree.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csfree.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csfree.c
 done csfree.o generated
 make csaddr.o
 make csaddr.c
 prev cslib.h implicit
 done csaddr.c
-meta csaddr.o %.c>%.o csaddr.c csaddr
+meta csaddr.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csaddr.c csaddr
 prev csaddr.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csaddr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csaddr.c
 done csaddr.o generated
 make csattr.o
 make csattr.c
@@ -227,92 +221,93 @@ make ${PACKAGE_ast_INCLUDE}/hash.h implicit
 prev ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hash.h
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev cslib.h implicit
 done csattr.c
-meta csattr.o %.c>%.o csattr.c csattr
+meta csattr.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csattr.c csattr
 prev csattr.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csattr.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csattr.c
 done csattr.o generated
 make csauth.o
 make csauth.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev cslib.h implicit
 done csauth.c
-meta csauth.o %.c>%.o csauth.c csauth
+meta csauth.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csauth.c csauth
 prev csauth.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csauth.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csauth.c
 done csauth.o generated
 make csbind.o
 make csbind.c
 prev cslib.h implicit
 done csbind.c
-meta csbind.o %.c>%.o csbind.c csbind
+meta csbind.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csbind.c csbind
 prev csbind.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csbind.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csbind.c
 done csbind.o generated
 make csclient.o
 make csclient.c
 make FEATURE/termios implicit
-meta FEATURE/termios features/%>FEATURE/% features/termios termios
+meta FEATURE/termios features/%>FEATURE/% ${PACKAGEROOT}/src/lib/libcs/features/termios termios
 make features/termios
 done features/termios
 prev cs.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast} ${mam_libast}  : run features/termios
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} ${mam_libast} ${mam_libast}  : run features/termios
 done FEATURE/termios generated
 prev cslib.h implicit
 done csclient.c
-meta csclient.o %.c>%.o csclient.c csclient
+meta csclient.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csclient.c csclient
 prev csclient.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csclient.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csclient.c
 done csclient.o generated
 make cscontrol.o
 make cscontrol.c
 prev cslib.h implicit
 done cscontrol.c
-meta cscontrol.o %.c>%.o cscontrol.c cscontrol
+meta cscontrol.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cscontrol.c cscontrol
 prev cscontrol.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cscontrol.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cscontrol.c
 done cscontrol.o generated
 make csdaemon.o
 make csdaemon.c
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev cslib.h implicit
 done csdaemon.c
-meta csdaemon.o %.c>%.o csdaemon.c csdaemon
+meta csdaemon.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csdaemon.c csdaemon
 prev csdaemon.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csdaemon.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csdaemon.c
 done csdaemon.o generated
 make csdata.o
 make csdata.c
 prev cslib.h implicit
 done csdata.c
-meta csdata.o %.c>%.o csdata.c csdata
+meta csdata.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csdata.c csdata
 prev csdata.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csdata.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csdata.c
 done csdata.o generated
 make csfrom.o
 make csfrom.c
 prev cslib.h implicit
 done csfrom.c
-meta csfrom.o %.c>%.o csfrom.c csfrom
+meta csfrom.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csfrom.c csfrom
 prev csfrom.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csfrom.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csfrom.c
 done csfrom.o generated
 make csfull.o
 make csfull.c
 prev cslib.h implicit
 done csfull.c
-meta csfull.o %.c>%.o csfull.c csfull
+meta csfull.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csfull.c csfull
 prev csfull.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csfull.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csfull.c
 done csfull.o generated
 make csinfo.o
 make csinfo.c
 prev cslib.h implicit
 done csinfo.c
-meta csinfo.o %.c>%.o csinfo.c csinfo
+meta csinfo.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csinfo.c csinfo
 prev csinfo.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csinfo.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csinfo.c
 done csinfo.o generated
 make cslocal.o
 make cslocal.c
@@ -324,33 +319,33 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/wait.h
 prev cslib.h implicit
 done cslocal.c
-meta cslocal.o %.c>%.o cslocal.c cslocal
+meta cslocal.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cslocal.c cslocal
 prev cslocal.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cslocal.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cslocal.c
 done cslocal.o generated
 make csname.o
 make csname.c
 prev cslib.h implicit
 done csname.c
-meta csname.o %.c>%.o csname.c csname
+meta csname.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csname.c csname
 prev csname.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csname.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csname.c
 done csname.o generated
 make csnote.o
 make csnote.c
 prev cslib.h implicit
 done csnote.c
-meta csnote.o %.c>%.o csnote.c csnote
+meta csnote.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csnote.c csnote
 prev csnote.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csnote.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csnote.c
 done csnote.o generated
 make csntoa.o
 make csntoa.c
 prev cslib.h implicit
 done csntoa.c
-meta csntoa.o %.c>%.o csntoa.c csntoa
+meta csntoa.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csntoa.c csntoa
 prev csntoa.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csntoa.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csntoa.c
 done csntoa.o generated
 make csopen.o
 make csopen.c
@@ -364,9 +359,9 @@ done ${PACKAGE_ast_INCLUDE}/proc.h
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev cslib.h implicit
 done csopen.c
-meta csopen.o %.c>%.o csopen.c csopen
+meta csopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csopen.c csopen
 prev csopen.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csopen.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csopen.c
 done csopen.o generated
 make cspath.o
 make cspath.c
@@ -383,74 +378,74 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_dir.h
 prev cslib.h implicit
 done cspath.c
-meta cspath.o %.c>%.o cspath.c cspath
+meta cspath.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cspath.c cspath
 prev cspath.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cspath.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cspath.c
 done cspath.o generated
 make cspeek.o
 make cspeek.c
 prev cslib.h implicit
 done cspeek.c
-meta cspeek.o %.c>%.o cspeek.c cspeek
+meta cspeek.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cspeek.c cspeek
 prev cspeek.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cspeek.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cspeek.c
 done cspeek.o generated
 make csping.o
 make csping.c
 prev cslib.h implicit
 done csping.c
-meta csping.o %.c>%.o csping.c csping
+meta csping.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csping.c csping
 prev csping.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csping.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csping.c
 done csping.o generated
 make cspipe.o
 make cspipe.c
 prev cslib.h implicit
 done cspipe.c
-meta cspipe.o %.c>%.o cspipe.c cspipe
+meta cspipe.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cspipe.c cspipe
 prev cspipe.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cspipe.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cspipe.c
 done cspipe.o generated
 make cspoll.o
 make cspoll.c
 prev cslib.h implicit
 done cspoll.c
-meta cspoll.o %.c>%.o cspoll.c cspoll
+meta cspoll.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cspoll.c cspoll
 prev cspoll.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cspoll.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cspoll.c
 done cspoll.o generated
 make csport.o
 make csport.c
 prev ${PACKAGE_ast_INCLUDE}/hashkey.h implicit
 prev cslib.h implicit
 done csport.c
-meta csport.o %.c>%.o csport.c csport
+meta csport.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csport.c csport
 prev csport.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csport.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csport.c
 done csport.o generated
 make csread.o
 make csread.c
 prev cslib.h implicit
 done csread.c
-meta csread.o %.c>%.o csread.c csread
+meta csread.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csread.c csread
 prev csread.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csread.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csread.c
 done csread.o generated
 make csrecv.o
 make csrecv.c
 prev cslib.h implicit
 done csrecv.c
-meta csrecv.o %.c>%.o csrecv.c csrecv
+meta csrecv.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csrecv.c csrecv
 prev csrecv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csrecv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csrecv.c
 done csrecv.o generated
 make cssend.o
 make cssend.c
 prev cslib.h implicit
 done cssend.c
-meta cssend.o %.c>%.o cssend.c cssend
+meta cssend.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cssend.c cssend
 prev cssend.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cssend.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cssend.c
 done cssend.o generated
 make css.o
 make css.c
@@ -465,7 +460,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev cslib.h implicit
 done csslib.h
 done css.c
-meta css.o %.c>%.o css.c css
+meta css.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/css.c css
 prev css.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c css.c
 done css.o generated
@@ -473,42 +468,42 @@ make csserve.o
 make csserve.c
 prev csslib.h implicit
 done csserve.c
-meta csserve.o %.c>%.o csserve.c csserve
+meta csserve.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csserve.c csserve
 prev csserve.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -DDEBUG -D_PACKAGE_ast -c csserve.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -DDEBUG -c csserve.c
 done csserve.o generated
 make csstat.o
 make csstat.c
 prev ${PACKAGE_ast_INCLUDE}/proc.h implicit
 prev cslib.h implicit
 done csstat.c
-meta csstat.o %.c>%.o csstat.c csstat
+meta csstat.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csstat.c csstat
 prev csstat.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csstat.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csstat.c
 done csstat.o generated
 make csto.o
 make csto.c
 prev cslib.h implicit
 done csto.c
-meta csto.o %.c>%.o csto.c csto
+meta csto.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csto.c csto
 prev csto.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csto.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csto.c
 done csto.o generated
 make csvar.o
 make csvar.c
 prev cslib.h implicit
 done csvar.c
-meta csvar.o %.c>%.o csvar.c csvar
+meta csvar.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/csvar.c csvar
 prev csvar.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DTRUST=\""${INSTALLROOT}:${INSTALLROOT}/opt/ast:/usr/add-on/ast:/usr/addon/ast:/usr/contrib/ast:/usr/local/arch/${mam_cc_HOSTTYPE}/ast:/usr/local/ast:/opt/ast:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/local:${INSTALLROOT}/opt:/usr/add-on:/usr/addon:/usr/contrib:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/local:/opt:/:/usr"\" -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c csvar.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DTRUST=\""${INSTALLROOT}:${INSTALLROOT}/opt/ast:/usr/add-on/ast:/usr/addon/ast:/usr/contrib/ast:/usr/local/arch/${mam_cc_HOSTTYPE}/ast:/usr/local/ast:/opt/ast:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/local:${INSTALLROOT}/opt:/usr/add-on:/usr/addon:/usr/contrib:/usr/local/arch/${mam_cc_HOSTTYPE}:/usr/local:/opt:/:/usr"\" -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c csvar.c
 done csvar.o generated
 make cswrite.o
 make cswrite.c
 prev cslib.h implicit
 done cswrite.c
-meta cswrite.o %.c>%.o cswrite.c cswrite
+meta cswrite.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/cswrite.c cswrite
 prev cswrite.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c cswrite.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -D_BLD_cs -c cswrite.c
 done cswrite.o generated
 make msgblast.o
 make msgblast.c
@@ -522,41 +517,41 @@ prev cs_lib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done msglib.h
 done msgblast.c
-meta msgblast.o %.c>%.o msgblast.c msgblast
+meta msgblast.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgblast.c msgblast
 prev msgblast.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msgblast.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgblast.c
 done msgblast.o generated
 make msgbuf.o
 make msgbuf.c
 prev msglib.h implicit
 done msgbuf.c
-meta msgbuf.o %.c>%.o msgbuf.c msgbuf
+meta msgbuf.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgbuf.c msgbuf
 prev msgbuf.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msgbuf.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgbuf.c
 done msgbuf.o generated
 make msggetmask.o
 make msggetmask.c
 prev msglib.h implicit
 done msggetmask.c
-meta msggetmask.o %.c>%.o msggetmask.c msggetmask
+meta msggetmask.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msggetmask.c msggetmask
 prev msggetmask.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msggetmask.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msggetmask.c
 done msggetmask.o generated
 make msgindex.o
 make msgindex.c
 prev msglib.h implicit
 done msgindex.c
-meta msgindex.o %.c>%.o msgindex.c msgindex
+meta msgindex.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgindex.c msgindex
 prev msgindex.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msgindex.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgindex.c
 done msgindex.o generated
 make msginfo.o
 make msginfo.c
 prev msglib.h implicit
 done msginfo.c
-meta msginfo.o %.c>%.o msginfo.c msginfo
+meta msginfo.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msginfo.c msginfo
 prev msginfo.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msginfo.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msginfo.c
 done msginfo.o generated
 make msglist.o
 make msglist.c
@@ -573,60 +568,60 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev msglib.h implicit
 done msglist.c
-meta msglist.o %.c>%.o msglist.c msglist
+meta msglist.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msglist.c msglist
 prev msglist.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -D_BLD_cs -c msglist.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cs -c msglist.c
 done msglist.o generated
 make msgname.o
 make msgname.c
 prev msglib.h implicit
 done msgname.c
-meta msgname.o %.c>%.o msgname.c msgname
+meta msgname.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgname.c msgname
 prev msgname.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msgname.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgname.c
 done msgname.o generated
 make msgread.o
 make msgread.c
 prev cs.h implicit
 prev msglib.h implicit
 done msgread.c
-meta msgread.o %.c>%.o msgread.c msgread
+meta msgread.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgread.c msgread
 prev msgread.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -DDEBUG -D_PACKAGE_ast -c msgread.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgread.c
 done msgread.o generated
 make msgrecv.o
 make msgrecv.c
 prev msglib.h implicit
 done msgrecv.c
-meta msgrecv.o %.c>%.o msgrecv.c msgrecv
+meta msgrecv.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgrecv.c msgrecv
 prev msgrecv.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msgrecv.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgrecv.c
 done msgrecv.o generated
 make msgsend.o
 make msgsend.c
 prev cs.h implicit
 prev msglib.h implicit
 done msgsend.c
-meta msgsend.o %.c>%.o msgsend.c msgsend
+meta msgsend.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgsend.c msgsend
 prev msgsend.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -DDEBUG -D_PACKAGE_ast -c msgsend.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgsend.c
 done msgsend.o generated
 make msgsetmask.o
 make msgsetmask.c
 prev msglib.h implicit
 done msgsetmask.c
-meta msgsetmask.o %.c>%.o msgsetmask.c msgsetmask
+meta msgsetmask.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msgsetmask.c msgsetmask
 prev msgsetmask.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_BLD_cs -D_PACKAGE_ast -c msgsetmask.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msgsetmask.c
 done msgsetmask.o generated
 make msguser.o
 make msguser.c
 prev cs.h implicit
 prev msglib.h implicit
 done msguser.c
-meta msguser.o %.c>%.o msguser.c msguser
+meta msguser.o %.c>%.o ${PACKAGEROOT}/src/lib/libcs/msguser.c msguser
 prev msguser.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -DDEBUG -D_PACKAGE_ast -c msguser.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cs -D_PACKAGE_ast -c msguser.c
 done msguser.o generated
 exec - ${AR} cr libcs.a csalloc.o csfree.o csaddr.o csattr.o csauth.o csbind.o csclient.o cscontrol.o csdaemon.o csdata.o csfrom.o csfull.o csinfo.o cslocal.o csname.o csnote.o csntoa.o csopen.o cspath.o cspeek.o csping.o cspipe.o cspoll.o csport.o csread.o csrecv.o cssend.o css.o csserve.o csstat.o
 exec - ${AR} cr libcs.a csto.o csvar.o cswrite.o msgblast.o msgbuf.o msggetmask.o msgindex.o msginfo.o msglist.o msgname.o msgread.o msgrecv.o msgsend.o msgsetmask.o msguser.o
@@ -637,7 +632,7 @@ prev libcs.a archive
 make genlocal
 make genlocal.sh
 done genlocal.sh
-meta genlocal %.sh>% genlocal.sh genlocal
+meta genlocal %.sh>% ${PACKAGEROOT}/src/lib/libcs/genlocal.sh genlocal
 prev genlocal.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -674,7 +669,7 @@ done genlocal generated
 make genshare
 make genshare.sh
 done genshare.sh
-meta genshare %.sh>% genshare.sh genshare
+meta genshare %.sh>% ${PACKAGEROOT}/src/lib/libcs/genshare.sh genshare
 prev genshare.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)

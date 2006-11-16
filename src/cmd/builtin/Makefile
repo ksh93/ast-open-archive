@@ -84,5 +84,5 @@ BUILTINS :COMMAND: cmdlist.h
 
 :: PROMO.mm RELEASE
 
-:TEST: asa chmod chown cut date expr fmt head join look mkdir nl \
-		nl od paste tail tr uniq uuencode wc
+:TEST: asa chmod chown cp cut date expr fmt head join ln look \
+	mkdir mv nl od paste tail tr uniq uuencode wc

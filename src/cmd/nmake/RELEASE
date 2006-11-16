@@ -1,9 +1,10 @@
+06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
 06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk
 06-09-28 Makerules.mk: add $(IFFEREFS)
 06-09-15 Makerules.mk: fix .SHARED.DEF.* scope prereq logic
 06-09-01 Makefile: no -O for command.c on darwin (probably gcc 4.0's fault)
 06-08-15 command.c: handle no action but .AFTER|.BEFORE prereqs 
-06-08-11 Makerules.mk: .PACKAGE.INIT now checks lin64 for HOSTTYPE==*64
+06-08-11 Makerules.mk: .PACKAGE.INIT now checks lib64 for HOSTTYPE==*64
 06-08-11 command.c: pass $(COSHELL) to coopen()
 06-08-07 command.c,parse.c: add 'query - blocked' for blocked jobs
 06-08-02 command.c: cokill(state.coshell,0,0) to kill event jobs

@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/bsd.lic
-done ${PACKAGEROOT}/lib/package/bsd.lic
+make ${INSTALLROOT}/lib/package/bsd.lic
+done ${INSTALLROOT}/lib/package/bsd.lic
 make install
 make mailx
 make data.o
@@ -45,7 +45,7 @@ done stamp.h
 make mailx.h implicit
 make local.h implicit
 make FEATURE/lcl implicit
-meta FEATURE/lcl %.iffe>FEATURE/% lcl.iffe lcl
+meta FEATURE/lcl %.iffe>FEATURE/% ${PACKAGEROOT}/src/cmd/mailx/lcl.iffe lcl
 make lcl.iffe
 done lcl.iffe
 bind -last
@@ -61,6 +61,11 @@ make ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+make ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
+done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
@@ -74,23 +79,18 @@ make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
@@ -98,7 +98,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_stdio.h
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
+done ${PACKAGE_ast_INCLUDE}/stdio.h
 make ${PACKAGE_ast_INCLUDE}/mime.h implicit
 make ${PACKAGE_ast_INCLUDE}/ls.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
@@ -114,6 +114,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/mime.h
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
@@ -156,7 +157,7 @@ done ${PACKAGE_ast_INCLUDE}/error.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done mailx.h
 done data.c
-meta data.o %.c>%.o data.c data
+meta data.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/data.c data
 prev data.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c data.c
 done data.o generated
@@ -164,7 +165,7 @@ make cmd1.o
 make cmd1.c
 prev mailx.h implicit
 done cmd1.c
-meta cmd1.o %.c>%.o cmd1.c cmd1
+meta cmd1.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/cmd1.c cmd1
 prev cmd1.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd1.c
 done cmd1.o generated
@@ -172,7 +173,7 @@ make cmd2.o
 make cmd2.c
 prev mailx.h implicit
 done cmd2.c
-meta cmd2.o %.c>%.o cmd2.c cmd2
+meta cmd2.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/cmd2.c cmd2
 prev cmd2.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd2.c
 done cmd2.o generated
@@ -180,7 +181,7 @@ make cmd3.o
 make cmd3.c
 prev mailx.h implicit
 done cmd3.c
-meta cmd3.o %.c>%.o cmd3.c cmd3
+meta cmd3.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/cmd3.c cmd3
 prev cmd3.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c cmd3.c
 done cmd3.o generated
@@ -188,7 +189,7 @@ make collect.o
 make collect.c
 prev mailx.h implicit
 done collect.c
-meta collect.o %.c>%.o collect.c collect
+meta collect.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/collect.c collect
 prev collect.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c collect.c
 done collect.o generated
@@ -196,7 +197,7 @@ make edit.o
 make edit.c
 prev mailx.h implicit
 done edit.c
-meta edit.o %.c>%.o edit.c edit
+meta edit.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/edit.c edit
 prev edit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c edit.c
 done edit.o generated
@@ -208,7 +209,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/fts.h
 prev mailx.h implicit
 done fio.c
-meta fio.o %.c>%.o fio.c fio
+meta fio.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/fio.c fio
 prev fio.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c fio.c
 done fio.o generated
@@ -216,7 +217,7 @@ make head.o
 make head.c
 prev mailx.h implicit
 done head.c
-meta head.o %.c>%.o head.c head
+meta head.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/head.c head
 prev head.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c head.c
 done head.o generated
@@ -230,7 +231,7 @@ done ${PACKAGE_ast_INCLUDE}/tm.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev mailx.h implicit
 done local.c
-meta local.o %.c>%.o local.c local
+meta local.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/local.c local
 prev local.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c local.c
 done local.o generated
@@ -238,7 +239,7 @@ make lex.o
 make lex.c
 prev mailx.h implicit
 done lex.c
-meta lex.o %.c>%.o lex.c lex
+meta lex.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/lex.c lex
 prev lex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c lex.c
 done lex.o generated
@@ -246,7 +247,7 @@ make list.o
 make list.c
 prev mailx.h implicit
 done list.c
-meta list.o %.c>%.o list.c list
+meta list.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/list.c list
 prev list.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c list.c
 done list.o generated
@@ -255,7 +256,7 @@ make main.c
 prev stamp.h implicit
 prev mailx.h implicit
 done main.c
-meta main.o %.c>%.o main.c main
+meta main.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/main.c main
 prev main.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DUSAGE_LICENSE=\""[-author?Kurt Shoens (UCB)][-author?gsf][-copyright?Copyright (c) 1978-2006 The Regents of the University of California and AT&T][-license?http://www.opensource.org/licenses/bsd-license][--catalog?mailx]"\" -D_PACKAGE_ast -c main.c
 done main.o generated
@@ -263,7 +264,7 @@ make misc.o
 make misc.c
 prev mailx.h implicit
 done misc.c
-meta misc.o %.c>%.o misc.c misc
+meta misc.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/misc.c misc
 prev misc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c misc.c
 done misc.o generated
@@ -271,7 +272,7 @@ make names.o
 make names.c
 prev mailx.h implicit
 done names.c
-meta names.o %.c>%.o names.c names
+meta names.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/names.c names
 prev names.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c names.c
 done names.o generated
@@ -279,7 +280,7 @@ make proc.o
 make proc.c
 prev mailx.h implicit
 done proc.c
-meta proc.o %.c>%.o proc.c proc
+meta proc.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/proc.c proc
 prev proc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c proc.c
 done proc.o generated
@@ -287,7 +288,7 @@ make quit.o
 make quit.c
 prev mailx.h implicit
 done quit.c
-meta quit.o %.c>%.o quit.c quit
+meta quit.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/quit.c quit
 prev quit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c quit.c
 done quit.o generated
@@ -295,7 +296,7 @@ make send.o
 make send.c
 prev mailx.h implicit
 done send.c
-meta send.o %.c>%.o send.c send
+meta send.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/send.c send
 prev send.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c send.c
 done send.o generated
@@ -304,7 +305,7 @@ make spam.c
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev mailx.h implicit
 done spam.c
-meta spam.o %.c>%.o spam.c spam
+meta spam.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/spam.c spam
 prev spam.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c spam.c
 done spam.o generated
@@ -312,7 +313,7 @@ make tty.o
 make tty.c
 prev mailx.h implicit
 done tty.c
-meta tty.o %.c>%.o tty.c tty
+meta tty.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/tty.c tty
 prev tty.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c tty.c
 done tty.o generated
@@ -320,7 +321,7 @@ make vars.o
 make vars.c
 prev mailx.h implicit
 done vars.c
-meta vars.o %.c>%.o vars.c vars
+meta vars.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/vars.c vars
 prev vars.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c vars.c
 done vars.o generated
@@ -336,8 +337,6 @@ make ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashpart.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_cs.h implicit
-make cell_sys_headers.h implicit
-done cell_sys_headers.h dontcare virtual
 done ${PACKAGE_ast_INCLUDE}/ast_cs.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
@@ -346,7 +345,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/css.h dontcare
 prev mailx.h implicit
 done imap.c
-meta imap.o %.c>%.o imap.c imap
+meta imap.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/imap.c imap
 prev imap.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c imap.c
 done imap.o generated
@@ -356,12 +355,12 @@ prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev ${PACKAGE_ast_INCLUDE}/css.h implicit
 prev mailx.h implicit
 done smtp.c
-meta smtp.o %.c>%.o smtp.c smtp
+meta smtp.o %.c>%.o ${PACKAGEROOT}/src/cmd/mailx/smtp.c smtp
 prev smtp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c smtp.c
 done smtp.o generated
 bind -lcs
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -o mailx data.o cmd1.o cmd2.o cmd3.o collect.o edit.o fio.o head.o local.o lex.o list.o main.o misc.o names.o proc.o quit.o send.o spam.o tty.o vars.o imap.o smtp.o ${mam_libcs} ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o mailx data.o cmd1.o cmd2.o cmd3.o collect.o edit.o fio.o head.o local.o lex.o list.o main.o misc.o names.o proc.o quit.o send.o spam.o tty.o vars.o imap.o smtp.o ${mam_libcs} ${mam_libast}
 done mailx generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin

@@ -29,12 +29,76 @@
 #endif
 
 #define _EXPARSE_H
-
-typedef union
-#ifdef __cplusplus
-	EXSTYPE
+#ifndef EXERRCODE
+#define EXERRCODE 256
 #endif
 
+#define MINTOKEN 257
+#define CHAR 258
+#define INT 259
+#define INTEGER 260
+#define UNSIGNED 261
+#define FLOATING 262
+#define STRING 263
+#define VOID 264
+#define ADDRESS 265
+#define BREAK 266
+#define CALL 267
+#define CASE 268
+#define CONSTANT 269
+#define CONTINUE 270
+#define DECLARE 271
+#define DEFAULT 272
+#define DYNAMIC 273
+#define ELSE 274
+#define EXIT 275
+#define FOR 276
+#define FUNCTION 277
+#define ITERATE 278
+#define ID 279
+#define IF 280
+#define LABEL 281
+#define MEMBER 282
+#define NAME 283
+#define POS 284
+#define PRAGMA 285
+#define PRE 286
+#define PRINTF 287
+#define PROCEDURE 288
+#define QUERY 289
+#define RETURN 290
+#define SCANF 291
+#define SPRINTF 292
+#define SSCANF 293
+#define SWITCH 294
+#define WHILE 295
+#define F2I 296
+#define F2S 297
+#define I2F 298
+#define I2S 299
+#define S2B 300
+#define S2F 301
+#define S2I 302
+#define F2X 303
+#define I2X 304
+#define S2X 305
+#define X2F 306
+#define X2I 307
+#define X2S 308
+#define OR 309
+#define AND 310
+#define EQ 311
+#define NE 312
+#define LE 313
+#define GE 314
+#define LS 315
+#define RS 316
+#define UNARY 317
+#define INC 318
+#define DEC 319
+#define CAST 320
+#define MAXTOKEN 321
+typedef union
 {
 	struct Exnode_s*expr;
 	double		floating;
@@ -46,69 +110,4 @@ typedef union
 	struct Exbuf_s*	buffer;
 } EXSTYPE;
 extern __MANGLE__ EXSTYPE exlval;
-# define MINTOKEN 257
-# define CHAR 258
-# define INT 259
-# define INTEGER 260
-# define UNSIGNED 261
-# define FLOATING 262
-# define STRING 263
-# define VOID 264
-# define ADDRESS 265
-# define BREAK 266
-# define CALL 267
-# define CASE 268
-# define CONSTANT 269
-# define CONTINUE 270
-# define DECLARE 271
-# define DEFAULT 272
-# define DYNAMIC 273
-# define ELSE 274
-# define EXIT 275
-# define FOR 276
-# define FUNCTION 277
-# define ITERATE 278
-# define ID 279
-# define IF 280
-# define LABEL 281
-# define MEMBER 282
-# define NAME 283
-# define POS 284
-# define PRAGMA 285
-# define PRE 286
-# define PRINTF 287
-# define PROCEDURE 288
-# define QUERY 289
-# define RETURN 290
-# define SCANF 291
-# define SPRINTF 292
-# define SSCANF 293
-# define SWITCH 294
-# define WHILE 295
-# define F2I 296
-# define F2S 297
-# define I2F 298
-# define I2S 299
-# define S2B 300
-# define S2F 301
-# define S2I 302
-# define F2X 303
-# define I2X 304
-# define S2X 305
-# define X2F 306
-# define X2I 307
-# define X2S 308
-# define OR 309
-# define AND 310
-# define EQ 311
-# define NE 312
-# define LE 313
-# define GE 314
-# define LS 315
-# define RS 316
-# define UNARY 317
-# define INC 318
-# define DEC 319
-# define CAST 320
-# define MAXTOKEN 321
 #endif /* _EXPARSE_H */

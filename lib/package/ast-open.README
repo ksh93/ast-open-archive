@@ -92,7 +92,9 @@ All recorded changes follow.
 
 :::::::: ksh93 ::::::::
 
-06-10-30  --- Release ksh93s-  ---
+06-11-14  --- Release ksh93s-  ---
+06-11-14  A bug which could cause a core dump if a file descriptor for
+	  an internal file was closed from within a subshell has been fixed.
 06-10-30  The redirections <# pattern, and <## pattern have been added.
 	  Both seek forward to the beginning of the next line that contains
 	  the pattern.  The <## form copies the skipped portion to standard
@@ -2323,12 +2325,13 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
 06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk
 06-09-28 Makerules.mk: add $(IFFEREFS)
 06-09-15 Makerules.mk: fix .SHARED.DEF.* scope prereq logic
 06-09-01 Makefile: no -O for command.c on darwin (probably gcc 4.0's fault)
 06-08-15 command.c: handle no action but .AFTER|.BEFORE prereqs 
-06-08-11 Makerules.mk: .PACKAGE.INIT now checks lin64 for HOSTTYPE==*64
+06-08-11 Makerules.mk: .PACKAGE.INIT now checks lib64 for HOSTTYPE==*64
 06-08-11 command.c: pass $(COSHELL) to coopen()
 06-08-07 command.c,parse.c: add 'query - blocked' for blocked jobs
 06-08-02 command.c: cokill(state.coshell,0,0) to kill event jobs
@@ -3569,6 +3572,7 @@ All recorded changes follow.
 
 :::::::: builtin ::::::::
 
+06-11-15 cp.tst,ln.tst,mv.tst: add initial regression tests
 06-10-31 global edit to eliminate most non-const static data
 06-10-11 add sfstruse() error checks
 06-08-25 uniq.rt: add initial regression tests
@@ -3926,16 +3930,6 @@ All recorded changes follow.
 03-01-23 update for void* => Dssrecord_t*
 03-01-21 add cxlocation() to errorf messages
 
-:::::::: num_t ::::::::
-
-05-11-01 num_t.c: fix bcd_external() off-by-1 to allow 1 byte bcd
-05-03-08 lib.c: add for dssstatic()
-03-01-28 num_t.c: update for Cxtype_t.Cxmember_t
-03-01-22 add rand_t format details string doc
-02-12-17 propagate -ldss changes
-02-12-03 be_t and le_t now handle float
-02-11-22 snarf from libcdb
-
 :::::::: opaque ::::::::
 
 03-01-23 update for void* => Dssrecord_t*
@@ -3966,19 +3960,6 @@ All recorded changes follow.
 
 02-12-17 propagate -ldss changes
 02-11-01 a rudimentary alternative to the flat method
-
-:::::::: time_t ::::::::
-
-05-03-08 lib.c: add for dssstatic()
-03-08-11 time_t.c: add stamp_t for 64 bit 1/2**32 seconds since the epoch
-03-03-02 time_t.c: fix ns_external() NS arithmetic
-03-02-17 time_t.c: add tm_*_t details
-03-02-14 time_t.c: fix ns_t time part logic
-03-01-31 time_t.c: clarify { tm_hour_t tm_mon_t tm_wday_t } docs
-03-01-30 time_t.c: add tm_set and { tm_hour_t tm_mon_t tm_wday_t }
-03-01-28 time_t.c: update for Cxtype_t.Cxmember_t
-03-01-22 time_t.c: add format details string docs
-03-01-20 time_t.c: add type.format.details defaults
 
 :::::::: validate ::::::::
 
@@ -4802,6 +4783,12 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+06-11-15 astconf.c,conf.tab: add CONF_DEFER_* for variable constants
+06-11-11 port/astconf.c: validate path arg w.r.t. underlying calls
+06-11-11 comp/conf.sh: fix S CONF_STANDARD bug, add D to defer to native
+06-11-11 comp/conf.tab: add D to defer to native
+06-11-01 include/vmalloc.h: avoid VM_FLAGS sys/v*.h clash
+06-11-01 include/ast.h: add FMT_PARAM for fmtquote()
 06-10-31 disc/sfdcseekable.c: add SFSK_DISCARD for seekable window control
 06-10-31 comp/spawnveg.c,features/lib: handle posix_spawn exit status 127
 06-10-30 features/lib: fix posix_spawn() fork() prototype conflicts
@@ -6187,6 +6174,10 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+06-11-15 cp.c: fix 06-10-31 ln -s enoent bug
+06-11-11 getconf.c: let astconf() handle "undefined" vs. ""
+06-11-11 getconf.c: fix deferred getconf path search
+06-11-11 fmt.c: handle two char { \t \n } in --usage ouput
 06-10-31 global edit to eliminate most non-const static data0
 06-10-31 use <cmd.h> for all b_*() implementations; drop <cmdlib.h> 
 06-10-31 cmd.h: add CMD_ prefix to { BUILTIN DYNAMIC STANDALONE } 

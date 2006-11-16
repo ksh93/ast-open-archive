@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -197,11 +197,15 @@ callinit(void)
 #if sun && !_sun && _lib_on_exit
 	sys_trace[0].name = "__exit";
 #endif
+	message((-1, "AHA callinit"));
 	if (dll = dllnext(RTLD_LAZY))
 	{
 		for (cp = sys_trace; cp < &sys_trace[elementsof(sys_trace)]; cp++)
+		{
 			if (!(cp->func = (Sysfunc_t)dlsym(dll, cp->name)) && (*cp->name != '_' || !(cp->func = (Sysfunc_t)dlsym(dll, cp->name + 1)) || !*cp->name++))
 				cp->func = (Sysfunc_t)nosys;
+			message((-1, "AHA callinit %s %p (%p)", cp->name, cp->func, nosys));
+		}
 #if _no_exit_exit
 		state.libexit = (Exitfunc_t)dlsym(dll, "exit");
 #endif
@@ -391,7 +395,11 @@ syscall3d(int call, ...)
 				state.kernel++;
 			}
 			n = errno;
+			#if 0
 			write(on, buf, b - buf);
+			#else
+			syscall(4, on, buf, b - buf);
+			#endif
 			errno = n;
 		}
 		else

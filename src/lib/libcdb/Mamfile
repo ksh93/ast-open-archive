@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make cdb
 make libcdb.a archive
@@ -76,6 +76,11 @@ make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+make ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
+done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
@@ -92,29 +97,18 @@ make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
-make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
-done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
-done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
@@ -128,7 +122,8 @@ done ${PACKAGE_ast_INCLUDE}/ast_ccode.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
+done ${PACKAGE_ast_INCLUDE}/sfio_s.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio.h dontcare
@@ -159,10 +154,11 @@ prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/debug.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cdblib.h
 done cdbopen.c
-meta cdbopen.o %.c>%.o cdbopen.c cdbopen
+meta cdbopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbopen.c cdbopen
 prev cdbopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbopen.c
 done cdbopen.o generated
@@ -170,7 +166,7 @@ make cdbread.o
 make cdbread.c
 prev cdblib.h implicit
 done cdbread.c
-meta cdbread.o %.c>%.o cdbread.c cdbread
+meta cdbread.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbread.c cdbread
 prev cdbread.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbread.c
 done cdbread.o generated
@@ -178,7 +174,7 @@ make cdbwrite.o
 make cdbwrite.c
 prev cdblib.h implicit
 done cdbwrite.c
-meta cdbwrite.o %.c>%.o cdbwrite.c cdbwrite
+meta cdbwrite.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbwrite.c cdbwrite
 prev cdbwrite.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbwrite.c
 done cdbwrite.o generated
@@ -186,7 +182,7 @@ make cdbseek.o
 make cdbseek.c
 prev cdblib.h implicit
 done cdbseek.c
-meta cdbseek.o %.c>%.o cdbseek.c cdbseek
+meta cdbseek.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbseek.c cdbseek
 prev cdbseek.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbseek.c
 done cdbseek.o generated
@@ -194,7 +190,7 @@ make cdbmove.o
 make cdbmove.c
 prev cdblib.h implicit
 done cdbmove.c
-meta cdbmove.o %.c>%.o cdbmove.c cdbmove
+meta cdbmove.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbmove.c cdbmove
 prev cdbmove.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbmove.c
 done cdbmove.o generated
@@ -202,7 +198,7 @@ make cdbmap.o
 make cdbmap.c
 prev cdblib.h implicit
 done cdbmap.c
-meta cdbmap.o %.c>%.o cdbmap.c cdbmap
+meta cdbmap.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbmap.c cdbmap
 prev cdbmap.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbmap.c
 done cdbmap.o generated
@@ -210,7 +206,7 @@ make cdbcache.o
 make cdbcache.c
 prev cdblib.h implicit
 done cdbcache.c
-meta cdbcache.o %.c>%.o cdbcache.c cdbcache
+meta cdbcache.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbcache.c cdbcache
 prev cdbcache.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbcache.c
 done cdbcache.o generated
@@ -218,7 +214,7 @@ make cdbdrop.o
 make cdbdrop.c
 prev cdblib.h implicit
 done cdbdrop.c
-meta cdbdrop.o %.c>%.o cdbdrop.c cdbdrop
+meta cdbdrop.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbdrop.c cdbdrop
 prev cdbdrop.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbdrop.c
 done cdbdrop.o generated
@@ -226,7 +222,7 @@ make cdbempty.o
 make cdbempty.c
 prev cdblib.h implicit
 done cdbempty.c
-meta cdbempty.o %.c>%.o cdbempty.c cdbempty
+meta cdbempty.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbempty.c cdbempty
 prev cdbempty.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbempty.c
 done cdbempty.o generated
@@ -236,7 +232,7 @@ make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h
 prev cdblib.h implicit
 done cdblib.c
-meta cdblib.o %.c>%.o cdblib.c cdblib
+meta cdblib.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdblib.c cdblib
 prev cdblib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdblib.c
 done cdblib.o generated
@@ -255,8 +251,10 @@ done ${PACKAGE_ast_INCLUDE}/tm.h
 make ${PACKAGE_ast_INCLUDE}/hashpart.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/hashpart.h
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 make FEATURE/lib implicit
-meta FEATURE/lib features/%>FEATURE/% features/lib lib
+meta FEATURE/lib features/%>FEATURE/% ${PACKAGEROOT}/src/lib/libcdb/features/lib lib
 make features/lib
 done features/lib
 prev cdb.req
@@ -271,7 +269,7 @@ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc
 done FEATURE/lib generated
 prev cdblib.h implicit
 done cdbtypes.c
-meta cdbtypes.o %.c>%.o cdbtypes.c cdbtypes
+meta cdbtypes.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbtypes.c cdbtypes
 prev cdbtypes.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbtypes.c
 done cdbtypes.o generated
@@ -279,7 +277,7 @@ make cdbmeth.o
 make cdbmeth.c
 prev cdblib.h implicit
 done cdbmeth.c
-meta cdbmeth.o %.c>%.o cdbmeth.c cdbmeth
+meta cdbmeth.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbmeth.c cdbmeth
 prev cdbmeth.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbmeth.c
 done cdbmeth.o generated
@@ -287,7 +285,7 @@ make cdbdump.o
 make cdbdump.c
 prev cdblib.h implicit
 done cdbdump.c
-meta cdbdump.o %.c>%.o cdbdump.c cdbdump
+meta cdbdump.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbdump.c cdbdump
 prev cdbdump.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbdump.c
 done cdbdump.o generated
@@ -295,7 +293,7 @@ make cdberror.o
 make cdberror.c
 prev cdblib.h implicit
 done cdberror.c
-meta cdberror.o %.c>%.o cdberror.c cdberror
+meta cdberror.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdberror.c cdberror
 prev cdberror.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdberror.c
 done cdberror.o generated
@@ -306,7 +304,7 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done cdbimage.c
-meta cdbimage.o %.c>%.o cdbimage.c cdbimage
+meta cdbimage.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbimage.c cdbimage
 prev cdbimage.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbimage.c
 done cdbimage.o generated
@@ -314,7 +312,7 @@ make cdbcdb.o
 make cdbcdb.c
 prev cdblib.h implicit
 done cdbcdb.c
-meta cdbcdb.o %.c>%.o cdbcdb.c cdbcdb
+meta cdbcdb.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbcdb.c cdbcdb
 prev cdbcdb.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbcdb.c
 done cdbcdb.o generated
@@ -335,7 +333,7 @@ done ${PACKAGE_ast_INCLUDE}/expr.h
 prev cdblib.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 done cdbflat.c
-meta cdbflat.o %.c>%.o cdbflat.c cdbflat
+meta cdbflat.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbflat.c cdbflat
 prev cdbflat.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbflat.c
 done cdbflat.o generated
@@ -350,7 +348,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfdcgzip.h
 prev cdblib.h implicit
 done cdbgzip.c
-meta cdbgzip.o %.c>%.o cdbgzip.c cdbgzip
+meta cdbgzip.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbgzip.c cdbgzip
 prev cdbgzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbgzip.c
 done cdbgzip.o generated
@@ -366,7 +364,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/pzip.h
 prev cdblib.h implicit
 done cdbpzip.c
-meta cdbpzip.o %.c>%.o cdbpzip.c cdbpzip
+meta cdbpzip.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbpzip.c cdbpzip
 prev cdbpzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_cdb -c cdbpzip.c
 done cdbpzip.o generated
@@ -376,7 +374,7 @@ make ${PACKAGE_ast_INCLUDE}/vdelta.h implicit
 done ${PACKAGE_ast_INCLUDE}/vdelta.h
 prev cdblib.h implicit
 done cdbvdelta.c
-meta cdbvdelta.o %.c>%.o cdbvdelta.c cdbvdelta
+meta cdbvdelta.o %.c>%.o ${PACKAGEROOT}/src/lib/libcdb/cdbvdelta.c cdbvdelta
 prev cdbvdelta.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_cdb -D_PACKAGE_ast -c cdbvdelta.c
 done cdbvdelta.o generated

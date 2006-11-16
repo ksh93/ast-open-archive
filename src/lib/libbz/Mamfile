@@ -82,6 +82,11 @@ make ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+make ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
+done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
 make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 make ${INSTALLROOT}/include/prototyped.h implicit
@@ -95,23 +100,18 @@ make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
 make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
@@ -122,11 +122,12 @@ done ${PACKAGE_ast_INCLUDE}/ast_stdio.h dontcare
 done ${PACKAGE_ast_INCLUDE}/stdio.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done bzlib.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done bzhdr.h
 done blocksort.c
-meta blocksort.o %.c>%.o blocksort.c blocksort
+meta blocksort.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/blocksort.c blocksort
 prev blocksort.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c blocksort.c
 done blocksort.o generated
@@ -134,7 +135,7 @@ make huffman.o
 make huffman.c
 prev bzhdr.h implicit
 done huffman.c
-meta huffman.o %.c>%.o huffman.c huffman
+meta huffman.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/huffman.c huffman
 prev huffman.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c huffman.c
 done huffman.o generated
@@ -142,7 +143,7 @@ make crctable.o
 make crctable.c
 prev bzhdr.h implicit
 done crctable.c
-meta crctable.o %.c>%.o crctable.c crctable
+meta crctable.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/crctable.c crctable
 prev crctable.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c crctable.c
 done crctable.o generated
@@ -150,7 +151,7 @@ make randtable.o
 make randtable.c
 prev bzhdr.h implicit
 done randtable.c
-meta randtable.o %.c>%.o randtable.c randtable
+meta randtable.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/randtable.c randtable
 prev randtable.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c randtable.c
 done randtable.o generated
@@ -158,7 +159,7 @@ make compress.o
 make compress.c
 prev bzhdr.h implicit
 done compress.c
-meta compress.o %.c>%.o compress.c compress
+meta compress.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/compress.c compress
 prev compress.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c compress.c
 done compress.o generated
@@ -166,7 +167,7 @@ make decompress.o
 make decompress.c
 prev bzhdr.h implicit
 done decompress.c
-meta decompress.o %.c>%.o decompress.c decompress
+meta decompress.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/decompress.c decompress
 prev decompress.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c decompress.c
 done decompress.o generated
@@ -176,7 +177,7 @@ make io.h implicit
 done io.h dontcare virtual
 prev bzhdr.h implicit
 done bzlib.c
-meta bzlib.o %.c>%.o bzlib.c bzlib
+meta bzlib.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/bzlib.c bzlib
 prev bzlib.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c bzlib.c
 done bzlib.o generated
@@ -209,7 +210,7 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done sfdcbzip.c
-meta sfdcbzip.o %.c>%.o sfdcbzip.c sfdcbzip
+meta sfdcbzip.o %.c>%.o ${PACKAGEROOT}/src/lib/libbz/sfdcbzip.c sfdcbzip
 prev sfdcbzip.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_bz -D_PACKAGE_ast -c sfdcbzip.c
 done sfdcbzip.o generated
@@ -247,7 +248,7 @@ done ${PACKAGE_ast_INCLUDE} generated
 make ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
 prev ${PACKAGE_ast_INCLUDE}
 prev sfdcbzip.h
-exec - proto -p -s -l LICENSE '-o zlib,since=1996,author="Julian R Seward"'  sfdcbzip.h  > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/src/lib/libbz/LICENSE '-o zlib,since=1996,author="Julian R Seward"'  sfdcbzip.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/sfdcbzip.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/sfdcbzip.h
@@ -255,7 +256,7 @@ exec - fi
 done ${PACKAGE_ast_INCLUDE}/sfdcbzip.h generated
 make ${PACKAGE_ast_INCLUDE}/bzlib.h
 prev bzlib.h
-exec - proto -p -s -l LICENSE '-o zlib,since=1996,author="Julian R Seward"'  bzlib.h  > 1.${COTEMP}.x
+exec - proto -p -s -l ${PACKAGEROOT}/src/lib/libbz/LICENSE '-o zlib,since=1996,author="Julian R Seward"'  bzlib.h  > 1.${COTEMP}.x
 exec - if	cmp 2>/dev/null -s ${PACKAGE_ast_INCLUDE}/bzlib.h 1.${COTEMP}.x
 exec - then	rm -f 1.${COTEMP}.x
 exec - else	mv 1.${COTEMP}.x ${PACKAGE_ast_INCLUDE}/bzlib.h

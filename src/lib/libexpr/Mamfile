@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${PACKAGEROOT}/lib/package/ast.lic
-done ${PACKAGEROOT}/lib/package/ast.lic
+make ${INSTALLROOT}/lib/package/ast.lic
+done ${INSTALLROOT}/lib/package/ast.lic
 make install
 make expr
 make libexpr.a archive
@@ -72,7 +72,7 @@ make exparse.y
 done exparse.y
 meta exparse.o %.c>%.o exparse.c exparse
 make exparse.c
-meta exparse.c %.y>%.c exparse.y exparse
+meta exparse.c %.y>%.c ${PACKAGEROOT}/src/lib/libexpr/exparse.y exparse
 prev exparse.y
 exec - if	silent ${YACC} --version >/dev/null 2>&1
 exec - then	${YACC} ${YACCFLAGS} -oexparse.c -pex exparse.y
@@ -134,18 +134,6 @@ exec - #define gettxt(h,t)	(t)\
 exec - #endif' $i > O$i
 exec - 	done
 exec - fi
-make ${PACKAGE_ast_INCLUDE}/re_comp.h implicit
-make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-make ${INSTALLROOT}/include/prototyped.h implicit
-done ${INSTALLROOT}/include/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
-done ${PACKAGE_ast_INCLUDE}/re_comp.h dontcare
-make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_stdio.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
@@ -155,8 +143,16 @@ make ${PACKAGE_ast_INCLUDE}/regex.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_map.h dontcare
+make ${PACKAGE_ast_INCLUDE}/endian.h implicit
+make ${PACKAGE_ast_INCLUDE}/bytesex.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
+done ${PACKAGE_ast_INCLUDE}/bytesex.h dontcare
+done ${PACKAGE_ast_INCLUDE}/endian.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_common.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+make ${INSTALLROOT}/include/prototyped.h implicit
+done ${INSTALLROOT}/include/prototyped.h dontcare
+done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/regex.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_map.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_botch.h implicit
@@ -165,14 +161,18 @@ make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-make error?--?old?ethernet?address?at?wrong?offset implicit
-done error?--?old?ethernet?address?at?wrong?offset dontcare virtual
 done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
-prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
-prev ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+make ${PACKAGE_ast_INCLUDE}/getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_sys.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_lib.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
@@ -206,6 +206,7 @@ done ${PACKAGE_ast_INCLUDE}/option.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/error.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 make expr.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/cdt.h implicit
@@ -232,7 +233,7 @@ make excc.o
 make excc.c
 prev exlib.h implicit
 done excc.c
-meta excc.o %.c>%.o excc.c excc
+meta excc.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/excc.c excc
 prev excc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excc.c
 done excc.o generated
@@ -240,7 +241,7 @@ make excontext.o
 make excontext.c
 prev exlib.h implicit
 done excontext.c
-meta excontext.o %.c>%.o excontext.c excontext
+meta excontext.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/excontext.c excontext
 prev excontext.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c excontext.c
 done excontext.o generated
@@ -248,7 +249,7 @@ make exdata.o
 make exdata.c
 prev exlib.h implicit
 done exdata.c
-meta exdata.o %.c>%.o exdata.c exdata
+meta exdata.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exdata.c exdata
 prev exdata.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exdata.c
 done exdata.o generated
@@ -276,7 +277,7 @@ exec - } < exparse.h > exop.h
 done exop.h generated
 prev exlib.h implicit
 done exeval.c
-meta exeval.o %.c>%.o exeval.c exeval
+meta exeval.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exeval.c exeval
 prev exeval.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exeval.c
 done exeval.o generated
@@ -284,7 +285,7 @@ make exexpr.o
 make exexpr.c
 prev exlib.h implicit
 done exexpr.c
-meta exexpr.o %.c>%.o exexpr.c exexpr
+meta exexpr.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exexpr.c exexpr
 prev exexpr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exexpr.c
 done exexpr.o generated
@@ -292,7 +293,7 @@ make exerror.o
 make exerror.c
 prev exlib.h implicit
 done exerror.c
-meta exerror.o %.c>%.o exerror.c exerror
+meta exerror.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exerror.c exerror
 prev exerror.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exerror.c
 done exerror.o generated
@@ -300,7 +301,7 @@ make exopen.o
 make exopen.c
 prev exlib.h implicit
 done exopen.c
-meta exopen.o %.c>%.o exopen.c exopen
+meta exopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exopen.c exopen
 prev exopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exopen.c
 done exopen.o generated
@@ -308,7 +309,7 @@ make exrewind.o
 make exrewind.c
 prev exlib.h implicit
 done exrewind.c
-meta exrewind.o %.c>%.o exrewind.c exrewind
+meta exrewind.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exrewind.c exrewind
 prev exrewind.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exrewind.c
 done exrewind.o generated
@@ -316,7 +317,7 @@ make extoken.o
 make extoken.c
 prev exlib.h implicit
 done extoken.c
-meta extoken.o %.c>%.o extoken.c extoken
+meta extoken.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/extoken.c extoken
 prev extoken.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extoken.c
 done extoken.o generated
@@ -324,7 +325,7 @@ make extype.o
 make extype.c
 prev exlib.h implicit
 done extype.c
-meta extype.o %.c>%.o extype.c extype
+meta extype.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/extype.c extype
 prev extype.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c extype.c
 done extype.o generated
@@ -332,7 +333,7 @@ make exnospace.o
 make exnospace.c
 prev exlib.h implicit
 done exnospace.c
-meta exnospace.o %.c>%.o exnospace.c exnospace
+meta exnospace.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exnospace.c exnospace
 prev exnospace.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exnospace.c
 done exnospace.o generated
@@ -340,7 +341,7 @@ make exstash.o
 make exstash.c
 prev exlib.h implicit
 done exstash.c
-meta exstash.o %.c>%.o exstash.c exstash
+meta exstash.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exstash.c exstash
 prev exstash.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exstash.c
 done exstash.o generated
@@ -348,7 +349,7 @@ make exzero.o
 make exzero.c
 prev exlib.h implicit
 done exzero.c
-meta exzero.o %.c>%.o exzero.c exzero
+meta exzero.o %.c>%.o ${PACKAGEROOT}/src/lib/libexpr/exzero.c exzero
 prev exzero.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_expr -c exzero.c
 done exzero.o generated
