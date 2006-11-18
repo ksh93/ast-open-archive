@@ -1046,9 +1046,12 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="ksh93 changes">ksh93 changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
-06-11-14  --- Release ksh93s-  ---
+06-11-16  --- Release ksh93s  ---
+06-11-16  The discipline functions have been modified to allow each subscript
+	  to act independently.  Currently the discipline function will not
+	  be called when called from a discipline function of the same variable.
 06-11-14  A bug which could cause a core dump if a file descriptor for
-	  an internal file was closed from within a subshell has been fixed.
+	  an internal file was closed from with a subshell has been fixed.
 06-10-30  The redirections &lt;# pattern, and &lt;## pattern have been added.
 	  Both seek forward to the beginning of the next line that contains
 	  the pattern.  The &lt;## form copies the skipped portion to standard
@@ -3298,6 +3301,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="msgcc changes">msgcc changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-11-15 msgcc.sh: date -f x =&gt; date +x for ast-base portability
 06-10-11 add sfstruse() error checks
 02-03-11 msgcc: fix merge replacement threshhold logic
 	 msggen: convert { \a \b < ></ >\r \v } back to C escapes
@@ -3315,6 +3319,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-11-15 Makerules.mk: fix :: vs :LIBRARY: ordering bug for .o prereqs
 06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
 06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk
 06-09-28 Makerules.mk: add $(IFFEREFS)
@@ -8755,7 +8760,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>November 16, 2006</TD>
+<TD align=right>November 18, 2006</TD>
 </TR>
 </TABLE>
 <P>

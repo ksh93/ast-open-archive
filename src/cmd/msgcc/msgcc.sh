@@ -1,10 +1,10 @@
 ########################################################################
 #                                                                      #
 #               This software is part of the ast package               #
-#                  Copyright (c) 2000-2005 AT&T Corp.                  #
+#           Copyright (c) 2000-2006 AT&T Knowledge Ventures            #
 #                      and is licensed under the                       #
 #                  Common Public License, Version 1.0                  #
-#                            by AT&T Corp.                             #
+#                      by AT&T Knowledge Ventures                      #
 #                                                                      #
 #                A copy of the License is available at                 #
 #            http://www.opensource.org/licenses/cpl1.0.txt             #
@@ -245,7 +245,7 @@ then	if	[[ $__merge__ && -r $__out__ ]]
 	fi
 	exec 1>$__tmp__ 9>&1
 	print -r -- '$'" ${__out__%.msg} message catalog"
-	print -r -- '$translation'" $__command__ $(date -f %Y-%m-%d)"
+	print -r -- '$translation'" $__command__ $(date +%Y-%m-%d)"
 	print -r -- '$set'" $__set__"
 	print -r -- '$quote "'
 	sort -u "${__objv__[@]}" | {

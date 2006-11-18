@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-11-11 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-11-15 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -1613,10 +1613,10 @@ end
 			($(TL)) : .PARAMETER
 			TP += ($(TL))
 		end
-		if T3
-			$(T3) : .SPECIAL $(TA:V:Q)
+		if T1 = "$(T3:A=.IMPLICIT)"
+			$(T1) : .SPECIAL $(TA:V:Q)
 			if "$(.OPTIONS.$(<))"
-				$(T3) : .SPECIAL (.OPTIONS.$(<))
+				$(T1) : .SPECIAL (.OPTIONS.$(<))
 			end
 		end
 		if TS
