@@ -21,6 +21,13 @@
 ***********************************************************************/
 #define _std_strtol	1
 
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE	1
+#endif
+#ifndef __EXTENSIONS__
+#define __EXTENSIONS__	1
+#endif
+
 #include <ast_std.h>
 
 #include "dll_3d.h"

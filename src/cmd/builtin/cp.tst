@@ -4,9 +4,11 @@ UNIT cp
 
 TEST 01 basics
 
-	EXEC	a b
+	EXEC	a
 		ERROR - 'cp: a: cannot copy [No such file or directory]'
 		EXIT 1
+
+	EXEC	a b
 
 	EXEC	a b
 		INPUT a aaa

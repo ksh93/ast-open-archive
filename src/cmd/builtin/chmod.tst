@@ -252,3 +252,29 @@ TEST 01 '"=" vs. umask'
 
 	EXEC	-c =,a=rw f
 		OUTPUT - 'f: mode changed to 0666 (rw-rw-rw-)'
+
+TEST 02 'X vs. DIR and REG'
+
+	PROG	touch f
+		UMASK 000
+
+	EXEC	444 f
+
+	EXEC	-c u=rX f
+
+	EXEC	-c o+x f
+		OUTPUT - 'f: mode changed to 0445 (r--r--r-x)'
+
+	EXEC	-c u=rX f
+		OUTPUT - 'f: mode changed to 0545 (r-xr--r-x)'
+
+	PROG	mkdir d
+		OUTPUT -
+
+	EXEC	400 d
+
+	EXEC	-c u=rX d
+		OUTPUT - 'd: mode changed to 0500 (r-x------)'
+
+	EXEC	-c o=rX d
+		OUTPUT - 'd: mode changed to 0505 (r-x---r-x)'

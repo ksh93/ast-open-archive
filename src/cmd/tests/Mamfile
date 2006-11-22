@@ -126,10 +126,10 @@ done opt.c
 meta opt.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/opt.c opt
 prev opt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c opt.c
-done opt.o virtual
+done opt.o generated
 bind -last
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o opt opt.o ${mam_libast}
-done opt virtual
+done opt generated
 exec - regress  opt.tst opt
 done test.opt virtual
 make test.strelapsed
@@ -143,9 +143,9 @@ done strelapsed.c
 meta strelapsed.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strelapsed.c strelapsed
 prev strelapsed.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strelapsed.c
-done strelapsed.o virtual
+done strelapsed.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o strelapsed strelapsed.o ${mam_libast}
-done strelapsed virtual
+done strelapsed generated
 exec - regress  strelapsed.tst strelapsed
 done test.strelapsed virtual
 make test.strtoi
@@ -160,9 +160,9 @@ done strtoi.c
 meta strtoi.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strtoi.c strtoi
 prev strtoi.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtoi.c
-done strtoi.o virtual
+done strtoi.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o strtoi strtoi.o ${mam_libast}
-done strtoi virtual
+done strtoi generated
 exec - regress  strtoi.tst strtoi
 done test.strtoi virtual
 make test.strntoi
@@ -177,9 +177,9 @@ done strntoi.c
 meta strntoi.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strntoi.c strntoi
 prev strntoi.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntoi.c
-done strntoi.o virtual
+done strntoi.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o strntoi strntoi.o ${mam_libast}
-done strntoi virtual
+done strntoi generated
 exec - regress  strntoi.tst strntoi
 done test.strntoi virtual
 make test.strtof
@@ -199,9 +199,9 @@ done strtof.c
 meta strtof.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strtof.c strtof
 prev strtof.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtof.c
-done strtof.o virtual
+done strtof.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o strtof strtof.o ${mam_libast}
-done strtof virtual
+done strtof generated
 exec - regress  strtof.tst strtof
 done test.strtof virtual
 make test.strntof
@@ -216,9 +216,9 @@ done strntof.c
 meta strntof.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strntof.c strntof
 prev strntof.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntof.c
-done strntof.o virtual
+done strntof.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o strntof strntof.o ${mam_libast}
-done strntof virtual
+done strntof generated
 exec - regress  strntof.tst strntof
 done test.strntof virtual
 make test.base64
@@ -230,9 +230,9 @@ done base64.c
 meta base64.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/base64.c base64
 prev base64.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c base64.c
-done base64.o virtual
+done base64.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o base64 base64.o ${mam_libast}
-done base64 virtual
+done base64 generated
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
 exec - base64
 done test.base64 virtual
@@ -297,9 +297,9 @@ done date.c
 meta date.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/date.c date
 prev date.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c date.c
-done date.o virtual
+done date.o generated
 exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o date date.o ${mam_libast}
-done date virtual
+done date generated
 make date.msk
 done date.msk
 make date.dat
@@ -327,8 +327,8 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
-make ../../lib/libast/FEATURE/sfio implicit
-meta ../../lib/libast/FEATURE/sfio >FEATURE/%  sfio
+make FEATURE/sfio implicit
+meta FEATURE/sfio >FEATURE/%  sfio
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : def sfio
 done FEATURE/sfio generated
 done sfio/sftest.h
@@ -548,8 +548,8 @@ make ${PACKAGE_ast_INCLUDE}/ast_windows.h implicit
 prev windows.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_windows.h dontcare
-make ../../lib/libast/FEATURE/vmalloc implicit
-meta ../../lib/libast/FEATURE/vmalloc >FEATURE/%  vmalloc
+make FEATURE/vmalloc implicit
+meta FEATURE/vmalloc >FEATURE/%  vmalloc
 exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libast}  : def vmalloc
 done FEATURE/vmalloc dontcare generated
 prev ../../lib/libast/ast_common.h implicit

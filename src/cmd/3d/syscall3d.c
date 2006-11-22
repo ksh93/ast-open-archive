@@ -182,6 +182,10 @@ buffer(char** buf, char* end, register char* s, int n)
 	}
 }
 
+#if __gnu_linux__
+#undef	_no_exit_exit
+#endif
+
 /*
  * initialize the 3d syscall table
  */
@@ -197,15 +201,11 @@ callinit(void)
 #if sun && !_sun && _lib_on_exit
 	sys_trace[0].name = "__exit";
 #endif
-	message((-1, "AHA callinit"));
 	if (dll = dllnext(RTLD_LAZY))
 	{
 		for (cp = sys_trace; cp < &sys_trace[elementsof(sys_trace)]; cp++)
-		{
 			if (!(cp->func = (Sysfunc_t)dlsym(dll, cp->name)) && (*cp->name != '_' || !(cp->func = (Sysfunc_t)dlsym(dll, cp->name + 1)) || !*cp->name++))
 				cp->func = (Sysfunc_t)nosys;
-			message((-1, "AHA callinit %s %p (%p)", cp->name, cp->func, nosys));
-		}
 #if _no_exit_exit
 		state.libexit = (Exitfunc_t)dlsym(dll, "exit");
 #endif
@@ -292,8 +292,6 @@ syscall3d(int call, ...)
 	char*			t;
 	char**			p;
 	int*			ip;
-	struct DIRdirent*	dp;
-	struct DIRdirent*	de;
 	ARG			arg[7];
 	char			buf[MAXOUT];
 	Sysfunc_t		func;
@@ -322,7 +320,7 @@ syscall3d(int call, ...)
 	case 1: arg[1].pointer = a1;
 	}
 #endif
-	if (state.kernel || state.trace.pid <= 1 || (on = fsfd(&state.fs[FS_option])) <= 0 || !(MSG_MASK(cp->call) & (state.trace.call & ~MSG_MASK(error_info.trace ? 0 : MSG_nop))))
+	if (state.kernel || state.trace.pid <= 1 || (on = fsfd(&state.fs[FS_option])) <= 0 || !(state.test & 0100) && !(MSG_MASK(cp->call) & (state.trace.call & ~MSG_MASK(error_info.trace ? 0 : MSG_nop))))
 		on = 0;
 	else
 	{
@@ -395,11 +393,7 @@ syscall3d(int call, ...)
 				state.kernel++;
 			}
 			n = errno;
-			#if 0
 			write(on, buf, b - buf);
-			#else
-			syscall(4, on, buf, b - buf);
-			#endif
 			errno = n;
 		}
 		else
@@ -566,8 +560,9 @@ syscall3d(int call, ...)
 					case SYS3D_getdents:
 						if (r > 0)
 						{
-							dp = (struct DIRdirent*)ap->pointer;
-							de = (struct DIRdirent*)((char*)dp + r);
+							struct DIRdirent*	dp = (struct DIRdirent*)ap->pointer;
+							struct DIRdirent*	de = (struct DIRdirent*)((char*)dp + r);
+
 							bprintf(&b, e, " [");
 							while (dp < de)
 							{
@@ -613,7 +608,40 @@ syscall3d(int call, ...)
 					break;
 				}
 			}
+#if DEBUG_dirent
+			switch (call)
+			{
+#ifdef SYS3D_readdir
+#undef	DIRdirent
+			case SYS3D_readdir:
+				if (r && (state.test & 0100))
+				{
+					struct DIRdirent*	dp = (struct DIRdirent*)pointerof(r);
+
+					bprintf(&b, e, " ) = [ %02d %lu \"%s\" ]", D_TYPE(dp), D_FILENO(dp), dp->d_name);
+					break;
+				}
+				goto number;
+#endif
+#ifdef SYS3D_readdir64
+			case SYS3D_readdir64:
+				if (r && (state.test & 0100))
+				{
+					struct dirent64*	dp = (struct dirent64*)pointerof(r);
+
+					bprintf(&b, e, " ) = [ %02d %llu \"%s\" ]", D_TYPE(dp), D_FILENO(dp), dp->d_name);
+					break;
+				}
+				goto number;
+#endif
+			default:
+			number:
+				bprintf(&b, e, "%s) = %d", a ? " " : "\t", r);
+				break;
+			}
+#else
 			bprintf(&b, e, "%s) = %d", a ? " " : "\t", r);
+#endif
 			if (r == -1)
 				bprintf(&b, e, " [%s]", strerror(errno));
 			n = errno;

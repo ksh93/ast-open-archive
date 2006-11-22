@@ -1,3 +1,5 @@
+06-11-23 finally get linux to pass regression tests
+06-11-21 fchdir3d: let chdir do the work if fd matches cached path
 06-09-28 3d.sh: used getconf LIBPATH|LIBPREFIX|LIBSUFFIX -- how novel
 06-09-26 3d.h,dir3d.c,dll3d.c: fix strtou*l*l maps for __int64 vs. long long
 06-09-18 strmatch.c,touch.c: add private obsolete api copies

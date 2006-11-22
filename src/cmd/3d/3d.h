@@ -135,6 +135,12 @@ typedef int (*Fs_get_t)(struct Fs*, char*, const char*, int);
 
 typedef int (*Fs_set_t)(struct Fs*, const char*, int, const char*, int);
 
+#ifdef LINK_MAX
+#define _3D_LINK_MAX	LINK_MAX
+#else
+#define _3D_LINK_MAX	30000
+#endif
+
 #define ATTR_MAX	121
 
 #include "FEATURE/peek"

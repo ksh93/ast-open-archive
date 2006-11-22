@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -31,10 +31,10 @@ fchdir3d(int fd)
 	Dir_t*		dp;
 	struct stat	st;
 
-	if (FCHDIR(fd))
-		return -1;
 	if (fd >= 0 && fd < elementsof(state.file) && (dp = state.file[fd].dir) && !FSTAT(fd, &st) && dp->dev == st.st_dev && dp->ino == st.st_ino)
 		chdir(dp->path);
+	else if (FCHDIR(fd))
+		return -1;
 	return 0;
 }
 

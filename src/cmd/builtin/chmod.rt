@@ -23,3 +23,20 @@ TEST '"=" vs. umask'
 	EXEC -c =,a=rw f
 
 	done
+
+TEST "X vs. DIR and REG"
+
+	UMASK 000
+
+	PROG touch f
+
+	EXEC 444 f
+	EXEC -c u=rX f
+	EXEC -c o+x f
+	EXEC -c u=rX f
+
+	PROG mkdir d
+
+	EXEC 400 d
+	EXEC -c u=rX d
+	EXEC -c o=rX d

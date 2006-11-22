@@ -24,7 +24,7 @@
 /*
  * 3d directory(3)
  *
- * NOTE: there are 2 limitations to this implementation
+ * NOTE: there are 3 limitations to this implementation
  *
  *	 (1) opendir() allocates one file descriptor for each directory
  *	     view and these remain open until closedir()
@@ -33,6 +33,10 @@
  *	     and TELLDIR() offset, and the directory view level takes
  *	     TABBITS bits, so TELLDIR() offsets are limited to (32-TABBITS)
  *	     bits, but that would be one big physical directory
+ *
+ *	(3) if dirent.d_type supported then directory stat.st_nlink is
+ *	    inflated to foil viewpath subdirectory counting that would
+ *	    ship lower view subdirs not reflected in the top level st_nlink
  */
 
 #define _std_strtol	1
@@ -46,6 +50,11 @@
 #undef	sbrk
 
 #include "dir_3d.h"
+
+#if !_dir_ok
+#undef	dirent
+#define dirent	DIRdirent
+#endif
 
 #undef	strtol
 #undef	strtoul
@@ -69,6 +78,7 @@ opendir3d(const char* apath)
 	else if (!(dirp = newof(0, DIR, 1, 0)))
 		return 0;
 	intercepted++;
+	dirp->fd = -1;
 	dirp->viewp = dirp->view;
 	n = state.in_2d;
 	if (path = pathreal(apath, P_SLASH, NiL))

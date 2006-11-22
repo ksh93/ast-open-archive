@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -69,6 +69,10 @@ int fstat(fd, st) int fd; struct stat* st;
 	if (FSTAT(fd, st))
 		return -1;
 #endif
+#if _mem_d_type_dirent
+	if (S_ISDIR(st->st_mode))
+		st->st_nlink = _3D_LINK_MAX;
+#endif
 	if (state.kernel)
 		return 0;
 #if FS
@@ -108,6 +112,10 @@ fstat643d(int fd, struct stat64* st)
 #endif
 	if (FSTAT64(fd, st))
 		return -1;
+#if _mem_d_type_dirent
+	if (S_ISDIR(st->st_mode))
+		st->st_nlink = _3D_LINK_MAX;
+#endif
 	if (state.kernel)
 		return 0;
 #if FS

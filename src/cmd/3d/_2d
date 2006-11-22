@@ -13,7 +13,7 @@ function _2d
 {
 	option=$(vpath /#option/3d 2>/dev/null)
 	case $option in
-	?*)	trap "set +o noglob; vpath \$option; export LD_PRELOAD=$LD_PRELOAD _RLD_LIST=$_RLD_LIST" 0 INT QUIT
+	?*)	trap "set +o noglob; vpath \$option; export LD_PRELOAD='$LD_PRELOAD' _RLD_LIST='$_RLD_LIST' _RLDN32_LIST='$_RLDN32_LIST'" 0 INT QUIT
 		vpath - /#option/2d
 		;;
 	esac
