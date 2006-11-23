@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make ast_at
 make at.o
@@ -147,7 +147,7 @@ done ${PACKAGE_ast_INCLUDE}/coshell.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done at.h
 done at.c
-meta at.o %.c>%.o ${PACKAGEROOT}/src/cmd/at/at.c at
+meta at.o %.c>%.o at.c at
 prev at.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1996-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?at]"\" -c at.c
 done at.o generated
@@ -168,7 +168,7 @@ make atx.o
 make atx.c
 prev at.h implicit
 done atx.c
-meta atx.o %.c>%.o ${PACKAGEROOT}/src/cmd/at/atx.c atx
+meta atx.o %.c>%.o atx.c atx
 prev atx.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c atx.c
 done atx.o generated
@@ -211,7 +211,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/cdt.h
 prev at.h implicit
 done atd.c
-meta atd.o %.c>%.o ${PACKAGEROOT}/src/cmd/at/atd.c atd
+meta atd.o %.c>%.o atd.c atd
 prev atd.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c atd.c
 done atd.o generated

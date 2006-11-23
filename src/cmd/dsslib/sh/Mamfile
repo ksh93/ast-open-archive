@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make dsstype
 make libkshdsstype.a archive
@@ -153,7 +153,7 @@ done ${PACKAGE_ast_INCLUDE}/cmd.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/shell.h
 done dsstype.c
-meta dsstype.o %.c>%.o ${PACKAGEROOT}/src/cmd/dsslib/sh/dsstype.c dsstype
+meta dsstype.o %.c>%.o dsstype.c dsstype
 prev dsstype.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_dsstype -DUSAGE_LICENSE=\""[-author?David Korn <dgk@research.att.com>][-copyright?Copyright (c) 2003-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?dsssh]"\" -D_PACKAGE_ast -c dsstype.c
 done dsstype.o generated

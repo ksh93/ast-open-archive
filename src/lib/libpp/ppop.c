@@ -341,6 +341,7 @@ ppop(int op, ...)
 	struct ppsymkey*		key;
 	struct oplist*			xp;
 	Sfio_t*				sp;
+	struct stat			st;
 	PPCOMMENT			ppcomment;
 	PPLINESYNC			pplinesync;
 
@@ -373,35 +374,32 @@ ppop(int op, ...)
 	case PP_CDIR:
 		p = va_arg(ap, char*);
 		c = va_arg(ap, int);
+		pp.cdir.path = 0;
 		if (!p)
-		{
-			pp.cdir = 0;
 			pp.c = c;
-		}
 		else if (streq(p, "-"))
 		{
-			pp.cdir = 0;
 			pp.c = c;
 			for (dp = pp.firstdir; dp; dp = dp->next)
 				dp->c = c;
 		}
 		else if (!pp.c)
 		{
-			if (!*p)
-			{
-				pp.cdir = 0;
+			if (!*p || stat((pathcanon(p, 0), p), &st))
 				pp.c = c;
-			}
 			else
 			{
-				pathcanon(p, 0);
 				for (dp = pp.firstdir; dp; dp = dp->next)
 				{
-					if (!pp.c && (dp->c || dp->name && streq(dp->name, p)))
+					if (!pp.c && (dp->c || dp->name && SAMEID(&dp->id, &st)))
 						pp.c = 1;
 					dp->c = pp.c == 1;
 				}
-				pp.cdir = pp.c ? 0 : p;
+				if (!pp.c)
+				{
+					pp.cdir.path = p;
+					SAVEID(&pp.cdir.id, &st);
+				}
 			}
 		}
 		break;
@@ -535,18 +533,15 @@ ppop(int op, ...)
 		pp.ro_mode |= INIT;
 		p = va_arg(ap, char*);
 		c = va_arg(ap, int);
+		pp.hostdir.path = 0;
 		if (!p)
-		{
-			pp.hostdir = 0;
 			pp.hosted = c;
-		}
 		else if (streq(p, "-"))
 		{
 			if (pp.initialized)
 				set(&pp.mode, HOSTED, c);
 			else
 			{
-				pp.hostdir = 0;
 				pp.hosted = c ? 1 : 2;
 				for (dp = pp.firstdir; dp; dp = dp->next)
 					if (pp.hosted == 1)
@@ -557,24 +552,24 @@ ppop(int op, ...)
 		}
 		else if (!pp.hosted)
 		{
-			if (!*p)
-			{
-				pp.hostdir = 0;
+			if (!*p || stat((pathcanon(p, 0), p), &st))
 				pp.hosted = 1;
-			}
 			else
 			{
-				pathcanon(p, 0);
 				for (dp = pp.firstdir; dp; dp = dp->next)
 				{
-					if (!pp.hosted && ((dp->type & TYPE_HOSTED) || dp->name && streq(dp->name, p)))
+					if (!pp.hosted && ((dp->type & TYPE_HOSTED) || dp->name && SAMEID(&dp->id, &st)))
 						pp.hosted = 1;
 					if (pp.hosted == 1)
 						dp->type |= TYPE_HOSTED;
 					else
 						dp->type &= ~TYPE_HOSTED;
 				}
-				pp.hostdir = pp.hosted ? 0 : p;
+				if (!pp.hosted)
+				{
+					pp.hostdir.path = p;
+					SAVEID(&pp.hostdir.id, &st);
+				}
 			}
 		}
 		break;
@@ -601,17 +596,19 @@ ppop(int op, ...)
 		if ((p = va_arg(ap, char*)) && *p)
 		{
 			pathcanon(p, 0);
+			if (stat(p, &st))
+				break;
 			for (dp = pp.stddirs; dp = dp->next;)
-				if (dp->name && streq(dp->name, p))
+				if (dp->name && SAMEID(&dp->id, &st))
 					break;
-			if (pp.cdir && streq(p, pp.cdir))
+			if (pp.cdir.path && SAMEID(&pp.cdir.id, &st))
 			{
-				pp.cdir = 0;
+				pp.cdir.path = 0;
 				pp.c = 1;
 			}
-			if (pp.hostdir && streq(p, pp.hostdir))
+			if (pp.hostdir.path && SAMEID(&pp.hostdir.id, &st))
 			{
-				pp.hostdir = 0;
+				pp.hostdir.path = 0;
 				pp.hosted = 1;
 			}
 			if ((pp.mode & INIT) && !(pp.ro_mode & INIT))
@@ -627,6 +624,7 @@ ppop(int op, ...)
 				}
 				dp = newof(0, struct ppdirs, 1, 0);
 				dp->name = p;
+				SAVEID(&dp->id, &st);
 				dp->type |= TYPE_INCLUDE;
 				dp->index = INC_LOCAL + pp.ignoresrc != 0;
 				dp->next = pp.lastdir->next;
@@ -1396,11 +1394,12 @@ ppop(int op, ...)
 		pp.standalone = 1;
 		break;
 	case PP_STANDARD:
-		pp.lastdir->next->name = ((p = va_arg(ap, char*)) && *p) ? p : NiL;
+		if ((pp.lastdir->next->name = ((p = va_arg(ap, char*)) && *p) ? p : NiL) && !stat(p, &st))
+			SAVEID(&pp.lastdir->next->id, &st);
 		for (dp = pp.firstdir; dp; dp = dp->next)
 			if (dp->name)
 				for (hp = pp.firstdir; hp != dp; hp = hp->next)
-					if (hp->name && streq(hp->name, dp->name))
+					if (hp->name && SAMEID(&hp->id, &dp->id))
 					{
 						hp->c = dp->c;
 						if (dp->type & TYPE_HOSTED)
@@ -1526,13 +1525,12 @@ ppop(int op, ...)
 				else
 					dp->type &= ~TYPE_VENDOR;
 		}
-		else
+		else if (!stat((pathcanon(p, 0), p), &st))
 		{
-			pathcanon(p, 0);
 			c = 0;
 			for (dp = pp.firstdir; dp; dp = dp->next)
 			{
-				if (!c && ((dp->type & TYPE_VENDOR) || dp->name && streq(dp->name, p)))
+				if (!c && ((dp->type & TYPE_VENDOR) || dp->name && SAMEID(&dp->id, &st)))
 					c = 1;
 				if (c)
 					dp->type |= TYPE_VENDOR;

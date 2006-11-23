@@ -1,3 +1,4 @@
+06-11-23 Makerules.mk: fix .BIND.-l% for -g only bootstrap
 06-11-15 Makerules.mk: fix :: vs :LIBRARY: ordering bug for .o prereqs
 06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
 06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk

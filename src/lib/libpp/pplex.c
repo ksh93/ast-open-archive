@@ -300,7 +300,7 @@ ppcpp(void)
 				goto fsm_begin;
 #endif
 			}
-			else if (comwarn < 0)
+			else if (comwarn < 0 && !(pp.mode & HOSTED))
 				error(1, "/* appears in // comment");
 			break;
 		case '*':

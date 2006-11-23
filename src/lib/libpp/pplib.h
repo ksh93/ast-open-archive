@@ -218,6 +218,21 @@ struct pptuple				/* tuple macro			*/
 	char		token[1];	/* matching token		*/
 };
 
+struct fileid				/* physical file id		*/
+{
+	unsigned long	st_dev;		/* dev				*/
+	unsigned long	st_ino;		/* ino				*/
+};
+
+struct pathid				/* physical file name and id	*/
+{
+	char*		path;		/* file path			*/
+	struct fileid	id;		/* file id			*/
+};
+
+#define SAMEID(a,b)	((a)->st_ino==(unsigned long)(b)->st_ino&&(a)->st_dev==(unsigned long)(b)->st_dev)
+#define SAVEID(a,b)	((a)->st_ino=(unsigned long)(b)->st_ino,(a)->st_dev=(unsigned long)(b)->st_dev)
+
 #define _PP_CONTEXT_PRIVATE_		/* ppglobals private context	*/ \
 	struct ppcontext* context;	/* current context		*/ \
 	long		state;		/* pp state flags		*/ \
@@ -246,8 +261,8 @@ struct pptuple				/* tuple macro			*/
 	long		ro_state;	/* readonly state		*/ \
 	long		ro_mode;	/* readonly mode		*/ \
 	long		ro_option;	/* readonly option		*/ \
-	char*		cdir;		/* arg C dir			*/ \
-	char*		hostdir;	/* arg host dir			*/ \
+	struct pathid	cdir;		/* arg C dir			*/ \
+	struct pathid	hostdir;	/* arg host dir			*/ \
 	char*		ppdefault;	/* arg default info file	*/ \
 	struct ppindex*	firstindex;	/* first include index entry	*/ \
 	struct ppindex*	lastindex;	/* last include index entry	*/ \
@@ -355,7 +370,8 @@ struct pptuple				/* tuple macro			*/
 	char*		buffer;		/* TYPE_BUFFER buffer		*/ \
 	Sfio_t*		sp;		/* archive stream		*/ \
 	struct ppdirs*	subdir;		/* subdir list			*/ \
-	}		info;		/* type info			*/
+	}		info;		/* type info			*/ \
+	struct fileid	id;		/* directory id			*/ \
 
 #if !PROTOMAIN
 #include <ast.h>
@@ -506,6 +522,7 @@ struct pptuple				/* tuple macro			*/
 #define INC_MAPHOSTED	(1<<(2*INC_MAX+4))
 #define INC_MAPNOHOSTED	(1<<(2*INC_MAX+5))
 #define INC_MAPNOLOCAL	(1<<(2*INC_MAX+6))
+#define INC_HOSTED	(1<<(2*INC_MAX+7))
 
 #define TYPE_ARCHIVE	(1<<0)
 #define TYPE_BUFFER	(1<<1)

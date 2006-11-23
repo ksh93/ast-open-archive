@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make nmake
 make archive.o
@@ -176,7 +176,7 @@ prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done make.h
 done archive.c
-meta archive.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/archive.c archive
+meta archive.o %.c>%.o archive.c archive
 prev archive.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c archive.c
 done archive.o generated
@@ -184,7 +184,7 @@ make bind.o
 make bind.c
 prev make.h implicit
 done bind.c
-meta bind.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/bind.c bind
+meta bind.o %.c>%.o bind.c bind
 prev bind.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c bind.c
 done bind.o generated
@@ -194,7 +194,7 @@ make ${PACKAGE_ast_INCLUDE}/sig.h implicit
 done ${PACKAGE_ast_INCLUDE}/sig.h
 prev make.h implicit
 done command.c
-meta command.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/command.c command
+meta command.o %.c>%.o command.c command
 prev command.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c command.c
 done command.o generated
@@ -202,7 +202,7 @@ make dump.o
 make dump.c
 prev make.h implicit
 done dump.c
-meta dump.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/dump.c dump
+meta dump.o %.c>%.o dump.c dump
 prev dump.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c dump.c
 done dump.o generated
@@ -218,7 +218,7 @@ make expand.h implicit
 done expand.h
 prev make.h implicit
 done expand.c
-meta expand.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/expand.c expand
+meta expand.o %.c>%.o expand.c expand
 prev expand.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expand.c
 done expand.o generated
@@ -240,7 +240,7 @@ make options.h implicit
 done options.h
 prev make.h implicit
 done main.c
-meta main.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/main.c main
+meta main.o %.c>%.o main.c main
 prev main.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DIDNAME=\""make"\" -DPATHCHECK=\""make"\" -D_PACKAGE_ast -c main.c
 done main.o generated
@@ -248,7 +248,7 @@ make make.o
 make make.c
 prev make.h implicit
 done make.c
-meta make.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/make.c make
+meta make.o %.c>%.o make.c make
 prev make.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c make.c
 done make.o generated
@@ -256,7 +256,7 @@ make mam.o
 make mam.c
 prev make.h implicit
 done mam.c
-meta mam.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/mam.c mam
+meta mam.o %.c>%.o mam.c mam
 prev mam.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c mam.c
 done mam.o generated
@@ -264,7 +264,7 @@ make metarule.o
 make metarule.c
 prev make.h implicit
 done metarule.c
-meta metarule.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/metarule.c metarule
+meta metarule.o %.c>%.o metarule.c metarule
 prev metarule.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c metarule.c
 done metarule.o generated
@@ -273,7 +273,7 @@ make misc.c
 prev ${PACKAGE_ast_INCLUDE}/int.h implicit
 prev make.h implicit
 done misc.c
-meta misc.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/misc.c misc
+meta misc.o %.c>%.o misc.c misc
 prev misc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c misc.c
 done misc.o generated
@@ -288,7 +288,7 @@ done ${PACKAGE_ast_INCLUDE}/ccode.h
 prev options.h implicit
 prev make.h implicit
 done object.c
-meta object.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/object.c object
+meta object.o %.c>%.o object.c object
 prev object.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c object.c
 done object.o generated
@@ -297,7 +297,7 @@ make option.c
 prev options.h implicit
 prev make.h implicit
 done option.c
-meta option.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/option.c option
+meta option.o %.c>%.o option.c option
 prev option.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1984-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt]"\" -D_PACKAGE_ast -c option.c
 done option.o generated
@@ -307,7 +307,7 @@ prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev options.h implicit
 prev make.h implicit
 done parse.c
-meta parse.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/parse.c parse
+meta parse.o %.c>%.o parse.c parse
 prev parse.c
 exec - ${CC} ${mam_cc_FLAGS} ${-debug-symbols?1?${mam_cc_DEBUG} -D_BLD_DEBUG?${CCFLAGS.FORCE}?} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c parse.c
 done parse.o generated
@@ -315,7 +315,7 @@ make read.o
 make read.c
 prev make.h implicit
 done read.c
-meta read.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/read.c read
+meta read.o %.c>%.o read.c read
 prev read.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c read.c
 done read.o generated
@@ -324,7 +324,7 @@ make rule.c
 prev options.h implicit
 prev make.h implicit
 done rule.c
-meta rule.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/rule.c rule
+meta rule.o %.c>%.o rule.c rule
 prev rule.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c rule.c
 done rule.o generated
@@ -333,7 +333,7 @@ make scan.c
 prev ${PACKAGE_ast_INCLUDE}/tm.h implicit
 prev make.h implicit
 done scan.c
-meta scan.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/scan.c scan
+meta scan.o %.c>%.o scan.c scan
 prev scan.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c scan.c
 done scan.o generated
@@ -342,7 +342,7 @@ make state.c
 prev options.h implicit
 prev make.h implicit
 done state.c
-meta state.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/state.c state
+meta state.o %.c>%.o state.c state
 prev state.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c state.c
 done state.o generated
@@ -351,7 +351,7 @@ make trap.c
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
 prev make.h implicit
 done trap.c
-meta trap.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/trap.c trap
+meta trap.o %.c>%.o trap.c trap
 prev trap.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c trap.c
 done trap.o generated
@@ -360,14 +360,14 @@ make variable.c
 prev options.h implicit
 prev make.h implicit
 done variable.c
-meta variable.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/variable.c variable
+meta variable.o %.c>%.o variable.c variable
 prev variable.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D__OBSOLETE__=20060101 -D_PACKAGE_ast -c variable.c
 done variable.o generated
 make version.o
 make version.c
 done version.c
-meta version.o %.c>%.o ${PACKAGEROOT}/src/cmd/nmake/version.c version
+meta version.o %.c>%.o version.c version
 prev version.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.1 2006-08-11 \$\0\n"\" -c version.c
 done version.o generated
@@ -379,7 +379,7 @@ done nmake generated
 make ppcc
 make ppcc.sh
 done ppcc.sh
-meta ppcc %.sh>% ${PACKAGEROOT}/src/cmd/nmake/ppcc.sh ppcc
+meta ppcc %.sh>% ppcc.sh ppcc
 prev ppcc.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -604,7 +604,7 @@ done ${INSTALLROOT}/lib/make virtual
 make ${INSTALLROOT}/lib/make/makerules.mo
 prev ${INSTALLROOT}/lib/make
 make Makerules.mo
-meta Makerules.mo %.mk>%.mo ${PACKAGEROOT}/src/cmd/nmake/Makerules.mk Makerules
+meta Makerules.mo %.mk>%.mo Makerules.mk Makerules
 prev Makerules.mk
 exec - ${NMAKE} ${NMAKEFLAGS} --base --compile --file=Makerules.mk
 done Makerules.mo generated

@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1986-2005 AT&T Corp.                  *
+*           Copyright (c) 1986-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -372,6 +372,8 @@ if (pp.test & 0x0020) error(1, "VDB#%d %s %s index=%d data=<%lu,%lu>", __LINE__,
 					if (!xp || !streq(xp->name, pp.path))
 					{
 						fp->bound[index] = xp = ppsetfile(pp.path);
+						if (dp->type & TYPE_HOSTED)
+							xp->flags |= INC_HOSTED;
 						if ((flags & SEARCH_INCLUDE) || (xp->flags & INC_EXISTS))
 						{
 							if (!(flags & SEARCH_INCLUDE))
@@ -486,7 +488,9 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 				else
 					pp.mode &= ~MARKC;
 			}
-			if (!(markhosted = (dp->type & TYPE_HOSTED)) && dp->index == INC_PREFIX && (pp.mode & (FILEDEPS|HEADERDEPS|INIT)) == FILEDEPS)
+			if (xp)
+				markhosted = xp->flags & INC_HOSTED;
+			else if (!(markhosted = (dp->type & TYPE_HOSTED)) && dp->index == INC_PREFIX && (pp.mode & (FILEDEPS|HEADERDEPS|INIT)) == FILEDEPS)
 			{
 				up = dp;
 				while ((up = up->next) && !streq(up->name, dp->name));
@@ -497,8 +501,10 @@ if (pp.test & 0x0010) error(1, "SEARCH#%d file=%s path=%s index=%d data=<%lu,%lu
 				pp.mode |= MARKHOSTED;
 			else
 				pp.mode &= ~MARKHOSTED;
-			message((-2, "search: %s -> %s%s%s", fp->name, pp.path, (pp.mode & MARKC) ? " [C]" : "", (pp.mode & MARKHOSTED) ? " [hosted]" : ""));
 			xp = ppsetfile(pp.path);
+			if (markhosted)
+				xp->flags |= INC_HOSTED;
+			message((-2, "search: %s -> %s%s%s", fp->name, pp.path, (pp.mode & MARKC) ? " [C]" : "", (pp.mode & MARKHOSTED) ? " [hosted]" : ""));
 #if ARCHIVE
 			if (!pp.member)
 			{

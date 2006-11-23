@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make vcodex
 make libsortvcodex.a archive
@@ -129,7 +129,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/error.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vcodex.c
-meta vcodex.o %.c>%.o ${PACKAGEROOT}/src/cmd/sortlib/vcodex/vcodex.c vcodex
+meta vcodex.o %.c>%.o vcodex.c vcodex
 prev vcodex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 2005-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?sortvcodex]"\" -c vcodex.c
 done vcodex.o generated

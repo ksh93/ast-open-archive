@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make cql
 make cql.o
@@ -172,7 +172,7 @@ done ${PACKAGE_ast_INCLUDE}/cdb.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done cql.h
 done cql.c
-meta cql.o %.c>%.o ${PACKAGEROOT}/src/cmd/cql/cql.c cql
+meta cql.o %.c>%.o cql.c cql
 prev cql.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cql]"\" -c cql.c
 done cql.o generated
@@ -180,7 +180,7 @@ make decl.o
 make decl.c
 prev cql.h implicit
 done decl.c
-meta decl.o %.c>%.o ${PACKAGEROOT}/src/cmd/cql/decl.c decl
+meta decl.o %.c>%.o decl.c decl
 prev decl.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c decl.c
 done decl.o generated
@@ -189,7 +189,7 @@ make expr.c
 prev ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev cql.h implicit
 done expr.c
-meta expr.o %.c>%.o ${PACKAGEROOT}/src/cmd/cql/expr.c expr
+meta expr.o %.c>%.o expr.c expr
 prev expr.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c expr.c
 done expr.o generated
@@ -197,7 +197,7 @@ make file.o
 make file.c
 prev cql.h implicit
 done file.c
-meta file.o %.c>%.o ${PACKAGEROOT}/src/cmd/cql/file.c file
+meta file.o %.c>%.o file.c file
 prev file.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DDEBUG -D_PACKAGE_ast -c file.c
 done file.o generated
@@ -220,7 +220,7 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done hix.c
-meta hix.o %.c>%.o ${PACKAGEROOT}/src/cmd/cql/hix.c hix
+meta hix.o %.c>%.o hix.c hix
 prev hix.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c hix.c
 done hix.o generated
@@ -236,7 +236,7 @@ make cdb.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/cdb.h implicit
 done cdb.c
-meta cdb.o %.c>%.o ${PACKAGEROOT}/src/cmd/cql/cdb.c cdb
+meta cdb.o %.c>%.o cdb.c cdb
 prev cdb.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cql]"\" -c cdb.c
 done cdb.o generated

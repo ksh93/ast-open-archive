@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make codex
 make libcodex.a archive
@@ -150,7 +150,7 @@ make ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 done ${PACKAGE_ast_INCLUDE}/sfio_t.h
 done codex.c
-meta codex.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codex.c codex
+meta codex.o %.c>%.o codex.c codex
 prev codex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codex.c
 done codex.o generated
@@ -158,7 +158,7 @@ make codexdata.o
 make codexdata.c
 prev codex.h implicit
 done codexdata.c
-meta codexdata.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexdata.c codexdata
+meta codexdata.o %.c>%.o codexdata.c codexdata
 prev codexdata.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexdata.c
 done codexdata.o generated
@@ -166,7 +166,7 @@ make codexid.o
 make codexid.c
 prev codex.h implicit
 done codexid.c
-meta codexid.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexid.c codexid
+meta codexid.o %.c>%.o codexid.c codexid
 prev codexid.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexid.c
 done codexid.o generated
@@ -176,7 +176,7 @@ make ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 done ${PACKAGE_ast_INCLUDE}/dlldefs.h
 prev codex.h implicit
 done codexlist.c
-meta codexlist.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexlist.c codexlist
+meta codexlist.o %.c>%.o codexlist.c codexlist
 prev codexlist.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexlist.c
 done codexlist.o generated
@@ -184,7 +184,7 @@ make codexcmp.o
 make codexcmp.c
 prev codex.h implicit
 done codexcmp.c
-meta codexcmp.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexcmp.c codexcmp
+meta codexcmp.o %.c>%.o codexcmp.c codexcmp
 prev codexcmp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexcmp.c
 done codexcmp.o generated
@@ -193,7 +193,7 @@ make codexmeth.c
 prev ${PACKAGE_ast_INCLUDE}/dlldefs.h implicit
 prev codex.h implicit
 done codexmeth.c
-meta codexmeth.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexmeth.c codexmeth
+meta codexmeth.o %.c>%.o codexmeth.c codexmeth
 prev codexmeth.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexmeth.c
 done codexmeth.o generated
@@ -201,7 +201,7 @@ make codexadd.o
 make codexadd.c
 prev codex.h implicit
 done codexadd.c
-meta codexadd.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexadd.c codexadd
+meta codexadd.o %.c>%.o codexadd.c codexadd
 prev codexadd.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexadd.c
 done codexadd.o generated
@@ -210,7 +210,7 @@ make codexnull.c
 prev codex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio_t.h implicit
 done codexnull.c
-meta codexnull.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexnull.c codexnull
+meta codexnull.o %.c>%.o codexnull.c codexnull
 prev codexnull.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexnull.c
 done codexnull.o generated
@@ -222,7 +222,7 @@ make ${PACKAGE_ast_INCLUDE}/sig.h implicit
 done ${PACKAGE_ast_INCLUDE}/sig.h
 prev codex.h implicit
 done codexgetpass.c
-meta codexgetpass.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexgetpass.c codexgetpass
+meta codexgetpass.o %.c>%.o codexgetpass.c codexgetpass
 prev codexgetpass.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexgetpass.c
 done codexgetpass.o generated
@@ -230,7 +230,7 @@ make codexpass.o
 make codexpass.c
 prev codex.h implicit
 done codexpass.c
-meta codexpass.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexpass.c codexpass
+meta codexpass.o %.c>%.o codexpass.c codexpass
 prev codexpass.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexpass.c
 done codexpass.o generated
@@ -238,7 +238,7 @@ make codexsize.o
 make codexsize.c
 prev codex.h implicit
 done codexsize.c
-meta codexsize.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/codexsize.c codexsize
+meta codexsize.o %.c>%.o codexsize.c codexsize
 prev codexsize.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c codexsize.c
 done codexsize.o generated
@@ -246,7 +246,7 @@ make code-rot13.o
 make code-rot13.c
 prev codex.h implicit
 done code-rot13.c
-meta code-rot13.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/code-rot13.c code-rot13
+meta code-rot13.o %.c>%.o code-rot13.c code-rot13
 prev code-rot13.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c code-rot13.c
 done code-rot13.o generated
@@ -255,7 +255,7 @@ make code-qp.c
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev codex.h implicit
 done code-qp.c
-meta code-qp.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/code-qp.c code-qp
+meta code-qp.o %.c>%.o code-qp.c code-qp
 prev code-qp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c code-qp.c
 done code-qp.o generated
@@ -263,7 +263,7 @@ make code-uu.o
 make code-uu.c
 prev codex.h implicit
 done code-uu.c
-meta code-uu.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/code-uu.c code-uu
+meta code-uu.o %.c>%.o code-uu.c code-uu
 prev code-uu.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c code-uu.c
 done code-uu.o generated
@@ -282,7 +282,7 @@ done ${PACKAGE_ast_INCLUDE}/ast_iconv.h
 done ${PACKAGE_ast_INCLUDE}/iconv.h
 prev codex.h implicit
 done code-iconv.c
-meta code-iconv.o %.c>%.o ${PACKAGEROOT}/src/lib/libcodex/code-iconv.c code-iconv
+meta code-iconv.o %.c>%.o code-iconv.c code-iconv
 prev code-iconv.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_codex -c code-iconv.c
 done code-iconv.o generated

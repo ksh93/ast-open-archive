@@ -3323,6 +3323,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-11-23 Makerules.mk: fix .BIND.-l% for -g only bootstrap
 06-11-15 Makerules.mk: fix :: vs :LIBRARY: ordering bug for .o prereqs
 06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
 06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk
@@ -7287,6 +7288,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libcmd changes">libcmd changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-11-23 cmd.h: because of proto cmdinit cannot be a function like macro
 06-11-21 cp.c: fix 06-10-31 const dot&#0091;&#0093; readonly assignment
 06-11-15 cp.c: fix 06-10-31 ln -s enoent bug
 06-11-11 getconf.c: let astconf() handle "undefined" vs. ""
@@ -7879,6 +7881,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libpp changes">libpp changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-09-23 ppop.c: check -I &lt;dev,ino&gt; for c and TYPE_HOSTED|TYPE_VENDOR attrs
+06-09-23 pplex.c: add HOSTED check for "/* appears in // comment" -- doh
 06-09-05 pp.probe: add version stamp comment
 06-06-29 pp.probe: gcc pp:linefile probe (otherwise it can dump!)
 06-06-28 ppproto.c: fix inappropriate __PARAM__ insertion
@@ -8768,7 +8772,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>November 22, 2006</TD>
+<TD align=right>November 28, 2006</TD>
 </TR>
 </TABLE>
 <P>

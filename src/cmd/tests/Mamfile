@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 exec - : only tests in this directory : nothing to install :
 done install virtual
@@ -123,7 +123,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done opt.c
-meta opt.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/opt.c opt
+meta opt.o %.c>%.o opt.c opt
 prev opt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c opt.c
 done opt.o generated
@@ -140,7 +140,7 @@ make strelapsed.o
 make strelapsed.c
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done strelapsed.c
-meta strelapsed.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strelapsed.c strelapsed
+meta strelapsed.o %.c>%.o strelapsed.c strelapsed
 prev strelapsed.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strelapsed.c
 done strelapsed.o generated
@@ -157,7 +157,7 @@ make strtoi.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done strtoi.c
-meta strtoi.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strtoi.c strtoi
+meta strtoi.o %.c>%.o strtoi.c strtoi
 prev strtoi.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtoi.c
 done strtoi.o generated
@@ -174,7 +174,7 @@ make strntoi.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done strntoi.c
-meta strntoi.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strntoi.c strntoi
+meta strntoi.o %.c>%.o strntoi.c strntoi
 prev strntoi.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntoi.c
 done strntoi.o generated
@@ -196,7 +196,7 @@ done ../../lib/libast/ast_stdio.h
 done ${PACKAGE_ast_INCLUDE}/stdio.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done strtof.c
-meta strtof.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strtof.c strtof
+meta strtof.o %.c>%.o strtof.c strtof
 prev strtof.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strtof.c
 done strtof.o generated
@@ -213,7 +213,7 @@ make strntof.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done strntof.c
-meta strntof.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/strntof.c strntof
+meta strntof.o %.c>%.o strntof.c strntof
 prev strntof.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c strntof.c
 done strntof.o generated
@@ -227,7 +227,7 @@ make base64.o
 make base64.c
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done base64.c
-meta base64.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/base64.c base64
+meta base64.o %.c>%.o base64.c base64
 prev base64.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c base64.c
 done base64.o generated
@@ -294,7 +294,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/tm.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done date.c
-meta date.o %.c>%.o ${PACKAGEROOT}/src/cmd/tests/date.c date
+meta date.o %.c>%.o date.c date
 prev date.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c date.c
 done date.o generated
@@ -390,11 +390,11 @@ make sfio/tmprocess.c
 prev sfio/sftest.h implicit
 done sfio/tmprocess.c
 make sfio/tmtsafe.c
-make ${INSTALLROOT}/src/lib/libast/sfio/vthread.h implicit
+make ../../lib/libast/sfio/vthread.h implicit
 make windows.h implicit
 done windows.h dontcare virtual
 prev ../../lib/libast/ast_common.h implicit
-done ${INSTALLROOT}/src/lib/libast/sfio/vthread.h
+done ../../lib/libast/sfio/vthread.h
 prev sfio/sftest.h implicit
 done sfio/tmtsafe.c
 make sfio/tmultiple.c
@@ -535,14 +535,14 @@ make sfio/twrrd.c
 prev sfio/sftest.h implicit
 done sfio/twrrd.c
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
-exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tsfstr.c cdt/tshare.c sfio/tsize.c cdt/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Icdt -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
+exec - 	set +x; sfio/testsfio  sfio/sftest.h ${mam_libast} sfio/talarm.c sfio/talign.c sfio/tappend.c sfio/tatexit.c sfio/tclose.c sfio/tdisc.c sfio/terrno.c sfio/texcept.c sfio/tflags.c sfio/tgetr.c sfio/thole.c sfio/tleak.c sfio/tlocale.c sfio/tlongdouble.c sfio/tmmap2read.c sfio/tmode.c sfio/tmove.c sfio/tmpread.c sfio/tmprocess.c sfio/tmtsafe.c sfio/tmultiple.c sfio/tmwrite.c sfio/tnoseek.c sfio/tnotify.c sfio/topen.c sfio/tpipe.c sfio/tpipemove.c sfio/tpkrd.c sfio/tpoll.c sfio/tpool.c sfio/tpopen.c sfio/tpopenrw.c sfio/tprintf.c sfio/tpublic.c sfio/tputgetc.c sfio/tputgetd.c sfio/tputgetl.c sfio/tputgetm.c sfio/tputgetr.c sfio/tputgetu.c sfio/trcrv.c sfio/treserve.c sfio/tscanf.c sfio/tseek.c sfio/tsetbuf.c sfio/tsetfd.c sfio/tsfstr.c cdt/tshare.c sfio/tsize.c cdt/tstack.c sfio/tstatus.c sfio/tstdio.c sfio/tstkpk.c sfio/tstring.c sfio/tswap.c sfio/tsync.c sfio/ttell.c sfio/ttmp.c sfio/ttmpfile.c sfio/tungetc.c sfio/twchar.c sfio/twhole.c sfio/twrrd.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Icdt -Isfio -I../../lib/libast/sfio -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
 done test.sfio virtual
 make test.vmalloc
 make vmalloc/testvmalloc
 done vmalloc/testvmalloc
 make vmalloc/vmtest.h
 prev cdt/terror.h implicit
-make ${INSTALLROOT}/src/lib/libast/vmalloc/vmhdr.h implicit
+make ../../lib/libast/vmalloc/vmhdr.h implicit
 prev ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_windows.h implicit
 prev windows.h implicit
@@ -554,7 +554,7 @@ exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc
 done FEATURE/vmalloc dontcare generated
 prev ../../lib/libast/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
-done ${INSTALLROOT}/src/lib/libast/vmalloc/vmhdr.h
+done ../../lib/libast/vmalloc/vmhdr.h
 done vmalloc/vmtest.h
 make vmalloc/talign.c
 prev vmalloc/vmtest.h implicit
@@ -590,6 +590,6 @@ make vmalloc/twalk.c
 prev vmalloc/vmtest.h implicit
 done vmalloc/twalk.c
 exec - set +x; (ulimit -c 0) >/dev/null 2>&1 && ulimit -c 0; set -x
-exec - 	set +x; vmalloc/testvmalloc  vmalloc/vmtest.h ${mam_libast} vmalloc/talign.c vmalloc/tcompact.c vmalloc/tlast.c vmalloc/tmalloc.c vmalloc/tmrandom.c vmalloc/tpool.c vmalloc/trandom.c vmalloc/tresize.c vmalloc/tsmall.c vmalloc/tstat.c vmalloc/twalk.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Icdt -I../../lib/libast -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
+exec - 	set +x; vmalloc/testvmalloc  vmalloc/vmtest.h ${mam_libast} vmalloc/talign.c vmalloc/tcompact.c vmalloc/tlast.c vmalloc/tmalloc.c vmalloc/tmrandom.c vmalloc/tpool.c vmalloc/trandom.c vmalloc/tresize.c vmalloc/tsmall.c vmalloc/tstat.c vmalloc/twalk.c ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -Icdt -Ivmalloc -I../../lib/libast -I../../lib/libast/vmalloc -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib}
 done test.vmalloc virtual
 done test dontcare virtual

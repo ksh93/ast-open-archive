@@ -199,19 +199,20 @@ pppush(register int t, register char* s, register char* p, int n)
 		}
 		pp.state |= NEWLINE;
 		if (pp.mode & HOSTED) cur->flags |= IN_hosted;
+		else cur->flags &= ~IN_hosted;
 		if (pp.mode & (INIT|MARKHOSTED))
 		{
 			pp.mode |= HOSTED;
 			pp.flags |= PP_hosted;
 		}
-		else
-		{
-			pp.mode &= ~HOSTED;
-			pp.flags &= ~PP_hosted;
-		}
 		switch (cur->type)
 		{
 		case IN_FILE:
+			if (!(pp.mode & (INIT|MARKHOSTED)))
+			{
+				pp.mode &= ~HOSTED;
+				pp.flags &= ~PP_hosted;
+			}
 #if CATSTRINGS
 			if (pp.state & JOINING) pp.state |= HIDDEN|SYNCLINE;
 			else

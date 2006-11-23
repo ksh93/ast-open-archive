@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-11-15 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-11-23 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -2577,7 +2577,7 @@ end
 
 .PACKAGE.INIT. : .FUNCTION .PROBE.INIT
 	local T1 T2 T3 T4 T5 T6 T7
-	local B D G H I K L N P Q T V W X Z IP LP LPL LPV PFX SFX FOUND
+	local B D G H I K L N P Q T V W X Y Z IP LP LPL LPV PFX SFX FOUND
 	if ! .PACKAGE.GLOBAL.
 		.PACKAGE.GLOBAL. := $(PATH:/:/ /G:D:N!=$(USRDIRS:/:/|/G)|/usr/*([!/])) $(INSTALLROOT:T=F:P=L=*) $(PATH:/:/ /G:D) $(OPTDIRS:/:/ /G)
 		.PACKAGE.GLOBAL. := $(.PACKAGE.GLOBAL.:N!=$(PACKAGE_IGNORE):T=F:U)
@@ -2728,8 +2728,12 @@ end
 								.PACKAGE.LOCAL. := $(PKGDIRS:T=F:P=A:U)
 							end
 							for X $(.PACKAGE.LOCAL.)
-								X := $(X)/$(PFX)$(P)$(SFX)
-								if ( T1 = "$(X:P=X:O=1:D)" )
+								Y := $(X)/$(PFX)$(P)$(SFX)
+								if ( T1 = "$(Y:P=X:O=1:D)" )
+									break 3
+								end
+								Y := $(X)/$(PFX)$(P)$(CC.LIB.TYPE)$(SFX)
+								if ( T1 = "$(Y:P=X:O=1:D)" )
 									break 3
 								end
 							end
@@ -2847,7 +2851,7 @@ PACKAGES : .SPECIAL .FUNCTION
 	return $(X:/\([A-Za-z_.][A-Za-z0-9_.]*\)/"$$(.PACKAGE.\1.found)"=="1"/G:@/"  *"/" \&\& "/G:E)
 
 ":PACKAGE:" : .MAKE .OPERATOR
-	local A H I T N O P V version insert=0 install=1 library=-l options=1
+	local A H I T N O P Q V version insert=0 install=1 library=-l options=1
 	if "$(<)"
 		/* a separate include handles package definitions */
 		eval
@@ -2892,6 +2896,7 @@ PACKAGES : .SPECIAL .FUNCTION
 					N := $(N:/=.*//)
 				end
 				S =
+				Q := $(N)
 				if N == "optimize"
 					if "$(PACKAGE_OPTIMIZE:N=space)"
 						N = dynamic
@@ -2917,7 +2922,9 @@ PACKAGES : .SPECIAL .FUNCTION
 				end
 				if N == "dynamic"
 					library := -l
-					.NO.LIB.TYPE = 1
+					if N == "$(Q)"
+						.NO.LIB.TYPE = 1
+					end
 				elif N == "license"
 					if V && ! .PACKAGE.license
 						if V == "1"
@@ -3023,6 +3030,7 @@ PACKAGES : .SPECIAL .FUNCTION
 					V := $(N:/[^=]*=//)
 					N := $(N:/=.*//)
 				end
+				Q := $(N)
 				if N == "optimize"
 					if "$(PACKAGE_OPTIMIZE:N=space)"
 						N = dynamic
@@ -3050,7 +3058,9 @@ PACKAGES : .SPECIAL .FUNCTION
 					end
 				elif N == "dynamic"
 					.PACKAGE.$(P).library := -l
-					.PACKAGE.$(P).type := -
+					if N == "$(Q)"
+						.PACKAGE.$(P).type := -
+					end
 				elif N == "static"
 					.PACKAGE.$(P).library := +l
 				elif N == "library"

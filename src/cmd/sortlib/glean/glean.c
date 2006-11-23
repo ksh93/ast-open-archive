@@ -24,16 +24,19 @@
  */
 
 static const char usage[] =
-"[-1lp0?\n@(#)$Id: sortglean (AT&T Research) 2006-06-29 $\n]"
+"[-1lp0?\n@(#)$Id: sortglean (AT&T Research) 2006-11-23 $\n]"
 USAGE_LICENSE
 "[+NAME?sortglean - glean minima and/or maxima from record stream]"
 "[+DESCRIPTION?The \bsortglean\b \bsort\b(1) discipline gleans minima "
     "and maxima from a record stream. Each record is categorized by the main "
     "sort key. If there is no main sort key then all records are in one "
-    "category. If the \b--min\b key sorts less than the current category "
-    "minimum or if the \b--max\b key sorts greater than the category maximum "
+    "category. If the \bmin\b key sorts less than the current category "
+    "minimum or if the \bmax\b key sorts greater than the category maximum "
     "then the category minimum or maximum is updated and the record is "
-    "written to the standard output.]"
+    "written to the standard output. \bmax=\b\ak1\a,\bmax=\b\ak2\a sets one "
+    "maximum using the two sort keys \ak1\a and \ak2\a. "
+    "\bmax:=\b\ak1\a,\bmax:=\b\ak2\a sets two maxima, the first using sort "
+    "key \ak1\a and the second using sort key \ak2\a.]"
 "[+?Note that \b,\b is the plugin option separator. Literal \b,\b must "
     "either be quoted or escaped \aafter\a normal shell expansion.]"
 "[c:count?Precede each output record with its category ordinal.]"
@@ -69,9 +72,18 @@ typedef struct Category_s
 	Dtlink_t	link;
 	Sfulong_t	count;
 	Data_t		key;
-	Data_t		min;
-	Data_t		max;
+	Data_t		lim[1];
 } Category_t;
+
+struct Field_s; typedef struct Field_s Field_t;
+
+struct Field_s
+{
+	Field_t*	next;
+	Rskey_t*	lim;
+	int		mm;
+	int		index;
+};
 
 typedef struct State_s
 {
@@ -79,8 +91,8 @@ typedef struct State_s
 	Dtdisc_t	dtdisc;
 	Rskeydisc_t	kydisc;
 	Dt_t*		categories;
-	Rskey_t*	min;
-	Rskey_t*	max;
+	Field_t*	field;
+	int		fields;
 	Data_t		key;
 	Vmalloc_t*	vm;
 	int		count;
@@ -125,9 +137,11 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 	State_t*		state = (State_t*)disc;
 	register Rsobj_t*	r;
 	register Category_t*	p;
+	register Field_t*	f;
 	Category_t		x;
 	ssize_t			k;
 	int			n;
+	int			m;
 	Data_t			t;
 
 	switch (op)
@@ -141,107 +155,66 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 		x.key.len = r->keylen;
 		if (!(p = (Category_t*)dtsearch(state->categories, &x)))
 		{
-			if (!(p = vmnewof(state->vm, 0, Category_t, 1, r->keylen)))
+			if (!(p = vmnewof(state->vm, 0, Category_t, 1, (state->fields - 1) * sizeof(Data_t) + r->keylen)))
 			{
 				error(ERROR_SYSTEM|2, "out of space [category]");
 				return -1;
 			}
 			p->key.len = r->keylen;
-			p->key.data = (void*)(p + 1);
+			p->key.data = (void*)(p + 1) + (state->fields - 1) * sizeof(Data_t);
 			memcpy(p->key.data, r->key, r->keylen);
 			dtinsert(state->categories, p);
 		}
 		state->total++;
 		p->count++;
 		message((-2, "glean record p=%p %I*u/%I*u key='%-*.*s' r:%d:%-*.*s: '%-*.*s'", p, sizeof(p->count), p->count, sizeof(state->total), state->total, r->keylen, r->keylen, r->key, x.key.len, x.key.len, x.key.len, x.key.data, r->datalen, r->datalen, r->data));
-		n = 0;
-		if (state->min)
+		m = 0;
+		for (f = state->field; f; f = f->next)
 		{
-			if (state->min->disc->defkeyf)
+			if (f->lim->disc->defkeyf)
 			{
-				if ((k = state->min->disc->keylen) <= 0)
+				if ((k = f->lim->disc->keylen) <= 0)
 					k = 4;
 				k *= r->datalen;
 				if (save(state->vm, &state->key, 0, k))
 					return -1;
-				if ((k = (*state->min->disc->defkeyf)(rs, r->data, r->datalen, state->key.data, state->key.size, state->min->disc)) < 0)
+				if ((k = (*f->lim->disc->defkeyf)(rs, r->data, r->datalen, state->key.data, state->key.size, f->lim->disc)) < 0)
 					return -1;
 				t.len = state->key.len = k;
 				t.data = state->key.data;
 			}
 			else
 			{
-				t.data = r->data + state->min->disc->key;
-				if ((k = state->min->disc->keylen) <= 0)
-					k += r->datalen - state->min->disc->key;
+				t.data = r->data + f->lim->disc->key;
+				if ((k = f->lim->disc->keylen) <= 0)
+					k += r->datalen - f->lim->disc->key;
 				t.len = k;
 			}
-			message((-1, "glean min a:%d:%-*.*s:", t.len, t.len, t.len, t.data));
-			if (!p->min.data)
-				n = -1;
+			message((-1, "glean [%d] %c a:%d:%-*.*s:", f->index, f->mm, t.len, t.len, t.len, t.data));
+			if (!p->lim[f->index].data)
+				n = f->mm == 'm' ? -1 : 1;
 			else
 			{
-				message((-1, "glean min b:%d:%-*.*s:", p->min.len, p->min.len, p->min.len, p->min.data));
-				if ((k = t.len) < p->min.len)
-					k = p->min.len;
-				if (!(n = memcmp(t.data, p->min.data, k)))
-					n = t.len - p->min.len;
+				message((-1, "glean [%d] %c b:%d:%-*.*s:", f->index, f->mm, p->lim[f->index].len, p->lim[f->index].len, p->lim[f->index].len, p->lim[f->index].data));
+				if ((k = t.len) < p->lim[f->index].len)
+					k = p->lim[f->index].len;
+				if (!(n = memcmp(t.data, p->lim[f->index].data, k)))
+					n = t.len - p->lim[f->index].len;
 			}
-			if (n >= 0)
-				n = 0;
-			else if (state->min->disc->defkeyf)
+			if (f->mm == 'm' ? (n < 0) : (n > 0))
 			{
-				t = state->key;
-				state->key = p->min;
-				p->min = t;
-			}
-			else if (save(state->vm, &p->min, t.data, t.len))
-				return -1;
-		}
-		if (state->max && (!n || !p->max.data))
-		{
-			if (state->max->disc->defkeyf)
-			{
-				if ((k = state->max->disc->keylen) <= 0)
-					k = 4;
-				k *= r->datalen;
-				if (save(state->vm, &state->key, 0, k))
+				m = 1;
+				if (f->lim->disc->defkeyf)
+				{
+					t = state->key;
+					state->key = p->lim[f->index];
+					p->lim[f->index] = t;
+				}
+				else if (save(state->vm, &p->lim[f->index], t.data, t.len))
 					return -1;
-				if ((k = (*state->max->disc->defkeyf)(rs, r->data, r->datalen, state->key.data, state->key.size, state->max->disc)) < 0)
-					return -1;
-				t.len = state->key.len = k;
-				t.data = state->key.data;
 			}
-			else
-			{
-				t.data = r->data + state->max->disc->key;
-				if ((k = state->max->disc->keylen) <= 0)
-					k += r->datalen - state->max->disc->key;
-				t.len = k;
-			}
-			message((-1, "glean max a:%d:%-*.*s:", t.len, t.len, t.len, t.data));
-			if (!p->max.data)
-				n = 1;
-			else
-			{
-				message((-1, "glean max b:%d:%-*.*s:", p->max.len, p->max.len, p->max.len, p->max.data));
-				if ((k = t.len) < p->max.len)
-					k = p->max.len;
-				if (!(n = memcmp(t.data, p->max.data, k)))
-					n = t.len - p->max.len;
-			}
-			if (n <= 0)
-				n = 0;
-			else if (state->max->disc->defkeyf)
-			{
-				t = state->key;
-				state->key = p->max;
-				p->max = t;
-			}
-			else if (save(state->vm, &p->max, t.data, t.len))
-				return -1;
 		}
-		if (n)
+		if (m)
 		{
 			if (state->count)
 				sfprintf(sfstdout, "%I*u/%I*u ", sizeof(p->count), p->count, sizeof(state->total), state->total);
@@ -256,7 +229,9 @@ Rsdisc_t*
 rs_disc(Rskey_t* key, const char* options)
 {
 	register State_t*	state;
+	register Field_t*	f;
 	Vmalloc_t*		vm;
+	int			i;
 
 	if (!(vm = vmopen(Vmdcheap, Vmbest, 0)) || !(state = vmnewof(vm, 0, State_t, 1, 0)))
 		error(ERROR_SYSTEM|3, "out of space [state]");
@@ -274,7 +249,7 @@ rs_disc(Rskey_t* key, const char* options)
 	{
 		for (;;)
 		{
-			switch (optstr(options, usage))
+			switch (i = optstr(options, usage))
 			{
 			case 0:
 				break;
@@ -285,19 +260,19 @@ rs_disc(Rskey_t* key, const char* options)
 				sfset(sfstdout, SF_LINE, 1);
 				continue;
 			case 'm':
-				if (!state->min && !(state->min = rskeyopen(&state->kydisc)))
-					error(ERROR_SYSTEM|3, "out of space [min]");
-				state->min->tab = key->tab;
-				state->min->type = key->type;
-				if (rskey(state->min, opt_info.arg, 0))
-					goto drop;
-				continue;
 			case 'M':
-				if (!state->max && !(state->max = rskeyopen(&state->kydisc)))
-					error(ERROR_SYSTEM|3, "out of space [max]");
-				state->max->tab = key->tab;
-				state->max->type = key->type;
-				if (rskey(state->max, opt_info.arg, 0))
+				if (opt_info.assignment == ':' || !(f = state->field) || f->mm != i)
+				{
+					if (!(f = vmnewof(vm, 0, Field_t, 1, 0)) || !(f->lim = rskeyopen(&state->kydisc)))
+						error(ERROR_SYSTEM|3, "out of space");
+					f->lim->tab = key->tab;
+					f->lim->type = key->type;
+					f->mm = i;
+					f->index = state->fields++;
+					f->next = state->field;
+					state->field = f;
+				}
+				if (rskey(f->lim, opt_info.arg, 0))
 					goto drop;
 				continue;
 			case '?':
@@ -309,15 +284,14 @@ rs_disc(Rskey_t* key, const char* options)
 			}
 			break;
 		}
-		if (state->min && rskeyinit(state->min) || state->max && rskeyinit(state->max))
-			goto drop;
+		for (f = state->field; f; f = f->next)
+			if (rskeyinit(f->lim))
+				goto drop;
 	}
 	return &state->rsdisc;
  drop:
-	if (state->min)
-		rskeyclose(state->min);
-	if (state->max)
-		rskeyclose(state->max);
+	for (f = state->field; f; f = f->next)
+		rskeyclose(f->lim);
 	vmclose(vm);
 	return 0;
 }

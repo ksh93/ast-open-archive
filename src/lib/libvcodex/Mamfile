@@ -34,8 +34,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make vcodex
 make libvcodex.a archive
@@ -146,7 +146,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
 done vchdr.h
 done vcbcktsort.c
-meta vcbcktsort.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcbcktsort.c vcbcktsort
+meta vcbcktsort.o %.c>%.o vcbcktsort.c vcbcktsort
 prev vcbcktsort.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcbcktsort.c
 done vcbcktsort.o generated
@@ -154,7 +154,7 @@ make vcclose.o
 make vcclose.c
 prev vchdr.h implicit
 done vcclose.c
-meta vcclose.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcclose.c vcclose
+meta vcclose.o %.c>%.o vcclose.c vcclose
 prev vcclose.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcclose.c
 done vcclose.o generated
@@ -162,7 +162,7 @@ make vccontext.o
 make vccontext.c
 prev vchdr.h implicit
 done vccontext.c
-meta vccontext.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vccontext.c vccontext
+meta vccontext.o %.c>%.o vccontext.c vccontext
 prev vccontext.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vccontext.c
 done vccontext.o generated
@@ -170,7 +170,7 @@ make vcdisc.o
 make vcdisc.c
 prev vchdr.h implicit
 done vcdisc.c
-meta vcdisc.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcdisc.c vcdisc
+meta vcdisc.o %.c>%.o vcdisc.c vcdisc
 prev vcdisc.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcdisc.c
 done vcdisc.o generated
@@ -178,7 +178,7 @@ make vcextract.o
 make vcextract.c
 prev vchdr.h implicit
 done vcextract.c
-meta vcextract.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcextract.c vcextract
+meta vcextract.o %.c>%.o vcextract.c vcextract
 prev vcextract.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcextract.c
 done vcextract.o generated
@@ -198,7 +198,7 @@ prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vcmeth.h
 done vcgetmeth.c
-meta vcgetmeth.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcgetmeth.c vcgetmeth
+meta vcgetmeth.o %.c>%.o vcgetmeth.c vcgetmeth
 prev vcgetmeth.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcgetmeth.c
 done vcgetmeth.o generated
@@ -206,7 +206,7 @@ make vcio.o
 make vcio.c
 prev vchdr.h implicit
 done vcio.c
-meta vcio.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcio.c vcio
+meta vcio.o %.c>%.o vcio.c vcio
 prev vcio.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcio.c
 done vcio.o generated
@@ -217,7 +217,7 @@ prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 prev vchdr.h implicit
 done vclog.c
-meta vclog.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vclog.c vclog
+meta vclog.o %.c>%.o vclog.c vclog
 prev vclog.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vclog.c
 done vclog.o generated
@@ -225,7 +225,7 @@ make vcopen.o
 make vcopen.c
 prev vchdr.h implicit
 done vcopen.c
-meta vcopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcopen.c vcopen
+meta vcopen.o %.c>%.o vcopen.c vcopen
 prev vcopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcopen.c
 done vcopen.o generated
@@ -233,7 +233,7 @@ make vcparse.o
 make vcparse.c
 prev vchdr.h implicit
 done vcparse.c
-meta vcparse.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcparse.c vcparse
+meta vcparse.o %.c>%.o vcparse.c vcparse
 prev vcparse.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcparse.c
 done vcparse.o generated
@@ -241,7 +241,7 @@ make vcperiod.o
 make vcperiod.c
 prev vchdr.h implicit
 done vcperiod.c
-meta vcperiod.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcperiod.c vcperiod
+meta vcperiod.o %.c>%.o vcperiod.c vcperiod
 prev vcperiod.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcperiod.c
 done vcperiod.o generated
@@ -249,7 +249,7 @@ make vcqsort.o
 make vcqsort.c
 prev vchdr.h implicit
 done vcqsort.c
-meta vcqsort.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcqsort.c vcqsort
+meta vcqsort.o %.c>%.o vcqsort.c vcqsort
 prev vcqsort.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcqsort.c
 done vcqsort.o generated
@@ -257,7 +257,7 @@ make vcsetbuf.o
 make vcsetbuf.c
 prev vchdr.h implicit
 done vcsetbuf.c
-meta vcsetbuf.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcsetbuf.c vcsetbuf
+meta vcsetbuf.o %.c>%.o vcsetbuf.c vcsetbuf
 prev vcsetbuf.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsetbuf.c
 done vcsetbuf.o generated
@@ -265,7 +265,7 @@ make vcsfxsort.o
 make vcsfxsort.c
 prev vchdr.h implicit
 done vcsfxsort.c
-meta vcsfxsort.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcsfxsort.c vcsfxsort
+meta vcsfxsort.o %.c>%.o vcsfxsort.c vcsfxsort
 prev vcsfxsort.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfxsort.c
 done vcsfxsort.o generated
@@ -276,7 +276,7 @@ prev vcodex.h implicit
 done vcsfio.h
 prev vchdr.h implicit
 done vcsfio.c
-meta vcsfio.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcsfio.c vcsfio
+meta vcsfio.o %.c>%.o vcsfio.c vcsfio
 prev vcsfio.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_BLD_vcodex -D_PACKAGE_ast -c vcsfio.c
 done vcsfio.o generated
@@ -287,7 +287,7 @@ prev vcsfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done vcsfcomp.c
-meta vcsfcomp.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/vcsfcomp.c vcsfcomp
+meta vcsfcomp.o %.c>%.o vcsfcomp.c vcsfcomp
 prev vcsfcomp.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c vcsfcomp.c
 done vcsfcomp.o generated
@@ -297,7 +297,7 @@ make Vcdelta/vcdhdr.h implicit
 prev vcmeth.h implicit
 done Vcdelta/vcdhdr.h
 done Vcdelta/vcdcache.c
-meta vcdcache.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcdelta/vcdcache.c vcdcache
+meta vcdcache.o %.c>%.o Vcdelta/vcdcache.c vcdcache
 prev Vcdelta/vcdcache.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcdelta/vcdcache.c
 done vcdcache.o generated
@@ -305,7 +305,7 @@ make vcdelta.o
 make Vcdelta/vcdelta.c
 prev Vcdelta/vcdhdr.h implicit
 done Vcdelta/vcdelta.c
-meta vcdelta.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcdelta/vcdelta.c vcdelta
+meta vcdelta.o %.c>%.o Vcdelta/vcdelta.c vcdelta
 prev Vcdelta/vcdelta.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcdelta/vcdelta.c
 done vcdelta.o generated
@@ -313,7 +313,7 @@ make vcdtable.o
 make Vcdelta/vcdtable.c
 prev Vcdelta/vcdhdr.h implicit
 done Vcdelta/vcdtable.c
-meta vcdtable.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcdelta/vcdtable.c vcdtable
+meta vcdtable.o %.c>%.o Vcdelta/vcdtable.c vcdtable
 prev Vcdelta/vcdtable.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcdelta/vcdtable.c
 done vcdtable.o generated
@@ -321,7 +321,7 @@ make vcdtblinit.o
 make Vcdelta/vcdtblinit.c
 prev Vcdelta/vcdhdr.h implicit
 done Vcdelta/vcdtblinit.c
-meta vcdtblinit.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcdelta/vcdtblinit.c vcdtblinit
+meta vcdtblinit.o %.c>%.o Vcdelta/vcdtblinit.c vcdtblinit
 prev Vcdelta/vcdtblinit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcdelta -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcdelta/vcdtblinit.c
 done vcdtblinit.o generated
@@ -331,7 +331,7 @@ make Vchuff/vchhdr.h implicit
 prev vcmeth.h implicit
 done Vchuff/vchhdr.h
 done Vchuff/vchbits.c
-meta vchbits.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vchuff/vchbits.c vchbits
+meta vchbits.o %.c>%.o Vchuff/vchbits.c vchbits
 prev Vchuff/vchbits.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchbits.c
 done vchbits.o generated
@@ -339,7 +339,7 @@ make vchcode.o
 make Vchuff/vchcode.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchcode.c
-meta vchcode.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vchuff/vchcode.c vchcode
+meta vchcode.o %.c>%.o Vchuff/vchcode.c vchcode
 prev Vchuff/vchcode.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchcode.c
 done vchcode.o generated
@@ -347,7 +347,7 @@ make vchsize.o
 make Vchuff/vchsize.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchsize.c
-meta vchsize.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vchuff/vchsize.c vchsize
+meta vchsize.o %.c>%.o Vchuff/vchsize.c vchsize
 prev Vchuff/vchsize.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchsize.c
 done vchsize.o generated
@@ -355,7 +355,7 @@ make vchtrie.o
 make Vchuff/vchtrie.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchtrie.c
-meta vchtrie.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vchuff/vchtrie.c vchtrie
+meta vchtrie.o %.c>%.o Vchuff/vchtrie.c vchtrie
 prev Vchuff/vchtrie.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchtrie.c
 done vchtrie.o generated
@@ -363,7 +363,7 @@ make vchuffgroup.o
 make Vchuff/vchuffgroup.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchuffgroup.c
-meta vchuffgroup.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vchuff/vchuffgroup.c vchuffgroup
+meta vchuffgroup.o %.c>%.o Vchuff/vchuffgroup.c vchuffgroup
 prev Vchuff/vchuffgroup.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchuffgroup.c
 done vchuffgroup.o generated
@@ -371,7 +371,7 @@ make vchuffman.o
 make Vchuff/vchuffman.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchuffman.c
-meta vchuffman.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vchuff/vchuffman.c vchuffman
+meta vchuffman.o %.c>%.o Vchuff/vchuffman.c vchuffman
 prev Vchuff/vchuffman.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchuffman.c
 done vchuffman.o generated
@@ -379,7 +379,7 @@ make vchuffpart.o
 make Vchuff/vchuffpart.c
 prev Vchuff/vchhdr.h implicit
 done Vchuff/vchuffpart.c
-meta vchuffpart.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vchuff/vchuffpart.c vchuffpart
+meta vchuffpart.o %.c>%.o Vchuff/vchuffpart.c vchuffpart
 prev Vchuff/vchuffpart.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVchuff -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vchuff/vchuffpart.c
 done vchuffpart.o generated
@@ -387,7 +387,7 @@ make vcbwt.o
 make Vcmisc/vcbwt.c
 prev vcmeth.h implicit
 done Vcmisc/vcbwt.c
-meta vcbwt.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcmisc/vcbwt.c vcbwt
+meta vcbwt.o %.c>%.o Vcmisc/vcbwt.c vcbwt
 prev Vcmisc/vcbwt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcbwt.c
 done vcbwt.o generated
@@ -395,7 +395,7 @@ make vcmap.o
 make Vcmisc/vcmap.c
 prev vcmeth.h implicit
 done Vcmisc/vcmap.c
-meta vcmap.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcmisc/vcmap.c vcmap
+meta vcmap.o %.c>%.o Vcmisc/vcmap.c vcmap
 prev Vcmisc/vcmap.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmap.c
 done vcmap.o generated
@@ -403,7 +403,7 @@ make vcmtf.o
 make Vcmisc/vcmtf.c
 prev vcmeth.h implicit
 done Vcmisc/vcmtf.c
-meta vcmtf.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcmisc/vcmtf.c vcmtf
+meta vcmtf.o %.c>%.o Vcmisc/vcmtf.c vcmtf
 prev Vcmisc/vcmtf.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcmtf.c
 done vcmtf.o generated
@@ -411,7 +411,7 @@ make vcrle.o
 make Vcmisc/vcrle.c
 prev vcmeth.h implicit
 done Vcmisc/vcrle.c
-meta vcrle.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcmisc/vcrle.c vcrle
+meta vcrle.o %.c>%.o Vcmisc/vcrle.c vcrle
 prev Vcmisc/vcrle.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcmisc/vcrle.c
 done vcrle.o generated
@@ -419,7 +419,7 @@ make vctranspose.o
 make Vctable/vctranspose.c
 prev vcmeth.h implicit
 done Vctable/vctranspose.c
-meta vctranspose.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vctable/vctranspose.c vctranspose
+meta vctranspose.o %.c>%.o Vctable/vctranspose.c vctranspose
 prev Vctable/vctranspose.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vctable/vctranspose.c
 done vctranspose.o generated
@@ -429,7 +429,7 @@ make Vcwindow/vcwhdr.h implicit
 prev vchdr.h implicit
 done Vcwindow/vcwhdr.h
 done Vcwindow/vcwclose.c
-meta vcwclose.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwclose.c vcwclose
+meta vcwclose.o %.c>%.o Vcwindow/vcwclose.c vcwclose
 prev Vcwindow/vcwclose.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwclose.c
 done vcwclose.o generated
@@ -437,7 +437,7 @@ make vcwdecode.o
 make Vcwindow/vcwdecode.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwdecode.c
-meta vcwdecode.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwdecode.c vcwdecode
+meta vcwdecode.o %.c>%.o Vcwindow/vcwdecode.c vcwdecode
 prev Vcwindow/vcwdecode.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwdecode.c
 done vcwdecode.o generated
@@ -445,7 +445,7 @@ make vcwfile.o
 make Vcwindow/vcwfile.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwfile.c
-meta vcwfile.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwfile.c vcwfile
+meta vcwfile.o %.c>%.o Vcwindow/vcwfile.c vcwfile
 prev Vcwindow/vcwfile.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwfile.c
 done vcwfile.o generated
@@ -453,7 +453,7 @@ make vcwgetmeth.o
 make Vcwindow/vcwgetmeth.c
 prev vchdr.h implicit
 done Vcwindow/vcwgetmeth.c
-meta vcwgetmeth.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwgetmeth.c vcwgetmeth
+meta vcwgetmeth.o %.c>%.o Vcwindow/vcwgetmeth.c vcwgetmeth
 prev Vcwindow/vcwgetmeth.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwgetmeth.c
 done vcwgetmeth.o generated
@@ -461,7 +461,7 @@ make vcwmirror.o
 make Vcwindow/vcwmirror.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwmirror.c
-meta vcwmirror.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwmirror.c vcwmirror
+meta vcwmirror.o %.c>%.o Vcwindow/vcwmirror.c vcwmirror
 prev Vcwindow/vcwmirror.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwmirror.c
 done vcwmirror.o generated
@@ -469,7 +469,7 @@ make vcwngram.o
 make Vcwindow/vcwngram.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwngram.c
-meta vcwngram.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwngram.c vcwngram
+meta vcwngram.o %.c>%.o Vcwindow/vcwngram.c vcwngram
 prev Vcwindow/vcwngram.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwngram.c
 done vcwngram.o generated
@@ -477,7 +477,7 @@ make vcwopen.o
 make Vcwindow/vcwopen.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwopen.c
-meta vcwopen.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwopen.c vcwopen
+meta vcwopen.o %.c>%.o Vcwindow/vcwopen.c vcwopen
 prev Vcwindow/vcwopen.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwopen.c
 done vcwopen.o generated
@@ -485,7 +485,7 @@ make vcwprefix.o
 make Vcwindow/vcwprefix.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwprefix.c
-meta vcwprefix.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwprefix.c vcwprefix
+meta vcwprefix.o %.c>%.o Vcwindow/vcwprefix.c vcwprefix
 prev Vcwindow/vcwprefix.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwprefix.c
 done vcwprefix.o generated
@@ -493,7 +493,7 @@ make vcwvote.o
 make Vcwindow/vcwvote.c
 prev Vcwindow/vcwhdr.h implicit
 done Vcwindow/vcwvote.c
-meta vcwvote.o %.c>%.o ${PACKAGEROOT}/src/lib/libvcodex/Vcwindow/vcwvote.c vcwvote
+meta vcwvote.o %.c>%.o Vcwindow/vcwvote.c vcwvote
 prev Vcwindow/vcwvote.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -IVcwindow -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -D_BLD_vcodex -c Vcwindow/vcwvote.c
 done vcwvote.o generated

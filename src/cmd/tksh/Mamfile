@@ -45,8 +45,8 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make tksh
 make uinit.o
@@ -158,7 +158,7 @@ done ${INSTALLROOT}/include/ast/shell.h dontcare
 prev ${INSTALLROOT}/include/ast/prototyped.h implicit
 done ${INSTALLROOT}/include/tcl/tksh.h
 done uinit.c
-meta uinit.o %.c>%.o ${PACKAGEROOT}/src/cmd/tksh/uinit.c uinit
+meta uinit.o %.c>%.o uinit.c uinit
 prev uinit.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -D_PACKAGE_ast -c uinit.c
 done uinit.o generated
@@ -178,7 +178,7 @@ prev ${INSTALLROOT}/include/ast/stdio.h implicit
 prev ${INSTALLROOT}/include/ast/endian.h implicit
 prev ${INSTALLROOT}/include/tcl/tksh.h implicit
 done tkMain.c
-meta tkMain.o %.c>%.o ${PACKAGEROOT}/src/cmd/tksh/tkMain.c tkMain
+meta tkMain.o %.c>%.o tkMain.c tkMain
 prev tkMain.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${INSTALLROOT}/include/tcl -I${INSTALLROOT}/include/ast -I${INSTALLROOT}/include -I/usr/X11R6/include -D_PACKAGE_ast -c tkMain.c
 done tkMain.o generated

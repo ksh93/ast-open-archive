@@ -2,11 +2,11 @@
 
 LICENSE = since=1993,author=dgk
 
-pack :: pack.c libhuff.a
+pack :: pack.c -lhuff
 
-unpack :: unpack.c libhuff.a
+unpack :: unpack.c -lhuff
 
-pcat :: unpack.c libhuff.a
+pcat :: unpack.c -lhuff
 
 huff 1.0 :LIBRARY: huff.3 huffman.h \
 		huffinit.c huffgethdr.c huffputhdr.c \

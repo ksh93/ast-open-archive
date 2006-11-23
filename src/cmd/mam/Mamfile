@@ -34,13 +34,13 @@ setv SILENT
 setv TAR tar
 setv YACC yacc
 setv YACCFLAGS -d
-make ${INSTALLROOT}/lib/package/ast.lic
-done ${INSTALLROOT}/lib/package/ast.lic
+make ${PACKAGEROOT}/lib/package/ast.lic
+done ${PACKAGEROOT}/lib/package/ast.lic
 make install
 make mamdag
 make mamdag.sh
 done mamdag.sh
-meta mamdag %.sh>% ${PACKAGEROOT}/src/cmd/mam/mamdag.sh mamdag
+meta mamdag %.sh>% mamdag.sh mamdag
 prev mamdag.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -77,7 +77,7 @@ done mamdag generated
 make mamdot
 make mamdot.sh
 done mamdot.sh
-meta mamdot %.sh>% ${PACKAGEROOT}/src/cmd/mam/mamdot.sh mamdot
+meta mamdot %.sh>% mamdot.sh mamdot
 prev mamdot.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -114,7 +114,7 @@ done mamdot generated
 make mamexec
 make mamexec.sh
 done mamexec.sh
-meta mamexec %.sh>% ${PACKAGEROOT}/src/cmd/mam/mamexec.sh mamexec
+meta mamexec %.sh>% mamexec.sh mamexec
 prev mamexec.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -228,7 +228,7 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/mam.h
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done mamnew.c
-meta mamnew.o %.c>%.o ${PACKAGEROOT}/src/cmd/mam/mamnew.c mamnew
+meta mamnew.o %.c>%.o mamnew.c mamnew
 prev mamnew.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?mam]"\" -c mamnew.c
 done mamnew.o generated
@@ -249,7 +249,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/mam.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done mamold.c
-meta mamold.o %.c>%.o ${PACKAGEROOT}/src/cmd/mam/mamold.c mamold
+meta mamold.o %.c>%.o mamold.c mamold
 prev mamold.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1989-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?mam]"\" -c mamold.c
 done mamold.o generated
@@ -258,7 +258,7 @@ done mamold generated
 make mamsh
 make mamsh.sh
 done mamsh.sh
-meta mamsh %.sh>% ${PACKAGEROOT}/src/cmd/mam/mamsh.sh mamsh
+meta mamsh %.sh>% mamsh.sh mamsh
 prev mamsh.sh
 exec - case static,port:$OPTIND:$RANDOM in
 exec - ?*:*:*|*::*|*:*:$RANDOM)
@@ -297,7 +297,7 @@ make mamstate.o
 make mamstate.c
 prev ${PACKAGE_ast_INCLUDE}/stdio.h implicit
 done mamstate.c
-meta mamstate.o %.c>%.o ${PACKAGEROOT}/src/cmd/mam/mamstate.c mamstate
+meta mamstate.o %.c>%.o mamstate.c mamstate
 prev mamstate.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE}  -c mamstate.c
 done mamstate.o generated

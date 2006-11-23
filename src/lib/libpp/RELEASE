@@ -1,3 +1,5 @@
+06-09-23 ppop.c: check -I <dev,ino> for c and TYPE_HOSTED|TYPE_VENDOR attrs
+06-09-23 pplex.c: add HOSTED check for "/* appears in // comment" -- doh
 06-09-05 pp.probe: add version stamp comment
 06-06-29 pp.probe: gcc pp:linefile probe (otherwise it can dump!)
 06-06-28 ppproto.c: fix inappropriate __PARAM__ insertion

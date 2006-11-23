@@ -2333,6 +2333,7 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+06-11-23 Makerules.mk: fix .BIND.-l% for -g only bootstrap
 06-11-15 Makerules.mk: fix :: vs :LIBRARY: ordering bug for .o prereqs
 06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
 06-10-31 Makerules.mk: add $(PROTOINSTALL) to :INSTALLPROTO:, rules-win32.mk
@@ -6186,6 +6187,7 @@ All recorded changes follow.
 
 :::::::: libcmd ::::::::
 
+06-11-23 cmd.h: because of proto cmdinit cannot be a function like macro
 06-11-21 cp.c: fix 06-10-31 const dot[] readonly assignment
 06-11-15 cp.c: fix 06-10-31 ln -s enoent bug
 06-11-11 getconf.c: let astconf() handle "undefined" vs. ""
@@ -6745,6 +6747,8 @@ All recorded changes follow.
 
 :::::::: libpp ::::::::
 
+06-09-23 ppop.c: check -I <dev,ino> for c and TYPE_HOSTED|TYPE_VENDOR attrs
+06-09-23 pplex.c: add HOSTED check for "/* appears in // comment" -- doh
 06-09-05 pp.probe: add version stamp comment
 06-06-29 pp.probe: gcc pp:linefile probe (otherwise it can dump!)
 06-06-28 ppproto.c: fix inappropriate __PARAM__ insertion
