@@ -174,7 +174,7 @@ int im_mount(argc, argv)
 }
 	
 
-callmount(fd, mpoint, mfs, reply)
+int callmount(fd, mpoint, mfs, reply)
 	int	fd;
 	char*	mpoint;
 	char*	mfs;

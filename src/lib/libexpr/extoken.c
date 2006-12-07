@@ -197,6 +197,8 @@ trace(Expr_t* ex, int lev, char* op, int c)
  * trace wrapper for extoken()
  */
 
+extern int	_extoken_(Expr_t*);
+
 int
 extoken(Expr_t* ex)
 {

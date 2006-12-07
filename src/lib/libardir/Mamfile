@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -261,6 +261,7 @@ make ${INSTALLROOT}/lib/lib/ardir
 prev ${INSTALLROOT}/lib/lib
 prev ardir.req
 exec - test '' = 'ardir.req' || ${STDCMP} 2>/dev/null -s ardir.req ${INSTALLROOT}/lib/lib/ardir || { ${STDMV} ${INSTALLROOT}/lib/lib/ardir ${INSTALLROOT}/lib/lib/ardir.old 2>/dev/null || true; ${STDCP} ardir.req ${INSTALLROOT}/lib/lib/ardir  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/lib/ardir) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/ardir generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

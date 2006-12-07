@@ -2282,7 +2282,7 @@ All recorded changes follow.
 95-04-31  The expansion of "$@" was incorrect when $1 was the null
 	  string.
 95-04-31  A bug which could incorrectly report a syntax error in
-	  a backquoted expression when a $ was preceded by 
+	  a backquoted expression when a $ was preceded by \\
 	  has been fixed.
 95-04-31  A bug which prevented the shell from exiting after
 	  reporting an error when failing to open a script
@@ -2865,6 +2865,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="proto changes">proto changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-04 proto.c: add utime() prototype
 06-06-28 proto.tst: add more externalize tests
 06-05-09 proto.c: add --externalize, -x
 06-05-09 proto.tst: add -x tests
@@ -2988,6 +2989,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="3d changes">3d changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-04 3d.h: strmode() bsd conflict tweak
 06-11-23 finally get linux to pass regression tests
 06-11-21 fchdir3d: let chdir do the work if fd matches cached path
 06-09-28 3d.sh: used getconf LIBPATH|LIBPREFIX|LIBSUFFIX -- how novel
@@ -3323,6 +3325,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="nmake changes">nmake changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-07 expand.c: add $("&lt;table&gt;":L...) for { FILES RULES VARIABLES }
+06-12-07 Makerules.mk: use $("&lt;VARIABLES&gt;":L=CC.+(&#0091;&#0091;:upper:&#0093;.&#0093;)) in .MAM.INIT
 06-11-23 Makerules.mk: fix .BIND.-l% for -g only bootstrap
 06-11-15 Makerules.mk: fix :: vs :LIBRARY: ordering bug for .o prereqs
 06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
@@ -3877,7 +3881,7 @@ All recorded changes follow.
 01-09-04 makerules: +l* bind conditioned on .LIBRARY.LIST. for dll builds
 01-08-11 makerules: reference $(CC.DLL.LIBRARIES) last and in link args only
 	 makerules: +l* in req list now checks .PACKAGE.*.library for -l*
-	 parse.c: fix `r to act like `n'
+	 parse.c: fix `\\\r to act like `\\\n'
 	 make.h: add FSWINDOWS to include { _WIN32 _UWIN __CYGWIN__ }
 01-07-17 makerules: fix :LIBRARY: to honor LDLIBRARIES
 01-06-21 misc.c: fix strtoll and strtoull macro rename
@@ -4109,7 +4113,7 @@ All recorded changes follow.
 	 Makerules: $(CC.DLL) uses local *.lib
 	 expand: add :P=N: for 'native-path'
 	 expand: :P=S=subdir: to handle recursive manifest
-	 parse: fix  splice bug that activated rules direcive
+	 parse: fix \\n splice bug that activated rules direcive
 	 rule: .READONLY external support
 	 bind: (P_readonly|P_terminal) does not get attribute assoc
 	 bind: add rule_compare() and rule_hash() for case hacks
@@ -5487,6 +5491,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="std changes">std changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-04 du.c: handle &gt; 2Ti in local.pointer
+06-11-23 ps.c: --escape now the default: -E =&gt; --noescape
 06-10-11 add sfstruse() error checks
 06-10-11 ls.c: header/trailer must honor state.scale too
 06-09-19 split.c: pathconf() =&gt; astconf()
@@ -5764,6 +5770,8 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="tw changes">tw changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-07 find.c,find.tst: fix -exec/-xargs vs {} +
+06-12-07 cmdarg.c,xargs.tst: adjust ARG_MAX logic
 06-10-11 add sfstropen()/sfstruse() error checks
 06-09-27 find.c: peel off leading &#0091;-+&#0093; from all -perm
 06-07-17 find.tst: fix -perm tests
@@ -5888,6 +5896,11 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libast changes">libast changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-05 Makefile: finx conftab.c generation CCFLAGS to match build - doh
+06-12-04 sfio/sfcvt.c: fix (int) vs. (long) cast mismatches
+06-12-01 comp/conf.tab: add changes to cover solaris { bin xpg4 xpg6 }
+06-12-01 regex/reginit.c: adjust { SRE KRE } escaped (){}*? inside &#0091;...&#0093;
+06-12-01 sfio/sfcvt.c: add signbit/copysign tests
 06-11-22 comp/spawnveg.c: fix _real_vfork logic to work with 3d
 06-11-20 features/common: bias _ast_int8_t "long long" before "__int64"
 06-11-20 string/strperm.c: fix X to work with all ops (not just +)
@@ -6003,7 +6016,7 @@ All recorded changes follow.
 	 magic.tab: ammend bsd db magic
 05-05-23 regex: REX_NEST (?%&#0091;D.&#0093;&#0091;E.&#0093;&#0091;L.&#0093;&#0091;Q.&#0093;&#0091;oc&#0093;...)
 05-05-21 regex: state.fold&#0091;&#0093; is now locale specific -- doh
-05-05-19 regex: add REX_NEST (?%lt;&gt;&#0091;&#0093;""...) %(...) nested match
+05-05-19 regex: add REX_NEST (?%\\()&lt;&gt;&#0091;&#0093;""...) %(...) nested match
 05-05-15 recfmt.h: add recstr() reclen() fmtrec()
 05-05-13 optget.c: allow boolean options to take numeric values
 05-05-12 recfmt.c: add to recfmt.h, adjust Recfmt_t encodings
@@ -7262,7 +7275,7 @@ All recorded changes follow.
 95-01-01 add this RELEASE file
 	 fix strperm() to properly handle "644 file"
 	 fix tokline() to return last '&nbsp;' terminated line in string
-	 fix tokscan() to properly handle  splice
+	 fix tokscan() to properly handle \\n splice
 	 add fmtesc() to complement stresc()
 	 add LS_NUMBER to fmtls()
 	 drop spurious optusage() ' '
@@ -8014,7 +8027,7 @@ All recorded changes follow.
 	 pragma: add pp:pragmaexpand to expand pragma args
 	 ppcontrol: always disable pp:* pragma expansion
 	 ppcall: fix pp:hide buffer clash
-00-06-01 pplex: fix "" and ""
+00-06-01 pplex: fix "\\U" and "\\u"
 00-05-22 ppsearch: fix uwin #include &lt;C:/foo/bar.h&gt;
 00-05-16 probe.win32: update reserved word list
 00-05-09 ppcontrol: fix C++ macro &gt;+&gt; invalid fuse
@@ -8029,10 +8042,10 @@ All recorded changes follow.
 99-11-11 ppproto: use astlicense()
 99-10-31 ppproto: add PROTO_SHARP, update license parse
 	 pplex: fix some MARK bugs seen by #define X "A B <SMALL>&lt;<A href=mailto:C@D>C@D</A>&gt;</SMALL>"
-99-10-01 add pp:stringsplit for "......" =&gt; "..."..."
+99-10-01 add pp:stringsplit for "...\\n..." =&gt; "..."..."
 	 add pp:lineid to match PP_LINEID
 99-07-17 ppbuiltin: fix getline() canon spacing for numbers
-	 ppsearch: fix FILEDEPS not found  print
+	 ppsearch: fix FILEDEPS not found \\n print
 	 pplex: fix spurious FILEDEPS '.' empty character constant message
 	 ppargs: fix usage error call and error_info.id default value
 	 ppproto: fix up copyright notice for ksh93 style .author file
@@ -8044,7 +8057,7 @@ All recorded changes follow.
 99-05-09 ppinput: add #pragma pp:native and (pp.option&amp;NATIVE) for native paths
 99-04-22 ppproto: finish type=open notice
 99-02-11 #define __STDC__ #(STDC); demote __STDC__ to 0 for HOSTED (thanks sun)
-99-02-04 pplex: joined strings separated by n
+99-02-04 pplex: joined strings separated by \\\n
 99-01-11 probe.win32: add _UWIN predef
 98-10-20 pplex: a few more (HOSTED|RELAX) checks
 	 -D:preserve throws a bunch of stuff -- great for imake (yuk)
@@ -8379,6 +8392,7 @@ All recorded changes follow.
 <P><HR><CENTER><FONT color=red><FONT face=courier><H3><A name="libdss changes">libdss changes</A></H3></FONT></FONT></CENTER>
 <PRE>
 
+06-12-04 dssopt.c: add full type description to dssopt()
 06-10-11 add sfstruse() error checks
 06-02-14 dss.h: always __EXPORT__ dss_lib()
 06-02-02 dssopt.c,dss-print.h: add <p>rint</p>< >default print format</ >
@@ -8772,7 +8786,7 @@ All recorded changes follow.
 <TR>
 <TD align=left></TD>
 <TD align=center></TD>
-<TD align=right>November 28, 2006</TD>
+<TD align=right>December 07, 2006</TD>
 </TR>
 </TABLE>
 <P>

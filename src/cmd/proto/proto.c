@@ -150,6 +150,9 @@ USAGE_LICENSE
 
 #include <ast.h>
 #include <error.h>
+#include <times.h>
+
+#define utime(p,t)	touch(p,t[0],t[1],0)
 
 #endif
 
@@ -235,7 +238,9 @@ extern int	mkdir(const char*, int);
 
 #endif
 
-/*NODELAY_CONTROL*/
+#if PROTO_STANDALONE
+extern int	utime(const char*, time_t*);
+#endif
 
 /*
  * rename newfile to oldfile
@@ -266,6 +271,11 @@ replace(const char* newfile, const char* oldfile, int preserve)
 	}
 	return preserve;
 }
+
+#undef	utime
+#define utime		______utime
+
+/*NODELAY_CONTROL*/
 
 #include "ppproto.c"
 

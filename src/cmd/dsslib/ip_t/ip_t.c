@@ -364,7 +364,7 @@ match_prefix_free(Cx_t* cx, void* data, Cxdisc_t* disc)
 static Cxmatch_t	match_prefix =
 {
 	"prefix-match",
-	"[+?Matches on this type treat a string pattern as a prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is an \bipprefix_t\b then matches test if the subject is matched by the prefix.]",
+	"Matches on this type treat a string pattern as a prefix table and test whether the subject is matched by the table. If the first character of the pattern is \b<\b then the remainder of the string is the path name of a file containing a prefix table. If the pattern is an \bipprefix_t\b then matches test if the subject is matched by the prefix.",
 	{0},
 	match_prefix_comp,
 	match_prefix_exec,

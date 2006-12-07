@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -140,10 +140,14 @@ USAGE_LICENSE
 "[+SEE ALSO?\b/bin/mail\b(1), \bMail\b(1)]"
 ;
 
+#undef	optarg
 #define optarg		opt_info.arg
+#undef	optnum
 #define optnum		opt_info.num
+#undef	optind
 #define optind		opt_info.index
 
+#undef	getopt
 #define getopt(c,v,u)	optget(v,u)
 
 #else

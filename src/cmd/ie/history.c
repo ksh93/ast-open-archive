@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -47,6 +47,7 @@
 #   include	"builtins.h"
 #else
 #   include	"io.h"
+#   include	"edit.h"
 #   include	<signal.h>
 #   include	<ctype.h>
 #endif	/* KSHELL */
@@ -300,6 +301,7 @@ register int fd;
  */
 
 static void hist_trim(n)
+	int n;
 {
 	register int c;
 	register struct fileblk *fp;
@@ -672,6 +674,7 @@ char *nl;
 histloc hist_find(string,index1,flag,direction)
 char *string;
 register int index1;
+int flag;
 int direction;
 {
 	register struct history *fp = hist_ptr;
@@ -731,6 +734,7 @@ int direction;
 int hist_match(offset,string,flag)
 off_t offset;
 char *string;
+int flag;
 {
 	register char *cp;
 	register int c;
@@ -797,6 +801,7 @@ char *string;
 
 int hist_copy(s1,command,line)
 register char *s1;
+int command, line;
 {
 	register int c;
 	register struct history *fp = hist_ptr;
@@ -842,6 +847,7 @@ register char *s1;
 
 char *hist_word(s1,word)
 char *s1;
+int word;
 {
 	register int c;
 	register char *cp = s1;
@@ -995,7 +1001,7 @@ char *buf;
  * returns the next character from file <fd>
  */
 
-static io_getc(fd)
+static int io_getc(fd)
 int fd;
 {
 	register struct fileblk *fp = io_ftable[fd];

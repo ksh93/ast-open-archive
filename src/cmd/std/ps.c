@@ -34,7 +34,7 @@
 #define FIELDS_l	"flags,state,user,pid,ppid,pri,nice,size,rss,wchan,tty,time,command"
 
 static const char usage[] =
-"[-1o?\n@(#)$Id: ps (AT&T Research) 2006-05-23 $\n]"
+"[-1o?\n@(#)$Id: ps (AT&T Research) 2006-11-23 $\n]"
 USAGE_LICENSE
 "[+NAME?ps - report process status]"
 "[+DESCRIPTION?\bps\b lists process information subject to the appropriate"
@@ -56,7 +56,7 @@ USAGE_LICENSE
 "	when \b%(\b\akey\a\b)\b is specified in \b--format\b. \akey\a may"
 "	override internal \b--format\b identifiers.]:[key[=value]]]"
 "[e|A:all?List all processes.]"
-"[E:escape?Escape non-printing characters in \bcommand\b and \bargs\b.]"
+"[E!:escape?Escape non-printing characters in \bcommand\b and \bargs\b.]"
 "[f:full?Equivalent to \b--fields=" FIELDS_f "\b.]"
 "[F:format?Append to the listing format string (if \b--format\b is specified"
 "	then \b--fields\b and all options that modify \b--fields\b are"
@@ -1469,6 +1469,7 @@ main(int argc, register char** argv)
 	error_info.id = "ps";
 	setlocale(LC_ALL, "");
 	state.now = time((time_t*)0);
+	state.escape = 1;
 	state.heading = 1;
 	if (!(fmt = sfstropen()) || !(state.tmp = sfstropen()) || !(state.wrk = sfstropen()))
 		error(ERROR_SYSTEM|3, "out of space");

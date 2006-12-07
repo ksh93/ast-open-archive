@@ -1095,3 +1095,19 @@ size/4815
 size/5136
 size/5457
 size/5778'
+
+TEST 07 '[ -exec -xargs ] X {} X [ ; + ]'
+	DO	DATA mode
+	EXEC	mode -sort -name -exec echo ';'
+		OUTPUT - $'mode\nmode/000\nmode/111\nmode/222\nmode/333\nmode/444\nmode/555\nmode/666\nmode/777'
+	EXEC	mode -sort -name -exec echo {} ';'
+	EXEC	mode -sort -name -xargs echo ';'
+		OUTPUT - $'mode mode/000 mode/111 mode/222 mode/333 mode/444 mode/555 mode/666 mode/777'
+	EXEC	mode -sort -name -xargs echo {} ';'
+	EXEC	mode -sort -name -xargs echo {} '+'
+	EXEC	mode -sort -name -exec echo {} '+'
+	EXEC	mode -sort -name -exec echo '+'
+		OUTPUT -
+		ERROR - $'find: incomplete statement'
+		EXIT 1
+	EXEC	mode -sort -name -xargs echo '+'

@@ -43,6 +43,7 @@ USAGE_LICENSE
 "[+SEE ALSO?\bgzip\b(1), \bgunzip\b(1), \blibz\b(3)]"
 ;
 
+int
 main(int argc, char** argv)
 {
 	Sfio_t*	sp;

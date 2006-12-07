@@ -39,15 +39,18 @@
  *	    ship lower view subdirs not reflected in the top level st_nlink
  */
 
+#define _def_map_ast	1
 #define _std_strtol	1
 
 #define getdirentries	______getdirentries
 #define sbrk		______sbrk
+#define strmode		______strmode
 
 #include <ast_std.h>
 
 #undef	getdirentries
 #undef	sbrk
+#undef	strmode
 
 #include "dir_3d.h"
 

@@ -218,7 +218,7 @@ struct pptuple				/* tuple macro			*/
 	char		token[1];	/* matching token		*/
 };
 
-struct fileid				/* physical file id		*/
+struct ppfileid				/* physical file id		*/
 {
 	unsigned long	st_dev;		/* dev				*/
 	unsigned long	st_ino;		/* ino				*/
@@ -227,7 +227,7 @@ struct fileid				/* physical file id		*/
 struct pathid				/* physical file name and id	*/
 {
 	char*		path;		/* file path			*/
-	struct fileid	id;		/* file id			*/
+	struct ppfileid	id;		/* file id			*/
 };
 
 #define SAMEID(a,b)	((a)->st_ino==(unsigned long)(b)->st_ino&&(a)->st_dev==(unsigned long)(b)->st_dev)
@@ -371,7 +371,7 @@ struct pathid				/* physical file name and id	*/
 	Sfio_t*		sp;		/* archive stream		*/ \
 	struct ppdirs*	subdir;		/* subdir list			*/ \
 	}		info;		/* type info			*/ \
-	struct fileid	id;		/* directory id			*/ \
+	struct ppfileid	id;		/* directory id			*/ \
 
 #if !PROTOMAIN
 #include <ast.h>

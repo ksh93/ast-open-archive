@@ -1520,6 +1520,7 @@ init(void)
 	hashset(state.tags, HASH_ALLOCATE);
 }
 
+int
 main(int argc, char** argv)
 {
 	register int		c;

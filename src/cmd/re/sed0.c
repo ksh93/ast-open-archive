@@ -73,6 +73,7 @@ int bflag;		/* strip leading blanks from c,a,i <text> */
 
 unsigned char*	map;	/* CC_NAT*IVE => CC_ASCII map */
 
+int
 main(int argc, char **argv)
 {
 	int c;

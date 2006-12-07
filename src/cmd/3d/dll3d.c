@@ -19,6 +19,7 @@
 *                   Eduardo Krell <ekrell@adexus.cl>                   *
 *                                                                      *
 ***********************************************************************/
+#define _def_map_ast	1
 #define _std_strtol	1
 
 #ifndef _GNU_SOURCE
@@ -28,7 +29,11 @@
 #define __EXTENSIONS__	1
 #endif
 
+#define strmode		______strmode
+
 #include <ast_std.h>
+
+#undef	strmode
 
 #include "dll_3d.h"
 

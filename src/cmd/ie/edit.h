@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1984-2005 AT&T Corp.                  *
+*           Copyright (c) 1984-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -162,6 +162,7 @@ extern struct edit editb;
     extern void ed_putchar(int);
     extern void ed_ringbell(void);
     extern void ed_setup(int);
+    extern void ed_failed(char*,char*);
     extern void ed_flush(void);
     extern int	ed_getchar(void);
     extern int	ed_virt_to_phys(genchar*,genchar*,int,int,int);
@@ -179,6 +180,7 @@ extern struct edit editb;
     extern void ed_putchar();
     extern void ed_ringbell();
     extern void ed_setup();
+    extern void ed_failed();
     extern void ed_flush();
     extern int	ed_getchar();
     extern int	ed_virt_to_phys();

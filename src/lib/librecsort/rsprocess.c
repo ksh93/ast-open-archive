@@ -219,7 +219,6 @@ ssize_t	s_data;		/* data size		*/
 						return -1;
 					r->key = c_key;
 					r->keylen = k;
-					error(-1, "AHA rsprocess key len=%d %03o %03o %03o %03o", k, r->key[0], r->key[1], r->key[2], r->key[3]);
 
 					if(rs->meth->type == RS_MTVERIFY)
 					{	/* each key is allocated separately */

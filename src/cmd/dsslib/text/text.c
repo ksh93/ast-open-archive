@@ -41,6 +41,7 @@ USAGE_LICENSE
 ;
 
 #include <dsslib.h>
+#include <tm.h>
 
 typedef unsigned _ast_int4_t Ipaddr_t;
 

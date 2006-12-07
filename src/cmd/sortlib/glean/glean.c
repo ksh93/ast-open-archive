@@ -161,7 +161,7 @@ glean(Rs_t* rs, int op, Void_t* data, Void_t* arg, Rsdisc_t* disc)
 				return -1;
 			}
 			p->key.len = r->keylen;
-			p->key.data = (void*)(p + 1) + (state->fields - 1) * sizeof(Data_t);
+			p->key.data = (char*)(p + 1) + (state->fields - 1) * sizeof(Data_t);
 			memcpy(p->key.data, r->key, r->keylen);
 			dtinsert(state->categories, p);
 		}

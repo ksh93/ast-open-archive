@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -104,9 +104,12 @@ meta FEATURE/ielib features/%>FEATURE/% features/ielib ielib
 make features/ielib
 done features/ielib
 prev edit.req
-bind -ldll
-bind -last
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast}  : run features/ielib
+make +ldll
+done +ldll virtual
+make +last archive
+done +last dontcare virtual
+prev +last archive
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/ielib
 done FEATURE/ielib dontcare generated
 make FEATURE/options implicit
 meta FEATURE/options features/%.sh>FEATURE/% features/options.sh options
@@ -115,7 +118,10 @@ make OPTIONS implicit
 done OPTIONS
 done features/options.sh dontcare
 prev edit.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref ${mam_cc_L+-L${INSTALLROOT}/lib} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdll} ${mam_libast} ${mam_libast}  : run features/options.sh OPTIONS
+prev +ldll
+prev +last archive
+prev +last archive
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DLDYNAMIC -DVSH -DESH ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include  : run features/options.sh OPTIONS
 done FEATURE/options dontcare generated
 done sh_config.h
 make ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -187,6 +193,7 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -DESH -DVSH
 done vi.o generated
 make emacs.o
 make emacs.c
+prev terminal.h implicit
 prev edit.h implicit
 prev history.h implicit
 prev io.h implicit
@@ -200,6 +207,7 @@ make history.o
 make history.c
 prev national.h implicit
 prev history.h implicit
+prev edit.h implicit
 prev io.h implicit
 make builtins.h implicit
 done builtins.h dontcare virtual
@@ -287,6 +295,7 @@ make ${INSTALLROOT}/lib/lib/edit
 prev ${INSTALLROOT}/lib/lib
 prev edit.req
 exec - test '' = 'edit.req' || ${STDCMP} 2>/dev/null -s edit.req ${INSTALLROOT}/lib/lib/edit || { ${STDMV} ${INSTALLROOT}/lib/lib/edit ${INSTALLROOT}/lib/lib/edit.old 2>/dev/null || true; ${STDCP} edit.req ${INSTALLROOT}/lib/lib/edit  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/lib/edit) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/edit generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -297,6 +306,7 @@ make ${INSTALLROOT}/bin/ie
 prev ${INSTALLROOT}/bin
 prev ie
 exec - test '' = 'ie' || ${STDCMP} 2>/dev/null -s ie ${INSTALLROOT}/bin/ie || { ${STDMV} ${INSTALLROOT}/bin/ie ${INSTALLROOT}/bin/ie.old 2>/dev/null || true; ${STDCP} ie ${INSTALLROOT}/bin/ie  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/ie) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/ie generated
 done install virtual
 make test

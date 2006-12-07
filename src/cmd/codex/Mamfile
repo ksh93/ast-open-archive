@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -117,9 +117,11 @@ meta codex.o %.c>%.o codex.c codex
 prev codex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?David Korn <dgk@research.att.com>][-author?Phong Vo <kpv@research.att.com>][-copyright?Copyright (c) 2003-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?codex]"\" -c codex.c
 done codex.o generated
+prev codex
 bind -lcodex
-bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o codex codex.o ${mam_libcodex} ${mam_libast}
+make ${mam_libast} archive
+done ${mam_libast} dontcare virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.}  -o codex codex.o ${mam_libcodex}
 done codex generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -130,6 +132,7 @@ make ${INSTALLROOT}/bin/codex
 prev ${INSTALLROOT}/bin
 prev codex
 exec - test '' = 'codex' || ${STDCMP} 2>/dev/null -s codex ${INSTALLROOT}/bin/codex || { ${STDMV} ${INSTALLROOT}/bin/codex ${INSTALLROOT}/bin/codex.old 2>/dev/null || true; ${STDCP} codex ${INSTALLROOT}/bin/codex  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/codex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/codex generated
 done install virtual
 make test

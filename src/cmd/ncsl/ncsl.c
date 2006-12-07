@@ -188,6 +188,7 @@ ncsl(register Sfio_t* sp)
 	/*NOTREACHED*/
 }
 
+int
 main(int argc, char** argv)
 {
 	register char*		s;

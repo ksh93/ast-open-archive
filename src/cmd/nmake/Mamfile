@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -182,6 +182,8 @@ exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_
 done archive.o generated
 make bind.o
 make bind.c
+make options.h implicit
+done options.h
 prev make.h implicit
 done bind.c
 meta bind.o %.c>%.o bind.c bind
@@ -236,8 +238,7 @@ done ${PACKAGE_ast_INCLUDE}/stk.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/stak.h
 prev ${PACKAGE_ast_INCLUDE}/sig.h implicit
-make options.h implicit
-done options.h
+prev options.h implicit
 prev make.h implicit
 done main.c
 meta main.o %.c>%.o main.c main
@@ -369,12 +370,15 @@ make version.c
 done version.c
 meta version.o %.c>%.o version.c version
 prev version.c
-exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.1 2006-08-11 \$\0\n"\" -c version.c
+exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS}  -DIDNAME=\""make"\" -DSTAMP=\""\n@(#)\$Id: make (AT&T Research) 5.1 2006-12-07 \$\0\n"\" -c version.c
 done version.o generated
-bind -lcoshell
-bind -lardir
-bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o ${mam_libcoshell} ${mam_libardir} ${mam_libast}
+make ${mam_libcoshell} archive
+done ${mam_libcoshell} dontcare virtual
+make ${mam_libardir} archive
+done ${mam_libardir} dontcare virtual
+make ${mam_libast} archive
+done ${mam_libast} dontcare virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o nmake archive.o bind.o command.o dump.o expand.o main.o make.o mam.o metarule.o misc.o object.o option.o parse.o read.o rule.o scan.o state.o trap.o variable.o version.o
 done nmake generated
 make ppcc
 make ppcc.sh
@@ -422,6 +426,7 @@ make ${INSTALLROOT}/bin/nmake
 prev ${INSTALLROOT}/bin
 prev nmake
 exec - test '' = 'nmake' || ${STDCMP} 2>/dev/null -s nmake ${INSTALLROOT}/bin/nmake || { ${STDMV} ${INSTALLROOT}/bin/nmake ${INSTALLROOT}/bin/nmake.old 2>/dev/null || true; ${STDCP} nmake ${INSTALLROOT}/bin/nmake  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/nmake) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/nmake generated
 make ${INSTALLROOT}/man/man1
 exec - if	silent test ! -d ${INSTALLROOT}/man/man1
@@ -439,6 +444,7 @@ done nmake.1.tail
 exec - nmake --nroff 2>&1 | sed -e '/itself/r nmake.1.body' -e '/fBsh/r nmake.1.tail' > nmake.1
 done nmake.1 generated
 exec - test '' = 'nmake.1' || ${STDCMP} 2>/dev/null -s nmake.1 ${INSTALLROOT}/man/man1/nmake.1 || { ${STDMV} ${INSTALLROOT}/man/man1/nmake.1 ${INSTALLROOT}/man/man1/nmake.1.old 2>/dev/null || true; ${STDCP} nmake.1 ${INSTALLROOT}/man/man1/nmake.1  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/man/man1/nmake.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/nmake.1 generated
 make ${INSTALLROOT}/lib/make
 exec - if	silent test ! -d ${INSTALLROOT}/lib/make
@@ -508,6 +514,7 @@ exec - 	done
 exec - } > Makeinstall.mk
 done Makeinstall.mk generated
 exec - test '' = 'Makeinstall.mk' || ${STDCMP} 2>/dev/null -s Makeinstall.mk ${INSTALLROOT}/lib/make/Makeinstall.mk || { ${STDMV} ${INSTALLROOT}/lib/make/Makeinstall.mk ${INSTALLROOT}/lib/make/Makeinstall.mk.old 2>/dev/null || true; ${STDCP} Makeinstall.mk ${INSTALLROOT}/lib/make/Makeinstall.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/Makeinstall.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/Makeinstall.mk generated
 make ${INSTALLROOT}/lib/make/Makerules.mk
 make Makerules.mk
@@ -522,79 +529,95 @@ make Scanrules.mk implicit
 done Scanrules.mk dontcare
 done Makerules.mk
 exec - test '' = 'Makerules.mk' || ${STDCMP} 2>/dev/null -s Makerules.mk ${INSTALLROOT}/lib/make/Makerules.mk || { ${STDMV} ${INSTALLROOT}/lib/make/Makerules.mk ${INSTALLROOT}/lib/make/Makerules.mk.old 2>/dev/null || true; ${STDCP} Makerules.mk ${INSTALLROOT}/lib/make/Makerules.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/Makerules.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/Makerules.mk generated
 make ${INSTALLROOT}/lib/make/Scanrules.mk
 prev Scanrules.mk
 exec - test '' = 'Scanrules.mk' || ${STDCMP} 2>/dev/null -s Scanrules.mk ${INSTALLROOT}/lib/make/Scanrules.mk || { ${STDMV} ${INSTALLROOT}/lib/make/Scanrules.mk ${INSTALLROOT}/lib/make/Scanrules.mk.old 2>/dev/null || true; ${STDCP} Scanrules.mk ${INSTALLROOT}/lib/make/Scanrules.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/Scanrules.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/Scanrules.mk generated
 make ${INSTALLROOT}/lib/make/S.mk
 make S.mk
 done S.mk
 exec - test '' = 'S.mk' || ${STDCMP} 2>/dev/null -s S.mk ${INSTALLROOT}/lib/make/S.mk || { ${STDMV} ${INSTALLROOT}/lib/make/S.mk ${INSTALLROOT}/lib/make/S.mk.old 2>/dev/null || true; ${STDCP} S.mk ${INSTALLROOT}/lib/make/S.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/S.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/S.mk generated
 make ${INSTALLROOT}/lib/make/SYSTEM.mk
 make SYSTEM.mk
 done SYSTEM.mk
 exec - test '' = 'SYSTEM.mk' || ${STDCMP} 2>/dev/null -s SYSTEM.mk ${INSTALLROOT}/lib/make/SYSTEM.mk || { ${STDMV} ${INSTALLROOT}/lib/make/SYSTEM.mk ${INSTALLROOT}/lib/make/SYSTEM.mk.old 2>/dev/null || true; ${STDCP} SYSTEM.mk ${INSTALLROOT}/lib/make/SYSTEM.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/SYSTEM.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/SYSTEM.mk generated
 make ${INSTALLROOT}/lib/make/TABLE.mk
 make TABLE.mk
 done TABLE.mk
 exec - test '' = 'TABLE.mk' || ${STDCMP} 2>/dev/null -s TABLE.mk ${INSTALLROOT}/lib/make/TABLE.mk || { ${STDMV} ${INSTALLROOT}/lib/make/TABLE.mk ${INSTALLROOT}/lib/make/TABLE.mk.old 2>/dev/null || true; ${STDCP} TABLE.mk ${INSTALLROOT}/lib/make/TABLE.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/TABLE.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/TABLE.mk generated
 make ${INSTALLROOT}/lib/make/debug.mk
 make debug.mk
 done debug.mk
 exec - test '' = 'debug.mk' || ${STDCMP} 2>/dev/null -s debug.mk ${INSTALLROOT}/lib/make/debug.mk || { ${STDMV} ${INSTALLROOT}/lib/make/debug.mk ${INSTALLROOT}/lib/make/debug.mk.old 2>/dev/null || true; ${STDCP} debug.mk ${INSTALLROOT}/lib/make/debug.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/debug.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/debug.mk generated
 make ${INSTALLROOT}/lib/make/mkservice.mk
 make mkservice.mk
 done mkservice.mk
 exec - test '' = 'mkservice.mk' || ${STDCMP} 2>/dev/null -s mkservice.mk ${INSTALLROOT}/lib/make/mkservice.mk || { ${STDMV} ${INSTALLROOT}/lib/make/mkservice.mk ${INSTALLROOT}/lib/make/mkservice.mk.old 2>/dev/null || true; ${STDCP} mkservice.mk ${INSTALLROOT}/lib/make/mkservice.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/mkservice.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/mkservice.mk generated
 make ${INSTALLROOT}/lib/make/yacc.mk
 make yacc.mk
 done yacc.mk
 exec - test '' = 'yacc.mk' || ${STDCMP} 2>/dev/null -s yacc.mk ${INSTALLROOT}/lib/make/yacc.mk || { ${STDMV} ${INSTALLROOT}/lib/make/yacc.mk ${INSTALLROOT}/lib/make/yacc.mk.old 2>/dev/null || true; ${STDCP} yacc.mk ${INSTALLROOT}/lib/make/yacc.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/yacc.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/yacc.mk generated
 make ${INSTALLROOT}/lib/make/rules-win32.mk
 make rules-win32.mk
 done rules-win32.mk
 exec - test '' = 'rules-win32.mk' || ${STDCMP} 2>/dev/null -s rules-win32.mk ${INSTALLROOT}/lib/make/rules-win32.mk || { ${STDMV} ${INSTALLROOT}/lib/make/rules-win32.mk ${INSTALLROOT}/lib/make/rules-win32.mk.old 2>/dev/null || true; ${STDCP} rules-win32.mk ${INSTALLROOT}/lib/make/rules-win32.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/rules-win32.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/rules-win32.mk generated
 make ${INSTALLROOT}/lib/make/pkg-tcl.mk
 make pkg-tcl.mk
 done pkg-tcl.mk
 exec - test '' = 'pkg-tcl.mk' || ${STDCMP} 2>/dev/null -s pkg-tcl.mk ${INSTALLROOT}/lib/make/pkg-tcl.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-tcl.mk ${INSTALLROOT}/lib/make/pkg-tcl.mk.old 2>/dev/null || true; ${STDCP} pkg-tcl.mk ${INSTALLROOT}/lib/make/pkg-tcl.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/pkg-tcl.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/pkg-tcl.mk generated
 make ${INSTALLROOT}/lib/make/pkg-X11.mk
 make pkg-X11.mk
 done pkg-X11.mk
 exec - test '' = 'pkg-X11.mk' || ${STDCMP} 2>/dev/null -s pkg-X11.mk ${INSTALLROOT}/lib/make/pkg-X11.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-X11.mk ${INSTALLROOT}/lib/make/pkg-X11.mk.old 2>/dev/null || true; ${STDCP} pkg-X11.mk ${INSTALLROOT}/lib/make/pkg-X11.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/pkg-X11.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/pkg-X11.mk generated
 make ${INSTALLROOT}/lib/make/pkg-freetype.mk
 make pkg-freetype.mk
 done pkg-freetype.mk
 exec - test '' = 'pkg-freetype.mk' || ${STDCMP} 2>/dev/null -s pkg-freetype.mk ${INSTALLROOT}/lib/make/pkg-freetype.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-freetype.mk ${INSTALLROOT}/lib/make/pkg-freetype.mk.old 2>/dev/null || true; ${STDCP} pkg-freetype.mk ${INSTALLROOT}/lib/make/pkg-freetype.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/pkg-freetype.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/pkg-freetype.mk generated
 make ${INSTALLROOT}/lib/make/pkg-cobol.mk
 make pkg-cobol.mk
 done pkg-cobol.mk
 exec - test '' = 'pkg-cobol.mk' || ${STDCMP} 2>/dev/null -s pkg-cobol.mk ${INSTALLROOT}/lib/make/pkg-cobol.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-cobol.mk ${INSTALLROOT}/lib/make/pkg-cobol.mk.old 2>/dev/null || true; ${STDCP} pkg-cobol.mk ${INSTALLROOT}/lib/make/pkg-cobol.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/pkg-cobol.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/pkg-cobol.mk generated
 make ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk
 make pkg-cobol-cobc.mk
 done pkg-cobol-cobc.mk
 exec - test '' = 'pkg-cobol-cobc.mk' || ${STDCMP} 2>/dev/null -s pkg-cobol-cobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk.old 2>/dev/null || true; ${STDCP} pkg-cobol-cobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/pkg-cobol-cobc.mk generated
 make ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk
 make pkg-cobol-mfcobc.mk
 done pkg-cobol-mfcobc.mk
 exec - test '' = 'pkg-cobol-mfcobc.mk' || ${STDCMP} 2>/dev/null -s pkg-cobol-mfcobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk || { ${STDMV} ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk.old 2>/dev/null || true; ${STDCP} pkg-cobol-mfcobc.mk ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/pkg-cobol-mfcobc.mk generated
 make ${INSTALLROOT}/lib/make/ppcc
 prev ppcc
 exec - test '' = 'ppcc' || ${STDCMP} 2>/dev/null -s ppcc ${INSTALLROOT}/lib/make/ppcc || { ${STDMV} ${INSTALLROOT}/lib/make/ppcc ${INSTALLROOT}/lib/make/ppcc.old 2>/dev/null || true; ${STDCP} ppcc ${INSTALLROOT}/lib/make/ppcc  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/ppcc) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/ppcc generated
 make ${INSTALLROOT}/lib/make
 exec - if	silent test ! -d ${INSTALLROOT}/lib/make
@@ -609,6 +632,7 @@ prev Makerules.mk
 exec - ${NMAKE} ${NMAKEFLAGS} --base --compile --file=Makerules.mk
 done Makerules.mo generated
 exec - test '' = 'Makerules.mo' || ${STDCMP} 2>/dev/null -s Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo || { ${STDMV} ${INSTALLROOT}/lib/make/makerules.mo ${INSTALLROOT}/lib/make/makerules.mo.old 2>/dev/null || true; ${STDCP} Makerules.mo ${INSTALLROOT}/lib/make/makerules.mo  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/make/makerules.mo) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/make/makerules.mo virtual
 done install virtual
 make test

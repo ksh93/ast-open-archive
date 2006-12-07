@@ -133,6 +133,7 @@
 #   if _PACKAGE_ast
 #	include <ast.h>
 #	include <ls.h>
+#	include <tm.h>
 #   else
 #	include <sys/types.h>
 #	include <unistd.h>
@@ -782,7 +783,7 @@ void copyDatePermissionsAndOwner ( Char *srcName, Char *dstName )
    ERROR_IF_NOT_ZERO ( retVal );
    */
 #if _PACKAGE_ast
-   retVal = touch ( dstName, statBuf.st_atime, statBuf.st_mtime );
+   retVal = touch ( dstName, statBuf.st_atime, statBuf.st_mtime, 0 );
 #else
    retVal = utime ( dstName, &uTimBuf );
 #endif

@@ -158,4 +158,6 @@ typedef struct Cxtable_s
 	unsigned char		precedence[CX_INTERNALS];
 } Cxtable_t;
 
+extern int		cxinitmap(Cxmap_t*, Cxdisc_t*);
+
 #endif

@@ -86,6 +86,7 @@ static void vprint(Huff_t*, int);
 static char *outname(char*);
 static const char suffix[] = ".z";
 
+int
 main(int argc, register char *argv[])
 {
 	static char command[] = "pack";

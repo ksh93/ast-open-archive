@@ -28,6 +28,7 @@
 #include "3d.h"
 
 #undef	gethostname
+#undef	FSYNC
 
 #include <ctype.h>
 

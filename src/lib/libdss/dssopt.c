@@ -352,9 +352,7 @@ dssoptlib(Sfio_t* sp, Dsslib_t* lib, Dssdisc_t* disc)
 	{
 		sfprintf(sp, "[+TYPES]{\n");
 		for (i = 0; lib->types[i].name; i++)
-			if (optout(sp, lib->types[i].name, lib->types[i].base ? lib->types[i].base->name : (const char*)0, NiL, lib->types[i].description, lib->types[i].member ? "This structure type has the following members:" : (char*)0))
-				return -1;
-			else if (lib->types[i].member && optmem(sp, &lib->types[i]))
+			if (opttype(sp, &lib->types[i], 1))
 				return -1;
 		sfprintf(sp, "}\n");
 	}

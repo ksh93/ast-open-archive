@@ -1,10 +1,10 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the ast package               *
-*                  Copyright (c) 1989-2005 AT&T Corp.                  *
+*           Copyright (c) 1989-2006 AT&T Knowledge Ventures            *
 *                      and is licensed under the                       *
 *                  Common Public License, Version 1.0                  *
-*                            by AT&T Corp.                             *
+*                      by AT&T Knowledge Ventures                      *
 *                                                                      *
 *                A copy of the License is available at                 *
 *            http://www.opensource.org/licenses/cpl1.0.txt             *
@@ -84,7 +84,8 @@ cmdopen(char** argv, int argmax, int size, const char* argpat, int flags)
 	if (size <= 0 || size > x)
 		size = x;
 	sh = pathshell();
-	m = n + (argc + 2) * sizeof(char**) + strlen(sh) + 2;
+	m = n + (argc + 4) * sizeof(char**) + strlen(sh) + 1;
+	m = roundof(m, sizeof(char**));
 	if (size < m)
 		error(3, "size must be at least %d", m);
 	if ((m = x / 10) > 2048)

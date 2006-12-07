@@ -63,26 +63,26 @@ char* stamp2version(list, t)
 	return (memdup(buf, strlen(buf)+1));
 }
 
-locking(fd)
+int locking(fd)
 	Sfio_t*	fd;
 {
 	return (0);
 }
 
 
-unlocking(fd)
+int unlocking(fd)
 	Sfio_t*	fd;
 {
 	return (0);
 }
 
-sfmark(sf)
+int sfmark(sf)
 {
 	return (0);
 }
 
 
-rollback(sf)
+int rollback(sf)
 {
 	return (0);
 }
@@ -234,7 +234,7 @@ char* getdomainbyid(i)
  *		2 : checkout is prohibited 
  */
 
-permission(st, uid, gid)
+int permission(st, uid, gid)
 	register struct stat* 	st;
 	register uid_t		uid;
 	register uid_t		gid;

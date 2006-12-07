@@ -5961,6 +5961,7 @@ html(register unsigned char* s, Sfio_t* op)
 	sfputc(op, '\n');
 }
 
+int
 main(int argc, char** argv)
 {
 	register int		n;

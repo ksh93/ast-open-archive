@@ -26,6 +26,7 @@
  */
 
 #include "make.h"
+#include "options.h"
 
 /*
  * embedded spaces in file name wreak havoc

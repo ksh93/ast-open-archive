@@ -484,6 +484,7 @@ describe(register Sfio_t* dp, char* desc, register Sfio_t* fp, char* file, int v
 		error(1, "%s: %I*d bytes ignored at %I*d", file, sizeof(skip), skip, sizeof(offset), offset);
 }
 
+int
 main(int argc, char** argv)
 {
 	register char*	file;

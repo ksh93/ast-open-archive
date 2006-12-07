@@ -975,6 +975,7 @@ scan(Sfio_t* sp, Keyword_t* key, unsigned long flags)
 	return 0;
 }
 
+int
 main(int argc, char** argv)
 {
 	register char*		name;

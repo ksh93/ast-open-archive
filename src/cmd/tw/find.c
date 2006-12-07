@@ -47,7 +47,7 @@
  */
 
 static const char usage1[] =
-"[-1p1?@(#)$Id: find (AT&T Research) 2006-09-27 $\n]"
+"[-1p1?@(#)$Id: find (AT&T Research) 2006-12-07 $\n]"
 USAGE_LICENSE
 "[+NAME?find - find files]"
 "[+DESCRIPTION?\bfind\b recursively descends the directory hierarchy for each"
@@ -1051,13 +1051,16 @@ compile(char** argv, register struct Node* np)
 					error(3, "incomplete statement");
 				if (streq(b, ";"))
 					break;
-				if (streq(b, "+"))
-				{
-					i = 0;
-					break;
-				}
 				if (strmatch(b, "*{}*"))
+				{
+					if (streq(b, "{}") && (b = argv[opt_info.index]) && (streq(b, ";") || streq(b, "+") && !(i = 0)))
+					{
+						argv[opt_info.index - 1] = 0;
+						opt_info.index++;
+						break;
+					}
 					k |= CMD_INSERT;
+				}
 			}
 			argv[opt_info.index - 1] = 0;
 			if (k & CMD_INSERT)
@@ -1597,6 +1600,7 @@ order(register Ftw_t* f1, register Ftw_t* f2)
 	return n;
 }
 
+int
 main(int argc, char** argv)
 {
 	register char*			cp;

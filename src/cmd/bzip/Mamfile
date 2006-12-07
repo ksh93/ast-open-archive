@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -61,11 +61,13 @@ done ${PACKAGE_ast_INCLUDE}/prototyped.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_getopt.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/getopt.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ls.h implicit
-make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
-done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
+make ${PACKAGE_ast_INCLUDE}/tm.h implicit
+make ${PACKAGE_ast_INCLUDE}/times.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_time.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_time.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ast.h implicit
+make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 make ${PACKAGE_ast_INCLUDE}/regex.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
@@ -77,7 +79,8 @@ done ${PACKAGE_ast_INCLUDE}/ast_botch.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_limits.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_limits.h dontcare
 make ${PACKAGE_ast_INCLUDE}/ast_fcntl.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_fs.h dontcare
 done ${PACKAGE_ast_INCLUDE}/ast_fcntl.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_getopt.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast_sys.h implicit
@@ -89,12 +92,6 @@ done ${PACKAGE_ast_INCLUDE}/ast_lib.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_std.h dontcare
-prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
-done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
-make ${PACKAGE_ast_INCLUDE}/ast.h implicit
-make ${PACKAGE_ast_INCLUDE}/vmalloc.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_common.h implicit
-prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
 done ${PACKAGE_ast_INCLUDE}/vmalloc.h dontcare
 make ${PACKAGE_ast_INCLUDE}/sfio.h implicit
 make ${PACKAGE_ast_INCLUDE}/sfio_s.h implicit
@@ -108,6 +105,19 @@ prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_version.h dontcare
 prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/times.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/tm.h dontcare
+make ${PACKAGE_ast_INCLUDE}/ls.h implicit
+make ${PACKAGE_ast_INCLUDE}/ast_mode.h implicit
+done ${PACKAGE_ast_INCLUDE}/ast_mode.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast_fs.h implicit
+prev ${PACKAGE_ast_INCLUDE}/ast_std.h implicit
+prev ${PACKAGE_ast_INCLUDE}/prototyped.h implicit
+done ${PACKAGE_ast_INCLUDE}/ls.h dontcare
+prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 prev ${PACKAGE_ast_INCLUDE}/endian.h implicit
 make ${PACKAGE_ast_INCLUDE}/stdio.h implicit
@@ -128,9 +138,11 @@ meta bzip2.o %.c>%.o bzip2.c bzip2
 prev bzip2.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c bzip2.c
 done bzip2.o generated
-bind -lbz
-bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o bzip2 bzip2.o ${mam_libbz} ${mam_libast}
+make ${mam_libbz} archive
+done ${mam_libbz} dontcare virtual
+make ${mam_libast} archive
+done ${mam_libast} dontcare virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o bzip2 bzip2.o
 done bzip2 generated
 make bzip
 prev bzip2
@@ -169,6 +181,7 @@ make ${INSTALLROOT}/bin/bzip2
 prev ${INSTALLROOT}/bin
 prev bzip2
 exec - test '' = 'bzip2' || ${STDCMP} 2>/dev/null -s bzip2 ${INSTALLROOT}/bin/bzip2 || { ${STDMV} ${INSTALLROOT}/bin/bzip2 ${INSTALLROOT}/bin/bzip2.old 2>/dev/null || true; ${STDCP} bzip2 ${INSTALLROOT}/bin/bzip2  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/bzip2) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/bzip2 generated
 make ${INSTALLROOT}/man/man1
 exec - if	silent test ! -d ${INSTALLROOT}/man/man1
@@ -180,6 +193,7 @@ prev ${INSTALLROOT}/man/man1
 make bzip2.1
 done bzip2.1
 exec - test '' = 'bzip2.1' || ${STDCMP} 2>/dev/null -s bzip2.1 ${INSTALLROOT}/man/man1/bzip2.1 || { ${STDMV} ${INSTALLROOT}/man/man1/bzip2.1 ${INSTALLROOT}/man/man1/bzip2.1.old 2>/dev/null || true; ${STDCP} bzip2.1 ${INSTALLROOT}/man/man1/bzip2.1  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/man/man1/bzip2.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/bzip2.1 generated
 make ${INSTALLROOT}/bin/bzip
 prev ${INSTALLROOT}/bin/bzip2

@@ -141,6 +141,7 @@ flatten(const char* path, Sfio_t* ip, Sfio_t* op)
 	}
 }
 
+int
 main(int argc, char** argv)
 {
 	register char*		s;

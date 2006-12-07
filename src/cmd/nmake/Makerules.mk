@@ -16,7 +16,7 @@ rules
  *	the flags for command $(XYZ) are $(XYZFLAGS)
  */
 
-.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-11-23 $"
+.ID. = "@(#)$Id: Makerules (AT&T Research) 2006-12-07 $"
 
 .RULESVERSION. := $(MAKEVERSION:@/.* //:/-//G)
 
@@ -4617,6 +4617,9 @@ end
 	end
 	LICENSEFILES := $(LICENSEINFO)
 	if "$(-mam:N=*,port*)"
+		for T $("<VARIABLES>":L=CC.+([[:upper:].]))
+			$(T) :=
+		end
 		CC.DEBUG = ${mam_cc_DEBUG}
 		CC.DIALECT =
 		CC.DLL = ${mam_cc_DLL}

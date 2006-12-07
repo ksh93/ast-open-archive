@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -205,6 +205,7 @@ prev ${INSTALLROOT}/man/man3
 make vdelta.3
 done vdelta.3
 exec - test '' = 'vdelta.3' || ${STDCMP} 2>/dev/null -s vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3 || { ${STDMV} ${INSTALLROOT}/man/man3/vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3.old 2>/dev/null || true; ${STDCP} vdelta.3 ${INSTALLROOT}/man/man3/vdelta.3  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/man/man3/vdelta.3) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man3/vdelta.3 generated
 make ${INSTALLROOT}/lib/lib
 exec - if	silent test ! -d ${INSTALLROOT}/lib/lib
@@ -215,6 +216,7 @@ make ${INSTALLROOT}/lib/lib/vdelta
 prev ${INSTALLROOT}/lib/lib
 prev vdelta.req
 exec - test '' = 'vdelta.req' || ${STDCMP} 2>/dev/null -s vdelta.req ${INSTALLROOT}/lib/lib/vdelta || { ${STDMV} ${INSTALLROOT}/lib/lib/vdelta ${INSTALLROOT}/lib/lib/vdelta.old 2>/dev/null || true; ${STDCP} vdelta.req ${INSTALLROOT}/lib/lib/vdelta  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/lib/vdelta) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/vdelta generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -179,6 +179,7 @@ make ${INSTALLROOT}/lib/lib/mam
 prev ${INSTALLROOT}/lib/lib
 prev mam.req
 exec - test '' = 'mam.req' || ${STDCMP} 2>/dev/null -s mam.req ${INSTALLROOT}/lib/lib/mam || { ${STDMV} ${INSTALLROOT}/lib/lib/mam ${INSTALLROOT}/lib/lib/mam.old 2>/dev/null || true; ${STDCP} mam.req ${INSTALLROOT}/lib/lib/mam  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/lib/mam) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/mam generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

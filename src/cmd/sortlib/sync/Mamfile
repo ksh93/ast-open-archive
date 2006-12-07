@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -184,6 +184,7 @@ prev ${PACKAGE_ast_INCLUDE}/error.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
 done ssexit.h
 exec - test '' = 'ssexit.h' || ${STDCMP} 2>/dev/null -s ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h || { ${STDMV} ${PACKAGE_ast_INCLUDE}/ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h.old 2>/dev/null || true; ${STDCP} ssexit.h ${PACKAGE_ast_INCLUDE}/ssexit.h  		    		    ;}
+exec - (ranlib ${PACKAGE_ast_INCLUDE}/ssexit.h) >/dev/null 2>&1 || true
 done ${PACKAGE_ast_INCLUDE}/ssexit.h generated
 done install virtual
 make test

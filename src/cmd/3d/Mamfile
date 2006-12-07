@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -79,8 +79,9 @@ meta FEATURE/syslib features/%>FEATURE/% features/syslib syslib
 make features/syslib
 done features/syslib
 prev 3d.req
-bind -ldl dontcare
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run features/syslib
+make ${mam_libdl}
+done ${mam_libdl} dontcare virtual
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -L${INSTALLROOT}/lib -last : run features/syslib
 done FEATURE/syslib dontcare generated
 make FEATURE/syscall implicit
 meta FEATURE/syscall features/%.sh>FEATURE/% features/syscall.sh syscall
@@ -89,7 +90,8 @@ make sys.tab implicit
 done sys.tab
 done features/syscall.sh
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run features/syscall.sh sys.tab
+prev ${mam_libdl}
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -L${INSTALLROOT}/lib -last : run features/syscall.sh sys.tab
 done FEATURE/syscall dontcare generated
 make FEATURE/peek implicit
 meta FEATURE/peek features/%.c>FEATURE/% features/peek.c peek
@@ -106,7 +108,8 @@ make ${PACKAGE_ast_INCLUDE}/ast_tty.h implicit
 done ${PACKAGE_ast_INCLUDE}/ast_tty.h dontcare
 done features/peek.c
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_ast ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run features/peek.c
+prev ${mam_libdl}
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_BLD_ast ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -L${INSTALLROOT}/lib -last : run features/peek.c
 done FEATURE/peek dontcare generated
 make ../../lib/libcs/msg.h implicit
 make ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -332,7 +335,8 @@ meta FEATURE/hack features/%>FEATURE/% ../../lib/libast/features/hack hack
 make ../../lib/libast/features/hack
 done ../../lib/libast/features/hack
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run ../../lib/libast/features/hack
+prev ${mam_libdl}
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -L${INSTALLROOT}/lib -last : run ../../lib/libast/features/hack
 done FEATURE/hack generated
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -420,7 +424,8 @@ meta FEATURE/eaccess features/%>FEATURE/% ../../lib/libast/features/eaccess eacc
 make ../../lib/libast/features/eaccess
 done ../../lib/libast/features/eaccess
 prev 3d.req
-exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref ${mam_cc_L+-L.} -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include ${mam_libdl} -L${INSTALLROOT}/lib -last : run ../../lib/libast/features/eaccess
+prev ${mam_libdl}
+exec - iffe -v -c '${CC} ${mam_cc_FLAGS} ${CCFLAGS}   ${LDFLAGS} '  ref  -I${PACKAGE_ast_INCLUDE} -I${INSTALLROOT}/include -L${INSTALLROOT}/lib -last : run ../../lib/libast/features/eaccess
 done FEATURE/eaccess dontcare generated
 prev ${PACKAGE_ast_INCLUDE}/ls.h implicit
 prev ${PACKAGE_ast_INCLUDE}/ast.h implicit
@@ -1233,6 +1238,7 @@ make ${INSTALLROOT}/lib/lib/3d
 prev ${INSTALLROOT}/lib/lib
 prev 3d.req
 exec - test '' = '3d.req' || ${STDCMP} 2>/dev/null -s 3d.req ${INSTALLROOT}/lib/lib/3d || { ${STDMV} ${INSTALLROOT}/lib/lib/3d ${INSTALLROOT}/lib/lib/3d.old 2>/dev/null || true; ${STDCP} 3d.req ${INSTALLROOT}/lib/lib/3d  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/lib/3d) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/3d generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -1243,6 +1249,7 @@ make ${INSTALLROOT}/bin/3d
 prev ${INSTALLROOT}/bin
 prev 3d
 exec - test '' = '3d' || ${STDCMP} 2>/dev/null -s 3d ${INSTALLROOT}/bin/3d || { ${STDMV} ${INSTALLROOT}/bin/3d ${INSTALLROOT}/bin/3d.old 2>/dev/null || true; ${STDCP} 3d ${INSTALLROOT}/bin/3d  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/3d) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/3d generated
 make ${INSTALLROOT}/man/man1
 exec - if	silent test ! -d ${INSTALLROOT}/man/man1
@@ -1254,14 +1261,17 @@ prev ${INSTALLROOT}/man/man1
 make 2d.1
 done 2d.1
 exec - test '' = '2d.1' || ${STDCMP} 2>/dev/null -s 2d.1 ${INSTALLROOT}/man/man1/2d.1 || { ${STDMV} ${INSTALLROOT}/man/man1/2d.1 ${INSTALLROOT}/man/man1/2d.1.old 2>/dev/null || true; ${STDCP} 2d.1 ${INSTALLROOT}/man/man1/2d.1  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/man/man1/2d.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/2d.1 generated
 make ${INSTALLROOT}/bin/opaque
 prev opaque
 exec - test '' = 'opaque' || ${STDCMP} 2>/dev/null -s opaque ${INSTALLROOT}/bin/opaque || { ${STDMV} ${INSTALLROOT}/bin/opaque ${INSTALLROOT}/bin/opaque.old 2>/dev/null || true; ${STDCP} opaque ${INSTALLROOT}/bin/opaque  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/opaque) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/opaque generated
 make ${INSTALLROOT}/bin/vex
 prev vex
 exec - test '' = 'vex' || ${STDCMP} 2>/dev/null -s vex ${INSTALLROOT}/bin/vex || { ${STDMV} ${INSTALLROOT}/bin/vex ${INSTALLROOT}/bin/vex.old 2>/dev/null || true; ${STDCP} vex ${INSTALLROOT}/bin/vex  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/vex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/vex generated
 make ${INSTALLROOT}/fun
 exec - if	silent test ! -d ${INSTALLROOT}/fun
@@ -1274,6 +1284,7 @@ make _2d
 done _2d
 setv mode -Dmode="+x"
 exec - test '' = '_2d' || ${STDCMP} 2>/dev/null -s _2d ${INSTALLROOT}/fun/_2d || { ${STDMV} ${INSTALLROOT}/fun/_2d ${INSTALLROOT}/fun/_2d.old 2>/dev/null || true; ${STDCP} _2d ${INSTALLROOT}/fun/_2d  		    		   && chmod ugo+x ${INSTALLROOT}/fun/_2d ;}
+exec - (ranlib ${INSTALLROOT}/fun/_2d) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/fun/_2d generated
 done install virtual
 make test

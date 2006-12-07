@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -311,6 +311,7 @@ make ${INSTALLROOT}/lib/lib/codex
 prev ${INSTALLROOT}/lib/lib
 prev codex.req
 exec - test '' = 'codex.req' || ${STDCMP} 2>/dev/null -s codex.req ${INSTALLROOT}/lib/lib/codex || { ${STDMV} ${INSTALLROOT}/lib/lib/codex ${INSTALLROOT}/lib/lib/codex.old 2>/dev/null || true; ${STDCP} codex.req ${INSTALLROOT}/lib/lib/codex  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/lib/lib/codex) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/lib/lib/codex generated
 make ${PACKAGE_ast_INCLUDE}
 exec - if	silent test ! -d ${PACKAGE_ast_INCLUDE}

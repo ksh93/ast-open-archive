@@ -388,6 +388,7 @@ omit(char* prefix)
 	state.omit = p;
 }
 
+int
 main(int argc, char** argv)
 {
 	register struct list*	p;

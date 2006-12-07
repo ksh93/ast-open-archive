@@ -131,6 +131,7 @@ USAGE_LICENSE
 #include <fts.h>
 #include <glob.h>
 #include <pwd.h>
+#include <tm.h>
 
 #define INDEX			"index.html"
 #define KEEP			".htaccess"
@@ -864,6 +865,7 @@ filter(register State_t* state, register Sfio_t* ip, Sfio_t* op)
 	return lines > 1;
 }
 
+int
 main(int argc, char** argv)
 {
 	register char*		s;

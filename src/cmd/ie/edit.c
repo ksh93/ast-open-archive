@@ -128,6 +128,7 @@ static int compare();
  */
 
 int tty_check(fd)
+int fd;
 {
 	savefd = -1;
 	return(tty_get(fd,(struct termios*)0)==0);
@@ -140,6 +141,7 @@ int tty_check(fd)
  */
 
 int tty_get(fd, tty)
+int fd;
 struct termios *tty;
 {
 	if(fd != savefd)
@@ -176,6 +178,7 @@ struct termios *tty;
 
 /* VARARGS 2 */
 int tty_set(fd, action, tty)
+int fd, action;
 struct termios *tty;
 {
 	if(fd >=0)
@@ -251,7 +254,7 @@ register int fd;
  *
 }*/
 
-tty_raw(fd)
+int tty_raw(fd)
 register int fd;
 {
 #ifdef L_MASK
@@ -346,7 +349,7 @@ register int fd;
  */
 
 #   ifdef TIOCGETC
-tty_alt(fd)
+int tty_alt(fd)
 register int fd;
 {
 	int mask;
@@ -388,7 +391,7 @@ register int fd;
 #	ifndef IEXTEN
 #	    define IEXTEN	0
 #	endif /* IEXTEN */
-tty_alt(fd)
+int tty_alt(fd)
 register int fd;
 {
 	if(editb.e_raw==ALTMODE)
@@ -553,6 +556,7 @@ void ed_crlf()
  */
 
 void	ed_setup(fd)
+int fd;
 {
 	register char *pp;
 	register char *last;
@@ -1096,10 +1100,10 @@ register int c;
 /*
  * copy virtual to physical and return the index for cursor in physical buffer
  */
-ed_virt_to_phys(virt,phys,cur,voff,poff)
+int ed_virt_to_phys(virt,phys,cur,voff,poff)
 genchar *virt;
 genchar *phys;
-int cur;
+int cur, voff, poff;
 {
 	register genchar *sp = virt;
 	register genchar *dp = phys;

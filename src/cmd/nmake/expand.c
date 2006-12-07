@@ -781,6 +781,65 @@ linebreak(Sfio_t* xp, register char* s, char* pfx)
 }
 
 /*
+ * generate list of hash table names matching pat
+ */
+
+static void
+listtab(Sfio_t* xp, Hash_table_t* tab, char* pat, int flags)
+{
+	register Rule_t*	r;
+	register char**		v;
+	char**			w;
+	Hash_position_t*	pos;
+	int			n;
+	Sfio_t*			hit;
+	regex_t			sre;
+
+	if (*pat && (n = regcomp(&sre, pat, REG_SHELL|REG_AUGMENTED|REG_LENIENT|REG_LEFT|REG_RIGHT)))
+	{
+		regfatalpat(&sre, 2, n, pat);
+		return;
+	}
+	hit = sfstropen();
+	if (pos = hashscan(tab, 0))
+	{
+		while (hashnext(pos))
+		{
+			if (*pat && (n = regexec(&sre, pos->bucket->name, 0, NiL, 0)))
+			{
+				if (n != REG_NOMATCH)
+				{
+					regfatal(&sre, 2, n);
+					break;
+				}
+				continue;
+			}
+			putptr(hit, pos->bucket->name);
+		}
+		hashdone(pos);
+	}
+
+	/*
+	 * sort and fill the output buffer
+	 */
+
+	if (sfstrtell(hit) > 0)
+	{
+		n = sfstrtell(hit);
+		putptr(hit, 0);
+		v = (char**)sfstrbase(hit);
+		if (flags & SORT_sort)
+			strsort(v, n / sizeof(v), sortcmpf(flags));
+		sfputr(xp, *v, -1);
+		while (*++v)
+			sfprintf(xp, " %s", *v);
+	}
+	sfstrclose(hit);
+	if (*pat)
+		regfree(&sre);
+}
+
+/*
  * generate list of file base names matching pat from all dirs in s
  */
 
@@ -807,8 +866,8 @@ list(Sfio_t* xp, register char* s, char* pat, int flags)
 		return;
 	}
 	ignorecase = 0;
-	vec = sfstropen();
 	hit = sfstropen();
+	vec = sfstropen();
 
 	/*
 	 * generate and bind (scan) the ordered dir list
@@ -3912,7 +3971,27 @@ expandops(Sfio_t* xp, char* v, char* ed, int del, int exp)
 					n |= SORT_sort|SORT_version;
 				if (sep & HAT)
 					n |= SORT_force;
-				list(xp, x, val, n);
+				if (x[0] == '<' && x[strlen(x)-1] == '>')
+					switch (x[1])
+					{
+					case 'F':
+					case 'f':
+						listtab(xp, table.file, val, n);
+						break;
+					case 'R':
+					case 'r':
+						listtab(xp, table.rule, val, n);
+						break;
+					case 'V':
+					case 'v':
+						listtab(xp, table.var, val, n);
+						break;
+					default:
+						error(2, "%s: unknown table", x);
+						return;
+					}
+				else
+					list(xp, x, val, n);
 				continue;
 			case 'M':
 				if (n = regcomp(&re, val, REG_AUGMENTED|REG_LENIENT|REG_NOSUB|REG_NULL))

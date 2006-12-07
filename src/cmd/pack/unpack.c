@@ -82,6 +82,7 @@ static const char unpack_see_also[] =
 static char *inname(char*);
 static const char suffix[] = ".z";
 
+int
 main(int argc, char *argv[])
 {
 	register Huff_t	*hp;

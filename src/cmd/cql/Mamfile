@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -224,13 +224,7 @@ meta hix.o %.c>%.o hix.c hix
 prev hix.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DDEBUG -c hix.c
 done hix.o generated
-bind -lcdb
-bind -ldll
-bind -lexpr
-bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o cql cql.o decl.o expr.o file.o hix.o ${mam_libcdb} ${mam_libdll} ${mam_libexpr} ${mam_libast}
-done cql generated
-make cdb
+make cdb archive
 make cdb.o
 make cdb.c
 prev ${PACKAGE_ast_INCLUDE}/error.h implicit
@@ -240,8 +234,21 @@ meta cdb.o %.c>%.o cdb.c cdb
 prev cdb.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1991-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?cql]"\" -c cdb.c
 done cdb.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o cdb cdb.o ${mam_libcdb} ${mam_libdll} ${mam_libast}
+prev cdb archive
+bind -lcdb
+make ${mam_libdll} archive
+done ${mam_libdll} dontcare virtual
+make ${mam_libast} archive
+done ${mam_libast} dontcare virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.}  -o cdb cdb.o ${mam_libcdb}
 done cdb generated
+prev ${mam_libdll} archive
+make ${mam_libexpr} archive
+done ${mam_libexpr} dontcare virtual
+prev ${mam_libast} archive
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L.}  -o cql cql.o decl.o expr.o file.o hix.o ${mam_libcdb}
+done cql generated
+prev cdb archive
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
 exec - then	mkdir -p ${INSTALLROOT}/bin
@@ -251,6 +258,7 @@ make ${INSTALLROOT}/bin/cql
 prev ${INSTALLROOT}/bin
 prev cql
 exec - test '' = 'cql' || ${STDCMP} 2>/dev/null -s cql ${INSTALLROOT}/bin/cql || { ${STDMV} ${INSTALLROOT}/bin/cql ${INSTALLROOT}/bin/cql.old 2>/dev/null || true; ${STDCP} cql ${INSTALLROOT}/bin/cql  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/cql) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/cql generated
 make ${INSTALLROOT}/man/man1
 exec - if	silent test ! -d ${INSTALLROOT}/man/man1
@@ -262,22 +270,25 @@ prev ${INSTALLROOT}/man/man1
 make cql.1
 done cql.1
 exec - test '' = 'cql.1' || ${STDCMP} 2>/dev/null -s cql.1 ${INSTALLROOT}/man/man1/cql.1 || { ${STDMV} ${INSTALLROOT}/man/man1/cql.1 ${INSTALLROOT}/man/man1/cql.1.old 2>/dev/null || true; ${STDCP} cql.1 ${INSTALLROOT}/man/man1/cql.1  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/man/man1/cql.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/cql.1 generated
 make ${INSTALLROOT}/bin/cdb
-prev cdb
+prev cdb archive
 exec - test '' = 'cdb' || ${STDCMP} 2>/dev/null -s cdb ${INSTALLROOT}/bin/cdb || { ${STDMV} ${INSTALLROOT}/bin/cdb ${INSTALLROOT}/bin/cdb.old 2>/dev/null || true; ${STDCP} cdb ${INSTALLROOT}/bin/cdb  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/cdb) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/cdb generated
 make ${INSTALLROOT}/man/man1/cdb.1
 make cdb.1
 done cdb.1
 exec - test '' = 'cdb.1' || ${STDCMP} 2>/dev/null -s cdb.1 ${INSTALLROOT}/man/man1/cdb.1 || { ${STDMV} ${INSTALLROOT}/man/man1/cdb.1 ${INSTALLROOT}/man/man1/cdb.1.old 2>/dev/null || true; ${STDCP} cdb.1 ${INSTALLROOT}/man/man1/cdb.1  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/man/man1/cdb.1) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/man/man1/cdb.1 generated
 done install virtual
 make test
 make test.cdb
 make cdb.tst
 done cdb.tst
-prev cdb
+prev cdb archive
 exec - regress  cdb.tst cdb
 done test.cdb virtual
 make test.cql

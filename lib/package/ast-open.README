@@ -1902,6 +1902,7 @@ All recorded changes follow.
 
 :::::::: proto ::::::::
 
+06-12-04 proto.c: add utime() prototype
 06-06-28 proto.tst: add more externalize tests
 06-05-09 proto.c: add --externalize, -x
 06-05-09 proto.tst: add -x tests
@@ -2016,6 +2017,7 @@ All recorded changes follow.
 
 :::::::: 3d ::::::::
 
+06-12-04 3d.h: strmode() bsd conflict tweak
 06-11-23 finally get linux to pass regression tests
 06-11-21 fchdir3d: let chdir do the work if fd matches cached path
 06-09-28 3d.sh: used getconf LIBPATH|LIBPREFIX|LIBSUFFIX -- how novel
@@ -2333,6 +2335,8 @@ All recorded changes follow.
 
 :::::::: nmake ::::::::
 
+06-12-07 expand.c: add $("<table>":L...) for { FILES RULES VARIABLES }
+06-12-07 Makerules.mk: use $("<VARIABLES>":L=CC.+([[:upper:].])) in .MAM.INIT
 06-11-23 Makerules.mk: fix .BIND.-l% for -g only bootstrap
 06-11-15 Makerules.mk: fix :: vs :LIBRARY: ordering bug for .o prereqs
 06-11-11 Makerules.mk: fix :PACKAGE: vs lib64
@@ -4407,6 +4411,8 @@ All recorded changes follow.
 
 :::::::: std ::::::::
 
+06-12-04 du.c: handle > 2Ti in local.pointer
+06-11-23 ps.c: --escape now the default: -E => --noescape
 06-10-11 add sfstruse() error checks
 06-10-11 ls.c: header/trailer must honor state.scale too
 06-09-19 split.c: pathconf() => astconf()
@@ -4678,6 +4684,8 @@ All recorded changes follow.
 
 :::::::: tw ::::::::
 
+06-12-07 find.c,find.tst: fix -exec/-xargs vs {} +
+06-12-07 cmdarg.c,xargs.tst: adjust ARG_MAX logic
 06-10-11 add sfstropen()/sfstruse() error checks
 06-09-27 find.c: peel off leading [-+] from all -perm
 06-07-17 find.tst: fix -perm tests
@@ -4793,6 +4801,11 @@ All recorded changes follow.
 
 :::::::: libast ::::::::
 
+06-12-05 Makefile: finx conftab.c generation CCFLAGS to match build - doh
+06-12-04 sfio/sfcvt.c: fix (int) vs. (long) cast mismatches
+06-12-01 comp/conf.tab: add changes to cover solaris { bin xpg4 xpg6 }
+06-12-01 regex/reginit.c: adjust { SRE KRE } escaped (){}*? inside [...]
+06-12-01 sfio/sfcvt.c: add signbit/copysign tests
 06-11-22 comp/spawnveg.c: fix _real_vfork logic to work with 3d
 06-11-20 features/common: bias _ast_int8_t "long long" before "__int64"
 06-11-20 string/strperm.c: fix X to work with all ops (not just +)
@@ -7236,6 +7249,7 @@ All recorded changes follow.
 
 :::::::: libdss ::::::::
 
+06-12-04 dssopt.c: add full type description to dssopt()
 06-10-11 add sfstruse() error checks
 06-02-14 dss.h: always __EXPORT__ dss_lib()
 06-02-02 dssopt.c,dss-print.h: add \fprint\f default print format

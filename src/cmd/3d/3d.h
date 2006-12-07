@@ -36,10 +36,11 @@
 
 #undef	_BLD_DEBUG
 
+#define _def_map_ast	1
 #define _std_strtol	1
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:hide ftruncate mount readlink sbrk truncate utimes __utimes
+__STDPP__directive pragma pp:hide ftruncate mount readlink sbrk strmode truncate utimes __utimes
 #else
 #undef	ftruncate
 #define ftruncate	______ftruncate
@@ -49,6 +50,8 @@ __STDPP__directive pragma pp:hide ftruncate mount readlink sbrk truncate utimes 
 #define readlink	______readlink
 #undef	sbrk
 #define sbrk		______sbrk
+#undef	strmode
+#define strmode		______strmode
 #undef	truncate
 #define truncate	______truncate
 #undef	utimes
@@ -62,6 +65,12 @@ __STDPP__directive pragma pp:note off64_t
 #endif
 
 #include <ast_std.h>
+
+#if defined(__STDPP__directive) && defined(__STDPP__hide)
+__STDPP__directive pragma pp:nohide strmode
+#else
+#undef	strmode
+#endif
 
 #include "lib_3d.h"
 
@@ -88,12 +97,13 @@ extern char*		strerror();
 #include "msg.h"
 
 #if defined(__STDPP__directive) && defined(__STDPP__hide)
-__STDPP__directive pragma pp:nohide ftruncate mount readlink sbrk truncate utimes __utimes
+__STDPP__directive pragma pp:nohide ftruncate mount readlink sbrk strmode truncate utimes __utimes
 #else
 #undef	ftruncate
 #undef	mount
 #undef	readlink
 #undef	sbrk
+#undef	strmode
 #undef	truncate
 #undef	utimes
 #undef	__utimes
@@ -135,10 +145,14 @@ typedef int (*Fs_get_t)(struct Fs*, char*, const char*, int);
 
 typedef int (*Fs_set_t)(struct Fs*, const char*, int, const char*, int);
 
+#define _3D_LINK_MAX	999		/* for nice ls -l */
+
+#ifndef _3D_LINK_MAX
 #ifdef LINK_MAX
 #define _3D_LINK_MAX	LINK_MAX
 #else
 #define _3D_LINK_MAX	30000
+#endif
 #endif
 
 #define ATTR_MAX	121

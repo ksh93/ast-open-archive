@@ -1,7 +1,7 @@
 /***********************************************************************
 *                                                                      *
 *               This software is part of the bsd package               *
-*Copyright (c) 1978-2005 The Regents of the University of California an*
+*Copyright (c) 1978-2006 The Regents of the University of California an*
 *                                                                      *
 * Redistribution and use in source and binary forms, with or           *
 * without modification, are permitted provided that the following      *
@@ -469,6 +469,8 @@ run_command(char* cmd, int critical, int infd, int outfd, char* a0, char* a1, ch
 	}
 	return 0;
 }
+
+extern pid_t	spawnvp(const char*, char* const*);	/* ast obsolete, but so is mailx, sort of */
 
 int
 start_command(char* cmd, int critical, int infd, int outfd, char* a0, char* a1, char* a2)

@@ -26,7 +26,7 @@
  */
 
 static const char usage[] =
-"[-?\n@(#)$Id: du (AT&T Research) 2002-12-04 $\n]"
+"[-?\n@(#)$Id: du (AT&T Research) 2006-12-04 $\n]"
 USAGE_LICENSE
 "[+NAME?du - summarize disk usage]"
 "[+DESCRIPTION?\bdu\b reports the number of blocks contained in all files"
@@ -113,6 +113,8 @@ du(register Ftw_t* ftw)
 	switch (ftw->info)
 	{
 	case FTW_D:
+		if (!(ftw->local.pointer = newof(0, Count_t, 1, 0)))
+			error(ERROR_SYSTEM|3, "out of space");
 		return 0;
 	case FTW_DC:
 		if (!state.silent)
@@ -128,7 +130,8 @@ du(register Ftw_t* ftw)
 		ftw->status = FTW_SKIP;
 		break;
 	case FTW_DP:
-		n = ftw->local.number;
+		n = *(Count_t*)ftw->local.pointer;
+		free(ftw->local.pointer);
 		break;
 	default:
 		if (ftw->statb.st_nlink > 1)
@@ -159,7 +162,8 @@ du(register Ftw_t* ftw)
 	b = iblocks(&ftw->statb);
 	state.count += b;
 	n += b;
-	ftw->parent->local.number += n;
+	if (ftw->parent->local.pointer)
+		*(Count_t*)ftw->parent->local.pointer += n;
 	if (!state.total && (list || ftw->level <= 0))
 		sfprintf(sfstdout, "%I*u\t%s\n", sizeof(Count_t), BLOCKS(n), ftw->path);
 	return 0;

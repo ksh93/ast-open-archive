@@ -1,4 +1,4 @@
-info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-08-11
+info mam static 00000 1994-07-17 make (AT&T Research) 5.1 2006-12-07
 setv INSTALLROOT ../../..
 setv PACKAGE_ast_INCLUDE ${INSTALLROOT}/include/ast
 setv PACKAGE_ast_LIB ${INSTALLROOT}/lib
@@ -125,8 +125,9 @@ meta ed.o %.c>%.o ed.c ed
 prev ed.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-copyright?Copyright (c) 1995-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?re]"\" -c ed.c
 done ed.o generated
-bind -last
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o ed ed.o ${mam_libast}
+make ${mam_libast} archive
+done ${mam_libast} dontcare virtual
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o ed ed.o
 done ed generated
 make red
 prev ed
@@ -153,8 +154,9 @@ prev grep.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -DUSAGE_LICENSE=\""[-author?Glenn Fowler <gsf@research.att.com>][-author?Doug McIlroy <doug@research.bell-labs.com>][-copyright?Copyright (c) 1995-2006 AT&T Knowledge Ventures][-license?http://www.opensource.org/licenses/cpl1.0.txt][--catalog?re]"\" -c grep.c
 done grep.o generated
+prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o grep grep.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o grep grep.o
 done grep generated
 make egrep
 prev grep
@@ -212,8 +214,9 @@ prev sed3.c
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I. -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c sed3.c
 done sed3.o generated
+prev ${mam_libast} archive
 setv LICENSE -DLICENSE="since=1995,author=gsf+doug"
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o sed sed0.o sed1.o sed2.o sed3.o ${mam_libast}
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o sed sed0.o sed1.o sed2.o sed3.o
 done sed generated
 make ${INSTALLROOT}/bin
 exec - if	silent test ! -d ${INSTALLROOT}/bin
@@ -224,6 +227,7 @@ make ${INSTALLROOT}/bin/ed
 prev ${INSTALLROOT}/bin
 prev ed
 exec - test '' = 'ed' || ${STDCMP} 2>/dev/null -s ed ${INSTALLROOT}/bin/ed || { ${STDMV} ${INSTALLROOT}/bin/ed ${INSTALLROOT}/bin/ed.old 2>/dev/null || true; ${STDCP} ed ${INSTALLROOT}/bin/ed  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/ed) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/ed generated
 make ${INSTALLROOT}/bin/red
 prev ${INSTALLROOT}/bin/ed
@@ -235,6 +239,7 @@ done ${INSTALLROOT}/bin/red generated
 make ${INSTALLROOT}/bin/grep
 prev grep
 exec - test '' = 'grep' || ${STDCMP} 2>/dev/null -s grep ${INSTALLROOT}/bin/grep || { ${STDMV} ${INSTALLROOT}/bin/grep ${INSTALLROOT}/bin/grep.old 2>/dev/null || true; ${STDCP} grep ${INSTALLROOT}/bin/grep  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/grep) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/grep generated
 make ${INSTALLROOT}/bin/egrep
 prev ${INSTALLROOT}/bin/grep
@@ -253,6 +258,7 @@ done ${INSTALLROOT}/bin/fgrep generated
 make ${INSTALLROOT}/bin/sed
 prev sed
 exec - test '' = 'sed' || ${STDCMP} 2>/dev/null -s sed ${INSTALLROOT}/bin/sed || { ${STDMV} ${INSTALLROOT}/bin/sed ${INSTALLROOT}/bin/sed.old 2>/dev/null || true; ${STDCP} sed ${INSTALLROOT}/bin/sed  		    		    ;}
+exec - (ranlib ${INSTALLROOT}/bin/sed) >/dev/null 2>&1 || true
 done ${INSTALLROOT}/bin/sed generated
 done install virtual
 make test
@@ -293,7 +299,8 @@ meta testglob.o %.c>%.o testglob.c testglob
 prev testglob.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testglob.c
 done testglob.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o testglob testglob.o ${mam_libast}
+prev ${mam_libast} archive
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o testglob testglob.o
 done testglob generated
 make testglob.dat
 done testglob.dat
@@ -313,7 +320,8 @@ meta testfmt.o %.c>%.o testfmt.c testfmt
 prev testfmt.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testfmt.c
 done testfmt.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o testfmt testfmt.o ${mam_libast}
+prev ${mam_libast} archive
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o testfmt testfmt.o
 done testfmt generated
 make testfmt.dat
 done testfmt.dat
@@ -335,7 +343,8 @@ meta testfnmatch.o %.c>%.o testfnmatch.c testfnmatch
 prev testfnmatch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testfnmatch.c
 done testfnmatch.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o testfnmatch testfnmatch.o ${mam_libast}
+prev ${mam_libast} archive
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o testfnmatch testfnmatch.o
 done testfnmatch generated
 make testfnmatch.dat
 done testfnmatch.dat
@@ -359,7 +368,8 @@ meta testmatch.o %.c>%.o testmatch.c testmatch
 prev testmatch.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testmatch.c
 done testmatch.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o testmatch testmatch.o ${mam_libast}
+prev ${mam_libast} archive
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o testmatch testmatch.o
 done testmatch generated
 prev testregex.dat
 prev locale.dat
@@ -383,7 +393,8 @@ meta testregex.o %.c>%.o testregex.c testregex
 prev testregex.c
 exec - ${CC} ${mam_cc_FLAGS} ${CCFLAGS} -I${PACKAGE_ast_INCLUDE} -D_PACKAGE_ast -c testregex.c
 done testregex.o generated
-exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS} ${mam_cc_L+-L${INSTALLROOT}/lib} -Wl,-z,origin -Wl,-R,\$ORIGIN/../lib -o testregex testregex.o ${mam_libast}
+prev ${mam_libast} archive
+exec - ${CC} ${CCLDFLAGS} ${mam_cc_FLAGS} ${CCFLAGS} ${LDFLAGS}   -o testregex testregex.o
 done testregex generated
 prev testregex.dat
 prev locale.dat
